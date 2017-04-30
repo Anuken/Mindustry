@@ -39,6 +39,7 @@ public class Moment extends ModuleController<Moment>{
 	public Array<Tile> spawnpoints = new Array<Tile>();
 	
 	public boolean playing = false;
+	public boolean paused = false;
 
 	@Override
 	public void init(){
@@ -55,7 +56,8 @@ public class Moment extends ModuleController<Moment>{
 				"left", Keys.A,
 				"down", Keys.S,
 				"right", Keys.D,
-				"rotate", Keys.R
+				"rotate", Keys.R,
+				"menu", Keys.ESCAPE
 			);
 			
 		Settings.loadAll("io.anuke.moment");
@@ -80,6 +82,7 @@ public class Moment extends ModuleController<Moment>{
 	
 	@Override
 	public void update(){
+		if(!paused)
 		super.update();
 		
 		if(!playing) return;

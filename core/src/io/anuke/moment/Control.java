@@ -245,14 +245,15 @@ public class Control extends RendererModule<Moment>{
 
 	@Override
 	public void update(){
-		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE))
-			Gdx.app.exit();
+		//if(Gdx.input.isKeyJustPressed(Keys.ESCAPE) && Gdx.app.getType() == ApplicationType.Desktop)
+		//	Gdx.app.exit();
 		
 		if(!main.playing){
 			clearScreen();
 			return;
 		}
 		
+		if(!main.paused)
 		Entities.update();
 
 		input();

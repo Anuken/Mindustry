@@ -13,6 +13,7 @@ import io.anuke.moment.world.Tile;
 import io.anuke.moment.world.TileType;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.UGraphics;
+import io.anuke.ucore.core.UInput;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.builders.*;
 import io.anuke.ucore.scene.style.Styles;
@@ -25,7 +26,7 @@ public class UI extends SceneModule<Moment>{
 	Table itemtable;
 	PrefsDialog prefs;
 	KeybindDialog keys;
-	Dialog about;
+	Dialog about, menu;
 
 	BooleanSupplier play = () -> {
 		return main.playing;
@@ -67,6 +68,17 @@ public class UI extends SceneModule<Moment>{
 				Draw.clear();
 			}
 			scene.getBatch().end();
+			
+			if(UInput.keyUp("menu")){
+				if(menu.getScene() != null){
+					menu.hide();
+					main.paused = false;
+				}else{
+					main.paused = true;
+					menu.show(scene);
+				}
+			}
+			
 		}else{
 			
 		}
@@ -93,7 +105,33 @@ public class UI extends SceneModule<Moment>{
 		about = new Dialog("About");
 		about.getContentTable().add("Made by Anuken for the" + "\nGDL Metal Monstrosity jam." + "\nTools used:");
 		about.addCloseButton();
-
+		
+		menu = new Dialog("Paused", "dialog");
+		menu.content().addButton("Back", ()->{
+			menu.hide();
+			main.paused = false;
+		}).width(200);
+		
+		menu.content().row();
+		menu.content().addButton("Back to menu", ()->{
+			new Dialog("Confirm", "dialog"){
+				{
+					text("Are you sure you want to quit?");
+					button("Ok", true);
+					button("Cancel", false);
+				}
+				
+				protected void result(Object object){
+					if(object == Boolean.TRUE){
+						menu.hide();
+						main.paused = false;
+						main.playing = false;
+					}
+				}
+			}.show(scene);
+			
+		}).width(200);
+		
 		build.begin(scene);
 
 		new table(){{
@@ -152,28 +190,40 @@ public class UI extends SceneModule<Moment>{
 						
 						i++;
 						
-						String description = r.result.description();
-						if(r.result.ammo != null){
-							description += "\n[SALMON]Ammo: " + r.result.ammo.name();
-						}
-
 						Table tiptable = new Table();
-						tiptable.background("button");
-						tiptable.add("[PURPLE]" + r.result.name(), 0.75f).left().padBottom(2f);
 						
-						ItemStack[] req = r.requirements;
-						for(ItemStack s : req){
+						Runnable run = ()->{
+							tiptable.clearChildren();
+							
+							String description = r.result.description();
+							if(r.result.ammo != null){
+								description += "\n[SALMON]Ammo: " + r.result.ammo.name();
+							}
+	
+							
+							tiptable.background("button");
+							tiptable.add("[PURPLE]" + r.result.name(), 0.75f).left().padBottom(2f);
+							
+							ItemStack[] req = r.requirements;
+							for(ItemStack s : req){
+								tiptable.row();
+								int amount = Math.min(main.items.get(s.item, 0), s.amount);
+								tiptable.add(
+										(amount >= s.amount ? "[YELLOW]" : "[RED]")
+								+s.item + ": " + amount + " / " +s.amount, 0.5f).left();
+							}
+							
 							tiptable.row();
-							tiptable.add("[YELLOW]" + s.amount + "x " + s.item.name(), 0.5f).left();
-						}
+							tiptable.add().size(10);
+							tiptable.row();
+							tiptable.add("[ORANGE]" + description).left();
+							tiptable.pad(10f);
+						};
 						
-						tiptable.row();
-						tiptable.add().size(10);
-						tiptable.row();
-						tiptable.add("[ORANGE]" + description).left();
-						tiptable.pad(10f);
-
-						Tooltip tip = new Tooltip(tiptable);
+						run.run();
+						
+						Tooltip tip = new Tooltip(tiptable, run);
+						
 						tip.setInstant(true);
 
 						image.addListener(tip);
@@ -184,6 +234,10 @@ public class UI extends SceneModule<Moment>{
 						table.row();
 						table.add().size(size);
 					}
+					
+					//if((int)((float)recipes.size/rows+1) == 2){
+					//	table.row();
+					//}
 					
 					table.setVisible(()->{
 						return button.isChecked();
