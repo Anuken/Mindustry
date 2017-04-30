@@ -88,6 +88,13 @@ public class Control extends RendererModule<Moment>{
 			Draw.circle(e.x, e.y, 3f + e.ifract() * 3f);
 			Draw.clear();
 		});
+		
+		Effect.addDraw("spawn", 23, e -> {
+			Draw.thickness(2f);
+			Draw.color(Hue.mix(Color.DARK_GRAY, Color.SCARLET, e.ifract()));
+			Draw.circle(e.x, e.y, 7f - e.ifract() * 6f);
+			Draw.clear();
+		});
 
 		Effect.addDraw("ind", 100, e -> {
 			Draw.thickness(3f);
@@ -210,10 +217,16 @@ public class Control extends RendererModule<Moment>{
 		return Mathf.scl2(UGraphics.mouseWorldPos().y, TileType.tilesize);
 	}
 
-	boolean validPlace(int x, int y, TileType tile){
+	boolean validPlace(int x, int y, TileType type){
 
 		if(!cursorNear())
 			return false;
+		
+		for(Tile spawn : main.spawnpoints){
+			if(Vector2.dst(x * tilesize, y * tilesize, spawn.worldx(), spawn.worldy()) < main.spawnspace){
+				return false;
+			}
+		}
 
 		for(SolidEntity e : Entities.getNearby(x * tilesize, y * tilesize, tilesize * 2f)){
 			Rectangle.tmp.setSize(e.hitsize);
@@ -223,7 +236,7 @@ public class Control extends RendererModule<Moment>{
 				return false;
 			}
 		}
-		return main.tiles[x][y].block() == TileType.air;
+		return main.tile(x, y).block() == TileType.air;
 	}
 
 	boolean cursorNear(){
@@ -234,7 +247,12 @@ public class Control extends RendererModule<Moment>{
 	public void update(){
 		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE))
 			Gdx.app.exit();
-
+		
+		if(!main.playing){
+			clearScreen();
+			return;
+		}
+		
 		Entities.update();
 
 		input();
@@ -312,11 +330,19 @@ public class Control extends RendererModule<Moment>{
 				vector.set(7, 0).rotate(main.rotation * 90);
 				Draw.line(x, y, x + vector.x, y + vector.y);
 			}
+			
+			Draw.thickness(1f);
+			Draw.color("scarlet");
+			for(Tile spawn : main.spawnpoints){
+				Draw.dashcircle(spawn.worldx(), spawn.worldy(), main.spawnspace);
+			}
 
 			if(valid)
 				Cursors.setHand();
 			else
 				Cursors.restoreCursor();
+			
+			Draw.clear();
 		}
 
 		//block breaking

@@ -22,16 +22,16 @@ public enum TileType{
 		public void draw(Tile tile){
 		}
 	},
-	grass, stone, dirt, iron, coal, dirtblock(true), stoneblock(true), stonewall(true, true){
-		{
-			health = 50;
-		}
-	},
-	ironwall(true, true){
-		{
-			health = 80;
-		}
-	},
+	grass, 
+	stone, 
+	dirt, 
+	iron, 
+	coal, 
+	dirtblock(true),
+	stoneblock(true), 
+	stonewall(true, true){{health = 50;}},
+	ironwall(true, true){{health = 80;}},
+	steelwall(true, true){{health = 110;}},
 	stonedrill(true, true){
 		public void update(Tile tile){
 
@@ -416,7 +416,7 @@ public enum TileType{
 	healturret(true, true, false){
 		{
 			range = 30;
-			reload = 30f;
+			reload = 40f;
 			health = 50;
 		}
 
@@ -447,17 +447,65 @@ public enum TileType{
 				float x = tile.worldx(), y = tile.worldy();
 				float x2 = tile.entity.link.x, y2 = tile.entity.link.y;
 
-				Draw.color(Hue.rgb(138, 244, 138, (MathUtils.sin(Timers.time() / 2f) + 1f) / 15f));
+				Draw.color(Hue.rgb(138, 244, 138, (MathUtils.sin(Timers.time()) + 1f) / 14f));
 				Draw.alpha(0.3f);
 				Draw.thickness(4f);
 				Draw.line(x, y, x2, y2);
 				Draw.thickness(2f);
-				Draw.circle(x2, y2, 2f);
+				Draw.rect("circle", x2, y2, 7f, 7f);
 				Draw.alpha(1f);
 				Draw.thickness(2f);
 				Draw.line(x, y, x2, y2);
 				Draw.thickness(1f);
-				Draw.circle(x2, y2, 1f);
+				Draw.rect("circle", x2, y2, 5f, 5f);
+				Draw.clear();
+			}
+			Draw.rect(name(), tile.worldx(), tile.worldy(), tile.entity.rotation - 90);
+		}
+
+		public String description(){
+			return "Heals nearby tiles.";
+		}
+	},
+	megahealturret(true, true, false){
+		{
+			range = 30;
+			reload = 25f;
+			health = 60;
+		}
+
+		public void update(Tile tile){
+			tile.entity.link = findTileTarget(tile, range);
+
+			if(tile.entity.link != null){
+				tile.entity.rotation = tile.entity.angleTo(tile.entity.link);
+
+				if(Timers.get(tile, reload)){
+					tile.entity.link.health++;
+				}
+			}
+		}
+
+		public void draw(Tile tile){
+			Draw.rect("block", tile.worldx(), tile.worldy());
+		}
+
+		public void drawOver(Tile tile){
+			if(tile.entity.link != null){
+				float x = tile.worldx(), y = tile.worldy();
+				float x2 = tile.entity.link.x, y2 = tile.entity.link.y;
+
+				Draw.color(Hue.rgb(132, 242, 242, (MathUtils.sin(Timers.time()) + 1f) / 13f));
+				Draw.alpha(0.3f);
+				Draw.thickness(4f);
+				Draw.line(x, y, x2, y2);
+				Draw.thickness(2f);
+				Draw.rect("circle", x2, y2, 7f, 7f);
+				Draw.alpha(1f);
+				Draw.thickness(2f);
+				Draw.line(x, y, x2, y2);
+				Draw.thickness(1f);
+				Draw.rect("circle", x2, y2, 5f, 5f);
 				Draw.clear();
 			}
 			Draw.rect(name(), tile.worldx(), tile.worldy(), tile.entity.rotation - 90);
@@ -558,7 +606,8 @@ public enum TileType{
 		Array<SolidEntity> array = Entities.getNearby(tile.worldx(), tile.worldy(), 100);
 
 		for(Entity e : array){
-
+			if(e == tile.entity) continue;
+			
 			if(e instanceof TileEntity && ((TileEntity) e).health < ((TileEntity) e).tile.block().health){
 				float ndst = Vector2.dst(tile.worldx(), tile.worldy(), e.x, e.y);
 				if(ndst < range && (closest == null || ndst < dst)){

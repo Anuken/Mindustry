@@ -15,6 +15,7 @@ import io.anuke.moment.world.TileType;
 import io.anuke.ucore.core.KeyBinds;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.UInput;
+import io.anuke.ucore.entities.Effects;
 import io.anuke.ucore.modules.ModuleController;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timers;
@@ -31,10 +32,13 @@ public class Moment extends ModuleController<Moment>{
 	public float placerange = 60;
 	
 	public int wave = 1;
-	public float wavespace = 2000/100;
+	public float wavespace = 1000;
 	public float wavetime = wavespace;
+	public float spawnspace = 65;
 	public Tile core;
 	public Array<Tile> spawnpoints = new Array<Tile>();
+	
+	public boolean playing = false;
 
 	@Override
 	public void init(){
@@ -78,12 +82,18 @@ public class Moment extends ModuleController<Moment>{
 	public void update(){
 		super.update();
 		
+		if(!playing) return;
+		
 		if(Enemy.amount == 0)
-		wavetime -= delta();
+			wavetime -= delta();
 		
 		if(wavetime < 0 || UInput.keyUp(Keys.F)){
 			runWave();
 		}
+	}
+	
+	public void play(){
+		playing = true;
 	}
 	
 	public void coreDestroyed(){
@@ -126,7 +136,9 @@ public class Moment extends ModuleController<Moment>{
 			Tile tile = spawnpoints.get(point);
 			
 			Timers.run((int)(i/spawnpoints.size)*40f, ()->{
-				new Enemy(point).set(tile.worldx(), tile.worldy()).add();
+				Enemy e = new Enemy(point).set(tile.worldx(), tile.worldy());
+				Effects.effect("spawn", e);
+				e.add();
 			});
 			
 		}
@@ -138,10 +150,6 @@ public class Moment extends ModuleController<Moment>{
 	public Tile tile(int x, int y){
 		if(!Mathf.inBounds(x, y, tiles)) return null;
 		return tiles[x][y];
-	}
-	
-	public Tile spawn(){
-		return tiles[size/2][size-1];
 	}
 	
 	public void addItem(Item item, int amount){
