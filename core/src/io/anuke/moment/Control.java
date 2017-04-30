@@ -2,6 +2,7 @@ package io.anuke.moment;
 
 import static io.anuke.moment.world.TileType.tilesize;
 
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
@@ -11,7 +12,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-import io.anuke.gif.GifRecorder;
 import io.anuke.moment.ai.Pathfind;
 import io.anuke.moment.entities.Enemy;
 import io.anuke.moment.entities.TileEntity;
@@ -29,7 +29,7 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timers;
 
 public class Control extends RendererModule<Moment>{
-	GifRecorder recorder = new GifRecorder(batch);
+	//GifRecorder recorder = new GifRecorder(batch);
 	int rangex = 10, rangey = 10;
 	float breaktime = 0;
 	float breakdur = 50;
@@ -245,8 +245,8 @@ public class Control extends RendererModule<Moment>{
 
 	@Override
 	public void update(){
-		//if(Gdx.input.isKeyJustPressed(Keys.ESCAPE) && Gdx.app.getType() == ApplicationType.Desktop)
-		//	Gdx.app.exit();
+		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE) && Gdx.app.getType() == ApplicationType.Desktop)
+			Gdx.app.exit();
 		
 		if(!main.playing){
 			clearScreen();
@@ -262,7 +262,7 @@ public class Control extends RendererModule<Moment>{
 
 		drawDefault();
 
-		recorder.update();
+		//recorder.update();
 	}
 
 	@Override
@@ -402,7 +402,7 @@ public class Control extends RendererModule<Moment>{
 		buffers.remove("shadow");
 		buffers.add("shadow", (int) (Gdx.graphics.getWidth() / cameraScale), (int) (Gdx.graphics.getHeight() / cameraScale));
 
-		rangex = (int) (width / tilesize / cameraScale);
-		rangey = (int) (height / tilesize / cameraScale);
+		rangex = (int) (width / tilesize / cameraScale/2)+1;
+		rangey = (int) (height / tilesize / cameraScale/2)+1;
 	}
 }

@@ -13,7 +13,7 @@ import io.anuke.ucore.util.Angles;
 
 public class Player extends DestructibleEntity{
 	Vector2 direction = new Vector2();
-	float speed = 2f;
+	float speed = 1f;
 	float rotation;
 	float reload;
 	Weapon weapon = Weapon.blaster;

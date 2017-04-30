@@ -4,6 +4,7 @@ import static io.anuke.moment.world.TileType.tilesize;
 
 import java.util.function.BooleanSupplier;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 
@@ -43,6 +44,12 @@ public class UI extends SceneModule<Moment>{
 		Dialog.closePadR = -1;
 		Dialog.closePadT = 4;
 	}
+	
+	void drawBackground(){
+		//float w = gwidth();
+		//float h = gheight();
+		Draw.rect("player", 0, 0, 100, 100);
+	}
 
 	@Override
 	public void update(){
@@ -80,7 +87,12 @@ public class UI extends SceneModule<Moment>{
 			}
 			
 		}else{
+			scene.getBatch().getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+			scene.getBatch().begin();
 			
+			drawBackground();
+			
+			scene.getBatch().end();
 		}
 		
 		super.update();
@@ -94,11 +106,6 @@ public class UI extends SceneModule<Moment>{
 		prefs.sliderPref("screenshake", "Screen Shake", 4, 0, 12, i -> {
 			return (i / 4f) + "x";
 		});
-
-		/*
-		 * prefs.sliderPref("difficulty", "Difficulty", 1, 0, 3, i->{ return
-		 * (i/3f) + "x"; });
-		 */
 
 		keys = new KeybindDialog();
 
@@ -322,6 +329,14 @@ public class UI extends SceneModule<Moment>{
 			itemtable.background("button");
 
 			get().setVisible(play);
+			
+			Label fps = new Label("");
+			fps.update(()->{
+				fps.setText(Gdx.graphics.getFramesPerSecond() + " FPS");
+			});
+			row();
+			add(fps);
+			
 		}}.end();
 
 		//wave table...

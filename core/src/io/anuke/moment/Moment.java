@@ -70,9 +70,10 @@ public class Moment extends ModuleController<Moment>{
 		
 		generate();
 		
-		items.put(Item.stone, 200);
-		items.put(Item.iron, 200);
-		items.put(Item.steel, 200);
+		items.put(Item.stone, 20);
+		//items.put(Item.stone, 200);
+		//items.put(Item.iron, 200);
+		//items.put(Item.steel, 200);
 		
 		player = new Player().add();
 		

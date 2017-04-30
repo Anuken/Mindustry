@@ -558,7 +558,7 @@ public enum TileType{
 		}
 		
 		//TODO readd
-		//if(tile.entity.shots > 0){
+		if(tile.entity.shots > 0){
 			Enemy enemy = findTarget(tile, range);
 			if(enemy != null){
 				tile.entity.rotation = MathUtils.lerpAngleDeg(tile.entity.rotation, Angles.predictAngle(tile.worldx(), tile.worldy(), enemy.x, enemy.y, enemy.xvelocity, enemy.yvelocity, bullet.speed - 0.1f), 0.2f);
@@ -567,7 +567,7 @@ public enum TileType{
 					tile.entity.shots--;
 				}
 			}
-		//}
+		}
 	}
 	
 	void shoot(Tile tile){
