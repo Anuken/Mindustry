@@ -33,7 +33,7 @@ public class Generator{
 				}
 				
 				if(color == white){
-					block = TileType.dirtblock;
+					block = TileType.stoneblock;
 					
 					
 				}else if(color == blue){

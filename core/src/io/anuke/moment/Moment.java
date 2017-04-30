@@ -4,7 +4,6 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 
-import io.anuke.aabb.Collider;
 import io.anuke.moment.entities.Enemy;
 import io.anuke.moment.entities.Player;
 import io.anuke.moment.resource.Item;
@@ -67,8 +66,7 @@ public class Moment extends ModuleController<Moment>{
 		
 		items.put(Item.stone, 200);
 		items.put(Item.iron, 200);
-		
-		Collider.defaultDrag = 0.2f;
+		items.put(Item.steel, 200);
 		
 		player = new Player().add();
 		

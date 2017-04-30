@@ -11,6 +11,7 @@ public class DesktopLauncher {
 		config.setTitle("Moment");
 		config.setMaximized(true);
 		config.useVsync(false);
+		config.setWindowedMode(800, 600);
 		new Lwjgl3Application(new Moment(), config);
 	}
 }

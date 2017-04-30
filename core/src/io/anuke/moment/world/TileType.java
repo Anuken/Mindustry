@@ -179,7 +179,7 @@ public enum TileType{
 		}
 
 		public String description(){
-			return "Moves Items (faster than a normal conveyor!)";
+			return "Moves Items\nFaster than a normal conveyor";
 		}
 
 		@Override
@@ -273,7 +273,7 @@ public enum TileType{
 	doubleturret(true, true, false){
 		{
 			range = 40;
-			reload = 10f;
+			reload = 13f;
 			bullet = BulletType.stone;
 			ammo = Item.stone;
 			health = 50;
@@ -294,11 +294,19 @@ public enum TileType{
 		public String description(){
 			return "Shoots things.";
 		}
+		
+		@Override
+		void shoot(Tile tile){
+			vector.set(4, -2).rotate(tile.entity.rotation);
+				bullet(tile, tile.entity.rotation);
+			vector.set(4, 2).rotate(tile.entity.rotation);
+				bullet(tile, tile.entity.rotation);
+		}
 	},
 	machineturret(true, true, false){
 		{
 			range = 65;
-			reload = 5f;
+			reload = 7f;
 			bullet = BulletType.iron;
 			ammo = Item.iron;
 			health = 65;
@@ -318,6 +326,91 @@ public enum TileType{
 
 		public String description(){
 			return "Shoots things.";
+		}
+	},
+	flameturret(true, true, false){
+		{
+			range = 30f;
+			reload = 6f;
+			bullet = BulletType.flame;
+			ammo = Item.coal;
+			health = 75;
+		}
+
+		public void update(Tile tile){
+			updateTurret(tile);
+		}
+
+		public void draw(Tile tile){
+			Draw.rect("block", tile.worldx(), tile.worldy());
+		}
+
+		public void drawOver(Tile tile){
+			Draw.rect(name(), tile.worldx(), tile.worldy(), tile.entity.rotation - 90);
+		}
+
+		public String description(){
+			return "Burns things.";
+		}
+	},
+	sniperturret(true, true, false){
+		{
+			range = 100;
+			reload = 60f;
+			bullet = BulletType.sniper;
+			ammo = Item.steel;
+			health = 60;
+		}
+
+		public void update(Tile tile){
+			updateTurret(tile);
+		}
+
+		public void draw(Tile tile){
+			Draw.rect("block", tile.worldx(), tile.worldy());
+		}
+
+		public void drawOver(Tile tile){
+			Draw.rect(name(), tile.worldx(), tile.worldy(), tile.entity.rotation - 90);
+		}
+
+		public String description(){
+			return "Shoots things.";
+		}
+	},
+	shotgunturret(true, true, false){
+		{
+			range = 65;
+			reload = 40f;
+			bullet = BulletType.iron;
+			ammo = Item.iron;
+			health = 70;
+		}
+
+		public void update(Tile tile){
+			updateTurret(tile);
+		}
+
+		public void draw(Tile tile){
+			Draw.rect("block", tile.worldx(), tile.worldy());
+		}
+
+		public void drawOver(Tile tile){
+			Draw.rect(name(), tile.worldx(), tile.worldy(), tile.entity.rotation - 90);
+		}
+
+		public String description(){
+			return "Shoots things.";
+		}
+		
+		@Override
+		void shoot(Tile tile){
+			vector.set(0, 4).setAngle(tile.entity.rotation);
+			for(int i = 0; i < 6; i ++)
+				Timers.run(i, ()->{
+					bullet(tile, tile.entity.rotation + Mathf.range(6));
+				});
+				
 		}
 	},
 	healturret(true, true, false){
@@ -415,24 +508,34 @@ public enum TileType{
 			tile.entity.shots += 20;
 			tile.entity.removeItem(ammo, 1);
 		}
-
-		if(tile.entity.shots > 0){
+		
+		//TODO readd
+		//if(tile.entity.shots > 0){
 			Enemy enemy = findTarget(tile, range);
 			if(enemy != null){
 				tile.entity.rotation = MathUtils.lerpAngleDeg(tile.entity.rotation, Angles.predictAngle(tile.worldx(), tile.worldy(), enemy.x, enemy.y, enemy.xvelocity, enemy.yvelocity, bullet.speed - 0.1f), 0.2f);
 				if(Timers.get(tile, reload)){
-					new Bullet(bullet, tile.entity, tile.worldx(), tile.worldy(), tile.entity.rotation).add();
+					shoot(tile);
 					tile.entity.shots--;
 				}
 			}
-		}
+		//}
+	}
+	
+	void shoot(Tile tile){
+		vector.set(0, 4).setAngle(tile.entity.rotation);
+		new Bullet(bullet, tile.entity, tile.worldx()+vector.x, tile.worldy()+vector.y, tile.entity.rotation).add();
+	}
+	
+	void bullet(Tile tile, float angle){
+		new Bullet(bullet, tile.entity, tile.worldx()+vector.x, tile.worldy()+vector.y, angle).add();
 	}
 
 	Enemy findTarget(Tile tile, float range){
 		Entity closest = null;
 		float dst = 0;
 
-		Array<SolidEntity> array = Entities.getNearby(tile.worldx(), tile.worldy(), 100);
+		Array<SolidEntity> array = Entities.getNearby(tile.worldx(), tile.worldy(), range*2);
 
 		for(Entity e : array){
 
