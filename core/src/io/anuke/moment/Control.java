@@ -404,6 +404,7 @@ public class Control extends RendererModule<Moment>{
 	void drawHealth(DestructibleEntity dest){
 		float len = 3;
 		float offset = 7;
+		
 		Draw.thickness(3f);
 		Draw.color(Color.GRAY);
 		Draw.line(dest.x - len + 1, dest.y - offset, dest.x + len + 1, dest.y - offset);
@@ -411,7 +412,7 @@ public class Control extends RendererModule<Moment>{
 		Draw.color(Color.BLACK);
 		Draw.line(dest.x - len + 1, dest.y - offset, dest.x + len, dest.y - offset);
 		Draw.color(Color.RED);
-		Draw.line(dest.x - len + 1, dest.y - offset, dest.x - len + len * 2 * ((float) dest.health / dest.maxhealth), dest.y - offset);
+		Draw.line(dest.x - len + 1, dest.y - offset, dest.x - len + (int)(len * 2 * ((float) dest.health / dest.maxhealth)), dest.y - offset);
 		Draw.clear();
 	}
 

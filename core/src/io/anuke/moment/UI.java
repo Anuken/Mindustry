@@ -12,9 +12,7 @@ import io.anuke.moment.entities.Enemy;
 import io.anuke.moment.resource.*;
 import io.anuke.moment.world.Tile;
 import io.anuke.moment.world.TileType;
-import io.anuke.ucore.core.Draw;
-import io.anuke.ucore.core.UGraphics;
-import io.anuke.ucore.core.UInput;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.builders.*;
 import io.anuke.ucore.scene.style.Styles;
@@ -107,6 +105,10 @@ public class UI extends SceneModule<Moment>{
 			return (i / 4f) + "x";
 		});
 		
+		prefs.sliderPref("difficulty", "Difficulty", 1, 0, 2, i -> {
+			return i == 0 ? "Easy" : i == 1 ? "Normal" : "Hard";
+		});
+		
 		
 		prefs.checkPref("fps", "Show FPS", false);
 
@@ -116,7 +118,7 @@ public class UI extends SceneModule<Moment>{
 		about.getContentTable().add("Made by Anuken for the" + "\nGDL Metal Monstrosity jam." + "\nTools used:");
 		about.addCloseButton();
 		
-		restart = new Dialog("Your core was destroyed.", "dialog");
+		restart = new Dialog("The core was destroyed.", "dialog");
 		restart.content().add("You lasted until wave [GREEN]" + main.wave + "[].").pad(6);
 		restart.getButtonTable().addButton("Back to menu", ()->{
 			restart.hide();
@@ -348,7 +350,7 @@ public class UI extends SceneModule<Moment>{
 			
 			Label fps = new Label("");
 			fps.update(()->{
-				fps.setText(Gdx.graphics.getFramesPerSecond() + " FPS");
+				fps.setText(Settings.getBool("fps") ? (Gdx.graphics.getFramesPerSecond() + " FPS") : "");
 			});
 			row();
 			add(fps);

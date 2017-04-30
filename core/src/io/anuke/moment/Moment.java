@@ -4,6 +4,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 
+import io.anuke.moment.ai.Pathfind;
 import io.anuke.moment.entities.Enemy;
 import io.anuke.moment.entities.Player;
 import io.anuke.moment.resource.Item;
@@ -35,7 +36,7 @@ public class Moment extends ModuleController<Moment>{
 	
 	public int wave = 1;
 	public float wavespace = 60*60;
-	public float wavetime = wavespace;
+	public float wavetime;
 	public float spawnspace = 65;
 	public Tile core;
 	public Array<Tile> spawnpoints = new Array<Tile>();
@@ -52,7 +53,7 @@ public class Moment extends ModuleController<Moment>{
 	}
 	
 	@Override
-	public void setup(){
+	public void preInit(){
 		KeyBinds.defaults(
 				"up", Keys.W,
 				"left", Keys.A,
@@ -76,6 +77,10 @@ public class Moment extends ModuleController<Moment>{
 		
 		player = new Player();
 		
+	}
+	
+	@Override
+	public void postInit(){
 		restart();
 	}
 	
@@ -95,12 +100,13 @@ public class Moment extends ModuleController<Moment>{
 	}
 	
 	public void play(){
+		wavetime = waveSpacing();
 		playing = true;
 	}
 	
 	public void restart(){
 		wave = 1;
-		wavetime = wavespace;
+		wavetime = waveSpacing();
 		Entities.clear();
 		Enemy.amount = 0;
 		player.add();
@@ -112,10 +118,12 @@ public class Moment extends ModuleController<Moment>{
 		player.y = core.worldy()+10;
 		
 		items.put(Item.stone, 20);
+		
+		if(get(UI.class).about != null)
+		get(UI.class).updateItems();
 	}
 	
 	public void coreDestroyed(){
-		//TODO "you lose" message or something
 		Effects.shake(5, 6);
 		for(int i = 0; i < 16; i ++){
 			Timers.run(i*2, ()->{
@@ -131,7 +139,10 @@ public class Moment extends ModuleController<Moment>{
 	}
 	
 	void generate(){
+		spawnpoints.clear();
+		Pathfind.reset();
 		Generator.generate(tiles, "map");
+		Pathfind.updatePath();
 		core.setBlock(TileType.core);
 		int x = core.x, y = core.y;
 		
@@ -174,7 +185,14 @@ public class Moment extends ModuleController<Moment>{
 		}
 		
 		wave ++;
-		wavetime = wavespace;
+		
+		wavetime = waveSpacing();
+	}
+	
+	public float waveSpacing(){
+		int scale = Settings.getInt("difficulty");
+		float out = (scale == 0 ? 2f : scale == 1f ? 1f : 0.5f);
+		return wavespace*out;
 	}
 	
 	public Tile tile(int x, int y){

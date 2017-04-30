@@ -46,6 +46,10 @@ public class Pathfind{
 		
 	}
 	
+	static public void reset(){
+		paths.clear();
+	}
+	
 	static public void updatePath(){
 		if(paths.size == 0){
 			for(int i = 0; i < Moment.i.spawnpoints.size; i ++){
