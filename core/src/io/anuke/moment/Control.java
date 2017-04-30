@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.moment.ai.Pathfind;
-import io.anuke.moment.entities.Enemy;
+import io.anuke.moment.entities.FlameEnemy;
 import io.anuke.moment.entities.TileEntity;
 import io.anuke.moment.resource.ItemStack;
 import io.anuke.moment.world.Tile;
@@ -89,6 +89,14 @@ public class Control extends RendererModule<Moment>{
 			Draw.clear();
 		});
 		
+		Effect.addDraw("coreexplosion", 13, e -> {
+			Draw.thickness(3f-e.ifract()*2f);
+			Draw.color(Hue.mix(Color.ORANGE, Color.WHITE, e.ifract()));
+			Draw.spikes(e.x, e.y, 5f + e.ifract() * 40f, 6, 6);
+			Draw.circle(e.x, e.y, 4f + e.ifract() * 40f);
+			Draw.clear();
+		});
+		
 		Effect.addDraw("spawn", 23, e -> {
 			Draw.thickness(2f);
 			Draw.color(Hue.mix(Color.DARK_GRAY, Color.SCARLET, e.ifract()));
@@ -102,13 +110,21 @@ public class Control extends RendererModule<Moment>{
 			Draw.circle(e.x, e.y, 3);
 			Draw.clear();
 		});
+		
+		Effect.addDraw("respawn", main.respawntime, e -> {
+			Draw.tcolor(Color.SCARLET);
+			Draw.tscl(0.25f);
+			Draw.text("Respawning in " + (int)((e.lifetime-e.time)/60), e.x, e.y);
+			Draw.tscl(0.5f);
+			Draw.clear();
+		});
 
 		Pathfind.updatePath();
 	}
 
 	public void tryMove(SolidEntity e, float x, float y){
 		e.getBoundingBox(Rectangle.tmp);
-		Rectangle.tmp.setSize(Rectangle.tmp.width * 0.5f);
+		Rectangle.tmp.setSize(4);
 
 		if(!overlaps(Rectangle.tmp, e.x + x, e.y)){
 			e.x += x;
@@ -152,8 +168,9 @@ public class Control extends RendererModule<Moment>{
 			Cursors.restoreCursor();
 		}
 		
+		//TODO
 		if(UInput.keyUp(Keys.G))
-			new Enemy(0).set(main.player.x, main.player.y).add();
+			new FlameEnemy(0).set(main.player.x, main.player.y).add();
 
 		if(UInput.buttonUp(Buttons.LEFT) && main.recipe != null && validPlace(tilex(), tiley(), main.recipe.result) && !get(UI.class).hasMouse()){
 			Tile tile = main.tile(tilex(), tiley());
@@ -257,7 +274,10 @@ public class Control extends RendererModule<Moment>{
 		Entities.update();
 
 		input();
-		camera.position.set(main.player.x, main.player.y, 0f);
+		if(main.core.block() == TileType.core)
+			camera.position.set(main.player.x, main.player.y, 0f);
+		else
+			camera.position.set(main.core.worldx(), main.core.worldy(), 0f);
 		clampCamera(-tilesize / 2f, -tilesize / 2f, main.pixsize - tilesize / 2f, main.pixsize - tilesize / 2f);
 
 		drawDefault();

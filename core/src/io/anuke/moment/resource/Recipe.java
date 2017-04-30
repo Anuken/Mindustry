@@ -14,8 +14,6 @@ public enum Recipe{
 	fastconveyor(distribution, TileType.steelconveyor, stack(Item.steel, 1)),
 	router(distribution, TileType.router, stack(Item.stone, 3)),
 	
-	healturret(defense, TileType.healturret, stack(Item.iron, 30)),
-	megahealturret(defense, TileType.megahealturret, stack(Item.iron, 30), stack(Item.steel, 30)),
 	
 	turret(defense, TileType.turret, stack(Item.stone, 4)),
 	dturret(defense, TileType.doubleturret, stack(Item.stone, 6)),
@@ -23,6 +21,9 @@ public enum Recipe{
 	shotgunturret(defense, TileType.shotgunturret, stack(Item.iron, 10), stack(Item.steel, 8)),
 	flameturret(defense, TileType.flameturret, stack(Item.iron, 12), stack(Item.steel, 12)),
 	sniperturret(defense, TileType.sniperturret, stack(Item.iron, 15), stack(Item.steel, 20)),
+	
+	healturret(defense, TileType.healturret, stack(Item.iron, 30)),
+	megahealturret(defense, TileType.megahealturret, stack(Item.iron, 30), stack(Item.steel, 30)),
 	
 	drill(production, TileType.stonedrill, stack(Item.stone, 5)),
 	irondrill(production, TileType.irondrill, stack(Item.stone, 30)),

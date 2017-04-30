@@ -19,6 +19,9 @@ public class Enemy extends DestructibleEntity{
 	public Entity target;
 	public int spawn;
 	public float reload = 40;
+	public float range = 60;
+	public BulletType bullet = BulletType.small;
+	public float length = 4;
 	
 	public Enemy(int spawn){
 		this.spawn = spawn;
@@ -37,14 +40,20 @@ public class Enemy extends DestructibleEntity{
 		
 		Moment.module(Control.class).tryMove(this, vec.x*delta, vec.y*delta);
 		
-		target = Entities.getClosest(x, y, 60, e->{
+		target = Entities.getClosest(x, y, range, e->{
 			return (e instanceof TileEntity || e instanceof Player);
 		});
 		
 		if(target != null){
 			if(Timers.get(this, reload))
-				new Bullet(BulletType.small, this, x, y, direction.angle()).add();
+				shoot();
+				
 		}
+	}
+	
+	public void shoot(){
+		vector.set(length, 0).rotate(direction.angle());
+		new Bullet(bullet, this, x+vector.x, y+vector.y, direction.angle()).add();
 	}
 	
 	@Override

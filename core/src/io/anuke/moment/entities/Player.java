@@ -9,7 +9,9 @@ import io.anuke.moment.UI;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.UInput;
 import io.anuke.ucore.entities.DestructibleEntity;
+import io.anuke.ucore.entities.Effects;
 import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Timers;
 
 public class Player extends DestructibleEntity{
 	Vector2 direction = new Vector2();
@@ -23,6 +25,20 @@ public class Player extends DestructibleEntity{
 		
 		maxhealth = 100;
 		heal();
+	}
+	
+	@Override
+	public void onDeath(){
+		remove();
+		Effects.effect("explosion", this);
+		Effects.shake(4f, 5f);
+		Effects.effect("respawn", this);
+		
+		Timers.run(Moment.i.respawntime, ()->{
+			set(Moment.i.core.worldx(), Moment.i.core.worldy()+8);
+			heal();
+			add();
+		});
 	}
 	
 	@Override

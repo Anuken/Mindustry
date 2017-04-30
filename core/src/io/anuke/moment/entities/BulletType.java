@@ -34,9 +34,25 @@ public enum BulletType{
 			Draw.clear();
 		}
 	},
+	smallfast(1.6f, 2){
+		Color color = new Color(0x8b5ec9ff);
+		public void draw(Bullet b){
+			Draw.color(color);
+			Draw.rect("bullet", b.x, b.y, b.angle());
+			Draw.clear();
+		}
+	},
 	flame(0.6f, 4){
 		public void draw(Bullet b){
 			Draw.color(Color.YELLOW, Color.SCARLET, b.time/lifetime);
+			float size = 6f-b.time/lifetime*5f;
+			Draw.rect("circle", b.x, b.y, size, size);
+			Draw.clear();
+		}
+	},
+	flameshot(0.5f, 3){
+		public void draw(Bullet b){
+			Draw.color(Color.ORANGE, Color.SCARLET, b.time/lifetime);
 			float size = 6f-b.time/lifetime*5f;
 			Draw.rect("circle", b.x, b.y, size, size);
 			Draw.clear();

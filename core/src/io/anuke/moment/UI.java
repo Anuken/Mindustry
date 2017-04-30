@@ -27,7 +27,7 @@ public class UI extends SceneModule<Moment>{
 	Table itemtable;
 	PrefsDialog prefs;
 	KeybindDialog keys;
-	Dialog about, menu;
+	Dialog about, menu, restart;
 
 	BooleanSupplier play = () -> {
 		return main.playing;
@@ -65,7 +65,7 @@ public class UI extends SceneModule<Moment>{
 					Draw.tscl(1 / 8f);
 					Draw.text(error, tile.worldx(), tile.worldy() + tilesize);
 
-				}else if(tile.block().name().contains("turret")){
+				}else if(tile.block().ammo != null){
 					Draw.tscl(1 / 8f);
 					Draw.tcolor(Color.GREEN);
 					Draw.text("Ammo: " + tile.entity.shots, tile.worldx(), tile.worldy() - tilesize);
@@ -106,12 +106,23 @@ public class UI extends SceneModule<Moment>{
 		prefs.sliderPref("screenshake", "Screen Shake", 4, 0, 12, i -> {
 			return (i / 4f) + "x";
 		});
+		
+		
+		prefs.checkPref("fps", "Show FPS", false);
 
 		keys = new KeybindDialog();
 
 		about = new Dialog("About");
 		about.getContentTable().add("Made by Anuken for the" + "\nGDL Metal Monstrosity jam." + "\nTools used:");
 		about.addCloseButton();
+		
+		restart = new Dialog("Your core was destroyed.", "dialog");
+		restart.content().add("You lasted until wave [GREEN]" + main.wave + "[].").pad(6);
+		restart.getButtonTable().addButton("Back to menu", ()->{
+			restart.hide();
+			main.playing = false;
+			main.restart();
+		});
 		
 		menu = new Dialog("Paused", "dialog");
 		menu.content().addButton("Back", ()->{
@@ -181,6 +192,7 @@ public class UI extends SceneModule<Moment>{
 						ImageButton image = new ImageButton(Draw.region(r.result.name()), "select");
 						
 						image.clicked(()->{
+							if(main.hasItems(r.requirements))
 							main.recipe = r;
 						});
 						
@@ -188,8 +200,12 @@ public class UI extends SceneModule<Moment>{
 						image.getImageCell().size(size);
 						
 						image.update(()->{
-							image.setChecked(main.recipe == r);
-							image.setDisabled(!main.hasItems(r.requirements));
+							
+							boolean has = main.hasItems(r.requirements);
+							image.setDisabled(!has);
+							image.setChecked(main.recipe == r && has);
+							//image.setTouchable(has ? Touchable.enabled : Touchable.disabled);
+							image.getImage().setColor(has ? Color.WHITE : Color.GRAY);
 						});
 						
 						if(i % rows == rows-1)
@@ -400,6 +416,10 @@ public class UI extends SceneModule<Moment>{
 		updateItems();
 
 		build.end();
+	}
+	
+	public void showRestart(){
+		restart.show(scene);
 	}
 
 	public void updateItems(){

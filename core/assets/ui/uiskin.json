@@ -36,7 +36,7 @@ io.anuke.ucore.scene.ui.ImageButton$ImageButtonStyle: {
 	default: {down: button-down, up: button },
 	blue: {down: button-blue-down, up: button-blue },
 	toggle: {checked: button-down, down: button-down, up: button },
-	select: {checked: button-select, down: button-select, up: clear },
+	select: {checked: button-select, up: clear },
 	gray: {down: button-down, up: button-gray, over: button-gray-over, disabled: button},
 	close-window: {up: button, imageUp: icon-close, imageOver: icon-close-over, imageDown: icon-close-down, disabled: button }
 },
@@ -60,7 +60,7 @@ io.anuke.ucore.scene.ui.Window$WindowStyle: {
 	default: {titleFont: default-font, background: window, titleFontColor: orange },
 	resizable: {background: window-resizable, titleFont: default-font, titleFontColor: white },
 	noborder: {background: window-noborder, titleFont: default-font, titleFontColor: white },
-	dialog: {stageBackground: dialogDim, titleFont: default-font, background: window, titleFontColor: white }
+	dialog: {stageBackground: dialogDim, titleFont: default-font, background: window, titleFontColor: orange }
 },
 io.anuke.ucore.scene.ui.KeybindDialog$KeybindDialogStyle: {
 	default: {keyColor: red, keyNameColor: white},
@@ -84,7 +84,7 @@ io.anuke.ucore.scene.ui.TextField$TextFieldStyle: {
 	small: {font: default-font, fontColor: white, disabledFontColor: grey, selection: selection, background: textfield, cursor: cursor, messageFont: default-font, messageFontColor: grey }
 },
 io.anuke.ucore.scene.ui.CheckBox$CheckBoxStyle: {
-	default: {checkboxOn: check-on, checkboxOff: check-off, font: default-font, fontColor: white, disabledFontColor: grey },
+	default: {checkboxOn: check-on, checkboxOff: check-off, checkboxOver: check-over, font: default-font, fontColor: white, disabledFontColor: grey },
 	radio: {checkboxOn: radio-on, checkboxOff: radio-off, font: default-font, fontColor: white, disabledFontColor: grey }
 },
 io.anuke.ucore.scene.ui.List$ListStyle: {

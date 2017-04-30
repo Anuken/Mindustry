@@ -16,6 +16,7 @@ import io.anuke.ucore.core.KeyBinds;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.UInput;
 import io.anuke.ucore.entities.Effects;
+import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.modules.ModuleController;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timers;
@@ -30,9 +31,10 @@ public class Moment extends ModuleController<Moment>{
 	public Recipe recipe;
 	public int rotation;
 	public float placerange = 60;
+	public float respawntime = 60*6;
 	
 	public int wave = 1;
-	public float wavespace = 1000;
+	public float wavespace = 60*60;
 	public float wavetime = wavespace;
 	public float spawnspace = 65;
 	public Tile core;
@@ -68,17 +70,13 @@ public class Moment extends ModuleController<Moment>{
 			}
 		}
 		
-		generate();
-		
-		items.put(Item.stone, 20);
 		//items.put(Item.stone, 200);
 		//items.put(Item.iron, 200);
 		//items.put(Item.steel, 200);
 		
-		player = new Player().add();
+		player = new Player();
 		
-		player.x = core.worldx();
-		player.y = core.worldy()+10;
+		restart();
 	}
 	
 	@Override
@@ -100,8 +98,36 @@ public class Moment extends ModuleController<Moment>{
 		playing = true;
 	}
 	
+	public void restart(){
+		wave = 1;
+		wavetime = wavespace;
+		Entities.clear();
+		Enemy.amount = 0;
+		player.add();
+		player.heal();
+		items.clear();
+		generate();
+		
+		player.x = core.worldx();
+		player.y = core.worldy()+10;
+		
+		items.put(Item.stone, 20);
+	}
+	
 	public void coreDestroyed(){
 		//TODO "you lose" message or something
+		Effects.shake(5, 6);
+		for(int i = 0; i < 16; i ++){
+			Timers.run(i*2, ()->{
+				Effects.effect("explosion", core.worldx()+Mathf.range(40), core.worldy()+Mathf.range(40));
+			});
+			
+		}
+		Effects.effect("coreexplosion", core.worldx(), core.worldy());
+		
+		Timers.run(60, ()->{
+			getModule(UI.class).showRestart();
+		});
 	}
 	
 	void generate(){
