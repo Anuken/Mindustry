@@ -12,7 +12,9 @@ import io.anuke.moment.resource.Recipe;
 import io.anuke.moment.world.Generator;
 import io.anuke.moment.world.Tile;
 import io.anuke.moment.world.TileType;
-import io.anuke.ucore.core.*;
+import io.anuke.ucore.core.KeyBinds;
+import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.core.USound;
 import io.anuke.ucore.entities.Effects;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.modules.ModuleController;
@@ -85,13 +87,13 @@ public class Moment extends ModuleController<Moment>{
 		
 		if(!playing || paused) return;
 		
-		if(UInput.keyUp(Keys.Q))
-			System.out.println("Enemies: " + Enemy.amount + " Wavetime: " + wavetime + " Wave: " + wave + " Wavespace: " + wavespace);
+		//if(UInput.keyUp(Keys.Q))
+		//	System.out.println("Enemies: " + Enemy.amount + " Wavetime: " + wavetime + " Wave: " + wave + " Wavespace: " + wavespace);
 		
 		if(Enemy.amount <= 0)
 			wavetime -= delta();
 		
-		if(wavetime <= 0){
+		if(wavetime <= 0/* || UInput.keyUp(Keys.Q)*/){
 			runWave();
 		}
 	}
@@ -125,9 +127,9 @@ public class Moment extends ModuleController<Moment>{
 		
 		items.put(Item.stone, 20);
 		
-		//items.put(Item.stone, 200);
-		//items.put(Item.iron, 200);
-		//items.put(Item.steel, 200);
+		items.put(Item.stone, 2000);
+		items.put(Item.iron, 2000);
+		items.put(Item.steel, 2000);
 		
 		if(get(UI.class).about != null)
 		get(UI.class).updateItems();

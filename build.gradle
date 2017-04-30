@@ -61,7 +61,7 @@ project(":core") {
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-ai:1.8.1"
-        //compile fileTree(dir: '../core/lib', include: '*.jar')
+        compile fileTree(dir: '../core/lib', include: '*.jar')
     }
 }
 

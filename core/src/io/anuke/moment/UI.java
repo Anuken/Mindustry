@@ -6,6 +6,9 @@ import java.util.function.BooleanSupplier;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureWrap;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Array;
 
 import io.anuke.moment.entities.Enemy;
@@ -21,12 +24,14 @@ import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Timers;
 
 public class UI extends SceneModule<Moment>{
 	Table itemtable;
 	PrefsDialog prefs;
 	KeybindDialog keys;
 	Dialog about, menu, restart, tutorial;
+	Texture conveyor = new Texture("sprites/conveyor.png"), conveyort = new Texture("sprites/conveyort.png");
 
 	BooleanSupplier play = () -> {
 		return main.playing;
@@ -42,18 +47,36 @@ public class UI extends SceneModule<Moment>{
 		
 		Dialog.closePadR = -1;
 		Dialog.closePadT = 4;
+		conveyor.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+		conveyort.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 	}
 	
 	void drawBackground(){
 		
+		Batch batch = scene.getBatch();
 		Draw.color();
-		float w = gwidth();
-		float h = gheight();
+		int w = gwidth();
+		int h = gheight();
+		
+		batch.draw(conveyor, 0, 0, (int)Timers.time(), 0, w, h);
+		
+		int tw = w/64+1;//, th = h/64+1;
+		
+		for(int x = 0; x < tw; x ++){
+			batch.draw(conveyort, x*64, 0, 0, (int)Timers.time(), 32, h);
+		}
+		
 		Draw.tscl(1.5f);
+		
+		
 		Draw.text("[DARK_GRAY]-( Mindustry )-", w/2, h-16);
 		Draw.text("[#f1de60]-( Mindustry )-", w/2, h-10);
 		
 		Draw.tscl(0.5f);
+		
+
+		
+		
 		//Draw.rect("conveyor", w/2, h/2, 1000, 1000);
 	}
 
@@ -306,10 +329,11 @@ public class UI extends SceneModule<Moment>{
 						table.add().size(size);
 					}
 					
-					//TODO rows
-					//if((int)((float)recipes.size/rows+1) == 2){
-					//	table.row();
-					//}
+					
+					if(sec == Section.distribution){
+						table.row();
+						table.add().size(size);
+					}
 					
 					table.setVisible(()->{
 						return button.isChecked();
