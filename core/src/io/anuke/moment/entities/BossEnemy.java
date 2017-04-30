@@ -9,6 +9,7 @@ public class BossEnemy extends Enemy{
 		
 		reload = 8;
 		bullet = BulletType.smallfast;
+		rotatespeed = 30f;
 		maxhealth = 260;
 		hitsize = 8;
 		speed = 0.27f;

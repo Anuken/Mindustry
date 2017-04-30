@@ -64,9 +64,10 @@ public class Tile{
 	
 	
 	public void changed(){
-		//TODO where do the items go?
-		if(entity != null)
+		if(entity != null){
 			entity.remove();
+			entity = null;
+		}
 		
 		if(block.update)
 			entity = new TileEntity(this).add();

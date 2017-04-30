@@ -106,7 +106,7 @@ public enum TileType{
 
 		public void draw(Tile tile){
 			Draw.rect(name() + (Timers.time() % ((20 / 100f) / speed) < (10 / 100f) / speed ? "" : "move"), tile.worldx(), tile.worldy(), tile.rotation * 90);
-
+			
 			vector.set(tilesize, 0).rotate(tile.rotation * 90);
 			vector2.set(-tilesize / 2, 0).rotate(tile.rotation * 90);
 
@@ -190,7 +190,7 @@ public enum TileType{
 	router(true, true, false){
 
 		public void update(Tile tile){
-			if(Timers.get(tile, 20) && tile.entity.totalItems() > 0){
+			if(Timers.get(tile, 10) && tile.entity.totalItems() > 0){
 				tryDump(tile, tile.rotation++);
 				tile.rotation %= 4;
 			}
@@ -426,7 +426,7 @@ public enum TileType{
 			 * tile.entity.removeItem(ammo, 1); }
 			 */
 			//if(tile.entity.shots > 0){
-			tile.entity.link = findTileTarget(tile, range);
+			tile.entity.link = findTileTarget(tile.worldx(), tile.worldy(), tile, range, true);
 
 			if(tile.entity.link != null){
 				tile.entity.rotation = tile.entity.angleTo(tile.entity.link);
@@ -475,7 +475,7 @@ public enum TileType{
 		}
 
 		public void update(Tile tile){
-			tile.entity.link = findTileTarget(tile, range);
+			tile.entity.link = findTileTarget(tile.worldx(), tile.worldy(), tile, range, true);
 
 			if(tile.entity.link != null){
 				tile.entity.rotation = tile.entity.angleTo(tile.entity.link);
@@ -557,7 +557,6 @@ public enum TileType{
 			tile.entity.removeItem(ammo, 1);
 		}
 		
-		//TODO readd
 		if(tile.entity.shots > 0){
 			Enemy enemy = findTarget(tile, range);
 			if(enemy != null){
@@ -599,17 +598,26 @@ public enum TileType{
 		return (Enemy) closest;
 	}
 
-	TileEntity findTileTarget(Tile tile, float range){
+	public static TileEntity findTileTarget(float x, float y, Tile tile, float range, boolean damaged){
 		Entity closest = null;
 		float dst = 0;
-
-		Array<SolidEntity> array = Entities.getNearby(tile.worldx(), tile.worldy(), 100);
-
-		for(Entity e : array){
-			if(e == tile.entity) continue;
-			
-			if(e instanceof TileEntity && ((TileEntity) e).health < ((TileEntity) e).tile.block().health){
-				float ndst = Vector2.dst(tile.worldx(), tile.worldy(), e.x, e.y);
+		
+		int rad = (int)(range/tilesize)+1;
+		int tilex = Mathf.scl2(x, tilesize);
+		int tiley = Mathf.scl2(y, tilesize);
+		
+		for(int rx = -rad; rx <= rad; rx ++){
+			for(int ry = -rad; ry <= rad; ry ++){
+				Tile other = Moment.i.tile(rx+tilex, ry+tiley);
+				
+				if(other == null || other.entity == null ||(tile != null && other.entity == tile.entity)) continue;
+				
+				TileEntity e = other.entity;
+				
+				if(damaged && ((TileEntity) e).health >= ((TileEntity) e).tile.block().health)
+					continue;
+				
+				float ndst = Vector2.dst(x, y, e.x, e.y);
 				if(ndst < range && (closest == null || ndst < dst)){
 					dst = ndst;
 					closest = e;

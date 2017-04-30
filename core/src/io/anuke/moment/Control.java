@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.moment.ai.Pathfind;
-import io.anuke.moment.entities.FlameEnemy;
+import io.anuke.moment.entities.BossEnemy;
 import io.anuke.moment.entities.TileEntity;
 import io.anuke.moment.resource.ItemStack;
 import io.anuke.moment.world.Tile;
@@ -169,8 +169,10 @@ public class Control extends RendererModule<Moment>{
 		}
 		
 		//TODO
-		if(UInput.keyUp(Keys.G))
-			new FlameEnemy(0).set(main.player.x, main.player.y).add();
+		if(UInput.keyUp(Keys.G)){
+			new BossEnemy(0).set(main.player.x, main.player.y).add();
+		}
+			//new FlameEnemy(0).set(main.player.x, main.player.y).add();
 
 		if(UInput.buttonUp(Buttons.LEFT) && main.recipe != null && validPlace(tilex(), tiley(), main.recipe.result) && !get(UI.class).hasMouse()){
 			Tile tile = main.tile(tilex(), tiley());
@@ -386,7 +388,7 @@ public class Control extends RendererModule<Moment>{
 					Draw.clear();
 				}
 				if(tile.entity != null)
-					drawHealth(tile.entity);
+					drawHealth(tile.entity.x, tile.entity.y, tile.entity.health, tile.entity.maxhealth);
 			}
 		}
 
@@ -394,25 +396,25 @@ public class Control extends RendererModule<Moment>{
 			if(entity instanceof DestructibleEntity && !(entity instanceof TileEntity)){
 				DestructibleEntity dest = ((DestructibleEntity) entity);
 
-				drawHealth(dest);
+				drawHealth(dest.x, dest.y, dest.health, dest.maxhealth);
 			}
 		}
 
 		//Draw.text(Gdx.graphics.getFramesPerSecond() + " FPS", main.player.x, main.player.y);
 	}
 
-	void drawHealth(DestructibleEntity dest){
+	void drawHealth(float x, float y, float health, float maxhealth){
 		float len = 3;
 		float offset = 7;
 		
 		Draw.thickness(3f);
 		Draw.color(Color.GRAY);
-		Draw.line(dest.x - len + 1, dest.y - offset, dest.x + len + 1, dest.y - offset);
+		Draw.line(x - len + 1, y - offset, x + len + 1, y - offset);
 		Draw.thickness(1f);
 		Draw.color(Color.BLACK);
-		Draw.line(dest.x - len + 1, dest.y - offset, dest.x + len, dest.y - offset);
+		Draw.line(x - len + 1, y - offset, x + len, y - offset);
 		Draw.color(Color.RED);
-		Draw.line(dest.x - len + 1, dest.y - offset, dest.x - len + (int)(len * 2 * ((float) dest.health / dest.maxhealth)), dest.y - offset);
+		Draw.line(x - len + 1, y - offset, x - len + (int)(len * 2 * ((float) health / maxhealth)), y - offset);
 		Draw.clear();
 	}
 

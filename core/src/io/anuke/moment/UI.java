@@ -14,6 +14,7 @@ import io.anuke.moment.world.Tile;
 import io.anuke.moment.world.TileType;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.modules.SceneModule;
+import io.anuke.ucore.scene.Scene;
 import io.anuke.ucore.scene.builders.*;
 import io.anuke.ucore.scene.style.Styles;
 import io.anuke.ucore.scene.ui.*;
@@ -118,8 +119,16 @@ public class UI extends SceneModule<Moment>{
 		about.getContentTable().add("Made by Anuken for the" + "\nGDL Metal Monstrosity jam." + "\nTools used:");
 		about.addCloseButton();
 		
-		restart = new Dialog("The core was destroyed.", "dialog");
-		restart.content().add("You lasted until wave [GREEN]" + main.wave + "[].").pad(6);
+		restart = new Dialog("The core was destroyed.", "dialog"){
+			public Dialog show(Scene scene){
+				super.show(scene);
+				restart.content().clearChildren();
+				restart.content().add("You lasted until wave [GREEN]" + main.wave + "[].").pad(6);
+				restart.pack();
+				return this;
+			}
+		};
+		
 		restart.getButtonTable().addButton("Back to menu", ()->{
 			restart.hide();
 			main.playing = false;

@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.moment.Control;
 import io.anuke.moment.Moment;
 import io.anuke.moment.ai.Pathfind;
+import io.anuke.moment.world.TileType;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.entities.*;
 import io.anuke.ucore.util.Timers;
@@ -22,6 +23,7 @@ public class Enemy extends DestructibleEntity{
 	public float range = 60;
 	public BulletType bullet = BulletType.small;
 	public float length = 4;
+	public float rotatespeed = 8f;
 	
 	public Enemy(int spawn){
 		this.spawn = spawn;
@@ -40,9 +42,8 @@ public class Enemy extends DestructibleEntity{
 		
 		Moment.module(Control.class).tryMove(this, vec.x*delta, vec.y*delta);
 		
-		target = Entities.getClosest(x, y, range, e->{
-			return (e instanceof TileEntity || e instanceof Player);
-		});
+		//if(Timers.get(this, 10))
+			target = TileType.findTileTarget(x, y, null, range, false);
 		
 		if(target != null){
 			if(Timers.get(this, reload))
@@ -84,7 +85,7 @@ public class Enemy extends DestructibleEntity{
 		
 		if(target == null){
 			direction.add(xvelocity, yvelocity);
-			direction.limit(speed*8);
+			direction.limit(speed*rotatespeed);
 		}else{
 			float angle = angleTo(target);
 			direction.lerp(vector.set(0, 1).setAngle(angle), 0.25f);

@@ -5,8 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 
 import io.anuke.moment.ai.Pathfind;
-import io.anuke.moment.entities.Enemy;
-import io.anuke.moment.entities.Player;
+import io.anuke.moment.entities.*;
 import io.anuke.moment.resource.Item;
 import io.anuke.moment.resource.ItemStack;
 import io.anuke.moment.resource.Recipe;
@@ -32,10 +31,10 @@ public class Moment extends ModuleController<Moment>{
 	public Recipe recipe;
 	public int rotation;
 	public float placerange = 60;
-	public float respawntime = 60*6;
+	public float respawntime = 60*5;
 	
 	public int wave = 1;
-	public float wavespace = 60*60;
+	public float wavespace = 20*60;
 	public float wavetime;
 	public float spawnspace = 65;
 	public Tile core;
@@ -71,10 +70,6 @@ public class Moment extends ModuleController<Moment>{
 			}
 		}
 		
-		//items.put(Item.stone, 200);
-		//items.put(Item.iron, 200);
-		//items.put(Item.steel, 200);
-		
 		player = new Player();
 		
 	}
@@ -91,10 +86,13 @@ public class Moment extends ModuleController<Moment>{
 		
 		if(!playing) return;
 		
-		if(Enemy.amount == 0)
+		if(UInput.keyUp(Keys.Q))
+			System.out.println("Enemies: " + Enemy.amount + " Wavetime: " + wavetime + " Wave: " + wave + " Wavespace: " + wavespace);
+		
+		if(Enemy.amount <= 0)
 			wavetime -= delta();
 		
-		if(wavetime < 0 || UInput.keyUp(Keys.F)){
+		if(wavetime <= 0){
 			runWave();
 		}
 	}
@@ -118,6 +116,10 @@ public class Moment extends ModuleController<Moment>{
 		player.y = core.worldy()+10;
 		
 		items.put(Item.stone, 20);
+		
+		//items.put(Item.stone, 200);
+		//items.put(Item.iron, 200);
+		//items.put(Item.steel, 200);
 		
 		if(get(UI.class).about != null)
 		get(UI.class).updateItems();
@@ -170,18 +172,34 @@ public class Moment extends ModuleController<Moment>{
 	}
 	
 	public void runWave(){
-		int amount = 3*wave;
+		int amount = wave;
 		
 		for(int i = 0; i < amount; i ++){
-			int point = i%spawnpoints.size;
-			Tile tile = spawnpoints.get(point);
+			int pos = i;
 			
-			Timers.run((int)(i/spawnpoints.size)*40f, ()->{
-				Enemy e = new Enemy(point).set(tile.worldx(), tile.worldy());
-				Effects.effect("spawn", e);
-				e.add();
-			});
-			
+			for(int w = 0; w < spawnpoints.size; w ++){
+				int point = w;
+				Tile tile = spawnpoints.get(w);
+				
+				Timers.run(i*30f, ()->{
+					
+					Enemy enemy = null;
+					
+					if(wave%5 == 0 /*&& point == 1 */&& pos == 0){
+						enemy = new BossEnemy(point);
+					}else if(wave > 3 && pos < amount/2){
+						enemy = new FastEnemy(point);
+					}else if(wave > 8 && pos % 3 == 0 && wave%2==1){
+						enemy = new FlameEnemy(point);
+					}else{
+						enemy = new Enemy(point);
+					}
+					
+					enemy.set(tile.worldx(), tile.worldy());
+					Effects.effect("spawn", enemy);
+					enemy.add();
+				});
+			}
 		}
 		
 		wave ++;

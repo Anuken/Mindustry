@@ -6,13 +6,13 @@ public class FlameEnemy extends Enemy{
 
 	public FlameEnemy(int spawn) {
 		super(spawn);
-		speed = 0.25f;
+		speed = 0.3f;
 		
-		maxhealth = 100;
+		maxhealth = 150;
 		reload = 6;
 		bullet = BulletType.flameshot;
 		
-		range = 30;
+		range = 40;
 		
 		heal();
 	}

@@ -8,35 +8,31 @@ import io.anuke.moment.ai.Pathfind;
 import io.anuke.moment.resource.Item;
 import io.anuke.moment.world.Tile;
 import io.anuke.moment.world.TileType;
-import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.entities.Effects;
-import io.anuke.ucore.entities.SolidEntity;
+import io.anuke.ucore.entities.Entity;
 
-public class TileEntity extends DestructibleEntity{
+public class TileEntity extends Entity{
 	public final Tile tile;
 	public DelayedRemovalArray<ItemPos> convey = new DelayedRemovalArray<>();
 	public ObjectMap<Item, Integer> items = new ObjectMap<>();
 	public int shots;
 	public TileEntity link;
 	public float rotation;
+	public int maxhealth, health;
+	public boolean dead = false;
 	
 	public TileEntity(Tile tile){
 		this.tile = tile;
 		x = tile.worldx();
 		y = tile.worldy();
-		hitsize = TileType.tilesize;
 		
 		maxhealth = tile.block().health;
-		heal();
+		health = maxhealth;
 	}
 	
-	@Override
-	public boolean collides(SolidEntity other){
-		return (other instanceof Bullet) && ((Bullet)other).owner instanceof Enemy;
-	}
-	
-	@Override
 	public void onDeath(){
+		dead = true;
+		
 		if(tile.block() == TileType.core){
 			Moment.i.coreDestroyed();
 		}
@@ -45,6 +41,16 @@ public class TileEntity extends DestructibleEntity{
 		Effects.shake(4f, 4f);
 		Effects.effect("explosion", this);
 	}
+	
+	public void collision(Bullet other){
+		health -= other.getDamage();
+		if(health <= 0) onDeath();
+	}
+	
+	public boolean collide(Bullet other){
+		return other.owner instanceof Enemy;
+	}
+		
 	
 	@Override
 	public void update(){

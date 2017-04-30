@@ -32,9 +32,10 @@ public class Generator{
 					floor = TileType.coal;
 				}
 				
+				
+				
 				if(color == white){
 					block = TileType.stoneblock;
-					
 					
 				}else if(color == blue){
 					Moment.i.core = tiles[x][y];

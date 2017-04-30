@@ -52,6 +52,9 @@ public class Player extends DestructibleEntity{
 	
 	@Override
 	public void update(){
+		if(health < maxhealth && Timers.get(this, 30))
+			health ++;
+		
 		vector.set(0, 0);
 		
 		if(UInput.keyDown("up"))
@@ -73,9 +76,6 @@ public class Player extends DestructibleEntity{
 		}
 		
 		vector.limit(speed);
-		
-		//x += vector.x*delta;
-		//y += vector.y*delta;
 		
 		Moment.module(Control.class).tryMove(this, vector.x*delta, vector.y*delta);
 		
