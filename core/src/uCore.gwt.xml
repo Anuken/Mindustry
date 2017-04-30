@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit trunk//EN" "http://google-web-toolkit.googlecode.com/svn/trunk/distro-source/core/src/gwt-module.dtd">
+<module>
+	<source path="io/anuke/ucore" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.ucore.scene" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.ucore.scene.ui" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.ucore.scene.style.Styles" />
+</module>
