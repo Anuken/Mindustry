@@ -8,6 +8,7 @@ import io.anuke.moment.ai.Pathfind;
 import io.anuke.moment.resource.Item;
 import io.anuke.moment.world.Tile;
 import io.anuke.moment.world.TileType;
+import io.anuke.ucore.core.USound;
 import io.anuke.ucore.entities.Effects;
 import io.anuke.ucore.entities.Entity;
 
@@ -40,6 +41,8 @@ public class TileEntity extends Entity{
 		Pathfind.updatePath();
 		Effects.shake(4f, 4f);
 		Effects.effect("explosion", this);
+		
+		USound.play("break");
 	}
 	
 	public void collision(Bullet other){

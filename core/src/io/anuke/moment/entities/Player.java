@@ -8,6 +8,7 @@ import io.anuke.moment.Moment;
 import io.anuke.moment.UI;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.UInput;
+import io.anuke.ucore.core.USound;
 import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.entities.Effects;
 import io.anuke.ucore.util.Angles;
@@ -72,6 +73,7 @@ public class Player extends DestructibleEntity{
 		
 		if(shooting && reload <= 0){
 			weapon.shoot(this);
+			USound.play("shoot");
 			reload = weapon.reload;
 		}
 		

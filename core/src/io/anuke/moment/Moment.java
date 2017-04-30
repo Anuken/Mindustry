@@ -12,9 +12,7 @@ import io.anuke.moment.resource.Recipe;
 import io.anuke.moment.world.Generator;
 import io.anuke.moment.world.Tile;
 import io.anuke.moment.world.TileType;
-import io.anuke.ucore.core.KeyBinds;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.UInput;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Effects;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.modules.ModuleController;
@@ -42,6 +40,7 @@ public class Moment extends ModuleController<Moment>{
 	
 	public boolean playing = false;
 	public boolean paused = false;
+	public boolean showedTutorial = false;
 
 	@Override
 	public void init(){
@@ -82,9 +81,9 @@ public class Moment extends ModuleController<Moment>{
 	@Override
 	public void update(){
 		if(!paused)
-		super.update();
+			super.update();
 		
-		if(!playing) return;
+		if(!playing || paused) return;
 		
 		if(UInput.keyUp(Keys.Q))
 			System.out.println("Enemies: " + Enemy.amount + " Wavetime: " + wavetime + " Wave: " + wave + " Wavespace: " + wavespace);
@@ -99,7 +98,16 @@ public class Moment extends ModuleController<Moment>{
 	
 	public void play(){
 		wavetime = waveSpacing();
-		playing = true;
+		
+		if(showedTutorial){
+			playing = true;
+			paused = false;
+		}else{
+			playing = true;
+			paused = true;
+			get(UI.class).tutorial.show(get(UI.class).scene);
+			showedTutorial = true;
+		}
 	}
 	
 	public void restart(){
@@ -127,6 +135,7 @@ public class Moment extends ModuleController<Moment>{
 	
 	public void coreDestroyed(){
 		Effects.shake(5, 6);
+		USound.play("corexplode");
 		for(int i = 0; i < 16; i ++){
 			Timers.run(i*2, ()->{
 				Effects.effect("explosion", core.worldx()+Mathf.range(40), core.worldy()+Mathf.range(40));
@@ -173,6 +182,7 @@ public class Moment extends ModuleController<Moment>{
 	
 	public void runWave(){
 		int amount = wave;
+		USound.play("spawn");
 		
 		for(int i = 0; i < amount; i ++){
 			int pos = i;

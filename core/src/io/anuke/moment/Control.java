@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.moment.ai.Pathfind;
-import io.anuke.moment.entities.BossEnemy;
+import io.anuke.moment.entities.Enemy;
 import io.anuke.moment.entities.TileEntity;
 import io.anuke.moment.resource.ItemStack;
 import io.anuke.moment.world.Tile;
@@ -39,6 +39,10 @@ public class Control extends RendererModule<Moment>{
 		cameraScale = 4f;
 		setPixelation();
 		buffers.add("shadow", (int) (Gdx.graphics.getWidth() / cameraScale), (int) (Gdx.graphics.getHeight() / cameraScale));
+		
+		USound.load("shoot.wav", "place.wav", "explosion.wav", "enemyshoot.wav", "corexplode.wav", "break.wav", "spawn.wav", "flame.wav");
+		UMusic.load("1.mp3", "2.mp3", "3.mp3");
+		UMusic.shuffleAll();
 	}
 
 	@Override
@@ -170,7 +174,7 @@ public class Control extends RendererModule<Moment>{
 		
 		//TODO
 		if(UInput.keyUp(Keys.G)){
-			new BossEnemy(0).set(main.player.x, main.player.y).add();
+			new Enemy(0).set(main.player.x, main.player.y).add();
 		}
 			//new FlameEnemy(0).set(main.player.x, main.player.y).add();
 
@@ -186,6 +190,7 @@ public class Control extends RendererModule<Moment>{
 
 			Effects.effect("place", roundx(), roundy());
 			Effects.shake(2f, 2f);
+			USound.play("place");
 
 			for(ItemStack stack : main.recipe.requirements){
 				main.removeItem(stack);

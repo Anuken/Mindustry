@@ -26,7 +26,7 @@ public class UI extends SceneModule<Moment>{
 	Table itemtable;
 	PrefsDialog prefs;
 	KeybindDialog keys;
-	Dialog about, menu, restart;
+	Dialog about, menu, restart, tutorial;
 
 	BooleanSupplier play = () -> {
 		return main.playing;
@@ -45,9 +45,16 @@ public class UI extends SceneModule<Moment>{
 	}
 	
 	void drawBackground(){
-		//float w = gwidth();
-		//float h = gheight();
-		Draw.rect("player", 0, 0, 100, 100);
+		
+		Draw.color();
+		float w = gwidth();
+		float h = gheight();
+		Draw.tscl(1.5f);
+		Draw.text("[DARK_GRAY]-( Mindustry )-", w/2, h-16);
+		Draw.text("[#f1de60]-( Mindustry )-", w/2, h-10);
+		
+		Draw.tscl(0.5f);
+		//Draw.rect("conveyor", w/2, h/2, 1000, 1000);
 	}
 
 	@Override
@@ -116,8 +123,38 @@ public class UI extends SceneModule<Moment>{
 		keys = new KeybindDialog();
 
 		about = new Dialog("About");
-		about.getContentTable().add("Made by Anuken for the" + "\nGDL Metal Monstrosity jam." + "\nTools used:");
+		about.getContentTable().add("Made by [ROYAL]Anuken[] for the" + "\nGDL Metal Monstrosity jam.\n" 
+		+ "\nSources used:"
+		+ "\n- [YELLOW]bfxr.com[] for sound effects"
+		+ "\n- [RED]freemusicarchive.org[] for music"
+		+ "\n- Music made by [GREEN]RoccoW[]"
+				);
 		about.addCloseButton();
+		
+		tutorial = new Dialog("Tutorial", "dialog"){
+			@Override
+			public void hide(){
+				super.hide();
+				main.playing = true;
+				main.paused = false;
+			}
+		};
+		tutorial.addCloseButton();
+		tutorial.getButtonTable().addButton("OK", ()->{
+			tutorial.hide();
+		});
+		
+		tutorial.content().add(
+				  "[GREEN]Default Controls:[WHITE]\n[YELLOW][[WASD][] to move, [YELLOW][[R][] to rotate blocks." 
+				+ "\n[YELLOW][[R-MOUSE][] to destroy blocks, [YELLOW][[L-MOUSE][] to place them."
+				+ "\n[YELLOW][[L-MOUSE][] to shoot."
+				+ "\n\n[GOLD]Every 20 seconds, a new wave will appear."
+				+ "\nBuild turrets to defend the core."
+				+ "\nIf the core is destroyed, you lose the game."
+				+ "\n[LIME]To collect building resources, \nmove them into the core with conveyors."
+				);
+		
+		tutorial.content().pad(8);
 		
 		restart = new Dialog("The core was destroyed.", "dialog"){
 			public Dialog show(Scene scene){
@@ -269,6 +306,7 @@ public class UI extends SceneModule<Moment>{
 						table.add().size(size);
 					}
 					
+					//TODO rows
 					//if((int)((float)recipes.size/rows+1) == 2){
 					//	table.row();
 					//}
@@ -283,64 +321,6 @@ public class UI extends SceneModule<Moment>{
 				
 				row();
 				add(stack).colspan(3);
-				
-				/*
-				for(Recipe r : Recipe.values()){
-					Image image = new Image(Draw.region(r.result.name()));
-					
-					get().add(image).size(40);
-					
-					if(i % rows == rows-1)
-						row();
-					
-					i++;
-					/*
-					new button(r.result.name(), () -> {
-						main.recipe = r;
-					}){{
-						get().clearChildren();
-						get().pad(10f);
-						get().add(image).size(42).padRight(4f);
-						Table table = new Table();
-						table.add(get().getLabel()).left();
-						get().add(table);
-						get().left();
-						
-						ItemStack[] req = r.requirements;
-						for(ItemStack stack : req){
-							table.row();
-							table.add("[YELLOW]" + stack.amount + "x " + stack.item.name()).left();
-						}
-						get().getLabel().setAlignment(Align.left);
-
-						String description = r.result.description();
-						if(r.result.ammo != null){
-							description += "\n[SALMON]Ammo: " + r.result.ammo.name();
-						}
-
-						Table tiptable = new Table();
-						tiptable.background("button");
-						tiptable.add("[PURPLE]" + r.result.name(), 0.5f).left().padBottom(2f);
-						tiptable.row();
-						tiptable.add("[ORANGE]" + description).left();
-						tiptable.pad(10f);
-
-						Tooltip tip = new Tooltip(tiptable);
-						tip.setInstant(true);
-
-						get().addListener(tip);
-
-						Recipe current = r;
-						get().update(() -> {
-							get().setDisabled(!main.hasItems(current.requirements));
-						});
-
-					}}.width(234f);
-					
-					//row();
-				}
-				*/
-
 				get().pad(10f);
 				
 			}}.right().bottom();
@@ -394,7 +374,30 @@ public class UI extends SceneModule<Moment>{
 
 			get().setVisible(play);
 		}}.end();
-
+		
+		
+		//+- table
+		new table(){{
+			aleft();
+			abottom();
+			Control c = main.get(Control.class);
+			new button("+", ()->{
+				if(c.cameraScale < 4f){
+					c.cameraScale = 4f;
+					c.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+				}
+			}).size(40);
+			
+			new button("-", ()->{
+				if(c.cameraScale > 3f){
+					c.cameraScale = 3f;
+					c.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+				}
+			}).size(40);
+			
+			get().setVisible(play);
+		}}.end();
+	
 		//menu table
 		new table(){{
 			float w = 200;

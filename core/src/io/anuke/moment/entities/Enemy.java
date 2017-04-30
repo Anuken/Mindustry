@@ -7,6 +7,7 @@ import io.anuke.moment.Moment;
 import io.anuke.moment.ai.Pathfind;
 import io.anuke.moment.world.TileType;
 import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.core.USound;
 import io.anuke.ucore.entities.*;
 import io.anuke.ucore.util.Timers;
 
@@ -24,6 +25,7 @@ public class Enemy extends DestructibleEntity{
 	public BulletType bullet = BulletType.small;
 	public float length = 4;
 	public float rotatespeed = 8f;
+	public String shootsound = "enemyshoot";
 	
 	public Enemy(int spawn){
 		this.spawn = spawn;
@@ -46,13 +48,16 @@ public class Enemy extends DestructibleEntity{
 			target = TileType.findTileTarget(x, y, null, range, false);
 		
 		if(target != null){
-			if(Timers.get(this, reload))
+			if(Timers.get(this, reload)){
 				shoot();
+				USound.play(shootsound);
+			}
 				
 		}
 	}
 	
 	public void shoot(){
+		
 		vector.set(length, 0).rotate(direction.angle());
 		new Bullet(bullet, this, x+vector.x, y+vector.y, direction.angle()).add();
 	}
@@ -66,6 +71,7 @@ public class Enemy extends DestructibleEntity{
 	public void onDeath(){
 		Effects.effect("explosion", this);
 		Effects.shake(3f, 4f);
+		USound.play("explosion");
 		remove();
 	}
 	

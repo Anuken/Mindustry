@@ -10,6 +10,7 @@ import io.anuke.moment.entities.*;
 import io.anuke.moment.entities.TileEntity.ItemPos;
 import io.anuke.moment.resource.Item;
 import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.core.USound;
 import io.anuke.ucore.entities.*;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.util.Angles;
@@ -330,11 +331,11 @@ public enum TileType{
 	},
 	flameturret(true, true, false){
 		{
-			range = 30f;
-			reload = 6f;
+			range = 35f;
+			reload = 5f;
 			bullet = BulletType.flame;
 			ammo = Item.coal;
-			health = 75;
+			health = 85;
 		}
 
 		public void update(Tile tile){
@@ -380,7 +381,7 @@ public enum TileType{
 	},
 	shotgunturret(true, true, false){
 		{
-			range = 65;
+			range = 50;
 			reload = 40f;
 			bullet = BulletType.iron;
 			ammo = Item.iron;
@@ -405,10 +406,11 @@ public enum TileType{
 		
 		@Override
 		void shoot(Tile tile){
-			vector.set(0, 4).setAngle(tile.entity.rotation);
+			
 			for(int i = 0; i < 6; i ++)
-				Timers.run(i, ()->{
-					bullet(tile, tile.entity.rotation + Mathf.range(6));
+				Timers.run(i/1.5f, ()->{
+					vector.set(4, 0).setAngle(tile.entity.rotation);
+					bullet(tile, tile.entity.rotation + Mathf.range(16));
 				});
 				
 		}
@@ -470,8 +472,8 @@ public enum TileType{
 	megahealturret(true, true, false){
 		{
 			range = 30;
-			reload = 25f;
-			health = 60;
+			reload = 20f;
+			health = 80;
 		}
 
 		public void update(Tile tile){
@@ -562,6 +564,7 @@ public enum TileType{
 			if(enemy != null){
 				tile.entity.rotation = MathUtils.lerpAngleDeg(tile.entity.rotation, Angles.predictAngle(tile.worldx(), tile.worldy(), enemy.x, enemy.y, enemy.xvelocity, enemy.yvelocity, bullet.speed - 0.1f), 0.2f);
 				if(Timers.get(tile, reload)){
+					USound.play("shoot");
 					shoot(tile);
 					tile.entity.shots--;
 				}
