@@ -165,13 +165,6 @@ grass
   orig: 8, 8
   offset: 0, 0
   index: -1
-healturret
-  rotate: false
-  xy: 49, 21
-  size: 10, 10
-  orig: 10, 10
-  offset: 0, 0
-  index: -1
 icon-coal
   rotate: false
   xy: 247, 23
@@ -251,7 +244,7 @@ laserend
   index: -1
 machineturret
   rotate: false
-  xy: 49, 9
+  xy: 49, 21
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
@@ -263,9 +256,9 @@ mech1
   orig: 8, 8
   offset: 0, 0
   index: -1
-megahealturret
+megarepairturret
   rotate: false
-  xy: 61, 21
+  xy: 49, 9
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
@@ -275,6 +268,13 @@ player
   xy: 188, 13
   size: 8, 8
   orig: 8, 8
+  offset: 0, 0
+  index: -1
+repairturret
+  rotate: false
+  xy: 61, 21
+  size: 10, 10
+  orig: 10, 10
   offset: 0, 0
   index: -1
 router

@@ -415,7 +415,7 @@ public enum TileType{
 				
 		}
 	},
-	healturret(true, true, false){
+	repairturret(true, true, false){
 		{
 			range = 30;
 			reload = 40f;
@@ -469,7 +469,7 @@ public enum TileType{
 			return "Heals nearby tiles.";
 		}
 	},
-	megahealturret(true, true, false){
+	megarepairturret(true, true, false){
 		{
 			range = 30;
 			reload = 20f;

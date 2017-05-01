@@ -45,7 +45,13 @@ public class Enemy extends DestructibleEntity{
 		Moment.module(Control.class).tryMove(this, vec.x*delta, vec.y*delta);
 		
 		//if(Timers.get(this, 10))
-			target = TileType.findTileTarget(x, y, null, range, false);
+		target = TileType.findTileTarget(x, y, null, range, false);
+		
+		//no tile found
+		if(target == null)
+			target = Entities.getClosest(x, y, range, e->{
+				return e instanceof Player;
+			});
 		
 		if(target != null){
 			if(Timers.get(this, reload)){

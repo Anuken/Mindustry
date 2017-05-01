@@ -36,7 +36,7 @@ public class Player extends DestructibleEntity{
 		Effects.effect("respawn", this);
 		
 		Timers.run(Moment.i.respawntime, ()->{
-			set(Moment.i.core.worldx(), Moment.i.core.worldy()+8);
+			set(Moment.i.core.worldx(), Moment.i.core.worldy()-8);
 			heal();
 			add();
 		});
@@ -53,7 +53,7 @@ public class Player extends DestructibleEntity{
 	
 	@Override
 	public void update(){
-		if(health < maxhealth && Timers.get(this, 30))
+		if(health < maxhealth && Timers.get(this, 50))
 			health ++;
 		
 		vector.set(0, 0);

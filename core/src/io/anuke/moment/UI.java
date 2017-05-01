@@ -169,12 +169,14 @@ public class UI extends SceneModule<Moment>{
 		
 		tutorial.content().add(
 				  "[GREEN]Default Controls:[WHITE]\n[YELLOW][[WASD][] to move, [YELLOW][[R][] to rotate blocks." 
-				+ "\n[YELLOW][[R-MOUSE][] to destroy blocks, [YELLOW][[L-MOUSE][] to place them."
+				+ "\nHold [YELLOW][[R-MOUSE][] to destroy blocks, click [YELLOW][[L-MOUSE][] to place them."
 				+ "\n[YELLOW][[L-MOUSE][] to shoot."
 				+ "\n\n[GOLD]Every 20 seconds, a new wave will appear."
 				+ "\nBuild turrets to defend the core."
 				+ "\nIf the core is destroyed, you lose the game."
 				+ "\n[LIME]To collect building resources, \nmove them into the core with conveyors."
+				+ "\n[LIME]Place [ORANGE]drills[] on the right material,\nthey will automatically mine material\nand dump it to nearby conveyors or turrets."
+				+ "\n\n[SCARLET]To produce steel, feed coal and iron into a smelter."
 				);
 		
 		tutorial.content().pad(8);

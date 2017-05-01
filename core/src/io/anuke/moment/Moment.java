@@ -34,7 +34,7 @@ public class Moment extends ModuleController<Moment>{
 	public float respawntime = 60*5;
 	
 	public int wave = 1;
-	public float wavespace = 20*60;
+	public float wavespace = 35*60;
 	public float wavetime;
 	public float spawnspace = 65;
 	public Tile core;
@@ -90,6 +90,7 @@ public class Moment extends ModuleController<Moment>{
 		//if(UInput.keyUp(Keys.Q))
 		//	System.out.println("Enemies: " + Enemy.amount + " Wavetime: " + wavetime + " Wave: " + wave + " Wavespace: " + wavespace);
 		
+		//System.out.println(Enemy.amount);
 		if(Enemy.amount <= 0)
 			wavetime -= delta();
 		
@@ -123,13 +124,13 @@ public class Moment extends ModuleController<Moment>{
 		generate();
 		
 		player.x = core.worldx();
-		player.y = core.worldy()+10;
+		player.y = core.worldy()-8;
 		
 		items.put(Item.stone, 20);
 		
-		items.put(Item.stone, 2000);
-		items.put(Item.iron, 2000);
-		items.put(Item.steel, 2000);
+		//items.put(Item.stone, 2000);
+		//items.put(Item.iron, 2000);
+		//items.put(Item.steel, 2000);
 		
 		if(get(UI.class).about != null)
 		get(UI.class).updateItems();
@@ -160,19 +161,20 @@ public class Moment extends ModuleController<Moment>{
 		int x = core.x, y = core.y;
 		
 		set(x, y-1, TileType.conveyor, 1);
-		set(x, y-2, TileType.router, 0);
+		set(x, y-2, TileType.conveyor, 1);
 		set(x, y-3, TileType.conveyor, 1);
 		set(x, y-4, TileType.stonedrill, 0);
 		//just in case
 		tiles[x][y-4].setFloor(TileType.stone);
 		
-		set(x+1, y-2, TileType.conveyor, 0);
-		set(x+2, y-2, TileType.conveyor, 1);
+		
+		tiles[x+2][y-2].setFloor(TileType.stone);
+		set(x+2, y-2, TileType.stonedrill, 0);
 		set(x+2, y-1, TileType.conveyor, 1);
 		set(x+2, y, TileType.turret, 0);
 		
-		set(x-1, y-2, TileType.conveyor, 2);
-		set(x-2, y-2, TileType.conveyor, 1);
+		tiles[x-2][y-2].setFloor(TileType.stone);
+		set(x-2, y-2, TileType.stonedrill, 0);
 		set(x-2, y-1, TileType.conveyor, 1);
 		set(x-2, y, TileType.turret, 0);
 	}

@@ -22,8 +22,8 @@ public enum Recipe{
 	flameturret(defense, TileType.flameturret, stack(Item.iron, 25), stack(Item.steel, 18)),
 	sniperturret(defense, TileType.sniperturret, stack(Item.iron, 30), stack(Item.steel, 20)),
 	
-	healturret(defense, TileType.healturret, stack(Item.iron, 40)),
-	megahealturret(defense, TileType.megahealturret, stack(Item.iron, 30), stack(Item.steel, 40)),
+	healturret(defense, TileType.repairturret, stack(Item.iron, 40)),
+	megahealturret(defense, TileType.megarepairturret, stack(Item.iron, 30), stack(Item.steel, 40)),
 	
 	drill(production, TileType.stonedrill, stack(Item.stone, 6)),
 	irondrill(production, TileType.irondrill, stack(Item.stone, 40)),
