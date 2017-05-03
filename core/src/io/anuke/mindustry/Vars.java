@@ -52,4 +52,30 @@ public class Vars{
 	public static boolean playing = false;
 	public static boolean paused = false;
 	public static boolean showedTutorial = false;
+	
+	public static String[] aboutText = {
+		"Made by [ROYAL]Anuken[] for the" + "\nGDL Metal Monstrosity jam.",
+		"",
+		"Sources used:",
+		"- [YELLOW]bfxr.com[] for sound effects",
+		"- [RED]freemusicarchive.org[] for music",
+		"- Music made by [GREEN]RoccoW[]",
+	};
+	
+	public static String[] tutorialText = {
+		"[GREEN]Default Controls:",
+		"[WHITE][YELLOW][[WASD][] to move, [YELLOW][[R][] to rotate blocks.",
+		"Hold [YELLOW][[R-MOUSE][] to destroy blocks, click [YELLOW][[L-MOUSE][] to place them.",
+		"[YELLOW][[L-MOUSE][] to shoot.",
+		"",
+		"[GOLD]Every 20 seconds, a new wave will appear.",
+		"Build turrets to defend the core.",
+		"If the core is destroyed, you lose the game.",
+		"",
+		"[LIME]To collect building resources, move them into the core with conveyors.",
+		"[LIME]Place [ORANGE]drills[] on the right material,they will automatically mine material",
+		"and dump it to nearby conveyors or turrets.",
+		"",
+		"[SCARLET]To produce steel, feed coal and iron into a smelter."
+	};
 }

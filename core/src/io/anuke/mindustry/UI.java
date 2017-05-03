@@ -77,7 +77,7 @@ public class UI extends SceneModule{
 		
 		Draw.tscl(1.5f);
 		
-		Draw.text("[DARK_GRAY]-( Mindustry )-", w/2, h-16);
+		Draw.text("[#111111]-( Mindustry )-", w/2, h-16);
 		Draw.text("[#f1de60]-( Mindustry )-", w/2, h-10);
 		
 		Draw.tscl(0.5f);
@@ -141,40 +141,19 @@ public class UI extends SceneModule{
 
 		keys = new KeybindDialog();
 
-		about = new Dialog("About");
-		about.getContentTable().add("Made by [ROYAL]Anuken[] for the" + "\nGDL Metal Monstrosity jam.\n" 
-		+ "\nSources used:"
-		+ "\n- [YELLOW]bfxr.com[] for sound effects"
-		+ "\n- [RED]freemusicarchive.org[] for music"
-		+ "\n- Music made by [GREEN]RoccoW[]"
-				);
-		about.addCloseButton();
+		about = new TextDialog("About", aboutText);
 		
-		tutorial = new Dialog("Tutorial", "dialog"){
-			@Override
-			public void hide(){
-				super.hide();
-				playing = true;
-				paused = false;
-			}
-		};
+		tutorial = new TextDialog("Tutorial", tutorialText)
+				.setDialog();
 		
-		tutorial.addCloseButton();
+		tutorial.hidden(()->{
+			playing = true;
+			paused = false;
+		});
+		
 		tutorial.getButtonTable().addButton("OK", ()->{
 			tutorial.hide();
 		});
-		
-		tutorial.content().add(
-				  "[GREEN]Default Controls:[WHITE]\n[YELLOW][[WASD][] to move, [YELLOW][[R][] to rotate blocks." 
-				+ "\nHold [YELLOW][[R-MOUSE][] to destroy blocks, click [YELLOW][[L-MOUSE][] to place them."
-				+ "\n[YELLOW][[L-MOUSE][] to shoot."
-				+ "\n\n[GOLD]Every 20 seconds, a new wave will appear."
-				+ "\nBuild turrets to defend the core."
-				+ "\nIf the core is destroyed, you lose the game."
-				+ "\n[LIME]To collect building resources, \nmove them into the core with conveyors."
-				+ "\n[LIME]Place [ORANGE]drills[] on the right material,\nthey will automatically mine material\nand dump it to nearby conveyors or turrets."
-				+ "\n\n[SCARLET]To produce steel, feed coal and iron into a smelter."
-				);
 		
 		tutorial.content().pad(8);
 		
