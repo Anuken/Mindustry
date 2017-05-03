@@ -126,7 +126,7 @@ public class Renderer{
 		if(recipe == null && !ui.hasMouse()){
 			Tile tile = World.cursorTile();
 
-			if(tile.block() != Blocks.air){
+			if(tile != null && tile.block() != Blocks.air){
 				if(tile.entity != null)
 				drawHealth(tile.entity.x, tile.entity.y, tile.entity.health, tile.entity.maxhealth);
 				

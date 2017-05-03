@@ -8,11 +8,10 @@
   			  <script src="soundmanager2-jsmin.js"></script>
        </head>
 
-       <body onkeydown="preventUseOfDefaultKeys(event);">
+       <body onkeydown="preventUseOfDefaultKeys(event);" oncontextmenu="return false;">
               <div align="center" id="embed-html"></div>
               <script type="text/javascript" src="html/html.nocache.js"></script>
        </body>
-
        <script>
               function handleMouseDown(evt) {
                 evt.preventDefault();

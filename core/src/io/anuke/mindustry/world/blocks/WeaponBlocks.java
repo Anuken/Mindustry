@@ -77,13 +77,13 @@ public class WeaponBlocks{
 			reload = 5f;
 			bullet = BulletType.flame;
 			ammo = Item.coal;
-			health = 85;
+			health = 90;
 		}
 	},
 	
 	sniperturret = new Turret("sniperturret"){
 		{
-			range = 100;
+			range = 120;
 			reload = 60f;
 			bullet = BulletType.sniper;
 			ammo = Item.steel;

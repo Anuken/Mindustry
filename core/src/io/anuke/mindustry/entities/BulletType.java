@@ -23,7 +23,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Draw.clear();
 		}
 	},
-	sniper = new BulletType(3f, 17){
+	sniper = new BulletType(3f, 20){
 		public void draw(Bullet b){
 			Draw.color("lightgray");
 			Draw.rect("bullet", b.x, b.y, b.angle());

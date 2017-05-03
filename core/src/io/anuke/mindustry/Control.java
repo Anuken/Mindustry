@@ -5,7 +5,6 @@ import static io.anuke.mindustry.Vars.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 
-import io.anuke.gif.GifRecorder;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.world.Generator;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
@@ -17,7 +16,7 @@ import io.anuke.ucore.util.Timers;
 
 public class Control extends RendererModule{
 	public int rangex = 10, rangey = 10;
-	GifRecorder recoder = new GifRecorder(batch);
+	//GifRecorder recoder = new GifRecorder(batch);
 	
 	public Control(){
 		cameraScale = 4f;
@@ -113,7 +112,7 @@ public class Control extends RendererModule{
 			Renderer.renderOverlay();
 			batch.end();
 			
-			recoder.update();
+			//recoder.update();
 		}
 		
 		if(!paused){
