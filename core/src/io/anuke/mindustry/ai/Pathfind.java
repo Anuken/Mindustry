@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.entities.Enemy;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Effects;
 public class Pathfind{
 	static MHueristic heuristic = new MHueristic();
 	static PassTileGraph passgraph = new PassTileGraph();
@@ -51,7 +52,7 @@ public class Pathfind{
 	
 	static public void updatePath(){
 		if(paths.size == 0){
-			pathSequences = new Tile[3][0];
+			pathSequences = new Tile[spawnpoints.size][0];
 			for(int i = 0; i < spawnpoints.size; i ++){
 				DefaultGraphPath<Tile> path = new DefaultGraphPath<>();
 				paths.add(path);
@@ -74,11 +75,12 @@ public class Pathfind{
 				pathSequences[i][node] = tile;
 			}
 			
-			/*
+			
+			if(debug)
 			for(Tile tile : path){
 				Effects.effect("ind", tile.worldx(), tile.worldy());
 			}
-			*/
+			
 		}
 	}
 	

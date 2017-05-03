@@ -33,7 +33,7 @@ public class Vars{
 	
 	public static float breaktime = 0;
 	
-	public static final String[] maps = {"delta", "canyon", "pit", "test"};
+	public static final String[] maps = {"delta", "canyon", "pit", "maze"};
 	public static Pixmap[] mapPixmaps;
 	public static Texture[] mapTextures;
 	public static int worldsize = 128;
