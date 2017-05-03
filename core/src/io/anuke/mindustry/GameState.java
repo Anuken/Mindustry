@@ -58,7 +58,7 @@ public class GameState{
 					
 					Enemy enemy = null;
 					
-					if(wave%5 == 0 /*&& point == 1 */&& pos == 0){
+					if(wave%5 == 0 & pos <= wave/5){
 						enemy = new BossEnemy(point);
 					}else if(wave > 3 && pos < amount/2){
 						enemy = new FastEnemy(point);
@@ -89,7 +89,6 @@ public class GameState{
 			Timers.run(i*2, ()->{
 				Effects.effect("explosion", core.worldx()+Mathf.range(40), core.worldy()+Mathf.range(40));
 			});
-			
 		}
 		Effects.effect("coreexplosion", core.worldx(), core.worldy());
 		

@@ -6,8 +6,6 @@ import java.util.function.BooleanSupplier;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
@@ -15,6 +13,8 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.resource.*;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.graphics.Hue;
+import io.anuke.ucore.graphics.Textures;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.Scene;
 import io.anuke.ucore.scene.builders.*;
@@ -29,7 +29,7 @@ public class UI extends SceneModule{
 	SettingsDialog prefs;
 	KeybindDialog keys;
 	Dialog about, menu, restart, tutorial, levels;
-	Texture conveyor = new Texture("sprites/conveyor.png"), conveyort = new Texture("sprites/conveyort.png");
+	//Texture conveyor = new Texture("sprites/conveyor.png"), conveyort = new Texture("sprites/conveyort.png");
 	int selectedMap = 0;
 
 	BooleanSupplier play = () -> {
@@ -46,8 +46,9 @@ public class UI extends SceneModule{
 		
 		Dialog.closePadR = -1;
 		Dialog.closePadT = 4;
-		conveyor.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-		conveyort.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+		
+		Textures.load("sprites/");
+		Textures.repeatWrap("conveyor", "conveyort", "back");
 	}
 	
 	void drawBackground(){
@@ -57,15 +58,20 @@ public class UI extends SceneModule{
 		int w = gwidth();
 		int h = gheight();
 		
-		Draw.color("gray");
-		
-		batch.draw(conveyor, 0, 0, (int)Timers.time(), 0, w, h);
+		Draw.color(Hue.lightness(0.6f));
 		
 		int tw = w/64+1;//, th = h/64+1;
 		
+		batch.draw(Textures.get("back"), 0, 0, 0, 0, w, h);
+		
 		for(int x = 0; x < tw; x ++){
-			batch.draw(conveyort, x*64, 0, 0, (int)Timers.time(), 32, h);
+			batch.draw(Textures.get("conveyort"), x*64, 0, 0, (int)(Timers.time()*2*(x%2-0.5f)), 32, h);
 		}
+		
+		//for(int y = 0; y < th; y ++){
+		//	batch.draw(Textures.get("conveyor"), 0, y*64, (int)(Timers.time()*2*(y%2-0.5f)), 0, w, 32);
+		//}
+		
 		
 		Draw.color();
 		

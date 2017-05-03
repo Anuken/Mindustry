@@ -53,7 +53,7 @@ public class WeaponBlocks{
 	shotgunturret = new Turret("shotgunturret"){
 		{
 			range = 50;
-			reload = 40f;
+			reload = 30f;
 			bullet = BulletType.iron;
 			ammo = Item.iron;
 			health = 70;

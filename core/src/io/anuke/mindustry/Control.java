@@ -95,8 +95,6 @@ public class Control extends RendererModule{
 				Input.doInput();
 			}
 			
-			
-			
 			if(core.block() == ProductionBlocks.core)
 				camera.position.set(player.x, player.y, 0f);
 			else
