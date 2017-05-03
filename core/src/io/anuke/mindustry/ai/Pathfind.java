@@ -1,13 +1,13 @@
-package io.anuke.moment.ai;
+package io.anuke.mindustry.ai;
 
 import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
-import io.anuke.moment.Moment;
-import io.anuke.moment.entities.Enemy;
-import io.anuke.moment.world.Tile;
+import io.anuke.mindustry.Moment;
+import io.anuke.mindustry.entities.Enemy;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 

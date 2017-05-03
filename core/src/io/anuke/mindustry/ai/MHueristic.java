@@ -1,9 +1,9 @@
-package io.anuke.moment.ai;
+package io.anuke.mindustry.ai;
 
 import com.badlogic.gdx.ai.pfa.Heuristic;
 
-import io.anuke.moment.world.Tile;
-import io.anuke.moment.world.TileType;
+import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.TileType;
 
 public class MHueristic implements Heuristic<Tile>{
 	//so this means that the cost of going through solids is 10x going through non solids

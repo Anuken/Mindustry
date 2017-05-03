@@ -1,13 +1,14 @@
-package io.anuke.moment.entities;
+package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.math.Vector2;
 
-import io.anuke.moment.Control;
-import io.anuke.moment.Moment;
-import io.anuke.moment.ai.Pathfind;
-import io.anuke.moment.world.TileType;
+import io.anuke.mindustry.Control;
+import io.anuke.mindustry.Moment;
+import io.anuke.mindustry.ai.Pathfind;
+import io.anuke.mindustry.world.TileType;
 import io.anuke.ucore.core.Draw;
-import io.anuke.ucore.core.USound;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Sounds;
 import io.anuke.ucore.entities.*;
 import io.anuke.ucore.util.Timers;
 
@@ -56,7 +57,7 @@ public class Enemy extends DestructibleEntity{
 		if(target != null){
 			if(Timers.get(this, reload)){
 				shoot();
-				USound.play(shootsound);
+				Sounds.play(shootsound);
 			}
 				
 		}
@@ -77,7 +78,7 @@ public class Enemy extends DestructibleEntity{
 	public void onDeath(){
 		Effects.effect("explosion", this);
 		Effects.shake(3f, 4f);
-		USound.play("explosion");
+		Sounds.play("explosion");
 		remove();
 	}
 	

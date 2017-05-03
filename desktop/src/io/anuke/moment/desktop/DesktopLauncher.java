@@ -3,7 +3,7 @@ package io.anuke.moment.desktop;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 
-import io.anuke.moment.Moment;
+import io.anuke.mindustry.Moment;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {

@@ -1,15 +1,15 @@
-package io.anuke.moment.entities;
+package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.badlogic.gdx.utils.ObjectMap;
 
-import io.anuke.moment.Moment;
-import io.anuke.moment.ai.Pathfind;
-import io.anuke.moment.resource.Item;
-import io.anuke.moment.world.Tile;
-import io.anuke.moment.world.TileType;
-import io.anuke.ucore.core.USound;
-import io.anuke.ucore.entities.Effects;
+import io.anuke.mindustry.Moment;
+import io.anuke.mindustry.ai.Pathfind;
+import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.TileType;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Sounds;
 import io.anuke.ucore.entities.Entity;
 
 public class TileEntity extends Entity{
@@ -42,7 +42,7 @@ public class TileEntity extends Entity{
 		Effects.shake(4f, 4f);
 		Effects.effect("explosion", this);
 		
-		USound.play("break");
+		Sounds.play("break");
 	}
 	
 	public void collision(Bullet other){

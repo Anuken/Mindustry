@@ -1,16 +1,17 @@
-package io.anuke.moment.world;
+package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
-import io.anuke.moment.Moment;
-import io.anuke.moment.entities.*;
-import io.anuke.moment.entities.TileEntity.ItemPos;
-import io.anuke.moment.resource.Item;
+import io.anuke.mindustry.Moment;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.TileEntity.ItemPos;
+import io.anuke.mindustry.resource.Item;
 import io.anuke.ucore.core.Draw;
-import io.anuke.ucore.core.USound;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Sounds;
 import io.anuke.ucore.entities.*;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.util.Angles;
@@ -564,7 +565,7 @@ public enum TileType{
 			if(enemy != null){
 				tile.entity.rotation = MathUtils.lerpAngleDeg(tile.entity.rotation, Angles.predictAngle(tile.worldx(), tile.worldy(), enemy.x, enemy.y, enemy.xvelocity, enemy.yvelocity, bullet.speed - 0.1f), 0.2f);
 				if(Timers.get(tile, reload)){
-					USound.play("shoot");
+					Sounds.play("shoot");
 					shoot(tile);
 					tile.entity.shots--;
 				}

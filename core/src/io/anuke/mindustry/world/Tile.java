@@ -1,7 +1,7 @@
-package io.anuke.moment.world;
+package io.anuke.mindustry.world;
 
-import io.anuke.moment.Moment;
-import io.anuke.moment.entities.TileEntity;
+import io.anuke.mindustry.Moment;
+import io.anuke.mindustry.entities.TileEntity;
 
 public class Tile{
 	private static Tile[] tiles = new Tile[4];

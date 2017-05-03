@@ -1,4 +1,4 @@
-package io.anuke.moment.entities;
+package io.anuke.mindustry.entities;
 
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.util.Angles;

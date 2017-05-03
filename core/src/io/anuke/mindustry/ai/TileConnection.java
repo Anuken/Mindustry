@@ -1,8 +1,8 @@
-package io.anuke.moment.ai;
+package io.anuke.mindustry.ai;
 
 import com.badlogic.gdx.ai.pfa.Connection;
 
-import io.anuke.moment.world.Tile;
+import io.anuke.mindustry.world.Tile;
 
 public class TileConnection implements Connection{
 	Tile a, b;

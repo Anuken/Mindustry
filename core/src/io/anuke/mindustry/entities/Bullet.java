@@ -1,8 +1,8 @@
-package io.anuke.moment.entities;
+package io.anuke.mindustry.entities;
 
-import io.anuke.moment.Moment;
-import io.anuke.moment.world.Tile;
-import io.anuke.moment.world.TileType;
+import io.anuke.mindustry.Moment;
+import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.TileType;
 import io.anuke.ucore.entities.BulletEntity;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
@@ -12,9 +12,8 @@ public class Bullet extends BulletEntity{
 	BulletType type;
 	
 	public Bullet(BulletType type, Entity owner, float x, float y, float angle){
-		super(owner, type.speed, angle);
+		super(type, owner, angle);
 		set(x, y);
-		this.lifetime = type.lifetime;
 		this.type = type;
 	}
 	
@@ -33,7 +32,7 @@ public class Bullet extends BulletEntity{
 				tile.entity.collide(this) && !tile.entity.dead){
 			tile.entity.collision(this);
 			remove();
-			type.collide(this);
+			type.removed(this);
 		}
 		
 		super.update();
@@ -42,7 +41,7 @@ public class Bullet extends BulletEntity{
 	@Override
 	public void collision(SolidEntity other){
 		super.collision(other);
-		type.collide(this);
+		type.removed(this);
 	}
 
 	@Override

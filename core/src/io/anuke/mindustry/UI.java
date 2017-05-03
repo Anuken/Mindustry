@@ -1,6 +1,6 @@
-package io.anuke.moment;
+package io.anuke.mindustry;
 
-import static io.anuke.moment.world.TileType.tilesize;
+import static io.anuke.mindustry.world.TileType.tilesize;
 
 import java.util.function.BooleanSupplier;
 
@@ -11,10 +11,10 @@ import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Array;
 
-import io.anuke.moment.entities.Enemy;
-import io.anuke.moment.resource.*;
-import io.anuke.moment.world.Tile;
-import io.anuke.moment.world.TileType;
+import io.anuke.mindustry.entities.Enemy;
+import io.anuke.mindustry.resource.*;
+import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.TileType;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.Scene;
@@ -28,7 +28,7 @@ import io.anuke.ucore.util.Timers;
 
 public class UI extends SceneModule<Moment>{
 	Table itemtable;
-	PrefsDialog prefs;
+	SettingsDialog prefs;
 	KeybindDialog keys;
 	Dialog about, menu, restart, tutorial;
 	Texture conveyor = new Texture("sprites/conveyor.png"), conveyort = new Texture("sprites/conveyort.png");
@@ -73,11 +73,6 @@ public class UI extends SceneModule<Moment>{
 		Draw.text("[#f1de60]-( Mindustry )-", w/2, h-10);
 		
 		Draw.tscl(0.5f);
-		
-
-		
-		
-		//Draw.rect("conveyor", w/2, h/2, 1000, 1000);
 	}
 
 	@Override
@@ -105,7 +100,7 @@ public class UI extends SceneModule<Moment>{
 			}
 			scene.getBatch().end();
 			
-			if(UInput.keyUp("menu")){
+			if(Inputs.keyUp("menu")){
 				if(menu.getScene() != null){
 					menu.hide();
 					main.paused = false;
@@ -130,7 +125,7 @@ public class UI extends SceneModule<Moment>{
 	@Override
 	public void init(){
 
-		prefs = new PrefsDialog("Settings");
+		prefs = new SettingsDialog();
 
 		prefs.sliderPref("screenshake", "Screen Shake", 4, 0, 12, i -> {
 			return (i / 4f) + "x";
@@ -476,18 +471,18 @@ public class UI extends SceneModule<Moment>{
 	}
 
 	float roundx(){
-		return Mathf.round2(UGraphics.mouseWorldPos().x, TileType.tilesize);
+		return Mathf.round2(Graphics.mouseWorld().x, TileType.tilesize);
 	}
 
 	float roundy(){
-		return Mathf.round2(UGraphics.mouseWorldPos().y, TileType.tilesize);
+		return Mathf.round2(Graphics.mouseWorld().y, TileType.tilesize);
 	}
 
 	int tilex(){
-		return Mathf.scl2(UGraphics.mouseWorldPos().x, TileType.tilesize);
+		return Mathf.scl2(Graphics.mouseWorld().x, TileType.tilesize);
 	}
 
 	int tiley(){
-		return Mathf.scl2(UGraphics.mouseWorldPos().y, TileType.tilesize);
+		return Mathf.scl2(Graphics.mouseWorld().y, TileType.tilesize);
 	}
 }

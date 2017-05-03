@@ -1,10 +1,10 @@
-package io.anuke.moment.resource;
+package io.anuke.mindustry.resource;
 
-import static io.anuke.moment.resource.Section.*;
+import static io.anuke.mindustry.resource.Section.*;
 
 import com.badlogic.gdx.utils.Array;
 
-import io.anuke.moment.world.TileType;
+import io.anuke.mindustry.world.TileType;
 
 public enum Recipe{
 	stonewall(distribution, TileType.stonewall, stack(Item.stone, 5)),

@@ -1,16 +1,13 @@
-package io.anuke.moment.entities;
+package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.math.Vector2;
 
-import io.anuke.moment.Control;
-import io.anuke.moment.Moment;
-import io.anuke.moment.UI;
-import io.anuke.ucore.core.Draw;
-import io.anuke.ucore.core.UInput;
-import io.anuke.ucore.core.USound;
+import io.anuke.mindustry.Control;
+import io.anuke.mindustry.Moment;
+import io.anuke.mindustry.UI;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.DestructibleEntity;
-import io.anuke.ucore.entities.Effects;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Timers;
 
@@ -58,22 +55,22 @@ public class Player extends DestructibleEntity{
 		
 		vector.set(0, 0);
 		
-		if(UInput.keyDown("up"))
+		if(Inputs.keyDown("up"))
 			vector.y += speed;
-		if(UInput.keyDown("down"))
+		if(Inputs.keyDown("down"))
 			vector.y -= speed;
-		if(UInput.keyDown("left"))
+		if(Inputs.keyDown("left"))
 			vector.x -= speed;
-		if(UInput.keyDown("right"))
+		if(Inputs.keyDown("right"))
 			vector.x += speed;
 		
 		reload -= delta;
 		
-		boolean shooting = UInput.buttonDown(Buttons.LEFT) && Moment.i.recipe == null && !Moment.module(UI.class).hasMouse();
+		boolean shooting = Inputs.buttonDown(Buttons.LEFT) && Moment.i.recipe == null && !Moment.module(UI.class).hasMouse();
 		
 		if(shooting && reload <= 0){
 			weapon.shoot(this);
-			USound.play("shoot");
+			Sounds.play("shoot");
 			reload = weapon.reload;
 		}
 		

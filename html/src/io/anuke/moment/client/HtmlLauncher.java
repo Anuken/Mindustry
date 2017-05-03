@@ -8,7 +8,7 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-import io.anuke.moment.Moment;
+import io.anuke.mindustry.Moment;
 
 public class HtmlLauncher extends GwtApplication {
     static final int WIDTH = 800;
