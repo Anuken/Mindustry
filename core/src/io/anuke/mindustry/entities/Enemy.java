@@ -2,19 +2,15 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.math.Vector2;
 
-import io.anuke.mindustry.Control;
-import io.anuke.mindustry.Moment;
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.World;
 import io.anuke.mindustry.ai.Pathfind;
-import io.anuke.mindustry.world.TileType;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Sounds;
 import io.anuke.ucore.entities.*;
 import io.anuke.ucore.util.Timers;
 
 public class Enemy extends DestructibleEntity{
-	public static int amount = 0;
-	
 	public Vector2 direction = new Vector2();
 	public float xvelocity, yvelocity;
 	public float speed = 0.3f;
@@ -27,6 +23,7 @@ public class Enemy extends DestructibleEntity{
 	public float length = 4;
 	public float rotatespeed = 8f;
 	public String shootsound = "enemyshoot";
+	public boolean dead = false;
 	
 	public Enemy(int spawn){
 		this.spawn = spawn;
@@ -35,18 +32,16 @@ public class Enemy extends DestructibleEntity{
 		
 		maxhealth = 30;
 		heal();
-		
-		amount ++;
 	}
 	
 	void move(){
 		Vector2 vec  = Pathfind.find(this);
 		vec.sub(x, y).setLength(speed);
 		
-		Moment.module(Control.class).tryMove(this, vec.x*delta, vec.y*delta);
+		move(vec.x*delta, vec.y*delta);
 		
 		//if(Timers.get(this, 10))
-		target = TileType.findTileTarget(x, y, null, range, false);
+		target = World.findTileTarget(x, y, null, range, false);
 		
 		//no tile found
 		if(target == null)
@@ -57,7 +52,7 @@ public class Enemy extends DestructibleEntity{
 		if(target != null){
 			if(Timers.get(this, reload)){
 				shoot();
-				Sounds.play(shootsound);
+				Effects.sound(shootsound, this);
 			}
 				
 		}
@@ -78,13 +73,15 @@ public class Enemy extends DestructibleEntity{
 	public void onDeath(){
 		Effects.effect("explosion", this);
 		Effects.shake(3f, 4f);
-		Sounds.play("explosion");
+		Effects.sound("explosion", this);
 		remove();
+		dead = true;
 	}
 	
 	@Override
 	public void removed(){
-		amount --;
+		if(!dead)
+		Vars.enemies --;
 	}
 	
 	@Override

@@ -1,8 +1,9 @@
 package io.anuke.mindustry.entities;
 
-import io.anuke.mindustry.Moment;
+import static io.anuke.mindustry.Vars.tilesize;
+
+import io.anuke.mindustry.World;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.TileType;
 import io.anuke.ucore.entities.BulletEntity;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
@@ -24,9 +25,9 @@ public class Bullet extends BulletEntity{
 	@Override
 	public void update(){
 		
-		int tilex = Mathf.scl2(x, TileType.tilesize);
-		int tiley = Mathf.scl2(y, TileType.tilesize);
-		Tile tile = Moment.i.tile(tilex, tiley);
+		int tilex = Mathf.scl2(x, tilesize);
+		int tiley = Mathf.scl2(y, tilesize);
+		Tile tile = World.tile(tilex, tiley);
 		
 		if(tile != null && tile.entity != null &&
 				tile.entity.collide(this) && !tile.entity.dead){

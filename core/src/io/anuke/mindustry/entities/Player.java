@@ -1,11 +1,11 @@
 package io.anuke.mindustry.entities;
 
+import static io.anuke.mindustry.Vars.*;
+
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.math.Vector2;
 
-import io.anuke.mindustry.Control;
-import io.anuke.mindustry.Moment;
-import io.anuke.mindustry.UI;
+import io.anuke.mindustry.Vars;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.util.Angles;
@@ -32,8 +32,8 @@ public class Player extends DestructibleEntity{
 		Effects.shake(4f, 5f);
 		Effects.effect("respawn", this);
 		
-		Timers.run(Moment.i.respawntime, ()->{
-			set(Moment.i.core.worldx(), Moment.i.core.worldy()-8);
+		Timers.run(respawntime, ()->{
+			set(core.worldx(), core.worldy()-8);
 			heal();
 			add();
 		});
@@ -50,6 +50,11 @@ public class Player extends DestructibleEntity{
 	
 	@Override
 	public void update(){
+		float speed = this.speed;
+		
+		if(Vars.debug)
+			speed = 3f;
+		
 		if(health < maxhealth && Timers.get(this, 50))
 			health ++;
 		
@@ -66,7 +71,7 @@ public class Player extends DestructibleEntity{
 		
 		reload -= delta;
 		
-		boolean shooting = Inputs.buttonDown(Buttons.LEFT) && Moment.i.recipe == null && !Moment.module(UI.class).hasMouse();
+		boolean shooting = Inputs.buttonDown(Buttons.LEFT) && recipe == null && !ui.hasMouse();
 		
 		if(shooting && reload <= 0){
 			weapon.shoot(this);
@@ -76,7 +81,7 @@ public class Player extends DestructibleEntity{
 		
 		vector.limit(speed);
 		
-		Moment.module(Control.class).tryMove(this, vector.x*delta, vector.y*delta);
+		move(vector.x*delta, vector.y*delta);
 		
 		if(!shooting){
 			direction.add(vector.scl(delta));

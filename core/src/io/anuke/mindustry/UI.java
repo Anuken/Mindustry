@@ -1,6 +1,6 @@
 package io.anuke.mindustry;
 
-import static io.anuke.mindustry.world.TileType.tilesize;
+import static io.anuke.mindustry.Vars.*;
 
 import java.util.function.BooleanSupplier;
 
@@ -9,13 +9,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
-import io.anuke.mindustry.entities.Enemy;
 import io.anuke.mindustry.resource.*;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.TileType;
-import io.anuke.ucore.core.*;
+import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.Scene;
 import io.anuke.ucore.scene.builders.*;
@@ -23,22 +22,22 @@ import io.anuke.ucore.scene.style.Styles;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timers;
 
-public class UI extends SceneModule<Moment>{
+public class UI extends SceneModule{
 	Table itemtable;
 	SettingsDialog prefs;
 	KeybindDialog keys;
-	Dialog about, menu, restart, tutorial;
+	Dialog about, menu, restart, tutorial, levels;
 	Texture conveyor = new Texture("sprites/conveyor.png"), conveyort = new Texture("sprites/conveyort.png");
+	int selectedMap = 0;
 
 	BooleanSupplier play = () -> {
-		return main.playing;
+		return playing;
 	};
 
 	BooleanSupplier nplay = () -> {
-		return !main.playing;
+		return !playing;
 	};
 
 	public UI() {
@@ -58,6 +57,8 @@ public class UI extends SceneModule<Moment>{
 		int w = gwidth();
 		int h = gheight();
 		
+		Draw.color("gray");
+		
 		batch.draw(conveyor, 0, 0, (int)Timers.time(), 0, w, h);
 		
 		int tw = w/64+1;//, th = h/64+1;
@@ -66,8 +67,9 @@ public class UI extends SceneModule<Moment>{
 			batch.draw(conveyort, x*64, 0, 0, (int)Timers.time(), 32, h);
 		}
 		
-		Draw.tscl(1.5f);
+		Draw.color();
 		
+		Draw.tscl(1.5f);
 		
 		Draw.text("[DARK_GRAY]-( Mindustry )-", w/2, h-16);
 		Draw.text("[#f1de60]-( Mindustry )-", w/2, h-10);
@@ -78,39 +80,7 @@ public class UI extends SceneModule<Moment>{
 	@Override
 	public void update(){
 
-		if(main.playing){
-			scene.getBatch().setProjectionMatrix(get(Control.class).camera.combined);
-			scene.getBatch().begin();
-			Tile tile = main.tiles[tilex()][tiley()];
-			if(tile.block() != TileType.air){
-				String error = tile.block().error(tile);
-				if(error != null){
-					Draw.tcolor(Color.SCARLET);
-					Draw.tscl(1 / 8f);
-					Draw.text(error, tile.worldx(), tile.worldy() + tilesize);
-
-				}else if(tile.block().ammo != null){
-					Draw.tscl(1 / 8f);
-					Draw.tcolor(Color.GREEN);
-					Draw.text("Ammo: " + tile.entity.shots, tile.worldx(), tile.worldy() - tilesize);
-				}
-
-				Draw.tscl(0.5f);
-				Draw.clear();
-			}
-			scene.getBatch().end();
-			
-			if(Inputs.keyUp("menu")){
-				if(menu.getScene() != null){
-					menu.hide();
-					main.paused = false;
-				}else{
-					main.paused = true;
-					menu.show(scene);
-				}
-			}
-			
-		}else{
+		if(!playing){
 			scene.getBatch().getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 			scene.getBatch().begin();
 			
@@ -124,18 +94,43 @@ public class UI extends SceneModule<Moment>{
 
 	@Override
 	public void init(){
-
-		prefs = new SettingsDialog();
-
-		prefs.sliderPref("screenshake", "Screen Shake", 4, 0, 12, i -> {
-			return (i / 4f) + "x";
+		ButtonGroup<ImageButton> mapgroup = new ButtonGroup<>();
+		
+		levels = new Dialog("Level Select");
+		levels.addCloseButton();
+		levels.getButtonTable().addButton("Play", ()->{
+			levels.hide();
+			World.loadMap(selectedMap);
+			GameState.play();
 		});
+		
+		for(int i = 0; i < maps.length; i ++){
+			levels.content().add(maps[i]);
+		}
+		
+		levels.content().row();
+		
+		for(int i = 0; i < maps.length; i ++){
+			int index = i;
+			ImageButton image = new ImageButton(new TextureRegion(mapTextures[i]), "togglemap");
+			mapgroup.add(image);
+			image.clicked(()->{
+				selectedMap = index;
+			});
+			image.getImageCell().size(150, 150);
+			levels.content().add(image).size(180);
+		}
+		
+		prefs = new SettingsDialog();
 		
 		prefs.sliderPref("difficulty", "Difficulty", 1, 0, 2, i -> {
 			return i == 0 ? "Easy" : i == 1 ? "Normal" : "Hard";
 		});
 		
+		prefs.screenshakePref();
+		prefs.volumePrefs();
 		
+		prefs.checkPref("tutorial", "Show tutorial Window", true);
 		prefs.checkPref("fps", "Show FPS", false);
 
 		keys = new KeybindDialog();
@@ -153,10 +148,11 @@ public class UI extends SceneModule<Moment>{
 			@Override
 			public void hide(){
 				super.hide();
-				main.playing = true;
-				main.paused = false;
+				playing = true;
+				paused = false;
 			}
 		};
+		
 		tutorial.addCloseButton();
 		tutorial.getButtonTable().addButton("OK", ()->{
 			tutorial.hide();
@@ -176,11 +172,16 @@ public class UI extends SceneModule<Moment>{
 		
 		tutorial.content().pad(8);
 		
+		tutorial.content().row();
+		tutorial.content().addCheck("Don't show again", b->{
+			Settings.putBool("tutorial", !b);
+		}).padTop(4);
+		
 		restart = new Dialog("The core was destroyed.", "dialog"){
 			public Dialog show(Scene scene){
 				super.show(scene);
 				restart.content().clearChildren();
-				restart.content().add("You lasted until wave [GREEN]" + main.wave + "[].").pad(6);
+				restart.content().add("You lasted until wave [GREEN]" + wave + "[].").pad(6);
 				restart.pack();
 				return this;
 			}
@@ -188,14 +189,24 @@ public class UI extends SceneModule<Moment>{
 		
 		restart.getButtonTable().addButton("Back to menu", ()->{
 			restart.hide();
-			main.playing = false;
-			main.restart();
+			playing = false;
+			GameState.reset();
 		});
 		
 		menu = new Dialog("Paused", "dialog");
 		menu.content().addButton("Back", ()->{
 			menu.hide();
-			main.paused = false;
+			paused = false;
+		}).width(200);
+		
+		menu.content().row();
+		menu.content().addButton("Settings", ()->{
+			prefs.show();
+		}).width(200);
+		
+		menu.content().row();
+		menu.content().addButton("Controls", ()->{
+			keys.show();
 		}).width(200);
 		
 		menu.content().row();
@@ -210,8 +221,8 @@ public class UI extends SceneModule<Moment>{
 				protected void result(Object object){
 					if(object == Boolean.TRUE){
 						menu.hide();
-						main.paused = false;
-						main.playing = false;
+						paused = false;
+						playing = false;
 					}
 				}
 			}.show(scene);
@@ -260,8 +271,8 @@ public class UI extends SceneModule<Moment>{
 						ImageButton image = new ImageButton(Draw.region(r.result.name()), "select");
 						
 						image.clicked(()->{
-							if(main.hasItems(r.requirements))
-							main.recipe = r;
+							if(Inventory.hasItems(r.requirements))
+							recipe = r;
 						});
 						
 						table.add(image).size(size+8).pad(4);
@@ -269,9 +280,9 @@ public class UI extends SceneModule<Moment>{
 						
 						image.update(()->{
 							
-							boolean has = main.hasItems(r.requirements);
+							boolean has = Inventory.hasItems(r.requirements);
 							image.setDisabled(!has);
-							image.setChecked(main.recipe == r && has);
+							image.setChecked(recipe == r && has);
 							//image.setTouchable(has ? Touchable.enabled : Touchable.disabled);
 							image.getImage().setColor(has ? Color.WHITE : Color.GRAY);
 						});
@@ -287,10 +298,6 @@ public class UI extends SceneModule<Moment>{
 							tiptable.clearChildren();
 							
 							String description = r.result.description();
-							if(r.result.ammo != null){
-								description += "\n[SALMON]Ammo: " + r.result.ammo.name();
-							}
-	
 							
 							tiptable.background("button");
 							tiptable.add("[PURPLE]" + r.result.name(), 0.75f).left().padBottom(2f);
@@ -298,7 +305,7 @@ public class UI extends SceneModule<Moment>{
 							ItemStack[] req = r.requirements;
 							for(ItemStack s : req){
 								tiptable.row();
-								int amount = Math.min(main.items.get(s.item, 0), s.amount);
+								int amount = Math.min(items.get(s.item, 0), s.amount);
 								tiptable.add(
 										(amount >= s.amount ? "[YELLOW]" : "[RED]")
 								+s.item + ": " + amount + " / " +s.amount, 0.5f).left();
@@ -378,7 +385,7 @@ public class UI extends SceneModule<Moment>{
 					new label("Wave 1"){{
 							get().setFontScale(1f);
 							get().update(() -> {
-								get().setText("[YELLOW]Wave " + Moment.i.wave);
+								get().setText("[YELLOW]Wave " + wave);
 							});
 						}}.left();
 
@@ -386,7 +393,8 @@ public class UI extends SceneModule<Moment>{
 
 					new label("Time"){{
 							get().update(() -> {
-								get().setText(Enemy.amount > 0 ? Enemy.amount + " Enemies remaining" : "New wave in " + (int) (main.wavetime / 60f));
+								get().setText(enemies > 0 ? 
+										enemies + " Enemies remaining" : "New wave in " + (int) (wavetime / 60f));
 							});
 						}}.minWidth(150);
 
@@ -401,18 +409,17 @@ public class UI extends SceneModule<Moment>{
 		new table(){{
 			aleft();
 			abottom();
-			Control c = main.get(Control.class);
 			new button("+", ()->{
-				if(c.cameraScale < 4f){
-					c.cameraScale = 4f;
-					c.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+				if(control.cameraScale < 4f){
+					control.cameraScale = 4f;
+					control.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 				}
 			}).size(40);
 			
 			new button("-", ()->{
-				if(c.cameraScale > 3f){
-					c.cameraScale = 3f;
-					c.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+				if(control.cameraScale > 3f){
+					control.cameraScale = 3f;
+					control.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 				}
 			}).size(40);
 			
@@ -424,7 +431,7 @@ public class UI extends SceneModule<Moment>{
 			float w = 200;
 
 			new button("Play", () -> {
-				main.play();
+				levels.show();
 			}).width(w);
 
 			row();
@@ -453,36 +460,33 @@ public class UI extends SceneModule<Moment>{
 		build.end();
 	}
 	
+	public void showMenu(){
+		menu.show();
+	}
+	
+	public void hideMenu(){
+		menu.hide();
+	}
+	
+	public void showTutorial(){
+		tutorial.show();
+	}
+	
 	public void showRestart(){
-		restart.show(scene);
+		restart.show();
 	}
 
 	public void updateItems(){
 		itemtable.clear();
 
-		for(Item stack : main.items.keys()){
+		for(Item stack : items.keys()){
 			Image image = new Image(Draw.region("icon-" + stack.name()));
-			Label label = new Label("" + main.items.get(stack));
+			Label label = new Label("" + items.get(stack));
 			label.setFontScale(1f);
 			itemtable.add(image).size(32);
 			itemtable.add(label);
 			itemtable.row();
 		}
 	}
-
-	float roundx(){
-		return Mathf.round2(Graphics.mouseWorld().x, TileType.tilesize);
-	}
-
-	float roundy(){
-		return Mathf.round2(Graphics.mouseWorld().y, TileType.tilesize);
-	}
-
-	int tilex(){
-		return Mathf.scl2(Graphics.mouseWorld().x, TileType.tilesize);
-	}
-
-	int tiley(){
-		return Mathf.scl2(Graphics.mouseWorld().y, TileType.tilesize);
-	}
+	
 }

@@ -1,51 +1,66 @@
 package io.anuke.mindustry.world;
 
-import io.anuke.mindustry.Moment;
+import static io.anuke.mindustry.Vars.*;
+
+import io.anuke.mindustry.World;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.world.blocks.Blocks;
+
 
 public class Tile{
-	private static Tile[] tiles = new Tile[4];
-	private TileType floor = TileType.air;
-	private TileType block = TileType.air;
+	private Block floor = Blocks.air;
+	private Block block = Blocks.air;
 	public TileEntity entity;
-	public int x, y, rotation;
+	public int x, y, rotation, dump;
 	
 	public Tile(int x, int y){
 		this.x = x;
 		this.y = y;
 	}
 	
-	public Tile(int x, int y, TileType floor){
+	public Tile(int x, int y, Block floor){
 		this(x, y);
 		this.floor = floor;
 	}
 	
+	public int relativeTo(int cx, int cy){
+		if(x == cx && y == cy - 1) return 1;
+		if(x == cx && y == cy + 1) return 3;
+		if(x == cx - 1 && y == cy) return 0;
+		if(x == cx + 1 && y == cy) return 2;
+		return -1;
+	}
+	
+	public <T extends TileEntity> T entity(){
+		return (T)entity;
+	}
+	
 	public int id(){
-		return x + y * Moment.i.size;
+		return x + y * worldsize;
 	}
 	
 	public float worldx(){
-		return x * TileType.tilesize;
+		return x * tilesize;
 	}
 	
 	public float worldy(){
-		return y * TileType.tilesize;
+		return y * tilesize;
 	}
 	
-	public TileType floor(){
+	public Block floor(){
 		return floor;
 	}
 	
-	public TileType block(){
+	public Block block(){
 		return block;
 	}
 	
-	public void setBlock(TileType type){
+	public void setBlock(Block type){
 		this.block = type;
 		changed();
 	}
 	
-	public void setFloor(TileType type){
+	public void setFloor(Block type){
 		this.floor = type;
 	}
 	
@@ -54,14 +69,8 @@ public class Tile{
 	}
 	
 	public Tile[] getNearby(){
-		tiles[0] = Moment.i.tile(x+1, y);
-		tiles[1] = Moment.i.tile(x, y+1);
-		tiles[2] = Moment.i.tile(x-1, y);
-		tiles[3] = Moment.i.tile(x, y-1);
-		
-		return tiles;
+		return World.getNearby(x, y);
 	}
-	
 	
 	public void changed(){
 		if(entity != null){
@@ -70,6 +79,11 @@ public class Tile{
 		}
 		
 		if(block.update)
-			entity = new TileEntity(this).add();
+			entity = block.getEntity().init(this).add();
+	}
+	
+	@Override
+	public String toString(){
+		return floor.name() + ":" + block.name();
 	}
 }

@@ -1,22 +1,20 @@
 package io.anuke.mindustry.ai;
 
+import static io.anuke.mindustry.Vars.*;
+
 import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
-import io.anuke.mindustry.Moment;
 import io.anuke.mindustry.entities.Enemy;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
-
 public class Pathfind{
 	static MHueristic heuristic = new MHueristic();
-	static TileGraph graph = new TileGraph();
 	static PassTileGraph passgraph = new PassTileGraph();
-	static IndexedAStarPathFinder<Tile> pathfinder = new IndexedAStarPathFinder<Tile>(graph);
-	static IndexedAStarPathFinder<Tile> passpathfinder = new IndexedAStarPathFinder<Tile>(passgraph);
+	static IndexedAStarPathFinder<Tile> passpathfinder;
 	static Array<DefaultGraphPath<Tile>> paths = new Array<>();
 	static Vector2 vector = new Vector2();
 	
@@ -48,11 +46,12 @@ public class Pathfind{
 	
 	static public void reset(){
 		paths.clear();
+		passpathfinder = new IndexedAStarPathFinder<Tile>(passgraph);
 	}
 	
 	static public void updatePath(){
 		if(paths.size == 0){
-			for(int i = 0; i < Moment.i.spawnpoints.size; i ++){
+			for(int i = 0; i < spawnpoints.size; i ++){
 				DefaultGraphPath<Tile> path = new DefaultGraphPath<>();
 				paths.add(path);
 			}
@@ -62,8 +61,8 @@ public class Pathfind{
 		for(DefaultGraphPath<Tile> path : paths){
 			path.clear();
 			passpathfinder.searchNodePath(
-					Moment.i.spawnpoints.get(i), 
-					Moment.i.core, heuristic, path);
+					spawnpoints.get(i), 
+					core, heuristic, path);
 			
 			//for(Tile tile : path){
 			//	Effects.effect("ind", tile.worldx(), tile.worldy());
@@ -80,7 +79,6 @@ public class Pathfind{
 	
 	static void findNode(Enemy enemy){
 		DefaultGraphPath<Tile> path = paths.get(enemy.spawn);
-		
 		Tile closest = null;
 		float ldst = 0f;
 		int cindex = -1;

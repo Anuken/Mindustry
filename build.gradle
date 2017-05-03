@@ -16,8 +16,9 @@ allprojects {
 
     version = '1.0'
     ext {
-        appName = "Moment"
+        appName = "Mindustry"
         gdxVersion = '1.9.6'
+        aiVersion = '1.8.0'
     }
 
     repositories {
@@ -36,7 +37,6 @@ project(":desktop") {
         compile project(":core")
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        
     }
 }
 
@@ -59,9 +59,9 @@ project(":core") {
 
 
     dependencies {
+        compile fileTree(dir: '../core/lib', include: '*.jar')
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-ai:1.8.1"
-        compile fileTree(dir: '../core/lib', include: '*.jar')
     }
 }
 

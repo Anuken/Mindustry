@@ -7,8 +7,8 @@ gwt {
     minHeapSize="1G"
 
     src = files(file("src/")) // Needs to be in front of "modules" below.
-    modules 'io.anuke.moment.GdxDefinition'
-    devModules 'io.anuke.moment.GdxDefinitionSuperdev'
+    modules 'io.anuke.mindustry.GdxDefinition'
+    devModules 'io.anuke.mindustry.GdxDefinitionSuperdev'
     project.webAppDirName = 'webapp'
 
     compiler {
