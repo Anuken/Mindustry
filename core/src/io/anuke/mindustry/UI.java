@@ -175,6 +175,7 @@ public class UI extends SceneModule{
 		tutorial.content().row();
 		tutorial.content().addCheck("Don't show again", b->{
 			Settings.putBool("tutorial", !b);
+			Settings.save();
 		}).padTop(4);
 		
 		restart = new Dialog("The core was destroyed.", "dialog"){

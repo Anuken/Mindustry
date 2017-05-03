@@ -87,7 +87,7 @@ public class Control extends RendererModule{
 				if(enemies <= 0)
 					wavetime -= delta();
 			
-				if(wavetime <= 0){
+				if(wavetime <= 0 || (debug && Inputs.keyUp(Keys.F))){
 					GameState.runWave();
 				}
 			

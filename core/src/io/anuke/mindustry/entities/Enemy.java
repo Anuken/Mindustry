@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.World;
 import io.anuke.mindustry.ai.Pathfind;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.*;
@@ -12,6 +13,7 @@ import io.anuke.ucore.util.Timers;
 
 public class Enemy extends DestructibleEntity{
 	public Vector2 direction = new Vector2();
+	public Tile[] path;
 	public float xvelocity, yvelocity;
 	public float speed = 0.3f;
 	public int node = -1;
@@ -40,21 +42,22 @@ public class Enemy extends DestructibleEntity{
 		
 		move(vec.x*delta, vec.y*delta);
 		
-		//if(Timers.get(this, 10))
-		target = World.findTileTarget(x, y, null, range, false);
+		if(Timers.get(this, 15)){
+			target = World.findTileTarget(x, y, null, range, false);
 		
-		//no tile found
-		if(target == null)
-			target = Entities.getClosest(x, y, range, e->{
-				return e instanceof Player;
-			});
+			//no tile found
+			if(target == null)
+				target = Entities.getClosest(x, y, range, e->{
+					return e instanceof Player;
+				});
+		
+		}
 		
 		if(target != null){
-			if(Timers.get(this, reload)){
+			if(Timers.get(hashCode()+"reload", reload)){
 				shoot();
 				Effects.sound(shootsound, this);
 			}
-				
 		}
 	}
 	

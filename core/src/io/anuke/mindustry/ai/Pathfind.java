@@ -9,13 +9,12 @@ import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.entities.Enemy;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.Entity;
 public class Pathfind{
 	static MHueristic heuristic = new MHueristic();
 	static PassTileGraph passgraph = new PassTileGraph();
 	static IndexedAStarPathFinder<Tile> passpathfinder;
 	static Array<DefaultGraphPath<Tile>> paths = new Array<>();
+	static Tile[][] pathSequences;
 	static Vector2 vector = new Vector2();
 	
 	static public Vector2 find(Enemy enemy){
@@ -26,17 +25,17 @@ public class Pathfind{
 		//-1 is only possible here if both pathfindings failed, which should NOT happen
 		//check graph code
 		
-		DefaultGraphPath<Tile> path = paths.get(enemy.spawn);
+		Tile[] path = enemy.path;
 
-		Tile target = path.get(enemy.node);
+		Tile target = path[enemy.node];
 			
 		float dst = Vector2.dst(enemy.x, enemy.y, target.worldx(), target.worldy());
 			
 		if(dst < 2){
-			if(enemy.node <= path.getCount()-2)
+			if(enemy.node <= path.length-2)
 				enemy.node ++;
 				
-			target = path.get(enemy.node);
+			target = path[enemy.node];
 		}
 			
 			
@@ -46,45 +45,52 @@ public class Pathfind{
 	
 	static public void reset(){
 		paths.clear();
+		pathSequences = null;
 		passpathfinder = new IndexedAStarPathFinder<Tile>(passgraph);
 	}
 	
 	static public void updatePath(){
 		if(paths.size == 0){
+			pathSequences = new Tile[3][0];
 			for(int i = 0; i < spawnpoints.size; i ++){
 				DefaultGraphPath<Tile> path = new DefaultGraphPath<>();
 				paths.add(path);
 			}
 		}
 		
-		int i = 0;
-		for(DefaultGraphPath<Tile> path : paths){
+		for(int i = 0; i < paths.size; i ++){
+			DefaultGraphPath<Tile> path = paths.get(i);
+			
 			path.clear();
 			passpathfinder.searchNodePath(
 					spawnpoints.get(i), 
 					core, heuristic, path);
 			
-			//for(Tile tile : path){
-			//	Effects.effect("ind", tile.worldx(), tile.worldy());
-			///}
-			i++;
-		}
-		
-		for(Entity e : Entities.all()){
-			if(e instanceof Enemy){
-				findNode((Enemy)e);
+			pathSequences[i] = new Tile[path.getCount()];
+			
+			for(int node = 0; node < path.getCount(); node ++){
+				Tile tile = path.get(node);
+				
+				pathSequences[i][node] = tile;
 			}
+			
+			/*
+			for(Tile tile : path){
+				Effects.effect("ind", tile.worldx(), tile.worldy());
+			}
+			*/
 		}
 	}
 	
 	static void findNode(Enemy enemy){
-		DefaultGraphPath<Tile> path = paths.get(enemy.spawn);
+		enemy.path = pathSequences[enemy.spawn];
+		Tile[] path = enemy.path;
 		Tile closest = null;
 		float ldst = 0f;
 		int cindex = -1;
 		
-		for(int i = 0; i < path.getCount(); i ++){
-			Tile tile = path.get(i);
+		for(int i = 0; i < path.length; i ++){
+			Tile tile = path[i];
 			float dst = Vector2.dst(tile.worldx(), tile.worldy(), enemy.x, enemy.y);
 			
 			if(closest == null || dst < ldst){

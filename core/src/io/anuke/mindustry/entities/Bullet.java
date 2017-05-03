@@ -40,6 +40,13 @@ public class Bullet extends BulletEntity{
 	}
 	
 	@Override
+	public boolean collides(SolidEntity other){
+		if(owner instanceof TileEntity && other instanceof Player)
+			return false;
+		return super.collides(other);
+	}
+	
+	@Override
 	public void collision(SolidEntity other){
 		super.collision(other);
 		type.removed(this);
