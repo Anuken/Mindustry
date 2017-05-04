@@ -58,7 +58,7 @@ public class GameState{
 					
 					Enemy enemy = null;
 					
-					if(wave%5 == 0 & pos <= wave/5){
+					if(wave%5 == 0 & pos < wave/5){
 						enemy = new BossEnemy(point);
 					}else if(wave > 3 && pos < amount/2){
 						enemy = new FastEnemy(point);

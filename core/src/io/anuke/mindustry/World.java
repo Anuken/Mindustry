@@ -59,6 +59,8 @@ public class World{
 			}
 		}
 		
+		Entities.resizeTree(0, 0, pixsize, pixsize);
+		
 		Generator.generate(id);
 		
 		Pathfind.reset();

@@ -50,7 +50,7 @@ public class Control extends RendererModule{
 	public void init(){
 		Musics.shuffleAll();
 		
-		Entities.initPhysics(0, 0, pixsize, pixsize);
+		Entities.initPhysics();
 		
 		Entities.setCollider(tilesize, (x, y)->{
 			return World.solid(x, y);
