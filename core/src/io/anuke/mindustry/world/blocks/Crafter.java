@@ -40,7 +40,7 @@ public class Crafter extends Block{
 	}
 
 	@Override
-	public boolean accept(Item item){
+	public boolean accept(Item item, Tile dest, Tile source){
 		return item == Item.iron || item == Item.coal;
 	}
 }

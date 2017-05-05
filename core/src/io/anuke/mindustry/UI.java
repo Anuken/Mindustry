@@ -7,10 +7,11 @@ import java.util.function.BooleanSupplier;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
+import io.anuke.mindustry.entities.Weapon;
 import io.anuke.mindustry.resource.*;
+import io.anuke.mindustry.ui.*;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.graphics.Hue;
@@ -25,12 +26,10 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Timers;
 
 public class UI extends SceneModule{
-	Table itemtable;
+	Table itemtable, weapontable;
 	SettingsDialog prefs;
 	KeybindDialog keys;
-	Dialog about, menu, restart, tutorial, levels;
-	//Texture conveyor = new Texture("sprites/conveyor.png"), conveyort = new Texture("sprites/conveyort.png");
-	int selectedMap = 0;
+	Dialog about, menu, restart, tutorial, levels, upgrades;
 
 	BooleanSupplier play = () -> {
 		return playing;
@@ -100,34 +99,15 @@ public class UI extends SceneModule{
 
 	@Override
 	public void init(){
-		ButtonGroup<ImageButton> mapgroup = new ButtonGroup<>();
+		//TODO oh my god just move these dialogs to different files
 		
-		levels = new Dialog("Level Select");
-		levels.addCloseButton();
-		levels.getButtonTable().addButton("Play", ()->{
-			levels.hide();
-			World.loadMap(selectedMap);
-			GameState.play();
-		});
+		upgrades = new UpgradeDialog();
 		
-		for(int i = 0; i < maps.length; i ++){
-			levels.content().add(maps[i]);
-		}
-		
-		levels.content().row();
-		
-		for(int i = 0; i < maps.length; i ++){
-			int index = i;
-			ImageButton image = new ImageButton(new TextureRegion(mapTextures[i]), "togglemap");
-			mapgroup.add(image);
-			image.clicked(()->{
-				selectedMap = index;
-			});
-			image.getImageCell().size(150, 150);
-			levels.content().add(image).size(180);
-		}
+		levels = new LevelDialog();
 		
 		prefs = new SettingsDialog();
+		
+		menu = new MenuDialog();
 		
 		prefs.sliderPref("difficulty", "Difficulty", 1, 0, 2, i -> {
 			return i == 0 ? "Easy" : i == 1 ? "Normal" : "Hard";
@@ -143,25 +123,7 @@ public class UI extends SceneModule{
 
 		about = new TextDialog("About", aboutText);
 		
-		tutorial = new TextDialog("Tutorial", tutorialText)
-				.setDialog();
-		
-		tutorial.hidden(()->{
-			playing = true;
-			paused = false;
-		});
-		
-		tutorial.getButtonTable().addButton("OK", ()->{
-			tutorial.hide();
-		});
-		
-		tutorial.content().pad(8);
-		
-		tutorial.content().row();
-		tutorial.content().addCheck("Don't show again", b->{
-			Settings.putBool("tutorial", !b);
-			Settings.save();
-		}).padTop(4);
+		tutorial = new TutorialDialog();
 		
 		restart = new Dialog("The core was destroyed.", "dialog"){
 			public Dialog show(Scene scene){
@@ -179,41 +141,9 @@ public class UI extends SceneModule{
 			GameState.reset();
 		});
 		
-		menu = new Dialog("Paused", "dialog");
-		menu.content().addButton("Back", ()->{
-			menu.hide();
-			paused = false;
-		}).width(200);
-		
-		menu.content().row();
-		menu.content().addButton("Settings", ()->{
-			prefs.show();
-		}).width(200);
-		
-		menu.content().row();
-		menu.content().addButton("Controls", ()->{
-			keys.show();
-		}).width(200);
-		
-		menu.content().row();
-		menu.content().addButton("Back to menu", ()->{
-			new Dialog("Confirm", "dialog"){
-				{
-					text("Are you sure you want to quit?");
-					button("Ok", true);
-					button("Cancel", false);
-				}
-				
-				protected void result(Object object){
-					if(object == Boolean.TRUE){
-						menu.hide();
-						paused = false;
-						playing = false;
-					}
-				}
-			}.show(scene);
-			
-		}).width(200);
+		weapontable = fill();
+		weapontable.bottom();
+		weapontable.setVisible(play);
 		
 		build.begin(scene);
 
@@ -319,12 +249,6 @@ public class UI extends SceneModule{
 						table.add().size(size);
 					}
 					
-					
-					if(sec == Section.distribution){
-						table.row();
-						table.add().size(size);
-					}
-					
 					table.setVisible(()->{
 						return button.isChecked();
 					});
@@ -337,7 +261,14 @@ public class UI extends SceneModule{
 				add(stack).colspan(3);
 				get().pad(10f);
 				
-			}}.right().bottom();
+				end();
+			}}.right().bottom().uniformX();
+			
+			row();
+			
+			new button("Upgrades", ()->{
+				upgrades.show();
+			}).uniformX().fillX();
 
 			get().setVisible(play);
 
@@ -444,6 +375,46 @@ public class UI extends SceneModule{
 		updateItems();
 
 		build.end();
+	}
+	
+	public void updateWeapons(){
+		weapontable.clearChildren();
+		
+		for(Weapon weapon : Weapon.values()){
+			if(weapons.get(weapon) == Boolean.TRUE){
+				ImageButton button = new ImageButton(Draw.region("weapon-"+weapon.name()), "static");
+				button.getImageCell().size(40);
+				button.setDisabled(true);
+				if(weapon != currentWeapon)
+					button.setColor(Color.GRAY);
+				weapontable.add(button).size(48, 52);
+				
+				Table tiptable = new Table();
+				String description = weapon.description;
+					
+				tiptable.background("button");
+				tiptable.add("[PURPLE]" + weapon.name(), 0.75f).left().padBottom(2f);
+					
+				tiptable.row();
+				tiptable.row();
+				tiptable.add("[ORANGE]" + description).left();
+				tiptable.pad(10f);
+				
+				Tooltip tip = new Tooltip(tiptable);
+				
+				tip.setInstant(true);
+
+				button.addListener(tip);
+			}
+		}
+	}
+	
+	public void showPrefs(){
+		prefs.show();
+	}
+	
+	public void showControls(){
+		keys.show();
 	}
 	
 	public void showMenu(){

@@ -39,4 +39,10 @@ public class Inventory{
 		items.put(req.item, items.get(req.item, 0)-req.amount);
 		ui.updateItems();
 	}
+	
+	public static void removeItems(ItemStack... reqs){
+		for(ItemStack req : reqs)
+		items.put(req.item, items.get(req.item, 0)-req.amount);
+		ui.updateItems();
+	}
 }

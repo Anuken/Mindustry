@@ -3,11 +3,12 @@ package io.anuke.mindustry.client;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import io.anuke.mindustry.Mindustry;
 import com.google.gwt.dom.client.*;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.VerticalPanel;
+
+import io.anuke.mindustry.Mindustry;
 
 public class HtmlLauncher extends GwtApplication {
     static final int WIDTH = 800;

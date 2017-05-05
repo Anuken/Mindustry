@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.Weapon;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.world.Tile;
@@ -17,8 +18,8 @@ public class Vars{
 	public static final float respawntime = 60*4;
 	public static final float wavespace = 20*60;
 	public static final float enemyspawnspace = 65;
-	public static final float breakduration = 40;
-	public static boolean debug = false;
+	public static final float breakduration = 30;
+	public static boolean debug = true;
 	
 	public static final Vector2 vector = new Vector2();
 	
@@ -28,6 +29,8 @@ public class Vars{
 	public static UI ui;
 	
 	public static final ObjectMap<Item, Integer> items = new ObjectMap<>();
+	public static final ObjectMap<Weapon, Boolean> weapons = new ObjectMap<Weapon, Boolean>();
+	public static Weapon currentWeapon;
 	
 	public static Player player;
 	
@@ -39,6 +42,7 @@ public class Vars{
 	public static int worldsize = 128;
 	public static int pixsize = worldsize*tilesize;
 	public static Tile[][] tiles = new Tile[worldsize][worldsize];
+	
 	public static Recipe recipe;
 	public static int rotation;
 	

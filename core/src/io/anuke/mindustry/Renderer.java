@@ -158,6 +158,7 @@ public class Renderer{
 		float offset = 7;
 		
 		float fraction = Mathf.clamp((float) health / maxhealth);
+		float w = (len * 2 * fraction);
 		
 		Draw.thickness(3f);
 		Draw.color(Color.GRAY);
@@ -166,7 +167,8 @@ public class Renderer{
 		Draw.color(Color.BLACK);
 		Draw.line(x - len + 1, y - offset, x + len, y - offset);
 		Draw.color(Color.RED);
-		Draw.line(x - len + 1, y - offset, x - len + (int)(len * 2 * fraction), y - offset);
+		if(w >= 1)
+		Draw.line(x - len + 1, y - offset, x - len + w, y - offset);
 		Draw.clear();
 	}
 }

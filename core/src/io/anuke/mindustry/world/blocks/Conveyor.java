@@ -64,7 +64,7 @@ public class Conveyor extends Block{
 	}
 
 	@Override
-	public boolean accept(Item item){
+	public boolean accept(Item item, Tile dest, Tile source){
 		return true;
 	}
 	
@@ -74,7 +74,7 @@ public class Conveyor extends Block{
 	}
 
 	@Override
-	protected void handleItem(Tile tile, Item item, Tile source){
+	public void handleItem(Tile tile, Item item, Tile source){
 		int ch = Math.abs(source.relativeTo(tile.x, tile.y) - tile.rotation);
 		int ang = ((source.relativeTo(tile.x, tile.y) - tile.rotation));
 		

@@ -16,6 +16,7 @@ public enum Recipe{
 	conveyor(distribution, ProductionBlocks.conveyor, stack(Item.stone, 1)),
 	fastconveyor(distribution, ProductionBlocks.steelconveyor, stack(Item.steel, 1)),
 	router(distribution, ProductionBlocks.router, stack(Item.stone, 3)),
+	junction(distribution, ProductionBlocks.junction, stack(Item.iron, 5)),
 	
 	turret(defense, WeaponBlocks.turret, stack(Item.stone, 6)),
 	dturret(defense, WeaponBlocks.doubleturret, stack(Item.stone, 12)),

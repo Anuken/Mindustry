@@ -16,7 +16,6 @@ public class Player extends DestructibleEntity{
 	float speed = 1f;
 	float rotation;
 	float reload;
-	Weapon weapon = Weapon.blaster;
 	
 	public Player(){
 		hitsize = 5;
@@ -74,14 +73,14 @@ public class Player extends DestructibleEntity{
 		boolean shooting = Inputs.buttonDown(Buttons.LEFT) && recipe == null && !ui.hasMouse();
 		
 		if(shooting && reload <= 0){
-			weapon.shoot(this);
+			currentWeapon.shoot(this);
 			Sounds.play("shoot");
-			reload = weapon.reload;
+			reload = currentWeapon.reload;
 		}
 		
 		vector.limit(speed);
 		
-		move(vector.x*delta, vector.y*delta);
+		move(vector.x*delta, vector.y*delta, 4);
 		
 		if(!shooting){
 			direction.add(vector.scl(delta));

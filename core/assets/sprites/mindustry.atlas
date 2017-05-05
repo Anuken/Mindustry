@@ -1,5 +1,5 @@
 
-mindsutry.png
+mindustry.png
 size: 256,32
 format: RGBA8888
 filter: Nearest,Nearest
@@ -228,6 +228,13 @@ ironwall
   orig: 8, 8
   offset: 0, 0
   index: -1
+junction
+  rotate: false
+  xy: 178, 13
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
 laser
   rotate: false
   xy: 95, 7
@@ -251,7 +258,7 @@ machineturret
   index: -1
 mech1
   rotate: false
-  xy: 178, 13
+  xy: 188, 13
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -265,7 +272,7 @@ megarepairturret
   index: -1
 player
   rotate: false
-  xy: 188, 13
+  xy: 198, 13
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -279,7 +286,7 @@ repairturret
   index: -1
 router
   rotate: false
-  xy: 198, 13
+  xy: 208, 13
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -307,77 +314,77 @@ sniperturret
   index: -1
 steelconveyor
   rotate: false
-  xy: 208, 13
+  xy: 218, 13
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 steelconveyormove
   rotate: false
-  xy: 218, 13
+  xy: 228, 13
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 steelwall
   rotate: false
-  xy: 228, 13
+  xy: 238, 13
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 stone
   rotate: false
-  xy: 238, 13
+  xy: 98, 3
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 stone1
   rotate: false
-  xy: 98, 3
+  xy: 108, 3
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 stone2
   rotate: false
-  xy: 108, 3
+  xy: 118, 3
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 stone3
   rotate: false
-  xy: 118, 3
+  xy: 128, 3
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 stoneblock
   rotate: false
-  xy: 128, 3
+  xy: 138, 3
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 stonedrill
   rotate: false
-  xy: 138, 3
+  xy: 148, 3
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 stonedrillhead
   rotate: false
-  xy: 138, 3
+  xy: 148, 3
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 stonewall
   rotate: false
-  xy: 148, 3
+  xy: 158, 3
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -387,5 +394,19 @@ turret
   xy: 85, 21
   size: 10, 10
   orig: 10, 10
+  offset: 0, 0
+  index: -1
+weapon-blaster
+  rotate: false
+  xy: 168, 3
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+weapon-trishot
+  rotate: false
+  xy: 178, 3
+  size: 8, 8
+  orig: 8, 8
   offset: 0, 0
   index: -1

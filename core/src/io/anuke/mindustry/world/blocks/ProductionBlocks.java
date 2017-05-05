@@ -17,12 +17,12 @@ public class ProductionBlocks{
 		}
 		
 		@Override
-		protected void handleItem(Tile tile, Item item, Tile source){
+		public void handleItem(Tile tile, Item item, Tile source){
 			Inventory.addItem(item, 1);
 		}
 		
 		@Override
-		public boolean accept(Item item){
+		public boolean accept(Item item, Tile dest, Tile source){
 			return true;
 		}
 	},
@@ -44,20 +44,51 @@ public class ProductionBlocks{
 		
 		@Override
 		public void update(Tile tile){
-			if(Timers.get(tile, 10) && tile.entity.totalItems() > 0){
+			if(Timers.get(tile, 2) && tile.entity.totalItems() > 0){
 				tryDump(tile, tile.rotation++, null);
 				tile.rotation %= 4;
 			}
 		}
 
 		@Override
-		public boolean accept(Item item){
+		public boolean accept(Item item, Tile dest, Tile source){
 			return true;
 		}
 		
 		@Override
 		public String description(){
 			return "Split input materials into 3 directions.";
+		}
+	},
+	
+	junction = new Block("junction"){
+		{
+			update = true;
+			solid = true;
+		}
+		
+		@Override
+		public void handleItem(Tile tile, Item item, Tile source){
+			int dir = source.relativeTo(tile.x, tile.y);
+			dir = (dir+4)%4;
+			Tile to = tile.getNearby()[dir];
+			Timers.run(15, ()->{
+				to.block().handleItem(to, item, tile);
+			});
+			
+		}
+
+		@Override
+		public boolean accept(Item item, Tile dest, Tile source){
+			int dir = source.relativeTo(dest.x, dest.y);
+			dir = (dir+4)%4;
+			Tile to = dest.getNearby()[dir];
+			return to != null && to.block() != junction && to.block().accept(item, dest, to);
+		}
+		
+		@Override
+		public String description(){
+			return "Serves as a conveyor junction.";
 		}
 	},
 	

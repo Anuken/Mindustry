@@ -15,6 +15,12 @@ import io.anuke.ucore.util.Timers;
 public class GameState{
 	
 	public static void reset(){
+		for(Weapon weapon : Weapon.values()){
+			weapons.put(weapon, weapon.unlocked);
+		}
+		
+		currentWeapon = Weapon.blaster;
+		
 		wave = 1;
 		wavetime = waveSpacing();
 		Entities.clear();
@@ -25,6 +31,7 @@ public class GameState{
 		spawnpoints.clear();
 		
 		ui.updateItems();
+		ui.updateWeapons();
 	}
 	
 	public static void play(){

@@ -5,6 +5,7 @@ import static io.anuke.mindustry.Vars.*;
 import com.badlogic.gdx.Input.Buttons;
 
 import io.anuke.mindustry.ai.Pathfind;
+import io.anuke.mindustry.entities.Weapon;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
@@ -18,9 +19,32 @@ import io.anuke.ucore.util.Mathf;
 public class Input{
 	
 	public static void doInput(){
-		
 		//player is dead
 		if(player.health <= 0) return;
+		
+		if(Inputs.scrolled()){
+			Weapon[] val = Weapon.values();
+			int index = 0;
+			for(int i = 0; i < val.length; i ++)
+				if(val[i] == currentWeapon){
+					index = i;
+					break;
+				}
+			
+			for(int i = 0; i < val.length; i ++){
+				index += Inputs.scroll();
+				if(index >= 0 && index < val.length){
+					if(weapons.get(val[index])){
+						currentWeapon = (val[index]);
+						break;
+					}
+				}else{
+					break;
+				}
+			}
+			
+			ui.updateWeapons();
+		}
 
 		if(Inputs.keyUp("rotate"))
 			rotation++;

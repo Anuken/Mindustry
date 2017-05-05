@@ -36,11 +36,11 @@ public class Block{
 		return null;
 	}
 
-	protected void handleItem(Tile tile, Item item, Tile source){
+	public void handleItem(Tile tile, Item item, Tile source){
 		tile.entity.addItem(item, 1);
 	}
 	
-	public boolean accept(Item item){
+	public boolean accept(Item item, Tile dest, Tile source){
 		return false;
 	}
 	
@@ -62,7 +62,7 @@ public class Block{
 		
 		for(int j = 0; j < 4; j ++){
 			Tile other = tiles[i];
-			if(other != null && other.block().accept(item)
+			if(other != null && other.block().accept(item, other, tile)
 					//don't output to things facing this thing
 					&& !(other.block().rotate && (other.rotation + 2) % 4 == i)){
 				
@@ -98,7 +98,7 @@ public class Block{
 					
 					if(todump != null && item != todump) continue;
 					
-					if(tile.entity.hasItem(item) && other != null && other.block().accept(item) &&
+					if(tile.entity.hasItem(item) && other != null && other.block().accept(item, other, tile) &&
 					//don't output to things facing this thing
 							!(other.block().rotate && (other.rotation + 2) % 4 == i)){
 						other.block().handleItem(other, item, tile);
@@ -119,7 +119,7 @@ public class Block{
 	 */
 	protected boolean offloadDir(Tile tile, Item item){
 		Tile other = tile.getNearby()[tile.rotation];
-		if(other != null && other.block().accept(item)){
+		if(other != null && other.block().accept(item, other, tile)){
 			other.block().handleItem(other, item, tile);
 			//other.entity.addCovey(item, ch == 1 ? 0.5f : ch ==2 ? 1f : 0f);
 			return true;

@@ -34,6 +34,8 @@ io.anuke.ucore.scene.ui.TextButton$TextButtonStyle: {
 },
 io.anuke.ucore.scene.ui.ImageButton$ImageButtonStyle: {
 	default: {down: button-down, up: button },
+	static: {up: button },
+	static-down: {up: button-down },
 	blue: {down: button-blue-down, up: button-blue },
 	toggle: {checked: button-down, down: button-down, up: button },
 	togglemap: {checked: button-map-down, down: button-map-down, up: button-map },
