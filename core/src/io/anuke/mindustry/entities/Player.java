@@ -29,13 +29,9 @@ public class Player extends DestructibleEntity{
 		remove();
 		Effects.effect("explosion", this);
 		Effects.shake(4f, 5f);
-		Effects.effect("respawn", this);
+		Effects.sound("die", this);
 		
-		Timers.run(respawntime, ()->{
-			set(core.worldx(), core.worldy()-8);
-			heal();
-			add();
-		});
+		respawntime = respawnduration;
 	}
 	
 	@Override
@@ -74,7 +70,7 @@ public class Player extends DestructibleEntity{
 		
 		if(shooting && reload <= 0){
 			currentWeapon.shoot(this);
-			Sounds.play("shoot");
+			Sounds.play(currentWeapon.shootsound);
 			reload = currentWeapon.reload;
 		}
 		

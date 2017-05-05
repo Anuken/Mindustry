@@ -15,7 +15,7 @@ import io.anuke.mindustry.world.Tile;
 /**ick, global state*/
 public class Vars{
 	public static final float placerange = 66;
-	public static final float respawntime = 60*4;
+	public static final float respawnduration = 60*4;
 	public static final float wavespace = 20*60;
 	public static final float enemyspawnspace = 65;
 	public static final float breakduration = 30;
@@ -49,6 +49,8 @@ public class Vars{
 	public static int wave = 1;
 	public static float wavetime;
 	public static int enemies = 0;
+	
+	public static float respawntime;
 
 	public static Tile core;
 	public static Array<Tile> spawnpoints = new Array<Tile>();

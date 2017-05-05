@@ -370,7 +370,26 @@ public class UI extends SceneModule{
 			}).width(w);
 
 			get().setVisible(nplay);
-		}};
+		}}.end();
+		
+		new table(){{
+			//atop();
+			new table(){{
+				get().background("button");
+				
+				new label("Respawning in"){{
+					get().update(()->{
+						get().setText("[crimson]Respawning in " + (int)(respawntime/60));
+					});
+					
+					get().setFontScale(0.75f);
+				}};
+				
+				visible(()->{
+					return respawntime > 0;
+				});
+			}};
+		}}.end();
 
 		updateItems();
 

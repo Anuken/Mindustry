@@ -68,6 +68,14 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Draw.rect("bullet", b.x, b.y, b.angle());
 			Draw.clear();
 		}
+	},
+	shot2 = new BulletType(2.5f, 2){
+		{lifetime=40;}
+		public void draw(Bullet b){
+			Draw.color(Color.SKY);
+			Draw.rect("bullet", b.x, b.y, b.angle());
+			Draw.clear();
+		}
 	};
 	
 	private BulletType(float speed, int damage){

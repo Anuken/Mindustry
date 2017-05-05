@@ -403,9 +403,23 @@ weapon-blaster
   orig: 8, 8
   offset: 0, 0
   index: -1
-weapon-trishot
+weapon-flamethrower
   rotate: false
   xy: 178, 3
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+weapon-multigun
+  rotate: false
+  xy: 188, 3
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+weapon-trishot
+  rotate: false
+  xy: 198, 3
   size: 8, 8
   orig: 8, 8
   offset: 0, 0

@@ -8,6 +8,7 @@ import io.anuke.mindustry.Inventory;
 import io.anuke.mindustry.entities.Weapon;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Table;
@@ -37,6 +38,7 @@ public class UpgradeDialog extends Dialog{
 		weptab.background("button");
 		weptab.pad(20);
 		
+		int i = 0;
 		for(Weapon weapon : Weapon.values()){
 			TextButton button = new TextButton(weapon.name());
 			
@@ -60,8 +62,12 @@ public class UpgradeDialog extends Dialog{
 				button.setDisabled(!Inventory.hasItems(weapon.requirements));
 			});
 			
+			if(i > 0 && (i)%2==0)
+				weptab.row();
 			
-			weptab.add(button).width(160);
+			i++;
+			
+			weptab.add(button).width(210);
 			
 			Table tiptable = new Table();
 			
@@ -107,6 +113,7 @@ public class UpgradeDialog extends Dialog{
 				weapons.put(weapon, true);
 				ui.updateWeapons();
 				run.run();
+				Effects.sound("purchase");
 			});
 		}
 		

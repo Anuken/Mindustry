@@ -45,6 +45,27 @@ public class EffectLoader{
 			Draw.spikes(e.x, e.y, e.ifract() * 3f, 2, 8);
 			Draw.clear();
 		});
+		
+		Effect.create("shoot", 8, e -> {
+			Draw.thickness(1f);
+			Draw.color(Hue.mix(Color.WHITE, Color.GOLD, e.ifract()));
+			Draw.spikes(e.x, e.y, e.ifract() * 2f, 2, 5);
+			Draw.clear();
+		});
+		
+		Effect.create("shoot2", 8, e -> {
+			Draw.thickness(1f);
+			Draw.color(Hue.mix(Color.WHITE, Color.SKY, e.ifract()));
+			Draw.spikes(e.x, e.y, e.ifract() * 2f, 1, 5);
+			Draw.clear();
+		});
+		
+		Effect.create("shoot3", 8, e -> {
+			Draw.thickness(1f);
+			Draw.color(Hue.mix(Color.WHITE, Color.GOLD, e.ifract()));
+			Draw.spikes(e.x, e.y, e.ifract() * 2f, 1, 5);
+			Draw.clear();
+		});
 
 		Effect.create("explosion", 15, e -> {
 			Draw.thickness(2f);
@@ -76,7 +97,7 @@ public class EffectLoader{
 			Draw.clear();
 		});
 		
-		Effect.create("respawn", respawntime, e -> {
+		Effect.create("respawn", respawnduration, e -> {
 			Draw.tcolor(Color.SCARLET);
 			Draw.tscl(0.25f);
 			Draw.text("Respawning in " + (int)((e.lifetime-e.time)/60), e.x, e.y);

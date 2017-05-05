@@ -25,7 +25,9 @@ public class Control extends RendererModule{
 		
 		atlas = new Atlas("mindustry.atlas");
 		
-		Sounds.load("shoot.wav", "place.wav", "explosion.wav", "enemyshoot.wav", "corexplode.wav", "break.wav", "spawn.wav", "flame.wav");
+		Sounds.load("shoot.wav", "place.wav", "explosion.wav", "enemyshoot.wav", 
+				"corexplode.wav", "break.wav", "spawn.wav", "flame.wav", "die.wav", 
+				"respawn.wav", "purchase.wav", "flame2.wav");
 		Musics.load("1.mp3", "2.mp3", "3.mp3");
 		
 		Generator.loadMaps();
@@ -82,6 +84,18 @@ public class Control extends RendererModule{
 			}
 		
 			if(!paused){
+				
+				if(respawntime > 0){
+					
+					respawntime -= delta();
+					
+					if(respawntime <= 0){
+						player.set(core.worldx(), core.worldy()-8);
+						player.heal();
+						player.add();
+						Effects.sound("respawn");
+					}
+				}
 				
 				if(enemies <= 0)
 					wavetime -= delta();
