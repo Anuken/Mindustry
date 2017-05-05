@@ -63,10 +63,10 @@ public class WeaponBlocks{
 		protected void shoot(Tile tile){
 			TurretEntity entity = tile.entity();
 			
-			for(int i = 0; i < 6; i ++)
+			for(int i = 0; i < 7; i ++)
 				Timers.run(i/1.5f, ()->{
 					vector.set(4, 0).setAngle(entity.rotation);
-					bullet(tile, entity.rotation + Mathf.range(16));
+					bullet(tile, entity.rotation + Mathf.range(30));
 				});
 		}
 	},

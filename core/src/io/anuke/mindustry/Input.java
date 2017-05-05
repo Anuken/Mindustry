@@ -43,8 +43,6 @@ public class Input{
 			tile.setBlock(recipe.result);
 			tile.rotation = rotation;
 
-			Pathfind.updatePath();
-
 			Effects.effect("place", World.roundx(), World.roundy());
 			Effects.shake(2f, 2f);
 			Sounds.play("place");

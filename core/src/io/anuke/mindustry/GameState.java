@@ -2,6 +2,7 @@ package io.anuke.mindustry;
 
 import static io.anuke.mindustry.Vars.*;
 
+import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -46,6 +47,8 @@ public class GameState{
 	public static void runWave(){
 		int amount = wave;
 		Sounds.play("spawn");
+		
+		Pathfind.updatePath();
 		
 		for(int i = 0; i < amount; i ++){
 			int pos = i;

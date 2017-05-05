@@ -3,7 +3,6 @@ package io.anuke.mindustry.entities;
 import com.badlogic.gdx.utils.ObjectMap;
 
 import io.anuke.mindustry.GameState;
-import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
@@ -37,7 +36,6 @@ public class TileEntity extends Entity{
 		}
 		
 		tile.setBlock(Blocks.air);
-		Pathfind.updatePath();
 		Effects.shake(4f, 4f);
 		Effects.effect("explosion", this);
 		
