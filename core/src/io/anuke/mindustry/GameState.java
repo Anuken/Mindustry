@@ -29,6 +29,8 @@ public class GameState{
 		player.heal();
 		Inventory.clearItems();
 		spawnpoints.clear();
+		respawntime = -1;
+		hiscore = false;
 		
 		ui.updateItems();
 		ui.updateWeapons();
@@ -88,6 +90,14 @@ public class GameState{
 		}
 		
 		wave ++;
+		
+		int last = Settings.getInt("hiscore"+maps[currentMap]);
+		
+		if(wave > last){
+			Settings.putInt("hiscore"+maps[currentMap], wave);
+			Settings.save();
+			hiscore = true;
+		}
 		
 		wavetime = waveSpacing();
 	}

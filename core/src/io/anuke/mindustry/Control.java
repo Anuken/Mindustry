@@ -43,6 +43,9 @@ public class Control extends RendererModule{
 			
 		Settings.loadAll("io.anuke.moment");
 		
+		for(String map : maps)
+			Settings.defaults("hiscore"+map, 0);
+		
 		Sounds.setFalloff(9000f);
 		
 		player = new Player();

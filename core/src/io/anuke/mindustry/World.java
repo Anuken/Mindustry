@@ -52,6 +52,7 @@ public class World{
 		worldsize = size;
 		pixsize = worldsize*tilesize;
 		tiles = new Tile[worldsize][worldsize];
+		currentMap = id;
 		
 		for(int x = 0; x < worldsize; x ++){
 			for(int y = 0; y < worldsize; y ++){

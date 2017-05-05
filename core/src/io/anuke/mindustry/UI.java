@@ -129,6 +129,10 @@ public class UI extends SceneModule{
 			public Dialog show(Scene scene){
 				super.show(scene);
 				restart.content().clearChildren();
+				if(hiscore){
+					restart.content().add("[YELLOW]New highscore!").pad(6);
+					restart.content().row();
+				}
 				restart.content().add("You lasted until wave [GREEN]" + wave + "[].").pad(6);
 				restart.pack();
 				return this;
@@ -379,14 +383,14 @@ public class UI extends SceneModule{
 				
 				new label("Respawning in"){{
 					get().update(()->{
-						get().setText("[crimson]Respawning in " + (int)(respawntime/60));
+						get().setText("[yellow]Respawning in " + (int)(respawntime/60));
 					});
 					
 					get().setFontScale(0.75f);
 				}};
 				
 				visible(()->{
-					return respawntime > 0;
+					return respawntime > 0 && playing;
 				});
 			}};
 		}}.end();

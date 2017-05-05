@@ -19,7 +19,7 @@ public class Vars{
 	public static final float wavespace = 20*60;
 	public static final float enemyspawnspace = 65;
 	public static final float breakduration = 30;
-	public static boolean debug = true;
+	public static boolean debug = false;
 	
 	public static final Vector2 vector = new Vector2();
 	
@@ -39,9 +39,12 @@ public class Vars{
 	public static final String[] maps = {"delta", "canyon", "pit", "maze"};
 	public static Pixmap[] mapPixmaps;
 	public static Texture[] mapTextures;
+	public static int currentMap;
 	public static int worldsize = 128;
 	public static int pixsize = worldsize*tilesize;
 	public static Tile[][] tiles = new Tile[worldsize][worldsize];
+	
+	public static boolean hiscore = false;
 	
 	public static Recipe recipe;
 	public static int rotation;

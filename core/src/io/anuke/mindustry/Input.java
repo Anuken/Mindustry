@@ -4,7 +4,6 @@ import static io.anuke.mindustry.Vars.*;
 
 import com.badlogic.gdx.Input.Buttons;
 
-import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.Weapon;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Tile;
@@ -97,7 +96,6 @@ public class Input{
 				Effects.effect("break", tile.entity);
 				Effects.shake(3f, 1f);
 				tile.setBlock(Blocks.air);
-				Pathfind.updatePath();
 				breaktime = 0f;
 				Sounds.play("break");
 			}
