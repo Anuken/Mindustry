@@ -76,6 +76,7 @@ public class Vars{
 		"[WHITE][YELLOW][[WASD][] to move, [YELLOW][[R][] to rotate blocks.",
 		"Hold [YELLOW][[R-MOUSE][] to destroy blocks, click [YELLOW][[L-MOUSE][] to place them.",
 		"[YELLOW][[L-MOUSE][] to shoot.",
+		"[yellow][[scrollwheel] to switch weapons.",
 		"",
 		"[GOLD]Every 20 seconds, a new wave will appear.",
 		"Build turrets to defend the core.",
