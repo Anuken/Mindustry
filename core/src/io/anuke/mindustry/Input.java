@@ -3,6 +3,7 @@ package io.anuke.mindustry;
 import static io.anuke.mindustry.Vars.*;
 
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.Input.Keys;
 
 import io.anuke.mindustry.entities.Weapon;
 import io.anuke.mindustry.resource.ItemStack;
@@ -55,6 +56,11 @@ public class Input{
 			Cursors.restoreCursor();
 		}
 		
+		for(int i = 0; i < 9; i ++)
+			if(Inputs.keyUp(Keys.valueOf(""+(i+1))) && getWeapon(i) != null){
+				currentWeapon = getWeapon(i);
+				ui.updateWeapons();
+			}
 		
 		if(Inputs.buttonUp(Buttons.LEFT) && recipe != null && 
 				World.validPlace(World.tilex(), World.tiley(), recipe.result) && !ui.hasMouse()){
@@ -103,5 +109,26 @@ public class Input{
 			breaktime = 0f;
 		}
 
+	}
+	
+	public static int currentWeapons(){
+		int i = 0;
+		
+		for(Weapon w : Weapon.values())
+			if(weapons.get(w))
+				i ++;
+		
+		return i;
+	}
+	
+	public static Weapon getWeapon(int id){
+		int i = 0;
+		
+		for(Weapon w : Weapon.values())
+			if(weapons.get(w))
+				if(i ++ == id)
+					return w;
+		
+		return null;
 	}
 }

@@ -19,7 +19,7 @@ public class Vars{
 	public static final float wavespace = 20*60;
 	public static final float enemyspawnspace = 65;
 	public static final float breakduration = 30;
-	public static boolean debug = false;
+	public static boolean debug = true;
 	
 	public static final Vector2 vector = new Vector2();
 	
