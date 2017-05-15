@@ -2,12 +2,9 @@ package io.anuke.mindustry;
 
 import static io.anuke.mindustry.Vars.*;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 
 import io.anuke.mindustry.entities.TileEntity;
@@ -20,7 +17,6 @@ import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
-import io.anuke.ucore.graphics.FrameBufferMap;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timers;
@@ -29,21 +25,12 @@ public class Renderer{
 	
 	public static void renderTiles(){
 		Draw.clear();
-		Batch batch = control.batch;
-		FrameBufferMap buffers = control.buffers;
 		OrthographicCamera camera = control.camera;
 		int rangex = control.rangex, rangey = control.rangey;
 		
 		for(int l = 0; l < 4; l++){
 			if(l == 1){
-				batch.end();
-				buffers.end("pixel");
-
-				buffers.begin("shadow");
-
-				batch.begin();
-				Gdx.gl.glClearColor(0, 0, 0, 0);
-				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+				Draw.surface("shadow");
 			}
 			
 			for(int x = -rangex; x <= rangex; x++){
@@ -66,17 +53,9 @@ public class Renderer{
 			}
 
 			if(l == 1){
-				batch.end();
-				buffers.end("shadow");
-				batch.setColor(0, 0, 0, 0.15f);
-
-				buffers.begin("pixel");
-
-				control.drawFull("shadow");
-				batch.setColor(Color.WHITE);
-				batch.setProjectionMatrix(camera.combined);
-
-				batch.begin();
+				Draw.color(0, 0, 0, 0.15f);
+				Draw.flushSurface();
+				Draw.color();
 			}
 		}
 	}

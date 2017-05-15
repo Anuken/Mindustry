@@ -54,8 +54,8 @@ public class UI extends SceneModule{
 		
 		Batch batch = scene.getBatch();
 		Draw.color();
-		int w = gwidth();
-		int h = gheight();
+		int w = (int)screen.x;
+		int h = (int)screen.y;
 		
 		Draw.color(Hue.lightness(0.6f));
 		
@@ -331,15 +331,15 @@ public class UI extends SceneModule{
 			aleft();
 			abottom();
 			new button("+", ()->{
-				if(control.cameraScale < 4f){
-					control.cameraScale = 4f;
+				if(control.cameraScale < 4){
+					control.cameraScale = 4;
 					control.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 				}
 			}).size(40);
 			
 			new button("-", ()->{
-				if(control.cameraScale > 3f){
-					control.cameraScale = 3f;
+				if(control.cameraScale > 3){
+					control.cameraScale = 3;
 					control.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 				}
 			}).size(40);

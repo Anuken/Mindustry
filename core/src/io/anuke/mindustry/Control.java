@@ -19,9 +19,10 @@ public class Control extends RendererModule{
 	//GifRecorder recoder = new GifRecorder(batch);
 	
 	public Control(){
-		cameraScale = 4f;
-		setPixelation();
-		buffers.add("shadow", (int) (Gdx.graphics.getWidth() / cameraScale), (int) (Gdx.graphics.getHeight() / cameraScale));
+		cameraScale = 4;
+		pixelate();
+		
+		Draw.addSurface("shadow", cameraScale);
 		
 		atlas = new Atlas("mindustry.atlas");
 		
@@ -146,10 +147,7 @@ public class Control extends RendererModule{
 	@Override
 	public void resize(int width, int height){
 		super.resize(width, height);
-
-		buffers.remove("shadow");
-		buffers.add("shadow", (int) (Gdx.graphics.getWidth() / cameraScale), (int) (Gdx.graphics.getHeight() / cameraScale));
-
+		
 		rangex = (int) (width / tilesize / cameraScale/2)+2;
 		rangey = (int) (height / tilesize / cameraScale/2)+2;
 	}

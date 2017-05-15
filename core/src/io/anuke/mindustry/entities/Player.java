@@ -35,10 +35,6 @@ public class Player extends DestructibleEntity{
 	}
 	
 	@Override
-	public void removed(){
-	}
-	
-	@Override
 	public void draw(){
 		Draw.rect("player", x, y, direction.angle()-90);
 	}
