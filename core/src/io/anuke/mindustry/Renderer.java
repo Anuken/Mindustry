@@ -17,19 +17,62 @@ import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
+import io.anuke.ucore.graphics.Cache;
+import io.anuke.ucore.graphics.Caches;
 import io.anuke.ucore.scene.utils.Cursors;
+import io.anuke.ucore.util.GridMap;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timers;
 
 public class Renderer{
+	private static int chunksize = 32;
+	private static GridMap<Cache> caches = new GridMap<>();
 	
 	public static void renderTiles(){
-		Draw.clear();
+		int chunksx = World.width()/chunksize, chunksy = World.height()/chunksize;
+		
+		//render the entire map
+		if(caches.size() == 0){
+			
+			for(int cx = 0; cx < chunksx; cx ++){
+				for(int cy = 0; cy < chunksy; cy ++){
+					Caches.begin();
+					
+					for(int tilex = cx*chunksize; tilex < (cx+1)*chunksize; tilex++){
+						for(int tiley = cy*chunksize; tiley < (cy+1)*chunksize; tiley++){
+							World.tile(tilex, tiley).floor().drawCache(World.tile(tilex, tiley));
+						}
+					}
+					
+					caches.put(cx, cy, Caches.end());
+				}
+			}
+		}
+		
 		OrthographicCamera camera = control.camera;
+		
+		Draw.end();
+		
+		int crangex = (int)(camera.viewportWidth/(chunksize*tilesize));
+		int crangey = (int)(camera.viewportHeight/(chunksize*tilesize))+1;
+		
+		for(int x = -crangex; x <= crangex; x++){
+			for(int y = -crangey; y <= crangey; y++){
+				int worldx = Mathf.scl(camera.position.x, chunksize*tilesize) + x;
+				int worldy = Mathf.scl(camera.position.y, chunksize*tilesize) + y;
+				
+				if(caches.containsKey(worldx, worldy))
+					caches.get(worldx, worldy).render();
+			}
+		}
+		
+		Draw.begin();
+		
+		Draw.reset();
 		int rangex = control.rangex, rangey = control.rangey;
 		
 		for(int l = 0; l < 4; l++){
-			if(l == 1){
+			if(l == 0){
 				Draw.surface("shadow");
 			}
 			
@@ -40,11 +83,11 @@ public class Renderer{
 
 					if(Mathf.inBounds(worldx, worldy, tiles)){
 						Tile tile = tiles[worldx][worldy];
-						if(l == 1){
+						if(l == 0){
 							if(tile.block() != Blocks.air)
-								Draw.rect("shadow", worldx * tilesize, worldy * tilesize);
-						}else if(l == 0 || l == 2){
-							(l == 0 ? tile.floor() : tile.block()).draw(tile);
+								Draw.rect(tile.block().shadow, worldx * tilesize, worldy * tilesize);
+						}else if(l == 1){
+							tile.block().draw(tile);
 						}else{
 							tile.block().drawOver(tile);
 						}
@@ -52,7 +95,7 @@ public class Renderer{
 				}
 			}
 
-			if(l == 1){
+			if(l == 0){
 				Draw.color(0, 0, 0, 0.15f);
 				Draw.flushSurface();
 				Draw.color();
@@ -89,16 +132,16 @@ public class Renderer{
 			else
 				Cursors.restoreCursor();
 			
-			Draw.clear();
+			Draw.reset();
 		}
 
 		//block breaking
 		if(Inputs.buttonDown(Buttons.RIGHT) && World.cursorNear()){
 			Tile tile = World.cursorTile();
-			if(tile.artifical() && tile.block() != ProductionBlocks.core){
-				Draw.color(Color.YELLOW, Color.SCARLET, breaktime / breakduration);
+			if(tile.breakable() && tile.block() != ProductionBlocks.core){
+				Draw.color(Color.YELLOW, Color.SCARLET, breaktime / tile.block().breaktime);
 				Draw.square(tile.worldx(), tile.worldy(), 4);
-				Draw.clear();
+				Draw.reset();
 			}
 		}
 
@@ -148,6 +191,6 @@ public class Renderer{
 		Draw.color(Color.RED);
 		if(w >= 1)
 		Draw.line(x - len + 1, y - offset, x - len + w, y - offset);
-		Draw.clear();
+		Draw.reset();
 	}
 }

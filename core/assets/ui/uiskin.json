@@ -19,7 +19,7 @@ com.badlogic.gdx.graphics.Color: {
 	menuitem: {a: 1, b: 0.65, g: 0.65, r: 0.65 },
 	link-label: {a: 1, b: 0.886, g: 0.631, r: 0.105 }
 },
-io.anuke.ucore.scene.style.Styles$TintedDrawable: {
+io.anuke.ucore.scene.Skin$TintedDrawable: {
 	dialogDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.45} }
 },
 io.anuke.ucore.scene.ui.Button$ButtonStyle: {

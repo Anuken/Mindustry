@@ -34,7 +34,7 @@ public class MenuDialog extends Dialog{
 				hide();
 				paused = false;
 				playing = false;
-			});
+			}).show();
 		}).width(200);
 	}
 }

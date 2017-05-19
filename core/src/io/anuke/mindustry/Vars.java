@@ -18,7 +18,6 @@ public class Vars{
 	public static final float respawnduration = 60*4;
 	public static final float wavespace = 20*60;
 	public static final float enemyspawnspace = 65;
-	public static final float breakduration = 30;
 	public static boolean debug = false;
 	
 	public static final Vector2 vector = new Vector2();
@@ -36,7 +35,7 @@ public class Vars{
 	
 	public static float breaktime = 0;
 	
-	public static final String[] maps = {"delta", "canyon", "pit", "maze"};
+	public static final String[] maps = {"delta", "canyon", "pit", "maze", "test"};
 	public static Pixmap[] mapPixmaps;
 	public static Texture[] mapTextures;
 	public static int currentMap;

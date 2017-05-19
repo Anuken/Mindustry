@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.MathUtils;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.noise.Noise;
+import io.anuke.ucore.util.Mathf;
 
 public class Generator{
 	static final int stonefloor = Color.rgba8888(Hue.rgb(54, 54, 54));
@@ -34,13 +35,29 @@ public class Generator{
 					floor = Blocks.iron;
 				}
 				
+				if(Noise.nnoise(x, y, 8, 1) > 0.1){
+					floor = Blocks.grass;
+				}
+				
+				if(Noise.nnoise(x, y, 8, 1) > 0.1){
+					floor = Blocks.water;
+				}
+				
+				if(Mathf.chance(0.01)){
+					block = Blocks.rock;
+				}
+				
+				if(Mathf.chance(0.01)){
+					block = Blocks.rock2;
+				}
+				
 				if(Noise.nnoise(x, y, 6, 1) > 0.245){
 					floor = Blocks.coal;
 				}
 				if(color == stone && map == 1){
 					block = Blocks.dirtblock;
 				}else if(color == stone){
-					block = Blocks.stoneblock;
+					block = Mathf.choose(Blocks.stoneblock, Blocks.stoneblock2, Blocks.stoneblock3);
 				}else if(color == start){
 					core = tiles[x][y];
 				}else if(color == spawn){

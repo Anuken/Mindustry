@@ -3,6 +3,7 @@ package io.anuke.mindustry.entities;
 import static io.anuke.mindustry.Vars.*;
 
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.Vars;
@@ -80,6 +81,9 @@ public class Player extends DestructibleEntity{
 		}else{
 			float angle = Angles.mouseAngle(x, y);
 			direction.lerp(vector.set(0, 1).setAngle(angle), 0.26f);
+			if(MathUtils.isEqual(angle, direction.angle(), 0.05f)){
+				direction.setAngle(angle);
+			}
 		}
 	}
 }

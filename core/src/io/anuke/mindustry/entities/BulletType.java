@@ -13,28 +13,28 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 		public void draw(Bullet b){
 			Draw.color("gray");
 			Draw.square(b.x, b.y, 1f);
-			Draw.clear();
+			Draw.reset();
 		}
 	},
 	iron = new BulletType(1.7f, 2){
 		public void draw(Bullet b){
 			Draw.color("gray");
 			Draw.rect("bullet", b.x, b.y, b.angle());
-			Draw.clear();
+			Draw.reset();
 		}
 	},
 	sniper = new BulletType(3f, 20){
 		public void draw(Bullet b){
 			Draw.color("lightgray");
 			Draw.rect("bullet", b.x, b.y, b.angle());
-			Draw.clear();
+			Draw.reset();
 		}
 	},
 	small = new BulletType(1.5f, 1){
 		public void draw(Bullet b){
 			Draw.color("orange");
 			Draw.rect("bullet", b.x, b.y, b.angle());
-			Draw.clear();
+			Draw.reset();
 		}
 	},
 	smallfast = new BulletType(1.6f, 2){
@@ -42,7 +42,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 		public void draw(Bullet b){
 			Draw.color(color);
 			Draw.rect("bullet", b.x, b.y, b.angle());
-			Draw.clear();
+			Draw.reset();
 		}
 	},
 	flame = new BulletType(0.6f, 4){
@@ -50,7 +50,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Draw.color(Color.YELLOW, Color.SCARLET, b.time/lifetime);
 			float size = 6f-b.time/lifetime*5f;
 			Draw.rect("circle", b.x, b.y, size, size);
-			Draw.clear();
+			Draw.reset();
 		}
 	},
 	flameshot = new BulletType(0.5f, 3){
@@ -58,7 +58,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Draw.color(Color.ORANGE, Color.SCARLET, b.time/lifetime);
 			float size = 6f-b.time/lifetime*5f;
 			Draw.rect("circle", b.x, b.y, size, size);
-			Draw.clear();
+			Draw.reset();
 		}
 	},
 	shot = new BulletType(2.4f, 2){
@@ -66,7 +66,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 		public void draw(Bullet b){
 			Draw.color(Color.GOLD);
 			Draw.rect("bullet", b.x, b.y, b.angle());
-			Draw.clear();
+			Draw.reset();
 		}
 	},
 	shot2 = new BulletType(2.5f, 2){
@@ -74,7 +74,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 		public void draw(Bullet b){
 			Draw.color(Color.SKY);
 			Draw.rect("bullet", b.x, b.y, b.angle());
-			Draw.clear();
+			Draw.reset();
 		}
 	};
 	

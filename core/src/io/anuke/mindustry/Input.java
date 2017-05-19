@@ -94,12 +94,12 @@ public class Input{
 		Tile cursor = World.cursorTile();
 
 		//block breaking
-		if(Inputs.buttonDown(Buttons.RIGHT) && World.cursorNear() && cursor.artifical()
+		if(Inputs.buttonDown(Buttons.RIGHT) && World.cursorNear() && cursor.breakable()
 				&& cursor.block() != ProductionBlocks.core){
 			Tile tile = cursor;
 			breaktime += Mathf.delta();
-			if(breaktime >= breakduration){
-				Effects.effect("break", tile.entity);
+			if(breaktime >= tile.block().breaktime){
+				Effects.effect("break", tile.worldx(), tile.worldy());
 				Effects.shake(3f, 1f);
 				tile.setBlock(Blocks.air);
 				breaktime = 0f;

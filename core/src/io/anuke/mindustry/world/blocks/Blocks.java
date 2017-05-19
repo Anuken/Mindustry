@@ -21,8 +21,33 @@ public class Blocks{
 	
 	grass = new Block("grass"),
 	
+	water = new Block("water"){{
+		vary = false;
+		solid = true;
+	}},
+	
 	stoneblock = new Block("stoneblock"){{
 		solid = true;
+	}},
+	
+	stoneblock2 = new Block("stoneblock2"){{
+		solid = true;
+	}},
+			
+	stoneblock3 = new Block("stoneblock3"){{
+		solid = true;
+	}},
+	
+	rock = new Block("rock"){{
+		shadow = "rockshadow";
+		breakable = true;
+		breaktime = 10;
+	}},
+			
+	rock2 = new Block("rock2"){{
+		shadow = "rock2shadow";
+		breakable = true;
+		breaktime = 10;
 	}},
 	
 	dirtblock = new Block("dirtblock"){{

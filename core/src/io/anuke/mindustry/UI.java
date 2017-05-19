@@ -1,12 +1,16 @@
 package io.anuke.mindustry;
 
 import static io.anuke.mindustry.Vars.*;
+import static io.anuke.ucore.scene.actions.Actions.*;
 
 import java.util.function.BooleanSupplier;
 
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.entities.Weapon;
@@ -18,8 +22,8 @@ import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Textures;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.Scene;
+import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.*;
-import io.anuke.ucore.scene.style.Styles;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
@@ -40,7 +44,20 @@ public class UI extends SceneModule{
 	};
 
 	public UI() {
-		Styles.styles.font().setUseIntegerPositions(false);
+		Dialog.setShowAction(()->{
+			return sequence(Actions.moveToAligned(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight(), Align.center), 
+						parallel(Actions.moveToAligned(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, Align.center, 0.09f, Interpolation.fade), 
+								
+								Actions.fadeIn(0.09f, Interpolation.fade)));
+		});
+		
+		Dialog.setHideAction(()->{
+			return sequence(
+					parallel(Actions.moveBy(0, -Gdx.graphics.getHeight()/2, 0.08f, Interpolation.fade), 
+							Actions.fadeOut(0.08f, Interpolation.fade)));
+		});
+		
+		skin.font().setUseIntegerPositions(false);
 		TooltipManager.getInstance().animations = false;
 		
 		Dialog.closePadR = -1;
@@ -59,18 +76,13 @@ public class UI extends SceneModule{
 		
 		Draw.color(Hue.lightness(0.6f));
 		
-		int tw = w/64+1;//, th = h/64+1;
+		int tw = w/64+1;
 		
 		batch.draw(Textures.get("back"), 0, 0, 0, 0, w, h);
 		
 		for(int x = 0; x < tw; x ++){
 			batch.draw(Textures.get("conveyort"), x*64, 0, 0, (int)(Timers.time()*2*(x%2-0.5f)), 32, h);
 		}
-		
-		//for(int y = 0; y < th; y ++){
-		//	batch.draw(Textures.get("conveyor"), 0, y*64, (int)(Timers.time()*2*(y%2-0.5f)), 0, w, 32);
-		//}
-		
 		
 		Draw.color();
 		
@@ -173,17 +185,17 @@ public class UI extends SceneModule{
 					maxcol = Math.max((int)((float)recipes.size/rows+1), maxcol);
 				}
 				
-				
 				for(Section sec : Section.values()){
 					recipes.clear();
 					Recipe.getBy(sec, recipes);
 					
 					ImageButton button = new ImageButton("icon-"+sec.name(), "toggle");
-					add(button).size(size).height(size+8);
+					add(button).fill().height(54).padTop(-10);
 					button.getImageCell().size(40).padBottom(4);
 					group.add(button);
 					
 					Table table = new Table();
+					table.pad(4);
 					
 					int i = 0;
 					
@@ -264,6 +276,9 @@ public class UI extends SceneModule{
 				row();
 				add(stack).colspan(3);
 				get().pad(10f);
+				
+				get().padLeft(0f);
+				get().padRight(0f);
 				
 				end();
 			}}.right().bottom().uniformX();
@@ -350,28 +365,39 @@ public class UI extends SceneModule{
 		//menu table
 		new table(){{
 			float w = 200;
+			
+			new table("button"){{
+				new button("Play", () -> {
+					levels.show();
+				}).width(w);
 
-			new button("Play", () -> {
-				levels.show();
-			}).width(w);
+				row();
 
-			row();
+				new button("Settings", () -> {
+					prefs.show(scene);
+				}).width(w);
 
-			new button("Settings", () -> {
-				prefs.show(scene);
-			}).width(w);
+				row();
 
-			row();
+				new button("Controls", () -> {
+					keys.show(scene);
+				}).width(w);
 
-			new button("Controls", () -> {
-				keys.show(scene);
-			}).width(w);
+				row();
 
-			row();
-
-			new button("About", () -> {
-				about.show(scene);
-			}).width(w);
+				new button("About", () -> {
+					about.show(scene);
+				}).width(w);
+				
+				row();
+				
+				if(Gdx.app.getType() != ApplicationType.WebGL)
+				new button("Exit", () -> {
+					Gdx.app.exit();
+				}).width(w);
+				
+				get().pad(20);
+			}};
 
 			get().setVisible(nplay);
 		}}.end();

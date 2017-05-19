@@ -48,7 +48,7 @@ public class RepairTurret extends Turret{
 			Draw.line(x, y, x2, y2);
 			Draw.thickness(1f);
 			Draw.rect("circle", x2, y2, 5f, 5f);
-			Draw.clear();
+			Draw.reset();
 		}
 		
 		Draw.rect(name(), tile.worldx(), tile.worldy(), entity.rotation - 90);

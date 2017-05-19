@@ -28,6 +28,14 @@ public class World{
 		return tile == null || tile.block().solid;
 	}
 	
+	public static int width(){
+		return Vars.mapPixmaps[Vars.currentMap].getWidth();
+	}
+	
+	public static int height(){
+		return Vars.mapPixmaps[Vars.currentMap].getHeight();
+	}
+	
 	public static Tile tile(int x, int y){
 		if(!Mathf.inBounds(x, y, tiles)) return null;
 		return tiles[x][y];

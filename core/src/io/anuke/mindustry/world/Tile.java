@@ -64,8 +64,8 @@ public class Tile{
 		this.floor = type;
 	}
 	
-	public boolean artifical(){
-		return block.update;
+	public boolean breakable(){
+		return block.update || block.breakable;
 	}
 	
 	public Tile[] getNearby(){

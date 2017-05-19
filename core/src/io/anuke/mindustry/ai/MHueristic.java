@@ -14,8 +14,8 @@ public class MHueristic implements Heuristic<Tile>{
 		float cost = Math.abs(node.worldx() - other.worldx()) + Math.abs(node.worldy() - other.worldy());
 		
 		//TODO balance multiplier
-		if(node.artifical() && node.block().solid) cost += Vars.tilesize*multiplier;
-		if(other.artifical() && other.block().solid) cost += Vars.tilesize*multiplier;
+		if(node.breakable() && node.block().solid) cost += Vars.tilesize*multiplier;
+		if(other.breakable() && other.block().solid) cost += Vars.tilesize*multiplier;
 		return cost;
 	}
 

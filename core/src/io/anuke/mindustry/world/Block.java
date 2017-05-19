@@ -1,23 +1,38 @@
 package io.anuke.mindustry.world;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
+import io.anuke.mindustry.World;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Caches;
+import io.anuke.ucore.util.Mathf;
 
 public class Block{
+	private static int lastid;
+	
 	protected static Vector2 vector = new Vector2();
 	protected static Vector2 vector2 = new Vector2();
+	protected static TextureRegion temp = new TextureRegion();
 	
 	public final String name;
-	public boolean solid, update, rotate;
+	public boolean solid, update, rotate, breakable;
 	public int health = 40;
+	public String shadow = "shadow";
+	public float breaktime = 30;
+	public final int id;
+	//edge fallback, used for ores
+	public String edge = "stone";
+	//whether to have 3 variants
+	public boolean vary = true;
 
 	public Block(String name) {
 		this.name = name;
-		solid = false;
+		this.solid = false;
+		this.id = lastid++;
 	}
 	
 	public void drawOver(Tile tile){}
@@ -126,11 +141,48 @@ public class Block{
 		}
 		return false;
 	}
+	
+	public void drawCache(Tile tile){
+		MathUtils.random.setSeed(tile.id());
+		
+		Caches.draw(vary ? (name() + MathUtils.random(1, 3))  : name(), tile.worldx(), tile.worldy());
+		
+		for(int dx = -1; dx <= 1; dx ++){
+			for(int dy = -1; dy <= 1; dy ++){
+				if(dx == 0 && dy == 0) continue;
+				
+				Tile other = World.tile(tile.x+dx, tile.y+dy);
+				
+				if(other == null) continue;
+				
+				Block floor = other.floor();
+				
+				if(floor.id <= this.id) continue;
+				
+				TextureRegion region = Draw.region(floor.name() + "edge");
+				
+				if(region == null)
+					region = Draw.region(floor.edge + "edge");
+				
+				int sx = -dx*8+2, sy = -dy*8+2;
+				int x = Mathf.clamp(sx, 0, 12);
+				int y = Mathf.clamp(sy, 0, 12);
+				int w = Mathf.clamp(sx+8, 0, 12)-x, h = Mathf.clamp(sy+8, 0, 12)-y;
+				
+				float rx = Mathf.clamp(dx*8, 0, 8-w);
+				float ry = Mathf.clamp(dy*8, 0, 8-h);
+				
+				temp.setTexture(region.getTexture());
+				temp.setRegion(region.getRegionX()+x, region.getRegionY()+y+h, w, -h);
+				
+				Caches.draw(temp, tile.worldx()-4 + rx, tile.worldy()-4 + ry, w, h);
+			}
+		}
+	}
 
 	public void draw(Tile tile){
 		if(tile.floor() == this){
-			MathUtils.random.setSeed(tile.id());
-			Draw.rect(name() + MathUtils.random(1, 3), tile.worldx(), tile.worldy(), rotate ? tile.rotation * 90 : 0);
+			throw new RuntimeException("Rendering non-cached tiles is disabled.");
 		}else{
 			Draw.rect(name(), tile.worldx(), tile.worldy(), rotate ? tile.rotation * 90 : 0);
 		}
