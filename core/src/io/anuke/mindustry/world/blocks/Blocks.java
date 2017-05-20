@@ -11,6 +11,16 @@ public class Blocks{
 		public void draw(Tile tile){}
 	},
 	
+	deepwater = new Block("deepwater"){{
+		vary = false;
+		solid = true;
+	}},
+	
+	water = new Block("water"){{
+		vary = false;
+		solid = true;
+	}},
+	
 	stone = new Block("stone"),
 	
 	dirt = new Block("dirt"),
@@ -20,11 +30,6 @@ public class Blocks{
 	coal = new Block("coal"),
 	
 	grass = new Block("grass"),
-	
-	water = new Block("water"){{
-		vary = false;
-		solid = true;
-	}},
 	
 	stoneblock = new Block("stoneblock"){{
 		solid = true;
@@ -38,16 +43,34 @@ public class Blocks{
 		solid = true;
 	}},
 	
+	grassblock = new Block("grassblock"){{
+		solid = true;
+	}},
+	
+	grassblock2 = new Block("grassblock2"){{
+		solid = true;
+	}},
+					
+	mossblock = new Block("mossblock"){{
+		solid = true;
+	}},
+	
+	shrub = new Block("shrub"){{
+		shadow = "shrubshadow";
+		breakable = true;
+		breaktime = 10;
+	}},
+	
 	rock = new Block("rock"){{
 		shadow = "rockshadow";
 		breakable = true;
-		breaktime = 10;
+		breaktime = 15;
 	}},
 			
 	rock2 = new Block("rock2"){{
 		shadow = "rock2shadow";
 		breakable = true;
-		breaktime = 10;
+		breaktime = 15;
 	}},
 	
 	dirtblock = new Block("dirtblock"){{

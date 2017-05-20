@@ -25,7 +25,7 @@ public class World{
 	public static boolean solid(int x, int y){
 		Tile tile = tile(x, y);
 		
-		return tile == null || tile.block().solid;
+		return tile == null || tile.block().solid || (tile.floor().solid && (tile.block() == Blocks.air));
 	}
 	
 	public static int width(){

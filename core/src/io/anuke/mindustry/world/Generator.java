@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.ObjectMap;
 
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.graphics.Hue;
@@ -14,10 +15,17 @@ import io.anuke.ucore.noise.Noise;
 import io.anuke.ucore.util.Mathf;
 
 public class Generator{
-	static final int stonefloor = Color.rgba8888(Hue.rgb(54, 54, 54));
-	static final int stone = Color.rgba8888(Hue.rgb(128, 128, 128));
 	static final int spawn = Color.rgba8888(Color.RED);
 	static final int start = Color.rgba8888(Color.GREEN);
+	
+	static ObjectMap<Integer, Block> colors = map(
+		Hue.rgb(80, 150, 90), Blocks.grass,
+		Hue.rgb(90, 180, 100), Blocks.grassblock,
+		Hue.rgb(80, 110, 180), Blocks.water,
+		Hue.rgb(70, 90, 150), Blocks.deepwater,
+		Hue.rgb(110, 80, 30), Blocks.dirt,
+		Hue.rgb(100, 100, 100), Blocks.stoneblock
+	);
 	
 	/**Returns world size.*/
 	public static void generate(int map){
@@ -31,37 +39,44 @@ public class Generator{
 				
 				int color = pix.getPixel(x, pix.getHeight()-1-y);
 				
-				if(Noise.nnoise(x, y, 8, 1) > 0.22){
-					floor = Blocks.iron;
-				}
-				
-				if(Noise.nnoise(x, y, 8, 1) > 0.1){
-					floor = Blocks.grass;
-				}
-				
-				if(Noise.nnoise(x, y, 8, 1) > 0.1){
-					floor = Blocks.water;
-				}
-				
-				if(Mathf.chance(0.01)){
-					block = Blocks.rock;
-				}
-				
-				if(Mathf.chance(0.01)){
-					block = Blocks.rock2;
-				}
-				
-				if(Noise.nnoise(x, y, 6, 1) > 0.245){
-					floor = Blocks.coal;
-				}
-				if(color == stone && map == 1){
-					block = Blocks.dirtblock;
-				}else if(color == stone){
-					block = Mathf.choose(Blocks.stoneblock, Blocks.stoneblock2, Blocks.stoneblock3);
+				if(colors.containsKey(color)){
+					//TODO less hacky method
+					if(colors.get(color).name().contains("block")){
+						block = colors.get(color);
+					}else{
+						floor = colors.get(color);
+					}
 				}else if(color == start){
 					core = tiles[x][y];
 				}else if(color == spawn){
 					spawnpoints.add(tiles[x][y]);
+				}else{
+					if(Mathf.chance(0.02)){
+						block = Mathf.choose(Blocks.rock, Blocks.rock2);
+					}
+				}
+				
+				if(floor == Blocks.stone || floor == Blocks.grass){
+					if(Noise.nnoise(x, y, 8, 1) > 0.2){
+						floor = Blocks.iron;
+					}
+					
+					if(Noise.nnoise(x, y, 6, 1) > 0.242){
+						floor = Blocks.coal;
+					}
+				}
+				
+				if(block == Blocks.grassblock){
+					floor = Blocks.grass;
+					block = Mathf.choose(Blocks.grassblock, Blocks.grassblock2);
+				}
+				
+				if(block == Blocks.stoneblock){
+					block = Mathf.choose(Blocks.stoneblock, Blocks.stoneblock2, Blocks.stoneblock3);
+				}
+				
+				if(floor == Blocks.grass && Mathf.chance(0.02) && block == Blocks.air){
+					block = Blocks.shrub;
 				}
 				
 				tiles[x][y].setBlock(block);
@@ -79,5 +94,16 @@ public class Generator{
 			mapPixmaps[i] = pix;
 			mapTextures[i] = new Texture(pix);
 		}
+	}
+	
+	private static ObjectMap<Integer, Block> map(Object...objects){
+		
+		ObjectMap<Integer, Block> out = new ObjectMap<>();
+		
+		for(int i = 0; i < objects.length; i += 2){
+			out.put(Hue.rgb((Color)objects[i]), (Block)objects[i+1]);
+		}
+		
+		return out;
 	}
 }
