@@ -64,6 +64,14 @@ public class Tile{
 		this.floor = type;
 	}
 	
+	public boolean passable(){
+		return !(floor.solid || (block.solid && !block.update));
+	}
+	
+	public boolean solid(){
+		return block.solid || floor.solid;
+	}
+	
 	public boolean breakable(){
 		return block.update || block.breakable;
 	}

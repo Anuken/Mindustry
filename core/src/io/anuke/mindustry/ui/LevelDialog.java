@@ -46,7 +46,7 @@ public class LevelDialog extends Dialog{
 			image.clicked(()->{
 				selectedMap = index;
 			});
-			image.getImageCell().size(150, 150);
+			image.getImageCell().size(164);
 			content().add(image).size(180);
 		}
 		

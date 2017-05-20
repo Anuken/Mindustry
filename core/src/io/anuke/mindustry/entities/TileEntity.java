@@ -9,6 +9,7 @@ import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.Entity;
+import io.anuke.ucore.util.Mathf;
 
 public class TileEntity extends Entity{
 	public Tile tile;
@@ -54,6 +55,12 @@ public class TileEntity extends Entity{
 	
 	@Override
 	public void update(){
+		if(health != 0 && !tile.block().name().contains("block") &&
+				Mathf.chance(0.009f*delta*(1f-(float)health/maxhealth))){
+			
+			Effects.effect("smoke", x+Mathf.range(4), y+Mathf.range(4));
+		}
+		
 		tile.block().update(tile);
 	}
 	

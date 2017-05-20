@@ -15,11 +15,11 @@ public class PassTileGraph implements IndexedGraph<Tile>{
 	public Array<Connection<Tile>> getConnections(Tile fromNode){
 		tempConnections.clear();
 		
-		if(fromNode.block().solid && !fromNode.block().update)
+		if(!fromNode.passable())
 			return tempConnections;
 		
 		for(Tile tile : fromNode.getNearby()){
-			if(tile != null && (!tile.block().solid || tile.block().update))
+			if(tile != null && (tile.passable()))
 				tempConnections.add(new TileConnection(fromNode, tile));
 		}
 		

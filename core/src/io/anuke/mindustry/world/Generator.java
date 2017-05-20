@@ -24,6 +24,7 @@ public class Generator{
 		Hue.rgb(80, 110, 180), Blocks.water,
 		Hue.rgb(70, 90, 150), Blocks.deepwater,
 		Hue.rgb(110, 80, 30), Blocks.dirt,
+		Hue.rgb(160, 120, 70), Blocks.dirtblock,
 		Hue.rgb(100, 100, 100), Blocks.stoneblock
 	);
 	
@@ -50,6 +51,7 @@ public class Generator{
 					core = tiles[x][y];
 				}else if(color == spawn){
 					spawnpoints.add(tiles[x][y]);
+					floor = Blocks.dirt;
 				}else{
 					if(Mathf.chance(0.02)){
 						block = Mathf.choose(Blocks.rock, Blocks.rock2);

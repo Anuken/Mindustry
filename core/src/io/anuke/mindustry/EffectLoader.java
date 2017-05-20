@@ -83,6 +83,13 @@ public class EffectLoader{
 			Draw.reset();
 		});
 		
+		Effect.create("smoke", 100, e -> {
+			Draw.color(Color.GRAY, new Color(0.3f, 0.3f, 0.3f, 1f), e.ifract());
+			float size = 7f-e.ifract()*7f;
+			Draw.rect("circle", e.x, e.y, size, size);
+			Draw.reset();
+		});
+		
 		Effect.create("spawn", 23, e -> {
 			Draw.thickness(2f);
 			Draw.color(Hue.mix(Color.DARK_GRAY, Color.SCARLET, e.ifract()));
