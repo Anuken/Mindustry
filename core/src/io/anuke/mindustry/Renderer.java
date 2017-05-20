@@ -36,7 +36,7 @@ public class Renderer{
 			
 			for(int cx = 0; cx < chunksx; cx ++){
 				for(int cy = 0; cy < chunksy; cy ++){
-					Caches.begin();
+					Caches.begin(1600);
 					
 					for(int tilex = cx*chunksize; tilex < (cx+1)*chunksize; tilex++){
 						for(int tiley = cy*chunksize; tiley < (cy+1)*chunksize; tiley++){
