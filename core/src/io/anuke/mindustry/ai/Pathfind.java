@@ -3,6 +3,7 @@ package io.anuke.mindustry.ai;
 import static io.anuke.mindustry.Vars.*;
 
 import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
+import com.badlogic.gdx.ai.pfa.PathFinder;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -13,7 +14,7 @@ import io.anuke.ucore.core.Effects;
 public class Pathfind{
 	static MHueristic heuristic = new MHueristic();
 	static PassTileGraph passgraph = new PassTileGraph();
-	static IndexedAStarPathFinder<Tile> passpathfinder;
+	static PathFinder<Tile> passpathfinder;
 	static Array<DefaultGraphPath<Tile>> paths = new Array<>();
 	static Tile[][] pathSequences;
 	static Vector2 vector = new Vector2();

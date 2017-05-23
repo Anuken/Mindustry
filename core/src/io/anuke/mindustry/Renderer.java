@@ -43,7 +43,6 @@ public class Renderer{
 							World.tile(tilex, tiley).floor().drawCache(World.tile(tilex, tiley));
 						}
 					}
-					
 					caches.put(cx, cy, Caches.end());
 				}
 			}
@@ -53,7 +52,7 @@ public class Renderer{
 		
 		Draw.end();
 		
-		int crangex = (int)(camera.viewportWidth/(chunksize*tilesize));
+		int crangex = (int)(camera.viewportWidth/(chunksize*tilesize))+1;
 		int crangey = (int)(camera.viewportHeight/(chunksize*tilesize))+1;
 		
 		for(int x = -crangex; x <= crangex; x++){

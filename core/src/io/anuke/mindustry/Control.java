@@ -67,6 +67,7 @@ public class Control extends RendererModule{
 	
 	@Override
 	public void update(){
+		
 		if(Inputs.keyUp(Keys.ESCAPE) && debug)
 			Gdx.app.exit();
 		

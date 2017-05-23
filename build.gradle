@@ -57,7 +57,6 @@ project(":html") {
 project(":core") {
     apply plugin: "java"
 
-
     dependencies {
         compile fileTree(dir: '../core/lib', include: '*.jar')
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
