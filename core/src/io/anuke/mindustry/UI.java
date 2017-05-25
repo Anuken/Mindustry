@@ -349,6 +349,8 @@ public class UI extends SceneModule{
 				if(control.cameraScale < 4){
 					control.cameraScale = 4;
 					control.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+					Draw.getSurface("pixel").setScale(control.cameraScale);
+					Draw.getSurface("shadow").setScale(control.cameraScale);
 				}
 			}).size(40);
 			
@@ -356,6 +358,8 @@ public class UI extends SceneModule{
 				if(control.cameraScale > 3){
 					control.cameraScale = 3;
 					control.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+					Draw.getSurface("pixel").setScale(control.cameraScale);
+					Draw.getSurface("shadow").setScale(control.cameraScale);
 				}
 			}).size(40);
 			

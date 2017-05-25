@@ -109,6 +109,8 @@ public class UpgradeDialog extends Dialog{
 			button.addListener(tip);
 			
 			button.clicked(()->{
+				if(button.isDisabled()) return;
+				
 				Inventory.removeItems(weapon.requirements);
 				weapons.put(weapon, true);
 				ui.updateWeapons();
