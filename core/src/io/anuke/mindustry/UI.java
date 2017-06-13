@@ -3,8 +3,6 @@ package io.anuke.mindustry;
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.scene.actions.Actions.*;
 
-import java.util.function.BooleanSupplier;
-
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -18,6 +16,7 @@ import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.function.VisibilityProvider;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Textures;
 import io.anuke.ucore.modules.SceneModule;
@@ -25,6 +24,7 @@ import io.anuke.ucore.scene.Scene;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.*;
 import io.anuke.ucore.scene.ui.*;
+import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Timers;
@@ -35,11 +35,11 @@ public class UI extends SceneModule{
 	KeybindDialog keys;
 	Dialog about, menu, restart, tutorial, levels, upgrades;
 
-	BooleanSupplier play = () -> {
+	VisibilityProvider play = () -> {
 		return playing;
 	};
 
-	BooleanSupplier nplay = () -> {
+	VisibilityProvider nplay = () -> {
 		return !playing;
 	};
 
@@ -134,6 +134,9 @@ public class UI extends SceneModule{
 		keys = new KeybindDialog();
 
 		about = new TextDialog("About", aboutText);
+		
+		for(Cell<?> cell : about.content().getCells())
+			cell.left();
 		
 		tutorial = new TutorialDialog();
 		
