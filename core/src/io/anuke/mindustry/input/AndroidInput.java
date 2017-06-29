@@ -104,6 +104,8 @@ public class AndroidInput extends InputAdapter{
 			
 			Tile sel = selected();
 			
+			if(sel == null) return;
+			
 			if(warmup > warmupDelay && sel.block() != ProductionBlocks.core && sel.breakable()){
 				breaktime += Mathf.delta();
 				

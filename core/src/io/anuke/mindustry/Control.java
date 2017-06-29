@@ -13,6 +13,7 @@ import io.anuke.mindustry.input.GestureHandler;
 import io.anuke.mindustry.input.Input;
 import io.anuke.mindustry.world.Generator;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.graphics.Atlas;
@@ -23,7 +24,6 @@ import io.anuke.ucore.util.Timers;
 public class Control extends RendererModule{
 	public int rangex = 10, rangey = 10;
 	public float targetzoom = 1f;
-	private float targetx, targety;
 	//GifRecorder recorder = new GifRecorder(batch);
 	
 	public Control(){
@@ -148,7 +148,14 @@ public class Control extends RendererModule{
 			}
 			
 			updateShake();
+			float prevx = camera.position.x, prevy = camera.position.y;
 			clampCamera(-tilesize / 2f, -tilesize / 2f, pixsize - tilesize / 2f, pixsize - tilesize / 2f);
+			
+			if(android){
+				UCore.log(camera.position.x-prevx, camera.position.y-prevy);
+				player.x += camera.position.x-prevx;
+				player.y += camera.position.y-prevy;
+			}
 			
 			float lastx = camera.position.x, lasty = camera.position.y;
 			
