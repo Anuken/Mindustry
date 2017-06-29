@@ -160,10 +160,8 @@ public class Block{
 				
 				if(floor.id <= this.id) continue;
 				
-				TextureRegion region = Draw.region(floor.name() + "edge");
-				
-				if(region == null)
-					region = Draw.region(floor.edge + "edge");
+				TextureRegion region = Draw.hasRegion(floor.name() + "edge") ? Draw.region(floor.name() + "edge") :
+					Draw.region(floor.edge + "edge");
 				
 				int sx = -dx*8+2, sy = -dy*8+2;
 				int x = Mathf.clamp(sx, 0, 12);

@@ -105,7 +105,7 @@ public class World{
 	
 	public static boolean validPlace(int x, int y, Block type){
 
-		if(!cursorNear())
+		if(!cursorNear() && !android)
 			return false;
 		
 		for(Tile spawn : spawnpoints){

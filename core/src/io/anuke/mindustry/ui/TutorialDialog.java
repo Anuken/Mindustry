@@ -8,7 +8,7 @@ import io.anuke.ucore.scene.ui.TextDialog;
 public class TutorialDialog extends TextDialog{
 	
 	public TutorialDialog(){
-		super("Tutorial", tutorialText);
+		super("Tutorial", android ? androidTutorialText : tutorialText);
 		setup();
 	}
 	

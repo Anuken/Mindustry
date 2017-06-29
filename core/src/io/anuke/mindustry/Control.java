@@ -2,25 +2,40 @@ package io.anuke.mindustry;
 
 import static io.anuke.mindustry.Vars.*;
 
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.input.GestureDetector;
 
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.input.AndroidInput;
+import io.anuke.mindustry.input.GestureHandler;
+import io.anuke.mindustry.input.Input;
 import io.anuke.mindustry.world.Generator;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.graphics.Atlas;
 import io.anuke.ucore.modules.RendererModule;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timers;
 
 public class Control extends RendererModule{
 	public int rangex = 10, rangey = 10;
+	public float targetzoom = 1f;
+	private float targetx, targety;
 	//GifRecorder recoder = new GifRecorder(batch);
 	
 	public Control(){
 		cameraScale = 4;
 		pixelate();
+		
+		Gdx.input.setCatchBackKey(true);
+		
+		if(android){
+			Inputs.addProcessor(new GestureDetector(20, 0.5f, 2, 0.15f, new GestureHandler()));
+			Inputs.addProcessor(new AndroidInput());
+		}
 		
 		Draw.addSurface("shadow", cameraScale);
 		
@@ -39,7 +54,7 @@ public class Control extends RendererModule{
 			"down", Keys.S,
 			"right", Keys.D,
 			"rotate", Keys.R,
-			"menu", Keys.ESCAPE
+			"menu", Gdx.app.getType() == ApplicationType.Android ? Keys.BACK : Keys.ESCAPE
 		);
 			
 		Settings.loadAll("io.anuke.moment");
@@ -65,11 +80,18 @@ public class Control extends RendererModule{
 		EffectLoader.create();
 	}
 	
+	public void clampZoom(){
+		targetzoom = Mathf.clamp(targetzoom, 0.5f, 2f);
+		camera.zoom = Mathf.clamp(camera.zoom, 0.5f, 2f);
+	}
+	
 	@Override
 	public void update(){
 		
 		if(Inputs.keyUp(Keys.ESCAPE) && debug)
 			Gdx.app.exit();
+		
+		//camera.zoom = MathUtils.lerp(camera.zoom, targetzoom, 0.5f*delta());
 		
 		if(Inputs.keyUp(Keys.SPACE) && debug)
 			Effects.sound("shoot", core.worldx(), core.worldy());
@@ -110,17 +132,26 @@ public class Control extends RendererModule{
 				}
 			
 				Entities.update();
-	
-				Input.doInput();
+				
+				if(!android){
+					Input.doInput();
+				}else{
+					AndroidInput.doInput();
+				}
+				
 			}
 			
-			if(core.block() == ProductionBlocks.core)
-				camera.position.set(player.x, player.y, 0f);
-			else
-				camera.position.set(core.worldx(), core.worldy(), 0f);
+			if(core.block() == ProductionBlocks.core){
+				smoothCamera(player.x, player.y, 0.3f);
+			}else{
+				smoothCamera(core.worldx(), core.worldy(), 0.4f);
+			}
 			
 			updateShake();
 			clampCamera(-tilesize / 2f, -tilesize / 2f, pixsize - tilesize / 2f, pixsize - tilesize / 2f);
+			
+			float lastx = camera.position.x, lasty = camera.position.y;
+			camera.position.set((int)camera.position.x, (int)camera.position.y, 0);
 	
 			drawDefault();
 			
@@ -128,6 +159,8 @@ public class Control extends RendererModule{
 			batch.begin();
 			Renderer.renderOverlay();
 			batch.end();
+			
+			camera.position.set(lastx, lasty, 0);
 			
 			//recoder.update();
 		}
@@ -151,5 +184,8 @@ public class Control extends RendererModule{
 		
 		rangex = (int) (width / tilesize / cameraScale/2)+2;
 		rangey = (int) (height / tilesize / cameraScale/2)+2;
+		
+		AndroidInput.mousex = Gdx.graphics.getWidth()/2;
+		AndroidInput.mousey = Gdx.graphics.getHeight()/2;
 	}
 }

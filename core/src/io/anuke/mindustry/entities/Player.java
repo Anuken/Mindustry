@@ -42,6 +42,7 @@ public class Player extends DestructibleEntity{
 	
 	@Override
 	public void update(){
+		
 		float speed = this.speed;
 		
 		if(Vars.debug)

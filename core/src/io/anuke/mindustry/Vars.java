@@ -1,5 +1,7 @@
 package io.anuke.mindustry;
 
+import com.badlogic.gdx.Application.ApplicationType;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -14,9 +16,11 @@ import io.anuke.mindustry.world.Tile;
 
 /**ick, global state*/
 public class Vars{
+	public static final boolean android = (Gdx.app.getType() == ApplicationType.Android);
+	
 	public static final float placerange = 66;
 	public static final float respawnduration = 60*4;
-	public static final float wavespace = 20*60;
+	public static final float wavespace = 20*60*(android ? 2 : 1);
 	public static final float enemyspawnspace = 65;
 	public static boolean debug = false;
 	
@@ -77,7 +81,23 @@ public class Vars{
 		"[YELLOW][[L-MOUSE][] to shoot.",
 		"[yellow][[scrollwheel] to switch weapons.",
 		"",
-		"[GOLD]Every 20 seconds, a new wave will appear.",
+		"[GOLD]Every "+wavespace/60+" seconds, a new wave will appear.",
+		"Build turrets to defend the core.",
+		"If the core is destroyed, you lose the game.",
+		"",
+		"[LIME]To collect building resources, move them into the core with conveyors.",
+		"[LIME]Place [ORANGE]drills[] on the right material,they will automatically mine material",
+		"and dump it to nearby conveyors or turrets.",
+		"",
+		"[SCARLET]To produce steel, feed coal and iron into a smelter."
+	};
+	
+	public static String[] androidTutorialText = {
+		"[GREEN]Default Controls:",
+		"[WHITE]Use [YELLOW]one finger[] to pan the camera, or two while placing blocks.",
+		"[YELLOW]Hold and tap[] to destroy blocks.",
+		"",
+		"[GOLD]Every "+wavespace/60+" seconds, a new wave will appear.",
 		"Build turrets to defend the core.",
 		"If the core is destroyed, you lose the game.",
 		"",

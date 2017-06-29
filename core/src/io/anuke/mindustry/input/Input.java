@@ -1,10 +1,12 @@
-package io.anuke.mindustry;
+package io.anuke.mindustry.input;
 
 import static io.anuke.mindustry.Vars.*;
 
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 
+import io.anuke.mindustry.Inventory;
+import io.anuke.mindustry.World;
 import io.anuke.mindustry.entities.Weapon;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Tile;

@@ -51,7 +51,7 @@ border-error
   index: -1
 border-white
   rotate: false
-  xy: 367, 6
+  xy: 421, 17
   size: 12, 12
   split: 4, 4, 4, 4
   orig: 12, 12
@@ -251,7 +251,7 @@ color-picker-selector-vertical
   index: -1
 cursor
   rotate: false
-  xy: 136, 56
+  xy: 383, 14
   size: 4, 4
   orig: 4, 4
   offset: 0, 0
@@ -309,6 +309,20 @@ menu-bg
   orig: 1, 1
   offset: 0, 0
   index: -1
+icon-cancel
+  rotate: false
+  xy: 367, 4
+  size: 14, 14
+  orig: 14, 14
+  offset: 0, 0
+  index: -1
+icon-check
+  rotate: false
+  xy: 389, 15
+  size: 14, 14
+  orig: 14, 14
+  offset: 0, 0
+  index: -1
 icon-close
   rotate: false
   xy: 217, 86
@@ -346,9 +360,16 @@ icon-distribution
   index: -1
 icon-production
   rotate: false
-  xy: 389, 19
+  xy: 383, 2
   size: 10, 10
   orig: 10, 10
+  offset: 0, 0
+  index: -1
+icon-rotate
+  rotate: false
+  xy: 405, 15
+  size: 14, 14
+  orig: 14, 14
   offset: 0, 0
   index: -1
 list-selection
@@ -616,7 +637,7 @@ touchpad-knob
   index: -1
 tree-minus
   rotate: false
-  xy: 401, 19
+  xy: 395, 2
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
@@ -630,7 +651,7 @@ tree-plus
   index: -1
 tree-selection
   rotate: false
-  xy: 430, 69
+  xy: 136, 57
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3
@@ -638,7 +659,7 @@ tree-selection
   index: -1
 white
   rotate: false
-  xy: 473, 17
+  xy: 430, 69
   size: 3, 3
   orig: 3, 3
   offset: 0, 0
@@ -653,7 +674,7 @@ window
   index: -1
 window-border-bg
   rotate: false
-  xy: 136, 7
+  xy: 473, 17
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3

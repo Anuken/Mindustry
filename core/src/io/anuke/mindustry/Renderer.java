@@ -6,8 +6,10 @@ import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
@@ -104,11 +106,27 @@ public class Renderer{
 	
 	public static void renderPixelOverlay(){
 		
-		if(recipe != null && !ui.hasMouse()){
-			float x = Mathf.round2(Graphics.mouseWorld().x, tilesize);
-			float y = Mathf.round2(Graphics.mouseWorld().y, tilesize);
+		if(recipe != null && (!ui.hasMouse() || android)){
+			float x = 0;
+			float y = 0;
+			
+			int tilex = 0;
+			int tiley = 0;
+			
+			if(android){
+				Vector2 vec = Graphics.world(AndroidInput.mousex, AndroidInput.mousey);
+				x = Mathf.round2(vec.x, tilesize);
+				y = Mathf.round2(vec.y, tilesize);
+				tilex = Mathf.scl2(vec.x, tilesize);
+				tiley = Mathf.scl2(vec.y, tilesize);
+			}else{
+				x = Mathf.round2(Graphics.mouseWorld().x, tilesize);
+				y = Mathf.round2(Graphics.mouseWorld().y, tilesize);
+				tilex = World.tilex();
+				tiley = World.tiley();
+			}
 
-			boolean valid = World.validPlace(World.tilex(), World.tiley(), recipe.result);
+			boolean valid = World.validPlace(tilex, tiley, recipe.result);
 
 			Draw.color(valid ? Color.PURPLE : Color.SCARLET);
 			Draw.thickness(2f);
@@ -140,6 +158,16 @@ public class Renderer{
 			if(tile.breakable() && tile.block() != ProductionBlocks.core){
 				Draw.color(Color.YELLOW, Color.SCARLET, breaktime / tile.block().breaktime);
 				Draw.square(tile.worldx(), tile.worldy(), 4);
+				Draw.reset();
+			}
+		}
+		
+		if(android && breaktime > 0){
+			Tile tile = AndroidInput.selected();
+			if(tile.breakable() && tile.block() != ProductionBlocks.core){
+				float fract = breaktime / tile.block().breaktime;
+				Draw.color(Color.YELLOW, Color.SCARLET, fract);
+				Draw.circle(tile.worldx(), tile.worldy(), 4 + (1f-fract)*26);
 				Draw.reset();
 			}
 		}

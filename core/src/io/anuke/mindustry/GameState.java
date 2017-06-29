@@ -25,7 +25,10 @@ public class GameState{
 		wavetime = waveSpacing();
 		Entities.clear();
 		enemies = 0;
-		player.add();
+		
+		if(!android)
+			player.add();
+		
 		player.heal();
 		Inventory.clearItems();
 		spawnpoints.clear();
@@ -39,6 +42,8 @@ public class GameState{
 	public static void play(){
 		player.x = core.worldx();
 		player.y = core.worldy()-8;
+		
+		control.camera.position.set(player.x, player.y, 0);
 		
 		wavetime = waveSpacing();
 		

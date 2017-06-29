@@ -9,6 +9,7 @@ import io.anuke.mindustry.entities.Weapon;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Table;
@@ -71,7 +72,7 @@ public class UpgradeDialog extends Dialog{
 			
 			Table tiptable = new Table();
 			
-			Runnable run = ()->{
+			Listenable run = ()->{
 				tiptable.clearChildren();
 				
 				String description = weapon.description;
@@ -100,7 +101,7 @@ public class UpgradeDialog extends Dialog{
 				tiptable.pad(10f);
 			};
 			
-			run.run();
+			run.listen();
 			
 			Tooltip tip = new Tooltip(tiptable, run);
 			
@@ -114,7 +115,7 @@ public class UpgradeDialog extends Dialog{
 				Inventory.removeItems(weapon.requirements);
 				weapons.put(weapon, true);
 				ui.updateWeapons();
-				run.run();
+				run.listen();
 				Effects.sound("purchase");
 			});
 		}

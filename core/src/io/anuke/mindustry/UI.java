@@ -12,10 +12,12 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.entities.Weapon;
+import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.function.VisibilityProvider;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Textures;
@@ -30,7 +32,7 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Timers;
 
 public class UI extends SceneModule{
-	Table itemtable, weapontable;
+	Table itemtable, weapontable, tools;
 	SettingsDialog prefs;
 	KeybindDialog keys;
 	Dialog about, menu, restart, tutorial, levels, upgrades;
@@ -164,6 +166,10 @@ public class UI extends SceneModule{
 		weapontable.bottom();
 		weapontable.setVisible(play);
 		
+		if(android){
+			weapontable.remove();
+		}
+		
 		build.begin(scene);
 
 		new table(){{
@@ -229,7 +235,7 @@ public class UI extends SceneModule{
 						
 						Table tiptable = new Table();
 						
-						Runnable run = ()->{
+						Listenable run = ()->{
 							tiptable.clearChildren();
 							
 							String description = r.result.description();
@@ -253,7 +259,7 @@ public class UI extends SceneModule{
 							tiptable.pad(10f);
 						};
 						
-						run.run();
+						run.listen();
 						
 						Tooltip tip = new Tooltip(tiptable, run);
 						
@@ -288,10 +294,11 @@ public class UI extends SceneModule{
 			
 			row();
 			
-			new button("Upgrades", ()->{
-				upgrades.show();
-			}).uniformX().fillX();
-
+			if(!android){
+				new button("Upgrades", ()->{
+					upgrades.show();
+				}).uniformX().fillX();
+			}
 			get().setVisible(play);
 
 		}}.end();
@@ -344,7 +351,8 @@ public class UI extends SceneModule{
 		}}.end();
 		
 		
-		//+- table
+		//if(Gdx.app.getType() != ApplicationType.Android){
+			//+- table
 		new table(){{
 			aleft();
 			abottom();
@@ -368,6 +376,7 @@ public class UI extends SceneModule{
 			
 			get().setVisible(play);
 		}}.end();
+		//}
 	
 		//menu table
 		new table(){{
@@ -385,12 +394,14 @@ public class UI extends SceneModule{
 				}).width(w);
 
 				row();
-
-				new button("Controls", () -> {
-					keys.show(scene);
-				}).width(w);
-
-				row();
+				
+				if(!android){
+					new button("Controls", () -> {
+						keys.show(scene);
+					}).width(w);
+					
+					row();
+				}
 
 				new button("About", () -> {
 					about.show(scene);
@@ -427,6 +438,30 @@ public class UI extends SceneModule{
 				});
 			}};
 		}}.end();
+		
+		tools = new Table();
+		tools.addIButton("icon-cancel", 42, ()->{
+			recipe = null;
+		});
+		tools.addIButton("icon-rotate", 42, ()->{
+			rotation++;
+
+			rotation %= 4;
+		});
+		tools.addIButton("icon-check", 42, ()->{
+			AndroidInput.place();
+		});
+		
+		
+		scene.add(tools);
+		
+		tools.setVisible(()->{
+			return playing && android && recipe != null;
+		});
+		
+		tools.update(()->{
+			tools.setPosition(AndroidInput.mousex, Gdx.graphics.getHeight()-AndroidInput.mousey-60, Align.top);
+		});
 
 		updateItems();
 
