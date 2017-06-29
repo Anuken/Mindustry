@@ -4,6 +4,7 @@ import static io.anuke.mindustry.Vars.*;
 
 import io.anuke.ucore.scene.ui.ConfirmDialog;
 import io.anuke.ucore.scene.ui.Dialog;
+import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class MenuDialog extends Dialog{
 
@@ -16,17 +17,17 @@ public class MenuDialog extends Dialog{
 		content().addButton("Back", ()->{
 			hide();
 			paused = false;
-		}).width(200);
+		}).width(200).units(Unit.dp);
 		
 		content().row();
 		content().addButton("Settings", ()->{
 			ui.showPrefs();
-		}).width(200);
+		}).width(200).units(Unit.dp);
 		
 		content().row();
 		content().addButton("Controls", ()->{
 			ui.showControls();
-		}).width(200);
+		}).width(200).units(Unit.dp);
 		
 		content().row();
 		content().addButton("Back to menu", ()->{
@@ -35,6 +36,6 @@ public class MenuDialog extends Dialog{
 				paused = false;
 				playing = false;
 			}).show();
-		}).width(200);
+		}).width(200).units(Unit.dp);
 	}
 }

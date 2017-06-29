@@ -4,6 +4,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
@@ -60,7 +61,7 @@ public class Turret extends Block{
 			Draw.text("Ammo: " + entity.ammo, tile.worldx(), tile.worldy() - tilesize);
 		}
 		
-		Draw.tscl(0.5f);
+		Draw.tscl(Vars.fontscale);
 	}
 	
 	@Override

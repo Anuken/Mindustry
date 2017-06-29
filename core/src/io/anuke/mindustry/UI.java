@@ -10,6 +10,8 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
 
 import io.anuke.mindustry.entities.Weapon;
 import io.anuke.mindustry.input.AndroidInput;
@@ -22,13 +24,13 @@ import io.anuke.ucore.function.VisibilityProvider;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Textures;
 import io.anuke.ucore.modules.SceneModule;
+import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Scene;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.*;
+import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.ui.*;
-import io.anuke.ucore.scene.ui.layout.Cell;
-import io.anuke.ucore.scene.ui.layout.Stack;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.scene.ui.layout.*;
 import io.anuke.ucore.util.Timers;
 
 public class UI extends SceneModule{
@@ -36,6 +38,7 @@ public class UI extends SceneModule{
 	SettingsDialog prefs;
 	KeybindDialog keys;
 	Dialog about, menu, restart, tutorial, levels, upgrades;
+	Tooltip tooltip;
 
 	VisibilityProvider play = () -> {
 		return playing;
@@ -60,6 +63,7 @@ public class UI extends SceneModule{
 		});
 		
 		skin.font().setUseIntegerPositions(false);
+		skin.font().getData().setScale(Vars.fontscale);
 		TooltipManager.getInstance().animations = false;
 		
 		Dialog.closePadR = -1;
@@ -88,12 +92,12 @@ public class UI extends SceneModule{
 		
 		Draw.color();
 		
-		Draw.tscl(1.5f);
+		Draw.tscl(Unit.dp.inPixels(1.5f));
 		
-		Draw.text("[#111111]-( Mindustry )-", w/2, h-16);
-		Draw.text("[#f1de60]-( Mindustry )-", w/2, h-10);
+		Draw.text("[#111111]-( Mindustry )-", w/2, h-Unit.dp.inPixels(16));
+		Draw.text("[#f1de60]-( Mindustry )-", w/2, h-Unit.dp.inPixels(10));
 		
-		Draw.tscl(0.5f);
+		Draw.tscl(Unit.dp.inPixels(0.5f));
 	}
 
 	@Override
@@ -199,8 +203,8 @@ public class UI extends SceneModule{
 					Recipe.getBy(sec, recipes);
 					
 					ImageButton button = new ImageButton("icon-"+sec.name(), "toggle");
-					add(button).fill().height(54).padTop(-10);
-					button.getImageCell().size(40).padBottom(4);
+					add(button).fill().height(54).padTop(-10).units(Unit.dp);
+					button.getImageCell().size(40).padBottom(4).units(Unit.dp);
 					group.add(button);
 					
 					Table table = new Table();
@@ -216,8 +220,8 @@ public class UI extends SceneModule{
 							recipe = r;
 						});
 						
-						table.add(image).size(size+8).pad(4);
-						image.getImageCell().size(size);
+						table.add(image).size(size+8).pad(4).units(Unit.dp);
+						image.getImageCell().size(size).units(Unit.dp);
 						
 						image.update(()->{
 							
@@ -241,7 +245,7 @@ public class UI extends SceneModule{
 							String description = r.result.description();
 							
 							tiptable.background("button");
-							tiptable.add("[PURPLE]" + r.result.name(), 0.75f).left().padBottom(2f);
+							tiptable.add("[PURPLE]" + r.result.name(), 0.75f*fontscale*2f).left().padBottom(2f).units(Unit.dp);
 							
 							ItemStack[] req = r.requirements;
 							for(ItemStack s : req){
@@ -249,19 +253,42 @@ public class UI extends SceneModule{
 								int amount = Math.min(items.get(s.item, 0), s.amount);
 								tiptable.add(
 										(amount >= s.amount ? "[YELLOW]" : "[RED]")
-								+s.item + ": " + amount + " / " +s.amount, 0.5f).left();
+								+s.item + ": " + amount + " / " +s.amount, fontscale).left();
 							}
 							
 							tiptable.row();
-							tiptable.add().size(10);
+							tiptable.add().size(10).units(Unit.px);
 							tiptable.row();
 							tiptable.add("[ORANGE]" + description).left();
-							tiptable.pad(10f);
+							tiptable.pad(Unit.dp.inPixels(10f));
 						};
 						
 						run.listen();
 						
-						Tooltip tip = new Tooltip(tiptable, run);
+						Tooltip tip = new Tooltip(tiptable, run){
+							public void enter (InputEvent event, float x, float y, int pointer, Element fromActor) {
+								if(tooltip != this)
+									hideTooltip();
+								Element actor = event.getListenerActor();
+								if (fromActor != null && fromActor.isDescendantOf(actor)) return;
+								setContainerPosition(actor, x, y);
+								manager.enter(this);
+								run.listen();
+								
+								tooltip = this;
+								
+								if(android){
+									
+									Timer.schedule(new Task(){
+										@Override
+										public void run(){
+											hide();
+										}
+									}, 1.5f);
+									
+								}
+							}
+						};
 						
 						tip.setInstant(true);
 
@@ -326,26 +353,26 @@ public class UI extends SceneModule{
 			aright();
 
 			new table(){{
-					get().background("button");
+				get().background("button");
 
-					new label("Wave 1"){{
-							get().setFontScale(1f);
-							get().update(() -> {
-								get().setText("[YELLOW]Wave " + wave);
-							});
-						}}.left();
+				new label("Wave 1"){{
+					get().setFontScale(fontscale*2f);
+					get().update(() -> {
+						get().setText("[YELLOW]Wave " + wave);
+					});
+				}}.left();
 
-					row();
+				row();
 
-					new label("Time"){{
-							get().update(() -> {
-								get().setText(enemies > 0 ? 
-										enemies + " Enemies remaining" : "New wave in " + (int) (wavetime / 60f));
-							});
-						}}.minWidth(150);
+				new label("Time"){{
+					get().update(() -> {
+						get().setText(enemies > 0 ? 
+								enemies + " Enemies remaining" : "New wave in " + (int) (wavetime / 60f));
+					});
+				}}.minWidth(150);
 
-					get().pad(12);
-				}};
+				get().pad(Unit.dp.inPixels(12));
+			}};
 
 			get().setVisible(play);
 		}}.end();
@@ -356,23 +383,26 @@ public class UI extends SceneModule{
 		new table(){{
 			aleft();
 			abottom();
+			int base = baseCameraScale;
 			new button("+", ()->{
-				if(control.cameraScale < 4){
-					control.cameraScale = 4;
+				if(control.cameraScale < base){
+					control.cameraScale = base;
 					control.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+					control.setCamera(player.x, player.y);
 					Draw.getSurface("pixel").setScale(control.cameraScale);
 					Draw.getSurface("shadow").setScale(control.cameraScale);
 				}
-			}).size(40);
+			}).size(Unit.dp.inPixels(40));
 			
 			new button("-", ()->{
-				if(control.cameraScale > 3){
-					control.cameraScale = 3;
+				if(control.cameraScale > base-zoomScale){
+					control.cameraScale = base-zoomScale;
 					control.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+					control.setCamera(player.x, player.y);
 					Draw.getSurface("pixel").setScale(control.cameraScale);
 					Draw.getSurface("shadow").setScale(control.cameraScale);
 				}
-			}).size(40);
+			}).size(Unit.dp.inPixels(40));
 			
 			get().setVisible(play);
 		}}.end();
@@ -380,7 +410,7 @@ public class UI extends SceneModule{
 	
 		//menu table
 		new table(){{
-			float w = 200;
+			float w = Unit.dp.inPixels(200);
 			
 			new table("button"){{
 				new button("Play", () -> {
@@ -440,15 +470,15 @@ public class UI extends SceneModule{
 		}}.end();
 		
 		tools = new Table();
-		tools.addIButton("icon-cancel", 42, ()->{
+		tools.addIButton("icon-cancel", Unit.dp.inPixels(42), ()->{
 			recipe = null;
 		});
-		tools.addIButton("icon-rotate", 42, ()->{
+		tools.addIButton("icon-rotate", Unit.dp.inPixels(42), ()->{
 			rotation++;
 
 			rotation %= 4;
 		});
-		tools.addIButton("icon-check", 42, ()->{
+		tools.addIButton("icon-check", Unit.dp.inPixels(42), ()->{
 			AndroidInput.place();
 		});
 		
@@ -460,7 +490,7 @@ public class UI extends SceneModule{
 		});
 		
 		tools.update(()->{
-			tools.setPosition(AndroidInput.mousex, Gdx.graphics.getHeight()-AndroidInput.mousey-60, Align.top);
+			tools.setPosition(AndroidInput.mousex, Gdx.graphics.getHeight()-AndroidInput.mousey-15*control.cameraScale, Align.top);
 		});
 
 		updateItems();
@@ -523,6 +553,11 @@ public class UI extends SceneModule{
 	public void showRestart(){
 		restart.show();
 	}
+	
+	public void hideTooltip(){
+		if(tooltip != null)
+			tooltip.hide();
+	}
 
 	public void updateItems(){
 		itemtable.clear();
@@ -530,8 +565,8 @@ public class UI extends SceneModule{
 		for(Item stack : items.keys()){
 			Image image = new Image(Draw.region("icon-" + stack.name()));
 			Label label = new Label("" + items.get(stack));
-			label.setFontScale(1f);
-			itemtable.add(image).size(32);
+			label.setFontScale(fontscale*2f);
+			itemtable.add(image).size(32).units(Unit.dp);
 			itemtable.add(label);
 			itemtable.row();
 		}

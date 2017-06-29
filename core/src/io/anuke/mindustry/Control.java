@@ -24,10 +24,10 @@ public class Control extends RendererModule{
 	public int rangex = 10, rangey = 10;
 	public float targetzoom = 1f;
 	private float targetx, targety;
-	//GifRecorder recoder = new GifRecorder(batch);
+	//GifRecorder recorder = new GifRecorder(batch);
 	
 	public Control(){
-		cameraScale = 4;
+		cameraScale = baseCameraScale;
 		pixelate();
 		
 		Gdx.input.setCatchBackKey(true);
@@ -142,7 +142,7 @@ public class Control extends RendererModule{
 			}
 			
 			if(core.block() == ProductionBlocks.core){
-				smoothCamera(player.x, player.y, 0.3f);
+				smoothCamera(player.x, player.y, android ? 0.3f : 0.14f);
 			}else{
 				smoothCamera(core.worldx(), core.worldy(), 0.4f);
 			}
@@ -151,7 +151,14 @@ public class Control extends RendererModule{
 			clampCamera(-tilesize / 2f, -tilesize / 2f, pixsize - tilesize / 2f, pixsize - tilesize / 2f);
 			
 			float lastx = camera.position.x, lasty = camera.position.y;
-			camera.position.set((int)camera.position.x, (int)camera.position.y, 0);
+			
+			if(android){
+				camera.position.set((int)camera.position.x, (int)camera.position.y, 0);
+				
+				if(Gdx.graphics.getHeight()/cameraScale % 2 == 1){
+					camera.position.add(0, -0.5f, 0);
+				}
+			}
 	
 			drawDefault();
 			
@@ -162,7 +169,7 @@ public class Control extends RendererModule{
 			
 			camera.position.set(lastx, lasty, 0);
 			
-			//recoder.update();
+			//recorder.update();
 		}
 		
 		if(!paused){

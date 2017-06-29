@@ -13,6 +13,7 @@ import io.anuke.mindustry.entities.Weapon;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.scene.ui.layout.Unit;
 
 /**ick, global state*/
 public class Vars{
@@ -23,6 +24,9 @@ public class Vars{
 	public static final float wavespace = 20*60*(android ? 2 : 1);
 	public static final float enemyspawnspace = 65;
 	public static boolean debug = false;
+	public static float fontscale = Unit.dp.inPixels(1f)/2f;
+	public static final int baseCameraScale = Math.round(Unit.dp.inPixels(4));
+	public static final int zoomScale = Math.round(Unit.dp.inPixels(1));
 	
 	public static final Vector2 vector = new Vector2();
 	

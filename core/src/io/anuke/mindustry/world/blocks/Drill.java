@@ -4,6 +4,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 
 import com.badlogic.gdx.graphics.Color;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -49,7 +50,7 @@ public class Drill extends Block{
 			Draw.text("Not on " + resource.name + " block!", tile.worldx(), tile.worldy() + tilesize);
 		}
 		
-		Draw.tscl(0.5f);
+		Draw.tscl(Vars.fontscale);
 	}
 	
 	//@Override

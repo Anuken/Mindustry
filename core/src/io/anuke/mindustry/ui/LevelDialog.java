@@ -8,6 +8,7 @@ import io.anuke.mindustry.GameState;
 import io.anuke.mindustry.World;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.scene.ui.*;
+import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class LevelDialog extends Dialog{
 	Label[] scores = new Label[maps.length];
@@ -46,8 +47,8 @@ public class LevelDialog extends Dialog{
 			image.clicked(()->{
 				selectedMap = index;
 			});
-			image.getImageCell().size(164);
-			content().add(image).size(180);
+			image.getImageCell().size(Unit.dp.inPixels(164));
+			content().add(image).size(Unit.dp.inPixels(180));
 		}
 		
 		content().row();

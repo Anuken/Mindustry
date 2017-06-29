@@ -35,6 +35,7 @@ public class AndroidInput extends InputAdapter{
 	
 	@Override
 	public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+		ui.hideTooltip();
 		if(pointer == 0){
 			lmousex = screenX;
 			lmousey = screenY;
@@ -117,5 +118,14 @@ public class AndroidInput extends InputAdapter{
 			lmousey = Gdx.input.getY(0);
 			breaktime = 0;
 		}
+	}
+	
+	public static int touches(){
+		int sum = 0;
+		for(int i = 0; i < 10; i ++){
+			if(Gdx.input.isTouched(i))
+				sum ++;
+		}
+		return sum;
 	}
 }
