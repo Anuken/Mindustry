@@ -444,7 +444,7 @@ public class UI extends SceneModule{
 					Gdx.app.exit();
 				}).width(w);
 				
-				get().pad(20);
+				get().pad(Unit.dp.inPixels(20));
 			}};
 
 			get().setVisible(nplay);
