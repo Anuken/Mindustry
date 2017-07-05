@@ -43,6 +43,7 @@ public class Control extends RendererModule{
 		Sounds.load("shoot.wav", "place.wav", "explosion.wav", "enemyshoot.wav", 
 				"corexplode.wav", "break.wav", "spawn.wav", "flame.wav", "die.wav", 
 				"respawn.wav", "purchase.wav", "flame2.wav");
+		
 		Musics.load("1.mp3", "2.mp3", "3.mp3");
 		
 		Generator.loadMaps();
