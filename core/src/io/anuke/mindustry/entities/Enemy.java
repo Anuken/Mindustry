@@ -54,7 +54,7 @@ public class Enemy extends DestructibleEntity{
 		}
 		
 		if(target != null){
-			if(Timers.get(hashCode()+"reload", reload)){
+			if(Timers.get(this, "reload", reload*Vars.multiplier)){
 				shoot();
 				Effects.sound(shootsound, this);
 			}
@@ -62,9 +62,9 @@ public class Enemy extends DestructibleEntity{
 	}
 	
 	public void shoot(){
-		
 		vector.set(length, 0).rotate(direction.angle());
-		new Bullet(bullet, this, x+vector.x, y+vector.y, direction.angle()).add();
+		Bullet out = new Bullet(bullet, this, x+vector.x, y+vector.y, direction.angle()).add();
+		out.damage = bullet.damage*Vars.multiplier;
 	}
 	
 	@Override

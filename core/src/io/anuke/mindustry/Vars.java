@@ -28,6 +28,7 @@ public class Vars{
 	public static final int baseCameraScale = Math.round(Unit.dp.inPixels(4));
 	public static final int zoomScale = Math.round(Unit.dp.inPixels(1));
 	
+	public static int multiplier = android ? 2 : 1;
 	public static final Vector2 vector = new Vector2();
 	
 	public static final int tilesize = 8;

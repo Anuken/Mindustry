@@ -90,7 +90,7 @@ public class Turret extends Block{
 			
 			if(enemy != null){
 				entity.rotation = MathUtils.lerpAngleDeg(entity.rotation, Angles.predictAngle(tile.worldx(), tile.worldy(), enemy.x, enemy.y, enemy.xvelocity, enemy.yvelocity, bullet.speed - 0.1f), 0.2f);
-				float reload = Vars.android ? this.reload*2 : this.reload;
+				float reload = Vars.multiplier*this.reload;
 				if(Timers.get(tile, reload)){
 					Effects.sound(shootsound, entity);
 					shoot(tile);
@@ -109,15 +109,13 @@ public class Turret extends Block{
 		TurretEntity entity = tile.entity();
 		
 		vector.set(0, 4).setAngle(entity.rotation);
-		new Bullet(bullet, tile.entity, tile.worldx()+vector.x, tile.worldy()+vector.y, entity.rotation).add();
+		Bullet out = new Bullet(bullet, tile.entity, tile.worldx()+vector.x, tile.worldy()+vector.y, entity.rotation).add();
+		out.damage = bullet.damage*Vars.multiplier;
 	}
 	
 	protected void bullet(Tile tile, float angle){
 		 Bullet out = new Bullet(bullet, tile.entity, tile.worldx()+vector.x, tile.worldy()+vector.y, angle).add();
-		 
-		 if(Vars.android){
-			 out.damage *= 2;
-		 }
+		 out.damage = bullet.damage*Vars.multiplier;
 	}
 	
 	static class TurretEntity extends TileEntity{

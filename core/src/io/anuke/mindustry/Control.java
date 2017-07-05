@@ -146,7 +146,7 @@ public class Control extends RendererModule{
 				smoothCamera(core.worldx(), core.worldy(), 0.4f);
 			}
 			
-			updateShake();
+			updateShake(0.5f);
 			float prevx = camera.position.x, prevy = camera.position.y;
 			clampCamera(-tilesize / 2f, -tilesize / 2f, pixsize - tilesize / 2f, pixsize - tilesize / 2f);
 			

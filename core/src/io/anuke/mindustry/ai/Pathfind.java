@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.entities.Enemy;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects;
 public class Pathfind{
 	static MHueristic heuristic = new MHueristic();
 	static PassTileGraph passgraph = new PassTileGraph();
@@ -77,10 +76,10 @@ public class Pathfind{
 			}
 			
 			
-			if(debug)
-			for(Tile tile : path){
-				Effects.effect("ind", tile.worldx(), tile.worldy());
-			}
+			//if(debug)
+			//for(Tile tile : path){
+			//	Effects.effect("ind", tile.worldx(), tile.worldy());
+			//}
 			
 		}
 	}

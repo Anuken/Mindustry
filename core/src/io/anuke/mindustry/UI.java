@@ -40,27 +40,19 @@ public class UI extends SceneModule{
 	Dialog about, menu, restart, tutorial, levels, upgrades;
 	Tooltip tooltip;
 
-	VisibilityProvider play = () -> {
-		return playing;
-	};
+	VisibilityProvider play = () -> playing;
 
-	VisibilityProvider nplay = () -> {
-		return !playing;
-	};
+	VisibilityProvider nplay = () -> !playing;
 
 	public UI() {
-		Dialog.setShowAction(()->{
-			return sequence(Actions.moveToAligned(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight(), Align.center), 
+		Dialog.setShowAction(()-> sequence(Actions.moveToAligned(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight(), Align.center),
 						parallel(Actions.moveToAligned(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, Align.center, 0.09f, Interpolation.fade), 
 								
-								Actions.fadeIn(0.09f, Interpolation.fade)));
-		});
+								Actions.fadeIn(0.09f, Interpolation.fade))));
 		
-		Dialog.setHideAction(()->{
-			return sequence(
+		Dialog.setHideAction(()-> sequence(
 					parallel(Actions.moveBy(0, -Gdx.graphics.getHeight()/2, 0.08f, Interpolation.fade), 
-							Actions.fadeOut(0.08f, Interpolation.fade)));
-		});
+							Actions.fadeOut(0.08f, Interpolation.fade))));
 		
 		skin.font().setUseIntegerPositions(false);
 		skin.font().getData().setScale(Vars.fontscale);
@@ -301,9 +293,7 @@ public class UI extends SceneModule{
 						table.add().size(size);
 					}
 					
-					table.setVisible(()->{
-						return button.isChecked();
-					});
+					table.setVisible(()-> button.isChecked());
 					
 					stack.add(table);
 				}
@@ -355,21 +345,13 @@ public class UI extends SceneModule{
 			new table(){{
 				get().background("button");
 
-				new label("Wave 1"){{
-					get().setFontScale(fontscale*2f);
-					get().update(() -> {
-						get().setText("[YELLOW]Wave " + wave);
-					});
-				}}.left();
+				new label(()->"[YELLOW]Wave " + wave).scale(fontscale*2f).left();
 
 				row();
 
-				new label("Time"){{
-					get().update(() -> {
-						get().setText(enemies > 0 ? 
-								enemies + " Enemies remaining" : "New wave in " + (int) (wavetime / 60f));
-					});
-				}}.minWidth(150);
+				new label(()->enemies > 0 ?
+						enemies + " Enemies remaining" : "New wave in " + (int) (wavetime / 60f))
+				.minWidth(150);
 
 				get().pad(Unit.dp.inPixels(12));
 			}};
@@ -379,7 +361,8 @@ public class UI extends SceneModule{
 		
 		
 		//if(Gdx.app.getType() != ApplicationType.Android){
-			//+- table
+		//+- table
+		//TODO refactor to make this less messy
 		new table(){{
 			aleft();
 			abottom();
