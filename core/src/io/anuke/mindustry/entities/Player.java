@@ -7,16 +7,21 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.resource.Recipe;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Timers;
 
 public class Player extends DestructibleEntity{
-	Vector2 direction = new Vector2();
-	float speed = 1f;
-	float rotation;
-	float reload;
+	public Weapon weapon;
+	public float breaktime = 0;
+	
+	public Recipe recipe;
+	public int rotation;
+	
+	private Vector2 direction = new Vector2();
+	private float speed = 1f;
 	
 	public Player(){
 		hitsize = 5;
@@ -32,7 +37,7 @@ public class Player extends DestructibleEntity{
 		Effects.shake(4f, 5f);
 		Effects.sound("die", this);
 		
-		respawntime = respawnduration;
+		Vars.control.setRespawnTime(respawnduration);
 	}
 	
 	@Override
@@ -62,14 +67,11 @@ public class Player extends DestructibleEntity{
 		if(Inputs.keyDown("right"))
 			vector.x += speed;
 		
-		reload -= delta;
-		
 		boolean shooting = Inputs.buttonDown(Buttons.LEFT) && recipe == null && !ui.hasMouse();
 		
-		if(shooting && reload <= 0){
-			currentWeapon.shoot(this);
-			Sounds.play(currentWeapon.shootsound);
-			reload = currentWeapon.reload;
+		if(shooting && Timers.get(this, "reload", weapon.reload)){
+			weapon.shoot(this);
+			Sounds.play(weapon.shootsound);
 		}
 		
 		vector.limit(speed);

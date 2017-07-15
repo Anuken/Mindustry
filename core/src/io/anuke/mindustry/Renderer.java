@@ -22,9 +22,7 @@ import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.graphics.Cache;
 import io.anuke.ucore.graphics.Caches;
 import io.anuke.ucore.scene.utils.Cursors;
-import io.anuke.ucore.util.GridMap;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Timers;
+import io.anuke.ucore.util.*;
 
 public class Renderer{
 	private static int chunksize = 32;
@@ -82,8 +80,8 @@ public class Renderer{
 					int worldx = Mathf.scl(camera.position.x, tilesize) + x;
 					int worldy = Mathf.scl(camera.position.y, tilesize) + y;
 
-					if(Mathf.inBounds(worldx, worldy, tiles)){
-						Tile tile = tiles[worldx][worldy];
+					if( World.tile(worldx, worldy) != null){
+						Tile tile = World.tile(worldx, worldy);
 						if(l == 0){
 							if(tile.block() != Blocks.air)
 								Draw.rect(tile.block().shadow, worldx * tilesize, worldy * tilesize);
@@ -106,7 +104,7 @@ public class Renderer{
 	
 	public static void renderPixelOverlay(){
 		
-		if(recipe != null && (!ui.hasMouse() || android)){
+		if(player.recipe != null && (!ui.hasMouse() || android)){
 			float x = 0;
 			float y = 0;
 			
@@ -126,21 +124,21 @@ public class Renderer{
 				tiley = World.tiley();
 			}
 
-			boolean valid = World.validPlace(tilex, tiley, recipe.result);
+			boolean valid = World.validPlace(tilex, tiley, player.recipe.result);
 
 			Draw.color(valid ? Color.PURPLE : Color.SCARLET);
 			Draw.thickness(2f);
 			Draw.square(x, y, tilesize / 2 + MathUtils.sin(Timers.time() / 6f) + 1);
 
-			if(recipe.result.rotate){
+			if(player.recipe.result.rotate){
 				Draw.color("orange");
-				vector.set(7, 0).rotate(rotation * 90);
-				Draw.line(x, y, x + vector.x, y + vector.y);
+				Tmp.v1.set(7, 0).rotate(player.rotation * 90);
+				Draw.line(x, y, x + Tmp.v1.x, y + Tmp.v1.y);
 			}
 			
 			Draw.thickness(1f);
 			Draw.color("scarlet");
-			for(Tile spawn : spawnpoints){
+			for(Tile spawn : World.spawnpoints){
 				Draw.dashcircle(spawn.worldx(), spawn.worldy(), enemyspawnspace);
 			}
 
@@ -156,23 +154,23 @@ public class Renderer{
 		if(Inputs.buttonDown(Buttons.RIGHT) && World.cursorNear()){
 			Tile tile = World.cursorTile();
 			if(tile.breakable() && tile.block() != ProductionBlocks.core){
-				Draw.color(Color.YELLOW, Color.SCARLET, breaktime / tile.block().breaktime);
+				Draw.color(Color.YELLOW, Color.SCARLET, player.breaktime / tile.block().breaktime);
 				Draw.square(tile.worldx(), tile.worldy(), 4);
 				Draw.reset();
 			}
 		}
 		
-		if(android && breaktime > 0){
+		if(android && player.breaktime > 0){
 			Tile tile = AndroidInput.selected();
 			if(tile.breakable() && tile.block() != ProductionBlocks.core){
-				float fract = breaktime / tile.block().breaktime;
+				float fract = player.breaktime / tile.block().breaktime;
 				Draw.color(Color.YELLOW, Color.SCARLET, fract);
 				Draw.circle(tile.worldx(), tile.worldy(), 4 + (1f-fract)*26);
 				Draw.reset();
 			}
 		}
 
-		if(recipe == null && !ui.hasMouse()){
+		if(player.recipe == null && !ui.hasMouse()){
 			Tile tile = World.cursorTile();
 
 			if(tile != null && tile.block() != Blocks.air){

@@ -1,13 +1,12 @@
 package io.anuke.mindustry.ai;
 
-import static io.anuke.mindustry.Vars.*;
-
 import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.ai.pfa.PathFinder;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+import io.anuke.mindustry.World;
 import io.anuke.mindustry.entities.Enemy;
 import io.anuke.mindustry.world.Tile;
 public class Pathfind{
@@ -52,8 +51,8 @@ public class Pathfind{
 	
 	static public void updatePath(){
 		if(paths.size == 0){
-			pathSequences = new Tile[spawnpoints.size][0];
-			for(int i = 0; i < spawnpoints.size; i ++){
+			pathSequences = new Tile[World.spawnpoints.size][0];
+			for(int i = 0; i < World.spawnpoints.size; i ++){
 				DefaultGraphPath<Tile> path = new DefaultGraphPath<>();
 				paths.add(path);
 			}
@@ -64,8 +63,8 @@ public class Pathfind{
 			
 			path.clear();
 			passpathfinder.searchNodePath(
-					spawnpoints.get(i), 
-					core, heuristic, path);
+					World.spawnpoints.get(i), 
+					World.core, heuristic, path);
 			
 			pathSequences[i] = new Tile[path.getCount()];
 			

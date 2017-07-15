@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 
+import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.entities.Weapon;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.resource.*;
@@ -40,9 +41,9 @@ public class UI extends SceneModule{
 	Dialog about, menu, restart, tutorial, levels, upgrades;
 	Tooltip tooltip;
 
-	VisibilityProvider play = () -> playing;
+	VisibilityProvider play = () -> !GameState.is(State.menu);
 
-	VisibilityProvider nplay = () -> !playing;
+	VisibilityProvider nplay = () -> GameState.is(State.menu);
 
 	public UI() {
 		Dialog.setShowAction(()-> sequence(Actions.moveToAligned(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight(), Align.center),
@@ -95,7 +96,7 @@ public class UI extends SceneModule{
 	@Override
 	public void update(){
 
-		if(!playing){
+		if(nplay.visible()){
 			scene.getBatch().getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 			scene.getBatch().begin();
 			
@@ -142,11 +143,11 @@ public class UI extends SceneModule{
 			public Dialog show(Scene scene){
 				super.show(scene);
 				restart.content().clearChildren();
-				if(hiscore){
+				if(control.isHighScore()){
 					restart.content().add("[YELLOW]New highscore!").pad(6);
 					restart.content().row();
 				}
-				restart.content().add("You lasted until wave [GREEN]" + wave + "[].").pad(6);
+				restart.content().add("You lasted until wave [GREEN]" + control.getWave() + "[].").pad(6);
 				restart.pack();
 				return this;
 			}
@@ -154,8 +155,8 @@ public class UI extends SceneModule{
 		
 		restart.getButtonTable().addButton("Back to menu", ()->{
 			restart.hide();
-			playing = false;
-			GameState.reset();
+			GameState.set(State.menu);
+			control.reset();
 		});
 		
 		weapontable = fill();
@@ -209,7 +210,7 @@ public class UI extends SceneModule{
 						
 						image.clicked(()->{
 							if(Inventory.hasItems(r.requirements))
-							recipe = r;
+								player.recipe = r;
 						});
 						
 						table.add(image).size(size+8).pad(4).units(Unit.dp);
@@ -219,7 +220,7 @@ public class UI extends SceneModule{
 							
 							boolean has = Inventory.hasItems(r.requirements);
 							image.setDisabled(!has);
-							image.setChecked(recipe == r && has);
+							image.setChecked(player.recipe == r && has);
 							//image.setTouchable(has ? Touchable.enabled : Touchable.disabled);
 							image.getImage().setColor(has ? Color.WHITE : Color.GRAY);
 						});
@@ -242,7 +243,7 @@ public class UI extends SceneModule{
 							ItemStack[] req = r.requirements;
 							for(ItemStack s : req){
 								tiptable.row();
-								int amount = Math.min(items.get(s.item, 0), s.amount);
+								int amount = Math.min(Inventory.getAmount(s.item), s.amount);
 								tiptable.add(
 										(amount >= s.amount ? "[YELLOW]" : "[RED]")
 								+s.item + ": " + amount + " / " +s.amount, fontscale).left();
@@ -345,12 +346,12 @@ public class UI extends SceneModule{
 			new table(){{
 				get().background("button");
 
-				new label(()->"[YELLOW]Wave " + wave).scale(fontscale*2f).left();
+				new label(()->"[YELLOW]Wave " + control.getWave()).scale(fontscale*2f).left();
 
 				row();
 
-				new label(()->enemies > 0 ?
-						enemies + " Enemies remaining" : "New wave in " + (int) (wavetime / 60f))
+				new label(()-> control.getEnemiesRemaining() > 0 ?
+						control.getEnemiesRemaining() + " Enemies remaining" : "New wave in " + (int) (control.getWaveCountdown() / 60f))
 				.minWidth(150);
 
 				get().pad(Unit.dp.inPixels(12));
@@ -440,26 +441,26 @@ public class UI extends SceneModule{
 				
 				new label("Respawning in"){{
 					get().update(()->{
-						get().setText("[yellow]Respawning in " + (int)(respawntime/60));
+						get().setText("[yellow]Respawning in " + (int)(control.getRespawnTime()/60));
 					});
 					
 					get().setFontScale(0.75f);
 				}};
 				
 				visible(()->{
-					return respawntime > 0 && playing;
+					return control.getRespawnTime() > 0 && !GameState.is(State.menu);
 				});
 			}};
 		}}.end();
 		
 		tools = new Table();
 		tools.addIButton("icon-cancel", Unit.dp.inPixels(42), ()->{
-			recipe = null;
+			player.recipe = null;
 		});
 		tools.addIButton("icon-rotate", Unit.dp.inPixels(42), ()->{
-			rotation++;
+			player.rotation++;
 
-			rotation %= 4;
+			player.rotation %= 4;
 		});
 		tools.addIButton("icon-check", Unit.dp.inPixels(42), ()->{
 			AndroidInput.place();
@@ -469,7 +470,7 @@ public class UI extends SceneModule{
 		scene.add(tools);
 		
 		tools.setVisible(()->{
-			return playing && android && recipe != null;
+			return !GameState.is(State.menu) && android && player.recipe != null;
 		});
 		
 		tools.update(()->{
@@ -484,32 +485,33 @@ public class UI extends SceneModule{
 	public void updateWeapons(){
 		weapontable.clearChildren();
 		
-		for(Weapon weapon : Weapon.values()){
-			if(weapons.get(weapon) == Boolean.TRUE){
-				ImageButton button = new ImageButton(Draw.region("weapon-"+weapon.name()), "static");
-				button.getImageCell().size(40);
-				button.setDisabled(true);
-				if(weapon != currentWeapon)
-					button.setColor(Color.GRAY);
-				weapontable.add(button).size(48, 52);
+		for(Weapon weapon : control.getWeapons()){
+			ImageButton button = new ImageButton(Draw.region("weapon-"+weapon.name()), "static");
+			button.getImageCell().size(40);
+			button.setDisabled(true);
+			
+			if(weapon != player.weapon)
+				button.setColor(Color.GRAY);
+			
+			weapontable.add(button).size(48, 52);
+			
+			Table tiptable = new Table();
+			String description = weapon.description;
 				
-				Table tiptable = new Table();
-				String description = weapon.description;
-					
-				tiptable.background("button");
-				tiptable.add("[PURPLE]" + weapon.name(), 0.75f).left().padBottom(2f);
-					
-				tiptable.row();
-				tiptable.row();
-				tiptable.add("[ORANGE]" + description).left();
-				tiptable.pad(10f);
+			tiptable.background("button");
+			tiptable.add("[PURPLE]" + weapon.name(), 0.75f).left().padBottom(2f);
 				
-				Tooltip tip = new Tooltip(tiptable);
-				
-				tip.setInstant(true);
+			tiptable.row();
+			tiptable.row();
+			tiptable.add("[ORANGE]" + description).left();
+			tiptable.pad(10f);
+			
+			Tooltip tip = new Tooltip(tiptable);
+			
+			tip.setInstant(true);
 
-				button.addListener(tip);
-			}
+			button.addListener(tip);
+			
 		}
 	}
 	
@@ -545,9 +547,9 @@ public class UI extends SceneModule{
 	public void updateItems(){
 		itemtable.clear();
 
-		for(Item stack : items.keys()){
+		for(Item stack : Inventory.getItemTypes()){
 			Image image = new Image(Draw.region("icon-" + stack.name()));
-			Label label = new Label("" + items.get(stack));
+			Label label = new Label("" + Inventory.getAmount(stack));
 			label.setFontScale(fontscale*2f);
 			itemtable.add(image).size(32).units(Unit.dp);
 			itemtable.add(label);

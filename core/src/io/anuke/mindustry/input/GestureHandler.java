@@ -21,12 +21,12 @@ public class GestureHandler extends GestureAdapter{
 	@Override
 	public boolean longPress(float x, float y){
 		Tile tile = World.cursorTile();
-		breaktime += Mathf.delta();
-		if(breaktime >= tile.block().breaktime){
+		player.breaktime += Mathf.delta();
+		if(player.breaktime >= tile.block().breaktime){
 			Effects.effect("break", tile.worldx(), tile.worldy());
 			Effects.shake(3f, 1f);
 			tile.setBlock(Blocks.air);
-			breaktime = 0f;
+			player.breaktime = 0f;
 			Sounds.play("break");
 		}
 		return false;
@@ -34,7 +34,7 @@ public class GestureHandler extends GestureAdapter{
 	
 	@Override
 	public boolean pan(float x, float y, float deltaX, float deltaY){
-		if(recipe == null){
+		if(player.recipe == null){
 			player.x -= deltaX*control.camera.zoom/control.cameraScale;
 			player.y += deltaY*control.camera.zoom/control.cameraScale;
 		}else{
@@ -47,7 +47,7 @@ public class GestureHandler extends GestureAdapter{
 	
 	@Override
 	public boolean pinch (Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
-		if(recipe == null)
+		if(player.recipe == null)
 			return false;
 		
 		if(pinch1.x < 0){

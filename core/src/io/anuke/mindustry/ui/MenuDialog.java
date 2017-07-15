@@ -1,7 +1,9 @@
 package io.anuke.mindustry.ui;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.ui;
 
+import io.anuke.mindustry.GameState;
+import io.anuke.mindustry.GameState.State;
 import io.anuke.ucore.scene.ui.ConfirmDialog;
 import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.layout.Unit;
@@ -16,7 +18,7 @@ public class MenuDialog extends Dialog{
 	void setup(){
 		content().addButton("Back", ()->{
 			hide();
-			paused = false;
+			GameState.set(State.playing);
 		}).width(200).units(Unit.dp);
 		
 		content().row();
@@ -33,8 +35,7 @@ public class MenuDialog extends Dialog{
 		content().addButton("Back to menu", ()->{
 			new ConfirmDialog("Confirm", "Are you sure you want to quit?", ()->{
 				hide();
-				paused = false;
-				playing = false;
+				GameState.set(State.menu);
 			}).show();
 		}).width(200).units(Unit.dp);
 	}

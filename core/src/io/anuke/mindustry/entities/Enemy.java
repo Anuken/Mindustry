@@ -84,7 +84,7 @@ public class Enemy extends DestructibleEntity{
 	@Override
 	public void removed(){
 		if(!dead)
-		Vars.enemies --;
+			Vars.control.enemyDeath();
 	}
 	
 	@Override

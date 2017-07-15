@@ -2,8 +2,12 @@ package io.anuke.mindustry;
 
 import static io.anuke.mindustry.Vars.*;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.TileEntity;
@@ -20,7 +24,17 @@ import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.util.Mathf;
 
 public class World{
+	public static int worldsize = 128;
+	public static int pixsize = worldsize*tilesize;
+	
+	private static Pixmap[] mapPixmaps;
+	private static Texture[] mapTextures;
+	private static int currentMap;
+	private static Tile[][] tiles = new Tile[worldsize][worldsize];
 	private static Tile[] temptiles = new Tile[4];
+	
+	public static Tile core;
+	public static Array<Tile> spawnpoints = new Array<Tile>();
 	
 	public static boolean solid(int x, int y){
 		Tile tile = tile(x, y);
@@ -28,12 +42,16 @@ public class World{
 		return tile == null || tile.block().solid || (tile.floor().solid && (tile.block() == Blocks.air));
 	}
 	
+	public static int getMap(){
+		return currentMap;
+	}
+	
 	public static int width(){
-		return Vars.mapPixmaps[Vars.currentMap].getWidth();
+		return mapPixmaps[currentMap].getWidth();
 	}
 	
 	public static int height(){
-		return Vars.mapPixmaps[Vars.currentMap].getHeight();
+		return mapPixmaps[currentMap].getHeight();
 	}
 	
 	public static Tile tile(int x, int y){
@@ -53,6 +71,21 @@ public class World{
 		return temptiles;
 	}
 	
+	public static Texture getTexture(int map){
+		return mapTextures[map];
+	}
+	
+	public static void loadMaps(){
+		mapPixmaps = new Pixmap[maps.length];
+		mapTextures = new Texture[maps.length];
+		
+		for(int i = 0; i < maps.length; i ++){
+			Pixmap pix = new Pixmap(Gdx.files.internal("maps/"+maps[i]+".png"));
+			mapPixmaps[i] = pix;
+			mapTextures[i] = new Texture(pix);
+		}
+	}
+	
 	public static void loadMap(int id){
 		spawnpoints.clear();
 		
@@ -70,7 +103,7 @@ public class World{
 		
 		Entities.resizeTree(0, 0, pixsize, pixsize);
 		
-		Generator.generate(id);
+		Generator.generate(mapPixmaps[id]);
 		
 		Pathfind.reset();
 		

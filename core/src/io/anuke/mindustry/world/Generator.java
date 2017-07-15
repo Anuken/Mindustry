@@ -1,14 +1,11 @@
 package io.anuke.mindustry.world;
 
-import static io.anuke.mindustry.Vars.*;
-
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.ObjectMap;
 
+import io.anuke.mindustry.World;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.noise.Noise;
@@ -29,16 +26,15 @@ public class Generator{
 	);
 	
 	/**Returns world size.*/
-	public static void generate(int map){
-		Pixmap pix = mapPixmaps[map];
+	public static void generate(Pixmap pixmap){
 		
 		Noise.setSeed(MathUtils.random(0, 99999));
-		for(int x = 0; x < tiles.length; x ++){
-			for(int y = 0; y < tiles.length; y ++){
+		for(int x = 0; x < pixmap.getWidth(); x ++){
+			for(int y = 0; y < pixmap.getHeight(); y ++){
 				Block floor = Blocks.stone;
 				Block block = Blocks.air;
 				
-				int color = pix.getPixel(x, pix.getHeight()-1-y);
+				int color = pixmap.getPixel(x, pixmap.getHeight()-1-y);
 				
 				if(colors.containsKey(color)){
 					//TODO less hacky method
@@ -48,9 +44,9 @@ public class Generator{
 						floor = colors.get(color);
 					}
 				}else if(color == start){
-					core = tiles[x][y];
+					World.core = World.tile(x, y);
 				}else if(color == spawn){
-					spawnpoints.add(tiles[x][y]);
+					World.spawnpoints.add(World.tile(x, y));
 					floor = Blocks.dirt;
 				}else{
 					if(Mathf.chance(0.02)){
@@ -81,20 +77,9 @@ public class Generator{
 					block = Blocks.shrub;
 				}
 				
-				tiles[x][y].setBlock(block);
-				tiles[x][y].setFloor(floor);
+				World.tile(x, y).setBlock(block);
+				World.tile(x, y).setFloor(floor);
 			}
-		}
-	}
-	
-	public static void loadMaps(){
-		mapPixmaps = new Pixmap[maps.length];
-		mapTextures = new Texture[maps.length];
-		
-		for(int i = 0; i < maps.length; i ++){
-			Pixmap pix = new Pixmap(Gdx.files.internal("maps/"+maps[i]+".png"));
-			mapPixmaps[i] = pix;
-			mapTextures[i] = new Texture(pix);
 		}
 	}
 	

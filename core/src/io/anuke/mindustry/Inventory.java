@@ -2,10 +2,13 @@ package io.anuke.mindustry;
 
 import static io.anuke.mindustry.Vars.*;
 
+import com.badlogic.gdx.utils.ObjectMap;
+
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 
 public class Inventory{
+	final static ObjectMap<Item, Integer> items = new ObjectMap<>();
 	
 	public static void clearItems(){
 		items.clear();
@@ -18,6 +21,14 @@ public class Inventory{
 			items.put(Item.steel, 2000);
 			items.put(Item.coal, 2000);
 		}
+	}
+	
+	public static Iterable<Item> getItemTypes(){
+		return items.keys();
+	}
+	
+	public static int getAmount(Item item){
+		return items.get(item, 0);
 	}
 	
 	public static void addItem(Item item, int amount){

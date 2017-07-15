@@ -25,71 +25,56 @@ public class Input{
 		if(player.health <= 0) return;
 		
 		if(Inputs.scrolled()){
-			Weapon[] val = Weapon.values();
-			int index = 0;
-			for(int i = 0; i < val.length; i ++)
-				if(val[i] == currentWeapon){
-					index = i;
-					break;
-				}
+			int index = currentWeapon();
 			
-			for(int i = 0; i < val.length; i ++){
-				index += Inputs.scroll();
-				if(index >= 0 && index < val.length){
-					if(weapons.get(val[index])){
-						currentWeapon = (val[index]);
-						break;
-					}
-				}else{
-					break;
-				}
-			}
+			index -= Inputs.scroll();
+			player.weapon = control.getWeapons().get(Mathf.clamp(index, 0, control.getWeapons().size-1));
 			
 			ui.updateWeapons();
 		}
 
 		if(Inputs.keyUp("rotate"))
-			rotation++;
+			player.rotation++;
 
-		rotation %= 4;
+		player.rotation %= 4;
 
-		if(recipe != null && !Inventory.hasItems(recipe.requirements)){
-			recipe = null;
+		if(player.recipe != null && !Inventory.hasItems(player.recipe.requirements)){
+			player.recipe = null;
 			Cursors.restoreCursor();
 		}
 		
 		for(int i = 0; i < 9; i ++)
-			if(Inputs.keyUp(Keys.valueOf(""+(i+1))) && getWeapon(i) != null){
-				currentWeapon = getWeapon(i);
+			if(Inputs.keyUp(Keys.valueOf(""+(i+1))) && i < control.getWeapons().size){
+				player.weapon = control.getWeapons().get(i);
 				ui.updateWeapons();
 			}
 		
-		if(Inputs.buttonUp(Buttons.LEFT) && recipe != null && 
-				World.validPlace(World.tilex(), World.tiley(), recipe.result) && !ui.hasMouse()){
+		if(Inputs.buttonUp(Buttons.LEFT) && player.recipe != null && 
+				World.validPlace(World.tilex(), World.tiley(), player.recipe.result) && !ui.hasMouse()){
 			Tile tile = World.tile(World.tilex(), World.tiley());
 			
 			if(tile == null)
 				return; //just in case
 			
-			tile.setBlock(recipe.result);
-			tile.rotation = rotation;
+			tile.setBlock(player.recipe.result);
+			tile.rotation = player.rotation;
 
 			Effects.effect("place", World.roundx(), World.roundy());
 			Effects.shake(2f, 2f);
 			Sounds.play("place");
 
-			for(ItemStack stack : recipe.requirements){
+			for(ItemStack stack : player.recipe.requirements){
 				Inventory.removeItem(stack);
 			}
 
-			if(!Inventory.hasItems(recipe.requirements)){
-				recipe = null;
+			if(!Inventory.hasItems(player.recipe.requirements)){
+				player.recipe = null;
 				Cursors.restoreCursor();
 			}
 		}
 
-		if(recipe != null && Inputs.buttonUp(Buttons.RIGHT)){
-			recipe = null;
+		if(player.recipe != null && Inputs.buttonUp(Buttons.RIGHT)){
+			player.recipe = null;
 			Cursors.restoreCursor();
 		}
 		
@@ -99,38 +84,27 @@ public class Input{
 		if(Inputs.buttonDown(Buttons.RIGHT) && World.cursorNear() && cursor.breakable()
 				&& cursor.block() != ProductionBlocks.core){
 			Tile tile = cursor;
-			breaktime += Mathf.delta();
-			if(breaktime >= tile.block().breaktime){
+			player.breaktime += Mathf.delta();
+			if(player.breaktime >= tile.block().breaktime){
 				Effects.effect("break", tile.worldx(), tile.worldy());
 				Effects.shake(3f, 1f);
 				tile.setBlock(Blocks.air);
-				breaktime = 0f;
+				player.breaktime = 0f;
 				Sounds.play("break");
 			}
 		}else{
-			breaktime = 0f;
+			player.breaktime = 0f;
 		}
 
 	}
 	
-	public static int currentWeapons(){
+	public static int currentWeapon(){
 		int i = 0;
-		
-		for(Weapon w : Weapon.values())
-			if(weapons.get(w))
-				i ++;
-		
-		return i;
-	}
-	
-	public static Weapon getWeapon(int id){
-		int i = 0;
-		
-		for(Weapon w : Weapon.values())
-			if(weapons.get(w))
-				if(i ++ == id)
-					return w;
-		
-		return null;
+		for(Weapon weapon : control.getWeapons()){
+			if(player.weapon == weapon)
+				return i;
+			i ++;
+		}
+		return 0;
 	}
 }

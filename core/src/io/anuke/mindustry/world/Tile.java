@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.tilesize;
 
 import io.anuke.mindustry.World;
 import io.anuke.mindustry.entities.TileEntity;
@@ -36,7 +36,7 @@ public class Tile{
 	}
 	
 	public int id(){
-		return x + y * worldsize;
+		return x + y * World.worldsize;
 	}
 	
 	public float worldx(){

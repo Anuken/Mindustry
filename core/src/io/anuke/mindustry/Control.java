@@ -6,12 +6,15 @@ import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.utils.Array;
 
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.GameState.State;
+import io.anuke.mindustry.ai.Pathfind;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.GestureHandler;
 import io.anuke.mindustry.input.Input;
-import io.anuke.mindustry.world.Generator;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
@@ -23,6 +26,19 @@ import io.anuke.ucore.util.Timers;
 public class Control extends RendererModule{
 	public int rangex = 10, rangey = 10;
 	public float targetzoom = 1f;
+	
+	boolean showedTutorial;
+	boolean hiscore = false;
+	
+	final Array<Weapon> weapons = new Array<>();
+	//final ObjectMap<Weapon, Boolean> weapons = new ObjectMap<Weapon, Boolean>();
+	
+	int wave = 1;
+	float wavetime;
+	int enemies = 0;
+	
+	float respawntime;
+	
 	//GifRecorder recorder = new GifRecorder(batch);
 	
 	public Control(){
@@ -46,7 +62,7 @@ public class Control extends RendererModule{
 		
 		Musics.load("1.mp3", "2.mp3", "3.mp3");
 		
-		Generator.loadMaps();
+		World.loadMaps();
 		
 		KeyBinds.defaults(
 			"up", Keys.W,
@@ -67,6 +83,163 @@ public class Control extends RendererModule{
 		player = new Player();
 	}
 	
+	public void reset(){
+		weapons.clear();
+		
+		weapons.add(Weapon.blaster);
+		player.weapon = weapons.first();
+		
+		wave = 1;
+		wavetime = waveSpacing();
+		Entities.clear();
+		enemies = 0;
+		
+		if(!android)
+			player.add();
+		
+		player.heal();
+		Inventory.clearItems();
+		World.spawnpoints.clear();
+		respawntime = -1;
+		hiscore = false;
+		
+		ui.updateItems();
+		ui.updateWeapons();
+	}
+	
+	public void play(){
+		player.x = World.core.worldx();
+		player.y = World.core.worldy()-8;
+		
+		control.camera.position.set(player.x, player.y, 0);
+		
+		wavetime = waveSpacing();
+		
+		if(showedTutorial || !Settings.getBool("tutorial")){
+			GameState.set(State.playing);
+		}else{
+			GameState.set(State.paused);
+			ui.showTutorial();
+			showedTutorial = true;
+		}
+	}
+	
+	public boolean hasWeapon(Weapon weapon){
+		return weapons.contains(weapon, true);
+	}
+	
+	public void addWeapon(Weapon weapon){
+		weapons.add(weapon);
+	}
+	
+	public Array<Weapon> getWeapons(){
+		return weapons;
+	}
+	
+	void runWave(){
+		int amount = wave;
+		Sounds.play("spawn");
+		
+		Pathfind.updatePath();
+		
+		for(int i = 0; i < amount; i ++){
+			int pos = i;
+			
+			for(int w = 0; w < World.spawnpoints.size; w ++){
+				int point = w;
+				Tile tile = World.spawnpoints.get(w);
+				
+				Timers.run(i*30f, ()->{
+					
+					Enemy enemy = null;
+					
+					if(wave%5 == 0 & pos < wave/5){
+						enemy = new BossEnemy(point);
+					}else if(wave > 3 && pos < amount/2){
+						enemy = new FastEnemy(point);
+					}else if(wave > 8 && pos % 3 == 0 && wave%2==1){
+						enemy = new FlameEnemy(point);
+					}else{
+						enemy = new Enemy(point);
+					}
+					
+					enemy.set(tile.worldx(), tile.worldy());
+					Effects.effect("spawn", enemy);
+					enemy.add();
+				});
+				
+				enemies ++;
+			}
+		}
+		
+		wave ++;
+		
+		int last = Settings.getInt("hiscore"+maps[World.getMap()]);
+		
+		if(wave > last){
+			Settings.putInt("hiscore"+maps[World.getMap()], wave);
+			Settings.save();
+			hiscore = true;
+		}
+		
+		wavetime = waveSpacing();
+	}
+	
+	public void enemyDeath(){
+		enemies --;
+	}
+	
+	public void coreDestroyed(){
+		Effects.shake(5, 6);
+		Sounds.play("corexplode");
+		Tile core = World.core;
+		for(int i = 0; i < 16; i ++){
+			Timers.run(i*2, ()->{
+				Effects.effect("explosion", core.worldx()+Mathf.range(40), core.worldy()+Mathf.range(40));
+			});
+		}
+		Effects.effect("coreexplosion", core.worldx(), core.worldy());
+		
+		Timers.run(60, ()->{
+			ui.showRestart();
+		});
+	}
+	
+	float waveSpacing(){
+		int scale = Settings.getInt("difficulty");
+		float out = (scale == 0 ? 2f : scale == 1f ? 1f : 0.5f);
+		return wavespace*out;
+	}
+	
+	public void clampZoom(){
+		targetzoom = Mathf.clamp(targetzoom, 0.5f, 2f);
+		camera.zoom = Mathf.clamp(camera.zoom, 0.5f, 2f);
+	}
+	
+	public boolean isHighScore(){
+		return hiscore;
+	}
+	
+	public int getEnemiesRemaining(){
+		return enemies;
+	}
+	
+	public float getWaveCountdown(){
+		return wavetime;
+	}
+	
+	public float getRespawnTime(){
+		return respawntime;
+	}
+	
+	public void setRespawnTime(float respawntime){
+		this.respawntime = respawntime;
+	}
+	
+	public int getWave(){
+		return wave;
+	}
+	
 	@Override
 	public void init(){
 		Musics.shuffleAll();
@@ -80,11 +253,6 @@ public class Control extends RendererModule{
 		EffectLoader.create();
 	}
 	
-	public void clampZoom(){
-		targetzoom = Mathf.clamp(targetzoom, 0.5f, 2f);
-		camera.zoom = Mathf.clamp(camera.zoom, 0.5f, 2f);
-	}
-	
 	@Override
 	public void update(){
 		
@@ -94,30 +262,30 @@ public class Control extends RendererModule{
 		//camera.zoom = MathUtils.lerp(camera.zoom, targetzoom, 0.5f*delta());
 		
 		if(Inputs.keyUp(Keys.SPACE) && debug)
-			Effects.sound("shoot", core.worldx(), core.worldy());
+			Effects.sound("shoot", World.core.worldx(), World.core.worldy());
 		
-		if(!playing){
+		if(GameState.is(State.menu)){
 			clearScreen();
 		}else{
 			
 			if(Inputs.keyUp("menu")){
-				if(paused){
+				if(GameState.is(State.paused)){
 					ui.hideMenu();
-					paused = false;
+					GameState.set(State.paused);
 				}else{
 					ui.showMenu();
-					paused = true;
+					GameState.set(State.paused);
 				}
 			}
 		
-			if(!paused){
+			if(!GameState.is(State.paused)){
 				
 				if(respawntime > 0){
 					
 					respawntime -= delta();
 					
 					if(respawntime <= 0){
-						player.set(core.worldx(), core.worldy()-8);
+						player.set(World.core.worldx(), World.core.worldy()-8);
 						player.heal();
 						player.add();
 						Effects.sound("respawn");
@@ -128,7 +296,7 @@ public class Control extends RendererModule{
 					wavetime -= delta();
 			
 				if(wavetime <= 0 || (debug && Inputs.keyUp(Keys.F))){
-					GameState.runWave();
+					runWave();
 				}
 			
 				Entities.update();
@@ -141,15 +309,15 @@ public class Control extends RendererModule{
 				
 			}
 			
-			if(core.block() == ProductionBlocks.core){
+			if(World.core.block() == ProductionBlocks.core){
 				smoothCamera(player.x, player.y, android ? 0.3f : 0.14f);
 			}else{
-				smoothCamera(core.worldx(), core.worldy(), 0.4f);
+				smoothCamera(World.core.worldx(), World.core.worldy(), 0.4f);
 			}
 			
 			updateShake(0.5f);
 			float prevx = camera.position.x, prevy = camera.position.y;
-			clampCamera(-tilesize / 2f, -tilesize / 2f, pixsize - tilesize / 2f, pixsize - tilesize / 2f);
+			clampCamera(-tilesize / 2f, -tilesize / 2f, World.pixsize - tilesize / 2f, World.pixsize - tilesize / 2f);
 			
 			if(android){
 				player.x += camera.position.x-prevx;
@@ -178,7 +346,7 @@ public class Control extends RendererModule{
 			//recorder.update();
 		}
 		
-		if(!paused){
+		if(!GameState.is(State.paused)){
 			Inputs.update();
 			Timers.update(Gdx.graphics.getDeltaTime()*60f);
 		}
@@ -201,4 +369,5 @@ public class Control extends RendererModule{
 		AndroidInput.mousex = Gdx.graphics.getWidth()/2;
 		AndroidInput.mousey = Gdx.graphics.getHeight()/2;
 	}
+
 }

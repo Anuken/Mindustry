@@ -2,6 +2,8 @@ package io.anuke.mindustry.ui;
 
 import static io.anuke.mindustry.Vars.*;
 
+import io.anuke.mindustry.GameState;
+import io.anuke.mindustry.GameState.State;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.scene.ui.TextDialog;
 
@@ -16,8 +18,7 @@ public class TutorialDialog extends TextDialog{
 		setDialog();
 		
 		hidden(()->{
-			playing = true;
-			paused = false;
+			GameState.set(State.playing);
 		});
 		
 		getButtonTable().addButton("OK", ()->{

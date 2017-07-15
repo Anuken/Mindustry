@@ -51,12 +51,12 @@ public class AndroidInput extends InputAdapter{
 	
 	public static void breakBlock(){
 		Tile tile = selected();
-		breaktime += Mathf.delta();
-		if(breaktime >= tile.block().breaktime){
+		player.breaktime += Mathf.delta();
+		if(player.breaktime >= tile.block().breaktime){
 			Effects.effect("break", tile.worldx(), tile.worldy());
 			Effects.shake(3f, 1f);
 			tile.setBlock(Blocks.air);
-			breaktime = 0f;
+			player.breaktime = 0f;
 			Sounds.play("break");
 		}
 	}
@@ -67,27 +67,27 @@ public class AndroidInput extends InputAdapter{
 		int tilex = Mathf.scl2(vec.x, tilesize);
 		int tiley = Mathf.scl2(vec.y, tilesize);
 		
-		if(recipe != null && 
-				World.validPlace(tilex, tiley, recipe.result)){
+		if(player.recipe != null && 
+				World.validPlace(tilex, tiley, player.recipe.result)){
 			
 			Tile tile = World.tile(tilex, tiley);
 			
 			if(tile == null)
 				return; //just in case
 			
-			tile.setBlock(recipe.result);
-			tile.rotation = rotation;
+			tile.setBlock(player.recipe.result);
+			tile.rotation = player.rotation;
 
 			Effects.effect("place", tilex*tilesize, tiley*tilesize);
 			Effects.shake(2f, 2f);
 			Sounds.play("place");
 
-			for(ItemStack stack : recipe.requirements){
+			for(ItemStack stack : player.recipe.requirements){
 				Inventory.removeItem(stack);
 			}
 
-			if(!Inventory.hasItems(recipe.requirements)){
-				recipe = null;
+			if(!Inventory.hasItems(player.recipe.requirements)){
+				player.recipe = null;
 				Cursors.restoreCursor();
 			}
 		}
@@ -96,7 +96,7 @@ public class AndroidInput extends InputAdapter{
 	public static void doInput(){
 		if(Gdx.input.isTouched(0) 
 				&& Mathf.near2d(lmousex, lmousey, Gdx.input.getX(0), Gdx.input.getY(0), 50) 
-				&& !ui.hasMouse() && recipe == null){
+				&& !ui.hasMouse() && player.recipe == null){
 			warmup += Mathf.delta();
 			
 			mousex = Gdx.input.getX(0);
@@ -107,18 +107,18 @@ public class AndroidInput extends InputAdapter{
 			if(sel == null) return;
 			
 			if(warmup > warmupDelay && sel.block() != ProductionBlocks.core && sel.breakable()){
-				breaktime += Mathf.delta();
+				player.breaktime += Mathf.delta();
 				
-				if(breaktime > selected().block().breaktime){
+				if(player.breaktime > selected().block().breaktime){
 					breakBlock();
-					breaktime = 0;
+					player.breaktime = 0;
 				}
 			}
 		}else{
 			warmup = 0;
 			lmousex = Gdx.input.getX(0);
 			lmousey = Gdx.input.getY(0);
-			breaktime = 0;
+			player.breaktime = 0;
 		}
 	}
 	

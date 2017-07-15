@@ -12,6 +12,6 @@ public class Mindustry extends Core {
 	
 	@Override
 	public void postInit(){
-		GameState.reset();
+		Vars.control.reset();
 	}
 }

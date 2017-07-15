@@ -2,7 +2,7 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.utils.ObjectMap;
 
-import io.anuke.mindustry.GameState;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
@@ -33,7 +33,7 @@ public class TileEntity extends Entity{
 		dead = true;
 		
 		if(tile.block() == ProductionBlocks.core){
-			GameState.coreDestroyed();
+			Vars.control.coreDestroyed();
 		}
 		
 		tile.setBlock(Blocks.air);

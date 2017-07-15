@@ -4,6 +4,8 @@ import static io.anuke.mindustry.Vars.*;
 
 import com.badlogic.gdx.graphics.Color;
 
+import io.anuke.mindustry.GameState;
+import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.Inventory;
 import io.anuke.mindustry.entities.Weapon;
 import io.anuke.mindustry.resource.ItemStack;
@@ -25,10 +27,10 @@ public class UpgradeDialog extends Dialog{
 		addCloseButton();
 		
 		hidden(()->{
-			paused = false;
+			GameState.set(State.playing);
 		});
 		shown(()->{
-			paused = true;
+			GameState.set(State.paused);
 		});
 		
 		getButtonTable().addButton("Ok", ()->{
@@ -51,7 +53,7 @@ public class UpgradeDialog extends Dialog{
 			
 			button.update(()->{
 				
-				if(weapons.get(weapon) == Boolean.TRUE){
+				if(control.hasWeapon(weapon)){
 					button.setDisabled(true);
 					button.setColor(Color.GRAY);
 					button.setTouchable(Touchable.disabled);
@@ -80,11 +82,11 @@ public class UpgradeDialog extends Dialog{
 				tiptable.background("button");
 				tiptable.add("[PURPLE]" + weapon.name(), 0.75f).left().padBottom(2f);
 				
-				if(weapons.get(weapon) != Boolean.TRUE){
+				if(!control.hasWeapon(weapon)){
 					ItemStack[] req = weapon.requirements;
 					for(ItemStack s : req){
 						tiptable.row();
-						int amount = Math.min(items.get(s.item, 0), s.amount);
+						int amount = Math.min(Inventory.getAmount(s.item), s.amount);
 						tiptable.add(
 								(amount >= s.amount ? "[YELLOW]" : "[RED]")
 						+s.item + ": " + amount + " / " +s.amount, 0.5f).left();
@@ -96,7 +98,7 @@ public class UpgradeDialog extends Dialog{
 				tiptable.row();
 				tiptable.add("[ORANGE]" + description).left();
 				tiptable.row();
-				if(weapons.get(weapon) == Boolean.TRUE)
+				if(control.hasWeapon(weapon))
 					tiptable.add("[LIME]Purchased!").left();
 				tiptable.pad(10f);
 			};
@@ -113,7 +115,7 @@ public class UpgradeDialog extends Dialog{
 				if(button.isDisabled()) return;
 				
 				Inventory.removeItems(weapon.requirements);
-				weapons.put(weapon, true);
+				control.addWeapon(weapon);
 				ui.updateWeapons();
 				run.listen();
 				Effects.sound("purchase");
