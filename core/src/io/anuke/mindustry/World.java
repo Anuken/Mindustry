@@ -155,7 +155,9 @@ public class World{
 				return false;
 			}
 		}
-		return tile(x, y).block() == Blocks.air;
+		Tile tile = tile(x, y);
+		
+		return tile != null && tile.block() == Blocks.air;
 	}
 	
 	public static boolean cursorNear(){

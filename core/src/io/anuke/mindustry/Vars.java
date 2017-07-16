@@ -21,7 +21,8 @@ public class Vars{
 	//not marked as final, because of warnings
 	public static boolean debug = false;
 	
-	public static final int multiplier = android ? 2 : 1;
+	//turret and enemy shoot speed inverse multiplier
+	public static final int multiplier = android ? 3 : 1;
 	
 	public static final int tilesize = 8;
 	

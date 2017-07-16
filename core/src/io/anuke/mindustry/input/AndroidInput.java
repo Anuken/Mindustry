@@ -119,6 +119,9 @@ public class AndroidInput extends InputAdapter{
 			lmousex = Gdx.input.getX(0);
 			lmousey = Gdx.input.getY(0);
 			player.breaktime = 0;
+			
+			mousex = Mathf.clamp(mousex, 0, Gdx.graphics.getWidth());
+			mousey = Mathf.clamp(mousey, 0, Gdx.graphics.getHeight());
 		}
 	}
 	
