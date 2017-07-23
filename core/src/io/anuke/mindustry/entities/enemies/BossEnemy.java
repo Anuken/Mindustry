@@ -1,5 +1,6 @@
-package io.anuke.mindustry.entities;
+package io.anuke.mindustry.entities.enemies;
 
+import io.anuke.mindustry.entities.BulletType;
 import io.anuke.ucore.core.Draw;
 
 public class BossEnemy extends Enemy{

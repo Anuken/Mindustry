@@ -33,7 +33,6 @@ public class Renderer{
 		
 		//render the entire map
 		if(caches.size() == 0){
-			
 			for(int cx = 0; cx < chunksx; cx ++){
 				for(int cy = 0; cy < chunksy; cy ++){
 					Caches.begin(1600);
@@ -100,6 +99,13 @@ public class Renderer{
 				Draw.color();
 			}
 		}
+	}
+	
+	public static void clearTiles(){
+		for(Cache cache : caches.values())
+			cache.dispose();
+		
+		caches.clear();
 	}
 	
 	public static void renderPixelOverlay(){

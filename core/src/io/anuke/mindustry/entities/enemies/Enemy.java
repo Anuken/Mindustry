@@ -1,10 +1,13 @@
-package io.anuke.mindustry.entities;
+package io.anuke.mindustry.entities.enemies;
 
 import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.World;
 import io.anuke.mindustry.ai.Pathfind;
+import io.anuke.mindustry.entities.Bullet;
+import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;

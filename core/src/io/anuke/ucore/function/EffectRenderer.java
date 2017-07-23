@@ -1,7 +1,7 @@
 package io.anuke.ucore.function;
 
-import io.anuke.ucore.entities.Effect;
+import io.anuke.ucore.core.Effects.EffectContainer;
 
 public interface EffectRenderer{
-	public void render(Effect effect);
+	public void render(EffectContainer effect);
 }

@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.World;
-import io.anuke.mindustry.entities.Enemy;
+import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.world.Tile;
 public class Pathfind{
 	static MHueristic heuristic = new MHueristic();

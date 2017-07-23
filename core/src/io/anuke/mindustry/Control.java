@@ -10,7 +10,9 @@ import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.ai.Pathfind;
-import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.Weapon;
+import io.anuke.mindustry.entities.enemies.*;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.GestureHandler;
 import io.anuke.mindustry.input.Input;
@@ -85,6 +87,7 @@ public class Control extends RendererModule{
 	
 	public void reset(){
 		weapons.clear();
+		Renderer.clearTiles();
 		
 		weapons.add(Weapon.blaster);
 		player.weapon = weapons.first();
@@ -108,6 +111,8 @@ public class Control extends RendererModule{
 	}
 	
 	public void play(){
+		Renderer.clearTiles();
+		
 		player.x = World.core.worldx();
 		player.y = World.core.worldy()-8;
 		

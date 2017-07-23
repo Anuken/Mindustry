@@ -1,4 +1,4 @@
-package io.anuke.mindustry.entities;
+package io.anuke.mindustry.entities.enemies;
 
 import io.anuke.ucore.core.Draw;
 

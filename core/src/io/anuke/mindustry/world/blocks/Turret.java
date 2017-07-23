@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.MathUtils;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
