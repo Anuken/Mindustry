@@ -9,6 +9,7 @@ import io.anuke.mindustry.World;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.Timers;
 
 public class LevelDialog extends Dialog{
 	Label[] scores = new Label[maps.length];
@@ -28,8 +29,15 @@ public class LevelDialog extends Dialog{
 		addCloseButton();
 		getButtonTable().addButton("Play", ()->{
 			hide();
-			World.loadMap(selectedMap);
-			Vars.control.play();
+			Vars.ui.showLoading();
+			Timers.run(16, ()->{
+				World.loadMap(selectedMap);
+				Vars.control.play();
+			});
+			
+			Timers.run(18, ()->{
+				Vars.ui.hideLoading();
+			});
 		});
 		
 		ButtonGroup<ImageButton> mapgroup = new ButtonGroup<>();

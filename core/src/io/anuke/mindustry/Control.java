@@ -85,6 +85,14 @@ public class Control extends RendererModule{
 		player = new Player();
 	}
 	
+	public void setCameraScale(int scale){
+		this.cameraScale = scale;
+		resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		setCamera(player.x, player.y);
+		Draw.getSurface("pixel").setScale(cameraScale);
+		Draw.getSurface("shadow").setScale(cameraScale);
+	}
+	
 	public void reset(){
 		weapons.clear();
 		Renderer.clearTiles();

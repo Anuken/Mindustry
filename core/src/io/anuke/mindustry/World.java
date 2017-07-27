@@ -87,6 +87,7 @@ public class World{
 	}
 	
 	public static void loadMap(int id){
+		
 		spawnpoints.clear();
 		
 		int size = mapPixmaps[id].getWidth();

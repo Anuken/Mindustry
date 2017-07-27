@@ -1,9 +1,9 @@
 {
 com.badlogic.gdx.graphics.g2d.BitmapFont: {
 	default-font: {
-	file: prose.fnt,
-	markupEnabled: true,
-	scale: 0.5
+		file: prose.fnt,
+		markupEnabled: true,
+		scale: 0.5
 	}
 },
 com.badlogic.gdx.graphics.Color: {
@@ -21,6 +21,7 @@ com.badlogic.gdx.graphics.Color: {
 },
 io.anuke.ucore.scene.Skin$TintedDrawable: {
 	dialogDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.45} }
+	loadDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.7} }
 },
 io.anuke.ucore.scene.ui.Button$ButtonStyle: {
 	default: {down: button-down, up: button },

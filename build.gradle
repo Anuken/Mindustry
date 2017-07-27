@@ -78,7 +78,7 @@ project(":core") {
 
     dependencies {
     	//compile fileTree(dir: '../core/lib', include: '*.jar')
-       	//compile 'com.github.Anuken:ucore:b58e4bd'
+       	compile 'com.github.Anuken:ucore:88b945b'
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-ai:1.8.1"
     }

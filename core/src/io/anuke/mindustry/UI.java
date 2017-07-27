@@ -35,14 +35,13 @@ import io.anuke.ucore.scene.ui.layout.*;
 import io.anuke.ucore.util.Timers;
 
 public class UI extends SceneModule{
-	Table itemtable, weapontable, tools;
+	Table itemtable, weapontable, tools, loadingtable;
 	SettingsDialog prefs;
 	KeybindDialog keys;
 	Dialog about, menu, restart, tutorial, levels, upgrades;
 	Tooltip tooltip;
 
 	VisibilityProvider play = () -> !GameState.is(State.menu);
-
 	VisibilityProvider nplay = () -> GameState.is(State.menu);
 
 	public UI() {
@@ -368,23 +367,17 @@ public class UI extends SceneModule{
 			aleft();
 			abottom();
 			int base = baseCameraScale;
+			int min = base-zoomScale*2;
+			int max = base+zoomScale;
 			new button("+", ()->{
-				if(control.cameraScale < base){
-					control.cameraScale = base;
-					control.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-					control.setCamera(player.x, player.y);
-					Draw.getSurface("pixel").setScale(control.cameraScale);
-					Draw.getSurface("shadow").setScale(control.cameraScale);
+				if(control.cameraScale < max){
+					control.setCameraScale(control.cameraScale+zoomScale);
 				}
 			}).size(Unit.dp.inPixels(40));
 			
 			new button("-", ()->{
-				if(control.cameraScale > base-zoomScale){
-					control.cameraScale = base-zoomScale;
-					control.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-					control.setCamera(player.x, player.y);
-					Draw.getSurface("pixel").setScale(control.cameraScale);
-					Draw.getSurface("shadow").setScale(control.cameraScale);
+				if(control.cameraScale > min){
+					control.setCameraScale(control.cameraScale-zoomScale);
 				}
 			}).size(Unit.dp.inPixels(40));
 			
@@ -453,6 +446,14 @@ public class UI extends SceneModule{
 			}};
 		}}.end();
 		
+		loadingtable = new table("loadDim"){{
+			new table("button"){{
+				new label("[yellow]Loading...").scale(1).pad(10);
+			}}.end();
+		}}.end().get();
+		
+		loadingtable.setVisible(false);
+		
 		tools = new Table();
 		tools.addIButton("icon-cancel", Unit.dp.inPixels(42), ()->{
 			player.recipe = null;
@@ -465,7 +466,6 @@ public class UI extends SceneModule{
 		tools.addIButton("icon-check", Unit.dp.inPixels(42), ()->{
 			AndroidInput.place();
 		});
-		
 		
 		scene.add(tools);
 		
@@ -513,6 +513,14 @@ public class UI extends SceneModule{
 			button.addListener(tip);
 			
 		}
+	}
+	
+	public void showLoading(){
+		loadingtable.setVisible(true);
+	}
+	
+	public void hideLoading(){
+		loadingtable.setVisible(false);
 	}
 	
 	public void showPrefs(){
