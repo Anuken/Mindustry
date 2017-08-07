@@ -109,7 +109,7 @@ public class UI extends SceneModule{
 
 	@Override
 	public void init(){
-		//TODO oh my god just move these dialogs to different files
+		//TODO just move these dialogs to different files
 		
 		upgrades = new UpgradeDialog();
 		
@@ -128,6 +128,7 @@ public class UI extends SceneModule{
 		
 		prefs.checkPref("tutorial", "Show tutorial Window", true);
 		prefs.checkPref("fps", "Show FPS", false);
+		prefs.checkPref("noshadows", "Disable shadows", false);
 
 		keys = new KeybindDialog();
 
@@ -537,6 +538,10 @@ public class UI extends SceneModule{
 	
 	public void hideMenu(){
 		menu.hide();
+		
+		if(scene.getKeyboardFocus() != null && scene.getKeyboardFocus() instanceof Dialog){
+			((Dialog)scene.getKeyboardFocus()).hide();
+		}
 	}
 	
 	public void showTutorial(){

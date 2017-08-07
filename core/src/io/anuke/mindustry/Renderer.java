@@ -13,9 +13,7 @@ import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
-import io.anuke.ucore.core.Draw;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
@@ -69,7 +67,9 @@ public class Renderer{
 		Draw.reset();
 		int rangex = control.rangex, rangey = control.rangey;
 		
-		for(int l = 0; l < 4; l++){
+		boolean noshadows = Settings.getBool("noshadows");
+		
+		for(int l = (noshadows ? 1 : 0); l < 4; l++){
 			if(l == 0){
 				Draw.surface("shadow");
 			}

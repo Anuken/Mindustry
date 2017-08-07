@@ -18,7 +18,7 @@ public class Vars{
 	public static final int baseCameraScale = Math.round(Unit.dp.inPixels(4));
 	public static final int zoomScale = Math.round(Unit.dp.inPixels(1));
 	
-	public static final boolean debug = true;
+	public static boolean debug = false;
 	
 	//turret and enemy shoot speed inverse multiplier
 	public static final int multiplier = android ? 3 : 1;

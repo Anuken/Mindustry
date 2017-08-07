@@ -284,13 +284,13 @@ public class Control extends RendererModule{
 			
 			if(Inputs.keyUp(Keys.O)){
 				Timers.mark();
-				SaveIO.write(Gdx.files.local("mapsave.mds"));
+				SaveIO.write(Gdx.files.local("mapsave.mins"));
 				log("Save time taken: " + Timers.elapsed());
 			}
 			
 			if(Inputs.keyUp(Keys.P)){
 				Timers.mark();
-				SaveIO.load(Gdx.files.local("mapsave.mds"));
+				SaveIO.load(Gdx.files.local("mapsave.mins"));
 				log("Load time taken: " + Timers.elapsed());
 				Renderer.clearTiles();
 			}
@@ -303,7 +303,7 @@ public class Control extends RendererModule{
 			if(Inputs.keyUp("menu")){
 				if(GameState.is(State.paused)){
 					ui.hideMenu();
-					GameState.set(State.paused);
+					GameState.set(State.playing);
 				}else{
 					ui.showMenu();
 					GameState.set(State.paused);
