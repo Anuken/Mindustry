@@ -15,20 +15,22 @@ import io.anuke.ucore.entities.*;
 import io.anuke.ucore.util.Timers;
 
 public class Enemy extends DestructibleEntity{
-	public Vector2 direction = new Vector2();
+	protected float speed = 0.3f;
+	protected float reload = 40;
+	protected float range = 60;
+	protected float length = 4;
+	protected float rotatespeed = 8f;
+	protected BulletType bullet = BulletType.small;
+	protected String shootsound = "enemyshoot";
+	
 	public Tile[] path;
-	public float xvelocity, yvelocity;
-	public float speed = 0.3f;
-	public int node = -1;
-	public Entity target;
 	public int spawn;
-	public float reload = 40;
-	public float range = 60;
-	public BulletType bullet = BulletType.small;
-	public float length = 4;
-	public float rotatespeed = 8f;
-	public String shootsound = "enemyshoot";
-	public boolean dead = false;
+	public int node = -1;
+	
+	public Vector2 direction = new Vector2();
+	public float xvelocity, yvelocity;
+	public Entity target;
+	
 	
 	public Enemy(int spawn){
 		this.spawn = spawn;
@@ -64,7 +66,7 @@ public class Enemy extends DestructibleEntity{
 		}
 	}
 	
-	public void shoot(){
+	void shoot(){
 		vector.set(length, 0).rotate(direction.angle());
 		Bullet out = new Bullet(bullet, this, x+vector.x, y+vector.y, direction.angle()).add();
 		out.damage = bullet.damage*Vars.multiplier;
@@ -97,7 +99,7 @@ public class Enemy extends DestructibleEntity{
 		move();
 		
 		xvelocity = x - lastx;
-		yvelocity = y-lasty;
+		yvelocity = y - lasty;
 		
 		if(target == null){
 			direction.add(xvelocity, yvelocity);

@@ -3,6 +3,7 @@ package io.anuke.mindustry.world;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.World;
 import io.anuke.mindustry.entities.TileEntity;
@@ -13,6 +14,7 @@ import io.anuke.ucore.util.Mathf;
 
 public class Block{
 	private static int lastid;
+	private static Array<Block> blocks = new Array<Block>();
 	
 	protected static Vector2 vector = new Vector2();
 	protected static Vector2 vector2 = new Vector2();
@@ -30,6 +32,8 @@ public class Block{
 	public boolean vary = true;
 
 	public Block(String name) {
+		blocks.add(this);
+		
 		this.name = name;
 		this.solid = false;
 		this.id = lastid++;
@@ -186,5 +190,13 @@ public class Block{
 			Draw.rect(name(), tile.worldx(), tile.worldy(), rotate ? tile.rotation * 90 : 0);
 		}
 	}
-
+	
+	
+	public static Array<Block> getAllBlocks(){
+		return blocks;
+	}
+	
+	public static Block getByID(int id){
+		return blocks.get(id);
+	}
 }

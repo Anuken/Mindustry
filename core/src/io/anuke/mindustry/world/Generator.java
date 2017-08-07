@@ -2,7 +2,6 @@ package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.ObjectMap;
 
 import io.anuke.mindustry.World;
@@ -28,7 +27,8 @@ public class Generator{
 	/**Returns world size.*/
 	public static void generate(Pixmap pixmap){
 		
-		Noise.setSeed(MathUtils.random(0, 99999));
+		Noise.setSeed(World.getSeed());
+		
 		for(int x = 0; x < pixmap.getWidth(); x ++){
 			for(int y = 0; y < pixmap.getHeight(); y ++){
 				Block floor = Blocks.stone;

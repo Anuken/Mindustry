@@ -16,6 +16,7 @@ import io.anuke.mindustry.entities.enemies.*;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.GestureHandler;
 import io.anuke.mindustry.input.Input;
+import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.*;
@@ -33,7 +34,6 @@ public class Control extends RendererModule{
 	boolean hiscore = false;
 	
 	final Array<Weapon> weapons = new Array<>();
-	//final ObjectMap<Weapon, Boolean> weapons = new ObjectMap<Weapon, Boolean>();
 	
 	int wave = 1;
 	float wavetime;
@@ -147,6 +147,12 @@ public class Control extends RendererModule{
 	
 	public Array<Weapon> getWeapons(){
 		return weapons;
+	}
+	
+	public void setWaveData(int enemies, int wave, float wavetime){
+		this.wave = wave;
+		this.wavetime = wavetime;
+		this.enemies = enemies;
 	}
 	
 	void runWave(){
@@ -269,13 +275,26 @@ public class Control extends RendererModule{
 	@Override
 	public void update(){
 		
-		if(Inputs.keyUp(Keys.ESCAPE) && debug)
-			Gdx.app.exit();
-		
-		//camera.zoom = MathUtils.lerp(camera.zoom, targetzoom, 0.5f*delta());
-		
-		if(Inputs.keyUp(Keys.SPACE) && debug)
-			Effects.sound("shoot", World.core.worldx(), World.core.worldy());
+		if(debug){
+			if(Inputs.keyUp(Keys.ESCAPE))
+				Gdx.app.exit();
+			
+			if(Inputs.keyUp(Keys.SPACE))
+				Effects.sound("shoot", World.core.worldx(), World.core.worldy());
+			
+			if(Inputs.keyUp(Keys.O)){
+				Timers.mark();
+				SaveIO.write(Gdx.files.local("mapsave.mds"));
+				log("Save time taken: " + Timers.elapsed());
+			}
+			
+			if(Inputs.keyUp(Keys.P)){
+				Timers.mark();
+				SaveIO.load(Gdx.files.local("mapsave.mds"));
+				log("Load time taken: " + Timers.elapsed());
+				Renderer.clearTiles();
+			}
+		}
 		
 		if(GameState.is(State.menu)){
 			clearScreen();

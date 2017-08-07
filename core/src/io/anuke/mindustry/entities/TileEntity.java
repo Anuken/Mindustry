@@ -18,7 +18,6 @@ public class TileEntity extends Entity{
 	public int maxhealth, health;
 	public boolean dead = false;
 	
-	
 	public TileEntity init(Tile tile){
 		this.tile = tile;
 		x = tile.worldx();

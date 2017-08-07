@@ -57,4 +57,8 @@ public class Inventory{
 		items.put(req.item, items.get(req.item, 0)-req.amount);
 		ui.updateItems();
 	}
+	
+	public static ObjectMap<Item, Integer> getItems(){
+		return items;
+	}
 }

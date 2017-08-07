@@ -5,6 +5,7 @@ import static io.anuke.mindustry.Vars.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -26,6 +27,7 @@ import io.anuke.ucore.util.Mathf;
 public class World{
 	public static int worldsize = 128;
 	public static int pixsize = worldsize*tilesize;
+	private static int seed;
 	
 	private static Pixmap[] mapPixmaps;
 	private static Texture[] mapTextures;
@@ -87,6 +89,10 @@ public class World{
 	}
 	
 	public static void loadMap(int id){
+		loadMap(id, MathUtils.random(0, 99999));
+	}
+	
+	public static void loadMap(int id, int seed){
 		
 		spawnpoints.clear();
 		
@@ -104,6 +110,7 @@ public class World{
 		
 		Entities.resizeTree(0, 0, pixsize, pixsize);
 		
+		World.seed = seed;
 		Generator.generate(mapPixmaps[id]);
 		
 		Pathfind.reset();
@@ -135,6 +142,10 @@ public class World{
 	static void set(int x, int y, Block type, int rot){
 		tiles[x][y].setBlock(type);
 		tiles[x][y].rotation = rot;
+	}
+	
+	public static int getSeed(){
+		return seed;
 	}
 	
 	public static boolean validPlace(int x, int y, Block type){
