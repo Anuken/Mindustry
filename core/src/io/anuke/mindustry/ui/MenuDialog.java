@@ -11,6 +11,7 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class MenuDialog extends Dialog{
 	private SaveDialog save = new SaveDialog();
+	private LoadDialog load = new LoadDialog();
 
 	public MenuDialog(){
 		super("Paused", "dialog");
@@ -44,7 +45,7 @@ public class MenuDialog extends Dialog{
 		
 		content().row();
 		content().addButton("Load Game", ()->{
-			
+			load.show();
 		});
 		
 		content().row();

@@ -94,6 +94,14 @@ public class SaveIO{
 			put(enemyIDs.get(value), value);
 	}};
 	
+	public static void saveToSlot(int slot){
+		write(fileFor(slot));
+	}
+	
+	public static void loadFromSlot(int slot){
+		load(fileFor(slot));
+	}
+	
 	public static boolean isSaveValid(int slot){
 		try(DataInputStream stream = new DataInputStream(fileFor(slot).read())){
 			return stream.readInt() == fileVersionID;
