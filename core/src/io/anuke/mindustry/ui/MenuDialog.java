@@ -19,7 +19,7 @@ public class MenuDialog extends Dialog{
 	}
 	
 	void setup(){
-		content().defaults().width(200).units(Unit.dp);
+		content().defaults().width(220).height(50).units(Unit.dp);
 		
 		content().addButton("Back", ()->{
 			hide();

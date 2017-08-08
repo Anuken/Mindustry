@@ -391,39 +391,40 @@ public class UI extends SceneModule{
 	
 		//menu table
 		new table(){{
-			float w = Unit.dp.inPixels(200);
 			
 			new table("button"){{
+				defaults().size(Unit.dp.inPixels(220), Unit.dp.inPixels(50));
+				
 				new button("Play", () -> {
 					levels.show();
-				}).width(w);
+				});
 
 				row();
 
 				new button("Settings", () -> {
 					prefs.show(scene);
-				}).width(w);
+				});
 
 				row();
 				
 				if(!android){
 					new button("Controls", () -> {
 						keys.show(scene);
-					}).width(w);
+					});
 					
 					row();
 				}
 
 				new button("About", () -> {
 					about.show(scene);
-				}).width(w);
+				});
 				
 				row();
 				
 				if(Gdx.app.getType() != ApplicationType.WebGL)
 				new button("Exit", () -> {
 					Gdx.app.exit();
-				}).width(w);
+				});
 				
 				get().pad(Unit.dp.inPixels(20));
 			}};
@@ -452,7 +453,9 @@ public class UI extends SceneModule{
 		
 		loadingtable = new table("loadDim"){{
 			new table("button"){{
-				new label("[yellow]Loading...").scale(1).pad(10);
+				new label("[yellow]Loading..."){{
+					get().setName("namelabel");
+				}}.scale(1).pad(10);
 			}}.end();
 		}}.end().get();
 		
@@ -520,7 +523,13 @@ public class UI extends SceneModule{
 	}
 	
 	public void showLoading(){
+		showLoading("[yellow]Loading..");
+	}
+	
+	public void showLoading(String text){
+		loadingtable.<Label>find("namelabel").setText(text);
 		loadingtable.setVisible(true);
+		loadingtable.toFront();
 	}
 	
 	public void hideLoading(){

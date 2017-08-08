@@ -1,5 +1,8 @@
 package io.anuke.mindustry.ui;
 
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
+
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.ucore.scene.ui.ConfirmDialog;
@@ -20,7 +23,7 @@ public class SaveDialog extends Dialog{
 		
 		getButtonTable().addButton("Back", ()->{
 			hide();
-		}).pad(8).size(180, 60);
+		}).pad(8).size(180, 50);
 	}
 	
 	private void setup(){
@@ -36,28 +39,39 @@ public class SaveDialog extends Dialog{
 			button.getLabelCell().top().left().growX();
 			button.row();
 			button.pad(12);
-			button.add("[gray]" + (!SaveIO.isSaveValid(i) ? "<empty>" : "Last Saved: " + SaveIO.getTimeString(i)));
+			button.add((!SaveIO.isSaveValid(i) ? "[gray]<empty>" : "[LIGHT_GRAY]Last Saved: " + SaveIO.getTimeString(i)));
 			button.getLabel().setFontScale(1f);
 			
 			button.clicked(()->{
 				if(SaveIO.isSaveValid(slot)){
 					new ConfirmDialog("Overwrite", "Are you sure you want to overwrite\nthis save slot?", ()->{
-						SaveIO.saveToSlot(slot);
-						hide();
+						save(slot);
 					}){{
 						content().pad(16);
 						for(Cell<?> cell : getButtonTable().getCells())
 							cell.size(110, 45).pad(4);
 					}}.show();
 				}else{
-					SaveIO.saveToSlot(slot);
-					hide();
+					save(slot);
 				}
 			});
 			
-			content().add(button).size(400, 100).units(Unit.dp).pad(10);
+			content().add(button).size(400, 90).units(Unit.dp).pad(8);
 			content().row();
 		}
+	}
+	
+	void save(int slot){
+		Vars.ui.showLoading("[yellow]Saving...");
+		
+		Timer.schedule(new Task(){
+			@Override
+			public void run(){
+				SaveIO.saveToSlot(slot);
+				hide();
+				Vars.ui.hideLoading();
+			}
+		}, 2f/60f);
 	}
 
 }

@@ -86,6 +86,10 @@ public class Input{
 			Tile tile = cursor;
 			player.breaktime += Mathf.delta();
 			if(player.breaktime >= tile.block().breaktime){
+				if(tile.block().drops != null){
+					Inventory.addItem(tile.block().drops.item, tile.block().drops.amount);
+				}
+				
 				Effects.effect("break", tile.worldx(), tile.worldy());
 				Effects.shake(3f, 1f);
 				tile.setBlock(Blocks.air);

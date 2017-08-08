@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.World;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.graphics.Caches;
 import io.anuke.ucore.util.Mathf;
@@ -30,6 +31,8 @@ public class Block{
 	public String edge = "stone";
 	//whether to have 3 variants
 	public boolean vary = true;
+	//stuff that drops when broken
+	public ItemStack drops = null;
 
 	public Block(String name) {
 		blocks.add(this);

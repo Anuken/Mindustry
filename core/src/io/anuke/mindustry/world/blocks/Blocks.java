@@ -1,5 +1,7 @@
 package io.anuke.mindustry.world.blocks;
 
+import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
@@ -65,12 +67,14 @@ public class Blocks{
 		shadow = "rockshadow";
 		breakable = true;
 		breaktime = 15;
+		drops = new ItemStack(Item.stone, 3);
 	}},
 			
 	rock2 = new Block("rock2"){{
 		shadow = "rock2shadow";
 		breakable = true;
 		breaktime = 15;
+		drops = new ItemStack(Item.stone, 3);
 	}},
 	
 	dirtblock = new Block("dirtblock"){{
