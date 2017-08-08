@@ -76,10 +76,13 @@ public class UI extends SceneModule{
 		
 		int tw = w/64+1;
 		
-		batch.draw(Textures.get("back"), 0, 0, 0, 0, w, h);
+		float scale = Unit.dp.inPixels(1f);
+		
+		batch.draw(Textures.get("back"), 0, 0, w, h, 0, 0, (float)w/h/scale * h/Textures.get("back").getHeight()/4f, -1f/scale * h/Textures.get("back").getHeight()/4f);
 		
 		for(int x = 0; x < tw; x ++){
-			batch.draw(Textures.get("conveyort"), x*64, 0, 0, (int)(Timers.time()*2*(x%2-0.5f)), 32, h);
+			float offset = (Timers.time()*2*(x%2-0.5f))/32f;
+			batch.draw(Textures.get("conveyort"), x*64*scale, 0, 32*scale, h*scale, 0, offset, 1, h/32 + offset);
 		}
 		
 		Draw.color();

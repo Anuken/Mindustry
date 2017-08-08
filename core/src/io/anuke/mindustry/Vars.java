@@ -20,6 +20,8 @@ public class Vars{
 	
 	public static boolean debug = false;
 	
+	public static final int saveSlots = 4;
+	
 	//turret and enemy shoot speed inverse multiplier
 	public static final int multiplier = android ? 3 : 1;
 	

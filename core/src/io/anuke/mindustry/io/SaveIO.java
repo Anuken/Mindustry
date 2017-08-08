@@ -3,9 +3,13 @@ package io.anuke.mindustry.io;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.Inventory;
@@ -22,6 +26,11 @@ import io.anuke.ucore.entities.Entity;
 
 /*
  * Save format:
+ * 
+ * --META--
+ * 
+ * Save file version ID (int)
+ * Last saved timestamp (long)
  * 
  * --STATE DATA--
  * Wave (int)
@@ -67,6 +76,11 @@ import io.anuke.ucore.entities.Entity;
  * 
  */
 public class SaveIO{
+	/**Save file version ID. Should be incremented every breaking release.*/
+	private static final int fileVersionID = 0;
+	
+	private static final SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss");
+	
 	//TODO automatic registration of types?
 	private static final ObjectMap<Class<? extends Enemy>, Byte> enemyIDs = new ObjectMap<Class<? extends Enemy>, Byte>(){{
 		put(Enemy.class, (byte)0);
@@ -80,9 +94,35 @@ public class SaveIO{
 			put(enemyIDs.get(value), value);
 	}};
 	
+	public static boolean isSaveValid(int slot){
+		try(DataInputStream stream = new DataInputStream(fileFor(slot).read())){
+			return stream.readInt() == fileVersionID;
+		}catch (Exception e){
+			return false;
+		}
+	}
+	
+	public static String getTimeString(int slot){
+		
+		try(DataInputStream stream = new DataInputStream(fileFor(slot).read())){
+			stream.readInt();
+			Date date = new Date(stream.readLong());
+			return format.format(date);
+		}catch (IOException e){
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static FileHandle fileFor(int slot){
+		return Gdx.files.local("mindustry-saves/" + slot + ".mins");
+	}
+	
 	public static void write(FileHandle file){
 		
 		try(DataOutputStream stream = new DataOutputStream(file.write(false))){
+			
+			stream.writeInt(fileVersionID); //version id
+			stream.writeLong(TimeUtils.millis());
 			
 			//--GENERAL STATE--
 			stream.writeInt(Vars.control.getWave()); //wave
@@ -187,6 +227,13 @@ public class SaveIO{
 		
 		try(DataInputStream stream = new DataInputStream(file.read())){
 			Item[] itemEnums = Item.values();
+			
+			int version = stream.readInt();
+			/*long loadTime = */stream.readLong();
+			
+			if(version != fileVersionID){
+				//TODO throw an exception?
+			}
 			
 			//general state
 			

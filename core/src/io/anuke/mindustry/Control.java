@@ -400,6 +400,7 @@ public class Control extends RendererModule{
 		
 		AndroidInput.mousex = Gdx.graphics.getWidth()/2;
 		AndroidInput.mousey = Gdx.graphics.getHeight()/2;
+		camera.position.set(player.x, player.y, 0);
 	}
 
 }
