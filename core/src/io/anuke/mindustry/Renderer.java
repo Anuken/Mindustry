@@ -135,13 +135,6 @@ public class Renderer{
 			Draw.color(valid ? Color.PURPLE : Color.SCARLET);
 			Draw.thickness(2f);
 			Draw.square(x, y, tilesize / 2 + MathUtils.sin(Timers.time() / 6f) + 1);
-			
-			if(android){
-				//TODO
-				Draw.thickness(1f);
-				Draw.color(Color.ORANGE);
-				Draw.square(x + tilesize/2, y + tilesize/2, tilesize/4);
-			}
 
 			if(player.recipe.result.rotate){
 				Draw.color("orange");

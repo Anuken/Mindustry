@@ -23,22 +23,22 @@ public class SaveDialog extends Dialog{
 		
 		getButtonTable().addButton("Back", ()->{
 			hide();
-		}).pad(8).size(180, 50);
+		}).pad(2).size(180, 44).units(Unit.dp);
 	}
 	
 	private void setup(){
 		content().clear();
 		
-		content().add("Select a save slot.").padBottom(4);
+		content().add("Select a save slot.").padBottom(2);
 		content().row();
 		
 		for(int i = 0; i < Vars.saveSlots; i ++){
 			final int slot = i;
 			
-			TextButton button = new TextButton("[yellow]Slot " + i);
+			TextButton button = new TextButton("[yellow]Slot " + (i+1));
 			button.getLabelCell().top().left().growX();
 			button.row();
-			button.pad(12);
+			button.pad(Unit.dp.inPixels(10));
 			button.add((!SaveIO.isSaveValid(i) ? "[gray]<empty>" : "[LIGHT_GRAY]Last Saved: " + SaveIO.getTimeString(i)));
 			button.getLabel().setFontScale(1f);
 			
@@ -49,14 +49,14 @@ public class SaveDialog extends Dialog{
 					}){{
 						content().pad(16);
 						for(Cell<?> cell : getButtonTable().getCells())
-							cell.size(110, 45).pad(4);
+							cell.size(110, 45).pad(4).units(Unit.dp);
 					}}.show();
 				}else{
 					save(slot);
 				}
 			});
 			
-			content().add(button).size(400, 90).units(Unit.dp).pad(8);
+			content().add(button).size(400, 75).units(Unit.dp).pad(2);
 			content().row();
 		}
 	}
@@ -71,7 +71,7 @@ public class SaveDialog extends Dialog{
 				hide();
 				Vars.ui.hideLoading();
 			}
-		}, 2f/60f);
+		}, 8f/60f);
 	}
 
 }

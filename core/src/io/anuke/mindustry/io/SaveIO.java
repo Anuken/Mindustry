@@ -12,9 +12,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
-import io.anuke.mindustry.Inventory;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.World;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.entities.Weapon;
 import io.anuke.mindustry.entities.enemies.*;
 import io.anuke.mindustry.resource.Item;
@@ -313,6 +311,7 @@ public class SaveIO{
 			int tiles = stream.readInt();
 			
 			World.loadMap(mapid, seed);
+			Renderer.clearTiles();
 			
 			for(int x = 0; x < World.width(); x ++){
 				for(int y = 0; y < World.height(); y ++){
