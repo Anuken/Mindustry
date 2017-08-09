@@ -38,7 +38,7 @@ public class LevelDialog extends Dialog{
 			Timers.run(18, ()->{
 				Vars.ui.hideLoading();
 			});
-		});
+		}).pad(3).size(180, 44).units(Unit.dp);
 		
 		ButtonGroup<ImageButton> mapgroup = new ButtonGroup<>();
 		

@@ -6,6 +6,7 @@ import io.anuke.mindustry.GameState;
 import io.anuke.mindustry.GameState.State;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.scene.ui.TextDialog;
+import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class TutorialDialog extends TextDialog{
 	
@@ -23,7 +24,7 @@ public class TutorialDialog extends TextDialog{
 		
 		getButtonTable().addButton("OK", ()->{
 			hide();
-		});
+		}).pad(2).size(180, 44).units(Unit.dp);
 		
 		content().pad(8);
 		

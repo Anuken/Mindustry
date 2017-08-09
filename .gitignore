@@ -1,9 +1,14 @@
+##Packr, build stuff
+
+/deploy/
+/desktop/packr-out/
+/desktop/packr-export/
+
 ## Java
 
 *.class
 *.war
 *.ear
-*.gif
 hs_err_pid*
 
 ## Robovm

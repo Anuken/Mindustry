@@ -62,7 +62,7 @@ public class UI extends SceneModule{
 		Dialog.closePadT = 4;
 		
 		Textures.load("sprites/");
-		Textures.repeatWrap("conveyor", "conveyort", "back");
+		Textures.repeatWrap("conveyort", "back");
 	}
 	
 	void drawBackground(){
@@ -400,12 +400,14 @@ public class UI extends SceneModule{
 				new button("Play", () -> {
 					levels.show();
 				});
-
-				row();
 				
-				new button("Load Game", () -> {
-					load.show();
-				});
+				if(Gdx.app.getType() != ApplicationType.WebGL){
+					row();
+				
+					new button("Load Game", () -> {
+						load.show();
+					});
+				}
 
 				row();
 

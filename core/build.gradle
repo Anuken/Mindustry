@@ -2,9 +2,22 @@ apply plugin: "java"
 sourceCompatibility = 1.8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 sourceSets.main.java.srcDirs = ["src/"]
+
+def TEXPACK_DIR = "$System.env.TEXPACK_DIR"
+
+task packSprites(type: Exec){
+	commandLine "java", "-cp", TEXPACK_DIR, "com.badlogic.gdx.tools.texturepacker.TexturePacker", "assets-raw/sprites/", "assets/sprites/", "sprites.atlas"
+}
+
+task packUI(type: Exec){
+	commandLine "java", "-cp", TEXPACK_DIR, "com.badlogic.gdx.tools.texturepacker.TexturePacker", "assets-raw/ui/", "assets/ui/", "uiskin.atlas"
+}
+
+task pack(){
+	dependsOn 'packSprites'
+	dependsOn 'packUI'
+}
+
 eclipse.project {
     name = appName + "-core"
-}
-dependencies {
-    compile files('lib/ucore.jar')
 }

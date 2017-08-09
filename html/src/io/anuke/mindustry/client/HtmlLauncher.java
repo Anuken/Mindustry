@@ -1,5 +1,7 @@
 package io.anuke.mindustry.client;
 
+import java.util.Date;
+
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
@@ -9,6 +11,8 @@ import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 import io.anuke.mindustry.Mindustry;
+import io.anuke.mindustry.io.SaveIO;
+import io.anuke.mindustry.io.SaveIO.FormatProvider;
 
 public class HtmlLauncher extends GwtApplication {
     static final int WIDTH = 800;
@@ -49,6 +53,14 @@ public class HtmlLauncher extends GwtApplication {
                 setupResizeHook();
             }
         });
+        
+        SaveIO.setFormatProvider(new FormatProvider(){
+			
+			public String format(Date date){
+				return "saving not supported";
+			}
+		});
+        
         return new Mindustry();
     }
 

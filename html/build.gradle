@@ -1,5 +1,5 @@
 apply plugin: "java"
-apply plugin: "jetty"
+apply plugin: 'org.akhikhl.gretty'
 
 gwt {
     gwtVersion='2.8.0' // Should match the gwt version used for building the gwt backend
@@ -50,12 +50,20 @@ task dist(dependsOn: [clean, compileGwt]) {
     }
 }
 
+task distZip(type: Zip, dependsOn: dist){
+	from "build/dist"
+    archiveName appName + "-html5.zip"
+    destinationDir(file("build/dist-zipped"))
+}
+
 draftWar {
    from "war"
 }
 
-task addSource << {
-	sourceSets.main.compileClasspath += files(project(':core').sourceSets.main.allJava.srcDirs)
+task addSource{
+	doLast{
+		sourceSets.main.compileClasspath += files(project(':core').sourceSets.main.allJava.srcDirs)
+	}
 }
 
 tasks.compileGwt.dependsOn(addSource)

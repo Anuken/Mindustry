@@ -1,9 +1,10 @@
 package io.anuke.mindustry.io;
 
+import static io.anuke.mindustry.Vars.android;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.badlogic.gdx.Gdx;
@@ -66,6 +67,7 @@ import io.anuke.ucore.entities.Entity;
  *   Tile type (boolean)- whether the block has a tile entity attached
  *   Block ID - the block ID
  *   (the following only applies to tile entity blocks)
+ *   Block rotation (byte)
  *   Block health (int)
  *   Amount of items (byte)
  *   (item list) 
@@ -75,9 +77,9 @@ import io.anuke.ucore.entities.Entity;
  */
 public class SaveIO{
 	/**Save file version ID. Should be incremented every breaking release.*/
-	private static final int fileVersionID = 0;
+	private static final int fileVersionID = 2;
 	
-	private static final SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss");
+	private static FormatProvider provider = null;
 	
 	//TODO automatic registration of types?
 	private static final ObjectMap<Class<? extends Enemy>, Byte> enemyIDs = new ObjectMap<Class<? extends Enemy>, Byte>(){{
@@ -113,7 +115,7 @@ public class SaveIO{
 		try(DataInputStream stream = new DataInputStream(fileFor(slot).read())){
 			stream.readInt();
 			Date date = new Date(stream.readLong());
-			return format.format(date);
+			return provider.format(date);
 		}catch (IOException e){
 			throw new RuntimeException(e);
 		}
@@ -121,6 +123,10 @@ public class SaveIO{
 	
 	public static FileHandle fileFor(int slot){
 		return Gdx.files.local("mindustry-saves/" + slot + ".mins");
+	}
+	
+	public static void setFormatProvider(FormatProvider prov){
+		provider = prov;
 	}
 	
 	public static void write(FileHandle file){
@@ -212,6 +218,7 @@ public class SaveIO{
 						stream.writeInt(tile.block().id); //block ID
 						
 						if(tile.entity != null){
+							stream.writeByte(tile.rotation);
 							stream.writeInt(tile.entity.health); //health
 							stream.writeByte(tile.entity.items.size); //amount of items
 							
@@ -282,6 +289,8 @@ public class SaveIO{
 			
 			//enemies
 			
+			Entities.clear();
+			
 			int enemies = stream.readInt();
 			
 			for(int i = 0; i < enemies; i ++){
@@ -303,6 +312,9 @@ public class SaveIO{
 			}
 			
 			Vars.control.setWaveData(enemies, wave, wavetime);
+			
+			if(!android)
+				Vars.player.add();
 			
 			//map
 			
@@ -333,10 +345,12 @@ public class SaveIO{
 				tile.setBlock(Block.getByID(blockid));
 				
 				if(hasEntity){
+					int rotation = stream.readByte();
 					int health = stream.readInt();
 					int items = stream.readByte();
 					
 					tile.entity.health = health;
+					tile.rotation = rotation;
 					
 					for(int j = 0; j < items; j ++){
 						int itemid = stream.readByte();
@@ -349,5 +363,9 @@ public class SaveIO{
 		}catch (IOException e){
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public static interface FormatProvider{
+		public String format(Date date);
 	}
 }

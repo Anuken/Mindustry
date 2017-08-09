@@ -56,7 +56,7 @@ public class Control extends RendererModule{
 		
 		Draw.addSurface("shadow", cameraScale);
 		
-		atlas = new Atlas("mindustry.atlas");
+		atlas = new Atlas("sprites.atlas");
 		
 		Sounds.load("shoot.wav", "place.wav", "explosion.wav", "enemyshoot.wav", 
 				"corexplode.wav", "break.wav", "spawn.wav", "flame.wav", "die.wav", 

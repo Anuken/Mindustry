@@ -8,6 +8,7 @@ buildscript {
     dependencies {
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
         classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath 'org.akhikhl.gretty:gretty:+'
     }
 }
 
@@ -77,8 +78,7 @@ project(":core") {
     apply plugin: "java"
 
     dependencies {
-    	//compile fileTree(dir: '../core/lib', include: '*.jar')
-       	//compile 'com.github.Anuken:ucore:88b945b'
+    	compile fileTree(dir: '../core/lib', include: '*.jar')
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-ai:1.8.1"
     }
