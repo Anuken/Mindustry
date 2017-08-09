@@ -6,6 +6,7 @@ import static io.anuke.ucore.scene.actions.Actions.*;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
@@ -62,7 +63,7 @@ public class UI extends SceneModule{
 		Dialog.closePadT = 4;
 		
 		Textures.load("sprites/");
-		Textures.repeatWrap("conveyort", "back");
+		Textures.repeatWrap("conveyort", Gdx.app.getType() == ApplicationType.WebGL ? "back-web" : "back");
 	}
 	
 	void drawBackground(){
@@ -78,7 +79,10 @@ public class UI extends SceneModule{
 		
 		float scale = Unit.dp.inPixels(1f);
 		
-		batch.draw(Textures.get("back"), 0, 0, w, h, 0, 0, (float)w/h/scale * h/Textures.get("back").getHeight()/4f, -1f/scale * h/Textures.get("back").getHeight()/4f);
+		Texture texture = Textures.get(Gdx.app.getType() == ApplicationType.WebGL ? "back-web" : "back");
+		
+		batch.draw(texture, 
+				0, 0, w, h, 0, 0, (float)w/h/scale * h/texture.getHeight()/4f, -1f/scale * h/texture.getHeight()/4f);
 		
 		for(int x = 0; x < tw; x ++){
 			float offset = (Timers.time()*2*(x%2-0.5f))/32f;

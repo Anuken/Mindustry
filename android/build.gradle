@@ -8,7 +8,7 @@ android {
             aidl.srcDirs = ['src']
             renderscript.srcDirs = ['src']
             res.srcDirs = ['res']
-            assets.srcDirs = ['assets']
+            assets.srcDirs = ['assets', 'src/main/assets', '../core/assets/']
             jniLibs.srcDirs = ['libs']
         }
 
@@ -131,5 +131,7 @@ idea {
         }
     }
 }
+
 dependencies {
+    //compile files('lib/ucore.jar')
 }

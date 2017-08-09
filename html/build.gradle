@@ -18,20 +18,6 @@ gwt {
     }
 }
 
-task draftRun(type: JettyRunWar) {
-    dependsOn draftWar
-    dependsOn.remove('war')
-    webApp=draftWar.archivePath
-    daemon=true
-}
-
-task superDev(type: de.richsource.gradle.plugins.gwt.GwtSuperDev) {
-    dependsOn draftRun
-    doFirst {
-    	gwt.modules = gwt.devModules
-    }
-}
-
 task dist(dependsOn: [clean, compileGwt]) {
     doLast {
         file("build/dist").mkdirs()
@@ -54,6 +40,13 @@ task distZip(type: Zip, dependsOn: dist){
 	from "build/dist"
     archiveName appName + "-html5.zip"
     destinationDir(file("build/dist-zipped"))
+}
+
+
+eclipseWtpFacet.doLast{
+	delete{
+		delete '.settings/org.eclipse.wst.common.project.facet.core.xml'
+	}
 }
 
 draftWar {

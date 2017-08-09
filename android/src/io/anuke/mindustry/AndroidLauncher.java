@@ -2,6 +2,7 @@ package io.anuke.mindustry;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
@@ -18,7 +19,7 @@ public class AndroidLauncher extends AndroidApplication {
 		config.useImmersiveMode = true;
 		
 		SaveIO.setFormatProvider(new FormatProvider(){
-			SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss");
+			SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss", Locale.ENGLISH);
 			
 			public String format(Date date){
 				return format.format(date);
