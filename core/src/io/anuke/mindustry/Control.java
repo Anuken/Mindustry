@@ -62,6 +62,8 @@ public class Control extends RendererModule{
 				"corexplode.wav", "break.wav", "spawn.wav", "flame.wav", "die.wav", 
 				"respawn.wav", "purchase.wav", "flame2.wav");
 		
+		Sounds.setFalloff(9000f);
+		
 		Musics.load("1.mp3", "2.mp3", "3.mp3");
 		
 		World.loadMaps();
@@ -79,8 +81,6 @@ public class Control extends RendererModule{
 		
 		for(String map : maps)
 			Settings.defaults("hiscore"+map, 0);
-		
-		Sounds.setFalloff(9000f);
 		
 		player = new Player();
 	}
@@ -389,6 +389,12 @@ public class Control extends RendererModule{
 		Renderer.renderTiles();
 		Entities.draw();
 		Renderer.renderPixelOverlay();
+	}
+	
+	@Override
+	public void dispose(){
+		super.dispose();
+		World.disposeMaps();
 	}
 	
 	@Override

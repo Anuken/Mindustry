@@ -1,20 +1,23 @@
 package io.anuke.mindustry.ai;
 
-import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.ai.pfa.PathFinder;
+import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.World;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Effects;
 public class Pathfind{
 	static MHueristic heuristic = new MHueristic();
 	static PassTileGraph passgraph = new PassTileGraph();
 	static PathFinder<Tile> passpathfinder;
-	static Array<DefaultGraphPath<Tile>> paths = new Array<>();
+	static Array<SmoothGraphPath> paths = new Array<>();
 	static Tile[][] pathSequences;
+	static PathSmoother<Tile, Vector2> smoother = new PathSmoother<Tile, Vector2>(new Raycaster());
 	static Vector2 vector = new Vector2();
 	
 	static public Vector2 find(Enemy enemy){
@@ -53,18 +56,20 @@ public class Pathfind{
 		if(paths.size == 0){
 			pathSequences = new Tile[World.spawnpoints.size][0];
 			for(int i = 0; i < World.spawnpoints.size; i ++){
-				DefaultGraphPath<Tile> path = new DefaultGraphPath<>();
+				SmoothGraphPath path = new SmoothGraphPath();
 				paths.add(path);
 			}
 		}
 		
 		for(int i = 0; i < paths.size; i ++){
-			DefaultGraphPath<Tile> path = paths.get(i);
+			SmoothGraphPath path = paths.get(i);
 			
 			path.clear();
 			passpathfinder.searchNodePath(
 					World.spawnpoints.get(i), 
 					World.core, heuristic, path);
+			
+			smoother.smoothPath(path);
 			
 			pathSequences[i] = new Tile[path.getCount()];
 			
@@ -75,10 +80,10 @@ public class Pathfind{
 			}
 			
 			
-			//if(debug)
-			//for(Tile tile : path){
-			//	Effects.effect("ind", tile.worldx(), tile.worldy());
-			//}
+			if(Vars.debug)
+			for(Tile tile : path){
+				Effects.effect("ind", tile.worldx(), tile.worldy());
+			}
 			
 		}
 	}

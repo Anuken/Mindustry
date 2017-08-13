@@ -16,6 +16,11 @@ public class MHueristic implements Heuristic<Tile>{
 		//TODO balance multiplier
 		if(node.breakable() && node.block().solid) cost += Vars.tilesize*multiplier;
 		if(other.breakable() && other.block().solid) cost += Vars.tilesize*multiplier;
+		for(Tile tile : node.getNearby()){
+			if(tile != null && tile.solid()){
+				cost += Vars.tilesize*2;
+			}
+		}
 		return cost;
 	}
 

@@ -435,10 +435,11 @@ public class UI extends SceneModule{
 				
 				row();
 				
-				if(Gdx.app.getType() != ApplicationType.WebGL)
-				new button("Exit", () -> {
-					Gdx.app.exit();
-				});
+				if(Gdx.app.getType() != ApplicationType.WebGL && !android){
+					new button("Exit", () -> {
+						Gdx.app.exit();
+					});
+				}
 				
 				get().pad(Unit.dp.inPixels(20));
 			}};

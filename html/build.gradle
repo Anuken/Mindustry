@@ -1,5 +1,6 @@
 apply plugin: "java"
-apply plugin: 'org.akhikhl.gretty'
+apply plugin: "jetty"
+//apply plugin: 'org.akhikhl.gretty'
 
 gwt {
     gwtVersion='2.8.0' // Should match the gwt version used for building the gwt backend

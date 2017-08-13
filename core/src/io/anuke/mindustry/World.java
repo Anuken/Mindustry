@@ -225,4 +225,14 @@ public class World{
 	public static int tiley(){
 		return Mathf.scl2(Graphics.mouseWorld().y, tilesize);
 	}
+	
+	public static void disposeMaps(){
+		for(Pixmap pixmap : mapPixmaps){
+			pixmap.dispose();
+		}
+		
+		for(Texture texture : mapTextures){
+			texture.dispose();
+		}
+	}
 }
