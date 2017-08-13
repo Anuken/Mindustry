@@ -5,7 +5,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.Bullet;
+import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
@@ -72,7 +74,7 @@ public class Turret extends Block{
 
 	@Override
 	public String description(){
-		return "Shoots things.";
+		return "[green]Ammo: "+(ammo==null ? "N/A" : ammo.name())+"\n[]Shoots things.";
 	}
 	
 	@Override

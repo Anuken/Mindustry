@@ -92,11 +92,18 @@ public class ProductionBlocks{
 		}
 	},
 	
-	smelter = new Crafter("smelter"){{
-		health = 70;
-		requirements = new Item[]{Item.coal, Item.iron};
-		result = Item.steel;
-	}},
+	smelter = new Crafter("smelter"){
+		{
+			health = 70;
+			requirements = new Item[]{Item.coal, Item.iron};
+			result = Item.steel;
+		}
+		
+		@Override
+		public String description(){
+			return "Takes in coal + iron, outputs steel.";
+		}
+	},
 	
 	stonedrill = new Drill("stonedrill"){{
 		resource = Blocks.stone;

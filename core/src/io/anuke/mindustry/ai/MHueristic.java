@@ -18,7 +18,8 @@ public class MHueristic implements Heuristic<Tile>{
 		if(other.breakable() && other.block().solid) cost += Vars.tilesize*multiplier;
 		for(Tile tile : node.getNearby()){
 			if(tile != null && tile.solid()){
-				cost += Vars.tilesize*2;
+				//don't go near solid tiles!
+				cost += Vars.tilesize*3;
 			}
 		}
 		return cost;

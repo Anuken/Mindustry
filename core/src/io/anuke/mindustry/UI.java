@@ -261,6 +261,10 @@ public class UI extends SceneModule{
 							tiptable.row();
 							tiptable.add().size(10).units(Unit.px);
 							tiptable.row();
+							tiptable.add("[scarlet]Health: " + r.result.health).left();
+							tiptable.row();
+							tiptable.add().size(6).units(Unit.px);
+							tiptable.row();
 							tiptable.add("[ORANGE]" + description).left();
 							tiptable.pad(Unit.dp.inPixels(10f));
 						};
