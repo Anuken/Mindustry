@@ -302,6 +302,7 @@ public class SaveIO{
 				
 				try{
 					Enemy enemy = (Enemy)ClassReflection.getConstructor(idEnemies.get(type), int.class).newInstance(lane);
+					enemy.findClosestNode();
 					enemy.health = health;
 					enemy.x = x;
 					enemy.y = y;

@@ -72,6 +72,26 @@ public class Enemy extends DestructibleEntity{
 		out.damage = bullet.damage*Vars.multiplier;
 	}
 	
+	public void findClosestNode(){
+		Pathfind.find(this);
+		
+		int index = 0;
+		int cindex = -1;
+		float dst = Float.MAX_VALUE;
+		
+		
+		for(Tile tile : path){
+			if(Vector2.dst(tile.worldx(), tile.worldy(), x, y) < dst){
+				dst = Vector2.dst(tile.worldx(), tile.worldy(), x, y);
+				cindex = index;
+			}
+			
+			index ++;
+		}
+		
+		node = cindex;
+	}
+	
 	@Override
 	public boolean collides(SolidEntity other){
 		return (other instanceof Bullet) && !(((Bullet)other).owner instanceof Enemy);
