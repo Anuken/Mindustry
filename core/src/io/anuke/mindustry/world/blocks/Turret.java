@@ -121,7 +121,7 @@ public class Turret extends Block{
 		 out.damage = bullet.damage*Vars.multiplier;
 	}
 	
-	static class TurretEntity extends TileEntity{
+	public static class TurretEntity extends TileEntity{
 		public TileEntity target;
 		public int ammo;
 		public float rotation;

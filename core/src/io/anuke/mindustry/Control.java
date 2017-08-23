@@ -294,6 +294,10 @@ public class Control extends RendererModule{
 				log("Load time taken: " + Timers.elapsed());
 				Renderer.clearTiles();
 			}
+			
+			if(Inputs.keyDown(Keys.SPACE)){
+				Effects.shake(6, 4);
+			}
 		}
 		
 		if(GameState.is(State.menu)){
@@ -347,9 +351,13 @@ public class Control extends RendererModule{
 				smoothCamera(World.core.worldx(), World.core.worldy(), 0.4f);
 			}
 			
-			updateShake(0.5f);
+			float prex = camera.position.x, prey = camera.position.y;
+			
+			updateShake(1f);
 			float prevx = camera.position.x, prevy = camera.position.y;
 			clampCamera(-tilesize / 2f, -tilesize / 2f, World.pixsize - tilesize / 2f, World.pixsize - tilesize / 2f);
+			
+			float deltax = camera.position.x - prex, deltay = camera.position.y - prey;
 			
 			if(android){
 				player.x += camera.position.x-prevx;
@@ -373,7 +381,7 @@ public class Control extends RendererModule{
 			Renderer.renderOverlay();
 			batch.end();
 			
-			camera.position.set(lastx, lasty, 0);
+			camera.position.set(lastx - deltax, lasty - deltay, 0);
 			
 			//recorder.update();
 		}

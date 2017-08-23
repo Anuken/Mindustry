@@ -1,5 +1,8 @@
 package io.anuke.mindustry.entities;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+
 import com.badlogic.gdx.utils.ObjectMap;
 
 import io.anuke.mindustry.Vars;
@@ -29,6 +32,14 @@ public class TileEntity extends Entity{
 		return this;
 	}
 	
+	public void write(DataOutputStream stream){
+		
+	}
+	
+	public void read(TileEntity entity, DataInputStream stream){
+		
+	}
+	
 	public void onDeath(){
 		dead = true;
 		
@@ -51,7 +62,6 @@ public class TileEntity extends Entity{
 	public boolean collide(Bullet other){
 		return other.owner instanceof Enemy;
 	}
-		
 	
 	@Override
 	public void update(){

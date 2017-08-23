@@ -86,7 +86,7 @@ public class Conveyor extends Block{
 		entity.convey.add(new ItemPos(item, pos, y*0.9f));
 	}
 	
-	static class ConveyorEntity extends TileEntity{
+	public static class ConveyorEntity extends TileEntity{
 		DelayedRemovalArray<ItemPos> convey = new DelayedRemovalArray<>();
 	}
 	

@@ -14,12 +14,15 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.*;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Weapon;
 import io.anuke.mindustry.entities.enemies.*;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.mindustry.world.blocks.Conveyor.ConveyorEntity;
+import io.anuke.mindustry.world.blocks.Turret.TurretEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 
@@ -77,7 +80,7 @@ import io.anuke.ucore.entities.Entity;
  */
 public class SaveIO{
 	/**Save file version ID. Should be incremented every breaking release.*/
-	private static final int fileVersionID = 2;
+	private static final int fileVersionID = 3;
 	
 	private static FormatProvider provider = null;
 	
@@ -92,6 +95,17 @@ public class SaveIO{
 	private static final ObjectMap<Byte, Class<? extends Enemy>> idEnemies = new ObjectMap<Byte, Class<? extends Enemy>>(){{
 		for(Class<? extends Enemy> value : enemyIDs.keys())
 			put(enemyIDs.get(value), value);
+	}};
+	
+	private static final ObjectMap<Class<? extends TileEntity>, Byte> tileIDs = new ObjectMap<Class<? extends TileEntity>, Byte>(){{
+		put(TileEntity.class, (byte)0);
+		put(TurretEntity.class, (byte)1);
+		put(ConveyorEntity.class, (byte)2);
+	}};
+	
+	private static final ObjectMap<Byte, Class<? extends TileEntity>> idTiles = new ObjectMap<Byte, Class<? extends TileEntity>>(){{
+		for(Class<? extends TileEntity> value : tileIDs.keys())
+			put(tileIDs.get(value), value);
 	}};
 	
 	public static void saveToSlot(int slot){
@@ -221,6 +235,10 @@ public class SaveIO{
 							stream.writeByte(tile.rotation);
 							stream.writeInt(tile.entity.health); //health
 							stream.writeByte(tile.entity.items.size); //amount of items
+							
+							//if(strea){
+							//	stream.writeInt(tile.entity.);
+							//}
 							
 							for(Item item : tile.entity.items.keys()){
 								stream.writeByte(item.ordinal()); //item ID
