@@ -276,8 +276,6 @@ public class Control extends RendererModule{
 	public void update(){
 		
 		if(debug){
-			if(Inputs.keyUp(Keys.ESCAPE))
-				Gdx.app.exit();
 			
 			if(Inputs.keyUp(Keys.SPACE))
 				Effects.sound("shoot", World.core.worldx(), World.core.worldy());

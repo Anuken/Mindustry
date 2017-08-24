@@ -1,6 +1,10 @@
 package io.anuke.mindustry.world.blocks;
 import static io.anuke.mindustry.Vars.tilesize;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 
@@ -125,5 +129,15 @@ public class Turret extends Block{
 		public TileEntity target;
 		public int ammo;
 		public float rotation;
+		
+		@Override
+		public void write(DataOutputStream stream) throws IOException{
+			stream.writeInt(ammo);
+		}
+		
+		@Override
+		public void read(DataInputStream stream) throws IOException{
+			this.ammo = stream.readInt();
+		}
 	}
 }

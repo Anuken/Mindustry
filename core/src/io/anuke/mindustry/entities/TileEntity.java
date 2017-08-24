@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 
 import com.badlogic.gdx.utils.ObjectMap;
 
@@ -32,11 +33,11 @@ public class TileEntity extends Entity{
 		return this;
 	}
 	
-	public void write(DataOutputStream stream){
+	public void write(DataOutputStream stream) throws IOException{
 		
 	}
 	
-	public void read(TileEntity entity, DataInputStream stream){
+	public void read(DataInputStream stream) throws IOException{
 		
 	}
 	

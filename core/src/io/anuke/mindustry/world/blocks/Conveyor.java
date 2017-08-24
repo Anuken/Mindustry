@@ -2,6 +2,10 @@ package io.anuke.mindustry.world.blocks;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.DelayedRemovalArray;
 
@@ -88,6 +92,31 @@ public class Conveyor extends Block{
 	
 	public static class ConveyorEntity extends TileEntity{
 		DelayedRemovalArray<ItemPos> convey = new DelayedRemovalArray<>();
+		
+		@Override
+		public void write(DataOutputStream stream) throws IOException{
+			stream.writeInt(convey.size);
+			
+			for(ItemPos pos : convey){
+				stream.writeByte(pos.item.ordinal());
+				stream.writeByte((int)(pos.pos*255-128));
+				stream.writeByte((int)(pos.y*255-128));
+			}
+		}
+		
+		@Override
+		public void read(DataInputStream stream) throws IOException{
+			int amount = stream.readInt();
+			
+			for(int i = 0; i < amount; i ++){
+				Item item = Item.values()[stream.readByte()];
+				float pos = ((int)stream.readByte()+128)/255f;
+				float y = ((int)stream.readByte()+128)/255f;
+				
+				ItemPos out = new ItemPos(item, pos, y);
+				convey.add(out);
+			}
+		}
 	}
 	
 	static class ItemPos{
@@ -99,5 +128,6 @@ public class Conveyor extends Block{
 			this.pos = pos;
 			this.y = y;
 		}
+		
 	}
 }

@@ -9,20 +9,18 @@ import java.util.Date;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.*;
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Weapon;
 import io.anuke.mindustry.entities.enemies.*;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.mindustry.world.blocks.Conveyor.ConveyorEntity;
-import io.anuke.mindustry.world.blocks.Turret.TurretEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 
@@ -76,6 +74,7 @@ import io.anuke.ucore.entities.Entity;
  *   (item list) 
  *     Item ID (byte)
  *     Item amount (int)
+ *   Additional tile entity data (varies, check the TileEntity classes)
  * 
  */
 public class SaveIO{
@@ -95,17 +94,6 @@ public class SaveIO{
 	private static final ObjectMap<Byte, Class<? extends Enemy>> idEnemies = new ObjectMap<Byte, Class<? extends Enemy>>(){{
 		for(Class<? extends Enemy> value : enemyIDs.keys())
 			put(enemyIDs.get(value), value);
-	}};
-	
-	private static final ObjectMap<Class<? extends TileEntity>, Byte> tileIDs = new ObjectMap<Class<? extends TileEntity>, Byte>(){{
-		put(TileEntity.class, (byte)0);
-		put(TurretEntity.class, (byte)1);
-		put(ConveyorEntity.class, (byte)2);
-	}};
-	
-	private static final ObjectMap<Byte, Class<? extends TileEntity>> idTiles = new ObjectMap<Byte, Class<? extends TileEntity>>(){{
-		for(Class<? extends TileEntity> value : tileIDs.keys())
-			put(tileIDs.get(value), value);
 	}};
 	
 	public static void saveToSlot(int slot){
@@ -232,18 +220,16 @@ public class SaveIO{
 						stream.writeInt(tile.block().id); //block ID
 						
 						if(tile.entity != null){
-							stream.writeByte(tile.rotation);
+							stream.writeByte(tile.rotation); //rotation
 							stream.writeInt(tile.entity.health); //health
 							stream.writeByte(tile.entity.items.size); //amount of items
-							
-							//if(strea){
-							//	stream.writeInt(tile.entity.);
-							//}
 							
 							for(Item item : tile.entity.items.keys()){
 								stream.writeByte(item.ordinal()); //item ID
 								stream.writeInt(tile.entity.items.get(item)); //item amount
 							}
+							
+							tile.entity.write(stream);
 						}
 					}
 				}
@@ -311,6 +297,8 @@ public class SaveIO{
 			
 			int enemies = stream.readInt();
 			
+			Array<Enemy> enemiesToUpdate = new Array<>();
+			
 			for(int i = 0; i < enemies; i ++){
 				byte type = stream.readByte();
 				int lane = stream.readByte();
@@ -320,11 +308,11 @@ public class SaveIO{
 				
 				try{
 					Enemy enemy = (Enemy)ClassReflection.getConstructor(idEnemies.get(type), int.class).newInstance(lane);
-					enemy.findClosestNode();
 					enemy.health = health;
 					enemy.x = x;
 					enemy.y = y;
 					enemy.add();
+					enemiesToUpdate.add(enemy);
 				}catch (Exception e){
 					throw new RuntimeException(e);
 				}
@@ -343,6 +331,10 @@ public class SaveIO{
 			
 			World.loadMap(mapid, seed);
 			Renderer.clearTiles();
+			
+			for(Enemy enemy : enemiesToUpdate){
+				enemy.findClosestNode();
+			}
 			
 			for(int x = 0; x < World.width(); x ++){
 				for(int y = 0; y < World.height(); y ++){
@@ -376,6 +368,8 @@ public class SaveIO{
 						int itemamount = stream.readInt();
 						tile.entity.items.put(itemEnums[itemid], itemamount);
 					}
+					
+					tile.entity.read(stream);
 				}
 			}
 			
