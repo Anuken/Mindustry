@@ -90,7 +90,10 @@ public class Conveyor extends Block{
 
 	@Override
 	public boolean accept(Item item, Tile dest, Tile source){
-		return dest.<ConveyorEntity>entity().minitem > 0.05f;
+		int direction = source == null ? 0 : Math.abs(source.relativeTo(dest.x, dest.y) - dest.rotation);
+		float minitem = dest.<ConveyorEntity>entity().minitem;
+		return ((direction == 0) && minitem > 0.05f) || 
+				((direction %2 == 1) && minitem > 0.5f);
 	}
 	
 	@Override
