@@ -79,8 +79,8 @@ project(":core") {
     apply plugin: "java"
 
     dependencies {
-    	//compile fileTree(dir: '../core/lib', include: '*.jar')
-    	compile 'com.github.anuken:ucore:c93833a2b5'
+    	compile fileTree(dir: '../core/lib', include: '*.jar')
+    	//compile 'com.github.anuken:ucore:1e7163626f'
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-ai:1.8.1"
     }

@@ -30,7 +30,8 @@ public class Conveyor extends Block{
 	public void draw(Tile tile){
 		ConveyorEntity entity = tile.entity();
 		
-		Draw.rect(name() + (Timers.time() % ((20 / 100f) / speed) < (10 / 100f) / speed ? "" : "move"), tile.worldx(), tile.worldy(), tile.rotation * 90);
+		Draw.rect(name() + 
+				(Timers.time() % ((20 / 100f) / speed) < (10 / 100f) / speed && accept(Item.stone, tile, null) ? "" : "move"), tile.worldx(), tile.worldy(), tile.rotation * 90);
 		
 		for(ItemPos pos : entity.convey){
 			vector.set(tilesize, 0).rotate(tile.rotation * 90);
@@ -44,19 +45,39 @@ public class Conveyor extends Block{
 	
 	@Override
 	public void update(Tile tile){
+		
 		ConveyorEntity entity = tile.entity();
+		entity.minitem = 1f;
 		
 		entity.convey.begin();
 
 		for(ItemPos pos : entity.convey){
-			pos.pos += speed * Mathf.delta();
-			pos.y = MathUtils.lerp(pos.y, 0, 0.14f * Mathf.delta());
+			boolean canmove = true;
+			
+			for(int i = 0; i < entity.convey.size; i ++){
+				ItemPos other = entity.convey.get(i);
+				
+				if(other.pos > pos.pos && other.pos-pos.pos < 0.14){
+					canmove = false;
+					break;
+				}
+			}
+			
+			if(canmove){
+				pos.pos += speed * Mathf.delta();
+				pos.y = MathUtils.lerp(pos.y, 0, 0.14f * Mathf.delta());
+			}else{
+				pos.y = MathUtils.lerp(pos.y, pos.seed/128f/3f, 0.1f * Mathf.delta());
+			}
 			
 			if(pos.pos >= 1f && offloadDir(tile, pos.item)){
 				entity.convey.removeValue(pos, true);
 				continue;
 			}
 			pos.pos = Mathf.clamp(pos.pos);
+			
+			if(pos.pos < entity.minitem)
+				entity.minitem = pos.pos;
 		}
 
 		entity.convey.end();
@@ -69,7 +90,7 @@ public class Conveyor extends Block{
 
 	@Override
 	public boolean accept(Item item, Tile dest, Tile source){
-		return true;
+		return dest.<ConveyorEntity>entity().minitem > 0.05f;
 	}
 	
 	@Override
@@ -83,7 +104,7 @@ public class Conveyor extends Block{
 		int ang = ((source.relativeTo(tile.x, tile.y) - tile.rotation));
 		
 
-		float pos = ch == 0 ? 0 : ch%2 == 1 ? 0.5f : 1f;
+		float pos = ch == 0 ? 0 : ch % 2 == 1 ? 0.5f : 1f;
 		float y = (ang == -1 || ang == 3) ? 1 : (ang == 1 || ang == -3) ? -1 : 0;
 		
 		ConveyorEntity entity = tile.entity();
@@ -92,6 +113,7 @@ public class Conveyor extends Block{
 	
 	public static class ConveyorEntity extends TileEntity{
 		DelayedRemovalArray<ItemPos> convey = new DelayedRemovalArray<>();
+		float minitem = 1;
 		
 		@Override
 		public void write(DataOutputStream stream) throws IOException{
@@ -120,13 +142,15 @@ public class Conveyor extends Block{
 	}
 	
 	static class ItemPos{
-		public Item item;
-		public float pos, y;
+		Item item;
+		float pos, y;
+		byte seed;
 		
 		public ItemPos(Item item, float pos, float y){
 			this.item = item;
 			this.pos = pos;
 			this.y = y;
+			seed = (byte)MathUtils.random(255);
 		}
 		
 	}

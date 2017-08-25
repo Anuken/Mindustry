@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks;
 
 import io.anuke.mindustry.Inventory;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -11,7 +12,7 @@ public class ProductionBlocks{
 	
 	core = new Block("core"){
 		{
-			health = 300;
+			health = Vars.debug ? 999999999 : 300;
 			solid = true;
 			update = true;
 		}

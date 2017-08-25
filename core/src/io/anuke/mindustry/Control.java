@@ -21,6 +21,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.graphics.Atlas;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.util.Mathf;
@@ -40,8 +41,6 @@ public class Control extends RendererModule{
 	int enemies = 0;
 	
 	float respawntime;
-	
-	//GifRecorder recorder = new GifRecorder(batch);
 	
 	public Control(){
 		cameraScale = baseCameraScale;
@@ -293,6 +292,13 @@ public class Control extends RendererModule{
 				Renderer.clearTiles();
 			}
 			
+			if(Inputs.keyUp(Keys.C)){
+				for(Entity entity : Entities.all()){
+					if(entity instanceof Enemy)
+						entity.remove();
+				}
+			}
+			
 			if(Inputs.keyDown(Keys.SPACE)){
 				Effects.shake(6, 4);
 			}
@@ -351,7 +357,7 @@ public class Control extends RendererModule{
 			
 			float prex = camera.position.x, prey = camera.position.y;
 			
-			updateShake(1f);
+			updateShake(0.75f);
 			float prevx = camera.position.x, prevy = camera.position.y;
 			clampCamera(-tilesize / 2f, -tilesize / 2f, World.pixsize - tilesize / 2f, World.pixsize - tilesize / 2f);
 			
@@ -381,7 +387,7 @@ public class Control extends RendererModule{
 			
 			camera.position.set(lastx - deltax, lasty - deltay, 0);
 			
-			//recorder.update();
+			record();
 		}
 		
 		if(!GameState.is(State.paused)){

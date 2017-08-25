@@ -207,21 +207,27 @@ public class Renderer{
 	}
 	
 	public static void drawHealth(float x, float y, float health, float maxhealth){
+		drawBar(Color.RED, x, y, health/maxhealth);
+	}
+	
+	public static void drawBar(Color color, float x, float y, float fraction){
 		float len = 3;
 		float offset = 7;
 		
-		float fraction = Mathf.clamp((float) health / maxhealth);
-		float w = (len * 2 * fraction);
+		float w = (int)(len * 2 * fraction) + 0.5f;
+		
+		x -= 0.5f;
+		y += 0.5f;
 		
 		Draw.thickness(3f);
-		Draw.color(Color.GRAY);
-		Draw.line(x - len + 1, y - offset, x + len + 1, y - offset);
+		Draw.color(Color.SLATE);
+		Draw.line(x - len + 1, y - offset, x + len + 1.5f, y - offset);
 		Draw.thickness(1f);
 		Draw.color(Color.BLACK);
-		Draw.line(x - len + 1, y - offset, x + len, y - offset);
-		Draw.color(Color.RED);
+		Draw.line(x - len + 1, y - offset, x + len + 0.5f, y - offset);
+		Draw.color(color);
 		if(w >= 1)
-		Draw.line(x - len + 1, y - offset, x - len + w, y - offset);
+			Draw.line(x - len + 1, y - offset, x - len + w, y - offset);
 		Draw.reset();
 	}
 }

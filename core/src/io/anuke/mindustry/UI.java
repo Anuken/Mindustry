@@ -451,6 +451,15 @@ public class UI extends SceneModule{
 			get().setVisible(nplay);
 		}}.end();
 		
+		if(debug){
+			new table(){{
+				atop();
+				new table("button"){{
+					new label("[red]DEBUG MODE").scale(1);
+				}}.end();
+			}}.end();
+		}
+		
 		new table(){{
 			//atop();
 			new table(){{

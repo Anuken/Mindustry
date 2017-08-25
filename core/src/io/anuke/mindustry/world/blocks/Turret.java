@@ -1,6 +1,4 @@
 package io.anuke.mindustry.world.blocks;
-import static io.anuke.mindustry.Vars.tilesize;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -8,6 +6,7 @@ import java.io.IOException;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 
+import io.anuke.mindustry.Renderer;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
@@ -20,6 +19,7 @@ import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timers;
 
 public class Turret extends Block{
@@ -28,6 +28,7 @@ public class Turret extends Block{
 	protected String shootsound = "shoot";
 	protected BulletType bullet;
 	protected Item ammo;
+	protected int maxammo = 400;
 
 	public Turret(String name) {
 		super(name);
@@ -51,29 +52,38 @@ public class Turret extends Block{
 		Draw.color("green");
 		Draw.dashcircle(tile.worldx(), tile.worldy(), range);
 		Draw.reset();
+		
+		TurretEntity entity = tile.entity();
+		
+		float fract = (float)entity.ammo/maxammo;
+		if(fract > 0)
+			fract = Mathf.clamp(fract, 0.24f, 1f);
+		
+		Renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 13, fract);
 	}
 	
 	@Override
 	public void drawOverlay(Tile tile){
+		/*
 		TurretEntity entity = tile.entity();
 		
 		if(entity.ammo <= 0 && ammo != null){
 			Draw.tcolor(Color.SCARLET);
 			Draw.tscl(1 / 8f);
-			Draw.text("No ammo!", tile.worldx(), tile.worldy() + tilesize);
-
+			//Draw.text("No ammo!", tile.worldx(), tile.worldy() + tilesize);
 		}else if(ammo != null){
 			Draw.tscl(1 / 8f);
 			Draw.tcolor(Color.GREEN);
-			Draw.text("Ammo: " + entity.ammo, tile.worldx(), tile.worldy() - tilesize);
+			//Draw.text("Ammo: " + entity.ammo, tile.worldx(), tile.worldy() - tilesize);
 		}
 		
 		Draw.tscl(Vars.fontscale);
+		*/
 	}
 	
 	@Override
 	public boolean accept(Item item, Tile dest, Tile source){
-		return item == ammo;
+		return item == ammo && dest.<TurretEntity>entity().ammo < maxammo;
 	}
 
 	@Override
@@ -96,7 +106,9 @@ public class Turret extends Block{
 			});
 			
 			if(enemy != null){
-				entity.rotation = MathUtils.lerpAngleDeg(entity.rotation, Angles.predictAngle(tile.worldx(), tile.worldy(), enemy.x, enemy.y, enemy.xvelocity, enemy.yvelocity, bullet.speed - 0.1f), 0.2f);
+				entity.rotation = MathUtils.lerpAngleDeg(entity.rotation, 
+						Angles.predictAngle(tile.worldx(), tile.worldy(), enemy.x, enemy.y, enemy.xvelocity, enemy.yvelocity, bullet.speed - 0.1f), 
+						0.2f*Mathf.delta());
 				float reload = Vars.multiplier*this.reload;
 				if(Timers.get(tile, reload)){
 					Effects.sound(shootsound, entity);

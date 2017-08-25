@@ -6,6 +6,8 @@ import io.anuke.mindustry.World;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.graphics.Hue;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timers;
 
 public class RepairTurret extends Turret{
@@ -21,9 +23,10 @@ public class RepairTurret extends Turret{
 		entity.target = World.findTileTarget(tile.worldx(), tile.worldy(), tile, range, true);
 
 		if(entity.target != null){
-			entity.rotation = entity.angleTo(entity.target);
+			float target = entity.angleTo(entity.target);
+			entity.rotation = Mathf.slerp(entity.rotation, target, 0.2f*Mathf.delta());
 
-			if(Timers.get(tile, reload)){
+			if(Timers.get(tile, reload) && Angles.angleDist(target, entity.rotation) < 12){
 				entity.target.health++;
 			}
 		}
