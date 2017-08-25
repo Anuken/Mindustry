@@ -11,6 +11,7 @@ import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.SaveIO.FormatProvider;
 
 public class DesktopLauncher {
+	
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setTitle("Mindustry");
@@ -25,6 +26,8 @@ public class DesktopLauncher {
 				return format.format(date);
 			}
 		});
+		
+		Mindustry.args = arg;
 		
 		new Lwjgl3Application(new Mindustry(), config);
 	}

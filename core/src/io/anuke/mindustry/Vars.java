@@ -7,6 +7,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class Vars{
+	
 	//shorthand for whether or not this is running on android
 	public static final boolean android = (Gdx.app.getType() == ApplicationType.Android);
 	//how far away from the player blocks can be placed
@@ -24,7 +25,7 @@ public class Vars{
 	//how much the zoom changes every zoom button press
 	public static final int zoomScale = Math.round(Unit.dp.inPixels(1));
 	//if true, player speed will be increased, massive amounts of resources will be given on start, and other debug options will be available
-	public static boolean debug = true;
+	public static boolean debug = false;
 	//number of save slots-- increasing may lead to layout issues
 	public static final int saveSlots = 4;
 	

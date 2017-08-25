@@ -43,6 +43,12 @@ public class Control extends RendererModule{
 	float respawntime;
 	
 	public Control(){
+		String[] args = Mindustry.args;
+		
+		if(args.length > 0 && args[0].equals("-debug")){
+			Vars.debug = true;
+		}
+		
 		cameraScale = baseCameraScale;
 		pixelate();
 		

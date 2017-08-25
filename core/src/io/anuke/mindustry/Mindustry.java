@@ -3,6 +3,7 @@ package io.anuke.mindustry;
 import io.anuke.ucore.modules.Core;
 
 public class Mindustry extends Core {
+	public static String[] args = {};
 	
 	@Override
 	public void init(){
