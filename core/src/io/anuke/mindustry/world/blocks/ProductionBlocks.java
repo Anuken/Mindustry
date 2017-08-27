@@ -9,6 +9,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.util.Timers;
 
 public class ProductionBlocks{
@@ -145,5 +146,34 @@ public class ProductionBlocks{
 		result = Item.coal;
 	}},
 	
-	end = null;
+	titaniumdrill = new Drill("titaniumdrill"){{
+		resource = Blocks.titanium;
+		result = Item.titanium;
+	}},
+	
+	omnidrill = new Drill("omnidrill"){
+		{
+			time = 4;
+		}
+		
+		@Override
+		public void update(Tile tile){
+
+			if(tile.floor().drops != null && Timers.get(tile, 60 * time)){
+				offloadNear(tile, tile.floor().drops.item);
+				Effects.effect("sparkbig", tile.worldx(), tile.worldy());
+			}
+
+			if(Timers.get(tile.hashCode() + "dump", 30)){
+				tryDump(tile);
+			}
+		}
+		
+		@Override
+		public String description(){
+			return "Mines 1 of any resource every "+time+" seconds.";
+		}
+	}
+	
+	;
 }

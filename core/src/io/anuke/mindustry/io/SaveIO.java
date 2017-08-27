@@ -79,7 +79,7 @@ import io.anuke.ucore.entities.Entity;
  */
 public class SaveIO{
 	/**Save file version ID. Should be incremented every breaking release.*/
-	private static final int fileVersionID = 3;
+	private static final int fileVersionID = 4;
 	
 	private static FormatProvider provider = null;
 	

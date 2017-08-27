@@ -24,9 +24,9 @@ public class RepairTurret extends Turret{
 
 		if(entity.target != null){
 			float target = entity.angleTo(entity.target);
-			entity.rotation = Mathf.slerp(entity.rotation, target, 0.2f*Mathf.delta());
+			entity.rotation = Mathf.slerp(entity.rotation, target, 0.16f*Mathf.delta());
 
-			if(Timers.get(tile, reload) && Angles.angleDist(target, entity.rotation) < 12){
+			if(Timers.get(tile, reload) && Angles.angleDist(target, entity.rotation) < 10){
 				entity.target.health++;
 			}
 		}

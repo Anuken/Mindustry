@@ -52,12 +52,5 @@ public class Drill extends Block{
 		
 		Draw.tscl(Vars.fontscale);
 	}
-	
-	//@Override
-	public String error(Tile tile){
-		if(tile.floor() != resource)
-			return "Not on iron ore block!";
-		return null;
-	}
 
 }

@@ -15,7 +15,7 @@ public class Vars{
 	//respawn time in frames
 	public static final float respawnduration = 60*4;
 	//time between waves in frames
-	public static final float wavespace = 20*60*(android ? 2 : 1);
+	public static final float wavespace = 30*60*(android ? 2 : 1);
 	//how far away from spawn points the player can't place blocks
 	public static final float enemyspawnspace = 65;
 	//scale of the font

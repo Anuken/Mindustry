@@ -9,6 +9,7 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.graphics.Hue;
 
 public class EffectLoader{
+	static Color lightRed = Hue.mix(Color.WHITE, Color.FIREBRICK, 0.1f);
 	
 	public static void create(){
 		
@@ -22,6 +23,13 @@ public class EffectLoader{
 			Draw.thickness(1f);
 			Draw.color(Hue.mix(Color.WHITE, Color.GRAY, e.ifract()));
 			Draw.spikes(e.x, e.y, e.ifract() * 5f, 2, 8);
+			Draw.reset();
+		});
+		
+		Effects.create("sparkbig", 11, e -> {
+			Draw.thickness(1f);
+			Draw.color(Hue.mix(lightRed, Color.GRAY, e.ifract()));
+			Draw.spikes(e.x, e.y, e.ifract() * 5f, 2.3f, 8);
 			Draw.reset();
 		});
 		

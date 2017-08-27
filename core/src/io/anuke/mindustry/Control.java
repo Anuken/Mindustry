@@ -131,7 +131,8 @@ public class Control extends RendererModule{
 		
 		control.camera.position.set(player.x, player.y, 0);
 		
-		wavetime = waveSpacing();
+		//multiplying by 2 so you start with more time in the beginning
+		wavetime = waveSpacing()*2;
 		
 		if(showedTutorial || !Settings.getBool("tutorial")){
 			GameState.set(State.playing);
@@ -393,7 +394,10 @@ public class Control extends RendererModule{
 			
 			camera.position.set(lastx - deltax, lasty - deltay, 0);
 			
-			record();
+			if(Vars.debug){
+				record();
+			}
+			
 		}
 		
 		if(!GameState.is(State.paused)){

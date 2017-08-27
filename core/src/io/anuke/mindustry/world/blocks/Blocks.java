@@ -23,13 +23,23 @@ public class Blocks{
 		solid = true;
 	}},
 	
-	stone = new Block("stone"),
+	stone = new Block("stone"){{
+		drops = new ItemStack(Item.stone, 1);
+	}},
+	
+	iron = new Block("iron"){{
+		drops = new ItemStack(Item.iron, 1);
+	}},
+	
+	coal = new Block("coal"){{
+		drops = new ItemStack(Item.coal, 1);
+	}},
+	
+	titanium = new Block("titanium"){{
+		drops = new ItemStack(Item.titanium, 1);
+	}},
 	
 	dirt = new Block("dirt"),
-	
-	iron = new Block("iron"),
-	
-	coal = new Block("coal"),
 	
 	grass = new Block("grass"),
 	
