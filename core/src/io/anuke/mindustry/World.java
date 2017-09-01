@@ -88,6 +88,26 @@ public class World{
 		}
 	}
 	
+	private static void createTiles(){
+		for(int x = 0; x < tiles.length; x ++){
+			for(int y = 0; y < tiles[0].length; y ++){
+				if(tiles[x][y] == null){
+					tiles[x][y] = new Tile(x, y, Blocks.stone);
+				}
+			}
+		}
+	}
+	
+	private static void clearTileEntities(){
+		for(int x = 0; x < tiles.length; x ++){
+			for(int y = 0; y < tiles[0].length; y ++){
+				if(tiles[x][y] != null && tiles[x][y].entity != null){
+					tiles[x][y].entity.remove();
+				}
+			}
+		}
+	}
+	
 	public static void loadMap(int id){
 		loadMap(id, MathUtils.random(0, 99999));
 	}
@@ -99,13 +119,21 @@ public class World{
 		int size = mapPixmaps[id].getWidth();
 		worldsize = size;
 		pixsize = worldsize*tilesize;
-		tiles = new Tile[worldsize][worldsize];
 		currentMap = id;
 		
-		for(int x = 0; x < worldsize; x ++){
-			for(int y = 0; y < worldsize; y ++){
-				tiles[x][y] = new Tile(x, y, Blocks.stone);
+		if(tiles != null){
+			clearTileEntities();
+			
+			if(tiles.length != worldsize || tiles[0].length != worldsize){
+				tiles = new Tile[worldsize][worldsize];
 			}
+			
+			createTiles();
+		}else{
+		
+			tiles = new Tile[worldsize][worldsize];
+			
+			createTiles();
 		}
 		
 		Entities.resizeTree(0, 0, pixsize, pixsize);
