@@ -35,7 +35,7 @@ public class UpgradeDialog extends Dialog{
 		
 		getButtonTable().addButton("Ok", ()->{
 			hide();
-		});
+		}).size(84, 48).pad(4);
 		
 		Table weptab = new Table();
 		weptab.background("button");

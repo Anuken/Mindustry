@@ -33,6 +33,11 @@ public class RepairTurret extends Turret{
 	}
 	
 	@Override
+	public void drawPixelOverlay(Tile tile){
+		
+	}
+	
+	@Override
 	public void drawOver(Tile tile){
 		TurretEntity entity = tile.entity();
 		

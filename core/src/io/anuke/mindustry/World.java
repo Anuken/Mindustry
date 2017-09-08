@@ -197,6 +197,11 @@ public class World{
 		}
 		Tile tile = tile(x, y);
 		
+		if(tile.block() != type && ((tile.block().name.contains("wall") && type.name.contains("wall")) ||
+				(tile.block().name.contains("conveyor") && type.name.contains("conveyor")))){
+			return true;
+		}
+		
 		return tile != null && tile.block() == Blocks.air;
 	}
 	

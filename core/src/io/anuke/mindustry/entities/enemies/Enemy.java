@@ -41,6 +41,10 @@ public class Enemy extends DestructibleEntity{
 		heal();
 	}
 	
+	public float drawSize(){
+		return 12;
+	}
+	
 	void move(){
 		Vector2 vec  = Pathfind.find(this);
 		vec.sub(x, y).setLength(speed);

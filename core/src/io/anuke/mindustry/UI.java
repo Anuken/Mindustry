@@ -337,17 +337,30 @@ public class UI extends SceneModule{
 		new table(){{
 			atop();
 			aleft();
-			itemtable = new table().top().left().get();
-			itemtable.background("button");
+			
+			defaults().size(60).units(Unit.dp);
+			
+			new button("M", ()->{
+				
+			});
+			
+			new button("P", ()->{
+				
+			});
+
+			new button("S", ()->{
+	
+			});
+			
+			row();
+			
+			itemtable = new table("button").end().top().left().colspan(3).fillX().size(-1).get();
 
 			get().setVisible(play);
 			
-			Label fps = new Label("");
-			fps.update(()->{
-				fps.setText(Settings.getBool("fps") ? (Gdx.graphics.getFramesPerSecond() + " FPS") : "");
-			});
+			Label fps = new Label(()->(Settings.getBool("fps") ? (Gdx.graphics.getFramesPerSecond() + " FPS") : ""));
 			row();
-			add(fps);
+			add(fps).colspan(3).size(-1);
 			
 		}}.end();
 
@@ -599,13 +612,14 @@ public class UI extends SceneModule{
 
 	public void updateItems(){
 		itemtable.clear();
+		itemtable.left();
 
 		for(Item stack : Inventory.getItemTypes()){
 			Image image = new Image(Draw.region("icon-" + stack.name()));
 			Label label = new Label("" + Inventory.getAmount(stack));
 			label.setFontScale(fontscale*2f);
 			itemtable.add(image).size(32).units(Unit.dp);
-			itemtable.add(label);
+			itemtable.add(label).left();
 			itemtable.row();
 		}
 	}

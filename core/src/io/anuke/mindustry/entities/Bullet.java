@@ -22,6 +22,10 @@ public class Bullet extends BulletEntity{
 		type.draw(this);
 	}
 	
+	public float drawSize(){
+		return 8;
+	}
+	
 	@Override
 	public void update(){
 		
