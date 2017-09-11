@@ -63,25 +63,6 @@ public class Turret extends Block{
 	}
 	
 	@Override
-	public void drawOverlay(Tile tile){
-		/*
-		TurretEntity entity = tile.entity();
-		
-		if(entity.ammo <= 0 && ammo != null){
-			Draw.tcolor(Color.SCARLET);
-			Draw.tscl(1 / 8f);
-			//Draw.text("No ammo!", tile.worldx(), tile.worldy() + tilesize);
-		}else if(ammo != null){
-			Draw.tscl(1 / 8f);
-			Draw.tcolor(Color.GREEN);
-			//Draw.text("Ammo: " + entity.ammo, tile.worldx(), tile.worldy() - tilesize);
-		}
-		
-		Draw.tscl(Vars.fontscale);
-		*/
-	}
-	
-	@Override
 	public boolean accept(Item item, Tile dest, Tile source){
 		return item == ammo && dest.<TurretEntity>entity().ammo < maxammo;
 	}
@@ -107,7 +88,7 @@ public class Turret extends Block{
 			
 			if(enemy != null){
 				entity.rotation = MathUtils.lerpAngleDeg(entity.rotation, 
-						Angles.predictAngle(tile.worldx(), tile.worldy(), enemy.x, enemy.y, enemy.xvelocity, enemy.yvelocity, bullet.speed - 0.1f), 
+						Angles.predictAngle(tile.worldx(), tile.worldy(), enemy.x, enemy.y, enemy.xvelocity, enemy.yvelocity, bullet.speed), 
 						0.2f*Mathf.delta());
 				float reload = Vars.multiplier*this.reload;
 				if(Timers.get(tile, reload)){

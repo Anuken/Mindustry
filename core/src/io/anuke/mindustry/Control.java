@@ -309,6 +309,10 @@ public class Control extends RendererModule{
 			if(Inputs.keyDown(Keys.SPACE)){
 				Effects.shake(6, 4);
 			}
+			
+			if(Inputs.keyDown(Keys.Y)){
+				new TestEnemy(0).set(player.x, player.y).add();
+			}
 		}
 		
 		if(GameState.is(State.menu)){

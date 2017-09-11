@@ -31,6 +31,7 @@ public class LevelDialog extends Dialog{
 			hide();
 			Vars.ui.showLoading();
 			Timers.run(16, ()->{
+				Vars.control.reset();
 				World.loadMap(selectedMap);
 				Vars.control.play();
 			});

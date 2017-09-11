@@ -17,7 +17,7 @@ public class Inventory{
 		
 		if(debug){
 			items.put(Item.stone, 2000);
-			items.put(Item.iron, 1);
+			items.put(Item.iron, 2000);
 			items.put(Item.steel, 2000);
 			items.put(Item.coal, 2000);
 		}

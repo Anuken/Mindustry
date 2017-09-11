@@ -12,6 +12,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.*;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timers;
 
 public class Enemy extends DestructibleEntity{
@@ -122,11 +123,11 @@ public class Enemy extends DestructibleEntity{
 		
 		move();
 		
-		xvelocity = x - lastx;
-		yvelocity = y - lasty;
+		xvelocity = (x - lastx) / Mathf.delta();
+		yvelocity = (y - lasty) / Mathf.delta();
 		
 		if(target == null){
-			direction.add(xvelocity, yvelocity);
+			direction.add(xvelocity * Mathf.delta(), yvelocity * Mathf.delta());
 			direction.limit(speed*rotatespeed);
 		}else{
 			float angle = angleTo(target);
