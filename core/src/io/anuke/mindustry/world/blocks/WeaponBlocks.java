@@ -4,8 +4,8 @@ import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Timers;
 
 public class WeaponBlocks{
 	public static Block

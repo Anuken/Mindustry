@@ -10,7 +10,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.util.Timers;
+import io.anuke.ucore.core.Timers;
 
 public class Drill extends Block{
 	protected Block resource;

@@ -19,8 +19,7 @@ import io.anuke.mindustry.entities.Weapon;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.ucore.core.Draw;
-import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.function.VisibilityProvider;
 import io.anuke.ucore.graphics.Hue;
@@ -33,7 +32,6 @@ import io.anuke.ucore.scene.builders.*;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.*;
-import io.anuke.ucore.util.Timers;
 
 public class UI extends SceneModule{
 	Table itemtable, weapontable, tools, loadingtable;
@@ -397,14 +395,14 @@ public class UI extends SceneModule{
 			int min = base-zoomScale*2;
 			int max = base+zoomScale;
 			new button("+", ()->{
-				if(control.cameraScale < max){
-					control.setCameraScale(control.cameraScale+zoomScale);
+				if(Core.cameraScale < max){
+					control.setCameraScale(Core.cameraScale+zoomScale);
 				}
 			}).size(Unit.dp.inPixels(40));
 			
 			new button("-", ()->{
-				if(control.cameraScale > min){
-					control.setCameraScale(control.cameraScale-zoomScale);
+				if(Core.cameraScale > min){
+					control.setCameraScale(Core.cameraScale-zoomScale);
 				}
 			}).size(Unit.dp.inPixels(40));
 			
@@ -522,7 +520,7 @@ public class UI extends SceneModule{
 		});
 		
 		tools.update(()->{
-			tools.setPosition(AndroidInput.mousex, Gdx.graphics.getHeight()-AndroidInput.mousey-15*control.cameraScale, Align.top);
+			tools.setPosition(AndroidInput.mousex, Gdx.graphics.getHeight()-AndroidInput.mousey-15*Core.cameraScale, Align.top);
 		});
 
 		updateItems();

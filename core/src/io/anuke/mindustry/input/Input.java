@@ -12,9 +12,7 @@ import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.core.Sounds;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 
@@ -84,7 +82,7 @@ public class Input{
 		if(Inputs.buttonDown(Buttons.RIGHT) && World.cursorNear() && cursor.breakable()
 				&& cursor.block() != ProductionBlocks.core){
 			Tile tile = cursor;
-			player.breaktime += Mathf.delta();
+			player.breaktime += Timers.delta();
 			if(player.breaktime >= tile.block().breaktime){
 				if(tile.block().drops != null){
 					Inventory.addItem(tile.block().drops.item, tile.block().drops.amount);

@@ -1,8 +1,8 @@
 package io.anuke.mindustry;
 
-import io.anuke.ucore.modules.Core;
+import io.anuke.ucore.modules.ModuleCore;
 
-public class Mindustry extends Core {
+public class Mindustry extends ModuleCore {
 	public static String[] args = {};
 	
 	@Override

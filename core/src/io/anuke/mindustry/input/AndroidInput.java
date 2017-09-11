@@ -13,9 +13,7 @@ import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Sounds;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 
@@ -51,7 +49,7 @@ public class AndroidInput extends InputAdapter{
 	
 	public static void breakBlock(){
 		Tile tile = selected();
-		player.breaktime += Mathf.delta();
+		player.breaktime += Timers.delta();
 		if(player.breaktime >= tile.block().breaktime){
 			if(tile.block().drops != null){
 				Inventory.addItem(tile.block().drops.item, tile.block().drops.amount);
@@ -101,7 +99,7 @@ public class AndroidInput extends InputAdapter{
 		if(Gdx.input.isTouched(0) 
 				&& Mathf.near2d(lmousex, lmousey, Gdx.input.getX(0), Gdx.input.getY(0), 50) 
 				&& !ui.hasMouse() && player.recipe == null){
-			warmup += Mathf.delta();
+			warmup += Timers.delta();
 			
 			mousex = Gdx.input.getX(0);
 			mousey = Gdx.input.getY(0);
@@ -111,7 +109,7 @@ public class AndroidInput extends InputAdapter{
 			if(sel == null) return;
 			
 			if(warmup > warmupDelay && sel.block() != ProductionBlocks.core && sel.breakable()){
-				player.breaktime += Mathf.delta();
+				player.breaktime += Timers.delta();
 				
 				if(player.breaktime > selected().block().breaktime){
 					breakBlock();

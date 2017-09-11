@@ -17,10 +17,10 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Timers;
 
 public class Turret extends Block{
 	protected float range = 50f;
@@ -89,7 +89,7 @@ public class Turret extends Block{
 			if(enemy != null){
 				entity.rotation = MathUtils.lerpAngleDeg(entity.rotation, 
 						Angles.predictAngle(tile.worldx(), tile.worldy(), enemy.x, enemy.y, enemy.xvelocity, enemy.yvelocity, bullet.speed), 
-						0.2f*Mathf.delta());
+						0.2f*Timers.delta());
 				float reload = Vars.multiplier*this.reload;
 				if(Timers.get(tile, reload)){
 					Effects.sound(shootsound, entity);

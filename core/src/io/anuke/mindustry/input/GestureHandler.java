@@ -9,9 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.World;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Sounds;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.core.*;
 
 public class GestureHandler extends GestureAdapter{
 	Vector2 pinch1 = new Vector2(-1, -1), pinch2 = pinch1.cpy();
@@ -21,7 +19,7 @@ public class GestureHandler extends GestureAdapter{
 	@Override
 	public boolean longPress(float x, float y){
 		Tile tile = World.cursorTile();
-		player.breaktime += Mathf.delta();
+		player.breaktime += Timers.delta();
 		if(player.breaktime >= tile.block().breaktime){
 			Effects.effect("break", tile.worldx(), tile.worldy());
 			Effects.shake(3f, 1f);
@@ -35,8 +33,8 @@ public class GestureHandler extends GestureAdapter{
 	@Override
 	public boolean pan(float x, float y, float deltaX, float deltaY){
 		if(player.recipe == null){
-			player.x -= deltaX*control.camera.zoom/control.cameraScale;
-			player.y += deltaY*control.camera.zoom/control.cameraScale;
+			player.x -= deltaX*control.camera.zoom/Core.cameraScale;
+			player.y += deltaY*control.camera.zoom/Core.cameraScale;
 		}else{
 			AndroidInput.mousex += deltaX;
 			AndroidInput.mousey += deltaY;
@@ -57,8 +55,8 @@ public class GestureHandler extends GestureAdapter{
 		
 		Vector2 vec = (vector.set(pointer1).add(pointer2).scl(0.5f)).sub(pinch1.add(pinch2).scl(0.5f));
 		
-		player.x -= vec.x*control.camera.zoom/control.cameraScale;
-		player.y += vec.y*control.camera.zoom/control.cameraScale;
+		player.x -= vec.x*control.camera.zoom/Core.cameraScale;
+		player.y += vec.y*control.camera.zoom/Core.cameraScale;
 		
 		pinch1.set(pointer1);
 		pinch2.set(pointer2);

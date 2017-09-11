@@ -14,8 +14,8 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Timers;
 
 public class Conveyor extends Block{
 	float speed = 0.02f;
@@ -64,10 +64,10 @@ public class Conveyor extends Block{
 			}
 			
 			if(canmove){
-				pos.pos += speed * Mathf.delta();
-				pos.y = MathUtils.lerp(pos.y, 0, 0.14f * Mathf.delta());
+				pos.pos += speed * Timers.delta();
+				pos.y = MathUtils.lerp(pos.y, 0, 0.14f * Timers.delta());
 			}else{
-				pos.y = MathUtils.lerp(pos.y, pos.seed/128f/3f, 0.1f * Mathf.delta());
+				pos.y = MathUtils.lerp(pos.y, pos.seed/128f/3f, 0.1f * Timers.delta());
 			}
 			
 			if(pos.pos >= 1f && offloadDir(tile, pos.item)){

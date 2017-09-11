@@ -5,10 +5,10 @@ import com.badlogic.gdx.math.MathUtils;
 import io.anuke.mindustry.World;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Timers;
 
 public class RepairTurret extends Turret{
 
@@ -24,7 +24,7 @@ public class RepairTurret extends Turret{
 
 		if(entity.target != null){
 			float target = entity.angleTo(entity.target);
-			entity.rotation = Mathf.slerp(entity.rotation, target, 0.16f*Mathf.delta());
+			entity.rotation = Mathf.slerp(entity.rotation, target, 0.16f*Timers.delta());
 
 			if(Timers.get(tile, reload) && Angles.angleDist(target, entity.rotation) < 10){
 				entity.target.health++;

@@ -1,7 +1,6 @@
 package io.anuke.mindustry.entities.enemies;
 
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Timers;
+import io.anuke.ucore.core.Timers;
 
 public class TestEnemy extends Enemy{
 	boolean dir = false;
@@ -17,6 +16,6 @@ public class TestEnemy extends Enemy{
 			dir = !dir;
 		}
 		
-		move(dir ? -0.3f * Mathf.delta() : 0.3f * Mathf.delta(),  0);
+		move(dir ? -0.3f * Timers.delta() : 0.3f * Timers.delta(),  0);
 	}
 }

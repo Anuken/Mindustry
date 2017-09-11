@@ -25,7 +25,6 @@ import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.graphics.Atlas;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Timers;
 
 public class Control extends RendererModule{
 	public int rangex = 10, rangey = 10;
@@ -49,7 +48,7 @@ public class Control extends RendererModule{
 			Vars.debug = true;
 		}
 		
-		cameraScale = baseCameraScale;
+		Core.cameraScale = baseCameraScale;
 		pixelate();
 		
 		Gdx.input.setCatchBackKey(true);
@@ -59,7 +58,7 @@ public class Control extends RendererModule{
 			Inputs.addProcessor(new AndroidInput());
 		}
 		
-		Draw.addSurface("shadow", cameraScale);
+		Draw.addSurface("shadow", Core.cameraScale);
 		
 		atlas = new Atlas("sprites.atlas");
 		
@@ -91,11 +90,11 @@ public class Control extends RendererModule{
 	}
 	
 	public void setCameraScale(int scale){
-		this.cameraScale = scale;
+		Core.cameraScale = scale;
 		resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		setCamera(player.x, player.y);
-		Draw.getSurface("pixel").setScale(cameraScale);
-		Draw.getSurface("shadow").setScale(cameraScale);
+		Draw.getSurface("pixel").setScale(Core.cameraScale);
+		Draw.getSurface("shadow").setScale(Core.cameraScale);
 	}
 	
 	public void reset(){
@@ -384,7 +383,7 @@ public class Control extends RendererModule{
 			if(android){
 				camera.position.set((int)camera.position.x, (int)camera.position.y, 0);
 				
-				if(Gdx.graphics.getHeight()/cameraScale % 2 == 1){
+				if(Gdx.graphics.getHeight()/Core.cameraScale % 2 == 1){
 					camera.position.add(0, -0.5f, 0);
 				}
 			}
@@ -427,8 +426,8 @@ public class Control extends RendererModule{
 	public void resize(int width, int height){
 		super.resize(width, height);
 		
-		rangex = (int) (width / tilesize / cameraScale/2)+2;
-		rangey = (int) (height / tilesize / cameraScale/2)+2;
+		rangex = (int) (width / tilesize / Core.cameraScale/2)+2;
+		rangey = (int) (height / tilesize / Core.cameraScale/2)+2;
 		
 		AndroidInput.mousex = Gdx.graphics.getWidth()/2;
 		AndroidInput.mousey = Gdx.graphics.getHeight()/2;

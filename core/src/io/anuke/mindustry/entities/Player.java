@@ -11,7 +11,6 @@ import io.anuke.mindustry.resource.Recipe;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Timers;
 
 public class Player extends DestructibleEntity{
 	public Weapon weapon;

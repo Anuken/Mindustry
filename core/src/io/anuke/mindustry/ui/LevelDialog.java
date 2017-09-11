@@ -7,9 +7,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.World;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Timers;
 
 public class LevelDialog extends Dialog{
 	Label[] scores = new Label[maps.length];
