@@ -20,7 +20,9 @@ import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.graphics.Cache;
 import io.anuke.ucore.graphics.Caches;
 import io.anuke.ucore.scene.utils.Cursors;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.GridMap;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Tmp;
 
 public class Renderer{
 	private static int chunksize = 32;
@@ -110,7 +112,7 @@ public class Renderer{
 	
 	public static void renderPixelOverlay(){
 		
-		if(player.recipe != null && (!ui.hasMouse() || android)){
+		if(player.recipe != null && Inventory.hasItems(player.recipe.requirements) && (!ui.hasMouse() || android)){
 			float x = 0;
 			float y = 0;
 			

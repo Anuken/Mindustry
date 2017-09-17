@@ -69,7 +69,7 @@ public class Turret extends Block{
 
 	@Override
 	public String description(){
-		return "[green]Ammo: "+(ammo==null ? "N/A" : ammo.name())+"\nRange: " + (int)range + "\nDamage: " + bullet.damage;
+		return "[turretinfo]Ammo: "+(ammo==null ? "N/A" : ammo.name())+"\nRange: " + (int)range + "\nDamage: " + bullet.damage;
 	}
 	
 	@Override

@@ -22,6 +22,7 @@ public class Block{
 	protected static TextureRegion temp = new TextureRegion();
 	
 	public final String name;
+	public String formalName;
 	public boolean solid, update, rotate, breakable;
 	public int health = 40;
 	public String shadow = "shadow";
@@ -38,6 +39,7 @@ public class Block{
 		blocks.add(this);
 		
 		this.name = name;
+		this.formalName = name;
 		this.solid = false;
 		this.id = lastid++;
 	}
@@ -51,7 +53,7 @@ public class Block{
 	}
 	
 	public String description(){
-		return "[no description]";
+		return null;
 	}
 	
 	public String errorMessage(Tile tile){

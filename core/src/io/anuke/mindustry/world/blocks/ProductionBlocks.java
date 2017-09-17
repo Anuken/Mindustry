@@ -40,6 +40,7 @@ public class ProductionBlocks{
 	steelconveyor = new Conveyor("steelconveyor"){{
 		update = true;
 		speed = 0.04f;
+		formalName = "steel conveyor";
 	}},
 	
 	router = new Block("router"){
@@ -131,29 +132,47 @@ public class ProductionBlocks{
 		}
 	},
 	
+	crucible = new Crafter("crucible"){
+		{
+			health = 90;
+			requirements = new Item[]{Item.titanium, Item.steel};
+			result = Item.hypanium;
+		}
+		
+		@Override
+		public String description(){
+			return "Takes in steel + titanium, outputs hypanium.";
+		}
+	},
+	
 	stonedrill = new Drill("stonedrill"){{
 		resource = Blocks.stone;
 		result = Item.stone;
+		formalName = "stone drill";
 	}},
 	
 	irondrill = new Drill("irondrill"){{
 		resource = Blocks.iron;
 		result = Item.iron;
+		formalName = "iron drill";
 	}},
 	
 	coaldrill = new Drill("coaldrill"){{
 		resource = Blocks.coal;
 		result = Item.coal;
+		formalName = "coal drill";
 	}},
 	
 	titaniumdrill = new Drill("titaniumdrill"){{
 		resource = Blocks.titanium;
 		result = Item.titanium;
+		formalName = "titanium drill";
 	}},
 	
 	omnidrill = new Drill("omnidrill"){
 		{
 			time = 4;
+			formalName = "omnidrill";
 		}
 		
 		@Override

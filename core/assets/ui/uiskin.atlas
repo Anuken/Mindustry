@@ -358,9 +358,23 @@ icon-distribution
   orig: 10, 10
   offset: 0, 0
   index: -1
-icon-production
+icon-menu
   rotate: false
   xy: 383, 2
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+icon-pause
+  rotate: false
+  xy: 395, 2
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+icon-production
+  rotate: false
+  xy: 407, 2
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
@@ -370,6 +384,13 @@ icon-rotate
   xy: 405, 15
   size: 14, 14
   orig: 14, 14
+  offset: 0, 0
+  index: -1
+icon-settings
+  rotate: false
+  xy: 419, 2
+  size: 10, 10
+  orig: 10, 10
   offset: 0, 0
   index: -1
 list-selection
@@ -556,7 +577,7 @@ slider-knob-over
   index: -1
 slider-vertical
   rotate: false
-  xy: 343, 62
+  xy: 421, 14
   size: 8, 1
   orig: 8, 1
   offset: 0, 0
@@ -571,14 +592,14 @@ slot
   index: -1
 splitpane
   rotate: false
-  xy: 343, 59
+  xy: 431, 14
   size: 8, 1
   orig: 8, 1
   offset: 0, 0
   index: -1
 splitpane-over
   rotate: false
-  xy: 343, 56
+  xy: 343, 62
   size: 8, 1
   orig: 8, 1
   offset: 0, 0
@@ -637,7 +658,7 @@ touchpad-knob
   index: -1
 tree-minus
   rotate: false
-  xy: 395, 2
+  xy: 431, 2
   size: 10, 10
   orig: 10, 10
   offset: 0, 0

@@ -508,6 +508,41 @@ stonewall
   orig: 8, 8
   offset: 0, 0
   index: -1
+titanium1
+  rotate: false
+  xy: 180, 13
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+titanium2
+  rotate: false
+  xy: 180, 3
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+titanium3
+  rotate: false
+  xy: 190, 13
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+titaniumblock
+  rotate: false
+  xy: 190, 3
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+titaniumdrill
+  rotate: false
+  xy: 200, 13
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
 turret
   rotate: false
   xy: 163, 21
@@ -517,7 +552,7 @@ turret
   index: -1
 water
   rotate: false
-  xy: 180, 13
+  xy: 200, 3
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -531,28 +566,28 @@ wateredge
   index: -1
 weapon-blaster
   rotate: false
-  xy: 180, 3
+  xy: 210, 13
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 weapon-flamethrower
   rotate: false
-  xy: 190, 13
+  xy: 210, 3
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 weapon-multigun
   rotate: false
-  xy: 190, 3
+  xy: 220, 13
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 weapon-trishot
   rotate: false
-  xy: 200, 13
+  xy: 220, 3
   size: 8, 8
   orig: 8, 8
   offset: 0, 0

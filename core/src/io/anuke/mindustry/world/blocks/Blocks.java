@@ -95,17 +95,27 @@ public class Blocks{
 		solid = true;
 		update = true;
 		health = 50;
+		formalName = "stone wall";
 	}},
 			
 	ironwall = new Block("ironwall"){{
 		solid = true;
 		update = true;
 		health = 80;
+		formalName = "iron wall";
 	}},
 	
 	steelwall = new Block("steelwall"){{
 		solid = true;
 		update = true;
-		health = 100;
+		health = 110;
+		formalName = "steel wall";
+	}},
+	
+	titaniumwall = new Block("titaniumwall"){{
+		solid = true;
+		update = true;
+		health = 140;
+		formalName = "titanium wall";
 	}};
 }

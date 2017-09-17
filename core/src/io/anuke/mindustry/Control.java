@@ -23,10 +23,10 @@ import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.graphics.Atlas;
-import io.anuke.ucore.modules.RendererModule;
+import io.anuke.ucore.modules.ControlModule;
 import io.anuke.ucore.util.Mathf;
 
-public class Control extends RendererModule{
+public class Control extends ControlModule{
 	public int rangex = 10, rangey = 10;
 	public float targetzoom = 1f;
 	

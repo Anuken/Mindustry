@@ -12,6 +12,7 @@ public class WeaponBlocks{
 	
 	turret = new Turret("turret"){
 		{
+			formalName = "turret";
 			range = 50;
 			reload = 10f;
 			bullet = BulletType.stone;
@@ -21,6 +22,7 @@ public class WeaponBlocks{
 	
 	doubleturret = new Turret("doubleturret"){
 		{
+			formalName = "double turret";
 			range = 40;
 			reload = 13f;
 			bullet = BulletType.stone;
@@ -42,6 +44,7 @@ public class WeaponBlocks{
 	
 	machineturret = new Turret("machineturret"){
 		{
+			formalName = "gattling turret";
 			range = 65;
 			reload = 7f;
 			bullet = BulletType.iron;
@@ -52,6 +55,7 @@ public class WeaponBlocks{
 	
 	shotgunturret = new Turret("shotgunturret"){
 		{
+			formalName = "splitter turret";
 			range = 50;
 			reload = 30f;
 			bullet = BulletType.iron;
@@ -73,6 +77,7 @@ public class WeaponBlocks{
 	
 	flameturret = new Turret("flameturret"){
 		{
+			formalName = "flamer turret";
 			range = 35f;
 			reload = 5f;
 			bullet = BulletType.flame;
@@ -83,6 +88,7 @@ public class WeaponBlocks{
 	
 	sniperturret = new Turret("sniperturret"){
 		{
+			formalName = "railgun turret";
 			range = 120;
 			reload = 60f;
 			bullet = BulletType.sniper;
@@ -93,6 +99,7 @@ public class WeaponBlocks{
 	
 	repairturret = new RepairTurret("repairturret"){
 		{
+			formalName = "heal turret";
 			range = 30;
 			reload = 40f;
 			health = 60;
@@ -101,6 +108,7 @@ public class WeaponBlocks{
 	
 	megarepairturret = new RepairTurret("megarepairturret"){
 		{
+			formalName = "heal turret II";
 			range = 50;
 			reload = 20f;
 			health = 90;

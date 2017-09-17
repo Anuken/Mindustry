@@ -6,13 +6,12 @@ import static io.anuke.ucore.scene.actions.Actions.*;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Timer;
-import com.badlogic.gdx.utils.Timer.Task;
 
 import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.entities.Weapon;
@@ -20,21 +19,18 @@ import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.ucore.core.*;
-import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.function.VisibilityProvider;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Textures;
 import io.anuke.ucore.modules.SceneModule;
-import io.anuke.ucore.scene.Element;
-import io.anuke.ucore.scene.Scene;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.*;
-import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.*;
+import io.anuke.ucore.util.Mathf;
 
 public class UI extends SceneModule{
-	Table itemtable, weapontable, tools, loadingtable;
+	Table itemtable, weapontable, tools, loadingtable, desctable;
 	SettingsDialog prefs;
 	KeybindDialog keys;
 	Dialog about, menu, restart, tutorial, levels, upgrades, load;
@@ -62,6 +58,10 @@ public class UI extends SceneModule{
 		
 		Textures.load("sprites/");
 		Textures.repeatWrap("conveyort", Gdx.app.getType() == ApplicationType.WebGL ? "back-web" : "back");
+		
+		Colors.put("description", Color.WHITE);
+		Colors.put("turretinfo", Color.ORANGE);
+		Colors.put("missingitems", Color.SCARLET);
 	}
 	
 	void drawBackground(){
@@ -114,7 +114,6 @@ public class UI extends SceneModule{
 
 	@Override
 	public void init(){
-		//TODO just move these dialogs to different files
 		
 		load = new LoadDialog();
 		
@@ -146,19 +145,17 @@ public class UI extends SceneModule{
 		
 		tutorial = new TutorialDialog();
 		
-		restart = new Dialog("The core was destroyed.", "dialog"){
-			public Dialog show(Scene scene){
-				super.show(scene);
-				restart.content().clearChildren();
-				if(control.isHighScore()){
-					restart.content().add("[YELLOW]New highscore!").pad(6);
-					restart.content().row();
-				}
-				restart.content().add("You lasted until wave [GREEN]" + control.getWave() + "[].").pad(6);
-				restart.pack();
-				return this;
+		restart = new Dialog("The core was destroyed.", "dialog");
+		
+		restart.shown(()->{
+			restart.content().clearChildren();
+			if(control.isHighScore()){
+				restart.content().add("[YELLOW]New highscore!").pad(6);
+				restart.content().row();
 			}
-		};
+			restart.content().add("You lasted until wave [GREEN]" + control.getWave() + "[].").pad(6);
+			restart.pack();
+		});
 		
 		restart.getButtonTable().addButton("Back to menu", ()->{
 			restart.hide();
@@ -179,10 +176,16 @@ public class UI extends SceneModule{
 		new table(){{
 			abottom();
 			aright();
+			
+			new table("button"){{
+				visible(()->player.recipe != null);
+				desctable = get();
+				fillX();
+			}}.end().uniformX();
+			
+			row();
 
-			new table(){{
-
-				get().background("button");
+			new table("button"){{
 				
 				int rows = 3;
 				int maxcol = 0;
@@ -202,12 +205,18 @@ public class UI extends SceneModule{
 					recipes.clear();
 					Recipe.getBy(sec, recipes);
 					
+					Table table = new Table();
+					
 					ImageButton button = new ImageButton("icon-"+sec.name(), "toggle");
+					button.clicked(()->{
+						if(!table.isVisible() && player.recipe != null){
+							player.recipe = null;
+						}
+					});
 					add(button).fill().height(54).padTop(-10).units(Unit.dp);
 					button.getImageCell().size(40).padBottom(4).units(Unit.dp);
 					group.add(button);
 					
-					Table table = new Table();
 					table.pad(4);
 					
 					int i = 0;
@@ -216,8 +225,10 @@ public class UI extends SceneModule{
 						ImageButton image = new ImageButton(Draw.region(r.result.name()), "select");
 						
 						image.clicked(()->{
-							if(Inventory.hasItems(r.requirements))
+							if(Inventory.hasItems(r.requirements)){
 								player.recipe = r;
+								updateRecipe();
+							}
 						});
 						
 						table.add(image).size(size+8).pad(4).units(Unit.dp);
@@ -236,67 +247,6 @@ public class UI extends SceneModule{
 							table.row();
 						
 						i++;
-						
-						Table tiptable = new Table();
-						
-						Listenable run = ()->{
-							tiptable.clearChildren();
-							
-							String description = r.result.description();
-							
-							tiptable.background("button");
-							tiptable.add("[PURPLE]" + r.result.name(), 0.75f*fontscale*2f).left().padBottom(2f).units(Unit.dp);
-							
-							ItemStack[] req = r.requirements;
-							for(ItemStack s : req){
-								tiptable.row();
-								int amount = Math.min(Inventory.getAmount(s.item), s.amount);
-								tiptable.add(
-										(amount >= s.amount ? "[YELLOW]" : "[RED]")
-								+s.item + ": " + amount + " / " +s.amount, fontscale).left();
-							}
-							
-							tiptable.row();
-							tiptable.add().size(10).units(Unit.px);
-							tiptable.row();
-							tiptable.add("[scarlet]Health: " + r.result.health).left();
-							tiptable.row();
-							tiptable.add().size(6).units(Unit.px);
-							tiptable.row();
-							tiptable.add("[ORANGE]" + description).left();
-							tiptable.pad(Unit.dp.inPixels(10f));
-						};
-						
-						run.listen();
-						
-						Tooltip tip = new Tooltip(tiptable, run){
-							public void enter (InputEvent event, float x, float y, int pointer, Element fromActor) {
-								if(tooltip != this)
-									hideTooltip();
-								Element actor = event.getListenerActor();
-								if (fromActor != null && fromActor.isDescendantOf(actor)) return;
-								setContainerPosition(actor, x, y);
-								manager.enter(this);
-								run.listen();
-								
-								tooltip = this;
-								
-								if(android){
-									
-									Timer.schedule(new Task(){
-										@Override
-										public void run(){
-											hide();
-										}
-									}, 1.5f);
-									
-								}
-							}
-						};
-						
-						tip.setInstant(true);
-
-						image.addListener(tip);
 					}
 					
 					//additional padding
@@ -336,18 +286,19 @@ public class UI extends SceneModule{
 			atop();
 			aleft();
 			
-			defaults().size(60).units(Unit.dp);
+			defaults().size(66).units(Unit.dp);
 			
-			new button("M", ()->{
-				
+			//TODO menu buttons!
+			new imagebutton("icon-menu", 40, ()->{
+				showMenu();
 			});
 			
-			new button("P", ()->{
-				
+			new imagebutton("icon-settings", 40, ()->{
+				prefs.show();
 			});
 
-			new button("S", ()->{
-	
+			new imagebutton("icon-pause", 40, ()->{
+				//TODO pause
 			});
 			
 			row();
@@ -370,7 +321,7 @@ public class UI extends SceneModule{
 			new table(){{
 				get().background("button");
 
-				new label(()->"[YELLOW]Wave " + control.getWave()).scale(fontscale*2f).left();
+				new label(()->"[orange]Wave " + control.getWave()).scale(fontscale*2f).left();
 
 				row();
 
@@ -385,9 +336,8 @@ public class UI extends SceneModule{
 		}}.end();
 		
 		
-		//if(Gdx.app.getType() != ApplicationType.Android){
 		//+- table
-		//TODO refactor to make this less messy
+		//TODO refactor to make this less messy?
 		new table(){{
 			aleft();
 			abottom();
@@ -408,7 +358,6 @@ public class UI extends SceneModule{
 			
 			get().setVisible(play);
 		}}.end();
-		//}
 	
 		//menu table
 		new table(){{
@@ -472,7 +421,6 @@ public class UI extends SceneModule{
 		}
 		
 		new table(){{
-			//atop();
 			new table(){{
 				get().background("button");
 				
@@ -526,6 +474,55 @@ public class UI extends SceneModule{
 		updateItems();
 
 		build.end();
+	}
+	
+	void updateRecipe(){
+		Recipe recipe = player.recipe;
+		desctable.clear();
+		
+		desctable.defaults().left();
+		desctable.left();
+		desctable.pad(12);
+		
+		desctable.add(recipe.result.formalName);
+		desctable.row();
+		desctable.addImage(Draw.region(recipe.result.name)).size(8*5).padTop(4);
+		desctable.row();
+		
+		desctable.add().pad(2);
+		
+		Table requirements = new Table();
+		
+		desctable.row();
+		
+		desctable.add(requirements);
+		desctable.left();
+		
+		for(ItemStack stack : recipe.requirements){
+			ItemStack fs = stack;
+			requirements.addImage(Draw.region("icon-"+stack.item.name())).size(8*3);
+			Label reqlabel = new Label("");
+			
+			reqlabel.update(()->{
+				int current = Inventory.getAmount(fs.item);
+				String text = Mathf.clamp(current, 0, stack.amount) + "/" + stack.amount;
+				
+				reqlabel.setColor(current < stack.amount ? Colors.get("missingitems") : Color.WHITE);
+				
+				reqlabel.setText(text);
+			});
+			
+			requirements.add(reqlabel);
+			requirements.row();
+		}
+		
+		desctable.row();
+		
+		if(recipe.result.description() != null){
+			Label label = new Label(recipe.result.description());
+			label.setWrap(true);
+			desctable.add(label).width(170).padTop(4);
+		}
 	}
 	
 	public void updateWeapons(){

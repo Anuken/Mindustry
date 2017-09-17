@@ -98,7 +98,7 @@ public class Conveyor extends Block{
 	
 	@Override
 	public String description(){
-		return "Moves Items";
+		return "Moves items.";
 	}
 
 	@Override

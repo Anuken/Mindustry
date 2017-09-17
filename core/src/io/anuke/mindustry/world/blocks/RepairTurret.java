@@ -64,6 +64,6 @@ public class RepairTurret extends Turret{
 	
 	@Override
 	public String description(){
-		return "[green]Range: " + (int)range + "\n[orange]Heals nearby tiles.";
+		return "[turretinfo]Range: " + (int)range + "\n[description]Heals nearby tiles.";
 	}
 }

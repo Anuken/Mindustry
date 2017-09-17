@@ -36,10 +36,7 @@ public class Input{
 
 		player.rotation %= 4;
 
-		if(player.recipe != null && !Inventory.hasItems(player.recipe.requirements)){
-			player.recipe = null;
-			Cursors.restoreCursor();
-		}
+		//TODO restore cursor when requirements are back
 		
 		for(int i = 0; i < 9; i ++)
 			if(Inputs.keyUp(Keys.valueOf(""+(i+1))) && i < control.getWeapons().size){
@@ -48,7 +45,8 @@ public class Input{
 			}
 		
 		if(Inputs.buttonUp(Buttons.LEFT) && player.recipe != null && 
-				World.validPlace(World.tilex(), World.tiley(), player.recipe.result) && !ui.hasMouse()){
+				World.validPlace(World.tilex(), World.tiley(), player.recipe.result) && !ui.hasMouse() &&
+				Inventory.hasItems(player.recipe.requirements)){
 			Tile tile = World.tile(World.tilex(), World.tiley());
 			
 			if(tile == null)
@@ -64,9 +62,8 @@ public class Input{
 			for(ItemStack stack : player.recipe.requirements){
 				Inventory.removeItem(stack);
 			}
-
+			
 			if(!Inventory.hasItems(player.recipe.requirements)){
-				player.recipe = null;
 				Cursors.restoreCursor();
 			}
 		}
