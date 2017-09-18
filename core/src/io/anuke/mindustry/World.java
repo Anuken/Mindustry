@@ -169,7 +169,7 @@ public class World{
 	
 	static void set(int x, int y, Block type, int rot){
 		tiles[x][y].setBlock(type);
-		tiles[x][y].rotation = rot;
+		tiles[x][y].rotation = (byte)rot;
 	}
 	
 	public static int getSeed(){
@@ -195,10 +195,10 @@ public class World{
 				return false;
 			}
 		}
+		
 		Tile tile = tile(x, y);
 		
-		if(tile.block() != type && ((tile.block().name.contains("wall") && type.name.contains("wall")) ||
-				(tile.block().name.contains("conveyor") && type.name.contains("conveyor")))){
+		if(tile.block() != type && type.canReplace(tile.block())){
 			return true;
 		}
 		

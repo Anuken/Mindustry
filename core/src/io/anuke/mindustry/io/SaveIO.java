@@ -356,7 +356,7 @@ public class SaveIO{
 				tile.setBlock(Block.getByID(blockid));
 				
 				if(hasEntity){
-					int rotation = stream.readByte();
+					byte rotation = stream.readByte();
 					int health = stream.readInt();
 					int items = stream.readByte();
 					

@@ -9,6 +9,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.*;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 
@@ -33,12 +34,20 @@ public class ProductionBlocks{
 		}
 	},
 	
+	conduit = new Conduit("conduit"){{
+		
+	}},
+	
+	pump = new Pump("pump"){{
+		
+	}},
+	
 	conveyor = new Conveyor("conveyor"){{
-		update = true;
+		
 	}},
 	
 	steelconveyor = new Conveyor("steelconveyor"){{
-		update = true;
+		health = 55;
 		speed = 0.04f;
 		formalName = "steel conveyor";
 	}},

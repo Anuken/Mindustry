@@ -53,7 +53,7 @@ public class Input{
 				return; //just in case
 			
 			tile.setBlock(player.recipe.result);
-			tile.rotation = player.rotation;
+			tile.rotation = (byte)player.rotation;
 
 			Effects.effect("place", World.roundx(), World.roundy());
 			Effects.shake(2f, 2f);

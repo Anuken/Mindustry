@@ -16,10 +16,11 @@ public class Inventory{
 		items.put(Item.stone, 40);
 		
 		if(debug){
-			items.put(Item.stone, 2000);
-			items.put(Item.iron, 2000);
-			items.put(Item.steel, 2000);
-			items.put(Item.coal, 2000);
+			items.put(Item.stone, 2000000);
+			items.put(Item.iron, 2000000);
+			items.put(Item.steel, 2000000);
+			items.put(Item.coal, 2000000);
+			items.put(Item.titanium, 2000000);
 		}
 	}
 	

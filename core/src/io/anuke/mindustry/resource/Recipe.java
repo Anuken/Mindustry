@@ -13,10 +13,14 @@ public enum Recipe{
 	stonewall(distribution, Blocks.stonewall, stack(Item.stone, 5)),
 	ironwall(distribution, Blocks.ironwall, stack(Item.iron, 5)),
 	steelwall(distribution, Blocks.steelwall, stack(Item.steel, 5)),
+	titaniumwall(distribution, Blocks.titaniumwall, stack(Item.titanium, 5)),
 	conveyor(distribution, ProductionBlocks.conveyor, stack(Item.stone, 1)),
 	fastconveyor(distribution, ProductionBlocks.steelconveyor, stack(Item.steel, 1)),
 	router(distribution, ProductionBlocks.router, stack(Item.stone, 3)),
 	junction(distribution, ProductionBlocks.junction, stack(Item.iron, 5)),
+	
+	conduit(distribution, ProductionBlocks.conduit, stack(Item.steel, 1)),
+	pump(distribution, ProductionBlocks.pump, stack(Item.steel, 20)),
 	
 	turret(defense, WeaponBlocks.turret, stack(Item.stone, 6)),
 	dturret(defense, WeaponBlocks.doubleturret, stack(Item.stone, 12)),
@@ -24,14 +28,19 @@ public enum Recipe{
 	shotgunturret(defense, WeaponBlocks.shotgunturret, stack(Item.iron, 18), stack(Item.stone, 20)),
 	flameturret(defense, WeaponBlocks.flameturret, stack(Item.iron, 25), stack(Item.steel, 18)),
 	sniperturret(defense, WeaponBlocks.sniperturret, stack(Item.iron, 30), stack(Item.steel, 20)),
+	laserturret(defense, WeaponBlocks.laserturret, stack(Item.steel, 20), stack(Item.titanium, 20)),
+	mortarturret(defense, WeaponBlocks.mortarturret, stack(Item.steel, 25), stack(Item.titanium, 25)),
 	
-	healturret(defense, WeaponBlocks.repairturret, stack(Item.iron, 40)),
+	healturret(defense, WeaponBlocks.repairturret, stack(Item.iron, 45)),
 	megahealturret(defense, WeaponBlocks.megarepairturret, stack(Item.iron, 30), stack(Item.steel, 40)),
 	
 	drill(production, ProductionBlocks.stonedrill, stack(Item.stone, 6)),
 	irondrill(production, ProductionBlocks.irondrill, stack(Item.stone, 40)),
 	coaldrill(production, ProductionBlocks.coaldrill, stack(Item.stone, 40), stack(Item.iron, 40)),
-	smelter(production, ProductionBlocks.smelter, stack(Item.stone, 80), stack(Item.iron, 80));
+	titaniumdrill(production, ProductionBlocks.titaniumdrill, stack(Item.iron, 40), stack(Item.steel, 40)),
+	omnidrill(production, ProductionBlocks.omnidrill, stack(Item.steel, 50), stack(Item.titanium, 50)),
+	smelter(production, ProductionBlocks.smelter, stack(Item.stone, 80), stack(Item.iron, 80)),
+	crucible(production, ProductionBlocks.crucible, stack(Item.titanium, 80), stack(Item.steel, 80));
 	
 	public Block result;
 	public ItemStack[] requirements;

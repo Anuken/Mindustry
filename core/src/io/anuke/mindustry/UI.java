@@ -3,6 +3,8 @@ package io.anuke.mindustry;
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.scene.actions.Actions.*;
 
+import java.text.NumberFormat;
+
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -62,6 +64,7 @@ public class UI extends SceneModule{
 		Colors.put("description", Color.WHITE);
 		Colors.put("turretinfo", Color.ORANGE);
 		Colors.put("missingitems", Color.SCARLET);
+		Colors.put("health", Color.YELLOW);
 	}
 	
 	void drawBackground(){
@@ -187,7 +190,7 @@ public class UI extends SceneModule{
 
 			new table("button"){{
 				
-				int rows = 3;
+				int rows = 4;
 				int maxcol = 0;
 				float size = 46;
 				
@@ -218,6 +221,7 @@ public class UI extends SceneModule{
 					group.add(button);
 					
 					table.pad(4);
+					table.top();
 					
 					int i = 0;
 					
@@ -231,7 +235,7 @@ public class UI extends SceneModule{
 							}
 						});
 						
-						table.add(image).size(size+8).pad(4).units(Unit.dp);
+						table.add(image).size(size+8).pad(2).units(Unit.dp);
 						image.getImageCell().size(size).units(Unit.dp);
 						
 						image.update(()->{
@@ -286,30 +290,32 @@ public class UI extends SceneModule{
 			atop();
 			aleft();
 			
-			defaults().size(66).units(Unit.dp);
-			
-			//TODO menu buttons!
-			new imagebutton("icon-menu", 40, ()->{
-				showMenu();
-			});
-			
-			new imagebutton("icon-settings", 40, ()->{
-				prefs.show();
-			});
+			new table(){{
+				left();
+				defaults().size(66).units(Unit.dp).left();
+				
+				new imagebutton("icon-menu", 40, ()->{
+					showMenu();
+				});
+				
+				new imagebutton("icon-settings", 40, ()->{
+					prefs.show();
+				});
 
-			new imagebutton("icon-pause", 40, ()->{
-				//TODO pause
-			});
+				new imagebutton("icon-pause", 40, ()->{
+					//TODO pause
+				});
+			}}.end();
 			
 			row();
 			
-			itemtable = new table("button").end().top().left().colspan(3).fillX().size(-1).get();
+			itemtable = new table("button").end().top().left().fillX().size(-1).get();
 
 			get().setVisible(play);
 			
 			Label fps = new Label(()->(Settings.getBool("fps") ? (Gdx.graphics.getFramesPerSecond() + " FPS") : ""));
 			row();
-			add(fps).colspan(3).size(-1);
+			add(fps).size(-1);
 			
 		}}.end();
 
@@ -484,10 +490,15 @@ public class UI extends SceneModule{
 		desctable.left();
 		desctable.pad(12);
 		
-		desctable.add(recipe.result.formalName);
+		Table header = new Table();
+		
+		desctable.add(header).left();
+		
 		desctable.row();
-		desctable.addImage(Draw.region(recipe.result.name)).size(8*5).padTop(4);
-		desctable.row();
+		
+		
+		header.addImage(Draw.region(recipe.result.name)).size(8*5).padTop(4);
+		header.add(recipe.result.formalName).padLeft(4);
 		
 		desctable.add().pad(2);
 		
@@ -518,11 +529,11 @@ public class UI extends SceneModule{
 		
 		desctable.row();
 		
-		if(recipe.result.description() != null){
-			Label label = new Label(recipe.result.description());
-			label.setWrap(true);
-			desctable.add(label).width(170).padTop(4);
-		}
+		Label label = new Label("[health]health: " + recipe.result.health + (recipe.result.description() == null ?
+				"" : ("\n[]" + recipe.result.description())));
+		label.setWrap(true);
+		desctable.add(label).width(200).padTop(4);
+		
 	}
 	
 	public void updateWeapons(){
@@ -611,9 +622,9 @@ public class UI extends SceneModule{
 
 		for(Item stack : Inventory.getItemTypes()){
 			Image image = new Image(Draw.region("icon-" + stack.name()));
-			Label label = new Label("" + Inventory.getAmount(stack));
-			label.setFontScale(fontscale*2f);
-			itemtable.add(image).size(32).units(Unit.dp);
+			Label label = new Label("" + NumberFormat.getIntegerInstance().format(Inventory.getAmount(stack)));
+			label.setFontScale(fontscale*1.5f);
+			itemtable.add(image).size(8*3).units(Unit.dp);
 			itemtable.add(label).left();
 			itemtable.row();
 		}

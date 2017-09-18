@@ -4,23 +4,534 @@ size: 512,32
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-block
+blocks/block
   rotate: false
-  xy: 175, 23
+  xy: 199, 23
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-bossmech
+blocks/coal1
   rotate: false
-  xy: 21, 17
-  size: 14, 14
-  orig: 14, 14
+  xy: 219, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/coal2
+  rotate: false
+  xy: 229, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/coal3
+  rotate: false
+  xy: 239, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/coaldrill
+  rotate: false
+  xy: 249, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/conduit
+  rotate: false
+  xy: 259, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/conduitbottom
+  rotate: false
+  xy: 269, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/conduitliquid
+  rotate: false
+  xy: 279, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/conduittop
+  rotate: false
+  xy: 289, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/conveyor
+  rotate: false
+  xy: 299, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/conveyormove
+  rotate: false
+  xy: 309, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/core
+  rotate: false
+  xy: 319, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/crucible
+  rotate: false
+  xy: 329, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/deepwater
+  rotate: false
+  xy: 339, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/dirt1
+  rotate: false
+  xy: 349, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/dirt2
+  rotate: false
+  xy: 359, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/dirt3
+  rotate: false
+  xy: 369, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/dirtblock
+  rotate: false
+  xy: 379, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/dirtedge
+  rotate: false
+  xy: 37, 19
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+blocks/doubleturret
+  rotate: false
+  xy: 65, 7
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+blocks/drill
+  rotate: false
+  xy: 389, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/flameturret
+  rotate: false
+  xy: 79, 21
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+blocks/grass1
+  rotate: false
+  xy: 409, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/grass2
+  rotate: false
+  xy: 419, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/grass3
+  rotate: false
+  xy: 429, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/grassblock
+  rotate: false
+  xy: 439, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/grassblock2
+  rotate: false
+  xy: 449, 23
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/grassedge
+  rotate: false
+  xy: 37, 5
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+blocks/iron1
+  rotate: false
+  xy: 80, 11
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/iron2
+  rotate: false
+  xy: 80, 1
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/iron3
+  rotate: false
+  xy: 90, 11
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/irondrill
+  rotate: false
+  xy: 90, 1
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/ironwall
+  rotate: false
+  xy: 100, 11
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/junction
+  rotate: false
+  xy: 100, 1
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/laserturret
+  rotate: false
+  xy: 91, 21
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+blocks/machineturret
+  rotate: false
+  xy: 103, 21
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+blocks/megarepairturret
+  rotate: false
+  xy: 115, 21
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+blocks/mortarturret
+  rotate: false
+  xy: 127, 21
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+blocks/mossblock
+  rotate: false
+  xy: 110, 1
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/mossstone
+  rotate: false
+  xy: 110, 1
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/omnidrill
+  rotate: false
+  xy: 120, 11
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/pump
+  rotate: false
+  xy: 130, 11
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/repairturret
+  rotate: false
+  xy: 139, 21
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+blocks/rock
+  rotate: false
+  xy: 130, 1
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/rock2
+  rotate: false
+  xy: 140, 11
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/rock2shadow
+  rotate: false
+  xy: 140, 1
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/rockshadow
+  rotate: false
+  xy: 150, 11
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/router
+  rotate: false
+  xy: 150, 1
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/shadow
+  rotate: false
+  xy: 151, 21
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+blocks/shotgunturret
+  rotate: false
+  xy: 163, 21
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+blocks/shrub
+  rotate: false
+  xy: 160, 11
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/shrubshadow
+  rotate: false
+  xy: 160, 1
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/smelter
+  rotate: false
+  xy: 170, 11
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/sniperturret
+  rotate: false
+  xy: 175, 21
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+blocks/steelconveyor
+  rotate: false
+  xy: 170, 1
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/steelconveyormove
+  rotate: false
+  xy: 180, 11
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/steelwall
+  rotate: false
+  xy: 180, 1
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/stone
+  rotate: false
+  xy: 51, 19
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+blocks/stone1
+  rotate: false
+  xy: 190, 11
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/stone2
+  rotate: false
+  xy: 190, 1
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/stone3
+  rotate: false
+  xy: 200, 13
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/stoneblock
+  rotate: false
+  xy: 200, 3
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/stoneblock2
+  rotate: false
+  xy: 210, 13
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/stoneblock3
+  rotate: false
+  xy: 210, 3
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/stonedrill
+  rotate: false
+  xy: 220, 13
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/stoneedge
+  rotate: false
+  xy: 51, 5
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+blocks/stonewall
+  rotate: false
+  xy: 220, 3
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/titanium1
+  rotate: false
+  xy: 230, 13
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/titanium2
+  rotate: false
+  xy: 230, 3
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/titanium3
+  rotate: false
+  xy: 240, 13
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/titaniumdrill
+  rotate: false
+  xy: 240, 3
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/titaniumwall
+  rotate: false
+  xy: 250, 13
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/turret
+  rotate: false
+  xy: 187, 21
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+blocks/water
+  rotate: false
+  xy: 250, 3
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/wateredge
+  rotate: false
+  xy: 65, 19
+  size: 12, 12
+  orig: 12, 12
   offset: 0, 0
   index: -1
 bullet
   rotate: false
-  xy: 185, 23
+  xy: 209, 23
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -32,254 +543,65 @@ circle
   orig: 10, 10
   offset: 0, 0
   index: -1
-coal1
+enemies/bossmech
   rotate: false
-  xy: 195, 23
+  xy: 21, 17
+  size: 14, 14
+  orig: 14, 14
+  offset: 0, 0
+  index: -1
+enemies/fastmech
+  rotate: false
+  xy: 399, 23
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-coal2
-  rotate: false
-  xy: 205, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-coal3
-  rotate: false
-  xy: 215, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-coaldrill
-  rotate: false
-  xy: 225, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-conveyor
-  rotate: false
-  xy: 235, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-conveyormove
-  rotate: false
-  xy: 245, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-core
-  rotate: false
-  xy: 255, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-deepwater
-  rotate: false
-  xy: 265, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-dirt1
-  rotate: false
-  xy: 275, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-dirt2
-  rotate: false
-  xy: 285, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-dirt3
-  rotate: false
-  xy: 295, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-dirtblock
-  rotate: false
-  xy: 305, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-dirtedge
-  rotate: false
-  xy: 37, 19
-  size: 12, 12
-  orig: 12, 12
-  offset: 0, 0
-  index: -1
-doubleturret
-  rotate: false
-  xy: 65, 7
-  size: 10, 10
-  orig: 10, 10
-  offset: 0, 0
-  index: -1
-drill
-  rotate: false
-  xy: 315, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-fastmech
-  rotate: false
-  xy: 325, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-firemech
+enemies/firemech
   rotate: false
   xy: 21, 1
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
-flameturret
+enemies/mech1
   rotate: false
-  xy: 79, 21
-  size: 10, 10
-  orig: 10, 10
-  offset: 0, 0
-  index: -1
-furnace
-  rotate: false
-  xy: 335, 23
+  xy: 110, 11
   size: 8, 8
   orig: 8, 8
-  offset: 0, 0
-  index: -1
-smelter
-  rotate: false
-  xy: 335, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-grass1
-  rotate: false
-  xy: 345, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-grass2
-  rotate: false
-  xy: 355, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-grass3
-  rotate: false
-  xy: 365, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-grassblock
-  rotate: false
-  xy: 375, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-grassblock2
-  rotate: false
-  xy: 385, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-grassedge
-  rotate: false
-  xy: 37, 5
-  size: 12, 12
-  orig: 12, 12
   offset: 0, 0
   index: -1
 icon-coal
   rotate: false
-  xy: 395, 23
+  xy: 459, 23
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 icon-iron
   rotate: false
-  xy: 405, 23
+  xy: 469, 23
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 icon-steel
   rotate: false
-  xy: 415, 23
+  xy: 479, 23
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 icon-stone
   rotate: false
-  xy: 425, 23
+  xy: 489, 23
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-iron1
+icon-titanium
   rotate: false
-  xy: 435, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-iron2
-  rotate: false
-  xy: 445, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-iron3
-  rotate: false
-  xy: 455, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-irondrill
-  rotate: false
-  xy: 465, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-ironwall
-  rotate: false
-  xy: 475, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-junction
-  rotate: false
-  xy: 485, 23
+  xy: 499, 23
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -298,296 +620,37 @@ laserend
   orig: 18, 18
   offset: 0, 0
   index: -1
-machineturret
-  rotate: false
-  xy: 91, 21
-  size: 10, 10
-  orig: 10, 10
-  offset: 0, 0
-  index: -1
-mech1
-  rotate: false
-  xy: 495, 23
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-megarepairturret
-  rotate: false
-  xy: 103, 21
-  size: 10, 10
-  orig: 10, 10
-  offset: 0, 0
-  index: -1
-mossblock
-  rotate: false
-  xy: 80, 11
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-mossstone
-  rotate: false
-  xy: 80, 11
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
 player
-  rotate: false
-  xy: 80, 1
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-repairturret
-  rotate: false
-  xy: 115, 21
-  size: 10, 10
-  orig: 10, 10
-  offset: 0, 0
-  index: -1
-rock
-  rotate: false
-  xy: 90, 11
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-rock2
-  rotate: false
-  xy: 90, 1
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-rock2shadow
-  rotate: false
-  xy: 100, 11
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-rockshadow
-  rotate: false
-  xy: 100, 1
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-router
-  rotate: false
-  xy: 110, 11
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-shadow
-  rotate: false
-  xy: 127, 21
-  size: 10, 10
-  orig: 10, 10
-  offset: 0, 0
-  index: -1
-shotgunturret
-  rotate: false
-  xy: 139, 21
-  size: 10, 10
-  orig: 10, 10
-  offset: 0, 0
-  index: -1
-shrub
-  rotate: false
-  xy: 110, 1
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-shrubshadow
-  rotate: false
-  xy: 120, 11
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-sniperturret
-  rotate: false
-  xy: 151, 21
-  size: 10, 10
-  orig: 10, 10
-  offset: 0, 0
-  index: -1
-steelconveyor
   rotate: false
   xy: 120, 1
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-steelconveyormove
-  rotate: false
-  xy: 130, 11
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-steelwall
-  rotate: false
-  xy: 130, 1
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-stone
-  rotate: false
-  xy: 51, 19
-  size: 12, 12
-  orig: 12, 12
-  offset: 0, 0
-  index: -1
-stone1
-  rotate: false
-  xy: 140, 11
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-stone2
-  rotate: false
-  xy: 140, 1
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-stone3
-  rotate: false
-  xy: 150, 11
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-stoneblock
-  rotate: false
-  xy: 150, 1
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-stoneblock2
-  rotate: false
-  xy: 160, 11
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-stoneblock3
-  rotate: false
-  xy: 160, 1
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-stonedrill
-  rotate: false
-  xy: 170, 11
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-stoneedge
-  rotate: false
-  xy: 51, 5
-  size: 12, 12
-  orig: 12, 12
-  offset: 0, 0
-  index: -1
-stonewall
-  rotate: false
-  xy: 170, 1
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-titanium1
-  rotate: false
-  xy: 180, 13
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-titanium2
-  rotate: false
-  xy: 180, 3
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-titanium3
-  rotate: false
-  xy: 190, 13
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-titaniumblock
-  rotate: false
-  xy: 190, 3
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-titaniumdrill
-  rotate: false
-  xy: 200, 13
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-turret
-  rotate: false
-  xy: 163, 21
-  size: 10, 10
-  orig: 10, 10
-  offset: 0, 0
-  index: -1
-water
-  rotate: false
-  xy: 200, 3
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-wateredge
-  rotate: false
-  xy: 65, 19
-  size: 12, 12
-  orig: 12, 12
-  offset: 0, 0
-  index: -1
 weapon-blaster
   rotate: false
-  xy: 210, 13
+  xy: 260, 13
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 weapon-flamethrower
   rotate: false
-  xy: 210, 3
+  xy: 260, 3
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 weapon-multigun
   rotate: false
-  xy: 220, 13
+  xy: 270, 13
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 weapon-trishot
   rotate: false
-  xy: 220, 3
+  xy: 270, 3
   size: 8, 8
   orig: 8, 8
   offset: 0, 0

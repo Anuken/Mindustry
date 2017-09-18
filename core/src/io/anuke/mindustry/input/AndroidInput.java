@@ -78,7 +78,7 @@ public class AndroidInput extends InputAdapter{
 				return; //just in case
 			
 			tile.setBlock(player.recipe.result);
-			tile.rotation = player.rotation;
+			tile.rotation = (byte)player.rotation;
 
 			Effects.effect("place", tilex*tilesize, tiley*tilesize);
 			Effects.shake(2f, 2f);

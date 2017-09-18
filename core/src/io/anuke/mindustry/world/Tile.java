@@ -11,7 +11,8 @@ public class Tile{
 	private Block floor = Blocks.air;
 	private Block block = Blocks.air;
 	public TileEntity entity;
-	public int x, y, rotation, dump;
+	public int x, y;
+	public byte rotation, dump;
 	
 	public Tile(int x, int y){
 		this.x = x;

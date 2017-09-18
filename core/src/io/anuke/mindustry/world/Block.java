@@ -59,6 +59,10 @@ public class Block{
 	public String errorMessage(Tile tile){
 		return null;
 	}
+	
+	public boolean canReplace(Block other){
+		return false;
+	}
 
 	public void handleItem(Tile tile, Item item, Tile source){
 		tile.entity.addItem(item, 1);
@@ -91,13 +95,13 @@ public class Block{
 					&& !(other.block().rotate && (other.rotation + 2) % 4 == i)){
 				
 				other.block().handleItem(other, item, tile);
-				tile.dump = (i+1)%4;
+				tile.dump = (byte)((i+1)%4);
 				return;
 			}
 			i++;
 			i %= 4;
 		}
-		tile.dump = pdump;
+		tile.dump = (byte)pdump;
 		handleItem(tile, item, tile);
 	}
 
@@ -127,7 +131,7 @@ public class Block{
 							!(other.block().rotate && (other.rotation + 2) % 4 == i)){
 						other.block().handleItem(other, item, tile);
 						tile.entity.removeItem(item, 1);
-						tile.dump = (i+1)%4;
+						tile.dump = (byte)((i+1)%4);
 						return true;
 					}
 				}

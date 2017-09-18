@@ -4,6 +4,8 @@ import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.RepairTurret;
+import io.anuke.mindustry.world.blocks.types.Turret;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 
@@ -14,7 +16,7 @@ public class WeaponBlocks{
 		{
 			formalName = "turret";
 			range = 50;
-			reload = 10f;
+			reload = 15f;
 			bullet = BulletType.stone;
 			ammo = Item.stone;
 		}
@@ -94,6 +96,30 @@ public class WeaponBlocks{
 			bullet = BulletType.sniper;
 			ammo = Item.steel;
 			health = 60;
+		}
+	},
+	
+	//TODO
+	mortarturret = new Turret("mortarturret"){
+		{
+			formalName = "flak turret";
+			range = 120;
+			reload = 120f;
+			bullet = BulletType.sniper;
+			ammo = Item.coal;
+			health = 110;
+		}
+	},
+	
+	//TODO
+	laserturret = new Turret("laserturret"){
+		{
+			formalName = "laser turret";
+			range = 60;
+			reload = 40f;
+			bullet = BulletType.sniper;
+			ammo = Item.coal;
+			health = 110;
 		}
 	},
 	

@@ -4,6 +4,7 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.Wall;
 
 public class Blocks{
 	public static final Block
@@ -91,30 +92,22 @@ public class Blocks{
 		solid = true;
 	}},
 	
-	stonewall = new Block("stonewall"){{
-		solid = true;
-		update = true;
+	stonewall = new Wall("stonewall"){{
 		health = 50;
 		formalName = "stone wall";
 	}},
 			
-	ironwall = new Block("ironwall"){{
-		solid = true;
-		update = true;
+	ironwall = new Wall("ironwall"){{
 		health = 80;
 		formalName = "iron wall";
 	}},
 	
-	steelwall = new Block("steelwall"){{
-		solid = true;
-		update = true;
+	steelwall = new Wall("steelwall"){{
 		health = 110;
 		formalName = "steel wall";
 	}},
 	
-	titaniumwall = new Block("titaniumwall"){{
-		solid = true;
-		update = true;
+	titaniumwall = new Wall("titaniumwall"){{
 		health = 140;
 		formalName = "titanium wall";
 	}};

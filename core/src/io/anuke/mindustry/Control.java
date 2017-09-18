@@ -126,7 +126,7 @@ public class Control extends ControlModule{
 		Renderer.clearTiles();
 		
 		player.x = World.core.worldx();
-		player.y = World.core.worldy()-8;
+		player.y = World.core.worldy() - 8f - ((int)(Gdx.graphics.getWidth() / (float)Core.cameraScale * 2) % 2 == 0 ? 0.5f : 0);
 		
 		control.camera.position.set(player.x, player.y, 0);
 		
