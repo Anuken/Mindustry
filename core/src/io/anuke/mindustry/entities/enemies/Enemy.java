@@ -104,7 +104,7 @@ public class Enemy extends DestructibleEntity{
 	@Override
 	public void onDeath(){
 		Effects.effect("explosion", this);
-		Effects.shake(3f, 4f);
+		Effects.shake(3f, 4f, this);
 		Effects.sound("explosion", this);
 		remove();
 		dead = true;

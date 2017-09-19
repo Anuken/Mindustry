@@ -49,7 +49,7 @@ public class TileEntity extends Entity{
 		}
 		
 		tile.setBlock(Blocks.air);
-		Effects.shake(4f, 4f);
+		Effects.shake(4f, 4f, this);
 		Effects.effect("explosion", this);
 		
 		Effects.sound("break", this);

@@ -7,11 +7,28 @@ import com.badlogic.gdx.graphics.Color;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.graphics.Hue;
+import io.anuke.ucore.util.Angles;
 
 public class EffectLoader{
 	static Color lightRed = Hue.mix(Color.WHITE, Color.FIREBRICK, 0.1f);
 	
 	public static void create(){
+		
+		Effects.create("shellsmoke", 21, e -> {
+			Angles.randLenVectors(e.id, 8, 1f + e.ifract()*16f, (x, y)->{
+				float size = 2f+e.fract()*5f;
+				Draw.color(Color.LIGHT_GRAY, Color.DARK_GRAY, e.ifract());
+				Draw.rect("circle", e.x + x, e.y + y, size, size);
+				Draw.reset();
+			});
+		});
+		
+		Effects.create("shellexplosion", 15, e -> {
+			Draw.thickness(1.3f - e.ifract());
+			Draw.color(Hue.mix(Color.WHITE, Color.ORANGE, e.ifract()));
+			Draw.circle(e.x, e.y, 1f + e.ifract() * 7f);
+			Draw.reset();
+		});
 		
 		Effects.create("place", 16, e -> {
 			Draw.thickness(3f - e.ifract() * 2f);
@@ -51,6 +68,13 @@ public class EffectLoader{
 			Draw.thickness(1f);
 			Draw.color(Hue.mix(Color.WHITE, Color.ORANGE, e.ifract()));
 			Draw.spikes(e.x, e.y, e.ifract() * 3f, 2, 8);
+			Draw.reset();
+		});
+		
+		Effects.create("laserhit", 10, e -> {
+			Draw.thickness(1f);
+			Draw.color(Hue.mix(Color.WHITE, Color.SKY, e.ifract()));
+			Draw.spikes(e.x, e.y, e.ifract() * 2f, 2, 6);
 			Draw.reset();
 		});
 		

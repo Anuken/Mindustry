@@ -26,7 +26,7 @@ public enum Recipe{
 	flameturret(defense, WeaponBlocks.flameturret, stack(Item.iron, 25), stack(Item.steel, 18)),
 	sniperturret(defense, WeaponBlocks.sniperturret, stack(Item.iron, 30), stack(Item.steel, 20)),
 	laserturret(defense, WeaponBlocks.laserturret, stack(Item.steel, 20), stack(Item.titanium, 20)),
-	mortarturret(defense, WeaponBlocks.mortarturret, stack(Item.steel, 25), stack(Item.titanium, 25)),
+	mortarturret(defense, WeaponBlocks.mortarturret, stack(Item.steel, 40), stack(Item.titanium, 30)),
 	
 	healturret(defense, WeaponBlocks.repairturret, stack(Item.iron, 45)),
 	megahealturret(defense, WeaponBlocks.megarepairturret, stack(Item.iron, 30), stack(Item.steel, 40)),

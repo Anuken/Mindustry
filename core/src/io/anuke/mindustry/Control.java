@@ -59,6 +59,8 @@ public class Control extends ControlModule{
 			Inputs.addProcessor(new AndroidInput());
 		}
 		
+		Effects.setShakeFalloff(10000f);
+		
 		Draw.addSurface("shadow", Core.cameraScale);
 		
 		atlas = new Atlas("sprites.atlas");
@@ -215,7 +217,7 @@ public class Control extends ControlModule{
 	}
 	
 	public void coreDestroyed(){
-		Effects.shake(5, 6);
+		Effects.shake(5, 6, camera.position.x, camera.position.y);
 		Sounds.play("corexplode");
 		Tile core = World.core;
 		for(int i = 0; i < 16; i ++){
@@ -306,7 +308,7 @@ public class Control extends ControlModule{
 			}
 			
 			if(Inputs.keyDown(Keys.SPACE)){
-				Effects.shake(6, 4);
+				Effects.shake(6, 4, Graphics.mouseWorld().x, Graphics.mouseWorld().y);
 			}
 			
 			if(Inputs.keyDown(Keys.Y)){

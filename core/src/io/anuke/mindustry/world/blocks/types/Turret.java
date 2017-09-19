@@ -28,10 +28,12 @@ public class Turret extends Block{
 	protected float range = 50f;
 	protected float reload = 10f;
 	protected String shootsound = "shoot";
-	protected BulletType bullet;
+	protected BulletType bullet = BulletType.iron;
 	protected Item ammo;
 	protected int ammoMultiplier = 20;
 	protected int maxammo = 400;
+	protected float rotatespeed = 0.2f;
+	protected float shootCone = 8f;
 
 	public Turret(String name) {
 		super(name);
@@ -68,7 +70,7 @@ public class Turret extends Block{
 	@Override
 	public void drawPlace(int x, int y, boolean valid){
 		//TODO?
-		//Draw.color(Color.PURPLE);
+		Draw.color(Color.PURPLE);
 		Draw.thick(1f);
 		Draw.dashcircle(x*Vars.tilesize, y*Vars.tilesize, range);
 	}
@@ -92,22 +94,27 @@ public class Turret extends Block{
 			entity.removeItem(ammo, 1);
 		}
 		
+		if(entity.target != null && entity.target.isDead())
+			entity.target = null;
+		
 		if(entity.ammo > 0){
 			
 			if(Timers.get(entity, "target", targetInterval)){
 				entity.target = (Enemy)Entities.getClosest(tile.worldx(), tile.worldy(), range, e->{
-					return e instanceof Enemy;
+					return e instanceof Enemy && !((Enemy)e).isDead();
 				});
 			}
 			
 			if(entity.target != null){
-				entity.rotation = MathUtils.lerpAngleDeg(entity.rotation, 
-						Angles.predictAngle(tile.worldx(), tile.worldy(), 
-								entity.target.x, entity.target.y, entity.target.xvelocity, entity.target.yvelocity, bullet.speed), 
-						0.2f*Timers.delta());
+				
+				float targetRot = Angles.predictAngle(tile.worldx(), tile.worldy(), 
+						entity.target.x, entity.target.y, entity.target.xvelocity, entity.target.yvelocity, bullet.speed);
+				
+				entity.rotation = MathUtils.lerpAngleDeg(entity.rotation, targetRot, 
+						rotatespeed*Timers.delta());
 				
 				float reload = Vars.multiplier*this.reload;
-				if(Timers.get(tile, reload)){
+				if(Angles.angleDist(entity.rotation, targetRot) < shootCone && Timers.get(tile, "reload", reload)){
 					Effects.sound(shootsound, entity);
 					shoot(tile);
 					entity.ammo --;

@@ -8,16 +8,23 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
 public class LaserTurret extends Turret{
 	protected Color beamColor = Color.WHITE.cpy();
-	protected String hiteffect = "hit";
+	protected String hiteffect = "laserhit";
 	protected int damage = 4;
+	protected float cone = 15f;
 
 	public LaserTurret(String name) {
 		super(name);
+	}
+	
+	@Override
+	public String description(){
+		return "[turretinfo]Ammo: "+(ammo==null ? "N/A" : ammo.name())+"\nRange: " + (int)range + "\nDamage: " + damage;
 	}
 	
 	@Override
@@ -25,15 +32,19 @@ public class LaserTurret extends Turret{
 		TurretEntity entity = tile.entity();
 		Enemy enemy = entity.target;
 		
-		enemy.damage(damage);
-		Effects.effect(hiteffect, enemy.x + Mathf.range(3), enemy.y + Mathf.range(3));
+		if(Angles.angleDist(entity.rotation, Angles.angle(tile.worldx(), tile.worldy(), enemy.x, enemy.y)) < cone){
+			enemy.damage(damage);
+			Effects.effect(hiteffect, enemy.x + Mathf.range(3), enemy.y + Mathf.range(3));
+		}
 	}
 	
 	@Override
 	public void drawOver(Tile tile){
 		TurretEntity entity = tile.entity();
 		
-		if(entity.target != null){
+		if(entity.target != null &&
+				Angles.angleDist(entity.rotation, Angles.angle(tile.worldx(), tile.worldy(), entity.target.x, entity.target.y)) <= cone){
+			
 			float x = tile.worldx(), y = tile.worldy();
 			float x2 = entity.target.x, y2 = entity.target.y;
 			
@@ -50,8 +61,10 @@ public class LaserTurret extends Turret{
 			Draw.line(x, y, x2, y2);
 			Draw.thickness(1f);
 			Draw.rect("circle", x2, y2, 5f, 5f);
-			Draw.reset();
+			
 		}
+		
+		Draw.reset();
 		
 		super.drawOver(tile);
 	}

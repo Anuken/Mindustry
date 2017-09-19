@@ -33,7 +33,7 @@ public class Player extends DestructibleEntity{
 	public void onDeath(){
 		remove();
 		Effects.effect("explosion", this);
-		Effects.shake(4f, 5f);
+		Effects.shake(4f, 5f, this);
 		Effects.sound("die", this);
 		
 		Vars.control.setRespawnTime(respawnduration);

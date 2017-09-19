@@ -1,9 +1,12 @@
 package io.anuke.mindustry.world.blocks;
 
+import com.badlogic.gdx.graphics.Color;
+
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.LaserTurret;
 import io.anuke.mindustry.world.blocks.types.RepairTurret;
 import io.anuke.mindustry.world.blocks.types.Turret;
 import io.anuke.ucore.core.Timers;
@@ -102,25 +105,27 @@ public class WeaponBlocks{
 	//TODO
 	mortarturret = new Turret("mortarturret"){
 		{
+			rotatespeed = 0.1f;
 			formalName = "flak turret";
 			range = 120;
 			reload = 120f;
-			bullet = BulletType.sniper;
-			ammo = Item.coal;
+			bullet = BulletType.shell;
+			ammo = Item.stone;
 			health = 110;
 		}
 	},
 	
 	//TODO
-	laserturret = new Turret("laserturret"){
+	laserturret = new LaserTurret("laserturret"){
 		
 		
 		{
+			beamColor = Color.SKY;
 			formalName = "laser turret";
 			range = 60;
-			reload = 40f;
-			bullet = BulletType.sniper;
-			ammo = Item.coal;
+			reload = 4f;
+			damage = 9;
+			ammo = Item.stone;
 			health = 110;
 		}
 	},

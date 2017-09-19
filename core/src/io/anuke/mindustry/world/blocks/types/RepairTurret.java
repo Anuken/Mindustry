@@ -20,16 +20,20 @@ public class RepairTurret extends Turret{
 	public void update(Tile tile){
 		TurretEntity entity = tile.entity();
 		
-		if(Timers.get(entity, "target", targetInterval)){
+		if(Timers.get(entity, "blocktarget", targetInterval)){
 			entity.blockTarget = World.findTileTarget(tile.worldx(), tile.worldy(), tile, range, true);
 		}
 		
-		if(entity.target != null){
-			float target = entity.angleTo(entity.target);
+		if(entity.blockTarget != null){
+			float target = entity.angleTo(entity.blockTarget);
 			entity.rotation = Mathf.slerp(entity.rotation, target, 0.16f*Timers.delta());
 
-			if(Timers.get(tile, reload) && Angles.angleDist(target, entity.rotation) < 10){
-				entity.target.health++;
+			if(Timers.get(tile, "reload", reload) && Angles.angleDist(target, entity.rotation) < shootCone){
+				entity.blockTarget.health++;
+				
+				if(entity.blockTarget.health > entity.blockTarget.health)
+					entity.blockTarget.health = entity.blockTarget.maxhealth;
+				
 			}
 		}
 	}
@@ -43,7 +47,7 @@ public class RepairTurret extends Turret{
 	public void drawOver(Tile tile){
 		TurretEntity entity = tile.entity();
 		
-		if(entity.blockTarget != null){
+		if(entity.blockTarget != null && Angles.angleDist(entity.angleTo(entity.blockTarget), entity.rotation) < 10){
 			float x = tile.worldx(), y = tile.worldy();
 			float x2 = entity.blockTarget.x, y2 = entity.blockTarget.y;
 

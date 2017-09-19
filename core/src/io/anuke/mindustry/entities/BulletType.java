@@ -4,11 +4,19 @@ import com.badlogic.gdx.graphics.Color;
 
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BaseBulletType;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
 
 public abstract class BulletType  extends BaseBulletType<Bullet>{
 	public static final BulletType 
 	
+	none = new BulletType(0f, 0){
+		public void draw(Bullet b){
+			
+		}
+	},
 	stone = new BulletType(1.5f, 2){
 		public void draw(Bullet b){
 			Draw.color("gray");
@@ -28,6 +36,52 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Draw.color(Color.LIGHT_GRAY);
 			Draw.rect("bullet", b.x, b.y, b.angle());
 			Draw.reset();
+		}
+	},
+	shell = new BulletType(1.1f, 110){
+		{
+			lifetime = 110f;
+		}
+		public void draw(Bullet b){
+			float rad = 8f;
+			Draw.color(Color.GRAY);
+			Draw.rect("circle", b.x, b.y, rad, rad);
+			rad += Mathf.sin(Timers.time(), 3f, 1f);
+			Draw.color(Color.ORANGE);
+			Draw.rect("circle", b.x, b.y, rad/1.7f, rad/1.7f);
+			Draw.reset();
+		}
+		
+		public void update(Bullet b){
+			if(Timers.get(b, "smoke", 7)){
+				Effects.effect("smoke", b.x + Mathf.range(2), b.y + Mathf.range(2));
+			}
+		}
+		
+		public void despawned(Bullet b){
+			removed(b);
+		}
+		
+		public void removed(Bullet b){
+			Effects.shake(3f, 3f, b);
+			
+			Effects.effect("shellsmoke", b);
+			Effects.effect("shellexplosion", b);
+			
+			Angles.circle(20, f->{
+				Angles.translation(f, 5f);
+				new Bullet(shellshot, b.owner, b.x + Angles.x(), b.y + Angles.y(), f).add();
+			});
+		}
+	},
+	shellshot = new BulletType(1.5f, 5){
+		{
+			lifetime = 7f;
+		}
+		public void draw(Bullet b){
+		//	Draw.color("orange");
+		//	Draw.rect("bullet", b.x, b.y, b.angle());
+		//	Draw.reset();
 		}
 	},
 	small = new BulletType(1.5f, 1){

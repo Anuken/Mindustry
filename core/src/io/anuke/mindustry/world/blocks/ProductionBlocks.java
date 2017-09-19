@@ -145,12 +145,12 @@ public class ProductionBlocks{
 		{
 			health = 90;
 			requirements = new Item[]{Item.titanium, Item.steel};
-			result = Item.hypanium;
+			result = Item.dirium;
 		}
 		
 		@Override
 		public String description(){
-			return "Takes in steel + titanium, outputs hypanium.";
+			return "Takes in steel + titanium, outputs dirium.";
 		}
 	},
 	
