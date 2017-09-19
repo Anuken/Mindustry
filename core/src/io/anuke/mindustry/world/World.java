@@ -1,4 +1,4 @@
-package io.anuke.mindustry;
+package io.anuke.mindustry.world;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -12,9 +12,6 @@ import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Generator;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.mindustry.world.blocks.WeaponBlocks;

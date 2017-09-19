@@ -15,4 +15,16 @@ public class Mindustry extends ModuleCore {
 	public void postInit(){
 		Vars.control.reset();
 	}
+	
+	@Override
+	public void render(){
+		
+		try{
+			super.render();
+		}catch (RuntimeException e){
+			//TODO
+			//Gdx.app.getClipboard().setContents(e.getMessage());
+			throw e;
+		}
+	}
 }

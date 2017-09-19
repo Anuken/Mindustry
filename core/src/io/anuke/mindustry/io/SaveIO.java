@@ -20,6 +20,7 @@ import io.anuke.mindustry.entities.enemies.*;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;

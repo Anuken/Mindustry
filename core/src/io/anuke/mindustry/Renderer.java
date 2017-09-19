@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.*;
@@ -137,6 +138,8 @@ public class Renderer{
 			Draw.color(valid ? Color.PURPLE : Color.SCARLET);
 			Draw.thickness(2f);
 			Draw.square(x, y, tilesize / 2 + MathUtils.sin(Timers.time() / 6f) + 1);
+			
+			player.recipe.result.drawPlace(tilex, tiley, valid);
 
 			if(player.recipe.result.rotate){
 				Draw.color("orange");

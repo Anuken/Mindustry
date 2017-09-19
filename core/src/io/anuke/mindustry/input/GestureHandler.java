@@ -6,8 +6,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.input.GestureDetector.GestureAdapter;
 import com.badlogic.gdx.math.Vector2;
 
-import io.anuke.mindustry.World;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.*;
 

@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
-import io.anuke.mindustry.World;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
@@ -47,6 +46,7 @@ public class Block{
 	public void drawOver(Tile tile){}
 	public void drawPixelOverlay(Tile tile){}
 	public void drawOverlay(Tile tile){}
+	public void drawPlace(int x, int y, boolean valid){}
 	
 	public String name(){
 		return name;

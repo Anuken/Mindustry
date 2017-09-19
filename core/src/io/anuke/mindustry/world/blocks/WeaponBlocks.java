@@ -113,6 +113,8 @@ public class WeaponBlocks{
 	
 	//TODO
 	laserturret = new Turret("laserturret"){
+		
+		
 		{
 			formalName = "laser turret";
 			range = 60;

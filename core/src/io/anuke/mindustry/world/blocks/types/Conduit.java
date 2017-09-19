@@ -1,5 +1,9 @@
 package io.anuke.mindustry.world.blocks.types;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
@@ -43,8 +47,6 @@ public class Conduit extends Block{
 		
 		if(entity.amount > 0.01f && Timers.get(entity, "flow", 3)){
 			tryMoveLiquid(tile, tile.getNearby()[tile.rotation]);
-			
-			entity.flowtime = 0f;
 		}
 		
 	}
@@ -94,6 +96,17 @@ public class Conduit extends Block{
 	static class ConduitEntity extends TileEntity{
 		Liquid liquid;
 		float amount;
-		float flowtime;
+		
+		@Override
+		public void write(DataOutputStream stream) throws IOException{
+			stream.writeByte(liquid.ordinal());
+			stream.writeByte((byte)(amount));
+		}
+		
+		@Override
+		public void read(DataInputStream stream) throws IOException{
+			liquid = Liquid.values()[stream.readByte()];
+			amount = stream.readByte();
+		}
 	}
 }

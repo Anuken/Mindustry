@@ -8,9 +8,9 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.Inventory;
-import io.anuke.mindustry.World;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.*;

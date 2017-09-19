@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.utils.ObjectMap;
 
-import io.anuke.mindustry.World;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.noise.Noise;
@@ -61,6 +60,10 @@ public class Generator{
 					
 					if(Noise.nnoise(x, y, 6, 1) > 0.242){
 						floor = Blocks.coal;
+					}
+					
+					if(Noise.nnoise(x, y, 5, 1) > 0.2){
+						floor = Blocks.titanium;
 					}
 				}
 				

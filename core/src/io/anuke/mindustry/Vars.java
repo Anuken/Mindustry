@@ -30,7 +30,7 @@ public class Vars{
 	public static final int saveSlots = 4;
 	
 	//turret and enemy shoot speed inverse multiplier
-	public static final int multiplier = android ? 3 : 1;
+	public static final float multiplier = android ? 3 : 2;
 	
 	public static final int tilesize = 8;
 	

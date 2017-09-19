@@ -18,6 +18,7 @@ import io.anuke.mindustry.input.GestureHandler;
 import io.anuke.mindustry.input.Input;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
@@ -281,7 +282,6 @@ public class Control extends ControlModule{
 	public void update(){
 		
 		if(debug){
-			
 			if(Inputs.keyUp(Keys.SPACE))
 				Effects.sound("shoot", World.core.worldx(), World.core.worldy());
 			

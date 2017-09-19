@@ -3,12 +3,12 @@ package io.anuke.mindustry.entities.enemies;
 import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.World;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.World;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
@@ -73,7 +73,7 @@ public class Enemy extends DestructibleEntity{
 	void shoot(){
 		vector.set(length, 0).rotate(direction.angle());
 		Bullet out = new Bullet(bullet, this, x+vector.x, y+vector.y, direction.angle()).add();
-		out.damage = bullet.damage*Vars.multiplier;
+		out.damage = (int)(bullet.damage*Vars.multiplier);
 	}
 	
 	public void findClosestNode(){

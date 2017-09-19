@@ -19,9 +19,6 @@ public enum Recipe{
 	router(distribution, ProductionBlocks.router, stack(Item.stone, 3)),
 	junction(distribution, ProductionBlocks.junction, stack(Item.iron, 5)),
 	
-	conduit(distribution, ProductionBlocks.conduit, stack(Item.steel, 1)),
-	pump(distribution, ProductionBlocks.pump, stack(Item.steel, 20)),
-	
 	turret(defense, WeaponBlocks.turret, stack(Item.stone, 6)),
 	dturret(defense, WeaponBlocks.doubleturret, stack(Item.stone, 12)),
 	machineturret(defense, WeaponBlocks.machineturret, stack(Item.iron, 15), stack(Item.stone, 20)),
@@ -40,7 +37,10 @@ public enum Recipe{
 	titaniumdrill(production, ProductionBlocks.titaniumdrill, stack(Item.iron, 40), stack(Item.steel, 40)),
 	omnidrill(production, ProductionBlocks.omnidrill, stack(Item.steel, 50), stack(Item.titanium, 50)),
 	smelter(production, ProductionBlocks.smelter, stack(Item.stone, 80), stack(Item.iron, 80)),
-	crucible(production, ProductionBlocks.crucible, stack(Item.titanium, 80), stack(Item.steel, 80));
+	crucible(production, ProductionBlocks.crucible, stack(Item.titanium, 80), stack(Item.steel, 80)),
+	
+	conduit(distribution, ProductionBlocks.conduit, stack(Item.steel, 1)),
+	pump(production, ProductionBlocks.pump, stack(Item.steel, 20));
 	
 	public Block result;
 	public ItemStack[] requirements;

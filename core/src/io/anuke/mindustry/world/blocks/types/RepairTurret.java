@@ -2,8 +2,8 @@ package io.anuke.mindustry.world.blocks.types;
 
 import com.badlogic.gdx.math.MathUtils;
 
-import io.anuke.mindustry.World;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.World;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Hue;
@@ -20,8 +20,10 @@ public class RepairTurret extends Turret{
 	public void update(Tile tile){
 		TurretEntity entity = tile.entity();
 		
-		entity.target = World.findTileTarget(tile.worldx(), tile.worldy(), tile, range, true);
-
+		if(Timers.get(entity, "target", targetInterval)){
+			entity.blockTarget = World.findTileTarget(tile.worldx(), tile.worldy(), tile, range, true);
+		}
+		
 		if(entity.target != null){
 			float target = entity.angleTo(entity.target);
 			entity.rotation = Mathf.slerp(entity.rotation, target, 0.16f*Timers.delta());
@@ -41,9 +43,9 @@ public class RepairTurret extends Turret{
 	public void drawOver(Tile tile){
 		TurretEntity entity = tile.entity();
 		
-		if(entity.target != null){
+		if(entity.blockTarget != null){
 			float x = tile.worldx(), y = tile.worldy();
-			float x2 = entity.target.x, y2 = entity.target.y;
+			float x2 = entity.blockTarget.x, y2 = entity.blockTarget.y;
 
 			Draw.color(Hue.rgb(138, 244, 138, (MathUtils.sin(Timers.time()) + 1f) / 14f));
 			Draw.alpha(0.3f);

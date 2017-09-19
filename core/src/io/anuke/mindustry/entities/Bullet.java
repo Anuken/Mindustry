@@ -2,8 +2,8 @@ package io.anuke.mindustry.entities;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
-import io.anuke.mindustry.World;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.World;
 import io.anuke.ucore.entities.BulletEntity;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;

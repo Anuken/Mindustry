@@ -23,11 +23,14 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
 public class Turret extends Block{
+	public static final int targetInterval = 15;
+	
 	protected float range = 50f;
 	protected float reload = 10f;
 	protected String shootsound = "shoot";
 	protected BulletType bullet;
 	protected Item ammo;
+	protected int ammoMultiplier = 20;
 	protected int maxammo = 400;
 
 	public Turret(String name) {
@@ -63,6 +66,14 @@ public class Turret extends Block{
 	}
 	
 	@Override
+	public void drawPlace(int x, int y, boolean valid){
+		//TODO?
+		//Draw.color(Color.PURPLE);
+		Draw.thick(1f);
+		Draw.dashcircle(x*Vars.tilesize, y*Vars.tilesize, range);
+	}
+	
+	@Override
 	public boolean accept(Item item, Tile dest, Tile source){
 		return item == ammo && dest.<TurretEntity>entity().ammo < maxammo;
 	}
@@ -77,19 +88,24 @@ public class Turret extends Block{
 		TurretEntity entity = tile.entity();
 		
 		if(entity.hasItem(ammo)){
-			entity.ammo += 20;
+			entity.ammo += ammoMultiplier;
 			entity.removeItem(ammo, 1);
 		}
 		
 		if(entity.ammo > 0){
-			Enemy enemy = (Enemy)Entities.getClosest(tile.worldx(), tile.worldy(), range, e->{
-				return e instanceof Enemy;
-			});
 			
-			if(enemy != null){
+			if(Timers.get(entity, "target", targetInterval)){
+				entity.target = (Enemy)Entities.getClosest(tile.worldx(), tile.worldy(), range, e->{
+					return e instanceof Enemy;
+				});
+			}
+			
+			if(entity.target != null){
 				entity.rotation = MathUtils.lerpAngleDeg(entity.rotation, 
-						Angles.predictAngle(tile.worldx(), tile.worldy(), enemy.x, enemy.y, enemy.xvelocity, enemy.yvelocity, bullet.speed), 
+						Angles.predictAngle(tile.worldx(), tile.worldy(), 
+								entity.target.x, entity.target.y, entity.target.xvelocity, entity.target.yvelocity, bullet.speed), 
 						0.2f*Timers.delta());
+				
 				float reload = Vars.multiplier*this.reload;
 				if(Timers.get(tile, reload)){
 					Effects.sound(shootsound, entity);
@@ -110,18 +126,19 @@ public class Turret extends Block{
 		
 		vector.set(0, 4).setAngle(entity.rotation);
 		Bullet out = new Bullet(bullet, tile.entity, tile.worldx()+vector.x, tile.worldy()+vector.y, entity.rotation).add();
-		out.damage = bullet.damage*Vars.multiplier;
+		out.damage = (int)(bullet.damage*Vars.multiplier);
 	}
 	
 	protected void bullet(Tile tile, float angle){
 		 Bullet out = new Bullet(bullet, tile.entity, tile.worldx()+vector.x, tile.worldy()+vector.y, angle).add();
-		 out.damage = bullet.damage*Vars.multiplier;
+		 out.damage = (int)(bullet.damage*Vars.multiplier);
 	}
 	
 	public static class TurretEntity extends TileEntity{
-		public TileEntity target;
+		public TileEntity blockTarget;
 		public int ammo;
 		public float rotation;
+		public Enemy target;
 		
 		@Override
 		public void write(DataOutputStream stream) throws IOException{

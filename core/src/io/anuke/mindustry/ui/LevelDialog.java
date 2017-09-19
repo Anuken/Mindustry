@@ -5,7 +5,7 @@ import static io.anuke.mindustry.Vars.maps;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.World;
+import io.anuke.mindustry.world.World;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.*;
