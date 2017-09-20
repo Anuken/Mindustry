@@ -50,7 +50,7 @@ public class Player extends DestructibleEntity{
 		float speed = this.speed;
 		
 		if(Vars.debug)
-			speed = 3f;
+			speed = 2f;
 		
 		if(health < maxhealth && Timers.get(this, 50))
 			health ++;

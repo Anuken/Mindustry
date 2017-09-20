@@ -35,12 +35,12 @@ public class SaveDialog extends Dialog{
 		for(int i = 0; i < Vars.saveSlots; i ++){
 			final int slot = i;
 			
-			TextButton button = new TextButton("[yellow]Slot " + (i+1));
+			TextButton button = new TextButton("[orange]Slot " + (i+1));
 			button.getLabelCell().top().left().growX();
 			button.row();
 			button.pad(Unit.dp.inPixels(10));
-			button.add((!SaveIO.isSaveValid(i) ? "[gray]<empty>" : "[LIGHT_GRAY]Last Saved: " + SaveIO.getTimeString(i)));
-			button.getLabel().setFontScale(1f);
+			button.add((!SaveIO.isSaveValid(i) ? "[gray]<empty>" : "[LIGHT_GRAY]Last Saved: " + SaveIO.getTimeString(i))).padBottom(2);
+			button.getLabel().setFontScale(0.75f);
 			
 			button.clicked(()->{
 				if(SaveIO.isSaveValid(slot)){
@@ -56,7 +56,7 @@ public class SaveDialog extends Dialog{
 				}
 			});
 			
-			content().add(button).size(400, 75).units(Unit.dp).pad(2);
+			content().add(button).size(400, 78).units(Unit.dp).pad(2);
 			content().row();
 		}
 	}

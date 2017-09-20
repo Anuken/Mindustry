@@ -6,6 +6,7 @@ import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
 
 public class Pump extends Conduit{
+	protected float pumpspeed = 2f;
 
 	public Pump(String name) {
 		super(name);
@@ -26,9 +27,9 @@ public class Pump extends Conduit{
 	public void update(Tile tile){
 		ConduitEntity entity = tile.entity();
 		
-		if(Timers.get(tile, "pump", 10) && entity.amount < capacity){
+		if(Timers.get(tile, "pump", 8) && entity.amount < capacity){
 			entity.liquid = Liquid.water;
-			entity.amount += 10f;
+			entity.amount += pumpspeed;
 		}
 		
 		if(Timers.get(tile, "dump", 1)){

@@ -10,7 +10,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
@@ -20,9 +20,10 @@ import io.anuke.mindustry.entities.Weapon;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.ucore.core.*;
+import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.function.VisibilityProvider;
-import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Textures;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.actions.Actions;
@@ -42,8 +43,9 @@ public class UI extends SceneModule{
 	VisibilityProvider nplay = () -> GameState.is(State.menu);
 
 	public UI() {
-		Dialog.setShowAction(()-> sequence(Actions.moveToAligned(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight(), Align.center),
-						parallel(Actions.moveToAligned(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, Align.center, 0.09f, Interpolation.fade), 
+		Dialog.setShowAction(()-> sequence(Actions.moveToAligned(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), Align.center),
+						parallel(Actions.moveToAligned(Gdx.graphics.getWidth()/2,
+								Gdx.graphics.getHeight()/2, Align.center, 0.09f, Interpolation.fade), 
 								
 								Actions.fadeIn(0.09f, Interpolation.fade))));
 		
@@ -56,10 +58,10 @@ public class UI extends SceneModule{
 		TooltipManager.getInstance().animations = false;
 		
 		Dialog.closePadR = -1;
-		Dialog.closePadT = 4;
+		Dialog.closePadT = 5;
 		
 		Textures.load("sprites/");
-		Textures.repeatWrap("conveyort", Gdx.app.getType() == ApplicationType.WebGL ? "back-web" : "back");
+		Textures.repeatWrap("conveyort", Gdx.app.getType() == ApplicationType.WebGL ? "back-web" : "back", "background");
 		
 		Colors.put("description", Color.WHITE);
 		Colors.put("turretinfo", Color.ORANGE);
@@ -68,12 +70,18 @@ public class UI extends SceneModule{
 	}
 	
 	void drawBackground(){
-		
-		Batch batch = scene.getBatch();
-		Draw.color();
 		int w = (int)screen.x;
 		int h = (int)screen.y;
 		
+		Draw.color();
+		
+		Texture back = Textures.get("background");
+		int backscl = 5;
+		
+		Draw.batch().draw(back, w/2 - back.getWidth()*backscl/2, h/2 - back.getHeight()*backscl/2, 
+				back.getWidth()*backscl, back.getHeight()*backscl);
+		
+		/*
 		Draw.color(Hue.lightness(0.6f));
 		
 		int tw = w/64+1;
@@ -89,15 +97,19 @@ public class UI extends SceneModule{
 			float offset = (Timers.time()*2*(x%2-0.5f))/32f;
 			batch.draw(Textures.get("conveyort"), x*64*scale, 0, 32*scale, h*scale, 0, offset, 1, h/32 + offset);
 		}
+		*/
+		
+		int logoscl = 7;
+		TextureRegion logo = skin.getRegion("logotext");
+		int logow = logo.getRegionWidth()*logoscl;
+		int logoh = logo.getRegionHeight()*logoscl;
+		
+		Draw.color();
+		//Draw.color(Color.CORAL);
+		Draw.batch().draw(logo, w/2 - logow/2, h - logoh + 10, logow, logoh);
 		
 		Draw.color();
 		
-		Draw.tscl(Unit.dp.inPixels(1.5f));
-		
-		Draw.text("[#111111]-( Mindustry )-", w/2, h-Unit.dp.inPixels(16));
-		Draw.text("[#f1de60]-( Mindustry )-", w/2, h-Unit.dp.inPixels(10));
-		
-		Draw.tscl(Unit.dp.inPixels(0.5f));
 	}
 
 	@Override
@@ -188,7 +200,7 @@ public class UI extends SceneModule{
 			
 			row();
 
-			new table("button"){{
+			new table("pane"){{
 				
 				int rows = 4;
 				int maxcol = 0;
@@ -368,8 +380,8 @@ public class UI extends SceneModule{
 		//menu table
 		new table(){{
 			
-			new table("button"){{
-				defaults().size(220, 50);
+			new table("pane"){{
+				defaults().size(220, 50).pad(3);
 				
 				new button("Play", () -> {
 					levels.show();
@@ -419,10 +431,9 @@ public class UI extends SceneModule{
 		
 		if(debug){
 			new table(){{
-				atop();
-				new table("button"){{
-					new label("[red]DEBUG MODE").scale(1);
-				}}.end();
+				abottom();
+				aleft();
+				new label("[red]DEBUG MODE").scale(0.5f);
 			}}.end();
 		}
 		
@@ -532,7 +543,7 @@ public class UI extends SceneModule{
 		Label label = new Label("[health]health: " + recipe.result.health + (recipe.result.description() == null ?
 				"" : ("\n[]" + recipe.result.description())));
 		label.setWrap(true);
-		desctable.add(label).width(200).padTop(4);
+		desctable.add(label).width(200).padTop(4).padBottom(2);
 		
 	}
 	

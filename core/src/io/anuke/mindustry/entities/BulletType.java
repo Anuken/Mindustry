@@ -41,6 +41,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 	shell = new BulletType(1.1f, 110){
 		{
 			lifetime = 110f;
+			hitsize = 8f;
 		}
 		public void draw(Bullet b){
 			float rad = 8f;
@@ -68,13 +69,13 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Effects.effect("shellsmoke", b);
 			Effects.effect("shellexplosion", b);
 			
-			Angles.circle(20, f->{
+			Angles.circle(25, f->{
 				Angles.translation(f, 5f);
 				new Bullet(shellshot, b.owner, b.x + Angles.x(), b.y + Angles.y(), f).add();
 			});
 		}
 	},
-	shellshot = new BulletType(1.5f, 5){
+	shellshot = new BulletType(1.5f, 6){
 		{
 			lifetime = 7f;
 		}

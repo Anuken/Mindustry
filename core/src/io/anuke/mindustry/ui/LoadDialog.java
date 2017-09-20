@@ -35,12 +35,12 @@ public class LoadDialog extends Dialog{
 		for(int i = 0; i < Vars.saveSlots; i ++){
 			final int slot = i;
 			
-			TextButton button = new TextButton("[yellow]Slot " + (i+1));
+			TextButton button = new TextButton("[orange]Slot " + (i+1));
 			button.getLabelCell().top().left().growX();
 			button.row();
 			button.pad(Unit.dp.inPixels(10));
-			button.add("[gray]" + (!SaveIO.isSaveValid(i) ? "<empty>" : "Last Saved: " + SaveIO.getTimeString(i)));
-			button.getLabel().setFontScale(1f);
+			button.add("[gray]" + (!SaveIO.isSaveValid(i) ? "<empty>" : "Last Saved: " + SaveIO.getTimeString(i))).padBottom(2);
+			button.getLabel().setFontScale(0.75f);
 			button.setDisabled(!SaveIO.isSaveValid(i) );
 			
 			button.clicked(()->{
@@ -59,7 +59,7 @@ public class LoadDialog extends Dialog{
 				}
 			});
 			
-			content().add(button).size(400, 75).units(Unit.dp).pad(2);
+			content().add(button).size(400, 78).units(Unit.dp).pad(2);
 			content().row();
 		}
 		
