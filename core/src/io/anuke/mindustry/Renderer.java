@@ -201,16 +201,6 @@ public class Renderer{
 		}
 	}
 	
-	public static void renderOverlay(){
-		
-		Tile tile = World.cursorTile();
-		
-		if(tile != null && tile.block() != Blocks.air){
-			tile.block().drawOverlay(tile);
-		}
-		
-	}
-	
 	public static void drawHealth(float x, float y, float health, float maxhealth){
 		drawBar(Color.RED, x, y, health/maxhealth);
 	}

@@ -1,16 +1,12 @@
 package io.anuke.mindustry.world.blocks.types;
 
-import static io.anuke.mindustry.Vars.tilesize;
-
-import com.badlogic.gdx.graphics.Color;
-
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Mathf;
 
 public class Drill extends Block{
 	protected Block resource;
@@ -42,15 +38,13 @@ public class Drill extends Block{
 	}
 	
 	@Override
-	public void drawOverlay(Tile tile){
+	public void drawOver(Tile tile){
 		
 		if(tile.floor() != resource && resource != null){
-			Draw.tcolor(Color.SCARLET);
-			Draw.tscl(1 / 8f);
-			Draw.text("Not on " + resource.name + " block!", tile.worldx(), tile.worldy() + tilesize);
+			Draw.colorl(0.85f + Mathf.absin(Timers.time(), 6f, 0.15f));
+			Draw.rect("cross", tile.worldx(), tile.worldy());
+			Draw.color();
 		}
-		
-		Draw.tscl(Vars.fontscale);
 	}
 
 }

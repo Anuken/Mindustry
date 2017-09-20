@@ -392,11 +392,6 @@ public class Control extends ControlModule{
 	
 			drawDefault();
 			
-			batch.setProjectionMatrix(control.camera.combined);
-			batch.begin();
-			Renderer.renderOverlay();
-			batch.end();
-			
 			camera.position.set(lastx - deltax, lasty - deltay, 0);
 			
 			if(Vars.debug){
