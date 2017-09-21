@@ -58,7 +58,7 @@ public class Generator{
 						floor = Blocks.iron;
 					}
 					
-					if(Noise.nnoise(x, y, 6, 1) > 0.242){
+					if(Noise.nnoise(x, y, 6, 1) > 0.24){
 						floor = Blocks.coal;
 					}
 					

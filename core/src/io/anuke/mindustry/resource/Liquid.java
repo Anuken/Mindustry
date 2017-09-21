@@ -3,7 +3,8 @@ package io.anuke.mindustry.resource;
 import com.badlogic.gdx.graphics.Color;
 
 public enum Liquid{
-	water(Color.ROYAL);
+	water(Color.ROYAL),
+	plasma(Color.CORAL);
 	
 	public final Color color;
 	

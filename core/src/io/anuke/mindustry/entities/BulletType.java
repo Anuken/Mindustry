@@ -108,6 +108,17 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Draw.reset();
 		}
 	},
+	plasmaflame = new BulletType(0.8f, 15){
+		{
+			lifetime = 65f;
+		}
+		public void draw(Bullet b){
+			Draw.color(Color.valueOf("c2efd7"), Color.valueOf("72deaf"), b.time/lifetime);
+			float size = 7f-b.time/lifetime*6f;
+			Draw.rect("circle", b.x, b.y, size, size);
+			Draw.reset();
+		}
+	},
 	flameshot = new BulletType(0.5f, 3){
 		public void draw(Bullet b){
 			Draw.color(Color.ORANGE, Color.SCARLET, b.time/lifetime);

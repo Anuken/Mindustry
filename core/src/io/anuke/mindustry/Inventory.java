@@ -21,6 +21,7 @@ public class Inventory{
 			items.put(Item.steel, 2000000);
 			items.put(Item.coal, 2000000);
 			items.put(Item.titanium, 2000000);
+			items.put(Item.dirium, 2000000);
 		}
 	}
 	

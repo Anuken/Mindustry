@@ -16,7 +16,6 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.GameState.State;
-import io.anuke.mindustry.entities.Weapon;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.ui.*;
@@ -551,8 +550,8 @@ public class UI extends SceneModule{
 		weapontable.clearChildren();
 		
 		for(Weapon weapon : control.getWeapons()){
-			ImageButton button = new ImageButton(Draw.region("weapon-"+weapon.name()), "static");
-			button.getImageCell().size(40);
+			ImageButton button = new ImageButton(Draw.region(weapon.name()), "static");
+			button.getImageCell().size(14*3);
 			button.setDisabled(true);
 			
 			if(weapon != player.weapon)

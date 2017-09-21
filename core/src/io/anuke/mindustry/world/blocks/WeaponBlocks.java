@@ -2,7 +2,9 @@ package io.anuke.mindustry.world.blocks;
 
 import com.badlogic.gdx.graphics.Color;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.effect.TeslaOrb;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -10,6 +12,7 @@ import io.anuke.mindustry.world.blocks.types.LaserTurret;
 import io.anuke.mindustry.world.blocks.types.RepairTurret;
 import io.anuke.mindustry.world.blocks.types.Turret;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
 public class WeaponBlocks{
@@ -127,6 +130,40 @@ public class WeaponBlocks{
 			damage = 9;
 			ammo = Item.stone;
 			health = 110;
+		}
+	},
+	
+	//TODO
+	teslaturret = new Turret("waveturret"){
+		{
+			formalName = "tesla turret";
+			range = 70;
+			reload = 20f;
+			bullet = BulletType.shell;
+			ammo = Item.stone;
+			health = 1100;
+		}
+		
+		@Override
+		public void shoot(Tile tile){
+			TurretEntity entity = tile.entity();
+			Angles.translation(entity.rotation, 4);
+
+			new TeslaOrb(tile.worldx() + Angles.x(), tile.worldy() + Angles.y(), 
+					70, (int)(10*Vars.multiplier)).add();
+		}
+	},
+		
+	//TODO
+	plasmaturret = new Turret("plasmaturret"){
+		{
+			inaccuracy = 7f;
+			formalName = "plasma turret";
+			range = 60f;
+			reload = 3f;
+			bullet = BulletType.plasmaflame;
+			ammo = Item.stone;
+			health = 180;
 		}
 	},
 	

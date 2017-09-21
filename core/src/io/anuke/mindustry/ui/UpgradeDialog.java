@@ -7,8 +7,8 @@ import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.GameState;
 import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.Inventory;
-import io.anuke.mindustry.entities.Weapon;
 import io.anuke.mindustry.resource.ItemStack;
+import io.anuke.mindustry.resource.Weapon;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.function.Listenable;
@@ -45,8 +45,8 @@ public class UpgradeDialog extends Dialog{
 		for(Weapon weapon : Weapon.values()){
 			TextButton button = new TextButton(weapon.name());
 			
-			Image img = new Image(Draw.region("weapon-"+weapon.name()));
-			button.add(img).size(8*5);
+			Image img = new Image(Draw.region(weapon.name()));
+			button.add(img).size(14*4);
 			button.getCells().reverse();
 			button.row();
 			button.pack();

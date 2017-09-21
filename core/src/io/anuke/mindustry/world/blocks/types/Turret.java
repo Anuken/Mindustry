@@ -27,6 +27,7 @@ public class Turret extends Block{
 	
 	protected float range = 50f;
 	protected float reload = 10f;
+	protected float inaccuracy = 0f;
 	protected String shootsound = "shoot";
 	protected BulletType bullet = BulletType.iron;
 	protected Item ammo;
@@ -131,8 +132,10 @@ public class Turret extends Block{
 	protected void shoot(Tile tile){
 		TurretEntity entity = tile.entity();
 		
-		vector.set(0, 4).setAngle(entity.rotation);
-		Bullet out = new Bullet(bullet, tile.entity, tile.worldx()+vector.x, tile.worldy()+vector.y, entity.rotation).add();
+		float inac = Mathf.range(inaccuracy);
+		
+		vector.set(0, 4).setAngle(entity.rotation + inac);
+		Bullet out = new Bullet(bullet, tile.entity, tile.worldx()+vector.x, tile.worldy()+vector.y, entity.rotation + inac).add();
 		out.damage = (int)(bullet.damage*Vars.multiplier);
 	}
 	
