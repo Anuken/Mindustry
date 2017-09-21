@@ -108,7 +108,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Draw.reset();
 		}
 	},
-	plasmaflame = new BulletType(0.8f, 15){
+	plasmaflame = new BulletType(0.8f, 17){
 		{
 			lifetime = 65f;
 		}

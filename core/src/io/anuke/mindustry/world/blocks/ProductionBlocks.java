@@ -7,6 +7,7 @@ import io.anuke.mindustry.Inventory;
 import io.anuke.mindustry.Renderer;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.*;
@@ -151,6 +152,20 @@ public class ProductionBlocks{
 		@Override
 		public String description(){
 			return "Takes in steel + titanium, outputs dirium.";
+		}
+	},
+	
+	coalpurifier = new Purifier("coalpurifier"){
+		{
+			formalName = "coal purifier";
+			input = Item.stone;
+			inputLiquid = Liquid.water;
+			output = Item.coal;
+		}
+		
+		@Override
+		public String description(){
+			return "Takes in stone + water, outputs coal.";
 		}
 	},
 	

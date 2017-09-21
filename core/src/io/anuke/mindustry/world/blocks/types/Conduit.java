@@ -12,7 +12,7 @@ import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
 
 public class Conduit extends Block{
-	protected float capacity = 10f;
+	protected float liquidCapacity = 10f;
 	protected float flowfactor = 4f;
 	
 	public Conduit(String name) {
@@ -26,9 +26,9 @@ public class Conduit extends Block{
 		ConduitEntity entity = tile.entity();
 		
 		Draw.rect(name() + "bottom", tile.worldx(), tile.worldy(), tile.rotation * 90);
-		if(entity.liquid != null && entity.amount > 0.01f){
+		if(entity.liquid != null && entity.liquidAmount > 0.01f){
 			Draw.color(entity.liquid.color);
-			Draw.alpha(entity.amount / capacity);
+			Draw.alpha(entity.liquidAmount / liquidCapacity);
 			Draw.rect("conduitliquid", tile.worldx(), tile.worldy(), tile.rotation * 90);
 			Draw.color();
 		}
@@ -45,7 +45,7 @@ public class Conduit extends Block{
 	public void update(Tile tile){
 		ConduitEntity entity = tile.entity();
 		
-		if(entity.amount > 0.01f && Timers.get(entity, "flow", 3)){
+		if(entity.liquidAmount > 0.01f && Timers.get(entity, "flow", 3)){
 			tryMoveLiquid(tile, tile.getNearby()[tile.rotation]);
 		}
 		
@@ -54,7 +54,7 @@ public class Conduit extends Block{
 	public void tryDumpLiquid(Tile tile){
 		ConduitEntity entity = tile.entity();
 		
-		if(entity.amount > 0.01f){
+		if(entity.liquidAmount > 0.01f){
 			tryMoveLiquid(tile, tile.getNearby()[tile.dump]);
 			tile.dump ++;
 			tile.dump %= 4;
@@ -66,47 +66,47 @@ public class Conduit extends Block{
 		
 		Liquid liquid = entity.liquid;
 		
-		if(next != null && next.block() instanceof Conduit && entity.amount > 0.01f){
+		if(next != null && next.block() instanceof Conduit && entity.liquidAmount > 0.01f){
 			Conduit other = (Conduit)next.block();
 			ConduitEntity otherentity = next.entity();
 			
-			float flow = Math.min(other.capacity - otherentity.amount - 0.001f, Math.min(entity.amount/flowfactor, entity.amount));
+			float flow = Math.min(other.liquidCapacity - otherentity.liquidAmount - 0.001f, Math.min(entity.liquidAmount/flowfactor, entity.liquidAmount));
 			
-			if(flow <= 0f || entity.amount < flow) return;
+			if(flow <= 0f || entity.liquidAmount < flow) return;
 			
-			if(other.accept(next, tile, liquid, flow)){
+			if(other.acceptLiquid(next, tile, liquid, flow)){
 				other.addLiquid(next, tile, liquid, flow);
-				entity.amount -= flow;
+				entity.liquidAmount -= flow;
 			}
 		}
 	}
 	
-	public boolean accept(Tile tile, Tile source, Liquid liquid, float amount){
+	public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
 		ConduitEntity entity = tile.entity();
 		
-		return entity.amount + amount < capacity && (entity.liquid == liquid || entity.amount <= 0.01f);
+		return entity.liquidAmount + amount < liquidCapacity && (entity.liquid == liquid || entity.liquidAmount <= 0.01f);
 	}
 	
 	public void addLiquid(Tile tile, Tile source, Liquid liquid, float amount){
 		ConduitEntity entity = tile.entity();
 		entity.liquid = liquid;
-		entity.amount += amount;
+		entity.liquidAmount += amount;
 	}
 	
 	static class ConduitEntity extends TileEntity{
 		Liquid liquid;
-		float amount;
+		float liquidAmount;
 		
 		@Override
 		public void write(DataOutputStream stream) throws IOException{
 			stream.writeByte(liquid.ordinal());
-			stream.writeByte((byte)(amount));
+			stream.writeByte((byte)(liquidAmount));
 		}
 		
 		@Override
 		public void read(DataInputStream stream) throws IOException{
 			liquid = Liquid.values()[stream.readByte()];
-			amount = stream.readByte();
+			liquidAmount = stream.readByte();
 		}
 	}
 }

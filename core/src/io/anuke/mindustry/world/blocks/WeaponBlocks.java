@@ -141,7 +141,7 @@ public class WeaponBlocks{
 			reload = 20f;
 			bullet = BulletType.shell;
 			ammo = Item.stone;
-			health = 1100;
+			health = 140;
 		}
 		
 		@Override
@@ -150,7 +150,7 @@ public class WeaponBlocks{
 			Angles.translation(entity.rotation, 4);
 
 			new TeslaOrb(tile.worldx() + Angles.x(), tile.worldy() + Angles.y(), 
-					70, (int)(10*Vars.multiplier)).add();
+					70, (int)(8*Vars.multiplier)).add();
 		}
 	},
 		

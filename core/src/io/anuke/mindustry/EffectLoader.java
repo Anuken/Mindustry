@@ -35,6 +35,13 @@ public class EffectLoader{
 			Draw.square(e.x, e.y, Vars.tilesize / 2f + e.ifract() * 3f);
 			Draw.reset();
 		});
+		
+		Effects.create("purify", 10, e -> {
+			Draw.color(Hue.mix(Color.ROYAL, Color.GRAY, e.ifract()));
+			Draw.thickness(2f);
+			Draw.spikes(e.x, e.y, e.ifract() * 4f, 2, 6);
+			Draw.reset();
+		});
 
 		Effects.create("spark", 10, e -> {
 			Draw.thickness(1f);

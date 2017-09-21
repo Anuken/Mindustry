@@ -27,7 +27,7 @@ public class Drill extends Block{
 			Effects.effect("spark", tile.worldx(), tile.worldy());
 		}
 
-		if(Timers.get(tile.hashCode() + "dump", 30)){
+		if(Timers.get(tile.hashCode(), "dump", 30)){
 			tryDump(tile);
 		}
 	}

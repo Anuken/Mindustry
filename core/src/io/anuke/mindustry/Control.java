@@ -402,7 +402,7 @@ public class Control extends ControlModule{
 		
 		if(!GameState.is(State.paused)){
 			Inputs.update();
-			Timers.update(Gdx.graphics.getDeltaTime()*60f);
+			Timers.update();
 		}
 	}
 	

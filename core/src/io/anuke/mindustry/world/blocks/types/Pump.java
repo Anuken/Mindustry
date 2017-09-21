@@ -14,7 +14,7 @@ public class Pump extends Conduit{
 	}
 	
 	@Override
-	public boolean accept(Tile tile, Tile source, Liquid liquid, float amount){
+	public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
 		return false;
 	}
 	
@@ -27,9 +27,9 @@ public class Pump extends Conduit{
 	public void update(Tile tile){
 		ConduitEntity entity = tile.entity();
 		
-		if(Timers.get(tile, "pump", 8) && entity.amount < capacity){
+		if(Timers.get(tile, "pump", 8) && entity.liquidAmount < liquidCapacity){
 			entity.liquid = Liquid.water;
-			entity.amount += pumpspeed;
+			entity.liquidAmount += pumpspeed;
 		}
 		
 		if(Timers.get(tile, "dump", 1)){

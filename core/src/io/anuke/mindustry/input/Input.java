@@ -76,7 +76,7 @@ public class Input{
 		Tile cursor = World.cursorTile();
 
 		//block breaking
-		if(Inputs.buttonDown(Buttons.RIGHT) && World.cursorNear() && cursor.breakable()
+		if(cursor != null && Inputs.buttonDown(Buttons.RIGHT) && World.cursorNear() && cursor.breakable()
 				&& cursor.block() != ProductionBlocks.core){
 			Tile tile = cursor;
 			player.breaktime += Timers.delta();

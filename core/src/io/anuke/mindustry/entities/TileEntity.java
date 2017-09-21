@@ -13,6 +13,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.util.Mathf;
 
@@ -67,7 +68,7 @@ public class TileEntity extends Entity{
 	@Override
 	public void update(){
 		if(health != 0 && !tile.block().name().contains("block") &&
-				Mathf.chance(0.009f*delta*(1f-(float)health/maxhealth))){
+				Mathf.chance(0.009f*Timers.delta()*(1f-(float)health/maxhealth))){
 			
 			Effects.effect("smoke", x+Mathf.range(4), y+Mathf.range(4));
 		}
@@ -85,6 +86,10 @@ public class TileEntity extends Entity{
 	
 	public boolean hasItem(Item item){
 		return items.get(item, 0) > 0;
+	}
+	
+	public boolean hasItem(Item item, int amount){
+		return items.get(item, 0) >= amount;
 	}
 	
 	public void addItem(Item item, int amount){

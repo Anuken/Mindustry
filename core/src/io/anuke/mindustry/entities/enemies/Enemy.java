@@ -48,7 +48,7 @@ public class Enemy extends DestructibleEntity{
 		Vector2 vec  = Pathfind.find(this);
 		vec.sub(x, y).setLength(speed);
 		
-		move(vec.x*delta, vec.y*delta, Vars.tilesize-4);
+		move(vec.x*Timers.delta(), vec.y*Timers.delta(), Vars.tilesize-4);
 		
 		if(Timers.get(this, 15)){
 			target = World.findTileTarget(x, y, null, range, false);

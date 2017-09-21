@@ -51,7 +51,7 @@ public class Player extends DestructibleEntity{
 		float speed = this.speed;
 		
 		if(Vars.debug)
-			speed = 2f;
+			speed *= 3f;
 		
 		if(health < maxhealth && Timers.get(this, 50))
 			health ++;
@@ -76,10 +76,10 @@ public class Player extends DestructibleEntity{
 		
 		vector.limit(speed);
 		
-		move(vector.x*delta, vector.y*delta, 4);
+		move(vector.x*Timers.delta(), vector.y*Timers.delta(), 4);
 		
 		if(!shooting){
-			direction.add(vector.scl(delta));
+			direction.add(vector.scl(Timers.delta()));
 			direction.limit(speed*6);
 		}else{
 			float angle = Angles.mouseAngle(x, y);

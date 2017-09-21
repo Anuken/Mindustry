@@ -27,8 +27,8 @@ public enum Recipe{
 	sniperturret(defense, WeaponBlocks.sniperturret, stack(Item.iron, 30), stack(Item.steel, 20)),
 	laserturret(defense, WeaponBlocks.laserturret, stack(Item.steel, 20), stack(Item.titanium, 20)),
 	mortarturret(defense, WeaponBlocks.mortarturret, stack(Item.steel, 40), stack(Item.titanium, 30)),
-	waveturret(defense, WeaponBlocks.teslaturret, stack(Item.steel, 20), stack(Item.titanium, 20), stack(Item.dirium, 20)),
-	plasmaturret(defense, WeaponBlocks.plasmaturret, stack(Item.steel, 40), stack(Item.titanium, 30), stack(Item.dirium, 25)),
+	teslaturret(defense, WeaponBlocks.teslaturret, stack(Item.steel, 20), stack(Item.titanium, 30), stack(Item.dirium, 30)),
+	plasmaturret(defense, WeaponBlocks.plasmaturret, stack(Item.steel, 20), stack(Item.titanium, 20), stack(Item.dirium, 30)),
 	
 	healturret(defense, WeaponBlocks.repairturret, stack(Item.iron, 50)),
 	megahealturret(defense, WeaponBlocks.megarepairturret, stack(Item.iron, 30), stack(Item.steel, 50)),
@@ -40,6 +40,7 @@ public enum Recipe{
 	omnidrill(production, ProductionBlocks.omnidrill, stack(Item.steel, 50), stack(Item.titanium, 50)),
 	smelter(production, ProductionBlocks.smelter, stack(Item.stone, 80), stack(Item.iron, 80)),
 	crucible(production, ProductionBlocks.crucible, stack(Item.titanium, 80), stack(Item.steel, 80)),
+	coalpurifier(production, ProductionBlocks.coalpurifier, stack(Item.steel, 20), stack(Item.iron, 20)),
 	
 	conduit(distribution, ProductionBlocks.conduit, stack(Item.steel, 1)),
 	pump(production, ProductionBlocks.pump, stack(Item.steel, 20));
