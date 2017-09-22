@@ -25,11 +25,11 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.graphics.Atlas;
 import io.anuke.ucore.modules.ControlModule;
+import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 
 public class Control extends ControlModule{
-	public int rangex = 10, rangey = 10;
-	public float targetzoom = 1f;
+	int targetscale = baseCameraScale;
 	
 	boolean showedTutorial;
 	boolean hiscore = false;
@@ -86,12 +86,13 @@ public class Control extends ControlModule{
 			
 		Settings.loadAll("io.anuke.moment");
 		
-		for(String map : maps)
+		for(String map : maps){
 			Settings.defaults("hiscore"+map, 0);
+		}
 		
 		player = new Player();
 	}
-	
+	/*
 	public void setCameraScale(int scale){
 		Core.cameraScale = scale;
 		resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -99,7 +100,7 @@ public class Control extends ControlModule{
 		Draw.getSurface("pixel").setScale(Core.cameraScale);
 		Draw.getSurface("shadow").setScale(Core.cameraScale);
 	}
-	
+	*/
 	public void reset(){
 		weapons.clear();
 		Renderer.clearTiles();
@@ -238,11 +239,6 @@ public class Control extends ControlModule{
 		return wavespace*out;
 	}
 	
-	public void clampZoom(){
-		targetzoom = Mathf.clamp(targetzoom, 0.5f, 2f);
-		camera.zoom = Mathf.clamp(camera.zoom, 0.5f, 2f);
-	}
-	
 	public boolean isHighScore(){
 		return hiscore;
 	}
@@ -267,6 +263,21 @@ public class Control extends ControlModule{
 		return wave;
 	}
 	
+	public void setCameraScale(int amount){
+		targetscale = amount;
+		clampScale();
+		Draw.getSurface("pixel").setScale(targetscale);
+		Draw.getSurface("shadow").setScale(targetscale);
+	}
+	
+	public void scaleCamera(int amount){
+		setCameraScale(targetscale + amount);
+	}
+	
+	public void clampScale(){
+		targetscale = Mathf.clamp(targetscale, Math.round(Unit.dp.inPixels(3)), Math.round(Unit.dp.inPixels((5))));
+	}
+	
 	@Override
 	public void init(){
 		Musics.shuffleAll();
@@ -284,6 +295,15 @@ public class Control extends ControlModule{
 	public void update(){
 		
 		if(debug){
+			
+			if(Inputs.keyUp(Keys.PLUS)){
+				scaleCamera(1);
+			}
+			
+			if(Inputs.keyUp(Keys.MINUS)){
+				scaleCamera(-1);
+			}
+			
 			if(Inputs.keyUp(Keys.SPACE))
 				Effects.sound("shoot", World.core.worldx(), World.core.worldy());
 			
@@ -313,6 +333,22 @@ public class Control extends ControlModule{
 			
 			if(Inputs.keyDown(Keys.Y)){
 				new TestEnemy(0).set(player.x, player.y).add();
+			}
+		}
+		
+		if(Core.cameraScale != targetscale){
+			float targetzoom = (float)Core.cameraScale / targetscale;
+			camera.zoom = Mathf.lerp(camera.zoom, targetzoom, 0.2f*Timers.delta());
+			
+			if(Mathf.in(camera.zoom, targetzoom, 0.005f)){
+				camera.zoom = 1f;
+				Core.cameraScale = targetscale;
+				//super.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+				camera.viewportWidth = Gdx.graphics.getWidth() / Core.cameraScale;
+				camera.viewportHeight = Gdx.graphics.getHeight() / Core.cameraScale;
+				
+				AndroidInput.mousex = Gdx.graphics.getWidth()/2;
+				AndroidInput.mousey = Gdx.graphics.getHeight()/2;
 			}
 		}
 		
@@ -422,9 +458,6 @@ public class Control extends ControlModule{
 	@Override
 	public void resize(int width, int height){
 		super.resize(width, height);
-		
-		rangex = (int) (width / tilesize / Core.cameraScale/2)+2;
-		rangey = (int) (height / tilesize / Core.cameraScale/2)+2;
 		
 		AndroidInput.mousex = Gdx.graphics.getWidth()/2;
 		AndroidInput.mousey = Gdx.graphics.getHeight()/2;

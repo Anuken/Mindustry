@@ -68,7 +68,8 @@ public class Renderer{
 		Draw.begin();
 		
 		Draw.reset();
-		int rangex = control.rangex, rangey = control.rangey;
+		int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2)+2;
+		int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2)+2;
 		
 		boolean noshadows = Settings.getBool("noshadows");
 		

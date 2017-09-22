@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 
 import io.anuke.mindustry.Inventory;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
@@ -14,7 +15,6 @@ import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.scene.utils.Cursors;
-import io.anuke.ucore.util.Mathf;
 
 public class Input{
 	
@@ -23,12 +23,16 @@ public class Input{
 		if(player.health <= 0) return;
 		
 		if(Inputs.scrolled()){
+			Vars.control.scaleCamera(Inputs.scroll());
+			//TODO
+			/*
 			int index = currentWeapon();
 			
 			index -= Inputs.scroll();
 			player.weapon = control.getWeapons().get(Mathf.clamp(index, 0, control.getWeapons().size-1));
 			
 			ui.updateWeapons();
+			*/
 		}
 
 		if(Inputs.keyUp("rotate"))

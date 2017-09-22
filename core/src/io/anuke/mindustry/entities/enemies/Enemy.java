@@ -135,6 +135,7 @@ public class Enemy extends DestructibleEntity{
 	
 	@Override
 	public void draw(){
+		Draw.color();
 		Draw.rect("mech1", x, y, direction.angle()-90);
 	}
 }

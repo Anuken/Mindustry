@@ -75,7 +75,7 @@ public class UI extends SceneModule{
 		Draw.color();
 		
 		Texture back = Textures.get("background");
-		int backscl = 5;
+		float backscl = 5;
 		
 		Draw.batch().draw(back, w/2 - back.getWidth()*backscl/2, h/2 - back.getHeight()*backscl/2, 
 				back.getWidth()*backscl, back.getHeight()*backscl);
@@ -98,14 +98,14 @@ public class UI extends SceneModule{
 		}
 		*/
 		
-		int logoscl = 7;
+		float logoscl = (int)Unit.dp.inPixels(7);
 		TextureRegion logo = skin.getRegion("logotext");
-		int logow = logo.getRegionWidth()*logoscl;
-		int logoh = logo.getRegionHeight()*logoscl;
+		float logow = logo.getRegionWidth()*logoscl;
+		float logoh = logo.getRegionHeight()*logoscl;
 		
 		Draw.color();
 		//Draw.color(Color.CORAL);
-		Draw.batch().draw(logo, w/2 - logow/2, h - logoh + 10, logow, logoh);
+		Draw.batch().draw(logo, w/2 - logow/2, h - logoh + 15, logow, logoh);
 		
 		Draw.color();
 		
@@ -167,7 +167,7 @@ public class UI extends SceneModule{
 				restart.content().add("[YELLOW]New highscore!").pad(6);
 				restart.content().row();
 			}
-			restart.content().add("You lasted until wave [GREEN]" + control.getWave() + "[].").pad(6);
+			restart.content().add("You lasted until wave [GREEN]" + control.getWave() + "[].").pad(12).units(Unit.dp).get();
 			restart.pack();
 		});
 		
@@ -175,10 +175,10 @@ public class UI extends SceneModule{
 			restart.hide();
 			GameState.set(State.menu);
 			control.reset();
-		});
+		}).size(200, 50).pad(3).units(Unit.dp);
 		
 		weapontable = fill();
-		weapontable.bottom();
+		weapontable.bottom().left();
 		weapontable.setVisible(play);
 		
 		if(android){
@@ -265,7 +265,7 @@ public class UI extends SceneModule{
 					}
 					
 					//additional padding
-					for(int j = 0; j < maxcol - (int)((float)recipes.size/rows+1); j ++){
+					for(int j = 0; j < maxcol - (int)((float)recipes.size/rows+2); j ++){
 						table.row();
 						table.add().size(size);
 					}
@@ -304,16 +304,17 @@ public class UI extends SceneModule{
 			new table(){{
 				left();
 				defaults().size(66).units(Unit.dp).left();
+				float isize = Unit.dp.inPixels(40);
 				
-				new imagebutton("icon-menu", 40, ()->{
+				new imagebutton("icon-menu", isize, ()->{
 					showMenu();
 				});
 				
-				new imagebutton("icon-settings", 40, ()->{
+				new imagebutton("icon-settings", isize, ()->{
 					prefs.show();
 				});
 
-				new imagebutton("icon-pause", 40, ()->{
+				new imagebutton("icon-pause", isize, ()->{
 					//TODO pause
 				});
 			}}.end();
@@ -349,30 +350,6 @@ public class UI extends SceneModule{
 				get().pad(Unit.dp.inPixels(12));
 			}};
 
-			get().setVisible(play);
-		}}.end();
-		
-		
-		//+- table
-		//TODO refactor to make this less messy?
-		new table(){{
-			aleft();
-			abottom();
-			int base = baseCameraScale;
-			int min = base-zoomScale*2;
-			int max = base+zoomScale;
-			new button("+", ()->{
-				if(Core.cameraScale < max){
-					control.setCameraScale(Core.cameraScale+zoomScale);
-				}
-			}).size(Unit.dp.inPixels(40));
-			
-			new button("-", ()->{
-				if(Core.cameraScale > min){
-					control.setCameraScale(Core.cameraScale-zoomScale);
-				}
-			}).size(Unit.dp.inPixels(40));
-			
 			get().setVisible(play);
 		}}.end();
 	
@@ -498,7 +475,7 @@ public class UI extends SceneModule{
 		
 		desctable.defaults().left();
 		desctable.left();
-		desctable.pad(12);
+		desctable.pad(Unit.dp.inPixels(12));
 		
 		Table header = new Table();
 		
@@ -507,10 +484,10 @@ public class UI extends SceneModule{
 		desctable.row();
 		
 		
-		header.addImage(Draw.region(recipe.result.name)).size(8*5).padTop(4);
-		header.add(recipe.result.formalName).padLeft(4);
+		header.addImage(Draw.region(recipe.result.name)).size(8*5).padTop(4).units(Unit.dp);
+		header.add(recipe.result.formalName).padLeft(4).units(Unit.dp);
 		
-		desctable.add().pad(2);
+		desctable.add().pad(2).units(Unit.dp);
 		
 		Table requirements = new Table();
 		
@@ -521,7 +498,7 @@ public class UI extends SceneModule{
 		
 		for(ItemStack stack : recipe.requirements){
 			ItemStack fs = stack;
-			requirements.addImage(Draw.region("icon-"+stack.item.name())).size(8*3);
+			requirements.addImage(Draw.region("icon-"+stack.item.name())).size(8*3).units(Unit.dp);
 			Label reqlabel = new Label("");
 			
 			reqlabel.update(()->{
@@ -542,7 +519,7 @@ public class UI extends SceneModule{
 		Label label = new Label("[health]health: " + recipe.result.health + (recipe.result.description() == null ?
 				"" : ("\n[]" + recipe.result.description())));
 		label.setWrap(true);
-		desctable.add(label).width(200).padTop(4).padBottom(2);
+		desctable.add(label).width(200).padTop(4).padBottom(2).units(Unit.dp);
 		
 	}
 	

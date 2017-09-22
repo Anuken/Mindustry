@@ -14,6 +14,11 @@ public class Pump extends Conduit{
 	}
 	
 	@Override
+	public String description(){
+		return "Pumps liquids from blocks into conduits.";
+	}
+	
+	@Override
 	public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
 		return false;
 	}

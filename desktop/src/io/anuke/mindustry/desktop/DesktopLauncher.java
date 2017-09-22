@@ -18,6 +18,7 @@ public class DesktopLauncher {
 		config.setMaximized(true);
 		//config.useVsync(false);
 		config.setWindowedMode(800, 600);
+		config.setWindowIcon("sprites/icon.png");
 		
 		SaveIO.setFormatProvider(new FormatProvider(){
 			SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss");

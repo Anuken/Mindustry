@@ -37,7 +37,7 @@ public enum Recipe{
 	irondrill(production, ProductionBlocks.irondrill, stack(Item.stone, 40)),
 	coaldrill(production, ProductionBlocks.coaldrill, stack(Item.stone, 40), stack(Item.iron, 40)),
 	titaniumdrill(production, ProductionBlocks.titaniumdrill, stack(Item.iron, 40), stack(Item.steel, 40)),
-	omnidrill(production, ProductionBlocks.omnidrill, stack(Item.steel, 50), stack(Item.titanium, 50)),
+	omnidrill(production, ProductionBlocks.omnidrill, stack(Item.titanium, 40), stack(Item.dirium, 40)),
 	smelter(production, ProductionBlocks.smelter, stack(Item.stone, 80), stack(Item.iron, 80)),
 	crucible(production, ProductionBlocks.crucible, stack(Item.titanium, 80), stack(Item.steel, 80)),
 	coalpurifier(production, ProductionBlocks.coalpurifier, stack(Item.steel, 20), stack(Item.iron, 20)),

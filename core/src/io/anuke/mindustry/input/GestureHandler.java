@@ -10,11 +10,13 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.*;
+import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class GestureHandler extends GestureAdapter{
 	Vector2 pinch1 = new Vector2(-1, -1), pinch2 = pinch1.cpy();
 	Vector2 vector = new Vector2();
 	float initzoom = -1;
+	boolean zoomed = false;
 	
 	@Override
 	public boolean longPress(float x, float y){
@@ -66,15 +68,17 @@ public class GestureHandler extends GestureAdapter{
 	
 	@Override
 	public boolean zoom(float initialDistance, float distance){
-		
-		if(initzoom <= 0)
+		if(initzoom < 0){
 			initzoom = initialDistance;
+		}
 		
-		control.targetzoom /= (distance/initzoom);
-		control.clampZoom();
-		control.camera.update();
-		
-		initzoom = distance;
+		if(Math.abs(distance - initzoom) > Unit.dp.inPixels(100f) && !zoomed){
+			int amount = (distance > initzoom ? 1 : -1);
+			control.scaleCamera(Math.round(Unit.dp.inPixels(amount)));
+			initzoom = distance;
+			zoomed = true;
+			return true;
+		}
 		
 		return false;
 	}
@@ -83,6 +87,7 @@ public class GestureHandler extends GestureAdapter{
 	public void pinchStop () {
 		initzoom = -1;
 		pinch2.set(pinch1.set(-1, -1));
+		zoomed = false;
 	}
 	
 	int touches(){
