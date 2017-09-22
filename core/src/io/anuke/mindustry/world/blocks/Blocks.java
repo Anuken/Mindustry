@@ -108,7 +108,15 @@ public class Blocks{
 	}},
 	
 	titaniumwall = new Wall("titaniumwall"){{
-		health = 140;
+		health = 150;
 		formalName = "titanium wall";
+	}},
+	diriumwall = new Wall("duriumwall"){{
+		health = 190;
+		formalName = "dirium wall";
+	}},
+	compositewall = new Wall("compositewall"){{
+		health = 270;
+		formalName = "composite wall";
 	}};
 }

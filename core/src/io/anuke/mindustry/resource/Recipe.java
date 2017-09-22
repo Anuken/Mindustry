@@ -14,6 +14,8 @@ public enum Recipe{
 	ironwall(distribution, Blocks.ironwall, stack(Item.iron, 5)),
 	steelwall(distribution, Blocks.steelwall, stack(Item.steel, 5)),
 	titaniumwall(distribution, Blocks.titaniumwall, stack(Item.titanium, 5)),
+	duriumwall(distribution, Blocks.diriumwall, stack(Item.dirium, 5)),
+	compositewall(distribution, Blocks.compositewall, stack(Item.dirium, 5), stack(Item.titanium, 5), stack(Item.steel, 5), stack(Item.iron, 5)),
 	conveyor(distribution, ProductionBlocks.conveyor, stack(Item.stone, 1)),
 	fastconveyor(distribution, ProductionBlocks.steelconveyor, stack(Item.steel, 1)),
 	router(distribution, ProductionBlocks.router, stack(Item.stone, 3)),
@@ -43,7 +45,10 @@ public enum Recipe{
 	coalpurifier(production, ProductionBlocks.coalpurifier, stack(Item.steel, 20), stack(Item.iron, 20)),
 	
 	conduit(distribution, ProductionBlocks.conduit, stack(Item.steel, 1)),
+	liquidrouter(distribution, ProductionBlocks.liquidrouter, stack(Item.steel, 5)),
 	pump(production, ProductionBlocks.pump, stack(Item.steel, 20));
+	
+	
 	
 	public Block result;
 	public ItemStack[] requirements;

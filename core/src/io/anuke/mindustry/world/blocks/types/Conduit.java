@@ -75,7 +75,7 @@ public class Conduit extends Block{
 			if(flow <= 0f || entity.liquidAmount < flow) return;
 			
 			if(other.acceptLiquid(next, tile, liquid, flow)){
-				other.addLiquid(next, tile, liquid, flow);
+				other.handleLiquid(next, tile, liquid, flow);
 				entity.liquidAmount -= flow;
 			}
 		}
@@ -87,7 +87,7 @@ public class Conduit extends Block{
 		return entity.liquidAmount + amount < liquidCapacity && (entity.liquid == liquid || entity.liquidAmount <= 0.01f);
 	}
 	
-	public void addLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+	public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
 		ConduitEntity entity = tile.entity();
 		entity.liquid = liquid;
 		entity.liquidAmount += amount;
