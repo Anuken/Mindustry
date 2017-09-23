@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.types;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ObjectMap;
 
-import io.anuke.mindustry.Renderer;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -47,7 +47,7 @@ public class Router extends Block{
 		
 		float fract = (float)tile.entity.totalItems()/maxitems;
 		
-		Renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 13, fract);
+		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 13, fract);
 	}
 	
 	@Override

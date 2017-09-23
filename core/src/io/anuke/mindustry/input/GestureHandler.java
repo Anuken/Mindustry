@@ -35,8 +35,8 @@ public class GestureHandler extends GestureAdapter{
 	@Override
 	public boolean pan(float x, float y, float deltaX, float deltaY){
 		if(player.recipe == null){
-			player.x -= deltaX*control.camera.zoom/Core.cameraScale;
-			player.y += deltaY*control.camera.zoom/Core.cameraScale;
+			player.x -= deltaX*Core.camera.zoom/Core.cameraScale;
+			player.y += deltaY*Core.camera.zoom/Core.cameraScale;
 		}else{
 			AndroidInput.mousex += deltaX;
 			AndroidInput.mousey += deltaY;
@@ -57,8 +57,8 @@ public class GestureHandler extends GestureAdapter{
 		
 		Vector2 vec = (vector.set(pointer1).add(pointer2).scl(0.5f)).sub(pinch1.add(pinch2).scl(0.5f));
 		
-		player.x -= vec.x*control.camera.zoom/Core.cameraScale;
-		player.y += vec.y*control.camera.zoom/Core.cameraScale;
+		player.x -= vec.x*Core.camera.zoom/Core.cameraScale;
+		player.y += vec.y*Core.camera.zoom/Core.cameraScale;
 		
 		pinch1.set(pointer1);
 		pinch2.set(pointer2);
@@ -74,7 +74,7 @@ public class GestureHandler extends GestureAdapter{
 		
 		if(Math.abs(distance - initzoom) > Unit.dp.inPixels(100f) && !zoomed){
 			int amount = (distance > initzoom ? 1 : -1);
-			control.scaleCamera(Math.round(Unit.dp.inPixels(amount)));
+			renderer.scaleCamera(Math.round(Unit.dp.inPixels(amount)));
 			initzoom = distance;
 			zoomed = true;
 			return true;

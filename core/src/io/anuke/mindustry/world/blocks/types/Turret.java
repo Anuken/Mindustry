@@ -6,7 +6,6 @@ import java.io.IOException;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 
-import io.anuke.mindustry.Renderer;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
@@ -65,7 +64,7 @@ public class Turret extends Block{
 		if(fract > 0)
 			fract = Mathf.clamp(fract, 0.24f, 1f);
 		
-		Renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 13, fract);
+		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 13, fract);
 	}
 	
 	@Override

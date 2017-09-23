@@ -23,7 +23,7 @@ public class Input{
 		if(player.health <= 0) return;
 		
 		if(Inputs.scrolled()){
-			Vars.control.scaleCamera(Inputs.scroll());
+			Vars.renderer.scaleCamera(Inputs.scroll());
 			//TODO
 			/*
 			int index = currentWeapon();

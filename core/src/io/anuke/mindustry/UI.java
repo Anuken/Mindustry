@@ -285,15 +285,15 @@ public class UI extends SceneModule{
 				
 				end();
 			}}.right().bottom().uniformX();
-			
+			/*
 			row();
 			
 			if(!android){
 				new button("Upgrades", ()->{
 					upgrades.show();
 				}).uniformX().fillX();
-			}
-			get().setVisible(play);
+			}*/
+			visible(play);
 
 		}}.end();
 

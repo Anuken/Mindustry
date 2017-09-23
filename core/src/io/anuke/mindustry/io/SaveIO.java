@@ -14,7 +14,8 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
-import io.anuke.mindustry.*;
+import io.anuke.mindustry.Inventory;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.*;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Weapon;
@@ -22,6 +23,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.ucore.core.Core;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 
@@ -85,16 +87,17 @@ public class SaveIO{
 	private static FormatProvider provider = null;
 	
 	//TODO automatic registration of types?
-	private static final ObjectMap<Class<? extends Enemy>, Byte> enemyIDs = new ObjectMap<Class<? extends Enemy>, Byte>(){{
-		put(Enemy.class, (byte)0);
-		put(FastEnemy.class, (byte)1);
-		put(BossEnemy.class, (byte)2);
-		put(FlameEnemy.class, (byte)3);
-	}};
+	private static final Array<Class<? extends Enemy>> enemyIDs = Array.with(
+		Enemy.class,
+		FastEnemy.class,
+		BossEnemy.class,
+		FlameEnemy.class
+	);
 	
-	private static final ObjectMap<Byte, Class<? extends Enemy>> idEnemies = new ObjectMap<Byte, Class<? extends Enemy>>(){{
-		for(Class<? extends Enemy> value : enemyIDs.keys())
-			put(enemyIDs.get(value), value);
+	private static final ObjectMap<Class<? extends Enemy>, Byte> idEnemies = new ObjectMap<Class<? extends Enemy>, Byte>(){{
+		for(int i = 0; i < enemyIDs.size; i ++){
+			put(enemyIDs.get(i), (byte)i);
+		}
 	}};
 	
 	public static void saveToSlot(int slot){
@@ -179,7 +182,7 @@ public class SaveIO{
 			for(Entity entity : Entities.all()){
 				if(entity instanceof Enemy){
 					Enemy enemy = (Enemy)entity;
-					stream.writeByte(enemyIDs.get(enemy.getClass())); //type
+					stream.writeByte(idEnemies.get(enemy.getClass())); //type
 					stream.writeByte(enemy.spawn); //lane
 					stream.writeFloat(enemy.x); //x
 					stream.writeFloat(enemy.y); //y
@@ -266,7 +269,7 @@ public class SaveIO{
 			Vars.player.x = playerx;
 			Vars.player.y = playery;
 			Vars.player.health = playerhealth;
-			Vars.control.camera.position.set(playerx, playery, 0);
+			Core.camera.position.set(playerx, playery, 0);
 			
 			//weapons
 			
@@ -308,7 +311,7 @@ public class SaveIO{
 				int health = stream.readInt();
 				
 				try{
-					Enemy enemy = (Enemy)ClassReflection.getConstructor(idEnemies.get(type), int.class).newInstance(lane);
+					Enemy enemy = (Enemy)ClassReflection.getConstructor(enemyIDs.get(type), int.class).newInstance(lane);
 					enemy.health = health;
 					enemy.x = x;
 					enemy.y = y;
@@ -331,7 +334,7 @@ public class SaveIO{
 			int tiles = stream.readInt();
 			
 			World.loadMap(mapid, seed);
-			Renderer.clearTiles();
+			Vars.renderer.clearTiles();
 			
 			for(Enemy enemy : enemiesToUpdate){
 				enemy.findClosestNode();

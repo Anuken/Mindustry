@@ -22,16 +22,15 @@ import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
-import io.anuke.mindustry.world.blocks.ProductionBlocks;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.graphics.Atlas;
-import io.anuke.ucore.modules.ControlModule;
-import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
 
-public class Control extends ControlModule{
+public class Control extends Module{
 	int targetscale = baseCameraScale;
 	
 	boolean showedTutorial;
@@ -53,9 +52,6 @@ public class Control extends ControlModule{
 			Vars.debug = true;
 		}
 		
-		Core.cameraScale = baseCameraScale;
-		pixelate();
-		
 		Gdx.input.setCatchBackKey(true);
 		
 		if(android){
@@ -65,9 +61,7 @@ public class Control extends ControlModule{
 		
 		Effects.setShakeFalloff(10000f);
 		
-		Draw.addSurface("shadow", Core.cameraScale);
-		
-		atlas = new Atlas("sprites.atlas");
+		Core.atlas = new Atlas("sprites.atlas");
 		
 		Sounds.load("shoot.wav", "place.wav", "explosion.wav", "enemyshoot.wav", 
 				"corexplode.wav", "break.wav", "spawn.wav", "flame.wav", "die.wav", 
@@ -95,19 +89,19 @@ public class Control extends ControlModule{
 		}
 		
 		player = new Player();
+		
+		spawns = Array.with(
+			new EnemySpawn(Enemy.class){{
+				
+			}}
+		);
+		
+		printEnemies(100);
 	}
-	/*
-	public void setCameraScale(int scale){
-		Core.cameraScale = scale;
-		resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		setCamera(player.x, player.y);
-		Draw.getSurface("pixel").setScale(Core.cameraScale);
-		Draw.getSurface("shadow").setScale(Core.cameraScale);
-	}
-	*/
+	
 	public void reset(){
 		weapons.clear();
-		Renderer.clearTiles();
+		Vars.renderer.clearTiles();
 		
 		weapons.add(Weapon.blaster);
 		player.weapon = weapons.first();
@@ -131,12 +125,12 @@ public class Control extends ControlModule{
 	}
 	
 	public void play(){
-		Renderer.clearTiles();
+		Vars.renderer.clearTiles();
 		
 		player.x = World.core.worldx();
 		player.y = World.core.worldy() - 8f - ((int)(Gdx.graphics.getWidth() / (float)Core.cameraScale * 2) % 2 == 0 ? 0.5f : 0);
 		
-		control.camera.position.set(player.x, player.y, 0);
+		Core.camera.position.set(player.x, player.y, 0);
 		
 		//multiplying by 2 so you start with more time in the beginning
 		wavetime = waveSpacing()*2;
@@ -210,12 +204,22 @@ public class Control extends ControlModule{
 		wavetime = waveSpacing();
 	}
 	
+	void printEnemies(int wave){
+		for(EnemySpawn spawn : spawns){
+			int spawnamount = spawn.evaluate(wave, 0);
+			
+			if(spawnamount > 0){
+				UCore.log(ClassReflection.getSimpleName(spawn.type) + " x" + spawnamount);
+			}
+		}
+	}
+	
 	public void enemyDeath(){
 		enemies --;
 	}
 	
 	public void coreDestroyed(){
-		Effects.shake(5, 6, camera.position.x, camera.position.y);
+		Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
 		Sounds.play("corexplode");
 		Tile core = World.core;
 		for(int i = 0; i < 16; i ++){
@@ -260,21 +264,6 @@ public class Control extends ControlModule{
 		return wave;
 	}
 	
-	public void setCameraScale(int amount){
-		targetscale = amount;
-		clampScale();
-		Draw.getSurface("pixel").setScale(targetscale);
-		Draw.getSurface("shadow").setScale(targetscale);
-	}
-	
-	public void scaleCamera(int amount){
-		setCameraScale(targetscale + amount);
-	}
-	
-	public void clampScale(){
-		targetscale = Mathf.clamp(targetscale, Math.round(Unit.dp.inPixels(3)), Math.round(Unit.dp.inPixels((5))));
-	}
-	
 	@Override
 	public void init(){
 		Musics.shuffleAll();
@@ -293,14 +282,6 @@ public class Control extends ControlModule{
 		
 		if(debug){
 			
-			if(Inputs.keyUp(Keys.PLUS)){
-				scaleCamera(1);
-			}
-			
-			if(Inputs.keyUp(Keys.MINUS)){
-				scaleCamera(-1);
-			}
-			
 			if(Inputs.keyUp(Keys.SPACE))
 				Effects.sound("shoot", World.core.worldx(), World.core.worldy());
 			
@@ -314,7 +295,7 @@ public class Control extends ControlModule{
 				Timers.mark();
 				SaveIO.load(Gdx.files.local("mapsave.mins"));
 				log("Load time taken: " + Timers.elapsed());
-				Renderer.clearTiles();
+				Vars.renderer.clearTiles();
 			}
 			
 			if(Inputs.keyUp(Keys.C)){
@@ -333,25 +314,8 @@ public class Control extends ControlModule{
 			}
 		}
 		
-		if(Core.cameraScale != targetscale){
-			float targetzoom = (float)Core.cameraScale / targetscale;
-			camera.zoom = Mathf.lerp(camera.zoom, targetzoom, 0.2f*Timers.delta());
-			
-			if(Mathf.in(camera.zoom, targetzoom, 0.005f)){
-				camera.zoom = 1f;
-				Core.cameraScale = targetscale;
-				//super.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-				camera.viewportWidth = Gdx.graphics.getWidth() / Core.cameraScale;
-				camera.viewportHeight = Gdx.graphics.getHeight() / Core.cameraScale;
-				
-				AndroidInput.mousex = Gdx.graphics.getWidth()/2;
-				AndroidInput.mousey = Gdx.graphics.getHeight()/2;
-			}
-		}
 		
-		if(GameState.is(State.menu)){
-			clearScreen();
-		}else{
+		if(!GameState.is(State.menu)){
 			
 			if(Inputs.keyUp("menu")){
 				if(GameState.is(State.paused)){
@@ -391,74 +355,13 @@ public class Control extends ControlModule{
 				}else{
 					AndroidInput.doInput();
 				}
-				
 			}
-			
-			if(World.core.block() == ProductionBlocks.core){
-				smoothCamera(player.x, player.y, android ? 0.3f : 0.14f);
-			}else{
-				smoothCamera(World.core.worldx(), World.core.worldy(), 0.4f);
-			}
-			
-			float prex = camera.position.x, prey = camera.position.y;
-			
-			updateShake(0.75f);
-			float prevx = camera.position.x, prevy = camera.position.y;
-			clampCamera(-tilesize / 2f, -tilesize / 2f, World.pixsize - tilesize / 2f, World.pixsize - tilesize / 2f);
-			
-			float deltax = camera.position.x - prex, deltay = camera.position.y - prey;
-			
-			if(android){
-				player.x += camera.position.x-prevx;
-				player.y += camera.position.y-prevy;
-			}
-			
-			float lastx = camera.position.x, lasty = camera.position.y;
-			
-			if(android){
-				camera.position.set((int)camera.position.x, (int)camera.position.y, 0);
-				
-				if(Gdx.graphics.getHeight()/Core.cameraScale % 2 == 1){
-					camera.position.add(0, -0.5f, 0);
-				}
-			}
-	
-			drawDefault();
-			
-			camera.position.set(lastx - deltax, lasty - deltay, 0);
-			
-			if(Vars.debug){
-				record();
-			}
-			
 		}
-		
-		if(!GameState.is(State.paused)){
-			Inputs.update();
-			Timers.update();
-		}
-	}
-	
-	@Override
-	public void draw(){
-		Renderer.renderTiles();
-		Entities.draw();
-		Renderer.renderPixelOverlay();
 	}
 	
 	@Override
 	public void dispose(){
-		super.dispose();
 		World.disposeMaps();
-	}
-	
-	@Override
-	public void resize(int width, int height){
-		super.resize(width, height);
-		
-		AndroidInput.mousex = Gdx.graphics.getWidth()/2;
-		AndroidInput.mousey = Gdx.graphics.getHeight()/2;
-		camera.position.set(player.x, player.y, 0);
 	}
 
 }

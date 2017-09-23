@@ -1,5 +1,8 @@
 package io.anuke.mindustry;
 
+import io.anuke.mindustry.GameState.State;
+import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.modules.ModuleCore;
 
 public class Mindustry extends ModuleCore {
@@ -8,6 +11,7 @@ public class Mindustry extends ModuleCore {
 	@Override
 	public void init(){
 		add(Vars.control = new Control());
+		add(Vars.renderer = new Renderer());
 		add(Vars.ui = new UI());
 	}
 	
@@ -25,6 +29,11 @@ public class Mindustry extends ModuleCore {
 			//TODO
 			//Gdx.app.getClipboard().setContents(e.getMessage());
 			throw e;
+		}
+		
+		if(!GameState.is(State.paused)){
+			Inputs.update();
+			Timers.update();
 		}
 	}
 }

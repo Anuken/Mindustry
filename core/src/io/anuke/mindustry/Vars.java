@@ -35,6 +35,7 @@ public class Vars{
 	public static final int tilesize = 8;
 	
 	public static Control control;
+	public static Renderer renderer;
 	public static UI ui;
 	
 	public static Player player;

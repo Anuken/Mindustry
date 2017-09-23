@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.types;
 
 import com.badlogic.gdx.graphics.Color;
 
-import io.anuke.mindustry.Renderer;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
@@ -62,7 +62,7 @@ public class Purifier extends Conduit{
 	public void drawPixelOverlay(Tile tile){
 		float fract = (float)tile.entity.items.get(input, 0) / itemCapacity;
 		
-		Renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 13, fract);
+		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 13, fract);
 	}
 	
 	@Override
