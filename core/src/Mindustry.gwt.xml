@@ -2,4 +2,5 @@
 <!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit trunk//EN" "https://raw.githubusercontent.com/gwtproject/gwt/master/distro-source/core/src/gwt-module.dtd">
 <module>
 	<source path="io/anuke/mindustry" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.enemies" />
 </module>

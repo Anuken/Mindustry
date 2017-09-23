@@ -7,11 +7,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.ai.Pathfind;
+import io.anuke.mindustry.entities.EnemySpawn;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.enemies.*;
+import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.entities.enemies.TestEnemy;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.GestureHandler;
 import io.anuke.mindustry.input.Input;
@@ -36,6 +39,7 @@ public class Control extends ControlModule{
 	
 	final Array<Weapon> weapons = new Array<>();
 	
+	Array<EnemySpawn> spawns = new Array<>();
 	int wave = 1;
 	float wavetime;
 	int enemies = 0;
@@ -165,38 +169,31 @@ public class Control extends ControlModule{
 	}
 	
 	void runWave(){
-		int amount = wave;
 		Sounds.play("spawn");
 		
 		Pathfind.updatePath();
 		
-		for(int i = 0; i < amount; i ++){
-			int pos = i;
-			
-			for(int w = 0; w < World.spawnpoints.size; w ++){
-				int point = w;
-				Tile tile = World.spawnpoints.get(w);
+		for(EnemySpawn spawn : spawns){
+			for(int lane = 0; lane < World.spawnpoints.size; lane ++){
+				Tile tile = World.spawnpoints.get(lane);
+				int spawnamount = spawn.evaluate(wave, lane);
 				
-				Timers.run(i*30f, ()->{
+				for(int i = 0; i < spawnamount; i ++){
+					int index = i;
 					
-					Enemy enemy = null;
-					
-					if(wave%5 == 0 & pos < wave/5){
-						enemy = new BossEnemy(point);
-					}else if(wave > 3 && pos < amount/2){
-						enemy = new FastEnemy(point);
-					}else if(wave > 8 && pos % 3 == 0 && wave%2==1){
-						enemy = new FlameEnemy(point);
-					}else{
-						enemy = new Enemy(point);
-					}
-					
-					enemy.set(tile.worldx(), tile.worldy());
-					Effects.effect("spawn", enemy);
-					enemy.add();
-				});
-				
-				enemies ++;
+					Timers.run(index*30f, ()->{
+						try{
+							Enemy enemy = (Enemy)ClassReflection.newInstance(spawn.type);
+							enemy.set(tile.worldx(), tile.worldy());
+							Effects.effect("spawn", enemy);
+							enemy.add();
+							
+							enemies ++;
+						}catch (Exception e){
+							throw new RuntimeException(e);
+						}
+					});
+				}
 			}
 		}
 		

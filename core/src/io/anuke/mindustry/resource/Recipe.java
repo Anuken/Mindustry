@@ -48,8 +48,6 @@ public enum Recipe{
 	liquidrouter(distribution, ProductionBlocks.liquidrouter, stack(Item.steel, 5)),
 	pump(production, ProductionBlocks.pump, stack(Item.steel, 20));
 	
-	
-	
 	public Block result;
 	public ItemStack[] requirements;
 	public Section section;

@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world.blocks.types;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ObjectMap;
 
 import io.anuke.mindustry.resource.Liquid;
@@ -42,7 +41,9 @@ public class LiquidRouter extends Conduit{
 		ConduitEntity entity = tile.entity();
 		Draw.rect(name(), tile.worldx(), tile.worldy());
 		
-		Draw.color(Color.ROYAL);
+		if(entity.liquid == null) return;
+		
+		Draw.color(entity.liquid.color);
 		Draw.alpha(entity.liquidAmount / liquidCapacity);
 		Draw.rect("blank", tile.worldx(), tile.worldy(), 2, 2);
 		Draw.color();
