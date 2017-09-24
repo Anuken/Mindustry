@@ -38,6 +38,7 @@ public class Player extends DestructibleEntity{
 		Effects.sound("die", this);
 		
 		Vars.control.setRespawnTime(respawnduration);
+		ui.fadeRespawn(true);
 	}
 	
 	@Override

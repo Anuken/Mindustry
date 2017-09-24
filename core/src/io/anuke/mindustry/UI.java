@@ -9,7 +9,6 @@ import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
@@ -23,7 +22,6 @@ import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.function.VisibilityProvider;
-import io.anuke.ucore.graphics.Textures;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.*;
@@ -32,7 +30,7 @@ import io.anuke.ucore.scene.ui.layout.*;
 import io.anuke.ucore.util.Mathf;
 
 public class UI extends SceneModule{
-	Table itemtable, weapontable, tools, loadingtable, desctable;
+	Table itemtable, weapontable, tools, loadingtable, desctable, respawntable;
 	SettingsDialog prefs;
 	KeybindDialog keys;
 	Dialog about, menu, restart, tutorial, levels, upgrades, load;
@@ -59,9 +57,6 @@ public class UI extends SceneModule{
 		Dialog.closePadR = -1;
 		Dialog.closePadT = 5;
 		
-		Textures.load("sprites/");
-		Textures.repeatWrap("conveyort", Gdx.app.getType() == ApplicationType.WebGL ? "back-web" : "back", "background");
-		
 		Colors.put("description", Color.WHITE);
 		Colors.put("turretinfo", Color.ORANGE);
 		Colors.put("missingitems", Color.SCARLET);
@@ -74,29 +69,11 @@ public class UI extends SceneModule{
 		
 		Draw.color();
 		
-		Texture back = Textures.get("background");
+		TextureRegion back = Draw.region("background");
 		float backscl = 5;
 		
-		Draw.batch().draw(back, w/2 - back.getWidth()*backscl/2, h/2 - back.getHeight()*backscl/2, 
-				back.getWidth()*backscl, back.getHeight()*backscl);
-		
-		/*
-		Draw.color(Hue.lightness(0.6f));
-		
-		int tw = w/64+1;
-		
-		float scale = Unit.dp.inPixels(1f);
-		
-		Texture texture = Textures.get(Gdx.app.getType() == ApplicationType.WebGL ? "back-web" : "back");
-		
-		batch.draw(texture, 
-				0, 0, w, h, 0, 0, (float)w/h/scale * h/texture.getHeight()/4f, -1f/scale * h/texture.getHeight()/4f);
-		
-		for(int x = 0; x < tw; x ++){
-			float offset = (Timers.time()*2*(x%2-0.5f))/32f;
-			batch.draw(Textures.get("conveyort"), x*64*scale, 0, 32*scale, h*scale, 0, offset, 1, h/32 + offset);
-		}
-		*/
+		Draw.batch().draw(back, w/2 - back.getRegionWidth()*backscl/2, h/2 - back.getRegionHeight()*backscl/2, 
+				back.getRegionWidth()*backscl, back.getRegionHeight()*backscl);
 		
 		float logoscl = (int)Unit.dp.inPixels(7);
 		TextureRegion logo = skin.getRegion("logotext");
@@ -104,7 +81,6 @@ public class UI extends SceneModule{
 		float logoh = logo.getRegionHeight()*logoscl;
 		
 		Draw.color();
-		//Draw.color(Color.CORAL);
 		Draw.batch().draw(logo, w/2 - logow/2, h - logoh + 15, logow, logoh);
 		
 		Draw.color();
@@ -413,29 +389,27 @@ public class UI extends SceneModule{
 			}}.end();
 		}
 		
+		new table("white"){{
+			respawntable = get();
+			respawntable.setColor(Color.CLEAR);
+			
+		}}.end();
+		
 		new table(){{
-			new table(){{
-				get().background("button");
+			new table("pane"){{
 				
-				new label("Respawning in"){{
-					get().update(()->{
-						get().setText("[yellow]Respawning in " + (int)(control.getRespawnTime()/60));
-					});
-					
-					get().setFontScale(0.75f);
-				}};
+				new label(()->"Respawning in " + (int)(control.getRespawnTime()/60)).scale(0.75f).pad(10);
 				
-				visible(()->{
-					return control.getRespawnTime() > 0 && !GameState.is(State.menu);
-				});
-			}};
+				visible(()->control.getRespawnTime() > 0 && !GameState.is(State.menu));
+				
+			}}.end();
 		}}.end();
 		
 		loadingtable = new table("loadDim"){{
 			new table("button"){{
-				new label("[yellow]Loading..."){{
+				new label("[orange]Loading..."){{
 					get().setName("namelabel");
-				}}.scale(1).pad(Unit.dp.inPixels(10));
+				}}.scale(2f*Vars.fontscale).pad(Unit.dp.inPixels(10));
 			}}.end();
 		}}.end().get();
 		
@@ -467,6 +441,10 @@ public class UI extends SceneModule{
 		updateItems();
 
 		build.end();
+	}
+	
+	public void fadeRespawn(boolean in){
+		respawntable.addAction(Actions.color(in ? new Color(0, 0, 0, 0.3f) : Color.CLEAR, 0.3f));
 	}
 	
 	void updateRecipe(){
@@ -557,7 +535,7 @@ public class UI extends SceneModule{
 	}
 	
 	public void showLoading(){
-		showLoading("[yellow]Loading..");
+		showLoading("[orange]Loading..");
 	}
 	
 	public void showLoading(String text){

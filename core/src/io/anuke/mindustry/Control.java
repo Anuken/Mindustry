@@ -93,30 +93,46 @@ public class Control extends Module{
 		spawns = Array.with(
 				
 			new EnemySpawn(Enemy.class){{
-				
+				scaling = 2;
+				tierscaleback = 4;
 			}},
 			new EnemySpawn(FastEnemy.class){{
-				
+				after = 2;
+				scaling = 3;
 			}},
 			new EnemySpawn(FlamerEnemy.class){{
-				
+				after = 14;
+				spacing = 5;
+				scaling = 2;
 			}},
 			new EnemySpawn(BlastEnemy.class){{
-				
+				after = 12;
+				spacing = 2;
+				scaling = 3;
 			}},
 			new EnemySpawn(RapidEnemy.class){{
-				
+				after = 7;
+				spacing = 5;
 			}},
 			new EnemySpawn(TankEnemy.class){{
-				
+				after = 4;
+				spacing = 2;
+				scaling = 3;
 			}},
 			new EnemySpawn(MortarEnemy.class){{
-				
+				after = 20;
+				spacing = 3;
+				scaling = 5;
 			}}
 			
 		);
 		
-		printEnemies(100);
+		for(int i = 1; i < 60; i ++){
+			UCore.log("\n\n--WAVE " + i);
+			printEnemies(i);
+		}
+		
+		
 	}
 	
 	public void reset(){
@@ -201,6 +217,7 @@ public class Control extends Module{
 							Constructor c = ClassReflection.getConstructor(spawn.type, int.class);
 							Enemy enemy = (Enemy)c.newInstance(fl);
 							enemy.set(tile.worldx(), tile.worldy());
+							enemy.tier = spawn.tier(wave, fl);
 							Effects.effect("spawn", enemy);
 							enemy.add();
 							
@@ -231,7 +248,7 @@ public class Control extends Module{
 			int spawnamount = spawn.evaluate(wave, 0);
 			
 			if(spawnamount > 0){
-				UCore.log(ClassReflection.getSimpleName(spawn.type) + " x" + spawnamount);
+				UCore.log(ClassReflection.getSimpleName(spawn.type) + " t" + spawn.tier(wave, 0) + " x" + spawnamount);
 			}
 		}
 	}
@@ -360,11 +377,13 @@ public class Control extends Module{
 						player.heal();
 						player.add();
 						Effects.sound("respawn");
+						ui.fadeRespawn(false);
 					}
 				}
 				
-				if(enemies <= 0)
+				if(enemies <= 0){
 					wavetime -= delta();
+				}
 			
 				if(wavetime <= 0 || (debug && Inputs.keyUp(Keys.F))){
 					runWave();

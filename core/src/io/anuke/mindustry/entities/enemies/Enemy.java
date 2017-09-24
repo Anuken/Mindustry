@@ -19,7 +19,8 @@ import io.anuke.ucore.entities.*;
 import io.anuke.ucore.util.Mathf;
 
 public class Enemy extends DestructibleEntity{
-	public final static Color[] tierColors = {Color.YELLOW, Color.MAGENTA, Color.RED};
+	public final static Color[] tierColors = {Color.YELLOW, Color.ORANGE, Color.RED, Color.MAGENTA};
+	public final static int maxtier = 4;
 	
 	protected float speed = 0.3f;
 	protected float reload = 40;
@@ -38,7 +39,7 @@ public class Enemy extends DestructibleEntity{
 	public Vector2 direction = new Vector2();
 	public float xvelocity, yvelocity;
 	public Entity target;
-	public int tier = Mathf.random(1, 3);
+	public int tier = 1;
 	
 	
 	public Enemy(int spawn){
@@ -64,11 +65,11 @@ public class Enemy extends DestructibleEntity{
 			target = World.findTileTarget(x, y, null, range, false);
 		
 			//no tile found
-			if(target == null)
+			if(target == null){
 				target = Entities.getClosest(x, y, range, e->{
 					return e instanceof Player;
 				});
-		
+			}
 		}
 		
 		if(target != null && bullet != null){
@@ -162,8 +163,9 @@ public class Enemy extends DestructibleEntity{
 	public void draw(){
 		Draw.color();
 		
-		String region = ClassReflection.getSimpleName(getClass()).toLowerCase() + "-t" + tier;
+		String region = ClassReflection.getSimpleName(getClass()).toLowerCase() + "-t" + Mathf.clamp(tier, 1, 3);
 		
+		//TODO is this necessary?
 		Draw.getShader(Outline.class).color.set(tierColors[tier-1]);
 		Draw.getShader(Outline.class).region = Draw.region(region);
 		
