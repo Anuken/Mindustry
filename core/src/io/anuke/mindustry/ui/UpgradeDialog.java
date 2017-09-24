@@ -12,7 +12,6 @@ import io.anuke.mindustry.resource.Weapon;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.function.Listenable;
-import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Table;
 
@@ -35,10 +34,10 @@ public class UpgradeDialog extends Dialog{
 		
 		getButtonTable().addButton("Ok", ()->{
 			hide();
-		}).size(84, 48).pad(4);
+		}).size(96, 50).pad(5);
 		
 		Table weptab = new Table();
-		weptab.background("button");
+		//weptab.background("button");
 		weptab.pad(20);
 		
 		int i = 0;
@@ -46,23 +45,22 @@ public class UpgradeDialog extends Dialog{
 			TextButton button = new TextButton(weapon.name());
 			
 			Image img = new Image(Draw.region(weapon.name()));
-			button.add(img).size(14*4);
+			button.add(img).size(8*5);
 			button.getCells().reverse();
 			button.row();
+			button.pad(14);
+			button.getLabelCell().left();
 			button.pack();
+			
 			
 			button.update(()->{
 				
 				if(control.hasWeapon(weapon)){
 					button.setDisabled(true);
 					button.setColor(Color.GRAY);
-					button.setTouchable(Touchable.disabled);
-				}else{
-					button.setColor(Color.WHITE);
-					button.setDisabled(false);
+				}else if(!Inventory.hasItems(weapon.requirements)){
+					button.setDisabled(true);
 				}
-				
-				button.setDisabled(!Inventory.hasItems(weapon.requirements));
 			});
 			
 			if(i > 0 && (i)%2==0)
@@ -70,7 +68,7 @@ public class UpgradeDialog extends Dialog{
 			
 			i++;
 			
-			weptab.add(button).width(210);
+			weptab.add(button).width(250);
 			
 			Table tiptable = new Table();
 			
@@ -79,28 +77,36 @@ public class UpgradeDialog extends Dialog{
 				
 				String description = weapon.description;
 				
-				tiptable.background("button");
-				tiptable.add("[PURPLE]" + weapon.name(), 0.75f).left().padBottom(2f);
+				tiptable.background("pane");
+				tiptable.add("[orange]" + weapon.name(), 0.5f).left().padBottom(4f);
+				
+				Table reqtable = new Table();
+				
+				tiptable.row();
+				tiptable.add(reqtable).left();
 				
 				if(!control.hasWeapon(weapon)){
 					ItemStack[] req = weapon.requirements;
 					for(ItemStack s : req){
-						tiptable.row();
+						
 						int amount = Math.min(Inventory.getAmount(s.item), s.amount);
-						tiptable.add(
-								(amount >= s.amount ? "[YELLOW]" : "[RED]")
-						+s.item + ": " + amount + " / " +s.amount, 0.5f).left();
+						reqtable.addImage(Draw.region("icon-" + s.item.name())).padRight(3).size(8*2);
+						reqtable.add(
+								(amount >= s.amount ? "" : "[RED]")
+						+ amount + " / " +s.amount, 0.5f).left();
+						reqtable.row();
 					}
 				}
 				
 				tiptable.row();
 				tiptable.add().size(10);
 				tiptable.row();
-				tiptable.add("[ORANGE]" + description).left();
+				tiptable.add("[gray]" + description).left();
 				tiptable.row();
-				if(control.hasWeapon(weapon))
-					tiptable.add("[LIME]Purchased!").left();
-				tiptable.pad(10f);
+				if(control.hasWeapon(weapon)){
+					tiptable.add("[LIME]Purchased!").padTop(6).left();
+				}
+				tiptable.pad(14f);
 			};
 			
 			run.listen();

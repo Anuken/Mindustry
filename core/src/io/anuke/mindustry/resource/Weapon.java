@@ -50,7 +50,7 @@ public enum Weapon{
 			Effects.effect("shoot2", p.x + vector.x, p.y+vector.y);
 		}
 	},
-	flamethrower(5, BulletType.flame, "Shoots a stream of fire.", stack(Item.steel, 60), stack(Item.coal, 60)){
+	flamer(5, BulletType.flame, "Shoots a stream of fire.", stack(Item.steel, 60), stack(Item.coal, 60)){
 		
 		{
 			shootsound = "flame2";
@@ -65,12 +65,7 @@ public enum Weapon{
 			bullet(p, p.x, p.y, ang + Mathf.range(12));
 		}
 	},
-	//TODO
-	railgun(40, BulletType.sniper, "Shoots a stream of fire.", stack(Item.steel, 60), stack(Item.coal, 60)){
-		
-		{
-			shootsound = "flame2";
-		}
+	railgun(40, BulletType.sniper, "Shoots one long-range bullet.", stack(Item.steel, 60), stack(Item.iron, 60)){
 		
 		@Override
 		public void shoot(Player p){
@@ -79,12 +74,7 @@ public enum Weapon{
 			bullet(p, p.x, p.y, ang);
 		}
 	},
-	//TODO
-	mortar(20, BulletType.shell, "Shoots a stream of fire.", stack(Item.steel, 60), stack(Item.coal, 60)){
-		
-		{
-			shootsound = "flame2";
-		}
+	mortar(100, BulletType.shell, "Shoots a slow, but damaging shell.", stack(Item.titanium, 40), stack(Item.steel, 60)){
 		
 		@Override
 		public void shoot(Player p){

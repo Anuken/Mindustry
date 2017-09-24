@@ -534,26 +534,36 @@ public class UI extends SceneModule{
 	public void updateWeapons(){
 		weapontable.clearChildren();
 		
+		ButtonGroup group = new ButtonGroup();
+		
+		weapontable.defaults().size(58, 62);
+		
 		for(Weapon weapon : control.getWeapons()){
-			ImageButton button = new ImageButton(Draw.region(weapon.name()), "static");
-			button.getImageCell().size(14*3);
-			button.setDisabled(true);
+			ImageButton button = new ImageButton(Draw.region(weapon.name()), "toggle");
+			button.getImageCell().size(8*5);
 			
-			if(weapon != player.weapon)
-				button.setColor(Color.GRAY);
+			group.add(button);
 			
-			weapontable.add(button).size(52, 56);
+			button.clicked(()->{
+				if(weapon == player.weapon) return;
+				player.weapon = weapon;
+				button.setChecked(true);
+			});
+			
+			button.setChecked(weapon == player.weapon);
+			
+			weapontable.add(button);
 			
 			Table tiptable = new Table();
 			String description = weapon.description;
 				
 			tiptable.background("button");
-			tiptable.add("[PURPLE]" + weapon.name(), 0.75f).left().padBottom(2f);
+			tiptable.add("" + weapon.name(), 0.5f).left().padBottom(3f);
 				
 			tiptable.row();
 			tiptable.row();
-			tiptable.add("[ORANGE]" + description).left();
-			tiptable.pad(10f);
+			tiptable.add("[GRAY]" + description).left();
+			tiptable.pad(14f);
 			
 			Tooltip tip = new Tooltip(tiptable);
 			
@@ -563,9 +573,9 @@ public class UI extends SceneModule{
 			
 		}
 		
-		weapontable.addIButton("icon-menu", 8*3, ()->{
+		weapontable.addIButton("icon-menu", 8*4, ()->{
 			upgrades.show();
-		}).size(52, 56);
+		});
 	}
 	
 	public void showLoading(){
