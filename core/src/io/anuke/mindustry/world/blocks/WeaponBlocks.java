@@ -113,7 +113,8 @@ public class WeaponBlocks{
 			range = 120;
 			reload = 120f;
 			bullet = BulletType.shell;
-			ammo = Item.stone;
+			ammo = Item.coal;
+			ammoMultiplier = 5;
 			health = 110;
 		}
 	},
@@ -128,7 +129,7 @@ public class WeaponBlocks{
 			range = 60;
 			reload = 4f;
 			damage = 9;
-			ammo = Item.stone;
+			ammo = Item.coal;
 			health = 110;
 		}
 	},
@@ -140,7 +141,7 @@ public class WeaponBlocks{
 			range = 70;
 			reload = 20f;
 			bullet = BulletType.shell;
-			ammo = Item.stone;
+			ammo = Item.coal;
 			health = 140;
 		}
 		
@@ -162,8 +163,9 @@ public class WeaponBlocks{
 			range = 60f;
 			reload = 3f;
 			bullet = BulletType.plasmaflame;
-			ammo = Item.stone;
+			ammo = Item.coal;
 			health = 180;
+			ammoMultiplier = 40;
 		}
 	},
 	

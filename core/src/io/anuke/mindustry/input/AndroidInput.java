@@ -14,7 +14,6 @@ import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.*;
-import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 
 public class AndroidInput extends InputAdapter{
@@ -86,11 +85,6 @@ public class AndroidInput extends InputAdapter{
 
 			for(ItemStack stack : player.recipe.requirements){
 				Inventory.removeItem(stack);
-			}
-
-			if(!Inventory.hasItems(player.recipe.requirements)){
-				player.recipe = null;
-				Cursors.restoreCursor();
 			}
 		}
 	}

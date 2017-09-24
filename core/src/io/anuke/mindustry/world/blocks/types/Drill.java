@@ -39,7 +39,6 @@ public class Drill extends Block{
 	
 	@Override
 	public void drawOver(Tile tile){
-		
 		if(tile.floor() != resource && resource != null){
 			Draw.colorl(0.85f + Mathf.absin(Timers.time(), 6f, 0.15f));
 			Draw.rect("cross", tile.worldx(), tile.worldy());

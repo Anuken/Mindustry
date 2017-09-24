@@ -6,6 +6,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.input.GestureDetector.GestureAdapter;
 import com.badlogic.gdx.math.Vector2;
 
+import io.anuke.mindustry.GameState;
+import io.anuke.mindustry.GameState.State;
+import io.anuke.mindustry.Inventory;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.Blocks;
@@ -22,7 +25,7 @@ public class GestureHandler extends GestureAdapter{
 	public boolean longPress(float x, float y){
 		Tile tile = World.cursorTile();
 		player.breaktime += Timers.delta();
-		if(player.breaktime >= tile.block().breaktime){
+		if(!GameState.is(State.menu) && player.breaktime >= tile.block().breaktime){
 			Effects.effect("break", tile.worldx(), tile.worldy());
 			Effects.shake(3f, 1f);
 			tile.setBlock(Blocks.air);
@@ -34,7 +37,7 @@ public class GestureHandler extends GestureAdapter{
 	
 	@Override
 	public boolean pan(float x, float y, float deltaX, float deltaY){
-		if(player.recipe == null){
+		if(player.recipe == null || !Inventory.hasItems(player.recipe.requirements)){
 			player.x -= deltaX*Core.camera.zoom/Core.cameraScale;
 			player.y += deltaY*Core.camera.zoom/Core.cameraScale;
 		}else{

@@ -26,6 +26,7 @@ import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.*;
 import io.anuke.ucore.scene.ui.*;
+import io.anuke.ucore.scene.ui.Window.WindowStyle;
 import io.anuke.ucore.scene.ui.layout.*;
 import io.anuke.ucore.util.Mathf;
 
@@ -112,6 +113,7 @@ public class UI extends SceneModule{
 		levels = new LevelDialog();
 		
 		prefs = new SettingsDialog();
+		prefs.setStyle(Core.skin.get("dialog", WindowStyle.class));
 		
 		menu = new MenuDialog();
 		
@@ -125,6 +127,15 @@ public class UI extends SceneModule{
 		prefs.checkPref("tutorial", "Show tutorial Window", true);
 		prefs.checkPref("fps", "Show FPS", false);
 		prefs.checkPref("noshadows", "Disable shadows", false);
+		
+		prefs.hidden(()->{
+			GameState.set(State.playing);
+		});
+		
+		prefs.shown(()->{
+			GameState.set(State.paused);
+			menu.hide();
+		});
 
 		keys = new KeybindDialog();
 
@@ -216,7 +227,9 @@ public class UI extends SceneModule{
 						ImageButton image = new ImageButton(Draw.region(r.result.name()), "select");
 						
 						image.clicked(()->{
-							if(Inventory.hasItems(r.requirements)){
+							if(player.recipe == r){
+								player.recipe = null;
+							}else{
 								player.recipe = r;
 								updateRecipe();
 							}
@@ -228,8 +241,8 @@ public class UI extends SceneModule{
 						image.update(()->{
 							
 							boolean has = Inventory.hasItems(r.requirements);
-							image.setDisabled(!has);
-							image.setChecked(player.recipe == r && has);
+							//image.setDisabled(!has);
+							image.setChecked(player.recipe == r);
 							//image.setTouchable(has ? Touchable.enabled : Touchable.disabled);
 							image.getImage().setColor(has ? Color.WHITE : Color.GRAY);
 						});
@@ -283,16 +296,23 @@ public class UI extends SceneModule{
 				float isize = Unit.dp.inPixels(40);
 				
 				new imagebutton("icon-menu", isize, ()->{
+					GameState.set(State.paused);
 					showMenu();
 				});
 				
 				new imagebutton("icon-settings", isize, ()->{
+					GameState.set(State.paused);
 					prefs.show();
 				});
 
 				new imagebutton("icon-pause", isize, ()->{
 					//TODO pause
-				});
+					GameState.set(GameState.is(State.paused) ? State.playing : State.paused);
+				}){{
+					get().update(()->{
+						get().getStyle().imageUp = Core.skin.getDrawable(GameState.is(State.paused) ? "icon-play" : "icon-pause");
+					});
+				}};
 			}}.end();
 			
 			row();
@@ -305,6 +325,16 @@ public class UI extends SceneModule{
 			row();
 			add(fps).size(-1);
 			
+		}}.end();
+		
+		//paused table
+		new table(){{
+			visible(()->GameState.is(State.paused));
+			atop();
+			
+			new table("pane"){{
+				new label("[orange]< paused >").scale(0.75f).pad(6);
+			}}.end();
 		}}.end();
 
 		//wave table...
@@ -431,7 +461,7 @@ public class UI extends SceneModule{
 		scene.add(tools);
 		
 		tools.setVisible(()->{
-			return !GameState.is(State.menu) && android && player.recipe != null;
+			return !GameState.is(State.menu) && android && player.recipe != null && Inventory.hasItems(player.recipe.requirements);
 		});
 		
 		tools.update(()->{
@@ -488,7 +518,7 @@ public class UI extends SceneModule{
 				reqlabel.setText(text);
 			});
 			
-			requirements.add(reqlabel);
+			requirements.add(reqlabel).left();
 			requirements.row();
 		}
 		
@@ -512,7 +542,7 @@ public class UI extends SceneModule{
 			if(weapon != player.weapon)
 				button.setColor(Color.GRAY);
 			
-			weapontable.add(button).size(48, 52);
+			weapontable.add(button).size(52, 56);
 			
 			Table tiptable = new Table();
 			String description = weapon.description;
@@ -532,6 +562,10 @@ public class UI extends SceneModule{
 			button.addListener(tip);
 			
 		}
+		
+		weapontable.addIButton("icon-menu", 8*3, ()->{
+			upgrades.show();
+		}).size(52, 56);
 	}
 	
 	public void showLoading(){

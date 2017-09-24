@@ -32,8 +32,9 @@ public class Mindustry extends ModuleCore {
 		}
 		
 		if(!GameState.is(State.paused)){
-			Inputs.update();
 			Timers.update();
 		}
+		
+		Inputs.update();
 	}
 }

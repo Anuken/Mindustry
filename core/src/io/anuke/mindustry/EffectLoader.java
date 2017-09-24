@@ -145,6 +145,13 @@ public class EffectLoader{
 			Draw.reset();
 		});
 		
+		Effects.create("railsmoke", 30, e -> {
+			Draw.color(Color.LIGHT_GRAY, Color.WHITE, e.ifract());
+			float size = e.fract()*4f;
+			Draw.rect("circle", e.x, e.y, size, size);
+			Draw.reset();
+		});
+		
 		Effects.create("spawn", 23, e -> {
 			Draw.thickness(2f);
 			Draw.color(Hue.mix(Color.DARK_GRAY, Color.SCARLET, e.ifract()));

@@ -42,11 +42,12 @@ public class Input{
 
 		//TODO restore cursor when requirements are back
 		
-		for(int i = 0; i < 9; i ++)
+		for(int i = 0; i < 9; i ++){
 			if(Inputs.keyUp(Keys.valueOf(""+(i+1))) && i < control.getWeapons().size){
 				player.weapon = control.getWeapons().get(i);
 				ui.updateWeapons();
 			}
+		}
 		
 		if(Inputs.buttonUp(Buttons.LEFT) && player.recipe != null && 
 				World.validPlace(World.tilex(), World.tiley(), player.recipe.result) && !ui.hasMouse() &&

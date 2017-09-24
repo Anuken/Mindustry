@@ -41,6 +41,7 @@ public class Control extends Module{
 	Array<EnemySpawn> spawns = new Array<>();
 	int wave = 1;
 	float wavetime;
+	float extrawavetime;
 	int enemies = 0;
 	
 	float respawntime;
@@ -79,7 +80,8 @@ public class Control extends Module{
 			"down", Keys.S,
 			"right", Keys.D,
 			"rotate", Keys.R,
-			"menu", Gdx.app.getType() == ApplicationType.Android ? Keys.BACK : Keys.ESCAPE
+			"menu", Gdx.app.getType() == ApplicationType.Android ? Keys.BACK : Keys.ESCAPE,
+			"pause", Keys.SPACE
 		);
 			
 		Settings.loadAll("io.anuke.moment");
@@ -127,6 +129,7 @@ public class Control extends Module{
 			
 		);
 		
+		//TODO remove this debugging
 		for(int i = 1; i < 60; i ++){
 			UCore.log("\n\n--WAVE " + i);
 			printEnemies(i);
@@ -143,6 +146,7 @@ public class Control extends Module{
 		player.weapon = weapons.first();
 		
 		wave = 1;
+		extrawavetime = maxwavespace;
 		wavetime = waveSpacing();
 		Entities.clear();
 		enemies = 0;
@@ -196,6 +200,7 @@ public class Control extends Module{
 		this.wave = wave;
 		this.wavetime = wavetime;
 		this.enemies = enemies;
+		this.extrawavetime = maxwavespace;
 	}
 	
 	void runWave(){
@@ -241,6 +246,7 @@ public class Control extends Module{
 		}
 		
 		wavetime = waveSpacing();
+		extrawavetime = maxwavespace;
 	}
 	
 	void printEnemies(int wave){
@@ -320,10 +326,6 @@ public class Control extends Module{
 	public void update(){
 		
 		if(debug){
-			
-			if(Inputs.keyUp(Keys.SPACE))
-				Effects.sound("shoot", World.core.worldx(), World.core.worldy());
-			
 			if(Inputs.keyUp(Keys.O)){
 				Timers.mark();
 				SaveIO.write(Gdx.files.local("mapsave.mins"));
@@ -339,13 +341,10 @@ public class Control extends Module{
 			
 			if(Inputs.keyUp(Keys.C)){
 				for(Entity entity : Entities.all()){
-					if(entity instanceof Enemy)
+					if(entity instanceof Enemy){
 						entity.remove();
+					}
 				}
-			}
-			
-			if(Inputs.keyDown(Keys.SPACE)){
-				Effects.shake(6, 4, Graphics.mouseWorld().x, Graphics.mouseWorld().y);
 			}
 			
 			if(Inputs.keyDown(Keys.Y)){
@@ -353,8 +352,11 @@ public class Control extends Module{
 			}
 		}
 		
-		
 		if(!GameState.is(State.menu)){
+			
+			if(Inputs.keyUp("pause") && (GameState.is(State.paused) || GameState.is(State.playing))){
+				GameState.set(GameState.is(State.playing) ? State.paused : State.playing);
+			}
 			
 			if(Inputs.keyUp("menu")){
 				if(GameState.is(State.paused)){
@@ -381,21 +383,23 @@ public class Control extends Module{
 					}
 				}
 				
+				extrawavetime -= delta();
+				
 				if(enemies <= 0){
 					wavetime -= delta();
 				}
 			
-				if(wavetime <= 0 || (debug && Inputs.keyUp(Keys.F))){
+				if(wavetime <= 0 || (debug && Inputs.keyUp(Keys.F)) || extrawavetime <= 0){
 					runWave();
 				}
 			
 				Entities.update();
-				
-				if(!android){
-					Input.doInput();
-				}else{
-					AndroidInput.doInput();
-				}
+			}
+			
+			if(!android){
+				Input.doInput();
+			}else{
+				AndroidInput.doInput();
 			}
 		}
 	}

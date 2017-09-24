@@ -119,6 +119,7 @@ public class ProductionBlocks{
 			input = Item.stone;
 			inputLiquid = Liquid.water;
 			output = Item.coal;
+			health = 50;
 		}
 		
 		@Override
@@ -137,6 +138,7 @@ public class ProductionBlocks{
 			liquidCapacity = 41f;
 			purifyTime = 90;
 			output = Item.titanium;
+			health = 70;
 		}
 		
 		@Override

@@ -34,8 +34,15 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 	sniper = new BulletType(3f, 20){
 		public void draw(Bullet b){
 			Draw.color(Color.LIGHT_GRAY);
-			Draw.rect("bullet", b.x, b.y, b.angle());
+			Draw.thick(1f);
+			Draw.lineAngleCenter(b.x, b.y, b.angle(), 3f);
 			Draw.reset();
+		}
+		
+		public void update(Bullet b){
+			if(Timers.get(b, "smoke", 4)){
+				Effects.effect("railsmoke", b.x, b.y);
+			}
 		}
 	},
 	shell = new BulletType(1.1f, 80){
