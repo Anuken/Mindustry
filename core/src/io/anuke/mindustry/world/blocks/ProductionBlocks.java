@@ -115,7 +115,7 @@ public class ProductionBlocks{
 	
 	coalpurifier = new Purifier("coalpurifier"){
 		{
-			formalName = "coal purifier";
+			formalName = "coal extractor";
 			input = Item.stone;
 			inputLiquid = Liquid.water;
 			output = Item.coal;
@@ -124,6 +124,24 @@ public class ProductionBlocks{
 		@Override
 		public String description(){
 			return "Takes in stone + water, outputs coal.";
+		}
+	},
+	
+	titaniumpurifier = new Purifier("titaniumpurifier"){
+		{
+			formalName = "titanium\nextractor";
+			input = Item.iron;
+			inputAmount = 11;
+			inputLiquid = Liquid.water;
+			liquidAmount = 40f;
+			liquidCapacity = 41f;
+			purifyTime = 90;
+			output = Item.titanium;
+		}
+		
+		@Override
+		public String description(){
+			return "Takes in iron + water, outputs coal.";
 		}
 	},
 	

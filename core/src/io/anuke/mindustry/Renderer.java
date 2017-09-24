@@ -40,6 +40,7 @@ public class Renderer extends RendererModule{
 		pixelate();
 		
 		Draw.addSurface("shadow", Core.cameraScale);
+		Shaders.create();
 	}
 	
 	@Override

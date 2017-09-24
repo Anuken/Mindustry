@@ -23,10 +23,26 @@ public class EffectLoader{
 			});
 		});
 		
+		Effects.create("blastsmoke", 26, e -> {
+			Angles.randLenVectors(e.id, 12, 1f + e.ifract()*23f, (x, y)->{
+				float size = 2f+e.fract()*6f;
+				Draw.color(Color.LIGHT_GRAY, Color.DARK_GRAY, e.ifract());
+				Draw.rect("circle", e.x + x, e.y + y, size, size);
+				Draw.reset();
+			});
+		});
+		
 		Effects.create("shellexplosion", 15, e -> {
 			Draw.thickness(1.3f - e.ifract());
 			Draw.color(Hue.mix(Color.WHITE, Color.ORANGE, e.ifract()));
 			Draw.circle(e.x, e.y, 1f + e.ifract() * 7f);
+			Draw.reset();
+		});
+		
+		Effects.create("blastexplosion", 16, e -> {
+			Draw.thickness(1.2f - e.ifract());
+			Draw.color(Hue.mix(Color.WHITE, Color.SCARLET, e.ifract()));
+			Draw.circle(e.x, e.y, 1.5f + e.ifract() * 9f);
 			Draw.reset();
 		});
 		

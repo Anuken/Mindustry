@@ -1,11 +1,10 @@
 package io.anuke.mindustry.entities.enemies;
 
 import io.anuke.mindustry.entities.BulletType;
-import io.anuke.ucore.core.Draw;
 
-public class FlameEnemy extends Enemy{
+public class FlamerEnemy extends Enemy{
 
-	public FlameEnemy(int spawn) {
+	public FlamerEnemy(int spawn) {
 		super(spawn);
 		
 		speed = 0.35f;
@@ -18,11 +17,6 @@ public class FlameEnemy extends Enemy{
 		range = 40;
 		
 		heal();
-	}
-	
-	@Override
-	public void draw(){
-		Draw.rect("firemech", x, y, direction.angle()-90);
 	}
 
 }

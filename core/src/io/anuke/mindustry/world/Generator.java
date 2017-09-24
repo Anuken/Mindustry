@@ -62,7 +62,7 @@ public class Generator{
 						floor = Blocks.coal;
 					}
 					
-					if(Noise.nnoise(x, y, 9, 1) > 0.254){
+					if(Noise.nnoise(x + 9999, y + 9999, 8, 1) > 0.253){
 						floor = Blocks.titanium;
 					}
 				}

@@ -1,11 +1,10 @@
 package io.anuke.mindustry.entities.enemies;
 
 import io.anuke.mindustry.entities.BulletType;
-import io.anuke.ucore.core.Draw;
 
-public class BossEnemy extends Enemy{
+public class RapidEnemy extends Enemy{
 
-	public BossEnemy(int spawn) {
+	public RapidEnemy(int spawn) {
 		super(spawn);
 		
 		reload = 8;
@@ -17,11 +16,6 @@ public class BossEnemy extends Enemy{
 		heal();
 		
 		range = 70;
-	}
-	
-	@Override
-	public void draw(){
-		Draw.rect("bossmech", x, y, direction.angle()-90);
 	}
 
 }

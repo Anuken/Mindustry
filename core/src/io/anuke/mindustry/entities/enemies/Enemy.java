@@ -1,25 +1,35 @@
 package io.anuke.mindustry.entities.enemies;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 
+import io.anuke.mindustry.Shaders.Outline;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
-import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.Bullet;
+import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.*;
+import io.anuke.ucore.util.Mathf;
 
 public class Enemy extends DestructibleEntity{
+	public final static Color[] tierColors = {Color.YELLOW, Color.MAGENTA, Color.RED};
+	
 	protected float speed = 0.3f;
 	protected float reload = 40;
 	protected float range = 60;
 	protected float length = 4;
-	protected float rotatespeed = 8f;
+	protected float rotatespeed = 7f;
+	protected float turretrotatespeed = 0.2f;
 	protected BulletType bullet = BulletType.small;
 	protected String shootsound = "enemyshoot";
+	protected int damage;
 	
 	public Tile[] path;
 	public int spawn;
@@ -28,7 +38,7 @@ public class Enemy extends DestructibleEntity{
 	public Vector2 direction = new Vector2();
 	public float xvelocity, yvelocity;
 	public Entity target;
-	public StatusEffect effect = StatusEffect.none;
+	public int tier = Mathf.random(1, 3);
 	
 	
 	public Enemy(int spawn){
@@ -61,7 +71,7 @@ public class Enemy extends DestructibleEntity{
 		
 		}
 		
-		if(target != null){
+		if(target != null && bullet != null){
 			if(Timers.get(this, "reload", reload*Vars.multiplier)){
 				shoot();
 				Effects.sound(shootsound, this);
@@ -72,7 +82,7 @@ public class Enemy extends DestructibleEntity{
 	void shoot(){
 		vector.set(length, 0).rotate(direction.angle());
 		Bullet out = new Bullet(bullet, this, x+vector.x, y+vector.y, direction.angle()).add();
-		out.damage = (int)(bullet.damage*Vars.multiplier);
+		out.damage = (int)(damage*Vars.multiplier);
 	}
 	
 	public void findClosestNode(){
@@ -96,6 +106,20 @@ public class Enemy extends DestructibleEntity{
 	}
 	
 	@Override
+	public void added(){
+		if(bullet != null){
+			damage = (int)(bullet.damage * (1 + (tier - 1) * 0.5f));
+		}
+		
+		maxhealth *= tier;
+		speed += 0.04f*tier + Mathf.range(0.1f);
+		reload /= Math.max(tier /1.5f, 1f);
+		range += tier*5;
+		
+		heal();
+	}
+	
+	@Override
 	public boolean collides(SolidEntity other){
 		return (other instanceof Bullet) && !(((Bullet)other).owner instanceof Enemy);
 	}
@@ -111,8 +135,9 @@ public class Enemy extends DestructibleEntity{
 	
 	@Override
 	public void removed(){
-		if(!dead)
+		if(!dead){
 			Vars.control.enemyDeath();
+		}
 	}
 	
 	@Override
@@ -129,13 +154,21 @@ public class Enemy extends DestructibleEntity{
 			direction.limit(speed*rotatespeed);
 		}else{
 			float angle = angleTo(target);
-			direction.lerp(vector.set(0, 1).setAngle(angle), 0.25f);
+			direction.lerp(vector.set(0, 1).setAngle(angle), turretrotatespeed * Timers.delta());
 		}
 	}
 	
 	@Override
 	public void draw(){
 		Draw.color();
-		Draw.rect("mech1", x, y, direction.angle()-90);
+		
+		String region = ClassReflection.getSimpleName(getClass()).toLowerCase() + "-t" + tier;
+		
+		Draw.getShader(Outline.class).color.set(tierColors[tier-1]);
+		Draw.getShader(Outline.class).region = Draw.region(region);
+		
+		Draw.shader(Outline.class);
+		Draw.rect(region, x, y, direction.angle()-90);
+		Draw.shader();
 	}
 }

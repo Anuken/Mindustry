@@ -18,12 +18,14 @@ public class Purifier extends Conduit{
 	public float liquidAmount = 19.99f;
 	public Item output = null;
 	public int itemCapacity = 100;
-	public int purifyTime = 90;
+	public int purifyTime = 80;
 
 	public Purifier(String name) {
 		super(name);
 		update = true;
 		rotate = false;
+		solid = true;
+		health = 60;
 		liquidCapacity = 20f;
 	}
 	

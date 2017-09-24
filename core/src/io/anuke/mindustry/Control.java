@@ -8,13 +8,13 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.Constructor;
 
 import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.EnemySpawn;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.enemies.Enemy;
-import io.anuke.mindustry.entities.enemies.TestEnemy;
+import io.anuke.mindustry.entities.enemies.*;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.GestureHandler;
 import io.anuke.mindustry.input.Input;
@@ -91,9 +91,29 @@ public class Control extends Module{
 		player = new Player();
 		
 		spawns = Array.with(
+				
 			new EnemySpawn(Enemy.class){{
 				
+			}},
+			new EnemySpawn(FastEnemy.class){{
+				
+			}},
+			new EnemySpawn(FlamerEnemy.class){{
+				
+			}},
+			new EnemySpawn(BlastEnemy.class){{
+				
+			}},
+			new EnemySpawn(RapidEnemy.class){{
+				
+			}},
+			new EnemySpawn(TankEnemy.class){{
+				
+			}},
+			new EnemySpawn(MortarEnemy.class){{
+				
 			}}
+			
 		);
 		
 		printEnemies(100);
@@ -169,15 +189,17 @@ public class Control extends Module{
 		
 		for(EnemySpawn spawn : spawns){
 			for(int lane = 0; lane < World.spawnpoints.size; lane ++){
+				int fl = lane;
 				Tile tile = World.spawnpoints.get(lane);
 				int spawnamount = spawn.evaluate(wave, lane);
 				
 				for(int i = 0; i < spawnamount; i ++){
 					int index = i;
 					
-					Timers.run(index*30f, ()->{
+					Timers.run(index*50f, ()->{
 						try{
-							Enemy enemy = (Enemy)ClassReflection.newInstance(spawn.type);
+							Constructor c = ClassReflection.getConstructor(spawn.type, int.class);
+							Enemy enemy = (Enemy)c.newInstance(fl);
 							enemy.set(tile.worldx(), tile.worldy());
 							Effects.effect("spawn", enemy);
 							enemy.add();

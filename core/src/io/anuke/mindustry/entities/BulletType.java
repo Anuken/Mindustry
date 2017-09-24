@@ -38,7 +38,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Draw.reset();
 		}
 	},
-	shell = new BulletType(1.1f, 110){
+	shell = new BulletType(1.1f, 80){
 		{
 			lifetime = 110f;
 			hitsize = 8f;
@@ -75,15 +75,43 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			});
 		}
 	},
+	blast = new BulletType(1.1f, 80){
+		{
+			lifetime = 0f;
+			hitsize = 8f;
+			speed = 0f;
+		}
+		
+		public void despawned(Bullet b){
+			removed(b);
+		}
+		
+		public void removed(Bullet b){
+			Effects.shake(3f, 3f, b);
+			
+			Effects.effect("blastsmoke", b);
+			Effects.effect("blastexplosion", b);
+			
+			Angles.circle(30, f->{
+				Angles.translation(f, 6f);
+				Bullet o = new Bullet(blastshot, b.owner, b.x + Angles.x(), b.y + Angles.y(), f).add();
+				o.damage = b.damage/9;
+			});
+		}
+
+		public void draw(Bullet b){}
+	},
 	shellshot = new BulletType(1.5f, 6){
 		{
 			lifetime = 7f;
 		}
-		public void draw(Bullet b){
-		//	Draw.color("orange");
-		//	Draw.rect("bullet", b.x, b.y, b.angle());
-		//	Draw.reset();
+		public void draw(Bullet b){}
+	},
+	blastshot = new BulletType(1.6f, 6){
+		{
+			lifetime = 7f;
 		}
+		public void draw(Bullet b){}
 	},
 	small = new BulletType(1.5f, 1){
 		public void draw(Bullet b){

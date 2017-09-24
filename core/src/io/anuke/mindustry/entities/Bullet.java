@@ -58,7 +58,7 @@ public class Bullet extends BulletEntity{
 
 	@Override
 	public int getDamage(){
-		return type.damage;
+		return damage == -1 ? type.damage : damage;
 	}
 
 }

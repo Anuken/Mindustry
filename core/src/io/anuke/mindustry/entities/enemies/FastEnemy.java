@@ -1,7 +1,5 @@
 package io.anuke.mindustry.entities.enemies;
 
-import io.anuke.ucore.core.Draw;
-
 public class FastEnemy extends Enemy{
 
 	public FastEnemy(int spawn) {
@@ -12,11 +10,6 @@ public class FastEnemy extends Enemy{
 		
 		maxhealth = 20;
 		heal();
-	}
-	
-	@Override
-	public void draw(){
-		Draw.rect("fastmech", x, y, direction.angle()-90);
 	}
 
 }

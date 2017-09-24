@@ -90,8 +90,8 @@ public class SaveIO{
 	private static final Array<Class<? extends Enemy>> enemyIDs = Array.with(
 		Enemy.class,
 		FastEnemy.class,
-		BossEnemy.class,
-		FlameEnemy.class
+		RapidEnemy.class,
+		FlamerEnemy.class
 	);
 	
 	private static final ObjectMap<Class<? extends Enemy>, Byte> idEnemies = new ObjectMap<Class<? extends Enemy>, Byte>(){{
