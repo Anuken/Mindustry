@@ -16,52 +16,58 @@ public class LoadDialog extends Dialog{
 	public LoadDialog() {
 		super("Load Game");
 		setup();
-		
-		shown(()->{
+
+		shown(() -> {
 			setup();
 		});
-		
-		getButtonTable().addButton("Back", ()->{
+
+		getButtonTable().addButton("Back", () -> {
 			hide();
 		}).pad(2).size(180, 44).units(Unit.dp);
 	}
-	
+
 	private void setup(){
 		content().clear();
-		
+
 		content().add("Select a save slot.").padBottom(2);
 		content().row();
-		
-		for(int i = 0; i < Vars.saveSlots; i ++){
+
+		for(int i = 0; i < Vars.saveSlots; i++){
 			final int slot = i;
-			
-			TextButton button = new TextButton("[orange]Slot " + (i+1));
+
+			TextButton button = new TextButton("[orange]Slot " + (i + 1));
 			button.getLabelCell().top().left().growX();
 			button.row();
 			button.pad(Unit.dp.inPixels(10));
 			button.add("[gray]" + (!SaveIO.isSaveValid(i) ? "<empty>" : "Last Saved: " + SaveIO.getTimeString(i))).padBottom(2);
-			button.getLabel().setFontScale(0.75f);
-			button.setDisabled(!SaveIO.isSaveValid(i) );
-			
-			button.clicked(()->{
+			button.getLabel().setFontScale(Unit.dp.inPixels(0.75f));
+			button.setDisabled(!SaveIO.isSaveValid(i));
+
+			button.clicked(() -> {
 				if(!button.isDisabled()){
 					Vars.ui.showLoading();
-					
+
 					Timer.schedule(new Task(){
+						@Override
 						public void run(){
-							SaveIO.loadFromSlot(slot);
 							Vars.ui.hideLoading();
 							hide();
+							try{
+								SaveIO.loadFromSlot(slot);
+							}catch(Exception e){
+								Vars.ui.showError("[orange]Save file corrupted or invalid!");
+								return;
+							}
 							Vars.ui.hideMenu();
 							GameState.set(State.playing);
 						}
-					}, 2f/60f);
+					}, 3f/60f);
 				}
 			});
-			
+
 			content().add(button).size(400, 78).units(Unit.dp).pad(2);
 			content().row();
 		}
-		
+
 	}
 }

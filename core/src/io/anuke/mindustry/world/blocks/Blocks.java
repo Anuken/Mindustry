@@ -4,6 +4,7 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.mindustry.world.blocks.types.Wall;
 
 public class Blocks{
@@ -11,38 +12,39 @@ public class Blocks{
 	
 	air = new Block("air"){
 		//no drawing here
+		public void drawCache(Tile tile){}
 		public void draw(Tile tile){}
 	},
 	
-	deepwater = new Block("deepwater"){{
+	deepwater = new Floor("deepwater"){{
 		vary = false;
 		solid = true;
 	}},
 	
-	water = new Block("water"){{
+	water = new Floor("water"){{
 		vary = false;
 		solid = true;
 	}},
 	
-	stone = new Block("stone"){{
+	stone = new Floor("stone"){{
 		drops = new ItemStack(Item.stone, 1);
 	}},
 	
-	iron = new Block("iron"){{
+	iron = new Floor("iron"){{
 		drops = new ItemStack(Item.iron, 1);
 	}},
 	
-	coal = new Block("coal"){{
+	coal = new Floor("coal"){{
 		drops = new ItemStack(Item.coal, 1);
 	}},
 	
-	titanium = new Block("titanium"){{
+	titanium = new Floor("titanium"){{
 		drops = new ItemStack(Item.titanium, 1);
 	}},
 	
-	dirt = new Block("dirt"),
+	dirt = new Floor("dirt"),
 	
-	grass = new Block("grass"),
+	grass = new Floor("grass"),
 	
 	stoneblock = new Block("stoneblock"){{
 		solid = true;

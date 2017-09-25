@@ -121,6 +121,21 @@ public class EffectLoader{
 			Draw.spikes(e.x, e.y, e.ifract() * 2f, 1, 5);
 			Draw.reset();
 		});
+		
+		Effects.create("railshoot", 8, e -> {
+			Draw.thickness(2f  - e.ifract()*2f);
+			Draw.color(Hue.mix(Color.WHITE, Color.LIGHT_GRAY, e.ifract()));
+			Draw.spikes(e.x, e.y, 1f + e.ifract() * 4f, 1, 5);
+			Draw.reset();
+		});
+		
+		Effects.create("mortarshoot", 9, e -> {
+			Draw.thickness(1.3f - e.ifract());
+			Draw.color(Hue.mix(Color.WHITE, Color.ORANGE, e.ifract()));
+			Draw.spikes(e.x, e.y, e.ifract() * 4f, 2, 6);
+			Draw.circle(e.x, e.y, e.ifract() * 5f + 1f);
+			Draw.reset();
+		});
 
 		Effects.create("explosion", 15, e -> {
 			Draw.thickness(2f);

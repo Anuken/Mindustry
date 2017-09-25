@@ -8,7 +8,7 @@ public class FastEnemy extends Enemy{
 		speed = 0.7f;
 		reload = 30;
 		
-		maxhealth = 20;
+		maxhealth = 30;
 		heal();
 	}
 

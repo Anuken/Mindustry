@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
@@ -72,6 +73,7 @@ public enum Weapon{
 			float ang = mouseAngle(p);
 			
 			bullet(p, p.x, p.y, ang);
+			Effects.effect("railshoot", p.x + vector.x, p.y+vector.y);
 		}
 	},
 	mortar(100, BulletType.shell, "Shoots a slow, but damaging shell.", stack(Item.titanium, 40), stack(Item.steel, 60)){
@@ -80,6 +82,8 @@ public enum Weapon{
 		public void shoot(Player p){
 			float ang = mouseAngle(p);
 			bullet(p, p.x, p.y, ang);
+			Effects.effect("mortarshoot", p.x + vector.x, p.y+vector.y);
+			Effects.shake(2f, 2f, Vars.player);
 		}
 	};
 	public float reload;

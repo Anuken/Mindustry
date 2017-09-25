@@ -114,7 +114,7 @@ public class Control extends Module{
 			}},
 			new EnemySpawn(RapidEnemy.class){{
 				after = 7;
-				spacing = 5;
+				spacing = 4;
 			}},
 			new EnemySpawn(TankEnemy.class){{
 				after = 4;
@@ -129,13 +129,13 @@ public class Control extends Module{
 			
 		);
 		
+		/*
 		//TODO remove this debugging
 		for(int i = 1; i < 60; i ++){
 			UCore.log("\n\n--WAVE " + i);
 			printEnemies(i);
 		}
-		
-		
+		*/
 	}
 	
 	public void reset(){

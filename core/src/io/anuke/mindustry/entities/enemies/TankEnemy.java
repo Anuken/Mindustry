@@ -1,6 +1,9 @@
 package io.anuke.mindustry.entities.enemies;
 
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
+import io.anuke.ucore.util.Angles;
 
 public class TankEnemy extends Enemy{
 
@@ -9,8 +12,19 @@ public class TankEnemy extends Enemy{
 		
 		maxhealth = 400;
 		speed = 0.2f;
-		reload = 140f;
-		bullet = BulletType.iron;
+		reload = 90f;
+		bullet = BulletType.small;
+	}
+	
+	void shoot(){
+		vector.set(length, 0).rotate(direction.angle());
+		
+		Angles.shotgun(3, 4f, direction.angle(), f->{
+			Bullet out = new Bullet(bullet, this, x+vector.x, y+vector.y, f).add();
+			out.damage = (int)(damage*Vars.multiplier);
+		});
+		
+		
 	}
 
 }

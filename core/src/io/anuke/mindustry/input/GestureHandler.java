@@ -6,13 +6,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.input.GestureDetector.GestureAdapter;
 import com.badlogic.gdx.math.Vector2;
 
-import io.anuke.mindustry.GameState;
-import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.Inventory;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.World;
-import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.ucore.core.*;
+import io.anuke.mindustry.Vars;
+import io.anuke.ucore.core.Core;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class GestureHandler extends GestureAdapter{
@@ -23,6 +19,7 @@ public class GestureHandler extends GestureAdapter{
 	
 	@Override
 	public boolean longPress(float x, float y){
+		/*
 		Tile tile = World.cursorTile();
 		player.breaktime += Timers.delta();
 		if(!GameState.is(State.menu) && player.breaktime >= tile.block().breaktime){
@@ -31,16 +28,28 @@ public class GestureHandler extends GestureAdapter{
 			tile.setBlock(Blocks.air);
 			player.breaktime = 0f;
 			Sounds.play("break");
+		}*/
+		return false;
+	}
+	
+	@Override
+	public boolean tap (float x, float y, int count, int button) {
+		if(AndroidInput.mode == PlaceMode.touch && !ui.hasMouse() && player.recipe != null &&
+				Inventory.hasItems(player.recipe.requirements) && !Vars.ui.hasMouse() && !AndroidInput.brokeBlock){
+			AndroidInput.mousex = x;
+			AndroidInput.mousey = y;
+			AndroidInput.place();
+			return true;
 		}
 		return false;
 	}
 	
 	@Override
 	public boolean pan(float x, float y, float deltaX, float deltaY){
-		if(player.recipe == null || !Inventory.hasItems(player.recipe.requirements)){
+		if(player.recipe == null || !Inventory.hasItems(player.recipe.requirements) || AndroidInput.mode == PlaceMode.touch){
 			player.x -= deltaX*Core.camera.zoom/Core.cameraScale;
 			player.y += deltaY*Core.camera.zoom/Core.cameraScale;
-		}else{
+		}else if(AndroidInput.mode == PlaceMode.cursor){
 			AndroidInput.mousex += deltaX;
 			AndroidInput.mousey += deltaY;
 		}

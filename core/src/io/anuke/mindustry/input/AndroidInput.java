@@ -18,6 +18,8 @@ import io.anuke.ucore.util.Mathf;
 
 public class AndroidInput extends InputAdapter{
 	public static float mousex, mousey;
+	public static PlaceMode mode = PlaceMode.cursor;
+	public static boolean brokeBlock = false;
 	private static float lmousex, lmousey;
 	private static float warmup;
 	private static float warmupDelay = 20;
@@ -27,6 +29,12 @@ public class AndroidInput extends InputAdapter{
 		if(keycode == Keys.E){
 			place();
 		}
+		return false;
+	}
+	
+	@Override
+	public boolean touchUp (int screenX, int screenY, int pointer, int button) {
+		brokeBlock = false;
 		return false;
 	}
 	
@@ -49,7 +57,9 @@ public class AndroidInput extends InputAdapter{
 	public static void breakBlock(){
 		Tile tile = selected();
 		player.breaktime += Timers.delta();
+		
 		if(player.breaktime >= tile.block().breaktime){
+			brokeBlock = true;
 			if(tile.block().drops != null){
 				Inventory.addItem(tile.block().drops.item, tile.block().drops.amount);
 			}
@@ -92,8 +102,10 @@ public class AndroidInput extends InputAdapter{
 	public static void doInput(){
 		if(Gdx.input.isTouched(0) 
 				&& Mathf.near2d(lmousex, lmousey, Gdx.input.getX(0), Gdx.input.getY(0), 50) 
-				&& !ui.hasMouse() && player.recipe == null){
+				&& !ui.hasMouse() /*&& (player.recipe == null || mode == PlaceMode.touch)*/){
 			warmup += Timers.delta();
+			
+			float lx = mousex, ly = mousey;
 			
 			mousex = Gdx.input.getX(0);
 			mousey = Gdx.input.getY(0);
@@ -110,6 +122,9 @@ public class AndroidInput extends InputAdapter{
 					player.breaktime = 0;
 				}
 			}
+			
+			mousex = lx;
+			mousey = ly;
 		}else{
 			warmup = 0;
 			lmousex = Gdx.input.getX(0);

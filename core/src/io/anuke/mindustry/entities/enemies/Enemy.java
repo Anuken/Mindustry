@@ -47,7 +47,7 @@ public class Enemy extends DestructibleEntity{
 		
 		hitsize = 5;
 		
-		maxhealth = 30;
+		maxhealth = 50;
 		heal();
 	}
 	

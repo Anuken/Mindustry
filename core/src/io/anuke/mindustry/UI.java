@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.input.AndroidInput;
+import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.ucore.core.Core;
@@ -25,6 +26,7 @@ import io.anuke.ucore.function.VisibilityProvider;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.*;
+import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.Window.WindowStyle;
 import io.anuke.ucore.scene.ui.layout.*;
@@ -129,12 +131,16 @@ public class UI extends SceneModule{
 		prefs.checkPref("noshadows", "Disable shadows", false);
 		
 		prefs.hidden(()->{
-			GameState.set(State.playing);
+			if(!GameState.is(State.menu)){
+				GameState.set(State.playing);
+			}
 		});
 		
 		prefs.shown(()->{
-			GameState.set(State.paused);
-			menu.hide();
+			if(!GameState.is(State.menu)){
+				GameState.set(State.paused);
+				menu.hide();
+			}
 		});
 
 		keys = new KeybindDialog();
@@ -214,7 +220,7 @@ public class UI extends SceneModule{
 							player.recipe = null;
 						}
 					});
-					add(button).fill().height(54).padTop(-10).units(Unit.dp);
+					add(button).fill().height(54).padRight(-0.1f).padTop(-10).units(Unit.dp);
 					button.getImageCell().size(40).padBottom(4).units(Unit.dp);
 					group.add(button);
 					
@@ -244,7 +250,7 @@ public class UI extends SceneModule{
 							//image.setDisabled(!has);
 							image.setChecked(player.recipe == r);
 							//image.setTouchable(has ? Touchable.enabled : Touchable.disabled);
-							image.getImage().setColor(has ? Color.WHITE : Color.GRAY);
+							image.getImage().setColor(has ? Color.WHITE : Color.DARK_GRAY);
 						});
 						
 						if(i % rows == rows-1)
@@ -306,7 +312,6 @@ public class UI extends SceneModule{
 				});
 
 				new imagebutton("icon-pause", isize, ()->{
-					//TODO pause
 					GameState.set(GameState.is(State.paused) ? State.playing : State.paused);
 				}){{
 					get().update(()->{
@@ -333,7 +338,7 @@ public class UI extends SceneModule{
 			atop();
 			
 			new table("pane"){{
-				new label("[orange]< paused >").scale(0.75f).pad(6);
+				new label("[orange]< paused >").scale(Unit.dp.inPixels(0.75f)).pad(6).units(Unit.dp);
 			}}.end();
 		}}.end();
 
@@ -419,12 +424,14 @@ public class UI extends SceneModule{
 			}}.end();
 		}
 		
+		//respawn background table
 		new table("white"){{
 			respawntable = get();
 			respawntable.setColor(Color.CLEAR);
 			
 		}}.end();
 		
+		//respawn table
 		new table(){{
 			new table("pane"){{
 				
@@ -435,7 +442,55 @@ public class UI extends SceneModule{
 			}}.end();
 		}}.end();
 		
+		if(android){
+			//placement table
+			new table(){{
+				visible(()->player.recipe != null);
+				abottom();
+				aleft();
+				
+				
+				new table("pane"){{
+					new label(()->"Placement Mode: [orange]" + AndroidInput.mode.name()).pad(4).units(Unit.dp);
+					row();
+					
+					aleft();
+					
+					new table(){{
+						aleft();
+						ButtonGroup<ImageButton> group = new ButtonGroup<>();
+						
+						defaults().size(58, 62).pad(6).units(Unit.dp);
+						
+						for(PlaceMode mode : PlaceMode.values()){
+							new imagebutton("icon-" + mode.name(), "toggle",  Unit.dp.inPixels(10*3), ()->{
+								AndroidInput.mode = mode;
+							}){{
+								group.add(get());
+							}};
+						}
+						
+						new imagebutton("icon-cancel", Unit.dp.inPixels(14*3), ()->{
+							player.recipe = null;
+						}).visible(()->player.recipe != null && AndroidInput.mode == PlaceMode.touch);
+						
+						new imagebutton("icon-rotate-arrow", Unit.dp.inPixels(14*3), ()->{
+							player.rotation ++;
+							player.rotation %= 4;
+						}).update(i->{
+							i.getImage().setOrigin(Align.center);
+							i.getImage().setRotation(player.rotation*90);
+						}).visible(()->player.recipe != null && AndroidInput.mode == PlaceMode.touch 
+								&& player.recipe.result.rotate);
+						
+					}}.left().end();
+				}}.end();
+			}}.end();
+		
+		}
+		
 		loadingtable = new table("loadDim"){{
+			get().setTouchable(Touchable.enabled);
 			new table("button"){{
 				new label("[orange]Loading..."){{
 					get().setName("namelabel");
@@ -449,20 +504,22 @@ public class UI extends SceneModule{
 		tools.addIButton("icon-cancel", Unit.dp.inPixels(42), ()->{
 			player.recipe = null;
 		});
+		
 		tools.addIButton("icon-rotate", Unit.dp.inPixels(42), ()->{
-			player.rotation++;
-
+			player.rotation ++;
 			player.rotation %= 4;
 		});
+		
 		tools.addIButton("icon-check", Unit.dp.inPixels(42), ()->{
 			AndroidInput.place();
 		});
 		
 		scene.add(tools);
 		
-		tools.setVisible(()->{
-			return !GameState.is(State.menu) && android && player.recipe != null && Inventory.hasItems(player.recipe.requirements);
-		});
+		tools.setVisible(()->
+			!GameState.is(State.menu) && android && player.recipe != null && Inventory.hasItems(player.recipe.requirements) &&
+			AndroidInput.mode == PlaceMode.cursor
+		);
 		
 		tools.update(()->{
 			tools.setPosition(AndroidInput.mousex, Gdx.graphics.getHeight()-AndroidInput.mousey-15*Core.cameraScale, Align.top);
@@ -576,6 +633,16 @@ public class UI extends SceneModule{
 		weapontable.addIButton("icon-menu", 8*4, ()->{
 			upgrades.show();
 		});
+	}
+	
+	public void showError(String text){
+		new Dialog("[crimson]An error has occured", "dialog"){{
+			content().pad(Unit.dp.inPixels(15));
+			content().add(text);
+			getButtonTable().addButton("OK", ()->{
+				hide();
+			}).size(90, 50).pad(4).units(Unit.dp);
+		}}.show();
 	}
 	
 	public void showLoading(){

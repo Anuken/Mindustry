@@ -26,12 +26,14 @@ public class Conduit extends Block{
 		ConduitEntity entity = tile.entity();
 		
 		Draw.rect(name() + "bottom", tile.worldx(), tile.worldy(), tile.rotation * 90);
+		
 		if(entity.liquid != null && entity.liquidAmount > 0.01f){
 			Draw.color(entity.liquid.color);
 			Draw.alpha(entity.liquidAmount / liquidCapacity);
 			Draw.rect("conduitliquid", tile.worldx(), tile.worldy(), tile.rotation * 90);
 			Draw.color();
 		}
+		
 		Draw.rect(name() + "top", tile.worldx(), tile.worldy(), tile.rotation * 90);
 		
 	}

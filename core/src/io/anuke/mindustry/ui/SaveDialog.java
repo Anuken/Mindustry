@@ -40,7 +40,7 @@ public class SaveDialog extends Dialog{
 			button.row();
 			button.pad(Unit.dp.inPixels(10));
 			button.add((!SaveIO.isSaveValid(i) ? "[gray]<empty>" : "[LIGHT_GRAY]Last Saved: " + SaveIO.getTimeString(i))).padBottom(2);
-			button.getLabel().setFontScale(0.75f);
+			button.getLabel().setFontScale(Unit.dp.inPixels(0.75f));
 			
 			button.clicked(()->{
 				if(SaveIO.isSaveValid(slot)){
@@ -62,16 +62,21 @@ public class SaveDialog extends Dialog{
 	}
 	
 	void save(int slot){
-		Vars.ui.showLoading("[yellow]Saving...");
+		Vars.ui.showLoading("[orange]Saving...");
 		
 		Timer.schedule(new Task(){
 			@Override
 			public void run(){
-				SaveIO.saveToSlot(slot);
 				hide();
+				try{
+					SaveIO.saveToSlot(slot);
+				}catch (Exception e){
+					Vars.ui.showError("[orange]Failed to save game!");
+					return;
+				}
 				Vars.ui.hideLoading();
 			}
-		}, 8f/60f);
+		}, 5f/60f);
 	}
 
 }
