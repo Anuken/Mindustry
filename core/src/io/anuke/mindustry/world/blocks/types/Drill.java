@@ -21,8 +21,9 @@ public class Drill extends Block{
 	
 	@Override
 	public void update(Tile tile){
-
-		if(tile.floor() == resource && Timers.get(tile, 60 * time)){
+		
+		//drills can only hold up to 10 items at a time
+		if(tile.floor() == resource && Timers.get(tile, 60 * time) && tile.entity.totalItems() < 10){
 			offloadNear(tile, result);
 			Effects.effect("spark", tile.worldx(), tile.worldy());
 		}

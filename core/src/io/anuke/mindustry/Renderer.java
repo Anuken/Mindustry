@@ -126,6 +126,12 @@ public class Renderer extends RendererModule{
 		//render the entire map
 		if(floorCache == null || floorCache.length != chunksx || floorCache[0].length != chunksy){
 			floorCache = new Cache[chunksx][chunksy];
+			
+			for(int x = 0; x < chunksx; x ++){
+				for(int y = 0; y < chunksy; y ++){
+					renderCache(x, y);
+				}
+			}
 		}
 
 		OrthographicCamera camera = Core.camera;

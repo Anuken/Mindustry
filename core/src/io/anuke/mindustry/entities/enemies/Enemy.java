@@ -161,7 +161,6 @@ public class Enemy extends DestructibleEntity{
 	
 	@Override
 	public void draw(){
-		Draw.color();
 		
 		String region = ClassReflection.getSimpleName(getClass()).toLowerCase() + "-t" + Mathf.clamp(tier, 1, 3);
 		
@@ -170,6 +169,7 @@ public class Enemy extends DestructibleEntity{
 		Draw.getShader(Outline.class).region = Draw.region(region);
 		
 		Draw.shader(Outline.class);
+		Draw.color();
 		Draw.rect(region, x, y, direction.angle()-90);
 		Draw.shader();
 	}

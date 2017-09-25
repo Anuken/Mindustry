@@ -14,6 +14,7 @@ import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.*;
+import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 
 public class AndroidInput extends InputAdapter{
@@ -101,7 +102,7 @@ public class AndroidInput extends InputAdapter{
 	
 	public static void doInput(){
 		if(Gdx.input.isTouched(0) 
-				&& Mathf.near2d(lmousex, lmousey, Gdx.input.getX(0), Gdx.input.getY(0), 50) 
+				&& Mathf.near2d(lmousex, lmousey, Gdx.input.getX(0), Gdx.input.getY(0), Unit.dp.inPixels(50)) 
 				&& !ui.hasMouse() /*&& (player.recipe == null || mode == PlaceMode.touch)*/){
 			warmup += Timers.delta();
 			
@@ -127,8 +128,8 @@ public class AndroidInput extends InputAdapter{
 			mousey = ly;
 		}else{
 			warmup = 0;
-			lmousex = Gdx.input.getX(0);
-			lmousey = Gdx.input.getY(0);
+			//lmousex = Gdx.input.getX(0);
+			//lmousey = Gdx.input.getY(0);
 			player.breaktime = 0;
 			
 			mousex = Mathf.clamp(mousex, 0, Gdx.graphics.getWidth());

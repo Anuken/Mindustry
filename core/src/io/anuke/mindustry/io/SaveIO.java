@@ -59,6 +59,7 @@ import io.anuke.ucore.entities.Entity;
  *   spawn lane (byte)
  *   x (float)
  *   y (float)
+ *   tier (byte)
  *   health (int)
  *   
  * 
@@ -82,7 +83,7 @@ import io.anuke.ucore.entities.Entity;
  */
 public class SaveIO{
 	/**Save file version ID. Should be incremented every breaking release.*/
-	private static final int fileVersionID = 6;
+	private static final int fileVersionID = 7;
 	
 	private static FormatProvider provider = null;
 	
@@ -91,7 +92,11 @@ public class SaveIO{
 		Enemy.class,
 		FastEnemy.class,
 		RapidEnemy.class,
-		FlamerEnemy.class
+		FlamerEnemy.class,
+		TankEnemy.class,
+		BlastEnemy.class,
+		MortarEnemy.class,
+		TestEnemy.class
 	);
 	
 	private static final ObjectMap<Class<? extends Enemy>, Byte> idEnemies = new ObjectMap<Class<? extends Enemy>, Byte>(){{
@@ -186,6 +191,7 @@ public class SaveIO{
 					stream.writeByte(enemy.spawn); //lane
 					stream.writeFloat(enemy.x); //x
 					stream.writeFloat(enemy.y); //y
+					stream.writeByte(enemy.tier); //tier
 					stream.writeInt(enemy.health); //health
 				}
 			}
@@ -308,6 +314,7 @@ public class SaveIO{
 				int lane = stream.readByte();
 				float x = stream.readFloat();
 				float y = stream.readFloat();
+				byte tier = stream.readByte();
 				int health = stream.readInt();
 				
 				try{
@@ -315,6 +322,7 @@ public class SaveIO{
 					enemy.health = health;
 					enemy.x = x;
 					enemy.y = y;
+					enemy.tier = tier;
 					enemy.add();
 					enemiesToUpdate.add(enemy);
 				}catch (Exception e){

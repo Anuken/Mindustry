@@ -14,12 +14,13 @@ public class TankEnemy extends Enemy{
 		speed = 0.2f;
 		reload = 90f;
 		bullet = BulletType.small;
+		length = 3f;
 	}
 	
 	void shoot(){
 		vector.set(length, 0).rotate(direction.angle());
 		
-		Angles.shotgun(3, 4f, direction.angle(), f->{
+		Angles.shotgun(3, 8f, direction.angle(), f->{
 			Bullet out = new Bullet(bullet, this, x+vector.x, y+vector.y, f).add();
 			out.damage = (int)(damage*Vars.multiplier);
 		});

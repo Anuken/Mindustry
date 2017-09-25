@@ -435,7 +435,7 @@ public class UI extends SceneModule{
 		new table(){{
 			new table("pane"){{
 				
-				new label(()->"Respawning in " + (int)(control.getRespawnTime()/60)).scale(0.75f).pad(10);
+				new label(()->"[orange]Respawning in " + (int)(control.getRespawnTime()/60)).scale(0.75f).pad(10);
 				
 				visible(()->control.getRespawnTime() > 0 && !GameState.is(State.menu));
 				

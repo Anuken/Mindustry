@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui;
 
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.SaveIO;
@@ -68,13 +69,17 @@ public class SaveDialog extends Dialog{
 			@Override
 			public void run(){
 				hide();
+				Vars.ui.hideLoading();
 				try{
 					SaveIO.saveToSlot(slot);
-				}catch (Exception e){
-					Vars.ui.showError("[orange]Failed to save game!");
-					return;
+				}catch (Throwable e){
+					e = (e.getCause() == null ? e : e.getCause());
+					
+					Vars.ui.showError("[orange]Failed to save game!\n[white]" +
+							ClassReflection.getSimpleName(e.getClass()) + ": " + e.getMessage() + "\n" +
+							"at " + e.getStackTrace()[0].getFileName() + ":"+ e.getStackTrace()[0].getLineNumber());
 				}
-				Vars.ui.hideLoading();
+				
 			}
 		}, 5f/60f);
 	}
