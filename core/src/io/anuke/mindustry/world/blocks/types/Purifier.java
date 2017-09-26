@@ -17,7 +17,7 @@ public class Purifier extends Conduit{
 	public Liquid inputLiquid = null;
 	public float liquidAmount = 19.99f;
 	public Item output = null;
-	public int itemCapacity = 100;
+	public int itemCapacity = 90;
 	public int purifyTime = 80;
 
 	public Purifier(String name) {

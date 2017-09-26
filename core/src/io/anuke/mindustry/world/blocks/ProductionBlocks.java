@@ -117,9 +117,12 @@ public class ProductionBlocks{
 		{
 			formalName = "coal extractor";
 			input = Item.stone;
+			inputAmount = 5;
 			inputLiquid = Liquid.water;
+			liquidAmount = 19.99f;
 			output = Item.coal;
 			health = 50;
+			purifyTime = 80;
 		}
 		
 		@Override

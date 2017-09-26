@@ -41,6 +41,15 @@ public class World{
 		return tile == null || tile.block().solid || (tile.floor().solid && (tile.block() == Blocks.air));
 	}
 	
+	public static boolean wallSolid(int x, int y){
+		Tile tile = tile(x, y);
+		return tile == null || tile.block().solid;
+	}
+	
+	public static boolean isAccessible(int x, int y){
+		return !wallSolid(x, y-1) || !wallSolid(x, y+1) || !wallSolid(x-1, y) ||!wallSolid(x+1, y);
+	}
+	
 	public static int getMap(){
 		return currentMap;
 	}

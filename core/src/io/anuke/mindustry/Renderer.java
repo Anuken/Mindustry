@@ -181,7 +181,7 @@ public class Renderer extends RendererModule{
 					if(World.tile(worldx, worldy) != null){
 						Tile tile = World.tile(worldx, worldy);
 						if(l == 0){
-							if(tile.block() != Blocks.air){
+							if(tile.block() != Blocks.air && World.isAccessible(worldx, worldy)){
 								Draw.rect(tile.block().shadow, worldx * tilesize, worldy * tilesize);
 							}
 						}else if(l == 1){
