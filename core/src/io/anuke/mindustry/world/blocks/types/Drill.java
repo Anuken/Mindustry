@@ -11,7 +11,7 @@ import io.anuke.ucore.util.Mathf;
 public class Drill extends Block{
 	protected Block resource;
 	protected Item result;
-	protected int time = 6;
+	protected int time = 5;
 
 	public Drill(String name) {
 		super(name);

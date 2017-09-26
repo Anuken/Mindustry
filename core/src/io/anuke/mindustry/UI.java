@@ -55,6 +55,9 @@ public class UI extends SceneModule{
 		
 		skin.font().setUseIntegerPositions(false);
 		skin.font().getData().setScale(Vars.fontscale);
+		skin.font().getData().down += 4f;
+		skin.font().getData().lineHeight -= 2f;
+		
 		TooltipManager.getInstance().animations = false;
 		
 		Dialog.closePadR = -1;

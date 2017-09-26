@@ -1,14 +1,13 @@
 package io.anuke.mindustry.ui;
 
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.SaveIO;
-import io.anuke.ucore.scene.ui.ConfirmDialog;
-import io.anuke.ucore.scene.ui.Dialog;
-import io.anuke.ucore.scene.ui.TextButton;
+import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
@@ -40,7 +39,12 @@ public class SaveDialog extends Dialog{
 			button.getLabelCell().top().left().growX();
 			button.row();
 			button.pad(Unit.dp.inPixels(10));
-			button.add((!SaveIO.isSaveValid(i) ? "[gray]<empty>" : "[LIGHT_GRAY]Last Saved: " + SaveIO.getTimeString(i))).padBottom(2);
+			
+			Label info = new Label("[gray]" + (!SaveIO.isSaveValid(i) ? "<empty>" : "Wave " +
+					SaveIO.getWave(slot)+"\nLast Saved: " + SaveIO.getTimeString(i)));
+			info.setAlignment(Align.center, Align.center);
+			
+			button.add(info).padBottom(2).padTop(6);
 			button.getLabel().setFontScale(Unit.dp.inPixels(0.75f));
 			
 			button.clicked(()->{
@@ -57,7 +61,7 @@ public class SaveDialog extends Dialog{
 				}
 			});
 			
-			content().add(button).size(400, 78).units(Unit.dp).pad(2);
+			content().add(button).size(400, 80).units(Unit.dp).pad(2);
 			content().row();
 		}
 	}

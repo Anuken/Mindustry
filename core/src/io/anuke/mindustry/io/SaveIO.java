@@ -132,6 +132,17 @@ public class SaveIO{
 		}
 	}
 	
+	public static int getWave(int slot){
+		
+		try(DataInputStream stream = new DataInputStream(fileFor(slot).read())){
+			stream.readInt();
+			stream.readLong();
+			return stream.readInt();
+		}catch (IOException e){
+			throw new RuntimeException(e);
+		}
+	}
+	
 	public static FileHandle fileFor(int slot){
 		return Gdx.files.local("mindustry-saves/" + slot + ".mins");
 	}

@@ -79,7 +79,7 @@ project(":core") {
     apply plugin: "java"
 
     dependencies {
-        compile 'com.github.anuken:ucore:f77bdb38e4'
+        compile 'com.github.anuken:ucore:5633a3df2f'
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-ai:1.8.1"
     }

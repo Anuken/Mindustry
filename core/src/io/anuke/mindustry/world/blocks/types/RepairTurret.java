@@ -40,7 +40,9 @@ public class RepairTurret extends Turret{
 	
 	@Override
 	public void drawPixelOverlay(Tile tile){
-		
+		Draw.color("green");
+		Draw.dashcircle(tile.worldx(), tile.worldy(), range);
+		Draw.reset();
 	}
 	
 	@Override
