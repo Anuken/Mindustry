@@ -95,8 +95,8 @@ public class Control extends Module{
 		spawns = Array.with(
 				
 			new EnemySpawn(Enemy.class){{
-				scaling = 2;
-				tierscaleback = 4;
+				scaling = 3;
+				tierscaleback = 3;
 			}},
 			new EnemySpawn(FastEnemy.class){{
 				after = 2;
@@ -114,7 +114,8 @@ public class Control extends Module{
 			}},
 			new EnemySpawn(RapidEnemy.class){{
 				after = 7;
-				spacing = 4;
+				spacing = 3;
+				scaling = 3;
 			}},
 			new EnemySpawn(TankEnemy.class){{
 				after = 4;
@@ -129,13 +130,13 @@ public class Control extends Module{
 			
 		);
 		
-		/*
+		
 		//TODO remove this debugging
 		for(int i = 1; i < 60; i ++){
 			UCore.log("\n\n--WAVE " + i);
 			printEnemies(i);
 		}
-		*/
+	
 	}
 	
 	public void reset(){
@@ -250,13 +251,17 @@ public class Control extends Module{
 	}
 	
 	void printEnemies(int wave){
+		int total = 0;
 		for(EnemySpawn spawn : spawns){
 			int spawnamount = spawn.evaluate(wave, 0);
+			total += spawnamount;
 			
 			if(spawnamount > 0){
 				UCore.log(ClassReflection.getSimpleName(spawn.type) + " t" + spawn.tier(wave, 0) + " x" + spawnamount);
 			}
 		}
+		
+		UCore.log("Total: " + total);
 	}
 	
 	public void enemyDeath(){

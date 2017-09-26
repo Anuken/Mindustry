@@ -3,8 +3,6 @@ package io.anuke.mindustry;
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.scene.actions.Actions.*;
 
-import java.text.NumberFormat;
-
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -701,7 +699,7 @@ public class UI extends SceneModule{
 
 		for(Item stack : Inventory.getItemTypes()){
 			Image image = new Image(Draw.region("icon-" + stack.name()));
-			Label label = new Label("" + NumberFormat.getIntegerInstance().format(Inventory.getAmount(stack)));
+			Label label = new Label("" + Mindustry.formatter.format(Inventory.getAmount(stack)));
 			label.setFontScale(fontscale*1.5f);
 			itemtable.add(image).size(8*3).units(Unit.dp);
 			itemtable.add(label).left();

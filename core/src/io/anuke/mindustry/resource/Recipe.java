@@ -21,10 +21,10 @@ public enum Recipe{
 	router(distribution, ProductionBlocks.router, stack(Item.stone, 2)),
 	junction(distribution, ProductionBlocks.junction, stack(Item.iron, 2)),
 	
-	turret(defense, WeaponBlocks.turret, stack(Item.stone, 3)),
-	dturret(defense, WeaponBlocks.doubleturret, stack(Item.stone, 6)),
-	machineturret(defense, WeaponBlocks.machineturret, stack(Item.iron, 7), stack(Item.stone, 10)),
-	shotgunturret(defense, WeaponBlocks.shotgunturret, stack(Item.iron, 9), stack(Item.stone, 10)),
+	turret(defense, WeaponBlocks.turret, stack(Item.stone, 4)),
+	dturret(defense, WeaponBlocks.doubleturret, stack(Item.stone, 7)),
+	machineturret(defense, WeaponBlocks.machineturret, stack(Item.iron, 8), stack(Item.stone, 10)),
+	shotgunturret(defense, WeaponBlocks.shotgunturret, stack(Item.iron, 10), stack(Item.stone, 10)),
 	flameturret(defense, WeaponBlocks.flameturret, stack(Item.iron, 12), stack(Item.steel, 9)),
 	sniperturret(defense, WeaponBlocks.sniperturret, stack(Item.iron, 15), stack(Item.steel, 10)),
 	laserturret(defense, WeaponBlocks.laserturret, stack(Item.steel, 10), stack(Item.titanium, 10)),
@@ -32,8 +32,8 @@ public enum Recipe{
 	teslaturret(defense, WeaponBlocks.teslaturret, stack(Item.steel, 10), stack(Item.titanium, 15), stack(Item.dirium, 15)),
 	plasmaturret(defense, WeaponBlocks.plasmaturret, stack(Item.steel, 10), stack(Item.titanium, 10), stack(Item.dirium, 15)),
 	
-	healturret(defense, WeaponBlocks.repairturret, stack(Item.iron, 25)),
-	megahealturret(defense, WeaponBlocks.megarepairturret, stack(Item.iron, 15), stack(Item.steel, 25)),
+	healturret(defense, WeaponBlocks.repairturret, stack(Item.iron, 30)),
+	megahealturret(defense, WeaponBlocks.megarepairturret, stack(Item.iron, 20), stack(Item.steel, 30)),
 	
 	drill(production, ProductionBlocks.stonedrill, stack(Item.stone, 16)),
 	irondrill(production, ProductionBlocks.irondrill, stack(Item.stone, 25)),

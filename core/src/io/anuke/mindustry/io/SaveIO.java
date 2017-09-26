@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.Inventory;
+import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.*;
 import io.anuke.mindustry.resource.Item;
@@ -85,8 +86,6 @@ public class SaveIO{
 	/**Save file version ID. Should be incremented every breaking release.*/
 	private static final int fileVersionID = 7;
 	
-	private static FormatProvider provider = null;
-	
 	//TODO automatic registration of types?
 	private static final Array<Class<? extends Enemy>> enemyIDs = Array.with(
 		Enemy.class,
@@ -126,7 +125,7 @@ public class SaveIO{
 		try(DataInputStream stream = new DataInputStream(fileFor(slot).read())){
 			stream.readInt();
 			Date date = new Date(stream.readLong());
-			return provider.format(date);
+			return Mindustry.formatter.format(date);
 		}catch (IOException e){
 			throw new RuntimeException(e);
 		}
@@ -145,10 +144,6 @@ public class SaveIO{
 	
 	public static FileHandle fileFor(int slot){
 		return Gdx.files.local("mindustry-saves/" + slot + ".mins");
-	}
-	
-	public static void setFormatProvider(FormatProvider prov){
-		provider = prov;
 	}
 	
 	public static void write(FileHandle file){
@@ -290,6 +285,9 @@ public class SaveIO{
 			
 			//weapons
 			
+			Vars.control.getWeapons().clear();
+			Vars.control.getWeapons().add(Weapon.blaster);
+			
 			int weapons = stream.readByte();
 			
 			for(int i = 0; i < weapons; i ++){
@@ -399,9 +397,5 @@ public class SaveIO{
 		}catch (IOException e){
 			throw new RuntimeException(e);
 		}
-	}
-	
-	public static interface FormatProvider{
-		public String format(Date date);
 	}
 }

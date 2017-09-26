@@ -122,7 +122,7 @@ public class ProductionBlocks{
 			liquidAmount = 19.99f;
 			output = Item.coal;
 			health = 50;
-			purifyTime = 80;
+			purifyTime = 70;
 		}
 		
 		@Override
@@ -135,11 +135,11 @@ public class ProductionBlocks{
 		{
 			formalName = "titanium\nextractor";
 			input = Item.iron;
-			inputAmount = 11;
+			inputAmount = 6;
 			inputLiquid = Liquid.water;
 			liquidAmount = 40f;
 			liquidCapacity = 41f;
-			purifyTime = 90;
+			purifyTime = 80;
 			output = Item.titanium;
 			health = 70;
 		}

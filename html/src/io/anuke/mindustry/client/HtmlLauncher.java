@@ -6,13 +6,14 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
 import com.google.gwt.dom.client.*;
+import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.i18n.shared.DateTimeFormat;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 import io.anuke.mindustry.Mindustry;
-import io.anuke.mindustry.io.SaveIO;
-import io.anuke.mindustry.io.SaveIO.FormatProvider;
+import io.anuke.mindustry.io.Formatter;
 
 public class HtmlLauncher extends GwtApplication {
     static final int WIDTH = 800;
@@ -54,12 +55,19 @@ public class HtmlLauncher extends GwtApplication {
             }
         });
         
-        SaveIO.setFormatProvider(new FormatProvider(){
+        Mindustry.formatter = new Formatter(){
+        	DateTimeFormat format = DateTimeFormat.getFormat("EEE, dd MMM yyyy HH:mm:ss");
 			
+			@Override
 			public String format(Date date){
-				return "saving not supported";
+				return format.format(date);
 			}
-		});
+
+			@Override
+			public String format(int number){
+				return NumberFormat.getDecimalFormat().format(number);
+			}
+		};
         
         return new Mindustry();
     }

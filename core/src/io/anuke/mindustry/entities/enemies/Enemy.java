@@ -23,7 +23,7 @@ public class Enemy extends DestructibleEntity{
 	public final static int maxtier = 4;
 	
 	protected float speed = 0.3f;
-	protected float reload = 40;
+	protected float reload = 32;
 	protected float range = 60;
 	protected float length = 4;
 	protected float rotatespeed = 7f;
@@ -47,7 +47,7 @@ public class Enemy extends DestructibleEntity{
 		
 		hitsize = 5;
 		
-		maxhealth = 50;
+		maxhealth = 60;
 		heal();
 	}
 	
@@ -104,17 +104,21 @@ public class Enemy extends DestructibleEntity{
 		}
 		
 		node = cindex;
+		
+		//node = 0;
+		
+		//set(World.spawnpoints.get(spawn).worldx(), World.spawnpoints.get(spawn).worldy());
 	}
 	
 	@Override
 	public void added(){
 		if(bullet != null){
-			damage = (int)(bullet.damage * (1 + (tier - 1) * 0.5f));
+			damage = (int)(bullet.damage * (1 + (tier - 1) * 1f));
 		}
 		
 		maxhealth *= tier;
 		speed += 0.04f*tier + Mathf.range(0.1f);
-		reload /= Math.max(tier /1.5f, 1f);
+		reload /= Math.max(tier / 1.5f, 1f);
 		range += tier*5;
 		
 		heal();

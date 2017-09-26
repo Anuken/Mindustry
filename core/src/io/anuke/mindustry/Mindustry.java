@@ -1,12 +1,28 @@
 package io.anuke.mindustry;
 
+import java.util.Date;
+
 import io.anuke.mindustry.GameState.State;
+import io.anuke.mindustry.io.Formatter;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.modules.ModuleCore;
 
 public class Mindustry extends ModuleCore {
 	public static String[] args = {};
+	public static Formatter formatter = new Formatter(){
+
+		@Override
+		public String format(Date date){
+			return "invalid date";
+		}
+
+		@Override
+		public String format(int number){
+			return number + "";
+		}
+		
+	};
 	
 	@Override
 	public void init(){

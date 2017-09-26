@@ -7,7 +7,7 @@ public class BlastEnemy extends Enemy{
 
 	public BlastEnemy(int spawn) {
 		super(spawn);
-		maxhealth = 15;
+		maxhealth = 30;
 		speed = 0.65f;
 		bullet = null;
 		turretrotatespeed = 0f;

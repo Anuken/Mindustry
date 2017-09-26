@@ -1,5 +1,6 @@
 package io.anuke.mindustry.desktop;
 
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -7,8 +8,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 
 import io.anuke.mindustry.Mindustry;
-import io.anuke.mindustry.io.SaveIO;
-import io.anuke.mindustry.io.SaveIO.FormatProvider;
+import io.anuke.mindustry.io.Formatter;
 
 public class DesktopLauncher {
 	
@@ -20,13 +20,19 @@ public class DesktopLauncher {
 		config.setWindowedMode(800, 600);
 		config.setWindowIcon("sprites/icon.png");
 		
-		SaveIO.setFormatProvider(new FormatProvider(){
-			SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss");
+		Mindustry.formatter = new Formatter(){
+			SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm");
 			
+			@Override
 			public String format(Date date){
 				return format.format(date);
 			}
-		});
+
+			@Override
+			public String format(int number){
+				return NumberFormat.getIntegerInstance().format(number);
+			}
+		};
 		
 		Mindustry.args = arg;
 		

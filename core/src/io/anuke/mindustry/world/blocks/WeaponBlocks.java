@@ -98,10 +98,10 @@ public class WeaponBlocks{
 		{
 			formalName = "railgun turret";
 			range = 120;
-			reload = 60f;
+			reload = 50f;
 			bullet = BulletType.sniper;
 			ammo = Item.steel;
-			health = 60;
+			health = 70;
 		}
 	},
 	
@@ -111,7 +111,7 @@ public class WeaponBlocks{
 			rotatespeed = 0.1f;
 			formalName = "flak turret";
 			range = 120;
-			reload = 120f;
+			reload = 100f;
 			bullet = BulletType.shell;
 			ammo = Item.coal;
 			ammoMultiplier = 5;
@@ -128,9 +128,10 @@ public class WeaponBlocks{
 			formalName = "laser turret";
 			range = 60;
 			reload = 4f;
-			damage = 9;
+			damage = 10;
 			ammo = Item.coal;
 			health = 110;
+			ammoMultiplier = 60;
 		}
 	},
 	
@@ -139,7 +140,7 @@ public class WeaponBlocks{
 		{
 			formalName = "tesla turret";
 			range = 70;
-			reload = 20f;
+			reload = 15f;
 			bullet = BulletType.shell;
 			ammo = Item.coal;
 			health = 140;
@@ -151,7 +152,7 @@ public class WeaponBlocks{
 			Angles.translation(entity.rotation, 4);
 
 			new TeslaOrb(tile.worldx() + Angles.x(), tile.worldy() + Angles.y(), 
-					70, (int)(8*Vars.multiplier)).add();
+					70, (int)(9*Vars.multiplier)).add();
 		}
 	},
 		
@@ -161,7 +162,7 @@ public class WeaponBlocks{
 			inaccuracy = 7f;
 			formalName = "plasma turret";
 			range = 60f;
-			reload = 3f;
+			reload = 2f;
 			bullet = BulletType.plasmaflame;
 			ammo = Item.coal;
 			health = 180;

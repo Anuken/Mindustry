@@ -31,7 +31,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Draw.reset();
 		}
 	},
-	sniper = new BulletType(3f, 20){
+	sniper = new BulletType(3f, 23){
 		public void draw(Bullet b){
 			Draw.color(Color.LIGHT_GRAY);
 			Draw.thick(1f);
@@ -45,7 +45,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			}
 		}
 	},
-	shell = new BulletType(1.1f, 80){
+	shell = new BulletType(1.1f, 85){
 		{
 			lifetime = 110f;
 			hitsize = 8f;

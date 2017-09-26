@@ -60,6 +60,9 @@ public class UpgradeDialog extends Dialog{
 					button.setColor(Color.GRAY);
 				}else if(!Inventory.hasItems(weapon.requirements)){
 					button.setDisabled(true);
+				}else{
+					button.setDisabled(false);
+					button.setColor(Color.WHITE);
 				}
 			});
 			
