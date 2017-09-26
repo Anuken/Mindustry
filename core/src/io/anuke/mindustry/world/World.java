@@ -20,6 +20,7 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Tmp;
 
 public class World{
 	public static int worldsize = 128;
@@ -273,5 +274,43 @@ public class World{
 		for(Texture texture : mapTextures){
 			texture.dispose();
 		}
+	}
+	
+	/**
+	 * Input is in block coordinates, not world coordinates.
+	 * @return null if no collisions found, block position otherwise.
+	 */
+	public static Vector2 raycast(int x0f, int y0f, int x1f, int y1f){
+		int x0 = (int)x0f;
+		int y0 = (int)y0f;
+		int x1 = (int)x1f;
+		int y1 = (int)y1f;
+		int dx = Math.abs(x1 - x0);
+		int dy = Math.abs(y1 - y0);
+
+		int sx = x0 < x1 ? 1 : -1;
+		int sy = y0 < y1 ? 1 : -1;
+
+		int err = dx - dy;
+		int e2;
+		while(true){
+
+			if(solid(x0, y0)){
+				return Tmp.v3.set(x0, y0);
+			}
+			if(x0 == x1 && y0 == y1) break;
+
+			e2 = 2 * err;
+			if(e2 > -dy){
+				err = err - dy;
+				x0 = x0 + sx;
+			}
+
+			if(e2 < dx){
+				err = err + dx;
+				y0 = y0 + sy;
+			}
+		}
+		return null;
 	}
 }

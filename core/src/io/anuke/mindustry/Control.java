@@ -130,12 +130,12 @@ public class Control extends Module{
 			
 		);
 		
-		
+		/*
 		//TODO remove this debugging
 		for(int i = 1; i < 60; i ++){
 			UCore.log("\n\n--WAVE " + i);
 			printEnemies(i);
-		}
+		}*/
 	
 	}
 	

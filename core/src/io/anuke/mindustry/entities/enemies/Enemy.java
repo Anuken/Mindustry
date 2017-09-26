@@ -105,9 +105,14 @@ public class Enemy extends DestructibleEntity{
 		
 		node = cindex;
 		
-		//node = 0;
+		int x2 = path[node].x, y2 = path[node].y;
 		
-		//set(World.spawnpoints.get(spawn).worldx(), World.spawnpoints.get(spawn).worldy());
+		if(World.raycast(Mathf.scl2(x, Vars.tilesize), Mathf.scl2(y, Vars.tilesize), x2, y2) != null){
+			Timers.run(Mathf.random(10f), ()->{
+				set(x2 * Vars.tilesize, y2 * Vars.tilesize);
+			});
+			
+		}
 	}
 	
 	@Override
