@@ -205,6 +205,8 @@ public class World{
 		
 		Tile tile = tile(x, y);
 		
+		if(tile == null) return false;
+		
 		if(tile.block() != type && type.canReplace(tile.block())){
 			return true;
 		}

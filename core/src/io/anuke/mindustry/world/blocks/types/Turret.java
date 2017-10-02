@@ -34,6 +34,7 @@ public class Turret extends Block{
 	protected int maxammo = 400;
 	protected float rotatespeed = 0.2f;
 	protected float shootCone = 8f;
+	protected float overPrediction = 0f;
 
 	public Turret(String name) {
 		super(name);
@@ -108,7 +109,7 @@ public class Turret extends Block{
 			if(entity.target != null){
 				
 				float targetRot = Angles.predictAngle(tile.worldx(), tile.worldy(), 
-						entity.target.x, entity.target.y, entity.target.xvelocity, entity.target.yvelocity, bullet.speed);
+						entity.target.x, entity.target.y, entity.target.xvelocity, entity.target.yvelocity, bullet.speed + overPrediction);
 				
 				entity.rotation = MathUtils.lerpAngleDeg(entity.rotation, targetRot, 
 						rotatespeed*Timers.delta());

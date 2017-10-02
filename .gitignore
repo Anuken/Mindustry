@@ -4,6 +4,7 @@
 /desktop/packr-out/
 /desktop/packr-export/
 /core/lib/
+*.gif
 
 ## Java
 

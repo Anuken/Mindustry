@@ -108,10 +108,9 @@ public class Enemy extends DestructibleEntity{
 		int x2 = path[node].x, y2 = path[node].y;
 		
 		if(World.raycast(Mathf.scl2(x, Vars.tilesize), Mathf.scl2(y, Vars.tilesize), x2, y2) != null){
-			Timers.run(Mathf.random(10f), ()->{
+			Timers.run(Mathf.random(15f), ()->{
 				set(x2 * Vars.tilesize, y2 * Vars.tilesize);
 			});
-			
 		}
 	}
 	
@@ -173,7 +172,7 @@ public class Enemy extends DestructibleEntity{
 		
 		String region = ClassReflection.getSimpleName(getClass()).toLowerCase() + "-t" + Mathf.clamp(tier, 1, 3);
 		
-		//TODO is this necessary?
+		//TODO is this really necessary?
 		Draw.getShader(Outline.class).color.set(tierColors[tier-1]);
 		Draw.getShader(Outline.class).region = Draw.region(region);
 		

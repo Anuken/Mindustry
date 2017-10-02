@@ -105,7 +105,6 @@ public class WeaponBlocks{
 		}
 	},
 	
-	//TODO
 	mortarturret = new Turret("mortarturret"){
 		{
 			rotatespeed = 0.1f;
@@ -116,10 +115,10 @@ public class WeaponBlocks{
 			ammo = Item.coal;
 			ammoMultiplier = 5;
 			health = 110;
+			overPrediction = 0.09f;
 		}
 	},
 	
-	//TODO
 	laserturret = new LaserTurret("laserturret"){
 		
 		
@@ -135,7 +134,6 @@ public class WeaponBlocks{
 		}
 	},
 	
-	//TODO
 	teslaturret = new Turret("waveturret"){
 		{
 			formalName = "tesla turret";
@@ -156,7 +154,6 @@ public class WeaponBlocks{
 		}
 	},
 		
-	//TODO
 	plasmaturret = new Turret("plasmaturret"){
 		{
 			inaccuracy = 7f;

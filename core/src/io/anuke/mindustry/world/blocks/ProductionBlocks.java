@@ -68,6 +68,7 @@ public class ProductionBlocks{
 			dir = (dir+4)%4;
 			Tile to = tile.getNearby()[dir];
 			Timers.run(10, ()->{
+				if(to == null || to.entity == null) return;
 				to.block().handleItem(to, item, tile);
 			});
 			
@@ -146,7 +147,7 @@ public class ProductionBlocks{
 		
 		@Override
 		public String description(){
-			return "Takes in iron + water, outputs coal.";
+			return "Takes in iron + water, outputs titanium.";
 		}
 	},
 	

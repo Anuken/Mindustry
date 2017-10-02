@@ -3,6 +3,7 @@ package io.anuke.mindustry.entities;
 import static io.anuke.mindustry.Vars.*;
 
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
@@ -51,7 +52,7 @@ public class Player extends DestructibleEntity{
 		
 		float speed = this.speed;
 		
-		if(Vars.debug)
+		if(Vars.debug && Inputs.keyDown(Keys.SHIFT_LEFT))
 			speed *= 3f;
 		
 		if(health < maxhealth && Timers.get(this, 50))
