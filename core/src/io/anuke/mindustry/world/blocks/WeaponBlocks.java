@@ -42,11 +42,11 @@ public class WeaponBlocks{
 		protected void shoot(Tile tile){
 			TurretEntity entity = tile.entity();
 			
-			vector.set(4, -2).rotate(entity.rotation);
-				bullet(tile, entity.rotation);
+			Angles.vector.set(4, -2).rotate(entity.rotation);
+			bullet(tile, entity.rotation);
 				
-			vector.set(4, 2).rotate(entity.rotation);
-				bullet(tile, entity.rotation);
+			Angles.vector.set(4, 2).rotate(entity.rotation);
+			bullet(tile, entity.rotation);
 		}
 	},
 	
@@ -77,7 +77,7 @@ public class WeaponBlocks{
 			
 			for(int i = 0; i < 7; i ++)
 				Timers.run(i/1.5f, ()->{
-					vector.set(4, 0).setAngle(entity.rotation);
+					Angles.translation(entity.rotation, 4f);
 					bullet(tile, entity.rotation + Mathf.range(30));
 				});
 		}
@@ -115,7 +115,6 @@ public class WeaponBlocks{
 			ammo = Item.coal;
 			ammoMultiplier = 5;
 			health = 110;
-			overPrediction = 0.09f;
 		}
 	},
 	
@@ -159,7 +158,7 @@ public class WeaponBlocks{
 			inaccuracy = 7f;
 			formalName = "plasma turret";
 			range = 60f;
-			reload = 2f;
+			reload = 3f;
 			bullet = BulletType.plasmaflame;
 			ammo = Item.coal;
 			health = 180;

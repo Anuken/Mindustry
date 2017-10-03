@@ -352,8 +352,8 @@ public class Control extends Module{
 				}
 			}
 			
-			if(Inputs.keyDown(Keys.Y)){
-				new TestEnemy(0).set(player.x, player.y).add();
+			if(Inputs.keyUp(Keys.Y)){
+				new FastEnemy(0).set(player.x, player.y).add();
 			}
 		}
 		

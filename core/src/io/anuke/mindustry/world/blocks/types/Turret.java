@@ -1,10 +1,10 @@
 package io.anuke.mindustry.world.blocks.types;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.MathUtils;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Bullet;
@@ -34,7 +34,6 @@ public class Turret extends Block{
 	protected int maxammo = 400;
 	protected float rotatespeed = 0.2f;
 	protected float shootCone = 8f;
-	protected float overPrediction = 0f;
 
 	public Turret(String name) {
 		super(name);
@@ -51,6 +50,10 @@ public class Turret extends Block{
 	public void drawOver(Tile tile){
 		TurretEntity entity = tile.entity();
 		Draw.rect(name(), tile.worldx(), tile.worldy(), entity.rotation - 90);
+		
+		if(Vars.debug){
+			drawTargeting(tile);
+		}
 	}
 	
 	@Override
@@ -70,7 +73,6 @@ public class Turret extends Block{
 	
 	@Override
 	public void drawPlace(int x, int y, boolean valid){
-		//TODO?
 		Draw.color(Color.PURPLE);
 		Draw.thick(1f);
 		Draw.dashcircle(x*Vars.tilesize, y*Vars.tilesize, range);
@@ -109,9 +111,9 @@ public class Turret extends Block{
 			if(entity.target != null){
 				
 				float targetRot = Angles.predictAngle(tile.worldx(), tile.worldy(), 
-						entity.target.x, entity.target.y, entity.target.xvelocity, entity.target.yvelocity, bullet.speed + overPrediction);
-				
-				entity.rotation = MathUtils.lerpAngleDeg(entity.rotation, targetRot, 
+						entity.target.x, entity.target.y, entity.target.xvelocity, entity.target.yvelocity, bullet.speed);
+				 
+				entity.rotation = Mathf.slerp(entity.rotation, targetRot, 
 						rotatespeed*Timers.delta());
 				
 				float reload = Vars.multiplier*this.reload;
@@ -129,18 +131,54 @@ public class Turret extends Block{
 		return new TurretEntity();
 	}
 	
+	void drawTargeting(Tile tile){
+		TurretEntity entity = tile.entity();
+		
+		if(entity.target == null) return;
+		
+		float dst = entity.distanceTo(entity.target);
+		float hittime = dst / bullet.speed;
+		
+		float angle = Angles.predictAngle(tile.worldx(), tile.worldy(), 
+				entity.target.x, entity.target.y, entity.target.xvelocity, entity.target.yvelocity, bullet.speed);
+		
+		float predictX = entity.target.x + entity.target.xvelocity * hittime, 
+				predictY = entity.target.y + entity.target.yvelocity * hittime;
+		
+		Draw.color(Color.GREEN);
+		Draw.line(tile.worldx(), tile.worldy(), entity.target.x, entity.target.y);
+		
+		Draw.color(Color.RED);
+		Draw.line(tile.worldx(), tile.worldy(), entity.target.x + entity.target.xvelocity * hittime, 
+				entity.target.y + entity.target.yvelocity * hittime);
+		
+		Draw.color(Color.PURPLE);
+		Draw.thick(2f);
+		Draw.lineAngle(tile.worldx(), tile.worldy(), angle, 7f);
+		
+		Draw.reset();
+		
+		if(Timers.getTime(tile, "reload") <= 0){
+			Timers.run(hittime, ()->{
+				Effects.effect("spawn", predictX, predictY);
+			});
+		}
+	}
+	
 	protected void shoot(Tile tile){
 		TurretEntity entity = tile.entity();
 		
 		float inac = Mathf.range(inaccuracy);
 		
-		vector.set(0, 4).setAngle(entity.rotation + inac);
-		Bullet out = new Bullet(bullet, tile.entity, tile.worldx()+vector.x, tile.worldy()+vector.y, entity.rotation + inac).add();
+		Angles.translation(entity.rotation + inac, 4f);
+		
+		Bullet out = new Bullet(bullet, tile.entity, 
+				tile.worldx() + Angles.x(), tile.worldy() + Angles.y(), entity.rotation + inac).add();
 		out.damage = (int)(bullet.damage*Vars.multiplier);
 	}
 	
 	protected void bullet(Tile tile, float angle){
-		 Bullet out = new Bullet(bullet, tile.entity, tile.worldx()+vector.x, tile.worldy()+vector.y, angle).add();
+		 Bullet out = new Bullet(bullet, tile.entity, tile.worldx() + Angles.x(), tile.worldy() + Angles.y(), angle).add();
 		 out.damage = (int)(bullet.damage*Vars.multiplier);
 	}
 	

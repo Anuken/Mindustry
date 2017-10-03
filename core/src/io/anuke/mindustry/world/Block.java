@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.entities.TileEntity;
@@ -12,9 +11,6 @@ import io.anuke.ucore.core.Draw;
 public class Block{
 	private static int lastid;
 	private static Array<Block> blocks = new Array<Block>();
-	
-	protected static Vector2 vector = new Vector2();
-	protected static Vector2 vector2 = new Vector2();
 	protected static TextureRegion temp = new TextureRegion();
 	
 	public final String name;

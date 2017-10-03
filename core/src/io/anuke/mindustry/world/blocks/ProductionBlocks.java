@@ -40,7 +40,7 @@ public class ProductionBlocks{
 	}},
 	
 	liquidrouter = new LiquidRouter("liquidrouter"){{
-				
+		formalName = "liquid router";
 	}},
 	
 	conveyor = new Conveyor("conveyor"){{

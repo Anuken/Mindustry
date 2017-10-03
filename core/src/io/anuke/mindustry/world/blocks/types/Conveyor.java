@@ -16,6 +16,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Tmp;
 
 public class Conveyor extends Block{
 	protected float speed = 0.02f;
@@ -38,12 +39,12 @@ public class Conveyor extends Block{
 				(Timers.time() % ((20 / 100f) / speed) < (10 / 100f) / speed && accept(Item.stone, tile, null) ? "" : "move"), tile.worldx(), tile.worldy(), tile.rotation * 90);
 		
 		for(ItemPos pos : entity.convey){
-			vector.set(tilesize, 0).rotate(tile.rotation * 90);
-			vector2.set(-tilesize / 2, pos.y*tilesize/2).rotate(tile.rotation * 90);
+			Tmp.v1.set(tilesize, 0).rotate(tile.rotation * 90);
+			Tmp.v2.set(-tilesize / 2, pos.y*tilesize/2).rotate(tile.rotation * 90);
 			
 			Draw.rect("icon-" + pos.item.name(), 
-					tile.x * tilesize + vector.x * pos.pos + vector2.x, 
-					tile.y * tilesize + vector.y * pos.pos + vector2.y, 4, 4);
+					tile.x * tilesize + Tmp.v1.x * pos.pos + Tmp.v2.x, 
+					tile.y * tilesize + Tmp.v1.y * pos.pos + Tmp.v2.y, 4, 4);
 		}
 	}
 	

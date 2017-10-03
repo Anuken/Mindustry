@@ -26,9 +26,9 @@ public class Mindustry extends ModuleCore {
 	
 	@Override
 	public void init(){
-		add(Vars.control = new Control());
-		add(Vars.renderer = new Renderer());
-		add(Vars.ui = new UI());
+		module(Vars.control = new Control());
+		module(Vars.renderer = new Renderer());
+		module(Vars.ui = new UI());
 	}
 	
 	@Override

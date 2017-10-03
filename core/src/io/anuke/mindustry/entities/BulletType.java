@@ -50,6 +50,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			lifetime = 110f;
 			hitsize = 8f;
 		}
+		
 		public void draw(Bullet b){
 			float rad = 8f;
 			Draw.color(Color.GRAY);

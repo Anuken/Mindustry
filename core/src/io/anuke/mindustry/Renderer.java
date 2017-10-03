@@ -282,7 +282,7 @@ public class Renderer extends RendererModule{
 		if(android && player.breaktime > 0){
 			Vector2 vec = Graphics.world(Gdx.input.getX(0), Gdx.input.getY(0));
 			Tile tile = World.tile(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize));
-			if(tile.breakable() && tile.block() != ProductionBlocks.core){
+			if(tile != null && tile.breakable() && tile.block() != ProductionBlocks.core){
 				float fract = player.breaktime / tile.block().breaktime;
 				Draw.color(Color.YELLOW, Color.SCARLET, fract);
 				Draw.circle(tile.worldx(), tile.worldy(), 4 + (1f - fract) * 26);
