@@ -67,7 +67,8 @@ public class ProductionBlocks{
 			int dir = source.relativeTo(tile.x, tile.y);
 			dir = (dir+4)%4;
 			Tile to = tile.getNearby()[dir];
-			Timers.run(10, ()->{
+			
+			Timers.run(15, ()->{
 				if(to == null || to.entity == null) return;
 				to.block().handleItem(to, item, tile);
 			});
@@ -79,7 +80,8 @@ public class ProductionBlocks{
 			int dir = source.relativeTo(dest.x, dest.y);
 			dir = (dir+4)%4;
 			Tile to = dest.getNearby()[dir];
-			return to != null && to.block() != junction && to.block().accept(item, to, dest);
+			//uncomment the junction bit to disable giving items to other junctions
+			return to != null /*&& to.block() != junction*/ && to.block().accept(item, to, dest);
 		}
 		
 		@Override

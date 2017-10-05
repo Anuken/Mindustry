@@ -33,7 +33,7 @@ public class Turret extends Block{
 	protected int ammoMultiplier = 20;
 	protected int maxammo = 400;
 	protected float rotatespeed = 0.2f;
-	protected float shootCone = 8f;
+	protected float shootCone = 2f;
 
 	public Turret(String name) {
 		super(name);
