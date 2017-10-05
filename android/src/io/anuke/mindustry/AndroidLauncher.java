@@ -11,6 +11,7 @@ import android.os.Bundle;
 import io.anuke.mindustry.io.Formatter;
 
 public class AndroidLauncher extends AndroidApplication {
+	@SuppressLint("SimpleDateFormat")
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

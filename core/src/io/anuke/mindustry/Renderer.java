@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.GameState.State;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.PlaceMode;
@@ -70,6 +71,8 @@ public class Renderer extends RendererModule{
 			}else{
 				smoothCamera(World.core.worldx(), World.core.worldy(), 0.4f);
 			}
+			
+			limitCamera(4f, player.x, player.y);
 
 			float prex = camera.position.x, prey = camera.position.y;
 
@@ -86,12 +89,10 @@ public class Renderer extends RendererModule{
 
 			float lastx = camera.position.x, lasty = camera.position.y;
 
-			if(android){
-				camera.position.set((int) camera.position.x, (int) camera.position.y, 0);
+			camera.position.set((int) camera.position.x, (int) camera.position.y, 0);
 
-				if(Gdx.graphics.getHeight() / Core.cameraScale % 2 == 1){
-					camera.position.add(0, -0.5f, 0);
-				}
+			if(Gdx.graphics.getHeight() / Core.cameraScale % 2 == 1){
+				camera.position.add(0, -0.5f, 0);
 			}
 
 			drawDefault();
@@ -304,8 +305,13 @@ public class Renderer extends RendererModule{
 		for(Entity entity : Entities.all()){
 			if(entity instanceof DestructibleEntity && !(entity instanceof TileEntity)){
 				DestructibleEntity dest = ((DestructibleEntity) entity);
-
-				drawHealth(dest.x, dest.y, dest.health, dest.maxhealth);
+				
+				if(dest instanceof Player){
+					drawHealth((int)dest.x, (int)dest.y, dest.health, dest.maxhealth);
+				}else{
+					drawHealth(dest.x, dest.y, dest.health, dest.maxhealth);
+				}
+				
 			}
 		}
 	}
