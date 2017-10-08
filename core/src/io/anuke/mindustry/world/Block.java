@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
+import io.anuke.mindustry.resource.Liquid;
 import io.anuke.ucore.core.Draw;
 
 public class Block{
@@ -26,6 +27,7 @@ public class Block{
 	public boolean vary = true;
 	//stuff that drops when broken
 	public ItemStack drops = null;
+	public Liquid liquidDrop = null;
 
 	public Block(String name) {
 		blocks.add(this);

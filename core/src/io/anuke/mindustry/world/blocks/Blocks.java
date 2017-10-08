@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks;
 
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
+import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Floor;
@@ -19,11 +20,13 @@ public class Blocks{
 	deepwater = new Floor("deepwater"){{
 		vary = false;
 		solid = true;
+		liquidDrop = Liquid.water;
 	}},
 	
 	water = new Floor("water"){{
 		vary = false;
 		solid = true;
+		liquidDrop = Liquid.water;
 	}},
 	
 	stone = new Floor("stone"){{

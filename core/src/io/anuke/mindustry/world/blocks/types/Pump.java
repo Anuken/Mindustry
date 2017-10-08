@@ -2,9 +2,9 @@ package io.anuke.mindustry.world.blocks.types;
 
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Mathf;
 
 public class Pump extends Conduit{
 	protected float pumpspeed = 2f;
@@ -30,12 +30,21 @@ public class Pump extends Conduit{
 	}
 	
 	@Override
+	public void drawOver(Tile tile){
+		if(tile.floor().liquidDrop == null){
+			Draw.colorl(0.85f + Mathf.absin(Timers.time(), 6f, 0.15f));
+			Draw.rect("cross", tile.worldx(), tile.worldy());
+			Draw.color();
+		}
+	}
+	
+	@Override
 	public void update(Tile tile){
 		ConduitEntity entity = tile.entity();
 		
-		if(tile.floor() == Blocks.water &&
+		if(tile.floor().liquidDrop != null &&
 				Timers.get(tile, "pump", 8) && entity.liquidAmount < liquidCapacity){
-			entity.liquid = Liquid.water;
+			entity.liquid = tile.floor().liquidDrop;
 			entity.liquidAmount += pumpspeed;
 		}
 		
