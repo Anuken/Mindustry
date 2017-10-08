@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.types;
 
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
 
@@ -32,7 +33,8 @@ public class Pump extends Conduit{
 	public void update(Tile tile){
 		ConduitEntity entity = tile.entity();
 		
-		if(Timers.get(tile, "pump", 8) && entity.liquidAmount < liquidCapacity){
+		if(tile.floor() == Blocks.water &&
+				Timers.get(tile, "pump", 8) && entity.liquidAmount < liquidCapacity){
 			entity.liquid = Liquid.water;
 			entity.liquidAmount += pumpspeed;
 		}

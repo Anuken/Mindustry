@@ -106,13 +106,14 @@ public class Conduit extends Block{
 		
 		@Override
 		public void write(DataOutputStream stream) throws IOException{
-			stream.writeByte(liquid.ordinal());
+			stream.writeByte(liquid == null ? -1 : liquid.ordinal());
 			stream.writeByte((byte)(liquidAmount));
 		}
 		
 		@Override
 		public void read(DataInputStream stream) throws IOException{
-			liquid = Liquid.values()[stream.readByte()];
+			byte ordinal = stream.readByte();
+			liquid = ordinal == -1 ? null : Liquid.values()[ordinal];
 			liquidAmount = stream.readByte();
 		}
 	}
