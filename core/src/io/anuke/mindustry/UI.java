@@ -17,9 +17,7 @@ import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Draw;
-import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.function.VisibilityProvider;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.actions.Actions;
@@ -34,7 +32,7 @@ public class UI extends SceneModule{
 	Table itemtable, weapontable, tools, loadingtable, desctable, respawntable;
 	SettingsDialog prefs;
 	KeybindDialog keys;
-	Dialog about, menu, restart, tutorial, levels, upgrades, load;
+	Dialog about, menu, restart, tutorial, levels, upgrades, load, settingserror;
 	Tooltip tooltip;
 
 	VisibilityProvider play = () -> !GameState.is(State.menu);
@@ -57,6 +55,12 @@ public class UI extends SceneModule{
 		skin.font().getData().lineHeight -= 2f;
 		
 		TooltipManager.getInstance().animations = false;
+		
+		Settings.setErrorHandler(()->{
+			Timers.run(1f, ()->{
+				settingserror.show();
+			});
+		});
 		
 		Dialog.closePadR = -1;
 		Dialog.closePadT = 5;
@@ -108,6 +112,13 @@ public class UI extends SceneModule{
 
 	@Override
 	public void init(){
+		
+		settingserror = new Dialog("Warning", "dialog");
+		settingserror.content().add("[crimson]Failed to access local storage.\nSettings will not be saved.");
+		settingserror.content().pad(10f);
+		settingserror.getButtonTable().addButton("OK", ()->{
+			settingserror.hide();
+		}).size(80f, 55f).pad(4);
 		
 		load = new LoadDialog();
 		

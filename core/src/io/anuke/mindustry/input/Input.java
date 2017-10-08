@@ -61,7 +61,7 @@ public class Input{
 			tile.rotation = (byte)player.rotation;
 
 			Effects.effect("place", World.roundx(), World.roundy());
-			Effects.shake(2f, 2f);
+			Effects.shake(2f, 2f, player);
 			Sounds.play("place");
 
 			for(ItemStack stack : player.recipe.requirements){
@@ -91,7 +91,7 @@ public class Input{
 				}
 				
 				Effects.effect("break", tile.worldx(), tile.worldy());
-				Effects.shake(3f, 1f);
+				Effects.shake(3f, 1f, player);
 				tile.setBlock(Blocks.air);
 				player.breaktime = 0f;
 				Sounds.play("break");

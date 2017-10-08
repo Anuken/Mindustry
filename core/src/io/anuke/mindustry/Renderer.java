@@ -94,6 +94,10 @@ public class Renderer extends RendererModule{
 			if(Gdx.graphics.getHeight() / Core.cameraScale % 2 == 1){
 				camera.position.add(0, -0.5f, 0);
 			}
+			
+			if(Gdx.graphics.getWidth() / Core.cameraScale % 2 == 1){
+				camera.position.add(-0.5f, 0, 0);
+			}
 
 			drawDefault();
 

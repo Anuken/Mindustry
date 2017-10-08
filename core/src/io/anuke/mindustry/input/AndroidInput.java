@@ -66,7 +66,7 @@ public class AndroidInput extends InputAdapter{
 			}
 			
 			Effects.effect("break", tile.worldx(), tile.worldy());
-			Effects.shake(3f, 1f);
+			Effects.shake(3f, 1f, player);
 			tile.setBlock(Blocks.air);
 			player.breaktime = 0f;
 			Sounds.play("break");
@@ -91,7 +91,7 @@ public class AndroidInput extends InputAdapter{
 			tile.rotation = (byte)player.rotation;
 
 			Effects.effect("place", tilex*tilesize, tiley*tilesize);
-			Effects.shake(2f, 2f);
+			Effects.shake(2f, 2f, player);
 			Sounds.play("place");
 
 			for(ItemStack stack : player.recipe.requirements){
