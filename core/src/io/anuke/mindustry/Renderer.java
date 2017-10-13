@@ -40,7 +40,7 @@ public class Renderer extends RendererModule{
 		Core.cameraScale = baseCameraScale;
 		pixelate();
 
-		Draw.addSurface("shadow", Core.cameraScale);
+		Graphics.addSurface("shadow", Core.cameraScale);
 		Shaders.create();
 	}
 
@@ -141,7 +141,7 @@ public class Renderer extends RendererModule{
 
 		OrthographicCamera camera = Core.camera;
 
-		Draw.end();
+		Graphics.end();
 
 		int crangex = (int) (camera.viewportWidth / (chunksize * tilesize)) + 1;
 		int crangey = (int) (camera.viewportHeight / (chunksize * tilesize)) + 1;
@@ -162,7 +162,7 @@ public class Renderer extends RendererModule{
 			}
 		}
 
-		Draw.begin();
+		Graphics.begin();
 
 		Draw.reset();
 		int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2) + 2;
@@ -175,7 +175,7 @@ public class Renderer extends RendererModule{
 		//2 = over blocks
 		for(int l = (noshadows ? 1 : 0); l < 3; l++){
 			if(l == 0){
-				Draw.surface("shadow");
+				Graphics.surface("shadow");
 			}
 			
 			for(int x = -rangex; x <= rangex; x++){
@@ -200,7 +200,7 @@ public class Renderer extends RendererModule{
 
 			if(l == 0){
 				Draw.color(0, 0, 0, 0.15f);
-				Draw.flushSurface();
+				Graphics.flushSurface();
 				Draw.color();
 			}
 		}
@@ -348,8 +348,8 @@ public class Renderer extends RendererModule{
 	public void setCameraScale(int amount){
 		targetscale = amount;
 		clampScale();
-		Draw.getSurface("pixel").setScale(targetscale);
-		Draw.getSurface("shadow").setScale(targetscale);
+		Graphics.getSurface("pixel").setScale(targetscale);
+		Graphics.getSurface("shadow").setScale(targetscale);
 	}
 
 	public void scaleCamera(int amount){

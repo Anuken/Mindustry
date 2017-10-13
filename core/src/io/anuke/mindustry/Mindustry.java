@@ -2,6 +2,8 @@ package io.anuke.mindustry;
 
 import java.util.Date;
 
+import com.badlogic.gdx.utils.Array;
+
 import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.io.Formatter;
 import io.anuke.ucore.core.Inputs;
@@ -9,7 +11,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.modules.ModuleCore;
 
 public class Mindustry extends ModuleCore {
-	public static String[] args = {};
+	public static Array<String> args = new Array<>();
 	public static Formatter formatter = new Formatter(){
 
 		@Override

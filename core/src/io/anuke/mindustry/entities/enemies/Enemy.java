@@ -12,9 +12,7 @@ import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
-import io.anuke.ucore.core.Draw;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.*;
 import io.anuke.ucore.util.Mathf;
 
@@ -173,12 +171,12 @@ public class Enemy extends DestructibleEntity{
 		String region = ClassReflection.getSimpleName(getClass()).toLowerCase() + "-t" + Mathf.clamp(tier, 1, 3);
 		
 		//TODO is this really necessary?
-		Draw.getShader(Outline.class).color.set(tierColors[tier-1]);
-		Draw.getShader(Outline.class).region = Draw.region(region);
+		Graphics.getShader(Outline.class).color.set(tierColors[tier-1]);
+		Graphics.getShader(Outline.class).region = Draw.region(region);
 		
-		Draw.shader(Outline.class);
+		Graphics.shader(Outline.class);
 		Draw.color();
 		Draw.rect(region, x, y, direction.angle()-90);
-		Draw.shader();
+		Graphics.shader();
 	}
 }

@@ -80,7 +80,7 @@ public class UI extends SceneModule{
 		TextureRegion back = Draw.region("background");
 		float backscl = 5;
 		
-		Draw.batch().draw(back, w/2 - back.getRegionWidth()*backscl/2, h/2 - back.getRegionHeight()*backscl/2, 
+		Core.batch.draw(back, w/2 - back.getRegionWidth()*backscl/2, h/2 - back.getRegionHeight()*backscl/2, 
 				back.getRegionWidth()*backscl, back.getRegionHeight()*backscl);
 		
 		float logoscl = (int)Unit.dp.inPixels(7);
@@ -89,7 +89,7 @@ public class UI extends SceneModule{
 		float logoh = logo.getRegionHeight()*logoscl;
 		
 		Draw.color();
-		Draw.batch().draw(logo, w/2 - logow/2, h - logoh + 15, logow, logoh);
+		Core.batch.draw(logo, w/2 - logow/2, h - logoh + 15, logow, logoh);
 		
 		Draw.color();
 		
@@ -384,6 +384,10 @@ public class UI extends SceneModule{
 				
 				new button("Play", () -> {
 					levels.show();
+				});
+				
+				new button("Tutorial", ()->{
+					//TODO
 				});
 				
 				if(Gdx.app.getType() != ApplicationType.WebGL){

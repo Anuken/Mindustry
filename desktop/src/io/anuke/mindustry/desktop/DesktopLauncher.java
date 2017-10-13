@@ -6,6 +6,7 @@ import java.util.Date;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.io.Formatter;
@@ -34,7 +35,7 @@ public class DesktopLauncher {
 			}
 		};
 		
-		Mindustry.args = arg;
+		Mindustry.args = Array.with(arg);
 		
 		new Lwjgl3Application(new Mindustry(), config);
 	}

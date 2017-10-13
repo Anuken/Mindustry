@@ -47,9 +47,7 @@ public class Control extends Module{
 	float respawntime;
 	
 	public Control(){
-		String[] args = Mindustry.args;
-		
-		if(args.length > 0 && args[0].equals("-debug")){
+		if(Mindustry.args.contains("-debug", false)){
 			Vars.debug = true;
 		}
 		
