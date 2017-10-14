@@ -233,6 +233,7 @@ public class UI extends SceneModule{
 							player.recipe = null;
 						}
 					});
+					button.setName("sectionbutton" + sec.name());
 					add(button).fill().height(54).padRight(-0.1f).padTop(-10).units(Unit.dp);
 					button.getImageCell().size(40).padBottom(4).units(Unit.dp);
 					group.add(button);
@@ -259,10 +260,11 @@ public class UI extends SceneModule{
 						
 						image.update(()->{
 							
-							boolean has = control.hasItems(r.requirements);
+							boolean canPlace = !control.tutorial.active() || control.tutorial.canPlace();
+							boolean has = control.hasItems(r.requirements) && canPlace;
 							//image.setDisabled(!has);
 							image.setChecked(player.recipe == r);
-							//image.setTouchable(has ? Touchable.enabled : Touchable.disabled);
+							image.setTouchable(canPlace ? Touchable.enabled : Touchable.disabled);
 							image.getImage().setColor(has ? Color.WHITE : Color.DARK_GRAY);
 						});
 						

@@ -23,7 +23,7 @@ public class Conduit extends Block{
 	
 	@Override
 	public String description(){
-		return "Transports liquids";
+		return "Transports liquids.";
 	}
 	
 	@Override

@@ -12,7 +12,6 @@ import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
@@ -115,7 +114,7 @@ public class AndroidInput extends InputAdapter{
 			
 			if(sel == null) return;
 			
-			if(warmup > warmupDelay && sel.block() != ProductionBlocks.core && sel.breakable()){
+			if(warmup > warmupDelay && World.validBreak(sel.x, sel.y)){
 				player.breaktime += Timers.delta();
 				
 				if(player.breaktime > selected().block().breaktime){

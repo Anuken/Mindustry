@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.utils.ObjectMap;
 
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.enemies.TargetEnemy;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.noise.Noise;
@@ -80,8 +82,15 @@ public class Generator{
 					block = Blocks.shrub;
 				}
 				
+				if(color == Hue.rgb(Color.PURPLE)){
+					if(!Vars.android) new TargetEnemy(0).set(x * Vars.tilesize, y * Vars.tilesize).add();
+					floor = Blocks.stone;
+				}
+				
 				World.tile(x, y).setBlock(block);
 				World.tile(x, y).setFloor(floor);
+				
+				
 			}
 		}
 	}

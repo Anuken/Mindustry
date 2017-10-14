@@ -325,6 +325,10 @@ public class Control extends Module{
 		return wave;
 	}
 	
+	public Tutorial getTutorial(){
+		return tutorial;
+	}
+	
 	public void clearItems(){
 		items.clear();
 		

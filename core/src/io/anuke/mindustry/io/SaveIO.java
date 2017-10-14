@@ -180,7 +180,7 @@ public class SaveIO{
 			int totalEnemies = 0;
 			
 			for(Entity entity : Entities.all()){
-				if(entity instanceof Enemy){
+				if(entity instanceof Enemy && idEnemies.containsKey((Class<? extends Enemy>) entity.getClass())){
 					totalEnemies ++;
 				}
 			}
@@ -188,7 +188,7 @@ public class SaveIO{
 			stream.writeInt(totalEnemies); //enemy amount
 			
 			for(Entity entity : Entities.all()){
-				if(entity instanceof Enemy){
+				if(entity instanceof Enemy && idEnemies.containsKey((Class<? extends Enemy>) entity.getClass())){
 					Enemy enemy = (Enemy)entity;
 					stream.writeByte(idEnemies.get(enemy.getClass())); //type
 					stream.writeByte(enemy.spawn); //lane

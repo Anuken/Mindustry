@@ -12,7 +12,7 @@ public class TestEnemy extends Enemy{
 	}
 	
 	void move(){
-		if(Timers.get(this, "asd", 300)){
+		if(Timers.get(this, "switch", 300)){
 			dir = !dir;
 		}
 		

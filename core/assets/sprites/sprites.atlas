@@ -641,6 +641,13 @@ enemies/enemy-t1
   orig: 14, 14
   offset: 0, 0
   index: -1
+enemies/targetenemy-t1
+  rotate: false
+  xy: 359, 475
+  size: 14, 14
+  orig: 14, 14
+  offset: 0, 0
+  index: -1
 enemies/enemy-t2
   rotate: false
   xy: 391, 461

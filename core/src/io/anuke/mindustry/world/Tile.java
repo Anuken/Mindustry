@@ -55,6 +55,14 @@ public class Tile{
 		return block;
 	}
 	
+	public void setBlock(Block type, int rotation){
+		if(rotation < 0) rotation = (-rotation + 2);
+		rotation %= 4;
+		this.block = type;
+		this.rotation = (byte)rotation;
+		changed();
+	}
+	
 	public void setBlock(Block type){
 		this.block = type;
 		changed();

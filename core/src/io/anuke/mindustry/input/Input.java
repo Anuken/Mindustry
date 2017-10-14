@@ -11,7 +11,6 @@ import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.scene.utils.Cursors;
 
@@ -80,8 +79,7 @@ public class Input{
 		Tile cursor = World.cursorTile();
 
 		//block breaking
-		if(cursor != null && Inputs.buttonDown(Buttons.RIGHT) && World.cursorNear() && cursor.breakable()
-				&& cursor.block() != ProductionBlocks.core){
+		if(Inputs.buttonDown(Buttons.RIGHT) && World.validBreak(World.tilex(), World.tiley())){
 			Tile tile = cursor;
 			player.breaktime += Timers.delta();
 			if(player.breaktime >= tile.block().breaktime){

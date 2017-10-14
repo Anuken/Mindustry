@@ -225,6 +225,23 @@ public class Renderer extends RendererModule{
 	}
 
 	void renderPixelOverlay(){
+		
+		if(Vars.control.tutorial.showBlock()){
+			int x = World.core.x + Vars.control.tutorial.getPlacePoint().x;
+			int y = World.core.y + Vars.control.tutorial.getPlacePoint().y;
+			int rot = Vars.control.tutorial.getPlaceRotation();
+			
+			Draw.thick(1f);
+			Draw.color(Color.YELLOW);
+			Draw.square(x * tilesize, y * tilesize, tilesize/2f + Mathf.sin(Timers.time(), 4f, 1f));
+			
+			Draw.color(Color.ORANGE);
+			Draw.thick(2f);
+			if(rot != -1){
+				Draw.lineAngle(x * tilesize, y * tilesize, rot * 90, 6);
+			}
+			Draw.reset();
+		}
 
 		if(player.recipe != null && Vars.control.hasItems(player.recipe.requirements) && (!ui.hasMouse() || android) && AndroidInput.mode == PlaceMode.cursor){
 			float x = 0;
@@ -275,19 +292,17 @@ public class Renderer extends RendererModule{
 		}
 
 		//block breaking
-		if(Inputs.buttonDown(Buttons.RIGHT) && World.cursorNear()){
+		if(Inputs.buttonDown(Buttons.RIGHT) && World.validBreak(World.tilex(), World.tiley())){
 			Tile tile = World.cursorTile();
-			if(tile.breakable() && tile.block() != ProductionBlocks.core){
-				Draw.color(Color.YELLOW, Color.SCARLET, player.breaktime / tile.block().breaktime);
-				Draw.square(tile.worldx(), tile.worldy(), 4);
-				Draw.reset();
-			}
-		}
-
-		if(android && player.breaktime > 0){
+			Draw.color(Color.YELLOW, Color.SCARLET, player.breaktime / tile.block().breaktime);
+			Draw.square(tile.worldx(), tile.worldy(), 4);
+			Draw.reset();
+		}else if(android && player.breaktime > 0){ //android block breaking
 			Vector2 vec = Graphics.world(Gdx.input.getX(0), Gdx.input.getY(0));
-			Tile tile = World.tile(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize));
-			if(tile != null && tile.breakable() && tile.block() != ProductionBlocks.core){
+			
+			if(World.validBreak(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize))){
+				Tile tile = World.tile(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize));
+				
 				float fract = player.breaktime / tile.block().breaktime;
 				Draw.color(Color.YELLOW, Color.SCARLET, fract);
 				Draw.circle(tile.worldx(), tile.worldy(), 4 + (1f - fract) * 26);

@@ -18,7 +18,7 @@ public class LiquidRouter extends Conduit{
 	
 	@Override
 	public String description(){
-		return "Splits input liquid into 3 directions";
+		return "Splits input liquid into 3 directions.";
 	}
 	
 	@Override

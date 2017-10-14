@@ -5,11 +5,10 @@ import static io.anuke.mindustry.Vars.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Array;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.blocks.Blocks;
@@ -154,6 +153,17 @@ public class World{
 		Pathfind.reset();
 		
 		core.setBlock(ProductionBlocks.core);
+		
+		if(map != Map.tutorial){
+			setDefaultBlocks();
+		}else{
+			Vars.control.getTutorial().setDefaultBlocks(core.x, core.y);
+		}
+		
+		Pathfind.updatePath();
+	}
+	
+	static void setDefaultBlocks(){
 		int x = core.x, y = core.y;
 		
 		set(x, y-1, ProductionBlocks.conveyor, 1);
@@ -173,8 +183,6 @@ public class World{
 		set(x-2, y-2, ProductionBlocks.stonedrill, 0);
 		set(x-2, y-1, ProductionBlocks.conveyor, 1);
 		set(x-2, y, WeaponBlocks.turret, 0);
-		
-		Pathfind.updatePath();
 	}
 	
 	static void set(int x, int y, Block type, int rot){
@@ -211,11 +219,46 @@ public class World{
 		
 		if(tile == null) return false;
 		
+		if(Vars.control.getTutorial().active() &&
+				Vars.control.getTutorial().showBlock()){
+			
+			GridPoint2 point = Vars.control.getTutorial().getPlacePoint();
+			int rotation = Vars.control.getTutorial().getPlaceRotation();
+			Block block = Vars.control.getTutorial().getPlaceBlock();
+			
+			if(type != block || point.x != x - core.x || point.y != y - core.y || (rotation != -1 && rotation != Vars.player.rotation)){
+				return false;
+			}
+		}
+		
 		if(tile.block() != type && type.canReplace(tile.block())){
 			return true;
 		}
 		
 		return tile != null && tile.block() == Blocks.air;
+	}
+	
+	public static boolean validBreak(int x, int y){
+		Tile tile = tile(x, y);
+		
+		if(tile == null || tile.block() == ProductionBlocks.core) return false;
+		
+		if(Vars.control.getTutorial().active()){
+			
+			if(Vars.control.getTutorial().showBlock()){
+				GridPoint2 point = Vars.control.getTutorial().getPlacePoint();
+				int rotation = Vars.control.getTutorial().getPlaceRotation();
+				Block block = Vars.control.getTutorial().getPlaceBlock();
+			
+				if(block != Blocks.air || point.x != x - core.x || point.y != y - core.y || (rotation != -1 && rotation != Vars.player.rotation)){
+					return false;
+				}
+			}else{
+				return false;
+			}
+		}
+		
+		return tile.breakable();
 	}
 	
 	public static boolean cursorNear(){
