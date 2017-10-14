@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 
 import io.anuke.mindustry.GameState;
 import io.anuke.mindustry.GameState.State;
-import io.anuke.mindustry.Inventory;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.ucore.core.Draw;
@@ -58,7 +58,7 @@ public class UpgradeDialog extends Dialog{
 				if(control.hasWeapon(weapon)){
 					button.setDisabled(true);
 					button.setColor(Color.GRAY);
-				}else if(!Inventory.hasItems(weapon.requirements)){
+				}else if(!Vars.control.hasItems(weapon.requirements)){
 					button.setDisabled(true);
 				}else{
 					button.setDisabled(false);
@@ -92,7 +92,7 @@ public class UpgradeDialog extends Dialog{
 					ItemStack[] req = weapon.requirements;
 					for(ItemStack s : req){
 						
-						int amount = Math.min(Inventory.getAmount(s.item), s.amount);
+						int amount = Math.min(Vars.control.getAmount(s.item), s.amount);
 						reqtable.addImage(Draw.region("icon-" + s.item.name())).padRight(3).size(8*2);
 						reqtable.add(
 								(amount >= s.amount ? "" : "[RED]")
@@ -123,7 +123,7 @@ public class UpgradeDialog extends Dialog{
 			button.clicked(()->{
 				if(button.isDisabled()) return;
 				
-				Inventory.removeItems(weapon.requirements);
+				Vars.control.removeItems(weapon.requirements);
 				control.addWeapon(weapon);
 				ui.updateWeapons();
 				run.listen();

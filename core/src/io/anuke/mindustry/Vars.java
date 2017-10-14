@@ -28,6 +28,7 @@ public class Vars{
 	//if true, player speed will be increased, massive amounts of resources will be given on start, and other debug options will be available
 	public static boolean debug = false;
 	//number of save slots-- increasing may lead to layout issues
+	//TODO named save slots, possibly with a scroll dialog
 	public static final int saveSlots = 4;
 	
 	//turret and enemy shoot speed inverse multiplier
@@ -40,8 +41,6 @@ public class Vars{
 	public static UI ui;
 	
 	public static Player player;
-	
-	public static final String[] maps = {"delta", "canyon", "pit", "maze"};
 	
 	public static String[] aboutText = {
 		"Made by [ROYAL]Anuken[] for the" + "\nGDL Metal Monstrosity jam.",

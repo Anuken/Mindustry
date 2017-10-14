@@ -13,6 +13,7 @@ import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
+//TODO unified save/load dialogs
 public class LoadDialog extends Dialog{
 
 	public LoadDialog() {

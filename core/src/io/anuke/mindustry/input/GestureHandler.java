@@ -6,7 +6,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.input.GestureDetector.GestureAdapter;
 import com.badlogic.gdx.math.Vector2;
 
-import io.anuke.mindustry.Inventory;
 import io.anuke.mindustry.Vars;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.scene.ui.layout.Unit;
@@ -35,7 +34,7 @@ public class GestureHandler extends GestureAdapter{
 	@Override
 	public boolean tap (float x, float y, int count, int button) {
 		if(AndroidInput.mode == PlaceMode.touch && !ui.hasMouse() && player.recipe != null &&
-				Inventory.hasItems(player.recipe.requirements) && !Vars.ui.hasMouse() && !AndroidInput.brokeBlock){
+				Vars.control.hasItems(player.recipe.requirements) && !Vars.ui.hasMouse() && !AndroidInput.brokeBlock){
 			AndroidInput.mousex = x;
 			AndroidInput.mousey = y;
 			AndroidInput.place();
@@ -46,7 +45,7 @@ public class GestureHandler extends GestureAdapter{
 	
 	@Override
 	public boolean pan(float x, float y, float deltaX, float deltaY){
-		if(player.recipe == null || !Inventory.hasItems(player.recipe.requirements) || AndroidInput.mode == PlaceMode.touch){
+		if(player.recipe == null || !Vars.control.hasItems(player.recipe.requirements) || AndroidInput.mode == PlaceMode.touch){
 			player.x -= deltaX*Core.camera.zoom/Core.cameraScale;
 			player.y += deltaY*Core.camera.zoom/Core.cameraScale;
 		}else if(AndroidInput.mode == PlaceMode.cursor){

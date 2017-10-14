@@ -7,7 +7,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector2;
 
-import io.anuke.mindustry.Inventory;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
@@ -62,7 +62,7 @@ public class AndroidInput extends InputAdapter{
 		if(player.breaktime >= tile.block().breaktime){
 			brokeBlock = true;
 			if(tile.block().drops != null){
-				Inventory.addItem(tile.block().drops.item, tile.block().drops.amount);
+				Vars.control.addItem(tile.block().drops.item, tile.block().drops.amount);
 			}
 			
 			Effects.effect("break", tile.worldx(), tile.worldy());
@@ -95,7 +95,7 @@ public class AndroidInput extends InputAdapter{
 			Sounds.play("place");
 
 			for(ItemStack stack : player.recipe.requirements){
-				Inventory.removeItem(stack);
+				Vars.control.removeItem(stack);
 			}
 		}
 	}

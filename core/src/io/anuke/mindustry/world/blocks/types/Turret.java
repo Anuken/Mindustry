@@ -23,6 +23,7 @@ import io.anuke.ucore.util.Mathf;
 
 public class Turret extends Block{
 	public static final int targetInterval = 15;
+	private static boolean drawDebug = false;
 	
 	protected float range = 50f;
 	protected float reload = 10f;
@@ -51,7 +52,7 @@ public class Turret extends Block{
 		TurretEntity entity = tile.entity();
 		Draw.rect(name(), tile.worldx(), tile.worldy(), entity.rotation - 90);
 		
-		if(Vars.debug){
+		if(Vars.debug && drawDebug){
 			drawTargeting(tile);
 		}
 	}

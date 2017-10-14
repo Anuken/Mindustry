@@ -14,15 +14,12 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
-import io.anuke.mindustry.Inventory;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.*;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Weapon;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.World;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.entities.Entities;
@@ -171,11 +168,11 @@ public class SaveIO{
 			
 			//--INVENTORY--
 			
-			stream.writeByte(Inventory.getItems().size); //amount of items
+			stream.writeByte(Vars.control.getItems().size); //amount of items
 			
-			for(Item item : Inventory.getItems().keys()){
+			for(Item item : Vars.control.getItems().keys()){
 				stream.writeByte(item.ordinal()); //item ID
-				stream.writeInt(Inventory.getAmount(item)); //item amount
+				stream.writeInt(Vars.control.getAmount(item)); //item amount
 			}
 			
 			//--ENEMIES--
@@ -205,7 +202,7 @@ public class SaveIO{
 			//--MAP DATA--
 			
 			//map ID
-			stream.writeByte(World.getMap());
+			stream.writeByte(World.getMap().ordinal());
 			
 			//seed
 			stream.writeInt(World.getSeed());
@@ -300,12 +297,12 @@ public class SaveIO{
 			
 			int totalItems = stream.readByte();
 			
-			Inventory.getItems().clear();
+			Vars.control.getItems().clear();
 			
 			for(int i = 0; i < totalItems; i ++){
 				Item item = itemEnums[stream.readByte()];
 				int amount = stream.readInt();
-				Inventory.getItems().put(item, amount);
+				Vars.control.getItems().put(item, amount);
 			}
 			
 			Vars.ui.updateItems();
@@ -350,7 +347,7 @@ public class SaveIO{
 			int seed = stream.readInt();
 			int tiles = stream.readInt();
 			
-			World.loadMap(mapid, seed);
+			World.loadMap(Map.values()[mapid], seed);
 			Vars.renderer.clearTiles();
 			
 			for(Enemy enemy : enemiesToUpdate){

@@ -1,60 +1,48 @@
 package io.anuke.mindustry.ui;
 
-import static io.anuke.mindustry.Vars.maps;
-
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.World;
 import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.ui.*;
+import io.anuke.ucore.scene.ui.ButtonGroup;
+import io.anuke.ucore.scene.ui.Dialog;
+import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class LevelDialog extends Dialog{
-	Label[] scores = new Label[maps.length];
-	private int selectedMap;
+	private Map selectedMap = Map.delta;
 	
 	public LevelDialog(){
 		super("Level Select");
 		setup();
-		
-		shown(()->{
-			for(int i = 0; i < maps.length; i ++)
-				scores[i].setText("High Score: [lime]" + Settings.getInt("hiscore"+maps[i]));
-		});
 	}
 	
 	void setup(){
 		addCloseButton();
 		getButtonTable().addButton("Play", ()->{
 			hide();
-			Vars.ui.showLoading();
-			Timers.run(16, ()->{
-				Vars.control.reset();
-				World.loadMap(selectedMap);
-				Vars.control.play();
-			});
-			
-			Timers.run(18, ()->{
-				Vars.ui.hideLoading();
-			});
+			Vars.control.playMap(selectedMap);
 		}).pad(3).size(180, 44).units(Unit.dp);
 		
 		ButtonGroup<ImageButton> mapgroup = new ButtonGroup<>();
 		
-		for(int i = 0; i < maps.length; i ++){
-			content().add(maps[i]);
+		for(Map map : Map.values()){
+			if(!map.visible) continue;
+			
+			content().add(map.name());
 		}
 		
 		content().row();
 		
-		for(int i = 0; i < maps.length; i ++){
-			int index = i;
-			ImageButton image = new ImageButton(new TextureRegion(World.getTexture(i)), "togglemap");
+		for(Map map : Map.values()){
+			if(!map.visible) continue;
+			
+			ImageButton image = new ImageButton(new TextureRegion(World.getTexture(map)), "togglemap");
 			mapgroup.add(image);
 			image.clicked(()->{
-				selectedMap = index;
+				selectedMap = map;
 			});
 			image.getImageCell().size(Unit.dp.inPixels(164));
 			content().add(image).size(Unit.dp.inPixels(180));
@@ -62,9 +50,10 @@ public class LevelDialog extends Dialog{
 		
 		content().row();
 		
-		for(int i = 0; i < maps.length; i ++){
-			scores[i] = new Label("");
-			content().add(scores[i]);
+		for(Map map : Map.values()){
+			if(!map.visible) continue;
+			
+			content().add(()->"High Score: [lime]" + Settings.getInt("hiscore" + map.name()));
 		}
 	}
 }

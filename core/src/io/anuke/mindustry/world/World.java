@@ -29,11 +29,12 @@ public class World{
 	
 	private static Pixmap[] mapPixmaps;
 	private static Texture[] mapTextures;
-	private static int currentMap;
+	private static Map currentMap;
 	private static Tile[][] tiles = new Tile[worldsize][worldsize];
 	private static Tile[] temptiles = new Tile[4];
 	
 	public static Tile core;
+	//TODO move this to control?
 	public static Array<Tile> spawnpoints = new Array<Tile>();
 	
 	public static boolean solid(int x, int y){
@@ -51,16 +52,16 @@ public class World{
 		return !wallSolid(x, y-1) || !wallSolid(x, y+1) || !wallSolid(x-1, y) ||!wallSolid(x+1, y);
 	}
 	
-	public static int getMap(){
+	public static Map getMap(){
 		return currentMap;
 	}
 	
 	public static int width(){
-		return mapPixmaps[currentMap].getWidth();
+		return mapPixmaps[currentMap.ordinal()].getWidth();
 	}
 	
 	public static int height(){
-		return mapPixmaps[currentMap].getHeight();
+		return mapPixmaps[currentMap.ordinal()].getHeight();
 	}
 	
 	public static Tile tile(int x, int y){
@@ -80,11 +81,13 @@ public class World{
 		return temptiles;
 	}
 	
-	public static Texture getTexture(int map){
-		return mapTextures[map];
+	public static Texture getTexture(Map map){
+		return mapTextures[map.ordinal()];
 	}
 	
 	public static void loadMaps(){
+		Map[] maps = Map.values();
+		
 		mapPixmaps = new Pixmap[maps.length];
 		mapTextures = new Texture[maps.length];
 		
@@ -115,18 +118,18 @@ public class World{
 		}
 	}
 	
-	public static void loadMap(int id){
-		loadMap(id, MathUtils.random(0, 99999));
+	public static void loadMap(Map map){
+		loadMap(map, MathUtils.random(0, 99999));
 	}
 	
-	public static void loadMap(int id, int seed){
+	public static void loadMap(Map map, int seed){
 		
 		spawnpoints.clear();
 		
-		int size = mapPixmaps[id].getWidth();
+		int size = mapPixmaps[map.ordinal()].getWidth();
 		worldsize = size;
 		pixsize = worldsize*tilesize;
-		currentMap = id;
+		currentMap = map;
 		
 		if(tiles != null){
 			clearTileEntities();
@@ -146,7 +149,7 @@ public class World{
 		Entities.resizeTree(0, 0, pixsize, pixsize);
 		
 		World.seed = seed;
-		Generator.generate(mapPixmaps[id]);
+		Generator.generate(mapPixmaps[map.ordinal()]);
 		
 		Pathfind.reset();
 		
@@ -183,6 +186,7 @@ public class World{
 		return seed;
 	}
 	
+	//TODO move this to control?
 	public static boolean validPlace(int x, int y, Block type){
 
 		if(!cursorNear() && !android)

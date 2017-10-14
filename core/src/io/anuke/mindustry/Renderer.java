@@ -226,7 +226,7 @@ public class Renderer extends RendererModule{
 
 	void renderPixelOverlay(){
 
-		if(player.recipe != null && Inventory.hasItems(player.recipe.requirements) && (!ui.hasMouse() || android) && AndroidInput.mode == PlaceMode.cursor){
+		if(player.recipe != null && Vars.control.hasItems(player.recipe.requirements) && (!ui.hasMouse() || android) && AndroidInput.mode == PlaceMode.cursor){
 			float x = 0;
 			float y = 0;
 

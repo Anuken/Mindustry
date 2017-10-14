@@ -9,7 +9,7 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.util.Angles;
 
-public class EffectLoader{
+public class EffectCreator{
 	static Color lightRed = Hue.mix(Color.WHITE, Color.FIREBRICK, 0.1f);
 	
 	public static void create(){

@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world.blocks;
 
-import io.anuke.mindustry.Inventory;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
@@ -22,7 +21,7 @@ public class ProductionBlocks{
 		
 		@Override
 		public void handleItem(Tile tile, Item item, Tile source){
-			Inventory.addItem(item, 1);
+			Vars.control.addItem(item, 1);
 		}
 		
 		@Override

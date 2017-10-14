@@ -11,6 +11,7 @@ import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
+//TODO unified save/load dialogs
 public class SaveDialog extends Dialog{
 
 	public SaveDialog() {

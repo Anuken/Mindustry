@@ -5,7 +5,6 @@ import static io.anuke.mindustry.Vars.*;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 
-import io.anuke.mindustry.Inventory;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
@@ -51,7 +50,7 @@ public class Input{
 		
 		if(Inputs.buttonUp(Buttons.LEFT) && player.recipe != null && 
 				World.validPlace(World.tilex(), World.tiley(), player.recipe.result) && !ui.hasMouse() &&
-				Inventory.hasItems(player.recipe.requirements)){
+				Vars.control.hasItems(player.recipe.requirements)){
 			Tile tile = World.tile(World.tilex(), World.tiley());
 			
 			if(tile == null)
@@ -65,10 +64,10 @@ public class Input{
 			Sounds.play("place");
 
 			for(ItemStack stack : player.recipe.requirements){
-				Inventory.removeItem(stack);
+				Vars.control.removeItem(stack);
 			}
 			
-			if(!Inventory.hasItems(player.recipe.requirements)){
+			if(!Vars.control.hasItems(player.recipe.requirements)){
 				Cursors.restoreCursor();
 			}
 		}
@@ -87,7 +86,7 @@ public class Input{
 			player.breaktime += Timers.delta();
 			if(player.breaktime >= tile.block().breaktime){
 				if(tile.block().drops != null){
-					Inventory.addItem(tile.block().drops.item, tile.block().drops.amount);
+					Vars.control.addItem(tile.block().drops.item, tile.block().drops.amount);
 				}
 				
 				Effects.effect("break", tile.worldx(), tile.worldy());

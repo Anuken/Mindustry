@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
 
@@ -19,7 +20,10 @@ import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.GestureHandler;
 import io.anuke.mindustry.input.Input;
 import io.anuke.mindustry.io.SaveIO;
+import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
+import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
 import io.anuke.ucore.UCore;
@@ -34,9 +38,11 @@ public class Control extends Module{
 	int targetscale = baseCameraScale;
 	
 	boolean showedTutorial;
+	Tutorial tutorial = new Tutorial();
 	boolean hiscore = false;
 	
 	final Array<Weapon> weapons = new Array<>();
+	final ObjectMap<Item, Integer> items = new ObjectMap<>();
 	
 	Array<EnemySpawn> spawns = new Array<>();
 	int wave = 1;
@@ -84,8 +90,8 @@ public class Control extends Module{
 			
 		Settings.loadAll("io.anuke.moment");
 		
-		for(String map : maps){
-			Settings.defaults("hiscore"+map, 0);
+		for(Map map : Map.values()){
+			Settings.defaults("hiscore" + map.name(), 0);
 		}
 		
 		player = new Player();
@@ -127,13 +133,6 @@ public class Control extends Module{
 			}}
 			
 		);
-		
-		/*
-		//TODO remove this debugging
-		for(int i = 1; i < 60; i ++){
-			UCore.log("\n\n--WAVE " + i);
-			printEnemies(i);
-		}*/
 	
 	}
 	
@@ -154,7 +153,7 @@ public class Control extends Module{
 			player.add();
 		
 		player.heal();
-		Inventory.clearItems();
+		clearItems();
 		World.spawnpoints.clear();
 		respawntime = -1;
 		hiscore = false;
@@ -181,6 +180,20 @@ public class Control extends Module{
 			ui.showTutorial();
 			showedTutorial = true;
 		}
+	}
+	
+	public void playMap(Map map){
+		Vars.ui.showLoading();
+		
+		Timers.run(16, ()->{
+			Vars.control.reset();
+			World.loadMap(map);
+			Vars.control.play();
+		});
+		
+		Timers.run(18, ()->{
+			Vars.ui.hideLoading();
+		});
 	}
 	
 	public boolean hasWeapon(Weapon weapon){
@@ -236,10 +249,10 @@ public class Control extends Module{
 		
 		wave ++;
 		
-		int last = Settings.getInt("hiscore"+maps[World.getMap()]);
+		int last = Settings.getInt("hiscore" + World.getMap().name());
 		
 		if(wave > last){
-			Settings.putInt("hiscore"+maps[World.getMap()], wave);
+			Settings.putInt("hiscore" + World.getMap().name(), wave);
 			Settings.save();
 			hiscore = true;
 		}
@@ -312,6 +325,52 @@ public class Control extends Module{
 		return wave;
 	}
 	
+	public void clearItems(){
+		items.clear();
+		
+		items.put(Item.stone, 40);
+		
+		if(debug){
+			for(Item item : Item.values())
+				items.put(item, 2000000);
+		}
+	}
+	
+	public  int getAmount(Item item){
+		return items.get(item, 0);
+	}
+	
+	public void addItem(Item item, int amount){
+		items.put(item, items.get(item, 0)+amount);
+		ui.updateItems();
+	}
+	
+	public boolean hasItems(ItemStack[] items){
+		for(ItemStack stack : items)
+			if(!hasItem(stack))
+				return false;
+		return true;
+	}
+	
+	public boolean hasItem(ItemStack req){
+		return items.get(req.item, 0) >= req.amount; 
+	}
+	
+	public void removeItem(ItemStack req){
+		items.put(req.item, items.get(req.item, 0)-req.amount);
+		ui.updateItems();
+	}
+	
+	public void removeItems(ItemStack... reqs){
+		for(ItemStack req : reqs)
+		items.put(req.item, items.get(req.item, 0)-req.amount);
+		ui.updateItems();
+	}
+	
+	public ObjectMap<Item, Integer> getItems(){
+		return items;
+	}
+	
 	@Override
 	public void init(){
 		Musics.shuffleAll();
@@ -322,7 +381,7 @@ public class Control extends Module{
 			return World.solid(x, y);
 		});
 
-		EffectLoader.create();
+		EffectCreator.create();
 	}
 	
 	@Override
@@ -386,10 +445,14 @@ public class Control extends Module{
 					}
 				}
 				
-				extrawavetime -= delta();
+				if(!tutorial.active()){
+					extrawavetime -= delta();
 				
-				if(enemies <= 0){
-					wavetime -= delta();
+					if(enemies <= 0){
+						wavetime -= delta();
+					}
+				}else{
+					tutorial.update();
 				}
 			
 				if(wavetime <= 0 || (debug && Inputs.keyUp(Keys.F)) || extrawavetime <= 0){

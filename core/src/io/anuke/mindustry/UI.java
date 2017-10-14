@@ -17,6 +17,7 @@ import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.function.VisibilityProvider;
 import io.anuke.ucore.modules.SceneModule;
@@ -258,7 +259,7 @@ public class UI extends SceneModule{
 						
 						image.update(()->{
 							
-							boolean has = Inventory.hasItems(r.requirements);
+							boolean has = control.hasItems(r.requirements);
 							//image.setDisabled(!has);
 							image.setChecked(player.recipe == r);
 							//image.setTouchable(has ? Touchable.enabled : Touchable.disabled);
@@ -292,14 +293,7 @@ public class UI extends SceneModule{
 				
 				end();
 			}}.right().bottom().uniformX();
-			/*
-			row();
 			
-			if(!android){
-				new button("Upgrades", ()->{
-					upgrades.show();
-				}).uniformX().fillX();
-			}*/
 			visible(play);
 
 		}}.end();
@@ -367,13 +361,20 @@ public class UI extends SceneModule{
 				row();
 
 				new label(()-> control.getEnemiesRemaining() > 0 ?
-						control.getEnemiesRemaining() + " Enemies remaining" : "New wave in " + (int) (control.getWaveCountdown() / 60f))
+						control.getEnemiesRemaining() + " Enemies remaining" : 
+							control.tutorial.active() ? "waiting..." : "New wave in " + (int) (control.getWaveCountdown() / 60f))
 				.minWidth(150);
 
 				get().pad(Unit.dp.inPixels(12));
 			}};
 
 			get().setVisible(play);
+		}}.end();
+		
+		new table(){{
+			control.tutorial.buildUI(this);
+			
+			visible(()->control.tutorial.active());
 		}}.end();
 	
 		//menu table
@@ -386,8 +387,11 @@ public class UI extends SceneModule{
 					levels.show();
 				});
 				
+				row();
+				
 				new button("Tutorial", ()->{
-					//TODO
+					//TODO show loading, etc
+					control.playMap(Map.tutorial);
 				});
 				
 				if(Gdx.app.getType() != ApplicationType.WebGL){
@@ -533,7 +537,7 @@ public class UI extends SceneModule{
 		scene.add(tools);
 		
 		tools.setVisible(()->
-			!GameState.is(State.menu) && android && player.recipe != null && Inventory.hasItems(player.recipe.requirements) &&
+			!GameState.is(State.menu) && android && player.recipe != null && control.hasItems(player.recipe.requirements) &&
 			AndroidInput.mode == PlaceMode.cursor
 		);
 		
@@ -583,7 +587,7 @@ public class UI extends SceneModule{
 			Label reqlabel = new Label("");
 			
 			reqlabel.update(()->{
-				int current = Inventory.getAmount(fs.item);
+				int current = control.getAmount(fs.item);
 				String text = Mathf.clamp(current, 0, stack.amount) + "/" + stack.amount;
 				
 				reqlabel.setColor(current < stack.amount ? Colors.get("missingitems") : Color.WHITE);
@@ -712,9 +716,9 @@ public class UI extends SceneModule{
 		itemtable.clear();
 		itemtable.left();
 
-		for(Item stack : Inventory.getItemTypes()){
+		for(Item stack : control.getItems().keys()){
 			Image image = new Image(Draw.region("icon-" + stack.name()));
-			Label label = new Label("" + Mindustry.formatter.format(Inventory.getAmount(stack)));
+			Label label = new Label("" + Mindustry.formatter.format(control.getAmount(stack)));
 			label.setFontScale(fontscale*1.5f);
 			itemtable.add(image).size(8*3).units(Unit.dp);
 			itemtable.add(label).left();
