@@ -229,6 +229,8 @@ public class World{
 			if(type != block || point.x != x - core.x || point.y != y - core.y || (rotation != -1 && rotation != Vars.player.rotation)){
 				return false;
 			}
+		}else if(Vars.control.getTutorial().active()){
+			return false;
 		}
 		
 		if(tile.block() != type && type.canReplace(tile.block())){

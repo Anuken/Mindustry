@@ -78,7 +78,7 @@ public class Renderer extends RendererModule{
 
 			updateShake(0.75f);
 			float prevx = camera.position.x, prevy = camera.position.y;
-			clampCamera(-tilesize / 2f, -tilesize / 2f, World.pixsize - tilesize / 2f, World.pixsize - tilesize / 2f);
+			clampCamera(-tilesize / 2f, -tilesize / 2f + 1, World.pixsize - tilesize / 2f, World.pixsize - tilesize / 2f);
 
 			float deltax = camera.position.x - prex, deltay = camera.position.y - prey;
 
