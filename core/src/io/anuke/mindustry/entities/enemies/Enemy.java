@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
-import io.anuke.mindustry.Shaders.Outline;
+import io.anuke.mindustry.Shaders;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.Bullet;
@@ -171,10 +171,10 @@ public class Enemy extends DestructibleEntity{
 		String region = ClassReflection.getSimpleName(getClass()).toLowerCase() + "-t" + Mathf.clamp(tier, 1, 3);
 		
 		//TODO is this really necessary?
-		Graphics.getShader(Outline.class).color.set(tierColors[tier-1]);
-		Graphics.getShader(Outline.class).region = Draw.region(region);
+		Shaders.outline.color.set(tierColors[tier-1]);
+		Shaders.outline.region = Draw.region(region);
 		
-		Graphics.shader(Outline.class);
+		Graphics.shader(Shaders.outline);
 		Draw.color();
 		Draw.rect(region, x, y, direction.angle()-90);
 		Graphics.shader();

@@ -121,10 +121,10 @@ public class ProductionBlocks{
 			input = Item.stone;
 			inputAmount = 5;
 			inputLiquid = Liquid.water;
-			liquidAmount = 19.99f;
+			liquidAmount = 18.99f;
 			output = Item.coal;
 			health = 50;
-			purifyTime = 70;
+			purifyTime = 60;
 		}
 		
 		@Override

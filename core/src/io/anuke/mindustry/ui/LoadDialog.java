@@ -63,6 +63,7 @@ public class LoadDialog extends Dialog{
 							try{
 								SaveIO.loadFromSlot(slot);
 							}catch(Exception e){
+								e.printStackTrace();
 								Vars.ui.showError("[orange]Save file corrupted or invalid!");
 								return;
 							}

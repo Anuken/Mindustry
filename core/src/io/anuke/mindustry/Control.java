@@ -37,7 +37,6 @@ import io.anuke.ucore.util.Mathf;
 public class Control extends Module{
 	int targetscale = baseCameraScale;
 	
-	boolean showedTutorial;
 	Tutorial tutorial = new Tutorial();
 	boolean hiscore = false;
 	
@@ -53,6 +52,7 @@ public class Control extends Module{
 	float respawntime;
 	
 	public Control(){
+		
 		if(Mindustry.args.contains("-debug", false)){
 			Vars.debug = true;
 		}
@@ -173,13 +173,7 @@ public class Control extends Module{
 		//multiplying by 2 so you start with more time in the beginning
 		wavetime = waveSpacing()*2;
 		
-		if(showedTutorial || !Settings.getBool("tutorial")){
-			GameState.set(State.playing);
-		}else{
-			GameState.set(State.paused);
-			ui.showTutorial();
-			showedTutorial = true;
-		}
+		GameState.set(State.playing);
 	}
 	
 	public void playMap(Map map){

@@ -13,7 +13,7 @@ import io.anuke.ucore.core.Timers;
 
 public class Conduit extends Block{
 	protected float liquidCapacity = 10f;
-	protected float flowfactor = 4f;
+	protected float flowfactor = 4.9f;
 	
 	public Conduit(String name) {
 		super(name);

@@ -6,6 +6,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.World;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.function.StringSupplier;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.ImageButton;
@@ -53,7 +54,7 @@ public class LevelDialog extends Dialog{
 		for(Map map : Map.values()){
 			if(!map.visible) continue;
 			
-			content().add(()->"High Score: [lime]" + Settings.getInt("hiscore" + map.name()));
+			content().add((StringSupplier)(()->"High Score: [lime]" + Settings.getInt("hiscore" + map.name())));
 		}
 	}
 }

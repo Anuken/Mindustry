@@ -19,7 +19,7 @@ public class BlastEnemy extends Enemy{
 		super.move();
 		if(target != null && target.distanceTo(this) < 10f){
 			Bullet b = new Bullet(BulletType.blast, this, x, y, 0).add();
-			b.damage = BulletType.blast.damage + (tier-1) * 50;
+			b.damage = BulletType.blast.damage + (tier-1) * 40;
 			damage(999);
 		}
 	}

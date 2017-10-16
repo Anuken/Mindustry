@@ -349,7 +349,7 @@ public class Tutorial{
 		turretExplanation{
 			{
 				canBack = false;
-				text = "Turrets will automatically shoot at the nearest enemy in range, as long as  they have enough ammo.";
+				text = "Turrets will automatically shoot at the nearest enemy in range, as long as they have enough ammo.";
 			}
 		},
 		waves{
@@ -373,7 +373,7 @@ public class Tutorial{
 			{
 				androidOnly = true;
 				text = "If you ever feel overwhelmed by enemies, you can press the [orange]pause button[] in the top right"
-						+ "to pause the game. You can still place select and place blocks while paused.";
+						+ " to pause the game. You can still place select and place blocks while paused.";
 			}
 		},
 		purchaseWeapons{

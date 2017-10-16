@@ -33,7 +33,7 @@ public class UI extends SceneModule{
 	Table itemtable, weapontable, tools, loadingtable, desctable, respawntable;
 	SettingsDialog prefs;
 	KeybindDialog keys;
-	Dialog about, menu, restart, tutorial, levels, upgrades, load, settingserror;
+	Dialog about, menu, restart, levels, upgrades, load, settingserror;
 	Tooltip tooltip;
 
 	VisibilityProvider play = () -> !GameState.is(State.menu);
@@ -162,8 +162,6 @@ public class UI extends SceneModule{
 		
 		for(Cell<?> cell : about.content().getCells())
 			cell.left();
-		
-		tutorial = new TutorialDialog();
 		
 		restart = new Dialog("The core was destroyed.", "dialog");
 		
@@ -383,7 +381,7 @@ public class UI extends SceneModule{
 		new table(){{
 			
 			new table("pane"){{
-				defaults().size(220, 50).pad(3);
+				defaults().size(220, 48).pad(3);
 				
 				new button("Play", () -> {
 					levels.show();
@@ -432,7 +430,7 @@ public class UI extends SceneModule{
 					});
 				}
 				
-				get().pad(Unit.dp.inPixels(20));
+				get().pad(Unit.dp.inPixels(16));
 			}};
 
 			get().setVisible(nplay);
@@ -699,10 +697,6 @@ public class UI extends SceneModule{
 		if(scene.getKeyboardFocus() != null && scene.getKeyboardFocus() instanceof Dialog){
 			((Dialog)scene.getKeyboardFocus()).hide();
 		}
-	}
-	
-	public void showTutorial(){
-		tutorial.show();
 	}
 	
 	public void showRestart(){

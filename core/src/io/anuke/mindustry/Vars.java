@@ -14,7 +14,7 @@ public class Vars{
 	//respawn time in frames
 	public static final float respawnduration = 60*4;
 	//time between waves in frames
-	public static final float wavespace = 30*60*(android ? 1 : 1);
+	public static final float wavespace = 35*60*(android ? 1 : 1);
 	//waves can last no longer than 6 minutes, otherwise the next one spawns
 	public static final float maxwavespace = 60*60*6;
 	//how far away from spawn points the player can't place blocks
@@ -49,39 +49,5 @@ public class Vars{
 		"- [YELLOW]bfxr.com[] for sound effects",
 		"- [RED]freemusicarchive.org[] for music",
 		"- Music made by [GREEN]RoccoW[]",
-	};
-	
-	public static String[] tutorialText = {
-		"[GREEN]Default Controls:",
-		"[WHITE][YELLOW][[WASD][] to move, [YELLOW][[R][] to rotate blocks.",
-		"Hold [YELLOW][[R-MOUSE][] to destroy blocks, click [YELLOW][[L-MOUSE][] to place them.",
-		"[YELLOW][[L-MOUSE][] to shoot.",
-		"[yellow][[scrollwheel] to switch weapons.",
-		"",
-		"[GOLD]Every "+wavespace/60+" seconds, a new wave will appear.",
-		"Build turrets to defend the core.",
-		"If the core is destroyed, you lose the game.",
-		"",
-		"[LIME]To collect building resources, move them into the core with conveyors.",
-		"[LIME]Place [ORANGE]drills[] on the right material,they will automatically mine material",
-		"and dump it to nearby conveyors or turrets.",
-		"",
-		"[SCARLET]To produce steel, feed coal and iron into a smelter."
-	};
-	
-	public static String[] androidTutorialText = {
-		"[GREEN]Default Controls:",
-		"[WHITE]Use [YELLOW]one finger[] to pan the camera, or two while placing blocks.",
-		"[YELLOW]Hold and tap[] to destroy blocks.",
-		"",
-		"[GOLD]Every "+wavespace/60+" seconds, a new wave will appear.",
-		"Build turrets to defend the core.",
-		"If the core is destroyed, you lose the game.",
-		"",
-		"[LIME]To collect building resources, move them into the core with conveyors.",
-		"[LIME]Place [ORANGE]drills[] on the right material,they will automatically mine material",
-		"and dump it to nearby conveyors or turrets.",
-		"",
-		"[SCARLET]To produce steel, feed coal and iron into a smelter."
 	};
 }
