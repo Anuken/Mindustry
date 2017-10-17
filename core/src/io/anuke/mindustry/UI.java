@@ -139,9 +139,9 @@ public class UI extends SceneModule{
 		prefs.screenshakePref();
 		prefs.volumePrefs();
 		
-		prefs.checkPref("tutorial", "Show tutorial Window", true);
 		prefs.checkPref("fps", "Show FPS", false);
 		prefs.checkPref("noshadows", "Disable shadows", false);
+		prefs.checkPref("smoothcam", "Smooth Camera", true);
 		
 		prefs.hidden(()->{
 			if(!GameState.is(State.menu)){

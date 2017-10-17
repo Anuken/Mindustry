@@ -199,7 +199,7 @@ public class Tutorial{
 				blockPlaceX = 0;
 				blockPlaceY = -1;
 				targetBlock = ProductionBlocks.conveyor;
-				text = "Use [orange][[R][] to rotate the conveyor to face up, then place it in the [yellow]marked location[]  using the [orange][[left mouse button]";
+				text = "Use [orange][[R][] to rotate the conveyor to face [orange]forwards[], then place it in the [yellow]marked location[]  using the [orange][[left mouse button][].";
 			}
 		},
 		placeConveyorAndroid{
@@ -212,7 +212,7 @@ public class Tutorial{
 				blockPlaceX = 0;
 				blockPlaceY = -1;
 				targetBlock = ProductionBlocks.conveyor;
-				text = "Use the [orange][[rotate button][] to rotate the conveyor to face up, drag it into position with one finger, then place it in the [yellow]marked location[] using the [orange][[checkmark]";
+				text = "Use the [orange][[rotate button][] to rotate the conveyor to face [orange]forwards[], drag it into position with one finger, then place it in the [yellow]marked location[] using the [orange][[checkmark][].";
 			}
 		},
 		placeConveyorAndroidInfo{
@@ -270,7 +270,7 @@ public class Tutorial{
 		},
 		drillInfo{
 			{
-				text = "Different types of ores require different types of drills. Stone requires stone drills, iron requires iron drills, and so on.";
+				text = "Different ores need different drills. Stone requires stone drills, iron requires iron drills, etc.";
 			}
 		},
 		drillPlaced2{
@@ -365,14 +365,14 @@ public class Tutorial{
 		pausingDesktop{
 			{
 				desktopOnly = true;
-				text = "If you ever feel overwhelmed by enemies, you can press the [orange]pause button[] in the top right or [orange]space[] "
+				text = "If you ever need to take a break, press the [orange]pause button[] in the top right or [orange]space[] "
 						+ "to pause the game. You can still select and place blocks while paused, but cannot move or shoot.";
 			}
 		},
 		pausingAndroid{
 			{
 				androidOnly = true;
-				text = "If you ever feel overwhelmed by enemies, you can press the [orange]pause button[] in the top right"
+				text = "If you ever need to take a break, press the [orange]pause button[] in the top right"
 						+ " to pause the game. You can still place select and place blocks while paused.";
 			}
 		},
@@ -422,7 +422,6 @@ public class Tutorial{
 				Vars.control.runWave();
 			}
 		},
-		/*
 		pumpDesc{
 			{
 				canBack = false;
@@ -438,7 +437,7 @@ public class Tutorial{
 				targetBlock = ProductionBlocks.pump;
 				blockPlaceX = 6;
 				blockPlaceY = -2;
-				text = "Pumps work similarly to drills, except that they produce liquids instead of items. Try placing a pump on the [yellow]designated area[].";
+				text = "Pumps work similarly to drills, except that they produce liquids instead of items. Try placing a pump on the [yellow]designated water[].";
 			}
 			
 			void onSwitch(){
@@ -457,11 +456,12 @@ public class Tutorial{
 				blockPlaceX = 5;
 				blockPlaceY = -2;
 				blockRotation = 2;
-				text = "Now place a conduit leading away from the pump.";
+				text = "Now place a [orange]conduit[] leading away from the pump.";
 			}
 			
 			void onSwitch(){
 				Vars.ui.<ImageButton>find("sectionbuttondistribution").fireClick();
+				World.tile(blockPlaceX + World.core.x, blockPlaceY + World.core.y).setBlock(Blocks.air);
 			}
 		},
 		conduitUse2{
@@ -473,8 +473,12 @@ public class Tutorial{
 				targetBlock = ProductionBlocks.conduit;
 				blockPlaceX = 4;
 				blockPlaceY = -2;
-				blockRotation = 2;
+				blockRotation = 1;
 				text = "And a few more...";
+			}
+			
+			void onSwitch(){
+				World.tile(blockPlaceX + World.core.x, blockPlaceY + World.core.y).setBlock(Blocks.air);
 			}
 		},
 		conduitUse3{
@@ -489,11 +493,65 @@ public class Tutorial{
 				blockRotation = 1;
 				text = "And a few more...";
 			}
-		}*/
+			
+			void onSwitch(){
+				World.tile(blockPlaceX + World.core.x, blockPlaceY + World.core.y).setBlock(Blocks.air);
+			}
+		},
+		extractor{
+			{
+				canBack = false;
+				canForward = false;
+				showBlock = true;
+				canPlace = true;
+				targetBlock = ProductionBlocks.coalpurifier;
+				blockPlaceX = 4;
+				blockPlaceY = 0;
+				text = "Now, place a [orange]coal extractor[] block at the end of the conduit.";
+			}
+			
+			void onSwitch(){
+				World.tile(blockPlaceX + World.core.x, blockPlaceY + World.core.y).setBlock(Blocks.air);
+				Vars.ui.<ImageButton>find("sectionbuttonproduction").fireClick();
+				Vars.control.addItem(Item.steel, 60);
+				Vars.control.addItem(Item.iron, 60);
+			}
+		},
+		extractorExplain{
+			{
+				canBack = false;
+				text = "The extractor will now produce [orange]coal[] from the stone and water, then move it to the core.";
+			}
+			
+			void onSwitch(){
+				for(int i = -2; i <= 2; i ++){
+					World.tile(World.core.x + i + 4, World.core.y + 2).setBlock(ProductionBlocks.stonedrill);
+					World.tile(World.core.x + i + 4, World.core.y + 2).setFloor(Blocks.stone);
+				}
+				
+				for(int i = 0; i < 3; i ++){
+					World.tile(World.core.x + 4 - 1 - i, World.core.y).setBlock(ProductionBlocks.conveyor, 2);
+				}
+				
+				World.tile(World.core.x + 2, World.core.y + 1).setBlock(ProductionBlocks.conveyor, 0);
+				World.tile(World.core.x + 3, World.core.y + 1).setBlock(ProductionBlocks.conveyor, 0);
+				World.tile(World.core.x + 4, World.core.y + 1).setBlock(ProductionBlocks.conveyor, 3);
+				World.tile(World.core.x + 5, World.core.y + 1).setBlock(ProductionBlocks.conveyor, 2);
+				World.tile(World.core.x + 6, World.core.y + 1).setBlock(ProductionBlocks.conveyor, 2);
+				
+			}
+		},
+		extractorMore{
+			{
+				canBack = false;
+				canPlace = true;
+				text = "The [orange]smeltery[] and [orange]crucible[] blocks work similarly to extractors, except they accept only items.";
+			}
+		},
 		end{
 			{
 				text = "And that concludes the tutorial!";
-				canBack  =false;
+				canBack = false;
 			}
 		};
 		String text = "no text";

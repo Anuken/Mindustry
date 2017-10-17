@@ -44,7 +44,12 @@ public class Player extends DestructibleEntity{
 	
 	@Override
 	public void draw(){
-		Draw.rect("player", (int)x, (int)y, direction.angle()-90);
+		if(Vars.snapCamera && Settings.getBool("smoothcam")){
+			Draw.rect("player", (int)x, (int)y, direction.angle()-90);
+		}else{
+			Draw.rect("player", x, y, direction.angle()-90);
+		}
+		
 	}
 	
 	@Override

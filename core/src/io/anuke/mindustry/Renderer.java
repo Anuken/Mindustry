@@ -64,9 +64,15 @@ public class Renderer extends RendererModule{
 		if(GameState.is(State.menu)){
 			clearScreen();
 		}else{
-
+			boolean smoothcam = Settings.getBool("smoothcam");
+			
 			if(World.core.block() == ProductionBlocks.core){
-				smoothCamera(player.x, player.y, android ? 0.3f : 0.14f);
+				
+				if(!smoothcam){
+					setCamera(player.x, player.y);
+				}else{
+					smoothCamera(player.x, player.y, android ? 0.3f : 0.14f);
+				}
 			}else{
 				smoothCamera(World.core.worldx(), World.core.worldy(), 0.4f);
 			}
@@ -87,9 +93,11 @@ public class Renderer extends RendererModule{
 			}
 
 			float lastx = camera.position.x, lasty = camera.position.y;
-
-			camera.position.set((int) camera.position.x, (int) camera.position.y, 0);
-
+			
+			if(Vars.snapCamera && smoothcam){
+				camera.position.set((int) camera.position.x, (int) camera.position.y, 0);
+			}
+			
 			if(Gdx.graphics.getHeight() / Core.cameraScale % 2 == 1){
 				camera.position.add(0, -0.5f, 0);
 			}
@@ -319,12 +327,14 @@ public class Renderer extends RendererModule{
 				tile.block().drawPixelOverlay(tile);
 			}
 		}
+		
+		boolean smoothcam = Settings.getBool("smoothcam");
 
 		for(Entity entity : Entities.all()){
 			if(entity instanceof DestructibleEntity && !(entity instanceof TileEntity)){
 				DestructibleEntity dest = ((DestructibleEntity) entity);
 				
-				if(dest instanceof Player){
+				if(dest instanceof Player && Vars.snapCamera && smoothcam){
 					drawHealth((int)dest.x, (int)dest.y, dest.health, dest.maxhealth);
 				}else{
 					drawHealth(dest.x, dest.y, dest.health, dest.maxhealth);

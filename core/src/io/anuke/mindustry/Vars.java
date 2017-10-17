@@ -31,6 +31,9 @@ public class Vars{
 	//TODO named save slots, possibly with a scroll dialog
 	public static final int saveSlots = 4;
 	
+	//only if smoothCamera
+	public static boolean snapCamera = true;
+	
 	//turret and enemy shoot speed inverse multiplier
 	public static final float multiplier = android ? 3 : 2;
 	
