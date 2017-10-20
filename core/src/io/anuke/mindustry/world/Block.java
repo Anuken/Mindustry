@@ -28,6 +28,7 @@ public class Block{
 	//stuff that drops when broken
 	public ItemStack drops = null;
 	public Liquid liquidDrop = null;
+	public int width, height;
 
 	public Block(String name) {
 		blocks.add(this);

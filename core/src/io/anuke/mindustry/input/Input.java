@@ -22,23 +22,18 @@ public class Input{
 		
 		if(Inputs.scrolled()){
 			Vars.renderer.scaleCamera(Inputs.scroll());
-			//TODO
-			/*
-			int index = currentWeapon();
-			
-			index -= Inputs.scroll();
-			player.weapon = control.getWeapons().get(Mathf.clamp(index, 0, control.getWeapons().size-1));
-			
-			ui.updateWeapons();
-			*/
 		}
 
 		if(Inputs.keyUp("rotate"))
-			player.rotation++;
+			player.rotation ++;
+		
+		if(Inputs.keyUp("rotate_back"))
+			player.rotation --;
 
+		if(player.rotation < 0)
+			player.rotation += 4;
+		
 		player.rotation %= 4;
-
-		//TODO restore cursor when requirements are back
 		
 		for(int i = 0; i < 9; i ++){
 			if(Inputs.keyUp(Keys.valueOf(""+(i+1))) && i < control.getWeapons().size){

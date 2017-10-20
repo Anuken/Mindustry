@@ -178,7 +178,7 @@ public class ProductionBlocks{
 	
 	omnidrill = new Drill("omnidrill"){
 		{
-			time = 3;
+			time = 2;
 			formalName = "omnidrill";
 		}
 		

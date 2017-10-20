@@ -465,7 +465,7 @@ public class UI extends SceneModule{
 		if(android){
 			//placement table
 			new table(){{
-				visible(()->player.recipe != null);
+				visible(()->player.recipe != null && !GameState.is(State.menu));
 				abottom();
 				aleft();
 				

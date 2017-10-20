@@ -84,6 +84,7 @@ public class Control extends Module{
 			"down", Keys.S,
 			"right", Keys.D,
 			"rotate", Keys.R,
+			"rotate_back", Keys.E,
 			"menu", Gdx.app.getType() == ApplicationType.Android ? Keys.BACK : Keys.ESCAPE,
 			"pause", Keys.SPACE
 		);

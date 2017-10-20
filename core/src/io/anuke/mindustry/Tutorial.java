@@ -182,7 +182,7 @@ public class Tutorial{
 			{
 				canBack = false;
 				canPlace = true;
-				text = "Try selecting a [yellow]conveyor[] from the block menu in the bottom left.";
+				text = "Try selecting a [yellow]conveyor[] from the block menu in the bottom right.";
 			}
 			
 			void onSwitch(){
@@ -219,7 +219,7 @@ public class Tutorial{
 			{
 				androidOnly = true;
 				canBack = false;
-				text = "Alternatively, you can press the crosshair icon to switch to [orange][[touch mode][], and "
+				text = "Alternatively, you can press the crosshair icon in the bottom left to switch to [orange][[touch mode][], and "
 						+ "place blocks by tapping on the screen. In touch mode, blocks can be rotated with the arrow at the bottom left. "
 						+ "Press [yellow]next[] to try it out.";
 			}
@@ -237,7 +237,7 @@ public class Tutorial{
 				blockPlaceX = 0;
 				blockPlaceY = -2;
 				targetBlock = ProductionBlocks.stonedrill;
-				text = "Now, select and place a [yellow]stone drill[]  at the marked location.";
+				text = "Now, select and place a [yellow]stone drill[] at the marked location.";
 			}
 			
 			void onSwitch(){
@@ -365,14 +365,14 @@ public class Tutorial{
 		pausingDesktop{
 			{
 				desktopOnly = true;
-				text = "If you ever need to take a break, press the [orange]pause button[] in the top right or [orange]space[] "
+				text = "If you ever need to take a break, press the [orange]pause button[] in the top left or [orange]space[] "
 						+ "to pause the game. You can still select and place blocks while paused, but cannot move or shoot.";
 			}
 		},
 		pausingAndroid{
 			{
 				androidOnly = true;
-				text = "If you ever need to take a break, press the [orange]pause button[] in the top right"
+				text = "If you ever need to take a break, press the [orange]pause button[] in the top left"
 						+ " to pause the game. You can still place select and place blocks while paused.";
 			}
 		},

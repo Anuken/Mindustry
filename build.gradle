@@ -50,7 +50,7 @@ project(":html") {
 
     dependencies {
         compile project(":core")
-        //compile fileTree(dir: '../core/lib', include: '*.jar')
+        compile fileTree(dir: '../core/lib', include: '*.jar')
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
