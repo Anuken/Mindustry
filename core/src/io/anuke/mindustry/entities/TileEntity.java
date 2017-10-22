@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
@@ -57,7 +58,10 @@ public class TileEntity extends Entity{
 	}
 	
 	public void collision(Bullet other){
-		health -= other.getDamage();
+		Block block = tile.block();
+		
+		int amount = block.handleDamage(tile, other.getDamage());
+		health -= amount;
 		if(health <= 0) onDeath();
 	}
 	

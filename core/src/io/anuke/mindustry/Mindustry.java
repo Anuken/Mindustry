@@ -2,6 +2,7 @@ package io.anuke.mindustry;
 
 import java.util.Date;
 
+import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.GameState.State;
@@ -31,6 +32,9 @@ public class Mindustry extends ModuleCore {
 	
 	@Override
 	public void init(){
+		//if(Vars.debug){
+		GLProfiler.enable();
+		//}
 		//always initialize blocks in this order, otherwise there are ID errors
 		Blocks.dirt.getClass();
 		ProductionBlocks.coaldrill.getClass();

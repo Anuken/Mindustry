@@ -11,7 +11,7 @@ public class Generator extends PowerBlock{
 	public static final int powerTime = 8;
 	
 	public int powerRange = 6;
-	public float powerSpeed = 1f;
+	public float powerSpeed = 0.15f;
 
 	public Generator(String name) {
 		super(name);

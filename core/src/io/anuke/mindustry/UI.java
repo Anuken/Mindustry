@@ -21,6 +21,7 @@ import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.function.VisibilityProvider;
 import io.anuke.ucore.modules.SceneModule;
+import io.anuke.ucore.scene.Skin;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.*;
 import io.anuke.ucore.scene.event.Touchable;
@@ -70,6 +71,10 @@ public class UI extends SceneModule{
 		Colors.put("turretinfo", Color.ORANGE);
 		Colors.put("missingitems", Color.SCARLET);
 		Colors.put("health", Color.YELLOW);
+	}
+	
+	protected void loadSkin(){
+		skin = new Skin(Gdx.files.internal("ui/uiskin.json"), Core.atlas);
 	}
 	
 	void drawBackground(){

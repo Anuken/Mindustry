@@ -60,6 +60,10 @@ public class Block{
 	public boolean canReplace(Block other){
 		return false;
 	}
+	
+	public int handleDamage(Tile tile, int amount){
+		return amount;
+	}
 
 	public void handleItem(Tile tile, Item item, Tile source){
 		tile.entity.addItem(item, 1);

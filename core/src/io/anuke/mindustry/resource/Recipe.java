@@ -16,6 +16,7 @@ public enum Recipe{
 	titaniumwall(distribution, Blocks.titaniumwall, stack(Item.titanium, 2)),
 	duriumwall(distribution, Blocks.diriumwall, stack(Item.dirium, 2)),
 	compositewall(distribution, Blocks.compositewall, stack(Item.dirium, 2), stack(Item.titanium, 2), stack(Item.steel, 2), stack(Item.iron, 2)),
+	titaniumshieldwall(distribution, Blocks.titaniumshieldwall, stack(Item.titanium, 2)),
 	conveyor(distribution, ProductionBlocks.conveyor, stack(Item.stone, 1)),
 	fastconveyor(distribution, ProductionBlocks.steelconveyor, stack(Item.steel, 1)),
 	router(distribution, ProductionBlocks.router, stack(Item.stone, 2)),

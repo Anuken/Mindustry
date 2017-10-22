@@ -8,6 +8,7 @@ import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
@@ -20,6 +21,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.entities.Entities;
@@ -109,6 +111,13 @@ public class Renderer extends RendererModule{
 			}
 
 			drawDefault();
+			
+			if(Vars.debug && Timers.get("profile", 30)){
+				UCore.log("shaders: " + GLProfiler.shaderSwitches, 
+						"calls: " + GLProfiler.drawCalls,
+						"bindings: " + GLProfiler.textureBindings,
+						"vertices: " + GLProfiler.vertexCount.average);
+			}
 
 			camera.position.set(lastx - deltax, lasty - deltay, 0);
 

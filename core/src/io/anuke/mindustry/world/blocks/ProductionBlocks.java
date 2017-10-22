@@ -14,9 +14,14 @@ public class ProductionBlocks{
 	
 	core = new Block("core"){
 		{
-			health = Vars.debug ? 999999999 : 300;
+			health = 300;
 			solid = true;
 			update = true;
+		}
+		
+		@Override
+		public int handleDamage(Tile tile, int amount){
+			return Vars.debug ? 0 : amount;
 		}
 		
 		@Override

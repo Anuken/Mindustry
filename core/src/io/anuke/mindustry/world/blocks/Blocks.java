@@ -6,6 +6,7 @@ import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Floor;
+import io.anuke.mindustry.world.blocks.types.ShieldedWallBlock;
 import io.anuke.mindustry.world.blocks.types.Wall;
 
 public class Blocks{
@@ -123,5 +124,9 @@ public class Blocks{
 	compositewall = new Wall("compositewall"){{
 		health = 270;
 		formalName = "composite wall";
+	}},
+	titaniumshieldwall = new ShieldedWallBlock("titaniumshieldwall"){{
+		health = 150;
+		formalName = "shielded wall";
 	}};
 }

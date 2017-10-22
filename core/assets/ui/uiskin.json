@@ -25,57 +25,38 @@ io.anuke.ucore.scene.Skin$TintedDrawable: {
 },
 io.anuke.ucore.scene.ui.Button$ButtonStyle: {
 	default: {down: button-down, up: button },
-	blue: {down: button-blue-down, up: button-blue },
 	toggle: {checked: button-down, down: button-down, up: button }
 },
 io.anuke.ucore.scene.ui.TextButton$TextButtonStyle: {
 	default: {over: button-over, disabled: button, font: default-font, fontColor: white, disabledFontColor: grey, down: button-down, up: button, transition: 0 },
-	blue: {over: button-blue-over, disabled: button, font: default-font, fontColor: white, disabledFontColor: grey, down: button-blue-down, up: button-blue },
 	toggle: {font: default-font, fontColor: white, checked: button-down, down: button-down, up: button, over: button-over, disabled: button, disabledFontColor: grey }
 },
 io.anuke.ucore.scene.ui.ImageButton$ImageButtonStyle: {
 	default: {down: button-down, up: button, over: button-over },
 	static: {up: button },
 	static-down: {up: button-down },
-	blue: {down: button-blue-down, up: button-blue },
 	toggle: {checked: button-down, down: button-down, up: button },
 	togglemap: {checked: button-map-down, down: button-map-down, up: button-map },
 	select: {checked: button-select, up: clear },
-	gray: {down: button-down, up: button-gray, over: button-gray-over, disabled: button},
 	close-window: {up: button, imageUp: icon-close, imageOver: icon-close-over, imageDown: icon-close-down, disabled: button }
 },
 io.anuke.ucore.scene.ui.ImageTextButton$ImageTextButtonStyle: {
 	default: {down: button-down, up: button, over: button-over, disabled: button, font: default-font, fontColor: white, disabledFontColor: grey },
-	blue: {down: button-blue-down, up: button-blue, over: button-blue-over, disabled: button, font: default-font, fontColor: white, disabledFontColor: grey },
 	toggle: {checked: button-down, down: button-down, up: button, font: default-font, fontColor: white, over: button-over, disabled: button, disabledFontColor: grey }
 },
 io.anuke.ucore.scene.ui.ScrollPane$ScrollPaneStyle: {
-	list: {vScroll: scroll, vScrollKnob: scroll-knob-vertical, hScroll: scroll-horizontal, hScrollKnob: scroll-knob-horizontal },
-	default: {background: border, vScroll: scroll, vScrollKnob: scroll-knob-vertical, hScroll: scroll-horizontal, hScrollKnob: scroll-knob-horizontal }
-},
-io.anuke.ucore.scene.ui.SelectBox$SelectBoxStyle: {
-	default: {background: default-select, scrollStyle: default, listStyle: {font: default-font, selection: padded-list-selection, background: select-box-list-bg}, font: default-font, fontColor: white, disabledFontColor: grey }
-},
-io.anuke.ucore.scene.ui.SplitPane$SplitPaneStyle: {
-	default-vertical: {handle: splitpane-vertical },
-	default-horizontal: {handle: splitpane }
+	default: {vScroll: scroll, vScrollKnob: scroll-knob-vertical, hScroll: scroll-horizontal, hScrollKnob: scroll-knob-horizontal }
 },
 io.anuke.ucore.scene.ui.Window$WindowStyle: {
 	default: {titleFont: default-font, background: window, titleFontColor: orange },
-	resizable: {background: window-resizable, titleFont: default-font, titleFontColor: white },
-	noborder: {background: window-noborder, titleFont: default-font, titleFontColor: white },
 	dialog: {stageBackground: dialogDim, titleFont: default-font, background: window, titleFontColor: orange }
 },
 io.anuke.ucore.scene.ui.KeybindDialog$KeybindDialogStyle: {
 	default: {keyColor: red, keyNameColor: white},
 },
-io.anuke.ucore.scene.ui.ProgressBar$ProgressBarStyle: {
-	default-horizontal: {background: progressbar, knob: progressbar-filled, knobBefore: progressbar-filled },
-	default-vertical: {background: progressbar-vertical, knob: progressbar-filled-vertical, knobBefore: progressbar-filled-vertical }
-},
 io.anuke.ucore.scene.ui.Slider$SliderStyle: {
-	default-horizontal: {background: slider, knob: slider-knob, knobOver: slider-knob-over, knobDown: slider-knob-down, disabledKnob: slider-knob-disabled },
-	default-vertical: {background: slider-vertical, knob: slider-knob, knobOver: slider-knob-over, knobDown: slider-knob-down, disabledKnob: slider-knob-disabled }
+	default-horizontal: {background: slider, knob: slider-knob, knobOver: slider-knob-over, knobDown: slider-knob-down},
+	default-vertical: {background: slider-vertical, knob: slider-knob, knobOver: slider-knob-over, knobDown: slider-knob-down}
 },
 io.anuke.ucore.scene.ui.Label$LabelStyle: {
 	default: {font: default-font, fontColor: white },
@@ -84,23 +65,12 @@ io.anuke.ucore.scene.ui.Label$LabelStyle: {
 	menuitem-shortcut: {font: default-font, fontColor: menuitem }
 },
 io.anuke.ucore.scene.ui.TextField$TextFieldStyle: {
-	default: {font: default-font, fontColor: white, disabledFontColor: grey, selection: selection, background: textfield, cursor: cursor, messageFont: default-font, messageFontColor: grey },
-	small: {font: default-font, fontColor: white, disabledFontColor: grey, selection: selection, background: textfield, cursor: cursor, messageFont: default-font, messageFontColor: grey }
+	default: {font: default-font, fontColor: white, disabledFontColor: grey, selection: selection, background: textfield, cursor: cursor, messageFont: default-font, messageFontColor: grey }
 },
 io.anuke.ucore.scene.ui.CheckBox$CheckBoxStyle: {
-	default: {checkboxOn: check-on, checkboxOff: check-off, checkboxOver: check-over, font: default-font, fontColor: white, disabledFontColor: grey },
-	radio: {checkboxOn: radio-on, checkboxOff: radio-off, font: default-font, fontColor: white, disabledFontColor: grey }
+	default: {checkboxOn: check-on, checkboxOff: check-off, checkboxOver: check-over, font: default-font, fontColor: white, disabledFontColor: grey }
 },
 io.anuke.ucore.scene.ui.List$ListStyle: {
-	default: {fontColorUnselected: white, selection: padded-list-selection, fontColorSelected: white, font: default-font }
-},
-io.anuke.ucore.scene.ui.Touchpad$TouchpadStyle: {
-	default: {background: default-pane, knob: touchpad-knob }
-},
-io.anuke.ucore.scene.ui.Tree$TreeStyle: {
-	default: {minus: tree-minus, plus: tree-plus, selection: tree-selection, over: tree-over }
-},
-io.anuke.ucore.scene.ui.TextTooltip$TextTooltipStyle: {
-	default: {background: default-pane, label: {font: default-font, fontColor: white} }
+	default: {fontColorUnselected: white, fontColorSelected: white, font: default-font }
 }
 }
