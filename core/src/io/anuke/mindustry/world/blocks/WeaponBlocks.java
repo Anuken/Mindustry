@@ -8,9 +8,7 @@ import io.anuke.mindustry.entities.effect.TeslaOrb;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.LaserTurret;
-import io.anuke.mindustry.world.blocks.types.RepairTurret;
-import io.anuke.mindustry.world.blocks.types.Turret;
+import io.anuke.mindustry.world.blocks.types.*;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
@@ -182,5 +180,9 @@ public class WeaponBlocks{
 			reload = 20f;
 			health = 90;
 		}
+	},
+	
+	shieldgenerator = new ShieldBlock("shieldgenerator"){
+		
 	};
 }

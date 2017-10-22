@@ -25,7 +25,7 @@ public class ProductionBlocks{
 		}
 		
 		@Override
-		public boolean accept(Item item, Tile dest, Tile source){
+		public boolean acceptItem(Item item, Tile dest, Tile source){
 			return true;
 		}
 	},
@@ -75,12 +75,12 @@ public class ProductionBlocks{
 		}
 
 		@Override
-		public boolean accept(Item item, Tile dest, Tile source){
+		public boolean acceptItem(Item item, Tile dest, Tile source){
 			int dir = source.relativeTo(dest.x, dest.y);
 			dir = (dir+4)%4;
 			Tile to = dest.getNearby()[dir];
 			//uncomment the junction bit to disable giving items to other junctions
-			return to != null /*&& to.block() != junction*/ && to.block().accept(item, to, dest);
+			return to != null /*&& to.block() != junction*/ && to.block().acceptItem(item, to, dest);
 		}
 		
 		@Override
@@ -199,7 +199,15 @@ public class ProductionBlocks{
 		public String description(){
 			return "Mines 1 of any resource every "+time+" seconds.";
 		}
-	}
+	},
+	coalgenerator = new ItemPowerGenerator("coalgenerator"){
+		{
+			//TODO
+			generateItem = Item.stone;
+			generateAmount = 4f;
+			powerCapacity = 40f;
+		}
+	};
 	
 	;
 }

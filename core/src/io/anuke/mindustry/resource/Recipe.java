@@ -44,6 +44,8 @@ public enum Recipe{
 	coalpurifier(production, ProductionBlocks.coalpurifier, stack(Item.steel, 10), stack(Item.iron, 10)),
 	titaniumpurifier(production, ProductionBlocks.titaniumpurifier, stack(Item.steel, 30), stack(Item.iron, 30)),
 	omnidrill(production, ProductionBlocks.omnidrill, stack(Item.titanium, 10), stack(Item.dirium, 10)),
+	coalgenerator(production, ProductionBlocks.coalgenerator, stack(Item.titanium, 10), stack(Item.dirium, 10)),
+	shieldgenerator(production, WeaponBlocks.shieldgenerator, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	
 	conduit(distribution, ProductionBlocks.conduit, stack(Item.steel, 1)),
 	liquidrouter(distribution, ProductionBlocks.liquidrouter, stack(Item.steel, 2)),

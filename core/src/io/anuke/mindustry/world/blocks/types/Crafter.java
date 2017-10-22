@@ -40,7 +40,7 @@ public class Crafter extends Block{
 	}
 
 	@Override
-	public boolean accept(Item item, Tile dest, Tile source){
+	public boolean acceptItem(Item item, Tile dest, Tile source){
 		boolean craft = false;
 		for(Item req : requirements){
 			if(item == req){

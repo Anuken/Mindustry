@@ -73,7 +73,7 @@ public class Purifier extends Conduit{
 	}
 	
 	@Override
-	public boolean accept(Item item, Tile tile, Tile source){
+	public boolean acceptItem(Item item, Tile tile, Tile source){
 		TileEntity entity = tile.entity();
 		return item == input && entity.items.get(item, 0) < itemCapacity;
 	}

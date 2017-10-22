@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
@@ -41,6 +42,7 @@ public class Renderer extends RendererModule{
 		pixelate();
 
 		Graphics.addSurface("shadow", Core.cameraScale);
+		Graphics.addSurface("shield", Core.cameraScale);
 	}
 
 	@Override
@@ -118,8 +120,14 @@ public class Renderer extends RendererModule{
 
 	@Override
 	public void draw(){
+		Graphics.surface("shield");
+		Graphics.surface();
+		
 		renderTiles();
 		Entities.draw();
+		
+		drawShield();
+		
 		renderPixelOverlay();
 	}
 
@@ -130,6 +138,24 @@ public class Renderer extends RendererModule{
 		AndroidInput.mousex = Gdx.graphics.getWidth() / 2;
 		AndroidInput.mousey = Gdx.graphics.getHeight() / 2;
 		camera.position.set(player.x, player.y, 0);
+	}
+	
+	void drawShield(){
+		Texture texture = Graphics.getSurface("shield").texture();
+		Shaders.shield.color.set(Color.SKY);
+		
+		Tmp.tr2.setRegion(texture);
+		Shaders.shield.region = Tmp.tr2;
+		
+		Graphics.end();
+		Graphics.shader(Shaders.shield);
+		Graphics.setScreen();
+		
+		Core.batch.draw(texture, 0, Gdx.graphics.getHeight(), Gdx.graphics.getWidth(), -Gdx.graphics.getHeight());
+		
+		Graphics.shader();
+		Graphics.end();
+		Graphics.beginCam();
 	}
 
 	void renderTiles(){
@@ -374,6 +400,7 @@ public class Renderer extends RendererModule{
 		clampScale();
 		Graphics.getSurface("pixel").setScale(targetscale);
 		Graphics.getSurface("shadow").setScale(targetscale);
+		Graphics.getSurface("shield").setScale(targetscale);
 	}
 
 	public void scaleCamera(int amount){

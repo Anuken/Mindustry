@@ -58,6 +58,13 @@ public class EffectCreator{
 			Draw.spikes(e.x, e.y, e.ifract() * 4f, 2, 6);
 			Draw.reset();
 		});
+		
+		Effects.create("generate", 11, e -> {
+			Draw.color(Hue.mix(Color.ORANGE, Color.YELLOW, e.ifract()));
+			Draw.thickness(1f);
+			Draw.spikes(e.x, e.y, e.ifract() * 5f, 2, 8);
+			Draw.reset();
+		});
 
 		Effects.create("spark", 10, e -> {
 			Draw.thickness(1f);

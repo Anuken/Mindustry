@@ -36,7 +36,7 @@ public class Conveyor extends Block{
 		ConveyorEntity entity = tile.entity();
 		
 		Draw.rect(name() + 
-				(Timers.time() % ((20 / 100f) / speed) < (10 / 100f) / speed && accept(Item.stone, tile, null) ? "" : "move"), tile.worldx(), tile.worldy(), tile.rotation * 90);
+				(Timers.time() % ((20 / 100f) / speed) < (10 / 100f) / speed && acceptItem(Item.stone, tile, null) ? "" : "move"), tile.worldx(), tile.worldy(), tile.rotation * 90);
 		
 		for(ItemPos pos : entity.convey){
 			Tmp.v1.set(tilesize, 0).rotate(tile.rotation * 90);
@@ -94,7 +94,7 @@ public class Conveyor extends Block{
 	}
 
 	@Override
-	public boolean accept(Item item, Tile dest, Tile source){
+	public boolean acceptItem(Item item, Tile dest, Tile source){
 		int direction = source == null ? 0 : Math.abs(source.relativeTo(dest.x, dest.y) - dest.rotation);
 		float minitem = dest.<ConveyorEntity>entity().minitem;
 		return ((direction == 0) && minitem > 0.05f) || 

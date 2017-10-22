@@ -80,7 +80,7 @@ public class Turret extends Block{
 	}
 	
 	@Override
-	public boolean accept(Item item, Tile dest, Tile source){
+	public boolean acceptItem(Item item, Tile dest, Tile source){
 		return item == ammo && dest.<TurretEntity>entity().ammo < maxammo;
 	}
 
