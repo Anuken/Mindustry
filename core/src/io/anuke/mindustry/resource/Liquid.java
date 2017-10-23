@@ -4,7 +4,8 @@ import com.badlogic.gdx.graphics.Color;
 
 public enum Liquid{
 	water(Color.ROYAL),
-	plasma(Color.CORAL);
+	plasma(Color.CORAL),
+	lava(Color.valueOf("ed5334"));
 	
 	public final Color color;
 	

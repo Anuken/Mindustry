@@ -112,7 +112,7 @@ public class Renderer extends RendererModule{
 
 			drawDefault();
 			
-			if(Vars.debug && Timers.get("profile", 30)){
+			if(Vars.debug && Vars.debugGL && Timers.get("profile", 60)){
 				UCore.log("shaders: " + GLProfiler.shaderSwitches, 
 						"calls: " + GLProfiler.drawCalls,
 						"bindings: " + GLProfiler.textureBindings,

@@ -27,6 +27,8 @@ public class Vars{
 	public static final int zoomScale = Math.round(Unit.dp.inPixels(1));
 	//if true, player speed will be increased, massive amounts of resources will be given on start, and other debug options will be available
 	public static boolean debug = false;
+	//whether to debug openGL info
+	public static boolean debugGL = false;
 	//number of save slots-- increasing may lead to layout issues
 	//TODO named save slots, possibly with a scroll dialog
 	public static final int saveSlots = 4;

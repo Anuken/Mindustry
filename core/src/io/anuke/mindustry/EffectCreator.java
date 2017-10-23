@@ -8,6 +8,7 @@ import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
 
 public class EffectCreator{
 	static Color lightRed = Hue.mix(Color.WHITE, Color.FIREBRICK, 0.1f);
@@ -30,6 +31,23 @@ public class EffectCreator{
 				Draw.rect("circle", e.x + x, e.y + y, size, size);
 				Draw.reset();
 			});
+		});
+		
+		Effects.create("lava", 18, e -> {
+			Angles.randLenVectors(e.id, 3, 1f + e.ifract()*10f, (x, y)->{
+				float size = e.sfract()*4f;
+				Draw.color(Color.ORANGE, Color.GRAY, e.ifract());
+				Draw.rect("circle", e.x + x, e.y + y, size, size);
+				Draw.reset();
+			});
+		});
+		
+		Effects.create("lavabubble", 45f, e -> {
+			Draw.color(Color.ORANGE);
+			float scl = 0.35f;
+			Draw.thick(1f - Mathf.clamp(e.ifract() - (1f-scl)) * (1f/scl));
+			Draw.circle(e.x, e.y, e.ifract()*4f);
+			Draw.reset();
 		});
 		
 		Effects.create("shellexplosion", 15, e -> {

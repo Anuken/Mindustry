@@ -6,8 +6,10 @@ import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Floor;
-import io.anuke.mindustry.world.blocks.types.ShieldedWallBlock;
 import io.anuke.mindustry.world.blocks.types.Wall;
+import io.anuke.mindustry.world.blocks.types.defense.ShieldedWallBlock;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.util.Mathf;
 
 public class Blocks{
 	public static final Block
@@ -15,7 +17,11 @@ public class Blocks{
 	air = new Block("air"){
 		//no drawing here
 		public void drawCache(Tile tile){}
-		public void draw(Tile tile){}
+		
+		//update floor blocks for effects, if needed
+		public void draw(Tile tile){
+			tile.floor().update(tile);
+		}
 	},
 	
 	deepwater = new Floor("deepwater"){{
@@ -29,6 +35,25 @@ public class Blocks{
 		solid = true;
 		liquidDrop = Liquid.water;
 	}},
+	
+	lava = new Floor("lava"){
+		{
+			vary = false;
+			solid = true;
+			liquidDrop = Liquid.lava;
+		}
+		
+		@Override
+		public void update(Tile tile){
+			if(Mathf.chance(0.001)){
+				Effects.effect("lava", tile.worldx() + Mathf.range(5f), tile.worldy() + Mathf.range(5f));
+			}
+			
+			if(Mathf.chance(0.004)){
+				Effects.effect("lavabubble", tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
+			}
+		}
+	},
 	
 	stone = new Floor("stone"){{
 		drops = new ItemStack(Item.stone, 1);

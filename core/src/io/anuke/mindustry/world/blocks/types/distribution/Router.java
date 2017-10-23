@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks.types;
+package io.anuke.mindustry.world.blocks.types.distribution;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ObjectMap;

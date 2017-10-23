@@ -3,7 +3,7 @@ package io.anuke.mindustry.entities.effect;
 import com.badlogic.gdx.graphics.Color;
 
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.ShieldBlock;
+import io.anuke.mindustry.world.blocks.types.defense.ShieldBlock;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.entities.BulletEntity;

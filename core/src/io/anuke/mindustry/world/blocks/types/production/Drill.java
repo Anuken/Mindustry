@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks.types;
+package io.anuke.mindustry.world.blocks.types.production;
 
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;

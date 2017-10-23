@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks.types;
+package io.anuke.mindustry.world.blocks.types.defense;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

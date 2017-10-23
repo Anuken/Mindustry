@@ -1,8 +1,9 @@
-package io.anuke.mindustry.world.blocks.types;
+package io.anuke.mindustry.world.blocks.types.defense;
 
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Shield;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Timers;
 
 public class ShieldBlock extends PowerBlock{

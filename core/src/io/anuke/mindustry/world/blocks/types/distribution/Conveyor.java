@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks.types;
+package io.anuke.mindustry.world.blocks.types.distribution;
 
 import static io.anuke.mindustry.Vars.tilesize;
 

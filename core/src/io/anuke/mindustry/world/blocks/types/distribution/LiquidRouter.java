@@ -1,13 +1,14 @@
-package io.anuke.mindustry.world.blocks.types;
+package io.anuke.mindustry.world.blocks.types.distribution;
 
 import com.badlogic.gdx.utils.ObjectMap;
 
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.LiquidBlock;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
 
-public class LiquidRouter extends Conduit{
+public class LiquidRouter extends LiquidBlock{
 	private ObjectMap<Tile, Byte> lastmap = new ObjectMap<>();
 
 	public LiquidRouter(String name) {
@@ -23,7 +24,7 @@ public class LiquidRouter extends Conduit{
 	
 	@Override
 	public void update(Tile tile){
-		ConduitEntity entity = tile.entity();
+		LiquidEntity entity = tile.entity();
 		
 		if(Timers.get(tile, 2) && entity.liquidAmount > 0){
 			if(lastmap.get(tile, (byte)-1) != tile.rotation){
@@ -43,7 +44,7 @@ public class LiquidRouter extends Conduit{
 	
 	@Override
 	public void draw(Tile tile){
-		ConduitEntity entity = tile.entity();
+		LiquidEntity entity = tile.entity();
 		Draw.rect(name(), tile.worldx(), tile.worldy());
 		
 		if(entity.liquid == null) return;

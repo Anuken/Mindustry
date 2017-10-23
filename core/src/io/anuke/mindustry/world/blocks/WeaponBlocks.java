@@ -8,7 +8,7 @@ import io.anuke.mindustry.entities.effect.TeslaOrb;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.*;
+import io.anuke.mindustry.world.blocks.types.defense.*;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;

@@ -27,7 +27,7 @@ public abstract class PowerBlock extends Block implements PowerAcceptor{
 		
 		float fract = (float)entity.power / powerCapacity;
 		if(fract > 0)
-			fract = Mathf.clamp(fract, 0.24f, 1f);
+			fract = Mathf.clamp(fract + 0.2f, 0.24f, 1f);
 		
 		Vars.renderer.drawBar(Color.YELLOW, tile.worldx(), tile.worldy() + 13, fract);
 	}

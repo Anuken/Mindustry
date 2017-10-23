@@ -6,6 +6,8 @@ import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.*;
+import io.anuke.mindustry.world.blocks.types.distribution.*;
+import io.anuke.mindustry.world.blocks.types.production.*;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 
@@ -35,7 +37,7 @@ public class ProductionBlocks{
 		}
 	},
 	
-	conduit = new Conduit("conduit"){{
+	conduit = new LiquidBlock("conduit"){{
 		
 	}},
 	

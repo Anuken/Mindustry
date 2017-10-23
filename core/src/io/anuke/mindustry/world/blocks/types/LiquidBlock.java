@@ -11,11 +11,11 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
 
-public class Conduit extends Block{
+public class LiquidBlock extends Block{
 	protected float liquidCapacity = 10f;
 	protected float flowfactor = 4.9f;
 	
-	public Conduit(String name) {
+	public LiquidBlock(String name) {
 		super(name);
 		rotate = true;
 		update = true;
@@ -28,7 +28,7 @@ public class Conduit extends Block{
 	
 	@Override
 	public void draw(Tile tile){
-		ConduitEntity entity = tile.entity();
+		LiquidEntity entity = tile.entity();
 		
 		Draw.rect(name() + "bottom", tile.worldx(), tile.worldy(), tile.rotation * 90);
 		
@@ -45,12 +45,12 @@ public class Conduit extends Block{
 	
 	@Override
 	public TileEntity getEntity(){
-		return new ConduitEntity();
+		return new LiquidEntity();
 	}
 	
 	@Override
 	public void update(Tile tile){
-		ConduitEntity entity = tile.entity();
+		LiquidEntity entity = tile.entity();
 		
 		if(entity.liquidAmount > 0.01f && Timers.get(entity, "flow", 3)){
 			tryMoveLiquid(tile, tile.getNearby()[tile.rotation]);
@@ -59,7 +59,7 @@ public class Conduit extends Block{
 	}
 	
 	public void tryDumpLiquid(Tile tile){
-		ConduitEntity entity = tile.entity();
+		LiquidEntity entity = tile.entity();
 		
 		if(entity.liquidAmount > 0.01f){
 			tryMoveLiquid(tile, tile.getNearby()[tile.dump]);
@@ -69,13 +69,13 @@ public class Conduit extends Block{
 	}
 	
 	public void tryMoveLiquid(Tile tile, Tile next){
-		ConduitEntity entity = tile.entity();
+		LiquidEntity entity = tile.entity();
 		
 		Liquid liquid = entity.liquid;
 		
-		if(next != null && next.block() instanceof Conduit && entity.liquidAmount > 0.01f){
-			Conduit other = (Conduit)next.block();
-			ConduitEntity otherentity = next.entity();
+		if(next != null && next.block() instanceof LiquidBlock && entity.liquidAmount > 0.01f){
+			LiquidBlock other = (LiquidBlock)next.block();
+			LiquidEntity otherentity = next.entity();
 			
 			float flow = Math.min(other.liquidCapacity - otherentity.liquidAmount - 0.001f, Math.min(entity.liquidAmount/flowfactor, entity.liquidAmount));
 			
@@ -89,20 +89,20 @@ public class Conduit extends Block{
 	}
 	
 	public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-		ConduitEntity entity = tile.entity();
+		LiquidEntity entity = tile.entity();
 		
 		return entity.liquidAmount + amount < liquidCapacity && (entity.liquid == liquid || entity.liquidAmount <= 0.01f);
 	}
 	
 	public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-		ConduitEntity entity = tile.entity();
+		LiquidEntity entity = tile.entity();
 		entity.liquid = liquid;
 		entity.liquidAmount += amount;
 	}
 	
-	static class ConduitEntity extends TileEntity{
-		Liquid liquid;
-		float liquidAmount;
+	public static class LiquidEntity extends TileEntity{
+		public Liquid liquid;
+		public float liquidAmount;
 		
 		@Override
 		public void write(DataOutputStream stream) throws IOException{

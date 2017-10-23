@@ -1,0 +1,60 @@
+#ifdef GL_ES
+precision mediump float;
+precision mediump int;
+#endif
+
+uniform sampler2D u_texture;
+
+uniform vec4 u_color;
+uniform vec2 u_texsize;
+uniform float u_time;
+uniform vec2 u_offset;
+
+varying vec4 v_color;
+varying vec2 v_texCoord;
+
+void main() {
+
+    vec2 T = v_texCoord.xy;
+    vec2 coords = (T * u_texsize) + u_offset;
+    
+    float si = 1.0 + sin(u_time / 20.0 /*+ (coords.x + coords.y) / 30.0*/) / 8.0;
+	
+	vec4 color = texture2D(u_texture, T) * vec4(si, si, si, 1.0);
+
+	vec2 v = vec2(1.0/u_texsize.x, 1.0/u_texsize.y);
+
+	bool any = false;
+
+	float thickness = 1.0;
+	float step = 1.0;
+
+	if(texture2D(u_texture, T).a < 0.1 && 
+		(texture2D(u_texture, T + vec2(0, step) * v).a > 0.1 || texture2D(u_texture, T + vec2(0, -step) * v).a > 0.1 ||
+		texture2D(u_texture, T + vec2(step, 0) * v).a > 0.1 || texture2D(u_texture, T + vec2(-step, 0) * v).a > 0.1))
+		any = true;
+
+	if(any){
+		gl_FragColor = u_color * vec4(si, si, si, 1.0);
+	}else{
+	    
+	    //coords.x = float(int(coords.x));
+	    if(color.a > 0.1){
+	        float x = coords.x;
+	        float y = coords.y;
+	        float time = u_time;
+	        float w = 1.0;
+	        float h = 1.0;
+	        float f1 = sin(2.0*time+(y/4.0*cos(time/3.0)+(x/2.0)-w/4.0)*((y/3.0)-h/4.0)/w);
+	        float f2 = -2.0*cos(11.0*time/9.0-11.0*pow(y, x)/9.0);
+	        
+	        color.r = (f2 + f1) / 4.0*abs(cos(2.0*(x-y)/w + time));
+	        color.g = (f2 + f1) /(3.0 + color.r);
+	        color.b = (f2 + f1) /(2.5 + color.g);
+	        
+	        
+	    }
+	    
+		gl_FragColor = color;
+	}
+}

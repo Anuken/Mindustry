@@ -22,7 +22,8 @@ public class Generator{
 		Hue.rgb(70, 90, 150), Blocks.deepwater,
 		Hue.rgb(110, 80, 30), Blocks.dirt,
 		Hue.rgb(160, 120, 70), Blocks.dirtblock,
-		Hue.rgb(100, 100, 100), Blocks.stoneblock
+		Hue.rgb(100, 100, 100), Blocks.stoneblock,
+		Color.valueOf("ed5334"), Blocks.lava
 	);
 	
 	/**Returns world size.*/

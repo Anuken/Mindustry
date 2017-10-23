@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks.types;
+package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Color;
 
@@ -7,11 +7,12 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.LiquidBlock;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 
-public class Purifier extends Conduit{
+public class Purifier extends LiquidBlock{
 	public Item input = null;
 	public int inputAmount = 5;
 	public Liquid inputLiquid = null;
@@ -31,7 +32,7 @@ public class Purifier extends Conduit{
 	
 	@Override
 	public void draw(Tile tile){
-		ConduitEntity entity = tile.entity();
+		LiquidEntity entity = tile.entity();
 		Draw.rect(name(), tile.worldx(), tile.worldy());
 		
 		if(entity.liquid == null) return;
@@ -44,7 +45,7 @@ public class Purifier extends Conduit{
 	
 	@Override
 	public void update(Tile tile){
-		ConduitEntity entity = tile.entity();
+		LiquidEntity entity = tile.entity();
 		
 		if(Timers.get(tile, "purify", purifyTime) && entity.liquidAmount >= liquidAmount &&
 				entity.hasItem(input, inputAmount)){

@@ -32,9 +32,6 @@ public class Mindustry extends ModuleCore {
 	
 	@Override
 	public void init(){
-		//if(Vars.debug){
-		GLProfiler.enable();
-		//}
 		//always initialize blocks in this order, otherwise there are ID errors
 		Blocks.dirt.getClass();
 		ProductionBlocks.coaldrill.getClass();
@@ -48,6 +45,9 @@ public class Mindustry extends ModuleCore {
 	
 	@Override
 	public void postInit(){
+		if(Vars.debug && Vars.debugGL){
+			GLProfiler.enable();
+		}
 		Vars.control.reset();
 	}
 	

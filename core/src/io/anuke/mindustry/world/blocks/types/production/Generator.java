@@ -1,10 +1,12 @@
-package io.anuke.mindustry.world.blocks.types;
+package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
+import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
+import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Draw;
 
 public class Generator extends PowerBlock{

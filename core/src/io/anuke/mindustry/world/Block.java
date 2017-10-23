@@ -41,8 +41,6 @@ public class Block{
 	
 	public void drawOver(Tile tile){}
 	public void drawPixelOverlay(Tile tile){}
-	@Deprecated
-	public void drawOverlay(Tile tile){}
 	public void drawPlace(int x, int y, boolean valid){}
 	
 	public String name(){
