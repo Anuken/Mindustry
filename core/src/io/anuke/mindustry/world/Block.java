@@ -1,13 +1,17 @@
 package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.util.Tmp;
 
 public class Block{
 	private static int lastid;
@@ -16,6 +20,8 @@ public class Block{
 	
 	public final String name;
 	public String formalName;
+	public String explosionEffect = "explosion";
+	public String explosionSound = "break";
 	public boolean solid, update, rotate, breakable;
 	public int health = 40;
 	public String shadow = "shadow";
@@ -28,7 +34,7 @@ public class Block{
 	//stuff that drops when broken
 	public ItemStack drops = null;
 	public Liquid liquidDrop = null;
-	public int width, height;
+	public int width = 1, height = 1;
 
 	public Block(String name) {
 		blocks.add(this);
@@ -72,6 +78,14 @@ public class Block{
 	}
 	
 	public void update(Tile tile){}
+	
+	public void onDestroyed(Tile tile){
+		float x = tile.worldx(), y = tile.worldy();
+		
+		Effects.shake(4f, 4f, x, y);
+		Effects.effect(explosionEffect, x, y);
+		Effects.sound(explosionSound, x, y);
+	}
 	
 	public TileEntity getEntity(){
 		return new TileEntity();
@@ -159,9 +173,24 @@ public class Block{
 	}
 	
 	public void draw(Tile tile){
-		Draw.rect(name(), tile.worldx(), tile.worldy(), rotate ? tile.rotation * 90 : 0);
+		//note: multiblocks do not support rotation
+		if(width == 1 && height == 1){
+			Draw.rect(name(), tile.worldx(), tile.worldy(), rotate ? tile.rotation * 90 : 0);
+		}else{
+			//if multiblock, make sure to draw even block sizes offset, since the core block is at the BOTTOM LEFT
+			Vector2 offset = getPlaceOffset();
+			Draw.rect(name(), tile.worldx() + offset.x, tile.worldy() + offset.y);
+		}
 	}
 	
+	/**Offset for placing and drawing multiblocks.*/
+	public Vector2 getPlaceOffset(){
+		return Tmp.v3.set(((width + 1) % 2) * Vars.tilesize/2, ((height + 1) % 2) * Vars.tilesize/2);
+	}
+	
+	public boolean isMultiblock(){
+		return width != 1 || height != 1;
+	}
 	
 	public static Array<Block> getAllBlocks(){
 		return blocks;

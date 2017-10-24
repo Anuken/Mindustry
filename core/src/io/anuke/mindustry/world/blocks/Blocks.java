@@ -7,6 +7,7 @@ import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.util.Mathf;
@@ -24,6 +25,8 @@ public class Blocks{
 				tile.floor().update(tile);
 		}
 	},
+	
+	blockpart = new BlockPart(),
 	
 	deepwater = new Floor("deepwater"){{
 		vary = false;

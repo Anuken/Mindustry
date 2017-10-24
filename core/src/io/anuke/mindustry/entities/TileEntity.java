@@ -50,11 +50,14 @@ public class TileEntity extends Entity{
 			Vars.control.coreDestroyed();
 		}
 		
-		tile.setBlock(Blocks.air);
-		Effects.shake(4f, 4f, this);
-		Effects.effect("explosion", this);
+		Block block = tile.block();
 		
-		Effects.sound("break", this);
+		block.onDestroyed(tile);
+		for(Tile other : tile.getLinkedTiles()){
+			other.setBlock(Blocks.air);
+		}
+		
+		tile.setBlock(Blocks.air);
 	}
 	
 	public void collision(Bullet other){

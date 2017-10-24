@@ -11,11 +11,14 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.blocks.*;
-import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Sounds;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
+import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
@@ -64,10 +67,6 @@ public class World{
 	public static Tile tile(int x, int y){
 		if(!Mathf.inBounds(x, y, tiles)) return null;
 		return tiles[x][y];
-	}
-	
-	public static Tile cursorTile(){
-		return tile(tilex(), tiley());
 	}
 	
 	public static Tile[] getNearby(int x, int y){
@@ -200,23 +199,70 @@ public class World{
 		return seed;
 	}
 	
+	//TODO move to control or player?
+	public static void placeBlock(int x, int y){
+		Tile tile = tile(x, y);
+		
+		//just in case
+		if(tile == null)
+			return;
+		
+		Block result = player.recipe.result;
+
+		tile.setBlock(result);
+		tile.rotation = (byte)player.rotation;
+		
+		if(result.isMultiblock()){
+			int offsetx = -(result.width-1)/2;
+			int offsety = -(result.height-1)/2;
+			
+			for(int dx = 0; dx < result.width; dx ++){
+				for(int dy = 0; dy < result.height; dy ++){
+					int worldx = dx + offsetx + x;
+					int worldy = dy + offsety + y;
+					if(!(worldx == x && worldy == y)){
+						//TODO make sure this is correct
+						Tile toplace = tile(worldx, worldy);
+						toplace.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
+					}
+					
+					Effects.effect("place", worldx * Vars.tilesize, worldy * Vars.tilesize);
+				}
+			}
+		}else{
+			Effects.effect("place", x * Vars.tilesize, y * Vars.tilesize);
+		}
+		
+		Effects.shake(2f, 2f, player);
+		Sounds.play("place");
+
+		for(ItemStack stack : player.recipe.requirements){
+			Vars.control.removeItem(stack);
+		}
+		
+		if(!Vars.control.hasItems(player.recipe.requirements)){
+			Cursors.restoreCursor();
+		}
+	}
+	
 	//TODO move this to control?
 	public static boolean validPlace(int x, int y, Block type){
-
-		if(!cursorNear() && !android)
-			return false;
 		
 		for(Tile spawn : spawnpoints){
 			if(Vector2.dst(x * tilesize, y * tilesize, spawn.worldx(), spawn.worldy()) < enemyspawnspace){
 				return false;
 			}
 		}
+		
+		Tmp.r2.setSize(type.width * Vars.tilesize, type.height * Vars.tilesize);
+		Vector2 offset = type.getPlaceOffset();
+		Tmp.r2.setCenter(offset.x + x * Vars.tilesize, offset.y + y * Vars.tilesize);
 
 		for(SolidEntity e : Entities.getNearby(x * tilesize, y * tilesize, tilesize * 2f)){
 			Rectangle.tmp.setSize(e.hitsize);
 			Rectangle.tmp.setCenter(e.x, e.y);
 
-			if(getCollider(x, y).overlaps(Rectangle.tmp)){
+			if(Tmp.r2.overlaps(Rectangle.tmp)){
 				return false;
 			}
 		}
@@ -225,7 +271,7 @@ public class World{
 		
 		if(tile == null) return false;
 		
-		if(Vars.control.getTutorial().active() &&
+		if(type.isMultiblock() && Vars.control.getTutorial().active() &&
 				Vars.control.getTutorial().showBlock()){
 			
 			GridPoint2 point = Vars.control.getTutorial().getPlacePoint();
@@ -243,7 +289,47 @@ public class World{
 			return true;
 		}
 		
-		return tile != null && tile.block() == Blocks.air;
+		if(type.isMultiblock()){
+			int offsetx = -(type.width-1)/2;
+			int offsety = -(type.height-1)/2;
+			for(int dx = 0; dx < type.width; dx ++){
+				for(int dy = 0; dy < type.height; dy ++){
+					Tile other = tile(x + dx - offsetx, y + dy - offsety);
+					if(other == null || other.block() != Blocks.air){
+						return false;
+					}
+				}
+			}
+			return true;
+		}else{
+			return tile != null && tile.block() == Blocks.air;
+		}
+	}
+	
+	public static void breakBlock(int x, int y){
+		Tile tile = tile(x, y);
+		
+		if(tile == null) return;
+		
+		if(tile.block().drops != null){
+			Vars.control.addItem(tile.block().drops.item, tile.block().drops.amount);
+		}
+		
+		Effects.shake(3f, 1f, player);
+		Sounds.play("break");
+		
+		if(!tile.block().isMultiblock() && !tile.isLinked()){
+			tile.setBlock(Blocks.air);
+		}else{
+			Tile target = tile.isLinked() ? tile.getLinked() : tile;
+			Array<Tile> removals = target.getLinkedTiles();
+			removals.add(tile);
+			for(Tile toremove : removals){
+				//note that setting a new block automatically unlinks it
+				toremove.setBlock(Blocks.air);
+				Effects.effect("break", toremove.worldx(), toremove.worldy());
+			}
+		}
 	}
 	
 	public static boolean validBreak(int x, int y){
@@ -269,13 +355,9 @@ public class World{
 		return tile.breakable();
 	}
 	
-	public static boolean cursorNear(){
-		return Vector2.dst(player.x, player.y, tilex() * tilesize, tiley() * tilesize) <= placerange;
-	}
-	
-	public static Rectangle getCollider(int x, int y){
-		return Rectangle.tmp2.setSize(tilesize).setCenter(x * tilesize, y * tilesize);
-	}
+	//public static Rectangle getCollider(int x, int y){
+	//	return Rectangle.tmp2.setSize(tilesize).setCenter(x * tilesize, y * tilesize);
+	//}
 	
 	public static TileEntity findTileTarget(float x, float y, Tile tile, float range, boolean damaged){
 		Entity closest = null;
@@ -305,22 +387,6 @@ public class World{
 		}
 
 		return (TileEntity) closest;
-	}
-	
-	public static float roundx(){
-		return Mathf.round2(Graphics.mouseWorld().x, tilesize);
-	}
-
-	public static float roundy(){
-		return Mathf.round2(Graphics.mouseWorld().y, tilesize);
-	}
-
-	public static int tilex(){
-		return Mathf.scl2(Graphics.mouseWorld().x, tilesize);
-	}
-
-	public static int tiley(){
-		return Mathf.scl2(Graphics.mouseWorld().y, tilesize);
 	}
 	
 	public static void disposeMaps(){

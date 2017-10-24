@@ -253,7 +253,9 @@ public class UI extends SceneModule{
 					int i = 0;
 					
 					for(Recipe r : recipes){
-						ImageButton image = new ImageButton(Draw.region(r.result.name()), "select");
+						TextureRegion region = Draw.hasRegion(r.result.name() + "-icon") ? 
+								Draw.region(r.result.name() + "-icon") : Draw.region(r.result.name());
+						ImageButton image = new ImageButton(region, "select");
 						
 						image.clicked(()->{
 							if(player.recipe == r){
@@ -573,8 +575,10 @@ public class UI extends SceneModule{
 		
 		desctable.row();
 		
+		TextureRegion region = Draw.hasRegion(recipe.result.name() + "-icon") ? 
+				Draw.region(recipe.result.name() + "-icon") : Draw.region(recipe.result.name());
 		
-		header.addImage(Draw.region(recipe.result.name)).size(8*5).padTop(4).units(Unit.dp);
+		header.addImage(region).size(8*5).padTop(4).units(Unit.dp);
 		header.add(recipe.result.formalName).padLeft(4).units(Unit.dp);
 		
 		desctable.add().pad(2).units(Unit.dp);

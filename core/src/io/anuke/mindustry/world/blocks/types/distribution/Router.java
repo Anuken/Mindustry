@@ -47,7 +47,7 @@ public class Router extends Block{
 		
 		float fract = (float)tile.entity.totalItems()/maxitems;
 		
-		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 13, fract);
+		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 6, fract);
 	}
 	
 	@Override

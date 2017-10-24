@@ -181,6 +181,15 @@ public class ProductionBlocks{
 			generateAmount = 4f;
 			powerCapacity = 40f;
 		}
-	}
-	;
+	},
+	nuclearReactor = new LiquidPowerGenerator("nuclearreactor"){
+		{
+			width = 2;
+			height = 2;
+			generateLiquid = Liquid.water;
+			health = 340;
+			breaktime *= 2.2f;
+			powerCapacity = 100f;
+		}
+	};
 }

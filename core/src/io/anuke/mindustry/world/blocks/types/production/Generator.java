@@ -62,6 +62,6 @@ public class Generator extends PowerBlock{
 	//don't accept any power
 	@Override
 	public float addPower(Tile tile, float amount){
-		return 0;
+		return amount;
 	}
 }

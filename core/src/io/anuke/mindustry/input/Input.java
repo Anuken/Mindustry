@@ -4,15 +4,17 @@ import static io.anuke.mindustry.Vars.*;
 
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
-import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.ucore.core.*;
+import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.utils.Cursors;
+import io.anuke.ucore.util.Mathf;
 
 public class Input{
 	
@@ -43,27 +45,11 @@ public class Input{
 		}
 		
 		if(Inputs.buttonUp(Buttons.LEFT) && player.recipe != null && 
-				World.validPlace(World.tilex(), World.tiley(), player.recipe.result) && !ui.hasMouse() &&
+				World.validPlace(tilex(), tiley(), player.recipe.result) && !ui.hasMouse() && cursorNear() &&
 				Vars.control.hasItems(player.recipe.requirements)){
-			Tile tile = World.tile(World.tilex(), World.tiley());
 			
-			if(tile == null)
-				return; //just in case
+			World.placeBlock(tilex(), tiley());
 			
-			tile.setBlock(player.recipe.result);
-			tile.rotation = (byte)player.rotation;
-
-			Effects.effect("place", World.roundx(), World.roundy());
-			Effects.shake(2f, 2f, player);
-			Sounds.play("place");
-
-			for(ItemStack stack : player.recipe.requirements){
-				Vars.control.removeItem(stack);
-			}
-			
-			if(!Vars.control.hasItems(player.recipe.requirements)){
-				Cursors.restoreCursor();
-			}
 		}
 
 		if(player.recipe != null && Inputs.buttonUp(Buttons.RIGHT)){
@@ -71,27 +57,36 @@ public class Input{
 			Cursors.restoreCursor();
 		}
 		
-		Tile cursor = World.cursorTile();
+		Tile cursor = World.tile(tilex(), tiley());
 
 		//block breaking
-		if(Inputs.buttonDown(Buttons.RIGHT) && World.validBreak(World.tilex(), World.tiley())){
+		if(cursor != null && Inputs.buttonDown(Buttons.RIGHT) && World.validBreak(tilex(), tiley())){
 			Tile tile = cursor;
 			player.breaktime += Timers.delta();
-			if(player.breaktime >= tile.block().breaktime){
-				if(tile.block().drops != null){
-					Vars.control.addItem(tile.block().drops.item, tile.block().drops.amount);
-				}
-				
-				Effects.effect("break", tile.worldx(), tile.worldy());
-				Effects.shake(3f, 1f, player);
-				tile.setBlock(Blocks.air);
+			if(player.breaktime >= tile.getBreakTime()){
+				World.breakBlock(cursor.x, cursor.y);
 				player.breaktime = 0f;
-				Sounds.play("break");
 			}
 		}else{
 			player.breaktime = 0f;
 		}
 
+	}
+	
+	public static boolean cursorNear(){
+		return Vector2.dst(player.x, player.y, tilex() * tilesize, tiley() * tilesize) <= placerange;
+	}
+
+	public static int tilex(){
+		return (player.recipe != null && player.recipe.result.isMultiblock() &&
+				player.recipe.result.width % 2 == 0) ?
+				Mathf.scl(Graphics.mouseWorld().x, tilesize) : Mathf.scl2(Graphics.mouseWorld().x, tilesize);
+	}
+
+	public static int tiley(){
+		return (player.recipe != null && player.recipe.result.isMultiblock() &&
+				player.recipe.result.height % 2 == 0) ?
+				Mathf.scl(Graphics.mouseWorld().y, tilesize) : Mathf.scl2(Graphics.mouseWorld().y, tilesize);
 	}
 	
 	public static int currentWeapon(){

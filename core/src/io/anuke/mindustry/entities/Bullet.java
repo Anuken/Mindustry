@@ -32,10 +32,25 @@ public class Bullet extends BulletEntity{
 		int tilex = Mathf.scl2(x, tilesize);
 		int tiley = Mathf.scl2(y, tilesize);
 		Tile tile = World.tile(tilex, tiley);
+		TileEntity targetEntity = null;
 		
-		if(tile != null && tile.entity != null &&
-				tile.entity.collide(this) && !tile.entity.dead){
-			tile.entity.collision(this);
+		if(tile != null){
+			if(tile.entity != null && tile.entity.collide(this) && !tile.entity.dead){
+				targetEntity = tile.entity;
+			}else{
+				//make sure to check for linked block collisions
+				//TODO move this to the block class?
+				Tile linked = tile.getLinked();
+				if(linked != null &&
+						linked.entity != null && linked.entity.collide(this) && !linked.entity.dead){
+					targetEntity = linked.entity;
+				}
+			}
+		}
+		
+		if(targetEntity != null){
+			
+			targetEntity.collision(this);
 			remove();
 			type.removed(this);
 		}

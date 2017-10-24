@@ -23,9 +23,7 @@ import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
-import io.anuke.mindustry.world.Map;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.World;
+import io.anuke.mindustry.world.*;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
@@ -52,10 +50,11 @@ public class Control extends Module{
 	float respawntime;
 	
 	public Control(){
-		
 		if(Mindustry.args.contains("-debug", false)){
 			Vars.debug = true;
 		}
+		
+		UCore.log("Total blocks loaded: " + Block.getAllBlocks().size);
 		
 		Gdx.input.setCatchBackKey(true);
 		
@@ -88,7 +87,7 @@ public class Control extends Module{
 			"menu", Gdx.app.getType() == ApplicationType.Android ? Keys.BACK : Keys.ESCAPE,
 			"pause", Keys.SPACE
 		);
-			
+		
 		Settings.loadAll("io.anuke.moment");
 		
 		for(Map map : Map.values()){

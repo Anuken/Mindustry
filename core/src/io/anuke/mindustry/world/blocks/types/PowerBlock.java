@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
@@ -29,7 +30,10 @@ public abstract class PowerBlock extends Block implements PowerAcceptor{
 		if(fract > 0)
 			fract = Mathf.clamp(fract + 0.2f, 0.24f, 1f);
 		
-		Vars.renderer.drawBar(Color.YELLOW, tile.worldx(), tile.worldy() + 13, fract);
+		Vector2 offset = getPlaceOffset();
+		
+		Vars.renderer.drawBar(Color.YELLOW, tile.worldx() + offset.x, 
+				tile.worldy() + Vars.tilesize * height/2f + 2 + offset.y, fract);
 	}
 	
 	/**Tries adding all the power with no remainder, returns success.*/

@@ -7,12 +7,10 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector2;
 
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
-import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.ucore.core.*;
+import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 
@@ -60,15 +58,8 @@ public class AndroidInput extends InputAdapter{
 		
 		if(player.breaktime >= tile.block().breaktime){
 			brokeBlock = true;
-			if(tile.block().drops != null){
-				Vars.control.addItem(tile.block().drops.item, tile.block().drops.amount);
-			}
-			
-			Effects.effect("break", tile.worldx(), tile.worldy());
-			Effects.shake(3f, 1f, player);
-			tile.setBlock(Blocks.air);
+			World.breakBlock(tile.x, tile.y);
 			player.breaktime = 0f;
-			Sounds.play("break");
 		}
 	}
 	
@@ -81,21 +72,7 @@ public class AndroidInput extends InputAdapter{
 		if(player.recipe != null && 
 				World.validPlace(tilex, tiley, player.recipe.result)){
 			
-			Tile tile = World.tile(tilex, tiley);
-			
-			if(tile == null)
-				return; //just in case
-			
-			tile.setBlock(player.recipe.result);
-			tile.rotation = (byte)player.rotation;
-
-			Effects.effect("place", tilex*tilesize, tiley*tilesize);
-			Effects.shake(2f, 2f, player);
-			Sounds.play("place");
-
-			for(ItemStack stack : player.recipe.requirements){
-				Vars.control.removeItem(stack);
-			}
+			World.placeBlock(tilex, tiley);
 		}
 	}
 	

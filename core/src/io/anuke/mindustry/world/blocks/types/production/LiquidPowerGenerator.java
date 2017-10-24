@@ -4,33 +4,56 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import com.badlogic.gdx.math.Vector2;
+
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.LiquidBlock;
+import io.anuke.mindustry.world.blocks.types.LiquidAcceptor;
+import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.core.Timers;
 
-public class LiquidPowerGenerator extends LiquidBlock{
+public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
+	public int generateTime = 5;
 	public Liquid generateLiquid;
-	public float generatePower;
-	public float generateAmount = 1f;
+	/**Power to generate per generateInput.*/
+	public float generatePower = 1f;
+	/**How much liquid to consume to get one generatePower.*/
+	public float generateInput = 1f;
+	public float liquidCapacity = 30f;
 
 	public LiquidPowerGenerator(String name) {
 		super(name);
 	}
 	
 	@Override
-	public void update(Tile tile){
+	public void draw(Tile tile){
+		super.draw(tile);
+		
 		LiquidPowerEntity entity = tile.entity();
 		
-		if(entity.liquidAmount >= generateAmount){
-			entity.liquidAmount -= generateAmount;
-			//TODO actually add power
-		}
+		if(entity.liquid == null) return;
+		
+		Vector2 offset = getPlaceOffset();
+		
+		Draw.color(entity.liquid.color);
+		Draw.alpha(entity.liquidAmount / liquidCapacity);
+		Draw.rect("blank", tile.worldx() + offset.x, tile.worldy() + offset.y, 2, 2);
+		Draw.color();
 	}
 	
 	@Override
-	public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-		return liquid == generateLiquid && super.acceptLiquid(tile, source, liquid, amount);
+	public void update(Tile tile){
+		LiquidPowerEntity entity = tile.entity();
+		
+		if(entity.liquidAmount >= generateInput && Timers.get(tile, "generate", generateTime)){
+			entity.liquidAmount -= generateInput;
+			entity.power += generatePower;
+		}
+		
+		if(Timers.get(tile, "generate", generateTime)){
+			distributePower(tile);
+		}
 	}
 	
 	@Override
@@ -38,19 +61,53 @@ public class LiquidPowerGenerator extends LiquidBlock{
 		return new LiquidPowerEntity();
 	}
 	
-	public static class LiquidPowerEntity extends LiquidEntity{
-		public float power;
+	@Override
+	public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+		LiquidPowerEntity entity = tile.entity();
+		
+		if(liquid != generateLiquid){
+			return false;
+		}
+		
+		return entity.liquidAmount + amount < liquidCapacity && (entity.liquid == liquid || entity.liquidAmount <= 0.01f);
+	}
+	
+	@Override
+	public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+		LiquidPowerEntity entity = tile.entity();
+		entity.liquid = liquid;
+		entity.liquidAmount += amount;
+	}
+	
+	@Override
+	public float getLiquid(Tile tile){
+		LiquidPowerEntity entity = tile.entity();
+		return entity.liquidAmount;
+	}
+
+	@Override
+	public float getLiquidCapacity(Tile tile){
+		return liquidCapacity;
+	}
+	
+	public static class LiquidPowerEntity extends PowerEntity{
+		public Liquid liquid;
+		public float liquidAmount;
 		
 		@Override
 		public void write(DataOutputStream stream) throws IOException{
 			super.write(stream);
-			stream.writeFloat(power);
+			stream.writeByte(liquid == null ? -1 : liquid.ordinal());
+			stream.writeByte((byte)(liquidAmount));
 		}
 		
 		@Override
 		public void read(DataInputStream stream) throws IOException{
 			super.read(stream);
-			power = stream.readFloat();
+			byte ordinal = stream.readByte();
+			liquid = ordinal == -1 ? null : Liquid.values()[ordinal];
+			liquidAmount = stream.readByte();
 		}
 	}
+
 }

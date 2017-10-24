@@ -11,7 +11,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
 
-public class LiquidBlock extends Block{
+public class LiquidBlock extends Block implements LiquidAcceptor{
 	protected float liquidCapacity = 10f;
 	protected float flowfactor = 4.9f;
 	
@@ -73,11 +73,10 @@ public class LiquidBlock extends Block{
 		
 		Liquid liquid = entity.liquid;
 		
-		if(next != null && next.block() instanceof LiquidBlock && entity.liquidAmount > 0.01f){
-			LiquidBlock other = (LiquidBlock)next.block();
-			LiquidEntity otherentity = next.entity();
+		if(next != null && next.block() instanceof LiquidAcceptor && entity.liquidAmount > 0.01f){
+			LiquidAcceptor other = (LiquidAcceptor)next.block();
 			
-			float flow = Math.min(other.liquidCapacity - otherentity.liquidAmount - 0.001f, Math.min(entity.liquidAmount/flowfactor, entity.liquidAmount));
+			float flow = Math.min(other.getLiquidCapacity(next) - other.getLiquid(next) - 0.001f, Math.min(entity.liquidAmount/flowfactor, entity.liquidAmount));
 			
 			if(flow <= 0f || entity.liquidAmount < flow) return;
 			
@@ -88,16 +87,29 @@ public class LiquidBlock extends Block{
 		}
 	}
 	
+	@Override
 	public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
 		LiquidEntity entity = tile.entity();
 		
 		return entity.liquidAmount + amount < liquidCapacity && (entity.liquid == liquid || entity.liquidAmount <= 0.01f);
 	}
 	
+	@Override
 	public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
 		LiquidEntity entity = tile.entity();
 		entity.liquid = liquid;
 		entity.liquidAmount += amount;
+	}
+	
+	@Override
+	public float getLiquid(Tile tile){
+		LiquidEntity entity = tile.entity();
+		return entity.liquidAmount;
+	}
+
+	@Override
+	public float getLiquidCapacity(Tile tile){
+		return liquidCapacity;
 	}
 	
 	public static class LiquidEntity extends TileEntity{

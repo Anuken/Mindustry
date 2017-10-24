@@ -2,20 +2,28 @@ package io.anuke.mindustry.world;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
+import com.badlogic.gdx.utils.Array;
+
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.ucore.util.Bits;
 
 
 public class Tile{
+	private static final Array<Tile> tmpArray = new Array<>();
+	
 	private Block floor = Blocks.air;
 	private Block block = Blocks.air;
+	/**The coordinates of the core tile this is linked to, in the form of two bytes packed into one.
+	 * This is relative to the block it is linked to; negate coords to find the link.*/
+	private byte link = 0;
 	public TileEntity entity;
-	public int x, y;
+	public short x, y;
 	public byte rotation, dump;
 	
 	public Tile(int x, int y){
-		this.x = x;
-		this.y = y;
+		this.x = (short)x;
+		this.y = (short)y;
 	}
 	
 	public Tile(int x, int y, Block floor){
@@ -55,16 +63,23 @@ public class Tile{
 		return block;
 	}
 	
+	/**Returns the breaktime of the block, <i>or</i> the breaktime of the linked block, if this tile is linked.*/
+	public float getBreakTime(){
+		return link == 0 ? block.breaktime : getLinked().block.breaktime;
+	}
+	
 	public void setBlock(Block type, int rotation){
 		if(rotation < 0) rotation = (-rotation + 2);
 		rotation %= 4;
 		this.block = type;
 		this.rotation = (byte)rotation;
+		this.link = 0;
 		changed();
 	}
 	
 	public void setBlock(Block type){
 		this.block = type;
+		this.link = 0;
 		changed();
 	}
 	
@@ -81,7 +96,49 @@ public class Tile{
 	}
 	
 	public boolean breakable(){
-		return block.update || block.breakable;
+		if(link == 0){
+			return (block.update || block.breakable);
+		}else{
+			return getLinked().breakable();
+		}
+	}
+	
+	public boolean isLinked(){
+		return link != 0;
+	}
+	
+	/**Sets this to a linked tile, which sets the block to a blockpart. dx and dy can only be -8-7.*/
+	public void setLinked(byte dx, byte dy){
+		setBlock(Blocks.blockpart);
+		link = Bits.packByte((byte)(dx + 8), (byte)(dy + 8));
+	}
+	
+	/**Returns the list of all tiles linked to this multiblock, or an empty array if it's not a multiblock.
+	 * This array contains only linked tiles, not this tile itself.*/
+	public Array<Tile> getLinkedTiles(){
+		tmpArray.clear();
+		if(!(block.width == 1 && block.health == 1)){
+			int offsetx = -(block.width-1)/2;
+			int offsety = -(block.height-1)/2;
+			for(int dx = 0; dx < block.width; dx ++){
+				for(int dy = 0; dy < block.height; dy ++){
+					Tile other = World.tile(x + dx - offsetx, y + dy - offsety);
+					tmpArray.add(other);
+				}
+			}
+		}
+		return tmpArray;
+	}
+	
+	/**Returns the block the multiblock is linked to, or null if it is not linked to any block.*/
+	public Tile getLinked(){
+		if(link == 0){
+			return null;
+		}else{
+			byte dx = Bits.getLeftByte(link);
+			byte dy = Bits.getRightByte(link);
+			return World.tile(x - (dx - 8), y - (dy - 8));
+		}
 	}
 	
 	public Tile[] getNearby(){
@@ -100,6 +157,7 @@ public class Tile{
 	
 	@Override
 	public String toString(){
-		return floor.name() + ":" + block.name();
+		return floor.name() + ":" + block.name() + 
+				(link != 0 ? " link=[" + (Bits.getLeftByte(link) - 8) + ", " + (Bits.getRightByte(link) - 8) +  "]" : "");
 	}
 }

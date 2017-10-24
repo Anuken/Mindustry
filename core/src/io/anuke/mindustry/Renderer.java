@@ -16,6 +16,7 @@ import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.input.AndroidInput;
+import io.anuke.mindustry.input.Input;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
@@ -294,22 +295,27 @@ public class Renderer extends RendererModule{
 
 			if(android){
 				Vector2 vec = Graphics.world(AndroidInput.mousex, AndroidInput.mousey);
-				x = Mathf.round2(vec.x, tilesize);
-				y = Mathf.round2(vec.y, tilesize);
 				tilex = Mathf.scl2(vec.x, tilesize);
 				tiley = Mathf.scl2(vec.y, tilesize);
 			}else{
-				x = Mathf.round2(Graphics.mouseWorld().x, tilesize);
-				y = Mathf.round2(Graphics.mouseWorld().y, tilesize);
-				tilex = World.tilex();
-				tiley = World.tiley();
+				tilex = Input.tilex();
+				tiley = Input.tiley();
 			}
+			
+			x = tilex*tilesize;
+			y = tiley*tilesize;
 
 			boolean valid = World.validPlace(tilex, tiley, player.recipe.result);
-
+			
+			Vector2 offset = player.recipe.result.getPlaceOffset();
+			
+			float si = MathUtils.sin(Timers.time() / 6f) + 1;
+			
 			Draw.color(valid ? Color.PURPLE : Color.SCARLET);
 			Draw.thickness(2f);
-			Draw.square(x, y, tilesize / 2 + MathUtils.sin(Timers.time() / 6f) + 1);
+			Draw.linecrect(x + offset.x, y + offset.y, 
+					tilesize * player.recipe.result.width + si, 
+					tilesize * player.recipe.result.height + si);
 
 			player.recipe.result.drawPlace(tilex, tiley, valid);
 
@@ -334,9 +340,9 @@ public class Renderer extends RendererModule{
 		}
 
 		//block breaking
-		if(Inputs.buttonDown(Buttons.RIGHT) && World.validBreak(World.tilex(), World.tiley())){
-			Tile tile = World.cursorTile();
-			Draw.color(Color.YELLOW, Color.SCARLET, player.breaktime / tile.block().breaktime);
+		if(Inputs.buttonDown(Buttons.RIGHT) && World.validBreak(Input.tilex(), Input.tiley())){
+			Tile tile = World.tile(Input.tilex(), Input.tiley());
+			Draw.color(Color.YELLOW, Color.SCARLET, player.breaktime / tile.getBreakTime());
 			Draw.square(tile.worldx(), tile.worldy(), 4);
 			Draw.reset();
 		}else if(android && player.breaktime > 0){ //android block breaking
@@ -345,7 +351,7 @@ public class Renderer extends RendererModule{
 			if(World.validBreak(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize))){
 				Tile tile = World.tile(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize));
 				
-				float fract = player.breaktime / tile.block().breaktime;
+				float fract = player.breaktime / tile.getBreakTime();
 				Draw.color(Color.YELLOW, Color.SCARLET, fract);
 				Draw.circle(tile.worldx(), tile.worldy(), 4 + (1f - fract) * 26);
 				Draw.reset();
@@ -353,13 +359,20 @@ public class Renderer extends RendererModule{
 		}
 
 		if(player.recipe == null && !ui.hasMouse()){
-			Tile tile = World.cursorTile();
+			Tile tile = World.tile(Input.tilex(), Input.tiley());
 
 			if(tile != null && tile.block() != Blocks.air){
-				if(tile.entity != null)
-					drawHealth(tile.entity.x, tile.entity.y, tile.entity.health, tile.entity.maxhealth);
-
-				tile.block().drawPixelOverlay(tile);
+				Tile target = tile;
+				if(tile.isLinked())
+					target = tile.getLinked();
+				
+				Vector2 offset = target.block().getPlaceOffset();
+				
+				if(target.entity != null)
+						drawHealth(target.entity.x + offset.x, target.entity.y - 3f - target.block().height/2f * Vars.tilesize + offset.y, 
+								target.entity.health, target.entity.maxhealth);
+					
+				target.block().drawPixelOverlay(target);
 			}
 		}
 		
@@ -370,9 +383,9 @@ public class Renderer extends RendererModule{
 				DestructibleEntity dest = ((DestructibleEntity) entity);
 				
 				if(dest instanceof Player && Vars.snapCamera && smoothcam){
-					drawHealth((int)dest.x, (int)dest.y, dest.health, dest.maxhealth);
+					drawHealth((int)dest.x, (int)dest.y - 7f, dest.health, dest.maxhealth);
 				}else{
-					drawHealth(dest.x, dest.y, dest.health, dest.maxhealth);
+					drawHealth(dest.x, dest.y - 7f, dest.health, dest.maxhealth);
 				}
 				
 			}
@@ -385,7 +398,6 @@ public class Renderer extends RendererModule{
 
 	public void drawBar(Color color, float x, float y, float fraction){
 		float len = 3;
-		float offset = 7;
 
 		float w = (int) (len * 2 * fraction) + 0.5f;
 
@@ -394,13 +406,13 @@ public class Renderer extends RendererModule{
 
 		Draw.thickness(3f);
 		Draw.color(Color.SLATE);
-		Draw.line(x - len + 1, y - offset, x + len + 1.5f, y - offset);
+		Draw.line(x - len + 1, y, x + len + 1.5f, y);
 		Draw.thickness(1f);
 		Draw.color(Color.BLACK);
-		Draw.line(x - len + 1, y - offset, x + len + 0.5f, y - offset);
+		Draw.line(x - len + 1, y, x + len + 0.5f, y);
 		Draw.color(color);
 		if(w >= 1)
-			Draw.line(x - len + 1, y - offset, x - len + w, y - offset);
+			Draw.line(x - len + 1, y, x - len + w, y);
 		Draw.reset();
 	}
 

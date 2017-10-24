@@ -25,7 +25,7 @@ public class ItemPowerGenerator extends Generator{
 		TileEntity entity = tile.entity;
 		
 		//TODO maybe don't draw it due to clutter
-		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 13 + 4, (float)entity.totalItems() / itemCapacity);
+		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 10, (float)entity.totalItems() / itemCapacity);
 	}
 	
 	@Override

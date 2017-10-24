@@ -69,7 +69,7 @@ public class Turret extends Block{
 		if(fract > 0)
 			fract = Mathf.clamp(fract, 0.24f, 1f);
 		
-		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 13, fract);
+		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 6, fract);
 	}
 	
 	@Override
