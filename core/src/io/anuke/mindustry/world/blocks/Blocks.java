@@ -1,13 +1,13 @@
 package io.anuke.mindustry.world.blocks;
 
+import io.anuke.mindustry.GameState;
+import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Floor;
-import io.anuke.mindustry.world.blocks.types.Wall;
-import io.anuke.mindustry.world.blocks.types.defense.ShieldedWallBlock;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.util.Mathf;
 
@@ -20,7 +20,8 @@ public class Blocks{
 		
 		//update floor blocks for effects, if needed
 		public void draw(Tile tile){
-			tile.floor().update(tile);
+			if(!GameState.is(State.paused))
+				tile.floor().update(tile);
 		}
 	},
 	
@@ -49,8 +50,23 @@ public class Blocks{
 				Effects.effect("lava", tile.worldx() + Mathf.range(5f), tile.worldy() + Mathf.range(5f));
 			}
 			
-			if(Mathf.chance(0.004)){
+			if(Mathf.chance(0.003)){
 				Effects.effect("lavabubble", tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
+			}
+		}
+	},
+	
+	oil = new Floor("oil"){
+		{
+			vary = false;
+			solid = true;
+			liquidDrop = Liquid.oil;
+		}
+		
+		@Override
+		public void update(Tile tile){
+			if(Mathf.chance(0.0025)){
+				Effects.effect("oilbubble", tile.worldx() + Mathf.range(2f), tile.worldy() + Mathf.range(2f));
 			}
 		}
 	},
@@ -121,37 +137,5 @@ public class Blocks{
 	
 	dirtblock = new Block("dirtblock"){{
 		solid = true;
-	}},
-	
-	stonewall = new Wall("stonewall"){{
-		health = 50;
-		formalName = "stone wall";
-	}},
-			
-	ironwall = new Wall("ironwall"){{
-		health = 80;
-		formalName = "iron wall";
-	}},
-	
-	steelwall = new Wall("steelwall"){{
-		health = 110;
-		formalName = "steel wall";
-	}},
-	
-	titaniumwall = new Wall("titaniumwall"){{
-		health = 150;
-		formalName = "titanium wall";
-	}},
-	diriumwall = new Wall("duriumwall"){{
-		health = 190;
-		formalName = "dirium wall";
-	}},
-	compositewall = new Wall("compositewall"){{
-		health = 270;
-		formalName = "composite wall";
-	}},
-	titaniumshieldwall = new ShieldedWallBlock("titaniumshieldwall"){{
-		health = 150;
-		formalName = "shielded wall";
 	}};
 }

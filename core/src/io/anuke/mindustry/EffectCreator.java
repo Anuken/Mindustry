@@ -50,6 +50,14 @@ public class EffectCreator{
 			Draw.reset();
 		});
 		
+		Effects.create("oilbubble", 64f, e -> {
+			Draw.color(Color.DARK_GRAY);
+			float scl = 0.25f;
+			Draw.thick(1f - Mathf.clamp(e.ifract() - (1f-scl)) * (1f/scl));
+			Draw.circle(e.x, e.y, e.ifract()*3f);
+			Draw.reset();
+		});
+		
 		Effects.create("shellexplosion", 15, e -> {
 			Draw.thickness(1.3f - e.ifract());
 			Draw.color(Hue.mix(Color.WHITE, Color.ORANGE, e.ifract()));

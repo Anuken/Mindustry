@@ -23,7 +23,8 @@ public class Generator{
 		Hue.rgb(110, 80, 30), Blocks.dirt,
 		Hue.rgb(160, 120, 70), Blocks.dirtblock,
 		Hue.rgb(100, 100, 100), Blocks.stoneblock,
-		Color.valueOf("ed5334"), Blocks.lava
+		Color.valueOf("ed5334"), Blocks.lava,
+		Color.valueOf("292929"), Blocks.oil
 	);
 	
 	/**Returns world size.*/

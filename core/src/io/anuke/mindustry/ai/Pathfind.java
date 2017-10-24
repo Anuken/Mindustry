@@ -53,7 +53,8 @@ public class Pathfind{
 	}
 	
 	static public void updatePath(){
-		if(paths.size == 0){
+		if(paths.size == 0 || paths.size != World.spawnpoints.size){
+			paths.clear();
 			pathSequences = new Tile[World.spawnpoints.size][0];
 			for(int i = 0; i < World.spawnpoints.size; i ++){
 				SmoothGraphPath path = new SmoothGraphPath();

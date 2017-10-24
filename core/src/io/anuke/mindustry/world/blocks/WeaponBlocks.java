@@ -8,7 +8,8 @@ import io.anuke.mindustry.entities.effect.TeslaOrb;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.defense.*;
+import io.anuke.mindustry.world.blocks.types.defense.LaserTurret;
+import io.anuke.mindustry.world.blocks.types.defense.Turret;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
@@ -162,27 +163,5 @@ public class WeaponBlocks{
 			health = 180;
 			ammoMultiplier = 40;
 		}
-	},
-	
-	repairturret = new RepairTurret("repairturret"){
-		{
-			formalName = "heal turret";
-			range = 30;
-			reload = 40f;
-			health = 60;
-		}
-	},
-	
-	megarepairturret = new RepairTurret("megarepairturret"){
-		{
-			formalName = "heal turret II";
-			range = 50;
-			reload = 20f;
-			health = 90;
-		}
-	},
-	
-	shieldgenerator = new ShieldBlock("shieldgenerator"){
-		
 	};
 }

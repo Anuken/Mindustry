@@ -7,9 +7,7 @@ import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.io.Formatter;
-import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.mindustry.world.blocks.ProductionBlocks;
-import io.anuke.mindustry.world.blocks.WeaponBlocks;
+import io.anuke.mindustry.world.blocks.*;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.modules.ModuleCore;
@@ -29,15 +27,17 @@ public class Mindustry extends ModuleCore {
 		}
 		
 	};
+	//always initialize blocks in this order, otherwise there are ID errors
+	public Class<?>[] blockClasses = new Class<?>[]{
+		Blocks.class,
+		DefenseBlocks.class,
+		DistributionBlocks.class,
+		ProductionBlocks.class,
+		WeaponBlocks.class
+	};
 	
 	@Override
 	public void init(){
-		//always initialize blocks in this order, otherwise there are ID errors
-		Blocks.dirt.getClass();
-		ProductionBlocks.coaldrill.getClass();
-		WeaponBlocks.turret.getClass();
-		
-		
 		module(Vars.control = new Control());
 		module(Vars.renderer = new Renderer());
 		module(Vars.ui = new UI());

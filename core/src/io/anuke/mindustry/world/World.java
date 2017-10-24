@@ -11,9 +11,7 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.mindustry.world.blocks.ProductionBlocks;
-import io.anuke.mindustry.world.blocks.WeaponBlocks;
+import io.anuke.mindustry.world.blocks.*;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
@@ -166,28 +164,36 @@ public class World{
 	static void setDefaultBlocks(){
 		int x = core.x, y = core.y;
 		
-		set(x, y-1, ProductionBlocks.conveyor, 1);
-		set(x, y-2, ProductionBlocks.conveyor, 1);
-		set(x, y-3, ProductionBlocks.conveyor, 1);
-		set(x, y-4, ProductionBlocks.stonedrill, 0);
-		//just in case
-		tiles[x][y-4].setFloor(Blocks.stone);
+		set(x, y-1, DistributionBlocks.conveyor, 1);
+		set(x, y-2, DistributionBlocks.conveyor, 1);
+		set(x, y-3, DistributionBlocks.conveyor, 1);
 		
-		
-		tiles[x+2][y-2].setFloor(Blocks.stone);
-		set(x+2, y-2, ProductionBlocks.stonedrill, 0);
-		set(x+2, y-1, ProductionBlocks.conveyor, 1);
-		set(x+2, y, WeaponBlocks.turret, 0);
-		
-		tiles[x-2][y-2].setFloor(Blocks.stone);
-		set(x-2, y-2, ProductionBlocks.stonedrill, 0);
-		set(x-2, y-1, ProductionBlocks.conveyor, 1);
-		set(x-2, y, WeaponBlocks.turret, 0);
+		for(int i = 0; i < 2; i ++){
+			int d = Mathf.sign(i-0.5f);
+			
+			set(x+2*d, y-2, ProductionBlocks.stonedrill, d);
+			set(x+2*d, y-1, DistributionBlocks.conveyor, 1);
+			set(x+2*d, y, DistributionBlocks.conveyor, 1);
+			set(x+2*d, y+1, WeaponBlocks.doubleturret, 0);
+			
+			set(x+1*d, y-3, DistributionBlocks.conveyor, 2*d);
+			set(x+2*d, y-3, DistributionBlocks.conveyor, 2*d);
+			set(x+2*d, y-4, DistributionBlocks.conveyor, 1);
+			set(x+2*d, y-5, DistributionBlocks.conveyor, 1);
+			//set(x+2*d, y-6, DistributionBlocks.conveyor, 1);
+			
+			//set(x+3*d, y-6, ProductionBlocks.stonedrill, 0);
+			set(x+3*d, y-5, ProductionBlocks.stonedrill, 0);
+			set(x+3*d, y-4, ProductionBlocks.stonedrill, 0);
+			set(x+3*d, y-3, ProductionBlocks.stonedrill, 0);
+		}
 	}
 	
 	static void set(int x, int y, Block type, int rot){
-		tiles[x][y].setBlock(type);
-		tiles[x][y].rotation = (byte)rot;
+		if(type == ProductionBlocks.stonedrill){
+			tiles[x][y].setFloor(Blocks.stone);
+		}
+		tiles[x][y].setBlock(type, rot);
 	}
 	
 	public static int getSeed(){

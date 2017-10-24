@@ -6,9 +6,7 @@ import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.mindustry.world.blocks.ProductionBlocks;
-import io.anuke.mindustry.world.blocks.WeaponBlocks;
+import io.anuke.mindustry.world.blocks.*;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.builders.button;
 import io.anuke.ucore.scene.builders.label;
@@ -198,7 +196,7 @@ public class Tutorial{
 				blockRotation = 1;
 				blockPlaceX = 0;
 				blockPlaceY = -1;
-				targetBlock = ProductionBlocks.conveyor;
+				targetBlock = DistributionBlocks.conveyor;
 				text = "Use [orange][[R][] to rotate the conveyor to face [orange]forwards[], then place it in the [yellow]marked location[]  using the [orange][[left mouse button][].";
 			}
 		},
@@ -211,7 +209,7 @@ public class Tutorial{
 				blockRotation = 1;
 				blockPlaceX = 0;
 				blockPlaceY = -1;
-				targetBlock = ProductionBlocks.conveyor;
+				targetBlock = DistributionBlocks.conveyor;
 				text = "Use the [orange][[rotate button][] to rotate the conveyor to face [orange]forwards[], drag it into position with one finger, then place it in the [yellow]marked location[] using the [orange][[checkmark][].";
 			}
 		},
@@ -286,9 +284,9 @@ public class Tutorial{
 			
 			void onSwitch(){
 				for(int flip : new int[]{1, -1}){
-					World.tile(World.core.x + flip, World.core.y - 1).setBlock(ProductionBlocks.conveyor, 2 * flip);
-					World.tile(World.core.x + flip*2, World.core.y - 1).setBlock(ProductionBlocks.conveyor, 2 * flip);
-					World.tile(World.core.x + flip*2, World.core.y - 2).setBlock(ProductionBlocks.conveyor, 1);
+					World.tile(World.core.x + flip, World.core.y - 1).setBlock(DistributionBlocks.conveyor, 2 * flip);
+					World.tile(World.core.x + flip*2, World.core.y - 1).setBlock(DistributionBlocks.conveyor, 2 * flip);
+					World.tile(World.core.x + flip*2, World.core.y - 2).setBlock(DistributionBlocks.conveyor, 1);
 					World.tile(World.core.x + flip*2, World.core.y - 3).setFloor(Blocks.stone);
 					World.tile(World.core.x + flip*2, World.core.y - 3).setBlock(ProductionBlocks.stonedrill);
 					
@@ -452,7 +450,7 @@ public class Tutorial{
 				canForward = false;
 				showBlock = true;
 				canPlace = true;
-				targetBlock = ProductionBlocks.conduit;
+				targetBlock = DistributionBlocks.conduit;
 				blockPlaceX = 5;
 				blockPlaceY = -2;
 				blockRotation = 2;
@@ -470,7 +468,7 @@ public class Tutorial{
 				canForward = false;
 				showBlock = true;
 				canPlace = true;
-				targetBlock = ProductionBlocks.conduit;
+				targetBlock = DistributionBlocks.conduit;
 				blockPlaceX = 4;
 				blockPlaceY = -2;
 				blockRotation = 1;
@@ -487,7 +485,7 @@ public class Tutorial{
 				canForward = false;
 				showBlock = true;
 				canPlace = true;
-				targetBlock = ProductionBlocks.conduit;
+				targetBlock = DistributionBlocks.conduit;
 				blockPlaceX = 4;
 				blockPlaceY = -1;
 				blockRotation = 1;
@@ -530,14 +528,14 @@ public class Tutorial{
 				}
 				
 				for(int i = 0; i < 3; i ++){
-					World.tile(World.core.x + 4 - 1 - i, World.core.y).setBlock(ProductionBlocks.conveyor, 2);
+					World.tile(World.core.x + 4 - 1 - i, World.core.y).setBlock(DistributionBlocks.conveyor, 2);
 				}
 				
-				World.tile(World.core.x + 2, World.core.y + 1).setBlock(ProductionBlocks.conveyor, 0);
-				World.tile(World.core.x + 3, World.core.y + 1).setBlock(ProductionBlocks.conveyor, 0);
-				World.tile(World.core.x + 4, World.core.y + 1).setBlock(ProductionBlocks.conveyor, 3);
-				World.tile(World.core.x + 5, World.core.y + 1).setBlock(ProductionBlocks.conveyor, 2);
-				World.tile(World.core.x + 6, World.core.y + 1).setBlock(ProductionBlocks.conveyor, 2);
+				World.tile(World.core.x + 2, World.core.y + 1).setBlock(DistributionBlocks.conveyor, 0);
+				World.tile(World.core.x + 3, World.core.y + 1).setBlock(DistributionBlocks.conveyor, 0);
+				World.tile(World.core.x + 4, World.core.y + 1).setBlock(DistributionBlocks.conveyor, 3);
+				World.tile(World.core.x + 5, World.core.y + 1).setBlock(DistributionBlocks.conveyor, 2);
+				World.tile(World.core.x + 6, World.core.y + 1).setBlock(DistributionBlocks.conveyor, 2);
 				
 			}
 		},
