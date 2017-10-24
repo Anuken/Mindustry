@@ -65,7 +65,7 @@ public class ProductionBlocks{
 		}
 	},
 	
-	coalpurifier = new Purifier("coalpurifier"){
+	coalpurifier = new LiquidCrafter("coalpurifier"){
 		{
 			formalName = "coal extractor";
 			input = Item.stone;
@@ -83,7 +83,7 @@ public class ProductionBlocks{
 		}
 	},
 	
-	titaniumpurifier = new Purifier("titaniumpurifier"){
+	titaniumpurifier = new LiquidCrafter("titaniumpurifier"){
 		{
 			formalName = "titanium\nextractor";
 			input = Item.iron;
@@ -99,6 +99,24 @@ public class ProductionBlocks{
 		@Override
 		public String description(){
 			return "Takes in iron + water, outputs titanium.";
+		}
+	},
+	
+	oilrefinery = new LiquidCrafter("oilrefinery"){
+		{
+			formalName = "oil refinery";
+			inputLiquid = Liquid.oil;
+			liquidAmount = 45f;
+			liquidCapacity = 46f;
+			purifyTime = 70;
+			output = Item.coal;
+			health = 80;
+			craftEffect = "purifyoil";
+		}
+		
+		@Override
+		public String description(){
+			return "Takes in oil, outputs coal.";
 		}
 	},
 	
@@ -118,6 +136,12 @@ public class ProductionBlocks{
 		resource = Blocks.coal;
 		result = Item.coal;
 		formalName = "coal drill";
+	}},
+	
+	uraniumdrill = new Drill("uraniumdrill"){{
+		resource = Blocks.uranium;
+		result = Item.uranium;
+		formalName = "uranium drill";
 	}},
 	
 	titaniumdrill = new Drill("titaniumdrill"){{
@@ -153,7 +177,7 @@ public class ProductionBlocks{
 	coalgenerator = new ItemPowerGenerator("coalgenerator"){
 		{
 			//TODO
-			generateItem = Item.stone;
+			generateItem = Item.coal;
 			generateAmount = 4f;
 			powerCapacity = 40f;
 		}

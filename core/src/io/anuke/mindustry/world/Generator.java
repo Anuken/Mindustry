@@ -69,6 +69,10 @@ public class Generator{
 					if(Noise.nnoise(x + 9999, y + 9999, 8, 1) > 0.253){
 						floor = Blocks.titanium;
 					}
+					
+					if(Noise.nnoise(x + 99999, y + 99999, 6, 1) > 0.254){
+						floor = Blocks.uranium;
+					}
 				}
 				
 				if(block == Blocks.grassblock){

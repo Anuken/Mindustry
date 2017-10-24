@@ -13,6 +13,7 @@ public class Pump extends LiquidBlock{
 	public Pump(String name) {
 		super(name);
 		rotate = false;
+		solid = true;
 	}
 	
 	@Override

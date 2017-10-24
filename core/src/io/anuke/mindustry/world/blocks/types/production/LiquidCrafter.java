@@ -12,7 +12,8 @@ import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 
-public class Purifier extends LiquidBlock{
+public class LiquidCrafter extends LiquidBlock{
+	/**Can be null.*/
 	public Item input = null;
 	public int inputAmount = 5;
 	public Liquid inputLiquid = null;
@@ -20,8 +21,9 @@ public class Purifier extends LiquidBlock{
 	public Item output = null;
 	public int itemCapacity = 90;
 	public int purifyTime = 80;
+	public String craftEffect = "purify";
 
-	public Purifier(String name) {
+	public LiquidCrafter(String name) {
 		super(name);
 		update = true;
 		rotate = false;
@@ -48,12 +50,13 @@ public class Purifier extends LiquidBlock{
 		LiquidEntity entity = tile.entity();
 		
 		if(Timers.get(tile, "purify", purifyTime) && entity.liquidAmount >= liquidAmount &&
-				entity.hasItem(input, inputAmount)){
+				(input == null || entity.hasItem(input, inputAmount))){
 			
-			entity.removeItem(input, inputAmount);
+			if(input != null)
+				entity.removeItem(input, inputAmount);
 			entity.liquidAmount -= liquidAmount;
 			offloadNear(tile, output);
-			Effects.effect("purify", tile.worldx(), tile.worldy());
+			Effects.effect(craftEffect, tile.worldx(), tile.worldy());
 		}
 		
 		if(Timers.get(tile.hashCode(), "dump", 30)){
@@ -63,6 +66,8 @@ public class Purifier extends LiquidBlock{
 	
 	@Override
 	public void drawPixelOverlay(Tile tile){
+		if(input == null) return;
+		
 		float fract = (float)tile.entity.items.get(input, 0) / itemCapacity;
 		
 		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 13, fract);
@@ -76,7 +81,7 @@ public class Purifier extends LiquidBlock{
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		TileEntity entity = tile.entity();
-		return item == input && entity.items.get(item, 0) < itemCapacity;
+		return input != null && item == input && entity.items.get(item, 0) < itemCapacity;
 	}
 
 }

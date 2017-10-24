@@ -40,6 +40,8 @@ public class UI extends SceneModule{
 	VisibilityProvider play = () -> !GameState.is(State.menu);
 	VisibilityProvider nplay = () -> GameState.is(State.menu);
 
+	private Array<Item> tempItems = new Array<>();
+	
 	public UI() {
 		Dialog.setShowAction(()-> sequence(Actions.moveToAligned(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), Align.center),
 						parallel(Actions.moveToAligned(Gdx.graphics.getWidth()/2,
@@ -237,12 +239,16 @@ public class UI extends SceneModule{
 						}
 					});
 					button.setName("sectionbutton" + sec.name());
-					add(button).fill().height(54).padRight(-0.1f).padTop(-10).units(Unit.dp);
-					button.getImageCell().size(40).padBottom(4).units(Unit.dp);
+					add(button).growX().height(54).padTop(sec.ordinal() <= 2 ? -10 : -5).units(Unit.dp);
+					button.getImageCell().size(40).padBottom(4).padTop(2).units(Unit.dp);
 					group.add(button);
 					
+					if(sec.ordinal() % 3 == 2 && sec.ordinal() > 0){
+						row();
+					}
+					
 					table.pad(4);
-					table.top();
+					table.top().left();
 					
 					int i = 0;
 					
@@ -277,12 +283,6 @@ public class UI extends SceneModule{
 						i++;
 					}
 					
-					//additional padding
-					for(int j = 0; j < maxcol - (int)((float)recipes.size/rows+2); j ++){
-						table.row();
-						table.add().size(size);
-					}
-					
 					table.setVisible(()-> button.isChecked());
 					
 					stack.add(table);
@@ -290,7 +290,7 @@ public class UI extends SceneModule{
 				
 				
 				row();
-				add(stack).colspan(3);
+				add(stack).colspan(Section.values().length);
 				get().pad(10f);
 				
 				get().padLeft(0f);
@@ -716,8 +716,14 @@ public class UI extends SceneModule{
 	public void updateItems(){
 		itemtable.clear();
 		itemtable.left();
+		
+		tempItems.clear();
+		for(Item item : control.getItems().keys()){
+			tempItems.add(item);
+		}
+		tempItems.sort();
 
-		for(Item stack : control.getItems().keys()){
+		for(Item stack : tempItems){
 			Image image = new Image(Draw.region("icon-" + stack.name()));
 			Label label = new Label("" + Mindustry.formatter.format(control.getAmount(stack)));
 			label.setFontScale(fontscale*1.5f);

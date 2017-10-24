@@ -6,9 +6,11 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.defense.ShieldBlock;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BulletEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
+import io.anuke.ucore.util.Mathf;
 
 public class Shield extends Entity{
 	public boolean active;
@@ -55,10 +57,12 @@ public class Shield extends Entity{
 		
 		ShieldBlock block = (ShieldBlock)tile.block();
 		
+		float rad = block.shieldRadius*2 + Mathf.sin(Timers.time(), 25f, 2f);
+		
 		Graphics.surface("shield", false);
 		Draw.color(Color.ROYAL);
 		Draw.thick(2f);
-		Draw.rect("circle2", x, y, block.shieldRadius*2, block.shieldRadius*2);
+		Draw.rect("circle2", x, y, rad, rad);
 		Draw.reset();
 		Graphics.surface();
 	}

@@ -30,13 +30,16 @@ public class DistributionBlocks{
 	poweredconveyor = new Conveyor("poweredconveyor"){{
 		health = 90;
 		speed = 0.09f;
-		formalName = "powered conveyor";
+		formalName = "pulse conveyor";
 	}},
 	
 	router = new Router("router"){
 	},
 	
 	junction = new Junction("junction"){
+		
+	},
+	liquidjunction = new LiquidJunction("liquidjunction"){
 		
 	};
 }
