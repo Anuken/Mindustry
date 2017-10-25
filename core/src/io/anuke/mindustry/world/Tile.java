@@ -88,7 +88,7 @@ public class Tile{
 	}
 	
 	public boolean passable(){
-		return !(floor.solid || (block.solid && !block.update));
+		return isLinked() || !(floor.solid || (block.solid && !block.update));
 	}
 	
 	public boolean solid(){

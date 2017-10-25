@@ -11,14 +11,12 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Sounds;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
-import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
@@ -149,7 +147,8 @@ public class World{
 		
 		Pathfind.reset();
 		
-		core.setBlock(ProductionBlocks.core);
+		//TODO multiblock core
+		placeBlock(core.x, core.y, ProductionBlocks.core, 0);
 		
 		if(map != Map.tutorial){
 			setDefaultBlocks();
@@ -163,7 +162,7 @@ public class World{
 	static void setDefaultBlocks(){
 		int x = core.x, y = core.y;
 		
-		set(x, y-1, DistributionBlocks.conveyor, 1);
+		//set(x, y-1, DistributionBlocks.conveyor, 1);
 		set(x, y-2, DistributionBlocks.conveyor, 1);
 		set(x, y-3, DistributionBlocks.conveyor, 1);
 		
@@ -200,17 +199,15 @@ public class World{
 	}
 	
 	//TODO move to control or player?
-	public static void placeBlock(int x, int y){
+	public static void placeBlock(int x, int y, Block result, int rotation){
 		Tile tile = tile(x, y);
 		
 		//just in case
 		if(tile == null)
 			return;
-		
-		Block result = player.recipe.result;
 
 		tile.setBlock(result);
-		tile.rotation = (byte)player.rotation;
+		tile.rotation = (byte)rotation;
 		
 		if(result.isMultiblock()){
 			int offsetx = -(result.width-1)/2;
@@ -221,7 +218,6 @@ public class World{
 					int worldx = dx + offsetx + x;
 					int worldy = dy + offsety + y;
 					if(!(worldx == x && worldy == y)){
-						//TODO make sure this is correct
 						Tile toplace = tile(worldx, worldy);
 						toplace.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
 					}
@@ -235,14 +231,6 @@ public class World{
 		
 		Effects.shake(2f, 2f, player);
 		Sounds.play("place");
-
-		for(ItemStack stack : player.recipe.requirements){
-			Vars.control.removeItem(stack);
-		}
-		
-		if(!Vars.control.hasItems(player.recipe.requirements)){
-			Cursors.restoreCursor();
-		}
 	}
 	
 	//TODO move this to control?
@@ -336,6 +324,10 @@ public class World{
 		Tile tile = tile(x, y);
 		
 		if(tile == null || tile.block() == ProductionBlocks.core) return false;
+		
+		if(tile.isLinked() && tile.getLinked().block() == ProductionBlocks.core){
+			return false;
+		}
 		
 		if(Vars.control.getTutorial().active()){
 			

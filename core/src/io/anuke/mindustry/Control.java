@@ -166,7 +166,7 @@ public class Control extends Module{
 		Vars.renderer.clearTiles();
 		
 		player.x = World.core.worldx();
-		player.y = World.core.worldy() - 8f - ((int)(Gdx.graphics.getWidth() / (float)Core.cameraScale * 2) % 2 == 0 ? 0.5f : 0);
+		player.y = World.core.worldy() - Vars.tilesize*2 - ((int)(Gdx.graphics.getWidth() / (float)Core.cameraScale * 2) % 2 == 0 ? 0.5f : 0);
 		
 		Core.camera.position.set(player.x, player.y, 0);
 		
@@ -435,7 +435,7 @@ public class Control extends Module{
 					respawntime -= delta();
 					
 					if(respawntime <= 0){
-						player.set(World.core.worldx(), World.core.worldy()-8);
+						player.set(World.core.worldx(), World.core.worldy()-Vars.tilesize*2);
 						player.heal();
 						player.add();
 						Effects.sound("respawn");

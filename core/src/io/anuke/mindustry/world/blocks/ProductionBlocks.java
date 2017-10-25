@@ -14,9 +14,11 @@ public class ProductionBlocks{
 	
 	core = new Block("core"){
 		{
-			health = 300;
+			health = 600;
 			solid = true;
 			update = true;
+			width = 3;
+			height = 3;
 		}
 		
 		@Override

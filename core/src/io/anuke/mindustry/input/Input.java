@@ -7,6 +7,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
@@ -48,7 +49,15 @@ public class Input{
 				World.validPlace(tilex(), tiley(), player.recipe.result) && !ui.hasMouse() && cursorNear() &&
 				Vars.control.hasItems(player.recipe.requirements)){
 			
-			World.placeBlock(tilex(), tiley());
+			World.placeBlock(tilex(), tiley(), player.recipe.result, player.rotation);
+			
+			for(ItemStack stack : player.recipe.requirements){
+				Vars.control.removeItem(stack);
+			}
+			
+			if(!Vars.control.hasItems(player.recipe.requirements)){
+				Cursors.restoreCursor();
+			}
 			
 		}
 

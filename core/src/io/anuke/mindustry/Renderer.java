@@ -342,8 +342,11 @@ public class Renderer extends RendererModule{
 		//block breaking
 		if(Inputs.buttonDown(Buttons.RIGHT) && World.validBreak(Input.tilex(), Input.tiley())){
 			Tile tile = World.tile(Input.tilex(), Input.tiley());
+			if(tile.isLinked()) tile = tile.getLinked();
+			Vector2 offset = tile.block().getPlaceOffset();
+			
 			Draw.color(Color.YELLOW, Color.SCARLET, player.breaktime / tile.getBreakTime());
-			Draw.square(tile.worldx(), tile.worldy(), 4);
+			Draw.linecrect(tile.worldx() + offset.x, tile.worldy() + offset.y, tile.block().width * Vars.tilesize, tile.block().height * Vars.tilesize);
 			Draw.reset();
 		}else if(android && player.breaktime > 0){ //android block breaking
 			Vector2 vec = Graphics.world(Gdx.input.getX(0), Gdx.input.getY(0));
