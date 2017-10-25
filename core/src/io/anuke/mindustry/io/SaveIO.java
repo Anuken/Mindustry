@@ -67,6 +67,7 @@ import io.anuke.ucore.entities.Entity;
  * Amount of tiles (int)
  * (tile list)
  *   Tile position, as a single integer, in the format x+y*width
+ *   Tile link - byte
  *   Tile type (boolean)- whether the block has a tile entity attached
  *   Block ID - the block ID
  *   (the following only applies to tile entity blocks)
@@ -81,7 +82,7 @@ import io.anuke.ucore.entities.Entity;
  */
 public class SaveIO{
 	/**Save file version ID. Should be incremented every breaking release.*/
-	private static final int fileVersionID = 7;
+	private static final int fileVersionID = 8;
 	
 	//TODO automatic registration of types?
 	private static final Array<Class<? extends Enemy>> enemyIDs = Array.with(
@@ -229,6 +230,7 @@ public class SaveIO{
 					if(tile.breakable()){
 						
 						stream.writeInt(x + y*World.width()); //tile pos
+						stream.writeByte(tile.link);
 						stream.writeBoolean(tile.entity != null); //whether it has a tile entity
 						stream.writeInt(tile.block().id); //block ID
 						
@@ -367,11 +369,13 @@ public class SaveIO{
 			
 			for(int i = 0; i < tiles; i ++){
 				int pos = stream.readInt();
+				byte link = stream.readByte();
 				boolean hasEntity = stream.readBoolean();
 				int blockid = stream.readInt();
 				
 				Tile tile = World.tile(pos % World.width(), pos / World.width());
 				tile.setBlock(Block.getByID(blockid));
+				tile.link = link;
 				
 				if(hasEntity){
 					byte rotation = stream.readByte();

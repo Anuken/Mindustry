@@ -142,6 +142,7 @@ public class ProductionBlocks{
 		resource = Blocks.uranium;
 		result = Item.uranium;
 		formalName = "uranium drill";
+		time = 7;
 	}},
 	
 	titaniumdrill = new Drill("titaniumdrill"){{
@@ -182,11 +183,15 @@ public class ProductionBlocks{
 			powerCapacity = 40f;
 		}
 	},
-	nuclearReactor = new LiquidPowerGenerator("nuclearreactor"){
+	nuclearReactor = new LiquidItemPowerGenerator("nuclearreactor"){
 		{
 			width = 2;
 			height = 2;
 			generateLiquid = Liquid.water;
+			generateItem = Item.uranium;
+			itemCapacity = 60;
+			itemInput = 6;
+			inputLiquid = 2f;
 			health = 340;
 			breaktime *= 2.2f;
 			powerCapacity = 100f;

@@ -11,6 +11,7 @@ import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidAcceptor;
 import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 
 public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
@@ -19,8 +20,9 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 	/**Power to generate per generateInput.*/
 	public float generatePower = 1f;
 	/**How much liquid to consume to get one generatePower.*/
-	public float generateInput = 1f;
+	public float inputLiquid = 1f;
 	public float liquidCapacity = 30f;
+	public String generateEffect = "generate";
 
 	public LiquidPowerGenerator(String name) {
 		super(name);
@@ -46,12 +48,15 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 	public void update(Tile tile){
 		LiquidPowerEntity entity = tile.entity();
 		
-		if(entity.liquidAmount >= generateInput && Timers.get(tile, "generate", generateTime)){
-			entity.liquidAmount -= generateInput;
+		if(entity.liquidAmount >= inputLiquid && Timers.get(tile, "consume", generateTime)){
+			entity.liquidAmount -= inputLiquid;
 			entity.power += generatePower;
+			
+			Vector2 offset = getPlaceOffset();
+			Effects.effect(generateEffect, tile.worldx() + offset.x, tile.worldy() + offset.y);
 		}
 		
-		if(Timers.get(tile, "generate", generateTime)){
+		if(Timers.get(tile, "consume", generateTime)){
 			distributePower(tile);
 		}
 	}

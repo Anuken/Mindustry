@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.types;
 
+import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -17,6 +18,16 @@ public class BlockPart extends Block implements PowerAcceptor, LiquidAcceptor{
 	@Override
 	public void draw(Tile tile){
 		//do nothing
+	}
+	
+	@Override
+	public void handleItem(Tile tile, Item item, Tile source){
+		tile.getLinked().block().handleItem(tile.getLinked(), item, source);
+	}
+	
+	@Override
+	public boolean acceptItem(Item item, Tile dest, Tile source){
+		return dest.getLinked().block().acceptItem(item, dest.getLinked(), source);
 	}
 
 	@Override

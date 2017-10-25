@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Bullet;
@@ -44,13 +45,16 @@ public class Turret extends Block{
 	
 	@Override
 	public void draw(Tile tile){
-		Draw.rect("block", tile.worldx(), tile.worldy());
+		Vector2 offset = getPlaceOffset();
+		Draw.rect("block", tile.worldx() + offset.x, tile.worldy() + offset.y);
 	}
 	
 	@Override
 	public void drawOver(Tile tile){
 		TurretEntity entity = tile.entity();
-		Draw.rect(name(), tile.worldx(), tile.worldy(), entity.rotation - 90);
+		Vector2 offset = getPlaceOffset();
+		
+		Draw.rect(name(), tile.worldx() + offset.x, tile.worldy() + offset.y, entity.rotation - 90);
 		
 		if(Vars.debug && drawDebug){
 			drawTargeting(tile);
@@ -59,8 +63,10 @@ public class Turret extends Block{
 	
 	@Override
 	public void drawPixelOverlay(Tile tile){
+		Vector2 offset = getPlaceOffset();
+		
 		Draw.color("green");
-		Draw.dashcircle(tile.worldx(), tile.worldy(), range);
+		Draw.dashcircle(tile.worldx() + offset.x, tile.worldy() + offset.y, range);
 		Draw.reset();
 		
 		TurretEntity entity = tile.entity();
@@ -69,7 +75,7 @@ public class Turret extends Block{
 		if(fract > 0)
 			fract = Mathf.clamp(fract, 0.24f, 1f);
 		
-		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 6, fract);
+		Vars.renderer.drawBar(Color.GREEN, tile.worldx() + offset.x, tile.worldy() + 6 + offset.y, fract);
 	}
 	
 	@Override

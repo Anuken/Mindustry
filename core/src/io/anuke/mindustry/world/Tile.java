@@ -16,7 +16,7 @@ public class Tile{
 	private Block block = Blocks.air;
 	/**The coordinates of the core tile this is linked to, in the form of two bytes packed into one.
 	 * This is relative to the block it is linked to; negate coords to find the link.*/
-	private byte link = 0;
+	public byte link = 0;
 	public TileEntity entity;
 	public short x, y;
 	public byte rotation, dump;
