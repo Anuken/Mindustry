@@ -85,7 +85,7 @@ public class ProductionBlocks{
 	
 	titaniumpurifier = new LiquidCrafter("titaniumpurifier"){
 		{
-			formalName = "titanium\nextractor";
+			formalName = "titanium extractor";
 			input = Item.iron;
 			inputAmount = 6;
 			inputLiquid = Liquid.water;
@@ -178,13 +178,46 @@ public class ProductionBlocks{
 	coalgenerator = new ItemPowerGenerator("coalgenerator"){
 		{
 			//TODO
+			formalName = "coal generator";
 			generateItem = Item.coal;
 			generateAmount = 4f;
 			powerCapacity = 40f;
 		}
 	},
+	thermalgenerator = new LiquidPowerGenerator("thermalgenerator"){
+		{
+			formalName = "thermal generator";
+			//TODO
+			generateLiquid = Liquid.lava;
+			inputLiquid = 2f;
+			generatePower = 1f;
+			powerCapacity = 40f;
+		}
+		
+		@Override
+		public String description(){
+			return "Generates power from lava.";
+		}
+	},
+	combustiongenerator = new LiquidPowerGenerator("combustiongenerator"){
+		{
+			formalName = "combustion generator";
+			//TODO
+			generateLiquid = Liquid.oil;
+			inputLiquid = 2f;
+			generatePower = 1f;
+			powerCapacity = 40f;
+		}
+		
+		@Override
+		public String description(){
+			return "Generates power from oil.";
+		}
+	},
 	nuclearReactor = new LiquidItemPowerGenerator("nuclearreactor"){
 		{
+			//TODO
+			formalName = "nuclear reactor";
 			width = 2;
 			height = 2;
 			generateLiquid = Liquid.water;
@@ -195,6 +228,11 @@ public class ProductionBlocks{
 			health = 340;
 			breaktime *= 2.2f;
 			powerCapacity = 100f;
+		}
+		
+		@Override
+		public String description(){
+			return "Generates power from uranium + water.";
 		}
 	};
 }

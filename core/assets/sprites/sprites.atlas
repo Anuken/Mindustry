@@ -60,6 +60,13 @@ blocks/coalgenerator
   orig: 8, 8
   offset: 0, 0
   index: -1
+blocks/combustiongenerator
+  rotate: false
+  xy: 230, 52
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
 blocks/coalpurifier
   rotate: false
   xy: 230, 42
@@ -613,51 +620,58 @@ blocks/stonewall
   orig: 8, 8
   offset: 0, 0
   index: -1
-blocks/titanium1
+blocks/thermalgenerator
   rotate: false
   xy: 427, 298
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-blocks/titanium2
+blocks/titanium1
   rotate: false
   xy: 437, 308
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-blocks/titanium3
+blocks/titanium2
   rotate: false
   xy: 447, 318
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-blocks/titaniumdrill
+blocks/titanium3
   rotate: false
   xy: 427, 288
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-blocks/titaniumpurifier
+blocks/titaniumdrill
   rotate: false
   xy: 437, 298
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-blocks/titaniumshieldwall
+blocks/titaniumpurifier
   rotate: false
   xy: 447, 308
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-blocks/titaniumwall
+blocks/titaniumshieldwall
   rotate: false
   xy: 437, 288
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/titaniumwall
+  rotate: false
+  xy: 447, 298
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -671,35 +685,35 @@ blocks/turret
   index: -1
 blocks/uranium1
   rotate: false
-  xy: 447, 288
+  xy: 427, 278
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/uranium2
   rotate: false
-  xy: 427, 278
+  xy: 437, 278
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/uranium3
   rotate: false
-  xy: 437, 278
+  xy: 447, 278
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/uraniumdrill
   rotate: false
-  xy: 447, 278
+  xy: 252, 173
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/water
   rotate: false
-  xy: 252, 173
+  xy: 262, 173
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -1360,7 +1374,7 @@ weapons/railgun
   index: -1
 weapons/triblaster
   rotate: false
-  xy: 447, 298
+  xy: 447, 288
   size: 8, 8
   orig: 8, 8
   offset: 0, 0

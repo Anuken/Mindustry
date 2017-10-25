@@ -48,6 +48,7 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 	public void update(Tile tile){
 		LiquidPowerEntity entity = tile.entity();
 		
+		//TODO don't generate when full of energy
 		if(entity.liquidAmount >= inputLiquid && Timers.get(tile, "consume", generateTime)){
 			entity.liquidAmount -= inputLiquid;
 			entity.power += generatePower;

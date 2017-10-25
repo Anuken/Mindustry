@@ -34,7 +34,8 @@ public class LiquidItemPowerGenerator extends LiquidPowerGenerator{
 	@Override
 	public void update(Tile tile){
 		LiquidPowerEntity entity = tile.entity();
-		
+
+		//TODO don't generate when full of energy
 		if(entity.liquidAmount >= inputLiquid && entity.hasItem(generateItem, itemInput) 
 				&& Timers.get(tile, "consume", generateTime)){
 			entity.liquidAmount -= inputLiquid;

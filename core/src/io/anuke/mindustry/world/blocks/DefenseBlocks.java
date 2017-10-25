@@ -61,6 +61,9 @@ public class DefenseBlocks{
 	},
 	
 	shieldgenerator = new ShieldBlock("shieldgenerator"){
-		//TODO
+		{
+			//TODO
+			formalName = "shield generator";
+		}
 	};
 }

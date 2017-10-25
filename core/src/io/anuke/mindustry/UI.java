@@ -579,7 +579,9 @@ public class UI extends SceneModule{
 				Draw.region(recipe.result.name() + "-icon") : Draw.region(recipe.result.name());
 		
 		header.addImage(region).size(8*5).padTop(4).units(Unit.dp);
-		header.add(recipe.result.formalName).padLeft(4).units(Unit.dp);
+		Label nameLabel = new Label(recipe.result.formalName);
+		nameLabel.setWrap(true);
+		header.add(nameLabel).padLeft(4).width(160f).units(Unit.dp);
 		
 		desctable.add().pad(2).units(Unit.dp);
 		

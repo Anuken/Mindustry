@@ -52,6 +52,8 @@ public enum Recipe{
 	omnidrill(production, ProductionBlocks.omnidrill, stack(Item.titanium, 20), stack(Item.dirium, 20)),
 	
 	coalgenerator(power, ProductionBlocks.coalgenerator, stack(Item.titanium, 10), stack(Item.dirium, 10)),
+	thermalgenerator(power, ProductionBlocks.thermalgenerator, stack(Item.titanium, 10), stack(Item.dirium, 10)),
+	combustiongenerator(power, ProductionBlocks.combustiongenerator, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	nuclearreactor(power, ProductionBlocks.nuclearReactor, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	shieldgenerator(power, DefenseBlocks.shieldgenerator, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	
