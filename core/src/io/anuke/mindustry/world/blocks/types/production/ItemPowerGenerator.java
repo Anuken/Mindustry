@@ -7,7 +7,6 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
 
 public class ItemPowerGenerator extends Generator{
 	public int itemCapacity = 20;
@@ -42,9 +41,8 @@ public class ItemPowerGenerator extends Generator{
 			entity.removeItem(generateItem, 1);
 		}
 		
-		if(Timers.get(tile, "power", powerTime)){
-			distributePower(tile);
-		}
+		distributePower(tile);
+		
 	}
 
 }

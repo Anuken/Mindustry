@@ -49,7 +49,8 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 		LiquidPowerEntity entity = tile.entity();
 		
 		//TODO don't generate when full of energy
-		if(entity.liquidAmount >= inputLiquid && Timers.get(tile, "consume", generateTime)){
+		if(entity.liquidAmount >= inputLiquid && entity.power + generatePower < powerCapacity 
+				&& Timers.get(tile, "consume", generateTime)){
 			entity.liquidAmount -= inputLiquid;
 			entity.power += generatePower;
 			
@@ -57,9 +58,8 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 			Effects.effect(generateEffect, tile.worldx() + offset.x, tile.worldy() + offset.y);
 		}
 		
-		if(Timers.get(tile, "consume", generateTime)){
-			distributePower(tile);
-		}
+		distributePower(tile);
+		
 	}
 	
 	@Override

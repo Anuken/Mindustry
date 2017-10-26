@@ -14,6 +14,7 @@ import io.anuke.ucore.util.Mathf;
 
 public class Shield extends Entity{
 	public boolean active;
+	private float uptime = 0f;
 	private final Tile tile;
 	//TODO
 	
@@ -29,6 +30,15 @@ public class Shield extends Entity{
 	
 	@Override
 	public void update(){
+		if(active){
+			uptime += Timers.delta() / 90f;
+		}else{
+			uptime -= Timers.delta() / 60f;
+			if(uptime < 0)
+				remove();
+		}
+		uptime = Mathf.clamp(uptime);
+		
 		if(!(tile.block() instanceof ShieldBlock)){
 			remove();
 			return;
@@ -36,7 +46,7 @@ public class Shield extends Entity{
 		
 		ShieldBlock block = (ShieldBlock)tile.block();
 		
-		Entities.getNearby(x, y, block.shieldRadius * 2 + 10, entity->{
+		Entities.getNearby(x, y, block.shieldRadius * 2*uptime + 10, entity->{
 			if(entity instanceof BulletEntity){
 				BulletEntity bullet = (BulletEntity)entity;
 				
@@ -58,6 +68,7 @@ public class Shield extends Entity{
 		ShieldBlock block = (ShieldBlock)tile.block();
 		
 		float rad = block.shieldRadius*2 + Mathf.sin(Timers.time(), 25f, 2f);
+		rad *= uptime;
 		
 		Graphics.surface("shield", false);
 		Draw.color(Color.ROYAL);
@@ -65,6 +76,10 @@ public class Shield extends Entity{
 		Draw.rect("circle2", x, y, rad, rad);
 		Draw.reset();
 		Graphics.surface();
+	}
+	
+	public void removeDelay(){
+		active = false;
 	}
 	
 	@Override
@@ -75,5 +90,7 @@ public class Shield extends Entity{
 	@Override
 	public void removed(){
 		active = false;
+		uptime = 0f;
 	}
+	
 }

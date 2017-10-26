@@ -7,10 +7,10 @@ import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Timers;
 
 public class ShieldBlock extends PowerBlock{
-	private static boolean debugShield = true;
+	private static boolean debugShield = false;
 	
 	public float shieldRadius = 40f;
-	public float powerDrain = 0.01f;
+	public float powerDrain = 0.005f;
 
 	public ShieldBlock(String name) {
 		super(name);
@@ -34,7 +34,7 @@ public class ShieldBlock extends PowerBlock{
 			entity.power -= powerDrain * Timers.delta();
 		}else{
 			if(entity.shield.active && !debugShield){
-				entity.shield.remove();
+				entity.shield.removeDelay();
 			}
 		}
 

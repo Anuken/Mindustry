@@ -11,6 +11,11 @@ public class PowerBooster extends Generator{
 	}
 	
 	@Override
+	public void update(Tile tile){
+		distributePower(tile);
+	}
+	
+	@Override
 	public float addPower(Tile tile, float amount){
 		PowerEntity entity = tile.entity();
 		

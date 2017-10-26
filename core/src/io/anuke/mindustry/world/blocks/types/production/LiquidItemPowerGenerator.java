@@ -37,6 +37,7 @@ public class LiquidItemPowerGenerator extends LiquidPowerGenerator{
 
 		//TODO don't generate when full of energy
 		if(entity.liquidAmount >= inputLiquid && entity.hasItem(generateItem, itemInput) 
+				&& entity.power + generatePower < powerCapacity 
 				&& Timers.get(tile, "consume", generateTime)){
 			entity.liquidAmount -= inputLiquid;
 			entity.power += generatePower;
@@ -45,9 +46,8 @@ public class LiquidItemPowerGenerator extends LiquidPowerGenerator{
 			Effects.effect(generateEffect, tile.worldx() + offset.x, tile.worldy() + offset.y);
 		}
 		
-		if(Timers.get(tile, "generate", generateTime)){
-			distributePower(tile);
-		}
+		distributePower(tile);
+		
 	}
 	
 	@Override
