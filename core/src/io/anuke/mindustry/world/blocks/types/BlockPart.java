@@ -65,8 +65,19 @@ public class BlockPart extends Block implements PowerAcceptor, LiquidAcceptor{
 		}
 	}
 	
+	@Override
+	public boolean acceptsPower(Tile tile){
+		Block block = linked(tile);
+		if(block instanceof PowerAcceptor){
+			return ((PowerAcceptor)block).acceptsPower(tile.getLinked());
+		}else{
+			return false;
+		}
+	}
+	
 	private Block linked(Tile tile){
 		return tile.getLinked().block();
 	}
+
 
 }

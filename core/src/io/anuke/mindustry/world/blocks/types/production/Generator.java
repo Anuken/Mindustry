@@ -51,7 +51,8 @@ public class Generator extends PowerBlock{
 
 					if(Vector2.dst(x, y, 0, 0) < powerRange){
 						Tile dest = World.tile(tile.x + x, tile.y + y);
-						if(dest != null && dest.block() instanceof PowerAcceptor){
+						if(dest != null && dest.block() instanceof PowerAcceptor && 
+								((PowerAcceptor)dest.block()).acceptsPower(dest)){
 							if(i == 1){
 								PowerAcceptor block = (PowerAcceptor) dest.block();
 
@@ -67,15 +68,15 @@ public class Generator extends PowerBlock{
 				}
 			}
 			
+			//TODO better distribution scheme
 			if(i == 0 && acceptors > 0){
-				flow = Mathf.clamp(powerSpeed / acceptors, 0f, p.power / acceptors);
+				flow = Mathf.clamp(p.power / acceptors, 0f, powerSpeed / acceptors);
 			}
 		}
 	}
 
-	//don't accept any power
 	@Override
-	public float addPower(Tile tile, float amount){
-		return amount;
+	public boolean acceptsPower(Tile tile){
+		return false;
 	}
 }

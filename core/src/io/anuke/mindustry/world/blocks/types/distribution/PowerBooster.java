@@ -16,11 +16,9 @@ public class PowerBooster extends Generator{
 	}
 	
 	@Override
-	public float addPower(Tile tile, float amount){
+	public boolean acceptsPower(Tile tile){
 		PowerEntity entity = tile.entity();
 		
-		float canAccept = Math.min(powerCapacity - entity.power, amount);
-		entity.power += canAccept;
-		return canAccept;
+		return entity.power + 0.001f <= powerCapacity;
 	}
 }

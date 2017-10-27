@@ -305,7 +305,8 @@ public class Renderer extends RendererModule{
 			x = tilex*tilesize;
 			y = tiley*tilesize;
 
-			boolean valid = World.validPlace(tilex, tiley, player.recipe.result);
+			boolean valid = World.validPlace(tilex, tiley, player.recipe.result) && (android ||
+					Input.cursorNear());
 			
 			Vector2 offset = player.recipe.result.getPlaceOffset();
 			

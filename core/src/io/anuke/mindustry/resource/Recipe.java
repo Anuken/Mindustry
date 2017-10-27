@@ -17,6 +17,8 @@ public enum Recipe{
 	healturret(defense, DefenseBlocks.repairturret, stack(Item.iron, 30)),
 	megahealturret(defense, DefenseBlocks.megarepairturret, stack(Item.iron, 20), stack(Item.steel, 30)),
 	titaniumshieldwall(defense, DefenseBlocks.titaniumshieldwall, stack(Item.titanium, 2)),
+	shieldgenerator(defense, DefenseBlocks.shieldgenerator, stack(Item.titanium, 10), stack(Item.dirium, 10)),
+	
 	
 	conveyor(distribution, DistributionBlocks.conveyor, stack(Item.stone, 1)),
 	steelconveyor(distribution, DistributionBlocks.steelconveyor, stack(Item.steel, 1)),
@@ -55,7 +57,7 @@ public enum Recipe{
 	thermalgenerator(power, ProductionBlocks.thermalgenerator, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	combustiongenerator(power, ProductionBlocks.combustiongenerator, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	nuclearreactor(power, ProductionBlocks.nuclearReactor, stack(Item.titanium, 10), stack(Item.dirium, 10)),
-	shieldgenerator(power, DefenseBlocks.shieldgenerator, stack(Item.titanium, 10), stack(Item.dirium, 10)),
+	powerbooster(power, DistributionBlocks.powerbooster, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	
 	pump(production, ProductionBlocks.pump, stack(Item.steel, 10));
 	

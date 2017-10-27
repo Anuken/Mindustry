@@ -14,6 +14,7 @@ public class ShieldBlock extends PowerBlock{
 
 	public ShieldBlock(String name) {
 		super(name);
+		voltage = powerDrain;
 	}
 
 	@Override
@@ -27,7 +28,7 @@ public class ShieldBlock extends PowerBlock{
 		}
 
 		if(entity.power > powerDrain * Timers.delta()){
-			if(!entity.shield.active){
+			if(!entity.shield.active && entity.power > powerDrain * Timers.delta() * 10f){
 				entity.shield.add();
 			}
 
