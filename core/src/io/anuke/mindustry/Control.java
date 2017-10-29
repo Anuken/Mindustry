@@ -73,7 +73,7 @@ public class Control extends Module{
 		
 		Sounds.setFalloff(9000f);
 		
-		Musics.load("1.mp3", "2.mp3", "3.mp3");
+		Musics.load("1.mp3", "2.mp3", "3.mp3", "4.mp3");
 		
 		World.loadMaps();
 		
