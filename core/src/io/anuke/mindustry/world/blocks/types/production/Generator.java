@@ -14,7 +14,7 @@ import io.anuke.ucore.util.Mathf;
 public class Generator extends PowerBlock{
 	public static final int powerTime = 2;
 
-	public int powerRange = 6;
+	public int powerRange = 4;
 	public float powerSpeed = 0.2f;
 
 	public Generator(String name) {

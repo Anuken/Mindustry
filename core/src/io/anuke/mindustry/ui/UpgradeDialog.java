@@ -16,6 +16,7 @@ import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Table;
 
 public class UpgradeDialog extends Dialog{
+	boolean wasPaused = false;
 
 	public UpgradeDialog() {
 		super("Upgrades");
@@ -26,9 +27,11 @@ public class UpgradeDialog extends Dialog{
 		addCloseButton();
 		
 		hidden(()->{
-			GameState.set(State.playing);
+			if(!wasPaused)
+				GameState.set(State.playing);
 		});
 		shown(()->{
+			wasPaused = GameState.is(State.paused);
 			GameState.set(State.paused);
 		});
 		
@@ -37,7 +40,6 @@ public class UpgradeDialog extends Dialog{
 		}).size(96, 50).pad(5);
 		
 		Table weptab = new Table();
-		//weptab.background("button");
 		weptab.pad(20);
 		
 		int i = 0;

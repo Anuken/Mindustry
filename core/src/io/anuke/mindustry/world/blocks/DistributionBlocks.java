@@ -46,5 +46,10 @@ public class DistributionBlocks{
 		{
 			formalName = "power booster";
 		}
+	},
+	powerlaser = new PowerLaser("powerlaser"){
+		{
+			formalName = "power laser";
+		}
 	};
 }
