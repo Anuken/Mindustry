@@ -445,9 +445,16 @@ blocks/powerlaser
   orig: 8, 8
   offset: 0, 0
   index: -1
-blocks/pump
+blocks/powerlaserrouter
   rotate: false
   xy: 499, 387
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/pump
+  rotate: false
+  xy: 389, 224
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -461,35 +468,35 @@ blocks/repairturret
   index: -1
 blocks/rock
   rotate: false
-  xy: 389, 214
+  xy: 389, 204
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/rock2
   rotate: false
-  xy: 389, 204
+  xy: 332, 197
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/rock2shadow
   rotate: false
-  xy: 332, 197
+  xy: 332, 187
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/rockshadow
   rotate: false
-  xy: 332, 187
+  xy: 342, 197
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/router
   rotate: false
-  xy: 342, 197
+  xy: 332, 177
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -503,7 +510,7 @@ blocks/shadow
   index: -1
 blocks/shieldgenerator
   rotate: false
-  xy: 332, 177
+  xy: 342, 187
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -517,21 +524,21 @@ blocks/shotgunturret
   index: -1
 blocks/shrub
   rotate: false
-  xy: 342, 187
+  xy: 342, 177
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/shrubshadow
   rotate: false
-  xy: 342, 177
+  xy: 352, 192
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/smelter
   rotate: false
-  xy: 352, 192
+  xy: 352, 182
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -545,21 +552,21 @@ blocks/sniperturret
   index: -1
 blocks/steelconveyor
   rotate: false
-  xy: 352, 182
+  xy: 362, 192
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/steelconveyormove
   rotate: false
-  xy: 362, 192
+  xy: 362, 182
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/steelwall
   rotate: false
-  xy: 362, 182
+  xy: 372, 192
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -573,49 +580,49 @@ blocks/stone
   index: -1
 blocks/stone1
   rotate: false
-  xy: 372, 192
+  xy: 372, 182
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/stone2
   rotate: false
-  xy: 372, 182
+  xy: 382, 192
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/stone3
   rotate: false
-  xy: 382, 192
+  xy: 382, 182
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/stoneblock
   rotate: false
-  xy: 382, 182
+  xy: 352, 172
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/stoneblock2
   rotate: false
-  xy: 352, 172
+  xy: 362, 172
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/stoneblock3
   rotate: false
-  xy: 362, 172
+  xy: 372, 172
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/stonedrill
   rotate: false
-  xy: 372, 172
+  xy: 382, 172
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -629,63 +636,63 @@ blocks/stoneedge
   index: -1
 blocks/stonewall
   rotate: false
-  xy: 382, 172
+  xy: 392, 194
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/thermalgenerator
   rotate: false
-  xy: 392, 194
+  xy: 392, 184
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/titanium1
   rotate: false
-  xy: 392, 184
+  xy: 392, 174
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/titanium2
   rotate: false
-  xy: 392, 174
+  xy: 332, 167
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/titanium3
   rotate: false
-  xy: 332, 167
+  xy: 342, 167
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/titaniumdrill
   rotate: false
-  xy: 342, 167
+  xy: 352, 162
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/titaniumpurifier
   rotate: false
-  xy: 352, 162
+  xy: 362, 162
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/titaniumshieldwall
   rotate: false
-  xy: 362, 162
+  xy: 372, 162
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/titaniumwall
   rotate: false
-  xy: 372, 162
+  xy: 382, 162
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -699,35 +706,35 @@ blocks/turret
   index: -1
 blocks/uranium1
   rotate: false
-  xy: 392, 164
+  xy: 389, 282
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/uranium2
   rotate: false
-  xy: 389, 282
+  xy: 389, 272
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/uranium3
   rotate: false
-  xy: 389, 272
+  xy: 389, 262
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/uraniumdrill
   rotate: false
-  xy: 389, 262
+  xy: 389, 252
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/water
   rotate: false
-  xy: 389, 252
+  xy: 391, 242
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -1381,14 +1388,14 @@ weapons/multigun
   index: -1
 weapons/railgun
   rotate: false
-  xy: 389, 224
+  xy: 389, 214
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 weapons/triblaster
   rotate: false
-  xy: 382, 162
+  xy: 392, 164
   size: 8, 8
   orig: 8, 8
   offset: 0, 0

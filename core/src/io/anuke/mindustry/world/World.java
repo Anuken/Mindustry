@@ -308,6 +308,7 @@ public class World{
 		
 		if(!tile.block().isMultiblock() && !tile.isLinked()){
 			tile.setBlock(Blocks.air);
+			Effects.effect("break", tile.worldx(), tile.worldy());
 		}else{
 			Tile target = tile.isLinked() ? tile.getLinked() : tile;
 			Array<Tile> removals = target.getLinkedTiles();

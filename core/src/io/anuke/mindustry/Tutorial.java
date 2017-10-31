@@ -33,24 +33,27 @@ public class Tutorial{
 	
 	public void buildUI(table table){
 		
+		//TODO maybe align it to the bottom?
 		table.atop();
 		
 		new table("pane"){{
 			atop();
-			get().pad(Unit.dp.inPixels(14));
+			get().pad(Unit.dp.inPixels(12));
+			
+			info = new label(()->stage.text).pad(10f).padBottom(5f).width(340f).units(Unit.dp).colspan(2).get();
+			info.setWrap(true);
+			
+			row();
 			
 			prev = new button("< Prev", ()->{
 				if(!prev.isDisabled())
 					move(false);
-			}).get();
-			
-			info = new label(()->stage.text).pad(10f).width(340f).units(Unit.dp).get();
-			info.setWrap(true);
+			}).left().get();
 			
 			next = new button("Next >", ()->{
 				if(!next.isDisabled())
 					move(true);
-			}).get();
+			}).right().get();
 			
 			
 		}}.end();

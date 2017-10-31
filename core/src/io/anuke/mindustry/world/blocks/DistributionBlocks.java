@@ -51,5 +51,10 @@ public class DistributionBlocks{
 		{
 			formalName = "power laser";
 		}
+	},
+	powerlaserrouter = new PowerLaserRouter("powerlaserrouter"){
+		{
+			formalName = "laser router";
+		}
 	};
 }

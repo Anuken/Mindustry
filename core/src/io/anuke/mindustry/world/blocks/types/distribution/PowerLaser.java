@@ -26,12 +26,32 @@ public class PowerLaser extends PowerBlock{
 	
 	@Override
 	public void drawOver(Tile tile){
-		Tile target = target(tile);
-		
 		PowerEntity entity = tile.entity();
 		
-		if(target != null && entity.power > powerAmount){
-			Angles.translation(tile.rotation * 90, 6f);
+		if(entity.power > powerAmount){
+			drawLaserTo(tile, tile.rotation);
+		}
+	}
+	
+	@Override
+	public void update(Tile tile){
+		PowerEntity entity = tile.entity();
+		Tile target = target(tile, tile.rotation);
+		
+		if(target == null) return;
+		
+		PowerAcceptor p = (PowerAcceptor)target.block();
+		if(p.acceptsPower(target) && entity.power >= powerAmount){
+			entity.power -= (powerAmount - p.addPower(target, powerAmount));
+		}
+	}
+	
+	protected void drawLaserTo(Tile tile, int rotation){
+		
+		Tile target = target(tile, rotation);
+		
+		if(target != null){
+			Angles.translation(rotation * 90, 6f);
 			
 			Draw.color(Color.GRAY, Color.WHITE, 0.902f + Mathf.sin(Timers.time(), 1.7f, 0.08f));
 			Draw.alpha(1f);
@@ -47,21 +67,11 @@ public class PowerLaser extends PowerBlock{
 		}
 	}
 	
-	@Override
-	public void update(Tile tile){
-		PowerEntity entity = tile.entity();
-		Tile target = target(tile);
-		
-		if(target == null) return;
-		
-		PowerAcceptor p = (PowerAcceptor)target.block();
-		if(p.acceptsPower(target) && entity.power >= powerAmount){
-			entity.power -= (powerAmount - p.addPower(target, powerAmount));
-		}
-	}
-	
-	private Tile target(Tile tile){
-		GridPoint2 point = Geometry.getD4Points()[tile.rotation];
+	protected Tile target(Tile tile, int rotation){
+		if(rotation < 0)
+			rotation += 4;
+		rotation %= 4;
+		GridPoint2 point = Geometry.getD4Points()[rotation];
 		
 		int i = 0;
 		

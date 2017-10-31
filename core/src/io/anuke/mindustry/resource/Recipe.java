@@ -59,6 +59,7 @@ public enum Recipe{
 	nuclearreactor(power, ProductionBlocks.nuclearReactor, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	powerbooster(power, DistributionBlocks.powerbooster, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	powerlaser(power, DistributionBlocks.powerlaser, stack(Item.titanium, 10), stack(Item.dirium, 10)),
+	powerlaserrouter(power, DistributionBlocks.powerlaserrouter, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	
 	pump(production, ProductionBlocks.pump, stack(Item.steel, 10));
 	

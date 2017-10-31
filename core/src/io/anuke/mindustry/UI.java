@@ -345,6 +345,12 @@ public class UI extends SceneModule{
 			
 		}}.end();
 		
+		new table(){{
+			control.tutorial.buildUI(this);
+			
+			visible(()->control.tutorial.active());
+		}}.end();
+		
 		//paused table
 		new table(){{
 			visible(()->GameState.is(State.paused));
@@ -376,12 +382,6 @@ public class UI extends SceneModule{
 			}};
 
 			get().setVisible(play);
-		}}.end();
-		
-		new table(){{
-			control.tutorial.buildUI(this);
-			
-			visible(()->control.tutorial.active());
 		}}.end();
 	
 		//menu table
