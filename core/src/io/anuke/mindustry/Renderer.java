@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.Input;
 import io.anuke.mindustry.input.PlaceMode;
@@ -32,6 +33,7 @@ import io.anuke.ucore.graphics.Caches;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
+import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
@@ -139,6 +141,8 @@ public class Renderer extends RendererModule{
 		drawShield();
 		
 		renderPixelOverlay();
+		
+		drawEnemyMarkers();
 	}
 
 	@Override
@@ -148,6 +152,27 @@ public class Renderer extends RendererModule{
 		AndroidInput.mousex = Gdx.graphics.getWidth() / 2;
 		AndroidInput.mousey = Gdx.graphics.getHeight() / 2;
 		camera.position.set(player.x, player.y, 0);
+	}
+	
+	void drawEnemyMarkers(){
+		Draw.color(Color.RED);
+		Draw.alpha(0.6f);
+		for(Entity entity : Entities.all()){
+			if(entity instanceof Enemy){
+				Enemy enemy = (Enemy)entity;
+				
+				if(Tmp.r1.setSize(camera.viewportWidth, camera.viewportHeight)
+						.setCenter(camera.position.x, camera.position.y)
+						.overlaps(Tmp.r2.setSize(enemy.hitsize).setCenter(enemy.x + enemy.hitoffsetx, enemy.y + enemy.hitoffsety))){
+					continue;
+				}
+				
+				float angle = Angles.angle(camera.position.x, camera.position.y, enemy.x, enemy.y);
+				Angles.translation(angle, Unit.dp.inPixels(20f));
+				Draw.rect("enemyarrow", camera.position.x + Angles.x(), camera.position.y + Angles.y(), angle);
+			}
+		}
+		Draw.color();
 	}
 	
 	void drawShield(){

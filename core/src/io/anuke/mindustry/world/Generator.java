@@ -70,7 +70,7 @@ public class Generator{
 						floor = Blocks.titanium;
 					}
 					
-					if(Noise.nnoise(x + 99999, y + 99999, 7, 1) > 0.257){
+					if(Noise.nnoise(x + 99999, y + 99999, 7, 1) > 0.258){
 						floor = Blocks.uranium;
 					}
 				}
