@@ -58,7 +58,7 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 			Effects.effect(generateEffect, tile.worldx() + offset.x, tile.worldy() + offset.y);
 		}
 		
-		distributePower(tile);
+		distributeLaserPower(tile);
 		
 	}
 	

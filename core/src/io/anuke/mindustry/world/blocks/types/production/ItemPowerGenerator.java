@@ -41,7 +41,7 @@ public class ItemPowerGenerator extends Generator{
 			entity.removeItem(generateItem, 1);
 		}
 		
-		distributePower(tile);
+		distributeLaserPower(tile);
 		
 	}
 

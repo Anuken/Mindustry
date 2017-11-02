@@ -12,8 +12,25 @@ import io.anuke.ucore.util.Mathf;
 
 public class EffectCreator{
 	static Color lightRed = Hue.mix(Color.WHITE, Color.FIREBRICK, 0.1f);
+	static Color lightOrange = Color.valueOf("f68021");
 	
 	public static void create(){
+		
+		Effects.create("generatorexplosion", 28, e -> {
+			Angles.randLenVectors(e.id, 16, 10f + e.ifract()*8f, (x, y)->{
+				float size = e.fract()*12f + 1f;
+				Draw.color(Color.WHITE, lightOrange, e.ifract());
+				Draw.rect("circle", e.x + x, e.y + y, size, size);
+				Draw.reset();
+			});
+		});
+		
+		Effects.create("shockwave", 10f, e -> {
+			Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.ifract());
+			Draw.thick(e.fract()*2f + 0.2f);
+			Draw.circle(e.x, e.y, e.ifract()*28f);
+			Draw.reset();
+		});
 		
 		Effects.create("shellsmoke", 21, e -> {
 			Angles.randLenVectors(e.id, 8, 1f + e.ifract()*16f, (x, y)->{

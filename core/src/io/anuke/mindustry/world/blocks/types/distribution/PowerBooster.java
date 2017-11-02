@@ -5,15 +5,19 @@ import io.anuke.mindustry.world.blocks.types.production.Generator;
 
 public class PowerBooster extends Generator{
 	
-	//TODO
 	public PowerBooster(String name) {
 		super(name);
+		drawRadius = true;
+		explosive = false;
 	}
 	
 	@Override
 	public void update(Tile tile){
 		distributePower(tile);
 	}
+	
+	@Override
+	public void drawOver(Tile tile){}
 	
 	@Override
 	public boolean acceptsPower(Tile tile){

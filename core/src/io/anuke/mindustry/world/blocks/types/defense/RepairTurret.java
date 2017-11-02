@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
@@ -50,8 +51,10 @@ public class RepairTurret extends Turret{
 		TurretEntity entity = tile.entity();
 		
 		if(entity.blockTarget != null && Angles.angleDist(entity.angleTo(entity.blockTarget), entity.rotation) < 10){
+			Tile targetTile = entity.blockTarget.tile;
+			Vector2 offset = targetTile.block().getPlaceOffset();
 			float x = tile.worldx(), y = tile.worldy();
-			float x2 = entity.blockTarget.x, y2 = entity.blockTarget.y;
+			float x2 = entity.blockTarget.x + offset.x, y2 = entity.blockTarget.y + offset.y;
 
 			Draw.color(Hue.rgb(138, 244, 138, (MathUtils.sin(Timers.time()) + 1f) / 14f));
 			Draw.alpha(0.3f);

@@ -61,9 +61,13 @@ public class TileEntity extends Entity{
 	}
 	
 	public void collision(Bullet other){
-		Block block = tile.block();
+		damage(other.getDamage());
+	}
+	
+	public void damage(int damage){
+		if(dead) return;
 		
-		int amount = block.handleDamage(tile, other.getDamage());
+		int amount = tile.block().handleDamage(tile, damage);
 		health -= amount;
 		if(health <= 0) onDeath();
 	}

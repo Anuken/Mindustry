@@ -46,7 +46,7 @@ public class LiquidItemPowerGenerator extends LiquidPowerGenerator{
 			Effects.effect(generateEffect, tile.worldx() + offset.x, tile.worldy() + offset.y);
 		}
 		
-		distributePower(tile);
+		distributeLaserPower(tile);
 		
 	}
 	

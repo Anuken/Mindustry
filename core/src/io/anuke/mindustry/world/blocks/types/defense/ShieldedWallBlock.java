@@ -17,6 +17,7 @@ public class ShieldedWallBlock extends PowerBlock{
 
 	public ShieldedWallBlock(String name) {
 		super(name);
+		voltage = 0.00001f;
 	}
 	
 	@Override

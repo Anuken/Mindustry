@@ -2,11 +2,13 @@ package io.anuke.mindustry.world;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.util.Bits;
+import io.anuke.ucore.util.Mathf;
 
 
 public class Tile{
@@ -41,6 +43,21 @@ public class Tile{
 	
 	public <T extends TileEntity> T entity(){
 		return (T)entity;
+	}
+	
+	public void damageNearby(int rad, int amount, float falloff){
+		//TODO damage falloff?
+		for(int dx = -rad; dx <= rad; dx ++){
+			for(int dy = -rad; dy <= rad; dy ++){
+				float dst = Vector2.dst(dx, dy, 0, 0);
+				if(dst > rad || (dx == 0 && dy == 0)) continue;
+				
+				Tile other = World.tile(x + dx, y + dy);
+				if(other.entity != null){
+					other.entity.damage((int)(amount * Mathf.lerp(1f-dst/rad, 1f, falloff)));
+				}
+			}
+		}
 	}
 	
 	public int id(){

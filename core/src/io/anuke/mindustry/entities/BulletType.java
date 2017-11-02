@@ -164,7 +164,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 		}
 	},
 	shot = new BulletType(2.4f, 2){
-		{lifetime=40;}
+		{lifetime = 40;}
 		public void draw(Bullet b){
 			Draw.color(Color.GOLD);
 			Draw.rect("bullet", b.x, b.y, b.angle());
