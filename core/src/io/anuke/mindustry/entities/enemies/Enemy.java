@@ -43,7 +43,8 @@ public class Enemy extends DestructibleEntity{
 	public Enemy(int spawn){
 		this.spawn = spawn;
 		
-		hitsize = 5;
+		hitbox.setSize(5f);
+		hitboxTile.setSize(4f);
 		
 		maxhealth = 60;
 		heal();
@@ -57,7 +58,7 @@ public class Enemy extends DestructibleEntity{
 		Vector2 vec  = Pathfind.find(this);
 		vec.sub(x, y).setLength(speed);
 		
-		move(vec.x*Timers.delta(), vec.y*Timers.delta(), Vars.tilesize-4);
+		move(vec.x*Timers.delta(), vec.y*Timers.delta());
 		
 		if(Timers.get(this, 15)){
 			target = World.findTileTarget(x, y, null, range, false);

@@ -11,9 +11,9 @@ public class RapidEnemy extends Enemy{
 		bullet = BulletType.smallfast;
 		rotatespeed = 30f;
 		maxhealth = 260;
-		hitsize = 8;
 		speed = 0.27f;
 		heal();
+		hitbox.setSize(8f);
 		
 		range = 70;
 	}

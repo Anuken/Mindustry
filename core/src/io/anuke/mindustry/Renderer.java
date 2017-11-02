@@ -163,7 +163,7 @@ public class Renderer extends RendererModule{
 				
 				if(Tmp.r1.setSize(camera.viewportWidth, camera.viewportHeight)
 						.setCenter(camera.position.x, camera.position.y)
-						.overlaps(Tmp.r2.setSize(enemy.hitsize).setCenter(enemy.x + enemy.hitoffsetx, enemy.y + enemy.hitoffsety))){
+						.overlaps(enemy.hitbox.getRect(enemy.x, enemy.y))){
 					continue;
 				}
 				

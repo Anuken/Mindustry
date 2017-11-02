@@ -247,10 +247,9 @@ public class World{
 		Tmp.r2.setCenter(offset.x + x * Vars.tilesize, offset.y + y * Vars.tilesize);
 
 		for(SolidEntity e : Entities.getNearby(x * tilesize, y * tilesize, tilesize * 2f)){
-			Rectangle.tmp.setSize(e.hitsize);
-			Rectangle.tmp.setCenter(e.x, e.y);
+			Rectangle rect = e.hitbox.getRect(e.x, e.y);
 
-			if(Tmp.r2.overlaps(Rectangle.tmp)){
+			if(Tmp.r2.overlaps(rect)){
 				return false;
 			}
 		}

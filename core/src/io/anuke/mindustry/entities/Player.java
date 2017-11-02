@@ -25,7 +25,8 @@ public class Player extends DestructibleEntity{
 	private float speed = 1f;
 	
 	public Player(){
-		hitsize = 5;
+		hitbox.setSize(5);
+		hitboxTile.setSize(4f);
 		
 		maxhealth = 100;
 		heal();
@@ -83,7 +84,7 @@ public class Player extends DestructibleEntity{
 		
 		vector.limit(speed);
 		
-		move(vector.x*Timers.delta(), vector.y*Timers.delta(), 4);
+		move(vector.x*Timers.delta(), vector.y*Timers.delta());
 		
 		if(!shooting){
 			direction.add(vector.scl(Timers.delta()));
