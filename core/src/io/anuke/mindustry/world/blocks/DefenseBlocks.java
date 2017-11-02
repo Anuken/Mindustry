@@ -37,6 +37,16 @@ public class DefenseBlocks{
 		health = 270;
 		formalName = "composite wall";
 	}},
+	titaniumwalllarge = new Wall("titaniumwall-large"){{
+		health = 150*4;
+		formalName = "large titanium wall";
+		width = height = 2;
+	}},
+	diriumwalllarge = new Wall("duriumwall-large"){{
+		health = 190*4;
+		formalName = "large dirium wall";
+		width = height = 2;
+	}},
 	titaniumshieldwall = new ShieldedWallBlock("titaniumshieldwall"){{
 		health = 150;
 		formalName = "shielded wall";
