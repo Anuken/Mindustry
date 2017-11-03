@@ -131,15 +131,15 @@ public class Tile{
 	}
 	
 	/**Returns the list of all tiles linked to this multiblock, or an empty array if it's not a multiblock.
-	 * This array contains only linked tiles, not this tile itself.*/
+	 * This array contains all linked tiles, including this tile itself.*/
 	public Array<Tile> getLinkedTiles(){
 		tmpArray.clear();
-		if(!(block.width == 1 && block.health == 1)){
+		if(!(block.width == 1 && block.height == 1)){
 			int offsetx = -(block.width-1)/2;
 			int offsety = -(block.height-1)/2;
 			for(int dx = 0; dx < block.width; dx ++){
 				for(int dy = 0; dy < block.height; dy ++){
-					Tile other = World.tile(x + dx - offsetx, y + dy - offsety);
+					Tile other = World.tile(x + dx + offsetx, y + dy + offsety);
 					tmpArray.add(other);
 				}
 			}

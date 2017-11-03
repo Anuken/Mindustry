@@ -220,14 +220,14 @@ public class ProductionBlocks{
 		{
 			//TODO
 			formalName = "nuclear reactor";
-			width = 2;
-			height = 2;
+			width = 3;
+			height = 3;
 			generateLiquid = Liquid.water;
 			generateItem = Item.uranium;
 			itemCapacity = 60;
 			itemInput = 6;
 			inputLiquid = 2f;
-			health = 340;
+			health = 500;
 			breaktime *= 2.2f;
 			powerCapacity = 100f;
 		}

@@ -281,7 +281,7 @@ public class World{
 			int offsety = -(type.height-1)/2;
 			for(int dx = 0; dx < type.width; dx ++){
 				for(int dy = 0; dy < type.height; dy ++){
-					Tile other = tile(x + dx - offsetx, y + dy - offsety);
+					Tile other = tile(x + dx + offsetx, y + dy + offsety);
 					if(other == null || other.block() != Blocks.air){
 						return false;
 					}
@@ -311,7 +311,6 @@ public class World{
 		}else{
 			Tile target = tile.isLinked() ? tile.getLinked() : tile;
 			Array<Tile> removals = target.getLinkedTiles();
-			removals.add(tile);
 			for(Tile toremove : removals){
 				//note that setting a new block automatically unlinks it
 				toremove.setBlock(Blocks.air);
