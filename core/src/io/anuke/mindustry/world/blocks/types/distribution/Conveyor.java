@@ -27,8 +27,9 @@ public class Conveyor extends Block{
 		update = true;
 	}
 	
+	@Override
 	public boolean canReplace(Block other){
-		return other instanceof Conveyor;
+		return other instanceof Conveyor || other instanceof Router || other instanceof Junction;
 	}
 	
 	@Override

@@ -20,6 +20,11 @@ public class Router extends Block{
 	}
 	
 	@Override
+	public boolean canReplace(Block other){
+		return other instanceof Junction || other instanceof Conveyor;
+	}
+	
+	@Override
 	public void update(Tile tile){
 		if(Timers.get(tile, 2) && tile.entity.totalItems() > 0){
 			if(lastmap.get(tile, (byte)-1) != tile.rotation)

@@ -44,6 +44,11 @@ public class Turret extends Block{
 	}
 	
 	@Override
+	public boolean canReplace(Block other){
+		return other instanceof Turret;
+	}
+	
+	@Override
 	public void draw(Tile tile){
 		Vector2 offset = getPlaceOffset();
 		Draw.rect("block", tile.worldx() + offset.x, tile.worldy() + offset.y);

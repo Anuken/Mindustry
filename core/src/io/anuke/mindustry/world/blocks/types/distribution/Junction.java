@@ -14,6 +14,11 @@ public class Junction extends Block{
 	}
 	
 	@Override
+	public boolean canReplace(Block other){
+		return other instanceof Conveyor || other instanceof Router;
+	}
+	
+	@Override
 	public void handleItem(Tile tile, Item item, Tile source){
 		int dir = source.relativeTo(tile.x, tile.y);
 		dir = (dir+4)%4;
