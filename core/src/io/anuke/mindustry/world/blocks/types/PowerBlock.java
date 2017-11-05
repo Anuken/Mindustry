@@ -71,6 +71,12 @@ public abstract class PowerBlock extends Block implements PowerAcceptor{
 	}
 	
 	@Override
+	public void setPower(Tile tile, float power){
+		PowerEntity entity = tile.entity();
+		entity.power = power;
+	}
+	
+	@Override
 	public TileEntity getEntity(){
 		return new PowerEntity();
 	}

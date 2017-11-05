@@ -14,6 +14,8 @@ public class MortarEnemy extends Enemy{
 		turretrotatespeed = 0.15f;
 		rotatespeed = 7f;
 		range = 120f;
+		
+		heal();
 	}
 
 }

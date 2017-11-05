@@ -72,16 +72,24 @@ public class Enemy extends DestructibleEntity{
 		}
 		
 		if(target != null && bullet != null){
-			if(Timers.get(this, "reload", reload*Vars.multiplier)){
-				shoot();
-				Effects.sound(shootsound, this);
-			}
+			updateShooting();
 		}
 	}
 	
-	void shoot(){
-		vector.set(length, 0).rotate(direction.angle());
-		Bullet out = new Bullet(bullet, this, x+vector.x, y+vector.y, direction.angle()).add();
+	void updateShooting(){
+		if(Timers.get(this, "reload", reload*Vars.multiplier)){
+			shoot(bullet);
+			Effects.sound(shootsound, this);
+		}
+	}
+	
+	void shoot(BulletType bullet){
+		shoot(bullet, 0);
+	}
+	
+	void shoot(BulletType bullet, float rotation){
+		vector.set(length, 0).rotate(direction.angle() + rotation);
+		Bullet out = new Bullet(bullet, this, x+vector.x, y+vector.y, direction.angle() + rotation).add();
 		out.damage = (int)(damage*Vars.multiplier);
 	}
 	

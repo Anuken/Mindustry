@@ -79,5 +79,14 @@ public class BlockPart extends Block implements PowerAcceptor, LiquidAcceptor{
 		return tile.getLinked().block();
 	}
 
+	@Override
+	public void setPower(Tile tile, float power){
+		Block block = linked(tile);
+		
+		if(block instanceof PowerAcceptor){
+			((PowerAcceptor)block).setPower(tile.getLinked(), power);
+		}
+	}
+
 
 }

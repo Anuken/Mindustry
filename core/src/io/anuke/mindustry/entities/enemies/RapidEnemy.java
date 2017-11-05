@@ -8,7 +8,7 @@ public class RapidEnemy extends Enemy{
 		super(spawn);
 		
 		reload = 8;
-		bullet = BulletType.smallfast;
+		bullet = BulletType.purple;
 		rotatespeed = 30f;
 		maxhealth = 260;
 		speed = 0.27f;

@@ -32,6 +32,22 @@ public class EffectCreator{
 			Draw.reset();
 		});
 		
+		Effects.create("empshockwave", 7f, e -> {
+			Draw.color(Color.WHITE, Color.SKY, e.ifract());
+			Draw.thick(e.fract()*2f);
+			Draw.circle(e.x, e.y, e.ifract()*40f);
+			Draw.reset();
+		});
+		
+		Effects.create("empspark", 13, e -> {
+			Angles.randLenVectors(e.id, 7, 1f + e.ifract()*12f, (x, y)->{
+				float len = 1f+e.fract()*6f;
+				Draw.color(Color.SKY);
+				Draw.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), len);
+				Draw.reset();
+			});
+		});
+		
 		Effects.create("shellsmoke", 21, e -> {
 			Angles.randLenVectors(e.id, 8, 1f + e.ifract()*16f, (x, y)->{
 				float size = 2f+e.fract()*5f;

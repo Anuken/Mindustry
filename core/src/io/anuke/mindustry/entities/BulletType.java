@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.graphics.Color;
 
+import io.anuke.mindustry.entities.effect.EMP;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
@@ -43,6 +44,39 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			if(Timers.get(b, "smoke", 4)){
 				Effects.effect("railsmoke", b.x, b.y);
 			}
+		}
+	},
+	emp = new BulletType(1.6f, 5){ //TODO implement
+		{
+			lifetime = 50f;
+			hitsize = 6f;
+		}
+		
+		public void draw(Bullet b){
+			float rad = 6f + Mathf.sin(Timers.time(), 5f, 2f);
+			
+			Draw.color(Color.SKY);
+			Draw.circle(b.x, b.y, 4f);
+			Draw.rect("circle", b.x, b.y, rad, rad);
+			Draw.reset();
+		}
+		
+		public void update(Bullet b){
+			if(Timers.get(b, "smoke", 2)){
+				Effects.effect("empspark", b.x + Mathf.range(2), b.y + Mathf.range(2));
+			}
+		}
+		
+		public void despawned(Bullet b){
+			removed(b);
+		}
+		
+		public void removed(Bullet b){
+			Timers.run(5f, ()->{
+				new EMP(b.x, b.y).add();
+			});
+			Effects.effect("empshockwave", b);
+			Effects.shake(3f, 3f, b);
 		}
 	},
 	shell = new BulletType(1.1f, 85){
@@ -128,7 +162,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Draw.reset();
 		}
 	},
-	smallfast = new BulletType(1.6f, 2){
+	purple = new BulletType(1.6f, 2){
 		Color color = new Color(0x8b5ec9ff);
 		public void draw(Bullet b){
 			Draw.color(color);
