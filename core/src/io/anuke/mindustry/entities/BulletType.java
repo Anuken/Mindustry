@@ -46,7 +46,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			}
 		}
 	},
-	emp = new BulletType(1.6f, 5){ //TODO implement
+	emp = new BulletType(1.6f, 6){
 		{
 			lifetime = 50f;
 			hitsize = 6f;
@@ -73,7 +73,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 		
 		public void removed(Bullet b){
 			Timers.run(5f, ()->{
-				new EMP(b.x, b.y).add();
+				new EMP(b.x, b.y, b.damage).add();
 			});
 			Effects.effect("empshockwave", b);
 			Effects.shake(3f, 3f, b);

@@ -22,7 +22,8 @@ public class EMP extends TimedEntity{
 	int damage = 6;
 	Array<Tile> targets = new Array<>(maxTargets);
 	
-	public EMP(float x, float y){
+	public EMP(float x, float y, int damage){
+		this.damage = damage;
 		set(x, y);
 		
 		lifetime = 30f;
@@ -73,11 +74,10 @@ public class EMP extends TimedEntity{
 			Draw.rect("circle", target.worldx(), target.worldy(), rad, rad);
 		}
 		
-		for(int i = 0; i < 7; i ++){
+		for(int i = 0; i < 14 - targets.size; i ++){
 			Angles.translation(Mathf.randomSeed(i + id*77)*360f, radius * Vars.tilesize);
 			drawLine(x + Angles.x(), y + Angles.y());
 		}
-		
 	
 		Draw.thick(fract()*2f);
 		Draw.circle(x, y, radius * Vars.tilesize);

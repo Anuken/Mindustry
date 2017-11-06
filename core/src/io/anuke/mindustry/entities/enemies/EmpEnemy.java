@@ -7,11 +7,12 @@ public class EmpEnemy extends Enemy{
 	public EmpEnemy(int spawn) {
 		super(spawn);
 		
-		speed = 0.4f;
-		reload = 50;
+		speed = 0.27f;
+		reload = 70;
 		maxhealth = 210;
 		range = 80f;
 		bullet = BulletType.emp;
+		turretrotatespeed = 0.1f;
 		
 		heal();
 	}

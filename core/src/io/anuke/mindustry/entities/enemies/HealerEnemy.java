@@ -17,12 +17,13 @@ public class HealerEnemy extends Enemy{
 	public HealerEnemy(int spawn) {
 		super(spawn);
 		
-		speed = 0.4f;
+		speed = 0.2f;
 		reload = 30;
 		maxhealth = 210;
-		range = 80f;
+		range = 90f;
 		bullet = BulletType.shot;
 		range = 30f;
+		alwaysRotate = false;
 		
 		heal();
 	}
@@ -34,8 +35,8 @@ public class HealerEnemy extends Enemy{
 		
 		move(vec.x*Timers.delta(), vec.y*Timers.delta());
 		
-		if(Timers.get(this, 15)){
-			target = Entities.getClosest(x, y, range, e->e instanceof Enemy);
+		if(Timers.get(this, "target", 15)){
+			target = Entities.getClosest(x, y, range, e->e instanceof Enemy && e != this && ((Enemy)e).healthfrac() < 1f);
 		}
 		
 		if(target != null){
@@ -57,12 +58,14 @@ public class HealerEnemy extends Enemy{
 		super.drawOver();
 		Enemy enemy = (Enemy)target;
 		
-		Angles.translation(this.angleTo(enemy), 3f);
+		if(enemy == null) return;
+		
+		Angles.translation(this.angleTo(enemy), 5f);
 		
 		if(enemy != null && enemy.health < enemy.maxhealth){
-			Draw.color(Hue.rgb(138, 244, 138, (MathUtils.sin(Timers.time()) + 1f) / 14f));
-			Draw.alpha(0.3f);
-			Draw.laser("laser", "laserend", x + Angles.x(), y + Angles.y(), enemy.x, enemy.y);
+			Draw.color(Hue.rgb(138, 244, 138, (MathUtils.sin(Timers.time()) + 1f) / 13f));
+			Draw.alpha(0.9f);
+			Draw.laser("laser", "laserend", x + Angles.x(), y + Angles.y(), enemy.x - Angles.x()/1.5f, enemy.y - Angles.y()/1.5f);
 			Draw.color();
 		}
 	}

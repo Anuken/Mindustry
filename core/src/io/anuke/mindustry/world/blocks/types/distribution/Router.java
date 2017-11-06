@@ -26,7 +26,7 @@ public class Router extends Block{
 	
 	@Override
 	public void update(Tile tile){
-		if(Timers.get(tile, 2) && tile.entity.totalItems() > 0){
+		if(Timers.get(tile, "dump", 2) && tile.entity.totalItems() > 0){
 			if(lastmap.get(tile, (byte)-1) != tile.rotation)
 				tryDump(tile, tile.rotation, null);
 			

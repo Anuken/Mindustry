@@ -19,7 +19,7 @@ public class Crafter extends Block{
 	@Override
 	public void update(Tile tile){
 		
-		if(Timers.get(tile, 20) && tile.entity.hasItem(result)){
+		if(Timers.get(tile, "dump", 20) && tile.entity.hasItem(result)){
 			tryDump(tile, -1, result);
 		}
 		
@@ -35,8 +35,6 @@ public class Crafter extends Block{
 		
 		offloadNear(tile, result);
 		Effects.effect("smelt", tile.entity);
-		
-		
 	}
 
 	@Override

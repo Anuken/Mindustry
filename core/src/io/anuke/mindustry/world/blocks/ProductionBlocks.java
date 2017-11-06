@@ -162,12 +162,12 @@ public class ProductionBlocks{
 		@Override
 		public void update(Tile tile){
 
-			if(tile.floor().drops != null && Timers.get(tile, 60 * time)){
+			if(tile.floor().drops != null && Timers.get(tile, "drill", 60 * time)){
 				offloadNear(tile, tile.floor().drops.item);
 				Effects.effect("sparkbig", tile.worldx(), tile.worldy());
 			}
 
-			if(Timers.get(tile.hashCode() + "dump", 30)){
+			if(Timers.get(tile, "dump", 30)){
 				tryDump(tile);
 			}
 		}

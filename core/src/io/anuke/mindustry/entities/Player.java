@@ -61,7 +61,7 @@ public class Player extends DestructibleEntity{
 		if(Vars.debug && Inputs.keyDown(Keys.SHIFT_LEFT))
 			speed *= 3f;
 		
-		if(health < maxhealth && Timers.get(this, 50))
+		if(health < maxhealth && Timers.get(this, "regen", 50))
 			health ++;
 		
 		vector.set(0, 0);

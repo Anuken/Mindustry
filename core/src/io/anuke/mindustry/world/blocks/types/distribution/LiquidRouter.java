@@ -26,7 +26,7 @@ public class LiquidRouter extends LiquidBlock{
 	public void update(Tile tile){
 		LiquidEntity entity = tile.entity();
 		
-		if(Timers.get(tile, 2) && entity.liquidAmount > 0){
+		if(Timers.get(tile, "dump", 2) && entity.liquidAmount > 0){
 			if(lastmap.get(tile, (byte)-1) != tile.rotation){
 				tryMoveLiquid(tile, tile.getNearby()[tile.rotation]);
 			}

@@ -408,7 +408,12 @@ public class Control extends Module{
 			}
 			
 			if(Inputs.keyUp(Keys.Y)){
-				new FastEnemy(0).set(player.x, player.y).add();
+				if(Inputs.keyDown(Keys.SHIFT_LEFT)){
+					new HealerEnemy(0).set(player.x, player.y).add();
+				}else{
+					new TitanEnemy(0).set(player.x, player.y).add();
+				}
+				
 			}
 		}
 		

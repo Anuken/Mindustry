@@ -26,6 +26,7 @@ public class Enemy extends DestructibleEntity{
 	protected float length = 4;
 	protected float rotatespeed = 7f;
 	protected float turretrotatespeed = 0.2f;
+	protected boolean alwaysRotate = false;
 	protected BulletType bullet = BulletType.small;
 	protected String shootsound = "enemyshoot";
 	protected int damage;
@@ -60,7 +61,7 @@ public class Enemy extends DestructibleEntity{
 		
 		move(vec.x*Timers.delta(), vec.y*Timers.delta());
 		
-		if(Timers.get(this, 15)){
+		if(Timers.get(this, "target", 15)){
 			target = World.findTileTarget(x, y, null, range, false);
 		
 			//no tile found
@@ -131,6 +132,7 @@ public class Enemy extends DestructibleEntity{
 		speed += 0.04f*tier + Mathf.range(0.1f);
 		reload /= Math.max(tier / 1.5f, 1f);
 		range += tier*5;
+		speed = Math.max(speed, 0.07f);
 		
 		heal();
 	}
@@ -165,8 +167,8 @@ public class Enemy extends DestructibleEntity{
 		xvelocity = (x - lastx) / Timers.delta();
 		yvelocity = (y - lasty) / Timers.delta();
 		
-		if(target == null){
-			direction.add(xvelocity * Timers.delta(), yvelocity * Timers.delta());
+		if(target == null || alwaysRotate){
+			direction.add(xvelocity * Timers.delta() / 3f, yvelocity * Timers.delta() / 3f);
 			direction.limit(speed*rotatespeed);
 		}else{
 			float angle = angleTo(target);
