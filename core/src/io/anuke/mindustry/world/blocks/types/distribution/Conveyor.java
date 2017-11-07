@@ -108,7 +108,7 @@ public class Conveyor extends Block{
 	}
 
 	@Override
-	public void handleItem(Tile tile, Item item, Tile source){
+	public void handleItem(Item item, Tile tile, Tile source){
 		int ch = Math.abs(source.relativeTo(tile.x, tile.y) - tile.rotation);
 		int ang = ((source.relativeTo(tile.x, tile.y) - tile.rotation));
 		

@@ -36,8 +36,8 @@ public class Router extends Block{
 	}
 	
 	@Override
-	public void handleItem(Tile tile, Item item, Tile source){
-		super.handleItem(tile, item, source);
+	public void handleItem(Item item, Tile tile, Tile source){
+		super.handleItem(item, tile, source);
 		lastmap.put(tile, (byte)tile.relativeTo(source.x, source.y));
 	}
 

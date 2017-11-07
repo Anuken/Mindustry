@@ -19,14 +19,13 @@ public class Junction extends Block{
 	}
 	
 	@Override
-	public void handleItem(Tile tile, Item item, Tile source){
+	public void handleItem(Item item, Tile tile, Tile source){
 		int dir = source.relativeTo(tile.x, tile.y);
-		dir = (dir+4)%4;
 		Tile to = tile.getNearby()[dir];
 		
 		Timers.run(15, ()->{
 			if(to == null || to.entity == null) return;
-			to.block().handleItem(to, item, tile);
+			to.block().handleItem(item, to, tile);
 		});
 		
 	}
@@ -34,10 +33,8 @@ public class Junction extends Block{
 	@Override
 	public boolean acceptItem(Item item, Tile dest, Tile source){
 		int dir = source.relativeTo(dest.x, dest.y);
-		dir = (dir+4)%4;
 		Tile to = dest.getNearby()[dir];
-		//uncomment the junction bit to disable giving items to other junctions
-		return to != null /*&& to.block() != junction*/ && to.block().acceptItem(item, to, dest);
+		return to != null && to.block().acceptItem(item, to, dest);
 	}
 	
 	@Override

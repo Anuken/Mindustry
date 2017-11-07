@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
@@ -18,9 +19,13 @@ import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.Map;
+import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.function.VisibilityProvider;
 import io.anuke.ucore.modules.SceneModule;
+import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Skin;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.*;
@@ -31,11 +36,12 @@ import io.anuke.ucore.scene.ui.layout.*;
 import io.anuke.ucore.util.Mathf;
 
 public class UI extends SceneModule{
-	Table itemtable, weapontable, tools, loadingtable, desctable, respawntable;
+	Table itemtable, weapontable, tools, loadingtable, desctable, respawntable, configtable;
 	SettingsDialog prefs;
 	KeybindDialog keys;
 	Dialog about, menu, restart, levels, upgrades, load, settingserror;
 	Tooltip tooltip;
+	Tile configTile;
 
 	VisibilityProvider play = () -> !GameState.is(State.menu);
 	VisibilityProvider nplay = () -> GameState.is(State.menu);
@@ -73,6 +79,7 @@ public class UI extends SceneModule{
 		Colors.put("turretinfo", Color.ORANGE);
 		Colors.put("missingitems", Color.SCARLET);
 		Colors.put("health", Color.YELLOW);
+		Colors.put("interact", Color.ORANGE);
 	}
 	
 	protected void loadSkin(){
@@ -120,6 +127,9 @@ public class UI extends SceneModule{
 
 	@Override
 	public void init(){
+		
+		configtable = new Table();
+		scene.add(configtable);
 		
 		settingserror = new Dialog("Warning", "dialog");
 		settingserror.content().add("[crimson]Failed to access local storage.\nSettings will not be saved.");
@@ -664,6 +674,32 @@ public class UI extends SceneModule{
 		weapontable.addIButton("icon-menu", 8*4, ()->{
 			upgrades.show();
 		});
+	}
+	
+	public void showConfig(Tile tile){
+		configTile = tile;
+		
+		configtable.setVisible(true);
+		configtable.clear();
+		((Configurable)tile.block()).buildTable(tile, configtable);
+		configtable.pack();
+		
+		configtable.update(()->{
+			Vector2 pos = Graphics.screen(tile.worldx(), tile.worldy());
+			configtable.setPosition(pos.x, pos.y, Align.center);
+			if(configTile == null || configTile.block() == Blocks.air){
+				hideConfig();
+			}
+		});
+	}
+	
+	public boolean hasConfigMouse(){
+		Element e = scene.hit(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), true);
+		return e != null && (e == configtable || e.isDescendantOf(configtable));
+	}
+	
+	public void hideConfig(){
+		configtable.setVisible(false);
 	}
 	
 	public void showError(String text){

@@ -162,8 +162,16 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Draw.reset();
 		}
 	},
+	smallSlow = new BulletType(1.2f, 1){
+		public void draw(Bullet b){
+			Draw.color("orange");
+			Draw.rect("bullet", b.x, b.y, b.angle());
+			Draw.reset();
+		}
+	},
 	purple = new BulletType(1.6f, 2){
 		Color color = new Color(0x8b5ec9ff);
+		
 		public void draw(Bullet b){
 			Draw.color(color);
 			Draw.rect("bullet", b.x, b.y, b.angle());

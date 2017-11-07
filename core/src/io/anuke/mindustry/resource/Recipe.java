@@ -21,7 +21,6 @@ public enum Recipe{
 	titaniumshieldwall(defense, DefenseBlocks.titaniumshieldwall, stack(Item.titanium, 2)),
 	shieldgenerator(defense, DefenseBlocks.shieldgenerator, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	
-	
 	conveyor(distribution, DistributionBlocks.conveyor, stack(Item.stone, 1)),
 	steelconveyor(distribution, DistributionBlocks.steelconveyor, stack(Item.steel, 1)),
 	poweredconveyor(distribution, DistributionBlocks.poweredconveyor, stack(Item.dirium, 1)),
@@ -30,6 +29,7 @@ public enum Recipe{
 	conduit(distribution, DistributionBlocks.conduit, stack(Item.steel, 1)),
 	liquidrouter(distribution, DistributionBlocks.liquidrouter, stack(Item.steel, 2)),
 	liquidjunction(distribution, DistributionBlocks.liquidjunction, stack(Item.steel, 2)),
+	sorter(distribution, DistributionBlocks.sorter, stack(Item.steel, 2)),
 	
 	turret(weapon, WeaponBlocks.turret, stack(Item.stone, 4)),
 	dturret(weapon, WeaponBlocks.doubleturret, stack(Item.stone, 7)),
@@ -62,6 +62,7 @@ public enum Recipe{
 	powerbooster(power, DistributionBlocks.powerbooster, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	powerlaser(power, DistributionBlocks.powerlaser, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	powerlaserrouter(power, DistributionBlocks.powerlaserrouter, stack(Item.titanium, 10), stack(Item.dirium, 10)),
+	teleporter(power, DistributionBlocks.teleporter, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	
 	pump(production, ProductionBlocks.pump, stack(Item.steel, 10));
 	

@@ -10,7 +10,7 @@ public class TankEnemy extends Enemy{
 	public TankEnemy(int spawn) {
 		super(spawn);
 		
-		maxhealth = 400;
+		maxhealth = 350;
 		speed = 0.2f;
 		reload = 90f;
 		bullet = BulletType.small;

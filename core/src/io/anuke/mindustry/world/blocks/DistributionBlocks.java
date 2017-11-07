@@ -56,5 +56,15 @@ public class DistributionBlocks{
 		{
 			formalName = "laser router";
 		}
+	},
+	teleporter = new Teleporter("teleporter"){
+		{
+			
+		}
+	},
+	sorter = new Sorter("sorter"){
+		{
+			
+		}
 	};
 }

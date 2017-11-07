@@ -97,7 +97,16 @@ public class Control extends Module{
 		player = new Player();
 		
 		spawns = Array.with(
-				
+			new EnemySpawn(TitanEnemy.class){{
+				after = 16;
+				spacing = 3;
+				scaling = 5;
+			}},
+			new EnemySpawn(HealerEnemy.class){{
+				scaling = 3;
+				spacing = 2;
+				after = 8;
+			}},
 			new EnemySpawn(Enemy.class){{
 				scaling = 3;
 				tierscaleback = 3;
@@ -121,6 +130,11 @@ public class Control extends Module{
 				spacing = 3;
 				scaling = 3;
 			}},
+			new EnemySpawn(EmpEnemy.class){{
+				after = 19;
+				spacing = 3;
+				scaling = 5;
+			}},
 			new EnemySpawn(TankEnemy.class){{
 				after = 4;
 				spacing = 2;
@@ -131,6 +145,7 @@ public class Control extends Module{
 				spacing = 3;
 				scaling = 5;
 			}}
+			
 			
 		);
 	
@@ -413,7 +428,6 @@ public class Control extends Module{
 				}else{
 					new TitanEnemy(0).set(player.x, player.y).add();
 				}
-				
 			}
 		}
 		

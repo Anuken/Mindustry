@@ -12,7 +12,7 @@ public class TitanEnemy extends Enemy{
 		
 		speed = 0.1f;
 		reload = 30;
-		maxhealth = 210;
+		maxhealth = 330;
 		range = 80f;
 		bullet = BulletType.small;
 		hitbox.setSize(7f);
@@ -26,23 +26,23 @@ public class TitanEnemy extends Enemy{
 	
 	@Override
 	void updateShooting(){
-		Timers.get(this, "salvo", 200);
+		Timers.get(this, "salvo", 250);
 		
 		if(Timers.getTime(this, "salvo") < 60){
-			if(Timers.get(this, "salvoShoot", 5)){
+			if(Timers.get(this, "salvoShoot", 6)){
 				shoot(BulletType.flame, Mathf.range(20f));
 			}
 		}
 		
-		if(Timers.get(this, "shotgun", 80)){
+		if(Timers.get(this, "shotgun", 90)){
 			Angles.shotgun(5, 10f, 0f, f->{
-				shoot(BulletType.small, f);
+				shoot(BulletType.smallSlow, f);
 			});
 		}
 		
 		if(Timers.get(this, "circle", 200)){
 			Angles.circle(8, f->{
-				shoot(BulletType.small, f);
+				shoot(BulletType.smallSlow, f);
 			});
 		}
 	}

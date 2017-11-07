@@ -69,7 +69,7 @@ public class Block{
 		return amount;
 	}
 
-	public void handleItem(Tile tile, Item item, Tile source){
+	public void handleItem(Item item, Tile tile, Tile source){
 		tile.entity.addItem(item, 1);
 	}
 	
@@ -107,7 +107,7 @@ public class Block{
 					//don't output to things facing this thing
 					&& !(other.block().rotate && (other.rotation + 2) % 4 == i)){
 				
-				other.block().handleItem(other, item, tile);
+				other.block().handleItem(item, other, tile);
 				tile.dump = (byte)((i+1)%4);
 				return;
 			}
@@ -115,7 +115,7 @@ public class Block{
 			i %= 4;
 		}
 		tile.dump = (byte)pdump;
-		handleItem(tile, item, tile);
+		handleItem(item, tile, tile);
 	}
 
 	/** Try dumping any item near the tile. */
@@ -142,7 +142,7 @@ public class Block{
 					if(tile.entity.hasItem(item) && other != null && other.block().acceptItem(item, other, tile) &&
 					//don't output to things facing this thing
 							!(other.block().rotate && (other.rotation + 2) % 4 == i)){
-						other.block().handleItem(other, item, tile);
+						other.block().handleItem(item, other, tile);
 						tile.entity.removeItem(item, 1);
 						tile.dump = (byte)((i+1)%4);
 						return true;
@@ -161,7 +161,7 @@ public class Block{
 	protected boolean offloadDir(Tile tile, Item item){
 		Tile other = tile.getNearby()[tile.rotation];
 		if(other != null && other.block().acceptItem(item, other, tile)){
-			other.block().handleItem(other, item, tile);
+			other.block().handleItem(item, other, tile);
 			//other.entity.addCovey(item, ch == 1 ? 0.5f : ch ==2 ? 1f : 0f);
 			return true;
 		}

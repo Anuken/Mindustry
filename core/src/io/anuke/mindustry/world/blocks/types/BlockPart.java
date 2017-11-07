@@ -21,8 +21,8 @@ public class BlockPart extends Block implements PowerAcceptor, LiquidAcceptor{
 	}
 	
 	@Override
-	public void handleItem(Tile tile, Item item, Tile source){
-		tile.getLinked().block().handleItem(tile.getLinked(), item, source);
+	public void handleItem(Item item, Tile tile, Tile source){
+		tile.getLinked().block().handleItem(item, tile.getLinked(), source);
 	}
 	
 	@Override

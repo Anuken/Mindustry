@@ -11,6 +11,7 @@ import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
+import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
@@ -45,6 +46,8 @@ public class Input{
 			}
 		}
 		
+		Tile cursor = World.tile(tilex(), tiley());
+		
 		if(Inputs.buttonUp(Buttons.LEFT) && player.recipe != null && 
 				World.validPlace(tilex(), tiley(), player.recipe.result) && !ui.hasMouse() && cursorNear() &&
 				Vars.control.hasItems(player.recipe.requirements)){
@@ -59,17 +62,25 @@ public class Input{
 				Cursors.restoreCursor();
 			}
 			
+		}else if(Inputs.buttonUp(Buttons.LEFT)){
+			if(cursor != null && cursor.block() instanceof Configurable){
+				Vars.ui.showConfig(cursor);
+			}else if(!Vars.ui.hasConfigMouse()){
+				Vars.ui.hideConfig();
+			}
+		}
+		
+		if(Inputs.buttonUp(Buttons.RIGHT)){
+			Vars.ui.hideConfig();
 		}
 
 		if(player.recipe != null && Inputs.buttonUp(Buttons.RIGHT)){
 			player.recipe = null;
 			Cursors.restoreCursor();
 		}
-		
-		Tile cursor = World.tile(tilex(), tiley());
 
 		//block breaking
-		if(cursor != null && Inputs.buttonDown(Buttons.RIGHT) && World.validBreak(tilex(), tiley())){
+		if(Inputs.buttonDown(Buttons.RIGHT) && cursor != null && World.validBreak(tilex(), tiley())){
 			Tile tile = cursor;
 			player.breaktime += Timers.delta();
 			if(player.breaktime >= tile.getBreakTime()){
