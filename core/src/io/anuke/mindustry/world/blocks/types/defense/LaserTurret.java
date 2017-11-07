@@ -12,7 +12,7 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
-public class LaserTurret extends Turret{
+public class LaserTurret extends PowerTurret{
 	protected Color beamColor = Color.WHITE.cpy();
 	protected String hiteffect = "laserhit";
 	protected int damage = 4;

@@ -39,7 +39,7 @@ public class TeslaOrb extends Entity{
 			if(Mathf.chance(stopchance)){
 				break;
 			}
-			Array<SolidEntity> enemies = Entities.getNearby(curx, cury, range);
+			Array<SolidEntity> enemies = Entities.getNearby(curx, cury, range*2f);
 			
 			for(SolidEntity entity : enemies){
 				if(entity instanceof Enemy && entity.distanceTo(curx, cury) < range 

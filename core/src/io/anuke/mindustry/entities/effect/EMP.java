@@ -15,7 +15,7 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
 public class EMP extends TimedEntity{
-	static final int maxTargets = 8;
+	static final int maxTargets = 10;
 	static Array<Tile> array = new Array<>();
 	
 	int radius = 4;
@@ -53,6 +53,7 @@ public class EMP extends TimedEntity{
 			
 			if(tile.block() instanceof PowerAcceptor){
 				PowerAcceptor p = (PowerAcceptor)tile.block();
+				tile.entity.damage(damage*2); //extra damage
 				p.setPower(tile, 0f);
 			}
 			

@@ -35,7 +35,7 @@ public class Turret extends Block{
 	protected int ammoMultiplier = 20;
 	protected int maxammo = 400;
 	protected float rotatespeed = 0.2f;
-	protected float shootCone = 2f;
+	protected float shootCone = 5f;
 
 	public Turret(String name) {
 		super(name);
@@ -112,7 +112,7 @@ public class Turret extends Block{
 		if(entity.target != null && entity.target.isDead())
 			entity.target = null;
 		
-		if(entity.ammo > 0){
+		if(hasAmmo(tile)){
 			
 			if(Timers.get(entity, "target", targetInterval)){
 				entity.target = (Enemy)Entities.getClosest(tile.worldx(), tile.worldy(), range, e->{
@@ -132,10 +132,21 @@ public class Turret extends Block{
 				if(Angles.angleDist(entity.rotation, targetRot) < shootCone && Timers.get(tile, "reload", reload)){
 					Effects.sound(shootsound, entity);
 					shoot(tile);
+					consumeAmmo(tile);
 					entity.ammo --;
 				}
 			}
 		}
+	}
+	
+	public boolean hasAmmo(Tile tile){
+		TurretEntity entity = tile.entity();
+		return entity.ammo > 0;
+	}
+	
+	public void consumeAmmo(Tile tile){
+		TurretEntity entity = tile.entity();
+		entity.ammo --;
 	}
 	
 	@Override

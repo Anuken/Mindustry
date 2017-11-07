@@ -12,13 +12,12 @@ import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.util.Angles;
 
 public class HealerEnemy extends Enemy{
-	int healTime = 14;
 
 	public HealerEnemy(int spawn) {
 		super(spawn);
 		
 		speed = 0.2f;
-		reload = 30;
+		reload = 14;
 		maxhealth = 130;
 		range = 90f;
 		bullet = BulletType.shot;
@@ -48,7 +47,7 @@ public class HealerEnemy extends Enemy{
 	void updateShooting(){
 		Enemy enemy = (Enemy)target;
 		
-		if(enemy.health < enemy.maxhealth && Timers.get(this, "heal", healTime)){
+		if(enemy.health < enemy.maxhealth && Timers.get(this, "heal", reload)){
 			enemy.health ++;
 		}
 	}

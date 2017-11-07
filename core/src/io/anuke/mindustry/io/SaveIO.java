@@ -93,7 +93,10 @@ public class SaveIO{
 		TankEnemy.class,
 		BlastEnemy.class,
 		MortarEnemy.class,
-		TestEnemy.class
+		TestEnemy.class,
+		HealerEnemy.class,
+		TitanEnemy.class,
+		EmpEnemy.class
 	);
 	
 	private static final ObjectMap<Class<? extends Enemy>, Byte> idEnemies = new ObjectMap<Class<? extends Enemy>, Byte>(){{

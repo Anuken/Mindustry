@@ -20,7 +20,7 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 	/**Power to generate per generateInput.*/
 	public float generatePower = 1f;
 	/**How much liquid to consume to get one generatePower.*/
-	public float inputLiquid = 1f;
+	public float inputLiquid = 5f;
 	public float liquidCapacity = 30f;
 	public String generateEffect = "generate";
 

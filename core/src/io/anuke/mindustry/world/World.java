@@ -362,6 +362,10 @@ public class World{
 			for(int ry = -rad; ry <= rad; ry ++){
 				Tile other = tile(rx+tilex, ry+tiley);
 				
+				if(other != null && other.getLinked() != null){
+					other = other.getLinked();
+				}
+				
 				if(other == null || other.entity == null ||(tile != null && other.entity == tile.entity)) continue;
 				
 				TileEntity e = other.entity;

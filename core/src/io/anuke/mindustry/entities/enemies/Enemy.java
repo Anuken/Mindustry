@@ -101,7 +101,7 @@ public class Enemy extends DestructibleEntity{
 		int cindex = -1;
 		float dst = Float.MAX_VALUE;
 		
-		
+		//find closest node index
 		for(Tile tile : path){
 			if(Vector2.dst(tile.worldx(), tile.worldy(), x, y) < dst){
 				dst = Vector2.dst(tile.worldx(), tile.worldy(), x, y);
@@ -111,11 +111,13 @@ public class Enemy extends DestructibleEntity{
 			index ++;
 		}
 		
+		//set node to that index
 		node = cindex;
 		
 		int x2 = path[node].x, y2 = path[node].y;
 		
-		if(World.raycast(Mathf.scl2(x, Vars.tilesize), Mathf.scl2(y, Vars.tilesize), x2, y2) != null){
+		//if the enemy can move to that node right now, set its position to it
+		if(World.raycast(Mathf.scl2(x, Vars.tilesize), Mathf.scl2(y, Vars.tilesize), x2, y2) == null){
 			Timers.run(Mathf.random(15f), ()->{
 				set(x2 * Vars.tilesize, y2 * Vars.tilesize);
 			});

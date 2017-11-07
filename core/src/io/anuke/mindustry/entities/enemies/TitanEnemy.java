@@ -12,7 +12,7 @@ public class TitanEnemy extends Enemy{
 		
 		speed = 0.1f;
 		reload = 30;
-		maxhealth = 330;
+		maxhealth = 400;
 		range = 80f;
 		bullet = BulletType.small;
 		hitbox.setSize(7f);

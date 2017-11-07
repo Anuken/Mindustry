@@ -9,6 +9,7 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.defense.LaserTurret;
+import io.anuke.mindustry.world.blocks.types.defense.PowerTurret;
 import io.anuke.mindustry.world.blocks.types.defense.Turret;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Angles;
@@ -118,21 +119,18 @@ public class WeaponBlocks{
 	},
 	
 	laserturret = new LaserTurret("laserturret"){
-		
-		
 		{
 			beamColor = Color.SKY;
 			formalName = "laser turret";
 			range = 60;
 			reload = 4f;
 			damage = 10;
-			ammo = Item.coal;
 			health = 110;
-			ammoMultiplier = 60;
+			powerUsed = 0.2f;
 		}
 	},
 	
-	teslaturret = new Turret("waveturret"){
+	teslaturret = new PowerTurret("waveturret"){
 		{
 			formalName = "tesla turret";
 			range = 70;
@@ -148,7 +146,7 @@ public class WeaponBlocks{
 			Angles.translation(entity.rotation, 4);
 
 			new TeslaOrb(tile.worldx() + Angles.x(), tile.worldy() + Angles.y(), 
-					70, (int)(9*Vars.multiplier)).add();
+					range, (int)(9*Vars.multiplier)).add();
 		}
 	},
 		

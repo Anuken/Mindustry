@@ -22,13 +22,12 @@ public class Generator extends PowerBlock{
 	public int laserRange = 6;
 	public int laserDirections = 4;
 	public int powerRange = 4;
-	public float powerSpeed = 0.03f;
+	public float powerSpeed = 0.06f;
 	public boolean explosive = true;
 	public boolean drawRadius = false;
 
 	public Generator(String name) {
 		super(name);
-		explosionEffect = "generatorexplosion";
 	}
 
 	@Override
@@ -41,7 +40,7 @@ public class Generator extends PowerBlock{
 
 			Timers.run(Mathf.random(8f + Mathf.random(6f)), () -> {
 				Effects.shake(6f, 8f, x, y);
-				Effects.effect(explosionEffect, x, y);
+				Effects.effect("generatorexplosion", x, y);
 				Effects.effect("shockwave", x, y);
 
 				Timers.run(12f + Mathf.random(20f), () -> {
@@ -128,9 +127,12 @@ public class Generator extends PowerBlock{
 
 		for(i = 1; i < laserRange; i++){
 			Tile other = World.tile(tile.x + i * point.x, tile.y + i * point.y);
-
+			
 			if(other != null && other.block() instanceof PowerAcceptor){
-				return other;
+				Tile linked = other.getLinked();
+				if(linked == null || linked instanceof PowerAcceptor){
+					return other;
+				}
 			}
 		}
 		return null;

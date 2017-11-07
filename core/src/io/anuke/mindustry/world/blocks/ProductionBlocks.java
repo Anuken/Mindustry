@@ -185,13 +185,18 @@ public class ProductionBlocks{
 			generateAmount = 4f;
 			powerCapacity = 40f;
 		}
+		
+		@Override
+		public String description(){
+			return "Generates power from coal.";
+		}
 	},
 	thermalgenerator = new LiquidPowerGenerator("thermalgenerator"){
 		{
 			formalName = "thermal generator";
 			//TODO
 			generateLiquid = Liquid.lava;
-			inputLiquid = 2f;
+			inputLiquid = 5f;
 			generatePower = 1f;
 			powerCapacity = 40f;
 		}
@@ -206,7 +211,7 @@ public class ProductionBlocks{
 			formalName = "combustion generator";
 			//TODO
 			generateLiquid = Liquid.oil;
-			inputLiquid = 2f;
+			inputLiquid = 8f;
 			generatePower = 1f;
 			powerCapacity = 40f;
 		}
