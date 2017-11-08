@@ -98,8 +98,8 @@ public class Control extends Module{
 		
 		spawns = Array.with(
 			new EnemySpawn(TitanEnemy.class){{
-				after = 16;
-				spacing = 3;
+				after = 3;
+				spacing = 2;
 				scaling = 5;
 			}},
 			new EnemySpawn(HealerEnemy.class){{

@@ -16,6 +16,7 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 public class MenuDialog extends Dialog{
 	private SaveDialog save = new SaveDialog();
 	private LoadDialog load = new LoadDialog();
+	public boolean wasPaused = false;
 
 	public MenuDialog(){
 		super("Paused", "dialog");
@@ -27,7 +28,13 @@ public class MenuDialog extends Dialog{
 		
 		content().addButton("Back", ()->{
 			hide();
-			GameState.set(State.playing);
+			if(!wasPaused)
+				GameState.set(State.playing);
+		});
+		
+		shown(()->{
+			wasPaused = GameState.is(State.paused);
+			GameState.set(State.paused);
 		});
 		
 		content().row();

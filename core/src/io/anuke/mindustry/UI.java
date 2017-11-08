@@ -39,9 +39,11 @@ public class UI extends SceneModule{
 	Table itemtable, weapontable, tools, loadingtable, desctable, respawntable, configtable;
 	SettingsDialog prefs;
 	KeybindDialog keys;
-	Dialog about, menu, restart, levels, upgrades, load, settingserror;
+	Dialog about, restart, levels, upgrades, load, settingserror;
+	MenuDialog menu;
 	Tooltip tooltip;
 	Tile configTile;
+	boolean wasPaused = false;
 
 	VisibilityProvider play = () -> !GameState.is(State.menu);
 	VisibilityProvider nplay = () -> GameState.is(State.menu);
@@ -162,12 +164,17 @@ public class UI extends SceneModule{
 		
 		prefs.hidden(()->{
 			if(!GameState.is(State.menu)){
-				GameState.set(State.playing);
+				if(!wasPaused)
+					GameState.set(State.playing);
 			}
 		});
 		
 		prefs.shown(()->{
 			if(!GameState.is(State.menu)){
+				wasPaused = GameState.is(State.paused);
+				if(menu.getScene() != null){
+					wasPaused = menu.wasPaused;
+				}
 				GameState.set(State.paused);
 				menu.hide();
 			}
@@ -325,12 +332,10 @@ public class UI extends SceneModule{
 				float isize = Unit.dp.inPixels(40);
 				
 				new imagebutton("icon-menu", isize, ()->{
-					GameState.set(State.paused);
 					showMenu();
 				});
 				
 				new imagebutton("icon-settings", isize, ()->{
-					GameState.set(State.paused);
 					prefs.show();
 				});
 
