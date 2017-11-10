@@ -9,17 +9,16 @@ import io.anuke.mindustry.GameState;
 import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.Vars;
 import io.anuke.ucore.scene.ui.ConfirmDialog;
-import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
-public class MenuDialog extends Dialog{
+public class MenuDialog extends FloatingDialog{
 	private SaveDialog save = new SaveDialog();
 	private LoadDialog load = new LoadDialog();
 	public boolean wasPaused = false;
 
 	public MenuDialog(){
-		super("Paused", "dialog");
+		super("Paused");
 		setup();
 	}
 	

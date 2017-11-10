@@ -8,25 +8,27 @@ import io.anuke.mindustry.GameState;
 import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.SaveIO;
-import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 //TODO unified save/load dialogs
-public class LoadDialog extends Dialog{
+public class LoadDialog extends FloatingDialog{
 
-	public LoadDialog() {
-		super("Load Game");
+	public LoadDialog(){
+		this("Load Game");
+	}
+	
+	public LoadDialog(String title) {
+		super(title);
 		setup();
+		
 
 		shown(() -> {
 			setup();
 		});
 
-		getButtonTable().addButton("Back", () -> {
-			hide();
-		}).pad(2).size(180, 44).units(Unit.dp);
+		addCloseButton();
 	}
 
 	private void setup(){
@@ -49,34 +51,37 @@ public class LoadDialog extends Dialog{
 			
 			button.add(info).padBottom(2).padTop(6);
 			button.getLabel().setFontScale(Unit.dp.inPixels(0.75f));
-			button.setDisabled(!SaveIO.isSaveValid(i));
-
-			button.clicked(() -> {
-				if(!button.isDisabled()){
-					Vars.ui.showLoading();
-
-					Timer.schedule(new Task(){
-						@Override
-						public void run(){
-							Vars.ui.hideLoading();
-							hide();
-							try{
-								SaveIO.loadFromSlot(slot);
-							}catch(Exception e){
-								e.printStackTrace();
-								Vars.ui.showError("[orange]Save file corrupted or invalid!");
-								return;
-							}
-							Vars.ui.hideMenu();
-							GameState.set(State.playing);
-						}
-					}, 3f/60f);
-				}
-			});
+			modifyButton(button, slot);
 
 			content().add(button).size(400, 80).units(Unit.dp).pad(2);
 			content().row();
 		}
 
+	}
+	
+	public void modifyButton(TextButton button, int slot){
+		button.setDisabled(!SaveIO.isSaveValid(slot));
+		button.clicked(() -> {
+			if(!button.isDisabled()){
+				Vars.ui.showLoading();
+
+				Timer.schedule(new Task(){
+					@Override
+					public void run(){
+						Vars.ui.hideLoading();
+						hide();
+						try{
+							SaveIO.loadFromSlot(slot);
+						}catch(Exception e){
+							e.printStackTrace();
+							Vars.ui.showError("[orange]Save file corrupted or invalid!");
+							return;
+						}
+						Vars.ui.hideMenu();
+						GameState.set(State.playing);
+					}
+				}, 3f/60f);
+			}
+		});
 	}
 }

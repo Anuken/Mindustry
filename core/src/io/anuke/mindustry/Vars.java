@@ -48,11 +48,11 @@ public class Vars{
 	public static Player player;
 	
 	public static String[] aboutText = {
-		"Made by [ROYAL]Anuken[] for the" + "\nGDL Metal Monstrosity jam.",
+		"Created by [ROYAL]Anuken.[]",
+		"Originally an entry in the [orange]GDL[] MM Jam.",
 		"",
-		"Sources used:",
-		"- [YELLOW]bfxr.com[] for sound effects",
-		"- [RED]freemusicarchive.org[] for music",
+		"Credits:",
+		"- SFX made with [YELLOW]bfxr.com[]",
 		"- Music made by [GREEN]RoccoW[]",
 	};
 }

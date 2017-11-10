@@ -41,6 +41,8 @@ public enum Recipe{
 	mortarturret(weapon, WeaponBlocks.mortarturret, stack(Item.steel, 20), stack(Item.titanium, 15)),
 	teslaturret(weapon, WeaponBlocks.teslaturret, stack(Item.steel, 10), stack(Item.titanium, 15), stack(Item.dirium, 15)),
 	plasmaturret(weapon, WeaponBlocks.plasmaturret, stack(Item.steel, 10), stack(Item.titanium, 10), stack(Item.dirium, 15)),
+	chainturret(weapon, WeaponBlocks.chainturret, stack(Item.steel, 10), stack(Item.titanium, 10), stack(Item.dirium, 15)),
+	rocketturret(weapon, WeaponBlocks.plasmaturret, stack(Item.steel, 10), stack(Item.titanium, 10), stack(Item.dirium, 15)),
 	
 	smelter(crafting, ProductionBlocks.smelter, stack(Item.stone, 40), stack(Item.iron, 40)),
 	crucible(crafting, ProductionBlocks.crucible, stack(Item.titanium, 40), stack(Item.steel, 40)),

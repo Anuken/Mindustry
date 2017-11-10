@@ -51,7 +51,12 @@ public class Turret extends Block{
 	@Override
 	public void draw(Tile tile){
 		Vector2 offset = getPlaceOffset();
-		Draw.rect("block", tile.worldx() + offset.x, tile.worldy() + offset.y);
+		
+		if(isMultiblock()){
+			Draw.rect("block-" + width + "x" + height, tile.worldx() + offset.x, tile.worldy() + offset.y);
+		}else{
+			Draw.rect("block", tile.worldx() + offset.x, tile.worldy() + offset.y);
+		}
 	}
 	
 	@Override
@@ -80,7 +85,7 @@ public class Turret extends Block{
 		if(fract > 0)
 			fract = Mathf.clamp(fract, 0.24f, 1f);
 		
-		Vars.renderer.drawBar(Color.GREEN, tile.worldx() + offset.x, tile.worldy() + 6 + offset.y, fract);
+		Vars.renderer.drawBar(Color.GREEN, tile.worldx() + offset.x, 2 + tile.worldy() + height/2f*Vars.tilesize + offset.y, fract);
 	}
 	
 	@Override
@@ -208,7 +213,7 @@ public class Turret extends Block{
 	public static class TurretEntity extends TileEntity{
 		public TileEntity blockTarget;
 		public int ammo;
-		public float rotation;
+		public float rotation = 90;
 		public Enemy target;
 		
 		@Override

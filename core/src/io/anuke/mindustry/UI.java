@@ -32,13 +32,15 @@ import io.anuke.ucore.scene.builders.*;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.Window.WindowStyle;
-import io.anuke.ucore.scene.ui.layout.*;
+import io.anuke.ucore.scene.ui.layout.Stack;
+import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 
 public class UI extends SceneModule{
 	Table itemtable, weapontable, tools, loadingtable, desctable, respawntable, configtable;
-	SettingsDialog prefs;
-	KeybindDialog keys;
+	MindustrySettingsDialog prefs;
+	MindustryKeybindDialog keys;
 	Dialog about, restart, levels, upgrades, load, settingserror;
 	MenuDialog menu;
 	Tooltip tooltip;
@@ -51,15 +53,23 @@ public class UI extends SceneModule{
 	private Array<Item> tempItems = new Array<>();
 	
 	public UI() {
-		Dialog.setShowAction(()-> sequence(Actions.moveToAligned(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), Align.center),
-						parallel(Actions.moveToAligned(Gdx.graphics.getWidth()/2,
-								Gdx.graphics.getHeight()/2, Align.center, 0.09f, Interpolation.fade), 
-								
-								Actions.fadeIn(0.09f, Interpolation.fade))));
+		Dialog.setShowAction(()-> sequence(
+			alpha(0f),
+			originCenter(),
+			moveToAligned(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, Align.center), 
+			scaleTo(0.0f, 1f),
+			parallel(
+				scaleTo(1f, 1f, 0.1f, Interpolation.fade), 
+				fadeIn(0.1f, Interpolation.fade)
+			)
+		));
 		
 		Dialog.setHideAction(()-> sequence(
-					parallel(Actions.moveBy(0, -Gdx.graphics.getHeight()/2, 0.08f, Interpolation.fade), 
-							Actions.fadeOut(0.08f, Interpolation.fade))));
+			parallel(
+				scaleTo(0.01f, 0.01f, 0.1f, Interpolation.fade), 
+				fadeOut(0.1f, Interpolation.fade)
+			)
+		));
 		
 		skin.font().setUseIntegerPositions(false);
 		skin.font().getData().setScale(Vars.fontscale);
@@ -146,7 +156,7 @@ public class UI extends SceneModule{
 		
 		levels = new LevelDialog();
 		
-		prefs = new SettingsDialog();
+		prefs = new MindustrySettingsDialog();
 		prefs.setStyle(Core.skin.get("dialog", WindowStyle.class));
 		
 		menu = new MenuDialog();
@@ -180,12 +190,14 @@ public class UI extends SceneModule{
 			}
 		});
 
-		keys = new KeybindDialog();
+		keys = new MindustryKeybindDialog();
 
-		about = new TextDialog("About", aboutText);
-		
-		for(Cell<?> cell : about.content().getCells())
-			cell.left();
+		about = new FloatingDialog("About");
+		about.addCloseButton();
+		for(String text : aboutText){
+			about.content().add(text).left();
+			about.content().row();
+		}
 		
 		restart = new Dialog("The core was destroyed.", "dialog");
 		
@@ -439,12 +451,6 @@ public class UI extends SceneModule{
 					
 					row();
 				}
-
-				new button("About", () -> {
-					about.show(scene);
-				});
-				
-				row();
 				
 				if(Gdx.app.getType() != ApplicationType.WebGL && !android){
 					new button("Exit", () -> {
@@ -455,8 +461,16 @@ public class UI extends SceneModule{
 				get().pad(Unit.dp.inPixels(16));
 			}};
 
-			get().setVisible(nplay);
+			visible(nplay);
 		}}.end();
+		
+		//settings icon
+		new table(){{
+			atop().aright();
+			new imagebutton("icon-settings", Unit.dp.inPixels(40f), ()->{
+				about.show();
+			}).get().pad(14).padTop(8);
+		}}.end().visible(nplay);
 		
 		if(debug){
 			new table(){{

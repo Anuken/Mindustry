@@ -12,10 +12,12 @@ import io.anuke.mindustry.resource.Weapon;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.function.Listenable;
-import io.anuke.ucore.scene.ui.*;
+import io.anuke.ucore.scene.ui.Image;
+import io.anuke.ucore.scene.ui.TextButton;
+import io.anuke.ucore.scene.ui.Tooltip;
 import io.anuke.ucore.scene.ui.layout.Table;
 
-public class UpgradeDialog extends Dialog{
+public class UpgradeDialog extends FloatingDialog{
 	boolean wasPaused = false;
 
 	public UpgradeDialog() {

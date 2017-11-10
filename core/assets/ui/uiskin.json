@@ -20,7 +20,7 @@ com.badlogic.gdx.graphics.Color: {
 	link-label: {a: 1, b: 0.886, g: 0.631, r: 0.105 }
 },
 io.anuke.ucore.scene.Skin$TintedDrawable: {
-	dialogDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.45} }
+	dialogDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.9} }
 	loadDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.7} }
 },
 io.anuke.ucore.scene.ui.Button$ButtonStyle: {
@@ -33,10 +33,11 @@ io.anuke.ucore.scene.ui.TextButton$TextButtonStyle: {
 },
 io.anuke.ucore.scene.ui.ImageButton$ImageButtonStyle: {
 	default: {down: button-down, up: button, over: button-over },
+	empty: {},
 	static: {up: button },
 	static-down: {up: button-down },
 	toggle: {checked: button-down, down: button-down, up: button },
-	togglemap: {checked: button-map-down, down: button-map-down, up: button-map },
+	togglemap: {down: button-map-down, up: button-map },
 	select: {checked: button-select, up: clear },
 	close-window: {up: button, imageUp: icon-close, imageOver: icon-close-over, imageDown: icon-close-down, disabled: button }
 },
@@ -45,11 +46,11 @@ io.anuke.ucore.scene.ui.ImageTextButton$ImageTextButtonStyle: {
 	toggle: {checked: button-down, down: button-down, up: button, font: default-font, fontColor: white, over: button-over, disabled: button, disabledFontColor: grey }
 },
 io.anuke.ucore.scene.ui.ScrollPane$ScrollPaneStyle: {
-	default: {vScroll: scroll, vScrollKnob: scroll-knob-vertical, hScroll: scroll-horizontal, hScrollKnob: scroll-knob-horizontal }
+	default: {background: border}
 },
 io.anuke.ucore.scene.ui.Window$WindowStyle: {
 	default: {titleFont: default-font, background: window, titleFontColor: orange },
-	dialog: {stageBackground: dialogDim, titleFont: default-font, background: window, titleFontColor: orange }
+	dialog: {stageBackground: dialogDim, titleFont: default-font, background: window-empty, titleFontColor: orange }
 },
 io.anuke.ucore.scene.ui.KeybindDialog$KeybindDialogStyle: {
 	default: {keyColor: red, keyNameColor: white},

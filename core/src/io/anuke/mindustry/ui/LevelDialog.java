@@ -5,56 +5,70 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.World;
+import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.StringSupplier;
-import io.anuke.ucore.scene.ui.ButtonGroup;
-import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.ImageButton;
+import io.anuke.ucore.scene.ui.ScrollPane;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
-public class LevelDialog extends Dialog{
+public class LevelDialog extends  FloatingDialog{
 	private Map selectedMap = Map.delta;
+	private TextureRegion region = new TextureRegion();
 	
 	public LevelDialog(){
 		super("Level Select");
+		getTitleTable().getCell(title()).growX().center();
+		getTitleTable().center();
 		setup();
 	}
 	
 	void setup(){
 		addCloseButton();
-		getButtonTable().addButton("Play", ()->{
-			hide();
-			Vars.control.playMap(selectedMap);
-		}).pad(3).size(180, 44).units(Unit.dp);
+		Table maps = new Table();
+		ScrollPane pane = new ScrollPane(maps);
 		
-		ButtonGroup<ImageButton> mapgroup = new ButtonGroup<>();
+		int maxwidth = 4;
 		
-		for(Map map : Map.values()){
+		for(int i = 0; i < Map.values().length; i ++){
+			Map map = Map.values()[i];
+			
 			if(!map.visible) continue;
 			
-			content().add(map.name());
-		}
-		
-		content().row();
-		
-		for(Map map : Map.values()){
-			if(!map.visible) continue;
+			if(i % maxwidth == 0){
+				maps.row();
+			}
+			
+			Table inset = new Table("pane");
+			inset.add("[orange]"+map.name()).pad(3f).units(Unit.dp);
+			inset.row();
+			inset.add((StringSupplier)(()->"High Score: [lime]" + Settings.getInt("hiscore" + map.name())))
+			.pad(3f).units(Unit.dp);
+			inset.pack();
+			
+			float images = Unit.dp.inPixels(154);
 			
 			ImageButton image = new ImageButton(new TextureRegion(World.getTexture(map)), "togglemap");
-			mapgroup.add(image);
+			image.row();
+			image.add(inset).width(images+6);
 			image.clicked(()->{
 				selectedMap = map;
+				hide();
+				Vars.control.playMap(selectedMap);
 			});
-			image.getImageCell().size(Unit.dp.inPixels(164));
-			content().add(image).size(Unit.dp.inPixels(180));
+			image.getImageCell().size(images);
+			maps.add(image).width(Unit.dp.inPixels(170)).pad(4f).units(Unit.dp);
 		}
 		
-		content().row();
+		content().add(pane);
 		
-		for(Map map : Map.values()){
-			if(!map.visible) continue;
-			
-			content().add((StringSupplier)(()->"High Score: [lime]" + Settings.getInt("hiscore" + map.name())));
-		}
+		shown(()->{
+			//this is necessary for some reason?
+			Timers.run(2f, ()->{
+				Core.scene.setScrollFocus(pane);
+			});
+		});
 	}
 }

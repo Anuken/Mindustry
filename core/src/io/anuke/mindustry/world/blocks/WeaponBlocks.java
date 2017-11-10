@@ -161,5 +161,19 @@ public class WeaponBlocks{
 			health = 180;
 			ammoMultiplier = 40;
 		}
+	},
+	
+	chainturret = new Turret("chainturret"){
+		{
+			inaccuracy = 7f;
+			formalName = "chain turret";
+			range = 60f;
+			reload = 40f;
+			bullet = BulletType.shell;
+			ammo = Item.coal;
+			health = 360;
+			ammoMultiplier = 10;
+			width = height = 2;
+		}
 	};
 }
