@@ -58,7 +58,7 @@ public class Enemy extends DestructibleEntity{
 	}
 	
 	void move(){
-		boolean nearCore = distanceTo(World.core.worldx(), World.core.worldy()) <= range - 14f;
+		boolean nearCore = distanceTo(World.core.worldx(), World.core.worldy()) <= range - 18f;
 		
 		Vector2 vec;
 		

@@ -19,7 +19,6 @@ import io.anuke.mindustry.entities.enemies.*;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.GestureHandler;
 import io.anuke.mindustry.input.Input;
-import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
@@ -401,17 +400,8 @@ public class Control extends Module{
 	public void update(){
 		
 		if(debug){
-			if(Inputs.keyUp(Keys.O)){
-				Timers.mark();
-				SaveIO.write(Gdx.files.local("mapsave.mins"));
-				log("Save time taken: " + Timers.elapsed());
-			}
-			
 			if(Inputs.keyUp(Keys.P)){
-				Timers.mark();
-				SaveIO.load(Gdx.files.local("mapsave.mins"));
-				log("Load time taken: " + Timers.elapsed());
-				Vars.renderer.clearTiles();
+				Effects.effect("blockexplosion", player);
 			}
 			
 			if(Inputs.keyUp(Keys.C)){

@@ -93,14 +93,14 @@ public class EffectCreator{
 		
 		Effects.create("shellexplosion", 15, e -> {
 			Draw.thickness(1.3f - e.ifract());
-			Draw.color(Hue.mix(Color.WHITE, Color.ORANGE, e.ifract()));
+			Draw.color(Color.WHITE, Color.ORANGE, e.ifract());
 			Draw.circle(e.x, e.y, 1f + e.ifract() * 7f);
 			Draw.reset();
 		});
 		
 		Effects.create("blastexplosion", 16, e -> {
 			Draw.thickness(1.2f - e.ifract());
-			Draw.color(Hue.mix(Color.WHITE, Color.SCARLET, e.ifract()));
+			Draw.color(Color.WHITE, Color.SCARLET, e.ifract());
 			Draw.circle(e.x, e.y, 1.5f + e.ifract() * 9f);
 			Draw.reset();
 		});
@@ -112,21 +112,21 @@ public class EffectCreator{
 		});
 		
 		Effects.create("purify", 10, e -> {
-			Draw.color(Hue.mix(Color.ROYAL, Color.GRAY, e.ifract()));
+			Draw.color(Color.ROYAL, Color.GRAY, e.ifract());
 			Draw.thickness(2f);
 			Draw.spikes(e.x, e.y, e.ifract() * 4f, 2, 6);
 			Draw.reset();
 		});
 		
 		Effects.create("purifyoil", 10, e -> {
-			Draw.color(Hue.mix(Color.BLACK, Color.GRAY, e.ifract()));
+			Draw.color(Color.BLACK, Color.GRAY, e.ifract());
 			Draw.thickness(2f);
 			Draw.spikes(e.x, e.y, e.ifract() * 4f, 2, 6);
 			Draw.reset();
 		});
 		
 		Effects.create("generate", 11, e -> {
-			Draw.color(Hue.mix(Color.ORANGE, Color.YELLOW, e.ifract()));
+			Draw.color(Color.ORANGE, Color.YELLOW, e.ifract());
 			Draw.thickness(1f);
 			Draw.spikes(e.x, e.y, e.ifract() * 5f, 2, 8);
 			Draw.reset();
@@ -134,21 +134,21 @@ public class EffectCreator{
 
 		Effects.create("spark", 10, e -> {
 			Draw.thickness(1f);
-			Draw.color(Hue.mix(Color.WHITE, Color.GRAY, e.ifract()));
+			Draw.color(Color.WHITE, Color.GRAY, e.ifract());
 			Draw.spikes(e.x, e.y, e.ifract() * 5f, 2, 8);
 			Draw.reset();
 		});
 		
 		Effects.create("sparkbig", 11, e -> {
 			Draw.thickness(1f);
-			Draw.color(Hue.mix(lightRed, Color.GRAY, e.ifract()));
+			Draw.color(lightRed, Color.GRAY, e.ifract());
 			Draw.spikes(e.x, e.y, e.ifract() * 5f, 2.3f, 8);
 			Draw.reset();
 		});
 		
 		Effects.create("smelt", 10, e -> {
 			Draw.thickness(1f);
-			Draw.color(Hue.mix(Color.YELLOW, Color.RED, e.ifract()));
+			Draw.color(Color.YELLOW, Color.RED, e.ifract());
 			Draw.spikes(e.x, e.y, e.ifract() * 5f, 2, 8);
 			Draw.reset();
 		});
@@ -162,65 +162,92 @@ public class EffectCreator{
 
 		Effects.create("hit", 10, e -> {
 			Draw.thickness(1f);
-			Draw.color(Hue.mix(Color.WHITE, Color.ORANGE, e.ifract()));
+			Draw.color(Color.WHITE, Color.ORANGE, e.ifract());
 			Draw.spikes(e.x, e.y, e.ifract() * 3f, 2, 8);
 			Draw.reset();
 		});
 		
 		Effects.create("laserhit", 10, e -> {
 			Draw.thickness(1f);
-			Draw.color(Hue.mix(Color.WHITE, Color.SKY, e.ifract()));
+			Draw.color(Color.WHITE, Color.SKY, e.ifract());
 			Draw.spikes(e.x, e.y, e.ifract() * 2f, 2, 6);
 			Draw.reset();
 		});
 		
 		Effects.create("shoot", 8, e -> {
 			Draw.thickness(1f);
-			Draw.color(Hue.mix(Color.WHITE, Color.GOLD, e.ifract()));
+			Draw.color(Color.WHITE, Color.GOLD, e.ifract());
 			Draw.spikes(e.x, e.y, e.ifract() * 2f, 2, 5);
 			Draw.reset();
 		});
 		
 		Effects.create("shoot2", 8, e -> {
 			Draw.thickness(1f);
-			Draw.color(Hue.mix(Color.WHITE, Color.SKY, e.ifract()));
+			Draw.color(Color.WHITE, Color.SKY, e.ifract());
 			Draw.spikes(e.x, e.y, e.ifract() * 2f, 1, 5);
 			Draw.reset();
 		});
 		
 		Effects.create("shoot3", 8, e -> {
 			Draw.thickness(1f);
-			Draw.color(Hue.mix(Color.WHITE, Color.GOLD, e.ifract()));
+			Draw.color(Color.WHITE, Color.GOLD, e.ifract());
 			Draw.spikes(e.x, e.y, e.ifract() * 2f, 1, 5);
 			Draw.reset();
 		});
 		
 		Effects.create("railshoot", 8, e -> {
 			Draw.thickness(2f  - e.ifract()*2f);
-			Draw.color(Hue.mix(Color.WHITE, Color.LIGHT_GRAY, e.ifract()));
+			Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.ifract());
 			Draw.spikes(e.x, e.y, 1f + e.ifract() * 4f, 1, 5);
 			Draw.reset();
 		});
 		
 		Effects.create("mortarshoot", 9, e -> {
 			Draw.thickness(1.3f - e.ifract());
-			Draw.color(Hue.mix(Color.WHITE, Color.ORANGE, e.ifract()));
+			Draw.color(Color.WHITE, Color.ORANGE, e.ifract());
 			Draw.spikes(e.x, e.y, e.ifract() * 4f, 2, 6);
 			Draw.circle(e.x, e.y, e.ifract() * 5f + 1f);
 			Draw.reset();
 		});
 
-		Effects.create("explosion", 15, e -> {
-			Draw.thickness(2f);
-			Draw.color(Hue.mix(Color.ORANGE, Color.GRAY, e.ifract()));
-			Draw.spikes(e.x, e.y, 2f + e.ifract() * 3f, 4, 6);
-			Draw.circle(e.x, e.y, 3f + e.ifract() * 3f);
+		Effects.create("explosion", 11, e -> {
+			Draw.thickness(2f*e.fract()+0.5f);
+			Draw.color(Color.WHITE, Color.DARK_GRAY, e.powfract());
+			Draw.circle(e.x, e.y, 5f + e.powfract() * 6f);
+			
+			Draw.color(e.ifract() < 0.5f ? Color.WHITE : Color.DARK_GRAY);
+			float rad = e.fract()*10f + 5f;
+			Angles.randLenVectors(e.id, 5, 8f, (x, y)->{
+				Draw.rect("circle2", e.x + x, e.y + y, rad, rad);
+			});
+			
+			Draw.reset();
+		});
+		
+		Effects.create("blockexplosion", 13, e -> {
+			Angles.randLenVectors(e.id+1, 8, 5f + e.ifract()*11f, (x, y)->{
+				float size = 2f+e.fract()*8f;
+				Draw.color(Color.LIGHT_GRAY, Color.DARK_GRAY, e.ifract());
+				Draw.rect("circle", e.x + x, e.y + y, size, size);
+				Draw.reset();
+			});
+			
+			Draw.thickness(2f*e.fract()+0.4f);
+			Draw.color(Color.WHITE, Color.ORANGE, e.powfract());
+			Draw.circle(e.x, e.y, 2f + e.powfract() * 9f);
+			
+			Draw.color(e.ifract() < 0.5f ? Color.WHITE : Color.DARK_GRAY);
+			float rad = e.fract()*10f + 2f;
+			Angles.randLenVectors(e.id, 5, 8f, (x, y)->{
+				Draw.rect("circle2", e.x + x, e.y + y, rad, rad);
+			});
+			
 			Draw.reset();
 		});
 		
 		Effects.create("coreexplosion", 13, e -> {
 			Draw.thickness(3f-e.ifract()*2f);
-			Draw.color(Hue.mix(Color.ORANGE, Color.WHITE, e.ifract()));
+			Draw.color(Color.ORANGE, Color.WHITE, e.ifract());
 			Draw.spikes(e.x, e.y, 5f + e.ifract() * 40f, 6, 6);
 			Draw.circle(e.x, e.y, 4f + e.ifract() * 40f);
 			Draw.reset();
@@ -242,7 +269,7 @@ public class EffectCreator{
 		
 		Effects.create("spawn", 23, e -> {
 			Draw.thickness(2f);
-			Draw.color(Hue.mix(Color.DARK_GRAY, Color.SCARLET, e.ifract()));
+			Draw.color(Color.DARK_GRAY, Color.SCARLET, e.ifract());
 			Draw.circle(e.x, e.y, 7f - e.ifract() * 6f);
 			Draw.reset();
 		});

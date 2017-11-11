@@ -10,7 +10,8 @@ public enum Map{
 	maze4("test"),
 	maze5("test"),
 	tutorial(false), 
-	test(false);
+	test1(false),
+	test2(false);
 	
 	public final boolean visible;
 	public final String description;

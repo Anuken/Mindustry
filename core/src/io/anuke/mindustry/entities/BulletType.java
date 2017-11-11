@@ -7,21 +7,23 @@ import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BaseBulletType;
+import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
 public abstract class BulletType  extends BaseBulletType<Bullet>{
+	static Color glowy = Color.valueOf("fdc056");
+	static Color lightGold = Hue.mix(Color.GOLD, Color.WHITE, 0.4f);
+	
 	public static final BulletType 
 	
 	none = new BulletType(0f, 0){
-		public void draw(Bullet b){
-			
-		}
+		public void draw(Bullet b){}
 	},
 	stone = new BulletType(1.5f, 2){
 		public void draw(Bullet b){
-			Draw.color("gray");
-			Draw.square(b.x, b.y, 1f);
+			Draw.colorl(0.64f);
+			Draw.rect("blank", b.x, b.y, 2f, 2f);
 			Draw.reset();
 		}
 	},
@@ -158,15 +160,15 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 	},
 	small = new BulletType(1.5f, 1){
 		public void draw(Bullet b){
-			Draw.color("orange");
-			Draw.rect("bullet", b.x, b.y, b.angle());
+			Draw.color(glowy);
+			Draw.rect("shot", b.x, b.y, b.angle() - 45);
 			Draw.reset();
 		}
 	},
 	smallSlow = new BulletType(1.2f, 1){
 		public void draw(Bullet b){
 			Draw.color("orange");
-			Draw.rect("bullet", b.x, b.y, b.angle());
+			Draw.rect("shot", b.x, b.y, b.angle() - 45);
 			Draw.reset();
 		}
 	},
@@ -209,12 +211,12 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 	shot = new BulletType(2.4f, 2){
 		{lifetime = 40;}
 		public void draw(Bullet b){
-			Draw.color(Color.GOLD);
+			Draw.color(lightGold);
 			Draw.rect("bullet", b.x, b.y, b.angle());
 			Draw.reset();
 		}
 	},
-	shot2 = new BulletType(2.5f, 2){
+	multishot = new BulletType(2.5f, 2){
 		{lifetime=40;}
 		public void draw(Bullet b){
 			Draw.color(Color.SKY);

@@ -26,7 +26,7 @@ public class Block{
 	/**display name*/
 	public String formalName;
 	/**played on destroy*/
-	public String explosionEffect = "explosion";
+	public String explosionEffect = "blockexplosion";
 	/**played on destroy*/
 	public String explosionSound = "break";
 	/**whether this block has a tile entity that updates*/

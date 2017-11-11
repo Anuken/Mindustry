@@ -40,7 +40,7 @@ public enum Weapon{
 			
 		}
 	},
-	multigun(6, BulletType.shot2, "Shoots inaccurate bullets with a high\nrate of fire.", stack(Item.iron, 60), stack(Item.steel, 20)){
+	multigun(6, BulletType.multishot, "Shoots inaccurate bullets with a high\nrate of fire.", stack(Item.iron, 60), stack(Item.steel, 20)){
 		@Override
 		public void shoot(Player p){
 			float ang = mouseAngle(p);

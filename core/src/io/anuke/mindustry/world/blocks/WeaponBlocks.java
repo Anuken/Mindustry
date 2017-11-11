@@ -21,7 +21,7 @@ public class WeaponBlocks{
 	turret = new Turret("turret"){
 		{
 			formalName = "turret";
-			range = 50;
+			range = 52;
 			reload = 15f;
 			bullet = BulletType.stone;
 			ammo = Item.stone;
@@ -31,7 +31,7 @@ public class WeaponBlocks{
 	doubleturret = new Turret("doubleturret"){
 		{
 			formalName = "double turret";
-			range = 40;
+			range = 44;
 			reload = 13f;
 			bullet = BulletType.stone;
 			ammo = Item.stone;
