@@ -58,8 +58,17 @@ public class Enemy extends DestructibleEntity{
 	}
 	
 	void move(){
-		Vector2 vec  = Pathfind.find(this);
-		vec.sub(x, y).setLength(speed);
+		boolean nearCore = distanceTo(World.core.worldx(), World.core.worldy()) <= range - 14f;
+		
+		Vector2 vec;
+		
+		if(nearCore){
+			vec = Tmp.v2.setZero();
+			target = World.core.entity;
+		}else{
+			vec  = Pathfind.find(this);
+			vec.sub(x, y).setLength(speed);
+		}
 		
 		Array<SolidEntity> entities = Entities.getNearby(x, y, range);
 		
@@ -79,7 +88,7 @@ public class Enemy extends DestructibleEntity{
 		
 		move(vec.x*Timers.delta(), vec.y*Timers.delta());
 		
-		if(Timers.get(this, "target", 15)){
+		if(Timers.get(this, "target", 15) && !nearCore){
 			target = World.findTileTarget(x, y, null, range, false);
 		
 			//no tile found

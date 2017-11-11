@@ -40,7 +40,11 @@ public class Pathfind{
 				
 			target = path[enemy.node];
 		}
-			
+		
+		//near the core, stop
+		if(enemy.node == path.length - 1){
+			vector.set(target.worldx(), target.worldy());
+		}
 			
 		return vector.set(target.worldx(), target.worldy());
 		
