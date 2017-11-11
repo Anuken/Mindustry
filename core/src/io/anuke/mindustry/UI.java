@@ -23,6 +23,8 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.*;
+import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.function.StringSupplier;
 import io.anuke.ucore.function.VisibilityProvider;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.Element;
@@ -499,7 +501,9 @@ public class UI extends SceneModule{
 			new table(){{
 				abottom();
 				aleft();
-				new label("[red]DEBUG MODE").scale(0.5f);
+				new label((StringSupplier)()->"[purple]entities: " + Entities.amount()).left();
+				row();
+				new label("[red]DEBUG MODE").scale(0.5f).left();
 			}}.end();
 		}
 		

@@ -13,6 +13,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
+import io.anuke.mindustry.world.blocks.types.Wall;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entity;
@@ -23,14 +24,21 @@ public class TileEntity extends Entity{
 	public ObjectMap<Item, Integer> items = new ObjectMap<>();
 	public int maxhealth, health;
 	public boolean dead = false;
+	public boolean added;
 	
-	public TileEntity init(Tile tile){
+	/**Sets this tile entity data to this tile, and adds it if necessary.*/
+	public TileEntity init(Tile tile, boolean added){
 		this.tile = tile;
+		this.added = added;
 		x = tile.worldx();
 		y = tile.worldy();
 		
 		maxhealth = tile.block().health;
 		health = maxhealth;
+		
+		if(added){
+			add();
+		}
 		
 		return this;
 	}
@@ -78,7 +86,7 @@ public class TileEntity extends Entity{
 	
 	@Override
 	public void update(){
-		if(health != 0 && !tile.block().name().contains("block") &&
+		if(health != 0 && !(tile.block() instanceof Wall) &&
 				Mathf.chance(0.009f*Timers.delta()*(1f-(float)health/maxhealth))){
 			
 			Effects.effect("smoke", x+Mathf.range(4), y+Mathf.range(4));

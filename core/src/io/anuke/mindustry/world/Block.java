@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+import io.anuke.mindustry.GameState;
+import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
@@ -12,28 +14,46 @@ import io.anuke.mindustry.resource.Liquid;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.util.Tmp;
-
 public class Block{
 	private static int lastid;
 	private static Array<Block> blocks = new Array<Block>();
 	protected static TextureRegion temp = new TextureRegion();
 	
+	/**internal name*/
 	public final String name;
-	public String formalName;
-	public String explosionEffect = "explosion";
-	public String explosionSound = "break";
-	public boolean solid, update, rotate, breakable;
-	public int health = 40;
-	public String shadow = "shadow";
-	public float breaktime = 30;
+	/**internal ID*/
 	public final int id;
-	//edge fallback, used for ores
+	/**display name*/
+	public String formalName;
+	/**played on destroy*/
+	public String explosionEffect = "explosion";
+	/**played on destroy*/
+	public String explosionSound = "break";
+	/**whether this block has a tile entity that updates*/
+	public boolean update;
+	/**whether this block has health and can be destroyed*/
+	public boolean destructible;
+	/**whether this is solid*/
+	public boolean solid;
+	/**whether this is rotateable*/
+	public boolean rotate;
+	/**whether you can break this with rightblick*/
+	public boolean breakable;
+	/**time it takes to break*/
+	public float breaktime = 30;
+	/**tile entity health*/
+	public int health = 40;
+	/**the shadow drawn under the block*/
+	public String shadow = "shadow";
+	/**edge fallback, used mainly for ores*/
 	public String edge = "stone";
-	//whether to have 3 variants
+	/**whether this block has 3 variants*/
 	public boolean vary = true;
-	//stuff that drops when broken
+	/**stuff that drops when broken*/
 	public ItemStack drops = null;
+	/**liquids that drop from this block, used for pumps*/
 	public Liquid liquidDrop = null;
+	/**multiblock width/height*/
 	public int width = 1, height = 1;
 
 	public Block(String name) {
@@ -180,6 +200,12 @@ public class Block{
 			//if multiblock, make sure to draw even block sizes offset, since the core block is at the BOTTOM LEFT
 			Vector2 offset = getPlaceOffset();
 			Draw.rect(name(), tile.worldx() + offset.x, tile.worldy() + offset.y);
+		}
+		
+		//update the tile entity through the draw method, only if it's an entity without updating
+		//TODO enable
+		if(destructible && !update && !GameState.is(State.paused)){
+		//	tile.entity.update();
 		}
 	}
 	

@@ -105,7 +105,7 @@ public class Tile{
 	}
 	
 	public boolean passable(){
-		return isLinked() || !(floor.solid || (block.solid && !block.update));
+		return isLinked() || !(floor.solid || (block.solid && (!block.destructible && !block.update)));
 	}
 	
 	public boolean solid(){
@@ -114,7 +114,7 @@ public class Tile{
 	
 	public boolean breakable(){
 		if(link == 0){
-			return (block.update || block.breakable);
+			return (block.destructible || block.breakable);
 		}else{
 			return getLinked().breakable();
 		}
@@ -163,13 +163,14 @@ public class Tile{
 	}
 	
 	public void changed(){
-		if(entity != null){
+		if(entity != null && entity.added){
 			entity.remove();
 			entity = null;
 		}
 		
-		if(block.update)
-			entity = block.getEntity().init(this).add();
+		if(block.destructible || block.update){
+			entity = block.getEntity().init(this, block.update);
+		}
 	}
 	
 	@Override

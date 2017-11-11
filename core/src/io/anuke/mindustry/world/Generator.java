@@ -93,6 +93,11 @@ public class Generator{
 					floor = Blocks.stone;
 				}
 				
+				//preformance debugging
+				//if(Vector2.dst(pixmap.getWidth()/2, pixmap.getHeight()/2, x, y) < 40){
+				//	block = DefenseBlocks.stonewall;
+				//}
+				
 				World.tile(x, y).setBlock(block);
 				World.tile(x, y).setFloor(floor);
 				

@@ -16,7 +16,7 @@ public class ProductionBlocks{
 		{
 			health = 600;
 			solid = true;
-			update = true;
+			destructible = true;
 			width = 3;
 			height = 3;
 		}

@@ -7,7 +7,7 @@ public class Wall extends Block{
 	public Wall(String name) {
 		super(name);
 		solid = true;
-		update = true;
+		destructible = true;
 	}
 	
 	public boolean canReplace(Block other){

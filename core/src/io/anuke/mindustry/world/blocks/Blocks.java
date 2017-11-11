@@ -10,6 +10,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 
 public class Blocks{
@@ -49,11 +50,11 @@ public class Blocks{
 		
 		@Override
 		public void update(Tile tile){
-			if(Mathf.chance(0.001)){
+			if(Mathf.chance(0.001 * Timers.delta())){
 				Effects.effect("lava", tile.worldx() + Mathf.range(5f), tile.worldy() + Mathf.range(5f));
 			}
 			
-			if(Mathf.chance(0.003)){
+			if(Mathf.chance(0.003 * Timers.delta())){
 				Effects.effect("lavabubble", tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
 			}
 		}
@@ -68,7 +69,7 @@ public class Blocks{
 		
 		@Override
 		public void update(Tile tile){
-			if(Mathf.chance(0.0025)){
+			if(Mathf.chance(0.0025 * Timers.delta())){
 				Effects.effect("oilbubble", tile.worldx() + Mathf.range(2f), tile.worldy() + Mathf.range(2f));
 			}
 		}

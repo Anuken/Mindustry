@@ -17,6 +17,8 @@ public class ShieldedWallBlock extends PowerBlock{
 
 	public ShieldedWallBlock(String name) {
 		super(name);
+		destructible = true;
+		update = false;
 		voltage = 0.00001f;
 	}
 	

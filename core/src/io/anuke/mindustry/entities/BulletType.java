@@ -79,6 +79,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Effects.shake(3f, 3f, b);
 		}
 	},
+	//TODO use DamageArea instead
 	shell = new BulletType(1.1f, 85){
 		{
 			lifetime = 110f;

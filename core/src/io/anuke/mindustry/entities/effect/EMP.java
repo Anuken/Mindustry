@@ -38,7 +38,7 @@ public class EMP extends TimedEntity{
 				if(Vector2.dst(dx, dy, 0, 0) < radius){
 					Tile tile = World.tile(worldx + dx, worldy + dy);
 					
-					if(tile != null && tile.block().update/* && tile.block() instanceof PowerAcceptor*/){
+					if(tile != null && tile.block().destructible){
 						array.add(tile);
 					}
 				}
