@@ -37,10 +37,6 @@ public class UpgradeDialog extends FloatingDialog{
 			GameState.set(State.paused);
 		});
 		
-		getButtonTable().addButton("Ok", ()->{
-			hide();
-		}).size(96, 50).pad(5);
-		
 		Table weptab = new Table();
 		weptab.pad(20);
 		
@@ -75,7 +71,7 @@ public class UpgradeDialog extends FloatingDialog{
 			
 			i++;
 			
-			weptab.add(button).width(250);
+			weptab.add(button).width(220);
 			
 			Table tiptable = new Table();
 			

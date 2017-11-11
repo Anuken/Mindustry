@@ -393,8 +393,7 @@ public class UI extends SceneModule{
 			atop();
 			aright();
 
-			new table(){{
-				get().background("button");
+			new table("button"){{
 
 				new label(()->"[orange]Wave " + control.getWave()).scale(fontscale*2f).left();
 
@@ -410,66 +409,90 @@ public class UI extends SceneModule{
 
 			get().setVisible(play);
 		}}.end();
-	
-		//menu table
-		new table(){{
-			
-			new table("pane"){{
-				defaults().size(220, 48).pad(3);
+		
+		if(!android){
+			//menu table
+			new table(){{
 				
-				new button("Play", () -> {
-					levels.show();
-				});
-				
-				row();
-				
-				new button("Tutorial", ()->{
-					//TODO show loading, etc
-					control.playMap(Map.tutorial);
-				});
-				
-				if(Gdx.app.getType() != ApplicationType.WebGL){
-					row();
-				
-					new button("Load Game", () -> {
-						load.show();
-					});
-				}
-
-				row();
-
-				new button("Settings", () -> {
-					prefs.show(scene);
-				});
-
-				row();
-				
-				if(!android){
-					new button("Controls", () -> {
-						keys.show(scene);
+				new table("pane"){{
+					defaults().size(220, 48).pad(3);
+					
+					new button("Play", () -> {
+						levels.show();
 					});
 					
 					row();
-				}
-				
-				if(Gdx.app.getType() != ApplicationType.WebGL && !android){
-					new button("Exit", () -> {
-						Gdx.app.exit();
+					
+					new button("Tutorial", ()->{
+						control.playMap(Map.tutorial);
 					});
-				}
+					
+					if(Gdx.app.getType() != ApplicationType.WebGL){
+						row();
+					
+						new button("Load Game", () -> {
+							load.show();
+						});
+					}
+	
+					row();
+	
+					new button("Settings", () -> {
+						prefs.show(scene);
+					});
+	
+					row();
+					
+					if(!android){
+						new button("Controls", () -> {
+							keys.show(scene);
+						});
+						
+						row();
+					}
+					
+					if(Gdx.app.getType() != ApplicationType.WebGL && !android){
+						new button("Exit", () -> {
+							Gdx.app.exit();
+						});
+					}
+					
+					get().pad(Unit.dp.inPixels(16));
+				}};
+	
+				visible(nplay);
+			}}.end();
+		}else{
+			new table(){{
+				defaults().size(120f).pad(5).units(Unit.dp);
+				float isize = Unit.dp.inPixels(14f*4);
 				
-				get().pad(Unit.dp.inPixels(16));
-			}};
+				new imagebutton("icon-play-2", isize, () -> {
+					levels.show();
+				}).text("Play").padTop(4f);
+				
+				new imagebutton("icon-tutorial", isize, ()->{
+					control.playMap(Map.tutorial);
+				}).text("Tutorial").padTop(4f);
+				
+				new imagebutton("icon-load", isize, () -> {
+					load.show();
+				}).text("Load").padTop(4f);
 
-			visible(nplay);
-		}}.end();
+				new imagebutton("icon-tools", isize, () -> {
+					prefs.show(scene);
+				}).text("Settings").padTop(4f);
+				
+				visible(nplay);
+			}}.end();
+		}
 		
 		//settings icon
 		new table(){{
 			atop().aright();
-			new imagebutton("icon-settings", Unit.dp.inPixels(40f), ()->{
+			new imagebutton("icon-info", Unit.dp.inPixels(30f), ()->{
 				about.show();
-			}).get().pad(14).padTop(8);
+			}).get().pad(14);
 		}}.end().visible(nplay);
 		
 		if(debug){
@@ -547,11 +570,17 @@ public class UI extends SceneModule{
 		
 		loadingtable = new table("loadDim"){{
 			get().setTouchable(Touchable.enabled);
-			new table("button"){{
-				new label("[orange]Loading..."){{
-					get().setName("namelabel");
-				}}.scale(2f*Vars.fontscale).pad(Unit.dp.inPixels(10));
-			}}.end();
+			//new table(){{
+			get().addImage("white").growX()
+			.height(3f).pad(4f).growX().units(Unit.dp).get().setColor(Color.ORANGE);
+			row();
+			new label("[orange]Loading..."){{
+				get().setName("namelabel");
+			}}.pad(10).units(Unit.dp);
+			row();
+			get().addImage("white").growX()
+			.height(3f).pad(4f).growX().units(Unit.dp).get().setColor(Color.ORANGE);
+			//}}.end();
 		}}.end().get();
 		
 		loadingtable.setVisible(false);

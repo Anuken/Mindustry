@@ -14,7 +14,7 @@ import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
-public class LevelDialog extends  FloatingDialog{
+public class LevelDialog extends FloatingDialog{
 	private Map selectedMap = Map.delta;
 	private TextureRegion region = new TextureRegion();
 	
@@ -41,10 +41,10 @@ public class LevelDialog extends  FloatingDialog{
 				maps.row();
 			}
 			
-			Table inset = new Table("pane");
+			Table inset = new Table("pane-button");
 			inset.add("[orange]"+map.name()).pad(3f).units(Unit.dp);
 			inset.row();
-			inset.add((StringSupplier)(()->"High Score: [lime]" + Settings.getInt("hiscore" + map.name())))
+			inset.add((StringSupplier)(()->"High Score: [orange]" + Settings.getInt("hiscore" + map.name())))
 			.pad(3f).units(Unit.dp);
 			inset.pack();
 			

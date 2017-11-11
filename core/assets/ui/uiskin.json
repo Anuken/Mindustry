@@ -21,7 +21,7 @@ com.badlogic.gdx.graphics.Color: {
 },
 io.anuke.ucore.scene.Skin$TintedDrawable: {
 	dialogDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.9} }
-	loadDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.7} }
+	loadDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.8} }
 },
 io.anuke.ucore.scene.ui.Button$ButtonStyle: {
 	default: {down: button-down, up: button },

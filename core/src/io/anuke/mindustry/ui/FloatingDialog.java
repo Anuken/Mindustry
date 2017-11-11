@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Align;
 
 import io.anuke.ucore.scene.ui.Dialog;
-import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class FloatingDialog extends Dialog{
@@ -15,8 +14,8 @@ public class FloatingDialog extends Dialog{
 		setFillParent(true);
 		title().setAlignment(Align.center);
 		getTitleTable().row();
-		getTitleTable().add(new Image("white"))
-		.growX().height(3f).pad(4f).units(Unit.dp).get().setColor(Color.ORANGE);
+		getTitleTable().addImage("white", Color.ORANGE)
+		.growX().height(3f).pad(4f).units(Unit.dp);
 	}
 	
 	@Override

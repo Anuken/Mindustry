@@ -1,5 +1,6 @@
 package io.anuke.mindustry.ui;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
@@ -41,19 +42,23 @@ public class LoadDialog extends FloatingDialog{
 			final int slot = i;
 
 			TextButton button = new TextButton("[orange]Slot " + (i + 1));
-			button.getLabelCell().top().left().growX();
-			button.row();
 			button.pad(Unit.dp.inPixels(10));
+			button.getLabelCell().top().left().growX();
+			
+			button.row();
 			
 			Label info = new Label("[gray]" + (!SaveIO.isSaveValid(i) ? "<empty>" : "Wave " +
 					SaveIO.getWave(slot)+"\nLast Saved: " + SaveIO.getTimeString(i)));
 			info.setAlignment(Align.center, Align.center);
 			
 			button.add(info).padBottom(2).padTop(6);
-			button.getLabel().setFontScale(Unit.dp.inPixels(0.75f));
+			button.row();
+			button.addImage("white", Color.GRAY)
+			.growX().height(3f).pad(4f).units(Unit.dp);
+			button.row();
 			modifyButton(button, slot);
 
-			content().add(button).size(400, 80).units(Unit.dp).pad(2);
+			content().add(button).size(400, 86).units(Unit.dp).pad(2);
 			content().row();
 		}
 
