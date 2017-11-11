@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities.enemies;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.Shaders;
@@ -15,6 +16,7 @@ import io.anuke.mindustry.world.World;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.*;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Tmp;
 
 public class Enemy extends DestructibleEntity{
 	public final static Color[] tierColors = {Color.YELLOW, Color.ORANGE, Color.RED, Color.MAGENTA};
@@ -59,6 +61,22 @@ public class Enemy extends DestructibleEntity{
 		Vector2 vec  = Pathfind.find(this);
 		vec.sub(x, y).setLength(speed);
 		
+		Array<SolidEntity> entities = Entities.getNearby(x, y, range);
+		
+		Vector2 shift = Tmp.v3.setZero();
+		float shiftRange = hitbox.width + 3f;
+		
+		for(SolidEntity other : entities){
+			float dst = other.distanceTo(this);
+			if(other != this && other instanceof Enemy && dst < shiftRange){
+				float scl = Mathf.clamp(1.4f - dst/shiftRange);
+				shift.add((x - other.x) * scl, (y - other.y) * scl);
+			}
+		}
+		
+		shift.nor();
+		vec.add(shift.scl(0.5f));
+		
 		move(vec.x*Timers.delta(), vec.y*Timers.delta());
 		
 		if(Timers.get(this, "target", 15)){
@@ -66,9 +84,7 @@ public class Enemy extends DestructibleEntity{
 		
 			//no tile found
 			if(target == null){
-				target = Entities.getClosest(x, y, range, e->{
-					return e instanceof Player;
-				});
+				target = Entities.getClosest(entities, x, y, range, e -> e instanceof Player);
 			}
 		}
 		

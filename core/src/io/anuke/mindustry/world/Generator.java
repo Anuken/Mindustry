@@ -2,6 +2,7 @@ package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectMap;
 
 import io.anuke.mindustry.Vars;
@@ -94,9 +95,9 @@ public class Generator{
 				}
 				
 				//preformance debugging
-				//if(Vector2.dst(pixmap.getWidth()/2, pixmap.getHeight()/2, x, y) < 40){
-				//	block = DefenseBlocks.stonewall;
-				//}
+				if(Vector2.dst(pixmap.getWidth()/2, pixmap.getHeight()/2, x, y) < 30){
+				//	block = Mathf.choose(ProductionBlocks.stonedrill, DistributionBlocks.conveyor);
+				}
 				
 				World.tile(x, y).setBlock(block);
 				World.tile(x, y).setFloor(floor);

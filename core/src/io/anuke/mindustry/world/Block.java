@@ -203,9 +203,8 @@ public class Block{
 		}
 		
 		//update the tile entity through the draw method, only if it's an entity without updating
-		//TODO enable
 		if(destructible && !update && !GameState.is(State.paused)){
-		//	tile.entity.update();
+			tile.entity.update();
 		}
 	}
 	

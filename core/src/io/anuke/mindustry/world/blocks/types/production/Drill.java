@@ -12,18 +12,20 @@ public class Drill extends Block{
 	protected Block resource;
 	protected Item result;
 	protected int time = 5;
+	protected int capacity = 5;
 
 	public Drill(String name) {
 		super(name);
 		update = true;
+		//update = false;
+		//destructible = true;
 		solid = true;
 	}
 	
 	@Override
 	public void update(Tile tile){
 		
-		//drills can only hold up to 10 items at a time
-		if(tile.floor() == resource && Timers.get(tile, "drill", 60 * time) && tile.entity.totalItems() < 10){
+		if(tile.floor() == resource && Timers.get(tile, "drill", 60 * time) && tile.entity.totalItems() < capacity){
 			offloadNear(tile, result);
 			Effects.effect("spark", tile.worldx(), tile.worldy());
 		}

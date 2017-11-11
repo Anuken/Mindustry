@@ -35,7 +35,7 @@ public class LevelDialog extends FloatingDialog{
 		for(int i = 0; i < Map.values().length; i ++){
 			Map map = Map.values()[i];
 			
-			if(!map.visible) continue;
+			if(!map.visible && !Vars.debug) continue;
 			
 			if(i % maxwidth == 0){
 				maps.row();
@@ -48,18 +48,18 @@ public class LevelDialog extends FloatingDialog{
 			.pad(3f).units(Unit.dp);
 			inset.pack();
 			
-			float images = Unit.dp.inPixels(154);
+			float images = 154f;
 			
 			ImageButton image = new ImageButton(new TextureRegion(World.getTexture(map)), "togglemap");
 			image.row();
-			image.add(inset).width(images+6);
+			image.add(inset).width(images+6).units(Unit.dp);
 			image.clicked(()->{
 				selectedMap = map;
 				hide();
 				Vars.control.playMap(selectedMap);
 			});
 			image.getImageCell().size(images);
-			maps.add(image).width(Unit.dp.inPixels(170)).pad(4f).units(Unit.dp);
+			maps.add(image).width(170).pad(4f).units(Unit.dp);
 		}
 		
 		content().add(pane);
