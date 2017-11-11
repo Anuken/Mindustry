@@ -171,9 +171,24 @@ public class WeaponBlocks{
 			reload = 40f;
 			bullet = BulletType.shell;
 			ammo = Item.coal;
-			health = 360;
+			health = 430;
 			ammoMultiplier = 10;
 			width = height = 2;
+		}
+	},
+	
+	titanturret = new Turret("titancannon"){
+		{
+			inaccuracy = 7f;
+			formalName = "titan cannon";
+			range = 120f;
+			reload = 40f;
+			bullet = BulletType.shell;
+			ammo = Item.coal;
+			health = 800;
+			ammoMultiplier = 10;
+			width = height = 3;
+			rotatespeed = 0.08f;
 		}
 	};
 }

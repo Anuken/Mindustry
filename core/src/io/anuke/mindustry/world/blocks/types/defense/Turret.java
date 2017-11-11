@@ -198,7 +198,7 @@ public class Turret extends Block{
 		
 		float inac = Mathf.range(inaccuracy);
 		
-		Angles.translation(entity.rotation + inac, 4f);
+		Angles.translation(entity.rotation + inac, width * Vars.tilesize / 2f);
 		
 		Bullet out = new Bullet(bullet, tile.entity, 
 				tile.worldx() + Angles.x(), tile.worldy() + Angles.y(), entity.rotation + inac).add();

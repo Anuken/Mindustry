@@ -53,6 +53,6 @@ public class Vars{
 		"",
 		"Credits:",
 		"- SFX made with [YELLOW]bfxr.com[]",
-		"- Music made by [GREEN]RoccoW[]",
+		"- Music made by [GREEN]RoccoW[] / found on [lime]FreeMusicArchive.org[]",
 	};
 }
