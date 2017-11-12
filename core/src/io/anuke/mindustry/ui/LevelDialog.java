@@ -58,7 +58,7 @@ public class LevelDialog extends FloatingDialog{
 				hide();
 				Vars.control.playMap(selectedMap);
 			});
-			image.getImageCell().size(images);
+			image.getImageCell().size(images).units(Unit.dp);
 			maps.add(image).width(170).pad(4f).units(Unit.dp);
 		}
 		

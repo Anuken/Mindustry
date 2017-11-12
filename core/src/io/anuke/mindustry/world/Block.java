@@ -113,8 +113,7 @@ public class Block{
 
 	/**
 	 * Tries to put this item into a nearby container, if there are no available
-	 * containers, it gets added to the block's inventory.
-	 */
+	 * containers, it gets added to the block's inventory.*/
 	protected void offloadNear(Tile tile, Item item){
 		int i = tile.dump;
 		int pdump = tile.dump;
@@ -194,7 +193,7 @@ public class Block{
 	
 	public void draw(Tile tile){
 		//note: multiblocks do not support rotation
-		if(width == 1 && height == 1){
+		if(!isMultiblock()){
 			Draw.rect(name(), tile.worldx(), tile.worldy(), rotate ? tile.rotation * 90 : 0);
 		}else{
 			//if multiblock, make sure to draw even block sizes offset, since the core block is at the BOTTOM LEFT

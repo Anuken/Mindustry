@@ -107,7 +107,7 @@ public class UI extends SceneModule{
 		Draw.color();
 		
 		TextureRegion back = Draw.region("background");
-		float backscl = 5;
+		float backscl = 5.5f;
 		
 		Core.batch.draw(back, w/2 - back.getRegionWidth()*backscl/2, h/2 - back.getRegionHeight()*backscl/2, 
 				back.getRegionWidth()*backscl, back.getRegionHeight()*backscl);
@@ -504,6 +504,30 @@ public class UI extends SceneModule{
 				new label((StringSupplier)()->"[purple]entities: " + Entities.amount()).left();
 				row();
 				new label("[red]DEBUG MODE").scale(0.5f).left();
+			}}.end();
+			
+			new table(){{
+				atop();
+				new table("button"){{
+					defaults().left().growX();
+					atop();
+					aleft();
+					new label((StringSupplier)()->"[red]total: " 
+					+ String.format("%.1f", (float)Profiler.total/Profiler.total*100f)+ "% - " + Profiler.total).left();
+					row();
+					new label((StringSupplier)()->"[yellow]draw: " 
+					+ String.format("%.1f", (float)Profiler.draw/Profiler.total*100f)+ "% - " + Profiler.draw).left();
+					row();
+					new label((StringSupplier)()->"[green]blockDraw: " 
+					+ String.format("%.1f", (float)Profiler.blockDraw/Profiler.total*100f)+ "% - " + Profiler.blockDraw).left();
+					row();
+					new label((StringSupplier)()->"[blue]entityDraw: " 
+					+ String.format("%.1f", (float)Profiler.entityDraw/Profiler.total*100f)+ "% - " + Profiler.entityDraw).left();
+					row();
+					new label((StringSupplier)()->"[purple]entityUpdate: " 
+					+ String.format("%.1f", (float)Profiler.entityUpdate/Profiler.total*100f)+ "% - " + Profiler.entityUpdate).left();
+					row();
+				}}.width(400f).end();
 			}}.end();
 		}
 		

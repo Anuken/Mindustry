@@ -33,6 +33,8 @@ public class Vars{
 	//TODO named save slots, possibly with a scroll dialog
 	public static final int saveSlots = 4;
 	
+	public static final int profileTime = 30;
+	
 	//only if smoothCamera
 	public static boolean snapCamera = true;
 	

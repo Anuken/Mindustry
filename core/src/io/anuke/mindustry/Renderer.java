@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.TimeUtils;
 
 import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -112,8 +113,10 @@ public class Renderer extends RendererModule{
 			if(Gdx.graphics.getWidth() / Core.cameraScale % 2 == 1){
 				camera.position.add(-0.5f, 0, 0);
 			}
-
+			
+			long time = TimeUtils.nanoTime();
 			drawDefault();
+			if(Timers.get("profiled", profileTime)) Profiler.draw = TimeUtils.timeSinceNanos(time);
 			
 			if(Vars.debug && Vars.debugGL && Timers.get("profile", 60)){
 				UCore.log("shaders: " + GLProfiler.shaderSwitches, 
@@ -135,8 +138,13 @@ public class Renderer extends RendererModule{
 		Graphics.surface("shield");
 		Graphics.surface();
 		
+		long time = TimeUtils.nanoTime();
 		renderTiles();
+		if(Timers.get("profilebd", profileTime)) Profiler.blockDraw = TimeUtils.timeSinceNanos(time);
+		
+		time = TimeUtils.nanoTime();
 		Entities.draw();
+		if(Timers.get("profileed", profileTime)) Profiler.entityDraw = TimeUtils.timeSinceNanos(time);
 		
 		drawShield();
 		
@@ -237,11 +245,13 @@ public class Renderer extends RendererModule{
 		int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2) + 2;
 
 		boolean noshadows = Settings.getBool("noshadows");
-
+		
+		boolean drawTiles = true;
+		
 		//0 = shadows
 		//1 = normal blocks
 		//2 = over blocks
-		for(int l = (noshadows ? 1 : 0); l < 3; l++){
+		for(int l = (noshadows ? 1 : 0); l < (drawTiles ? 3 : 0); l++){
 			if(l == 0){
 				Graphics.surface("shadow");
 			}

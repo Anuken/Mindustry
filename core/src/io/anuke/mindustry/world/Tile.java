@@ -114,7 +114,7 @@ public class Tile{
 	
 	public boolean breakable(){
 		if(link == 0){
-			return (block.destructible || block.breakable);
+			return (block.destructible || block.breakable || block.update);
 		}else{
 			return getLinked().breakable();
 		}

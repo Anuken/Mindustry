@@ -8,6 +8,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
 
@@ -466,7 +467,9 @@ public class Control extends Module{
 					runWave();
 				}
 			
+				long time = TimeUtils.nanoTime();
 				Entities.update();
+				if(Timers.get("profileeu", profileTime)) Profiler.entityUpdate = TimeUtils.timeSinceNanos(time);
 			}
 			
 			if(!android){

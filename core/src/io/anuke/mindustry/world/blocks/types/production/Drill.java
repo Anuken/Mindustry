@@ -17,8 +17,6 @@ public class Drill extends Block{
 	public Drill(String name) {
 		super(name);
 		update = true;
-		//update = false;
-		//destructible = true;
 		solid = true;
 	}
 	
