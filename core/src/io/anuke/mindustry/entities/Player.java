@@ -87,7 +87,7 @@ public class Player extends DestructibleEntity{
 		move(vector.x*Timers.delta(), vector.y*Timers.delta());
 		
 		if(!shooting){
-			direction.add(vector.scl(Timers.delta()));
+			direction.add(vector);
 			direction.limit(speed*6);
 		}else{
 			float angle = Angles.mouseAngle(x, y);

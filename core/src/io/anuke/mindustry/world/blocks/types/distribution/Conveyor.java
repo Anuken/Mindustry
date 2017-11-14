@@ -150,6 +150,7 @@ public class Conveyor extends Block{
 		}
 	}
 	
+	//TODO optimize, maybe with pooling?
 	static class ItemPos{
 		Item item;
 		float pos, y;
