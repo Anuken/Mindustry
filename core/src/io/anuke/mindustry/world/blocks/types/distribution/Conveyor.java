@@ -13,7 +13,6 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Bits;
@@ -101,9 +100,6 @@ public class Conveyor extends Block{
 			}
 			
 		}
-		
-		if(removals.size > 0)
-			UCore.log(removals.size);
 		entity.convey.removeAll(removals);
 	}
 	
