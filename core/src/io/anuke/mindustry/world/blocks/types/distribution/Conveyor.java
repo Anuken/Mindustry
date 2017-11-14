@@ -7,19 +7,26 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.DelayedRemovalArray;
+import com.badlogic.gdx.utils.IntArray;
 
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
 public class Conveyor extends Block{
-	protected float speed = 0.02f;
+	private static Item[] items = Item.values();
+	private static ItemPos pos1 = new ItemPos();
+	private static ItemPos pos2 = new ItemPos();
+	private static IntArray removals = new IntArray();
+	
+	public float speed = 0.02f;
 	
 	protected Conveyor(String name) {
 		super(name);
@@ -39,13 +46,15 @@ public class Conveyor extends Block{
 		Draw.rect(name() + 
 				(Timers.time() % ((20 / 100f) / speed) < (10 / 100f) / speed && acceptItem(Item.stone, tile, null) ? "" : "move"), tile.worldx(), tile.worldy(), tile.rotation * 90);
 		
-		for(ItemPos pos : entity.convey){
+		for(int i = 0; i < entity.convey.size; i ++){
+			ItemPos pos = pos1.set(entity.convey.get(i));
+			
 			Tmp.v1.set(tilesize, 0).rotate(tile.rotation * 90);
-			Tmp.v2.set(-tilesize / 2, pos.y*tilesize/2).rotate(tile.rotation * 90);
+			Tmp.v2.set(-tilesize / 2, pos.x*tilesize/2).rotate(tile.rotation * 90);
 			
 			Draw.rect("icon-" + pos.item.name(), 
-					tile.x * tilesize + Tmp.v1.x * pos.pos + Tmp.v2.x, 
-					tile.y * tilesize + Tmp.v1.y * pos.pos + Tmp.v2.y, 4, 4);
+					tile.x * tilesize + Tmp.v1.x * pos.y + Tmp.v2.x, 
+					tile.y * tilesize + Tmp.v1.y * pos.y + Tmp.v2.y, 4, 4);
 		}
 	}
 	
@@ -55,38 +64,47 @@ public class Conveyor extends Block{
 		ConveyorEntity entity = tile.entity();
 		entity.minitem = 1f;
 		
-		entity.convey.begin();
+		removals.clear();
 
-		for(ItemPos pos : entity.convey){
+		for(int i = 0; i < entity.convey.size; i ++){
+			int value = entity.convey.get(i);
+			ItemPos pos = pos1.set(value);
+			
 			boolean canmove = true;
 			
-			for(int i = 0; i < entity.convey.size; i ++){
-				ItemPos other = entity.convey.get(i);
+			for(int j = 0; j < entity.convey.size; j ++){
+				ItemPos other = pos2.set(entity.convey.get(j));
 				
-				if(other.pos > pos.pos && other.pos-pos.pos < 0.14){
+				if(other.y > pos.y && other.y - pos.y < 0.14){
 					canmove = false;
 					break;
 				}
 			}
 			
 			if(canmove){
-				pos.pos += speed * Timers.delta();
-				pos.y = MathUtils.lerp(pos.y, 0, 0.14f * Timers.delta());
+				pos.y += speed * Timers.delta();
+				pos.x = MathUtils.lerp(pos.x, 0, 0.06f * Timers.delta());
 			}else{
-				pos.y = MathUtils.lerp(pos.y, pos.seed/128f/3f, 0.1f * Timers.delta());
+				pos.x = MathUtils.lerp(pos.x, pos.seed/128f/3f, 0.1f * Timers.delta());
 			}
 			
-			if(pos.pos >= 1f && offloadDir(tile, pos.item)){
-				entity.convey.removeValue(pos, true);
-				continue;
-			}
-			pos.pos = Mathf.clamp(pos.pos);
+			pos.y = Mathf.clamp(pos.y);
 			
-			if(pos.pos < entity.minitem)
-				entity.minitem = pos.pos;
+			if(pos.y >= 0.9999f && offloadDir(tile, pos.item)){
+				removals.add(value);
+			}else{
+				value = pos.pack();
+				
+				if(pos.y < entity.minitem)
+					entity.minitem = pos.y;
+				entity.convey.set(i, value);
+			}
+			
 		}
-
-		entity.convey.end();
+		
+		if(removals.size > 0)
+			UCore.log(removals.size);
+		entity.convey.removeAll(removals);
 	}
 	
 	@Override
@@ -117,51 +135,71 @@ public class Conveyor extends Block{
 		float y = (ang == -1 || ang == 3) ? 1 : (ang == 1 || ang == -3) ? -1 : 0;
 		
 		ConveyorEntity entity = tile.entity();
-		entity.convey.add(new ItemPos(item, pos, y*0.9f));
+		entity.convey.add(ItemPos.packItem(item, y*0.9f, pos, (byte)Mathf.random(255)));
 	}
 	
+	/**
+	 * Conveyor data format:
+	 * [0] item ordinal
+	 * [1] x: byte ranging from -128 to 127, scaled should be at [-1, 1], corresponds to relative X from the conveyor middle
+	 * [2] y: byte ranging from 0 to 127, scaled should be at [0, 1], corresponds to relative Y from the conveyor start
+	 * [3] seed: -128 to 127, unscaled
+	 * Size is 4 bytes, or one int.
+	 */
 	public static class ConveyorEntity extends TileEntity{
-		DelayedRemovalArray<ItemPos> convey = new DelayedRemovalArray<>();
+		IntArray convey = new IntArray();
 		float minitem = 1;
 		
 		@Override
 		public void write(DataOutputStream stream) throws IOException{
 			stream.writeInt(convey.size);
 			
-			for(ItemPos pos : convey){
-				stream.writeByte(pos.item.ordinal());
-				stream.writeByte((int)(pos.pos*255-128));
-				stream.writeByte((int)(pos.y*255-128));
+			for(int i = 0; i < convey.size; i ++){
+				stream.writeInt(convey.get(i));
 			}
 		}
 		
 		@Override
 		public void read(DataInputStream stream) throws IOException{
 			int amount = stream.readInt();
+			convey.ensureCapacity(amount);
 			
 			for(int i = 0; i < amount; i ++){
-				Item item = Item.values()[stream.readByte()];
-				float pos = ((int)stream.readByte()+128)/255f;
-				float y = ((int)stream.readByte()+128)/255f;
-				
-				ItemPos out = new ItemPos(item, pos, y);
-				convey.add(out);
+				convey.add(stream.readInt());
 			}
 		}
 	}
 	
-	//TODO optimize, maybe with pooling?
+	//Container class. Do not instantiate.
 	static class ItemPos{
 		Item item;
-		float pos, y;
+		float x, y;
 		byte seed;
 		
-		public ItemPos(Item item, float pos, float y){
-			this.item = item;
-			this.pos = pos;
-			this.y = y;
-			seed = (byte)MathUtils.random(255);
+		private ItemPos(){}
+		
+		ItemPos set(int value){
+			byte[] values = Bits.getBytes(value);
+			item = items[values[0]];
+			x = values[1] / 127f;
+			y = ((int)values[2]) / 127f;
+			seed = values[3];
+			return this;
 		}
 		
+		int pack(){
+			return packItem(item, x, y, seed);
+		}
+		
+		static int packItem(Item item, float x, float y, byte seed){
+			byte[] bytes = Bits.getBytes(0);
+			bytes[0] = (byte)item.ordinal();
+			bytes[1] = (byte)(x*127);
+			bytes[2] = (byte)(y*127);
+			bytes[3] = seed;
+			//UCore.log("Packing item: ", item, x, y, seed, "\n", Arrays.toString(bytes));
+			//UCore.log(Arrays.toString(Bits.getBytes(Bits.packInt(bytes))));
+			return Bits.packInt(bytes);
+		}
 	}
 }
