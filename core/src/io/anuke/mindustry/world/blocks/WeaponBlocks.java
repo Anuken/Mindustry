@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.BulletType;
@@ -11,6 +12,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.defense.LaserTurret;
 import io.anuke.mindustry.world.blocks.types.defense.PowerTurret;
 import io.anuke.mindustry.world.blocks.types.defense.Turret;
+import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
@@ -168,12 +170,29 @@ public class WeaponBlocks{
 			inaccuracy = 7f;
 			formalName = "chain turret";
 			range = 60f;
-			reload = 40f;
-			bullet = BulletType.shell;
-			ammo = Item.coal;
+			reload = 10f;
+			bullet = BulletType.chain;
+			ammo = Item.stone; //TODO
 			health = 430;
 			ammoMultiplier = 10;
 			width = height = 2;
+		}
+		
+		@Override
+		protected void shoot(Tile tile){
+			TurretEntity entity = tile.entity();
+			Vector2 offset = getPlaceOffset();
+			
+			float len = 8;
+			float space = 4f;
+			
+			Angles.vector.set(len, -space).rotate(entity.rotation);
+			bullet(tile, entity.rotation);
+			Effects.effect("chainshot", tile.worldx() + Angles.x() + offset.x, tile.worldy()+ Angles.y() + offset.y, entity.rotation);
+				
+			Angles.vector.set(len, space).rotate(entity.rotation);
+			bullet(tile, entity.rotation);
+			Effects.effect("chainshot", tile.worldx() + Angles.x() + offset.x, tile.worldy()+ Angles.y() + offset.y, entity.rotation);
 		}
 	},
 	

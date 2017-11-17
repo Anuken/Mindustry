@@ -34,6 +34,13 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Draw.reset();
 		}
 	},
+	chain = new BulletType(2f, 8){
+		public void draw(Bullet b){
+			Draw.color("gray");
+			Draw.rect("bullet", b.x, b.y, b.angle());
+			Draw.reset();
+		}
+	},
 	sniper = new BulletType(3f, 23){
 		public void draw(Bullet b){
 			Draw.color(Color.LIGHT_GRAY);

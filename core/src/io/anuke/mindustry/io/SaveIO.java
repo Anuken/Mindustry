@@ -78,7 +78,6 @@ import io.anuke.ucore.entities.Entity;
  *     Item ID (byte)
  *     Item amount (int)
  *   Additional tile entity data (varies, check the TileEntity classes)
- * 
  */
 public class SaveIO{
 	/**Save file version ID. Should be incremented every breaking release.*/

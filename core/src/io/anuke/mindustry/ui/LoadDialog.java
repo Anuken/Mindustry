@@ -1,6 +1,5 @@
 package io.anuke.mindustry.ui;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
@@ -53,8 +52,8 @@ public class LoadDialog extends FloatingDialog{
 			
 			button.add(info).padBottom(2).padTop(6);
 			button.row();
-			button.addImage("white", Color.GRAY)
-			.growX().height(3f).pad(4f).units(Unit.dp);
+			//button.addImage("white", Color.GRAY)
+			//.growX().height(3f).pad(4f).units(Unit.dp);
 			button.row();
 			modifyButton(button, slot);
 

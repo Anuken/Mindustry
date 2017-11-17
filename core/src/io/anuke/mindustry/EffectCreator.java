@@ -25,6 +25,15 @@ public class EffectCreator{
 			});
 		});
 		
+		Effects.create("chainshot", 9f, e -> {
+			Draw.color(Color.WHITE, lightOrange, e.ifract());
+			Draw.thick(e.fract()*4f);
+			Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*7f);
+			Draw.thick(e.fract()*2f);
+			Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*10f);
+			Draw.reset();
+		});
+		
 		Effects.create("shockwave", 10f, e -> {
 			Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.ifract());
 			Draw.thick(e.fract()*2f + 0.2f);
