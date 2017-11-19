@@ -3,7 +3,6 @@ package io.anuke.mindustry;
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.scene.actions.Actions.*;
 
-import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
@@ -173,6 +172,7 @@ public class UI extends SceneModule{
 		prefs.checkPref("fps", "Show FPS", false);
 		prefs.checkPref("noshadows", "Disable shadows", false);
 		prefs.checkPref("smoothcam", "Smooth Camera", true);
+		prefs.checkPref("indicators", "Enemy Indicators", true);
 		
 		prefs.hidden(()->{
 			if(!GameState.is(State.menu)){
@@ -191,6 +191,13 @@ public class UI extends SceneModule{
 				menu.hide();
 			}
 		});
+		
+		if(!android){
+			prefs.content().row();
+			prefs.content().addButton("Controls", () -> {
+				keys.show(scene);
+			}).size(300f, 50f).pad(5f).units(Unit.dp);
+		}
 
 		keys = new MindustryKeybindDialog();
 
@@ -416,49 +423,27 @@ public class UI extends SceneModule{
 			//menu table
 			new table(){{
 				
-				new table("pane"){{
-					defaults().size(220, 48).pad(3);
+				new table(){{
+					float scale = 4f;
+					defaults().size(100*scale, 21*scale).pad(-10f).units(Unit.dp);
 					
-					new button("Play", () -> {
-						levels.show();
-					});
-					
+					add(new MenuButton("text-play", ()-> levels.show()));
 					row();
 					
-					new button("Tutorial", ()->{
-						control.playMap(Map.tutorial);
-					});
-					
-					if(Gdx.app.getType() != ApplicationType.WebGL){
-						row();
-					
-						new button("Load Game", () -> {
-							load.show();
-						});
-					}
-	
-					row();
-	
-					new button("Settings", () -> {
-						prefs.show(scene);
-					});
-	
+					add(new MenuButton("text-tutorial", ()-> control.playMap(Map.tutorial)));
 					row();
 					
-					if(!android){
-						new button("Controls", () -> {
-							keys.show(scene);
-						});
-						
+					if(!gwt){
+						add(new MenuButton("text-load", ()-> load.show()));
 						row();
 					}
 					
-					if(Gdx.app.getType() != ApplicationType.WebGL && !android){
-						new button("Exit", () -> {
-							Gdx.app.exit();
-						});
-					}
+					add(new MenuButton("text-settings", ()-> prefs.show()));
+					row();
 					
+					if(!gwt){
+						add(new MenuButton("text-exit", ()-> Gdx.app.exit()));
+					}
 					get().pad(Unit.dp.inPixels(16));
 				}};
 	

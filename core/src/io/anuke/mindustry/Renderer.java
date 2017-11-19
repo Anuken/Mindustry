@@ -150,7 +150,9 @@ public class Renderer extends RendererModule{
 		
 		renderPixelOverlay();
 		
-		drawEnemyMarkers();
+		if(Settings.getBool("indicators")){
+			drawEnemyMarkers();
+		}
 	}
 
 	@Override
