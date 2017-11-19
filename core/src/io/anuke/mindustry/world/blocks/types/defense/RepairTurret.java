@@ -34,7 +34,6 @@ public class RepairTurret extends Turret{
 				
 				if(entity.blockTarget.health > entity.blockTarget.health)
 					entity.blockTarget.health = entity.blockTarget.maxhealth;
-				
 			}
 		}
 	}

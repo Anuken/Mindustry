@@ -24,8 +24,8 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
 public class Turret extends Block{
-	public static final int targetInterval = 15;
-	private static boolean drawDebug = false;
+	static final int targetInterval = 15;
+	static boolean drawDebug = false;
 	
 	protected float range = 50f;
 	protected float reload = 10f;
@@ -118,7 +118,7 @@ public class Turret extends Block{
 		if(entity.target != null && entity.target.isDead())
 			entity.target = null;
 		
-		if(hasAmmo(tile)){
+		if(hasAmmo(tile) || (Vars.debug && Vars.infiniteAmmo)){
 			
 			if(Timers.get(entity, "target", targetInterval)){
 				entity.target = (Enemy)Entities.getClosest(tile.worldx(), tile.worldy(), range, e->{

@@ -236,7 +236,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			lifetime = 65f;
 		}
 		public void draw(Bullet b){
-			Draw.color(Color.valueOf("c2efd7"), Color.valueOf("72deaf"), b.time/lifetime);
+			Draw.color(Color.valueOf("efa66c"), Color.valueOf("72deaf"), b.time/lifetime);
 			float size = 7f-b.time/lifetime*6f;
 			Draw.rect("circle", b.x, b.y, size, size);
 			Draw.reset();

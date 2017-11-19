@@ -16,17 +16,16 @@ public enum Recipe{
 	//compositewall(defense, DefenseBlocks.compositewall, stack(Item.dirium, 2), stack(Item.titanium, 2), stack(Item.steel, 2), stack(Item.iron, 2)),
 	titaniumwalllarge(defense, DefenseBlocks.titaniumwalllarge, stack(Item.titanium, 8)),
 	duriumwalllarge(defense, DefenseBlocks.diriumwalllarge, stack(Item.dirium, 8)),
-	healturret(defense, DefenseBlocks.repairturret, stack(Item.iron, 30)),
-	megahealturret(defense, DefenseBlocks.megarepairturret, stack(Item.iron, 20), stack(Item.steel, 30)),
 	titaniumshieldwall(defense, DefenseBlocks.titaniumshieldwall, stack(Item.titanium, 2)),
 	shieldgenerator(defense, DefenseBlocks.shieldgenerator, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	
 	conveyor(distribution, DistributionBlocks.conveyor, stack(Item.stone, 1)),
 	steelconveyor(distribution, DistributionBlocks.steelconveyor, stack(Item.steel, 1)),
-	poweredconveyor(distribution, DistributionBlocks.poweredconveyor, stack(Item.dirium, 1)),
+	poweredconveyor(distribution, DistributionBlocks.pulseconveyor, stack(Item.dirium, 1)),
 	router(distribution, DistributionBlocks.router, stack(Item.stone, 2)),
 	junction(distribution, DistributionBlocks.junction, stack(Item.iron, 2)),
 	conduit(distribution, DistributionBlocks.conduit, stack(Item.steel, 1)),
+	pulseconduit(distribution, DistributionBlocks.pulseconduit, stack(Item.titanium, 1), stack(Item.steel, 1)),
 	liquidrouter(distribution, DistributionBlocks.liquidrouter, stack(Item.steel, 2)),
 	liquidjunction(distribution, DistributionBlocks.liquidjunction, stack(Item.steel, 2)),
 	liquiditemjunction(distribution, DistributionBlocks.liquiditemjunction, stack(Item.steel, 1), stack(Item.iron, 1)),	
@@ -67,7 +66,11 @@ public enum Recipe{
 	powerlaserrouter(power, DistributionBlocks.powerlaserrouter, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	teleporter(power, DistributionBlocks.teleporter, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	
-	pump(production, ProductionBlocks.pump, stack(Item.steel, 10));
+	healturret(power, DefenseBlocks.repairturret, stack(Item.iron, 30)),
+	megahealturret(power, DefenseBlocks.megarepairturret, stack(Item.iron, 20), stack(Item.steel, 30)),
+	
+	pump(production, ProductionBlocks.pump, stack(Item.steel, 10)),
+	fluxpump(production, ProductionBlocks.fluxpump, stack(Item.steel, 10), stack(Item.dirium, 5));
 	
 	public Block result;
 	public ItemStack[] requirements;

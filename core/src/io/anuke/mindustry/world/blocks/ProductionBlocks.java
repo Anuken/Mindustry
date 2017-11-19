@@ -42,6 +42,10 @@ public class ProductionBlocks{
 		
 	}},
 	
+	fluxpump = new Pump("fluxpump"){{
+		pumpspeed = 3f;
+	}},
+	
 	smelter = new Crafter("smelter"){
 		{
 			health = 70;
@@ -51,7 +55,7 @@ public class ProductionBlocks{
 		
 		@Override
 		public String description(){
-			return "Takes in coal + iron, outputs steel.";
+			return "Converts coal + iron to steel.";
 		}
 	},
 	
@@ -64,7 +68,7 @@ public class ProductionBlocks{
 		
 		@Override
 		public String description(){
-			return "Takes in steel + titanium, outputs dirium.";
+			return "Converts steel + titanium to dirium.";
 		}
 	},
 	
@@ -82,7 +86,7 @@ public class ProductionBlocks{
 		
 		@Override
 		public String description(){
-			return "Takes in stone + water, outputs coal.";
+			return "Converts stone + water to coal.";
 		}
 	},
 	
@@ -101,7 +105,7 @@ public class ProductionBlocks{
 		
 		@Override
 		public String description(){
-			return "Takes in iron + water, outputs titanium.";
+			return "Converts iron + water to titanium.";
 		}
 	},
 	
@@ -119,7 +123,45 @@ public class ProductionBlocks{
 		
 		@Override
 		public String description(){
-			return "Takes in oil, outputs coal.";
+			return "Converts oil to coal.";
+		}
+	},
+	
+	stoneformer = new LiquidCrafter("stoneformer"){
+		{
+			formalName = "stone former";
+			input = Item.iron;
+			inputAmount = 2;
+			inputLiquid = Liquid.lava;
+			liquidAmount = 20f;
+			liquidCapacity = 21f;
+			purifyTime = 10;
+			output = Item.stone;
+			health = 80;
+			craftEffect = Fx.purifystone;
+		}
+		
+		@Override
+		public String description(){
+			return "Converts lava to stone.";
+		}
+	},
+	
+	lavasmelter = new LiquidCrafter("lavasmelter"){
+		{
+			formalName = "lava smelter";
+			inputLiquid = Liquid.lava;
+			liquidAmount = 40f;
+			liquidCapacity = 41f;
+			purifyTime = 25;
+			output = Item.stone;
+			health = 80;
+			craftEffect = Fx.purifystone;
+		}
+		
+		@Override
+		public String description(){
+			return "Converts iron + lava to steel.";
 		}
 	},
 	
@@ -156,7 +198,7 @@ public class ProductionBlocks{
 	
 	omnidrill = new Drill("omnidrill"){
 		{
-			time = 2;
+			time = 3;
 			formalName = "omnidrill";
 		}
 		

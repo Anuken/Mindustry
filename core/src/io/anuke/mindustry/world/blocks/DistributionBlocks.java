@@ -9,7 +9,13 @@ public class DistributionBlocks{
 	public static final Block
 	
 	conduit = new LiquidBlock("conduit"){{
-		
+		health = 45;
+	}},
+	
+	pulseconduit = new LiquidBlock("pulseconduit"){{
+		liquidCapacity = 16f;
+		flowfactor = 4.9f;
+		health = 65;
 	}},
 	
 	liquidrouter = new LiquidRouter("liquidrouter"){{
@@ -27,7 +33,7 @@ public class DistributionBlocks{
 	}},
 	
 	//TODO
-	poweredconveyor = new Conveyor("poweredconveyor"){{
+	pulseconveyor = new Conveyor("poweredconveyor"){{
 		health = 90;
 		speed = 0.09f;
 		formalName = "pulse conveyor";

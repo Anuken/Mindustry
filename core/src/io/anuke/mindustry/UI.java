@@ -245,7 +245,7 @@ public class UI extends SceneModule{
 				
 				int rows = 4;
 				int maxcol = 0;
-				float size = 46;
+				float size = 48;
 				
 				Stack stack = new Stack();
 				ButtonGroup<ImageButton> group = new ButtonGroup<>();

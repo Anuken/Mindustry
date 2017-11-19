@@ -29,6 +29,15 @@ public class Pump extends LiquidBlock{
 	@Override
 	public void draw(Tile tile){
 		Draw.rect(name(), tile.worldx(), tile.worldy());
+		
+		LiquidEntity entity = tile.entity();
+		
+		if(entity.liquid == null) return;
+		
+		Draw.color(entity.liquid.color);
+		Draw.alpha(entity.liquidAmount / liquidCapacity);
+		Draw.rect("blank", tile.worldx(), tile.worldy(), 2, 2);
+		Draw.color();
 	}
 	
 	@Override
@@ -47,7 +56,7 @@ public class Pump extends LiquidBlock{
 		if(tile.floor().liquidDrop != null &&
 				Timers.get(tile, "pump", 8) && entity.liquidAmount < liquidCapacity){
 			entity.liquid = tile.floor().liquidDrop;
-			entity.liquidAmount += pumpspeed;
+			entity.liquidAmount += Math.min(pumpspeed, this.liquidCapacity - entity.liquidAmount);
 		}
 		
 		if(Timers.get(tile, "dump", 1)){

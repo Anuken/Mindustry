@@ -151,6 +151,13 @@ public class Fx{
 		Draw.reset();
 	}),
 	
+	purifystone = new Effect(10, e -> {
+		Draw.color(Color.ORANGE, Color.GRAY, e.ifract());
+		Draw.thickness(2f);
+		Draw.spikes(e.x, e.y, e.ifract() * 4f, 2, 6);
+		Draw.reset();
+	}),
+	
 	generate = new Effect(11, e -> {
 		Draw.color(Color.ORANGE, Color.YELLOW, e.ifract());
 		Draw.thickness(1f);

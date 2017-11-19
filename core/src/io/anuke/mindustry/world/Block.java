@@ -57,6 +57,8 @@ public class Block{
 	public Liquid liquidDrop = null;
 	/**multiblock width/height*/
 	public int width = 1, height = 1;
+	/**Detailed description of the block. Can be as long as necesary.*/
+	public String fullDescription; //TODO show this
 
 	public Block(String name) {
 		blocks.add(this);
