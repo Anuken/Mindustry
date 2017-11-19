@@ -56,6 +56,8 @@ public class Control extends Module{
 		
 		UCore.log("Total blocks loaded: " + Block.getAllBlocks().size);
 		
+		Draw.setCircleVertices(14);
+		
 		Gdx.input.setCatchBackKey(true);
 		
 		if(android){
@@ -237,14 +239,15 @@ public class Control extends Module{
 				
 				for(int i = 0; i < spawnamount; i ++){
 					int index = i;
+					float range = 8f;
 					
 					Timers.run(index*50f, ()->{
 						try{
 							Constructor c = ClassReflection.getConstructor(spawn.type, int.class);
 							Enemy enemy = (Enemy)c.newInstance(fl);
-							enemy.set(tile.worldx(), tile.worldy());
+							enemy.set(tile.worldx() + Mathf.range(range), tile.worldy() + Mathf.range(range));
 							enemy.tier = spawn.tier(wave, fl);
-							Effects.effect("spawn", enemy);
+							Effects.effect(Fx.spawn, enemy);
 							enemy.add();
 							
 							enemies ++;
@@ -294,10 +297,10 @@ public class Control extends Module{
 		Tile core = World.core;
 		for(int i = 0; i < 16; i ++){
 			Timers.run(i*2, ()->{
-				Effects.effect("explosion", core.worldx()+Mathf.range(40), core.worldy()+Mathf.range(40));
+				Effects.effect(Fx.explosion, core.worldx()+Mathf.range(40), core.worldy()+Mathf.range(40));
 			});
 		}
-		Effects.effect("coreexplosion", core.worldx(), core.worldy());
+		Effects.effect(Fx.coreexplosion, core.worldx(), core.worldy());
 		
 		Timers.run(60, ()->{
 			ui.showRestart();
@@ -393,8 +396,6 @@ public class Control extends Module{
 		Entities.setCollider(tilesize, (x, y)->{
 			return World.solid(x, y);
 		});
-
-		EffectCreator.create();
 	}
 	
 	@Override
@@ -402,7 +403,8 @@ public class Control extends Module{
 		
 		if(debug){
 			if(Inputs.keyUp(Keys.P)){
-				Effects.effect("blockexplosion", player);
+				Effects.effect(Fx.shellsmoke, player);
+				Effects.effect(Fx.shellexplosion, player);
 			}
 			
 			if(Inputs.keyUp(Keys.C)){

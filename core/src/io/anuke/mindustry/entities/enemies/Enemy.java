@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
+import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Shaders;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
@@ -171,7 +172,7 @@ public class Enemy extends DestructibleEntity{
 	
 	@Override
 	public void onDeath(){
-		Effects.effect("explosion", this);
+		Effects.effect(Fx.explosion, this);
 		Effects.shake(3f, 4f, this);
 		Effects.sound("explosion", this);
 		remove();

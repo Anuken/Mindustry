@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import com.badlogic.gdx.utils.ObjectMap;
 
+import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.resource.Item;
@@ -89,7 +90,7 @@ public class TileEntity extends Entity{
 		if(health != 0 && !(tile.block() instanceof Wall) &&
 				Mathf.chance(0.009f*Timers.delta()*(1f-(float)health/maxhealth))){
 			
-			Effects.effect("smoke", x+Mathf.range(4), y+Mathf.range(4));
+			Effects.effect(Fx.smoke, x+Mathf.range(4), y+Mathf.range(4));
 		}
 		
 		tile.block().update(tile);

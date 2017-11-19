@@ -6,12 +6,14 @@ import java.io.IOException;
 
 import com.badlogic.gdx.math.Vector2;
 
+import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidAcceptor;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 
 public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
@@ -22,7 +24,7 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 	/**How much liquid to consume to get one generatePower.*/
 	public float inputLiquid = 5f;
 	public float liquidCapacity = 30f;
-	public String generateEffect = "generate";
+	public Effect generateEffect = Fx.generate;
 
 	public LiquidPowerGenerator(String name) {
 		super(name);

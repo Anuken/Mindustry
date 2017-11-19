@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.GameState;
 import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.Vars;
@@ -13,6 +14,7 @@ import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.util.Tmp;
 public class Block{
 	private static int lastid;
@@ -26,7 +28,7 @@ public class Block{
 	/**display name*/
 	public String formalName;
 	/**played on destroy*/
-	public String explosionEffect = "blockexplosion";
+	public Effect explosionEffect = Fx.blockexplosion;
 	/**played on destroy*/
 	public String explosionSound = "break";
 	/**whether this block has a tile entity that updates*/

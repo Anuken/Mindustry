@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Color;
 
+import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
@@ -10,6 +11,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidBlock;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 
 public class LiquidCrafter extends LiquidBlock{
@@ -21,7 +23,7 @@ public class LiquidCrafter extends LiquidBlock{
 	public Item output = null;
 	public int itemCapacity = 90;
 	public int purifyTime = 80;
-	public String craftEffect = "purify";
+	public Effect craftEffect = Fx.purify;
 
 	public LiquidCrafter(String name) {
 		super(name);

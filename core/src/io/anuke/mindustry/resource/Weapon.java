@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
+import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
@@ -22,7 +23,7 @@ public enum Weapon{
 		@Override
 		public void shoot(Player p){
 			super.shoot(p);
-			Effects.effect("shoot3", p.x + vector.x, p.y+vector.y);
+			Effects.effect(Fx.shoot3, p.x + vector.x, p.y+vector.y);
 		}
 	},
 	triblaster(13, BulletType.shot, "Shoots 3 bullets in a spread.", stack(Item.iron, 40)){
@@ -36,7 +37,7 @@ public enum Weapon{
 			bullet(p, p.x, p.y, ang+space);
 			bullet(p, p.x, p.y, ang-space);
 			
-			Effects.effect("shoot", p.x + vector.x, p.y+vector.y);
+			Effects.effect(Fx.shoot, p.x + vector.x, p.y+vector.y);
 			
 		}
 	},
@@ -48,7 +49,7 @@ public enum Weapon{
 			
 			bullet(p, p.x, p.y, ang + Mathf.range(8));
 			
-			Effects.effect("shoot2", p.x + vector.x, p.y+vector.y);
+			Effects.effect(Fx.shoot, p.x + vector.x, p.y+vector.y);
 		}
 	},
 	flamer(5, BulletType.flame, "Shoots a stream of fire.", stack(Item.steel, 60), stack(Item.coal, 60)){
@@ -73,7 +74,7 @@ public enum Weapon{
 			float ang = mouseAngle(p);
 			
 			bullet(p, p.x, p.y, ang);
-			Effects.effect("railshoot", p.x + vector.x, p.y+vector.y);
+			Effects.effect(Fx.railshoot, p.x + vector.x, p.y+vector.y);
 		}
 	},
 	mortar(100, BulletType.shell, "Shoots a slow, but damaging shell.", stack(Item.titanium, 40), stack(Item.steel, 60)){
@@ -82,7 +83,7 @@ public enum Weapon{
 		public void shoot(Player p){
 			float ang = mouseAngle(p);
 			bullet(p, p.x, p.y, ang);
-			Effects.effect("mortarshoot", p.x + vector.x, p.y+vector.y);
+			Effects.effect(Fx.mortarshoot, p.x + vector.x, p.y+vector.y);
 			Effects.shake(2f, 2f, Vars.player);
 		}
 	};

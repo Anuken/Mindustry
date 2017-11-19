@@ -7,6 +7,7 @@ import java.io.IOException;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 
+import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
@@ -188,7 +189,7 @@ public class Turret extends Block{
 		
 		if(Timers.getTime(tile, "reload") <= 0){
 			Timers.run(hittime, ()->{
-				Effects.effect("spawn", predictX, predictY);
+				Effects.effect(Fx.spawn, predictX, predictY);
 			});
 		}
 	}
@@ -206,7 +207,8 @@ public class Turret extends Block{
 	}
 	
 	protected void bullet(Tile tile, float angle){
-		 Bullet out = new Bullet(bullet, tile.entity, tile.worldx() + Angles.x(), tile.worldy() + Angles.y(), angle).add();
+		Vector2 offset = getPlaceOffset();
+		 Bullet out = new Bullet(bullet, tile.entity, tile.worldx() + Angles.x() + offset.x, tile.worldy() + Angles.y() + offset.y, angle).add();
 		 out.damage = (int)(bullet.damage*Vars.multiplier);
 	}
 	

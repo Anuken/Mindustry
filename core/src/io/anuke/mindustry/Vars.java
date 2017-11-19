@@ -29,6 +29,10 @@ public class Vars{
 	public static boolean debug = false;
 	//whether to debug openGL info
 	public static boolean debugGL = false;
+	//whether turrets have infinite ammo (only with debug)
+	public static boolean infiniteAmmo = true;
+	//whether to show paths of enemies
+	public static boolean showPaths = false;
 	//number of save slots-- increasing may lead to layout issues
 	//TODO named save slots, possibly with a scroll dialog
 	public static final int saveSlots = 4;

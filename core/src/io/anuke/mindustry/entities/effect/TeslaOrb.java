@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 
+import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
@@ -64,7 +65,7 @@ public class TeslaOrb extends Entity{
 	void damageEnemy(Enemy enemy){
 		//TODO
 		enemy.damage(damage);
-		Effects.effect("laserhit", enemy.x + Mathf.range(2f), enemy.y + Mathf.range(2f));
+		Effects.effect(Fx.laserhit, enemy.x + Mathf.range(2f), enemy.y + Mathf.range(2f));
 	}
 	
 	@Override

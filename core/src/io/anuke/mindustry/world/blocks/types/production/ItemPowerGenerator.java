@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Color;
 
+import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
@@ -37,7 +38,7 @@ public class ItemPowerGenerator extends Generator{
 		PowerEntity entity = tile.entity();
 		
 		if(entity.hasItem(generateItem) && tryAddPower(tile, generateAmount)){
-			Effects.effect("generate", tile.entity);
+			Effects.effect(Fx.generate, tile.entity);
 			entity.removeItem(generateItem, 1);
 		}
 		

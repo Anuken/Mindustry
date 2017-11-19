@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks;
 
+import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
@@ -113,7 +114,7 @@ public class ProductionBlocks{
 			purifyTime = 70;
 			output = Item.coal;
 			health = 80;
-			craftEffect = "purifyoil";
+			craftEffect = Fx.purifyoil;
 		}
 		
 		@Override
@@ -164,7 +165,7 @@ public class ProductionBlocks{
 
 			if(tile.floor().drops != null && Timers.get(tile, "drill", 60 * time)){
 				offloadNear(tile, tile.floor().drops.item);
-				Effects.effect("sparkbig", tile.worldx(), tile.worldy());
+				Effects.effect(Fx.sparkbig, tile.worldx(), tile.worldy());
 			}
 
 			if(Timers.get(tile, "dump", 30)){

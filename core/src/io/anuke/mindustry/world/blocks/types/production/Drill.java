@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -25,7 +26,7 @@ public class Drill extends Block{
 		
 		if(tile.floor() == resource && Timers.get(tile, "drill", 60 * time) && tile.entity.totalItems() < capacity){
 			offloadNear(tile, result);
-			Effects.effect("spark", tile.worldx(), tile.worldy());
+			Effects.effect(Fx.spark, tile.worldx(), tile.worldy());
 		}
 
 		if(Timers.get(tile, "dump", 30)){

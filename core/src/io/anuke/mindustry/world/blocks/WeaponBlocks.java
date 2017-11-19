@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.blocks;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 
+import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.effect.TeslaOrb;
@@ -167,15 +168,49 @@ public class WeaponBlocks{
 	
 	chainturret = new Turret("chainturret"){
 		{
-			inaccuracy = 7f;
+			inaccuracy = 8f;
 			formalName = "chain turret";
-			range = 60f;
-			reload = 10f;
+			range = 80f;
+			reload = 7f;
 			bullet = BulletType.chain;
-			ammo = Item.stone; //TODO
+			ammo = Item.uranium;
 			health = 430;
-			ammoMultiplier = 10;
 			width = height = 2;
+			shootCone = 9f;
+		}
+		
+		//TODO specify turret shoot effect in turret instead of doing it manually
+		@Override
+		protected void shoot(Tile tile){
+			TurretEntity entity = tile.entity();
+			Vector2 offset = getPlaceOffset();
+			
+			float len = 8;
+			float space = 3.5f;
+			
+			for(int i = -1; i < 1; i ++){
+				Angles.vector.set(len, Mathf.sign(i) * space).rotate(entity.rotation);
+				bullet(tile, entity.rotation);
+				Effects.effect(Fx.chainshot, tile.worldx() + Angles.x() + offset.x, 
+						tile.worldy()+ Angles.y() + offset.y, entity.rotation);
+			}
+			
+			Effects.shake(1f, 1f, tile.worldx(), tile.worldy());
+		}
+	},
+	
+	titanturret = new Turret("titancannon"){
+		{
+			formalName = "titan cannon";
+			range = 120f;
+			reload = 20f;
+			bullet = BulletType.titanshell;
+			ammo = Item.uranium;
+			health = 800;
+			ammoMultiplier = 5;
+			width = height = 3;
+			rotatespeed = 0.07f;
+			shootCone = 9f;
 		}
 		
 		@Override
@@ -183,31 +218,12 @@ public class WeaponBlocks{
 			TurretEntity entity = tile.entity();
 			Vector2 offset = getPlaceOffset();
 			
-			float len = 8;
-			float space = 4f;
+			Angles.translation(entity.rotation, 14f);
+			bullet(tile, entity.rotation);
+			Effects.effect(Fx.titanshot, tile.worldx() + Angles.x() + offset.x, 
+						tile.worldy()+ Angles.y() + offset.y, entity.rotation);
 			
-			Angles.vector.set(len, -space).rotate(entity.rotation);
-			bullet(tile, entity.rotation);
-			Effects.effect("chainshot", tile.worldx() + Angles.x() + offset.x, tile.worldy()+ Angles.y() + offset.y, entity.rotation);
-				
-			Angles.vector.set(len, space).rotate(entity.rotation);
-			bullet(tile, entity.rotation);
-			Effects.effect("chainshot", tile.worldx() + Angles.x() + offset.x, tile.worldy()+ Angles.y() + offset.y, entity.rotation);
-		}
-	},
-	
-	titanturret = new Turret("titancannon"){
-		{
-			inaccuracy = 7f;
-			formalName = "titan cannon";
-			range = 120f;
-			reload = 40f;
-			bullet = BulletType.shell;
-			ammo = Item.coal;
-			health = 800;
-			ammoMultiplier = 10;
-			width = height = 3;
-			rotatespeed = 0.08f;
+			Effects.shake(3f, 3f, tile.worldx(), tile.worldy());
 		}
 	};
 }

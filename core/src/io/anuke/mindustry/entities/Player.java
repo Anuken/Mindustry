@@ -7,6 +7,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
+import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Weapon;
@@ -35,7 +36,7 @@ public class Player extends DestructibleEntity{
 	@Override
 	public void onDeath(){
 		remove();
-		Effects.effect("explosion", this);
+		Effects.effect(Fx.explosion, this);
 		Effects.shake(4f, 5f, this);
 		Effects.sound("die", this);
 		

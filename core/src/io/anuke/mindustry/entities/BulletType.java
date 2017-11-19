@@ -2,7 +2,10 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.graphics.Color;
 
+import io.anuke.mindustry.Fx;
+import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.entities.effect.EMP;
+import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
@@ -14,6 +17,9 @@ import io.anuke.ucore.util.Mathf;
 public abstract class BulletType  extends BaseBulletType<Bullet>{
 	static Color glowy = Color.valueOf("fdc056");
 	static Color lightGold = Hue.mix(Color.GOLD, Color.WHITE, 0.4f);
+	static Color lightRed = Hue.mix(Color.WHITE, Color.FIREBRICK, 0.1f);
+	static Color lightOrange = Color.valueOf("f68021");
+	static Color whiteOrange = Hue.mix(lightOrange, Color.WHITE, 0.6f);
 	
 	public static final BulletType 
 	
@@ -36,8 +42,8 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 	},
 	chain = new BulletType(2f, 8){
 		public void draw(Bullet b){
-			Draw.color("gray");
-			Draw.rect("bullet", b.x, b.y, b.angle());
+			Draw.color(whiteOrange);
+			Draw.rect("chainbullet", b.x, b.y, b.angle());
 			Draw.reset();
 		}
 	},
@@ -51,7 +57,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 		
 		public void update(Bullet b){
 			if(Timers.get(b, "smoke", 4)){
-				Effects.effect("railsmoke", b.x, b.y);
+				Effects.effect(Fx.railsmoke, b.x, b.y);
 			}
 		}
 	},
@@ -72,7 +78,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 		
 		public void update(Bullet b){
 			if(Timers.get(b, "smoke", 2)){
-				Effects.effect("empspark", b.x + Mathf.range(2), b.y + Mathf.range(2));
+				Effects.effect(Fx.empspark, b.x + Mathf.range(2), b.y + Mathf.range(2));
 			}
 		}
 		
@@ -84,19 +90,20 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Timers.run(5f, ()->{
 				new EMP(b.x, b.y, b.damage).add();
 			});
-			Effects.effect("empshockwave", b);
+			Effects.effect(Fx.empshockwave, b);
 			Effects.shake(3f, 3f, b);
 		}
 	},
-	//TODO use DamageArea instead
-	shell = new BulletType(1.1f, 85){
+	//TODO better visuals for shell
+	shell = new BulletType(1.1f, 60){
 		{
 			lifetime = 110f;
-			hitsize = 8f;
+			hitsize = 11f;
 		}
 		
 		public void draw(Bullet b){
 			float rad = 8f;
+			Draw.color(Color.ORANGE);
 			Draw.color(Color.GRAY);
 			Draw.rect("circle", b.x, b.y, rad, rad);
 			rad += Mathf.sin(Timers.time(), 3f, 1f);
@@ -107,7 +114,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 		
 		public void update(Bullet b){
 			if(Timers.get(b, "smoke", 7)){
-				Effects.effect("smoke", b.x + Mathf.range(2), b.y + Mathf.range(2));
+				Effects.effect(Fx.smoke, b.x + Mathf.range(2), b.y + Mathf.range(2));
 			}
 		}
 		
@@ -118,13 +125,41 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 		public void removed(Bullet b){
 			Effects.shake(3f, 3f, b);
 			
-			Effects.effect("shellsmoke", b);
-			Effects.effect("shellexplosion", b);
+			Effects.effect(Fx.shellsmoke, b);
+			Effects.effect(Fx.shellexplosion, b);
 			
-			Angles.circle(25, f->{
-				Angles.translation(f, 5f);
-				new Bullet(shellshot, b.owner, b.x + Angles.x(), b.y + Angles.y(), f).add();
-			});
+			DamageArea.damage(b.owner instanceof Enemy, b.x, b.y, 25f, (int)(damage * 2f/3f));
+		}
+	},
+	titanshell = new BulletType(1.8f, 60){
+		{
+			lifetime = 70f;
+			hitsize = 11f;
+		}
+		
+		public void draw(Bullet b){
+			Draw.color(whiteOrange);
+			Draw.rect("titanshell", b.x, b.y, b.angle());
+			Draw.reset();
+		}
+		
+		public void update(Bullet b){
+			if(Timers.get(b, "smoke", 4)){
+				Effects.effect(Fx.smoke, b.x + Mathf.range(2), b.y + Mathf.range(2));
+			}
+		}
+		
+		public void despawned(Bullet b){
+			removed(b);
+		}
+		
+		public void removed(Bullet b){
+			Effects.shake(3f, 3f, b);
+			
+			Effects.effect(Fx.shellsmoke, b);
+			Effects.effect(Fx.shockwaveSmall, b);
+			
+			DamageArea.damage(!(b.owner instanceof Enemy), b.x, b.y, 25f, (int)(damage * 2f/3f));
 		}
 	},
 	blast = new BulletType(1.1f, 80){
@@ -141,8 +176,8 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 		public void removed(Bullet b){
 			Effects.shake(3f, 3f, b);
 			
-			Effects.effect("blastsmoke", b);
-			Effects.effect("blastexplosion", b);
+			Effects.effect(Fx.blastsmoke, b);
+			Effects.effect(Fx.blastexplosion, b);
 			
 			Angles.circle(30, f->{
 				Angles.translation(f, 6f);
@@ -239,6 +274,6 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 	
 	@Override
 	public void removed(Bullet b){
-		Effects.effect("hit", b);
+		Effects.effect(Fx.hit, b);
 	}
 }

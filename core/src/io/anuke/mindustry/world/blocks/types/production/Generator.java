@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 
+import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
@@ -35,13 +36,13 @@ public class Generator extends PowerBlock{
 		if(explosive){
 			float x = tile.worldx(), y = tile.worldy();
 
-			Effects.effect("shellsmoke", x, y);
-			Effects.effect("blastsmoke", x, y);
+			Effects.effect(Fx.shellsmoke, x, y);
+			Effects.effect(Fx.blastsmoke, x, y);
 
 			Timers.run(Mathf.random(8f + Mathf.random(6f)), () -> {
 				Effects.shake(6f, 8f, x, y);
-				Effects.effect("generatorexplosion", x, y);
-				Effects.effect("shockwave", x, y);
+				Effects.effect(Fx.generatorexplosion, x, y);
+				Effects.effect(Fx.shockwave, x, y);
 
 				Timers.run(12f + Mathf.random(20f), () -> {
 					tile.damageNearby(3, 40, 0f);

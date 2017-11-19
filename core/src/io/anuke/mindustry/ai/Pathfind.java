@@ -6,6 +6,7 @@ import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.world.Tile;
@@ -85,9 +86,9 @@ public class Pathfind{
 			}
 			
 			
-			if(Vars.debug)
+			if(Vars.debug && Vars.showPaths)
 			for(Tile tile : path){
-				Effects.effect("ind", tile.worldx(), tile.worldy());
+				Effects.effect(Fx.ind, tile.worldx(), tile.worldy());
 			}
 			
 		}

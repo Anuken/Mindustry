@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Array;
 
+import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.TileEntity;
@@ -222,11 +223,11 @@ public class World{
 						toplace.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
 					}
 					
-					Effects.effect("place", worldx * Vars.tilesize, worldy * Vars.tilesize);
+					Effects.effect(Fx.place, worldx * Vars.tilesize, worldy * Vars.tilesize);
 				}
 			}
 		}else{
-			Effects.effect("place", x * Vars.tilesize, y * Vars.tilesize);
+			Effects.effect(Fx.place, x * Vars.tilesize, y * Vars.tilesize);
 		}
 		
 		Effects.shake(2f, 2f, player);
@@ -307,14 +308,14 @@ public class World{
 		
 		if(!tile.block().isMultiblock() && !tile.isLinked()){
 			tile.setBlock(Blocks.air);
-			Effects.effect("break", tile.worldx(), tile.worldy());
+			Effects.effect(Fx.breakBlock, tile.worldx(), tile.worldy());
 		}else{
 			Tile target = tile.isLinked() ? tile.getLinked() : tile;
 			Array<Tile> removals = target.getLinkedTiles();
 			for(Tile toremove : removals){
 				//note that setting a new block automatically unlinks it
 				toremove.setBlock(Blocks.air);
-				Effects.effect("break", toremove.worldx(), toremove.worldy());
+				Effects.effect(Fx.breakBlock, toremove.worldx(), toremove.worldy());
 			}
 		}
 	}

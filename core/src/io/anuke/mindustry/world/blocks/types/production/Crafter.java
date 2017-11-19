@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -34,7 +35,7 @@ public class Crafter extends Block{
 		}
 		
 		offloadNear(tile, result);
-		Effects.effect("smelt", tile.entity);
+		Effects.effect(Fx.smelt, tile.entity);
 	}
 
 	@Override

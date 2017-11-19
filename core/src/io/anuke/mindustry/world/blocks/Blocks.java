@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks;
 
+import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.GameState;
 import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.resource.Item;
@@ -51,11 +52,11 @@ public class Blocks{
 		@Override
 		public void update(Tile tile){
 			if(Mathf.chance(0.001 * Timers.delta())){
-				Effects.effect("lava", tile.worldx() + Mathf.range(5f), tile.worldy() + Mathf.range(5f));
+				Effects.effect(Fx.lava, tile.worldx() + Mathf.range(5f), tile.worldy() + Mathf.range(5f));
 			}
 			
 			if(Mathf.chance(0.003 * Timers.delta())){
-				Effects.effect("lavabubble", tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
+				Effects.effect(Fx.lavabubble, tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
 			}
 		}
 	},
@@ -70,7 +71,7 @@ public class Blocks{
 		@Override
 		public void update(Tile tile){
 			if(Mathf.chance(0.0025 * Timers.delta())){
-				Effects.effect("oilbubble", tile.worldx() + Mathf.range(2f), tile.worldy() + Mathf.range(2f));
+				Effects.effect(Fx.oilbubble, tile.worldx() + Mathf.range(2f), tile.worldy() + Mathf.range(2f));
 			}
 		}
 	},
