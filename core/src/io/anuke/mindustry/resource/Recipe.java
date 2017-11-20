@@ -14,6 +14,7 @@ public enum Recipe{
 	titaniumwall(defense, DefenseBlocks.titaniumwall, stack(Item.titanium, 2)),
 	duriumwall(defense, DefenseBlocks.diriumwall, stack(Item.dirium, 2)),
 	//compositewall(defense, DefenseBlocks.compositewall, stack(Item.dirium, 2), stack(Item.titanium, 2), stack(Item.steel, 2), stack(Item.iron, 2)),
+	steelwalllarge(defense, DefenseBlocks.steelwalllarge, stack(Item.steel, 8)),
 	titaniumwalllarge(defense, DefenseBlocks.titaniumwalllarge, stack(Item.titanium, 8)),
 	duriumwalllarge(defense, DefenseBlocks.diriumwalllarge, stack(Item.dirium, 8)),
 	titaniumshieldwall(defense, DefenseBlocks.titaniumshieldwall, stack(Item.titanium, 2)),

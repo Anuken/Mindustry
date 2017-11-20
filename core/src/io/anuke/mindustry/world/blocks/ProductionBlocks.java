@@ -165,6 +165,25 @@ public class ProductionBlocks{
 		}
 	},
 	
+	//TODO
+	lavacompressor = new LiquidCrafter("lavacompressor"){
+		{
+			formalName = "lava compressor";
+			inputLiquid = Liquid.lava;
+			liquidAmount = 40f;
+			liquidCapacity = 41f;
+			purifyTime = 25;
+			output = Item.iron;
+			health = 80;
+			craftEffect = Fx.purifystone;
+		}
+		
+		@Override
+		public String description(){
+			return "Converts stone + lava to iron.";
+		}
+	},
+	
 	stonedrill = new Drill("stonedrill"){{
 		resource = Blocks.stone;
 		result = Item.stone;

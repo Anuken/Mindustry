@@ -37,6 +37,11 @@ public class DefenseBlocks{
 		health = 270;
 		formalName = "composite wall";
 	}},
+	steelwalllarge = new Wall("steelwall-large"){{
+		health = 110*4;
+		formalName = "large steel wall";
+		width = height = 2;
+	}},
 	titaniumwalllarge = new Wall("titaniumwall-large"){{
 		health = 150*4;
 		formalName = "large titanium wall";
