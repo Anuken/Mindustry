@@ -239,7 +239,7 @@ public class ProductionBlocks{
 			formalName = "thermal generator";
 			//TODO
 			generateLiquid = Liquid.lava;
-			inputLiquid = 5f;
+			inputLiquid = 20f;
 			generatePower = 1f;
 			powerCapacity = 40f;
 		}
@@ -254,7 +254,7 @@ public class ProductionBlocks{
 			formalName = "combustion generator";
 			//TODO
 			generateLiquid = Liquid.oil;
-			inputLiquid = 8f;
+			inputLiquid = 14f;
 			generatePower = 1f;
 			powerCapacity = 40f;
 		}
@@ -262,6 +262,21 @@ public class ProductionBlocks{
 		@Override
 		public String description(){
 			return "Generates power from oil.";
+		}
+	},
+	rtgenerator = new ItemPowerGenerator("rtgenerator"){
+		{
+			//TODO make this generate slowly
+			formalName = "radioisotope generator";
+			generateItem = Item.uranium;
+			generateAmount = 10f;
+			powerCapacity = 40f;
+			generateTime = 50f;
+		}
+		
+		@Override
+		public String description(){
+			return "Generates small amounts of power from uranium.";
 		}
 	},
 	nuclearReactor = new LiquidItemPowerGenerator("nuclearreactor"){

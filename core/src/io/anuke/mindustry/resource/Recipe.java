@@ -17,7 +17,6 @@ public enum Recipe{
 	titaniumwalllarge(defense, DefenseBlocks.titaniumwalllarge, stack(Item.titanium, 8)),
 	duriumwalllarge(defense, DefenseBlocks.diriumwalllarge, stack(Item.dirium, 8)),
 	titaniumshieldwall(defense, DefenseBlocks.titaniumshieldwall, stack(Item.titanium, 2)),
-	shieldgenerator(defense, DefenseBlocks.shieldgenerator, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	
 	conveyor(distribution, DistributionBlocks.conveyor, stack(Item.stone, 1)),
 	steelconveyor(distribution, DistributionBlocks.steelconveyor, stack(Item.steel, 1)),
@@ -60,11 +59,15 @@ public enum Recipe{
 	coalgenerator(power, ProductionBlocks.coalgenerator, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	thermalgenerator(power, ProductionBlocks.thermalgenerator, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	combustiongenerator(power, ProductionBlocks.combustiongenerator, stack(Item.titanium, 10), stack(Item.dirium, 10)),
+	rtgenerator(power, ProductionBlocks.rtgenerator, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	nuclearreactor(power, ProductionBlocks.nuclearReactor, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	powerbooster(power, DistributionBlocks.powerbooster, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	powerlaser(power, DistributionBlocks.powerlaser, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	powerlaserrouter(power, DistributionBlocks.powerlaserrouter, stack(Item.titanium, 10), stack(Item.dirium, 10)),
-	teleporter(power, DistributionBlocks.teleporter, stack(Item.titanium, 10), stack(Item.dirium, 10)),
+	
+	shieldgenerator(power, DefenseBlocks.shieldgenerator, stack(Item.titanium, 10), stack(Item.dirium, 10)),
+	
+	teleporter(distribution, DistributionBlocks.teleporter, stack(Item.titanium, 10), stack(Item.dirium, 10)),
 	
 	healturret(power, DefenseBlocks.repairturret, stack(Item.iron, 30)),
 	megahealturret(power, DefenseBlocks.megarepairturret, stack(Item.iron, 20), stack(Item.steel, 30)),

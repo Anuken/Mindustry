@@ -46,7 +46,9 @@ public class DistributionBlocks{
 		
 	},
 	liquidjunction = new LiquidJunction("liquidjunction"){
-		
+		{
+			formalName = "liquid junction";
+		}
 	},
 	liquiditemjunction = new LiquidItemJunction("liquiditemjunction"){
 		{

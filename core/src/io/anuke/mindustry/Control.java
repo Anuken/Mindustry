@@ -100,7 +100,7 @@ public class Control extends Module{
 		
 		spawns = Array.with(
 			new EnemySpawn(TitanEnemy.class){{
-				after = 3;
+				after = 4;
 				spacing = 2;
 				scaling = 5;
 			}},
