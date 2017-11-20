@@ -85,6 +85,8 @@ public class UI extends SceneModule{
 			});
 		});
 		
+		Settings.defaults("pixelate", true);
+		
 		Dialog.closePadR = -1;
 		Dialog.closePadT = 5;
 		
@@ -173,6 +175,17 @@ public class UI extends SceneModule{
 		prefs.checkPref("noshadows", "Disable shadows", false);
 		prefs.checkPref("smoothcam", "Smooth Camera", true);
 		prefs.checkPref("indicators", "Enemy Indicators", true);
+		prefs.checkPref("pixelate", "Pixelate Screen", true, b->{
+			if(b){
+				Graphics.getSurface("pixel").setScale(Core.cameraScale);
+				Graphics.getSurface("shadow").setScale(Core.cameraScale);
+				Graphics.getSurface("shield").setScale(Core.cameraScale);
+			}else{
+				Graphics.getSurface("shadow").setScale(1);
+				Graphics.getSurface("shield").setScale(1);
+			}
+			renderer.setPixelate(b);
+		});
 		
 		prefs.hidden(()->{
 			if(!GameState.is(State.menu)){

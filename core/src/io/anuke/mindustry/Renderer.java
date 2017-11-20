@@ -45,10 +45,19 @@ public class Renderer extends RendererModule{
 
 	public Renderer() {
 		Core.cameraScale = baseCameraScale;
-		pixelate();
-
-		Graphics.addSurface("shadow", Core.cameraScale);
-		Graphics.addSurface("shield", Core.cameraScale);
+		
+		Graphics.addSurface("pixel", Core.cameraScale);
+	}
+	
+	@Override
+	public void init(){
+		pixelate = Settings.getBool("pixelate");
+		Graphics.addSurface("shadow", Settings.getBool("pixelate") ? Core.cameraScale : 1);
+		Graphics.addSurface("shield", Settings.getBool("pixelate") ? Core.cameraScale : 1);
+	}
+	
+	public void setPixelate(boolean pixelate){
+		this.pixelate = pixelate;
 	}
 
 	@Override
@@ -85,7 +94,8 @@ public class Renderer extends RendererModule{
 				smoothCamera(World.core.worldx(), World.core.worldy(), 0.4f);
 			}
 			
-			limitCamera(4f, player.x, player.y);
+			if(Settings.getBool("pixelate"))
+				limitCamera(4f, player.x, player.y);
 
 			float prex = camera.position.x, prey = camera.position.y;
 
@@ -102,7 +112,7 @@ public class Renderer extends RendererModule{
 
 			float lastx = camera.position.x, lasty = camera.position.y;
 			
-			if(Vars.snapCamera && smoothcam){
+			if(Vars.snapCamera && smoothcam && Settings.getBool("pixelate")){
 				camera.position.set((int) camera.position.x, (int) camera.position.y, 0);
 			}
 			
@@ -423,7 +433,7 @@ public class Renderer extends RendererModule{
 			if(entity instanceof DestructibleEntity && !(entity instanceof TileEntity)){
 				DestructibleEntity dest = ((DestructibleEntity) entity);
 				
-				if(dest instanceof Player && Vars.snapCamera && smoothcam){
+				if(dest instanceof Player && Vars.snapCamera && smoothcam && Settings.getBool("pixelate")){
 					drawHealth((int)dest.x, (int)dest.y - 7f, dest.health, dest.maxhealth);
 				}else{
 					drawHealth(dest.x, dest.y - 7f, dest.health, dest.maxhealth);
@@ -460,9 +470,11 @@ public class Renderer extends RendererModule{
 	public void setCameraScale(int amount){
 		targetscale = amount;
 		clampScale();
-		Graphics.getSurface("pixel").setScale(targetscale);
-		Graphics.getSurface("shadow").setScale(targetscale);
-		Graphics.getSurface("shield").setScale(targetscale);
+		if(Settings.getBool("pixelate")){
+			Graphics.getSurface("pixel").setScale(targetscale);
+			Graphics.getSurface("shadow").setScale(targetscale);
+			Graphics.getSurface("shield").setScale(targetscale);
+		}
 	}
 
 	public void scaleCamera(int amount){
