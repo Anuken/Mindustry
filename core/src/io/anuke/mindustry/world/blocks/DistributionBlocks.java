@@ -37,6 +37,7 @@ public class DistributionBlocks{
 	steelconveyor = new Conveyor("steelconveyor"){{
 		health = 55;
 		speed = 0.04f;
+		description = "Moves items faster.";
 		formalName = "steel conveyor";
 		fullDescription = "Advanced item transport block. Moves items faster than standard conveyors.";
 	}},
@@ -45,6 +46,7 @@ public class DistributionBlocks{
 	pulseconveyor = new Conveyor("poweredconveyor"){{
 		health = 90;
 		speed = 0.09f;
+		description = "Moves items even faster.";
 		formalName = "pulse conveyor";
 		fullDescription = "The ultimate item transport block. Moves items faster than steel conveyors.";
 	}},
@@ -75,15 +77,18 @@ public class DistributionBlocks{
 	powerbooster = new PowerBooster("powerbooster"){{
 		formalName = "power booster";
 		powerRange = 4;
+		description = "Distributes power within a radius.";
 		fullDescription = "Distributes power to all blocks within its radius. ";
 	}},
 	powerlaser = new PowerLaser("powerlaser"){{
 		formalName = "power laser";
+		description = "Transmits power with a laser.";
 		fullDescription = "Creates a laser that transmits power to the block in front of it. Does not generate any power itself. "
 				+ "Best used with generators or other lasers.";
 	}},
 	powerlaserrouter = new PowerLaserRouter("powerlaserrouter"){{
 		formalName = "laser router";
+		description = "Splits input power into 3 lasers.";
 		fullDescription = "Laser that distributes power to three directions at once. "
 				+ "Useful in situations where it is required to power multiple blocks from one generator.";
 	}},

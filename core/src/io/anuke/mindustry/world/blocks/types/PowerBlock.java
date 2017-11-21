@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
@@ -21,6 +22,12 @@ public abstract class PowerBlock extends Block implements PowerAcceptor{
 		super(name);
 		update = true;
 		solid = true;
+	}
+	
+	@Override
+	public void getStats(Array<String> list){
+		super.getStats(list);
+		list.add("[powerinfo]Power Capacity: " + powerCapacity);
 	}
 	
 	@Override

@@ -19,6 +19,7 @@ import io.anuke.ucore.util.Tmp;
 public class Block{
 	private static int lastid;
 	private static Array<Block> blocks = new Array<Block>();
+	
 	protected static TextureRegion temp = new TextureRegion();
 	
 	/**internal name*/
@@ -75,6 +76,11 @@ public class Block{
 	public void drawPixelOverlay(Tile tile){}
 	public void drawPlace(int x, int y, boolean valid){}
 	public void postInit(){}
+	
+	public void getStats(Array<String> list){
+		list.add("[gray]size: " + width + "x" + height);
+		list.add("[health]health: " + health);
+	}
 	
 	public String name(){
 		return name;

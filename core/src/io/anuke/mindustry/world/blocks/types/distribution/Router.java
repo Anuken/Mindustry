@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 
 import io.anuke.mindustry.Vars;
@@ -11,12 +12,18 @@ import io.anuke.ucore.core.Timers;
 
 public class Router extends Block{
 	private ObjectMap<Tile, Byte> lastmap = new ObjectMap<>();
-	int maxitems = 20;
+	int capacity = 20;
 
 	public Router(String name) {
 		super(name);
 		update = true;
 		solid = true;
+	}
+	
+	@Override
+	public void getStats(Array<String> list){
+		super.getStats(list);
+		list.add("[iteminfo]Capacity: " + capacity);
 	}
 	
 	@Override
@@ -44,13 +51,13 @@ public class Router extends Block{
 	@Override
 	public boolean acceptItem(Item item, Tile dest, Tile source){
 		int items = dest.entity.totalItems();
-		return items < maxitems;
+		return items < capacity;
 	}
 	
 	@Override
 	public void drawPixelOverlay(Tile tile){
 		
-		float fract = (float)tile.entity.totalItems()/maxitems;
+		float fract = (float)tile.entity.totalItems()/capacity;
 		
 		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 6, fract);
 	}

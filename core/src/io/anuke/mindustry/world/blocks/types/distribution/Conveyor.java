@@ -7,6 +7,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 
 import io.anuke.mindustry.entities.TileEntity;
@@ -15,9 +16,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Bits;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
+import io.anuke.ucore.util.*;
 
 public class Conveyor extends Block{
 	private static Item[] items = Item.values();
@@ -31,6 +30,12 @@ public class Conveyor extends Block{
 		super(name);
 		rotate = true;
 		update = true;
+	}
+	
+	@Override
+	public void getStats(Array<String> list){
+		super.getStats(list);
+		list.add("[iteminfo]Move Speed: " + Strings.toFixed(speed * 60, 1) + " units/s");
 	}
 	
 	@Override

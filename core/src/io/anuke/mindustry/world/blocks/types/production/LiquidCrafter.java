@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
@@ -13,13 +14,14 @@ import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Strings;
 
 public class LiquidCrafter extends LiquidBlock{
 	/**Can be null.*/
 	public Item input = null;
 	public int inputAmount = 5;
 	public Liquid inputLiquid = null;
-	public float liquidAmount = 19.99f;
+	public float liquidAmount = 20f;
 	public Item output = null;
 	public int itemCapacity = 90;
 	public int purifyTime = 80;
@@ -31,7 +33,17 @@ public class LiquidCrafter extends LiquidBlock{
 		rotate = false;
 		solid = true;
 		health = 60;
-		liquidCapacity = 20f;
+		liquidCapacity = 21f;
+	}
+	
+	@Override
+	public void getStats(Array<String> list){
+		super.getStats(list);
+		list.add("[liquidinfo]Max items/second: " + Strings.toFixed(60f/purifyTime, 1));
+		list.add("[liquidinfo]Input liquid: " + inputLiquid + " x " + (int)liquidAmount);
+		if(input != null) list.add("[iteminfo]Item Capacity: " + itemCapacity);
+		if(input != null) list.add("[iteminfo]Input item: " + input + " x " + inputAmount);
+		list.add("[iteminfo]Output: " + output);
 	}
 	
 	@Override

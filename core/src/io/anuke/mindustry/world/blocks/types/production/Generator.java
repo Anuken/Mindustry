@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.blocks.types.production;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
@@ -29,6 +30,14 @@ public class Generator extends PowerBlock{
 
 	public Generator(String name) {
 		super(name);
+	}
+	
+	@Override
+	public void getStats(Array<String> list){
+		super.getStats(list);
+		if(explosive){
+			list.add("[orange]Highly explosive!");
+		}
 	}
 
 	@Override

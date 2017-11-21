@@ -1,5 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
+import com.badlogic.gdx.utils.Array;
+
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.production.Generator;
 
@@ -9,6 +11,12 @@ public class PowerBooster extends Generator{
 		super(name);
 		drawRadius = true;
 		explosive = false;
+	}
+	
+	@Override
+	public void getStats(Array<String> list){
+		super.getStats(list);
+		list.add("[powerinfo]Power Range: " + powerRange + " tiles");
 	}
 	
 	@Override

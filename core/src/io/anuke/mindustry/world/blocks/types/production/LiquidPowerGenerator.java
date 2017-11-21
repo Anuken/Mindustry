@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.entities.TileEntity;
@@ -15,6 +16,7 @@ import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Strings;
 
 public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 	public int generateTime = 5;
@@ -28,6 +30,14 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 
 	public LiquidPowerGenerator(String name) {
 		super(name);
+	}
+	
+	@Override
+	public void getStats(Array<String> list){
+		super.getStats(list);
+		list.add("[liquidinfo]Liquid Capacity: " + (int)liquidCapacity);
+		list.add("[liquidinfo]Generation: " + Strings.toFixed(generatePower / inputLiquid, 3) + "power units/liquid unit");
+		list.add("[liquidinfo]Input: " + generateLiquid);
 	}
 	
 	@Override

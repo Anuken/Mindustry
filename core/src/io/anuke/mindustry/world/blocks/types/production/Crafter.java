@@ -1,5 +1,9 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import java.util.Arrays;
+
+import com.badlogic.gdx.utils.Array;
+
 import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
@@ -15,6 +19,13 @@ public class Crafter extends Block{
 		super(name);
 		update = true;
 		solid = true;
+	}
+	
+	@Override
+	public void getStats(Array<String> list){
+		super.getStats(list);
+		list.add("[craftinfo]Input: " + Arrays.toString(requirements));
+		list.add("[craftinfo]Output: " + result);
 	}
 	
 	@Override

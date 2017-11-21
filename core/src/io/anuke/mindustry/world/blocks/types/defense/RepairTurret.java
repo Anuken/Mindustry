@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
@@ -10,11 +11,19 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Strings;
 
 public class RepairTurret extends Turret{
 
 	public RepairTurret(String name) {
 		super(name);
+	}
+	
+	@Override
+	public void getStats(Array<String> list){
+		list.add("[health]health: " + health);
+		list.add("[turretinfo]Range: " + (int)range);
+		list.add("[turretinfo]Repairs/Second: " + Strings.toFixed(60f/reload, 1));
 	}
 	
 	@Override

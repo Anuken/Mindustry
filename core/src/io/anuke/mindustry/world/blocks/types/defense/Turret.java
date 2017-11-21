@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
@@ -22,6 +23,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Strings;
 
 public class Turret extends Block{
 	static final int targetInterval = 15;
@@ -30,6 +32,8 @@ public class Turret extends Block{
 	protected float range = 50f;
 	protected float reload = 10f;
 	protected float inaccuracy = 0f;
+	protected int shots = 1;
+	protected float shotDelayScale = 0;
 	protected String shootsound = "shoot";
 	protected BulletType bullet = BulletType.iron;
 	protected Item ammo;
@@ -45,8 +49,22 @@ public class Turret extends Block{
 	}
 	
 	@Override
+	public void getStats(Array<String> list){
+		super.getStats(list);
+		if(ammo != null) list.add("[turretinfo]Ammo: " + ammo);
+		if(ammo != null) list.add("[turretinfo]Ammo Capacity: " + maxammo);
+		if(ammo != null) list.add("[turretinfo]Ammo/Item: " + ammoMultiplier);
+		list.add("[turretinfo]Range: " + (int)range);
+		list.add("[turretinfo]Inaccuracy: " + (int)inaccuracy);
+		list.add("[turretinfo]Damage/Shot: " + bullet.damage);
+		list.add("[turretinfo]Shots/Second: " + Strings.toFixed(60f/reload, 1));
+		list.add("[turretinfo]Shots: " + shots);
+	}
+	
+	@Override
 	public void postInit(){
-		description = "[turretinfo]Ammo: "+(ammo==null ? "N/A" : ammo.name())+"\nRange: " + (int)range + "\nDamage: " + bullet.damage;
+		description = "[turretinfo]" + (ammo==null ? "" : "Ammo: " + ammo +"\n")
+				+ "Range: " + (int)range;
 	}
 	
 	@Override
@@ -110,7 +128,7 @@ public class Turret extends Block{
 	public void update(Tile tile){
 		TurretEntity entity = tile.entity();
 		
-		if(entity.hasItem(ammo)){
+		if(ammo != null && entity.hasItem(ammo)){
 			entity.ammo += ammoMultiplier;
 			entity.removeItem(ammo, 1);
 		}
@@ -197,13 +215,18 @@ public class Turret extends Block{
 	protected void shoot(Tile tile){
 		TurretEntity entity = tile.entity();
 		
-		float inac = Mathf.range(inaccuracy);
+		Angles.translation(entity.rotation, width * Vars.tilesize / 2f);
 		
-		Angles.translation(entity.rotation + inac, width * Vars.tilesize / 2f);
-		
-		Bullet out = new Bullet(bullet, tile.entity, 
-				tile.worldx() + Angles.x(), tile.worldy() + Angles.y(), entity.rotation + inac).add();
-		out.damage = (int)(bullet.damage*Vars.multiplier);
+		for(int i = 0; i < shots; i ++){
+			if(Mathf.zero(shotDelayScale)){
+				bullet(tile, entity.rotation + Mathf.range(inaccuracy));
+			}else{
+				Timers.run(i * shotDelayScale, ()->{
+					bullet(tile, entity.rotation + Mathf.range(inaccuracy));
+				});
+			}
+			
+		}
 	}
 	
 	protected void bullet(Tile tile, float angle){

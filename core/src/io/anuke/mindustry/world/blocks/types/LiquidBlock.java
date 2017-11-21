@@ -4,6 +4,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import com.badlogic.gdx.utils.Array;
+
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
@@ -20,6 +22,12 @@ public class LiquidBlock extends Block implements LiquidAcceptor{
 		description = "Transports liquids.";
 		rotate = true;
 		update = true;
+	}
+	
+	@Override
+	public void getStats(Array<String> list){
+		super.getStats(list);
+		list.add("[liquidinfo]Liquid Capacity: " + liquidCapacity);
 	}
 	
 	@Override

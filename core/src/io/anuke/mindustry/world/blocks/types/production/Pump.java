@@ -1,19 +1,29 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import com.badlogic.gdx.utils.Array;
+
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidBlock;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Strings;
 
 public class Pump extends LiquidBlock{
-	protected float pumpspeed = 2f;
+	protected float pumpAmount = 2f;
+	protected float pumpTime = 8f;
 
 	public Pump(String name) {
 		super(name);
 		rotate = false;
 		solid = true;
+	}
+	
+	@Override
+	public void getStats(Array<String> list){
+		super.getStats(list);
+		list.add("[liquidinfo]Pump Speed: " + Strings.toFixed(60f/pumpTime*pumpAmount, 1) + "/s");
 	}
 	
 	@Override
@@ -49,9 +59,9 @@ public class Pump extends LiquidBlock{
 		LiquidEntity entity = tile.entity();
 		
 		if(tile.floor().liquidDrop != null &&
-				Timers.get(tile, "pump", 8) && entity.liquidAmount < liquidCapacity){
+				Timers.get(tile, "pump", pumpTime) && entity.liquidAmount < liquidCapacity){
 			entity.liquid = tile.floor().liquidDrop;
-			entity.liquidAmount += Math.min(pumpspeed, this.liquidCapacity - entity.liquidAmount);
+			entity.liquidAmount += Math.min(pumpAmount, this.liquidCapacity - entity.liquidAmount);
 		}
 		
 		if(Timers.get(tile, "dump", 1)){

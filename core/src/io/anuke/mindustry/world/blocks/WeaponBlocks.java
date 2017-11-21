@@ -14,7 +14,6 @@ import io.anuke.mindustry.world.blocks.types.defense.LaserTurret;
 import io.anuke.mindustry.world.blocks.types.defense.PowerTurret;
 import io.anuke.mindustry.world.blocks.types.defense.Turret;
 import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
@@ -75,19 +74,11 @@ public class WeaponBlocks{
 			bullet = BulletType.iron;
 			ammo = Item.iron;
 			health = 70;
+			shots = 7;
+			inaccuracy = 30f;
+			shotDelayScale = 0.7f;
 			fullDescription = "A standard turret. Uses iron for ammo. Shoots a spread of 7 bullets. "
 					+ "Lower range, but higher damage output than the gattling turret.";
-		}
-		
-		@Override
-		protected void shoot(Tile tile){
-			TurretEntity entity = tile.entity();
-			
-			for(int i = 0; i < 7; i ++)
-				Timers.run(i/1.5f, ()->{
-					Angles.translation(entity.rotation, 4f);
-					bullet(tile, entity.rotation + Mathf.range(30));
-				});
 		}
 	},
 	
@@ -195,6 +186,7 @@ public class WeaponBlocks{
 			health = 430;
 			width = height = 2;
 			shootCone = 9f;
+			shots = 2;
 			fullDescription = "The ultimate rapid-fire turret. Uses uranium as ammo. Shoots large slugs at a high fire rate. "
 					+ "Medium range. Spans multiple tiles. Extremely tough.";
 		}

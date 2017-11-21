@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.production.Generator;
@@ -15,6 +16,12 @@ public class PowerLaser extends Generator{
 		solid = true;
 		explosive = false;
 		laserDirections = 1;
+	}
+	
+	@Override
+	public void getStats(Array<String> list){
+		super.getStats(list);
+		list.add("[powerinfo]Laser Range: " + laserRange + " tiles");
 	}
 	
 	@Override

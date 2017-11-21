@@ -44,7 +44,7 @@ public class ProductionBlocks{
 	}},
 	
 	fluxpump = new Pump("fluxpump"){{
-		pumpspeed = 3f;
+		pumpAmount = 3f;
 		description = "Pumps liquids into nearby conduits.";
 		fullDescription = "An advanced version of the pump. Stores more liquid and pumps liquid faster.";
 	}},

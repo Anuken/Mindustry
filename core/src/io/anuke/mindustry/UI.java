@@ -46,6 +46,7 @@ public class UI extends SceneModule{
 	MenuDialog menu;
 	Tooltip tooltip;
 	Tile configTile;
+	Array<String> statlist = new Array<>();
 	boolean wasPaused = false;
 
 	VisibilityProvider play = () -> !GameState.is(State.menu);
@@ -92,6 +93,10 @@ public class UI extends SceneModule{
 		
 		Colors.put("description", Color.WHITE);
 		Colors.put("turretinfo", Color.ORANGE);
+		Colors.put("iteminfo", Color.LIGHT_GRAY);
+		Colors.put("powerinfo", Color.YELLOW);
+		Colors.put("liquidinfo", Color.ROYAL);
+		Colors.put("craftinfo", Color.LIGHT_GRAY);
 		Colors.put("missingitems", Color.SCARLET);
 		Colors.put("health", Color.YELLOW);
 		Colors.put("interact", Color.ORANGE);
@@ -670,6 +675,9 @@ public class UI extends SceneModule{
 		//extra info
 		if(recipe.result.fullDescription != null){
 			header.addButton("?", ()->{
+				statlist.clear();
+				recipe.result.getStats(statlist);
+				
 				Label desclabel = new Label(recipe.result.fullDescription);
 				desclabel.setWrap(true);
 				
@@ -684,10 +692,23 @@ public class UI extends SceneModule{
 				d.content().add(top).fill().left();
 				d.content().row();
 				d.content().add(desclabel).width(600).units(Unit.dp);
+				d.content().row();
+				
+				if(statlist.size > 0){
+					d.content().add("[coral][[extra block info]:").padTop(6).padBottom(5).left();
+					d.content().row();
+				}
+				
+				for(String s : statlist){
+					d.content().add(s).left();
+					d.content().row();
+				}
+				
 				d.buttons().addButton("OK", ()->{
 					if(!wasPaused) GameState.set(State.playing);
 					d.hide();
 				}).size(110, 50).pad(10f).units(Unit.dp);
+				
 				d.show();
 			}).expandX().padLeft(4).top().right().size(36f, 40f).units(Unit.dp);
 		}

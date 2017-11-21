@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
@@ -14,6 +15,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Strings;
 
 public class PowerTurret extends Turret implements PowerAcceptor{
 	public float powerCapacity = 20f;
@@ -21,7 +23,14 @@ public class PowerTurret extends Turret implements PowerAcceptor{
 
 	public PowerTurret(String name) {
 		super(name);
-		ammo = Item.stone;
+		ammo = null;
+	}
+	
+	@Override
+	public void getStats(Array<String> list){
+		super.getStats(list);
+		list.add("[powerinfo]Power Capacity: " + (int)powerCapacity);
+		list.add("[powerinfo]Power/shot: " + Strings.toFixed(powerUsed, 1));
 	}
 	
 	@Override
