@@ -56,6 +56,10 @@ public class Control extends Module{
 		
 		UCore.log("Total blocks loaded: " + Block.getAllBlocks().size);
 		
+		for(Block block : Block.getAllBlocks()){
+			block.postInit();
+		}
+		
 		Draw.setCircleVertices(14);
 		
 		Gdx.input.setCatchBackKey(true);

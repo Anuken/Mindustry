@@ -18,11 +18,6 @@ public class LiquidRouter extends LiquidBlock{
 	}
 	
 	@Override
-	public String description(){
-		return "Splits input liquid into 3 directions.";
-	}
-	
-	@Override
 	public void update(Tile tile){
 		LiquidEntity entity = tile.entity();
 		

@@ -37,11 +37,6 @@ public class Sorter extends Junction implements Configurable{
 	}
 	
 	@Override
-	public String description(){
-		return "[interact]Tap block to config[]\nSorts input items by type.";
-	}
-	
-	@Override
 	public boolean acceptItem(Item item, Tile dest, Tile source){
 		Tile to = getTileTarget(item, dest, source, false);
 		

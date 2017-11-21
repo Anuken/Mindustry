@@ -679,7 +679,7 @@ public class UI extends SceneModule{
 				FloatingDialog d = new FloatingDialog("Block Info");
 				Table top = new Table();
 				top.left();
-				top.add(new Image(region)).size(8*5).units(Unit.dp);
+				top.add(new Image(Draw.region(recipe.result.name))).size(8*5 * recipe.result.width).units(Unit.dp);
 				top.add("[orange]"+recipe.result.formalName).padLeft(6f).units(Unit.dp);
 				d.content().add(top).fill().left();
 				d.content().row();
@@ -689,7 +689,7 @@ public class UI extends SceneModule{
 					d.hide();
 				}).size(110, 50).pad(10f).units(Unit.dp);
 				d.show();
-			}).fillX().top().right().size(36f, 40f).units(Unit.dp);
+			}).expandX().padLeft(4).top().right().size(36f, 40f).units(Unit.dp);
 		}
 		
 		
@@ -722,8 +722,8 @@ public class UI extends SceneModule{
 		
 		desctable.row();
 		
-		Label label = new Label("[health]health: " + recipe.result.health + (recipe.result.description() == null ?
-				"" : ("\n[]" + recipe.result.description())));
+		Label label = new Label("[health]health: " + recipe.result.health + (recipe.result.description == null ?
+				"" : ("\n[]" + recipe.result.description)));
 		label.setWrap(true);
 		desctable.add(label).width(200).padTop(4).padBottom(2).units(Unit.dp);
 		

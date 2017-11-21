@@ -45,6 +45,11 @@ public class Turret extends Block{
 	}
 	
 	@Override
+	public void postInit(){
+		description = "[turretinfo]Ammo: "+(ammo==null ? "N/A" : ammo.name())+"\nRange: " + (int)range + "\nDamage: " + bullet.damage;
+	}
+	
+	@Override
 	public boolean canReplace(Block other){
 		return other instanceof Turret;
 	}
@@ -99,11 +104,6 @@ public class Turret extends Block{
 	@Override
 	public boolean acceptItem(Item item, Tile dest, Tile source){
 		return item == ammo && dest.<TurretEntity>entity().ammo < maxammo;
-	}
-
-	@Override
-	public String description(){
-		return "[turretinfo]Ammo: "+(ammo==null ? "N/A" : ammo.name())+"\nRange: " + (int)range + "\nDamage: " + bullet.damage;
 	}
 	
 	@Override

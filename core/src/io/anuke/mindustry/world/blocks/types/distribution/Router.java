@@ -54,10 +54,5 @@ public class Router extends Block{
 		
 		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 6, fract);
 	}
-	
-	@Override
-	public String description(){
-		return "Split input materials into 3 directions.";
-	}
 
 }

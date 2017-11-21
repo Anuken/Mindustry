@@ -41,11 +41,6 @@ public class Teleporter extends Block implements Configurable{
 	}
 	
 	@Override
-	public String description(){
-		return "[interact]Tap block to config[]\nTeleports items to others of the same color.";
-	}
-	
-	@Override
 	public void draw(Tile tile){
 		TeleporterEntity entity = tile.entity();
 		

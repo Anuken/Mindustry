@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.io.Formatter;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
@@ -31,12 +32,12 @@ public class Mindustry extends ModuleCore {
 		
 	};
 	//always initialize blocks in this order, otherwise there are ID errors
-	public Class<?>[] blockClasses = new Class<?>[]{
-		Blocks.class,
-		DefenseBlocks.class,
-		DistributionBlocks.class,
-		ProductionBlocks.class,
-		WeaponBlocks.class
+	public Block[] blockClasses = {
+		Blocks.air,
+		DefenseBlocks.compositewall,
+		DistributionBlocks.conduit,
+		ProductionBlocks.coaldrill,
+		WeaponBlocks.chainturret
 	};
 	
 	@Override

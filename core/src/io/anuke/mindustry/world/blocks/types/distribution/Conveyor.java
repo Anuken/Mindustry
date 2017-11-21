@@ -115,11 +115,6 @@ public class Conveyor extends Block{
 		return ((direction == 0) && minitem > 0.05f) || 
 				((direction %2 == 1) && minitem > 0.5f);
 	}
-	
-	@Override
-	public String description(){
-		return "Moves items.";
-	}
 
 	@Override
 	public void handleItem(Item item, Tile tile, Tile source){

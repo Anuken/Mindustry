@@ -39,11 +39,14 @@ public class ProductionBlocks{
 	},
 	
 	pump = new Pump("pump"){{
-		
+		description = "Pumps liquids into nearby conduits.";
+		fullDescription = "Pumps liquids from a source block- usually water, lava or oil. Outputs liquid into nearby conduits.";
 	}},
 	
 	fluxpump = new Pump("fluxpump"){{
 		pumpspeed = 3f;
+		description = "Pumps liquids into nearby conduits.";
+		fullDescription = "An advanced version of the pump. Stores more liquid and pumps liquid faster.";
 	}},
 	
 	smelter = new Crafter("smelter"){
@@ -51,11 +54,8 @@ public class ProductionBlocks{
 			health = 70;
 			requirements = new Item[]{Item.coal, Item.iron};
 			result = Item.steel;
-		}
-		
-		@Override
-		public String description(){
-			return "Converts coal + iron to steel.";
+			description = "Converts coal + iron to steel.";
+			fullDescription = "The essential crafting block. When inputted 1x iron and 1x iron, outputs one steel.";
 		}
 	},
 	
@@ -64,11 +64,8 @@ public class ProductionBlocks{
 			health = 90;
 			requirements = new Item[]{Item.titanium, Item.steel};
 			result = Item.dirium;
-		}
-		
-		@Override
-		public String description(){
-			return "Converts steel + titanium to dirium.";
+			description = "Converts steel + titanium to dirium.";
+			fullDescription = "An advanced crafting block. When inputted 1x titanium and 1x steel, outputs one dirium.";
 		}
 	},
 	
@@ -82,11 +79,8 @@ public class ProductionBlocks{
 			output = Item.coal;
 			health = 50;
 			purifyTime = 60;
-		}
-		
-		@Override
-		public String description(){
-			return "Converts stone + water to coal.";
+			description = "Converts stone + water to coal.";
+			fullDescription = "A basic extractor block. Outputs coal when supplied with large amounts of water and stone.";
 		}
 	},
 	
@@ -101,11 +95,8 @@ public class ProductionBlocks{
 			purifyTime = 80;
 			output = Item.titanium;
 			health = 70;
-		}
-		
-		@Override
-		public String description(){
-			return "Converts iron + water to titanium.";
+			description = "Converts iron + water to titanium.";
+			fullDescription = "A standard extractor block. Outputs titanium when supplied with large amounts of water and iron.";
 		}
 	},
 	
@@ -119,11 +110,8 @@ public class ProductionBlocks{
 			output = Item.coal;
 			health = 80;
 			craftEffect = Fx.purifyoil;
-		}
-		
-		@Override
-		public String description(){
-			return "Converts oil to coal.";
+			description = "Converts oil to coal.";
+			fullDescription = "Refines large amounts of oil into coal items. Useful for fueling coal-based turrets when coal veins are scarce.";
 		}
 	},
 	
@@ -139,11 +127,8 @@ public class ProductionBlocks{
 			output = Item.stone;
 			health = 80;
 			craftEffect = Fx.purifystone;
-		}
-		
-		@Override
-		public String description(){
-			return "Converts lava to stone.";
+			description = "Converts lava to stone.";
+			fullDescription = "Soldifies liquid lava into stone. Useful for producing massive amounts of stone for coal purifiers.";
 		}
 	},
 	
@@ -153,34 +138,12 @@ public class ProductionBlocks{
 			inputLiquid = Liquid.lava;
 			liquidAmount = 40f;
 			liquidCapacity = 41f;
-			purifyTime = 25;
+			purifyTime = 30;
 			output = Item.stone;
 			health = 80;
 			craftEffect = Fx.purifystone;
-		}
-		
-		@Override
-		public String description(){
-			return "Converts iron + lava to steel.";
-		}
-	},
-	
-	//TODO
-	lavacompressor = new LiquidCrafter("lavacompressor"){
-		{
-			formalName = "lava compressor";
-			inputLiquid = Liquid.lava;
-			liquidAmount = 40f;
-			liquidCapacity = 41f;
-			purifyTime = 25;
-			output = Item.iron;
-			health = 80;
-			craftEffect = Fx.purifystone;
-		}
-		
-		@Override
-		public String description(){
-			return "Converts stone + lava to iron.";
+			description = "Converts iron + lava to steel.";
+			fullDescription = "Uses lava to convert iron to steel. An alternative to smelteries. Useful in situations where coal is scarace.";
 		}
 	},
 	
@@ -188,18 +151,24 @@ public class ProductionBlocks{
 		resource = Blocks.stone;
 		result = Item.stone;
 		formalName = "stone drill";
+		description = "Mines 1 "+resource.name+" every "+time+" seconds.";
+		fullDescription = "The essential drill. When placed on stone tiles, outputs stone at a slow pace indefinitely.";
 	}},
 	
 	irondrill = new Drill("irondrill"){{
 		resource = Blocks.iron;
 		result = Item.iron;
 		formalName = "iron drill";
+		description = "Mines 1 "+resource.name+" every "+time+" seconds.";
+		fullDescription = "A basic drill. When placed on iron ore tiles, outputs iron at a slow pace indefinitely.";
 	}},
 	
 	coaldrill = new Drill("coaldrill"){{
 		resource = Blocks.coal;
 		result = Item.coal;
 		formalName = "coal drill";
+		description = "Mines 1 "+resource.name+" every "+time+" seconds.";
+		fullDescription = "A basic drill. When placed on coal ore tiles, outputs coal at a slow pace indefinitely.";
 	}},
 	
 	uraniumdrill = new Drill("uraniumdrill"){{
@@ -207,18 +176,24 @@ public class ProductionBlocks{
 		result = Item.uranium;
 		formalName = "uranium drill";
 		time = 7;
+		description = "Mines 1 "+resource.name+" every "+time+" seconds.";
+		fullDescription = "An advanced drill. When placed on uranium ore tiles, outputs uranium at a slow pace indefinitely.";
 	}},
 	
 	titaniumdrill = new Drill("titaniumdrill"){{
 		resource = Blocks.titanium;
 		result = Item.titanium;
 		formalName = "titanium drill";
+		description = "Mines 1 "+resource.name+" every "+time+" seconds.";
+		fullDescription = "An advanced drill. When placed on titanium ore tiles, outputs titanium at a slow pace indefinitely.";
 	}},
 	
 	omnidrill = new Drill("omnidrill"){
 		{
 			time = 3;
 			formalName = "omnidrill";
+			description = "Mines 1 of any resource every "+time+" seconds.";
+			fullDescription = "The ultimate drill. Will mine any ore it is placed on at a rapid pace.";
 		}
 		
 		@Override
@@ -233,11 +208,6 @@ public class ProductionBlocks{
 				tryDump(tile);
 			}
 		}
-		
-		@Override
-		public String description(){
-			return "Mines 1 of any resource every "+time+" seconds.";
-		}
 	},
 	coalgenerator = new ItemPowerGenerator("coalgenerator"){
 		{
@@ -246,11 +216,8 @@ public class ProductionBlocks{
 			generateItem = Item.coal;
 			generateAmount = 4f;
 			powerCapacity = 40f;
-		}
-		
-		@Override
-		public String description(){
-			return "Generates power from coal.";
+			description = "Generates power from coal.";
+			fullDescription = "The essential generator. Generates power from coal. Outputs power as lasers to its 4 sides.";
 		}
 	},
 	thermalgenerator = new LiquidPowerGenerator("thermalgenerator"){
@@ -261,11 +228,8 @@ public class ProductionBlocks{
 			inputLiquid = 20f;
 			generatePower = 1f;
 			powerCapacity = 40f;
-		}
-		
-		@Override
-		public String description(){
-			return "Generates power from lava.";
+			description = "Generates power from lava.";
+			fullDescription = "Generates power from lava. Outputs power as lasers to its 4 sides.";
 		}
 	},
 	combustiongenerator = new LiquidPowerGenerator("combustiongenerator"){
@@ -276,26 +240,20 @@ public class ProductionBlocks{
 			inputLiquid = 14f;
 			generatePower = 1f;
 			powerCapacity = 40f;
-		}
-		
-		@Override
-		public String description(){
-			return "Generates power from oil.";
+			description = "Generates power from oil.";
+			fullDescription = "Generates power from oil. Outputs power as lasers to its 4 sides.";
 		}
 	},
 	rtgenerator = new ItemPowerGenerator("rtgenerator"){
 		{
 			//TODO make this generate slowly
-			formalName = "radioisotope generator";
+			formalName = "RTG generator";
 			generateItem = Item.uranium;
 			generateAmount = 10f;
 			powerCapacity = 40f;
 			generateTime = 50f;
-		}
-		
-		@Override
-		public String description(){
-			return "Generates small amounts of power from uranium.";
+			description = "Generates power from uranium.";
+			fullDescription = "Generates small amounts of power from the radioactive decay of uranium. Outputs power as lasers to its 4 sides.";
 		}
 	},
 	nuclearReactor = new LiquidItemPowerGenerator("nuclearreactor"){
@@ -312,11 +270,9 @@ public class ProductionBlocks{
 			health = 500;
 			breaktime *= 2.2f;
 			powerCapacity = 100f;
-		}
-		
-		@Override
-		public String description(){
-			return "Generates power from uranium + water.";
+			description = "Generates power from uranium + water.";
+			fullDescription = "The ultimate power generator. Highly volatile. Generates power from uranium. Requires constant cooling in the form of water. "
+					+ "Will explode violently if insufficient amounts of coolant are supplied. ";
 		}
 	};
 }

@@ -37,9 +37,4 @@ public class LiquidJunction extends LiquidBlock{
 		return to != null && to.block() != this && to.block() instanceof LiquidBlock &&
 				((LiquidBlock)to.block()).acceptLiquid(to, dest, liquid, amount);
 	}
-	
-	@Override
-	public String description(){
-		return "Serves as a liquid junction.";
-	}
 }

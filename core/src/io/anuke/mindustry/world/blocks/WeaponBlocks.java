@@ -28,6 +28,7 @@ public class WeaponBlocks{
 			reload = 15f;
 			bullet = BulletType.stone;
 			ammo = Item.stone;
+			fullDescription = "A basic, cheap turret. Uses stone for ammo. Has slightly more range than the double-turret.";
 		}
 	},
 	
@@ -39,6 +40,7 @@ public class WeaponBlocks{
 			bullet = BulletType.stone;
 			ammo = Item.stone;
 			health = 50;
+			fullDescription = "A slightly more powerful version of the turret. Uses stone for ammo. Does significantly more damage, but has a lower range. Shoots two bullets.";
 		}
 		
 		@Override
@@ -61,6 +63,7 @@ public class WeaponBlocks{
 			bullet = BulletType.iron;
 			ammo = Item.iron;
 			health = 65;
+			fullDescription = "A standard all-around turret. Uses iron for ammo. Has a fast fire rate with decent damage.";
 		}
 	},
 	
@@ -72,6 +75,8 @@ public class WeaponBlocks{
 			bullet = BulletType.iron;
 			ammo = Item.iron;
 			health = 70;
+			fullDescription = "A standard turret. Uses iron for ammo. Shoots a spread of 7 bullets. "
+					+ "Lower range, but higher damage output than the gattling turret.";
 		}
 		
 		@Override
@@ -94,6 +99,8 @@ public class WeaponBlocks{
 			bullet = BulletType.flame;
 			ammo = Item.coal;
 			health = 90;
+			fullDescription = "Advanced close-range turret. Uses coal for ammo. Has very low range, but very high damage and damage. "
+					+ "Good for close quarters. Recommended to be used behind walls.";
 		}
 	},
 	
@@ -105,6 +112,8 @@ public class WeaponBlocks{
 			bullet = BulletType.sniper;
 			ammo = Item.steel;
 			health = 70;
+			fullDescription = "Advanced long-range turret. Uses steel for ammo. Very high damage, but low fire rate. "
+					+ "Expensive to use, but can be placed far away from enemy lines due to its range.";
 		}
 	},
 	
@@ -118,6 +127,9 @@ public class WeaponBlocks{
 			ammo = Item.coal;
 			ammoMultiplier = 5;
 			health = 110;
+			fullDescription = "Advanced splash-damage turret. Uses coal for ammo. "
+					+ "Very slow fire rate and bullets, but very high single-target and splash damage. "
+					+ "Useful for large crowds of enemies.";
 		}
 	},
 	
@@ -130,6 +142,8 @@ public class WeaponBlocks{
 			damage = 10;
 			health = 110;
 			powerUsed = 0.2f;
+			fullDescription = "Advanced single-target turret. Uses power. Good medium-range all-around turret. "
+					+ "Single-target only. Never misses.";
 		}
 	},
 	
@@ -141,6 +155,8 @@ public class WeaponBlocks{
 			bullet = BulletType.shell;
 			ammo = Item.coal;
 			health = 140;
+			fullDescription = "Advanced multi-target turret. Uses power. Medium range. Never misses."
+					+ "Average to low damage, but can hit multiple enemies simultaneously with chain lighting.";
 		}
 		
 		@Override
@@ -163,6 +179,8 @@ public class WeaponBlocks{
 			ammo = Item.coal;
 			health = 180;
 			ammoMultiplier = 40;
+			fullDescription = "Highly advanced version of the flamer turret. Uses coal as ammo. "
+					+ "Very high damage, low to medium range.";
 		}
 	},
 	
@@ -177,6 +195,8 @@ public class WeaponBlocks{
 			health = 430;
 			width = height = 2;
 			shootCone = 9f;
+			fullDescription = "The ultimate rapid-fire turret. Uses uranium as ammo. Shoots large slugs at a high fire rate. "
+					+ "Medium range. Spans multiple tiles. Extremely tough.";
 		}
 		
 		//TODO specify turret shoot effect in turret instead of doing it manually
@@ -211,6 +231,8 @@ public class WeaponBlocks{
 			width = height = 3;
 			rotatespeed = 0.07f;
 			shootCone = 9f;
+			fullDescription = "The ultimate long-range turret. Uses uranium as ammo. Shoots large splash-damage shells at a medium rate of fire. "
+					+ "Long range. Spans multiple tiles. Extremely tough.";
 		}
 		
 		@Override

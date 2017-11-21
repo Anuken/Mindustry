@@ -37,9 +37,4 @@ public class Junction extends Block{
 		return to != null && to.block().acceptItem(item, to, dest);
 	}
 	
-	@Override
-	public String description(){
-		return "Serves as a conveyor junction.";
-	}
-	
 }

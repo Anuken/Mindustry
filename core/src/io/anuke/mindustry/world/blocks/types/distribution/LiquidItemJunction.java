@@ -61,9 +61,4 @@ public class LiquidItemJunction extends LiquidBlock{
 		Tile to = dest.getNearby()[dir];
 		return to != null && to.block().acceptItem(item, to, dest);
 	}
-	
-	@Override
-	public String description(){
-		return "Serves as a junction for items and liquids.";
-	}
 }

@@ -33,11 +33,6 @@ public class Drill extends Block{
 			tryDump(tile);
 		}
 	}
-
-	@Override
-	public String description(){
-		return "Mines 1 "+resource.name+" every "+time+" seconds.";
-	}
 	
 	@Override
 	public void drawOver(Tile tile){

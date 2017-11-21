@@ -25,8 +25,8 @@ public class LaserTurret extends PowerTurret{
 	}
 	
 	@Override
-	public String description(){
-		return "[turretinfo]Ammo: "+(ammo==null ? "N/A" : ammo.name())+"\nRange: " + (int)range + "\nDamage: " + damage;
+	public void postInit(){
+		description = "[turretinfo]Ammo: "+(ammo==null ? "N/A" : ammo.name())+"\nRange: " + (int)range + "\nDamage: " + damage;
 	}
 	
 	@Override

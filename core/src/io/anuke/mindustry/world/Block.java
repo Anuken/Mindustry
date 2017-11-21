@@ -57,8 +57,10 @@ public class Block{
 	public Liquid liquidDrop = null;
 	/**multiblock width/height*/
 	public int width = 1, height = 1;
+	/**Brief block description. Should be short enough fit in the place menu.*/
+	public String description;
 	/**Detailed description of the block. Can be as long as necesary.*/
-	public String fullDescription; //TODO show this
+	public String fullDescription;
 
 	public Block(String name) {
 		blocks.add(this);
@@ -72,13 +74,10 @@ public class Block{
 	public void drawOver(Tile tile){}
 	public void drawPixelOverlay(Tile tile){}
 	public void drawPlace(int x, int y, boolean valid){}
+	public void postInit(){}
 	
 	public String name(){
 		return name;
-	}
-	
-	public String description(){
-		return null;
 	}
 	
 	public String errorMessage(Tile tile){

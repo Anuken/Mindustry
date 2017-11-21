@@ -18,6 +18,11 @@ public class RepairTurret extends Turret{
 	}
 	
 	@Override
+	public void postInit(){
+		description = "[turretinfo]Range: " + (int)range + "\n[description]Heals nearby tiles.";
+	}
+	
+	@Override
 	public void update(Tile tile){
 		TurretEntity entity = tile.entity();
 		
@@ -70,10 +75,5 @@ public class RepairTurret extends Turret{
 		}
 		
 		Draw.rect(name(), tile.worldx(), tile.worldy(), entity.rotation - 90);
-	}
-	
-	@Override
-	public String description(){
-		return "[turretinfo]Range: " + (int)range + "\n[description]Heals nearby tiles.";
 	}
 }
