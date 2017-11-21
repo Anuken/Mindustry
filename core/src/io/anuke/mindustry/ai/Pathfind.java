@@ -1,6 +1,7 @@
 package io.anuke.mindustry.ai;
 
 import com.badlogic.gdx.ai.pfa.PathFinder;
+import com.badlogic.gdx.ai.pfa.PathFinderRequest;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.Vector2;
@@ -66,6 +67,12 @@ public class Pathfind{
 				paths.add(path);
 			}
 		}
+		
+		//TODO
+		PathFinderRequest<Tile> request = new PathFinderRequest<Tile>();
+		request.startNode = World.spawnpoints.get(0);
+		request.endNode = World.core;
+		passpathfinder.search(request, 1000);
 		
 		for(int i = 0; i < paths.size; i ++){
 			SmoothGraphPath path = paths.get(i);

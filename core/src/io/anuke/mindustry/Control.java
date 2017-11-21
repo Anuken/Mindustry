@@ -35,7 +35,7 @@ import io.anuke.ucore.util.Mathf;
 public class Control extends Module{
 	int targetscale = baseCameraScale;
 	
-	Tutorial tutorial = new Tutorial();
+	public Tutorial tutorial = new Tutorial();
 	boolean hiscore = false;
 	
 	final Array<Weapon> weapons = new Array<>();
