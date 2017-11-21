@@ -45,17 +45,17 @@ public class Renderer extends RendererModule{
 
 	public Renderer() {
 		Core.cameraScale = baseCameraScale;
-		
+
 		Graphics.addSurface("pixel", Core.cameraScale);
 	}
-	
+
 	@Override
 	public void init(){
 		pixelate = Settings.getBool("pixelate");
 		Graphics.addSurface("shadow", Settings.getBool("pixelate") ? Core.cameraScale : 1);
 		Graphics.addSurface("shield", Settings.getBool("pixelate") ? Core.cameraScale : 1);
 	}
-	
+
 	public void setPixelate(boolean pixelate){
 		this.pixelate = pixelate;
 	}
@@ -82,9 +82,9 @@ public class Renderer extends RendererModule{
 			clearScreen();
 		}else{
 			boolean smoothcam = Settings.getBool("smoothcam");
-			
+
 			if(World.core.block() == ProductionBlocks.core){
-				
+
 				if(!smoothcam){
 					setCamera(player.x, player.y);
 				}else{
@@ -93,7 +93,7 @@ public class Renderer extends RendererModule{
 			}else{
 				smoothCamera(World.core.worldx(), World.core.worldy(), 0.4f);
 			}
-			
+
 			if(Settings.getBool("pixelate"))
 				limitCamera(4f, player.x, player.y);
 
@@ -111,28 +111,26 @@ public class Renderer extends RendererModule{
 			}
 
 			float lastx = camera.position.x, lasty = camera.position.y;
-			
+
 			if(Vars.snapCamera && smoothcam && Settings.getBool("pixelate")){
 				camera.position.set((int) camera.position.x, (int) camera.position.y, 0);
 			}
-			
+
 			if(Gdx.graphics.getHeight() / Core.cameraScale % 2 == 1){
 				camera.position.add(0, -0.5f, 0);
 			}
-			
+
 			if(Gdx.graphics.getWidth() / Core.cameraScale % 2 == 1){
 				camera.position.add(-0.5f, 0, 0);
 			}
-			
+
 			long time = TimeUtils.nanoTime();
 			drawDefault();
-			if(Timers.get("profiled", profileTime)) Profiler.draw = TimeUtils.timeSinceNanos(time);
-			
+			if(Timers.get("profiled", profileTime))
+				Profiler.draw = TimeUtils.timeSinceNanos(time);
+
 			if(Vars.debug && Vars.debugGL && Timers.get("profile", 60)){
-				UCore.log("shaders: " + GLProfiler.shaderSwitches, 
-						"calls: " + GLProfiler.drawCalls,
-						"bindings: " + GLProfiler.textureBindings,
-						"vertices: " + GLProfiler.vertexCount.average);
+				UCore.log("shaders: " + GLProfiler.shaderSwitches, "calls: " + GLProfiler.drawCalls, "bindings: " + GLProfiler.textureBindings, "vertices: " + GLProfiler.vertexCount.average);
 			}
 
 			camera.position.set(lastx - deltax, lasty - deltay, 0);
@@ -147,19 +145,21 @@ public class Renderer extends RendererModule{
 	public void draw(){
 		Graphics.surface("shield");
 		Graphics.surface();
-		
+
 		long time = TimeUtils.nanoTime();
 		renderTiles();
-		if(Timers.get("profilebd", profileTime)) Profiler.blockDraw = TimeUtils.timeSinceNanos(time);
-		
+		if(Timers.get("profilebd", profileTime))
+			Profiler.blockDraw = TimeUtils.timeSinceNanos(time);
+
 		time = TimeUtils.nanoTime();
 		Entities.draw();
-		if(Timers.get("profileed", profileTime)) Profiler.entityDraw = TimeUtils.timeSinceNanos(time);
-		
+		if(Timers.get("profileed", profileTime))
+			Profiler.entityDraw = TimeUtils.timeSinceNanos(time);
+
 		drawShield();
-		
+
 		renderPixelOverlay();
-		
+
 		if(Settings.getBool("indicators")){
 			drawEnemyMarkers();
 		}
@@ -173,20 +173,18 @@ public class Renderer extends RendererModule{
 		AndroidInput.mousey = Gdx.graphics.getHeight() / 2;
 		camera.position.set(player.x, player.y, 0);
 	}
-	
+
 	void drawEnemyMarkers(){
 		Draw.color(Color.RED);
 		Draw.alpha(0.6f);
 		for(Entity entity : Entities.all()){
 			if(entity instanceof Enemy){
-				Enemy enemy = (Enemy)entity;
-				
-				if(Tmp.r1.setSize(camera.viewportWidth, camera.viewportHeight)
-						.setCenter(camera.position.x, camera.position.y)
-						.overlaps(enemy.hitbox.getRect(enemy.x, enemy.y))){
+				Enemy enemy = (Enemy) entity;
+
+				if(Tmp.r1.setSize(camera.viewportWidth, camera.viewportHeight).setCenter(camera.position.x, camera.position.y).overlaps(enemy.hitbox.getRect(enemy.x, enemy.y))){
 					continue;
 				}
-				
+
 				float angle = Angles.angle(camera.position.x, camera.position.y, enemy.x, enemy.y);
 				Angles.translation(angle, Unit.dp.inPixels(20f));
 				Draw.rect("enemyarrow", camera.position.x + Angles.x(), camera.position.y + Angles.y(), angle);
@@ -194,20 +192,20 @@ public class Renderer extends RendererModule{
 		}
 		Draw.color();
 	}
-	
+
 	void drawShield(){
 		Texture texture = Graphics.getSurface("shield").texture();
 		Shaders.shield.color.set(Color.SKY);
-		
+
 		Tmp.tr2.setRegion(texture);
 		Shaders.shield.region = Tmp.tr2;
-		
+
 		Graphics.end();
 		Graphics.shader(Shaders.shield);
 		Graphics.setScreen();
-		
+
 		Core.batch.draw(texture, 0, Gdx.graphics.getHeight(), Gdx.graphics.getWidth(), -Gdx.graphics.getHeight());
-		
+
 		Graphics.shader();
 		Graphics.end();
 		Graphics.beginCam();
@@ -219,9 +217,9 @@ public class Renderer extends RendererModule{
 		//render the entire map
 		if(floorCache == null || floorCache.length != chunksx || floorCache[0].length != chunksy){
 			floorCache = new Cache[chunksx][chunksy];
-			
-			for(int x = 0; x < chunksx; x ++){
-				for(int y = 0; y < chunksy; y ++){
+
+			for(int x = 0; x < chunksx; x++){
+				for(int y = 0; y < chunksy; y++){
 					renderCache(x, y);
 				}
 			}
@@ -257,9 +255,9 @@ public class Renderer extends RendererModule{
 		int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2) + 2;
 
 		boolean noshadows = Settings.getBool("noshadows");
-		
+
 		boolean drawTiles = true;
-		
+
 		//0 = shadows
 		//1 = normal blocks
 		//2 = over blocks
@@ -267,7 +265,7 @@ public class Renderer extends RendererModule{
 			if(l == 0){
 				Graphics.surface("shadow");
 			}
-			
+
 			for(int x = -rangex; x <= rangex; x++){
 				for(int y = -rangey; y <= rangey; y++){
 					int worldx = Mathf.scl(camera.position.x, tilesize) + x;
@@ -294,6 +292,23 @@ public class Renderer extends RendererModule{
 				Draw.color();
 			}
 		}
+
+		if(Vars.debug && Vars.debugChunks){
+			Draw.color(Color.YELLOW);
+			Draw.thick(1f);
+			for(int x = -crangex; x <= crangex; x++){
+				for(int y = -crangey; y <= crangey; y++){
+					int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
+					int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
+
+					if(!Mathf.inBounds(worldx, worldy, floorCache))
+						continue;
+					Draw.linerect(worldx * chunksize * tilesize, worldy * chunksize * tilesize, 
+							chunksize * tilesize, chunksize * tilesize);
+				}
+			}
+			Draw.reset();
+		}
 	}
 
 	void renderCache(int cx, int cy){
@@ -303,11 +318,11 @@ public class Renderer extends RendererModule{
 			for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
 				Tile tile = World.tile(tilex, tiley);
 				tile.floor().drawCache(tile);
-				
+
 			}
 		}
 		floorCache[cx][cy] = Caches.end();
-		
+
 	}
 
 	public void clearTiles(){
@@ -316,15 +331,16 @@ public class Renderer extends RendererModule{
 
 	void renderPixelOverlay(){
 		
+		//draw tutorial placement point
 		if(Vars.control.tutorial.showBlock()){
 			int x = World.core.x + Vars.control.tutorial.getPlacePoint().x;
 			int y = World.core.y + Vars.control.tutorial.getPlacePoint().y;
 			int rot = Vars.control.tutorial.getPlaceRotation();
-			
+
 			Draw.thick(1f);
 			Draw.color(Color.YELLOW);
-			Draw.square(x * tilesize, y * tilesize, tilesize/2f + Mathf.sin(Timers.time(), 4f, 1f));
-			
+			Draw.square(x * tilesize, y * tilesize, tilesize / 2f + Mathf.sin(Timers.time(), 4f, 1f));
+
 			Draw.color(Color.ORANGE);
 			Draw.thick(2f);
 			if(rot != -1){
@@ -332,8 +348,10 @@ public class Renderer extends RendererModule{
 			}
 			Draw.reset();
 		}
-
-		if(player.recipe != null && Vars.control.hasItems(player.recipe.requirements) && (!ui.hasMouse() || android) && AndroidInput.mode == PlaceMode.cursor){
+		
+		//draw placement box
+		if(player.recipe != null && Vars.control.hasItems(player.recipe.requirements) 
+				&& (!ui.hasMouse() || android) && AndroidInput.mode == PlaceMode.cursor){
 			float x = 0;
 			float y = 0;
 
@@ -348,22 +366,19 @@ public class Renderer extends RendererModule{
 				tilex = Input.tilex();
 				tiley = Input.tiley();
 			}
-			
-			x = tilex*tilesize;
-			y = tiley*tilesize;
 
-			boolean valid = World.validPlace(tilex, tiley, player.recipe.result) && (android ||
-					Input.cursorNear());
-			
+			x = tilex * tilesize;
+			y = tiley * tilesize;
+
+			boolean valid = World.validPlace(tilex, tiley, player.recipe.result) && (android || Input.cursorNear());
+
 			Vector2 offset = player.recipe.result.getPlaceOffset();
-			
+
 			float si = MathUtils.sin(Timers.time() / 6f) + 1;
-			
+
 			Draw.color(valid ? Color.PURPLE : Color.SCARLET);
 			Draw.thickness(2f);
-			Draw.linecrect(x + offset.x, y + offset.y, 
-					tilesize * player.recipe.result.width + si, 
-					tilesize * player.recipe.result.height + si);
+			Draw.linecrect(x + offset.x, y + offset.y, tilesize * player.recipe.result.width + si, tilesize * player.recipe.result.height + si);
 
 			player.recipe.result.drawPlace(tilex, tiley, valid);
 
@@ -390,25 +405,27 @@ public class Renderer extends RendererModule{
 		//block breaking
 		if(Inputs.buttonDown(Buttons.RIGHT) && World.validBreak(Input.tilex(), Input.tiley())){
 			Tile tile = World.tile(Input.tilex(), Input.tiley());
-			if(tile.isLinked()) tile = tile.getLinked();
+			if(tile.isLinked())
+				tile = tile.getLinked();
 			Vector2 offset = tile.block().getPlaceOffset();
-			
+
 			Draw.color(Color.YELLOW, Color.SCARLET, player.breaktime / tile.getBreakTime());
 			Draw.linecrect(tile.worldx() + offset.x, tile.worldy() + offset.y, tile.block().width * Vars.tilesize, tile.block().height * Vars.tilesize);
 			Draw.reset();
 		}else if(android && player.breaktime > 0){ //android block breaking
 			Vector2 vec = Graphics.world(Gdx.input.getX(0), Gdx.input.getY(0));
-			
+
 			if(World.validBreak(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize))){
 				Tile tile = World.tile(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize));
-				
+
 				float fract = player.breaktime / tile.getBreakTime();
 				Draw.color(Color.YELLOW, Color.SCARLET, fract);
 				Draw.circle(tile.worldx(), tile.worldy(), 4 + (1f - fract) * 26);
 				Draw.reset();
 			}
 		}
-
+		
+		//draw selected block health
 		if(player.recipe == null && !ui.hasMouse()){
 			Tile tile = World.tile(Input.tilex(), Input.tiley());
 
@@ -416,33 +433,33 @@ public class Renderer extends RendererModule{
 				Tile target = tile;
 				if(tile.isLinked())
 					target = tile.getLinked();
-				
+
 				Vector2 offset = target.block().getPlaceOffset();
-				
+
 				if(target.entity != null)
-						drawHealth(target.entity.x + offset.x, target.entity.y - 3f - target.block().height/2f * Vars.tilesize + offset.y, 
-								target.entity.health, target.entity.maxhealth);
-					
+					drawHealth(target.entity.x + offset.x, target.entity.y - 3f - target.block().height / 2f * Vars.tilesize + offset.y, target.entity.health, target.entity.maxhealth);
+
 				target.block().drawPixelOverlay(target);
 			}
 		}
-		
-		boolean smoothcam = Settings.getBool("smoothcam");
 
+		boolean smoothcam = Settings.getBool("smoothcam");
+		
+		//draw entity health bars
 		for(Entity entity : Entities.all()){
 			if(entity instanceof DestructibleEntity && !(entity instanceof TileEntity)){
 				DestructibleEntity dest = ((DestructibleEntity) entity);
-				
+
 				if(dest instanceof Player && Vars.snapCamera && smoothcam && Settings.getBool("pixelate")){
-					drawHealth((int)dest.x, (int)dest.y - 7f, dest.health, dest.maxhealth);
+					drawHealth((int) dest.x, (int) dest.y - 7f, dest.health, dest.maxhealth);
 				}else{
 					drawHealth(dest.x, dest.y - 7f, dest.health, dest.maxhealth);
 				}
-				
+
 			}
 		}
 	}
-
+	
 	void drawHealth(float x, float y, float health, float maxhealth){
 		drawBar(Color.RED, x, y, health / maxhealth);
 	}

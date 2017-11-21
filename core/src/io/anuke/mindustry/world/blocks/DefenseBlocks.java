@@ -13,6 +13,8 @@ public class DefenseBlocks{
 	stonewall = new Wall("stonewall"){{
 		health = 50;
 		formalName = "stone wall";
+		fullDescription = 
+			"A cheap defensive block. Useful for protecting the core and turrets in the first few waves.";
 	}},
 			
 	ironwall = new Wall("ironwall"){{

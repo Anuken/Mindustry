@@ -665,7 +665,33 @@ public class UI extends SceneModule{
 		header.addImage(region).size(8*5).padTop(4).units(Unit.dp);
 		Label nameLabel = new Label(recipe.result.formalName);
 		nameLabel.setWrap(true);
-		header.add(nameLabel).padLeft(4).width(160f).units(Unit.dp);
+		header.add(nameLabel).padLeft(4).width(135f).units(Unit.dp);
+		
+		//extra info
+		if(recipe.result.fullDescription != null){
+			header.addButton("?", ()->{
+				Label desclabel = new Label(recipe.result.fullDescription);
+				desclabel.setWrap(true);
+				
+				boolean wasPaused = GameState.is(State.paused);
+				GameState.set(State.paused);
+				
+				FloatingDialog d = new FloatingDialog("Block Info");
+				Table top = new Table();
+				top.left();
+				top.add(new Image(region)).size(8*5).units(Unit.dp);
+				top.add("[orange]"+recipe.result.formalName).padLeft(6f).units(Unit.dp);
+				d.content().add(top).fill().left();
+				d.content().row();
+				d.content().add(desclabel).width(600).units(Unit.dp);
+				d.buttons().addButton("OK", ()->{
+					if(!wasPaused) GameState.set(State.playing);
+					d.hide();
+				}).size(110, 50).pad(10f).units(Unit.dp);
+				d.show();
+			}).fillX().top().right().size(36f, 40f).units(Unit.dp);
+		}
+		
 		
 		desctable.add().pad(2).units(Unit.dp);
 		

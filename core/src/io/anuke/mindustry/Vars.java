@@ -31,6 +31,8 @@ public class Vars{
 	public static boolean debug = false;
 	//whether to debug openGL info
 	public static boolean debugGL = false;
+	//whether to draw chunk borders
+	public static boolean debugChunks = false;
 	//whether turrets have infinite ammo (only with debug)
 	public static boolean infiniteAmmo = true;
 	//whether to show paths of enemies
