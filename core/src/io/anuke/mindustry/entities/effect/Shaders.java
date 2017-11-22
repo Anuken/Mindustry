@@ -1,4 +1,4 @@
-package io.anuke.mindustry;
+package io.anuke.mindustry.entities.effect;
 
 import com.badlogic.gdx.graphics.Color;
 

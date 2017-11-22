@@ -12,11 +12,11 @@ import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
-import io.anuke.mindustry.Shaders;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.effect.Shaders;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.Input;

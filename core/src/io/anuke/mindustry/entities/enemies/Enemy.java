@@ -5,13 +5,13 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
-import io.anuke.mindustry.Shaders;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.effect.Fx;
+import io.anuke.mindustry.entities.effect.Shaders;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
 import io.anuke.ucore.core.*;

@@ -12,7 +12,6 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
 
 import io.anuke.mindustry.Mindustry;
-import io.anuke.mindustry.Tutorial;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.core.GameState.State;
@@ -155,10 +154,7 @@ public class Control extends Module{
 				spacing = 3;
 				scaling = 5;
 			}}
-			
-			
 		);
-	
 	}
 	
 	public void reset(){
