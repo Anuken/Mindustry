@@ -2,9 +2,9 @@ package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Color;
 
-import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;

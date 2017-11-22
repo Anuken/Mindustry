@@ -1,4 +1,4 @@
-package io.anuke.mindustry;
+package io.anuke.mindustry.core;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.scene.actions.Actions.*;
@@ -12,8 +12,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
-import io.anuke.mindustry.GameState.State;
-import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.mindustry.world.Tile;
@@ -24,7 +24,6 @@ import io.anuke.ucore.function.VisibilityProvider;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Skin;
-import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
@@ -35,7 +34,7 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class UI extends SceneModule{
-	Table itemtable, weapontable, loadingtable, desctable, respawntable, configtable;
+	Table loadingtable, desctable, configtable;
 	MindustrySettingsDialog prefs;
 	MindustryKeybindDialog keys;
 	Dialog about, restart, levels, upgrades, load, settingserror;
@@ -47,7 +46,6 @@ public class UI extends SceneModule{
 	
 	private Fragment blockfrag = new BlocksFragment(),
 			menufrag = new MenuFragment(),
-			profilefrag = new ProfilerFragment(),
 			toolfrag = new ToolFragment(),
 			hudfrag = new HudFragment(),
 			placefrag = new PlacementFragment(),
@@ -55,8 +53,6 @@ public class UI extends SceneModule{
 
 	VisibilityProvider play = () -> !GameState.is(State.menu);
 	VisibilityProvider nplay = () -> GameState.is(State.menu);
-
-	private Array<Item> tempItems = new Array<>();
 	
 	public UI() {
 		Dialog.setShowAction(()-> sequence(
@@ -258,8 +254,6 @@ public class UI extends SceneModule{
 		
 		menufrag.build();
 		
-		profilefrag.build();
-		
 		placefrag.build();
 		
 		loadingtable = new table("loadDim"){{
@@ -289,7 +283,7 @@ public class UI extends SceneModule{
 	}
 	
 	public void fadeRespawn(boolean in){
-		respawntable.addAction(Actions.color(in ? new Color(0, 0, 0, 0.3f) : Color.CLEAR, 0.3f));
+		((HudFragment)hudfrag).fadeRespawn(in);
 	}
 	
 	public void showConfig(Tile tile){
@@ -388,23 +382,7 @@ public class UI extends SceneModule{
 	}
 
 	public void updateItems(){
-		itemtable.clear();
-		itemtable.left();
-		
-		tempItems.clear();
-		for(Item item : control.getItems().keys()){
-			tempItems.add(item);
-		}
-		tempItems.sort();
-
-		for(Item stack : tempItems){
-			Image image = new Image(Draw.region("icon-" + stack.name()));
-			Label label = new Label("" + Mindustry.formatter.format(control.getAmount(stack)));
-			label.setFontScale(fontscale*1.5f);
-			itemtable.add(image).size(8*3).units(Unit.dp);
-			itemtable.add(label).left();
-			itemtable.row();
-		}
+		((HudFragment)hudfrag).updateItems();
 	}
 	
 }

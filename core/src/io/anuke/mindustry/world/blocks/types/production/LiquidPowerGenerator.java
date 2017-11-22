@@ -7,8 +7,8 @@ import java.io.IOException;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
-import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidAcceptor;

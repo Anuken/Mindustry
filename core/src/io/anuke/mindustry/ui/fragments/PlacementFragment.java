@@ -4,8 +4,8 @@ import static io.anuke.mindustry.Vars.*;
 
 import com.badlogic.gdx.utils.Align;
 
-import io.anuke.mindustry.GameState;
-import io.anuke.mindustry.GameState.State;
+import io.anuke.mindustry.core.GameState;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.ucore.scene.builders.imagebutton;

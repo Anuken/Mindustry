@@ -2,7 +2,8 @@ package io.anuke.mindustry;
 
 import com.badlogic.gdx.math.GridPoint2;
 
-import io.anuke.mindustry.GameState.State;
+import io.anuke.mindustry.core.GameState;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.*;

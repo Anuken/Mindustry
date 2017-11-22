@@ -1,7 +1,8 @@
-package io.anuke.mindustry;
+package io.anuke.mindustry.entities.effect;
 
 import com.badlogic.gdx.graphics.Color;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Hue;

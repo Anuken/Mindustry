@@ -3,6 +3,9 @@ package io.anuke.mindustry;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 
+import io.anuke.mindustry.core.Control;
+import io.anuke.mindustry.core.Renderer;
+import io.anuke.mindustry.core.UI;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
@@ -40,8 +43,6 @@ public class Vars{
 	//number of save slots-- increasing may lead to layout issues
 	//TODO named save slots, possibly with a scroll dialog
 	public static final int saveSlots = 4;
-	
-	public static final int profileTime = 30;
 	
 	//only if smoothCamera
 	public static boolean snapCamera = true;

@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import com.badlogic.gdx.utils.Array;
 
-import io.anuke.mindustry.Fx;
+import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;

@@ -4,22 +4,33 @@ import static io.anuke.mindustry.Vars.*;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Array;
 
-import io.anuke.mindustry.GameState;
-import io.anuke.mindustry.GameState.State;
+import io.anuke.mindustry.Mindustry;
+import io.anuke.mindustry.core.GameState;
+import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.resource.Item;
 import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.function.StringSupplier;
+import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
+import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.Profiler;
 
 public class HudFragment implements Fragment{
 	private Table itemtable, respawntable;
+	private Array<Item> tempItems = new Array<>();
 	
 	public void build(){
+		//menu at top left
 		new table(){{
 			atop();
 			aleft();
@@ -122,5 +133,50 @@ public class HudFragment implements Fragment{
 				
 			}}.end();
 		}}.end();
+		
+		//profiling table
+		if(debug){
+			new table(){{
+				abottom();
+				aleft();
+				new label((StringSupplier)()->"[purple]entities: " + Entities.amount()).left();
+				row();
+				new label("[red]DEBUG MODE").scale(0.5f).left();
+			}}.end();
+			
+			new table(){{
+				atop();
+				new table("button"){{
+					defaults().left().growX();
+					atop();
+					aleft();
+					new label((StringSupplier)()->Profiler.formatDisplayTimes());
+				}}.width(400f).end();
+			}}.end();
+		}
+	}
+	
+	public void updateItems(){
+		itemtable.clear();
+		itemtable.left();
+		
+		tempItems.clear();
+		for(Item item : control.getItems().keys()){
+			tempItems.add(item);
+		}
+		tempItems.sort();
+
+		for(Item stack : tempItems){
+			Image image = new Image(Draw.region("icon-" + stack.name()));
+			Label label = new Label("" + Mindustry.formatter.format(control.getAmount(stack)));
+			label.setFontScale(fontscale*1.5f);
+			itemtable.add(image).size(8*3).units(Unit.dp);
+			itemtable.add(label).left();
+			itemtable.row();
+		}
+	}
+	
+	public void fadeRespawn(boolean in){
+		respawntable.addAction(Actions.color(in ? new Color(0, 0, 0, 0.3f) : Color.CLEAR, 0.3f));
 	}
 }

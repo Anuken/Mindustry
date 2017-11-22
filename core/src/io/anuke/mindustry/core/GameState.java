@@ -1,4 +1,4 @@
-package io.anuke.mindustry;
+package io.anuke.mindustry.core;
 
 public class GameState{
 	private static State state = State.menu;

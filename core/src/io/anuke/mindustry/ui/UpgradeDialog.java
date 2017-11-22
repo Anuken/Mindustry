@@ -4,9 +4,9 @@ import static io.anuke.mindustry.Vars.*;
 
 import com.badlogic.gdx.graphics.Color;
 
-import io.anuke.mindustry.GameState;
-import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.GameState;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.ucore.core.Draw;

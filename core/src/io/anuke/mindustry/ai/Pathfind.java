@@ -1,14 +1,13 @@
 package io.anuke.mindustry.ai;
 
 import com.badlogic.gdx.ai.pfa.PathFinder;
-import com.badlogic.gdx.ai.pfa.PathFinderRequest;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
-import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
@@ -68,11 +67,12 @@ public class Pathfind{
 			}
 		}
 		
-		//TODO
+		//TODO make this work?
+		/*
 		PathFinderRequest<Tile> request = new PathFinderRequest<Tile>();
 		request.startNode = World.spawnpoints.get(0);
 		request.endNode = World.core;
-		passpathfinder.search(request, 1000);
+		passpathfinder.search(request, 1000); */
 		
 		for(int i = 0; i < paths.size; i ++){
 			SmoothGraphPath path = paths.get(i);

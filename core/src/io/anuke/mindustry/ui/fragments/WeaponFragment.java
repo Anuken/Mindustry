@@ -2,8 +2,8 @@ package io.anuke.mindustry.ui.fragments;
 
 import static io.anuke.mindustry.Vars.*;
 
-import io.anuke.mindustry.GameState;
-import io.anuke.mindustry.GameState.State;
+import io.anuke.mindustry.core.GameState;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Draw;

@@ -4,9 +4,9 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 
-import io.anuke.mindustry.GameState;
-import io.anuke.mindustry.GameState.State;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.GameState;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.TextButton;

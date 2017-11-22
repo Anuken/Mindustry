@@ -1,20 +1,19 @@
 package io.anuke.mindustry;
 
-import static io.anuke.mindustry.Vars.profileTime;
-
 import java.util.Date;
 
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.TimeUtils;
 
-import io.anuke.mindustry.GameState.State;
+import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.Formatter;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.modules.ModuleCore;
+import io.anuke.ucore.util.Profiler;
 
 public class Mindustry extends ModuleCore {
 	public static Array<String> args = new Array<>();
@@ -57,7 +56,7 @@ public class Mindustry extends ModuleCore {
 	
 	@Override
 	public void render(){
-		long time = TimeUtils.nanoTime();
+		Profiler.begin("total");
 		
 		try{
 			super.render();
@@ -73,6 +72,6 @@ public class Mindustry extends ModuleCore {
 		
 		Inputs.update();
 		
-		if(Timers.get("profilet", profileTime)) Profiler.total = TimeUtils.timeSinceNanos(time);
+		Profiler.end("total");
 	}
 }

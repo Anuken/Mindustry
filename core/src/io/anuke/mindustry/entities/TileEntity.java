@@ -6,8 +6,8 @@ import java.io.IOException;
 
 import com.badlogic.gdx.utils.ObjectMap;
 
-import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;

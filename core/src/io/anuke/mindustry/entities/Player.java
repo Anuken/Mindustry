@@ -7,8 +7,8 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
-import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.ucore.core.*;

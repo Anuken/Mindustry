@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.blocks;
 
-import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;

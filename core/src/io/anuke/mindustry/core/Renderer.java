@@ -1,4 +1,4 @@
-package io.anuke.mindustry;
+package io.anuke.mindustry.core;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.core.Core.camera;
@@ -11,9 +11,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.TimeUtils;
 
-import io.anuke.mindustry.GameState.State;
+import io.anuke.mindustry.Shaders;
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
@@ -34,9 +35,7 @@ import io.anuke.ucore.graphics.Caches;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
+import io.anuke.ucore.util.*;
 
 public class Renderer extends RendererModule{
 	int targetscale = baseCameraScale;
@@ -124,10 +123,11 @@ public class Renderer extends RendererModule{
 				camera.position.add(-0.5f, 0, 0);
 			}
 
-			long time = TimeUtils.nanoTime();
+			Profiler.begin("draw");
+			
 			drawDefault();
-			if(Timers.get("profiled", profileTime))
-				Profiler.draw = TimeUtils.timeSinceNanos(time);
+			
+			Profiler.end("draw");
 
 			if(Vars.debug && Vars.debugGL && Timers.get("profile", 60)){
 				UCore.log("shaders: " + GLProfiler.shaderSwitches, "calls: " + GLProfiler.drawCalls, "bindings: " + GLProfiler.textureBindings, "vertices: " + GLProfiler.vertexCount.average);
@@ -146,15 +146,15 @@ public class Renderer extends RendererModule{
 		Graphics.surface("shield");
 		Graphics.surface();
 
-		long time = TimeUtils.nanoTime();
+		Profiler.begin("blockDraw");
+		
 		renderTiles();
-		if(Timers.get("profilebd", profileTime))
-			Profiler.blockDraw = TimeUtils.timeSinceNanos(time);
+		
+		Profiler.end("blockDraw");
 
-		time = TimeUtils.nanoTime();
+		Profiler.begin("entityDraw");
 		Entities.draw();
-		if(Timers.get("profileed", profileTime))
-			Profiler.entityDraw = TimeUtils.timeSinceNanos(time);
+		Profiler.end("entityDraw");
 
 		drawShield();
 

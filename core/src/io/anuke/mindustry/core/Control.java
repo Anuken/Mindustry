@@ -1,4 +1,4 @@
-package io.anuke.mindustry;
+package io.anuke.mindustry.core;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -8,14 +8,17 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
 
-import io.anuke.mindustry.GameState.State;
+import io.anuke.mindustry.Mindustry;
+import io.anuke.mindustry.Tutorial;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.EnemySpawn;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.entities.enemies.*;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.GestureHandler;
@@ -31,6 +34,7 @@ import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.graphics.Atlas;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Profiler;
 
 public class Control extends Module{
 	int targetscale = baseCameraScale;
@@ -230,7 +234,7 @@ public class Control extends Module{
 		this.extrawavetime = maxwavespace;
 	}
 	
-	void runWave(){
+	public void runWave(){
 		Sounds.play("spawn");
 		
 		Pathfind.updatePath();
@@ -473,9 +477,11 @@ public class Control extends Module{
 					runWave();
 				}
 			
-				long time = TimeUtils.nanoTime();
+				Profiler.begin("entityUpdate");
+				
 				Entities.update();
-				if(Timers.get("profileeu", profileTime)) Profiler.entityUpdate = TimeUtils.timeSinceNanos(time);
+				
+				Profiler.end("entityUpdate");
 			}
 			
 			if(!android){

@@ -8,10 +8,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Array;
 
-import io.anuke.mindustry.Fx;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Sounds;
