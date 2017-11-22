@@ -49,6 +49,8 @@ public enum Recipe{
 	coalpurifier(crafting, ProductionBlocks.coalpurifier, stack(Item.steel, 10), stack(Item.iron, 10)),
 	titaniumpurifier(crafting, ProductionBlocks.titaniumpurifier, stack(Item.steel, 30), stack(Item.iron, 30)),
 	oilrefinery(crafting, ProductionBlocks.oilrefinery, stack(Item.steel, 30), stack(Item.iron, 30)),
+	stoneformer(crafting, ProductionBlocks.stoneformer, stack(Item.steel, 30), stack(Item.iron, 30)),
+	lavasmelter(crafting, ProductionBlocks.lavasmelter, stack(Item.steel, 30), stack(Item.iron, 30)),
 	
 	stonedrill(production, ProductionBlocks.stonedrill, stack(Item.stone, 12)),
 	irondrill(production, ProductionBlocks.irondrill, stack(Item.stone, 25)),

@@ -118,12 +118,11 @@ public class ProductionBlocks{
 	stoneformer = new LiquidCrafter("stoneformer"){
 		{
 			formalName = "stone former";
-			input = Item.iron;
-			inputAmount = 2;
+			input = null;
 			inputLiquid = Liquid.lava;
-			liquidAmount = 20f;
+			liquidAmount = 16f;
 			liquidCapacity = 21f;
-			purifyTime = 10;
+			purifyTime = 12;
 			output = Item.stone;
 			health = 80;
 			craftEffect = Fx.purifystone;
@@ -135,11 +134,13 @@ public class ProductionBlocks{
 	lavasmelter = new LiquidCrafter("lavasmelter"){
 		{
 			formalName = "lava smelter";
+			input = Item.iron;
+			inputAmount = 1;
 			inputLiquid = Liquid.lava;
 			liquidAmount = 40f;
 			liquidCapacity = 41f;
 			purifyTime = 30;
-			output = Item.stone;
+			output = Item.steel;
 			health = 80;
 			craftEffect = Fx.purifystone;
 			description = "Converts iron + lava to steel.";

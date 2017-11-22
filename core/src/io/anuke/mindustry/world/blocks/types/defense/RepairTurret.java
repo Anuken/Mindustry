@@ -13,22 +13,25 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
-public class RepairTurret extends Turret{
+public class RepairTurret extends PowerTurret{
 
 	public RepairTurret(String name) {
 		super(name);
+		powerUsed = 0.1f;
 	}
 	
 	@Override
 	public void getStats(Array<String> list){
 		list.add("[health]health: " + health);
+		list.add("[powerinfo]Power Capacity: " + (int)powerCapacity);
+		list.add("[powerinfo]Power/shot: " + Strings.toFixed(powerUsed, 1));
 		list.add("[turretinfo]Range: " + (int)range);
 		list.add("[turretinfo]Repairs/Second: " + Strings.toFixed(60f/reload, 1));
 	}
 	
 	@Override
 	public void postInit(){
-		description = "[turretinfo]Range: " + (int)range + "\n[description]Heals nearby tiles.";
+		description = "[turretinfo]Range: " + (int)range + "\nPower/unit: "+powerUsed+"\n[description]Heals nearby tiles.";
 	}
 	
 	@Override
