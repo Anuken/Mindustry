@@ -1,5 +1,7 @@
 package io.anuke.mindustry.entities.enemies;
 
+import com.badlogic.gdx.ai.pfa.PathFinder;
+import com.badlogic.gdx.ai.pfa.PathFinderRequest;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -7,6 +9,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
+import io.anuke.mindustry.ai.SmoothGraphPath;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
@@ -34,9 +37,11 @@ public class Enemy extends DestructibleEntity{
 	protected String shootsound = "enemyshoot";
 	protected int damage;
 	
-	public Tile[] path;
+	public PathFinderRequest<Tile> request = new PathFinderRequest<>();;
+	public SmoothGraphPath gpath;
 	public int spawn;
 	public int node = -1;
+	public PathFinder<Tile> finder;
 	
 	public Vector2 direction = new Vector2();
 	public float xvelocity, yvelocity;
@@ -122,6 +127,7 @@ public class Enemy extends DestructibleEntity{
 	
 	public void findClosestNode(){
 		Pathfind.find(this);
+		/*
 		
 		int index = 0;
 		int cindex = -1;
@@ -147,7 +153,7 @@ public class Enemy extends DestructibleEntity{
 			Timers.run(Mathf.random(15f), ()->{
 				set(x2 * Vars.tilesize, y2 * Vars.tilesize);
 			});
-		}
+		}*/
 	}
 	
 	@Override

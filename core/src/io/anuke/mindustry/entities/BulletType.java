@@ -47,7 +47,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Draw.reset();
 		}
 	},
-	sniper = new BulletType(3f, 23){
+	sniper = new BulletType(3f, 25){
 		public void draw(Bullet b){
 			Draw.color(Color.LIGHT_GRAY);
 			Draw.thick(1f);
@@ -223,7 +223,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Draw.reset();
 		}
 	},
-	flame = new BulletType(0.6f, 4){
+	flame = new BulletType(0.6f, 5){
 		public void draw(Bullet b){
 			Draw.color(Color.YELLOW, Color.SCARLET, b.time/lifetime);
 			float size = 6f-b.time/lifetime*5f;
@@ -250,7 +250,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Draw.reset();
 		}
 	},
-	shot = new BulletType(2.4f, 2){
+	shot = new BulletType(2.4f, 4){
 		{lifetime = 40;}
 		public void draw(Bullet b){
 			Draw.color(lightGold);
@@ -258,7 +258,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Draw.reset();
 		}
 	},
-	multishot = new BulletType(2.5f, 2){
+	multishot = new BulletType(2.5f, 3){
 		{lifetime=40;}
 		public void draw(Bullet b){
 			Draw.color(Color.SKY);

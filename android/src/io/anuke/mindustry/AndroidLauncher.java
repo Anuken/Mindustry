@@ -6,7 +6,6 @@ import java.util.Date;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.badlogic.gdx.utils.Array;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -34,9 +33,6 @@ public class AndroidLauncher extends AndroidApplication {
 				return NumberFormat.getIntegerInstance().format(number);
 			}
 		};
-		
-		//TODO
-		Mindustry.args = Array.with("-debug");
 		
 		initialize(new Mindustry(), config);
 	}

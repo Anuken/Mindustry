@@ -71,7 +71,7 @@ public class DefenseBlocks{
 		{
 			fullDescription = "Repairs nearby damaged blocks in range at a slow rate. "
 					+ "Uses small amounts of power.";
-			formalName = "heal turret";
+			formalName = "repair turret";
 			range = 30;
 			reload = 40f;
 			health = 60;
@@ -82,7 +82,7 @@ public class DefenseBlocks{
 		{
 			fullDescription = "Repairs nearby damaged blocks in range at a decent rate. "
 					+ "Uses power.";
-			formalName = "heal turret II";
+			formalName = "repair turret II";
 			range = 44;
 			reload = 20f;
 			health = 90;

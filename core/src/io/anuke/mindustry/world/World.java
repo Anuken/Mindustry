@@ -68,6 +68,10 @@ public class World{
 		return tiles[x][y];
 	}
 	
+	public static Tile tileWorld(float x, float y){
+		return tile(Mathf.scl2(x, tilesize), Mathf.scl2(y, tilesize));
+	}
+	
 	public static Tile[] getNearby(int x, int y){
 		temptiles[0] = tile(x+1, y);
 		temptiles[1] = tile(x, y+1);
@@ -145,8 +149,6 @@ public class World{
 		
 		World.seed = seed;
 		Generator.generate(mapPixmaps[map.ordinal()]);
-		
-		Pathfind.reset();
 		
 		//TODO multiblock core
 		placeBlock(core.x, core.y, ProductionBlocks.core, 0);

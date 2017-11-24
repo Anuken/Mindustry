@@ -14,6 +14,7 @@ import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
@@ -80,9 +81,13 @@ public class Generator extends PowerBlock{
 	public void drawOver(Tile tile){
 		PowerEntity entity = tile.entity();
 		if(entity.power > powerSpeed){
-			for(int i = 0; i < laserDirections; i++){
-				drawLaserTo(tile, (tile.rotation + i) - laserDirections/2);
-			}
+			Draw.alpha(1f);
+		}else{
+			Draw.alpha(0.75f);
+		}
+			
+		for(int i = 0; i < laserDirections; i++){
+			drawLaserTo(tile, (tile.rotation + i) - laserDirections/2);
 		}
 	}
 	
@@ -114,10 +119,9 @@ public class Generator extends PowerBlock{
 		Tile target = laserTarget(tile, rotation);
 
 		if(target != null){
-			Angles.translation(rotation * 90, 6f);
+			Angles.translation(rotation * 90, width * Vars.tilesize/2 + 2f);
 
-			Draw.color(Color.GRAY, Color.WHITE, 0.902f + Mathf.sin(Timers.time(), 1.7f, 0.08f));
-			Draw.alpha(1f);
+			Draw.tint(Hue.mix(Color.GRAY, Color.WHITE, 0.902f + Mathf.sin(Timers.time(), 1.7f, 0.08f)));
 
 			float r = 0f;
 

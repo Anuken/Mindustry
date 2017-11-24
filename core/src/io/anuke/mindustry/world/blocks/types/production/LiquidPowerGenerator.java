@@ -36,7 +36,7 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 	public void getStats(Array<String> list){
 		super.getStats(list);
 		list.add("[liquidinfo]Liquid Capacity: " + (int)liquidCapacity);
-		list.add("[liquidinfo]Generation: " + Strings.toFixed(generatePower / inputLiquid, 3) + "power units/liquid unit");
+		list.add("[liquidinfo]Generation: " + Strings.toFixed(generatePower / inputLiquid, 2) + " power/liquid");
 		list.add("[liquidinfo]Input: " + generateLiquid);
 	}
 	

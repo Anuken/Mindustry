@@ -12,7 +12,7 @@ public class SmoothGraphPath extends DefaultGraphPath<Tile> implements Smoothabl
 	@Override
 	public Vector2 getNodePosition(int index){
 		Tile tile = nodes.get(index);
-		return Tmp.v1.set(tile.worldx(), tile.worldy());
+		return Tmp.v3.set(tile.worldx(), tile.worldy());
 	}
 
 	@Override
@@ -23,6 +23,11 @@ public class SmoothGraphPath extends DefaultGraphPath<Tile> implements Smoothabl
 	@Override
 	public void truncatePath(int newLength){
 		nodes.truncate(newLength);
+	}
+	
+	@Override
+	public void add (Tile node) {
+		nodes.add(node);
 	}
 
 }
