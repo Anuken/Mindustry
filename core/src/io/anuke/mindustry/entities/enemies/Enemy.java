@@ -1,7 +1,5 @@
 package io.anuke.mindustry.entities.enemies;
 
-import com.badlogic.gdx.ai.pfa.PathFinder;
-import com.badlogic.gdx.ai.pfa.PathFinderRequest;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -9,7 +7,6 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
-import io.anuke.mindustry.ai.SmoothGraphPath;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
@@ -23,7 +20,12 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
 public class Enemy extends DestructibleEntity{
-	public final static Color[] tierColors = {Color.YELLOW, Color.ORANGE, Color.RED, Color.MAGENTA};
+	public final static Color[] tierColors = {
+		Color.valueOf("ffe451"), 
+		Color.valueOf("f48e20"),
+		Color.valueOf("ff6757"),
+		Color.valueOf("ff2d86")
+	};
 	public final static int maxtier = 4;
 	
 	protected float speed = 0.3f;
@@ -37,11 +39,9 @@ public class Enemy extends DestructibleEntity{
 	protected String shootsound = "enemyshoot";
 	protected int damage;
 	
-	public PathFinderRequest<Tile> request = new PathFinderRequest<>();;
-	public SmoothGraphPath gpath;
 	public int spawn;
 	public int node = -1;
-	public PathFinder<Tile> finder;
+	public Tile[] path;
 	
 	public Vector2 direction = new Vector2();
 	public float xvelocity, yvelocity;
@@ -80,16 +80,23 @@ public class Enemy extends DestructibleEntity{
 		
 		Vector2 shift = Tmp.v3.setZero();
 		float shiftRange = hitbox.width + 3f;
+		float avoidRange = 16f;
+		float avoidSpeed = 0.1f;
 		
 		for(SolidEntity other : entities){
 			float dst = other.distanceTo(this);
-			if(other != this && other instanceof Enemy && dst < shiftRange){
-				float scl = Mathf.clamp(1.4f - dst/shiftRange);
-				shift.add((x - other.x) * scl, (y - other.y) * scl);
+			if(other != this && other instanceof Enemy){
+				if(dst < shiftRange){
+					float scl = Mathf.clamp(1.4f - dst/shiftRange);
+					shift.add((x - other.x) * scl, (y - other.y) * scl);
+				}else if(dst < avoidRange){
+					Tmp.v2.set((x - other.x), (y - other.y)).setLength(avoidSpeed);
+					shift.add(Tmp.v2);
+				}
 			}
 		}
 		
-		shift.nor();
+		shift.limit(1f);
 		vec.add(shift.scl(0.5f));
 		
 		move(vec.x*Timers.delta(), vec.y*Timers.delta());
@@ -127,7 +134,6 @@ public class Enemy extends DestructibleEntity{
 	
 	public void findClosestNode(){
 		Pathfind.find(this);
-		/*
 		
 		int index = 0;
 		int cindex = -1;
@@ -143,6 +149,8 @@ public class Enemy extends DestructibleEntity{
 			index ++;
 		}
 		
+		node = Math.max(cindex, 1);
+		
 		//set node to that index
 		node = cindex;
 		
@@ -153,7 +161,7 @@ public class Enemy extends DestructibleEntity{
 			Timers.run(Mathf.random(15f), ()->{
 				set(x2 * Vars.tilesize, y2 * Vars.tilesize);
 			});
-		}*/
+		}
 	}
 	
 	@Override

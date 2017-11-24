@@ -150,6 +150,8 @@ public class World{
 		World.seed = seed;
 		Generator.generate(mapPixmaps[map.ordinal()]);
 		
+		Pathfind.reset();
+		
 		//TODO multiblock core
 		placeBlock(core.x, core.y, ProductionBlocks.core, 0);
 		

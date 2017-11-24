@@ -243,7 +243,7 @@ public class Control extends Module{
 				
 				for(int i = 0; i < spawnamount; i ++){
 					int index = i;
-					float range = 8f;
+					float range = 12f;
 					
 					Timers.run(index*50f, ()->{
 						try{
@@ -417,6 +417,10 @@ public class Control extends Module{
 						entity.remove();
 					}
 				}
+			}
+			
+			if(Inputs.keyUp(Keys.O)){
+				Vars.noclip = !Vars.noclip;
 			}
 			
 			if(Inputs.keyUp(Keys.Y)){

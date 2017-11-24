@@ -49,7 +49,7 @@ public enum Weapon{
 			
 			bullet(p, p.x, p.y, ang + Mathf.range(8));
 			
-			Effects.effect(Fx.shoot, p.x + vector.x, p.y+vector.y);
+			Effects.effect(Fx.shoot2, p.x + vector.x, p.y+vector.y);
 		}
 	},
 	flamer(5, BulletType.flame, "Shoots a stream of fire.", stack(Item.steel, 60), stack(Item.coal, 60)){

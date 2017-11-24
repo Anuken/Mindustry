@@ -4,7 +4,7 @@ import com.badlogic.gdx.ai.pfa.Connection;
 
 import io.anuke.mindustry.world.Tile;
 
-public class TileConnection implements Connection{
+public class TileConnection implements Connection<Tile>{
 	Tile a, b;
 	
 	public TileConnection(Tile a, Tile b){
@@ -14,16 +14,16 @@ public class TileConnection implements Connection{
 
 	@Override
 	public float getCost(){
-		return Math.abs(a.worldx() - b.worldx()) + Math.abs(a.worldy() - b.worldy());
+		return MHueristic.estimateStatic(a, b);
 	}
 
 	@Override
-	public Object getFromNode(){
+	public Tile getFromNode(){
 		return a;
 	}
 
 	@Override
-	public Object getToNode(){
+	public Tile getToNode(){
 		return b;
 	}
 

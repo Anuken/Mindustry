@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.Mindustry;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Item;
@@ -141,18 +142,22 @@ public class HudFragment implements Fragment{
 				aleft();
 				new label((StringSupplier)()->"[purple]entities: " + Entities.amount()).left();
 				row();
+				new label((StringSupplier)()->"[orange]noclip: " + Vars.noclip).left();
+				row();
 				new label("[red]DEBUG MODE").scale(0.5f).left();
 			}}.end();
 			
-			new table(){{
-				atop();
-				new table("button"){{
-					defaults().left().growX();
+			if(profile){
+				new table(){{
 					atop();
-					aleft();
-					new label((StringSupplier)()->Profiler.formatDisplayTimes());
-				}}.width(400f).end();
-			}}.end();
+					new table("button"){{
+						defaults().left().growX();
+						atop();
+						aleft();
+						new label((StringSupplier)()->Profiler.formatDisplayTimes());
+					}}.width(400f).end();
+				}}.end();
+			}
 		}
 	}
 	

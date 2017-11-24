@@ -35,6 +35,8 @@ public class Player extends DestructibleEntity{
 	
 	@Override
 	public void onDeath(){
+		if(Vars.debug) return;
+		
 		remove();
 		Effects.effect(Fx.explosion, this);
 		Effects.shake(4f, 5f, this);
@@ -85,7 +87,12 @@ public class Player extends DestructibleEntity{
 		
 		vector.limit(speed);
 		
-		move(vector.x*Timers.delta(), vector.y*Timers.delta());
+		if(!Vars.noclip){
+			move(vector.x*Timers.delta(), vector.y*Timers.delta());
+		}else{
+			x += vector.x*Timers.delta();
+			y += vector.y*Timers.delta();
+		}
 		
 		if(!shooting){
 			direction.add(vector);
