@@ -79,14 +79,14 @@ public class Conveyor extends Block{
 			for(int j = 0; j < entity.convey.size; j ++){
 				ItemPos other = pos2.set(entity.convey.get(j));
 				
-				if(other.y > pos.y && other.y - pos.y < 0.14){
+				if(other.y > pos.y && other.y - pos.y < 0.14 * Timers.delta()){
 					canmove = false;
 					break;
 				}
 			}
 			
 			if(canmove){
-				pos.y += speed * Timers.delta();
+				pos.y += Math.max(speed * Timers.delta(), 1f/252f); //TODO fix precision issues?
 				pos.x = MathUtils.lerp(pos.x, 0, 0.06f * Timers.delta());
 			}else{
 				pos.x = MathUtils.lerp(pos.x, pos.seed/128f/3f, 0.1f * Timers.delta());
@@ -138,7 +138,7 @@ public class Conveyor extends Block{
 	 * Conveyor data format:
 	 * [0] item ordinal
 	 * [1] x: byte ranging from -128 to 127, scaled should be at [-1, 1], corresponds to relative X from the conveyor middle
-	 * [2] y: byte ranging from 0 to 127, scaled should be at [0, 1], corresponds to relative Y from the conveyor start
+	 * [2] y: byte ranging from -128 to 127, scaled should be at [0, 1], corresponds to relative Y from the conveyor start
 	 * [3] seed: -128 to 127, unscaled
 	 * Size is 4 bytes, or one int.
 	 */
@@ -178,7 +178,7 @@ public class Conveyor extends Block{
 			byte[] values = Bits.getBytes(value);
 			item = items[values[0]];
 			x = values[1] / 127f;
-			y = ((int)values[2]) / 127f;
+			y = ((int)values[2] + 128) / 255f;
 			seed = values[3];
 			return this;
 		}
@@ -191,7 +191,7 @@ public class Conveyor extends Block{
 			byte[] bytes = Bits.getBytes(0);
 			bytes[0] = (byte)item.ordinal();
 			bytes[1] = (byte)(x*127);
-			bytes[2] = (byte)(y*127);
+			bytes[2] = (byte)(y*255-128);
 			bytes[3] = seed;
 			//UCore.log("Packing item: ", item, x, y, seed, "\n", Arrays.toString(bytes));
 			//UCore.log(Arrays.toString(Bits.getBytes(Bits.packInt(bytes))));

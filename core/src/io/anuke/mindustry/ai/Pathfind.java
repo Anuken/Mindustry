@@ -92,13 +92,6 @@ public class Pathfind{
 			}
 		}
 		
-		//TODO make this work?
-		/*
-		PathFinderRequest<Tile> request = new PathFinderRequest<Tile>();
-		request.startNode = World.spawnpoints.get(0);
-		request.endNode = World.core;
-		passpathfinder.search(request, 1000); */
-		
 		for(int i = 0; i < paths.size; i ++){
 			SmoothGraphPath path = paths.get(i);
 			

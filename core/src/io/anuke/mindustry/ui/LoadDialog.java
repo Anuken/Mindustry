@@ -76,13 +76,17 @@ public class LoadDialog extends FloatingDialog{
 						hide();
 						try{
 							SaveIO.loadFromSlot(slot);
+							GameState.set(State.playing);
+							Vars.ui.hideMenu();
 						}catch(Exception e){
 							e.printStackTrace();
+							Vars.ui.hideMenu();
+							GameState.set(State.menu);
+							Vars.control.reset();
 							Vars.ui.showError("[orange]Save file corrupted or invalid!");
 							return;
 						}
-						Vars.ui.hideMenu();
-						GameState.set(State.playing);
+
 					}
 				}, 3f/60f);
 			}

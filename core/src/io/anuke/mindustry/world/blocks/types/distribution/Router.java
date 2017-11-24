@@ -9,6 +9,7 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Mathf;
 
 public class Router extends Block{
 	private ObjectMap<Tile, Byte> lastmap = new ObjectMap<>();
@@ -34,8 +35,10 @@ public class Router extends Block{
 	@Override
 	public void update(Tile tile){
 		if(Timers.get(tile, "dump", 2) && tile.entity.totalItems() > 0){
-			if(lastmap.get(tile, (byte)-1) != tile.rotation)
+			if(lastmap.get(tile, (byte)-1) != tile.rotation 
+					|| Mathf.chance(0.3)){ //sometimes dump backwards at a 1/4 chance... this somehow works?
 				tryDump(tile, tile.rotation, null);
+			}
 			
 			tile.rotation ++;
 			tile.rotation %= 4;
