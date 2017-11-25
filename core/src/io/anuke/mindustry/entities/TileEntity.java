@@ -17,6 +17,7 @@ import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.mindustry.world.blocks.types.Wall;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.util.Mathf;
 
@@ -38,7 +39,7 @@ public class TileEntity extends Entity{
 		health = maxhealth;
 		
 		if(added){
-			add();
+			add(Entities.getGroup(TileEntity.class));
 		}
 		
 		return this;

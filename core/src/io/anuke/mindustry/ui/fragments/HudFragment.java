@@ -10,6 +10,7 @@ import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Draw;
@@ -109,14 +110,6 @@ public class HudFragment implements Fragment{
 			visible(()->!GameState.is(State.menu));
 		}}.end();
 		
-		//settings icon
-		new table(){{
-			atop().aright();
-			new imagebutton("icon-info", Unit.dp.inPixels(30f), ()->{
-				ui.showAbout();
-			}).get().pad(14);
-		}}.end().visible(()->GameState.is(State.menu));
-		
 		//respawn background table
 		new table("white"){{
 			respawntable = get();
@@ -140,7 +133,7 @@ public class HudFragment implements Fragment{
 			new table(){{
 				abottom();
 				aleft();
-				new label((StringSupplier)()->"[purple]entities: " + Entities.amount()).left();
+				new label((StringSupplier)()->"[purple]enemies: " + Entities.getGroup(Enemy.class).amount()).left();
 				row();
 				new label((StringSupplier)()->"[orange]noclip: " + Vars.noclip).left();
 				row();

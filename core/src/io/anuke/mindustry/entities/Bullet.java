@@ -4,9 +4,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.World;
-import io.anuke.ucore.entities.BulletEntity;
-import io.anuke.ucore.entities.Entity;
-import io.anuke.ucore.entities.SolidEntity;
+import io.anuke.ucore.entities.*;
 import io.anuke.ucore.util.Mathf;
 
 public class Bullet extends BulletEntity{
@@ -74,6 +72,11 @@ public class Bullet extends BulletEntity{
 	@Override
 	public int getDamage(){
 		return damage == -1 ? type.damage : damage;
+	}
+	
+	@Override
+	public Bullet add(){
+		return super.add(Entities.getGroup(Bullet.class));
 	}
 
 }

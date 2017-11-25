@@ -34,6 +34,7 @@ public class Pathfind{
 		
 		Tile[] path = enemy.path;
 		
+		//REPRODUCE BUG: load in test map, then load save 1
 		Tile prev = path[enemy.node - 1];
 
 		Tile target = path[enemy.node];

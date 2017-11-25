@@ -3,6 +3,7 @@ package io.anuke.mindustry.entities.enemies;
 import com.badlogic.gdx.graphics.Color;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.BulletType;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
 
@@ -14,12 +15,15 @@ public class TargetEnemy extends Enemy{
 		maxhealth = 10;
 	}
 	
+	@Override
 	void move(){
-		
+		speed = 0f;
+		super.move();
 	}
 	
-	void shoot(){
-		
+	@Override
+	void shoot(BulletType bullet){
+		//do nothing
 	}
 	
 	@Override

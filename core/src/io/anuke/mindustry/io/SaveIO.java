@@ -23,7 +23,6 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.Entity;
 
 /*
  * Save format:
@@ -182,17 +181,16 @@ public class SaveIO{
 			
 			int totalEnemies = 0;
 			
-			for(Entity entity : Entities.all()){
-				if(entity instanceof Enemy && idEnemies.containsKey((Class<? extends Enemy>) entity.getClass())){
+			for(Enemy entity : Entities.get(Enemy.class)){
+				if(idEnemies.containsKey(entity.getClass())){
 					totalEnemies ++;
 				}
 			}
 			
 			stream.writeInt(totalEnemies); //enemy amount
 			
-			for(Entity entity : Entities.all()){
-				if(entity instanceof Enemy && idEnemies.containsKey((Class<? extends Enemy>) entity.getClass())){
-					Enemy enemy = (Enemy)entity;
+			for(Enemy enemy :  Entities.get(Enemy.class)){
+				if(idEnemies.containsKey(enemy.getClass())){
 					stream.writeByte(idEnemies.get(enemy.getClass())); //type
 					stream.writeByte(enemy.spawn); //lane
 					stream.writeFloat(enemy.x); //x
@@ -333,7 +331,7 @@ public class SaveIO{
 					enemy.x = x;
 					enemy.y = y;
 					enemy.tier = tier;
-					enemy.add();
+					enemy.add(Entities.getGroup(Enemy.class));
 					enemiesToUpdate.add(enemy);
 				}catch (Exception e){
 					throw new RuntimeException(e);

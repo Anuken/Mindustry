@@ -15,7 +15,6 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Shaders;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.input.AndroidInput;
@@ -29,7 +28,6 @@ import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.graphics.Cache;
 import io.anuke.ucore.graphics.Caches;
 import io.anuke.ucore.modules.RendererModule;
@@ -124,9 +122,9 @@ public class Renderer extends RendererModule{
 			}
 
 			Profiler.begin("draw");
-			
+
 			drawDefault();
-			
+
 			Profiler.end("draw");
 
 			if(Vars.debug && Vars.debugGL && Timers.get("profile", 60)){
@@ -147,13 +145,18 @@ public class Renderer extends RendererModule{
 		Graphics.surface();
 
 		Profiler.begin("blockDraw");
-		
 		renderTiles();
-		
 		Profiler.end("blockDraw");
 
 		Profiler.begin("entityDraw");
-		Entities.draw();
+		
+		Graphics.shader(Shaders.outline, false);
+		Entities.draw(control.enemyGroup);
+		Graphics.shader();
+		
+		Entities.draw(Entities.defaultGroup());
+		Entities.draw(control.bulletGroup);
+		
 		Profiler.end("entityDraw");
 
 		drawShield();
@@ -177,18 +180,15 @@ public class Renderer extends RendererModule{
 	void drawEnemyMarkers(){
 		Draw.color(Color.RED);
 		Draw.alpha(0.6f);
-		for(Entity entity : Entities.all()){
-			if(entity instanceof Enemy){
-				Enemy enemy = (Enemy) entity;
+		for(Enemy enemy : control.enemyGroup.all()){
 
-				if(Tmp.r1.setSize(camera.viewportWidth, camera.viewportHeight).setCenter(camera.position.x, camera.position.y).overlaps(enemy.hitbox.getRect(enemy.x, enemy.y))){
-					continue;
-				}
-
-				float angle = Angles.angle(camera.position.x, camera.position.y, enemy.x, enemy.y);
-				Angles.translation(angle, Unit.dp.inPixels(20f));
-				Draw.rect("enemyarrow", camera.position.x + Angles.x(), camera.position.y + Angles.y(), angle);
+			if(Tmp.r1.setSize(camera.viewportWidth, camera.viewportHeight).setCenter(camera.position.x, camera.position.y).overlaps(enemy.hitbox.getRect(enemy.x, enemy.y))){
+				continue;
 			}
+
+			float angle = Angles.angle(camera.position.x, camera.position.y, enemy.x, enemy.y);
+			Angles.translation(angle, Unit.dp.inPixels(20f));
+			Draw.rect("enemyarrow", camera.position.x + Angles.x(), camera.position.y + Angles.y(), angle);
 		}
 		Draw.color();
 	}
@@ -303,8 +303,7 @@ public class Renderer extends RendererModule{
 
 					if(!Mathf.inBounds(worldx, worldy, floorCache))
 						continue;
-					Draw.linerect(worldx * chunksize * tilesize, worldy * chunksize * tilesize, 
-							chunksize * tilesize, chunksize * tilesize);
+					Draw.linerect(worldx * chunksize * tilesize, worldy * chunksize * tilesize, chunksize * tilesize, chunksize * tilesize);
 				}
 			}
 			Draw.reset();
@@ -330,7 +329,7 @@ public class Renderer extends RendererModule{
 	}
 
 	void renderPixelOverlay(){
-		
+
 		//draw tutorial placement point
 		if(Vars.control.tutorial.showBlock()){
 			int x = World.core.x + Vars.control.tutorial.getPlacePoint().x;
@@ -348,10 +347,9 @@ public class Renderer extends RendererModule{
 			}
 			Draw.reset();
 		}
-		
+
 		//draw placement box
-		if(player.recipe != null && Vars.control.hasItems(player.recipe.requirements) 
-				&& (!ui.hasMouse() || android) && AndroidInput.mode == PlaceMode.cursor){
+		if(player.recipe != null && Vars.control.hasItems(player.recipe.requirements) && (!ui.hasMouse() || android) && AndroidInput.mode == PlaceMode.cursor){
 			float x = 0;
 			float y = 0;
 
@@ -424,7 +422,7 @@ public class Renderer extends RendererModule{
 				Draw.reset();
 			}
 		}
-		
+
 		//draw selected block health
 		if(player.recipe == null && !ui.hasMouse()){
 			Tile tile = World.tile(Input.tilex(), Input.tiley());
@@ -443,23 +441,22 @@ public class Renderer extends RendererModule{
 			}
 		}
 
-		boolean smoothcam = Settings.getBool("smoothcam");
-		
 		//draw entity health bars
-		for(Entity entity : Entities.all()){
-			if(entity instanceof DestructibleEntity && !(entity instanceof TileEntity)){
-				DestructibleEntity dest = ((DestructibleEntity) entity);
-
-				if(dest instanceof Player && Vars.snapCamera && smoothcam && Settings.getBool("pixelate")){
-					drawHealth((int) dest.x, (int) dest.y - 7f, dest.health, dest.maxhealth);
-				}else{
-					drawHealth(dest.x, dest.y - 7f, dest.health, dest.maxhealth);
-				}
-
-			}
+		for(Enemy entity : control.enemyGroup.all()){
+			drawHealth(entity);
 		}
+		
+		drawHealth(player);
 	}
 	
+	void drawHealth(DestructibleEntity dest){
+		if(dest instanceof Player && Vars.snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate")){
+			drawHealth((int) dest.x, (int) dest.y - 7f, dest.health, dest.maxhealth);
+		}else{
+			drawHealth(dest.x, dest.y - 7f, dest.health, dest.maxhealth);
+		}
+	}
+
 	void drawHealth(float x, float y, float health, float maxhealth){
 		drawBar(Color.RED, x, y, health / maxhealth);
 	}

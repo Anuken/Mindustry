@@ -15,8 +15,7 @@ import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.EnemySpawn;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.entities.enemies.*;
 import io.anuke.mindustry.input.AndroidInput;
@@ -29,7 +28,7 @@ import io.anuke.mindustry.world.*;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.Entity;
+import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.graphics.Atlas;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
@@ -43,6 +42,10 @@ public class Control extends Module{
 	
 	final Array<Weapon> weapons = new Array<>();
 	final ObjectMap<Item, Integer> items = new ObjectMap<>();
+	
+	final EntityGroup<Enemy> enemyGroup = Entities.addGroup(Enemy.class);
+	final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);
+	final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
 	
 	Array<EnemySpawn> spawns = new Array<>();
 	int wave = 1;
@@ -252,7 +255,7 @@ public class Control extends Module{
 							enemy.set(tile.worldx() + Mathf.range(range), tile.worldy() + Mathf.range(range));
 							enemy.tier = spawn.tier(wave, fl);
 							Effects.effect(Fx.spawn, enemy);
-							enemy.add();
+							enemy.add(enemyGroup);
 							
 							enemies ++;
 						}catch (Exception e){
@@ -412,11 +415,7 @@ public class Control extends Module{
 			}
 			
 			if(Inputs.keyUp(Keys.C)){
-				for(Entity entity : Entities.all()){
-					if(entity instanceof Enemy){
-						entity.remove();
-					}
-				}
+				enemyGroup.clear();
 			}
 			
 			if(Inputs.keyUp(Keys.O)){
@@ -479,7 +478,14 @@ public class Control extends Module{
 			
 				Profiler.begin("entityUpdate");
 				
-				Entities.update();
+				//TODO
+				Entities.update(Entities.defaultGroup());
+				Entities.update(bulletGroup);
+				Entities.update(enemyGroup);
+				Entities.update(tileGroup);
+				
+				Entities.collideGroups(enemyGroup, bulletGroup);
+				Entities.collideGroups(Entities.defaultGroup(), bulletGroup);
 				
 				Profiler.end("entityUpdate");
 			}

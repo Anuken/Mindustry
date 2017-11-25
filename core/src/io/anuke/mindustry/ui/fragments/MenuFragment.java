@@ -62,6 +62,14 @@ public class MenuFragment implements Fragment{
 				
 				visible(()->GameState.is(State.menu));
 			}}.end();
-		}
+		}		
+		
+		//settings icon
+		new table(){{
+			atop().aright();
+			new imagebutton("icon-info", Unit.dp.inPixels(30f), ()->{
+				ui.showAbout();
+			}).get().pad(Unit.dp.inPixels(14));
+		}}.end().visible(()->GameState.is(State.menu));
 	}
 }

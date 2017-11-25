@@ -34,26 +34,25 @@ public class TeslaOrb extends Entity{
 		float curx = x, cury = y;
 		float shake = 3f;
 		
-		outer:
-		while(true){
+		int max = 7;
+		
+		while(points.size < max){
 			if(Mathf.chance(stopchance)){
 				break;
 			}
-			Array<SolidEntity> enemies = Entities.getNearby(curx, cury, range*2f);
+			
+			Array<SolidEntity> enemies = Entities.getNearby(Entities.getGroup(Enemy.class), curx, cury, range*2f);
 			
 			for(SolidEntity entity : enemies){
-				if(entity instanceof Enemy && entity.distanceTo(curx, cury) < range 
-						&& !hit.contains((Enemy)entity)){
+				if(entity.distanceTo(curx, cury) < range && !hit.contains((Enemy)entity)){
 					hit.add((Enemy)entity);
 					points.add(new Vector2(entity.x + Mathf.range(shake), entity.y + Mathf.range(shake)));
 					damageEnemy((Enemy)entity);
 					curx = entity.x;
 					cury = entity.y;
-					continue outer;
+					break;
 				}
 			}
-			
-			break;
 		}
 		
 		if(points.size == 0){
@@ -122,6 +121,10 @@ public class TeslaOrb extends Entity{
 		Timers.run(1f, ()->{
 			shock();
 		});
-		
+	}
+	
+	@Override
+	public float drawSize(){
+		return 200;
 	}
 }

@@ -35,7 +35,8 @@ public class HealerEnemy extends Enemy{
 		move(vec.x*Timers.delta(), vec.y*Timers.delta());
 		
 		if(Timers.get(this, "target", 15)){
-			target = Entities.getClosest(x, y, range, e->e instanceof Enemy && e != this && ((Enemy)e).healthfrac() < 1f);
+			target = Entities.getClosest(Entities.getGroup(Enemy.class),
+					x, y, range, e -> e instanceof Enemy && e != this && ((Enemy)e).healthfrac() < 1f);
 		}
 		
 		if(target != null){

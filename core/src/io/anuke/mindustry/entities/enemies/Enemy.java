@@ -2,7 +2,6 @@ package io.anuke.mindustry.entities.enemies;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.Vars;
@@ -20,14 +19,9 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
 public class Enemy extends DestructibleEntity{
-	public final static Color[] tierColors = {
-		Color.valueOf("ffe451"), 
-		Color.valueOf("f48e20"),
-		Color.valueOf("ff6757"),
-		Color.valueOf("ff2d86")
-	};
+	public final static Color[] tierColors = { Color.valueOf("ffe451"), Color.valueOf("f48e20"), Color.valueOf("ff6757"), Color.valueOf("ff2d86") };
 	public final static int maxtier = 4;
-	
+
 	protected float speed = 0.3f;
 	protected float reload = 32;
 	protected float range = 60;
@@ -38,152 +32,151 @@ public class Enemy extends DestructibleEntity{
 	protected BulletType bullet = BulletType.small;
 	protected String shootsound = "enemyshoot";
 	protected int damage;
-	
+
 	public int spawn;
 	public int node = -1;
 	public Tile[] path;
-	
+
 	public Vector2 direction = new Vector2();
 	public float xvelocity, yvelocity;
 	public Entity target;
 	public int tier = 1;
-	
-	
-	public Enemy(int spawn){
+
+	public Enemy(int spawn) {
 		this.spawn = spawn;
-		
+
 		hitbox.setSize(5f);
 		hitboxTile.setSize(4f);
-		
+
 		maxhealth = 60;
 		heal();
 	}
-	
+
 	public float drawSize(){
 		return 12;
 	}
-	
+
 	void move(){
 		boolean nearCore = distanceTo(World.core.worldx(), World.core.worldy()) <= range - 18f;
-		
+
 		Vector2 vec;
-		
+
 		if(nearCore){
 			vec = Tmp.v2.setZero();
 			target = World.core.entity;
 		}else{
-			vec  = Pathfind.find(this);
+			vec = Pathfind.find(this);
 			vec.sub(x, y).setLength(speed);
 		}
-		
-		Array<SolidEntity> entities = Entities.getNearby(x, y, range);
-		
+
 		Vector2 shift = Tmp.v3.setZero();
 		float shiftRange = hitbox.width + 3f;
 		float avoidRange = 16f;
 		float avoidSpeed = 0.1f;
 		
-		for(SolidEntity other : entities){
+		Entities.getNearby(Entities.getGroup(Enemy.class), x, y, range, other -> {
 			float dst = other.distanceTo(this);
-			if(other != this && other instanceof Enemy){
-				if(dst < shiftRange){
-					float scl = Mathf.clamp(1.4f - dst/shiftRange);
-					shift.add((x - other.x) * scl, (y - other.y) * scl);
-				}else if(dst < avoidRange){
-					Tmp.v2.set((x - other.x), (y - other.y)).setLength(avoidSpeed);
-					shift.add(Tmp.v2);
-				}
+			if(other == this)
+				return;
+			
+			if(dst < shiftRange){
+				float scl = Mathf.clamp(1.4f - dst / shiftRange);
+				shift.add((x - other.x) * scl, (y - other.y) * scl);
+			}else if(dst < avoidRange){
+				Tmp.v2.set((x - other.x), (y - other.y)).setLength(avoidSpeed);
+				shift.add(Tmp.v2);
 			}
-		}
-		
+
+		});
+
 		shift.limit(1f);
 		vec.add(shift.scl(0.5f));
-		
-		move(vec.x*Timers.delta(), vec.y*Timers.delta());
-		
+
+		move(vec.x * Timers.delta(), vec.y * Timers.delta());
+
 		if(Timers.get(this, "target", 15) && !nearCore){
 			target = World.findTileTarget(x, y, null, range, false);
-		
+
 			//no tile found
 			if(target == null){
-				target = Entities.getClosest(entities, x, y, range, e -> e instanceof Player);
+				target = Entities.getClosest(Entities.defaultGroup(), x, y, range, e -> e instanceof Player);
 			}
 		}
-		
+
 		if(target != null && bullet != null){
 			updateShooting();
 		}
 	}
-	
+
 	void updateShooting(){
-		if(Timers.get(this, "reload", reload*Vars.multiplier)){
+		if(Timers.get(this, "reload", reload * Vars.multiplier)){
 			shoot(bullet);
 			Effects.sound(shootsound, this);
 		}
 	}
-	
+
 	void shoot(BulletType bullet){
 		shoot(bullet, 0);
 	}
-	
+
 	void shoot(BulletType bullet, float rotation){
 		vector.set(length, 0).rotate(direction.angle() + rotation);
-		Bullet out = new Bullet(bullet, this, x+vector.x, y+vector.y, direction.angle() + rotation).add();
-		out.damage = (int)(damage*Vars.multiplier);
+		Bullet out = new Bullet(bullet, this, x + vector.x, y + vector.y, direction.angle() + rotation).add();
+		out.damage = (int) (damage * Vars.multiplier);
 	}
-	
+
 	public void findClosestNode(){
 		Pathfind.find(this);
-		
+
 		int index = 0;
 		int cindex = -1;
 		float dst = Float.MAX_VALUE;
-		
+
 		//find closest node index
 		for(Tile tile : path){
 			if(Vector2.dst(tile.worldx(), tile.worldy(), x, y) < dst){
 				dst = Vector2.dst(tile.worldx(), tile.worldy(), x, y);
 				cindex = index;
 			}
-			
-			index ++;
+
+			index++;
 		}
-		
-		node = Math.max(cindex, 1);
-		
+
+		cindex = Math.max(cindex, 1);
+
 		//set node to that index
 		node = cindex;
-		
+
 		int x2 = path[node].x, y2 = path[node].y;
-		
-		//if the enemy can move to that node right now, set its position to it
-		if(World.raycast(Mathf.scl2(x, Vars.tilesize), Mathf.scl2(y, Vars.tilesize), x2, y2) == null){
-			Timers.run(Mathf.random(15f), ()->{
+
+		//if the enemy can't move to that node right now, set its position to it
+		if(World.raycast(Mathf.scl2(x, Vars.tilesize), Mathf.scl2(y, Vars.tilesize), x2, y2) != null){
+			Timers.run(Mathf.random(15f), () -> {
 				set(x2 * Vars.tilesize, y2 * Vars.tilesize);
 			});
 		}
 	}
-	
+
 	@Override
 	public void added(){
 		if(bullet != null){
-			damage = (int)(bullet.damage * (1 + (tier - 1) * 1f));
+			damage = (int) (bullet.damage * (1 + (tier - 1) * 1f));
 		}
-		
+
 		maxhealth *= tier;
-		speed += 0.04f*tier + Mathf.range(0.1f);
+		speed += 0.04f * tier + Mathf.range(0.1f);
 		reload /= Math.max(tier / 1.5f, 1f);
-		range += tier*5;
+		range += tier * 5;
 		speed = Math.max(speed, 0.07f);
-		
+
 		heal();
 	}
-	
+
 	@Override
 	public boolean collides(SolidEntity other){
-		return (other instanceof Bullet) && !(((Bullet)other).owner instanceof Enemy);
+		return (other instanceof Bullet) && !(((Bullet) other).owner instanceof Enemy);
 	}
-	
+
 	@Override
 	public void onDeath(){
 		Effects.effect(Fx.explosion, this);
@@ -192,44 +185,50 @@ public class Enemy extends DestructibleEntity{
 		remove();
 		dead = true;
 	}
-	
+
 	@Override
 	public void removed(){
 		if(!dead){
 			Vars.control.enemyDeath();
 		}
 	}
-	
+
 	@Override
 	public void update(){
 		float lastx = x, lasty = y;
-		
+
 		move();
-		
+
 		xvelocity = (x - lastx) / Timers.delta();
 		yvelocity = (y - lasty) / Timers.delta();
-		
+
 		if(target == null || alwaysRotate){
 			direction.add(xvelocity * Timers.delta() / 3f, yvelocity * Timers.delta() / 3f);
-			direction.limit(speed*rotatespeed);
+			direction.limit(speed * rotatespeed);
 		}else{
 			float angle = angleTo(target);
-			direction.lerp(vector.set(0, 1).setAngle(angle), turretrotatespeed * Timers.delta());
+			direction.lerp(vector.set(1f, 0f).rotate(angle), turretrotatespeed * Timers.delta());
 		}
+	}
+
+	@Override
+	public void draw(){
+		String region = ClassReflection.getSimpleName(getClass()).toLowerCase() + "-t" + Mathf.clamp(tier, 1, 3);
+
+		Shaders.outline.color.set(tierColors[tier - 1]);
+		Shaders.outline.region = Draw.region(region);
+
+		Shaders.outline.apply();
+
+		Draw.color();
+		Draw.rect(region, x, y, direction.angle() - 90);
+
+		Graphics.flush();
+
 	}
 	
 	@Override
-	public void draw(){
-		
-		String region = ClassReflection.getSimpleName(getClass()).toLowerCase() + "-t" + Mathf.clamp(tier, 1, 3);
-		
-		//TODO is this really necessary?
-		Shaders.outline.color.set(tierColors[tier-1]);
-		Shaders.outline.region = Draw.region(region);
-		
-		Graphics.shader(Shaders.outline);
-		Draw.color();
-		Draw.rect(region, x, y, direction.angle()-90);
-		Graphics.shader();
+	public <T extends Entity> T add(){
+		return (T) add(Entities.getGroup(Enemy.class));
 	}
 }
