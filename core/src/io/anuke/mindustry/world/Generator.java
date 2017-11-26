@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.TargetEnemy;
 import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.noise.Noise;
 import io.anuke.ucore.util.Mathf;
@@ -23,14 +24,16 @@ public class Generator{
 		Hue.rgb(110, 80, 30), Blocks.dirt,
 		Hue.rgb(160, 120, 70), Blocks.dirtblock,
 		Hue.rgb(100, 100, 100), Blocks.stoneblock,
+		Color.valueOf("414141"), Blocks.blackstoneblock,
+		Color.valueOf("252525"), Blocks.blackstone,
 		Color.valueOf("ed5334"), Blocks.lava,
 		Color.valueOf("292929"), Blocks.oil
 	);
 	
 	/**Returns world size.*/
-	public static void generate(Pixmap pixmap){
+	public static void generate(Pixmap pixmap, Tile[][] tiles){
 		
-		Noise.setSeed(World.getSeed());
+		Noise.setSeed(Vars.world.getSeed());
 		
 		for(int x = 0; x < pixmap.getWidth(); x ++){
 			for(int y = 0; y < pixmap.getHeight(); y ++){
@@ -41,23 +44,29 @@ public class Generator{
 				
 				if(colors.containsKey(color)){
 					//TODO less hacky method
-					if(colors.get(color).name().contains("block")){
+					if(!(colors.get(color) instanceof Floor)){
 						block = colors.get(color);
 					}else{
 						floor = colors.get(color);
 					}
 				}else if(color == start){
-					World.core = World.tile(x, y);
+					Vars.control.setCore(Vars.world.tile(x, y));
 				}else if(color == spawn){
-					World.spawnpoints.add(World.tile(x, y));
+					Vars.control.addSpawnPoint(Vars.world.tile(x, y));
 					floor = Blocks.dirt;
-				}else{
-					if(Mathf.chance(0.02)){
-						block = Mathf.choose(Blocks.rock, Blocks.rock2);
+				}
+				
+				if(block == Blocks.air){
+					if(floor == Blocks.stone && Mathf.chance(0.02)){
+						block = Blocks.rock;
+					}
+					
+					if(floor == Blocks.blackstone && Mathf.chance(0.03)){
+						block = Blocks.blackrock;
 					}
 				}
 				
-				if(floor == Blocks.stone || floor == Blocks.grass){
+				if(floor == Blocks.stone || floor == Blocks.grass || floor == Blocks.blackstone){
 					if(Noise.nnoise(x, y, 8, 1) > 0.2){
 						floor = Blocks.iron;
 					}
@@ -77,11 +86,6 @@ public class Generator{
 				
 				if(block == Blocks.grassblock){
 					floor = Blocks.grass;
-					block = Mathf.choose(Blocks.grassblock, Blocks.grassblock2);
-				}
-				
-				if(block == Blocks.stoneblock){
-					block = Mathf.choose(Blocks.stoneblock, Blocks.stoneblock2, Blocks.stoneblock3);
 				}
 				
 				if(floor == Blocks.grass && Mathf.chance(0.02) && block == Blocks.air){
@@ -98,10 +102,8 @@ public class Generator{
 				//	block = Mathf.choose(ProductionBlocks.stonedrill, DistributionBlocks.conveyor);
 				//}
 				
-				World.tile(x, y).setBlock(block);
-				World.tile(x, y).setFloor(floor);
-				
-				
+				tiles[x][y].setBlock(block, 0);
+				tiles[x][y].setFloor(floor);
 			}
 		}
 	}

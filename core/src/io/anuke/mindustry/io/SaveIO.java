@@ -19,7 +19,9 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.*;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Weapon;
-import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Map;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.entities.Entities;
@@ -203,16 +205,16 @@ public class SaveIO{
 			//--MAP DATA--
 			
 			//map ID
-			stream.writeByte(World.getMap().ordinal());
+			stream.writeByte(Vars.world.getMap().ordinal());
 			
 			//seed
-			stream.writeInt(World.getSeed());
+			stream.writeInt(Vars.world.getSeed());
 			
 			int totalblocks = 0;
 			
-			for(int x = 0; x < World.width(); x ++){
-				for(int y = 0; y < World.height(); y ++){
-					Tile tile = World.tile(x, y);
+			for(int x = 0; x < Vars.world.width(); x ++){
+				for(int y = 0; y < Vars.world.height(); y ++){
+					Tile tile = Vars.world.tile(x, y);
 					
 					if(tile.breakable()){
 						totalblocks ++;
@@ -223,13 +225,13 @@ public class SaveIO{
 			//tile amount
 			stream.writeInt(totalblocks);
 			
-			for(int x = 0; x < World.width(); x ++){
-				for(int y = 0; y < World.height(); y ++){
-					Tile tile = World.tile(x, y);
+			for(int x = 0; x < Vars.world.width(); x ++){
+				for(int y = 0; y < Vars.world.height(); y ++){
+					Tile tile = Vars.world.tile(x, y);
 					
 					if(tile.breakable()){
 						
-						stream.writeInt(x + y*World.width()); //tile pos
+						stream.writeInt(x + y*Vars.world.width()); //tile pos
 						stream.writeByte(tile.link);
 						stream.writeBoolean(tile.entity != null); //whether it has a tile entity
 						stream.writeInt(tile.block().id); //block ID
@@ -349,20 +351,20 @@ public class SaveIO{
 			int seed = stream.readInt();
 			int tiles = stream.readInt();
 			
-			World.loadMap(Map.values()[mapid], seed);
+			Vars.world.loadMap(Map.values()[mapid], seed);
 			Vars.renderer.clearTiles();
 			
 			for(Enemy enemy : enemiesToUpdate){
 				enemy.findClosestNode();
 			}
 			
-			for(int x = 0; x < World.width(); x ++){
-				for(int y = 0; y < World.height(); y ++){
-					Tile tile = World.tile(x, y);
+			for(int x = 0; x < Vars.world.width(); x ++){
+				for(int y = 0; y < Vars.world.height(); y ++){
+					Tile tile = Vars.world.tile(x, y);
 					
 					//remove breakables like rocks
 					if(tile.breakable()){
-						World.tile(x, y).setBlock(Blocks.air);
+						Vars.world.tile(x, y).setBlock(Blocks.air);
 					}
 				}
 			}
@@ -373,7 +375,7 @@ public class SaveIO{
 				boolean hasEntity = stream.readBoolean();
 				int blockid = stream.readInt();
 				
-				Tile tile = World.tile(pos % World.width(), pos / World.width());
+				Tile tile = Vars.world.tile(pos % Vars.world.width(), pos / Vars.world.width());
 				tile.setBlock(Block.getByID(blockid));
 				tile.link = link;
 				

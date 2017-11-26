@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Map;
-import io.anuke.mindustry.world.World;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
@@ -50,7 +49,7 @@ public class LevelDialog extends FloatingDialog{
 			
 			float images = 154f;
 			
-			ImageButton image = new ImageButton(new TextureRegion(World.getTexture(map)), "togglemap");
+			ImageButton image = new ImageButton(new TextureRegion(Vars.world.getTexture(map)), "togglemap");
 			image.row();
 			image.add(inset).width(images+6).units(Unit.dp);
 			image.clicked(()->{

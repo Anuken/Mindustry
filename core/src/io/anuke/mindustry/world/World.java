@@ -18,61 +18,81 @@ import io.anuke.ucore.core.Sounds;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
+import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
-public class World{
-	public static int worldsize = 128;
-	public static int pixsize = worldsize*tilesize;
-	private static int seed;
+public class World extends Module{
+	private int seed;
 	
-	private static Pixmap[] mapPixmaps;
-	private static Texture[] mapTextures;
-	private static Map currentMap;
-	private static Tile[][] tiles = new Tile[worldsize][worldsize];
-	private static Tile[] temptiles = new Tile[4];
+	private Pixmap[] mapPixmaps;
+	private Texture[] mapTextures;
+	private Map currentMap;
+	private Tile[][] tiles;
+	private Tile[] temptiles = new Tile[4];
+	private Pathfind pathfind = new Pathfind();
 	
-	public static Tile core;
-	//TODO move this to control?
-	public static Array<Tile> spawnpoints = new Array<Tile>();
+	public World(){
+		loadMaps();
+	}
 	
-	public static boolean solid(int x, int y){
+	@Override
+	public void update(){
+		pathfind.update();
+	}
+	
+	@Override
+	public void dispose(){
+		for(Texture texture : mapTextures){
+			texture.dispose();
+		}
+		
+		for(Pixmap pix : mapPixmaps){
+			pix.dispose();
+		}
+	}
+	
+	public Pathfind pathfinder(){
+		return pathfind;
+	}
+	
+	public boolean solid(int x, int y){
 		Tile tile = tile(x, y);
 		
 		return tile == null || tile.block().solid || (tile.floor().solid && (tile.block() == Blocks.air));
 	}
 	
-	public static boolean wallSolid(int x, int y){
+	public boolean wallSolid(int x, int y){
 		Tile tile = tile(x, y);
 		return tile == null || tile.block().solid;
 	}
 	
-	public static boolean isAccessible(int x, int y){
+	public boolean isAccessible(int x, int y){
 		return !wallSolid(x, y-1) || !wallSolid(x, y+1) || !wallSolid(x-1, y) ||!wallSolid(x+1, y);
 	}
 	
-	public static Map getMap(){
+	public Map getMap(){
 		return currentMap;
 	}
 	
-	public static int width(){
-		return mapPixmaps[currentMap.ordinal()].getWidth();
+	public int width(){
+		return currentMap.width;
 	}
 	
-	public static int height(){
-		return mapPixmaps[currentMap.ordinal()].getHeight();
+	public int height(){
+		return currentMap.height;
 	}
 	
-	public static Tile tile(int x, int y){
+	public Tile tile(int x, int y){
 		if(!Mathf.inBounds(x, y, tiles)) return null;
 		return tiles[x][y];
 	}
 	
-	public static Tile tileWorld(float x, float y){
+	public Tile tileWorld(float x, float y){
 		return tile(Mathf.scl2(x, tilesize), Mathf.scl2(y, tilesize));
 	}
 	
-	public static Tile[] getNearby(int x, int y){
+	public Tile[] getNearby(int x, int y){
 		temptiles[0] = tile(x+1, y);
 		temptiles[1] = tile(x, y+1);
 		temptiles[2] = tile(x-1, y);
@@ -80,11 +100,11 @@ public class World{
 		return temptiles;
 	}
 	
-	public static Texture getTexture(Map map){
+	public Texture getTexture(Map map){
 		return mapTextures[map.ordinal()];
 	}
 	
-	public static void loadMaps(){
+	public void loadMaps(){
 		Map[] maps = Map.values();
 		
 		mapPixmaps = new Pixmap[maps.length];
@@ -94,10 +114,12 @@ public class World{
 			Pixmap pix = new Pixmap(Gdx.files.internal("maps/"+maps[i]+".png"));
 			mapPixmaps[i] = pix;
 			mapTextures[i] = new Texture(pix);
+			maps[i].width = pix.getWidth();
+			maps[i].height = pix.getHeight();
 		}
 	}
 	
-	private static void createTiles(){
+	private void createTiles(){
 		for(int x = 0; x < tiles.length; x ++){
 			for(int y = 0; y < tiles[0].length; y ++){
 				if(tiles[x][y] == null){
@@ -107,7 +129,7 @@ public class World{
 		}
 	}
 	
-	private static void clearTileEntities(){
+	private void clearTileEntities(){
 		for(int x = 0; x < tiles.length; x ++){
 			for(int y = 0; y < tiles[0].length; y ++){
 				if(tiles[x][y] != null && tiles[x][y].entity != null){
@@ -117,57 +139,48 @@ public class World{
 		}
 	}
 	
-	public static void loadMap(Map map){
+	public void loadMap(Map map){
 		loadMap(map, MathUtils.random(0, 99999));
 	}
 	
-	public static void loadMap(Map map, int seed){
-		
-		spawnpoints.clear();
-		
-		int size = mapPixmaps[map.ordinal()].getWidth();
-		worldsize = size;
-		pixsize = worldsize*tilesize;
+	public void loadMap(Map map, int seed){
 		currentMap = map;
 		
 		if(tiles != null){
 			clearTileEntities();
 			
-			if(tiles.length != worldsize || tiles[0].length != worldsize){
-				tiles = new Tile[worldsize][worldsize];
+			if(tiles.length != map.width || tiles[0].length != map.height){
+				tiles = new Tile[map.width][map.height];
 			}
 			
 			createTiles();
 		}else{
 		
-			tiles = new Tile[worldsize][worldsize];
+			tiles = new Tile[map.width][map.height];
 			
 			createTiles();
 		}
 		
-		Entities.resizeTree(0, 0, pixsize, pixsize);
+		Entities.resizeTree(0, 0, map.width * tilesize, map.height * tilesize);
 		
-		World.seed = seed;
-		Generator.generate(mapPixmaps[map.ordinal()]);
-		
-		Pathfind.reset();
+		this.seed = seed;
+		Generator.generate(mapPixmaps[map.ordinal()], tiles);
 		
 		//TODO multiblock core
-		placeBlock(core.x, core.y, ProductionBlocks.core, 0);
+		placeBlock(control.getCore().x, control.getCore().y, ProductionBlocks.core, 0);
 		
 		if(map != Map.tutorial){
 			setDefaultBlocks();
 		}else{
-			Vars.control.getTutorial().setDefaultBlocks(core.x, core.y);
+			Vars.control.getTutorial().setDefaultBlocks(control.getCore().x, control.getCore().y);
 		}
 		
-		Pathfind.updatePath();
+		pathfind.updatePath();
 	}
 	
-	static void setDefaultBlocks(){
-		int x = core.x, y = core.y;
+	void setDefaultBlocks(){
+		int x = control.getCore().x, y = control.getCore().y;
 		
-		//set(x, y-1, DistributionBlocks.conveyor, 1);
 		set(x, y-2, DistributionBlocks.conveyor, 1);
 		set(x, y-3, DistributionBlocks.conveyor, 1);
 		
@@ -183,28 +196,26 @@ public class World{
 			set(x+2*d, y-3, DistributionBlocks.conveyor, 2*d);
 			set(x+2*d, y-4, DistributionBlocks.conveyor, 1);
 			set(x+2*d, y-5, DistributionBlocks.conveyor, 1);
-			//set(x+2*d, y-6, DistributionBlocks.conveyor, 1);
 			
-			//set(x+3*d, y-6, ProductionBlocks.stonedrill, 0);
 			set(x+3*d, y-5, ProductionBlocks.stonedrill, 0);
 			set(x+3*d, y-4, ProductionBlocks.stonedrill, 0);
 			set(x+3*d, y-3, ProductionBlocks.stonedrill, 0);
 		}
 	}
 	
-	static void set(int x, int y, Block type, int rot){
+	void set(int x, int y, Block type, int rot){
 		if(type == ProductionBlocks.stonedrill){
 			tiles[x][y].setFloor(Blocks.stone);
 		}
 		tiles[x][y].setBlock(type, rot);
 	}
 	
-	public static int getSeed(){
+	public int getSeed(){
 		return seed;
 	}
 	
 	//TODO move to control or player?
-	public static void placeBlock(int x, int y, Block result, int rotation){
+	public void placeBlock(int x, int y, Block result, int rotation){
 		Tile tile = tile(x, y);
 		
 		//just in case
@@ -239,10 +250,10 @@ public class World{
 	}
 	
 	//TODO move this to control?
-	public static boolean validPlace(int x, int y, Block type){
+	public boolean validPlace(int x, int y, Block type){
 		
-		for(Tile spawn : spawnpoints){
-			if(Vector2.dst(x * tilesize, y * tilesize, spawn.worldx(), spawn.worldy()) < enemyspawnspace){
+		for(SpawnPoint spawn : control.getSpawnPoints()){
+			if(Vector2.dst(x * tilesize, y * tilesize, spawn.start.worldx(), spawn.start.worldy()) < enemyspawnspace){
 				return false;
 			}
 		}
@@ -270,7 +281,8 @@ public class World{
 			int rotation = Vars.control.getTutorial().getPlaceRotation();
 			Block block = Vars.control.getTutorial().getPlaceBlock();
 			
-			if(type != block || point.x != x - core.x || point.y != y - core.y || (rotation != -1 && rotation != Vars.player.rotation)){
+			if(type != block || point.x != x - control.getCore().x || point.y != y - control.getCore().y 
+					|| (rotation != -1 && rotation != Vars.player.rotation)){
 				return false;
 			}
 		}else if(Vars.control.getTutorial().active()){
@@ -298,7 +310,7 @@ public class World{
 		}
 	}
 	
-	public static void breakBlock(int x, int y){
+	public void breakBlock(int x, int y){
 		Tile tile = tile(x, y);
 		
 		if(tile == null) return;
@@ -324,7 +336,7 @@ public class World{
 		}
 	}
 	
-	public static boolean validBreak(int x, int y){
+	public boolean validBreak(int x, int y){
 		Tile tile = tile(x, y);
 		
 		if(tile == null || tile.block() == ProductionBlocks.core) return false;
@@ -340,7 +352,8 @@ public class World{
 				int rotation = Vars.control.getTutorial().getPlaceRotation();
 				Block block = Vars.control.getTutorial().getPlaceBlock();
 			
-				if(block != Blocks.air || point.x != x - core.x || point.y != y - core.y || (rotation != -1 && rotation != Vars.player.rotation)){
+				if(block != Blocks.air || point.x != x - control.getCore().x || point.y != y - control.getCore().y 
+						|| (rotation != -1 && rotation != Vars.player.rotation)){
 					return false;
 				}
 			}else{
@@ -351,11 +364,7 @@ public class World{
 		return tile.breakable();
 	}
 	
-	//public static Rectangle getCollider(int x, int y){
-	//	return Rectangle.tmp2.setSize(tilesize).setCenter(x * tilesize, y * tilesize);
-	//}
-	
-	public static TileEntity findTileTarget(float x, float y, Tile tile, float range, boolean damaged){
+	public TileEntity findTileTarget(float x, float y, Tile tile, float range, boolean damaged){
 		Entity closest = null;
 		float dst = 0;
 		
@@ -389,21 +398,11 @@ public class World{
 		return (TileEntity) closest;
 	}
 	
-	public static void disposeMaps(){
-		for(Pixmap pixmap : mapPixmaps){
-			pixmap.dispose();
-		}
-		
-		for(Texture texture : mapTextures){
-			texture.dispose();
-		}
-	}
-	
 	/**
 	 * Input is in block coordinates, not world coordinates.
 	 * @return null if no collisions found, block position otherwise.
 	 */
-	public static Vector2 raycast(int x0f, int y0f, int x1f, int y1f){
+	public Vector2 raycast(int x0f, int y0f, int x1f, int y1f){
 		int x0 = (int)x0f;
 		int y0 = (int)y0f;
 		int x1 = (int)x1f;

@@ -13,7 +13,6 @@ import com.badlogic.gdx.utils.reflect.Constructor;
 
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.Fx;
@@ -53,6 +52,9 @@ public class Control extends Module{
 	float extrawavetime;
 	int enemies = 0;
 	
+	Tile core;
+	Array<SpawnPoint> spawnpoints = new Array<>();
+	
 	float respawntime;
 	
 	public Control(){
@@ -86,8 +88,6 @@ public class Control extends Module{
 		Sounds.setFalloff(9000f);
 		
 		Musics.load("1.mp3", "2.mp3", "3.mp3", "4.mp3");
-		
-		World.loadMaps();
 		
 		KeyBinds.defaults(
 			"up", Keys.W,
@@ -178,7 +178,7 @@ public class Control extends Module{
 		
 		player.heal();
 		clearItems();
-		World.spawnpoints.clear();
+		spawnpoints.clear();
 		respawntime = -1;
 		hiscore = false;
 		
@@ -189,8 +189,8 @@ public class Control extends Module{
 	public void play(){
 		Vars.renderer.clearTiles();
 		
-		player.x = World.core.worldx();
-		player.y = World.core.worldy() - Vars.tilesize*2 - ((int)(Gdx.graphics.getWidth() / (float)Core.cameraScale * 2) % 2 == 0 ? 0.5f : 0);
+		player.x = core.worldx();
+		player.y = core.worldy() - Vars.tilesize*2 - ((int)(Gdx.graphics.getWidth() / (float)Core.cameraScale * 2) % 2 == 0 ? 0.5f : 0);
 		
 		Core.camera.position.set(player.x, player.y, 0);
 		
@@ -200,17 +200,35 @@ public class Control extends Module{
 		GameState.set(State.playing);
 	}
 	
+	public Tile getCore(){
+		return core;
+	}
+	
+	public Array<SpawnPoint> getSpawnPoints(){
+		return spawnpoints;
+	}
+	
+	public void setCore(Tile tile){
+		this.core = tile;
+	}
+	
+	public void addSpawnPoint(Tile tile){
+		SpawnPoint point = new SpawnPoint();
+		point.start = tile;
+		spawnpoints.add(point);
+	}
+	
 	public void playMap(Map map){
 		Vars.ui.showLoading();
 		
 		Timers.run(16, ()->{
-			Vars.control.reset();
-			World.loadMap(map);
-			Vars.control.play();
+			reset();
+			world.loadMap(map);
+			play();
 		});
 		
 		Timers.run(18, ()->{
-			Vars.ui.hideLoading();
+			ui.hideLoading();
 		});
 	}
 	
@@ -236,12 +254,12 @@ public class Control extends Module{
 	public void runWave(){
 		Sounds.play("spawn");
 		
-		Pathfind.updatePath();
+		world.pathfinder().updatePath();
 		
 		for(EnemySpawn spawn : spawns){
-			for(int lane = 0; lane < World.spawnpoints.size; lane ++){
+			for(int lane = 0; lane < spawnpoints.size; lane ++){
 				int fl = lane;
-				Tile tile = World.spawnpoints.get(lane);
+				Tile tile = spawnpoints.get(lane).start;
 				int spawnamount = spawn.evaluate(wave, lane);
 				
 				for(int i = 0; i < spawnamount; i ++){
@@ -268,10 +286,10 @@ public class Control extends Module{
 		
 		wave ++;
 		
-		int last = Settings.getInt("hiscore" + World.getMap().name());
+		int last = Settings.getInt("hiscore" + world.getMap().name());
 		
 		if(wave > last){
-			Settings.putInt("hiscore" + World.getMap().name(), wave);
+			Settings.putInt("hiscore" + world.getMap().name(), wave);
 			Settings.save();
 			hiscore = true;
 		}
@@ -301,7 +319,6 @@ public class Control extends Module{
 	public void coreDestroyed(){
 		Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
 		Sounds.play("corexplode");
-		Tile core = World.core;
 		for(int i = 0; i < 16; i ++){
 			Timers.run(i*2, ()->{
 				Effects.effect(Fx.explosion, core.worldx()+Mathf.range(40), core.worldy()+Mathf.range(40));
@@ -401,7 +418,7 @@ public class Control extends Module{
 		Entities.initPhysics();
 		
 		Entities.setCollider(tilesize, (x, y)->{
-			return World.solid(x, y);
+			return world.solid(x, y);
 		});
 	}
 	
@@ -454,7 +471,7 @@ public class Control extends Module{
 					respawntime -= delta();
 					
 					if(respawntime <= 0){
-						player.set(World.core.worldx(), World.core.worldy()-Vars.tilesize*2);
+						player.set(core.worldx(), core.worldy()-Vars.tilesize*2);
 						player.heal();
 						player.add();
 						Effects.sound("respawn");
@@ -496,11 +513,6 @@ public class Control extends Module{
 				AndroidInput.doInput();
 			}
 		}
-	}
-	
-	@Override
-	public void dispose(){
-		World.disposeMaps();
 	}
 
 }

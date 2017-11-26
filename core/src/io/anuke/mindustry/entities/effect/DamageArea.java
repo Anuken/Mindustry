@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.World;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.util.Mathf;
 
@@ -29,7 +28,7 @@ public class DamageArea{
 			int trad = (int)(radius / Vars.tilesize);
 			for(int dx = -trad; dx <= trad; dx ++){
 				for(int dy= -trad; dy <= trad; dy ++){
-					Tile tile = World.tile(Mathf.scl2(x, Vars.tilesize) + dx, Mathf.scl2(y, Vars.tilesize) + dy);
+					Tile tile = Vars.world.tile(Mathf.scl2(x, Vars.tilesize) + dx, Mathf.scl2(y, Vars.tilesize) + dy);
 					if(tile != null && tile.entity != null && Vector2.dst(dx, dy, 0, 0) <= trad){
 						int amount = calculateDamage(x, y, tile.worldx(), tile.worldy(), radius, damage);
 						tile.entity.damage(amount);

@@ -3,9 +3,9 @@ package io.anuke.mindustry.world.blocks.types;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.World;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.graphics.Caches;
 import io.anuke.ucore.util.Mathf;
@@ -14,20 +14,21 @@ public class Floor extends Block{
 
 	public Floor(String name) {
 		super(name);
+		variants = 3;
 	}
 	
 	@Override
 	public void drawCache(Tile tile){
 		MathUtils.random.setSeed(tile.id());
 		
-		Caches.draw(vary ? (name() + MathUtils.random(1, 3))  : name(), tile.worldx(), tile.worldy());
+		Caches.draw(variants > 0 ? (name() + MathUtils.random(1, variants))  : name(), tile.worldx(), tile.worldy());
 		
 		for(int dx = -1; dx <= 1; dx ++){
 			for(int dy = -1; dy <= 1; dy ++){
 				
 				if(dx == 0 && dy == 0) continue;
 				
-				Tile other = World.tile(tile.x+dx, tile.y+dy);
+				Tile other = Vars.world.tile(tile.x+dx, tile.y+dy);
 				
 				if(other == null) continue;
 				

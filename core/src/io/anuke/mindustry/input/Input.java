@@ -10,7 +10,6 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
@@ -46,13 +45,13 @@ public class Input{
 			}
 		}
 		
-		Tile cursor = World.tile(tilex(), tiley());
+		Tile cursor = Vars.world.tile(tilex(), tiley());
 		
 		if(Inputs.buttonUp(Buttons.LEFT) && player.recipe != null && 
-				World.validPlace(tilex(), tiley(), player.recipe.result) && !ui.hasMouse() && cursorNear() &&
+				Vars.world.validPlace(tilex(), tiley(), player.recipe.result) && !ui.hasMouse() && cursorNear() &&
 				Vars.control.hasItems(player.recipe.requirements)){
 			
-			World.placeBlock(tilex(), tiley(), player.recipe.result, player.rotation);
+			Vars.world.placeBlock(tilex(), tiley(), player.recipe.result, player.rotation);
 			
 			for(ItemStack stack : player.recipe.requirements){
 				Vars.control.removeItem(stack);
@@ -80,11 +79,11 @@ public class Input{
 		}
 
 		//block breaking
-		if(Inputs.buttonDown(Buttons.RIGHT) && cursor != null && World.validBreak(tilex(), tiley())){
+		if(Inputs.buttonDown(Buttons.RIGHT) && cursor != null && Vars.world.validBreak(tilex(), tiley())){
 			Tile tile = cursor;
 			player.breaktime += Timers.delta();
 			if(player.breaktime >= tile.getBreakTime()){
-				World.breakBlock(cursor.x, cursor.y);
+				Vars.world.breakBlock(cursor.x, cursor.y);
 				player.breaktime = 0f;
 			}
 		}else{

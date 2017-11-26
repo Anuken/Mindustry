@@ -4,8 +4,8 @@ import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedGraph;
 import com.badlogic.gdx.utils.Array;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.World;
 /**Tilegraph that ignores player-made tiles.*/
 public class PassTileGraph implements IndexedGraph<Tile>{
 	private Array<Connection<Tile>> tempConnections = new Array<Connection<Tile>>();
@@ -27,11 +27,11 @@ public class PassTileGraph implements IndexedGraph<Tile>{
 
 	@Override
 	public int getIndex(Tile node){
-		return node.x+node.y*World.worldsize;
+		return node.id();
 	}
 
 	@Override
 	public int getNodeCount(){
-		return World.worldsize*World.worldsize;
+		return Vars.world.width() * Vars.world.height();
 	}
 }

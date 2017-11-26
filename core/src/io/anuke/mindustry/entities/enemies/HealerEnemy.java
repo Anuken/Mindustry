@@ -1,11 +1,11 @@
 package io.anuke.mindustry.entities.enemies;
 
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 
-import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.effect.Shaders;
 import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.graphics.Hue;
@@ -28,12 +28,7 @@ public class HealerEnemy extends Enemy{
 	}
 	
 	@Override
-	void move(){
-		Vector2 vec  = Pathfind.find(this);
-		vec.sub(x, y).setLength(speed);
-		
-		move(vec.x*Timers.delta(), vec.y*Timers.delta());
-		
+	void updateTargeting(boolean nearCore){
 		if(Timers.get(this, "target", 15)){
 			target = Entities.getClosest(Entities.getGroup(Enemy.class),
 					x, y, range, e -> e instanceof Enemy && e != this && ((Enemy)e).healthfrac() < 1f);
@@ -62,12 +57,14 @@ public class HealerEnemy extends Enemy{
 		
 		Angles.translation(this.angleTo(enemy), 5f);
 		
+		Graphics.shader();
 		if(enemy != null && enemy.health < enemy.maxhealth){
 			Draw.color(Hue.rgb(138, 244, 138, (MathUtils.sin(Timers.time()) + 1f) / 13f));
 			Draw.alpha(0.9f);
 			Draw.laser("laser", "laserend", x + Angles.x(), y + Angles.y(), enemy.x - Angles.x()/1.5f, enemy.y - Angles.y()/1.5f);
 			Draw.color();
 		}
+		Graphics.shader(Shaders.outline);
 	}
 
 }

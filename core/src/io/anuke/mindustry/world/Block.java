@@ -15,6 +15,7 @@ import io.anuke.mindustry.resource.Liquid;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 public class Block{
 	private static int lastid;
@@ -48,10 +49,12 @@ public class Block{
 	public int health = 40;
 	/**the shadow drawn under the block*/
 	public String shadow = "shadow";
+	/**whether to display a different shadow per variant*/
+	public boolean varyShadow = false;
 	/**edge fallback, used mainly for ores*/
 	public String edge = "stone";
-	/**whether this block has 3 variants*/
-	public boolean vary = true;
+	/**number of block variants, 0 to disable*/
+	public int variants = 0;
 	/**stuff that drops when broken*/
 	public ItemStack drops = null;
 	/**liquids that drop from this block, used for pumps*/
@@ -203,16 +206,27 @@ public class Block{
 	public void draw(Tile tile){
 		//note: multiblocks do not support rotation
 		if(!isMultiblock()){
-			Draw.rect(name(), tile.worldx(), tile.worldy(), rotate ? tile.rotation * 90 : 0);
+			Draw.rect(variants > 0 ? (name() + Mathf.randomSeed(tile.id(), 1, variants))  : name(), 
+					tile.worldx(), tile.worldy(), rotate ? tile.rotation * 90 : 0);
 		}else{
 			//if multiblock, make sure to draw even block sizes offset, since the core block is at the BOTTOM LEFT
 			Vector2 offset = getPlaceOffset();
+			
 			Draw.rect(name(), tile.worldx() + offset.x, tile.worldy() + offset.y);
 		}
 		
 		//update the tile entity through the draw method, only if it's an entity without updating
 		if(destructible && !update && !GameState.is(State.paused)){
 			tile.entity.update();
+		}
+	}
+	
+	public void drawShadow(Tile tile){
+		
+		if(varyShadow && variants > 0){
+			Draw.rect(shadow + (Mathf.randomSeed(tile.id(), 1, variants)), tile.worldx(), tile.worldy());
+		}else{
+			Draw.rect(shadow, tile.worldx(), tile.worldy());
 		}
 	}
 	

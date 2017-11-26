@@ -4,7 +4,6 @@ import com.badlogic.gdx.ai.pfa.Heuristic;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.World;
 
 public class MHueristic implements Heuristic<Tile>{
 	//so this means that the cost of going through solids is 10x going through non solids
@@ -23,7 +22,7 @@ public class MHueristic implements Heuristic<Tile>{
 		if(other.breakable() && other.block().solid) cost += Vars.tilesize*multiplier;
 		for(int dx = -1; dx <= 1; dx ++){
 			for(int dy = -1; dy <= 1; dy ++){
-				Tile tile = World.tile(node.x + dx, node.y + dy);
+				Tile tile = Vars.world.tile(node.x + dx, node.y + dy);
 				if(tile != null && tile.solid()){
 					cost += Vars.tilesize*5;
 				}

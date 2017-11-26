@@ -5,14 +5,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.entities.effect.Shaders;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.World;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.*;
 import io.anuke.ucore.util.Mathf;
@@ -57,15 +55,17 @@ public class Enemy extends DestructibleEntity{
 	}
 
 	void move(){
-		boolean nearCore = distanceTo(World.core.worldx(), World.core.worldy()) <= range - 18f;
+		Tile core = Vars.control.getCore();
+		
+		boolean nearCore = distanceTo(core.worldx(), core.worldy()) <= range - 18f;
 
 		Vector2 vec;
 
 		if(nearCore){
 			vec = Tmp.v2.setZero();
-			target = World.core.entity;
+			target = core.entity;
 		}else{
-			vec = Pathfind.find(this);
+			vec = Vars.world.pathfinder().find(this);
 			vec.sub(x, y).setLength(speed);
 		}
 
@@ -94,8 +94,13 @@ public class Enemy extends DestructibleEntity{
 
 		move(vec.x * Timers.delta(), vec.y * Timers.delta());
 
+		
+		updateTargeting(nearCore);
+	}
+	
+	void updateTargeting(boolean nearCore){
 		if(Timers.get(this, "target", 15) && !nearCore){
-			target = World.findTileTarget(x, y, null, range, false);
+			target = Vars.world.findTileTarget(x, y, null, range, false);
 
 			//no tile found
 			if(target == null){
@@ -126,7 +131,7 @@ public class Enemy extends DestructibleEntity{
 	}
 
 	public void findClosestNode(){
-		Pathfind.find(this);
+		Vars.world.pathfinder().find(this);
 
 		int index = 0;
 		int cindex = -1;
@@ -150,7 +155,7 @@ public class Enemy extends DestructibleEntity{
 		int x2 = path[node].x, y2 = path[node].y;
 
 		//if the enemy can't move to that node right now, set its position to it
-		if(World.raycast(Mathf.scl2(x, Vars.tilesize), Mathf.scl2(y, Vars.tilesize), x2, y2) != null){
+		if(Vars.world.raycast(Mathf.scl2(x, Vars.tilesize), Mathf.scl2(y, Vars.tilesize), x2, y2) != null){
 			Timers.run(Mathf.random(15f), () -> {
 				set(x2 * Vars.tilesize, y2 * Vars.tilesize);
 			});

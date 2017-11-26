@@ -31,20 +31,20 @@ public class Blocks{
 	blockpart = new BlockPart(),
 	
 	deepwater = new Floor("deepwater"){{
-		vary = false;
+		variants = 0;
 		solid = true;
 		liquidDrop = Liquid.water;
 	}},
 	
 	water = new Floor("water"){{
-		vary = false;
+		variants = 0;
 		solid = true;
 		liquidDrop = Liquid.water;
 	}},
 	
 	lava = new Floor("lava"){
 		{
-			vary = false;
+			variants = 0;
 			solid = true;
 			liquidDrop = Liquid.lava;
 		}
@@ -63,7 +63,7 @@ public class Blocks{
 	
 	oil = new Floor("oil"){
 		{
-			vary = false;
+			variants = 0;
 			solid = true;
 			liquidDrop = Liquid.oil;
 		}
@@ -77,6 +77,10 @@ public class Blocks{
 	},
 	
 	stone = new Floor("stone"){{
+		drops = new ItemStack(Item.stone, 1);
+	}},
+	
+	blackstone = new Floor("blackstone"){{
 		drops = new ItemStack(Item.stone, 1);
 	}},
 	
@@ -100,24 +104,38 @@ public class Blocks{
 	
 	grass = new Floor("grass"),
 	
-	stoneblock = new Block("stoneblock"){{
-		solid = true;
-	}},
+	stoneblock = new Block("stoneblock"){
+		{
+			solid = true;
+			variants = 3;
+		}
+		
+		@Override
+		public void draw(Tile tile){
+		//	Draw.colorl(0.9f + Mathf.randomSeed(tile.id()*9999, 1, 10)/10f / 10f);
+			super.draw(tile);
+		//	Draw.color();
+		}
+	},
 	
-	stoneblock2 = new Block("stoneblock2"){{
-		solid = true;
-	}},
-			
-	stoneblock3 = new Block("stoneblock3"){{
-		solid = true;
-	}},
+	blackstoneblock = new Block("blackstoneblock"){
+		{
+			solid = true;
+			variants = 3;
+		}
+		
+		@Override
+		public void draw(Tile tile){
+		//	float f = 0.15f;
+		//	Draw.colorl(1f - f + Mathf.randomSeed(tile.id()*9999, 1, 10)/10f / (1f / f));
+			super.draw(tile);
+		//	Draw.color();
+		}
+	},
 	
 	grassblock = new Block("grassblock"){{
 		solid = true;
-	}},
-	
-	grassblock2 = new Block("grassblock2"){{
-		solid = true;
+		variants = 2;
 	}},
 					
 	mossblock = new Block("mossblock"){{
@@ -134,13 +152,17 @@ public class Blocks{
 		shadow = "rockshadow";
 		breakable = true;
 		breaktime = 15;
+		variants = 2;
+		varyShadow = true;
 		drops = new ItemStack(Item.stone, 3);
 	}},
-			
-	rock2 = new Block("rock2"){{
-		shadow = "rock2shadow";
+	
+	blackrock = new Block("blackrock"){{
+		shadow = "blackrockshadow";
 		breakable = true;
 		breaktime = 15;
+		variants = 1;
+		varyShadow = true;
 		drops = new ItemStack(Item.stone, 3);
 	}},
 	

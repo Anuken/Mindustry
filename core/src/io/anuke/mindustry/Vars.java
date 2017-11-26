@@ -7,6 +7,7 @@ import io.anuke.mindustry.core.Control;
 import io.anuke.mindustry.core.Renderer;
 import io.anuke.mindustry.core.UI;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.world.World;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class Vars{
@@ -59,6 +60,7 @@ public class Vars{
 	public static Control control;
 	public static Renderer renderer;
 	public static UI ui;
+	public static World world;
 	
 	public static Player player;
 	

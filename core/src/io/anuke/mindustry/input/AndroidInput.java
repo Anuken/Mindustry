@@ -10,7 +10,6 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.World;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.layout.Unit;
@@ -51,7 +50,7 @@ public class AndroidInput extends InputAdapter{
 	
 	public static Tile selected(){
 		Vector2 vec = Graphics.world(mousex, mousey);
-		return World.tile(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize));
+		return Vars.world.tile(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize));
 	}
 	
 	public static void breakBlock(){
@@ -60,7 +59,7 @@ public class AndroidInput extends InputAdapter{
 		
 		if(player.breaktime >= tile.block().breaktime){
 			brokeBlock = true;
-			World.breakBlock(tile.x, tile.y);
+			Vars.world.breakBlock(tile.x, tile.y);
 			player.breaktime = 0f;
 		}
 	}
@@ -72,9 +71,9 @@ public class AndroidInput extends InputAdapter{
 		int tiley = Mathf.scl2(vec.y, tilesize);
 		
 		if(player.recipe != null && 
-				World.validPlace(tilex, tiley, player.recipe.result)){
+				Vars.world.validPlace(tilex, tiley, player.recipe.result)){
 			
-			World.placeBlock(tilex, tiley, player.recipe.result, player.rotation);
+			Vars.world.placeBlock(tilex, tiley, player.recipe.result, player.rotation);
 			
 			for(ItemStack stack : player.recipe.requirements){
 				Vars.control.removeItem(stack);
@@ -97,7 +96,7 @@ public class AndroidInput extends InputAdapter{
 			
 			if(sel == null) return;
 			
-			if(warmup > warmupDelay && World.validBreak(sel.x, sel.y)){
+			if(warmup > warmupDelay && Vars.world.validBreak(sel.x, sel.y)){
 				player.breaktime += Timers.delta();
 				
 				if(player.breaktime > selected().block().breaktime){

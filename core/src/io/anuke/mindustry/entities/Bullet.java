@@ -2,8 +2,8 @@ package io.anuke.mindustry.entities;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.World;
 import io.anuke.ucore.entities.*;
 import io.anuke.ucore.util.Mathf;
 
@@ -29,7 +29,7 @@ public class Bullet extends BulletEntity{
 		
 		int tilex = Mathf.scl2(x, tilesize);
 		int tiley = Mathf.scl2(y, tilesize);
-		Tile tile = World.tile(tilex, tiley);
+		Tile tile = Vars.world.tile(tilex, tiley);
 		TileEntity targetEntity = null;
 		
 		if(tile != null){

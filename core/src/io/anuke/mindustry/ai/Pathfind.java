@@ -1,32 +1,33 @@
 package io.anuke.mindustry.ai;
 
-import com.badlogic.gdx.ai.pfa.PathFinder;
+import com.badlogic.gdx.ai.pfa.PathFinderRequest;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.world.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.World;
-import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Tmp;
+
 public class Pathfind{
-	static MHueristic heuristic = new MHueristic();
-	static PassTileGraph passgraph = new PassTileGraph();
-	static PathFinder<Tile> passpathfinder;
-	static Array<SmoothGraphPath> paths = new Array<>();
-	static Tile[][] pathSequences;
-	static PathSmoother<Tile, Vector2> smoother = new PathSmoother<Tile, Vector2>(new Raycaster());
-	static Vector2 vector = new Vector2();
+	private static final long ms = 1000000;
 	
-	static public Vector2 find(Enemy enemy){
+	MHueristic heuristic = new MHueristic();
+	PassTileGraph graph = new PassTileGraph();
+	PathSmoother<Tile, Vector2> smoother = new PathSmoother<Tile, Vector2>(new Raycaster());
+	Vector2 vector = new Vector2();
+	
+	public Vector2 find(Enemy enemy){
 		if(enemy.node == -1){
 			findNode(enemy);
+		}
+		
+		if(enemy.path == null){
+			return vector.set(enemy.x, enemy.y);
 		}
 		
 		//-1 is only possible here if both pathfindings failed, which should NOT happen
@@ -34,7 +35,7 @@ public class Pathfind{
 		
 		Tile[] path = enemy.path;
 		
-		//REPRODUCE BUG: load in test map, then load save 1
+		//REPRODUCE BUG: load in test map, then load save 1?
 		Tile prev = path[enemy.node - 1];
 
 		Tile target = path[enemy.node];
@@ -77,19 +78,41 @@ public class Pathfind{
 		
 	}
 	
-	static public void reset(){
-		paths.clear();
-		pathSequences = null;
-		passpathfinder = new IndexedAStarPathFinder<Tile>(passgraph);
+	public void update(){
+		
+		for(SpawnPoint point : Vars.control.getSpawnPoints()){
+			if(!point.request.pathFound){
+				if(point.finder.search(point.request, ms*2)){
+					smoother.smoothPath(point.path);
+					point.pathTiles = point.path.nodes.toArray(Tile.class);
+				}
+			}
+		}
 	}
 	
-	static public void updatePath(){
+	public void updatePath(){
+		for(SpawnPoint point : Vars.control.getSpawnPoints()){
+			if(point.finder == null){
+				point.finder = new IndexedAStarPathFinder<Tile>(graph);
+			}
+			
+			point.path.clear();
+			
+			point.pathTiles = null;
+			
+			point.request = new PathFinderRequest<Tile>(point.start, Vars.control.getCore(), heuristic, point.path);
+			point.request.statusChanged = true; //IMPORTANT!
+		}
+		
+		/*
 		if(paths.size == 0 || paths.size != World.spawnpoints.size){
 			paths.clear();
+			finders.clear();
 			pathSequences = new Tile[World.spawnpoints.size][0];
 			for(int i = 0; i < World.spawnpoints.size; i ++){
 				SmoothGraphPath path = new SmoothGraphPath();
 				paths.add(path);
+				finders.add(new IndexedAStarPathFinder(graph));
 			}
 		}
 		
@@ -97,7 +120,7 @@ public class Pathfind{
 			SmoothGraphPath path = paths.get(i);
 			
 			path.clear();
-			passpathfinder.searchNodePath(
+			finders.get(i).searchNodePath(
 					World.spawnpoints.get(i), 
 					World.core, heuristic, path);
 			
@@ -117,11 +140,15 @@ public class Pathfind{
 				Effects.effect(Fx.ind, tile.worldx(), tile.worldy());
 			}
 			
-		}
+		}*/
 	}
 	
-	static void findNode(Enemy enemy){
-		enemy.path = pathSequences[enemy.spawn];
+	void findNode(Enemy enemy){
+		if(Vars.control.getSpawnPoints().get(enemy.spawn).pathTiles == null){
+			return;
+		}
+		
+		enemy.path = Vars.control.getSpawnPoints().get(enemy.spawn).pathTiles;
 		Tile[] path = enemy.path;
 		Tile closest = null;
 		float ldst = 0f;

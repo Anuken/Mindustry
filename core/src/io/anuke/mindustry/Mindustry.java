@@ -9,6 +9,7 @@ import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.Formatter;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
@@ -41,6 +42,7 @@ public class Mindustry extends ModuleCore {
 	
 	@Override
 	public void init(){
+		module(Vars.world = new World());
 		module(Vars.control = new Control());
 		module(Vars.renderer = new Renderer());
 		module(Vars.ui = new UI());

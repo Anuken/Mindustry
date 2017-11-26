@@ -8,7 +8,6 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Draw;
@@ -140,7 +139,7 @@ public class Generator extends PowerBlock{
 		int i = 0;
 
 		for(i = 1; i < laserRange; i++){
-			Tile other = World.tile(tile.x + i * point.x, tile.y + i * point.y);
+			Tile other = Vars.world.tile(tile.x + i * point.x, tile.y + i * point.y);
 			
 			if(other != null && other.block() instanceof PowerAcceptor){
 				Tile linked = other.getLinked();
@@ -173,7 +172,7 @@ public class Generator extends PowerBlock{
 					}
 
 					if(Vector2.dst(x, y, 0, 0) < powerRange){
-						Tile dest = World.tile(tile.x + x, tile.y + y);
+						Tile dest = Vars.world.tile(tile.x + x, tile.y + y);
 						if(dest != null && dest.block() instanceof PowerAcceptor && ((PowerAcceptor) dest.block()).acceptsPower(dest)){
 							if(i == 1){
 								PowerAcceptor block = (PowerAcceptor) dest.block();

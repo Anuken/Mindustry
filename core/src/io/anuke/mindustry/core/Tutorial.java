@@ -1,12 +1,16 @@
 package io.anuke.mindustry.core;
 
+import static io.anuke.mindustry.Vars.*;
+
 import com.badlogic.gdx.math.GridPoint2;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Weapon;
-import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Map;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.builders.button;
@@ -29,7 +33,7 @@ public class Tutorial{
 	}
 	
 	public boolean active(){
-		return World.getMap() == Map.tutorial && !GameState.is(State.menu);
+		return world.getMap() == Map.tutorial && !GameState.is(State.menu);
 	}
 	
 	public void buildUI(table table){
@@ -71,7 +75,7 @@ public class Tutorial{
 		//info.setText(stage.text);
 		
 		if(stage.showBlock){
-			Tile tile = World.tile(World.core.x + stage.blockPlaceX, World.core.y + stage.blockPlaceY);
+			Tile tile = world.tile(control.core.x + stage.blockPlaceX, control.core.y + stage.blockPlaceY);
 			
 			if(tile.block() == stage.targetBlock && (tile.rotation == stage.blockRotation || stage.blockRotation == -1)){
 				move(true);
@@ -151,9 +155,9 @@ public class Tutorial{
 	}
 	
 	public void setDefaultBlocks(int corex, int corey){
-		World.tile(corex, corey - 1).setBlock(Blocks.air);
-		World.tile(corex, corey - 2).setBlock(Blocks.air);
-		World.tile(corex, corey - 2).setFloor(Blocks.stone);
+		world.tile(corex, corey - 1).setBlock(Blocks.air);
+		world.tile(corex, corey - 2).setBlock(Blocks.air);
+		world.tile(corex, corey - 2).setFloor(Blocks.stone);
 	}
 	
 	enum Stage{
@@ -288,11 +292,11 @@ public class Tutorial{
 			
 			void onSwitch(){
 				for(int flip : new int[]{1, -1}){
-					World.tile(World.core.x + flip, World.core.y - 1).setBlock(DistributionBlocks.conveyor, 2 * flip);
-					World.tile(World.core.x + flip*2, World.core.y - 1).setBlock(DistributionBlocks.conveyor, 2 * flip);
-					World.tile(World.core.x + flip*2, World.core.y - 2).setBlock(DistributionBlocks.conveyor, 1);
-					World.tile(World.core.x + flip*2, World.core.y - 3).setFloor(Blocks.stone);
-					World.tile(World.core.x + flip*2, World.core.y - 3).setBlock(ProductionBlocks.stonedrill);
+					world.tile(control.core.x + flip, control.core.y - 1).setBlock(DistributionBlocks.conveyor, 2 * flip);
+					world.tile(control.core.x + flip*2, control.core.y - 1).setBlock(DistributionBlocks.conveyor, 2 * flip);
+					world.tile(control.core.x + flip*2, control.core.y - 2).setBlock(DistributionBlocks.conveyor, 1);
+					world.tile(control.core.x + flip*2, control.core.y - 3).setFloor(Blocks.stone);
+					world.tile(control.core.x + flip*2, control.core.y - 3).setBlock(ProductionBlocks.stonedrill);
 					
 				}
 			}
@@ -463,7 +467,7 @@ public class Tutorial{
 			
 			void onSwitch(){
 				Vars.ui.<ImageButton>find("sectionbuttondistribution").fireClick();
-				World.tile(blockPlaceX + World.core.x, blockPlaceY + World.core.y).setBlock(Blocks.air);
+				world.tile(blockPlaceX + control.core.x, blockPlaceY + control.core.y).setBlock(Blocks.air);
 			}
 		},
 		conduitUse2{
@@ -480,7 +484,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				World.tile(blockPlaceX + World.core.x, blockPlaceY + World.core.y).setBlock(Blocks.air);
+				world.tile(blockPlaceX + control.core.x, blockPlaceY + control.core.y).setBlock(Blocks.air);
 			}
 		},
 		conduitUse3{
@@ -497,7 +501,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				World.tile(blockPlaceX + World.core.x, blockPlaceY + World.core.y).setBlock(Blocks.air);
+				world.tile(blockPlaceX + control.core.x, blockPlaceY + control.core.y).setBlock(Blocks.air);
 			}
 		},
 		extractor{
@@ -513,7 +517,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				World.tile(blockPlaceX + World.core.x, blockPlaceY + World.core.y).setBlock(Blocks.air);
+				world.tile(blockPlaceX + control.core.x, blockPlaceY + control.core.y).setBlock(Blocks.air);
 				Vars.ui.<ImageButton>find("sectionbuttonproduction").fireClick();
 				Vars.control.addItem(Item.steel, 60);
 				Vars.control.addItem(Item.iron, 60);
@@ -527,19 +531,19 @@ public class Tutorial{
 			
 			void onSwitch(){
 				for(int i = -2; i <= 2; i ++){
-					World.tile(World.core.x + i + 4, World.core.y + 2).setBlock(ProductionBlocks.stonedrill);
-					World.tile(World.core.x + i + 4, World.core.y + 2).setFloor(Blocks.stone);
+					world.tile(control.core.x + i + 4, control.core.y + 2).setBlock(ProductionBlocks.stonedrill);
+					world.tile(control.core.x + i + 4, control.core.y + 2).setFloor(Blocks.stone);
 				}
 				
 				for(int i = 0; i < 3; i ++){
-					World.tile(World.core.x + 4 - 1 - i, World.core.y).setBlock(DistributionBlocks.conveyor, 2);
+					world.tile(control.core.x + 4 - 1 - i, control.core.y).setBlock(DistributionBlocks.conveyor, 2);
 				}
 				
-				World.tile(World.core.x + 2, World.core.y + 1).setBlock(DistributionBlocks.conveyor, 0);
-				World.tile(World.core.x + 3, World.core.y + 1).setBlock(DistributionBlocks.conveyor, 0);
-				World.tile(World.core.x + 4, World.core.y + 1).setBlock(DistributionBlocks.conveyor, 3);
-				World.tile(World.core.x + 5, World.core.y + 1).setBlock(DistributionBlocks.conveyor, 2);
-				World.tile(World.core.x + 6, World.core.y + 1).setBlock(DistributionBlocks.conveyor, 2);
+				world.tile(control.core.x + 2, control.core.y + 1).setBlock(DistributionBlocks.conveyor, 0);
+				world.tile(control.core.x + 3, control.core.y + 1).setBlock(DistributionBlocks.conveyor, 0);
+				world.tile(control.core.x + 4, control.core.y + 1).setBlock(DistributionBlocks.conveyor, 3);
+				world.tile(control.core.x + 5, control.core.y + 1).setBlock(DistributionBlocks.conveyor, 2);
+				world.tile(control.core.x + 6, control.core.y + 1).setBlock(DistributionBlocks.conveyor, 2);
 				
 			}
 		},

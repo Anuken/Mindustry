@@ -20,8 +20,8 @@ import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.Input;
 import io.anuke.mindustry.input.PlaceMode;
+import io.anuke.mindustry.world.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.UCore;
@@ -80,7 +80,7 @@ public class Renderer extends RendererModule{
 		}else{
 			boolean smoothcam = Settings.getBool("smoothcam");
 
-			if(World.core.block() == ProductionBlocks.core){
+			if(control.core.block() == ProductionBlocks.core){
 
 				if(!smoothcam){
 					setCamera(player.x, player.y);
@@ -88,7 +88,7 @@ public class Renderer extends RendererModule{
 					smoothCamera(player.x, player.y, android ? 0.3f : 0.14f);
 				}
 			}else{
-				smoothCamera(World.core.worldx(), World.core.worldy(), 0.4f);
+				smoothCamera(control.core.worldx(), control.core.worldy(), 0.4f);
 			}
 
 			if(Settings.getBool("pixelate"))
@@ -98,7 +98,8 @@ public class Renderer extends RendererModule{
 
 			updateShake(0.75f);
 			float prevx = camera.position.x, prevy = camera.position.y;
-			clampCamera(-tilesize / 2f, -tilesize / 2f + 1, World.pixsize - tilesize / 2f, World.pixsize - tilesize / 2f);
+			clampCamera(-tilesize / 2f, -tilesize / 2f + 1, world.width() * tilesize - tilesize / 2f, 
+					world.height() * tilesize - tilesize / 2f);
 
 			float deltax = camera.position.x - prex, deltay = camera.position.y - prey;
 
@@ -212,7 +213,7 @@ public class Renderer extends RendererModule{
 	}
 
 	void renderTiles(){
-		int chunksx = World.width() / chunksize, chunksy = World.height() / chunksize;
+		int chunksx = world.width() / chunksize, chunksy = world.height() / chunksize;
 
 		//render the entire map
 		if(floorCache == null || floorCache.length != chunksx || floorCache[0].length != chunksy){
@@ -271,11 +272,11 @@ public class Renderer extends RendererModule{
 					int worldx = Mathf.scl(camera.position.x, tilesize) + x;
 					int worldy = Mathf.scl(camera.position.y, tilesize) + y;
 
-					if(World.tile(worldx, worldy) != null){
-						Tile tile = World.tile(worldx, worldy);
+					if(world.tile(worldx, worldy) != null){
+						Tile tile = world.tile(worldx, worldy);
 						if(l == 0){
-							if(tile.block() != Blocks.air && World.isAccessible(worldx, worldy)){
-								Draw.rect(tile.block().shadow, worldx * tilesize, worldy * tilesize);
+							if(tile.block() != Blocks.air && world.isAccessible(worldx, worldy)){
+								tile.block().drawShadow(tile);
 							}
 						}else if(l == 1){
 							tile.block().draw(tile);
@@ -315,7 +316,7 @@ public class Renderer extends RendererModule{
 
 		for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
 			for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
-				Tile tile = World.tile(tilex, tiley);
+				Tile tile = world.tile(tilex, tiley);
 				tile.floor().drawCache(tile);
 
 			}
@@ -332,8 +333,8 @@ public class Renderer extends RendererModule{
 
 		//draw tutorial placement point
 		if(Vars.control.tutorial.showBlock()){
-			int x = World.core.x + Vars.control.tutorial.getPlacePoint().x;
-			int y = World.core.y + Vars.control.tutorial.getPlacePoint().y;
+			int x = control.core.x + Vars.control.tutorial.getPlacePoint().x;
+			int y = control.core.y + Vars.control.tutorial.getPlacePoint().y;
 			int rot = Vars.control.tutorial.getPlaceRotation();
 
 			Draw.thick(1f);
@@ -368,7 +369,7 @@ public class Renderer extends RendererModule{
 			x = tilex * tilesize;
 			y = tiley * tilesize;
 
-			boolean valid = World.validPlace(tilex, tiley, player.recipe.result) && (android || Input.cursorNear());
+			boolean valid = world.validPlace(tilex, tiley, player.recipe.result) && (android || Input.cursorNear());
 
 			Vector2 offset = player.recipe.result.getPlaceOffset();
 
@@ -388,8 +389,8 @@ public class Renderer extends RendererModule{
 
 			Draw.thickness(1f);
 			Draw.color("scarlet");
-			for(Tile spawn : World.spawnpoints){
-				Draw.dashcircle(spawn.worldx(), spawn.worldy(), enemyspawnspace);
+			for(SpawnPoint spawn : control.getSpawnPoints()){
+				Draw.dashcircle(spawn.start.worldx(), spawn.start.worldy(), enemyspawnspace);
 			}
 
 			if(valid)
@@ -401,8 +402,8 @@ public class Renderer extends RendererModule{
 		}
 
 		//block breaking
-		if(Inputs.buttonDown(Buttons.RIGHT) && World.validBreak(Input.tilex(), Input.tiley())){
-			Tile tile = World.tile(Input.tilex(), Input.tiley());
+		if(Inputs.buttonDown(Buttons.RIGHT) && world.validBreak(Input.tilex(), Input.tiley())){
+			Tile tile = world.tile(Input.tilex(), Input.tiley());
 			if(tile.isLinked())
 				tile = tile.getLinked();
 			Vector2 offset = tile.block().getPlaceOffset();
@@ -413,8 +414,8 @@ public class Renderer extends RendererModule{
 		}else if(android && player.breaktime > 0){ //android block breaking
 			Vector2 vec = Graphics.world(Gdx.input.getX(0), Gdx.input.getY(0));
 
-			if(World.validBreak(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize))){
-				Tile tile = World.tile(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize));
+			if(world.validBreak(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize))){
+				Tile tile = world.tile(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize));
 
 				float fract = player.breaktime / tile.getBreakTime();
 				Draw.color(Color.YELLOW, Color.SCARLET, fract);
@@ -425,7 +426,7 @@ public class Renderer extends RendererModule{
 
 		//draw selected block health
 		if(player.recipe == null && !ui.hasMouse()){
-			Tile tile = World.tile(Input.tilex(), Input.tiley());
+			Tile tile = world.tile(Input.tilex(), Input.tiley());
 
 			if(tile != null && tile.block() != Blocks.air){
 				Tile target = tile;

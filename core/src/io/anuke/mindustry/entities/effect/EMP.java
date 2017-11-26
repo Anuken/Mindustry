@@ -6,7 +6,6 @@ import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
@@ -36,7 +35,7 @@ public class EMP extends TimedEntity{
 		for(int dx = -radius; dx <= radius; dx ++){
 			for(int dy = -radius; dy <= radius; dy ++){
 				if(Vector2.dst(dx, dy, 0, 0) < radius){
-					Tile tile = World.tile(worldx + dx, worldy + dy);
+					Tile tile = Vars.world.tile(worldx + dx, worldy + dy);
 					
 					if(tile != null && tile.block().destructible){
 						array.add(tile);
