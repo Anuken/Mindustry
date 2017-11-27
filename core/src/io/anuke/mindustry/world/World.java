@@ -155,11 +155,12 @@ public class World extends Module{
 			
 			createTiles();
 		}else{
-		
 			tiles = new Tile[map.width][map.height];
 			
 			createTiles();
 		}
+		
+		Vars.control.getSpawnPoints().clear();
 		
 		Entities.resizeTree(0, 0, map.width * tilesize, map.height * tilesize);
 		

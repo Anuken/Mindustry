@@ -139,8 +139,6 @@ public class Enemy extends DestructibleEntity{
 	}
 
 	public void findClosestNode(){
-		Vars.world.pathfinder().find(this);
-
 		int index = 0;
 		int cindex = -1;
 		float dst = Float.MAX_VALUE;

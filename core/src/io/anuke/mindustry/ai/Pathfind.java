@@ -22,12 +22,15 @@ public class Pathfind{
 	Vector2 vector = new Vector2();
 	
 	public Vector2 find(Enemy enemy){
-		if(enemy.node == -1){
+		if(enemy.node == -1 || enemy.node == -2){
 			findNode(enemy);
 		}
 		
 		if(enemy.path == null){
 			return vector.set(enemy.x, enemy.y);
+		}else if(enemy.node == -2){
+			enemy.node = -1;
+			enemy.findClosestNode();
 		}
 		
 		//-1 is only possible here if both pathfindings failed, which should NOT happen
@@ -35,7 +38,6 @@ public class Pathfind{
 		
 		Tile[] path = enemy.path;
 		
-		//REPRODUCE BUG: load in test map, then load save 1?
 		Tile prev = path[enemy.node - 1];
 
 		Tile target = path[enemy.node];
@@ -92,9 +94,7 @@ public class Pathfind{
 	
 	public void updatePath(){
 		for(SpawnPoint point : Vars.control.getSpawnPoints()){
-			if(point.finder == null){
-				point.finder = new IndexedAStarPathFinder<Tile>(graph);
-			}
+			point.finder = new IndexedAStarPathFinder<Tile>(graph);
 			
 			point.path.clear();
 			
@@ -103,47 +103,10 @@ public class Pathfind{
 			point.request = new PathFinderRequest<Tile>(point.start, Vars.control.getCore(), heuristic, point.path);
 			point.request.statusChanged = true; //IMPORTANT!
 		}
-		
-		/*
-		if(paths.size == 0 || paths.size != World.spawnpoints.size){
-			paths.clear();
-			finders.clear();
-			pathSequences = new Tile[World.spawnpoints.size][0];
-			for(int i = 0; i < World.spawnpoints.size; i ++){
-				SmoothGraphPath path = new SmoothGraphPath();
-				paths.add(path);
-				finders.add(new IndexedAStarPathFinder(graph));
-			}
-		}
-		
-		for(int i = 0; i < paths.size; i ++){
-			SmoothGraphPath path = paths.get(i);
-			
-			path.clear();
-			finders.get(i).searchNodePath(
-					World.spawnpoints.get(i), 
-					World.core, heuristic, path);
-			
-			smoother.smoothPath(path);
-			
-			pathSequences[i] = new Tile[path.getCount()];
-			
-			for(int node = 0; node < path.getCount(); node ++){
-				Tile tile = path.get(node);
-				
-				pathSequences[i][node] = tile;
-			}
-			
-			
-			if(Vars.debug && Vars.showPaths)
-			for(Tile tile : path){
-				Effects.effect(Fx.ind, tile.worldx(), tile.worldy());
-			}
-			
-		}*/
 	}
 	
 	void findNode(Enemy enemy){
+		
 		if(Vars.control.getSpawnPoints().get(enemy.spawn).pathTiles == null){
 			return;
 		}

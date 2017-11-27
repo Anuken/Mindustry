@@ -444,6 +444,10 @@ public class Control extends Module{
 				enemyGroup.clear();
 			}
 			
+			if(Inputs.keyUp(Keys.F)){
+				wavetime = 0f;
+			}
+			
 			if(Inputs.keyUp(Keys.O)){
 				Vars.noclip = !Vars.noclip;
 			}

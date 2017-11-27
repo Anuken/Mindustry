@@ -372,7 +372,7 @@ public class SaveIO{
 			Vars.renderer.clearTiles();
 			
 			for(Enemy enemy : enemiesToUpdate){
-				enemy.findClosestNode();
+				enemy.node = -2;
 			}
 			
 			for(int x = 0; x < Vars.world.width(); x ++){
