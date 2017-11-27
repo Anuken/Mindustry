@@ -11,8 +11,10 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.entities.effect.Shaders;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.*;
+import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
@@ -24,18 +26,21 @@ public class Enemy extends DestructibleEntity{
 	protected float reload = 32;
 	protected float range = 60;
 	protected float length = 4;
-	protected float rotatespeed = 7f;
+	protected float rotatespeed = 0.1f;
 	protected float turretrotatespeed = 0.2f;
 	protected boolean alwaysRotate = false;
 	protected BulletType bullet = BulletType.small;
 	protected String shootsound = "enemyshoot";
 	protected int damage;
+	protected Enemy spawner;
+	protected int spawned = 0;
+	protected float angle;
+	protected boolean targetCore = false;
 
 	public int spawn;
 	public int node = -1;
 	public Tile[] path;
 
-	public Vector2 direction = new Vector2();
 	public float xvelocity, yvelocity;
 	public Entity target;
 	public int tier = 1;
@@ -63,7 +68,7 @@ public class Enemy extends DestructibleEntity{
 
 		if(nearCore){
 			vec = Tmp.v2.setZero();
-			target = core.entity;
+			if(targetCore) target = core.entity;
 		}else{
 			vec = Vars.world.pathfinder().find(this);
 			vec.sub(x, y).setLength(speed);
@@ -94,7 +99,6 @@ public class Enemy extends DestructibleEntity{
 
 		move(vec.x * Timers.delta(), vec.y * Timers.delta());
 
-		
 		updateTargeting(nearCore);
 	}
 	
@@ -106,6 +110,10 @@ public class Enemy extends DestructibleEntity{
 			if(target == null){
 				target = Entities.getClosest(Entities.defaultGroup(), x, y, range, e -> e instanceof Player);
 			}
+		}
+		
+		if(target instanceof Enemy){
+			UCore.log(target);
 		}
 
 		if(target != null && bullet != null){
@@ -125,8 +133,8 @@ public class Enemy extends DestructibleEntity{
 	}
 
 	void shoot(BulletType bullet, float rotation){
-		vector.set(length, 0).rotate(direction.angle() + rotation);
-		Bullet out = new Bullet(bullet, this, x + vector.x, y + vector.y, direction.angle() + rotation).add();
+		Angles.translation(angle + rotation, length);
+		Bullet out = new Bullet(bullet, this, x + Angles.x(), y + Angles.y(), this.angle + rotation).add();
 		out.damage = (int) (damage * Vars.multiplier);
 	}
 
@@ -195,6 +203,9 @@ public class Enemy extends DestructibleEntity{
 	public void removed(){
 		if(!dead){
 			Vars.control.enemyDeath();
+			if(spawner != null){
+				spawner.spawned --;
+			}
 		}
 	}
 
@@ -208,11 +219,9 @@ public class Enemy extends DestructibleEntity{
 		yvelocity = (y - lasty) / Timers.delta();
 
 		if(target == null || alwaysRotate){
-			direction.add(xvelocity * Timers.delta() / 3f, yvelocity * Timers.delta() / 3f);
-			direction.limit(speed * rotatespeed);
+			angle = Mathf.slerp(angle, 180f+Mathf.atan2(xvelocity, yvelocity), rotatespeed * Timers.delta());
 		}else{
-			float angle = angleTo(target);
-			direction.lerp(vector.set(1f, 0f).rotate(angle), turretrotatespeed * Timers.delta());
+			angle = Mathf.slerp(angle, angleTo(target), turretrotatespeed * Timers.delta());
 		}
 	}
 
@@ -226,7 +235,7 @@ public class Enemy extends DestructibleEntity{
 		Shaders.outline.apply();
 
 		Draw.color();
-		Draw.rect(region, x, y, direction.angle() - 90);
+		Draw.rect(region, x, y, this.angle - 90);
 
 		Graphics.flush();
 

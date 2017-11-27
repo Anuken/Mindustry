@@ -12,6 +12,7 @@ import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.world.GameMode;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Settings;
@@ -73,9 +74,9 @@ public class HudFragment implements Fragment{
 		
 		//ui table
 		new table(){{
-			control.tutorial.buildUI(this);
+			control.getTutorial().buildUI(this);
 			
-			visible(()->control.tutorial.active());
+			visible(()->control.getTutorial().active());
 		}}.end();
 		
 		//paused table
@@ -92,6 +93,13 @@ public class HudFragment implements Fragment{
 		new table(){{
 			atop();
 			aright();
+			
+			float uheight = 72f;
+			
+			new imagebutton("icon-play", Unit.dp.inPixels(30f), ()->{
+				Vars.control.runWave();
+			}).size(uheight).uniformY().units(Unit.dp)
+				.visible(()-> Vars.control.getMode() == GameMode.sandbox && Vars.control.getEnemiesRemaining() <= 0);
 
 			new table("button"){{
 
@@ -101,11 +109,11 @@ public class HudFragment implements Fragment{
 
 				new label(()-> control.getEnemiesRemaining() > 0 ?
 						control.getEnemiesRemaining() + " Enemies remaining" : 
-							control.tutorial.active() ? "waiting..." : "New wave in " + (int) (control.getWaveCountdown() / 60f))
+							(control.getTutorial().active() || Vars.control.getMode() == GameMode.sandbox) ? "waiting..." : "New wave in " + (int) (control.getWaveCountdown() / 60f))
 				.minWidth(150);
 
 				get().pad(Unit.dp.inPixels(12));
-			}};
+			}}.height(uheight).units(Unit.dp);
 
 			visible(()->!GameState.is(State.menu));
 		}}.end();

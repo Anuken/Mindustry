@@ -19,6 +19,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.util.Angles;
@@ -41,6 +42,8 @@ public class Turret extends Block{
 	protected int maxammo = 400;
 	protected float rotatespeed = 0.2f;
 	protected float shootCone = 5f;
+	protected Effect shootEffect = null;
+	protected float shootShake = 0f;
 
 	public Turret(String name) {
 		super(name);
@@ -216,6 +219,8 @@ public class Turret extends Block{
 	protected void shoot(Tile tile){
 		TurretEntity entity = tile.entity();
 		
+		Vector2 offset = getPlaceOffset();
+		
 		Angles.translation(entity.rotation, width * Vars.tilesize / 2f);
 		
 		for(int i = 0; i < shots; i ++){
@@ -228,12 +233,21 @@ public class Turret extends Block{
 			}
 			
 		}
+		
+		if(shootEffect != null){
+			Effects.effect(shootEffect, tile.worldx() + Angles.x() + offset.x, 
+				tile.worldy()+ Angles.y() + offset.y, entity.rotation);
+		}
+		
+		if(shootShake > 0){
+			Effects.shake(shootShake, shootShake, tile.entity);
+		}
 	}
 	
 	protected void bullet(Tile tile, float angle){
 		Vector2 offset = getPlaceOffset();
-		 Bullet out = new Bullet(bullet, tile.entity, tile.worldx() + Angles.x() + offset.x, tile.worldy() + Angles.y() + offset.y, angle).add();
-		 out.damage = (int)(bullet.damage*Vars.multiplier);
+		Bullet out = new Bullet(bullet, tile.entity, tile.worldx() + Angles.x() + offset.x, tile.worldy() + Angles.y() + offset.y, angle).add();
+		out.damage = (int)(bullet.damage*Vars.multiplier);
 	}
 	
 	public static class TurretEntity extends TileEntity{

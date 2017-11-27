@@ -31,6 +31,7 @@ public class Mindustry extends ModuleCore {
 		}
 		
 	};
+	
 	//always initialize blocks in this order, otherwise there are ID errors
 	public Block[] blockClasses = {
 		Blocks.air,

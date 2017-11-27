@@ -19,9 +19,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.*;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Weapon;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Map;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.entities.Entities;
@@ -37,6 +35,8 @@ import io.anuke.ucore.entities.Entities;
  * --STATE DATA--
  * Wave (int)
  * Wave countdown time (float)
+ * 
+ * Gamemode Ordinal (byte)
  * 
  * Player X (float)
  * Player Y (float)
@@ -82,7 +82,7 @@ import io.anuke.ucore.entities.Entities;
  */
 public class SaveIO{
 	/**Save file version ID. Should be incremented every breaking release.*/
-	private static final int fileVersionID = 9;
+	private static final int fileVersionID = 10;
 	
 	//TODO automatic registration of types?
 	private static final Array<Class<? extends Enemy>> enemyIDs = Array.with(
@@ -135,9 +135,21 @@ public class SaveIO{
 	public static int getWave(int slot){
 		
 		try(DataInputStream stream = new DataInputStream(fileFor(slot).read())){
-			stream.readInt();
-			stream.readLong();
-			return stream.readInt();
+			stream.readInt(); //read version
+			stream.readLong(); //read last saved time
+			stream.readByte(); //read the gamemode
+			return stream.readInt(); //read the wave
+		}catch (IOException e){
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static GameMode getMode(int slot){
+		
+		try(DataInputStream stream = new DataInputStream(fileFor(slot).read())){
+			stream.readInt(); //read version
+			stream.readLong(); //read last saved time
+			return GameMode.values()[stream.readByte()]; //read the gamemode
 		}catch (IOException e){
 			throw new RuntimeException(e);
 		}
@@ -151,10 +163,13 @@ public class SaveIO{
 		
 		try(DataOutputStream stream = new DataOutputStream(file.write(false))){
 			
+			//--META--
 			stream.writeInt(fileVersionID); //version id
-			stream.writeLong(TimeUtils.millis());
+			stream.writeLong(TimeUtils.millis()); //last saved
 			
 			//--GENERAL STATE--
+			stream.writeByte(Vars.control.getMode().ordinal()); //gamemode
+			
 			stream.writeInt(Vars.control.getWave()); //wave
 			stream.writeFloat(Vars.control.getWaveCountdown()); //wave countdown
 			
@@ -270,6 +285,7 @@ public class SaveIO{
 			}
 			
 			//general state
+			byte mode = stream.readByte();
 			
 			int wave = stream.readInt();
 			float wavetime = stream.readFloat();
@@ -282,6 +298,7 @@ public class SaveIO{
 			Vars.player.x = playerx;
 			Vars.player.y = playery;
 			Vars.player.health = playerhealth;
+			Vars.control.setMode(GameMode.values()[mode]);
 			Core.camera.position.set(playerx, playery, 0);
 			
 			//weapons

@@ -14,7 +14,7 @@ public class DamageArea{
 	public static void damage(boolean enemies, float x, float y, float radius, int damage){
 		
 		if(enemies){
-			Entities.getNearby(x, y, radius*2, entity->{
+			Entities.getNearby(Entities.getGroup(Enemy.class), x, y, radius*2, entity->{
 				if(entity instanceof Enemy){
 					Enemy enemy = (Enemy)entity;
 					if(enemy.distanceTo(x, y) > radius){

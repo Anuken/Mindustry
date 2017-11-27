@@ -23,6 +23,7 @@ public class HealerEnemy extends Enemy{
 		bullet = BulletType.shot;
 		range = 30f;
 		alwaysRotate = false;
+		targetCore = false;
 		
 		heal();
 	}

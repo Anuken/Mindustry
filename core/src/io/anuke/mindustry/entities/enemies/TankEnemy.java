@@ -18,9 +18,9 @@ public class TankEnemy extends Enemy{
 	}
 	
 	void shoot(){
-		vector.set(length, 0).rotate(direction.angle());
+		Angles.translation(angle, 8f);
 		
-		Angles.shotgun(3, 8f, direction.angle(), f->{
+		Angles.shotgun(3, 8f, angle, f->{
 			Bullet out = new Bullet(bullet, this, x+vector.x, y+vector.y, f).add();
 			out.damage = (int)(damage*Vars.multiplier);
 		});

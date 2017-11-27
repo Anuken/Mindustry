@@ -3,15 +3,16 @@ package io.anuke.mindustry.ui;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.world.GameMode;
 import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.StringSupplier;
-import io.anuke.ucore.scene.ui.ImageButton;
-import io.anuke.ucore.scene.ui.ScrollPane;
+import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.scene.utils.Elements;
 
 public class LevelDialog extends FloatingDialog{
 	private Map selectedMap = Map.delta;
@@ -30,6 +31,21 @@ public class LevelDialog extends FloatingDialog{
 		ScrollPane pane = new ScrollPane(maps);
 		
 		int maxwidth = 4;
+		
+		Table selmode = new Table();
+		ButtonGroup<TextButton> group = new ButtonGroup<>();
+		selmode.add("Gamemode: ").padRight(10f).units(Unit.dp);
+		
+		for(GameMode mode : GameMode.values()){
+			TextButton b = Elements.newButton(mode.toString(), "toggle", ()->{
+				Vars.control.setMode(mode);
+			});
+			group.add(b);
+			selmode.add(b).size(130f, 54f).units(Unit.dp);
+		}
+		
+		content().add(selmode);
+		content().row();
 		
 		for(int i = 0; i < Map.values().length; i ++){
 			Map map = Map.values()[i];
@@ -61,7 +77,7 @@ public class LevelDialog extends FloatingDialog{
 			maps.add(image).width(170).pad(4f).units(Unit.dp);
 		}
 		
-		content().add(pane);
+		content().add(pane).uniformX();
 		
 		shown(()->{
 			//this is necessary for some reason?

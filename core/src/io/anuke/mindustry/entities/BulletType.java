@@ -20,6 +20,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 	static Color lightRed = Hue.mix(Color.WHITE, Color.FIREBRICK, 0.1f);
 	static Color lightOrange = Color.valueOf("f68021");
 	static Color whiteOrange = Hue.mix(lightOrange, Color.WHITE, 0.6f);
+	static Color whiteYellow = Hue.mix(Color.YELLOW, Color.WHITE, 0.6f);
 	
 	public static final BulletType 
 	
@@ -128,7 +129,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Effects.effect(Fx.shellsmoke, b);
 			Effects.effect(Fx.shellexplosion, b);
 			
-			DamageArea.damage(b.owner instanceof Enemy, b.x, b.y, 25f, (int)(damage * 2f/3f));
+			DamageArea.damage(!(b.owner instanceof Enemy), b.x, b.y, 25f, (int)(damage * 2f/3f));
 		}
 	},
 	titanshell = new BulletType(1.8f, 60){
@@ -139,6 +140,37 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 		
 		public void draw(Bullet b){
 			Draw.color(whiteOrange);
+			Draw.rect("titanshell", b.x, b.y, b.angle());
+			Draw.reset();
+		}
+		
+		public void update(Bullet b){
+			if(Timers.get(b, "smoke", 4)){
+				Effects.effect(Fx.smoke, b.x + Mathf.range(2), b.y + Mathf.range(2));
+			}
+		}
+		
+		public void despawned(Bullet b){
+			removed(b);
+		}
+		
+		public void removed(Bullet b){
+			Effects.shake(3f, 3f, b);
+			
+			Effects.effect(Fx.shellsmoke, b);
+			Effects.effect(Fx.shockwaveSmall, b);
+			
+			DamageArea.damage(!(b.owner instanceof Enemy), b.x, b.y, 25f, (int)(damage * 2f/3f));
+		}
+	},
+	yellowshell = new BulletType(1.2f, 20){
+		{
+			lifetime = 60f;
+			hitsize = 11f;
+		}
+		
+		public void draw(Bullet b){
+			Draw.color(whiteYellow);
 			Draw.rect("titanshell", b.x, b.y, b.angle());
 			Draw.reset();
 		}

@@ -103,6 +103,7 @@ public class WeaponBlocks{
 			bullet = BulletType.sniper;
 			ammo = Item.steel;
 			health = 70;
+			shootEffect = Fx.railshot;
 			fullDescription = "Advanced long-range turret. Uses steel for ammo. Very high damage, but low fire rate. "
 					+ "Expensive to use, but can be placed far away from enemy lines due to its range.";
 		}
@@ -121,6 +122,8 @@ public class WeaponBlocks{
 			fullDescription = "Advanced splash-damage turret. Uses coal for ammo. "
 					+ "Very slow fire rate and bullets, but very high single-target and splash damage. "
 					+ "Useful for large crowds of enemies.";
+			shootEffect = Fx.mortarshot;
+			shootShake = 2f;
 		}
 	},
 	
@@ -189,6 +192,7 @@ public class WeaponBlocks{
 			shots = 2;
 			fullDescription = "The ultimate rapid-fire turret. Uses uranium as ammo. Shoots large slugs at a high fire rate. "
 					+ "Medium range. Spans multiple tiles. Extremely tough.";
+			shootEffect = Fx.chainshot;
 		}
 		
 		//TODO specify turret shoot effect in turret instead of doing it manually
@@ -203,7 +207,7 @@ public class WeaponBlocks{
 			for(int i = -1; i < 1; i ++){
 				Angles.vector.set(len, Mathf.sign(i) * space).rotate(entity.rotation);
 				bullet(tile, entity.rotation);
-				Effects.effect(Fx.chainshot, tile.worldx() + Angles.x() + offset.x, 
+				Effects.effect(shootEffect, tile.worldx() + Angles.x() + offset.x, 
 						tile.worldy()+ Angles.y() + offset.y, entity.rotation);
 			}
 			
@@ -225,19 +229,8 @@ public class WeaponBlocks{
 			shootCone = 9f;
 			fullDescription = "The ultimate long-range turret. Uses uranium as ammo. Shoots large splash-damage shells at a medium rate of fire. "
 					+ "Long range. Spans multiple tiles. Extremely tough.";
-		}
-		
-		@Override
-		protected void shoot(Tile tile){
-			TurretEntity entity = tile.entity();
-			Vector2 offset = getPlaceOffset();
-			
-			Angles.translation(entity.rotation, 14f);
-			bullet(tile, entity.rotation);
-			Effects.effect(Fx.titanshot, tile.worldx() + Angles.x() + offset.x, 
-						tile.worldy()+ Angles.y() + offset.y, entity.rotation);
-			
-			Effects.shake(3f, 3f, tile.worldx(), tile.worldy());
+			shootEffect = Fx.titanshot;
+			shootShake = 3f;
 		}
 	};
 }

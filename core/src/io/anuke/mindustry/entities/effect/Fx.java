@@ -13,6 +13,7 @@ public class Fx{
 	static Color lightRed = Hue.mix(Color.WHITE, Color.FIREBRICK, 0.1f);
 	static Color lightOrange = Color.valueOf("f68021");
 	static Color whiteOrange = Hue.mix(lightOrange, Color.WHITE, 0.6f);
+	static Color whiteYellow = Hue.mix(Color.YELLOW, Color.WHITE, 0.6f);
 	
 	public static final Effect
 	
@@ -34,6 +35,28 @@ public class Fx{
 		Draw.reset();
 	}),
 	
+	mortarshot = new Effect(10f, e -> {
+		Draw.color(Color.WHITE, Color.DARK_GRAY, e.ifract());
+		Draw.thick(e.fract()*6f);
+		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*10f);
+		Draw.thick(e.fract()*5f);
+		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*14f);
+		Draw.thick(e.fract()*1f);
+		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*16f);
+		Draw.reset();
+	}),
+	
+	railshot = new Effect(9f, e -> {
+		Draw.color(Color.WHITE, Color.DARK_GRAY, e.ifract());
+		Draw.thick(e.fract()*5f);
+		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*8f);
+		Draw.thick(e.fract()*4f);
+		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*12f);
+		Draw.thick(e.fract()*1f);
+		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*14f);
+		Draw.reset();
+	}),
+	
 	titanshot = new Effect(12f, e -> {
 		Draw.color(Color.WHITE, lightOrange, e.ifract());
 		Draw.thick(e.fract()*7f);
@@ -41,6 +64,17 @@ public class Fx{
 		Draw.thick(e.fract()*4f);
 		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*16f);
 		Draw.thick(e.fract()*2f);
+		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*18f);
+		Draw.reset();
+	}),
+	
+	largeCannonShot = new Effect(11f, e -> {
+		Draw.color(Color.WHITE, whiteYellow, e.ifract());
+		Draw.thick(e.fract()*6f);
+		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*12f);
+		Draw.thick(e.fract()*3f);
+		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*16f);
+		Draw.thick(e.fract()*1f);
 		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*18f);
 		Draw.reset();
 	}),

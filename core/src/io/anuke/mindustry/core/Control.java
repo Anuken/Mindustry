@@ -36,7 +36,7 @@ import io.anuke.ucore.util.Profiler;
 public class Control extends Module{
 	int targetscale = baseCameraScale;
 	
-	public Tutorial tutorial = new Tutorial();
+	Tutorial tutorial = new Tutorial();
 	boolean hiscore = false;
 	
 	final Array<Weapon> weapons = new Array<>();
@@ -51,6 +51,7 @@ public class Control extends Module{
 	float wavetime;
 	float extrawavetime;
 	int enemies = 0;
+	GameMode mode = GameMode.waves;
 	
 	Tile core;
 	Array<SpawnPoint> spawnpoints = new Array<>();
@@ -162,7 +163,7 @@ public class Control extends Module{
 	
 	public void reset(){
 		weapons.clear();
-		Vars.renderer.clearTiles();
+		renderer.clearTiles();
 		
 		weapons.add(Weapon.blaster);
 		player.weapon = weapons.first();
@@ -187,7 +188,7 @@ public class Control extends Module{
 	}
 	
 	public void play(){
-		Vars.renderer.clearTiles();
+		renderer.clearTiles();
 		
 		player.x = core.worldx();
 		player.y = core.worldy() - Vars.tilesize*2 - ((int)(Gdx.graphics.getWidth() / (float)Core.cameraScale * 2) % 2 == 0 ? 0.5f : 0);
@@ -230,6 +231,14 @@ public class Control extends Module{
 		Timers.run(18, ()->{
 			ui.hideLoading();
 		});
+	}
+	
+	public GameMode getMode(){
+		return mode;
+	}
+	
+	public void setMode(GameMode mode){
+		this.mode = mode;
 	}
 	
 	public boolean hasWeapon(Weapon weapon){
@@ -443,7 +452,7 @@ public class Control extends Module{
 				if(Inputs.keyDown(Keys.SHIFT_LEFT)){
 					new HealerEnemy(0).set(player.x, player.y).add();
 				}else{
-					new TitanEnemy(0).set(player.x, player.y).add();
+					new FortressEnemy(0).set(player.x, player.y).add();
 				}
 			}
 		}
@@ -479,17 +488,19 @@ public class Control extends Module{
 					}
 				}
 				
-				if(!tutorial.active()){
+				if(tutorial.active()){
+					tutorial.update();
+				}
+				
+				if(!tutorial.active() && mode != GameMode.sandbox){
 					extrawavetime -= delta();
 				
 					if(enemies <= 0){
 						wavetime -= delta();
 					}
-				}else{
-					tutorial.update();
 				}
 			
-				if(wavetime <= 0 || (debug && Inputs.keyUp(Keys.F)) || extrawavetime <= 0){
+				if(wavetime <= 0){
 					runWave();
 				}
 			
