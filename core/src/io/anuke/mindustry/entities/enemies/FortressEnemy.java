@@ -16,14 +16,15 @@ public class FortressEnemy extends Enemy{
 	public FortressEnemy(int spawn) {
 		super(spawn);
 		
-		speed = 0.1f;
+		speed = 0.12f;
 		reload = 90;
 		maxhealth = 700;
 		range = 70f;
 		bullet = BulletType.yellowshell;
-		hitbox.setSize(9f);
+		hitbox.setSize(10f);
 		turretrotatespeed = rotatespeed = 0.08f;
 		length = 7f;
+		mass = 7f;
 		
 		heal();
 	}

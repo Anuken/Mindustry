@@ -10,12 +10,13 @@ public class TitanEnemy extends Enemy{
 	public TitanEnemy(int spawn) {
 		super(spawn);
 		
-		speed = 0.1f;
+		speed = 0.14f;
 		reload = 30;
 		maxhealth = 400;
 		range = 60f;
 		bullet = BulletType.small;
 		hitbox.setSize(7f);
+		mass = 4f;
 		
 		heal();
 		

@@ -9,11 +9,12 @@ public class RapidEnemy extends Enemy{
 		
 		reload = 8;
 		bullet = BulletType.purple;
-		rotatespeed = 30f;
+		rotatespeed = 0.08f;
 		maxhealth = 260;
 		speed = 0.27f;
 		heal();
 		hitbox.setSize(8f);
+		mass = 3f;
 		
 		range = 70;
 	}

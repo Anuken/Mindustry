@@ -13,8 +13,10 @@ public class TankEnemy extends Enemy{
 		maxhealth = 350;
 		speed = 0.2f;
 		reload = 90f;
+		rotatespeed = 0.06f;
 		bullet = BulletType.small;
 		length = 3f;
+		mass = 1.4f;
 	}
 	
 	void shoot(){

@@ -37,6 +37,7 @@ import io.anuke.ucore.entities.Entities;
  * Wave countdown time (float)
  * 
  * Gamemode Ordinal (byte)
+ * Map ordinal (byte)
  * 
  * Player X (float)
  * Player Y (float)
@@ -63,7 +64,6 @@ import io.anuke.ucore.entities.Entities;
  *   
  * 
  * --MAP DATA--
- * Map ID (byte)
  * Seed (int)
  * Amount of tiles (int)
  * (tile list)
@@ -82,7 +82,7 @@ import io.anuke.ucore.entities.Entities;
  */
 public class SaveIO{
 	/**Save file version ID. Should be incremented every breaking release.*/
-	private static final int fileVersionID = 10;
+	private static final int fileVersionID = 11;
 	
 	//TODO automatic registration of types?
 	private static final Array<Class<? extends Enemy>> enemyIDs = Array.with(
@@ -138,6 +138,7 @@ public class SaveIO{
 			stream.readInt(); //read version
 			stream.readLong(); //read last saved time
 			stream.readByte(); //read the gamemode
+			stream.readByte(); //read the map
 			return stream.readInt(); //read the wave
 		}catch (IOException e){
 			throw new RuntimeException(e);
@@ -150,6 +151,18 @@ public class SaveIO{
 			stream.readInt(); //read version
 			stream.readLong(); //read last saved time
 			return GameMode.values()[stream.readByte()]; //read the gamemode
+		}catch (IOException e){
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static Map getMap(int slot){
+		
+		try(DataInputStream stream = new DataInputStream(fileFor(slot).read())){
+			stream.readInt(); //read version
+			stream.readLong(); //read last saved time
+			stream.readByte(); //read the gamemode
+			return Map.values()[stream.readByte()]; //read the map
 		}catch (IOException e){
 			throw new RuntimeException(e);
 		}
@@ -169,6 +182,7 @@ public class SaveIO{
 			
 			//--GENERAL STATE--
 			stream.writeByte(Vars.control.getMode().ordinal()); //gamemode
+			stream.writeByte(Vars.world.getMap().ordinal()); //map ID
 			
 			stream.writeInt(Vars.control.getWave()); //wave
 			stream.writeFloat(Vars.control.getWaveCountdown()); //wave countdown
@@ -218,9 +232,6 @@ public class SaveIO{
 			}
 			
 			//--MAP DATA--
-			
-			//map ID
-			stream.writeByte(Vars.world.getMap().ordinal());
 			
 			//seed
 			stream.writeInt(Vars.world.getSeed());
@@ -286,6 +297,7 @@ public class SaveIO{
 			
 			//general state
 			byte mode = stream.readByte();
+			byte mapid = stream.readByte();
 			
 			int wave = stream.readInt();
 			float wavetime = stream.readFloat();
@@ -364,7 +376,6 @@ public class SaveIO{
 			
 			//map
 			
-			int mapid = stream.readByte();
 			int seed = stream.readInt();
 			int tiles = stream.readInt();
 			

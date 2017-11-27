@@ -36,6 +36,7 @@ public class Enemy extends DestructibleEntity{
 	protected int spawned = 0;
 	protected float angle;
 	protected boolean targetCore = false;
+	protected float mass = 1f;
 
 	public int spawn;
 	public int node = -1;
@@ -80,18 +81,18 @@ public class Enemy extends DestructibleEntity{
 		float avoidSpeed = 0.1f;
 		
 		Entities.getNearby(Entities.getGroup(Enemy.class), x, y, range, other -> {
+			Enemy enemy = (Enemy)other;
 			float dst = other.distanceTo(this);
 			if(other == this)
 				return;
 			
 			if(dst < shiftRange){
-				float scl = Mathf.clamp(1.4f - dst / shiftRange);
+				float scl = Mathf.clamp(1.4f - dst / shiftRange) * enemy.mass * 1f/mass;
 				shift.add((x - other.x) * scl, (y - other.y) * scl);
 			}else if(dst < avoidRange){
 				Tmp.v2.set((x - other.x), (y - other.y)).setLength(avoidSpeed);
 				shift.add(Tmp.v2);
 			}
-
 		});
 
 		shift.limit(1f);

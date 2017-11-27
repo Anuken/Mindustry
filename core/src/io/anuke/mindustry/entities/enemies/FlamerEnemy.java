@@ -13,6 +13,7 @@ public class FlamerEnemy extends Enemy{
 		reload = 6;
 		bullet = BulletType.flameshot;
 		shootsound = "flame";
+		mass = 1.5f;
 		
 		range = 40;
 		

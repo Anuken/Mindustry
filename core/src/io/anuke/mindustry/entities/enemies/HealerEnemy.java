@@ -24,6 +24,7 @@ public class HealerEnemy extends Enemy{
 		range = 30f;
 		alwaysRotate = false;
 		targetCore = false;
+		mass = 1.1f;
 		
 		heal();
 	}

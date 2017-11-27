@@ -111,8 +111,13 @@ public class Control extends Module{
 		
 		spawns = Array.with(
 			new EnemySpawn(TitanEnemy.class){{
-				after = 4;
+				after = 5;
 				spacing = 2;
+				scaling = 5;
+			}},
+			new EnemySpawn(FortressEnemy.class){{
+				after = 12;
+				spacing = 3;
 				scaling = 5;
 			}},
 			new EnemySpawn(HealerEnemy.class){{
@@ -442,6 +447,7 @@ public class Control extends Module{
 			
 			if(Inputs.keyUp(Keys.C)){
 				enemyGroup.clear();
+				enemies = 0;
 			}
 			
 			if(Inputs.keyUp(Keys.F)){
