@@ -3,6 +3,9 @@ precision mediump float;
 precision mediump int;
 #endif
 
+#define MAX_HITS 64
+#define HIT_RADIUS 12.0
+
 uniform sampler2D u_texture;
 
 uniform vec4 u_color;
@@ -10,6 +13,8 @@ uniform vec2 u_texsize;
 uniform float u_time;
 uniform float u_scaling;
 uniform vec2 u_offset;
+uniform int u_hitamount;
+uniform vec3 u_hits[MAX_HITS];
 
 varying vec4 v_color;
 varying vec2 v_texCoord;
@@ -49,8 +54,19 @@ void main() {
 	        }
 	        
 	        color.a = 0.18;
+	        
+	        for(int i = 0; i < u_hitamount; i ++){
+	    		vec3 hit = u_hits[i];
+	    		float rad = hit.z * HIT_RADIUS;
+	    		float fract = 1.0 - hit.z;
+	    	
+	    		if(abs(distance(vec2(hit.x, hit.y), coords - u_texsize/2.0) - rad) < 1.0){
+	    			color = mix(color, u_color* vec4(si, si, si, 1.0), (1.0 * fract));
+	    			color.a = 0.18 + 0.82 *fract;
+	    		}
+	    	}
 	    }
-	    
+		
 		gl_FragColor = color;
 	}
 }

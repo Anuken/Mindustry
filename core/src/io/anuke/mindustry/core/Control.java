@@ -59,9 +59,12 @@ public class Control extends Module{
 	float respawntime;
 	
 	public Control(){
-		if(Mindustry.args.contains("-debug", false)){
+		if(Mindustry.args.contains("-debug", false))
 			Vars.debug = true;
-		}
+		if(Mindustry.args.contains("-profile", false))
+			Vars.profile = true;
+		if(Mindustry.args.contains("-debugGL", false))
+			Vars.debugGL = true;
 		
 		UCore.log("Total blocks loaded: " + Block.getAllBlocks().size);
 		

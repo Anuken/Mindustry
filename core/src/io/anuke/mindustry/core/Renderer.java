@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.FloatArray;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
@@ -39,6 +40,8 @@ public class Renderer extends RendererModule{
 	int targetscale = baseCameraScale;
 	int chunksize = 32;
 	Cache[][] floorCache;
+	FloatArray shieldHits = new FloatArray();
+	float shieldHitDuration = 18f;
 
 	public Renderer() {
 		Core.cameraScale = baseCameraScale;
@@ -127,6 +130,10 @@ public class Renderer extends RendererModule{
 			drawDefault();
 
 			Profiler.end("draw");
+			if(Profiler.updating())
+				Profiler.getTimes().put("draw", Profiler.getTimes().get("draw") 
+						- Profiler.getTimes().get("blockDraw") 
+						- Profiler.getTimes().get("entityDraw"));
 
 			if(Vars.debug && Vars.debugGL && Timers.get("profile", 60)){
 				UCore.log("shaders: " + GLProfiler.shaderSwitches, "calls: " + GLProfiler.drawCalls, "bindings: " + GLProfiler.textureBindings, "vertices: " + GLProfiler.vertexCount.average);
@@ -195,11 +202,26 @@ public class Renderer extends RendererModule{
 	}
 
 	void drawShield(){
+		for(int i = 0; i < shieldHits.size/3; i ++){
+			//float x = hits.get(i*3+0);
+			//float y = hits.get(i*3+1);
+			float time = shieldHits.get(i*3+2);
+			
+			time += Timers.delta() / shieldHitDuration;
+			shieldHits.set(i*3 + 2, time);
+			
+			if(time >= 1f){
+				shieldHits.removeRange(i*3, i*3 + 2);
+				i --;
+			}
+		}
+		
 		Texture texture = Graphics.getSurface("shield").texture();
 		Shaders.shield.color.set(Color.SKY);
 
 		Tmp.tr2.setRegion(texture);
 		Shaders.shield.region = Tmp.tr2;
+		Shaders.shield.hits = shieldHits;
 
 		Graphics.end();
 		Graphics.shader(Shaders.shield);
@@ -210,6 +232,10 @@ public class Renderer extends RendererModule{
 		Graphics.shader();
 		Graphics.end();
 		Graphics.beginCam();
+	}
+	
+	public void addShieldHit(float x, float y){
+		shieldHits.addAll(x, y, 0f);
 	}
 
 	void renderTiles(){

@@ -1,7 +1,10 @@
 package io.anuke.mindustry.entities.effect;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Interpolation;
 
+import io.anuke.mindustry.entities.Bullet;
+import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.defense.ShieldBlock;
 import io.anuke.ucore.core.Draw;
@@ -14,6 +17,8 @@ import io.anuke.ucore.util.Mathf;
 
 public class Shield extends Entity{
 	public boolean active;
+	public boolean hitPlayers = true;
+	
 	private float uptime = 0f;
 	private final Tile tile;
 	//TODO
@@ -30,11 +35,14 @@ public class Shield extends Entity{
 	
 	@Override
 	public void update(){
+		float alpha = 0.1f;
+		Interpolation interp = Interpolation.fade;
+		
 		if(active){
-			uptime += Timers.delta() / 90f;
+			uptime = interp.apply(uptime, 1f, alpha * Timers.delta());
 		}else{
-			uptime -= Timers.delta() / 60f;
-			if(uptime < 0)
+			uptime = interp.apply(uptime, 0f, alpha * Timers.delta());
+			if(uptime <= 0.05f)
 				remove();
 		}
 		uptime = Mathf.clamp(uptime);
@@ -46,14 +54,14 @@ public class Shield extends Entity{
 		
 		ShieldBlock block = (ShieldBlock)tile.block();
 		
-		Entities.getNearby(x, y, block.shieldRadius * 2*uptime + 10, entity->{
-			if(entity instanceof BulletEntity){
-				BulletEntity bullet = (BulletEntity)entity;
+		Entities.getNearby(Entities.getGroup(Bullet.class), x, y, block.shieldRadius * 2*uptime + 10, entity->{
+			BulletEntity bullet = (BulletEntity)entity;
+			if((bullet.owner instanceof Enemy || hitPlayers)){
 				
 				float dst =  entity.distanceTo(this);
 				
-				if(Math.abs(dst - block.shieldRadius) < 2){
-					bullet.velocity.scl(-1);
+				if(dst  < drawRadius()/2f){
+					((ShieldBlock)tile.block()).handleBullet(tile, bullet);
 				}
 			}
 		});
@@ -65,10 +73,7 @@ public class Shield extends Entity{
 			return;
 		}
 		
-		ShieldBlock block = (ShieldBlock)tile.block();
-		
-		float rad = block.shieldRadius*2 + Mathf.sin(Timers.time(), 25f, 2f);
-		rad *= uptime;
+		float rad = drawRadius();
 		
 		Graphics.surface("shield", false);
 		Draw.color(Color.ROYAL);
@@ -76,6 +81,11 @@ public class Shield extends Entity{
 		Draw.rect("circle2", x, y, rad, rad);
 		Draw.reset();
 		Graphics.surface();
+	}
+	
+	float drawRadius(){
+		ShieldBlock block = (ShieldBlock)tile.block();
+		return (block.shieldRadius*2 + Mathf.sin(Timers.time(), 25f, 2f)) * uptime;
 	}
 	
 	public void removeDelay(){

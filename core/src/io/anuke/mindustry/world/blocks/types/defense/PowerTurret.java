@@ -41,6 +41,12 @@ public class PowerTurret extends Turret implements PowerAcceptor{
 		Draw.dashcircle(tile.worldx() + offset.x, tile.worldy() + offset.y, range);
 		Draw.reset();
 		
+		drawPowerBar(tile);
+	}
+	
+	public void drawPowerBar(Tile tile){
+		Vector2 offset = getPlaceOffset();
+		
 		PowerTurretEntity entity = tile.entity();
 		
 		float fract = (float)entity.power / powerCapacity;

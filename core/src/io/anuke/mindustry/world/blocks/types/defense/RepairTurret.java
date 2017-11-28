@@ -36,7 +36,9 @@ public class RepairTurret extends PowerTurret{
 	
 	@Override
 	public void update(Tile tile){
-		TurretEntity entity = tile.entity();
+		PowerTurretEntity entity = tile.entity();
+		
+		if(entity.power < powerUsed) return;
 		
 		if(Timers.get(entity, "blocktarget", targetInterval)){
 			entity.blockTarget = Vars.world.findTileTarget(tile.worldx(), tile.worldy(), tile, range, true);
@@ -51,6 +53,8 @@ public class RepairTurret extends PowerTurret{
 				
 				if(entity.blockTarget.health > entity.blockTarget.health)
 					entity.blockTarget.health = entity.blockTarget.maxhealth;
+				
+				entity.power -= powerUsed;
 			}
 		}
 	}
@@ -60,6 +64,8 @@ public class RepairTurret extends PowerTurret{
 		Draw.color("green");
 		Draw.dashcircle(tile.worldx(), tile.worldy(), range);
 		Draw.reset();
+		
+		drawPowerBar(tile);
 	}
 	
 	@Override
