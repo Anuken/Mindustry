@@ -156,7 +156,7 @@ public class HudFragment implements Fragment{
 						atop();
 						aleft();
 						new label((StringSupplier)()->Profiler.formatDisplayTimes());
-					}}.width(400f).end();
+					}}.width(400f).units(Unit.dp).end();
 				}}.end();
 			}
 		}

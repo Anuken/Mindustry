@@ -32,6 +32,7 @@ import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.Window.WindowStyle;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.Profiler;
 
 public class UI extends SceneModule{
 	Table loadingtable, desctable, configtable;
@@ -132,7 +133,8 @@ public class UI extends SceneModule{
 
 	@Override
 	public void update(){
-
+		Profiler.begin("ui");
+		
 		if(nplay.visible()){
 			scene.getBatch().getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 			scene.getBatch().begin();
@@ -143,6 +145,8 @@ public class UI extends SceneModule{
 		}
 		
 		super.update();
+		
+		Profiler.end("ui");
 	}
 
 	@Override

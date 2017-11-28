@@ -86,7 +86,7 @@ public class Generator extends PowerBlock{
 		}
 			
 		for(int i = 0; i < laserDirections; i++){
-			drawLaserTo(tile, (tile.rotation + i) - laserDirections/2);
+			drawLaserTo(tile, (tile.getRotation() + i) - laserDirections/2);
 		}
 	}
 	
@@ -99,7 +99,7 @@ public class Generator extends PowerBlock{
 		PowerEntity entity = tile.entity();
 
 		for(int i = 0; i < laserDirections; i++){
-			Tile target = laserTarget(tile, (tile.rotation + i) - laserDirections/2);
+			Tile target = laserTarget(tile, (tile.getRotation() + i) - laserDirections/2);
 			
 			if(target == null) continue;
 			

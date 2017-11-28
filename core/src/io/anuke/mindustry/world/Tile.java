@@ -15,14 +15,15 @@ import io.anuke.ucore.util.Mathf;
 public class Tile{
 	private static final Array<Tile> tmpArray = new Array<>();
 	
-	private Block floor = Blocks.air;
-	private Block block = Blocks.air;
+	/**Packed block data. Left is floor, right is block.*/
+	private short blocks;
+	/**Packed data. Left is rotation, right is dump.*/
+	private short data;
 	/**The coordinates of the core tile this is linked to, in the form of two bytes packed into one.
 	 * This is relative to the block it is linked to; negate coords to find the link.*/
 	public byte link = 0;
-	public TileEntity entity;
 	public short x, y;
-	public byte rotation, dump;
+	public TileEntity entity;
 	
 	public Tile(int x, int y){
 		this.x = (short)x;
@@ -31,7 +32,25 @@ public class Tile{
 	
 	public Tile(int x, int y, Block floor){
 		this(x, y);
-		this.floor = floor;
+		iSetFloor(floor);
+	}
+	
+	private void iSetFloor(Block floor){
+		byte id = (byte)floor.id;
+		blocks = Bits.packShort(id, getWallID());
+	}
+	
+	private void iSetBlock(Block wall){
+		byte id = (byte)wall.id;
+		blocks = Bits.packShort(getFloorID(), id);
+	}
+	
+	public byte getWallID(){
+		return Bits.getRightByte(blocks);
+	}
+	
+	public byte getFloorID(){
+		return Bits.getLeftByte(blocks);
 	}
 	
 	public int relativeTo(int cx, int cy){
@@ -74,46 +93,68 @@ public class Tile{
 	}
 	
 	public Block floor(){
-		return floor;
+		return Block.getByID(getFloorID());
 	}
 	
 	public Block block(){
-		return block;
+		return Block.getByID(getWallID());
 	}
 	
 	/**Returns the breaktime of the block, <i>or</i> the breaktime of the linked block, if this tile is linked.*/
 	public float getBreakTime(){
-		return link == 0 ? block.breaktime : getLinked().block.breaktime;
+		Block block = block();
+		return link == 0 ? block.breaktime : getLinked().block().breaktime;
 	}
 	
 	public void setBlock(Block type, int rotation){
 		if(rotation < 0) rotation = (-rotation + 2);
 		rotation %= 4;
-		this.block = type;
-		this.rotation = (byte)rotation;
+		iSetBlock(type);
+		setRotation((byte)rotation);
 		this.link = 0;
 		changed();
 	}
 	
 	public void setBlock(Block type){
-		this.block = type;
+		iSetBlock(type);
 		this.link = 0;
 		changed();
 	}
 	
 	public void setFloor(Block type){
-		this.floor = type;
+		iSetFloor(type);
+	}
+	
+	public void setRotation(byte rotation){
+		data = Bits.packShort(rotation, getDump());
+	}
+	
+	public void setDump(byte dump){
+		data = Bits.packShort(getRotation(), dump);
+	}
+	
+	public byte getRotation(){
+		return Bits.getLeftByte(data);
+	}
+	
+	public byte getDump(){
+		return Bits.getRightByte(data);
 	}
 	
 	public boolean passable(){
+		Block block = block();
+		Block floor = floor();
 		return isLinked() || !(floor.solid || (block.solid && (!block.destructible && !block.update)));
 	}
 	
 	public boolean solid(){
+		Block block = block();
+		Block floor = floor();
 		return block.solid || floor.solid;
 	}
 	
 	public boolean breakable(){
+		Block block = block();
 		if(link == 0){
 			return (block.destructible || block.breakable || block.update);
 		}else{
@@ -134,6 +175,7 @@ public class Tile{
 	/**Returns the list of all tiles linked to this multiblock, or an empty array if it's not a multiblock.
 	 * This array contains all linked tiles, including this tile itself.*/
 	public Array<Tile> getLinkedTiles(){
+		Block block = block();
 		tmpArray.clear();
 		if(!(block.width == 1 && block.height == 1)){
 			int offsetx = -(block.width-1)/2;
@@ -169,6 +211,8 @@ public class Tile{
 			entity = null;
 		}
 		
+		Block block = block();
+		
 		if(block.destructible || block.update){
 			entity = block.getEntity().init(this, block.update);
 		}
@@ -176,6 +220,9 @@ public class Tile{
 	
 	@Override
 	public String toString(){
+		Block block = block();
+		Block floor = floor();
+		
 		return floor.name() + ":" + block.name() + 
 				(link != 0 ? " link=[" + (Bits.getLeftByte(link) - 8) + ", " + (Bits.getRightByte(link) - 8) +  "]" : "");
 	}

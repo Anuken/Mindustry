@@ -12,6 +12,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Mathf;
 
 public class LiquidBlock extends Block implements LiquidAcceptor{
 	protected float liquidCapacity = 10f;
@@ -34,16 +35,16 @@ public class LiquidBlock extends Block implements LiquidAcceptor{
 	public void draw(Tile tile){
 		LiquidEntity entity = tile.entity();
 		
-		Draw.rect(name() + "bottom", tile.worldx(), tile.worldy(), tile.rotation * 90);
+		Draw.rect(name() + "bottom", tile.worldx(), tile.worldy(), tile.getRotation() * 90);
 		
 		if(entity.liquid != null && entity.liquidAmount > 0.01f){
 			Draw.color(entity.liquid.color);
 			Draw.alpha(entity.liquidAmount / liquidCapacity);
-			Draw.rect("conduitliquid", tile.worldx(), tile.worldy(), tile.rotation * 90);
+			Draw.rect("conduitliquid", tile.worldx(), tile.worldy(), tile.getRotation() * 90);
 			Draw.color();
 		}
 		
-		Draw.rect(name() + "top", tile.worldx(), tile.worldy(), tile.rotation * 90);
+		Draw.rect(name() + "top", tile.worldx(), tile.worldy(), tile.getRotation() * 90);
 		
 	}
 	
@@ -57,7 +58,7 @@ public class LiquidBlock extends Block implements LiquidAcceptor{
 		LiquidEntity entity = tile.entity();
 		
 		if(entity.liquidAmount > 0.01f && Timers.get(entity, "flow", 3)){
-			tryMoveLiquid(tile, tile.getNearby()[tile.rotation]);
+			tryMoveLiquid(tile, tile.getNearby()[tile.getRotation()]);
 		}
 		
 	}
@@ -66,9 +67,8 @@ public class LiquidBlock extends Block implements LiquidAcceptor{
 		LiquidEntity entity = tile.entity();
 		
 		if(entity.liquidAmount > 0.01f){
-			tryMoveLiquid(tile, tile.getNearby()[tile.dump]);
-			tile.dump ++;
-			tile.dump %= 4;
+			tryMoveLiquid(tile, tile.getNearby()[tile.getDump()]);
+			tile.setDump((byte)Mathf.mod(tile.getDump() + 1, 4));
 		}
 	}
 	

@@ -68,9 +68,9 @@ import io.anuke.ucore.entities.Entities;
  * Amount of tiles (int)
  * (tile list)
  *   Tile position, as a single integer, in the format x+y*width
- *   Tile link - byte
+ *   Tile link - (byte)
  *   Tile type (boolean)- whether the block has a tile entity attached
- *   Block ID - the block ID
+ *   Block ID - the block ID (byte)
  *   (the following only applies to tile entity blocks)
  *   Block rotation (byte)
  *   Block health (int)
@@ -263,7 +263,7 @@ public class SaveIO{
 						stream.writeInt(tile.block().id); //block ID
 						
 						if(tile.entity != null){
-							stream.writeByte(tile.rotation); //rotation
+							stream.writeByte(tile.getRotation()); //rotation
 							stream.writeInt(tile.entity.health); //health
 							stream.writeByte(tile.entity.items.size); //amount of items
 							
@@ -413,7 +413,7 @@ public class SaveIO{
 					int items = stream.readByte();
 					
 					tile.entity.health = health;
-					tile.rotation = rotation;
+					tile.setRotation(rotation);
 					
 					for(int j = 0; j < items; j ++){
 						int itemid = stream.readByte();

@@ -22,12 +22,11 @@ public class LiquidRouter extends LiquidBlock{
 		LiquidEntity entity = tile.entity();
 		
 		if(Timers.get(tile, "dump", 2) && entity.liquidAmount > 0){
-			if(lastmap.get(tile, (byte)-1) != tile.rotation){
-				tryMoveLiquid(tile, tile.getNearby()[tile.rotation]);
+			if(lastmap.get(tile, (byte)-1) != tile.getRotation()){
+				tryMoveLiquid(tile, tile.getNearby()[tile.getRotation()]);
 			}
 			
-			tile.rotation ++;
-			tile.rotation %= 4;
+			tile.setRotation((byte)((tile.getRotation() + 1) % 4));
 		}
 	}
 	

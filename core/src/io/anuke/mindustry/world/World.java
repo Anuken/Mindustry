@@ -20,6 +20,7 @@ import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Profiler;
 import io.anuke.ucore.util.Tmp;
 
 public class World extends Module{
@@ -38,7 +39,9 @@ public class World extends Module{
 	
 	@Override
 	public void update(){
+		Profiler.begin("pathfind");
 		pathfind.update();
+		Profiler.end("pathfind");
 	}
 	
 	@Override
@@ -223,8 +226,7 @@ public class World extends Module{
 		if(tile == null)
 			return;
 
-		tile.setBlock(result);
-		tile.rotation = (byte)rotation;
+		tile.setBlock(result, rotation);
 		
 		if(result.isMultiblock()){
 			int offsetx = -(result.width-1)/2;

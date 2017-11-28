@@ -127,8 +127,8 @@ public class Block{
 	 * Tries to put this item into a nearby container, if there are no available
 	 * containers, it gets added to the block's inventory.*/
 	protected void offloadNear(Tile tile, Item item){
-		int i = tile.dump;
-		int pdump = tile.dump;
+		byte i = tile.getDump();
+		byte pdump = tile.getDump();
 		
 		Tile[] tiles = tile.getNearby();
 		
@@ -136,16 +136,16 @@ public class Block{
 			Tile other = tiles[i];
 			if(other != null && other.block().acceptItem(item, other, tile)
 					//don't output to things facing this thing
-					&& !(other.block().rotate && (other.rotation + 2) % 4 == i)){
+					&& !(other.block().rotate && (other.getRotation() + 2) % 4 == i)){
 				
 				other.block().handleItem(item, other, tile);
-				tile.dump = (byte)((i+1)%4);
+				tile.setDump((byte)((i+1)%4));
 				return;
 			}
 			i++;
 			i %= 4;
 		}
-		tile.dump = (byte)pdump;
+		tile.setDump((byte)pdump);
 		handleItem(item, tile, tile);
 	}
 
@@ -158,7 +158,7 @@ public class Block{
 	 * Try dumping any item near the tile. -1 = any direction
 	 */
 	protected boolean tryDump(Tile tile, int direction, Item todump){
-		int i = tile.dump;
+		int i = tile.getDump();
 		
 		Tile[] tiles = tile.getNearby();
 		
@@ -172,10 +172,10 @@ public class Block{
 					
 					if(tile.entity.hasItem(item) && other != null && other.block().acceptItem(item, other, tile) &&
 					//don't output to things facing this thing
-							!(other.block().rotate && (other.rotation + 2) % 4 == i)){
+							!(other.block().rotate && (other.getRotation() + 2) % 4 == i)){
 						other.block().handleItem(item, other, tile);
 						tile.entity.removeItem(item, 1);
-						tile.dump = (byte)((i+1)%4);
+						tile.setDump((byte)((i+1)%4));
 						return true;
 					}
 				}
@@ -190,7 +190,7 @@ public class Block{
 	 * Try offloading an item to a nearby container. Returns true if success.
 	 */
 	protected boolean offloadDir(Tile tile, Item item){
-		Tile other = tile.getNearby()[tile.rotation];
+		Tile other = tile.getNearby()[tile.getRotation()];
 		if(other != null && other.block().acceptItem(item, other, tile)){
 			other.block().handleItem(item, other, tile);
 			//other.entity.addCovey(item, ch == 1 ? 0.5f : ch ==2 ? 1f : 0f);
@@ -207,7 +207,7 @@ public class Block{
 		//note: multiblocks do not support rotation
 		if(!isMultiblock()){
 			Draw.rect(variants > 0 ? (name() + Mathf.randomSeed(tile.id(), 1, variants))  : name(), 
-					tile.worldx(), tile.worldy(), rotate ? tile.rotation * 90 : 0);
+					tile.worldx(), tile.worldy(), rotate ? tile.getRotation() * 90 : 0);
 		}else{
 			//if multiblock, make sure to draw even block sizes offset, since the core block is at the BOTTOM LEFT
 			Vector2 offset = getPlaceOffset();

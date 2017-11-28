@@ -81,10 +81,9 @@ public class Pathfind{
 	}
 	
 	public void update(){
-		
 		for(SpawnPoint point : Vars.control.getSpawnPoints()){
 			if(!point.request.pathFound){
-				if(point.finder.search(point.request, ms)){
+				if(point.finder.search(point.request, ms * 2)){
 					smoother.smoothPath(point.path);
 					point.pathTiles = point.path.nodes.toArray(Tile.class);
 				}

@@ -77,7 +77,7 @@ public class Tutorial{
 		if(stage.showBlock){
 			Tile tile = world.tile(control.core.x + stage.blockPlaceX, control.core.y + stage.blockPlaceY);
 			
-			if(tile.block() == stage.targetBlock && (tile.rotation == stage.blockRotation || stage.blockRotation == -1)){
+			if(tile.block() == stage.targetBlock && (tile.getRotation() == stage.blockRotation || stage.blockRotation == -1)){
 				move(true);
 			}
 		}

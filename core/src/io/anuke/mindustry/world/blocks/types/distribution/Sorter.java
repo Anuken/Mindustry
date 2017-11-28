@@ -73,14 +73,14 @@ public class Sorter extends Junction implements Configurable{
 			}else if(bc && !ac){
 				to = b;
 			}else{
-				if(dest.dump == 0){
+				if(dest.getDump() == 0){
 					to = a;
 					if(flip)
-						dest.dump = 1;
+						dest.setDump((byte)1);
 				}else{
 					to = b;
 					if(flip)
-						dest.dump = 0;
+						dest.setDump((byte)0);
 				}
 			}
 		}

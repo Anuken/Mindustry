@@ -16,7 +16,7 @@ public class LiquidItemJunction extends LiquidBlock{
 	
 	@Override
 	public void draw(Tile tile){
-		Draw.rect(name(), tile.worldx(), tile.worldy(), tile.rotation * 90);
+		Draw.rect(name(), tile.worldx(), tile.worldy(), tile.getRotation() * 90);
 	}
 	
 	@Override

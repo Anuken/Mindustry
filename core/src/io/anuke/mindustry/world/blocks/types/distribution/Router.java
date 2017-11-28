@@ -35,13 +35,12 @@ public class Router extends Block{
 	@Override
 	public void update(Tile tile){
 		if(Timers.get(tile, "dump", 2) && tile.entity.totalItems() > 0){
-			if(lastmap.get(tile, (byte)-1) != tile.rotation 
+			if(lastmap.get(tile, (byte)-1) != tile.getRotation() 
 					|| Mathf.chance(0.3)){ //sometimes dump backwards at a 1/4 chance... this somehow works?
-				tryDump(tile, tile.rotation, null);
+				tryDump(tile, tile.getRotation(), null);
 			}
 			
-			tile.rotation ++;
-			tile.rotation %= 4;
+			tile.setRotation((byte)((tile.getRotation() + 1) % 4));
 		}
 	}
 	

@@ -3,6 +3,7 @@ package io.anuke.mindustry.world;
 public enum Map{
 	delta("Starting map."), 
 	pit("Eck."), 
+	canyon("the canyon"),
 	maze("it's okay."),
 	volcano("desc"),
 	tutorial(false), 

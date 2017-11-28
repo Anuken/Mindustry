@@ -447,7 +447,8 @@ public class Renderer extends RendererModule{
 			drawHealth(entity);
 		}
 		
-		drawHealth(player);
+		if(!Vars.android)
+			drawHealth(player);
 	}
 	
 	void drawHealth(DestructibleEntity dest){

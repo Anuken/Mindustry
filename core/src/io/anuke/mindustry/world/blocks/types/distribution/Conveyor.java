@@ -47,14 +47,16 @@ public class Conveyor extends Block{
 	public void draw(Tile tile){
 		ConveyorEntity entity = tile.entity();
 		
+		byte rotation = tile.getRotation();
+		
 		Draw.rect(name() + 
-				(Timers.time() % ((20 / 100f) / speed) < (10 / 100f) / speed && acceptItem(Item.stone, tile, null) ? "" : "move"), tile.worldx(), tile.worldy(), tile.rotation * 90);
+				(Timers.time() % ((20 / 100f) / speed) < (10 / 100f) / speed && acceptItem(Item.stone, tile, null) ? "" : "move"), tile.worldx(), tile.worldy(), rotation * 90);
 		
 		for(int i = 0; i < entity.convey.size; i ++){
 			ItemPos pos = pos1.set(entity.convey.get(i));
 			
-			Tmp.v1.set(tilesize, 0).rotate(tile.rotation * 90);
-			Tmp.v2.set(-tilesize / 2, pos.x*tilesize/2).rotate(tile.rotation * 90);
+			Tmp.v1.set(tilesize, 0).rotate(rotation * 90);
+			Tmp.v2.set(-tilesize / 2, pos.x*tilesize/2).rotate(rotation * 90);
 			
 			Draw.rect("icon-" + pos.item.name(), 
 					tile.x * tilesize + Tmp.v1.x * pos.y + Tmp.v2.x, 
@@ -115,7 +117,7 @@ public class Conveyor extends Block{
 
 	@Override
 	public boolean acceptItem(Item item, Tile dest, Tile source){
-		int direction = source == null ? 0 : Math.abs(source.relativeTo(dest.x, dest.y) - dest.rotation);
+		int direction = source == null ? 0 : Math.abs(source.relativeTo(dest.x, dest.y) - dest.getRotation());
 		float minitem = dest.<ConveyorEntity>entity().minitem;
 		return ((direction == 0) && minitem > 0.05f) || 
 				((direction %2 == 1) && minitem > 0.5f);
@@ -123,8 +125,10 @@ public class Conveyor extends Block{
 
 	@Override
 	public void handleItem(Item item, Tile tile, Tile source){
-		int ch = Math.abs(source.relativeTo(tile.x, tile.y) - tile.rotation);
-		int ang = ((source.relativeTo(tile.x, tile.y) - tile.rotation));
+		byte rotation = tile.getRotation();
+		
+		int ch = Math.abs(source.relativeTo(tile.x, tile.y) - rotation);
+		int ang = ((source.relativeTo(tile.x, tile.y) - rotation));
 		
 
 		float pos = ch == 0 ? 0 : ch % 2 == 1 ? 0.5f : 1f;

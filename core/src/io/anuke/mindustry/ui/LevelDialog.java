@@ -29,6 +29,7 @@ public class LevelDialog extends FloatingDialog{
 		addCloseButton();
 		Table maps = new Table();
 		ScrollPane pane = new ScrollPane(maps);
+		pane.setFadeScrollBars(false);
 		
 		int maxwidth = 4;
 		
@@ -75,6 +76,8 @@ public class LevelDialog extends FloatingDialog{
 			});
 			image.getImageCell().size(images).units(Unit.dp);
 			maps.add(image).width(170).pad(4f).units(Unit.dp);
+			
+			maps.padRight(Unit.dp.inPixels(26));
 		}
 		
 		content().add(pane).uniformX();
