@@ -48,12 +48,15 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 		
 		if(entity.liquid == null) return;
 		
-		Vector2 offset = getPlaceOffset();
-		
 		Draw.color(entity.liquid.color);
 		Draw.alpha(entity.liquidAmount / liquidCapacity);
-		Draw.rect("blank", tile.worldx() + offset.x, tile.worldy() + offset.y, 2, 2);
+		drawLiquidCenter(tile);
 		Draw.color();
+	}
+	
+	public void drawLiquidCenter(Tile tile){
+		Vector2 offset = getPlaceOffset();
+		Draw.rect("black", tile.worldx() + offset.x, tile.worldy() + offset.y, 2, 2);
 	}
 	
 	@Override

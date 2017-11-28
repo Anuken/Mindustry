@@ -38,7 +38,9 @@ public class RepairTurret extends PowerTurret{
 	public void update(Tile tile){
 		PowerTurretEntity entity = tile.entity();
 		
-		if(entity.power < powerUsed) return;
+		if(entity.power < powerUsed){
+			return;
+		}
 		
 		if(Timers.get(entity, "blocktarget", targetInterval)){
 			entity.blockTarget = Vars.world.findTileTarget(tile.worldx(), tile.worldy(), tile, range, true);
@@ -70,9 +72,9 @@ public class RepairTurret extends PowerTurret{
 	
 	@Override
 	public void drawOver(Tile tile){
-		TurretEntity entity = tile.entity();
+		PowerTurretEntity entity = tile.entity();
 		
-		if(entity.blockTarget != null && Angles.angleDist(entity.angleTo(entity.blockTarget), entity.rotation) < 10){
+		if(entity.power >= powerUsed && entity.blockTarget != null && Angles.angleDist(entity.angleTo(entity.blockTarget), entity.rotation) < 10){
 			Tile targetTile = entity.blockTarget.tile;
 			Vector2 offset = targetTile.block().getPlaceOffset();
 			float x = tile.worldx(), y = tile.worldy();

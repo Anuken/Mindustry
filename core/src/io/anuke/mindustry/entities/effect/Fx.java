@@ -26,6 +26,33 @@ public class Fx{
 		});
 	}),
 	
+	reactorsmoke = new Effect(17, e -> {
+		Angles.randLenVectors(e.id, 4, e.ifract()*8f, (x, y)->{
+			float size = 1f+e.fract()*5f;
+			Draw.color(Color.LIGHT_GRAY, Color.GRAY, e.ifract());
+			Draw.rect("circle", e.x + x, e.y + y, size, size);
+			Draw.reset();
+		});
+	}),
+	
+	nuclearsmoke = new Effect(40, e -> {
+		Angles.randLenVectors(e.id, 4, e.ifract()*13f, (x, y)->{
+			float size = e.sfract()*4f;
+			Draw.color(Color.LIGHT_GRAY, Color.GRAY, e.ifract());
+			Draw.rect("circle", e.x + x, e.y + y, size, size);
+			Draw.reset();
+		});
+	}),
+	
+	nuclearcloud = new Effect(90, e -> {
+		Angles.randLenVectors(e.id, 10, e.powfract()*90f, (x, y)->{
+			float size = e.fract()*14f;
+			Draw.color(Color.LIME, Color.GRAY, e.ifract());
+			Draw.rect("circle", e.x + x, e.y + y, size, size);
+			Draw.reset();
+		});
+	}),
+	
 	chainshot = new Effect(9f, e -> {
 		Draw.color(Color.WHITE, lightOrange, e.ifract());
 		Draw.thick(e.fract()*4f);
@@ -83,6 +110,13 @@ public class Fx{
 		Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.ifract());
 		Draw.thick(e.fract()*2f + 0.2f);
 		Draw.circle(e.x, e.y, e.ifract()*28f);
+		Draw.reset();
+	}),
+	
+	nuclearShockwave = new Effect(10f, e -> {
+		Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.ifract());
+		Draw.thick(e.fract()*3f + 0.2f);
+		Draw.polygon(40, e.x, e.y, e.ifract()*140f);
 		Draw.reset();
 	}),
 	

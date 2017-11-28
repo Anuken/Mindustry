@@ -17,7 +17,7 @@ import io.anuke.ucore.util.Mathf;
 
 public class Shield extends Entity{
 	public boolean active;
-	public boolean hitPlayers = true;
+	public boolean hitPlayers = false;
 	
 	private float uptime = 0f;
 	private final Tile tile;

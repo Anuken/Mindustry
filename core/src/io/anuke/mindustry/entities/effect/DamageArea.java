@@ -3,6 +3,7 @@ package io.anuke.mindustry.entities.effect;
 import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.Entities;
@@ -10,6 +11,15 @@ import io.anuke.ucore.util.Mathf;
 
 //TODO
 public class DamageArea{
+	
+	public static void damageEntities(float x, float y, float radius, int damage){
+		damage(true, x, y, radius, damage);
+		if(!Vars.android){
+			Player player = Vars.player;
+			int amount = calculateDamage(x, y, player.x, player.y, radius, damage);
+			player.damage(amount);
+		}
+	}
 	
 	public static void damage(boolean enemies, float x, float y, float radius, int damage){
 		
@@ -34,6 +44,12 @@ public class DamageArea{
 						tile.entity.damage(amount);
 					}
 				}
+			}
+			
+			if(!Vars.android){
+				Player player = Vars.player;
+				int amount = calculateDamage(x, y, player.x, player.y, radius, damage);
+				player.damage(amount);
 			}
 		}
 	}

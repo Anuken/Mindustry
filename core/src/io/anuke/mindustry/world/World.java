@@ -339,6 +339,19 @@ public class World extends Module{
 		}
 	}
 	
+	public void removeBlock(Tile tile){
+		if(!tile.block().isMultiblock() && !tile.isLinked()){
+			tile.setBlock(Blocks.air);
+		}else{
+			Tile target = tile.isLinked() ? tile.getLinked() : tile;
+			Array<Tile> removals = target.getLinkedTiles();
+			for(Tile toremove : removals){
+				//note that setting a new block automatically unlinks it
+				toremove.setBlock(Blocks.air);
+			}
+		}
+	}
+	
 	public boolean validBreak(int x, int y){
 		Tile tile = tile(x, y);
 		

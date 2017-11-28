@@ -257,20 +257,14 @@ public class ProductionBlocks{
 			fullDescription = "Generates small amounts of power from the radioactive decay of uranium. Outputs power as lasers to its 4 sides.";
 		}
 	},
-	nuclearReactor = new LiquidItemPowerGenerator("nuclearreactor"){
+	nuclearReactor = new NuclearReactor("nuclearreactor"){
 		{
 			//TODO
 			formalName = "nuclear reactor";
 			width = 3;
 			height = 3;
-			generateLiquid = Liquid.water;
-			generateItem = Item.uranium;
-			itemCapacity = 60;
-			itemInput = 6;
-			inputLiquid = 2f;
-			health = 500;
-			breaktime *= 2.2f;
-			powerCapacity = 100f;
+			health = 600;
+			breaktime *= 2.3f;
 			description = "Generates power from uranium + water.";
 			fullDescription = "The ultimate power generator. Highly volatile. Generates power from uranium. Requires constant cooling in the form of water. "
 					+ "Will explode violently if insufficient amounts of coolant are supplied. ";

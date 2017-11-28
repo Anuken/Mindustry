@@ -44,7 +44,7 @@ public class DistributionBlocks{
 	
 	//TODO
 	pulseconveyor = new Conveyor("poweredconveyor"){{
-		health = 90;
+		health = 75;
 		speed = 0.09f;
 		description = "Moves items even faster.";
 		formalName = "pulse conveyor";

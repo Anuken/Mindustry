@@ -12,7 +12,6 @@ import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.mindustry.world.blocks.types.Wall;
 import io.anuke.ucore.core.Effects;
@@ -63,11 +62,8 @@ public class TileEntity extends Entity{
 		Block block = tile.block();
 		
 		block.onDestroyed(tile);
-		for(Tile other : tile.getLinkedTiles()){
-			other.setBlock(Blocks.air);
-		}
 		
-		tile.setBlock(Blocks.air);
+		Vars.world.removeBlock(tile);
 	}
 	
 	public void collision(Bullet other){
@@ -103,6 +99,10 @@ public class TileEntity extends Entity{
 			sum += items.get(item, 0);
 		}
 		return sum;
+	}
+	
+	public int getItem(Item item){
+		return items.get(item, 0);
 	}
 	
 	public boolean hasItem(Item item){

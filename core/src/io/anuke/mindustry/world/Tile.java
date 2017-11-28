@@ -73,7 +73,7 @@ public class Tile{
 				if(dst > rad || (dx == 0 && dy == 0)) continue;
 				
 				Tile other = Vars.world.tile(x + dx, y + dy);
-				if(other.entity != null){
+				if(other != null && other.entity != null){
 					other.entity.damage((int)(amount * Mathf.lerp(1f-dst/rad, 1f, falloff)));
 				}
 			}

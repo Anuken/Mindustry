@@ -31,7 +31,7 @@ public class ShieldBlock extends PowerBlock{
 		}
 
 		if(entity.power > powerPerDamage){
-			if(!entity.shield.active && entity.power > powerDrain * Timers.delta() * 10f){
+			if(!entity.shield.active && entity.power > powerPerDamage * 8f){
 				entity.shield.add();
 			}
 

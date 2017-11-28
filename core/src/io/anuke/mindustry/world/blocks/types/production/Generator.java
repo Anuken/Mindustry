@@ -14,9 +14,7 @@ import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Hue;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.*;
 
 public class Generator extends PowerBlock{
 	public static final int powerTime = 2;
@@ -118,13 +116,15 @@ public class Generator extends PowerBlock{
 		Tile target = laserTarget(tile, rotation);
 
 		if(target != null){
+			Tmp.v1.set(Angles.translation(rotation * 90, target.block().width * Vars.tilesize/2 + 2f));
 			Angles.translation(rotation * 90, width * Vars.tilesize/2 + 2f);
 
 			Draw.tint(Hue.mix(Color.GRAY, Color.WHITE, 0.902f + Mathf.sin(Timers.time(), 1.7f, 0.08f)));
 
 			float r = 0f;
 
-			Draw.laser("laser", "laserend", tile.worldx() + Angles.x() + Mathf.range(r), tile.worldy() + Angles.y() + Mathf.range(r), target.worldx() - Angles.x() + Mathf.range(r), target.worldy() - Angles.y() + Mathf.range(r), 0.7f + Mathf.sin(Timers.time(), 2f, 0.1f * 0));
+			Draw.laser("laser", "laserend", tile.worldx() + Angles.x() + Mathf.range(r), tile.worldy() + Angles.y() + Mathf.range(r), 
+					target.worldx() - Tmp.v1.x + Mathf.range(r), target.worldy() - Tmp.v1.y + Mathf.range(r), 0.7f + Mathf.sin(Timers.time(), 2f, 0.1f * 0));
 
 			Draw.color();
 		}

@@ -147,7 +147,6 @@ public class WeaponBlocks{
 			range = 70;
 			reload = 15f;
 			bullet = BulletType.shell;
-			ammo = Item.coal;
 			health = 140;
 			fullDescription = "Advanced multi-target turret. Uses power. Medium range. Never misses."
 					+ "Average to low damage, but can hit multiple enemies simultaneously with chain lighting.";
@@ -189,6 +188,7 @@ public class WeaponBlocks{
 			health = 430;
 			width = height = 2;
 			shootCone = 9f;
+			ammoMultiplier = 8;
 			shots = 2;
 			fullDescription = "The ultimate rapid-fire turret. Uses uranium as ammo. Shoots large slugs at a high fire rate. "
 					+ "Medium range. Spans multiple tiles. Extremely tough.";
@@ -223,7 +223,7 @@ public class WeaponBlocks{
 			bullet = BulletType.titanshell;
 			ammo = Item.uranium;
 			health = 800;
-			ammoMultiplier = 5;
+			ammoMultiplier = 4;
 			width = height = 3;
 			rotatespeed = 0.07f;
 			shootCone = 9f;
