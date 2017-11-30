@@ -14,7 +14,8 @@ public class DamageArea{
 	
 	public static void damageEntities(float x, float y, float radius, int damage){
 		damage(true, x, y, radius, damage);
-		if(!Vars.android){
+		
+		if(!Vars.android && Vars.player.distanceTo(x, y) < radius){
 			Player player = Vars.player;
 			int amount = calculateDamage(x, y, player.x, player.y, radius, damage);
 			player.damage(amount);
@@ -46,7 +47,7 @@ public class DamageArea{
 				}
 			}
 			
-			if(!Vars.android){
+			if(!Vars.android && Vars.player.distanceTo(x, y) < radius){
 				Player player = Vars.player;
 				int amount = calculateDamage(x, y, player.x, player.y, radius, damage);
 				player.damage(amount);

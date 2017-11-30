@@ -36,6 +36,7 @@ public class Enemy extends DestructibleEntity{
 	protected int spawned = 0;
 	protected float angle;
 	protected boolean targetCore = false;
+	protected boolean stopNearCore = true;
 	protected float mass = 1f;
 
 	public int spawn;
@@ -63,7 +64,7 @@ public class Enemy extends DestructibleEntity{
 	void move(){
 		Tile core = Vars.control.getCore();
 		
-		boolean nearCore = distanceTo(core.worldx(), core.worldy()) <= range - 18f;
+		boolean nearCore = distanceTo(core.worldx(), core.worldy()) <= range - 18f && stopNearCore;
 
 		Vector2 vec;
 

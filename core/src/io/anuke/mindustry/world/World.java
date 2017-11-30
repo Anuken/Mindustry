@@ -184,26 +184,28 @@ public class World extends Module{
 	
 	void setDefaultBlocks(){
 		int x = control.getCore().x, y = control.getCore().y;
+		int flip = Mathf.sign(!currentMap.flipBase);
+		int fr = currentMap.flipBase ? 2 : 0;
 		
-		set(x, y-2, DistributionBlocks.conveyor, 1);
-		set(x, y-3, DistributionBlocks.conveyor, 1);
+		set(x, y-2*flip, DistributionBlocks.conveyor, 1 + fr);
+		set(x, y-3*flip, DistributionBlocks.conveyor, 1 + fr);
 		
 		for(int i = 0; i < 2; i ++){
 			int d = Mathf.sign(i-0.5f);
 			
-			set(x+2*d, y-2, ProductionBlocks.stonedrill, d);
-			set(x+2*d, y-1, DistributionBlocks.conveyor, 1);
-			set(x+2*d, y, DistributionBlocks.conveyor, 1);
-			set(x+2*d, y+1, WeaponBlocks.doubleturret, 0);
+			set(x+2*d, y-2*flip, ProductionBlocks.stonedrill, d);
+			set(x+2*d, y-1*flip, DistributionBlocks.conveyor, 1 + fr);
+			set(x+2*d, y, DistributionBlocks.conveyor, 1 + fr);
+			set(x+2*d, y+1*flip, WeaponBlocks.doubleturret, 0 + fr);
 			
-			set(x+1*d, y-3, DistributionBlocks.conveyor, 2*d);
-			set(x+2*d, y-3, DistributionBlocks.conveyor, 2*d);
-			set(x+2*d, y-4, DistributionBlocks.conveyor, 1);
-			set(x+2*d, y-5, DistributionBlocks.conveyor, 1);
+			set(x+1*d, y-3*flip, DistributionBlocks.conveyor, 2*d);
+			set(x+2*d, y-3*flip, DistributionBlocks.conveyor, 2*d);
+			set(x+2*d, y-4*flip, DistributionBlocks.conveyor, 1 + fr);
+			set(x+2*d, y-5*flip, DistributionBlocks.conveyor, 1 + fr);
 			
-			set(x+3*d, y-5, ProductionBlocks.stonedrill, 0);
-			set(x+3*d, y-4, ProductionBlocks.stonedrill, 0);
-			set(x+3*d, y-3, ProductionBlocks.stonedrill, 0);
+			set(x+3*d, y-5*flip, ProductionBlocks.stonedrill, 0 + fr);
+			set(x+3*d, y-4*flip, ProductionBlocks.stonedrill, 0 + fr);
+			set(x+3*d, y-3*flip, ProductionBlocks.stonedrill, 0 + fr);
 		}
 	}
 	

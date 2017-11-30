@@ -87,6 +87,12 @@ public class NuclearReactor extends LiquidItemPowerGenerator{
 	public void onDestroyed(Tile tile){
 		super.onDestroyed(tile);
 		
+		NuclearReactorEntity entity = tile.entity();
+		
+		int fuel = entity.getItem(generateItem);
+		
+		if(fuel < 5) return;
+		
 		int waves = 6;
 		float delay = 8f;
 		

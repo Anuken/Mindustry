@@ -465,7 +465,8 @@ public class Control extends Module{
 				if(Inputs.keyDown(Keys.SHIFT_LEFT)){
 					new HealerEnemy(0).set(player.x, player.y).add();
 				}else{
-					new FortressEnemy(0).set(player.x, player.y).add();
+					float px = player.x, py = player.y;
+					Timers.run(30f, ()->new BlastEnemy(0).set(px, py).add());
 				}
 			}
 		}

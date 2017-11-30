@@ -14,6 +14,7 @@ public class BlastEnemy extends Enemy{
 		bullet = null;
 		turretrotatespeed = 0f;
 		mass = 0.8f;
+		stopNearCore = false;
 		
 		heal();
 	}
