@@ -16,7 +16,7 @@ public class Generator{
 	static final int spawn = Color.rgba8888(Color.RED);
 	static final int start = Color.rgba8888(Color.GREEN);
 	
-	static ObjectMap<Integer, Block> colors = map(
+	public static ObjectMap<Integer, Block> colors = map(
 		Hue.rgb(80, 150, 90), Blocks.grass,
 		Hue.rgb(90, 180, 100), Blocks.grassblock,
 		Hue.rgb(80, 110, 180), Blocks.water,
@@ -24,10 +24,16 @@ public class Generator{
 		Hue.rgb(110, 80, 30), Blocks.dirt,
 		Hue.rgb(160, 120, 70), Blocks.dirtblock,
 		Hue.rgb(100, 100, 100), Blocks.stoneblock,
-		Color.valueOf("414141"), Blocks.blackstoneblock,
+		Color.valueOf("323232"), Blocks.stone,
+		Color.valueOf("575757"), Blocks.blackstoneblock,
 		Color.valueOf("252525"), Blocks.blackstone,
 		Color.valueOf("ed5334"), Blocks.lava,
-		Color.valueOf("292929"), Blocks.oil
+		Color.valueOf("292929"), Blocks.oil,
+		Color.valueOf("e5d8bb"), Blocks.sandblock,
+		Color.valueOf("988a67"), Blocks.sand,
+		Color.valueOf("f7feff"), Blocks.snowblock,
+		Color.valueOf("c2d1d2"), Blocks.snow,
+		Color.valueOf("c4e3e7"), Blocks.ice
 	);
 	
 	/**Returns world size.*/
@@ -61,12 +67,17 @@ public class Generator{
 						block = Blocks.rock;
 					}
 					
+					if(floor == Blocks.snow && Mathf.chance(0.02)){
+						block = Blocks.icerock;
+					}
+					
 					if(floor == Blocks.blackstone && Mathf.chance(0.03)){
 						block = Blocks.blackrock;
 					}
 				}
 				
-				if(floor == Blocks.stone || floor == Blocks.grass || floor == Blocks.blackstone){
+				if(floor == Blocks.stone || floor == Blocks.grass || floor == Blocks.blackstone ||
+						floor == Blocks.snow){
 					if(Noise.nnoise(x, y, 8, 1) > 0.2){
 						floor = Blocks.iron;
 					}
@@ -86,6 +97,10 @@ public class Generator{
 				
 				if(block == Blocks.grassblock){
 					floor = Blocks.grass;
+				}
+				
+				if(block == Blocks.snowblock){
+					floor = Blocks.snow;
 				}
 				
 				if(floor == Blocks.grass && Mathf.chance(0.02) && block == Blocks.air){

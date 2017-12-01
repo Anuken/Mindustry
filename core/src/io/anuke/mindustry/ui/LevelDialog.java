@@ -10,6 +10,7 @@ import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.StringSupplier;
 import io.anuke.ucore.scene.ui.*;
+import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Elements;
@@ -66,6 +67,11 @@ public class LevelDialog extends FloatingDialog{
 			
 			float images = 154f;
 			
+			Stack stack = new Stack();
+			
+			Image back = new Image("white");
+			back.setColor(map.backgroundColor);
+			
 			ImageButton image = new ImageButton(new TextureRegion(Vars.world.getTexture(map)), "togglemap");
 			image.row();
 			image.add(inset).width(images+6).units(Unit.dp);
@@ -75,7 +81,11 @@ public class LevelDialog extends FloatingDialog{
 				Vars.control.playMap(selectedMap);
 			});
 			image.getImageCell().size(images).units(Unit.dp);
-			maps.add(image).width(170).pad(4f).units(Unit.dp);
+			
+			stack.add(back);
+			stack.add(image);
+			
+			maps.add(stack).width(170).pad(4f).units(Unit.dp);
 			
 			maps.padRight(Unit.dp.inPixels(26));
 		}

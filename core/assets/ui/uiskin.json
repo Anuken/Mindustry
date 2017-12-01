@@ -67,8 +67,8 @@ io.anuke.ucore.scene.ui.Label$LabelStyle: {
 	menuitem-shortcut: {font: default-font, fontColor: menuitem }
 },
 io.anuke.ucore.scene.ui.TextField$TextFieldStyle: {
-	default: {font: default-font, fontColor: white, disabledFontColor: grey, selection: selection, background: textfield, cursor: cursor, messageFont: default-font, messageFontColor: grey }
-},
+	default: {font: default-font, fontColor: white, disabledFontColor: grey, selection: selection, background: button, cursor: cursor, messageFont: default-font, messageFontColor: grey }
+}
 io.anuke.ucore.scene.ui.CheckBox$CheckBoxStyle: {
 	default: {checkboxOn: check-on, checkboxOff: check-off, checkboxOver: check-over, font: default-font, fontColor: white, disabledFontColor: grey }
 },

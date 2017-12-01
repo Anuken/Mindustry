@@ -102,36 +102,33 @@ public class Blocks{
 	
 	dirt = new Floor("dirt"),
 	
+	sand = new Floor("sand"),
+	
+	ice = new Floor("ice"),
+	
+	snow = new Floor("snow"),
+	
 	grass = new Floor("grass"),
 	
-	stoneblock = new Block("stoneblock"){
-		{
-			solid = true;
-			variants = 3;
-		}
-		
-		@Override
-		public void draw(Tile tile){
-		//	Draw.colorl(0.9f + Mathf.randomSeed(tile.id()*9999, 1, 10)/10f / 10f);
-			super.draw(tile);
-		//	Draw.color();
-		}
-	},
+	sandblock = new Block("sandblock"){{
+		solid = true;
+		variants = 3;
+	}},
 	
-	blackstoneblock = new Block("blackstoneblock"){
-		{
-			solid = true;
-			variants = 3;
-		}
-		
-		@Override
-		public void draw(Tile tile){
-		//	float f = 0.15f;
-		//	Draw.colorl(1f - f + Mathf.randomSeed(tile.id()*9999, 1, 10)/10f / (1f / f));
-			super.draw(tile);
-		//	Draw.color();
-		}
-	},
+	snowblock = new Block("snowblock"){{
+		solid = true;
+		variants = 3;
+	}},
+	
+	stoneblock = new Block("stoneblock"){{
+		solid = true;
+		variants = 3;
+	}},
+	
+	blackstoneblock = new Block("blackstoneblock"){{
+		solid = true;
+		variants = 3;
+	}},
 	
 	grassblock = new Block("grassblock"){{
 		solid = true;
@@ -149,6 +146,15 @@ public class Blocks{
 	}},
 	
 	rock = new Block("rock"){{
+		shadow = "rockshadow";
+		breakable = true;
+		breaktime = 15;
+		variants = 2;
+		varyShadow = true;
+		drops = new ItemStack(Item.stone, 3);
+	}},
+	
+	icerock = new Block("icerock"){{
 		shadow = "rockshadow";
 		breakable = true;
 		breaktime = 15;

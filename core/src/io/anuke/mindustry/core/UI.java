@@ -81,11 +81,7 @@ public class UI extends SceneModule{
 		
 		TooltipManager.getInstance().animations = false;
 		
-		Settings.setErrorHandler(()->{
-			Timers.run(1f, ()->{
-				settingserror.show();
-			});
-		});
+		Settings.setErrorHandler(()-> Timers.run(1f, ()-> settingserror.show()));
 		
 		Settings.defaults("pixelate", true);
 		
