@@ -3,20 +3,18 @@ package io.anuke.mindustry.world;
 import com.badlogic.gdx.graphics.Color;
 
 public enum Map{
-	delta("Starting map."), 
-	pit("Eck."), 
-	canyon("the canyon"),
-	maze("it's okay."),
-	volcano("desc"),
-	fortress("desc", true),
+	maze("desc"),
+	fortress("desc"),
 	sinkhole("desc"),
-	volcanic("desc"),
-	rooms("desc"),
+	caves("desc"),
+	volcano("desc", true),
+	caldera("desc"),
+	scorch("desc", Color.valueOf("e5d8bb")),
 	desert("desc"),
-	grassland("desc"){{
-		backgroundColor = Color.valueOf("5ab464");
-	}},
+	islands("desc", Color.valueOf("e5d8bb")),
+	grassland("desc", Color.valueOf("5ab464")),
 	tundra("desc"),
+	spiral("desc", Color.valueOf("f7feff")),
 	tutorial(false), 
 	test1(false),
 	test2(false),
@@ -42,5 +40,10 @@ public enum Map{
 		this.visible = true;
 		this.flipBase = flipBase;
 		this.description = description;
+	}
+	
+	private Map(String description, Color background){
+		this(description);
+		backgroundColor = background;
 	}
 }

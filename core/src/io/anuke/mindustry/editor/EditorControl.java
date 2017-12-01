@@ -30,21 +30,24 @@ public class EditorControl extends Module{
 	RidgedPerlin rid = new RidgedPerlin(1, 10, 20f);
 	RidgedPerlin rid2 = new RidgedPerlin(1, 6, 1f);
 	RidgedPerlin rid3 = new RidgedPerlin(1, 6, 1f);
-	String map = "volcano";
+	String map = "fortress";
 	ObjectMap<String, Boolean> prefs = new OrderedMap<String, Boolean>(){
 		{
 			put("replace", true);
 			put("terrain", false);
+			put("circle", false);
 			put("distort", false);
 			put("sand", false);
 			put("grass", false);
 			put("stone", false);
 			put("allgrass", false);
 			put("allsnow", false);
+			put("allsand", false);
 			put("lavarock", false);
 			put("water", false);
 			put("oil", false);
 			put("lavariver", false);
+			put("slavariver", false);
 			put("river", false);
 			put("iceriver", false);
 			put("oilriver", false);
@@ -102,7 +105,7 @@ public class EditorControl extends Module{
 			for(int x = 0; x < pixmap.getWidth(); x++){
 				for(int y = 0; y < pixmap.getHeight(); y++){
 					float dist = Vector2.dst((float) x / pixmap.getWidth(), (float) y / pixmap.getHeight(), 0.5f, 0.5f) * 2f;
-					double noise = sim.octaveNoise2D(5, 0.6, 1 / 150.0, x, y + 9999) + dist / 10f;
+					double noise = sim.octaveNoise2D(6, 0.6, 1 / 180.0, x, y + 9999) / (prefs.get("circle") ? 1.7 : 1f) + dist / 10f;
 
 					if(dist > 0.8){
 						noise += 2 * (dist - 0.8);
@@ -122,10 +125,10 @@ public class EditorControl extends Module{
 				int dx = 0, dy = 0;
 
 				if(prefs.get("distort")){
-					double intensity = 10;
+					double intensity = 12;
 					double scale = 80;
-					double octaves = 3;
-					double falloff = 0.7;
+					double octaves = 4;
+					double falloff = 0.6;
 					double nx = (sim.octaveNoise2D(octaves, falloff, 1 / scale, x, y) - 0.5f) * intensity;
 					double ny = (sim.octaveNoise2D(octaves, falloff, 1 / scale, x, y + 99999) - 0.5f) * intensity;
 					dx = (int) nx;
@@ -148,23 +151,27 @@ public class EditorControl extends Module{
 				double noil = sim.octaveNoise2D(1, 1.0, 1 / 150.0, x + 9999, y) + sim.octaveNoise2D(1, 1.0, 1 / 2.0, x, y) / 290.0;
 
 				if(!floor || prefs.get("replace")){
+					
 					if(prefs.get("allgrass")){
 						block = floor ? Blocks.grass : Blocks.grassblock;
-					}
-					
-					if(prefs.get("allsnow")){
+					}else if(prefs.get("allsnow")){
 						block = floor ? Blocks.snow : Blocks.snowblock;
+					}else if(prefs.get("allsand")){
+						block = floor ? Blocks.sand : Blocks.sandblock;
+					}else if(prefs.get("replace")){
+						block = floor ? Blocks.stone : Blocks.stoneblock;
 					}
-					
+						
 					if(noise > 0.7 && prefs.get("grass")){
 						block = floor ? Blocks.grass : Blocks.grassblock;
-					}else if(noise > 0.7 && prefs.get("lavarock")){
+					}
+					if(noise > 0.7 && prefs.get("lavarock")){
 						block = floor ? Blocks.blackstone : Blocks.blackstoneblock;
-					}else if(noise > 0.7 && prefs.get("sand")){
+					}
+					if(noise > 0.7 && prefs.get("sand")){
 						block = floor ? Blocks.sand : Blocks.sandblock;
-					}else if(noise > 0.8 && prefs.get("stone")){
-						block = floor ? Blocks.stone : Blocks.stoneblock;
-					}else if(prefs.get("replace") && !prefs.get("allgrass") && !prefs.get("allsnow")){
+					}
+					if(noise > 0.8 && prefs.get("stone")){
 						block = floor ? Blocks.stone : Blocks.stoneblock;
 					}
 				}
@@ -191,6 +198,16 @@ public class EditorControl extends Module{
 					if(lava > t){
 						block = Blocks.lava;
 					}else if(lava > t - 0.2){
+						block = Blocks.blackstone;
+					}
+				}
+				
+				if(floor && prefs.get("slavariver")){
+					double lava = rid.getValue(x, y, 1 / 40f);
+					double t = 0.7;
+					if(lava > t){
+						block = Blocks.lava;
+					}else if(lava > t - 0.3){
 						block = Blocks.blackstone;
 					}
 				}

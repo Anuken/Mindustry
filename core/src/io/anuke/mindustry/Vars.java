@@ -11,8 +11,9 @@ import io.anuke.mindustry.world.World;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class Vars{
+	public static final boolean testAndroid = false;
 	//shorthand for whether or not this is running on android
-	public static final boolean android = (Gdx.app.getType() == ApplicationType.Android);
+	public static final boolean android = (Gdx.app.getType() == ApplicationType.Android) || testAndroid;
 	//shorthand for whether or not this is running on GWT
 	public static final boolean gwt = (Gdx.app.getType() == ApplicationType.WebGL);
 	//how far away from the player blocks can be placed

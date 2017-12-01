@@ -16,7 +16,7 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Elements;
 
 public class LevelDialog extends FloatingDialog{
-	private Map selectedMap = Map.delta;
+	private Map selectedMap = Map.maze;
 	private TextureRegion region = new TextureRegion();
 	
 	public LevelDialog(){

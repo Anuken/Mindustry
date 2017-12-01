@@ -52,9 +52,7 @@ public class MenuFragment implements Fragment{
 				
 				new imagebutton("icon-play-2", isize, () -> ui.showLevels()).text("Play").padTop(4f);
 				
-				new imagebutton("icon-tutorial", isize, ()->{
-					control.playMap(Map.tutorial);
-				}).text("Tutorial").padTop(4f);
+				new imagebutton("icon-tutorial", isize, ()-> control.playMap(Map.tutorial)).text("Tutorial").padTop(4f);
 				
 				new imagebutton("icon-load", isize, () -> ui.showLoadGame()).text("Load").padTop(4f);
 

@@ -10,7 +10,7 @@ public class DistributionBlocks{
 	
 	conduit = new LiquidBlock("conduit"){{
 		fullDescription = "Basic liquid transport block. Works like a conveyor, but with liquids. "
-				+ "Best used with pumps or other conduits.";
+				+ "Best used with pumps or other conduits. Can be used as a bridge over liquids for enemies and players.";
 		health = 45;
 	}},
 	
@@ -31,7 +31,7 @@ public class DistributionBlocks{
 	conveyor = new Conveyor("conveyor"){{
 		description = "Moves items.";
 		fullDescription = "Basic item transport block. Moves items forward and automatically deposits them into turrets or crafters. "
-				+ "Can be rotated.";
+				+ "Rotatable. Can be used as a bridge over liquids for enemies and players.";
 	}},
 	
 	steelconveyor = new Conveyor("steelconveyor"){{

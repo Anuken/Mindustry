@@ -103,6 +103,10 @@ public class Generator{
 					floor = Blocks.snow;
 				}
 				
+				if(block == Blocks.sandblock){
+					floor = Blocks.sand;
+				}
+				
 				if(floor == Blocks.grass && Mathf.chance(0.02) && block == Blocks.air){
 					block = Blocks.shrub;
 				}
