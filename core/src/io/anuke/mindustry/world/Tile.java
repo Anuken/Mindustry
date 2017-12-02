@@ -53,6 +53,7 @@ public class Tile{
 		return Bits.getLeftByte(blocks);
 	}
 	
+	/**Return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile.*/
 	public int relativeTo(int cx, int cy){
 		if(x == cx && y == cy - 1) return 1;
 		if(x == cx && y == cy + 1) return 3;

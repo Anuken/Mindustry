@@ -12,6 +12,8 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Fx;
+import io.anuke.mindustry.resource.ItemStack;
+import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Sounds;
@@ -319,6 +321,22 @@ public class World extends Module{
 		Tile tile = tile(x, y);
 		
 		if(tile == null) return;
+		
+		Block block = tile.block();
+		Recipe result = null;
+		
+		for(Recipe recipe : Recipe.values()){
+			if(recipe.result == block){
+				result = recipe;
+				break;
+			}
+		}
+		
+		if(result != null){
+			for(ItemStack stack : result.requirements){
+				Vars.control.addItem(stack.item, (int)(stack.amount * Vars.breakDropAmount));
+			}
+		}
 		
 		if(tile.block().drops != null){
 			Vars.control.addItem(tile.block().drops.item, tile.block().drops.amount);

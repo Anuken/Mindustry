@@ -25,6 +25,7 @@ public class Generator extends PowerBlock{
 	public float powerSpeed = 0.06f;
 	public boolean explosive = true;
 	public boolean drawRadius = false;
+	public boolean hasLasers = true;
 
 	public Generator(String name) {
 		super(name);
@@ -80,7 +81,7 @@ public class Generator extends PowerBlock{
 		if(entity.power > powerSpeed){
 			Draw.alpha(1f);
 		}else{
-			Draw.alpha(0.75f);
+			Draw.alpha(0.5f);
 		}
 			
 		for(int i = 0; i < laserDirections; i++){
@@ -97,9 +98,10 @@ public class Generator extends PowerBlock{
 		PowerEntity entity = tile.entity();
 
 		for(int i = 0; i < laserDirections; i++){
-			Tile target = laserTarget(tile, (tile.getRotation() + i) - laserDirections/2);
+			int rot = (tile.getRotation() + i) - laserDirections/2;
+			Tile target = laserTarget(tile, rot);
 			
-			if(target == null) continue;
+			if(target == null || isInterfering(target, rot)) continue;
 			
 			PowerAcceptor p = (PowerAcceptor) target.block();
 			if(p.acceptsPower(target) && entity.power >= powerSpeed){
@@ -108,7 +110,6 @@ public class Generator extends PowerBlock{
 			}
 
 		}
-
 	}
 
 	protected void drawLaserTo(Tile tile, int rotation){
@@ -116,18 +117,41 @@ public class Generator extends PowerBlock{
 		Tile target = laserTarget(tile, rotation);
 
 		if(target != null){
-			Tmp.v1.set(Angles.translation(rotation * 90, target.block().width * Vars.tilesize/2 + 2f));
+			boolean interfering = isInterfering(target, rotation);
+			
+			Tmp.v1.set(Angles.translation(rotation * 90, target.block().width * Vars.tilesize/2 + 2f + 
+					(interfering ? 
+							Vector2.dst(tile.worldx(), tile.worldy(), target.worldx(), target.worldy()) / 2f - Vars.tilesize/2f - 1 : 0)));
+			
 			Angles.translation(rotation * 90, width * Vars.tilesize/2 + 2f);
 
-			Draw.tint(Hue.mix(Color.GRAY, Color.WHITE, 0.902f + Mathf.sin(Timers.time(), 1.7f, 0.08f)));
+			if(!interfering){
+				Draw.tint(Hue.mix(Color.GRAY, Color.WHITE, 0.904f + Mathf.sin(Timers.time(), 1.7f, 0.06f)));
+			}else{
+				Draw.tint(Hue.mix(Color.SCARLET, Color.WHITE, 0.902f + Mathf.sin(Timers.time(), 1.7f, 0.08f)));
+				if(Mathf.chance(Timers.delta() * 0.033)){
+					Effects.effect(Fx.laserspark, target.worldx() - Tmp.v1.x, target.worldy() - Tmp.v1.y);
+				}
+			}
+			
+			float r = interfering ? 0.8f : 0f;
 
-			float r = 0f;
-
-			Draw.laser("laser", "laserend", tile.worldx() + Angles.x() + Mathf.range(r), tile.worldy() + Angles.y() + Mathf.range(r), 
+			Draw.laser("laser", "laserend", tile.worldx() + Angles.x(), tile.worldy() + Angles.y(), 
 					target.worldx() - Tmp.v1.x + Mathf.range(r), target.worldy() - Tmp.v1.y + Mathf.range(r), 0.7f + Mathf.sin(Timers.time(), 2f, 0.1f * 0));
 
 			Draw.color();
 		}
+	}
+	
+	protected boolean isInterfering(Tile target, int rotation){
+		if(target.block() instanceof Generator){
+			Generator other = (Generator)target.block();
+			int relrot = (rotation + 2) % 4;
+			if(other.hasLasers && Math.abs(target.getRotation() - relrot) <= other.laserDirections/2){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	protected Tile laserTarget(Tile tile, int rotation){
@@ -149,51 +173,6 @@ public class Generator extends PowerBlock{
 			}
 		}
 		return null;
-	}
-	
-	//TODO better distribution
-	protected void distributePower(Tile tile){
-		if(!Timers.get(tile, "generate", powerTime)){
-			return;
-		}
-
-		PowerEntity p = tile.entity();
-
-		int acceptors = 0;
-		float flow = 0f;
-
-		//TODO have two phases, where it checks nearby blocks first, then distributes it evenly
-		for(int i = 0; i < 2; i++){
-			for(int x = -powerRange; x <= powerRange; x++){
-				for(int y = -powerRange; y <= powerRange; y++){
-
-					if(x == 0 && y == 0){
-						continue;
-					}
-
-					if(Vector2.dst(x, y, 0, 0) < powerRange){
-						Tile dest = Vars.world.tile(tile.x + x, tile.y + y);
-						if(dest != null && dest.block() instanceof PowerAcceptor && ((PowerAcceptor) dest.block()).acceptsPower(dest)){
-							if(i == 1){
-								PowerAcceptor block = (PowerAcceptor) dest.block();
-
-								float transmission = Math.min(flow, p.power);
-
-								float amount = block.addPower(dest, transmission);
-								p.power -= amount;
-							}else{
-								acceptors++;
-							}
-						}
-					}
-				}
-			}
-
-			//TODO better distribution scheme
-			if(i == 0 && acceptors > 0){
-				flow = Mathf.clamp(p.power / acceptors, 0f, powerSpeed / acceptors);
-			}
-		}
 	}
 
 }

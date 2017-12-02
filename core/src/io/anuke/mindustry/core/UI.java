@@ -97,6 +97,7 @@ public class UI extends SceneModule{
 		Colors.put("missingitems", Color.SCARLET);
 		Colors.put("health", Color.YELLOW);
 		Colors.put("interact", Color.ORANGE);
+		Colors.put("accent", Color.valueOf("f4ba6e"));
 	}
 	
 	protected void loadSkin(){
@@ -259,14 +260,14 @@ public class UI extends SceneModule{
 		loadingtable = new table("loadDim"){{
 			get().setTouchable(Touchable.enabled);
 			get().addImage("white").growX()
-			.height(3f).pad(4f).growX().units(Unit.dp).get().setColor(Color.ORANGE);
+			.height(3f).pad(4f).growX().units(Unit.dp).get().setColor(Colors.get("accent"));
 			row();
-			new label("[orange]Loading..."){{
+			new label("[accent]Loading..."){{
 				get().setName("namelabel");
 			}}.pad(10).units(Unit.dp);
 			row();
 			get().addImage("white").growX()
-			.height(3f).pad(4f).growX().units(Unit.dp).get().setColor(Color.ORANGE);
+			.height(3f).pad(4f).growX().units(Unit.dp).get().setColor(Colors.get("accent"));
 		}}.end().get();
 		
 		loadingtable.setVisible(false);
@@ -323,7 +324,7 @@ public class UI extends SceneModule{
 	}
 	
 	public void showLoading(){
-		showLoading("[orange]Loading..");
+		showLoading("[accent]Loading..");
 	}
 	
 	public void showLoading(String text){

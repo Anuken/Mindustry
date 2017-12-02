@@ -59,9 +59,9 @@ public class LevelDialog extends FloatingDialog{
 			}
 			
 			Table inset = new Table("pane-button");
-			inset.add("[orange]"+map.name()).pad(3f).units(Unit.dp);
+			inset.add("[accent]"+map.name()).pad(3f).units(Unit.dp);
 			inset.row();
-			inset.add((StringSupplier)(()->"High Score: [orange]" + Settings.getInt("hiscore" + map.name())))
+			inset.add((StringSupplier)(()->"High Score: [accent]" + Settings.getInt("hiscore" + map.name())))
 			.pad(3f).units(Unit.dp);
 			inset.pack();
 			

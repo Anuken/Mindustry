@@ -1,7 +1,7 @@
 package io.anuke.mindustry.ui;
 
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.utils.Align;
 
 import io.anuke.ucore.scene.ui.Image;
@@ -17,7 +17,7 @@ public class MindustryKeybindDialog extends KeybindDialog{
 		title().setAlignment(Align.center);
 		getTitleTable().row();
 		getTitleTable().add(new Image("white"))
-		.growX().height(3f).pad(4f).units(Unit.dp).get().setColor(Color.ORANGE);
+		.growX().height(3f).pad(4f).units(Unit.dp).get().setColor(Colors.get("accent"));
 	}
 	
 	@Override

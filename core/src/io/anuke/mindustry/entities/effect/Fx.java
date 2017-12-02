@@ -143,6 +143,16 @@ public class Fx{
 		});
 	}),
 	
+	laserspark = new Effect(14, e -> {
+		Angles.randLenVectors(e.id, 8, 1f + e.ifract()*11f, (x, y)->{
+			float len = 1f+e.fract()*5f;
+			Draw.color(Color.WHITE, Color.CORAL, e.ifract());
+			Draw.alpha(e.ifract()/1.3f);
+			Draw.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), len);
+			Draw.reset();
+		});
+	}),
+	
 	shellsmoke = new Effect(20, e -> {
 		Angles.randLenVectors(e.id, 8, 3f + e.ifract()*17f, (x, y)->{
 			float size = 2f+e.fract()*5f;

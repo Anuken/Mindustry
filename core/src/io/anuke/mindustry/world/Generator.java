@@ -77,7 +77,7 @@ public class Generator{
 				}
 				
 				if(floor == Blocks.stone || floor == Blocks.grass || floor == Blocks.blackstone ||
-						floor == Blocks.snow){
+						floor == Blocks.snow || floor == Blocks.sand){
 					if(Noise.nnoise(x, y, 8, 1) > 0.2){
 						floor = Blocks.iron;
 					}
@@ -107,7 +107,7 @@ public class Generator{
 					floor = Blocks.sand;
 				}
 				
-				if(floor == Blocks.grass && Mathf.chance(0.02) && block == Blocks.air){
+				if(floor == Blocks.grass && Mathf.chance(0.03) && block == Blocks.air){
 					block = Blocks.shrub;
 				}
 				

@@ -8,13 +8,18 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.SaveIO;
+import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.Label;
+import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 //TODO unified save/load dialogs
 public class LoadDialog extends FloatingDialog{
-
+	ScrollPane pane;
+	
 	public LoadDialog(){
 		this("Load Game");
 	}
@@ -26,6 +31,7 @@ public class LoadDialog extends FloatingDialog{
 
 		shown(() -> {
 			setup();
+			Timers.runTask(2f, ()-> Core.scene.setScrollFocus(pane));
 		});
 
 		addCloseButton();
@@ -36,12 +42,18 @@ public class LoadDialog extends FloatingDialog{
 
 		content().add("Select a save slot.").padBottom(2);
 		content().row();
+	
+		Table slots = new Table();
+		pane = new ScrollPane(slots);
+		pane.setFadeScrollBars(false);
+		
+		slots.padRight(Unit.dp.inPixels(24));
 
 		for(int i = 0; i < Vars.saveSlots; i++){
 			final int slot = i;
 
 			TextButton button = new TextButton("[orange]Slot " + (i + 1));
-			button.pad(Unit.dp.inPixels(10));
+			button.pad(Unit.dp.inPixels(12));
 			button.getLabelCell().top().left().growX();
 			
 			button.row();
@@ -51,16 +63,18 @@ public class LoadDialog extends FloatingDialog{
 			", Wave " + SaveIO.getWave(slot) + "\nLast Saved: " + SaveIO.getTimeString(i)));
 			info.setAlignment(Align.center, Align.center);
 			
-			button.add(info).padBottom(2).padTop(6);
+			button.add(info).padBottom(3).padTop(7);
 			button.row();
 			//button.addImage("white", Color.GRAY)
 			//.growX().height(3f).pad(4f).units(Unit.dp);
 			button.row();
 			modifyButton(button, slot);
 
-			content().add(button).size(400, 86).units(Unit.dp).pad(2);
-			content().row();
+			slots.add(button).size(404, 104).pad(4).units(Unit.dp);
+			slots.row();
 		}
+		
+		content().add(pane);
 
 	}
 	

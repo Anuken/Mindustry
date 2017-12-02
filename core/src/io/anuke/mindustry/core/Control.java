@@ -55,6 +55,7 @@ public class Control extends Module{
 	
 	Tile core;
 	Array<SpawnPoint> spawnpoints = new Array<>();
+	boolean shouldUpdateItems = false;
 	
 	float respawntime;
 	
@@ -399,7 +400,7 @@ public class Control extends Module{
 	
 	public void addItem(Item item, int amount){
 		items.put(item, items.get(item, 0)+amount);
-		ui.updateItems();
+		shouldUpdateItems = true;
 	}
 	
 	public boolean hasItems(ItemStack[] items){
@@ -415,13 +416,13 @@ public class Control extends Module{
 	
 	public void removeItem(ItemStack req){
 		items.put(req.item, items.get(req.item, 0)-req.amount);
-		ui.updateItems();
+		shouldUpdateItems = true;
 	}
 	
 	public void removeItems(ItemStack... reqs){
 		for(ItemStack req : reqs)
 		items.put(req.item, items.get(req.item, 0)-req.amount);
-		ui.updateItems();
+		shouldUpdateItems = true;
 	}
 	
 	public ObjectMap<Item, Integer> getItems(){
@@ -469,6 +470,11 @@ public class Control extends Module{
 					Timers.run(30f, ()->new BlastEnemy(0).set(px, py).add());
 				}
 			}
+		}
+		
+		if(shouldUpdateItems && Timers.get("updateItems", 8)){
+			ui.updateItems();
+			shouldUpdateItems = false;
 		}
 		
 		if(!GameState.is(State.menu)){

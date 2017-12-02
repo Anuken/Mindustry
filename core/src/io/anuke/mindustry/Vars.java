@@ -48,7 +48,9 @@ public class Vars{
 	public static boolean showPaths = true;
 	//number of save slots-- increasing may lead to layout issues
 	//TODO named save slots, possibly with a scroll dialog
-	public static final int saveSlots = 4;
+	public static final int saveSlots = 8;
+	//amount of drops that are left when breaking a block
+	public static final float breakDropAmount = 0.5f;
 	
 	//only if smoothCamera
 	public static boolean snapCamera = true;
