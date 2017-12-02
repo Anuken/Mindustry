@@ -192,6 +192,10 @@ public class Control extends Module{
 		respawntime = -1;
 		hiscore = false;
 		
+		for(Block block : Block.getAllBlocks()){
+			block.onReset();
+		}
+		
 		ui.updateItems();
 		ui.updateWeapons();
 	}

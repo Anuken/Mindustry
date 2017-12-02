@@ -82,7 +82,7 @@ import io.anuke.ucore.entities.Entities;
  */
 public class SaveIO{
 	/**Save file version ID. Should be incremented every breaking release.*/
-	private static final int fileVersionID = 11;
+	private static final int fileVersionID = 12;
 	
 	//TODO automatic registration of types?
 	private static final Array<Class<? extends Enemy>> enemyIDs = Array.with(

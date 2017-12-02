@@ -2,11 +2,15 @@ package io.anuke.mindustry.world.blocks.types.defense;
 
 import static io.anuke.mindustry.Vars.*;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.ObjectMap;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.world.Block;
@@ -22,8 +26,6 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Tmp;
 
 public class Door extends Wall implements Configurable{
-	private ObjectMap<Tile, Boolean> open = new ObjectMap<>();
-	
 	protected Effect openfx = Fx.dooropen;
 	protected Effect closefx = Fx.doorclose;
 
@@ -34,7 +36,9 @@ public class Door extends Wall implements Configurable{
 	
 	@Override
 	public void draw(Tile tile){
-		if(open.get(tile, true)){
+		DoorEntity entity = tile.entity();
+		
+		if(!entity.open){
 			Draw.rect(name, tile.worldx(), tile.worldy());
 		}else{
 			Draw.rect(name + "-open", tile.worldx(), tile.worldy());
@@ -43,20 +47,25 @@ public class Door extends Wall implements Configurable{
 	
 	@Override
 	public boolean isSolidFor(Tile tile){
-		return open.get(tile, true);
+		DoorEntity entity = tile.entity();
+		return !entity.open;
 	}
 
 	@Override
 	public void buildTable(Tile tile, Table table){
-		if(anyEntities(tile) && !open.get(tile, true)){
+		DoorEntity entity = tile.entity();
+		
+		if(anyEntities(tile) && !entity.open){
 			return;
 		}
 		
-		open.put(tile, !open.get(tile, true));
-		if(open.get(tile)){
-			Effects.effect(closefx, tile.worldx(), tile.worldy());
+		Vector2 offset = getPlaceOffset();
+		
+		entity.open = !entity.open;
+		if(!entity.open){
+			Effects.effect(closefx, tile.worldx() + offset.x, tile.worldy() + offset.y);
 		}else{
-			Effects.effect(openfx, tile.worldx(), tile.worldy());
+			Effects.effect(openfx, tile.worldx() + offset.x, tile.worldy() + offset.y);
 		}
 	}
 	
@@ -80,6 +89,27 @@ public class Door extends Wall implements Configurable{
 		}
 		
 		return false;
+	}
+	
+	@Override
+	public TileEntity getEntity(){
+		return new DoorEntity();
+	}
+	
+	public class DoorEntity extends TileEntity{
+		public boolean open = false;
+		
+		@Override
+		public void write(DataOutputStream stream) throws IOException{
+			super.write(stream);
+			stream.writeBoolean(open);
+		}
+		
+		@Override
+		public void read(DataInputStream stream) throws IOException{
+			super.read(stream);
+			open = stream.readBoolean();
+		}
 	}
 
 }
