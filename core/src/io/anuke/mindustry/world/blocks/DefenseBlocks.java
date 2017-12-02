@@ -2,9 +2,7 @@ package io.anuke.mindustry.world.blocks;
 
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.Wall;
-import io.anuke.mindustry.world.blocks.types.defense.RepairTurret;
-import io.anuke.mindustry.world.blocks.types.defense.ShieldBlock;
-import io.anuke.mindustry.world.blocks.types.defense.ShieldedWallBlock;
+import io.anuke.mindustry.world.blocks.types.defense.*;
 
 public class DefenseBlocks{
 	
@@ -96,5 +94,9 @@ public class DefenseBlocks{
 					+ "but drains energy quickly on bullet contact.";
 			formalName = "shield generator";
 		}
-	};
+	},
+	door = new Door("door"){{
+		fullDescription = "A block than can be opened and closed by clicking it.";
+		health = 90;
+	}};
 }

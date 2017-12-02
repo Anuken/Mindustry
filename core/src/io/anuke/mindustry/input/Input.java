@@ -95,6 +95,11 @@ public class Input{
 	public static boolean cursorNear(){
 		return Vector2.dst(player.x, player.y, tilex() * tilesize, tiley() * tilesize) <= placerange;
 	}
+	
+	public static boolean onConfigurable(){
+		Tile tile = Vars.world.tile(tilex(), tiley());
+		return tile != null && tile.block() instanceof Configurable;
+	}
 
 	public static int tilex(){
 		return (player.recipe != null && player.recipe.result.isMultiblock() &&

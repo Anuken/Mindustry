@@ -12,6 +12,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Fx;
+import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.world.blocks.*;
@@ -64,7 +65,7 @@ public class World extends Module{
 	public boolean solid(int x, int y){
 		Tile tile = tile(x, y);
 		
-		return tile == null || tile.block().solid || (tile.floor().solid && (tile.block() == Blocks.air));
+		return tile == null || tile.solid();
 	}
 	
 	public boolean wallSolid(int x, int y){
@@ -269,12 +270,16 @@ public class World extends Module{
 		Vector2 offset = type.getPlaceOffset();
 		Tmp.r2.setCenter(offset.x + x * Vars.tilesize, offset.y + y * Vars.tilesize);
 
-		for(SolidEntity e : Entities.getNearby(x * tilesize, y * tilesize, tilesize * 2f)){
+		for(SolidEntity e : Entities.getNearby(Entities.getGroup(Enemy.class), x * tilesize, y * tilesize, tilesize * 2f)){
 			Rectangle rect = e.hitbox.getRect(e.x, e.y);
 
 			if(Tmp.r2.overlaps(rect)){
 				return false;
 			}
+		}
+		
+		if(Tmp.r2.overlaps(player.hitbox.getRect(player.x, player.y))){
+			return false;
 		}
 		
 		Tile tile = tile(x, y);

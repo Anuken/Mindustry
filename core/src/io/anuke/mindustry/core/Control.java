@@ -435,9 +435,7 @@ public class Control extends Module{
 		
 		Entities.initPhysics();
 		
-		Entities.setCollider(tilesize, (x, y)->{
-			return world.solid(x, y);
-		});
+		Entities.setCollider(tilesize, (x, y)-> world.solid(x, y));
 	}
 	
 	@Override

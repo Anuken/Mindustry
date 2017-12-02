@@ -18,6 +18,7 @@ public class ItemPowerGenerator extends Generator{
 
 	public ItemPowerGenerator(String name) {
 		super(name);
+		outputOnly = true;
 	}
 	
 	@Override

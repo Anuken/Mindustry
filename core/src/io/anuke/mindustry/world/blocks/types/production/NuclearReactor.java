@@ -1,5 +1,9 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 
@@ -26,7 +30,7 @@ public class NuclearReactor extends LiquidItemPowerGenerator{
 	protected float smokeThreshold = 0.3f; //threshold at which block starts smoking
 	protected int explosionRadius = 19;
 	protected int explosionDamage = 128;
-	protected float flashThreshold = 0.5f;
+	protected float flashThreshold = 0.46f;
 	
 	public NuclearReactor(String name) {
 		super(name);
@@ -91,7 +95,7 @@ public class NuclearReactor extends LiquidItemPowerGenerator{
 		
 		int fuel = entity.getItem(generateItem);
 		
-		if(fuel < 5) return;
+		if(fuel < 5 && entity.heat < 0.5f) return;
 		
 		int waves = 6;
 		float delay = 8f;
@@ -156,13 +160,14 @@ public class NuclearReactor extends LiquidItemPowerGenerator{
 		Draw.rect("white", tile.worldx() + offset.x, tile.worldy() + offset.y, width * Vars.tilesize, height * Vars.tilesize);
 		
 		if(entity.heat > flashThreshold){
-			float flash = 9f - ((entity.heat - flashThreshold) / (1f - flashThreshold)) * 4f;
-			Draw.color(Color.RED, Color.YELLOW, Mathf.absin(Timers.time(), flash, 1f));
+			float flash = 1f + ((entity.heat - flashThreshold) / (1f - flashThreshold)) * 5.4f;
+			entity.flash += flash * Timers.delta();
+			Draw.color(Color.RED, Color.YELLOW, Mathf.absin(entity.flash, 9f, 1f));
 			Draw.alpha(0.6f);
 			Draw.rect(name + "-lights", tile.worldx() + offset.x, tile.worldy() + offset.y);
 		}
 		
-		Draw.color();
+		Draw.reset();
 	}
 	
 	@Override
@@ -172,5 +177,18 @@ public class NuclearReactor extends LiquidItemPowerGenerator{
 	
 	public static class NuclearReactorEntity extends LiquidPowerEntity{
 		public float heat;
+		public float flash;
+		
+		@Override
+		public void write(DataOutputStream stream) throws IOException{
+			super.write(stream);
+			stream.writeFloat(heat);
+		}
+		
+		@Override
+		public void read(DataInputStream stream) throws IOException{
+			super.read(stream);
+			heat = stream.readFloat();
+		}
 	}
 }

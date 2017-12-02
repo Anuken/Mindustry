@@ -39,6 +39,8 @@ public class Block{
 	public boolean destructible;
 	/**whether this is solid*/
 	public boolean solid;
+	/**whethe this block CAN be solid.*/
+	public boolean solidifes;
 	/**whether this is rotateable*/
 	public boolean rotate;
 	/**whether you can break this with rightblick*/
@@ -89,8 +91,8 @@ public class Block{
 		return name;
 	}
 	
-	public String errorMessage(Tile tile){
-		return null;
+	public boolean isSolidFor(Tile tile){
+		return false;
 	}
 	
 	public boolean canReplace(Block other){

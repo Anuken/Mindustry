@@ -30,6 +30,7 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 
 	public LiquidPowerGenerator(String name) {
 		super(name);
+		outputOnly = true;
 	}
 	
 	@Override
@@ -56,7 +57,7 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 	
 	public void drawLiquidCenter(Tile tile){
 		Vector2 offset = getPlaceOffset();
-		Draw.rect("black", tile.worldx() + offset.x, tile.worldy() + offset.y, 2, 2);
+		Draw.rect("blank", tile.worldx() + offset.x, tile.worldy() + offset.y, 2, 2);
 	}
 	
 	@Override

@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.effect.Fx;
+import io.anuke.mindustry.input.Input;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.ucore.core.*;
@@ -78,7 +79,7 @@ public class Player extends DestructibleEntity{
 		if(Inputs.keyDown("right"))
 			vector.x += speed;
 		
-		boolean shooting = Inputs.buttonDown(Buttons.LEFT) && recipe == null && !ui.hasMouse();
+		boolean shooting = Inputs.buttonDown(Buttons.LEFT) && recipe == null && !ui.hasMouse() && !Input.onConfigurable();
 		
 		if(shooting && Timers.get(this, "reload", weapon.reload)){
 			weapon.shoot(this);

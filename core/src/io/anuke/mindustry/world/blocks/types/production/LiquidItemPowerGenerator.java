@@ -7,6 +7,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 
@@ -29,6 +30,7 @@ public class LiquidItemPowerGenerator extends LiquidPowerGenerator{
 		
 		Vars.renderer.drawBar(Color.GREEN, tile.worldx() + offset.x, tile.worldy() + 6 +
 				offset.y + height*Vars.tilesize/2f, (float)entity.totalItems() / itemCapacity);
+		Draw.reset();
 	}
 	
 	@Override

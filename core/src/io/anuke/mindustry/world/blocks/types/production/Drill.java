@@ -1,5 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import com.badlogic.gdx.utils.Array;
+
 import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
@@ -19,6 +21,13 @@ public class Drill extends Block{
 		super(name);
 		update = true;
 		solid = true;
+	}
+	
+	@Override
+	public void getStats(Array<String> list){
+		super.getStats(list);
+		list.add("[iteminfo]Capacity: " + capacity);
+		list.add("[iteminfo]Seconds/item: " + time);
 	}
 	
 	@Override

@@ -26,6 +26,7 @@ public class Generator extends PowerBlock{
 	public boolean explosive = true;
 	public boolean drawRadius = false;
 	public boolean hasLasers = true;
+	public boolean outputOnly = false;
 
 	public Generator(String name) {
 		super(name);
@@ -78,15 +79,17 @@ public class Generator extends PowerBlock{
 	@Override
 	public void drawOver(Tile tile){
 		PowerEntity entity = tile.entity();
-		if(entity.power > powerSpeed){
-			Draw.alpha(1f);
-		}else{
-			Draw.alpha(0.5f);
-		}
-			
+
 		for(int i = 0; i < laserDirections; i++){
+			if(entity.power > powerSpeed){
+				Draw.alpha(1f);
+			}else{
+				Draw.alpha(0.5f);
+			}
 			drawLaserTo(tile, (tile.getRotation() + i) - laserDirections/2);
 		}
+		
+		Draw.color();
 	}
 	
 	@Override
@@ -121,7 +124,7 @@ public class Generator extends PowerBlock{
 			
 			Tmp.v1.set(Angles.translation(rotation * 90, target.block().width * Vars.tilesize/2 + 2f + 
 					(interfering ? 
-							Vector2.dst(tile.worldx(), tile.worldy(), target.worldx(), target.worldy()) / 2f - Vars.tilesize/2f - 1 : 0)));
+							Vector2.dst(tile.worldx(), tile.worldy(), target.worldx(), target.worldy()) / 2f - Vars.tilesize/2f * target.block().width - 1 : 0)));
 			
 			Angles.translation(rotation * 90, width * Vars.tilesize/2 + 2f);
 
