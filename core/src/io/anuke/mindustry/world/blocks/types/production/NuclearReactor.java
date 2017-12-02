@@ -29,7 +29,7 @@ public class NuclearReactor extends LiquidItemPowerGenerator{
 	protected float coolantPower = 0.007f; //how much heat decreases per coolant unit
 	protected float smokeThreshold = 0.3f; //threshold at which block starts smoking
 	protected int explosionRadius = 19;
-	protected int explosionDamage = 128;
+	protected int explosionDamage = 135;
 	protected float flashThreshold = 0.46f;
 	
 	public NuclearReactor(String name) {

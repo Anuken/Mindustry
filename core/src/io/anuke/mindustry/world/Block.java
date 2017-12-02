@@ -84,7 +84,7 @@ public class Block{
 	
 	public void getStats(Array<String> list){
 		list.add("[gray]size: " + width + "x" + height);
-		list.add("[health]health: " + health);
+		list.add("[healthstats]health: " + health);
 	}
 	
 	public String name(){

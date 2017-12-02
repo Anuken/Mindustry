@@ -96,6 +96,7 @@ public class UI extends SceneModule{
 		Colors.put("craftinfo", Color.LIGHT_GRAY);
 		Colors.put("missingitems", Color.SCARLET);
 		Colors.put("health", Color.YELLOW);
+		Colors.put("healthstats", Color.SCARLET);
 		Colors.put("interact", Color.ORANGE);
 		Colors.put("accent", Color.valueOf("f4ba6e"));
 	}

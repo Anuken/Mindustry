@@ -37,6 +37,7 @@ import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.*;
 
 public class Renderer extends RendererModule{
+	String[] surfaces = {"shadow", "shield", "pixel", "indicators"};
 	int targetscale = baseCameraScale;
 	int chunksize = 32;
 	Cache[][] floorCache;
@@ -45,15 +46,14 @@ public class Renderer extends RendererModule{
 
 	public Renderer() {
 		Core.cameraScale = baseCameraScale;
-
-		Graphics.addSurface("pixel", Core.cameraScale);
 	}
 
 	@Override
 	public void init(){
 		pixelate = Settings.getBool("pixelate");
-		Graphics.addSurface("shadow", Settings.getBool("pixelate") ? Core.cameraScale : 1);
-		Graphics.addSurface("shield", Settings.getBool("pixelate") ? Core.cameraScale : 1);
+		for(String surface : surfaces){
+			Graphics.addSurface(surface, Settings.getBool("pixelate") ? Core.cameraScale : 1);
+		}
 	}
 
 	public void setPixelate(boolean pixelate){
@@ -186,8 +186,9 @@ public class Renderer extends RendererModule{
 	}
 
 	void drawEnemyMarkers(){
+		Graphics.surface("indicators");
 		Draw.color(Color.RED);
-		Draw.alpha(0.6f);
+		//Draw.alpha(0.6f);
 		for(Enemy enemy : control.enemyGroup.all()){
 
 			if(Tmp.r1.setSize(camera.viewportWidth, camera.viewportHeight).setCenter(camera.position.x, camera.position.y).overlaps(enemy.hitbox.getRect(enemy.x, enemy.y))){
@@ -198,6 +199,9 @@ public class Renderer extends RendererModule{
 			Angles.translation(angle, Unit.dp.inPixels(20f));
 			Draw.rect("enemyarrow", camera.position.x + Angles.x(), camera.position.y + Angles.y(), angle);
 		}
+		Draw.color();
+		Draw.alpha(0.4f);
+		Graphics.flushSurface();
 		Draw.color();
 	}
 
@@ -513,9 +517,9 @@ public class Renderer extends RendererModule{
 		targetscale = amount;
 		clampScale();
 		if(Settings.getBool("pixelate")){
-			Graphics.getSurface("pixel").setScale(targetscale);
-			Graphics.getSurface("shadow").setScale(targetscale);
-			Graphics.getSurface("shield").setScale(targetscale);
+			for(String surface : surfaces){
+				Graphics.getSurface(surface).setScale(targetscale);
+			}
 		}
 	}
 

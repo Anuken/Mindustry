@@ -1,5 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
+import com.badlogic.gdx.utils.Array;
+
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Fx;
@@ -9,15 +11,24 @@ import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BulletEntity;
+import io.anuke.ucore.util.Strings;
 
 public class ShieldBlock extends PowerBlock{
 	public float shieldRadius = 40f;
-	public float powerDrain = 0.005f;
+	public float powerDrain = 0.006f;
 	public float powerPerDamage = 0.1f;
 	
 	public ShieldBlock(String name) {
 		super(name);
 		voltage = powerDrain;
+	}
+	
+	@Override
+	public void getStats(Array<String> list){
+		super.getStats(list);
+		list.add("[powerinfo]Power Drain/second: " + Strings.toFixed(powerDrain*60, 2));
+		list.add("[powerinfo]Power Drain/damage taken: " + Strings.toFixed(powerPerDamage, 2));
+		list.add("[powerinfo]Shield Radius: " + (int)shieldRadius + " units");
 	}
 
 	@Override

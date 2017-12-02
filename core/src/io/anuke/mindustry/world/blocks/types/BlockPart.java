@@ -6,7 +6,8 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
 /**Used for multiblocks. Each block that is not the center of the multiblock is a blockpart.
- * Think of these as delegates to the actual block; all events are passed to the target block.*/
+ * Think of these as delegates to the actual block; all events are passed to the target block.
+ * They are made to share all properties from the linked tile/block.*/
 public class BlockPart extends Block implements PowerAcceptor, LiquidAcceptor{
 
 	public BlockPart() {
@@ -78,10 +79,6 @@ public class BlockPart extends Block implements PowerAcceptor, LiquidAcceptor{
 			return false;
 		}
 	}
-	
-	private Block linked(Tile tile){
-		return tile.getLinked().block();
-	}
 
 	@Override
 	public void setPower(Tile tile, float power){
@@ -91,6 +88,9 @@ public class BlockPart extends Block implements PowerAcceptor, LiquidAcceptor{
 			((PowerAcceptor)block).setPower(tile.getLinked(), power);
 		}
 	}
-
+	
+	private Block linked(Tile tile){
+		return tile.getLinked().block();
+	}
 
 }

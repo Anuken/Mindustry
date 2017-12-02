@@ -7,16 +7,26 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
 import io.anuke.mindustry.world.blocks.types.production.Generator;
+import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 
 public class PowerBooster extends Generator{
+	public int powerRange = 4;
 	
 	public PowerBooster(String name) {
 		super(name);
-		drawRadius = true;
 		explosive = false;
 		hasLasers = false;
+	}
+	
+	@Override
+	public void drawPixelOverlay(Tile tile){
+		super.drawPixelOverlay(tile);
+		
+		Draw.color("yellow");
+		Draw.dashcircle(tile.worldx(), tile.worldy(), powerRange * Vars.tilesize);
+		Draw.reset();
 	}
 	
 	@Override

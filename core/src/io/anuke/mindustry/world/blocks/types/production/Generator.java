@@ -21,10 +21,8 @@ public class Generator extends PowerBlock{
 
 	public int laserRange = 6;
 	public int laserDirections = 4;
-	public int powerRange = 4;
 	public float powerSpeed = 0.06f;
 	public boolean explosive = true;
-	public boolean drawRadius = false;
 	public boolean hasLasers = true;
 	public boolean outputOnly = false;
 
@@ -35,6 +33,12 @@ public class Generator extends PowerBlock{
 	@Override
 	public void getStats(Array<String> list){
 		super.getStats(list);
+		
+		if(hasLasers){
+			list.add("[powerinfo]Laser range: " + laserRange + " blocks");
+			list.add("[powerinfo]Max power transfer/second: " + Strings.toFixed(powerSpeed*2, 2));
+		}
+		
 		if(explosive){
 			list.add("[orange]Highly explosive!");
 		}
@@ -62,17 +66,6 @@ public class Generator extends PowerBlock{
 
 		}else{
 			super.onDestroyed(tile);
-		}
-	}
-
-	@Override
-	public void drawPixelOverlay(Tile tile){
-		super.drawPixelOverlay(tile);
-		
-		if(drawRadius){
-			Draw.color("yellow");
-			Draw.dashcircle(tile.worldx(), tile.worldy(), powerRange * Vars.tilesize);
-			Draw.reset();
 		}
 	}
 	
