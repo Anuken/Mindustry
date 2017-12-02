@@ -18,6 +18,7 @@ public enum Recipe{
 	titaniumwalllarge(defense, DefenseBlocks.titaniumwalllarge, stack(Item.titanium, 8)),
 	duriumwalllarge(defense, DefenseBlocks.diriumwalllarge, stack(Item.dirium, 8)),
 	door(defense, DefenseBlocks.door, stack(Item.steel, 3), stack(Item.iron, 3)),
+	largedoor(defense, DefenseBlocks.largedoor, stack(Item.steel, 3*4), stack(Item.iron, 3*4)),
 	titaniumshieldwall(defense, DefenseBlocks.titaniumshieldwall, stack(Item.titanium, 2)),
 	
 	conveyor(distribution, DistributionBlocks.conveyor, stack(Item.stone, 1)),

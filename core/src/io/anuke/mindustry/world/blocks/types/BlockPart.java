@@ -11,13 +11,17 @@ public class BlockPart extends Block implements PowerAcceptor, LiquidAcceptor{
 
 	public BlockPart() {
 		super("blockpart");
-		//TODO note: all block parts are solid, which means you can't have non-solid multiblocks
-		solid = true;
+		solid = false;
 	}
 	
 	@Override
 	public void draw(Tile tile){
 		//do nothing
+	}
+	
+	@Override
+	public boolean isSolidFor(Tile tile){
+		return tile.getLinked().solid() || tile.getLinked().block().isSolidFor(tile.getLinked());
 	}
 	
 	@Override

@@ -62,8 +62,9 @@ public class Input{
 			}
 			
 		}else if(Inputs.buttonUp(Buttons.LEFT)){
-			if(cursor != null && cursor.block() instanceof Configurable){
-				Vars.ui.showConfig(cursor);
+			Tile linked = cursor.isLinked() ? cursor.getLinked() : cursor;
+			if(linked != null && linked.block() instanceof Configurable){
+				Vars.ui.showConfig(linked);
 			}else if(!Vars.ui.hasConfigMouse()){
 				Vars.ui.hideConfig();
 			}
@@ -98,7 +99,7 @@ public class Input{
 	
 	public static boolean onConfigurable(){
 		Tile tile = Vars.world.tile(tilex(), tiley());
-		return tile != null && tile.block() instanceof Configurable;
+		return tile != null && (tile.block() instanceof Configurable || (tile.isLinked() && tile.getLinked().block() instanceof Configurable));
 	}
 
 	public static int tilex(){

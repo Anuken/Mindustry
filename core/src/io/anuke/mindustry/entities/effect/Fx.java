@@ -228,6 +228,18 @@ public class Fx{
 		Draw.reset();
 	}),
 	
+	dooropenlarge = new Effect(10, e -> {
+		Draw.thickness(e.fract() * 1.6f);
+		Draw.square(e.x, e.y, Vars.tilesize + e.ifract() * 2f);
+		Draw.reset();
+	}),
+			
+	doorcloselarge = new Effect(10, e -> {
+		Draw.thickness(e.fract() * 1.6f);
+		Draw.square(e.x, e.y, Vars.tilesize + e.fract() * 2f);
+		Draw.reset();
+	}),
+	
 	purify = new Effect(10, e -> {
 		Draw.color(Color.ROYAL, Color.GRAY, e.ifract());
 		Draw.thickness(2f);

@@ -301,10 +301,6 @@ public class World extends Module{
 			return false;
 		}
 		
-		if(tile.block() != type && type.canReplace(tile.block())){
-			return true;
-		}
-		
 		if(type.isMultiblock()){
 			int offsetx = -(type.width-1)/2;
 			int offsety = -(type.height-1)/2;
@@ -318,6 +314,9 @@ public class World extends Module{
 			}
 			return true;
 		}else{
+			if(tile.block() != type && type.canReplace(tile.block()) && tile.block().isMultiblock() == type.isMultiblock()){
+				return true;
+			}
 			return tile != null && tile.block() == Blocks.air;
 		}
 	}

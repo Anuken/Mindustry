@@ -38,10 +38,12 @@ public class Door extends Wall implements Configurable{
 	public void draw(Tile tile){
 		DoorEntity entity = tile.entity();
 		
+		Vector2 offset = getPlaceOffset();
+		
 		if(!entity.open){
-			Draw.rect(name, tile.worldx(), tile.worldy());
+			Draw.rect(name, tile.worldx() + offset.x, tile.worldy() + offset.y);
 		}else{
-			Draw.rect(name + "-open", tile.worldx(), tile.worldy());
+			Draw.rect(name + "-open", tile.worldx() + offset.x, tile.worldy() + offset.y);
 		}
 	}
 	
@@ -55,7 +57,7 @@ public class Door extends Wall implements Configurable{
 	public void buildTable(Tile tile, Table table){
 		DoorEntity entity = tile.entity();
 		
-		if(anyEntities(tile) && !entity.open){
+		if(anyEntities(tile) && entity.open){
 			return;
 		}
 		

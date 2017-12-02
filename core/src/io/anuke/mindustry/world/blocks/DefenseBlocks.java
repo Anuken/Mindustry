@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks;
 
+import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.Wall;
 import io.anuke.mindustry.world.blocks.types.defense.*;
@@ -96,7 +97,17 @@ public class DefenseBlocks{
 		}
 	},
 	door = new Door("door"){{
-		fullDescription = "A block than can be opened and closed by clicking it.";
+		fullDescription = "A block than can be opened and closed by tapping it.";
+		description = "Opens and closes.\n[interact]Tap to toggle";
 		health = 90;
+	}},
+	largedoor = new Door("door-large"){{
+		formalName = "large door";
+		fullDescription = "A block than can be opened and closed by tapping it.";
+		description = "Opens and closes.\n[interact]Tap to toggle";
+		openfx = Fx.dooropenlarge;
+		closefx = Fx.doorcloselarge;
+		health = 90*4;
+		width = height = 2;
 	}};
 }
