@@ -2,14 +2,13 @@ package io.anuke.mindustry.entities.enemies;
 
 public class FastEnemy extends Enemy{
 
-	public FastEnemy(int spawn) {
-		super(spawn);
+	public FastEnemy() {
 		
-		speed = 0.7f;
-		reload = 30;
+		speed = 0.73f;
+		reload = 25;
 		mass = 0.2f;
 		
-		maxhealth = 30;
+		maxhealth = 40;
 		heal();
 	}
 

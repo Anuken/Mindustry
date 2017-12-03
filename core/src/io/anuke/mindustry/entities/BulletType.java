@@ -232,14 +232,14 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 		}
 		public void draw(Bullet b){}
 	},
-	small = new BulletType(1.5f, 1){
+	small = new BulletType(1.5f, 2){
 		public void draw(Bullet b){
 			Draw.color(glowy);
 			Draw.rect("shot", b.x, b.y, b.angle() - 45);
 			Draw.reset();
 		}
 	},
-	smallSlow = new BulletType(1.2f, 1){
+	smallSlow = new BulletType(1.2f, 2){
 		public void draw(Bullet b){
 			Draw.color("orange");
 			Draw.rect("shot", b.x, b.y, b.angle() - 45);

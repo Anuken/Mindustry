@@ -58,7 +58,7 @@ public class Generator extends PowerBlock{
 				Effects.effect(Fx.shockwave, x, y);
 
 				Timers.run(12f + Mathf.random(20f), () -> {
-					tile.damageNearby(3, 40, 0f);
+					tile.damageNearby(4, 40, 0f);
 				});
 
 				Effects.sound(explosionSound, x, y);

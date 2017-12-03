@@ -7,6 +7,8 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.GameState;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
@@ -23,7 +25,7 @@ public class Input{
 		//player is dead
 		if(player.health <= 0) return;
 		
-		if(Inputs.scrolled()){
+		if(Inputs.scrolled() && GameState.is(State.playing)){
 			Vars.renderer.scaleCamera(Inputs.scroll());
 		}
 

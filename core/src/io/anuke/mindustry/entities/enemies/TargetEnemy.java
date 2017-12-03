@@ -9,8 +9,7 @@ import io.anuke.ucore.core.Timers;
 
 public class TargetEnemy extends Enemy{
 	
-	public TargetEnemy(int spawn){
-		super(0);
+	public TargetEnemy(){
 		speed = 0f;
 		maxhealth = 10;
 	}
@@ -48,7 +47,7 @@ public class TargetEnemy extends Enemy{
 	public void onDeath(){
 		super.onDeath();
 		Timers.run(100f, ()->{
-			new TargetEnemy(0).set(x, y).add();
+			new TargetEnemy().set(x, y).add();
 		});
 	}
 }

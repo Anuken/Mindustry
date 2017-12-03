@@ -52,7 +52,7 @@ public class LoadDialog extends FloatingDialog{
 		for(int i = 0; i < Vars.saveSlots; i++){
 			final int slot = i;
 
-			TextButton button = new TextButton("[orange]Slot " + (i + 1));
+			TextButton button = new TextButton("[accent]Slot " + (i + 1));
 			button.pad(Unit.dp.inPixels(12));
 			button.getLabelCell().top().left().growX();
 			

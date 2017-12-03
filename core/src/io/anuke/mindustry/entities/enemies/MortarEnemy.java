@@ -4,11 +4,10 @@ import io.anuke.mindustry.entities.BulletType;
 
 public class MortarEnemy extends Enemy{
 
-	public MortarEnemy(int spawn) {
-		super(spawn);
+	public MortarEnemy() {
 		
 		maxhealth = 200;
-		speed = 0.2f;
+		speed = 0.25f;
 		reload = 100f;
 		bullet = BulletType.shell;
 		turretrotatespeed = 0.15f;

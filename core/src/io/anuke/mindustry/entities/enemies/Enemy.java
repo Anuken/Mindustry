@@ -22,7 +22,7 @@ public class Enemy extends DestructibleEntity{
 	public final static Color[] tierColors = { Color.valueOf("ffe451"), Color.valueOf("f48e20"), Color.valueOf("ff6757"), Color.valueOf("ff2d86") };
 	public final static int maxtier = 4;
 
-	protected float speed = 0.3f;
+	protected float speed = 0.4f;
 	protected float reload = 32;
 	protected float range = 60;
 	protected float length = 4;
@@ -47,9 +47,7 @@ public class Enemy extends DestructibleEntity{
 	public Entity target;
 	public int tier = 1;
 
-	public Enemy(int spawn) {
-		this.spawn = spawn;
-
+	public Enemy() {
 		hitbox.setSize(5f);
 		hitboxTile.setSize(4f);
 

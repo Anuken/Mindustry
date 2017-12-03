@@ -74,8 +74,8 @@ public class WeaponBlocks{
 			bullet = BulletType.iron;
 			ammo = Item.iron;
 			health = 70;
-			shots = 7;
-			inaccuracy = 30f;
+			shots = 5;
+			inaccuracy = 15f;
 			shotDelayScale = 0.7f;
 			fullDescription = "A standard turret. Uses iron for ammo. Shoots a spread of 7 bullets. "
 					+ "Lower range, but higher damage output than the gattling turret.";

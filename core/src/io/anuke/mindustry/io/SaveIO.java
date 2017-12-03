@@ -357,7 +357,8 @@ public class SaveIO{
 				int health = stream.readInt();
 				
 				try{
-					Enemy enemy = (Enemy)ClassReflection.getConstructor(enemyIDs.get(type), int.class).newInstance(lane);
+					Enemy enemy = ClassReflection.newInstance(enemyIDs.get(type));
+					enemy.spawn = lane;
 					enemy.health = health;
 					enemy.x = x;
 					enemy.y = y;

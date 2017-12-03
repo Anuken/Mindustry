@@ -13,8 +13,7 @@ import io.anuke.ucore.util.Angles;
 
 public class HealerEnemy extends Enemy{
 
-	public HealerEnemy(int spawn) {
-		super(spawn);
+	public HealerEnemy() {
 		
 		speed = 0.2f;
 		reload = 14;

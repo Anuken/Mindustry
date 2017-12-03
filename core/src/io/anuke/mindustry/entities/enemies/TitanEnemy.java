@@ -7,12 +7,11 @@ import io.anuke.ucore.util.Mathf;
 
 public class TitanEnemy extends Enemy{
 
-	public TitanEnemy(int spawn) {
-		super(spawn);
+	public TitanEnemy() {
 		
-		speed = 0.14f;
+		speed = 0.22f;
 		reload = 30;
-		maxhealth = 400;
+		maxhealth = 421;
 		range = 60f;
 		bullet = BulletType.small;
 		hitbox.setSize(7f);
@@ -27,7 +26,7 @@ public class TitanEnemy extends Enemy{
 	
 	@Override
 	void updateShooting(){
-		Timers.get(this, "salvo", 250);
+		Timers.get(this, "salvo", 240);
 		
 		if(Timers.getTime(this, "salvo") < 60){
 			if(Timers.get(this, "salvoShoot", 6)){
@@ -35,7 +34,7 @@ public class TitanEnemy extends Enemy{
 			}
 		}
 		
-		if(Timers.get(this, "shotgun", 90)){
+		if(Timers.get(this, "shotgun", 80)){
 			Angles.shotgun(5, 10f, 0f, f->{
 				shoot(BulletType.smallSlow, f);
 			});

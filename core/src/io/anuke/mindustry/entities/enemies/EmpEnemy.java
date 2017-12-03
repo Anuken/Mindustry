@@ -4,8 +4,7 @@ import io.anuke.mindustry.entities.BulletType;
 
 public class EmpEnemy extends Enemy{
 
-	public EmpEnemy(int spawn) {
-		super(spawn);
+	public EmpEnemy() {
 		
 		speed = 0.27f;
 		reload = 70;

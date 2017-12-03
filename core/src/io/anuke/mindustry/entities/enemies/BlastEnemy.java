@@ -7,10 +7,9 @@ import io.anuke.mindustry.entities.TileEntity;
 
 public class BlastEnemy extends Enemy{
 
-	public BlastEnemy(int spawn) {
-		super(spawn);
+	public BlastEnemy() {
 		maxhealth = 30;
-		speed = 0.65f;
+		speed = 0.7f;
 		bullet = null;
 		turretrotatespeed = 0f;
 		mass = 0.8f;

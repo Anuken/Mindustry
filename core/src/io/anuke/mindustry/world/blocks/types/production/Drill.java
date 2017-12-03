@@ -33,7 +33,7 @@ public class Drill extends Block{
 	@Override
 	public void update(Tile tile){
 		
-		if(tile.floor() == resource && Timers.get(tile, "drill", 60 * time) && tile.entity.totalItems() < capacity){
+		if((tile.floor() == resource || (resource.drops.equals(tile.floor().drops))) && Timers.get(tile, "drill", 60 * time) && tile.entity.totalItems() < capacity){
 			offloadNear(tile, result);
 			Effects.effect(Fx.spark, tile.worldx(), tile.worldy());
 		}
@@ -45,7 +45,7 @@ public class Drill extends Block{
 	
 	@Override
 	public void drawOver(Tile tile){
-		if(tile.floor() != resource && resource != null){
+		if(tile.floor() != resource && !(resource.drops.equals(tile.floor().drops)) && resource != null){
 			Draw.colorl(0.85f + Mathf.absin(Timers.time(), 6f, 0.15f));
 			Draw.rect("cross", tile.worldx(), tile.worldy());
 			Draw.color();

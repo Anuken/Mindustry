@@ -5,8 +5,7 @@ import io.anuke.ucore.core.Timers;
 public class TestEnemy extends Enemy{
 	boolean dir = false;
 
-	public TestEnemy(int spawn) {
-		super(spawn);
+	public TestEnemy() {
 		maxhealth = 99999;
 		heal();
 	}

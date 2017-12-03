@@ -13,10 +13,9 @@ public class FortressEnemy extends Enemy{
 	float spawnTime = 240;
 	boolean deployed;
 
-	public FortressEnemy(int spawn) {
-		super(spawn);
+	public FortressEnemy() {
 		
-		speed = 0.12f;
+		speed = 0.2f;
 		reload = 90;
 		maxhealth = 700;
 		range = 70f;
@@ -38,7 +37,8 @@ public class FortressEnemy extends Enemy{
 			if(Timers.get(this, "spawn", spawnTime) && spawned < maxSpawn){
 				Angles.translation(angle, 20f);
 				
-				FastEnemy enemy = new FastEnemy(spawn);
+				FastEnemy enemy = new FastEnemy();
+				enemy.spawn = spawn;
 				enemy.tier = this.tier;
 				enemy.spawner = this;
 				enemy.set(x + Angles.x(), y + Angles.y());

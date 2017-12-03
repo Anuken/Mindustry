@@ -228,6 +228,7 @@ public class Turret extends Block{
 				bullet(tile, entity.rotation + Mathf.range(inaccuracy));
 			}else{
 				Timers.run(i * shotDelayScale, ()->{
+					Angles.translation(entity.rotation, width * Vars.tilesize / 2f);
 					bullet(tile, entity.rotation + Mathf.range(inaccuracy));
 				});
 			}

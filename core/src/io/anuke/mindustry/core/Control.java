@@ -9,14 +9,15 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.Constructor;
 
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.Fx;
-import io.anuke.mindustry.entities.enemies.*;
+import io.anuke.mindustry.entities.enemies.BlastEnemy;
+import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.entities.enemies.HealerEnemy;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.GestureHandler;
 import io.anuke.mindustry.input.Input;
@@ -113,61 +114,8 @@ public class Control extends Module{
 		
 		player = new Player();
 		
-		spawns = Array.with(
-			new EnemySpawn(TitanEnemy.class){{
-				after = 5;
-				spacing = 2;
-				scaling = 5;
-			}},
-			new EnemySpawn(FortressEnemy.class){{
-				after = 12;
-				spacing = 3;
-				scaling = 5;
-			}},
-			new EnemySpawn(HealerEnemy.class){{
-				scaling = 3;
-				spacing = 2;
-				after = 8;
-			}},
-			new EnemySpawn(Enemy.class){{
-				scaling = 3;
-				tierscaleback = 3;
-			}},
-			new EnemySpawn(FastEnemy.class){{
-				after = 2;
-				scaling = 3;
-			}},
-			new EnemySpawn(FlamerEnemy.class){{
-				after = 14;
-				spacing = 5;
-				scaling = 2;
-			}},
-			new EnemySpawn(BlastEnemy.class){{
-				after = 12;
-				spacing = 2;
-				scaling = 3;
-			}},
-			new EnemySpawn(RapidEnemy.class){{
-				after = 7;
-				spacing = 3;
-				scaling = 3;
-			}},
-			new EnemySpawn(EmpEnemy.class){{
-				after = 19;
-				spacing = 3;
-				scaling = 5;
-			}},
-			new EnemySpawn(TankEnemy.class){{
-				after = 4;
-				spacing = 2;
-				scaling = 3;
-			}},
-			new EnemySpawn(MortarEnemy.class){{
-				after = 20;
-				spacing = 3;
-				scaling = 5;
-			}}
-		);
+		spawns = WaveCreator.getSpawns();
+		WaveCreator.testWaves(1, 30);
 	}
 	
 	public void reset(){
@@ -290,9 +238,9 @@ public class Control extends Module{
 					
 					Timers.run(index*50f, ()->{
 						try{
-							Constructor c = ClassReflection.getConstructor(spawn.type, int.class);
-							Enemy enemy = (Enemy)c.newInstance(fl);
+							Enemy enemy = ClassReflection.newInstance(spawn.type);
 							enemy.set(tile.worldx() + Mathf.range(range), tile.worldy() + Mathf.range(range));
+							enemy.spawn = fl;
 							enemy.tier = spawn.tier(wave, fl);
 							Effects.effect(Fx.spawn, enemy);
 							enemy.add(enemyGroup);
@@ -466,15 +414,15 @@ public class Control extends Module{
 			
 			if(Inputs.keyUp(Keys.Y)){
 				if(Inputs.keyDown(Keys.SHIFT_LEFT)){
-					new HealerEnemy(0).set(player.x, player.y).add();
+					new HealerEnemy().set(player.x, player.y).add();
 				}else{
 					float px = player.x, py = player.y;
-					Timers.run(30f, ()->new BlastEnemy(0).set(px, py).add());
+					Timers.run(30f, ()->new BlastEnemy().set(px, py).add());
 				}
 			}
 		}
 		
-		if(shouldUpdateItems && Timers.get("updateItems", 8)){
+		if(shouldUpdateItems && (Timers.get("updateItems", 8) || GameState.is(State.paused))){
 			ui.updateItems();
 			shouldUpdateItems = false;
 		}

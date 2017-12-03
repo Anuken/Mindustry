@@ -11,7 +11,7 @@ public class Wall extends Block{
 	}
 	
 	public boolean canReplace(Block other){
-		return other instanceof Wall;
+		return other instanceof Wall && health > other.health;
 	}
 
 }

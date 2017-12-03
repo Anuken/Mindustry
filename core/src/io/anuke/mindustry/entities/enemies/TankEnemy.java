@@ -7,11 +7,10 @@ import io.anuke.ucore.util.Angles;
 
 public class TankEnemy extends Enemy{
 
-	public TankEnemy(int spawn) {
-		super(spawn);
+	public TankEnemy() {
 		
 		maxhealth = 350;
-		speed = 0.2f;
+		speed = 0.24f;
 		reload = 90f;
 		rotatespeed = 0.06f;
 		bullet = BulletType.small;

@@ -151,6 +151,7 @@ public class ProductionBlocks{
 	stonedrill = new Drill("stonedrill"){{
 		resource = Blocks.stone;
 		result = Item.stone;
+		time = 4;
 		formalName = "stone drill";
 		description = "Mines 1 "+resource.name+" every "+time+" seconds.";
 		fullDescription = "The essential drill. When placed on stone tiles, outputs stone at a slow pace indefinitely.";

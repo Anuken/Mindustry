@@ -4,8 +4,7 @@ import io.anuke.mindustry.entities.BulletType;
 
 public class FlamerEnemy extends Enemy{
 
-	public FlamerEnemy(int spawn) {
-		super(spawn);
+	public FlamerEnemy() {
 		
 		speed = 0.35f;
 		

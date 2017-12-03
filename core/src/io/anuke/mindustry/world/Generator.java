@@ -86,11 +86,11 @@ public class Generator{
 						floor = Blocks.coal;
 					}
 					
-					if(Noise.nnoise(x + 9999, y + 9999, 8, 1) > 0.253){
+					if(Noise.nnoise(x + 9999, y + 9999, 8, 1) > 0.264){
 						floor = Blocks.titanium;
 					}
 					
-					if(Noise.nnoise(x + 99999, y + 99999, 7, 1) > 0.258){
+					if(Noise.nnoise(x + 99999, y + 99999, 7, 1) > 0.259){
 						floor = Blocks.uranium;
 					}
 				}
@@ -112,7 +112,7 @@ public class Generator{
 				}
 				
 				if(color == Hue.rgb(Color.PURPLE)){
-					if(!Vars.android) new TargetEnemy(0).set(x * Vars.tilesize, y * Vars.tilesize).add();
+					if(!Vars.android) new TargetEnemy().set(x * Vars.tilesize, y * Vars.tilesize).add();
 					floor = Blocks.stone;
 				}
 				
