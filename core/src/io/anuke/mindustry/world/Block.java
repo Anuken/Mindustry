@@ -79,7 +79,7 @@ public class Block{
 	
 	public void drawOver(Tile tile){}
 	public void drawPixelOverlay(Tile tile){}
-	public void drawPlace(int x, int y, boolean valid){}
+	public void drawPlace(int x, int y, int rotation, boolean valid){}
 	public void postInit(){}
 	
 	public void getStats(Array<String> list){

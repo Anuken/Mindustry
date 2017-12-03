@@ -53,11 +53,18 @@ public class WaveCreator{
 				amount = 1;
 			}},
 			
+			new EnemySpawn(Enemy.class){{
+				scaling = 3;
+				after = 8;
+				spacing = 4;
+				tier = 2;
+			}},
+			
 			new EnemySpawn(TitanEnemy.class){{
 				after = 6;
 				amount = 2;
 				spacing = 5;
-				scaling = 3;
+				scaling = 2;
 			}},
 			
 			new EnemySpawn(FlamerEnemy.class){{
@@ -65,6 +72,13 @@ public class WaveCreator{
 				amount = 3;
 				spacing = 5;
 				scaling = 2;
+			}},
+			
+			new EnemySpawn(EmpEnemy.class){{
+				after = 15;
+				amount = 1;
+				spacing = 5;
+				scaling = 1;
 			}},
 			
 			new EnemySpawn(BlastEnemy.class){{

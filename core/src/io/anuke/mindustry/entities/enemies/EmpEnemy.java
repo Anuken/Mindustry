@@ -6,8 +6,8 @@ public class EmpEnemy extends Enemy{
 
 	public EmpEnemy() {
 		
-		speed = 0.27f;
-		reload = 70;
+		speed = 0.3f;
+		reload = 60;
 		maxhealth = 210;
 		range = 80f;
 		bullet = BulletType.emp;

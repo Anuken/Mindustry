@@ -132,10 +132,10 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			DamageArea.damage(!(b.owner instanceof Enemy), b.x, b.y, 25f, (int)(damage * 2f/3f));
 		}
 	},
-	titanshell = new BulletType(1.8f, 60){
+	titanshell = new BulletType(1.8f, 40){
 		{
 			lifetime = 70f;
-			hitsize = 11f;
+			hitsize = 15f;
 		}
 		
 		public void draw(Bullet b){

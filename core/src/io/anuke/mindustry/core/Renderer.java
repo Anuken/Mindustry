@@ -409,7 +409,8 @@ public class Renderer extends RendererModule{
 			Draw.thickness(2f);
 			Draw.linecrect(x + offset.x, y + offset.y, tilesize * player.recipe.result.width + si, tilesize * player.recipe.result.height + si);
 
-			player.recipe.result.drawPlace(tilex, tiley, valid);
+			player.recipe.result.drawPlace(tilex, tiley, player.rotation, valid);
+			Draw.thickness(2f);
 
 			if(player.recipe.result.rotate){
 				Draw.color("orange");
@@ -420,7 +421,7 @@ public class Renderer extends RendererModule{
 			Draw.thickness(1f);
 			Draw.color("scarlet");
 			for(SpawnPoint spawn : control.getSpawnPoints()){
-				Draw.dashcircle(spawn.start.worldx(), spawn.start.worldy(), enemyspawnspace);
+				Draw.dashCircle(spawn.start.worldx(), spawn.start.worldy(), enemyspawnspace);
 			}
 
 			if(valid)

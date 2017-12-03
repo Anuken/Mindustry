@@ -42,6 +42,10 @@ public class RepairTurret extends PowerTurret{
 			return;
 		}
 		
+		if(entity.blockTarget != null && entity.blockTarget.dead){
+			entity.blockTarget = null;
+		}
+		
 		if(Timers.get(entity, "blocktarget", targetInterval)){
 			entity.blockTarget = Vars.world.findTileTarget(tile.worldx(), tile.worldy(), tile, range, true);
 		}
@@ -64,7 +68,7 @@ public class RepairTurret extends PowerTurret{
 	@Override
 	public void drawPixelOverlay(Tile tile){
 		Draw.color("green");
-		Draw.dashcircle(tile.worldx(), tile.worldy(), range);
+		Draw.dashCircle(tile.worldx(), tile.worldy(), range);
 		Draw.reset();
 		
 		drawPowerBar(tile);

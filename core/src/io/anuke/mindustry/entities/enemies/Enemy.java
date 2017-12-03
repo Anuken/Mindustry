@@ -175,7 +175,7 @@ public class Enemy extends DestructibleEntity{
 		}
 
 		maxhealth *= tier;
-		speed += 0.04f * tier + Mathf.range(0.1f);
+		speed += 0.04f * tier /*+ Mathf.range(0.1f)*/;
 		reload /= Math.max(tier / 1.5f, 1f);
 		range += tier * 5;
 		speed = Math.max(speed, 0.07f);

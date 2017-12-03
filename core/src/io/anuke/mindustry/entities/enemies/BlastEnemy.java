@@ -27,10 +27,20 @@ public class BlastEnemy extends Enemy{
 		}
 		
 		if(target != null && target.distanceTo(this) < range){
-			Bullet b = new Bullet(BulletType.blast, this, x, y, 0).add();
-			b.damage = BulletType.blast.damage + (tier-1) * 40;
-			damage(999);
+			explode();
 		}
+	}
+	
+	@Override
+	public void onDeath(){
+		super.onDeath();
+		explode();
+	}
+	
+	void explode(){
+		Bullet b = new Bullet(BulletType.blast, this, x, y, 0).add();
+		b.damage = BulletType.blast.damage + (tier-1) * 40;
+		damage(999);
 	}
 
 }

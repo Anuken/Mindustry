@@ -159,6 +159,14 @@ public class Control extends Module{
 		//multiplying by 2 so you start with more time in the beginning
 		wavetime = waveSpacing()*2;
 		
+		if(mode == GameMode.sandbox){
+			for(Item type : Item.values()){
+				items.put(type, 999999999);
+			}
+		}
+		
+		ui.updateItems();
+		
 		GameState.set(State.playing);
 	}
 	
@@ -236,7 +244,7 @@ public class Control extends Module{
 					int index = i;
 					float range = 12f;
 					
-					Timers.run(index*50f, ()->{
+					Timers.run(index*5f, ()->{
 						try{
 							Enemy enemy = ClassReflection.newInstance(spawn.type);
 							enemy.set(tile.worldx() + Mathf.range(range), tile.worldy() + Mathf.range(range));

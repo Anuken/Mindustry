@@ -79,7 +79,7 @@ public class TileEntity extends Entity{
 	}
 	
 	public boolean collide(Bullet other){
-		return other.owner instanceof Enemy;
+		return other.owner instanceof Enemy; //TODO
 	}
 	
 	@Override

@@ -15,9 +15,9 @@ public class FortressEnemy extends Enemy{
 
 	public FortressEnemy() {
 		
-		speed = 0.2f;
+		speed = 0.25f;
 		reload = 90;
-		maxhealth = 700;
+		maxhealth = 800;
 		range = 70f;
 		bullet = BulletType.yellowshell;
 		hitbox.setSize(10f);

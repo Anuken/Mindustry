@@ -24,12 +24,14 @@ import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.Label;
+import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Profiler;
 
 public class HudFragment implements Fragment{
 	private Table itemtable, respawntable;
+	private Cell<Table> itemcell;
 	private Array<Item> tempItems = new Array<>();
 	
 	public void build(){
@@ -63,6 +65,8 @@ public class HudFragment implements Fragment{
 			row();
 			
 			itemtable = new table("button").end().top().left().fillX().size(-1).get();
+			itemtable.setVisible(()-> control.getMode() != GameMode.sandbox);
+			itemcell = get().getCell(itemtable);
 
 			get().setVisible(()->!GameState.is(State.menu));
 			
@@ -167,6 +171,10 @@ public class HudFragment implements Fragment{
 		itemtable.clear();
 		itemtable.left();
 		
+		if(control.getMode() == GameMode.sandbox){
+			return;
+		}
+		
 		tempItems.clear();
 		for(Item item : control.getItems().keys()){
 			tempItems.add(item);
@@ -174,8 +182,13 @@ public class HudFragment implements Fragment{
 		tempItems.sort();
 
 		for(Item stack : tempItems){
+			int amount = control.getAmount(stack);
+			String formatted = Mindustry.formatter.format(amount);
+			if(amount > 99999999){
+				formatted = "inf";
+			}
 			Image image = new Image(Draw.region("icon-" + stack.name()));
-			Label label = new Label("" + Mindustry.formatter.format(control.getAmount(stack)));
+			Label label = new Label(formatted);
 			label.setFontScale(fontscale*1.5f);
 			itemtable.add(image).size(8*3).units(Unit.dp);
 			itemtable.add(label).left();

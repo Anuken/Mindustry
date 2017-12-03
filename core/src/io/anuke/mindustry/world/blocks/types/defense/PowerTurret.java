@@ -38,7 +38,7 @@ public class PowerTurret extends Turret implements PowerAcceptor{
 		Vector2 offset = getPlaceOffset();
 		
 		Draw.color("green");
-		Draw.dashcircle(tile.worldx() + offset.x, tile.worldy() + offset.y, range);
+		Draw.dashCircle(tile.worldx() + offset.x, tile.worldy() + offset.y, range);
 		Draw.reset();
 		
 		drawPowerBar(tile);

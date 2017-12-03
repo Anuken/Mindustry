@@ -78,7 +78,7 @@ public class Generator{
 				
 				if(floor == Blocks.stone || floor == Blocks.grass || floor == Blocks.blackstone ||
 						floor == Blocks.snow || floor == Blocks.sand){
-					if(Noise.nnoise(x, y, 8, 1) > 0.2){
+					if(Noise.nnoise(x, y, 8, 1) > 0.21){
 						floor = Blocks.iron;
 					}
 					
@@ -86,7 +86,7 @@ public class Generator{
 						floor = Blocks.coal;
 					}
 					
-					if(Noise.nnoise(x + 9999, y + 9999, 8, 1) > 0.264){
+					if(Noise.nnoise(x + 9999, y + 9999, 8, 1) > 0.27){
 						floor = Blocks.titanium;
 					}
 					

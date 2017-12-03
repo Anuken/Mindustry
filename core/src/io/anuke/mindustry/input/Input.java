@@ -25,7 +25,7 @@ public class Input{
 		//player is dead
 		if(player.health <= 0) return;
 		
-		if(Inputs.scrolled() && GameState.is(State.playing)){
+		if(Inputs.scrolled() && !GameState.is(State.menu) && !Vars.ui.onDialog()){
 			Vars.renderer.scaleCamera(Inputs.scroll());
 		}
 

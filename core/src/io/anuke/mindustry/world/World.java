@@ -326,7 +326,7 @@ public class World extends Module{
 		
 		if(tile == null) return;
 		
-		Block block = tile.block();
+		Block block = tile.isLinked() ? tile.getLinked().block() : tile.block();
 		Recipe result = null;
 		
 		for(Recipe recipe : Recipe.values()){
@@ -420,7 +420,7 @@ public class World extends Module{
 					other = other.getLinked();
 				}
 				
-				if(other == null || other.entity == null ||(tile != null && other.entity == tile.entity)) continue;
+				if(other == null || other.entity == null || (tile != null && other.entity == tile.entity)) continue;
 				
 				TileEntity e = other.entity;
 				

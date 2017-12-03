@@ -25,7 +25,14 @@ public class PowerBooster extends Generator{
 		super.drawPixelOverlay(tile);
 		
 		Draw.color("yellow");
-		Draw.dashcircle(tile.worldx(), tile.worldy(), powerRange * Vars.tilesize);
+		Draw.dashCircle(tile.worldx(), tile.worldy(), powerRange * Vars.tilesize);
+		Draw.reset();
+	}
+	
+	@Override
+	public void drawPlace(int x, int y, int rotation, boolean valid){
+		Draw.color("purple");
+		Draw.dashCircle(x * Vars.tilesize, y * Vars.tilesize, laserRange * Vars.tilesize);
 		Draw.reset();
 	}
 	

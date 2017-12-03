@@ -182,7 +182,7 @@ public class WeaponBlocks{
 			inaccuracy = 8f;
 			formalName = "chain turret";
 			range = 80f;
-			reload = 7f;
+			reload = 8f;
 			bullet = BulletType.chain;
 			ammo = Item.uranium;
 			health = 430;
@@ -219,7 +219,7 @@ public class WeaponBlocks{
 		{
 			formalName = "titan cannon";
 			range = 120f;
-			reload = 20f;
+			reload = 23f;
 			bullet = BulletType.titanshell;
 			ammo = Item.uranium;
 			health = 800;

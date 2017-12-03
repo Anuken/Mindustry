@@ -227,8 +227,8 @@ public class ProductionBlocks{
 			formalName = "thermal generator";
 			//TODO
 			generateLiquid = Liquid.lava;
-			inputLiquid = 20f;
-			generatePower = 1f;
+			inputLiquid = 25f;
+			generatePower = 0.5f;
 			powerCapacity = 40f;
 			description = "Generates power from lava.";
 			fullDescription = "Generates power from lava. Outputs power as lasers to its 4 sides.";

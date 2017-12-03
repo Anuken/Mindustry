@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.input.Input;
+import io.anuke.mindustry.resource.Mech;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.ucore.core.*;
@@ -18,6 +19,7 @@ import io.anuke.ucore.util.Angles;
 
 public class Player extends DestructibleEntity{
 	public Weapon weapon;
+	public Mech mech = Mech.standard;
 	public float breaktime = 0;
 	
 	public Recipe recipe;
@@ -50,9 +52,9 @@ public class Player extends DestructibleEntity{
 	@Override
 	public void draw(){
 		if(Vars.snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate")){
-			Draw.rect("player", (int)x, (int)y, direction.angle()-90);
+			Draw.rect("mech-"+mech.name(), (int)x, (int)y, direction.angle()-90);
 		}else{
-			Draw.rect("player", x, y, direction.angle()-90);
+			Draw.rect("mech-"+mech.name(), x, y, direction.angle()-90);
 		}
 		
 	}

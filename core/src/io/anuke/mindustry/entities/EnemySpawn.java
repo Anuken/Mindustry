@@ -13,9 +13,11 @@ public class EnemySpawn{
 	/**The spacing, in waves, of spawns. 2 = spawns every other wave*/
 	protected int spacing = 1;
 	/**How many waves need to pass after the start of this spawn for the tier to increase by one*/
-	protected int tierscale = 15;
+	protected int tierscale = 14;
 	/**How many less enemies there are, every time the tier increases*/
 	protected int tierscaleback = 1;
+	/**The tier this spawn starts at.*/
+	protected int tier = 1;
 	/**Maximum amount of enemies that spawn*/
 	protected int max = 17;
 	/**How many waves need to pass before the amount of enemies increases by 1*/
@@ -35,6 +37,6 @@ public class EnemySpawn{
 	}
 	
 	public int tier(int wave, int lane){
-		return Mathf.clamp(1 + (wave-after)/tierscale, 1, Enemy.maxtier);
+		return Mathf.clamp(tier + (wave-after)/tierscale, 1, Enemy.maxtier);
 	}
 }

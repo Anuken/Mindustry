@@ -103,7 +103,7 @@ public class Turret extends Block{
 		Vector2 offset = getPlaceOffset();
 		
 		Draw.color("green");
-		Draw.dashcircle(tile.worldx() + offset.x, tile.worldy() + offset.y, range);
+		Draw.dashCircle(tile.worldx() + offset.x, tile.worldy() + offset.y, range);
 		Draw.reset();
 		
 		TurretEntity entity = tile.entity();
@@ -116,10 +116,10 @@ public class Turret extends Block{
 	}
 	
 	@Override
-	public void drawPlace(int x, int y, boolean valid){
+	public void drawPlace(int x, int y, int rotation, boolean valid){
 		Draw.color(Color.PURPLE);
 		Draw.thick(1f);
-		Draw.dashcircle(x*Vars.tilesize, y*Vars.tilesize, range);
+		Draw.dashCircle(x*Vars.tilesize, y*Vars.tilesize, range);
 	}
 	
 	@Override

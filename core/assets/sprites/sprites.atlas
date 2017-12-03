@@ -664,7 +664,7 @@ blocks/oil
   index: -1
 blocks/oiledge
   rotate: false
-  xy: 456, 423
+  xy: 470, 423
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -1579,9 +1579,9 @@ laserend
   orig: 18, 18
   offset: 0, 0
   index: -1
-mechs/player
+mechs/mech-standard
   rotate: false
-  xy: 470, 423
+  xy: 456, 423
   size: 12, 12
   orig: 12, 12
   offset: 0, 0

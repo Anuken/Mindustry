@@ -379,6 +379,10 @@ public class UI extends SceneModule{
 		about.show();
 	}
 	
+	public boolean onDialog(){
+		return scene.getKeyboardFocus() instanceof Dialog;
+	}
+	
 	public void showUpgrades(){
 		upgrades.show();
 	}

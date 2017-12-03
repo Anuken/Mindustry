@@ -72,7 +72,7 @@ public class DefenseBlocks{
 					+ "Uses small amounts of power.";
 			formalName = "repair turret";
 			range = 30;
-			reload = 40f;
+			reload = 60f;
 			health = 60;
 		}
 	},
@@ -83,7 +83,8 @@ public class DefenseBlocks{
 					+ "Uses power.";
 			formalName = "repair turret II";
 			range = 44;
-			reload = 20f;
+			reload = 30f;
+			powerUsed = 0.15f;
 			health = 90;
 		}
 	},

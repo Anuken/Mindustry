@@ -15,9 +15,9 @@ public class HealerEnemy extends Enemy{
 
 	public HealerEnemy() {
 		
-		speed = 0.2f;
-		reload = 14;
-		maxhealth = 130;
+		speed = 0.25f;
+		reload = 10;
+		maxhealth = 200;
 		range = 90f;
 		bullet = BulletType.shot;
 		range = 30f;

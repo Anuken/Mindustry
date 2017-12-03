@@ -207,8 +207,8 @@ public class Tile{
 	}
 	
 	public void changed(){
-		if(entity != null && entity.added){
-			entity.remove();
+		if(entity != null){
+			if(entity.added) entity.remove();
 			entity = null;
 		}
 		
