@@ -26,6 +26,7 @@ public class WeaponBlocks{
 			range = 52;
 			reload = 15f;
 			bullet = BulletType.stone;
+			health = 50;
 			ammo = Item.stone;
 			fullDescription = "A basic, cheap turret. Uses stone for ammo. Has slightly more range than the double-turret.";
 		}
@@ -38,6 +39,7 @@ public class WeaponBlocks{
 			reload = 13f;
 			bullet = BulletType.stone;
 			ammo = Item.stone;
+			health = 55;
 			health = 50;
 			fullDescription = "A slightly more powerful version of the turret. Uses stone for ammo. Does significantly more damage, but has a lower range. Shoots two bullets.";
 		}

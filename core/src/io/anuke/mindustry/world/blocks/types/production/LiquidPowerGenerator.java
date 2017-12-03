@@ -19,7 +19,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Strings;
 
 public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
-	public int generateTime = 5;
+	public int generateTime = 15;
 	public Liquid generateLiquid;
 	/**Power to generate per generateInput.*/
 	public float generatePower = 1f;

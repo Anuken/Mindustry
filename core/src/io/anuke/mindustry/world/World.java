@@ -286,7 +286,7 @@ public class World extends Module{
 		
 		if(tile == null) return false;
 		
-		if(type.isMultiblock() && Vars.control.getTutorial().active() &&
+		if(!type.isMultiblock() && Vars.control.getTutorial().active() &&
 				Vars.control.getTutorial().showBlock()){
 			
 			GridPoint2 point = Vars.control.getTutorial().getPlacePoint();

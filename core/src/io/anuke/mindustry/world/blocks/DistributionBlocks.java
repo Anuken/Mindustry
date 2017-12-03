@@ -92,6 +92,13 @@ public class DistributionBlocks{
 		fullDescription = "Laser that distributes power to three directions at once. "
 				+ "Useful in situations where it is required to power multiple blocks from one generator.";
 	}},
+	powerlasercorner = new PowerLaserRouter("powerlasercorner"){{
+		laserDirections = 2;
+		formalName = "laser corner";
+		description = "Splits input power into 2 lasers.";
+		fullDescription = "Laser that distributes power to two directions at once. "
+				+ "Useful in situations where it is required to power multiple blocks from one generator, and a normal router is imprecise.";
+	}},
 	teleporter = new Teleporter("teleporter"){{
 		description = "[interact]Tap block to config[]\nTeleports items to others of the same color.";
 		fullDescription = "Advanced item transport block. Teleporters input items to other teleporters of the same color."

@@ -33,7 +33,7 @@ public class LiquidItemJunction extends LiquidBlock{
 		int dir = source.relativeTo(dest.x, dest.y);
 		dir = (dir+4)%4;
 		
-		if(dir % 2 == 0) return false;
+		if(dir+dest.getRotation() % 2 == 1) return false;
 		
 		Tile to = dest.getNearby()[dir];
 		return to != null && to.block() != this && to.block() instanceof LiquidBlock &&
@@ -56,7 +56,7 @@ public class LiquidItemJunction extends LiquidBlock{
 	public boolean acceptItem(Item item, Tile dest, Tile source){
 		int dir = source.relativeTo(dest.x, dest.y);
 		
-		if(dir % 2 == 1) return false;
+		if((dir+dest.getRotation()) % 2 == 0) return false;
 		
 		Tile to = dest.getNearby()[dir];
 		return to != null && to.block().acceptItem(item, to, dest);

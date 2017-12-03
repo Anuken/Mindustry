@@ -158,7 +158,7 @@ public class Turret extends Block{
 				
 				float reload = Vars.multiplier*this.reload;
 				if(Angles.angleDist(entity.rotation, targetRot) < shootCone && Timers.get(tile, "reload", reload)){
-					Effects.sound(shootsound, entity);
+					if(shootsound != null) Effects.sound(shootsound, entity);
 					shoot(tile);
 					consumeAmmo(tile);
 					entity.ammo --;

@@ -22,6 +22,7 @@ public class LaserTurret extends PowerTurret{
 
 	public LaserTurret(String name) {
 		super(name);
+		shootsound = null;
 	}
 	
 	@Override

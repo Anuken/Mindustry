@@ -6,12 +6,14 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Mathf;
 
 public class TargetEnemy extends Enemy{
 	
 	public TargetEnemy(){
 		speed = 0f;
-		maxhealth = 10;
+		maxhealth = 25;
+		shootsound = null;
 	}
 	
 	@Override
@@ -37,7 +39,7 @@ public class TargetEnemy extends Enemy{
 		Draw.color(Color.YELLOW);
 		
 		if(Vars.control.getTutorial().showTarget()){
-			Draw.spikes(x, y, 11f, 4f, 8, Timers.time());
+			Draw.spikes(x, y, 11f + Mathf.sin(Timers.time(), 7f, 1f), 4f, 8, Timers.time());
 		}
 		
 		Draw.color();

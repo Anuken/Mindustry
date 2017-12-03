@@ -155,9 +155,9 @@ public class Tutorial{
 	}
 	
 	public void setDefaultBlocks(int corex, int corey){
-		world.tile(corex, corey - 1).setBlock(Blocks.air);
 		world.tile(corex, corey - 2).setBlock(Blocks.air);
-		world.tile(corex, corey - 2).setFloor(Blocks.stone);
+		world.tile(corex, corey - 3).setBlock(Blocks.air);
+		world.tile(corex, corey - 3).setFloor(Blocks.stone);
 	}
 	
 	enum Stage{
@@ -203,7 +203,7 @@ public class Tutorial{
 				canForward = false;
 				blockRotation = 1;
 				blockPlaceX = 0;
-				blockPlaceY = -1;
+				blockPlaceY = -2;
 				targetBlock = DistributionBlocks.conveyor;
 				text = "Use [orange][[R][] to rotate the conveyor to face [orange]forwards[], then place it in the [yellow]marked location[]  using the [orange][[left mouse button][].";
 			}
@@ -216,7 +216,7 @@ public class Tutorial{
 				canForward = false;
 				blockRotation = 1;
 				blockPlaceX = 0;
-				blockPlaceY = -1;
+				blockPlaceY = -2;
 				targetBlock = DistributionBlocks.conveyor;
 				text = "Use the [orange][[rotate button][] to rotate the conveyor to face [orange]forwards[], drag it into position with one finger, then place it in the [yellow]marked location[] using the [orange][[checkmark][].";
 			}
@@ -241,7 +241,7 @@ public class Tutorial{
 				showBlock = true;
 				canForward = false;
 				blockPlaceX = 0;
-				blockPlaceY = -2;
+				blockPlaceY = -3;
 				targetBlock = ProductionBlocks.stonedrill;
 				text = "Now, select and place a [yellow]stone drill[] at the marked location.";
 			}
@@ -292,11 +292,12 @@ public class Tutorial{
 			
 			void onSwitch(){
 				for(int flip : new int[]{1, -1}){
-					world.tile(control.core.x + flip, control.core.y - 1).setBlock(DistributionBlocks.conveyor, 2 * flip);
-					world.tile(control.core.x + flip*2, control.core.y - 1).setBlock(DistributionBlocks.conveyor, 2 * flip);
-					world.tile(control.core.x + flip*2, control.core.y - 2).setBlock(DistributionBlocks.conveyor, 1);
-					world.tile(control.core.x + flip*2, control.core.y - 3).setFloor(Blocks.stone);
-					world.tile(control.core.x + flip*2, control.core.y - 3).setBlock(ProductionBlocks.stonedrill);
+					world.tile(control.core.x + flip, control.core.y - 2).setBlock(DistributionBlocks.conveyor, 2 * flip);
+					world.tile(control.core.x + flip*2, control.core.y - 2).setBlock(DistributionBlocks.conveyor, 2 * flip);
+					world.tile(control.core.x + flip*2, control.core.y - 3).setBlock(DistributionBlocks.conveyor, 2 * flip);
+					world.tile(control.core.x + flip*2, control.core.y - 3).setBlock(DistributionBlocks.conveyor, 1);
+					world.tile(control.core.x + flip*2, control.core.y - 4).setFloor(Blocks.stone);
+					world.tile(control.core.x + flip*2, control.core.y - 4).setBlock(ProductionBlocks.stonedrill);
 					
 				}
 			}
@@ -308,23 +309,24 @@ public class Tutorial{
 				showBlock = true;
 				targetBlock = Blocks.air;
 				blockPlaceX = 2;
-				blockPlaceY = -1;
+				blockPlaceY = -2;
 				text = !Vars.android ? 
 					"You can delete blocks by holding the  [orange]right mouse button[] on the block you want to delete. Try deleting this conveyor.":
 					"You can delete blocks by [orange]tapping and holding[]  on the block you want to delete. Try deleting this conveyor.";
 			}
 		},
+		/*
 		deleteBlock2{
 			{
 				canBack = false;
 				canForward = false;
 				showBlock = true;
 				targetBlock = Blocks.air;
-				blockPlaceX = 1;
-				blockPlaceY = -1;
+				blockPlaceX = -2;
+				blockPlaceY = -2;
 				text = "Try deleting this other conveyor too.";
 			}
-		},
+		},*/
 		placeTurret{
 			{
 				canBack = false;
@@ -333,12 +335,12 @@ public class Tutorial{
 				canPlace = true;
 				targetBlock = WeaponBlocks.turret;
 				blockPlaceX = 2;
-				blockPlaceY = -1;
+				blockPlaceY = 2;
 				text = "Now, select and place a [yellow]turret[] at the [yellow]marked location[].";
 			}
 			
 			void onSwitch(){
-				Vars.ui.<ImageButton>find("sectionbuttondefense").fireClick();
+				Vars.ui.<ImageButton>find("sectionbuttonweapon").fireClick();
 			}
 		},
 		placedTurretAmmo{
@@ -349,6 +351,9 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
+				for(int i = 0; i < 4; i ++){
+					world.tile(control.core.x + 2, control.core.y - 2 + i).setBlock(DistributionBlocks.conveyor, 1);
+				}
 				Vars.player.recipe = null;
 			}
 		},
@@ -518,7 +523,7 @@ public class Tutorial{
 			
 			void onSwitch(){
 				world.tile(blockPlaceX + control.core.x, blockPlaceY + control.core.y).setBlock(Blocks.air);
-				Vars.ui.<ImageButton>find("sectionbuttonproduction").fireClick();
+				Vars.ui.<ImageButton>find("sectionbuttoncrafting").fireClick();
 				Vars.control.addItem(Item.steel, 60);
 				Vars.control.addItem(Item.iron, 60);
 			}
@@ -535,9 +540,9 @@ public class Tutorial{
 					world.tile(control.core.x + i + 4, control.core.y + 2).setFloor(Blocks.stone);
 				}
 				
-				for(int i = 0; i < 3; i ++){
-					world.tile(control.core.x + 4 - 1 - i, control.core.y).setBlock(DistributionBlocks.conveyor, 2);
-				}
+				world.tile(control.core.x + 3, control.core.y).setBlock(DistributionBlocks.conveyor, 2);
+				
+				world.tile(control.core.x + 2, control.core.y).setBlock(DistributionBlocks.junction, 2);
 				
 				world.tile(control.core.x + 2, control.core.y + 1).setBlock(DistributionBlocks.conveyor, 0);
 				world.tile(control.core.x + 3, control.core.y + 1).setBlock(DistributionBlocks.conveyor, 0);

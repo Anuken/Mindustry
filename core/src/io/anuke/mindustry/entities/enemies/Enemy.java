@@ -124,7 +124,7 @@ public class Enemy extends DestructibleEntity{
 	void updateShooting(){
 		if(Timers.get(this, "reload", reload * Vars.multiplier)){
 			shoot(bullet);
-			Effects.sound(shootsound, this);
+			if(shootsound != null) Effects.sound(shootsound, this);
 		}
 	}
 

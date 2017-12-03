@@ -34,6 +34,12 @@ public class PowerTurret extends Turret implements PowerAcceptor{
 	}
 	
 	@Override
+	public void postInit(){
+		super.postInit();
+		description += "\n[powerinfo]Power/shot: " + Strings.toFixed(powerUsed, 1);
+	}
+	
+	@Override
 	public void drawPixelOverlay(Tile tile){
 		Vector2 offset = getPlaceOffset();
 		
