@@ -105,6 +105,9 @@ public class Pathfind{
 	}
 	
 	void findNode(Enemy enemy){
+		if(enemy.spawn >= Vars.control.getSpawnPoints().size){
+			enemy.spawn = 0;
+		}
 		
 		if(Vars.control.getSpawnPoints().get(enemy.spawn).pathTiles == null){
 			return;

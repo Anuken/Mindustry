@@ -26,11 +26,11 @@ public enum Recipe{
 	poweredconveyor(distribution, DistributionBlocks.pulseconveyor, stack(Item.dirium, 1)),
 	router(distribution, DistributionBlocks.router, stack(Item.stone, 2)),
 	junction(distribution, DistributionBlocks.junction, stack(Item.iron, 2)),
+	tunnel(distribution, DistributionBlocks.tunnel, stack(Item.iron, 2)),
 	conduit(distribution, DistributionBlocks.conduit, stack(Item.steel, 1)),
 	pulseconduit(distribution, DistributionBlocks.pulseconduit, stack(Item.titanium, 1), stack(Item.steel, 1)),
 	liquidrouter(distribution, DistributionBlocks.liquidrouter, stack(Item.steel, 2)),
 	liquidjunction(distribution, DistributionBlocks.liquidjunction, stack(Item.steel, 2)),
-	liquiditemjunction(distribution, DistributionBlocks.liquiditemjunction, stack(Item.steel, 1), stack(Item.iron, 1)),	
 	sorter(distribution, DistributionBlocks.sorter, stack(Item.steel, 2)),
 	
 	turret(weapon, WeaponBlocks.turret, stack(Item.stone, 4)),

@@ -6,6 +6,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.GameState;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
@@ -27,7 +29,7 @@ public class Generator extends PowerBlock{
 	public boolean hasLasers = true;
 	public boolean outputOnly = false;
 
-	public Generator(String name) {
+	public Generator(String name){
 		super(name);
 	}
 
@@ -175,7 +177,7 @@ public class Generator extends PowerBlock{
 				Draw.tint(Hue.mix(Color.GRAY, Color.WHITE, 0.904f + Mathf.sin(Timers.time(), 1.7f, 0.06f)));
 			}else{
 				Draw.tint(Hue.mix(Color.SCARLET, Color.WHITE, 0.902f + Mathf.sin(Timers.time(), 1.7f, 0.08f)));
-				if(Mathf.chance(Timers.delta() * 0.033)){
+				if(GameState.is(State.playing) && Mathf.chance(Timers.delta() * 0.033)){
 					Effects.effect(Fx.laserspark, target.worldx() - Tmp.v1.x, target.worldy() - Tmp.v1.y);
 				}
 			}
@@ -192,6 +194,13 @@ public class Generator extends PowerBlock{
 		if(target.block() instanceof Generator){
 			Generator other = (Generator) target.block();
 			int relrot = (rotation + 2) % 4;
+			if(other.hasLasers){
+				for(int i = 0; i < other.laserDirections; i ++){
+					if(target.getRotation() + i - other.laserDirections/2 == (target.getRotation() + 2) % 4){
+						return true;
+					}
+				}
+			}
 			if(other.hasLasers && Math.abs(target.getRotation() - relrot) <= other.laserDirections / 2){
 				return true;
 			}

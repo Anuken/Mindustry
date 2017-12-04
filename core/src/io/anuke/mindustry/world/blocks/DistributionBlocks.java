@@ -63,6 +63,12 @@ public class DistributionBlocks{
 				+ "two different conveyors carrying different materials to different locations.";
 		
 	}},
+	tunnel = new TunnelConveyor("conveyortunnel"){{
+		formalName = "conveyor tunnel";
+		description = "Transports items under blocks.";
+		fullDescription = "Transports item under blocks. "
+				+ "To use, place one tunnel leading into the block to be tunneled under, and one on the other side.";	
+	}},
 	liquidjunction = new LiquidJunction("liquidjunction"){{
 		formalName = "liquid junction";
 		description = "Serves as a liquid junction.";

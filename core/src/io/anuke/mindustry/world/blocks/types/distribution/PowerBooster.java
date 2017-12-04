@@ -32,7 +32,8 @@ public class PowerBooster extends Generator{
 	@Override
 	public void drawPlace(int x, int y, int rotation, boolean valid){
 		Draw.color("purple");
-		Draw.dashCircle(x * Vars.tilesize, y * Vars.tilesize, laserRange * Vars.tilesize);
+		Draw.thick(1f);
+		Draw.dashCircle(x * Vars.tilesize, y * Vars.tilesize, powerRange * Vars.tilesize);
 		Draw.reset();
 	}
 	
