@@ -22,6 +22,7 @@ import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
+import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.layout.Cell;
@@ -42,7 +43,7 @@ public class HudFragment implements Fragment{
 			
 			new table(){{
 				left();
-				defaults().size(66).units(Unit.dp).left();
+				defaults().size(68).units(Unit.dp).left();
 				float isize = Unit.dp.inPixels(40);
 				
 				new imagebutton("icon-menu", isize, ()->{
@@ -61,6 +62,12 @@ public class HudFragment implements Fragment{
 					});
 				}};
 			}}.end();
+			
+			row();
+			
+			new table(){{
+				addWaveTable();
+			}}.fillX().end();
 			
 			row();
 			
@@ -95,29 +102,16 @@ public class HudFragment implements Fragment{
 
 		//wave table...
 		new table(){{
-			atop();
-			aright();
 			
-			float uheight = 72f;
+			if(!Vars.android){
+				atop();
+				aright();
+			}else{
+				abottom();
+				aleft();
+			}
 			
-			new imagebutton("icon-play", Unit.dp.inPixels(30f), ()->{
-				Vars.control.runWave();
-			}).size(uheight).uniformY().units(Unit.dp)
-				.visible(()-> Vars.control.getMode() == GameMode.sandbox && Vars.control.getEnemiesRemaining() <= 0);
-
-			new table("button"){{
-
-				new label(()->"[orange]Wave " + control.getWave()).scale(fontscale*2f).left();
-
-				row();
-
-				new label(()-> control.getEnemiesRemaining() > 0 ?
-						control.getEnemiesRemaining() + " Enemies remaining" : 
-							(control.getTutorial().active() || Vars.control.getMode() == GameMode.sandbox) ? "waiting..." : "New wave in " + (int) (control.getWaveCountdown() / 60f))
-				.minWidth(150);
-
-				get().pad(Unit.dp.inPixels(12));
-			}}.height(uheight).units(Unit.dp);
+			//addWaveTable();
 
 			visible(()->!GameState.is(State.menu));
 		}}.end();
@@ -164,6 +158,46 @@ public class HudFragment implements Fragment{
 				}}.end();
 			}
 		}
+	}
+	
+	private void addWaveTable(){
+		float uheight = 66f;
+		
+		new table("button"){{
+			aleft();
+			new table(){{
+				aleft();
+
+				new label(()->"[orange]Wave " + control.getWave()).scale(fontscale*1.5f).left();
+
+				row();
+			
+				new label(()-> control.getEnemiesRemaining() > 0 ?
+					control.getEnemiesRemaining() + " enemies" : 
+						(control.getTutorial().active() || Vars.control.getMode() == GameMode.sandbox) ? "waiting..." : "Wave in " + (int) (control.getWaveCountdown() / 60f))
+				.minWidth(140).left();
+
+				get().pad(Unit.dp.inPixels(12));
+			}}.left().padLeft(-6).end();
+			
+			playButton(uheight);
+			//get().padTop(Unit.dp.inPixels(1));
+			//get().padBottom(Unit.dp.inPixels(1));
+		}}.height(uheight).units(Unit.dp).fillX().expandX().end();
+		
+	}
+	
+	private void playButton(float uheight){
+		new imagebutton("icon-play", Unit.dp.inPixels(30f), ()->{
+			Vars.control.runWave();
+		}).height(uheight).fillX().padTop(-8f).padBottom(-12f).padRight(-18f).padLeft(-10f).width(40f).units(Unit.dp).update(l->{
+			boolean vis = Vars.control.getMode() == GameMode.sandbox && Vars.control.getEnemiesRemaining() <= 0;
+			boolean paused = GameState.is(State.paused) || !vis;
+			
+			l.setVisible(vis);
+			l.getStyle().imageUp = Core.skin.getDrawable(vis ? "icon-play" : "clear");
+			l.setTouchable(!paused ? Touchable.enabled : Touchable.disabled);
+		});
 	}
 	
 	public void updateItems(){

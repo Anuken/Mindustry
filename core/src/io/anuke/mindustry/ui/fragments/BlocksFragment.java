@@ -14,6 +14,7 @@ import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Section;
 import io.anuke.mindustry.ui.FloatingDialog;
 import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
@@ -105,7 +106,7 @@ public class BlocksFragment implements Fragment{
 							//image.setDisabled(!has);
 							image.setChecked(player.recipe == r);
 							image.setTouchable(canPlace ? Touchable.enabled : Touchable.disabled);
-							image.getImage().setColor(has ? Color.WHITE : Color.DARK_GRAY);
+							image.getImage().setColor(has ? Color.WHITE : Hue.lightness(0.33f));
 						});
 						
 						if(i % rows == rows-1)
@@ -195,7 +196,7 @@ public class BlocksFragment implements Fragment{
 				}).size(110, 50).pad(10f).units(Unit.dp);
 				
 				d.show();
-			}).expandX().padLeft(4).top().right().size(36f, 40f).units(Unit.dp);
+			}).expandX().padLeft(4).top().right().size(42f, 46f).padTop(-2).units(Unit.dp);
 		}
 		
 		

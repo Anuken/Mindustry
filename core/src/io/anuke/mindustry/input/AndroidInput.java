@@ -3,6 +3,7 @@ package io.anuke.mindustry.input;
 import static io.anuke.mindustry.Vars.*;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector2;
@@ -10,7 +11,9 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
@@ -82,6 +85,18 @@ public class AndroidInput extends InputAdapter{
 	}
 	
 	public static void doInput(){
+		Tile cursor = selected();
+		
+		//TODO test
+		if(Inputs.buttonUp(Buttons.LEFT) && cursor != null){
+			Tile linked = cursor.isLinked() ? cursor.getLinked() : cursor;
+			if(linked != null && linked.block() instanceof Configurable){
+				Vars.ui.showConfig(linked);
+			}else if(!Vars.ui.hasConfigMouse()){
+				Vars.ui.hideConfig();
+			}
+		}
+		
 		if(Gdx.input.isTouched(0) 
 				&& Mathf.near2d(lmousex, lmousey, Gdx.input.getX(0), Gdx.input.getY(0), Unit.dp.inPixels(50)) 
 				&& !ui.hasMouse() /*&& (player.recipe == null || mode == PlaceMode.touch)*/){

@@ -115,7 +115,7 @@ public class Control extends Module{
 		player = new Player();
 		
 		spawns = WaveCreator.getSpawns();
-		WaveCreator.testWaves(1, 30);
+		//WaveCreator.testWaves(1, 30);
 	}
 	
 	public void reset(){

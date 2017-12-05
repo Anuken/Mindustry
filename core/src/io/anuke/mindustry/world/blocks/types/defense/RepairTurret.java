@@ -31,7 +31,7 @@ public class RepairTurret extends PowerTurret{
 	
 	@Override
 	public void postInit(){
-		description = "[turretinfo]Range: " + (int)range + "\nPower/unit: "+powerUsed+"\n[description]Heals nearby tiles.";
+		description = "[powerinfo]Uses power[white]\nRepairs nearby blocks.";
 	}
 	
 	@Override

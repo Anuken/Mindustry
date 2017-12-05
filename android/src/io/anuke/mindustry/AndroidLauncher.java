@@ -51,7 +51,7 @@ public class AndroidLauncher extends AndroidApplication {
 			Unit.dp.multiplier = 1f;
 		}
 		
-		Mindustry.args.add("-debug");
+		//Mindustry.args.add("-debug");
 		
 		initialize(new Mindustry(), config);
 	}

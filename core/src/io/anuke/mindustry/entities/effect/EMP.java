@@ -50,14 +50,15 @@ public class EMP extends TimedEntity{
 			Tile tile = array.get(i);
 			targets.add(tile);
 			
-			if(tile.block() instanceof PowerAcceptor){
+			if(tile != null && tile.block() instanceof PowerAcceptor){
 				PowerAcceptor p = (PowerAcceptor)tile.block();
-				tile.entity.damage(damage*2); //extra damage
 				p.setPower(tile, 0f);
+				tile.entity.damage(damage*2); //extra damage
 			}
 			
-			Effects.effect(Fx.empspark, tile.entity);
-			tile.entity.damage(damage);
+			//entity may be null here, after the block is dead!
+			Effects.effect(Fx.empspark, tile.worldx(), tile.worldy());
+			if(tile.entity != null) tile.entity.damage(damage);
 		}
 	}
 	

@@ -33,6 +33,7 @@ public class Junction extends Block{
 	@Override
 	public boolean acceptItem(Item item, Tile dest, Tile source){
 		int dir = source.relativeTo(dest.x, dest.y);
+		if(dir == -1) return false;
 		Tile to = dest.getNearby()[dir];
 		return to != null && to.block().acceptItem(item, to, dest);
 	}

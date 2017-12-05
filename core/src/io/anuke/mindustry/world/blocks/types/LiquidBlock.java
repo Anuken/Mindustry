@@ -20,7 +20,6 @@ public class LiquidBlock extends Block implements LiquidAcceptor{
 	
 	public LiquidBlock(String name) {
 		super(name);
-		description = "Transports liquids.";
 		rotate = true;
 		update = true;
 	}

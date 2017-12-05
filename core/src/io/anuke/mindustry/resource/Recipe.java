@@ -52,7 +52,7 @@ public enum Recipe{
 	titaniumpurifier(crafting, ProductionBlocks.titaniumpurifier, stack(Item.steel, 30), stack(Item.iron, 30)),
 	oilrefinery(crafting, ProductionBlocks.oilrefinery, stack(Item.steel, 15), stack(Item.iron, 15)),
 	stoneformer(crafting, ProductionBlocks.stoneformer, stack(Item.steel, 10), stack(Item.iron, 10)),
-	lavasmelter(crafting, ProductionBlocks.lavasmelter, stack(Item.steel, 20), stack(Item.iron, 20), stack(Item.titanium, 10)),
+	lavasmelter(crafting, ProductionBlocks.lavasmelter, stack(Item.steel, 30), stack(Item.titanium, 15)),
 	
 	stonedrill(production, ProductionBlocks.stonedrill, stack(Item.stone, 12)),
 	irondrill(production, ProductionBlocks.irondrill, stack(Item.stone, 25)),

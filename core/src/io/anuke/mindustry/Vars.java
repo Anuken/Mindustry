@@ -43,7 +43,7 @@ public class Vars{
 	//whether to draw chunk borders
 	public static boolean debugChunks = false;
 	//whether turrets have infinite ammo (only with debug)
-	public static boolean infiniteAmmo = true;
+	public static boolean infiniteAmmo = false;
 	//whether to show paths of enemies
 	public static boolean showPaths = true;
 	//number of save slots-- increasing may lead to layout issues

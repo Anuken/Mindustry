@@ -18,6 +18,7 @@ import io.anuke.ucore.util.Mathf;
 public class Shield extends Entity{
 	public boolean active;
 	public boolean hitPlayers = false;
+	public float radius = 0f;
 	
 	private float uptime = 0f;
 	private final Tile tile;
@@ -84,8 +85,7 @@ public class Shield extends Entity{
 	}
 	
 	float drawRadius(){
-		ShieldBlock block = (ShieldBlock)tile.block();
-		return (block.shieldRadius*2 + Mathf.sin(Timers.time(), 25f, 2f)) * uptime;
+		return (radius*2 + Mathf.sin(Timers.time(), 25f, 2f));
 	}
 	
 	public void removeDelay(){

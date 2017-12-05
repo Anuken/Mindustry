@@ -62,7 +62,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			}
 		}
 	},
-	emp = new BulletType(1.6f, 6){
+	emp = new BulletType(1.6f, 8){
 		{
 			lifetime = 50f;
 			hitsize = 6f;
@@ -89,7 +89,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 		
 		public void removed(Bullet b){
 			Timers.run(5f, ()->{
-				new EMP(b.x, b.y, b.damage).add();
+				new EMP(b.x, b.y, b.getDamage()).add();
 			});
 			Effects.effect(Fx.empshockwave, b);
 			Effects.shake(3f, 3f, b);
@@ -132,7 +132,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			DamageArea.damage(!(b.owner instanceof Enemy), b.x, b.y, 25f, (int)(damage * 2f/3f));
 		}
 	},
-	titanshell = new BulletType(1.8f, 40){
+	titanshell = new BulletType(1.8f, 38){
 		{
 			lifetime = 70f;
 			hitsize = 15f;
@@ -160,7 +160,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Effects.effect(Fx.shellsmoke, b);
 			Effects.effect(Fx.shockwaveSmall, b);
 			
-			DamageArea.damage(!(b.owner instanceof Enemy), b.x, b.y, 25f, (int)(damage * 2f/3f));
+			DamageArea.damage(!(b.owner instanceof Enemy), b.x, b.y, 50f, (int)(damage * 2f/3f));
 		}
 	},
 	yellowshell = new BulletType(1.2f, 20){

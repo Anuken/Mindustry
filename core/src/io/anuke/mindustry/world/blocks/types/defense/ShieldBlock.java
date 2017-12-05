@@ -11,16 +11,20 @@ import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BulletEntity;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 public class ShieldBlock extends PowerBlock{
 	public float shieldRadius = 40f;
-	public float powerDrain = 0.006f;
+	public float powerDrain = 0.005f;
 	public float powerPerDamage = 0.1f;
+	public float maxRadius = 40f;
+	public float radiusPowerScale = 7.5f;
 	
 	public ShieldBlock(String name) {
 		super(name);
 		voltage = powerDrain;
+		health = 100;
 	}
 	
 	@Override
@@ -42,7 +46,7 @@ public class ShieldBlock extends PowerBlock{
 		}
 
 		if(entity.power > powerPerDamage){
-			if(!entity.shield.active && entity.power > powerPerDamage * 8f){
+			if(!entity.shield.active){
 				entity.shield.add();
 			}
 
@@ -52,6 +56,8 @@ public class ShieldBlock extends PowerBlock{
 				entity.shield.removeDelay();
 			}
 		}
+		
+		entity.shield.radius = Mathf.lerp(entity.shield.radius, Math.min(entity.power * radiusPowerScale, maxRadius), Timers.delta() * 0.05f);
 
 	}
 

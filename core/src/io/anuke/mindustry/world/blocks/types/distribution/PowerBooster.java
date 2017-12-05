@@ -18,6 +18,7 @@ public class PowerBooster extends Generator{
 		super(name);
 		explosive = false;
 		hasLasers = false;
+		powerSpeed = 0.4f;
 	}
 	
 	@Override
@@ -69,7 +70,6 @@ public class PowerBooster extends Generator{
 			int acceptors = 0;
 			float flow = 0f;
 
-			//TODO have two phases, where it checks nearby blocks first, then distributes it evenly
 			for(int i = 0; i < 2; i++){
 				for(int x = -powerRange; x <= powerRange; x++){
 					for(int y = -powerRange; y <= powerRange; y++){

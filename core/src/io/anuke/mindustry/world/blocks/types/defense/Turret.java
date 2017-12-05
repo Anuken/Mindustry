@@ -66,8 +66,8 @@ public class Turret extends Block{
 	
 	@Override
 	public void postInit(){
-		description = "[turretinfo]" + (ammo==null ? "" : "Ammo: " + ammo +"\n")
-				+ "Range: " + (int)range;
+		if(ammo != null)
+			description = "[turretinfo]Ammo: " + ammo;
 	}
 	
 	@Override

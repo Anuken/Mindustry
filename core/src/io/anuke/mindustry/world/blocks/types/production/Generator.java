@@ -24,7 +24,7 @@ public class Generator extends PowerBlock{
 
 	public int laserRange = 6;
 	public int laserDirections = 4;
-	public float powerSpeed = 0.06f;
+	public float powerSpeed = 0.1f;
 	public boolean explosive = true;
 	public boolean hasLasers = true;
 	public boolean outputOnly = false;
@@ -196,22 +196,17 @@ public class Generator extends PowerBlock{
 			int relrot = (rotation + 2) % 4;
 			if(other.hasLasers){
 				for(int i = 0; i < other.laserDirections; i ++){
-					if(target.getRotation() + i - other.laserDirections/2 == (target.getRotation() + 2) % 4){
+					if(Mathf.mod(target.getRotation() + i - other.laserDirections/2, 4) == relrot){
 						return true;
 					}
 				}
-			}
-			if(other.hasLasers && Math.abs(target.getRotation() - relrot) <= other.laserDirections / 2){
-				return true;
 			}
 		}
 		return false;
 	}
 
 	protected Tile laserTarget(Tile tile, int rotation){
-		if(rotation < 0)
-			rotation += 4;
-		rotation %= 4;
+		rotation = Mathf.mod(rotation, 4);
 		GridPoint2 point = Geometry.getD4Points()[rotation];
 
 		int i = 0;

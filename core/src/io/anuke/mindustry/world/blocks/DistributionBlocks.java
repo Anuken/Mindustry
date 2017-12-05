@@ -15,6 +15,7 @@ public class DistributionBlocks{
 	}},
 	
 	pulseconduit = new LiquidBlock("pulseconduit"){{
+		formalName = "pulse conduit";
 		fullDescription = "Advanced liquid transport block. Transports liquids faster and stores more than standard conduits.";
 		liquidCapacity = 16f;
 		flowfactor = 4.9f;
@@ -29,7 +30,6 @@ public class DistributionBlocks{
 	}},
 	
 	conveyor = new Conveyor("conveyor"){{
-		description = "Moves items.";
 		fullDescription = "Basic item transport block. Moves items forward and automatically deposits them into turrets or crafters. "
 				+ "Rotatable. Can be used as a bridge over liquids for enemies and players.";
 	}},
@@ -37,16 +37,13 @@ public class DistributionBlocks{
 	steelconveyor = new Conveyor("steelconveyor"){{
 		health = 55;
 		speed = 0.04f;
-		description = "Moves items faster.";
 		formalName = "steel conveyor";
 		fullDescription = "Advanced item transport block. Moves items faster than standard conveyors.";
 	}},
 	
-	//TODO
 	pulseconveyor = new Conveyor("poweredconveyor"){{
 		health = 75;
 		speed = 0.09f;
-		description = "Moves items even faster.";
 		formalName = "pulse conveyor";
 		fullDescription = "The ultimate item transport block. Moves items faster than steel conveyors.";
 	}},
@@ -71,7 +68,6 @@ public class DistributionBlocks{
 	}},
 	liquidjunction = new LiquidJunction("liquidjunction"){{
 		formalName = "liquid junction";
-		description = "Serves as a liquid junction.";
 		fullDescription = "Acts as a bridge for two crossing conduits. Useful in situations with "
 				+ "two different conduits carrying different liquids to different locations.";
 	}},
@@ -88,7 +84,7 @@ public class DistributionBlocks{
 	}},
 	powerlaser = new PowerLaser("powerlaser"){{
 		formalName = "power laser";
-		description = "Transmits power with a laser.";
+		description = "Transmits power.";
 		fullDescription = "Creates a laser that transmits power to the block in front of it. Does not generate any power itself. "
 				+ "Best used with generators or other lasers.";
 	}},
@@ -103,16 +99,16 @@ public class DistributionBlocks{
 		formalName = "laser corner";
 		description = "Splits input power into 2 lasers.";
 		fullDescription = "Laser that distributes power to two directions at once. "
-				+ "Useful in situations where it is required to power multiple blocks from one generator, and a normal router is imprecise.";
+				+ "Useful in situations where it is required to power multiple blocks from one generator, and a router is imprecise.";
 	}},
 	teleporter = new Teleporter("teleporter"){{
-		description = "[interact]Tap block to config[]\nTeleports items to others of the same color.";
+		description = "[interact]Tap block to config[]";
 		fullDescription = "Advanced item transport block. Teleporters input items to other teleporters of the same color."
 				+ " Does nothing if no teleporters of the same color exist. If multiple teleporters exist of the same color, a random one is selected."
 				+ " Tap and click the arrows to change color.";
 	}},
 	sorter = new Sorter("sorter"){{
-		description = "[interact]Tap block to config[]\nSorts input items by type.";
+		description = "[interact]Tap block to config[]";
 		fullDescription = "Sorts item by material type. Material to accept is indicated by the color in the block. "
 				+ "All items that match the sort material are outputted forward, everything else is outputted to the left and right.";
 	}};

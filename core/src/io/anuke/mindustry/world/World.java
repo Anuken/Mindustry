@@ -278,7 +278,7 @@ public class World extends Module{
 			}
 		}
 		
-		if(Tmp.r2.overlaps(player.hitbox.getRect(player.x, player.y))){
+		if(!Vars.android && Tmp.r2.overlaps(player.hitbox.getRect(player.x, player.y))){
 			return false;
 		}
 		

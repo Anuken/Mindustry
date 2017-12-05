@@ -5,13 +5,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.Bullet;
-import io.anuke.mindustry.entities.BulletType;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.entities.effect.Shaders;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.*;
 import io.anuke.ucore.util.Angles;
@@ -103,6 +100,10 @@ public class Enemy extends DestructibleEntity{
 	}
 	
 	void updateTargeting(boolean nearCore){
+		if(target != null && target instanceof TileEntity && ((TileEntity)target).dead){
+			target = null;
+		}
+		
 		if(Timers.get(this, "target", 15) && !nearCore){
 			target = Vars.world.findTileTarget(x, y, null, range, false);
 
@@ -110,10 +111,8 @@ public class Enemy extends DestructibleEntity{
 			if(target == null){
 				target = Entities.getClosest(Entities.defaultGroup(), x, y, range, e -> e instanceof Player);
 			}
-		}
-		
-		if(target instanceof Enemy){
-			UCore.log(target);
+		}else if(nearCore){
+			target = Vars.control.getCore().entity;
 		}
 
 		if(target != null && bullet != null){

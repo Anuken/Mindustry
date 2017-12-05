@@ -78,7 +78,7 @@ public class ProductionBlocks{
 			liquidAmount = 18.99f;
 			output = Item.coal;
 			health = 50;
-			purifyTime = 60;
+			purifyTime = 50;
 			description = "Converts stone + water to coal.";
 			fullDescription = "A basic extractor block. Outputs coal when supplied with large amounts of water and stone.";
 		}
@@ -92,7 +92,7 @@ public class ProductionBlocks{
 			inputLiquid = Liquid.water;
 			liquidAmount = 40f;
 			liquidCapacity = 41f;
-			purifyTime = 80;
+			purifyTime = 60;
 			output = Item.titanium;
 			health = 70;
 			description = "Converts iron + water to titanium.";
@@ -106,7 +106,7 @@ public class ProductionBlocks{
 			inputLiquid = Liquid.oil;
 			liquidAmount = 45f;
 			liquidCapacity = 46f;
-			purifyTime = 70;
+			purifyTime = 60;
 			output = Item.coal;
 			health = 80;
 			craftEffect = Fx.purifyoil;
@@ -266,7 +266,7 @@ public class ProductionBlocks{
 			height = 3;
 			health = 600;
 			breaktime *= 2.3f;
-			description = "Generates power from uranium + water.";
+			//description = "Advanced generator.";
 			fullDescription = "The ultimate power generator. Highly volatile. Generates power from uranium. Requires constant cooling in the form of water. "
 					+ "Will explode violently if insufficient amounts of coolant are supplied. ";
 		}

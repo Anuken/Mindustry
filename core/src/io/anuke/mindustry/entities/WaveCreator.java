@@ -91,7 +91,7 @@ public class WaveCreator{
 			//boss wave
 			new EnemySpawn(FortressEnemy.class){{
 				after = 16;
-				amount = 2;
+				amount = 1;
 				spacing = 5;
 				scaling = 1;
 			}},
@@ -149,8 +149,8 @@ public class WaveCreator{
 			}},
 			new EnemySpawn(FortressEnemy.class){{
 				after = 12;
-				spacing = 3;
-				scaling = 5;
+				spacing = 4;
+				scaling = 6;
 			}},
 			new EnemySpawn(HealerEnemy.class){{
 				scaling = 3;
