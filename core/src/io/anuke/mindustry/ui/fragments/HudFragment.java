@@ -175,10 +175,11 @@ public class HudFragment implements Fragment{
 				new label(()-> control.getEnemiesRemaining() > 0 ?
 					control.getEnemiesRemaining() + " enemies" : 
 						(control.getTutorial().active() || Vars.control.getMode() == GameMode.sandbox) ? "waiting..." : "Wave in " + (int) (control.getWaveCountdown() / 60f))
-				.minWidth(140).left();
+				.minWidth(140).units(Unit.dp).left();
 
 				get().pad(Unit.dp.inPixels(12));
-			}}.left().padLeft(-6).end();
+				get().padLeft(6);
+			}}.left().end();
 			
 			playButton(uheight);
 			//get().padTop(Unit.dp.inPixels(1));
@@ -190,7 +191,8 @@ public class HudFragment implements Fragment{
 	private void playButton(float uheight){
 		new imagebutton("icon-play", Unit.dp.inPixels(30f), ()->{
 			Vars.control.runWave();
-		}).height(uheight).fillX().padTop(-8f).padBottom(-12f).padRight(-18f).padLeft(-10f).width(40f).units(Unit.dp).update(l->{
+		}).height(uheight).fillX().right().padTop(-8f).padBottom(-12f).padRight(-36)
+				.padLeft(-10f).width(40f).units(Unit.dp).update(l->{
 			boolean vis = Vars.control.getMode() == GameMode.sandbox && Vars.control.getEnemiesRemaining() <= 0;
 			boolean paused = GameState.is(State.paused) || !vis;
 			

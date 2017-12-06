@@ -17,13 +17,14 @@ import io.anuke.ucore.util.Strings;
 public class ShieldBlock extends PowerBlock{
 	public float shieldRadius = 40f;
 	public float powerDrain = 0.005f;
-	public float powerPerDamage = 0.1f;
+	public float powerPerDamage = 0.2f;
 	public float maxRadius = 40f;
-	public float radiusPowerScale = 7.5f;
+	public float radiusScale = 80f;
 	
 	public ShieldBlock(String name) {
 		super(name);
 		voltage = powerDrain;
+		powerCapacity = 30f;
 		health = 100;
 	}
 	
@@ -57,7 +58,7 @@ public class ShieldBlock extends PowerBlock{
 			}
 		}
 		
-		entity.shield.radius = Mathf.lerp(entity.shield.radius, Math.min(entity.power * radiusPowerScale, maxRadius), Timers.delta() * 0.05f);
+		entity.shield.radius = Mathf.lerp(entity.shield.radius, Math.min(entity.power / powerCapacity * radiusScale, maxRadius), Timers.delta() * 0.05f);
 
 	}
 
