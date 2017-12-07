@@ -2,6 +2,7 @@ package io.anuke.mindustry.editor;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.Texture;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.OrderedMap;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Generator;
@@ -77,7 +79,12 @@ public class EditorControl extends Module{
 			}
 
 			if(Inputs.keyUp(Keys.E)){
-				PixmapIO.writePNG(Gdx.files.absolute("/home/anuke/Pictures/maps/out-" + TimeUtils.millis() + ".png"), pixmap);
+				try{
+					ClassReflection.getMethod(PixmapIO.class, "writePNG", FileHandle.class, Pixmap.class)
+					.invoke(Gdx.files.absolute("/home/anuke/Pictures/maps/out-" + TimeUtils.millis() + ".png"), pixmap);
+				}catch (Exception e){
+					throw new RuntimeException(e);
+				}
 			}
 		}
 	}

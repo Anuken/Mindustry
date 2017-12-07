@@ -10,6 +10,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.mindustry.world.blocks.types.Floor;
+import io.anuke.mindustry.world.blocks.types.StaticBlock;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
@@ -110,32 +111,32 @@ public class Blocks{
 	
 	grass = new Floor("grass"),
 	
-	sandblock = new Block("sandblock"){{
+	sandblock = new StaticBlock("sandblock"){{
 		solid = true;
 		variants = 3;
 	}},
 	
-	snowblock = new Block("snowblock"){{
+	snowblock = new StaticBlock("snowblock"){{
 		solid = true;
 		variants = 3;
 	}},
 	
-	stoneblock = new Block("stoneblock"){{
+	stoneblock = new StaticBlock("stoneblock"){{
 		solid = true;
 		variants = 3;
 	}},
 	
-	blackstoneblock = new Block("blackstoneblock"){{
+	blackstoneblock = new StaticBlock("blackstoneblock"){{
 		solid = true;
 		variants = 3;
 	}},
 	
-	grassblock = new Block("grassblock"){{
+	grassblock = new StaticBlock("grassblock"){{
 		solid = true;
 		variants = 2;
 	}},
 					
-	mossblock = new Block("mossblock"){{
+	mossblock = new StaticBlock("mossblock"){{
 		solid = true;
 	}},
 	
@@ -172,7 +173,7 @@ public class Blocks{
 		drops = new ItemStack(Item.stone, 3);
 	}},
 	
-	dirtblock = new Block("dirtblock"){{
+	dirtblock = new StaticBlock("dirtblock"){{
 		solid = true;
 	}};
 }

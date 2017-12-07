@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.utils.Align;
 
 import io.anuke.ucore.scene.ui.Image;
+import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.SettingsDialog;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
@@ -16,6 +17,17 @@ public class MindustrySettingsDialog extends SettingsDialog{
 		getTitleTable().row();
 		getTitleTable().add(new Image("white"))
 		.growX().height(3f).pad(4f).units(Unit.dp).get().setColor(Colors.get("accent"));
+		
+		content().remove();
+		buttons().remove();
+		
+		ScrollPane pane = new ScrollPane(content());
+		pane.setFadeScrollBars(false);
+		
+		row();
+		add(pane).expand().fill();
+		row();
+		add(buttons()).fillX();
 	}
 	
 	@Override

@@ -5,9 +5,7 @@ import static io.anuke.ucore.core.Core.camera;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -25,27 +23,33 @@ import io.anuke.mindustry.world.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
+import io.anuke.mindustry.world.blocks.types.StaticBlock;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.DestructibleEntity;
+import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.graphics.Cache;
-import io.anuke.ucore.graphics.Caches;
+import io.anuke.ucore.graphics.CacheBatch;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.*;
 
 public class Renderer extends RendererModule{
-	String[] surfaces = {"shadow", "shield", "pixel", "indicators"};
+	String[] surfaces = { "shadow", "shield", "pixel", "indicators" };
 	int targetscale = baseCameraScale;
 	int chunksize = 32;
-	Cache[][] floorCache;
+	int[][][] cache;
 	FloatArray shieldHits = new FloatArray();
 	float shieldHitDuration = 18f;
+	CacheBatch cbatch;
 
 	public Renderer() {
 		Core.cameraScale = baseCameraScale;
+		Effects.setEffectProvider((name, color, x, y, rotation) -> {
+			if(Settings.getBool("effects"))
+				new EffectEntity(name, color, rotation).set(x, y).add();
+		});
 	}
 
 	@Override
@@ -101,8 +105,7 @@ public class Renderer extends RendererModule{
 
 			updateShake(0.75f);
 			float prevx = camera.position.x, prevy = camera.position.y;
-			clampCamera(-tilesize / 2f, -tilesize / 2f + 1, world.width() * tilesize - tilesize / 2f, 
-					world.height() * tilesize - tilesize / 2f);
+			clampCamera(-tilesize / 2f, -tilesize / 2f + 1, world.width() * tilesize - tilesize / 2f, world.height() * tilesize - tilesize / 2f);
 
 			float deltax = camera.position.x - prex, deltay = camera.position.y - prey;
 
@@ -131,9 +134,7 @@ public class Renderer extends RendererModule{
 
 			Profiler.end("draw");
 			if(Profiler.updating())
-				Profiler.getTimes().put("draw", Profiler.getTimes().get("draw") 
-						- Profiler.getTimes().get("blockDraw") 
-						- Profiler.getTimes().get("entityDraw"));
+				Profiler.getTimes().put("draw", Profiler.getTimes().get("draw") - Profiler.getTimes().get("blockDraw") - Profiler.getTimes().get("entityDraw"));
 
 			if(Vars.debug && Vars.debugGL && Timers.get("profile", 60)){
 				UCore.log("shaders: " + GLProfiler.shaderSwitches, "calls: " + GLProfiler.drawCalls, "bindings: " + GLProfiler.textureBindings, "vertices: " + GLProfiler.vertexCount.average);
@@ -157,14 +158,14 @@ public class Renderer extends RendererModule{
 		Profiler.end("blockDraw");
 
 		Profiler.begin("entityDraw");
-		
+
 		Graphics.shader(Shaders.outline, false);
 		Entities.draw(control.enemyGroup);
 		Graphics.shader();
-		
+
 		Entities.draw(Entities.defaultGroup());
 		Entities.draw(control.bulletGroup);
-		
+
 		Profiler.end("entityDraw");
 
 		drawShield();
@@ -206,20 +207,20 @@ public class Renderer extends RendererModule{
 	}
 
 	void drawShield(){
-		for(int i = 0; i < shieldHits.size/3; i ++){
+		for(int i = 0; i < shieldHits.size / 3; i++){
 			//float x = hits.get(i*3+0);
 			//float y = hits.get(i*3+1);
-			float time = shieldHits.get(i*3+2);
-			
+			float time = shieldHits.get(i * 3 + 2);
+
 			time += Timers.delta() / shieldHitDuration;
-			shieldHits.set(i*3 + 2, time);
-			
+			shieldHits.set(i * 3 + 2, time);
+
 			if(time >= 1f){
-				shieldHits.removeRange(i*3, i*3 + 2);
-				i --;
+				shieldHits.removeRange(i * 3, i * 3 + 2);
+				i--;
 			}
 		}
-		
+
 		Texture texture = Graphics.getSurface("shield").texture();
 		Shaders.shield.color.set(Color.SKY);
 
@@ -237,7 +238,7 @@ public class Renderer extends RendererModule{
 		Graphics.end();
 		Graphics.beginCam();
 	}
-	
+
 	public void addShieldHit(float x, float y){
 		shieldHits.addAll(x, y, 0f);
 	}
@@ -246,12 +247,13 @@ public class Renderer extends RendererModule{
 		int chunksx = world.width() / chunksize, chunksy = world.height() / chunksize;
 
 		//render the entire map
-		if(floorCache == null || floorCache.length != chunksx || floorCache[0].length != chunksy){
-			floorCache = new Cache[chunksx][chunksy];
+		if(cache == null || cache.length != chunksx || cache[0].length != chunksy){
+			cache = new int[chunksx][chunksy][2];
 
 			for(int x = 0; x < chunksx; x++){
 				for(int y = 0; y < chunksy; y++){
-					renderCache(x, y);
+					cacheChunk(x, y, true);
+					cacheChunk(x, y, false);
 				}
 			}
 		}
@@ -263,21 +265,7 @@ public class Renderer extends RendererModule{
 		int crangex = (int) (camera.viewportWidth / (chunksize * tilesize)) + 1;
 		int crangey = (int) (camera.viewportHeight / (chunksize * tilesize)) + 1;
 
-		for(int x = -crangex; x <= crangex; x++){
-			for(int y = -crangey; y <= crangey; y++){
-				int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
-				int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
-
-				if(!Mathf.inBounds(worldx, worldy, floorCache))
-					continue;
-
-				if(floorCache[worldx][worldy] == null){
-					renderCache(worldx, worldy);
-				}
-
-				floorCache[worldx][worldy].render();
-			}
-		}
+		drawCache(0, crangex, crangey);
 
 		Graphics.begin();
 
@@ -287,31 +275,40 @@ public class Renderer extends RendererModule{
 
 		boolean noshadows = Settings.getBool("noshadows");
 
-		boolean drawTiles = true;
+		boolean drawTiles = Settings.getBool("drawblocks");
 
 		//0 = shadows
-		//1 = normal blocks
-		//2 = over blocks
-		for(int l = (noshadows ? 1 : 0); l < (drawTiles ? 3 : 0); l++){
+		//1 = cache blocks
+		//2 = normal blocks
+		//3 = over blocks
+		for(int l = (noshadows ? 1 : 0); l < (drawTiles ? 4 : 0); l++){
 			if(l == 0){
 				Graphics.surface("shadow");
 			}
 
-			for(int x = -rangex; x <= rangex; x++){
-				for(int y = -rangey; y <= rangey; y++){
-					int worldx = Mathf.scl(camera.position.x, tilesize) + x;
-					int worldy = Mathf.scl(camera.position.y, tilesize) + y;
+			if(l == 1){
+				Graphics.end();
+				drawCache(1, crangex, crangey);
+				Graphics.begin();
+			}else{
+				for(int x = -rangex; x <= rangex; x++){
+					for(int y = -rangey; y <= rangey; y++){
+						int worldx = Mathf.scl(camera.position.x, tilesize) + x;
+						int worldy = Mathf.scl(camera.position.y, tilesize) + y;
 
-					if(world.tile(worldx, worldy) != null){
-						Tile tile = world.tile(worldx, worldy);
-						if(l == 0){
-							if(tile.block() != Blocks.air && world.isAccessible(worldx, worldy)){
-								tile.block().drawShadow(tile);
+						if(world.tile(worldx, worldy) != null){
+							Tile tile = world.tile(worldx, worldy);
+							if(l == 0){
+								if(tile.block() != Blocks.air && world.isAccessible(worldx, worldy)){
+									tile.block().drawShadow(tile);
+								}
+							}else if(!(tile.block() instanceof StaticBlock)){
+								if(l == 2){
+									tile.block().draw(tile);
+								}else if(l == 3){
+									tile.block().drawOver(tile);
+								}
 							}
-						}else if(l == 1){
-							tile.block().draw(tile);
-						}else if(l == 2){
-							tile.block().drawOver(tile);
 						}
 					}
 				}
@@ -332,7 +329,7 @@ public class Renderer extends RendererModule{
 					int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
 					int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
 
-					if(!Mathf.inBounds(worldx, worldy, floorCache))
+					if(!Mathf.inBounds(worldx, worldy, cache))
 						continue;
 					Draw.linerect(worldx * chunksize * tilesize, worldy * chunksize * tilesize, chunksize * tilesize, chunksize * tilesize);
 				}
@@ -341,22 +338,50 @@ public class Renderer extends RendererModule{
 		}
 	}
 
-	void renderCache(int cx, int cy){
-		Caches.begin(1600);
+	void drawCache(int layer, int crangex, int crangey){
+		Gdx.gl.glEnable(GL20.GL_BLEND);
+
+		cbatch.setProjectionMatrix(Core.camera.combined);
+		cbatch.beginDraw();
+		for(int x = -crangex; x <= crangex; x++){
+			for(int y = -crangey; y <= crangey; y++){
+				int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
+				int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
+
+				if(!Mathf.inBounds(worldx, worldy, cache))
+					continue;
+
+				cbatch.drawCache(cache[worldx][worldy][layer]);
+			}
+		}
+
+		cbatch.endDraw();
+	}
+
+	void cacheChunk(int cx, int cy, boolean floor){
+		cbatch.begin();
+		Graphics.useBatch(cbatch);
 
 		for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
 			for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
 				Tile tile = world.tile(tilex, tiley);
-				tile.floor().drawCache(tile);
-
+				if(floor){
+					tile.floor().draw(tile);
+				}else if(tile.block() instanceof StaticBlock){
+					tile.block().draw(tile);
+				}
 			}
 		}
-		floorCache[cx][cy] = Caches.end();
-
+		Graphics.popBatch();
+		cbatch.end();
+		cache[cx][cy][floor ? 0 : 1] = cbatch.getLastCache();
 	}
 
 	public void clearTiles(){
-		floorCache = null;
+		cache = null;
+		if(cbatch != null)
+			cbatch.dispose();
+		cbatch = new CacheBatch(256 * 256 * 3);
 	}
 
 	void renderPixelOverlay(){
@@ -477,11 +502,11 @@ public class Renderer extends RendererModule{
 		for(Enemy entity : control.enemyGroup.all()){
 			drawHealth(entity);
 		}
-		
+
 		if(!Vars.android)
 			drawHealth(player);
 	}
-	
+
 	void drawHealth(DestructibleEntity dest){
 		if(dest instanceof Player && Vars.snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate")){
 			drawHealth((int) dest.x, (int) dest.y - 7f, dest.health, dest.maxhealth);

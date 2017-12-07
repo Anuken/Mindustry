@@ -205,10 +205,6 @@ public class Block{
 		return false;
 	}
 	
-	public void drawCache(Tile tile){
-		
-	}
-	
 	public void draw(Tile tile){
 		//note: multiblocks do not support rotation
 		if(!isMultiblock()){

@@ -1,9 +1,12 @@
 package io.anuke.mindustry.entities.enemies;
 
+import com.badlogic.gdx.math.Vector2;
+
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.ucore.util.Tmp;
 
 public class BlastEnemy extends Enemy{
 
@@ -21,12 +24,14 @@ public class BlastEnemy extends Enemy{
 	void move(){
 		super.move();
 		float range = 10f;
+		Vector2 offset = Tmp.v3.setZero();
 		if(target instanceof TileEntity){
 			TileEntity e = (TileEntity)target;
-			range = (e.tile.block().width * Vars.tilesize) /2f + 6f;
+			range = (e.tile.block().width * Vars.tilesize) /2f + 8f;
+			offset.set(e.tile.block().getPlaceOffset());
 		}
 		
-		if(target != null && target.distanceTo(this) < range){
+		if(target != null && target.distanceTo(this.x - offset.x, this.y - offset.y) < range){
 			explode();
 		}
 	}

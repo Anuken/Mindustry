@@ -7,7 +7,6 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
-import io.anuke.ucore.graphics.Caches;
 import io.anuke.ucore.util.Mathf;
 
 public class Floor extends Block{
@@ -18,10 +17,10 @@ public class Floor extends Block{
 	}
 	
 	@Override
-	public void drawCache(Tile tile){
+	public void draw(Tile tile){
 		MathUtils.random.setSeed(tile.id());
 		
-		Caches.draw(variants > 0 ? (name() + MathUtils.random(1, variants))  : name(), tile.worldx(), tile.worldy());
+		Draw.rect(variants > 0 ? (name() + MathUtils.random(1, variants))  : name(), tile.worldx(), tile.worldy());
 		
 		for(int dx = -1; dx <= 1; dx ++){
 			for(int dy = -1; dy <= 1; dy ++){
@@ -50,7 +49,7 @@ public class Floor extends Block{
 				temp.setTexture(region.getTexture());
 				temp.setRegion(region.getRegionX()+x, region.getRegionY()+y+h, w, -h);
 				
-				Caches.draw(temp, tile.worldx()-4 + rx, tile.worldy()-4 + ry, w, h);
+				Draw.crect(temp, tile.worldx()-4 + rx, tile.worldy()-4 + ry, w, h);
 			}
 		}
 	}

@@ -171,9 +171,7 @@ public class UI extends SceneModule{
 		
 		menu = new MenuDialog();
 		
-		prefs.sliderPref("difficulty", "Difficulty", 1, 0, 2, i -> {
-			return i == 0 ? "Easy" : i == 1 ? "Normal" : "Hard";
-		});
+		prefs.sliderPref("difficulty", "Difficulty", 1, 0, 2, i -> i == 0 ? "Easy" : i == 1 ? "Normal" : "Hard");
 		
 		prefs.screenshakePref();
 		prefs.volumePrefs();
@@ -182,6 +180,8 @@ public class UI extends SceneModule{
 		prefs.checkPref("noshadows", "Disable shadows", false);
 		prefs.checkPref("smoothcam", "Smooth Camera", true);
 		prefs.checkPref("indicators", "Enemy Indicators", true);
+		prefs.checkPref("effects", "Display Effects", true);
+		prefs.checkPref("drawblocks", "Draw Blocks", true);
 		prefs.checkPref("pixelate", "Pixelate Screen", true, b->{
 			if(b){
 				Graphics.getSurface("pixel").setScale(Core.cameraScale);
