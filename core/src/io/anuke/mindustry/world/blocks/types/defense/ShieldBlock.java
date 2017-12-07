@@ -31,8 +31,8 @@ public class ShieldBlock extends PowerBlock{
 	@Override
 	public void getStats(Array<String> list){
 		super.getStats(list);
-		list.add("[powerinfo]Power Drain/second: " + Strings.toFixed(powerDrain*60, 2));
-		list.add("[powerinfo]Power Drain/damage taken: " + Strings.toFixed(powerPerDamage, 2));
+		list.add("[powerinfo]Power used: " + Strings.toFixed(powerDrain*60, 2) + "power/s");
+		list.add("[powerinfo]Power Drain: " + Strings.toFixed(powerPerDamage, 2) + "power/damage");
 		list.add("[powerinfo]Shield Radius: " + (int)shieldRadius + " units");
 	}
 

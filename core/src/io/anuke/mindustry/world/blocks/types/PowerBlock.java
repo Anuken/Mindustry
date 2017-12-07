@@ -90,6 +90,7 @@ public abstract class PowerBlock extends Block implements PowerAcceptor{
 	
 	public static class PowerEntity extends TileEntity{
 		public float power;
+		public float time; //generator time. this is a bit of a hack
 		
 		@Override
 		public void write(DataOutputStream stream) throws IOException{

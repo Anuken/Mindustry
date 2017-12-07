@@ -8,8 +8,6 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
 
 public class LiquidItemPowerGenerator extends LiquidPowerGenerator{
 	public Item generateItem;
@@ -33,6 +31,8 @@ public class LiquidItemPowerGenerator extends LiquidPowerGenerator{
 		Draw.reset();
 	}
 	
+	//TODO implement?
+	/*
 	@Override
 	public void update(Tile tile){
 		LiquidPowerEntity entity = tile.entity();
@@ -50,7 +50,7 @@ public class LiquidItemPowerGenerator extends LiquidPowerGenerator{
 		
 		distributeLaserPower(tile);
 		
-	}
+	}*/
 	
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){

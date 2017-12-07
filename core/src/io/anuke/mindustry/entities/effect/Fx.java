@@ -143,6 +143,26 @@ public class Fx{
 		});
 	}),
 	
+	redgeneratespark = new Effect(18, e -> {
+		Angles.randLenVectors(e.id, 5, e.ifract()*8f, (x, y)->{
+			float len = e.fract()*4f;
+			Draw.color(Color.valueOf("fbb97f"), Color.GRAY, e.ifract());
+			//Draw.alpha(e.fract());
+			Draw.rect("circle", e.x + x, e.y + y, len, len);
+			Draw.reset();
+		});
+	}),
+	
+	generatespark = new Effect(18, e -> {
+		Angles.randLenVectors(e.id, 5, e.ifract()*8f, (x, y)->{
+			float len = e.fract()*4f;
+			Draw.color(Color.valueOf("d2b29c"), Color.GRAY, e.ifract());
+					//Draw.alpha(e.fract());
+			Draw.rect("circle", e.x + x, e.y + y, len, len);
+			Draw.reset();
+		});
+	}),
+	
 	laserspark = new Effect(14, e -> {
 		Angles.randLenVectors(e.id, 8, 1f + e.ifract()*11f, (x, y)->{
 			float len = 1f+e.fract()*5f;

@@ -216,7 +216,7 @@ public class ProductionBlocks{
 			//TODO
 			formalName = "coal generator";
 			generateItem = Item.coal;
-			generateAmount = 4f;
+			powerOutput = 0.05f;
 			powerCapacity = 40f;
 			description = "Generates power from coal.";
 			fullDescription = "The essential generator. Generates power from coal. Outputs power as lasers to its 4 sides.";
@@ -227,11 +227,12 @@ public class ProductionBlocks{
 			formalName = "thermal generator";
 			//TODO
 			generateLiquid = Liquid.lava;
-			inputLiquid = 25f;
-			generatePower = 0.5f;
+			maxLiquidGenerate = 0.5f;
+			powerPerLiquid = 0.09f;
 			powerCapacity = 40f;
 			description = "Generates power from lava.";
 			fullDescription = "Generates power from lava. Outputs power as lasers to its 4 sides.";
+			generateEffect = Fx.redgeneratespark;
 		}
 	},
 	combustiongenerator = new LiquidPowerGenerator("combustiongenerator"){
@@ -239,8 +240,8 @@ public class ProductionBlocks{
 			formalName = "combustion generator";
 			//TODO
 			generateLiquid = Liquid.oil;
-			inputLiquid = 14f;
-			generatePower = 1f;
+			maxLiquidGenerate = 0.4f;
+			powerPerLiquid = 0.13f;
 			powerCapacity = 40f;
 			description = "Generates power from oil.";
 			fullDescription = "Generates power from oil. Outputs power as lasers to its 4 sides.";
@@ -251,9 +252,9 @@ public class ProductionBlocks{
 			//TODO make this generate slowly
 			formalName = "RTG generator";
 			generateItem = Item.uranium;
-			generateAmount = 10f;
 			powerCapacity = 40f;
-			generateTime = 50f;
+			powerOutput = 0.055f;
+			itemDuration = 250f;
 			description = "Generates power from uranium.";
 			fullDescription = "Generates small amounts of power from the radioactive decay of uranium. Outputs power as lasers to its 4 sides.";
 		}

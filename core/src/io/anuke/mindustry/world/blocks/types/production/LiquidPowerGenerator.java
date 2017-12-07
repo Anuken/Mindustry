@@ -16,17 +16,17 @@ import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 	public int generateTime = 15;
 	public Liquid generateLiquid;
-	/**Power to generate per generateInput.*/
-	public float generatePower = 1f;
-	/**How much liquid to consume to get one generatePower.*/
-	public float inputLiquid = 5f;
+	public float powerPerLiquid = 0.13f;
+	/**Maximum liquid used per frame.*/
+	public float maxLiquidGenerate = 0.4f;
 	public float liquidCapacity = 30f;
-	public Effect generateEffect = Fx.generate;
+	public Effect generateEffect = Fx.generatespark;
 
 	public LiquidPowerGenerator(String name) {
 		super(name);
@@ -37,7 +37,8 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 	public void getStats(Array<String> list){
 		super.getStats(list);
 		list.add("[liquidinfo]Liquid Capacity: " + (int)liquidCapacity);
-		list.add("[liquidinfo]Generation: " + Strings.toFixed(generatePower / inputLiquid, 2) + " power/liquid");
+		list.add("[liquidinfo]Generation: " + Strings.toFixed(powerPerLiquid, 2) + " power/liquid");
+		list.add("[liquidinfo]Max liquid: " + Strings.toFixed(maxLiquidGenerate*60f, 2) + " liquid/s");
 		list.add("[liquidinfo]Input: " + generateLiquid);
 	}
 	
@@ -65,13 +66,17 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 		LiquidPowerEntity entity = tile.entity();
 		
 		//TODO don't generate when full of energy
-		if(entity.liquidAmount >= inputLiquid && entity.power + generatePower < powerCapacity 
-				&& Timers.get(tile, "consume", generateTime)){
-			entity.liquidAmount -= inputLiquid;
-			entity.power += generatePower;
+		if(entity.liquidAmount > 0){
+			float used = Math.min(entity.liquidAmount, maxLiquidGenerate);
+			used = Math.min(used, (powerCapacity - entity.power)/powerPerLiquid);
 			
-			Vector2 offset = getPlaceOffset();
-			Effects.effect(generateEffect, tile.worldx() + offset.x, tile.worldy() + offset.y);
+			entity.liquidAmount -= used;
+			entity.power += used * powerPerLiquid;
+			
+			if(used > 0.001f && Mathf.chance(0.05 * Timers.delta())){
+				Vector2 offset = getPlaceOffset();
+				Effects.effect(generateEffect, tile.worldx() + offset.x + Mathf.range(3f), tile.worldy() + offset.y + Mathf.range(3f));
+			}
 		}
 		
 		distributeLaserPower(tile);
