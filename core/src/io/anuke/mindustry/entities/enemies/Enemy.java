@@ -18,6 +18,7 @@ import io.anuke.ucore.util.Tmp;
 public class Enemy extends DestructibleEntity{
 	public final static Color[] tierColors = { Color.valueOf("ffe451"), Color.valueOf("f48e20"), Color.valueOf("ff6757"), Color.valueOf("ff2d86") };
 	public final static int maxtier = 4;
+	public final static float maxIdle = 60*3f;
 
 	protected float speed = 0.4f;
 	protected float reload = 32;
@@ -35,7 +36,8 @@ public class Enemy extends DestructibleEntity{
 	protected boolean targetCore = false;
 	protected boolean stopNearCore = true;
 	protected float mass = 1f;
-
+	
+	public  float idletime = 0f;
 	public int spawn;
 	public int node = -1;
 	public Tile[] path;
@@ -68,13 +70,14 @@ public class Enemy extends DestructibleEntity{
 			if(targetCore) target = core.entity;
 		}else{
 			vec = Vars.world.pathfinder().find(this);
-			vec.sub(x, y).setLength(speed);
+			vec.sub(x, y).limit(speed);
 		}
 
 		Vector2 shift = Tmp.v3.setZero();
-		float shiftRange = hitbox.width + 3f;
-		float avoidRange = 16f;
-		float avoidSpeed = 0.1f;
+		float shiftRange = hitbox.width + 2f;
+		float avoidRange = shiftRange + 4f;
+		float attractRange = avoidRange + 7f;
+		float avoidSpeed = this.speed/2.7f;
 		
 		Entities.getNearby(Entities.getGroup(Enemy.class), x, y, range, other -> {
 			Enemy enemy = (Enemy)other;
@@ -87,7 +90,10 @@ public class Enemy extends DestructibleEntity{
 				shift.add((x - other.x) * scl, (y - other.y) * scl);
 			}else if(dst < avoidRange){
 				Tmp.v2.set((x - other.x), (y - other.y)).setLength(avoidSpeed);
-				shift.add(Tmp.v2);
+				shift.add(Tmp.v2.scl(1.1f));
+			}else if(dst < attractRange && !nearCore){
+				Tmp.v2.set((x - other.x), (y - other.y)).setLength(avoidSpeed);
+				shift.add(Tmp.v2.scl(-1));
 			}
 		});
 
@@ -214,6 +220,14 @@ public class Enemy extends DestructibleEntity{
 
 		xvelocity = (x - lastx) / Timers.delta();
 		yvelocity = (y - lasty) / Timers.delta();
+		
+		float minv = 0.001f;
+		
+		if(xvelocity < minv && yvelocity < minv && node > 0){
+			idletime += Timers.delta();
+		}else{
+			idletime = 0;
+		}
 
 		if(target == null || alwaysRotate){
 			angle = Mathf.slerp(angle, 180f+Mathf.atan2(xvelocity, yvelocity), rotatespeed * Timers.delta());

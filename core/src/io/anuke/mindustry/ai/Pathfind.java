@@ -33,10 +33,24 @@ public class Pathfind{
 			enemy.findClosestNode();
 		}
 		
+		Tile[] path = enemy.path;
+		
+		
+		if(enemy.idletime > Enemy.maxIdle){
+			//TODO reverse
+			Tile target = path[enemy.node];
+			if(Vars.world.raycastWorld(enemy.x, enemy.y, target.worldx(), target.worldy()) != null){
+				if(enemy.node > 1)
+					enemy.node = enemy.node - 1;
+			}else{
+				//what's the problem, then?
+			}
+			
+			enemy.idletime = 0;
+		}
+		
 		//-1 is only possible here if both pathfindings failed, which should NOT happen
 		//check graph code
-		
-		Tile[] path = enemy.path;
 		
 		Tile prev = path[enemy.node - 1];
 

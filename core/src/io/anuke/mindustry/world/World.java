@@ -438,11 +438,16 @@ public class World extends Module{
 		return (TileEntity) closest;
 	}
 	
+	public GridPoint2 raycastWorld(float x, float y, float x2, float y2){
+		return raycast(Mathf.scl2(x, tilesize), Mathf.scl2(y, tilesize),
+				Mathf.scl2(x2, tilesize), Mathf.scl2(y2, tilesize));
+	}
+	
 	/**
 	 * Input is in block coordinates, not world coordinates.
 	 * @return null if no collisions found, block position otherwise.
 	 */
-	public Vector2 raycast(int x0f, int y0f, int x1f, int y1f){
+	public GridPoint2 raycast(int x0f, int y0f, int x1f, int y1f){
 		int x0 = (int)x0f;
 		int y0 = (int)y0f;
 		int x1 = (int)x1f;
@@ -458,7 +463,7 @@ public class World extends Module{
 		while(true){
 
 			if(solid(x0, y0)){
-				return Tmp.v3.set(x0, y0);
+				return Tmp.g1.set(x0, y0);
 			}
 			if(x0 == x1 && y0 == y1) break;
 

@@ -37,8 +37,13 @@ public class Player extends DestructibleEntity{
 	}
 	
 	@Override
+	public void damage(int amount){
+		if(!Vars.debug)
+			super.damage(amount);
+	}
+	
+	@Override
 	public void onDeath(){
-		if(Vars.debug) return;
 		
 		remove();
 		Effects.effect(Fx.explosion, this);
