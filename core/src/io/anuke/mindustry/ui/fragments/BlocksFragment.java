@@ -171,23 +171,29 @@ public class BlocksFragment implements Fragment{
 				GameState.set(State.paused);
 				
 				FloatingDialog d = new FloatingDialog("Block Info");
+				Table table = new Table();
+				table.defaults().pad(1f).units(Unit.dp);
+				ScrollPane pane = new ScrollPane(table, "clear");
+				pane.setFadeScrollBars(false);
 				Table top = new Table();
 				top.left();
 				top.add(new Image(Draw.region(recipe.result.name))).size(8*5 * recipe.result.width).units(Unit.dp);
 				top.add("[orange]"+recipe.result.formalName).padLeft(6f).units(Unit.dp);
-				d.content().add(top).fill().left();
-				d.content().row();
-				d.content().add(desclabel).width(600).units(Unit.dp);
-				d.content().row();
+				table.add(top).fill().left();
+				table.row();
+				table.add(desclabel).width(600).units(Unit.dp);
+				table.row();
+				
+				d.content().add(pane).grow();
 				
 				if(statlist.size > 0){
-					d.content().add("[coral][[extra block info]:").padTop(6).padBottom(5).left();
-					d.content().row();
+					table.add("[coral][[extra block info]:").padTop(6).padBottom(5).left();
+					table.row();
 				}
 				
 				for(String s : statlist){
-					d.content().add(s).left();
-					d.content().row();
+					table.add(s).left();
+					table.row();
 				}
 				
 				d.buttons().addButton("OK", ()->{
