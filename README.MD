@@ -6,13 +6,13 @@ This game is a pixelated sandbox tower defense game made using [LibGDX](https://
 
 You can play the game on these platforms:
 
-<img src="https://i.imgur.com/sk26hTV.png" width="80" height="75">
+<a href="https://anuke.itch.io/mindustry"><img src="https://i.imgur.com/sk26hTV.png" width="auto" height="75"></a>
 
-<img src="https://i.imgur.com/bkGYoDb.png" width="80" height="75">
+<a href="<img src="https://i.imgur.com/bkGYoDb.png" width="187" height="75"></a>
 
-<img src="https://i.imgur.com/jmRu4aN.png" width="80" height="75">
+<img src="https://i.imgur.com/jmRu4aN.png" width="187" height="75"></a>
 
-<img src="https://i.imgur.com/Umtgysa.png" width="80" height="75">
+<img src="https://i.imgur.com/Umtgysa.png" width="187" height="75"></a>
 
-<img src="https://i.imgur.com/8dF6l81.png" style="height: 60px;">
+<img src="https://i.imgur.com/8dF6l81.png" width="auto" height="75"></a>
 
