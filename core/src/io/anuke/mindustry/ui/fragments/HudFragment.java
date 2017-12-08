@@ -66,12 +66,14 @@ public class HudFragment implements Fragment{
 			row();
 			
 			new table(){{
+				get().setTouchable(Touchable.enabled);
 				addWaveTable();
 			}}.fillX().end();
 			
 			row();
 			
 			itemtable = new table("button").end().top().left().fillX().size(-1).get();
+			itemtable.setTouchable(Touchable.enabled);
 			itemtable.setVisible(()-> control.getMode() != GameMode.sandbox);
 			itemcell = get().getCell(itemtable);
 

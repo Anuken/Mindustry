@@ -41,7 +41,7 @@ public class BlocksFragment implements Fragment{
 			row();
 
 			new table("pane"){{
-				
+				get().setTouchable(Touchable.enabled);
 				int rows = 4;
 				int maxcol = 0;
 				float size = 48;
@@ -139,6 +139,7 @@ public class BlocksFragment implements Fragment{
 	void updateRecipe(){
 		Recipe recipe = player.recipe;
 		desctable.clear();
+		desctable.setTouchable(Touchable.enabled);
 		
 		desctable.defaults().left();
 		desctable.left();

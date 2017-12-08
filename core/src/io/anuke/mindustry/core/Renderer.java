@@ -38,7 +38,7 @@ import io.anuke.ucore.util.*;
 public class Renderer extends RendererModule{
 	String[] surfaces = { "shadow", "shield", "pixel", "indicators" };
 	int targetscale = baseCameraScale;
-	int chunksize = 16;
+	int chunksize = 32;
 	int[][][] cache;
 	FloatArray shieldHits = new FloatArray();
 	float shieldHitDuration = 18f;

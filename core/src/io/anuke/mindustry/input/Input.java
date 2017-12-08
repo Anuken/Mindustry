@@ -25,20 +25,15 @@ public class Input{
 		//player is dead
 		if(player.health <= 0) return;
 		
-		if(Inputs.scrolled() && !GameState.is(State.menu) && !Vars.ui.onDialog()){
+		if(Inputs.scrolled() && Inputs.keyDown("zoom_hold") && !GameState.is(State.menu) && !Vars.ui.onDialog()){
 			Vars.renderer.scaleCamera(Inputs.scroll());
 		}
-
-		if(Inputs.keyUp("rotate"))
-			player.rotation ++;
 		
-		if(Inputs.keyUp("rotate_back"))
-			player.rotation --;
-
-		if(player.rotation < 0)
-			player.rotation += 4;
+		if(Inputs.scrolled()){
+			player.rotation += Inputs.scroll();
+		}
 		
-		player.rotation %= 4;
+		player.rotation = Mathf.mod(player.rotation, 4);
 		
 		for(int i = 0; i < 9; i ++){
 			if(Inputs.keyUp(Keys.valueOf(""+(i+1))) && i < control.getWeapons().size){

@@ -11,6 +11,7 @@ import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
+import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Unit;
@@ -27,6 +28,7 @@ public class PlacementFragment implements Fragment{
 				
 				
 				new table("pane"){{
+					get().setTouchable(Touchable.enabled);
 					new label(()->"Placement Mode: [orange]" + AndroidInput.mode.name()).pad(4).units(Unit.dp);
 					row();
 					
