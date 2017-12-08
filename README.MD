@@ -6,13 +6,13 @@ This game is a pixelated sandbox tower defense game made using [LibGDX](https://
 
 You can play the game on these platforms:
 
-![](https://i.imgur.com/sk26hTV.png)
+<img src="https://imgur.com/sk26hTV" style="height: 60px;"/>
 
-![](https://i.imgur.com/bkGYoDb.png)
+<img src="https://imgur.com/bkGYoDb" style="height: 60px;"/>
 
-![](https://i.imgur.com/Umtgysa.png)
+<img src="https://imgur.com/jmRu4aN" style="height: 60px;"/>
 
-![](https://i.imgur.com/jmRu4aN.png)
+<img src="https://imgur.com/Umtgysa" style="height: 60px;"/>
 
-![](https://i.imgur.com/8dF6l81.png)
+<img src="https://imgur.com/8dF6l81" style="height: 60px;"/>
 
