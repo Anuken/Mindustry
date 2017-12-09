@@ -5,9 +5,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.AbstractList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
@@ -201,7 +199,7 @@ public class Conveyor extends Block{
 	        }
 	    };
 	    
-	    Collections.sort(wrapper, Conveyor::compareItems);
+	    Collections.sort(wrapper, new Comparator(){public int compare(Object a, Object b){ return compareItems((Integer)a, (Integer)b); }});
 	}
 	
 	private static int compareItems(int a, int b){

@@ -15,7 +15,7 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
 public class Pathfind{
-	private static final long ms = 1000000;
+	private static final long ms = 1000000 * 3;
 	
 	MHueristic heuristic = new MHueristic();
 	PassTileGraph graph = new PassTileGraph();
@@ -100,7 +100,7 @@ public class Pathfind{
 	public void update(){
 		for(SpawnPoint point : Vars.control.getSpawnPoints()){
 			if(!point.request.pathFound){
-				if(point.finder.search(point.request, ms * 2)){
+				if(point.finder.search(point.request, ms)){
 					smoother.smoothPath(point.path);
 					point.pathTiles = point.path.nodes.toArray(Tile.class);
 					point.tempTiles = point.path.nodes.toArray(Tile.class);
