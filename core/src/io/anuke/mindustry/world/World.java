@@ -68,6 +68,12 @@ public class World extends Module{
 		return tile == null || tile.solid();
 	}
 	
+	public boolean passable(int x, int y){
+		Tile tile = tile(x, y);
+		
+		return tile != null && tile.passable();
+	}
+	
 	public boolean wallSolid(int x, int y){
 		Tile tile = tile(x, y);
 		return tile == null || tile.block().solid;
@@ -462,7 +468,7 @@ public class World extends Module{
 		int e2;
 		while(true){
 
-			if(solid(x0, y0)){
+			if(!passable(x0, y0)){
 				return Tmp.g1.set(x0, y0);
 			}
 			if(x0 == x1 && y0 == y1) break;

@@ -30,6 +30,6 @@ void main() {
 	if(any){
 		gl_FragColor = u_color;
 	}else{
-		gl_FragColor = texture2D(u_texture, T);
+		gl_FragColor = texture2D(u_texture, T) * v_color;
 	}
 }

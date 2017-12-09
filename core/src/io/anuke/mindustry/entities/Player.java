@@ -56,6 +56,8 @@ public class Player extends DestructibleEntity{
 	
 	@Override
 	public void draw(){
+		if(!Vars.showPlayer) return;
+		
 		if(Vars.snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate")){
 			Draw.rect("mech-"+mech.name(), (int)x, (int)y, direction.angle()-90);
 		}else{

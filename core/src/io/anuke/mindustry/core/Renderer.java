@@ -270,6 +270,11 @@ public class Renderer extends RendererModule{
 		Graphics.begin();
 
 		Draw.reset();
+		
+		if(Vars.showPaths){
+			drawPaths();
+		}
+		
 		int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2) + 2;
 		int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2) + 2;
 
@@ -382,6 +387,20 @@ public class Renderer extends RendererModule{
 		if(cbatch != null)
 			cbatch.dispose();
 		cbatch = new CacheBatch(256 * 256 * 3);
+	}
+	
+	void drawPaths(){
+		Draw.color(Color.RED);
+		for(SpawnPoint point : control.spawnpoints){
+			if(point.pathTiles != null){
+				for(int i = 1; i < point.pathTiles.length; i ++){
+					Draw.line(point.pathTiles[i-1].worldx(), point.pathTiles[i-1].worldy(), 
+							point.pathTiles[i].worldx(), point.pathTiles[i].worldy());
+					Draw.circle(point.pathTiles[i-1].worldx(), point.pathTiles[i-1].worldy(), 6f);
+				}
+			}
+		}
+		Draw.reset();
 	}
 
 	void renderPixelOverlay(){
@@ -503,7 +522,7 @@ public class Renderer extends RendererModule{
 			drawHealth(entity);
 		}
 
-		if(!Vars.android)
+		if(!Vars.android && Vars.showPlayer)
 			drawHealth(player);
 	}
 

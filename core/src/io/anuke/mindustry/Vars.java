@@ -46,6 +46,8 @@ public class Vars{
 	public static boolean infiniteAmmo = false;
 	//whether to show paths of enemies
 	public static boolean showPaths = true;
+	//if false, player is always hidden
+	public static boolean showPlayer = true;
 	//number of save slots-- increasing may lead to layout issues
 	//TODO named save slots, possibly with a scroll dialog
 	public static final int saveSlots = 8;

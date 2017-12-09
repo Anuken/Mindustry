@@ -21,7 +21,7 @@ public class MindustrySettingsDialog extends SettingsDialog{
 		content().remove();
 		buttons().remove();
 		
-		ScrollPane pane = new ScrollPane(content());
+		ScrollPane pane = new ScrollPane(content(), "clear");
 		pane.setFadeScrollBars(false);
 		
 		row();

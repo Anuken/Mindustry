@@ -112,10 +112,10 @@ public class UI extends SceneModule{
 		Draw.color();
 		
 		TextureRegion back = Draw.region("background");
-		float backscl = 4f;
+		float backscl = 4.5f;
 		
-		Draw.alpha(0.8f);
-		Core.batch.draw(back, w/2 - back.getRegionWidth()*backscl/2, h/2 - back.getRegionHeight()*backscl/2, 
+		Draw.alpha(0.7f);
+		Core.batch.draw(back, w/2 - back.getRegionWidth()*backscl/2 +240f, h/2 - back.getRegionHeight()*backscl/2 + 250f, 
 				back.getRegionWidth()*backscl, back.getRegionHeight()*backscl);
 		
 		float logoscl = (int)Unit.dp.inPixels(7);

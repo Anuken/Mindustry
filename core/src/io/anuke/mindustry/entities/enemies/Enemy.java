@@ -18,7 +18,7 @@ import io.anuke.ucore.util.Tmp;
 public class Enemy extends DestructibleEntity{
 	public final static Color[] tierColors = { Color.valueOf("ffe451"), Color.valueOf("f48e20"), Color.valueOf("ff6757"), Color.valueOf("ff2d86") };
 	public final static int maxtier = 4;
-	public final static float maxIdle = 60*3f;
+	public final static float maxIdle = 60*1.5f;
 
 	protected float speed = 0.4f;
 	protected float reload = 32;
@@ -142,11 +142,16 @@ public class Enemy extends DestructibleEntity{
 		Bullet out = new Bullet(bullet, this, x + Angles.x(), y + Angles.y(), this.angle + rotation).add();
 		out.damage = (int) (damage * Vars.multiplier);
 	}
-
+	
+	/*
 	public void findClosestNode(){
 		int index = 0;
 		int cindex = -1;
 		float dst = Float.MAX_VALUE;
+		UCore.log("Finding closest.");
+		
+		Tile[] clone = path.clone();
+		UCore.log(clone.length);
 
 		//find closest node index
 		for(Tile tile : path){
@@ -171,7 +176,7 @@ public class Enemy extends DestructibleEntity{
 				set(x2 * Vars.tilesize, y2 * Vars.tilesize);
 			});
 		}
-	}
+	}*/
 
 	@Override
 	public void added(){
@@ -221,7 +226,7 @@ public class Enemy extends DestructibleEntity{
 		xvelocity = (x - lastx) / Timers.delta();
 		yvelocity = (y - lasty) / Timers.delta();
 		
-		float minv = 0.001f;
+		float minv = 0.0001f;
 		
 		if(xvelocity < minv && yvelocity < minv && node > 0){
 			idletime += Timers.delta();
@@ -248,6 +253,12 @@ public class Enemy extends DestructibleEntity{
 		Draw.color();
 		Draw.rect(region, x, y, this.angle - 90);
 
+		if(Vars.showPaths){
+			Draw.color(Color.PURPLE);
+			Draw.line(x, y, x + xvelocity*10f, y + yvelocity*10f);
+			Draw.color();
+		}
+		
 		Graphics.flush();
 
 	}
