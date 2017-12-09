@@ -1,10 +1,11 @@
+_Keep in mind that this is just a basic outline of planned features, and will be constantly changing!_
 
 ### 3.0 Release
-- New tutorial with the power blocks.
+- New tutorial with the power blocks
 - New SFX for specific blocks, especially turrets
-- Block drawing layers. Refactor/remove `Block#drawOver()`, add `Layer` enum. Should fix 'glitchy' lasers and conveyor clipping.
-- Balance nuclear reactor, improve effectiveness. Currently underpowered.
-- Make generation frame independant.
+- Block drawing layers. Refactor/remove `Block#drawOver()`, add `Layer` enum. Should fix 'glitchy' lasers and conveyor clipping
+- Balance nuclear reactor, improve effectiveness as they are currently underpowered
+- Make generation frame independent
 - Investigate issue #5 (enemies stuck in blocks)
 - Faster mech movement, possibly with a "boost" key
 - Balance enemy difficulty
