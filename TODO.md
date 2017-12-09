@@ -1,6 +1,6 @@
 ### Important
 1. Add an improved conveyor belt drawing system
-2. Add localization support, storing game text in txt files instead of within code. This is in response to a couple of translation requests from Omicron Translation Group on the Itch.io page. I [l5474] *might* be able to do it... eventually.
+2. Add localization support, storing game text in JSON files instead of within code. This is in response to a couple of translation requests from Omicron Translation Group on the Itch.io page. I [l5474] *might* be able to do it... eventually.
 3. Fix some AI going to the wall, as mentioned in #5
 
 ### Optional/Low Priority
