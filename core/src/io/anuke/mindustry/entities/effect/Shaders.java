@@ -41,8 +41,10 @@ public class Shaders{
 		public void apply(){
 			float scale = Settings.getBool("pixelate") ? 1 : Core.cameraScale / Core.camera.zoom;
 			float scaling = Core.cameraScale / 4f / Core.camera.zoom;
-			shader.setUniform3fv("u_hits[0]", hits.items, 0, Math.min(hits.size, MAX_HITS));
-			shader.setUniformi("u_hitamount", Math.min(hits.size, MAX_HITS)/3);
+			if(hits.size > 0){
+				shader.setUniform3fv("u_hits[0]", hits.items, 0, Math.min(hits.size, MAX_HITS));
+				shader.setUniformi("u_hitamount", Math.min(hits.size, MAX_HITS)/3);
+			}
 			shader.setUniformf("u_color", color);
 			shader.setUniformf("u_time", Timers.time());
 			shader.setUniformf("u_scaling", scaling);

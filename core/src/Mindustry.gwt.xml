@@ -3,6 +3,5 @@
 <module>
 	<source path="io/anuke/mindustry" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities" />
-	<extend-configuration-property name="gdx.reflect.include" value="java.lang.Class" />
-	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.ucore.function.DelayRun" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.Tile" />
 </module>

@@ -226,7 +226,7 @@ public class Enemy extends DestructibleEntity{
 		xvelocity = (x - lastx) / Timers.delta();
 		yvelocity = (y - lasty) / Timers.delta();
 		
-		float minv = 0.0001f;
+		float minv = 0.08f;
 		
 		if(xvelocity < minv && yvelocity < minv && node > 0){
 			idletime += Timers.delta();

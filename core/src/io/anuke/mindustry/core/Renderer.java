@@ -271,7 +271,7 @@ public class Renderer extends RendererModule{
 
 		Draw.reset();
 		
-		if(Vars.showPaths){
+		if(Vars.showPaths && Vars.debug){
 			drawPaths();
 		}
 		

@@ -2,9 +2,6 @@ package io.anuke.mindustry.ui;
 
 import static io.anuke.mindustry.Vars.ui;
 
-import com.badlogic.gdx.Application.ApplicationType;
-import com.badlogic.gdx.Gdx;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
@@ -44,7 +41,7 @@ public class MenuDialog extends FloatingDialog{
 				ui.showPrefs();
 			});
 
-			if(Gdx.app.getType() != ApplicationType.WebGL){
+			if(!Vars.gwt){
 				content().row();
 				content().addButton("Save Game", () -> {
 					save.show();

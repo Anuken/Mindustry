@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -80,7 +79,7 @@ public class EditorControl extends Module{
 
 			if(Inputs.keyUp(Keys.E)){
 				try{
-					ClassReflection.getMethod(PixmapIO.class, "writePNG", FileHandle.class, Pixmap.class)
+					ClassReflection.getMethod(ClassReflection.forName("com.badlogic.gdx.graphics.PixmapIO"), "writePNG", FileHandle.class, Pixmap.class)
 					.invoke(Gdx.files.absolute("/home/anuke/Pictures/maps/out-" + TimeUtils.millis() + ".png"), pixmap);
 				}catch (Exception e){
 					throw new RuntimeException(e);

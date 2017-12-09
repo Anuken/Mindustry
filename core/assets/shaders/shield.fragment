@@ -56,7 +56,8 @@ void main() {
 	        
 	        color.a = ALPHA;
 	        
-	        for(int i = 0; i < u_hitamount; i ++){
+	        for(int i = 0; i < MAX_HITS; i ++){
+	        	if(i >= u_hitamount) break;
 	    		vec3 hit = u_hits[i];
 	    		float rad = hit.z * HIT_RADIUS;
 	    		float fract = 1.0 - hit.z;

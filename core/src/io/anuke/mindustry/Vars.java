@@ -45,7 +45,7 @@ public class Vars{
 	//whether turrets have infinite ammo (only with debug)
 	public static boolean infiniteAmmo = false;
 	//whether to show paths of enemies
-	public static boolean showPaths = true;
+	public static boolean showPaths = false;
 	//if false, player is always hidden
 	public static boolean showPlayer = true;
 	//number of save slots-- increasing may lead to layout issues

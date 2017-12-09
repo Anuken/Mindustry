@@ -10,7 +10,6 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.world.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
@@ -72,8 +71,11 @@ public class Pathfind{
 		}
 			
 		float dst = Vector2.dst(enemy.x, enemy.y, target.worldx(), target.worldy());
+		float nlinedist = enemy.node >= path.length - 1 ? 9999 :
+			pointLineDist(path[enemy.node].worldx(), path[enemy.node].worldy(), 
+					path[enemy.node + 1].worldx(), path[enemy.node + 1].worldy(), enemy.x, enemy.y);
 			
-		if(dst < 8){
+		if(dst < 8 || nlinedist < 8){
 			if(enemy.node <= path.length-2)
 				enemy.node ++;
 				
@@ -132,9 +134,7 @@ public class Pathfind{
 		
 		enemy.path = Vars.control.getSpawnPoints().get(enemy.spawn).pathTiles;
 		
-		int closest = findClosest(enemy.path, 0, enemy.x, enemy.y);
-		closest = findClosest(enemy.path, closest + 1, enemy.x, enemy.y);
-		//closest ++;
+		int closest = findClosest(enemy.path, enemy.x, enemy.y);
 		
 		closest = Mathf.clamp(closest, 1, enemy.path.length-1);
 		Tile end = enemy.path[closest];
@@ -142,23 +142,25 @@ public class Pathfind{
 		
 		//if the enemy can't get to this node, teleport to it
 		if(enemy.node < enemy.path.length - 2 && Vars.world.raycastWorld(enemy.x, enemy.y, end.worldx(), end.worldy()) != null){
-			Timers.run(Mathf.random(20f), () -> enemy.set(end.worldx(), end.worldy()));
+		//	Timers.run(Mathf.random(20f), () -> enemy.set(end.worldx(), end.worldy()));
 		}
 	}
 	
-	private static int findClosest(Tile[] tiles, int offset, float x, float y){
-		int cindex = -1;
+	private static int findClosest(Tile[] tiles, float x, float y){
+		int cindex = -2;
 		float dst = Float.MAX_VALUE;
 
-		for(int i = offset; i < tiles.length; i ++){
+		for(int i = 0; i < tiles.length - 1; i ++){
 			Tile tile = tiles[i];
-			if(Vector2.dst(tile.worldx(), tile.worldy(), x, y) < dst){
-				dst = Vector2.dst(tile.worldx(), tile.worldy(), x, y);
+			Tile next = tiles[i + 1];
+			float d = pointLineDist(tile.worldx(), tile.worldy(), next.worldx(), next.worldy(), x, y);
+			if(d < dst){
+				dst = d;
 				cindex = i;
 			}
 		}
 		
-		return cindex;
+		return cindex + 1;
 	}
 	
 	private static int indexOf(Tile tile, Tile[] tiles){
@@ -173,6 +175,13 @@ public class Pathfind{
 	
 	private static boolean onLine(Vector2 vector, float x1, float y1, float x2, float y2){
 		return MathUtils.isEqual(vector.dst(x1, y1) + vector.dst(x2, y2), Vector2.dst(x1, y1, x2, y2), 0.01f);
+	}
+	
+	private static float pointLineDist(float x, float y, float x2, float y2, float px, float py){
+		float l2 = Vector2.dst2(x, y, x2, y2);
+		float t = Math.max(0, Math.min(1, Vector2.dot(px - x, py - y, x2 - x, y2 - y) / l2));
+		Vector2 projection = Tmp.v1.set(x, y).add(Tmp.v2.set(x2, y2).sub(x, y).scl(t)); // Projection falls on the segment
+		return projection.dst(px, py);
 	}
 	
 	private static Vector2 projectPoint(float x1, float y1, float x2, float y2, float pointx, float pointy){
