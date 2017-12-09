@@ -8,15 +8,19 @@ _[Current TODO list](TODO.md)_
 
 First, make sure you have Java 8 and JDK 8 installed. Open a terminal in the root directory, and run the following commands:
 
-_Windows:_
-Running: `gradlew.bat desktop:run`
-Building: `gradlew.bat desktop:dist`
+**_Windows_**
 
-_Linux:_
-Running: `./gradlew desktop:run`
-Building: `./gradlew desktop:dist`
+_Running:_ `gradlew.bat desktop:run`  
+_Building:_ `gradlew.bat desktop:dist`
 
-Gradle may take up to several minutes to download files. Be patient.
+---
+
+**_Linux_**
+
+_Running:_ `./gradlew desktop:run`  
+_Building:_ `./gradlew desktop:dist`
+
+Gradle may take up to several minutes to download files. Be patient. <br>
 After building, the output .JAR file should be in the output JAR file should be in `/desktop/build/libs/desktop-1.0.jar.`
 
 ### Downloads
