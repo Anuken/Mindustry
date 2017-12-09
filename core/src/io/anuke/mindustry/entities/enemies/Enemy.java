@@ -11,15 +11,15 @@ import io.anuke.mindustry.entities.effect.Shaders;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.*;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
+import io.anuke.ucore.util.*;
 
 public class Enemy extends DestructibleEntity{
 	public final static Color[] tierColors = { Color.valueOf("ffe451"), Color.valueOf("f48e20"), Color.valueOf("ff6757"), Color.valueOf("ff2d86") };
 	public final static int maxtier = 4;
 	public final static float maxIdle = 60*1.5f;
-
+	
+	protected int timeid;
+	protected Timer timer = new Timer(5);
 	protected float speed = 0.4f;
 	protected float reload = 32;
 	protected float range = 60;
@@ -37,7 +37,7 @@ public class Enemy extends DestructibleEntity{
 	protected boolean stopNearCore = true;
 	protected float mass = 1f;
 	
-	public  float idletime = 0f;
+	public float idletime = 0f;
 	public int spawn;
 	public int node = -1;
 	public Tile[] path;
@@ -45,6 +45,9 @@ public class Enemy extends DestructibleEntity{
 	public float xvelocity, yvelocity;
 	public Entity target;
 	public int tier = 1;
+	
+	protected final int timerTarget = timeid ++;
+	protected final int timerReload = timeid ++;
 
 	public Enemy() {
 		hitbox.setSize(5f);
@@ -110,7 +113,7 @@ public class Enemy extends DestructibleEntity{
 			target = null;
 		}
 		
-		if(Timers.get(this, "target", 15) && !nearCore){
+		if(timer.get(timerTarget, 15) && !nearCore){
 			target = Vars.world.findTileTarget(x, y, null, range, false);
 
 			//no tile found
@@ -127,7 +130,7 @@ public class Enemy extends DestructibleEntity{
 	}
 
 	void updateShooting(){
-		if(Timers.get(this, "reload", reload * Vars.multiplier)){
+		if(timer.get(timerReload, reload * Vars.multiplier)){
 			shoot(bullet);
 			if(shootsound != null) Effects.sound(shootsound, this);
 		}

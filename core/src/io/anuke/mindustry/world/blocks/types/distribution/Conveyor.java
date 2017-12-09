@@ -5,8 +5,10 @@ import static io.anuke.mindustry.Vars.tilesize;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.AbstractList;
+import java.util.Collections;
+import java.util.List;
 
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 
@@ -76,22 +78,14 @@ public class Conveyor extends Block{
 			int value = entity.convey.get(i);
 			ItemPos pos = pos1.set(value);
 			
-			boolean canmove = true;
-			
-			for(int j = 0; j < entity.convey.size; j ++){
-				ItemPos other = pos2.set(entity.convey.get(j));
-				
-				if(other.y > pos.y && other.y - pos.y < 0.14 * Timers.delta()){
-					canmove = false;
-					break;
-				}
-			}
+			boolean canmove = i == entity.convey.size - 1 || 
+					!(pos2.set(entity.convey.get(i + 1)).y - pos.y < 0.135 * Timers.delta());
 			
 			if(canmove){
 				pos.y += Math.max(speed * Timers.delta(), 1f/252f); //TODO fix precision issues?
-				pos.x = MathUtils.lerp(pos.x, 0, 0.06f * Timers.delta());
+				pos.x = Mathf.lerpDelta(pos.x, 0, 0.06f);
 			}else{
-				pos.x = MathUtils.lerp(pos.x, pos.seed/128f/3f, 0.1f * Timers.delta());
+				pos.x = Mathf.lerpDelta(pos.x, pos.seed/128f/3f, 0.1f);
 			}
 			
 			pos.y = Mathf.clamp(pos.y);
@@ -135,7 +129,21 @@ public class Conveyor extends Block{
 		float y = (ang == -1 || ang == 3) ? 1 : (ang == 1 || ang == -3) ? -1 : 0;
 		
 		ConveyorEntity entity = tile.entity();
-		entity.convey.add(ItemPos.packItem(item, y*0.9f, pos, (byte)Mathf.random(255)));
+		int result = ItemPos.packItem(item, y*0.9f, pos, (byte)Mathf.random(255));
+		boolean inserted = false;
+		
+		for(int i = 0; i < entity.convey.size; i ++){
+			if(compareItems(result, entity.convey.get(i)) < 0){
+				entity.convey.insert(i, result);
+				inserted = true;
+				break;
+			}
+		}
+		
+		//this item must be greater than anything there...
+		if(!inserted){
+			entity.convey.add(result);
+		}
 	}
 	
 	/**
@@ -167,7 +175,39 @@ public class Conveyor extends Block{
 			for(int i = 0; i < amount; i ++){
 				convey.add(stream.readInt());
 			}
+			
+			sort(convey.items, convey.size);
 		}
+	}
+	
+	private static void sort(int[] elements, int length){
+		List<Integer> wrapper = new AbstractList<Integer>() {
+
+	        @Override
+	        public Integer get(int index) {
+	            return elements[index];
+	        }
+
+	        @Override
+	        public int size() {
+	            return length;
+	        }
+
+	        @Override
+	        public Integer set(int index, Integer element) {
+	            int v = elements[index];
+	            elements[index] = element;
+	            return v;
+	        }
+	    };
+	    
+	    Collections.sort(wrapper, Conveyor::compareItems);
+	}
+	
+	private static int compareItems(int a, int b){
+		pos1.set(a);
+		pos2.set(b);
+		return Float.compare(pos1.y, pos2.y);
 	}
 	
 	//Container class. Do not instantiate.

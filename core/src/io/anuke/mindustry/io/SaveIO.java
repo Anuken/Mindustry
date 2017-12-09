@@ -269,7 +269,7 @@ public class SaveIO{
 							
 							for(Item item : tile.entity.items.keys()){
 								stream.writeByte(item.ordinal()); //item ID
-								stream.writeInt(tile.entity.items.get(item)); //item amount
+								stream.writeInt(tile.entity.items.get(item, 0)); //item amount
 							}
 							
 							tile.entity.write(stream);

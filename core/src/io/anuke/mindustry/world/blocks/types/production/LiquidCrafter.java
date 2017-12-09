@@ -13,10 +13,12 @@ import io.anuke.mindustry.world.blocks.types.LiquidBlock;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Strings;
 
 public class LiquidCrafter extends LiquidBlock{
+	protected final int timerDump = timers++;
+	protected final int timerPurify = timers++;
+	
 	/**Can be null.*/
 	public Item input = null;
 	public int inputAmount = 5;
@@ -63,7 +65,7 @@ public class LiquidCrafter extends LiquidBlock{
 	public void update(Tile tile){
 		LiquidEntity entity = tile.entity();
 		
-		if(Timers.get(tile, "purify", purifyTime) && entity.liquidAmount >= liquidAmount &&
+		if(entity.timer.get(timerPurify, purifyTime) && entity.liquidAmount >= liquidAmount &&
 				(input == null || entity.hasItem(input, inputAmount))){
 			
 			if(input != null)
@@ -73,7 +75,7 @@ public class LiquidCrafter extends LiquidBlock{
 			Effects.effect(craftEffect, tile.worldx(), tile.worldy());
 		}
 		
-		if(Timers.get(tile.hashCode(), "dump", 30)){
+		if(entity.timer.get(timerDump, 30)){
 			tryDump(tile, -1, output);
 		}
 	}

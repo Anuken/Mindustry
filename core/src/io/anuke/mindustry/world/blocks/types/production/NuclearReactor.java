@@ -21,6 +21,8 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
 public class NuclearReactor extends LiquidItemPowerGenerator{
+	protected final int timerFuel = timers++;
+	
 	protected Color coolColor = new Color(1, 1, 1, 0f);
 	protected Color hotColor = Color.valueOf("ff9575a3");
 	protected int fuelUseTime = 120; //time to consume 1 fuel
@@ -53,7 +55,7 @@ public class NuclearReactor extends LiquidItemPowerGenerator{
 		if(fuel > 0){
 			entity.heat += fullness * heating;
 			entity.power += powerMultiplier * fullness;
-			if(Timers.get(tile, "fuelRemove", fuelUseTime)){
+			if(entity.timer.get(timerFuel, fuelUseTime)){
 				entity.removeItem(generateItem, 1);
 			}
 		}

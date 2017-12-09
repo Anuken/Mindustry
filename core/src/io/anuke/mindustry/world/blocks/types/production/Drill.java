@@ -2,20 +2,26 @@ package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.utils.Array;
 
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 
 public class Drill extends Block{
+	protected final int timerDrill = timers++;
+	protected final int timerDump = timers++;
+	
 	protected Block resource;
 	protected Item result;
 	protected int time = 5;
 	protected int capacity = 5;
+	protected Effect drillEffect = Fx.spark;
 
 	public Drill(String name) {
 		super(name);
@@ -32,13 +38,15 @@ public class Drill extends Block{
 	
 	@Override
 	public void update(Tile tile){
+		TileEntity entity = tile.entity;
 		
-		if((tile.floor() == resource || (resource.drops.equals(tile.floor().drops))) && Timers.get(tile, "drill", 60 * time) && tile.entity.totalItems() < capacity){
+		if((tile.floor() == resource || (resource.drops.equals(tile.floor().drops))) 
+				&& entity.timer.get(timerDrill, 60 * time) && tile.entity.totalItems() < capacity){
 			offloadNear(tile, result);
-			Effects.effect(Fx.spark, tile.worldx(), tile.worldy());
+			Effects.effect(drillEffect, tile.worldx(), tile.worldy());
 		}
 
-		if(Timers.get(tile, "dump", 30)){
+		if(entity.timer.get(timerDump, 30)){
 			tryDump(tile);
 		}
 	}

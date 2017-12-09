@@ -9,9 +9,10 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
 
 public class Crafter extends Block{
+	protected final int timerDump = timers++;
+	
 	protected Item[] requirements;
 	protected Item result;
 
@@ -31,7 +32,7 @@ public class Crafter extends Block{
 	@Override
 	public void update(Tile tile){
 		
-		if(Timers.get(tile, "dump", 20) && tile.entity.hasItem(result)){
+		if(tile.entity.timer.get(timerDump, 20) && tile.entity.hasItem(result)){
 			tryDump(tile, -1, result);
 		}
 		

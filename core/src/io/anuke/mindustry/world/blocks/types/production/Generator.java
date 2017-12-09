@@ -184,9 +184,19 @@ public class Generator extends PowerBlock{
 			}
 
 			float r = interfering ? 0.8f : 0f;
-
-			Draw.laser("laser", "laserend", tile.worldx() + Angles.x(), tile.worldy() + Angles.y(), target.worldx() - Tmp.v1.x + Mathf.range(r), target.worldy() - Tmp.v1.y + Mathf.range(r), 0.7f + Mathf.sin(Timers.time(), 2f, 0.1f * 0));
-
+			
+			int relative = tile.relativeTo(target.x, target.y);
+			
+			if(relative == -1){
+				Draw.laser("laser", "laserend", tile.worldx() + Angles.x(), tile.worldy() + Angles.y(), 
+						target.worldx() - Tmp.v1.x + Mathf.range(r), 
+						target.worldy() - Tmp.v1.y + Mathf.range(r), 0.7f);
+			}else{
+				Draw.rect("laserfull", 
+						tile.worldx() + Geometry.getD4Points()[relative].x * width * Vars.tilesize / 2f, 
+						tile.worldy() + Geometry.getD4Points()[relative].y * width * Vars.tilesize / 2f);
+			}
+			
 			Draw.color();
 		}
 	}

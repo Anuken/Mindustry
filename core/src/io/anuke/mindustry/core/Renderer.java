@@ -8,6 +8,7 @@ import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.FloatArray;
 
@@ -47,8 +48,14 @@ public class Renderer extends RendererModule{
 	public Renderer() {
 		Core.cameraScale = baseCameraScale;
 		Effects.setEffectProvider((name, color, x, y, rotation) -> {
-			if(Settings.getBool("effects"))
-				new EffectEntity(name, color, rotation).set(x, y).add();
+			if(Settings.getBool("effects")){
+				Rectangle view = Tmp.r1.setSize(camera.viewportWidth, camera.viewportHeight)
+						.setCenter(camera.position.x, camera.position.y);
+				Rectangle pos = Tmp.r2.setSize(name.size).setCenter(x, y);
+				if(view.overlaps(pos)){
+					new EffectEntity(name, color, rotation).set(x, y).add();
+				}
+			}
 		});
 	}
 

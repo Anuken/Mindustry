@@ -10,6 +10,7 @@ import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.GameMode;
@@ -141,6 +142,8 @@ public class HudFragment implements Fragment{
 			new table(){{
 				abottom();
 				aleft();
+				new label((StringSupplier)()->"[purple]tiles: " + Entities.getGroup(TileEntity.class).amount()).left();
+				row();
 				new label((StringSupplier)()->"[purple]enemies: " + Entities.getGroup(Enemy.class).amount()).left();
 				row();
 				new label((StringSupplier)()->"[orange]noclip: " + Vars.noclip).left();

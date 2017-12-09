@@ -4,7 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectIntMap;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.effect.Fx;
@@ -19,10 +19,12 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Timer;
 
 public class TileEntity extends Entity{
 	public Tile tile;
-	public ObjectMap<Item, Integer> items = new ObjectMap<>();
+	public ObjectIntMap<Item> items = new ObjectIntMap<>();
+	public Timer timer;
 	public int maxhealth, health;
 	public boolean dead = false;
 	public boolean added;
@@ -37,8 +39,10 @@ public class TileEntity extends Entity{
 		maxhealth = tile.block().health;
 		health = maxhealth;
 		
+		timer = new Timer(tile.block().timers);
+		
 		if(added){
-			add(Entities.getGroup(TileEntity.class));
+			add();
 		}
 		
 		return this;
@@ -79,12 +83,12 @@ public class TileEntity extends Entity{
 	}
 	
 	public boolean collide(Bullet other){
-		return other.owner instanceof Enemy; //TODO
+		return other.owner instanceof Enemy;
 	}
 	
 	@Override
 	public void update(){
-		if(health != 0 && !(tile.block() instanceof Wall) &&
+		if(health != 0 && health < tile.block().health && !(tile.block() instanceof Wall) &&
 				Mathf.chance(0.009f*Timers.delta()*(1f-(float)health/maxhealth))){
 			
 			Effects.effect(Fx.smoke, x+Mathf.range(4), y+Mathf.range(4));
@@ -119,5 +123,10 @@ public class TileEntity extends Entity{
 	
 	public void removeItem(Item item, int amount){
 		items.put(item, items.get(item, 0) - amount);
+	}
+	
+	@Override
+	public TileEntity add(){
+		return add(Entities.getGroup(TileEntity.class));
 	}
 }

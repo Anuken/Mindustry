@@ -69,6 +69,8 @@ public class Block{
 	public String fullDescription;
 	/**Whether to draw this block in the expanded draw range.*/
 	public boolean expanded = false;
+	/**Max of timers used.*/
+	public int timers = 0;
 
 	public Block(String name) {
 		blocks.add(this);
@@ -201,7 +203,6 @@ public class Block{
 		Tile other = tile.getNearby()[tile.getRotation()];
 		if(other != null && other.block().acceptItem(item, other, tile)){
 			other.block().handleItem(item, other, tile);
-			//other.entity.addCovey(item, ch == 1 ? 0.5f : ch ==2 ? 1f : 0f);
 			return true;
 		}
 		return false;

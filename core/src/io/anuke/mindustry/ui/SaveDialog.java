@@ -37,7 +37,7 @@ public class SaveDialog extends LoadDialog{
 	}
 
 	void save(int slot){
-		Vars.ui.showLoading("[orange]Saving...");
+		Vars.ui.showLoading("[accent]Saving...");
 
 		Timers.runTask(5f, () -> {
 			hide();

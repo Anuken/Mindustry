@@ -46,7 +46,7 @@ public class RepairTurret extends PowerTurret{
 			entity.blockTarget = null;
 		}
 		
-		if(Timers.get(entity, "blocktarget", targetInterval)){
+		if(entity.timer.get(timerTarget, targetInterval)){
 			entity.blockTarget = Vars.world.findTileTarget(tile.worldx(), tile.worldy(), tile, range, true);
 		}
 		
@@ -54,7 +54,7 @@ public class RepairTurret extends PowerTurret{
 			float target = entity.angleTo(entity.blockTarget);
 			entity.rotation = Mathf.slerp(entity.rotation, target, 0.16f*Timers.delta());
 
-			if(Timers.get(tile, "reload", reload) && Angles.angleDist(target, entity.rotation) < shootCone){
+			if(entity.timer.get(timerReload, reload) && Angles.angleDist(target, entity.rotation) < shootCone){
 				entity.blockTarget.health++;
 				
 				if(entity.blockTarget.health > entity.blockTarget.health)

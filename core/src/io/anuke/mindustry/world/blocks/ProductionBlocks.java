@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
@@ -8,7 +9,6 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.production.*;
 import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
 
 public class ProductionBlocks{
 	public static final Block
@@ -192,6 +192,9 @@ public class ProductionBlocks{
 	
 	omnidrill = new Drill("omnidrill"){
 		{
+			drillEffect = Fx.sparkbig;
+			resource = null;
+			result = null;
 			time = 3;
 			formalName = "omnidrill";
 			description = "Mines 1 of any resource every "+time+" seconds.";
@@ -200,13 +203,14 @@ public class ProductionBlocks{
 		
 		@Override
 		public void update(Tile tile){
+			TileEntity entity = tile.entity;
 
-			if(tile.floor().drops != null && Timers.get(tile, "drill", 60 * time)){
+			if(tile.floor().drops != null && entity.timer.get(timerDrill, 60 * time)){
 				offloadNear(tile, tile.floor().drops.item);
-				Effects.effect(Fx.sparkbig, tile.worldx(), tile.worldy());
+				Effects.effect(drillEffect, tile.worldx(), tile.worldy());
 			}
 
-			if(Timers.get(tile, "dump", 30)){
+			if(entity.timer.get(timerDump, 30)){
 				tryDump(tile);
 			}
 		}

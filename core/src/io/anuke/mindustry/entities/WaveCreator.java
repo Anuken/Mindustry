@@ -71,7 +71,7 @@ public class WaveCreator{
 				after = 12;
 				amount = 3;
 				spacing = 5;
-				scaling = 2;
+				scaling = 3;
 			}},
 			
 			new EnemySpawn(EmpEnemy.class){{
@@ -107,7 +107,7 @@ public class WaveCreator{
 			new EnemySpawn(HealerEnemy.class){{
 				after = 16;
 				spacing = 5;
-				scaling = 1;
+				scaling = 2;
 				amount = 2;
 			}},
 			//end boss wave
@@ -117,14 +117,14 @@ public class WaveCreator{
 				after = 16 + 5;
 				amount = 1;
 				spacing = 5;
-				scaling = 1;
+				scaling = 2;
 			}},
 			
 			new EnemySpawn(EmpEnemy.class){{
 				after = 16 + 5;
 				amount = 1;
 				spacing = 5;
-				scaling = 1;
+				scaling = 2;
 			}}
 			//end enchanced boss wave
 		);

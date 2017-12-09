@@ -11,6 +11,9 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 public class Pump extends LiquidBlock{
+	protected final int timerPump = timers++;
+	protected final int timerDump = timers++;
+	
 	protected float pumpAmount = 2f;
 	protected float pumpTime = 8f;
 
@@ -59,12 +62,12 @@ public class Pump extends LiquidBlock{
 		LiquidEntity entity = tile.entity();
 		
 		if(tile.floor().liquidDrop != null &&
-				Timers.get(tile, "pump", pumpTime) && entity.liquidAmount < liquidCapacity){
+				entity.timer.get(timerPump, pumpTime) && entity.liquidAmount < liquidCapacity){
 			entity.liquid = tile.floor().liquidDrop;
 			entity.liquidAmount += Math.min(pumpAmount, this.liquidCapacity - entity.liquidAmount);
 		}
 		
-		if(Timers.get(tile, "dump", 1)){
+		if(entity.timer.get(timerDump, pumpTime)){
 			tryDumpLiquid(tile);
 		}
 	}

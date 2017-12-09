@@ -6,9 +6,10 @@ import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidBlock;
 import io.anuke.ucore.core.Draw;
-import io.anuke.ucore.core.Timers;
 
 public class LiquidRouter extends LiquidBlock{
+	protected final int timerDump = timers++;
+	
 	private ObjectMap<Tile, Byte> lastmap = new ObjectMap<>();
 
 	public LiquidRouter(String name) {
@@ -21,7 +22,7 @@ public class LiquidRouter extends LiquidBlock{
 	public void update(Tile tile){
 		LiquidEntity entity = tile.entity();
 		
-		if(Timers.get(tile, "dump", 2) && entity.liquidAmount > 0){
+		if(entity.timer.get(timerDump, 2) && entity.liquidAmount > 0){
 			if(lastmap.get(tile, (byte)-1) != tile.getRotation()){
 				tryMoveLiquid(tile, tile.getNearby()[tile.getRotation()]);
 			}

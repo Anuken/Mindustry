@@ -11,10 +11,11 @@ import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 
 public class LiquidBlock extends Block implements LiquidAcceptor{
+	protected final int timerFlow = timers++;
+	
 	protected float liquidCapacity = 10f;
 	protected float flowfactor = 4.9f;
 	
@@ -56,7 +57,7 @@ public class LiquidBlock extends Block implements LiquidAcceptor{
 	public void update(Tile tile){
 		LiquidEntity entity = tile.entity();
 		
-		if(entity.liquidAmount > 0.01f && Timers.get(entity, "flow", 3)){
+		if(entity.liquidAmount > 0.01f && entity.timer.get(timerFlow, 3)){
 			tryMoveLiquid(tile, tile.getNearby()[tile.getRotation()]);
 		}
 		

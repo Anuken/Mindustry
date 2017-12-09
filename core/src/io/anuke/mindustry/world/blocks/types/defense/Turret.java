@@ -30,6 +30,9 @@ public class Turret extends Block{
 	static final int targetInterval = 15;
 	static boolean drawDebug = false;
 	
+	protected final int timerTarget = timers++;
+	protected final int timerReload = timers++;
+	
 	protected float range = 50f;
 	protected float reload = 10f;
 	protected float inaccuracy = 0f;
@@ -141,11 +144,9 @@ public class Turret extends Block{
 		
 		if(hasAmmo(tile) || (Vars.debug && Vars.infiniteAmmo)){
 			
-			if(Timers.get(entity, "target", targetInterval)){
+			if(entity.timer.get(timerTarget, targetInterval)){
 				entity.target = (Enemy)Entities.getClosest(Entities.getGroup(Enemy.class), 
-						tile.worldx(), tile.worldy(), range, e->
-					e instanceof Enemy && !((Enemy)e).isDead()
-				);
+						tile.worldx(), tile.worldy(), range, e-> e instanceof Enemy && !((Enemy)e).isDead());
 			}
 			
 			if(entity.target != null){
@@ -157,7 +158,7 @@ public class Turret extends Block{
 						rotatespeed*Timers.delta());
 				
 				float reload = Vars.multiplier*this.reload;
-				if(Angles.angleDist(entity.rotation, targetRot) < shootCone && Timers.get(tile, "reload", reload)){
+				if(Angles.angleDist(entity.rotation, targetRot) < shootCone && entity.timer.get(timerReload, reload)){
 					if(shootsound != null) Effects.sound(shootsound, entity);
 					shoot(tile);
 					consumeAmmo(tile);

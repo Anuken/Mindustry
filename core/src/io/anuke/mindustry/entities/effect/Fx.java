@@ -17,7 +17,7 @@ public class Fx{
 	
 	public static final Effect
 	
-	generatorexplosion = new Effect(28, e -> {
+	generatorexplosion = new Effect(28, 40f, e -> {
 		Angles.randLenVectors(e.id, 16, 10f + e.ifract()*8f, (x, y)->{
 			float size = e.fract()*12f + 1f;
 			Draw.color(Color.WHITE, lightOrange, e.ifract());
@@ -44,7 +44,7 @@ public class Fx{
 		});
 	}),
 	
-	nuclearcloud = new Effect(90, e -> {
+	nuclearcloud = new Effect(90, 200f, e -> {
 		Angles.randLenVectors(e.id, 10, e.powfract()*90f, (x, y)->{
 			float size = e.fract()*14f;
 			Draw.color(Color.LIME, Color.GRAY, e.ifract());
@@ -106,14 +106,14 @@ public class Fx{
 		Draw.reset();
 	}),
 	
-	shockwave = new Effect(10f, e -> {
+	shockwave = new Effect(10f, 80f, e -> {
 		Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.ifract());
 		Draw.thick(e.fract()*2f + 0.2f);
 		Draw.circle(e.x, e.y, e.ifract()*28f);
 		Draw.reset();
 	}),
 	
-	nuclearShockwave = new Effect(10f, e -> {
+	nuclearShockwave = new Effect(10f, 200f, e -> {
 		Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.ifract());
 		Draw.thick(e.fract()*3f + 0.2f);
 		Draw.polygon(40, e.x, e.y, e.ifract()*140f);
@@ -366,7 +366,7 @@ public class Fx{
 		Draw.reset();
 	}),
 	
-	titanExplosion = new Effect(11, e -> {
+	titanExplosion = new Effect(11, 48f, e -> {
 		Draw.thickness(2f*e.fract()+0.5f);
 		Draw.color(Color.WHITE, Color.DARK_GRAY, e.powfract());
 		Draw.circle(e.x, e.y, 5f + e.powfract() * 8f);

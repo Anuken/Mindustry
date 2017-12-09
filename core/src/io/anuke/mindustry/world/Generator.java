@@ -2,17 +2,20 @@ package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectMap;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.TargetEnemy;
-import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.noise.Noise;
 import io.anuke.ucore.util.Mathf;
 
 public class Generator{
+	public static boolean debugBlockspam = false;
+	
 	static final int spawn = Color.rgba8888(Color.RED);
 	static final int start = Color.rgba8888(Color.GREEN);
 	
@@ -117,9 +120,9 @@ public class Generator{
 				}
 				
 				//preformance debugging
-				//if(Vector2.dst(pixmap.getWidth()/2, pixmap.getHeight()/2, x, y) < 30){
-				//	block = Mathf.choose(ProductionBlocks.stonedrill, DistributionBlocks.conveyor);
-				//}
+				if(debugBlockspam && Vector2.dst(0, 0, x, y) < 260){
+					block = Mathf.choose(ProductionBlocks.omnidrill, DistributionBlocks.conveyor, DistributionBlocks.router, WeaponBlocks.turret);
+				}
 				
 				tiles[x][y].setBlock(block, 0);
 				tiles[x][y].setFloor(floor);
