@@ -31,6 +31,7 @@ public class Generator extends PowerBlock{
 
 	public Generator(String name){
 		super(name);
+		expanded = true;
 	}
 
 	@Override

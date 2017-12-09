@@ -67,6 +67,8 @@ public class Block{
 	public String description;
 	/**Detailed description of the block. Can be as long as necesary.*/
 	public String fullDescription;
+	/**Whether to draw this block in the expanded draw range.*/
+	public boolean expanded = false;
 
 	public Block(String name) {
 		blocks.add(this);

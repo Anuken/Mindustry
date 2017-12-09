@@ -105,6 +105,10 @@ public class Control extends Module{
 			"pause", Keys.SPACE
 		);
 		
+		for(int i = 0; i < Vars.saveSlots; i ++){
+			Settings.defaults("saveslot" + i, "empty");
+		}
+		
 		Settings.loadAll("io.anuke.moment");
 		
 		for(Map map : Map.values()){

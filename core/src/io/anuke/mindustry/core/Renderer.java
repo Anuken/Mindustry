@@ -290,24 +290,29 @@ public class Renderer extends RendererModule{
 			if(l == 0){
 				Graphics.surface("shadow");
 			}
+			
+			boolean expand = l >= 2;
+			int expandr = (expand ? 4 : 0);
 
 			if(l == 1){
 				Graphics.end();
 				drawCache(1, crangex, crangey);
 				Graphics.begin();
 			}else{
-				for(int x = -rangex; x <= rangex; x++){
-					for(int y = -rangey; y <= rangey; y++){
+				for(int x = -rangex - expandr; x <= rangex + expandr; x++){
+					for(int y = -rangey - expandr; y <= rangey + expandr; y++){
 						int worldx = Mathf.scl(camera.position.x, tilesize) + x;
 						int worldy = Mathf.scl(camera.position.y, tilesize) + y;
-
+						boolean expanded = (x < -rangex || x > rangex || y < -rangey || y > rangey);
+						
 						if(world.tile(worldx, worldy) != null){
 							Tile tile = world.tile(worldx, worldy);
-							if(l == 0){
+							if(l == 0 && !expanded){
 								if(tile.block() != Blocks.air && world.isAccessible(worldx, worldy)){
 									tile.block().drawShadow(tile);
 								}
-							}else if(!(tile.block() instanceof StaticBlock)){
+							}else if(!(tile.block() instanceof StaticBlock) &&
+									!expanded || tile.block().expanded){
 								if(l == 2){
 									tile.block().draw(tile);
 								}else if(l == 3){

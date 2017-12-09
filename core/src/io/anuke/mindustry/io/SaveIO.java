@@ -283,6 +283,7 @@ public class SaveIO{
 		}
 	}
 	
+	//TODO GWT support
 	public static void load(FileHandle file){
 		
 		try(DataInputStream stream = new DataInputStream(file.read())){
