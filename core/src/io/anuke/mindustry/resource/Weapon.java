@@ -69,6 +69,10 @@ public enum Weapon{
 	},
 	railgun(40, BulletType.sniper, "Shoots one long-range bullet.", stack(Item.steel, 60), stack(Item.iron, 60)){
 		
+		{
+			shootsound = "railgun";
+		}
+		
 		@Override
 		public void shoot(Player p){
 			float ang = mouseAngle(p);
@@ -78,6 +82,10 @@ public enum Weapon{
 		}
 	},
 	mortar(100, BulletType.shell, "Shoots a slow, but damaging shell.", stack(Item.titanium, 40), stack(Item.steel, 60)){
+		
+		{
+			shootsound = "bigshot";
+		}
 		
 		@Override
 		public void shoot(Player p){

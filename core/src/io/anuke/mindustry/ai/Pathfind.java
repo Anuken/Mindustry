@@ -109,6 +109,15 @@ public class Pathfind{
 		}
 	}
 	
+	public boolean finishedUpdating(){
+		for(SpawnPoint point : Vars.control.getSpawnPoints()){
+			if(point.pathTiles == null){
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	public void updatePath(){
 		for(SpawnPoint point : Vars.control.getSpawnPoints()){
 			point.finder = new IndexedAStarPathFinder<Tile>(graph);

@@ -54,7 +54,8 @@ public class NuclearReactor extends LiquidItemPowerGenerator{
 		
 		if(fuel > 0){
 			entity.heat += fullness * heating;
-			entity.power += powerMultiplier * fullness;
+			entity.power += powerMultiplier * fullness * Timers.delta();
+			entity.power = Mathf.clamp(entity.power);
 			if(entity.timer.get(timerFuel, fuelUseTime)){
 				entity.removeItem(generateItem, 1);
 			}

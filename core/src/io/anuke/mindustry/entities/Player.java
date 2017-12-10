@@ -3,7 +3,6 @@ package io.anuke.mindustry.entities;
 import static io.anuke.mindustry.Vars.*;
 
 import com.badlogic.gdx.Input.Buttons;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
@@ -26,7 +25,8 @@ public class Player extends DestructibleEntity{
 	public int rotation;
 	
 	private Vector2 direction = new Vector2();
-	private float speed = 1f;
+	private float speed = 1.1f;
+	private float dashSpeed = 1.8f;
 	
 	public Player(){
 		hitbox.setSize(5);
@@ -71,8 +71,13 @@ public class Player extends DestructibleEntity{
 		
 		float speed = this.speed;
 		
-		if(Vars.debug && Inputs.keyDown(Keys.SHIFT_LEFT))
-			speed *= 3f;
+		if(Inputs.keyDown("dash")){
+			speed = dashSpeed;
+			
+			if(Vars.debug){
+			//	speed *= 3f;
+			}
+		}
 		
 		if(health < maxhealth && Timers.get(this, "regen", 50))
 			health ++;
@@ -88,11 +93,16 @@ public class Player extends DestructibleEntity{
 		if(Inputs.keyDown("right"))
 			vector.x += speed;
 		
-		boolean shooting = Inputs.buttonDown(Buttons.LEFT) && recipe == null && !ui.hasMouse() && !Input.onConfigurable();
+		boolean shooting = !Inputs.keyDown("dash") && Inputs.buttonDown(Buttons.LEFT) && recipe == null && !ui.hasMouse() && !Input.onConfigurable();
 		
 		if(shooting && Timers.get(this, "reload", weapon.reload)){
 			weapon.shoot(this);
 			Sounds.play(weapon.shootsound);
+		}
+		
+		if(Inputs.keyDown("dash") && Timers.get(this, "dashfx", 3) && vector.len() > 0){
+			Angles.translation(direction.angle() + 180, 3f);
+			Effects.effect(Fx.dashsmoke, x + Angles.x(), y + Angles.y());
 		}
 		
 		vector.limit(speed);

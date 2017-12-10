@@ -438,6 +438,14 @@ public class Fx{
 		Draw.reset();
 	}),
 	
+	dashsmoke = new Effect(30, e -> {
+		Draw.color(Color.CORAL, Color.GRAY, e.ifract());
+		//Draw.alpha(e.fract());
+		float size = e.fract()*4f;
+		Draw.rect("circle", e.x, e.y, size, size);
+		Draw.reset();
+	}),
+	
 	spawn = new Effect(23, e -> {
 		Draw.thickness(2f);
 		Draw.color(Color.DARK_GRAY, Color.SCARLET, e.ifract());

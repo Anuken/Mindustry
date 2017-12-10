@@ -280,8 +280,8 @@ public class Renderer extends RendererModule{
 
 		Graphics.end();
 
-		int crangex = Math.round(camera.viewportWidth * camera.zoom / (chunksize * tilesize));
-		int crangey = Math.round(camera.viewportHeight * camera.zoom / (chunksize * tilesize));
+		int crangex = (int)(camera.viewportWidth * camera.zoom / (chunksize * tilesize))+1;
+		int crangey = (int)(camera.viewportHeight * camera.zoom / (chunksize * tilesize))+1;
 
 		drawCache(0, crangex, crangey);
 

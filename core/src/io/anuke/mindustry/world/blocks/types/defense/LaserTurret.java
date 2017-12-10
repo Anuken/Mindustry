@@ -25,6 +25,7 @@ public class LaserTurret extends PowerTurret{
 		super(name);
 		shootsound = null;
 		layer2 = Layer.laser;
+		soundReload = 20;
 	}
 	
 	@Override

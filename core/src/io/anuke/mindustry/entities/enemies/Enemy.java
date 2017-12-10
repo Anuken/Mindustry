@@ -203,7 +203,7 @@ public class Enemy extends DestructibleEntity{
 	public void onDeath(){
 		Effects.effect(Fx.explosion, this);
 		Effects.shake(3f, 4f, this);
-		Effects.sound("explosion", this);
+		Effects.sound("bang2", this);
 		remove();
 		dead = true;
 	}

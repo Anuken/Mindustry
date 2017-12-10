@@ -33,6 +33,7 @@ public class Turret extends Block{
 	
 	protected final int timerTarget = timers++;
 	protected final int timerReload = timers++;
+	protected final int timerSound = timers++;
 	
 	protected float range = 50f;
 	protected float reload = 10f;
@@ -48,6 +49,7 @@ public class Turret extends Block{
 	protected float shootCone = 5f;
 	protected Effect shootEffect = null;
 	protected float shootShake = 0f;
+	protected int soundReload = 0;
 
 	public Turret(String name) {
 		super(name);
@@ -161,7 +163,7 @@ public class Turret extends Block{
 				
 				float reload = Vars.multiplier*this.reload;
 				if(Angles.angleDist(entity.rotation, targetRot) < shootCone && entity.timer.get(timerReload, reload)){
-					if(shootsound != null) Effects.sound(shootsound, entity);
+					if(shootsound != null && entity.timer.get(timerSound, soundReload)) Effects.sound(shootsound, entity);
 					shoot(tile);
 					consumeAmmo(tile);
 					entity.ammo --;

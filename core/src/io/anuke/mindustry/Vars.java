@@ -22,8 +22,10 @@ public class Vars{
 	public static final float respawnduration = 60*4;
 	//time between waves in frames (on normal mode)
 	public static final float wavespace = 50*60*(android ? 1 : 1);
-	//waves can last no longer than 6 minutes, otherwise the next one spawns
-	public static final float maxwavespace = 60*60*6;
+	//waves can last no longer than 5 minutes, otherwise the next one spawns
+	public static final float maxwavespace = 60*60*5;
+	//advance time the pathfinding starts at
+	public static final float aheadPathfinding = 60*20;
 	//how far away from spawn points the player can't place blocks
 	public static final float enemyspawnspace = 65;
 	//scale of the font
@@ -43,7 +45,7 @@ public class Vars{
 	//whether to draw chunk borders
 	public static boolean debugChunks = false;
 	//whether turrets have infinite ammo (only with debug)
-	public static boolean infiniteAmmo = false;
+	public static boolean infiniteAmmo = true;
 	//whether to show paths of enemies
 	public static boolean showPaths = false;
 	//if false, player is always hidden

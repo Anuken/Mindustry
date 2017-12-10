@@ -83,7 +83,7 @@ public class HealerEnemy extends Enemy{
 	
 	void explode(){
 		Bullet b = new Bullet(BulletType.blast, this, x, y, 0).add();
-		b.damage = BulletType.blast.damage + (tier-1) * 40;
+		b.damage = BulletType.blast.damage + (tier-1) * 30;
 		damage(999);
 	}
 

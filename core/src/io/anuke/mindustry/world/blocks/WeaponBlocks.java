@@ -99,6 +99,7 @@ public class WeaponBlocks{
 	
 	sniperturret = new Turret("sniperturret"){
 		{
+			shootsound = "railgun";
 			formalName = "railgun turret";
 			range = 120;
 			reload = 50f;
@@ -113,6 +114,7 @@ public class WeaponBlocks{
 	
 	mortarturret = new Turret("mortarturret"){
 		{
+			shootsound = "bigshot";
 			rotatespeed = 0.1f;
 			formalName = "flak turret";
 			range = 120;
@@ -131,6 +133,7 @@ public class WeaponBlocks{
 	
 	laserturret = new LaserTurret("laserturret"){
 		{
+			shootsound = "laser";
 			beamColor = Color.SKY;
 			formalName = "laser turret";
 			range = 60;
@@ -145,6 +148,7 @@ public class WeaponBlocks{
 	
 	teslaturret = new PowerTurret("waveturret"){
 		{
+			shootsound = "tesla";
 			formalName = "tesla turret";
 			range = 70;
 			reload = 15f;
@@ -166,6 +170,7 @@ public class WeaponBlocks{
 		
 	plasmaturret = new Turret("plasmaturret"){
 		{
+			shootsound = "flame2";
 			inaccuracy = 7f;
 			formalName = "plasma turret";
 			range = 60f;
@@ -181,6 +186,7 @@ public class WeaponBlocks{
 	
 	chainturret = new Turret("chainturret"){
 		{
+			shootsound = "bigshot";
 			inaccuracy = 8f;
 			formalName = "chain turret";
 			range = 80f;
@@ -219,6 +225,7 @@ public class WeaponBlocks{
 	
 	titanturret = new Turret("titancannon"){
 		{
+			shootsound = "blast";
 			formalName = "titan cannon";
 			range = 120f;
 			reload = 23f;

@@ -50,6 +50,7 @@ public class Control extends Module{
 	
 	Array<EnemySpawn> spawns = new Array<>();
 	int wave = 1;
+	int lastUpdated = -1;
 	float wavetime;
 	float extrawavetime;
 	int enemies = 0;
@@ -90,7 +91,8 @@ public class Control extends Module{
 		
 		Sounds.load("shoot.wav", "place.wav", "explosion.wav", "enemyshoot.wav", 
 				"corexplode.wav", "break.wav", "spawn.wav", "flame.wav", "die.wav", 
-				"respawn.wav", "purchase.wav", "flame2.wav");
+				"respawn.wav", "purchase.wav", "flame2.wav", "bigshot.wav", "laser.wav", "lasershot.wav",
+				"ping.wav", "tesla.wav", "waveend.wav", "railgun.wav", "blast.wav", "bang2.wav");
 		
 		Sounds.setFalloff(9000f);
 		
@@ -103,7 +105,8 @@ public class Control extends Module{
 			"right", Keys.D,
 			"zoom_hold", Keys.CONTROL_LEFT,
 			"menu", Gdx.app.getType() == ApplicationType.Android ? Keys.BACK : Keys.ESCAPE,
-			"pause", Keys.SPACE
+			"pause", Keys.SPACE,
+			"dash", Keys.SHIFT_LEFT
 		);
 		
 		for(int i = 0; i < Vars.saveSlots; i ++){
@@ -129,6 +132,7 @@ public class Control extends Module{
 		weapons.add(Weapon.blaster);
 		player.weapon = weapons.first();
 		
+		lastUpdated = -1;
 		wave = 1;
 		extrawavetime = maxwavespace;
 		wavetime = waveSpacing();
@@ -232,7 +236,10 @@ public class Control extends Module{
 	public void runWave(){
 		Sounds.play("spawn");
 		
-		world.pathfinder().updatePath();
+		if(lastUpdated < wave + 1){
+			world.pathfinder().updatePath();
+			lastUpdated = wave + 1;
+		}
 		
 		for(EnemySpawn spawn : spawns){
 			for(int lane = 0; lane < spawnpoints.size; lane ++){
@@ -471,6 +478,15 @@ public class Control extends Module{
 				
 					if(enemies <= 0){
 						wavetime -= delta();
+						
+						if(Vars.debug && Inputs.keyDown(Keys.I)){
+							wavetime -= delta() * 10f;
+						}
+						
+						if(lastUpdated < wave + 1 && wavetime < Vars.aheadPathfinding){ //start updatingbeforehand
+							world.pathfinder().updatePath();
+							lastUpdated = wave + 1;
+						}
 					}
 				}
 			
