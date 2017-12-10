@@ -85,7 +85,7 @@ public class AndroidInput extends InputAdapter{
 		int tilex = Mathf.scl2(vec.x, tilesize);
 		int tiley = Mathf.scl2(vec.y, tilesize);
 
-		if(player.recipe != null && Vars.world.validPlace(tilex, tiley, player.recipe.result)){
+		if(player.recipe != null && Vars.control.hasItems(player.recipe.requirements) && Vars.world.validPlace(tilex, tiley, player.recipe.result)){
 
 			Vars.world.placeBlock(tilex, tiley, player.recipe.result, player.rotation);
 
@@ -98,10 +98,7 @@ public class AndroidInput extends InputAdapter{
 	public static void doInput(){
 
 		if(Gdx.input.isTouched(0) && Mathf.near2d(lmousex, lmousey, Gdx.input.getX(0), Gdx.input.getY(0), Unit.dp.inPixels(50))
-				&& !ui.hasMouse() /*
-									 * && (player.recipe == null || mode ==
-									 * PlaceMode.touch)
-									 */){
+				&& !ui.hasMouse()){
 			warmup += Timers.delta();
 
 			float lx = mousex, ly = mousey;

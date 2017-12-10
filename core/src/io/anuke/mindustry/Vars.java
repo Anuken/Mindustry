@@ -27,7 +27,7 @@ public class Vars{
 	//how far away from spawn points the player can't place blocks
 	public static final float enemyspawnspace = 65;
 	//scale of the font
-	public static final float fontscale = Unit.dp.inPixels(1f)/2f;
+	public static float fontscale = Unit.dp.inPixels(1f)/2f;
 	//camera zoom displayed on startup
 	public static final int baseCameraScale = Math.round(Unit.dp.inPixels(4));
 	//how much the zoom changes every zoom button press

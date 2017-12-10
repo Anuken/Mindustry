@@ -32,19 +32,22 @@ import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.graphics.CacheBatch;
+import io.anuke.ucore.graphics.Surface;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.*;
 
 public class Renderer extends RendererModule{
-	String[] surfaces = { "shadow", "shield", "pixel", "indicators" };
-	int targetscale = baseCameraScale;
-	int chunksize = 32;
-	int[][][] cache;
-	FloatArray shieldHits = new FloatArray();
-	float shieldHitDuration = 18f;
-	CacheBatch cbatch;
+	private final static int chunksize = 32;
+	private final static float shieldHitDuration = 18f;
+	
+	public Surface shadowSurface, shieldSurface, indicatorSurface;
+	
+	private int targetscale = baseCameraScale;
+	private int[][][] cache;
+	private FloatArray shieldHits = new FloatArray();
+	private CacheBatch cbatch;
 
 	public Renderer() {
 		Core.cameraScale = baseCameraScale;
@@ -63,9 +66,12 @@ public class Renderer extends RendererModule{
 	@Override
 	public void init(){
 		pixelate = Settings.getBool("pixelate");
-		for(String surface : surfaces){
-			Graphics.addSurface(surface, Settings.getBool("pixelate") ? Core.cameraScale : 1);
-		}
+		int scale = Settings.getBool("pixelate") ? Core.cameraScale : 1;
+		
+		shadowSurface = Graphics.createSurface(scale);
+		shieldSurface = Graphics.createSurface(scale);
+		indicatorSurface = Graphics.createSurface(scale);
+		pixelSurface = Graphics.createSurface(scale);
 	}
 
 	public void setPixelate(boolean pixelate){
@@ -81,9 +87,7 @@ public class Renderer extends RendererModule{
 
 			if(Mathf.in(camera.zoom, targetzoom, 0.005f)){
 				camera.zoom = 1f;
-				Core.cameraScale = targetscale;
-				camera.viewportWidth = Gdx.graphics.getWidth() / Core.cameraScale;
-				camera.viewportHeight = Gdx.graphics.getHeight() / Core.cameraScale;
+				Graphics.setCameraScale(targetscale);
 
 				AndroidInput.mousex = Gdx.graphics.getWidth() / 2;
 				AndroidInput.mousey = Gdx.graphics.getHeight() / 2;
@@ -158,12 +162,15 @@ public class Renderer extends RendererModule{
 
 	@Override
 	public void draw(){
-		Graphics.surface("shield");
+		//clera shield surface
+		Graphics.surface(shieldSurface);
 		Graphics.surface();
+		
+		boolean optimize = false;
 
 		Profiler.begin("blockDraw");
 		drawFloor();
-		drawBlocks(false);
+		drawBlocks(false, optimize);
 		Profiler.end("blockDraw");
 
 		Profiler.begin("entityDraw");
@@ -177,11 +184,11 @@ public class Renderer extends RendererModule{
 
 		Profiler.end("entityDraw");
 		
-		drawBlocks(true);
+		if(!optimize) drawBlocks(true, false);
 
 		drawShield();
 
-		renderPixelOverlay();
+		drawOverlay();
 
 		if(Settings.getBool("indicators")){
 			drawEnemyMarkers();
@@ -198,7 +205,7 @@ public class Renderer extends RendererModule{
 	}
 
 	void drawEnemyMarkers(){
-		Graphics.surface("indicators");
+		Graphics.surface(indicatorSurface);
 		Draw.color(Color.RED);
 		//Draw.alpha(0.6f);
 		for(Enemy enemy : control.enemyGroup.all()){
@@ -232,7 +239,7 @@ public class Renderer extends RendererModule{
 			}
 		}
 
-		Texture texture = Graphics.getSurface("shield").texture();
+		Texture texture = shieldSurface.texture();
 		Shaders.shield.color.set(Color.SKY);
 
 		Tmp.tr2.setRegion(texture);
@@ -273,8 +280,8 @@ public class Renderer extends RendererModule{
 
 		Graphics.end();
 
-		int crangex = (int) (camera.viewportWidth / (chunksize * tilesize)) + 1;
-		int crangey = (int) (camera.viewportHeight / (chunksize * tilesize)) + 1;
+		int crangex = Math.round(camera.viewportWidth * camera.zoom / (chunksize * tilesize));
+		int crangey = Math.round(camera.viewportHeight * camera.zoom / (chunksize * tilesize));
 
 		drawCache(0, crangex, crangey);
 
@@ -303,12 +310,12 @@ public class Renderer extends RendererModule{
 		}
 	}
 	
-	void drawBlocks(boolean top){
+	void drawBlocks(boolean top, boolean optimize){
 		int crangex = (int) (camera.viewportWidth / (chunksize * tilesize)) + 1;
 		int crangey = (int) (camera.viewportHeight / (chunksize * tilesize)) + 1;
 		
-		int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2) + 2;
-		int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2) + 2;
+		int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2)+2;
+		int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2)+2;
 
 		boolean noshadows = Settings.getBool("noshadows");
 
@@ -318,8 +325,8 @@ public class Renderer extends RendererModule{
 		
 		Layer[] layers = Layer.values();
 		
-		int start = top ? 4 : (noshadows ? 1 : 0);
-		int end = top ? 4 + layers.length-1 : 4;
+		int start = optimize ? (noshadows ? 1 : 0) : (top ? 4 : (noshadows ? 1 : 0));
+		int end = optimize ? 4 : (top ? 4 + layers.length-1 : 4);
 
 		//0 = shadows
 		//1 = cache blocks
@@ -327,13 +334,13 @@ public class Renderer extends RendererModule{
 		//3+ = layers
 		for(int l = start; l < end; l++){
 			if(l == 0){
-				Graphics.surface("shadow");
+				Graphics.surface(shadowSurface);
 			}
 			
 			Layer layer = l >= 3 ? layers[l - 3] : null;
 			
-			boolean expand = l >= 2;
-			int expandr = (expand ? 4 : 0);
+			boolean expand = layer == Layer.power;
+			int expandr = (expand ? 3 : 0);
 
 			if(l == 1){
 				Graphics.end();
@@ -353,15 +360,18 @@ public class Renderer extends RendererModule{
 									tile.block().drawShadow(tile);
 								}
 							}else if(!(tile.block() instanceof StaticBlock) &&
-									!expanded || tile.block().expanded){
+									(!expanded || tile.block().expanded)){
 								if(l == 2){
 									tile.block().draw(tile);
-								}else{
+								}else if(!optimize){
 									if(tile.block().layer == layer)
 										 tile.block().drawLayer(tile);
 									
 									if(tile.block().layer2 == layer)
 										 tile.block().drawLayer2(tile);
+								}else if(l == 3){
+									tile.block().drawLayer(tile);
+									tile.block().drawLayer2(tile);
 								}
 							}
 						}
@@ -437,7 +447,7 @@ public class Renderer extends RendererModule{
 		Draw.reset();
 	}
 
-	void renderPixelOverlay(){
+	void drawOverlay(){
 
 		//draw tutorial placement point
 		if(Vars.control.tutorial.showBlock()){
@@ -571,7 +581,8 @@ public class Renderer extends RendererModule{
 	void drawHealth(float x, float y, float health, float maxhealth){
 		drawBar(Color.RED, x, y, health / maxhealth);
 	}
-
+	
+	//TODO optimize!
 	public void drawBar(Color color, float x, float y, float fraction){
 		float len = 3;
 
@@ -595,9 +606,10 @@ public class Renderer extends RendererModule{
 	public void setCameraScale(int amount){
 		targetscale = amount;
 		clampScale();
+		//scale up all surfaces in preparation for the zoom
 		if(Settings.getBool("pixelate")){
-			for(String surface : surfaces){
-				Graphics.getSurface(surface).setScale(targetscale);
+			for(Surface surface : Graphics.getSurfaces()){
+				surface.setScale(targetscale);
 			}
 		}
 	}

@@ -3,11 +3,11 @@ package io.anuke.mindustry.entities.enemies;
 import com.badlogic.gdx.math.MathUtils;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.entities.effect.Shaders;
-import io.anuke.ucore.core.Draw;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.util.Angles;
@@ -19,19 +19,30 @@ public class HealerEnemy extends Enemy{
 		speed = 0.25f;
 		reload = 10;
 		maxhealth = 200;
-		range = 90f;
 		bullet = BulletType.shot;
-		range = 30f;
+		range = 40f;
 		alwaysRotate = false;
 		targetCore = false;
+		stopNearCore = true;
 		mass = 1.1f;
 		
 		heal();
 	}
 	
 	@Override
+	void move(){
+		super.move();
+		
+		if(idletime > 60f*3){ //explode after 3 seconds of stillness
+			explode();
+			Effects.effect(Fx.shellexplosion, this);
+			Effects.effect(Fx.shellsmoke, this);
+		}
+	}
+	
+	@Override
 	void updateTargeting(boolean nearCore){
-		if(Timers.get(this, "target", 15)){
+		if(timer.get(timerTarget, 15)){
 			target = Entities.getClosest(Vars.control.enemyGroup,
 					x, y, range, e -> e instanceof Enemy && e != this && ((Enemy)e).healthfrac() < 1f);
 		}
@@ -47,6 +58,7 @@ public class HealerEnemy extends Enemy{
 		
 		if(enemy.health < enemy.maxhealth && Timers.get(this, "heal", reload)){
 			enemy.health ++;
+			idletime = 0;
 		}
 	}
 	
@@ -67,6 +79,12 @@ public class HealerEnemy extends Enemy{
 			Draw.color();
 		}
 		Graphics.shader(Shaders.outline);
+	}
+	
+	void explode(){
+		Bullet b = new Bullet(BulletType.blast, this, x, y, 0).add();
+		b.damage = BulletType.blast.damage + (tier-1) * 40;
+		damage(999);
 	}
 
 }

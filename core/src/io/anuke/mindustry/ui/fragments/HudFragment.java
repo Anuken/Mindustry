@@ -215,6 +215,7 @@ public class HudFragment implements Fragment{
 
 		for(int i = 0; i < control.getItems().length; i ++){
 			int amount = control.getItems()[i];
+			if(amount == 0) continue;
 			String formatted = Mindustry.formatter.format(amount);
 			if(amount > 99999999){
 				formatted = "inf";

@@ -76,7 +76,7 @@ public class Shield extends Entity{
 		
 		float rad = drawRadius();
 		
-		Graphics.surface("shield", false);
+		Graphics.surface(Vars.renderer.shieldSurface, false);
 		Draw.color(Color.ROYAL);
 		Draw.thick(2f);
 		Draw.rect("circle2", x, y, rad, rad);

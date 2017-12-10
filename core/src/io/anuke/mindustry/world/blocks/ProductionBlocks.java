@@ -257,7 +257,7 @@ public class ProductionBlocks{
 			formalName = "RTG generator";
 			generateItem = Item.uranium;
 			powerCapacity = 40f;
-			powerOutput = 0.055f;
+			powerOutput = 0.05f;
 			itemDuration = 250f;
 			description = "Generates power from uranium.";
 			fullDescription = "Generates small amounts of power from the radioactive decay of uranium. Outputs power as lasers to its 4 sides.";

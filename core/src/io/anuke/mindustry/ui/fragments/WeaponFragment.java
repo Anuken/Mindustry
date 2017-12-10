@@ -18,7 +18,7 @@ public class WeaponFragment implements Fragment{
 	public void build(){
 		weapontable = Core.scene.table();
 		weapontable.bottom().left();
-		weapontable.setVisible(()->!GameState.is(State.menu));
+		weapontable.setVisible(()-> !GameState.is(State.menu));
 		
 		if(android){
 			weapontable.remove();

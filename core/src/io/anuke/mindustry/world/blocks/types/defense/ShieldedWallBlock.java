@@ -48,7 +48,7 @@ public class ShieldedWallBlock extends PowerBlock{
 		ShieldedWallEntity entity = tile.entity();
 		
 		if(entity.power > powerToDamage){
-			Graphics.surface("shield", false);
+			Graphics.surface(Vars.renderer.shieldSurface, false);
 			Draw.color(Color.ROYAL);
 			Draw.rect("blank", tile.worldx(), tile.worldy(), Vars.tilesize, Vars.tilesize);
 			Graphics.surface();

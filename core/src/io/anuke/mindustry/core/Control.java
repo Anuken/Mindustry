@@ -199,9 +199,7 @@ public class Control extends Module{
 			play();
 		});
 		
-		Timers.run(18, ()->{
-			ui.hideLoading();
-		});
+		Timers.run(18, ()-> ui.hideLoading());
 	}
 	
 	public GameMode getMode(){
@@ -306,9 +304,7 @@ public class Control extends Module{
 		}
 		Effects.effect(Fx.coreexplosion, core.worldx(), core.worldy());
 		
-		Timers.run(60, ()->{
-			ui.showRestart();
-		});
+		Timers.run(60, ()-> ui.showRestart());
 	}
 	
 	float waveSpacing(){

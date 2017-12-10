@@ -3,8 +3,8 @@ _Keep in mind that this is just a basic outline of planned features, and will be
 ### 3.0 Release
 - New tutorial with the power blocks
 - New SFX for specific blocks, especially turrets
-- Block drawing layers. Refactor/remove `Block#drawOver()`, add `Layer` enum. Should fix 'glitchy' lasers and conveyor clipping
-- Balance nuclear reactor, improve effectiveness as they are currently underpowered
+- [DONE] Block drawing layers. Refactor/remove `Block#drawOver()`, add `Layer` enum. Should fix 'glitchy' lasers and conveyor clipping
+- [DONE] Balance nuclear reactor, improve effectiveness as they are currently underpowered
 - Make generation frame independent
 - Investigate issue #5 (enemies stuck in blocks)
 - Faster mech movement, possibly with a "boost" key
@@ -52,4 +52,7 @@ _Keep in mind that this is just a basic outline of planned features, and will be
 - Optimize generator laser distribution, especially finding targets
 - Optimize UI
 - Check memory usage and GC, profile
+- Optimize health bars and enemies in general
+- Make drawing of enemies more efficient (don't call `flush()`?)
+- Look into `NodeRecord` storage for pathfinder, since it's taking 2MB+ of memory!
 

@@ -175,6 +175,17 @@ public class UI extends SceneModule{
 		
 		prefs.screenshakePref();
 		prefs.volumePrefs();
+		//this is incredinbly buggy
+		/*
+		prefs.sliderPref("sscale", "UI Scale", 100, 25, 200, i ->{ 
+			
+			Unit.dp.multiplier = i / 100f;
+			fontscale = Unit.dp.inPixels(1f)/2f;
+			skin.font().getData().setScale(fontscale);
+			invalidateAll();
+			
+			return i + "%";
+		});*/
 		
 		prefs.checkPref("fps", "Show FPS", false);
 		prefs.checkPref("noshadows", "Disable shadows", false);
@@ -184,12 +195,12 @@ public class UI extends SceneModule{
 		prefs.checkPref("drawblocks", "Draw Blocks", true);
 		prefs.checkPref("pixelate", "Pixelate Screen", true, b->{
 			if(b){
-				Graphics.getSurface("pixel").setScale(Core.cameraScale);
-				Graphics.getSurface("shadow").setScale(Core.cameraScale);
-				Graphics.getSurface("shield").setScale(Core.cameraScale);
+				Vars.renderer.pixelSurface.setScale(Core.cameraScale);
+				Vars.renderer.shadowSurface.setScale(Core.cameraScale);
+				Vars.renderer.shieldSurface.setScale(Core.cameraScale);
 			}else{
-				Graphics.getSurface("shadow").setScale(1);
-				Graphics.getSurface("shield").setScale(1);
+				Vars.renderer.shadowSurface.setScale(1);
+				Vars.renderer.shieldSurface.setScale(1);
 			}
 			renderer.setPixelate(b);
 		});
@@ -278,6 +289,15 @@ public class UI extends SceneModule{
 		updateItems();
 
 		build.end();
+	}
+	
+	void invalidateAll(){
+		for(Element e : scene.getElements()){
+			if(e instanceof Table){
+				((Table)e).invalidateHierarchy();
+			}
+				
+		}
 	}
 	
 	public void updateWeapons(){

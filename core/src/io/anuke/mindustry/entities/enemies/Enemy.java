@@ -65,11 +65,10 @@ public class Enemy extends DestructibleEntity{
 		Tile core = Vars.control.getCore();
 		
 		boolean nearCore = distanceTo(core.worldx(), core.worldy()) <= range - 18f && stopNearCore;
-
 		Vector2 vec;
-
+		
 		if(nearCore){
-			vec = Tmp.v2.setZero();
+			vec = Tmp.v1.setZero();
 			if(targetCore) target = core.entity;
 		}else{
 			vec = Vars.world.pathfinder().find(this);
@@ -84,9 +83,8 @@ public class Enemy extends DestructibleEntity{
 		
 		Entities.getNearby(Vars.control.enemyGroup, x, y, range, other -> {
 			Enemy enemy = (Enemy)other;
+			if(other == this) return;
 			float dst = other.distanceTo(this);
-			if(other == this)
-				return;
 			
 			if(dst < shiftRange){
 				float scl = Mathf.clamp(1.4f - dst / shiftRange) * enemy.mass * 1f/mass;
