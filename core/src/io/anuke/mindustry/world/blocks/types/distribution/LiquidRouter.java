@@ -1,7 +1,5 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
-import com.badlogic.gdx.utils.ObjectMap;
-
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidBlock;
@@ -9,8 +7,6 @@ import io.anuke.ucore.core.Draw;
 
 public class LiquidRouter extends LiquidBlock{
 	protected final int timerDump = timers++;
-	
-	private ObjectMap<Tile, Byte> lastmap = new ObjectMap<>();
 
 	public LiquidRouter(String name) {
 		super(name);
@@ -23,7 +19,7 @@ public class LiquidRouter extends LiquidBlock{
 		LiquidEntity entity = tile.entity();
 		
 		if(entity.timer.get(timerDump, 2) && entity.liquidAmount > 0){
-			if(lastmap.get(tile, (byte)-1) != tile.getRotation()){
+			if(tile.getExtra() != tile.getRotation()){
 				tryMoveLiquid(tile, tile.getNearby()[tile.getRotation()]);
 			}
 			
@@ -34,7 +30,7 @@ public class LiquidRouter extends LiquidBlock{
 	@Override
 	public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
 		super.handleLiquid(tile, source, liquid, amount);
-		lastmap.put(tile, (byte)tile.relativeTo(source.x, source.y));
+		tile.setExtra((byte)tile.relativeTo(source.x, source.y));
 	}
 	
 	@Override

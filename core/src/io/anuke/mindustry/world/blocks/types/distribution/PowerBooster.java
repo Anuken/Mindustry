@@ -23,8 +23,8 @@ public class PowerBooster extends Generator{
 	}
 
 	@Override
-	public void drawPixelOverlay(Tile tile){
-		super.drawPixelOverlay(tile);
+	public void drawSelect(Tile tile){
+		super.drawSelect(tile);
 
 		Draw.color("yellow");
 		Draw.dashCircle(tile.worldx(), tile.worldy(), powerRange * Vars.tilesize);
@@ -51,8 +51,7 @@ public class PowerBooster extends Generator{
 	}
 
 	@Override
-	public void drawOver(Tile tile){
-	}
+	public void drawLayer(Tile tile){}
 
 	@Override
 	public boolean acceptsPower(Tile tile){

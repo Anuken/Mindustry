@@ -31,7 +31,7 @@ public abstract class PowerBlock extends Block implements PowerAcceptor{
 	}
 	
 	@Override
-	public void drawPixelOverlay(Tile tile){
+	public void drawSelect(Tile tile){
 		PowerEntity entity = tile.entity();
 		
 		float fract = (float)entity.power / powerCapacity;

@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.IntArray;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
@@ -30,6 +31,7 @@ public class Conveyor extends Block{
 		super(name);
 		rotate = true;
 		update = true;
+		layer = Layer.overlay;
 	}
 	
 	@Override
@@ -45,12 +47,18 @@ public class Conveyor extends Block{
 	
 	@Override
 	public void draw(Tile tile){
-		ConveyorEntity entity = tile.entity();
-		
 		byte rotation = tile.getRotation();
 		
 		Draw.rect(name() + 
-				(Timers.time() % ((20 / 100f) / speed) < (10 / 100f) / speed && acceptItem(Item.stone, tile, null) ? "" : "move"), tile.worldx(), tile.worldy(), rotation * 90);
+				(Timers.time() % ((20 / 100f) / speed) < (10 / 100f) / speed && acceptItem(Item.stone, tile, null) ? "" : "move"), 
+				tile.worldx(), tile.worldy(), rotation * 90);
+	}
+	
+	@Override
+	public void drawLayer(Tile tile){
+		ConveyorEntity entity = tile.entity();
+		
+		byte rotation = tile.getRotation();
 		
 		for(int i = 0; i < entity.convey.size; i ++){
 			ItemPos pos = pos1.set(entity.convey.get(i));

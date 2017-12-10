@@ -131,7 +131,11 @@ public class Tile{
 	}
 	
 	public void setDump(byte dump){
-		data = Bits.packShort(getRotation(), dump);
+		data = Bits.packShort(getRotation(), Bits.packByte(dump, getExtra()));
+	}
+	
+	public void setExtra(byte extra){
+		data = Bits.packShort(getRotation(), Bits.packByte(getDump(), extra));
 	}
 	
 	public byte getRotation(){
@@ -139,7 +143,11 @@ public class Tile{
 	}
 	
 	public byte getDump(){
-		return Bits.getRightByte(data);
+		return Bits.getLeftByte(Bits.getRightByte(data));
+	}
+	
+	public byte getExtra(){
+		return Bits.getRightByte(Bits.getRightByte(data));
 	}
 	
 	public boolean passable(){

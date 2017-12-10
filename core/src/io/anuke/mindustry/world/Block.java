@@ -71,6 +71,10 @@ public class Block{
 	public boolean expanded = false;
 	/**Max of timers used.*/
 	public int timers = 0;
+	/**Layer to draw extra stuff on.*/
+	public Layer layer = Layer.overlay;
+	/**Extra layer to draw extra extra stuff on.*/
+	public Layer layer2 = Layer.overlay;
 
 	public Block(String name) {
 		blocks.add(this);
@@ -81,8 +85,10 @@ public class Block{
 		this.id = lastid++;
 	}
 	
-	public void drawOver(Tile tile){}
-	public void drawPixelOverlay(Tile tile){}
+	
+	public void drawLayer(Tile tile){}
+	public void drawLayer2(Tile tile){}
+	public void drawSelect(Tile tile){}
 	public void drawPlace(int x, int y, int rotation, boolean valid){}
 	public void postInit(){}
 	

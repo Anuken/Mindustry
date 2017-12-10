@@ -82,7 +82,7 @@ public class Enemy extends DestructibleEntity{
 		float attractRange = avoidRange + 7f;
 		float avoidSpeed = this.speed/2.7f;
 		
-		Entities.getNearby(Entities.getGroup(Enemy.class), x, y, range, other -> {
+		Entities.getNearby(Vars.control.enemyGroup, x, y, range, other -> {
 			Enemy enemy = (Enemy)other;
 			float dst = other.distanceTo(this);
 			if(other == this)
@@ -268,6 +268,6 @@ public class Enemy extends DestructibleEntity{
 	
 	@Override
 	public <T extends Entity> T add(){
-		return (T) add(Entities.getGroup(Enemy.class));
+		return (T) add(Vars.control.enemyGroup);
 	}
 }

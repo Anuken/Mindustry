@@ -12,7 +12,6 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Fx;
-import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Configurable;
@@ -78,7 +77,7 @@ public class Door extends Wall implements Configurable{
 		Vector2 offset = type.getPlaceOffset();
 		Tmp.r2.setCenter(offset.x + x * Vars.tilesize, offset.y + y * Vars.tilesize);
 		
-		for(SolidEntity e : Entities.getNearby(Entities.getGroup(Enemy.class), x * tilesize, y * tilesize, tilesize * 2f)){
+		for(SolidEntity e : Entities.getNearby(Vars.control.enemyGroup, x * tilesize, y * tilesize, tilesize * 2f)){
 			Rectangle rect = e.hitbox.getRect(e.x, e.y);
 
 			if(Tmp.r2.overlaps(rect)){

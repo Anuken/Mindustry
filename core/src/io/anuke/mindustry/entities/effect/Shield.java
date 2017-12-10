@@ -3,7 +3,7 @@ package io.anuke.mindustry.entities.effect;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 
-import io.anuke.mindustry.entities.Bullet;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.defense.ShieldBlock;
@@ -55,7 +55,7 @@ public class Shield extends Entity{
 		
 		ShieldBlock block = (ShieldBlock)tile.block();
 		
-		Entities.getNearby(Entities.getGroup(Bullet.class), x, y, block.shieldRadius * 2*uptime + 10, entity->{
+		Entities.getNearby(Vars.control.bulletGroup, x, y, block.shieldRadius * 2*uptime + 10, entity->{
 			BulletEntity bullet = (BulletEntity)entity;
 			if((bullet.owner instanceof Enemy || hitPlayers)){
 				

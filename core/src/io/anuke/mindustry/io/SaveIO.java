@@ -5,6 +5,7 @@ import static io.anuke.mindustry.Vars.android;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 
 import com.badlogic.gdx.Gdx;
@@ -201,18 +202,29 @@ public class SaveIO{
 			
 			//--INVENTORY--
 			
-			stream.writeByte(Vars.control.getItems().size); //amount of items
+			int l = Vars.control.getItems().length;
+			int itemsize = 0;
 			
-			for(Item item : Vars.control.getItems().keys()){
-				stream.writeByte(item.ordinal()); //item ID
-				stream.writeInt(Vars.control.getAmount(item)); //item amount
+			for(int i = 0; i < l; i ++){
+				if(Vars.control.getItems()[i] > 0){
+					itemsize ++;
+				}
+			}
+			
+			stream.writeByte(itemsize); //amount of items
+			
+			for(int i = 0; i < l; i ++){
+				if(Vars.control.getItems()[i] > 0){
+					stream.writeByte(i); //item ID
+					stream.writeInt(Vars.control.getItems()[i]); //item amount
+				}
 			}
 			
 			//--ENEMIES--
 			
 			int totalEnemies = 0;
 			
-			for(Enemy entity : Entities.get(Enemy.class)){
+			for(Enemy entity : Vars.control.enemyGroup.all()){
 				if(idEnemies.containsKey(entity.getClass())){
 					totalEnemies ++;
 				}
@@ -220,7 +232,7 @@ public class SaveIO{
 			
 			stream.writeInt(totalEnemies); //enemy amount
 			
-			for(Enemy enemy :  Entities.get(Enemy.class)){
+			for(Enemy enemy : Vars.control.enemyGroup.all()){
 				if(idEnemies.containsKey(enemy.getClass())){
 					stream.writeByte(idEnemies.get(enemy.getClass())); //type
 					stream.writeByte(enemy.spawn); //lane
@@ -265,11 +277,17 @@ public class SaveIO{
 						if(tile.entity != null){
 							stream.writeByte(tile.getRotation()); //rotation
 							stream.writeInt(tile.entity.health); //health
-							stream.writeByte(tile.entity.items.size); //amount of items
+							int amount = 0;
+							for(int i = 0; i < tile.entity.items.length; i ++){
+								if(tile.entity.items[i] > 0) amount ++;
+							}
+							stream.writeByte(amount); //amount of items
 							
-							for(Item item : tile.entity.items.keys()){
-								stream.writeByte(item.ordinal()); //item ID
-								stream.writeInt(tile.entity.items.get(item, 0)); //item amount
+							for(int i = 0; i < tile.entity.items.length; i ++){
+								if(tile.entity.items[i] > 0){
+									stream.writeByte(i); //item ID
+									stream.writeInt(tile.entity.items[i]); //item amount
+								}
 							}
 							
 							tile.entity.write(stream);
@@ -331,12 +349,12 @@ public class SaveIO{
 			
 			int totalItems = stream.readByte();
 			
-			Vars.control.getItems().clear();
+			Arrays.fill(Vars.control.getItems(), 0);
 			
 			for(int i = 0; i < totalItems; i ++){
 				Item item = itemEnums[stream.readByte()];
 				int amount = stream.readInt();
-				Vars.control.getItems().put(item, amount);
+				Vars.control.getItems()[item.ordinal()] = amount;
 			}
 			
 			Vars.ui.updateItems();
@@ -364,7 +382,7 @@ public class SaveIO{
 					enemy.x = x;
 					enemy.y = y;
 					enemy.tier = tier;
-					enemy.add(Entities.getGroup(Enemy.class));
+					enemy.add(Vars.control.enemyGroup);
 					enemiesToUpdate.add(enemy);
 				}catch (Exception e){
 					throw new RuntimeException(e);
@@ -420,7 +438,7 @@ public class SaveIO{
 					for(int j = 0; j < items; j ++){
 						int itemid = stream.readByte();
 						int itemamount = stream.readInt();
-						tile.entity.items.put(itemEnums[itemid], itemamount);
+						tile.entity.items[itemid] = itemamount;
 					}
 					
 					tile.entity.read(stream);

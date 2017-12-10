@@ -54,18 +54,18 @@ public class ItemPowerGenerator extends Generator{
 	}
 	
 	@Override
-	public void drawPixelOverlay(Tile tile){
-		super.drawPixelOverlay(tile);
+	public void drawSelect(Tile tile){
+		super.drawSelect(tile);
 		
 		TileEntity entity = tile.entity;
 		
 		//TODO maybe don't draw it due to clutter
-		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 10, (float)entity.totalItems() / itemCapacity);
+		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 10, (float)entity.getItem(generateItem) / itemCapacity);
 	}
 	
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
-		return item == generateItem && tile.entity.totalItems() < itemCapacity;
+		return item == generateItem && tile.entity.getItem(generateItem) < itemCapacity;
 	}
 	
 	@Override

@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
@@ -18,6 +19,7 @@ public class RepairTurret extends PowerTurret{
 	public RepairTurret(String name) {
 		super(name);
 		powerUsed = 0.1f;
+		layer2 = Layer.laser;
 	}
 	
 	@Override
@@ -66,7 +68,7 @@ public class RepairTurret extends PowerTurret{
 	}
 	
 	@Override
-	public void drawPixelOverlay(Tile tile){
+	public void drawSelect(Tile tile){
 		Draw.color("green");
 		Draw.dashCircle(tile.worldx(), tile.worldy(), range);
 		Draw.reset();
@@ -75,13 +77,14 @@ public class RepairTurret extends PowerTurret{
 	}
 	
 	@Override
-	public void drawOver(Tile tile){
+	public void drawLayer2(Tile tile){
 		PowerTurretEntity entity = tile.entity();
 		
 		if(entity.power >= powerUsed && entity.blockTarget != null && Angles.angleDist(entity.angleTo(entity.blockTarget), entity.rotation) < 10){
 			Tile targetTile = entity.blockTarget.tile;
 			Vector2 offset = targetTile.block().getPlaceOffset();
-			float x = tile.worldx(), y = tile.worldy();
+			Angles.translation(entity.rotation, 4f);
+			float x = tile.worldx() + Angles.x(), y = tile.worldy() + Angles.y();
 			float x2 = entity.blockTarget.x + offset.x, y2 = entity.blockTarget.y + offset.y;
 
 			Draw.color(Hue.rgb(138, 244, 138, (MathUtils.sin(Timers.time()) + 1f) / 14f));
@@ -97,7 +100,5 @@ public class RepairTurret extends PowerTurret{
 			Draw.rect("circle", x2, y2, 5f, 5f);
 			Draw.reset();
 		}
-		
-		Draw.rect(name(), tile.worldx(), tile.worldy(), entity.rotation - 90);
 	}
 }

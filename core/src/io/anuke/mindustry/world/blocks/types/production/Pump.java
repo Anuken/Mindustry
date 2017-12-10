@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.blocks.types.production;
 import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.resource.Liquid;
+import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidBlock;
 import io.anuke.ucore.core.Draw;
@@ -21,6 +22,7 @@ public class Pump extends LiquidBlock{
 		super(name);
 		rotate = false;
 		solid = true;
+		layer = Layer.overlay;
 	}
 	
 	@Override
@@ -49,7 +51,7 @@ public class Pump extends LiquidBlock{
 	}
 	
 	@Override
-	public void drawOver(Tile tile){
+	public void drawLayer(Tile tile){
 		if(tile.floor().liquidDrop == null){
 			Draw.colorl(0.85f + Mathf.absin(Timers.time(), 6f, 0.15f));
 			Draw.rect("cross", tile.worldx(), tile.worldy());

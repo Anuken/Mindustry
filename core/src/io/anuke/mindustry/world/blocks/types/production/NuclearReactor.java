@@ -136,8 +136,8 @@ public class NuclearReactor extends LiquidItemPowerGenerator{
 	}
 	
 	@Override
-	public void drawPixelOverlay(Tile tile){
-		super.drawPixelOverlay(tile);
+	public void drawSelect(Tile tile){
+		super.drawSelect(tile);
 		
 		NuclearReactorEntity entity = tile.entity();
 		

@@ -12,7 +12,6 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Fx;
-import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.world.blocks.*;
@@ -276,7 +275,7 @@ public class World extends Module{
 		Vector2 offset = type.getPlaceOffset();
 		Tmp.r2.setCenter(offset.x + x * Vars.tilesize, offset.y + y * Vars.tilesize);
 
-		for(SolidEntity e : Entities.getNearby(Entities.getGroup(Enemy.class), x * tilesize, y * tilesize, tilesize * 2f)){
+		for(SolidEntity e : Entities.getNearby(control.enemyGroup, x * tilesize, y * tilesize, tilesize * 2f)){
 			Rectangle rect = e.hitbox.getRect(e.x, e.y);
 
 			if(Tmp.r2.overlaps(rect)){

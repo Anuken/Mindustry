@@ -20,8 +20,8 @@ public class Vars{
 	public static final float placerange = 66;
 	//respawn time in frames
 	public static final float respawnduration = 60*4;
-	//time between waves in frames
-	public static final float wavespace = 40*60*(android ? 1 : 1);
+	//time between waves in frames (on normal mode)
+	public static final float wavespace = 50*60*(android ? 1 : 1);
 	//waves can last no longer than 6 minutes, otherwise the next one spawns
 	public static final float maxwavespace = 60*60*6;
 	//how far away from spawn points the player can't place blocks

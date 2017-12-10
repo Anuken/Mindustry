@@ -39,7 +39,7 @@ public class PowerTurret extends Turret implements PowerAcceptor{
 	}
 	
 	@Override
-	public void drawPixelOverlay(Tile tile){
+	public void drawSelect(Tile tile){
 		Vector2 offset = getPlaceOffset();
 		
 		Draw.color("green");

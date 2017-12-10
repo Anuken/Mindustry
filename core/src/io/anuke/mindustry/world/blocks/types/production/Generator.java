@@ -9,6 +9,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.effect.Fx;
+import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
@@ -32,6 +33,7 @@ public class Generator extends PowerBlock{
 	public Generator(String name){
 		super(name);
 		expanded = true;
+		layer = Layer.power;
 	}
 
 	@Override
@@ -49,8 +51,8 @@ public class Generator extends PowerBlock{
 	}
 
 	@Override
-	public void drawPixelOverlay(Tile tile){
-		super.drawPixelOverlay(tile);
+	public void drawSelect(Tile tile){
+		super.drawSelect(tile);
 
 		if(drawRangeOverlay){
 			int rotation = tile.getRotation();
@@ -124,7 +126,7 @@ public class Generator extends PowerBlock{
 	}
 
 	@Override
-	public void drawOver(Tile tile){
+	public void drawLayer(Tile tile){
 		PowerEntity entity = tile.entity();
 
 		for(int i = 0; i < laserDirections; i++){

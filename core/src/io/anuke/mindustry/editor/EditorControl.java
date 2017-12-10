@@ -6,9 +6,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.OrderedMap;
-import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.world.Block;
@@ -24,7 +22,7 @@ import io.anuke.ucore.noise.Simplex;
 import io.anuke.ucore.util.Mathf;
 
 public class EditorControl extends Module{
-	private ObjectMap<Block, Integer> colors = new ObjectMap<>();
+	private ObjectIntMap<Block> colors = new ObjectIntMap<>();
 	Pixmap pixmap;
 	Texture texture;
 	Simplex sim = new Simplex();
@@ -56,8 +54,9 @@ public class EditorControl extends Module{
 	};
 
 	public EditorControl() {
-
-		for(int key : Generator.colors.keys()){
+		IntMap.Keys keys = Generator.colors.keys();
+		
+		for(int key = keys.next(); keys.hasNext; key = keys.next()){
 			colors.put(Generator.colors.get(key), key);
 		}
 		loadMap(map);
@@ -119,7 +118,7 @@ public class EditorControl extends Module{
 
 					Block block = noise > 0.6 ? Blocks.stoneblock : Blocks.stone;
 
-					pixmap.drawPixel(x, y, colors.get(block));
+					pixmap.drawPixel(x, y, colors.get(block, 0));
 				}
 			}
 		}
@@ -254,7 +253,7 @@ public class EditorControl extends Module{
 					}
 				}
 
-				pixmap.drawPixel(x, y, colors.get(block));
+				pixmap.drawPixel(x, y, colors.get(block, 0));
 			}
 		}
 

@@ -6,6 +6,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
@@ -27,6 +28,7 @@ public class Drill extends Block{
 		super(name);
 		update = true;
 		solid = true;
+		layer = Layer.overlay;
 	}
 	
 	@Override
@@ -41,7 +43,7 @@ public class Drill extends Block{
 		TileEntity entity = tile.entity;
 		
 		if((tile.floor() == resource || (resource.drops.equals(tile.floor().drops))) 
-				&& entity.timer.get(timerDrill, 60 * time) && tile.entity.totalItems() < capacity){
+				&& entity.timer.get(timerDrill, 60 * time) && tile.entity.getItem(result) < capacity){
 			offloadNear(tile, result);
 			Effects.effect(drillEffect, tile.worldx(), tile.worldy());
 		}
@@ -52,7 +54,7 @@ public class Drill extends Block{
 	}
 	
 	@Override
-	public void drawOver(Tile tile){
+	public void drawLayer(Tile tile){
 		if(tile.floor() != resource && resource != null && !(resource.drops.equals(tile.floor().drops))){
 			Draw.colorl(0.85f + Mathf.absin(Timers.time(), 6f, 0.15f));
 			Draw.rect("cross", tile.worldx(), tile.worldy());

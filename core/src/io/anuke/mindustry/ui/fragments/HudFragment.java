@@ -4,20 +4,16 @@ import static io.anuke.mindustry.Vars.*;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.GameMode;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.function.StringSupplier;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.imagebutton;
@@ -34,7 +30,6 @@ import io.anuke.ucore.util.Profiler;
 public class HudFragment implements Fragment{
 	private Table itemtable, respawntable;
 	private Cell<Table> itemcell;
-	private Array<Item> tempItems = new Array<>();
 	
 	public void build(){
 		//menu at top left
@@ -142,9 +137,9 @@ public class HudFragment implements Fragment{
 			new table(){{
 				abottom();
 				aleft();
-				new label((StringSupplier)()->"[purple]tiles: " + Entities.getGroup(TileEntity.class).amount()).left();
+				new label((StringSupplier)()->"[purple]tiles: " + Vars.control.tileGroup.amount()).left();
 				row();
-				new label((StringSupplier)()->"[purple]enemies: " + Entities.getGroup(Enemy.class).amount()).left();
+				new label((StringSupplier)()->"[purple]enemies: " + Vars.control.enemyGroup.amount()).left();
 				row();
 				new label((StringSupplier)()->"[orange]noclip: " + Vars.noclip).left();
 				row();
@@ -216,19 +211,15 @@ public class HudFragment implements Fragment{
 			return;
 		}
 		
-		tempItems.clear();
-		for(Item item : control.getItems().keys()){
-			tempItems.add(item);
-		}
-		tempItems.sort();
+		Item[] items = Item.values();
 
-		for(Item stack : tempItems){
-			int amount = control.getAmount(stack);
+		for(int i = 0; i < control.getItems().length; i ++){
+			int amount = control.getItems()[i];
 			String formatted = Mindustry.formatter.format(amount);
 			if(amount > 99999999){
 				formatted = "inf";
 			}
-			Image image = new Image(Draw.region("icon-" + stack.name()));
+			Image image = new Image(Draw.region("icon-" + items[i]));
 			Label label = new Label(formatted);
 			label.setFontScale(fontscale*1.5f);
 			itemtable.add(image).size(8*3).units(Unit.dp);

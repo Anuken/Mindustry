@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities.enemies;
 
 import com.badlogic.gdx.math.MathUtils;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.effect.Shaders;
 import io.anuke.ucore.core.Draw;
@@ -31,7 +32,7 @@ public class HealerEnemy extends Enemy{
 	@Override
 	void updateTargeting(boolean nearCore){
 		if(Timers.get(this, "target", 15)){
-			target = Entities.getClosest(Entities.getGroup(Enemy.class),
+			target = Entities.getClosest(Vars.control.enemyGroup,
 					x, y, range, e -> e instanceof Enemy && e != this && ((Enemy)e).healthfrac() < 1f);
 		}
 		

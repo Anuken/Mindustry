@@ -19,15 +19,15 @@ public class LiquidItemPowerGenerator extends LiquidPowerGenerator{
 	}
 	
 	@Override
-	public void drawPixelOverlay(Tile tile){
-		super.drawPixelOverlay(tile);
+	public void drawSelect(Tile tile){
+		super.drawSelect(tile);
 		
 		TileEntity entity = tile.entity();
 		
 		Vector2 offset = getPlaceOffset();
 		
 		Vars.renderer.drawBar(Color.GREEN, tile.worldx() + offset.x, tile.worldy() + 6 +
-				offset.y + height*Vars.tilesize/2f, (float)entity.totalItems() / itemCapacity);
+				offset.y + height*Vars.tilesize/2f, (float)entity.getItem(generateItem) / itemCapacity);
 		Draw.reset();
 	}
 	
@@ -54,7 +54,7 @@ public class LiquidItemPowerGenerator extends LiquidPowerGenerator{
 	
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
-		return item == generateItem && tile.entity.totalItems() < itemCapacity;
+		return item == generateItem && tile.entity.getItem(generateItem) < itemCapacity;
 	}
 
 }

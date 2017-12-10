@@ -81,10 +81,10 @@ public class LiquidCrafter extends LiquidBlock{
 	}
 	
 	@Override
-	public void drawPixelOverlay(Tile tile){
+	public void drawSelect(Tile tile){
 		if(input == null) return;
 		
-		float fract = (float)tile.entity.items.get(input, 0) / itemCapacity;
+		float fract = (float)tile.entity.getItem(input) / itemCapacity;
 		
 		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 6, fract);
 	}
@@ -97,7 +97,7 @@ public class LiquidCrafter extends LiquidBlock{
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		TileEntity entity = tile.entity();
-		return input != null && item == input && entity.items.get(item, 0) < itemCapacity;
+		return input != null && item == input && entity.getItem(input) < itemCapacity;
 	}
 
 }

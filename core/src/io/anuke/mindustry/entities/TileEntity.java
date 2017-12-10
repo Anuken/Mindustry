@@ -4,8 +4,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import com.badlogic.gdx.utils.ObjectIntMap;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.entities.enemies.Enemy;
@@ -16,14 +14,13 @@ import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.mindustry.world.blocks.types.Wall;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
 
 public class TileEntity extends Entity{
 	public Tile tile;
-	public ObjectIntMap<Item> items = new ObjectIntMap<>();
+	public int[] items = new int[Item.values().length];
 	public Timer timer;
 	public int maxhealth, health;
 	public boolean dead = false;
@@ -99,34 +96,34 @@ public class TileEntity extends Entity{
 	
 	public int totalItems(){
 		int sum = 0;
-		for(Item item : Item.values()){
-			sum += items.get(item, 0);
+		for(int i = 0; i < items.length; i ++){
+			sum += items[i];
 		}
 		return sum;
 	}
 	
 	public int getItem(Item item){
-		return items.get(item, 0);
+		return items[item.ordinal()];
 	}
 	
 	public boolean hasItem(Item item){
-		return items.get(item, 0) > 0;
+		return getItem(item) > 0;
 	}
 	
 	public boolean hasItem(Item item, int amount){
-		return items.get(item, 0) >= amount;
+		return getItem(item) >= amount;
 	}
 	
 	public void addItem(Item item, int amount){
-		items.put(item, items.get(item, 0) + amount);
+		items[item.ordinal()] += amount;
 	}
 	
 	public void removeItem(Item item, int amount){
-		items.put(item, items.get(item, 0) - amount);
+		items[item.ordinal()] -= amount;;
 	}
 	
 	@Override
 	public TileEntity add(){
-		return add(Entities.getGroup(TileEntity.class));
+		return add(Vars.control.tileGroup);
 	}
 }

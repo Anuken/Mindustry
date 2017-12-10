@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.MathUtils;
 
 import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
@@ -23,6 +24,7 @@ public class LaserTurret extends PowerTurret{
 	public LaserTurret(String name) {
 		super(name);
 		shootsound = null;
+		layer2 = Layer.laser;
 	}
 	
 	@Override
@@ -37,15 +39,16 @@ public class LaserTurret extends PowerTurret{
 	}
 	
 	@Override
-	public void drawOver(Tile tile){
+	public void drawLayer2(Tile tile){
 		TurretEntity entity = tile.entity();
 		
 		if(entity.target != null &&
 				Angles.angleDist(entity.rotation, Angles.angle(tile.worldx(), tile.worldy(), entity.target.x, entity.target.y)) <= cone){
+			Angles.translation(entity.rotation, 4f);
 			
-			float x = tile.worldx(), y = tile.worldy();
+			float x = tile.worldx() + Angles.x(), y = tile.worldy() + Angles.y();
 			float x2 = entity.target.x, y2 = entity.target.y;
-			
+
 			float lighten = (MathUtils.sin(Timers.time()/1.2f) + 1f) / 10f;
 			
 			Draw.color(Tmp.c1.set(beamColor).mul(1f + lighten, 1f + lighten, 1f + lighten, 1f));
@@ -63,7 +66,5 @@ public class LaserTurret extends PowerTurret{
 		}
 		
 		Draw.reset();
-		
-		super.drawOver(tile);
 	}
 }

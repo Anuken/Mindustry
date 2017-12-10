@@ -2,7 +2,6 @@ package io.anuke.mindustry.world.blocks.types.distribution;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.Item;
@@ -13,7 +12,6 @@ import io.anuke.ucore.util.Mathf;
 public class Router extends Block{
 	protected final int timerDump = timers++;
 	
-	private ObjectMap<Tile, Byte> lastmap = new ObjectMap<>();
 	int capacity = 20;
 
 	public Router(String name) {
@@ -36,7 +34,7 @@ public class Router extends Block{
 	@Override
 	public void update(Tile tile){
 		if(tile.entity.timer.get(timerDump, 2) && tile.entity.totalItems() > 0){
-			if(lastmap.get(tile, (byte)-1) != tile.getRotation() 
+			if(tile.getExtra() != tile.getRotation() 
 					|| Mathf.chance(0.3)){ //sometimes dump backwards at a 1/4 chance... this somehow works?
 				tryDump(tile, tile.getRotation(), null);
 			}
@@ -48,7 +46,7 @@ public class Router extends Block{
 	@Override
 	public void handleItem(Item item, Tile tile, Tile source){
 		super.handleItem(item, tile, source);
-		lastmap.put(tile, (byte)tile.relativeTo(source.x, source.y));
+		tile.setExtra((byte)tile.relativeTo(source.x, source.y));
 	}
 
 	@Override
@@ -58,7 +56,7 @@ public class Router extends Block{
 	}
 	
 	@Override
-	public void drawPixelOverlay(Tile tile){
+	public void drawSelect(Tile tile){
 		
 		float fract = (float)tile.entity.totalItems()/capacity;
 		

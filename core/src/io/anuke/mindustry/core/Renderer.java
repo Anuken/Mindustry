@@ -20,6 +20,7 @@ import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.Input;
 import io.anuke.mindustry.input.PlaceMode;
+import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
@@ -161,7 +162,8 @@ public class Renderer extends RendererModule{
 		Graphics.surface();
 
 		Profiler.begin("blockDraw");
-		renderTiles();
+		drawFloor();
+		drawBlocks(false);
 		Profiler.end("blockDraw");
 
 		Profiler.begin("entityDraw");
@@ -174,6 +176,8 @@ public class Renderer extends RendererModule{
 		Entities.draw(control.bulletGroup);
 
 		Profiler.end("entityDraw");
+		
+		drawBlocks(true);
 
 		drawShield();
 
@@ -250,7 +254,7 @@ public class Renderer extends RendererModule{
 		shieldHits.addAll(x, y, 0f);
 	}
 
-	void renderTiles(){
+	void drawFloor(){
 		int chunksx = world.width() / chunksize, chunksy = world.height() / chunksize;
 
 		//render the entire map
@@ -281,6 +285,27 @@ public class Renderer extends RendererModule{
 		if(Vars.showPaths && Vars.debug){
 			drawPaths();
 		}
+
+		if(Vars.debug && Vars.debugChunks){
+			Draw.color(Color.YELLOW);
+			Draw.thick(1f);
+			for(int x = -crangex; x <= crangex; x++){
+				for(int y = -crangey; y <= crangey; y++){
+					int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
+					int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
+
+					if(!Mathf.inBounds(worldx, worldy, cache))
+						continue;
+					Draw.linerect(worldx * chunksize * tilesize, worldy * chunksize * tilesize, chunksize * tilesize, chunksize * tilesize);
+				}
+			}
+			Draw.reset();
+		}
+	}
+	
+	void drawBlocks(boolean top){
+		int crangex = (int) (camera.viewportWidth / (chunksize * tilesize)) + 1;
+		int crangey = (int) (camera.viewportHeight / (chunksize * tilesize)) + 1;
 		
 		int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2) + 2;
 		int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2) + 2;
@@ -288,15 +313,24 @@ public class Renderer extends RendererModule{
 		boolean noshadows = Settings.getBool("noshadows");
 
 		boolean drawTiles = Settings.getBool("drawblocks");
+		
+		if(!drawTiles) return;
+		
+		Layer[] layers = Layer.values();
+		
+		int start = top ? 4 : (noshadows ? 1 : 0);
+		int end = top ? 4 + layers.length-1 : 4;
 
 		//0 = shadows
 		//1 = cache blocks
 		//2 = normal blocks
-		//3 = over blocks
-		for(int l = (noshadows ? 1 : 0); l < (drawTiles ? 4 : 0); l++){
+		//3+ = layers
+		for(int l = start; l < end; l++){
 			if(l == 0){
 				Graphics.surface("shadow");
 			}
+			
+			Layer layer = l >= 3 ? layers[l - 3] : null;
 			
 			boolean expand = l >= 2;
 			int expandr = (expand ? 4 : 0);
@@ -322,8 +356,12 @@ public class Renderer extends RendererModule{
 									!expanded || tile.block().expanded){
 								if(l == 2){
 									tile.block().draw(tile);
-								}else if(l == 3){
-									tile.block().drawOver(tile);
+								}else{
+									if(tile.block().layer == layer)
+										 tile.block().drawLayer(tile);
+									
+									if(tile.block().layer2 == layer)
+										 tile.block().drawLayer2(tile);
 								}
 							}
 						}
@@ -336,22 +374,6 @@ public class Renderer extends RendererModule{
 				Graphics.flushSurface();
 				Draw.color();
 			}
-		}
-
-		if(Vars.debug && Vars.debugChunks){
-			Draw.color(Color.YELLOW);
-			Draw.thick(1f);
-			for(int x = -crangex; x <= crangex; x++){
-				for(int y = -crangey; y <= crangey; y++){
-					int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
-					int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
-
-					if(!Mathf.inBounds(worldx, worldy, cache))
-						continue;
-					Draw.linerect(worldx * chunksize * tilesize, worldy * chunksize * tilesize, chunksize * tilesize, chunksize * tilesize);
-				}
-			}
-			Draw.reset();
 		}
 	}
 
@@ -525,7 +547,7 @@ public class Renderer extends RendererModule{
 				if(target.entity != null)
 					drawHealth(target.entity.x + offset.x, target.entity.y - 3f - target.block().height / 2f * Vars.tilesize + offset.y, target.entity.health, target.entity.maxhealth);
 
-				target.block().drawPixelOverlay(target);
+				target.block().drawSelect(target);
 			}
 		}
 

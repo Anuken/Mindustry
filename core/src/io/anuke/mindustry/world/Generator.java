@@ -3,7 +3,7 @@ package io.anuke.mindustry.world;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.IntMap;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.TargetEnemy;
@@ -19,7 +19,7 @@ public class Generator{
 	static final int spawn = Color.rgba8888(Color.RED);
 	static final int start = Color.rgba8888(Color.GREEN);
 	
-	public static ObjectMap<Integer, Block> colors = map(
+	public static IntMap<Block> colors = map(
 		Hue.rgb(80, 150, 90), Blocks.grass,
 		Hue.rgb(90, 180, 100), Blocks.grassblock,
 		Hue.rgb(80, 110, 180), Blocks.water,
@@ -130,9 +130,9 @@ public class Generator{
 		}
 	}
 	
-	private static ObjectMap<Integer, Block> map(Object...objects){
+	private static IntMap<Block> map(Object...objects){
 		
-		ObjectMap<Integer, Block> out = new ObjectMap<>();
+		IntMap<Block> out = new IntMap<>();
 		
 		for(int i = 0; i < objects.length; i += 2){
 			out.put(Hue.rgb((Color)objects[i]), (Block)objects[i+1]);

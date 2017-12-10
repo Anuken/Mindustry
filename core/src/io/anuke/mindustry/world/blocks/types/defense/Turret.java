@@ -16,6 +16,7 @@ import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
@@ -52,6 +53,7 @@ public class Turret extends Block{
 		super(name);
 		update = true;
 		solid = true;
+		layer = Layer.turret;
 	}
 	
 	@Override
@@ -90,7 +92,7 @@ public class Turret extends Block{
 	}
 	
 	@Override
-	public void drawOver(Tile tile){
+	public void drawLayer(Tile tile){
 		TurretEntity entity = tile.entity();
 		Vector2 offset = getPlaceOffset();
 		
@@ -102,7 +104,7 @@ public class Turret extends Block{
 	}
 	
 	@Override
-	public void drawPixelOverlay(Tile tile){
+	public void drawSelect(Tile tile){
 		Vector2 offset = getPlaceOffset();
 		
 		Draw.color("green");
@@ -145,7 +147,7 @@ public class Turret extends Block{
 		if(hasAmmo(tile) || (Vars.debug && Vars.infiniteAmmo)){
 			
 			if(entity.timer.get(timerTarget, targetInterval)){
-				entity.target = (Enemy)Entities.getClosest(Entities.getGroup(Enemy.class), 
+				entity.target = (Enemy)Entities.getClosest(Vars.control.enemyGroup, 
 						tile.worldx(), tile.worldy(), range, e-> e instanceof Enemy && !((Enemy)e).isDead());
 			}
 			

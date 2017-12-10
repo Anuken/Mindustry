@@ -2,12 +2,13 @@ package io.anuke.mindustry.core;
 
 import static io.anuke.mindustry.Vars.*;
 
+import java.util.Arrays;
+
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.Mindustry;
@@ -41,11 +42,11 @@ public class Control extends Module{
 	boolean hiscore = false;
 	
 	final Array<Weapon> weapons = new Array<>();
-	final ObjectMap<Item, Integer> items = new ObjectMap<>();
+	final int[] items = new int[Item.values().length];
 	
-	final EntityGroup<Enemy> enemyGroup = Entities.addGroup(Enemy.class);
-	final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);
-	final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
+	public final EntityGroup<Enemy> enemyGroup = Entities.addGroup(Enemy.class);
+	public final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);
+	public final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
 	
 	Array<EnemySpawn> spawns = new Array<>();
 	int wave = 1;
@@ -163,9 +164,7 @@ public class Control extends Module{
 		wavetime = waveSpacing()*2;
 		
 		if(mode == GameMode.sandbox){
-			for(Item type : Item.values()){
-				items.put(type, 999999999);
-			}
+			Arrays.fill(items, 999999999);
 		}
 		
 		ui.updateItems();
@@ -347,22 +346,21 @@ public class Control extends Module{
 	}
 	
 	public void clearItems(){
-		items.clear();
+		Arrays.fill(items, 0);
 		
-		items.put(Item.stone, 40);
+		addItem(Item.stone, 40);
 		
 		if(debug){
-			for(Item item : Item.values())
-				items.put(item, 2000000);
+			Arrays.fill(items, 2000000);
 		}
 	}
 	
 	public  int getAmount(Item item){
-		return items.get(item, 0);
+		return items[item.ordinal()];
 	}
 	
 	public void addItem(Item item, int amount){
-		items.put(item, items.get(item, 0)+amount);
+		items[item.ordinal()] += amount;
 		shouldUpdateItems = true;
 	}
 	
@@ -374,21 +372,20 @@ public class Control extends Module{
 	}
 	
 	public boolean hasItem(ItemStack req){
-		return items.get(req.item, 0) >= req.amount; 
+		return items[req.item.ordinal()] >= req.amount; 
 	}
 	
 	public void removeItem(ItemStack req){
-		items.put(req.item, items.get(req.item, 0)-req.amount);
+		items[req.item.ordinal()] -= req.amount;
 		shouldUpdateItems = true;
 	}
 	
 	public void removeItems(ItemStack... reqs){
 		for(ItemStack req : reqs)
-		items.put(req.item, items.get(req.item, 0)-req.amount);
-		shouldUpdateItems = true;
+			removeItem(req);
 	}
 	
-	public ObjectMap<Item, Integer> getItems(){
+	public int[] getItems(){
 		return items;
 	}
 	
