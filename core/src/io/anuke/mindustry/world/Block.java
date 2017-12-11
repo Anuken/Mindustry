@@ -148,7 +148,7 @@ public class Block{
 		
 		Tile[] tiles = tile.getNearby();
 		
-		for(int j = 0; j < 4; j ++){
+		for(int j = 0; j < tiles.length; j ++){
 			Tile other = tiles[i];
 			if(other != null && other.block().acceptItem(item, other, tile)
 					//don't output to things facing this thing
@@ -178,7 +178,7 @@ public class Block{
 		
 		Tile[] tiles = tile.getNearby();
 		
-		for(int j = 0; j < 4; j ++){
+		for(int j = 0; j < tiles.length; j ++){
 			Tile other = tiles[i];
 			
 			if(i == direction || direction == -1)
