@@ -143,7 +143,7 @@ public class Tile{
 	}
 	
 	public byte getDump(){
-		return Bits.getLeftByte(Bits.getRightByte(data));
+		return Bits.getRightByte(Bits.getRightByte(data));
 	}
 	
 	public byte getExtra(){
