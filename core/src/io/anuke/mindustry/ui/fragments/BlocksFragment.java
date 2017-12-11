@@ -179,7 +179,7 @@ public class BlocksFragment implements Fragment{
 				Table top = new Table();
 				top.left();
 				top.add(new Image(Draw.region(recipe.result.name))).size(8*5 * recipe.result.width).units(Unit.dp);
-				top.add("[orange]"+recipe.result.formalName).padLeft(6f).units(Unit.dp);
+				top.add("[accent]"+recipe.result.formalName).padLeft(6f).units(Unit.dp);
 				table.add(top).fill().left();
 				table.row();
 				table.add(desclabel).width(600).units(Unit.dp);
@@ -188,7 +188,7 @@ public class BlocksFragment implements Fragment{
 				d.content().add(pane).grow();
 				
 				if(statlist.size > 0){
-					table.add("[coral][[extra block info]:").padTop(6).padBottom(5).left();
+					table.add("[accent]extra block info:").padTop(6).padBottom(5).left();
 					table.row();
 				}
 				

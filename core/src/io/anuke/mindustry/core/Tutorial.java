@@ -158,6 +158,19 @@ public class Tutorial{
 		world.tile(corex, corey - 2).setBlock(Blocks.air);
 		world.tile(corex, corey - 3).setBlock(Blocks.air);
 		world.tile(corex, corey - 3).setFloor(Blocks.stone);
+		
+		world.tile(corex + 1, corey - 7).setFloor(Blocks.iron);
+		world.tile(corex - 1, corey - 7).setFloor(Blocks.coal);
+		
+		int r = 10;
+		
+		for(int x = -r; x <= r; x ++){
+			for(int y = -r; y <= r; y ++){
+				if(world.tile(corex + x, corey + y).block() == Blocks.rock){
+					world.tile(corex + x, corey + y).setBlock(Blocks.air);
+				}
+			}
+		}
 	}
 	
 	enum Stage{
@@ -169,7 +182,7 @@ public class Tutorial{
 		moveDesktop{
 			{
 				desktopOnly = true;
-				text = "To move, use the [orange][[WASD][] keys. Use the [orange]scrollwheel[] to zoom in or out.";
+				text = "To move, use the [orange][[WASD][] keys. Hold [orange]shift[] to boost. Hold [orange]CTRL[] while using the [orange]scrollwheel[] to zoom in or out.";
 			}
 		},
 		shoot{
@@ -205,7 +218,7 @@ public class Tutorial{
 				blockPlaceX = 0;
 				blockPlaceY = -2;
 				targetBlock = DistributionBlocks.conveyor;
-				text = "Use [orange][[R][] to rotate the conveyor to face [orange]forwards[], then place it in the [yellow]marked location[]  using the [orange][[left mouse button][].";
+				text = "Use the [orange][[scrollwheel][] to rotate the conveyor to face [orange]forwards[], then place it in the [yellow]marked location[]  using the [orange][[left mouse button][].";
 			}
 		},
 		placeConveyorAndroid{
@@ -248,6 +261,12 @@ public class Tutorial{
 			
 			void onSwitch(){
 				Vars.ui.<ImageButton>find("sectionbuttonproduction").fireClick();
+			}
+		},
+		blockInfo{
+			{
+				canBack = true;
+				text = "If you want to learn more about a block, you can tap the [orange]question mark[] in the top right to read its description.";
 			}
 		},
 		deselectDesktop{
@@ -436,7 +455,7 @@ public class Tutorial{
 		pumpDesc{
 			{
 				canBack = false;
-				text = "In later waves, you might need to use [yellow]pumps[] to distribute liquids for extractors.";
+				text = "In later waves, you might need to use [yellow]pumps[] to distribute liquids for generators or extractors.";
 			}
 		}, 
 		pumpPlace{
@@ -448,7 +467,7 @@ public class Tutorial{
 				targetBlock = ProductionBlocks.pump;
 				blockPlaceX = 6;
 				blockPlaceY = -2;
-				text = "Pumps work similarly to drills, except that they produce liquids instead of items. Try placing a pump on the [yellow]designated water[].";
+				text = "Pumps work similarly to drills, except that they produce liquids instead of items. Try placing a pump on the [yellow]designated oil[].";
 			}
 			
 			void onSwitch(){
@@ -509,59 +528,124 @@ public class Tutorial{
 				world.tile(blockPlaceX + control.core.x, blockPlaceY + control.core.y).setBlock(Blocks.air);
 			}
 		},
-		extractor{
+		generator{
 			{
 				canBack = false;
 				canForward = false;
 				showBlock = true;
 				canPlace = true;
-				targetBlock = ProductionBlocks.coalpurifier;
+				targetBlock = ProductionBlocks.combustiongenerator;
 				blockPlaceX = 4;
 				blockPlaceY = 0;
-				text = "Now, place a [orange]coal extractor[] block at the end of the conduit.";
+				text = "Now, place a [orange]combustion generator[] block at the end of the conduit.";
 			}
 			
 			void onSwitch(){
 				world.tile(blockPlaceX + control.core.x, blockPlaceY + control.core.y).setBlock(Blocks.air);
-				Vars.ui.<ImageButton>find("sectionbuttoncrafting").fireClick();
+				Vars.ui.<ImageButton>find("sectionbuttonpower").fireClick();
 				Vars.control.addItem(Item.steel, 60);
 				Vars.control.addItem(Item.iron, 60);
 			}
 		},
-		extractorExplain{
+		generatorExplain{
 			{
 				canBack = false;
-				text = "The extractor will now produce [orange]coal[] from the stone and water, then move it to the core.";
+				text = "This generator will now create [yellow]power[] from the oil.";
+			}
+		},
+		lasers{
+			{
+				canBack = false;
+				canForward = false;
+				showBlock = true;
+				canPlace = true;
+				text = "Power is distributed using [yellow]power lasers[]. Rotate and place one here.";
+				blockPlaceX = 4;
+				blockPlaceY = 4;
+				blockRotation = 2;
+				targetBlock = DistributionBlocks.powerlaser;
 			}
 			
 			void onSwitch(){
-				for(int i = -2; i <= 2; i ++){
-					world.tile(control.core.x + i + 4, control.core.y + 2).setBlock(ProductionBlocks.stonedrill);
-					world.tile(control.core.x + i + 4, control.core.y + 2).setFloor(Blocks.stone);
-				}
-				
-				world.tile(control.core.x + 3, control.core.y).setBlock(DistributionBlocks.conveyor, 2);
-				
-				world.tile(control.core.x + 2, control.core.y).setBlock(DistributionBlocks.junction, 2);
-				
-				world.tile(control.core.x + 2, control.core.y + 1).setBlock(DistributionBlocks.conveyor, 0);
-				world.tile(control.core.x + 3, control.core.y + 1).setBlock(DistributionBlocks.conveyor, 0);
-				world.tile(control.core.x + 4, control.core.y + 1).setBlock(DistributionBlocks.conveyor, 3);
-				world.tile(control.core.x + 5, control.core.y + 1).setBlock(DistributionBlocks.conveyor, 2);
-				world.tile(control.core.x + 6, control.core.y + 1).setBlock(DistributionBlocks.conveyor, 2);
+				Vars.ui.<ImageButton>find("sectionbuttonpower").fireClick();
+			}
+		},
+		laserExplain{
+			{
+				canBack = false;
+				text = "The generator will now move power into the laser block. An [yellow]opaque[] beam means that it is currently transmitting power, "
+						+ "and a [yellow]transparent[] beam means it is not.";
+			}
+		},
+		laserMore{
+			{
+				canBack = false;
+				text = "You can check how much power a block has by hovering over it and checking the [yellow]yellow bar[] at the top.";
+			}
+		},
+		healingTurret{
+			{
+				canBack = false;
+				canForward = false;
+				showBlock = true;
+				canPlace = true;
+				canBack = false;
+				blockPlaceX = 1;
+				blockPlaceY = 4;
+				targetBlock = DefenseBlocks.repairturret;
+				text = "This laser can be used to power a [lime]repair turret[]. Place one here.";
+			}
+			
+			void onSwitch(){
+				Vars.ui.<ImageButton>find("sectionbuttonpower").fireClick();
+			}
+		},
+		healingTurretExplain{
+			{
+				canBack = false;
+				text = "As long as it has power, this turret will [lime]repair nearby blocks.[] When playing, make sure you get one in your base as quickly as possible!";
+			}
+		},
+		smeltery{
+			{
+				canBack = false;
+				canForward = false;
+				showBlock = true;
+				canPlace = true;
+				canBack = false;
+				blockPlaceX = 0;
+				blockPlaceY = -6;
+				targetBlock = ProductionBlocks.smelter;
+				text = "Many blocks require [orange]steel[] to make, which requires a [orange]smelter[] to craft. Place one here.";
+			}
+			
+			void onSwitch(){
+				Vars.control.addItem(Item.stone, 40);
+				Vars.control.addItem(Item.iron, 40);
+				Vars.ui.<ImageButton>find("sectionbuttoncrafting").fireClick();
 				
 			}
 		},
-		extractorMore{
+		smelterySetup{
 			{
 				canBack = false;
-				canPlace = true;
-				text = "The [orange]smeltery[] and [orange]crucible[] blocks work similarly to extractors, except they accept only items.";
+				text = "This smelter will now produce [orange]steel[] from the input coal and iron.";
+			}
+			
+			void onSwitch(){
+				for(int i = 0; i < 4; i ++){
+					world.tile(control.core.x, control.core.y - 5 + i).setBlock(DistributionBlocks.conveyor, 1);
+				}
+				world.tile(control.core.x+1, control.core.y - 7).setBlock(ProductionBlocks.irondrill);
+				world.tile(control.core.x-1, control.core.y - 7).setBlock(ProductionBlocks.coaldrill);
+				
+				world.tile(control.core.x+1, control.core.y - 6).setBlock(DistributionBlocks.conveyor, 2);
+				world.tile(control.core.x-1, control.core.y - 6).setBlock(DistributionBlocks.conveyor, 0);
 			}
 		},
 		end{
 			{
-				text = "And that concludes the tutorial!";
+				text = "And that concludes the tutorial! Good luck!";
 				canBack = false;
 			}
 		};

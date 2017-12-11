@@ -1,7 +1,7 @@
 _Keep in mind that this is just a basic outline of planned features, and will be constantly changing!_
 
 ### 3.0 Release
-- New tutorial with the power blocks
+- [DONE] New tutorial with the power blocks
 - [DONE] New SFX for specific blocks, especially turrets
 - [DONE] Block drawing layers. Refactor/remove `Block#drawOver()`, add `Layer` enum. Should fix 'glitchy' lasers and conveyor clipping
 - [DONE] Balance nuclear reactor, improve effectiveness as they are currently underpowered
