@@ -174,7 +174,7 @@ public class Block{
 	 * Try dumping any item near the tile. -1 = any direction
 	 */
 	protected boolean tryDump(Tile tile, int direction, Item todump){
-		int i = tile.getDump();
+		int i = tile.getDump()%4;
 		
 		Tile[] tiles = tile.getNearby();
 		
@@ -186,9 +186,9 @@ public class Block{
 					
 					if(todump != null && item != todump) continue;
 					
-					if(tile.entity.hasItem(item) && other != null && other.block().acceptItem(item, other, tile) &&
+					if(tile.entity.hasItem(item) && other != null && other.block().acceptItem(item, other, tile)
 					//don't output to things facing this thing
-							!(other.block().rotate && (other.getRotation() + 2) % 4 == i)){
+							/*!(other.block().rotate && (other.getRotation() + 2) % 4 == i)*/){
 						other.block().handleItem(item, other, tile);
 						tile.entity.removeItem(item, 1);
 						tile.setDump((byte)((i+1)%4));

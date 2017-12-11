@@ -16,6 +16,7 @@ public class PowerLaser extends Generator{
 		solid = true;
 		explosive = false;
 		laserDirections = 1;
+		health = 50;
 	}
 	
 	@Override

@@ -154,9 +154,9 @@ public class Renderer extends RendererModule{
 
 			camera.position.set(lastx - deltax, lasty - deltay, 0);
 
-			if(Vars.debug){
-				record();
-			}
+			//if(Vars.debug){
+			record();
+			//}
 		}
 	}
 

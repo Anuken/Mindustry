@@ -6,6 +6,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 
 public class TunnelConveyor extends Block{
+	protected int maxdist = 3;
 
 	protected TunnelConveyor(String name) {
 		super(name);
@@ -21,25 +22,37 @@ public class TunnelConveyor extends Block{
 	
 	@Override
 	public void handleItem(Item item, Tile tile, Tile source){
-		int dir = source.relativeTo(tile.x, tile.y);
-		Tile to = getOther(tile, dir, 3);
-		Tile inter = getOther(tile, dir, 2);
+		Tile tunnel = getDestTunnel(tile);
+		Tile to = tunnel.getNearby()[tunnel.getRotation()];
 		
 		Timers.run(25, ()->{
 			if(to == null || to.entity == null) return;
-			to.block().handleItem(item, to, inter);
+			to.block().handleItem(item, to, tunnel);
 		});
 		
 	}
 
 	@Override
 	public boolean acceptItem(Item item, Tile dest, Tile source){
-		int dir = source.relativeTo(dest.x, dest.y);
-		Tile to = getOther(dest, dir, 3);
-		Tile inter = getOther(dest, dir, 2);
-		return to != null && inter != null && source.getRotation() == (dest.getRotation() + 2)%4 && inter.block() instanceof TunnelConveyor 
-				&& (inter.getRotation() + 2) % 4 == dest.getRotation() &&
-				to.block().acceptItem(item, to, inter);
+		Tile tunnel = getDestTunnel(dest);
+		if(tunnel != null){
+			Tile to = tunnel.getNearby()[tunnel.getRotation()];
+			return to != null && to.block().acceptItem(item, to, tunnel);
+		}else{
+			return false;
+		}
+	}
+	
+	Tile getDestTunnel(Tile tile){
+		Tile dest = tile;
+		int rel = (tile.getRotation() + 2)%4;
+		for(int i = 0; i < maxdist; i ++){
+			dest = dest.getNearby()[rel];
+			if(dest != null && dest.block() instanceof TunnelConveyor && dest.getRotation() == rel){
+				return dest;
+			}
+		}
+		return null;
 	}
 	
 	Tile getOther(Tile tile, int dir, int amount){

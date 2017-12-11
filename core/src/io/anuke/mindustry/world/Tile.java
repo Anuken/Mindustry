@@ -17,7 +17,7 @@ public class Tile{
 	
 	/**Packed block data. Left is floor, right is block.*/
 	private short blocks;
-	/**Packed data. Left is rotation, right is dump.*/
+	/**Packed data. Left is rotation, right is extra data, packed into two half-bytes: left is dump, right is extra.*/
 	private short data;
 	/**The coordinates of the core tile this is linked to, in the form of two bytes packed into one.
 	 * This is relative to the block it is linked to; negate coords to find the link.*/

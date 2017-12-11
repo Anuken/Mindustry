@@ -28,14 +28,14 @@ public class WaveCreator{
 				after = 4;
 				amount = 3;
 				spacing = 5;
-				scaling = 1;
+				scaling = 2;
 				tierscaleback = 0;
 			}},
 			
 			new EnemySpawn(TankEnemy.class){{
 				after = 5;
 				spacing = 5;
-				scaling = 1;
+				scaling = 2;
 				amount = 2;
 			}},
 			
@@ -64,7 +64,7 @@ public class WaveCreator{
 				after = 6;
 				amount = 2;
 				spacing = 5;
-				scaling = 2;
+				scaling = 3;
 			}},
 			
 			new EnemySpawn(FlamerEnemy.class){{
@@ -78,14 +78,14 @@ public class WaveCreator{
 				after = 15;
 				amount = 1;
 				spacing = 5;
-				scaling = 1;
+				scaling = 2;
 			}},
 			
 			new EnemySpawn(BlastEnemy.class){{
 				after = 4 + 5 + 5;
 				amount = 3;
 				spacing = 5;
-				scaling = 1;
+				scaling = 2;
 				tierscaleback = 0;
 			}},
 			//boss wave
@@ -117,14 +117,14 @@ public class WaveCreator{
 				after = 16 + 5;
 				amount = 1;
 				spacing = 5;
-				scaling = 2;
+				scaling = 3;
 			}},
 			
 			new EnemySpawn(EmpEnemy.class){{
 				after = 16 + 5;
 				amount = 1;
 				spacing = 5;
-				scaling = 2;
+				scaling = 3;
 			}}
 			//end enchanced boss wave
 		);
