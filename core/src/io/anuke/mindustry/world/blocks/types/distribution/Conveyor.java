@@ -120,7 +120,7 @@ public class Conveyor extends Block{
 		int direction = source == null ? 0 : Math.abs(source.relativeTo(dest.x, dest.y) - dest.getRotation());
 		float minitem = dest.<ConveyorEntity>entity().minitem;
 		return (((direction == 0) && minitem > 0.05f) || 
-				((direction %2 == 1) && minitem > 0.52f)) && (source == null || !((source.getRotation() + 2) % 4 == dest.getRotation()));
+				((direction %2 == 1) && minitem > 0.52f)) && (source == null || !(source.block().rotate && (source.getRotation() + 2) % 4 == dest.getRotation()));
 	}
 
 	@Override

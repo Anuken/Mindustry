@@ -144,16 +144,13 @@ public class Block{
 	 * containers, it gets added to the block's inventory.*/
 	protected void offloadNear(Tile tile, Item item){
 		byte i = tile.getDump();
-		byte pdump = tile.getDump();
+		byte pdump = i;
 		
 		Tile[] tiles = tile.getNearby();
 		
 		for(int j = 0; j < 4; j ++){
 			Tile other = tiles[i];
-			if(other != null && other.block().acceptItem(item, other, tile)
-					//don't output to things facing this thing
-					&& !(other.block().rotate && (other.getRotation() + 2) % 4 == i)){
-				
+			if(other != null && other.block().acceptItem(item, other, tile)){
 				other.block().handleItem(item, other, tile);
 				tile.setDump((byte)((i+1)%4));
 				return;
@@ -181,20 +178,19 @@ public class Block{
 		for(int j = 0; j < 4; j ++){
 			Tile other = tiles[i];
 			
-			if(i == direction || direction == -1)
+			if(i == direction || direction == -1){
 				for(Item item : Item.values()){
 					
 					if(todump != null && item != todump) continue;
 					
-					if(tile.entity.hasItem(item) && other != null && other.block().acceptItem(item, other, tile)
-					//don't output to things facing this thing
-							/*!(other.block().rotate && (other.getRotation() + 2) % 4 == i)*/){
+					if(tile.entity.hasItem(item) && other != null && other.block().acceptItem(item, other, tile)){
 						other.block().handleItem(item, other, tile);
 						tile.entity.removeItem(item, 1);
 						tile.setDump((byte)((i+1)%4));
 						return true;
 					}
 				}
+			}
 			i++;
 			i %= 4;
 		}

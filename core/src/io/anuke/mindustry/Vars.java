@@ -85,8 +85,8 @@ public class Vars{
 		"- Music made by [GREEN]RoccoW[] / found on [lime]FreeMusicArchive.org[]",
 		"",
 		"Special thanks to:",
-		"- MitchellFJN: extensive playtesting and feedback",
-		"- Luxray5474: wiki work, code contributions",
+		"- [coral]MitchellFJN[]: extensive playtesting and feedback",
+		"- [sky]Luxray5474[]: wiki work, code contributions",
 		"- All the beta testers on itch.io and Google Play"
 	};
 }

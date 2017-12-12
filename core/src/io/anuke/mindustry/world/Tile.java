@@ -127,7 +127,7 @@ public class Tile{
 	}
 	
 	public void setRotation(byte rotation){
-		data = Bits.packShort(rotation, getDump());
+		data = Bits.packShort(rotation, Bits.getRightByte(data));
 	}
 	
 	public void setDump(byte dump){

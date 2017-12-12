@@ -157,7 +157,7 @@ public class BlocksFragment implements Fragment{
 		header.addImage(region).size(8*5).padTop(4).units(Unit.dp);
 		Label nameLabel = new Label(recipe.result.formalName);
 		nameLabel.setWrap(true);
-		header.add(nameLabel).padLeft(2).width(135f).units(Unit.dp);
+		header.add(nameLabel).padLeft(2).width(130f).units(Unit.dp);
 		
 		//extra info
 		if(recipe.result.fullDescription != null){
@@ -203,7 +203,7 @@ public class BlocksFragment implements Fragment{
 				}).size(110, 50).pad(10f).units(Unit.dp);
 				
 				d.show();
-			}).expandX().padLeft(4).top().right().size(42f, 46f).padTop(-2).units(Unit.dp);
+			}).expandX().padLeft(3).top().right().size(40f, 44f).padTop(-2).units(Unit.dp);
 		}
 		
 		
