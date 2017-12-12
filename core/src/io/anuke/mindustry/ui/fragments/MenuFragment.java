@@ -4,6 +4,7 @@ import static io.anuke.mindustry.Vars.*;
 
 import com.badlogic.gdx.Gdx;
 
+import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.ui.MenuButton;
@@ -65,6 +66,11 @@ public class MenuFragment implements Fragment{
 		//settings icon
 		new table(){{
 			atop().aright();
+			if(Mindustry.donationsCallable != null){
+				new imagebutton("icon-tools", Unit.dp.inPixels(30f), ()->{
+					Mindustry.donationsCallable.run();
+				}).get().pad(Unit.dp.inPixels(14));
+			}
 			new imagebutton("icon-info", Unit.dp.inPixels(30f), ()->{
 				ui.showAbout();
 			}).get().pad(Unit.dp.inPixels(14));

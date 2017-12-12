@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.anuke.mindustry"
-    android:versionCode="24"
-    android:versionName="3.08b" >
+    android:versionCode="25"
+    android:versionName="3.09b" >
 
     <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="25" />
     <uses-permission android:name="com.android.vending.BILLING" />
@@ -23,7 +23,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".DonationsActivity" />
+        <activity android:name=".DonationsActivity"
+            android:theme="@style/GdxTheme" />
 
     </application>
 
