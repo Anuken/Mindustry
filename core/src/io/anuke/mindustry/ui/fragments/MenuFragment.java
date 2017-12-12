@@ -42,35 +42,38 @@ public class MenuFragment implements Fragment{
 						add(new MenuButton("text-exit", ()-> Gdx.app.exit()));
 					}
 					get().pad(Unit.dp.inPixels(16));
-				}};
+				}}.end();
 	
 				visible(()->GameState.is(State.menu));
 			}}.end();
 		}else{
 			new table(){{
-				defaults().size(120f).pad(5).units(Unit.dp);
-				float isize = Unit.dp.inPixels(14f*4);
-				
-				new imagebutton("icon-play-2", isize, () -> ui.showLevels()).text("Play").padTop(4f);
-				
-				new imagebutton("icon-tutorial", isize, ()-> control.playMap(Map.tutorial)).text("Tutorial").padTop(4f);
-				
-				new imagebutton("icon-load", isize, () -> ui.showLoadGame()).text("Load").padTop(4f);
-
-				new imagebutton("icon-tools", isize, () -> ui.showPrefs()).text("Settings").padTop(4f);
-				
-				visible(()->GameState.is(State.menu));
+				new table(){{
+					defaults().size(120f).pad(5).units(Unit.dp);
+					float isize = Unit.dp.inPixels(14f*4);
+					
+					new imagebutton("icon-play-2", isize, () -> ui.showLevels()).text("Play").padTop(4f);
+					
+					new imagebutton("icon-tutorial", isize, ()-> control.playMap(Map.tutorial)).text("Tutorial").padTop(4f);
+					
+					new imagebutton("icon-load", isize, () -> ui.showLoadGame()).text("Load").padTop(4f);
+	
+					new imagebutton("icon-tools", isize, () -> ui.showPrefs()).text("Settings").padTop(4f);
+					
+					if(Mindustry.donationsCallable != null){
+						new imagebutton("icon-donate", isize, () -> {
+							Mindustry.donationsCallable.run();
+						}).text("Donate").padTop(4f);
+					}
+					
+					visible(()->GameState.is(State.menu));
+				}}.end();
 			}}.end();
 		}		
 		
 		//settings icon
 		new table(){{
 			atop().aright();
-			if(Mindustry.donationsCallable != null){
-				new imagebutton("icon-tools", Unit.dp.inPixels(30f), ()->{
-					Mindustry.donationsCallable.run();
-				}).get().pad(Unit.dp.inPixels(14));
-			}
 			new imagebutton("icon-info", Unit.dp.inPixels(30f), ()->{
 				ui.showAbout();
 			}).get().pad(Unit.dp.inPixels(14));
