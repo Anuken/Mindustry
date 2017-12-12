@@ -159,6 +159,12 @@ public class HudFragment implements Fragment{
 			}
 		}
 	}
+
+	private String printEnemiesRemaining() {
+		if(control.getEnemiesRemaining() == 1) {
+			return " enemy left";
+		} else return " enemies left";
+	}
 	
 	private void addWaveTable(){
 		float uheight = 66f;
@@ -173,7 +179,7 @@ public class HudFragment implements Fragment{
 				row();
 			
 				new label(()-> control.getEnemiesRemaining() > 0 ?
-					control.getEnemiesRemaining() + " enemies" : 
+					control.getEnemiesRemaining() + printEnemiesRemaining() : 
 						(control.getTutorial().active() || Vars.control.getMode() == GameMode.sandbox) ? "waiting..." : "Wave in " + (int) (control.getWaveCountdown() / 60f))
 				.minWidth(140).units(Unit.dp).left();
 
