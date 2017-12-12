@@ -131,6 +131,8 @@ public class UI extends SceneModule{
 
 	@Override
 	public void update(){
+		if(Vars.debug && !Vars.showUI) return;
+		
 		Profiler.begin("ui");
 		
 		if(nplay.visible()){

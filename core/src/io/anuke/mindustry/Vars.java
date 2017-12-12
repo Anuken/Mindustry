@@ -2,6 +2,7 @@ package io.anuke.mindustry;
 
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.I18NBundle;
 
 import io.anuke.mindustry.core.Control;
 import io.anuke.mindustry.core.Renderer;
@@ -50,8 +51,10 @@ public class Vars{
 	public static boolean showPaths = false;
 	//if false, player is always hidden
 	public static boolean showPlayer = true;
+	//whether to hide ui, only on debug
+	public static boolean showUI = true;
 	//number of save slots-- increasing may lead to layout issues
-	//TODO named save slots, possibly with a scroll dialog
+	//TODO named save slots
 	public static final int saveSlots = 8;
 	//amount of drops that are left when breaking a block
 	public static final float breakDropAmount = 0.5f;
@@ -63,6 +66,8 @@ public class Vars{
 	public static final float multiplier = android ? 3 : 2;
 	
 	public static final int tilesize = 8;
+	
+	public static I18NBundle bundle;
 	
 	public static Control control;
 	public static Renderer renderer;

@@ -191,7 +191,7 @@ public class Renderer extends RendererModule{
 
 		drawOverlay();
 
-		if(Settings.getBool("indicators")){
+		if(Settings.getBool("indicators") && Vars.showUI){
 			drawEnemyMarkers();
 		}
 	}
@@ -561,14 +561,17 @@ public class Renderer extends RendererModule{
 				target.block().drawSelect(target);
 			}
 		}
+		
+		if(!Vars.debug || Vars.showUI){
 
-		//draw entity health bars
-		for(Enemy entity : control.enemyGroup.all()){
-			drawHealth(entity);
+			//draw entity health bars
+			for(Enemy entity : control.enemyGroup.all()){
+				drawHealth(entity);
+			}
+
+			if(!Vars.android && Vars.showPlayer)
+				drawHealth(player);
 		}
-
-		if(!Vars.android && Vars.showPlayer)
-			drawHealth(player);
 	}
 
 	void drawHealth(DestructibleEntity dest){

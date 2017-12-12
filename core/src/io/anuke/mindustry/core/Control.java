@@ -106,7 +106,9 @@ public class Control extends Module{
 			"zoom_hold", Keys.CONTROL_LEFT,
 			"menu", Gdx.app.getType() == ApplicationType.Android ? Keys.BACK : Keys.ESCAPE,
 			"pause", Keys.SPACE,
-			"dash", Keys.SHIFT_LEFT
+			"dash", Keys.SHIFT_LEFT,
+			"rotate_right", Keys.R,
+			"rotate_left", Keys.E
 		);
 		
 		for(int i = 0; i < Vars.saveSlots; i ++){
@@ -417,6 +419,10 @@ public class Control extends Module{
 			
 			if(Inputs.keyUp(Keys.F)){
 				wavetime = 0f;
+			}
+			
+			if(Inputs.keyUp(Keys.U)){
+				Vars.showUI = !Vars.showUI;
 			}
 			
 			if(Inputs.keyUp(Keys.O)){

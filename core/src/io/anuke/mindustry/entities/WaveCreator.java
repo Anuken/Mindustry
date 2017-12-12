@@ -98,7 +98,7 @@ public class WaveCreator{
 			
 			new EnemySpawn(TitanEnemy.class){{
 				after = 16;
-				amount = 2;
+				amount = 1;
 				spacing = 5;
 				scaling = 3;
 				tierscaleback = 0;

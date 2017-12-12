@@ -33,6 +33,14 @@ public class Input{
 			player.rotation += Inputs.scroll();
 		}
 		
+		if(Inputs.keyUp("rotate_right")){
+			player.rotation --;
+		}
+		
+		if(Inputs.keyUp("rotate_left")){
+			player.rotation ++;
+		}
+		
 		player.rotation = Mathf.mod(player.rotation, 4);
 		
 		for(int i = 0; i < 9; i ++){

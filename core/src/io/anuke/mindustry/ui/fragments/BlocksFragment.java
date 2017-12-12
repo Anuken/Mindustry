@@ -157,7 +157,7 @@ public class BlocksFragment implements Fragment{
 		header.addImage(region).size(8*5).padTop(4).units(Unit.dp);
 		Label nameLabel = new Label(recipe.result.formalName);
 		nameLabel.setWrap(true);
-		header.add(nameLabel).padLeft(4).width(135f).units(Unit.dp);
+		header.add(nameLabel).padLeft(2).width(135f).units(Unit.dp);
 		
 		//extra info
 		if(recipe.result.fullDescription != null){

@@ -10,14 +10,14 @@ import io.anuke.ucore.util.Angles;
 public class FortressEnemy extends Enemy{
 	static int maxSpawn = 6;
 	
-	float spawnTime = 240;
+	float spawnTime = 190;
 	boolean deployed;
 
 	public FortressEnemy() {
 		
 		speed = 0.25f;
 		reload = 90;
-		maxhealth = 800;
+		maxhealth = 700;
 		range = 70f;
 		bullet = BulletType.yellowshell;
 		hitbox.setSize(10f);
@@ -47,7 +47,7 @@ public class FortressEnemy extends Enemy{
 				spawned ++;
 			}
 		}else if(distanceTo(Vars.control.getCore().worldx(), 
-				Vars.control.getCore().worldy()) <= 120f){
+				Vars.control.getCore().worldy()) <= 90f){
 			deployed = true;
 			speed = 0.001f;
 		}

@@ -219,9 +219,11 @@ public class Enemy extends DestructibleEntity{
 	@Override
 	public void removed(){
 		if(!dead){
-			Vars.control.enemyDeath();
+			
 			if(spawner != null){
 				spawner.spawned --;
+			}else{
+				Vars.control.enemyDeath();
 			}
 		}
 	}
