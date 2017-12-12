@@ -8,6 +8,7 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import io.anuke.mindustry.io.Formatter;
@@ -37,6 +38,8 @@ public class AndroidLauncher extends AndroidApplication{
 				return NumberFormat.getIntegerInstance().format(number);
 			}
 		};
+		
+		Mindustry.donationsCallable = this::showDonations;
 
 		if(doubleScaleTablets){
 			DisplayMetrics metrics = new DisplayMetrics();
@@ -55,7 +58,14 @@ public class AndroidLauncher extends AndroidApplication{
 		}
 
 		//Mindustry.args.add("-debug");
-
+		
+		config.hideStatusBar = true;
+		
 		initialize(new Mindustry(), config);
+	}
+	
+	void showDonations(){
+		Intent intent = new Intent(this, DonationsActivity.class);
+		startActivity(intent);
 	}
 }

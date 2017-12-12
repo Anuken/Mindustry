@@ -62,7 +62,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			}
 		}
 	},
-	emp = new BulletType(1.6f, 8){
+	emp = new BulletType(1.6f, 6){
 		{
 			lifetime = 50f;
 			hitsize = 6f;

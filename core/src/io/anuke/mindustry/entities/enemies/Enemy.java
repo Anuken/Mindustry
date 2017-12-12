@@ -17,6 +17,7 @@ public class Enemy extends DestructibleEntity{
 	public final static Color[] tierColors = { Color.valueOf("ffe451"), Color.valueOf("f48e20"), Color.valueOf("ff6757"), Color.valueOf("ff2d86") };
 	public final static int maxtier = 4;
 	public final static float maxIdle = 60*1.5f;
+	public final static float maxIdleLife = 60f*15f; //15 seconds idle = death
 	
 	protected int timeid;
 	protected Timer timer = new Timer(5);
@@ -63,6 +64,13 @@ public class Enemy extends DestructibleEntity{
 
 	void move(){
 		Tile core = Vars.control.getCore();
+		
+		if(idletime > maxIdleLife){
+			Effects.effect(Fx.shellsmoke, this);
+			Effects.effect(Fx.explosion, this);
+			remove();
+			return;
+		}
 		
 		boolean nearCore = distanceTo(core.worldx(), core.worldy()) <= range - 18f && stopNearCore;
 		Vector2 vec;

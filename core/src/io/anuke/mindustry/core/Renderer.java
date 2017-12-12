@@ -180,11 +180,12 @@ public class Renderer extends RendererModule{
 		Graphics.shader();
 
 		Entities.draw(Entities.defaultGroup());
-		Entities.draw(control.bulletGroup);
 
 		Profiler.end("entityDraw");
 		
 		if(!optimize) drawBlocks(true, false);
+		
+		Entities.draw(control.bulletGroup);
 
 		drawShield();
 

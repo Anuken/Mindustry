@@ -13,23 +13,16 @@ import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.modules.ModuleCore;
 import io.anuke.ucore.util.Profiler;
 
 public class Mindustry extends ModuleCore {
+	public static Callable donationsCallable;
 	public static Array<String> args = new Array<>();
 	public static Formatter formatter = new Formatter(){
-
-		@Override
-		public String format(Date date){
-			return "invalid date";
-		}
-
-		@Override
-		public String format(int number){
-			return number + "";
-		}
-		
+		@Override public String format(Date date){ return "invalid date"; }
+		@Override public String format(int number){ return number + ""; }
 	};
 	
 	//always initialize blocks in this order, otherwise there are ID errors

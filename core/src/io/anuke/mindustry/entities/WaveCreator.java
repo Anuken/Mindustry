@@ -149,8 +149,8 @@ public class WaveCreator{
 			}},
 			new EnemySpawn(FortressEnemy.class){{
 				after = 12;
-				spacing = 4;
-				scaling = 6;
+				spacing = 5;
+				scaling = 7;
 			}},
 			new EnemySpawn(HealerEnemy.class){{
 				scaling = 3;
@@ -163,8 +163,8 @@ public class WaveCreator{
 			}},
 			new EnemySpawn(FlamerEnemy.class){{
 				after = 14;
-				spacing = 5;
-				scaling = 2;
+				spacing = 6;
+				scaling = 3;
 			}},
 			new EnemySpawn(BlastEnemy.class){{
 				after = 12;

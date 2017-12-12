@@ -1,3 +1,17 @@
+
+repositories {
+	mavenCentral()
+    jcenter()
+    maven {
+    	url "https://maven.google.com"
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:22.1.1'
+    compile 'org.sufficientlysecure:donations:2.5'
+}
+
 android {
     buildToolsVersion "25.0.0"
     compileSdkVersion 25
@@ -30,6 +44,12 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    productFlavors {
+        google {
+            buildConfigField "boolean", "DONATIONS_GOOGLE", "true"
+        }
     }
 }
 // called every time gradle gets executed, takes the native dependencies of
@@ -130,8 +150,4 @@ idea {
             }
         }
     }
-}
-
-dependencies {
-    //compile files('lib/ucore.jar')
 }
