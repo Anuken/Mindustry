@@ -25,7 +25,6 @@ public class AndroidLauncher extends AndroidApplication{
 		config.useImmersiveMode = true;
 
 		Mindustry.formatter = new Formatter(){
-			@SuppressLint("SimpleDateFormat")
 			SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm");
 
 			@Override

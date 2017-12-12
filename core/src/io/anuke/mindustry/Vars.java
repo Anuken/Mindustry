@@ -76,7 +76,12 @@ public class Vars{
 		"Originally an entry in the [orange]GDL[] MM Jam.",
 		"",
 		"Credits:",
-		"- SFX made with [YELLOW]bfxr.com[]",
+		"- SFX made with [YELLOW]bfxr[]",
 		"- Music made by [GREEN]RoccoW[] / found on [lime]FreeMusicArchive.org[]",
+		"",
+		"Special thanks to:",
+		"- MitchellFJN: extensive playtesting and feedback",
+		"- Luxray5474: wiki work, code contributions",
+		"- All the beta testers on itch.io and Google Play"
 	};
 }

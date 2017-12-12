@@ -33,7 +33,7 @@ android {
     }
     defaultConfig {
         applicationId "io.anuke.mindustry"
-        minSdkVersion 11
+        minSdkVersion 9
         targetSdkVersion 25
 
         jackOptions {

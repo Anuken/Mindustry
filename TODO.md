@@ -8,7 +8,7 @@ _Keep in mind that this is just a basic outline of planned features, and will be
 - [DONE] Make generation frame independent
 - [DONE/MOVED] Investigate issue #5 (enemies stuck in blocks) - looks like it's caused by map loading lag, needs to be fixed with a slightly different physics system
 - [DONE] Faster mech movement, possibly with a "boost" key
-- Balance enemy difficulty
+- [DONE] Balance enemy difficulty
 
 ### 3.x Planned
 - New save system: toggleable autosave, named slots, less clunky save UI
@@ -19,6 +19,8 @@ _Keep in mind that this is just a basic outline of planned features, and will be
 - Underground conduits
 - Minimap
 - More indicators for when the core is damaged and/or under attack
+- Fix bugs with junction not accepting blocks(low FPS)
+- Fix bugs with tunnel merging and/or removing items (low FPS)
 
 
 ### 4.0 Planned
