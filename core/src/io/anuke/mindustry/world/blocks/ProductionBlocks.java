@@ -271,9 +271,8 @@ public class ProductionBlocks{
 			height = 3;
 			health = 600;
 			breaktime *= 2.3f;
-			//description = "Advanced generator.";
-			fullDescription = "The ultimate power generator. Highly volatile. Generates power from uranium. Requires constant cooling in the form of water. "
-					+ "Will explode violently if insufficient amounts of coolant are supplied. ";
+			fullDescription = "An advanced version of the RTG Generator, and the ultimate power generator. Generates power from uranium. Requires constant water cooling. "
+					+ "Highly volatile; will explode violently if insufficient amounts of coolant are supplied. ";
 		}
 	};
 }
