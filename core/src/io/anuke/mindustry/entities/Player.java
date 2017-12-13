@@ -38,7 +38,7 @@ public class Player extends DestructibleEntity{
 	
 	@Override
 	public void damage(int amount){
-		if(!Vars.debug)
+		if(!Vars.debug && !Vars.android)
 			super.damage(amount);
 	}
 	

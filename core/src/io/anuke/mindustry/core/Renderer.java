@@ -98,6 +98,10 @@ public class Renderer extends RendererModule{
 			clearScreen();
 		}else{
 			boolean smoothcam = Settings.getBool("smoothcam");
+			
+			if(control.core == null){ //how is this possible? apparently it is
+				control.findCore();
+			}
 
 			if(control.core.block() == ProductionBlocks.core){
 

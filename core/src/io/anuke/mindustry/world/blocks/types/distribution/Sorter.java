@@ -38,6 +38,7 @@ public class Sorter extends Junction implements Configurable{
 	
 	@Override
 	public boolean acceptItem(Item item, Tile dest, Tile source){
+		if(source.block() instanceof Sorter) return false;
 		Tile to = getTileTarget(item, dest, source, false);
 		
 		return to != null && to.block().acceptItem(item, to, dest);

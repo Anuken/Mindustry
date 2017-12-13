@@ -65,6 +65,7 @@ public class TileEntity extends Entity{
 		block.onDestroyed(tile);
 		
 		Vars.world.removeBlock(tile);
+		remove();
 	}
 	
 	public void collision(Bullet other){
@@ -89,6 +90,10 @@ public class TileEntity extends Entity{
 				Mathf.chance(0.009f*Timers.delta()*(1f-(float)health/maxhealth))){
 			
 			Effects.effect(Fx.smoke, x+Mathf.range(4), y+Mathf.range(4));
+		}
+		
+		if(health <= 0){
+			onDeath();
 		}
 		
 		tile.block().update(tile);

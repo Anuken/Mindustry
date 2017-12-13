@@ -23,6 +23,7 @@ public class TunnelConveyor extends Block{
 	@Override
 	public void handleItem(Item item, Tile tile, Tile source){
 		Tile tunnel = getDestTunnel(tile);
+		if(tunnel == null) return; //TODO how is this possible? HOW DID THEY ACHIEVE SUCH A FEAT?!
 		Tile to = tunnel.getNearby()[tunnel.getRotation()];
 		
 		Timers.run(25, ()->{
