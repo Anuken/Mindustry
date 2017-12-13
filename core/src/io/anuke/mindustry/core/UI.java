@@ -38,7 +38,7 @@ public class UI extends SceneModule{
 	Table loadingtable, desctable, configtable;
 	MindustrySettingsDialog prefs;
 	MindustryKeybindDialog keys;
-	Dialog about, restart, levels, upgrades, load, settingserror;
+	Dialog about, restart, levels, upgrades, load, settingserror, gameerror;
 	MenuDialog menu;
 	Tooltip tooltip;
 	Tile configTile;
@@ -161,6 +161,15 @@ public class UI extends SceneModule{
 		settingserror.getButtonTable().addButton("OK", ()->{
 			settingserror.hide();
 		}).size(80f, 55f).pad(4);
+		
+		gameerror = new Dialog("An error has occured", "dialog");
+		gameerror.content().add(new Label("[SCARLET]An unexpected error has occured, which would have caused a crash. "
+				+ "[]Please report the exact circumstances under which this error occured to the developer: "
+				+ "\n[ORANGE]anukendev@gmail.com[]"){{
+					setWrap(true);
+				}}).width(600f).units(Unit.dp).pad(10f);
+		gameerror.buttons().addButton("OK", ()-> gameerror.hide()).size(200f, 50).units(Unit.dp);
+		//gameerror.setFillParent(true);
 		
 		load = new LoadDialog();
 		
@@ -298,8 +307,11 @@ public class UI extends SceneModule{
 			if(e instanceof Table){
 				((Table)e).invalidateHierarchy();
 			}
-				
 		}
+	}
+	
+	public void showGameError(){
+		gameerror.show();
 	}
 	
 	public void updateWeapons(){

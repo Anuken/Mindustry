@@ -87,7 +87,7 @@ public class AndroidInput extends InputAdapter{
 
 		if(player.recipe != null && Vars.control.hasItems(player.recipe.requirements) && Vars.world.validPlace(tilex, tiley, player.recipe.result)){
 
-			Vars.world.placeBlock(tilex, tiley, player.recipe.result, player.rotation);
+			Vars.world.placeBlock(tilex, tiley, player.recipe.result, player.rotation, true);
 
 			for(ItemStack stack : player.recipe.requirements){
 				Vars.control.removeItem(stack);

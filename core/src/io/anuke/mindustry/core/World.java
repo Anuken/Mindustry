@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world;
+package io.anuke.mindustry.core;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -10,10 +10,12 @@ import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Sounds;
@@ -95,12 +97,21 @@ public class World extends Module{
 	}
 	
 	public Tile tile(int x, int y){
+		if(tiles == null){
+			ui.showGameError();
+			GameState.set(State.menu);
+			return null;
+		}
 		if(!Mathf.inBounds(x, y, tiles)) return null;
 		return tiles[x][y];
 	}
 	
 	public Tile tileWorld(float x, float y){
 		return tile(Mathf.scl2(x, tilesize), Mathf.scl2(y, tilesize));
+	}
+	
+	public Tile[][] getTiles(){
+		return tiles;
 	}
 	
 	public Tile[] getNearby(int x, int y){
@@ -179,7 +190,7 @@ public class World extends Module{
 		Generator.generate(mapPixmaps[map.ordinal()], tiles);
 		
 		//TODO multiblock core
-		placeBlock(control.getCore().x, control.getCore().y, ProductionBlocks.core, 0);
+		placeBlock(control.getCore().x, control.getCore().y, ProductionBlocks.core, 0, false);
 		
 		if(map != Map.tutorial){
 			setDefaultBlocks();
@@ -229,7 +240,7 @@ public class World extends Module{
 	}
 	
 	//TODO move to control or player?
-	public void placeBlock(int x, int y, Block result, int rotation){
+	public void placeBlock(int x, int y, Block result, int rotation, boolean effects){
 		Tile tile = tile(x, y);
 		
 		//just in case
@@ -251,15 +262,15 @@ public class World extends Module{
 						toplace.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
 					}
 					
-					Effects.effect(Fx.place, worldx * Vars.tilesize, worldy * Vars.tilesize);
+					if(effects) Effects.effect(Fx.place, worldx * Vars.tilesize, worldy * Vars.tilesize);
 				}
 			}
 		}else{
-			Effects.effect(Fx.place, x * Vars.tilesize, y * Vars.tilesize);
+			if(effects) Effects.effect(Fx.place, x * Vars.tilesize, y * Vars.tilesize);
 		}
 		
-		Effects.shake(2f, 2f, player);
-		Sounds.play("place");
+		//Effects.shake(2f, 2f, player);
+		if(effects) Sounds.play("place");
 	}
 	
 	//TODO move this to control?

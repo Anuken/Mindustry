@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities.enemies;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -37,6 +38,7 @@ public class Enemy extends DestructibleEntity{
 	protected boolean targetCore = false;
 	protected boolean stopNearCore = true;
 	protected float mass = 1f;
+	protected String className;
 	
 	public float idletime = 0f;
 	public int spawn;
@@ -56,6 +58,8 @@ public class Enemy extends DestructibleEntity{
 
 		maxhealth = 60;
 		heal();
+		
+		className = ClassReflection.getSimpleName(getClass()).toLowerCase();
 	}
 
 	public float drawSize(){
@@ -252,7 +256,8 @@ public class Enemy extends DestructibleEntity{
 
 	@Override
 	public void draw(){
-		String region = ClassReflection.getSimpleName(getClass()).toLowerCase() + "-t" + Mathf.clamp(tier, 1, 3);
+		if(Timers.get(this, "asd", 30)) Gdx.app.error("ENEMY", "Currently drawing at " + x + " " + y);
+		String region = className + "-t" + Mathf.clamp(tier, 1, 3);
 
 		Shaders.outline.color.set(tierColors[tier - 1]);
 		Shaders.outline.region = Draw.region(region);

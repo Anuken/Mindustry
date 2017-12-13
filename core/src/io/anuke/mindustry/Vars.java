@@ -4,11 +4,8 @@ import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.I18NBundle;
 
-import io.anuke.mindustry.core.Control;
-import io.anuke.mindustry.core.Renderer;
-import io.anuke.mindustry.core.UI;
+import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.world.World;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class Vars{

@@ -56,7 +56,7 @@ public class Input{
 				Vars.world.validPlace(tilex(), tiley(), player.recipe.result) && !ui.hasMouse() && cursorNear() &&
 				Vars.control.hasItems(player.recipe.requirements)){
 			
-			Vars.world.placeBlock(tilex(), tiley(), player.recipe.result, player.rotation);
+			Vars.world.placeBlock(tilex(), tiley(), player.recipe.result, player.rotation, true);
 			
 			for(ItemStack stack : player.recipe.requirements){
 				Vars.control.removeItem(stack);

@@ -9,7 +9,6 @@ import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.Formatter;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.World;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;

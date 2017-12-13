@@ -99,8 +99,10 @@ public class Renderer extends RendererModule{
 		}else{
 			boolean smoothcam = Settings.getBool("smoothcam");
 			
-			if(control.core == null){ //how is this possible? apparently it is
-				control.findCore();
+			if(control.core == null){
+				ui.showGameError();
+				GameState.set(State.menu);
+				return;
 			}
 
 			if(control.core.block() == ProductionBlocks.core){
@@ -250,9 +252,15 @@ public class Renderer extends RendererModule{
 		Tmp.tr2.setRegion(texture);
 		Shaders.shield.region = Tmp.tr2;
 		Shaders.shield.hits = shieldHits;
+		
+		if(Shaders.shield.isFallback){
+			Draw.color(1f, 1f, 1f, 0.3f);
+			Shaders.outline.color = Color.SKY;
+			Shaders.outline.region = Tmp.tr2;
+		}
 
 		Graphics.end();
-		Graphics.shader(Shaders.shield);
+		Graphics.shader(Shaders.shield.isFallback ? Shaders.outline : Shaders.shield);
 		Graphics.setScreen();
 
 		Core.batch.draw(texture, 0, Gdx.graphics.getHeight(), Gdx.graphics.getWidth(), -Gdx.graphics.getHeight());
@@ -260,6 +268,8 @@ public class Renderer extends RendererModule{
 		Graphics.shader();
 		Graphics.end();
 		Graphics.beginCam();
+		
+		Draw.color();
 	}
 
 	public void addShieldHit(float x, float y){

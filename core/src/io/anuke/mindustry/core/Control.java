@@ -26,7 +26,6 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
@@ -177,17 +176,6 @@ public class Control extends Module{
 		ui.updateItems();
 		
 		GameState.set(State.playing);
-	}
-	
-	public void findCore(){
-		for(int x = 0; x < Vars.world.width(); x ++){
-			for(int y = 0; y < Vars.world.height(); y ++){
-				if(world.tile(x, y).block() == ProductionBlocks.core){
-					core = world.tile(x, y);
-					return;
-				}
-			}
-		}
 	}
 	
 	public Tile getCore(){
@@ -431,6 +419,10 @@ public class Control extends Module{
 			
 			if(Inputs.keyUp(Keys.F)){
 				wavetime = 0f;
+			}
+			
+			if(Inputs.keyUp(Keys.C)){
+				GameState.set(State.playing);
 			}
 			
 			if(Inputs.keyUp(Keys.U)){
