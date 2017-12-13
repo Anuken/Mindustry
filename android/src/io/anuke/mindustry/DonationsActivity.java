@@ -1,15 +1,18 @@
 package io.anuke.mindustry;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.View;
+import android.widget.Button;
 
 import org.sufficientlysecure.donations.DonationsFragment;
 
 public class DonationsActivity extends FragmentActivity {
+    DonationsFragment donationsFragment;
 
     /**
      * Google
@@ -33,7 +36,6 @@ public class DonationsActivity extends FragmentActivity {
         setContentView(R.layout.donations_activity);
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        DonationsFragment donationsFragment;
         if (BuildConfig.DONATIONS_GOOGLE) {
             donationsFragment = DonationsFragment.newInstance(BuildConfig.DEBUG, true, GOOGLE_PUBKEY, GOOGLE_CATALOG,
                     getResources().getStringArray(R.array.donation_google_catalog_values), false, null, null,
@@ -43,8 +45,20 @@ public class DonationsActivity extends FragmentActivity {
 
         ft.replace(R.id.donations_activity_container, donationsFragment, "donationsFragment");
         ft.commit();
-
     }
+
+    public void onStart(){
+        super.onStart();
+        Button b = ((Button)findViewById(org.sufficientlysecure.donations.R.id.donations__google_android_market_donate_button));
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View view) {
+                donationsFragment.donateGoogleOnClick(donationsFragment.getView());
+                b.setEnabled(false);
+            }
+        });
+    }
+
+
 
     /**
      * Needed for Google Play In-app Billing. It uses startIntentSenderForResult(). The result is not propagated to
@@ -53,6 +67,8 @@ public class DonationsActivity extends FragmentActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Button b = ((Button)findViewById(org.sufficientlysecure.donations.R.id.donations__google_android_market_donate_button));
+        b.setEnabled(true);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentByTag("donationsFragment");
@@ -61,5 +77,4 @@ public class DonationsActivity extends FragmentActivity {
             //TODO donation event, set settings
         }
     }
-
 }

@@ -6,7 +6,7 @@ canvas {
 }
 
 body {
-    background-color: transparent;
+    background-color: #191919;
     margin: 0px;
     padding: 0px;
 }
@@ -16,4 +16,8 @@ body {
 	background-image: -moz-linear-gradient(top, #f4ba6e, #d29d58) !important;
 	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #f4ba6e),color-stop(1, #d29d58)) !important;
 	background-image: -webkit-linear-gradient(#f4ba6e, #d29d58) !important;
+}
+
+.gdx-meter { 
+	max-width: 100% !important;
 }
