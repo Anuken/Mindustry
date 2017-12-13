@@ -5,9 +5,11 @@ import static io.anuke.mindustry.Vars.ui;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.ui.ConfirmDialog;
+import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
@@ -69,6 +71,8 @@ public class MenuDialog extends FloatingDialog{
 		}else{
 			build.begin(content());
 			
+			PressGroup group = new PressGroup();
+			
 			content().defaults().size(120f).pad(5).units(Unit.dp);
 			float isize = Unit.dp.inPixels(14f*4);
 			
@@ -93,6 +97,12 @@ public class MenuDialog extends FloatingDialog{
 						cell.pad(3).size(180, 44).units(Unit.dp);
 				}}.show();
 			}).text("Quit").padTop(4f);
+			
+			for(Element e : content().getChildren()){
+				if(e instanceof ImageButton){
+					group.add((ImageButton)e);
+				}
+			}
 			
 			build.end();
 		}

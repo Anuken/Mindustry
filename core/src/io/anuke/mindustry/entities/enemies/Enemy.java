@@ -66,9 +66,7 @@ public class Enemy extends DestructibleEntity{
 		Tile core = Vars.control.getCore();
 		
 		if(idletime > maxIdleLife){
-			Effects.effect(Fx.shellsmoke, this);
-			Effects.effect(Fx.explosion, this);
-			remove();
+			onDeath();
 			return;
 		}
 		
@@ -239,7 +237,7 @@ public class Enemy extends DestructibleEntity{
 		
 		float minv = 0.08f;
 		
-		if(xvelocity < minv && yvelocity < minv && node > 0){
+		if(xvelocity < minv && yvelocity < minv && node > 0 && target == null){
 			idletime += Timers.delta();
 		}else{
 			idletime = 0;

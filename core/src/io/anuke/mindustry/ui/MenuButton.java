@@ -9,7 +9,7 @@ import io.anuke.ucore.scene.ui.Image;
 
 public class MenuButton extends Button{
 	
-	public MenuButton(String icon, Listenable clicked){
+	public MenuButton(String icon, PressGroup group, Listenable clicked){
 		super("menu");
 		Image image = new Image(icon);
 		image.setScaling(Scaling.fit);
@@ -17,5 +17,6 @@ public class MenuButton extends Button{
 		image.setOrigin(Align.center);
 		add(image);
 		clicked(clicked);
+		group.add(this);
 	}
 }

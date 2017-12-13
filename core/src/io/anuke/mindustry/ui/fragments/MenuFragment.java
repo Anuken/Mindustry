@@ -8,6 +8,7 @@ import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.ui.MenuButton;
+import io.anuke.mindustry.ui.PressGroup;
 import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.table;
@@ -21,25 +22,27 @@ public class MenuFragment implements Fragment{
 			new table(){{
 				
 				new table(){{
+					PressGroup group = new PressGroup();
+					
 					float scale = 4f;
 					defaults().size(100*scale, 21*scale).pad(-10f).units(Unit.dp);
 					
-					add(new MenuButton("text-play", ()-> ui.showLevels()));
+					add(new MenuButton("text-play", group, ()-> ui.showLevels()));
 					row();
 					
-					add(new MenuButton("text-tutorial", ()-> control.playMap(Map.tutorial)));
+					add(new MenuButton("text-tutorial", group, ()-> control.playMap(Map.tutorial)));
 					row();
 					
 					if(!gwt){
-						add(new MenuButton("text-load", ()-> ui.showLoadGame()));
+						add(new MenuButton("text-load", group, ()-> ui.showLoadGame()));
 						row();
 					}
 					
-					add(new MenuButton("text-settings", ()-> ui.showPrefs()));
+					add(new MenuButton("text-settings", group, ()-> ui.showPrefs()));
 					row();
 					
 					if(!gwt){
-						add(new MenuButton("text-exit", ()-> Gdx.app.exit()));
+						add(new MenuButton("text-exit", group, ()-> Gdx.app.exit()));
 					}
 					get().pad(Unit.dp.inPixels(16));
 				}}.end();
