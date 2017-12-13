@@ -46,7 +46,7 @@ public class Block{
 	/**whether you can break this with rightblick*/
 	public boolean breakable;
 	/**time it takes to break*/
-	public float breaktime = 30;
+	public float breaktime = 18;
 	/**tile entity health*/
 	public int health = 40;
 	/**the shadow drawn under the block*/

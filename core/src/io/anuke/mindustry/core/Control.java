@@ -458,7 +458,7 @@ public class Control extends Module{
 		
 		if(!GameState.is(State.menu)){
 			
-			if(Inputs.keyUp("pause") && (GameState.is(State.paused) || GameState.is(State.playing))){
+			if(Inputs.keyUp("pause") && !ui.isGameOver() && (GameState.is(State.paused) || GameState.is(State.playing))){
 				GameState.set(GameState.is(State.playing) ? State.paused : State.playing);
 			}
 			
@@ -466,7 +466,7 @@ public class Control extends Module{
 				if(GameState.is(State.paused)){
 					ui.hideMenu();
 					GameState.set(State.playing);
-				}else{
+				}else if (!ui.isGameOver()){
 					ui.showMenu();
 					GameState.set(State.paused);
 				}

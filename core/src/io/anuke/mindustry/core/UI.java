@@ -405,6 +405,10 @@ public class UI extends SceneModule{
 		return scene.getKeyboardFocus() instanceof Dialog;
 	}
 	
+	public boolean isGameOver(){
+		return restart.getScene() != null;
+	}
+	
 	public void showUpgrades(){
 		upgrades.show();
 	}

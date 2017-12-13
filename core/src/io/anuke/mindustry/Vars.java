@@ -22,7 +22,7 @@ public class Vars{
 	//respawn time in frames
 	public static final float respawnduration = 60*4;
 	//time between waves in frames (on normal mode)
-	public static final float wavespace = 50*60*(android ? 1 : 1);
+	public static final float wavespace = 60*60*(android ? 1 : 1);
 	//waves can last no longer than 5 minutes, otherwise the next one spawns
 	public static final float maxwavespace = 60*60*5;
 	//advance time the pathfinding starts at
