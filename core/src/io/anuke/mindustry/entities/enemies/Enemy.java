@@ -1,6 +1,5 @@
 package io.anuke.mindustry.entities.enemies;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -246,6 +245,10 @@ public class Enemy extends DestructibleEntity{
 		}else{
 			idletime = 0;
 		}
+		
+		if(Float.isNaN(angle)){
+			angle = 0;
+		}
 
 		if(target == null || alwaysRotate){
 			angle = Mathf.slerp(angle, 180f+Mathf.atan2(xvelocity, yvelocity), rotatespeed * Timers.delta());
@@ -256,7 +259,6 @@ public class Enemy extends DestructibleEntity{
 
 	@Override
 	public void draw(){
-		if(Timers.get(this, "asd", 30)) Gdx.app.error("ENEMY", "Currently drawing at " + x + " " + y);
 		String region = className + "-t" + Mathf.clamp(tier, 1, 3);
 
 		Shaders.outline.color.set(tierColors[tier - 1]);
@@ -264,9 +266,8 @@ public class Enemy extends DestructibleEntity{
 
 		Shaders.outline.apply();
 
-		Draw.color();
 		Draw.rect(region, x, y, this.angle - 90);
-
+		
 		if(Vars.showPaths){
 			Draw.color(Color.PURPLE);
 			Draw.line(x, y, x + xvelocity*10f, y + yvelocity*10f);
@@ -274,7 +275,6 @@ public class Enemy extends DestructibleEntity{
 		}
 		
 		Graphics.flush();
-
 	}
 	
 	@Override
