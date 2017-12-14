@@ -383,8 +383,19 @@ public class Control extends Module{
 		return true;
 	}
 	
+	public boolean hasItems(ItemStack[] items, int scaling){
+		for(ItemStack stack : items)
+			if(!hasItem(stack.item, stack.amount * scaling))
+				return false;
+		return true;
+	}
+	
 	public boolean hasItem(ItemStack req){
 		return items[req.item.ordinal()] >= req.amount; 
+	}
+	
+	public boolean hasItem(Item item, int amount){
+		return items[item.ordinal()] >= amount; 
 	}
 	
 	public void removeItem(ItemStack req){
@@ -456,6 +467,7 @@ public class Control extends Module{
 		}
 		
 		if(!GameState.is(State.menu)){
+			input.update();
 			
 			if(Inputs.keyUp("pause") && !ui.isGameOver() && (GameState.is(State.paused) || GameState.is(State.playing))){
 				GameState.set(GameState.is(State.playing) ? State.paused : State.playing);
@@ -524,8 +536,6 @@ public class Control extends Module{
 				
 				Profiler.end("entityUpdate");
 			}
-			
-			input.update();
 		}
 	}
 

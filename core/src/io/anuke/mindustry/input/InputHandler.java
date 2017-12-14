@@ -19,10 +19,10 @@ public abstract class InputHandler extends InputAdapter{
 	public abstract float getCursorY();
 	public abstract float getCursorEndX();
 	public abstract float getCursorEndY();
-	public int getBlockX(){ return Mathf.scl2(Graphics.world(getCursorX(), getCursorY()).x, Vars.tilesize); }
-	public int getBlockY(){ return Mathf.scl2(Graphics.world(getCursorX(), getCursorY()).y, Vars.tilesize); }
-	public int getBlockEndX(){ return Mathf.scl2(Graphics.world(getCursorEndX(), getCursorEndY()).x, Vars.tilesize); }
-	public int getBlockEndY(){ return Mathf.scl2(Graphics.world(getCursorEndX(), getCursorEndY()).y, Vars.tilesize); }
+	public int getBlockX(){ return Mathf.sclb(Graphics.world(getCursorX(), getCursorY()).x, Vars.tilesize, round2()); }
+	public int getBlockY(){ return Mathf.sclb(Graphics.world(getCursorX(), getCursorY()).y, Vars.tilesize, round2()); }
+	public int getBlockEndX(){ return Mathf.sclb(Graphics.world(getCursorEndX(), getCursorEndY()).x, Vars.tilesize, round2()); }
+	public int getBlockEndY(){ return Mathf.sclb(Graphics.world(getCursorEndX(), getCursorEndY()).y, Vars.tilesize, round2()); }
 	public void resetCursor(){}
 	
 	public boolean onConfigurable(){
@@ -49,5 +49,9 @@ public abstract class InputHandler extends InputAdapter{
 				Cursors.restoreCursor();
 			}
 		}
+	}
+	
+	public boolean round2(){
+		return !(player.recipe != null && player.recipe.result.isMultiblock() && player.recipe.result.height % 2 == 0);
 	}
 }

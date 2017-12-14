@@ -49,54 +49,25 @@ public enum PlaceMode{
 	}, 
 	touch{
 		int maxlen = 10;
+		int tilex;
+		int tiley;
+		int endx;
+		int endy;
+		int rotation;
+		
 		{
 			lockCamera = true;
 		}
 		
 		public void draw(int tilex, int tiley, int endx, int endy){
-			int maxlen = this.maxlen * Vars.tilesize;
-			
 			float t = Vars.tilesize;
 			
-			float x = tilex * t, y = tiley * t, 
-					x2 = endx * t, y2 = endy * t;
-			
-			if(Math.abs(x - x2) > Math.abs(y2 - y)){
-				y2 = y;
-			}else{
-				x2 = x;
-			}
-			
-			if(Math.abs(x2 - x) > maxlen){
-				x2 = Mathf.sign(x2 - x) * maxlen + x;
-			}
-			
-			if(Math.abs(y2 - y) > maxlen){
-				y2 = Mathf.sign(y2 - y) * maxlen + y;
-			}
-			
-			int rotation = 0;
-			
-			if(x2 > x)
-				rotation = 0;
-			if(x2 < x)
-				rotation = 2;
-			if(y2 > y)
-				rotation = 1;
-			if(y2 < y)
-				rotation = 3;
-			
-			if(x2 < x){
-				float d = x;
-				x = x2;
-				x2 = d;
-			}
-			
-			if(y2 < y){
-				float d = y;
-				y = y2;
-				y2 = d;
-			}
+			process(tilex, tiley, endx, endy);
+			int tx = tilex, ty = tiley, ex = endx, ey = endy;
+			tilex = this.tilex; tiley = this.tiley; 
+			endx = this.endx; endy = this.endy;
+			float x = this.tilex * t, y = this.tiley * t, 
+					x2 = this.endx * t, y2 = this.endy * t;
 			
 			if(x2 >= x){
 				x -= t/2;
@@ -117,6 +88,22 @@ public enum PlaceMode{
 				Draw.alpha(0.3f);
 				Draw.crect("blank", x, y, x2 - x, y2 - y);
 				
+				Draw.color(Color.RED);
+				
+				int amount = 1;
+				for(int cx = 0; cx <= Math.abs(endx - tilex); cx ++){
+					for(int cy = 0; cy <= Math.abs(endy - tiley); cy ++){
+						int px = tx + cx * Mathf.sign(ex - tx), 
+						py = ty + cy * Mathf.sign(ey - ty);
+						
+						if(!world.validPlace(px, py, player.recipe.result) 
+								|| !control.hasItems(player.recipe.requirements, amount)){
+							Draw.square(px * t, py * t, t/2);
+						}
+						amount ++;
+					}
+				}
+				
 				if(player.recipe.result.rotate){
 					float cx = tilex * t, cy = tiley * t;
 					Draw.color(Color.ORANGE);
@@ -129,7 +116,25 @@ public enum PlaceMode{
 		
 		public void tapped(int tilex, int tiley, int endx, int endy){
 			int prev = player.rotation;
+			process(tilex, tiley, endx, endy);
+			//tilex = this.tilex; tiley = this.tiley; 
+			//endx = this.endx; endy = this.endy;
 			
+			player.rotation = this.rotation;
+			
+			for(int x = 0; x <= Math.abs(this.endx - this.tilex); x ++){
+				for(int y = 0; y <= Math.abs(this.endy - this.tiley); y ++){
+					control.getInput().tryPlaceBlock(
+							tilex + x * Mathf.sign(endx - tilex), 
+							tiley + y * Mathf.sign(endy - tiley));
+				}
+			}
+			
+			player.rotation = prev;
+			
+		}
+		
+		void process(int tilex, int tiley, int endx, int endy){
 			if(Math.abs(tilex - endx) > Math.abs(tiley - endy)){
 				endy = tiley;
 			}else{
@@ -145,13 +150,15 @@ public enum PlaceMode{
 			}
 			
 			if(endx > tilex)
-				player.rotation = 0;
-			if(endx < tilex)
-				player.rotation = 2;
-			if(endy > tiley)
-				player.rotation = 1;
-			if(endy < tiley)
-				player.rotation = 3;
+				rotation = 0;
+			else if(endx < tilex)
+				rotation = 2;
+			else if(endy > tiley)
+				rotation = 1;
+			else if(endy < tiley)
+				rotation = 3;
+			else 
+				rotation = player.rotation;
 			
 			if(endx < tilex){
 				int t = endx;
@@ -164,14 +171,10 @@ public enum PlaceMode{
 				tiley = t;
 			}
 			
-			for(int x = tilex; x <= endx; x ++){
-				for(int y = tiley; y <= endy; y ++){
-					control.getInput().tryPlaceBlock(x, y);
-				}
-			}
-			
-			player.rotation = prev;
-			
+			this.endx = endx;
+			this.endy = endy;
+			this.tilex = tilex;
+			this.tiley = tiley;
 		}
 	},
 	breaker{

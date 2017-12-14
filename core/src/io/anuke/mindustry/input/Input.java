@@ -5,6 +5,7 @@ import static io.anuke.mindustry.Vars.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
@@ -21,17 +22,19 @@ import io.anuke.ucore.util.Mathf;
 
 public class Input extends InputHandler{
 	float mousex, mousey;
+	float endx, endy;
 	
-	@Override public float getCursorEndX(){ return Gdx.input.getX(); }
-	@Override public float getCursorEndY(){ return Gdx.input.getY(); }
-	@Override public float getCursorX(){ return mousex; }
-	@Override public float getCursorY(){ return mousey; }
+	@Override public float getCursorEndX(){ return endx; }
+	@Override public float getCursorEndY(){ return endy; }
+	@Override public float getCursorX(){ return Graphics.screen(mousex, mousey).x; }
+	@Override public float getCursorY(){ return Gdx.graphics.getHeight() - Graphics.screen(mousex, mousey).y; }
 	
 	@Override
-	public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+	public boolean touchDown (int screenX, int screenY, int pointer, int button){
 		if(button == Buttons.LEFT){
-			mousex = screenX;
-			mousey = screenY;
+			Vector2 vec = Graphics.world(screenX, screenY);
+			mousex = vec.x;
+			mousey = vec.y;
 		}
 		return false;
 	}
@@ -46,9 +49,12 @@ public class Input extends InputHandler{
 		if(player.isDead()) return;
 		
 		if(!Inputs.buttonDown(Buttons.LEFT)){
-			mousex = Gdx.input.getX();
-			mousey = Gdx.input.getY();
+			Vector2 vec = Graphics.world(Gdx.input.getX(), Gdx.input.getY());
+			mousex = vec.x;
+			mousey = vec.y;
 		}
+		endx = Gdx.input.getX();
+		endy = Gdx.input.getY();
 		
 		if(Inputs.scrolled() && Inputs.keyDown("zoom_hold") && !GameState.is(State.menu) && !Vars.ui.onDialog()){
 			Vars.renderer.scaleCamera(Inputs.scroll());
