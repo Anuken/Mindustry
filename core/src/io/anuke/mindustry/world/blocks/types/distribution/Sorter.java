@@ -59,6 +59,7 @@ public class Sorter extends Junction implements Configurable{
 		SorterEntity entity = dest.entity();
 		
 		int dir = source.relativeTo(dest.x, dest.y);
+		if(dir == -1) return null;
 		Tile to = null;
 		
 		if(item == entity.sortItem){
