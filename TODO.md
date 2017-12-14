@@ -1,15 +1,5 @@
 _Keep in mind that this is just a basic outline of planned features, and will be constantly changing!_
 
-### 3.0 Release
-- [DONE] New tutorial with the power blocks
-- [DONE] New SFX for specific blocks, especially turrets
-- [DONE] Block drawing layers. Refactor/remove `Block#drawOver()`, add `Layer` enum. Should fix 'glitchy' lasers and conveyor clipping
-- [DONE] Balance nuclear reactor, improve effectiveness as they are currently underpowered
-- [DONE] Make generation frame independent
-- [DONE/MOVED] Investigate issue #5 (enemies stuck in blocks) - looks like it's caused by map loading lag, needs to be fixed with a slightly different physics system
-- [DONE] Faster mech movement, possibly with a "boost" key
-- [DONE] Balance enemy difficulty
-
 ### 3.x Planned
 - New save system: toggleable autosave, named slots, less clunky save UI
 - Teleporter UI changes, more colors (?)
@@ -21,7 +11,7 @@ _Keep in mind that this is just a basic outline of planned features, and will be
 - More indicators for when the core is damaged and/or under attack
 - Fix bugs with junction not accepting blocks(low FPS)
 - Fix bugs with tunnel merging and/or removing items (low FPS)
-
+- Investigate #6
 
 ### 4.0 Planned
 - Multiplayer framework, possibly implementation

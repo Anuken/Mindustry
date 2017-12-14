@@ -42,7 +42,7 @@ public class PowerTurret extends Turret implements PowerAcceptor{
 	public void drawSelect(Tile tile){
 		Vector2 offset = getPlaceOffset();
 		
-		Draw.color("green");
+		Draw.color(Color.GREEN);
 		Draw.dashCircle(tile.worldx() + offset.x, tile.worldy() + offset.y, range);
 		Draw.reset();
 		

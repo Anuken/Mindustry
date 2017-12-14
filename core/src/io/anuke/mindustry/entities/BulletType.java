@@ -36,7 +36,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 	},
 	iron = new BulletType(1.7f, 2){
 		public void draw(Bullet b){
-			Draw.color("gray");
+			Draw.color(Color.GRAY);
 			Draw.rect("bullet", b.x, b.y, b.angle());
 			Draw.reset();
 		}
@@ -241,7 +241,7 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 	},
 	smallSlow = new BulletType(1.2f, 2){
 		public void draw(Bullet b){
-			Draw.color("orange");
+			Draw.color(Color.ORANGE);
 			Draw.rect("shot", b.x, b.y, b.angle() - 45);
 			Draw.reset();
 		}

@@ -455,7 +455,7 @@ public class Fx{
 
 	ind = new Effect(100, e -> {
 		Draw.thickness(3f);
-		Draw.color("royal");
+		Draw.color(Color.ROYAL);
 		Draw.circle(e.x, e.y, 3);
 		Draw.reset();
 	}),

@@ -2,6 +2,7 @@ package io.anuke.mindustry.input;
 
 import static io.anuke.mindustry.Vars.*;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
@@ -19,11 +20,36 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 
-public class Input{
+public class Input extends InputHandler{
+	float mousex, mousey;
 	
-	public static void doInput(){
-		//player is dead
-		if(player.health <= 0) return;
+	@Override public float getCursorEndX(){ return Gdx.input.getX(); }
+	@Override public float getCursorEndY(){ return Gdx.input.getY(); }
+	@Override public float getCursorX(){ return mousex; }
+	@Override public float getCursorY(){ return mousey; }
+	
+	@Override
+	public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+		if(button == Buttons.LEFT){
+			mousex = screenX;
+			mousey = screenY;
+		}
+		return false;
+	}
+	
+	public boolean touchUp(int screenX, int screenY, int pointer, int button){
+		player.placeMode.tapped(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
+		return false;
+	}
+	
+	@Override
+	public void update(){
+		if(player.isDead()) return;
+		
+		if(!Inputs.buttonDown(Buttons.LEFT)){
+			mousex = Gdx.input.getX();
+			mousey = Gdx.input.getY();
+		}
 		
 		if(Inputs.scrolled() && Inputs.keyDown("zoom_hold") && !GameState.is(State.menu) && !Vars.ui.onDialog()){
 			Vars.renderer.scaleCamera(Inputs.scroll());
@@ -52,21 +78,7 @@ public class Input{
 		
 		Tile cursor = Vars.world.tile(tilex(), tiley());
 		
-		if(Inputs.buttonUp(Buttons.LEFT) && player.recipe != null && 
-				Vars.world.validPlace(tilex(), tiley(), player.recipe.result) && !ui.hasMouse() && cursorNear() &&
-				Vars.control.hasItems(player.recipe.requirements)){
-			
-			Vars.world.placeBlock(tilex(), tiley(), player.recipe.result, player.rotation, true);
-			
-			for(ItemStack stack : player.recipe.requirements){
-				Vars.control.removeItem(stack);
-			}
-			
-			if(!Vars.control.hasItems(player.recipe.requirements)){
-				Cursors.restoreCursor();
-			}
-			
-		}else if(Inputs.buttonUp(Buttons.LEFT)){
+		if(Inputs.buttonUp(Buttons.LEFT) && cursor != null){
 			Tile linked = cursor.isLinked() ? cursor.getLinked() : cursor;
 			if(linked != null && linked.block() instanceof Configurable){
 				Vars.ui.showConfig(linked);
@@ -98,28 +110,40 @@ public class Input{
 
 	}
 	
-	public static boolean cursorNear(){
-		return Vector2.dst(player.x, player.y, tilex() * tilesize, tiley() * tilesize) <= placerange;
+	public void tryPlaceBlock(int x, int y){
+		if(player.recipe != null && 
+				Vars.world.validPlace(x, y, player.recipe.result) && !ui.hasMouse() && cursorNear() &&
+				Vars.control.hasItems(player.recipe.requirements)){
+			
+			Vars.world.placeBlock(x, y, player.recipe.result, player.rotation, true);
+			
+			for(ItemStack stack : player.recipe.requirements){
+				Vars.control.removeItem(stack);
+			}
+			
+			if(!Vars.control.hasItems(player.recipe.requirements)){
+				Cursors.restoreCursor();
+			}
+		}
 	}
 	
-	public static boolean onConfigurable(){
-		Tile tile = Vars.world.tile(tilex(), tiley());
-		return tile != null && (tile.block() instanceof Configurable || (tile.isLinked() && tile.getLinked().block() instanceof Configurable));
+	public boolean cursorNear(){
+		return Vector2.dst(player.x, player.y, tilex() * tilesize, tiley() * tilesize) <= placerange;
 	}
 
-	public static int tilex(){
+	public int tilex(){
 		return (player.recipe != null && player.recipe.result.isMultiblock() &&
 				player.recipe.result.width % 2 == 0) ?
 				Mathf.scl(Graphics.mouseWorld().x, tilesize) : Mathf.scl2(Graphics.mouseWorld().x, tilesize);
 	}
 
-	public static int tiley(){
+	public int tiley(){
 		return (player.recipe != null && player.recipe.result.isMultiblock() &&
 				player.recipe.result.height % 2 == 0) ?
 				Mathf.scl(Graphics.mouseWorld().y, tilesize) : Mathf.scl2(Graphics.mouseWorld().y, tilesize);
 	}
 	
-	public static int currentWeapon(){
+	public int currentWeapon(){
 		int i = 0;
 		for(Weapon weapon : control.getWeapons()){
 			if(player.weapon == weapon)

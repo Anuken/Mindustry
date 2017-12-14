@@ -7,7 +7,6 @@ import java.util.Arrays;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
@@ -20,8 +19,8 @@ import io.anuke.mindustry.entities.enemies.BlastEnemy;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.HealerEnemy;
 import io.anuke.mindustry.input.AndroidInput;
-import io.anuke.mindustry.input.GestureHandler;
 import io.anuke.mindustry.input.Input;
+import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
@@ -61,6 +60,7 @@ public class Control extends Module{
 	boolean shouldUpdateItems = false;
 	
 	float respawntime;
+	InputHandler input;
 	
 	public Control(){
 		if(Mindustry.args.contains("-debug", false))
@@ -81,9 +81,12 @@ public class Control extends Module{
 		Gdx.input.setCatchBackKey(true);
 		
 		if(android){
-			Inputs.addProcessor(new GestureDetector(20, 0.5f, 2, 0.15f, new GestureHandler()));
-			Inputs.addProcessor(new AndroidInput());
+			input = new AndroidInput();
+		}else{
+			input = new Input();
 		}
+		
+		Inputs.addProcessor(input);
 		
 		Effects.setShakeFalloff(10000f);
 		
@@ -188,6 +191,10 @@ public class Control extends Module{
 	
 	public void setCore(Tile tile){
 		this.core = tile;
+	}
+	
+	public InputHandler getInput(){
+		return input;
 	}
 	
 	public void addSpawnPoint(Tile tile){
@@ -518,11 +525,7 @@ public class Control extends Module{
 				Profiler.end("entityUpdate");
 			}
 			
-			if(!android){
-				Input.doInput();
-			}else{
-				AndroidInput.doInput();
-			}
+			input.update();
 		}
 	}
 

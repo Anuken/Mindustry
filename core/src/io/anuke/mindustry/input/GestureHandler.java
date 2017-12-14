@@ -9,35 +9,33 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.Mathf;
 
 public class GestureHandler extends GestureAdapter{
+	AndroidInput input;
 	Vector2 pinch1 = new Vector2(-1, -1), pinch2 = pinch1.cpy();
 	Vector2 vector = new Vector2();
 	float initzoom = -1;
 	boolean zoomed = false;
 	
+	GestureHandler(AndroidInput input){
+		this.input = input;
+	}
+	
 	@Override
 	public boolean longPress(float x, float y){
-		/*
-		Tile tile = World.cursorTile();
-		player.breaktime += Timers.delta();
-		if(!GameState.is(State.menu) && player.breaktime >= tile.block().breaktime){
-			Effects.effect("break", tile.worldx(), tile.worldy());
-			Effects.shake(3f, 1f);
-			tile.setBlock(Blocks.air);
-			player.breaktime = 0f;
-			Sounds.play("break");
-		}*/
 		return false;
 	}
 	
 	@Override
 	public boolean tap (float x, float y, int count, int button) {
-		if(AndroidInput.mode == PlaceMode.touch && !ui.hasMouse() && player.recipe != null &&
-				Vars.control.hasItems(player.recipe.requirements) && !Vars.ui.hasMouse() && !AndroidInput.brokeBlock){
-			AndroidInput.mousex = x;
-			AndroidInput.mousey = y;
-			AndroidInput.place();
+		if(!ui.hasMouse() && player.recipe != null &&
+				Vars.control.hasItems(player.recipe.requirements) && !Vars.ui.hasMouse() && !input.brokeBlock){
+
+			player.placeMode.tapped(Mathf.scl2(x, Vars.tilesize), Mathf.scl2(y, Vars.tilesize), Mathf.scl2(x, Vars.tilesize), Mathf.scl2(y, Vars.tilesize));
+			
+			input.mousex = x;
+			input.mousey = y;
 			return true;
 		}
 		return false;
@@ -45,12 +43,12 @@ public class GestureHandler extends GestureAdapter{
 	
 	@Override
 	public boolean pan(float x, float y, float deltaX, float deltaY){
-		if(player.recipe == null || !Vars.control.hasItems(player.recipe.requirements) || AndroidInput.mode == PlaceMode.touch){
+		if(player.recipe == null || !Vars.control.hasItems(player.recipe.requirements) || !player.placeMode.lockCamera){
 			player.x -= deltaX*Core.camera.zoom/Core.cameraScale;
 			player.y += deltaY*Core.camera.zoom/Core.cameraScale;
-		}else if(AndroidInput.mode == PlaceMode.cursor){
-			AndroidInput.mousex += deltaX;
-			AndroidInput.mousey += deltaY;
+		}else if(player.placeMode.lockCamera){
+			input.mousex += deltaX;
+			input.mousey += deltaY;
 		}
 		
 		return false;

@@ -4,7 +4,7 @@ import static io.anuke.mindustry.Vars.*;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.Vars;
@@ -14,17 +14,26 @@ import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 
-public class AndroidInput extends InputAdapter{
-	public static float mousex, mousey;
-	public static PlaceMode mode = PlaceMode.cursor;
-	public static boolean brokeBlock = false;
-	private static float lmousex, lmousey;
-	private static float warmup;
-	private static float warmupDelay = 20;
+public class AndroidInput extends InputHandler{
+	public float mousex, mousey;
+	public boolean brokeBlock = false;
+	private float lmousex, lmousey;
+	private float warmup;
+	private float warmupDelay = 20;
+	
+	public AndroidInput(){
+		Inputs.addProcessor(new GestureDetector(20, 0.5f, 2, 0.15f, new GestureHandler(this)));
+	}
+	
+	@Override public float getCursorEndX(){ return Gdx.input.getX(0); }
+	@Override public float getCursorEndY(){ return Gdx.input.getY(0); }
+	@Override public float getCursorX(){ return mousex; }
+	@Override public float getCursorY(){ return mousey; }
 
 	@Override
 	public boolean keyDown(int keycode){
@@ -62,13 +71,24 @@ public class AndroidInput extends InputAdapter{
 		}
 		return false;
 	}
+	
+	@Override
+	public void resetCursor(){
+		mousex = Gdx.graphics.getWidth()/2;
+		mousey = Gdx.graphics.getHeight()/2;
+	}
+	
+	@Override
+	public boolean cursorNear(){
+		return true;
+	}
 
-	public static Tile selected(){
+	public Tile selected(){
 		Vector2 vec = Graphics.world(mousex, mousey);
 		return Vars.world.tile(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize));
 	}
 
-	public static void breakBlock(){
+	public void breakBlock(){
 		Tile tile = selected();
 		player.breaktime += Timers.delta();
 
@@ -79,7 +99,7 @@ public class AndroidInput extends InputAdapter{
 		}
 	}
 
-	public static void place(){
+	public void place(){
 		Vector2 vec = Graphics.world(mousex, mousey);
 
 		int tilex = Mathf.scl2(vec.x, tilesize);
@@ -95,7 +115,8 @@ public class AndroidInput extends InputAdapter{
 		}
 	}
 
-	public static void doInput(){
+	@Override
+	public void update(){
 
 		if(Gdx.input.isTouched(0) && Mathf.near2d(lmousex, lmousey, Gdx.input.getX(0), Gdx.input.getY(0), Unit.dp.inPixels(50))
 				&& !ui.hasMouse()){
@@ -133,7 +154,7 @@ public class AndroidInput extends InputAdapter{
 		}
 	}
 
-	public static int touches(){
+	public int touches(){
 		int sum = 0;
 		for(int i = 0; i < 10; i++){
 			if(Gdx.input.isTouched(i))

@@ -6,7 +6,6 @@ import com.badlogic.gdx.utils.Align;
 
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.label;
@@ -29,7 +28,7 @@ public class PlacementFragment implements Fragment{
 				
 				new table("pane"){{
 					get().setTouchable(Touchable.enabled);
-					new label(()->"Placement Mode: [orange]" + AndroidInput.mode.name()).pad(4).units(Unit.dp);
+					new label(()->"Placement Mode: [orange]" + player.placeMode.name()).pad(4).units(Unit.dp);
 					row();
 					
 					aleft();
@@ -42,7 +41,7 @@ public class PlacementFragment implements Fragment{
 						
 						for(PlaceMode mode : PlaceMode.values()){
 							new imagebutton("icon-" + mode.name(), "toggle",  Unit.dp.inPixels(10*3), ()->{
-								AndroidInput.mode = mode;
+								player.placeMode = mode;
 							}){{
 								group.add(get());
 							}};
@@ -50,7 +49,7 @@ public class PlacementFragment implements Fragment{
 						
 						new imagebutton("icon-cancel", Unit.dp.inPixels(14*3), ()->{
 							player.recipe = null;
-						}).visible(()->player.recipe != null && AndroidInput.mode == PlaceMode.touch);
+						}).visible(()->player.recipe != null && player.placeMode == PlaceMode.touch);
 						
 						new imagebutton("icon-rotate-arrow", Unit.dp.inPixels(14*3), ()->{
 							player.rotation ++;
@@ -58,7 +57,7 @@ public class PlacementFragment implements Fragment{
 						}).update(i->{
 							i.getImage().setOrigin(Align.center);
 							i.getImage().setRotation(player.rotation*90);
-						}).visible(()->player.recipe != null && AndroidInput.mode == PlaceMode.touch 
+						}).visible(()->player.recipe != null && player.placeMode == PlaceMode.touch 
 								&& player.recipe.result.rotate);
 						
 					}}.left().end();

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -69,7 +70,7 @@ public class RepairTurret extends PowerTurret{
 	
 	@Override
 	public void drawSelect(Tile tile){
-		Draw.color("green");
+		Draw.color(Color.GREEN);
 		Draw.dashCircle(tile.worldx(), tile.worldy(), range);
 		Draw.reset();
 		

@@ -4,10 +4,8 @@ import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.core.Core.camera;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.FloatArray;
@@ -17,8 +15,6 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.effect.Shaders;
 import io.anuke.mindustry.entities.enemies.Enemy;
-import io.anuke.mindustry.input.AndroidInput;
-import io.anuke.mindustry.input.Input;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.SpawnPoint;
@@ -35,7 +31,6 @@ import io.anuke.ucore.graphics.CacheBatch;
 import io.anuke.ucore.graphics.Surface;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.*;
 
 public class Renderer extends RendererModule{
@@ -88,9 +83,7 @@ public class Renderer extends RendererModule{
 			if(Mathf.in(camera.zoom, targetzoom, 0.005f)){
 				camera.zoom = 1f;
 				Graphics.setCameraScale(targetscale);
-
-				AndroidInput.mousex = Gdx.graphics.getWidth() / 2;
-				AndroidInput.mousey = Gdx.graphics.getHeight() / 2;
+				control.input.resetCursor();
 			}
 		}
 
@@ -99,6 +92,7 @@ public class Renderer extends RendererModule{
 		}else{
 			boolean smoothcam = Settings.getBool("smoothcam");
 			
+			//TODO identify the source of this bug
 			if(control.core == null){
 				ui.showGameError();
 				GameState.set(State.menu);
@@ -160,15 +154,13 @@ public class Renderer extends RendererModule{
 
 			camera.position.set(lastx - deltax, lasty - deltay, 0);
 
-			//if(Vars.debug){
-			record();
-			//}
+			record(); //this only does something if GdxGifRecorder is on the class path, which it usually isn't
 		}
 	}
 
 	@Override
 	public void draw(){
-		//clera shield surface
+		//clears shield surface
 		Graphics.surface(shieldSurface);
 		Graphics.surface();
 		
@@ -205,9 +197,7 @@ public class Renderer extends RendererModule{
 	@Override
 	public void resize(int width, int height){
 		super.resize(width, height);
-
-		AndroidInput.mousex = Gdx.graphics.getWidth() / 2;
-		AndroidInput.mousey = Gdx.graphics.getHeight() / 2;
+		control.input.resetCursor();
 		camera.position.set(player.x, player.y, 0);
 	}
 
@@ -481,86 +471,35 @@ public class Renderer extends RendererModule{
 			}
 			Draw.reset();
 		}
+		
+		int tilex = control.input.getBlockX();
+		int tiley = control.input.getBlockY();
 
 		//draw placement box
-		if(player.recipe != null && Vars.control.hasItems(player.recipe.requirements) && (!ui.hasMouse() || android) && AndroidInput.mode == PlaceMode.cursor){
-			float x = 0;
-			float y = 0;
+		if(player.recipe != null && Vars.control.hasItems(player.recipe.requirements) && (!ui.hasMouse() || android)){
 
-			int tilex = 0;
-			int tiley = 0;
-
-			if(android){
-				Vector2 vec = Graphics.world(AndroidInput.mousex, AndroidInput.mousey);
-				tilex = Mathf.scl2(vec.x, tilesize);
-				tiley = Mathf.scl2(vec.y, tilesize);
-			}else{
-				tilex = Input.tilex();
-				tiley = Input.tiley();
-			}
-
-			x = tilex * tilesize;
-			y = tiley * tilesize;
-
-			boolean valid = world.validPlace(tilex, tiley, player.recipe.result) && (android || Input.cursorNear());
-
-			Vector2 offset = player.recipe.result.getPlaceOffset();
-
-			float si = MathUtils.sin(Timers.time() / 6f) + 1;
-
-			Draw.color(valid ? Color.PURPLE : Color.SCARLET);
-			Draw.thickness(2f);
-			Draw.linecrect(x + offset.x, y + offset.y, tilesize * player.recipe.result.width + si, tilesize * player.recipe.result.height + si);
-
-			player.recipe.result.drawPlace(tilex, tiley, player.rotation, valid);
-			Draw.thickness(2f);
-
-			if(player.recipe.result.rotate){
-				Draw.color("orange");
-				Tmp.v1.set(7, 0).rotate(player.rotation * 90);
-				Draw.line(x, y, x + Tmp.v1.x, y + Tmp.v1.y);
-			}
+			player.placeMode.draw(tilex, tiley, control.input.getBlockEndX(), control.input.getBlockEndY()); //TODO proper end points
 
 			Draw.thickness(1f);
-			Draw.color("scarlet");
+			Draw.color(Color.SCARLET);
 			for(SpawnPoint spawn : control.getSpawnPoints()){
 				Draw.dashCircle(spawn.start.worldx(), spawn.start.worldy(), enemyspawnspace);
 			}
 
-			if(valid)
-				Cursors.setHand();
-			else
-				Cursors.restoreCursor();
-
 			Draw.reset();
 		}
-
-		//block breaking
-		if(Inputs.buttonDown(Buttons.RIGHT) && world.validBreak(Input.tilex(), Input.tiley())){
-			Tile tile = world.tile(Input.tilex(), Input.tiley());
-			if(tile.isLinked())
-				tile = tile.getLinked();
-			Vector2 offset = tile.block().getPlaceOffset();
-
-			Draw.color(Color.YELLOW, Color.SCARLET, player.breaktime / tile.getBreakTime());
-			Draw.linecrect(tile.worldx() + offset.x, tile.worldy() + offset.y, tile.block().width * Vars.tilesize, tile.block().height * Vars.tilesize);
-			Draw.reset();
-		}else if(android && player.breaktime > 0){ //android block breaking
+		
+		if(Vars.android){
 			Vector2 vec = Graphics.world(Gdx.input.getX(0), Gdx.input.getY(0));
-
-			if(world.validBreak(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize))){
-				Tile tile = world.tile(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize));
-
-				float fract = player.breaktime / tile.getBreakTime();
-				Draw.color(Color.YELLOW, Color.SCARLET, fract);
-				Draw.circle(tile.worldx(), tile.worldy(), 4 + (1f - fract) * 26);
-				Draw.reset();
-			}
+			tilex = Mathf.scl2(vec.x, tilesize);
+			tiley = Mathf.scl2(vec.y, tilesize);
 		}
+		
+		PlaceMode.breaker.draw(tilex, tiley, 0, 0);
 
 		//draw selected block health
 		if(player.recipe == null && !ui.hasMouse()){
-			Tile tile = world.tile(Input.tilex(), Input.tiley());
+			Tile tile = world.tile(tilex, tiley);
 
 			if(tile != null && tile.block() != Blocks.air){
 				Tile target = tile;

@@ -57,7 +57,7 @@ public class Generator extends PowerBlock{
 		if(drawRangeOverlay){
 			int rotation = tile.getRotation();
 			if(hasLasers){
-				Draw.color("yellow");
+				Draw.color(Color.YELLOW);
 				Draw.thick(2f);
 
 				for(int i = 0; i < laserDirections; i++){
@@ -81,7 +81,7 @@ public class Generator extends PowerBlock{
 	@Override
 	public void drawPlace(int x, int y, int rotation, boolean valid){
 		if(hasLasers){
-			Draw.color("purple");
+			Draw.color(Color.PURPLE);
 			Draw.thick(2f);
 
 			for(int i = 0; i < laserDirections; i++){

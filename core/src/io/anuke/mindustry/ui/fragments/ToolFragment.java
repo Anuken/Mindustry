@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.Align;
 
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.scene.ui.layout.Table;
@@ -28,18 +27,19 @@ public class ToolFragment implements Fragment{
 		});
 		
 		tools.addIButton("icon-check", Unit.dp.inPixels(42), ()->{
-			AndroidInput.place();
+			player.placeMode.tapped(control.getInput().getBlockX(), control.getInput().getBlockY(), 
+					control.getInput().getBlockEndX(), control.getInput().getBlockEndY());
 		});
 		
 		Core.scene.add(tools);
 		
 		tools.setVisible(()->
 			!GameState.is(State.menu) && android && player.recipe != null && control.hasItems(player.recipe.requirements) &&
-			AndroidInput.mode == PlaceMode.cursor
+			player.placeMode == PlaceMode.cursor
 		);
 		
 		tools.update(()->{
-			tools.setPosition(AndroidInput.mousex, Gdx.graphics.getHeight()-AndroidInput.mousey-15*Core.cameraScale, Align.top);
+			tools.setPosition(control.getInput().getCursorX(), Gdx.graphics.getHeight() - control.getInput().getCursorY() - 15*Core.cameraScale, Align.top);
 		});
 	}
 }

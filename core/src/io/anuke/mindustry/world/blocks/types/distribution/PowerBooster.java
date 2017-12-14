@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
@@ -26,14 +27,14 @@ public class PowerBooster extends Generator{
 	public void drawSelect(Tile tile){
 		super.drawSelect(tile);
 
-		Draw.color("yellow");
+		Draw.color(Color.YELLOW);
 		Draw.dashCircle(tile.worldx(), tile.worldy(), powerRange * Vars.tilesize);
 		Draw.reset();
 	}
 
 	@Override
 	public void drawPlace(int x, int y, int rotation, boolean valid){
-		Draw.color("purple");
+		Draw.color(Color.PURPLE);
 		Draw.thick(1f);
 		Draw.dashCircle(x * Vars.tilesize, y * Vars.tilesize, powerRange * Vars.tilesize);
 		Draw.reset();
