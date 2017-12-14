@@ -5,7 +5,6 @@ import static io.anuke.mindustry.Vars.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
@@ -125,10 +124,6 @@ public class Input extends InputHandler{
 				Cursors.restoreCursor();
 			}
 		}
-	}
-	
-	public boolean cursorNear(){
-		return Vector2.dst(player.x, player.y, tilex() * tilesize, tiley() * tilesize) <= placerange;
 	}
 
 	public int tilex(){

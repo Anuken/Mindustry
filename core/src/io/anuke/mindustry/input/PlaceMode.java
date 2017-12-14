@@ -13,6 +13,7 @@ import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.utils.Cursors;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
 public enum PlaceMode{
@@ -47,16 +48,43 @@ public enum PlaceMode{
 		}
 	}, 
 	touch{
+		int maxlen = 10;
 		{
 			lockCamera = true;
 		}
 		
 		public void draw(int tilex, int tiley, int endx, int endy){
+			int maxlen = this.maxlen * Vars.tilesize;
 			
 			float t = Vars.tilesize;
 			
 			float x = tilex * t, y = tiley * t, 
 					x2 = endx * t, y2 = endy * t;
+			
+			if(Math.abs(x - x2) > Math.abs(y2 - y)){
+				y2 = y;
+			}else{
+				x2 = x;
+			}
+			
+			if(Math.abs(x2 - x) > maxlen){
+				x2 = Mathf.sign(x2 - x) * maxlen + x;
+			}
+			
+			if(Math.abs(y2 - y) > maxlen){
+				y2 = Mathf.sign(y2 - y) * maxlen + y;
+			}
+			
+			int rotation = 0;
+			
+			if(x2 > x)
+				rotation = 0;
+			if(x2 < x)
+				rotation = 2;
+			if(y2 > y)
+				rotation = 1;
+			if(y2 < y)
+				rotation = 3;
 			
 			if(x2 < x){
 				float d = x;
@@ -83,15 +111,48 @@ public enum PlaceMode{
 			if(tilex == endx && tiley == endy){
 				cursor.draw(tilex, tiley, endx, endy);
 			}else{
-				Draw.color(Color.GREEN);
+				Draw.thick(2f);
+				Draw.color(control.getInput().cursorNear() ? Color.PURPLE : Color.RED);
 				Draw.linerect(x, y, x2 - x, y2 - y);
 				Draw.alpha(0.3f);
 				Draw.crect("blank", x, y, x2 - x, y2 - y);
+				
+				if(player.recipe.result.rotate){
+					float cx = tilex * t, cy = tiley * t;
+					Draw.color(Color.ORANGE);
+					Tmp.v1.set(7, 0).rotate(rotation * 90);
+					Draw.line(cx, cy, cx + Tmp.v1.x, cy + Tmp.v1.y);
+				}
 				Draw.reset();
 			}
 		}
 		
 		public void tapped(int tilex, int tiley, int endx, int endy){
+			int prev = player.rotation;
+			
+			if(Math.abs(tilex - endx) > Math.abs(tiley - endy)){
+				endy = tiley;
+			}else{
+				endx = tilex;
+			}
+			
+			if(Math.abs(endx - tilex) > maxlen){
+				endx = Mathf.sign(endx - tilex) * maxlen + tilex;
+			}
+			
+			if(Math.abs(endy - tiley) > maxlen){
+				endy = Mathf.sign(endy - tiley) * maxlen + tiley;
+			}
+			
+			if(endx > tilex)
+				player.rotation = 0;
+			if(endx < tilex)
+				player.rotation = 2;
+			if(endy > tiley)
+				player.rotation = 1;
+			if(endy < tiley)
+				player.rotation = 3;
+			
 			if(endx < tilex){
 				int t = endx;
 				endx = tilex;
@@ -108,6 +169,8 @@ public enum PlaceMode{
 					control.getInput().tryPlaceBlock(x, y);
 				}
 			}
+			
+			player.rotation = prev;
 			
 		}
 	},
