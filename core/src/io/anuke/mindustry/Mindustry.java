@@ -2,7 +2,6 @@ package io.anuke.mindustry;
 
 import java.util.Date;
 
-import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.core.*;
@@ -14,7 +13,6 @@ import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.modules.ModuleCore;
-import io.anuke.ucore.util.Profiler;
 
 public class Mindustry extends ModuleCore {
 	public static Callable donationsCallable;
@@ -43,15 +41,11 @@ public class Mindustry extends ModuleCore {
 	
 	@Override
 	public void postInit(){
-		if(Vars.debug && Vars.debugGL){
-			GLProfiler.enable();
-		}
 		Vars.control.reset();
 	}
 	
 	@Override
 	public void render(){
-		Profiler.begin("total");
 		
 		try{
 			super.render();
@@ -66,7 +60,5 @@ public class Mindustry extends ModuleCore {
 		}
 		
 		Inputs.update();
-		
-		Profiler.end("total");
 	}
 }

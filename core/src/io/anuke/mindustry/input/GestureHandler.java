@@ -9,7 +9,6 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Mathf;
 
 public class GestureHandler extends GestureAdapter{
 	AndroidInput input;
@@ -29,14 +28,10 @@ public class GestureHandler extends GestureAdapter{
 	
 	@Override
 	public boolean tap (float x, float y, int count, int button) {
-		if(!ui.hasMouse() && player.recipe != null &&
-				Vars.control.hasItems(player.recipe.requirements) && !Vars.ui.hasMouse() && !input.brokeBlock){
-
-			player.placeMode.tapped(Mathf.scl2(x, Vars.tilesize), Mathf.scl2(y, Vars.tilesize), Mathf.scl2(x, Vars.tilesize), Mathf.scl2(y, Vars.tilesize));
-			
+		if(!player.placeMode.pan){
 			input.mousex = x;
 			input.mousey = y;
-			return true;
+			player.placeMode.tapped(input.getBlockX(), input.getBlockY());
 		}
 		return false;
 	}

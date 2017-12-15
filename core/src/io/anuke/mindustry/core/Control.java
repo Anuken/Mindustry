@@ -19,7 +19,7 @@ import io.anuke.mindustry.entities.enemies.BlastEnemy;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.HealerEnemy;
 import io.anuke.mindustry.input.AndroidInput;
-import io.anuke.mindustry.input.Input;
+import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
@@ -32,7 +32,6 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.graphics.Atlas;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Profiler;
 
 public class Control extends Module{
 	int targetscale = baseCameraScale;
@@ -65,10 +64,6 @@ public class Control extends Module{
 	public Control(){
 		if(Mindustry.args.contains("-debug", false))
 			Vars.debug = true;
-		if(Mindustry.args.contains("-profile", false))
-			Vars.profile = true;
-		if(Mindustry.args.contains("-debugGL", false))
-			Vars.debugGL = true;
 		
 		UCore.log("Total blocks loaded: " + Block.getAllBlocks().size);
 		
@@ -83,7 +78,7 @@ public class Control extends Module{
 		if(android){
 			input = new AndroidInput();
 		}else{
-			input = new Input();
+			input = new DesktopInput();
 		}
 		
 		Inputs.addProcessor(input);
@@ -111,7 +106,8 @@ public class Control extends Module{
 			"pause", Keys.SPACE,
 			"dash", Keys.SHIFT_LEFT,
 			"rotate_right", Keys.R,
-			"rotate_left", Keys.E
+			"rotate_left", Keys.E,
+			"area_delete_mode", Keys.Q
 		);
 		
 		for(int i = 0; i < Vars.saveSlots; i ++){
@@ -165,7 +161,7 @@ public class Control extends Module{
 		renderer.clearTiles();
 		
 		player.x = core.worldx();
-		player.y = core.worldy() - Vars.tilesize*2 - ((int)(Gdx.graphics.getWidth() / (float)Core.cameraScale * 2) % 2 == 0 ? 0.5f : 0);
+		player.y = core.worldy() - Vars.tilesize*2;
 		
 		Core.camera.position.set(player.x, player.y, 0);
 		
@@ -282,7 +278,7 @@ public class Control extends Module{
 		
 		int last = Settings.getInt("hiscore" + world.getMap().name());
 		
-		if(wave > last){
+		if(wave > last && mode != GameMode.sandbox){
 			Settings.putInt("hiscore" + world.getMap().name(), wave);
 			Settings.save();
 			hiscore = true;
@@ -522,10 +518,7 @@ public class Control extends Module{
 				if(wavetime <= 0){
 					runWave();
 				}
-			
-				Profiler.begin("entityUpdate");
 				
-				//TODO
 				Entities.update(Entities.defaultGroup());
 				Entities.update(bulletGroup);
 				Entities.update(enemyGroup);
@@ -533,8 +526,6 @@ public class Control extends Module{
 				
 				Entities.collideGroups(enemyGroup, bulletGroup);
 				Entities.collideGroups(Entities.defaultGroup(), bulletGroup);
-				
-				Profiler.end("entityUpdate");
 			}
 		}
 	}

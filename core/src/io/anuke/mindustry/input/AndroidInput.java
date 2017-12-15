@@ -7,7 +7,6 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.ItemStack;
@@ -20,9 +19,10 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 
 public class AndroidInput extends InputHandler{
+	public float lmousex, lmousey;
 	public float mousex, mousey;
 	public boolean brokeBlock = false;
-	private float lmousex, lmousey;
+	private boolean placing = true;
 	private float warmup;
 	private float warmupDelay = 20;
 	
@@ -34,11 +34,12 @@ public class AndroidInput extends InputHandler{
 	@Override public float getCursorEndY(){ return Gdx.input.getY(0); }
 	@Override public float getCursorX(){ return mousex; }
 	@Override public float getCursorY(){ return mousey; }
+	@Override public boolean drawPlace(){ return placing; }
 
 	@Override
 	public boolean keyDown(int keycode){
 		if(keycode == Keys.E){
-			place();
+			
 		}
 		return false;
 	}
@@ -46,26 +47,43 @@ public class AndroidInput extends InputHandler{
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button){
 		brokeBlock = false;
+		if(placing && pointer == 0 && !player.placeMode.pan){
+			player.placeMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
+			placing = false;
+		}
 		return false;
 	}
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button){
+		if(ui.hasMouse()) return false;
+		
 		ui.hideTooltip();
-		if(pointer == 0){
-			lmousex = screenX;
-			lmousey = screenY;
+		lmousex = screenX;
+		lmousey = screenY;
+		
+		if(!player.placeMode.pan){
+			if(pointer == 0){
+				placing = true;
+			
+				mousex = screenX;
+				mousey = screenY;
+			
+			}else{
+				placing = false;
+			}
 		}
+		
 		warmup = 0;
 
 		if(!GameState.is(State.menu)){
-			Tile cursor = Vars.world.tile(Mathf.scl2(Graphics.mouseWorld().x, tilesize), Mathf.scl2(Graphics.mouseWorld().y, tilesize));
-			if(cursor != null && !Vars.ui.hasMouse()){
+			Tile cursor = world.tile(Mathf.scl2(Graphics.mouseWorld().x, tilesize), Mathf.scl2(Graphics.mouseWorld().y, tilesize));
+			if(cursor != null && !ui.hasMouse()){
 				Tile linked = cursor.isLinked() ? cursor.getLinked() : cursor;
 				if(linked != null && linked.block() instanceof Configurable){
-					Vars.ui.showConfig(linked);
-				}else if(!Vars.ui.hasConfigMouse()){
-					Vars.ui.hideConfig();
+					ui.showConfig(linked);
+				}else if(!ui.hasConfigMouse()){
+					ui.hideConfig();
 				}
 			}
 		}
@@ -85,7 +103,7 @@ public class AndroidInput extends InputHandler{
 
 	public Tile selected(){
 		Vector2 vec = Graphics.world(mousex, mousey);
-		return Vars.world.tile(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize));
+		return world.tile(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize));
 	}
 
 	public void breakBlock(){
@@ -94,23 +112,18 @@ public class AndroidInput extends InputHandler{
 
 		if(player.breaktime >= tile.block().breaktime){
 			brokeBlock = true;
-			Vars.world.breakBlock(tile.x, tile.y);
+			breakBlock(tile.x, tile.y);
 			player.breaktime = 0f;
 		}
 	}
+	
+	public void tryPlaceBlock(int tilex, int tiley){
+		if(player.recipe != null && control.hasItems(player.recipe.requirements) && validPlace(tilex, tiley, player.recipe.result)){
 
-	public void place(){
-		Vector2 vec = Graphics.world(mousex, mousey);
-
-		int tilex = Mathf.scl2(vec.x, tilesize);
-		int tiley = Mathf.scl2(vec.y, tilesize);
-
-		if(player.recipe != null && Vars.control.hasItems(player.recipe.requirements) && Vars.world.validPlace(tilex, tiley, player.recipe.result)){
-
-			Vars.world.placeBlock(tilex, tiley, player.recipe.result, player.rotation, true);
+			placeBlock(tilex, tiley, player.recipe.result, player.rotation, true);
 
 			for(ItemStack stack : player.recipe.requirements){
-				Vars.control.removeItem(stack);
+				control.removeItem(stack);
 			}
 		}
 	}
@@ -132,7 +145,7 @@ public class AndroidInput extends InputHandler{
 			if(sel == null)
 				return;
 
-			if(warmup > warmupDelay && Vars.world.validBreak(sel.x, sel.y)){
+			if(warmup > warmupDelay && validBreak(sel.x, sel.y)){
 				player.breaktime += Timers.delta();
 
 				if(player.breaktime > selected().block().breaktime){
@@ -145,8 +158,6 @@ public class AndroidInput extends InputHandler{
 			mousey = ly;
 		}else{
 			warmup = 0;
-			//lmousex = Gdx.input.getX(0);
-			//lmousey = Gdx.input.getY(0);
 			player.breaktime = 0;
 
 			mousex = Mathf.clamp(mousex, 0, Gdx.graphics.getWidth());

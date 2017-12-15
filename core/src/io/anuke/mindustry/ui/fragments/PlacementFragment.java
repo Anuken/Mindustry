@@ -8,7 +8,6 @@ import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.ucore.scene.builders.imagebutton;
-import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.ButtonGroup;
@@ -28,8 +27,8 @@ public class PlacementFragment implements Fragment{
 				
 				new table("pane"){{
 					get().setTouchable(Touchable.enabled);
-					new label(()->"Placement Mode: [orange]" + player.placeMode.name()).pad(4).units(Unit.dp);
-					row();
+					//new label(()->"Placement Mode: [orange]" + player.placeMode.name()).pad(4).units(Unit.dp);
+					//row();
 					
 					aleft();
 					
@@ -37,19 +36,28 @@ public class PlacementFragment implements Fragment{
 						aleft();
 						ButtonGroup<ImageButton> group = new ButtonGroup<>();
 						
-						defaults().size(58, 62).pad(6).units(Unit.dp);
+						defaults().size(52, 56).pad(0).units(Unit.dp);
+						
+						int d = 0;
 						
 						for(PlaceMode mode : PlaceMode.values()){
+							if(!mode.shown) continue;
+							
 							new imagebutton("icon-" + mode.name(), "toggle",  Unit.dp.inPixels(10*3), ()->{
+								control.getInput().resetCursor();
 								player.placeMode = mode;
 							}){{
 								group.add(get());
-							}};
+							}}.padBottom(-5.5f).units(Unit.dp);
+							
+							if(++d % 2 == 0){
+								row();
+							}
 						}
 						
 						new imagebutton("icon-cancel", Unit.dp.inPixels(14*3), ()->{
 							player.recipe = null;
-						}).visible(()->player.recipe != null && player.placeMode == PlaceMode.touch);
+						}).visible(()->player.recipe != null && player.placeMode.showCancel);
 						
 						new imagebutton("icon-rotate-arrow", Unit.dp.inPixels(14*3), ()->{
 							player.rotation ++;
@@ -57,7 +65,7 @@ public class PlacementFragment implements Fragment{
 						}).update(i->{
 							i.getImage().setOrigin(Align.center);
 							i.getImage().setRotation(player.rotation*90);
-						}).visible(()->player.recipe != null && player.placeMode == PlaceMode.touch 
+						}).visible(() -> player.recipe != null && player.placeMode.showRotate 
 								&& player.recipe.result.rotate);
 						
 					}}.left().end();

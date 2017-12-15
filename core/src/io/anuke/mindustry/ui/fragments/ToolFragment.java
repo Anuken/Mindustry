@@ -27,8 +27,7 @@ public class ToolFragment implements Fragment{
 		});
 		
 		tools.addIButton("icon-check", Unit.dp.inPixels(42), ()->{
-			player.placeMode.tapped(control.getInput().getBlockX(), control.getInput().getBlockY(), 
-					control.getInput().getBlockEndX(), control.getInput().getBlockEndY());
+			player.placeMode.tapped(control.getInput().getBlockX(), control.getInput().getBlockY());
 		});
 		
 		Core.scene.add(tools);

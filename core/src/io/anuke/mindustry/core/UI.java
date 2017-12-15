@@ -32,7 +32,6 @@ import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.Window.WindowStyle;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Profiler;
 
 public class UI extends SceneModule{
 	Table loadingtable, desctable, configtable;
@@ -99,6 +98,12 @@ public class UI extends SceneModule{
 		Colors.put("healthstats", Color.SCARLET);
 		Colors.put("interact", Color.ORANGE);
 		Colors.put("accent", Color.valueOf("f4ba6e"));
+		Colors.put("place", Color.PURPLE);
+		Colors.put("placeInvalid", Color.RED);
+		Colors.put("placeRotate", Color.ORANGE);
+		Colors.put("break", Color.CORAL);
+		Colors.put("breakStart", Color.YELLOW);
+		Colors.put("breakInvalid", Color.RED);
 	}
 	
 	protected void loadSkin(){
@@ -133,8 +138,6 @@ public class UI extends SceneModule{
 	public void update(){
 		if(Vars.debug && !Vars.showUI) return;
 		
-		Profiler.begin("ui");
-		
 		if(nplay.visible()){
 			scene.getBatch().getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 			scene.getBatch().begin();
@@ -144,9 +147,8 @@ public class UI extends SceneModule{
 			scene.getBatch().end();
 		}
 		
-		super.update();
-		
-		Profiler.end("ui");
+		scene.act();
+		scene.draw();
 	}
 
 	@Override

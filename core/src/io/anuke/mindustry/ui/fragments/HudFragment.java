@@ -14,7 +14,6 @@ import io.anuke.mindustry.world.GameMode;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.function.StringSupplier;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.label;
@@ -25,7 +24,6 @@ import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Profiler;
 
 public class HudFragment implements Fragment{
 	private Table itemtable, respawntable;
@@ -137,26 +135,14 @@ public class HudFragment implements Fragment{
 			new table(){{
 				abottom();
 				aleft();
-				new label((StringSupplier)()->"[purple]tiles: " + Vars.control.tileGroup.amount()).left();
+				new label(()->"[purple]tiles: " + Vars.control.tileGroup.amount()).left();
 				row();
-				new label((StringSupplier)()->"[purple]enemies: " + Vars.control.enemyGroup.amount()).left();
+				new label(()->"[purple]enemies: " + Vars.control.enemyGroup.amount()).left();
 				row();
-				new label((StringSupplier)()->"[orange]noclip: " + Vars.noclip).left();
+				new label(()->"[orange]noclip: " + Vars.noclip).left();
 				row();
 				new label("[red]DEBUG MODE").scale(0.5f).left();
 			}}.end();
-			
-			if(profile){
-				new table(){{
-					atop();
-					new table("button"){{
-						defaults().left().growX();
-						atop();
-						aleft();
-						new label((StringSupplier)()->Profiler.formatDisplayTimes());
-					}}.width(400f).units(Unit.dp).end();
-				}}.end();
-			}
 		}
 	}
 
@@ -188,8 +174,6 @@ public class HudFragment implements Fragment{
 			}}.left().end();
 			
 			playButton(uheight);
-			//get().padTop(Unit.dp.inPixels(1));
-			//get().padBottom(Unit.dp.inPixels(1));
 		}}.height(uheight).units(Unit.dp).fillX().expandX().end();
 		
 	}

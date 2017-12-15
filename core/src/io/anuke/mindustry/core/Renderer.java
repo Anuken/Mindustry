@@ -1,11 +1,12 @@
 package io.anuke.mindustry.core;
 
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.ucore.core.Core.camera;
+import static io.anuke.ucore.core.Core.*;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.profiling.GLProfiler;
+import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.FloatArray;
@@ -22,16 +23,18 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.mindustry.world.blocks.types.StaticBlock;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.graphics.CacheBatch;
+import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Surface;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Tmp;
 
 public class Renderer extends RendererModule{
 	private final static int chunksize = 32;
@@ -56,6 +59,8 @@ public class Renderer extends RendererModule{
 				}
 			}
 		});
+		
+		clearColor = Hue.lightness(0.4f);
 	}
 
 	@Override
@@ -131,7 +136,7 @@ public class Renderer extends RendererModule{
 			if(Vars.snapCamera && smoothcam && Settings.getBool("pixelate")){
 				camera.position.set((int) camera.position.x, (int) camera.position.y, 0);
 			}
-
+			
 			if(Gdx.graphics.getHeight() / Core.cameraScale % 2 == 1){
 				camera.position.add(0, -0.5f, 0);
 			}
@@ -139,47 +144,82 @@ public class Renderer extends RendererModule{
 			if(Gdx.graphics.getWidth() / Core.cameraScale % 2 == 1){
 				camera.position.add(-0.5f, 0, 0);
 			}
-
-			Profiler.begin("draw");
-
-			drawDefault();
-
-			Profiler.end("draw");
-			if(Profiler.updating())
-				Profiler.getTimes().put("draw", Profiler.getTimes().get("draw") - Profiler.getTimes().get("blockDraw") - Profiler.getTimes().get("entityDraw"));
-
-			if(Vars.debug && Vars.debugGL && Timers.get("profile", 60)){
-				UCore.log("shaders: " + GLProfiler.shaderSwitches, "calls: " + GLProfiler.drawCalls, "bindings: " + GLProfiler.textureBindings, "vertices: " + GLProfiler.vertexCount.average);
-			}
+			
+			draw();
 
 			camera.position.set(lastx - deltax, lasty - deltay, 0);
 
 			record(); //this only does something if GdxGifRecorder is on the class path, which it usually isn't
 		}
 	}
+	FrameBuffer buffer = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
+	
+	void drawTest(){
+		camera.update();
+		
+		clearScreen(clearColor);
+		
+		Core.batch.setProjectionMatrix(camera.combined);
+		
+		Graphics.surface(pixelSurface, false);
+		
+		Draw.color(1f, 1f, 1f, Mathf.absin(Timers.time(), 10f, 1f));
+		Draw.rect("blank", camera.position.x, camera.position.y, camera.viewportWidth, camera.viewportHeight);
+		Draw.color();
+		
+		Graphics.surface(shadowSurface);
+		Draw.color(Color.RED);
+		Draw.alpha(0.5f);
+		Draw.rect("blank", camera.position.x, camera.position.y, 100, 100);
+		Draw.color();
+		Graphics.flushSurface();
+		
+		Graphics.flushSurface();
+		Graphics.end();
+	}
+	
+	void drawTest2(){
+		camera.update();
+		
+		clearScreen(clearColor);
+		Core.batch.setProjectionMatrix(camera.combined);
+
+		Graphics.surface(pixelSurface, false);
+		
+		Draw.color(1f, 1f, 1f, 0.3f);
+		Draw.rect("blank", camera.position.x, camera.position.y, camera.viewportWidth, camera.viewportHeight);
+		Draw.color();
+		
+		Graphics.flushSurface();
+	}
 
 	@Override
 	public void draw(){
+		camera.update();
+		
+		clearScreen(clearColor);
+		
+		batch.setProjectionMatrix(camera.combined);
+		
+		if(pixelate) 
+			Graphics.surface(pixelSurface, false);
+		else
+			batch.begin();
+		
 		//clears shield surface
 		Graphics.surface(shieldSurface);
 		Graphics.surface();
 		
 		boolean optimize = false;
-
-		Profiler.begin("blockDraw");
+		
 		drawFloor();
 		drawBlocks(false, optimize);
-		Profiler.end("blockDraw");
-
-		Profiler.begin("entityDraw");
 
 		Graphics.shader(Shaders.outline, false);
 		Entities.draw(control.enemyGroup);
 		Graphics.shader();
 
 		Entities.draw(Entities.defaultGroup());
-
-		Profiler.end("entityDraw");
 		
 		if(!optimize) drawBlocks(true, false);
 		
@@ -192,6 +232,12 @@ public class Renderer extends RendererModule{
 		if(Settings.getBool("indicators") && Vars.showUI){
 			drawEnemyMarkers();
 		}
+		
+
+		if(pixelate)
+			Graphics.flushSurface();
+		
+		batch.end();
 	}
 
 	@Override
@@ -476,9 +522,10 @@ public class Renderer extends RendererModule{
 		int tiley = control.input.getBlockY();
 
 		//draw placement box
-		if(player.recipe != null && Vars.control.hasItems(player.recipe.requirements) && (!ui.hasMouse() || android)){
+		if((player.recipe != null && Vars.control.hasItems(player.recipe.requirements) && (!ui.hasMouse() || android) 
+				&& control.input.drawPlace()) || (player.placeMode.delete && Inputs.keyDown("area_delete_mode"))){
 
-			player.placeMode.draw(tilex, tiley, control.input.getBlockEndX(), control.input.getBlockEndY()); //TODO proper end points
+			player.placeMode.draw(tilex, tiley, control.input.getBlockEndX(), control.input.getBlockEndY());
 
 			Draw.thickness(1f);
 			Draw.color(Color.SCARLET);

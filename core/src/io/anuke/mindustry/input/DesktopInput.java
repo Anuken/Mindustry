@@ -7,7 +7,6 @@ import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
 
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.ItemStack;
@@ -20,27 +19,27 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 
-public class Input extends InputHandler{
-	float mousex, mousey;
-	float endx, endy;
+public class DesktopInput extends InputHandler{
+	int mousex, mousey;
+	int endx, endy;
 	
 	@Override public float getCursorEndX(){ return endx; }
 	@Override public float getCursorEndY(){ return endy; }
-	@Override public float getCursorX(){ return Graphics.screen(mousex, mousey).x; }
-	@Override public float getCursorY(){ return Gdx.graphics.getHeight() - Graphics.screen(mousex, mousey).y; }
+	@Override public float getCursorX(){ return (int)(Graphics.screen(mousex, mousey).x + 2); }
+	@Override public float getCursorY(){ return (int)(Gdx.graphics.getHeight() - 1 - Graphics.screen(mousex, mousey).y); }
 	
 	@Override
 	public boolean touchDown (int screenX, int screenY, int pointer, int button){
 		if(button == Buttons.LEFT){
 			Vector2 vec = Graphics.world(screenX, screenY);
-			mousex = vec.x;
-			mousey = vec.y;
+			mousex = (int)vec.x;
+			mousey = (int)vec.y;
 		}
 		return false;
 	}
 	
 	public boolean touchUp(int screenX, int screenY, int pointer, int button){
-		player.placeMode.tapped(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
+		player.placeMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
 		return false;
 	}
 	
@@ -49,15 +48,14 @@ public class Input extends InputHandler{
 		if(player.isDead()) return;
 		
 		if(!Inputs.buttonDown(Buttons.LEFT)){
-			Vector2 vec = Graphics.world(Gdx.input.getX(), Gdx.input.getY());
-			mousex = vec.x;
-			mousey = vec.y;
+			mousex = (int)Graphics.mouseWorld().x;
+			mousey = (int)Graphics.mouseWorld().y;
 		}
 		endx = Gdx.input.getX();
 		endy = Gdx.input.getY();
 		
-		if(Inputs.scrolled() && Inputs.keyDown("zoom_hold") && !GameState.is(State.menu) && !Vars.ui.onDialog()){
-			Vars.renderer.scaleCamera(Inputs.scroll());
+		if(Inputs.scrolled() && Inputs.keyDown("zoom_hold") && !GameState.is(State.menu) && !ui.onDialog()){
+			renderer.scaleCamera(Inputs.scroll());
 		}
 		
 		if(Inputs.scrolled()){
@@ -72,6 +70,12 @@ public class Input extends InputHandler{
 			player.rotation ++;
 		}
 		
+		if(Inputs.keyDown("area_delete_mode")){
+			player.placeMode = PlaceMode.areaDelete;
+		}else{
+			player.placeMode = PlaceMode.hold;
+		}
+		
 		player.rotation = Mathf.mod(player.rotation, 4);
 		
 		for(int i = 0; i < 9; i ++){
@@ -81,19 +85,19 @@ public class Input extends InputHandler{
 			}
 		}
 		
-		Tile cursor = Vars.world.tile(tilex(), tiley());
+		Tile cursor = world.tile(tilex(), tiley());
 		
 		if(Inputs.buttonUp(Buttons.LEFT) && cursor != null){
 			Tile linked = cursor.isLinked() ? cursor.getLinked() : cursor;
 			if(linked != null && linked.block() instanceof Configurable){
-				Vars.ui.showConfig(linked);
-			}else if(!Vars.ui.hasConfigMouse()){
-				Vars.ui.hideConfig();
+				ui.showConfig(linked);
+			}else if(!ui.hasConfigMouse()){
+				ui.hideConfig();
 			}
 		}
 		
 		if(Inputs.buttonUp(Buttons.RIGHT)){
-			Vars.ui.hideConfig();
+			ui.hideConfig();
 		}
 
 		if(player.recipe != null && Inputs.buttonUp(Buttons.RIGHT)){
@@ -102,11 +106,11 @@ public class Input extends InputHandler{
 		}
 
 		//block breaking
-		if(Inputs.buttonDown(Buttons.RIGHT) && cursor != null && Vars.world.validBreak(tilex(), tiley())){
+		if(Inputs.buttonDown(Buttons.RIGHT) && cursor != null && validBreak(tilex(), tiley())){
 			Tile tile = cursor;
 			player.breaktime += Timers.delta();
 			if(player.breaktime >= tile.getBreakTime()){
-				Vars.world.breakBlock(cursor.x, cursor.y);
+				breakBlock(cursor.x, cursor.y);
 				player.breaktime = 0f;
 			}
 		}else{
@@ -117,16 +121,16 @@ public class Input extends InputHandler{
 	
 	public void tryPlaceBlock(int x, int y){
 		if(player.recipe != null && 
-				Vars.world.validPlace(x, y, player.recipe.result) && !ui.hasMouse() && cursorNear() &&
-				Vars.control.hasItems(player.recipe.requirements)){
+				validPlace(x, y, player.recipe.result) && !ui.hasMouse() && cursorNear() &&
+				control.hasItems(player.recipe.requirements)){
 			
-			Vars.world.placeBlock(x, y, player.recipe.result, player.rotation, true);
+			placeBlock(x, y, player.recipe.result, player.rotation, true);
 			
 			for(ItemStack stack : player.recipe.requirements){
-				Vars.control.removeItem(stack);
+				control.removeItem(stack);
 			}
 			
-			if(!Vars.control.hasItems(player.recipe.requirements)){
+			if(!control.hasItems(player.recipe.requirements)){
 				Cursors.restoreCursor();
 			}
 		}

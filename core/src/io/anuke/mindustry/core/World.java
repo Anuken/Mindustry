@@ -5,26 +5,21 @@ import static io.anuke.mindustry.Vars.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.effect.Fx;
-import io.anuke.mindustry.resource.ItemStack;
-import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Sounds;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
-import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Profiler;
 import io.anuke.ucore.util.Tmp;
 
 public class World extends Module{
@@ -43,9 +38,7 @@ public class World extends Module{
 	
 	@Override
 	public void update(){
-		Profiler.begin("pathfind");
 		pathfind.update();
-		Profiler.end("pathfind");
 	}
 	
 	@Override
@@ -190,7 +183,7 @@ public class World extends Module{
 		Generator.generate(mapPixmaps[map.ordinal()], tiles);
 		
 		//TODO multiblock core
-		placeBlock(control.getCore().x, control.getCore().y, ProductionBlocks.core, 0, false);
+		control.getInput().placeBlock(control.getCore().x, control.getCore().y, ProductionBlocks.core, 0, false);
 		
 		if(map != Map.tutorial){
 			setDefaultBlocks();
@@ -239,146 +232,6 @@ public class World extends Module{
 		return seed;
 	}
 	
-	//TODO move to control or player?
-	public void placeBlock(int x, int y, Block result, int rotation, boolean effects){
-		Tile tile = tile(x, y);
-		
-		//just in case
-		if(tile == null)
-			return;
-
-		tile.setBlock(result, rotation);
-		
-		if(result.isMultiblock()){
-			int offsetx = -(result.width-1)/2;
-			int offsety = -(result.height-1)/2;
-			
-			for(int dx = 0; dx < result.width; dx ++){
-				for(int dy = 0; dy < result.height; dy ++){
-					int worldx = dx + offsetx + x;
-					int worldy = dy + offsety + y;
-					if(!(worldx == x && worldy == y)){
-						Tile toplace = tile(worldx, worldy);
-						toplace.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
-					}
-					
-					if(effects) Effects.effect(Fx.place, worldx * Vars.tilesize, worldy * Vars.tilesize);
-				}
-			}
-		}else{
-			if(effects) Effects.effect(Fx.place, x * Vars.tilesize, y * Vars.tilesize);
-		}
-		
-		//Effects.shake(2f, 2f, player);
-		if(effects) Sounds.play("place");
-	}
-	
-	//TODO move this to control?
-	public boolean validPlace(int x, int y, Block type){
-		
-		for(SpawnPoint spawn : control.getSpawnPoints()){
-			if(Vector2.dst(x * tilesize, y * tilesize, spawn.start.worldx(), spawn.start.worldy()) < enemyspawnspace){
-				return false;
-			}
-		}
-		
-		Tmp.r2.setSize(type.width * Vars.tilesize, type.height * Vars.tilesize);
-		Vector2 offset = type.getPlaceOffset();
-		Tmp.r2.setCenter(offset.x + x * Vars.tilesize, offset.y + y * Vars.tilesize);
-
-		for(SolidEntity e : Entities.getNearby(control.enemyGroup, x * tilesize, y * tilesize, tilesize * 2f)){
-			Rectangle rect = e.hitbox.getRect(e.x, e.y);
-
-			if(Tmp.r2.overlaps(rect)){
-				return false;
-			}
-		}
-		
-		if(!Vars.android && Tmp.r2.overlaps(player.hitbox.getRect(player.x, player.y))){
-			return false;
-		}
-		
-		Tile tile = tile(x, y);
-		
-		if(tile == null) return false;
-		
-		if(!type.isMultiblock() && Vars.control.getTutorial().active() &&
-				Vars.control.getTutorial().showBlock()){
-			
-			GridPoint2 point = Vars.control.getTutorial().getPlacePoint();
-			int rotation = Vars.control.getTutorial().getPlaceRotation();
-			Block block = Vars.control.getTutorial().getPlaceBlock();
-			
-			if(type != block || point.x != x - control.getCore().x || point.y != y - control.getCore().y 
-					|| (rotation != -1 && rotation != Vars.player.rotation)){
-				return false;
-			}
-		}else if(Vars.control.getTutorial().active()){
-			return false;
-		}
-		
-		if(type.isMultiblock()){
-			int offsetx = -(type.width-1)/2;
-			int offsety = -(type.height-1)/2;
-			for(int dx = 0; dx < type.width; dx ++){
-				for(int dy = 0; dy < type.height; dy ++){
-					Tile other = tile(x + dx + offsetx, y + dy + offsety);
-					if(other == null || other.block() != Blocks.air){
-						return false;
-					}
-				}
-			}
-			return true;
-		}else{
-			if(tile.block() != type && type.canReplace(tile.block()) && tile.block().isMultiblock() == type.isMultiblock()){
-				return true;
-			}
-			return tile != null && tile.block() == Blocks.air;
-		}
-	}
-	
-	public void breakBlock(int x, int y){
-		Tile tile = tile(x, y);
-		
-		if(tile == null) return;
-		
-		Block block = tile.isLinked() ? tile.getLinked().block() : tile.block();
-		Recipe result = null;
-		
-		for(Recipe recipe : Recipe.values()){
-			if(recipe.result == block){
-				result = recipe;
-				break;
-			}
-		}
-		
-		if(result != null){
-			for(ItemStack stack : result.requirements){
-				Vars.control.addItem(stack.item, (int)(stack.amount * Vars.breakDropAmount));
-			}
-		}
-		
-		if(tile.block().drops != null){
-			Vars.control.addItem(tile.block().drops.item, tile.block().drops.amount);
-		}
-		
-		Effects.shake(3f, 1f, player);
-		Sounds.play("break");
-		
-		if(!tile.block().isMultiblock() && !tile.isLinked()){
-			tile.setBlock(Blocks.air);
-			Effects.effect(Fx.breakBlock, tile.worldx(), tile.worldy());
-		}else{
-			Tile target = tile.isLinked() ? tile.getLinked() : tile;
-			Array<Tile> removals = target.getLinkedTiles();
-			for(Tile toremove : removals){
-				//note that setting a new block automatically unlinks it
-				toremove.setBlock(Blocks.air);
-				Effects.effect(Fx.breakBlock, toremove.worldx(), toremove.worldy());
-			}
-		}
-	}
-	
 	public void removeBlock(Tile tile){
 		if(!tile.block().isMultiblock() && !tile.isLinked()){
 			tile.setBlock(Blocks.air);
@@ -390,34 +243,6 @@ public class World extends Module{
 				toremove.setBlock(Blocks.air);
 			}
 		}
-	}
-	
-	public boolean validBreak(int x, int y){
-		Tile tile = tile(x, y);
-		
-		if(tile == null || tile.block() == ProductionBlocks.core) return false;
-		
-		if(tile.isLinked() && tile.getLinked().block() == ProductionBlocks.core){
-			return false;
-		}
-		
-		if(Vars.control.getTutorial().active()){
-			
-			if(Vars.control.getTutorial().showBlock()){
-				GridPoint2 point = Vars.control.getTutorial().getPlacePoint();
-				int rotation = Vars.control.getTutorial().getPlaceRotation();
-				Block block = Vars.control.getTutorial().getPlaceBlock();
-			
-				if(block != Blocks.air || point.x != x - control.getCore().x || point.y != y - control.getCore().y 
-						|| (rotation != -1 && rotation != Vars.player.rotation)){
-					return false;
-				}
-			}else{
-				return false;
-			}
-		}
-		
-		return tile.breakable();
 	}
 	
 	public TileEntity findTileTarget(float x, float y, Tile tile, float range, boolean damaged){

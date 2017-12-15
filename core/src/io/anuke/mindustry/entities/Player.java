@@ -26,7 +26,7 @@ public class Player extends DestructibleEntity{
 	public transient float breaktime = 0;
 	public transient Recipe recipe;
 	public transient int rotation;
-	public transient PlaceMode placeMode = PlaceMode.touch;
+	public transient PlaceMode placeMode = android ? PlaceMode.cursor : PlaceMode.hold;
 	
 	public Player(){
 		hitbox.setSize(5);
@@ -86,7 +86,7 @@ public class Player extends DestructibleEntity{
 			vector.x += speed;
 		
 		boolean shooting = !Inputs.keyDown("dash") && Inputs.buttonDown(Buttons.LEFT) && recipe == null 
-				&& !ui.hasMouse() && !control.getInput().onConfigurable();
+				&& !ui.hasMouse() && !control.getInput().onConfigurable() && !Inputs.keyDown("area_delete_mode");
 		
 		if(shooting && Timers.get(this, "reload", weapon.reload)){
 			weapon.shoot(this);
@@ -108,7 +108,8 @@ public class Player extends DestructibleEntity{
 		}
 		
 		if(!shooting){
-			angle = Mathf.lerpAngDelta(angle, vector.angle(), 0.13f);
+			if(!vector.isZero())
+				angle = Mathf.lerpAngDelta(angle, vector.angle(), 0.13f);
 		}else{
 			float angle = Angles.mouseAngle(x, y);
 			this.angle = Mathf.lerpAngDelta(this.angle, angle, 0.1f);

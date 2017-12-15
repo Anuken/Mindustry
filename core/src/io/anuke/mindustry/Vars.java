@@ -9,7 +9,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class Vars{
-	public static final boolean testAndroid = false;
+	public static final boolean testAndroid = true;
 	//shorthand for whether or not this is running on android
 	public static final boolean android = (Gdx.app.getType() == ApplicationType.Android) || testAndroid;
 	//shorthand for whether or not this is running on GWT
@@ -34,10 +34,6 @@ public class Vars{
 	public static final int zoomScale = Math.round(Unit.dp.inPixels(1));
 	//if true, player speed will be increased, massive amounts of resources will be given on start, and other debug options will be available
 	public static boolean debug = false;
-	//whether to debug openGL info
-	public static boolean debugGL = false;
-	//whether profiling is shown
-	public static boolean profile = false;
 	//whether the player can clip through walls
 	public static boolean noclip = false;
 	//whether to draw chunk borders

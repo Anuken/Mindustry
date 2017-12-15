@@ -17,7 +17,6 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
-//TODO
 public class Sorter extends Junction implements Configurable{
 	
 	public Sorter(String name) {
