@@ -8,9 +8,7 @@ import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.PlaceMode;
-import io.anuke.ucore.scene.builders.button;
-import io.anuke.ucore.scene.builders.imagebutton;
-import io.anuke.ucore.scene.builders.table;
+import io.anuke.ucore.scene.builders.*;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
@@ -44,6 +42,8 @@ public class PlacementFragment implements Fragment{
 					touchable(Touchable.enabled);
 					
 					aleft();
+					new label("place mode");
+					row();
 					
 					new table("pane"){{
 						get().pad(5);
@@ -89,6 +89,9 @@ public class PlacementFragment implements Fragment{
 				visible(()->player.recipe == null && !GameState.is(State.menu));
 				abottom();
 				aleft();
+				
+				new label("break mode");
+				row();
 				
 				new table("pane"){{
 					get().pad(5);

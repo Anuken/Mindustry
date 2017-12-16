@@ -268,6 +268,14 @@ public class Renderer extends RendererModule{
 	}
 
 	void drawShield(){
+		if(control.shieldGroup.amount() == 0) return;
+		
+		Graphics.surface(Vars.renderer.shieldSurface, false);
+		Draw.color(Color.ROYAL);
+		Entities.draw(control.shieldGroup);
+		Draw.reset();
+		Graphics.surface();
+		
 		for(int i = 0; i < shieldHits.size / 3; i++){
 			//float x = hits.get(i*3+0);
 			//float y = hits.get(i*3+1);

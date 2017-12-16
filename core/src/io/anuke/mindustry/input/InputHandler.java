@@ -49,12 +49,12 @@ public abstract class InputHandler extends InputAdapter{
 		return Vector2.dst(player.x, player.y, getBlockX() * tilesize, getBlockY() * tilesize) <= placerange;
 	}
 	
-	public void tryPlaceBlock(int x, int y){
+	public void tryPlaceBlock(int x, int y, boolean sound){
 		if(player.recipe != null && 
 				validPlace(x, y, player.recipe.result) && !ui.hasMouse() && cursorNear() &&
 				Vars.control.hasItems(player.recipe.requirements)){
 			
-			placeBlock(x, y, player.recipe.result, player.rotation, true);
+			placeBlock(x, y, player.recipe.result, player.rotation, true, sound);
 			
 			for(ItemStack stack : player.recipe.requirements){
 				Vars.control.removeItem(stack);
@@ -66,9 +66,9 @@ public abstract class InputHandler extends InputAdapter{
 		}
 	}
 	
-	public void tryDeleteBlock(int x, int y){
+	public void tryDeleteBlock(int x, int y, boolean sound){
 		if(cursorNear() && validBreak(x, y)){
-			breakBlock(x, y);
+			breakBlock(x, y, sound);
 		}
 	}
 	
@@ -167,7 +167,7 @@ public abstract class InputHandler extends InputAdapter{
 		return tile.breakable();
 	}
 	
-	public void placeBlock(int x, int y, Block result, int rotation, boolean effects){
+	public void placeBlock(int x, int y, Block result, int rotation, boolean effects, boolean sound){
 		Tile tile = world.tile(x, y);
 		
 		//just in case
@@ -196,10 +196,10 @@ public abstract class InputHandler extends InputAdapter{
 			if(effects) Effects.effect(Fx.place, x * Vars.tilesize, y * Vars.tilesize);
 		}
 		
-		if(effects) Sounds.play("place");
+		if(effects && sound) Sounds.play("place");
 	}
 	
-	public void breakBlock(int x, int y){
+	public void breakBlock(int x, int y, boolean sound){
 		Tile tile = world.tile(x, y);
 		
 		if(tile == null) return;
@@ -225,7 +225,7 @@ public abstract class InputHandler extends InputAdapter{
 		}
 		
 		//Effects.shake(3f, 1f, player);
-		Sounds.play("break");
+		if(sound)Sounds.play("break");
 		
 		if(!tile.block().isMultiblock() && !tile.isLinked()){
 			tile.setBlock(Blocks.air);

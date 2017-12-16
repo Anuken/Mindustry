@@ -8,7 +8,6 @@ import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.Graphics;
@@ -33,7 +32,7 @@ public class AndroidInput extends InputHandler{
 	@Override public float getCursorEndY(){ return Gdx.input.getY(0); }
 	@Override public float getCursorX(){ return mousex; }
 	@Override public float getCursorY(){ return mousey; }
-	@Override public boolean drawPlace(){ return placing || (player.placeMode.pan && player.recipe != null); }
+	@Override public boolean drawPlace(){ return (placing && !brokeBlock) || (player.placeMode.pan && player.recipe != null); }
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button){
@@ -108,26 +107,15 @@ public class AndroidInput extends InputHandler{
 
 		if(player.breaktime >= tile.block().breaktime){
 			brokeBlock = true;
-			breakBlock(tile.x, tile.y);
+			breakBlock(tile.x, tile.y, true);
 			player.breaktime = 0f;
-		}
-	}
-	
-	public void tryPlaceBlock(int tilex, int tiley){
-		if(player.recipe != null && control.hasItems(player.recipe.requirements) && validPlace(tilex, tiley, player.recipe.result)){
-
-			placeBlock(tilex, tiley, player.recipe.result, player.rotation, true);
-
-			for(ItemStack stack : player.recipe.requirements){
-				control.removeItem(stack);
-			}
 		}
 	}
 
 	@Override
 	public void update(){
 
-		if(Gdx.input.isTouched(0) && Mathf.near2d(lmousex, lmousey, Gdx.input.getX(0), Gdx.input.getY(0), Unit.dp.inPixels(50))
+		if(player.recipe != null && Gdx.input.isTouched(0) && Mathf.near2d(lmousex, lmousey, Gdx.input.getX(0), Gdx.input.getY(0), Unit.dp.inPixels(50))
 				&& !ui.hasMouse()){
 			warmup += Timers.delta();
 

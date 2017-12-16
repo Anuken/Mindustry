@@ -15,6 +15,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.Fx;
+import io.anuke.mindustry.entities.effect.Shield;
 import io.anuke.mindustry.entities.enemies.BlastEnemy;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.HealerEnemy;
@@ -45,6 +46,7 @@ public class Control extends Module{
 	public final EntityGroup<Enemy> enemyGroup = Entities.addGroup(Enemy.class);
 	public final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);
 	public final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
+	public final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class);
 	
 	Array<EnemySpawn> spawns = new Array<>();
 	int wave = 1;

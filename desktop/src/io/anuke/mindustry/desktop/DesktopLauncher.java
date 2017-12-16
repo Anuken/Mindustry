@@ -17,9 +17,9 @@ public class DesktopLauncher {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setTitle("Mindustry");
 		config.setMaximized(true);
-		//config.useVsync(false);
-		config.setWindowedMode(800, 600);
+		config.setWindowedMode(960, 540);
 		config.setWindowIcon("sprites/icon.png");
+		//config.useVsync(false);
 		
 		Mindustry.formatter = new Formatter(){
 			SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm");

@@ -1,6 +1,5 @@
 package io.anuke.mindustry.entities.effect;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 
 import io.anuke.mindustry.Vars;
@@ -8,7 +7,6 @@ import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.defense.ShieldBlock;
 import io.anuke.ucore.core.Draw;
-import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BulletEntity;
 import io.anuke.ucore.entities.Entities;
@@ -75,13 +73,7 @@ public class Shield extends Entity{
 		}
 		
 		float rad = drawRadius();
-		
-		Graphics.surface(Vars.renderer.shieldSurface, false);
-		Draw.color(Color.ROYAL);
-		Draw.thick(2f);
 		Draw.rect("circle2", x, y, rad, rad);
-		Draw.reset();
-		Graphics.surface();
 	}
 	
 	float drawRadius(){
@@ -90,6 +82,11 @@ public class Shield extends Entity{
 	
 	public void removeDelay(){
 		active = false;
+	}
+	
+	@Override
+	public Shield add(){
+		return add(Vars.control.shieldGroup);
 	}
 	
 	@Override

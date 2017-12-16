@@ -12,7 +12,6 @@ _Keep in mind that this is just a basic outline of planned features, and will be
 - More indicators for when the core is damaged and/or under attack
 - Fix bugs with junction not accepting blocks (low FPS)
 - Fix bugs with tunnel merging and/or removing items (low FPS)
-- Investigate #6
 - Edit descriptions for conveyors to be more clear about how to use them
 - Add link to Mindustry discord everywhere
 - Balancing to slow down progression

@@ -183,7 +183,7 @@ public class World extends Module{
 		Generator.generate(mapPixmaps[map.ordinal()], tiles);
 		
 		//TODO multiblock core
-		control.getInput().placeBlock(control.getCore().x, control.getCore().y, ProductionBlocks.core, 0, false);
+		control.getInput().placeBlock(control.getCore().x, control.getCore().y, ProductionBlocks.core, 0, false, false);
 		
 		if(map != Map.tutorial){
 			setDefaultBlocks();

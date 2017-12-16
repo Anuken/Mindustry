@@ -58,7 +58,7 @@ public enum PlaceMode{
 		}
 		
 		public void tapped(int tilex, int tiley){
-			control.getInput().tryPlaceBlock(tilex, tiley);
+			control.getInput().tryPlaceBlock(tilex, tiley, true);
 		}
 	},
 	touch{
@@ -70,13 +70,19 @@ public enum PlaceMode{
 		}
 		
 		public void tapped(int x, int y){
-			control.getInput().tryPlaceBlock(x, y);
+			control.getInput().tryPlaceBlock(x, y, true);
+		}
+	},
+	none{
+		{
+			delete = true;
+			shown = true;
 		}
 	},
 	holdDelete{
 		{
 			delete = true;
-			shown = true;
+			shown = false;
 		}
 		
 		public void draw(int tilex, int tiley, int endx, int endy){
@@ -109,7 +115,7 @@ public enum PlaceMode{
 		}
 		
 		public void tapped(int x, int y){
-			control.getInput().tryDeleteBlock(x, y);
+			control.getInput().tryDeleteBlock(x, y, true);
 		}
 	},
 	areaDelete{
@@ -173,9 +179,12 @@ public enum PlaceMode{
 			tilex = this.tilex; tiley = this.tiley; 
 			endx = this.endx; endy = this.endy;
 			
+			boolean first = true;
+			
 			for(int cx = tilex; cx <= endx; cx ++){
 				for(int cy = tiley; cy <= endy; cy ++){
-					control.getInput().tryDeleteBlock(cx, cy);
+					control.getInput().tryDeleteBlock(cx, cy, first);
+					first = false;
 				}
 			}
 		}
@@ -207,7 +216,7 @@ public enum PlaceMode{
 			this.tiley = tiley;
 		}
 	},
-	hold{ //TODO multiblock support!
+	hold{
 		int maxlen = 10;
 		int tilex;
 		int tiley;
@@ -293,11 +302,13 @@ public enum PlaceMode{
 			
 			player.rotation = this.rotation;
 			
+			boolean first = true;
 			for(int x = 0; x <= Math.abs(this.endx - this.tilex); x ++){
 				for(int y = 0; y <= Math.abs(this.endy - this.tiley); y ++){
 					control.getInput().tryPlaceBlock(
 							tilex + x * Mathf.sign(endx - tilex), 
-							tiley + y * Mathf.sign(endy - tiley));
+							tiley + y * Mathf.sign(endy - tiley), first);
+					first = false;
 				}
 			}
 		}

@@ -9,7 +9,6 @@ import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Configurable;
@@ -110,30 +109,13 @@ public class DesktopInput extends InputHandler{
 			Tile tile = cursor;
 			player.breaktime += Timers.delta();
 			if(player.breaktime >= tile.getBreakTime()){
-				breakBlock(cursor.x, cursor.y);
+				breakBlock(cursor.x, cursor.y, true);
 				player.breaktime = 0f;
 			}
 		}else{
 			player.breaktime = 0f;
 		}
 
-	}
-	
-	public void tryPlaceBlock(int x, int y){
-		if(player.recipe != null && 
-				validPlace(x, y, player.recipe.result) && !ui.hasMouse() && cursorNear() &&
-				control.hasItems(player.recipe.requirements)){
-			
-			placeBlock(x, y, player.recipe.result, player.rotation, true);
-			
-			for(ItemStack stack : player.recipe.requirements){
-				control.removeItem(stack);
-			}
-			
-			if(!control.hasItems(player.recipe.requirements)){
-				Cursors.restoreCursor();
-			}
-		}
 	}
 
 	public int tilex(){
