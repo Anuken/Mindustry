@@ -28,7 +28,7 @@ public class GestureHandler extends GestureAdapter{
 	
 	@Override
 	public boolean tap (float x, float y, int count, int button) {
-		if(ui.hasMouse()) return false;
+		if(ui.hasMouse() || input.brokeBlock) return false;
 		
 		if(!player.placeMode.pan || player.recipe == null){
 			input.mousex = x;
@@ -58,7 +58,7 @@ public class GestureHandler extends GestureAdapter{
 	
 	@Override
 	public boolean pinch (Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
-		if(player.recipe == null)
+		if(player.recipe == null && !player.breakMode.lockCamera)
 			return false;
 		
 		if(pinch1.x < 0){

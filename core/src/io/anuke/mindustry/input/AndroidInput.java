@@ -37,7 +37,7 @@ public class AndroidInput extends InputHandler{
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button){
-		//if(ui.hasMouse()) return false;
+		if(brokeBlock) return false;
 		
 		brokeBlock = false;
 		if(placing && pointer == 0 && !player.placeMode.pan){

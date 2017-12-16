@@ -8,11 +8,11 @@ import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.PlaceMode;
+import io.anuke.ucore.scene.builders.button;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.ButtonGroup;
-import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
@@ -26,19 +26,19 @@ public class PlacementFragment implements Fragment{
 				visible(()->player.recipe != null && !GameState.is(State.menu));
 				abottom();
 				aleft();
-				
+				/*
 				Image image = new Image("icon-arrow");
-				image.setVisible(() -> player.recipe != null && player.recipe.result.rotate);
 				image.update(() -> { 
 					image.setRotation(player.rotation*90);
 					image.setOrigin(Align.center);
 				});
 				
 				new table("pane"){{
+					visible(() -> player.recipe != null && player.recipe.result.rotate);
 					add(image).size(40f).units(Unit.dp);
 				}}.size(54f).units(Unit.dp).end();
 				
-				row();
+				row();*/
 				
 				new table(){{
 					touchable(Touchable.enabled);
@@ -65,18 +65,21 @@ public class PlacementFragment implements Fragment{
 						
 						row();
 						
+						Color color = Color.GRAY;//Colors.get("accent"); //Color.valueOf("4d4d4d")
+						
 						new imagebutton("icon-cancel", Unit.dp.inPixels(14*3), ()->{
 							player.recipe = null;
-						}).imageColor(Color.valueOf("4d4d4d"))
+						}).imageColor(color)
 						.visible(()->player.recipe != null);
 						
-						new imagebutton("icon-rotate-left", Unit.dp.inPixels(14*3), ()->{
-							player.rotation = Mathf.mod(player.rotation + 1, 4);
-						}).imageColor(Color.valueOf("4d4d4d")).visible(() -> player.recipe != null);
+						new button("", ()->{}).get().setTouchable(Touchable.disabled);;
 						
-						new imagebutton("icon-rotate-right", Unit.dp.inPixels(14*3), ()->{
-							player.rotation = Mathf.mod(player.rotation - 1, 4);
-						}).imageColor(Color.valueOf("4d4d4d")).visible(() -> player.recipe != null);
+						new imagebutton("icon-arrow", Unit.dp.inPixels(14*3), ()->{
+							player.rotation = Mathf.mod(player.rotation + 1, 4);
+						}).imageColor(color).visible(() -> player.recipe != null).update(image ->{
+							image.getImage().setRotation(player.rotation*90);
+							image.getImage().setOrigin(Align.center);
+						});
 						
 					}}.left().end();
 				}}.end();
