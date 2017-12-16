@@ -16,7 +16,6 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.effect.Shaders;
 import io.anuke.mindustry.entities.enemies.Enemy;
-import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
@@ -132,7 +131,7 @@ public class Renderer extends RendererModule{
 			}
 
 			float lastx = camera.position.x, lasty = camera.position.y;
-
+			
 			if(Vars.snapCamera && smoothcam && Settings.getBool("pixelate")){
 				camera.position.set((int) camera.position.x, (int) camera.position.y, 0);
 			}
@@ -547,7 +546,6 @@ public class Renderer extends RendererModule{
 				Draw.dashCircle(spawn.start.worldx(), spawn.start.worldy(), enemyspawnspace);
 			}
 			
-			PlaceMode.holdDelete.draw(tilex, tiley, 0, 0);
 		}else if(player.breakMode.delete && control.input.drawPlace()){
 			player.breakMode.draw(control.input.getBlockX(), control.input.getBlockY(), 
 					control.input.getBlockEndX(), control.input.getBlockEndY());

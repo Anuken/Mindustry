@@ -16,19 +16,19 @@ public class Pump extends LiquidBlock{
 	protected final int timerDump = timers++;
 	
 	protected float pumpAmount = 2f;
-	protected float pumpTime = 8f;
 
 	public Pump(String name) {
 		super(name);
 		rotate = false;
 		solid = true;
 		layer = Layer.overlay;
+		flowfactor = 3f;
 	}
 	
 	@Override
 	public void getStats(Array<String> list){
 		super.getStats(list);
-		list.add("[liquidinfo]Pump Speed: " + Strings.toFixed(60f/pumpTime*pumpAmount, 1) + "/s");
+		list.add("[liquidinfo]Pump Speed: " + Strings.toFixed(60f*pumpAmount, 1) + "/s");
 	}
 	
 	@Override
@@ -63,13 +63,13 @@ public class Pump extends LiquidBlock{
 	public void update(Tile tile){
 		LiquidEntity entity = tile.entity();
 		
-		if(tile.floor().liquidDrop != null &&
-				entity.timer.get(timerPump, pumpTime) && entity.liquidAmount < liquidCapacity){
+		if(tile.floor().liquidDrop != null){
+			float maxPump = Math.min(liquidCapacity - entity.liquidAmount, pumpAmount);
 			entity.liquid = tile.floor().liquidDrop;
-			entity.liquidAmount += Math.min(pumpAmount, this.liquidCapacity - entity.liquidAmount);
+			entity.liquidAmount += maxPump;
 		}
 		
-		if(entity.timer.get(timerDump, pumpTime)){
+		if(entity.timer.get(timerDump, 2)){
 			tryDumpLiquid(tile);
 		}
 	}

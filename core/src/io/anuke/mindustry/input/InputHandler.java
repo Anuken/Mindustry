@@ -66,10 +66,12 @@ public abstract class InputHandler extends InputAdapter{
 		}
 	}
 	
-	public void tryDeleteBlock(int x, int y, boolean sound){
+	public boolean tryDeleteBlock(int x, int y, boolean sound){
 		if(cursorNear() && validBreak(x, y)){
 			breakBlock(x, y, sound);
+			return true;
 		}
+		return false;
 	}
 	
 	public boolean round2(){
@@ -225,7 +227,7 @@ public abstract class InputHandler extends InputAdapter{
 		}
 		
 		//Effects.shake(3f, 1f, player);
-		if(sound)Sounds.play("break");
+		if(sound) Sounds.play("break");
 		
 		if(!tile.block().isMultiblock() && !tile.isLinked()){
 			tile.setBlock(Blocks.air);

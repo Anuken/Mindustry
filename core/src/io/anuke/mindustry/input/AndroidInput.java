@@ -6,20 +6,25 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 
 public class AndroidInput extends InputHandler{
 	public float lmousex, lmousey;
 	public float mousex, mousey;
 	public boolean brokeBlock = false;
+	
+	private boolean enableHold = false;
 	private boolean placing = false;
 	private float warmup;
 	private float warmupDelay = 20;
@@ -115,7 +120,7 @@ public class AndroidInput extends InputHandler{
 	@Override
 	public void update(){
 
-		if(player.recipe != null && Gdx.input.isTouched(0) && Mathf.near2d(lmousex, lmousey, Gdx.input.getX(0), Gdx.input.getY(0), Unit.dp.inPixels(50))
+		if(enableHold && player.recipe != null && Gdx.input.isTouched(0) && Mathf.near2d(lmousex, lmousey, Gdx.input.getX(0), Gdx.input.getY(0), Unit.dp.inPixels(50))
 				&& !ui.hasMouse()){
 			warmup += Timers.delta();
 
@@ -148,13 +153,22 @@ public class AndroidInput extends InputHandler{
 			mousey = Mathf.clamp(mousey, 0, Gdx.graphics.getHeight());
 		}
 	}
-
-	public int touches(){
-		int sum = 0;
-		for(int i = 0; i < 10; i++){
-			if(Gdx.input.isTouched(i))
-				sum++;
+	
+	@Override
+	public void tryPlaceBlock(int x, int y, boolean sound){
+		if(player.recipe != null && 
+				validPlace(x, y, player.recipe.result) && cursorNear() &&
+				Vars.control.hasItems(player.recipe.requirements)){
+			
+			placeBlock(x, y, player.recipe.result, player.rotation, true, sound);
+			
+			for(ItemStack stack : player.recipe.requirements){
+				Vars.control.removeItem(stack);
+			}
+			
+			if(!Vars.control.hasItems(player.recipe.requirements)){
+				Cursors.restoreCursor();
+			}
 		}
-		return sum;
 	}
 }

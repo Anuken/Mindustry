@@ -135,6 +135,8 @@ public class HudFragment implements Fragment{
 			new table(){{
 				abottom();
 				aleft();
+				new label("[green]density: " + Gdx.graphics.getDensity()).left();
+				row();
 				new label(()->"[purple]tiles: " + Vars.control.tileGroup.amount()).left();
 				row();
 				new label(()->"[purple]enemies: " + Vars.control.enemyGroup.amount()).left();

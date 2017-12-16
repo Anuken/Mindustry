@@ -86,7 +86,7 @@ public class Shield extends Entity{
 	
 	@Override
 	public Shield add(){
-		return add(Vars.control.shieldGroup);
+		return super.add(Vars.control.shieldGroup);
 	}
 	
 	@Override

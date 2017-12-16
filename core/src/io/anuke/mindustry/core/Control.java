@@ -529,6 +529,7 @@ public class Control extends Module{
 				Entities.update(bulletGroup);
 				Entities.update(enemyGroup);
 				Entities.update(tileGroup);
+				Entities.update(shieldGroup);
 				
 				Entities.collideGroups(enemyGroup, bulletGroup);
 				Entities.collideGroups(Entities.defaultGroup(), bulletGroup);

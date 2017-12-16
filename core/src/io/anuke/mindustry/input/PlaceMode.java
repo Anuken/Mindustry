@@ -183,8 +183,9 @@ public enum PlaceMode{
 			
 			for(int cx = tilex; cx <= endx; cx ++){
 				for(int cy = tiley; cy <= endy; cy ++){
-					control.getInput().tryDeleteBlock(cx, cy, first);
-					first = false;
+					if(control.getInput().tryDeleteBlock(cx, cy, first)){
+						first = false;
+					}
 				}
 			}
 		}

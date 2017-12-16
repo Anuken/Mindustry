@@ -8,16 +8,17 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import io.anuke.mindustry.io.PlatformFunction;
 import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class AndroidLauncher extends AndroidApplication{
-	boolean doubleScaleTablets = false;
+	boolean doubleScaleTablets = true;
 
 	@SuppressLint("SimpleDateFormat")
 	@Override
@@ -51,22 +52,12 @@ public class AndroidLauncher extends AndroidApplication{
 		Mindustry.donationsCallable = new Callable(){ @Override public void run(){ showDonations(); } };
 
 		if(doubleScaleTablets){
-			DisplayMetrics metrics = new DisplayMetrics();
-			getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-			float yInches = metrics.heightPixels / metrics.ydpi;
-			float xInches = metrics.widthPixels / metrics.xdpi;
-			double diagonalInches = Math.sqrt(xInches * xInches + yInches * yInches);
-			if(diagonalInches >= 6.5){
-				// 6.5inch device or bigger
+			if(isTablet(this.getContext())){
 				Unit.dp.multiplier = 2f;
 			}else{
-				// smaller device
 				Unit.dp.multiplier = 1f;
 			}
 		}
-
-		//Mindustry.args.add("-debug");
 		
 		config.hideStatusBar = true;
 		
@@ -82,7 +73,13 @@ public class AndroidLauncher extends AndroidApplication{
 	    }
 	}
 	
-	void showDonations(){
+	private boolean isTablet(Context context) {
+	    boolean xlarge = ((context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE);
+	    boolean large = ((context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE);
+	    return (xlarge || large);
+	}
+	
+	private void showDonations(){
 		Intent intent = new Intent(this, DonationsActivity.class);
 		startActivity(intent);
 	}
