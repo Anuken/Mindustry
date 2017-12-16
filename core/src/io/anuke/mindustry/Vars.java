@@ -9,7 +9,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class Vars{
-	public static final boolean testAndroid = true;
+	public static final boolean testAndroid = false;
 	//shorthand for whether or not this is running on android
 	public static final boolean android = (Gdx.app.getType() == ApplicationType.Android) || testAndroid;
 	//shorthand for whether or not this is running on GWT
@@ -26,6 +26,8 @@ public class Vars{
 	public static final float aheadPathfinding = 60*20;
 	//how far away from spawn points the player can't place blocks
 	public static final float enemyspawnspace = 65;
+	//discord group URL
+	public static final String discordURL = "https://discord.gg/r8BkXNd";
 	//scale of the font
 	public static float fontscale = Unit.dp.inPixels(1f)/2f;
 	//camera zoom displayed on startup

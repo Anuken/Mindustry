@@ -1,5 +1,8 @@
 package io.anuke.mindustry.desktop;
 
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -9,7 +12,8 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.Mindustry;
-import io.anuke.mindustry.io.Formatter;
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.io.PlatformFunction;
 
 public class DesktopLauncher {
 	
@@ -21,7 +25,7 @@ public class DesktopLauncher {
 		config.setWindowIcon("sprites/icon.png");
 		//config.useVsync(false);
 		
-		Mindustry.formatter = new Formatter(){
+		Mindustry.platforms = new PlatformFunction(){
 			SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm");
 			
 			@Override
@@ -32,6 +36,16 @@ public class DesktopLauncher {
 			@Override
 			public String format(int number){
 				return NumberFormat.getIntegerInstance().format(number);
+			}
+			
+			@Override
+			public void openLink(String link){
+				try{
+					Desktop.getDesktop().browse(URI.create(link));
+				}catch(IOException e){
+					e.printStackTrace();
+					Vars.ui.showError("Error opening link.");
+				}
 			}
 		};
 		

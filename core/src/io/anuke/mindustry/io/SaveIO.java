@@ -127,7 +127,7 @@ public class SaveIO{
 		try(DataInputStream stream = new DataInputStream(fileFor(slot).read())){
 			stream.readInt();
 			Date date = new Date(stream.readLong());
-			return Mindustry.formatter.format(date);
+			return Mindustry.platforms.format(date);
 		}catch (IOException e){
 			throw new RuntimeException(e);
 		}

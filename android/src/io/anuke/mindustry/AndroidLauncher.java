@@ -9,9 +9,11 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import io.anuke.mindustry.io.Formatter;
+import io.anuke.mindustry.io.PlatformFunction;
+import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class AndroidLauncher extends AndroidApplication{
@@ -23,8 +25,9 @@ public class AndroidLauncher extends AndroidApplication{
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		config.useImmersiveMode = true;
-
-		Mindustry.formatter = new Formatter(){
+		
+		Mindustry.hasDiscord = isPackageInstalled("com.discord");
+		Mindustry.platforms = new PlatformFunction(){
 			SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm");
 
 			@Override
@@ -36,9 +39,16 @@ public class AndroidLauncher extends AndroidApplication{
 			public String format(int number){
 				return NumberFormat.getIntegerInstance().format(number);
 			}
+
+			@Override
+			public void openLink(String link){
+				Uri marketUri = Uri.parse(link);
+			    Intent intent = new Intent( Intent.ACTION_VIEW, marketUri );
+			    startActivity(intent); 
+			}
 		};
 		
-		Mindustry.donationsCallable = this::showDonations;
+		Mindustry.donationsCallable = new Callable(){ @Override public void run(){ showDonations(); } };
 
 		if(doubleScaleTablets){
 			DisplayMetrics metrics = new DisplayMetrics();
@@ -61,6 +71,15 @@ public class AndroidLauncher extends AndroidApplication{
 		config.hideStatusBar = true;
 		
 		initialize(new Mindustry(), config);
+	}
+	
+	private boolean isPackageInstalled(String packagename) {
+	    try {
+	    	getPackageManager().getPackageInfo(packagename, 0);
+	        return true;
+	    } catch (Exception e) {
+	        return false;
+	    }
 	}
 	
 	void showDonations(){

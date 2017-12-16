@@ -12,10 +12,11 @@ import com.google.gwt.dom.client.*;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.shared.DateTimeFormat;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 
 import io.anuke.mindustry.Mindustry;
-import io.anuke.mindustry.io.Formatter;
+import io.anuke.mindustry.io.PlatformFunction;
 
 public class HtmlLauncher extends GwtApplication {
     static final int WIDTH = 800;
@@ -88,7 +89,7 @@ public class HtmlLauncher extends GwtApplication {
             }
         });
         
-        Mindustry.formatter = new Formatter(){
+        Mindustry.platforms = new PlatformFunction(){
         	DateTimeFormat format = DateTimeFormat.getFormat("EEE, dd MMM yyyy HH:mm:ss");
 			
 			@Override
@@ -99,6 +100,11 @@ public class HtmlLauncher extends GwtApplication {
 			@Override
 			public String format(int number){
 				return NumberFormat.getDecimalFormat().format(number);
+			}
+
+			@Override
+			public void openLink(String link){
+				Window.open(link, "_blank", "");
 			}
 		};
         

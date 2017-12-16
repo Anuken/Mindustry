@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
+import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.ui.*;
@@ -37,7 +38,7 @@ public class UI extends SceneModule{
 	Table loadingtable, desctable, configtable;
 	MindustrySettingsDialog prefs;
 	MindustryKeybindDialog keys;
-	Dialog about, restart, levels, upgrades, load, settingserror, gameerror;
+	Dialog about, restart, levels, upgrades, load, settingserror, gameerror, discord;
 	MenuDialog menu;
 	Tooltip tooltip;
 	Tile configTile;
@@ -170,8 +171,15 @@ public class UI extends SceneModule{
 				+ "\n[ORANGE]anukendev@gmail.com[]"){{
 					setWrap(true);
 				}}).width(600f).units(Unit.dp).pad(10f);
-		gameerror.buttons().addButton("OK", ()-> gameerror.hide()).size(200f, 50).units(Unit.dp);
+		gameerror.buttons().addButton("OK", gameerror::hide).size(200f, 50).units(Unit.dp);
 		//gameerror.setFillParent(true);
+		
+		discord = new Dialog("Discord", "dialog");
+		discord.content().pad(Unit.dp.inPixels(12f));
+		discord.content().add("Join the mindustry discord!\n[orange]" + Vars.discordURL);
+		discord.buttons().defaults().size(200f, 50).units(Unit.dp);
+		discord.buttons().addButton("Open link", () -> Mindustry.platforms.openLink(Vars.discordURL));
+		discord.buttons().addButton("Back", discord::hide);
 		
 		load = new LoadDialog();
 		
@@ -425,6 +433,10 @@ public class UI extends SceneModule{
 	
 	public void showUpgrades(){
 		upgrades.show();
+	}
+	
+	public void showDiscord(){
+		discord.show();
 	}
 
 	public void updateItems(){

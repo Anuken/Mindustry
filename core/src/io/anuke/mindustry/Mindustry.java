@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.io.Formatter;
+import io.anuke.mindustry.io.PlatformFunction;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.ucore.core.Inputs;
@@ -16,10 +16,12 @@ import io.anuke.ucore.modules.ModuleCore;
 
 public class Mindustry extends ModuleCore {
 	public static Callable donationsCallable;
+	public static boolean hasDiscord = true;
 	public static Array<String> args = new Array<>();
-	public static Formatter formatter = new Formatter(){
+	public static PlatformFunction platforms = new PlatformFunction(){
 		@Override public String format(Date date){ return "invalid date"; }
 		@Override public String format(int number){ return number + ""; }
+		@Override public void openLink(String link){ }
 	};
 	
 	//always initialize blocks in this order, otherwise there are ID errors

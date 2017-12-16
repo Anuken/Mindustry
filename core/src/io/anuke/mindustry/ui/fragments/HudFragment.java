@@ -169,7 +169,7 @@ public class HudFragment implements Fragment{
 						(control.getTutorial().active() || Vars.control.getMode() == GameMode.sandbox) ? "waiting..." : "Wave in " + (int) (control.getWaveCountdown() / 60f))
 				.minWidth(140).units(Unit.dp).left();
 
-				get().pad(Unit.dp.inPixels(12));
+				margin(12f);
 				get().padLeft(6);
 			}}.left().end();
 			
@@ -206,7 +206,7 @@ public class HudFragment implements Fragment{
 		for(int i = 0; i < control.getItems().length; i ++){
 			int amount = control.getItems()[i];
 			if(amount == 0) continue;
-			String formatted = Mindustry.formatter.format(amount);
+			String formatted = Mindustry.platforms.format(amount);
 			if(amount > 99999999){
 				formatted = "inf";
 			}

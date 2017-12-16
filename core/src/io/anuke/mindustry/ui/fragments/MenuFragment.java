@@ -1,7 +1,5 @@
 package io.anuke.mindustry.ui.fragments;
 
-import static io.anuke.mindustry.Vars.*;
-
 import com.badlogic.gdx.Gdx;
 
 import io.anuke.mindustry.Mindustry;
@@ -13,6 +11,11 @@ import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.layout.Unit;
+
+import static io.anuke.mindustry.Vars.android;
+import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.gwt;
+import static io.anuke.mindustry.Vars.ui;
 
 public class MenuFragment implements Fragment{
 	
@@ -77,9 +80,14 @@ public class MenuFragment implements Fragment{
 		//settings icon
 		new table(){{
 			atop().aright();
+			if(Mindustry.hasDiscord){
+				new imagebutton("icon-discord", Unit.dp.inPixels(30f), ()->{
+					ui.showDiscord();
+				}).margin(14);
+			}
 			new imagebutton("icon-info", Unit.dp.inPixels(30f), ()->{
 				ui.showAbout();
-			}).get().pad(Unit.dp.inPixels(14));
+			}).margin(14);
 		}}.end().visible(()->GameState.is(State.menu));
 	}
 }

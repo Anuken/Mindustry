@@ -46,7 +46,7 @@ public class PlacementFragment implements Fragment{
 					row();
 					
 					new table("pane"){{
-						get().pad(5);
+						margin(5f);
 						aleft();
 						ButtonGroup<ImageButton> group = new ButtonGroup<>();
 						
@@ -94,7 +94,7 @@ public class PlacementFragment implements Fragment{
 				row();
 				
 				new table("pane"){{
-					get().pad(5);
+					margin(5f);
 					touchable(Touchable.enabled);
 					aleft();
 					ButtonGroup<ImageButton> group = new ButtonGroup<>();

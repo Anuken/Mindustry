@@ -123,7 +123,7 @@ public class BlocksFragment implements Fragment{
 				
 				row();
 				add(stack).colspan(Section.values().length);
-				get().pad(10f);
+				margin(10f);
 				
 				get().padLeft(0f);
 				get().padRight(0f);

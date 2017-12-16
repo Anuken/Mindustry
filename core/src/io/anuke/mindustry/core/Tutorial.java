@@ -43,7 +43,7 @@ public class Tutorial{
 		
 		new table("pane"){{
 			atop();
-			get().pad(Unit.dp.inPixels(12));
+			margin(12);
 			
 			info = new label(()->stage.text).pad(10f).padBottom(5f).width(340f).units(Unit.dp).colspan(2).get();
 			info.setWrap(true);

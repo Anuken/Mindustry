@@ -42,7 +42,7 @@ public class EditorUI extends SceneModule{
 					}).left();
 					row();
 				}
-				get().pad(16);
+				margin(16);
 			}}.end();
 		}}.end();
 		build.end();
