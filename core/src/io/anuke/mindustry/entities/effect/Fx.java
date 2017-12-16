@@ -1,6 +1,7 @@
 package io.anuke.mindustry.entities.effect;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Colors;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.ucore.core.Draw;
@@ -311,8 +312,11 @@ public class Fx{
 
 	breakBlock = new Effect(12, e -> {
 		Draw.thickness(2f);
-		Draw.color(Color.WHITE, Color.GRAY, e.ifract());
-		Draw.spikes(e.x, e.y, e.ifract() * 5f, 2, 5);
+		Draw.color(Color.WHITE, Colors.get("break"), e.ifract());
+		Draw.spikes(e.x, e.y, e.ifract() * 5f, 2, 5, 90);
+		
+		Draw.thickness(2f - e.ifract() * 2f);
+		Draw.polygon(4, e.x, e.y, Vars.tilesize / 1.6f + e.ifract() * 5f, 45);
 		Draw.reset();
 	}),
 

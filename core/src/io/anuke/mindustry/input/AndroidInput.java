@@ -37,10 +37,12 @@ public class AndroidInput extends InputHandler{
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button){
-		if(brokeBlock) return false;
+		if(brokeBlock){
+			brokeBlock = false;
+			return false;
+		}
 		
-		brokeBlock = false;
-		if(placing && pointer == 0 && !player.placeMode.pan){
+		if(placing && pointer == 0 && !player.placeMode.pan && player.recipe != null){
 			player.placeMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
 		}else if(pointer == 0 && !player.breakMode.pan && player.recipe == null && drawPlace()){
 			player.breakMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
