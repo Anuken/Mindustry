@@ -3,7 +3,6 @@ package io.anuke.mindustry.input;
 import static io.anuke.mindustry.Vars.*;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 
@@ -22,7 +21,7 @@ public class AndroidInput extends InputHandler{
 	public float lmousex, lmousey;
 	public float mousex, mousey;
 	public boolean brokeBlock = false;
-	private boolean placing = true;
+	private boolean placing = false;
 	private float warmup;
 	private float warmupDelay = 20;
 	
@@ -34,23 +33,19 @@ public class AndroidInput extends InputHandler{
 	@Override public float getCursorEndY(){ return Gdx.input.getY(0); }
 	@Override public float getCursorX(){ return mousex; }
 	@Override public float getCursorY(){ return mousey; }
-	@Override public boolean drawPlace(){ return placing; }
-
-	@Override
-	public boolean keyDown(int keycode){
-		if(keycode == Keys.E){
-			
-		}
-		return false;
-	}
+	@Override public boolean drawPlace(){ return placing || (player.placeMode.pan && player.recipe != null); }
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button){
+		//if(ui.hasMouse()) return false;
+		
 		brokeBlock = false;
 		if(placing && pointer == 0 && !player.placeMode.pan){
 			player.placeMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
-			placing = false;
+		}else if(pointer == 0 && !player.breakMode.pan && player.recipe == null && drawPlace()){
+			player.breakMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
 		}
+		placing = false;
 		return false;
 	}
 
@@ -62,16 +57,15 @@ public class AndroidInput extends InputHandler{
 		lmousex = screenX;
 		lmousey = screenY;
 		
-		if(!player.placeMode.pan){
-			if(pointer == 0){
-				placing = true;
-			
-				mousex = screenX;
-				mousey = screenY;
-			
-			}else{
-				placing = false;
-			}
+		if((!player.placeMode.pan || player.recipe == null) && pointer == 0){
+			mousex = screenX;
+			mousey = screenY;
+		}
+		
+		if(pointer != 0){
+			placing = false;
+		}else{
+			placing = true;
 		}
 		
 		warmup = 0;

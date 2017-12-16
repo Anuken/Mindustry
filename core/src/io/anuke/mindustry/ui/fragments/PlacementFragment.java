@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui.fragments;
 
 import static io.anuke.mindustry.Vars.*;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Align;
 
 import io.anuke.mindustry.core.GameState;
@@ -11,8 +12,10 @@ import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.ButtonGroup;
+import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.Mathf;
 
 public class PlacementFragment implements Fragment{
 	
@@ -24,54 +27,91 @@ public class PlacementFragment implements Fragment{
 				abottom();
 				aleft();
 				
+				Image image = new Image("icon-arrow");
+				image.setVisible(() -> player.recipe != null && player.recipe.result.rotate);
+				image.update(() -> { 
+					image.setRotation(player.rotation*90);
+					image.setOrigin(Align.center);
+				});
 				
 				new table("pane"){{
-					get().setTouchable(Touchable.enabled);
-					//new label(()->"Placement Mode: [orange]" + player.placeMode.name()).pad(4).units(Unit.dp);
-					//row();
+					add(image).size(40f).units(Unit.dp);
+				}}.size(54f).units(Unit.dp).end();
+				
+				row();
+				
+				new table(){{
+					touchable(Touchable.enabled);
 					
 					aleft();
 					
-					new table(){{
+					new table("pane"){{
+						get().pad(5);
 						aleft();
 						ButtonGroup<ImageButton> group = new ButtonGroup<>();
 						
-						defaults().size(52, 56).pad(0).units(Unit.dp);
-						
-						int d = 0;
+						defaults().size(54, 58).pad(0).units(Unit.dp);
 						
 						for(PlaceMode mode : PlaceMode.values()){
-							if(!mode.shown) continue;
+							if(!mode.shown || mode.delete) continue;
+							
+							defaults().padBottom(-5.5f);
 							
 							new imagebutton("icon-" + mode.name(), "toggle",  Unit.dp.inPixels(10*3), ()->{
 								control.getInput().resetCursor();
 								player.placeMode = mode;
-							}){{
-								group.add(get());
-							}}.padBottom(-5.5f).units(Unit.dp);
-							
-							if(++d % 2 == 0){
-								row();
-							}
+							}).group(group).units(Unit.dp);	
 						}
+						
+						row();
 						
 						new imagebutton("icon-cancel", Unit.dp.inPixels(14*3), ()->{
 							player.recipe = null;
-						}).visible(()->player.recipe != null && player.placeMode.showCancel);
+						}).imageColor(Color.valueOf("4d4d4d"))
+						.visible(()->player.recipe != null);
 						
-						new imagebutton("icon-rotate-arrow", Unit.dp.inPixels(14*3), ()->{
-							player.rotation ++;
-							player.rotation %= 4;
-						}).update(i->{
-							i.getImage().setOrigin(Align.center);
-							i.getImage().setRotation(player.rotation*90);
-						}).visible(() -> player.recipe != null && player.placeMode.showRotate 
-								&& player.recipe.result.rotate);
+						new imagebutton("icon-rotate-left", Unit.dp.inPixels(14*3), ()->{
+							player.rotation = Mathf.mod(player.rotation + 1, 4);
+						}).imageColor(Color.valueOf("4d4d4d")).visible(() -> player.recipe != null);
+						
+						new imagebutton("icon-rotate-right", Unit.dp.inPixels(14*3), ()->{
+							player.rotation = Mathf.mod(player.rotation - 1, 4);
+						}).imageColor(Color.valueOf("4d4d4d")).visible(() -> player.recipe != null);
 						
 					}}.left().end();
 				}}.end();
 			}}.end();
-		
+			
+			new table(){{
+				visible(()->player.recipe == null && !GameState.is(State.menu));
+				abottom();
+				aleft();
+				
+				new table("pane"){{
+					get().pad(5);
+					touchable(Touchable.enabled);
+					aleft();
+					ButtonGroup<ImageButton> group = new ButtonGroup<>();
+					
+					defaults().size(54, 58).pad(0).units(Unit.dp);
+					
+					int d = 0;
+					
+					for(PlaceMode mode : PlaceMode.values()){
+						if(!mode.shown || !mode.delete) continue;
+						
+						defaults().padBottom(d < 2 ? -5.5f : 0);
+						
+						new imagebutton("icon-" + mode.name(), "toggle",  Unit.dp.inPixels(10*3), ()->{
+							control.getInput().resetCursor();
+							player.breakMode = mode;
+						}){{
+							group.add(get());
+						}}.units(Unit.dp);
+					}
+					
+				}}.end();
+			}}.end();
 		}
 	}
 }

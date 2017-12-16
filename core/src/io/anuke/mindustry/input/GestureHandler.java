@@ -28,20 +28,27 @@ public class GestureHandler extends GestureAdapter{
 	
 	@Override
 	public boolean tap (float x, float y, int count, int button) {
-		if(!player.placeMode.pan){
+		if(ui.hasMouse()) return false;
+		
+		if(!player.placeMode.pan || player.recipe == null){
 			input.mousex = x;
 			input.mousey = y;
-			player.placeMode.tapped(input.getBlockX(), input.getBlockY());
+			
+			if(player.recipe == null)
+				player.breakMode.tapped(input.getBlockX(), input.getBlockY());
+			else
+				player.placeMode.tapped(input.getBlockX(), input.getBlockY());
 		}
 		return false;
 	}
 	
 	@Override
 	public boolean pan(float x, float y, float deltaX, float deltaY){
-		if(player.recipe == null || !Vars.control.hasItems(player.recipe.requirements) || !player.placeMode.lockCamera){
+		if(!(player.recipe != null && Vars.control.hasItems(player.recipe.requirements) && player.placeMode.lockCamera) &&
+				!(player.recipe == null && player.breakMode.lockCamera)){
 			player.x -= deltaX*Core.camera.zoom/Core.cameraScale;
 			player.y += deltaY*Core.camera.zoom/Core.cameraScale;
-		}else if(player.placeMode.lockCamera){
+		}else if(player.placeMode.lockCamera && (player.placeMode.pan && player.recipe != null)){
 			input.mousex += deltaX;
 			input.mousey += deltaY;
 		}

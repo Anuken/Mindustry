@@ -144,7 +144,7 @@ public class Block{
 	 * containers, it gets added to the block's inventory.*/
 	protected void offloadNear(Tile tile, Item item){
 		byte i = tile.getDump();
-		byte pdump = i;
+		byte pdump = (byte)(i % 4);
 		
 		Tile[] tiles = tile.getNearby();
 		

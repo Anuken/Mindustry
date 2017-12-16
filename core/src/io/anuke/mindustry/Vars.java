@@ -9,7 +9,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class Vars{
-	public static final boolean testAndroid = true;
+	public static final boolean testAndroid = false;
 	//shorthand for whether or not this is running on android
 	public static final boolean android = (Gdx.app.getType() == ApplicationType.Android) || testAndroid;
 	//shorthand for whether or not this is running on GWT

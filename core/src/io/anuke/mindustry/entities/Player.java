@@ -27,6 +27,7 @@ public class Player extends DestructibleEntity{
 	public transient Recipe recipe;
 	public transient int rotation;
 	public transient PlaceMode placeMode = android ? PlaceMode.cursor : PlaceMode.hold;
+	public transient PlaceMode breakMode = PlaceMode.holdDelete;
 	
 	public Player(){
 		hitbox.setSize(5);

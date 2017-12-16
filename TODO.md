@@ -12,6 +12,15 @@ _Keep in mind that this is just a basic outline of planned features, and will be
 - Fix bugs with junction not accepting blocks(low FPS)
 - Fix bugs with tunnel merging and/or removing items (low FPS)
 - Investigate #6
+- Edit descriptions for conveyors to be more clear about how to use them
+- Add link to Mindustry discord everywhere
+
+### Major Bugs
+- Black screen when tabbing out on Android
+- Infinite explosions that destroy blocks
+- Random map reload when playing, leading to a crash (UI cause?)
+- Google Payments verify crash
+- Google Payments IllegalArgument crash
 
 ### 4.0 Planned
 - Multiplayer framework, possibly implementation

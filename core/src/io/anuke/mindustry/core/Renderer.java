@@ -520,29 +520,32 @@ public class Renderer extends RendererModule{
 		
 		int tilex = control.input.getBlockX();
 		int tiley = control.input.getBlockY();
-
-		//draw placement box
-		if((player.recipe != null && Vars.control.hasItems(player.recipe.requirements) && (!ui.hasMouse() || android) 
-				&& control.input.drawPlace()) || (player.placeMode.delete && Inputs.keyDown("area_delete_mode"))){
-
-			player.placeMode.draw(tilex, tiley, control.input.getBlockEndX(), control.input.getBlockEndY());
-
-			Draw.thickness(1f);
-			Draw.color(Color.SCARLET);
-			for(SpawnPoint spawn : control.getSpawnPoints()){
-				Draw.dashCircle(spawn.start.worldx(), spawn.start.worldy(), enemyspawnspace);
-			}
-
-			Draw.reset();
-		}
 		
 		if(Vars.android){
 			Vector2 vec = Graphics.world(Gdx.input.getX(0), Gdx.input.getY(0));
 			tilex = Mathf.scl2(vec.x, tilesize);
 			tiley = Mathf.scl2(vec.y, tilesize);
 		}
+
+		//draw placement box
+		if((player.recipe != null && Vars.control.hasItems(player.recipe.requirements) && (!ui.hasMouse() || android) 
+				&& control.input.drawPlace()) || (player.placeMode.delete && Inputs.keyDown("area_delete_mode"))){
+
+			player.placeMode.draw(control.input.getBlockX(), control.input.getBlockY(), control.input.getBlockEndX(), control.input.getBlockEndY());
+			
+			Draw.thickness(1f);
+			Draw.color(Color.SCARLET);
+			for(SpawnPoint spawn : control.getSpawnPoints()){
+				Draw.dashCircle(spawn.start.worldx(), spawn.start.worldy(), enemyspawnspace);
+			}
+			
+			PlaceMode.holdDelete.draw(tilex, tiley, 0, 0);
+		}else if(player.breakMode.delete && control.input.drawPlace()){
+			player.breakMode.draw(control.input.getBlockX(), control.input.getBlockY(), 
+					control.input.getBlockEndX(), control.input.getBlockEndY());
+		}
 		
-		PlaceMode.breaker.draw(tilex, tiley, 0, 0);
+		Draw.reset();
 
 		//draw selected block health
 		if(player.recipe == null && !ui.hasMouse()){

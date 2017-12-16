@@ -36,7 +36,7 @@ public class Router extends Block{
 		//TODO fix, check issue
 		tile.setRotation((byte)Mathf.mod(tile.getRotation(), 4));
 		
-		if(tile.entity.timer.get(timerDump, 2) && tile.entity.totalItems() > 0){
+		if(tile.entity.totalItems() > 0){
 			if(tile.getExtra() != tile.getRotation() 
 					|| Mathf.chance(0.35)){ //sometimes dump backwards at a 1/4 chance... this somehow works?
 				tryDump(tile, tile.getRotation(), null);

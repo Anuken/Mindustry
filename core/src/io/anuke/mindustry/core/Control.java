@@ -421,6 +421,7 @@ public class Control extends Module{
 	public void update(){
 		
 		if(debug){
+			//debug actions
 			if(Inputs.keyUp(Keys.P)){
 				Effects.effect(Fx.shellsmoke, player);
 				Effects.effect(Fx.shellexplosion, player);
@@ -436,7 +437,10 @@ public class Control extends Module{
 			}
 			
 			if(Inputs.keyUp(Keys.C)){
-				GameState.set(State.playing);
+				//crash cause:
+				//map is null.
+				//core is null.
+				//tiles are null.
 			}
 			
 			if(Inputs.keyUp(Keys.U)){
@@ -452,7 +456,7 @@ public class Control extends Module{
 					new HealerEnemy().set(player.x, player.y).add();
 				}else{
 					float px = player.x, py = player.y;
-					Timers.run(30f, ()->new BlastEnemy().set(px, py).add());
+					Timers.run(30f, ()-> new BlastEnemy().set(px, py).add());
 				}
 			}
 		}

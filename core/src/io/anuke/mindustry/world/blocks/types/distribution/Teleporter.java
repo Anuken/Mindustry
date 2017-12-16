@@ -38,6 +38,7 @@ public class Teleporter extends Block implements Configurable{
 		super(name);
 		update = true;
 		solid = true;
+		health = 80;
 	}
 	
 	@Override

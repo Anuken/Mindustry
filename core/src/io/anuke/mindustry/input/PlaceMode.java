@@ -58,7 +58,6 @@ public enum PlaceMode{
 		}
 		
 		public void tapped(int tilex, int tiley){
-			System.out.println("tap " + tilex + " " + tiley);
 			control.getInput().tryPlaceBlock(tilex, tiley);
 		}
 	},
@@ -72,6 +71,45 @@ public enum PlaceMode{
 		
 		public void tapped(int x, int y){
 			control.getInput().tryPlaceBlock(x, y);
+		}
+	},
+	holdDelete{
+		{
+			delete = true;
+			shown = true;
+		}
+		
+		public void draw(int tilex, int tiley, int endx, int endy){
+			Tile tile = world.tile(tilex, tiley);
+			
+			if(tile != null && control.getInput().validBreak(tilex, tiley)){
+				if(tile.isLinked())
+					tile = tile.getLinked();
+				Vector2 offset = tile.block().getPlaceOffset();
+				float fract = player.breaktime / tile.getBreakTime();
+				
+				if(Inputs.buttonDown(Buttons.RIGHT)){
+					Draw.color(Color.YELLOW, Color.SCARLET, fract);
+					Draw.linecrect(tile.worldx() + offset.x, tile.worldy() + offset.y, tile.block().width * Vars.tilesize, tile.block().height * Vars.tilesize);
+				}else if(android && player.breaktime > 0){
+					Draw.color(Colors.get("breakStart"), Colors.get("break"), fract);
+					Draw.polygon(25, tile.worldx() + offset.x, tile.worldy() + offset.y, 4 + (1f - fract) * 26);
+				}
+				Draw.reset();
+			}
+		}
+	},
+	touchDelete{
+		{
+			shown = true;
+			lockCamera = false;
+			showRotate = true;
+			showCancel = true;
+			delete = true;
+		}
+		
+		public void tapped(int x, int y){
+			control.getInput().tryDeleteBlock(x, y);
 		}
 	},
 	areaDelete{
@@ -305,27 +343,6 @@ public enum PlaceMode{
 			this.endy = endy;
 			this.tilex = tilex;
 			this.tiley = tiley;
-		}
-	},
-	breaker{
-		public void draw(int tilex, int tiley, int endx, int endy){
-			Tile tile = world.tile(tilex, tiley);
-			
-			if(tile != null && control.getInput().validBreak(tilex, tiley)){
-				if(tile.isLinked())
-					tile = tile.getLinked();
-				Vector2 offset = tile.block().getPlaceOffset();
-				float fract = player.breaktime / tile.getBreakTime();
-				
-				if(Inputs.buttonDown(Buttons.RIGHT)){
-					Draw.color(Color.YELLOW, Color.SCARLET, fract);
-					Draw.linecrect(tile.worldx() + offset.x, tile.worldy() + offset.y, tile.block().width * Vars.tilesize, tile.block().height * Vars.tilesize);
-				}else if(android && player.breaktime > 0){
-					Draw.color(Colors.get("breakStart"), Colors.get("break"), fract);
-					Draw.polygon(25, tile.worldx() + offset.x, tile.worldy() + offset.y, 4 + (1f - fract) * 26);
-				}
-				Draw.reset();
-			}
 		}
 	};
 	public boolean lockCamera;

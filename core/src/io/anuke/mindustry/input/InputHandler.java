@@ -224,7 +224,7 @@ public abstract class InputHandler extends InputAdapter{
 			Vars.control.addItem(tile.block().drops.item, tile.block().drops.amount);
 		}
 		
-		Effects.shake(3f, 1f, player);
+		//Effects.shake(3f, 1f, player);
 		Sounds.play("break");
 		
 		if(!tile.block().isMultiblock() && !tile.isLinked()){
