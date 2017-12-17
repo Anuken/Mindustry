@@ -87,7 +87,7 @@ public class Player extends DestructibleEntity{
 			vector.x += speed;
 		
 		boolean shooting = !Inputs.keyDown("dash") && Inputs.buttonDown(Buttons.LEFT) && recipe == null 
-				&& !ui.hasMouse() && !control.getInput().onConfigurable() && !Inputs.keyDown("area_delete_mode");
+				&& !ui.hasMouse() && !control.getInput().onConfigurable();
 		
 		if(shooting && Timers.get(this, "reload", weapon.reload)){
 			weapon.shoot(this);

@@ -10,9 +10,9 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import io.anuke.mindustry.io.PlatformFunction;
 import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.scene.ui.layout.Unit;
@@ -51,12 +51,8 @@ public class AndroidLauncher extends AndroidApplication{
 		
 		Mindustry.donationsCallable = new Callable(){ @Override public void run(){ showDonations(); } };
 
-		if(doubleScaleTablets){
-			if(isTablet(this.getContext())){
-				Unit.dp.multiplier = 2f;
-			}else{
-				Unit.dp.multiplier = 1f;
-			}
+		if(doubleScaleTablets && isTablet(this.getContext())){
+			Unit.dp.addition = 0.5f;
 		}
 		
 		config.hideStatusBar = true;
@@ -74,9 +70,8 @@ public class AndroidLauncher extends AndroidApplication{
 	}
 	
 	private boolean isTablet(Context context) {
-	    boolean xlarge = ((context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE);
-	    boolean large = ((context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE);
-	    return (xlarge || large);
+		TelephonyManager manager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+		return manager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE;
 	}
 	
 	private void showDonations(){

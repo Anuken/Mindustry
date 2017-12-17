@@ -2,7 +2,7 @@ _Keep in mind that this is just a basic outline of planned features, and will be
 
 ### 3.x Planned
 - New save system: toggleable autosave, named slots, less clunky save UI
-- Optimize for tablets
+- [DONE?] Optimize for tablets
 - Teleporter UI changes, more colors (?)
 - [DONE] New building tools: selection-delete, hold to place blocks in a line, one-tap delete mode (mobile). New 'tool' menu (desktop).
 - [DONE] Refactor `Renderer`, remove code for rendering platform-specific placement and move to 2 different classes
@@ -13,8 +13,9 @@ _Keep in mind that this is just a basic outline of planned features, and will be
 - Fix bugs with junction not accepting blocks (low FPS)
 - Fix bugs with tunnel merging and/or removing items (low FPS)
 - Edit descriptions for conveyors to be more clear about how to use them
-- Add link to Mindustry discord everywhere
+- [DONE] Add link to Mindustry discord everywhere
 - Balancing to slow down progression
+- Map editor
 
 ### Major Bugs
 - Black screen when tabbing out on Android

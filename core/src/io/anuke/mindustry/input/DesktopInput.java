@@ -22,11 +22,13 @@ public class DesktopInput extends InputHandler{
 	int mousex, mousey;
 	int endx, endy;
 	private boolean enableHold = false;
+	private boolean beganBreak;
 	
 	@Override public float getCursorEndX(){ return endx; }
 	@Override public float getCursorEndY(){ return endy; }
 	@Override public float getCursorX(){ return (int)(Graphics.screen(mousex, mousey).x + 2); }
 	@Override public float getCursorY(){ return (int)(Gdx.graphics.getHeight() - 1 - Graphics.screen(mousex, mousey).y); }
+	@Override public boolean drawPlace(){ return !beganBreak; }
 	
 	@Override
 	public boolean touchDown (int screenX, int screenY, int pointer, int button){
@@ -41,7 +43,7 @@ public class DesktopInput extends InputHandler{
 	public boolean touchUp(int screenX, int screenY, int pointer, int button){
 		if(button == Buttons.LEFT){
 			player.placeMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
-		}else if(button == Buttons.RIGHT){
+		}else if(button == Buttons.RIGHT && !beganBreak){
 			player.breakMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
 		}
 		return false;
@@ -104,8 +106,13 @@ public class DesktopInput extends InputHandler{
 		if(Inputs.buttonUp(Buttons.RIGHT)){
 			ui.hideConfig();
 		}
+		
+		if(Inputs.buttonRelease(Buttons.RIGHT)){
+			beganBreak = false;
+		}
 
 		if(player.recipe != null && Inputs.buttonUp(Buttons.RIGHT)){
+			beganBreak = true;
 			player.recipe = null;
 			Cursors.restoreCursor();
 		}
