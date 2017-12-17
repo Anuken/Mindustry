@@ -330,8 +330,8 @@ public class Tutorial{
 				blockPlaceX = 2;
 				blockPlaceY = -2;
 				text = !Vars.android ? 
-					"You can delete blocks by holding the  [orange]right mouse button[] on the block you want to delete. Try deleting this conveyor.":
-					"You can delete blocks by [orange]tapping and holding[]  on the block you want to delete. Try deleting this conveyor.";
+					"You can delete blocks by clicking the  [orange]right mouse button[] on the block you want to delete. Try deleting this conveyor.":
+					"You can delete blocks by [orange]selecting the crosshair[] in the [orange]break mode menu[] in the bottom left and tapping a block. Try deleting this conveyor.";
 			}
 		},
 		/*
@@ -645,7 +645,7 @@ public class Tutorial{
 		},
 		end{
 			{
-				text = "And that concludes the tutorial! Good luck!";
+				text = "And that concludes the tutorial!  Good luck!";
 				canBack = false;
 			}
 		};

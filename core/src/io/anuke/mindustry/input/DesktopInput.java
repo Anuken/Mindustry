@@ -21,6 +21,7 @@ import io.anuke.ucore.util.Mathf;
 public class DesktopInput extends InputHandler{
 	int mousex, mousey;
 	int endx, endy;
+	private boolean enableHold = false;
 	
 	@Override public float getCursorEndX(){ return endx; }
 	@Override public float getCursorEndY(){ return endy; }
@@ -29,7 +30,7 @@ public class DesktopInput extends InputHandler{
 	
 	@Override
 	public boolean touchDown (int screenX, int screenY, int pointer, int button){
-		if(button == Buttons.LEFT){
+		if((button == Buttons.LEFT && player.recipe != null) || (button == Buttons.RIGHT)){
 			Vector2 vec = Graphics.world(screenX, screenY);
 			mousex = (int)vec.x;
 			mousey = (int)vec.y;
@@ -38,7 +39,11 @@ public class DesktopInput extends InputHandler{
 	}
 	
 	public boolean touchUp(int screenX, int screenY, int pointer, int button){
-		player.placeMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
+		if(button == Buttons.LEFT){
+			player.placeMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
+		}else if(button == Buttons.RIGHT){
+			player.breakMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
+		}
 		return false;
 	}
 	
@@ -46,10 +51,11 @@ public class DesktopInput extends InputHandler{
 	public void update(){
 		if(player.isDead()) return;
 		
-		if(!Inputs.buttonDown(Buttons.LEFT)){
+		if(!Inputs.buttonDown(Buttons.LEFT) && !Inputs.buttonDown(Buttons.RIGHT)){
 			mousex = (int)Graphics.mouseWorld().x;
 			mousey = (int)Graphics.mouseWorld().y;
 		}
+		
 		endx = Gdx.input.getX();
 		endy = Gdx.input.getY();
 		
@@ -69,10 +75,10 @@ public class DesktopInput extends InputHandler{
 			player.rotation ++;
 		}
 		
-		if(Inputs.keyDown("area_delete_mode")){
-			player.placeMode = PlaceMode.areaDelete;
+		if(Inputs.buttonDown(Buttons.RIGHT)){
+			player.breakMode = PlaceMode.areaDelete;
 		}else{
-			player.placeMode = PlaceMode.hold;
+			player.breakMode = PlaceMode.hold;
 		}
 		
 		player.rotation = Mathf.mod(player.rotation, 4);
@@ -105,7 +111,7 @@ public class DesktopInput extends InputHandler{
 		}
 
 		//block breaking
-		if(Inputs.buttonDown(Buttons.RIGHT) && cursor != null && validBreak(tilex(), tiley())){
+		if(enableHold && Inputs.buttonDown(Buttons.RIGHT) && cursor != null && validBreak(tilex(), tiley())){
 			Tile tile = cursor;
 			player.breaktime += Timers.delta();
 			if(player.breaktime >= tile.getBreakTime()){

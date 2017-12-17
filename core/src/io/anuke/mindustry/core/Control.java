@@ -108,8 +108,7 @@ public class Control extends Module{
 			"pause", Keys.SPACE,
 			"dash", Keys.SHIFT_LEFT,
 			"rotate_right", Keys.R,
-			"rotate_left", Keys.E,
-			"area_delete_mode", Keys.Q
+			"rotate_left", Keys.E
 		);
 		
 		for(int i = 0; i < Vars.saveSlots; i ++){
