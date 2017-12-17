@@ -59,6 +59,7 @@ public class Control extends Module{
 	Tile core;
 	Array<SpawnPoint> spawnpoints = new Array<>();
 	boolean shouldUpdateItems = false;
+	boolean wasPaused = false;
 	
 	float respawntime;
 	InputHandler input;
@@ -407,6 +408,19 @@ public class Control extends Module{
 	
 	public int[] getItems(){
 		return items;
+	}
+	
+	@Override
+	public void pause(){
+		wasPaused = GameState.is(State.paused);
+		if(GameState.is(State.playing)) GameState.set(State.paused);
+	}
+	
+	@Override
+	public void resume(){
+		if(GameState.is(State.paused) && !wasPaused){
+			GameState.set(State.playing);
+		}
 	}
 	
 	@Override

@@ -157,7 +157,10 @@ public class Turret extends Block{
 				
 				float targetRot = Angles.predictAngle(tile.worldx(), tile.worldy(), 
 						entity.target.x, entity.target.y, entity.target.xvelocity, entity.target.yvelocity, bullet.speed);
-				 
+				
+				if(Float.isNaN(entity.rotation)){
+					entity.rotation = 0;
+				}
 				entity.rotation = Mathf.slerp(entity.rotation, targetRot, 
 						rotatespeed*Timers.delta());
 				

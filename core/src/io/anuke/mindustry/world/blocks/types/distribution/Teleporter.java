@@ -22,7 +22,7 @@ import io.anuke.ucore.util.Mathf;
 //TODO
 public class Teleporter extends Block implements Configurable{
 	public static final int colors = 4;
-	public static final Color[] colorArray = {Color.ROYAL, Color.ORANGE, Color.SCARLET, Color.FOREST};
+	public static final Color[] colorArray = {Color.ROYAL, Color.ORANGE, Color.SCARLET, Color.FOREST, Color.PURPLE, Color.GOLD, Color.PINK};
 	
 	private static Array<Tile> removal = new Array<>();
 	private static Array<Tile> returns = new Array<>();

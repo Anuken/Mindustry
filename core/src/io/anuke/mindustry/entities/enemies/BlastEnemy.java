@@ -46,6 +46,7 @@ public class BlastEnemy extends Enemy{
 		Bullet b = new Bullet(BulletType.blast, this, x, y, 0).add();
 		b.damage = BulletType.blast.damage + (tier-1) * 40;
 		damage(999);
+		remove();
 	}
 
 }
