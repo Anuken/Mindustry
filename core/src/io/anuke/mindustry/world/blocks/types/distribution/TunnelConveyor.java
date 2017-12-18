@@ -13,6 +13,7 @@ public class TunnelConveyor extends Block{
 		rotate = true;
 		update = true;
 		solid = true;
+		health = 70;
 	}
 	
 	@Override
@@ -38,7 +39,7 @@ public class TunnelConveyor extends Block{
 		Tile tunnel = getDestTunnel(dest);
 		if(tunnel != null){
 			Tile to = tunnel.getNearby()[tunnel.getRotation()];
-			return to != null && to.block().acceptItem(item, to, tunnel);
+			return to != null && !(to.block() instanceof TunnelConveyor) && to.block().acceptItem(item, to, tunnel);
 		}else{
 			return false;
 		}

@@ -75,17 +75,12 @@ public class MapEditor{
 		int y = dy - dstHeight/2;
 		
 		if (x + dstWidth > width){
-			//x = width - dstWidth;
-			dstWidth = width - x;
+			x = width - dstWidth;
 		}else if (x < 0){
-			dstWidth += x;
 			x = 0;
 		}
 		
-		//System.out.println(x + " " + y + " " + dstWidth + " " + dstHeight);
-
 		if (y + dstHeight > height){
-			//y = height - dstHeight;
 			dstHeight = height - y;
 		}else if (y < 0){
 			dstHeight += y;
