@@ -42,11 +42,10 @@ public class Pathfind{
 			if(Vars.world.raycastWorld(enemy.x, enemy.y, target.worldx(), target.worldy()) != null){
 				if(enemy.node > 1)
 					enemy.node = enemy.node - 1;
+				enemy.idletime = 0;
 			}else{
-				//must be blocked by a playermade block
+				//must be blocked by a playermade block, do nothing
 			}
-			
-			enemy.idletime = 0;
 		}
 		
 		//-1 is only possible here if both pathfindings failed, which should NOT happen

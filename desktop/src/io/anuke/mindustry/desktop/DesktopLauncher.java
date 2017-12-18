@@ -23,7 +23,7 @@ public class DesktopLauncher {
 		config.setMaximized(true);
 		config.setWindowedMode(960, 540);
 		config.setWindowIcon("sprites/icon.png");
-		config.useVsync(false);
+		config.useVsync(true);
 		
 		Mindustry.platforms = new PlatformFunction(){
 			SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm");

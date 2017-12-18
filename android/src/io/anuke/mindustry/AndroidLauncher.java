@@ -52,7 +52,7 @@ public class AndroidLauncher extends AndroidApplication{
 		Mindustry.donationsCallable = new Callable(){ @Override public void run(){ showDonations(); } };
 
 		if(doubleScaleTablets && isTablet(this.getContext())){
-			Unit.dp.addition = 1f;
+			Unit.dp.addition = 0.5f;
 		}
 		
 		config.hideStatusBar = true;

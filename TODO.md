@@ -16,6 +16,8 @@ _Keep in mind that this is just a basic outline of planned features, and will be
 - [DONE] Add link to Mindustry discord everywhere
 - Balancing to slow down progression
 - Map editor
+- Delete saves
+- Display playtime
 
 ### Major Bugs
 - Black screen when tabbing out on Android

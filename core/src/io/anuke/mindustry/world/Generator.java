@@ -2,42 +2,26 @@ package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.ObjectMap;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.TargetEnemy;
-import io.anuke.mindustry.world.blocks.*;
-import io.anuke.mindustry.world.blocks.types.Floor;
+import io.anuke.mindustry.world.ColorMapper.BlockPair;
+import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.noise.Noise;
 import io.anuke.ucore.util.Mathf;
 
 public class Generator{
-	public static boolean debugBlockspam = false;
-	
 	static final int spawn = Color.rgba8888(Color.RED);
 	static final int start = Color.rgba8888(Color.GREEN);
-	
-	public static IntMap<Block> colors = map(
-		Hue.rgb(80, 150, 90), Blocks.grass,
-		Hue.rgb(90, 180, 100), Blocks.grassblock,
-		Hue.rgb(80, 110, 180), Blocks.water,
-		Hue.rgb(70, 90, 150), Blocks.deepwater,
-		Hue.rgb(110, 80, 30), Blocks.dirt,
-		Hue.rgb(160, 120, 70), Blocks.dirtblock,
-		Hue.rgb(100, 100, 100), Blocks.stoneblock,
-		Color.valueOf("323232"), Blocks.stone,
-		Color.valueOf("575757"), Blocks.blackstoneblock,
-		Color.valueOf("252525"), Blocks.blackstone,
-		Color.valueOf("ed5334"), Blocks.lava,
-		Color.valueOf("292929"), Blocks.oil,
-		Color.valueOf("e5d8bb"), Blocks.sandblock,
-		Color.valueOf("988a67"), Blocks.sand,
-		Color.valueOf("f7feff"), Blocks.snowblock,
-		Color.valueOf("c2d1d2"), Blocks.snow,
-		Color.valueOf("c4e3e7"), Blocks.ice
-	);
+	static final ObjectMap<Block, Block> rocks = new ObjectMap(){{
+		put(Blocks.stone, Blocks.rock);
+		put(Blocks.snow, Blocks.icerock);
+		put(Blocks.grass, Blocks.shrub);
+		put(Blocks.blackstone, Blocks.blackrock);
+	}};
 	
 	/**Returns world size.*/
 	public static void generate(Pixmap pixmap, Tile[][] tiles){
@@ -50,14 +34,11 @@ public class Generator{
 				Block block = Blocks.air;
 				
 				int color = pixmap.getPixel(x, pixmap.getHeight()-1-y);
+				BlockPair pair = ColorMapper.get(color);
 				
-				if(colors.containsKey(color)){
-					//TODO less hacky method
-					if(!(colors.get(color) instanceof Floor)){
-						block = colors.get(color);
-					}else{
-						floor = colors.get(color);
-					}
+				if(pair != null){
+					block = pair.wall;
+					floor = pair.floor;
 				}else if(color == start){
 					Vars.control.setCore(Vars.world.tile(x, y));
 				}else if(color == spawn){
@@ -65,18 +46,8 @@ public class Generator{
 					floor = Blocks.dirt;
 				}
 				
-				if(block == Blocks.air){
-					if(floor == Blocks.stone && Mathf.chance(0.02)){
-						block = Blocks.rock;
-					}
-					
-					if(floor == Blocks.snow && Mathf.chance(0.02)){
-						block = Blocks.icerock;
-					}
-					
-					if(floor == Blocks.blackstone && Mathf.chance(0.03)){
-						block = Blocks.blackrock;
-					}
+				if(block == Blocks.air && Mathf.chance(0.025) && rocks.containsKey(floor)){
+					block = rocks.get(floor);
 				}
 				
 				if(floor == Blocks.stone || floor == Blocks.grass || floor == Blocks.blackstone ||
@@ -98,30 +69,9 @@ public class Generator{
 					}
 				}
 				
-				if(block == Blocks.grassblock){
-					floor = Blocks.grass;
-				}
-				
-				if(block == Blocks.snowblock){
-					floor = Blocks.snow;
-				}
-				
-				if(block == Blocks.sandblock){
-					floor = Blocks.sand;
-				}
-				
-				if(floor == Blocks.grass && Mathf.chance(0.03) && block == Blocks.air){
-					block = Blocks.shrub;
-				}
-				
 				if(color == Hue.rgb(Color.PURPLE)){
 					if(!Vars.android) new TargetEnemy().set(x * Vars.tilesize, y * Vars.tilesize).add();
 					floor = Blocks.stone;
-				}
-				
-				//preformance debugging
-				if(debugBlockspam && Vector2.dst(0, 0, x, y) < 260){
-					block = Mathf.choose(ProductionBlocks.omnidrill, DistributionBlocks.conveyor, DistributionBlocks.router, WeaponBlocks.turret);
 				}
 				
 				tiles[x][y].setBlock(block, 0);

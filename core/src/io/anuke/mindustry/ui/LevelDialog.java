@@ -16,7 +16,7 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Elements;
 
 public class LevelDialog extends FloatingDialog{
-	private Map selectedMap = Map.maze;
+	private Map selectedMap = Vars.world.maps().getMap(0);
 	private TextureRegion region = new TextureRegion();
 	
 	public LevelDialog(){
@@ -49,8 +49,8 @@ public class LevelDialog extends FloatingDialog{
 		content().add(selmode);
 		content().row();
 		
-		for(int i = 0; i < Map.values().length; i ++){
-			Map map = Map.values()[i];
+		int i = 0;
+		for(Map map : Vars.world.maps().list()){
 			
 			if(!map.visible && !Vars.debug) continue;
 			
@@ -59,9 +59,9 @@ public class LevelDialog extends FloatingDialog{
 			}
 			
 			Table inset = new Table("pane-button");
-			inset.add("[accent]"+map.name()).pad(3f).units(Unit.dp);
+			inset.add("[accent]"+map.name).pad(3f).units(Unit.dp);
 			inset.row();
-			inset.add((StringSupplier)(()->"High Score: [accent]" + Settings.getInt("hiscore" + map.name())))
+			inset.add((StringSupplier)(()->"High Score: [accent]" + Settings.getInt("hiscore" + map.name)))
 			.pad(3f).units(Unit.dp);
 			inset.pack();
 			
@@ -72,7 +72,7 @@ public class LevelDialog extends FloatingDialog{
 			Image back = new Image("white");
 			back.setColor(map.backgroundColor);
 			
-			ImageButton image = new ImageButton(new TextureRegion(Vars.world.getTexture(map)), "togglemap");
+			ImageButton image = new ImageButton(new TextureRegion(map.texture), "togglemap");
 			image.row();
 			image.add(inset).width(images+6).units(Unit.dp);
 			image.clicked(()->{
@@ -88,6 +88,8 @@ public class LevelDialog extends FloatingDialog{
 			maps.add(stack).width(170).pad(4f).units(Unit.dp);
 			
 			maps.padRight(Unit.dp.inPixels(26));
+			
+			i ++;
 		}
 		
 		content().add(pane).uniformX();

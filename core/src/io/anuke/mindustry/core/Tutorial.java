@@ -9,7 +9,6 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.ucore.core.Timers;
@@ -33,7 +32,7 @@ public class Tutorial{
 	}
 	
 	public boolean active(){
-		return world.getMap() == Map.tutorial && !GameState.is(State.menu);
+		return world.getMap().name.equals("tutorial") && !GameState.is(State.menu);
 	}
 	
 	public void buildUI(table table){

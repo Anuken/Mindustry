@@ -2,6 +2,7 @@ package io.anuke.mindustry;
 
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.I18NBundle;
 
 import io.anuke.mindustry.core.*;
@@ -20,14 +21,18 @@ public class Vars{
 	public static final float respawnduration = 60*4;
 	//time between waves in frames (on normal mode)
 	public static final float wavespace = 60*60*(android ? 1 : 1);
-	//waves can last no longer than 2 minutes, otherwise the next one spawns
-	public static final float maxwavespace = 60*60*2;
+	//waves can last no longer than 3 minutes, otherwise the next one spawns
+	public static final float maxwavespace = 60*60*4f;
 	//advance time the pathfinding starts at
 	public static final float aheadPathfinding = 60*20;
 	//how far away from spawn points the player can't place blocks
 	public static final float enemyspawnspace = 65;
 	//discord group URL
 	public static final String discordURL = "https://discord.gg/r8BkXNd";
+	//directory for user-created map data
+	public static final FileHandle customMapDirectory = Gdx.files.local("mindustry-maps/");
+	//save file directory
+	public static final FileHandle saveDirectory = Gdx.files.local("mindustry-saves/");
 	//scale of the font
 	public static float fontscale = Unit.dp.inPixels(1f)/2f;
 	//camera zoom displayed on startup

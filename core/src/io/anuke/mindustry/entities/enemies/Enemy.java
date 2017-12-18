@@ -17,7 +17,7 @@ public class Enemy extends DestructibleEntity{
 	public final static Color[] tierColors = { Color.valueOf("ffe451"), Color.valueOf("f48e20"), Color.valueOf("ff6757"), Color.valueOf("ff2d86") };
 	public final static int maxtier = 4;
 	public final static float maxIdle = 60*1.5f;
-	public final static float maxIdleLife = 60f*15f; //15 seconds idle = death
+	public final static float maxIdleLife = 60f*13f; //13 seconds idle = death
 	
 	protected int timeid;
 	protected Timer timer = new Timer(5);
@@ -238,7 +238,7 @@ public class Enemy extends DestructibleEntity{
 		xvelocity = (x - lastx) / Timers.delta();
 		yvelocity = (y - lasty) / Timers.delta();
 		
-		float minv = 0.08f;
+		float minv = 0.09f;
 		
 		if(xvelocity < minv && yvelocity < minv && node > 0 && target == null){
 			idletime += Timers.delta();

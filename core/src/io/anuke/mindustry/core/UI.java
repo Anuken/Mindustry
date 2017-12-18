@@ -15,6 +15,8 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.mapeditor.MapEditor;
+import io.anuke.mindustry.mapeditor.MapEditorDialog;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.mindustry.world.Tile;
@@ -38,11 +40,13 @@ public class UI extends SceneModule{
 	Table loadingtable, desctable, configtable;
 	MindustrySettingsDialog prefs;
 	MindustryKeybindDialog keys;
+	MapEditorDialog editorDialog;
 	Dialog about, restart, levels, upgrades, load, settingserror, gameerror, discord;
 	MenuDialog menu;
 	Tooltip tooltip;
 	Tile configTile;
 	Array<String> statlist = new Array<>();
+	MapEditor editor = new MapEditor();
 	boolean wasPaused = false;
 	
 	private Fragment blockfrag = new BlocksFragment(),
@@ -118,7 +122,7 @@ public class UI extends SceneModule{
 		Draw.color();
 		
 		TextureRegion back = Draw.region("background");
-		float backscl = 5f;
+		float backscl = Unit.dp.inPixels(5f);
 		
 		Draw.alpha(0.7f);
 		Core.batch.draw(back, w/2 - back.getRegionWidth()*backscl/2 +240f, h/2 - back.getRegionHeight()*backscl/2 + 250f, 
@@ -157,6 +161,8 @@ public class UI extends SceneModule{
 		
 		configtable = new Table();
 		scene.add(configtable);
+		
+		editorDialog = new MapEditorDialog(editor);
 		
 		settingserror = new Dialog("Warning", "dialog");
 		settingserror.content().add("[crimson]Failed to access local storage.\nSettings will not be saved.");
@@ -437,6 +443,10 @@ public class UI extends SceneModule{
 	
 	public void showDiscord(){
 		discord.show();
+	}
+	
+	public void showEditor(){
+		editorDialog.show();
 	}
 
 	public void updateItems(){

@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -163,14 +162,14 @@ public class SaveIO{
 			stream.readInt(); //read version
 			stream.readLong(); //read last saved time
 			stream.readByte(); //read the gamemode
-			return Map.values()[stream.readByte()]; //read the map
+			return Vars.world.maps().getMap(stream.readByte()); //read the map
 		}catch (IOException e){
 			throw new RuntimeException(e);
 		}
 	}
 	
 	public static FileHandle fileFor(int slot){
-		return Gdx.files.local("mindustry-saves/" + slot + ".mins");
+		return Vars.saveDirectory.child(slot  + ".mins");
 	}
 	
 	public static void write(FileHandle file){
@@ -183,7 +182,7 @@ public class SaveIO{
 			
 			//--GENERAL STATE--
 			stream.writeByte(Vars.control.getMode().ordinal()); //gamemode
-			stream.writeByte(Vars.world.getMap().ordinal()); //map ID
+			stream.writeByte(Vars.world.getMap().id); //map ID
 			
 			stream.writeInt(Vars.control.getWave()); //wave
 			stream.writeFloat(Vars.control.getWaveCountdown()); //wave countdown
@@ -399,7 +398,7 @@ public class SaveIO{
 			int seed = stream.readInt();
 			int tiles = stream.readInt();
 			
-			Vars.world.loadMap(Map.values()[mapid], seed);
+			Vars.world.loadMap(Vars.world.maps().getMap(mapid), seed);
 			Vars.renderer.clearTiles();
 			
 			for(Enemy enemy : enemiesToUpdate){

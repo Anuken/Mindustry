@@ -118,8 +118,8 @@ public class Control extends Module{
 		
 		Settings.loadAll("io.anuke.moment");
 		
-		for(Map map : Map.values()){
-			Settings.defaults("hiscore" + map.name(), 0);
+		for(Map map : Vars.world.maps().list()){
+			Settings.defaults("hiscore" + map.name, 0);
 		}
 		
 		player = new Player();
@@ -278,10 +278,10 @@ public class Control extends Module{
 		
 		wave ++;
 		
-		int last = Settings.getInt("hiscore" + world.getMap().name());
+		int last = Settings.getInt("hiscore" + world.getMap().name);
 		
 		if(wave > last && mode != GameMode.sandbox){
-			Settings.putInt("hiscore" + world.getMap().name(), wave);
+			Settings.putInt("hiscore" + world.getMap().name, wave);
 			Settings.save();
 			hiscore = true;
 		}
@@ -518,7 +518,6 @@ public class Control extends Module{
 				}
 				
 				if(!tutorial.active() && mode != GameMode.sandbox){
-					extrawavetime -= delta();
 				
 					if(enemies <= 0){
 						wavetime -= delta();
@@ -531,10 +530,12 @@ public class Control extends Module{
 							world.pathfinder().updatePath();
 							lastUpdated = wave + 1;
 						}
+					}else{
+						extrawavetime -= delta();
 					}
 				}
 			
-				if(wavetime <= 0){
+				if(wavetime <= 0 || extrawavetime <= 0){
 					runWave();
 				}
 				

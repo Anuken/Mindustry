@@ -2,9 +2,6 @@ package io.anuke.mindustry.core;
 
 import static io.anuke.mindustry.Vars.*;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -25,15 +22,15 @@ import io.anuke.ucore.util.Tmp;
 public class World extends Module{
 	private int seed;
 	
-	private Pixmap[] mapPixmaps;
-	private Texture[] mapTextures;
 	private Map currentMap;
 	private Tile[][] tiles;
 	private Tile[] temptiles = new Tile[4];
 	private Pathfind pathfind = new Pathfind();
+	private Maps maps = new Maps();
 	
 	public World(){
-		loadMaps();
+		maps.loadMaps();
+		currentMap = maps.getMap(0);
 	}
 	
 	@Override
@@ -43,13 +40,11 @@ public class World extends Module{
 	
 	@Override
 	public void dispose(){
-		for(Texture texture : mapTextures){
-			texture.dispose();
-		}
-		
-		for(Pixmap pix : mapPixmaps){
-			pix.dispose();
-		}
+		maps.dispose();
+	}
+	
+	public Maps maps(){
+		return maps;
 	}
 	
 	public Pathfind pathfinder(){
@@ -82,11 +77,11 @@ public class World extends Module{
 	}
 	
 	public int width(){
-		return currentMap.width;
+		return currentMap.getWidth();
 	}
 	
 	public int height(){
-		return currentMap.height;
+		return currentMap.getHeight();
 	}
 	
 	public Tile tile(int x, int y){
@@ -113,25 +108,6 @@ public class World extends Module{
 		temptiles[2] = tile(x-1, y);
 		temptiles[3] = tile(x, y-1);
 		return temptiles;
-	}
-	
-	public Texture getTexture(Map map){
-		return mapTextures[map.ordinal()];
-	}
-	
-	public void loadMaps(){
-		Map[] maps = Map.values();
-		
-		mapPixmaps = new Pixmap[maps.length];
-		mapTextures = new Texture[maps.length];
-		
-		for(int i = 0; i < maps.length; i ++){
-			Pixmap pix = new Pixmap(Gdx.files.internal("maps/"+maps[i]+".png"));
-			mapPixmaps[i] = pix;
-			mapTextures[i] = new Texture(pix);
-			maps[i].width = pix.getWidth();
-			maps[i].height = pix.getHeight();
-		}
 	}
 	
 	private void createTiles(){
@@ -164,28 +140,28 @@ public class World extends Module{
 		if(tiles != null){
 			clearTileEntities();
 			
-			if(tiles.length != map.width || tiles[0].length != map.height){
-				tiles = new Tile[map.width][map.height];
+			if(tiles.length != map.getWidth() || tiles[0].length != map.getHeight()){
+				tiles = new Tile[map.getWidth()][map.getHeight()];
 			}
 			
 			createTiles();
 		}else{
-			tiles = new Tile[map.width][map.height];
+			tiles = new Tile[map.getWidth()][map.getHeight()];
 			
 			createTiles();
 		}
 		
 		Vars.control.getSpawnPoints().clear();
 		
-		Entities.resizeTree(0, 0, map.width * tilesize, map.height * tilesize);
+		Entities.resizeTree(0, 0, map.getWidth() * tilesize, map.getHeight() * tilesize);
 		
 		this.seed = seed;
-		Generator.generate(mapPixmaps[map.ordinal()], tiles);
+		Generator.generate(map.pixmap, tiles);
 		
 		//TODO multiblock core
 		control.getInput().placeBlock(control.getCore().x, control.getCore().y, ProductionBlocks.core, 0, false, false);
 		
-		if(map != Map.tutorial){
+		if(!map.name.equals("tutorial")){
 			setDefaultBlocks();
 		}else{
 			Vars.control.getTutorial().setDefaultBlocks(control.getCore().x, control.getCore().y);

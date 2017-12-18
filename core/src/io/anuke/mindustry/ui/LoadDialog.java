@@ -55,7 +55,9 @@ public class LoadDialog extends FloatingDialog{
 
 			button.row();
 
-			Label info = new Label("[gray]" + (!SaveIO.isSaveValid(i) ? "<empty>" : SaveIO.getMode(slot) + ", " + SaveIO.getMap(slot) + ", Wave " + SaveIO.getWave(slot) + "\nLast Saved: " + SaveIO.getTimeString(i)));
+			Label info = new Label("[gray]" + (!SaveIO.isSaveValid(i) ? "<empty>" : SaveIO.getMode(slot) + ", " 
+					+ SaveIO.getMap(slot).name + ", Wave " + SaveIO.getWave(slot) 
+					+ "\nLast Saved: " + SaveIO.getTimeString(i)));
 			info.setAlignment(Align.center, Align.center);
 
 			button.add(info).padBottom(3).padTop(7);
