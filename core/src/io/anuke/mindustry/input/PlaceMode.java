@@ -306,10 +306,12 @@ public enum PlaceMode{
 			boolean first = true;
 			for(int x = 0; x <= Math.abs(this.endx - this.tilex); x ++){
 				for(int y = 0; y <= Math.abs(this.endy - this.tiley); y ++){
-					control.getInput().tryPlaceBlock(
+					if(control.getInput().tryPlaceBlock(
 							tilex + x * Mathf.sign(endx - tilex), 
-							tiley + y * Mathf.sign(endy - tiley), first);
-					first = false;
+							tiley + y * Mathf.sign(endy - tiley), first)){
+						first = false;
+					}
+					
 				}
 			}
 		}

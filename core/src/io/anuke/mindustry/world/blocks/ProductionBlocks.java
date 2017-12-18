@@ -55,7 +55,7 @@ public class ProductionBlocks{
 			requirements = new Item[]{Item.coal, Item.iron};
 			result = Item.steel;
 			description = "Converts coal + iron to steel.";
-			fullDescription = "The essential crafting block. When inputted 1x iron and 1x iron, outputs one steel.";
+			fullDescription = "The essential crafting block. When inputted 1x iron and 1x coal, outputs one steel.";
 		}
 	},
 	

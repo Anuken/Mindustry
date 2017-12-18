@@ -31,7 +31,6 @@ public class TunnelConveyor extends Block{
 			if(to == null || to.entity == null) return;
 			to.block().handleItem(item, to, tunnel);
 		});
-		
 	}
 
 	@Override

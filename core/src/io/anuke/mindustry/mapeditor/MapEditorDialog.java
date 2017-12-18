@@ -5,6 +5,7 @@ import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.ColorMapper.BlockPair;
 import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.scene.builders.*;
 import io.anuke.ucore.scene.ui.*;
@@ -14,10 +15,13 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 public class MapEditorDialog extends Dialog{
 	private MapEditor editor;
 	private MapView view;
+	private MapGenerateDialog dialog;
+	private ButtonGroup<ImageButton> blockgroup;
 	
 	public MapEditorDialog(MapEditor editor){
 		super("Map Editor", "dialog");
 		this.editor = editor;
+		dialog = new MapGenerateDialog(editor);
 		view = new MapView(editor);
 		
 		setFillParent(true);
@@ -30,7 +34,21 @@ public class MapEditorDialog extends Dialog{
 		
 		shown(() -> {
 			editor.beginEdit(new Map());
+			Core.scene.setScrollFocus(view);
 		});
+	}
+	
+	public void updateSelectedBlock(){
+		Block block = editor.getDrawBlock();
+		int i = 0;
+		for(BlockPair pair : ColorMapper.getPairs()){
+			if(pair.wall == block || (pair.wall == Blocks.air && pair.floor == block)){
+				blockgroup.getButtons().get(i).setChecked(true);
+				break;
+			}
+			i++;
+		}
+		
 	}
 	
 	public void build(){
@@ -40,7 +58,14 @@ public class MapEditorDialog extends Dialog{
 			aleft();
 			
 			new table(){{
+				
 				defaults().growY().width(130f).units(Unit.dp).padBottom(-6);
+				
+				new imagebutton("icon-terrain", isize, () -> {
+					dialog.show();
+				}).text("generate").units(Unit.dp);
+				
+				row();
 				
 				new imagebutton("icon-load", isize, () -> {
 					
@@ -73,7 +98,7 @@ public class MapEditorDialog extends Dialog{
 				row();
 				
 				new imagebutton("icon-arrow-left", isize, () -> {
-					
+					hide();
 				}).padBottom(0).text("back");
 				
 			}}.left().growY().end();
@@ -83,9 +108,24 @@ public class MapEditorDialog extends Dialog{
 			}}.grow().end();
 			
 			new table(){{
-				new imagebutton("icon-terrain", isize, () -> {
+				Table tools = new Table("button");
+				tools.top();
+				tools.padTop(0).padBottom(6);
+				
+				ButtonGroup<ImageButton> group = new ButtonGroup<>();
+				int i = 0;
+				
+				for(EditorTool tool : EditorTool.values()){
+					ImageButton button = new ImageButton("icon-" + tool.name(), "toggle");
+					button.clicked(() -> view.setTool(tool));
+					button.resizeImage(Unit.dp.inPixels(16*2f));
+					group.add(button);
 					
-				}).margin(12f).text("generate...").width(148f).units(Unit.dp);
+					tools.add(button).size(80f, 85f).padBottom(-6f).units(Unit.dp);
+					if(i++ % 2 == 1) tools.row();
+				}
+				
+				add(tools).units(Unit.dp).width(160f).padBottom(-6);
 				
 				row();
 				
@@ -116,6 +156,7 @@ public class MapEditorDialog extends Dialog{
 		pane.setFadeScrollBars(false);
 		pane.setOverscroll(true, false);
 		ButtonGroup<ImageButton> group = new ButtonGroup<>();
+		blockgroup = group;
 		
 		int i = 0;
 		

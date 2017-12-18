@@ -69,6 +69,10 @@ public class ColorMapper{
 	public static class BlockPair{
 		public final Block floor, wall;
 		
+		public Block dominant(){
+			return wall == Blocks.air ? floor : wall;
+		}
+		
 		private BlockPair(Block floor, Block wall){
 			this.floor = floor;
 			this.wall = wall;

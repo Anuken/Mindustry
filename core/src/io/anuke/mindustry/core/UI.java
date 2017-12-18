@@ -448,6 +448,14 @@ public class UI extends SceneModule{
 	public void showEditor(){
 		editorDialog.show();
 	}
+	
+	public MapEditorDialog getEditor(){
+		return editorDialog;
+	}
+	
+	public boolean isEditing(){
+		return editorDialog.getScene() != null;
+	}
 
 	public void updateItems(){
 		((HudFragment)hudfrag).updateItems();

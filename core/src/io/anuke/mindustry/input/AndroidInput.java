@@ -78,7 +78,7 @@ public class AndroidInput extends InputHandler{
 
 		if(!GameState.is(State.menu)){
 			Tile cursor = world.tile(Mathf.scl2(Graphics.mouseWorld().x, tilesize), Mathf.scl2(Graphics.mouseWorld().y, tilesize));
-			if(cursor != null && !ui.hasMouse()){
+			if(cursor != null && !ui.hasMouse(screenX, screenY)){
 				Tile linked = cursor.isLinked() ? cursor.getLinked() : cursor;
 				if(linked != null && linked.block() instanceof Configurable){
 					ui.showConfig(linked);
@@ -155,7 +155,7 @@ public class AndroidInput extends InputHandler{
 	}
 	
 	@Override
-	public void tryPlaceBlock(int x, int y, boolean sound){
+	public boolean tryPlaceBlock(int x, int y, boolean sound){
 		if(player.recipe != null && 
 				validPlace(x, y, player.recipe.result) && cursorNear() &&
 				Vars.control.hasItems(player.recipe.requirements)){
@@ -169,6 +169,8 @@ public class AndroidInput extends InputHandler{
 			if(!Vars.control.hasItems(player.recipe.requirements)){
 				Cursors.restoreCursor();
 			}
+			return true;
 		}
+		return false;
 	}
 }

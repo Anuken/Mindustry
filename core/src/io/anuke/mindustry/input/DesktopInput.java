@@ -94,7 +94,7 @@ public class DesktopInput extends InputHandler{
 		
 		Tile cursor = world.tile(tilex(), tiley());
 		
-		if(Inputs.buttonUp(Buttons.LEFT) && cursor != null){
+		if(Inputs.buttonUp(Buttons.LEFT) && cursor != null && !ui.hasMouse()){
 			Tile linked = cursor.isLinked() ? cursor.getLinked() : cursor;
 			if(linked != null && linked.block() instanceof Configurable){
 				ui.showConfig(linked);

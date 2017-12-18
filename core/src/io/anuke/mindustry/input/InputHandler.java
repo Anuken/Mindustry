@@ -49,7 +49,7 @@ public abstract class InputHandler extends InputAdapter{
 		return Vector2.dst(player.x, player.y, getBlockX() * tilesize, getBlockY() * tilesize) <= placerange;
 	}
 	
-	public void tryPlaceBlock(int x, int y, boolean sound){
+	public boolean tryPlaceBlock(int x, int y, boolean sound){
 		if(player.recipe != null && 
 				validPlace(x, y, player.recipe.result) && !ui.hasMouse() && cursorNear() &&
 				Vars.control.hasItems(player.recipe.requirements)){
@@ -63,7 +63,9 @@ public abstract class InputHandler extends InputAdapter{
 			if(!Vars.control.hasItems(player.recipe.requirements)){
 				Cursors.restoreCursor();
 			}
+			return true;
 		}
+		return false;
 	}
 	
 	public boolean tryDeleteBlock(int x, int y, boolean sound){

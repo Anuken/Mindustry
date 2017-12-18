@@ -19,6 +19,11 @@ public class MapEditor{
 	private Pixmap[] brushPixmaps = new Pixmap[brushSizes.length];
 	
 	private Map map;
+	
+	private MapFilter filter = new MapFilter();
+	private Pixmap filterPixmap;
+	private Texture filterTexture;
+	
 	private Pixmap pixmap;
 	private Texture texture;
 	private int brushSize = 1;
@@ -29,6 +34,44 @@ public class MapEditor{
 			int s = brushSizes[i];
 			brushPixmaps[i] = new Pixmap(s*2-1, s*2-1, Format.RGB888);
 		}
+	}
+	
+	public void updateTexture(){
+		texture.draw(pixmap, 0, 0);
+	}
+	
+	public MapFilter getFilter(){
+		return filter;
+	}
+	
+	public void applyFilterPreview(){
+		if(filterPixmap != null && (filterPixmap.getWidth() != pixmap.getWidth() 
+				|| filterPixmap.getHeight() != pixmap.getHeight())){
+			filterPixmap.dispose();
+			filterTexture.dispose();
+			filterPixmap = null;
+			filterTexture = null;
+		}
+		
+		if(filterPixmap == null){
+			filterPixmap = Pixmaps.copy(pixmap);
+			filter.process(filterPixmap);
+			filterTexture = new Texture(filterPixmap);
+		}else{
+			filterPixmap.drawPixmap(pixmap, 0, 0);
+			filter.process(filterPixmap);
+			filterTexture.draw(filterPixmap, 0, 0);
+		}
+		
+	}
+	
+	public Texture getFilterTexture(){
+		return filterTexture;
+	}
+	
+	public void applyFilter(){
+		filter.process(pixmap);
+		texture.draw(pixmap, 0, 0);
 	}
 	
 	public void beginEdit(Map map){
@@ -87,7 +130,7 @@ public class MapEditor{
 			y = 0;
 		}
 		
-		pixmap.fillCircle(dx, dy, brushSize);
+		pixmap.fillCircle(dx, dy, brushSize-1);
 		
 		Pixmap dst = brush(brushSize);
 		dst.drawPixmap(pixmap, x, y, dstWidth, dstHeight, 0, 0, dstWidth, dstHeight);
@@ -107,6 +150,10 @@ public class MapEditor{
 	
 	public Texture texture(){
 		return texture;
+	}
+	
+	public Pixmap pixmap(){
+		return pixmap;
 	}
 	
 	public void resize(int mapSize){

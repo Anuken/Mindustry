@@ -331,6 +331,15 @@ public class Fx{
 		Draw.reset();
 	}),
 	
+	shieldhit = new Effect(9, e -> {
+		Draw.thickness(1f);
+		Draw.color(Color.WHITE, Color.SKY, e.ifract());
+		Draw.spikes(e.x, e.y, e.ifract() * 5f, 2, 6);
+		Draw.thickness(4f*e.fract());
+		Draw.circle(e.x, e.y, e.ifract()*14f);
+		Draw.reset();
+	}),
+	
 	shoot = new Effect(8, e -> {
 		Draw.thickness(1f);
 		Draw.color(Color.WHITE, Color.GOLD, e.ifract());

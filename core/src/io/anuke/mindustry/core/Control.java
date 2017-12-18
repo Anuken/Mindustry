@@ -16,8 +16,8 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.entities.effect.Shield;
-import io.anuke.mindustry.entities.enemies.BlastEnemy;
 import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.entities.enemies.FortressEnemy;
 import io.anuke.mindustry.entities.enemies.HealerEnemy;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.DesktopInput;
@@ -471,7 +471,7 @@ public class Control extends Module{
 					new HealerEnemy().set(player.x, player.y).add();
 				}else{
 					float px = player.x, py = player.y;
-					Timers.run(30f, ()-> new BlastEnemy().set(px, py).add());
+					Timers.run(30f, ()-> new FortressEnemy().set(px, py).add());
 				}
 			}
 		}

@@ -546,7 +546,7 @@ public class Renderer extends RendererModule{
 				Draw.dashCircle(spawn.start.worldx(), spawn.start.worldy(), enemyspawnspace);
 			}
 			
-		}else if(player.breakMode.delete && control.input.drawPlace()){
+		}else if(player.breakMode.delete && control.input.drawPlace() && player.recipe == null){ //TODO test!
 			player.breakMode.draw(control.input.getBlockX(), control.input.getBlockY(), 
 					control.input.getBlockEndX(), control.input.getBlockEndY());
 		}
