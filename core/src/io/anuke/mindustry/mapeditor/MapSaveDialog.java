@@ -17,7 +17,7 @@ public class MapSaveDialog extends FloatingDialog{
 		
 		shown(() -> {
 			content().clear();
-			content().add(() ->{ 
+			content().label(() ->{ 
 				Map map = Vars.world.maps().getMap(field.getText());
 				if(map != null){
 					if(map.custom){
@@ -46,6 +46,11 @@ public class MapSaveDialog extends FloatingDialog{
 		button.setDisabled(this::invalid);
 		buttons().add(button);
 	}
+	
+	public void setFieldText(String text){
+		field.setText(text);
+	}
+		
 	
 	private boolean invalid(){
 		if(field.getText().isEmpty()){

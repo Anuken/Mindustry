@@ -23,6 +23,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.*;
+import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.function.VisibilityProvider;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.Element;
@@ -467,6 +468,18 @@ public class UI extends SceneModule{
 
 	public void updateItems(){
 		((HudFragment)hudfrag).updateItems();
+	}
+	
+	public void showConfirm(String title, String text, Listenable confirmed){
+		FloatingDialog dialog = new FloatingDialog(title);
+		dialog.content().add(text).pad(4f).units(Unit.dp);
+		dialog.buttons().defaults().size(200f, 54f).pad(2f).units(Unit.dp);
+		dialog.buttons().addButton("Cancel", dialog::hide);
+		dialog.buttons().addButton("OK", () -> {
+			dialog.hide();
+			confirmed.listen();
+		});
+		dialog.show();
 	}
 	
 }

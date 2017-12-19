@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_root"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:padding="10dp" >
+ 
+    <TextView
+        android:id="@+id/gdxDialogsEnterTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        
+        
+         />
+    
+    <TextView
+        android:id="@+id/gdxDialogsEnterMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        
+        
+         />
+    
+ 
+    <EditText
+        android:id="@+id/gdxDialogsEditTextInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:maxLines="1"
+        android:maxLength="15"
+         >
+ 
+        <requestFocus />
+ 
+    </EditText>
+ 
+</LinearLayout>

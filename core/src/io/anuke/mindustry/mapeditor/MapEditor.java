@@ -84,13 +84,13 @@ public class MapEditor{
 		this.brushSize = 1;
 		if(map.pixmap == null){
 			pixmap = new Pixmap(256, 256, Format.RGB888);
-			pixmap.setColor(ColorMapper.getColor(Blocks.stone));
+			pixmap.setColor(ColorMapper.getColor(drawBlock));
 			pixmap.fill();
 			texture = new Texture(pixmap);
 		}else{
 			pixmap = map.pixmap;
-			pixmap.setColor(ColorMapper.getColor(Blocks.stone));
 			texture = map.texture;
+			pixmap.setColor(ColorMapper.getColor(drawBlock));
 		}
 		
 	}
@@ -161,8 +161,24 @@ public class MapEditor{
 		return pixmap;
 	}
 	
+	public void setPixmap(Pixmap out){
+		if(pixmap.getWidth() == out.getWidth() && pixmap.getHeight() == out.getHeight()){
+			pixmap.dispose();
+			pixmap = out;
+			texture.draw(out, 0, 0);
+		}else{
+			pixmap.dispose();
+			texture.dispose();
+			pixmap = out;
+			texture = new Texture(out);
+		}
+		pixmap.setColor(ColorMapper.getColor(drawBlock));
+		map.pixmap = pixmap;
+		map.texture = texture;
+	}
+	
 	public void resize(int width, int height){
-		Pixmap out = Pixmaps.resize(pixmap, width, height);
+		Pixmap out = Pixmaps.resize(pixmap, width, height, ColorMapper.getColor(Blocks.stone));
 		pixmap.dispose();
 		pixmap = out;
 		texture.dispose();
@@ -174,5 +190,6 @@ public class MapEditor{
 			filterPixmap = null;
 			filterTexture = null;
 		}
+		pixmap.setColor(ColorMapper.getColor(drawBlock));
 	}
 }

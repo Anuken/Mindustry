@@ -13,6 +13,7 @@ import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.modules.ModuleCore;
+import io.anuke.ucore.scene.ui.TextField;
 
 public class Mindustry extends ModuleCore {
 	public static Callable donationsCallable;
@@ -22,6 +23,7 @@ public class Mindustry extends ModuleCore {
 		@Override public String format(Date date){ return "invalid date"; }
 		@Override public String format(int number){ return number + ""; }
 		@Override public void openLink(String link){ }
+		@Override public void addDialog(TextField field){}
 	};
 	
 	//always initialize blocks in this order, otherwise there are ID errors

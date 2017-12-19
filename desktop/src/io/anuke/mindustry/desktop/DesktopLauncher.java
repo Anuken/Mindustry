@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.PlatformFunction;
+import io.anuke.ucore.scene.ui.TextField;
 
 public class DesktopLauncher {
 	
@@ -46,6 +47,11 @@ public class DesktopLauncher {
 					e.printStackTrace();
 					Vars.ui.showError("Error opening link.");
 				}
+			}
+
+			@Override
+			public void addDialog(TextField field){
+				
 			}
 		};
 		

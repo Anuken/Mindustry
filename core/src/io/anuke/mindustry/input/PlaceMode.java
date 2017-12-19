@@ -82,7 +82,7 @@ public enum PlaceMode{
 	holdDelete{
 		{
 			delete = true;
-			shown = false;
+			shown = true;
 		}
 		
 		public void draw(int tilex, int tiley, int endx, int endy){

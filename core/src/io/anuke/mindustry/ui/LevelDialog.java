@@ -8,7 +8,6 @@ import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.function.StringSupplier;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
@@ -18,6 +17,7 @@ import io.anuke.ucore.scene.utils.Elements;
 public class LevelDialog extends FloatingDialog{
 	private Map selectedMap = Vars.world.maps().getMap(0);
 	private TextureRegion region = new TextureRegion();
+	private ScrollPane pane;
 	
 	public LevelDialog(){
 		super("Level Select");
@@ -34,7 +34,7 @@ public class LevelDialog extends FloatingDialog{
 	
 	void setup(){
 		Table maps = new Table();
-		ScrollPane pane = new ScrollPane(maps);
+		pane = new ScrollPane(maps);
 		pane.setFadeScrollBars(false);
 		
 		int maxwidth = 4;
@@ -66,7 +66,7 @@ public class LevelDialog extends FloatingDialog{
 			Table inset = new Table("pane-button");
 			inset.add("[accent]"+map.name).pad(3f).units(Unit.dp);
 			inset.row();
-			inset.add((StringSupplier)(()->"High Score: [accent]" + Settings.getInt("hiscore" + map.name)))
+			inset.label((() -> "High Score: [accent]" + Settings.getInt("hiscore" + map.name)))
 			.pad(3f).units(Unit.dp);
 			inset.pack();
 			
@@ -80,7 +80,21 @@ public class LevelDialog extends FloatingDialog{
 			ImageButton image = new ImageButton(new TextureRegion(map.texture), "togglemap");
 			image.row();
 			image.add(inset).width(images+6).units(Unit.dp);
+			TextButton[] delete = new TextButton[1];
+			if(map.custom){
+				image.row();
+				delete[0] = image.addButton("Delete", () -> {
+					Vars.ui.showConfirm("Confirm Delete", "Are you sure you want to delete\nthe map \"[orange]" + map.name + "[]\"?", () -> {
+						Vars.world.maps().removeMap(map);
+						reload();
+						Core.scene.setScrollFocus(pane);
+					});
+				}).width(images+16).units(Unit.dp).padBottom(-10f).grow().get();
+			}
 			image.clicked(()->{
+				if(delete[0] != null && delete[0].getClickListener().isOver()){
+					return;
+				}
 				selectedMap = map;
 				hide();
 				Vars.control.playMap(selectedMap);
@@ -90,7 +104,7 @@ public class LevelDialog extends FloatingDialog{
 			stack.add(back);
 			stack.add(image);
 			
-			maps.add(stack).width(170).pad(4f).units(Unit.dp);
+			maps.add(stack).width(170).top().pad(4f).units(Unit.dp);
 			
 			maps.padRight(Unit.dp.inPixels(26));
 			

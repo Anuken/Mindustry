@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.mapeditor.MapFilter.GenPref;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.mindustry.ui.FloatingDialog;
@@ -70,9 +71,15 @@ public class MapGenerateDialog extends FloatingDialog{
 		buttons().addButton("Update", () ->{ 
 			apply();
 		});
-		buttons().addButton("Apply", () ->{ 
-			editor.applyFilter();
-			hide();
+		buttons().addButton("Apply", () ->{
+			Vars.ui.showLoading();
+			
+			Timers.run(3f, () ->{
+				editor.applyFilter();
+				Vars.ui.hideLoading();
+				Vars.ui.getEditorDialog().resetSaved();
+				hide();
+			});
 		});
 		
 		shown(() ->{

@@ -51,6 +51,18 @@ public class Maps implements Disposable{
 		}
 	}
 	
+	public void removeMap(Map map){
+		maps.remove(map.id);
+		mapNames.remove(map.name);
+		Array<Map> out = new Array<>();
+		for(Map m : maps.values()){
+			if(m.custom){
+				out.add(m);
+			}
+		}
+		saveMaps(out, Vars.customMapDirectory.child("maps.json"));
+	}
+	
 	public void saveAndReload(Map map, Pixmap out){
 		if(map.pixmap != null && out != map.pixmap && map.texture != null){
 			map.texture.dispose();
@@ -58,6 +70,7 @@ public class Maps implements Disposable{
 		}else if (out == map.pixmap){
 			map.texture.draw(out, 0, 0);
 		}
+		
 		map.pixmap = out;
 		if(map.texture == null) map.texture = new Texture(map.pixmap);
 		
@@ -90,6 +103,7 @@ public class Maps implements Disposable{
 			if(map.custom){
 				if(map.name.equals(toSave.name)){
 					out.add(toSave);
+					toSave.id = map.id;
 					added = true;
 				}else{
 					out.add(map);

@@ -1,8 +1,13 @@
 package io.anuke.mindustry.mapeditor;
 
+import java.util.Arrays;
+
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.ui.FileChooser;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.ColorMapper.BlockPair;
@@ -12,6 +17,7 @@ import io.anuke.mindustry.world.blocks.SpecialBlocks;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Pixmaps;
 import io.anuke.ucore.scene.builders.*;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Table;
@@ -24,6 +30,8 @@ public class MapEditorDialog extends Dialog{
 	private MapLoadDialog loadDialog;
 	private MapSaveDialog saveDialog;
 	private MapResizeDialog resizeDialog;
+	private FileChooser openFile, saveFile;
+	private boolean saved = false;
 	
 	private ButtonGroup<ImageButton> blockgroup;
 	
@@ -33,8 +41,54 @@ public class MapEditorDialog extends Dialog{
 		dialog = new MapGenerateDialog(editor);
 		view = new MapView(editor);
 		
+		openFile = new FileChooser("Load Image", FileChooser.pngFilter, true, file -> {
+			Vars.ui.showLoading();
+			Timers.run(3f, () -> {
+				try{
+					Pixmap pixmap = new Pixmap(file);
+					if(verifySize(pixmap)){
+						editor.setPixmap(pixmap);
+					}else{
+						Vars.ui.showError("[orange]Invalid image dimensions![]\nValid map dimensions: " + Arrays.toString(MapEditor.validMapSizes));
+					}
+				}catch (Exception e){
+					Vars.ui.showError("Error loading image file!");
+					e.printStackTrace();
+				}
+				Vars.ui.hideLoading();
+			});
+		});
+		
+		saveFile = new FileChooser("Save Image", false, file -> {
+			if(!file.extension().toLowerCase().equals(".png")){
+				file = file.parent().child(file.nameWithoutExtension() + ".png");
+			}
+			FileHandle result = file;
+			Vars.ui.showLoading();
+			Timers.run(3f, () -> {
+				try{
+					Pixmaps.write(editor.pixmap(), result);
+				}catch (Exception e){
+					Vars.ui.showError("Error saving image file!");
+					e.printStackTrace();
+				}
+				Vars.ui.hideLoading();
+			});
+		});
+		
 		loadDialog = new MapLoadDialog(map -> {
-			editor.beginEdit(map);
+			saveDialog.setFieldText(map.name);
+			Vars.ui.showLoading();
+			
+			Timers.run(3f, () -> {
+				Map copy = new Map();
+				copy.name = map.name;
+				copy.id = -1;
+				copy.pixmap = Pixmaps.copy(map.pixmap);
+				copy.texture = new Texture(copy.pixmap);
+				editor.beginEdit(copy);
+				Vars.ui.hideLoading();
+			});
 		});
 		
 		resizeDialog = new MapResizeDialog(editor, (x, y) -> {
@@ -51,6 +105,7 @@ public class MapEditorDialog extends Dialog{
 		saveDialog = new MapSaveDialog(name -> {
 			Vars.ui.showLoading();
 			if(verifyMap()){
+				saved = true;
 				editor.getMap().name = name;
 				Timers.run(10f, () -> {
 					Vars.world.maps().saveAndReload(editor.getMap(), editor.pixmap());
@@ -70,9 +125,14 @@ public class MapEditorDialog extends Dialog{
 		build.end();
 		
 		shown(() -> {
+			saved = true;
 			editor.beginEdit(new Map());
 			Core.scene.setScrollFocus(view);
 		});
+	}
+	
+	public void resetSaved(){
+		saved = false;
 	}
 	
 	public void updateSelectedBlock(){
@@ -103,6 +163,12 @@ public class MapEditorDialog extends Dialog{
 				
 				row();
 				
+				new imagebutton("icon-cursor", 10f*3f, () -> {
+					resizeDialog.show();
+				}).text("resize").padTop(4f);
+				
+				row();
+				
 				new imagebutton("icon-load", isize, () -> {
 					loadDialog.show();
 				}).text("load map");
@@ -116,25 +182,23 @@ public class MapEditorDialog extends Dialog{
 				row();
 				
 				new imagebutton("icon-load", isize, () -> {
-					
+					openFile.show();
 				}).text("load image");
 				
 				row();
 				
 				new imagebutton("icon-save", isize, () -> {
-					
+					saveFile.show();
 				}).text("save image");
 				
 				row();
 				
-				new imagebutton("icon-cursor", 10f*3f, () -> {
-					resizeDialog.show();
-				}).text("resize").padTop(4f);
-				
-				row();
-				
 				new imagebutton("icon-arrow-left", isize, () -> {
-					hide();
+					if(!saved){
+						Vars.ui.showConfirm("Confirm Exit", "[scarlet]You have unsaved changes![]\nAre you sure you want to exit?", () -> hide());
+					}else{
+						hide();
+					}
 				}).padBottom(0).text("back");
 				
 			}}.left().growY().end();
@@ -186,6 +250,18 @@ public class MapEditorDialog extends Dialog{
 		}}.grow().end();
 	}
 	
+	private boolean verifySize(Pixmap pix){
+		boolean w = false, h = false;
+		for(int i : MapEditor.validMapSizes){
+			if(pix.getWidth() == i)
+				w = true;
+			if(pix.getHeight() == i)
+				h = true;
+		}
+		
+		return w && h;
+	}
+	
 	private boolean verifyMap(){
 		int psc = ColorMapper.getColor(SpecialBlocks.playerSpawn);
 		int esc = ColorMapper.getColor(SpecialBlocks.enemySpawn);
@@ -221,6 +297,7 @@ public class MapEditorDialog extends Dialog{
 	private void addBlockSelection(Table table){
 		Table content = new Table();
 		ScrollPane pane = new ScrollPane(content, "volume");
+		pane.setScrollingDisabled(true, false);
 		pane.setFadeScrollBars(false);
 		pane.setOverscroll(true, false);
 		ButtonGroup<ImageButton> group = new ButtonGroup<>();
@@ -242,10 +319,12 @@ public class MapEditorDialog extends Dialog{
 			}
 		}
 		
-		group.getButtons().get(3).setChecked(true);
+		content.padLeft(Unit.dp.inPixels(-5f));
+		
+		group.getButtons().get(2).setChecked(true);
 		
 		Table extra = new Table("button");
-		extra.addWrap(() -> editor.getDrawBlock().name).width(120f).center();
+		extra.labelWrap(() -> editor.getDrawBlock().name).width(120f).center();
 		table.add(extra).growX();
 		table.row();
 		table.add(pane).growY().fillX();

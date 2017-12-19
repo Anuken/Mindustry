@@ -17,6 +17,7 @@ import com.google.gwt.user.client.ui.*;
 
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.io.PlatformFunction;
+import io.anuke.ucore.scene.ui.TextField;
 
 public class HtmlLauncher extends GwtApplication {
     static final int WIDTH = 800;
@@ -105,6 +106,11 @@ public class HtmlLauncher extends GwtApplication {
 			@Override
 			public void openLink(String link){
 				Window.open(link, "_blank", "");
+			}
+
+			@Override
+			public void addDialog(TextField field){
+				
 			}
 		};
         

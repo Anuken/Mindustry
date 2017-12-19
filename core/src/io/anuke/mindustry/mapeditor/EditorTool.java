@@ -12,11 +12,19 @@ import io.anuke.mindustry.world.ColorMapper;
 
 public enum EditorTool{
 	pencil{
+		{
+			edit = true;
+		}
+		
 		public void touched(MapEditor editor, int x, int y){
 			editor.draw(x, y);
 		}
 	},
 	fill{
+		{
+			edit = true;
+		}
+		
 		public void touched(MapEditor editor, int x, int y){
 			Pixmap pix = editor.pixmap();
 			
@@ -63,6 +71,7 @@ public enum EditorTool{
 		}
 	},
 	zoom;
+	boolean edit;
 	
 	public void touched(MapEditor editor, int x, int y){
 		

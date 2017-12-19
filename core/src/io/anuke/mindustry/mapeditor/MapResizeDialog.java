@@ -16,6 +16,7 @@ public class MapResizeDialog extends FloatingDialog{
 	public MapResizeDialog(MapEditor editor, BiConsumer<Integer, Integer> cons){
 		super("resize map");
 		shown(() -> {
+			content().clear();
 			Pixmap pix = editor.pixmap();
 			width = pix.getWidth();
 			height = pix.getHeight();
@@ -48,7 +49,7 @@ public class MapResizeDialog extends FloatingDialog{
 				table.row();
 			}
 			
-			content().add(() -> 
+			content().label(() -> 
 				width + height > 512 ? "[scarlet]Warning!\n[]Maps larger than 256 units may be laggy and unstable." : ""
 			).get().setAlignment(Align.center, Align.center);
 			content().row();

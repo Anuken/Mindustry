@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import io.anuke.mindustry.io.PlatformFunction;
 import io.anuke.ucore.function.Callable;
+import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class AndroidLauncher extends AndroidApplication{
@@ -46,6 +47,11 @@ public class AndroidLauncher extends AndroidApplication{
 				Uri marketUri = Uri.parse(link);
 			    Intent intent = new Intent( Intent.ACTION_VIEW, marketUri );
 			    startActivity(intent); 
+			}
+
+			@Override
+			public void addDialog(TextField field){
+				TextFieldDialogListener.add(field);
 			}
 		};
 		
