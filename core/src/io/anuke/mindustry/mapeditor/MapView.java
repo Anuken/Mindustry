@@ -120,12 +120,12 @@ public class MapView extends Element implements GestureListener{
 		float centery = y + height/2 + offsety * zoom;
 		
 		batch.flush();
-		ScissorStack.pushScissors(Tmp.r1.set(x + width/2 - size/2, y + height/2 - size/2, size, size));
+		boolean pop = ScissorStack.pushScissors(Tmp.r1.set(x + width/2 - size/2, y + height/2 - size/2, size, size));
 		
 		batch.draw(editor.texture(), centerx - sclsize/2, centery - sclsize/2, sclsize, sclsize);
 		batch.flush();
 		
-		ScissorStack.popScissors();
+		if(pop) ScissorStack.popScissors();
 		
 		Draw.color(Colors.get("accent"));
 		Draw.thick(Unit.dp.inPixels(3f));
@@ -134,7 +134,7 @@ public class MapView extends Element implements GestureListener{
 	}
 	
 	private boolean active(){
-		return Core.scene.getKeyboardFocus().isDescendantOf(Vars.ui.getEditor()) && Vars.ui.isEditing() && tool == EditorTool.zoom;
+		return Core.scene.getKeyboardFocus() != null && Core.scene.getKeyboardFocus().isDescendantOf(Vars.ui.getEditorDialog()) && Vars.ui.isEditing() && tool == EditorTool.zoom;
 	}
 
 	@Override

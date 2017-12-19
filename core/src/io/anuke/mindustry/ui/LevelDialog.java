@@ -23,11 +23,16 @@ public class LevelDialog extends FloatingDialog{
 		super("Level Select");
 		getTitleTable().getCell(title()).growX().center();
 		getTitleTable().center();
+		addCloseButton();
+		setup();
+	}
+	
+	public void reload(){
+		content().clear();
 		setup();
 	}
 	
 	void setup(){
-		addCloseButton();
 		Table maps = new Table();
 		ScrollPane pane = new ScrollPane(maps);
 		pane.setFadeScrollBars(false);

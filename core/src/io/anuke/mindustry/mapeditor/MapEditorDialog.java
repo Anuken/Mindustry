@@ -1,12 +1,17 @@
 package io.anuke.mindustry.mapeditor;
 
+import com.badlogic.gdx.graphics.Pixmap;
+
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.ColorMapper.BlockPair;
 import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.mindustry.world.blocks.SpecialBlocks;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.builders.*;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Table;
@@ -16,6 +21,10 @@ public class MapEditorDialog extends Dialog{
 	private MapEditor editor;
 	private MapView view;
 	private MapGenerateDialog dialog;
+	private MapLoadDialog loadDialog;
+	private MapSaveDialog saveDialog;
+	private MapResizeDialog resizeDialog;
+	
 	private ButtonGroup<ImageButton> blockgroup;
 	
 	public MapEditorDialog(MapEditor editor){
@@ -23,6 +32,34 @@ public class MapEditorDialog extends Dialog{
 		this.editor = editor;
 		dialog = new MapGenerateDialog(editor);
 		view = new MapView(editor);
+		
+		loadDialog = new MapLoadDialog(map -> {
+			editor.beginEdit(map);
+		});
+		
+		resizeDialog = new MapResizeDialog(editor, (x, y) -> {
+			Pixmap pix = editor.pixmap();
+			if(!(pix.getWidth() == x && pix.getHeight() == y)){
+				Vars.ui.showLoading();
+				Timers.run(10f, ()->{
+					editor.resize(x, y);
+					Vars.ui.hideLoading();
+				});
+			}
+		});
+		
+		saveDialog = new MapSaveDialog(name -> {
+			Vars.ui.showLoading();
+			if(verifyMap()){
+				editor.getMap().name = name;
+				Timers.run(10f, () -> {
+					Vars.world.maps().saveAndReload(editor.getMap(), editor.pixmap());
+					Vars.ui.hideLoading();
+				});
+			}else{
+				Vars.ui.hideLoading();
+			}
+		});
 		
 		setFillParent(true);
 		
@@ -48,7 +85,6 @@ public class MapEditorDialog extends Dialog{
 			}
 			i++;
 		}
-		
 	}
 	
 	public void build(){
@@ -68,13 +104,13 @@ public class MapEditorDialog extends Dialog{
 				row();
 				
 				new imagebutton("icon-load", isize, () -> {
-					
+					loadDialog.show();
 				}).text("load map");
 				
 				row();
 				
 				new imagebutton("icon-save", isize, ()->{
-					
+					saveDialog.show();
 				}).text("save map");
 				
 				row();
@@ -92,7 +128,7 @@ public class MapEditorDialog extends Dialog{
 				row();
 				
 				new imagebutton("icon-cursor", 10f*3f, () -> {
-					
+					resizeDialog.show();
 				}).text("resize").padTop(4f);
 				
 				row();
@@ -150,6 +186,38 @@ public class MapEditorDialog extends Dialog{
 		}}.grow().end();
 	}
 	
+	private boolean verifyMap(){
+		int psc = ColorMapper.getColor(SpecialBlocks.playerSpawn);
+		int esc = ColorMapper.getColor(SpecialBlocks.enemySpawn);
+		
+		int playerSpawns = 0;
+		int enemySpawns = 0;
+		Pixmap pix = editor.pixmap();
+		
+		for(int x = 0; x < pix.getWidth(); x ++){
+			for(int y = 0; y < pix.getHeight(); y ++){
+				int i = pix.getPixel(x, y);
+				if(i == psc) playerSpawns ++;
+				if(i == esc) enemySpawns ++;
+			}
+		}
+		
+		if(playerSpawns == 0){
+			Vars.ui.showError("This map has no player spawnpoint!");
+			return false;
+		}else if(playerSpawns > 1){
+			Vars.ui.showError("Maps cannot have more than one\nplayer spawnpoint!");
+			return false;
+		}
+		
+		if(enemySpawns > MapEditor.maxSpawnpoints){
+			Vars.ui.showError("Cannot have more than\n" + MapEditor.maxSpawnpoints + " enemy spawnpoints!");
+			return false;
+		}
+		
+		return true;
+	}
+	
 	private void addBlockSelection(Table table){
 		Table content = new Table();
 		ScrollPane pane = new ScrollPane(content, "volume");
@@ -173,6 +241,8 @@ public class MapEditorDialog extends Dialog{
 				content.row();
 			}
 		}
+		
+		group.getButtons().get(3).setChecked(true);
 		
 		Table extra = new Table("button");
 		extra.addWrap(() -> editor.getDrawBlock().name).width(120f).center();

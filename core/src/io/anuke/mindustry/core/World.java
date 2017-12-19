@@ -158,6 +158,8 @@ public class World extends Module{
 		this.seed = seed;
 		Generator.generate(map.pixmap, tiles);
 		
+		if(control.getCore() == null) return;
+		
 		//TODO multiblock core
 		control.getInput().placeBlock(control.getCore().x, control.getCore().y, ProductionBlocks.core, 0, false, false);
 		

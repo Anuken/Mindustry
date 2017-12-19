@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 
 public class Map{
-	public int id;
+	public int id = -1;
 	public String name;
 	public boolean visible = true;
 	public boolean flipBase = false;

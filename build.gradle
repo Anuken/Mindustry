@@ -16,7 +16,7 @@ allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
 
-    version = '1.0'
+    version = 'release'
     ext {
         appName = "Mindustry"
         gdxVersion = '1.9.6'

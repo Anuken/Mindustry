@@ -87,7 +87,7 @@
     {
       "id": 12,
       "name": "tutorial",
-      "visible": true,
+      "visible": false,
       "flipBase": false,
       "backgroundColor": "646464"
     }

@@ -30,7 +30,8 @@ public class Mindustry extends ModuleCore {
 		DefenseBlocks.compositewall,
 		DistributionBlocks.conduit,
 		ProductionBlocks.coaldrill,
-		WeaponBlocks.chainturret
+		WeaponBlocks.chainturret,
+		SpecialBlocks.enemySpawn
 	};
 	
 	@Override

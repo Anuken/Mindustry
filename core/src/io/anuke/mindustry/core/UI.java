@@ -449,8 +449,16 @@ public class UI extends SceneModule{
 		editorDialog.show();
 	}
 	
-	public MapEditorDialog getEditor(){
+	public MapEditorDialog getEditorDialog(){
 		return editorDialog;
+	}
+	
+	public MapEditor getEditor(){
+		return editor;
+	}
+	
+	public void reloadLevels(){
+		((LevelDialog)levels).reload();
 	}
 	
 	public boolean isEditing(){

@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Json.Serializer;
 import com.badlogic.gdx.utils.JsonWriter.OutputType;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.graphics.Pixmaps;
 
 public class Maps implements Disposable{
@@ -49,17 +50,59 @@ public class Maps implements Disposable{
 			}
 		}
 	}
+	
+	public void saveAndReload(Map map, Pixmap out){
+		if(map.pixmap != null && out != map.pixmap && map.texture != null){
+			map.texture.dispose();
+			map.texture = new Texture(out);
+		}else if (out == map.pixmap){
+			map.texture.draw(out, 0, 0);
+		}
+		map.pixmap = out;
+		if(map.texture == null) map.texture = new Texture(map.pixmap);
+		
+		if(map.id == -1){
+			if(mapNames.containsKey(map.name)){
+				map.id = mapNames.get(map.name).id;
+			}else{
+				map.id = ++lastID;
+			}
+		}
+		
+		if(!Settings.has("hiscore" + map.name)){
+			Settings.defaults("hiscore" + map.name, 0);
+		}
+		
+		saveCustomMap(map);
+		Vars.ui.reloadLevels();
+		//TODO reload map dialog
+	}
 
 	public void saveMaps(Array<Map> array, FileHandle file){
 		json.toJson(new ArrayContainer(array), file);
 	}
 	
 	public void saveCustomMap(Map toSave){
+		toSave.custom = true;
 		Array<Map> out = new Array<>();
+		boolean added = false;
 		for(Map map : maps.values()){
-			if(map.custom)
-				out.add(map);
+			if(map.custom){
+				if(map.name.equals(toSave.name)){
+					out.add(toSave);
+					added = true;
+				}else{
+					out.add(map);
+				}
+			}
 		}
+		if(!added){
+			out.add(toSave);
+		}
+		maps.remove(toSave.id);
+		mapNames.remove(toSave.name);
+		maps.put(toSave.id, toSave);
+		mapNames.put(toSave.name, toSave);
 		Pixmaps.write(toSave.pixmap, Vars.customMapDirectory.child(toSave.name + ".png"));
 		saveMaps(out, Vars.customMapDirectory.child("maps.json"));
 	}
@@ -73,6 +116,7 @@ public class Maps implements Disposable{
 					map.texture = new Texture(map.pixmap);
 					maps.put(map.id, map);
 					mapNames.put(map.name, map);
+					lastID = Math.max(lastID, map.id);
 				}
 			}
 			return true;

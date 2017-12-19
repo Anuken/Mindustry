@@ -19,10 +19,9 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 
-//TODO
 public class Teleporter extends Block implements Configurable{
-	public static final int colors = 4;
 	public static final Color[] colorArray = {Color.ROYAL, Color.ORANGE, Color.SCARLET, Color.FOREST, Color.PURPLE, Color.GOLD, Color.PINK};
+	public static final int colors = colorArray.length;
 	
 	private static Array<Tile> removal = new Array<>();
 	private static Array<Tile> returns = new Array<>();
@@ -71,16 +70,13 @@ public class Teleporter extends Block implements Configurable{
 		TeleporterEntity entity = tile.entity();
 		
 		table.addIButton("icon-arrow-left", Unit.dp.inPixels(10*3), ()->{
-			entity.color --;
-			if(entity.color < 0)
-				entity.color += 4;
+			entity.color = (byte)Mathf.mod(entity.color - 1, colors);
 		});
 		
 		table.add().size(40f).units(Unit.dp);
 		
 		table.addIButton("icon-arrow-right", Unit.dp.inPixels(10*3), ()->{
-			entity.color ++;
-			entity.color %= 4;
+			entity.color = (byte)Mathf.mod(entity.color + 1, colors);
 		});
 	}
 	

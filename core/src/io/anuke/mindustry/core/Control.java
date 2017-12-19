@@ -160,6 +160,8 @@ public class Control extends Module{
 	}
 	
 	public void play(){
+		if(core == null) return;
+		
 		renderer.clearTiles();
 		
 		player.x = core.worldx();
@@ -435,7 +437,7 @@ public class Control extends Module{
 	@Override
 	public void update(){
 		
-		if(debug){
+		if(debug && GameState.is(State.playing)){
 			//debug actions
 			if(Inputs.keyUp(Keys.P)){
 				Effects.effect(Fx.shellsmoke, player);

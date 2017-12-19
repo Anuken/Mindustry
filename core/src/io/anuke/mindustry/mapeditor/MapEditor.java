@@ -13,8 +13,9 @@ import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.graphics.Pixmaps;
 
 public class MapEditor{
-	public static final int[] validMapSizes = {64, 128, 256};
+	public static final int[] validMapSizes = {128, 256, 512};
 	public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15};
+	public static final int maxSpawnpoints = 15;
 	
 	private Pixmap[] brushPixmaps = new Pixmap[brushSizes.length];
 	
@@ -34,6 +35,10 @@ public class MapEditor{
 			int s = brushSizes[i];
 			brushPixmaps[i] = new Pixmap(s*2-1, s*2-1, Format.RGB888);
 		}
+	}
+	
+	public Map getMap(){
+		return map;
 	}
 	
 	public void updateTexture(){
@@ -156,10 +161,18 @@ public class MapEditor{
 		return pixmap;
 	}
 	
-	public void resize(int mapSize){
-		Pixmap out = Pixmaps.resize(pixmap, mapSize, mapSize);
+	public void resize(int width, int height){
+		Pixmap out = Pixmaps.resize(pixmap, width, height);
 		pixmap.dispose();
 		pixmap = out;
-		texture.draw(pixmap, 0, 0);
+		texture.dispose();
+		texture = new Texture(out);
+		
+		if(filterPixmap != null){
+			filterPixmap.dispose();
+			filterTexture.dispose();
+			filterPixmap = null;
+			filterTexture = null;
+		}
 	}
 }

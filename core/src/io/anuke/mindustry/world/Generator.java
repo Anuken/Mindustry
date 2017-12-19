@@ -6,16 +6,17 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.GameState;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.enemies.TargetEnemy;
 import io.anuke.mindustry.world.ColorMapper.BlockPair;
 import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.mindustry.world.blocks.SpecialBlocks;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.noise.Noise;
 import io.anuke.ucore.util.Mathf;
 
 public class Generator{
-	static final int spawn = Color.rgba8888(Color.RED);
-	static final int start = Color.rgba8888(Color.GREEN);
 	static final ObjectMap<Block, Block> rocks = new ObjectMap(){{
 		put(Blocks.stone, Blocks.rock);
 		put(Blocks.snow, Blocks.icerock);
@@ -25,6 +26,7 @@ public class Generator{
 	
 	/**Returns world size.*/
 	public static void generate(Pixmap pixmap, Tile[][] tiles){
+		boolean hasenemies = true, hascore = false;;
 		
 		Noise.setSeed(Vars.world.getSeed());
 		
@@ -39,11 +41,16 @@ public class Generator{
 				if(pair != null){
 					block = pair.wall;
 					floor = pair.floor;
-				}else if(color == start){
+				}
+					
+				if(block == SpecialBlocks.playerSpawn){
+					block = Blocks.air;
 					Vars.control.setCore(Vars.world.tile(x, y));
-				}else if(color == spawn){
+					hascore = true;
+				}else if(block == SpecialBlocks.enemySpawn){
+					block = Blocks.air;
 					Vars.control.addSpawnPoint(Vars.world.tile(x, y));
-					floor = Blocks.dirt;
+					hasenemies = true;
 				}
 				
 				if(block == Blocks.air && Mathf.chance(0.025) && rocks.containsKey(floor)){
@@ -77,6 +84,16 @@ public class Generator{
 				tiles[x][y].setBlock(block, 0);
 				tiles[x][y].setFloor(floor);
 			}
+		}
+		
+		if(!hascore){
+			GameState.set(State.menu);
+			Vars.ui.showError("[orange]Invalid map:[] this map has no core!");
+		}
+		
+		if(!hasenemies){
+			GameState.set(State.menu);
+			Vars.ui.showError("[orange]Invalid map:[] this map has no enemy spawnpoints!");
 		}
 	}
 	

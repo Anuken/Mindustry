@@ -59,7 +59,7 @@ public enum EditorTool{
 		public void touched(MapEditor editor, int x, int y){
 			Block block = ColorMapper.get(editor.pixmap().getPixel(x, y)).dominant();
 			editor.setDrawBlock(block);
-			Vars.ui.getEditor().updateSelectedBlock();
+			Vars.ui.getEditorDialog().updateSelectedBlock();
 		}
 	},
 	zoom;

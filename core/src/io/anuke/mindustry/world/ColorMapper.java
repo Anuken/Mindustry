@@ -7,11 +7,14 @@ import com.badlogic.gdx.utils.IntMap.Entry;
 import com.badlogic.gdx.utils.ObjectIntMap;
 
 import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.mindustry.world.blocks.SpecialBlocks;
 
 public class ColorMapper{
 	private static ObjectIntMap<Block> reverseColors = new ObjectIntMap<>();
 	private static Array<BlockPair> pairs = new Array<>();
 	private static IntMap<BlockPair> colors = map(
+		"ff0000", pair(Blocks.dirt, SpecialBlocks.enemySpawn),
+		"00ff00", pair(Blocks.stone, SpecialBlocks.playerSpawn),
 		"323232", pair(Blocks.stone),
 		"646464", pair(Blocks.stone, Blocks.stoneblock),
 		"50965a", pair(Blocks.grass),
