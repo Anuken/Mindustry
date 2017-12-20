@@ -8,10 +8,13 @@ import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.scene.utils.ClickListener;
 import io.anuke.ucore.scene.utils.Elements;
+import io.anuke.ucore.util.Tmp;
 
 public class LevelDialog extends FloatingDialog{
 	private Map selectedMap = Vars.world.maps().getMap(0);
@@ -83,20 +86,29 @@ public class LevelDialog extends FloatingDialog{
 			if(map.custom){
 				image.row();
 				delete[0] = image.addButton("Delete", () -> {
-					Vars.ui.showConfirm("Confirm Delete", "Are you sure you want to delete\nthe map \"[orange]" + map.name + "[]\"?", () -> {
-						Vars.world.maps().removeMap(map);
-						reload();
-						Core.scene.setScrollFocus(pane);
+					Timers.run(1f, () -> {
+						Vars.ui.showConfirm("Confirm Delete", "Are you sure you want to delete\nthe map \"[orange]" + map.name + "[]\"?", () -> {
+							Vars.world.maps().removeMap(map);
+							reload();
+							Core.scene.setScrollFocus(pane);
+						});
 					});
 				}).width(images+16).padBottom(-10f).grow().get();
 			}
-			image.clicked(()->{
-				if(delete[0] != null && delete[0].getClickListener().isOver()){
-					return;
+			
+			image.addListener(new ClickListener(){
+				public void clicked(InputEvent event, float x, float y){
+					image.localToStageCoordinates(Tmp.v1.set(x, y));
+					if(delete[0] != null && (delete[0].getClickListener().isOver() || delete[0].getClickListener().isPressed()
+							|| (Core.scene.hit(Tmp.v1.x, Tmp.v1.y, true) != null && 
+							Core.scene.hit(Tmp.v1.x, Tmp.v1.y, true).isDescendantOf(delete[0])))){
+						return;
+					}
+					
+					selectedMap = map;
+					hide();
+					Vars.control.playMap(selectedMap);
 				}
-				selectedMap = map;
-				hide();
-				Vars.control.playMap(selectedMap);
 			});
 			image.getImageCell().size(images);
 			

@@ -8,9 +8,7 @@ import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.BlockPart;
-import io.anuke.mindustry.world.blocks.types.Floor;
-import io.anuke.mindustry.world.blocks.types.StaticBlock;
+import io.anuke.mindustry.world.blocks.types.*;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
@@ -79,25 +77,26 @@ public class Blocks{
 	
 	stone = new Floor("stone"){{
 		drops = new ItemStack(Item.stone, 1);
+		blends = block -> block != this && !(block instanceof Ore);
 	}},
 	
 	blackstone = new Floor("blackstone"){{
 		drops = new ItemStack(Item.stone, 1);
 	}},
 	
-	iron = new Floor("iron"){{
+	iron = new Ore("iron"){{
 		drops = new ItemStack(Item.iron, 1);
 	}},
 	
-	coal = new Floor("coal"){{
+	coal = new Ore("coal"){{
 		drops = new ItemStack(Item.coal, 1);
 	}},
 	
-	titanium = new Floor("titanium"){{
+	titanium = new Ore("titanium"){{
 		drops = new ItemStack(Item.titanium, 1);
 	}},
 	
-	uranium = new Floor("uranium"){{
+	uranium = new Ore("uranium"){{
 		drops = new ItemStack(Item.uranium, 1);
 	}},
 	

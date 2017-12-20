@@ -7,10 +7,12 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.util.Mathf;
 
 public class Floor extends Block{
-
+	protected Predicate<Block> blends = block -> block != this;
+	
 	public Floor(String name) {
 		super(name);
 		variants = 3;
@@ -33,7 +35,7 @@ public class Floor extends Block{
 				
 				Block floor = other.floor();
 				
-				if(floor.id <= this.id) continue;
+				if(floor.id <= this.id || !blends.test(floor)) continue;
 				
 				TextureRegion region = Draw.hasRegion(floor.name() + "edge") ? Draw.region(floor.name() + "edge") :
 					Draw.region(floor.edge + "edge");

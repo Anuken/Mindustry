@@ -210,18 +210,14 @@ public class Renderer extends RendererModule{
 		Graphics.surface(shieldSurface);
 		Graphics.surface();
 		
-		boolean optimize = false;
-		
 		drawFloor();
-		drawBlocks(false, optimize);
+		drawBlocks(false);
 
 		Graphics.shader(Shaders.outline, false);
 		Entities.draw(control.enemyGroup);
 		Graphics.shader();
 
 		Entities.draw(Entities.defaultGroup());
-		
-		if(!optimize) drawBlocks(true, false);
 		
 		Entities.draw(control.bulletGroup);
 
@@ -369,7 +365,7 @@ public class Renderer extends RendererModule{
 		}
 	}
 	
-	void drawBlocks(boolean top, boolean optimize){
+	void drawBlocks(boolean top){
 		int crangex = (int) (camera.viewportWidth / (chunksize * tilesize)) + 1;
 		int crangey = (int) (camera.viewportHeight / (chunksize * tilesize)) + 1;
 		
@@ -384,8 +380,8 @@ public class Renderer extends RendererModule{
 		
 		Layer[] layers = Layer.values();
 		
-		int start = optimize ? (noshadows ? 1 : 0) : (top ? 4 : (noshadows ? 1 : 0));
-		int end = optimize ? 4 : (top ? 4 + layers.length-1 : 4);
+		int start = (top ? 4 : (noshadows ? 1 : 0));
+		int end = (top ? 4 + layers.length-1 : 4);
 
 		//0 = shadows
 		//1 = cache blocks
@@ -422,15 +418,12 @@ public class Renderer extends RendererModule{
 									(!expanded || tile.block().expanded)){
 								if(l == 2){
 									tile.block().draw(tile);
-								}else if(!optimize){
+								}else{
 									if(tile.block().layer == layer)
 										 tile.block().drawLayer(tile);
 									
 									if(tile.block().layer2 == layer)
 										 tile.block().drawLayer2(tile);
-								}else if(l == 3){
-									tile.block().drawLayer(tile);
-									tile.block().drawLayer2(tile);
 								}
 							}
 						}
