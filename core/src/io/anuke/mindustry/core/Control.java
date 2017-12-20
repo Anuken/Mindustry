@@ -130,7 +130,6 @@ public class Control extends Module{
 	
 	public void reset(){
 		weapons.clear();
-		renderer.clearTiles();
 		
 		weapons.add(Weapon.blaster);
 		player.weapon = weapons.first();
@@ -161,7 +160,6 @@ public class Control extends Module{
 	
 	public void play(){
 		if(core == null) return;
-		
 		renderer.clearTiles();
 		
 		player.x = core.worldx();

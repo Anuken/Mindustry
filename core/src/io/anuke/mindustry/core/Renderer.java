@@ -489,7 +489,7 @@ public class Renderer extends RendererModule{
 		cache = null;
 		if(cbatch != null)
 			cbatch.dispose();
-		cbatch = new CacheBatch(256 * 256 * 3);
+		cbatch = new CacheBatch(Vars.world.width() * Vars.world.height() * 3);
 	}
 	
 	void drawPaths(){

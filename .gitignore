@@ -4,10 +4,11 @@
 /desktop/packr-out/
 /desktop/packr-export/
 /desktop/mindustry-saves/
-/destkop/mindustry-maps/
+/destkop/mindustry-maps/*
 /core/lib/
 *.gif
 
+.attach_*
 ## Java
 
 *.class

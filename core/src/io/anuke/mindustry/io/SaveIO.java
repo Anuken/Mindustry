@@ -115,7 +115,11 @@ public class SaveIO{
 	
 	public static boolean isSaveValid(int slot){
 		try(DataInputStream stream = new DataInputStream(fileFor(slot).read())){
-			return stream.readInt() == fileVersionID;
+			int version = stream.readInt(); //read version
+			stream.readLong(); //read last saved time
+			stream.readByte(); //read the gamemode
+			byte map = stream.readByte(); //read the map
+			return version == fileVersionID && Vars.world.maps().getMap(map) != null;
 		}catch (Exception e){
 			return false;
 		}
