@@ -8,7 +8,6 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.ConfirmDialog;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Cell;
-import io.anuke.ucore.scene.ui.layout.Unit;
 
 //TODO unified save/load dialogs
 public class SaveDialog extends LoadDialog{
@@ -27,7 +26,7 @@ public class SaveDialog extends LoadDialog{
 					{
 						content().pad(16);
 						for(Cell<?> cell : getButtonTable().getCells())
-							cell.size(110, 45).pad(4).units(Unit.dp);
+							cell.size(110, 45).pad(4);
 					}
 				}.show();
 			}else{

@@ -16,6 +16,7 @@ public class MapEditor{
 	public static final int[] validMapSizes = {128, 256, 512};
 	public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15};
 	public static final int maxSpawnpoints = 15;
+	public static final Format format = Format.RGBA8888;
 	
 	private Pixmap[] brushPixmaps = new Pixmap[brushSizes.length];
 	
@@ -33,7 +34,7 @@ public class MapEditor{
 	public MapEditor(){
 		for(int i = 0; i < brushSizes.length; i ++){
 			int s = brushSizes[i];
-			brushPixmaps[i] = new Pixmap(s*2-1, s*2-1, Format.RGB888);
+			brushPixmaps[i] = new Pixmap(s*2-1, s*2-1, format);
 		}
 	}
 	
@@ -83,7 +84,7 @@ public class MapEditor{
 		this.map = map;
 		this.brushSize = 1;
 		if(map.pixmap == null){
-			pixmap = new Pixmap(256, 256, Format.RGB888);
+			pixmap = new Pixmap(256, 256, format);
 			pixmap.setColor(ColorMapper.getColor(drawBlock));
 			pixmap.fill();
 			texture = new Texture(pixmap);

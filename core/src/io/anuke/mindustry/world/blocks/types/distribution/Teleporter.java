@@ -69,13 +69,13 @@ public class Teleporter extends Block implements Configurable{
 	public void buildTable(Tile tile, Table table){
 		TeleporterEntity entity = tile.entity();
 		
-		table.addIButton("icon-arrow-left", Unit.dp.inPixels(10*3), ()->{
+		table.addIButton("icon-arrow-left", Unit.dp.scl(10*3), ()->{
 			entity.color = (byte)Mathf.mod(entity.color - 1, colors);
 		});
 		
-		table.add().size(40f).units(Unit.dp);
+		table.add().size(40f);
 		
-		table.addIButton("icon-arrow-right", Unit.dp.inPixels(10*3), ()->{
+		table.addIButton("icon-arrow-right", Unit.dp.scl(10*3), ()->{
 			entity.color = (byte)Mathf.mod(entity.color + 1, colors);
 		});
 	}

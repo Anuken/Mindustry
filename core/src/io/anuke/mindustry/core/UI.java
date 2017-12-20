@@ -123,13 +123,13 @@ public class UI extends SceneModule{
 		Draw.color();
 		
 		TextureRegion back = Draw.region("background");
-		float backscl = Unit.dp.inPixels(5f);
+		float backscl = Unit.dp.scl(5f);
 		
 		Draw.alpha(0.7f);
 		Core.batch.draw(back, w/2 - back.getRegionWidth()*backscl/2 +240f, h/2 - back.getRegionHeight()*backscl/2 + 250f, 
 				back.getRegionWidth()*backscl, back.getRegionHeight()*backscl);
 		
-		float logoscl = (int)Unit.dp.inPixels(7);
+		float logoscl = (int)Unit.dp.scl(7);
 		TextureRegion logo = skin.getRegion("logotext");
 		float logow = logo.getRegionWidth()*logoscl;
 		float logoh = logo.getRegionHeight()*logoscl;
@@ -177,14 +177,14 @@ public class UI extends SceneModule{
 				+ "[]Please report the exact circumstances under which this error occured to the developer: "
 				+ "\n[ORANGE]anukendev@gmail.com[]"){{
 					setWrap(true);
-				}}).width(600f).units(Unit.dp).pad(10f);
-		gameerror.buttons().addButton("OK", gameerror::hide).size(200f, 50).units(Unit.dp);
+				}}).width(600f).pad(10f);
+		gameerror.buttons().addButton("OK", gameerror::hide).size(200f, 50);
 		//gameerror.setFillParent(true);
 		
 		discord = new Dialog("Discord", "dialog");
-		discord.content().pad(Unit.dp.inPixels(12f));
+		discord.content().pad(Unit.dp.scl(12f));
 		discord.content().add("Join the mindustry discord!\n[orange]" + Vars.discordURL);
-		discord.buttons().defaults().size(200f, 50).units(Unit.dp);
+		discord.buttons().defaults().size(200f, 50);
 		discord.buttons().addButton("Open link", () -> Mindustry.platforms.openLink(Vars.discordURL));
 		discord.buttons().addButton("Back", discord::hide);
 		
@@ -255,7 +255,7 @@ public class UI extends SceneModule{
 			prefs.content().row();
 			prefs.content().addButton("Controls", () -> {
 				keys.show(scene);
-			}).size(300f, 50f).pad(5f).units(Unit.dp);
+			}).size(300f, 50f).pad(5f);
 		}
 
 		keys = new MindustryKeybindDialog();
@@ -275,7 +275,7 @@ public class UI extends SceneModule{
 				restart.content().add("[YELLOW]New highscore!").pad(6);
 				restart.content().row();
 			}
-			restart.content().add("You lasted until wave [GREEN]" + control.getWave() + "[].").pad(12).units(Unit.dp).get();
+			restart.content().add("You lasted until wave [GREEN]" + control.getWave() + "[].").pad(12).get();
 			restart.pack();
 		});
 		
@@ -283,7 +283,7 @@ public class UI extends SceneModule{
 			restart.hide();
 			GameState.set(State.menu);
 			control.reset();
-		}).size(200, 50).pad(3).units(Unit.dp);
+		}).size(200, 50).pad(3);
 		
 		build.begin(scene);
 		
@@ -300,14 +300,14 @@ public class UI extends SceneModule{
 		loadingtable = new table("loadDim"){{
 			get().setTouchable(Touchable.enabled);
 			get().addImage("white").growX()
-			.height(3f).pad(4f).growX().units(Unit.dp).get().setColor(Colors.get("accent"));
+			.height(3f).pad(4f).growX().get().setColor(Colors.get("accent"));
 			row();
 			new label("[accent]Loading..."){{
 				get().setName("namelabel");
-			}}.pad(10).units(Unit.dp);
+			}}.pad(10);
 			row();
 			get().addImage("white").growX()
-			.height(3f).pad(4f).growX().units(Unit.dp).get().setColor(Colors.get("accent"));
+			.height(3f).pad(4f).growX().get().setColor(Colors.get("accent"));
 		}}.end().get();
 		
 		loadingtable.setVisible(false);
@@ -367,11 +367,11 @@ public class UI extends SceneModule{
 	
 	public void showError(String text){
 		new Dialog("[crimson]An error has occured", "dialog"){{
-			content().pad(Unit.dp.inPixels(15));
+			content().pad(Unit.dp.scl(15));
 			content().add(text);
 			getButtonTable().addButton("OK", ()->{
 				hide();
-			}).size(90, 50).pad(4).units(Unit.dp);
+			}).size(90, 50).pad(4);
 		}}.show();
 	}
 	
@@ -472,8 +472,8 @@ public class UI extends SceneModule{
 	
 	public void showConfirm(String title, String text, Listenable confirmed){
 		FloatingDialog dialog = new FloatingDialog(title);
-		dialog.content().add(text).pad(4f).units(Unit.dp);
-		dialog.buttons().defaults().size(200f, 54f).pad(2f).units(Unit.dp);
+		dialog.content().add(text).pad(4f);
+		dialog.buttons().defaults().size(200f, 54f).pad(2f);
 		dialog.buttons().addButton("Cancel", dialog::hide);
 		dialog.buttons().addButton("OK", () -> {
 			dialog.hide();

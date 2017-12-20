@@ -44,13 +44,13 @@ public class LoadDialog extends FloatingDialog{
 		pane = new ScrollPane(slots);
 		pane.setFadeScrollBars(false);
 
-		slots.padRight(Unit.dp.inPixels(24));
+		slots.padRight(Unit.dp.scl(24));
 
 		for(int i = 0; i < Vars.saveSlots; i++){
 			final int slot = i;
 
 			TextButton button = new TextButton("[accent]Slot " + (i + 1));
-			button.pad(Unit.dp.inPixels(12));
+			button.pad(Unit.dp.scl(12));
 			button.getLabelCell().top().left().growX();
 
 			button.row();
@@ -63,11 +63,11 @@ public class LoadDialog extends FloatingDialog{
 			button.add(info).padBottom(3).padTop(7);
 			button.row();
 			//button.addImage("white", Color.GRAY)
-			//.growX().height(3f).pad(4f).units(Unit.dp);
+			//.growX().height(3f).pad(4f);
 			button.row();
 			modifyButton(button, slot);
 
-			slots.add(button).size(404, 104).pad(4).units(Unit.dp);
+			slots.add(button).size(404, 104).pad(4);
 			slots.row();
 		}
 

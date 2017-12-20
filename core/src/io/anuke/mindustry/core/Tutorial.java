@@ -44,7 +44,7 @@ public class Tutorial{
 			atop();
 			margin(12);
 			
-			info = new label(()->stage.text).pad(10f).padBottom(5f).width(340f).units(Unit.dp).colspan(2).get();
+			info = new label(()->stage.text).pad(10f).padBottom(5f).width(340f).colspan(2).get();
 			info.setWrap(true);
 			
 			row();
@@ -62,8 +62,8 @@ public class Tutorial{
 			
 		}}.end();
 		
-		prev.pad(Unit.dp.inPixels(16));
-		next.pad(Unit.dp.inPixels(16));
+		prev.pad(Unit.dp.scl(16));
+		next.pad(Unit.dp.scl(16));
 		
 		prev.setDisabled(()->!canMove(false) || !stage.canBack);
 		next.setDisabled(()->!stage.canForward);

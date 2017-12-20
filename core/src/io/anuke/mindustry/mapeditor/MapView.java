@@ -124,7 +124,7 @@ public class MapView extends Element implements GestureListener{
 		if(pop) ScissorStack.popScissors();
 		
 		Draw.color(Colors.get("accent"));
-		Draw.thick(Unit.dp.inPixels(3f));
+		Draw.thick(Unit.dp.scl(3f));
 		Draw.linerect(x + width/2 - size/2, y + height/2 - size/2, size, size);
 		Draw.reset();
 	}
@@ -173,7 +173,7 @@ public class MapView extends Element implements GestureListener{
 	public boolean zoom(float initialDistance, float distance){
 		if(!active()) return false;
 		float nzoom = distance - initialDistance;
-		zoom += nzoom / 2000f / Unit.dp.inPixels(1f) * zoom;
+		zoom += nzoom / 2000f / Unit.dp.scl(1f) * zoom;
 		clampZoom();
 		return false;
 	}

@@ -121,7 +121,7 @@ public class AndroidInput extends InputHandler{
 	public void update(){
 		enableHold = player.breakMode == PlaceMode.holdDelete;
 
-		if(enableHold && player.recipe != null && Gdx.input.isTouched(0) && Mathf.near2d(lmousex, lmousey, Gdx.input.getX(0), Gdx.input.getY(0), Unit.dp.inPixels(50))
+		if(enableHold && Gdx.input.isTouched(0) && Mathf.near2d(lmousex, lmousey, Gdx.input.getX(0), Gdx.input.getY(0), Unit.dp.scl(50))
 				&& !ui.hasMouse()){
 			warmup += Timers.delta();
 

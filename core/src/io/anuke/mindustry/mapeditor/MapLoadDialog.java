@@ -23,8 +23,8 @@ public class MapLoadDialog extends FloatingDialog{
 		int i = 0;
 		
 		Table table = new Table();
-		table.defaults().size(200f, 90f).units(Unit.dp).pad(4f);
-		table.pad(Unit.dp.inPixels(10f));
+		table.defaults().size(200f, 90f).pad(4f);
+		table.pad(Unit.dp.scl(10f));
 		
 		ScrollPane pane = new ScrollPane(table, "horizontal");
 		pane.setFadeScrollBars(false);
@@ -33,10 +33,10 @@ public class MapLoadDialog extends FloatingDialog{
 			if(!map.visible) continue;
 			
 			TextButton button = new TextButton(map.name, "toggle");
-			button.add(new BorderImage(map.texture, 2f)).size(Unit.dp.inPixels(16*4f));
+			button.add(new BorderImage(map.texture, 2f)).size(Unit.dp.scl(16*4f));
 			button.getCells().reverse();
 			button.clicked(() -> selected = map);
-			button.getLabelCell().grow().left().padLeft(5f).units(Unit.dp);
+			button.getLabelCell().grow().left().padLeft(5f);
 			group.add(button);
 			table.add(button);
 			if(++i % maxcol == 0) table.row();
@@ -55,7 +55,7 @@ public class MapLoadDialog extends FloatingDialog{
 			}
 		});
 		
-		buttons().defaults().size(200f, 50f).units(Unit.dp);
+		buttons().defaults().size(200f, 50f);
 		buttons().addButton("Cancel", this::hide);
 		buttons().add(button);
 	}

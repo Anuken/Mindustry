@@ -34,11 +34,11 @@ public class Vars{
 	//save file directory
 	public static final FileHandle saveDirectory = Gdx.files.local("mindustry-saves/");
 	//scale of the font
-	public static float fontscale = Math.max(Unit.dp.inPixels(1f)/2f, 0.5f);
+	public static float fontscale = Math.max(Unit.dp.scl(1f)/2f, 0.5f);
 	//camera zoom displayed on startup
-	public static final int baseCameraScale = Math.round(Unit.dp.inPixels(4));
+	public static final int baseCameraScale = Math.round(Unit.dp.scl(4));
 	//how much the zoom changes every zoom button press
-	public static final int zoomScale = Math.round(Unit.dp.inPixels(1));
+	public static final int zoomScale = Math.round(Unit.dp.scl(1));
 	//if true, player speed will be increased, massive amounts of resources will be given on start, and other debug options will be available
 	public static boolean debug = false;
 	//whether the player can clip through walls

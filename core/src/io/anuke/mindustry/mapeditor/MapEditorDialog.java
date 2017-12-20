@@ -152,16 +152,16 @@ public class MapEditorDialog extends Dialog{
 	public void build(){
 		
 		new table(){{
-			float isize = Unit.dp.inPixels(16*2f);
+			float isize = Unit.dp.scl(16*2f);
 			aleft();
 			
 			new table(){{
 				
-				defaults().growY().width(130f).units(Unit.dp).padBottom(-6);
+				defaults().growY().width(130f).padBottom(-6);
 				
 				new imagebutton("icon-terrain", isize, () -> {
 					dialog.show();
-				}).text("generate").units(Unit.dp);
+				}).text("generate");
 				
 				row();
 				
@@ -220,14 +220,14 @@ public class MapEditorDialog extends Dialog{
 				for(EditorTool tool : EditorTool.values()){
 					ImageButton button = new ImageButton("icon-" + tool.name(), "toggle");
 					button.clicked(() -> view.setTool(tool));
-					button.resizeImage(Unit.dp.inPixels(16*2f));
+					button.resizeImage(Unit.dp.scl(16*2f));
 					group.add(button);
 					
-					tools.add(button).size(80f, 85f).padBottom(-6f).units(Unit.dp);
+					tools.add(button).size(80f, 85f).padBottom(-6f);
 					if(i++ % 2 == 1) tools.row();
 				}
 				
-				add(tools).units(Unit.dp).width(160f).padBottom(-6);
+				add(tools).width(160f).padBottom(-6);
 				
 				row();
 				
@@ -239,7 +239,7 @@ public class MapEditorDialog extends Dialog{
 					});
 					new label(() -> "Brush size: " + MapEditor.brushSizes[(int)slider.getValue()]).left();
 					row();
-					add(slider).growX().padTop(4f).units(Unit.dp);
+					add(slider).growX().padTop(4f);
 				}}.growX().end();
 				
 				row();
@@ -312,16 +312,16 @@ public class MapEditorDialog extends Dialog{
 			
 			ImageButton button = new ImageButton(Draw.hasRegion(block.name) ? Draw.region(block.name) : Draw.region(block.name + "1"), "toggle");
 			button.clicked(() -> editor.setDrawBlock(block));
-			button.resizeImage(Unit.dp.inPixels(8*4f));
+			button.resizeImage(Unit.dp.scl(8*4f));
 			group.add(button);
-			content.add(button).pad(4f).size(53f, 58f).units(Unit.dp);
+			content.add(button).pad(4f).size(53f, 58f);
 			
 			if(i++ % 2 == 1){
 				content.row();
 			}
 		}
 		
-		content.padLeft(Unit.dp.inPixels(-5f));
+		content.padLeft(Unit.dp.scl(-5f));
 		
 		group.getButtons().get(2).setChecked(true);
 		

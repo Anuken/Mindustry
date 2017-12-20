@@ -37,8 +37,8 @@ public class HudFragment implements Fragment{
 			
 			new table(){{
 				left();
-				defaults().size(68).units(Unit.dp).left();
-				float isize = Unit.dp.inPixels(40);
+				defaults().size(68).left();
+				float isize = Unit.dp.scl(40);
 				
 				new imagebutton("icon-menu", isize, ()->{
 					ui.showMenu();
@@ -92,7 +92,7 @@ public class HudFragment implements Fragment{
 			atop();
 			
 			new table("pane"){{
-				new label("[orange]< paused >").scale(Unit.dp.inPixels(0.75f)).pad(6).units(Unit.dp);
+				new label("[orange]< paused >").scale(Unit.dp.scl(0.75f)).pad(6);
 			}}.end();
 		}}.end();
 
@@ -169,22 +169,22 @@ public class HudFragment implements Fragment{
 				new label(()-> control.getEnemiesRemaining() > 0 ?
 					control.getEnemiesRemaining() + printEnemiesRemaining() : 
 						(control.getTutorial().active() || Vars.control.getMode() == GameMode.sandbox) ? "waiting..." : "Wave in " + (int) (control.getWaveCountdown() / 60f))
-				.minWidth(140).units(Unit.dp).left();
+				.minWidth(140).left();
 
 				margin(12f);
 				get().padLeft(6);
 			}}.left().end();
 			
 			playButton(uheight);
-		}}.height(uheight).units(Unit.dp).fillX().expandX().end();
+		}}.height(uheight).fillX().expandX().end();
 		
 	}
 	
 	private void playButton(float uheight){
-		new imagebutton("icon-play", Unit.dp.inPixels(30f), ()->{
+		new imagebutton("icon-play", Unit.dp.scl(30f), ()->{
 			Vars.control.runWave();
 		}).height(uheight).fillX().right().padTop(-8f).padBottom(-12f).padRight(-36)
-				.padLeft(-10f).width(40f).units(Unit.dp).update(l->{
+				.padLeft(-10f).width(40f).update(l->{
 			boolean vis = Vars.control.getMode() == GameMode.sandbox && Vars.control.getEnemiesRemaining() <= 0;
 			boolean paused = GameState.is(State.paused) || !vis;
 			
@@ -215,7 +215,7 @@ public class HudFragment implements Fragment{
 			Image image = new Image(Draw.region("icon-" + items[i]));
 			Label label = new Label(formatted);
 			label.setFontScale(fontscale*1.5f);
-			itemtable.add(image).size(8*3).units(Unit.dp);
+			itemtable.add(image).size(8*3);
 			itemtable.add(label).left();
 			itemtable.row();
 		}

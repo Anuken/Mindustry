@@ -6,7 +6,6 @@ import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.TextField;
-import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class MapSaveDialog extends FloatingDialog{
 	private TextField field;
@@ -33,7 +32,7 @@ public class MapSaveDialog extends FloatingDialog{
 			content().add(field).size(220f, 48f);
 		});
 		
-		buttons().defaults().size(200f, 50f).pad(2f).units(Unit.dp);
+		buttons().defaults().size(200f, 50f).pad(2f);
 		buttons().addButton("Cancel", this::hide);
 		
 		TextButton button = new TextButton("Save");

@@ -30,7 +30,7 @@ public class BorderImage extends Image{
 		float scaleY = getScaleY();
 		
 		Draw.color(Colors.get("accent"));
-		Draw.thick(Unit.dp.inPixels(thickness));
+		Draw.thick(Unit.dp.scl(thickness));
 		Draw.linerect(x + imageX, y + imageY, imageWidth * scaleX, imageHeight * scaleY);
 		Draw.reset();
 	}

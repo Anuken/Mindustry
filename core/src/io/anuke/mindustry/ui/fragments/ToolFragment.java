@@ -17,16 +17,16 @@ public class ToolFragment implements Fragment{
 	
 	public void build(){
 		tools = new Table();
-		tools.addIButton("icon-cancel", Unit.dp.inPixels(42), ()->{
+		tools.addIButton("icon-cancel", Unit.dp.scl(42), ()->{
 			player.recipe = null;
 		});
 		
-		tools.addIButton("icon-rotate", Unit.dp.inPixels(42), ()->{
+		tools.addIButton("icon-rotate", Unit.dp.scl(42), ()->{
 			player.rotation ++;
 			player.rotation %= 4;
 		});
 		
-		tools.addIButton("icon-check", Unit.dp.inPixels(42), ()->{
+		tools.addIButton("icon-check", Unit.dp.scl(42), ()->{
 			player.placeMode.tapped(control.getInput().getBlockX(), control.getInput().getBlockY());
 		});
 		

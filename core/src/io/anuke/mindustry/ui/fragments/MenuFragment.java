@@ -24,7 +24,7 @@ public class MenuFragment implements Fragment{
 					PressGroup group = new PressGroup();
 					
 					float scale = 4f;
-					defaults().size(100*scale, 21*scale).pad(-10f).units(Unit.dp);
+					defaults().size(100*scale, 21*scale).pad(-10f);
 					
 					add(new MenuButton("text-play", group, ui::showLevels));
 					row();
@@ -46,7 +46,7 @@ public class MenuFragment implements Fragment{
 					if(!gwt){
 						add(new MenuButton("text-exit", group, Gdx.app::exit));
 					}
-					get().pad(Unit.dp.inPixels(16));
+					get().pad(Unit.dp.scl(16));
 				}}.end();
 	
 				visible(()->GameState.is(State.menu));
@@ -54,8 +54,8 @@ public class MenuFragment implements Fragment{
 		}else{
 			new table(){{
 				new table(){{
-					defaults().size(120f).pad(5).units(Unit.dp);
-					float isize = Unit.dp.inPixels(14f*4);
+					defaults().size(120f).pad(5);
+					float isize = Unit.dp.scl(14f*4);
 					
 					new imagebutton("icon-play-2", isize, () -> ui.showLevels()).text("Play").padTop(4f);
 					
@@ -84,11 +84,11 @@ public class MenuFragment implements Fragment{
 		new table(){{
 			atop().aright();
 			if(Mindustry.hasDiscord){
-				new imagebutton("icon-discord", Unit.dp.inPixels(30f), ()->{
+				new imagebutton("icon-discord", Unit.dp.scl(30f), ()->{
 					ui.showDiscord();
 				}).margin(14);
 			}
-			new imagebutton("icon-info", Unit.dp.inPixels(30f), ()->{
+			new imagebutton("icon-info", Unit.dp.scl(30f), ()->{
 				ui.showAbout();
 			}).margin(14);
 		}}.end().visible(()->GameState.is(State.menu));

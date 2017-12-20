@@ -16,6 +16,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.effect.Shaders;
 import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
@@ -257,7 +258,7 @@ public class Renderer extends RendererModule{
 			}
 
 			float angle = Angles.angle(camera.position.x, camera.position.y, enemy.x, enemy.y);
-			Angles.translation(angle, Unit.dp.inPixels(20f));
+			Angles.translation(angle, Unit.dp.scl(20f));
 			Draw.rect("enemyarrow", camera.position.x + Angles.x(), camera.position.y + Angles.y(), angle);
 		}
 		Draw.color();
@@ -546,6 +547,9 @@ public class Renderer extends RendererModule{
 				Draw.dashCircle(spawn.start.worldx(), spawn.start.worldy(), enemyspawnspace);
 			}
 			
+			if(player.breakMode == PlaceMode.holdDelete)
+				player.breakMode.draw(tilex, tiley, 0, 0);
+			
 		}else if(player.breakMode.delete && control.input.drawPlace() && player.recipe == null){ //TODO test!
 			player.breakMode.draw(control.input.getBlockX(), control.input.getBlockY(), 
 					control.input.getBlockEndX(), control.input.getBlockEndY());
@@ -632,7 +636,7 @@ public class Renderer extends RendererModule{
 	}
 
 	public void clampScale(){
-		targetscale = Mathf.clamp(targetscale, Math.round(Unit.dp.inPixels(2)), Math.round(Unit.dp.inPixels((5))));
+		targetscale = Mathf.clamp(targetscale, Math.round(Unit.dp.scl(2)), Math.round(Unit.dp.scl((5))));
 	}
 
 }

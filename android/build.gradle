@@ -14,7 +14,7 @@ dependencies {
 
 android {
     buildToolsVersion '26.0.2'
-    compileSdkVersion 25
+    compileSdkVersion 26
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -34,7 +34,7 @@ android {
     defaultConfig {
         applicationId "io.anuke.mindustry"
         minSdkVersion 9
-        targetSdkVersion 25
+        targetSdkVersion 26
     }
 
     compileOptions {

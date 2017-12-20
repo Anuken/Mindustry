@@ -30,7 +30,7 @@ public class MenuDialog extends FloatingDialog{
 		});
 		
 		if(!Vars.android){
-			content().defaults().width(220).height(50).units(Unit.dp);
+			content().defaults().width(220).height(50);
 
 			content().addButton("Back", () -> {
 				hide();
@@ -63,7 +63,7 @@ public class MenuDialog extends FloatingDialog{
 				}){
 					{
 						for(Cell<?> cell : getButtonTable().getCells())
-							cell.pad(3).size(180, 44).units(Unit.dp);
+							cell.pad(3).size(180, 44);
 					}
 				}.show();
 			});
@@ -73,8 +73,8 @@ public class MenuDialog extends FloatingDialog{
 			
 			PressGroup group = new PressGroup();
 			
-			content().defaults().size(120f).pad(5).units(Unit.dp);
-			float isize = Unit.dp.inPixels(14f*4);
+			content().defaults().size(120f).pad(5);
+			float isize = Unit.dp.scl(14f*4);
 			
 			new imagebutton("icon-play-2", isize, () -> {
 				hide();
@@ -94,7 +94,7 @@ public class MenuDialog extends FloatingDialog{
 					GameState.set(State.menu);
 				}){{
 					for(Cell<?> cell : getButtonTable().getCells())
-						cell.pad(3).size(180, 44).units(Unit.dp);
+						cell.pad(3).size(180, 44);
 				}}.show();
 			}).text("Quit").padTop(4f);
 			

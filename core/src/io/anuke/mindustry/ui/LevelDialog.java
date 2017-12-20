@@ -41,14 +41,14 @@ public class LevelDialog extends FloatingDialog{
 		
 		Table selmode = new Table();
 		ButtonGroup<TextButton> group = new ButtonGroup<>();
-		selmode.add("Gamemode: ").padRight(10f).units(Unit.dp);
+		selmode.add("Gamemode: ").padRight(10f);
 		
 		for(GameMode mode : GameMode.values()){
 			TextButton b = Elements.newButton(mode.toString(), "toggle", ()->{
 				Vars.control.setMode(mode);
 			});
 			group.add(b);
-			selmode.add(b).size(130f, 54f).units(Unit.dp);
+			selmode.add(b).size(130f, 54f);
 		}
 		
 		content().add(selmode);
@@ -64,10 +64,10 @@ public class LevelDialog extends FloatingDialog{
 			}
 			
 			Table inset = new Table("pane-button");
-			inset.add("[accent]"+map.name).pad(3f).units(Unit.dp);
+			inset.add("[accent]"+map.name).pad(3f);
 			inset.row();
 			inset.label((() -> "High Score: [accent]" + Settings.getInt("hiscore" + map.name)))
-			.pad(3f).units(Unit.dp);
+			.pad(3f);
 			inset.pack();
 			
 			float images = 154f;
@@ -79,7 +79,7 @@ public class LevelDialog extends FloatingDialog{
 			
 			ImageButton image = new ImageButton(new TextureRegion(map.texture), "togglemap");
 			image.row();
-			image.add(inset).width(images+6).units(Unit.dp);
+			image.add(inset).width(images+6);
 			TextButton[] delete = new TextButton[1];
 			if(map.custom){
 				image.row();
@@ -89,7 +89,7 @@ public class LevelDialog extends FloatingDialog{
 						reload();
 						Core.scene.setScrollFocus(pane);
 					});
-				}).width(images+16).units(Unit.dp).padBottom(-10f).grow().get();
+				}).width(images+16).padBottom(-10f).grow().get();
 			}
 			image.clicked(()->{
 				if(delete[0] != null && delete[0].getClickListener().isOver()){
@@ -99,14 +99,14 @@ public class LevelDialog extends FloatingDialog{
 				hide();
 				Vars.control.playMap(selectedMap);
 			});
-			image.getImageCell().size(images).units(Unit.dp);
+			image.getImageCell().size(images);
 			
 			stack.add(back);
 			stack.add(image);
 			
-			maps.add(stack).width(170).top().pad(4f).units(Unit.dp);
+			maps.add(stack).width(170).top().pad(4f);
 			
-			maps.padRight(Unit.dp.inPixels(26));
+			maps.padRight(Unit.dp.scl(26));
 			
 			i ++;
 		}

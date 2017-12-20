@@ -69,8 +69,8 @@ public class BlocksFragment implements Fragment{
 						}
 					});
 					button.setName("sectionbutton" + sec.name());
-					add(button).growX().height(54).padTop(sec.ordinal() <= 2 ? -10 : -5).units(Unit.dp);
-					button.getImageCell().size(40).padBottom(4).padTop(2).units(Unit.dp);
+					add(button).growX().height(54).padTop(sec.ordinal() <= 2 ? -10 : -5);
+					button.getImageCell().size(40).padBottom(4).padTop(2);
 					group.add(button);
 					
 					if(sec.ordinal() % 3 == 2 && sec.ordinal() > 0){
@@ -96,8 +96,8 @@ public class BlocksFragment implements Fragment{
 							}
 						});
 						
-						table.add(image).size(size+8).pad(2).units(Unit.dp);
-						image.getImageCell().size(size).units(Unit.dp);
+						table.add(image).size(size+8).pad(2);
+						image.getImageCell().size(size);
 						
 						image.update(()->{
 							
@@ -143,7 +143,7 @@ public class BlocksFragment implements Fragment{
 		
 		desctable.defaults().left();
 		desctable.left();
-		desctable.pad(Unit.dp.inPixels(12));
+		desctable.pad(Unit.dp.scl(12));
 		
 		Table header = new Table();
 		
@@ -154,10 +154,10 @@ public class BlocksFragment implements Fragment{
 		TextureRegion region = Draw.hasRegion(recipe.result.name() + "-icon") ? 
 				Draw.region(recipe.result.name() + "-icon") : Draw.region(recipe.result.name());
 		
-		header.addImage(region).size(8*5).padTop(4).units(Unit.dp);
+		header.addImage(region).size(8*5).padTop(4);
 		Label nameLabel = new Label(recipe.result.formalName);
 		nameLabel.setWrap(true);
-		header.add(nameLabel).padLeft(2).width(130f).units(Unit.dp);
+		header.add(nameLabel).padLeft(2).width(130f);
 		
 		//extra info
 		if(recipe.result.fullDescription != null){
@@ -173,16 +173,16 @@ public class BlocksFragment implements Fragment{
 				
 				FloatingDialog d = new FloatingDialog("Block Info");
 				Table table = new Table();
-				table.defaults().pad(1f).units(Unit.dp);
+				table.defaults().pad(1f);
 				ScrollPane pane = new ScrollPane(table, "clear");
 				pane.setFadeScrollBars(false);
 				Table top = new Table();
 				top.left();
-				top.add(new Image(Draw.region(recipe.result.name))).size(8*5 * recipe.result.width).units(Unit.dp);
-				top.add("[accent]"+recipe.result.formalName).padLeft(6f).units(Unit.dp);
+				top.add(new Image(Draw.region(recipe.result.name))).size(8*5 * recipe.result.width);
+				top.add("[accent]"+recipe.result.formalName).padLeft(6f);
 				table.add(top).fill().left();
 				table.row();
-				table.add(desclabel).width(600).units(Unit.dp);
+				table.add(desclabel).width(600);
 				table.row();
 				
 				d.content().add(pane).grow();
@@ -200,14 +200,14 @@ public class BlocksFragment implements Fragment{
 				d.buttons().addButton("OK", ()->{
 					if(!wasPaused) GameState.set(State.playing);
 					d.hide();
-				}).size(110, 50).pad(10f).units(Unit.dp);
+				}).size(110, 50).pad(10f);
 				
 				d.show();
-			}).expandX().padLeft(3).top().right().size(40f, 44f).padTop(-2).units(Unit.dp);
+			}).expandX().padLeft(3).top().right().size(40f, 44f).padTop(-2);
 		}
 		
 		
-		desctable.add().pad(2).units(Unit.dp);
+		desctable.add().pad(2);
 		
 		Table requirements = new Table();
 		
@@ -218,7 +218,7 @@ public class BlocksFragment implements Fragment{
 		
 		for(ItemStack stack : recipe.requirements){
 			ItemStack fs = stack;
-			requirements.addImage(Draw.region("icon-"+stack.item.name())).size(8*3).units(Unit.dp);
+			requirements.addImage(Draw.region("icon-"+stack.item.name())).size(8*3);
 			Label reqlabel = new Label("");
 			
 			reqlabel.update(()->{
@@ -239,7 +239,7 @@ public class BlocksFragment implements Fragment{
 		Label label = new Label("[health]health: " + recipe.result.health + (recipe.result.description == null ?
 				"" : ("\n[]" + recipe.result.description)));
 		label.setWrap(true);
-		desctable.add(label).width(200).padTop(4).padBottom(2).units(Unit.dp);
+		desctable.add(label).width(200).padTop(4).padBottom(2);
 		
 	}
 }

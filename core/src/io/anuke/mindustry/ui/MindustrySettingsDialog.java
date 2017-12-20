@@ -16,7 +16,7 @@ public class MindustrySettingsDialog extends SettingsDialog{
 		title().setAlignment(Align.center);
 		getTitleTable().row();
 		getTitleTable().add(new Image("white"))
-		.growX().height(3f).pad(4f).units(Unit.dp).get().setColor(Colors.get("accent"));
+		.growX().height(3f).pad(4f).get().setColor(Colors.get("accent"));
 		
 		content().remove();
 		buttons().remove();
@@ -32,9 +32,9 @@ public class MindustrySettingsDialog extends SettingsDialog{
 	
 	@Override
 	public void addCloseButton(){
-		buttons().addImageTextButton("Back", "icon-arrow-left", Unit.dp.inPixels(30f), ()->{
+		buttons().addImageTextButton("Back", "icon-arrow-left", Unit.dp.scl(30f), ()->{
 			hide();
-		}).size(230f, 64f).units(Unit.dp);
+		}).size(230f, 64f);
 		
 		keyDown(key->{
 			if(key == Keys.ESCAPE || key == Keys.BACK)

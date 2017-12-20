@@ -46,13 +46,13 @@ public class MapGenerateDialog extends FloatingDialog{
 		image.setScaling(Scaling.fit);
 		Table preft = new Table();
 		preft.left();
-		preft.pad(Unit.dp.inPixels(4f)).padRight(Unit.dp.inPixels(25f));
+		preft.pad(Unit.dp.scl(4f)).padRight(Unit.dp.scl(25f));
 		
 		for(GenPref pref : editor.getFilter().getPrefs().values()){
 			CheckBox box = new CheckBox(pref.name);
 			box.setChecked(pref.enabled);
 			box.changed(() -> pref.enabled = box.isChecked());
-			preft.add(box).pad(4f).units(Unit.dp).left();
+			preft.add(box).pad(4f).left();
 			preft.row();
 		}
 		
@@ -62,7 +62,7 @@ public class MapGenerateDialog extends FloatingDialog{
 		
 		content().add(pane).fillY();
 		
-		buttons().defaults().size(170f, 50f).units(Unit.dp).pad(4f);
+		buttons().defaults().size(170f, 50f).pad(4f);
 		buttons().addButton("Back", () -> hide());
 		buttons().addButton("Randomize", () ->{ 
 			editor.getFilter().randomize();

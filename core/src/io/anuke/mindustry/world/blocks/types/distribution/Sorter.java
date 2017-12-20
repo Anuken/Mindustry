@@ -93,7 +93,7 @@ public class Sorter extends Junction implements Configurable{
 	public void buildTable(Tile tile, Table table){
 		SorterEntity entity = tile.entity();
 		
-		table.addIButton("icon-arrow-left", Unit.dp.inPixels(10*3), ()->{
+		table.addIButton("icon-arrow-left", Unit.dp.scl(10*3), ()->{
 			int color = entity.sortItem.ordinal();
 			
 			color --;
@@ -103,9 +103,9 @@ public class Sorter extends Junction implements Configurable{
 			entity.sortItem = Item.values()[color];
 		});
 		
-		table.add().size(40f).units(Unit.dp);
+		table.add().size(40f);
 		
-		table.addIButton("icon-arrow-right", Unit.dp.inPixels(10*3), ()->{
+		table.addIButton("icon-arrow-right", Unit.dp.scl(10*3), ()->{
 			int color = entity.sortItem.ordinal();
 			
 			color ++;

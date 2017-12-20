@@ -19,7 +19,7 @@ public class DonationsActivity extends FragmentActivity {
      */
     private static final String GOOGLE_PUBKEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzG93KhpfBPKTo2jF0yxbWkkmMKwsPNM4SsMj1aDq7vv6n3R+mqJVfprOJxFfJh7JchXTflLIgiaKXFAiU70gJbMTniEWnEaFSxAeF09a7U0RjOwN+7rFwjCG91c2CpYxPanBTQP4zasc1ODPVzq4q6/4ByjhenN71V4WmR08NFIAodcfFPrOkDPil7i8y7cgcd1Ky53U0TS+LLYJttAK3XdTK4s7VE3I5IKoeNa4uwCmIM59R67q2k3cXjLk/nP6MP+y++EzHN/PTiR1sVg4dMP8K31RPw/1QNLPQwJz6Wc872oWwb7xo5gkoXbDc5WPPydsi8F3SyKNaYwzN6CDFQIDAQAB";
     private static final String[] GOOGLE_CATALOG = new String[]{
-            "mindustry.donation.1", "mindustry.donation.5",
+            "mindustry.donation.1", "mindustry.donation.2", "mindustry.donation.5",
             "mindustry.donation.10", "mindustry.donation.15",
             "mindustry.donation.25", "mindustry.donation.50" };
 

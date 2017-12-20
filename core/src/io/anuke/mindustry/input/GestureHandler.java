@@ -83,9 +83,9 @@ public class GestureHandler extends GestureAdapter{
 			initzoom = initialDistance;
 		}
 		
-		if(Math.abs(distance - initzoom) > Unit.dp.inPixels(100f) && !zoomed){
+		if(Math.abs(distance - initzoom) > Unit.dp.scl(100f) && !zoomed){
 			int amount = (distance > initzoom ? 1 : -1);
-			renderer.scaleCamera(Math.round(Unit.dp.inPixels(amount)));
+			renderer.scaleCamera(Math.round(Unit.dp.scl(amount)));
 			initzoom = distance;
 			zoomed = true;
 			return true;

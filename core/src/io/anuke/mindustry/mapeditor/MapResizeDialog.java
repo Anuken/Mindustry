@@ -8,7 +8,6 @@ import io.anuke.ucore.function.BiConsumer;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class MapResizeDialog extends FloatingDialog{
 	int width, height;
@@ -43,7 +42,7 @@ public class MapResizeDialog extends FloatingDialog{
 					});
 					group.add(button);
 					if(i == idx) button.setChecked(true);
-					table.add(button).size(100f, 54f).pad(2f).units(Unit.dp);
+					table.add(button).size(100f, 54f).pad(2f);
 				}
 				
 				table.row();
@@ -57,7 +56,7 @@ public class MapResizeDialog extends FloatingDialog{
 			
 		});
 		
-		buttons().defaults().size(200f, 50f).units(Unit.dp);
+		buttons().defaults().size(200f, 50f);
 		buttons().addButton("Cancel", this::hide);
 		buttons().addButton("Resize", () -> {
 			cons.accept(width, height);

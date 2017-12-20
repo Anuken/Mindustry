@@ -1,9 +1,6 @@
 package io.anuke.mindustry.ui;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.util.Arrays;
-import java.util.Comparator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -22,7 +19,6 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class FileChooser extends FloatingDialog{
-	
 	private Table files;
 	private FileHandle homeDirectory = Gdx.files.absolute(Gdx.files.getExternalStoragePath());
 	private FileHandle directory = homeDirectory;
@@ -48,7 +44,7 @@ public class FileChooser extends FloatingDialog{
 
 	private void setupWidgets(){
 		getCell(content()).maxWidth(Gdx.graphics.getWidth()/2);
-		content().pad(-Unit.dp.inPixels(10));
+		content().pad(-Unit.dp.scl(10));
 		
 		Table content = new Table();
 		
@@ -91,7 +87,7 @@ public class FileChooser extends FloatingDialog{
 
 		Table icontable = new Table();
 		
-		float isize = Unit.dp.inPixels(14*2);
+		float isize = Unit.dp.scl(14*2);
 
 		ImageButton up = new ImageButton("icon-folder-parent");
 		up.resizeImage(isize);
@@ -162,20 +158,12 @@ public class FileChooser extends FloatingDialog{
 	}
 
 	private FileHandle[] getFileNames(){
-		FileHandle[] handles = directory.list(new FileFilter(){
-			@Override
-			public boolean accept(File file){
-				return !file.getName().startsWith(".");
-			}
-		});
+		FileHandle[] handles = directory.list(file -> !file.getName().startsWith("."));
 
-		Arrays.sort(handles, new Comparator<FileHandle>(){
-			@Override
-			public int compare(FileHandle a, FileHandle b){
-				if(a.isDirectory() && !b.isDirectory()) return -1;
-				if( !a.isDirectory() && b.isDirectory()) return 1;
-				return a.name().compareTo(b.name());
-			}
+		Arrays.sort(handles, (a, b) ->{
+			if(a.isDirectory() && !b.isDirectory()) return -1;
+			if( !a.isDirectory() && b.isDirectory()) return 1;
+			return a.name().compareTo(b.name());
 		});
 		return handles;
 	}
