@@ -12,7 +12,6 @@ import io.anuke.ucore.scene.builders.*;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
-import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 
 public class PlacementFragment implements Fragment{
@@ -57,7 +56,7 @@ public class PlacementFragment implements Fragment{
 							
 							defaults().padBottom(-5.5f);
 							
-							new imagebutton("icon-" + mode.name(), "toggle",  Unit.dp.scl(10*3), ()->{
+							new imagebutton("icon-" + mode.name(), "toggle",  10*3, ()->{
 								control.getInput().resetCursor();
 								player.placeMode = mode;
 							}).group(group);	
@@ -67,14 +66,14 @@ public class PlacementFragment implements Fragment{
 						
 						Color color = Color.GRAY;//Colors.get("accent"); //Color.valueOf("4d4d4d")
 						
-						new imagebutton("icon-cancel", Unit.dp.scl(14*3), ()->{
+						new imagebutton("icon-cancel", 14*3, ()->{
 							player.recipe = null;
 						}).imageColor(color)
 						.visible(()->player.recipe != null);
 						
 						new button("", ()->{}).get().setTouchable(Touchable.disabled);;
 						
-						new imagebutton("icon-arrow", Unit.dp.scl(14*3), ()->{
+						new imagebutton("icon-arrow", 14*3, ()->{
 							player.rotation = Mathf.mod(player.rotation + 1, 4);
 						}).imageColor(color).visible(() -> player.recipe != null).update(image ->{
 							image.getImage().setRotation(player.rotation*90);
@@ -108,7 +107,7 @@ public class PlacementFragment implements Fragment{
 						
 						defaults().padBottom(d < 2 ? -5.5f : 0);
 						
-						new imagebutton("icon-" + mode.name(), "toggle",  Unit.dp.scl(10*3), ()->{
+						new imagebutton("icon-" + mode.name(), "toggle",  10*3, ()->{
 							control.getInput().resetCursor();
 							player.breakMode = mode;
 						}){{

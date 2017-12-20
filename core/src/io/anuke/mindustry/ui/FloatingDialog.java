@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.utils.Align;
 
 import io.anuke.ucore.scene.ui.Dialog;
-import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class FloatingDialog extends Dialog{
 	
@@ -20,7 +19,7 @@ public class FloatingDialog extends Dialog{
 	
 	@Override
 	public void addCloseButton(){
-		buttons().addImageTextButton("Back", "icon-arrow-left", Unit.dp.scl(30f), ()->{
+		buttons().addImageTextButton("Back", "icon-arrow-left", 30f, ()->{
 			hide();
 		}).size(230f, 64f);
 		

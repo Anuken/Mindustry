@@ -18,7 +18,6 @@ import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.TextButton;
-import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
@@ -62,8 +61,8 @@ public class Tutorial{
 			
 		}}.end();
 		
-		prev.pad(Unit.dp.scl(16));
-		next.pad(Unit.dp.scl(16));
+		prev.pad(16);
+		next.pad(16);
 		
 		prev.setDisabled(()->!canMove(false) || !stage.canBack);
 		next.setDisabled(()->!stage.canForward);

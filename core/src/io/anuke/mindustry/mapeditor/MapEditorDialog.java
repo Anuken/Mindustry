@@ -22,7 +22,6 @@ import io.anuke.ucore.graphics.Pixmaps;
 import io.anuke.ucore.scene.builders.*;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class MapEditorDialog extends Dialog{
 	private MapEditor editor;
@@ -152,7 +151,7 @@ public class MapEditorDialog extends Dialog{
 	public void build(){
 		
 		new table(){{
-			float isize = Unit.dp.scl(16*2f);
+			float isize = 16*2f;
 			aleft();
 			
 			new table(){{
@@ -220,7 +219,7 @@ public class MapEditorDialog extends Dialog{
 				for(EditorTool tool : EditorTool.values()){
 					ImageButton button = new ImageButton("icon-" + tool.name(), "toggle");
 					button.clicked(() -> view.setTool(tool));
-					button.resizeImage(Unit.dp.scl(16*2f));
+					button.resizeImage(16*2f);
 					group.add(button);
 					
 					tools.add(button).size(80f, 85f).padBottom(-6f);
@@ -312,7 +311,7 @@ public class MapEditorDialog extends Dialog{
 			
 			ImageButton button = new ImageButton(Draw.hasRegion(block.name) ? Draw.region(block.name) : Draw.region(block.name + "1"), "toggle");
 			button.clicked(() -> editor.setDrawBlock(block));
-			button.resizeImage(Unit.dp.scl(8*4f));
+			button.resizeImage(8*4f);
 			group.add(button);
 			content.add(button).pad(4f).size(53f, 58f);
 			
@@ -321,7 +320,7 @@ public class MapEditorDialog extends Dialog{
 			}
 		}
 		
-		content.padLeft(Unit.dp.scl(-5f));
+		content.padLeft(-5f);
 		
 		group.getButtons().get(2).setChecked(true);
 		

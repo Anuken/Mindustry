@@ -1,5 +1,9 @@
 package io.anuke.mindustry.desktop;
 
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.utils.Array;
+
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
@@ -7,18 +11,18 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.badlogic.gdx.utils.Array;
-
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.PlatformFunction;
 import io.anuke.ucore.scene.ui.TextField;
+import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class DesktopLauncher {
 	
 	public static void main (String[] arg) {
+
+		Unit.dp.addition = 2f;
+		
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setTitle("Mindustry");
 		config.setMaximized(true);

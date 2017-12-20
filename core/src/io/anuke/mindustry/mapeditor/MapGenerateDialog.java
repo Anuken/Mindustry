@@ -15,7 +15,6 @@ import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class MapGenerateDialog extends FloatingDialog{
 	private MapEditor editor;
@@ -46,7 +45,7 @@ public class MapGenerateDialog extends FloatingDialog{
 		image.setScaling(Scaling.fit);
 		Table preft = new Table();
 		preft.left();
-		preft.pad(Unit.dp.scl(4f)).padRight(Unit.dp.scl(25f));
+		preft.pad(4f).padRight(25f);
 		
 		for(GenPref pref : editor.getFilter().getPrefs().values()){
 			CheckBox box = new CheckBox(pref.name);

@@ -182,7 +182,7 @@ public class UI extends SceneModule{
 		//gameerror.setFillParent(true);
 		
 		discord = new Dialog("Discord", "dialog");
-		discord.content().pad(Unit.dp.scl(12f));
+		discord.content().pad(12f);
 		discord.content().add("Join the mindustry discord!\n[orange]" + Vars.discordURL);
 		discord.buttons().defaults().size(200f, 50);
 		discord.buttons().addButton("Open link", () -> Mindustry.platforms.openLink(Vars.discordURL));
@@ -367,7 +367,7 @@ public class UI extends SceneModule{
 	
 	public void showError(String text){
 		new Dialog("[crimson]An error has occured", "dialog"){{
-			content().pad(Unit.dp.scl(15));
+			content().pad(15);
 			content().add(text);
 			getButtonTable().addButton("OK", ()->{
 				hide();

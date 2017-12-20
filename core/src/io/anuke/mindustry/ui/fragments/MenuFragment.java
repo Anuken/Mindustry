@@ -11,7 +11,6 @@ import io.anuke.mindustry.ui.MenuButton;
 import io.anuke.mindustry.ui.PressGroup;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.table;
-import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class MenuFragment implements Fragment{
 	
@@ -46,7 +45,7 @@ public class MenuFragment implements Fragment{
 					if(!gwt){
 						add(new MenuButton("text-exit", group, Gdx.app::exit));
 					}
-					get().pad(Unit.dp.scl(16));
+					get().pad(16);
 				}}.end();
 	
 				visible(()->GameState.is(State.menu));
@@ -55,7 +54,7 @@ public class MenuFragment implements Fragment{
 			new table(){{
 				new table(){{
 					defaults().size(120f).pad(5);
-					float isize = Unit.dp.scl(14f*4);
+					float isize = 14f*4;
 					
 					new imagebutton("icon-play-2", isize, () -> ui.showLevels()).text("Play").padTop(4f);
 					
@@ -84,11 +83,11 @@ public class MenuFragment implements Fragment{
 		new table(){{
 			atop().aright();
 			if(Mindustry.hasDiscord){
-				new imagebutton("icon-discord", Unit.dp.scl(30f), ()->{
+				new imagebutton("icon-discord", 30f, ()->{
 					ui.showDiscord();
 				}).margin(14);
 			}
-			new imagebutton("icon-info", Unit.dp.scl(30f), ()->{
+			new imagebutton("icon-info", 30f, ()->{
 				ui.showAbout();
 			}).margin(14);
 		}}.end().visible(()->GameState.is(State.menu));

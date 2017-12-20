@@ -11,7 +11,6 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Elements;
 
 public class LevelDialog extends FloatingDialog{
@@ -106,7 +105,7 @@ public class LevelDialog extends FloatingDialog{
 			
 			maps.add(stack).width(170).top().pad(4f);
 			
-			maps.padRight(Unit.dp.scl(26));
+			maps.padRight(26);
 			
 			i ++;
 		}

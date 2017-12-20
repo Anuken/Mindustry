@@ -16,7 +16,6 @@ import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 
 public class Teleporter extends Block implements Configurable{
@@ -69,13 +68,13 @@ public class Teleporter extends Block implements Configurable{
 	public void buildTable(Tile tile, Table table){
 		TeleporterEntity entity = tile.entity();
 		
-		table.addIButton("icon-arrow-left", Unit.dp.scl(10*3), ()->{
+		table.addIButton("icon-arrow-left", 10*3, ()->{
 			entity.color = (byte)Mathf.mod(entity.color - 1, colors);
 		});
 		
 		table.add().size(40f);
 		
-		table.addIButton("icon-arrow-right", Unit.dp.scl(10*3), ()->{
+		table.addIButton("icon-arrow-right", 10*3, ()->{
 			entity.color = (byte)Mathf.mod(entity.color + 1, colors);
 		});
 	}

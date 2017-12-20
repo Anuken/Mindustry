@@ -43,8 +43,8 @@ public class FileChooser extends FloatingDialog{
 	}
 
 	private void setupWidgets(){
-		getCell(content()).maxWidth(Gdx.graphics.getWidth()/2);
-		content().pad(-Unit.dp.scl(10));
+		getCell(content()).width(Gdx.graphics.getWidth() / Unit.dp.scl(2f));
+		content().pad(-10);
 		
 		Table content = new Table();
 		
@@ -87,7 +87,7 @@ public class FileChooser extends FloatingDialog{
 
 		Table icontable = new Table();
 		
-		float isize = Unit.dp.scl(14*2);
+		float isize = 14*2;
 
 		ImageButton up = new ImageButton("icon-folder-parent");
 		up.resizeImage(isize);
@@ -135,7 +135,7 @@ public class FileChooser extends FloatingDialog{
 		//content.add(navigation).colspan(3).left().padBottom(10f).expandX().fillX().height(40f);
 		//content.row();
 
-		content.center().add(pane).width(Gdx.graphics.getWidth()/2).colspan(3).units(Unit.px).grow();
+		content.center().add(pane).width(Gdx.graphics.getWidth()/2).colspan(3).grow();
 		content.row();
 		
 		if(!open){

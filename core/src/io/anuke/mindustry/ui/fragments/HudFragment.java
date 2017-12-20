@@ -23,7 +23,6 @@ import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class HudFragment implements Fragment{
 	private Table itemtable, respawntable;
@@ -38,7 +37,7 @@ public class HudFragment implements Fragment{
 			new table(){{
 				left();
 				defaults().size(68).left();
-				float isize = Unit.dp.scl(40);
+				float isize = 40;
 				
 				new imagebutton("icon-menu", isize, ()->{
 					ui.showMenu();
@@ -92,7 +91,7 @@ public class HudFragment implements Fragment{
 			atop();
 			
 			new table("pane"){{
-				new label("[orange]< paused >").scale(Unit.dp.scl(0.75f)).pad(6);
+				new label("[orange]< paused >").scale(0.75f).pad(6);
 			}}.end();
 		}}.end();
 
@@ -181,7 +180,7 @@ public class HudFragment implements Fragment{
 	}
 	
 	private void playButton(float uheight){
-		new imagebutton("icon-play", Unit.dp.scl(30f), ()->{
+		new imagebutton("icon-play", 30f, ()->{
 			Vars.control.runWave();
 		}).height(uheight).fillX().right().padTop(-8f).padBottom(-12f).padRight(-36)
 				.padLeft(-10f).width(40f).update(l->{

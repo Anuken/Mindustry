@@ -13,7 +13,6 @@ import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
@@ -93,7 +92,7 @@ public class Sorter extends Junction implements Configurable{
 	public void buildTable(Tile tile, Table table){
 		SorterEntity entity = tile.entity();
 		
-		table.addIButton("icon-arrow-left", Unit.dp.scl(10*3), ()->{
+		table.addIButton("icon-arrow-left", 10*3, ()->{
 			int color = entity.sortItem.ordinal();
 			
 			color --;
@@ -105,7 +104,7 @@ public class Sorter extends Junction implements Configurable{
 		
 		table.add().size(40f);
 		
-		table.addIButton("icon-arrow-right", Unit.dp.scl(10*3), ()->{
+		table.addIButton("icon-arrow-right", 10*3, ()->{
 			int color = entity.sortItem.ordinal();
 			
 			color ++;

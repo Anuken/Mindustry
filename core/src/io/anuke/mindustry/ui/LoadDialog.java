@@ -12,7 +12,6 @@ import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
 
 //TODO unified save/load dialogs
 public class LoadDialog extends FloatingDialog{
@@ -44,13 +43,13 @@ public class LoadDialog extends FloatingDialog{
 		pane = new ScrollPane(slots);
 		pane.setFadeScrollBars(false);
 
-		slots.padRight(Unit.dp.scl(24));
+		slots.padRight(24);
 
 		for(int i = 0; i < Vars.saveSlots; i++){
 			final int slot = i;
 
 			TextButton button = new TextButton("[accent]Slot " + (i + 1));
-			button.pad(Unit.dp.scl(12));
+			button.pad(12);
 			button.getLabelCell().top().left().growX();
 
 			button.row();

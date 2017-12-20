@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.Align;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.SettingsDialog;
-import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class MindustrySettingsDialog extends SettingsDialog{
 	
@@ -32,7 +31,7 @@ public class MindustrySettingsDialog extends SettingsDialog{
 	
 	@Override
 	public void addCloseButton(){
-		buttons().addImageTextButton("Back", "icon-arrow-left", Unit.dp.scl(30f), ()->{
+		buttons().addImageTextButton("Back", "icon-arrow-left", 30f, ()->{
 			hide();
 		}).size(230f, 64f);
 		

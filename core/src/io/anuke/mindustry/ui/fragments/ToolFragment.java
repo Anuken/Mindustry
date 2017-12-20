@@ -10,23 +10,25 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class ToolFragment implements Fragment{
 	private Table tools;
 	
 	public void build(){
+		float isize = 14*3;
+		
 		tools = new Table();
-		tools.addIButton("icon-cancel", Unit.dp.scl(42), ()->{
+		
+		tools.addIButton("icon-cancel", isize, ()->{
 			player.recipe = null;
 		});
 		
-		tools.addIButton("icon-rotate", Unit.dp.scl(42), ()->{
+		tools.addIButton("icon-rotate", isize, ()->{
 			player.rotation ++;
 			player.rotation %= 4;
 		});
 		
-		tools.addIButton("icon-check", Unit.dp.scl(42), ()->{
+		tools.addIButton("icon-check", isize, ()->{
 			player.placeMode.tapped(control.getInput().getBlockX(), control.getInput().getBlockY());
 		});
 		

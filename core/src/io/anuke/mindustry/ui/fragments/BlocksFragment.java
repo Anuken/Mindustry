@@ -20,7 +20,6 @@ import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 
 public class BlocksFragment implements Fragment{
@@ -143,7 +142,7 @@ public class BlocksFragment implements Fragment{
 		
 		desctable.defaults().left();
 		desctable.left();
-		desctable.pad(Unit.dp.scl(12));
+		desctable.pad(12);
 		
 		Table header = new Table();
 		

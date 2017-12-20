@@ -11,7 +11,6 @@ import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.ui.ConfirmDialog;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Cell;
-import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class MenuDialog extends FloatingDialog{
 	private SaveDialog save = new SaveDialog();
@@ -74,7 +73,7 @@ public class MenuDialog extends FloatingDialog{
 			PressGroup group = new PressGroup();
 			
 			content().defaults().size(120f).pad(5);
-			float isize = Unit.dp.scl(14f*4);
+			float isize = 14f*4;
 			
 			new imagebutton("icon-play-2", isize, () -> {
 				hide();
