@@ -4,7 +4,7 @@
     android:versionCode="39"
     android:versionName="3.2b" >
 
-    <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="25" />
+    <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="26" />
     <uses-permission android:name="com.android.vending.BILLING" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
