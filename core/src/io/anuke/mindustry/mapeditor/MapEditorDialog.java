@@ -2,6 +2,7 @@ package io.anuke.mindustry.mapeditor;
 
 import java.util.Arrays;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -67,6 +68,7 @@ public class MapEditorDialog extends Dialog{
 			Vars.ui.showLoading();
 			Timers.run(3f, () -> {
 				try{
+					Gdx.app.error("MINDUSTRYAAAAAAAAAA", "Saving to file: " + result.toString() + " " + result.type());
 					Pixmaps.write(editor.pixmap(), result);
 				}catch (Exception e){
 					Vars.ui.showError("Error saving image file!");
@@ -150,7 +152,7 @@ public class MapEditorDialog extends Dialog{
 	public void build(){
 		
 		new table(){{
-			float isize = Unit.dp.inPixels(14*3f);
+			float isize = Unit.dp.inPixels(16*2f);
 			aleft();
 			
 			new table(){{
@@ -163,37 +165,37 @@ public class MapEditorDialog extends Dialog{
 				
 				row();
 				
-				new imagebutton("icon-cursor", 10f*3f, () -> {
+				new imagebutton("icon-resize", isize, () -> {
 					resizeDialog.show();
 				}).text("resize").padTop(4f);
 				
 				row();
 				
-				new imagebutton("icon-load", isize, () -> {
+				new imagebutton("icon-load-map", isize, () -> {
 					loadDialog.show();
 				}).text("load map");
 				
 				row();
 				
-				new imagebutton("icon-save", isize, ()->{
+				new imagebutton("icon-save-map", isize, ()->{
 					saveDialog.show();
 				}).text("save map");
 				
 				row();
 				
-				new imagebutton("icon-load", isize, () -> {
+				new imagebutton("icon-load-image", isize, () -> {
 					openFile.show();
 				}).text("load image");
 				
 				row();
 				
-				new imagebutton("icon-save", isize, () -> {
+				new imagebutton("icon-save-image", isize, () -> {
 					saveFile.show();
 				}).text("save image");
 				
 				row();
 				
-				new imagebutton("icon-arrow-left", isize, () -> {
+				new imagebutton("icon-back", isize, () -> {
 					if(!saved){
 						Vars.ui.showConfirm("Confirm Exit", "[scarlet]You have unsaved changes![]\nAre you sure you want to exit?", () -> hide());
 					}else{

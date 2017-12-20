@@ -1,5 +1,4 @@
 apply plugin: "java"
-apply plugin: "jetty"
 //apply plugin: 'org.akhikhl.gretty'
 
 gwt {

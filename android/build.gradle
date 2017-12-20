@@ -13,7 +13,7 @@ dependencies {
 }
 
 android {
-    buildToolsVersion "25.0.0"
+    buildToolsVersion '26.0.2'
     compileSdkVersion 25
     sourceSets {
         main {
@@ -35,16 +35,14 @@ android {
         applicationId "io.anuke.mindustry"
         minSdkVersion 9
         targetSdkVersion 25
-
-        jackOptions {
-            enabled true
-        }
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    flavorDimensions "google"
 
     productFlavors {
         google {

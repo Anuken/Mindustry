@@ -24,7 +24,7 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 public class FileChooser extends FloatingDialog{
 	
 	private Table files;
-	private FileHandle homeDirectory = Gdx.files.local(Gdx.files.getExternalStoragePath());
+	private FileHandle homeDirectory = Gdx.files.absolute(Gdx.files.getExternalStoragePath());
 	private FileHandle directory = homeDirectory;
 	private ScrollPane pane;
 	private TextField navigation, filefield;

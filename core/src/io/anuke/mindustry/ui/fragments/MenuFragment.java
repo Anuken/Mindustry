@@ -65,7 +65,7 @@ public class MenuFragment implements Fragment{
 					
 					row();
 					
-					new imagebutton("icon-terrain", isize, () -> ui.showEditor()).text("Editor").padTop(4f);
+					new imagebutton("icon-editor", isize, () -> ui.showEditor()).text("Editor").padTop(4f);
 	
 					new imagebutton("icon-tools", isize, () -> ui.showPrefs()).text("Settings").padTop(4f);
 					
