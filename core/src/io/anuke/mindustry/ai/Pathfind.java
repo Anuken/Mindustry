@@ -51,6 +51,10 @@ public class Pathfind{
 		//-1 is only possible here if both pathfindings failed, which should NOT happen
 		//check graph code
 		
+		if(enemy.node <= -1){
+			return vector.set(enemy.x, enemy.y);
+		}
+		
 		Tile prev = path[enemy.node - 1];
 
 		Tile target = path[enemy.node];
@@ -99,10 +103,15 @@ public class Pathfind{
 	public void update(){
 		for(SpawnPoint point : Vars.control.getSpawnPoints()){
 			if(!point.request.pathFound){
-				if(point.finder.search(point.request, ms)){
-					smoother.smoothPath(point.path);
-					point.pathTiles = point.path.nodes.toArray(Tile.class);
-					point.tempTiles = point.path.nodes.toArray(Tile.class);
+				try{
+					if(point.finder.search(point.request, ms)){
+						smoother.smoothPath(point.path);
+						point.pathTiles = point.path.nodes.toArray(Tile.class);
+						point.tempTiles = point.path.nodes.toArray(Tile.class);
+					}
+				}catch (ArrayIndexOutOfBoundsException e){
+					//no path
+					point.request.pathFound = true;
 				}
 			}
 		}
@@ -145,6 +154,10 @@ public class Pathfind{
 		int closest = findClosest(enemy.path, enemy.x, enemy.y);
 		
 		closest = Mathf.clamp(closest, 1, enemy.path.length-1);
+		if(closest == -1){
+			return;
+		}
+		
 		Tile end = enemy.path[closest];
 		enemy.node = closest;
 		
