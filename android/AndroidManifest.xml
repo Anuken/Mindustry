@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.anuke.mindustry"
-    android:versionCode="39"
+    android:versionCode="41"
     android:versionName="3.2b" >
 
     <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="26" />

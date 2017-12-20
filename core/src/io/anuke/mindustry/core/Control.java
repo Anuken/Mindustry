@@ -90,14 +90,14 @@ public class Control extends Module{
 		
 		Core.atlas = new Atlas("sprites.atlas");
 		
-		Sounds.load("shoot.wav", "place.wav", "explosion.wav", "enemyshoot.wav", 
-				"corexplode.wav", "break.wav", "spawn.wav", "flame.wav", "die.wav", 
-				"respawn.wav", "purchase.wav", "flame2.wav", "bigshot.wav", "laser.wav", "lasershot.wav",
-				"ping.wav", "tesla.wav", "waveend.wav", "railgun.wav", "blast.wav", "bang2.wav");
+		Sounds.load("shoot.ogg", "place.ogg", "explosion.ogg", "enemyshoot.ogg", 
+				"corexplode.ogg", "break.ogg", "spawn.ogg", "flame.ogg", "die.ogg", 
+				"respawn.ogg", "purchase.ogg", "flame2.ogg", "bigshot.ogg", "laser.ogg", "lasershot.ogg",
+				"ping.ogg", "tesla.ogg", "waveend.ogg", "railgun.ogg", "blast.ogg", "bang2.ogg");
 		
 		Sounds.setFalloff(9000f);
 		
-		Musics.load("1.mp3", "2.mp3", "3.mp3", "4.mp3");
+		Musics.load("1.ogg", "2.ogg", "3.ogg", "4.ogg");
 		
 		KeyBinds.defaults(
 			"up", Keys.W,

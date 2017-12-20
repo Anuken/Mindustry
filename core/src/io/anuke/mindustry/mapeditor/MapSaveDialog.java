@@ -1,5 +1,6 @@
 package io.anuke.mindustry.mapeditor;
 
+import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ui.FloatingDialog;
 import io.anuke.mindustry.world.Map;
@@ -13,6 +14,8 @@ public class MapSaveDialog extends FloatingDialog{
 	public MapSaveDialog(Consumer<String> cons){
 		super("Save Map");
 		field = new TextField();
+		
+		Mindustry.platforms.addDialog(field);
 		
 		shown(() -> {
 			content().clear();

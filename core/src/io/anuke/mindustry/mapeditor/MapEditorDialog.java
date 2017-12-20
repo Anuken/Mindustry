@@ -128,6 +128,7 @@ public class MapEditorDialog extends Dialog{
 		shown(() -> {
 			saved = true;
 			editor.beginEdit(new Map());
+			blockgroup.getButtons().get(2).setChecked(true);
 			Core.scene.setScrollFocus(view);
 		});
 	}

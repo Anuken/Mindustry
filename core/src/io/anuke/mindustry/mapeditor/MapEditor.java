@@ -81,6 +81,7 @@ public class MapEditor{
 	}
 	
 	public void beginEdit(Map map){
+		drawBlock = Blocks.stone;
 		this.map = map;
 		this.brushSize = 1;
 		if(map.pixmap == null){
