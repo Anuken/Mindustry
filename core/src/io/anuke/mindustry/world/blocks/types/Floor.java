@@ -12,6 +12,7 @@ import io.anuke.ucore.util.Mathf;
 
 public class Floor extends Block{
 	protected Predicate<Block> blends = block -> block != this;
+	protected boolean blend = true;
 	
 	public Floor(String name) {
 		super(name);
@@ -24,6 +25,7 @@ public class Floor extends Block{
 		
 		Draw.rect(variants > 0 ? (name() + MathUtils.random(1, variants))  : name(), tile.worldx(), tile.worldy());
 		
+		if(blend)
 		for(int dx = -1; dx <= 1; dx ++){
 			for(int dy = -1; dy <= 1; dy ++){
 				

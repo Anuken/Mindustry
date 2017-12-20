@@ -59,6 +59,7 @@ public class Renderer extends RendererModule{
 		});
 		
 		clearColor = Hue.lightness(0.4f);
+		clearColor.a = 1f;
 	}
 
 	@Override
@@ -319,7 +320,6 @@ public class Renderer extends RendererModule{
 	public void addShieldHit(float x, float y){
 		shieldHits.addAll(x, y, 0f);
 	}
-
 
 	void drawOverlay(){
 

@@ -148,81 +148,6 @@ public class BlockRenderer{
 		requestidx ++;
 	}
 	
-	/*
-	public void drawBlocks(boolean top){
-		int crangex = (int) (camera.viewportWidth / (chunksize * tilesize)) + 1;
-		int crangey = (int) (camera.viewportHeight / (chunksize * tilesize)) + 1;
-		
-		int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2)+2;
-		int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2)+2;
-
-		boolean noshadows = Settings.getBool("noshadows");
-
-		boolean drawTiles = Settings.getBool("drawblocks");
-		
-		if(!drawTiles) return;
-		
-		Layer[] layers = Layer.values();
-		
-		int start = (top ? 4 : (noshadows ? 1 : 0));
-		int end = (top ? 4 + layers.length-1 : 4);
-
-		//0 = shadows
-		//1 = cache blocks
-		//2 = normal blocks
-		//3+ = layers
-		for(int l = start; l < end; l++){
-			if(l == 0){
-				Graphics.surface(renderer.shadowSurface);
-			}
-			
-			Layer layer = l >= 3 ? layers[l - 3] : null;
-			
-			boolean expand = layer == Layer.power;
-			int expandr = (expand ? 3 : 0);
-
-			if(l == 1){
-				Graphics.end();
-				drawCache(1, crangex, crangey);
-				Graphics.begin();
-			}else{
-				for(int x = -rangex - expandr; x <= rangex + expandr; x++){
-					for(int y = -rangey - expandr; y <= rangey + expandr; y++){
-						int worldx = Mathf.scl(camera.position.x, tilesize) + x;
-						int worldy = Mathf.scl(camera.position.y, tilesize) + y;
-						boolean expanded = (x < -rangex || x > rangex || y < -rangey || y > rangey);
-						
-						if(world.tile(worldx, worldy) != null){
-							Tile tile = world.tile(worldx, worldy);
-							if(l == 0 && !expanded){
-								if(tile.block() != Blocks.air && world.isAccessible(worldx, worldy)){
-									tile.block().drawShadow(tile);
-								}
-							}else if(!(tile.block() instanceof StaticBlock) &&
-									(!expanded || tile.block().expanded)){
-								if(l == 2){
-									tile.block().draw(tile);
-								}else{
-									if(tile.block().layer == layer)
-										 tile.block().drawLayer(tile);
-									
-									if(tile.block().layer2 == layer)
-										 tile.block().drawLayer2(tile);
-								}
-							}
-						}
-					}
-				}
-			}
-
-			if(l == 0){
-				Draw.color(0, 0, 0, 0.15f);
-				Graphics.flushSurface();
-				Draw.color();
-			}
-		}
-	}*/
-	
 	public void drawFloor(){
 		int chunksx = world.width() / chunksize, chunksy = world.height() / chunksize;
 
@@ -315,7 +240,9 @@ public class BlockRenderer{
 			for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
 				Tile tile = world.tile(tilex, tiley);
 				if(floor){
-					tile.floor().draw(tile);
+					if(!(tile.block() instanceof StaticBlock)){
+						tile.floor().draw(tile);
+					}
 				}else if(tile.block() instanceof StaticBlock){
 					tile.block().draw(tile);
 				}

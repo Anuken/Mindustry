@@ -72,6 +72,16 @@ public class World extends Module{
 		return !wallSolid(x, y-1) || !wallSolid(x, y+1) || !wallSolid(x-1, y) ||!wallSolid(x+1, y);
 	}
 	
+	public boolean blends(Block block, int x, int y){
+		return !floorBlends(x, y-1, block) || !floorBlends(x, y+1, block) 
+				|| !floorBlends(x-1, y, block) ||!floorBlends(x+1, y, block);
+	}
+	
+	public boolean floorBlends(int x, int y, Block block){
+		Tile tile = tile(x, y);
+		return tile == null || tile.floor().id <= block.id;
+	}
+	
 	public Map getMap(){
 		return currentMap;
 	}
