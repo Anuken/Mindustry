@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.graphics.Fx;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;

@@ -1,0 +1,335 @@
+package io.anuke.mindustry.graphics;
+
+import static io.anuke.mindustry.Vars.*;
+import static io.anuke.ucore.core.Core.camera;
+
+import java.util.Arrays;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.utils.Array;
+
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.GameState;
+import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.mindustry.world.blocks.types.StaticBlock;
+import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.graphics.CacheBatch;
+import io.anuke.ucore.util.Mathf;
+
+public class BlockRenderer{
+	private final static int chunksize = 32;
+	private final static int initialRequests = 32*32;
+	
+	private int[][][] cache;
+	private CacheBatch cbatch;
+	
+	private Array<BlockRequest> requests = new Array<BlockRequest>(initialRequests);
+	private int requestidx = 0;
+	private int iterateidx = 0;
+	
+	public BlockRenderer(){
+		for(int i = 0; i < requests.size; i ++){
+			requests.set(i, new BlockRequest());
+		}
+	}
+	
+	private class BlockRequest implements Comparable<BlockRequest>{
+		Tile tile;
+		Layer layer;
+		
+		@Override
+		public int compareTo(BlockRequest other){
+			return layer.compareTo(other.layer);
+		}
+	}
+	
+	/**Process all blocks to draw, simultaneously drawing block shadows and static blocks.*/
+	public void processBlocks(){
+		requestidx = 0;
+		
+		int crangex = (int) (camera.viewportWidth / (chunksize * tilesize)) + 1;
+		int crangey = (int) (camera.viewportHeight / (chunksize * tilesize)) + 1;
+		
+		int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2)+2;
+		int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2)+2;
+			
+		int expandr = 3;
+		
+		Graphics.surface(renderer.shadowSurface);
+
+		for(int x = -rangex - expandr; x <= rangex + expandr; x++){
+			for(int y = -rangey - expandr; y <= rangey + expandr; y++){
+				int worldx = Mathf.scl(camera.position.x, tilesize) + x;
+				int worldy = Mathf.scl(camera.position.y, tilesize) + y;
+				boolean expanded = (x < -rangex || x > rangex || y < -rangey || y > rangey);
+				
+				Tile tile = world.tile(worldx, worldy);
+				
+				if(tile != null){
+					Block block = tile.block();
+					
+					if(!expanded && block != Blocks.air && world.isAccessible(worldx, worldy)){
+						block.drawShadow(tile);
+					}
+					
+					if(!(block instanceof StaticBlock)){
+						if(block == Blocks.air){
+							if(!GameState.is(State.paused)) tile.floor().update(tile);
+						}else{
+						
+							if(!expanded){
+								addRequest(tile, Layer.block);
+							}
+						
+							if(block.expanded || !expanded){
+								if(block.layer != null){
+									addRequest(tile, block.layer);
+								}
+						
+								if(block.layer2 != null){
+									addRequest(tile, block.layer2);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		Draw.color(0, 0, 0, 0.15f);
+		Graphics.flushSurface();
+		Draw.color();
+		
+		Graphics.end();
+		drawCache(1, crangex, crangey);
+		Graphics.begin();
+		
+		Arrays.sort(requests.items, 0, requestidx);
+		iterateidx = 0;
+	}
+	
+	public void drawBlocks(boolean top){
+		Layer stopAt = top ? Layer.laser : Layer.overlay;
+		
+		for(; iterateidx < requests.size; iterateidx ++){
+			if(iterateidx < requests.size - 1 && requests.get(iterateidx).layer.ordinal() > stopAt.ordinal()){
+				break;
+			}
+			
+			BlockRequest req = requests.get(iterateidx);
+			Block block = req.tile.block();
+			if(req.layer == Layer.block){
+				block.draw(req.tile);
+			}else if(req.layer == block.layer){
+				block.drawLayer(req.tile);
+			}else if(req.layer == block.layer2){
+				block.drawLayer2(req.tile);
+			}
+		}
+	}
+	
+	private void addRequest(Tile tile, Layer layer){
+		if(requestidx >= requests.size){
+			requests.add(new BlockRequest());
+		}
+		BlockRequest r = requests.get(requestidx);
+		if(r == null){
+			requests.set(requestidx, r = new BlockRequest());
+		}
+		r.tile = tile;
+		r.layer = layer;
+		requestidx ++;
+	}
+	
+	/*
+	public void drawBlocks(boolean top){
+		int crangex = (int) (camera.viewportWidth / (chunksize * tilesize)) + 1;
+		int crangey = (int) (camera.viewportHeight / (chunksize * tilesize)) + 1;
+		
+		int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2)+2;
+		int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2)+2;
+
+		boolean noshadows = Settings.getBool("noshadows");
+
+		boolean drawTiles = Settings.getBool("drawblocks");
+		
+		if(!drawTiles) return;
+		
+		Layer[] layers = Layer.values();
+		
+		int start = (top ? 4 : (noshadows ? 1 : 0));
+		int end = (top ? 4 + layers.length-1 : 4);
+
+		//0 = shadows
+		//1 = cache blocks
+		//2 = normal blocks
+		//3+ = layers
+		for(int l = start; l < end; l++){
+			if(l == 0){
+				Graphics.surface(renderer.shadowSurface);
+			}
+			
+			Layer layer = l >= 3 ? layers[l - 3] : null;
+			
+			boolean expand = layer == Layer.power;
+			int expandr = (expand ? 3 : 0);
+
+			if(l == 1){
+				Graphics.end();
+				drawCache(1, crangex, crangey);
+				Graphics.begin();
+			}else{
+				for(int x = -rangex - expandr; x <= rangex + expandr; x++){
+					for(int y = -rangey - expandr; y <= rangey + expandr; y++){
+						int worldx = Mathf.scl(camera.position.x, tilesize) + x;
+						int worldy = Mathf.scl(camera.position.y, tilesize) + y;
+						boolean expanded = (x < -rangex || x > rangex || y < -rangey || y > rangey);
+						
+						if(world.tile(worldx, worldy) != null){
+							Tile tile = world.tile(worldx, worldy);
+							if(l == 0 && !expanded){
+								if(tile.block() != Blocks.air && world.isAccessible(worldx, worldy)){
+									tile.block().drawShadow(tile);
+								}
+							}else if(!(tile.block() instanceof StaticBlock) &&
+									(!expanded || tile.block().expanded)){
+								if(l == 2){
+									tile.block().draw(tile);
+								}else{
+									if(tile.block().layer == layer)
+										 tile.block().drawLayer(tile);
+									
+									if(tile.block().layer2 == layer)
+										 tile.block().drawLayer2(tile);
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if(l == 0){
+				Draw.color(0, 0, 0, 0.15f);
+				Graphics.flushSurface();
+				Draw.color();
+			}
+		}
+	}*/
+	
+	public void drawFloor(){
+		int chunksx = world.width() / chunksize, chunksy = world.height() / chunksize;
+
+		//render the entire map
+		if(cache == null || cache.length != chunksx || cache[0].length != chunksy){
+			cache = new int[chunksx][chunksy][2];
+
+			for(int x = 0; x < chunksx; x++){
+				for(int y = 0; y < chunksy; y++){
+					cacheChunk(x, y, true);
+					cacheChunk(x, y, false);
+				}
+			}
+		}
+
+		OrthographicCamera camera = Core.camera;
+
+		Graphics.end();
+
+		int crangex = (int)(camera.viewportWidth * camera.zoom / (chunksize * tilesize))+1;
+		int crangey = (int)(camera.viewportHeight * camera.zoom / (chunksize * tilesize))+1;
+
+		drawCache(0, crangex, crangey);
+
+		Graphics.begin();
+
+		Draw.reset();
+		
+		if(Vars.showPaths && Vars.debug){
+			drawPaths();
+		}
+
+		if(Vars.debug && Vars.debugChunks){
+			Draw.color(Color.YELLOW);
+			Draw.thick(1f);
+			for(int x = -crangex; x <= crangex; x++){
+				for(int y = -crangey; y <= crangey; y++){
+					int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
+					int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
+
+					if(!Mathf.inBounds(worldx, worldy, cache))
+						continue;
+					Draw.linerect(worldx * chunksize * tilesize, worldy * chunksize * tilesize, chunksize * tilesize, chunksize * tilesize);
+				}
+			}
+			Draw.reset();
+		}
+	}
+	
+	void drawPaths(){
+		Draw.color(Color.RED);
+		for(SpawnPoint point : control.getSpawnPoints()){
+			if(point.pathTiles != null){
+				for(int i = 1; i < point.pathTiles.length; i ++){
+					Draw.line(point.pathTiles[i-1].worldx(), point.pathTiles[i-1].worldy(), 
+							point.pathTiles[i].worldx(), point.pathTiles[i].worldy());
+					Draw.circle(point.pathTiles[i-1].worldx(), point.pathTiles[i-1].worldy(), 6f);
+				}
+			}
+		}
+		Draw.reset();
+	}
+	
+
+	void drawCache(int layer, int crangex, int crangey){
+		Gdx.gl.glEnable(GL20.GL_BLEND);
+
+		cbatch.setProjectionMatrix(Core.camera.combined);
+		cbatch.beginDraw();
+		for(int x = -crangex; x <= crangex; x++){
+			for(int y = -crangey; y <= crangey; y++){
+				int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
+				int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
+
+				if(!Mathf.inBounds(worldx, worldy, cache))
+					continue;
+
+				cbatch.drawCache(cache[worldx][worldy][layer]);
+			}
+		}
+
+		cbatch.endDraw();
+	}
+
+	void cacheChunk(int cx, int cy, boolean floor){
+		cbatch.begin();
+		Graphics.useBatch(cbatch);
+
+		for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
+			for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
+				Tile tile = world.tile(tilex, tiley);
+				if(floor){
+					tile.floor().draw(tile);
+				}else if(tile.block() instanceof StaticBlock){
+					tile.block().draw(tile);
+				}
+			}
+		}
+		Graphics.popBatch();
+		cbatch.end();
+		cache[cx][cy][floor ? 0 : 1] = cbatch.getLastCache();
+	}
+
+	public void clearTiles(){
+		cache = null;
+		if(cbatch != null)
+			cbatch.dispose();
+		cbatch = new CacheBatch(Vars.world.width() * Vars.world.height() * 3);
+	}
+}

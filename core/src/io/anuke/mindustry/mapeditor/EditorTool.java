@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
+import io.anuke.mindustry.world.ColorMapper.BlockPair;
 
 public enum EditorTool{
 	pencil{
@@ -65,7 +66,9 @@ public enum EditorTool{
 	},
 	pick{
 		public void touched(MapEditor editor, int x, int y){
-			Block block = ColorMapper.get(editor.pixmap().getPixel(x, y)).dominant();
+			BlockPair pair = ColorMapper.get(editor.pixmap().getPixel(x, y));
+			if(pair == null) return;
+			Block block = pair.dominant();
 			editor.setDrawBlock(block);
 			Vars.ui.getEditorDialog().updateSelectedBlock();
 		}

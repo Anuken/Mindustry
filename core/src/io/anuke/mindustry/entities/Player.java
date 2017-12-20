@@ -5,7 +5,7 @@ import static io.anuke.mindustry.Vars.*;
 import com.badlogic.gdx.Input.Buttons;
 
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.effect.Fx;
+import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.resource.Mech;
 import io.anuke.mindustry.resource.Recipe;

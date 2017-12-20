@@ -6,8 +6,8 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.effect.Fx;
-import io.anuke.mindustry.entities.effect.Shaders;
+import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.*;
@@ -238,7 +238,7 @@ public class Enemy extends DestructibleEntity{
 		xvelocity = (x - lastx) / Timers.delta();
 		yvelocity = (y - lasty) / Timers.delta();
 		
-		float minv = 0.09f;
+		float minv = 0.07f;
 		
 		if(xvelocity < minv && yvelocity < minv && node > 0 && target == null){
 			idletime += Timers.delta();

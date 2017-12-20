@@ -4,8 +4,8 @@ import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.effect.Fx;
 import io.anuke.mindustry.entities.effect.Shield;
+import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Effects;

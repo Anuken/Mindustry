@@ -1,8 +1,6 @@
 package io.anuke.mindustry.world.blocks;
 
-import io.anuke.mindustry.core.GameState;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.effect.Fx;
+import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
@@ -21,10 +19,7 @@ public class Blocks{
 		public void drawCache(Tile tile){}
 		
 		//update floor blocks for effects, if needed
-		public void draw(Tile tile){
-			if(!GameState.is(State.paused))
-				tile.floor().update(tile);
-		}
+		public void draw(Tile tile){}
 	},
 	
 	blockpart = new BlockPart(),

@@ -43,6 +43,9 @@ public class MapView extends Element implements GestureListener{
 			
 			@Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				if(pointer != 0){
+					return false;
+				}
 				GridPoint2 p = project(x, y);
 				lastx = p.x;
 				lasty = p.y;

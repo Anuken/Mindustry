@@ -4,8 +4,9 @@ import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.core.Core.*;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -14,20 +15,18 @@ import com.badlogic.gdx.utils.FloatArray;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.effect.Shaders;
 import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.graphics.BlockRenderer;
+import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.PlaceMode;
-import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
-import io.anuke.mindustry.world.blocks.types.StaticBlock;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.graphics.CacheBatch;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Surface;
 import io.anuke.ucore.modules.RendererModule;
@@ -43,9 +42,8 @@ public class Renderer extends RendererModule{
 	public Surface shadowSurface, shieldSurface, indicatorSurface;
 	
 	private int targetscale = baseCameraScale;
-	private int[][][] cache;
 	private FloatArray shieldHits = new FloatArray();
-	private CacheBatch cbatch;
+	private BlockRenderer blocks = new BlockRenderer();
 
 	public Renderer() {
 		Core.cameraScale = baseCameraScale;
@@ -210,14 +208,17 @@ public class Renderer extends RendererModule{
 		Graphics.surface(shieldSurface);
 		Graphics.surface();
 		
-		drawFloor();
-		drawBlocks(false);
+		blocks.drawFloor();
+		blocks.processBlocks();
+		blocks.drawBlocks(false);
 
 		Graphics.shader(Shaders.outline, false);
 		Entities.draw(control.enemyGroup);
 		Graphics.shader();
 
 		Entities.draw(Entities.defaultGroup());
+		
+		blocks.drawBlocks(true);
 		
 		Entities.draw(control.bulletGroup);
 
@@ -228,7 +229,6 @@ public class Renderer extends RendererModule{
 		if(Settings.getBool("indicators") && Vars.showUI){
 			drawEnemyMarkers();
 		}
-		
 
 		if(pixelate)
 			Graphics.flushSurface();
@@ -241,6 +241,10 @@ public class Renderer extends RendererModule{
 		super.resize(width, height);
 		control.input.resetCursor();
 		camera.position.set(player.x, player.y, 0);
+	}
+	
+	public void clearTiles(){
+		blocks.clearTiles();
 	}
 
 	void drawEnemyMarkers(){
@@ -316,188 +320,6 @@ public class Renderer extends RendererModule{
 		shieldHits.addAll(x, y, 0f);
 	}
 
-	void drawFloor(){
-		int chunksx = world.width() / chunksize, chunksy = world.height() / chunksize;
-
-		//render the entire map
-		if(cache == null || cache.length != chunksx || cache[0].length != chunksy){
-			cache = new int[chunksx][chunksy][2];
-
-			for(int x = 0; x < chunksx; x++){
-				for(int y = 0; y < chunksy; y++){
-					cacheChunk(x, y, true);
-					cacheChunk(x, y, false);
-				}
-			}
-		}
-
-		OrthographicCamera camera = Core.camera;
-
-		Graphics.end();
-
-		int crangex = (int)(camera.viewportWidth * camera.zoom / (chunksize * tilesize))+1;
-		int crangey = (int)(camera.viewportHeight * camera.zoom / (chunksize * tilesize))+1;
-
-		drawCache(0, crangex, crangey);
-
-		Graphics.begin();
-
-		Draw.reset();
-		
-		if(Vars.showPaths && Vars.debug){
-			drawPaths();
-		}
-
-		if(Vars.debug && Vars.debugChunks){
-			Draw.color(Color.YELLOW);
-			Draw.thick(1f);
-			for(int x = -crangex; x <= crangex; x++){
-				for(int y = -crangey; y <= crangey; y++){
-					int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
-					int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
-
-					if(!Mathf.inBounds(worldx, worldy, cache))
-						continue;
-					Draw.linerect(worldx * chunksize * tilesize, worldy * chunksize * tilesize, chunksize * tilesize, chunksize * tilesize);
-				}
-			}
-			Draw.reset();
-		}
-	}
-	
-	void drawBlocks(boolean top){
-		int crangex = (int) (camera.viewportWidth / (chunksize * tilesize)) + 1;
-		int crangey = (int) (camera.viewportHeight / (chunksize * tilesize)) + 1;
-		
-		int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2)+2;
-		int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2)+2;
-
-		boolean noshadows = Settings.getBool("noshadows");
-
-		boolean drawTiles = Settings.getBool("drawblocks");
-		
-		if(!drawTiles) return;
-		
-		Layer[] layers = Layer.values();
-		
-		int start = (top ? 4 : (noshadows ? 1 : 0));
-		int end = (top ? 4 + layers.length-1 : 4);
-
-		//0 = shadows
-		//1 = cache blocks
-		//2 = normal blocks
-		//3+ = layers
-		for(int l = start; l < end; l++){
-			if(l == 0){
-				Graphics.surface(shadowSurface);
-			}
-			
-			Layer layer = l >= 3 ? layers[l - 3] : null;
-			
-			boolean expand = layer == Layer.power;
-			int expandr = (expand ? 3 : 0);
-
-			if(l == 1){
-				Graphics.end();
-				drawCache(1, crangex, crangey);
-				Graphics.begin();
-			}else{
-				for(int x = -rangex - expandr; x <= rangex + expandr; x++){
-					for(int y = -rangey - expandr; y <= rangey + expandr; y++){
-						int worldx = Mathf.scl(camera.position.x, tilesize) + x;
-						int worldy = Mathf.scl(camera.position.y, tilesize) + y;
-						boolean expanded = (x < -rangex || x > rangex || y < -rangey || y > rangey);
-						
-						if(world.tile(worldx, worldy) != null){
-							Tile tile = world.tile(worldx, worldy);
-							if(l == 0 && !expanded){
-								if(tile.block() != Blocks.air && world.isAccessible(worldx, worldy)){
-									tile.block().drawShadow(tile);
-								}
-							}else if(!(tile.block() instanceof StaticBlock) &&
-									(!expanded || tile.block().expanded)){
-								if(l == 2){
-									tile.block().draw(tile);
-								}else{
-									if(tile.block().layer == layer)
-										 tile.block().drawLayer(tile);
-									
-									if(tile.block().layer2 == layer)
-										 tile.block().drawLayer2(tile);
-								}
-							}
-						}
-					}
-				}
-			}
-
-			if(l == 0){
-				Draw.color(0, 0, 0, 0.15f);
-				Graphics.flushSurface();
-				Draw.color();
-			}
-		}
-	}
-
-	void drawCache(int layer, int crangex, int crangey){
-		Gdx.gl.glEnable(GL20.GL_BLEND);
-
-		cbatch.setProjectionMatrix(Core.camera.combined);
-		cbatch.beginDraw();
-		for(int x = -crangex; x <= crangex; x++){
-			for(int y = -crangey; y <= crangey; y++){
-				int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
-				int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
-
-				if(!Mathf.inBounds(worldx, worldy, cache))
-					continue;
-
-				cbatch.drawCache(cache[worldx][worldy][layer]);
-			}
-		}
-
-		cbatch.endDraw();
-	}
-
-	void cacheChunk(int cx, int cy, boolean floor){
-		cbatch.begin();
-		Graphics.useBatch(cbatch);
-
-		for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
-			for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
-				Tile tile = world.tile(tilex, tiley);
-				if(floor){
-					tile.floor().draw(tile);
-				}else if(tile.block() instanceof StaticBlock){
-					tile.block().draw(tile);
-				}
-			}
-		}
-		Graphics.popBatch();
-		cbatch.end();
-		cache[cx][cy][floor ? 0 : 1] = cbatch.getLastCache();
-	}
-
-	public void clearTiles(){
-		cache = null;
-		if(cbatch != null)
-			cbatch.dispose();
-		cbatch = new CacheBatch(Vars.world.width() * Vars.world.height() * 3);
-	}
-	
-	void drawPaths(){
-		Draw.color(Color.RED);
-		for(SpawnPoint point : control.spawnpoints){
-			if(point.pathTiles != null){
-				for(int i = 1; i < point.pathTiles.length; i ++){
-					Draw.line(point.pathTiles[i-1].worldx(), point.pathTiles[i-1].worldy(), 
-							point.pathTiles[i].worldx(), point.pathTiles[i].worldy());
-					Draw.circle(point.pathTiles[i-1].worldx(), point.pathTiles[i-1].worldy(), 6f);
-				}
-			}
-		}
-		Draw.reset();
-	}
 
 	void drawOverlay(){
 

@@ -8,7 +8,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.effect.Fx;
+import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
@@ -72,9 +72,9 @@ public class Block{
 	/**Max of timers used.*/
 	public int timers = 0;
 	/**Layer to draw extra stuff on.*/
-	public Layer layer = Layer.overlay;
+	public Layer layer = null;
 	/**Extra layer to draw extra extra stuff on.*/
-	public Layer layer2 = Layer.overlay;
+	public Layer layer2 = null;
 
 	public Block(String name) {
 		blocks.add(this);
