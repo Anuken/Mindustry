@@ -4,7 +4,8 @@
 /desktop/packr-out/
 /desktop/packr-export/
 /desktop/mindustry-saves/
-/destkop/mindustry-maps/*
+/desktop/mindustry-maps/
+/desktop/gifexport/
 /core/lib/
 *.gif
 
