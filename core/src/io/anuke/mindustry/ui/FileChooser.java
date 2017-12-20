@@ -1,7 +1,5 @@
 package io.anuke.mindustry.ui;
 
-import java.util.Arrays;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -9,12 +7,21 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 
+import java.util.Arrays;
+
 import io.anuke.mindustry.Mindustry;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.*;
+import io.anuke.ucore.scene.ui.ButtonGroup;
+import io.anuke.ucore.scene.ui.Dialog;
+import io.anuke.ucore.scene.ui.Image;
+import io.anuke.ucore.scene.ui.ImageButton;
+import io.anuke.ucore.scene.ui.Label;
+import io.anuke.ucore.scene.ui.ScrollPane;
+import io.anuke.ucore.scene.ui.TextButton;
+import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
@@ -43,7 +50,7 @@ public class FileChooser extends FloatingDialog{
 	}
 
 	private void setupWidgets(){
-		getCell(content()).width(Gdx.graphics.getWidth() / Unit.dp.scl(2f));
+		getCell(content()).maxWidth(Gdx.graphics.getWidth()/Unit.dp.scl(2f));
 		content().pad(-10);
 		
 		Table content = new Table();
@@ -135,7 +142,7 @@ public class FileChooser extends FloatingDialog{
 		//content.add(navigation).colspan(3).left().padBottom(10f).expandX().fillX().height(40f);
 		//content.row();
 
-		content.center().add(pane).width(Gdx.graphics.getWidth()/2).colspan(3).grow();
+		content.center().add(pane).width(Gdx.graphics.getWidth()/Unit.dp.scl(2)).colspan(3).grow();
 		content.row();
 		
 		if(!open){
