@@ -68,7 +68,7 @@ public class Control extends Module{
 		if(Mindustry.args.contains("-debug", false))
 			Vars.debug = true;
 		
-		UCore.log("Total blocks loaded: " + Block.getAllBlocks().size);
+		log("Total blocks loaded: " + Block.getAllBlocks().size);
 		
 		for(Block block : Block.getAllBlocks()){
 			block.postInit();

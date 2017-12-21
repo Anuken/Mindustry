@@ -23,6 +23,7 @@ import io.anuke.ucore.util.Tmp;
 public class MapView extends Element implements GestureListener{
 	private MapEditor editor;
 	private EditorTool tool = EditorTool.pencil;
+	private OperationStack stack = new OperationStack();
 	private Bresenham2 br = new Bresenham2();
 	private float offsetx, offsety;
 	private float zoom = 1f;
@@ -30,7 +31,11 @@ public class MapView extends Element implements GestureListener{
 	public void setTool(EditorTool tool){
 		this.tool = tool;
 	}
-	
+
+	public void clearStack(){
+		stack.clear();
+	}
+
 	public MapView(MapEditor editor){
 		this.editor = editor;
 		

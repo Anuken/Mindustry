@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -314,7 +315,7 @@ public class SaveIO{
 			/*long loadTime = */stream.readLong();
 			
 			if(version != fileVersionID){
-				//TODO throw an exception?
+				throw new RuntimeException("Save file version mismatch!");
 			}
 			
 			//general state

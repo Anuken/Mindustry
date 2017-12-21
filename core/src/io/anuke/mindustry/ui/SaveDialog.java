@@ -1,5 +1,6 @@
 package io.anuke.mindustry.ui;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.Vars;
@@ -41,6 +42,10 @@ public class SaveDialog extends LoadDialog{
 		Timers.runTask(5f, () -> {
 			hide();
 			Vars.ui.hideLoading();
+			if(Gdx.files.getLocalStoragePath().equals("C:\\Windows\\System32")){
+				Vars.ui.showError("[orange]Invalid local storage directory![]\nAre you running the game from inside a zip file?");
+				return;
+			}
 			try{
 				SaveIO.saveToSlot(slot);
 			}catch(Throwable e){
