@@ -6,7 +6,6 @@ jdk:
 
 android:
   components:
-    # The SDK version used to compile your project
     - android-26
 
     # Additional components
@@ -15,4 +14,10 @@ android:
     - extra-android-m2repository
     - addon-google_apis-google-26
 
-script: ./gradlew desktop:dist
+script: 
+    - ./gradlew clean desktop:dist
+    - ./gradlew clean android:build
+
+after_success:
+    - chmod +x upload-build.sh
+    - ./upload-build.sh

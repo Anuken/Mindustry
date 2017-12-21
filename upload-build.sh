@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+cd $HOME
+git config --global user.email $GHEMAIL
+git config --global user.name $GHUSERNAME
+
+# add, commit and push files
+git clone https://github.com/Anuken/Mindustry.wiki.git
+cd Mindustry.wiki
+
+DESKFILE=$TRAVIS_COMMIT"-desktop-bleeding-edge.jar"
+cp desktop/build/libs/desktop-release.jar $DESKFILE
+
+FILE1=$TRAVIS_BUILD_NUMBER-Bleeding-Edge-Build-$TRAVIS_COMMIT.md
+
+if [ ! -e $FILE1 ]; then
+    touch $FILE1
+fi
+
+echo "This is the latest build of #"$TRAVIS_COMMIT" \nDesktop download: ["$DESKFILE"]("$DESKFILE")" >> $FILE1
+
+git add $FILE1
+git add desktop-bleeding-edge.jar
+git commit -m "Added a new bleeding edge build"
+git push https://$GHUSERNAME:$GHPASSWORD@github.com:Anuken/Mindustry.git --all
