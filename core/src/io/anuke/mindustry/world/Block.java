@@ -155,6 +155,7 @@ public class Block{
 				tile.setDump((byte)((i+1)%4));
 				return;
 			}
+			tiles = tile.getNearby();
 			i++;
 			i %= 4;
 		}
@@ -191,6 +192,7 @@ public class Block{
 					}
 				}
 			}
+			tiles = tile.getNearby();
 			i++;
 			i %= 4;
 		}

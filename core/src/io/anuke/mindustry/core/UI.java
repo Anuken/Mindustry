@@ -163,13 +163,7 @@ public class UI extends SceneModule{
 		configtable = new Table();
 		scene.add(configtable);
 
-		try {
-			editorDialog = new MapEditorDialog(editor);
-		}catch (Exception e){
-			Timers.run(1f, () -> {
-				showErrorClose("[orange]Error occurred loading editor![]Are you running from a zip file?\n");
-			});
-		}
+		editorDialog = new MapEditorDialog(editor);
 		
 		settingserror = new Dialog("Warning", "dialog");
 		settingserror.content().add("[crimson]Failed to access local storage.\nSettings will not be saved.");
@@ -210,6 +204,7 @@ public class UI extends SceneModule{
 		prefs.volumePrefs();
 		
 		prefs.checkPref("fps", "Show FPS", false);
+		prefs.checkPref("vsync", "VSync", true, b -> Gdx.graphics.setVSync(b));
 		prefs.checkPref("noshadows", "Disable shadows", false);
 		prefs.checkPref("smoothcam", "Smooth Camera", true);
 		prefs.checkPref("indicators", "Enemy Indicators", true);
@@ -226,6 +221,8 @@ public class UI extends SceneModule{
 			}
 			renderer.setPixelate(b);
 		});
+
+		Gdx.graphics.setVSync(Settings.getBool("vsync"));
 		
 		prefs.hidden(()->{
 			if(!GameState.is(State.menu)){

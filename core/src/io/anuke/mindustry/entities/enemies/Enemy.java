@@ -9,6 +9,7 @@ import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.*;
 import io.anuke.ucore.util.*;
@@ -152,41 +153,6 @@ public class Enemy extends DestructibleEntity{
 		Bullet out = new Bullet(bullet, this, x + Angles.x(), y + Angles.y(), this.angle + rotation).add();
 		out.damage = (int) (damage * Vars.multiplier);
 	}
-	
-	/*
-	public void findClosestNode(){
-		int index = 0;
-		int cindex = -1;
-		float dst = Float.MAX_VALUE;
-		UCore.log("Finding closest.");
-		
-		Tile[] clone = path.clone();
-		UCore.log(clone.length);
-
-		//find closest node index
-		for(Tile tile : path){
-			if(Vector2.dst(tile.worldx(), tile.worldy(), x, y) < dst){
-				dst = Vector2.dst(tile.worldx(), tile.worldy(), x, y);
-				cindex = index;
-			}
-
-			index++;
-		}
-
-		cindex = Math.max(cindex, 1);
-
-		//set node to that index
-		node = cindex;
-
-		int x2 = path[node].x, y2 = path[node].y;
-
-		//if the enemy can't move to that node right now, set its position to it
-		if(Vars.world.raycast(Mathf.scl2(x, Vars.tilesize), Mathf.scl2(y, Vars.tilesize), x2, y2) != null){
-			Timers.run(Mathf.random(15f), () -> {
-				set(x2 * Vars.tilesize, y2 * Vars.tilesize);
-			});
-		}
-	}*/
 
 	@Override
 	public void added(){
@@ -240,7 +206,7 @@ public class Enemy extends DestructibleEntity{
 		
 		float minv = 0.07f;
 		
-		if(xvelocity < minv && yvelocity < minv && node > 0 && target == null){
+		if(Math.abs(xvelocity) < minv && Math.abs(yvelocity) < minv && node > 0 && target == null){
 			idletime += Timers.delta();
 		}else{
 			idletime = 0;
@@ -271,8 +237,14 @@ public class Enemy extends DestructibleEntity{
 		if(Vars.showPaths){
 			Draw.color(Color.PURPLE);
 			Draw.line(x, y, x + xvelocity*10f, y + yvelocity*10f);
+
+			Draw.color(Color.BLACK, Color.WHITE, idletime / maxIdleLife);
+			Draw.square(x, y, 7f);
+
 			Draw.color();
 		}
+
+		Draw.color();
 		
 		Graphics.flush();
 	}
