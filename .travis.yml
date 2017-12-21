@@ -14,6 +14,11 @@ android:
     - extra-android-m2repository
     - addon-google_apis-google-26
 
+  licenses:
+    - 'android-sdk-preview-license-52d11cd2'
+    - 'android-sdk-license-.+'
+    - 'google-gdk-license-.+'
+
 script: 
     - ./gradlew clean desktop:dist
     - ./gradlew clean android:build
