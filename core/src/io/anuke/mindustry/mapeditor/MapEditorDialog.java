@@ -22,6 +22,7 @@ import io.anuke.ucore.graphics.Pixmaps;
 import io.anuke.ucore.scene.builders.*;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.util.Strings;
 
 public class MapEditorDialog extends Dialog{
 	private MapEditor editor;
@@ -52,7 +53,7 @@ public class MapEditorDialog extends Dialog{
 						Vars.ui.showError("[orange]Invalid image dimensions![]\nValid map dimensions: " + Arrays.toString(MapEditor.validMapSizes));
 					}
 				}catch (Exception e){
-					Vars.ui.showError("Error loading image file!");
+					Vars.ui.showError("Error loading image file:\n" + Strings.parseException((Exception)e.getCause()));
 					e.printStackTrace();
 				}
 				Vars.ui.hideLoading();
@@ -67,10 +68,9 @@ public class MapEditorDialog extends Dialog{
 			Vars.ui.showLoading();
 			Timers.run(3f, () -> {
 				try{
-					Gdx.app.error("MINDUSTRYAAAAAAAAAA", "Saving to file: " + result.toString() + " " + result.type());
 					Pixmaps.write(editor.pixmap(), result);
 				}catch (Exception e){
-					Vars.ui.showError("Error saving image file!");
+					Vars.ui.showError("Error saving image file:\n " + Strings.parseException((Exception)e.getCause()));
 					e.printStackTrace();
 				}
 				Vars.ui.hideLoading();
@@ -110,6 +110,7 @@ public class MapEditorDialog extends Dialog{
 				editor.getMap().name = name;
 				Timers.run(10f, () -> {
 					Vars.world.maps().saveAndReload(editor.getMap(), editor.pixmap());
+					loadDialog.rebuild();
 					Vars.ui.hideLoading();
 				});
 			}else{
@@ -159,45 +160,46 @@ public class MapEditorDialog extends Dialog{
 				
 				defaults().growY().width(130f).padBottom(-6);
 				
-				new imagebutton("icon-terrain", isize, () -> {
-					dialog.show();
-				}).text("generate");
+				new imagebutton("icon-terrain", isize, () ->
+					dialog.show()
+				).text("generate");
 				
 				row();
 				
-				new imagebutton("icon-resize", isize, () -> {
-					resizeDialog.show();
-				}).text("resize").padTop(4f);
+				new imagebutton("icon-resize", isize, () ->
+					resizeDialog.show()
+				).text("resize").padTop(4f);
 				
 				row();
 				
-				new imagebutton("icon-load-map", isize, () -> {
-					loadDialog.show();
-				}).text("load map");
+				new imagebutton("icon-load-map", isize, () ->
+					loadDialog.show()
+				).text("load map");
 				
 				row();
 				
-				new imagebutton("icon-save-map", isize, ()->{
-					saveDialog.show();
-				}).text("save map");
+				new imagebutton("icon-save-map", isize, ()->
+					saveDialog.show()
+				).text("save map");
 				
 				row();
 				
-				new imagebutton("icon-load-image", isize, () -> {
-					openFile.show();
-				}).text("load image");
+				new imagebutton("icon-load-image", isize, () ->
+					openFile.show()
+				).text("load image");
 				
 				row();
 				
-				new imagebutton("icon-save-image", isize, () -> {
-					saveFile.show();
-				}).text("save image");
+				new imagebutton("icon-save-image", isize, () ->
+					saveFile.show()
+				).text("save image");
 				
 				row();
 				
 				new imagebutton("icon-back", isize, () -> {
 					if(!saved){
-						Vars.ui.showConfirm("Confirm Exit", "[scarlet]You have unsaved changes![]\nAre you sure you want to exit?", () -> hide());
+						Vars.ui.showConfirm("Confirm Exit", "[scarlet]You have unsaved changes![]\nAre you sure you want to exit?",
+								MapEditorDialog.this::hide);
 					}else{
 						hide();
 					}
@@ -234,9 +236,7 @@ public class MapEditorDialog extends Dialog{
 				new table("button"){{
 					margin(10f);
 					Slider slider = new Slider(0, MapEditor.brushSizes.length-1, 1, false);
-					slider.moved(f -> {
-						editor.setBrushSize(MapEditor.brushSizes[(int)(float)f]);
-					});
+					slider.moved(f -> editor.setBrushSize(MapEditor.brushSizes[(int)(float)f]));
 					new label(() -> "Brush size: " + MapEditor.brushSizes[(int)slider.getValue()]).left();
 					row();
 					add(slider).growX().padTop(4f);
