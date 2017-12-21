@@ -1,0 +1,18 @@
+language: android
+
+jdk:
+    - oraclejdk8
+    - openjdk8
+
+android:
+  components:
+    # The SDK version used to compile your project
+    - android-26
+
+    # Additional components
+    - extra-google-google_play_services
+    - extra-google-m2repository
+    - extra-android-m2repository
+    - addon-google_apis-google-26
+
+script: ./gradlew desktop:dist
