@@ -20,5 +20,3 @@ after_success:
     - chmod +x upload-build.sh
     - ./upload-build.sh
 
-deploy:
-  skip_cleanup: true
