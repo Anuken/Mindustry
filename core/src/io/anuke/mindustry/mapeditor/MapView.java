@@ -24,6 +24,7 @@ public class MapView extends Element implements GestureListener{
 	private MapEditor editor;
 	private EditorTool tool = EditorTool.pencil;
 	private OperationStack stack = new OperationStack();
+	private PixelOperation op;
 	private Bresenham2 br = new Bresenham2();
 	private float offsetx, offsety;
 	private float zoom = 1f;
@@ -59,7 +60,9 @@ public class MapView extends Element implements GestureListener{
 				if(tool.edit){
 					Vars.ui.getEditorDialog().resetSaved();
 				}
-				
+
+				op = new PixelOperation(editor.pixmap());
+
 				drawing = true;
 				return true;
 			}
@@ -67,6 +70,8 @@ public class MapView extends Element implements GestureListener{
 			@Override
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 				drawing = false;
+				stack.add(op);
+				op = null;
 			}
 			
 			@Override

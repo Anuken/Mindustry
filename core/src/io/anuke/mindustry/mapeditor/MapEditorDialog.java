@@ -49,6 +49,7 @@ public class MapEditorDialog extends Dialog{
 					Pixmap pixmap = new Pixmap(file);
 					if(verifySize(pixmap)){
 						editor.setPixmap(pixmap);
+						view.clearStack();
 					}else{
 						Vars.ui.showError("[orange]Invalid image dimensions![]\nValid map dimensions: " + Arrays.toString(MapEditor.validMapSizes));
 					}
@@ -89,6 +90,7 @@ public class MapEditorDialog extends Dialog{
 				copy.texture = new Texture(copy.pixmap);
 				editor.beginEdit(copy);
 				Vars.ui.hideLoading();
+				view.clearStack();
 			});
 		});
 		
@@ -98,6 +100,7 @@ public class MapEditorDialog extends Dialog{
 				Vars.ui.showLoading();
 				Timers.run(10f, ()->{
 					editor.resize(x, y);
+					view.clearStack();
 					Vars.ui.hideLoading();
 				});
 			}
@@ -112,6 +115,7 @@ public class MapEditorDialog extends Dialog{
 					Vars.world.maps().saveAndReload(editor.getMap(), editor.pixmap());
 					loadDialog.rebuild();
 					Vars.ui.hideLoading();
+					view.clearStack();
 				});
 			}else{
 				Vars.ui.hideLoading();
@@ -131,9 +135,14 @@ public class MapEditorDialog extends Dialog{
 			editor.beginEdit(new Map());
 			blockgroup.getButtons().get(2).setChecked(true);
 			Core.scene.setScrollFocus(view);
+			view.clearStack();
 		});
 	}
-	
+
+	public MapView getView() {
+		return view;
+	}
+
 	public void resetSaved(){
 		saved = false;
 	}

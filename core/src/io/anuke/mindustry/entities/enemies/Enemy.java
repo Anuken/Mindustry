@@ -206,7 +206,7 @@ public class Enemy extends DestructibleEntity{
 		
 		float minv = 0.07f;
 		
-		if(Math.abs(xvelocity) < minv && Math.abs(yvelocity) < minv && node > 0 && target == null){
+		if(Vector2.dst(xvelocity, yvelocity, 0, 0) < minv && node > 0 && target == null){
 			idletime += Timers.delta();
 		}else{
 			idletime = 0;

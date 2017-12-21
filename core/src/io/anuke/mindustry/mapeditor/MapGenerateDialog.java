@@ -62,14 +62,12 @@ public class MapGenerateDialog extends FloatingDialog{
 		content().add(pane).fillY();
 		
 		buttons().defaults().size(170f, 50f).pad(4f);
-		buttons().addButton("Back", () -> hide());
+		buttons().addButton("Back", this::hide);
 		buttons().addButton("Randomize", () ->{ 
 			editor.getFilter().randomize();
 			apply();
 		});
-		buttons().addButton("Update", () ->{ 
-			apply();
-		});
+		buttons().addButton("Update", this::apply);
 		buttons().addButton("Apply", () ->{
 			Vars.ui.showLoading();
 			
@@ -77,6 +75,7 @@ public class MapGenerateDialog extends FloatingDialog{
 				editor.applyFilter();
 				Vars.ui.hideLoading();
 				Vars.ui.getEditorDialog().resetSaved();
+				Vars.ui.getEditorDialog().getView().clearStack();
 				hide();
 			});
 		});
@@ -93,7 +92,7 @@ public class MapGenerateDialog extends FloatingDialog{
 	
 	private void apply(){
 		loading = true;
-		Timers.run(3f, ()->{
+		Timers.run(3f, () -> {
 			editor.applyFilterPreview();
 			loading = false;
 		});
