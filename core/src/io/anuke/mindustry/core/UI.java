@@ -162,8 +162,14 @@ public class UI extends SceneModule{
 		
 		configtable = new Table();
 		scene.add(configtable);
-		
-		editorDialog = new MapEditorDialog(editor);
+
+		try {
+			editorDialog = new MapEditorDialog(editor);
+		}catch (Exception e){
+			Timers.run(1f, () -> {
+				showErrorClose("[orange]Error occurred loading editor![]Are you running from a zip file?\n");
+			});
+		}
 		
 		settingserror = new Dialog("Warning", "dialog");
 		settingserror.content().add("[crimson]Failed to access local storage.\nSettings will not be saved.");
@@ -179,7 +185,6 @@ public class UI extends SceneModule{
 					setWrap(true);
 				}}).width(600f).pad(10f);
 		gameerror.buttons().addButton("OK", gameerror::hide).size(200f, 50);
-		//gameerror.setFillParent(true);
 		
 		discord = new Dialog("Discord", "dialog");
 		discord.content().pad(12f);
@@ -203,17 +208,6 @@ public class UI extends SceneModule{
 		
 		prefs.screenshakePref();
 		prefs.volumePrefs();
-		//this is incredinbly buggy
-		/*
-		prefs.sliderPref("sscale", "UI Scale", 100, 25, 200, i ->{ 
-			
-			Unit.dp.multiplier = i / 100f;
-			fontscale = Unit.dp.inPixels(1f)/2f;
-			skin.font().getData().setScale(fontscale);
-			invalidateAll();
-			
-			return i + "%";
-		});*/
 		
 		prefs.checkPref("fps", "Show FPS", false);
 		prefs.checkPref("noshadows", "Disable shadows", false);
@@ -369,9 +363,15 @@ public class UI extends SceneModule{
 		new Dialog("[crimson]An error has occured", "dialog"){{
 			content().pad(15);
 			content().add(text);
-			getButtonTable().addButton("OK", ()->{
-				hide();
-			}).size(90, 50).pad(4);
+			getButtonTable().addButton("OK", this::hide).size(90, 50).pad(4);
+		}}.show();
+	}
+
+	public void showErrorClose(String text){
+		new Dialog("[crimson]A critical error has occured", "dialog"){{
+			content().pad(15);
+			content().add(text);
+			getButtonTable().addButton("Exit", Gdx.app::exit).size(90, 50).pad(4);
 		}}.show();
 	}
 	

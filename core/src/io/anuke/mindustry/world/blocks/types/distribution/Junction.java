@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.blocks.types.distribution;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 
 public class Junction extends Block{
@@ -22,6 +23,8 @@ public class Junction extends Block{
 	public void handleItem(Item item, Tile tile, Tile source){
 		int dir = source.relativeTo(tile.x, tile.y);
 		Tile to = tile.getNearby()[dir];
+
+		UCore.log("handling to " + to + " from " + source + ", tile = " + tile);
 		
 		Timers.run(15, ()->{
 			if(to == null || to.entity == null) return;
@@ -35,6 +38,7 @@ public class Junction extends Block{
 		int dir = source.relativeTo(dest.x, dest.y);
 		if(dir == -1) return false;
 		Tile to = dest.getNearby()[dir];
+		UCore.log("outputting to " + to + " " + to.block().acceptItem(item, to, dest) + " from " + source);
 		return to != null && to.block().acceptItem(item, to, dest);
 	}
 	
