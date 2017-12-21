@@ -17,9 +17,9 @@ if [ ! -e $FILE1 ]; then
     touch $FILE1
 fi
 
-echo "This is the latest build of #"$TRAVIS_COMMIT" \nDesktop download: ["$DESKFILE"]("$DESKFILE")" >> $FILE1
+echo "This is the latest build of #"$TRAVIS_COMMIT"  >>Desktop download: ["$DESKFILE"]("$DESKFILE")" >> $FILE1
 
 git add $FILE1
-git add desktop-bleeding-edge.jar
+git add $DESKFILE
 git commit -m "Added a new bleeding edge build"
 git push https://$GHUSERNAME:$GHPASSWORD@github.com/Anuken/Mindustry.wiki.git --all
