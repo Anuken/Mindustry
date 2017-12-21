@@ -10,6 +10,8 @@ import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.resource.Mech;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Weapon;
+import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.util.Angles;
@@ -74,6 +76,11 @@ public class Player extends DestructibleEntity{
 		
 		if(health < maxhealth && Timers.get(this, "regen", 50))
 			health ++;
+
+		Tile tile = world.tileWorld(x, y);
+		if(tile != null && tile.floor().liquid && tile.block() == Blocks.air){
+			damage(health+1); //drown
+		}
 		
 		vector.set(0, 0);
 		

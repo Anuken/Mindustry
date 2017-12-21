@@ -61,6 +61,7 @@ public class MapEditor{
 		
 		if(filterPixmap == null){
 			filterPixmap = Pixmaps.copy(pixmap);
+
 			filter.process(filterPixmap);
 			filterTexture = new Texture(filterPixmap);
 		}else{
@@ -109,7 +110,11 @@ public class MapEditor{
 	public void setBrushSize(int size){
 		this.brushSize = size;
 	}
-	
+
+	public int getBrushSize() {
+		return brushSize;
+	}
+
 	public void draw(int dx, int dy){
 		if(dx < 0 || dy < 0 || dx >= pixmap.getWidth() || dy >= pixmap.getHeight()){
 			return;

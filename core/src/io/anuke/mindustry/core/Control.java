@@ -35,8 +35,6 @@ import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
 
 public class Control extends Module{
-	int targetscale = baseCameraScale;
-	
 	Tutorial tutorial = new Tutorial();
 	boolean hiscore = false;
 	
@@ -48,7 +46,7 @@ public class Control extends Module{
 	public final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
 	public final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class);
 	
-	Array<EnemySpawn> spawns = new Array<>();
+	Array<EnemySpawn> spawns;
 	int wave = 1;
 	int lastUpdated = -1;
 	float wavetime;
@@ -429,7 +427,7 @@ public class Control extends Module{
 		
 		Entities.initPhysics();
 		
-		Entities.setCollider(tilesize, (x, y)-> world.solid(x, y));
+		Entities.setCollider(tilesize, (x, y) -> world.solid(x, y));
 	}
 	
 	@Override
@@ -449,13 +447,6 @@ public class Control extends Module{
 			
 			if(Inputs.keyUp(Keys.F)){
 				wavetime = 0f;
-			}
-			
-			if(Inputs.keyUp(Keys.C)){
-				//crash cause:
-				//map is null.
-				//core is null.
-				//tiles are null.
 			}
 			
 			if(Inputs.keyUp(Keys.U)){

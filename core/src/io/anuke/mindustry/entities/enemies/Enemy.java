@@ -9,10 +9,13 @@ import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.*;
 import io.anuke.ucore.util.*;
+
+import static io.anuke.mindustry.Vars.world;
 
 public class Enemy extends DestructibleEntity{
 	public final static Color[] tierColors = { Color.valueOf("ffe451"), Color.valueOf("f48e20"), Color.valueOf("ff6757"), Color.valueOf("ff2d86") };
@@ -210,6 +213,11 @@ public class Enemy extends DestructibleEntity{
 			idletime += Timers.delta();
 		}else{
 			idletime = 0;
+		}
+
+		Tile tile = world.tileWorld(x, y);
+		if(tile != null && tile.floor().liquid && tile.block() == Blocks.air){
+			damage(health+1); //drown
 		}
 		
 		if(Float.isNaN(angle)){

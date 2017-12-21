@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 
@@ -226,19 +227,33 @@ public class MapEditorDialog extends Dialog{
 				tools.padTop(0).padBottom(6);
 				
 				ButtonGroup<ImageButton> group = new ButtonGroup<>();
-				int i = 0;
+				int i = 1;
+
+				tools.defaults().size(53f, 58f).padBottom(-6);
+
+				ImageButton undo = tools.addIButton("icon-undo", 16*2f, () -> view.undo()).get();
+				ImageButton redo = tools.addIButton("icon-redo", 16*2f, () -> view.redo()).get();
+                ImageButton grid = tools.addIButton("toggle", "icon-grid", 16*2f, () -> view.setGrid(!view.isGrid())).get();
+
+				undo.setDisabled(() -> !view.getStack().canUndo());
+				redo.setDisabled(() -> !view.getStack().canRedo());
+
+				undo.update(() -> undo.getImage().setColor(undo.isDisabled() ? Color.GRAY : Color.WHITE));
+				redo.update(() -> redo.getImage().setColor(redo.isDisabled() ? Color.GRAY : Color.WHITE));
 				
 				for(EditorTool tool : EditorTool.values()){
 					ImageButton button = new ImageButton("icon-" + tool.name(), "toggle");
 					button.clicked(() -> view.setTool(tool));
 					button.resizeImage(16*2f);
 					group.add(button);
+					if (tool == EditorTool.pencil)
+						button.setChecked(true);
 					
-					tools.add(button).size(80f, 85f).padBottom(-6f);
-					if(i++ % 2 == 1) tools.row();
+					tools.add(button).padBottom(-6f);
+					if(i++ % 4 == 1) tools.row();
 				}
 				
-				add(tools).width(160f).padBottom(-6);
+				add(tools).width(53*4).padBottom(-6);
 				
 				row();
 				
@@ -330,12 +345,10 @@ public class MapEditorDialog extends Dialog{
 			}
 		}
 		
-		content.padLeft(-5f);
-		
 		group.getButtons().get(2).setChecked(true);
 		
 		Table extra = new Table("button");
-		extra.labelWrap(() -> editor.getDrawBlock().name).width(120f).center();
+		extra.labelWrap(() -> editor.getDrawBlock().name).width(180f).center();
 		table.add(extra).growX();
 		table.row();
 		table.add(pane).growY().fillX();

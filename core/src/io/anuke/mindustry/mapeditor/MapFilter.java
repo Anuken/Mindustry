@@ -45,6 +45,7 @@ public class MapFilter{
 	public MapFilter(){
 		prefs.get("replace").enabled = true;
 		prefs.get("terrain").enabled = true;
+		randomize();
 	}
 	
 	public void randomize(){

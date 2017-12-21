@@ -12,6 +12,15 @@ import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.ColorMapper.BlockPair;
 
 public enum EditorTool{
+	pick{
+		public void touched(MapEditor editor, int x, int y){
+			BlockPair pair = ColorMapper.get(editor.pixmap().getPixel(x, y));
+			if(pair == null) return;
+			Block block = pair.dominant();
+			editor.setDrawBlock(block);
+			Vars.ui.getEditorDialog().updateSelectedBlock();
+		}
+	},
 	pencil{
 		{
 			edit = true;
@@ -20,6 +29,12 @@ public enum EditorTool{
 		public void touched(MapEditor editor, int x, int y){
 			editor.draw(x, y);
 		}
+	},
+	line{
+		{
+
+		}
+
 	},
 	fill{
 		{
@@ -62,15 +77,6 @@ public enum EditorTool{
 		
 		boolean colorEquals(int a, int b){
 			return a == b;
-		}
-	},
-	pick{
-		public void touched(MapEditor editor, int x, int y){
-			BlockPair pair = ColorMapper.get(editor.pixmap().getPixel(x, y));
-			if(pair == null) return;
-			Block block = pair.dominant();
-			editor.setDrawBlock(block);
-			Vars.ui.getEditorDialog().updateSelectedBlock();
 		}
 	},
 	zoom;

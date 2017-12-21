@@ -1,8 +1,12 @@
 package io.anuke.mindustry.mapeditor;
 
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Pixmaps;
 
 public class OperationStack{
+	private final static int maxSize = 10;
 	private Array<DrawOperation> stack = new Array<>();
 	private int index = 0;
 	
@@ -11,6 +15,9 @@ public class OperationStack{
 	}
 	
 	public void clear(){
+		for(DrawOperation op : stack){
+			op.dispose();
+		}
 		stack.clear();
 		index = 0;
 	}
@@ -19,6 +26,11 @@ public class OperationStack{
 		stack.truncate(stack.size + index);
 		index = 0;
 		stack.add(action);
+
+		if(stack.size > maxSize){
+            stack.get(0).disposeFrom();
+            stack.removeIndex(0);
+        }
 	}
 	
 	public boolean canUndo(){
@@ -42,9 +54,5 @@ public class OperationStack{
 		index ++;
 		stack.get(stack.size - 1 + index).redo();
 		
-	}
-
-	public void dispose(){
-		//TODO
 	}
 }

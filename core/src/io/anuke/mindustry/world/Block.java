@@ -39,12 +39,14 @@ public class Block{
 	public boolean destructible;
 	/**whether this is solid*/
 	public boolean solid;
-	/**whethe this block CAN be solid.*/
+	/**whether this block CAN be solid.*/
 	public boolean solidifes;
 	/**whether this is rotateable*/
 	public boolean rotate;
-	/**whether you can break this with rightblick*/
+	/**whether you can break this with rightclick*/
 	public boolean breakable;
+	/**whether this block can be drowned in*/
+	public  boolean liquid;
 	/**time it takes to break*/
 	public float breaktime = 18;
 	/**tile entity health*/

@@ -253,7 +253,7 @@ public class World extends Module{
 				
 				TileEntity e = other.entity;
 				
-				if(damaged && ((TileEntity) e).health >= ((TileEntity) e).tile.block().health)
+				if(damaged && e.health >= e.tile.block().health)
 					continue;
 				
 				float ndst = Vector2.dst(x, y, e.x, e.y);
@@ -276,11 +276,9 @@ public class World extends Module{
 	 * Input is in block coordinates, not world coordinates.
 	 * @return null if no collisions found, block position otherwise.
 	 */
-	public GridPoint2 raycast(int x0f, int y0f, int x1f, int y1f){
-		int x0 = (int)x0f;
-		int y0 = (int)y0f;
-		int x1 = (int)x1f;
-		int y1 = (int)y1f;
+	public GridPoint2 raycast(int x0f, int y0f, int x1, int y1){
+		int x0 = x0f;
+		int y0 = y0f;
 		int dx = Math.abs(x1 - x0);
 		int dy = Math.abs(y1 - y0);
 

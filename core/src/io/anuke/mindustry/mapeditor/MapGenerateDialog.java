@@ -1,5 +1,6 @@
 package io.anuke.mindustry.mapeditor;
 
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
@@ -9,6 +10,7 @@ import io.anuke.mindustry.mapeditor.MapFilter.GenPref;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.mindustry.ui.FloatingDialog;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Pixmaps;
 import io.anuke.ucore.scene.style.TextureRegionDrawable;
 import io.anuke.ucore.scene.ui.CheckBox;
 import io.anuke.ucore.scene.ui.Image;
@@ -72,10 +74,11 @@ public class MapGenerateDialog extends FloatingDialog{
 			Vars.ui.showLoading();
 			
 			Timers.run(3f, () ->{
+				Pixmap copy = Pixmaps.copy(editor.pixmap());
 				editor.applyFilter();
+				Vars.ui.getEditorDialog().getView().push(copy, Pixmaps.copy(editor.pixmap()));
 				Vars.ui.hideLoading();
 				Vars.ui.getEditorDialog().resetSaved();
-				Vars.ui.getEditorDialog().getView().clearStack();
 				hide();
 			});
 		});

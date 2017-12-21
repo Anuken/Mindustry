@@ -1,14 +1,40 @@
 package io.anuke.mindustry.mapeditor;
 
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.utils.Disposable;
+import io.anuke.ucore.graphics.Pixmaps;
 
-public abstract class DrawOperation{
-	protected Pixmap pixmap;
-	
+public class DrawOperation implements Disposable{
+	Pixmap from, to, pixmap;
+
 	public DrawOperation(Pixmap pixmap){
 		this.pixmap = pixmap;
 	}
-	
-	public abstract void undo();
-	public abstract void redo();
+
+	public void add(Pixmap from,  Pixmap to) {
+		this.from = from;
+		this.to = to;
+	}
+
+	public void undo() {
+		pixmap.drawPixmap(from, 0, 0);
+	}
+
+	public void redo() {
+		pixmap.drawPixmap(to, 0, 0);
+	}
+
+	@Override
+	public void dispose() {
+		if(!Pixmaps.isDisposed(from))
+			from.dispose();
+
+		if(!Pixmaps.isDisposed(to))
+			to.dispose();
+	}
+
+	public void disposeFrom(){
+		from.dispose();
+	}
+
 }

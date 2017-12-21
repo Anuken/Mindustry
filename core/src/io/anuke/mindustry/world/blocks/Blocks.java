@@ -28,12 +28,14 @@ public class Blocks{
 		variants = 0;
 		solid = true;
 		liquidDrop = Liquid.water;
+		liquid = true;
 	}},
 	
 	water = new Floor("water"){{
 		variants = 0;
 		solid = true;
 		liquidDrop = Liquid.water;
+		liquid = true;
 	}},
 	
 	lava = new Floor("lava"){
@@ -41,6 +43,7 @@ public class Blocks{
 			variants = 0;
 			solid = true;
 			liquidDrop = Liquid.lava;
+			liquid = true;
 		}
 		
 		@Override
@@ -60,6 +63,7 @@ public class Blocks{
 			variants = 0;
 			solid = true;
 			liquidDrop = Liquid.oil;
+			liquid = true;
 		}
 		
 		@Override

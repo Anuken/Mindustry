@@ -159,7 +159,7 @@ public class Tile{
 	public boolean solid(){
 		Block block = block();
 		Block floor = floor();
-		return block.solid || (floor.solid && block == Blocks.air) || block.isSolidFor(this);
+		return block.solid || (floor.solid && (block == Blocks.air || block.solidifes)) || block.isSolidFor(this);
 	}
 	
 	public boolean breakable(){

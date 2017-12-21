@@ -54,18 +54,20 @@ public class TileEntity extends Entity{
 	}
 	
 	public void onDeath(){
-		dead = true;
 		
 		if(tile.block() == ProductionBlocks.core){
 			Vars.control.coreDestroyed();
 		}
-		
-		Block block = tile.block();
-		
-		block.onDestroyed(tile);
-		
-		Vars.world.removeBlock(tile);
-		remove();
+
+		if(!dead) {
+			dead = true;
+			Block block = tile.block();
+
+			block.onDestroyed(tile);
+
+			Vars.world.removeBlock(tile);
+			remove();
+		}
 	}
 	
 	public void collision(Bullet other){

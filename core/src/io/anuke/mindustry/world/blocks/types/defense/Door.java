@@ -31,6 +31,7 @@ public class Door extends Wall implements Configurable{
 	public Door(String name) {
 		super(name);
 		solid = false;
+		solidifes = true;
 	}
 	
 	@Override

@@ -397,7 +397,7 @@ public class Renderer extends RendererModule{
 				drawHealth(entity);
 			}
 
-			if(!Vars.android && Vars.showPlayer)
+			if(!Vars.android && Vars.showPlayer && !player.isDead())
 				drawHealth(player);
 		}
 	}
