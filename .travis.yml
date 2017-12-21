@@ -1,0 +1,6 @@
+language: java
+jdk:
+  - oraclejdk8
+  - openjdk8
+
+script: ./gradlew desktop:dist
