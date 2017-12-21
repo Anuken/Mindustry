@@ -14,9 +14,11 @@ android:
     - addon-google_apis-google-26
 
 script: 
+    skip_cleanup: true
     - ./gradlew desktop:dist
     - ./gradlew android:build
 
 after_success:
+    skip_cleanup: true
     - chmod +x upload-build.sh
     - ./upload-build.sh
