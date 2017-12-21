@@ -4,24 +4,27 @@
 
 A pixelated sandbox tower defense game made using [LibGDX](https://libgdx.badlogicgames.com/). Winner of the [GDL Metal Monstrosity Jam](https://itch.io/jam/gdl---metal-monstrosity-jam).
 
-_[TODO list](TODO.md)_  
-_[Wiki](http://mindustry.wikia.com/wiki/Mindustry_Wiki)_  
+_[TODO list](TODO.md)_
+_[Wiki](http://mindustry.wikia.com/wiki/Mindustry_Wiki)_
 _[Discord](https://discord.gg/r8BkXNd)_
 
 ### Building
 
+Bleeding-edge live builds are generated automatically for every commit. You can see them [here](https://github.com/Anuken/Mindustry/wiki)
+
+If you'd rather compile on your own, follow these instructions.
 First, make sure you have Java 8 and JDK 8 installed. Open a terminal in the root directory, and run the following commands:
 
 
 **_Windows_**
 
-_Running:_ `gradlew.bat desktop:run`  
+_Running:_ `gradlew.bat desktop:run`
 _Building:_ `gradlew.bat desktop:dist`
 
 
 **_Linux_**
 
-_Running:_ `./gradlew desktop:run`  
+_Running:_ `./gradlew desktop:run`
 _Building:_ `./gradlew desktop:dist`
 
 ---
