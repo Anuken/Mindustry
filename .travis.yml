@@ -1,7 +1,6 @@
 language: android
 
 jdk:
-    - oraclejdk8
     - openjdk8
 
 android:
@@ -14,17 +13,8 @@ android:
     - extra-android-m2repository
     - addon-google_apis-google-26
 
-  licenses:
-    - 'android-sdk-preview-license-52d11cd2'
-    - 'android-sdk-license-.+'
-    - 'google-gdk-license-.+'
-
-before_script:
-    - echo "\nd56f5187479451eabf01fb78af6dfcb131a6481e" >> $ANDROID_HOME/Sdk/licenses/android-sdk-license
-
 script: 
-    - ./gradlew clean desktop:dist
-    - ./gradlew clean android:build
+    - ./gradlew desktop:dist
 
 after_success:
     - chmod +x upload-build.sh
