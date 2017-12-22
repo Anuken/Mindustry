@@ -11,14 +11,14 @@ cd Mindustry.wiki
 DESKFILE=$TRAVIS_COMMIT"-desktop-bleeding-edge.jar"
 cp ../desktop/build/libs/desktop-release.jar $DESKFILE
 
-FILE1=$TRAVIS_BUILD_NUMBER-Bleeding-Edge-Build-$TRAVIS_COMMIT.md
+FILE1="$TRAVIS_BUILD_NUMBER-Bleeding-Edge-Build-$TRAVIS_COMMIT.md"
 
 if [ ! -e $FILE1 ]; then
     touch $FILE1
 fi
 
-MSG=$"### Travis build #"$TRAVIS_BUILD_NUMBER".\n####Desktop JAR download: ["$DESKFILE"]("$DESKFILE")"
-echo "$MSG" >> $FILE1
+NEWLINE=$'\n'
+echo "### Travis Build #"$TRAVIS_BUILD_NUMBER".${NEWLINE}####Desktop JAR download: ["$DESKFILE"]("$DESKFILE")" >> $FILE1
 
 git add $FILE1
 git add $DESKFILE
