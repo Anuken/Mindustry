@@ -61,8 +61,8 @@ public class Tutorial{
 			
 		}}.end();
 		
-		prev.pad(16);
-		next.pad(16);
+		prev.margin(16);
+		next.margin(16);
 		
 		prev.setDisabled(()->!canMove(false) || !stage.canBack);
 		next.setDisabled(()->!stage.canForward);

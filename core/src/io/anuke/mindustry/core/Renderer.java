@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 
 import io.anuke.mindustry.Vars;
@@ -27,6 +28,7 @@ import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Surface;
 import io.anuke.ucore.modules.RendererModule;
@@ -43,6 +45,7 @@ public class Renderer extends RendererModule{
 	
 	private int targetscale = baseCameraScale;
 	private FloatArray shieldHits = new FloatArray();
+	private Array<Callable> shieldDraws = new Array<>();
 	private BlockRenderer blocks = new BlockRenderer();
 
 	public Renderer() {
@@ -251,7 +254,6 @@ public class Renderer extends RendererModule{
 	void drawEnemyMarkers(){
 		Graphics.surface(indicatorSurface);
 		Draw.color(Color.RED);
-		//Draw.alpha(0.6f);
 		for(Enemy enemy : control.enemyGroup.all()){
 
 			if(Tmp.r1.setSize(camera.viewportWidth, camera.viewportHeight).setCenter(camera.position.x, camera.position.y).overlaps(enemy.hitbox.getRect(enemy.x, enemy.y))){
@@ -269,11 +271,14 @@ public class Renderer extends RendererModule{
 	}
 
 	void drawShield(){
-		if(control.shieldGroup.amount() == 0) return;
+		if(control.shieldGroup.amount() == 0 && shieldDraws.size == 0) return;
 		
 		Graphics.surface(Vars.renderer.shieldSurface, false);
 		Draw.color(Color.ROYAL);
 		Entities.draw(control.shieldGroup);
+		for(Callable c : shieldDraws){
+			c.run();
+		}
 		Draw.reset();
 		Graphics.surface();
 		
@@ -315,6 +320,7 @@ public class Renderer extends RendererModule{
 		Graphics.beginCam();
 		
 		Draw.color();
+		shieldDraws.clear();
 	}
 
 	public BlockRenderer getBlocks() {
@@ -323,6 +329,10 @@ public class Renderer extends RendererModule{
 
 	public void addShieldHit(float x, float y){
 		shieldHits.addAll(x, y, 0f);
+	}
+
+	public void addShield(Callable call){
+		shieldDraws.add(call);
 	}
 
 	void drawOverlay(){
@@ -394,7 +404,7 @@ public class Renderer extends RendererModule{
 			}
 		}
 		
-		if(!Vars.debug || Vars.showUI){
+		if((!Vars.debug || Vars.showUI) && Settings.getBool("healthbars")){
 
 			//draw entity health bars
 			for(Enemy entity : control.enemyGroup.all()){

@@ -292,7 +292,7 @@ public class MapView extends Element implements GestureListener{
 	public boolean zoom(float initialDistance, float distance){
 		if(!active()) return false;
 		float nzoom = distance - initialDistance;
-		zoom += nzoom / 5000f / Unit.dp.scl(1f) * zoom;
+		zoom += nzoom / 10000f / Unit.dp.scl(1f) * zoom;
 		clampZoom();
 		return false;
 	}

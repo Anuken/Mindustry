@@ -2,7 +2,6 @@ package io.anuke.mindustry.mapeditor;
 
 import java.util.Arrays;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -126,7 +125,7 @@ public class MapEditorDialog extends Dialog{
 		setFillParent(true);
 		
 		clearChildren();
-		pad(0);
+		margin(0);
 		build.begin(this);
 		build();
 		build.end();
@@ -224,7 +223,7 @@ public class MapEditorDialog extends Dialog{
 			new table(){{
 				Table tools = new Table("button");
 				tools.top();
-				tools.padTop(0).padBottom(6);
+				tools.marginTop(0).marginBottom(6);
 				
 				ButtonGroup<ImageButton> group = new ButtonGroup<>();
 				int i = 1;

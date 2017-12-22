@@ -7,6 +7,7 @@ import java.util.Arrays;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
@@ -423,7 +424,7 @@ public class Control extends Module{
 	
 	@Override
 	public void init(){
-		Musics.shuffleAll();
+		Timers.run(1f, Musics::shuffleAll);
 		
 		Entities.initPhysics();
 		

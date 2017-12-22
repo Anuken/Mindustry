@@ -38,7 +38,7 @@ public class UpgradeDialog extends FloatingDialog{
 		});
 		
 		Table weptab = new Table();
-		weptab.pad(20);
+		weptab.margin(20);
 		
 		int i = 0;
 		for(Weapon weapon : Weapon.values()){
@@ -48,7 +48,7 @@ public class UpgradeDialog extends FloatingDialog{
 			button.add(img).size(8*5);
 			button.getCells().reverse();
 			button.row();
-			button.pad(14);
+			button.margin(14);
 			button.getLabelCell().left();
 			button.pack();
 			
@@ -109,7 +109,7 @@ public class UpgradeDialog extends FloatingDialog{
 				if(control.hasWeapon(weapon)){
 					tiptable.add("[LIME]Purchased!").padTop(6).left();
 				}
-				tiptable.pad(14f);
+				tiptable.margin(14f);
 			};
 			
 			run.listen();

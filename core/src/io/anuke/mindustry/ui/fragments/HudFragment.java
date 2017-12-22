@@ -173,7 +173,7 @@ public class HudFragment implements Fragment{
 				.minWidth(140).left();
 
 				margin(12f);
-				get().padLeft(6);
+				get().marginLeft(6);
 			}}.left().end();
 			
 			playButton(uheight);

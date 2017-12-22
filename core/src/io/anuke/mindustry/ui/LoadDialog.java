@@ -42,12 +42,12 @@ public class LoadDialog extends FloatingDialog{
 		pane = new ScrollPane(slots);
 		pane.setFadeScrollBars(false);
 
-		slots.padRight(24);
+		slots.marginRight(24);
 
 		for(int i = 0; i < Vars.saveSlots; i++){
 
 			TextButton button = new TextButton("[accent]Slot " + (i + 1));
-			button.pad(12);
+			button.margin(12);
 			button.getLabelCell().top().left().growX();
 
 			button.row();

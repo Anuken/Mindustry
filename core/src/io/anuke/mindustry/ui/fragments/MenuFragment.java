@@ -45,7 +45,7 @@ public class MenuFragment implements Fragment{
 					if(!gwt){
 						add(new MenuButton("text-exit", group, Gdx.app::exit));
 					}
-					get().pad(16);
+					get().margin(16);
 				}}.end();
 	
 				visible(()->GameState.is(State.menu));

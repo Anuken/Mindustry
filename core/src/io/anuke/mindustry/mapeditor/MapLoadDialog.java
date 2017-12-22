@@ -45,7 +45,7 @@ public class MapLoadDialog extends FloatingDialog{
 
 		Table table = new Table();
 		table.defaults().size(200f, 90f).pad(4f);
-		table.pad(10f);
+		table.margin(10f);
 
 		ScrollPane pane = new ScrollPane(table, "horizontal");
 		pane.setFadeScrollBars(false);

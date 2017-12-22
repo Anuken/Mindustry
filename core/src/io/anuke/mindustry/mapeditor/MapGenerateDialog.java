@@ -47,7 +47,7 @@ public class MapGenerateDialog extends FloatingDialog{
 		image.setScaling(Scaling.fit);
 		Table preft = new Table();
 		preft.left();
-		preft.pad(4f).padRight(25f);
+		preft.margin(4f).marginRight(25f);
 		
 		for(GenPref pref : editor.getFilter().getPrefs().values()){
 			CheckBox box = new CheckBox(pref.name);

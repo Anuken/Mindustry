@@ -3,6 +3,7 @@
 <module rename-to="html">
 	<inherits name='com.badlogic.gdx.backends.gdx_backends_gwt' />
 	<inherits name='com.badlogic.gdx.ai' />
+	<inherits name='com.badlogic.gdx.controllers.controllers-gwt' />
 	<inherits name='Mindustry' />
 	<inherits name='uCore' />
 	

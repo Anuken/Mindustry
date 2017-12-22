@@ -15,6 +15,7 @@ import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.util.*;
@@ -127,6 +128,8 @@ public class Generator extends PowerBlock{
 
 	@Override
 	public void drawLayer(Tile tile){
+		if(!Settings.getBool("lasers")) return;
+
 		PowerEntity entity = tile.entity();
 
 		for(int i = 0; i < laserDirections; i++){

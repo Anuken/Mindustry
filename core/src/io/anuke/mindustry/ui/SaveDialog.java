@@ -1,6 +1,5 @@
 package io.anuke.mindustry.ui;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.Vars;
@@ -24,7 +23,7 @@ public class SaveDialog extends LoadDialog{
 					save(slot);
 				}){
 					{
-						content().pad(16);
+						content().margin(16);
 						for(Cell<?> cell : getButtonTable().getCells())
 							cell.size(110, 45).pad(4);
 					}

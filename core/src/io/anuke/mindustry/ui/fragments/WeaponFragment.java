@@ -57,7 +57,7 @@ public class WeaponFragment implements Fragment{
 			tiptable.row();
 			tiptable.row();
 			tiptable.add("[GRAY]" + description).left();
-			tiptable.pad(14f);
+			tiptable.margin(14f);
 			
 			Tooltip tip = new Tooltip(tiptable);
 			

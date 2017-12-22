@@ -117,7 +117,7 @@ public class LevelDialog extends FloatingDialog{
 			
 			maps.add(stack).width(170).top().pad(4f);
 			
-			maps.padRight(26);
+			maps.marginRight(26);
 			
 			i ++;
 		}

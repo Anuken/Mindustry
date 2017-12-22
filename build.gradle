@@ -21,7 +21,7 @@ allprojects {
         appName = "Mindustry"
         gdxVersion = '1.9.8'
         aiVersion = '1.8.1'
-        uCoreVersion = '4434f35';
+        uCoreVersion = 'd239170bc0';
     }
 
     repositories {
@@ -36,11 +36,11 @@ allprojects {
 project(":desktop") {
     apply plugin: "java"
 
-
     dependencies {
         compile project(":core")
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
     }
 }
 
@@ -51,11 +51,14 @@ project(":html") {
 
     dependencies {
         compile project(":core")
-        compile fileTree(dir: '../core/lib', include: '*.jar')
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion:sources"
+
+        compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion:sources"
+        compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion:sources"
     }
 }
 
@@ -73,6 +76,7 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+        compile "com.badlogicgames.gdx:gdx-controllers-android:$gdxVersion"
     }
 }
 
@@ -90,6 +94,7 @@ project(":core") {
         }
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+        compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
     }
 }
 

@@ -76,7 +76,7 @@ public class BlocksFragment implements Fragment{
 						row();
 					}
 					
-					table.pad(4);
+					table.margin(4);
 					table.top().left();
 					
 					int i = 0;
@@ -124,8 +124,8 @@ public class BlocksFragment implements Fragment{
 				add(stack).colspan(Section.values().length);
 				margin(10f);
 				
-				get().padLeft(0f);
-				get().padRight(0f);
+				get().marginLeft(0f);
+				get().marginRight(0f);
 				
 				end();
 			}}.right().bottom().uniformX();
@@ -142,7 +142,7 @@ public class BlocksFragment implements Fragment{
 		
 		desctable.defaults().left();
 		desctable.left();
-		desctable.pad(12);
+		desctable.margin(12);
 		
 		Table header = new Table();
 		
