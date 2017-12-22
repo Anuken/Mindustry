@@ -17,7 +17,8 @@ if [ ! -e $FILE1 ]; then
     touch $FILE1
 fi
 
-echo "This is the latest build of #"$TRAVIS_COMMIT"  >>Desktop download: ["$DESKFILE"]("$DESKFILE")" >> $FILE1
+MSG=$"### Travis build #"$TRAVIS_BUILD_NUMBER".\n####Desktop JAR download: ["$DESKFILE"]("$DESKFILE")" >> $FILE1
+echo "$MSG"
 
 git add $FILE1
 git add $DESKFILE

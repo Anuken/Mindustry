@@ -9,7 +9,6 @@ buildscript {
     dependencies {
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
         classpath 'com.android.tools.build:gradle:3.0.1'
-        //classpath 'org.akhikhl.gretty:gretty:+'
     }
 }
 
@@ -85,6 +84,9 @@ project(":core") {
             compile project(":uCore")
         }else{
             compile "com.github.anuken:ucore:$uCoreVersion"
+        }
+        if(new File('../GDXGifRecorder').exists()) {
+            compile project(":GDXGifRecorder")
         }
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"

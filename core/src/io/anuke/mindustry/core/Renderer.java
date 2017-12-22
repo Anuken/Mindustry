@@ -324,7 +324,7 @@ public class Renderer extends RendererModule{
 	void drawOverlay(){
 
 		//draw tutorial placement point
-		if(Vars.control.tutorial.showBlock()){
+		if(Vars.world.getMap().name.equals("tutorial") && Vars.control.tutorial.showBlock()){
 			int x = control.core.x + Vars.control.tutorial.getPlacePoint().x;
 			int y = control.core.y + Vars.control.tutorial.getPlacePoint().y;
 			int rot = Vars.control.tutorial.getPlaceRotation();

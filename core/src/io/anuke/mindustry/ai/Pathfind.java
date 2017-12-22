@@ -15,7 +15,7 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
 public class Pathfind{
-	private static final long ms = 1000000 * 3;
+	private static final long ms = 1000000 * 5;
 	
 	MHueristic heuristic = new MHueristic();
 	PassTileGraph graph = new PassTileGraph();
