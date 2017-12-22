@@ -17,8 +17,8 @@ if [ ! -e $FILE1 ]; then
     touch $FILE1
 fi
 
-MSG=$"### Travis build #"$TRAVIS_BUILD_NUMBER".\n####Desktop JAR download: ["$DESKFILE"]("$DESKFILE")" >> $FILE1
-echo "$MSG"
+MSG=$"### Travis build #"$TRAVIS_BUILD_NUMBER".\n####Desktop JAR download: ["$DESKFILE"]("$DESKFILE")"
+echo "$MSG" >> $FILE1
 
 git add $FILE1
 git add $DESKFILE
