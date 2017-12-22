@@ -136,11 +136,13 @@ public class HudFragment implements Fragment{
 				aleft();
 				new label("[green]density: " + Gdx.graphics.getDensity()).left();
 				row();
-				new label(()->"[purple]tiles: " + Vars.control.tileGroup.amount()).left();
+				new label(() -> "[blue]requests: " + renderer.getBlocks().getRequests()).left();
 				row();
-				new label(()->"[purple]enemies: " + Vars.control.enemyGroup.amount()).left();
+				new label(() -> "[purple]tiles: " + Vars.control.tileGroup.amount()).left();
 				row();
-				new label(()->"[orange]noclip: " + Vars.noclip).left();
+				new label(() -> "[purple]enemies: " + Vars.control.enemyGroup.amount()).left();
+				row();
+				new label(() -> "[orange]noclip: " + Vars.noclip).left();
 				row();
 				new label("[red]DEBUG MODE").scale(0.5f).left();
 			}}.end();

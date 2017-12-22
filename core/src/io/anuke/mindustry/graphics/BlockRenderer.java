@@ -17,6 +17,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.StaticBlock;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Graphics;
@@ -47,6 +48,11 @@ public class BlockRenderer{
 		@Override
 		public int compareTo(BlockRequest other){
 			return layer.compareTo(other.layer);
+		}
+
+		@Override
+		public String toString(){
+			return tile.block().name + ":" + layer.toString();
 		}
 	}
 	
@@ -114,17 +120,23 @@ public class BlockRenderer{
 		Arrays.sort(requests.items, 0, requestidx);
 		iterateidx = 0;
 	}
+
+	public int getRequests(){
+		return requestidx;
+	}
 	
 	public void drawBlocks(boolean top){
 		Layer stopAt = top ? Layer.laser : Layer.overlay;
 		
-		for(; iterateidx < requests.size; iterateidx ++){
+		for(; iterateidx < requestidx; iterateidx ++){
+
 			if(iterateidx < requests.size - 1 && requests.get(iterateidx).layer.ordinal() > stopAt.ordinal()){
 				break;
 			}
 			
 			BlockRequest req = requests.get(iterateidx);
 			Block block = req.tile.block();
+
 			if(req.layer == Layer.block){
 				block.draw(req.tile);
 			}else if(req.layer == block.layer){

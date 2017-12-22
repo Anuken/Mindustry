@@ -218,7 +218,7 @@ public class Renderer extends RendererModule{
 		Graphics.shader();
 
 		Entities.draw(Entities.defaultGroup());
-		
+
 		blocks.drawBlocks(true);
 		
 		Entities.draw(control.bulletGroup);
@@ -315,6 +315,10 @@ public class Renderer extends RendererModule{
 		Graphics.beginCam();
 		
 		Draw.color();
+	}
+
+	public BlockRenderer getBlocks() {
+		return blocks;
 	}
 
 	public void addShieldHit(float x, float y){
