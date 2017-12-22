@@ -13,7 +13,6 @@ import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 
-//TODO unified save/load dialogs
 public class LoadDialog extends FloatingDialog{
 	ScrollPane pane;
 
@@ -46,7 +45,6 @@ public class LoadDialog extends FloatingDialog{
 		slots.padRight(24);
 
 		for(int i = 0; i < Vars.saveSlots; i++){
-			final int slot = i;
 
 			TextButton button = new TextButton("[accent]Slot " + (i + 1));
 			button.pad(12);
@@ -54,17 +52,15 @@ public class LoadDialog extends FloatingDialog{
 
 			button.row();
 
-			Label info = new Label("[gray]" + (!SaveIO.isSaveValid(i) ? "<empty>" : SaveIO.getMode(slot) + ", " 
-					+ SaveIO.getMap(slot).name + ", Wave " + SaveIO.getWave(slot) 
+			Label info = new Label("[gray]" + (!SaveIO.isSaveValid(i) ? "<empty>" : SaveIO.getMode(i) + ", "
+					+ SaveIO.getMap(i).name + ", Wave " + SaveIO.getWave(i)
 					+ "\nLast Saved: " + SaveIO.getTimeString(i)));
 			info.setAlignment(Align.center, Align.center);
 
 			button.add(info).padBottom(3).padTop(7);
 			button.row();
-			//button.addImage("white", Color.GRAY)
-			//.growX().height(3f).pad(4f);
 			button.row();
-			modifyButton(button, slot);
+			modifyButton(button, i);
 
 			slots.add(button).size(404, 104).pad(4);
 			slots.row();

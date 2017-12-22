@@ -10,7 +10,6 @@ import io.anuke.ucore.scene.ui.ConfirmDialog;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Cell;
 
-//TODO unified save/load dialogs
 public class SaveDialog extends LoadDialog{
 
 	public SaveDialog() {

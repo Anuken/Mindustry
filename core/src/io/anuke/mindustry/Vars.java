@@ -53,9 +53,8 @@ public class Vars{
 	public static boolean showPlayer = true;
 	//whether to hide ui, only on debug
 	public static boolean showUI = true;
-	//number of save slots-- increasing may lead to layout issues
-	//TODO named save slots
-	public static final int saveSlots = 8;
+
+	public static final int saveSlots = 10;
 	//amount of drops that are left when breaking a block
 	public static final float breakDropAmount = 0.5f;
 	

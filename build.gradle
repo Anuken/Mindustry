@@ -20,8 +20,9 @@ allprojects {
     version = 'release'
     ext {
         appName = "Mindustry"
-        gdxVersion = '1.9.6'
-        aiVersion = '1.8.0'
+        gdxVersion = '1.9.8'
+        aiVersion = '1.8.1'
+        uCoreVersion = '4434f35';
     }
 
     repositories {
@@ -55,7 +56,7 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-        compile "com.badlogicgames.gdx:gdx-ai:1.8.0:sources"
+        compile "com.badlogicgames.gdx:gdx-ai:$aiVersion:sources"
     }
 }
 
@@ -80,13 +81,13 @@ project(":core") {
     apply plugin: "java"
 
     dependencies {
-        if(new File('../uCore-master').exists()){
+        if(new File('../uCore').exists()){
             compile project(":uCore")
         }else{
-            compile 'com.github.anuken:ucore:7938cb4bf9'
+            compile "com.github.anuken:ucore:$uCoreVersion"
         }
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-ai:1.8.1"
+        compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
     }
 }
 

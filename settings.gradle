@@ -1,6 +1,6 @@
 include 'desktop', 'html', 'core', 'android'
 
-if (new File(settingsDir, '../uCore-master').exists()) {
+if (new File(settingsDir, '../uCore').exists()) {
     include ':uCore'
-    project(':uCore').projectDir = new File(settingsDir, '../uCore-master')
+    project(':uCore').projectDir = new File(settingsDir, '../uCore')
 }

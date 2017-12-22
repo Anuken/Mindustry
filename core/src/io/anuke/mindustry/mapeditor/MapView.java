@@ -304,6 +304,6 @@ public class MapView extends Element implements GestureListener{
 
 	@Override
 	public void pinchStop(){
-		
+
 	}
 }

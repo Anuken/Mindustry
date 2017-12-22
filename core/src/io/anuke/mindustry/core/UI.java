@@ -205,11 +205,11 @@ public class UI extends SceneModule{
 		
 		prefs.checkPref("fps", "Show FPS", false);
 		prefs.checkPref("vsync", "VSync", true, b -> Gdx.graphics.setVSync(b));
-		prefs.checkPref("noshadows", "Disable shadows", false);
+		//prefs.checkPref("noshadows", "Disable shadows", false);
+		//prefs.checkPref("drawblocks", "Draw Blocks", true);
 		prefs.checkPref("smoothcam", "Smooth Camera", true);
 		prefs.checkPref("indicators", "Enemy Indicators", true);
 		prefs.checkPref("effects", "Display Effects", true);
-		prefs.checkPref("drawblocks", "Draw Blocks", true);
 		prefs.checkPref("pixelate", "Pixelate Screen", true, b->{
 			if(b){
 				Vars.renderer.pixelSurface.setScale(Core.cameraScale);

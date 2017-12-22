@@ -55,7 +55,7 @@ public class MapEditorDialog extends Dialog{
 						Vars.ui.showError("[orange]Invalid image dimensions![]\nValid map dimensions: " + Arrays.toString(MapEditor.validMapSizes));
 					}
 				}catch (Exception e){
-					Vars.ui.showError("Error loading image file:\n" + Strings.parseException((Exception)e.getCause()));
+					Vars.ui.showError("Error loading image file:\n[orange]" + Strings.parseException(e, false));
 					e.printStackTrace();
 				}
 				Vars.ui.hideLoading();
@@ -72,7 +72,7 @@ public class MapEditorDialog extends Dialog{
 				try{
 					Pixmaps.write(editor.pixmap(), result);
 				}catch (Exception e){
-					Vars.ui.showError("Error saving image file:\n " + Strings.parseException((Exception)e.getCause()));
+					Vars.ui.showError("Error saving image file:\n[orange]" + Strings.parseException(e, false));
 					e.printStackTrace();
 				}
 				Vars.ui.hideLoading();
