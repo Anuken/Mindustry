@@ -12,10 +12,14 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Configurable;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.core.Inputs.DeviceType;
+import io.anuke.ucore.core.KeyBinds;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.utils.Cursors;
+import io.anuke.ucore.util.InputProxy;
 import io.anuke.ucore.util.Mathf;
 
 public class DesktopInput extends InputHandler{
@@ -23,6 +27,10 @@ public class DesktopInput extends InputHandler{
 	int endx, endy;
 	private boolean enableHold = false;
 	private boolean beganBreak;
+
+	public DesktopInput(){
+
+	}
 	
 	@Override public float getCursorEndX(){ return endx; }
 	@Override public float getCursorEndY(){ return endy; }
@@ -52,7 +60,7 @@ public class DesktopInput extends InputHandler{
 	@Override
 	public void update(){
 		if(player.isDead()) return;
-		
+
 		if(!Inputs.buttonDown(Buttons.LEFT) && !Inputs.buttonDown(Buttons.RIGHT)){
 			mousex = (int)Graphics.mouseWorld().x;
 			mousey = (int)Graphics.mouseWorld().y;
@@ -61,21 +69,13 @@ public class DesktopInput extends InputHandler{
 		endx = Gdx.input.getX();
 		endy = Gdx.input.getY();
 		
-		if(Inputs.scrolled() && Inputs.keyDown("zoom_hold") && !GameState.is(State.menu) && !ui.onDialog()){
-			renderer.scaleCamera(Inputs.scroll());
+		if(Inputs.getAxisActive("zoom") && Inputs.keyDown("zoom_hold") && !GameState.is(State.menu) && !ui.onDialog()){
+			renderer.scaleCamera((int)Inputs.getAxis("zoom"));
 		}
-		
-		if(Inputs.scrolled()){
-			player.rotation += Inputs.scroll();
-		}
-		
-		if(Inputs.keyUp("rotate_right")){
-			player.rotation --;
-		}
-		
-		if(Inputs.keyUp("rotate_left")){
-			player.rotation ++;
-		}
+
+		player.rotation += Inputs.getAxis("rotate_alt");
+		player.rotation += Inputs.getAxis("rotate");
+		player.rotation = Mathf.mod(player.rotation, 4);
 		
 		if(Inputs.buttonDown(Buttons.RIGHT)){
 			player.breakMode = PlaceMode.areaDelete;
@@ -83,11 +83,9 @@ public class DesktopInput extends InputHandler{
 			player.breakMode = PlaceMode.hold;
 		}
 		
-		player.rotation = Mathf.mod(player.rotation, 4);
-		
-		for(int i = 0; i < 9; i ++){
-			if(Inputs.keyUp(Keys.valueOf(""+(i+1))) && i < control.getWeapons().size){
-				player.weapon = control.getWeapons().get(i);
+		for(int i = 1; i <= 6 && i < control.getWeapons().size; i ++){
+			if(Inputs.keyTap("weapon_" + i) && i < control.getWeapons().size){
+				player.weapon = control.getWeapons().get(i - 1);
 				ui.updateWeapons();
 			}
 		}

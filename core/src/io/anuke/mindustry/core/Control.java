@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.utils.Array;
@@ -29,10 +30,14 @@ import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.*;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
+import io.anuke.ucore.core.Inputs.Axis;
+import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.graphics.Atlas;
 import io.anuke.ucore.modules.Module;
+import io.anuke.ucore.util.Input;
+import io.anuke.ucore.util.InputProxy;
 import io.anuke.ucore.util.Mathf;
 
 public class Control extends Module{
@@ -62,6 +67,10 @@ public class Control extends Module{
 	
 	float respawntime;
 	InputHandler input;
+
+    private InputProxy proxy;
+    private float controlx, controly;
+    private boolean controlling;
 	
 	public Control(){
 		if(Mindustry.args.contains("-debug", false))
@@ -82,6 +91,18 @@ public class Control extends Module{
 		}else{
 			input = new DesktopInput();
 		}
+
+        proxy = new InputProxy(Gdx.input){
+            @Override
+            public int getY() {
+                return controlling ? (int)controly : input.getY();
+            }
+
+            @Override
+            public int getX() {
+                return controlling ? (int)controlx : input.getX();
+            }
+        };
 		
 		Inputs.addProcessor(input);
 		
@@ -99,16 +120,45 @@ public class Control extends Module{
 		Musics.load("1.ogg", "2.ogg", "3.ogg", "4.ogg");
 		
 		KeyBinds.defaults(
-			"up", Keys.W,
-			"left", Keys.A,
-			"down", Keys.S,
-			"right", Keys.D,
-			"zoom_hold", Keys.CONTROL_LEFT,
-			"menu", Gdx.app.getType() == ApplicationType.Android ? Keys.BACK : Keys.ESCAPE,
-			"pause", Keys.SPACE,
-			"dash", Keys.SHIFT_LEFT,
-			"rotate_right", Keys.R,
-			"rotate_left", Keys.E
+				"move_x", new Axis(Input.A, Input.D),
+				"move_y", new Axis(Input.S, Input.W),
+				"shoot", Input.MOUSE_LEFT,
+				"zoom_hold", Input.CONTROL_LEFT,
+				"zoom", new Axis(Input.SCROLL),
+				"menu", Gdx.app.getType() == ApplicationType.Android ? Input.BACK : Input.ESCAPE,
+				"pause", Input.SPACE,
+				"dash", Input.SHIFT_LEFT,
+				"rotate_alt", new Axis(Input.R, Input.E),
+				"rotate", new Axis(Input.SCROLL),
+				"weapon_1", Input.NUM_1,
+				"weapon_2", Input.NUM_2,
+				"weapon_3", Input.NUM_3,
+				"weapon_4", Input.NUM_4,
+				"weapon_5", Input.NUM_5,
+				"weapon_6", Input.NUM_6
+		);
+
+		KeyBinds.defaults(
+				DeviceType.controller,
+				"move_x", new Axis(Input.CONTROLLER_L_STICK_HORIZONTAL_AXIS),
+				"move_y", new Axis(Input.CONTROLLER_L_STICK_VERTICAL_AXIS),
+				"cursor_x", new Axis(Input.CONTROLLER_R_STICK_HORIZONTAL_AXIS),
+				"cursor_y", new Axis(Input.CONTROLLER_R_STICK_VERTICAL_AXIS),
+				"select", Input.CONTROLLER_R_BUMPER,
+				"shoot", Input.CONTROLLER_Y,
+				"zoom_hold", Input.ANY_KEY,
+				"zoom", new Axis(Input.CONTROLLER_DPAD_DOWN, Input.CONTROLLER_DPAD_UP),
+				"menu", Input.CONTROLLER_X,
+				"pause", Input.CONTROLLER_L_BUMPER,
+				"dash", Input.CONTROLLER_B,
+				"rotate_alt", new Axis(Input.UNSET),
+				"rotate", new Axis(Input.CONTROLLER_DPAD_LEFT, Input.CONTROLLER_DPAD_RIGHT),
+				"weapon_1", Input.NUM_1,
+				"weapon_2", Input.NUM_2,
+				"weapon_3", Input.NUM_3,
+				"weapon_4", Input.NUM_4,
+				"weapon_5", Input.NUM_5,
+				"weapon_6", Input.NUM_6
 		);
 		
 		for(int i = 0; i < Vars.saveSlots; i ++){
@@ -125,6 +175,10 @@ public class Control extends Module{
 		
 		spawns = WaveCreator.getSpawns();
 		//WaveCreator.testWaves(1, 30);
+	}
+
+	public boolean showCursor(){
+		return controlling;
 	}
 	
 	public void reset(){
@@ -433,32 +487,73 @@ public class Control extends Module{
 	
 	@Override
 	public void update(){
+
+        if(Gdx.input != proxy){
+            Gdx.input = proxy;
+        }
+
+        if(KeyBinds.getSection("default").device.type == DeviceType.controller){
+            if(Inputs.keyTap("select")){
+            	UCore.log("Select.");
+                Core.scene.touchDown(Gdx.input.getX(), Gdx.input.getY(), 0, Buttons.LEFT);
+            }
+
+            if(Inputs.keyRelease("select")){
+                Core.scene.touchUp(Gdx.input.getX(), Gdx.input.getY(), 0, Buttons.LEFT);
+            }
+
+            float xa = Inputs.getAxis("cursor_x");
+            float ya = Inputs.getAxis("cursor_y");
+
+            if(Math.abs(xa) > 0.3 || Math.abs(ya) > 0.3) {
+                controlx += xa*10;
+                controly -= ya*10;
+                controlling = true;
+
+                Core.scene.touchDragged(Gdx.input.getX(), Gdx.input.getY(), 0);
+            }
+
+            controlx = Mathf.clamp(controlx, 0, Gdx.graphics.getWidth());
+            controly = Mathf.clamp(controly, 0, Gdx.graphics.getHeight());
+
+            if(Gdx.input.getDeltaX() > 1 || Gdx.input.getDeltaY() > 1)
+                controlling = false;
+        }else{
+            controlling = false;
+        }
+
+        if(!controlling){
+            controlx = Gdx.input.getX();
+            controly = Gdx.input.getY();
+        }
+
+        Gdx.input.setCursorCatched(controlling);
 		
 		if(debug && GameState.is(State.playing)){
 			//debug actions
-			if(Inputs.keyUp(Keys.P)){
+			if(Inputs.keyTap(Keys.P)){
 				Effects.effect(Fx.shellsmoke, player);
 				Effects.effect(Fx.shellexplosion, player);
 			}
 			
-			if(Inputs.keyUp(Keys.C)){
+			if(Inputs.keyTap(Keys.C)){
 				enemyGroup.clear();
 				enemies = 0;
 			}
 			
-			if(Inputs.keyUp(Keys.F)){
+			if(Inputs.keyTap(Keys.F)){
 				wavetime = 0f;
 			}
 			
-			if(Inputs.keyUp(Keys.U)){
+			if(Inputs.keyTap(Keys.U)){
 				Vars.showUI = !Vars.showUI;
 			}
 			
-			if(Inputs.keyUp(Keys.O)){
+			if(Inputs.keyTap(Keys.O)){
 				Vars.noclip = !Vars.noclip;
 			}
 			
-			if(Inputs.keyUp(Keys.Y)){
+			if(Inputs.keyTap(Keys.Y)){
 				if(Inputs.keyDown(Keys.SHIFT_LEFT)){
 					new HealerEnemy().set(player.x, player.y).add();
 				}else{
@@ -476,11 +571,11 @@ public class Control extends Module{
 		if(!GameState.is(State.menu)){
 			input.update();
 			
-			if(Inputs.keyUp("pause") && !ui.isGameOver() && (GameState.is(State.paused) || GameState.is(State.playing))){
+			if(Inputs.keyTap("pause") && !ui.isGameOver() && (GameState.is(State.paused) || GameState.is(State.playing))){
 				GameState.set(GameState.is(State.playing) ? State.paused : State.playing);
 			}
 			
-			if(Inputs.keyUp("menu")){
+			if(Inputs.keyTap("menu")){
 				if(GameState.is(State.paused)){
 					ui.hideMenu();
 					GameState.set(State.playing);

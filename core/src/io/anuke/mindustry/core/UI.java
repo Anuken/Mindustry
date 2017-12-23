@@ -22,7 +22,9 @@ import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.Configurable;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
+import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.function.VisibilityProvider;
 import io.anuke.ucore.modules.SceneModule;
@@ -155,6 +157,13 @@ public class UI extends SceneModule{
 		
 		scene.act();
 		scene.draw();
+
+		if(control.showCursor()) {
+			Draw.color();
+			scene.getBatch().begin();
+			Draw.rect("icon-close", Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+			scene.getBatch().end();
+		}
 	}
 
 	@Override
@@ -163,7 +172,7 @@ public class UI extends SceneModule{
 		configtable = new Table();
 		scene.add(configtable);
 
-		editorDialog = new MapEditorDialog(editor);
+		if(!Vars.gwt) editorDialog = new MapEditorDialog(editor);
 		
 		settingserror = new Dialog("Warning", "dialog");
 		settingserror.content().add("[crimson]Failed to access local storage.\nSettings will not be saved.");

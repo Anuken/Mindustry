@@ -58,7 +58,7 @@ io.anuke.ucore.scene.ui.Window$WindowStyle: {
 	dialog: {stageBackground: dialogDim, titleFont: default-font, background: window-empty, titleFontColor: accent }
 },
 io.anuke.ucore.scene.ui.KeybindDialog$KeybindDialogStyle: {
-	default: {keyColor: red, keyNameColor: white},
+	default: {keyColor: red, keyNameColor: white, paneStyle: clear},
 },
 io.anuke.ucore.scene.ui.Slider$SliderStyle: {
 	default-horizontal: {background: slider, knob: slider-knob, knobOver: slider-knob-over, knobDown: slider-knob-down},

@@ -83,17 +83,16 @@ public class Player extends DestructibleEntity{
 		}
 		
 		vector.set(0, 0);
+
+		float xa = Inputs.getAxis("move_x");
+		float ya = Inputs.getAxis("move_y");
+		if(Math.abs(xa) < 0.3) xa = 0;
+		if(Math.abs(ya) < 0.3) ya = 0;
+
+		vector.y += ya*speed;
+		vector.x += xa*speed;
 		
-		if(Inputs.keyDown("up"))
-			vector.y += speed;
-		if(Inputs.keyDown("down"))
-			vector.y -= speed;
-		if(Inputs.keyDown("left"))
-			vector.x -= speed;
-		if(Inputs.keyDown("right"))
-			vector.x += speed;
-		
-		boolean shooting = !Inputs.keyDown("dash") && Inputs.buttonDown(Buttons.LEFT) && recipe == null 
+		boolean shooting = !Inputs.keyDown("dash") && Inputs.keyDown("shoot") && recipe == null
 				&& !ui.hasMouse() && !control.getInput().onConfigurable();
 		
 		if(shooting && Timers.get(this, "reload", weapon.reload)){

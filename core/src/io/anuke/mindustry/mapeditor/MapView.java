@@ -1,6 +1,7 @@
 package io.anuke.mindustry.mapeditor;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -219,9 +220,12 @@ public class MapView extends Element implements GestureListener{
 		boolean pop = ScissorStack.pushScissors(Tmp.r1.set(x + width/2 - size/2, y + height/2 - size/2, size, size));
 		
 		batch.draw(editor.texture(), centerx - sclwidth/2, centery - sclheight/2, sclwidth, sclheight);
+
 		if(grid){
+			Draw.color(Color.GRAY);
 			image.setBounds(centerx - sclwidth/2, centery - sclheight/2, sclwidth, sclheight);
 			image.draw(batch, alpha);
+			Draw.color();
 		}
 
 		if(tool == EditorTool.line && drawing){
