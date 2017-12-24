@@ -14,6 +14,8 @@ public class Map{
 	
 	public transient Pixmap pixmap;
 	public transient Texture texture;
+
+	public Map(){}
 	
 	public int getWidth(){
 		return pixmap.getWidth();

@@ -76,6 +76,8 @@ public class Control extends Module{
 	public Control(){
 		if(Mindustry.args.contains("-debug", false))
 			Vars.debug = true;
+
+		Inputs.useControllers(!gwt);
 		
 		log("Total blocks loaded: " + Block.getAllBlocks().size);
 		

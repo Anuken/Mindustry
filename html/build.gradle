@@ -10,11 +10,10 @@ gwt {
     modules 'io.anuke.mindustry.GdxDefinition'
     devModules 'io.anuke.mindustry.GdxDefinitionSuperdev'
     project.webAppDirName = 'webapp'
-    compiler.style = de.richsource.gradle.plugins.gwt.Style.PRETTY;
 
     compiler {
-        strict = true;
-        disableCastChecking = true;
+        strict = true
+        disableCastChecking = true
     }
 }
 

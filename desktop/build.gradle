@@ -69,7 +69,7 @@ task packrCmd(type: Exec) {
 
 	copy{
 		into PACKR_DIR
-		from "build/libs/desktop-1.0.jar"
+		from "build/libs/desktop-release.jar"
 	}
 
 	commandLine "java", "-jar", PACKR_DIR+"packr.jar", "--verbose", /*"--resources", project.ext.assetsDir,*/ "--platform", getPlatform(), "--executable", appName, "--output", "packr-out/", "--mainclass", project.ext.mainClassName, "--jdk", PACKR_DIR+"jdk-"+getPlatform()+".zip", "--classpath", 

@@ -152,13 +152,13 @@ public class Maps implements Disposable{
 		maps.clear();
 	}
 
-	private static class ArrayContainer{
+	public static class ArrayContainer{
 		Array<Map> maps;
 
-		ArrayContainer() {
+		public ArrayContainer() {
 		}
 
-		ArrayContainer(Array<Map> maps) {
+		public ArrayContainer(Array<Map> maps) {
 			this.maps = maps;
 		}
 	}

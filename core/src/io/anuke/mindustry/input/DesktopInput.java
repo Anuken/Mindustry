@@ -27,7 +27,7 @@ public class DesktopInput extends InputHandler{
 	int endx, endy;
 	private boolean enableHold = false;
 	private boolean beganBreak;
-	private boolean rotated = false;
+	private boolean rotated = false, rotatedAlt;
 	
 	@Override public float getCursorEndX(){ return endx; }
 	@Override public float getCursorEndY(){ return endy; }
@@ -71,7 +71,12 @@ public class DesktopInput extends InputHandler{
 		}
 		if(!Inputs.getAxisActive("rotate_alt")) rotated = false;
 
-		player.rotation += Inputs.getAxis("rotate");
+		if(!rotatedAlt) {
+			player.rotation += Inputs.getAxis("rotate");
+			rotatedAlt = true;
+		}
+		if(!Inputs.getAxisActive("rotate")) rotatedAlt = false;
+
 		player.rotation = Mathf.mod(player.rotation, 4);
 		
 		if(Inputs.keyDown("break")){
