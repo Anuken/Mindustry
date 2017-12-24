@@ -15,6 +15,8 @@ import io.anuke.mindustry.resource.Section;
 import io.anuke.mindustry.ui.FloatingDialog;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.graphics.Hue;
+import io.anuke.ucore.scene.builders.button;
+import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
@@ -25,112 +27,122 @@ import io.anuke.ucore.util.Mathf;
 public class BlocksFragment implements Fragment{
 	private Table desctable;
 	private Array<String> statlist = new Array<>();
+	private boolean shown = true;
 	
 	public void build(){
+
 		new table(){{
 			abottom();
 			aright();
-			
-			new table("button"){{
-				visible(()->player.recipe != null);
-				desctable = get();
-				fillX();
-			}}.end().uniformX();
-			
-			row();
 
-			new table("pane"){{
-				get().setTouchable(Touchable.enabled);
-				int rows = 4;
-				int maxcol = 0;
-				float size = 48;
-				
-				Stack stack = new Stack();
-				ButtonGroup<ImageButton> group = new ButtonGroup<>();
-				Array<Recipe> recipes = new Array<Recipe>();
-				
-				for(Section sec : Section.values()){
-					recipes.clear();
-					Recipe.getBy(sec, recipes);
-					maxcol = Math.max((int)((float)recipes.size/rows+1), maxcol);
-				}
-				
-				for(Section sec : Section.values()){
-					recipes.clear();
-					Recipe.getBy(sec, recipes);
-					
-					Table table = new Table();
-					
-					ImageButton button = new ImageButton("icon-"+sec.name(), "toggle");
-					button.clicked(()->{
-						if(!table.isVisible() && player.recipe != null){
-							player.recipe = null;
-						}
-					});
-					button.setName("sectionbutton" + sec.name());
-					add(button).growX().height(54).padTop(sec.ordinal() <= 2 ? -10 : -5);
-					button.getImageCell().size(40).padBottom(4).padTop(2);
-					group.add(button);
-					
-					if(sec.ordinal() % 3 == 2 && sec.ordinal() > 0){
-						row();
+			new table(){{
+
+				new table("button") {{
+					visible(() -> player.recipe != null);
+					desctable = get();
+					fillX();
+				}}.end().uniformX();
+
+				row();
+
+				new table("pane") {{
+					touchable(Touchable.enabled);
+					int rows = 4;
+					int maxcol = 0;
+					float size = 48;
+
+					Stack stack = new Stack();
+					ButtonGroup<ImageButton> group = new ButtonGroup<>();
+					Array<Recipe> recipes = new Array<Recipe>();
+
+					for (Section sec : Section.values()) {
+						recipes.clear();
+						Recipe.getBy(sec, recipes);
+						maxcol = Math.max((int) ((float) recipes.size / rows + 1), maxcol);
 					}
-					
-					table.margin(4);
-					table.top().left();
-					
-					int i = 0;
-					
-					for(Recipe r : recipes){
-						TextureRegion region = Draw.hasRegion(r.result.name() + "-icon") ? 
-								Draw.region(r.result.name() + "-icon") : Draw.region(r.result.name());
-						ImageButton image = new ImageButton(region, "select");
-						
-						image.clicked(()->{
-							if(player.recipe == r){
+
+					for (Section sec : Section.values()) {
+						recipes.clear();
+						Recipe.getBy(sec, recipes);
+
+						Table table = new Table();
+
+						ImageButton button = new ImageButton("icon-" + sec.name(), "toggle");
+						button.clicked(() -> {
+							if (!table.isVisible() && player.recipe != null) {
 								player.recipe = null;
-							}else{
-								player.recipe = r;
-								updateRecipe();
 							}
 						});
-						
-						table.add(image).size(size+8).pad(2);
-						image.getImageCell().size(size);
-						
-						image.update(()->{
-							
-							boolean canPlace = !control.getTutorial().active() || control.getTutorial().canPlace();
-							boolean has = (control.hasItems(r.requirements)) && canPlace;
-							//image.setDisabled(!has);
-							image.setChecked(player.recipe == r);
-							image.setTouchable(canPlace ? Touchable.enabled : Touchable.disabled);
-							image.getImage().setColor(has ? Color.WHITE : Hue.lightness(0.33f));
-						});
-						
-						if(i % rows == rows-1)
-							table.row();
-						
-						i++;
+						button.setName("sectionbutton" + sec.name());
+						add(button).growX().height(54).padTop(sec.ordinal() <= 2 ? -10 : -5);
+						button.getImageCell().size(40).padBottom(4).padTop(2);
+						group.add(button);
+
+						if (sec.ordinal() % 3 == 2 && sec.ordinal() > 0) {
+							row();
+						}
+
+						table.margin(4);
+						table.top().left();
+
+						int i = 0;
+
+						for (Recipe r : recipes) {
+							TextureRegion region = Draw.hasRegion(r.result.name() + "-icon") ?
+									Draw.region(r.result.name() + "-icon") : Draw.region(r.result.name());
+							ImageButton image = new ImageButton(region, "select");
+
+							image.clicked(() -> {
+								if (player.recipe == r) {
+									player.recipe = null;
+								} else {
+									player.recipe = r;
+									updateRecipe();
+								}
+							});
+
+							table.add(image).size(size + 8).pad(2);
+							image.getImageCell().size(size);
+
+							image.update(() -> {
+
+								boolean canPlace = !control.getTutorial().active() || control.getTutorial().canPlace();
+								boolean has = (control.hasItems(r.requirements)) && canPlace;
+								//image.setDisabled(!has);
+								image.setChecked(player.recipe == r);
+								image.setTouchable(canPlace ? Touchable.enabled : Touchable.disabled);
+								image.getImage().setColor(has ? Color.WHITE : Hue.lightness(0.33f));
+							});
+
+							if (i % rows == rows - 1)
+								table.row();
+
+							i++;
+						}
+
+						table.setVisible(button::isChecked);
+
+						stack.add(table);
 					}
-					
-					table.setVisible(()-> button.isChecked());
-					
-					stack.add(table);
-				}
-				
-				
-				row();
-				add(stack).colspan(Section.values().length);
-				margin(10f);
-				
-				get().marginLeft(0f);
-				get().marginRight(0f);
-				
-				end();
-			}}.right().bottom().uniformX();
-			
-			visible(()->!GameState.is(State.menu));
+
+
+					row();
+					add(stack).colspan(Section.values().length);
+					margin(10f);
+
+					get().marginLeft(0f);
+					get().marginRight(0f);
+
+					end();
+				}}.right().bottom().uniformX();
+
+				visible(() -> !GameState.is(State.menu) && shown);
+
+			}}.end();
+
+			//new imagebutton("icon-arrow-right", 10*2, () -> {
+			//	shown = !shown;
+			//}).uniformY().fillY();
 
 		}}.end();
 	}

@@ -113,6 +113,10 @@ public class World extends Module{
 	}
 	
 	public Tile[] getNearby(int x, int y){
+		return getNearby(x, y, temptiles);
+	}
+
+	public Tile[] getNearby(int x, int y, Tile[] temptiles){
 		temptiles[0] = tile(x+1, y);
 		temptiles[1] = tile(x, y+1);
 		temptiles[2] = tile(x-1, y);

@@ -67,7 +67,7 @@ public class HudFragment implements Fragment{
 			
 			itemtable = new table("button").end().top().left().fillX().size(-1).get();
 			itemtable.setTouchable(Touchable.enabled);
-			itemtable.setVisible(()-> control.getMode() != GameMode.sandbox);
+			itemtable.setVisible(()-> !control.getMode().infiniteResources);
 			itemcell = get().getCell(itemtable);
 
 			get().setVisible(()->!GameState.is(State.menu));
@@ -169,7 +169,7 @@ public class HudFragment implements Fragment{
 			
 				new label(()-> control.getEnemiesRemaining() > 0 ?
 					control.getEnemiesRemaining() + printEnemiesRemaining() : 
-						(control.getTutorial().active() || Vars.control.getMode() == GameMode.sandbox) ? "waiting..." : "Wave in " + (int) (control.getWaveCountdown() / 60f))
+						(control.getTutorial().active() || Vars.control.getMode().toggleWaves) ? "waiting..." : "Wave in " + (int) (control.getWaveCountdown() / 60f))
 				.minWidth(140).left();
 
 				margin(12f);
@@ -186,7 +186,7 @@ public class HudFragment implements Fragment{
 			Vars.control.runWave();
 		}).height(uheight).fillX().right().padTop(-8f).padBottom(-12f).padRight(-36)
 				.padLeft(-10f).width(40f).update(l->{
-			boolean vis = Vars.control.getMode() == GameMode.sandbox && Vars.control.getEnemiesRemaining() <= 0;
+			boolean vis = Vars.control.getMode().toggleWaves && Vars.control.getEnemiesRemaining() <= 0;
 			boolean paused = GameState.is(State.paused) || !vis;
 			
 			l.setVisible(vis);
@@ -200,7 +200,7 @@ public class HudFragment implements Fragment{
 		itemtable.clear();
 		itemtable.left();
 		
-		if(control.getMode() == GameMode.sandbox){
+		if(control.getMode().infiniteResources){
 			return;
 		}
 		

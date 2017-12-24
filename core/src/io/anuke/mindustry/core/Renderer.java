@@ -152,7 +152,7 @@ public class Renderer extends RendererModule{
 
 			camera.position.set(lastx - deltax, lasty - deltay, 0);
 
-			record(); //this only does something if GdxGifRecorder is on the class path, which it usually isn't
+			if(Vars.debug) record(); //this only does something if GdxGifRecorder is on the class path, which it usually isn't
 		}
 	}
 	FrameBuffer buffer = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);

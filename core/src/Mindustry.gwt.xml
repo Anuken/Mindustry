@@ -4,4 +4,5 @@
 	<source path="io/anuke/mindustry" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.enemies" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.Tile" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.Maps" />
 </module>

@@ -213,6 +213,10 @@ public class Tile{
 	public Tile[] getNearby(){
 		return Vars.world.getNearby(x, y);
 	}
+
+	public Tile[] getNearby(Tile[] copy){
+		return Vars.world.getNearby(x, y);
+	}
 	
 	public void changed(){
 		if(entity != null){

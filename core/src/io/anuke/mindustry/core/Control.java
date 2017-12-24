@@ -237,7 +237,7 @@ public class Control extends Module{
 		//multiplying by 2 so you start with more time in the beginning
 		wavetime = waveSpacing()*2;
 		
-		if(mode == GameMode.sandbox){
+		if(mode.infiniteResources){
 			Arrays.fill(items, 999999999);
 		}
 		
@@ -347,7 +347,7 @@ public class Control extends Module{
 		
 		int last = Settings.getInt("hiscore" + world.getMap().name);
 		
-		if(wave > last && mode != GameMode.sandbox){
+		if(wave > last && !mode.infiniteResources && !mode.toggleWaves){
 			Settings.putInt("hiscore" + world.getMap().name, wave);
 			Settings.save();
 			hiscore = true;
@@ -622,7 +622,7 @@ public class Control extends Module{
 					tutorial.update();
 				}
 				
-				if(!tutorial.active() && mode != GameMode.sandbox){
+				if(!tutorial.active() && !mode.toggleWaves){
 				
 					if(enemies <= 0){
 						wavetime -= delta();

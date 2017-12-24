@@ -22,7 +22,8 @@ public class Block{
 	private static Array<Block> blocks = new Array<Block>();
 	
 	protected static TextureRegion temp = new TextureRegion();
-	
+
+	public Tile[] temptiles = new Tile[4];
 	/**internal name*/
 	public final String name;
 	/**internal ID*/
@@ -148,7 +149,7 @@ public class Block{
 		byte i = tile.getDump();
 		byte pdump = (byte)(i % 4);
 		
-		Tile[] tiles = tile.getNearby();
+		Tile[] tiles = tile.getNearby(temptiles);
 		
 		for(int j = 0; j < 4; j ++){
 			Tile other = tiles[i];
@@ -157,7 +158,6 @@ public class Block{
 				tile.setDump((byte)((i+1)%4));
 				return;
 			}
-			tiles = tile.getNearby();
 			i++;
 			i %= 4;
 		}
@@ -176,7 +176,7 @@ public class Block{
 	protected boolean tryDump(Tile tile, int direction, Item todump){
 		int i = tile.getDump()%4;
 		
-		Tile[] tiles = tile.getNearby();
+		Tile[] tiles = tile.getNearby(temptiles);
 		
 		for(int j = 0; j < 4; j ++){
 			Tile other = tiles[i];
@@ -194,7 +194,6 @@ public class Block{
 					}
 				}
 			}
-			tiles = tile.getNearby();
 			i++;
 			i %= 4;
 		}

@@ -51,7 +51,7 @@ public class UI extends SceneModule{
 	Tooltip tooltip;
 	Tile configTile;
 	Array<String> statlist = new Array<>();
-	MapEditor editor = new MapEditor();
+	MapEditor editor;
 	boolean wasPaused = false;
 	
 	private Fragment blockfrag = new BlocksFragment(),
@@ -175,7 +175,10 @@ public class UI extends SceneModule{
 		configtable = new Table();
 		scene.add(configtable);
 
-		if(!Vars.gwt) editorDialog = new MapEditorDialog(editor);
+		if(!Vars.gwt){
+			editor = new MapEditor();
+			editorDialog = new MapEditorDialog(editor);
+		}
 		
 		settingserror = new Dialog("Warning", "dialog");
 		settingserror.content().add("[crimson]Failed to access local storage.\nSettings will not be saved.");

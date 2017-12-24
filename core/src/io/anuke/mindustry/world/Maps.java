@@ -41,12 +41,14 @@ public class Maps implements Disposable{
 		if(!loadMapFile(Gdx.files.internal("maps/maps.json"))){
 			throw new RuntimeException("Failed to load maps!");
 		}
-		
-		if(!loadMapFile(Vars.customMapDirectory.child("maps.json"))){
-			try{
-				Vars.customMapDirectory.child("maps.json").writeString("{}", false);
-			}catch(Exception e){
-				throw new RuntimeException("Failed to create custom map directory!");
+
+		if(!Vars.gwt) {
+			if (!loadMapFile(Vars.customMapDirectory.child("maps.json"))) {
+				try {
+					Vars.customMapDirectory.child("maps.json").writeString("{}", false);
+				} catch (Exception e) {
+					throw new RuntimeException("Failed to create custom map directory!");
+				}
 			}
 		}
 	}

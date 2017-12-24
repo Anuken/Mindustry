@@ -27,6 +27,7 @@ public class DesktopInput extends InputHandler{
 	int endx, endy;
 	private boolean enableHold = false;
 	private boolean beganBreak;
+	private boolean rotated = false;
 	
 	@Override public float getCursorEndX(){ return endx; }
 	@Override public float getCursorEndY(){ return endy; }
@@ -64,7 +65,12 @@ public class DesktopInput extends InputHandler{
 			renderer.scaleCamera((int)Inputs.getAxis("zoom"));
 		}
 
-		player.rotation += Inputs.getAxis("rotate_alt");
+		if(!rotated) {
+			player.rotation += Inputs.getAxis("rotate_alt");
+			rotated = true;
+		}
+		if(!Inputs.getAxisActive("rotate_alt")) rotated = false;
+
 		player.rotation += Inputs.getAxis("rotate");
 		player.rotation = Mathf.mod(player.rotation, 4);
 		
@@ -74,8 +80,8 @@ public class DesktopInput extends InputHandler{
 			player.breakMode = PlaceMode.hold;
 		}
 		
-		for(int i = 1; i <= 6 && i < control.getWeapons().size; i ++){
-			if(Inputs.keyTap("weapon_" + i) && i < control.getWeapons().size){
+		for(int i = 1; i <= 6 && i <= control.getWeapons().size; i ++){
+			if(Inputs.keyTap("weapon_" + i)){
 				player.weapon = control.getWeapons().get(i - 1);
 				ui.updateWeapons();
 			}

@@ -30,9 +30,9 @@ public class Vars{
 	//discord group URL
 	public static final String discordURL = "https://discord.gg/r8BkXNd";
 	//directory for user-created map data
-	public static final FileHandle customMapDirectory = Gdx.files.local("mindustry-maps/");
+	public static final FileHandle customMapDirectory = gwt ? null : Gdx.files.local("mindustry-maps/");
 	//save file directory
-	public static final FileHandle saveDirectory = Gdx.files.local("mindustry-saves/");
+	public static final FileHandle saveDirectory = gwt ? null : Gdx.files.local("mindustry-saves/");
 	//scale of the font
 	public static float fontscale = Math.max(Unit.dp.scl(1f)/2f, 0.5f);
 	//camera zoom displayed on startup

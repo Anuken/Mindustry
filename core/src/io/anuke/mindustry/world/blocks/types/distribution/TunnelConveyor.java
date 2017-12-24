@@ -35,6 +35,8 @@ public class TunnelConveyor extends Block{
 
 	@Override
 	public boolean acceptItem(Item item, Tile dest, Tile source){
+		int rot = source.relativeTo(dest.x, dest.y);
+		if(rot != (dest.getRotation() + 2)%4) return false;
 		Tile tunnel = getDestTunnel(dest);
 		if(tunnel != null){
 			Tile to = tunnel.getNearby()[tunnel.getRotation()];
