@@ -7,6 +7,9 @@
 /desktop/mindustry-maps/
 /desktop/gifexport/
 /core/lib/
+/core/assets/mindustry-saves/
+/core/assets/mindustry-maps/
+/core/assets/gifexport/
 *.gif
 
 .attach_*
