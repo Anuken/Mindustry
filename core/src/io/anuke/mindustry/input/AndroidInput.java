@@ -14,6 +14,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
@@ -67,12 +68,8 @@ public class AndroidInput extends InputHandler{
 			mousex = screenX;
 			mousey = screenY;
 		}
-		
-		if(pointer != 0){
-			placing = false;
-		}else{
-			placing = true;
-		}
+
+		placing = pointer == 0;
 		
 		warmup = 0;
 
@@ -120,6 +117,19 @@ public class AndroidInput extends InputHandler{
 	@Override
 	public void update(){
 		enableHold = player.breakMode == PlaceMode.holdDelete;
+
+		float scl = Settings.getInt("sensitivity")/100f * Unit.dp.scl(1f);
+		float xa = Inputs.getAxis("move_x");
+		float ya = Inputs.getAxis("move_y");
+		if(Math.abs(xa) < Vars.controllerMin) xa = 0;
+		if(Math.abs(ya) < Vars.controllerMin) ya = 0;
+
+		player.x += xa * 4f;
+		player.y += ya * 4f;
+
+		player.rotation += Inputs.getAxis("rotate_alt");
+		player.rotation += Inputs.getAxis("rotate");
+		player.rotation = Mathf.mod(player.rotation, 4);
 
 		if(enableHold && Gdx.input.isTouched(0) && Mathf.near2d(lmousex, lmousey, Gdx.input.getX(0), Gdx.input.getY(0), Unit.dp.scl(50))
 				&& !ui.hasMouse()){

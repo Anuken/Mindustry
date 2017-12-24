@@ -27,10 +27,6 @@ public class DesktopInput extends InputHandler{
 	int endx, endy;
 	private boolean enableHold = false;
 	private boolean beganBreak;
-
-	public DesktopInput(){
-
-	}
 	
 	@Override public float getCursorEndX(){ return endx; }
 	@Override public float getCursorEndY(){ return endy; }
@@ -39,29 +35,24 @@ public class DesktopInput extends InputHandler{
 	@Override public boolean drawPlace(){ return !beganBreak; }
 	
 	@Override
-	public boolean touchDown (int screenX, int screenY, int pointer, int button){
-		if((button == Buttons.LEFT && player.recipe != null) || (button == Buttons.RIGHT)){
-			Vector2 vec = Graphics.world(screenX, screenY);
-			mousex = (int)vec.x;
-			mousey = (int)vec.y;
-		}
-		return false;
-	}
-	
-	public boolean touchUp(int screenX, int screenY, int pointer, int button){
-		if(button == Buttons.LEFT){
-			player.placeMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
-		}else if(button == Buttons.RIGHT && !beganBreak){
-			player.breakMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
-		}
-		return false;
-	}
-	
-	@Override
 	public void update(){
 		if(player.isDead()) return;
 
-		if(!Inputs.buttonDown(Buttons.LEFT) && !Inputs.buttonDown(Buttons.RIGHT)){
+		if(Inputs.keyRelease("select")){
+			player.placeMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
+		}
+
+		if(Inputs.keyRelease("break") && !beganBreak){
+			player.breakMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
+		}
+
+		if((Inputs.keyTap("select") && player.recipe != null) || Inputs.keyTap("break")){
+			Vector2 vec = Graphics.world(Gdx.input.getX(), Gdx.input.getY());
+			mousex = (int)vec.x;
+			mousey = (int)vec.y;
+		}
+
+		if(!Inputs.keyDown("select") && !Inputs.keyDown("break")){
 			mousex = (int)Graphics.mouseWorld().x;
 			mousey = (int)Graphics.mouseWorld().y;
 		}
@@ -77,7 +68,7 @@ public class DesktopInput extends InputHandler{
 		player.rotation += Inputs.getAxis("rotate");
 		player.rotation = Mathf.mod(player.rotation, 4);
 		
-		if(Inputs.buttonDown(Buttons.RIGHT)){
+		if(Inputs.keyDown("break")){
 			player.breakMode = PlaceMode.areaDelete;
 		}else{
 			player.breakMode = PlaceMode.hold;
@@ -92,7 +83,7 @@ public class DesktopInput extends InputHandler{
 		
 		Tile cursor = world.tile(tilex(), tiley());
 		
-		if(Inputs.buttonUp(Buttons.LEFT) && cursor != null && !ui.hasMouse()){
+		if(Inputs.keyTap("select") && cursor != null && !ui.hasMouse()){
 			Tile linked = cursor.isLinked() ? cursor.getLinked() : cursor;
 			if(linked != null && linked.block() instanceof Configurable){
 				ui.showConfig(linked);
@@ -101,25 +92,24 @@ public class DesktopInput extends InputHandler{
 			}
 		}
 		
-		if(Inputs.buttonUp(Buttons.RIGHT)){
+		if(Inputs.keyTap("break")){
 			ui.hideConfig();
 		}
 		
-		if(Inputs.buttonRelease(Buttons.RIGHT)){
+		if(Inputs.keyRelease("break")){
 			beganBreak = false;
 		}
 
-		if(player.recipe != null && Inputs.buttonUp(Buttons.RIGHT)){
+		if(player.recipe != null && Inputs.keyTap("break")){
 			beganBreak = true;
 			player.recipe = null;
 			Cursors.restoreCursor();
 		}
 
 		//block breaking
-		if(enableHold && Inputs.buttonDown(Buttons.RIGHT) && cursor != null && validBreak(tilex(), tiley())){
-			Tile tile = cursor;
+		if(enableHold && Inputs.keyDown("break") && cursor != null && validBreak(tilex(), tiley())){
 			player.breaktime += Timers.delta();
-			if(player.breaktime >= tile.getBreakTime()){
+			if(player.breaktime >= cursor.getBreakTime()){
 				breakBlock(cursor.x, cursor.y, true);
 				player.breaktime = 0f;
 			}

@@ -10,7 +10,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class Vars{
-	public static final boolean testAndroid = false;
+	public static final boolean testAndroid = true;
 	//shorthand for whether or not this is running on android
 	public static final boolean android = (Gdx.app.getType() == ApplicationType.Android) || testAndroid;
 	//shorthand for whether or not this is running on GWT
@@ -53,6 +53,10 @@ public class Vars{
 	public static boolean showPlayer = true;
 	//whether to hide ui, only on debug
 	public static boolean showUI = true;
+
+	public static float controllerMin = 0.25f;
+
+	public static float baseControllerSpeed = 11f;
 
 	public static final int saveSlots = 10;
 	//amount of drops that are left when breaking a block

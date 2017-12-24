@@ -7,6 +7,8 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.ucore.UCore;
+import io.anuke.ucore.function.Consumer;
+import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
@@ -35,9 +37,14 @@ public class MindustrySettingsDialog extends SettingsDialog{
 
 		menu = new Table();
 
-		game = new SettingsTable();
-		graphics = new SettingsTable();
-		sound = new SettingsTable();
+		Consumer<SettingsTable> s = table -> {
+			table.row();
+			table.addImageTextButton("Back", "icon-arrow-left", 10*3, this::back).size(240f, 60f).colspan(2).padTop(15f);
+		};
+
+		game = new SettingsTable(s);
+		graphics = new SettingsTable(s);
+		sound = new SettingsTable(s);
 
 		prefs = new Table();
 		prefs.top();
@@ -50,10 +57,10 @@ public class MindustrySettingsDialog extends SettingsDialog{
 		menu.row();
 		menu.addButton("Sound", () -> visible(2));
 
-		if(!Vars.android) {
-			menu.row();
-			menu.addButton("Controls", () -> Vars.ui.showControls());
-		}
+		//if(!Vars.android) {
+		menu.row();
+		menu.addButton("Controls", () -> Vars.ui.showControls());
+		//}
 
 		prefs.clearChildren();
 		prefs.add(menu);
@@ -67,16 +74,6 @@ public class MindustrySettingsDialog extends SettingsDialog{
 		add(buttons()).fillX();
 
 		hidden(this::back);
-
-		shown(() -> {
-			if(built) return;
-			built = true;
-
-			Mathf.each(table -> {
-				table.row();
-				table.addImageTextButton("Back", "icon-arrow-left", 10*3, this::back).size(240f, 60f).colspan(2).padTop(15f);
-			},  game, graphics, sound);
-		});
 	}
 
 	private void back(){

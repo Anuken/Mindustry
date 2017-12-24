@@ -12,6 +12,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
+import com.badlogic.gdx.utils.IntSet;
+import com.badlogic.gdx.utils.IntSet.IntSetIterator;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
@@ -160,8 +162,9 @@ public class UI extends SceneModule{
 
 		if(control.showCursor()) {
 			Draw.color();
+			float scl = Unit.dp.scl(3f);
 			scene.getBatch().begin();
-			Draw.rect("icon-close", Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+			Draw.rect("controller-cursor", Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), 16*scl, 16*scl);
 			scene.getBatch().end();
 		}
 	}
@@ -214,6 +217,7 @@ public class UI extends SceneModule{
 		prefs.game.checkPref("smoothcam", "Smooth Camera", true);
 		prefs.game.checkPref("indicators", "Enemy Indicators", true);
 		prefs.game.checkPref("effects", "Display Effects", true);
+		prefs.game.sliderPref("sensitivity", "Controller Sensitivity", 100, 10, 300, i -> i + "%");
 
         prefs.graphics.checkPref("fps", "Show FPS", false);
 		prefs.graphics.checkPref("vsync", "VSync", true, b -> Gdx.graphics.setVSync(b));

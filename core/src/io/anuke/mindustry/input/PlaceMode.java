@@ -233,7 +233,7 @@ public enum PlaceMode{
 		}
 		
 		public void draw(int tilex, int tiley, int endx, int endy){
-			if(Vars.android && !Gdx.input.isTouched(0)){
+			if(Vars.android && !Gdx.input.isTouched(0) && !Vars.control.showCursor()){
 				return;
 			}
 			

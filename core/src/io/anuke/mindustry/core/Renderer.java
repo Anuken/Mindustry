@@ -24,6 +24,7 @@ import io.anuke.mindustry.world.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.entities.EffectEntity;
@@ -369,7 +370,7 @@ public class Renderer extends RendererModule{
 				&& control.input.drawPlace()) || (player.placeMode.delete && Inputs.keyDown("area_delete_mode"))){
 
 			player.placeMode.draw(control.input.getBlockX(), control.input.getBlockY(), control.input.getBlockEndX(), control.input.getBlockEndY());
-			
+
 			Draw.thickness(1f);
 			Draw.color(Color.SCARLET);
 			for(SpawnPoint spawn : control.getSpawnPoints()){

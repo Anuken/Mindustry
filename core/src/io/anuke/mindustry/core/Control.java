@@ -36,6 +36,7 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.graphics.Atlas;
 import io.anuke.ucore.modules.Module;
+import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Input;
 import io.anuke.ucore.util.InputProxy;
 import io.anuke.ucore.util.Mathf;
@@ -102,6 +103,16 @@ public class Control extends Module{
             public int getX() {
                 return controlling ? (int)controlx : input.getX();
             }
+
+			@Override
+			public int getY(int pointer) {
+				return pointer == 0 ? getY() : super.getY(pointer);
+			}
+
+			@Override
+			public int getX(int pointer) {
+				return pointer == 0 ? getX() : super.getX(pointer);
+			}
         };
 		
 		Inputs.addProcessor(input);
@@ -122,6 +133,8 @@ public class Control extends Module{
 		KeyBinds.defaults(
 				"move_x", new Axis(Input.A, Input.D),
 				"move_y", new Axis(Input.S, Input.W),
+				"select", Input.MOUSE_LEFT,
+				"break", Input.MOUSE_RIGHT,
 				"shoot", Input.MOUSE_LEFT,
 				"zoom_hold", Input.CONTROL_LEFT,
 				"zoom", new Axis(Input.SCROLL),
@@ -145,14 +158,15 @@ public class Control extends Module{
 				"cursor_x", new Axis(Input.CONTROLLER_R_STICK_HORIZONTAL_AXIS),
 				"cursor_y", new Axis(Input.CONTROLLER_R_STICK_VERTICAL_AXIS),
 				"select", Input.CONTROLLER_R_BUMPER,
-				"shoot", Input.CONTROLLER_Y,
+				"break", Input.CONTROLLER_L_BUMPER,
+				"shoot", Input.CONTROLLER_R_TRIGGER,
 				"zoom_hold", Input.ANY_KEY,
 				"zoom", new Axis(Input.CONTROLLER_DPAD_DOWN, Input.CONTROLLER_DPAD_UP),
 				"menu", Input.CONTROLLER_X,
-				"pause", Input.CONTROLLER_L_BUMPER,
-				"dash", Input.CONTROLLER_B,
+				"pause", Input.CONTROLLER_L_TRIGGER,
+				"dash", Input.CONTROLLER_Y,
 				"rotate_alt", new Axis(Input.UNSET),
-				"rotate", new Axis(Input.CONTROLLER_DPAD_LEFT, Input.CONTROLLER_DPAD_RIGHT),
+				"rotate", new Axis(Input.CONTROLLER_A, Input.CONTROLLER_B),
 				"weapon_1", Input.NUM_1,
 				"weapon_2", Input.NUM_2,
 				"weapon_3", Input.NUM_3,
@@ -494,23 +508,23 @@ public class Control extends Module{
 
         if(KeyBinds.getSection("default").device.type == DeviceType.controller){
             if(Inputs.keyTap("select")){
-            	UCore.log("Select.");
-                Core.scene.touchDown(Gdx.input.getX(), Gdx.input.getY(), 0, Buttons.LEFT);
+                Inputs.getProcessor().touchDown(Gdx.input.getX(), Gdx.input.getY(), 0, Buttons.LEFT);
             }
 
             if(Inputs.keyRelease("select")){
-                Core.scene.touchUp(Gdx.input.getX(), Gdx.input.getY(), 0, Buttons.LEFT);
+				Inputs.getProcessor().touchUp(Gdx.input.getX(), Gdx.input.getY(), 0, Buttons.LEFT);
             }
 
             float xa = Inputs.getAxis("cursor_x");
             float ya = Inputs.getAxis("cursor_y");
 
-            if(Math.abs(xa) > 0.3 || Math.abs(ya) > 0.3) {
-                controlx += xa*10;
-                controly -= ya*10;
+            if(Math.abs(xa) > Vars.controllerMin || Math.abs(ya) > Vars.controllerMin) {
+            	float scl = Settings.getInt("sensitivity")/100f * Unit.dp.scl(1f);
+                controlx += xa*Vars.baseControllerSpeed*scl;
+                controly -= ya*Vars.baseControllerSpeed*scl;
                 controlling = true;
 
-                Core.scene.touchDragged(Gdx.input.getX(), Gdx.input.getY(), 0);
+				Inputs.getProcessor().touchDragged(Gdx.input.getX(), Gdx.input.getY(), 0);
             }
 
             controlx = Mathf.clamp(controlx, 0, Gdx.graphics.getWidth());
@@ -544,7 +558,11 @@ public class Control extends Module{
 			if(Inputs.keyTap(Keys.F)){
 				wavetime = 0f;
 			}
-			
+
+			if(Inputs.keyDown(Keys.I)){
+				wavetime -= delta() * 10f;
+			}
+
 			if(Inputs.keyTap(Keys.U)){
 				Vars.showUI = !Vars.showUI;
 			}
@@ -608,11 +626,7 @@ public class Control extends Module{
 				
 					if(enemies <= 0){
 						wavetime -= delta();
-						
-						if(Vars.debug && Inputs.keyDown(Keys.I)){
-							wavetime -= delta() * 10f;
-						}
-						
+
 						if(lastUpdated < wave + 1 && wavetime < Vars.aheadPathfinding){ //start updatingbeforehand
 							world.pathfinder().updatePath();
 							lastUpdated = wave + 1;
