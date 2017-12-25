@@ -50,8 +50,10 @@ ext.getPlatform = {
 
 	if (project.hasProperty("platform")) {
 		def lc = platform.toLowerCase()
-		if(lc.equals("windows")){
-			return "windows64";
+		if(lc.equals("windows64")) {
+            return "windows64";
+        }else if(lc.equals("windows32")){
+            return "windows32";
 		}else if(lc.equals("linux")){
 			return "linux64";
 		}else if(lc.equals("mac")){

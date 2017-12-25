@@ -84,12 +84,21 @@ project(":core") {
     apply plugin: "java"
 
     dependencies {
-        if(new File('../uCore').exists()){
+        boolean comp = System.properties["release"] == null || System.properties["release"].equals("false");
+
+        if(!comp){
+            println("NOTICE: Compiling release build.")
+        }else{
+            println("Compiling DEBUG build.");
+        }
+
+        if(new File('../uCore').exists() && comp){
             compile project(":uCore")
         }else{
             compile "com.github.anuken:ucore:$uCoreVersion"
         }
-        if(new File('../GDXGifRecorder').exists()) {
+
+        if(new File('../GDXGifRecorder').exists() && comp) {
             compile project(":GDXGifRecorder")
         }
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"

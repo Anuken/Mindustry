@@ -57,10 +57,10 @@ public class MindustrySettingsDialog extends SettingsDialog{
 		menu.row();
 		menu.addButton("Sound", () -> visible(2));
 
-		//if(!Vars.android) {
-		menu.row();
-		menu.addButton("Controls", () -> Vars.ui.showControls());
-		//}
+		if(!Vars.android) {
+			menu.row();
+			menu.addButton("Controls", () -> Vars.ui.showControls());
+		}
 
 		prefs.clearChildren();
 		prefs.add(menu);
