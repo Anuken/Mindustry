@@ -1,5 +1,7 @@
 ##Packr, build stuff
 
+/core/assets/mindustry-saves/
+/core/assets/mindustry-maps/
 /deploy/
 /desktop/packr-out/
 /desktop/packr-export/

@@ -7,6 +7,7 @@ import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Shader;
+import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Tmp;
 
 public class Shaders{
@@ -45,8 +46,9 @@ public class Shaders{
 				shader.setUniform3fv("u_hits[0]", hits.items, 0, Math.min(hits.size, MAX_HITS));
 				shader.setUniformi("u_hitamount", Math.min(hits.size, MAX_HITS)/3);
 			}
+			shader.setUniformf("u_dp", Unit.dp.scl(1f));
 			shader.setUniformf("u_color", color);
-			shader.setUniformf("u_time", Timers.time());
+			shader.setUniformf("u_time", Timers.time() / Unit.dp.scl(1f));
 			shader.setUniformf("u_scaling", scaling);
 			shader.setUniformf("u_offset", Tmp.v1.set(Core.camera.position.x, Core.camera.position.y));
 			shader.setUniformf("u_texsize", Tmp.v1.set(region.getTexture().getWidth() / scale, 

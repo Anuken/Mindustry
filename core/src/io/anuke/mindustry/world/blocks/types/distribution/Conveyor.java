@@ -24,6 +24,9 @@ public class Conveyor extends Block{
 	private static ItemPos pos1 = new ItemPos();
 	private static ItemPos pos2 = new ItemPos();
 	private static IntArray removals = new IntArray();
+	private static final float itemSpace = 0.135f;
+	private static final float offsetScl = 128f*3f;
+	private static final float itemSize = 4f;
 	
 	public float speed = 0.02f;
 	
@@ -68,7 +71,7 @@ public class Conveyor extends Block{
 			
 			Draw.rect("icon-" + pos.item.name(), 
 					tile.x * tilesize + Tmp.v1.x * pos.y + Tmp.v2.x, 
-					tile.y * tilesize + Tmp.v1.y * pos.y + Tmp.v2.y, 4, 4);
+					tile.y * tilesize + Tmp.v1.y * pos.y + Tmp.v2.y, itemSize, itemSize);
 		}
 	}
 	
@@ -85,13 +88,13 @@ public class Conveyor extends Block{
 			ItemPos pos = pos1.set(value);
 			
 			boolean canmove = i == entity.convey.size - 1 || 
-					!(pos2.set(entity.convey.get(i + 1)).y - pos.y < 0.135 * Timers.delta());
+					!(pos2.set(entity.convey.get(i + 1)).y - pos.y < itemSpace * Timers.delta());
 			
 			if(canmove){
 				pos.y += Math.max(speed * Timers.delta(), 1f/252f); //TODO fix precision issues?
 				pos.x = Mathf.lerpDelta(pos.x, 0, 0.06f);
 			}else{
-				pos.x = Mathf.lerpDelta(pos.x, pos.seed/128f/3f, 0.1f);
+				pos.x = Mathf.lerpDelta(pos.x, pos.seed/offsetScl, 0.1f);
 			}
 			
 			pos.y = Mathf.clamp(pos.y);

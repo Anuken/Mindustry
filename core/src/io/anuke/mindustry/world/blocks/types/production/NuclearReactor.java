@@ -25,14 +25,14 @@ public class NuclearReactor extends LiquidItemPowerGenerator{
 	
 	protected Color coolColor = new Color(1, 1, 1, 0f);
 	protected Color hotColor = Color.valueOf("ff9575a3");
-	protected int fuelUseTime = 120; //time to consume 1 fuel
-	protected float powerMultiplier = 0.3f; //power per frame, depends on full capacity 
+	protected int fuelUseTime = 140; //time to consume 1 fuel
+	protected float powerMultiplier = 0.4f; //power per frame, depends on full capacity
 	protected float heating = 0.007f; //heating per frame
 	protected float coolantPower = 0.007f; //how much heat decreases per coolant unit
 	protected float smokeThreshold = 0.3f; //threshold at which block starts smoking
 	protected int explosionRadius = 19;
 	protected int explosionDamage = 135;
-	protected float flashThreshold = 0.46f;
+	protected float flashThreshold = 0.46f; //heat threshold at which the lights start flashing
 	
 	public NuclearReactor(String name) {
 		super(name);

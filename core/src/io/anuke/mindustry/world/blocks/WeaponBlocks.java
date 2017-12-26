@@ -92,7 +92,7 @@ public class WeaponBlocks{
 			bullet = BulletType.flame;
 			ammo = Item.coal;
 			health = 90;
-			fullDescription = "Advanced close-range turret. Uses coal for ammo. Has very low range, but very high damage and damage. "
+			fullDescription = "Advanced close-range turret. Uses coal for ammo. Has very low range, but very high damage. "
 					+ "Good for close quarters. Recommended to be used behind walls.";
 		}
 	},

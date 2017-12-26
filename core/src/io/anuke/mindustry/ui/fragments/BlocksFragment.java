@@ -13,6 +13,7 @@ import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Section;
 import io.anuke.mindustry.ui.FloatingDialog;
+import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.scene.builders.button;
@@ -34,6 +35,8 @@ public class BlocksFragment implements Fragment{
 		new table(){{
 			abottom();
 			aright();
+
+            visible(() -> !GameState.is(State.menu));
 
 			new table(){{
 
@@ -133,8 +136,6 @@ public class BlocksFragment implements Fragment{
 					get().marginLeft(0f);
 					get().marginRight(0f);
 
-
-
 					end();
 				}}.right().bottom().uniformX();
 
@@ -142,10 +143,12 @@ public class BlocksFragment implements Fragment{
 
 			}}.end();
 
-			//new imagebutton("icon-arrow-right", 10*2, () -> {
-			//	shown = !shown;
-			//}).uniformY().fillY();
+			row();
 
+			new imagebutton("icon-arrow-down", 10*2, () -> {
+				shown = !shown;
+			}).padBottom(-5).uniformX().fillX()
+					.update(i -> i.getStyle().imageUp = Core.skin.getDrawable(shown ? "icon-arrow-down" : "icon-arrow-up"));
 		}}.end();
 	}
 	
