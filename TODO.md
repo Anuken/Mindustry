@@ -6,7 +6,9 @@ _(These are not planned in the near future at all, and have been suggested befor
 - Online player profiles
 - Player mech on Android
 - Modding support
-- Speed increase (fast forward)
+- Game speed increase (fast forward)
+- Liquid teleporter
+- More teleporter colors/any system that gives it more frequencies (numbers)
 
 ### Already Suggested
 _(not necessarily planned!)_
