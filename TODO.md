@@ -9,6 +9,7 @@ _(These are not planned in the near future at all, and have been suggested befor
 - Game speed increase (fast forward)
 - Liquid teleporter
 - More teleporter colors/any system that gives it more frequencies (numbers)
+- More ore generation (if you're playing on maze, *play any different map, maze has the least resources, and for good reason!*)
 
 ### Already Suggested
 _(not necessarily planned!)_
