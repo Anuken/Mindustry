@@ -2,9 +2,12 @@ package io.anuke.mindustry.ui.fragments;
 
 import static io.anuke.mindustry.Vars.*;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.core.GameState;
@@ -13,9 +16,11 @@ import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Section;
 import io.anuke.mindustry.ui.FloatingDialog;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.graphics.Hue;
+import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.button;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.table;
@@ -23,6 +28,7 @@ import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
 public class BlocksFragment implements Fragment{
@@ -38,7 +44,7 @@ public class BlocksFragment implements Fragment{
 
             visible(() -> !GameState.is(State.menu));
 
-			new table(){{
+			Table blocks = new table(){{
 
 				new table("button") {{
 					visible(() -> player.recipe != null);
@@ -108,10 +114,8 @@ public class BlocksFragment implements Fragment{
 							image.getImageCell().size(size);
 
 							image.update(() -> {
-
 								boolean canPlace = !control.getTutorial().active() || control.getTutorial().canPlace();
 								boolean has = (control.hasItems(r.requirements)) && canPlace;
-								//image.setDisabled(!has);
 								image.setChecked(player.recipe == r);
 								image.setTouchable(canPlace ? Touchable.enabled : Touchable.disabled);
 								image.getImage().setColor(has ? Color.WHITE : Hue.lightness(0.33f));
@@ -133,22 +137,42 @@ public class BlocksFragment implements Fragment{
 					add(stack).colspan(Section.values().length);
 					margin(10f);
 
-					get().marginLeft(0f);
-					get().marginRight(0f);
+					marginLeft(0f);
+					marginRight(0f);
 
 					end();
 				}}.right().bottom().uniformX();
 
 				visible(() -> !GameState.is(State.menu) && shown);
 
-			}}.end();
+			}}.end().get();
 
 			row();
 
-			new imagebutton("icon-arrow-down", 10*2, () -> {
-				shown = !shown;
-			}).padBottom(-5).uniformX().fillX()
-					.update(i -> i.getStyle().imageUp = Core.skin.getDrawable(shown ? "icon-arrow-down" : "icon-arrow-up"));
+			ImageButton buttons[] = new ImageButton[2];
+			float size = 46f;
+
+			float t = 0.2f;
+			Interpolation ip = Interpolation.pow3Out;
+
+			//TODO fix glitch when resizing
+			buttons[0] = new imagebutton("icon-arrow-down", 10*2, () -> {
+				if(blocks.getActions().size != 0) return;
+				blocks.actions(Actions.translateBy(0, -blocks.getHeight(), t, ip), Actions.call(() -> shown = false));
+				buttons[0].actions(Actions.fadeOut(t));
+				buttons[1].actions(Actions.fadeIn(t));
+			}).padBottom(-5).visible(() -> shown).height(size).uniformX().fillX()
+					.update(i -> i.getStyle().imageUp = Core.skin.getDrawable(shown ? "icon-arrow-down" : "icon-arrow-up")).get();
+
+			buttons[1] = new imagebutton("icon-arrow-up", 10*2, () -> {
+				if(blocks.getActions().size != 0) return;
+				blocks.actions(Actions.translateBy(0, blocks.getHeight(), t, ip));
+				shown = true;
+				buttons[0].actions(Actions.fadeIn(t));
+				buttons[1].actions(Actions.fadeOut(t));
+			}).touchable(() -> shown ? Touchable.disabled : Touchable.enabled).size(size).padBottom(-5).padLeft(-size).get();
+
+			buttons[1].getColor().a = 0f;
 		}}.end();
 	}
 	
@@ -187,7 +211,7 @@ public class BlocksFragment implements Fragment{
 				boolean wasPaused = GameState.is(State.paused);
 				GameState.set(State.paused);
 				
-				FloatingDialog d = new FloatingDialog("Block Info");
+				FloatingDialog d = new FloatingDialog("$text.blocks.blockinfo");
 				Table table = new Table();
 				table.defaults().pad(1f);
 				ScrollPane pane = new ScrollPane(table, "clear");
@@ -204,7 +228,7 @@ public class BlocksFragment implements Fragment{
 				d.content().add(pane).grow();
 				
 				if(statlist.size > 0){
-					table.add("[accent]extra block info:").padTop(6).padBottom(5).left();
+					table.add("$text.blocks.extrainfo").padTop(6).padBottom(5).left();
 					table.row();
 				}
 				
@@ -213,7 +237,7 @@ public class BlocksFragment implements Fragment{
 					table.row();
 				}
 				
-				d.buttons().addButton("OK", ()->{
+				d.buttons().addButton("$text.ok", ()->{
 					if(!wasPaused) GameState.set(State.playing);
 					d.hide();
 				}).size(110, 50).pad(10f);
@@ -252,7 +276,7 @@ public class BlocksFragment implements Fragment{
 		
 		desctable.row();
 		
-		Label label = new Label("[health]health: " + recipe.result.health + (recipe.result.description == null ?
+		Label label = new Label("[health]"+ Bundles.get("text.health")+": " + recipe.result.health + (recipe.result.description == null ?
 				"" : ("\n[]" + recipe.result.description)));
 		label.setWrap(true);
 		desctable.add(label).width(200).padTop(4).padBottom(2);

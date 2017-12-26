@@ -18,6 +18,7 @@ import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.TextButton;
+import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
@@ -171,35 +172,30 @@ public class Tutorial{
 		}
 	}
 	
-	enum Stage{
+	public enum Stage{
 		intro{
 			{
-				text = "[yellow]Welcome to the tutorial.[] To begin, press 'next'.";
 			}
 		},
 		moveDesktop{
 			{
 				desktopOnly = true;
-				text = "To move, use the [orange][[WASD][] keys. Hold [orange]shift[] to boost. Hold [orange]CTRL[] while using the [orange]scrollwheel[] to zoom in or out.";
 			}
 		},
 		shoot{
 			{
 				desktopOnly = true;
-				text = "Use your mouse to aim,  hold [orange]left mouse button[] to shoot. Try practicing on the [yellow]target[].";
 			}
 		},
 		moveAndroid{
 			{
 				androidOnly = true;
-				text = "To pan the view, drag one finger across the screen. Pinch and drag to zoom in or out.";
 			}
 		},
 		placeSelect{
 			{
 				canBack = false;
 				canPlace = true;
-				text = "Try selecting a [yellow]conveyor[] from the block menu in the bottom right.";
 			}
 			
 			void onSwitch(){
@@ -216,7 +212,6 @@ public class Tutorial{
 				blockPlaceX = 0;
 				blockPlaceY = -2;
 				targetBlock = DistributionBlocks.conveyor;
-				text = "Use the [orange][[scrollwheel][] to rotate the conveyor to face [orange]forwards[], then place it in the [yellow]marked location[]  using the [orange][[left mouse button][].";
 			}
 		},
 		placeConveyorAndroid{
@@ -229,16 +224,12 @@ public class Tutorial{
 				blockPlaceX = 0;
 				blockPlaceY = -2;
 				targetBlock = DistributionBlocks.conveyor;
-				text = "Use the [orange][[rotate button][] to rotate the conveyor to face [orange]forwards[], drag it into position with one finger, then place it in the [yellow]marked location[] using the [orange][[checkmark][].";
 			}
 		},
 		placeConveyorAndroidInfo{
 			{
 				androidOnly = true;
 				canBack = false;
-				text = "Alternatively, you can press the crosshair icon in the bottom left to switch to [orange][[touch mode][], and "
-						+ "place blocks by tapping on the screen. In touch mode, blocks can be rotated with the arrow at the bottom left. "
-						+ "Press [yellow]next[] to try it out.";
 			}
 			
 			void onSwitch(){
@@ -254,7 +245,6 @@ public class Tutorial{
 				blockPlaceX = 0;
 				blockPlaceY = -3;
 				targetBlock = ProductionBlocks.stonedrill;
-				text = "Now, select and place a [yellow]stone drill[] at the marked location.";
 			}
 			
 			void onSwitch(){
@@ -264,27 +254,23 @@ public class Tutorial{
 		blockInfo{
 			{
 				canBack = true;
-				text = "If you want to learn more about a block, you can tap the [orange]question mark[] in the top right to read its description.";
 			}
 		},
 		deselectDesktop{
 			{
 				desktopOnly = true;
 				canBack = false;
-				text = "You can de-select a block using the [orange][[right mouse button][].";
 			}
 		},
 		deselectAndroid{
 			{
 				androidOnly = true;
 				canBack = false;
-				text = "You can deselect a block by pressing the [orange]X[] button.";
 			}
 		},
 		drillPlaced{
 			{
 				canBack = false;
-				text = "The drill will now produce [yellow]stone,[] output it onto the conveyor, then move it into the [yellow]core[].";
 			}
 			
 			void onSwitch(){
@@ -293,18 +279,15 @@ public class Tutorial{
 		},
 		drillInfo{
 			{
-				text = "Different ores need different drills. Stone requires stone drills, iron requires iron drills, etc.";
 			}
 		},
 		drillPlaced2{
 			{
-				text = "Moving items into the core puts them in your [yellow]item inventory[], in the top left. Placing blocks uses items from your inventory.";
 			}
 		},
 		moreDrills{
 			{
 				canBack = false;
-				text = "You can link many drills and conveyors up together, like so.";
 			}
 			
 			void onSwitch(){
@@ -327,23 +310,20 @@ public class Tutorial{
 				targetBlock = Blocks.air;
 				blockPlaceX = 2;
 				blockPlaceY = -2;
-				text = !Vars.android ? 
-					"You can delete blocks by clicking the  [orange]right mouse button[] on the block you want to delete. Try deleting this conveyor.":
-					"You can delete blocks by [orange]selecting the crosshair[] in the [orange]break mode menu[] in the bottom left and tapping a block. Try deleting this conveyor.";
+				desktopOnly = true;
 			}
 		},
-		/*
-		deleteBlock2{
+		deleteBlockAndroid{
 			{
 				canBack = false;
 				canForward = false;
 				showBlock = true;
 				targetBlock = Blocks.air;
-				blockPlaceX = -2;
+				blockPlaceX = 2;
 				blockPlaceY = -2;
-				text = "Try deleting this other conveyor too.";
+				androidOnly = true;
 			}
-		},*/
+		},
 		placeTurret{
 			{
 				canBack = false;
@@ -353,7 +333,6 @@ public class Tutorial{
 				targetBlock = WeaponBlocks.turret;
 				blockPlaceX = 2;
 				blockPlaceY = 2;
-				text = "Now, select and place a [yellow]turret[] at the [yellow]marked location[].";
 			}
 			
 			void onSwitch(){
@@ -363,8 +342,6 @@ public class Tutorial{
 		placedTurretAmmo{
 			{
 				canBack = false;
-				text = "This turret will now accept [yellow]ammo[] from the conveyor. You can see how much ammo it has by " + 
-				(Vars.android ? "tapping it" : "hovering over it") + " and checking the [green]green bar[].";
 			}
 			
 			void onSwitch(){
@@ -377,38 +354,30 @@ public class Tutorial{
 		turretExplanation{
 			{
 				canBack = false;
-				text = "Turrets will automatically shoot at the nearest enemy in range, as long as they have enough ammo.";
 			}
 		},
 		waves{
 			{
-				text = "Every [yellow]" + (int)(Vars.wavespace/60) + "[] seconds, a wave of [coral]enemies[] will spawn in specific locations and attempt to destroy the core.";
 			}
 		},
 		coreDestruction{
 			{
-				text = "Your objective is to [yellow]defend the core[]. If the core is destroyed, you [coral]lose the game[].";
 			}
 		},
 		pausingDesktop{
 			{
 				desktopOnly = true;
-				text = "If you ever need to take a break, press the [orange]pause button[] in the top left or [orange]space[] "
-						+ "to pause the game. You can still select and place blocks while paused, but cannot move or shoot.";
 			}
 		},
 		pausingAndroid{
 			{
 				androidOnly = true;
-				text = "If you ever need to take a break, press the [orange]pause button[] in the top left"
-						+ " to pause the game. You can still place select and place blocks while paused.";
 			}
 		},
 		purchaseWeapons{
 			{
 				desktopOnly = true;
 				canBack = false;
-				text = "You can purchase new [yellow]weapons[] for your mech by opening the upgrade menu in the bottom left.";
 			}
 			
 			void onSwitch(){
@@ -420,7 +389,6 @@ public class Tutorial{
 			{
 				canBack = false;
 				desktopOnly = true;
-				text = "Switch weapons by either clicking its icon in the bottom left, or using numbers [orange][[1-9][].";
 			}
 			
 			void onSwitch(){
@@ -435,7 +403,6 @@ public class Tutorial{
 			{
 				canBack = false;
 				canForward = false;
-				text = "Here comes a wave now. Destroy them.";
 			}
 			
 			void update(Tutorial t){
@@ -453,7 +420,6 @@ public class Tutorial{
 		pumpDesc{
 			{
 				canBack = false;
-				text = "In later waves, you might need to use [yellow]pumps[] to distribute liquids for generators or extractors.";
 			}
 		}, 
 		pumpPlace{
@@ -465,7 +431,6 @@ public class Tutorial{
 				targetBlock = ProductionBlocks.pump;
 				blockPlaceX = 6;
 				blockPlaceY = -2;
-				text = "Pumps work similarly to drills, except that they produce liquids instead of items. Try placing a pump on the [yellow]designated oil[].";
 			}
 			
 			void onSwitch(){
@@ -484,7 +449,6 @@ public class Tutorial{
 				blockPlaceX = 5;
 				blockPlaceY = -2;
 				blockRotation = 2;
-				text = "Now place a [orange]conduit[] leading away from the pump.";
 			}
 			
 			void onSwitch(){
@@ -502,7 +466,6 @@ public class Tutorial{
 				blockPlaceX = 4;
 				blockPlaceY = -2;
 				blockRotation = 1;
-				text = "And a few more...";
 			}
 			
 			void onSwitch(){
@@ -519,7 +482,6 @@ public class Tutorial{
 				blockPlaceX = 4;
 				blockPlaceY = -1;
 				blockRotation = 1;
-				text = "And a few more...";
 			}
 			
 			void onSwitch(){
@@ -535,7 +497,6 @@ public class Tutorial{
 				targetBlock = ProductionBlocks.combustiongenerator;
 				blockPlaceX = 4;
 				blockPlaceY = 0;
-				text = "Now, place a [orange]combustion generator[] block at the end of the conduit.";
 			}
 			
 			void onSwitch(){
@@ -548,7 +509,6 @@ public class Tutorial{
 		generatorExplain{
 			{
 				canBack = false;
-				text = "This generator will now create [yellow]power[] from the oil.";
 			}
 		},
 		lasers{
@@ -557,7 +517,6 @@ public class Tutorial{
 				canForward = false;
 				showBlock = true;
 				canPlace = true;
-				text = "Power is distributed using [yellow]power lasers[]. Rotate and place one here.";
 				blockPlaceX = 4;
 				blockPlaceY = 4;
 				blockRotation = 2;
@@ -571,14 +530,11 @@ public class Tutorial{
 		laserExplain{
 			{
 				canBack = false;
-				text = "The generator will now move power into the laser block. An [yellow]opaque[] beam means that it is currently transmitting power, "
-						+ "and a [yellow]transparent[] beam means it is not.";
 			}
 		},
 		laserMore{
 			{
 				canBack = false;
-				text = "You can check how much power a block has by hovering over it and checking the [yellow]yellow bar[] at the top.";
 			}
 		},
 		healingTurret{
@@ -591,7 +547,6 @@ public class Tutorial{
 				blockPlaceX = 1;
 				blockPlaceY = 4;
 				targetBlock = DefenseBlocks.repairturret;
-				text = "This laser can be used to power a [lime]repair turret[]. Place one here.";
 			}
 			
 			void onSwitch(){
@@ -601,7 +556,6 @@ public class Tutorial{
 		healingTurretExplain{
 			{
 				canBack = false;
-				text = "As long as it has power, this turret will [lime]repair nearby blocks.[] When playing, make sure you get one in your base as quickly as possible!";
 			}
 		},
 		smeltery{
@@ -614,7 +568,6 @@ public class Tutorial{
 				blockPlaceX = 0;
 				blockPlaceY = -6;
 				targetBlock = ProductionBlocks.smelter;
-				text = "Many blocks require [orange]steel[] to make, which requires a [orange]smelter[] to craft. Place one here.";
 			}
 			
 			void onSwitch(){
@@ -627,7 +580,6 @@ public class Tutorial{
 		smelterySetup{
 			{
 				canBack = false;
-				text = "This smelter will now produce [orange]steel[] from the input coal and iron.";
 			}
 			
 			void onSwitch(){
@@ -643,11 +595,10 @@ public class Tutorial{
 		},
 		end{
 			{
-				text = "And that concludes the tutorial!  Good luck!";
 				canBack = false;
 			}
 		};
-		String text = "no text";
+		public final String text = Bundles.getNotNull("tutorial."+name()+".text");
 		
 		boolean androidOnly;
 		boolean desktopOnly;

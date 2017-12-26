@@ -15,6 +15,7 @@ import io.anuke.mindustry.resource.Liquid;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 public class Block{
@@ -29,7 +30,7 @@ public class Block{
 	/**internal ID*/
 	public final int id;
 	/**display name*/
-	public String formalName;
+	public final String formalName;
 	/**played on destroy*/
 	public Effect explosionEffect = Fx.blockexplosion;
 	/**played on destroy*/
@@ -67,9 +68,9 @@ public class Block{
 	/**multiblock width/height*/
 	public int width = 1, height = 1;
 	/**Brief block description. Should be short enough fit in the place menu.*/
-	public String description;
+	public final String description;
 	/**Detailed description of the block. Can be as long as necesary.*/
-	public String fullDescription;
+	public final String fullDescription;
 	/**Whether to draw this block in the expanded draw range.*/
 	public boolean expanded = false;
 	/**Max of timers used.*/
@@ -83,7 +84,9 @@ public class Block{
 		blocks.add(this);
 		
 		this.name = name;
-		this.formalName = name;
+		this.formalName = Bundles.get("block." + name + ".name", name);
+		this.description = Bundles.get("block." + name + ".description");
+		this.fullDescription = Bundles.get("block." + name + ".fulldescription");
 		this.solid = false;
 		this.id = lastid++;
 	}

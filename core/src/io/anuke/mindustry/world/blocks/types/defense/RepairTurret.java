@@ -33,11 +33,6 @@ public class RepairTurret extends PowerTurret{
 	}
 	
 	@Override
-	public void postInit(){
-		description = "[powerinfo]Uses power[white]\nRepairs nearby blocks.";
-	}
-	
-	@Override
 	public void update(Tile tile){
 		PowerTurretEntity entity = tile.entity();
 		

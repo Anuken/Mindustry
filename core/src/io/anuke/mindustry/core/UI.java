@@ -43,6 +43,7 @@ import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.Window.WindowStyle;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.Bundles;
 
 public class UI extends SceneModule{
 	Table loadingtable, desctable, configtable;
@@ -190,20 +191,18 @@ public class UI extends SceneModule{
 			settingserror.hide();
 		}).size(80f, 55f).pad(4);
 		
-		gameerror = new Dialog("An error has occured", "dialog");
-		gameerror.content().add(new Label("[SCARLET]An unexpected error has occured, which would have caused a crash. "
-				+ "[]Please report the exact circumstances under which this error occured to the developer: "
-				+ "\n[ORANGE]anukendev@gmail.com[]"){{
-					setWrap(true);
-				}}).width(600f).pad(10f);
-		gameerror.buttons().addButton("OK", gameerror::hide).size(200f, 50);
+		gameerror = new Dialog("$text.error.crashtitle", "dialog");
+		gameerror.content().labelWrap("$text.error.crashmessage").width(600f).pad(10f);
+		gameerror.buttons().addButton("#text.ok", gameerror::hide).size(200f, 50);
 		
 		discord = new Dialog("Discord", "dialog");
 		discord.content().margin(12f);
-		discord.content().add("Join the mindustry discord!\n[orange]" + Vars.discordURL);
+		discord.content().add("$text.discord");
+		discord.content().row();
+		discord.content().add("[orange]"+Vars.discordURL);
 		discord.buttons().defaults().size(200f, 50);
-		discord.buttons().addButton("Open link", () -> Mindustry.platforms.openLink(Vars.discordURL));
-		discord.buttons().addButton("Back", discord::hide);
+		discord.buttons().addButton("$text.openlink", () -> Mindustry.platforms.openLink(Vars.discordURL));
+		discord.buttons().addButton("$text.back", discord::hide);
 		
 		load = new LoadDialog();
 		
@@ -218,18 +217,18 @@ public class UI extends SceneModule{
 
 		prefs.sound.volumePrefs();
 		
-		prefs.game.sliderPref("difficulty", "Difficulty", 1, 0, 2, i -> i == 0 ? "Easy" : i == 1 ? "Normal" : "Hard");
+		prefs.game.sliderPref("difficulty", 1, 0, 2, i -> Bundles.get("setting.difficulty." + (i == 0 ? "easy" : i == 1 ? "normal" : "hard")));
 		prefs.game.screenshakePref();
-		prefs.game.checkPref("smoothcam", "Smooth Camera", true);
-		prefs.game.checkPref("indicators", "Enemy Indicators", true);
-		prefs.game.checkPref("effects", "Display Effects", true);
-		prefs.game.sliderPref("sensitivity", "Controller Sensitivity", 100, 10, 300, i -> i + "%");
+		prefs.game.checkPref("smoothcam", true);
+		prefs.game.checkPref("indicators", true);
+		prefs.game.checkPref("effects", true);
+		prefs.game.sliderPref("sensitivity", 100, 10, 300, i -> i + "%");
 
-        prefs.graphics.checkPref("fps", "Show FPS", false);
-		prefs.graphics.checkPref("vsync", "VSync", true, b -> Gdx.graphics.setVSync(b));
-		prefs.graphics.checkPref("lasers", "Show Power Lasers", true);
-		prefs.graphics.checkPref("healthbars", "Show Entity Health bars", true);
-		prefs.graphics.checkPref("pixelate", "Pixelate Screen", true, b->{
+        prefs.graphics.checkPref("fps", false);
+		prefs.graphics.checkPref("vsync", true, b -> Gdx.graphics.setVSync(b));
+		prefs.graphics.checkPref("lasers", true);
+		prefs.graphics.checkPref("healthbars", true);
+		prefs.graphics.checkPref("pixelate", true, b->{
 			if(b){
 				Vars.renderer.pixelSurface.setScale(Core.cameraScale);
 				Vars.renderer.shadowSurface.setScale(Core.cameraScale);
@@ -270,19 +269,20 @@ public class UI extends SceneModule{
 			about.content().row();
 		}
 		
-		restart = new Dialog("The core was destroyed.", "dialog");
+		restart = new Dialog("$text.gameover", "dialog");
 		
 		restart.shown(()->{
 			restart.content().clearChildren();
 			if(control.isHighScore()){
-				restart.content().add("[YELLOW]New highscore!").pad(6);
+				restart.content().add("$text.highscore").pad(6);
 				restart.content().row();
 			}
-			restart.content().add("You lasted until wave [GREEN]" + control.getWave() + "[].").pad(12).get();
+			restart.content().add("$text.lasted").pad(12).get();
+			restart.content().add("[GREEN]" + control.getWave());
 			restart.pack();
 		});
 		
-		restart.getButtonTable().addButton("Back to menu", ()->{
+		restart.getButtonTable().addButton("$text.menu", ()->{
 			restart.hide();
 			GameState.set(State.menu);
 			control.reset();
@@ -305,7 +305,7 @@ public class UI extends SceneModule{
 			get().addImage("white").growX()
 			.height(3f).pad(4f).growX().get().setColor(Colors.get("accent"));
 			row();
-			new label("[accent]Loading..."){{
+			new label("$text.loading"){{
 				get().setName("namelabel");
 			}}.pad(10);
 			row();
@@ -370,7 +370,7 @@ public class UI extends SceneModule{
 	}
 	
 	public void showError(String text){
-		new Dialog("[crimson]An error has occured", "dialog"){{
+		new Dialog("$text.error.title", "dialog"){{
 			content().margin(15);
 			content().add(text);
 			getButtonTable().addButton("OK", this::hide).size(90, 50).pad(4);
@@ -378,7 +378,7 @@ public class UI extends SceneModule{
 	}
 
 	public void showErrorClose(String text){
-		new Dialog("[crimson]A critical error has occured", "dialog"){{
+		new Dialog("$text.error.title", "dialog"){{
 			content().margin(15);
 			content().add(text);
 			getButtonTable().addButton("Exit", Gdx.app::exit).size(90, 50).pad(4);
@@ -386,7 +386,7 @@ public class UI extends SceneModule{
 	}
 	
 	public void showLoading(){
-		showLoading("[accent]Loading..");
+		showLoading("$text.loading");
 	}
 	
 	public void showLoading(String text){
@@ -479,13 +479,17 @@ public class UI extends SceneModule{
 	public void updateItems(){
 		((HudFragment)hudfrag).updateItems();
 	}
-	
+
+	public MindustrySettingsDialog getPrefs() {
+		return prefs;
+	}
+
 	public void showConfirm(String title, String text, Listenable confirmed){
 		FloatingDialog dialog = new FloatingDialog(title);
 		dialog.content().add(text).pad(4f);
 		dialog.buttons().defaults().size(200f, 54f).pad(2f);
-		dialog.buttons().addButton("Cancel", dialog::hide);
-		dialog.buttons().addButton("OK", () -> {
+		dialog.buttons().addButton("$text.cancel", dialog::hide);
+		dialog.buttons().addButton("$text.ok", () -> {
 			dialog.hide();
 			confirmed.listen();
 		});

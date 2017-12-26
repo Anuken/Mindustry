@@ -8,18 +8,19 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.ConfirmDialog;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Cell;
+import io.anuke.ucore.util.Bundles;
 
 public class SaveDialog extends LoadDialog{
 
 	public SaveDialog() {
-		super("Save Game");
+		super("$text.savegame");
 	}
 
 	@Override
 	public void modifyButton(TextButton button, int slot){
 		button.clicked(() -> {
 			if(SaveIO.isSaveValid(slot)){
-				new ConfirmDialog("Overwrite", "Are you sure you want to overwrite\nthis save slot?", () -> {
+				new ConfirmDialog("$text.overwrite", "$text.save.overwrite", () -> {
 					save(slot);
 				}){
 					{
@@ -35,7 +36,7 @@ public class SaveDialog extends LoadDialog{
 	}
 
 	void save(int slot){
-		Vars.ui.showLoading("[accent]Saving...");
+		Vars.ui.showLoading("text.saveload");
 
 		Timers.runTask(5f, () -> {
 			hide();
@@ -45,7 +46,7 @@ public class SaveDialog extends LoadDialog{
 			}catch(Throwable e){
 				e = (e.getCause() == null ? e : e.getCause());
 
-				Vars.ui.showError("[orange]Failed to save game!\n[white]" + ClassReflection.getSimpleName(e.getClass()) + ": " + e.getMessage() + "\n" + "at " + e.getStackTrace()[0].getFileName() + ":" + e.getStackTrace()[0].getLineNumber());
+				Vars.ui.showError("[orange]"+Bundles.get("text.savefail")+"\n[white]" + ClassReflection.getSimpleName(e.getClass()) + ": " + e.getMessage() + "\n" + "at " + e.getStackTrace()[0].getFileName() + ":" + e.getStackTrace()[0].getLineNumber());
 			}
 		});
 	}

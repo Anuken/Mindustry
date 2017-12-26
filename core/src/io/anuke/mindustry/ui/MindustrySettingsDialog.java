@@ -39,7 +39,7 @@ public class MindustrySettingsDialog extends SettingsDialog{
 
 		Consumer<SettingsTable> s = table -> {
 			table.row();
-			table.addImageTextButton("Back", "icon-arrow-left", 10*3, this::back).size(240f, 60f).colspan(2).padTop(15f);
+			table.addImageTextButton("$text.back", "icon-arrow-left", 10*3, this::back).size(240f, 60f).colspan(2).padTop(15f);
 		};
 
 		game = new SettingsTable(s);
@@ -51,15 +51,15 @@ public class MindustrySettingsDialog extends SettingsDialog{
 		prefs.margin(14f);
 
 		menu.defaults().size(300f, 60f).pad(3f);
-		menu.addButton("Game", () -> visible(0));
+		menu.addButton("$text.settings.game", () -> visible(0));
 		menu.row();
-		menu.addButton("Graphics", () -> visible(1));
+		menu.addButton("$text.settings.graphics", () -> visible(1));
 		menu.row();
-		menu.addButton("Sound", () -> visible(2));
+		menu.addButton("$text.settings.sound", () -> visible(2));
 
 		if(!Vars.android) {
 			menu.row();
-			menu.addButton("Controls", () -> Vars.ui.showControls());
+			menu.addButton("$text.settings.controls", () -> Vars.ui.showControls());
 		}
 
 		prefs.clearChildren();
@@ -89,7 +89,7 @@ public class MindustrySettingsDialog extends SettingsDialog{
 	
 	@Override
 	public void addCloseButton(){
-		buttons().addImageTextButton("Menu", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
+		buttons().addImageTextButton("$text.menu", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
 		
 		keyDown(key->{
 			if(key == Keys.ESCAPE || key == Keys.BACK)

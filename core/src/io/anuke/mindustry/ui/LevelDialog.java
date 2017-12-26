@@ -14,6 +14,7 @@ import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.utils.ClickListener;
 import io.anuke.ucore.scene.utils.Elements;
+import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Tmp;
 
 public class LevelDialog extends FloatingDialog{
@@ -22,7 +23,7 @@ public class LevelDialog extends FloatingDialog{
 	private ScrollPane pane;
 	
 	public LevelDialog(){
-		super("Level Select");
+		super("$text.level.select");
 		getTitleTable().getCell(title()).growX().center();
 		getTitleTable().center();
 		addCloseButton();
@@ -43,10 +44,10 @@ public class LevelDialog extends FloatingDialog{
 		
 		Table selmode = new Table();
 		ButtonGroup<TextButton> group = new ButtonGroup<>();
-		selmode.add("Gamemode: ").padRight(10f);
+		selmode.add("$text.level.mode").padRight(15f);
 		
 		for(GameMode mode : GameMode.values()){
-			TextButton b = Elements.newButton(mode.toString(), "toggle", ()->{
+			TextButton b = Elements.newButton("$mode."+mode.name()+".name", "toggle", ()->{
 				Vars.control.setMode(mode);
 			});
 			group.add(b);
@@ -66,9 +67,9 @@ public class LevelDialog extends FloatingDialog{
 			}
 			
 			Table inset = new Table("pane-button");
-			inset.add("[accent]"+map.name).pad(3f);
+			inset.add("[accent]" + Bundles.get("map."+map.name+".name", map.name)).pad(3f);
 			inset.row();
-			inset.label((() -> "High Score: [accent]" + Settings.getInt("hiscore" + map.name)))
+			inset.label((() -> Bundles.format("text.level.highscore", Settings.getInt("hiscore" + map.name))))
 			.pad(3f);
 			inset.pack();
 			
@@ -87,7 +88,7 @@ public class LevelDialog extends FloatingDialog{
 				image.row();
 				delete[0] = image.addButton("Delete", () -> {
 					Timers.run(1f, () -> {
-						Vars.ui.showConfirm("Confirm Delete", "Are you sure you want to delete\nthe map \"[orange]" + map.name + "[]\"?", () -> {
+						Vars.ui.showConfirm("$text.level.delete.title", Bundles.format("text.level.delete", Bundles.get("map."+map.name+".name", map.name)), () -> {
 							Vars.world.maps().removeMap(map);
 							reload();
 							Core.scene.setScrollFocus(pane);

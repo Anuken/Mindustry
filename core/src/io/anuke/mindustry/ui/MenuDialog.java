@@ -31,32 +31,32 @@ public class MenuDialog extends FloatingDialog{
 		if(!Vars.android){
 			content().defaults().width(220).height(50);
 
-			content().addButton("Back", () -> {
+			content().addButton("$text.back", () -> {
 				hide();
 				if(!wasPaused)
 					GameState.set(State.playing);
 			});
 
 			content().row();
-			content().addButton("Settings", () -> {
+			content().addButton("$text.settings", () -> {
 				ui.showPrefs();
 			});
 
 			if(!Vars.gwt){
 				content().row();
-				content().addButton("Save Game", () -> {
+				content().addButton("$text.savegame", () -> {
 					save.show();
 				});
 
 				content().row();
-				content().addButton("Load Game", () -> {
+				content().addButton("$text.loadgame", () -> {
 					load.show();
 				});
 			}
 
 			content().row();
-			content().addButton("Quit", () -> {
-				new ConfirmDialog("Confirm", "Are you sure you want to quit?", () -> {
+			content().addButton("$text.quit", () -> {
+				new ConfirmDialog("$text.confirm", "$text.quit.confirm", () -> {
 					hide();
 					GameState.set(State.menu);
 				}){
@@ -79,16 +79,16 @@ public class MenuDialog extends FloatingDialog{
 				hide();
 				if(!wasPaused)
 					GameState.set(State.playing);
-			}).text("Back").padTop(4f);
+			}).text("$text.back").padTop(4f);
 			
-			new imagebutton("icon-tools", isize, () -> ui.showPrefs()).text("Settings").padTop(4f);
+			new imagebutton("icon-tools", isize, () -> ui.showPrefs()).text("$text.settings").padTop(4f);
 			
-			new imagebutton("icon-save", isize, ()-> save.show()).text("Save").padTop(4f);
+			new imagebutton("icon-save", isize, ()-> save.show()).text("$text.save").padTop(4f);
 			
-			new imagebutton("icon-load", isize, () -> load.show()).text("Load").padTop(4f);
+			new imagebutton("icon-load", isize, () -> load.show()).text("$text.load").padTop(4f);
 			
 			new imagebutton("icon-quit", isize, () -> {
-				new ConfirmDialog("Confirm", "Are you sure you want to quit?", () -> {
+				new ConfirmDialog("$text.confirm", "$text.quit.confirm", () -> {
 					hide();
 					GameState.set(State.menu);
 				}){{

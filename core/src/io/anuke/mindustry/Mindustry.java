@@ -1,14 +1,21 @@
 package io.anuke.mindustry;
 
 import java.util.Date;
+import java.util.Locale;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 
+import com.badlogic.gdx.utils.I18NBundle;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.io.BundleUtil;
 import io.anuke.mindustry.io.PlatformFunction;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.*;
+import io.anuke.ucore.UCore;
+import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Callable;
@@ -26,27 +33,41 @@ public class Mindustry extends ModuleCore {
 		@Override public void addDialog(TextField field){}
 	};
 	
-	//always initialize blocks in this order, otherwise there are ID errors
-	public Block[] blockClasses = {
-		Blocks.air,
-		DefenseBlocks.compositewall,
-		DistributionBlocks.conduit,
-		ProductionBlocks.coaldrill,
-		WeaponBlocks.chainturret,
-		SpecialBlocks.enemySpawn
-	};
-	
 	@Override
 	public void init(){
+		loadBundle();
+
 		module(Vars.world = new World());
 		module(Vars.control = new Control());
 		module(Vars.renderer = new Renderer());
 		module(Vars.ui = new UI());
 	}
+
+	public void loadBundle(){
+		I18NBundle.setExceptionOnMissingKey(false);
+
+		FileHandle handle = Gdx.files.internal("bundles/bundle");
+
+		Locale locale = Locale.getDefault();
+		Core.bundle = I18NBundle.createBundle(handle, locale);
+
+		//always initialize blocks in this order, otherwise there are ID errors
+		Block[] blockClasses = {
+				Blocks.air,
+				DefenseBlocks.compositewall,
+				DistributionBlocks.conduit,
+				ProductionBlocks.coaldrill,
+				WeaponBlocks.chainturret,
+				SpecialBlocks.enemySpawn
+		};
+
+		UCore.log("Block classes: " + blockClasses.length);
+	}
 	
 	@Override
 	public void postInit(){
 		Vars.control.reset();
+		BundleUtil.buildBundle(Gdx.files.absolute("/home/anuke/bundle_en_US.properties"));
 	}
 	
 	@Override

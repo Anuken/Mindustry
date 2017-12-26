@@ -21,7 +21,7 @@ public class UpgradeDialog extends FloatingDialog{
 	boolean wasPaused = false;
 
 	public UpgradeDialog() {
-		super("Upgrades");
+		super("$text.upgrades");
 		setup();
 	}
 	
@@ -107,7 +107,7 @@ public class UpgradeDialog extends FloatingDialog{
 				tiptable.add("[gray]" + description).left();
 				tiptable.row();
 				if(control.hasWeapon(weapon)){
-					tiptable.add("[LIME]Purchased!").padTop(6).left();
+					tiptable.add("$text.purchased").padTop(6).left();
 				}
 				tiptable.margin(14f);
 			};
@@ -131,7 +131,7 @@ public class UpgradeDialog extends FloatingDialog{
 			});
 		}
 		
-		content().add("Weapons");
+		content().add("$text.weapons");
 		content().row();
 		content().add(weptab);
 		content().row();

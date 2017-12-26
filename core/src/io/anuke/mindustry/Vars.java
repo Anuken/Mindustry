@@ -70,8 +70,6 @@ public class Vars{
 	
 	public static final int tilesize = 8;
 	
-	public static I18NBundle bundle;
-	
 	public static Control control;
 	public static Renderer renderer;
 	public static UI ui;

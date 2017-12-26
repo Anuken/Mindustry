@@ -12,10 +12,11 @@ import io.anuke.mindustry.graphics.Fx;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
 public enum Weapon{
-	blaster(15, BulletType.shot, "Shoots a slow, weak bullet."){
+	blaster(15, BulletType.shot){
 		{
 			unlocked = true;
 		}
@@ -26,7 +27,7 @@ public enum Weapon{
 			Effects.effect(Fx.shoot3, p.x + vector.x, p.y+vector.y);
 		}
 	},
-	triblaster(13, BulletType.shot, "Shoots 3 bullets in a spread.", stack(Item.iron, 40)){
+	triblaster(13, BulletType.shot, stack(Item.iron, 40)){
 		
 		@Override
 		public void shoot(Player p){
@@ -41,7 +42,7 @@ public enum Weapon{
 			
 		}
 	},
-	multigun(6, BulletType.multishot, "Shoots inaccurate bullets with a high\nrate of fire.", stack(Item.iron, 60), stack(Item.steel, 20)){
+	multigun(6, BulletType.multishot, stack(Item.iron, 60), stack(Item.steel, 20)){
 		@Override
 		public void shoot(Player p){
 			float ang = mouseAngle(p);
@@ -52,7 +53,7 @@ public enum Weapon{
 			Effects.effect(Fx.shoot2, p.x + vector.x, p.y+vector.y);
 		}
 	},
-	flamer(5, BulletType.flame, "Shoots a stream of fire.", stack(Item.steel, 60), stack(Item.coal, 60)){
+	flamer(5, BulletType.flame, stack(Item.steel, 60), stack(Item.coal, 60)){
 		
 		{
 			shootsound = "flame2";
@@ -67,7 +68,7 @@ public enum Weapon{
 			bullet(p, p.x, p.y, ang + Mathf.range(12));
 		}
 	},
-	railgun(40, BulletType.sniper, "Shoots one long-range bullet.", stack(Item.steel, 60), stack(Item.iron, 60)){
+	railgun(40, BulletType.sniper,  stack(Item.steel, 60), stack(Item.iron, 60)){
 		
 		{
 			shootsound = "railgun";
@@ -81,7 +82,7 @@ public enum Weapon{
 			Effects.effect(Fx.railshoot, p.x + vector.x, p.y+vector.y);
 		}
 	},
-	mortar(100, BulletType.shell, "Shoots a slow, but damaging shell.", stack(Item.titanium, 40), stack(Item.steel, 60)){
+	mortar(100, BulletType.shell, stack(Item.titanium, 40), stack(Item.steel, 60)){
 		
 		{
 			shootsound = "bigshot";
@@ -100,15 +101,15 @@ public enum Weapon{
 	public String shootsound = "shoot";
 	public boolean unlocked;
 	public ItemStack[] requirements;
-	public String description = "no desc for you";
+	public final String description;
 	
 	Vector2 vector = new Vector2();
 	
-	private Weapon(float reload, BulletType type, String desc, ItemStack... requirements){
+	private Weapon(float reload, BulletType type, ItemStack... requirements){
 		this.reload = reload;
 		this.type = type;
 		this.requirements = requirements;
-		this.description = desc;
+		this.description = Bundles.getNotNull("weapon."+name()+".description");
 	}
 
 	public void shoot(Player p){

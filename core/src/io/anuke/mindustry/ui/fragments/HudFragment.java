@@ -23,6 +23,7 @@ import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.util.Bundles;
 
 public class HudFragment implements Fragment{
 	private Table itemtable, respawntable;
@@ -91,7 +92,7 @@ public class HudFragment implements Fragment{
 			atop();
 			
 			new table("pane"){{
-				new label("[orange]< paused >").scale(0.75f).pad(6);
+				new label("[orange]< "+ Bundles.get("text.paused") + " >").scale(0.75f).pad(6);
 			}}.end();
 		}}.end();
 
@@ -122,7 +123,7 @@ public class HudFragment implements Fragment{
 		new table(){{
 			new table("pane"){{
 				
-				new label(()->"[orange]Respawning in " + (int)(control.getRespawnTime()/60)).scale(0.75f).pad(10);
+				new label(()->"[orange]"+Bundles.get("text.respawn")+" " + (int)(control.getRespawnTime()/60)).scale(0.75f).pad(10);
 				
 				visible(()->control.getRespawnTime() > 0 && !GameState.is(State.menu));
 				
@@ -149,10 +150,10 @@ public class HudFragment implements Fragment{
 		}
 	}
 
-	private String printEnemiesRemaining() {
+	private String getEnemiesRemaining() {
 		if(control.getEnemiesRemaining() == 1) {
-			return " enemy left";
-		} else return " enemies left";
+			return Bundles.format("text.single", control.getEnemiesRemaining());
+		} else return Bundles.format("text.enemies", control.getEnemiesRemaining());
 	}
 	
 	private void addWaveTable(){
@@ -163,13 +164,14 @@ public class HudFragment implements Fragment{
 			new table(){{
 				aleft();
 
-				new label(()->"[orange]Wave " + control.getWave()).scale(fontscale*1.5f).left();
+				new label(() -> Bundles.format("text.wave", control.getWave())).scale(fontscale*1.5f).left();
 
 				row();
 			
 				new label(()-> control.getEnemiesRemaining() > 0 ?
-					control.getEnemiesRemaining() + printEnemiesRemaining() : 
-						(control.getTutorial().active() || Vars.control.getMode().toggleWaves) ? "waiting..." : "Wave in " + (int) (control.getWaveCountdown() / 60f))
+					getEnemiesRemaining() :
+						(control.getTutorial().active() || Vars.control.getMode().toggleWaves) ? "$text.waiting"
+								: Bundles.format("text.wave.waiting", (int) (control.getWaveCountdown() / 60f)))
 				.minWidth(140).left();
 
 				margin(12f);

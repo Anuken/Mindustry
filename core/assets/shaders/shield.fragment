@@ -1,6 +1,6 @@
 #ifdef GL_ES
-precision mediump float;
-precision mediump int;
+precision highp float;
+precision highp int;
 #endif
 
 #define MAX_HITS 64
@@ -13,6 +13,7 @@ uniform vec4 u_color;
 uniform vec2 u_texsize;
 uniform float u_time;
 uniform float u_scaling;
+uniform float u_dp;
 uniform vec2 u_offset;
 uniform int u_hitamount;
 uniform vec3 u_hits[MAX_HITS];
@@ -20,15 +21,19 @@ uniform vec3 u_hits[MAX_HITS];
 varying vec4 v_color;
 varying vec2 v_texCoord;
 
+float round(float f){
+    return float(int(f));
+}
+
 void main() {
 
     vec2 T = v_texCoord.xy;
     
     vec2 coords = (T * u_texsize) + u_offset;
     
-    T += vec2(sin(coords.y / 3.0 + u_time / 20.0) / 250.0, sin(coords.x / 3.0 + u_time / 20.0) / 250.0) * u_scaling;
+    T += vec2(sin(coords.y / 3.0 + u_time / 20.0) / 240.0, sin(coords.x / 3.0 + u_time / 20.0) / 240.0) * u_scaling;
     
-    float si = 1.0 + sin(u_time / 20.0 /*+ (coords.x + coords.y) / 30.0*/) / 8.0;
+    float si = 1.0 + sin(u_time / 20.0) / 8.0;
 	
 	vec4 color = texture2D(u_texture, T) * vec4(si, si, si, 1.0);
 
@@ -47,10 +52,9 @@ void main() {
 	if(any){
 		gl_FragColor = u_color * vec4(si, si, si, 1.0);
 	}else{
-	    
-	    //coords.x = float(int(coords.x));
+
 	    if(color.a > 0.1){
-	        if(mod(coords.x + coords.y + sin(coords.x / 5.0) * 3.0 + sin(coords.y / 5.0) * 3.0  + u_time / 4.0, 10.0) < 2.0){
+	        if(mod(coords.x / u_dp + coords.y / u_dp + sin(round(coords.x / u_dp) / 5.0) * 3.0 + sin(round(coords.y / u_dp) / 5.0) * 3.0  + u_time / 4.0, 10.0) < 2.0){
 	            color *= 1.65;
 	        }
 	        

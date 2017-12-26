@@ -56,22 +56,22 @@ public class MenuFragment implements Fragment{
 					defaults().size(120f).pad(5);
 					float isize = 14f*4;
 					
-					new imagebutton("icon-play-2", isize, () -> ui.showLevels()).text("Play").padTop(4f);
+					new imagebutton("icon-play-2", isize, () -> ui.showLevels()).text("$text.play").padTop(4f);
 					
-					new imagebutton("icon-tutorial", isize, () -> control.playMap(world.maps().getMap("tutorial"))).text("Tutorial").padTop(4f);
+					new imagebutton("icon-tutorial", isize, () -> control.playMap(world.maps().getMap("tutorial"))).text("$text.tutorial").padTop(4f);
 					
-					new imagebutton("icon-load", isize, () -> ui.showLoadGame()).text("Load").padTop(4f);
+					new imagebutton("icon-load", isize, () -> ui.showLoadGame()).text("$text.load").padTop(4f);
 					
 					row();
 					
-					new imagebutton("icon-editor", isize, () -> ui.showEditor()).text("Editor").padTop(4f);
+					new imagebutton("icon-editor", isize, () -> ui.showEditor()).text("$text.editor").padTop(4f);
 	
-					new imagebutton("icon-tools", isize, () -> ui.showPrefs()).text("Settings").padTop(4f);
+					new imagebutton("icon-tools", isize, () -> ui.showPrefs()).text("$text.settings").padTop(4f);
 					
 					if(Mindustry.donationsCallable != null){
 						new imagebutton("icon-donate", isize, () -> {
 							Mindustry.donationsCallable.run();
-						}).text("Donate").padTop(4f);
+						}).text("$text.donate").padTop(4f);
 					}
 					
 					visible(()->GameState.is(State.menu));

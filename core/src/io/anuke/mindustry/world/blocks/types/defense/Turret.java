@@ -72,12 +72,6 @@ public class Turret extends Block{
 	}
 	
 	@Override
-	public void postInit(){
-		if(ammo != null)
-			description = "[turretinfo]Ammo: " + ammo;
-	}
-	
-	@Override
 	public boolean canReplace(Block other){
 		return other instanceof Turret;
 	}

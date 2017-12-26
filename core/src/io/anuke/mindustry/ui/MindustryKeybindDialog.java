@@ -21,7 +21,7 @@ public class MindustryKeybindDialog extends KeybindDialog{
 	
 	@Override
 	public void addCloseButton(){
-		buttons().addImageTextButton("Back", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
+		buttons().addImageTextButton("$text.back", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
 		
 		keyDown(key->{
 			if(key == Keys.ESCAPE || key == Keys.BACK)

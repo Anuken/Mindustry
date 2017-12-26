@@ -28,7 +28,7 @@ public class WeaponFragment implements Fragment{
 	public void updateWeapons(){
 		weapontable.clearChildren();
 		
-		ButtonGroup group = new ButtonGroup();
+		ButtonGroup<ImageButton> group = new ButtonGroup<>();
 		
 		weapontable.defaults().size(58, 62);
 		
@@ -52,14 +52,14 @@ public class WeaponFragment implements Fragment{
 			String description = weapon.description;
 				
 			tiptable.background("button");
-			tiptable.add("" + weapon.name(), 0.5f).left().padBottom(3f);
+			tiptable.add("weapon."+weapon.name()+".name", 0.5f).left().padBottom(3f);
 				
 			tiptable.row();
 			tiptable.row();
 			tiptable.add("[GRAY]" + description).left();
 			tiptable.margin(14f);
 			
-			Tooltip tip = new Tooltip(tiptable);
+			Tooltip<Table> tip = new Tooltip<>(tiptable);
 			
 			tip.setInstant(true);
 

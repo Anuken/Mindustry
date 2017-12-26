@@ -28,7 +28,7 @@ public class PlacementFragment implements Fragment{
 					touchable(Touchable.enabled);
 					
 					aleft();
-					new label("place mode");
+					new label("$text.placemode");
 					row();
 					
 					new table("pane"){{
@@ -76,7 +76,7 @@ public class PlacementFragment implements Fragment{
 				abottom();
 				aleft();
 				
-				new label("break mode");
+				new label("$text.breakmode");
 				row();
 				
 				new table("pane"){{

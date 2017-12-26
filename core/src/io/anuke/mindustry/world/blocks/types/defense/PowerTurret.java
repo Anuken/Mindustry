@@ -27,11 +27,6 @@ public class PowerTurret extends Turret implements PowerAcceptor{
 	}
 	
 	@Override
-	public void postInit(){
-		description = "[turretinfo]Uses power.";
-	}
-	
-	@Override
 	public void getStats(Array<String> list){
 		super.getStats(list);
 		list.add("[powerinfo]Power Capacity: " + (int)powerCapacity);
