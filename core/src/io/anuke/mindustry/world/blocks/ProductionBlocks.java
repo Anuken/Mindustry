@@ -10,6 +10,11 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.production.*;
 import io.anuke.ucore.core.Effects;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 public class ProductionBlocks{
 	public static final Block
 	
@@ -38,22 +43,26 @@ public class ProductionBlocks{
 		}
 	},
 	
-	pump = new Pump("pump"){{
-		description = "Pumps liquids into nearby conduits.";
-		fullDescription = "Pumps liquids from a source block- usually water, lava or oil. Outputs liquid into nearby conduits.";
-	}},
+	pump = new Pump("pump") {
+        {
+            description = "Pumps liquids into nearby conduits.";
+            fullDescription = "Pumps liquids from a source block- usually water, lava or oil. Outputs liquid into nearby conduits.";
+        }
+    },
 	
-	fluxpump = new Pump("fluxpump"){{
-		pumpAmount = 3f;
-		description = "Pumps liquids into nearby conduits.";
-		fullDescription = "An advanced version of the pump. Stores more liquid and pumps liquid faster.";
-	}},
+	fluxpump = new Pump("fluxpump") {
+        {
+            pumpAmount = 3f;
+            description = "Pumps liquids into nearby conduits.";
+            fullDescription = "An advanced version of the pump. Stores more liquid and pumps liquid faster.";
+        }
+    },
 	
 	smelter = new Crafter("smelter"){
 		{
 			health = 70;
-			requirements = new Item[]{Item.coal, Item.iron};
-			result = Item.steel;
+            recipe = new HashMap<>();
+			recipe.put(Item.steel,new Item[]{Item.coal,Item.iron});
 			description = "Converts coal + iron to steel.";
 			fullDescription = "The essential crafting block. When inputted 1x iron and 1x coal, outputs one steel.";
 		}
@@ -62,8 +71,8 @@ public class ProductionBlocks{
 	crucible = new Crafter("crucible"){
 		{
 			health = 90;
-			requirements = new Item[]{Item.titanium, Item.steel};
-			result = Item.dirium;
+            recipe = new HashMap<>();
+            recipe.put(Item.dirium,new Item[]{Item.titanium,Item.steel});
 			description = "Converts steel + titanium to dirium.";
 			fullDescription = "An advanced crafting block. When inputted 1x titanium and 1x steel, outputs one dirium.";
 		}
@@ -148,73 +157,83 @@ public class ProductionBlocks{
 		}
 	},
 	
-	stonedrill = new Drill("stonedrill"){{
-		resource = Blocks.stone;
-		result = Item.stone;
-		time = 4;
-		formalName = "stone drill";
-		description = "Mines 1 "+resource.name+" every "+time+" seconds.";
-		fullDescription = "The essential drill. When placed on stone tiles, outputs stone at a slow pace indefinitely.";
-	}},
+	stonedrill = new Drill("stonedrill") {
+        {
+            resource = Blocks.stone;
+            result = Item.stone;
+            time = 4;
+            formalName = "stone drill";
+            description = "Mines 1 " + resource.name + " every " + time + " seconds.";
+            fullDescription = "The essential drill. When placed on stone tiles, outputs stone at a slow pace indefinitely.";
+        }
+    },
 	
-	irondrill = new Drill("irondrill"){{
-		resource = Blocks.iron;
-		result = Item.iron;
-		formalName = "iron drill";
-		description = "Mines 1 "+resource.name+" every "+time+" seconds.";
-		fullDescription = "A basic drill. When placed on iron ore tiles, outputs iron at a slow pace indefinitely.";
-	}},
+	irondrill = new Drill("irondrill") {
+        {
+            resource = Blocks.iron;
+            result = Item.iron;
+            formalName = "iron drill";
+            description = "Mines 1 " + resource.name + " every " + time + " seconds.";
+            fullDescription = "A basic drill. When placed on iron ore tiles, outputs iron at a slow pace indefinitely.";
+        }
+    },
 	
-	coaldrill = new Drill("coaldrill"){{
-		resource = Blocks.coal;
-		result = Item.coal;
-		formalName = "coal drill";
-		description = "Mines 1 "+resource.name+" every "+time+" seconds.";
-		fullDescription = "A basic drill. When placed on coal ore tiles, outputs coal at a slow pace indefinitely.";
-	}},
+	coaldrill = new Drill("coaldrill") {
+        {
+            resource = Blocks.coal;
+            result = Item.coal;
+            formalName = "coal drill";
+            description = "Mines 1 " + resource.name + " every " + time + " seconds.";
+            fullDescription = "A basic drill. When placed on coal ore tiles, outputs coal at a slow pace indefinitely.";
+        }
+    },
 	
-	uraniumdrill = new Drill("uraniumdrill"){{
-		resource = Blocks.uranium;
-		result = Item.uranium;
-		formalName = "uranium drill";
-		time = 7;
-		description = "Mines 1 "+resource.name+" every "+time+" seconds.";
-		fullDescription = "An advanced drill. When placed on uranium ore tiles, outputs uranium at a slow pace indefinitely.";
-	}},
+	uraniumdrill = new Drill("uraniumdrill") {
+        {
+            resource = Blocks.uranium;
+            result = Item.uranium;
+            formalName = "uranium drill";
+            time = 7;
+            description = "Mines 1 " + resource.name + " every " + time + " seconds.";
+            fullDescription = "An advanced drill. When placed on uranium ore tiles, outputs uranium at a slow pace indefinitely.";
+        }
+    },
 	
-	titaniumdrill = new Drill("titaniumdrill"){{
-		resource = Blocks.titanium;
-		result = Item.titanium;
-		formalName = "titanium drill";
-		description = "Mines 1 "+resource.name+" every "+time+" seconds.";
-		fullDescription = "An advanced drill. When placed on titanium ore tiles, outputs titanium at a slow pace indefinitely.";
-	}},
+	titaniumdrill = new Drill("titaniumdrill") {
+        {
+            resource = Blocks.titanium;
+            result = Item.titanium;
+            formalName = "titanium drill";
+            description = "Mines 1 " + resource.name + " every " + time + " seconds.";
+            fullDescription = "An advanced drill. When placed on titanium ore tiles, outputs titanium at a slow pace indefinitely.";
+        }
+    },
 	
-	omnidrill = new Drill("omnidrill"){
-		{
-			drillEffect = Fx.sparkbig;
-			resource = null;
-			result = null;
-			time = 3;
-			formalName = "omnidrill";
-			description = "Mines 1 of any resource every "+time+" seconds.";
-			fullDescription = "The ultimate drill. Will mine any ore it is placed on at a rapid pace.";
-		}
-		
-		@Override
-		public void update(Tile tile){
-			TileEntity entity = tile.entity;
+	omnidrill = new Drill("omnidrill") {
+        {
+            drillEffect = Fx.sparkbig;
+            resource = null;
+            result = null;
+            time = 3;
+            formalName = "omnidrill";
+            description = "Mines 1 of any resource every " + time + " seconds.";
+            fullDescription = "The ultimate drill. Will mine any ore it is placed on at a rapid pace.";
+        }
 
-			if(tile.floor().drops != null && entity.timer.get(timerDrill, 60 * time)){
-				offloadNear(tile, tile.floor().drops.item);
-				Effects.effect(drillEffect, tile.worldx(), tile.worldy());
-			}
+        @Override
+        public void update(Tile tile) {
+            TileEntity entity = tile.entity;
 
-			if(entity.timer.get(timerDump, 30)){
-				tryDump(tile);
-			}
-		}
-	},
+            if (tile.floor().drops != null && entity.timer.get(timerDrill, 60 * time)) {
+                offloadNear(tile, tile.floor().drops.item);
+                Effects.effect(drillEffect, tile.worldx(), tile.worldy());
+            }
+
+            if (entity.timer.get(timerDump, 30)) {
+                tryDump(tile);
+            }
+        }
+    },
 	coalgenerator = new ItemPowerGenerator("coalgenerator"){
 		{
 			//TODO
