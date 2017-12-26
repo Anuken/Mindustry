@@ -6,6 +6,7 @@ _(These are not planned in the near future at all, and have been suggested befor
 - Online player profiles
 - Player mech on Android
 - Modding support
+- Speed increase (fast forward)
 
 ### Already Suggested
 _(not necessarily planned!)_
@@ -27,6 +28,12 @@ _(not necessarily planned!)_
 - Enemies dropping resources
 - Final objectives/non-endless mode
 - Fusion reactor
+- Dams, flowing water
+- Flying enemies
+- Day/night cycle
+- Solar panels
+- Deflector shields
+- Autosave
 
 ### Balance
 - Slow down progression slightly
