@@ -72,7 +72,7 @@ public class MapEditorDialog extends Dialog{
 					Pixmaps.write(editor.pixmap(), result);
 				}catch (Exception e){
 					Vars.ui.showError("Error saving image file:\n[orange]" + Strings.parseException(e, false));
-					e.printStackTrace();
+					if(!Vars.android) e.printStackTrace();
 				}
 				Vars.ui.hideLoading();
 			});

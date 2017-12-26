@@ -133,6 +133,8 @@ public class BlocksFragment implements Fragment{
 					get().marginLeft(0f);
 					get().marginRight(0f);
 
+
+
 					end();
 				}}.right().bottom().uniformX();
 

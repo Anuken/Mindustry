@@ -137,7 +137,7 @@ public class Maps implements Disposable{
 			}
 			return true;
 		}catch(Exception e){
-			e.printStackTrace();
+			if(!Vars.android) e.printStackTrace();
 			Gdx.app.error("Mindustry-Maps", "Failed loading map file: " + file);
 			return false;
 		}

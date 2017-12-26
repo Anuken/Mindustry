@@ -23,19 +23,6 @@ public class PlacementFragment implements Fragment{
 				visible(()->player.recipe != null && !GameState.is(State.menu));
 				abottom();
 				aleft();
-				/*
-				Image image = new Image("icon-arrow");
-				image.update(() -> { 
-					image.setRotation(player.rotation*90);
-					image.setOrigin(Align.center);
-				});
-				
-				new table("pane"){{
-					visible(() -> player.recipe != null && player.recipe.result.rotate);
-					add(image).size(40f);
-				}}.size(54f).end();
-				
-				row();*/
 				
 				new table(){{
 					touchable(Touchable.enabled);

@@ -1,23 +1,50 @@
 _Keep in mind that this is just a basic outline of planned features, and will be constantly changing!_
 
-### 3.x Planned
-- New save system: toggleable autosave, named slots, less clunky save UI
-- [DONE?] Optimize for tablets
-- Teleporter UI changes, more colors (?)
-- [DONE] New building tools: selection-delete, hold to place blocks in a line, one-tap delete mode (mobile). New 'tool' menu (desktop).
-- [DONE] Refactor `Renderer`, remove code for rendering platform-specific placement and move to 2 different classes
-- New map format system. Each new version is a different class, convert between different versions.
-- Underground conduits
+### Won't Add
+_(These are not planned in the near future at all, and have been suggested before **many** times.)_
+- Texture packs
+- Online player profiles
+- Player mech on Android
+- Modding support
+
+### Already Suggested
+_(not necessarily planned!)_
+- "more blocks" "more turrets" "more content" "more X/Y/Z"
+- Multiplayer
+- Building of units (tanks, drones, _soldiers_, doesn't matter)
+- Enemy bases, fighting against AI, capture points
+- Co-op of any sort
+- Campaign, challenge mode
+- Multiple cores
+- Movable turrets
+- Batteries or storage for anything
+- Destroy map indestructible blocks
+- Customizable world ore generation + seed
+- Steam release
+- Research system, tech tree, persistent upgrades, upgrades at all
+- Missile enemies/turrets/weapons (both homing and non-homing)
+- Better graphics
+- Enemies dropping resources
+- Final objectives/non-endless mode
+- Fusion reactor
+
+### Balance
+- Slow down progression slightly
+- Better endgame turrets (?)
+- Nerf RTG, buff nuclear reactor
+- Faster power
+
+### Misc. QoL
 - Minimap
-- More indicators for when the core is damaged and/or under attack
-- Fix bugs with junction not accepting blocks (low FPS)
-- Fix bugs with tunnel merging and/or removing items (low FPS)
+- Underground conduits
+- More indicators for core damaged/attacked
+- Delete saves, export saves, import saves
+- Display playtime in saves
 - Edit descriptions for conveyor tunnels to be more clear about how to use them
-- [DONE] Add link to Mindustry discord everywhere
-- Balancing to slow down progression
-- Map editor
-- Delete saves
-- Display playtime
+- New map format system to display
+- Better placement controls, break while placing
+- Hide UI elements
+- New liquid conduit system
 
 ### Major Bugs
 - Black screen when tabbing out on Android
@@ -25,10 +52,6 @@ _Keep in mind that this is just a basic outline of planned features, and will be
 - Random map reload when playing, leading to a crash (UI cause?)
 - Google Payments verify crash
 - Google Payments IllegalArgument crash
-
-### 4.0 Planned
-- Multiplayer framework, possibly implementation
-- New look to blocks, make them less 'blocky'
 
 ### Misc
 - Localization support. Change all in-game strings to localized strings. Check compatibility with GWT and Android libraries.
