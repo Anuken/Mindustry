@@ -373,7 +373,7 @@ public class UI extends SceneModule{
 		new Dialog("$text.error.title", "dialog"){{
 			content().margin(15);
 			content().add(text);
-			getButtonTable().addButton("OK", this::hide).size(90, 50).pad(4);
+			getButtonTable().addButton("$text.ok", this::hide).size(90, 50).pad(4);
 		}}.show();
 	}
 
@@ -381,7 +381,7 @@ public class UI extends SceneModule{
 		new Dialog("$text.error.title", "dialog"){{
 			content().margin(15);
 			content().add(text);
-			getButtonTable().addButton("Exit", Gdx.app::exit).size(90, 50).pad(4);
+			getButtonTable().addButton("$text.quit", Gdx.app::exit).size(90, 50).pad(4);
 		}}.show();
 	}
 	

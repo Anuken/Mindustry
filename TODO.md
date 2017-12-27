@@ -10,6 +10,7 @@ _(These are not planned in the near future at all, and have been suggested befor
 - Liquid teleporter
 - More teleporter colors/any system that gives it more frequencies (numbers)
 - More ore generation (if you're playing on maze, *play any different map, maze has the least resources, and for good reason!*)
+- Power wires or conduits
 
 ### Already Suggested
 _(not necessarily planned!)_

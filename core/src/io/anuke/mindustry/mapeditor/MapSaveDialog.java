@@ -12,7 +12,7 @@ public class MapSaveDialog extends FloatingDialog{
 	private TextField field;
 	
 	public MapSaveDialog(Consumer<String> cons){
-		super("Save Map");
+		super("$text.editor.savemap");
 		field = new TextField();
 		
 		Mindustry.platforms.addDialog(field);
@@ -23,22 +23,22 @@ public class MapSaveDialog extends FloatingDialog{
 				Map map = Vars.world.maps().getMap(field.getText());
 				if(map != null){
 					if(map.custom){
-						return "[accent]Warning!\nThis overwrites an existing map.";
+						return "$text.editor.overwrite";
 					}else{
-						return "[crimson]Cannot overwrite default map!";
+						return "$text.editor.failoverwrite";
 					}
 				}
 				return "";
 			}).colspan(2);
 			content().row();
-			content().add("Map Name:  ");
+			content().add("$text.editor.mapname").padRight(14f);
 			content().add(field).size(220f, 48f);
 		});
 		
 		buttons().defaults().size(200f, 50f).pad(2f);
-		buttons().addButton("Cancel", this::hide);
+		buttons().addButton("$text.cancel", this::hide);
 		
-		TextButton button = new TextButton("Save");
+		TextButton button = new TextButton("$text.save");
 		button.clicked(() -> {
 			if(!invalid()){
 				cons.accept(field.getText());

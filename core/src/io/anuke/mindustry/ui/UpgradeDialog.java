@@ -42,7 +42,7 @@ public class UpgradeDialog extends FloatingDialog{
 		
 		int i = 0;
 		for(Weapon weapon : Weapon.values()){
-			TextButton button = new TextButton(weapon.name());
+			TextButton button = new TextButton("$weapon."+weapon.name()+".name");
 			
 			Image img = new Image(Draw.region(weapon.name()));
 			button.add(img).size(8*5);
@@ -81,7 +81,7 @@ public class UpgradeDialog extends FloatingDialog{
 				String description = weapon.description;
 				
 				tiptable.background("pane");
-				tiptable.add("[orange]" + weapon.name(), 0.5f).left().padBottom(4f);
+				tiptable.add("[orange]" + weapon.localized(), 0.5f).left().padBottom(4f);
 				
 				Table reqtable = new Table();
 				

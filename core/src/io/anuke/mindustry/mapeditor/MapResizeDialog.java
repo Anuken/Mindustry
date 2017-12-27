@@ -13,7 +13,7 @@ public class MapResizeDialog extends FloatingDialog{
 	int width, height;
 	
 	public MapResizeDialog(MapEditor editor, BiConsumer<Integer, Integer> cons){
-		super("resize map");
+		super("$text.editor.resizemap");
 		shown(() -> {
 			content().clear();
 			Pixmap pix = editor.pixmap();
@@ -29,7 +29,7 @@ public class MapResizeDialog extends FloatingDialog{
 				for(int i = 0; i < MapEditor.validMapSizes.length; i ++)
 					if(MapEditor.validMapSizes[i] == curr) idx = i;
 				
-				table.add(d == 0 ? "Width: ": "Height: ");
+				table.add(d == 0 ? "$text.width": "$text.height").padRight(8f);
 				ButtonGroup<TextButton> group = new ButtonGroup<>();
 				for(int i = 0; i < MapEditor.validMapSizes.length; i ++){
 					int size = MapEditor.validMapSizes[i];
@@ -49,7 +49,7 @@ public class MapResizeDialog extends FloatingDialog{
 			}
 			
 			content().label(() -> 
-				width + height > 512 ? "[scarlet]Warning!\n[]Maps larger than 256 units may be laggy and unstable." : ""
+				width + height > 512 ? "$text.editor.resizebig" : ""
 			).get().setAlignment(Align.center, Align.center);
 			content().row();
 			content().add(table);
@@ -57,8 +57,8 @@ public class MapResizeDialog extends FloatingDialog{
 		});
 		
 		buttons().defaults().size(200f, 50f);
-		buttons().addButton("Cancel", this::hide);
-		buttons().addButton("Resize", () -> {
+		buttons().addButton("$text.cancel", this::hide);
+		buttons().addButton("$text.editor.resize", () -> {
 			cons.accept(width, height);
 			hide();
 		});

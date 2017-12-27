@@ -20,12 +20,6 @@ public class PowerLaser extends Generator{
 	}
 	
 	@Override
-	public void getStats(Array<String> list){
-		super.getStats(list);
-		list.add("[powerinfo]Laser Range: " + laserRange + " tiles");
-	}
-	
-	@Override
 	public void update(Tile tile){
 		distributeLaserPower(tile);
 	}

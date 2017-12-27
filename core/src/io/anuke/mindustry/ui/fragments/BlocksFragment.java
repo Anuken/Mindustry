@@ -233,6 +233,12 @@ public class BlocksFragment implements Fragment{
 				}
 				
 				for(String s : statlist){
+					if(s.contains(":")) {
+					    String color = s.substring(0, s.indexOf("]")+1);
+						String first = s.substring(color.length(), s.indexOf(":")).replace("/", "").replace(" ", "").toLowerCase();
+						String last = s.substring(s.indexOf(":"), s.length());
+						s = color + Bundles.get("text.blocks." + first) + last;
+					}
 					table.add(s).left();
 					table.row();
 				}

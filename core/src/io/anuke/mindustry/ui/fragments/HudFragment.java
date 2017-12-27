@@ -152,7 +152,7 @@ public class HudFragment implements Fragment{
 
 	private String getEnemiesRemaining() {
 		if(control.getEnemiesRemaining() == 1) {
-			return Bundles.format("text.single", control.getEnemiesRemaining());
+			return Bundles.format("text.enemies.single", control.getEnemiesRemaining());
 		} else return Bundles.format("text.enemies", control.getEnemiesRemaining());
 	}
 	
@@ -215,7 +215,7 @@ public class HudFragment implements Fragment{
 			if(amount > 99999999){
 				formatted = "inf";
 			}
-			Image image = new Image(Draw.region("icon-" + items[i]));
+			Image image = new Image(Draw.region("icon-" + items[i].name()));
 			Label label = new Label(formatted);
 			label.setFontScale(fontscale*1.5f);
 			itemtable.add(image).size(8*3);

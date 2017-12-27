@@ -28,7 +28,7 @@ public class Pump extends LiquidBlock{
 	@Override
 	public void getStats(Array<String> list){
 		super.getStats(list);
-		list.add("[liquidinfo]Pump Speed: " + Strings.toFixed(60f*pumpAmount, 1) + "/s");
+		list.add("[liquidinfo]Liquid/second: " + Strings.toFixed(60f*pumpAmount, 1));
 	}
 	
 	@Override

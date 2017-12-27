@@ -2,6 +2,7 @@ package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Tutorial;
 import io.anuke.mindustry.core.Tutorial.Stage;
@@ -15,6 +16,7 @@ import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.core.KeyBinds;
 import io.anuke.ucore.core.KeyBinds.Keybind;
 import io.anuke.ucore.scene.ui.SettingsDialog.SettingsTable.Setting;
+import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
 import java.io.File;
@@ -61,6 +63,17 @@ public class BundleUtil {
             write("block." + block.name + ".name=" + block.formalName);
             if(block.fullDescription != null) write("block." + block.name + ".fulldescription=" + block.fullDescription);
             if(block.description != null) write("block." + block.name + ".description=" + block.description);
+
+            Array<String> a = new Array<>();
+            block.getStats(a);
+            for(String s : a){
+                if(s.contains(":")) {
+                    String color = s.substring(0, s.indexOf("]")+1);
+                    String first = s.substring(color.length(), s.indexOf(":")).replace("/", "").replace(" ", "").toLowerCase();
+                    String last = s.substring(s.indexOf(":"), s.length());
+                    s = color + Bundles.getNotNull("text.blocks." + first) + last;
+                }
+            }
         }
     }
 

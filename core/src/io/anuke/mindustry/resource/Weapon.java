@@ -104,6 +104,10 @@ public enum Weapon{
 	public final String description;
 	
 	Vector2 vector = new Vector2();
+
+	public String localized(){
+		return Bundles.get("weapon."+name() + ".name");
+	}
 	
 	private Weapon(float reload, BulletType type, ItemStack... requirements){
 		this.reload = reload;

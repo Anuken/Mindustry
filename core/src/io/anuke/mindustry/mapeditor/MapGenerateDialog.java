@@ -24,7 +24,7 @@ public class MapGenerateDialog extends FloatingDialog{
 	private boolean loading;
 	
 	public MapGenerateDialog(MapEditor editor) {
-		super("generate");
+		super("$text.generate");
 		this.editor = editor;
 		
 		Stack stack = new Stack();
@@ -64,13 +64,13 @@ public class MapGenerateDialog extends FloatingDialog{
 		content().add(pane).fillY();
 		
 		buttons().defaults().size(170f, 50f).pad(4f);
-		buttons().addButton("Back", this::hide);
-		buttons().addButton("Randomize", () ->{ 
+		buttons().addButton("$text.back", this::hide);
+		buttons().addButton("$text.randomize", () ->{
 			editor.getFilter().randomize();
 			apply();
 		});
-		buttons().addButton("Update", this::apply);
-		buttons().addButton("Apply", () ->{
+		buttons().addButton("$text.update", this::apply);
+		buttons().addButton("$text.apply", () ->{
 			Vars.ui.showLoading();
 			
 			Timers.run(3f, () ->{

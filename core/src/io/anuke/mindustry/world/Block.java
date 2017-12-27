@@ -85,8 +85,8 @@ public class Block{
 		
 		this.name = name;
 		this.formalName = Bundles.get("block." + name + ".name", name);
-		this.description = Bundles.get("block." + name + ".description");
-		this.fullDescription = Bundles.get("block." + name + ".fulldescription");
+		this.description = Bundles.getOrNull("block." + name + ".description");
+		this.fullDescription = Bundles.getOrNull("block." + name + ".fulldescription");
 		this.solid = false;
 		this.id = lastid++;
 	}

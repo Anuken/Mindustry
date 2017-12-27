@@ -22,6 +22,7 @@ import io.anuke.ucore.graphics.Pixmaps;
 import io.anuke.ucore.scene.builders.*;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Strings;
 
 public class MapEditorDialog extends Dialog{
@@ -37,12 +38,12 @@ public class MapEditorDialog extends Dialog{
 	private ButtonGroup<ImageButton> blockgroup;
 	
 	public MapEditorDialog(MapEditor editor){
-		super("Map Editor", "dialog");
+		super("$text.mapeditor", "dialog");
 		this.editor = editor;
 		dialog = new MapGenerateDialog(editor);
 		view = new MapView(editor);
 		
-		openFile = new FileChooser("Load Image", FileChooser.pngFilter, true, file -> {
+		openFile = new FileChooser("$text.loadimage", FileChooser.pngFilter, true, file -> {
 			Vars.ui.showLoading();
 			Timers.run(3f, () -> {
 				try{
@@ -51,17 +52,17 @@ public class MapEditorDialog extends Dialog{
 						editor.setPixmap(pixmap);
 						view.clearStack();
 					}else{
-						Vars.ui.showError("[orange]Invalid image dimensions![]\nValid map dimensions: " + Arrays.toString(MapEditor.validMapSizes));
+						Vars.ui.showError(Bundles.format("text.editor.badsize", Arrays.toString(MapEditor.validMapSizes)));
 					}
 				}catch (Exception e){
-					Vars.ui.showError("Error loading image file:\n[orange]" + Strings.parseException(e, false));
+					Vars.ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
 					e.printStackTrace();
 				}
 				Vars.ui.hideLoading();
 			});
 		});
 		
-		saveFile = new FileChooser("Save Image", false, file -> {
+		saveFile = new FileChooser("$saveimage", false, file -> {
 			if(!file.extension().toLowerCase().equals(".png")){
 				file = file.parent().child(file.nameWithoutExtension() + ".png");
 			}
@@ -71,7 +72,7 @@ public class MapEditorDialog extends Dialog{
 				try{
 					Pixmaps.write(editor.pixmap(), result);
 				}catch (Exception e){
-					Vars.ui.showError("Error saving image file:\n[orange]" + Strings.parseException(e, false));
+					Vars.ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
 					if(!Vars.android) e.printStackTrace();
 				}
 				Vars.ui.hideLoading();
@@ -171,48 +172,48 @@ public class MapEditorDialog extends Dialog{
 				
 				new imagebutton("icon-terrain", isize, () ->
 					dialog.show()
-				).text("generate");
+				).text("$text.editor.generate");
 				
 				row();
 				
 				new imagebutton("icon-resize", isize, () ->
 					resizeDialog.show()
-				).text("resize").padTop(4f);
+				).text("$text.editor.resize").padTop(4f);
 				
 				row();
 				
 				new imagebutton("icon-load-map", isize, () ->
 					loadDialog.show()
-				).text("load map");
+				).text("$text.editor.loadmap");
 				
 				row();
 				
 				new imagebutton("icon-save-map", isize, ()->
 					saveDialog.show()
-				).text("save map");
+				).text("$text.editor.savemap");
 				
 				row();
 				
 				new imagebutton("icon-load-image", isize, () ->
 					openFile.show()
-				).text("load image");
+				).text("$text.editor.loadimage");
 				
 				row();
 				
 				new imagebutton("icon-save-image", isize, () ->
 					saveFile.show()
-				).text("save image");
+				).text("$text.editor.saveimage");
 				
 				row();
 				
 				new imagebutton("icon-back", isize, () -> {
 					if(!saved){
-						Vars.ui.showConfirm("Confirm Exit", "[scarlet]You have unsaved changes![]\nAre you sure you want to exit?",
+						Vars.ui.showConfirm("$text.confirm", "$text.editor.unsaved",
 								MapEditorDialog.this::hide);
 					}else{
 						hide();
 					}
-				}).padBottom(0).text("back");
+				}).padBottom(0).text("$text.back");
 				
 			}}.left().growY().end();
 			
@@ -260,7 +261,7 @@ public class MapEditorDialog extends Dialog{
 					margin(10f);
 					Slider slider = new Slider(0, MapEditor.brushSizes.length-1, 1, false);
 					slider.moved(f -> editor.setBrushSize(MapEditor.brushSizes[(int)(float)f]));
-					new label(() -> "Brush size: " + MapEditor.brushSizes[(int)slider.getValue()]).left();
+					new label(() -> Bundles.format("text.editor.brushsize", MapEditor.brushSizes[(int)slider.getValue()])).left();
 					row();
 					add(slider).growX().padTop(4f);
 				}}.growX().end();
@@ -304,15 +305,15 @@ public class MapEditorDialog extends Dialog{
 		}
 		
 		if(playerSpawns == 0){
-			Vars.ui.showError("This map has no player spawnpoint!");
+			Vars.ui.showError("$text.editor.noplayerspawn");
 			return false;
 		}else if(playerSpawns > 1){
-			Vars.ui.showError("Maps cannot have more than one\nplayer spawnpoint!");
+			Vars.ui.showError("$text.editor.manyplayerspawns");
 			return false;
 		}
 		
 		if(enemySpawns > MapEditor.maxSpawnpoints){
-			Vars.ui.showError("Cannot have more than\n" + MapEditor.maxSpawnpoints + " enemy spawnpoints!");
+			Vars.ui.showError(Bundles.format("text.editor.manyenemyspawns", MapEditor.maxSpawnpoints));
 			return false;
 		}
 		
@@ -347,7 +348,7 @@ public class MapEditorDialog extends Dialog{
 		group.getButtons().get(2).setChecked(true);
 		
 		Table extra = new Table("button");
-		extra.labelWrap(() -> editor.getDrawBlock().name).width(180f).center();
+		extra.labelWrap(() -> editor.getDrawBlock().formalName).width(180f).center();
 		table.add(extra).growX();
 		table.row();
 		table.add(pane).growY().fillX();

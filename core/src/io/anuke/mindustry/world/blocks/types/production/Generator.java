@@ -42,12 +42,12 @@ public class Generator extends PowerBlock{
 		super.getStats(list);
 
 		if(hasLasers){
-			list.add("[powerinfo]Laser range: " + laserRange + " blocks");
+			list.add("[powerinfo]Laser tile range: " + laserRange);
 			list.add("[powerinfo]Max power transfer/second: " + Strings.toFixed(powerSpeed * 2, 2));
 		}
 
 		if(explosive){
-			list.add("[orange]Highly explosive!");
+			list.add("[orange]" + Bundles.get("text.blocks.explosive"));
 		}
 	}
 

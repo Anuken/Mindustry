@@ -87,12 +87,10 @@ public class PlacementFragment implements Fragment{
 					
 					defaults().size(54, 58).pad(0);
 					
-					int d = 0;
-					
 					for(PlaceMode mode : PlaceMode.values()){
 						if(!mode.shown || !mode.delete) continue;
 						
-						defaults().padBottom(d < 2 ? -5.5f : 0);
+						defaults().padBottom(-5.5f);
 						
 						new imagebutton("icon-" + mode.name(), "toggle",  10*3, ()->{
 							control.getInput().resetCursor();

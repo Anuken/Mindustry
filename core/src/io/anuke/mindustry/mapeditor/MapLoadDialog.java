@@ -14,11 +14,11 @@ public class MapLoadDialog extends FloatingDialog{
 	private Map selected = Vars.world.maps().getMap(0);
 
 	public MapLoadDialog(Consumer<Map> loader) {
-		super("load map");
+		super("$text.editor.loadmap");
 
 		rebuild();
 
-		TextButton button = new TextButton("Load");
+		TextButton button = new TextButton("$text.load");
 		button.setDisabled(() -> selected == null);
 		button.clicked(() -> {
 			if (selected != null) {
@@ -28,7 +28,7 @@ public class MapLoadDialog extends FloatingDialog{
 		});
 
 		buttons().defaults().size(200f, 50f);
-		buttons().addButton("Cancel", this::hide);
+		buttons().addButton("$text.cancel", this::hide);
 		buttons().add(button);
 	}
 
@@ -53,7 +53,7 @@ public class MapLoadDialog extends FloatingDialog{
 		for (Map map : Vars.world.maps().list()) {
 			if (!map.visible) continue;
 
-			TextButton button = new TextButton(map.name, "toggle");
+			TextButton button = new TextButton(map.localized(), "toggle");
 			button.add(new BorderImage(map.texture, 2f)).size(16 * 4f);
 			button.getCells().reverse();
 			button.clicked(() -> selected = map);
@@ -63,7 +63,7 @@ public class MapLoadDialog extends FloatingDialog{
 			if (++i % maxcol == 0) table.row();
 		}
 
-		content().add("Select a map to load:");
+		content().add("$text.editor.loadmap");
 		content().row();
 		content().add(pane);
 	}

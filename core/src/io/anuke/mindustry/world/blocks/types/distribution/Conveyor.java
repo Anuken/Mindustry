@@ -40,7 +40,7 @@ public class Conveyor extends Block{
 	@Override
 	public void getStats(Array<String> list){
 		super.getStats(list);
-		list.add("[iteminfo]Move Speed: " + Strings.toFixed(speed * 60, 1) + " units/s");
+		list.add("[iteminfo]Item Speed/second: " + Strings.toFixed(speed * 60, 1));
 	}
 	
 	@Override

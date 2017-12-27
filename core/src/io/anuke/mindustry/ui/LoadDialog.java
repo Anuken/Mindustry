@@ -54,7 +54,7 @@ public class LoadDialog extends FloatingDialog{
 			button.row();
 
 			Label info = new Label("[gray]" + (!SaveIO.isSaveValid(i) ? Bundles.get("text.empty") : SaveIO.getMode(i) + ", "
-					+ SaveIO.getMap(i).name + ", " + Bundles.format("text.save.wave", SaveIO.getWave(i)) + "\n"
+					+ Bundles.get("map."+SaveIO.getMap(i).name+".name", SaveIO.getMap(i).name) + ", " + Bundles.format("text.save.wave", SaveIO.getWave(i)) + "\n"
 					+ Bundles.format("text.save.date", SaveIO.getTimeString(i))));
 			info.setAlignment(Align.center, Align.center);
 
