@@ -20,6 +20,7 @@ import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.graphics.BlockRenderer;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.PlaceMode;
+import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
@@ -383,6 +384,11 @@ public class Renderer extends RendererModule{
 		}else if(player.breakMode.delete && control.input.drawPlace() && player.recipe == null){ //TODO test!
 			player.breakMode.draw(control.input.getBlockX(), control.input.getBlockY(), 
 					control.input.getBlockEndX(), control.input.getBlockEndY());
+		}
+
+		if(Vars.ui.getTools().confirming){
+			ToolFragment t = Vars.ui.getTools();
+			PlaceMode.areaDelete.draw(t.px, t.py, t.px2, t.py2);
 		}
 		
 		Draw.reset();

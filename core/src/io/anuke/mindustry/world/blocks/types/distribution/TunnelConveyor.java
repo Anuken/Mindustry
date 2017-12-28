@@ -23,7 +23,7 @@ public class TunnelConveyor extends Block{
 	
 	@Override
 	public void handleItem(Item item, Tile tile, Tile source){
-		Tile tunnel = getDestTunnel(tile);
+		Tile tunnel = getDestTunnel(tile, item);
 		if(tunnel == null) return; //TODO how is this possible? HOW DID THEY ACHIEVE SUCH A FEAT?!
 		Tile to = tunnel.getNearby()[tunnel.getRotation()];
 		
@@ -37,7 +37,8 @@ public class TunnelConveyor extends Block{
 	public boolean acceptItem(Item item, Tile dest, Tile source){
 		int rot = source.relativeTo(dest.x, dest.y);
 		if(rot != (dest.getRotation() + 2)%4) return false;
-		Tile tunnel = getDestTunnel(dest);
+		Tile tunnel = getDestTunnel(dest, item);
+
 		if(tunnel != null){
 			Tile to = tunnel.getNearby()[tunnel.getRotation()];
 			return to != null && !(to.block() instanceof TunnelConveyor) && to.block().acceptItem(item, to, tunnel);
@@ -46,12 +47,14 @@ public class TunnelConveyor extends Block{
 		}
 	}
 	
-	Tile getDestTunnel(Tile tile){
+	Tile getDestTunnel(Tile tile, Item item){
 		Tile dest = tile;
 		int rel = (tile.getRotation() + 2)%4;
 		for(int i = 0; i < maxdist; i ++){
 			dest = dest.getNearby()[rel];
-			if(dest != null && dest.block() instanceof TunnelConveyor && dest.getRotation() == rel){
+			if(dest != null && dest.block() instanceof TunnelConveyor && dest.getRotation() == rel
+					&& dest.getNearby()[rel] != null
+					&& dest.getNearby()[rel].block().acceptItem(item, dest.getNearby()[rel], dest)){
 				return dest;
 			}
 		}

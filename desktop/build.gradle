@@ -7,6 +7,7 @@ project.ext.mainClassName = "io.anuke.mindustry.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets");
 
 def PACKR_DIR = "/home/anuke/Documents/Packr/"
+def ICON_DIR = new File("core/assets/sprites/icon.icns")
 
 task run(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName
@@ -66,6 +67,10 @@ ext.getPlatform = {
 	}
 }
 
+ext.getPackage = {
+    return project.ext.mainClassName.substring(0, project.ext.mainClassName.indexOf("desktop") - 1)
+}
+
 //note: call desktop:dist beforehand
 task packrCmd(type: Exec) {
 
@@ -74,15 +79,59 @@ task packrCmd(type: Exec) {
 		from "build/libs/desktop-release.jar"
 	}
 
-	commandLine "java", "-jar", PACKR_DIR+"packr.jar", "--verbose", /*"--resources", project.ext.assetsDir,*/ "--platform", getPlatform(), "--executable", appName, "--output", "packr-out/", "--mainclass", project.ext.mainClassName, "--jdk", PACKR_DIR+"jdk-"+getPlatform()+".zip", "--classpath", 
-		"--", PACKR_DIR+"config.json"
+	commandLine "java", "-jar", PACKR_DIR+"packr.jar",
+            "--verbose",
+            "--bundle", getPackage(),
+            "--platform", getPlatform(),
+            "--executable", appName,
+            "--output", "packr-out/",
+            "--mainclass", project.ext.mainClassName,
+            "--jdk", PACKR_DIR+"jdk-"+getPlatform()+".zip",
+            "--icon", ICON_DIR.getAbsolutePath(),
+            "--classpath", "--", PACKR_DIR+"config.json"
 	
+}
+
+task fixMac (type: Copy){
+    dependsOn "packrCmd"
+
+    into "packr-out/" + appName + ".app/Contents/"
+    from "packr-out/Contents/"
+
+    doLast{
+        delete{
+            delete "packr-out/Contents/"
+        }
+    }
+}
+
+task fixWindows32 (type: Copy){
+    dependsOn "packrCmd"
+
+    into "packr-out/jre/bin/"
+    from PACKR_DIR + "zip.dll"
+    rename ("zip.dll", "ojdkbuild_zlib.dll")
+
+    doLast{
+        copy{
+            into "packr-out/jre/bin/"
+            from PACKR_DIR + "zip.dll"
+        }
+    }
 }
 
 task packrZip(type: Zip) {
 	dependsOn "packrCmd"
 	finalizedBy "clearOut"
-	
+
+    if(getPlatform().equals("mac")){
+        dependsOn "fixMac"
+    }
+
+    if(getPlatform().equals("windows32")){
+        dependsOn "fixWindows32"
+    }
+
     from "packr-out/"
     archiveName appName + "-" + getPlatform() + ".zip"
     destinationDir(file("packr-export"))

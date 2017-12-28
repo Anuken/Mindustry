@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world;
+package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Json.Serializer;
 import com.badlogic.gdx.utils.JsonWriter.OutputType;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.graphics.Pixmaps;
 

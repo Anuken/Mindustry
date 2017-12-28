@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
@@ -18,6 +19,8 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
+
+import javax.tools.Tool;
 
 public enum PlaceMode{
 	cursor{
@@ -77,12 +80,14 @@ public enum PlaceMode{
 		{
 			delete = true;
 			shown = true;
+			both = true;
 		}
 	},
 	holdDelete{
 		{
 			delete = true;
 			shown = true;
+			both = true;
 		}
 		
 		public void draw(int tilex, int tiley, int endx, int endy){
@@ -175,9 +180,22 @@ public enum PlaceMode{
 		}
 		
 		public void released(int tilex, int tiley, int endx, int endy){
+
 			process(tilex, tiley, endx, endy);
 			tilex = this.tilex; tiley = this.tiley; 
 			endx = this.endx; endy = this.endy;
+
+			if(Vars.android){
+				ToolFragment t = Vars.ui.getTools();
+				if(!t.confirming || t.px != tilex || t.py != tiley || t.px2 != endx || t.py2 != endy) {
+					t.confirming = true;
+					t.px = tilex;
+					t.py = tiley;
+					t.px2 = endx;
+					t.py2 = endy;
+					return;
+				}
+			}
 			
 			boolean first = true;
 			
@@ -365,6 +383,7 @@ public enum PlaceMode{
 	public boolean showRotate;
 	public boolean showCancel;
 	public boolean delete = false;
+	public boolean both = false;
 	
 	public void draw(int tilex, int tiley, int endx, int endy){
 		

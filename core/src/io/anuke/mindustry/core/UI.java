@@ -45,6 +45,8 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Bundles;
 
+import javax.tools.Tool;
+
 public class UI extends SceneModule{
 	Table loadingtable, desctable, configtable;
 	MindustrySettingsDialog prefs;
@@ -459,6 +461,10 @@ public class UI extends SceneModule{
 	
 	public MapEditorDialog getEditorDialog(){
 		return editorDialog;
+	}
+
+	public ToolFragment getTools(){
+		return (ToolFragment)toolfrag;
 	}
 	
 	public MapEditor getEditor(){

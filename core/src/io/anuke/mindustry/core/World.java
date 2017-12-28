@@ -11,6 +11,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.io.Maps;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.ucore.entities.Entities;
@@ -26,7 +27,7 @@ public class World extends Module{
 	private Tile[][] tiles;
 	private Tile[] temptiles = new Tile[4];
 	private Pathfind pathfind = new Pathfind();
-	private Maps maps = new Maps();
+	private io.anuke.mindustry.io.Maps maps = new io.anuke.mindustry.io.Maps();
 	
 	public World(){
 		maps.loadMaps();
