@@ -1,7 +1,7 @@
 {
 com.badlogic.gdx.graphics.g2d.BitmapFont: {
 	default-font: {
-		file: prose.fnt,
+		file: square.fnt,
 		markupEnabled: true,
 		scale: 0.5
 	}

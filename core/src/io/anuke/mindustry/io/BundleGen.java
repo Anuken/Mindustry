@@ -1,6 +1,5 @@
 package io.anuke.mindustry.io;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
@@ -19,13 +18,11 @@ import io.anuke.ucore.scene.ui.SettingsDialog.SettingsTable.Setting;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
-import java.io.File;
-
-public class BundleUtil {
+public class BundleGen {
     private static FileHandle file;
 
     public static void buildBundle(FileHandle file){
-        BundleUtil.file = file;
+        BundleGen.file = file;
 
         file.writeString("", false);
         write("about.text=" + join(Vars.aboutText));

@@ -10,8 +10,10 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
+import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Section;
@@ -28,11 +30,14 @@ import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.scene.ui.layout.Value;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Strings;
 
 public class BlocksFragment implements Fragment{
-	private Table desctable;
+	private Table desctable, itemtable, blocks;
+	private Stack stack = new Stack();
 	private Array<String> statlist = new Array<>();
 	private boolean shown = true;
 	
@@ -42,15 +47,25 @@ public class BlocksFragment implements Fragment{
 			abottom();
 			aright();
 
-            visible(() -> !GameState.is(State.menu));
+            visible(() -> !GameState.is(State.menu) && shown);
 
-			Table blocks = new table(){{
+			blocks = new table(){{
 
-				new table("button") {{
-					visible(() -> player.recipe != null);
-					desctable = get();
-					fillX();
-				}}.end().uniformX();
+				itemtable = new Table("button");
+				itemtable.setVisible(() -> player.recipe == null);
+
+				desctable = new Table("button");
+				desctable.setVisible(() -> player.recipe != null);
+				desctable.update(() -> {
+					if(player.recipe == null && desctable.getChildren().size != 0){
+						desctable.clear();
+					}
+				});
+
+				stack.add(itemtable);
+				stack.add(desctable);
+
+				add(stack).fillX().uniformX();
 
 				row();
 
@@ -83,7 +98,7 @@ public class BlocksFragment implements Fragment{
 							}
 						});
 						button.setName("sectionbutton" + sec.name());
-						add(button).growX().height(54).padTop(sec.ordinal() <= 2 ? -10 : -5);
+						add(button).growX().height(54).padRight(-1).padTop(sec.ordinal() <= 2 ? -10 : -5);
 						button.getImageCell().size(40).padBottom(4).padTop(2);
 						group.add(button);
 
@@ -110,7 +125,7 @@ public class BlocksFragment implements Fragment{
 								}
 							});
 
-							table.add(image).size(size + 8).pad(2);
+							table.add(image).size(size + 8);
 							image.getImageCell().size(size);
 
 							image.update(() -> {
@@ -146,35 +161,17 @@ public class BlocksFragment implements Fragment{
 				visible(() -> !GameState.is(State.menu) && shown);
 
 			}}.end().get();
-
-			row();
-
-			ImageButton buttons[] = new ImageButton[2];
-			float size = 46f;
-
-			float t = 0.2f;
-			Interpolation ip = Interpolation.pow3Out;
-
-			//TODO fix glitch when resizing
-			buttons[0] = new imagebutton("icon-arrow-down", 10*2, () -> {
-				if(blocks.getActions().size != 0) return;
-				blocks.actions(Actions.translateBy(0, -blocks.getHeight(), t, ip), Actions.call(() -> shown = false));
-				buttons[0].actions(Actions.fadeOut(t));
-				buttons[1].actions(Actions.fadeIn(t));
-			}).padBottom(-5).visible(() -> shown).height(size).uniformX().fillX()
-					.update(i -> i.getStyle().imageUp = Core.skin.getDrawable(shown ? "icon-arrow-down" : "icon-arrow-up")).get();
-
-			buttons[1] = new imagebutton("icon-arrow-up", 10*2, () -> {
-				if(blocks.getActions().size != 0) return;
-				blocks.actions(Actions.translateBy(0, blocks.getHeight(), t, ip));
-				shown = true;
-				buttons[0].actions(Actions.fadeIn(t));
-				buttons[1].actions(Actions.fadeOut(t));
-			}).touchable(() -> shown ? Touchable.disabled : Touchable.enabled).size(size).padBottom(-5).padLeft(-size).get();
-
-			buttons[1].getColor().a = 0f;
 		}}.end();
 	}
+
+	public void toggle(boolean show, float t, Interpolation ip){
+	    if(!show){
+            blocks.actions(Actions.translateBy(0, -blocks.getHeight() - stack.getHeight(), t, ip), Actions.call(() -> shown = false));
+        }else{
+	    	shown = true;
+            blocks.actions(Actions.translateBy(0, -blocks.getTranslation().y, t, ip));
+        }
+    }
 	
 	void updateRecipe(){
 		Recipe recipe = player.recipe;
@@ -197,7 +194,7 @@ public class BlocksFragment implements Fragment{
 		header.addImage(region).size(8*5).padTop(4);
 		Label nameLabel = new Label(recipe.result.formalName);
 		nameLabel.setWrap(true);
-		header.add(nameLabel).padLeft(2).width(130f);
+		header.add(nameLabel).padLeft(2).width(120f);
 		
 		//extra info
 		if(recipe.result.fullDescription != null){
@@ -287,5 +284,41 @@ public class BlocksFragment implements Fragment{
 		label.setWrap(true);
 		desctable.add(label).width(200).padTop(4).padBottom(2);
 		
+	}
+
+	public void updateItems(){
+
+		itemtable.clear();
+		itemtable.left();
+
+		if(control.getMode().infiniteResources){
+			return;
+		}
+
+		Item[] items = Item.values();
+
+		for(int i = 0; i < control.getItems().length; i ++){
+			int amount = control.getItems()[i];
+			if(amount == 0) continue;
+			String formatted = amount > 99999999 ? "inf" : format(amount);
+			Image image = new Image(Draw.region("icon-" + items[i].name()));
+			Label label = new Label(formatted);
+			label.setFontScale(fontscale*1.5f);
+			itemtable.add(image).size(8*3);
+			itemtable.add(label).expandX().left();
+			if(i % 2 == 1 && i > 0) itemtable.row();
+		}
+	}
+
+	String format(int number){
+		if(number > 1000000) {
+			return Strings.toFixed(number/1000000f, 1) + "[gray]mil";
+		}else if(number > 10000){
+			return number/1000 + "[gray]k";
+		}else if(number > 1000){
+			return Strings.toFixed(number/1000f, 1) + "[gray]k";
+		}else{
+			return number + "";
+		}
 	}
 }

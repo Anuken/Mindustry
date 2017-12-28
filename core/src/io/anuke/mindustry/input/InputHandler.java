@@ -190,7 +190,8 @@ public abstract class InputHandler extends InputAdapter{
 					int worldy = dy + offsety + y;
 					if(!(worldx == x && worldy == y)){
 						Tile toplace = world.tile(worldx, worldy);
-						toplace.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
+						if(toplace != null)
+							toplace.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
 					}
 					
 					if(effects) Effects.effect(Fx.place, worldx * Vars.tilesize, worldy * Vars.tilesize);
@@ -201,6 +202,8 @@ public abstract class InputHandler extends InputAdapter{
 		}
 		
 		if(effects && sound) Sounds.play("place");
+
+		result.placed(tile);
 	}
 	
 	public void breakBlock(int x, int y, boolean sound){

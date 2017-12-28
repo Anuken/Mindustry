@@ -48,7 +48,7 @@ public class Block{
 	/**whether you can break this with rightclick*/
 	public boolean breakable;
 	/**whether this block can be drowned in*/
-	public  boolean liquid;
+	public boolean liquid;
 	/**time it takes to break*/
 	public float breaktime = 18;
 	/**tile entity health*/
@@ -91,12 +91,15 @@ public class Block{
 		this.id = lastid++;
 	}
 	
-	
+
+	public boolean isLayer(Tile tile){return true;}
+	public boolean isLayer2(Tile tile){return true;}
 	public void drawLayer(Tile tile){}
 	public void drawLayer2(Tile tile){}
 	public void drawSelect(Tile tile){}
 	public void drawPlace(int x, int y, int rotation, boolean valid){}
 	public void postInit(){}
+	public void placed(Tile tile){}
 	
 	public void getStats(Array<String> list){
 		list.add("[gray]size: " + width + "x" + height);
@@ -124,6 +127,7 @@ public class Block{
 	}
 
 	public void handleItem(Item item, Tile tile, Tile source){
+		if(tile.entity == null) return;
 		tile.entity.addItem(item, 1);
 	}
 	

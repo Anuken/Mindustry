@@ -52,14 +52,17 @@ public class Drill extends Block{
 			tryDump(tile);
 		}
 	}
+
+	@Override
+	public boolean isLayer(Tile tile){
+		return tile.floor() != resource && resource != null && !(resource.drops.equals(tile.floor().drops));
+	}
 	
 	@Override
 	public void drawLayer(Tile tile){
-		if(tile.floor() != resource && resource != null && !(resource.drops.equals(tile.floor().drops))){
-			Draw.colorl(0.85f + Mathf.absin(Timers.time(), 6f, 0.15f));
-			Draw.rect("cross", tile.worldx(), tile.worldy());
-			Draw.color();
-		}
+		Draw.colorl(0.85f + Mathf.absin(Timers.time(), 6f, 0.15f));
+		Draw.rect("cross", tile.worldx(), tile.worldy());
+		Draw.color();
 	}
 
 }

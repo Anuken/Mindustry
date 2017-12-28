@@ -7,6 +7,7 @@ import java.io.IOException;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.DamageArea;
@@ -18,11 +19,16 @@ import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Strings;
 import io.anuke.ucore.util.Tmp;
 
-public class NuclearReactor extends LiquidItemPowerGenerator{
+//TODO possibly proken
+public class NuclearReactor extends LiquidPowerGenerator{
 	protected final int timerFuel = timers++;
-	
+
+	protected Item generateItem;
+	protected int itemInput = 5;
+	protected int itemCapacity = 30;
 	protected Color coolColor = new Color(1, 1, 1, 0f);
 	protected Color hotColor = Color.valueOf("ff9575a3");
 	protected int fuelUseTime = 140; //time to consume 1 fuel
@@ -43,6 +49,12 @@ public class NuclearReactor extends LiquidItemPowerGenerator{
 		explosionEffect = Fx.nuclearShockwave;
 		explosive = true;
 		powerCapacity = 80f;
+	}
+
+	@Override
+	public void getStats(Array<String> list){
+		super.getStats(list);
+		list.add("[powerinfo]Input Item: " + generateItem);
 	}
 	
 	@Override
@@ -139,17 +151,25 @@ public class NuclearReactor extends LiquidItemPowerGenerator{
 	@Override
 	public void drawSelect(Tile tile){
 		super.drawSelect(tile);
-		
+
 		NuclearReactorEntity entity = tile.entity();
+		Vector2 offset = getPlaceOffset();
+
+		Vars.renderer.drawBar(Color.GREEN, tile.worldx() + offset.x, tile.worldy() + 6 +
+				offset.y + height*Vars.tilesize/2f, (float)entity.getItem(generateItem) / itemCapacity);
+		Draw.reset();
 		
 		float fract = entity.heat;
 		if(fract > 0)
 			fract = Mathf.clamp(fract + 0.2f, 0.24f, 1f);
 		
-		Vector2 offset = getPlaceOffset();
-		
 		Vars.renderer.drawBar(Color.ORANGE, tile.worldx() + offset.x, 
 				tile.worldy() + Vars.tilesize * height/2f + 10 + offset.y, fract);
+	}
+
+	@Override
+	public boolean acceptItem(Item item, Tile tile, Tile source){
+		return item == generateItem && tile.entity.getItem(generateItem) < itemCapacity;
 	}
 	
 	@Override

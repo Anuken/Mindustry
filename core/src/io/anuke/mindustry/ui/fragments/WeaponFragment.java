@@ -52,7 +52,7 @@ public class WeaponFragment implements Fragment{
 			String description = weapon.description;
 				
 			tiptable.background("button");
-			tiptable.add("weapon."+weapon.name()+".name", 0.5f).left().padBottom(3f);
+			tiptable.add("$weapon."+weapon.name()+".name", 0.5f).left().padBottom(3f);
 				
 			tiptable.row();
 			tiptable.row();

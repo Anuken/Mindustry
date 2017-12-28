@@ -58,8 +58,7 @@ public class UI extends SceneModule{
 	MapEditor editor;
 	boolean wasPaused = false;
 	
-	private Fragment blockfrag = new BlocksFragment(),
-			menufrag = new MenuFragment(),
+	private Fragment menufrag = new MenuFragment(),
 			toolfrag = new ToolFragment(),
 			hudfrag = new HudFragment(),
 			placefrag = new PlacementFragment(),
@@ -291,8 +290,6 @@ public class UI extends SceneModule{
 		build.begin(scene);
 		
 		weaponfrag.build();
-
-		blockfrag.build();
 		
 		hudfrag.build();
 		

@@ -5,12 +5,14 @@ import static io.anuke.mindustry.Vars.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 
+import com.badlogic.gdx.math.Interpolation;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.GameMode;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Settings;
@@ -20,16 +22,21 @@ import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.Image;
+import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
 public class HudFragment implements Fragment{
-	private Table itemtable, respawntable;
-	private Cell<Table> itemcell;
+	private ImageButton menu, flip, pause;
+	private Table respawntable;
+	private Table wavetable;
+	private boolean shown = true;
+	private BlocksFragment blockfrag = new BlocksFragment();
 	
 	public void build(){
+
 		//menu at top left
 		new table(){{
 			atop();
@@ -37,41 +44,50 @@ public class HudFragment implements Fragment{
 			
 			new table(){{
 				left();
-				defaults().size(68).left();
+				float dsize = 58;
+				defaults().size(dsize).left();
 				float isize = 40;
-				
-				new imagebutton("icon-menu", isize, ()->{
-					ui.showMenu();
-				});
-				
-				new imagebutton("icon-settings", isize, ()->{
-					ui.showPrefs();
-				});
 
-				new imagebutton("icon-pause", isize, ()->{
+				menu = new imagebutton("icon-menu", isize, ()->{
+					ui.showMenu();
+				}).get();
+
+				flip = new imagebutton("icon-arrow-up", isize, ()->{
+					if(wavetable.getActions().size != 0) return;
+
+					float dur = 0.3f;
+					Interpolation in = Interpolation.pow3Out;
+
+					flip.getStyle().imageUp = Core.skin.getDrawable(shown ? "icon-arrow-down" : "icon-arrow-up");
+
+					if(shown){
+						blockfrag.toggle(false, dur, in);
+						wavetable.actions(Actions.translateBy(0, wavetable.getHeight() + dsize, dur, in), Actions.call(() -> shown = false));
+					}else{
+						shown = true;
+						blockfrag.toggle(true, dur, in);
+						wavetable.actions(Actions.translateBy(0, -wavetable.getTranslation().y, dur, in));
+					}
+
+				}).get();
+
+				pause = new imagebutton("icon-pause", isize, ()->{
 					GameState.set(GameState.is(State.paused) ? State.playing : State.paused);
-				}){{
-					get().update(()->{
-						get().getStyle().imageUp = Core.skin.getDrawable(GameState.is(State.paused) ? "icon-play" : "icon-pause");
-					});
-				}};
+				}).update(i -> i.getStyle().imageUp = Core.skin.getDrawable(GameState.is(State.paused) ? "icon-play" : "icon-pause")).get();
+
 			}}.end();
-			
+
 			row();
 			
 			new table(){{
-				get().setTouchable(Touchable.enabled);
+				touchable(Touchable.enabled);
+				visible(() -> shown);
 				addWaveTable();
 			}}.fillX().end();
 			
 			row();
-			
-			itemtable = new table("button").end().top().left().fillX().size(-1).get();
-			itemtable.setTouchable(Touchable.enabled);
-			itemtable.setVisible(()-> !control.getMode().infiniteResources);
-			itemcell = get().getCell(itemtable);
 
-			get().setVisible(()->!GameState.is(State.menu));
+			visible(()->!GameState.is(State.menu));
 			
 			Label fps = new Label(()->(Settings.getBool("fps") ? (Gdx.graphics.getFramesPerSecond() + " FPS") : ""));
 			row();
@@ -79,7 +95,7 @@ public class HudFragment implements Fragment{
 			
 		}}.end();
 		
-		//ui table
+		//tutorial ui table
 		new table(){{
 			control.getTutorial().buildUI(this);
 			
@@ -95,28 +111,11 @@ public class HudFragment implements Fragment{
 				new label("[orange]< "+ Bundles.get("text.paused") + " >").scale(0.75f).pad(6);
 			}}.end();
 		}}.end();
-
-		//wave table...
-		new table(){{
-			
-			if(!Vars.android){
-				atop();
-				aright();
-			}else{
-				abottom();
-				aleft();
-			}
-			
-			//addWaveTable();
-
-			visible(()->!GameState.is(State.menu));
-		}}.end();
 		
 		//respawn background table
 		new table("white"){{
 			respawntable = get();
 			respawntable.setColor(Color.CLEAR);
-			
 		}}.end();
 		
 		//respawn table
@@ -148,6 +147,8 @@ public class HudFragment implements Fragment{
 				new label("[red]DEBUG MODE").scale(0.5f).left();
 			}}.end();
 		}
+
+		blockfrag.build();
 	}
 
 	private String getEnemiesRemaining() {
@@ -159,12 +160,12 @@ public class HudFragment implements Fragment{
 	private void addWaveTable(){
 		float uheight = 66f;
 		
-		new table("button"){{
+		wavetable = new table("button"){{
 			aleft();
 			new table(){{
 				aleft();
 
-				new label(() -> Bundles.format("text.wave", control.getWave())).scale(fontscale*1.5f).left();
+				new label(() -> Bundles.format("text.wave", control.getWave())).scale(fontscale*1.5f).left().padLeft(-6);
 
 				row();
 			
@@ -172,15 +173,15 @@ public class HudFragment implements Fragment{
 					getEnemiesRemaining() :
 						(control.getTutorial().active() || Vars.control.getMode().toggleWaves) ? "$text.waiting"
 								: Bundles.format("text.wave.waiting", (int) (control.getWaveCountdown() / 60f)))
-				.minWidth(140).left();
+				.minWidth(140).padLeft(-6).padRight(-12).left();
 
-				margin(12f);
+				margin(10f);
 				get().marginLeft(6);
 			}}.left().end();
 			
 			playButton(uheight);
-		}}.height(uheight).fillX().expandX().end();
-		
+		}}.height(uheight).fillX().expandX().end().get();
+		wavetable.getParent().getParent().swapActor(wavetable.getParent(), menu.getParent());
 	}
 	
 	private void playButton(float uheight){
@@ -196,36 +197,12 @@ public class HudFragment implements Fragment{
 			l.setTouchable(!paused ? Touchable.enabled : Touchable.disabled);
 		});
 	}
-	
-	public void updateItems(){
-		
-		itemtable.clear();
-		itemtable.left();
-		
-		if(control.getMode().infiniteResources){
-			return;
-		}
-		
-		Item[] items = Item.values();
 
-		for(int i = 0; i < control.getItems().length; i ++){
-			int amount = control.getItems()[i];
-			if(amount == 0) continue;
-			String formatted = Mindustry.platforms.format(amount);
-			if(amount > 99999999){
-				formatted = "inf";
-			}
-			Image image = new Image(Draw.region("icon-" + items[i].name()));
-			Label label = new Label(formatted);
-			label.setFontScale(fontscale*1.5f);
-			itemtable.add(image).size(8*3);
-			itemtable.add(label).left();
-			itemtable.row();
-		}
+	public void updateItems(){
+		blockfrag.updateItems();
 	}
 	
 	public void fadeRespawn(boolean in){
-		
 		respawntable.addAction(Actions.color(in ? new Color(0, 0, 0, 0.3f) : Color.CLEAR, 0.3f));
 	}
 }

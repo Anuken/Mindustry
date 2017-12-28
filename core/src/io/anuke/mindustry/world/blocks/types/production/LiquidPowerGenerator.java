@@ -91,11 +91,7 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 	public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
 		LiquidPowerEntity entity = tile.entity();
 		
-		if(liquid != generateLiquid){
-			return false;
-		}
-		
-		return entity.liquidAmount + amount < liquidCapacity && (entity.liquid == liquid || entity.liquidAmount <= 0.01f);
+		return liquid == generateLiquid && entity.liquidAmount + amount < liquidCapacity && (entity.liquid == liquid || entity.liquidAmount <= 0.01f);
 	}
 	
 	@Override

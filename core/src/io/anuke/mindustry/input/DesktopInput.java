@@ -151,4 +151,9 @@ public class DesktopInput extends InputHandler{
 		}
 		return 0;
 	}
+
+	@Override
+	public boolean keyDown(int keycode) {
+		return super.keyDown(keycode);
+	}
 }

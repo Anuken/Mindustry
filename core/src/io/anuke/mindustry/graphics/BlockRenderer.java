@@ -95,11 +95,11 @@ public class BlockRenderer{
 							}
 						
 							if(block.expanded || !expanded){
-								if(block.layer != null){
+								if(block.layer != null && block.isLayer(tile)){
 									addRequest(tile, block.layer);
 								}
 						
-								if(block.layer2 != null){
+								if(block.layer2 != null && block.isLayer2(tile)){
 									addRequest(tile, block.layer2);
 								}
 							}

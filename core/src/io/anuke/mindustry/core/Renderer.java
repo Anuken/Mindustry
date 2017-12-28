@@ -367,7 +367,7 @@ public class Renderer extends RendererModule{
 
 		//draw placement box
 		if((player.recipe != null && Vars.control.hasItems(player.recipe.requirements) && (!ui.hasMouse() || android) 
-				&& control.input.drawPlace()) || (player.placeMode.delete && Inputs.keyDown("area_delete_mode"))){
+				&& control.input.drawPlace())){
 
 			player.placeMode.draw(control.input.getBlockX(), control.input.getBlockY(), control.input.getBlockEndX(), control.input.getBlockEndY());
 

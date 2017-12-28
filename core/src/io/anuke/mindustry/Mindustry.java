@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.io.BundleUtil;
 import io.anuke.mindustry.io.PlatformFunction;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.*;
@@ -32,6 +31,7 @@ public class Mindustry extends ModuleCore {
 		@Override public void openLink(String link){ }
 		@Override public void addDialog(TextField field){}
 	};
+	public static boolean externalBundle = false;
 	
 	@Override
 	public void init(){
@@ -46,10 +46,18 @@ public class Mindustry extends ModuleCore {
 	public void loadBundle(){
 		I18NBundle.setExceptionOnMissingKey(false);
 
-		FileHandle handle = Gdx.files.internal("bundles/bundle");
+		if(externalBundle){
+			FileHandle handle = Gdx.files.local("bundle");
 
-		Locale locale = Locale.getDefault();
-		Core.bundle = I18NBundle.createBundle(handle, locale);
+			Locale locale = Locale.ENGLISH;
+			Core.bundle = I18NBundle.createBundle(handle, locale);
+		}else{
+			FileHandle handle = Gdx.files.internal("bundles/bundle");
+
+			Locale locale = Locale.getDefault();
+			Core.bundle = I18NBundle.createBundle(handle, locale);
+		}
+
 
 		//always initialize blocks in this order, otherwise there are ID errors
 		Block[] blockClasses = {
@@ -67,7 +75,6 @@ public class Mindustry extends ModuleCore {
 	@Override
 	public void postInit(){
 		Vars.control.reset();
-		BundleUtil.buildBundle(Gdx.files.absolute("/home/anuke/bundle_en_US.properties"));
 	}
 	
 	@Override

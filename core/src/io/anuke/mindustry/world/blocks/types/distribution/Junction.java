@@ -25,7 +25,7 @@ public class Junction extends Block{
 		Tile to = tile.getNearby()[dir];
 		
 		Timers.run(15, ()->{
-			if(to == null || to.entity == null) return;
+			if(to == null) return;
 			to.block().handleItem(item, to, tile);
 		});
 		

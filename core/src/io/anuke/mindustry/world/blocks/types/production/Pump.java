@@ -49,14 +49,17 @@ public class Pump extends LiquidBlock{
 		Draw.rect("blank", tile.worldx(), tile.worldy(), 2, 2);
 		Draw.color();
 	}
+
+	@Override
+	public boolean isLayer(Tile tile) {
+		return tile.floor().liquidDrop == null;
+	}
 	
 	@Override
 	public void drawLayer(Tile tile){
-		if(tile.floor().liquidDrop == null){
-			Draw.colorl(0.85f + Mathf.absin(Timers.time(), 6f, 0.15f));
-			Draw.rect("cross", tile.worldx(), tile.worldy());
-			Draw.color();
-		}
+		Draw.colorl(0.85f + Mathf.absin(Timers.time(), 6f, 0.15f));
+		Draw.rect("cross", tile.worldx(), tile.worldy());
+		Draw.color();
 	}
 	
 	@Override

@@ -38,6 +38,9 @@ _(not necessarily planned!)_
 - Solar panels
 - Deflector shields
 - Autosave
+- Underground blocks
+- Configurable outputs/inputs
+- Getting items out of the core
 
 ### Balance
 - Slow down progression slightly

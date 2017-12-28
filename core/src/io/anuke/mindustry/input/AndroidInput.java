@@ -47,9 +47,9 @@ public class AndroidInput extends InputHandler{
 			return false;
 		}
 		
-		if(placing && pointer == 0 && !player.placeMode.pan && player.recipe != null){
+		if(placing && pointer == 0 && !player.placeMode.pan && !breaking()){
 			player.placeMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
-		}else if(pointer == 0 && !player.breakMode.pan && player.recipe == null && drawPlace()){
+		}else if(pointer == 0 && !player.breakMode.pan && breaking() && drawPlace()){
 			player.breakMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
 		}
 		placing = false;
@@ -64,7 +64,7 @@ public class AndroidInput extends InputHandler{
 		lmousex = screenX;
 		lmousey = screenY;
 		
-		if((!player.placeMode.pan || player.recipe == null) && pointer == 0){
+		if((!player.placeMode.pan || breaking()) && pointer == 0){
 			mousex = screenX;
 			mousey = screenY;
 		}
@@ -183,5 +183,9 @@ public class AndroidInput extends InputHandler{
 			return true;
 		}
 		return false;
+	}
+
+	public boolean breaking(){
+		return player.recipe == null;
 	}
 }

@@ -21,11 +21,13 @@ import io.anuke.ucore.util.Mathf;
 public class Teleporter extends Block implements Configurable{
 	public static final Color[] colorArray = {Color.ROYAL, Color.ORANGE, Color.SCARLET, Color.FOREST, Color.PURPLE, Color.GOLD, Color.PINK};
 	public static final int colors = colorArray.length;
-	
-	private static Array<Tile> removal = new Array<>();
-	private static Array<Tile> returns = new Array<>();
+
 	private static ObjectSet<Tile>[] teleporters = new ObjectSet[colors];
-	
+	private static byte lastColor = 0;
+
+	private Array<Tile> removal = new Array<>();
+	private Array<Tile> returns = new Array<>();
+
 	static{
 		for(int i = 0; i < colors; i ++){
 			teleporters[i] = new ObjectSet<>();
@@ -37,6 +39,11 @@ public class Teleporter extends Block implements Configurable{
 		update = true;
 		solid = true;
 		health = 80;
+	}
+
+	@Override
+	public void placed(Tile tile){
+		tile.<TeleporterEntity>entity().color = lastColor;
 	}
 	
 	@Override
@@ -70,12 +77,14 @@ public class Teleporter extends Block implements Configurable{
 		
 		table.addIButton("icon-arrow-left", 10*3, ()->{
 			entity.color = (byte)Mathf.mod(entity.color - 1, colors);
+			lastColor = entity.color;
 		});
 		
 		table.add().size(40f);
 		
 		table.addIButton("icon-arrow-right", 10*3, ()->{
 			entity.color = (byte)Mathf.mod(entity.color + 1, colors);
+			lastColor = entity.color;
 		});
 	}
 	
@@ -100,7 +109,7 @@ public class Teleporter extends Block implements Configurable{
 		return new TeleporterEntity();
 	}
 	
-	static Array<Tile> findLinks(Tile tile){
+	private Array<Tile> findLinks(Tile tile){
 		TeleporterEntity entity = tile.entity();
 		
 		removal.clear();

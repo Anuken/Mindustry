@@ -3,19 +3,12 @@ package io.anuke.mindustry.core;
 import static io.anuke.mindustry.Vars.*;
 
 import java.util.Arrays;
-import java.util.Locale;
 
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.controllers.Controller;
-import com.badlogic.gdx.controllers.ControllerAdapter;
-import com.badlogic.gdx.controllers.Controllers;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.Mindustry;
@@ -30,7 +23,6 @@ import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
-import io.anuke.mindustry.io.BundleUtil;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
@@ -83,11 +75,6 @@ public class Control extends Module{
 	public Control(){
 		if(Mindustry.args.contains("-debug", false))
 			Vars.debug = true;
-
-		FileHandle handle = Gdx.files.internal("bundles/bundle");
-
-		Locale locale = Locale.getDefault();
-		Core.bundle = I18NBundle.createBundle(handle, locale);
 
 		Inputs.useControllers(false);
 		
@@ -442,7 +429,7 @@ public class Control extends Module{
 		addItem(Item.stone, 40);
 		
 		if(debug){
-			Arrays.fill(items, 2000000);
+			Arrays.fill(items, 999900);
 		}
 	}
 	

@@ -56,6 +56,11 @@ public class Conveyor extends Block{
 				(Timers.time() % ((20 / 100f) / speed) < (10 / 100f) / speed && acceptItem(Item.stone, tile, null) ? "" : "move"), 
 				tile.worldx(), tile.worldy(), rotation * 90);
 	}
+
+	@Override
+	public boolean isLayer(Tile tile){
+		return tile.<ConveyorEntity>entity().convey.size > 0;
+	}
 	
 	@Override
 	public void drawLayer(Tile tile){
