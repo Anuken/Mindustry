@@ -53,7 +53,7 @@ public enum Weapon{
 			Effects.effect(Fx.shoot2, p.x + vector.x, p.y+vector.y);
 		}
 	},
-	flamer(5, BulletType.flame, stack(Item.steel, 60), stack(Item.coal, 60)){
+	flamer(5, BulletType.flame, stack(Item.steel, 60), stack(Item.iron, 120)){
 		
 		{
 			shootsound = "flame2";

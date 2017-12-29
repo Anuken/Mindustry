@@ -3,6 +3,7 @@ package io.anuke.mindustry.desktop;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -30,7 +31,7 @@ public class DesktopLauncher {
 		config.setWindowIcon("sprites/icon.png");
 
 		Mindustry.platforms = new PlatformFunction(){
-			SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm");
+			DateFormat format = SimpleDateFormat.getDateTimeInstance();
 			
 			@Override
 			public String format(Date date){

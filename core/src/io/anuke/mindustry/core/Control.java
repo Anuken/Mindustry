@@ -23,6 +23,7 @@ import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
+import io.anuke.mindustry.io.Saves;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
@@ -64,7 +65,9 @@ public class Control extends Module{
 	Array<SpawnPoint> spawnpoints = new Array<>();
 	boolean shouldUpdateItems = false;
 	boolean wasPaused = false;
-	
+
+	Saves saves;
+
 	float respawntime;
 	InputHandler input;
 
@@ -75,6 +78,8 @@ public class Control extends Module{
 	public Control(){
 		if(Mindustry.args.contains("-debug", false))
 			Vars.debug = true;
+
+		saves = new Saves();
 
 		Inputs.useControllers(false);
 		
@@ -177,7 +182,8 @@ public class Control extends Module{
 		);
 		
 		for(int i = 0; i < Vars.saveSlots; i ++){
-			Settings.defaults("saveslot" + i, "empty");
+			Settings.defaults("save-" + i + "-autosave", true);
+			Settings.defaults("save-" + i + "-name", "untitled");
 		}
 		
 		Settings.loadAll("io.anuke.moment");
@@ -189,7 +195,12 @@ public class Control extends Module{
 		player = new Player();
 		
 		spawns = WaveCreator.getSpawns();
-		//WaveCreator.testWaves(1, 30);
+
+		saves.load();
+	}
+
+	public Saves getSaves(){
+		return saves;
 	}
 
 	public boolean showCursor(){

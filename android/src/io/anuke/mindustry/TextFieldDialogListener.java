@@ -9,8 +9,8 @@ import io.anuke.mindustry.AndroidTextFieldDialog.TextPromptListener;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.InputListener;
 import io.anuke.ucore.scene.ui.TextField;
-import io.anuke.ucore.scene.utils.ChangeListener;
-import io.anuke.ucore.scene.utils.ClickListener;
+import io.anuke.ucore.scene.event.ChangeListener;
+import io.anuke.ucore.scene.event.ClickListener;
 
 public class TextFieldDialogListener extends ClickListener{
 	private TextField field;

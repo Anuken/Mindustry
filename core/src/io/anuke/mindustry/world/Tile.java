@@ -220,7 +220,7 @@ public class Tile{
 	
 	public void changed(){
 		if(entity != null){
-			if(entity.added) entity.remove();
+			entity.remove();
 			entity = null;
 		}
 		

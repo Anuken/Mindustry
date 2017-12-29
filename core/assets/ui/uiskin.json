@@ -13,6 +13,7 @@ com.badlogic.gdx.graphics.Color: {
 	red: {a: 1, b: 0, g: 0, r: 1 },
 	blue: {a: 1, b: 1, g: 0, r: 0 },
 	grey: {a: 1, b: 0.32, g: 0.32, r: 0.32 },
+	lightgray: {a: 1, b: 0.3, g: 0.3, r: 0.3 },
 	orange: {hex: "#FFA500"},
 	accent: {hex: "f4ba6e"},
 	vis-blue: {a: 1, b: 0.886, g: 0.631, r: 0.105 },
@@ -21,8 +22,12 @@ com.badlogic.gdx.graphics.Color: {
 	link-label: {a: 1, b: 0.886, g: 0.631, r: 0.105 }
 },
 io.anuke.ucore.scene.Skin$TintedDrawable: {
-	dialogDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.9} }
-	loadDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.8} }
+	dialogDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.9} },
+	invis: {name: white, color: {r: 0, g: 0, b: 0, a: 0} }
+	loadDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.8} },
+    clear: {name: white, color: {r: 0.1, g: 0.1, b: 0.1, a: 0.7}},
+    clear-over: {name: white, color: {r: 1, g: 1, b: 1, a: 0.2} },
+    clear-down: {name: white, color: {r: 1, g: 1, b: 1, a: 0.4} }
 },
 io.anuke.ucore.scene.ui.Button$ButtonStyle: {
 	default: {down: button-down, up: button },
@@ -31,11 +36,14 @@ io.anuke.ucore.scene.ui.Button$ButtonStyle: {
 },
 io.anuke.ucore.scene.ui.TextButton$TextButtonStyle: {
 	default: {over: button-over, disabled: button, font: default-font, fontColor: white, disabledFontColor: grey, down: button-down, up: button, transition: 0 },
+	clear: {down: clear-down, up: clear, over: clear-over, font: default-font, fontColor: white, disabledFontColor: grey },
+	empty: {font: default-font},
 	toggle: {font: default-font, fontColor: white, checked: button-down, down: button-down, up: button, over: button-over, disabled: button, disabledFontColor: grey }
 },
 io.anuke.ucore.scene.ui.ImageButton$ImageButtonStyle: {
 	default: {down: button-down, up: button, over: button-over },
-	empty: {},
+	empty: { imageDownColor: accent, imageUpColor: white},
+	emptytoggle: {imageCheckedColor: white, imageDownColor: white, imageUpColor: lightgray},
 	static: {up: button },
 	static-down: {up: button-down },
 	toggle: {checked: button-down, down: button-down, up: button },
@@ -51,14 +59,15 @@ io.anuke.ucore.scene.ui.ScrollPane$ScrollPaneStyle: {
 	default: {background: border, vScroll: scroll, vScrollKnob: scroll-knob-vertical},
 	horizontal: {background: border, vScroll: scroll, vScrollKnob: scroll-knob-vertical, hScroll: scroll-horizontal, hScrollKnob: scroll-knob-horizontal},
 	volume: {background: button-map, vScroll: scroll, vScrollKnob: scroll-knob-vertical},
-	clear: {vScroll: scroll, vScrollKnob: scroll-knob-vertical}
+	clear: {vScroll: scroll, vScrollKnob: scroll-knob-vertical},
+	clear-black: {vScroll: scroll, vScrollKnob: scroll-knob-vertical-black}
 },
 io.anuke.ucore.scene.ui.Window$WindowStyle: {
-	default: {titleFont: default-font, background: window, titleFontColor: orange },
+	default: {titleFont: default-font, background: window, titleFontColor: accent },
 	dialog: {stageBackground: dialogDim, titleFont: default-font, background: window-empty, titleFontColor: accent }
 },
 io.anuke.ucore.scene.ui.KeybindDialog$KeybindDialogStyle: {
-	default: {keyColor: red, keyNameColor: white, paneStyle: clear},
+	default: {keyColor: accent, keyNameColor: white, paneStyle: clear},
 },
 io.anuke.ucore.scene.ui.Slider$SliderStyle: {
 	default-horizontal: {background: slider, knob: slider-knob, knobOver: slider-knob-over, knobDown: slider-knob-down},
@@ -74,7 +83,7 @@ io.anuke.ucore.scene.ui.TextField$TextFieldStyle: {
 	default: {font: default-font, fontColor: white, disabledFontColor: grey, selection: selection, background: button, cursor: cursor, messageFont: default-font, messageFontColor: grey }
 }
 io.anuke.ucore.scene.ui.CheckBox$CheckBoxStyle: {
-	default: {checkboxOn: check-on, checkboxOff: check-off, checkboxOver: check-over, font: default-font, fontColor: white, disabledFontColor: grey }
+	default: {checkboxOn: check-on, checkboxOff: check-off, checkboxOnOver: check-on-over, checkboxOver: check-over, font: default-font, fontColor: white, disabledFontColor: grey }
 },
 io.anuke.ucore.scene.ui.List$ListStyle: {
 	default: {fontColorUnselected: white, fontColorSelected: white, font: default-font }

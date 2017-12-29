@@ -30,12 +30,14 @@ import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.core.Inputs.DeviceType;
+import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.function.VisibilityProvider;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Skin;
 import io.anuke.ucore.scene.builders.build;
+import io.anuke.ucore.scene.builders.field;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
@@ -367,12 +369,28 @@ public class UI extends SceneModule{
 	public void hideConfig(){
 		configtable.setVisible(false);
 	}
-	
+
+	public void showTextInput(String title, String text, String def, Consumer<String> confirmed){
+		new Dialog(title, "dialog"){{
+			content().margin(30);
+			content().add(text).padRight(6f);
+			TextField field = content().addField(def, t->{}).size(170f, 50f).get();
+			field.setTextFieldFilter((f, c) -> field.getText().length() < 12);
+			Mindustry.platforms.addDialog(field);
+			buttons().defaults().size(120, 54).pad(4);
+			buttons().addButton("$text.ok", () -> {
+				confirmed.accept(field.getText());
+				hide();
+			}).disabled(b -> field.getText().isEmpty());
+			buttons().addButton("$text.cancel", this::hide);
+		}}.show();
+	}
+
 	public void showError(String text){
 		new Dialog("$text.error.title", "dialog"){{
 			content().margin(15);
 			content().add(text);
-			getButtonTable().addButton("$text.ok", this::hide).size(90, 50).pad(4);
+			buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);
 		}}.show();
 	}
 
@@ -380,7 +398,7 @@ public class UI extends SceneModule{
 		new Dialog("$text.error.title", "dialog"){{
 			content().margin(15);
 			content().add(text);
-			getButtonTable().addButton("$text.quit", Gdx.app::exit).size(90, 50).pad(4);
+			buttons().addButton("$text.quit", Gdx.app::exit).size(90, 50).pad(4);
 		}}.show();
 	}
 	

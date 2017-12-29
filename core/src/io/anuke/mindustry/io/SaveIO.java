@@ -115,7 +115,11 @@ public class SaveIO{
 	}
 	
 	public static boolean isSaveValid(int slot){
-		try(DataInputStream stream = new DataInputStream(fileFor(slot).read())){
+		return isSaveValid(fileFor(slot));
+	}
+
+	public static boolean isSaveValid(FileHandle file){
+		try(DataInputStream stream = new DataInputStream(file.read())){
 			int version = stream.readInt(); //read version
 			stream.readLong(); //read last saved time
 			stream.readByte(); //read the gamemode
@@ -340,6 +344,7 @@ public class SaveIO{
 			
 			Vars.control.getWeapons().clear();
 			Vars.control.getWeapons().add(Weapon.blaster);
+			Vars.player.weapon = Weapon.blaster;
 			
 			int weapons = stream.readByte();
 			

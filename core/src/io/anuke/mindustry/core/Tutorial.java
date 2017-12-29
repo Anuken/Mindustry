@@ -49,12 +49,12 @@ public class Tutorial{
 			
 			row();
 			
-			prev = new button("< Prev", ()->{
+			prev = new button("$text.tutorial.back", ()->{
 				if(!prev.isDisabled())
 					move(false);
 			}).left().get();
 			
-			next = new button("Next >", ()->{
+			next = new button("$text.tutorial.next", ()->{
 				if(!next.isDisabled())
 					move(true);
 			}).right().get();

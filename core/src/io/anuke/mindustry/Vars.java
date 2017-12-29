@@ -58,7 +58,7 @@ public class Vars{
 
 	public static float baseControllerSpeed = 11f;
 
-	public static final int saveSlots = 10;
+	public static final int saveSlots = 16;
 	//amount of drops that are left when breaking a block
 	public static final float breakDropAmount = 0.5f;
 	

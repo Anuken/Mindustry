@@ -1,5 +1,6 @@
 package io.anuke.mindustry;
 
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,7 +22,6 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 public class AndroidLauncher extends AndroidApplication{
 	boolean doubleScaleTablets = true;
 
-	@SuppressLint("SimpleDateFormat")
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -30,7 +30,7 @@ public class AndroidLauncher extends AndroidApplication{
 		
 		Mindustry.hasDiscord = isPackageInstalled("com.discord");
 		Mindustry.platforms = new PlatformFunction(){
-			SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm");
+			DateFormat format = SimpleDateFormat.getDateTimeInstance();
 
 			@Override
 			public String format(Date date){
