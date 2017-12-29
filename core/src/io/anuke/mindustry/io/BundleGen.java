@@ -53,8 +53,8 @@ public class BundleGen {
         for(Item item : Item.values()){
             write("item." + item.name() + ".name=" + item.name());
         }
-        for(Liquid liquid : Liquid.values()){
-            write("liquid." + liquid.name() + ".name=" + liquid.name());
+        for(Liquid liquid : Liquid.getAllLiquids()){
+            write("liquid." + liquid.name + ".name=" + liquid.name);
         }
         for(Block block : Block.getAllBlocks()){
             write("block." + block.name + ".name=" + block.formalName);
