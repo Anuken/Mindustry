@@ -2,7 +2,12 @@ package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
+import com.badlogic.gdx.utils.async.AsyncExecutor;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.GameState;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.world.GameMode;
 import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.core.Settings;
@@ -12,6 +17,10 @@ import java.io.IOException;
 public class Saves {
     private int nextSlot;
     private Array<SaveSlot> saves = new Array<>();
+    private SaveSlot current;
+    private boolean saving;
+
+    private AsyncExecutor exec = new AsyncExecutor(1);
 
     public void load(){
         saves.clear();
@@ -21,6 +30,26 @@ public class Saves {
                 nextSlot = i + 1;
             }
         }
+
+
+        Timer.schedule(new Task() {
+            @Override
+            public void run() {
+                if(!GameState.is(State.menu) && !GameState.is(State.dead) && current != null && current.isAutosave()){
+                    saving = true;
+
+                    exec.submit(() -> {
+                        SaveIO.saveToSlot(current.index);
+                        saving = false;
+                        return true;
+                    });
+                }
+            }
+        }, 0f, 60f*2);
+    }
+
+    public boolean isSaving(){
+        return saving;
     }
 
     public boolean canAddSave(){
@@ -44,6 +73,16 @@ public class Saves {
 
         public SaveSlot(int index){
             this.index = index;
+        }
+
+        public void load(){
+            current = this;
+            SaveIO.loadFromSlot(index);
+        }
+
+        public void save(){
+            current = this;
+            SaveIO.isSaveValid(index);
         }
 
         public String getDate(){

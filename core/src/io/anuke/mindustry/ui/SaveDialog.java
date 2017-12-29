@@ -44,19 +44,19 @@ public class SaveDialog extends LoadDialog{
 			if(button.childrenPressed()) return;
 
 			Vars.ui.showConfirm("$text.overwrite", "$text.save.overwrite", () -> {
-				save(slot.index);
+				save(slot);
 			});
 		});
 	}
 
-	void save(int slot){
+	void save(SaveSlot slot){
 		Vars.ui.showLoading("$text.saveload");
 
 		Timers.runTask(5f, () -> {
 			hide();
 			Vars.ui.hideLoading();
 			try{
-				SaveIO.saveToSlot(slot);
+				slot.save();
 			}catch(Throwable e){
 				e = (e.getCause() == null ? e : e.getCause());
 

@@ -162,7 +162,7 @@ public class LoadDialog extends FloatingDialog{
 					Vars.ui.hideLoading();
 					hide();
 					try{
-						SaveIO.loadFromSlot(slot.index);
+						slot.load();
 						GameState.set(State.playing);
 						Vars.ui.hideMenu();
 					}catch(Exception e){
