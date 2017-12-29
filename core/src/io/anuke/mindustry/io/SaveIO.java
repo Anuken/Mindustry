@@ -309,7 +309,6 @@ public class SaveIO{
 	public static void load(FileHandle file){
 		
 		try(DataInputStream stream = new DataInputStream(file.read())){
-			Item[] itemEnums = Item.values();
 			
 			int version = stream.readInt();
 			/*long loadTime = */stream.readLong();
@@ -356,9 +355,9 @@ public class SaveIO{
 			Arrays.fill(Vars.control.getItems(), 0);
 			
 			for(int i = 0; i < totalItems; i ++){
-				Item item = itemEnums[stream.readByte()];
+				Item item = Item.items.get(stream.readByte());
 				int amount = stream.readInt();
-				Vars.control.getItems()[item.ordinal()] = amount;
+				Vars.control.getItems()[item.id] = amount;
 			}
 			
 			Vars.ui.updateItems();

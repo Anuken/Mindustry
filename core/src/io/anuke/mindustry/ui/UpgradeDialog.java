@@ -93,7 +93,7 @@ public class UpgradeDialog extends FloatingDialog{
 					for(ItemStack s : req){
 						
 						int amount = Math.min(Vars.control.getAmount(s.item), s.amount);
-						reqtable.addImage(Draw.region("icon-" + s.item.name())).padRight(3).size(8*2);
+						reqtable.addImage(Draw.region("icon-" + s.item.name)).padRight(3).size(8*2);
 						reqtable.add(
 								(amount >= s.amount ? "" : "[RED]")
 						+ amount + " / " +s.amount, 0.5f).left();

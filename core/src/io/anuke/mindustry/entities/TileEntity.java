@@ -20,7 +20,7 @@ import io.anuke.ucore.util.Timer;
 
 public class TileEntity extends Entity{
 	public Tile tile;
-	public int[] items = new int[Item.values().length];
+	public int[] items = new int[Item.getAllItems().size];
 	public Timer timer;
 	public int maxhealth, health;
 	public boolean dead = false;
@@ -110,7 +110,7 @@ public class TileEntity extends Entity{
 	}
 	
 	public int getItem(Item item){
-		return items[item.ordinal()];
+		return items[item.id];
 	}
 	
 	public boolean hasItem(Item item){
@@ -122,11 +122,11 @@ public class TileEntity extends Entity{
 	}
 	
 	public void addItem(Item item, int amount){
-		items[item.ordinal()] += amount;
+		items[item.id] += amount;
 	}
 	
 	public void removeItem(Item item, int amount){
-		items[item.ordinal()] -= amount;;
+		items[item.id] -= amount;
 	}
 	
 	@Override

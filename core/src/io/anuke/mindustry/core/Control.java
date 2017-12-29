@@ -45,7 +45,7 @@ public class Control extends Module{
 	boolean hiscore = false;
 	
 	final Array<Weapon> weapons = new Array<>();
-	final int[] items = new int[Item.values().length];
+	final int[] items = new int[Item.getAllItems().size];
 	
 	public final EntityGroup<Enemy> enemyGroup = Entities.addGroup(Enemy.class);
 	public final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);
@@ -434,11 +434,11 @@ public class Control extends Module{
 	}
 	
 	public  int getAmount(Item item){
-		return items[item.ordinal()];
+		return items[item.id];
 	}
 	
 	public void addItem(Item item, int amount){
-		items[item.ordinal()] += amount;
+		items[item.id] += amount;
 		shouldUpdateItems = true;
 	}
 	
@@ -457,15 +457,15 @@ public class Control extends Module{
 	}
 	
 	public boolean hasItem(ItemStack req){
-		return items[req.item.ordinal()] >= req.amount; 
+		return items[req.item.id] >= req.amount;
 	}
 	
 	public boolean hasItem(Item item, int amount){
-		return items[item.ordinal()] >= amount; 
+		return items[item.id] >= amount;
 	}
 	
 	public void removeItem(ItemStack req){
-		items[req.item.ordinal()] -= req.amount;
+		items[req.item.id] -= req.amount;
 		shouldUpdateItems = true;
 	}
 	

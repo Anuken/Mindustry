@@ -50,8 +50,8 @@ public class BundleGen {
             write("weapon." + weapon.name() + ".name=" + weapon.name());
             write("weapon." + weapon.name() + ".description=" + weapon.description);
         }
-        for(Item item : Item.values()){
-            write("item." + item.name() + ".name=" + item.name());
+        for(Item item : Item.getAllItems()){
+            write("item." + item.name + ".name=" + item.name);
         }
         for(Liquid liquid : Liquid.getAllLiquids()){
             write("liquid." + liquid.name + ".name=" + liquid.name);
