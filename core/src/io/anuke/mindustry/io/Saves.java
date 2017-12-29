@@ -5,6 +5,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.Field;
+import com.badlogic.gdx.utils.reflect.ReflectionException;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
@@ -33,8 +36,30 @@ public class Saves {
 
 
         Timer.schedule(new Task() {
+            Field field;
+            int lastInterval;
+
+            {
+                try{
+                    field = ClassReflection.getDeclaredField(getClass(), "intervalMillis");
+                    field.setAccessible(true);
+                }catch (ReflectionException e){
+                    throw new RuntimeException(e);
+                }
+            }
+
             @Override
             public void run() {
+                if(Settings.getInt("saveinterval") != lastInterval){
+                    try{
+                        field.set(this, (long)(Settings.getInt("saveinterval")) / 60f  * 1000);
+                    }catch (ReflectionException e){
+                        throw new RuntimeException(e);
+                    }
+
+                    lastInterval = Settings.getInt("saveinterval");
+                }
+
                 if(!GameState.is(State.menu) && !GameState.is(State.dead) && current != null && current.isAutosave()){
                     saving = true;
 
