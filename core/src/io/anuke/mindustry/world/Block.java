@@ -189,7 +189,7 @@ public class Block{
 			Tile other = tiles[i];
 			
 			if(i == direction || direction == -1){
-				for(Item item : Item.values()){
+				for(Item item : Item.getAllItems()){
 					
 					if(todump != null && item != todump) continue;
 					
