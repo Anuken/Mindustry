@@ -6,19 +6,19 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.utils.Array;
 
+import com.esotericsoftware.kryonet.Client;
 import io.anuke.mindustry.Mindustry;
+import io.anuke.mindustry.Net;
+import io.anuke.mindustry.Net.ClientProvider;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.PlatformFunction;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.scene.ui.TextField;
-import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class DesktopLauncher {
 	
@@ -60,6 +60,31 @@ public class DesktopLauncher {
 		};
 		
 		Mindustry.args = Array.with(arg);
+
+		Net.setClientProvider(new ClientProvider() {
+			Client client;
+
+			{
+				client = new Client();
+			}
+
+			@Override
+			public void connect(String ip, String port) throws IOException {
+
+			}
+
+			@Override
+			public void send(Object object) {
+
+			}
+
+			@Override
+			public void register(Class<?>... types) {
+				for(Class<?> c : types){
+					client.getKryo().register(c);
+				}
+			}
+		});
 		
 		new Lwjgl3Application(new Mindustry(), config);
 	}
