@@ -23,8 +23,8 @@ import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.PlatformFunction;
 import io.anuke.mindustry.net.Net.ServerProvider;
-import io.anuke.mindustry.net.packets.Connect;
-import io.anuke.mindustry.net.packets.Disconnect;
+import io.anuke.mindustry.net.Packets.Connect;
+import io.anuke.mindustry.net.Packets.Disconnect;
 import io.anuke.ucore.scene.ui.TextField;
 
 public class DesktopLauncher {
@@ -133,7 +133,9 @@ public class DesktopLauncher {
 
 			{
 				server = new Server();
-				server.start();
+				Thread thread = new Thread(server, "Kryonet Server");
+				thread.setDaemon(true);
+				thread.start();
 				server.addListener(new Listener(){
 					@Override
 					public void connected (Connection connection) {
@@ -161,6 +163,11 @@ public class DesktopLauncher {
 			@Override
 			public void host(int port) throws IOException {
 				server.bind(port, port);
+			}
+
+			@Override
+			public void close() {
+				server.close();
 			}
 
 			@Override

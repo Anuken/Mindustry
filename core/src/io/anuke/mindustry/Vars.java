@@ -72,11 +72,15 @@ public class Vars{
 	public static final float multiplier = android ? 3 : 2;
 	
 	public static final int tilesize = 8;
+
+	//server port
+	public static final int port = 6567;
 	
 	public static Control control;
 	public static Renderer renderer;
 	public static UI ui;
 	public static World world;
+	public static Network network;
 	
 	public static Player player;
 	

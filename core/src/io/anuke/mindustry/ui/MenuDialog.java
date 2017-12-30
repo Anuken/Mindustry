@@ -10,7 +10,12 @@ import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.ui.ConfirmDialog;
 import io.anuke.ucore.scene.ui.ImageButton;
+import io.anuke.ucore.scene.ui.TextField.TextFieldFilter.DigitsOnlyFilter;
 import io.anuke.ucore.scene.ui.layout.Cell;
+import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Strings;
+
+import java.io.IOException;
 
 public class MenuDialog extends FloatingDialog{
 	private SaveDialog save = new SaveDialog();
@@ -55,6 +60,24 @@ public class MenuDialog extends FloatingDialog{
 			}
 
 			content().row();
+
+			content().addButton("$text.hostserver", () -> {
+				Vars.ui.showTextInput("$text.hostserver", "$text.server.port", Vars.port + "", new DigitsOnlyFilter(), text -> {
+					int result = Strings.parseInt(text);
+					if(result == Integer.MIN_VALUE || result >= 65535){
+						Vars.ui.showError("$text.server.invalidport");
+					}else{
+						try{
+							Vars.network.hostServer(result);
+						}catch (IOException e){
+							Vars.ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
+						}
+					}
+				});
+			}).disabled(b -> Vars.network.isHosting());
+
+            content().row();
+
 			content().addButton("$text.quit", () -> {
 				new ConfirmDialog("$text.confirm", "$text.quit.confirm", () -> {
 					hide();

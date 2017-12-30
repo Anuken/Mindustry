@@ -41,6 +41,7 @@ public class Mindustry extends ModuleCore {
 		module(Vars.control = new Control());
 		module(Vars.renderer = new Renderer());
 		module(Vars.ui = new UI());
+		module(Vars.network = new Network());
 	}
 
 	public void loadBundle(){

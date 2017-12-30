@@ -23,8 +23,17 @@ public class Net{
 
 	/**Host a server at an address*/
 	public static void host(int port) throws IOException{
+		active = true;
+		server = true;
 		serverProvider.host(port);
 	}
+
+	/**Closes the server.*/
+	public static void closeServer(){
+        serverProvider.close();
+        server = false;
+        active = false;
+    }
 	
 	/**Send an object to all connected clients, or to the server if this is a client.*/
 	public static void send(Object object, SendMode mode){
@@ -113,6 +122,8 @@ public class Net{
 		public void sendTo(int id, Object object, SendMode mode);
 		/**Send an object to everyone <i>except</i> a client ID.*/
 		public void sendExcept(int id, Object object, SendMode mode);
+		/**Close the server connection.*/
+		public void close();
 		/**Register classes to be sent.*/
 		public void register(Class<?>... types);
 	}

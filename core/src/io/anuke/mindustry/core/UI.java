@@ -42,6 +42,7 @@ import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
+import io.anuke.ucore.scene.ui.TextField.TextFieldFilter;
 import io.anuke.ucore.scene.ui.Window.WindowStyle;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
@@ -371,12 +372,12 @@ public class UI extends SceneModule{
 		configtable.setVisible(false);
 	}
 
-	public void showTextInput(String title, String text, String def, Consumer<String> confirmed){
+	public void showTextInput(String title, String text, String def, TextFieldFilter filter, Consumer<String> confirmed){
 		new Dialog(title, "dialog"){{
 			content().margin(30);
 			content().add(text).padRight(6f);
 			TextField field = content().addField(def, t->{}).size(170f, 50f).get();
-			field.setTextFieldFilter((f, c) -> field.getText().length() < 12);
+			field.setTextFieldFilter((f, c) -> field.getText().length() < 12 && filter.acceptChar(f, c));
 			Mindustry.platforms.addDialog(field);
 			buttons().defaults().size(120, 54).pad(4);
 			buttons().addButton("$text.ok", () -> {
@@ -385,6 +386,10 @@ public class UI extends SceneModule{
 			}).disabled(b -> field.getText().isEmpty());
 			buttons().addButton("$text.cancel", this::hide);
 		}}.show();
+	}
+
+	public void showTextInput(String title, String text, String def, Consumer<String> confirmed){
+		showTextInput(title, text, def, (field, c) -> true, confirmed);
 	}
 
 	public void showError(String text){
