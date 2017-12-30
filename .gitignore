@@ -9,8 +9,8 @@
 /desktop/mindustry-maps/
 /desktop/gifexport/
 /core/lib/
-/core/assets/mindustry-saves/
-/core/assets/mindustry-maps/
+/android/assets/mindustry-maps/
+/android/assets/mindustry-saves/
 /core/assets/gifexport/
 *.gif
 
@@ -129,3 +129,4 @@ gradle-app.setting
 ## OS Specific
 .DS_Store
 Thumbs.db
+android/libs/

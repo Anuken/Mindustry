@@ -20,10 +20,7 @@ public class SaveDialog extends LoadDialog{
 		super("$text.savegame");
 	}
 
-	@Override
-	protected void setup(){
-		super.setup();
-
+	public void addSetup(){
 		if(!Vars.control.getSaves().canAddSave()){
 			return;
 		}
@@ -34,9 +31,8 @@ public class SaveDialog extends LoadDialog{
 				Vars.control.getSaves().addSave(text);
 				setup();
 			});
-		}).fillX().margin(10f).height(70f).pad(4f).padRight(-4);
+		}).fillX().margin(10f).minWidth(300f).height(70f).pad(4f).padRight(-4);
 	}
-
 
 	@Override
 	public void modifyButton(TextButton button, SaveSlot slot){

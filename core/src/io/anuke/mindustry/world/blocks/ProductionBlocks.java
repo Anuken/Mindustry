@@ -63,6 +63,19 @@ public class ProductionBlocks{
 			health = 70;
 		}
 	},
+
+	//TODO
+	/*siliconextractor = new LiquidCrafter("siliconextractor"){
+		{
+			input = Item.sand;
+			inputAmount = 5;
+			inputLiquid = Liquid.water;
+			liquidAmount = 18.99f;
+			output = Item.silicon;
+			health = 50;
+			purifyTime = 50;
+		}
+	},*/
 	
 	oilrefinery = new LiquidCrafter("oilrefinery"){
 		{

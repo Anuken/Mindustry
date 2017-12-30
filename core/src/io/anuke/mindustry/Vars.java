@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.I18NBundle;
 
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class Vars{
@@ -30,9 +31,11 @@ public class Vars{
 	//discord group URL
 	public static final String discordURL = "https://discord.gg/r8BkXNd";
 	//directory for user-created map data
-	public static final FileHandle customMapDirectory = gwt ? null : Gdx.files.local("mindustry-maps/");
+	public static final FileHandle customMapDirectory = gwt ? null : UCore.isAssets ?
+			Gdx.files.local("../../desktop/mindustry-maps") : Gdx.files.local("mindustry-maps/");
 	//save file directory
-	public static final FileHandle saveDirectory = gwt ? null : Gdx.files.local("mindustry-saves/");
+	public static final FileHandle saveDirectory = gwt ? null : UCore.isAssets ?
+			Gdx.files.local("../../desktop/mindustry-saves") : Gdx.files.local("mindustry-saves/");
 	//scale of the font
 	public static float fontscale = Math.max(Unit.dp.scl(1f)/2f, 0.5f);
 	//camera zoom displayed on startup

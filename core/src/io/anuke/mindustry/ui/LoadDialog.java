@@ -151,6 +151,15 @@ public class LoadDialog extends FloatingDialog{
 
 		content().add(pane);
 
+		addSetup();
+	}
+
+	public void addSetup(){
+		if(Vars.control.getSaves().getSaveSlots().size != 0) return;
+
+		slots.row();
+		slots.addButton("$text.save.none", "clear", ()->{})
+				.disabled(true).fillX().margin(20f).minWidth(340f).height(80f).pad(4f);
 	}
 
 	public void modifyButton(TextButton button, SaveSlot slot){
