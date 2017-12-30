@@ -282,6 +282,7 @@ public class Control extends Module{
 	
 	public void playMap(Map map){
 		Vars.ui.showLoading();
+		saves.resetSave();
 		
 		Timers.run(16, ()->{
 			reset();
@@ -554,6 +555,8 @@ public class Control extends Module{
         }
 
         Gdx.input.setCursorCatched(controlling);
+
+        saves.update();
 		
 		if(debug && GameState.is(State.playing)){
 			//debug actions

@@ -14,6 +14,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.world.GameMode;
 import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.core.Timers;
 
 import java.io.IOException;
 
@@ -22,6 +23,7 @@ public class Saves {
     private Array<SaveSlot> saves = new Array<>();
     private SaveSlot current;
     private boolean saving;
+    private float time;
 
     private AsyncExecutor exec = new AsyncExecutor(1);
 
@@ -33,44 +35,30 @@ public class Saves {
                 nextSlot = i + 1;
             }
         }
+    }
 
+    public void update(){
+        if(!GameState.is(State.menu) && !GameState.is(State.dead) && current != null && current.isAutosave()){
+            time += Timers.delta();
+            if(time > Settings.getInt("saveinterval")*60) {
+                saving = true;
+                Vars.ui.showError("sacving");
 
-        Timer.schedule(new Task() {
-            Field field;
-            int lastInterval;
+                exec.submit(() -> {
+                    SaveIO.saveToSlot(current.index);
+                    saving = false;
+                    return true;
+                });
 
-            {
-                try{
-                    field = ClassReflection.getDeclaredField(getClass(), "intervalMillis");
-                    field.setAccessible(true);
-                }catch (ReflectionException e){
-                    throw new RuntimeException(e);
-                }
+                time = 0;
             }
+        }else{
+            time = 0;
+        }
+    }
 
-            @Override
-            public void run() {
-                if(Settings.getInt("saveinterval") != lastInterval){
-                    try{
-                        field.set(this, (long)(Settings.getInt("saveinterval")) / 60f  * 1000);
-                    }catch (ReflectionException e){
-                        throw new RuntimeException(e);
-                    }
-
-                    lastInterval = Settings.getInt("saveinterval");
-                }
-
-                if(!GameState.is(State.menu) && !GameState.is(State.dead) && current != null && current.isAutosave()){
-                    saving = true;
-
-                    exec.submit(() -> {
-                        SaveIO.saveToSlot(current.index);
-                        saving = false;
-                        return true;
-                    });
-                }
-            }
-        }, 0f, 60f*2);
+    public void resetSave(){
+        current = null;
     }
 
     public boolean isSaving(){

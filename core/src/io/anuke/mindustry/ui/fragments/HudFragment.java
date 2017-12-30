@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui.fragments;
 
 import static io.anuke.mindustry.Vars.*;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 
@@ -147,6 +148,14 @@ public class HudFragment implements Fragment{
 				new label("[red]DEBUG MODE").scale(0.5f).left();
 			}}.end();
 		}
+
+		new table(){{
+			abottom();
+			visible(() -> !GameState.is(State.menu) && Vars.control.getSaves().isSaving());
+
+			new label("$text.saveload");
+
+		}}.end();
 
 		blockfrag.build();
 	}
