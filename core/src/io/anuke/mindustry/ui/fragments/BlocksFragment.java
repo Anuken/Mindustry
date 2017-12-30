@@ -299,7 +299,7 @@ public class BlocksFragment implements Fragment{
 			int amount = control.getItems()[i];
 			if(amount == 0) continue;
 			String formatted = amount > 99999999 ? "inf" : format(amount);
-			Image image = new Image(Draw.region("icon-" + Item.items.get(i).name));
+			Image image = new Image(Draw.region("icon-" + Item.getByID(i).name));
 			Label label = new Label(formatted);
 			label.setFontScale(fontscale*1.5f);
 			itemtable.add(image).size(8*3);

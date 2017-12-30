@@ -127,7 +127,7 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 		public void read(DataInputStream stream) throws IOException{
 			super.read(stream);
 			byte id = stream.readByte();
-			liquid = id == -1 ? null : Liquid.liquids.get(id);
+			liquid = id == -1 ? null : Liquid.getByID(id);
 			liquidAmount = stream.readByte();
 		}
 	}

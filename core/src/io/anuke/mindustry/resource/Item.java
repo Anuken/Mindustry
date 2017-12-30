@@ -4,16 +4,16 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.ucore.util.Bundles;
 
 public class Item{
+	private static final Array<Item> items = new Array<>();
 
-	public static final Array<Item> items = new Array<>();
-
-	public static final Item stone = new Item("stone");
-	public static final Item iron = new Item("iron");
-	public static final Item coal = new Item("coal");
-	public static final Item steel = new Item("steel");
-	public static final Item titanium = new Item("titanium");
-	public static final Item dirium = new Item("dirium");
-	public static final Item uranium = new Item("uranium");
+	public static final Item
+		stone = new Item("stone"),
+		iron = new Item("iron"),
+		coal = new Item("coal"),
+		steel = new Item("steel"),
+		titanium = new Item("titanium"),
+		dirium = new Item("dirium"),
+		uranium = new Item("uranium");
 
 	public final int id;
 	public final String name;
@@ -36,5 +36,9 @@ public class Item{
 
 	public static Array<Item> getAllItems() {
 		return Item.items;
+	}
+
+	public static Item getByID(int id){
+		return items.get(id);
 	}
 }

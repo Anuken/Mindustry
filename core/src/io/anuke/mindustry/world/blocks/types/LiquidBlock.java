@@ -130,7 +130,7 @@ public class LiquidBlock extends Block implements LiquidAcceptor{
 		@Override
 		public void read(DataInputStream stream) throws IOException{
 			byte id = stream.readByte();
-			liquid = id == -1 ? null : Liquid.liquids.get(id);
+			liquid = id == -1 ? null : Liquid.getByID(id);
 			liquidAmount = stream.readByte();
 		}
 	}

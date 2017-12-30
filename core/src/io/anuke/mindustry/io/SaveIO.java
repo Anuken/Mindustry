@@ -360,7 +360,7 @@ public class SaveIO{
 			Arrays.fill(Vars.control.getItems(), 0);
 			
 			for(int i = 0; i < totalItems; i ++){
-				Item item = Item.items.get(stream.readByte());
+				Item item = Item.getByID(stream.readByte());
 				int amount = stream.readInt();
 				Vars.control.getItems()[item.id] = amount;
 			}

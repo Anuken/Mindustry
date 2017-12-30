@@ -6,12 +6,13 @@ import io.anuke.ucore.util.Bundles;
 
 public class Liquid {
 
-	public static final Array<Liquid> liquids = new Array<>();
+	private static final Array<Liquid> liquids = new Array<>();
 
-	public static final Liquid water = new Liquid("water", Color.ROYAL);
-	public static final Liquid plasma = new Liquid("plasma", Color.CORAL);
-	public static final Liquid lava = new Liquid("lava", Color.valueOf("ed5334"));
-	public static final Liquid oil = new Liquid("oil", Color.valueOf("292929"));
+	public static final Liquid
+		water = new Liquid("water", Color.ROYAL),
+		plasma = new Liquid("plasma", Color.CORAL),
+		lava = new Liquid("lava", Color.valueOf("ed5334")),
+		oil = new Liquid("oil", Color.valueOf("292929"));
 	
 	public final Color color;
 	public final String name;
@@ -37,5 +38,9 @@ public class Liquid {
 
 	public static Array<Liquid> getAllLiquids() {
 		return Liquid.liquids;
+	}
+
+	public static Liquid getByID(int id){
+		return liquids.get(id);
 	}
 }
