@@ -37,6 +37,10 @@ public class Saves {
         }
     }
 
+    public SaveSlot getCurrent() {
+        return current;
+    }
+
     public void update(){
         if(!GameState.is(State.menu) && !GameState.is(State.dead) && current != null && current.isAutosave()){
             time += Timers.delta();

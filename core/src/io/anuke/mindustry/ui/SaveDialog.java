@@ -46,6 +46,7 @@ public class SaveDialog extends LoadDialog{
 	}
 
 	void save(SaveSlot slot){
+
 		Vars.ui.showLoading("$text.saveload");
 
 		Timers.runTask(5f, () -> {
