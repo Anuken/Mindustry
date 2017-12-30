@@ -12,7 +12,8 @@ public class Liquid {
 		water = new Liquid("water", Color.ROYAL),
 		plasma = new Liquid("plasma", Color.CORAL),
 		lava = new Liquid("lava", Color.valueOf("ed5334")),
-		oil = new Liquid("oil", Color.valueOf("292929"));
+		oil = new Liquid("oil", Color.valueOf("292929")),
+		cryofluid = new Liquid("cryofluid", Color.SKY);
 	
 	public final Color color;
 	public final String name;
