@@ -228,6 +228,13 @@ blocks/conveyortunnel
   orig: 8, 8
   offset: 0, 0
   index: -1
+blocks/conduittunnel
+  rotate: false
+  xy: 423, 83
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
 blocks/core
   rotate: false
   xy: 445, 105
