@@ -19,13 +19,15 @@ public class Net{
 	/**Connect to an address.*/
 	public static void connect(String ip, int port) throws IOException{
 		clientProvider.connect(ip, port);
+		active = true;
+		server = false;
 	}
 
 	/**Host a server at an address*/
 	public static void host(int port) throws IOException{
+		serverProvider.host(port);
 		active = true;
 		server = true;
-		serverProvider.host(port);
 	}
 
 	/**Closes the server.*/
@@ -34,6 +36,12 @@ public class Net{
         server = false;
         active = false;
     }
+
+    public static void disconnect(){
+		clientProvider.disconnect();
+		server = false;
+		active = false;
+	}
 	
 	/**Send an object to all connected clients, or to the server if this is a client.*/
 	public static void send(Object object, SendMode mode){
@@ -108,6 +116,8 @@ public class Net{
 		public void updatePing();
 		/**Get ping in milliseconds. Will only be valid after a call to updatePing.*/
 		public int getPing();
+		/**Disconnect from the server.*/
+		public void disconnect();
 		/**Register classes to be sent.*/
 		public void register(Class<?>... types);
 	}

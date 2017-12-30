@@ -12,10 +12,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.utils.Array;
 
-import com.esotericsoftware.kryonet.Client;
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
-import com.esotericsoftware.kryonet.Server;
+import com.esotericsoftware.kryonet.*;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.ClientProvider;
@@ -91,6 +88,7 @@ public class DesktopLauncher {
 
 					@Override
 					public void received (Connection connection, Object object) {
+						if(object instanceof FrameworkMessage) return;
 						Net.handleClientReceived(object);
 					}
 				});
@@ -99,6 +97,11 @@ public class DesktopLauncher {
 			@Override
 			public void connect(String ip, int port) throws IOException {
 				client.connect(5000, ip, port, port);
+			}
+
+			@Override
+			public void disconnect() {
+				client.close();
 			}
 
 			@Override
@@ -155,6 +158,7 @@ public class DesktopLauncher {
 
 					@Override
 					public void received (Connection connection, Object object) {
+						if(object instanceof FrameworkMessage) return;
 						Net.handleServerReceived(object);
 					}
 				});

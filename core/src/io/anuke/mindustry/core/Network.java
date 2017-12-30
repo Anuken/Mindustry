@@ -15,6 +15,14 @@ public class Network extends Module{
     }
 
     public void update(){
+        if(GameState.is(State.playing) && Net.active()){
+            if(Net.server()){
+
+            }else{
+
+            }
+        }
+
         if(isHosting && GameState.is(State.menu)){
             Net.closeServer();
             isHosting = false;

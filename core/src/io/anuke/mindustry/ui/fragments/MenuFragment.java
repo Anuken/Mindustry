@@ -25,25 +25,30 @@ public class MenuFragment implements Fragment{
 					float scale = 4f;
 					defaults().size(100*scale, 21*scale).pad(-10f);
 					
-					add(new MenuButton("text-play", group, ui::showLevels));
+					add(new MenuButton("$text.play", group, ui::showLevels));
 					row();
-					
-					add(new MenuButton("text-tutorial", group, ()-> control.playMap(world.maps().getMap("tutorial"))));
-					row();
-					
+
 					if(!gwt){
-						add(new MenuButton("text-load", group, ui::showLoadGame));
-						row();
-						
-						add(new MenuButton("text-editor", group, ui::showEditor));
+						add(new MenuButton("$text.joingame", group, ui::showJoinGame));
 						row();
 					}
 					
-					add(new MenuButton("text-settings", group, ui::showPrefs));
+					add(new MenuButton("$text.tutorial", group, ()-> control.playMap(world.maps().getMap("tutorial"))));
 					row();
 					
 					if(!gwt){
-						add(new MenuButton("text-exit", group, Gdx.app::exit));
+						add(new MenuButton("$text.loadgame", group, ui::showLoadGame));
+						row();
+						
+						add(new MenuButton("$text.editor", group, ui::showEditor));
+						row();
+					}
+					
+					add(new MenuButton("$text.settings", group, ui::showPrefs));
+					row();
+					
+					if(!gwt){
+						add(new MenuButton("$text.quit", group, Gdx.app::exit));
 					}
 					get().margin(16);
 				}}.end();

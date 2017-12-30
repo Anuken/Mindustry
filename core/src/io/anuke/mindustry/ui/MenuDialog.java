@@ -79,15 +79,10 @@ public class MenuDialog extends FloatingDialog{
             content().row();
 
 			content().addButton("$text.quit", () -> {
-				new ConfirmDialog("$text.confirm", "$text.quit.confirm", () -> {
+				Vars.ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
 					hide();
 					GameState.set(State.menu);
-				}){
-					{
-						for(Cell<?> cell : getButtonTable().getCells())
-							cell.pad(3).size(180, 44);
-					}
-				}.show();
+				});
 			});
 
 		}else{
@@ -111,13 +106,10 @@ public class MenuDialog extends FloatingDialog{
 			new imagebutton("icon-load", isize, () -> load.show()).text("$text.load").padTop(4f);
 			
 			new imagebutton("icon-quit", isize, () -> {
-				new ConfirmDialog("$text.confirm", "$text.quit.confirm", () -> {
+				Vars.ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
 					hide();
 					GameState.set(State.menu);
-				}){{
-					for(Cell<?> cell : getButtonTable().getCells())
-						cell.pad(3).size(180, 44);
-				}}.show();
+				});
 			}).text("Quit").padTop(4f);
 			
 			for(Element e : content().getChildren()){
