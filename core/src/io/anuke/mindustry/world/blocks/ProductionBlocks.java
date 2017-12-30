@@ -164,6 +164,11 @@ public class ProductionBlocks{
 				tryDump(tile);
 			}
 		}
+		
+                @Override
+                public boolean isLayer(Tile tile){
+                    return tile.floor().drops == null;
+                }
 	},
 	coalgenerator = new ItemPowerGenerator("coalgenerator"){
 		{
