@@ -28,7 +28,7 @@ public class Sorter extends Junction implements Configurable{
 		
 		SorterEntity entity = tile.entity();
 		
-		TextureRegion region = Draw.region("icon-" + entity.sortItem.name());
+		TextureRegion region = Draw.region("icon-" + entity.sortItem.name);
 		Tmp.tr1.setRegion(region, 4, 4, 1, 1);
 		
 		Draw.rect(Tmp.tr1, tile.worldx(), tile.worldy(), 4f, 4f);
@@ -93,24 +93,24 @@ public class Sorter extends Junction implements Configurable{
 		SorterEntity entity = tile.entity();
 		
 		table.addIButton("icon-arrow-left", 10*3, ()->{
-			int color = entity.sortItem.ordinal();
+			int color = entity.sortItem.id;
 			
 			color --;
 			if(color < 0)
-				color += Item.values().length;
+				color += Item.getAllItems().size;
 			
-			entity.sortItem = Item.values()[color];
+			entity.sortItem = Item.getAllItems().get(color);
 		});
 		
 		table.add().size(40f);
 		
 		table.addIButton("icon-arrow-right", 10*3, ()->{
-			int color = entity.sortItem.ordinal();
+			int color = entity.sortItem.id;
 			
 			color ++;
-			color %= Item.values().length;
+			color %= Item.getAllItems().size;
 			
-			entity.sortItem = Item.values()[color];
+			entity.sortItem = Item.getAllItems().get(color);
 		});
 	}
 	
@@ -124,12 +124,12 @@ public class Sorter extends Junction implements Configurable{
 		
 		@Override
 		public void write(DataOutputStream stream) throws IOException{
-			stream.writeByte(sortItem.ordinal());
+			stream.writeByte(sortItem.id);
 		}
 		
 		@Override
 		public void read(DataInputStream stream) throws IOException{
-			sortItem = Item.values()[stream.readByte()];
+			sortItem = Item.getAllItems().get(stream.readByte());
 		}
 	}
 }
