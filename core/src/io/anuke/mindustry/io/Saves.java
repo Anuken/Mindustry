@@ -42,7 +42,6 @@ public class Saves {
             time += Timers.delta();
             if(time > Settings.getInt("saveinterval")*60) {
                 saving = true;
-                Vars.ui.showError("sacving");
 
                 exec.submit(() -> {
                     SaveIO.saveToSlot(current.index);
