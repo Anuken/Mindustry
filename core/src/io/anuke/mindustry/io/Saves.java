@@ -37,6 +37,10 @@ public class Saves {
         }
     }
 
+    public SaveSlot getCurrent() {
+        return current;
+    }
+
     public void update(){
         if(!GameState.is(State.menu) && !GameState.is(State.dead) && current != null && current.isAutosave()){
             time += Timers.delta();
@@ -94,7 +98,7 @@ public class Saves {
 
         public void save(){
             current = this;
-            SaveIO.isSaveValid(index);
+            SaveIO.saveToSlot(index);
         }
 
         public String getDate(){
@@ -152,7 +156,9 @@ public class Saves {
 
         public void delete(){
             SaveIO.fileFor(index).delete();
-            load();
+            if(this == current){
+                current = null;
+            }
         }
     }
 }

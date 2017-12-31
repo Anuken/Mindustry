@@ -13,4 +13,7 @@ public class Packets {
         public String addressTCP;
     }
 
+    public static class WorldData {
+
+    }
 }

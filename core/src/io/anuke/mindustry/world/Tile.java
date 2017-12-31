@@ -149,11 +149,11 @@ public class Tile{
 	public byte getExtra(){
 		return Bits.getRightByte(Bits.getRightByte(data));
 	}
-	
+
 	public boolean passable(){
 		Block block = block();
 		Block floor = floor();
-		return isLinked() || !(floor.solid || (block.solid && (!block.destructible && !block.update)));
+		return isLinked() || !((floor.solid && (block == Blocks.air || block.solidifes)) || (block.solid && (!block.destructible && !block.update)));
 	}
 	
 	public boolean solid(){

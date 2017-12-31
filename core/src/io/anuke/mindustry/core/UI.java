@@ -248,7 +248,7 @@ public class UI extends SceneModule{
 		prefs.game.checkPref("indicators", true);
 		prefs.game.checkPref("effects", true);
 		prefs.game.sliderPref("sensitivity", 100, 10, 300, i -> i + "%");
-		prefs.game.sliderPref("saveinterval", 120, 15, 5*120, i -> Bundles.format("setting.seconds", i));
+		prefs.game.sliderPref("saveinterval", 90, 15, 5*120, i -> Bundles.format("setting.seconds", i));
 
         prefs.graphics.checkPref("fps", false);
 		prefs.graphics.checkPref("vsync", true, b -> Gdx.graphics.setVSync(b));
