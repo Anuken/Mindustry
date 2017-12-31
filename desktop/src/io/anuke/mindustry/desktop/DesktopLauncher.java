@@ -13,6 +13,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.utils.Array;
 
+import com.badlogic.gdx.utils.compression.Lzma;
 import com.esotericsoftware.kryonet.*;
 import com.esotericsoftware.kryonet.util.InputStreamSender;
 import com.esotericsoftware.minlog.Log;

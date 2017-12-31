@@ -222,6 +222,7 @@ public class Renderer extends RendererModule{
 		Entities.draw(control.enemyGroup);
 		Graphics.shader();
 
+		Entities.draw(control.playerGroup);
 		Entities.draw(Entities.defaultGroup());
 
 		blocks.drawBlocks(true);

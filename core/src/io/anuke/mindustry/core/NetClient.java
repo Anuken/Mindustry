@@ -1,6 +1,7 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.net.Net;
 import com.badlogic.gdx.Gdx;
@@ -9,6 +10,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
+import io.anuke.mindustry.net.Packets.EntityDataPacket;
 import io.anuke.mindustry.net.Packets.WorldData;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
@@ -42,10 +44,24 @@ public class NetClient extends Module {
             Gdx.app.postRunnable(() -> {
                 UCore.log("Recieved world data: " + data.stream.available() + " bytes.");
                 SaveIO.load(data.stream);
+
                 GameState.set(State.playing);
                 connecting = false;
                 Vars.ui.hideLoading();
                 Vars.ui.hideJoinGame();
+            });
+        });
+
+        Net.handle(EntityDataPacket.class, data -> {
+
+            Gdx.app.postRunnable(() -> {
+                Timers.run(10f, () -> {
+                    for (Player player : data.players) {
+                        if (player.id != data.playerid) {
+                            player.add();
+                        }
+                    }
+                });
             });
         });
     }

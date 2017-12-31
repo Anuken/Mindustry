@@ -129,7 +129,7 @@ public class Enemy extends DestructibleEntity{
 
 			//no tile found
 			if(target == null){
-				target = Entities.getClosest(Entities.defaultGroup(), x, y, range, e -> e instanceof Player);
+				target = Entities.getClosest(Vars.control.playerGroup, x, y, range, e -> true);
 			}
 		}else if(nearCore){
 			target = Vars.control.getCore().entity;

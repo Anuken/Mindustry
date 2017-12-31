@@ -52,6 +52,7 @@ public class Control extends Module{
 	public final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);
 	public final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
 	public final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class);
+	public final EntityGroup<Player> playerGroup = Entities.addGroup(Player.class);
 	
 	Array<EnemySpawn> spawns;
 	int wave = 1;
@@ -660,9 +661,10 @@ public class Control extends Module{
 				Entities.update(enemyGroup);
 				Entities.update(tileGroup);
 				Entities.update(shieldGroup);
+				Entities.update(playerGroup);
 				
 				Entities.collideGroups(enemyGroup, bulletGroup);
-				Entities.collideGroups(Entities.defaultGroup(), bulletGroup);
+				Entities.collideGroups(playerGroup, bulletGroup);
 			}
 		}
 	}

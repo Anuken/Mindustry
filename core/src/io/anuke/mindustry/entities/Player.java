@@ -7,6 +7,7 @@ import com.badlogic.gdx.Input.Buttons;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.input.PlaceMode;
+import io.anuke.mindustry.net.Syncable;
 import io.anuke.mindustry.resource.Mech;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Weapon;
@@ -17,14 +18,16 @@ import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
-public class Player extends DestructibleEntity{
+public class Player extends DestructibleEntity implements Syncable{
 	private static final float speed = 1.1f;
 	private static final float dashSpeed = 1.8f;
 	
-	public Weapon weapon;
+	public transient Weapon weapon;
 	public Mech mech = Mech.standard;
 	public float angle;
-	
+
+	public transient int clientid;
+
 	public transient float breaktime = 0;
 	public transient Recipe recipe;
 	public transient int rotation;
@@ -121,5 +124,10 @@ public class Player extends DestructibleEntity{
 			float angle = Angles.mouseAngle(x, y);
 			this.angle = Mathf.lerpAngDelta(this.angle, angle, 0.1f);
 		}
+	}
+
+	@Override
+	public Player add(){
+		return add(Vars.control.playerGroup);
 	}
 }
