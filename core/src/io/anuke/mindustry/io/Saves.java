@@ -156,7 +156,9 @@ public class Saves {
 
         public void delete(){
             SaveIO.fileFor(index).delete();
-            load();
+            if(this == current){
+                current = null;
+            }
         }
     }
 }
