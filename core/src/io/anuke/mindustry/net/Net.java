@@ -100,6 +100,11 @@ public class Net{
 		return server;
 	}
 
+	/**Whether this is a client or not.*/
+	public static boolean client(){
+		return !server;
+	}
+
 	/**Register classes that will be sent. Must be done for all classes.*/
 	public static void registerClasses(Class<?>... classes){
 		clientProvider.register(classes);

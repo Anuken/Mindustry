@@ -3,7 +3,6 @@ package io.anuke.mindustry;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.I18NBundle;
 
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.Player;
@@ -80,7 +79,8 @@ public class Vars{
 	public static Renderer renderer;
 	public static UI ui;
 	public static World world;
-	public static Network network;
+	public static NetServer netServer;
+	public static NetClient netClient;
 	
 	public static Player player;
 	

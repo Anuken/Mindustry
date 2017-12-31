@@ -5,13 +5,12 @@ import static io.anuke.mindustry.Vars.ui;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.builders.imagebutton;
-import io.anuke.ucore.scene.ui.ConfirmDialog;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.TextField.TextFieldFilter.DigitsOnlyFilter;
-import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Strings;
 
@@ -68,13 +67,13 @@ public class MenuDialog extends FloatingDialog{
 						Vars.ui.showError("$text.server.invalidport");
 					}else{
 						try{
-							Vars.network.hostServer(result);
+							Net.host(result);
 						}catch (IOException e){
 							Vars.ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
 						}
 					}
 				});
-			}).disabled(b -> Vars.network.isHosting());
+			}).disabled(b -> Net.active() || (Net.active() && !Net.server()));
 
             content().row();
 
