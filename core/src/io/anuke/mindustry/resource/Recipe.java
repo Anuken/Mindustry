@@ -1,11 +1,13 @@
 package io.anuke.mindustry.resource;
 
-import static io.anuke.mindustry.resource.Section.*;
-
 import com.badlogic.gdx.utils.Array;
-
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.blocks.DefenseBlocks;
+import io.anuke.mindustry.world.blocks.DistributionBlocks;
+import io.anuke.mindustry.world.blocks.ProductionBlocks;
+import io.anuke.mindustry.world.blocks.WeaponBlocks;
+
+import static io.anuke.mindustry.resource.Section.*;
 
 public enum Recipe{
 	stonewall(defense, DefenseBlocks.stonewall, stack(Item.stone, 2)),
@@ -93,6 +95,15 @@ public enum Recipe{
 	
 	private static ItemStack stack(Item item, int amount){
 		return new ItemStack(item, amount);
+	}
+
+	public static Recipe getByResult(Block block){
+		for(Recipe recipe : Recipe.values()){
+			if(recipe.result == block){
+				return recipe;
+			}
+		}
+		return null;
 	}
 	
 	public static Array<Recipe> getBy(Section section, Array<Recipe> r){

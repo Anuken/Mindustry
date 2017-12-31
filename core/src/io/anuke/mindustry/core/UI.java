@@ -1,22 +1,12 @@
 package io.anuke.mindustry.core;
 
-import static io.anuke.mindustry.Vars.*;
-import static io.anuke.ucore.scene.actions.Actions.*;
-
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.controllers.Controller;
-import com.badlogic.gdx.controllers.ControllerAdapter;
-import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
-
-import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.IntSet.IntSetIterator;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
@@ -28,17 +18,13 @@ import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.Configurable;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
-import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Listenable;
-import io.anuke.ucore.function.VisibilityProvider;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Skin;
 import io.anuke.ucore.scene.builders.build;
-import io.anuke.ucore.scene.builders.field;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
@@ -51,8 +37,10 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Strings;
 
-import javax.tools.Tool;
 import java.io.IOException;
+
+import static io.anuke.mindustry.Vars.*;
+import static io.anuke.ucore.scene.actions.Actions.*;
 
 public class UI extends SceneModule{
 	Table loadingtable, configtable;
@@ -325,7 +313,7 @@ public class UI extends SceneModule{
 		placefrag.build();
 		
 		loadingtable = new table("loadDim"){{
-			get().setTouchable(Touchable.enabled);
+			touchable(Touchable.enabled);
 			get().addImage("white").growX()
 			.height(3f).pad(4f).growX().get().setColor(Colors.get("accent"));
 			row();

@@ -67,7 +67,7 @@ public class Vars{
 	//only if smoothCamera
 	public static boolean snapCamera = true;
 	
-	//turret and enemy shoot speed inverse multiplier
+	//turret and enemy shootInternal speed inverse multiplier
 	public static final float multiplier = android ? 3 : 2;
 	
 	public static final int tilesize = 8;

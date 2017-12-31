@@ -221,7 +221,7 @@ public class Block{
 	}
 	
 	public void draw(Tile tile){
-		//note: multiblocks do not support rotation
+		//note: multiblocks do not support placerot
 		if(!isMultiblock()){
 			Draw.rect(variants > 0 ? (name() + Mathf.randomSeed(tile.id(), 1, variants))  : name(), 
 					tile.worldx(), tile.worldy(), rotate ? tile.getRotation() * 90 : 0);

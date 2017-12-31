@@ -1,17 +1,14 @@
 package io.anuke.mindustry.net;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.stream.Stream;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
-
 import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamBuilder;
 import io.anuke.mindustry.net.Streamable.StreamChunk;
 import io.anuke.ucore.function.Consumer;
+
+import java.io.IOException;
 
 //TODO stub
 public class Net{
@@ -22,6 +19,7 @@ public class Net{
 	private static ClientProvider clientProvider;
 	private static ServerProvider serverProvider;
 
+	private static int lastConnection = -1;
 	private static IntMap<StreamBuilder> streams = new IntMap<>();
 	
 	/**Connect to an address.*/
@@ -63,6 +61,11 @@ public class Net{
 	/**Send an object to a certain client. Server-side only*/
 	public static void sendTo(int id, Object object, SendMode mode){
 		serverProvider.sendTo(id, object, mode);
+	}
+
+	/**Send an object to everyone EXCEPT certain client. Server-side only*/
+	public static void sendExcept(int id, Object object, SendMode mode){
+		serverProvider.sendExcept(id, object, mode);
 	}
 
 	/**Send a stream to a specific client. Server-side only.*/
@@ -114,12 +117,18 @@ public class Net{
 	}
 
 	/**Call to handle a packet being recieved for the server.*/
-	public static void handleServerReceived(Object object){
+	public static void handleServerReceived(Object object, int connection){
 		if(serverListeners.get(object.getClass()) != null){
+			lastConnection = connection;
 			serverListeners.get(object.getClass()).accept(object);
 		}else{
 			Gdx.app.error("Mindustry::Net", "Unhandled packet type: '" + object.getClass() + "'!");
 		}
+	}
+
+	/**Returns the last connection that sent a packet to this server.*/
+	public static int getLastConnection(){
+		return lastConnection;
 	}
 	
 	/**Whether the net is active, e.g. whether this is a multiplayer game.*/

@@ -1,9 +1,5 @@
 package io.anuke.mindustry.entities;
 
-import static io.anuke.mindustry.Vars.*;
-
-import com.badlogic.gdx.Input.Buttons;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.input.PlaceMode;
@@ -18,19 +14,23 @@ import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
+import static io.anuke.mindustry.Vars.*;
+
 public class Player extends DestructibleEntity implements Syncable{
 	private static final float speed = 1.1f;
 	private static final float dashSpeed = 1.8f;
 	
-	public transient Weapon weapon;
+	public transient Weapon weapon = Weapon.blaster;
 	public Mech mech = Mech.standard;
 	public float angle;
 
 	public transient int clientid;
+	public transient boolean isLocal = false;
+	public transient Interpolator<Player> inter = new Interpolator<>(SyncType.player);
 
 	public transient float breaktime = 0;
 	public transient Recipe recipe;
-	public transient int rotation;
+	public transient int placerot;
 	public transient PlaceMode placeMode = android ? PlaceMode.cursor : PlaceMode.hold;
 	public transient PlaceMode breakMode = android ? PlaceMode.none : PlaceMode.holdDelete;
 	
@@ -41,7 +41,12 @@ public class Player extends DestructibleEntity implements Syncable{
 		maxhealth = 100;
 		heal();
 	}
-	
+
+	@Override
+	public Interpolator getInterpolator() {
+		return inter;
+	}
+
 	@Override
 	public void damage(int amount){
 		if(!Vars.debug && !Vars.android)
@@ -50,14 +55,26 @@ public class Player extends DestructibleEntity implements Syncable{
 	
 	@Override
 	public void onDeath(){
-		
-		remove();
+		if(isLocal){
+			remove();
+		}else{
+			set(-9999, -9999);
+		}
+
 		Effects.effect(Fx.explosion, this);
 		Effects.shake(4f, 5f, this);
 		Effects.sound("die", this);
-		
-		Vars.control.setRespawnTime(respawnduration);
-		ui.fadeRespawn(true);
+
+		//TODO respawning doesn't work for multiplayer
+		if(isLocal) {
+			Vars.control.setRespawnTime(respawnduration);
+			ui.fadeRespawn(true);
+		}else{
+			Timers.run(respawnduration, () -> {
+				heal();
+				set(Vars.control.getCore().worldx(), Vars.control.getCore().worldy());
+			});
+		}
 	}
 	
 	@Override
@@ -74,6 +91,10 @@ public class Player extends DestructibleEntity implements Syncable{
 	
 	@Override
 	public void update(){
+		if(!isLocal){
+			if(!isDead()) inter.update(this);
+			return;
+		}
 		
 		float speed = Inputs.keyDown("dash") ? Player.dashSpeed : Player.speed;
 		
@@ -95,11 +116,11 @@ public class Player extends DestructibleEntity implements Syncable{
 		vector.y += ya*speed;
 		vector.x += xa*speed;
 		
-		boolean shooting = !Inputs.keyDown("dash") && Inputs.keyDown("shoot") && recipe == null
+		boolean shooting = !Inputs.keyDown("dash") && Inputs.keyDown("shootInternal") && recipe == null
 				&& !ui.hasMouse() && !control.getInput().onConfigurable();
 		
 		if(shooting && Timers.get(this, "reload", weapon.reload)){
-			weapon.shoot(this);
+			weapon.shoot(this, x, y, Angles.mouseAngle(x, y));
 			Sounds.play(weapon.shootsound);
 		}
 		

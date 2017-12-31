@@ -1,13 +1,8 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
@@ -26,6 +21,10 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class Turret extends Block{
 	static final int targetInterval = 15;

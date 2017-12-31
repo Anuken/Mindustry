@@ -1,28 +1,17 @@
 package io.anuke.mindustry.desktop;
 
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URI;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.utils.Array;
-
-import com.badlogic.gdx.utils.compression.Lzma;
 import com.esotericsoftware.kryonet.*;
 import com.esotericsoftware.kryonet.util.InputStreamSender;
 import com.esotericsoftware.minlog.Log;
 import io.anuke.mindustry.Mindustry;
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.io.PlatformFunction;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.ClientProvider;
 import io.anuke.mindustry.net.Net.SendMode;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.io.PlatformFunction;
 import io.anuke.mindustry.net.Net.ServerProvider;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
@@ -32,6 +21,15 @@ import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamChunk;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.scene.ui.TextField;
+
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 
 public class DesktopLauncher {
 	
@@ -158,20 +156,20 @@ public class DesktopLauncher {
 						Connect c = new Connect();
 						c.id = connection.getID();
 						c.addressTCP = connection.getRemoteAddressTCP().toString();
-						Net.handleServerReceived(c);
+						Net.handleServerReceived(c, c.id);
 					}
 
 					@Override
 					public void disconnected (Connection connection) {
 						Disconnect c = new Disconnect();
 						c.id = connection.getID();
-						Net.handleServerReceived(c);
+						Net.handleServerReceived(c, c.id);
 					}
 
 					@Override
 					public void received (Connection connection, Object object) {
 						if(object instanceof FrameworkMessage) return;
-						Net.handleServerReceived(object);
+						Net.handleServerReceived(object, connection.getID());
 					}
 				});
 

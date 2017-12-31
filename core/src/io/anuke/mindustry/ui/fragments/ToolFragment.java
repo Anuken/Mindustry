@@ -33,8 +33,8 @@ public class ToolFragment implements Fragment{
 		});
 		
 		tools.addIButton("icon-rotate", isize, () -> {
-			player.rotation ++;
-			player.rotation %= 4;
+			player.placerot++;
+			player.placerot %= 4;
 		});
 		
 		tools.addIButton("icon-check", isize, () -> {

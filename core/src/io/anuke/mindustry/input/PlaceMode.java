@@ -20,8 +20,6 @@ import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
-import javax.tools.Tool;
-
 public enum PlaceMode{
 	cursor{
 		{
@@ -45,12 +43,12 @@ public enum PlaceMode{
 			Draw.linecrect(x + offset.x, y + offset.y, tilesize * player.recipe.result.width + si, 
 					tilesize * player.recipe.result.height + si);
 
-			player.recipe.result.drawPlace(tilex, tiley, player.rotation, valid);
+			player.recipe.result.drawPlace(tilex, tiley, player.placerot, valid);
 			Draw.thickness(2f);
 
 			if(player.recipe.result.rotate){
 				Draw.color(Colors.get("placeRotate"));
-				Tmp.v1.set(7, 0).rotate(player.rotation * 90);
+				Tmp.v1.set(7, 0).rotate(player.placerot * 90);
 				Draw.line(x, y, x + Tmp.v1.x, y + Tmp.v1.y);
 			}
 			
@@ -319,7 +317,7 @@ public enum PlaceMode{
 		public void released(int tilex, int tiley, int endx, int endy){
 			process(tilex, tiley, endx, endy);
 			
-			player.rotation = this.rotation;
+			player.placerot = this.rotation;
 			
 			boolean first = true;
 			for(int x = 0; x <= Math.abs(this.endx - this.tilex); x ++){
@@ -358,7 +356,7 @@ public enum PlaceMode{
 			else if(endy < tiley)
 				rotation = 3;
 			else 
-				rotation = player.rotation;
+				rotation = player.placerot;
 			
 			if(endx < tilex){
 				int t = endx;

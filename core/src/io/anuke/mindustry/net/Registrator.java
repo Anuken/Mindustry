@@ -3,13 +3,10 @@ package io.anuke.mindustry.net;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.net.Packets.EntityDataPacket;
-import io.anuke.mindustry.net.Packets.SyncPacket;
-import io.anuke.mindustry.net.Packets.WorldData;
+import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamChunk;
 import io.anuke.mindustry.resource.Mech;
-import io.anuke.mindustry.resource.Weapon;
 import io.anuke.ucore.entities.Entity;
 
 public class Registrator {
@@ -21,8 +18,18 @@ public class Registrator {
                 WorldData.class,
                 SyncPacket.class,
                 EntityDataPacket.class,
+                PositionPacket.class,
+                ShootPacket.class,
+                PlacePacket.class,
+                BreakPacket.class,
+                StateSyncPacket.class,
+                BlockSyncPacket.class,
+
                 Class.class,
                 byte[].class,
+                float[].class,
+                float[][].class,
+                int[].class,
                 Entity[].class,
                 Player[].class,
                 Array.class,
