@@ -98,7 +98,7 @@ public class Saves {
 
         public void save(){
             current = this;
-            SaveIO.isSaveValid(index);
+            SaveIO.saveToSlot(index);
         }
 
         public String getDate(){
