@@ -1,5 +1,7 @@
 package io.anuke.mindustry.core;
 
+import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.net.Net;
 import com.badlogic.gdx.Gdx;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;

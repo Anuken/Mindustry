@@ -4,6 +4,11 @@ com.badlogic.gdx.graphics.g2d.BitmapFont: {
 		file: square.fnt,
 		markupEnabled: true,
 		scale: 0.5
+	},
+	title: {
+		file: title.fnt,
+		markupEnabled: true,
+		scale: 2
 	}
 },
 com.badlogic.gdx.graphics.Color: {
@@ -75,6 +80,7 @@ io.anuke.ucore.scene.ui.Slider$SliderStyle: {
 },
 io.anuke.ucore.scene.ui.Label$LabelStyle: {
 	default: {font: default-font, fontColor: white },
+	title: {font: title, fontColor: white },
 	link-label: {fontColor: link-label, font: default-font },
 	small: {font: default-font, fontColor: white },
 	menuitem-shortcut: {font: default-font, fontColor: menuitem }

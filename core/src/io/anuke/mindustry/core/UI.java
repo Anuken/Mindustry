@@ -22,6 +22,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.mapeditor.MapEditor;
 import io.anuke.mindustry.mapeditor.MapEditorDialog;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.mindustry.world.Tile;
@@ -42,24 +43,29 @@ import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
+import io.anuke.ucore.scene.ui.TextField.TextFieldFilter;
+import io.anuke.ucore.scene.ui.TextField.TextFieldFilter.DigitsOnlyFilter;
 import io.anuke.ucore.scene.ui.Window.WindowStyle;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Strings;
 
 import javax.tools.Tool;
+import java.io.IOException;
 
 public class UI extends SceneModule{
-	Table loadingtable, desctable, configtable;
+	Table loadingtable, configtable;
 	MindustrySettingsDialog prefs;
 	MindustryKeybindDialog keys;
 	MapEditorDialog editorDialog;
-	Dialog about, restart, levels, upgrades, load, settingserror, gameerror, discord;
+	Dialog about, restart, levels, upgrades, load, settingserror, gameerror, discord, join;
 	MenuDialog menu;
 	Tooltip tooltip;
 	Tile configTile;
-	Array<String> statlist = new Array<>();
 	MapEditor editor;
+	String lastip = "localhost";
+	int lastport = Vars.port;
 	boolean wasPaused = false;
 	
 	private Fragment menufrag = new MenuFragment(),
@@ -67,9 +73,6 @@ public class UI extends SceneModule{
 			hudfrag = new HudFragment(),
 			placefrag = new PlacementFragment(),
 			weaponfrag = new WeaponFragment();
-
-	VisibilityProvider play = () -> !GameState.is(State.menu);
-	VisibilityProvider nplay = () -> GameState.is(State.menu);
 	
 	public UI() {
 		Dialog.setShowAction(()-> sequence(
@@ -155,7 +158,7 @@ public class UI extends SceneModule{
 	public void update(){
 		if(Vars.debug && !Vars.showUI) return;
 		
-		if(nplay.visible()){
+		if(GameState.is(State.menu)){
 			scene.getBatch().getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 			scene.getBatch().begin();
 			
@@ -186,13 +189,32 @@ public class UI extends SceneModule{
 			editor = new MapEditor();
 			editorDialog = new MapEditorDialog(editor);
 		}
+
+		join = new FloatingDialog("$text.joingame.title");
+		join.content().add("$text.joingame.ip").left();
+		join.content().addField("localhost", text -> lastip = text).size(180f, 54f);
+		join.content().row();
+		join.content().add("$text.server.port").left();
+		join.content().addField(Vars.port + "", new DigitsOnlyFilter(), text -> lastport = Strings.parseInt(text)).size(180f, 54f);
+		join.buttons().defaults().size(140f, 60f).pad(4f);
+		join.buttons().addButton("$text.cancel", join::hide);
+		join.buttons().addButton("$text.ok", () -> {
+			showLoading("$text.connecting");
+
+			Timers.runTask(2f, () -> {
+				try{
+					Net.connect(lastip, lastport);
+				}catch (IOException e) {
+					showError(Bundles.format("text.connectfail", Strings.parseException(e, false)));
+					hideLoading();
+				}
+			});
+		}).disabled(b -> lastip.isEmpty() || lastport == Integer.MIN_VALUE);
 		
 		settingserror = new Dialog("Warning", "dialog");
 		settingserror.content().add("[crimson]Failed to access local storage.\nSettings will not be saved.");
 		settingserror.content().margin(10f);
-		settingserror.getButtonTable().addButton("OK", ()->{
-			settingserror.hide();
-		}).size(80f, 55f).pad(4);
+		settingserror.getButtonTable().addButton("OK", settingserror::hide).size(80f, 55f).pad(4);
 		
 		gameerror = new Dialog("$text.error.crashtitle", "dialog");
 		gameerror.content().labelWrap("$text.error.crashmessage").width(600f).pad(10f);
@@ -325,14 +347,6 @@ public class UI extends SceneModule{
 
 	}
 	
-	void invalidateAll(){
-		for(Element e : scene.getElements()){
-			if(e instanceof Table){
-				((Table)e).invalidateHierarchy();
-			}
-		}
-	}
-	
 	public void showGameError(){
 		gameerror.show();
 	}
@@ -371,12 +385,12 @@ public class UI extends SceneModule{
 		configtable.setVisible(false);
 	}
 
-	public void showTextInput(String title, String text, String def, Consumer<String> confirmed){
+	public void showTextInput(String title, String text, String def, TextFieldFilter filter, Consumer<String> confirmed){
 		new Dialog(title, "dialog"){{
 			content().margin(30);
 			content().add(text).padRight(6f);
 			TextField field = content().addField(def, t->{}).size(170f, 50f).get();
-			field.setTextFieldFilter((f, c) -> field.getText().length() < 12);
+			field.setTextFieldFilter((f, c) -> field.getText().length() < 12 && filter.acceptChar(f, c));
 			Mindustry.platforms.addDialog(field);
 			buttons().defaults().size(120, 54).pad(4);
 			buttons().addButton("$text.ok", () -> {
@@ -385,6 +399,10 @@ public class UI extends SceneModule{
 			}).disabled(b -> field.getText().isEmpty());
 			buttons().addButton("$text.cancel", this::hide);
 		}}.show();
+	}
+
+	public void showTextInput(String title, String text, String def, Consumer<String> confirmed){
+		showTextInput(title, text, def, (field, c) -> true, confirmed);
 	}
 
 	public void showError(String text){
@@ -431,6 +449,10 @@ public class UI extends SceneModule{
 	
 	public void showLoadGame(){
 		load.show();
+	}
+
+	public void showJoinGame(){
+		join.show();
 	}
 	
 	public void showMenu(){

@@ -16,5 +16,4 @@ public class Packets {
     public static class WorldData {
 
     }
-
 }
