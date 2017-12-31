@@ -1,5 +1,7 @@
 package io.anuke.mindustry.net;
 
+import java.io.InputStream;
+
 /**Class for storing all packets.*/
 public class Packets {
 
@@ -13,7 +15,7 @@ public class Packets {
         public String addressTCP;
     }
 
-    public static class WorldData {
+    public static class WorldData extends Streamable{
 
     }
 }

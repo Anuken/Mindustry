@@ -454,6 +454,10 @@ public class UI extends SceneModule{
 	public void showJoinGame(){
 		join.show();
 	}
+
+	public void hideJoinGame(){
+		join.hide();
+	}
 	
 	public void showMenu(){
 		menu.show();

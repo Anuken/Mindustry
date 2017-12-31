@@ -6,6 +6,7 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
@@ -13,6 +14,8 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.utils.Array;
 
 import com.esotericsoftware.kryonet.*;
+import com.esotericsoftware.kryonet.util.InputStreamSender;
+import com.esotericsoftware.minlog.Log;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.ClientProvider;
@@ -22,6 +25,11 @@ import io.anuke.mindustry.io.PlatformFunction;
 import io.anuke.mindustry.net.Net.ServerProvider;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
+import io.anuke.mindustry.net.Registrator;
+import io.anuke.mindustry.net.Streamable;
+import io.anuke.mindustry.net.Streamable.StreamBegin;
+import io.anuke.mindustry.net.Streamable.StreamChunk;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.scene.ui.TextField;
 
 public class DesktopLauncher {
@@ -65,6 +73,8 @@ public class DesktopLauncher {
 		
 		Mindustry.args = Array.with(arg);
 
+		Log.set(Log.LEVEL_DEBUG);
+
 		Net.setClientProvider(new ClientProvider() {
 			Client client;
 
@@ -92,6 +102,8 @@ public class DesktopLauncher {
 						Net.handleClientReceived(object);
 					}
 				});
+
+				register(Registrator.getClasses());
 			}
 
 			@Override
@@ -145,15 +157,14 @@ public class DesktopLauncher {
 						Connect c = new Connect();
 						c.id = connection.getID();
 						c.addressTCP = connection.getRemoteAddressTCP().toString();
-						Net.handleClientReceived(c);
+						Net.handleServerReceived(c);
 					}
 
 					@Override
 					public void disconnected (Connection connection) {
 						Disconnect c = new Disconnect();
 						c.id = connection.getID();
-						c.addressTCP = connection.getRemoteAddressTCP().toString();
-						Net.handleClientReceived(c);
+						Net.handleServerReceived(c);
 					}
 
 					@Override
@@ -162,6 +173,8 @@ public class DesktopLauncher {
 						Net.handleServerReceived(object);
 					}
 				});
+
+				register(Registrator.getClasses());
 			}
 
 			@Override
@@ -172,6 +185,33 @@ public class DesktopLauncher {
 			@Override
 			public void close() {
 				server.close();
+			}
+
+			@Override
+			public void sendStream(int id, Streamable stream) {
+				Connection connection = getByID(id);
+
+				connection.addListener(new InputStreamSender(stream.stream, 512) {
+					int id;
+
+					protected void start () {
+						//send an object so the receiving side knows how to handle the following chunks
+						StreamBegin begin = new StreamBegin();
+						begin.total = stream.stream.available();
+						begin.type = stream.getClass();
+						connection.sendTCP(begin);
+						id = begin.id;
+						UCore.log("Sending begin packet: " + begin);
+					}
+
+					protected Object next (byte[] bytes) {
+						StreamChunk chunk = new StreamChunk();
+						chunk.id = id;
+						chunk.data = bytes;
+						UCore.log("Sending chunk of size " + chunk.data.length);
+						return chunk; //wrap the byte[] with an object so the receiving side knows how to handle it.
+					}
+				});
 			}
 
 			@Override
@@ -207,6 +247,18 @@ public class DesktopLauncher {
 					server.getKryo().register(c);
 				}
 			}
+
+			Connection getByID(int id){
+				for(Connection con : server.getConnections()){
+					if(con.getID() == id){
+						return con;
+					}
+				}
+
+				throw new RuntimeException("Unable to find connection with ID " + id + "! Current connections: "
+						+ Arrays.toString(server.getConnections()));
+			}
+
 		});
 		
 		new Lwjgl3Application(new Mindustry(), config);

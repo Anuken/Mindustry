@@ -1,10 +1,16 @@
 package io.anuke.mindustry.net;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.stream.Stream;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 
+import io.anuke.mindustry.net.Streamable.StreamBegin;
+import io.anuke.mindustry.net.Streamable.StreamBuilder;
+import io.anuke.mindustry.net.Streamable.StreamChunk;
 import io.anuke.ucore.function.Consumer;
 
 //TODO stub
@@ -15,6 +21,8 @@ public class Net{
 	private static ObjectMap<Class<?>, Consumer> serverListeners = new ObjectMap<>();
 	private static ClientProvider clientProvider;
 	private static ServerProvider serverProvider;
+
+	private static IntMap<StreamBuilder> streams = new IntMap<>();
 	
 	/**Connect to an address.*/
 	public static void connect(String ip, int port) throws IOException{
@@ -51,6 +59,16 @@ public class Net{
 			clientProvider.send(object, mode);
 		}
 	}
+
+	/**Send an object to a certain client. Server-side only*/
+	public static void sendTo(int id, Object object, SendMode mode){
+		serverProvider.sendTo(id, object, mode);
+	}
+
+	/**Send a stream to a specific client. Server-side only.*/
+	public static void sendStream(int id, Streamable stream){
+		serverProvider.sendStream(id, stream);
+	}
 	
 	/**Sets the net clientProvider, e.g. what handles sending, recieving and connecting to a server.*/
 	public static void setClientProvider(ClientProvider provider){
@@ -74,7 +92,21 @@ public class Net{
 	
 	/**Call to handle a packet being recieved for the client.*/
 	public static void handleClientReceived(Object object){
-		if(clientListeners.get(object.getClass()) != null){
+		if(object instanceof StreamBegin) {
+			StreamBegin b = (StreamBegin) object;
+			streams.put(b.id, new StreamBuilder(b));
+		}else if(object instanceof StreamChunk) {
+			StreamChunk c = (StreamChunk)object;
+			StreamBuilder builder = streams.get(c.id);
+			if(builder == null){
+				throw new RuntimeException("Recieved stream chunk without a StreamBegin beforehand!");
+			}
+			builder.add(c.data);
+			if(builder.isDone()){
+				streams.remove(builder.id);
+				handleClientReceived(builder.build());
+			}
+		}else if(clientListeners.get(object.getClass()) != null){
 			clientListeners.get(object.getClass()).accept(object);
 		}else{
 			Gdx.app.error("Mindustry::Net", "Unhandled packet type: '" + object.getClass() + "'!");
@@ -131,6 +163,8 @@ public class Net{
 	public static interface ServerProvider {
 		/**Host a server at specified port.*/
 		public void host(int port) throws IOException;
+		/**Sends a large stream of data to a specific client.*/
+		public void sendStream(int id, Streamable stream);
 		/**Send an object to everyone connected.*/
 		public void send(Object object, SendMode mode);
 		/**Send an object to a specific client ID.*/

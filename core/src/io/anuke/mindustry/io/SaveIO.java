@@ -2,9 +2,7 @@ package io.anuke.mindustry.io;
 
 import static io.anuke.mindustry.Vars.android;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -180,10 +178,14 @@ public class SaveIO{
 	public static FileHandle fileFor(int slot){
 		return Vars.saveDirectory.child(slot  + ".mins");
 	}
-	
+
 	public static void write(FileHandle file){
+		write(file.write(false));
+	}
+
+	public static void write(OutputStream os){
 		
-		try(DataOutputStream stream = new DataOutputStream(file.write(false))){
+		try(DataOutputStream stream = new DataOutputStream(os)){
 			
 			//--META--
 			stream.writeInt(fileVersionID); //version id
@@ -308,11 +310,15 @@ public class SaveIO{
 			throw new RuntimeException(e);
 		}
 	}
+
+	public static void load(FileHandle file){
+		load(file.read());
+	}
 	
 	//TODO GWT support
-	public static void load(FileHandle file){
+	public static void load(InputStream is){
 		
-		try(DataInputStream stream = new DataInputStream(file.read())){
+		try(DataInputStream stream = new DataInputStream(is)){
 			
 			int version = stream.readInt();
 			/*long loadTime = */stream.readLong();

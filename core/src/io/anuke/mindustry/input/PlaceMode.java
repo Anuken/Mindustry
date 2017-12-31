@@ -124,7 +124,7 @@ public enum PlaceMode{
 		}
 	},
 	areaDelete{
-		int maxlen = 10;
+		int maxlen = 20;
 		int tilex;
 		int tiley;
 		int endx;
@@ -236,7 +236,7 @@ public enum PlaceMode{
 		}
 	},
 	hold{
-		int maxlen = 10;
+		int maxlen = 20;
 		int tilex;
 		int tiley;
 		int endx;
