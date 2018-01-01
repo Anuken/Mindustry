@@ -75,7 +75,7 @@ public class NetClient extends Module {
         Net.handle(EntityDataPacket.class, data -> {
 
             Gdx.app.postRunnable(() -> {
-                Timers.run(10f, () -> { //TODO hack
+                Timers.run(10f, () -> { //TODO hack. should only run once world data is recieved
                     Vars.control.playerGroup.remap(Vars.player, data.playerid);
 
                     for (Player player : data.players) {

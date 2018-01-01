@@ -38,10 +38,10 @@ project(":desktop") {
 
     dependencies {
         compile project(":core")
+        compile project(":kryonet")
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
-        compile "com.esotericsoftware:kryonet:2.22.0-RC1"
     }
 }
 
@@ -70,6 +70,7 @@ project(":android") {
 
     dependencies {
         compile project(":core")
+        compile project(":kryonet")
         compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
@@ -78,7 +79,6 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         compile "com.badlogicgames.gdx:gdx-controllers-android:$gdxVersion"
-        compile "com.esotericsoftware:kryonet:2.22.0-RC1"
     }
 }
 
@@ -106,6 +106,15 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
+    }
+}
+
+project(":kryonet") {
+    apply plugin: "java"
+
+    dependencies {
+        compile project(":core")
+        compile "com.esotericsoftware:kryonet:2.22.0-RC1"
     }
 }
 
