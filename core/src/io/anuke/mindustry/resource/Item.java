@@ -13,10 +13,10 @@ public class Item{
 		steel = new Item("steel"),
 		titanium = new Item("titanium"),
 		dirium = new Item("dirium"),
-		uranium = new Item("uranium"),
-		sand = new Item("sand"),
+		uranium = new Item("uranium");
+		/*sand = new Item("sand"),
 		glass = new Item("glass"),
-		silicon = new Item("silicon");
+		silicon = new Item("silicon");*/
 
 	public final int id;
 	public final String name;
