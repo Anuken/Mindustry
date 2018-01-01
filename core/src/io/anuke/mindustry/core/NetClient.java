@@ -52,6 +52,8 @@ public class NetClient extends Module {
                     Vars.ui.hideLoading();
                 });
 
+                GameState.set(State.menu);
+
                 Vars.ui.showError("$text.disconnect");
                 connecting = false;
             });

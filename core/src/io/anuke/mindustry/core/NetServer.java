@@ -60,8 +60,7 @@ public class NetServer extends Module{
 
                 Player player = new Player();
                 player.clientid = packet.id;
-                player.set(Vars.player.x, Vars.player.y);
-                player.placerot = Vars.player.placerot;
+                player.set(Vars.control.core.worldx(), Vars.control.core.worldy() - Vars.tilesize*2);
                 player.add();
                 connections.put(packet.id, player);
 
