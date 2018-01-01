@@ -79,20 +79,22 @@ public class Player extends DestructibleEntity implements Syncable{
 	
 	@Override
 	public void draw(){
-		if(Vars.debug && (!Vars.showPlayer || !Vars.showUI)) return;
+		if((Vars.debug && (!Vars.showPlayer || !Vars.showUI)) || (Vars.android && isLocal)) return;
+
+		String part = Vars.android ? "ship" : "mech";
 		
 		if(Vars.snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate")){
-			Draw.rect("mech-"+mech.name(), (int)x, (int)y, angle-90);
+			Draw.rect(part+"-"+mech.name(), (int)x, (int)y, angle-90);
 		}else{
-			Draw.rect("mech-"+mech.name(), x, y, angle-90);
+			Draw.rect(part+"-"+mech.name(), x, y, angle-90);
 		}
 		
 	}
 	
 	@Override
 	public void update(){
-		if(!isLocal){
-			if(!isDead()) inter.update(this);
+		if(!isLocal || android){
+			if(!isDead() && !isLocal) inter.update(this);
 			return;
 		}
 		

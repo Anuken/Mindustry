@@ -221,9 +221,8 @@ public class Control extends Module{
 		wavetime = waveSpacing();
 		Entities.clear();
 		enemies = 0;
-		
-		if(!android)
-			player.add();
+
+		player.add();
 		
 		player.heal();
 		clearItems();

@@ -96,6 +96,6 @@ public class Packets {
     }
 
     public static class BlockUpdatePacket{
-        public int health;
+        public int health, position;
     }
 }

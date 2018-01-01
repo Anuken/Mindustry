@@ -1,8 +1,10 @@
 package io.anuke.mindustry.desktop;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntArray;
 import com.esotericsoftware.kryonet.*;
 import com.esotericsoftware.kryonet.util.InputStreamSender;
 import com.esotericsoftware.minlog.Log;
@@ -98,7 +100,14 @@ public class DesktopLauncher {
 					@Override
 					public void received (Connection connection, Object object) {
 						if(object instanceof FrameworkMessage) return;
-						Net.handleClientReceived(object);
+
+						try{
+							Net.handleClientReceived(object);
+						}catch (Exception e){
+							Gdx.app.exit();
+							throw new RuntimeException(e);
+						}
+
 					}
 				});
 
@@ -144,6 +153,7 @@ public class DesktopLauncher {
 
 		Net.setServerProvider(new ServerProvider() {
 			Server server;
+			IntArray connections = new IntArray();
 
 			{
 				server = new Server();
@@ -157,6 +167,7 @@ public class DesktopLauncher {
 						c.id = connection.getID();
 						c.addressTCP = connection.getRemoteAddressTCP().toString();
 						Net.handleServerReceived(c, c.id);
+						connections.add(c.id);
 					}
 
 					@Override
@@ -164,16 +175,28 @@ public class DesktopLauncher {
 						Disconnect c = new Disconnect();
 						c.id = connection.getID();
 						Net.handleServerReceived(c, c.id);
+						connections.removeValue(c.id);
 					}
 
 					@Override
 					public void received (Connection connection, Object object) {
 						if(object instanceof FrameworkMessage) return;
-						Net.handleServerReceived(object, connection.getID());
+
+						try{
+							Net.handleServerReceived(object, connection.getID());
+						}catch (Exception e){
+							Gdx.app.exit();
+							throw new RuntimeException(e);
+						}
 					}
 				});
 
 				register(Registrator.getClasses());
+			}
+
+			@Override
+			public IntArray getConnections() {
+				return connections;
 			}
 
 			@Override

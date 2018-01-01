@@ -2,11 +2,13 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.io.NetworkIO;
 import io.anuke.mindustry.net.Net;
@@ -22,10 +24,12 @@ import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.modules.Module;
+import io.anuke.ucore.util.Mathf;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 
 public class NetServer extends Module{
@@ -66,7 +70,6 @@ public class NetServer extends Module{
                 UCore.log("Sending entities: " + Arrays.toString(dp.players));
 
                 //TODO send pathfind positions
-                //TODO new denser format
                 //TODO save enemy nodes
 
                 Net.sendTo(packet.id, dp, SendMode.tcp);
@@ -166,6 +169,19 @@ public class NetServer extends Module{
         Net.send(packet, SendMode.tcp);
     }
 
+    public void handleBlockDestroyed(TileEntity entity){
+        BlockDestroyPacket packet = new BlockDestroyPacket();
+        packet.position = entity.tile.packedPosition();
+        Net.send(packet, SendMode.tcp);
+    }
+
+    public void handleBlockDamaged(TileEntity entity){
+        BlockUpdatePacket packet = new BlockUpdatePacket();
+        packet.health = entity.health;
+        packet.position = entity.tile.packedPosition();
+        Net.send(packet, SendMode.udp);
+    }
+
     public void update(){
         if(!Net.server()) return;
 
@@ -220,18 +236,59 @@ public class NetServer extends Module{
         if(Timers.get("serverBlockSync", blockSyncTime)){
             BlockSyncPacket packet = new BlockSyncPacket();
 
-            //TODO
+            IntArray connections = Net.getConnections();
+
+            for(int i = 0; i < connections.size; i ++){
+                int id = connections.get(i);
+                Player player = this.connections.get(i);
+                int x = Mathf.scl2(player.x, Vars.tilesize);
+                int y = Mathf.scl2(player.y, Vars.tilesize);
+            }
+
+            //TODO sync to each player entity
         }
     }
 
-    public void sendBlockSync(int client){
+    public void sendBlockSync(int client, int x, int y, int viewx, int viewy){
         BlockSyncPacket packet = new BlockSyncPacket();
-
         ByteArrayOutputStream bs = new ByteArrayOutputStream();
-        DataOutputStream stream = new DataOutputStream(bs);
 
-        //TODO
+        try {
+            DataOutputStream stream = new DataOutputStream(bs);
+
+            for (int rx = -viewx / 2; rx <= viewx / 2; rx++) {
+                for (int ry = -viewy / 2; ry <= viewy / 2; ry++) {
+                    Tile tile = Vars.world.tile(x + rx, y + ry);
+
+                    if (tile == null || tile.entity == null) continue;
+
+                    stream.writeInt(tile.packedPosition());
+                    byte times = 0;
+
+                    for(; times < tile.entity.timer.getTimes().length; times ++){
+                        if(tile.entity.timer.getTimes()[times] > 0){
+                            break;
+                        }
+                    }
+
+                    stream.writeByte(times);
+
+                    for(int i = 0; i < times; i ++){
+                        stream.writeFloat(tile.entity.timer.getTimes()[times]);
+                    }
+
+                    tile.entity.write(stream);
+                }
+            }
+
+        }catch (IOException e){
+            throw new RuntimeException(e);
+        }
+
+        //TODO finish
 
         packet.stream = new ByteArrayInputStream(bs.toByteArray());
+
+        Net.sendStream(client, packet);
     }
 }

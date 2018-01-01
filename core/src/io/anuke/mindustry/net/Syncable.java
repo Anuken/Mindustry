@@ -1,9 +1,14 @@
 package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.math.Vector2;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.graphics.Fx;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entity;
+import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
 //TODO clean up this giant mess
@@ -34,6 +39,11 @@ public interface Syncable {
                 Interpolator i = entity.getInterpolator();
                 if(i.target.dst(entity.x, entity.y) > 16){
                     entity.set(i.target.x, i.target.y);
+                }
+
+                if(Vars.android && i.target.dst(entity.x, entity.y) > 2f && Timers.get(entity, "dashfx", 3)){
+                    Angles.translation(entity.angle + 180, 3f);
+                    Effects.effect(Fx.dashsmoke, entity.x + Angles.x(), entity.y + Angles.y());
                 }
 
                 entity.x = Mathf.lerpDelta(entity.x, i.target.x, 0.4f);

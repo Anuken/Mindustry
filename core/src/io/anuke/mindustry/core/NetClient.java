@@ -100,8 +100,12 @@ public class NetClient extends Module {
                         entity = Vars.control.playerGroup.getByID(id);
                     }
 
+                    Syncable sync = ((Syncable)entity);
+
+                    if(sync == null) continue;
+
                     //augh
-                    ((Interpolator)((Syncable)entity).getInterpolator()).type.read(entity, packet.data[i]);
+                    ((Interpolator)sync.getInterpolator()).type.read(entity, packet.data[i]);
                 }
             }
         });
@@ -151,8 +155,10 @@ public class NetClient extends Module {
         });
 
         Net.handle(EnemyDeathPacket.class, spawn -> {
-            Enemy enemy = Vars.control.enemyGroup.getByID(spawn.id);
-            if(enemy != null) enemy.onDeath();
+            Gdx.app.postRunnable(() -> {
+                Enemy enemy = Vars.control.enemyGroup.getByID(spawn.id);
+                if (enemy != null) enemy.onDeath();
+            });
         });
 
         Net.handle(PathPacket.class, packet -> {
@@ -169,6 +175,24 @@ public class NetClient extends Module {
             BulletType type = (BulletType) BaseBulletType.getByID(packet.type);
             Entity owner = Vars.control.enemyGroup.getByID(packet.owner);
             Bullet bullet = new Bullet(type, owner, packet.x, packet.y, packet.angle).add();
+        });
+
+        Net.handle(BlockDestroyPacket.class, packet -> {
+            Tile tile = Vars.world.tile(packet.position % Vars.world.width(), packet.position / Vars.world.width());
+            if(tile.entity != null){
+                tile.entity.onDeath(true);
+            }
+        });
+
+        Net.handle(BlockUpdatePacket.class, packet -> {
+            Tile tile = Vars.world.tile(packet.position % Vars.world.width(), packet.position / Vars.world.width());
+            if(tile.entity != null){
+                tile.entity.health = packet.health;
+            }
+        });
+
+        Net.handle(BlockSyncPacket.class, packet -> {
+            //TODO implementation, load data...
         });
     }
 

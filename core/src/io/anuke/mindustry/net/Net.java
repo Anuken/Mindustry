@@ -1,6 +1,7 @@
 package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
@@ -47,6 +48,11 @@ public class Net{
 		clientProvider.disconnect();
 		server = false;
 		active = false;
+	}
+
+	/**Returns a list of all connections IDs.*/
+	public static IntArray getConnections(){
+		return serverProvider.getConnections();
 	}
 	
 	/**Send an object to all connected clients, or to the server if this is a client.*/
@@ -182,6 +188,8 @@ public class Net{
 		public void sendExcept(int id, Object object, SendMode mode);
 		/**Close the server connection.*/
 		public void close();
+		/**Return all connected users.*/
+		public IntArray getConnections();
 		/**Register classes to be sent.*/
 		public void register(Class<?>... types);
 	}

@@ -29,6 +29,8 @@ public class Registrator {
                 PathPacket.class,
                 BulletPacket.class,
                 EnemyDeathPacket.class,
+                BlockUpdatePacket.class,
+                BlockDestroyPacket.class,
 
                 Class.class,
                 byte[].class,
