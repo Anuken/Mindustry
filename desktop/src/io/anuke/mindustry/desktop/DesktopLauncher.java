@@ -3,7 +3,6 @@ package io.anuke.mindustry.desktop;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.utils.Array;
-import com.esotericsoftware.minlog.Log;
 import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.Mindustry;
@@ -58,8 +57,6 @@ public class DesktopLauncher {
 		};
 		
 		Mindustry.args = Array.with(arg);
-
-		Log.set(Log.LEVEL_DEBUG);
 
 		Net.setClientProvider(new KryoClient());
 		Net.setServerProvider(new KryoServer());

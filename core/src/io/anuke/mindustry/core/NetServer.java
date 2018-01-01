@@ -95,6 +95,8 @@ public class NetServer extends Module{
 
             Gdx.app.postRunnable(() -> Vars.ui.showInfo(Bundles.format("text.server.disconnected", player.name)));
 
+            player.remove();
+
             DisconnectPacket dc = new DisconnectPacket();
             dc.playerid = player.id;
 

@@ -31,20 +31,34 @@ public class KryoServer implements ServerProvider {
         thread.setDaemon(true);
         thread.start();
         server.addListener(new Listener(){
+
             @Override
             public void connected (Connection connection) {
                 Connect c = new Connect();
                 c.id = connection.getID();
                 c.addressTCP = connection.getRemoteAddressTCP().toString();
-                Net.handleServerReceived(c, c.id);
-                connections.add(c.id);
+
+                try {
+                    Net.handleServerReceived(c, c.id);
+                    connections.add(c.id);
+                }catch (Exception e){
+                    Gdx.app.exit();
+                    throw new RuntimeException(e);
+                }
             }
 
             @Override
             public void disconnected (Connection connection) {
                 Disconnect c = new Disconnect();
                 c.id = connection.getID();
-                Net.handleServerReceived(c, c.id);
+
+                try{
+                    Net.handleServerReceived(c, c.id);
+                }catch (Exception e){
+                    Gdx.app.exit();
+                    throw new RuntimeException(e);
+                }
+
                 connections.removeValue(c.id);
             }
 

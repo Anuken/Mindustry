@@ -26,13 +26,25 @@ public class KryoClient implements ClientProvider{
                 Connect c = new Connect();
                 c.id = connection.getID();
                 c.addressTCP = connection.getRemoteAddressTCP().toString();
-                Net.handleClientReceived(c);
+
+                try{
+                    Net.handleClientReceived(c);
+                }catch (Exception e){
+                    Gdx.app.exit();
+                    throw new RuntimeException(e);
+                }
             }
 
             @Override
             public void disconnected (Connection connection) {
                 Disconnect c = new Disconnect();
-                Net.handleClientReceived(c);
+
+                try{
+                    Net.handleClientReceived(c);
+                }catch (Exception e){
+                    Gdx.app.exit();
+                    throw new RuntimeException(e);
+                }
             }
 
             @Override
