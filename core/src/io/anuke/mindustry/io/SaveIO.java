@@ -1,27 +1,28 @@
 package io.anuke.mindustry.io;
 
-import static io.anuke.mindustry.Vars.android;
-
-import java.io.*;
-import java.util.Arrays;
-import java.util.Date;
-
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
-
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.*;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Weapon;
-import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.GameMode;
+import io.anuke.mindustry.world.Map;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.entities.Entities;
+
+import java.io.*;
+import java.util.Arrays;
+import java.util.Date;
+
+import static io.anuke.mindustry.Vars.android;
 
 /*
  * Save format:
@@ -84,7 +85,7 @@ public class SaveIO{
 	private static final int fileVersionID = 12;
 	
 	//TODO automatic registration of types?
-	private static final Array<Class<? extends Enemy>> enemyIDs = Array.with(
+	public static final Array<Class<? extends Enemy>> enemyIDs = Array.with(
 		Enemy.class,
 		FastEnemy.class,
 		RapidEnemy.class,
@@ -98,7 +99,7 @@ public class SaveIO{
 		EmpEnemy.class
 	);
 	
-	private static final ObjectMap<Class<? extends Enemy>, Byte> idEnemies = new ObjectMap<Class<? extends Enemy>, Byte>(){{
+	public static final ObjectMap<Class<? extends Enemy>, Byte> idEnemies = new ObjectMap<Class<? extends Enemy>, Byte>(){{
 		for(int i = 0; i < enemyIDs.size; i ++){
 			put(enemyIDs.get(i), (byte)i);
 		}
@@ -245,7 +246,7 @@ public class SaveIO{
 			for(Enemy enemy : Vars.control.enemyGroup.all()){
 				if(idEnemies.containsKey(enemy.getClass())){
 					stream.writeByte(idEnemies.get(enemy.getClass())); //type
-					stream.writeByte(enemy.spawn); //lane
+					stream.writeByte(enemy.lane); //lane
 					stream.writeFloat(enemy.x); //x
 					stream.writeFloat(enemy.y); //y
 					stream.writeByte(enemy.tier); //tier
@@ -391,7 +392,7 @@ public class SaveIO{
 				
 				try{
 					Enemy enemy = ClassReflection.newInstance(enemyIDs.get(type));
-					enemy.spawn = lane;
+					enemy.lane = lane;
 					enemy.health = health;
 					enemy.x = x;
 					enemy.y = y;

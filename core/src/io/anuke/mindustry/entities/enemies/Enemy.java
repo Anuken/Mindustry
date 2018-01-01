@@ -3,21 +3,32 @@ package io.anuke.mindustry.entities.enemies;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
-
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.Bullet;
+import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.graphics.Shaders;
+import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.Syncable;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.ucore.UCore;
-import io.anuke.ucore.core.*;
-import io.anuke.ucore.entities.*;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.entities.DestructibleEntity;
+import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.entities.Entity;
+import io.anuke.ucore.entities.SolidEntity;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Timer;
+import io.anuke.ucore.util.Tmp;
 
 import static io.anuke.mindustry.Vars.world;
 
-public class Enemy extends DestructibleEntity{
+public class Enemy extends DestructibleEntity implements Syncable{
 	public final static Color[] tierColors = { Color.valueOf("ffe451"), Color.valueOf("f48e20"), Color.valueOf("ff6757"), Color.valueOf("ff2d86") };
 	public final static int maxtier = 4;
 	public final static float maxIdle = 60*1.5f;
@@ -37,17 +48,19 @@ public class Enemy extends DestructibleEntity{
 	protected int damage;
 	protected Enemy spawner;
 	protected int spawned = 0;
-	protected float angle;
 	protected boolean targetCore = false;
 	protected boolean stopNearCore = true;
 	protected float mass = 1f;
 	protected String className;
-	
+
+	protected Interpolator<Enemy> inter = new Interpolator(SyncType.enemy);
+
 	public float idletime = 0f;
-	public int spawn;
+	public int lane;
 	public int node = -1;
 	public Tile[] path;
 
+	public float angle;
 	public float xvelocity, yvelocity;
 	public Entity target;
 	public int tier = 1;
@@ -65,11 +78,20 @@ public class Enemy extends DestructibleEntity{
 		className = ClassReflection.getSimpleName(getClass()).toLowerCase();
 	}
 
+	public Interpolator<Enemy> getInterpolator() {
+		return inter;
+	}
+
 	public float drawSize(){
 		return 12;
 	}
 
 	void move(){
+		if(Net.client() && Net.active()){
+			inter.update(this);
+			return;
+		}
+
 		Tile core = Vars.control.getCore();
 		
 		if(idletime > maxIdleLife){
@@ -152,9 +174,21 @@ public class Enemy extends DestructibleEntity{
 	}
 
 	void shoot(BulletType bullet, float rotation){
-		Angles.translation(angle + rotation, length);
-		Bullet out = new Bullet(bullet, this, x + Angles.x(), y + Angles.y(), this.angle + rotation).add();
-		out.damage = (int) (damage * Vars.multiplier);
+
+		if(!(Net.active() && Net.client())) {
+			Angles.translation(angle + rotation, length);
+			Bullet out = new Bullet(bullet, this, x + Angles.x(), y + Angles.y(), this.angle + rotation).add();
+			out.damage = (int) (damage * Vars.multiplier);
+			onShoot(bullet, rotation);
+
+			if(Net.active() && Net.server()){
+				Vars.netServer.handleBullet(bullet, this, x + Angles.x(), y + Angles.y(), this.angle + rotation, (short) (damage * Vars.multiplier));
+			}
+		}
+	}
+
+	void onShoot(BulletType type, float rotation){
+
 	}
 
 	@Override
@@ -184,6 +218,10 @@ public class Enemy extends DestructibleEntity{
 		Effects.sound("bang2", this);
 		remove();
 		dead = true;
+
+		if(Net.active() && Net.server()){
+			Vars.netServer.handleEnemyDeath(this);
+		}
 	}
 
 	@Override
@@ -258,7 +296,7 @@ public class Enemy extends DestructibleEntity{
 	}
 	
 	@Override
-	public <T extends Entity> T add(){
-		return (T) add(Vars.control.enemyGroup);
+	public Enemy add(){
+		return add(Vars.control.enemyGroup);
 	}
 }

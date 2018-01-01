@@ -1,24 +1,30 @@
 package io.anuke.mindustry.core;
 
-import static io.anuke.mindustry.Vars.*;
-
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.io.Maps;
-import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Generator;
+import io.anuke.mindustry.world.Map;
+import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.mindustry.world.blocks.DistributionBlocks;
+import io.anuke.mindustry.world.blocks.ProductionBlocks;
+import io.anuke.mindustry.world.blocks.WeaponBlocks;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class World extends Module{
 	private int seed;
@@ -36,7 +42,8 @@ public class World extends Module{
 	
 	@Override
 	public void update(){
-		pathfind.update();
+		if(!(Net.active() && Net.client()))
+			pathfind.update();
 	}
 	
 	@Override

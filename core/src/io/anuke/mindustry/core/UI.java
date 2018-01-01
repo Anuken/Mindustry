@@ -24,6 +24,7 @@ import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Skin;
+import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
@@ -258,7 +259,7 @@ public class UI extends SceneModule{
 		
 		prefs.hidden(()->{
 			if(!GameState.is(State.menu)){
-				if(!wasPaused)
+				if(!wasPaused || Net.active())
 					GameState.set(State.playing);
 			}
 		});
@@ -269,7 +270,7 @@ public class UI extends SceneModule{
 				if(menu.getScene() != null){
 					wasPaused = menu.wasPaused;
 				}
-				GameState.set(State.paused);
+				if(!Net.active()) GameState.set(State.paused);
 				menu.hide();
 			}
 		});
@@ -466,6 +467,10 @@ public class UI extends SceneModule{
 	public void hideTooltip(){
 		if(tooltip != null)
 			tooltip.hide();
+	}
+
+	public void showInfo(String info){
+		scene.table().add(info).get().getParent().actions(Actions.fadeOut(4f), Actions.removeActor());
 	}
 	
 	public void showAbout(){

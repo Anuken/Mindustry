@@ -1,13 +1,10 @@
 package io.anuke.mindustry.ui;
 
-import static io.anuke.mindustry.Vars.ui;
-
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.builders.build;
@@ -19,20 +16,22 @@ import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.ui;
+
 public class MenuDialog extends FloatingDialog{
 	private SaveDialog save = new SaveDialog();
 	private LoadDialog load = new LoadDialog();
 	public boolean wasPaused = false;
 
 	public MenuDialog() {
-		super("Paused");
+		super("$text.menu");
 		setup();
 	}
 
 	void setup(){
 		shown(() -> {
 			wasPaused = GameState.is(State.paused);
-			GameState.set(State.paused);
+			if(!Net.active()) GameState.set(State.paused);
 		});
 		
 		if(!Vars.android){
@@ -40,7 +39,7 @@ public class MenuDialog extends FloatingDialog{
 
 			content().addButton("$text.back", () -> {
 				hide();
-				if(!wasPaused)
+				if(!wasPaused || Net.active())
 					GameState.set(State.playing);
 			});
 
@@ -71,6 +70,7 @@ public class MenuDialog extends FloatingDialog{
 					}else{
 						try{
 							Net.host(result);
+							GameState.set(State.playing);
 						}catch (IOException e){
 							Vars.ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
 						}

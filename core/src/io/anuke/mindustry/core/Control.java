@@ -48,7 +48,7 @@ public class Control extends Module{
 	final Array<Weapon> weapons = new Array<>();
 	final int[] items = new int[Item.getAllItems().size];
 	
-	public final EntityGroup<Enemy> enemyGroup = Entities.addGroup(Enemy.class);
+	public final EntityGroup<Enemy> enemyGroup = Entities.addGroup(Enemy.class).enableMapping();
 	public final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);
 	public final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
 	public final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class);
@@ -348,10 +348,11 @@ public class Control extends Module{
 						try{
 							Enemy enemy = ClassReflection.newInstance(spawn.type);
 							enemy.set(tile.worldx() + Mathf.range(range), tile.worldy() + Mathf.range(range));
-							enemy.spawn = fl;
+							enemy.lane = fl;
 							enemy.tier = spawn.tier(wave, fl);
+							enemy.add();
+
 							Effects.effect(Fx.spawn, enemy);
-							enemy.add(enemyGroup);
 
 							Vars.netServer.handleEnemySpawn(enemy);
 							
@@ -612,7 +613,7 @@ public class Control extends Module{
 		if(!GameState.is(State.menu)){
 			input.update();
 			
-			if(Inputs.keyTap("pause") && !ui.isGameOver() && (GameState.is(State.paused) || GameState.is(State.playing))){
+			if(Inputs.keyTap("pause") && !ui.isGameOver() && !Net.active() && (GameState.is(State.paused) || GameState.is(State.playing))){
 				GameState.set(GameState.is(State.playing) ? State.paused : State.playing);
 			}
 			
@@ -626,7 +627,7 @@ public class Control extends Module{
 				}
 			}
 		
-			if(!GameState.is(State.paused)){
+			if(!GameState.is(State.paused) || Net.active()){
 				
 				if(respawntime > 0){
 					
@@ -650,7 +651,7 @@ public class Control extends Module{
 					if(enemies <= 0){
 						wavetime -= delta();
 
-						if(lastUpdated < wave + 1 && wavetime < Vars.aheadPathfinding){ //start updatingbeforehand
+						if(lastUpdated < wave + 1 && wavetime < Vars.aheadPathfinding){ //start updating beforehand
 							world.pathfinder().updatePath();
 							lastUpdated = wave + 1;
 						}

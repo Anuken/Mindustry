@@ -5,9 +5,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.enemies.Enemy;
-import io.anuke.mindustry.io.SaveIO;
+import io.anuke.mindustry.io.NetworkIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
@@ -15,9 +16,11 @@ import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.modules.Module;
 
 import java.io.ByteArrayInputStream;
@@ -27,7 +30,7 @@ import java.util.Arrays;
 
 public class NetServer extends Module{
     IntMap<Player> connections = new IntMap<>();
-    float serverSyncTime = 4, itemSyncTime = 20, blockSyncTime = 120;
+    float serverSyncTime = 4, itemSyncTime = 10, blockSyncTime = 120;
 
     public NetServer(){
 
@@ -36,7 +39,7 @@ public class NetServer extends Module{
 
             WorldData data = new WorldData();
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            SaveIO.write(stream);
+            NetworkIO.write(stream);
 
             UCore.log("Packed " + stream.size() + " uncompressed bytes of data.");
 
@@ -46,6 +49,8 @@ public class NetServer extends Module{
             Net.sendStream(packet.id, data);
 
             Gdx.app.postRunnable(() -> {
+                Vars.ui.showInfo("$text.server.connected");
+
                 EntityDataPacket dp = new EntityDataPacket();
 
                 Player player = new Player();
@@ -60,8 +65,16 @@ public class NetServer extends Module{
 
                 UCore.log("Sending entities: " + Arrays.toString(dp.players));
 
+                //TODO send pathfind positions
+                //TODO new denser format
+                //TODO save enemy nodes
+
                 Net.sendTo(packet.id, dp, SendMode.tcp);
             });
+        });
+
+        Net.handleServer(Disconnect.class, packet -> {
+            Gdx.app.postRunnable(() -> Vars.ui.showInfo("$text.server.disconnected"));
         });
 
         Net.handleServer(PositionPacket.class, pos -> {
@@ -112,8 +125,45 @@ public class NetServer extends Module{
         Net.send(packet, SendMode.udp);
     }
 
-    public void handleEnemySpawn(Enemy enemy){
+    public void handleBullet(BulletType type, Entity owner, float x, float y, float angle, short damage){
+        BulletPacket packet = new BulletPacket();
+        packet.x = x;
+        packet.y = y;
+        packet.angle = angle;
+        packet.damage = damage;
+        packet.owner = owner.id;
+        packet.type = type.id;
+        Net.send(packet, SendMode.udp);
+    }
 
+    public void handlePathFound(int index, Tile[] tiles){
+        PathPacket packet = new PathPacket();
+        int[] out = new int[tiles.length];
+
+        for(int p = 0; p < out.length; p ++){
+            out[p] = tiles[p].packedPosition();
+        }
+
+        packet.path = out;
+        packet.index = (byte)index;
+        Net.send(packet, SendMode.tcp);
+    }
+
+    public void handleEnemySpawn(Enemy enemy){
+        EnemySpawnPacket packet = new EnemySpawnPacket();
+        packet.type = enemy.getClass();
+        packet.lane = (byte)enemy.lane;
+        packet.tier = (byte)enemy.tier;
+        packet.x = enemy.x;
+        packet.y = enemy.y;
+        packet.id = enemy.id;
+        Net.send(packet, SendMode.tcp);
+    }
+
+    public void handleEnemyDeath(Enemy enemy){
+        EnemyDeathPacket packet = new EnemyDeathPacket();
+        packet.id = enemy.id;
+        Net.send(packet, SendMode.tcp);
     }
 
     public void update(){
@@ -130,7 +180,7 @@ public class NetServer extends Module{
 
         if(Timers.get("serverSync", serverSyncTime)){
             SyncPacket packet = new SyncPacket();
-            int amount = Vars.control.playerGroup.amount();
+            int amount = Vars.control.playerGroup.amount() + Vars.control.enemyGroup.amount();
             packet.ids = new int[amount];
             packet.data = new float[amount][0];
 
@@ -140,6 +190,16 @@ public class NetServer extends Module{
                 float[] out = player.getInterpolator().type.write(player);
                 packet.data[index] = out;
                 packet.ids[index] = player.id;
+
+                index ++;
+            }
+
+            packet.enemyStart = index;
+
+            for(Enemy enemy : Vars.control.enemyGroup.all()){
+                float[] out = enemy.getInterpolator().type.write(enemy);
+                packet.data[index] = out;
+                packet.ids[index] = enemy.id;
 
                 index ++;
             }
@@ -160,7 +220,7 @@ public class NetServer extends Module{
         if(Timers.get("serverBlockSync", blockSyncTime)){
             BlockSyncPacket packet = new BlockSyncPacket();
 
-
+            //TODO
         }
     }
 
@@ -170,7 +230,7 @@ public class NetServer extends Module{
         ByteArrayOutputStream bs = new ByteArrayOutputStream();
         DataOutputStream stream = new DataOutputStream(bs);
 
-
+        //TODO
 
         packet.stream = new ByteArrayInputStream(bs.toByteArray());
     }
