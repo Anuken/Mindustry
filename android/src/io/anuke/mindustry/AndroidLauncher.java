@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.esotericsoftware.minlog.Log;
 import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.io.PlatformFunction;
@@ -63,6 +64,8 @@ public class AndroidLauncher extends AndroidApplication{
 		}
 		
 		config.hideStatusBar = true;
+
+		Log.set(Log.LEVEL_DEBUG);
 
         Net.setClientProvider(new KryoClient());
         Net.setServerProvider(new KryoServer());

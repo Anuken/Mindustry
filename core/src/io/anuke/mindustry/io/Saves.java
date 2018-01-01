@@ -2,12 +2,7 @@ package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Timer;
-import com.badlogic.gdx.utils.Timer.Task;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.Field;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
@@ -156,6 +151,7 @@ public class Saves {
 
         public void delete(){
             SaveIO.fileFor(index).delete();
+            saves.removeValue(this, true);
             if(this == current){
                 current = null;
             }

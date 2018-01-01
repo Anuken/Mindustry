@@ -194,6 +194,7 @@ public class Control extends Module{
 		}
 		
 		player = new Player();
+		player.isAndroid = Vars.android;
 		player.isLocal = true;
 		
 		spawns = WaveCreator.getSpawns();
@@ -397,6 +398,10 @@ public class Control extends Module{
 	}
 	
 	public void coreDestroyed(){
+		if(Net.active() && Net.server()){
+			Net.closeServer();
+		}
+
 		Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
 		Sounds.play("corexplode");
 		for(int i = 0; i < 16; i ++){

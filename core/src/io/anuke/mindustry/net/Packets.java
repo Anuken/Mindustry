@@ -28,17 +28,27 @@ public class Packets {
     public static class SyncPacket{
         public int[] ids;
         public float[][] data;
-        public int enemyStart = 0;
+        public short enemyStart;
     }
 
     public static class BlockSyncPacket extends Streamable{
 
     }
 
-    public static class StateSyncPacket {
+    public static class ConnectPacket{
+        public String name;
+        public boolean android;
+    }
+
+    public static class DisconnectPacket{
+        public int playerid;
+    }
+
+    public static class StateSyncPacket{
         public int[] items;
-        public float countdown;
+        public float countdown, time;
         public int enemies, wave;
+        public long timestamp;
     }
 
     public static class PositionPacket{

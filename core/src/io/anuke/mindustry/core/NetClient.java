@@ -1,6 +1,7 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import io.anuke.mindustry.Vars;
@@ -33,7 +34,7 @@ import java.util.Arrays;
 public class NetClient extends Module {
     boolean connecting = false;
     boolean gotEntities = false;
-    float playerSyncTime = 3;
+    float playerSyncTime = 2;
 
     public NetClient(){
 
@@ -44,6 +45,11 @@ public class NetClient extends Module {
                 Vars.ui.hideLoading();
                 Vars.ui.showLoading("$text.connecting.data");
             });
+
+            ConnectPacket c = new ConnectPacket();
+            c.name = UCore.getProperty("user.name");
+            c.android = Vars.android;
+            Net.send(c, SendMode.tcp);
         });
 
         Net.handle(Disconnect.class, packet -> {
@@ -98,7 +104,7 @@ public class NetClient extends Module {
                 int id = packet.ids[i];
                 if(id != Vars.player.id){
                     Entity entity = null;
-                    if(id >= packet.enemyStart){
+                    if(i >= packet.enemyStart){
                         entity = Vars.control.enemyGroup.getByID(id);
                     }else {
                         entity = Vars.control.playerGroup.getByID(id);
@@ -106,7 +112,10 @@ public class NetClient extends Module {
 
                     Syncable sync = ((Syncable)entity);
 
-                    if(sync == null) continue;
+                    if(sync == null){
+                        Gdx.app.error("Mindustry", "Unknown entity ID: " + id + " " + (i >= packet.enemyStart ? "(enemy)" : "(player)"));
+                        continue;
+                    }
 
                     //augh
                     ((Interpolator)sync.getInterpolator()).type.read(entity, packet.data[i]);
@@ -135,6 +144,8 @@ public class NetClient extends Module {
                 Vars.control.items[i] = packet.items[i];
             }
             Vars.control.setWaveData(packet.enemies, packet.wave, packet.countdown);
+
+            Timers.resetTime(packet.time + (float)(TimeUtils.timeSinceMillis(packet.timestamp) / 1000.0 * 60.0));
 
             Gdx.app.postRunnable(() -> {
                 Vars.ui.updateItems();
@@ -217,6 +228,18 @@ public class NetClient extends Module {
                 e.printStackTrace();
             }
         });
+
+        Net.handle(DisconnectPacket.class, packet -> {
+            Player player = Vars.control.playerGroup.getByID(packet.playerid);
+
+            if(player != null){
+                player.remove();
+            }
+        });
+
+        Net.handle(Player.class, player -> {
+            player.add();
+        });
     }
 
     public void update(){
@@ -259,7 +282,7 @@ public class NetClient extends Module {
         if(Timers.get("syncPlayer", playerSyncTime)){
             PositionPacket packet = new PositionPacket();
             packet.data = Vars.player.getInterpolator().type.write(Vars.player);
-            Net.send(packet, SendMode.tcp); //TODO udp instead?
+            Net.send(packet, SendMode.udp); //TODO udp instead?
         }
     }
 }

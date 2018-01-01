@@ -181,10 +181,12 @@ public class UI extends SceneModule{
 
 		join = new FloatingDialog("$text.joingame.title");
 		join.content().add("$text.joingame.ip").left();
-		join.content().addField("localhost", text -> lastip = text).size(180f, 54f);
+		Mindustry.platforms.addDialog(join.content().addField("localhost", text -> lastip = text).size(180f, 54f).get());
 		join.content().row();
 		join.content().add("$text.server.port").left();
-		join.content().addField(Vars.port + "", new DigitsOnlyFilter(), text -> lastport = Strings.parseInt(text)).size(180f, 54f);
+		Mindustry.platforms.addDialog(join.content()
+				.addField(Vars.port + "", new DigitsOnlyFilter(), text -> lastport = Strings.parseInt(text))
+				.size(180f, 54f).get());
 		join.buttons().defaults().size(140f, 60f).pad(4f);
 		join.buttons().addButton("$text.cancel", join::hide);
 		join.buttons().addButton("$text.ok", () -> {
@@ -471,6 +473,21 @@ public class UI extends SceneModule{
 
 	public void showInfo(String info){
 		scene.table().add(info).get().getParent().actions(Actions.fadeOut(4f), Actions.removeActor());
+	}
+
+	public void showHostServer(){
+		showTextInput("$text.hostserver", "$text.server.port", Vars.port + "", new DigitsOnlyFilter(), text -> {
+			int result = Strings.parseInt(text);
+			if(result == Integer.MIN_VALUE || result >= 65535){
+				Vars.ui.showError("$text.server.invalidport");
+			}else{
+				try{
+					Net.host(result);
+				}catch (IOException e){
+					Vars.ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
+				}
+			}
+		});
 	}
 	
 	public void showAbout(){

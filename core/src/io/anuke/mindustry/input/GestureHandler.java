@@ -52,7 +52,7 @@ public class GestureHandler extends GestureAdapter{
 			float dx = deltaX*Core.camera.zoom/Core.cameraScale, dy = deltaY*Core.camera.zoom/Core.cameraScale;
 			player.x -= dx;
 			player.y += dy;
-			player.angle = Mathf.lerpAngDelta(player.angle, Mathf.atan2(dx, dy), 0.5f);
+			player.targetAngle = Mathf.atan2(dx, -dy);
 		}else if(player.placeMode.lockCamera && (player.placeMode.pan && player.recipe != null)){
 			input.mousex += deltaX;
 			input.mousey += deltaY;

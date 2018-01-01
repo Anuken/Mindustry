@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.BulletType;
@@ -24,6 +25,7 @@ import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.modules.Module;
+import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
 import java.io.ByteArrayInputStream;
@@ -39,8 +41,14 @@ public class NetServer extends Module{
 
     public NetServer(){
 
-        Net.handleServer(Connect.class, packet -> {
-            UCore.log("Sending world data to client (ID="+packet.id+"/"+packet.addressTCP+")");
+        Net.handleServer(Connect.class, connect -> {
+            UCore.log("Connection found: " + connect.addressTCP);
+        });
+
+        Net.handleServer(ConnectPacket.class, packet -> {
+            int id = Net.getLastConnection();
+
+            UCore.log("Sending world data to client (ID="+id+")");
 
             WorldData data = new WorldData();
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -51,7 +59,7 @@ public class NetServer extends Module{
             //TODO compress and uncompress when sending
             data.stream = new ByteArrayInputStream(stream.toByteArray());
 
-            Net.sendStream(packet.id, data);
+            Net.sendStream(id, data);
 
             Gdx.app.postRunnable(() -> {
                 Vars.ui.showInfo("$text.server.connected");
@@ -59,25 +67,38 @@ public class NetServer extends Module{
                 EntityDataPacket dp = new EntityDataPacket();
 
                 Player player = new Player();
-                player.clientid = packet.id;
+                player.clientid = id;
+                player.name = packet.name;
+                player.isAndroid = packet.android;
                 player.set(Vars.control.core.worldx(), Vars.control.core.worldy() - Vars.tilesize*2);
                 player.add();
-                connections.put(packet.id, player);
+                connections.put(id, player);
 
                 dp.playerid = player.id;
                 dp.players = Vars.control.playerGroup.all().toArray(Player.class);
 
                 UCore.log("Sending entities: " + Arrays.toString(dp.players));
 
-                //TODO send pathfind positions
-                //TODO save enemy nodes
+                Net.sendExcept(id, player, SendMode.tcp);
 
-                Net.sendTo(packet.id, dp, SendMode.tcp);
+                Net.sendTo(id, dp, SendMode.tcp);
             });
         });
 
         Net.handleServer(Disconnect.class, packet -> {
-            Gdx.app.postRunnable(() -> Vars.ui.showInfo("$text.server.disconnected"));
+            Player player = connections.get(packet.id);
+
+            if(player == null) {
+                Gdx.app.postRunnable(() -> Vars.ui.showInfo(Bundles.format("text.server.disconnected", "<???>")));
+                return;
+            }
+
+            Gdx.app.postRunnable(() -> Vars.ui.showInfo(Bundles.format("text.server.disconnected", player.name)));
+
+            DisconnectPacket dc = new DisconnectPacket();
+            dc.playerid = player.id;
+
+            Net.send(dc, SendMode.tcp);
         });
 
         Net.handleServer(PositionPacket.class, pos -> {
@@ -200,7 +221,7 @@ public class NetServer extends Module{
             packet.ids = new int[amount];
             packet.data = new float[amount][0];
 
-            int index = 0;
+            short index = 0;
 
             for(Player player : Vars.control.playerGroup.all()){
                 float[] out = player.getInterpolator().type.write(player);
@@ -229,23 +250,24 @@ public class NetServer extends Module{
             packet.countdown = Vars.control.getWaveCountdown();
             packet.enemies = Vars.control.getEnemiesRemaining();
             packet.wave = Vars.control.getWave();
+            packet.time = Timers.time();
+            packet.timestamp = TimeUtils.millis();
 
             Net.send(packet, SendMode.udp);
         }
 
         if(Timers.get("serverBlockSync", blockSyncTime)){
-            BlockSyncPacket packet = new BlockSyncPacket();
 
             IntArray connections = Net.getConnections();
 
             for(int i = 0; i < connections.size; i ++){
                 int id = connections.get(i);
-                Player player = this.connections.get(i);
+                Player player = this.connections.get(id);
                 if(player == null) continue;
                 int x = Mathf.scl2(player.x, Vars.tilesize);
                 int y = Mathf.scl2(player.y, Vars.tilesize);
-                int w = 14;
-                int h = 10;
+                int w = 16;
+                int h = 12;
                 sendBlockSync(id, x, y, w, h);
             }
 
@@ -270,7 +292,7 @@ public class NetServer extends Module{
                     byte times = 0;
 
                     for(; times < tile.entity.timer.getTimes().length; times ++){
-                        if(tile.entity.timer.getTimes()[times] > 0){
+                        if(tile.entity.timer.getTimes()[times] <= 1f){
                             break;
                         }
                     }
@@ -278,7 +300,7 @@ public class NetServer extends Module{
                     stream.writeByte(times);
 
                     for(int i = 0; i < times; i ++){
-                        stream.writeFloat(tile.entity.timer.getTimes()[times]);
+                        stream.writeFloat(tile.entity.timer.getTimes()[i]);
                     }
 
                     tile.entity.write(stream);

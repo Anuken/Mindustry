@@ -31,6 +31,8 @@ public class Registrator {
                 EnemyDeathPacket.class,
                 BlockUpdatePacket.class,
                 BlockDestroyPacket.class,
+                ConnectPacket.class,
+                DisconnectPacket.class,
 
                 Class.class,
                 byte[].class,

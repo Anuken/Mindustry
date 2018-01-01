@@ -10,11 +10,7 @@ import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.ui.ImageButton;
-import io.anuke.ucore.scene.ui.TextField.TextFieldFilter.DigitsOnlyFilter;
 import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Strings;
-
-import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.ui;
 
@@ -62,26 +58,13 @@ public class MenuDialog extends FloatingDialog{
 
 			content().row();
 
-			content().addButton("$text.hostserver", () -> {
-				Vars.ui.showTextInput("$text.hostserver", "$text.server.port", Vars.port + "", new DigitsOnlyFilter(), text -> {
-					int result = Strings.parseInt(text);
-					if(result == Integer.MIN_VALUE || result >= 65535){
-						Vars.ui.showError("$text.server.invalidport");
-					}else{
-						try{
-							Net.host(result);
-							GameState.set(State.playing);
-						}catch (IOException e){
-							Vars.ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
-						}
-					}
-				});
-			}).disabled(b -> Net.active() || (Net.active() && !Net.server()));
+			content().addButton("$text.hostserver", () -> ui.showHostServer())
+                    .disabled(b -> Net.active() || (Net.active() && !Net.server()));
 
             content().row();
 
 			content().addButton("$text.quit", () -> {
-        Vars.ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
+                ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
 					runSave();
 					hide();
 					GameState.set(State.menu);
@@ -105,8 +88,12 @@ public class MenuDialog extends FloatingDialog{
 			new imagebutton("icon-tools", isize, () -> ui.showPrefs()).text("$text.settings").padTop(4f);
 			
 			new imagebutton("icon-save", isize, ()-> save.show()).text("$text.save").padTop(4f);
+
+			content().row();
 			
 			new imagebutton("icon-load", isize, () -> load.show()).text("$text.load").padTop(4f);
+
+			new imagebutton("icon-host", isize, () -> ui.showHostServer()).text("$text.host").padTop(4f);
 			
 			new imagebutton("icon-quit", isize, () -> {
 				Vars.ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {

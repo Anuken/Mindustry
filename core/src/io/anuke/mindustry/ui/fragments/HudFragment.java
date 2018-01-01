@@ -150,6 +150,14 @@ public class HudFragment implements Fragment{
 
 		}}.end();
 
+		if(Vars.debugNet) {
+            new table() {{
+                new label(() -> "players: " + Vars.control.playerGroup.amount());
+                row();
+                new label(() -> "" + Vars.control.playerGroup.all());
+            }}.end();
+        }
+
 		blockfrag.build();
 	}
 

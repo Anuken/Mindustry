@@ -1,7 +1,6 @@
 package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.math.Vector2;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.graphics.Fx;
@@ -37,11 +36,11 @@ public interface Syncable {
             @Override
             public void update(Player entity, Interpolator interpolator) {
                 Interpolator i = entity.getInterpolator();
-                if(i.target.dst(entity.x, entity.y) > 16){
+                if(i.target.dst(entity.x, entity.y) > 16 && !entity.isAndroid){
                     entity.set(i.target.x, i.target.y);
                 }
 
-                if(Vars.android && i.target.dst(entity.x, entity.y) > 2f && Timers.get(entity, "dashfx", 3)){
+                if(entity.isAndroid && i.target.dst(entity.x, entity.y) > 2f && Timers.get(entity, "dashfx", 2)){
                     Angles.translation(entity.angle + 180, 3f);
                     Effects.effect(Fx.dashsmoke, entity.x + Angles.x(), entity.y + Angles.y());
                 }

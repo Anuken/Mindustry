@@ -114,7 +114,7 @@ project(":kryonet") {
 
     dependencies {
         compile project(":core")
-        compile "com.esotericsoftware:kryonet:2.22.0-RC1"
+        compile 'com.github.crykn:kryonet:2.22.1'
     }
 }
 

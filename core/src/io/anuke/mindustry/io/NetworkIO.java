@@ -1,7 +1,6 @@
 package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.Vars;
@@ -12,8 +11,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.mindustry.world.blocks.types.Rock;
-import io.anuke.mindustry.world.blocks.types.production.Generator;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 
@@ -141,7 +138,7 @@ public class NetworkIO {
                             byte times = 0;
 
                             for(; times < tile.entity.timer.getTimes().length; times ++){
-                                if(tile.entity.timer.getTimes()[times] > 0){
+                                if(tile.entity.timer.getTimes()[times] <= 1){
                                     break;
                                 }
                             }
@@ -149,7 +146,7 @@ public class NetworkIO {
                             stream.writeByte(times);
 
                             for(int i = 0; i < times; i ++){
-                                stream.writeFloat(tile.entity.timer.getTimes()[times]);
+                                stream.writeFloat(tile.entity.timer.getTimes()[i]);
                             }
 
                             tile.entity.write(stream);
@@ -204,8 +201,6 @@ public class NetworkIO {
 
             int enemies = stream.readInt();
 
-            Array<Enemy> enemiesToUpdate = new Array<>();
-
             for(int i = 0; i < enemies; i ++){
                 int id = stream.readInt();
                 byte type = stream.readByte();
@@ -226,7 +221,6 @@ public class NetworkIO {
                     enemy.tier = tier;
                     enemy.node = node;
                     enemy.add(Vars.control.enemyGroup);
-                    enemiesToUpdate.add(enemy);
                 }catch (Exception e){
                     throw new RuntimeException(e);
                 }
@@ -234,8 +228,7 @@ public class NetworkIO {
 
             Vars.control.setWaveData(enemies, wave, wavetime);
 
-            if(!android)
-                Vars.player.add();
+            Vars.player.add();
 
             //map
 

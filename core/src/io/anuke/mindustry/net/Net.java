@@ -192,6 +192,8 @@ public class Net{
 		public IntArray getConnections();
 		/**Register classes to be sent.*/
 		public void register(Class<?>... types);
+		/**Returns the ping for a certain connection.*/
+		public int getPingFor(int connection);
 	}
 
 	public enum SendMode{

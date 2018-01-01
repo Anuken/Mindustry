@@ -11,6 +11,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.DestructibleEntity;
+import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
@@ -19,10 +20,14 @@ import static io.anuke.mindustry.Vars.*;
 public class Player extends DestructibleEntity implements Syncable{
 	private static final float speed = 1.1f;
 	private static final float dashSpeed = 1.8f;
-	
+
+	public String name = "player name";
 	public transient Weapon weapon = Weapon.blaster;
 	public Mech mech = Mech.standard;
 	public float angle;
+	public boolean isAndroid;
+
+	public transient float targetAngle = 0f;
 
 	public transient int clientid;
 	public transient boolean isLocal = false;
@@ -43,14 +48,19 @@ public class Player extends DestructibleEntity implements Syncable{
 	}
 
 	@Override
-	public Interpolator getInterpolator() {
+	public Interpolator<Player> getInterpolator() {
 		return inter;
 	}
 
 	@Override
 	public void damage(int amount){
-		if(!Vars.debug && !Vars.android)
+		if(!Vars.debug)
 			super.damage(amount);
+	}
+
+	@Override
+	public boolean collides(SolidEntity other){
+		return super.collides(other) && !isAndroid;
 	}
 	
 	@Override
@@ -79,9 +89,13 @@ public class Player extends DestructibleEntity implements Syncable{
 	
 	@Override
 	public void draw(){
-		if((Vars.debug && (!Vars.showPlayer || !Vars.showUI)) || (Vars.android && isLocal)) return;
+        if(isAndroid && isLocal){
+            angle = Mathf.lerpAngDelta(angle, targetAngle, 0.2f);
+        }
 
-		String part = Vars.android ? "ship" : "mech";
+		if((Vars.debug && (!Vars.showPlayer || !Vars.showUI)) || (isAndroid && isLocal)) return;
+
+		String part = isAndroid ? "ship" : "mech";
 		
 		if(Vars.snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate")){
 			Draw.rect(part+"-"+mech.name(), (int)x, (int)y, angle-90);
@@ -93,7 +107,7 @@ public class Player extends DestructibleEntity implements Syncable{
 	
 	@Override
 	public void update(){
-		if(!isLocal || android){
+		if(!isLocal || isAndroid){
 			if(!isDead() && !isLocal) inter.update(this);
 			return;
 		}
@@ -153,4 +167,9 @@ public class Player extends DestructibleEntity implements Syncable{
 	public Player add(){
 		return add(Vars.control.playerGroup);
 	}
+
+    @Override
+    public String toString() {
+        return "Player{" + id + ", android=" + isAndroid + ", local=" + isLocal + ", " + x + ", " + y + "}\n";
+    }
 }

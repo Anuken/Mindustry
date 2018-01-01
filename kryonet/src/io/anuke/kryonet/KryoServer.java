@@ -134,6 +134,11 @@ public class KryoServer implements ServerProvider {
     }
 
     @Override
+    public int getPingFor(int connection) {
+        return getByID(connection).getReturnTripTime();
+    }
+
+    @Override
     public void register(Class<?>... types) {
         for(Class<?> c : types){
             server.getKryo().register(c);
