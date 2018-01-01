@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class NetServer extends Module{
+    /**Maps connection IDs to players.*/
     IntMap<Player> connections = new IntMap<>();
     float serverSyncTime = 4, itemSyncTime = 10, blockSyncTime = 120;
 
@@ -241,8 +242,12 @@ public class NetServer extends Module{
             for(int i = 0; i < connections.size; i ++){
                 int id = connections.get(i);
                 Player player = this.connections.get(i);
+                if(player == null) continue;
                 int x = Mathf.scl2(player.x, Vars.tilesize);
                 int y = Mathf.scl2(player.y, Vars.tilesize);
+                int w = 14;
+                int h = 10;
+                sendBlockSync(id, x, y, w, h);
             }
 
             //TODO sync to each player entity

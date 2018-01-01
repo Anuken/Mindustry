@@ -26,6 +26,8 @@ import io.anuke.ucore.entities.BaseBulletType;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.modules.Module;
 
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.util.Arrays;
 
 public class NetClient extends Module {
@@ -193,6 +195,25 @@ public class NetClient extends Module {
 
         Net.handle(BlockSyncPacket.class, packet -> {
             //TODO implementation, load data...
+            DataInputStream stream = new DataInputStream(packet.stream);
+
+            try{
+                while(stream.available() > 0){
+                    int pos = stream.readInt();
+
+                    Tile tile = Vars.world.tile(pos % Vars.world.width(), pos / Vars.world.width());
+
+                    byte times = stream.readByte();
+
+                    for(int i = 0; i < times; i ++){
+                        tile.entity.timer.getTimes()[i] = stream.readFloat();
+                    }
+
+                    tile.entity.read(stream);
+                }
+            }catch (IOException e){
+                e.printStackTrace();
+            }
         });
     }
 
