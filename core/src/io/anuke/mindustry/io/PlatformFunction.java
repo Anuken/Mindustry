@@ -9,4 +9,6 @@ public interface PlatformFunction{
 	public String format(int number);
 	public void openLink(String link);
 	public void addDialog(TextField field);
+	public void onSceneChange(String state, String details, String icon);
+	public void onGameExit();
 }

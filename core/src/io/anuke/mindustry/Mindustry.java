@@ -30,7 +30,10 @@ public class Mindustry extends ModuleCore {
 		@Override public String format(int number){ return number + ""; }
 		@Override public void openLink(String link){ }
 		@Override public void addDialog(TextField field){}
+		@Override public void onSceneChange(String state, String details, String icon) {}
+		@Override public void onGameExit() { }
 	};
+
 	public static boolean externalBundle = false;
 	
 	@Override
@@ -43,6 +46,12 @@ public class Mindustry extends ModuleCore {
 		module(Vars.ui = new UI());
 		module(Vars.netServer = new NetServer());
 		module(Vars.netClient = new NetClient());
+	}
+
+	@Override
+	public void dispose() {
+		platforms.onGameExit();
+		super.dispose();
 	}
 
 	public void loadBundle(){

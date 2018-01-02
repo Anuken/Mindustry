@@ -112,7 +112,17 @@ public class HtmlLauncher extends GwtApplication {
 			public void addDialog(TextField field){
 				
 			}
-		};
+
+            @Override
+            public void onSceneChange(String state, String details, String icon) {
+
+            }
+
+            @Override
+            public void onGameExit() {
+
+            }
+        };
         
         return new Mindustry();
     }

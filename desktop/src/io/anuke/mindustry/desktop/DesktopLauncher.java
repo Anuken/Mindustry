@@ -1,5 +1,8 @@
 package io.anuke.mindustry.desktop;
 
+import club.minnced.discord.rpc.DiscordEventHandlers;
+import club.minnced.discord.rpc.DiscordRPC;
+import club.minnced.discord.rpc.DiscordRichPresence;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.utils.Array;
@@ -58,7 +61,33 @@ public class DesktopLauncher {
 			}
 
 			@Override
-			public void addDialog(TextField field){ }
+			public void addDialog(TextField field){
+				
+			}
+
+			@Override
+			public void onSceneChange(String state, String details, String icon) {
+        DiscordRPC lib = DiscordRPC.INSTANCE;
+
+        String applicationId = "397335883319083018";
+
+        DiscordEventHandlers handlers = new DiscordEventHandlers();
+
+        lib.Discord_Initialize(applicationId, handlers, true, "");
+
+        DiscordRichPresence presence = new DiscordRichPresence();
+        presence.startTimestamp = System.currentTimeMillis() / 1000; // epoch second
+        presence.state = state;
+        //presence.details = details;
+        presence.largeImageKey = "logo";
+        presence.largeImageText = details;
+        lib.Discord_UpdatePresence(presence);
+      }
+
+      @Override
+      public void onGameExit() {
+        DiscordRPC.INSTANCE.Discord_Shutdown();
+      }
 		};
 		
 		Mindustry.args = Array.with(arg);
