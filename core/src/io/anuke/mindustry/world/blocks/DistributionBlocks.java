@@ -45,7 +45,7 @@ public class DistributionBlocks{
 	tunnel = new TunnelConveyor("conveyortunnel"){{
 
 	}},
-	luquidtunel = new TunnelConduit("conduittunnel") {{
+	liquidtunel = new TunnelConduit("conduittunnel") {{
 
 	}},
 	liquidjunction = new LiquidJunction("liquidjunction"){{

@@ -43,12 +43,10 @@ public class TunnelConduit extends LiquidBlock {
 
         Tile to = tunnel.getNearby()[tunnel.getRotation()];
 
-        Timers.run(25, () -> {
-            if (to == null || to.entity == null)
-                return;
+        if (to == null || to.entity == null)
+            return;
 
-            ((LiquidBlock)to.block()).handleLiquid(to, tunnel, liquid, amount);
-        });
+        ((LiquidBlock)to.block()).handleLiquid(to, tunnel, liquid, amount);
     }
 
     @Override
