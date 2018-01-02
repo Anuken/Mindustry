@@ -1,19 +1,24 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import java.util.Arrays;
+
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
+
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 
-import java.util.Arrays;
-
 public class Crafter extends Block{
 	protected final int timerDump = timers++;
 	
 	protected Item[] requirements;
 	protected Item result;
+
+        int capacity = 20;
 
 	public Crafter(String name) {
 		super(name);
@@ -26,6 +31,7 @@ public class Crafter extends Block{
 		super.getStats(list);
 		list.add("[craftinfo]Input: " + Arrays.toString(requirements));
 		list.add("[craftinfo]Output: " + result);
+		list.add("[craftinfo]Capacity per input type: " + capacity);
 	}
 	
 	@Override
@@ -53,9 +59,16 @@ public class Crafter extends Block{
 	public boolean acceptItem(Item item, Tile dest, Tile source){
 		for(Item req : requirements){
 			if(item == req){
-				return true;
+                            return dest.entity.getItem(item) < capacity;
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public void drawSelect(Tile tile){
+                float fract = (float)tile.entity.totalItems()/((requirements.length-1) *capacity);
+		
+		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 6, fract);
 	}
 }
