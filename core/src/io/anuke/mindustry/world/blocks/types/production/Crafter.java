@@ -18,7 +18,7 @@ public class Crafter extends Block{
 	protected Item[] requirements;
 	protected Item result;
 
-        int capacity = 20;
+	int capacity = 20;
 
 	public Crafter(String name) {
 		super(name);
@@ -48,8 +48,7 @@ public class Crafter extends Block{
 		}
 
 		// crafter full - it has to be emptied before it can craft again.
-		if(tile.entity.getItem(result) >= capacity)
-		{
+		if(tile.entity.getItem(result) >= capacity){
 			return;
 		}
 
