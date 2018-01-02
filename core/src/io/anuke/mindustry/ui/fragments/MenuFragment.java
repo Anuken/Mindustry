@@ -39,7 +39,6 @@ public class MenuFragment implements Fragment{
 					row();
 
 					if(!gwt){
-						
 						add(new MenuButton("$text.editor", group, ui::showEditor));
 						row();
 					}

@@ -187,6 +187,11 @@ public class Control extends Module{
 			Settings.defaults("save-" + i + "-name", "untitled");
 			Settings.defaults("save-" + i + "-data", "empty");
 		}
+
+		Settings.defaultList(
+			"ip", "localhost",
+			"port", Vars.port+""
+		);
 		
 		Settings.loadAll("io.anuke.moment");
 		

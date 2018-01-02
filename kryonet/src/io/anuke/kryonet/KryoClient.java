@@ -2,6 +2,7 @@ package io.anuke.kryonet;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.FrameworkMessage;
@@ -101,10 +102,13 @@ public class KryoClient implements ClientProvider{
     @Override
     public Array<Address> discover(){
         List<InetAddress> list = client.discoverHosts(Vars.port, 5000);
+        ObjectSet<String> hostnames = new ObjectSet<>();
         Array<Address> result = new Array<>();
 
         for(InetAddress a : list){
-            result.add(new Address(a.getHostName(), a.getHostAddress()));
+            if(!hostnames.contains(a.getHostName()))
+                result.add(new Address(a.getCanonicalHostName(), a.getHostAddress()));
+            hostnames.add(a.getHostName());
         }
 
         return result;

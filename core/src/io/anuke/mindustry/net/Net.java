@@ -55,7 +55,7 @@ public class Net{
 
 	/**Starts discovering servers on a different thread. Does not work with GWT.
 	 * Callback is run on the main libGDX thread.*/
-	public void discoverServers(Consumer<Array<Address>> cons){
+	public static void discoverServers(Consumer<Array<Address>> cons){
 		executor.submit(() -> {
 			Array<Address> arr = clientProvider.discover();
 			Gdx.app.postRunnable(() -> {

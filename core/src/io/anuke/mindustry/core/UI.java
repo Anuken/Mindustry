@@ -178,29 +178,6 @@ public class UI extends SceneModule{
 			editor = new MapEditor();
 			editorDialog = new MapEditorDialog(editor);
 		}
-
-		join = new FloatingDialog("$text.joingame.title");
-		join.content().add("$text.joingame.ip").left();
-		Mindustry.platforms.addDialog(join.content().addField("localhost", text -> lastip = text).size(180f, 54f).get());
-		join.content().row();
-		join.content().add("$text.server.port").left();
-		Mindustry.platforms.addDialog(join.content()
-				.addField(Vars.port + "", new DigitsOnlyFilter(), text -> lastport = Strings.parseInt(text))
-				.size(180f, 54f).get());
-		join.buttons().defaults().size(140f, 60f).pad(4f);
-		join.buttons().addButton("$text.cancel", join::hide);
-		join.buttons().addButton("$text.ok", () -> {
-			showLoading("$text.connecting");
-
-			Timers.runTask(2f, () -> {
-				try{
-					Net.connect(lastip, lastport);
-				}catch (IOException e) {
-					showError(Bundles.format("text.connectfail", Strings.parseException(e, false)));
-					hideLoading();
-				}
-			});
-		}).disabled(b -> lastip.isEmpty() || lastport == Integer.MIN_VALUE);
 		
 		settingserror = new Dialog("Warning", "dialog");
 		settingserror.content().add("[crimson]Failed to access local storage.\nSettings will not be saved.");
@@ -210,6 +187,8 @@ public class UI extends SceneModule{
 		gameerror = new Dialog("$text.error.crashtitle", "dialog");
 		gameerror.content().labelWrap("$text.error.crashmessage").width(600f).pad(10f);
 		gameerror.buttons().addButton("#text.ok", gameerror::hide).size(200f, 50);
+
+		join = new JoinDialog();
 		
 		discord = new Dialog("Discord", "dialog");
 		discord.content().margin(12f);

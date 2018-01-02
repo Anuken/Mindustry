@@ -44,17 +44,15 @@ public class MenuDialog extends FloatingDialog{
 				ui.showPrefs();
 			});
 
-			//if(!Vars.gwt){
-				content().row();
-				content().addButton("$text.savegame", () -> {
-					save.show();
-				});
+			content().row();
+			content().addButton("$text.savegame", () -> {
+				save.show();
+			});
 
-				content().row();
-				content().addButton("$text.loadgame", () -> {
-					load.show();
-				});
-			//}
+			content().row();
+			content().addButton("$text.loadgame", () -> {
+				load.show();
+			});
 
 			content().row();
 
