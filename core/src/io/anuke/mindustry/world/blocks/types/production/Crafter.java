@@ -57,7 +57,6 @@ public class Crafter extends Block{
 
 	@Override
 	public boolean acceptItem(Item item, Tile dest, Tile source){
-		boolean craft = false;
 		for(Item req : requirements){
 			if(item == req){
                             return dest.entity.getItem(item) < capacity;
