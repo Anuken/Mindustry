@@ -37,7 +37,7 @@ public class Crafter extends Block{
 	@Override
 	public void update(Tile tile){
 		
-		if(tile.entity.timer.get(timerDump, 20) && tile.entity.hasItem(result)){
+		if(tile.entity.timer.get(timerDump, 15) && tile.entity.hasItem(result)){
 			tryDump(tile, -1, result);
 		}
 		
