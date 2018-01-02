@@ -35,6 +35,7 @@ public class NetClient extends Module {
     boolean connecting = false;
     boolean gotEntities = false;
     float playerSyncTime = 2;
+    float dataTimeout = 60*10;
 
     public NetClient(){
 
@@ -50,6 +51,14 @@ public class NetClient extends Module {
             c.name = UCore.getProperty("user.name");
             c.android = Vars.android;
             Net.send(c, SendMode.tcp);
+
+            Timers.runTask(dataTimeout, () -> {
+                if(!gotEntities){
+                    Gdx.app.error("Mindustry", "Failed to load data!");
+                    Vars.ui.hideLoading();
+                    Net.disconnect();
+                }
+            });
         });
 
         Net.handle(Disconnect.class, packet -> {
@@ -243,7 +252,7 @@ public class NetClient extends Module {
     }
 
     public void update(){
-        if(!Net.client()) return;
+        if(!Net.client() || !Net.active()) return;
 
         if(!GameState.is(State.menu) && Net.active()){
             sync();

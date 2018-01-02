@@ -34,10 +34,11 @@ public class MenuFragment implements Fragment{
 					
 					add(new MenuButton("$text.tutorial", group, ()-> control.playMap(world.maps().getMap("tutorial"))));
 					row();
-					
+
+					add(new MenuButton("$text.loadgame", group, ui::showLoadGame));
+					row();
+
 					if(!gwt){
-						add(new MenuButton("$text.loadgame", group, ui::showLoadGame));
-						row();
 						
 						add(new MenuButton("$text.editor", group, ui::showEditor));
 						row();

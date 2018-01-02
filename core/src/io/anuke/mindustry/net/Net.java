@@ -1,9 +1,11 @@
 package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.async.AsyncExecutor;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamBuilder;
 import io.anuke.mindustry.net.Streamable.StreamChunk;
@@ -22,6 +24,7 @@ public class Net{
 
 	private static int lastConnection = -1;
 	private static IntMap<StreamBuilder> streams = new IntMap<>();
+	private static AsyncExecutor executor = new AsyncExecutor(4);
 	
 	/**Connect to an address.*/
 	public static void connect(String ip, int port) throws IOException{
@@ -48,6 +51,18 @@ public class Net{
 		clientProvider.disconnect();
 		server = false;
 		active = false;
+	}
+
+	/**Starts discovering servers on a different thread. Does not work with GWT.
+	 * Callback is run on the main libGDX thread.*/
+	public void discoverServers(Consumer<Array<Address>> cons){
+		executor.submit(() -> {
+			Array<Address> arr = clientProvider.discover();
+			Gdx.app.postRunnable(() -> {
+				cons.accept(arr);
+			});
+			return false;
+		});
 	}
 
 	/**Returns a list of all connections IDs.*/
@@ -152,6 +167,12 @@ public class Net{
 		return !server;
 	}
 
+	public static void dispose(){
+		clientProvider.dispose();
+		serverProvider.dispose();
+		executor.dispose();
+	}
+
 	/**Register classes that will be sent. Must be done for all classes.*/
 	public static void registerClasses(Class<?>... classes){
 		clientProvider.register(classes);
@@ -170,8 +191,12 @@ public class Net{
 		public int getPing();
 		/**Disconnect from the server.*/
 		public void disconnect();
+        /**Discover servers. This should block for a certain amount of time, and will most likely be run in a different thread.*/
+        public Array<Address> discover();
 		/**Register classes to be sent.*/
 		public void register(Class<?>... types);
+		/**Close all connections.*/
+		public void dispose();
 	}
 
 	/**Server implementation.*/
@@ -194,6 +219,8 @@ public class Net{
 		public void register(Class<?>... types);
 		/**Returns the ping for a certain connection.*/
 		public int getPingFor(int connection);
+		/**Close all connections.*/
+		public void dispose();
 	}
 
 	public enum SendMode{

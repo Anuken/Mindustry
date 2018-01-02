@@ -2,6 +2,7 @@ package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -16,6 +17,7 @@ import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.entities.Entities;
 
 import java.io.*;
@@ -106,71 +108,71 @@ public class SaveIO{
 	}};
 	
 	public static void saveToSlot(int slot){
-		write(fileFor(slot));
+		if(Vars.gwt){
+			ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			write(stream);
+			Settings.putString("save-"+slot+"-data", new String(Base64Coder.encode(stream.toByteArray())));
+			Settings.save();
+		}else{
+			write(fileFor(slot));
+		}
 	}
 	
 	public static void loadFromSlot(int slot){
-		load(fileFor(slot));
+		if(Vars.gwt){
+			String string = Settings.getString("save-"+slot+"-data");
+			ByteArrayInputStream stream = new ByteArrayInputStream(Base64Coder.decode(string));
+			load(stream);
+		}else{
+			load(fileFor(slot));
+		}
+	}
+
+	public static DataInputStream readSlotMeta(int slot){
+		if(Vars.gwt){
+			String string = Settings.getString("save-"+slot+"-data");
+			byte[] bytes = Base64Coder.decode(string);
+			return new DataInputStream(new ByteArrayInputStream(bytes));
+		}else{
+			return new DataInputStream(fileFor(slot).read());
+		}
 	}
 	
 	public static boolean isSaveValid(int slot){
-		return isSaveValid(fileFor(slot));
-	}
-
-	public static boolean isSaveValid(FileHandle file){
-		try(DataInputStream stream = new DataInputStream(file.read())){
-			int version = stream.readInt(); //read version
-			stream.readLong(); //read last saved time
-			stream.readByte(); //read the gamemode
-			byte map = stream.readByte(); //read the map
-			return version == fileVersionID && Vars.world.maps().getMap(map) != null;
+		try {
+			return isSaveValid(readSlotMeta(slot));
 		}catch (Exception e){
 			return false;
 		}
 	}
-	
-	public static String getTimeString(int slot){
-		
-		try(DataInputStream stream = new DataInputStream(fileFor(slot).read())){
-			stream.readInt();
-			Date date = new Date(stream.readLong());
-			return Mindustry.platforms.format(date);
-		}catch (IOException e){
-			throw new RuntimeException(e);
+
+	public static boolean isSaveValid(FileHandle file){
+		return isSaveValid(new DataInputStream(file.read()));
+	}
+
+	public static boolean isSaveValid(DataInputStream stream){
+
+		try{
+			SaveMeta meta = getData(stream);
+			return meta.version == fileVersionID && meta.map != null;
+		}catch (Exception e){
+			return false;
 		}
 	}
-	
-	public static int getWave(int slot){
-		
-		try(DataInputStream stream = new DataInputStream(fileFor(slot).read())){
-			stream.readInt(); //read version
-			stream.readLong(); //read last saved time
-			stream.readByte(); //read the gamemode
-			stream.readByte(); //read the map
-			return stream.readInt(); //read the wave
-		}catch (IOException e){
-			throw new RuntimeException(e);
-		}
+
+	public static SaveMeta getData(int slot){
+		return getData(readSlotMeta(slot));
 	}
 	
-	public static GameMode getMode(int slot){
+	public static SaveMeta getData(DataInputStream stream){
 		
-		try(DataInputStream stream = new DataInputStream(fileFor(slot).read())){
-			stream.readInt(); //read version
-			stream.readLong(); //read last saved time
-			return GameMode.values()[stream.readByte()]; //read the gamemode
-		}catch (IOException e){
-			throw new RuntimeException(e);
-		}
-	}
-	
-	public static Map getMap(int slot){
-		
-		try(DataInputStream stream = new DataInputStream(fileFor(slot).read())){
-			stream.readInt(); //read version
-			stream.readLong(); //read last saved time
-			stream.readByte(); //read the gamemode
-			return Vars.world.maps().getMap(stream.readByte()); //read the map
+		try{
+			int version = stream.readInt(); //read version
+			long time = stream.readLong(); //read last saved time
+			byte mode = stream.readByte(); //read the gamemode
+			byte map = stream.readByte(); //read the map
+			int wave = stream.readInt(); //read the wave
+			return new SaveMeta(version, time, mode, map, wave);
 		}catch (IOException e){
 			throw new RuntimeException(e);
 		}

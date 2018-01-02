@@ -185,6 +185,7 @@ public class Control extends Module{
 		for(int i = 0; i < Vars.saveSlots; i ++){
 			Settings.defaults("save-" + i + "-autosave", true);
 			Settings.defaults("save-" + i + "-name", "untitled");
+			Settings.defaults("save-" + i + "-data", "empty");
 		}
 		
 		Settings.loadAll("io.anuke.moment");

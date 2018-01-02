@@ -1,10 +1,13 @@
 package io.anuke.kryonet;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.FrameworkMessage;
 import com.esotericsoftware.kryonet.Listener;
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.net.Address;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.ClientProvider;
 import io.anuke.mindustry.net.Net.SendMode;
@@ -13,6 +16,8 @@ import io.anuke.mindustry.net.Packets.Disconnect;
 import io.anuke.mindustry.net.Registrator;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.util.List;
 
 public class KryoClient implements ClientProvider{
     Client client;
@@ -94,9 +99,31 @@ public class KryoClient implements ClientProvider{
     }
 
     @Override
+    public Array<Address> discover(){
+        List<InetAddress> list = client.discoverHosts(Vars.port, 5000);
+        Array<Address> result = new Array<>();
+
+        for(InetAddress a : list){
+            result.add(new Address(a.getHostName(), a.getHostAddress()));
+        }
+
+        return result;
+    }
+
+    @Override
     public void register(Class<?>... types) {
         for(Class<?> c : types){
             client.getKryo().register(c);
         }
     }
+
+    @Override
+    public void dispose(){
+        try {
+            client.dispose();
+        }catch (IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
 }

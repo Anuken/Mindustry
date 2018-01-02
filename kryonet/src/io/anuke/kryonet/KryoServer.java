@@ -159,6 +159,15 @@ public class KryoServer implements ServerProvider {
         }
     }
 
+    @Override
+    public void dispose(){
+        try {
+            server.dispose();
+        }catch (IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
     Connection getByID(int id){
         for(Connection con : server.getConnections()){
             if(con.getID() == id){

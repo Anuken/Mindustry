@@ -26,7 +26,9 @@ public class Saves {
         saves.clear();
         for(int i = 0; i < Vars.saveSlots; i ++){
             if(SaveIO.isSaveValid(i)){
-                saves.add(new SaveSlot(i));
+                SaveSlot slot = new SaveSlot(i);
+                saves.add(slot);
+                slot.meta = SaveIO.getData(i);
                 nextSlot = i + 1;
             }
         }
@@ -73,6 +75,7 @@ public class Saves {
         slot.setName(name);
         saves.add(slot);
         SaveIO.saveToSlot(slot.index);
+        slot.meta = SaveIO.getData(slot.index);
     }
 
     public Array<SaveSlot> getSaveSlots(){
@@ -81,6 +84,7 @@ public class Saves {
 
     public class SaveSlot{
         public final int index;
+        SaveMeta meta;
 
         public SaveSlot(int index){
             this.index = index;
@@ -89,19 +93,21 @@ public class Saves {
         public void load(){
             current = this;
             SaveIO.loadFromSlot(index);
+            meta = SaveIO.getData(index);
         }
 
         public void save(){
             current = this;
             SaveIO.saveToSlot(index);
+            meta = SaveIO.getData(index);
         }
 
         public String getDate(){
-            return SaveIO.getTimeString(index);
+            return meta.date;
         }
 
         public Map getMap(){
-            return SaveIO.getMap(index);
+            return meta.map;
         }
 
         public String getName(){
@@ -114,11 +120,11 @@ public class Saves {
         }
 
         public int getWave(){
-            return SaveIO.getWave(index);
+            return meta.wave;
         }
 
         public GameMode getMode(){
-            return SaveIO.getMode(index);
+            return meta.mode;
         }
 
         public boolean isAutosave(){
