@@ -10,10 +10,15 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.PlatformFunction;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.scene.ui.TextField;
+import io.anuke.ucore.util.Strings;
 
+import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -60,7 +65,30 @@ public class DesktopLauncher {
 
 		Net.setClientProvider(new KryoClient());
 		Net.setServerProvider(new KryoServer());
-		
-		new Lwjgl3Application(new Mindustry(), config);
+
+		try {
+			new Lwjgl3Application(new Mindustry(), config);
+		}catch (Exception e){
+			e.printStackTrace();
+
+			//don't create crash logs for me, as it's expected
+			if(System.getProperty("user.name").equals("anuke")) return;
+
+		    String result = Strings.parseException(e, true);
+		    boolean failed = false;
+
+		    String filename = "crash-report-" + DateFormat.getDateTimeInstance().format(new Date()) + ".txt";
+
+		    try{
+                Files.write(Paths.get(filename), result.getBytes());
+            }catch (IOException i){
+                i.printStackTrace();
+                failed = true;
+            }
+
+			JOptionPane.showMessageDialog(null, "An error has occured: \n" + result + "\n\n" +
+                    (!failed ? "A crash report has been written to " + new File(filename).getAbsolutePath() + ".\nPlease send this file to the developer!"
+                            : "Failed to generate crash report.\nPlease send an image of this crash log to the developer!"));
+		}
 	}
 }
