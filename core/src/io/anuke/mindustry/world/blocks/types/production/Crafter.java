@@ -18,7 +18,7 @@ public class Crafter extends Block{
 	protected Item[] requirements;
 	protected Item result;
 
-        int capacity = 20;
+	int capacity = 20;
 
 	public Crafter(String name) {
 		super(name);
@@ -37,7 +37,7 @@ public class Crafter extends Block{
 	@Override
 	public void update(Tile tile){
 		
-		if(tile.entity.timer.get(timerDump, 15) && tile.entity.hasItem(result)){
+		if(tile.entity.timer.get(timerDump, 5) && tile.entity.hasItem(result)){
 			tryDump(tile, -1, result);
 		}
 		
@@ -46,7 +46,12 @@ public class Crafter extends Block{
 				return;
 			}
 		}
-		
+
+		// crafter full - it has to be emptied before it can craft again.
+		if(tile.entity.getItem(result) >= capacity){
+			return;
+		}
+
 		for(Item item : requirements){
 			tile.entity.removeItem(item, 1);
 		}
@@ -67,8 +72,10 @@ public class Crafter extends Block{
 
 	@Override
 	public void drawSelect(Tile tile){
-                float fract = (float)tile.entity.totalItems()/((requirements.length-1) *capacity);
-		
+		// each req item has its input buffer + 1 buffer for output.
+		int totalCapacity = (requirements.length + 1) * capacity;
+		float fract = ((float)tile.entity.totalItems())/totalCapacity;
+
 		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 6, fract);
 	}
 }
