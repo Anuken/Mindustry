@@ -34,6 +34,12 @@ public class Saves {
         }
     }
 
+    public void convertSaves(){
+        for(SaveSlot slot : saves){
+            SaveIO.checkConvert(slot.index);
+        }
+    }
+
     public SaveSlot getCurrent() {
         return current;
     }

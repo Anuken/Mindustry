@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world.blocks;
 
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
@@ -14,14 +13,15 @@ import io.anuke.ucore.core.Effects;
 public class ProductionBlocks{
 	public static final Block
 	
-	core = new CoreBlock("core"),
+	core = new CoreBlock("core"){},
 	
-	pump = new Pump("pump"){{
-	}},
+	pump = new Pump("pump"){},
 	
-	fluxpump = new Pump("fluxpump"){{
-		pumpAmount = 3f;
-	}},
+	fluxpump = new Pump("fluxpump"){
+		{
+			pumpAmount = 3f;
+		}
+	},
 	
 	smelter = new Crafter("smelter"){
 		{
@@ -63,19 +63,6 @@ public class ProductionBlocks{
 			health = 70;
 		}
 	},
-
-	//TODO
-	/*siliconextractor = new LiquidCrafter("siliconextractor"){
-		{
-			input = Item.sand;
-			inputAmount = 5;
-			inputLiquid = Liquid.water;
-			liquidAmount = 18.99f;
-			output = Item.silicon;
-			health = 50;
-			purifyTime = 50;
-		}
-	},*/
 	
 	oilrefinery = new LiquidCrafter("oilrefinery"){
 		{
@@ -116,32 +103,42 @@ public class ProductionBlocks{
 		}
 	},
 	
-	stonedrill = new Drill("stonedrill"){{
-		resource = Blocks.stone;
-		result = Item.stone;
-		time = 4;
-	}},
+	stonedrill = new Drill("stonedrill"){
+		{
+			resource = Blocks.stone;
+			result = Item.stone;
+			time = 4;
+		}
+	},
 	
-	irondrill = new Drill("irondrill"){{
-		resource = Blocks.iron;
-		result = Item.iron;
-	}},
+	irondrill = new Drill("irondrill"){
+		{
+			resource = Blocks.iron;
+			result = Item.iron;
+		}
+	},
 	
-	coaldrill = new Drill("coaldrill"){{
-		resource = Blocks.coal;
-		result = Item.coal;
-	}},
+	coaldrill = new Drill("coaldrill"){
+		{
+			resource = Blocks.coal;
+			result = Item.coal;
+		}
+	},
 	
-	uraniumdrill = new Drill("uraniumdrill"){{
-		resource = Blocks.uranium;
-		result = Item.uranium;
-		time = 7;
-	}},
+	uraniumdrill = new Drill("uraniumdrill"){
+		{
+			resource = Blocks.uranium;
+			result = Item.uranium;
+			time = 7;
+		}
+	},
 	
-	titaniumdrill = new Drill("titaniumdrill"){{
-		resource = Blocks.titanium;
-		result = Item.titanium;
-	}},
+	titaniumdrill = new Drill("titaniumdrill"){
+		{
+			resource = Blocks.titanium;
+			result = Item.titanium;
+		}
+	},
 	
 	omnidrill = new Drill("omnidrill"){
 		{
@@ -210,4 +207,16 @@ public class ProductionBlocks{
 			breaktime *= 2.3f;
 		}
 	};
+	/*
+	siliconextractor = new LiquidCrafter("siliconextractor"){
+		{
+			input = Item.sand;
+			inputAmount = 5;
+			inputLiquid = Liquid.water;
+			liquidAmount = 18.99f;
+			output = Item.sand;
+			health = 50;
+			purifyTime = 50;
+		}
+	}*/;
 }

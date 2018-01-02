@@ -22,7 +22,9 @@ public class Blocks{
 		public void draw(Tile tile){}
 	},
 	
-	blockpart = new BlockPart(),
+	blockpart = new BlockPart(){
+
+	},
 	
 	deepwater = new Floor("deepwater"){{
 		variants = 0;
@@ -99,15 +101,15 @@ public class Blocks{
 		drops = new ItemStack(Item.uranium, 1);
 	}},
 	
-	dirt = new Floor("dirt"),
+	dirt = new Floor("dirt"){},
 	
-	sand = new Floor("sand"),
+	sand = new Floor("sand"){},
 	
-	ice = new Floor("ice"),
+	ice = new Floor("ice"){},
 	
-	snow = new Floor("snow"),
+	snow = new Floor("snow"){},
 	
-	grass = new Floor("grass"),
+	grass = new Floor("grass"){},
 	
 	sandblock = new StaticBlock("sandblock"){{
 		solid = true;

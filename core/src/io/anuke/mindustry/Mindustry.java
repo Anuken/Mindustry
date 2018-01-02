@@ -4,17 +4,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
+import com.badlogic.gdx.utils.OrderedMap;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.PlatformFunction;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.*;
-import io.anuke.ucore.UCore;
+import io.anuke.mindustry.world.BlockLoader;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.modules.ModuleCore;
 import io.anuke.ucore.scene.ui.TextField;
 
@@ -22,7 +20,6 @@ import java.util.Date;
 import java.util.Locale;
 
 public class Mindustry extends ModuleCore {
-	public static Callable donationsCallable;
 	public static boolean hasDiscord = true;
 	public static Array<String> args = new Array<>();
 	public static PlatformFunction platforms = new PlatformFunction(){
@@ -31,14 +28,17 @@ public class Mindustry extends ModuleCore {
 		@Override public void openLink(String link){ }
 		@Override public void addDialog(TextField field){}
 		@Override public void onSceneChange(String state, String details, String icon) {}
-		@Override public void onGameExit() { }
+		@Override public void onGameExit() {}
+		@Override public void openDonations() {}
 	};
+	public static OrderedMap<String, Integer> idMap = new OrderedMap<>();
 
 	public static boolean externalBundle = false;
 	
 	@Override
 	public void init(){
 		loadBundle();
+		BlockLoader.load();
 
 		module(Vars.world = new World());
 		module(Vars.control = new Control());
@@ -68,24 +68,12 @@ public class Mindustry extends ModuleCore {
 			Locale locale = Locale.getDefault();
 			Core.bundle = I18NBundle.createBundle(handle, locale);
 		}
-
-
-		//always initialize blocks in this order, otherwise there are ID errors
-		Block[] blockClasses = {
-				Blocks.air,
-				DefenseBlocks.compositewall,
-				DistributionBlocks.conduit,
-				ProductionBlocks.coaldrill,
-				WeaponBlocks.chainturret,
-				SpecialBlocks.enemySpawn
-		};
-
-		UCore.log("Block classes: " + blockClasses.length);
 	}
 	
 	@Override
 	public void postInit(){
 		Vars.control.reset();
+		Vars.control.getSaves().convertSaves();
 	}
 	
 	@Override

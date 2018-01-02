@@ -11,7 +11,6 @@ import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.io.PlatformFunction;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
@@ -56,17 +55,16 @@ public class AndroidLauncher extends AndroidApplication{
 			}
 
 			@Override
-			public void onSceneChange(String state, String details, String icon) {
-
-			}
+			public void onSceneChange(String state, String details, String icon) { }
 
 			@Override
-			public void onGameExit() {
+			public void onGameExit() { }
 
+			@Override
+			public void openDonations() {
+				showDonations();
 			}
 		};
-		
-		Mindustry.donationsCallable = new Callable(){ @Override public void run(){ showDonations(); } };
 
 		if(doubleScaleTablets && isTablet(this.getContext())){
 			Unit.dp.addition = 0.5f;

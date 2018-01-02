@@ -1,8 +1,8 @@
 package io.anuke.mindustry.io;
 
-import java.util.Date;
-
 import io.anuke.ucore.scene.ui.TextField;
+
+import java.util.Date;
 
 public interface PlatformFunction{
 	public String format(Date date);
@@ -11,4 +11,5 @@ public interface PlatformFunction{
 	public void addDialog(TextField field);
 	public void onSceneChange(String state, String details, String icon);
 	public void onGameExit();
+	public void openDonations();
 }

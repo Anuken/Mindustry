@@ -81,16 +81,15 @@ public class Block{
 	public Layer layer2 = null;
 
 	public Block(String name) {
-		blocks.add(this);
-		
 		this.name = name;
 		this.formalName = Bundles.get("block." + name + ".name", name);
 		this.description = Bundles.getOrNull("block." + name + ".description");
 		this.fullDescription = Bundles.getOrNull("block." + name + ".fulldescription");
 		this.solid = false;
 		this.id = lastid++;
+
+		blocks.add(this);
 	}
-	
 
 	public boolean isLayer(Tile tile){return true;}
 	public boolean isLayer2(Tile tile){return true;}

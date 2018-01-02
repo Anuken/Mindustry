@@ -73,13 +73,11 @@ public class MenuFragment implements Fragment{
 					new imagebutton("icon-tools", isize, () -> ui.showPrefs()).text("$text.settings").padTop(4f);
 
 					new imagebutton("icon-add", isize, () -> ui.showJoinGame()).text("$text.joingame").padTop(4f);
-					
-					if(Mindustry.donationsCallable != null){
-						new imagebutton("icon-donate", isize, () -> {
-							Mindustry.donationsCallable.run();
-						}).text("$text.donate").padTop(4f);
-					}
-					
+
+					new imagebutton("icon-donate", isize, () -> {
+						Mindustry.platforms.openDonations();
+					}).text("$text.donate").padTop(4f);
+
 					visible(()->GameState.is(State.menu));
 				}}.end();
 			}}.end();

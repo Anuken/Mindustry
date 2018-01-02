@@ -53,8 +53,6 @@ public class UI extends SceneModule{
 	Tooltip tooltip;
 	Tile configTile;
 	MapEditor editor;
-	String lastip = "localhost";
-	int lastport = Vars.port;
 	boolean wasPaused = false;
 	
 	private Fragment menufrag = new MenuFragment(),

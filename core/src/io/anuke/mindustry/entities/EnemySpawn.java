@@ -5,7 +5,8 @@ import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.util.Mathf;
 
 public class EnemySpawn{
-	private static float[] scalings = {2f, 1.5f, 1f};
+	/**Scaling multiplier for each difficulty. Easy, normal, hard.*/
+	private static float[] scalings = {4f, 2.5f, 1.5f};
 	
 	/**The enemy type spawned*/
 	public final Class<? extends Enemy> type;

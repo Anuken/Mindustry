@@ -16,9 +16,8 @@ import io.anuke.ucore.entities.Entities;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.android;
-import static io.anuke.mindustry.io.SaveIO.enemyIDs;
-import static io.anuke.mindustry.io.SaveIO.idEnemies;
+import static io.anuke.mindustry.io.SaveFileVersion.enemyIDs;
+import static io.anuke.mindustry.io.SaveFileVersion.idEnemies;
 
 public class NetworkIO {
     private static final int fileVersionID = 13;

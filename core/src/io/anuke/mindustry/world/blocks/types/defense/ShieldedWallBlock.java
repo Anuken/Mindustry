@@ -1,19 +1,19 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.graphics.Color;
-
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Draw;
-import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Strings;
 
 public class ShieldedWallBlock extends PowerBlock{
 	static final float hitTime = 18f;
 	static final Color hitColor = Color.SKY.cpy().mul(1.2f);
-	public float powerToDamage = 0.1f;
+	public float powerPerDamage = 0.08f;
 
 	public ShieldedWallBlock(String name) {
 		super(name);
@@ -24,7 +24,7 @@ public class ShieldedWallBlock extends PowerBlock{
 	
 	@Override
 	public int handleDamage(Tile tile, int amount){
-		float drain = amount * powerToDamage;
+		float drain = amount * powerPerDamage;
 		ShieldedWallEntity entity = tile.entity();
 		
 		if(entity.power > drain){
@@ -32,13 +32,19 @@ public class ShieldedWallBlock extends PowerBlock{
 			entity.hit = hitTime;
 			return 0;
 		}else if(entity.power > 0){
-			int reduction = (int)(entity.power / powerToDamage);
+			int reduction = (int)(entity.power / powerPerDamage);
 			entity.power = 0;
 			
 			return amount - reduction;
 		}
 		
 		return amount;
+	}
+
+	@Override
+	public void getStats(Array<String> list){
+		super.getStats(list);
+		list.add("[powerinfo]Power Drain/damage: " + Strings.toFixed(powerPerDamage, 2));
 	}
 	
 	@Override
@@ -47,7 +53,7 @@ public class ShieldedWallBlock extends PowerBlock{
 		
 		ShieldedWallEntity entity = tile.entity();
 		
-		if(entity.power > powerToDamage){
+		if(entity.power > powerPerDamage){
 			Vars.renderer.addShield(() -> Draw.rect("blank", tile.worldx(), tile.worldy(), Vars.tilesize, Vars.tilesize));
 		}
 		

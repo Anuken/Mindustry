@@ -1,23 +1,25 @@
 package io.anuke.mindustry.client;
 
-import java.util.Date;
-
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
 import com.badlogic.gdx.backends.gwt.preloader.Preloader.PreloaderCallback;
 import com.badlogic.gdx.backends.gwt.preloader.Preloader.PreloaderState;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.*;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.shared.DateTimeFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
-
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.io.PlatformFunction;
 import io.anuke.ucore.scene.ui.TextField;
+
+import java.util.Date;
 
 public class HtmlLauncher extends GwtApplication {
     static final int WIDTH = 800;
@@ -109,19 +111,16 @@ public class HtmlLauncher extends GwtApplication {
 			}
 
 			@Override
-			public void addDialog(TextField field){
-				
-			}
+			public void addDialog(TextField field){}
 
             @Override
-            public void onSceneChange(String state, String details, String icon) {
-
-            }
+            public void onSceneChange(String state, String details, String icon) {}
 
             @Override
-            public void onGameExit() {
+            public void onGameExit() {}
 
-            }
+            @Override
+            public void openDonations() {}
         };
         
         return new Mindustry();

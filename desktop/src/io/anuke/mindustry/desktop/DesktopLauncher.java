@@ -61,31 +61,32 @@ public class DesktopLauncher {
 			}
 
 			@Override
-			public void addDialog(TextField field){
-				
-			}
+			public void addDialog(TextField field){}
+
+			@Override
+			public void openDonations(){}
 
 			@Override
 			public void onSceneChange(String state, String details, String icon) {
-        DiscordRPC lib = DiscordRPC.INSTANCE;
+				DiscordRPC lib = DiscordRPC.INSTANCE;
 
-        String applicationId = "397335883319083018";
+				String applicationId = "397335883319083018";
 
-        DiscordEventHandlers handlers = new DiscordEventHandlers();
+				DiscordEventHandlers handlers = new DiscordEventHandlers();
 
-        lib.Discord_Initialize(applicationId, handlers, true, "");
+				lib.Discord_Initialize(applicationId, handlers, true, "");
 
-        DiscordRichPresence presence = new DiscordRichPresence();
-        presence.startTimestamp = System.currentTimeMillis() / 1000; // epoch second
-        presence.state = state;
-        //presence.details = details;
-        presence.largeImageKey = "logo";
-        presence.largeImageText = details;
-        lib.Discord_UpdatePresence(presence);
-      }
+				DiscordRichPresence presence = new DiscordRichPresence();
+				presence.startTimestamp = System.currentTimeMillis() / 1000; // epoch second
+				presence.state = state;
+				//presence.details = details;
+				presence.largeImageKey = "logo";
+				presence.largeImageText = details;
+				lib.Discord_UpdatePresence(presence);
+      		}
 
-      @Override
-      public void onGameExit() {
+      		@Override
+      		public void onGameExit() {
         DiscordRPC.INSTANCE.Discord_Shutdown();
       }
 		};
