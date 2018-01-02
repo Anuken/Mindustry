@@ -108,4 +108,9 @@ public class Packets {
     public static class BlockUpdatePacket{
         public int health, position;
     }
+
+    public static class ChatPacket{
+        public String name;
+        public String text;
+    }
 }

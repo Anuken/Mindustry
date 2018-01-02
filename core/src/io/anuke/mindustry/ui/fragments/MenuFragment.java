@@ -52,7 +52,7 @@ public class MenuFragment implements Fragment{
 					get().margin(16);
 				}}.end();
 	
-				visible(()->GameState.is(State.menu));
+				visible(()-> GameState.is(State.menu));
 			}}.end();
 		}else{
 			new table(){{

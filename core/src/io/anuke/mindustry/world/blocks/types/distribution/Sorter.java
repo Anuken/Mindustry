@@ -1,20 +1,23 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.scene.style.TextureRegionDrawable;
+import io.anuke.ucore.scene.ui.ButtonGroup;
+import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class Sorter extends Junction implements Configurable{
 	
@@ -91,27 +94,31 @@ public class Sorter extends Junction implements Configurable{
 	@Override
 	public void buildTable(Tile tile, Table table){
 		SorterEntity entity = tile.entity();
-		
-		table.addIButton("icon-arrow-left", 10*3, ()->{
-			int color = entity.sortItem.id;
-			
-			color --;
-			if(color < 0)
-				color += Item.getAllItems().size;
-			
-			entity.sortItem = Item.getAllItems().get(color);
-		});
-		
-		table.add().size(40f);
-		
-		table.addIButton("icon-arrow-right", 10*3, ()->{
-			int color = entity.sortItem.id;
-			
-			color ++;
-			color %= Item.getAllItems().size;
-			
-			entity.sortItem = Item.getAllItems().get(color);
-		});
+
+		Array<Item> items = Item.getAllItems();
+
+		ButtonGroup<ImageButton> group = new ButtonGroup<>();
+		Table cont = new Table();
+		cont.margin(4);
+		cont.marginBottom(5);
+
+		cont.add().colspan(4).height(105f);
+		cont.row();
+
+		for(int i = 0; i < items.size; i ++){
+			final int f = i;
+			ImageButton button = cont.addIButton("white", "toggle", 24, () -> {
+				entity.sortItem = items.get(f);
+			}).size(38, 42).padBottom(-5.1f).group(group).get();
+			button.getStyle().imageUp = new TextureRegionDrawable(new TextureRegion(Draw.region("icon-"+items.get(i).name)));
+			button.setChecked(entity.sortItem.id == f);
+
+			if(i%4 == 3){
+				cont.row();
+			}
+		}
+
+		table.add(cont);
 	}
 	
 	@Override

@@ -52,7 +52,7 @@ public class MenuDialog extends FloatingDialog{
 			content().row();
 			content().addButton("$text.loadgame", () -> {
 				load.show();
-			});
+			}).disabled(Net.active());
 
 			content().row();
 
@@ -89,7 +89,7 @@ public class MenuDialog extends FloatingDialog{
 
 			content().row();
 			
-			new imagebutton("icon-load", isize, () -> load.show()).text("$text.load").padTop(4f);
+			new imagebutton("icon-load", isize, () -> load.show()).text("$text.load").padTop(4f).disabled(Net.active());
 
 			new imagebutton("icon-host", isize, () -> ui.showHostServer()).text("$text.host").padTop(4f);
 			

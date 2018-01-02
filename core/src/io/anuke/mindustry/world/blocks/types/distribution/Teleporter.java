@@ -1,13 +1,8 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
-
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
@@ -15,11 +10,17 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.scene.ui.ButtonGroup;
+import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 public class Teleporter extends Block implements Configurable{
-	public static final Color[] colorArray = {Color.ROYAL, Color.ORANGE, Color.SCARLET, Color.FOREST, Color.PURPLE, Color.GOLD, Color.PINK};
+	public static final Color[] colorArray = {Color.ROYAL, Color.ORANGE, Color.SCARLET, Color.FOREST, Color.PURPLE, Color.GOLD, Color.PINK, Color.BLACK};
 	public static final int colors = colorArray.length;
 
 	private static ObjectSet<Tile>[] teleporters = new ObjectSet[colors];
@@ -74,18 +75,30 @@ public class Teleporter extends Block implements Configurable{
 	@Override
 	public void buildTable(Tile tile, Table table){
 		TeleporterEntity entity = tile.entity();
-		
-		table.addIButton("icon-arrow-left", 10*3, ()->{
-			entity.color = (byte)Mathf.mod(entity.color - 1, colors);
-			lastColor = entity.color;
-		});
-		
-		table.add().size(40f);
-		
-		table.addIButton("icon-arrow-right", 10*3, ()->{
-			entity.color = (byte)Mathf.mod(entity.color + 1, colors);
-			lastColor = entity.color;
-		});
+
+		ButtonGroup<ImageButton> group = new ButtonGroup<>();
+		Table cont = new Table();
+		cont.margin(4);
+		cont.marginBottom(5);
+
+		cont.add().colspan(4).height(105f);
+		cont.row();
+
+		for(int i = 0; i < colors; i ++){
+			final int f = i;
+			ImageButton button = cont.addIButton("white", "toggle", 24, () -> {
+				entity.color = (byte)f;
+				lastColor = (byte)f;
+			}).size(34, 38).padBottom(-5.1f).group(group).get();
+			button.getStyle().imageUpColor = colorArray[f];
+			button.setChecked(entity.color == f);
+
+			if(i%4 == 3){
+				cont.row();
+			}
+		}
+
+		table.add(cont);
 	}
 	
 	@Override

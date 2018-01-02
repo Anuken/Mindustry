@@ -33,6 +33,7 @@ public class Registrator {
                 BlockDestroyPacket.class,
                 ConnectPacket.class,
                 DisconnectPacket.class,
+                ChatPacket.class,
 
                 Class.class,
                 byte[].class,

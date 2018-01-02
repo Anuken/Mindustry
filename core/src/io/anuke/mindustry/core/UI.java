@@ -331,13 +331,16 @@ public class UI extends SceneModule{
 	
 	public void showConfig(Tile tile){
 		configTile = tile;
-		
-		configtable.setVisible(true);
+
 		configtable.clear();
 		((Configurable)tile.block()).buildTable(tile, configtable);
 		configtable.pack();
+		configtable.setTransform(true);
+		configtable.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
+				Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
 		
 		configtable.update(()->{
+			configtable.setOrigin(Align.center);
 			Vector2 pos = Graphics.screen(tile.worldx(), tile.worldy());
 			configtable.setPosition(pos.x, pos.y, Align.center);
 			if(configTile == null || configTile.block() == Blocks.air){
@@ -352,7 +355,7 @@ public class UI extends SceneModule{
 	}
 	
 	public void hideConfig(){
-		configtable.setVisible(false);
+		configtable.actions(Actions.scaleTo(0f, 1f, 0.06f, Interpolation.pow3Out), Actions.visible(false));
 	}
 
 	public void showTextInput(String title, String text, String def, TextFieldFilter filter, Consumer<String> confirmed){

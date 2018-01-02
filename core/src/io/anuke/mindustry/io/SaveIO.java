@@ -236,16 +236,20 @@ public class SaveIO{
 			//--ENEMIES--
 			
 			int totalEnemies = 0;
+
+			Array<Enemy> enemies = Vars.control.enemyGroup.all();
 			
-			for(Enemy entity : Vars.control.enemyGroup.all()){
-				if(idEnemies.containsKey(entity.getClass())){
+			for(int i = 0; i < enemies.size; i ++){
+				Enemy enemy = enemies.get(i);
+				if(idEnemies.containsKey(enemy.getClass())){
 					totalEnemies ++;
 				}
 			}
 			
 			stream.writeInt(totalEnemies); //enemy amount
 			
-			for(Enemy enemy : Vars.control.enemyGroup.all()){
+			for(int i = 0; i < enemies.size; i ++){
+				Enemy enemy = enemies.get(i);
 				if(idEnemies.containsKey(enemy.getClass())){
 					stream.writeByte(idEnemies.get(enemy.getClass())); //type
 					stream.writeByte(enemy.lane); //lane
