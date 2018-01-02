@@ -8,7 +8,6 @@ import io.anuke.mindustry.ai.SmoothGraphPath;
 public class SpawnPoint{
 	public Tile start;
 	public Tile[] pathTiles;
-	public Tile[] tempTiles;
 	public PathFinder<Tile> finder;
 	public SmoothGraphPath path = new SmoothGraphPath();
 	public PathFinderRequest<Tile> request;

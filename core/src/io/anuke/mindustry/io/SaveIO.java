@@ -1,29 +1,28 @@
 package io.anuke.mindustry.io;
 
-import static io.anuke.mindustry.Vars.android;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
-
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.*;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Weapon;
-import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.GameMode;
+import io.anuke.mindustry.world.Map;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.entities.Entities;
+
+import java.io.*;
+import java.util.Arrays;
+import java.util.Date;
+
+import static io.anuke.mindustry.Vars.android;
 
 /*
  * Save format:
@@ -73,7 +72,7 @@ import io.anuke.ucore.entities.Entities;
  *   Tile type (boolean)- whether the block has a tile entity attached
  *   Block ID - the block ID (byte)
  *   (the following only applies to tile entity blocks)
- *   Block rotation (byte)
+ *   Block placerot (byte)
  *   Block health (int)
  *   Amount of items (byte)
  *   (item list) 
@@ -86,7 +85,7 @@ public class SaveIO{
 	private static final int fileVersionID = 12;
 	
 	//TODO automatic registration of types?
-	private static final Array<Class<? extends Enemy>> enemyIDs = Array.with(
+	public static final Array<Class<? extends Enemy>> enemyIDs = Array.with(
 		Enemy.class,
 		FastEnemy.class,
 		RapidEnemy.class,
@@ -100,7 +99,7 @@ public class SaveIO{
 		EmpEnemy.class
 	);
 	
-	private static final ObjectMap<Class<? extends Enemy>, Byte> idEnemies = new ObjectMap<Class<? extends Enemy>, Byte>(){{
+	public static final ObjectMap<Class<? extends Enemy>, Byte> idEnemies = new ObjectMap<Class<? extends Enemy>, Byte>(){{
 		for(int i = 0; i < enemyIDs.size; i ++){
 			put(enemyIDs.get(i), (byte)i);
 		}
@@ -115,7 +114,11 @@ public class SaveIO{
 	}
 	
 	public static boolean isSaveValid(int slot){
-		try(DataInputStream stream = new DataInputStream(fileFor(slot).read())){
+		return isSaveValid(fileFor(slot));
+	}
+
+	public static boolean isSaveValid(FileHandle file){
+		try(DataInputStream stream = new DataInputStream(file.read())){
 			int version = stream.readInt(); //read version
 			stream.readLong(); //read last saved time
 			stream.readByte(); //read the gamemode
@@ -176,10 +179,14 @@ public class SaveIO{
 	public static FileHandle fileFor(int slot){
 		return Vars.saveDirectory.child(slot  + ".mins");
 	}
-	
+
 	public static void write(FileHandle file){
+		write(file.write(false));
+	}
+
+	public static void write(OutputStream os){
 		
-		try(DataOutputStream stream = new DataOutputStream(file.write(false))){
+		try(DataOutputStream stream = new DataOutputStream(os)){
 			
 			//--META--
 			stream.writeInt(fileVersionID); //version id
@@ -239,7 +246,7 @@ public class SaveIO{
 			for(Enemy enemy : Vars.control.enemyGroup.all()){
 				if(idEnemies.containsKey(enemy.getClass())){
 					stream.writeByte(idEnemies.get(enemy.getClass())); //type
-					stream.writeByte(enemy.spawn); //lane
+					stream.writeByte(enemy.lane); //lane
 					stream.writeFloat(enemy.x); //x
 					stream.writeFloat(enemy.y); //y
 					stream.writeByte(enemy.tier); //tier
@@ -279,7 +286,7 @@ public class SaveIO{
 						stream.writeInt(tile.block().id); //block ID
 						
 						if(tile.entity != null){
-							stream.writeByte(tile.getRotation()); //rotation
+							stream.writeByte(tile.getRotation()); //placerot
 							stream.writeInt(tile.entity.health); //health
 							int amount = 0;
 							for(int i = 0; i < tile.entity.items.length; i ++){
@@ -304,12 +311,15 @@ public class SaveIO{
 			throw new RuntimeException(e);
 		}
 	}
+
+	public static void load(FileHandle file){
+		load(file.read());
+	}
 	
 	//TODO GWT support
-	public static void load(FileHandle file){
+	public static void load(InputStream is){
 		
-		try(DataInputStream stream = new DataInputStream(file.read())){
-			Item[] itemEnums = Item.values();
+		try(DataInputStream stream = new DataInputStream(is)){
 			
 			int version = stream.readInt();
 			/*long loadTime = */stream.readLong();
@@ -340,6 +350,7 @@ public class SaveIO{
 			
 			Vars.control.getWeapons().clear();
 			Vars.control.getWeapons().add(Weapon.blaster);
+			Vars.player.weapon = Weapon.blaster;
 			
 			int weapons = stream.readByte();
 			
@@ -356,9 +367,9 @@ public class SaveIO{
 			Arrays.fill(Vars.control.getItems(), 0);
 			
 			for(int i = 0; i < totalItems; i ++){
-				Item item = itemEnums[stream.readByte()];
+				Item item = Item.getByID(stream.readByte());
 				int amount = stream.readInt();
-				Vars.control.getItems()[item.ordinal()] = amount;
+				Vars.control.getItems()[item.id] = amount;
 			}
 			
 			Vars.ui.updateItems();
@@ -381,7 +392,7 @@ public class SaveIO{
 				
 				try{
 					Enemy enemy = ClassReflection.newInstance(enemyIDs.get(type));
-					enemy.spawn = lane;
+					enemy.lane = lane;
 					enemy.health = health;
 					enemy.x = x;
 					enemy.y = y;

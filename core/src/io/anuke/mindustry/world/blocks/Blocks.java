@@ -138,34 +138,23 @@ public class Blocks{
 		solid = true;
 	}},
 	
-	shrub = new Block("shrub"){{
-		shadow = "shrubshadow";
-		breakable = true;
-		breaktime = 10;
-	}},
+	shrub = new Rock("shrub"){
+
+	},
 	
-	rock = new Block("rock"){{
-		shadow = "rockshadow";
-		breakable = true;
-		breaktime = 15;
+	rock = new Rock("rock"){{
 		variants = 2;
 		varyShadow = true;
 		drops = new ItemStack(Item.stone, 3);
 	}},
 	
-	icerock = new Block("icerock"){{
-		shadow = "rockshadow";
-		breakable = true;
-		breaktime = 15;
+	icerock = new Rock("icerock"){{
 		variants = 2;
 		varyShadow = true;
 		drops = new ItemStack(Item.stone, 3);
 	}},
 	
-	blackrock = new Block("blackrock"){{
-		shadow = "blackrockshadow";
-		breakable = true;
-		breaktime = 15;
+	blackrock = new Rock("blackrock"){{
 		variants = 1;
 		varyShadow = true;
 		drops = new ItemStack(Item.stone, 3);

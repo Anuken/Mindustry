@@ -3,8 +3,6 @@ package io.anuke.mindustry.input;
 import static io.anuke.mindustry.Vars.*;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Buttons;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.core.GameState;
@@ -12,14 +10,10 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Configurable;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.core.Inputs.DeviceType;
-import io.anuke.ucore.core.KeyBinds;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.utils.Cursors;
-import io.anuke.ucore.util.InputProxy;
 import io.anuke.ucore.util.Mathf;
 
 public class DesktopInput extends InputHandler{
@@ -66,18 +60,18 @@ public class DesktopInput extends InputHandler{
 		}
 
 		if(!rotated) {
-			player.rotation += Inputs.getAxis("rotate_alt");
+			player.placerot += Inputs.getAxis("rotate_alt");
 			rotated = true;
 		}
 		if(!Inputs.getAxisActive("rotate_alt")) rotated = false;
 
 		if(!rotatedAlt) {
-			player.rotation += Inputs.getAxis("rotate");
+			player.placerot += Inputs.getAxis("rotate");
 			rotatedAlt = true;
 		}
 		if(!Inputs.getAxisActive("rotate")) rotatedAlt = false;
 
-		player.rotation = Mathf.mod(player.rotation, 4);
+		player.placerot = Mathf.mod(player.placerot, 4);
 		
 		if(Inputs.keyDown("break")){
 			player.breakMode = PlaceMode.areaDelete;

@@ -3,10 +3,10 @@ package io.anuke.mindustry;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.I18NBundle;
 
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class Vars{
@@ -20,7 +20,7 @@ public class Vars{
 	//respawn time in frames
 	public static final float respawnduration = 60*4;
 	//time between waves in frames (on normal mode)
-	public static final float wavespace = 60*60*(android ? 1 : 1);
+	public static final float wavespace = 60*60*(android ? 1 : 1); //TODO revert
 	//waves can last no longer than 3 minutes, otherwise the next one spawns
 	public static final float maxwavespace = 60*60*4f;
 	//advance time the pathfinding starts at
@@ -30,9 +30,11 @@ public class Vars{
 	//discord group URL
 	public static final String discordURL = "https://discord.gg/r8BkXNd";
 	//directory for user-created map data
-	public static final FileHandle customMapDirectory = gwt ? null : Gdx.files.local("mindustry-maps/");
+	public static final FileHandle customMapDirectory = gwt ? null : UCore.isAssets ?
+			Gdx.files.local("../../desktop/mindustry-maps") : Gdx.files.local("mindustry-maps/");
 	//save file directory
-	public static final FileHandle saveDirectory = gwt ? null : Gdx.files.local("mindustry-saves/");
+	public static final FileHandle saveDirectory = gwt ? null : UCore.isAssets ?
+			Gdx.files.local("../../desktop/mindustry-saves") : Gdx.files.local("mindustry-saves/");
 	//scale of the font
 	public static float fontscale = Math.max(Unit.dp.scl(1f)/2f, 0.5f);
 	//camera zoom displayed on startup
@@ -58,22 +60,27 @@ public class Vars{
 
 	public static float baseControllerSpeed = 11f;
 
-	public static final int saveSlots = 10;
+	public static final int saveSlots = 16;
 	//amount of drops that are left when breaking a block
 	public static final float breakDropAmount = 0.5f;
 	
 	//only if smoothCamera
 	public static boolean snapCamera = true;
 	
-	//turret and enemy shoot speed inverse multiplier
+	//turret and enemy shootInternal speed inverse multiplier
 	public static final float multiplier = android ? 3 : 2;
 	
 	public static final int tilesize = 8;
+
+	//server port
+	public static final int port = 6567;
 	
 	public static Control control;
 	public static Renderer renderer;
 	public static UI ui;
 	public static World world;
+	public static NetServer netServer;
+	public static NetClient netClient;
 	
 	public static Player player;
 	

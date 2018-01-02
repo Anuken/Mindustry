@@ -127,9 +127,9 @@ public class AndroidInput extends InputHandler{
 		player.x += xa * 4f;
 		player.y += ya * 4f;
 
-		player.rotation += Inputs.getAxis("rotate_alt");
-		player.rotation += Inputs.getAxis("rotate");
-		player.rotation = Mathf.mod(player.rotation, 4);
+		player.placerot += Inputs.getAxis("rotate_alt");
+		player.placerot += Inputs.getAxis("rotate");
+		player.placerot = Mathf.mod(player.placerot, 4);
 
 		if(enableHold && Gdx.input.isTouched(0) && Mathf.near2d(lmousex, lmousey, Gdx.input.getX(0), Gdx.input.getY(0), Unit.dp.scl(50))
 				&& !ui.hasMouse()){
@@ -171,7 +171,7 @@ public class AndroidInput extends InputHandler{
 				validPlace(x, y, player.recipe.result) && cursorNear() &&
 				Vars.control.hasItems(player.recipe.requirements)){
 			
-			placeBlock(x, y, player.recipe.result, player.rotation, true, sound);
+			placeBlock(x, y, player.recipe.result, player.placerot, true, sound);
 			
 			for(ItemStack stack : player.recipe.requirements){
 				Vars.control.removeItem(stack);

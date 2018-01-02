@@ -261,7 +261,7 @@ public class BlocksFragment implements Fragment{
 		
 		for(ItemStack stack : recipe.requirements){
 			ItemStack fs = stack;
-			requirements.addImage(Draw.region("icon-"+stack.item.name())).size(8*3);
+			requirements.addImage(Draw.region("icon-"+stack.item.name)).size(8*3);
 			Label reqlabel = new Label("");
 			
 			reqlabel.update(()->{
@@ -295,13 +295,12 @@ public class BlocksFragment implements Fragment{
 			return;
 		}
 
-		Item[] items = Item.values();
-
 		for(int i = 0; i < control.getItems().length; i ++){
 			int amount = control.getItems()[i];
 			if(amount == 0) continue;
 			String formatted = amount > 99999999 ? "inf" : format(amount);
-			Image image = new Image(Draw.region("icon-" + items[i].name()));
+			Image image = new Image(Draw.hasRegion("icon-" + Item.getByID(i).name) ?
+					Draw.region("icon-" + Item.getByID(i).name) : Draw.region("blank"));
 			Label label = new Label(formatted);
 			label.setFontScale(fontscale*1.5f);
 			itemtable.add(image).size(8*3);

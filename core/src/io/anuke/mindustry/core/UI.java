@@ -1,63 +1,60 @@
 package io.anuke.mindustry.core;
 
-import static io.anuke.mindustry.Vars.*;
-import static io.anuke.ucore.scene.actions.Actions.*;
-
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.controllers.Controller;
-import com.badlogic.gdx.controllers.ControllerAdapter;
-import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
-
-import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.IntSet.IntSetIterator;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.mapeditor.MapEditor;
 import io.anuke.mindustry.mapeditor.MapEditorDialog;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.Configurable;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
-import io.anuke.ucore.core.Inputs.DeviceType;
+import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Listenable;
-import io.anuke.ucore.function.VisibilityProvider;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Skin;
+import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
+import io.anuke.ucore.scene.ui.TextField.TextFieldFilter;
+import io.anuke.ucore.scene.ui.TextField.TextFieldFilter.DigitsOnlyFilter;
 import io.anuke.ucore.scene.ui.Window.WindowStyle;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Strings;
 
-import javax.tools.Tool;
+import java.io.IOException;
+
+import static io.anuke.mindustry.Vars.*;
+import static io.anuke.ucore.scene.actions.Actions.*;
 
 public class UI extends SceneModule{
-	Table loadingtable, desctable, configtable;
+	Table loadingtable, configtable;
 	MindustrySettingsDialog prefs;
 	MindustryKeybindDialog keys;
 	MapEditorDialog editorDialog;
-	Dialog about, restart, levels, upgrades, load, settingserror, gameerror, discord;
+	Dialog about, restart, levels, upgrades, load, settingserror, gameerror, discord, join;
 	MenuDialog menu;
 	Tooltip tooltip;
 	Tile configTile;
-	Array<String> statlist = new Array<>();
 	MapEditor editor;
+	String lastip = "localhost";
+	int lastport = Vars.port;
 	boolean wasPaused = false;
 	
 	private Fragment menufrag = new MenuFragment(),
@@ -65,9 +62,6 @@ public class UI extends SceneModule{
 			hudfrag = new HudFragment(),
 			placefrag = new PlacementFragment(),
 			weaponfrag = new WeaponFragment();
-
-	VisibilityProvider play = () -> !GameState.is(State.menu);
-	VisibilityProvider nplay = () -> GameState.is(State.menu);
 	
 	public UI() {
 		Dialog.setShowAction(()-> sequence(
@@ -153,7 +147,7 @@ public class UI extends SceneModule{
 	public void update(){
 		if(Vars.debug && !Vars.showUI) return;
 		
-		if(nplay.visible()){
+		if(GameState.is(State.menu)){
 			scene.getBatch().getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 			scene.getBatch().begin();
 			
@@ -184,13 +178,32 @@ public class UI extends SceneModule{
 			editor = new MapEditor();
 			editorDialog = new MapEditorDialog(editor);
 		}
+
+		join = new FloatingDialog("$text.joingame.title");
+		join.content().add("$text.joingame.ip").left();
+		join.content().addField("localhost", text -> lastip = text).size(180f, 54f);
+		join.content().row();
+		join.content().add("$text.server.port").left();
+		join.content().addField(Vars.port + "", new DigitsOnlyFilter(), text -> lastport = Strings.parseInt(text)).size(180f, 54f);
+		join.buttons().defaults().size(140f, 60f).pad(4f);
+		join.buttons().addButton("$text.cancel", join::hide);
+		join.buttons().addButton("$text.ok", () -> {
+			showLoading("$text.connecting");
+
+			Timers.runTask(2f, () -> {
+				try{
+					Net.connect(lastip, lastport);
+				}catch (IOException e) {
+					showError(Bundles.format("text.connectfail", Strings.parseException(e, false)));
+					hideLoading();
+				}
+			});
+		}).disabled(b -> lastip.isEmpty() || lastport == Integer.MIN_VALUE);
 		
 		settingserror = new Dialog("Warning", "dialog");
 		settingserror.content().add("[crimson]Failed to access local storage.\nSettings will not be saved.");
 		settingserror.content().margin(10f);
-		settingserror.getButtonTable().addButton("OK", ()->{
-			settingserror.hide();
-		}).size(80f, 55f).pad(4);
+		settingserror.getButtonTable().addButton("OK", settingserror::hide).size(80f, 55f).pad(4);
 		
 		gameerror = new Dialog("$text.error.crashtitle", "dialog");
 		gameerror.content().labelWrap("$text.error.crashmessage").width(600f).pad(10f);
@@ -224,6 +237,7 @@ public class UI extends SceneModule{
 		prefs.game.checkPref("indicators", true);
 		prefs.game.checkPref("effects", true);
 		prefs.game.sliderPref("sensitivity", 100, 10, 300, i -> i + "%");
+		prefs.game.sliderPref("saveinterval", 90, 15, 5*120, i -> Bundles.format("setting.seconds", i));
 
         prefs.graphics.checkPref("fps", false);
 		prefs.graphics.checkPref("vsync", true, b -> Gdx.graphics.setVSync(b));
@@ -245,7 +259,7 @@ public class UI extends SceneModule{
 		
 		prefs.hidden(()->{
 			if(!GameState.is(State.menu)){
-				if(!wasPaused)
+				if(!wasPaused || Net.active())
 					GameState.set(State.playing);
 			}
 		});
@@ -256,7 +270,7 @@ public class UI extends SceneModule{
 				if(menu.getScene() != null){
 					wasPaused = menu.wasPaused;
 				}
-				GameState.set(State.paused);
+				if(!Net.active()) GameState.set(State.paused);
 				menu.hide();
 			}
 		});
@@ -300,7 +314,7 @@ public class UI extends SceneModule{
 		placefrag.build();
 		
 		loadingtable = new table("loadDim"){{
-			get().setTouchable(Touchable.enabled);
+			touchable(Touchable.enabled);
 			get().addImage("white").growX()
 			.height(3f).pad(4f).growX().get().setColor(Colors.get("accent"));
 			row();
@@ -320,14 +334,6 @@ public class UI extends SceneModule{
 
 		build.end();
 
-	}
-	
-	void invalidateAll(){
-		for(Element e : scene.getElements()){
-			if(e instanceof Table){
-				((Table)e).invalidateHierarchy();
-			}
-		}
 	}
 	
 	public void showGameError(){
@@ -367,12 +373,32 @@ public class UI extends SceneModule{
 	public void hideConfig(){
 		configtable.setVisible(false);
 	}
-	
+
+	public void showTextInput(String title, String text, String def, TextFieldFilter filter, Consumer<String> confirmed){
+		new Dialog(title, "dialog"){{
+			content().margin(30);
+			content().add(text).padRight(6f);
+			TextField field = content().addField(def, t->{}).size(170f, 50f).get();
+			field.setTextFieldFilter((f, c) -> field.getText().length() < 12 && filter.acceptChar(f, c));
+			Mindustry.platforms.addDialog(field);
+			buttons().defaults().size(120, 54).pad(4);
+			buttons().addButton("$text.ok", () -> {
+				confirmed.accept(field.getText());
+				hide();
+			}).disabled(b -> field.getText().isEmpty());
+			buttons().addButton("$text.cancel", this::hide);
+		}}.show();
+	}
+
+	public void showTextInput(String title, String text, String def, Consumer<String> confirmed){
+		showTextInput(title, text, def, (field, c) -> true, confirmed);
+	}
+
 	public void showError(String text){
 		new Dialog("$text.error.title", "dialog"){{
 			content().margin(15);
 			content().add(text);
-			getButtonTable().addButton("$text.ok", this::hide).size(90, 50).pad(4);
+			buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);
 		}}.show();
 	}
 
@@ -380,7 +406,7 @@ public class UI extends SceneModule{
 		new Dialog("$text.error.title", "dialog"){{
 			content().margin(15);
 			content().add(text);
-			getButtonTable().addButton("$text.quit", Gdx.app::exit).size(90, 50).pad(4);
+			buttons().addButton("$text.quit", Gdx.app::exit).size(90, 50).pad(4);
 		}}.show();
 	}
 	
@@ -413,6 +439,14 @@ public class UI extends SceneModule{
 	public void showLoadGame(){
 		load.show();
 	}
+
+	public void showJoinGame(){
+		join.show();
+	}
+
+	public void hideJoinGame(){
+		join.hide();
+	}
 	
 	public void showMenu(){
 		menu.show();
@@ -433,6 +467,10 @@ public class UI extends SceneModule{
 	public void hideTooltip(){
 		if(tooltip != null)
 			tooltip.hide();
+	}
+
+	public void showInfo(String info){
+		scene.table().add(info).get().getParent().actions(Actions.fadeOut(4f), Actions.removeActor());
 	}
 	
 	public void showAbout(){

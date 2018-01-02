@@ -86,7 +86,7 @@ _(not necessarily planned!)_
 - Spawn points changed into enemy bases with hostile turrets
 - Unit production
 
-### Optmiziation
+### Optimization
 - Look into uses for `IntMap`
 - Spread updating over multiple frames for large groups of specific tile entities (?)
 - Optimize enemy + bullet code and check quadtree leaf parameters

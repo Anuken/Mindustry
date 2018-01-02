@@ -1,5 +1,7 @@
 package io.anuke.mindustry.ui;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 
@@ -9,13 +11,9 @@ import io.anuke.ucore.scene.ui.Image;
 
 public class MenuButton extends Button{
 	
-	public MenuButton(String icon, PressGroup group, Listenable clicked){
+	public MenuButton(String text, PressGroup group, Listenable clicked){
 		super("menu");
-		Image image = new Image(icon);
-		image.setScaling(Scaling.fit);
-		image.setScale(4f);
-		image.setOrigin(Align.center);
-		add(image);
+		add(text, "title", 4);
 		clicked(clicked);
 		group.add(this);
 	}

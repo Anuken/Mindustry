@@ -119,15 +119,15 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 		@Override
 		public void write(DataOutputStream stream) throws IOException{
 			super.write(stream);
-			stream.writeByte(liquid == null ? -1 : liquid.ordinal());
+			stream.writeByte(liquid == null ? -1 : liquid.id);
 			stream.writeByte((byte)(liquidAmount));
 		}
 		
 		@Override
 		public void read(DataInputStream stream) throws IOException{
 			super.read(stream);
-			byte ordinal = stream.readByte();
-			liquid = ordinal == -1 ? null : Liquid.values()[ordinal];
+			byte id = stream.readByte();
+			liquid = id == -1 ? null : Liquid.getByID(id);
 			liquidAmount = stream.readByte();
 		}
 	}

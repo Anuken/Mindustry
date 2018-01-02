@@ -17,7 +17,7 @@ import io.anuke.ucore.noise.Noise;
 import io.anuke.ucore.util.Mathf;
 
 public class Generator{
-	static final ObjectMap<Block, Block> rocks = new ObjectMap(){{
+	public static final ObjectMap<Block, Block> rocks = new ObjectMap(){{
 		put(Blocks.stone, Blocks.rock);
 		put(Blocks.snow, Blocks.icerock);
 		put(Blocks.grass, Blocks.shrub);

@@ -1,12 +1,9 @@
 package io.anuke.mindustry.entities;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -18,9 +15,13 @@ import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 public class TileEntity extends Entity{
 	public Tile tile;
-	public int[] items = new int[Item.values().length];
+	public int[] items = new int[Item.getAllItems().size];
 	public Timer timer;
 	public int maxhealth, health;
 	public boolean dead = false;
@@ -54,19 +55,28 @@ public class TileEntity extends Entity{
 	}
 	
 	public void onDeath(){
-		
-		if(tile.block() == ProductionBlocks.core){
-			Vars.control.coreDestroyed();
+		onDeath(false);
+	}
+
+	public void onDeath(boolean force){
+		if(Net.active() && Net.server()){
+			Vars.netServer.handleBlockDestroyed(this);
 		}
 
-		if(!dead) {
-			dead = true;
-			Block block = tile.block();
+		if(!Net.active() || Net.server() || force){
+			if(tile.block() == ProductionBlocks.core){
+				Vars.control.coreDestroyed();
+			}
 
-			block.onDestroyed(tile);
+			if(!dead) {
+				dead = true;
+				Block block = tile.block();
 
-			Vars.world.removeBlock(tile);
-			remove();
+				block.onDestroyed(tile);
+
+				Vars.world.removeBlock(tile);
+				remove();
+			}
 		}
 	}
 	
@@ -80,6 +90,10 @@ public class TileEntity extends Entity{
 		int amount = tile.block().handleDamage(tile, damage);
 		health -= amount;
 		if(health <= 0) onDeath();
+
+		if(Net.active() && Net.server()){
+			Vars.netServer.handleBlockDamaged(this);
+		}
 	}
 	
 	public boolean collide(Bullet other){
@@ -110,7 +124,7 @@ public class TileEntity extends Entity{
 	}
 	
 	public int getItem(Item item){
-		return items[item.ordinal()];
+		return items[item.id];
 	}
 	
 	public boolean hasItem(Item item){
@@ -122,11 +136,11 @@ public class TileEntity extends Entity{
 	}
 	
 	public void addItem(Item item, int amount){
-		items[item.ordinal()] += amount;
+		items[item.id] += amount;
 	}
 	
 	public void removeItem(Item item, int amount){
-		items[item.ordinal()] -= amount;;
+		items[item.id] -= amount;
 	}
 	
 	@Override

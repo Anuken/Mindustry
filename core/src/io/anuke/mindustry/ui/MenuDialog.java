@@ -1,16 +1,22 @@
 package io.anuke.mindustry.ui;
 
-import static io.anuke.mindustry.Vars.ui;
-
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.net.Net;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.builders.imagebutton;
-import io.anuke.ucore.scene.ui.ConfirmDialog;
 import io.anuke.ucore.scene.ui.ImageButton;
-import io.anuke.ucore.scene.ui.layout.Cell;
+import io.anuke.ucore.scene.ui.TextField.TextFieldFilter.DigitsOnlyFilter;
+import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Strings;
+
+import java.io.IOException;
+
+import static io.anuke.mindustry.Vars.ui;
 
 public class MenuDialog extends FloatingDialog{
 	private SaveDialog save = new SaveDialog();
@@ -18,14 +24,14 @@ public class MenuDialog extends FloatingDialog{
 	public boolean wasPaused = false;
 
 	public MenuDialog() {
-		super("Paused");
+		super("$text.menu");
 		setup();
 	}
 
 	void setup(){
 		shown(() -> {
 			wasPaused = GameState.is(State.paused);
-			GameState.set(State.paused);
+			if(!Net.active()) GameState.set(State.paused);
 		});
 		
 		if(!Vars.android){
@@ -33,7 +39,7 @@ public class MenuDialog extends FloatingDialog{
 
 			content().addButton("$text.back", () -> {
 				hide();
-				if(!wasPaused)
+				if(!wasPaused || Net.active())
 					GameState.set(State.playing);
 			});
 
@@ -55,16 +61,31 @@ public class MenuDialog extends FloatingDialog{
 			}
 
 			content().row();
+
+			content().addButton("$text.hostserver", () -> {
+				Vars.ui.showTextInput("$text.hostserver", "$text.server.port", Vars.port + "", new DigitsOnlyFilter(), text -> {
+					int result = Strings.parseInt(text);
+					if(result == Integer.MIN_VALUE || result >= 65535){
+						Vars.ui.showError("$text.server.invalidport");
+					}else{
+						try{
+							Net.host(result);
+							GameState.set(State.playing);
+						}catch (IOException e){
+							Vars.ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
+						}
+					}
+				});
+			}).disabled(b -> Net.active() || (Net.active() && !Net.server()));
+
+            content().row();
+
 			content().addButton("$text.quit", () -> {
-				new ConfirmDialog("$text.confirm", "$text.quit.confirm", () -> {
+        Vars.ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
+					runSave();
 					hide();
 					GameState.set(State.menu);
-				}){
-					{
-						for(Cell<?> cell : getButtonTable().getCells())
-							cell.pad(3).size(180, 44);
-					}
-				}.show();
+				});
 			});
 
 		}else{
@@ -88,13 +109,11 @@ public class MenuDialog extends FloatingDialog{
 			new imagebutton("icon-load", isize, () -> load.show()).text("$text.load").padTop(4f);
 			
 			new imagebutton("icon-quit", isize, () -> {
-				new ConfirmDialog("$text.confirm", "$text.quit.confirm", () -> {
+				Vars.ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
+					runSave();
 					hide();
 					GameState.set(State.menu);
-				}){{
-					for(Cell<?> cell : getButtonTable().getCells())
-						cell.pad(3).size(180, 44);
-				}}.show();
+				});
 			}).text("Quit").padTop(4f);
 			
 			for(Element e : content().getChildren()){
@@ -105,5 +124,23 @@ public class MenuDialog extends FloatingDialog{
 			
 			build.end();
 		}
+	}
+
+	private void runSave(){
+		if(Vars.control.getSaves().getCurrent() == null ||
+				!Vars.control.getSaves().getCurrent().isAutosave()) return;
+
+		Vars.ui.showLoading("$text.saveload");
+
+		Timers.runTask(5f, () -> {
+			Vars.ui.hideLoading();
+			try{
+				Vars.control.getSaves().getCurrent().save();
+			}catch(Throwable e){
+				e = (e.getCause() == null ? e : e.getCause());
+
+				Vars.ui.showError("[orange]"+ Bundles.get("text.savefail")+"\n[white]" + ClassReflection.getSimpleName(e.getClass()) + ": " + e.getMessage() + "\n" + "at " + e.getStackTrace()[0].getFileName() + ":" + e.getStackTrace()[0].getLineNumber());
+			}
+		});
 	}
 }

@@ -10,7 +10,6 @@ import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.*;
 import io.anuke.ucore.scene.event.Touchable;
@@ -18,8 +17,6 @@ import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
-
-import javax.xml.soap.Text;
 
 public class PlacementFragment implements Fragment{
 	boolean shown = false;
@@ -100,9 +97,9 @@ public class PlacementFragment implements Fragment{
 						}
 
 						new imagebutton("icon-arrow", 14*3, ()->{
-							player.rotation = Mathf.mod(player.rotation + 1, 4);
+							player.placerot = Mathf.mod(player.placerot + 1, 4);
 						}).imageColor(color).visible(() -> player.recipe != null).update(image ->{
-							image.getImage().setRotation(player.rotation*90);
+							image.getImage().setRotation(player.placerot *90);
 							image.getImage().setOrigin(Align.center);
 						});
 

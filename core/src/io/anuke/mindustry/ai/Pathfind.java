@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.util.Angles;
@@ -101,20 +102,28 @@ public class Pathfind{
 	}
 	
 	public void update(){
+		int index = 0;
+
 		for(SpawnPoint point : Vars.control.getSpawnPoints()){
 			if(!point.request.pathFound){
 				try{
 					if(point.finder.search(point.request, ms)){
 						smoother.smoothPath(point.path);
 						point.pathTiles = point.path.nodes.toArray(Tile.class);
-						point.tempTiles = point.path.nodes.toArray(Tile.class);
+
+                        if(Net.active() && Net.server()){
+                            Vars.netServer.handlePathFound(index, point.pathTiles);
+                        }
 					}
 				}catch (ArrayIndexOutOfBoundsException e){
 					//no path
 					point.request.pathFound = true;
 				}
 			}
+
+			index ++;
 		}
+
 	}
 	
 	public boolean finishedUpdating(){
@@ -133,7 +142,6 @@ public class Pathfind{
 			point.path.clear();
 			
 			point.pathTiles = null;
-			point.tempTiles = null;
 			
 			point.request = new PathFinderRequest<Tile>(point.start, Vars.control.getCore(), heuristic, point.path);
 			point.request.statusChanged = true; //IMPORTANT!
@@ -141,15 +149,15 @@ public class Pathfind{
 	}
 	
 	void findNode(Enemy enemy){
-		if(enemy.spawn >= Vars.control.getSpawnPoints().size){
-			enemy.spawn = 0;
+		if(enemy.lane >= Vars.control.getSpawnPoints().size){
+			enemy.lane = 0;
 		}
 		
-		if(Vars.control.getSpawnPoints().get(enemy.spawn).pathTiles == null){
+		if(Vars.control.getSpawnPoints().get(enemy.lane).pathTiles == null){
 			return;
 		}
 		
-		enemy.path = Vars.control.getSpawnPoints().get(enemy.spawn).pathTiles;
+		enemy.path = Vars.control.getSpawnPoints().get(enemy.lane).pathTiles;
 		
 		int closest = findClosest(enemy.path, enemy.x, enemy.y);
 		

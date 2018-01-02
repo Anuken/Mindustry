@@ -1,16 +1,11 @@
 package io.anuke.mindustry.core;
 
-import static io.anuke.mindustry.Vars.*;
-
-import java.util.Arrays;
-
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
-
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
@@ -23,6 +18,8 @@ import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
+import io.anuke.mindustry.io.Saves;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
@@ -40,17 +37,22 @@ import io.anuke.ucore.util.Input;
 import io.anuke.ucore.util.InputProxy;
 import io.anuke.ucore.util.Mathf;
 
+import java.util.Arrays;
+
+import static io.anuke.mindustry.Vars.*;
+
 public class Control extends Module{
 	Tutorial tutorial = new Tutorial();
 	boolean hiscore = false;
 	
 	final Array<Weapon> weapons = new Array<>();
-	final int[] items = new int[Item.values().length];
+	final int[] items = new int[Item.getAllItems().size];
 	
-	public final EntityGroup<Enemy> enemyGroup = Entities.addGroup(Enemy.class);
+	public final EntityGroup<Enemy> enemyGroup = Entities.addGroup(Enemy.class).enableMapping();
 	public final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);
 	public final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
 	public final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class);
+	public final EntityGroup<Player> playerGroup = Entities.addGroup(Player.class).enableMapping();
 	
 	Array<EnemySpawn> spawns;
 	int wave = 1;
@@ -64,7 +66,9 @@ public class Control extends Module{
 	Array<SpawnPoint> spawnpoints = new Array<>();
 	boolean shouldUpdateItems = false;
 	boolean wasPaused = false;
-	
+
+	Saves saves;
+
 	float respawntime;
 	InputHandler input;
 
@@ -75,6 +79,8 @@ public class Control extends Module{
 	public Control(){
 		if(Mindustry.args.contains("-debug", false))
 			Vars.debug = true;
+
+		saves = new Saves();
 
 		Inputs.useControllers(false);
 		
@@ -122,7 +128,7 @@ public class Control extends Module{
 		
 		Core.atlas = new Atlas("sprites.atlas");
 		
-		Sounds.load("shoot.ogg", "place.ogg", "explosion.ogg", "enemyshoot.ogg", 
+		Sounds.load("shoot.ogg", "place.ogg", "explosion.ogg", "enemyshoot.ogg",
 				"corexplode.ogg", "break.ogg", "spawn.ogg", "flame.ogg", "die.ogg", 
 				"respawn.ogg", "purchase.ogg", "flame2.ogg", "bigshot.ogg", "laser.ogg", "lasershot.ogg",
 				"ping.ogg", "tesla.ogg", "waveend.ogg", "railgun.ogg", "blast.ogg", "bang2.ogg");
@@ -136,7 +142,7 @@ public class Control extends Module{
 				"move_y", new Axis(Input.S, Input.W),
 				"select", Input.MOUSE_LEFT,
 				"break", Input.MOUSE_RIGHT,
-				"shoot", Input.MOUSE_LEFT,
+				"shootInternal", Input.MOUSE_LEFT,
 				"zoom_hold", Input.CONTROL_LEFT,
 				"zoom", new Axis(Input.SCROLL),
 				"menu", Gdx.app.getType() == ApplicationType.Android ? Input.BACK : Input.ESCAPE,
@@ -160,7 +166,7 @@ public class Control extends Module{
 				"cursor_y", new Axis(Input.CONTROLLER_R_STICK_VERTICAL_AXIS),
 				"select", Input.CONTROLLER_R_BUMPER,
 				"break", Input.CONTROLLER_L_BUMPER,
-				"shoot", Input.CONTROLLER_R_TRIGGER,
+				"shootInternal", Input.CONTROLLER_R_TRIGGER,
 				"zoom_hold", Input.ANY_KEY,
 				"zoom", new Axis(Input.CONTROLLER_DPAD_DOWN, Input.CONTROLLER_DPAD_UP),
 				"menu", Input.CONTROLLER_X,
@@ -177,7 +183,8 @@ public class Control extends Module{
 		);
 		
 		for(int i = 0; i < Vars.saveSlots; i ++){
-			Settings.defaults("saveslot" + i, "empty");
+			Settings.defaults("save-" + i + "-autosave", true);
+			Settings.defaults("save-" + i + "-name", "untitled");
 		}
 		
 		Settings.loadAll("io.anuke.moment");
@@ -187,9 +194,15 @@ public class Control extends Module{
 		}
 		
 		player = new Player();
+		player.isLocal = true;
 		
 		spawns = WaveCreator.getSpawns();
-		//WaveCreator.testWaves(1, 30);
+
+		saves.load();
+	}
+
+	public Saves getSaves(){
+		return saves;
 	}
 
 	public boolean showCursor(){
@@ -208,9 +221,8 @@ public class Control extends Module{
 		wavetime = waveSpacing();
 		Entities.clear();
 		enemies = 0;
-		
-		if(!android)
-			player.add();
+
+		player.add();
 		
 		player.heal();
 		clearItems();
@@ -271,6 +283,7 @@ public class Control extends Module{
 	
 	public void playMap(Map map){
 		Vars.ui.showLoading();
+		saves.resetSave();
 		
 		Timers.run(16, ()->{
 			reset();
@@ -309,6 +322,10 @@ public class Control extends Module{
 	}
 	
 	public void runWave(){
+		if(Net.client() && Net.active()){
+			return;
+		}
+
 		Sounds.play("spawn");
 		
 		if(lastUpdated < wave + 1){
@@ -330,10 +347,13 @@ public class Control extends Module{
 						try{
 							Enemy enemy = ClassReflection.newInstance(spawn.type);
 							enemy.set(tile.worldx() + Mathf.range(range), tile.worldy() + Mathf.range(range));
-							enemy.spawn = fl;
+							enemy.lane = fl;
 							enemy.tier = spawn.tier(wave, fl);
+							enemy.add();
+
 							Effects.effect(Fx.spawn, enemy);
-							enemy.add(enemyGroup);
+
+							Vars.netServer.handleEnemySpawn(enemy);
 							
 							enemies ++;
 						}catch (Exception e){
@@ -434,11 +454,11 @@ public class Control extends Module{
 	}
 	
 	public  int getAmount(Item item){
-		return items[item.ordinal()];
+		return items[item.id];
 	}
 	
 	public void addItem(Item item, int amount){
-		items[item.ordinal()] += amount;
+		items[item.id] += amount;
 		shouldUpdateItems = true;
 	}
 	
@@ -457,15 +477,15 @@ public class Control extends Module{
 	}
 	
 	public boolean hasItem(ItemStack req){
-		return items[req.item.ordinal()] >= req.amount; 
+		return items[req.item.id] >= req.amount;
 	}
 	
 	public boolean hasItem(Item item, int amount){
-		return items[item.ordinal()] >= amount; 
+		return items[item.id] >= amount;
 	}
 	
 	public void removeItem(ItemStack req){
-		items[req.item.ordinal()] -= req.amount;
+		items[req.item.id] -= req.amount;
 		shouldUpdateItems = true;
 	}
 	
@@ -543,6 +563,8 @@ public class Control extends Module{
         }
 
         Gdx.input.setCursorCatched(controlling);
+
+        saves.update();
 		
 		if(debug && GameState.is(State.playing)){
 			//debug actions
@@ -590,7 +612,7 @@ public class Control extends Module{
 		if(!GameState.is(State.menu)){
 			input.update();
 			
-			if(Inputs.keyTap("pause") && !ui.isGameOver() && (GameState.is(State.paused) || GameState.is(State.playing))){
+			if(Inputs.keyTap("pause") && !ui.isGameOver() && !Net.active() && (GameState.is(State.paused) || GameState.is(State.playing))){
 				GameState.set(GameState.is(State.playing) ? State.paused : State.playing);
 			}
 			
@@ -604,7 +626,7 @@ public class Control extends Module{
 				}
 			}
 		
-			if(!GameState.is(State.paused)){
+			if(!GameState.is(State.paused) || Net.active()){
 				
 				if(respawntime > 0){
 					
@@ -628,7 +650,7 @@ public class Control extends Module{
 					if(enemies <= 0){
 						wavetime -= delta();
 
-						if(lastUpdated < wave + 1 && wavetime < Vars.aheadPathfinding){ //start updatingbeforehand
+						if(lastUpdated < wave + 1 && wavetime < Vars.aheadPathfinding){ //start updating beforehand
 							world.pathfinder().updatePath();
 							lastUpdated = wave + 1;
 						}
@@ -646,9 +668,10 @@ public class Control extends Module{
 				Entities.update(enemyGroup);
 				Entities.update(tileGroup);
 				Entities.update(shieldGroup);
+				Entities.update(playerGroup);
 				
 				Entities.collideGroups(enemyGroup, bulletGroup);
-				Entities.collideGroups(Entities.defaultGroup(), bulletGroup);
+				Entities.collideGroups(playerGroup, bulletGroup);
 			}
 		}
 	}

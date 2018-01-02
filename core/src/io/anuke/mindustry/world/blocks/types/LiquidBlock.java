@@ -123,14 +123,14 @@ public class LiquidBlock extends Block implements LiquidAcceptor{
 		
 		@Override
 		public void write(DataOutputStream stream) throws IOException{
-			stream.writeByte(liquid == null ? -1 : liquid.ordinal());
+			stream.writeByte(liquid == null ? -1 : liquid.id);
 			stream.writeByte((byte)(liquidAmount));
 		}
 		
 		@Override
 		public void read(DataInputStream stream) throws IOException{
-			byte ordinal = stream.readByte();
-			liquid = ordinal == -1 ? null : Liquid.values()[ordinal];
+			byte id = stream.readByte();
+			liquid = id == -1 ? null : Liquid.getByID(id);
 			liquidAmount = stream.readByte();
 		}
 	}

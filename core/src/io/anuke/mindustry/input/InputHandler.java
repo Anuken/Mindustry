@@ -1,15 +1,13 @@
 package io.anuke.mindustry.input;
 
-import static io.anuke.mindustry.Vars.*;
-
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.world.Block;
@@ -26,6 +24,8 @@ import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
+
+import static io.anuke.mindustry.Vars.*;
 
 public abstract class InputHandler extends InputAdapter{
 	public abstract void update();
@@ -54,7 +54,7 @@ public abstract class InputHandler extends InputAdapter{
 				validPlace(x, y, player.recipe.result) && !ui.hasMouse() && cursorNear() &&
 				Vars.control.hasItems(player.recipe.requirements)){
 			
-			placeBlock(x, y, player.recipe.result, player.rotation, true, sound);
+			placeBlock(x, y, player.recipe.result, player.placerot, true, sound);
 			
 			for(ItemStack stack : player.recipe.requirements){
 				Vars.control.removeItem(stack);
@@ -116,7 +116,7 @@ public abstract class InputHandler extends InputAdapter{
 			Block block = Vars.control.getTutorial().getPlaceBlock();
 			
 			if(type != block || point.x != x - control.getCore().x || point.y != y - control.getCore().y 
-					|| (rotation != -1 && rotation != Vars.player.rotation)){
+					|| (rotation != -1 && rotation != Vars.player.placerot)){
 				return false;
 			}
 		}else if(Vars.control.getTutorial().active()){
@@ -160,7 +160,7 @@ public abstract class InputHandler extends InputAdapter{
 				Block block = Vars.control.getTutorial().getPlaceBlock();
 			
 				if(block != Blocks.air || point.x != x - control.getCore().x || point.y != y - control.getCore().y 
-						|| (rotation != -1 && rotation != Vars.player.rotation)){
+						|| (rotation != -1 && rotation != Vars.player.placerot)){
 					return false;
 				}
 			}else{
@@ -172,18 +172,27 @@ public abstract class InputHandler extends InputAdapter{
 	}
 	
 	public void placeBlock(int x, int y, Block result, int rotation, boolean effects, boolean sound){
+
+		placeBlockInternal(x, y, result, rotation, effects, sound);
+
+		if(Net.active()){
+			Vars.netClient.handlePlace(x, y, result, rotation);
+		}
+	}
+
+	public void placeBlockInternal(int x, int y, Block result, int rotation, boolean effects, boolean sound){
 		Tile tile = world.tile(x, y);
-		
+
 		//just in case
 		if(tile == null)
 			return;
 
 		tile.setBlock(result, rotation);
-		
+
 		if(result.isMultiblock()){
 			int offsetx = -(result.width-1)/2;
 			int offsety = -(result.height-1)/2;
-			
+
 			for(int dx = 0; dx < result.width; dx ++){
 				for(int dy = 0; dy < result.height; dy ++){
 					int worldx = dx + offsetx + x;
@@ -193,47 +202,55 @@ public abstract class InputHandler extends InputAdapter{
 						if(toplace != null)
 							toplace.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
 					}
-					
+
 					if(effects) Effects.effect(Fx.place, worldx * Vars.tilesize, worldy * Vars.tilesize);
 				}
 			}
 		}else{
 			if(effects) Effects.effect(Fx.place, x * Vars.tilesize, y * Vars.tilesize);
 		}
-		
+
 		if(effects && sound) Sounds.play("place");
 
 		result.placed(tile);
 	}
 	
 	public void breakBlock(int x, int y, boolean sound){
+		breakBlockInternal(x, y, sound);
+
+		if(Net.active()){
+			Vars.netClient.handleBreak(x, y);
+		}
+	}
+
+	public void breakBlockInternal(int x, int y, boolean sound){
 		Tile tile = world.tile(x, y);
-		
+
 		if(tile == null) return;
-		
+
 		Block block = tile.isLinked() ? tile.getLinked().block() : tile.block();
 		Recipe result = null;
-		
+
 		for(Recipe recipe : Recipe.values()){
 			if(recipe.result == block){
 				result = recipe;
 				break;
 			}
 		}
-		
+
 		if(result != null){
 			for(ItemStack stack : result.requirements){
 				Vars.control.addItem(stack.item, (int)(stack.amount * Vars.breakDropAmount));
 			}
 		}
-		
+
 		if(tile.block().drops != null){
 			Vars.control.addItem(tile.block().drops.item, tile.block().drops.amount);
 		}
-		
+
 		//Effects.shake(3f, 1f, player);
 		if(sound) Sounds.play("break");
-		
+
 		if(!tile.block().isMultiblock() && !tile.isLinked()){
 			tile.setBlock(Blocks.air);
 			Effects.effect(Fx.breakBlock, tile.worldx(), tile.worldy());

@@ -59,7 +59,7 @@ public class FileChooser extends FloatingDialog{
 		if(!open) Mindustry.platforms.addDialog(filefield);
 		filefield.setDisabled(open);
 
-		ok = new TextButton(open ? "$text.save" : "$text.save");
+		ok = new TextButton(open ? "$text.load" : "$text.save");
 		
 		ok.clicked(() -> {
 			if(ok.isDisabled()) return;

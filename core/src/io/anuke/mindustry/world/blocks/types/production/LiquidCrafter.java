@@ -75,7 +75,7 @@ public class LiquidCrafter extends LiquidBlock{
 			Effects.effect(craftEffect, tile.worldx(), tile.worldy());
 		}
 		
-		if(entity.timer.get(timerDump, 30)){
+		if(entity.timer.get(timerDump, 15)){
 			tryDump(tile, -1, output);
 		}
 	}

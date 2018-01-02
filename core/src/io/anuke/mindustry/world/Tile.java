@@ -1,15 +1,14 @@
 package io.anuke.mindustry.world;
 
-import static io.anuke.mindustry.Vars.tilesize;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Mathf;
+
+import static io.anuke.mindustry.Vars.tilesize;
 
 
 public class Tile{
@@ -17,7 +16,7 @@ public class Tile{
 	
 	/**Packed block data. Left is floor, right is block.*/
 	private short blocks;
-	/**Packed data. Left is rotation, right is extra data, packed into two half-bytes: left is dump, right is extra.*/
+	/**Packed data. Left is placerot, right is extra data, packed into two half-bytes: left is dump, right is extra.*/
 	private short data;
 	/**The coordinates of the core tile this is linked to, in the form of two bytes packed into one.
 	 * This is relative to the block it is linked to; negate coords to find the link.*/
@@ -33,6 +32,10 @@ public class Tile{
 	public Tile(int x, int y, Block floor){
 		this(x, y);
 		iSetFloor(floor);
+	}
+
+	public int packedPosition(){
+		return x + y * Vars.world.width();
 	}
 	
 	private void iSetFloor(Block floor){
@@ -53,7 +56,7 @@ public class Tile{
 		return Bits.getLeftByte(blocks);
 	}
 	
-	/**Return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile.*/
+	/**Return relative placerot to a coordinate. Returns -1 if the coordinate is not near this tile.*/
 	public int relativeTo(int cx, int cy){
 		if(x == cx && y == cy - 1) return 1;
 		if(x == cx && y == cy + 1) return 3;
@@ -149,11 +152,11 @@ public class Tile{
 	public byte getExtra(){
 		return Bits.getRightByte(Bits.getRightByte(data));
 	}
-	
+
 	public boolean passable(){
 		Block block = block();
 		Block floor = floor();
-		return isLinked() || !(floor.solid || (block.solid && (!block.destructible && !block.update)));
+		return isLinked() || !((floor.solid && (block == Blocks.air || block.solidifes)) || (block.solid && (!block.destructible && !block.update)));
 	}
 	
 	public boolean solid(){
@@ -220,7 +223,7 @@ public class Tile{
 	
 	public void changed(){
 		if(entity != null){
-			if(entity.added) entity.remove();
+			entity.remove();
 			entity = null;
 		}
 		

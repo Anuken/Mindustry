@@ -1,8 +1,5 @@
 package io.anuke.mindustry.core;
 
-import static io.anuke.mindustry.Vars.*;
-import static io.anuke.ucore.core.Core.*;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -12,7 +9,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -25,7 +21,6 @@ import io.anuke.mindustry.world.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.entities.EffectEntity;
@@ -38,6 +33,10 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
+
+import static io.anuke.mindustry.Vars.*;
+import static io.anuke.ucore.core.Core.batch;
+import static io.anuke.ucore.core.Core.camera;
 
 public class Renderer extends RendererModule{
 	private final static int chunksize = 32;
@@ -222,6 +221,7 @@ public class Renderer extends RendererModule{
 		Entities.draw(control.enemyGroup);
 		Graphics.shader();
 
+		Entities.draw(control.playerGroup);
 		Entities.draw(Entities.defaultGroup());
 
 		blocks.drawBlocks(true);
@@ -418,8 +418,11 @@ public class Renderer extends RendererModule{
 				drawHealth(entity);
 			}
 
-			if(!Vars.android && Vars.showPlayer && !player.isDead())
-				drawHealth(player);
+			if(!Vars.android && Vars.showPlayer) {
+				for(Player player : Vars.control.playerGroup.all()){
+					if(!player.isDead()) drawHealth(player);
+				}
+			}
 		}
 	}
 

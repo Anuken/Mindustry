@@ -20,7 +20,6 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.*;
 
 public class Conveyor extends Block{
-	private static Item[] items = Item.values();
 	private static ItemPos pos1 = new ItemPos();
 	private static ItemPos pos2 = new ItemPos();
 	private static IntArray removals = new IntArray();
@@ -74,7 +73,7 @@ public class Conveyor extends Block{
 			Tmp.v1.set(tilesize, 0).rotate(rotation * 90);
 			Tmp.v2.set(-tilesize / 2, pos.x*tilesize/2).rotate(rotation * 90);
 			
-			Draw.rect("icon-" + pos.item.name(), 
+			Draw.rect("icon-" + pos.item.name,
 					tile.x * tilesize + Tmp.v1.x * pos.y + Tmp.v2.x, 
 					tile.y * tilesize + Tmp.v1.y * pos.y + Tmp.v2.y, itemSize, itemSize);
 		}
@@ -234,7 +233,7 @@ public class Conveyor extends Block{
 		
 		ItemPos set(int value){
 			byte[] values = Bits.getBytes(value);
-			item = items[values[0]];
+			item = Item.getAllItems().get(values[0]);
 			x = values[1] / 127f;
 			y = ((int)values[2] + 128) / 255f;
 			seed = values[3];
@@ -247,7 +246,7 @@ public class Conveyor extends Block{
 		
 		static int packItem(Item item, float x, float y, byte seed){
 			byte[] bytes = Bits.getBytes(0);
-			bytes[0] = (byte)item.ordinal();
+			bytes[0] = (byte)item.id;
 			bytes[1] = (byte)(x*127);
 			bytes[2] = (byte)(y*255-128);
 			bytes[3] = seed;
