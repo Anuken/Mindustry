@@ -42,6 +42,7 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
         compile "com.esotericsoftware:kryonet:2.22.0-RC1"
+        compile "com.github.MinnDevelopment:Java-DiscordRPC:dbd4aac"
     }
 }
 

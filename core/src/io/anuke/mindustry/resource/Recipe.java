@@ -2,10 +2,7 @@ package io.anuke.mindustry.resource;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.DefenseBlocks;
-import io.anuke.mindustry.world.blocks.DistributionBlocks;
-import io.anuke.mindustry.world.blocks.ProductionBlocks;
-import io.anuke.mindustry.world.blocks.WeaponBlocks;
+import io.anuke.mindustry.world.blocks.*;
 
 import static io.anuke.mindustry.resource.Section.*;
 

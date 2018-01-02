@@ -33,6 +33,7 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.graphics.Atlas;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Input;
 import io.anuke.ucore.util.InputProxy;
 import io.anuke.ucore.util.Mathf;
@@ -75,6 +76,7 @@ public class Control extends Module{
     private InputProxy proxy;
     private float controlx, controly;
     private boolean controlling;
+    private Map map;
 	
 	public Control(){
 		if(Mindustry.args.contains("-debug", false))
@@ -293,6 +295,10 @@ public class Control extends Module{
 		});
 		
 		Timers.run(18, ()-> ui.hideLoading());
+
+		this.map = map;
+
+		Mindustry.platforms.onSceneChange(Bundles.get("text.playing", "Playing on map") + ": " + map.name, Bundles.get("text.wavenumber", "Wave") + " 0", "fight");
 	}
 	
 	public GameMode getMode(){
@@ -323,6 +329,7 @@ public class Control extends Module{
 	}
 	
 	public void runWave(){
+		Mindustry.platforms.onSceneChange(Bundles.get("text.playing", "Playing on map") + ": " + map.name, Bundles.get("text.wavenumber", "Wave") + " " + wave, "fight");
 		if(Net.client() && Net.active()){
 			return;
 		}

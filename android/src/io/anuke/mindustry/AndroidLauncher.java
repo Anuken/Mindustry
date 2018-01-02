@@ -53,6 +53,16 @@ public class AndroidLauncher extends AndroidApplication{
 			public void addDialog(TextField field){
 				TextFieldDialogListener.add(field);
 			}
+
+			@Override
+			public void onSceneChange(String state, String details, String icon) {
+
+			}
+
+			@Override
+			public void onGameExit() {
+
+			}
 		};
 		
 		Mindustry.donationsCallable = new Callable(){ @Override public void run(){ showDonations(); } };
