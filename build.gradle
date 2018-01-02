@@ -21,7 +21,7 @@ allprojects {
         appName = "Mindustry"
         gdxVersion = '1.9.8'
         aiVersion = '1.8.1'
-        uCoreVersion = '4fb2c63';
+        uCoreVersion = '8751c0a66c';
     }
 
     repositories {
@@ -38,10 +38,10 @@ project(":desktop") {
 
     dependencies {
         compile project(":core")
+        compile project(":kryonet")
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
-        compile "com.esotericsoftware:kryonet:2.22.0-RC1"
         compile "com.github.MinnDevelopment:Java-DiscordRPC:dbd4aac"
     }
 }
@@ -71,6 +71,7 @@ project(":android") {
 
     dependencies {
         compile project(":core")
+        compile project(":kryonet")
         compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
@@ -79,7 +80,6 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         compile "com.badlogicgames.gdx:gdx-controllers-android:$gdxVersion"
-        compile "com.esotericsoftware:kryonet:2.22.0-RC1"
     }
 }
 
@@ -107,6 +107,15 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
+    }
+}
+
+project(":kryonet") {
+    apply plugin: "java"
+
+    dependencies {
+        compile project(":core")
+        compile 'com.github.crykn:kryonet:2.22.1'
     }
 }
 

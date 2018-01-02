@@ -1,9 +1,6 @@
 package io.anuke.mindustry.ui.fragments;
 
-import static io.anuke.mindustry.Vars.*;
-
 import com.badlogic.gdx.Gdx;
-
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
@@ -11,6 +8,8 @@ import io.anuke.mindustry.ui.MenuButton;
 import io.anuke.mindustry.ui.PressGroup;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.table;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class MenuFragment implements Fragment{
 	
@@ -35,11 +34,11 @@ public class MenuFragment implements Fragment{
 					
 					add(new MenuButton("$text.tutorial", group, ()-> control.playMap(world.maps().getMap("tutorial"))));
 					row();
-					
+
+					add(new MenuButton("$text.loadgame", group, ui::showLoadGame));
+					row();
+
 					if(!gwt){
-						add(new MenuButton("$text.loadgame", group, ui::showLoadGame));
-						row();
-						
 						add(new MenuButton("$text.editor", group, ui::showEditor));
 						row();
 					}
@@ -72,6 +71,8 @@ public class MenuFragment implements Fragment{
 					new imagebutton("icon-editor", isize, () -> ui.showEditor()).text("$text.editor").padTop(4f);
 	
 					new imagebutton("icon-tools", isize, () -> ui.showPrefs()).text("$text.settings").padTop(4f);
+
+					new imagebutton("icon-add", isize, () -> ui.showJoinGame()).text("$text.joingame").padTop(4f);
 					
 					if(Mindustry.donationsCallable != null){
 						new imagebutton("icon-donate", isize, () -> {

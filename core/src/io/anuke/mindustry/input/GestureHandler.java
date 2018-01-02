@@ -1,15 +1,15 @@
 package io.anuke.mindustry.input;
 
-import static io.anuke.mindustry.Vars.*;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.input.GestureDetector.GestureAdapter;
 import com.badlogic.gdx.math.Vector2;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.Mathf;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class GestureHandler extends GestureAdapter{
 	AndroidInput input;
@@ -49,8 +49,10 @@ public class GestureHandler extends GestureAdapter{
 
 		if(!Vars.control.showCursor() && !(player.recipe != null && Vars.control.hasItems(player.recipe.requirements) && player.placeMode.lockCamera) &&
 				!(player.recipe == null && player.breakMode.lockCamera)){
-			player.x -= deltaX*Core.camera.zoom/Core.cameraScale;
-			player.y += deltaY*Core.camera.zoom/Core.cameraScale;
+			float dx = deltaX*Core.camera.zoom/Core.cameraScale, dy = deltaY*Core.camera.zoom/Core.cameraScale;
+			player.x -= dx;
+			player.y += dy;
+			player.targetAngle = Mathf.atan2(dx, -dy);
 		}else if(player.placeMode.lockCamera && (player.placeMode.pan && player.recipe != null)){
 			input.mousex += deltaX;
 			input.mousey += deltaY;

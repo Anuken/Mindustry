@@ -1,33 +1,25 @@
 package io.anuke.mindustry.ui.fragments;
 
-import static io.anuke.mindustry.Vars.*;
-
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-
 import com.badlogic.gdx.math.Interpolation;
-import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.world.GameMode;
-import io.anuke.ucore.UCore;
+import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.Label;
-import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class HudFragment implements Fragment{
 	private ImageButton menu, flip, pause;
@@ -74,7 +66,8 @@ public class HudFragment implements Fragment{
 
 				pause = new imagebutton("icon-pause", isize, ()->{
 					GameState.set(GameState.is(State.paused) ? State.playing : State.paused);
-				}).update(i -> i.getStyle().imageUp = Core.skin.getDrawable(GameState.is(State.paused) ? "icon-play" : "icon-pause")).get();
+				}).update(i -> i.getStyle().imageUp = Core.skin.getDrawable(GameState.is(State.paused) ? "icon-play" : "icon-pause")).cell
+						.disabled(b -> Net.active()).get();
 
 			}}.end();
 
@@ -105,7 +98,7 @@ public class HudFragment implements Fragment{
 		
 		//paused table
 		new table(){{
-			visible(()->GameState.is(State.paused));
+			visible(()->GameState.is(State.paused) && !Net.active());
 			atop();
 			
 			new table("pane"){{
@@ -156,6 +149,14 @@ public class HudFragment implements Fragment{
 			new label("$text.saveload");
 
 		}}.end();
+
+		if(Vars.debugNet) {
+            new table() {{
+                new label(() -> "players: " + Vars.control.playerGroup.amount());
+                row();
+                new label(() -> "" + Vars.control.playerGroup.all());
+            }}.end();
+        }
 
 		blockfrag.build();
 	}

@@ -1,6 +1,7 @@
 package io.anuke.mindustry.net;
 
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.enemies.Enemy;
 
 /**Class for storing all packets.*/
 public class Packets {
@@ -27,16 +28,27 @@ public class Packets {
     public static class SyncPacket{
         public int[] ids;
         public float[][] data;
+        public short enemyStart;
     }
 
     public static class BlockSyncPacket extends Streamable{
 
     }
 
-    public static class StateSyncPacket {
+    public static class ConnectPacket{
+        public String name;
+        public boolean android;
+    }
+
+    public static class DisconnectPacket{
+        public int playerid;
+    }
+
+    public static class StateSyncPacket{
         public int[] items;
-        public float countdown;
+        public float countdown, time;
         public int enemies, wave;
+        public long timestamp;
     }
 
     public static class PositionPacket{
@@ -55,6 +67,12 @@ public class Packets {
         public int playerid;
     }
 
+    public static class BulletPacket{
+        public int type, owner;
+        public float x, y, angle;
+        public short damage;
+    }
+
     public static class PlacePacket{
         public int playerid;
         public byte rotation;
@@ -65,5 +83,29 @@ public class Packets {
     public static class BreakPacket{
         public int playerid;
         public short x, y;
+    }
+
+    public static class EnemySpawnPacket{
+        public Class<? extends Enemy> type;
+        public byte lane, tier;
+        public float x, y;
+        public int id;
+    }
+
+    public static class EnemyDeathPacket{
+        public int id;
+    }
+
+    public static class PathPacket{
+        public int[] path;
+        public byte index;
+    }
+
+    public static class BlockDestroyPacket{
+        public int position;
+    }
+
+    public static class BlockUpdatePacket{
+        public int health, position;
     }
 }

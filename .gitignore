@@ -21,6 +21,7 @@
 *.war
 *.ear
 hs_err_pid*
+crash-report-*
 
 ## Robovm
 /ios/robovm-build/

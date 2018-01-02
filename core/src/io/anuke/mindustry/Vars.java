@@ -20,7 +20,7 @@ public class Vars{
 	//respawn time in frames
 	public static final float respawnduration = 60*4;
 	//time between waves in frames (on normal mode)
-	public static final float wavespace = 60*60*(android ? 1 : 1);
+	public static final float wavespace = 60*60*(android ? 1 : 1); //TODO revert
 	//waves can last no longer than 3 minutes, otherwise the next one spawns
 	public static final float maxwavespace = 60*60*4f;
 	//advance time the pathfinding starts at
@@ -43,6 +43,7 @@ public class Vars{
 	public static final int zoomScale = Math.round(Unit.dp.scl(1));
 	//if true, player speed will be increased, massive amounts of resources will be given on start, and other debug options will be available
 	public static boolean debug = false;
+	public static boolean debugNet = false;
 	//whether the player can clip through walls
 	public static boolean noclip = false;
 	//whether to draw chunk borders

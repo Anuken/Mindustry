@@ -1,15 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
-import static io.anuke.mindustry.Vars.tilesize;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.*;
-
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
-
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
@@ -17,7 +9,20 @@ import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Bits;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Strings;
+import io.anuke.ucore.util.Tmp;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.AbstractList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class Conveyor extends Block{
 	private static ItemPos pos1 = new ItemPos();
@@ -182,6 +187,7 @@ public class Conveyor extends Block{
 		
 		@Override
 		public void read(DataInputStream stream) throws IOException{
+			convey.clear();
 			int amount = stream.readInt();
 			convey.ensureCapacity(amount);
 			

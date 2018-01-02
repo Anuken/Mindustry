@@ -38,7 +38,7 @@ public class FortressEnemy extends Enemy{
 				Angles.translation(angle, 20f);
 				
 				FastEnemy enemy = new FastEnemy();
-				enemy.spawn = spawn;
+				enemy.lane = lane;
 				enemy.tier = this.tier;
 				enemy.spawner = this;
 				enemy.set(x + Angles.x(), y + Angles.y());
@@ -52,10 +52,9 @@ public class FortressEnemy extends Enemy{
 			speed = 0.001f;
 		}
 	}
-	
-	@Override
-	public void shoot(BulletType type){
-		super.shoot(bullet);
+
+
+	void onShoot(BulletType type, float rotation){
 		Effects.effect(Fx.largeCannonShot, x + Angles.x(), y + Angles.y(), angle);
 		Effects.shake(3f, 3f, this);
 	}

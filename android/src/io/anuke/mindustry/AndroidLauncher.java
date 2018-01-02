@@ -1,23 +1,24 @@
 package io.anuke.mindustry;
 
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import com.badlogic.gdx.backends.android.AndroidApplication;
-import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import com.badlogic.gdx.backends.android.AndroidApplication;
+import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import io.anuke.kryonet.KryoClient;
+import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.io.PlatformFunction;
+import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Unit;
+
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class AndroidLauncher extends AndroidApplication{
 	boolean doubleScaleTablets = true;
@@ -72,6 +73,9 @@ public class AndroidLauncher extends AndroidApplication{
 		}
 		
 		config.hideStatusBar = true;
+
+        Net.setClientProvider(new KryoClient());
+        Net.setServerProvider(new KryoServer());
 		
 		initialize(new Mindustry(), config);
 	}

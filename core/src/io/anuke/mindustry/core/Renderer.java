@@ -418,10 +418,8 @@ public class Renderer extends RendererModule{
 				drawHealth(entity);
 			}
 
-			if(!Vars.android && Vars.showPlayer) {
-				for(Player player : Vars.control.playerGroup.all()){
-					if(!player.isDead()) drawHealth(player);
-				}
+			for(Player player : Vars.control.playerGroup.all()){
+				if(!player.isDead() && !player.isAndroid) drawHealth(player);
 			}
 		}
 	}

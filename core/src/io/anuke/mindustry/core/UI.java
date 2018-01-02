@@ -24,6 +24,7 @@ import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Skin;
+import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
@@ -177,27 +178,6 @@ public class UI extends SceneModule{
 			editor = new MapEditor();
 			editorDialog = new MapEditorDialog(editor);
 		}
-
-		join = new FloatingDialog("$text.joingame.title");
-		join.content().add("$text.joingame.ip").left();
-		join.content().addField("localhost", text -> lastip = text).size(180f, 54f);
-		join.content().row();
-		join.content().add("$text.server.port").left();
-		join.content().addField(Vars.port + "", new DigitsOnlyFilter(), text -> lastport = Strings.parseInt(text)).size(180f, 54f);
-		join.buttons().defaults().size(140f, 60f).pad(4f);
-		join.buttons().addButton("$text.cancel", join::hide);
-		join.buttons().addButton("$text.ok", () -> {
-			showLoading("$text.connecting");
-
-			Timers.runTask(2f, () -> {
-				try{
-					Net.connect(lastip, lastport);
-				}catch (IOException e) {
-					showError(Bundles.format("text.connectfail", Strings.parseException(e, false)));
-					hideLoading();
-				}
-			});
-		}).disabled(b -> lastip.isEmpty() || lastport == Integer.MIN_VALUE);
 		
 		settingserror = new Dialog("Warning", "dialog");
 		settingserror.content().add("[crimson]Failed to access local storage.\nSettings will not be saved.");
@@ -207,6 +187,8 @@ public class UI extends SceneModule{
 		gameerror = new Dialog("$text.error.crashtitle", "dialog");
 		gameerror.content().labelWrap("$text.error.crashmessage").width(600f).pad(10f);
 		gameerror.buttons().addButton("#text.ok", gameerror::hide).size(200f, 50);
+
+		join = new JoinDialog();
 		
 		discord = new Dialog("Discord", "dialog");
 		discord.content().margin(12f);
@@ -258,7 +240,7 @@ public class UI extends SceneModule{
 		
 		prefs.hidden(()->{
 			if(!GameState.is(State.menu)){
-				if(!wasPaused)
+				if(!wasPaused || Net.active())
 					GameState.set(State.playing);
 			}
 		});
@@ -269,7 +251,7 @@ public class UI extends SceneModule{
 				if(menu.getScene() != null){
 					wasPaused = menu.wasPaused;
 				}
-				GameState.set(State.paused);
+				if(!Net.active()) GameState.set(State.paused);
 				menu.hide();
 			}
 		});
@@ -466,6 +448,25 @@ public class UI extends SceneModule{
 	public void hideTooltip(){
 		if(tooltip != null)
 			tooltip.hide();
+	}
+
+	public void showInfo(String info){
+		scene.table().add(info).get().getParent().actions(Actions.fadeOut(4f), Actions.removeActor());
+	}
+
+	public void showHostServer(){
+		showTextInput("$text.hostserver", "$text.server.port", Vars.port + "", new DigitsOnlyFilter(), text -> {
+			int result = Strings.parseInt(text);
+			if(result == Integer.MIN_VALUE || result >= 65535){
+				Vars.ui.showError("$text.server.invalidport");
+			}else{
+				try{
+					Net.host(result);
+				}catch (IOException e){
+					Vars.ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
+				}
+			}
+		});
 	}
 	
 	public void showAbout(){

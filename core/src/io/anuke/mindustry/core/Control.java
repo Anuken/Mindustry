@@ -49,7 +49,7 @@ public class Control extends Module{
 	final Array<Weapon> weapons = new Array<>();
 	final int[] items = new int[Item.getAllItems().size];
 	
-	public final EntityGroup<Enemy> enemyGroup = Entities.addGroup(Enemy.class);
+	public final EntityGroup<Enemy> enemyGroup = Entities.addGroup(Enemy.class).enableMapping();
 	public final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);
 	public final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
 	public final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class);
@@ -187,7 +187,13 @@ public class Control extends Module{
 		for(int i = 0; i < Vars.saveSlots; i ++){
 			Settings.defaults("save-" + i + "-autosave", true);
 			Settings.defaults("save-" + i + "-name", "untitled");
+			Settings.defaults("save-" + i + "-data", "empty");
 		}
+
+		Settings.defaultList(
+			"ip", "localhost",
+			"port", Vars.port+""
+		);
 		
 		Settings.loadAll("io.anuke.moment");
 		
@@ -196,6 +202,7 @@ public class Control extends Module{
 		}
 		
 		player = new Player();
+		player.isAndroid = Vars.android;
 		player.isLocal = true;
 		
 		spawns = WaveCreator.getSpawns();
@@ -223,9 +230,8 @@ public class Control extends Module{
 		wavetime = waveSpacing();
 		Entities.clear();
 		enemies = 0;
-		
-		if(!android)
-			player.add();
+
+		player.add();
 		
 		player.heal();
 		clearItems();
@@ -355,10 +361,11 @@ public class Control extends Module{
 						try{
 							Enemy enemy = ClassReflection.newInstance(spawn.type);
 							enemy.set(tile.worldx() + Mathf.range(range), tile.worldy() + Mathf.range(range));
-							enemy.spawn = fl;
+							enemy.lane = fl;
 							enemy.tier = spawn.tier(wave, fl);
+							enemy.add();
+
 							Effects.effect(Fx.spawn, enemy);
-							enemy.add(enemyGroup);
 
 							Vars.netServer.handleEnemySpawn(enemy);
 							
@@ -404,6 +411,10 @@ public class Control extends Module{
 	}
 	
 	public void coreDestroyed(){
+		if(Net.active() && Net.server()){
+			Net.closeServer();
+		}
+
 		Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
 		Sounds.play("corexplode");
 		for(int i = 0; i < 16; i ++){
@@ -619,7 +630,7 @@ public class Control extends Module{
 		if(!GameState.is(State.menu)){
 			input.update();
 			
-			if(Inputs.keyTap("pause") && !ui.isGameOver() && (GameState.is(State.paused) || GameState.is(State.playing))){
+			if(Inputs.keyTap("pause") && !ui.isGameOver() && !Net.active() && (GameState.is(State.paused) || GameState.is(State.playing))){
 				GameState.set(GameState.is(State.playing) ? State.paused : State.playing);
 			}
 			
@@ -633,7 +644,7 @@ public class Control extends Module{
 				}
 			}
 		
-			if(!GameState.is(State.paused)){
+			if(!GameState.is(State.paused) || Net.active()){
 				
 				if(respawntime > 0){
 					
@@ -657,7 +668,7 @@ public class Control extends Module{
 					if(enemies <= 0){
 						wavetime -= delta();
 
-						if(lastUpdated < wave + 1 && wavetime < Vars.aheadPathfinding){ //start updatingbeforehand
+						if(lastUpdated < wave + 1 && wavetime < Vars.aheadPathfinding){ //start updating beforehand
 							world.pathfinder().updatePath();
 							lastUpdated = wave + 1;
 						}

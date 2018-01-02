@@ -1,15 +1,14 @@
 package io.anuke.mindustry.world;
 
-import static io.anuke.mindustry.Vars.tilesize;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Mathf;
+
+import static io.anuke.mindustry.Vars.tilesize;
 
 
 public class Tile{
@@ -33,6 +32,10 @@ public class Tile{
 	public Tile(int x, int y, Block floor){
 		this(x, y);
 		iSetFloor(floor);
+	}
+
+	public int packedPosition(){
+		return x + y * Vars.world.width();
 	}
 	
 	private void iSetFloor(Block floor){
