@@ -24,6 +24,7 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.*;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.core.Inputs.Axis;
 import io.anuke.ucore.core.Inputs.DeviceType;
@@ -189,7 +190,8 @@ public class Control extends Module{
 
 		Settings.defaultList(
 			"ip", "localhost",
-			"port", Vars.port+""
+			"port", Vars.port+"",
+			"name", Vars.android ? "player" : UCore.getProperty("user.name")
 		);
 		
 		Settings.loadAll("io.anuke.moment");
@@ -199,6 +201,7 @@ public class Control extends Module{
 		}
 		
 		player = new Player();
+		player.name = Settings.getString("name");
 		player.isAndroid = Vars.android;
 		player.isLocal = true;
 		

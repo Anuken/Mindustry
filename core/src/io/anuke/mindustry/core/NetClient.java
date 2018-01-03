@@ -51,7 +51,7 @@ public class NetClient extends Module {
             });
 
             ConnectPacket c = new ConnectPacket();
-            c.name = UCore.getProperty("user.name");
+            c.name = Vars.player.name;
             c.android = Vars.android;
             Net.send(c, SendMode.tcp);
 

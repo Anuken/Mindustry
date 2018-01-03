@@ -97,7 +97,7 @@ public class Player extends DestructibleEntity implements Syncable{
 
 		String part = isAndroid ? "ship" : "mech";
 		
-		if(Vars.snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate")){
+		if(Vars.snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate") && isLocal){
 			Draw.rect(part+"-"+mech.name(), (int)x, (int)y, angle-90);
 		}else{
 			Draw.rect(part+"-"+mech.name(), x, y, angle-90);

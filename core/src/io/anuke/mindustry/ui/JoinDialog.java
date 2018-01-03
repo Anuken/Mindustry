@@ -63,6 +63,17 @@ public class JoinDialog extends FloatingDialog {
     void setup(){
         hosts.background("button");
         content().clear();
+
+        content().table(t -> {
+            t.add("$text.name").padRight(10);
+            t.addField(Settings.getString("name"), text -> {
+                if(text.isEmpty()) return;
+                Vars.player.name = text;
+                Settings.put("name", text);
+                Settings.save();
+            }).grow().pad(8);
+        }).width(w).height(70f).pad(4);
+        content().row();
         content().add(hosts).width(w).pad(0);
         content().row();
         content().addButton("$text.joingame.byip", "clear", join::show).width(w).height(80f);

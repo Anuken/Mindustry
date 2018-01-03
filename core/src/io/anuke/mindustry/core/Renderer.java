@@ -196,6 +196,8 @@ public class Renderer extends RendererModule{
 
 		if(pixelate)
 			Graphics.flushSurface();
+
+		drawPlayerNames();
 		
 		batch.end();
 	}
@@ -210,6 +212,16 @@ public class Renderer extends RendererModule{
 	public void clearTiles(){
 		blocks.clearTiles();
 	}
+
+	void drawPlayerNames(){
+        Draw.tscl(0.25f/2);
+	    for(Player player : Vars.control.playerGroup.all()){
+	        if(!player.isLocal){
+	            Draw.text(player.name, player.x, player.y - 8);
+            }
+        }
+        Draw.tscl(Vars.fontscale);
+    }
 
 	void drawEnemyMarkers(){
 		Graphics.surface(indicatorSurface);
