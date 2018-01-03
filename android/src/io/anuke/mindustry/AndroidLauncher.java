@@ -76,6 +76,15 @@ public class AndroidLauncher extends AndroidApplication{
 			public void openDonations() {
 				showDonations();
 			}
+
+			@Override
+			public void requestWritePerms() {
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+					if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+						requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_REQUEST_CODE);
+					}
+				}
+			}
 		};
 
 		if(doubleScaleTablets && isTablet(this.getContext())){

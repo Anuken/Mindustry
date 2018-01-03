@@ -60,11 +60,9 @@ public class DesktopLauncher {
 				}
 			}
 
-			@Override
-			public void addDialog(TextField field){}
-
-			@Override
-			public void openDonations(){}
+			@Override public void addDialog(TextField field){}
+			@Override public void openDonations(){}
+			@Override public void requestWritePerms() {}
 
 			@Override
 			public void onSceneChange(String state, String details, String icon) {

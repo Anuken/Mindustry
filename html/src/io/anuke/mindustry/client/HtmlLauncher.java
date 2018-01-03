@@ -110,17 +110,11 @@ public class HtmlLauncher extends GwtApplication {
 				Window.open(link, "_blank", "");
 			}
 
-			@Override
-			public void addDialog(TextField field){}
-
-            @Override
-            public void onSceneChange(String state, String details, String icon) {}
-
-            @Override
-            public void onGameExit() {}
-
-            @Override
-            public void openDonations() {}
+            @Override public void onSceneChange(String state, String details, String icon) {}
+            @Override public void onGameExit() {}
+            @Override public void addDialog(TextField field){}
+            @Override public void openDonations(){}
+            @Override public void requestWritePerms() {}
         };
         
         return new Mindustry();

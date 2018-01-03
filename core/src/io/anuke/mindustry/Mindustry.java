@@ -30,6 +30,7 @@ public class Mindustry extends ModuleCore {
 		@Override public void onSceneChange(String state, String details, String icon) {}
 		@Override public void onGameExit() {}
 		@Override public void openDonations() {}
+		@Override public void requestWritePerms() {}
 	};
 	public static OrderedMap<String, Integer> idMap = new OrderedMap<>();
 

@@ -12,4 +12,5 @@ public interface PlatformFunction{
 	public void onSceneChange(String state, String details, String icon);
 	public void onGameExit();
 	public void openDonations();
+	public void requestWritePerms();
 }
