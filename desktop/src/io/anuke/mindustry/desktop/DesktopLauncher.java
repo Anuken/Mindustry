@@ -109,7 +109,7 @@ public class DesktopLauncher {
 		    String result = Strings.parseException(e, true);
 		    boolean failed = false;
 
-		    String filename = "crash-report-" + DateFormat.getDateTimeInstance().format(new Date()) + ".txt";
+		    String filename = "crash-report-" + new SimpleDateFormat("dd-MM-yy h:mm:ss").format(new Date()) + ".txt";
 
 		    try{
                 Files.write(Paths.get(filename), result.getBytes());
