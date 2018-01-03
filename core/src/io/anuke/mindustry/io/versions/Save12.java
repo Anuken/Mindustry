@@ -2,9 +2,9 @@ package io.anuke.mindustry.io.versions;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.mindustry.io.SaveFileVersion;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Weapon;
@@ -101,7 +101,7 @@ public class Save12 extends SaveFileVersion {
             int health = stream.readInt();
 
             try{
-                Enemy enemy = ClassReflection.newInstance(enemyIDs.get(type));
+                Enemy enemy = new Enemy(EnemyType.getByID(type));
                 enemy.lane = lane;
                 enemy.health = health;
                 enemy.x = x;
@@ -219,29 +219,18 @@ public class Save12 extends SaveFileVersion {
 
         //--ENEMIES--
 
-        int totalEnemies = 0;
-
         Array<Enemy> enemies = Vars.control.enemyGroup.all();
 
-        for(int i = 0; i < enemies.size; i ++){
-            Enemy enemy = enemies.get(i);
-            if(idEnemies.containsKey(enemy.getClass())){
-                totalEnemies ++;
-            }
-        }
-
-        stream.writeInt(totalEnemies); //enemy amount
+        stream.writeInt(enemies.size); //enemy amount
 
         for(int i = 0; i < enemies.size; i ++){
             Enemy enemy = enemies.get(i);
-            if(idEnemies.containsKey(enemy.getClass())){
-                stream.writeByte(idEnemies.get(enemy.getClass())); //type
-                stream.writeByte(enemy.lane); //lane
-                stream.writeFloat(enemy.x); //x
-                stream.writeFloat(enemy.y); //y
-                stream.writeByte(enemy.tier); //tier
-                stream.writeInt(enemy.health); //health
-            }
+            stream.writeByte(enemy.type.id); //type
+            stream.writeByte(enemy.lane); //lane
+            stream.writeFloat(enemy.x); //x
+            stream.writeFloat(enemy.y); //y
+            stream.writeByte(enemy.tier); //tier
+            stream.writeInt(enemy.health); //health
         }
 
         //--MAP DATA--

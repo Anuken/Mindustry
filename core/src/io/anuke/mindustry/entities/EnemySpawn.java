@@ -1,6 +1,6 @@
 package io.anuke.mindustry.entities;
 
-import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.util.Mathf;
 
@@ -9,7 +9,7 @@ public class EnemySpawn{
 	private static float[] scalings = {4f, 2.5f, 1.5f};
 	
 	/**The enemy type spawned*/
-	public final Class<? extends Enemy> type;
+	public final EnemyType type;
 	/**When this spawns should end*/
 	protected int before = Integer.MAX_VALUE;
 	/**When this spawns should start*/
@@ -29,7 +29,7 @@ public class EnemySpawn{
 	/**Amount of enemies spawned initially, with no scaling*/
 	protected int amount = 1;
 	
-	public EnemySpawn(Class<? extends Enemy> type){
+	public EnemySpawn(EnemyType type){
 		this.type = type;
 	}
 	
@@ -39,10 +39,10 @@ public class EnemySpawn{
 		}
 		float scaling = this.scaling * scalings[(Settings.getInt("difficulty"))];
 		
-		return Math.min(amount-1 + 1 * Math.max((int)((wave / spacing) / scaling), 1) - (tier(wave, lane)-1) * tierscaleback, max);
+		return Math.min(amount-1 + Math.max((int)((wave / spacing) / scaling), 1) - (tier(wave, lane)-1) * tierscaleback, max);
 	}
 	
 	public int tier(int wave, int lane){
-		return Mathf.clamp(tier + (wave-after)/tierscale, 1, Enemy.maxtier);
+		return Mathf.clamp(tier + (wave-after)/tierscale, 1, EnemyType.maxtier);
 	}
 }

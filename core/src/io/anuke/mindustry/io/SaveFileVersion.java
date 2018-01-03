@@ -1,34 +1,10 @@
 package io.anuke.mindustry.io;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import io.anuke.mindustry.entities.enemies.*;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
 public abstract class SaveFileVersion {
-    public static final Array<Class<? extends Enemy>> enemyIDs = Array.with(
-            Enemy.class,
-            FastEnemy.class,
-            RapidEnemy.class,
-            FlamerEnemy.class,
-            TankEnemy.class,
-            BlastEnemy.class,
-            MortarEnemy.class,
-            TestEnemy.class,
-            HealerEnemy.class,
-            TitanEnemy.class,
-            EmpEnemy.class
-    );
-
-    public static final ObjectMap<Class<? extends Enemy>, Byte> idEnemies = new ObjectMap<Class<? extends Enemy>, Byte>(){{
-        for(int i = 0; i < enemyIDs.size; i ++){
-            put(enemyIDs.get(i), (byte)i);
-        }
-    }};
-
     public final int version;
 
     public SaveFileVersion(int version){

@@ -405,7 +405,7 @@ blocks/grassblock2
   index: -1
 blocks/grassedge
   rotate: false
-  xy: 152, 91
+  xy: 124, 91
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -433,7 +433,7 @@ blocks/ice3
   index: -1
 blocks/iceedge
   rotate: false
-  xy: 166, 91
+  xy: 138, 91
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -538,7 +538,7 @@ blocks/lava
   index: -1
 blocks/lavaedge
   rotate: false
-  xy: 95, 75
+  xy: 152, 91
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -650,7 +650,7 @@ blocks/oil
   index: -1
 blocks/oiledge
   rotate: false
-  xy: 109, 75
+  xy: 95, 75
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -839,7 +839,7 @@ blocks/sandblock3
   index: -1
 blocks/sandedge
   rotate: false
-  xy: 95, 47
+  xy: 95, 61
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -937,7 +937,7 @@ blocks/snowblock3
   index: -1
 blocks/snowedge
   rotate: false
-  xy: 95, 33
+  xy: 95, 47
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -1278,72 +1278,44 @@ enemies/empenemy-t3
   orig: 14, 14
   offset: 0, 0
   index: -1
-enemies/enemy-t1
-  rotate: false
-  xy: 646, 243
-  size: 14, 14
-  orig: 14, 14
-  offset: 0, 0
-  index: -1
-enemies/targetenemy-t1
-  rotate: false
-  xy: 646, 243
-  size: 14, 14
-  orig: 14, 14
-  offset: 0, 0
-  index: -1
-enemies/enemy-t2
-  rotate: false
-  xy: 124, 91
-  size: 12, 12
-  orig: 12, 12
-  offset: 0, 0
-  index: -1
-enemies/enemy-t3
-  rotate: false
-  xy: 138, 91
-  size: 12, 12
-  orig: 12, 12
-  offset: 0, 0
-  index: -1
 enemies/fastenemy-t1
   rotate: false
-  xy: 718, 297
+  xy: 646, 243
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/fastenemy-t2
   rotate: false
-  xy: 495, 120
+  xy: 718, 297
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/fastenemy-t3
   rotate: false
-  xy: 492, 104
+  xy: 495, 120
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/flamerenemy-t1
   rotate: false
-  xy: 511, 120
+  xy: 492, 104
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/flamerenemy-t2
   rotate: false
-  xy: 508, 104
+  xy: 511, 120
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/flamerenemy-t3
   rotate: false
-  xy: 519, 208
+  xy: 508, 104
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -1371,65 +1343,93 @@ enemies/fortressenemy-t3
   index: -1
 enemies/healerenemy-t1
   rotate: false
-  xy: 519, 192
+  xy: 519, 208
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/healerenemy-t2
   rotate: false
-  xy: 521, 162
+  xy: 519, 192
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/healerenemy-t3
   rotate: false
-  xy: 521, 146
+  xy: 521, 162
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/mortarenemy-t1
   rotate: false
-  xy: 738, 396
+  xy: 738, 412
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/mortarenemy-t2
   rotate: false
-  xy: 754, 414
+  xy: 738, 396
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/mortarenemy-t3
   rotate: false
-  xy: 754, 398
+  xy: 754, 414
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/rapidenemy-t1
   rotate: false
-  xy: 770, 414
+  xy: 754, 398
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/rapidenemy-t2
   rotate: false
-  xy: 770, 398
+  xy: 770, 414
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/rapidenemy-t3
   rotate: false
+  xy: 770, 398
+  size: 14, 14
+  orig: 14, 14
+  offset: 0, 0
+  index: -1
+enemies/standardenemy-t1
+  rotate: false
   xy: 786, 419
   size: 14, 14
   orig: 14, 14
+  offset: 0, 0
+  index: -1
+enemies/targetenemy-t1
+  rotate: false
+  xy: 786, 419
+  size: 14, 14
+  orig: 14, 14
+  offset: 0, 0
+  index: -1
+enemies/standardenemy-t2
+  rotate: false
+  xy: 109, 61
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+enemies/standardenemy-t3
+  rotate: false
+  xy: 95, 33
+  size: 12, 12
+  orig: 12, 12
   offset: 0, 0
   index: -1
 enemies/tankenemy-t1
@@ -1560,14 +1560,14 @@ laserfull
   index: -1
 mechs/mech-standard
   rotate: false
-  xy: 95, 61
+  xy: 166, 91
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 mechs/ship-standard
   rotate: false
-  xy: 109, 61
+  xy: 109, 75
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -1715,7 +1715,7 @@ ui/icons/controller-cursor
   index: -1
 ui/icons/icon-add
   rotate: false
-  xy: 535, 209
+  xy: 521, 146
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -1729,7 +1729,7 @@ ui/icons/icon-areaDelete
   index: -1
 ui/icons/icon-arrow
   rotate: false
-  xy: 535, 193
+  xy: 535, 209
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -1771,14 +1771,14 @@ ui/icons/icon-back
   index: -1
 ui/icons/icon-cancel
   rotate: false
-  xy: 551, 211
+  xy: 535, 193
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-check
   rotate: false
-  xy: 551, 195
+  xy: 551, 211
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -1827,7 +1827,7 @@ ui/icons/icon-defense
   index: -1
 ui/icons/icon-discord
   rotate: false
-  xy: 567, 211
+  xy: 551, 195
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -1841,28 +1841,28 @@ ui/icons/icon-distribution
   index: -1
 ui/icons/icon-donate
   rotate: false
-  xy: 567, 195
+  xy: 567, 211
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-dots
   rotate: false
-  xy: 583, 213
+  xy: 567, 195
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-editor
   rotate: false
-  xy: 583, 197
+  xy: 583, 213
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-file-text
   rotate: false
-  xy: 599, 216
+  xy: 583, 197
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -1876,21 +1876,21 @@ ui/icons/icon-fill
   index: -1
 ui/icons/icon-floppy
   rotate: false
-  xy: 599, 200
+  xy: 599, 216
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-folder
   rotate: false
-  xy: 615, 216
+  xy: 599, 200
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-folder-parent
   rotate: false
-  xy: 615, 200
+  xy: 615, 216
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -1918,14 +1918,14 @@ ui/icons/icon-holdDelete
   index: -1
 ui/icons/icon-home
   rotate: false
-  xy: 631, 220
+  xy: 615, 200
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-host
   rotate: false
-  xy: 631, 204
+  xy: 631, 220
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -1946,7 +1946,7 @@ ui/icons/icon-line
   index: -1
 ui/icons/icon-load
   rotate: false
-  xy: 647, 227
+  xy: 631, 204
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -2016,7 +2016,7 @@ ui/icons/icon-play
   index: -1
 ui/icons/icon-play-2
   rotate: false
-  xy: 647, 211
+  xy: 647, 227
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -2037,7 +2037,7 @@ ui/icons/icon-production
   index: -1
 ui/icons/icon-quit
   rotate: false
-  xy: 647, 195
+  xy: 647, 211
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -2051,7 +2051,7 @@ ui/icons/icon-redo
   index: -1
 ui/icons/icon-rename
   rotate: false
-  xy: 631, 188
+  xy: 647, 195
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -2065,35 +2065,35 @@ ui/icons/icon-resize
   index: -1
 ui/icons/icon-rotate
   rotate: false
-  xy: 647, 179
+  xy: 631, 188
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-rotate-arrow
   rotate: false
-  xy: 722, 411
+  xy: 647, 179
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-rotate-left
   rotate: false
-  xy: 722, 395
+  xy: 722, 411
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-rotate-right
   rotate: false
-  xy: 724, 365
+  xy: 722, 395
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-save
   rotate: false
-  xy: 724, 349
+  xy: 724, 365
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -2128,7 +2128,7 @@ ui/icons/icon-terrain
   index: -1
 ui/icons/icon-tools
   rotate: false
-  xy: 724, 333
+  xy: 724, 349
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -2149,14 +2149,14 @@ ui/icons/icon-touchDelete
   index: -1
 ui/icons/icon-trash
   rotate: false
-  xy: 724, 317
+  xy: 724, 333
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-tutorial
   rotate: false
-  xy: 738, 412
+  xy: 724, 317
   size: 14, 14
   orig: 14, 14
   offset: 0, 0

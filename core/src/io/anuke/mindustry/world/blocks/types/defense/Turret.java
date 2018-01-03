@@ -149,7 +149,7 @@ public class Turret extends Block{
 			if(entity.target != null){
 				
 				float targetRot = Angles.predictAngle(tile.worldx(), tile.worldy(), 
-						entity.target.x, entity.target.y, entity.target.xvelocity, entity.target.yvelocity, bullet.speed);
+						entity.target.x, entity.target.y, entity.target.velocity.x, entity.target.velocity.y, bullet.speed);
 				
 				if(Float.isNaN(entity.rotation)){
 					entity.rotation = 0;
@@ -192,17 +192,17 @@ public class Turret extends Block{
 		float hittime = dst / bullet.speed;
 		
 		float angle = Angles.predictAngle(tile.worldx(), tile.worldy(), 
-				entity.target.x, entity.target.y, entity.target.xvelocity, entity.target.yvelocity, bullet.speed);
+				entity.target.x, entity.target.y, entity.target.velocity.x, entity.target.velocity.y, bullet.speed);
 		
-		float predictX = entity.target.x + entity.target.xvelocity * hittime, 
-				predictY = entity.target.y + entity.target.yvelocity * hittime;
+		float predictX = entity.target.x + entity.target.velocity.x * hittime,
+				predictY = entity.target.y + entity.target.velocity.y * hittime;
 		
 		Draw.color(Color.GREEN);
 		Draw.line(tile.worldx(), tile.worldy(), entity.target.x, entity.target.y);
 		
 		Draw.color(Color.RED);
-		Draw.line(tile.worldx(), tile.worldy(), entity.target.x + entity.target.xvelocity * hittime, 
-				entity.target.y + entity.target.yvelocity * hittime);
+		Draw.line(tile.worldx(), tile.worldy(), entity.target.x + entity.target.velocity.x * hittime,
+				entity.target.y + entity.target.velocity.y * hittime);
 		
 		Draw.color(Color.PURPLE);
 		Draw.thick(2f);

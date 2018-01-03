@@ -1,10 +1,12 @@
 package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.GameMode;
 import io.anuke.mindustry.world.Tile;
@@ -15,9 +17,6 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 
 import java.io.*;
-
-import static io.anuke.mindustry.io.SaveFileVersion.enemyIDs;
-import static io.anuke.mindustry.io.SaveFileVersion.idEnemies;
 
 public class NetworkIO {
     private static final int fileVersionID = 13;
@@ -45,28 +44,20 @@ public class NetworkIO {
             }
 
             //--ENEMIES--
+            Array<Enemy> enemies = Vars.control.enemyGroup.all();
 
-            int totalEnemies = 0;
+            stream.writeInt(enemies.size); //enemy amount
 
-            for(Enemy entity : Vars.control.enemyGroup.all()){
-                if(idEnemies.containsKey(entity.getClass())){
-                    totalEnemies ++;
-                }
-            }
-
-            stream.writeInt(totalEnemies); //enemy amount
-
-            for(Enemy enemy : Vars.control.enemyGroup.all()){
-                if(idEnemies.containsKey(enemy.getClass())){
-                    stream.writeInt(enemy.id);
-                    stream.writeByte(idEnemies.get(enemy.getClass())); //type
-                    stream.writeByte(enemy.lane); //lane
-                    stream.writeFloat(enemy.x); //x
-                    stream.writeFloat(enemy.y); //y
-                    stream.writeByte(enemy.tier); //tier
-                    stream.writeShort(enemy.health); //health
-                    stream.writeShort(enemy.node); //current node
-                }
+            for(int i = 0; i < enemies.size; i ++){
+                Enemy enemy = enemies.get(i);
+                stream.writeInt(enemy.id);
+                stream.writeByte(enemy.type.id); //type
+                stream.writeByte(enemy.lane); //lane
+                stream.writeFloat(enemy.x); //x
+                stream.writeFloat(enemy.y); //y
+                stream.writeByte(enemy.tier); //tier
+                stream.writeShort(enemy.health); //health
+                stream.writeShort(enemy.node); //current node
             }
 
             //--MAP DATA--
@@ -210,19 +201,15 @@ public class NetworkIO {
                 short health = stream.readShort();
                 short node = stream.readShort();
 
-                try{
-                    Enemy enemy = ClassReflection.newInstance(enemyIDs.get(type));
-                    enemy.id = id;
-                    enemy.lane = lane;
-                    enemy.health = health;
-                    enemy.x = x;
-                    enemy.y = y;
-                    enemy.tier = tier;
-                    enemy.node = node;
-                    enemy.add(Vars.control.enemyGroup);
-                }catch (Exception e){
-                    throw new RuntimeException(e);
-                }
+                Enemy enemy = new Enemy(EnemyType.getByID(type));
+                enemy.id = id;
+                enemy.lane = lane;
+                enemy.health = health;
+                enemy.x = x;
+                enemy.y = y;
+                enemy.tier = tier;
+                enemy.node = node;
+                enemy.add(Vars.control.enemyGroup);
             }
 
             Vars.control.setWaveData(enemies, wave, wavetime);

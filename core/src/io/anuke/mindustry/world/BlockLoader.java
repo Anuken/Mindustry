@@ -117,10 +117,6 @@ public class BlockLoader {
             //add any new block sections here
         };
 
-        for(Block block : Block.getAllBlocks()){
-            UCore.log("\""+block.name+"\"", block.id, "");
-        }
-
         for(String string : defaultMap.keys()){
             Block block = Block.getByName(string);
             blockmap.put(defaultMap.get(string, -1), block);

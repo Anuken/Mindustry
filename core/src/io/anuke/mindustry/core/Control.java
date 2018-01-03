@@ -5,15 +5,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.Shield;
 import io.anuke.mindustry.entities.enemies.Enemy;
-import io.anuke.mindustry.entities.enemies.FortressEnemy;
-import io.anuke.mindustry.entities.enemies.HealerEnemy;
+import io.anuke.mindustry.entities.enemies.EnemyTypes;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.DesktopInput;
@@ -356,21 +354,17 @@ public class Control extends Module{
 					float range = 12f;
 					
 					Timers.run(index*5f, ()->{
-						try{
-							Enemy enemy = ClassReflection.newInstance(spawn.type);
-							enemy.set(tile.worldx() + Mathf.range(range), tile.worldy() + Mathf.range(range));
-							enemy.lane = fl;
-							enemy.tier = spawn.tier(wave, fl);
-							enemy.add();
 
-							Effects.effect(Fx.spawn, enemy);
+						Enemy enemy = new Enemy(spawn.type);
+						enemy.set(tile.worldx() + Mathf.range(range), tile.worldy() + Mathf.range(range));
+						enemy.lane = fl;
+						enemy.tier = spawn.tier(wave, fl);
+						enemy.add();
 
-							Vars.netServer.handleEnemySpawn(enemy);
-							
-							enemies ++;
-						}catch (Exception e){
-							throw new RuntimeException(e);
-						}
+						Effects.effect(Fx.spawn, enemy);
+						Vars.netServer.handleEnemySpawn(enemy);
+
+						enemies ++;
 					});
 				}
 			}
@@ -601,10 +595,10 @@ public class Control extends Module{
 			
 			if(Inputs.keyTap(Keys.Y)){
 				if(Inputs.keyDown(Keys.SHIFT_LEFT)){
-					new HealerEnemy().set(player.x, player.y).add();
+					new Enemy(EnemyTypes.healer).set(player.x, player.y).add();
 				}else{
 					float px = player.x, py = player.y;
-					Timers.run(30f, ()-> new FortressEnemy().set(px, py).add());
+					Timers.run(30f, ()-> new Enemy(EnemyTypes.fortress).set(px, py).add());
 				}
 			}
 		}

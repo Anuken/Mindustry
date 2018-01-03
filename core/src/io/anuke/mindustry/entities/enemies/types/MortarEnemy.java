@@ -1,12 +1,14 @@
-package io.anuke.mindustry.entities.enemies;
+package io.anuke.mindustry.entities.enemies.types;
 
 import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.enemies.EnemyType;
 
-public class MortarEnemy extends Enemy{
+public class MortarEnemy extends EnemyType {
 
 	public MortarEnemy() {
+		super("mortarenemy");
 		
-		maxhealth = 200;
+		health = 200;
 		speed = 0.25f;
 		reload = 100f;
 		bullet = BulletType.shell;
@@ -14,8 +16,6 @@ public class MortarEnemy extends Enemy{
 		rotatespeed = 0.05f;
 		range = 120f;
 		mass = 1.2f;
-		
-		heal();
 	}
 
 }

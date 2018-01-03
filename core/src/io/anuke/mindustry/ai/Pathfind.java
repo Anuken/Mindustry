@@ -5,9 +5,9 @@ import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
@@ -28,25 +28,27 @@ public class Pathfind{
 			findNode(enemy);
 		}
 		
-		if(enemy.path == null){
-			return vector.set(enemy.x, enemy.y);
-		}else if(enemy.node == -2){
+		if(enemy.node == -2){
 			enemy.node = -1;
 		}
+
+		if(enemy.node < 0 || Vars.control.getSpawnPoints().get(enemy.lane).pathTiles == null){
+			return vector.set(enemy.x, enemy.y);
+		}
+
+		Tile[] path = Vars.control.getSpawnPoints().get(enemy.lane).pathTiles;
 		
-		Tile[] path = enemy.path;
-		
-		
-		if(enemy.idletime > Enemy.maxIdle){
+		if(enemy.idletime > EnemyType.maxIdle){
 			//TODO reverse
 			Tile target = path[enemy.node];
-			if(Vars.world.raycastWorld(enemy.x, enemy.y, target.worldx(), target.worldy()) != null){
-				if(enemy.node > 1)
+			if(Vars.world.raycastWorld(enemy.x, enemy.y, target.worldx(), target.worldy()) != null) {
+				if (enemy.node > 1)
 					enemy.node = enemy.node - 1;
 				enemy.idletime = 0;
-			}else{
-				//must be blocked by a playermade block, do nothing
 			}
+
+			//else, must be blocked by a playermade block, do nothing
+
 		}
 		
 		//-1 is only possible here if both pathfindings failed, which should NOT happen
@@ -157,22 +159,24 @@ public class Pathfind{
 			return;
 		}
 		
-		enemy.path = Vars.control.getSpawnPoints().get(enemy.lane).pathTiles;
+		Tile[] path = Vars.control.getSpawnPoints().get(enemy.lane).pathTiles;
 		
-		int closest = findClosest(enemy.path, enemy.x, enemy.y);
+		int closest = findClosest(path, enemy.x, enemy.y);
 		
-		closest = Mathf.clamp(closest, 1, enemy.path.length-1);
+		closest = Mathf.clamp(closest, 1, path.length-1);
 		if(closest == -1){
 			return;
 		}
-		
-		Tile end = enemy.path[closest];
+
 		enemy.node = closest;
-		
+
+		//TODO
+
+		//Tile end = path[closest];
 		//if the enemy can't get to this node, teleport to it
-		if(enemy.node < enemy.path.length - 2 && Vars.world.raycastWorld(enemy.x, enemy.y, end.worldx(), end.worldy()) != null){
+		//if(enemy.node < path.length - 2 && Vars.world.raycastWorld(enemy.x, enemy.y, end.worldx(), end.worldy()) != null){
 		//	Timers.run(Mathf.random(20f), () -> enemy.set(end.worldx(), end.worldy()));
-		}
+		//}
 	}
 	
 	private static int findClosest(Tile[] tiles, float x, float y){
