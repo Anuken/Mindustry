@@ -46,4 +46,16 @@ public abstract class SaveFileVersion {
 
     public abstract void read(DataInputStream stream) throws IOException;
     public abstract void write(DataOutputStream stream) throws IOException;
+
+    public static void writeString(DataOutputStream stream, String string) throws IOException{
+        stream.writeByte(string.length());
+        stream.writeBytes(string);
+    }
+
+    public static String readString(DataInputStream stream) throws IOException{
+        int length = stream.readByte();
+        byte[] result = new byte[length];
+        stream.read(result);
+        return new String(result);
+    }
 }

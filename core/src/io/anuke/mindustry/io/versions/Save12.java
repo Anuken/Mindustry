@@ -8,7 +8,7 @@ import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.io.SaveFileVersion;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Weapon;
-import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.BlockLoader;
 import io.anuke.mindustry.world.GameMode;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
@@ -149,7 +149,7 @@ public class Save12 extends SaveFileVersion {
             int blockid = stream.readInt();
 
             Tile tile = Vars.world.tile(pos % Vars.world.width(), pos / Vars.world.width());
-            tile.setBlock(Block.getByID(blockid));
+            tile.setBlock(BlockLoader.getByOldID(blockid));
             tile.link = link;
 
             if(hasEntity){

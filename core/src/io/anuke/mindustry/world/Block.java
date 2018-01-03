@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
@@ -21,6 +22,7 @@ import io.anuke.ucore.util.Tmp;
 public class Block{
 	private static int lastid;
 	private static Array<Block> blocks = new Array<Block>();
+	private static ObjectMap<String, Block> map = new ObjectMap<>();
 	
 	protected static TextureRegion temp = new TextureRegion();
 
@@ -88,6 +90,11 @@ public class Block{
 		this.solid = false;
 		this.id = lastid++;
 
+		if(map.containsKey(name)){
+			throw new RuntimeException("Two blocks cannot have the same names! Problematic block: " + name);
+		}
+
+		map.put(name, this);
 		blocks.add(this);
 	}
 
@@ -257,6 +264,10 @@ public class Block{
 	
 	public static Array<Block> getAllBlocks(){
 		return blocks;
+	}
+
+	public static Block getByName(String name){
+		return map.get(name);
 	}
 	
 	public static Block getByID(int id){

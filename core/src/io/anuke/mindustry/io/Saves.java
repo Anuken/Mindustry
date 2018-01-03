@@ -82,6 +82,7 @@ public class Saves {
         saves.add(slot);
         SaveIO.saveToSlot(slot.index);
         slot.meta = SaveIO.getData(slot.index);
+        current = slot;
     }
 
     public Array<SaveSlot> getSaveSlots(){

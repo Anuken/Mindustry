@@ -102,6 +102,18 @@ public class ProductionBlocks{
 			craftEffect = Fx.purifystone;
 		}
 	},
+
+	siliconextractor = new LiquidCrafter("siliconextractor"){
+		{
+			input = Item.sand;
+			inputAmount = 5;
+			inputLiquid = Liquid.water;
+			liquidAmount = 18.99f;
+			output = Item.sand;
+			health = 50;
+			purifyTime = 50;
+		}
+	},
 	
 	stonedrill = new Drill("stonedrill"){
 		{
@@ -207,16 +219,4 @@ public class ProductionBlocks{
 			breaktime *= 2.3f;
 		}
 	};
-	/*
-	siliconextractor = new LiquidCrafter("siliconextractor"){
-		{
-			input = Item.sand;
-			inputAmount = 5;
-			inputLiquid = Liquid.water;
-			liquidAmount = 18.99f;
-			output = Item.sand;
-			health = 50;
-			purifyTime = 50;
-		}
-	}*/;
 }

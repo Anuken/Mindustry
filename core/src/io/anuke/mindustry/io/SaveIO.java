@@ -1,22 +1,31 @@
 package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Base64Coder;
-import com.badlogic.gdx.utils.OrderedMap;
+import com.badlogic.gdx.utils.IntMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.versions.Save12;
 import io.anuke.mindustry.io.versions.Save13;
+import io.anuke.mindustry.io.versions.Save14;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Settings;
 
 import java.io.*;
 
 public class SaveIO{
+	public static final IntMap<SaveFileVersion> versions = new IntMap<>();
+	public static final Array<SaveFileVersion> versionArray = Array.with(
+			new Save12(),
+			new Save13(),
+			new Save14()
+	);
 
-	public static final OrderedMap<Integer, SaveFileVersion> versions = new OrderedMap(){{
-		put(12, new Save12());
-		put(13, new Save13());
-	}};
+	static{
+		for(SaveFileVersion version : versionArray){
+			versions.put(version.version, version);
+		}
+	}
 
 	public static void saveToSlot(int slot){
 		if(Vars.gwt){
@@ -26,11 +35,12 @@ public class SaveIO{
 			Settings.save();
 		}else{
 			FileHandle file = fileFor(slot);
-			file.moveTo(file.sibling(file.name() + "-backup." + file.extension()));
+			boolean exists = file.exists();
+			if(exists) file.moveTo(file.sibling(file.name() + "-backup." + file.extension()));
 			try {
 				write(fileFor(slot));
 			}catch (Exception e){
-				file.sibling(file.name() + "-backup." + file.extension()).moveTo(file);
+				if(exists) file.sibling(file.name() + "-backup." + file.extension()).moveTo(file);
 				throw new RuntimeException(e);
 			}
 		}
@@ -156,6 +166,6 @@ public class SaveIO{
 	}
 
 	public static SaveFileVersion getVersion(){
-		return versions.get(versions.orderedKeys().peek());
+		return versionArray.peek();
 	}
 }

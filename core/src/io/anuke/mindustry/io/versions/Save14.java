@@ -1,6 +1,7 @@
 package io.anuke.mindustry.io.versions;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.Vars;
@@ -8,7 +9,10 @@ import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.io.SaveFileVersion;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Weapon;
-import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.GameMode;
+import io.anuke.mindustry.world.Generator;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.mindustry.world.blocks.types.Rock;
@@ -22,10 +26,11 @@ import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.android;
 
-public class Save13 extends SaveFileVersion {
+public class Save14 extends SaveFileVersion{
 
-    public Save13(){
-        super(13);
+
+    public Save14(){
+        super(14);
     }
 
     @Override
@@ -44,6 +49,19 @@ public class Save13 extends SaveFileVersion {
 
         int wave = stream.readInt();
         float wavetime = stream.readFloat();
+
+        //block header
+
+        int blocksize = stream.readInt();
+
+        IntMap<Block> map = new IntMap<>();
+
+        for(int i = 0; i < blocksize; i ++){
+            String name = readString(stream);
+            int id = stream.readShort();
+
+            map.put(id, Block.getByName(name));
+        }
 
         float playerx = stream.readFloat();
         float playery = stream.readFloat();
@@ -157,7 +175,7 @@ public class Save13 extends SaveFileVersion {
             int blockid = stream.readInt();
 
             Tile tile = Vars.world.tile(pos % Vars.world.width(), pos / Vars.world.width());
-            tile.setBlock(BlockLoader.getByOldID(blockid));
+            tile.setBlock(map.get(blockid));
 
             if(blockid == Blocks.blockpart.id){
                 tile.link = stream.readByte();
@@ -194,6 +212,16 @@ public class Save13 extends SaveFileVersion {
 
         stream.writeInt(Vars.control.getWave()); //wave
         stream.writeFloat(Vars.control.getWaveCountdown()); //wave countdown
+
+        //--BLOCK HEADER--
+
+        stream.writeInt(Block.getAllBlocks().size);
+
+        for(int i = 0; i < Block.getAllBlocks().size; i ++){
+            Block block = Block.getAllBlocks().get(i);
+            writeString(stream, block.name);
+            stream.writeShort(block.id);
+        }
 
         stream.writeFloat(Vars.player.x); //player x/y
         stream.writeFloat(Vars.player.y);
@@ -326,5 +354,4 @@ public class Save13 extends SaveFileVersion {
             }
         }
     }
-
 }
