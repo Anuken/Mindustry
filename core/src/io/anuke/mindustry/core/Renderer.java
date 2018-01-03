@@ -2,9 +2,7 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -155,46 +153,6 @@ public class Renderer extends RendererModule{
 			if(Vars.debug) record(); //this only does something if GdxGifRecorder is on the class path, which it usually isn't
 		}
 	}
-	FrameBuffer buffer = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
-	
-	void drawTest(){
-		camera.update();
-		
-		clearScreen(clearColor);
-		
-		Core.batch.setProjectionMatrix(camera.combined);
-		
-		Graphics.surface(pixelSurface, false);
-		
-		Draw.color(1f, 1f, 1f, Mathf.absin(Timers.time(), 10f, 1f));
-		Draw.rect("blank", camera.position.x, camera.position.y, camera.viewportWidth, camera.viewportHeight);
-		Draw.color();
-		
-		Graphics.surface(shadowSurface);
-		Draw.color(Color.RED);
-		Draw.alpha(0.5f);
-		Draw.rect("blank", camera.position.x, camera.position.y, 100, 100);
-		Draw.color();
-		Graphics.flushSurface();
-		
-		Graphics.flushSurface();
-		Graphics.end();
-	}
-	
-	void drawTest2(){
-		camera.update();
-		
-		clearScreen(clearColor);
-		Core.batch.setProjectionMatrix(camera.combined);
-
-		Graphics.surface(pixelSurface, false);
-		
-		Draw.color(1f, 1f, 1f, 0.3f);
-		Draw.rect("blank", camera.position.x, camera.position.y, camera.viewportWidth, camera.viewportHeight);
-		Draw.color();
-		
-		Graphics.flushSurface();
-	}
 
 	@Override
 	public void draw(){
@@ -285,8 +243,6 @@ public class Renderer extends RendererModule{
 		Graphics.surface();
 		
 		for(int i = 0; i < shieldHits.size / 3; i++){
-			//float x = hits.get(i*3+0);
-			//float y = hits.get(i*3+1);
 			float time = shieldHits.get(i * 3 + 2);
 
 			time += Timers.delta() / shieldHitDuration;
