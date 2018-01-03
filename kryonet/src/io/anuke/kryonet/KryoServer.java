@@ -10,6 +10,7 @@ import io.anuke.mindustry.net.Net.ServerProvider;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
 import io.anuke.mindustry.net.Packets.KickPacket;
+import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.net.Registrator;
 import io.anuke.mindustry.net.Streamable;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
@@ -104,8 +105,10 @@ public class KryoServer implements ServerProvider {
     @Override
     public void kick(int connection) {
         Connection conn = getByID(connection);
+        KickPacket p = new KickPacket();
+        p.reason = (byte)KickReason.kick.ordinal();
 
-        conn.sendTCP(new KickPacket());
+        conn.sendTCP(p);
         Timers.runTask(1f, () -> {
             if(conn.isConnected()){
                 conn.close();

@@ -9,6 +9,7 @@ import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.style.Drawable;
 import io.anuke.ucore.scene.ui.Dialog;
+import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.TextField.TextFieldFilter.DigitsOnlyFilter;
 import io.anuke.ucore.scene.ui.layout.Table;
@@ -48,20 +49,24 @@ public class JoinDialog extends FloatingDialog {
 
         setup();
 
-        shown(() -> {
-            hosts.clear();
-            hosts.background("button");
-            hosts.label(() -> "[accent]" + Bundles.get("text.hosts.discovering") + new String(new char[(int)(Timers.time() / 10) % 4]).replace("\0", ".")).pad(10f);
-            Net.discoverServers(list -> {
-                addHosts(list);
-            });
-        });
+        shown(this::refresh);
+    }
+
+    void refresh(){
+        hosts.clear();
+        hosts.background("button");
+        hosts.label(() -> "[accent]" + Bundles.get("text.hosts.discovering") + new String(new char[(int)(Timers.time() / 10) % 4]).replace("\0", ".")).pad(10f);
+        Net.discoverServers(this::addHosts);
     }
 
     void setup(){
         hosts.background("button");
-        content().clear();
 
+        ScrollPane pane = new ScrollPane(hosts, "clear");
+        pane.setFadeScrollBars(false);
+        pane.setScrollingDisabled(true, false);
+
+        content().clear();
         content().table(t -> {
             t.add("$text.name").padRight(10);
             t.addField(Settings.getString("name"), text -> {
@@ -72,7 +77,7 @@ public class JoinDialog extends FloatingDialog {
             }).grow().pad(8);
         }).width(w).height(70f).pad(4);
         content().row();
-        content().add(hosts).width(w).pad(0);
+        content().add(pane).width(w).pad(0);
         content().row();
         content().addButton("$text.joingame.byip", "clear", join::show).width(w).height(80f);
     }
@@ -81,7 +86,9 @@ public class JoinDialog extends FloatingDialog {
         hosts.clear();
 
         if(array.size == 0){
-            hosts.add("$text.hosts.none").pad(20f);
+            hosts.add("$text.hosts.none").pad(10f);
+            hosts.add().growX();
+            hosts.addIButton("icon-loading", 16*2f, this::refresh).pad(-10f).padLeft(0).padTop(-6).size(70f, 74f);
         }else {
             for (Address a : array) {
                 TextButton button = hosts.addButton("[accent]"+a.name, "clear", () -> {

@@ -115,6 +115,10 @@ public class Packets {
     }
 
     public static class KickPacket{
+        public byte reason;
+    }
 
+    public enum KickReason{
+        kick, invalidPassword
     }
 }

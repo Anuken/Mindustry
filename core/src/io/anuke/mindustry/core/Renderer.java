@@ -217,7 +217,7 @@ public class Renderer extends RendererModule{
         Draw.tscl(0.25f/2);
 	    for(Player player : Vars.control.playerGroup.all()){
 	        if(!player.isLocal){
-	            Draw.text(player.name, player.x, player.y - 8);
+	            Draw.text(player.name, player.x, player.y - 9);
             }
         }
         Draw.tscl(Vars.fontscale);
