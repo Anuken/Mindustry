@@ -302,7 +302,7 @@ public class Control extends Module{
 		
 		Timers.run(18, ()-> ui.hideLoading());
 
-		Mindustry.platforms.onSceneChange("Playing on map: " + map.name, "Wave 0", "fight");
+		Mindustry.platforms.onSceneChange("Playing on map: " + map.name, "Wave 1", "fight");
 	}
 	
 	public GameMode getMode(){

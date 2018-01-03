@@ -15,8 +15,6 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Strings;
 
-import java.io.IOException;
-
 public class JoinDialog extends FloatingDialog {
     Dialog join;
     Table hosts = new Table();
@@ -45,8 +43,8 @@ public class JoinDialog extends FloatingDialog {
         join.buttons().defaults().size(140f, 60f).pad(4f);
         join.buttons().addButton("$text.cancel", join::hide);
         join.buttons().addButton("$text.ok", () ->
-            connect(Settings.getString("port"), Integer.parseInt(Settings.getString("port")))
-        ).disabled(b -> Settings.getString("ip").isEmpty() || Integer.parseInt(Settings.getString("port")) == Integer.MIN_VALUE);
+            connect(Settings.getString("ip"), Strings.parseInt(Settings.getString("port")))
+        ).disabled(b -> Settings.getString("ip").isEmpty() || Strings.parseInt(Settings.getString("port")) == Integer.MIN_VALUE);
 
         setup();
 
@@ -105,9 +103,27 @@ public class JoinDialog extends FloatingDialog {
         Timers.runTask(2f, () -> {
             try{
                 Net.connect(ip, port);
-            }catch (IOException e) {
-                Vars.ui.showError(Bundles.format("text.connectfail", Strings.parseException(e, false)));
+            }catch (Exception e) {
+                Throwable t = e;
+                while(t.getCause() != null){
+                    t = t.getCause();
+                }
+                String error = t.getMessage() == null ? "" : t.getMessage().toLowerCase();
+                if(error.contains("connection refused")) {
+                    error = "connection refused";
+                }else if(error.contains("port out of range")){
+                    error = "invalid port!";
+                }else if(error.contains("invalid argument")) {
+                    error = "invalid IP or port!";
+                }else if(t.getClass().toString().toLowerCase().contains("sockettimeout")){
+                    error = "timed out!";
+                }else{
+                    error = Strings.parseException(e, false);
+                }
+                Vars.ui.showError(Bundles.format("text.connectfail", error));
                 Vars.ui.hideLoading();
+
+                e.printStackTrace();
             }
         });
     }
