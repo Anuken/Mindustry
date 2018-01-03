@@ -8,7 +8,7 @@ git config --global user.name $GHUSERNAME
 git clone https://github.com/Anuken/Mindustry.wiki.git
 cd Mindustry.wiki
 
-DESKFILE=$TRAVIS_COMMIT"-desktop-bleeding-edge.jar"
+DESKFILE=$TRAVIS_BUILD_NUMBER"-desktop-bleeding-edge.jar"
 cp ../desktop/build/libs/desktop-release.jar $DESKFILE
 
 FILE1="Bleeding-Edge-Build-$TRAVIS_BUILD_NUMBER.md"
