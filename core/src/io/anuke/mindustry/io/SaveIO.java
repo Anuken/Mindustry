@@ -25,7 +25,14 @@ public class SaveIO{
 			Settings.putString("save-"+slot+"-data", new String(Base64Coder.encode(stream.toByteArray())));
 			Settings.save();
 		}else{
-			write(fileFor(slot));
+			FileHandle file = fileFor(slot);
+			file.moveTo(file.sibling(file.name() + "-backup." + file.extension()));
+			try {
+				write(fileFor(slot));
+			}catch (Exception e){
+				file.sibling(file.name() + "-backup." + file.extension()).moveTo(file);
+				throw new RuntimeException(e);
+			}
 		}
 	}
 	
