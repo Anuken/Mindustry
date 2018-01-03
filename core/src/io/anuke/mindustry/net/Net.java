@@ -65,6 +65,11 @@ public class Net{
 		});
 	}
 
+	/**Kick a specified connection from the server.*/
+	public static void kickConnection(int id){
+		serverProvider.kick(id);
+	}
+
 	/**Returns a list of all connections IDs.*/
 	public static IntArray getConnections(){
 		return serverProvider.getConnections();
@@ -215,10 +220,12 @@ public class Net{
 		public void close();
 		/**Return all connected users.*/
 		public IntArray getConnections();
-		/**Register classes to be sent.*/
-		public void register(Class<?>... types);
+		/**Kick a certain connection.*/
+		public void kick(int connection);
 		/**Returns the ping for a certain connection.*/
 		public int getPingFor(int connection);
+		/**Register classes to be sent.*/
+		public void register(Class<?>... types);
 		/**Close all connections.*/
 		public void dispose();
 	}

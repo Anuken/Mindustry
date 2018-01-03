@@ -34,6 +34,7 @@ public class Registrator {
                 ConnectPacket.class,
                 DisconnectPacket.class,
                 ChatPacket.class,
+                KickPacket.class,
 
                 Class.class,
                 byte[].class,

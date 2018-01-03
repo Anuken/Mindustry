@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.layout.Unit;
@@ -19,6 +20,11 @@ public class BorderImage extends Image{
 	
 	public BorderImage(Texture texture, float thick){
 		super(texture);
+		thickness = thick;
+	}
+
+	public BorderImage(TextureRegion region, float thick){
+		super(region);
 		thickness = thick;
 	}
 	

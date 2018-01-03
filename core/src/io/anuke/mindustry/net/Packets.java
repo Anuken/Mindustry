@@ -113,4 +113,8 @@ public class Packets {
         public String name;
         public String text;
     }
+
+    public static class KickPacket{
+
+    }
 }

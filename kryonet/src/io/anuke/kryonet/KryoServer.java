@@ -9,11 +9,13 @@ import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Net.ServerProvider;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
+import io.anuke.mindustry.net.Packets.KickPacket;
 import io.anuke.mindustry.net.Registrator;
 import io.anuke.mindustry.net.Streamable;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamChunk;
 import io.anuke.ucore.UCore;
+import io.anuke.ucore.core.Timers;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -97,6 +99,18 @@ public class KryoServer implements ServerProvider {
     @Override
     public IntArray getConnections() {
         return connections;
+    }
+
+    @Override
+    public void kick(int connection) {
+        Connection conn = getByID(connection);
+
+        conn.sendTCP(new KickPacket());
+        Timers.runTask(1f, () -> {
+            if(conn.isConnected()){
+                conn.close();
+            }
+        });
     }
 
     @Override

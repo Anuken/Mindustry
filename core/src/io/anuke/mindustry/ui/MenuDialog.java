@@ -62,7 +62,7 @@ public class MenuDialog extends FloatingDialog{
 				}else {
 					ui.showHostServer();
 				}
-			}).disabled(b -> Net.active() || (Net.active() && !Net.server()));
+			}).disabled(b -> Net.active());
 
             content().row();
 
@@ -96,7 +96,14 @@ public class MenuDialog extends FloatingDialog{
 			
 			new imagebutton("icon-load", isize, () -> load.show()).text("$text.load").padTop(4f).disabled(Net.active());
 
-			new imagebutton("icon-host", isize, () -> ui.showHostServer()).text("$text.host").padTop(4f);
+			new imagebutton("icon-host", isize, () -> {
+				if(Vars.world.getMap().custom){
+					ui.showError("$text.nohost");
+				}else {
+					ui.showHostServer();
+				}
+			}).text("$text.host")
+					.disabled(b -> Net.active()).padTop(4f);
 			
 			new imagebutton("icon-quit", isize, () -> {
 				Vars.ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {

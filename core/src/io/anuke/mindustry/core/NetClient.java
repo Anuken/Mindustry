@@ -37,6 +37,7 @@ import java.util.Arrays;
 public class NetClient extends Module {
     boolean connecting = false;
     boolean gotEntities = false;
+    boolean kicked = false;
     float playerSyncTime = 2;
     float dataTimeout = 60*10;
 
@@ -45,6 +46,7 @@ public class NetClient extends Module {
         Net.handle(Connect.class, packet -> {
             connecting = true;
             gotEntities = false;
+            kicked = false;
             Gdx.app.postRunnable(() -> {
                 Vars.ui.hideLoading();
                 Vars.ui.showLoading("$text.connecting.data");
@@ -65,6 +67,8 @@ public class NetClient extends Module {
         });
 
         Net.handle(Disconnect.class, packet -> {
+            if(kicked) return;
+
             Gdx.app.postRunnable(() -> {
                 Timers.runFor(3f, () -> {
                     Vars.ui.hideLoading();
@@ -263,6 +267,12 @@ public class NetClient extends Module {
 
         Net.handle(ChatPacket.class, packet -> {
             //TODO
+        });
+
+        Net.handle(KickPacket.class, packet -> {
+            kicked = true;
+            Net.disconnect();
+            Gdx.app.postRunnable(() -> Vars.ui.showError("$text.server.kicked"));
         });
     }
 

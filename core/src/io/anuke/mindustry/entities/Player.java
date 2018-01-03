@@ -21,7 +21,7 @@ public class Player extends DestructibleEntity implements Syncable{
 	private static final float speed = 1.1f;
 	private static final float dashSpeed = 1.8f;
 
-	public String name = "player name";
+	public String name = "name";
 	public transient Weapon weapon = Weapon.blaster;
 	public Mech mech = Mech.standard;
 	public float angle;
