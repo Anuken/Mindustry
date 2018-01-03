@@ -260,6 +260,10 @@ public class NetClient extends Module {
         Net.handle(Player.class, player -> {
             player.add();
         });
+
+        Net.handle(ChatPacket.class, packet -> {
+            //TODO
+        });
     }
 
     public void update(){
@@ -270,6 +274,12 @@ public class NetClient extends Module {
         }else if(!connecting){
             Net.disconnect();
         }
+    }
+
+    public void handleSendMessage(String message){
+        ChatPacket packet = new ChatPacket();
+        packet.text = message;
+        Net.send(packet, SendMode.tcp);
     }
 
     public void handleShoot(Weapon weapon, float x, float y, float angle){

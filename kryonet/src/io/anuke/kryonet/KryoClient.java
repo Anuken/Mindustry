@@ -3,10 +3,7 @@ package io.anuke.kryonet;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
-import com.esotericsoftware.kryonet.Client;
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.FrameworkMessage;
-import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.kryonet.*;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.net.Address;
 import io.anuke.mindustry.net.Net;
@@ -15,9 +12,12 @@ import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
 import io.anuke.mindustry.net.Registrator;
+import io.anuke.ucore.UCore;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.util.Arrays;
 import java.util.List;
 
 public class KryoClient implements ClientProvider{
@@ -25,6 +25,23 @@ public class KryoClient implements ClientProvider{
 
     public KryoClient(){
         client = new Client();
+        client.setDiscoveryHandler(new ClientDiscoveryHandler() {
+            @Override
+            public DatagramPacket onRequestNewDatagramPacket() {
+                return new DatagramPacket(new byte[4], 4);
+            }
+
+            @Override
+            public void onDiscoveredHost(DatagramPacket datagramPacket) {
+                //TODO doesn't send data
+                UCore.log("DATA HOST FOUND: " + Arrays.toString(datagramPacket.getData()));
+            }
+
+            @Override
+            public void onFinally() {
+
+            }
+        });
         client.start();
         client.addListener(new Listener(){
             @Override

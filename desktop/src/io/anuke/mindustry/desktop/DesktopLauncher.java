@@ -70,6 +70,8 @@ public class DesktopLauncher {
 			public void onSceneChange(String state, String details, String icon) {
 				DiscordRPC lib = DiscordRPC.INSTANCE;
 
+				if(lib == null) return;
+
 				String applicationId = "397335883319083018";
 
 				DiscordEventHandlers handlers = new DiscordEventHandlers();
@@ -79,7 +81,7 @@ public class DesktopLauncher {
 				DiscordRichPresence presence = new DiscordRichPresence();
 				presence.startTimestamp = System.currentTimeMillis() / 1000; // epoch second
 				presence.state = state;
-				//presence.details = details;
+				presence.details = details;
 				presence.largeImageKey = "logo";
 				presence.largeImageText = details;
 				lib.Discord_UpdatePresence(presence);

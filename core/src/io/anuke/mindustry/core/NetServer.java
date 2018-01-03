@@ -150,6 +150,18 @@ public class NetServer extends Module{
 
             Net.sendExcept(Net.getLastConnection(), packet, SendMode.tcp);
         });
+
+        Net.handleServer(ChatPacket.class, packet -> {
+            Player player = connections.get(Net.getLastConnection());
+
+            if(player == null)
+                return; //GHOSTS AAAA
+
+            //TODO add to chat fragment
+
+            packet.name = player.name;
+            Net.send(packet, SendMode.tcp);
+        });
     }
 
     //TODO decide whether to use effects

@@ -312,7 +312,6 @@ public class UI extends SceneModule{
 		updateItems();
 
 		build.end();
-
 	}
 	
 	public void showGameError(){

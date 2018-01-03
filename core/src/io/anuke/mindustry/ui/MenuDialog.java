@@ -56,8 +56,13 @@ public class MenuDialog extends FloatingDialog{
 
 			content().row();
 
-			content().addButton("$text.hostserver", () -> ui.showHostServer())
-                    .disabled(b -> Net.active() || (Net.active() && !Net.server()));
+			content().addButton("$text.hostserver", () ->{
+				if(Vars.world.getMap().custom){
+					ui.showError("$text.nohost");
+				}else {
+					ui.showHostServer();
+				}
+			}).disabled(b -> Net.active() || (Net.active() && !Net.server()));
 
             content().row();
 

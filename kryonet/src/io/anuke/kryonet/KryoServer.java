@@ -2,10 +2,7 @@ package io.anuke.kryonet;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.IntArray;
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.FrameworkMessage;
-import com.esotericsoftware.kryonet.Listener;
-import com.esotericsoftware.kryonet.Server;
+import com.esotericsoftware.kryonet.*;
 import com.esotericsoftware.kryonet.util.InputStreamSender;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
@@ -19,6 +16,9 @@ import io.anuke.mindustry.net.Streamable.StreamChunk;
 import io.anuke.ucore.UCore;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
 import java.util.Arrays;
 
 public class KryoServer implements ServerProvider {
@@ -27,6 +27,22 @@ public class KryoServer implements ServerProvider {
 
     public KryoServer(){
         server = new Server();
+        server.setDiscoveryHandler(new ServerDiscoveryHandler() {
+            private ByteBuffer buffer = ByteBuffer.allocate(4);
+
+            {
+                buffer.putInt(987264236);
+            }
+
+            @Override
+            public boolean onDiscoverHost(DatagramChannel datagramChannel, InetSocketAddress fromAddress) throws IOException {
+                //TODO doesn't send data
+                UCore.log("SENDING DATA: " + Arrays.toString(buffer.array()));
+                datagramChannel.send(this.buffer, fromAddress);
+                return true;
+            }
+        });
+
         Thread thread = new Thread(server, "Kryonet Server");
         thread.setDaemon(true);
         thread.start();

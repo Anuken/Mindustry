@@ -24,7 +24,6 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.*;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.core.Inputs.Axis;
 import io.anuke.ucore.core.Inputs.DeviceType;
@@ -33,7 +32,6 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.graphics.Atlas;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Input;
 import io.anuke.ucore.util.InputProxy;
 import io.anuke.ucore.util.Mathf;
@@ -76,7 +74,6 @@ public class Control extends Module{
     private InputProxy proxy;
     private float controlx, controly;
     private boolean controlling;
-    private Map map;
 	
 	public Control(){
 		if(Mindustry.args.contains("-debug", false))
@@ -302,9 +299,7 @@ public class Control extends Module{
 		
 		Timers.run(18, ()-> ui.hideLoading());
 
-		this.map = map;
-
-		Mindustry.platforms.onSceneChange(Bundles.get("text.playing", "Playing on map") + ": " + map.name, Bundles.get("text.wavenumber", "Wave") + " 0", "fight");
+		Mindustry.platforms.onSceneChange("Playing on map: " + map.name, "Wave 0", "fight");
 	}
 	
 	public GameMode getMode(){
@@ -335,7 +330,7 @@ public class Control extends Module{
 	}
 	
 	public void runWave(){
-		Mindustry.platforms.onSceneChange(Bundles.get("text.playing", "Playing on map") + ": " + map.name, Bundles.get("text.wavenumber", "Wave") + " " + wave, "fight");
+
 		if(Net.client() && Net.active()){
 			return;
 		}
@@ -390,20 +385,9 @@ public class Control extends Module{
 		
 		wavetime = waveSpacing();
 		extrawavetime = maxwavespace;
-	}
-	
-	void printEnemies(int wave){
-		int total = 0;
-		for(EnemySpawn spawn : spawns){
-			int spawnamount = spawn.evaluate(wave, 0);
-			total += spawnamount;
-			
-			if(spawnamount > 0){
-				UCore.log(ClassReflection.getSimpleName(spawn.type) + " t" + spawn.tier(wave, 0) + " x" + spawnamount);
-			}
-		}
-		
-		UCore.log("Total: " + total);
+
+        Mindustry.platforms.onSceneChange("Playing on map: "
+                + Vars.world.getMap().name, "Wave " + wave, "fight");
 	}
 	
 	public void enemyDeath(){
