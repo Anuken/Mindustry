@@ -10,11 +10,11 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Angles;
 
-public class FortressEnemy extends EnemyType {
+public class FortressType extends EnemyType {
 	final int maxSpawn = 6;
 	final float spawnTime = 190;
 
-	public FortressEnemy() {
+	public FortressType() {
 		super("fortressenemy");
 		
 		speed = 0.25f;

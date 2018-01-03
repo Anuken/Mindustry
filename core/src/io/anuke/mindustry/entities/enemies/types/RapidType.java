@@ -3,9 +3,9 @@ package io.anuke.mindustry.entities.enemies.types;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.enemies.EnemyType;
 
-public class RapidEnemy extends EnemyType {
+public class RapidType extends EnemyType {
 
-	public RapidEnemy() {
+	public RapidType() {
 		super("rapidenemy");
 		
 		reload = 8;

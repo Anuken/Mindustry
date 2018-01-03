@@ -7,9 +7,9 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
-public class TitanEnemy extends EnemyType {
+public class TitanType extends EnemyType {
 
-	public TitanEnemy() {
+	public TitanType() {
 		super("titanenemy");
 		
 		speed = 0.26f;

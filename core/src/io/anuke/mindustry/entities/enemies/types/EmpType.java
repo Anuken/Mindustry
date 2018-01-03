@@ -3,9 +3,9 @@ package io.anuke.mindustry.entities.enemies.types;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.enemies.EnemyType;
 
-public class EmpEnemy extends EnemyType {
+public class EmpType extends EnemyType {
 
-	public EmpEnemy() {
+	public EmpType() {
 		super("empenemy");
 		
 		speed = 0.3f;

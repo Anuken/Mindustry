@@ -10,9 +10,9 @@ import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 
-public class TargetEnemy extends EnemyType {
+public class TargetType extends EnemyType {
 	
-	public TargetEnemy(){
+	public TargetType(){
 		super("targetenemy");
 
 		speed = 0f;

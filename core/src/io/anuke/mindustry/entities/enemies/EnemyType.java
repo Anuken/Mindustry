@@ -102,7 +102,7 @@ public class EnemyType {
         }
 
         if(enemy.target == null || alwaysRotate){
-            enemy.angle = Mathf.slerp(enemy.angle, 180f + enemy.velocity.angle(), rotatespeed * Timers.delta());
+            enemy.angle = Mathf.slerp(enemy.angle, enemy.velocity.angle(), rotatespeed * Timers.delta());
         }else{
             enemy.angle = Mathf.slerp(enemy.angle, enemy.angleTo(enemy.target), turretrotatespeed * Timers.delta());
         }

@@ -3,9 +3,9 @@ package io.anuke.mindustry.entities.enemies.types;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.enemies.EnemyType;
 
-public class MortarEnemy extends EnemyType {
+public class MortarType extends EnemyType {
 
-	public MortarEnemy() {
+	public MortarType() {
 		super("mortarenemy");
 		
 		health = 200;
