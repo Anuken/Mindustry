@@ -23,4 +23,18 @@ echo "### Commit #"$TRAVIS_COMMIT".${NEWLINE}Desktop JAR download: [Link]("$DESK
 git add $FILE1
 git add $DESKFILE
 git commit -m "Added a new bleeding edge build"
+
+# now remove old build
+
+OLD_TRAVIS_BUILD_NUMBER=`expr $TRAVIS_BUILD_NUMBER - 7`
+OLD_DESKFILE=$OLD_TRAVIS_BUILD_BUMBER"-desktop-bleeding-edge.jar"
+OLD_FILE1="Bleeding-Edge-Build-$OLD_TRAVIS_BUILD_NUMBER.md"
+
+if [ -e $OLD_FILE1 ]; then
+    rm -f $OLD_FILE1
+    rm -f $OLD_DESKFILE
+    git add $OLD_FILE1
+    git add $OLD_DESKFILE
+fi
+
 git push https://$GHUSERNAME:$GHPASSWORD@github.com/Anuken/Mindustry.wiki.git --all
