@@ -5,9 +5,9 @@ import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.ucore.util.Angles;
 
-public class TankEnemy extends EnemyType {
+public class TankType extends EnemyType {
 
-	public TankEnemy() {
+	public TankType() {
 		super("tankenemy");
 		
 		health = 350;

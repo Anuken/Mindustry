@@ -2,9 +2,9 @@ package io.anuke.mindustry.entities.enemies.types;
 
 import io.anuke.mindustry.entities.enemies.EnemyType;
 
-public class StandardEnemy extends EnemyType {
+public class StandardType extends EnemyType {
 
-    public StandardEnemy(){
+    public StandardType(){
         super("standardenemy");
     }
 }

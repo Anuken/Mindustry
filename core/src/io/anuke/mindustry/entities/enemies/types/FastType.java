@@ -2,9 +2,9 @@ package io.anuke.mindustry.entities.enemies.types;
 
 import io.anuke.mindustry.entities.enemies.EnemyType;
 
-public class FastEnemy extends EnemyType {
+public class FastType extends EnemyType {
 
-	public FastEnemy() {
+	public FastType() {
 		super("fastenemy");
 		
 		speed = 0.73f;

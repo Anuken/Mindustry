@@ -14,9 +14,9 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.util.Angles;
 
-public class HealerEnemy extends EnemyType {
+public class HealerType extends EnemyType {
 
-	public HealerEnemy() {
+	public HealerType() {
 		super("healerenemy");
 		
 		speed = 0.25f;

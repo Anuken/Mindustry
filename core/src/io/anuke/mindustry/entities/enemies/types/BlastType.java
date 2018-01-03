@@ -10,9 +10,9 @@ import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.ucore.util.Tmp;
 
-public class BlastEnemy extends EnemyType {
+public class BlastType extends EnemyType {
 
-	public BlastEnemy() {
+	public BlastType() {
 		super("blastenemy");
 		health = 30;
 		speed = 0.7f;

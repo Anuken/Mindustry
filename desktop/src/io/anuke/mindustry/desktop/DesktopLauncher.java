@@ -37,6 +37,11 @@ public class DesktopLauncher {
 		config.setWindowedMode(960, 540);
 		config.setWindowIcon("sprites/icon.png");
 
+		DiscordRPC lib = DiscordRPC.INSTANCE;
+		String applicationId = "397335883319083018";
+		DiscordEventHandlers handlers = new DiscordEventHandlers();
+		lib.Discord_Initialize(applicationId, handlers, true, "");
+
 		Mindustry.platforms = new PlatformFunction(){
 			DateFormat format = SimpleDateFormat.getDateTimeInstance();
 			
@@ -66,22 +71,13 @@ public class DesktopLauncher {
 
 			@Override
 			public void onSceneChange(String state, String details, String icon) {
-				DiscordRPC lib = DiscordRPC.INSTANCE;
-
-				if(lib == null) return;
-
-				String applicationId = "397335883319083018";
-
-				DiscordEventHandlers handlers = new DiscordEventHandlers();
-
-				lib.Discord_Initialize(applicationId, handlers, true, "");
-
 				DiscordRichPresence presence = new DiscordRichPresence();
 				presence.startTimestamp = System.currentTimeMillis() / 1000; // epoch second
 				presence.state = state;
 				presence.details = details;
 				presence.largeImageKey = "logo";
 				presence.largeImageText = details;
+
 				lib.Discord_UpdatePresence(presence);
       		}
 
