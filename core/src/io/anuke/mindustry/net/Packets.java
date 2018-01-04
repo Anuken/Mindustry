@@ -1,7 +1,6 @@
 package io.anuke.mindustry.net;
 
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.enemies.Enemy;
 
 /**Class for storing all packets.*/
 public class Packets {
@@ -86,8 +85,7 @@ public class Packets {
     }
 
     public static class EnemySpawnPacket{
-        public Class<? extends Enemy> type;
-        public byte lane, tier;
+        public byte type, lane, tier;
         public float x, y;
         public int id;
     }

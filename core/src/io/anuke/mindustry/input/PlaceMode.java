@@ -1,14 +1,11 @@
 package io.anuke.mindustry.input;
 
-import static io.anuke.mindustry.Vars.*;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.Block;
@@ -19,6 +16,8 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
+
+import static io.anuke.mindustry.Vars.*;
 
 public enum PlaceMode{
 	cursor{
@@ -32,23 +31,23 @@ public enum PlaceMode{
 			float x = tilex * Vars.tilesize;
 			float y = tiley * Vars.tilesize;
 			
-			boolean valid = control.getInput().validPlace(tilex, tiley, player.recipe.result) && (android || control.getInput().cursorNear());
+			boolean valid = control.getInput().validPlace(tilex, tiley, control.getInput().recipe.result) && (android || control.getInput().cursorNear());
 
-			Vector2 offset = player.recipe.result.getPlaceOffset();
+			Vector2 offset = control.getInput().recipe.result.getPlaceOffset();
 
 			float si = MathUtils.sin(Timers.time() / 6f) + 1.5f;
 
 			Draw.color(valid ? Colors.get("place") : Colors.get("placeInvalid"));
 			Draw.thickness(2f);
-			Draw.linecrect(x + offset.x, y + offset.y, tilesize * player.recipe.result.width + si, 
-					tilesize * player.recipe.result.height + si);
+			Draw.linecrect(x + offset.x, y + offset.y, tilesize * control.getInput().recipe.result.width + si, 
+					tilesize * control.getInput().recipe.result.height + si);
 
-			player.recipe.result.drawPlace(tilex, tiley, player.placerot, valid);
+			control.getInput().recipe.result.drawPlace(tilex, tiley, control.getInput().rotation, valid);
 			Draw.thickness(2f);
 
-			if(player.recipe.result.rotate){
+			if(control.getInput().recipe.result.rotate){
 				Draw.color(Colors.get("placeRotate"));
-				Tmp.v1.set(7, 0).rotate(player.placerot * 90);
+				Tmp.v1.set(7, 0).rotate(control.getInput().rotation * 90);
 				Draw.line(x, y, x + Tmp.v1.x, y + Tmp.v1.y);
 			}
 			
@@ -95,12 +94,12 @@ public enum PlaceMode{
 				if(tile.isLinked())
 					tile = tile.getLinked();
 				Vector2 offset = tile.block().getPlaceOffset();
-				float fract = player.breaktime / tile.getBreakTime();
+				float fract = control.getInput().breaktime / tile.getBreakTime();
 				
 				if(Inputs.buttonDown(Buttons.RIGHT)){
 					Draw.color(Color.YELLOW, Color.SCARLET, fract);
 					Draw.linecrect(tile.worldx() + offset.x, tile.worldy() + offset.y, tile.block().width * Vars.tilesize, tile.block().height * Vars.tilesize);
-				}else if(android && player.breaktime > 0){
+				}else if(android && control.getInput().breaktime > 0){
 					Draw.color(Colors.get("breakStart"), Colors.get("break"), fract);
 					Draw.polygon(25, tile.worldx() + offset.x, tile.worldy() + offset.y, 4 + (1f - fract) * 26);
 				}
@@ -254,7 +253,7 @@ public enum PlaceMode{
 			}
 			
 			float t = Vars.tilesize;
-			Block block = player.recipe.result;
+			Block block = control.getInput().recipe.result;
 			Vector2 offset = block.getPlaceOffset();
 			
 			process(tilex, tiley, endx, endy);
@@ -296,15 +295,15 @@ public enum PlaceMode{
 						int px = tx + cx * Mathf.sign(ex - tx), 
 						py = ty + cy * Mathf.sign(ey - ty);
 						
-						if(!control.getInput().validPlace(px, py, player.recipe.result) 
-								|| !control.hasItems(player.recipe.requirements, amount)){
+						if(!control.getInput().validPlace(px, py, control.getInput().recipe.result) 
+								|| !control.hasItems(control.getInput().recipe.requirements, amount)){
 							Draw.linecrect(px * t + offset.x, py * t + offset.y, t*block.width, t*block.height);
 						}
 						amount ++;
 					}
 				}
 				
-				if(player.recipe.result.rotate){
+				if(control.getInput().recipe.result.rotate){
 					float cx = tx * t, cy = ty * t;
 					Draw.color(Colors.get("placeRotate"));
 					Tmp.v1.set(7, 0).rotate(rotation * 90);
@@ -317,7 +316,7 @@ public enum PlaceMode{
 		public void released(int tilex, int tiley, int endx, int endy){
 			process(tilex, tiley, endx, endy);
 			
-			player.placerot = this.rotation;
+			control.getInput().rotation = this.rotation;
 			
 			boolean first = true;
 			for(int x = 0; x <= Math.abs(this.endx - this.tilex); x ++){
@@ -356,7 +355,7 @@ public enum PlaceMode{
 			else if(endy < tiley)
 				rotation = 3;
 			else 
-				rotation = player.placerot;
+				rotation = control.getInput().rotation;
 			
 			if(endx < tilex){
 				int t = endx;

@@ -3,14 +3,13 @@ package io.anuke.mindustry.core;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.compression.Lzma;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.io.NetworkIO;
 import io.anuke.mindustry.net.Net;
@@ -178,18 +177,14 @@ public class NetClient extends Module {
 
         Net.handle(EnemySpawnPacket.class, spawn -> {
             Gdx.app.postRunnable(() -> {
-                try{
-                    Enemy enemy = ClassReflection.newInstance(spawn.type);
-                    enemy.set(spawn.x, spawn.y);
-                    enemy.tier = spawn.tier;
-                    enemy.lane = spawn.lane;
-                    enemy.id = spawn.id;
-                    enemy.add();
+                Enemy enemy = new Enemy(EnemyType.getByID(spawn.type));
+                enemy.set(spawn.x, spawn.y);
+                enemy.tier = spawn.tier;
+                enemy.lane = spawn.lane;
+                enemy.id = spawn.id;
+                enemy.add();
 
-                    Effects.effect(Fx.spawn, enemy);
-                }catch (ReflectionException e){
-                    throw new RuntimeException(e);
-                }
+                Effects.effect(Fx.spawn, enemy);
             });
         });
 

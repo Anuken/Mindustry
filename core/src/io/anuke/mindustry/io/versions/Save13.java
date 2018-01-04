@@ -293,7 +293,7 @@ public class Save13 extends SaveFileVersion {
                     if(tile.block() instanceof BlockPart) stream.writeByte(tile.link);
 
                     if(tile.entity != null){
-                        stream.writeByte(tile.getRotation()); //placerot
+                        stream.writeByte(tile.getRotation()); //rotation
                         stream.writeShort(tile.entity.health); //health
                         byte amount = 0;
                         for(int i = 0; i < tile.entity.items.length; i ++){

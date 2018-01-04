@@ -27,7 +27,7 @@ public class Mindustry extends ModuleCore {
 		@Override public String format(int number){ return number + ""; }
 		@Override public void openLink(String link){ }
 		@Override public void addDialog(TextField field){}
-		@Override public void onSceneChange(String state, String details, String icon) {}
+		@Override public void updateRPC() {}
 		@Override public void onGameExit() {}
 		@Override public void openDonations() {}
 		@Override public void requestWritePerms() {}

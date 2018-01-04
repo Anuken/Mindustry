@@ -13,6 +13,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.graphics.BlockRenderer;
 import io.anuke.mindustry.graphics.Shaders;
+import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.SpawnPoint;
@@ -334,11 +335,13 @@ public class Renderer extends RendererModule{
 			tiley = Mathf.scl2(vec.y, tilesize);
 		}
 
+		InputHandler input = control.getInput();
+
 		//draw placement box
-		if((player.recipe != null && Vars.control.hasItems(player.recipe.requirements) && (!ui.hasMouse() || android) 
+		if((input.recipe != null && Vars.control.hasItems(input.recipe.requirements) && (!ui.hasMouse() || android)
 				&& control.input.drawPlace())){
 
-			player.placeMode.draw(control.input.getBlockX(), control.input.getBlockY(), control.input.getBlockEndX(), control.input.getBlockEndY());
+			input.placeMode.draw(control.input.getBlockX(), control.input.getBlockY(), control.input.getBlockEndX(), control.input.getBlockEndY());
 
 			Draw.thickness(1f);
 			Draw.color(Color.SCARLET);
@@ -346,11 +349,11 @@ public class Renderer extends RendererModule{
 				Draw.dashCircle(spawn.start.worldx(), spawn.start.worldy(), enemyspawnspace);
 			}
 			
-			if(player.breakMode == PlaceMode.holdDelete)
-				player.breakMode.draw(tilex, tiley, 0, 0);
+			if(input.breakMode == PlaceMode.holdDelete)
+				input.breakMode.draw(tilex, tiley, 0, 0);
 			
-		}else if(player.breakMode.delete && control.input.drawPlace() && player.recipe == null){ //TODO test!
-			player.breakMode.draw(control.input.getBlockX(), control.input.getBlockY(), 
+		}else if(input.breakMode.delete && control.input.drawPlace() && input.recipe == null){ //TODO test!
+			input.breakMode.draw(control.input.getBlockX(), control.input.getBlockY(),
 					control.input.getBlockEndX(), control.input.getBlockEndY());
 		}
 
@@ -362,7 +365,7 @@ public class Renderer extends RendererModule{
 		Draw.reset();
 
 		//draw selected block health
-		if(player.recipe == null && !ui.hasMouse()){
+		if(input.recipe == null && !ui.hasMouse()){
 			Tile tile = world.tile(tilex, tiley);
 
 			if(tile != null && tile.block() != Blocks.air){

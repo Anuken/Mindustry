@@ -1,18 +1,18 @@
 package io.anuke.mindustry.ui.fragments;
 
-import static io.anuke.mindustry.Vars.*;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.scene.ui.layout.Table;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class ToolFragment implements Fragment{
 	private Table tools;
@@ -20,37 +20,39 @@ public class ToolFragment implements Fragment{
 	public boolean confirming;
 	
 	public void build(){
+		InputHandler input = control.getInput();
+		
 		float isize = 14*3;
 		
 		tools = new Table();
 		
 		tools.addIButton("icon-cancel", isize, () -> {
-			if(player.placeMode == PlaceMode.areaDelete && confirming){
+			if(input.placeMode == PlaceMode.areaDelete && confirming){
 				confirming = false;
 			}else{
-				player.recipe = null;
+				input.recipe = null;
 			}
 		});
 		
 		tools.addIButton("icon-rotate", isize, () -> {
-			player.placerot++;
-			player.placerot %= 4;
+			input.rotation++;
+			input.rotation %= 4;
 		});
 		
 		tools.addIButton("icon-check", isize, () -> {
-			if(player.placeMode == PlaceMode.areaDelete && confirming){
-				player.placeMode.released(px, py, px2, py2);
+			if(input.placeMode == PlaceMode.areaDelete && confirming){
+				input.placeMode.released(px, py, px2, py2);
 				confirming = false;
 			}else{
-				player.placeMode.tapped(control.getInput().getBlockX(), control.getInput().getBlockY());
+				input.placeMode.tapped(control.getInput().getBlockX(), control.getInput().getBlockY());
 			}
 		});
 		
 		Core.scene.add(tools);
 		
 		tools.setVisible(() ->
-			!GameState.is(State.menu) && android && ((player.recipe != null && control.hasItems(player.recipe.requirements) &&
-			player.placeMode == PlaceMode.cursor) || confirming)
+			!GameState.is(State.menu) && android && ((input.recipe != null && control.hasItems(input.recipe.requirements) &&
+			input.placeMode == PlaceMode.cursor) || confirming)
 		);
 		
 		tools.update(() -> {
@@ -63,7 +65,7 @@ public class ToolFragment implements Fragment{
 						Gdx.graphics.getHeight() - control.getInput().getCursorY() - 15*Core.cameraScale, Align.top);
 			}
 
-			if(player.placeMode != PlaceMode.areaDelete){
+			if(input.placeMode != PlaceMode.areaDelete){
 				confirming = false;
 			}
 		});

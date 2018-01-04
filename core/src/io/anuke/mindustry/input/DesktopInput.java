@@ -1,10 +1,7 @@
 package io.anuke.mindustry.input;
 
-import static io.anuke.mindustry.Vars.*;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Weapon;
@@ -15,6 +12,8 @@ import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class DesktopInput extends InputHandler{
 	int mousex, mousey;
@@ -34,14 +33,14 @@ public class DesktopInput extends InputHandler{
 		if(player.isDead()) return;
 
 		if(Inputs.keyRelease("select")){
-			player.placeMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
+			placeMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
 		}
 
 		if(Inputs.keyRelease("break") && !beganBreak){
-			player.breakMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
+			breakMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
 		}
 
-		if((Inputs.keyTap("select") && player.recipe != null) || Inputs.keyTap("break")){
+		if((Inputs.keyTap("select") && recipe != null) || Inputs.keyTap("break")){
 			Vector2 vec = Graphics.world(Gdx.input.getX(), Gdx.input.getY());
 			mousex = (int)vec.x;
 			mousey = (int)vec.y;
@@ -60,23 +59,23 @@ public class DesktopInput extends InputHandler{
 		}
 
 		if(!rotated) {
-			player.placerot += Inputs.getAxis("rotate_alt");
+			rotation += Inputs.getAxis("rotate_alt");
 			rotated = true;
 		}
 		if(!Inputs.getAxisActive("rotate_alt")) rotated = false;
 
 		if(!rotatedAlt) {
-			player.placerot += Inputs.getAxis("rotate");
+			rotation += Inputs.getAxis("rotate");
 			rotatedAlt = true;
 		}
 		if(!Inputs.getAxisActive("rotate")) rotatedAlt = false;
 
-		player.placerot = Mathf.mod(player.placerot, 4);
+		rotation = Mathf.mod(rotation, 4);
 		
 		if(Inputs.keyDown("break")){
-			player.breakMode = PlaceMode.areaDelete;
+			breakMode = PlaceMode.areaDelete;
 		}else{
-			player.breakMode = PlaceMode.hold;
+			breakMode = PlaceMode.hold;
 		}
 		
 		for(int i = 1; i <= 6 && i <= control.getWeapons().size; i ++){
@@ -105,41 +104,41 @@ public class DesktopInput extends InputHandler{
 			beganBreak = false;
 		}
 
-		if(player.recipe != null && Inputs.keyTap("break")){
+		if(recipe != null && Inputs.keyTap("break")){
 			beganBreak = true;
-			player.recipe = null;
+			recipe = null;
 			Cursors.restoreCursor();
 		}
 
 		//block breaking
 		if(enableHold && Inputs.keyDown("break") && cursor != null && validBreak(tilex(), tiley())){
-			player.breaktime += Timers.delta();
-			if(player.breaktime >= cursor.getBreakTime()){
+			breaktime += Timers.delta();
+			if(breaktime >= cursor.getBreakTime()){
 				breakBlock(cursor.x, cursor.y, true);
-				player.breaktime = 0f;
+				breaktime = 0f;
 			}
 		}else{
-			player.breaktime = 0f;
+			breaktime = 0f;
 		}
 
 	}
 
 	public int tilex(){
-		return (player.recipe != null && player.recipe.result.isMultiblock() &&
-				player.recipe.result.width % 2 == 0) ?
+		return (recipe != null && recipe.result.isMultiblock() &&
+				recipe.result.width % 2 == 0) ?
 				Mathf.scl(Graphics.mouseWorld().x, tilesize) : Mathf.scl2(Graphics.mouseWorld().x, tilesize);
 	}
 
 	public int tiley(){
-		return (player.recipe != null && player.recipe.result.isMultiblock() &&
-				player.recipe.result.height % 2 == 0) ?
+		return (recipe != null && recipe.result.isMultiblock() &&
+				recipe.result.height % 2 == 0) ?
 				Mathf.scl(Graphics.mouseWorld().y, tilesize) : Mathf.scl2(Graphics.mouseWorld().y, tilesize);
 	}
 	
 	public int currentWeapon(){
 		int i = 0;
 		for(Weapon weapon : control.getWeapons()){
-			if(player.weapon == weapon)
+			if(weapon == weapon)
 				return i;
 			i ++;
 		}

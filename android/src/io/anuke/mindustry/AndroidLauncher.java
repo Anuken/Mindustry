@@ -67,7 +67,7 @@ public class AndroidLauncher extends AndroidApplication{
 			}
 
 			@Override
-			public void onSceneChange(String state, String details, String icon) { }
+			public void updateRPC() { }
 
 			@Override
 			public void onGameExit() { }

@@ -10,6 +10,8 @@ import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.GameState;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.PlatformFunction;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.scene.ui.TextField;
@@ -38,7 +40,7 @@ public class DesktopLauncher {
 		config.setWindowIcon("sprites/icon.png");
 
 		DiscordRPC lib = DiscordRPC.INSTANCE;
-		String applicationId = "397335883319083018";
+		String applicationId = "398246104468291591";
 		DiscordEventHandlers handlers = new DiscordEventHandlers();
 		lib.Discord_Initialize(applicationId, handlers, true, "");
 
@@ -67,24 +69,34 @@ public class DesktopLauncher {
 
 			@Override public void addDialog(TextField field){}
 			@Override public void openDonations(){}
-			@Override public void requestWritePerms() {}
+			@Override public void requestWritePerms(){}
 
 			@Override
-			public void onSceneChange(String state, String details, String icon) {
+			public void updateRPC() {
 				DiscordRichPresence presence = new DiscordRichPresence();
-				presence.startTimestamp = System.currentTimeMillis() / 1000; // epoch second
-				presence.state = state;
-				presence.details = details;
+
+				if(!GameState.is(State.menu)){
+					presence.state = "Map: " + Strings.capitalize(Vars.world.getMap().name);
+					presence.details = "Wave " + Vars.control.getWave();
+					if(Net.active() ){
+						presence.partyMax = 16;
+						presence.partySize = Vars.control.playerGroup.amount();
+					}
+				}else{
+					presence.state = "In Menu";
+				}
+
+				//presence.startTimestamp = System.currentTimeMillis() / 1000; // epoch second
 				presence.largeImageKey = "logo";
-				presence.largeImageText = details;
+				presence.largeImageText = presence.details;
 
 				lib.Discord_UpdatePresence(presence);
       		}
 
       		@Override
       		public void onGameExit() {
-        DiscordRPC.INSTANCE.Discord_Shutdown();
-      }
+        		DiscordRPC.INSTANCE.Discord_Shutdown();
+      		}
 		};
 		
 		Mindustry.args = Array.with(arg);
@@ -97,7 +109,7 @@ public class DesktopLauncher {
 		}catch (Exception e){
 			e.printStackTrace();
 
-			//don't create crash logs for me, as it's expected
+			//don't create crash logs for me (anuke), as it's expected
 			if(System.getProperty("user.name").equals("anuke")) return;
 
 		    String result = Strings.parseException(e, true);

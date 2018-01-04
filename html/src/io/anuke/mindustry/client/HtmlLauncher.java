@@ -110,7 +110,7 @@ public class HtmlLauncher extends GwtApplication {
 				Window.open(link, "_blank", "");
 			}
 
-            @Override public void onSceneChange(String state, String details, String icon) {}
+            @Override public void updateRPC() {}
             @Override public void onGameExit() {}
             @Override public void addDialog(TextField field){}
             @Override public void openDonations(){}

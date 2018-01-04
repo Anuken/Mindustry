@@ -1,39 +1,33 @@
 package io.anuke.mindustry.ui.fragments;
 
-import static io.anuke.mindustry.Vars.*;
-
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-
-import io.anuke.mindustry.Mindustry;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Section;
 import io.anuke.mindustry.ui.FloatingDialog;
-import io.anuke.ucore.UCore;
-import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.scene.actions.Actions;
-import io.anuke.ucore.scene.builders.button;
-import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Value;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
+
+import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.fontscale;
 
 public class BlocksFragment implements Fragment{
 	private Table desctable, itemtable, blocks;
@@ -42,6 +36,7 @@ public class BlocksFragment implements Fragment{
 	private boolean shown = true;
 	
 	public void build(){
+		InputHandler input = control.getInput();
 
 		new table(){{
 			abottom();
@@ -52,12 +47,12 @@ public class BlocksFragment implements Fragment{
 			blocks = new table(){{
 
 				itemtable = new Table("button");
-				itemtable.setVisible(() -> player.recipe == null);
+				itemtable.setVisible(() -> input.recipe == null);
 
 				desctable = new Table("button");
-				desctable.setVisible(() -> player.recipe != null);
+				desctable.setVisible(() -> input.recipe != null);
 				desctable.update(() -> {
-					if(player.recipe == null && desctable.getChildren().size != 0){
+					if(input.recipe == null && desctable.getChildren().size != 0){
 						desctable.clear();
 					}
 				});
@@ -93,8 +88,8 @@ public class BlocksFragment implements Fragment{
 
 						ImageButton button = new ImageButton("icon-" + sec.name(), "toggle");
 						button.clicked(() -> {
-							if (!table.isVisible() && player.recipe != null) {
-								player.recipe = null;
+							if (!table.isVisible() && input.recipe != null) {
+								input.recipe = null;
 							}
 						});
 						button.setName("sectionbutton" + sec.name());
@@ -117,10 +112,10 @@ public class BlocksFragment implements Fragment{
 							ImageButton image = new ImageButton(region, "select");
 
 							image.clicked(() -> {
-								if (player.recipe == r) {
-									player.recipe = null;
+								if (input.recipe == r) {
+									input.recipe = null;
 								} else {
-									player.recipe = r;
+									input.recipe = r;
 									updateRecipe();
 								}
 							});
@@ -131,7 +126,7 @@ public class BlocksFragment implements Fragment{
 							image.update(() -> {
 								boolean canPlace = !control.getTutorial().active() || control.getTutorial().canPlace();
 								boolean has = (control.hasItems(r.requirements)) && canPlace;
-								image.setChecked(player.recipe == r);
+								image.setChecked(input.recipe == r);
 								image.setTouchable(canPlace ? Touchable.enabled : Touchable.disabled);
 								image.getImage().setColor(has ? Color.WHITE : Hue.lightness(0.33f));
 							});
@@ -174,7 +169,7 @@ public class BlocksFragment implements Fragment{
     }
 	
 	void updateRecipe(){
-		Recipe recipe = player.recipe;
+		Recipe recipe = Vars.control.getInput().recipe;
 		desctable.clear();
 		desctable.setTouchable(Touchable.enabled);
 		

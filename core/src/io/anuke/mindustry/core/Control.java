@@ -299,8 +299,6 @@ public class Control extends Module{
 		});
 		
 		Timers.run(18, ()-> ui.hideLoading());
-
-		Mindustry.platforms.onSceneChange("Playing on map: " + map.name, "Wave 1", "fight");
 	}
 	
 	public GameMode getMode(){
@@ -350,10 +348,9 @@ public class Control extends Module{
 				int spawnamount = spawn.evaluate(wave, lane);
 				
 				for(int i = 0; i < spawnamount; i ++){
-					int index = i;
 					float range = 12f;
 					
-					Timers.run(index*5f, ()->{
+					Timers.run(i*5f, ()->{
 
 						Enemy enemy = new Enemy(spawn.type);
 						enemy.set(tile.worldx() + Mathf.range(range), tile.worldy() + Mathf.range(range));
@@ -383,8 +380,7 @@ public class Control extends Module{
 		wavetime = waveSpacing();
 		extrawavetime = maxwavespace;
 
-        Mindustry.platforms.onSceneChange("Playing on map: "
-                + Vars.world.getMap().name, "Wave " + wave, "fight");
+        Mindustry.platforms.updateRPC();
 	}
 	
 	public void enemyDeath(){
@@ -399,9 +395,7 @@ public class Control extends Module{
 		Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
 		Sounds.play("corexplode");
 		for(int i = 0; i < 16; i ++){
-			Timers.run(i*2, ()->{
-				Effects.effect(Fx.explosion, core.worldx()+Mathf.range(40), core.worldy()+Mathf.range(40));
-			});
+			Timers.run(i*2, ()-> Effects.effect(Fx.explosion, core.worldx()+Mathf.range(40), core.worldy()+Mathf.range(40)));
 		}
 		Effects.effect(Fx.coreexplosion, core.worldx(), core.worldy());
 		
@@ -516,7 +510,9 @@ public class Control extends Module{
 		
 		Entities.initPhysics();
 		
-		Entities.setCollider(tilesize, (x, y) -> world.solid(x, y));
+		Entities.setCollider(tilesize, world::solid);
+
+		Mindustry.platforms.updateRPC();
 	}
 	
 	@Override

@@ -28,6 +28,12 @@ import io.anuke.ucore.util.Tmp;
 import static io.anuke.mindustry.Vars.*;
 
 public abstract class InputHandler extends InputAdapter{
+	public float breaktime = 0;
+	public Recipe recipe;
+	public int rotation;
+	public PlaceMode placeMode = android ? PlaceMode.cursor : PlaceMode.hold;
+	public PlaceMode breakMode = android ? PlaceMode.none : PlaceMode.holdDelete;
+
 	public abstract void update();
 	public abstract float getCursorX();
 	public abstract float getCursorY();
@@ -50,17 +56,17 @@ public abstract class InputHandler extends InputAdapter{
 	}
 	
 	public boolean tryPlaceBlock(int x, int y, boolean sound){
-		if(player.recipe != null && 
-				validPlace(x, y, player.recipe.result) && !ui.hasMouse() && cursorNear() &&
-				Vars.control.hasItems(player.recipe.requirements)){
+		if(recipe != null && 
+				validPlace(x, y, recipe.result) && !ui.hasMouse() && cursorNear() &&
+				Vars.control.hasItems(recipe.requirements)){
 			
-			placeBlock(x, y, player.recipe.result, player.placerot, true, sound);
+			placeBlock(x, y, recipe.result, rotation, true, sound);
 			
-			for(ItemStack stack : player.recipe.requirements){
+			for(ItemStack stack : recipe.requirements){
 				Vars.control.removeItem(stack);
 			}
 			
-			if(!Vars.control.hasItems(player.recipe.requirements)){
+			if(!Vars.control.hasItems(recipe.requirements)){
 				Cursors.restoreCursor();
 			}
 			return true;
@@ -77,7 +83,7 @@ public abstract class InputHandler extends InputAdapter{
 	}
 	
 	public boolean round2(){
-		return !(player.recipe != null && player.recipe.result.isMultiblock() && player.recipe.result.height % 2 == 0);
+		return !(recipe != null && recipe.result.isMultiblock() && recipe.result.height % 2 == 0);
 	}
 	
 	public boolean validPlace(int x, int y, Block type){
@@ -116,7 +122,7 @@ public abstract class InputHandler extends InputAdapter{
 			Block block = Vars.control.getTutorial().getPlaceBlock();
 			
 			if(type != block || point.x != x - control.getCore().x || point.y != y - control.getCore().y 
-					|| (rotation != -1 && rotation != Vars.player.placerot)){
+					|| (rotation != -1 && rotation != this.rotation)){
 				return false;
 			}
 		}else if(Vars.control.getTutorial().active()){
@@ -160,7 +166,7 @@ public abstract class InputHandler extends InputAdapter{
 				Block block = Vars.control.getTutorial().getPlaceBlock();
 			
 				if(block != Blocks.air || point.x != x - control.getCore().x || point.y != y - control.getCore().y 
-						|| (rotation != -1 && rotation != Vars.player.placerot)){
+						|| (rotation != -1 && rotation != this.rotation)){
 					return false;
 				}
 			}else{

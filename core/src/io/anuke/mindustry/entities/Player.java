@@ -2,10 +2,8 @@ package io.anuke.mindustry.entities;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.graphics.Fx;
-import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.net.Syncable;
 import io.anuke.mindustry.resource.Mech;
-import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
@@ -32,12 +30,6 @@ public class Player extends DestructibleEntity implements Syncable{
 	public transient int clientid;
 	public transient boolean isLocal = false;
 	public transient Interpolator<Player> inter = new Interpolator<>(SyncType.player);
-
-	public transient float breaktime = 0;
-	public transient Recipe recipe;
-	public transient int placerot;
-	public transient PlaceMode placeMode = android ? PlaceMode.cursor : PlaceMode.hold;
-	public transient PlaceMode breakMode = android ? PlaceMode.none : PlaceMode.holdDelete;
 	
 	public Player(){
 		hitbox.setSize(5);
@@ -132,7 +124,7 @@ public class Player extends DestructibleEntity implements Syncable{
 		vector.y += ya*speed;
 		vector.x += xa*speed;
 		
-		boolean shooting = !Inputs.keyDown("dash") && Inputs.keyDown("shootInternal") && recipe == null
+		boolean shooting = !Inputs.keyDown("dash") && Inputs.keyDown("shootInternal") && control.getInput().recipe == null
 				&& !ui.hasMouse() && !control.getInput().onConfigurable();
 		
 		if(shooting && Timers.get(this, "reload", weapon.reload)){

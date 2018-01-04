@@ -201,7 +201,7 @@ public class NetServer extends Module{
 
     public void handleEnemySpawn(Enemy enemy){
         EnemySpawnPacket packet = new EnemySpawnPacket();
-        packet.type = enemy.getClass();
+        packet.type = enemy.type.id;
         packet.lane = (byte)enemy.lane;
         packet.tier = (byte)enemy.tier;
         packet.x = enemy.x;

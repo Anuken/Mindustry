@@ -1,11 +1,8 @@
 package io.anuke.mindustry.input;
 
-import static io.anuke.mindustry.Vars.*;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
@@ -19,6 +16,8 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class AndroidInput extends InputHandler{
 	public float lmousex, lmousey;
@@ -38,7 +37,7 @@ public class AndroidInput extends InputHandler{
 	@Override public float getCursorEndY(){ return Gdx.input.getY(0); }
 	@Override public float getCursorX(){ return mousex; }
 	@Override public float getCursorY(){ return mousey; }
-	@Override public boolean drawPlace(){ return (placing && !brokeBlock) || (player.placeMode.pan && player.recipe != null); }
+	@Override public boolean drawPlace(){ return (placing && !brokeBlock) || (placeMode.pan && recipe != null); }
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button){
@@ -47,10 +46,10 @@ public class AndroidInput extends InputHandler{
 			return false;
 		}
 		
-		if(placing && pointer == 0 && !player.placeMode.pan && !breaking()){
-			player.placeMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
-		}else if(pointer == 0 && !player.breakMode.pan && breaking() && drawPlace()){
-			player.breakMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
+		if(placing && pointer == 0 && !placeMode.pan && !breaking()){
+			placeMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
+		}else if(pointer == 0 && !breakMode.pan && breaking() && drawPlace()){
+			breakMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
 		}
 		placing = false;
 		return false;
@@ -64,7 +63,7 @@ public class AndroidInput extends InputHandler{
 		lmousex = screenX;
 		lmousey = screenY;
 		
-		if((!player.placeMode.pan || breaking()) && pointer == 0){
+		if((!placeMode.pan || breaking()) && pointer == 0){
 			mousex = screenX;
 			mousey = screenY;
 		}
@@ -105,18 +104,18 @@ public class AndroidInput extends InputHandler{
 
 	public void breakBlock(){
 		Tile tile = selected();
-		player.breaktime += Timers.delta();
+		breaktime += Timers.delta();
 
-		if(player.breaktime >= tile.block().breaktime){
+		if(breaktime >= tile.block().breaktime){
 			brokeBlock = true;
 			breakBlock(tile.x, tile.y, true);
-			player.breaktime = 0f;
+			breaktime = 0f;
 		}
 	}
 
 	@Override
 	public void update(){
-		enableHold = player.breakMode == PlaceMode.holdDelete;
+		enableHold = breakMode == PlaceMode.holdDelete;
 
 		float scl = Settings.getInt("sensitivity")/100f * Unit.dp.scl(1f);
 		float xa = Inputs.getAxis("move_x");
@@ -127,9 +126,9 @@ public class AndroidInput extends InputHandler{
 		player.x += xa * 4f;
 		player.y += ya * 4f;
 
-		player.placerot += Inputs.getAxis("rotate_alt");
-		player.placerot += Inputs.getAxis("rotate");
-		player.placerot = Mathf.mod(player.placerot, 4);
+		rotation += Inputs.getAxis("rotate_alt");
+		rotation += Inputs.getAxis("rotate");
+		rotation = Mathf.mod(rotation, 4);
 
 		if(enableHold && Gdx.input.isTouched(0) && Mathf.near2d(lmousex, lmousey, Gdx.input.getX(0), Gdx.input.getY(0), Unit.dp.scl(50))
 				&& !ui.hasMouse()){
@@ -146,11 +145,11 @@ public class AndroidInput extends InputHandler{
 				return;
 
 			if(warmup > warmupDelay && validBreak(sel.x, sel.y)){
-				player.breaktime += Timers.delta();
+				breaktime += Timers.delta();
 
-				if(player.breaktime > selected().block().breaktime){
+				if(breaktime > selected().block().breaktime){
 					breakBlock();
-					player.breaktime = 0;
+					breaktime = 0;
 				}
 			}
 
@@ -158,7 +157,7 @@ public class AndroidInput extends InputHandler{
 			mousey = ly;
 		}else{
 			warmup = 0;
-			player.breaktime = 0;
+			breaktime = 0;
 
 			mousex = Mathf.clamp(mousex, 0, Gdx.graphics.getWidth());
 			mousey = Mathf.clamp(mousey, 0, Gdx.graphics.getHeight());
@@ -167,17 +166,17 @@ public class AndroidInput extends InputHandler{
 	
 	@Override
 	public boolean tryPlaceBlock(int x, int y, boolean sound){
-		if(player.recipe != null && 
-				validPlace(x, y, player.recipe.result) && cursorNear() &&
-				Vars.control.hasItems(player.recipe.requirements)){
+		if(recipe != null && 
+				validPlace(x, y, recipe.result) && cursorNear() &&
+				Vars.control.hasItems(recipe.requirements)){
 			
-			placeBlock(x, y, player.recipe.result, player.placerot, true, sound);
+			placeBlock(x, y, recipe.result, rotation, true, sound);
 			
-			for(ItemStack stack : player.recipe.requirements){
+			for(ItemStack stack : recipe.requirements){
 				Vars.control.removeItem(stack);
 			}
 			
-			if(!Vars.control.hasItems(player.recipe.requirements)){
+			if(!Vars.control.hasItems(recipe.requirements)){
 				Cursors.restoreCursor();
 			}
 			return true;
@@ -186,6 +185,6 @@ public class AndroidInput extends InputHandler{
 	}
 
 	public boolean breaking(){
-		return player.recipe == null;
+		return recipe == null;
 	}
 }

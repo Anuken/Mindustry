@@ -1,9 +1,6 @@
 package io.anuke.mindustry.core;
 
-import static io.anuke.mindustry.Vars.*;
-
 import com.badlogic.gdx.math.GridPoint2;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Item;
@@ -21,6 +18,9 @@ import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
+
+import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.world;
 
 public class Tutorial{
 	private Stage stage;
@@ -274,7 +274,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				Vars.player.recipe = null;
+				control.getInput().recipe = null;
 			}
 		},
 		drillInfo{
@@ -348,7 +348,8 @@ public class Tutorial{
 				for(int i = 0; i < 4; i ++){
 					world.tile(control.core.x + 2, control.core.y - 2 + i).setBlock(DistributionBlocks.conveyor, 1);
 				}
-				Vars.player.recipe = null;
+
+				control.getInput().recipe = null;
 			}
 		},
 		turretExplanation{

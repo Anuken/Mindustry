@@ -1,14 +1,11 @@
 package io.anuke.mindustry.world.blocks;
 
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.defense.CoreBlock;
 import io.anuke.mindustry.world.blocks.types.production.*;
-import io.anuke.ucore.core.Effects;
 
 public class ProductionBlocks{
 	public static final Block
@@ -152,32 +149,8 @@ public class ProductionBlocks{
 		}
 	},
 	
-	omnidrill = new Drill("omnidrill"){
-		{
-			drillEffect = Fx.sparkbig;
-			resource = null;
-			result = null;
-			time = 3;
-		}
-		
-		@Override
-		public void update(Tile tile){
-			TileEntity entity = tile.entity;
+	omnidrill = new Omnidrill("omnidrill"){
 
-			if(tile.floor().drops != null && entity.timer.get(timerDrill, 60 * time)){
-				offloadNear(tile, tile.floor().drops.item);
-				Effects.effect(drillEffect, tile.worldx(), tile.worldy());
-			}
-
-			if(entity.timer.get(timerDump, 30)){
-				tryDump(tile);
-			}
-		}
-		
-                @Override
-                public boolean isLayer(Tile tile){
-                    return tile.floor().drops == null;
-                }
 	},
 	coalgenerator = new ItemPowerGenerator("coalgenerator"){
 		{
