@@ -128,8 +128,6 @@ public class ChatFragment extends Table implements Fragment{
 
         if(message.replaceAll(" ", "").isEmpty()) return;
 
-
-
         Vars.netClient.handleSendMessage(message);
     }
 

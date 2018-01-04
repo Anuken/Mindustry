@@ -323,7 +323,7 @@ public class UI extends SceneModule{
 	public void addChatMessage(String sender, String message){
 		((ChatFragment)chatfrag).addMessage(message, sender);
 	}
-	
+
 	public void showGameError(){
 		gameerror.show();
 	}

@@ -267,6 +267,7 @@ public class NetClient extends Module {
         Net.handle(KickPacket.class, packet -> {
             kicked = true;
             Net.disconnect();
+            GameState.set(State.menu);
             Gdx.app.postRunnable(() -> Vars.ui.showError("$text.server.kicked." + KickReason.values()[packet.reason].name()));
         });
     }
