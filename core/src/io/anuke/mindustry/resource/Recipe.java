@@ -9,7 +9,7 @@ import static io.anuke.mindustry.resource.Section.*;
 public enum Recipe{
 	stonewall(defense, DefenseBlocks.stonewall, stack(Item.stone, 12)),
 	ironwall(defense, DefenseBlocks.ironwall, stack(Item.iron, 12)),
-	steelwall(defense, DefenseBlocks.steelwall, stack(Item.steel, 11)),
+	steelwall(defense, DefenseBlocks.steelwall, stack(Item.steel, 12)),
 	titaniumwall(defense, DefenseBlocks.titaniumwall, stack(Item.titanium, 12)),
 	duriumwall(defense, DefenseBlocks.diriumwall, stack(Item.dirium, 12)),
 	//compositewall(defense, DefenseBlocks.compositewall, stack(Item.dirium, 2), stack(Item.titanium, 2), stack(Item.steel, 2), stack(Item.iron, 2)),

@@ -24,7 +24,7 @@ public class MenuFragment implements Fragment{
 					
 					float scale = 4f;
 					defaults().size(100*scale, 21*scale).pad(-10f);
-					
+
 					add(new MenuButton("$text.play", group, ui::showLevels));
 					row();
 
