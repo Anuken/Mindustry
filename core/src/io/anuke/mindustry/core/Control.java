@@ -80,7 +80,7 @@ public class Control extends Module{
 
 		saves = new Saves();
 
-		Inputs.useControllers(false);
+		Inputs.useControllers(!Vars.gwt);
 		
 		log("Total blocks loaded: " + Block.getAllBlocks().size);
 		
@@ -560,8 +560,6 @@ public class Control extends Module{
             controlx = Gdx.input.getX();
             controly = Gdx.input.getY();
         }
-
-        Gdx.input.setCursorCatched(controlling);
 
         saves.update();
 		
