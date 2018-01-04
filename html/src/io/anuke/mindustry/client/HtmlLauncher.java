@@ -17,7 +17,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.io.PlatformFunction;
-import io.anuke.ucore.scene.ui.TextField;
 
 import java.util.Date;
 
@@ -109,12 +108,6 @@ public class HtmlLauncher extends GwtApplication {
 			public void openLink(String link){
 				Window.open(link, "_blank", "");
 			}
-
-            @Override public void updateRPC() {}
-            @Override public void onGameExit() {}
-            @Override public void addDialog(TextField field){}
-            @Override public void openDonations(){}
-            @Override public void requestWritePerms() {}
         };
         
         return new Mindustry();

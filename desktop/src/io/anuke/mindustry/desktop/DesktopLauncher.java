@@ -14,7 +14,6 @@ import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.PlatformFunction;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.util.Strings;
 
 import javax.swing.*;
@@ -66,10 +65,6 @@ public class DesktopLauncher {
 					Vars.ui.showError("Error opening link.");
 				}
 			}
-
-			@Override public void addDialog(TextField field){}
-			@Override public void openDonations(){}
-			@Override public void requestWritePerms(){}
 
 			@Override
 			public void updateRPC() {

@@ -40,9 +40,7 @@ public class FileChooser extends FloatingDialog{
 		this.selectListener = result;
 		setupWidgets();
 
-		if(!open){
-			Mindustry.platforms.requestWritePerms();
-		}
+		Mindustry.platforms.requestWritePerms();
 	}
 
 	private void setupWidgets(){

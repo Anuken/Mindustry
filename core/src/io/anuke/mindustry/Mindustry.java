@@ -14,24 +14,13 @@ import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.modules.ModuleCore;
-import io.anuke.ucore.scene.ui.TextField;
 
-import java.util.Date;
 import java.util.Locale;
 
 public class Mindustry extends ModuleCore {
 	public static boolean hasDiscord = true;
 	public static Array<String> args = new Array<>();
-	public static PlatformFunction platforms = new PlatformFunction(){
-		@Override public String format(Date date){ return "invalid date"; }
-		@Override public String format(int number){ return number + ""; }
-		@Override public void openLink(String link){ }
-		@Override public void addDialog(TextField field){}
-		@Override public void updateRPC() {}
-		@Override public void onGameExit() {}
-		@Override public void openDonations() {}
-		@Override public void requestWritePerms() {}
-	};
+	public static PlatformFunction platforms = new PlatformFunction(){};
 	public static OrderedMap<String, Integer> idMap = new OrderedMap<>();
 
 	public static boolean externalBundle = false;
