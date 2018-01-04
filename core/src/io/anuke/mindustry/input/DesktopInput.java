@@ -27,7 +27,7 @@ public class DesktopInput extends InputHandler{
 	@Override public float getCursorX(){ return (int)(Graphics.screen(mousex, mousey).x + 2); }
 	@Override public float getCursorY(){ return (int)(Gdx.graphics.getHeight() - 1 - Graphics.screen(mousex, mousey).y); }
 	@Override public boolean drawPlace(){ return !beganBreak; }
-	
+
 	@Override
 	public void update(){
 		if(player.isDead()) return;

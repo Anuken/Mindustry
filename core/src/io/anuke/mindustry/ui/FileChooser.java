@@ -132,9 +132,6 @@ public class FileChooser extends FloatingDialog{
 		content.top().left();
 		content.add(icontable).expandX().fillX();
 		content.row();
-		
-		//content.add(navigation).colspan(3).left().marginBottom(10f).expandX().fillX().height(40f);
-		//content.row();
 
 		content.center().add(pane).width(Gdx.graphics.getWidth()/Unit.dp.scl(2)).colspan(3).grow();
 		content.row();
@@ -147,7 +144,6 @@ public class FileChooser extends FloatingDialog{
 		content.add(buttons).growX();
 		
 		content().add(content);
-		//content().add(icontable).expandY().top();
 	}
 	
 	private void updateFileFieldStatus(){
