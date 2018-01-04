@@ -59,7 +59,9 @@ public class UI extends SceneModule{
 			toolfrag = new ToolFragment(),
 			hudfrag = new HudFragment(),
 			placefrag = new PlacementFragment(),
-			weaponfrag = new WeaponFragment();
+			weaponfrag = new WeaponFragment(),
+			chatfrag = new ChatFragment(),
+			listfrag = new PlayerListFragment();
 	
 	public UI() {
 		Dialog.setShowAction(()-> sequence(
@@ -309,9 +311,17 @@ public class UI extends SceneModule{
 		
 		toolfrag.build();
 
+		chatfrag.build();
+
+		listfrag.build();
+
 		updateItems();
 
 		build.end();
+	}
+
+	public void addChatMessage(String sender, String message){
+		((ChatFragment)chatfrag).addMessage(message, sender);
 	}
 	
 	public void showGameError(){

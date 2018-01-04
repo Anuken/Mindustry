@@ -261,7 +261,7 @@ public class NetClient extends Module {
         });
 
         Net.handle(ChatPacket.class, packet -> {
-            //TODO
+            Gdx.app.postRunnable(() -> Vars.ui.addChatMessage(packet.name, packet.text));
         });
 
         Net.handle(KickPacket.class, packet -> {
@@ -285,6 +285,10 @@ public class NetClient extends Module {
         ChatPacket packet = new ChatPacket();
         packet.text = message;
         Net.send(packet, SendMode.tcp);
+
+        if(Net.server()){
+            Vars.ui.addChatMessage(Vars.player.name, packet.text);
+        }
     }
 
     public void handleShoot(Weapon weapon, float x, float y, float angle){

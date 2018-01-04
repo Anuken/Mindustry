@@ -3,6 +3,7 @@ package io.anuke.mindustry.ui.fragments;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.InputHandler;
@@ -24,6 +25,8 @@ public class PlacementFragment implements Fragment{
 	Table breaktable, next;
 	
 	public void build(){
+		if(!Vars.android) return;
+
 		InputHandler input = control.getInput();
 
 		float s = 50f;

@@ -8,7 +8,10 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.Scene;
 import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.Label.LabelStyle;
@@ -18,8 +21,10 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import static io.anuke.ucore.core.Core.scene;
 import static io.anuke.ucore.core.Core.skin;
 
+//TODO show chat even when not toggled
 public class ChatFragment extends Table implements Fragment{
     private final static int messagesShown = 10;
+    private final static int maxLength = 150;
     private Array<ChatMessage> messages = new Array<>();
     private float fadetime;
     private float lastfadetime;
@@ -30,14 +35,21 @@ public class ChatFragment extends Table implements Fragment{
     private GlyphLayout layout = new GlyphLayout();
     private float offsetx = 4, offsety = 4, fontoffsetx = 2, chatspace = 50;
     private float textWidth = 600;
-    private Color shadowColor = new Color(0,0,0,0.4f);
+    private Color shadowColor = new Color(0, 0, 0, 0.4f);
     private float textspacing = 10;
 
     public ChatFragment(){
         super();
 
         setFillParent(true);
-        font = Core.skin.getFont("pixel-font");
+        font = Core.skin.getFont("default-font");
+
+        //TODO put it input
+        update(() -> {
+            if(Net.active() && Inputs.keyTap("chat")){
+                toggle();
+            }
+        });
 
         setup();
     }
@@ -51,12 +63,12 @@ public class ChatFragment extends Table implements Fragment{
         fieldlabel.setStyle(new LabelStyle(fieldlabel.getStyle()));
         fieldlabel.getStyle().font = font;
         fieldlabel.setStyle(fieldlabel.getStyle());
-        fieldlabel.setFontScale(2);
-        chatfield = new TextField("", new TextField.TextFieldStyle(skin.get(TextField.TextFieldStyle.class)));
 
-        chatfield.getStyle().background = skin.getDrawable("blank");
+        chatfield = new TextField("", new TextField.TextFieldStyle(skin.get(TextField.TextFieldStyle.class)));
+        chatfield.setTextFieldFilter((field, c) -> field.getText().length() < maxLength);
+        chatfield.getStyle().background = skin.getDrawable("chatfield");
         chatfield.getStyle().fontColor = Color.WHITE;
-        chatfield.getStyle().font = skin.getFont("pixel-font-nomarkup");
+        chatfield.getStyle().font = skin.getFont("default-font-chat");
 
         bottom().left().marginBottom(offsety).marginLeft(offsetx*2).add(fieldlabel).padBottom(4f);
 
@@ -67,15 +79,14 @@ public class ChatFragment extends Table implements Fragment{
     public void draw(Batch batch, float alpha){
 
         batch.setColor(shadowColor);
+
         if(chatOpen)
             batch.draw(skin.getRegion("white"), offsetx, chatfield.getY(), Gdx.graphics.getWidth()-offsetx*2, chatfield.getHeight()-1);
 
-        font.getData().setScale(2f);
         font.getData().down = -21.5f;
         font.getData().lineHeight = 22f;
 
         super.draw(batch, alpha);
-
 
         float spacing = chatspace;
 
@@ -89,15 +100,14 @@ public class ChatFragment extends Table implements Fragment{
 
             layout.setText(font, messages.get(i).formattedMessage, Color.WHITE, textWidth, Align.bottomLeft, true);
             theight += layout.height+textspacing;
-            if(i == 0)theight -= textspacing+1;
+            if(i == 0) theight -= textspacing+1;
 
             font.getCache().clear();
             font.getCache().addText(messages.get(i).formattedMessage, fontoffsetx + offsetx, offsety + theight, textWidth, Align.bottomLeft, true);
 
             if(fadetime-i < 1f && fadetime-i >= 0f){
                 font.getCache().setAlphas(fadetime-i);
-                batch.setColor(0,0,0,shadowColor.a*(fadetime-i));
-
+                batch.setColor(0, 0, 0, shadowColor.a*(fadetime-i));
             }
 
             batch.draw(skin.getRegion("white"), offsetx, theight-layout.height+1-4, textWidth, layout.height+textspacing);
@@ -109,7 +119,7 @@ public class ChatFragment extends Table implements Fragment{
         batch.setColor(Color.WHITE);
 
         if(fadetime > 0 && !chatOpen)
-            fadetime -= Gdx.graphics.getDeltaTime()*60f/120f;
+            fadetime -= Timers.delta()/120f;
     }
 
     private void sendMessage(){
@@ -117,6 +127,8 @@ public class ChatFragment extends Table implements Fragment{
         chatfield.clearText();
 
         if(message.replaceAll(" ", "").isEmpty()) return;
+
+
 
         Vars.netClient.handleSendMessage(message);
     }
@@ -128,12 +140,12 @@ public class ChatFragment extends Table implements Fragment{
             scene.setKeyboardFocus(chatfield);
             chatOpen = !chatOpen;
             lastfadetime = fadetime;
-            fadetime = messagesShown+1;
+            fadetime = messagesShown + 1;
         }else if(chatOpen){
             scene.setKeyboardFocus(null);
             chatOpen = !chatOpen;
             sendMessage();
-            fadetime = lastfadetime;
+            fadetime = messagesShown + 1; //TODO?
         }
     }
 
@@ -145,7 +157,7 @@ public class ChatFragment extends Table implements Fragment{
         messages.insert(0, new ChatMessage(message, sender));
 
         fadetime += 1f;
-        fadetime = Math.min(fadetime, messagesShown)+2f;
+        fadetime = Math.min(fadetime, messagesShown) + 2f;
     }
 
     private static class ChatMessage{

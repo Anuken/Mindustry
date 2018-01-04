@@ -148,6 +148,8 @@ public class Control extends Module{
 				"dash", Input.SHIFT_LEFT,
 				"rotate_alt", new Axis(Input.R, Input.E),
 				"rotate", new Axis(Input.SCROLL),
+				"player_list", Input.TAB,
+				"chat", Input.ENTER,
 				"weapon_1", Input.NUM_1,
 				"weapon_2", Input.NUM_2,
 				"weapon_3", Input.NUM_3,
@@ -172,6 +174,7 @@ public class Control extends Module{
 				"dash", Input.CONTROLLER_Y,
 				"rotate_alt", new Axis(Input.UNSET),
 				"rotate", new Axis(Input.CONTROLLER_A, Input.CONTROLLER_B),
+				"player_list", Input.CONTROLLER_START,
 				"weapon_1", Input.NUM_1,
 				"weapon_2", Input.NUM_2,
 				"weapon_3", Input.NUM_3,
@@ -256,7 +259,8 @@ public class Control extends Module{
 		
 		//multiplying by 2 so you start with more time in the beginning
 		wavetime = waveSpacing()*2;
-		
+
+		//hacky, but I doubt anyone will use this many resources
 		if(mode.infiniteResources){
 			Arrays.fill(items, 999999999);
 		}

@@ -5,6 +5,11 @@ com.badlogic.gdx.graphics.g2d.BitmapFont: {
 		markupEnabled: true,
 		scale: 0.5
 	},
+	default-font-chat: {
+		file: square.fnt,
+		markupEnabled: false,
+		scale: 0.5
+	},
 	title: {
 		file: title.fnt,
 		markupEnabled: true,
@@ -30,6 +35,7 @@ io.anuke.ucore.scene.Skin$TintedDrawable: {
 	dialogDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.9} },
 	invis: {name: white, color: {r: 0, g: 0, b: 0, a: 0} }
 	loadDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.8} },
+	chatfield: {name: white, color: {r: 0, g: 0, b: 0, a: 0.2}},
     clear: {name: white, color: {r: 0.1, g: 0.1, b: 0.1, a: 0.75}},
     clear-over: {name: white, color: {r: 1, g: 1, b: 1, a: 0.2} },
     clear-down: {name: white, color: {r: 1, g: 1, b: 1, a: 0.4} }

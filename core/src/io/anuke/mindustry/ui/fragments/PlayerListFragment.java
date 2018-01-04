@@ -5,6 +5,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.layout.Table;
@@ -21,6 +22,8 @@ public class PlayerListFragment implements Fragment{
                 row();
                 add(content).grow();
             }}.end();
+
+            visible(() -> Inputs.keyDown("player_list"));
         }}.end();
 
         rebuild();

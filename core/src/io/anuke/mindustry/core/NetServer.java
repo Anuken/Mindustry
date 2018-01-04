@@ -157,8 +157,6 @@ public class NetServer extends Module{
             if(player == null)
                 return; //GHOSTS AAAA
 
-            //TODO add to chat fragment
-
             packet.name = player.name;
             Net.send(packet, SendMode.tcp);
         });
