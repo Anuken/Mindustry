@@ -38,11 +38,11 @@ public enum Recipe{
 	shotgunturret(weapon, WeaponBlocks.shotgunturret, stack(Item.iron, 10), stack(Item.stone, 10)),
 	flameturret(weapon, WeaponBlocks.flameturret, stack(Item.iron, 12), stack(Item.steel, 9)),
 	sniperturret(weapon, WeaponBlocks.sniperturret, stack(Item.iron, 15), stack(Item.steel, 10)),
-	laserturret(weapon, WeaponBlocks.laserturret, stack(Item.steel, 10), stack(Item.titanium, 10)),
-	mortarturret(weapon, WeaponBlocks.mortarturret, stack(Item.steel, 20), stack(Item.titanium, 15)),
-	teslaturret(weapon, WeaponBlocks.teslaturret, stack(Item.steel, 10), stack(Item.titanium, 15), stack(Item.dirium, 15)),
-	plasmaturret(weapon, WeaponBlocks.plasmaturret, stack(Item.steel, 10), stack(Item.titanium, 10), stack(Item.dirium, 15)),
-	chainturret(weapon, WeaponBlocks.chainturret, stack(Item.steel, 50), stack(Item.titanium, 25), stack(Item.dirium, 35)),
+	laserturret(weapon, WeaponBlocks.laserturret, stack(Item.steel, 12), stack(Item.titanium, 12)),
+	mortarturret(weapon, WeaponBlocks.mortarturret, stack(Item.steel, 25), stack(Item.titanium, 15)),
+	teslaturret(weapon, WeaponBlocks.teslaturret, stack(Item.steel, 20), stack(Item.titanium, 25), stack(Item.dirium, 15)),
+	plasmaturret(weapon, WeaponBlocks.plasmaturret, stack(Item.steel, 10), stack(Item.titanium, 20), stack(Item.dirium, 15)),
+	chainturret(weapon, WeaponBlocks.chainturret, stack(Item.steel, 50), stack(Item.titanium, 25), stack(Item.dirium, 40)),
 	titanturret(weapon, WeaponBlocks.titanturret, stack(Item.steel, 70), stack(Item.titanium, 50), stack(Item.dirium, 55)),
 	
 	smelter(crafting, ProductionBlocks.smelter, stack(Item.stone, 40), stack(Item.iron, 40)),
@@ -56,9 +56,9 @@ public enum Recipe{
 	stonedrill(production, ProductionBlocks.stonedrill, stack(Item.stone, 12)),
 	irondrill(production, ProductionBlocks.irondrill, stack(Item.stone, 25)),
 	coaldrill(production, ProductionBlocks.coaldrill, stack(Item.stone, 25), stack(Item.iron, 40)),
-	titaniumdrill(production, ProductionBlocks.titaniumdrill, stack(Item.iron, 40), stack(Item.steel, 40)),
+	titaniumdrill(production, ProductionBlocks.titaniumdrill, stack(Item.iron, 40), stack(Item.steel, 50)),
 	uraniumdrill(production, ProductionBlocks.uraniumdrill, stack(Item.iron, 40), stack(Item.steel, 40)),
-	omnidrill(production, ProductionBlocks.omnidrill, stack(Item.titanium, 30), stack(Item.dirium, 20)),
+	omnidrill(production, ProductionBlocks.omnidrill, stack(Item.titanium, 30), stack(Item.dirium, 40)),
 	
 	coalgenerator(power, ProductionBlocks.coalgenerator, stack(Item.iron, 30), stack(Item.stone, 20)),
 	thermalgenerator(power, ProductionBlocks.thermalgenerator, stack(Item.steel, 30), stack(Item.iron, 30)),
@@ -70,7 +70,7 @@ public enum Recipe{
 	powerlasercorner(power, DistributionBlocks.powerlasercorner, stack(Item.steel, 4), stack(Item.iron, 4)),
 	powerlaserrouter(power, DistributionBlocks.powerlaserrouter, stack(Item.steel, 5), stack(Item.iron, 5)),
 	
-	shieldgenerator(power, DefenseBlocks.shieldgenerator, stack(Item.titanium, 30), stack(Item.dirium, 40)),
+	shieldgenerator(power, DefenseBlocks.shieldgenerator, stack(Item.titanium, 30), stack(Item.dirium, 30)),
 	
 	teleporter(distribution, DistributionBlocks.teleporter, stack(Item.steel, 20), stack(Item.dirium, 15)),
 	

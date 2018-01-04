@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.GameState;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Inputs;
@@ -43,6 +45,8 @@ public class ChatFragment extends Table implements Fragment{
 
         setFillParent(true);
         font = Core.skin.getFont("default-font");
+
+        setVisible(() -> !GameState.is(State.menu) && Net.active());
 
         //TODO put it input
         update(() -> {

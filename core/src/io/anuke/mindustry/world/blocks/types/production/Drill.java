@@ -20,7 +20,7 @@ public class Drill extends Block{
 	
 	protected Block resource;
 	protected Item result;
-	protected int time = 5;
+	protected float time = 5;
 	protected int capacity = 5;
 	protected Effect drillEffect = Fx.spark;
 

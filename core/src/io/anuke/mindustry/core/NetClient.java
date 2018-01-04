@@ -285,6 +285,7 @@ public class NetClient extends Module {
     public void handleSendMessage(String message){
         ChatPacket packet = new ChatPacket();
         packet.text = message;
+        packet.name = Vars.player.name;
         Net.send(packet, SendMode.tcp);
 
         if(Net.server()){

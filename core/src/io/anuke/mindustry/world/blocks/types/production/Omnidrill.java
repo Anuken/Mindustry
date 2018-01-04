@@ -17,7 +17,6 @@ public class Omnidrill extends Drill {
         drillEffect = Fx.sparkbig;
         resource = null;
         result = null;
-        time = 3;
     }
 
     @Override

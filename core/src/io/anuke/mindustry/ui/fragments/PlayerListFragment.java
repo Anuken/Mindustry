@@ -1,6 +1,8 @@
 package io.anuke.mindustry.ui.fragments;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.GameState;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.BorderImage;
@@ -33,7 +35,7 @@ public class PlayerListFragment implements Fragment{
                }
             });
 
-            visible(() -> Inputs.keyDown("player_list") && Net.active()); //TODO move elsewhere?
+            visible(() -> Inputs.keyDown("player_list") && Net.active() && !GameState.is(State.menu)); //TODO move elsewhere?
         }}.end();
 
         rebuild();

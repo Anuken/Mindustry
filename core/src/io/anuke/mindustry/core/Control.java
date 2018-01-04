@@ -45,12 +45,12 @@ public class Control extends Module{
 	
 	final Array<Weapon> weapons = new Array<>();
 	final int[] items = new int[Item.getAllItems().size];
-	
+
+	public final EntityGroup<Player> playerGroup = Entities.addGroup(Player.class).enableMapping();
 	public final EntityGroup<Enemy> enemyGroup = Entities.addGroup(Enemy.class).enableMapping();
 	public final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);
 	public final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
 	public final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class);
-	public final EntityGroup<Player> playerGroup = Entities.addGroup(Player.class).enableMapping();
 	
 	Array<EnemySpawn> spawns;
 	int wave = 1;

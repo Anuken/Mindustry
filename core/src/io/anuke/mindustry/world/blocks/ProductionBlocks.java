@@ -131,6 +131,7 @@ public class ProductionBlocks{
 		{
 			resource = Blocks.coal;
 			result = Item.coal;
+			time = 6;
 		}
 	},
 	
@@ -146,11 +147,14 @@ public class ProductionBlocks{
 		{
 			resource = Blocks.titanium;
 			result = Item.titanium;
+			time = 7;
 		}
 	},
 	
 	omnidrill = new Omnidrill("omnidrill"){
-
+		{
+			time = 4;
+		}
 	},
 	coalgenerator = new ItemPowerGenerator("coalgenerator"){
 		{
