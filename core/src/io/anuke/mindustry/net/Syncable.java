@@ -10,7 +10,7 @@ import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
-//TODO clean up this giant mess
+//TODO clean up this mess
 public interface Syncable {
 
     public Interpolator<?> getInterpolator();
@@ -20,6 +20,7 @@ public interface Syncable {
         public abstract void read(T entity, float[] data);
         public abstract void update(T entity, Interpolator interpolator);
 
+        //TODO write dashing state so particles appear
         public static final SyncType<Player> player = new SyncType<Player>() {
             @Override
             public float[] write(Player entity) {
@@ -78,7 +79,7 @@ public interface Syncable {
         };
     }
 
-    public static class Interpolator<T extends Entity> {
+    class Interpolator<T extends Entity> {
         public SyncType<T> type;
         public Vector2 target = new Vector2();
         public Vector2 last = new Vector2();

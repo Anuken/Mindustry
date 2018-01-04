@@ -65,9 +65,19 @@ public class HudFragment implements Fragment{
 				}).get();
 
 				pause = new imagebutton("icon-pause", isize, ()->{
-					GameState.set(GameState.is(State.paused) ? State.playing : State.paused);
-				}).update(i -> i.getStyle().imageUp = Core.skin.getDrawable(GameState.is(State.paused) ? "icon-play" : "icon-pause")).cell
-						.disabled(b -> Net.active()).get();
+					if(Net.active() && Vars.android){
+						//TODO open android chat
+					}else {
+						GameState.set(GameState.is(State.paused) ? State.playing : State.paused);
+					}
+				}).update(i ->{
+					if(Net.active() && Vars.android){
+						i.getStyle().imageUp = Core.skin.getDrawable("icon-chat");
+					}else {
+						i.setDisabled(Net.active());
+						i.getStyle().imageUp = Core.skin.getDrawable(GameState.is(State.paused) ? "icon-play" : "icon-pause");
+					}
+				}).get();
 
 			}}.end();
 
