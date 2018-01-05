@@ -191,7 +191,7 @@ public class World extends Module{
 			Vars.control.getTutorial().setDefaultBlocks(control.getCore().x, control.getCore().y);
 		}
 		
-		pathfind.updatePath();
+		pathfind.resetPaths();
 	}
 	
 	void setDefaultBlocks(){

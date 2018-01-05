@@ -22,6 +22,8 @@ public class Tile{
 	 * This is relative to the block it is linked to; negate coords to find the link.*/
 	public byte link = 0;
 	public short x, y;
+	/**Whether this tile has any solid blocks near it.*/
+	public boolean occluded = false;
 	public TileEntity entity;
 	
 	public Tile(int x, int y){
@@ -218,7 +220,20 @@ public class Tile{
 	}
 
 	public Tile[] getNearby(Tile[] copy){
-		return Vars.world.getNearby(x, y);
+		return Vars.world.getNearby(x, y, copy);
+	}
+
+	public void updateOcclusion(){
+		occluded = false;
+		for(int dx = -1; dx <= 1; dx ++){
+			for(int dy = -1; dy <= 1; dy ++){
+				Tile tile = Vars.world.tile(x + dx, y + dy);
+				if(tile != null && tile.solid()){
+					occluded = true;
+					break;
+				}
+			}
+		}
 	}
 	
 	public void changed(){
@@ -232,6 +247,8 @@ public class Tile{
 		if(block.destructible || block.update){
 			entity = block.getEntity().init(this, block.update);
 		}
+
+		updateOcclusion();
 	}
 	
 	@Override

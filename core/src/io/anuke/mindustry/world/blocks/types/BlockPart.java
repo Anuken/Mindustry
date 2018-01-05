@@ -22,7 +22,8 @@ public class BlockPart extends Block implements PowerAcceptor, LiquidAcceptor{
 	
 	@Override
 	public boolean isSolidFor(Tile tile){
-		return tile.getLinked().solid() || tile.getLinked().block().isSolidFor(tile.getLinked());
+		return tile.getLinked() == null
+				|| (tile.getLinked().solid() || tile.getLinked().block().isSolidFor(tile.getLinked()));
 	}
 	
 	@Override

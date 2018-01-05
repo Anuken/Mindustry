@@ -1,7 +1,6 @@
 package io.anuke.mindustry.ai;
 
 import com.badlogic.gdx.ai.pfa.Connection;
-
 import io.anuke.mindustry.world.Tile;
 
 public class TileConnection implements Connection<Tile>{
@@ -14,7 +13,7 @@ public class TileConnection implements Connection<Tile>{
 
 	@Override
 	public float getCost(){
-		return MHueristic.estimateStatic(a, b);
+		return HueristicImpl.estimateStatic(a, b);
 	}
 
 	@Override
