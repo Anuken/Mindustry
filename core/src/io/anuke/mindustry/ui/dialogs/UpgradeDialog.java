@@ -1,4 +1,4 @@
-package io.anuke.mindustry.ui;
+package io.anuke.mindustry.ui.dialogs;
 
 import static io.anuke.mindustry.Vars.*;
 

@@ -1,17 +1,11 @@
-package io.anuke.mindustry.ui;
+package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.io.SaveIO;
-import io.anuke.mindustry.io.Saves;
 import io.anuke.mindustry.io.Saves.SaveSlot;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.builders.button;
-import io.anuke.ucore.scene.ui.ConfirmDialog;
-import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.TextButton;
-import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.util.Bundles;
 
 public class SaveDialog extends LoadDialog{

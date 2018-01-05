@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Scaling;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.mapeditor.MapFilter.GenPref;
 import io.anuke.mindustry.ui.BorderImage;
-import io.anuke.mindustry.ui.FloatingDialog;
+import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Pixmaps;
 import io.anuke.ucore.scene.style.TextureRegionDrawable;

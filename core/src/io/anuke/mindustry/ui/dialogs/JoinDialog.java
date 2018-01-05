@@ -1,4 +1,4 @@
-package io.anuke.mindustry.ui;
+package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Mindustry;

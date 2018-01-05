@@ -3,7 +3,7 @@ package io.anuke.mindustry.mapeditor;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.utils.Align;
 
-import io.anuke.mindustry.ui.FloatingDialog;
+import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.function.BiConsumer;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.TextButton;

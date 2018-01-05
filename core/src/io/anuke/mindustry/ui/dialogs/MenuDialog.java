@@ -1,10 +1,11 @@
-package io.anuke.mindustry.ui;
+package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.ui.PressGroup;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.builders.build;

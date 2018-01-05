@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.ui.FileChooser;
+import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.ColorMapper.BlockPair;
@@ -37,9 +37,8 @@ public class MapEditorDialog extends Dialog{
 	
 	private ButtonGroup<ImageButton> blockgroup;
 	
-	public MapEditorDialog(MapEditor editor){
+	public MapEditorDialog(){
 		super("$text.mapeditor", "dialog");
-		this.editor = editor;
 		dialog = new MapGenerateDialog(editor);
 		view = new MapView(editor);
 		

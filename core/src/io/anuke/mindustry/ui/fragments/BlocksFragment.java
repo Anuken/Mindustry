@@ -13,7 +13,7 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Section;
-import io.anuke.mindustry.ui.FloatingDialog;
+import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.scene.actions.Actions;

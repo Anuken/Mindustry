@@ -1,22 +1,21 @@
-package io.anuke.mindustry.ui;
+package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.utils.Align;
 
-import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.KeybindDialog;
+import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.scene.ui.Dialog;
 
-public class MindustryKeybindDialog extends KeybindDialog{
+public class FloatingDialog extends Dialog{
 	
-	public MindustryKeybindDialog(){
-		setDialog();
-		
+	public FloatingDialog(String title){
+		super(title, "dialog");
 		setFillParent(true);
 		title().setAlignment(Align.center);
 		getTitleTable().row();
-		getTitleTable().add(new Image("white"))
-		.growX().height(3f).pad(4f).get().setColor(Colors.get("accent"));
+		getTitleTable().addImage("white", Colors.get("accent"))
+		.growX().height(3f).pad(4f);
 	}
 	
 	@Override
@@ -26,6 +25,12 @@ public class MindustryKeybindDialog extends KeybindDialog{
 		keyDown(key->{
 			if(key == Keys.ESCAPE || key == Keys.BACK)
 				hide();
+		});
+
+		update(() -> {
+			if(Inputs.keyTap("menu")){
+				hide();
+			}
 		});
 	}
 }
