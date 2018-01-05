@@ -13,7 +13,7 @@ public class TileConnection implements Connection<Tile>{
 
 	@Override
 	public float getCost(){
-		return HueristicImpl.estimateStatic(a, b);
+		return HeuristicImpl.estimateStatic(a, b);
 	}
 
 	@Override

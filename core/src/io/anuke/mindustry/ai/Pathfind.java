@@ -20,7 +20,7 @@ public class Pathfind{
 	private static final long maxTime = 1000000 * 5;
 
 	/**Heuristic for determining cost between two tiles*/
-	HueristicImpl heuristic = new HueristicImpl();
+	HeuristicImpl heuristic = new HeuristicImpl();
 	/**Tile graph, for determining conenctions between two tiles*/
 	TileGraph graph = new TileGraph();
 	/**Smoother that removes extra nodes from a path.*/
@@ -135,10 +135,11 @@ public class Pathfind{
 
 	}
 
-	//1300-1500ms, usually 1400 unoptimized
+	//1300-1500ms, usually 1400 unoptimized on Caldera
 	/**Benchmark pathfinding speed. Debugging stuff.*/
 	public void benchmark(){
 		SpawnPoint point = Vars.control.getSpawnPoints().first();
+		int amount = 100;
 
 		//warmup
 		for(int i = 0; i < 100; i ++){
@@ -147,11 +148,11 @@ public class Pathfind{
 		}
 
 		Timers.mark();
-		for(int i = 0; i < 100; i ++){
+		for(int i = 0; i < amount; i ++){
 			point.finder.searchNodePath(point.start, Vars.control.getCore(), heuristic, point.path);
 			point.path.clear();
 		}
-		UCore.log("Time elapsed: " + Timers.elapsed() + "ms");
+		UCore.log("Time elapsed: " + Timers.elapsed() + "ms\nAverage MS per path: " + Timers.elapsed()/amount);
 	}
 
 	/**Reset and clear the paths.*/
