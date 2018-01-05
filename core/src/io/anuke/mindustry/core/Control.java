@@ -579,6 +579,10 @@ public class Control extends Module{
 				wavetime = 0f;
 			}
 
+			if(Inputs.keyTap(Keys.G)){
+				world.pathfinder().benchmark();
+			}
+
 			if(Inputs.keyDown(Keys.I)){
 				wavetime -= delta() * 10f;
 			}

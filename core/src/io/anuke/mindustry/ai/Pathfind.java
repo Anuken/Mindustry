@@ -10,12 +10,14 @@ import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.mindustry.world.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.UCore;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
 public class Pathfind{
-	private static final long ms = 1000000 * 5;
+	private static final long ms = 1000000 * 500;
 	
 	MHueristic heuristic = new MHueristic();
 	PassTileGraph graph = new PassTileGraph();
@@ -121,6 +123,23 @@ public class Pathfind{
 			index ++;
 		}
 
+	}
+
+	public void benchmark(){
+		SpawnPoint point = Vars.control.getSpawnPoints().first();
+
+		//warmup
+		for(int i = 0; i < 100; i ++){
+			point.finder.searchNodePath(point.start, Vars.control.getCore(), heuristic, point.path);
+			point.path.clear();
+		}
+
+		Timers.mark();
+		for(int i = 0; i < 100; i ++){
+			point.finder.searchNodePath(point.start, Vars.control.getCore(), heuristic, point.path);
+			point.path.clear();
+		}
+		UCore.log("Time elapsed: " + Timers.elapsed() + "ms");
 	}
 	
 	public boolean finishedUpdating(){
