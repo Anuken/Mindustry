@@ -1,10 +1,7 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import static io.anuke.mindustry.Vars.*;
 
 import com.badlogic.gdx.graphics.Color;
-
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.ItemStack;
@@ -16,6 +13,9 @@ import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.Tooltip;
 import io.anuke.ucore.scene.ui.layout.Table;
+
+import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.ui;
 
 public class UpgradeDialog extends FloatingDialog{
 	boolean wasPaused = false;
@@ -58,7 +58,7 @@ public class UpgradeDialog extends FloatingDialog{
 				if(control.hasWeapon(weapon)){
 					button.setDisabled(true);
 					button.setColor(Color.GRAY);
-				}else if(!Vars.control.hasItems(weapon.requirements)){
+				}else if(!control.hasItems(weapon.requirements)){
 					button.setDisabled(true);
 				}else{
 					button.setDisabled(false);
@@ -92,7 +92,7 @@ public class UpgradeDialog extends FloatingDialog{
 					ItemStack[] req = weapon.requirements;
 					for(ItemStack s : req){
 						
-						int amount = Math.min(Vars.control.getAmount(s.item), s.amount);
+						int amount = Math.min(control.getAmount(s.item), s.amount);
 						reqtable.addImage(Draw.region("icon-" + s.item.name)).padRight(3).size(8*2);
 						reqtable.add(
 								(amount >= s.amount ? "" : "[RED]")
@@ -114,7 +114,7 @@ public class UpgradeDialog extends FloatingDialog{
 			
 			run.listen();
 			
-			Tooltip tip = new Tooltip(tiptable, run);
+			Tooltip<Table> tip = new Tooltip<>(tiptable, run);
 			
 			tip.setInstant(true);
 
@@ -123,9 +123,9 @@ public class UpgradeDialog extends FloatingDialog{
 			button.clicked(()->{
 				if(button.isDisabled()) return;
 				
-				Vars.control.removeItems(weapon.requirements);
+				control.removeItems(weapon.requirements);
 				control.addWeapon(weapon);
-				ui.updateWeapons();
+				ui.weaponfrag.updateWeapons();
 				run.listen();
 				Effects.sound("purchase");
 			});

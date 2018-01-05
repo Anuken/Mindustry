@@ -20,12 +20,12 @@ public class SaveDialog extends LoadDialog{
 		}
 
 		slots.row();
-		slots.addImageTextButton("$text.save.new", "icon-add", "clear", 14*3, () -> {
+		slots.addImageTextButton("$text.save.new", "icon-add", "clear", 14*3, () ->
 			Vars.ui.showTextInput("$text.save", "$text.save.newslot", "", text -> {
 				Vars.control.getSaves().addSave(text);
 				setup();
-			});
-		}).fillX().margin(10f).minWidth(300f).height(70f).pad(4f).padRight(-4);
+			})
+		).fillX().margin(10f).minWidth(300f).height(70f).pad(4f).padRight(-4);
 	}
 
 	@Override
@@ -33,19 +33,17 @@ public class SaveDialog extends LoadDialog{
 		button.clicked(() -> {
 			if(button.childrenPressed()) return;
 
-			Vars.ui.showConfirm("$text.overwrite", "$text.save.overwrite", () -> {
-				save(slot);
-			});
+			Vars.ui.showConfirm("$text.overwrite", "$text.save.overwrite", () -> save(slot));
 		});
 	}
 
 	void save(SaveSlot slot){
 
-		Vars.ui.showLoading("$text.saveload");
+		Vars.ui.loadfrag.show("$text.saveload");
 
 		Timers.runTask(5f, () -> {
 			hide();
-			Vars.ui.hideLoading();
+			Vars.ui.loadfrag.hide();
 			try{
 				slot.save();
 			}catch(Throwable e){

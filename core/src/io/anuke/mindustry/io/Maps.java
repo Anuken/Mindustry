@@ -92,6 +92,7 @@ public class Maps implements Disposable{
 		saveCustomMap(map);
 		Vars.ui.reloadLevels();
 		//TODO reload map dialog
+
 	}
 
 	public void saveMaps(Array<Map> array, FileHandle file){

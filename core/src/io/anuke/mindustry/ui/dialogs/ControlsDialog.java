@@ -7,9 +7,9 @@ import com.badlogic.gdx.utils.Align;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.KeybindDialog;
 
-public class MindustryKeybindDialog extends KeybindDialog{
+public class ControlsDialog extends KeybindDialog{
 	
-	public MindustryKeybindDialog(){
+	public ControlsDialog(){
 		setDialog();
 		
 		setFillParent(true);

@@ -36,8 +36,7 @@ public class Tutorial{
 	}
 	
 	public void buildUI(table table){
-		
-		//TODO maybe align it to the bottom?
+
 		table.atop();
 		
 		new table("pane"){{
@@ -395,7 +394,7 @@ public class Tutorial{
 			void onSwitch(){
 				if(!Vars.control.getWeapons().contains(Weapon.multigun, true)){
 					Vars.control.getWeapons().add(Weapon.multigun);
-					Vars.ui.updateWeapons();
+					Vars.ui.weaponfrag.updateWeapons();
 				}
 			}
 		},

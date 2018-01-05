@@ -11,7 +11,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
@@ -58,8 +57,7 @@ public class AndroidInput extends InputHandler{
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button){
 		if(ui.hasMouse()) return false;
-		
-		ui.hideTooltip();
+
 		lmousex = screenX;
 		lmousey = screenY;
 		
@@ -77,9 +75,9 @@ public class AndroidInput extends InputHandler{
 			if(cursor != null && !ui.hasMouse(screenX, screenY)){
 				Tile linked = cursor.isLinked() ? cursor.getLinked() : cursor;
 				if(linked != null && linked.block() instanceof Configurable){
-					ui.showConfig(linked);
-				}else if(!ui.hasConfigMouse()){
-					ui.hideConfig();
+					ui.configfrag.showConfig(linked);
+				}else if(!ui.configfrag.hasConfigMouse()){
+					ui.configfrag.hideConfig();
 				}
 			}
 		}
@@ -117,7 +115,6 @@ public class AndroidInput extends InputHandler{
 	public void update(){
 		enableHold = breakMode == PlaceMode.holdDelete;
 
-		float scl = Settings.getInt("sensitivity")/100f * Unit.dp.scl(1f);
 		float xa = Inputs.getAxis("move_x");
 		float ya = Inputs.getAxis("move_y");
 		if(Math.abs(xa) < Vars.controllerMin) xa = 0;

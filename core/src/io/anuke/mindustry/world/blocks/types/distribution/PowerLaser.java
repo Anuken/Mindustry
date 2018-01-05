@@ -1,13 +1,10 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Array;
-
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.production.Generator;
 
 public class PowerLaser extends Generator{
-	public float powerAmount = 0.03f;
 	public Color color = Color.valueOf("e54135");
 
 	public PowerLaser(String name) {

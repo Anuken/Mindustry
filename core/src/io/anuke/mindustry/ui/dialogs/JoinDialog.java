@@ -105,7 +105,7 @@ public class JoinDialog extends FloatingDialog {
     }
 
     void connect(String ip, int port){
-        Vars.ui.showLoading("$text.connecting");
+        Vars.ui.loadfrag.show("$text.connecting");
 
         Timers.runTask(2f, () -> {
             try{
@@ -128,7 +128,7 @@ public class JoinDialog extends FloatingDialog {
                     error = Strings.parseException(e, false);
                 }
                 Vars.ui.showError(Bundles.format("text.connectfail", error));
-                Vars.ui.hideLoading();
+                Vars.ui.loadfrag.hide();
 
                 e.printStackTrace();
             }

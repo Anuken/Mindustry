@@ -38,7 +38,6 @@ import static io.anuke.ucore.core.Core.batch;
 import static io.anuke.ucore.core.Core.camera;
 
 public class Renderer extends RendererModule{
-	private final static int chunksize = 32;
 	private final static float shieldHitDuration = 18f;
 	
 	public Surface shadowSurface, shieldSurface, indicatorSurface;
@@ -101,7 +100,7 @@ public class Renderer extends RendererModule{
 			
 			//TODO identify the source of this bug
 			if(control.core == null){
-				ui.showGameError();
+				ui.showError("$text.error.crashmessage");
 				GameState.set(State.menu);
 				return;
 			}
@@ -352,13 +351,13 @@ public class Renderer extends RendererModule{
 			if(input.breakMode == PlaceMode.holdDelete)
 				input.breakMode.draw(tilex, tiley, 0, 0);
 			
-		}else if(input.breakMode.delete && control.input.drawPlace() && input.recipe == null){ //TODO test!
+		}else if(input.breakMode.delete && control.input.drawPlace() && input.recipe == null){
 			input.breakMode.draw(control.input.getBlockX(), control.input.getBlockY(),
 					control.input.getBlockEndX(), control.input.getBlockEndY());
 		}
 
-		if(Vars.ui.getTools().confirming){
-			ToolFragment t = Vars.ui.getTools();
+		if(Vars.ui.toolfrag.confirming){
+			ToolFragment t = Vars.ui.toolfrag;
 			PlaceMode.areaDelete.draw(t.px, t.py, t.px2, t.py2);
 		}
 		

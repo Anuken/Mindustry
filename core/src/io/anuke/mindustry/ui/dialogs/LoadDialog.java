@@ -161,18 +161,18 @@ public class LoadDialog extends FloatingDialog{
 	public void modifyButton(TextButton button, SaveSlot slot){
 		button.clicked(() -> {
 			if(!button.childrenPressed()){
-				Vars.ui.showLoading();
+				Vars.ui.loadfrag.show();
 
 				Timers.runTask(3f, () -> {
-					Vars.ui.hideLoading();
+					Vars.ui.loadfrag.hide();
 					hide();
 					try{
 						slot.load();
 						GameState.set(State.playing);
-						Vars.ui.hideMenu();
+						Vars.ui.menu.hide();
 					}catch(Exception e){
 						e.printStackTrace();
-						Vars.ui.hideMenu();
+						Vars.ui.menu.hide();
 						GameState.set(State.menu);
 						Vars.control.reset();
 						Vars.ui.showError("$text.save.corrupted");

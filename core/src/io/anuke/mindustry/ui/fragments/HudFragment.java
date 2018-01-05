@@ -41,9 +41,7 @@ public class HudFragment implements Fragment{
 				defaults().size(dsize).left();
 				float isize = 40;
 
-				menu = new imagebutton("icon-menu", isize, ()->{
-					ui.showMenu();
-				}).get();
+				menu = new imagebutton("icon-menu", isize, ui.menu::show).get();
 
 				flip = new imagebutton("icon-arrow-up", isize, ()->{
 					if(wavetable.getActions().size != 0) return;

@@ -15,6 +15,7 @@ import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.Skin;
+import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.TextField;
@@ -26,7 +27,7 @@ import static io.anuke.mindustry.Vars.control;
 import static io.anuke.ucore.scene.actions.Actions.*;
 
 public class UI extends SceneModule{
-	public Dialog about, restart, levels, upgrades, load, discord, join, menu, prefs, keys, editor;
+	public Dialog about, restart, levels, upgrades, load, discord, join, menu, prefs, keys, editor, host;
 
 	public final MenuFragment menufrag = new MenuFragment();
     public final ToolFragment toolfrag = new ToolFragment();
@@ -37,6 +38,7 @@ public class UI extends SceneModule{
     public final PlayerListFragment listfrag = new PlayerListFragment();
     public final BackgroundFragment backfrag = new BackgroundFragment();
     public final LoadingFragment loadfrag = new LoadingFragment();
+    public final BlockConfigFragment configfrag = new BlockConfigFragment();
 	
 	public UI() {
 		Dialog.setShowAction(()-> sequence(
@@ -126,16 +128,18 @@ public class UI extends SceneModule{
 		load = new LoadDialog();
 		upgrades = new UpgradeDialog();
 		levels = new LevelDialog();
-		prefs = new MindustrySettingsDialog();
+		prefs = new SettingsMenuDialog();
 		menu = new MenuDialog();
-		keys = new MindustryKeybindDialog();
+		keys = new ControlsDialog();
 		about = new AboutDialog();
+		host = new HostDialog();
 		
 		build.begin(scene);
 
 		backfrag.build();
 		weaponfrag.build();
 		hudfrag.build();
+		configfrag.build();
 		menufrag.build();
 		placefrag.build();
 		toolfrag.build();
@@ -163,6 +167,10 @@ public class UI extends SceneModule{
 
 	public void showTextInput(String title, String text, String def, Consumer<String> confirmed){
 		showTextInput(title, text, def, (field, c) -> true, confirmed);
+	}
+
+	public void showInfo(String info){
+		scene.table().add("[accent]" + info).padBottom(Gdx.graphics.getHeight()/2+100f).get().getParent().actions(Actions.fadeOut(4f), Actions.removeActor());
 	}
 
 	public void showError(String text){

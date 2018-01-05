@@ -20,7 +20,7 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.renderer;
 
-public class MindustrySettingsDialog extends SettingsDialog{
+public class SettingsMenuDialog extends SettingsDialog{
 	public SettingsTable graphics;
 	public SettingsTable game;
 	public SettingsTable sound;
@@ -30,7 +30,7 @@ public class MindustrySettingsDialog extends SettingsDialog{
 	private boolean built = false;
 	private boolean wasPaused;
 	
-	public MindustrySettingsDialog(){
+	public SettingsMenuDialog(){
 		setStyle(Core.skin.get("dialog", WindowStyle.class));
 
 		hidden(()->{

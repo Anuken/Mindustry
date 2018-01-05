@@ -81,7 +81,7 @@ public class DesktopInput extends InputHandler{
 		for(int i = 1; i <= 6 && i <= control.getWeapons().size; i ++){
 			if(Inputs.keyTap("weapon_" + i)){
 				player.weapon = control.getWeapons().get(i - 1);
-				ui.updateWeapons();
+				ui.weaponfrag.updateWeapons();
 			}
 		}
 		
@@ -90,14 +90,14 @@ public class DesktopInput extends InputHandler{
 		if(Inputs.keyTap("select") && cursor != null && !ui.hasMouse()){
 			Tile linked = cursor.isLinked() ? cursor.getLinked() : cursor;
 			if(linked != null && linked.block() instanceof Configurable){
-				ui.showConfig(linked);
-			}else if(!ui.hasConfigMouse()){
-				ui.hideConfig();
+				ui.configfrag.showConfig(linked);
+			}else if(!ui.configfrag.hasConfigMouse()){
+				ui.configfrag.hideConfig();
 			}
 		}
 		
 		if(Inputs.keyTap("break")){
-			ui.hideConfig();
+			ui.configfrag.hideConfig();
 		}
 		
 		if(Inputs.keyRelease("break")){

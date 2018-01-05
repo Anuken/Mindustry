@@ -41,9 +41,7 @@ public class MenuDialog extends FloatingDialog{
 			});
 
 			content().row();
-			content().addButton("$text.settings", () -> {
-				ui.showPrefs();
-			});
+			content().addButton("$text.settings", ui.prefs::show);
 
 			content().row();
 			content().addButton("$text.savegame", () -> {
@@ -61,7 +59,7 @@ public class MenuDialog extends FloatingDialog{
 				if(Vars.world.getMap().custom){
 					ui.showError("$text.nohost");
 				}else {
-					ui.showHostServer();
+					ui.host.show();
 				}
 			}).disabled(b -> Net.active());
 
@@ -89,19 +87,19 @@ public class MenuDialog extends FloatingDialog{
 					GameState.set(State.playing);
 			}).text("$text.back").padTop(4f);
 			
-			new imagebutton("icon-tools", isize, () -> ui.showPrefs()).text("$text.settings").padTop(4f);
+			new imagebutton("icon-tools", isize, ui.prefs::show).text("$text.settings").padTop(4f);
 			
-			new imagebutton("icon-save", isize, ()-> save.show()).text("$text.save").padTop(4f);
+			new imagebutton("icon-save", isize, save::show).text("$text.save").padTop(4f);
 
 			content().row();
 			
-			new imagebutton("icon-load", isize, () -> load.show()).text("$text.load").padTop(4f).disabled(Net.active());
+			new imagebutton("icon-load", isize, load::show).text("$text.load").padTop(4f).disabled(Net.active());
 
 			new imagebutton("icon-host", isize, () -> {
 				if(Vars.world.getMap().custom){
 					ui.showError("$text.nohost");
 				}else {
-					ui.showHostServer();
+					ui.host.show();
 				}
 			}).text("$text.host")
 					.disabled(b -> Net.active()).padTop(4f);
@@ -128,15 +126,14 @@ public class MenuDialog extends FloatingDialog{
 		if(Vars.control.getSaves().getCurrent() == null ||
 				!Vars.control.getSaves().getCurrent().isAutosave()) return;
 
-		Vars.ui.showLoading("$text.saveload");
+		Vars.ui.loadfrag.show("$text.saveload");
 
 		Timers.runTask(5f, () -> {
-			Vars.ui.hideLoading();
+			Vars.ui.loadfrag.hide();
 			try{
 				Vars.control.getSaves().getCurrent().save();
 			}catch(Throwable e){
 				e = (e.getCause() == null ? e : e.getCause());
-
 				Vars.ui.showError("[orange]"+ Bundles.get("text.savefail")+"\n[white]" + ClassReflection.getSimpleName(e.getClass()) + ": " + e.getMessage() + "\n" + "at " + e.getStackTrace()[0].getFileName() + ":" + e.getStackTrace()[0].getLineNumber());
 			}
 		});

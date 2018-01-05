@@ -70,7 +70,7 @@ public class Player extends DestructibleEntity implements Syncable{
 		//TODO respawning doesn't work for multiplayer
 		if(isLocal) {
 			Vars.control.setRespawnTime(respawnduration);
-			ui.fadeRespawn(true);
+			ui.hudfrag.fadeRespawn(true);
 		}else{
 			Timers.run(respawnduration, () -> {
 				heal();
