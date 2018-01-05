@@ -45,7 +45,7 @@ public class JoinDialog extends FloatingDialog {
         join.buttons().addButton("$text.cancel", join::hide);
         join.buttons().addButton("$text.ok", () ->
             connect(Settings.getString("ip"), Strings.parseInt(Settings.getString("port")))
-        ).disabled(b -> Settings.getString("ip").isEmpty() || Strings.parseInt(Settings.getString("port")) == Integer.MIN_VALUE);
+        ).disabled(b -> Settings.getString("ip").isEmpty() || Strings.parseInt(Settings.getString("port")) == Integer.MIN_VALUE || Net.active());
 
         setup();
 
@@ -110,6 +110,8 @@ public class JoinDialog extends FloatingDialog {
         Timers.runTask(2f, () -> {
             try{
                 Net.connect(ip, port);
+                hide();
+                join.hide();
             }catch (Exception e) {
                 Throwable t = e;
                 while(t.getCause() != null){
