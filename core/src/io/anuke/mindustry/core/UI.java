@@ -34,7 +34,7 @@ public class UI extends SceneModule{
 	public DiscordDialog discord;
 	public JoinDialog join;
 	public HostDialog host;
-	public MenuDialog menu;
+	public PausedDialog paused;
 	public SettingsMenuDialog settings;
 	public ControlsDialog controls;
 	public MapEditorDialog editor;
@@ -138,7 +138,7 @@ public class UI extends SceneModule{
 		upgrades = new UpgradeDialog();
 		levels = new LevelDialog();
 		settings = new SettingsMenuDialog();
-		menu = new MenuDialog();
+		paused = new PausedDialog();
 		about = new AboutDialog();
 		host = new HostDialog();
 		

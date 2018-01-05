@@ -15,12 +15,12 @@ import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.ui;
 
-public class MenuDialog extends FloatingDialog{
+public class PausedDialog extends FloatingDialog{
 	private SaveDialog save = new SaveDialog();
 	private LoadDialog load = new LoadDialog();
 	public boolean wasPaused = false;
 
-	public MenuDialog() {
+	public PausedDialog() {
 		super("$text.menu");
 		setup();
 	}

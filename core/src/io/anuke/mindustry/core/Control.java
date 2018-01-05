@@ -615,10 +615,10 @@ public class Control extends Module{
 			
 			if(Inputs.keyTap("menu")){
 				if(GameState.is(State.paused)){
-					ui.menu.hide();
+					ui.paused.hide();
 					GameState.set(State.playing);
 				}else if (!ui.restart.isShown()){
-					ui.menu.show();
+					ui.paused.show();
 					GameState.set(State.paused);
 				}
 			}

@@ -44,11 +44,11 @@ public class SettingsMenuDialog extends SettingsDialog{
 			if(!GameState.is(State.menu)){
 				wasPaused = GameState.is(State.paused);
 				if(menu.getScene() != null){
-					wasPaused = ((io.anuke.mindustry.ui.dialogs.MenuDialog)menu).wasPaused;
+					wasPaused = ((PausedDialog)menu).wasPaused;
 				}
 				if(!Net.active()) GameState.set(State.paused);
 				//TODO hide menu
-				Vars.ui.menu.hide();
+				Vars.ui.paused.hide();
 			}
 		});
 
