@@ -44,7 +44,7 @@ public class MenuFragment implements Fragment{
 						row();
 					}
 					
-					add(new MenuButton("$text.settings", group, ui.prefs::show));
+					add(new MenuButton("$text.settings", group, ui.settings::show));
 					row();
 					
 					if(!gwt){
@@ -73,7 +73,7 @@ public class MenuFragment implements Fragment{
 
 					new imagebutton("icon-editor", isize, ui.editor::show).text("$text.editor").padTop(4f);
 	
-					new imagebutton("icon-tools", isize, ui.prefs::show).text("$text.settings").padTop(4f);
+					new imagebutton("icon-tools", isize, ui.settings::show).text("$text.settings").padTop(4f);
 
 					new imagebutton("icon-info", isize, ui.about::show).text("$text.about.button").padTop(4f);
 

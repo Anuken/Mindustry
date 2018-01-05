@@ -27,7 +27,18 @@ import static io.anuke.mindustry.Vars.control;
 import static io.anuke.ucore.scene.actions.Actions.*;
 
 public class UI extends SceneModule{
-	public Dialog about, restart, levels, upgrades, load, discord, join, menu, prefs, keys, editor, host;
+	public AboutDialog about;
+	public RestartDialog restart;
+	public LevelDialog levels;
+	public LoadDialog load;
+	public DiscordDialog discord;
+	public JoinDialog join;
+	public HostDialog host;
+	public MenuDialog menu;
+	public SettingsMenuDialog settings;
+	public ControlsDialog controls;
+	public MapEditorDialog editor;
+	public UpgradeDialog upgrades;
 
 	public final MenuFragment menufrag = new MenuFragment();
     public final ToolFragment toolfrag = new ToolFragment();
@@ -118,19 +129,16 @@ public class UI extends SceneModule{
 	@Override
 	public void init(){
 
-		if(!Vars.gwt){
-			editor = new MapEditorDialog();
-		}
-
+		editor = new MapEditorDialog();
+		controls = new ControlsDialog();
 		restart = new RestartDialog();
 		join = new JoinDialog();
 		discord = new DiscordDialog();
 		load = new LoadDialog();
 		upgrades = new UpgradeDialog();
 		levels = new LevelDialog();
-		prefs = new SettingsMenuDialog();
+		settings = new SettingsMenuDialog();
 		menu = new MenuDialog();
-		keys = new ControlsDialog();
 		about = new AboutDialog();
 		host = new HostDialog();
 		

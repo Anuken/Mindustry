@@ -54,7 +54,7 @@ public class DesktopInput extends InputHandler{
 		endx = Gdx.input.getX();
 		endy = Gdx.input.getY();
 		
-		if(Inputs.getAxisActive("zoom") && Inputs.keyDown("zoom_hold") && !GameState.is(State.menu) && !ui.onDialog()){
+		if(Inputs.getAxisActive("zoom") && Inputs.keyDown("zoom_hold") && !GameState.is(State.menu) && !ui.hasDialog()){
 			renderer.scaleCamera((int)Inputs.getAxis("zoom"));
 		}
 

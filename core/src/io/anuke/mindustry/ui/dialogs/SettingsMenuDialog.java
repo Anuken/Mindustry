@@ -86,7 +86,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
 		if(!Vars.android) {
 			menu.row();
-			menu.addButton("$text.settings.controls", Vars.ui.keys::show);
+			menu.addButton("$text.settings.controls", Vars.ui.controls::show);
 		}
 
 		prefs.clearChildren();

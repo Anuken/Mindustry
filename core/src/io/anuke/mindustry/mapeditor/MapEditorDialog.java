@@ -41,6 +41,8 @@ public class MapEditorDialog extends Dialog{
 	
 	public MapEditorDialog(){
 		super("$text.mapeditor", "dialog");
+		if(Vars.gwt) return;
+
 		editor = new MapEditor();
 		dialog = new MapGenerateDialog(editor);
 		view = new MapView(editor);

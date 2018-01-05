@@ -71,14 +71,14 @@ public class MapGenerateDialog extends FloatingDialog{
 		});
 		buttons().addButton("$text.update", this::apply);
 		buttons().addButton("$text.apply", () ->{
-			Vars.ui.showLoading();
+			Vars.ui.loadfrag.show();
 			
 			Timers.run(3f, () ->{
 				Pixmap copy = Pixmaps.copy(editor.pixmap());
 				editor.applyFilter();
-				Vars.ui.getEditorDialog().getView().push(copy, Pixmaps.copy(editor.pixmap()));
-				Vars.ui.hideLoading();
-				Vars.ui.getEditorDialog().resetSaved();
+				Vars.ui.editor.getView().push(copy, Pixmaps.copy(editor.pixmap()));
+				Vars.ui.loadfrag.hide();
+				Vars.ui.editor.resetSaved();
 				hide();
 			});
 		});

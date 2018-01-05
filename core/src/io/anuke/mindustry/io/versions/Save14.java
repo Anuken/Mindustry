@@ -86,7 +86,7 @@ public class Save14 extends SaveFileVersion{
             Vars.control.addWeapon(Weapon.values()[stream.readByte()]);
         }
 
-        Vars.ui.updateWeapons();
+        Vars.ui.weaponfrag.updateWeapons();
 
         //inventory
 
@@ -100,7 +100,7 @@ public class Save14 extends SaveFileVersion{
             Vars.control.getItems()[item.id] = amount;
         }
 
-        Vars.ui.updateItems();
+        Vars.ui.hudfrag.updateItems();
 
         //enemies
 

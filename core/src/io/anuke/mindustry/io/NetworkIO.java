@@ -183,7 +183,7 @@ public class NetworkIO {
                 Vars.control.getItems()[i] = stream.readInt();
             }
 
-            Vars.ui.updateItems();
+            Vars.ui.hudfrag.updateItems();
 
             //enemies
 

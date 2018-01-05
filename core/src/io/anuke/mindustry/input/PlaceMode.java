@@ -183,7 +183,7 @@ public enum PlaceMode{
 			endx = this.endx; endy = this.endy;
 
 			if(Vars.android){
-				ToolFragment t = Vars.ui.getTools();
+				ToolFragment t = Vars.ui.toolfrag;
 				if(!t.confirming || t.px != tilex || t.py != tiley || t.px2 != endx || t.py2 != endy) {
 					t.confirming = true;
 					t.px = tilex;

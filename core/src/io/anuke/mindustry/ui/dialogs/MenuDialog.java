@@ -41,7 +41,7 @@ public class MenuDialog extends FloatingDialog{
 			});
 
 			content().row();
-			content().addButton("$text.settings", ui.prefs::show);
+			content().addButton("$text.settings", ui.settings::show);
 
 			content().row();
 			content().addButton("$text.savegame", () -> {
@@ -87,7 +87,7 @@ public class MenuDialog extends FloatingDialog{
 					GameState.set(State.playing);
 			}).text("$text.back").padTop(4f);
 			
-			new imagebutton("icon-tools", isize, ui.prefs::show).text("$text.settings").padTop(4f);
+			new imagebutton("icon-tools", isize, ui.settings::show).text("$text.settings").padTop(4f);
 			
 			new imagebutton("icon-save", isize, save::show).text("$text.save").padTop(4f);
 
