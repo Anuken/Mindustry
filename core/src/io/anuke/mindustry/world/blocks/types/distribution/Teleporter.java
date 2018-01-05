@@ -86,7 +86,7 @@ public class Teleporter extends Block implements Configurable{
 
 		for(int i = 0; i < colors; i ++){
 			final int f = i;
-			ImageButton button = cont.addIButton("white", "toggle", 24, () -> {
+			ImageButton button = cont.addImageButton("white", "toggle", 24, () -> {
 				entity.color = (byte)f;
 				lastColor = (byte)f;
 			}).size(34, 38).padBottom(-5.1f).group(group).get();

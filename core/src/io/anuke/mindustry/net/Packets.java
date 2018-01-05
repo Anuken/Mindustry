@@ -94,11 +94,6 @@ public class Packets {
         public int id;
     }
 
-    public static class PathPacket{
-        public int[] path;
-        public byte index;
-    }
-
     public static class BlockDestroyPacket{
         public int position;
     }

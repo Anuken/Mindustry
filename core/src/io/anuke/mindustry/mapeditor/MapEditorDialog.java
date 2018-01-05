@@ -231,9 +231,9 @@ public class MapEditorDialog extends Dialog{
 
 				tools.defaults().size(53f, 58f).padBottom(-6);
 
-				ImageButton undo = tools.addIButton("icon-undo", 16*2f, () -> view.undo()).get();
-				ImageButton redo = tools.addIButton("icon-redo", 16*2f, () -> view.redo()).get();
-                tools.addIButton("icon-grid", "toggle", 16*2f, () -> view.setGrid(!view.isGrid())).get();
+				ImageButton undo = tools.addImageButton("icon-undo", 16*2f, () -> view.undo()).get();
+				ImageButton redo = tools.addImageButton("icon-redo", 16*2f, () -> view.redo()).get();
+                tools.addImageButton("icon-grid", "toggle", 16*2f, () -> view.setGrid(!view.isGrid())).get();
 
 				undo.setDisabled(() -> !view.getStack().canUndo());
 				redo.setDisabled(() -> !view.getStack().canRedo());

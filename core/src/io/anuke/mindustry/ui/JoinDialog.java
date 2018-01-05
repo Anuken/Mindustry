@@ -88,7 +88,7 @@ public class JoinDialog extends FloatingDialog {
         if(array.size == 0){
             hosts.add("$text.hosts.none").pad(10f);
             hosts.add().growX();
-            hosts.addIButton("icon-loading", 16*2f, this::refresh).pad(-10f).padLeft(0).padTop(-6).size(70f, 74f);
+            hosts.addImageButton("icon-loading", 16*2f, this::refresh).pad(-10f).padLeft(0).padTop(-6).size(70f, 74f);
         }else {
             for (Address a : array) {
                 TextButton button = hosts.addButton("[accent]"+a.name, "clear", () -> {

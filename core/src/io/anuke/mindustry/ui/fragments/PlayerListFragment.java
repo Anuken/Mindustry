@@ -57,7 +57,7 @@ public class PlayerListFragment implements Fragment{
 
             if(Net.server() && !player.isLocal){
                 button.add().growY();
-                button.addIButton("icon-cancel", 14*3, () ->
+                button.addImageButton("icon-cancel", 14*3, () ->
                     Net.kickConnection(player.clientid)
                 ).pad(-5).padBottom(-10).size(h+10, h+14);
             }

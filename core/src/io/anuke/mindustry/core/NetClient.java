@@ -195,15 +195,6 @@ public class NetClient extends Module {
             });
         });
 
-        Net.handle(PathPacket.class, packet -> {
-            Tile[] tiles = new Tile[packet.path.length];
-            for(int i = 0; i < tiles.length; i ++){
-                int c = packet.path[i];
-                tiles[i] = Vars.world.tile(c % Vars.world.width(), c / Vars.world.width());
-            }
-            Vars.control.spawnpoints.get(packet.index).pathTiles = tiles;
-        });
-
         Net.handle(BulletPacket.class, packet -> {
             //TODO shoot effects for enemies, clientside as well as serverside
             BulletType type = (BulletType) BaseBulletType.getByID(packet.type);

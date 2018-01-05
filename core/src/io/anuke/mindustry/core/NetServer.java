@@ -184,19 +184,6 @@ public class NetServer extends Module{
         Net.send(packet, SendMode.udp);
     }
 
-    public void handlePathFound(int index, Tile[] tiles){
-        PathPacket packet = new PathPacket();
-        int[] out = new int[tiles.length];
-
-        for(int p = 0; p < out.length; p ++){
-            out[p] = tiles[p].packedPosition();
-        }
-
-        packet.path = out;
-        packet.index = (byte)index;
-        Net.send(packet, SendMode.tcp);
-    }
-
     public void handleEnemySpawn(Enemy enemy){
         EnemySpawnPacket packet = new EnemySpawnPacket();
         packet.type = enemy.type.id;

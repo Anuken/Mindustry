@@ -6,12 +6,8 @@ import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.Saves.SaveSlot;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.builders.button;
-import io.anuke.ucore.scene.builders.dialog;
-import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
@@ -66,18 +62,18 @@ public class LoadDialog extends FloatingDialog{
 			button.table(t -> {
 				t.right();
 
-				t.addIButton("icon-floppy", "emptytoggle", 14*3, () -> {
+				t.addImageButton("icon-floppy", "emptytoggle", 14*3, () -> {
 					slot.setAutosave(!slot.isAutosave());
 				}).checked(slot.isAutosave()).right();
 
-				t.addIButton("icon-trash", "empty", 14*3, () -> {
+				t.addImageButton("icon-trash", "empty", 14*3, () -> {
 					Vars.ui.showConfirm("$text.confirm", "$text.save.delete.confirm", () -> {
 						slot.delete();
 						setup();
 					});
 				}).size(14*3).right();
 
-				t.addIButton("icon-dots", "empty", 14*3, () -> {
+				t.addImageButton("icon-dots", "empty", 14*3, () -> {
 					FloatingDialog dialog = new FloatingDialog("Save Options");
 					dialog.addCloseButton();
 

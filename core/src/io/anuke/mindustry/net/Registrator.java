@@ -26,7 +26,6 @@ public class Registrator {
                 StateSyncPacket.class,
                 BlockSyncPacket.class,
                 EnemySpawnPacket.class,
-                PathPacket.class,
                 BulletPacket.class,
                 EnemyDeathPacket.class,
                 BlockUpdatePacket.class,

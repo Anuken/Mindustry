@@ -67,7 +67,7 @@ public class WeaponFragment implements Fragment{
 			
 		}
 		
-		weapontable.addIButton("icon-menu", 8*4, ()->{
+		weapontable.addImageButton("icon-menu", 8*4, ()->{
 			ui.showUpgrades();
 		});
 	}

@@ -107,7 +107,7 @@ public class Sorter extends Junction implements Configurable{
 
 		for(int i = 0; i < items.size; i ++){
 			final int f = i;
-			ImageButton button = cont.addIButton("white", "toggle", 24, () -> {
+			ImageButton button = cont.addImageButton("white", "toggle", 24, () -> {
 				entity.sortItem = items.get(f);
 			}).size(38, 42).padBottom(-5.1f).group(group).get();
 			button.getStyle().imageUp = new TextureRegionDrawable(new TextureRegion(Draw.region("icon-"+items.get(i).name)));

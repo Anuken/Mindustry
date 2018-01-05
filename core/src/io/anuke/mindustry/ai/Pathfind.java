@@ -8,7 +8,6 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.util.Angles;
@@ -112,10 +111,6 @@ public class Pathfind{
 					if(point.finder.search(point.request, ms)){
 						smoother.smoothPath(point.path);
 						point.pathTiles = point.path.nodes.toArray(Tile.class);
-
-                        if(Net.active() && Net.server()){
-                            Vars.netServer.handlePathFound(index, point.pathTiles);
-                        }
 					}
 				}catch (ArrayIndexOutOfBoundsException e){
 					//no path

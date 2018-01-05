@@ -26,7 +26,7 @@ public class ToolFragment implements Fragment{
 		
 		tools = new Table();
 		
-		tools.addIButton("icon-cancel", isize, () -> {
+		tools.addImageButton("icon-cancel", isize, () -> {
 			if(input.placeMode == PlaceMode.areaDelete && confirming){
 				confirming = false;
 			}else{
@@ -34,12 +34,12 @@ public class ToolFragment implements Fragment{
 			}
 		});
 		
-		tools.addIButton("icon-rotate", isize, () -> {
+		tools.addImageButton("icon-rotate", isize, () -> {
 			input.rotation++;
 			input.rotation %= 4;
 		});
 		
-		tools.addIButton("icon-check", isize, () -> {
+		tools.addImageButton("icon-check", isize, () -> {
 			if(input.placeMode == PlaceMode.areaDelete && confirming){
 				input.placeMode.released(px, py, px2, py2);
 				confirming = false;
