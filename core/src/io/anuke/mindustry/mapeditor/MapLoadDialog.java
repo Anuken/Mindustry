@@ -2,7 +2,7 @@ package io.anuke.mindustry.mapeditor;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ui.BorderImage;
-import io.anuke.mindustry.ui.FloatingDialog;
+import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.scene.ui.ButtonGroup;

@@ -1,4 +1,4 @@
-package io.anuke.mindustry.ui;
+package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Mindustry;
@@ -45,7 +45,7 @@ public class JoinDialog extends FloatingDialog {
         join.buttons().addButton("$text.cancel", join::hide);
         join.buttons().addButton("$text.ok", () ->
             connect(Settings.getString("ip"), Strings.parseInt(Settings.getString("port")))
-        ).disabled(b -> Settings.getString("ip").isEmpty() || Strings.parseInt(Settings.getString("port")) == Integer.MIN_VALUE);
+        ).disabled(b -> Settings.getString("ip").isEmpty() || Strings.parseInt(Settings.getString("port")) == Integer.MIN_VALUE || Net.active());
 
         setup();
 
@@ -105,11 +105,13 @@ public class JoinDialog extends FloatingDialog {
     }
 
     void connect(String ip, int port){
-        Vars.ui.showLoading("$text.connecting");
+        Vars.ui.loadfrag.show("$text.connecting");
 
         Timers.runTask(2f, () -> {
             try{
                 Net.connect(ip, port);
+                hide();
+                join.hide();
             }catch (Exception e) {
                 Throwable t = e;
                 while(t.getCause() != null){
@@ -128,7 +130,7 @@ public class JoinDialog extends FloatingDialog {
                     error = Strings.parseException(e, false);
                 }
                 Vars.ui.showError(Bundles.format("text.connectfail", error));
-                Vars.ui.hideLoading();
+                Vars.ui.loadfrag.hide();
 
                 e.printStackTrace();
             }

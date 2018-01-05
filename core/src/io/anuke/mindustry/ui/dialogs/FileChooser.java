@@ -1,4 +1,4 @@
-package io.anuke.mindustry.ui;
+package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -17,7 +17,7 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 
 import java.util.Arrays;
 
-public class FileChooser extends FloatingDialog{
+public class FileChooser extends FloatingDialog {
 	private Table files;
 	private FileHandle homeDirectory = Gdx.files.absolute(Gdx.files.getExternalStoragePath());
 	private FileHandle directory = homeDirectory;

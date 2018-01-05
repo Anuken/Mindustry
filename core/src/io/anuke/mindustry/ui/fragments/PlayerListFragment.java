@@ -35,7 +35,7 @@ public class PlayerListFragment implements Fragment{
                }
             });
 
-            visible(() -> Inputs.keyDown("player_list") && Net.active() && !GameState.is(State.menu)); //TODO move elsewhere?
+            visible(() -> Inputs.keyDown("player_list") && Net.active() && !GameState.is(State.menu));
         }}.end();
 
         rebuild();

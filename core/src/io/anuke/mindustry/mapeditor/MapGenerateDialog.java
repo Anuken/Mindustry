@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Scaling;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.mapeditor.MapFilter.GenPref;
 import io.anuke.mindustry.ui.BorderImage;
-import io.anuke.mindustry.ui.FloatingDialog;
+import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Pixmaps;
 import io.anuke.ucore.scene.style.TextureRegionDrawable;
@@ -71,14 +71,14 @@ public class MapGenerateDialog extends FloatingDialog{
 		});
 		buttons().addButton("$text.update", this::apply);
 		buttons().addButton("$text.apply", () ->{
-			Vars.ui.showLoading();
+			Vars.ui.loadfrag.show();
 			
 			Timers.run(3f, () ->{
 				Pixmap copy = Pixmaps.copy(editor.pixmap());
 				editor.applyFilter();
-				Vars.ui.getEditorDialog().getView().push(copy, Pixmaps.copy(editor.pixmap()));
-				Vars.ui.hideLoading();
-				Vars.ui.getEditorDialog().resetSaved();
+				Vars.ui.editor.getView().push(copy, Pixmaps.copy(editor.pixmap()));
+				Vars.ui.loadfrag.hide();
+				Vars.ui.editor.resetSaved();
 				hide();
 			});
 		});

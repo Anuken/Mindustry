@@ -104,7 +104,7 @@ public class World extends Module{
 	
 	public Tile tile(int x, int y){
 		if(tiles == null){
-			ui.showGameError();
+			ui.showError("$text.error.crashmessage");
 			GameState.set(State.menu);
 			return null;
 		}

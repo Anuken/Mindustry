@@ -1,4 +1,4 @@
-package io.anuke.mindustry.ui;
+package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Colors;
@@ -7,9 +7,9 @@ import com.badlogic.gdx.utils.Align;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.KeybindDialog;
 
-public class MindustryKeybindDialog extends KeybindDialog{
+public class ControlsDialog extends KeybindDialog{
 	
-	public MindustryKeybindDialog(){
+	public ControlsDialog(){
 		setDialog();
 		
 		setFillParent(true);

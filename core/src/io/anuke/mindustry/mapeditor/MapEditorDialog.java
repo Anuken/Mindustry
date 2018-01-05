@@ -1,14 +1,11 @@
 package io.anuke.mindustry.mapeditor;
 
-import java.util.Arrays;
-
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.ui.FileChooser;
+import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.ColorMapper.BlockPair;
@@ -19,11 +16,16 @@ import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Pixmaps;
-import io.anuke.ucore.scene.builders.*;
+import io.anuke.ucore.scene.builders.build;
+import io.anuke.ucore.scene.builders.imagebutton;
+import io.anuke.ucore.scene.builders.label;
+import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Strings;
+
+import java.util.Arrays;
 
 public class MapEditorDialog extends Dialog{
 	private MapEditor editor;
@@ -37,14 +39,16 @@ public class MapEditorDialog extends Dialog{
 	
 	private ButtonGroup<ImageButton> blockgroup;
 	
-	public MapEditorDialog(MapEditor editor){
+	public MapEditorDialog(){
 		super("$text.mapeditor", "dialog");
-		this.editor = editor;
+		if(Vars.gwt) return;
+
+		editor = new MapEditor();
 		dialog = new MapGenerateDialog(editor);
 		view = new MapView(editor);
 		
 		openFile = new FileChooser("$text.loadimage", FileChooser.pngFilter, true, file -> {
-			Vars.ui.showLoading();
+			Vars.ui.loadfrag.show();
 			Timers.run(3f, () -> {
 				try{
 					Pixmap pixmap = new Pixmap(file);
@@ -58,7 +62,7 @@ public class MapEditorDialog extends Dialog{
 					Vars.ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
 					e.printStackTrace();
 				}
-				Vars.ui.hideLoading();
+				Vars.ui.loadfrag.hide();
 			});
 		});
 		
@@ -67,7 +71,7 @@ public class MapEditorDialog extends Dialog{
 				file = file.parent().child(file.nameWithoutExtension() + ".png");
 			}
 			FileHandle result = file;
-			Vars.ui.showLoading();
+			Vars.ui.loadfrag.show();
 			Timers.run(3f, () -> {
 				try{
 					Pixmaps.write(editor.pixmap(), result);
@@ -75,13 +79,13 @@ public class MapEditorDialog extends Dialog{
 					Vars.ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
 					if(!Vars.android) e.printStackTrace();
 				}
-				Vars.ui.hideLoading();
+				Vars.ui.loadfrag.hide();
 			});
 		});
 		
 		loadDialog = new MapLoadDialog(map -> {
 			saveDialog.setFieldText(map.name);
-			Vars.ui.showLoading();
+			Vars.ui.loadfrag.show();
 			
 			Timers.run(3f, () -> {
 				Map copy = new Map();
@@ -90,7 +94,7 @@ public class MapEditorDialog extends Dialog{
 				copy.pixmap = Pixmaps.copy(map.pixmap);
 				copy.texture = new Texture(copy.pixmap);
 				editor.beginEdit(copy);
-				Vars.ui.hideLoading();
+				Vars.ui.loadfrag.hide();
 				view.clearStack();
 			});
 		});
@@ -98,28 +102,28 @@ public class MapEditorDialog extends Dialog{
 		resizeDialog = new MapResizeDialog(editor, (x, y) -> {
 			Pixmap pix = editor.pixmap();
 			if(!(pix.getWidth() == x && pix.getHeight() == y)){
-				Vars.ui.showLoading();
+				Vars.ui.loadfrag.show();
 				Timers.run(10f, ()->{
 					editor.resize(x, y);
 					view.clearStack();
-					Vars.ui.hideLoading();
+					Vars.ui.loadfrag.hide();
 				});
 			}
 		});
 		
 		saveDialog = new MapSaveDialog(name -> {
-			Vars.ui.showLoading();
+			Vars.ui.loadfrag.show();
 			if(verifyMap()){
 				saved = true;
 				editor.getMap().name = name;
 				Timers.run(10f, () -> {
 					Vars.world.maps().saveAndReload(editor.getMap(), editor.pixmap());
 					loadDialog.rebuild();
-					Vars.ui.hideLoading();
+					Vars.ui.loadfrag.hide();
 					view.clearStack();
 				});
 			}else{
-				Vars.ui.hideLoading();
+				Vars.ui.loadfrag.hide();
 			}
 		});
 		

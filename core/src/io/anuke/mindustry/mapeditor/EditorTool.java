@@ -1,15 +1,14 @@
 package io.anuke.mindustry.mapeditor;
 
-import java.util.Stack;
-
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.IntSet;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.ColorMapper.BlockPair;
+
+import java.util.Stack;
 
 public enum EditorTool{
 	pick{
@@ -18,7 +17,7 @@ public enum EditorTool{
 			if(pair == null) return;
 			Block block = pair.dominant();
 			editor.setDrawBlock(block);
-			Vars.ui.getEditorDialog().updateSelectedBlock();
+			Vars.ui.editor.updateSelectedBlock();
 		}
 	},
 	pencil{

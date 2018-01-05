@@ -14,9 +14,7 @@ import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.core.KeyBinds;
 import io.anuke.ucore.core.KeyBinds.Keybind;
-import io.anuke.ucore.scene.ui.SettingsDialog.SettingsTable.Setting;
 import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Mathf;
 
 public class BundleGen {
     private static FileHandle file;
@@ -27,12 +25,12 @@ public class BundleGen {
         file.writeString("", false);
         write("about.text=" + join(Vars.aboutText));
         write("discord.text=Join the mindustry discord!\n[orange]");
-
+        /*
         Mathf.each(table -> {
             for(Setting setting : table.getSettings()){
                 write("setting." + setting.name + ".name=" + setting.title);
             }
-        }, Vars.ui.getPrefs().game, Vars.ui.getPrefs().graphics, Vars.ui.getPrefs().sound);
+        }, Vars.ui.getPrefs().game, Vars.ui.getPrefs().graphics, Vars.ui.getPrefs().sound);*/
 
         for(Map map : Vars.world.maps().list()){
             write("map." + map.name + ".name=" + map.name);

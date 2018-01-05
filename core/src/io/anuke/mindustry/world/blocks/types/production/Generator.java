@@ -43,7 +43,7 @@ public class Generator extends PowerBlock{
 
 		if(hasLasers){
 			list.add("[powerinfo]Laser tile range: " + laserRange);
-			list.add("[powerinfo]Max power transfer/second: " + Strings.toFixed(powerSpeed * 2, 2));
+			list.add("[powerinfo]Max power transfer/second: " + Strings.toFixed(powerSpeed * 60, 2));
 		}
 
 		if(explosive){

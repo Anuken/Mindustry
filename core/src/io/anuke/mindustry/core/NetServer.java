@@ -1,7 +1,6 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -22,7 +21,6 @@ import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.UCore;
-import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.modules.Module;
@@ -42,9 +40,7 @@ public class NetServer extends Module{
 
     public NetServer(){
 
-        Net.handleServer(Connect.class, connect -> {
-            UCore.log("Connection found: " + connect.addressTCP);
-        });
+        Net.handleServer(Connect.class, connect -> UCore.log("Connection found: " + connect.addressTCP));
 
         Net.handleServer(ConnectPacket.class, packet -> {
             int id = Net.getLastConnection();
@@ -68,14 +64,11 @@ public class NetServer extends Module{
 
             UCore.log("Packed " + outc.size() + " COMPRESSED bytes of data.");
 
-            //TODO compress and uncompress when sending
             data.stream = new ByteArrayInputStream(outc.toByteArray());
 
             Net.sendStream(id, data);
 
             Gdx.app.postRunnable(() -> {
-                Vars.ui.showInfo("$text.server.connected");
-
                 EntityDataPacket dp = new EntityDataPacket();
 
                 Player player = new Player();
@@ -94,6 +87,8 @@ public class NetServer extends Module{
                 Net.sendExcept(id, player, SendMode.tcp);
 
                 Net.sendTo(id, dp, SendMode.tcp);
+
+                Vars.ui.showInfo(Bundles.format("text.server.connected", packet.name));
             });
         });
 
@@ -160,17 +155,6 @@ public class NetServer extends Module{
             packet.name = player.name;
             Net.send(packet, SendMode.tcp);
         });
-    }
-
-    //TODO decide whether to use effects
-    public void sendEffect(Effect effect, Color color, float x, float y, float rotation){
-        EffectPacket packet = new EffectPacket();
-        packet.id = effect.id;
-        packet.color = Color.rgba8888(color);
-        packet.x = x;
-        packet.y = y;
-        packet.rotation = rotation;
-        Net.send(packet, SendMode.udp);
     }
 
     public void handleBullet(BulletType type, Entity owner, float x, float y, float angle, short damage){
@@ -281,8 +265,6 @@ public class NetServer extends Module{
                 int h = 12;
                 sendBlockSync(id, x, y, w, h);
             }
-
-            //TODO sync to each player entity
         }
     }
 
@@ -321,8 +303,6 @@ public class NetServer extends Module{
         }catch (IOException e){
             throw new RuntimeException(e);
         }
-
-        //TODO finish
 
         packet.stream = new ByteArrayInputStream(bs.toByteArray());
 

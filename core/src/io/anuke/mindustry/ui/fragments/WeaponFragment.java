@@ -1,7 +1,5 @@
 package io.anuke.mindustry.ui.fragments;
 
-import static io.anuke.mindustry.Vars.*;
-
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Weapon;
@@ -11,6 +9,8 @@ import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.Tooltip;
 import io.anuke.ucore.scene.ui.layout.Table;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class WeaponFragment implements Fragment{
 	Table weapontable;
@@ -64,11 +64,8 @@ public class WeaponFragment implements Fragment{
 			tip.setInstant(true);
 
 			button.addListener(tip);
-			
 		}
 		
-		weapontable.addImageButton("icon-menu", 8*4, ()->{
-			ui.showUpgrades();
-		});
+		weapontable.addImageButton("icon-menu", 8*4, ui.weaponfrag::updateWeapons);
 	}
 }

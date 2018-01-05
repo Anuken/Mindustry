@@ -46,9 +46,10 @@ public class NetClient extends Module {
             connecting = true;
             gotEntities = false;
             kicked = false;
+
             Gdx.app.postRunnable(() -> {
-                Vars.ui.hideLoading();
-                Vars.ui.showLoading("$text.connecting.data");
+                Vars.ui.loadfrag.hide();
+                Vars.ui.loadfrag.show("$text.connecting.data");
             });
 
             ConnectPacket c = new ConnectPacket();
@@ -59,7 +60,7 @@ public class NetClient extends Module {
             Timers.runTask(dataTimeout, () -> {
                 if(!gotEntities){
                     Gdx.app.error("Mindustry", "Failed to load data!");
-                    Vars.ui.hideLoading();
+                    Vars.ui.loadfrag.hide();
                     Net.disconnect();
                 }
             });
@@ -69,9 +70,7 @@ public class NetClient extends Module {
             if(kicked) return;
 
             Gdx.app.postRunnable(() -> {
-                Timers.runFor(3f, () -> {
-                    Vars.ui.hideLoading();
-                });
+                Timers.runFor(3f, Vars.ui.loadfrag::hide);
 
                 GameState.set(State.menu);
 
@@ -96,8 +95,8 @@ public class NetClient extends Module {
 
                 GameState.set(State.playing);
                 connecting = false;
-                Vars.ui.hideLoading();
-                Vars.ui.hideJoinGame();
+                Vars.ui.loadfrag.hide();
+                Vars.ui.join.hide();
             });
         });
 
@@ -170,9 +169,7 @@ public class NetClient extends Module {
 
             Timers.resetTime(packet.time + (float)(TimeUtils.timeSinceMillis(packet.timestamp) / 1000.0 * 60.0));
 
-            Gdx.app.postRunnable(() -> {
-                Vars.ui.updateItems();
-            });
+            Gdx.app.postRunnable(Vars.ui.hudfrag::updateItems);
         });
 
         Net.handle(EnemySpawnPacket.class, spawn -> {
@@ -199,7 +196,7 @@ public class NetClient extends Module {
             //TODO shoot effects for enemies, clientside as well as serverside
             BulletType type = (BulletType) BaseBulletType.getByID(packet.type);
             Entity owner = Vars.control.enemyGroup.getByID(packet.owner);
-            Bullet bullet = new Bullet(type, owner, packet.x, packet.y, packet.angle).add();
+            new Bullet(type, owner, packet.x, packet.y, packet.angle).add();
         });
 
         Net.handle(BlockDestroyPacket.class, packet -> {
@@ -217,7 +214,6 @@ public class NetClient extends Module {
         });
 
         Net.handle(BlockSyncPacket.class, packet -> {
-            //TODO implementation, load data...
             DataInputStream stream = new DataInputStream(packet.stream);
 
             try{
@@ -247,13 +243,9 @@ public class NetClient extends Module {
             }
         });
 
-        Net.handle(Player.class, player -> {
-            player.add();
-        });
+        Net.handle(Player.class, Player::add);
 
-        Net.handle(ChatPacket.class, packet -> {
-            Gdx.app.postRunnable(() -> Vars.ui.addChatMessage(packet.name, packet.text));
-        });
+        Net.handle(ChatPacket.class, packet -> Gdx.app.postRunnable(() -> Vars.ui.chatfrag.addMessage(packet.name, packet.text)));
 
         Net.handle(KickPacket.class, packet -> {
             kicked = true;
@@ -280,7 +272,7 @@ public class NetClient extends Module {
         Net.send(packet, SendMode.tcp);
 
         if(Net.server()){
-            Vars.ui.addChatMessage(Vars.player.name, packet.text);
+            Vars.ui.chatfrag.addMessage(packet.text, Vars.player.name);
         }
     }
 
@@ -314,7 +306,7 @@ public class NetClient extends Module {
         if(Timers.get("syncPlayer", playerSyncTime)){
             PositionPacket packet = new PositionPacket();
             packet.data = Vars.player.getInterpolator().type.write(Vars.player);
-            Net.send(packet, SendMode.udp); //TODO udp instead?
+            Net.send(packet, SendMode.udp);
         }
     }
 }

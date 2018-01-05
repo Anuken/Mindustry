@@ -243,9 +243,9 @@ public class Control extends Module{
 		for(Block block : Block.getAllBlocks()){
 			block.onReset();
 		}
-		
-		ui.updateItems();
-		ui.updateWeapons();
+
+		ui.hudfrag.updateItems();
+		ui.weaponfrag.updateWeapons();
 	}
 	
 	public void play(){
@@ -264,8 +264,8 @@ public class Control extends Module{
 		if(mode.infiniteResources){
 			Arrays.fill(items, 999999999);
 		}
-		
-		ui.updateItems();
+
+		ui.hudfrag.updateItems();
 		
 		GameState.set(State.playing);
 	}
@@ -293,7 +293,7 @@ public class Control extends Module{
 	}
 	
 	public void playMap(Map map){
-		Vars.ui.showLoading();
+		ui.loadfrag.show();
 		saves.resetSave();
 		
 		Timers.run(16, ()->{
@@ -302,7 +302,7 @@ public class Control extends Module{
 			play();
 		});
 		
-		Timers.run(18, ()-> ui.hideLoading());
+		Timers.run(18, ()-> ui.loadfrag.hide());
 	}
 	
 	public GameMode getMode(){
@@ -403,7 +403,7 @@ public class Control extends Module{
 		}
 		Effects.effect(Fx.coreexplosion, core.worldx(), core.worldy());
 		
-		Timers.run(60, ()-> ui.showRestart());
+		Timers.run(60, ()-> ui.restart.show());
 	}
 	
 	float waveSpacing(){
@@ -602,23 +602,23 @@ public class Control extends Module{
 		}
 		
 		if(shouldUpdateItems && (Timers.get("updateItems", 8) || GameState.is(State.paused))){
-			ui.updateItems();
+			ui.hudfrag.updateItems();
 			shouldUpdateItems = false;
 		}
 		
 		if(!GameState.is(State.menu)){
 			input.update();
 			
-			if(Inputs.keyTap("pause") && !ui.isGameOver() && !Net.active() && (GameState.is(State.paused) || GameState.is(State.playing))){
+			if(Inputs.keyTap("pause") && !ui.restart.isShown() && !Net.active() && (GameState.is(State.paused) || GameState.is(State.playing))){
 				GameState.set(GameState.is(State.playing) ? State.paused : State.playing);
 			}
 			
 			if(Inputs.keyTap("menu")){
 				if(GameState.is(State.paused)){
-					ui.hideMenu();
+					ui.paused.hide();
 					GameState.set(State.playing);
-				}else if (!ui.isGameOver()){
-					ui.showMenu();
+				}else if (!ui.restart.isShown()){
+					ui.paused.show();
 					GameState.set(State.paused);
 				}
 			}
@@ -634,7 +634,7 @@ public class Control extends Module{
 						player.heal();
 						player.add();
 						Effects.sound("respawn");
-						ui.fadeRespawn(false);
+						ui.hudfrag.fadeRespawn(false);
 					}
 				}
 				
