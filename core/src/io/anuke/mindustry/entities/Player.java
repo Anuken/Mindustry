@@ -20,7 +20,7 @@ public class Player extends DestructibleEntity implements Syncable{
 	private static final float dashSpeed = 1.8f;
 
 	public String name = "name";
-	public transient Weapon weapon = Weapon.blaster;
+	public Weapon weapon = Weapon.blaster;
 	public Mech mech = Mech.standard;
 	public float angle;
 	public boolean isAndroid;
@@ -124,12 +124,11 @@ public class Player extends DestructibleEntity implements Syncable{
 		vector.y += ya*speed;
 		vector.x += xa*speed;
 		
-		boolean shooting = !Inputs.keyDown("dash") && Inputs.keyDown("shootInternal") && control.getInput().recipe == null
+		boolean shooting = !Inputs.keyDown("dash") && Inputs.keyDown("shoot") && control.getInput().recipe == null
 				&& !ui.hasMouse() && !control.getInput().onConfigurable();
 		
-		if(shooting && Timers.get(this, "reload", weapon.reload)){
-			weapon.shoot(this, x, y, Angles.mouseAngle(x, y));
-			Sounds.play(weapon.shootsound);
+		if(shooting){
+			weapon.update(player);
 		}
 		
 		if(Inputs.keyDown("dash") && Timers.get(this, "dashfx", 3) && vector.len() > 0){

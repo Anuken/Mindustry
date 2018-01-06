@@ -1,8 +1,5 @@
 package io.anuke.mindustry.resource;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
@@ -10,109 +7,86 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entity;
+import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
-public enum Weapon{
-	blaster(15, BulletType.shot){
+public class Weapon extends Upgrade{
+	public static final Weapon
+
+	blaster = new Weapon("blaster", 15, BulletType.shot){
 		{
-			unlocked = true;
-		}
-		
-		@Override
-		public void shootInternal(Player p, float x, float y, float rotation){
-			super.shootInternal(p, x, y, rotation);
-			Effects.effect(Fx.shoot3, x + vector.x, y+vector.y);
+			effect =  Fx.shoot3;
 		}
 	},
-	triblaster(13, BulletType.shot, stack(Item.iron, 40)){
-		
-		@Override
-		public void shootInternal(Player p, float x, float y, float rotation){
-			float space = 12;
-			
-			bullet(p, x, y, rotation);
-			bullet(p, x, y, rotation + space);
-			bullet(p, x, y, rotation - space);
-			
-			Effects.effect(Fx.shoot, x + vector.x, y + vector.y);
-			
+	triblaster = new Weapon("blaster", 13, BulletType.shot){
+		{
+			shots = 3;
+			effect = Fx.shoot;
 		}
 	},
-	multigun(6, BulletType.multishot, stack(Item.iron, 60), stack(Item.steel, 20)){
-		@Override
-		public void shootInternal(Player p, float x, float y, float rotation){
-			MathUtils.random.setSeed(Gdx.graphics.getFrameId());
-			
-			bullet(p, x, y, rotation + Mathf.range(8));
-			
-			Effects.effect(Fx.shoot2, x + vector.x, y + vector.y);
+	multigun = new Weapon("blaster", 6, BulletType.multishot){
+		{
+			effect = Fx.shoot2;
+			inaccuracy = 8f;
 		}
 	},
-	flamer(5, BulletType.flame, stack(Item.steel, 60), stack(Item.iron, 120)){
-		
+	flamer = new Weapon("blaster", 5, BulletType.flame){
 		{
 			shootsound = "flame2";
-		}
-		
-		@Override
-		public void shootInternal(Player p, float x, float y, float rotation){
-			MathUtils.random.setSeed(Gdx.graphics.getFrameId());
-			
-			bullet(p, x, y, rotation + Mathf.range(12));
+			inaccuracy = 12f;
 		}
 	},
-	railgun(40, BulletType.sniper,  stack(Item.steel, 60), stack(Item.iron, 60)){
-		
+	railgun = new Weapon("blaster", 40, BulletType.sniper){
 		{
 			shootsound = "railgun";
-		}
-		
-		@Override
-		public void shootInternal(Player p, float x, float y, float rotation){
-			bullet(p, x, y, rotation);
-			Effects.effect(Fx.railshoot, x + vector.x, y + vector.y);
+			effect = Fx.railshoot;
 		}
 	},
-	mortar(100, BulletType.shell, stack(Item.titanium, 40), stack(Item.steel, 60)){
-		
+	mortar = new Weapon("blaster", 100, BulletType.shell){
 		{
 			shootsound = "bigshot";
-		}
-		
-		@Override
-		public void shootInternal(Player p, float x, float y, float rotation){
-			bullet(p, x, y, rotation);
-			Effects.effect(Fx.mortarshoot, x + vector.x, y + vector.y);
-			Effects.shake(2f, 2f, p);
+			effect = Fx.mortarshoot;
+			shake = 2f;
 		}
 	};
-	public float reload;
-	public BulletType type;
-	public String shootsound = "shoot";
-	public boolean unlocked;
-	public ItemStack[] requirements;
+	float reload;
+	BulletType type;
+	String shootsound = "shoot";
+	int shots = 1;
+	float inaccuracy = 0f;
+	float shake = 0f;
+	Effect effect;
+
 	public final String description;
-
-	Vector2 vector = new Vector2();
-
-	public String localized(){
-		return Bundles.get("weapon."+name() + ".name");
-	}
+	public final String name;
 	
-	private Weapon(float reload, BulletType type, ItemStack... requirements){
+	private Weapon(String name, float reload, BulletType type){
 		this.reload = reload;
 		this.type = type;
-		this.requirements = requirements;
-		this.description = Bundles.getNotNull("weapon."+name()+".description");
+		this.name = name;
+		this.description = Bundles.getNotNull("weapon."+name+".description");
 	}
+
+	public void update(Player p){
+		if(Timers.get(p, "reload", reload)){
+			shoot(p, p.x, p.y, Angles.mouseAngle(p.x, p.y));
+		}
+	}
+
 
 	void shootInternal(Player p, float x, float y, float rotation){
-		bullet(p, x, y, rotation);
+		Angles.shotgun(shots, 12f, rotation, f -> bullet(p, x, y, f + Mathf.range(inaccuracy)));
+		Angles.translation(rotation, 3f);
+		if(effect != null) Effects.effect(effect, x + Angles.x(), y + Angles.y());
+		Effects.shake(shake, shake, x, y);
+		Effects.sound(shootsound, x, y);
 	}
 
-	public void shoot(Player p, float x, float y, float angle){
+	void shoot(Player p, float x, float y, float angle){
 		shootInternal(p, x, y, angle);
 
 		if(Net.active() && p == Vars.player){
@@ -121,8 +95,12 @@ public enum Weapon{
 	}
 	
 	void bullet(Entity owner, float x, float y, float angle){
-		vector.set(3, 0).rotate(angle);
-		new Bullet(type, owner,  x + vector.x, y + vector.y, angle).add();
+		Angles.translation(angle, 3f);
+		new Bullet(type, owner,  x + Angles.x(), y + Angles.y(), angle).add();
+	}
+
+	public String localized(){
+		return Bundles.get("weapon."+name + ".name");
 	}
 	
 	private static ItemStack stack(Item item, int amount){
