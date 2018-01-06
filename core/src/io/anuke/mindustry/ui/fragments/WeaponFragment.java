@@ -66,6 +66,6 @@ public class WeaponFragment implements Fragment{
 			button.addListener(tip);
 		}
 		
-		weapontable.addImageButton("icon-menu", 8*4, ui.weaponfrag::updateWeapons);
+		weapontable.addImageButton("icon-menu", 8*4, ui.upgrades::show);
 	}
 }
