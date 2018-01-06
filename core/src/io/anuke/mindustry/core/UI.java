@@ -22,6 +22,7 @@ import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.TextField.TextFieldFilter;
 import io.anuke.ucore.scene.ui.TooltipManager;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.control;
 import static io.anuke.ucore.scene.actions.Actions.*;
@@ -69,11 +70,13 @@ public class UI extends SceneModule{
 				fadeOut(0.1f, Interpolation.fade)
 			)
 		));
-		
-		skin.font().setUseIntegerPositions(false);
-		skin.font().getData().setScale(Vars.fontscale);
-		skin.font().getData().down += 4f;
-		skin.font().getData().lineHeight -= 2f;
+
+		Mathf.each(font -> {
+			font.setUseIntegerPositions(false);
+			font.getData().setScale(Vars.fontscale);
+			font.getData().down += Unit.dp.scl(4f);
+			font.getData().lineHeight -= Unit.dp.scl(2f);
+		}, skin.font(), skin.getFont("default-font-chat"));
 		
 		TooltipManager.getInstance().animations = false;
 		

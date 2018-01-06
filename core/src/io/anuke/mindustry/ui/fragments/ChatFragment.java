@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
@@ -74,6 +75,8 @@ public class ChatFragment extends Table implements Fragment{
         chatfield.getStyle().fontColor = Color.WHITE;
         chatfield.getStyle().font = skin.getFont("default-font-chat");
 
+        Mindustry.platforms.addDialog(chatfield);
+
         bottom().left().marginBottom(offsety).marginLeft(offsetx*2).add(fieldlabel).padBottom(4f);
 
         add(chatfield).padBottom(offsety).padLeft(offsetx).growX().padRight(offsetx).height(28);
@@ -87,8 +90,9 @@ public class ChatFragment extends Table implements Fragment{
         if(chatOpen)
             batch.draw(skin.getRegion("white"), offsetx, chatfield.getY(), Gdx.graphics.getWidth()-offsetx*2, chatfield.getHeight()-1);
 
-        font.getData().down = -21.5f;
-        font.getData().lineHeight = 22f;
+        //font.getData().down = -21.5f;
+       // font.getData().lineHeight = 22f;
+        //chatfield.getStyle().font.getData().setScale(Vars.fontscale);
 
         super.draw(batch, alpha);
 

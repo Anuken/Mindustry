@@ -65,6 +65,7 @@ public class HudFragment implements Fragment{
 				pause = new imagebutton("icon-pause", isize, ()->{
 					if(Net.active() && Vars.android){
 						//TODO open android chat
+						ui.chatfrag.toggle();
 					}else {
 						GameState.set(GameState.is(State.paused) ? State.playing : State.paused);
 					}
