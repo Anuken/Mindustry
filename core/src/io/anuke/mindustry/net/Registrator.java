@@ -35,6 +35,7 @@ public class Registrator {
                 ChatPacket.class,
                 KickPacket.class,
                 UpgradePacket.class,
+                WeaponSwitchPacket.class,
 
                 Class.class,
                 byte[].class,

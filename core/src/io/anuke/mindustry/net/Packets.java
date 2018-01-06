@@ -118,4 +118,9 @@ public class Packets {
     public static class UpgradePacket{
         public byte id; //weapon ID only, currently
     }
+
+    public static class WeaponSwitchPacket{
+        public int playerid;
+        public byte left, right;
+    }
 }

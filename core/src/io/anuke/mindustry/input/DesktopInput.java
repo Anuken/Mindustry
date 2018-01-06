@@ -2,6 +2,7 @@ package io.anuke.mindustry.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Weapon;
@@ -81,6 +82,7 @@ public class DesktopInput extends InputHandler{
 		for(int i = 1; i <= 6 && i <= control.getWeapons().size; i ++){
 			if(Inputs.keyTap("weapon_" + i)){
 				player.weaponLeft = player.weaponRight = control.getWeapons().get(i - 1);
+                Vars.netClient.handleWeaponSwitch();
 				ui.weaponfrag.update();
 			}
 		}

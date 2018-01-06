@@ -147,8 +147,7 @@ public class NetServer extends Module{
         Net.handleServer(ChatPacket.class, packet -> {
             Player player = connections.get(Net.getLastConnection());
 
-            if(player == null)
-                return; //GHOSTS AAAA
+            if(player == null) return; //GHOSTS AAAA
 
             packet.name = player.name;
             Net.send(packet, SendMode.tcp);
@@ -157,6 +156,19 @@ public class NetServer extends Module{
         Net.handleServer(UpgradePacket.class, packet -> {
             Weapon weapon = (Weapon)Upgrade.getByID(packet.id);
             Vars.control.removeItems(UpgradeRecipes.get(weapon));
+        });
+
+        Net.handleServer(WeaponSwitchPacket.class, packet -> {
+            Player player = connections.get(Net.getLastConnection());
+
+            if(player == null) return;
+
+            packet.playerid = player.id;
+
+            player.weaponLeft = (Weapon)Upgrade.getByID(packet.left);
+            player.weaponRight = (Weapon)Upgrade.getByID(packet.right);
+
+            Net.sendExcept(player.clientid, packet, SendMode.tcp);
         });
     }
 

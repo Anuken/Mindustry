@@ -252,6 +252,15 @@ public class NetClient extends Module {
             GameState.set(State.menu);
             Gdx.app.postRunnable(() -> Vars.ui.showError("$text.server.kicked." + KickReason.values()[packet.reason].name()));
         });
+
+        Net.handle(WeaponSwitchPacket.class, packet -> {
+            Player player = Vars.control.playerGroup.getByID(packet.playerid);
+
+            if(player == null) return;
+
+            player.weaponLeft = (Weapon)Upgrade.getByID(packet.left);
+            player.weaponRight = (Weapon)Upgrade.getByID(packet.right);
+        });
     }
 
     @Override
@@ -263,6 +272,14 @@ public class NetClient extends Module {
         }else if(!connecting){
             Net.disconnect();
         }
+    }
+
+    public void handleWeaponSwitch(){
+        WeaponSwitchPacket packet = new WeaponSwitchPacket();
+        packet.left = Vars.player.weaponLeft.id;
+        packet.right = Vars.player.weaponRight.id;
+        packet.playerid = Vars.player.id;
+        Net.send(packet, SendMode.tcp);
     }
 
     public void handleUpgrade(Weapon weapon){

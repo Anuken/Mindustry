@@ -1,5 +1,6 @@
 package io.anuke.mindustry.ui.fragments;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Weapon;
@@ -48,6 +49,7 @@ public class WeaponFragment implements Fragment{
                     player.weaponLeft = weapon;
                 }
 				button.setChecked(true);
+                Vars.netClient.handleWeaponSwitch();
 			});
 			
 			button.update(() -> button.setChecked(weapon == player.weaponLeft || weapon == player.weaponRight)); //TODO
