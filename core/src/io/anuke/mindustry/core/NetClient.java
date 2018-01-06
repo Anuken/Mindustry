@@ -284,7 +284,7 @@ public class NetClient extends Module {
 
     public void handleShoot(Weapon weapon, float x, float y, float angle){
         ShootPacket packet = new ShootPacket();
-        packet.weaponid = (byte)weapon.id;
+        packet.weaponid = weapon.id;
         packet.x = x;
         packet.y = y;
         packet.rotation = angle;

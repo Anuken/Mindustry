@@ -38,7 +38,6 @@ public class UI extends SceneModule{
 	public SettingsMenuDialog settings;
 	public ControlsDialog controls;
 	public MapEditorDialog editor;
-	public UpgradeDialog upgrades;
 
 	public final MenuFragment menufrag = new MenuFragment();
     public final ToolFragment toolfrag = new ToolFragment();
@@ -135,7 +134,6 @@ public class UI extends SceneModule{
 		join = new JoinDialog();
 		discord = new DiscordDialog();
 		load = new LoadDialog();
-		upgrades = new UpgradeDialog();
 		levels = new LevelDialog();
 		settings = new SettingsMenuDialog();
 		paused = new PausedDialog();

@@ -241,7 +241,6 @@ public class BlocksFragment implements Fragment{
 			}).expandX().padLeft(3).top().right().size(40f, 44f).padTop(-2);
 		}
 		
-		
 		desctable.add().pad(2);
 		
 		Table requirements = new Table();
@@ -252,12 +251,11 @@ public class BlocksFragment implements Fragment{
 		desctable.left();
 		
 		for(ItemStack stack : recipe.requirements){
-			ItemStack fs = stack;
 			requirements.addImage(Draw.region("icon-"+stack.item.name)).size(8*3);
 			Label reqlabel = new Label("");
 			
 			reqlabel.update(()->{
-				int current = control.getAmount(fs.item);
+				int current = control.getAmount(stack.item);
 				String text = Mathf.clamp(current, 0, stack.amount) + "/" + stack.amount;
 				
 				reqlabel.setColor(current < stack.amount ? Colors.get("missingitems") : Color.WHITE);
@@ -271,8 +269,7 @@ public class BlocksFragment implements Fragment{
 		
 		desctable.row();
 		
-		Label label = new Label("[health]"+ Bundles.get("text.health")+": " + recipe.result.health + (recipe.result.description == null ?
-				"" : ("\n[]" + recipe.result.description)));
+		Label label = new Label("[health]"+ Bundles.get("text.health")+": " + recipe.result.health);
 		label.setWrap(true);
 		desctable.add(label).width(200).padTop(4).padBottom(2);
 		

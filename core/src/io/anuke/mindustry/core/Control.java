@@ -141,6 +141,7 @@ public class Control extends Module{
 				"select", Input.MOUSE_LEFT,
 				"break", Input.MOUSE_RIGHT,
 				"shoot", Input.MOUSE_LEFT,
+				"weapon_alt_select", Input.Q,
 				"zoom_hold", Input.CONTROL_LEFT,
 				"zoom", new Axis(Input.SCROLL),
 				"menu", Gdx.app.getType() == ApplicationType.Android ? Input.BACK : Input.ESCAPE,
@@ -223,7 +224,7 @@ public class Control extends Module{
 		weapons.clear();
 		
 		weapons.add(Weapon.blaster);
-		player.weapon = weapons.first();
+		player.weaponLeft = player.weaponRight = weapons.first();
 		
 		lastUpdated = -1;
 		wave = 1;
@@ -672,5 +673,4 @@ public class Control extends Module{
 			}
 		}
 	}
-
 }

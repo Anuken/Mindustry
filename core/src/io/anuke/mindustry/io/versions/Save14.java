@@ -79,7 +79,7 @@ public class Save14 extends SaveFileVersion{
 
         Vars.control.getWeapons().clear();
         Vars.control.getWeapons().add(Weapon.blaster);
-        Vars.player.weapon = Weapon.blaster;
+        Vars.player.weaponLeft = Vars.player.weaponRight = Weapon.blaster;
 
         int weapons = stream.readByte();
 

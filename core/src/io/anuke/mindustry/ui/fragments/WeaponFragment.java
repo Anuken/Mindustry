@@ -5,6 +5,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.Tooltip;
@@ -29,6 +30,7 @@ public class WeaponFragment implements Fragment{
 		weapontable.clearChildren();
 		
 		ButtonGroup<ImageButton> group = new ButtonGroup<>();
+		group.setMaxCheckCount(2);
 		
 		weapontable.defaults().size(58, 62);
 		
@@ -39,12 +41,16 @@ public class WeaponFragment implements Fragment{
 			group.add(button);
 			
 			button.clicked(()->{
-				if(weapon == player.weapon) return;
-				player.weapon = weapon;
+				//if(weapon == player.weapon) return;
+                if(Inputs.keyDown("weapon_alt_select")){
+                    player.weaponRight = weapon;
+                }else {
+                    player.weaponLeft = weapon;
+                }
 				button.setChecked(true);
 			});
 			
-			button.setChecked(weapon == player.weapon);
+			button.update(() -> button.setChecked(weapon == player.weaponLeft || weapon == player.weaponRight)); //TODO
 			
 			weapontable.add(button);
 			
@@ -52,7 +58,7 @@ public class WeaponFragment implements Fragment{
 			String description = weapon.description;
 				
 			tiptable.background("button");
-			tiptable.add("$weapon."+weapon.name+".name", 0.5f).left().padBottom(3f);
+			tiptable.add(weapon.localized(), 0.5f).left().padBottom(3f);
 				
 			tiptable.row();
 			tiptable.row();

@@ -80,7 +80,7 @@ public class DesktopInput extends InputHandler{
 		
 		for(int i = 1; i <= 6 && i <= control.getWeapons().size; i ++){
 			if(Inputs.keyTap("weapon_" + i)){
-				player.weapon = control.getWeapons().get(i - 1);
+				player.weaponLeft = player.weaponRight = control.getWeapons().get(i - 1);
 				ui.weaponfrag.update();
 			}
 		}

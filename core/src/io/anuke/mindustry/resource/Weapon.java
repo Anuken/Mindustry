@@ -30,7 +30,7 @@ public class Weapon extends Upgrade{
 	multigun = new Weapon("multigun", 6, BulletType.multishot){
 		{
 			effect = Fx.shoot2;
-			inaccuracy = 8f;
+			inaccuracy = 6f;
 		}
 	},
 	flamer = new Weapon("flamer", 5, BulletType.flame){
@@ -39,7 +39,7 @@ public class Weapon extends Upgrade{
 			inaccuracy = 12f;
 		}
 	},
-	railgun = new Weapon("railgun", 40, BulletType.sniper){
+	railgun = new Weapon("railgun", 30, BulletType.sniper){
 		{
 			shootsound = "railgun";
 			effect = Fx.railshoot;
@@ -67,9 +67,11 @@ public class Weapon extends Upgrade{
 		this.type = type;
 	}
 
-	public void update(Player p){
-		if(Timers.get(p, "reload", reload)){
-			shoot(p, p.x, p.y, Angles.mouseAngle(p.x, p.y));
+	public void update(Player p, boolean left){
+		if(Timers.get(p, "reload"+left, reload)){
+			float ang = Angles.mouseAngle(p.x, p.y);
+			Angles.translation(ang + Mathf.sign(left) * -70f, 2f);
+			shoot(p, p.x + Angles.x(), p.y + Angles.y(), Angles.mouseAngle(p.x + Angles.x(), p.y + Angles.y()));
 		}
 	}
 

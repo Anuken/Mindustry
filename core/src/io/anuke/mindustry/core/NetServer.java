@@ -156,8 +156,7 @@ public class NetServer extends Module{
 
         Net.handleServer(UpgradePacket.class, packet -> {
             Weapon weapon = (Weapon)Upgrade.getByID(packet.id);
-            //TODO
-            //Vars.control.removeItems(weapon.requirements);
+            Vars.control.removeItems(UpgradeRecipes.get(weapon));
         });
     }
 

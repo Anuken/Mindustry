@@ -13,8 +13,10 @@ public class UpgradeRecipes {
             Weapon.mortar, list(stack(Item.titanium, 40), stack(Item.steel, 60))
     );
 
-    public ItemStack[] get(Upgrade upgrade){
-        return recipes.get(upgrade);
+    private static final ItemStack[] empty = {};
+
+    public static ItemStack[] get(Upgrade upgrade){
+        return recipes.get(upgrade, empty);
     }
 
     public static Entries<Upgrade, ItemStack[]> getAllRecipes(){

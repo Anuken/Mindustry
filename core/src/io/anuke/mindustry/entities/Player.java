@@ -22,7 +22,8 @@ public class Player extends DestructibleEntity implements Syncable{
 	public String name = "name";
 	public boolean isAndroid;
 
-	public Weapon weapon = Weapon.blaster;
+	public Weapon weaponLeft = Weapon.blaster;
+	public Weapon weaponRight = Weapon.blaster;
 	public Mech mech = Mech.standard;
 
 	public float angle;
@@ -129,7 +130,8 @@ public class Player extends DestructibleEntity implements Syncable{
 				&& !ui.hasMouse() && !control.getInput().onConfigurable();
 		
 		if(shooting){
-			weapon.update(player);
+			weaponLeft.update(player, true);
+			weaponRight.update(player, false);
 		}
 		
 		if(Inputs.keyDown("dash") && Timers.get(this, "dashfx", 3) && vector.len() > 0){

@@ -1,13 +1,16 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
-import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Upgrade;
+import io.anuke.mindustry.resource.UpgradeRecipes;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.scene.style.TextureRegionDrawable;
 import io.anuke.ucore.scene.ui.ImageButton;
@@ -17,12 +20,11 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import static io.anuke.mindustry.Vars.control;
 
 public class WeaponFactory extends Block implements Configurable{
-    protected ObjectMap<Weapon, ItemStack[]> costs = new ObjectMap<>();
 
     public WeaponFactory(String name){
         super(name);
         solid = true;
-        breakable = true;
+        destructible = true;
     }
 
     @Override
@@ -31,13 +33,11 @@ public class WeaponFactory extends Block implements Configurable{
 
         Table content = new Table();
 
-        content.add("$text.upgrades").colspan(3).row();
-
         for(Upgrade upgrade : Upgrade.getAllUpgrades()){
             if(!(upgrade instanceof Weapon)) continue;
             Weapon weapon = (Weapon)upgrade;
 
-            ItemStack[] requirements = costs.get(weapon);
+            ItemStack[] requirements = UpgradeRecipes.get(weapon);
 
             Table tiptable = new Table();
 
@@ -47,7 +47,7 @@ public class WeaponFactory extends Block implements Configurable{
                 String description = weapon.description;
 
                 tiptable.background("pane");
-                tiptable.add("[orange]" + weapon.localized(), 0.5f).left().padBottom(4f);
+                tiptable.add("[orange]" + weapon.localized(), 0.5f).left().padBottom(2f);
 
                 Table reqtable = new Table();
 
@@ -67,14 +67,14 @@ public class WeaponFactory extends Block implements Configurable{
                 }
 
                 tiptable.row();
-                tiptable.add().size(10);
+                tiptable.add().size(4);
                 tiptable.row();
                 tiptable.add("[gray]" + description).left();
                 tiptable.row();
                 if(control.hasWeapon(weapon)){
-                    tiptable.add("$text.purchased").padTop(6).left();
+                    tiptable.add("$text.purchased").padTop(4).left();
                 }
-                tiptable.margin(14f);
+                tiptable.margin(8f);
             };
 
             run.listen();
@@ -84,10 +84,18 @@ public class WeaponFactory extends Block implements Configurable{
             tip.setInstant(true);
 
             ImageButton button = content.addImageButton("white", 8*4, () -> {
+                control.removeItems(requirements);
+                control.addWeapon(weapon);
+                Vars.ui.weaponfrag.update();
+                run.listen();
+                Effects.sound("purchase");
 
-            }).size(49f, 54f).padBottom(-5)
-                    .get();
+                if(Net.active() && Net.client()){
+                    Vars.netClient.handleUpgrade(weapon);
+                }
+            }).size(49f, 54f).padBottom(-5).get();
 
+            button.setDisabled(() -> control.hasWeapon(weapon));
             button.getStyle().imageUp = new TextureRegionDrawable(Draw.region(weapon.name));
             button.addListener(tip);
 
