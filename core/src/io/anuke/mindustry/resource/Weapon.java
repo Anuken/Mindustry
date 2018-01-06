@@ -52,6 +52,7 @@ public class Weapon extends Upgrade{
 			shake = 2f;
 		}
 	};
+
 	float reload;
 	BulletType type;
 	String shootsound = "shoot";
@@ -91,9 +92,5 @@ public class Weapon extends Upgrade{
 	void bullet(Entity owner, float x, float y, float angle){
 		Angles.translation(angle, 3f);
 		new Bullet(type, owner,  x + Angles.x(), y + Angles.y(), angle).add();
-	}
-	
-	private static ItemStack stack(Item item, int amount){
-		return new ItemStack(item, amount);
 	}
 }
