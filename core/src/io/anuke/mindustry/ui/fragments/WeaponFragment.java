@@ -25,7 +25,7 @@ public class WeaponFragment implements Fragment{
 		}
 	}
 	
-	public void updateWeapons(){
+	public void update(){
 		weapontable.clearChildren();
 		
 		ButtonGroup<ImageButton> group = new ButtonGroup<>();

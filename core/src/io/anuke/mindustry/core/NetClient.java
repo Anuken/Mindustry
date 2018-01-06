@@ -161,10 +161,8 @@ public class NetClient extends Module {
         });
 
         Net.handle(StateSyncPacket.class, packet -> {
-            //TODO replace with arraycopy()
-            for(int i = 0; i < packet.items.length; i ++){
-                Vars.control.items[i] = packet.items[i];
-            }
+            System.arraycopy(packet.items, 0, Vars.control.items, 0, packet.items.length);
+
             Vars.control.setWaveData(packet.enemies, packet.wave, packet.countdown);
 
             Timers.resetTime(packet.time + (float)(TimeUtils.timeSinceMillis(packet.timestamp) / 1000.0 * 60.0));

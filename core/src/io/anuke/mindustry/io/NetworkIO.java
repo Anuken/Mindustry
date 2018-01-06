@@ -3,10 +3,10 @@ package io.anuke.mindustry.io;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
+import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.GameMode;
 import io.anuke.mindustry.world.Tile;
@@ -184,6 +184,10 @@ public class NetworkIO {
             }
 
             Vars.ui.hudfrag.updateItems();
+
+            Vars.control.getWeapons().clear();
+            Vars.control.getWeapons().add(Weapon.blaster);
+            Vars.ui.weaponfrag.update();
 
             //enemies
 

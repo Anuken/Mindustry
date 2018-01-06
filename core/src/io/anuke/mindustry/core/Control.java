@@ -245,7 +245,7 @@ public class Control extends Module{
 		}
 
 		ui.hudfrag.updateItems();
-		ui.weaponfrag.updateWeapons();
+		ui.weaponfrag.update();
 	}
 	
 	public void play(){

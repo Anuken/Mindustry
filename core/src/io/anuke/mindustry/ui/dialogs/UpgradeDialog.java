@@ -125,7 +125,7 @@ public class UpgradeDialog extends FloatingDialog{
 				
 				control.removeItems(weapon.requirements);
 				control.addWeapon(weapon);
-				ui.weaponfrag.updateWeapons();
+				ui.weaponfrag.update();
 				run.listen();
 				Effects.sound("purchase");
 

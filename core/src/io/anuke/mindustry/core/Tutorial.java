@@ -394,7 +394,7 @@ public class Tutorial{
 			void onSwitch(){
 				if(!Vars.control.getWeapons().contains(Weapon.multigun, true)){
 					Vars.control.getWeapons().add(Weapon.multigun);
-					Vars.ui.weaponfrag.updateWeapons();
+					Vars.ui.weaponfrag.update();
 				}
 			}
 		},
