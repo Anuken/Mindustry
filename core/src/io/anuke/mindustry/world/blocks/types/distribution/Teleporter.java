@@ -5,21 +5,22 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Configurable;
+import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Strings;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class Teleporter extends Block implements Configurable{
+public class Teleporter extends PowerBlock implements Configurable{
 	public static final Color[] colorArray = {Color.ROYAL, Color.ORANGE, Color.SCARLET, Color.FOREST, Color.PURPLE, Color.GOLD, Color.PINK, Color.BLACK};
 	public static final int colors = colorArray.length;
 
@@ -28,6 +29,8 @@ public class Teleporter extends Block implements Configurable{
 
 	private Array<Tile> removal = new Array<>();
 	private Array<Tile> returns = new Array<>();
+
+	protected float powerPerItem = 1f;
 
 	static{
 		for(int i = 0; i < colors; i ++){
@@ -40,6 +43,13 @@ public class Teleporter extends Block implements Configurable{
 		update = true;
 		solid = true;
 		health = 80;
+		powerCapacity = 30f;
+	}
+
+	@Override
+	public void getStats(Array<String> list){
+		super.getStats(list);
+		list.add("[powerinfo]Power/item: " + Strings.toFixed(powerPerItem, 1));
 	}
 
 	@Override
@@ -103,18 +113,22 @@ public class Teleporter extends Block implements Configurable{
 	
 	@Override
 	public void handleItem(Item item, Tile tile, Tile source){
+		PowerEntity entity = tile.entity();
+
 		Array<Tile> links = findLinks(tile);
 		
 		if(links.size > 0){
 			Tile target = links.get(Mathf.random(0, links.size-1));
 			target.entity.addItem(item, 1);
 		}
+
+		entity.power -= powerPerItem;
 	}
 	
 	@Override
-	public boolean acceptItem(Item item, Tile dest, Tile source){
-		Array<Tile> links = findLinks(dest);
-		return links.size > 0;
+	public boolean acceptItem(Item item, Tile tile, Tile source){
+		PowerEntity entity = tile.entity();
+		return entity.power >= powerPerItem && findLinks(tile).size > 0;
 	}
 	
 	@Override
@@ -147,7 +161,7 @@ public class Teleporter extends Block implements Configurable{
 		return returns;
 	}
 
-	public static class TeleporterEntity extends TileEntity{
+	public static class TeleporterEntity extends PowerEntity{
 		public byte color = 0;
 		
 		@Override

@@ -137,7 +137,7 @@ public class Block{
 		tile.entity.addItem(item, 1);
 	}
 	
-	public boolean acceptItem(Item item, Tile dest, Tile source){
+	public boolean acceptItem(Item item, Tile tile, Tile source){
 		return false;
 	}
 	

@@ -128,11 +128,11 @@ public class Conveyor extends Block{
 	}
 
 	@Override
-	public boolean acceptItem(Item item, Tile dest, Tile source){
-		int direction = source == null ? 0 : Math.abs(source.relativeTo(dest.x, dest.y) - dest.getRotation());
-		float minitem = dest.<ConveyorEntity>entity().minitem;
+	public boolean acceptItem(Item item, Tile tile, Tile source){
+		int direction = source == null ? 0 : Math.abs(source.relativeTo(tile.x, tile.y) - tile.getRotation());
+		float minitem = tile.<ConveyorEntity>entity().minitem;
 		return (((direction == 0) && minitem > 0.05f) || 
-				((direction %2 == 1) && minitem > 0.52f)) && (source == null || !(source.block().rotate && (source.getRotation() + 2) % 4 == dest.getRotation()));
+				((direction %2 == 1) && minitem > 0.52f)) && (source == null || !(source.block().rotate && (source.getRotation() + 2) % 4 == tile.getRotation()));
 	}
 
 	@Override

@@ -31,8 +31,8 @@ public class BlockPart extends Block implements PowerAcceptor, LiquidAcceptor{
 	}
 	
 	@Override
-	public boolean acceptItem(Item item, Tile dest, Tile source){
-		return dest.getLinked().block().acceptItem(item, dest.getLinked(), source);
+	public boolean acceptItem(Item item, Tile tile, Tile source){
+		return tile.getLinked().block().acceptItem(item, tile.getLinked(), source);
 	}
 
 	@Override

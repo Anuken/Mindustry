@@ -28,7 +28,7 @@ public class CoreBlock extends Block {
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile dest, Tile source){
+    public boolean acceptItem(Item item, Tile tile, Tile source){
         return true;
     }
 }

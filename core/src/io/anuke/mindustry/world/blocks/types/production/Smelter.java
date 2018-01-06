@@ -91,16 +91,16 @@ public class Smelter extends Block{
 	}
 
 	@Override
-	public boolean acceptItem(Item item, Tile dest, Tile source){
+	public boolean acceptItem(Item item, Tile tile, Tile source){
 		int amount = 0;
 		boolean isInput = false;
 
 		for(Item req : inputs){
 			if(req == item) isInput = true;
-			amount += dest.entity.getItem(req);
+			amount += tile.entity.getItem(req);
 		}
 
-		return (isInput && amount < capacity) || (item == fuel && dest.entity.getItem(fuel) < capacity);
+		return (isInput && amount < capacity) || (item == fuel && tile.entity.getItem(fuel) < capacity);
 	}
 
 	@Override
