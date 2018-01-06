@@ -17,7 +17,7 @@ import io.anuke.ucore.util.Strings;
 
 import java.util.Arrays;
 
-public class Crafter extends Block{
+public class Smelter extends Block{
 	protected final int timerDump = timers++;
 	protected final int timerCraft = timers++;
 	
@@ -31,7 +31,7 @@ public class Crafter extends Block{
 
 	protected int capacity = 30;
 
-	public Crafter(String name) {
+	public Smelter(String name) {
 		super(name);
 		update = true;
 		solid = true;

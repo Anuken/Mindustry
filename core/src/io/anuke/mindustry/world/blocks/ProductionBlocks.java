@@ -20,7 +20,7 @@ public class ProductionBlocks{
 		}
 	},
 	
-	smelter = new Crafter("smelter"){
+	smelter = new Smelter("smelter"){
 		{
 			health = 70;
 			inputs = new Item[]{Item.iron};
@@ -29,7 +29,7 @@ public class ProductionBlocks{
 		}
 	},
 	
-	crucible = new Crafter("crucible"){
+	crucible = new Smelter("crucible"){
 		{
 			health = 90;
 			inputs = new Item[]{Item.titanium, Item.steel};
