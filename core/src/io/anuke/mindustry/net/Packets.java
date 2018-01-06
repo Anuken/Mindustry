@@ -114,4 +114,8 @@ public class Packets {
     public enum KickReason{
         kick, invalidPassword
     }
+
+    public static class UpgradePacket{
+        public int id; //weapon ID only, currently
+    }
 }

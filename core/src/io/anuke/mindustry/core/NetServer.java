@@ -155,6 +155,11 @@ public class NetServer extends Module{
             packet.name = player.name;
             Net.send(packet, SendMode.tcp);
         });
+
+        Net.handleServer(UpgradePacket.class, packet -> {
+            Weapon weapon = Weapon.values()[packet.id];
+            Vars.control.removeItems(weapon.requirements);
+        });
     }
 
     public void handleBullet(BulletType type, Entity owner, float x, float y, float angle, short damage){

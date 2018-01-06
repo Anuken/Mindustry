@@ -2,8 +2,10 @@ package io.anuke.mindustry.ui.dialogs;
 
 
 import com.badlogic.gdx.graphics.Color;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.ucore.core.Draw;
@@ -52,9 +54,7 @@ public class UpgradeDialog extends FloatingDialog{
 			button.getLabelCell().left();
 			button.pack();
 			
-			
 			button.update(()->{
-				
 				if(control.hasWeapon(weapon)){
 					button.setDisabled(true);
 					button.setColor(Color.GRAY);
@@ -128,6 +128,10 @@ public class UpgradeDialog extends FloatingDialog{
 				ui.weaponfrag.updateWeapons();
 				run.listen();
 				Effects.sound("purchase");
+
+				if(Net.active() && Net.client()){
+					Vars.netClient.handleUpgrade(weapon);
+				}
 			});
 		}
 		

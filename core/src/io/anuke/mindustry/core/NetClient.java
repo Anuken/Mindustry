@@ -255,6 +255,7 @@ public class NetClient extends Module {
         });
     }
 
+    @Override
     public void update(){
         if(!Net.client() || !Net.active()) return;
 
@@ -263,6 +264,12 @@ public class NetClient extends Module {
         }else if(!connecting){
             Net.disconnect();
         }
+    }
+
+    public void handleUpgrade(Weapon weapon){
+        UpgradePacket packet = new UpgradePacket();
+        packet.id = weapon.ordinal();
+        Net.send(packet, SendMode.tcp);
     }
 
     public void handleSendMessage(String message){
