@@ -9,10 +9,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.InputHandler;
-import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.resource.ItemStack;
-import io.anuke.mindustry.resource.Recipe;
-import io.anuke.mindustry.resource.Section;
+import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.graphics.Hue;
@@ -72,17 +69,17 @@ public class BlocksFragment implements Fragment{
 
 					Stack stack = new Stack();
 					ButtonGroup<ImageButton> group = new ButtonGroup<>();
-					Array<Recipe> recipes = new Array<Recipe>();
+					Array<Recipe> recipes = new Array<>();
 
 					for (Section sec : Section.values()) {
 						recipes.clear();
-						Recipe.getBy(sec, recipes);
+						Recipes.getBy(sec, recipes);
 						maxcol = Math.max((int) ((float) recipes.size / rows + 1), maxcol);
 					}
 
 					for (Section sec : Section.values()) {
 						recipes.clear();
-						Recipe.getBy(sec, recipes);
+						Recipes.getBy(sec, recipes);
 
 						Table table = new Table();
 

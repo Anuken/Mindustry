@@ -7,6 +7,7 @@ import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.mindustry.io.SaveFileVersion;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.BlockLoader;
 import io.anuke.mindustry.world.GameMode;
@@ -65,7 +66,7 @@ public class Save12 extends SaveFileVersion {
         int weapons = stream.readByte();
 
         for(int i = 0; i < weapons; i ++){
-            Vars.control.addWeapon(Weapon.values()[stream.readByte()]);
+            Vars.control.addWeapon((Weapon)Upgrade.getByID(stream.readByte()));
         }
 
         Vars.ui.weaponfrag.update();
@@ -194,7 +195,7 @@ public class Save12 extends SaveFileVersion {
 
         //start at 1, because the first weapon is always the starter - ignore that
         for(int i = 1; i < Vars.control.getWeapons().size; i ++){
-            stream.writeByte(Vars.control.getWeapons().get(i).ordinal()); //weapon ordinal
+            stream.writeByte(Vars.control.getWeapons().get(i).id); //weapon ordinal
         }
 
         //--INVENTORY--

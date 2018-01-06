@@ -1,15 +1,11 @@
 package io.anuke.mindustry.resource;
 
-public enum Mech{
-	standard, 
-	scout{{
-		
-	}};
-	public float speedBoost = 1f, damageBoost = 1f;
-	public int regenRate = 10;
-	public int health = 20;
+public class Mech extends Upgrade{
+	public static final Mech
 
-	private Mech(){
-		
+	standard = new Mech("standard");
+
+	public Mech(String name){
+		super(name);
 	}
 }

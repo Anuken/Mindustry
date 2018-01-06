@@ -11,7 +11,6 @@ import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
 public class Weapon extends Upgrade{
@@ -22,31 +21,31 @@ public class Weapon extends Upgrade{
 			effect =  Fx.shoot3;
 		}
 	},
-	triblaster = new Weapon("blaster", 13, BulletType.shot){
+	triblaster = new Weapon("triblaster", 13, BulletType.shot){
 		{
 			shots = 3;
 			effect = Fx.shoot;
 		}
 	},
-	multigun = new Weapon("blaster", 6, BulletType.multishot){
+	multigun = new Weapon("multigun", 6, BulletType.multishot){
 		{
 			effect = Fx.shoot2;
 			inaccuracy = 8f;
 		}
 	},
-	flamer = new Weapon("blaster", 5, BulletType.flame){
+	flamer = new Weapon("flamer", 5, BulletType.flame){
 		{
 			shootsound = "flame2";
 			inaccuracy = 12f;
 		}
 	},
-	railgun = new Weapon("blaster", 40, BulletType.sniper){
+	railgun = new Weapon("railgun", 40, BulletType.sniper){
 		{
 			shootsound = "railgun";
 			effect = Fx.railshoot;
 		}
 	},
-	mortar = new Weapon("blaster", 100, BulletType.shell){
+	mortar = new Weapon("mortar", 100, BulletType.shell){
 		{
 			shootsound = "bigshot";
 			effect = Fx.mortarshoot;
@@ -60,15 +59,11 @@ public class Weapon extends Upgrade{
 	float inaccuracy = 0f;
 	float shake = 0f;
 	Effect effect;
-
-	public final String description;
-	public final String name;
 	
 	private Weapon(String name, float reload, BulletType type){
+		super(name);
 		this.reload = reload;
 		this.type = type;
-		this.name = name;
-		this.description = Bundles.getNotNull("weapon."+name+".description");
 	}
 
 	public void update(Player p){
@@ -76,7 +71,6 @@ public class Weapon extends Upgrade{
 			shoot(p, p.x, p.y, Angles.mouseAngle(p.x, p.y));
 		}
 	}
-
 
 	void shootInternal(Player p, float x, float y, float rotation){
 		Angles.shotgun(shots, 12f, rotation, f -> bullet(p, x, y, f + Mathf.range(inaccuracy)));
@@ -86,7 +80,7 @@ public class Weapon extends Upgrade{
 		Effects.sound(shootsound, x, y);
 	}
 
-	void shoot(Player p, float x, float y, float angle){
+	public void shoot(Player p, float x, float y, float angle){
 		shootInternal(p, x, y, angle);
 
 		if(Net.active() && p == Vars.player){
@@ -97,10 +91,6 @@ public class Weapon extends Upgrade{
 	void bullet(Entity owner, float x, float y, float angle){
 		Angles.translation(angle, 3f);
 		new Bullet(type, owner,  x + Angles.x(), y + Angles.y(), angle).add();
-	}
-
-	public String localized(){
-		return Bundles.get("weapon."+name + ".name");
 	}
 	
 	private static ItemStack stack(Item item, int amount){

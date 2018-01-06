@@ -136,6 +136,7 @@ public class KryoClient implements ClientProvider{
         for(Class<?> c : types){
             client.getKryo().register(c);
         }
+        KryoRegistrator.register(client.getKryo());
     }
 
     @Override

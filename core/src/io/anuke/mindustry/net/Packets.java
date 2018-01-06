@@ -116,6 +116,6 @@ public class Packets {
     }
 
     public static class UpgradePacket{
-        public int id; //weapon ID only, currently
+        public byte id; //weapon ID only, currently
     }
 }

@@ -10,6 +10,7 @@ import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
+import io.anuke.mindustry.resource.Recipes;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
@@ -237,7 +238,7 @@ public abstract class InputHandler extends InputAdapter{
 		Block block = tile.isLinked() ? tile.getLinked().block() : tile.block();
 		Recipe result = null;
 
-		for(Recipe recipe : Recipe.values()){
+		for(Recipe recipe : Recipes.all()){
 			if(recipe.result == block){
 				result = recipe;
 				break;

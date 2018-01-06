@@ -33,7 +33,7 @@ public class WeaponFragment implements Fragment{
 		weapontable.defaults().size(58, 62);
 		
 		for(Weapon weapon : control.getWeapons()){
-			ImageButton button = new ImageButton(Draw.region(weapon.name()), "toggle");
+			ImageButton button = new ImageButton(Draw.region(weapon.name), "toggle");
 			button.getImageCell().size(8*5);
 			
 			group.add(button);
@@ -52,7 +52,7 @@ public class WeaponFragment implements Fragment{
 			String description = weapon.description;
 				
 			tiptable.background("button");
-			tiptable.add("$weapon."+weapon.name()+".name", 0.5f).left().padBottom(3f);
+			tiptable.add("$weapon."+weapon.name+".name", 0.5f).left().padBottom(3f);
 				
 			tiptable.row();
 			tiptable.row();
@@ -65,7 +65,5 @@ public class WeaponFragment implements Fragment{
 
 			button.addListener(tip);
 		}
-		
-		weapontable.addImageButton("icon-menu", 8*4, ui.upgrades::show);
 	}
 }

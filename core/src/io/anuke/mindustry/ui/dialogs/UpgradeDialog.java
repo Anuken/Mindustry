@@ -1,24 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
 
-import com.badlogic.gdx.graphics.Color;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.resource.ItemStack;
-import io.anuke.mindustry.resource.Weapon;
-import io.anuke.ucore.core.Draw;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.function.Listenable;
-import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.TextButton;
-import io.anuke.ucore.scene.ui.Tooltip;
-import io.anuke.ucore.scene.ui.layout.Table;
-
-import static io.anuke.mindustry.Vars.control;
-import static io.anuke.mindustry.Vars.ui;
-
 public class UpgradeDialog extends FloatingDialog{
 	boolean wasPaused = false;
 
@@ -28,6 +10,7 @@ public class UpgradeDialog extends FloatingDialog{
 	}
 	
 	void setup(){
+		/*
 		addCloseButton();
 		
 		hidden(()->{
@@ -43,10 +26,14 @@ public class UpgradeDialog extends FloatingDialog{
 		weptab.margin(20);
 		
 		int i = 0;
-		for(Weapon weapon : Weapon.values()){
-			TextButton button = new TextButton("$weapon."+weapon.name()+".name");
+		for(Upgrade upgrade : Upgrade.getAllUpgrades()){
+			if(!(upgrade instanceof Weapon)) continue;
+
+			Weapon weapon = (Weapon)upgrade;
+
+			TextButton button = new TextButton(weapon.localized());
 			
-			Image img = new Image(Draw.region(weapon.name()));
+			Image img = new Image(Draw.region(weapon.name));
 			button.add(img).size(8*5);
 			button.getCells().reverse();
 			button.row();
@@ -139,6 +126,7 @@ public class UpgradeDialog extends FloatingDialog{
 		content().row();
 		content().add(weptab);
 		content().row();
+		*/
 	}
 
 }

@@ -17,6 +17,7 @@ import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.net.Syncable;
 import io.anuke.mindustry.net.Syncable.Interpolator;
+import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -148,7 +149,7 @@ public class NetClient extends Module {
         Net.handle(ShootPacket.class, packet -> {
             Player player = Vars.control.playerGroup.getByID(packet.playerid);
 
-            Weapon weapon = Weapon.values()[packet.weaponid];
+            Weapon weapon = (Weapon) Upgrade.getByID(packet.weaponid);
             weapon.shoot(player, packet.x, packet.y, packet.rotation);
         });
 
@@ -266,7 +267,7 @@ public class NetClient extends Module {
 
     public void handleUpgrade(Weapon weapon){
         UpgradePacket packet = new UpgradePacket();
-        packet.id = weapon.ordinal();
+        packet.id = weapon.id;
         Net.send(packet, SendMode.tcp);
     }
 
@@ -283,7 +284,7 @@ public class NetClient extends Module {
 
     public void handleShoot(Weapon weapon, float x, float y, float angle){
         ShootPacket packet = new ShootPacket();
-        packet.weaponid = (byte)weapon.ordinal();
+        packet.weaponid = (byte)weapon.id;
         packet.x = x;
         packet.y = y;
         packet.rotation = angle;

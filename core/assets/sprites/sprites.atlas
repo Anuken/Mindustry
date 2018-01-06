@@ -95,6 +95,13 @@ blocks/block-2x2
   orig: 16, 16
   offset: 0, 0
   index: -1
+blocks/weaponfactory
+  rotate: false
+  xy: 844, 495
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 blocks/block-3x3
   rotate: false
   xy: 698, 313

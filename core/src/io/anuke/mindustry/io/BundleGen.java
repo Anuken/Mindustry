@@ -7,7 +7,6 @@ import io.anuke.mindustry.core.Tutorial;
 import io.anuke.mindustry.core.Tutorial.Stage;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
-import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.GameMode;
 import io.anuke.mindustry.world.Map;
@@ -46,10 +45,6 @@ public class BundleGen {
         }
         for(GameMode mode : GameMode.values()){
             write("mode." + mode.name() + ".name=" + mode.name());
-        }
-        for(Weapon weapon : Weapon.values()){
-            write("weapon." + weapon.name() + ".name=" + weapon.name());
-            write("weapon." + weapon.name() + ".description=" + weapon.description);
         }
         for(Item item : Item.getAllItems()){
             write("item." + item.name + ".name=" + item.name);
