@@ -1,24 +1,35 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
-import java.util.Arrays;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Strings;
+
+import java.util.Arrays;
 
 public class Crafter extends Block{
 	protected final int timerDump = timers++;
+	protected final int timerCraft = timers++;
 	
-	protected Item[] requirements;
+	protected Item[] inputs;
+	protected Item fuel;
 	protected Item result;
 
-	int capacity = 20;
+	protected float craftTime = 30f; //time to craft one item, so max 2 items per second by default
+	protected float burnDuration = 60f; //by default, the fuel will burn 60 frames, so that's 2 items/fuel at most
+	protected Effect craftEffect = Fx.smelt, burnEffect = Fx.fuelburn;
+
+	protected int capacity = 30;
 
 	public Crafter(String name) {
 		super(name);
@@ -29,53 +40,105 @@ public class Crafter extends Block{
 	@Override
 	public void getStats(Array<String> list){
 		super.getStats(list);
-		list.add("[craftinfo]Input: " + Arrays.toString(requirements));
+		list.add("[craftinfo]Input: " + Arrays.toString(inputs));
+		list.add("[craftinfo]Fuel: " + fuel);
 		list.add("[craftinfo]Output: " + result);
-		list.add("[craftinfo]Capacity per input type: " + capacity);
+		list.add("[craftinfo]Fuel Duration: " + Strings.toFixed(burnDuration/60f, 1));
+		list.add("[craftinfo]Max output/second: " + Strings.toFixed(60f/craftTime, 1));
+		list.add("[craftinfo]Input Capacity: " + capacity);
+		list.add("[craftinfo]Output Capacity: " + capacity);
 	}
 	
 	@Override
 	public void update(Tile tile){
+		CrafterEntity entity = tile.entity();
 		
-		if(tile.entity.timer.get(timerDump, 5) && tile.entity.hasItem(result)){
+		if(entity.timer.get(timerDump, 5) && entity.hasItem(result)){
 			tryDump(tile, -1, result);
 		}
-		
-		for(Item item : requirements){
-			if(!tile.entity.hasItem(item)){
+
+		//add fuel
+		if(entity.getItem(fuel) > 0 && entity.burnTime <= 0f){
+			entity.removeItem(fuel, 1);
+			entity.burnTime += burnDuration;
+			Effects.effect(burnEffect, entity.x + Mathf.range(2f), entity.y + Mathf.range(2f));
+		}
+
+		//decrement burntime
+		if(entity.burnTime > 0){
+			entity.burnTime -= Timers.delta();
+		}
+
+		//make sure it has all the items
+		for(Item item : inputs){
+			if(!entity.hasItem(item)){
 				return;
 			}
 		}
 
-		// crafter full - it has to be emptied before it can craft again.
-		if(tile.entity.getItem(result) >= capacity){
+		if(entity.getItem(result) >= capacity //output full
+				|| entity.burnTime <= 0 //not burning
+				|| !entity.timer.get(timerCraft, craftTime)){ //not yet time
 			return;
 		}
 
-		for(Item item : requirements){
-			tile.entity.removeItem(item, 1);
+		for(Item item : inputs){
+			entity.removeItem(item, 1);
 		}
 		
 		offloadNear(tile, result);
-		Effects.effect(Fx.smelt, tile.entity);
+		Effects.effect(craftEffect, entity);
 	}
 
 	@Override
 	public boolean acceptItem(Item item, Tile dest, Tile source){
-		for(Item req : requirements){
-			if(item == req){
-                            return dest.entity.getItem(item) < capacity;
-			}
+		int amount = 0;
+		boolean isInput = false;
+
+		for(Item req : inputs){
+			if(req == item) isInput = true;
+			amount += dest.entity.getItem(req);
 		}
-		return false;
+
+		return (isInput && amount < capacity) || (item == fuel && dest.entity.getItem(fuel) < capacity);
 	}
 
 	@Override
+	public void draw(Tile tile){
+		super.draw(tile);
+
+        CrafterEntity entity = tile.entity();
+
+        //draw glowing center
+        if(entity.burnTime > 0){
+            Draw.color(1f, 1f, 1f, Mathf.absin(Timers.time(), 9f, 0.4f) + Mathf.random(0.05f));
+            Draw.rect("smelter-middle", tile.worldx(), tile.worldy());
+            Draw.color();
+        }
+    }
+
+
+	@Override
 	public void drawSelect(Tile tile){
-		// each req item has its input buffer + 1 buffer for output.
-		int totalCapacity = (requirements.length + 1) * capacity;
-		float fract = ((float)tile.entity.totalItems())/totalCapacity;
+		//all required items are put into one big capacity buffer
+		int totalCapacity = capacity;
+		int amount = 0;
+
+		for(Item item : inputs){
+			amount += tile.entity.getItem(item);
+		}
+
+		float fract = ((float)amount)/totalCapacity;
 
 		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 6, fract);
+	}
+
+	@Override
+	public TileEntity getEntity() {
+		return new CrafterEntity();
+	}
+
+	public class CrafterEntity extends TileEntity{
+		public float burnTime;
 	}
 }
