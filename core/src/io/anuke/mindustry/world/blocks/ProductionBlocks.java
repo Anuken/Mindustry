@@ -20,19 +20,23 @@ public class ProductionBlocks{
 		}
 	},
 	
-	smelter = new Crafter("smelter"){
+	smelter = new Smelter("smelter"){
 		{
 			health = 70;
-			requirements = new Item[]{Item.coal, Item.iron};
+			inputs = new Item[]{Item.iron};
+			fuel = Item.coal;
 			result = Item.steel;
 		}
 	},
 	
-	crucible = new Crafter("crucible"){
+	crucible = new Smelter("crucible"){
 		{
 			health = 90;
-			requirements = new Item[]{Item.titanium, Item.steel};
+			inputs = new Item[]{Item.titanium, Item.steel};
+			fuel = Item.coal;
 			result = Item.dirium;
+			burnDuration = 80f;
+			craftTime = 40f;
 		}
 	},
 	

@@ -53,12 +53,12 @@ public class LiquidItemJunction extends LiquidBlock{
 	}
 
 	@Override
-	public boolean acceptItem(Item item, Tile dest, Tile source){
-		int dir = source.relativeTo(dest.x, dest.y);
+	public boolean acceptItem(Item item, Tile tile, Tile source){
+		int dir = source.relativeTo(tile.x, tile.y);
 		
-		if((dir+dest.getRotation()) % 2 == 0) return false;
+		if((dir+ tile.getRotation()) % 2 == 0) return false;
 		
-		Tile to = dest.getNearby()[dir];
-		return to != null && to.block().acceptItem(item, to, dest);
+		Tile to = tile.getNearby()[dir];
+		return to != null && to.block().acceptItem(item, to, tile);
 	}
 }

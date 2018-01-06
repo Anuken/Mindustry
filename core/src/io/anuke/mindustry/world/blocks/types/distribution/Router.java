@@ -53,8 +53,8 @@ public class Router extends Block{
 	}
 
 	@Override
-	public boolean acceptItem(Item item, Tile dest, Tile source){
-		int items = dest.entity.totalItems();
+	public boolean acceptItem(Item item, Tile tile, Tile source){
+		int items = tile.entity.totalItems();
 		return items < capacity;
 	}
 	

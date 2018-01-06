@@ -19,7 +19,6 @@ import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
 import io.anuke.ucore.util.Tmp;
 
 //TODO possibly proken

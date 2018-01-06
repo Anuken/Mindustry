@@ -163,6 +163,16 @@ public class Fx{
 			Draw.reset();
 		});
 	}),
+
+	fuelburn = new Effect(23, e -> {
+		Angles.randLenVectors(e.id, 5, e.ifract()*9f, (x, y)->{
+			float len = e.fract()*4f;
+			Draw.color(Color.LIGHT_GRAY, Color.GRAY, e.ifract());
+			//Draw.alpha(e.fract());
+			Draw.rect("circle", e.x + x, e.y + y, len, len);
+			Draw.reset();
+		});
+	}),
 	
 	laserspark = new Effect(14, e -> {
 		Angles.randLenVectors(e.id, 8, 1f + e.ifract()*11f, (x, y)->{
@@ -306,7 +316,7 @@ public class Fx{
 	smelt = new Effect(10, e -> {
 		Draw.thickness(1f);
 		Draw.color(Color.YELLOW, Color.RED, e.ifract());
-		Draw.spikes(e.x, e.y, e.ifract() * 5f, 2, 8);
+		Draw.spikes(e.x, e.y, e.ifract() * 5f, 1f, 8);
 		Draw.reset();
 	}),
 

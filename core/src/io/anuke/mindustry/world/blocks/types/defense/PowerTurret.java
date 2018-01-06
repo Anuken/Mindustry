@@ -14,7 +14,6 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
 import io.anuke.ucore.core.Draw;
-import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
@@ -70,7 +69,7 @@ public class PowerTurret extends Turret implements PowerAcceptor{
 	}
 	
 	@Override
-	public boolean acceptItem(Item item, Tile dest, Tile source){
+	public boolean acceptItem(Item item, Tile tile, Tile source){
 		return false;
 	}
 	
