@@ -50,6 +50,7 @@ public class FileChooser extends FloatingDialog {
 		Table content = new Table();
 		
 		filefield = new TextField();
+		filefield.setOnlyFontChars(false);
 		if(!open) Mindustry.platforms.addDialog(filefield);
 		filefield.setDisabled(open);
 

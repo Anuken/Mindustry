@@ -52,6 +52,7 @@ public class DefenseBlocks{
 			range = 30;
 			reload = 60f;
 			health = 60;
+			powerUsed = 0.08f;
 		}
 	},
 	
@@ -59,8 +60,8 @@ public class DefenseBlocks{
 		{
 			range = 44;
 			reload = 30f;
-			powerUsed = 0.15f;
 			health = 90;
+			powerUsed = 0.13f;
 		}
 	},
 	
