@@ -238,9 +238,9 @@ public class MapView extends Element implements GestureListener{
 			Draw.thick(Unit.dp.scl(3f * zoom));
 			Draw.line(sx, sy, v2.x, v2.y);
 
-			Draw.polygon(40, sx, sy, editor.getBrushSize() * zoom * 3);
+			Draw.polygon(sy, sx, 40, editor.getBrushSize() * zoom * 3);
 
-            Draw.polygon(40, v2.x, v2.y, editor.getBrushSize() * zoom * 3);
+            Draw.polygon(v2.y, v2.x, 40, editor.getBrushSize() * zoom * 3);
 		}
 
 		batch.flush();

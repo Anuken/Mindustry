@@ -1,5 +1,6 @@
 package io.anuke.mindustry.io;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
@@ -7,7 +8,6 @@ import io.anuke.mindustry.core.Tutorial;
 import io.anuke.mindustry.core.Tutorial.Stage;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
-import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.GameMode;
 import io.anuke.mindustry.world.Map;
@@ -21,6 +21,17 @@ import io.anuke.ucore.util.Mathf;
 /**Used for generating a bundle from existing strings in the game.*/
 public class BundleGen {
     private static FileHandle file;
+
+    public static void cleanBundles(FileHandle file){
+        String[] strings = file.readString().split("\n");
+        FileHandle out = Gdx.files.absolute("/home/anuke/out.properties");
+        out.writeString("", false);
+        for(String string : strings){
+            if(!string.contains(".description")){
+                out.writeString(string + "\n", true);
+            }
+        }
+    }
 
     public static void buildBundle(FileHandle file){
         BundleGen.file = file;
@@ -46,10 +57,6 @@ public class BundleGen {
         }
         for(GameMode mode : GameMode.values()){
             write("mode." + mode.name() + ".name=" + mode.name());
-        }
-        for(Weapon weapon : Weapon.values()){
-            write("weapon." + weapon.name() + ".name=" + weapon.name());
-            write("weapon." + weapon.name() + ".description=" + weapon.description);
         }
         for(Item item : Item.getAllItems()){
             write("item." + item.name + ".name=" + item.name);

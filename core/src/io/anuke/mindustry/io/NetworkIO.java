@@ -154,7 +154,7 @@ public class NetworkIO {
         load(file.read());
     }
 
-    //TODO GWT support
+
     public static void load(InputStream is){
 
         try(DataInputStream stream = new DataInputStream(is)){
@@ -187,7 +187,8 @@ public class NetworkIO {
 
             Vars.control.getWeapons().clear();
             Vars.control.getWeapons().add(Weapon.blaster);
-            Vars.ui.weaponfrag.update();
+            Vars.player.weaponLeft = Vars.player.weaponRight = Weapon.blaster;
+            Vars.ui.hudfrag.updateWeapons();
 
             //enemies
 

@@ -39,13 +39,11 @@ public class UI extends SceneModule{
 	public SettingsMenuDialog settings;
 	public ControlsDialog controls;
 	public MapEditorDialog editor;
-	public UpgradeDialog upgrades;
 
 	public final MenuFragment menufrag = new MenuFragment();
     public final ToolFragment toolfrag = new ToolFragment();
     public final HudFragment hudfrag = new HudFragment();
     public final PlacementFragment placefrag = new PlacementFragment();
-    public final WeaponFragment weaponfrag = new WeaponFragment();
     public final ChatFragment chatfrag = new ChatFragment();
     public final PlayerListFragment listfrag = new PlayerListFragment();
     public final BackgroundFragment backfrag = new BackgroundFragment();
@@ -137,7 +135,6 @@ public class UI extends SceneModule{
 		join = new JoinDialog();
 		discord = new DiscordDialog();
 		load = new LoadDialog();
-		upgrades = new UpgradeDialog();
 		levels = new LevelDialog();
 		settings = new SettingsMenuDialog();
 		paused = new PausedDialog();
@@ -147,7 +144,6 @@ public class UI extends SceneModule{
 		build.begin(scene);
 
 		backfrag.build();
-		weaponfrag.build();
 		hudfrag.build();
 		configfrag.build();
 		menufrag.build();

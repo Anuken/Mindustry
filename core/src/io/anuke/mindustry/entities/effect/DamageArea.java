@@ -1,22 +1,66 @@
 package io.anuke.mindustry.entities.effect;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.*;
 
-//TODO
 public class DamageArea{
+	private static Rectangle rect = new Rectangle();
+
+	//only for entities, not tiles (yet!)
+	public static void damageLine(boolean enemies, Effect effect, float x, float y, float angle, float length, int damage){
+		Angles.translation(angle, length);
+		rect.setPosition(x, y).setSize(Angles.x(), Angles.y());
+		float x2 = Angles.x() + x, y2 = Angles.y() + y;
+
+		if(rect.width < 0){
+			rect.x += rect.width;
+			rect.width *= -1;
+		}
+
+		if(rect.height < 0){
+			rect.y += rect.height;
+			rect.height *= -1;
+		}
+
+		float expand = 3f;
+
+		rect.y -= expand;
+		rect.x -= expand;
+		rect.width += expand*2;
+		rect.height += expand*2;
+
+		if(enemies){
+			Entities.getNearby(Vars.control.enemyGroup, rect, e -> {
+				Enemy enemy = (Enemy)e;
+				Rectangle other = enemy.hitbox.getRect(enemy.x, enemy.y);
+				other.y -= expand;
+				other.x -= expand;
+				other.width += expand*2;
+				other.height += expand*2;
+
+                Vector2 vec = Physics.raycastRect(x, y, x2, y2, other);
+
+				if(vec != null){
+                    Effects.effect(effect, vec.x, vec.y);
+					enemy.damage(damage);
+				}
+			});
+		}//TODO else damage players and blocks?
+	}
 	
 	public static void damageEntities(float x, float y, float radius, int damage){
 		damage(true, x, y, radius, damage);
-		
-		if(!Vars.android && Vars.player.distanceTo(x, y) < radius){
-			Player player = Vars.player;
+
+		for(Player player : Vars.control.playerGroup.all()){
+			if(player.isAndroid) continue;
 			int amount = calculateDamage(x, y, player.x, player.y, radius, damage);
 			player.damage(amount);
 		}

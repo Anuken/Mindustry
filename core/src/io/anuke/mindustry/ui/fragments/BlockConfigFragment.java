@@ -23,6 +23,14 @@ public class BlockConfigFragment implements  Fragment {
         Core.scene.add(table);
     }
 
+    public boolean isShown(){
+        return table.isVisible() && configTile != null;
+    }
+
+    public Tile getSelectedTile(){
+        return configTile;
+    }
+
     public void showConfig(Tile tile){
         configTile = tile;
 
@@ -35,7 +43,7 @@ public class BlockConfigFragment implements  Fragment {
 
         table.update(()->{
             table.setOrigin(Align.center);
-            Vector2 pos = Graphics.screen(tile.worldx(), tile.worldy());
+            Vector2 pos = Graphics.screen(tile.worldx() + tile.block().getPlaceOffset().x, tile.worldy() + tile.block().getPlaceOffset().y);
             table.setPosition(pos.x, pos.y, Align.center);
             if(configTile == null || configTile.block() == Blocks.air){
                 hideConfig();

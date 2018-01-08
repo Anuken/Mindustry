@@ -17,6 +17,7 @@ import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.net.Syncable;
 import io.anuke.mindustry.net.Syncable.Interpolator;
+import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -148,7 +149,7 @@ public class NetClient extends Module {
         Net.handle(ShootPacket.class, packet -> {
             Player player = Vars.control.playerGroup.getByID(packet.playerid);
 
-            Weapon weapon = Weapon.values()[packet.weaponid];
+            Weapon weapon = (Weapon) Upgrade.getByID(packet.weaponid);
             weapon.shoot(player, packet.x, packet.y, packet.rotation);
         });
 
@@ -251,6 +252,15 @@ public class NetClient extends Module {
             GameState.set(State.menu);
             Gdx.app.postRunnable(() -> Vars.ui.showError("$text.server.kicked." + KickReason.values()[packet.reason].name()));
         });
+
+        Net.handle(WeaponSwitchPacket.class, packet -> {
+            Player player = Vars.control.playerGroup.getByID(packet.playerid);
+
+            if(player == null) return;
+
+            player.weaponLeft = (Weapon)Upgrade.getByID(packet.left);
+            player.weaponRight = (Weapon)Upgrade.getByID(packet.right);
+        });
     }
 
     @Override
@@ -264,9 +274,17 @@ public class NetClient extends Module {
         }
     }
 
+    public void handleWeaponSwitch(){
+        WeaponSwitchPacket packet = new WeaponSwitchPacket();
+        packet.left = Vars.player.weaponLeft.id;
+        packet.right = Vars.player.weaponRight.id;
+        packet.playerid = Vars.player.id;
+        Net.send(packet, SendMode.tcp);
+    }
+
     public void handleUpgrade(Weapon weapon){
         UpgradePacket packet = new UpgradePacket();
-        packet.id = weapon.ordinal();
+        packet.id = weapon.id;
         Net.send(packet, SendMode.tcp);
     }
 
@@ -283,7 +301,7 @@ public class NetClient extends Module {
 
     public void handleShoot(Weapon weapon, float x, float y, float angle){
         ShootPacket packet = new ShootPacket();
-        packet.weaponid = (byte)weapon.ordinal();
+        packet.weaponid = weapon.id;
         packet.x = x;
         packet.y = y;
         packet.rotation = angle;

@@ -16,15 +16,17 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.*;
 
 public class Player extends DestructibleEntity implements Syncable{
-	private static final float speed = 1.1f;
-	private static final float dashSpeed = 1.8f;
+	static final float speed = 1.1f;
+	static final float dashSpeed = 1.8f;
 
 	public String name = "name";
-	public transient Weapon weapon = Weapon.blaster;
-	public Mech mech = Mech.standard;
-	public float angle;
 	public boolean isAndroid;
 
+	public Weapon weaponLeft = Weapon.blaster;
+	public Weapon weaponRight = Weapon.blaster;
+	public Mech mech = Mech.standard;
+
+	public float angle;
 	public transient float targetAngle = 0f;
 
 	public transient int clientid;
@@ -86,15 +88,28 @@ public class Player extends DestructibleEntity implements Syncable{
         }
 
 		if((Vars.debug && (!Vars.showPlayer || !Vars.showUI)) || (isAndroid && isLocal)) return;
+        boolean snap = Vars.snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate") && isLocal;
 
 		String part = isAndroid ? "ship" : "mech";
 		
-		if(Vars.snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate") && isLocal){
-			Draw.rect(part+"-"+mech.name(), (int)x, (int)y, angle-90);
+		if(snap){
+			Draw.rect(part + "-" + mech.name, (int)x, (int)y, angle-90);
 		}else{
-			Draw.rect(part+"-"+mech.name(), x, y, angle-90);
+			Draw.rect(part + "-" + mech.name, x, y, angle-90);
 		}
-		
+
+		if(!isAndroid) {
+			for (boolean b : new boolean[]{true, false}) {
+				Weapon weapon = b ? weaponLeft : weaponRight;
+				Angles.translation(angle + Mathf.sign(b) * -50f, 3.5f);
+				float s = 5f;
+				if(snap){
+					Draw.rect(weapon.name, (int)x + Angles.x(), (int)y + Angles.y(), s, s, angle- 90);
+				}else{
+					Draw.rect(weapon.name, x + Angles.x(), y + Angles.y(), s, s, angle - 90);
+				}
+			}
+		}
 	}
 	
 	@Override
@@ -124,12 +139,12 @@ public class Player extends DestructibleEntity implements Syncable{
 		vector.y += ya*speed;
 		vector.x += xa*speed;
 		
-		boolean shooting = !Inputs.keyDown("dash") && Inputs.keyDown("shootInternal") && control.getInput().recipe == null
+		boolean shooting = !Inputs.keyDown("dash") && Inputs.keyDown("shoot") && control.getInput().recipe == null
 				&& !ui.hasMouse() && !control.getInput().onConfigurable();
 		
-		if(shooting && Timers.get(this, "reload", weapon.reload)){
-			weapon.shoot(this, x, y, Angles.mouseAngle(x, y));
-			Sounds.play(weapon.shootsound);
+		if(shooting){
+			weaponLeft.update(player, true);
+			weaponRight.update(player, false);
 		}
 		
 		if(Inputs.keyDown("dash") && Timers.get(this, "dashfx", 3) && vector.len() > 0){

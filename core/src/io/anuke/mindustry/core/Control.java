@@ -140,7 +140,8 @@ public class Control extends Module{
 				"move_y", new Axis(Input.S, Input.W),
 				"select", Input.MOUSE_LEFT,
 				"break", Input.MOUSE_RIGHT,
-				"shootInternal", Input.MOUSE_LEFT,
+				"shoot", Input.MOUSE_LEFT,
+				"weapon_alt_select", Input.Q,
 				"zoom_hold", Input.CONTROL_LEFT,
 				"zoom", new Axis(Input.SCROLL),
 				"menu", Gdx.app.getType() == ApplicationType.Android ? Input.BACK : Input.ESCAPE,
@@ -166,7 +167,7 @@ public class Control extends Module{
 				"cursor_y", new Axis(Input.CONTROLLER_R_STICK_VERTICAL_AXIS),
 				"select", Input.CONTROLLER_R_BUMPER,
 				"break", Input.CONTROLLER_L_BUMPER,
-				"shootInternal", Input.CONTROLLER_R_TRIGGER,
+				"shoot", Input.CONTROLLER_R_TRIGGER,
 				"zoom_hold", Input.ANY_KEY,
 				"zoom", new Axis(Input.CONTROLLER_DPAD_DOWN, Input.CONTROLLER_DPAD_UP),
 				"menu", Input.CONTROLLER_X,
@@ -223,7 +224,13 @@ public class Control extends Module{
 		weapons.clear();
 		
 		weapons.add(Weapon.blaster);
-		player.weapon = weapons.first();
+		player.weaponLeft = player.weaponRight = weapons.first();
+
+		if(debug){
+			//weapons.add(Weapon.triblaster, Weapon.clustergun, Weapon.beam, Weapon.vulcan);
+			//weapons.add(Weapon.shockgun);
+			player.weaponLeft = player.weaponRight = weapons.peek();
+		}
 		
 		lastUpdated = -1;
 		wave = 1;
@@ -245,7 +252,7 @@ public class Control extends Module{
 		}
 
 		ui.hudfrag.updateItems();
-		ui.weaponfrag.update();
+        ui.hudfrag.updateWeapons();
 	}
 	
 	public void play(){
@@ -672,5 +679,4 @@ public class Control extends Module{
 			}
 		}
 	}
-
 }

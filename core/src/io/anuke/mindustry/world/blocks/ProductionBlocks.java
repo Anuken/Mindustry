@@ -199,5 +199,10 @@ public class ProductionBlocks{
 			health = 600;
 			breaktime *= 2.3f;
 		}
+	},
+	weaponFactory = new WeaponFactory("weaponfactory"){
+		{
+			width = height = 2;
+		}
 	};
 }

@@ -190,6 +190,7 @@ public class KryoServer implements ServerProvider {
         for(Class<?> c : types){
             server.getKryo().register(c);
         }
+        KryoRegistrator.register(server.getKryo());
     }
 
     @Override

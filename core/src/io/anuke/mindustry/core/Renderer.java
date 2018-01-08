@@ -2,6 +2,7 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -322,6 +323,16 @@ public class Renderer extends RendererModule{
 			if(rot != -1){
 				Draw.lineAngle(x * tilesize, y * tilesize, rot * 90, 6);
 			}
+			Draw.reset();
+		}
+
+		//draw config selected block
+		if(Vars.ui.configfrag.isShown()){
+			Tile tile = ui.configfrag.getSelectedTile();
+			Draw.color(Colors.get("accent"));
+			Draw.thick(1f);
+			Draw.square(tile.worldx() + tile.block().getPlaceOffset().x, tile.worldy() + tile.block().getPlaceOffset().y,
+					tile.block().width * Vars.tilesize / 2f + 1f);
 			Draw.reset();
 		}
 		

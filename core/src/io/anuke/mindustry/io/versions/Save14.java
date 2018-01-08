@@ -8,6 +8,7 @@ import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.mindustry.io.SaveFileVersion;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.GameMode;
@@ -78,15 +79,15 @@ public class Save14 extends SaveFileVersion{
 
         Vars.control.getWeapons().clear();
         Vars.control.getWeapons().add(Weapon.blaster);
-        Vars.player.weapon = Weapon.blaster;
+        Vars.player.weaponLeft = Vars.player.weaponRight = Weapon.blaster;
 
         int weapons = stream.readByte();
 
         for(int i = 0; i < weapons; i ++){
-            Vars.control.addWeapon(Weapon.values()[stream.readByte()]);
+            Vars.control.addWeapon((Weapon) Upgrade.getByID(stream.readByte()));
         }
 
-        Vars.ui.weaponfrag.update();
+        Vars.ui.hudfrag.updateWeapons();
 
         //inventory
 
@@ -232,7 +233,7 @@ public class Save14 extends SaveFileVersion{
 
         //start at 1, because the first weapon is always the starter - ignore that
         for(int i = 1; i < Vars.control.getWeapons().size; i ++){
-            stream.writeByte(Vars.control.getWeapons().get(i).ordinal()); //weapon ordinal
+            stream.writeByte(Vars.control.getWeapons().get(i).id); //weapon ordinal
         }
 
         //--INVENTORY--

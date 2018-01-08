@@ -15,9 +15,7 @@ import io.anuke.mindustry.io.NetworkIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.resource.ItemStack;
-import io.anuke.mindustry.resource.Recipe;
-import io.anuke.mindustry.resource.Weapon;
+import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.UCore;
@@ -118,7 +116,7 @@ public class NetServer extends Module{
         Net.handleServer(ShootPacket.class, packet -> {
             Player player = connections.get(Net.getLastConnection());
 
-            Weapon weapon = Weapon.values()[packet.weaponid];
+            Weapon weapon = (Weapon)Upgrade.getByID(packet.weaponid);
             weapon.shoot(player, packet.x, packet.y, packet.rotation);
             packet.playerid = player.id;
 
@@ -129,7 +127,7 @@ public class NetServer extends Module{
             Vars.control.input.placeBlockInternal(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false);
             packet.playerid = connections.get(Net.getLastConnection()).id;
 
-            Recipe recipe = Recipe.getByResult(Block.getByID(packet.block));
+            Recipe recipe = Recipes.getByResult(Block.getByID(packet.block));
             if(recipe != null){
                 for(ItemStack stack : recipe.requirements){
                     Vars.control.removeItem(stack);
@@ -149,16 +147,28 @@ public class NetServer extends Module{
         Net.handleServer(ChatPacket.class, packet -> {
             Player player = connections.get(Net.getLastConnection());
 
-            if(player == null)
-                return; //GHOSTS AAAA
+            if(player == null) return; //GHOSTS AAAA
 
             packet.name = player.name;
             Net.send(packet, SendMode.tcp);
         });
 
         Net.handleServer(UpgradePacket.class, packet -> {
-            Weapon weapon = Weapon.values()[packet.id];
-            Vars.control.removeItems(weapon.requirements);
+            Weapon weapon = (Weapon)Upgrade.getByID(packet.id);
+            Vars.control.removeItems(UpgradeRecipes.get(weapon));
+        });
+
+        Net.handleServer(WeaponSwitchPacket.class, packet -> {
+            Player player = connections.get(Net.getLastConnection());
+
+            if(player == null) return;
+
+            packet.playerid = player.id;
+
+            player.weaponLeft = (Weapon)Upgrade.getByID(packet.left);
+            player.weaponRight = (Weapon)Upgrade.getByID(packet.right);
+
+            Net.sendExcept(player.clientid, packet, SendMode.tcp);
         });
     }
 
