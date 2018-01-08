@@ -69,7 +69,7 @@ public class Save13 extends SaveFileVersion {
             Vars.control.addWeapon((Weapon) Upgrade.getByID(stream.readByte()));
         }
 
-        Vars.ui.weaponfrag.update();
+        Vars.ui.hudfrag.updateWeapons();
 
         //inventory
 

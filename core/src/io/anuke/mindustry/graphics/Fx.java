@@ -10,10 +10,15 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
 public class Fx{
-	static Color lightRed = Hue.mix(Color.WHITE, Color.FIREBRICK, 0.1f);
-	static Color lightOrange = Color.valueOf("f68021");
-	static Color whiteOrange = Hue.mix(lightOrange, Color.WHITE, 0.6f);
-	static Color whiteYellow = Hue.mix(Color.YELLOW, Color.WHITE, 0.6f);
+	public static Color lightRed = Hue.mix(Color.WHITE, Color.FIREBRICK, 0.1f);
+    public static Color lightOrange = Color.valueOf("f68021");
+    public static Color lighterOrange = Color.valueOf("f6e096");
+    public static Color whiteOrange = Hue.mix(lightOrange, Color.WHITE, 0.6f);
+    public static Color whiteYellow = Hue.mix(Color.YELLOW, Color.WHITE, 0.6f);
+    public static Color lightGray = Color.valueOf("b0b0b0");
+	public static Color glowy = Color.valueOf("fdc056");
+	public static Color beam = Color.valueOf("9bffbe");
+	public static Color beamLight = Color.valueOf("ddffe9");
 	
 	public static final Effect
 	
@@ -350,9 +355,8 @@ public class Fx{
 	}),
 	
 	laserShoot = new Effect(8, e -> {
-		Draw.thickness(1f);
 		Draw.color(Color.WHITE, lightOrange, e.ifract());
-		Draw.spikes(e.x, e.y, e.ifract() * 2f, 1, 5);
+		Draw.lineShot(e.x, e.y, e.rotation, 3, e.fract(), 6f, 2f, 0.8f);
 		Draw.reset();
 	}),
 
@@ -361,22 +365,40 @@ public class Fx{
 		Draw.lineShot(e.x, e.y, e.rotation, 3, e.fract(), 9f, 3.5f, 0.8f);
 		Draw.reset();
 	}),
-	
-	railshoot = new Effect(8, e -> {
-		Draw.thickness(2f  - e.ifract()*2f);
-		Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.ifract());
-		Draw.spikes(e.x, e.y, 1f + e.ifract() * 4f, 1, 5);
+
+	clusterShoot = new Effect(12, e -> {
+		Draw.color(Color.WHITE, lightOrange, e.ifract());
+		Draw.lineShot(e.x, e.y, e.rotation, 3, e.fract(), 10f, 2.5f, 0.7f);
 		Draw.reset();
 	}),
 	
-	mortarshoot = new Effect(9, e -> {
-		Draw.thickness(1.3f - e.ifract());
+	railShoot = new Effect(8, e -> {
+		Draw.color(lighterOrange, lightOrange, e.ifract());
+		Draw.lineShot(e.x, e.y, e.rotation, 3, e.fract(), 10f, 2f, 0.7f);
+		Draw.reset();
+	}),
+	
+	mortarShoot = new Effect(8, e -> {
 		Draw.color(Color.WHITE, Color.ORANGE, e.ifract());
-		Draw.spikes(e.x, e.y, e.ifract() * 4f, 2, 6);
-		Draw.circle(e.x, e.y, e.ifract() * 5f + 1f);
+		Draw.lineShot(e.x, e.y, e.rotation, 3, e.fract(), 14f, 4f, 0.8f);
 		Draw.reset();
 	}),
-	
+
+	beamShoot = new Effect(8, e -> {
+		Draw.color(beamLight, beam, e.ifract());
+		Draw.lineShot(e.x, e.y, e.rotation - 70, 3, e.fract(), 12f, 1f, 0.5f);
+		Draw.lineShot(e.x, e.y, e.rotation + 70, 3, e.fract(), 12f, 1f, 0.5f);
+		Draw.reset();
+	}),
+
+    beamhit = new Effect(8, e -> {
+        Draw.color(beamLight, beam, e.ifract());
+        Draw.thick(e.fract()*3f+0.5f);
+        Draw.circle(e.x, e.y, e.ifract()*8f);
+        Draw.spikes(e.x, e.y, e.ifract()*6f, 2f, 4, 45);
+        Draw.reset();
+    }),
+
 	titanExplosion = new Effect(11, 48f, e -> {
 		Draw.thickness(2f*e.fract()+0.5f);
 		Draw.color(Color.WHITE, Color.DARK_GRAY, e.powfract());
@@ -426,6 +448,14 @@ public class Fx{
 		
 		Draw.reset();
 	}),
+
+	clusterbomb = new Effect(10f, e -> {
+		Draw.color(Color.WHITE, lightOrange, e.ifract());
+		Draw.thick(e.fract()*1.5f);
+		Draw.polygon(4, e.x, e.y, e.fract()*8f);
+		Draw.circle(e.x, e.y, e.ifract()*14f);
+		Draw.reset();
+	}),
 	
 	coreexplosion = new Effect(13, e -> {
 		Draw.thickness(3f-e.ifract()*2f);
@@ -444,6 +474,13 @@ public class Fx{
 	
 	railsmoke = new Effect(30, e -> {
 		Draw.color(Color.LIGHT_GRAY, Color.WHITE, e.ifract());
+		float size = e.fract()*4f;
+		Draw.rect("circle", e.x, e.y, size, size);
+		Draw.reset();
+	}),
+
+	chainsmoke = new Effect(30, e -> {
+		Draw.color(lightGray);
 		float size = e.fract()*4f;
 		Draw.rect("circle", e.x, e.y, size, size);
 		Draw.reset();

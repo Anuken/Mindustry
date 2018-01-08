@@ -28,6 +28,7 @@ public class Enemy extends DestructibleEntity implements Syncable{
 	public float angle;
 	public Vector2 velocity = new Vector2();
 	public Entity target;
+	public float hitTime;
 	public int tier = 1;
 
 	public Enemy(EnemyType type){
@@ -57,6 +58,12 @@ public class Enemy extends DestructibleEntity implements Syncable{
 	@Override
 	public boolean collides(SolidEntity other){
 		return (other instanceof Bullet) && !(((Bullet) other).owner instanceof Enemy);
+	}
+
+	@Override
+	public void damage(int amount){
+		super.damage(amount);
+		hitTime = EnemyType.hitDuration;
 	}
 
 	@Override

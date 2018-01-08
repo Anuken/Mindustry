@@ -21,36 +21,49 @@ public class Weapon extends Upgrade{
 			effect =  Fx.laserShoot;
 		}
 	},
-	triblaster = new Weapon("triblaster", 18, BulletType.spread){
+	triblaster = new Weapon("triblaster", 20, BulletType.spread){
 		{
 			shots = 3;
 			effect = Fx.spreadShoot;
 			roundrobin = true;
 		}
 	},
-	multigun = new Weapon("multigun", 6, BulletType.multishot){
+	clustergun = new Weapon("clustergun", 26f, BulletType.cluster){
 		{
-			effect = Fx.laserShoot;
-			inaccuracy = 6f;
+			effect = Fx.clusterShoot;
+			inaccuracy = 20f;
+			roundrobin = true;
+			shots = 2;
+			spacing = 0;
 		}
 	},
-	flamer = new Weapon("flamer", 5, BulletType.flame){
+	beam = new Weapon("beam", 30f, BulletType.beamlaser){
 		{
-			shootsound = "flame2";
-			inaccuracy = 12f;
+			effect = Fx.beamShoot;
+			inaccuracy = 0;
+			roundrobin = true;
+			shake = 2f;
 		}
 	},
-	railgun = new Weapon("railgun", 30, BulletType.sniper){
+	railgun = new Weapon("railgun", 5, BulletType.rail){
 		{
 			shootsound = "railgun";
-			effect = Fx.railshoot;
+			effect = Fx.railShoot;
+			inaccuracy = 5;
+			roundrobin = true;
+			shake = 1f;
+			inaccuracy = 4f;
 		}
 	},
-	mortar = new Weapon("mortar", 100, BulletType.shell){
+	//TODO rename!
+	mortar = new Weapon("mortar", 36, BulletType.shotgun){
 		{
 			shootsound = "bigshot";
-			effect = Fx.mortarshoot;
+			effect = Fx.mortarShoot;
 			shake = 2f;
+			roundrobin = true;
+			shots = 7;
+			inaccuracy = 15f;
 		}
 	};
 	/**weapon reload in frames*/
@@ -80,8 +93,8 @@ public class Weapon extends Upgrade{
 
 	public void update(Player p, boolean left){
 		if(Timers.get(p, "reload"+left, reload)){
-			if(left && roundrobin){
-				Timers.reset(p, "reload" + false, reload/2f);
+			if(roundrobin){
+				Timers.reset(p, "reload" + !left, reload/2f);
 			}
 			float ang = Angles.mouseAngle(p.x, p.y);
 			Angles.translation(ang + Mathf.sign(left) * -60f, 3f);

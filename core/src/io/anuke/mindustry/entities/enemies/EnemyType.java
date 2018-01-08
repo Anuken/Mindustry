@@ -31,6 +31,7 @@ public class EnemyType {
     public final static int maxtier = 4;
     public final static float maxIdle = 60*1.5f;
     public final static float maxIdleLife = 60f*13f; //13 seconds idle = death
+    public final static float hitDuration = 5f;
 
     public final String name;
     public final byte id;
@@ -65,6 +66,7 @@ public class EnemyType {
         String region = name + "-t" + Mathf.clamp(enemy.tier, 1, 3);
 
         Shaders.outline.color.set(tierColors[enemy.tier - 1]);
+        Shaders.outline.lighten = Mathf.clamp(enemy.hitTime/hitDuration);
         Shaders.outline.region = Draw.region(region);
 
         Shaders.outline.apply();
@@ -73,12 +75,16 @@ public class EnemyType {
         Draw.color();
 
         Graphics.flush();
+        Shaders.outline.lighten = 0f;
     }
 
     public void drawOver(Enemy enemy){ }
 
     public void update(Enemy enemy){
         float lastx = enemy.x, lasty = enemy.y;
+        if(enemy.hitTime > 0){
+            enemy.hitTime -= Timers.delta();
+        }
 
         move(enemy);
 

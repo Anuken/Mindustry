@@ -392,9 +392,9 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				if(!Vars.control.getWeapons().contains(Weapon.multigun, true)){
-					Vars.control.getWeapons().add(Weapon.multigun);
-					Vars.ui.weaponfrag.update();
+				if(!Vars.control.getWeapons().contains(Weapon.triblaster, true)){
+					Vars.control.getWeapons().add(Weapon.triblaster);
+					Vars.ui.hudfrag.updateWeapons();
 				}
 			}
 		},

@@ -27,7 +27,7 @@ import static io.anuke.mindustry.Vars.control;
 import static io.anuke.mindustry.Vars.fontscale;
 
 public class BlocksFragment implements Fragment{
-	private Table desctable, itemtable, blocks;
+	private Table desctable, itemtable, blocks, weapons;
 	private Stack stack = new Stack();
 	private Array<String> statlist = new Array<>();
 	private boolean shown = true;
@@ -90,7 +90,7 @@ public class BlocksFragment implements Fragment{
 							}
 						});
 						button.setName("sectionbutton" + sec.name());
-						add(button).growX().height(54).padRight(-1).padTop(sec.ordinal() <= 2 ? -10 : -5);
+						add(button).growX().height(54).padLeft(-1).padTop(sec.ordinal() <= 2 ? -10 : -5);
 						button.getImageCell().size(40).padBottom(4).padTop(2);
 						group.add(button);
 
@@ -144,16 +144,47 @@ public class BlocksFragment implements Fragment{
 					add(stack).colspan(Section.values().length);
 					margin(10f);
 
-					marginLeft(0f);
-					marginRight(0f);
+					marginLeft(1f);
+					marginRight(1f);
 
 					end();
 				}}.right().bottom().uniformX();
+
+				row();
+
+				if(!Vars.android) {
+					weapons = new table("button").margin(0).fillX().end().get();
+				}
 
 				visible(() -> !GameState.is(State.menu) && shown);
 
 			}}.end().get();
 		}}.end();
+
+		updateWeapons();
+	}
+
+	public void updateWeapons(){
+		if(Vars.android) return;
+
+		weapons.clearChildren();
+		weapons.left();
+
+		ButtonGroup<ImageButton> group = new ButtonGroup<>();
+
+		for(int i = 0; i < Vars.control.getWeapons().size; i ++){
+			Weapon weapon = Vars.control.getWeapons().get(i);
+			weapons.addImageButton(weapon.name, "toggle", 8*3, () -> {
+				Vars.player.weaponLeft = Vars.player.weaponRight = weapon;
+			}).left().size(40f, 45f).padRight(-1).group(group);
+		}
+
+		int idx = Vars.control.getWeapons().indexOf(Vars.player.weaponLeft, true);
+
+		if(idx != -1)
+			group.getButtons().get(idx).setChecked(true);
+		else if(group.getButtons().size > 0)
+			group.getButtons().get(0).setChecked(true);
 	}
 
 	public void toggle(boolean show, float t, Interpolation ip){

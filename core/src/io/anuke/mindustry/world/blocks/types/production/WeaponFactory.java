@@ -86,7 +86,7 @@ public class WeaponFactory extends Block implements Configurable{
             ImageButton button = content.addImageButton("white", 8*4, () -> {
                 control.removeItems(requirements);
                 control.addWeapon(weapon);
-                Vars.ui.weaponfrag.update();
+                Vars.ui.hudfrag.updateWeapons();
                 run.listen();
                 Effects.sound("purchase");
 

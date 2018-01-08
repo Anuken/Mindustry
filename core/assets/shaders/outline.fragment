@@ -7,6 +7,7 @@ uniform sampler2D u_texture;
 
 uniform vec4 u_color;
 uniform vec2 u_texsize;
+uniform float u_lighten;
 
 varying vec4 v_color;
 varying vec2 v_texCoord;
@@ -30,6 +31,7 @@ void main() {
 	if(any){
 		gl_FragColor = u_color;
 	}else{
-		gl_FragColor = texture2D(u_texture, T) * v_color;
+	    vec4 c = texture2D(u_texture, T);
+		gl_FragColor = mix(c, vec4(1.0, 1.0, 1.0, c.a), u_lighten) * v_color;
 	}
 }

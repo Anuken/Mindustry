@@ -43,7 +43,6 @@ public class UI extends SceneModule{
     public final ToolFragment toolfrag = new ToolFragment();
     public final HudFragment hudfrag = new HudFragment();
     public final PlacementFragment placefrag = new PlacementFragment();
-    public final WeaponFragment weaponfrag = new WeaponFragment();
     public final ChatFragment chatfrag = new ChatFragment();
     public final PlayerListFragment listfrag = new PlayerListFragment();
     public final BackgroundFragment backfrag = new BackgroundFragment();
@@ -143,7 +142,6 @@ public class UI extends SceneModule{
 		build.begin(scene);
 
 		backfrag.build();
-		weaponfrag.build();
 		hudfrag.build();
 		configfrag.build();
 		menufrag.build();

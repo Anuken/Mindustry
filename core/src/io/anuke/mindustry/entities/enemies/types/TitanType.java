@@ -27,7 +27,7 @@ public class TitanType extends EnemyType {
 		
 		if(Timers.getTime(enemy, "salvo") < 60){
 			if(Timers.get(enemy, "salvoShoot", 6)){
-				enemy.shoot(BulletType.flame, Mathf.range(20f));
+				enemy.shoot(BulletType.flameshot, Mathf.range(20f));
 			}
 		}
 		

@@ -83,7 +83,7 @@ public class DesktopInput extends InputHandler{
 			if(Inputs.keyTap("weapon_" + i)){
 				player.weaponLeft = player.weaponRight = control.getWeapons().get(i - 1);
                 Vars.netClient.handleWeaponSwitch();
-				ui.weaponfrag.update();
+				Vars.ui.hudfrag.updateWeapons();
 			}
 		}
 		
