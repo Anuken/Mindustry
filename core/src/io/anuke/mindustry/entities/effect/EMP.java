@@ -84,7 +84,7 @@ public class EMP extends TimedEntity{
 		}
 	
 		Draw.thick(fract()*2f);
-		Draw.polygon(34, x, y, radius * Vars.tilesize);
+		Draw.polygon(y, x, 34, radius * Vars.tilesize);
 		
 		Draw.reset();
 	}

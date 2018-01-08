@@ -101,7 +101,7 @@ public enum PlaceMode{
 					Draw.linecrect(tile.worldx() + offset.x, tile.worldy() + offset.y, tile.block().width * Vars.tilesize, tile.block().height * Vars.tilesize);
 				}else if(android && control.getInput().breaktime > 0){
 					Draw.color(Colors.get("breakStart"), Colors.get("break"), fract);
-					Draw.polygon(25, tile.worldx() + offset.x, tile.worldy() + offset.y, 4 + (1f - fract) * 26);
+					Draw.polygon(tile.worldy() + offset.y, tile.worldx() + offset.x, 25, 4 + (1f - fract) * 26);
 				}
 				Draw.reset();
 			}

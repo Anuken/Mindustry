@@ -47,7 +47,6 @@ public class Weapon extends Upgrade{
 	},
 	vulcan = new Weapon("vulcan", 5, BulletType.vulcan){
 		{
-			shootsound = "vulcan";
 			effect = Fx.vulcanShoot;
 			inaccuracy = 5;
 			roundrobin = true;

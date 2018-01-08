@@ -23,6 +23,14 @@ public class BlockConfigFragment implements  Fragment {
         Core.scene.add(table);
     }
 
+    public boolean isShown(){
+        return table.isVisible() && configTile != null;
+    }
+
+    public Tile getSelectedTile(){
+        return configTile;
+    }
+
     public void showConfig(Tile tile){
         configTile = tile;
 

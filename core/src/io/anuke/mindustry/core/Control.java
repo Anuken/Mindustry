@@ -227,8 +227,8 @@ public class Control extends Module{
 		player.weaponLeft = player.weaponRight = weapons.first();
 
 		if(debug){
-			weapons.add(Weapon.triblaster, Weapon.clustergun, Weapon.beam, Weapon.vulcan);
-			weapons.add(Weapon.shockgun);
+			//weapons.add(Weapon.triblaster, Weapon.clustergun, Weapon.beam, Weapon.vulcan);
+			//weapons.add(Weapon.shockgun);
 			player.weaponLeft = player.weaponRight = weapons.peek();
 		}
 		

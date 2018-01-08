@@ -268,7 +268,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			Draw.reset();
 		}
 	},
-	shot = new BulletType(2.7f, 4){
+	shot = new BulletType(2.7f, 5){
 		{
 			lifetime = 40;
 		}
@@ -302,8 +302,8 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 
 		public void draw(Bullet b){
 			Draw.thick(2f);
-			Draw.color(lightOrange);
-			Draw.circle(b.x, b.y, 1.6f);
+			Draw.color(lightOrange, Color.WHITE, 0.4f);
+			Draw.polygon(b.y, b.x, 3, 1.6f, b.angle());
 			Draw.thick(1f);
 			Draw.color(Color.WHITE, lightOrange, b.ifract()/2f);
 			Draw.alpha(b.ifract());
@@ -316,7 +316,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		}
 
 		public void removed(Bullet b){
-			Effects.shake(1f, 1f, b);
+			Effects.shake(1.5f, 1.5f, b);
 
 			Effects.effect(Fx.clusterbomb, b);
 
