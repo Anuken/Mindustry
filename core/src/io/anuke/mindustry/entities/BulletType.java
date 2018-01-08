@@ -323,7 +323,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			DamageArea.damage(!(b.owner instanceof Enemy), b.x, b.y, 22f, damage);
 		}
 	},
-    rail = new BulletType(4.5f, 11) {
+    vulcan = new BulletType(4.5f, 11) {
 		{
 			lifetime = 50;
 		}
@@ -345,7 +345,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
             }
         }
     },
-	shotgun = new BulletType(5.4f, 10) {
+	shockshell = new BulletType(5.4f, 10) {
 
 		{
 			drag = 0.03f;

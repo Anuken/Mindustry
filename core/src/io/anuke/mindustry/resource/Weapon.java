@@ -45,21 +45,20 @@ public class Weapon extends Upgrade{
 			shake = 2f;
 		}
 	},
-	railgun = new Weapon("railgun", 5, BulletType.rail){
+	vulcan = new Weapon("vulcan", 5, BulletType.vulcan){
 		{
-			shootsound = "railgun";
-			effect = Fx.railShoot;
+			shootsound = "vulcan";
+			effect = Fx.vulcanShoot;
 			inaccuracy = 5;
 			roundrobin = true;
 			shake = 1f;
 			inaccuracy = 4f;
 		}
 	},
-	//TODO rename!
-	mortar = new Weapon("mortar", 36, BulletType.shotgun){
+	shockgun = new Weapon("shockgun", 36, BulletType.shockshell){
 		{
 			shootsound = "bigshot";
-			effect = Fx.mortarShoot;
+			effect = Fx.shockShoot;
 			shake = 2f;
 			roundrobin = true;
 			shots = 7;

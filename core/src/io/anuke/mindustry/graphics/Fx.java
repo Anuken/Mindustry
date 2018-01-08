@@ -372,13 +372,13 @@ public class Fx{
 		Draw.reset();
 	}),
 	
-	railShoot = new Effect(8, e -> {
+	vulcanShoot = new Effect(8, e -> {
 		Draw.color(lighterOrange, lightOrange, e.ifract());
 		Draw.lineShot(e.x, e.y, e.rotation, 3, e.fract(), 10f, 2f, 0.7f);
 		Draw.reset();
 	}),
 	
-	mortarShoot = new Effect(8, e -> {
+	shockShoot = new Effect(8, e -> {
 		Draw.color(Color.WHITE, Color.ORANGE, e.ifract());
 		Draw.lineShot(e.x, e.y, e.rotation, 3, e.fract(), 14f, 4f, 0.8f);
 		Draw.reset();

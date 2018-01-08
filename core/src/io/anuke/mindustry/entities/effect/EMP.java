@@ -56,7 +56,9 @@ public class EMP extends TimedEntity{
 				p.setPower(tile, 0f);
 				tile.entity.damage((int)(damage*1.5f)); //extra damage
 			}
-			
+
+			if(tile == null) continue;
+
 			//entity may be null here, after the block is dead!
 			Effects.effect(Fx.empspark, tile.worldx(), tile.worldy());
 			if(tile.entity != null) tile.entity.damage(damage);
@@ -96,7 +98,7 @@ public class EMP extends TimedEntity{
 			float dx = Mathf.range(r), 
 					dy = Mathf.range(r);
 			
-			float frac = (float)(seg+1f)/joints;
+			float frac = (seg+1f)/joints;
 			
 			float tx = (targetx - x)*frac + x + dx, 
 					ty = (targety - y)*frac + y + dy;
