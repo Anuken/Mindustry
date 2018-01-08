@@ -70,13 +70,6 @@ public class UI extends SceneModule{
 				fadeOut(0.1f, Interpolation.fade)
 			)
 		));
-
-		Mathf.each(font -> {
-			font.setUseIntegerPositions(false);
-			font.getData().setScale(Vars.fontscale);
-			font.getData().down += Unit.dp.scl(4f);
-			font.getData().lineHeight -= Unit.dp.scl(2f);
-		}, skin.font(), skin.getFont("default-font-chat"));
 		
 		TooltipManager.getInstance().animations = false;
 		
@@ -109,6 +102,12 @@ public class UI extends SceneModule{
 	@Override
 	protected void loadSkin(){
 		skin = new Skin(Gdx.files.internal("ui/uiskin.json"), Core.atlas);
+		Mathf.each(font -> {
+			font.setUseIntegerPositions(false);
+			font.getData().setScale(Vars.fontscale);
+			font.getData().down += Unit.dp.scl(4f);
+			font.getData().lineHeight -= Unit.dp.scl(2f);
+		}, skin.font(), skin.getFont("default-font-chat"));
 	}
 
 	@Override

@@ -56,8 +56,8 @@ public class AndroidLauncher extends AndroidApplication{
 			}
 
 			@Override
-			public void addDialog(TextField field){
-				TextFieldDialogListener.add(field);
+			public void addDialog(TextField field, int length){
+				TextFieldDialogListener.add(field, 0, length);
 			}
 
 			@Override

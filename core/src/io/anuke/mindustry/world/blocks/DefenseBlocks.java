@@ -9,19 +9,19 @@ public class DefenseBlocks{
 	static final int wallHealthMultiplier = 4;
 	
 	public static final Block
-	
+
 	stonewall = new Wall("stonewall"){{
 		health = 50*wallHealthMultiplier;
 	}},
-			
+
 	ironwall = new Wall("ironwall"){{
 		health = 80*wallHealthMultiplier;
 	}},
-	
+
 	steelwall = new Wall("steelwall"){{
 		health = 110*wallHealthMultiplier;
 	}},
-	
+
 	titaniumwall = new Wall("titaniumwall"){{
 		health = 150*wallHealthMultiplier;
 	}},
@@ -46,7 +46,7 @@ public class DefenseBlocks{
 	titaniumshieldwall = new ShieldedWallBlock("titaniumshieldwall"){{
 		health = 150*wallHealthMultiplier;
 	}},
-	
+
 	repairturret = new RepairTurret("repairturret"){
 		{
 			range = 30;
@@ -55,7 +55,7 @@ public class DefenseBlocks{
 			powerUsed = 0.08f;
 		}
 	},
-	
+
 	megarepairturret = new RepairTurret("megarepairturret"){
 		{
 			range = 44;
@@ -64,7 +64,7 @@ public class DefenseBlocks{
 			powerUsed = 0.13f;
 		}
 	},
-	
+
 	shieldgenerator = new ShieldBlock("shieldgenerator"){
 		{
 			health = 100*wallHealthMultiplier;

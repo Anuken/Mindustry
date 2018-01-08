@@ -135,8 +135,7 @@ public class HudFragment implements Fragment{
 		//profiling table
 		if(debug){
 			new table(){{
-				abottom();
-				aleft();
+				atop();
 				new label("[green]density: " + Gdx.graphics.getDensity()).left();
 				row();
 				new label(() -> "[blue]requests: " + renderer.getBlocks().getRequests()).left();
