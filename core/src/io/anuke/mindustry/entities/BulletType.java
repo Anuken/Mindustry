@@ -282,16 +282,36 @@ public abstract class BulletType  extends BaseBulletType<Bullet>{
 			Draw.reset();
 		}
 	},
-	shot = new BulletType(2.4f, 4){
-		{lifetime = 40;}
+	shot = new BulletType(2.7f, 4){
+		{
+			lifetime = 40;
+		}
+
 		public void draw(Bullet b){
-			Draw.color(lightGold);
-			Draw.rect("bullet", b.x, b.y, b.angle());
+			Draw.color(Color.WHITE, lightOrange, b.fract()/2f + 0.25f);
+			Draw.thick(1.5f);
+			Draw.lineAngle(b.x, b.y, b.angle(), 3f);
+			Draw.reset();
+		}
+	},
+	spread = new BulletType(2.4f, 6) {
+		{
+			lifetime = 50;
+		}
+
+		public void draw(Bullet b) {
+			float size = 3f - b.ifract()*1f;
+
+			Draw.color(Color.PURPLE, Color.WHITE, 0.8f);
+			Draw.thick(1f);
+			Draw.circle(b.x, b.y, size);
 			Draw.reset();
 		}
 	},
 	multishot = new BulletType(2.5f, 3){
-		{lifetime=40;}
+		{
+			lifetime = 40;
+		}
 		public void draw(Bullet b){
 			Draw.color(Color.SKY);
 			Draw.rect("bullet", b.x, b.y, b.angle());

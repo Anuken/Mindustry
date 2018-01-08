@@ -16,6 +16,7 @@ import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
+import io.anuke.mindustry.io.BundleGen;
 import io.anuke.mindustry.io.Saves;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Item;
@@ -75,6 +76,8 @@ public class Control extends Module{
     private boolean controlling;
 	
 	public Control(){
+		BundleGen.cleanBundles(Gdx.files.internal("bundles/bundle.properties"));
+
 		if(Mindustry.args.contains("-debug", false))
 			Vars.debug = true;
 
@@ -225,6 +228,11 @@ public class Control extends Module{
 		
 		weapons.add(Weapon.blaster);
 		player.weaponLeft = player.weaponRight = weapons.first();
+
+		if(debug){
+			weapons.add(Weapon.triblaster);
+			player.weaponLeft = player.weaponRight = weapons.peek();
+		}
 		
 		lastUpdated = -1;
 		wave = 1;

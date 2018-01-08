@@ -16,20 +16,21 @@ import io.anuke.ucore.util.Mathf;
 public class Weapon extends Upgrade{
 	public static final Weapon
 
-	blaster = new Weapon("blaster", 15, BulletType.shot){
+	blaster = new Weapon("blaster", 12, BulletType.shot){
 		{
-			effect =  Fx.shoot3;
+			effect =  Fx.laserShoot;
 		}
 	},
-	triblaster = new Weapon("triblaster", 13, BulletType.shot){
+	triblaster = new Weapon("triblaster", 18, BulletType.spread){
 		{
 			shots = 3;
-			effect = Fx.shoot;
+			effect = Fx.spreadShoot;
+			roundrobin = true;
 		}
 	},
 	multigun = new Weapon("multigun", 6, BulletType.multishot){
 		{
-			effect = Fx.shoot2;
+			effect = Fx.laserShoot;
 			inaccuracy = 6f;
 		}
 	},
@@ -52,14 +53,24 @@ public class Weapon extends Upgrade{
 			shake = 2f;
 		}
 	};
-
+	/**weapon reload in frames*/
 	float reload;
+	/**type of bullet shot*/
 	BulletType type;
+	/**sound made when shooting*/
 	String shootsound = "shoot";
+	/**amount of shots per fire*/
 	int shots = 1;
+	/**spacing in degrees between multiple shots, if applicable*/
+	float spacing = 12f;
+	/**inaccuracy of degrees of each shot*/
 	float inaccuracy = 0f;
+	/**intensity and duration of each shot's screen shake*/
 	float shake = 0f;
+	/**effect displayed when shooting*/
 	Effect effect;
+	/**whether to shoot the weapons in different arms one after another, rather an all at once*/
+	boolean roundrobin = false;
 	
 	private Weapon(String name, float reload, BulletType type){
 		super(name);
@@ -69,16 +80,19 @@ public class Weapon extends Upgrade{
 
 	public void update(Player p, boolean left){
 		if(Timers.get(p, "reload"+left, reload)){
+			if(left && roundrobin){
+				Timers.reset(p, "reload" + false, reload/2f);
+			}
 			float ang = Angles.mouseAngle(p.x, p.y);
-			Angles.translation(ang + Mathf.sign(left) * -70f, 2f);
+			Angles.translation(ang + Mathf.sign(left) * -60f, 3f);
 			shoot(p, p.x + Angles.x(), p.y + Angles.y(), Angles.mouseAngle(p.x + Angles.x(), p.y + Angles.y()));
 		}
 	}
 
 	void shootInternal(Player p, float x, float y, float rotation){
-		Angles.shotgun(shots, 12f, rotation, f -> bullet(p, x, y, f + Mathf.range(inaccuracy)));
+		Angles.shotgun(shots, spacing, rotation, f -> bullet(p, x, y, f + Mathf.range(inaccuracy)));
 		Angles.translation(rotation, 3f);
-		if(effect != null) Effects.effect(effect, x + Angles.x(), y + Angles.y());
+		if(effect != null) Effects.effect(effect, x + Angles.x(), y + Angles.y(), rotation);
 		Effects.shake(shake, shake, x, y);
 		Effects.sound(shootsound, x, y);
 	}

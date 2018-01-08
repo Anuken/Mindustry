@@ -1,5 +1,6 @@
 package io.anuke.mindustry.io;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
@@ -20,6 +21,17 @@ import io.anuke.ucore.util.Mathf;
 /**Used for generating a bundle from existing strings in the game.*/
 public class BundleGen {
     private static FileHandle file;
+
+    public static void cleanBundles(FileHandle file){
+        String[] strings = file.readString().split("\n");
+        FileHandle out = Gdx.files.absolute("/home/anuke/out.properties");
+        out.writeString("", false);
+        for(String string : strings){
+            if(!string.contains(".description")){
+                out.writeString(string + "\n", true);
+            }
+        }
+    }
 
     public static void buildBundle(FileHandle file){
         BundleGen.file = file;

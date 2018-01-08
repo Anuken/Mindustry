@@ -100,13 +100,13 @@ public class Player extends DestructibleEntity implements Syncable{
 
 		if(!isAndroid) {
 			for (boolean b : new boolean[]{true, false}) {
+				Weapon weapon = b ? weaponLeft : weaponRight;
 				Angles.translation(angle + Mathf.sign(b) * -50f, 3.5f);
-				String name = b ? weaponLeft.name : weaponRight.name;
 				float s = 5f;
 				if(snap){
-					Draw.rect(name, (int)x + Angles.x(), (int)y + Angles.y(), s, s, angle- 90);
+					Draw.rect(weapon.name, (int)x + Angles.x(), (int)y + Angles.y(), s, s, angle- 90);
 				}else{
-					Draw.rect(name, x + Angles.x(), y + Angles.y(), s, s, angle - 90);
+					Draw.rect(weapon.name, x + Angles.x(), y + Angles.y(), s, s, angle - 90);
 				}
 			}
 		}

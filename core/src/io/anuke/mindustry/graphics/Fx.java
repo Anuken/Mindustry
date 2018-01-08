@@ -2,7 +2,6 @@ package io.anuke.mindustry.graphics;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects.Effect;
@@ -350,24 +349,16 @@ public class Fx{
 		Draw.reset();
 	}),
 	
-	shoot = new Effect(8, e -> {
+	laserShoot = new Effect(8, e -> {
 		Draw.thickness(1f);
-		Draw.color(Color.WHITE, Color.GOLD, e.ifract());
-		Draw.spikes(e.x, e.y, e.ifract() * 2f, 2, 5);
-		Draw.reset();
-	}),
-	
-	shoot2 = new Effect(8, e -> {
-		Draw.thickness(1f);
-		Draw.color(Color.WHITE, Color.SKY, e.ifract());
+		Draw.color(Color.WHITE, lightOrange, e.ifract());
 		Draw.spikes(e.x, e.y, e.ifract() * 2f, 1, 5);
 		Draw.reset();
 	}),
-	
-	shoot3 = new Effect(8, e -> {
-		Draw.thickness(1f);
-		Draw.color(Color.WHITE, Color.GOLD, e.ifract());
-		Draw.spikes(e.x, e.y, e.ifract() * 2f, 1, 5);
+
+	spreadShoot = new Effect(12, e -> {
+		Draw.color(Color.WHITE, Color.PURPLE, e.ifract());
+		Draw.lineShot(e.x, e.y, e.rotation, 3, e.fract(), 9f, 3.5f, 0.8f);
 		Draw.reset();
 	}),
 	
@@ -460,7 +451,6 @@ public class Fx{
 	
 	dashsmoke = new Effect(30, e -> {
 		Draw.color(Color.CORAL, Color.GRAY, e.ifract());
-		//Draw.alpha(e.fract());
 		float size = e.fract()*4f;
 		Draw.rect("circle", e.x, e.y, size, size);
 		Draw.reset();
@@ -470,13 +460,6 @@ public class Fx{
 		Draw.thickness(2f);
 		Draw.color(Color.DARK_GRAY, Color.SCARLET, e.ifract());
 		Draw.circle(e.x, e.y, 7f - e.ifract() * 6f);
-		Draw.reset();
-	}),
-
-	ind = new Effect(100, e -> {
-		Draw.thickness(3f);
-		Draw.color(Color.ROYAL);
-		Draw.circle(e.x, e.y, 3);
 		Draw.reset();
 	}),
 	
