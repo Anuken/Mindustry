@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
@@ -19,6 +20,7 @@ import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.Label.LabelStyle;
 import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.scene.ui.layout.Unit;
 
 import static io.anuke.ucore.core.Core.scene;
 import static io.anuke.ucore.core.Core.skin;
@@ -29,16 +31,15 @@ public class ChatFragment extends Table implements Fragment{
     private final static int maxLength = 150;
     private Array<ChatMessage> messages = new Array<>();
     private float fadetime;
-    private float lastfadetime;
     private boolean chatOpen = false;
     private TextField chatfield;
     private Label fieldlabel = new Label(">");
     private BitmapFont font;
     private GlyphLayout layout = new GlyphLayout();
-    private float offsetx = 4, offsety = 4, fontoffsetx = 2, chatspace = 50;
-    private float textWidth = 600;
+    private float offsetx = Unit.dp.scl(4), offsety = Unit.dp.scl(4), fontoffsetx = Unit.dp.scl(2), chatspace = Unit.dp.scl(50);
+    private float textWidth = Unit.dp.scl(600);
     private Color shadowColor = new Color(0, 0, 0, 0.4f);
-    private float textspacing = 10;
+    private float textspacing = Unit.dp.scl(10);
 
     public ChatFragment(){
         super();
@@ -73,6 +74,8 @@ public class ChatFragment extends Table implements Fragment{
         chatfield.getStyle().background = skin.getDrawable("chatfield");
         chatfield.getStyle().fontColor = Color.WHITE;
         chatfield.getStyle().font = skin.getFont("default-font-chat");
+        chatfield.setStyle(chatfield.getStyle());
+        Mindustry.platforms.addDialog(chatfield, maxLength);
 
         bottom().left().marginBottom(offsety).marginLeft(offsetx*2).add(fieldlabel).padBottom(4f);
 
@@ -87,8 +90,9 @@ public class ChatFragment extends Table implements Fragment{
         if(chatOpen)
             batch.draw(skin.getRegion("white"), offsetx, chatfield.getY(), Gdx.graphics.getWidth()-offsetx*2, chatfield.getHeight()-1);
 
-        font.getData().down = -21.5f;
-        font.getData().lineHeight = 22f;
+        //font.getData().down = Unit.dp.scl(-21.5f);
+        //font.getData().lineHeight = 22f;
+        //chatfield.getStyle().font.getData().setScale(Vars.fontscale);
 
         super.draw(batch, alpha);
 
@@ -114,7 +118,7 @@ public class ChatFragment extends Table implements Fragment{
                 batch.setColor(0, 0, 0, shadowColor.a*(fadetime-i));
             }
 
-            batch.draw(skin.getRegion("white"), offsetx, theight-layout.height+1-4, textWidth, layout.height+textspacing);
+            batch.draw(skin.getRegion("white"), offsetx, theight-layout.height+1-4, textWidth + Unit.dp.scl(4f), layout.height+textspacing);
             batch.setColor(shadowColor);
 
             font.getCache().draw(batch);
@@ -141,7 +145,6 @@ public class ChatFragment extends Table implements Fragment{
         if(!chatOpen && (scene.getKeyboardFocus() == null || !scene.getKeyboardFocus().getParent().isVisible())){
             scene.setKeyboardFocus(chatfield);
             chatOpen = !chatOpen;
-            lastfadetime = fadetime;
             fadetime = messagesShown + 1;
         }else if(chatOpen){
             scene.setKeyboardFocus(null);
@@ -170,7 +173,7 @@ public class ChatFragment extends Table implements Fragment{
         public ChatMessage(String message, String sender){
             this.message = message;
             this.sender = sender;
-            if(sender == null){ //no sender, this is a server message
+            if(sender == null){ //no sender, this is a server message?
                 formattedMessage = message;
             }else{
                 formattedMessage = "[ROYAL]["+sender+"]: [YELLOW]"+message;

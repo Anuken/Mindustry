@@ -22,6 +22,7 @@ import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.TextField.TextFieldFilter;
 import io.anuke.ucore.scene.ui.TooltipManager;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.control;
 import static io.anuke.ucore.scene.actions.Actions.*;
@@ -68,11 +69,6 @@ public class UI extends SceneModule{
 			)
 		));
 		
-		skin.font().setUseIntegerPositions(false);
-		skin.font().getData().setScale(Vars.fontscale);
-		skin.font().getData().down += 4f;
-		skin.font().getData().lineHeight -= 2f;
-		
 		TooltipManager.getInstance().animations = false;
 		
 		Settings.setErrorHandler(()-> Timers.run(1f, ()-> showError("[crimson]Failed to access local storage.\nSettings will not be saved.")));
@@ -104,6 +100,12 @@ public class UI extends SceneModule{
 	@Override
 	protected void loadSkin(){
 		skin = new Skin(Gdx.files.internal("ui/uiskin.json"), Core.atlas);
+		Mathf.each(font -> {
+			font.setUseIntegerPositions(false);
+			font.getData().setScale(Vars.fontscale);
+			font.getData().down += Unit.dp.scl(4f);
+			font.getData().lineHeight -= Unit.dp.scl(2f);
+		}, skin.font(), skin.getFont("default-font-chat"));
 	}
 
 	@Override

@@ -8,7 +8,10 @@ public abstract class PlatformFunction{
 	public String format(Date date){return "invalid";}
 	public String format(int number){return "invalid";}
 	public void openLink(String link){}
-	public void addDialog(TextField field){}
+	public void addDialog(TextField field){
+		addDialog(field, 16);
+	}
+	public void addDialog(TextField field, int maxLength){}
 	public void updateRPC(){}
 	public void onGameExit(){}
 	public void openDonations(){}

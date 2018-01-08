@@ -65,6 +65,7 @@ public class HudFragment implements Fragment{
 				pause = new imagebutton("icon-pause", isize, ()->{
 					if(Net.active() && Vars.android){
 						//TODO open android chat
+						ui.chatfrag.toggle();
 					}else {
 						GameState.set(GameState.is(State.paused) ? State.playing : State.paused);
 					}
@@ -134,8 +135,7 @@ public class HudFragment implements Fragment{
 		//profiling table
 		if(debug){
 			new table(){{
-				abottom();
-				aleft();
+				atop();
 				new label("[green]density: " + Gdx.graphics.getDensity()).left();
 				row();
 				new label(() -> "[blue]requests: " + renderer.getBlocks().getRequests()).left();

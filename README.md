@@ -6,7 +6,7 @@
 
 A pixelated sandbox tower defense game made using [LibGDX](https://libgdx.badlogicgames.com/). Winner of the [GDL Metal Monstrosity Jam](https://itch.io/jam/gdl---metal-monstrosity-jam).
 
-_[Issue tracker](https://waffle.io/Anuken/Mindustry)_
+_[Issue tracker](https://waffle.io/Anuken/Mindustry)_  
 _[TODO list](TODO.md)_  
 _[Wiki](http://mindustry.wikia.com/wiki/Mindustry_Wiki)_  
 _[Discord](https://discord.gg/r8BkXNd)_  
@@ -33,7 +33,7 @@ _Building:_ `./gradlew desktop:dist`
 ---
 
 Gradle may take up to several minutes to download files. Be patient. <br>
-After building, the output .JAR file should be in the output JAR file should be in `/desktop/build/libs/desktop-1.0.jar.`
+After building, the output .JAR file should be in the output JAR file should be in `/desktop/build/libs/desktop-release.jar.`
 
 ### Downloads
 

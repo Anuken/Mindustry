@@ -5,7 +5,7 @@ import static io.anuke.mindustry.Vars.aboutText;
 public class AboutDialog extends FloatingDialog {
 
     public AboutDialog(){
-        super("$text.about");
+        super("$text.about.button");
 
         addCloseButton();
 

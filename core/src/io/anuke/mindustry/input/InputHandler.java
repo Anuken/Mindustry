@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.ItemStack;
@@ -27,6 +28,7 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
 import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.player;
 
 public abstract class InputHandler extends InputAdapter{
 	public float breaktime = 0;
@@ -106,9 +108,11 @@ public abstract class InputHandler extends InputAdapter{
 				return false;
 			}
 		}
-		
-		if(!Vars.android && Tmp.r2.overlaps(player.hitbox.getRect(player.x, player.y))){
-			return false;
+
+		for(Player player : Vars.control.playerGroup.all()){
+			if(!player.isAndroid && Tmp.r2.overlaps(player.hitbox.getRect(player.x, player.y))){
+				return false;
+			}
 		}
 		
 		Tile tile = world.tile(x, y);
