@@ -11,14 +11,14 @@ public class RestartDialog extends Dialog {
     public RestartDialog(){
         super("$text.gameover", "dialog");
 
-        shown(()->{
+        shown(() -> {
             content().clearChildren();
             if(control.isHighScore()){
                 content().add("$text.highscore").pad(6);
                 content().row();
             }
             content().add("$text.lasted").pad(12).get();
-            content().add("[GREEN]" + control.getWave());
+            content().add("[accent]" + control.getWave());
             pack();
         });
 
@@ -26,6 +26,6 @@ public class RestartDialog extends Dialog {
             hide();
             GameState.set(State.menu);
             control.reset();
-        });
+        }).size(130f, 60f);
     }
 }

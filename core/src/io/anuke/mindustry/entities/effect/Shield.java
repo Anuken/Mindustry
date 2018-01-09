@@ -68,7 +68,7 @@ public class Shield extends Entity{
 	
 	@Override
 	public void draw(){
-		if(!(tile.block() instanceof ShieldBlock)){
+		if(!(tile.block() instanceof ShieldBlock) || radius <= 1f){
 			return;
 		}
 		

@@ -29,7 +29,7 @@ public class Smelter extends Block{
 	protected float burnDuration = 60f; //by default, the fuel will burn 60 frames, so that's 2 items/fuel at most
 	protected Effect craftEffect = Fx.smelt, burnEffect = Fx.fuelburn;
 
-	protected int capacity = 30;
+	protected int capacity = 20;
 
 	public Smelter(String name) {
 		super(name);
@@ -92,15 +92,16 @@ public class Smelter extends Block{
 
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
-		int amount = 0;
 		boolean isInput = false;
 
 		for(Item req : inputs){
-			if(req == item) isInput = true;
-			amount += tile.entity.getItem(req);
+			if(req == item){
+				isInput = true;
+				break;
+			}
 		}
 
-		return (isInput && amount < capacity) || (item == fuel && tile.entity.getItem(fuel) < capacity);
+		return (isInput && tile.entity.getItem(item) < capacity) || (item == fuel && tile.entity.getItem(fuel) < capacity);
 	}
 
 	@Override
@@ -120,17 +121,12 @@ public class Smelter extends Block{
 
 	@Override
 	public void drawSelect(Tile tile){
-		//all required items are put into one big capacity buffer
-		int totalCapacity = capacity;
-		int amount = 0;
+		//draw a separate bar for each requirement
+		for(int i = 0; i < inputs.length; i ++){
+			float fract = ((float)tile.entity.getItem(inputs[i]))/capacity;
 
-		for(Item item : inputs){
-			amount += tile.entity.getItem(item);
+			Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 6 + i*4, fract);
 		}
-
-		float fract = ((float)amount)/totalCapacity;
-
-		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 6, fract);
 	}
 
 	@Override

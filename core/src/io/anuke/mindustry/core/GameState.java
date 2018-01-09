@@ -20,6 +20,6 @@ public class GameState{
 	}
 	
 	public enum State{
-		paused, playing, menu, dead
+		paused, playing, menu
 	}
 }

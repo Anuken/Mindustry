@@ -26,7 +26,7 @@ public class Generator{
 	
 	/**Returns world size.*/
 	public static void generate(Pixmap pixmap, Tile[][] tiles){
-		boolean hasenemies = true, hascore = false;;
+		boolean hasenemies = true, hascore = false;
 		
 		Noise.setSeed(Vars.world.getSeed());
 		

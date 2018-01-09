@@ -136,6 +136,7 @@ public class KryoServer implements ServerProvider {
     @Override
     public void sendStream(int id, Streamable stream) {
         Connection connection = getByID(id);
+        UCore.log("Sending stream: " + stream.getClass().getSimpleName() + " / " + stream.stream.available());
 
         connection.addListener(new InputStreamSender(stream.stream, 512) {
             int id;
@@ -147,14 +148,12 @@ public class KryoServer implements ServerProvider {
                 begin.type = stream.getClass();
                 connection.sendTCP(begin);
                 id = begin.id;
-                UCore.log("Sending begin packet: " + begin);
             }
 
             protected Object next (byte[] bytes) {
                 StreamChunk chunk = new StreamChunk();
                 chunk.id = id;
                 chunk.data = bytes;
-                UCore.log("Sending chunk of size " + chunk.data.length);
                 return chunk; //wrap the byte[] with an object so the receiving side knows how to handle it.
             }
         });

@@ -89,24 +89,6 @@ public class LoadDialog extends FloatingDialog{
 
 					dialog.content().row();
 
-					dialog.content().addImageTextButton("$text.save.import", "icon-save", 14*3, () -> {
-						new FileChooser("$text.save.import", f -> f.extension().equals("mins"), true, file -> {
-							if(SaveIO.isSaveValid(file)){
-								try{
-									slot.importFile(file);
-									setup();
-								}catch (IOException e){
-									Vars.ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e, false)));
-								}
-							}else{
-								Vars.ui.showError("$text.save.import.invalid");
-							}
-							dialog.hide();
-						}).show();
-					});
-
-					dialog.content().row();
-
 					dialog.content().addImageTextButton("$text.save.export", "icon-load", 14*3, () -> {
 						new FileChooser("$text.save.export", false, file -> {
 							try{
@@ -151,11 +133,29 @@ public class LoadDialog extends FloatingDialog{
 	}
 
 	public void addSetup(){
-		if(Vars.control.getSaves().getSaveSlots().size != 0) return;
+		if(Vars.control.getSaves().getSaveSlots().size == 0) {
+
+			slots.row();
+			slots.addButton("$text.save.none", "clear", () -> {
+			}).disabled(true).fillX().margin(20f).minWidth(340f).height(80f).pad(4f);
+		}
 
 		slots.row();
-		slots.addButton("$text.save.none", "clear", ()->{})
-				.disabled(true).fillX().margin(20f).minWidth(340f).height(80f).pad(4f);
+
+		slots.addImageTextButton("$text.save.import", "icon-add", "clear", 14*3, () -> {
+			new FileChooser("$text.save.import", f -> f.extension().equals("mins"), true, file -> {
+				if(SaveIO.isSaveValid(file)){
+					try{
+						Vars.control.getSaves().importSave(file);
+						setup();
+					}catch (IOException e){
+						Vars.ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e, false)));
+					}
+				}else{
+					Vars.ui.showError("$text.save.import.invalid");
+				}
+			}).show();
+		}).fillX().margin(10f).minWidth(300f).height(70f).pad(4f).padRight(-4);
 	}
 
 	public void modifyButton(TextButton button, SaveSlot slot){

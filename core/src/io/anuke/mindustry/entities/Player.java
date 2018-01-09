@@ -29,6 +29,7 @@ public class Player extends DestructibleEntity implements Syncable{
 
 	public float angle;
 	public transient float targetAngle = 0f;
+	public transient boolean dashing = false;
 
 	public transient int clientid;
 	public transient boolean isLocal = false;
@@ -70,7 +71,7 @@ public class Player extends DestructibleEntity implements Syncable{
 		Effects.shake(4f, 5f, this);
 		Effects.sound("die", this);
 
-		//TODO respawning doesn't work for multiplayer
+		//TODO respawning doesn't work properly for multiplayer at all
 		if(isLocal) {
 			Vars.control.setRespawnTime(respawnduration);
 			ui.hudfrag.fadeRespawn(true);
@@ -119,8 +120,10 @@ public class Player extends DestructibleEntity implements Syncable{
 			if(!isDead() && !isLocal) inter.update(this);
 			return;
 		}
+
+		dashing = Inputs.keyDown("dash");
 		
-		float speed = Inputs.keyDown("dash") ? Player.dashSpeed : Player.speed;
+		float speed = dashing ? Player.dashSpeed : Player.speed;
 		
 		if(health < maxhealth && Timers.get(this, "regen", 50))
 			health ++;
@@ -148,7 +151,7 @@ public class Player extends DestructibleEntity implements Syncable{
 			weaponRight.update(player, false);
 		}
 		
-		if(Inputs.keyDown("dash") && Timers.get(this, "dashfx", 3) && vector.len() > 0){
+		if(dashing && Timers.get(this, "dashfx", 3) && vector.len() > 0){
 			Angles.translation(angle + 180, 3f);
 			Effects.effect(Fx.dashsmoke, x + Angles.x(), y + Angles.y());
 		}

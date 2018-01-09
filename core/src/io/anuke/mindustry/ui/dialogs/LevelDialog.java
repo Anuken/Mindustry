@@ -65,6 +65,11 @@ public class LevelDialog extends FloatingDialog{
 			if(i % maxwidth == 0){
 				maps.row();
 			}
+
+			//TODO this is a hack
+			if(!Settings.has("hiscore" + map.name)){
+				Settings.defaults("hiscore" + map.name, 1);
+			}
 			
 			Table inset = new Table("pane-button");
 			inset.add("[accent]" + Bundles.get("map."+map.name+".name", map.name)).pad(3f);

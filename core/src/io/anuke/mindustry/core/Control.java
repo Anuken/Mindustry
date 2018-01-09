@@ -22,6 +22,7 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.core.Inputs.Axis;
@@ -405,6 +406,10 @@ public class Control extends Module{
 		Effects.effect(Fx.coreexplosion, core.worldx(), core.worldy());
 		
 		Timers.run(60, ()-> ui.restart.show());
+	}
+
+	public boolean isGameOver(){
+		return core.block() != ProductionBlocks.core;
 	}
 	
 	float waveSpacing(){

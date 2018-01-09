@@ -107,7 +107,6 @@ public class Renderer extends RendererModule{
 			}
 
 			if(control.core.block() == ProductionBlocks.core){
-
 				if(!smoothcam){
 					setCamera(player.x, player.y);
 				}else{

@@ -45,7 +45,7 @@ public class Saves {
     }
 
     public void update(){
-        if(!GameState.is(State.menu) && !GameState.is(State.dead) && current != null && current.isAutosave()){
+        if(!GameState.is(State.menu) && !Vars.control.isGameOver() && current != null && current.isAutosave()){
             time += Timers.delta();
             if(time > Settings.getInt("saveinterval")*60) {
                 saving = true;
@@ -81,6 +81,16 @@ public class Saves {
         slot.setName(name);
         saves.add(slot);
         SaveIO.saveToSlot(slot.index);
+        slot.meta = SaveIO.getData(slot.index);
+        current = slot;
+    }
+
+    public void importSave(FileHandle file) throws IOException{
+        SaveSlot slot = new SaveSlot(nextSlot);
+        slot.importFile(file);
+        nextSlot ++;
+        slot.setName(file.nameWithoutExtension());
+        saves.add(slot);
         slot.meta = SaveIO.getData(slot.index);
         current = slot;
     }

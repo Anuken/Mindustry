@@ -24,7 +24,7 @@ public interface Syncable {
         public static final SyncType<Player> player = new SyncType<Player>() {
             @Override
             public float[] write(Player entity) {
-                return new float[]{entity.x, entity.y, entity.angle, entity.health};
+                return new float[]{entity.x, entity.y, entity.angle, entity.health, entity.dashing ? 1f : -1f};
             }
 
             @Override
@@ -32,6 +32,7 @@ public interface Syncable {
                 entity.getInterpolator().target.set(data[0], data[1]);
                 entity.getInterpolator().targetrot = data[2];
                 entity.health = (int)data[3];
+                entity.dashing = data[4] > 0;
             }
 
             @Override
@@ -42,6 +43,11 @@ public interface Syncable {
                 }
 
                 if(entity.isAndroid && i.target.dst(entity.x, entity.y) > 2f && Timers.get(entity, "dashfx", 2)){
+                    Angles.translation(entity.angle + 180, 3f);
+                    Effects.effect(Fx.dashsmoke, entity.x + Angles.x(), entity.y + Angles.y());
+                }
+
+                if(entity.dashing && Timers.get(entity, "dashfx", 3)){
                     Angles.translation(entity.angle + 180, 3f);
                     Effects.effect(Fx.dashsmoke, entity.x + Angles.x(), entity.y + Angles.y());
                 }
