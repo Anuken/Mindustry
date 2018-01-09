@@ -174,6 +174,13 @@ public class NetServer extends Module{
 
             Net.sendExcept(player.clientid, packet, SendMode.tcp);
         });
+
+        Net.handleServer(BlockTapPacket.class, packet -> {
+            Tile tile = Vars.world.tile(packet.position);
+            tile.block().tapped(tile);
+
+            Net.sendExcept(Net.getLastConnection(), packet, SendMode.tcp);
+        });
     }
 
     public void sendMessage(String message){

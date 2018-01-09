@@ -203,6 +203,7 @@ public class ProductionBlocks{
 	weaponFactory = new WeaponFactory("weaponfactory"){
 		{
 			width = height = 2;
+			health = 250;
 		}
 	};
 }

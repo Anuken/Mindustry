@@ -261,6 +261,11 @@ public class NetClient extends Module {
             player.weaponLeft = (Weapon)Upgrade.getByID(packet.left);
             player.weaponRight = (Weapon)Upgrade.getByID(packet.right);
         });
+
+        Net.handle(BlockTapPacket.class, packet -> {
+            Tile tile = Vars.world.tile(packet.position);
+            tile.block().tapped(tile);
+        });
     }
 
     @Override
@@ -272,6 +277,12 @@ public class NetClient extends Module {
         }else if(!connecting){
             Net.disconnect();
         }
+    }
+
+    public void handleBlockTap(Tile tile){
+        BlockTapPacket packet = new BlockTapPacket();
+        packet.position = tile.packedPosition();
+        Net.send(packet, SendMode.tcp);
     }
 
     public void handleWeaponSwitch(){

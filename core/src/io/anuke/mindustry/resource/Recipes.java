@@ -49,7 +49,7 @@ public class Recipes {
 			new Recipe(weapon, WeaponBlocks.titanturret, stack(Item.steel, 70), stack(Item.titanium, 50), stack(Item.dirium, 55)),
 
 			new Recipe(crafting, ProductionBlocks.smelter, stack(Item.stone, 40), stack(Item.iron, 40)),
-			new Recipe(crafting, ProductionBlocks.crucible, stack(Item.titanium, 40), stack(Item.steel, 40)),
+			new Recipe(crafting, ProductionBlocks.crucible, stack(Item.titanium, 50), stack(Item.steel, 50)),
 			new Recipe(crafting, ProductionBlocks.coalpurifier, stack(Item.steel, 10), stack(Item.iron, 10)),
 			new Recipe(crafting, ProductionBlocks.titaniumpurifier, stack(Item.steel, 30), stack(Item.iron, 30)),
 			new Recipe(crafting, ProductionBlocks.oilrefinery, stack(Item.steel, 15), stack(Item.iron, 15)),
@@ -60,9 +60,9 @@ public class Recipes {
 			new Recipe(production, ProductionBlocks.stonedrill, stack(Item.stone, 12)),
 			new Recipe(production, ProductionBlocks.irondrill, stack(Item.stone, 25)),
 			new Recipe(production, ProductionBlocks.coaldrill, stack(Item.stone, 25), stack(Item.iron, 40)),
-			new Recipe(production, ProductionBlocks.titaniumdrill, stack(Item.iron, 40), stack(Item.steel, 50)),
+			new Recipe(production, ProductionBlocks.titaniumdrill, stack(Item.iron, 50), stack(Item.steel, 50)),
 			new Recipe(production, ProductionBlocks.uraniumdrill, stack(Item.iron, 40), stack(Item.steel, 40)),
-			new Recipe(production, ProductionBlocks.omnidrill, stack(Item.titanium, 30), stack(Item.dirium, 40)),
+			new Recipe(production, ProductionBlocks.omnidrill, stack(Item.titanium, 40), stack(Item.dirium, 40)),
 
 			new Recipe(power, ProductionBlocks.coalgenerator, stack(Item.iron, 30), stack(Item.stone, 20)),
 			new Recipe(power, ProductionBlocks.thermalgenerator, stack(Item.steel, 30), stack(Item.iron, 30)),

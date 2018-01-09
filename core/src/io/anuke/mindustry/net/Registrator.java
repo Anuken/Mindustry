@@ -36,6 +36,7 @@ public class Registrator {
                 KickPacket.class,
                 UpgradePacket.class,
                 WeaponSwitchPacket.class,
+                BlockTapPacket.class,
 
                 Class.class,
                 byte[].class,

@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Configurable;
@@ -95,6 +96,11 @@ public class DesktopInput extends InputHandler{
 				ui.configfrag.showConfig(linked);
 			}else if(!ui.configfrag.hasConfigMouse()){
 				ui.configfrag.hideConfig();
+			}
+
+			if(linked != null) {
+				linked.block().tapped(linked);
+				if(Net.active()) netClient.handleBlockTap(linked);
 			}
 		}
 		

@@ -1,30 +1,28 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
-import static io.anuke.mindustry.Vars.*;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.mindustry.world.blocks.types.Wall;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.SolidEntity;
-import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Tmp;
 
-public class Door extends Wall implements Configurable{
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+import static io.anuke.mindustry.Vars.player;
+import static io.anuke.mindustry.Vars.tilesize;
+
+public class Door extends Wall{
 	protected Effect openfx = Fx.dooropen;
 	protected Effect closefx = Fx.doorclose;
 
@@ -54,7 +52,7 @@ public class Door extends Wall implements Configurable{
 	}
 
 	@Override
-	public void buildTable(Tile tile, Table table){
+	public void tapped(Tile tile){
 		DoorEntity entity = tile.entity();
 		
 		if(anyEntities(tile) && entity.open){

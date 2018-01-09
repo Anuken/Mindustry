@@ -124,7 +124,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			DamageArea.damage(!(b.owner instanceof Enemy), b.x, b.y, 25f, (int)(damage * 2f/3f));
 		}
 	},
-	flak = new BulletType(3f, 8) {
+	flak = new BulletType(2.9f, 8) {
 
 		public void init(Bullet b) {
 			b.velocity.scl(Mathf.random(0.6f, 1f));

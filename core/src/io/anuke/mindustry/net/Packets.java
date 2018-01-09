@@ -123,4 +123,8 @@ public class Packets {
         public int playerid;
         public byte left, right;
     }
+
+    public static class BlockTapPacket{
+        public int position;
+    }
 }

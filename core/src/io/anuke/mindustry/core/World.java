@@ -101,6 +101,10 @@ public class World extends Module{
 	public int height(){
 		return currentMap.getHeight();
 	}
+
+	public Tile tile(int packed){
+		return tile(packed % width(), packed / width());
+	}
 	
 	public Tile tile(int x, int y){
 		if(tiles == null){

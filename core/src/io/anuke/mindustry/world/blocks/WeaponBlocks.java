@@ -102,10 +102,10 @@ public class WeaponBlocks{
 			shootsound = "bigshot";
 			rotatespeed = 0.2f;
 			range = 120;
-			reload = 65f;
+			reload = 70f;
 			bullet = BulletType.flak;
 			shots = 3;
-			inaccuracy = 8f;
+			inaccuracy = 9f;
 			ammo = Item.coal;
 			ammoMultiplier = 5;
 			health = 110;

@@ -106,6 +106,7 @@ public class Block{
 	public void drawPlace(int x, int y, int rotation, boolean valid){}
 	public void postInit(){}
 	public void placed(Tile tile){}
+	public void tapped(Tile tile){}
 	
 	public void getStats(Array<String> list){
 		list.add("[gray]size: " + width + "x" + height);
