@@ -94,8 +94,8 @@ public class AndroidLauncher extends AndroidApplication{
 
         Net.setClientProvider(new KryoClient());
         Net.setServerProvider(new KryoServer());
-		
-		initialize(new Mindustry(), config);
+
+        initialize(new Mindustry(), config);
 	}
 	
 	private boolean isPackageInstalled(String packagename) {

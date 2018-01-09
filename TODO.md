@@ -41,6 +41,7 @@ _(not necessarily planned!)_
 - Underground blocks
 - Configurable outputs/inputs
 - Getting items out of the core
+- Map sharing/map browser
 
 ### Balance
 - Slow down progression slightly

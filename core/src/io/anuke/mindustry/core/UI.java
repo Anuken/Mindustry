@@ -197,5 +197,20 @@ public class UI extends SceneModule{
 		});
 		dialog.show();
 	}
+
+	public void showConfirmListen(String title, String text, Consumer<Boolean> listener){
+		FloatingDialog dialog = new FloatingDialog(title);
+		dialog.content().add(text).pad(4f);
+		dialog.buttons().defaults().size(200f, 54f).pad(2f);
+		dialog.buttons().addButton("$text.cancel", () -> {
+			dialog.hide();
+			listener.accept(true);
+		});
+		dialog.buttons().addButton("$text.ok", () -> {
+			dialog.hide();
+			listener.accept(true);
+		});
+		dialog.show();
+	}
 	
 }

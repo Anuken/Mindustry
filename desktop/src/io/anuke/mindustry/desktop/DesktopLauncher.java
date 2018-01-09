@@ -41,6 +41,21 @@ public class DesktopLauncher {
 		DiscordRPC lib = DiscordRPC.INSTANCE;
 		String applicationId = "398246104468291591";
 		DiscordEventHandlers handlers = new DiscordEventHandlers();
+		handlers.joinGame = secret -> {
+
+		};
+
+		handlers.joinRequest = request -> {
+			//TODO actual text
+			Vars.ui.showConfirmListen("$text.join.discord.title", "$text.join.discord", b -> {
+				if(b){
+					lib.Discord_Respond(request.userId, DiscordRPC.DISCORD_REPLY_YES);
+				}else{
+					lib.Discord_Respond(request.userId, DiscordRPC.DISCORD_REPLY_NO);
+				}
+			});
+		};
+
 		lib.Discord_Initialize(applicationId, handlers, true, "");
 
 		Mindustry.platforms = new PlatformFunction(){
@@ -71,19 +86,19 @@ public class DesktopLauncher {
 				DiscordRichPresence presence = new DiscordRichPresence();
 
 				if(!GameState.is(State.menu)){
-					presence.state = "Map: " + Strings.capitalize(Vars.world.getMap().name);
-					presence.details = "Wave " + Vars.control.getWave();
+					presence.state = Strings.capitalize(Vars.control.getMode().toString()) + ", Solo";
+					presence.details = Strings.capitalize(Vars.world.getMap().name) + " | Wave " + Vars.control.getWave();
+					presence.largeImageText = "Wave " + Vars.control.getWave();
 					if(Net.active() ){
 						presence.partyMax = 16;
 						presence.partySize = Vars.control.playerGroup.amount();
+						presence.state = Strings.capitalize(Vars.control.getMode().toString());
 					}
 				}else{
 					presence.state = "In Menu";
 				}
 
-				//presence.startTimestamp = System.currentTimeMillis() / 1000; // epoch second
 				presence.largeImageKey = "logo";
-				presence.largeImageText = presence.details;
 
 				lib.Discord_UpdatePresence(presence);
       		}
@@ -104,13 +119,9 @@ public class DesktopLauncher {
 		}catch (Exception e){
 			e.printStackTrace();
 
-			try{
-				Net.closeServer();
-			}catch (Exception p){}
-
-			try{
-				Net.disconnect();
-			}catch (Exception p){}
+			//attempt to close connections
+			try{ Net.closeServer(); }catch (Exception p){}
+			try{ Net.disconnect(); }catch (Exception p){}
 
 			//don't create crash logs for me (anuke), as it's expected
 			if(System.getProperty("user.name").equals("anuke")) return;

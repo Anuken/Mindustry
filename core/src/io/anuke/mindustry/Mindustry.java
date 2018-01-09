@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
-import com.badlogic.gdx.utils.OrderedMap;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.PlatformFunction;
@@ -21,8 +20,6 @@ public class Mindustry extends ModuleCore {
 	public static boolean hasDiscord = true;
 	public static Array<String> args = new Array<>();
 	public static PlatformFunction platforms = new PlatformFunction(){};
-	public static OrderedMap<String, Integer> idMap = new OrderedMap<>();
-
 	public static boolean externalBundle = false;
 	
 	@Override

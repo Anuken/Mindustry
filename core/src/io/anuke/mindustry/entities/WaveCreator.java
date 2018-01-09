@@ -16,13 +16,13 @@ public class WaveCreator{
 				scaling = 1;
 				after = 3;
 				spacing = 5;
-				amount = 4;
+				amount = 3;
 				tierscaleback = 0;
 			}},
 			
 			new EnemySpawn(EnemyTypes.blast){{
 				after = 4;
-				amount = 3;
+				amount = 2;
 				spacing = 5;
 				scaling = 2;
 				tierscaleback = 0;
@@ -65,7 +65,7 @@ public class WaveCreator{
 			
 			new EnemySpawn(EnemyTypes.flamer){{
 				after = 12;
-				amount = 3;
+				amount = 2;
 				spacing = 5;
 				scaling = 3;
 			}},

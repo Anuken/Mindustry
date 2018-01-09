@@ -68,6 +68,8 @@ public class KryoServer implements ServerProvider {
 
             @Override
             public void disconnected (Connection connection) {
+                connections.removeValue(connection.getID());
+
                 Disconnect c = new Disconnect();
                 c.id = connection.getID();
 
@@ -77,8 +79,6 @@ public class KryoServer implements ServerProvider {
                     Gdx.app.exit();
                     throw new RuntimeException(e);
                 }
-
-                connections.removeValue(c.id);
             }
 
             @Override
@@ -104,7 +104,14 @@ public class KryoServer implements ServerProvider {
 
     @Override
     public void kick(int connection) {
-        Connection conn = getByID(connection);
+        Connection conn;
+        try {
+            conn = getByID(connection);
+        }catch (Exception e){
+            e.printStackTrace();
+            connections.removeValue(connection);
+            return;
+        }
         KickPacket p = new KickPacket();
         p.reason = (byte)KickReason.kick.ordinal();
 
