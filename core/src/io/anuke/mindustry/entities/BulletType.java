@@ -124,6 +124,55 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			DamageArea.damage(!(b.owner instanceof Enemy), b.x, b.y, 25f, (int)(damage * 2f/3f));
 		}
 	},
+	flak = new BulletType(3f, 8) {
+
+		public void init(Bullet b) {
+			b.velocity.scl(Mathf.random(0.6f, 1f));
+		}
+
+		public void update(Bullet b){
+			if(Timers.get(b, "smoke", 7)){
+				Effects.effect(Fx.smoke, b.x + Mathf.range(2), b.y + Mathf.range(2));
+			}
+		}
+
+		public void draw(Bullet b) {
+			Draw.color(Color.GRAY);
+			Draw.thick(3f);
+			Draw.lineAngleCenter(b.x, b.y, b.angle(), 2f);
+			Draw.thick(1.5f);
+			Draw.lineAngleCenter(b.x, b.y, b.angle(), 5f);
+			Draw.reset();
+		}
+
+		public void removed(Bullet b) {
+			despawned(b);
+		}
+
+		public void despawned(Bullet b) {
+			Effects.effect(shellsmoke, b);
+			for(int i = 0; i < 3; i ++){
+				Bullet bullet = new Bullet(flakspark, b.owner, b.x, b.y, b.angle() + Mathf.range(120f));
+				bullet.add();
+			}
+		}
+	},
+	flakspark = new BulletType(2f, 2) {
+		{
+			drag = 0.05f;
+		}
+
+		public void init(Bullet b) {
+			b.velocity.scl(Mathf.random(0.6f, 1f));
+		}
+
+		public void draw(Bullet b) {
+			Draw.color(Color.LIGHT_GRAY, Color.GRAY, b.ifract());
+			Draw.thick(2f - b.ifract());
+			Draw.lineAngleCenter(b.x, b.y, b.angle(), 2f);
+			Draw.reset();
+		}
+	},
 	titanshell = new BulletType(1.8f, 38){
 		{
 			lifetime = 70f;

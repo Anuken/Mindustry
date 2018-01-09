@@ -86,8 +86,6 @@ public class AndroidLauncher extends AndroidApplication{
 			}
 		};
 
-		Mindustry.platforms.requestWritePerms();
-
 		if(doubleScaleTablets && isTablet(this.getContext())){
 			Unit.dp.addition = 0.5f;
 		}

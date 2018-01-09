@@ -59,7 +59,7 @@ public class DefenseBlocks{
 	megarepairturret = new RepairTurret("megarepairturret"){
 		{
 			range = 44;
-      reload = 20f;
+      		reload = 20f;
 			health = 90;
 			powerUsed = 0.13f;
 		}

@@ -1,12 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
@@ -21,6 +16,10 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 //TODO possibly proken
 public class NuclearReactor extends LiquidPowerGenerator{
 	protected final int timerFuel = timers++;
@@ -30,8 +29,8 @@ public class NuclearReactor extends LiquidPowerGenerator{
 	protected int itemCapacity = 30;
 	protected Color coolColor = new Color(1, 1, 1, 0f);
 	protected Color hotColor = Color.valueOf("ff9575a3");
-	protected int fuelUseTime = 140; //time to consume 1 fuel
-	protected float powerMultiplier = 0.4f; //power per frame, depends on full capacity
+	protected int fuelUseTime = 130; //time to consume 1 fuel
+	protected float powerMultiplier = 0.45f; //power per frame, depends on full capacity
 	protected float heating = 0.007f; //heating per frame
 	protected float coolantPower = 0.007f; //how much heat decreases per coolant unit
 	protected float smokeThreshold = 0.3f; //threshold at which block starts smoking

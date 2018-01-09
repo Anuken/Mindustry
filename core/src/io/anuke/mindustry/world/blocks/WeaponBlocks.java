@@ -100,10 +100,12 @@ public class WeaponBlocks{
 	mortarturret = new Turret("mortarturret"){
 		{
 			shootsound = "bigshot";
-			rotatespeed = 0.1f;
+			rotatespeed = 0.2f;
 			range = 120;
-			reload = 100f;
-			bullet = BulletType.shell;
+			reload = 50f;
+			bullet = BulletType.flak;
+			shots = 3;
+			inaccuracy = 8f;
 			ammo = Item.coal;
 			ammoMultiplier = 5;
 			health = 110;
