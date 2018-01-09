@@ -22,9 +22,9 @@ public class Player extends DestructibleEntity implements Syncable{
 	public String name = "name";
 	public boolean isAndroid;
 
-	public Weapon weaponLeft = Weapon.blaster;
-	public Weapon weaponRight = Weapon.blaster;
-	public Mech mech = Mech.standard;
+	public transient Weapon weaponLeft = Weapon.blaster;
+	public transient Weapon weaponRight = Weapon.blaster;
+	public transient Mech mech = Mech.standard;
 
 	public float angle;
 	public transient float targetAngle = 0f;
