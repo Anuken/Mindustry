@@ -85,6 +85,12 @@ public class Generator{
 				tiles[x][y].setFloor(floor);
 			}
 		}
+
+		for(int x = 0; x < pixmap.getWidth(); x ++){
+			for(int y = 0; y < pixmap.getHeight(); y ++) {
+				tiles[x][y].updateOcclusion();
+			}
+		}
 		
 		if(!hascore){
 			GameState.set(State.menu);

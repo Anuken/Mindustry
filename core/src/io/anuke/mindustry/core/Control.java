@@ -343,7 +343,7 @@ public class Control extends Module{
 		Sounds.play("spawn");
 		
 		if(lastUpdated < wave + 1){
-			world.pathfinder().updatePath();
+			world.pathfinder().resetPaths();
 			lastUpdated = wave + 1;
 		}
 		
@@ -585,6 +585,10 @@ public class Control extends Module{
 				wavetime = 0f;
 			}
 
+			if(Inputs.keyTap(Keys.G)){
+				world.pathfinder().benchmark();
+			}
+
 			if(Inputs.keyDown(Keys.I)){
 				wavetime -= delta() * 10f;
 			}
@@ -654,7 +658,7 @@ public class Control extends Module{
 						wavetime -= delta();
 
 						if(lastUpdated < wave + 1 && wavetime < Vars.aheadPathfinding){ //start updating beforehand
-							world.pathfinder().updatePath();
+							world.pathfinder().resetPaths();
 							lastUpdated = wave + 1;
 						}
 					}else{
