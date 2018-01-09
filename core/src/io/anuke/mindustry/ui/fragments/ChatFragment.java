@@ -71,7 +71,7 @@ public class ChatFragment extends Table implements Fragment{
 
         chatfield = new TextField("", new TextField.TextFieldStyle(skin.get(TextField.TextFieldStyle.class)));
         chatfield.setTextFieldFilter((field, c) -> field.getText().length() < maxLength);
-        chatfield.getStyle().background = skin.getDrawable("chatfield");
+        chatfield.getStyle().background = null;
         chatfield.getStyle().fontColor = Color.WHITE;
         chatfield.getStyle().font = skin.getFont("default-font-chat");
         chatfield.setStyle(chatfield.getStyle());
@@ -118,7 +118,7 @@ public class ChatFragment extends Table implements Fragment{
                 batch.setColor(0, 0, 0, shadowColor.a*(fadetime-i));
             }
 
-            batch.draw(skin.getRegion("white"), offsetx, theight-layout.height+1-4, textWidth + Unit.dp.scl(4f), layout.height+textspacing);
+            batch.draw(skin.getRegion("white"), offsetx, theight-layout.height-2, textWidth + Unit.dp.scl(4f), layout.height+textspacing);
             batch.setColor(shadowColor);
 
             font.getCache().draw(batch);

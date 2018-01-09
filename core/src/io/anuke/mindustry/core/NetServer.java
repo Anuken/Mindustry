@@ -86,7 +86,7 @@ public class NetServer extends Module{
 
                 Net.sendTo(id, dp, SendMode.tcp);
 
-                Vars.ui.showInfo(Bundles.format("text.server.connected", packet.name));
+                sendMessage("[accent]"+Bundles.format("text.server.connected", packet.name));
             });
         });
 
@@ -94,11 +94,11 @@ public class NetServer extends Module{
             Player player = connections.get(packet.id);
 
             if(player == null) {
-                Gdx.app.postRunnable(() -> Vars.ui.showInfo(Bundles.format("text.server.disconnected", "<???>")));
+                sendMessage("[accent]"+Bundles.format("text.server.disconnected", "<???>"));
                 return;
             }
 
-            Gdx.app.postRunnable(() -> Vars.ui.showInfo(Bundles.format("text.server.disconnected", player.name)));
+            sendMessage("[accent]"+Bundles.format("text.server.disconnected", player.name));
 
             player.remove();
 
@@ -147,10 +147,14 @@ public class NetServer extends Module{
         Net.handleServer(ChatPacket.class, packet -> {
             Player player = connections.get(Net.getLastConnection());
 
-            if(player == null) return; //GHOSTS AAAA
+            if(player == null){
+                Gdx.app.error("Mindustry", "Could not find player for chat: " + Net.getLastConnection());
+                return; //GHOSTS AAAA
+            }
 
             packet.name = player.name;
-            Net.send(packet, SendMode.tcp);
+            Net.sendExcept(player.clientid, packet, SendMode.tcp);
+            Gdx.app.postRunnable(() -> Vars.ui.chatfrag.addMessage(packet.text, packet.name));
         });
 
         Net.handleServer(UpgradePacket.class, packet -> {
@@ -170,6 +174,15 @@ public class NetServer extends Module{
 
             Net.sendExcept(player.clientid, packet, SendMode.tcp);
         });
+    }
+
+    public void sendMessage(String message){
+        ChatPacket packet = new ChatPacket();
+        packet.name = null;
+        packet.text = message;
+        Net.send(packet, SendMode.tcp);
+
+        Gdx.app.postRunnable(() -> Vars.ui.chatfrag.addMessage(message, null));
     }
 
     public void handleBullet(BulletType type, Entity owner, float x, float y, float angle, short damage){

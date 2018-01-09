@@ -22,6 +22,7 @@ public class Player extends DestructibleEntity implements Syncable{
 	public String name = "name";
 	public boolean isAndroid;
 
+	//TODO send these.
 	public transient Weapon weaponLeft = Weapon.blaster;
 	public transient Weapon weaponRight = Weapon.blaster;
 	public transient Mech mech = Mech.standard;

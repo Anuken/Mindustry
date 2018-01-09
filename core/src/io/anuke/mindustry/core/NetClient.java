@@ -244,7 +244,7 @@ public class NetClient extends Module {
 
         Net.handle(Player.class, Player::add);
 
-        Net.handle(ChatPacket.class, packet -> Gdx.app.postRunnable(() -> Vars.ui.chatfrag.addMessage(packet.name, packet.text)));
+        Net.handle(ChatPacket.class, packet -> Gdx.app.postRunnable(() -> Vars.ui.chatfrag.addMessage(packet.text, packet.name)));
 
         Net.handle(KickPacket.class, packet -> {
             kicked = true;
@@ -294,9 +294,7 @@ public class NetClient extends Module {
         packet.name = Vars.player.name;
         Net.send(packet, SendMode.tcp);
 
-        if(Net.server()){
-            Vars.ui.chatfrag.addMessage(packet.text, Vars.player.name);
-        }
+        Vars.ui.chatfrag.addMessage(packet.text, Vars.player.name);
     }
 
     public void handleShoot(Weapon weapon, float x, float y, float angle){

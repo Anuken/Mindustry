@@ -102,7 +102,7 @@ public class WeaponBlocks{
 			shootsound = "bigshot";
 			rotatespeed = 0.2f;
 			range = 120;
-			reload = 50f;
+			reload = 65f;
 			bullet = BulletType.flak;
 			shots = 3;
 			inaccuracy = 8f;
