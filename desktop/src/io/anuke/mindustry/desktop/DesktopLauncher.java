@@ -46,7 +46,7 @@ public class DesktopLauncher {
 		};
 
 		handlers.joinRequest = request -> {
-			//TODO actual text
+			//TODO actual text, implementation of discord join dialog, possibly move it to Dialogs
 			Vars.ui.showConfirmListen("$text.join.discord.title", "$text.join.discord", b -> {
 				if(b){
 					lib.Discord_Respond(request.userId, DiscordRPC.DISCORD_REPLY_YES);

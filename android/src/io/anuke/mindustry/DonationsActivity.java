@@ -32,7 +32,6 @@ public class DonationsActivity extends FragmentActivity {
 
         setTheme(R.style.GdxTheme);
 
-        //TODO
         setContentView(R.layout.donations_activity);
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -74,7 +73,7 @@ public class DonationsActivity extends FragmentActivity {
         Fragment fragment = fragmentManager.findFragmentByTag("donationsFragment");
         if (fragment != null) {
             fragment.onActivityResult(requestCode, resultCode, data);
-            //TODO donation event, set settings
+            //TODO donation event, set settings?
         }
     }
 }

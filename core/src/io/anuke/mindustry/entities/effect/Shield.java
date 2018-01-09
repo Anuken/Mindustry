@@ -20,7 +20,6 @@ public class Shield extends Entity{
 	
 	private float uptime = 0f;
 	private final Tile tile;
-	//TODO
 	
 	public Shield(Tile tile){
 		this.tile = tile;

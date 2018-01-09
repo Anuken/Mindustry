@@ -25,7 +25,6 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 import static io.anuke.ucore.core.Core.scene;
 import static io.anuke.ucore.core.Core.skin;
 
-//TODO show chat even when not toggled
 public class ChatFragment extends Table implements Fragment{
     private final static int messagesShown = 10;
     private final static int maxLength = 150;
@@ -49,7 +48,7 @@ public class ChatFragment extends Table implements Fragment{
 
         setVisible(() -> !GameState.is(State.menu) && Net.active());
 
-        //TODO put it input
+        //TODO put it in input?
         update(() -> {
             if(Net.active() && Inputs.keyTap("chat")){
                 toggle();
@@ -154,7 +153,7 @@ public class ChatFragment extends Table implements Fragment{
             scene.setKeyboardFocus(null);
             chatOpen = !chatOpen;
             sendMessage();
-            fadetime = messagesShown + 1; //TODO?
+            fadetime = messagesShown + 1;
         }
     }
 

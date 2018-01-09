@@ -70,7 +70,6 @@ public class Tile{
 	}
 	
 	public void damageNearby(int rad, int amount, float falloff){
-		//TODO damage falloff?
 		for(int dx = -rad; dx <= rad; dx ++){
 			for(int dy = -rad; dy <= rad; dy ++){
 				float dst = Vector2.dst(dx, dy, 0, 0);

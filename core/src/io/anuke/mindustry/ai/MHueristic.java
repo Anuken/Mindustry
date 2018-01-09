@@ -16,7 +16,7 @@ public class MHueristic implements Heuristic<Tile>{
 	
 	public static float estimateStatic(Tile node, Tile other){
 		float cost = Math.abs(node.worldx() - other.worldx()) + Math.abs(node.worldy() - other.worldy());
-		
+
 		//TODO balance multiplier
 		if(node.breakable() && node.block().solid) cost += Vars.tilesize*multiplier;
 		if(other.breakable() && other.block().solid) cost += Vars.tilesize*multiplier;

@@ -9,7 +9,7 @@ public class PressGroup{
 	private boolean active = true;
 	
 	public void add(Button button){
-		//TODO make only one button in the group be clickable
+		//TODO make only one button in the group be clickable, add implementation
 		buttons.add(button);
 	}
 	

@@ -36,7 +36,7 @@ public class FortressType extends EnemyType {
 			if(Timers.get(this, "spawn", spawnTime) && enemy.spawned < maxSpawn){
 				Angles.translation(enemy.angle, 20f);
 
-				Enemy s = new Enemy(EnemyTypes.fast); //TODO assign type!
+				Enemy s = new Enemy(EnemyTypes.fast);
 				s.lane = enemy.lane;
 				s.tier = enemy.tier;
 				s.spawner = enemy;

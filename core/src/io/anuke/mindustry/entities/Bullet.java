@@ -1,13 +1,13 @@
 package io.anuke.mindustry.entities;
 
-import static io.anuke.mindustry.Vars.tilesize;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.BulletEntity;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.util.Mathf;
+
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class Bullet extends BulletEntity{
 	BulletType type;
@@ -39,7 +39,6 @@ public class Bullet extends BulletEntity{
 				targetEntity = tile.entity;
 			}else{
 				//make sure to check for linked block collisions
-				//TODO move this to the block class?
 				Tile linked = tile.getLinked();
 				if(linked != null &&
 						linked.entity != null && linked.entity.collide(this) && !linked.entity.dead){

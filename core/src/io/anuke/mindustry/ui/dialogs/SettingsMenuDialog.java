@@ -46,7 +46,6 @@ public class SettingsMenuDialog extends SettingsDialog{
 					wasPaused = ((PausedDialog)menu).wasPaused;
 				}
 				if(!Net.active()) GameState.set(State.paused);
-				//TODO hide menu
 				Vars.ui.paused.hide();
 			}
 		});

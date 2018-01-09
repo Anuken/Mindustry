@@ -150,8 +150,7 @@ public class SaveIO{
 	public static void load(FileHandle file){
 		load(file.read());
 	}
-	
-	//TODO GWT support
+
 	public static void load(InputStream is){
 
 		DataInputStream stream;

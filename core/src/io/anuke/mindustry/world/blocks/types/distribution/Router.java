@@ -33,7 +33,6 @@ public class Router extends Block{
 	
 	@Override
 	public void update(Tile tile){
-		//TODO fix, check issue
 		tile.setRotation((byte)Mathf.mod(tile.getRotation(), 4));
 		
 		if(tile.entity.totalItems() > 0){

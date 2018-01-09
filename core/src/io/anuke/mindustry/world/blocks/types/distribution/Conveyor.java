@@ -100,7 +100,7 @@ public class Conveyor extends Block{
 					!(pos2.set(entity.convey.get(i + 1)).y - pos.y < itemSpace * Timers.delta());
 			
 			if(canmove){
-				pos.y += Math.max(speed * Timers.delta(), 1f/252f); //TODO fix precision issues?
+				pos.y += Math.max(speed * Timers.delta(), 1f/252f); //TODO fix precision issues when at high FPS?
 				pos.x = Mathf.lerpDelta(pos.x, 0, 0.06f);
 			}else{
 				pos.x = Mathf.lerpDelta(pos.x, pos.seed/offsetScl, 0.1f);

@@ -20,12 +20,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-//TODO possibly proken
 public class NuclearReactor extends LiquidPowerGenerator{
 	protected final int timerFuel = timers++;
 
 	protected Item generateItem;
-	protected int itemInput = 5;
 	protected int itemCapacity = 30;
 	protected Color coolColor = new Color(1, 1, 1, 0f);
 	protected Color hotColor = Color.valueOf("ff9575a3");

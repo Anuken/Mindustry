@@ -10,7 +10,7 @@ import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
 
-//TODO
+//TODO add port specification
 public class HostDialog extends Dialog{
     float w = 300;
 

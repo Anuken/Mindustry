@@ -173,8 +173,7 @@ public class WeaponBlocks{
 			shots = 2;
 			shootEffect = Fx.chainshot;
 		}
-		
-		//TODO specify turret shootInternal effect in turret instead of doing it manually
+
 		@Override
 		protected void shoot(Tile tile){
 			TurretEntity entity = tile.entity();

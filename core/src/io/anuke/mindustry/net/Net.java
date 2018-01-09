@@ -15,7 +15,6 @@ import io.anuke.ucore.function.Consumer;
 
 import java.io.IOException;
 
-//TODO stub
 public class Net{
 	private static boolean server;
 	private static boolean active;
