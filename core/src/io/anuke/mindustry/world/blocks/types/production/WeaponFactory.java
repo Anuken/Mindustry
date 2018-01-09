@@ -8,7 +8,6 @@ import io.anuke.mindustry.resource.UpgradeRecipes;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.function.Listenable;
@@ -19,12 +18,17 @@ import io.anuke.ucore.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.control;
 
-public class WeaponFactory extends Block implements Configurable{
+public class WeaponFactory extends Block{
 
     public WeaponFactory(String name){
         super(name);
         solid = true;
         destructible = true;
+    }
+
+    @Override
+    public boolean isConfigurable(Tile tile){
+        return !Vars.android;
     }
 
     @Override

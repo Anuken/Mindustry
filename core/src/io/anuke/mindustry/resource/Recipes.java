@@ -1,6 +1,7 @@
 package io.anuke.mindustry.resource;
 
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.DefenseBlocks;
 import io.anuke.mindustry.world.blocks.DistributionBlocks;
@@ -19,8 +20,8 @@ public class Recipes {
 			new Recipe(defense, DefenseBlocks.steelwalllarge, stack(Item.steel, 12*4)),
 			new Recipe(defense, DefenseBlocks.titaniumwalllarge, stack(Item.titanium, 12*4)),
 			new Recipe(defense, DefenseBlocks.diriumwalllarge, stack(Item.dirium, 12*4)),
-			new Recipe(defense, DefenseBlocks.door, stack(Item.steel, 3), stack(Item.iron, 3*4)),
-			new Recipe(defense, DefenseBlocks.largedoor, stack(Item.steel, 3*4), stack(Item.iron, 3*4*4)),
+			new Recipe(defense, DefenseBlocks.door, stack(Item.steel, 3), stack(Item.iron, 3*4)).setDesktop(),
+			new Recipe(defense, DefenseBlocks.largedoor, stack(Item.steel, 3*4), stack(Item.iron, 3*4*4)).setDesktop(),
 			new Recipe(defense, DefenseBlocks.titaniumshieldwall, stack(Item.titanium, 16)),
 
 			new Recipe(distribution, DistributionBlocks.conveyor, stack(Item.stone, 1)),
@@ -55,7 +56,7 @@ public class Recipes {
 			new Recipe(crafting, ProductionBlocks.oilrefinery, stack(Item.steel, 15), stack(Item.iron, 15)),
 			new Recipe(crafting, ProductionBlocks.stoneformer, stack(Item.steel, 10), stack(Item.iron, 10)),
 			new Recipe(crafting, ProductionBlocks.lavasmelter, stack(Item.steel, 30), stack(Item.titanium, 15)),
-			new Recipe(crafting, ProductionBlocks.weaponFactory, stack(Item.steel, 60), stack(Item.iron, 60)),
+			new Recipe(crafting, ProductionBlocks.weaponFactory, stack(Item.steel, 60), stack(Item.iron, 60)).setDesktop(),
 
 			new Recipe(production, ProductionBlocks.stonedrill, stack(Item.stone, 12)),
 			new Recipe(production, ProductionBlocks.irondrill, stack(Item.stone, 25)),
@@ -104,8 +105,8 @@ public class Recipes {
 	
 	public static Array<Recipe> getBy(Section section, Array<Recipe> r){
 		for(Recipe recipe : list){
-			if(recipe.section == section)
-			r.add(recipe);
+			if(recipe.section == section && !(Vars.android && recipe.desktopOnly))
+				r.add(recipe);
 		}
 		
 		return r;

@@ -17,7 +17,6 @@ import io.anuke.mindustry.world.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
-import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Sounds;
@@ -51,7 +50,7 @@ public abstract class InputHandler extends InputAdapter{
 	
 	public boolean onConfigurable(){
 		Tile tile = Vars.world.tile(getBlockX(), getBlockY());
-		return tile != null && (tile.block() instanceof Configurable || (tile.isLinked() && tile.getLinked().block() instanceof Configurable));
+		return tile != null && (tile.block().isConfigurable(tile) || (tile.isLinked() && tile.getLinked().block().isConfigurable(tile)));
 	}
 	
 	public boolean cursorNear(){

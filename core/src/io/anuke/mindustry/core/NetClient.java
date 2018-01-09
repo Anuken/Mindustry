@@ -154,11 +154,11 @@ public class NetClient extends Module {
         });
 
         Net.handle(PlacePacket.class, packet -> {
-            Vars.control.input.placeBlockInternal(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false);
+            Gdx.app.postRunnable(() -> Vars.control.input.placeBlockInternal(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false));
         });
 
         Net.handle(BreakPacket.class, packet -> {
-            Vars.control.input.breakBlockInternal(packet.x, packet.y, false);
+            Gdx.app.postRunnable(() -> Vars.control.input.breakBlockInternal(packet.x, packet.y, false));
         });
 
         Net.handle(StateSyncPacket.class, packet -> {

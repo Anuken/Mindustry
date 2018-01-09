@@ -307,6 +307,8 @@ public class NetServer extends Module{
         BlockSyncPacket packet = new BlockSyncPacket();
         ByteArrayOutputStream bs = new ByteArrayOutputStream();
 
+        //TODO compress stream
+
         try {
             DataOutputStream stream = new DataOutputStream(bs);
 

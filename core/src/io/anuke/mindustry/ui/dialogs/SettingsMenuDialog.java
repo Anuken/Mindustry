@@ -27,7 +27,6 @@ public class SettingsMenuDialog extends SettingsDialog{
 
 	private Table prefs;
 	private Table menu;
-	private boolean built = false;
 	private boolean wasPaused;
 	
 	public SettingsMenuDialog(){
@@ -114,20 +113,20 @@ public class SettingsMenuDialog extends SettingsDialog{
 		game.checkPref("indicators", true);
 		game.checkPref("effects", true);
 		game.sliderPref("sensitivity", 100, 10, 300, i -> i + "%");
-		game.sliderPref("saveinterval", 90, 15, 5*120, i -> Bundles.format("setting.seconds", i));
+		game.sliderPref("saveinterval", 90, 10, 5*120, i -> Bundles.format("setting.seconds", i));
 
 		graphics.checkPref("fps", false);
 		graphics.checkPref("vsync", true, b -> Gdx.graphics.setVSync(b));
 		graphics.checkPref("lasers", true);
 		graphics.checkPref("healthbars", true);
-		graphics.checkPref("pixelate", true, b->{
+		graphics.checkPref("pixelate", true, b -> {
 			if(b){
-				Vars.renderer.pixelSurface.setScale(Core.cameraScale);
-				Vars.renderer.shadowSurface.setScale(Core.cameraScale);
-				Vars.renderer.shieldSurface.setScale(Core.cameraScale);
+				renderer.pixelSurface.setScale(Core.cameraScale);
+				renderer.shadowSurface.setScale(Core.cameraScale);
+				renderer.shieldSurface.setScale(Core.cameraScale);
 			}else{
-				Vars.renderer.shadowSurface.setScale(1);
-				Vars.renderer.shieldSurface.setScale(1);
+				renderer.shadowSurface.setScale(1);
+				renderer.shieldSurface.setScale(1);
 			}
 			renderer.setPixelate(b);
 		});

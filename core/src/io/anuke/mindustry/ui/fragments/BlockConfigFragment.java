@@ -6,7 +6,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.scene.Element;
@@ -35,7 +34,7 @@ public class BlockConfigFragment implements  Fragment {
         configTile = tile;
 
         table.clear();
-        ((Configurable)tile.block()).buildTable(tile, table);
+        tile.block().buildTable(tile, table);
         table.pack();
         table.setTransform(true);
         table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),

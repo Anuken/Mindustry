@@ -6,7 +6,6 @@ import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
@@ -20,8 +19,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class Teleporter extends PowerBlock implements Configurable{
-	public static final Color[] colorArray = {Color.ROYAL, Color.ORANGE, Color.SCARLET, Color.FOREST, Color.PURPLE, Color.GOLD, Color.PINK, Color.BLACK};
+public class Teleporter extends PowerBlock{
+	public static final Color[] colorArray = {Color.ROYAL, Color.ORANGE, Color.SCARLET, Color.FOREST,
+			Color.PURPLE, Color.GOLD, Color.PINK, Color.BLACK};
 	public static final int colors = colorArray.length;
 
 	private static ObjectSet<Tile>[] teleporters = new ObjectSet[colors];
@@ -80,6 +80,11 @@ public class Teleporter extends PowerBlock implements Configurable{
 		if(entity.totalItems() > 0){
 			tryDump(tile);
 		}
+	}
+
+	@Override
+	public boolean isConfigurable(Tile tile){
+		return true;
 	}
 	
 	@Override

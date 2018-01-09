@@ -3,7 +3,6 @@ package io.anuke.mindustry.world;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
@@ -16,6 +15,7 @@ import io.anuke.mindustry.resource.Liquid;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
@@ -106,7 +106,13 @@ public class Block{
 	public void drawPlace(int x, int y, int rotation, boolean valid){}
 	public void postInit(){}
 	public void placed(Tile tile){}
+
 	public void tapped(Tile tile){}
+	public void buildTable(Tile tile, Table table) {}
+
+	public boolean isConfigurable(Tile tile){
+		return false;
+	}
 	
 	public void getStats(Array<String> list){
 		list.add("[gray]size: " + width + "x" + height);

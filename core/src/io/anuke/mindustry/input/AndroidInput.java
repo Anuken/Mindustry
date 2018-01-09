@@ -9,7 +9,6 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
@@ -75,7 +74,7 @@ public class AndroidInput extends InputHandler{
 			Tile cursor = world.tile(Mathf.scl2(Graphics.mouseWorld().x, tilesize), Mathf.scl2(Graphics.mouseWorld().y, tilesize));
 			if(cursor != null && !ui.hasMouse(screenX, screenY)){
 				Tile linked = cursor.isLinked() ? cursor.getLinked() : cursor;
-				if(linked != null && linked.block() instanceof Configurable){
+				if(linked != null && linked.block().isConfigurable(linked)){
 					ui.configfrag.showConfig(linked);
 				}else if(!ui.configfrag.hasConfigMouse()){
 					ui.configfrag.hideConfig();

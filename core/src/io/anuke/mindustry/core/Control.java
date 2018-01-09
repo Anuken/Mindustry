@@ -409,7 +409,7 @@ public class Control extends Module{
 	}
 
 	public boolean isGameOver(){
-		return core.block() != ProductionBlocks.core;
+		return core != null && core.block() != ProductionBlocks.core;
 	}
 	
 	float waveSpacing(){

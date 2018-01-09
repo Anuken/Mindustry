@@ -80,6 +80,9 @@ public class ChatFragment extends Table implements Fragment{
         bottom().left().marginBottom(offsety).marginLeft(offsetx*2).add(fieldlabel).padBottom(4f);
 
         add(chatfield).padBottom(offsety).padLeft(offsetx).growX().padRight(offsetx).height(28);
+        if(Vars.android) {
+            addImageButton("icon-chat", 14 * 2, this::toggle).size(30f).visible(() -> chatOpen);
+        }
     }
 
     @Override
@@ -144,6 +147,7 @@ public class ChatFragment extends Table implements Fragment{
 
         if(!chatOpen && (scene.getKeyboardFocus() == null || !scene.getKeyboardFocus().getParent().isVisible())){
             scene.setKeyboardFocus(chatfield);
+            chatfield.fireClick();
             chatOpen = !chatOpen;
             fadetime = messagesShown + 1;
         }else if(chatOpen){
@@ -152,6 +156,12 @@ public class ChatFragment extends Table implements Fragment{
             sendMessage();
             fadetime = messagesShown + 1; //TODO?
         }
+    }
+
+    public void hide(){
+        scene.setKeyboardFocus(null);
+        chatOpen = false;
+        chatfield.setText("");
     }
 
     public boolean chatOpen(){

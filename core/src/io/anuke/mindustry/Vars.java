@@ -24,7 +24,7 @@ public class Vars{
 	//waves can last no longer than 3 minutes, otherwise the next one spawns
 	public static final float maxwavespace = 60*60*4f;
 	//advance time the pathfinding starts at
-	public static final float aheadPathfinding = 60*20;
+	public static final float aheadPathfinding = 60*15;
 	//how far away from spawn points the player can't place blocks
 	public static final float enemyspawnspace = 65;
 	//discord group URL

@@ -5,7 +5,6 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.Configurable;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.style.TextureRegionDrawable;
@@ -19,7 +18,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class Sorter extends Junction implements Configurable{
+public class Sorter extends Junction{
 	
 	public Sorter(String name) {
 		super(name);
@@ -89,6 +88,11 @@ public class Sorter extends Junction implements Configurable{
 		}
 		
 		return to;
+	}
+
+	@Override
+	public boolean isConfigurable(Tile tile){
+		return true;
 	}
 	
 	@Override
