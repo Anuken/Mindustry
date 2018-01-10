@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.*;
@@ -374,6 +373,8 @@ public class Tutorial{
 				androidOnly = true;
 			}
 		},
+		//TODO re-add tutorial on weapons
+		/*
 		purchaseWeapons{
 			{
 				desktopOnly = true;
@@ -397,7 +398,7 @@ public class Tutorial{
 					Vars.ui.hudfrag.updateWeapons();
 				}
 			}
-		},
+		},*/
 		spawnWave{
 			float warmup = 0f;
 			{

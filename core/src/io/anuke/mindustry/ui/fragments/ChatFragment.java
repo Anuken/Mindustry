@@ -1,6 +1,5 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -81,7 +80,12 @@ public class ChatFragment extends Table implements Fragment{
         add(chatfield).padBottom(offsety).padLeft(offsetx).growX().padRight(offsetx).height(28);
 
         if(Vars.android) {
-            addImageButton("icon-arrow-right", 14 * 2, this::toggle).size(50f, 55f).visible(() -> chatOpen);
+            marginBottom(110f);
+            marginRight(240f);
+        }
+
+        if(Vars.android) {
+            addImageButton("icon-arrow-right", 14 * 2, this::toggle).size(46f, 51f).visible(() -> chatOpen).pad(2f);
         }
     }
 
@@ -91,7 +95,7 @@ public class ChatFragment extends Table implements Fragment{
         batch.setColor(shadowColor);
 
         if(chatOpen)
-            batch.draw(skin.getRegion("white"), offsetx, chatfield.getY(), Gdx.graphics.getWidth()-offsetx*2, chatfield.getHeight()-1);
+            batch.draw(skin.getRegion("white"), offsetx, chatfield.getY(), chatfield.getWidth() + 15f, chatfield.getHeight()-1);
 
         //font.getData().down = Unit.dp.scl(-21.5f);
         //font.getData().lineHeight = 22f;
@@ -106,7 +110,7 @@ public class ChatFragment extends Table implements Fragment{
 
         batch.setColor(shadowColor);
 
-        float theight = offsety + spacing;
+        float theight = offsety + spacing + getMarginBottom();
         for(int i = 0; i < messagesShown && i < messages.size && i < fadetime; i ++){
 
             layout.setText(font, messages.get(i).formattedMessage, Color.WHITE, textWidth, Align.bottomLeft, true);

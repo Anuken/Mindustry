@@ -11,18 +11,22 @@ import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.imagebutton;
+import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
+import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.control;
 
 public class PlacementFragment implements Fragment{
-	boolean shown = false;
-	Table breaktable, next;
+	boolean shown = false, placing = false;
+	Table breaktable, next, container;
+	Label modelabel;
 	
 	public void build(){
 		if(!Vars.android) return;
@@ -30,6 +34,7 @@ public class PlacementFragment implements Fragment{
 		InputHandler input = control.getInput();
 
 		float s = 50f;
+		float translation = 54f;
 
 		new table(){{
 			visible(() -> !GameState.is(State.menu));
@@ -41,6 +46,20 @@ public class PlacementFragment implements Fragment{
 			ButtonGroup<ImageButton> breakGroup = new ButtonGroup<>();
 
 			update(t -> {
+				if((input.recipe == null) == placing){
+					float i = 0.1f;
+					Interpolation n = Interpolation.pow3Out;
+					if(input.recipe == null){
+						placing = false;
+						container.clearActions();
+						container.actions(Actions.translateBy(0, -(container.getTranslation().y + translation), i, n));
+					}else{
+						placing = true;
+						container.clearActions();
+						container.actions(Actions.translateBy(0, -(container.getTranslation().y), i, n));
+						input.placeMode = input.lastPlaceMode;
+					}
+				}
 
 				if(!input.placeMode.delete){
 					placeGroup.setMinCheckCount(1);
@@ -72,93 +91,111 @@ public class PlacementFragment implements Fragment{
 				}
 			});
 
-			new table(){{
-				visible(() -> input.recipe != null);
-				touchable(Touchable.enabled);
+			container = new table(){{
+				modelabel = new label("").get();
 
-				aleft();
+				row();
 
-				new table("pane"){{
-					margin(5f);
+				new table() {{
+					abottom();
 					aleft();
 
-					defaults().size(s, s + 4).padBottom(-5.5f);
+					height(s + 5 + 4);
 
-					Color color = Color.GRAY;
-
-					new imagebutton("icon-cancel", 14*3, ()->{
-						input.recipe = null;
-					}).imageColor(color)
-							.visible(()->input.recipe != null);
-
-					for(PlaceMode mode : PlaceMode.values()){
-						if(!mode.shown || mode.delete) continue;
-
-						new imagebutton("icon-" + mode.name(), "toggle",  10*3, ()->{
-							control.getInput().resetCursor();
-							input.placeMode = mode;
-						}).group(placeGroup).get().setName(mode.name());
-					}
-
-					new imagebutton("icon-arrow", 14*3, ()->{
-						input.rotation = Mathf.mod(input.rotation + 1, 4);
-					}).imageColor(color).visible(() -> input.recipe != null).update(image ->{
-						image.getImage().setRotation(input.rotation *90);
-						image.getImage().setOrigin(Align.center);
-					});
-
-				}}.padBottom(-5).left().end();
-			}}.left().end();
-
-			row();
-
-			new table(){{
-				abottom();
-				aleft();
-
-				height(s+5+4);
-
-				next = new table("pane"){{
-					margin(5f);
-
-					defaults().padBottom(-5.5f);
-
-					new imagebutton("icon-arrow-right", 10 * 3, () -> {
-						toggle(!shown);
-					}).update(l -> l.getStyle().imageUp = Core.skin.getDrawable(shown ? "icon-arrow-left" : "icon-" + input.breakMode.name())).size(s, s+4);
-
-				}}.end().get();
-
-				breaktable = new table("pane"){{
-					visible(() -> shown);
-					margin(5f);
-					marginLeft(0f);
-					touchable(Touchable.enabled);
-					aleft();
-
-					defaults().size(s, s+4);
-
-					for(PlaceMode mode : PlaceMode.values()){
-						if(!mode.shown || !mode.delete) continue;
+					next = new table("pane") {{
+						margin(5f);
 
 						defaults().padBottom(-5.5f);
 
-						new imagebutton("icon-" + mode.name(), "toggle",  10*3, ()->{
-							control.getInput().resetCursor();
-							input.breakMode = mode;
-							if(!mode.both) input.placeMode = mode;
-						}).group(breakGroup).get().setName(mode.name());
-					}
+						new imagebutton("icon-arrow-right", 10 * 3, () -> {
+							toggle(!shown);
+						}).update(l -> l.getStyle().imageUp = Core.skin.getDrawable(shown ? "icon-arrow-left" : "icon-" + input.breakMode.name())).size(s, s + 4);
+
+					}}.end().get();
+
+					breaktable = new table("pane") {{
+						visible(() -> shown);
+						margin(5f);
+						marginLeft(0f);
+						touchable(Touchable.enabled);
+						aleft();
+
+						defaults().size(s, s + 4);
+
+						for (PlaceMode mode : PlaceMode.values()) {
+							if (!mode.shown || !mode.delete) continue;
+
+							defaults().padBottom(-5.5f);
+
+							new imagebutton("icon-" + mode.name(), "toggle", 10 * 3, () -> {
+								control.getInput().resetCursor();
+								input.breakMode = mode;
+								if (!mode.both) input.placeMode = mode;
+								modeText(Bundles.format("text.mode.break", mode.toString()));
+							}).group(breakGroup).get().setName(mode.name());
+						}
+
+					}}.end().get();
+
+					breaktable.getParent().swapActor(breaktable, next);
+
+					breaktable.getTranslation().set(-breaktable.getPrefWidth(), 0);
 
 				}}.end().get();
 
-				breaktable.getParent().swapActor(breaktable, next);
+				row();
 
-				breaktable.getTranslation().set(-breaktable.getPrefWidth(), 0);
+				new table() {{
+					touchable(Touchable.enabled);
+
+					aleft();
+
+					new table("pane") {{
+						margin(5f);
+						aleft();
+
+						defaults().size(s, s + 4).padBottom(-5.5f);
+
+						Color color = Color.GRAY;
+
+						new imagebutton("icon-cancel", 14 * 3, () -> {
+							input.recipe = null;
+						}).imageColor(color)
+								.visible(() -> input.recipe != null);
+
+						for (PlaceMode mode : PlaceMode.values()) {
+							if (!mode.shown || mode.delete) continue;
+
+							new imagebutton("icon-" + mode.name(), "toggle", 10 * 3, () -> {
+								control.getInput().resetCursor();
+								input.placeMode = mode;
+								input.lastPlaceMode = mode;
+								modeText(Bundles.format("text.mode.place", mode.toString()));
+							}).group(placeGroup).get().setName(mode.name());
+						}
+
+						new imagebutton("icon-arrow", 14 * 3, () -> {
+							input.rotation = Mathf.mod(input.rotation + 1, 4);
+						}).imageColor(color).visible(() -> input.recipe != null).update(image -> {
+							image.getImage().setRotation(input.rotation * 90);
+							image.getImage().setOrigin(Align.center);
+						});
+
+					}}.left().end();
+				}}.left().end();
 
 			}}.end().get();
 
+			container.setTranslation(0, -translation);
+
 		}}.end();
+	}
+
+	private void modeText(String text){
+		modelabel.setText(text);
+		modelabel.clearActions();
+		modelabel.setColor(Color.WHITE);
+		modelabel.actions(Actions.fadeOut(5f, Interpolation.fade));
 	}
 
 	private void toggle(boolean show){

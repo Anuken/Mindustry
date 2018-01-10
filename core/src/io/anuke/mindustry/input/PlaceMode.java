@@ -14,6 +14,7 @@ import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.utils.Cursors;
+import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
@@ -392,5 +393,10 @@ public enum PlaceMode{
 	
 	public void tapped(int x, int y){
 		
+	}
+
+	@Override
+	public String toString(){
+		return Bundles.get("placemode."+name().toLowerCase()+".name");
 	}
 }

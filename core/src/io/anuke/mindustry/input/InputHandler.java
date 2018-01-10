@@ -35,6 +35,7 @@ public abstract class InputHandler extends InputAdapter{
 	public int rotation;
 	public PlaceMode placeMode = android ? PlaceMode.cursor : PlaceMode.hold;
 	public PlaceMode breakMode = android ? PlaceMode.none : PlaceMode.holdDelete;
+	public PlaceMode lastPlaceMode = placeMode;
 
 	public abstract void update();
 	public abstract float getCursorX();
