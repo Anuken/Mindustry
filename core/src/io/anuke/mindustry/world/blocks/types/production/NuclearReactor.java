@@ -14,6 +14,7 @@ import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Strings;
 import io.anuke.ucore.util.Tmp;
 
 import java.io.DataInputStream;
@@ -35,7 +36,7 @@ public class NuclearReactor extends LiquidPowerGenerator{
 	protected int explosionRadius = 19;
 	protected int explosionDamage = 135;
 	protected float flashThreshold = 0.46f; //heat threshold at which the lights start flashing
-	
+
 	public NuclearReactor(String name) {
 		super(name);
 		generateItem = Item.uranium;
@@ -52,6 +53,9 @@ public class NuclearReactor extends LiquidPowerGenerator{
 	public void getStats(Array<String> list){
 		super.getStats(list);
 		list.add("[powerinfo]Input Item: " + generateItem);
+		list.add("[powerinfo]Max Power Generation/second: " + Strings.toFixed(powerMultiplier*60f, 2));
+		list.removeValue(list.select(s -> s.contains("Power/Liquid")).iterator().next(), true);
+		list.removeValue(list.select(s -> s.contains("Max liquid/second:")).iterator().next(), true);
 	}
 	
 	@Override

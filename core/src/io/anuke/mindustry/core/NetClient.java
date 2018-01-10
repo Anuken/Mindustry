@@ -102,6 +102,12 @@ public class NetClient extends Module {
                         }
                     }
 
+                    for(int i = 0; i < data.weapons.length; i ++){
+                        Vars.control.addWeapon((Weapon) Upgrade.getByID(data.weapons[i]));
+                    }
+                    Vars.player.weaponLeft = Vars.player.weaponRight = Vars.control.getWeapons().peek();
+                    Vars.ui.hudfrag.updateWeapons();
+
                     UCore.log("Recieved entities: " + Arrays.toString(data.players) + " player ID: " + data.playerid);
                     gotEntities = true;
                 });

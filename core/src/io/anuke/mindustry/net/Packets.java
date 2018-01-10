@@ -22,6 +22,7 @@ public class Packets {
     public static class EntityDataPacket{
         public Player[] players;
         public int playerid;
+        public byte[] weapons;
     }
 
     public static class SyncPacket{

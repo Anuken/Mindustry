@@ -1,9 +1,7 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.*;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.BulletType;
@@ -33,6 +31,7 @@ import java.util.Arrays;
 public class NetServer extends Module{
     /**Maps connection IDs to players.*/
     IntMap<Player> connections = new IntMap<>();
+    ObjectMap<String, ByteArray> weapons = new ObjectMap<>();
     float serverSyncTime = 4, itemSyncTime = 10, blockSyncTime = 120;
     boolean closing = false;
 
@@ -67,6 +66,7 @@ public class NetServer extends Module{
 
                 dp.playerid = player.id;
                 dp.players = Vars.control.playerGroup.all().toArray(Player.class);
+                dp.weapons = weapons.get(packet.name, new ByteArray()).toArray();
 
                 UCore.log("Sending entities: " + Arrays.toString(dp.players));
 
@@ -145,7 +145,13 @@ public class NetServer extends Module{
         });
 
         Net.handleServer(UpgradePacket.class, packet -> {
+            Player player = connections.get(Net.getLastConnection());
+
             Weapon weapon = (Weapon)Upgrade.getByID(packet.id);
+
+            if(!weapons.containsKey(player.name)) weapons.put(player.name, new ByteArray());
+            if(!weapons.get(player.name).contains(weapon.id)) weapons.get(player.name).add(weapon.id);
+
             Vars.control.removeItems(UpgradeRecipes.get(weapon));
         });
 
