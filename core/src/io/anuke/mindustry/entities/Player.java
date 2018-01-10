@@ -89,7 +89,7 @@ public class Player extends DestructibleEntity implements Syncable{
             angle = Mathf.lerpAngDelta(angle, targetAngle, 0.2f);
         }
 
-		if((Vars.debug && (!Vars.showPlayer || !Vars.showUI)) || (isAndroid && isLocal)) return;
+		if((Vars.debug && (!Vars.showPlayer || !Vars.showUI)) || (isAndroid && isLocal) ) return;
         boolean snap = Vars.snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate") && isLocal;
 
 		String part = isAndroid ? "ship" : "mech";
@@ -116,7 +116,7 @@ public class Player extends DestructibleEntity implements Syncable{
 	
 	@Override
 	public void update(){
-		if(!isLocal || isAndroid){
+		if(!isLocal || isAndroid || Vars.ui.chatfrag.chatOpen()){
 			if(!isDead() && !isLocal) inter.update(this);
 			return;
 		}

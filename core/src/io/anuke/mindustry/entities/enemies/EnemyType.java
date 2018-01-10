@@ -209,14 +209,14 @@ public class EnemyType {
     public void onShoot(Enemy enemy, BulletType type, float rotation){}
 
     public void onDeath(Enemy enemy){
-        Effects.effect(Fx.explosion, enemy);
-        Effects.shake(3f, 4f, enemy);
-        Effects.sound("bang2", enemy);
-        enemy.remove();
-        enemy.dead = true;
-
         if(Net.active() && Net.server()){
             Vars.netServer.handleEnemyDeath(enemy);
+        }else if(!Net.active()){ //must be client
+            Effects.effect(Fx.explosion, enemy);
+            Effects.shake(3f, 4f, enemy);
+            Effects.sound("bang2", enemy);
+            enemy.remove();
+            enemy.dead = true;
         }
     }
 

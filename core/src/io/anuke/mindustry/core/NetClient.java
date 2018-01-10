@@ -139,7 +139,7 @@ public class NetClient extends Module {
             Player player = Vars.control.playerGroup.getByID(packet.playerid);
 
             Weapon weapon = (Weapon) Upgrade.getByID(packet.weaponid);
-            weapon.shoot(player, packet.x, packet.y, packet.rotation);
+            Gdx.app.postRunnable(() -> weapon.shoot(player, packet.x, packet.y, packet.rotation));
         });
 
         Net.handle(PlacePacket.class, packet -> {
@@ -183,14 +183,16 @@ public class NetClient extends Module {
         Net.handle(BulletPacket.class, packet -> {
             //TODO shoot effects for enemies, clientside as well as serverside
             BulletType type = (BulletType) BaseBulletType.getByID(packet.type);
-            Entity owner = Vars.control.enemyGroup.getByID(packet.owner);
-            new Bullet(type, owner, packet.x, packet.y, packet.angle).add();
+            Gdx.app.postRunnable(() -> {
+                Entity owner = Vars.control.enemyGroup.getByID(packet.owner);
+                new Bullet(type, owner, packet.x, packet.y, packet.angle).add();
+            });
         });
 
         Net.handle(BlockDestroyPacket.class, packet -> {
             Tile tile = Vars.world.tile(packet.position % Vars.world.width(), packet.position / Vars.world.width());
             if(tile.entity != null){
-                tile.entity.onDeath(true);
+                Gdx.app.postRunnable(() -> tile.entity.onDeath(true));
             }
         });
 
@@ -227,7 +229,7 @@ public class NetClient extends Module {
             Player player = Vars.control.playerGroup.getByID(packet.playerid);
 
             if(player != null){
-                player.remove();
+                Gdx.app.postRunnable(player::remove);
             }
         });
 

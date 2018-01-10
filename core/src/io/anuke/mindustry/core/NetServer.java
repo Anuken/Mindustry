@@ -87,8 +87,7 @@ public class NetServer extends Module{
             }
 
             sendMessage("[accent]"+Bundles.format("text.server.disconnected", player.name));
-
-            player.remove();
+            Gdx.app.postRunnable(player::remove);
 
             DisconnectPacket dc = new DisconnectPacket();
             dc.playerid = player.id;
@@ -112,7 +111,7 @@ public class NetServer extends Module{
         });
 
         Net.handleServer(PlacePacket.class, packet -> {
-            Vars.control.input.placeBlockInternal(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false);
+            Gdx.app.postRunnable(() -> Vars.control.input.placeBlockInternal(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false));
             packet.playerid = connections.get(Net.getLastConnection()).id;
 
             Recipe recipe = Recipes.getByResult(Block.getByID(packet.block));
@@ -126,7 +125,7 @@ public class NetServer extends Module{
         });
 
         Net.handleServer(BreakPacket.class, packet -> {
-            Vars.control.input.breakBlockInternal(packet.x, packet.y, false);
+            Gdx.app.postRunnable(() -> Vars.control.input.breakBlockInternal(packet.x, packet.y, false));
             packet.playerid = connections.get(Net.getLastConnection()).id;
 
             Net.sendExcept(Net.getLastConnection(), packet, SendMode.tcp);

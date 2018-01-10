@@ -18,6 +18,7 @@ import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
@@ -34,7 +35,7 @@ public class PlacementFragment implements Fragment{
 		InputHandler input = control.getInput();
 
 		float s = 50f;
-		float translation = 54f;
+		float translation = Unit.dp.scl(54f);
 
 		new table(){{
 			visible(() -> !GameState.is(State.menu));

@@ -190,7 +190,7 @@ public class ChatFragment extends Table implements Fragment{
             if(sender == null){ //no sender, this is a server message?
                 formattedMessage = message;
             }else{
-                formattedMessage = "[ROYAL]["+sender+"]: [YELLOW]"+message;
+                formattedMessage = "[CORAL]["+sender+"]: [YELLOW]"+message;
             }
         }
     }

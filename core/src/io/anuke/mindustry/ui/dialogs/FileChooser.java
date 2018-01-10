@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.scene.event.Touchable;
@@ -38,9 +39,6 @@ public class FileChooser extends FloatingDialog {
 		this.open = open;
 		this.filter = filter;
 		this.selectListener = result;
-		setupWidgets();
-
-		Mindustry.platforms.requestWritePerms();
 	}
 
 	private void setupWidgets(){
@@ -253,8 +251,13 @@ public class FileChooser extends FloatingDialog {
 
 	@Override
 	public Dialog show(){
-		super.show();
-		Core.scene.setScrollFocus(pane);
+		Mindustry.platforms.requestWritePerms();
+		Timers.runTask(2f, () -> {
+			content().clear();
+			setupWidgets();
+			super.show();
+			Core.scene.setScrollFocus(pane);
+		});
 		return this;
 	}
 
