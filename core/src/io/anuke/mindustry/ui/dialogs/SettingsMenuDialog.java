@@ -109,7 +109,6 @@ public class SettingsMenuDialog extends SettingsDialog{
 		game.sliderPref("difficulty", 1, 0, 2, i -> Bundles.get("setting.difficulty." + (i == 0 ? "easy" : i == 1 ? "normal" : "hard")));
 		game.screenshakePref();
 		game.checkPref("smoothcam", true);
-		game.checkPref("indicators", true);
 		game.checkPref("effects", true);
 		game.sliderPref("sensitivity", 100, 10, 300, i -> i + "%");
 		game.sliderPref("saveinterval", 90, 10, 5*120, i -> Bundles.format("setting.seconds", i));
@@ -117,6 +116,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 		graphics.checkPref("fps", false);
 		graphics.checkPref("vsync", true, b -> Gdx.graphics.setVSync(b));
 		graphics.checkPref("lasers", true);
+		graphics.checkPref("indicators", true);
 		graphics.checkPref("healthbars", true);
 		graphics.checkPref("pixelate", true, b -> {
 			if(b){

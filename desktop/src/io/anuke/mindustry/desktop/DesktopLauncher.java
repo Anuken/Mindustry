@@ -86,13 +86,13 @@ public class DesktopLauncher {
 				DiscordRichPresence presence = new DiscordRichPresence();
 
 				if(!GameState.is(State.menu)){
-					presence.state = Strings.capitalize(Vars.control.getMode().toString()) + ", Solo";
+					presence.state = Strings.capitalize(Vars.control.getMode().name()) + ", Solo";
 					presence.details = Strings.capitalize(Vars.world.getMap().name) + " | Wave " + Vars.control.getWave();
 					presence.largeImageText = "Wave " + Vars.control.getWave();
 					if(Net.active() ){
 						presence.partyMax = 16;
 						presence.partySize = Vars.control.playerGroup.amount();
-						presence.state = Strings.capitalize(Vars.control.getMode().toString());
+						presence.state = Strings.capitalize(Vars.control.getMode().name());
 					}
 				}else{
 					if(Vars.ui.editor != null && Vars.ui.editor.isShown()){
