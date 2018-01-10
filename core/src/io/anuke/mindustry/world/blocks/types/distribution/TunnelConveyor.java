@@ -26,10 +26,16 @@ public class TunnelConveyor extends Block{
 		Tile tunnel = getDestTunnel(tile, item);
 		if(tunnel == null) return;
 		Tile to = tunnel.getNearby()[tunnel.getRotation()];
+		if(to == null) return;
+		Block before = to.block();
 		
-		Timers.run(25, ()->{
-			if(to == null || to.entity == null) return;
-			to.block().handleItem(item, to, tunnel);
+		Timers.run(25, () -> {
+			if(to.block() != before) return;
+			try {
+				to.block().handleItem(item, to, tunnel);
+			}catch (NullPointerException e){
+				e.printStackTrace();
+			}
 		});
 	}
 
