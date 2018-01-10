@@ -30,7 +30,11 @@ public class ColorMapper{
 		"f7feff", pair(Blocks.snow, Blocks.snowblock),
 		"6e501e", pair(Blocks.dirt),
 		"ed5334", pair(Blocks.lava),
-		"292929", pair(Blocks.oil)
+		"292929", pair(Blocks.oil),
+		"c3a490", pair(Blocks.iron),
+		"161616", pair(Blocks.coal),
+		"6277bc", pair(Blocks.titanium),
+		"83bc58", pair(Blocks.uranium)
 	);
 	
 	public static BlockPair get(int color){

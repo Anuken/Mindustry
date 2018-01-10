@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
@@ -75,18 +74,17 @@ public class DamageArea{
 	}
 	
 	public static void damage(boolean enemies, float x, float y, float radius, int damage){
+		Consumer<SolidEntity> cons = entity -> {
+			DestructibleEntity enemy = (DestructibleEntity)entity;
+			if(enemy.distanceTo(x, y) > radius || (entity instanceof Player && ((Player)entity).isAndroid)){
+				return;
+			}
+			int amount = calculateDamage(x, y, enemy.x, enemy.y, radius, damage);
+			enemy.damage(amount);
+		};
 		
 		if(enemies){
-			Entities.getNearby(Vars.control.enemyGroup, x, y, radius*2, entity->{
-				if(entity instanceof Enemy){
-					Enemy enemy = (Enemy)entity;
-					if(enemy.distanceTo(x, y) > radius){
-						return;
-					}
-					int amount = calculateDamage(x, y, enemy.x, enemy.y, radius, damage);
-					enemy.damage(amount);
-				}
-			});
+			Entities.getNearby(Vars.control.enemyGroup, x, y, radius*2, cons);
 		}else{
 			int trad = (int)(radius / Vars.tilesize);
 			for(int dx = -trad; dx <= trad; dx ++){
@@ -98,12 +96,8 @@ public class DamageArea{
 					}
 				}
 			}
-			
-			if(!Vars.android && Vars.player.distanceTo(x, y) < radius){
-				Player player = Vars.player;
-				int amount = calculateDamage(x, y, player.x, player.y, radius, damage);
-				player.damage(amount);
-			}
+
+			Entities.getNearby(Vars.control.playerGroup, x, y, radius*2, cons);
 		}
 	}
 	
