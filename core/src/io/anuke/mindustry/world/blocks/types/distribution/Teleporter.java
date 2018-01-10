@@ -47,6 +47,14 @@ public class Teleporter extends PowerBlock{
 	}
 
 	@Override
+	public void configure(Tile tile, byte data) {
+		TeleporterEntity entity = tile.entity();
+		if(entity != null){
+			entity.color = data;
+		}
+	}
+
+	@Override
 	public void getStats(Array<String> list){
 		super.getStats(list);
 		list.add("[powerinfo]Power/item: " + Strings.toFixed(powerPerItem, 1));
@@ -104,6 +112,7 @@ public class Teleporter extends PowerBlock{
 			ImageButton button = cont.addImageButton("white", "toggle", 24, () -> {
 				entity.color = (byte)f;
 				lastColor = (byte)f;
+				setConfigure(tile, (byte)f);
 			}).size(34, 38).padBottom(-5.1f).group(group).get();
 			button.getStyle().imageUpColor = colorArray[f];
 			button.setChecked(entity.color == f);

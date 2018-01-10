@@ -29,7 +29,7 @@ public class KryoServer implements ServerProvider {
     IntArray connections = new IntArray();
 
     public KryoServer(){
-        server = new Server(4096, 1024); //TODO tweak
+        server = new Server(4096*2, 2048); //TODO tweak
         server.setDiscoveryHandler(new ServerDiscoveryHandler() {
             private ByteBuffer buffer = ByteBuffer.allocate(4);
 
@@ -61,8 +61,7 @@ public class KryoServer implements ServerProvider {
                     Net.handleServerReceived(c, c.id);
                     connections.add(c.id);
                 }catch (Exception e){
-                    Gdx.app.exit();
-                    throw new RuntimeException(e);
+                    Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
                 }
             }
 
@@ -76,8 +75,7 @@ public class KryoServer implements ServerProvider {
                 try{
                     Net.handleServerReceived(c, c.id);
                 }catch (Exception e){
-                    Gdx.app.exit();
-                    throw new RuntimeException(e);
+                    Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
                 }
             }
 
@@ -88,8 +86,7 @@ public class KryoServer implements ServerProvider {
                 try{
                     Net.handleServerReceived(object, connection.getID());
                 }catch (Exception e){
-                    Gdx.app.exit();
-                    throw new RuntimeException(e);
+                    Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
                 }
             }
         });

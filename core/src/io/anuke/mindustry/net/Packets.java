@@ -127,4 +127,9 @@ public class Packets {
     public static class BlockTapPacket{
         public int position;
     }
+
+    public static class BlockConfigPacket{
+        public int position;
+        public byte data;
+    }
 }

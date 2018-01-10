@@ -109,6 +109,11 @@ public class Block{
 
 	public void tapped(Tile tile){}
 	public void buildTable(Tile tile, Table table) {}
+	public void configure(Tile tile, byte data){}
+
+	public void setConfigure(Tile tile, byte data){
+		Vars.netClient.handleBlockConfig(tile, data);
+	}
 
 	public boolean isConfigurable(Tile tile){
 		return false;

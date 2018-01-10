@@ -186,7 +186,7 @@ public abstract class InputHandler extends InputAdapter{
 
 		placeBlockInternal(x, y, result, rotation, effects, sound);
 
-		if(Net.active()){
+		if(Net.active() && result != ProductionBlocks.core){
 			Vars.netClient.handlePlace(x, y, result, rotation);
 		}
 	}

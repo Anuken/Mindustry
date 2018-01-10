@@ -35,9 +35,15 @@ public class Saves {
     }
 
     public void convertSaves(){
+        Array<SaveSlot> invalid = new Array<>();
+
         for(SaveSlot slot : saves){
-            SaveIO.checkConvert(slot.index);
+            if(!SaveIO.checkConvert(slot.index)){
+                invalid.add(slot);
+            }
         }
+
+        saves.removeAll(invalid, true);
     }
 
     public SaveSlot getCurrent() {

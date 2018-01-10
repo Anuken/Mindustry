@@ -91,6 +91,14 @@ public class Sorter extends Junction{
 	}
 
 	@Override
+	public void configure(Tile tile, byte data) {
+		SorterEntity entity = tile.entity();
+		if(entity != null){
+			entity.sortItem = Item.getByID(data);
+		}
+	}
+
+	@Override
 	public boolean isConfigurable(Tile tile){
 		return true;
 	}
@@ -113,6 +121,7 @@ public class Sorter extends Junction{
 			final int f = i;
 			ImageButton button = cont.addImageButton("white", "toggle", 24, () -> {
 				entity.sortItem = items.get(f);
+				setConfigure(tile, (byte)f);
 			}).size(38, 42).padBottom(-5.1f).group(group).get();
 			button.getStyle().imageUp = new TextureRegionDrawable(new TextureRegion(Draw.region("icon-"+items.get(i).name)));
 			button.setChecked(entity.sortItem.id == f);

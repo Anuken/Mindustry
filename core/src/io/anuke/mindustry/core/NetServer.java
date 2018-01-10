@@ -168,6 +168,13 @@ public class NetServer extends Module{
 
             Net.sendExcept(Net.getLastConnection(), packet, SendMode.tcp);
         });
+
+        Net.handleServer(BlockConfigPacket.class, packet -> {
+            Tile tile = Vars.world.tile(packet.position);
+            if(tile != null) tile.block().configure(tile, packet.data);
+
+            Net.sendExcept(Net.getLastConnection(), packet, SendMode.tcp);
+        });
     }
 
     public void sendMessage(String message){

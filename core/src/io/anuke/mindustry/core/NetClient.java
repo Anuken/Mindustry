@@ -200,31 +200,37 @@ public class NetClient extends Module {
 
         Net.handle(BlockUpdatePacket.class, packet -> {
             Tile tile = Vars.world.tile(packet.position % Vars.world.width(), packet.position / Vars.world.width());
-            if(tile.entity != null){
+            if(tile != null && tile.entity != null){
                 tile.entity.health = packet.health;
             }
         });
 
         Net.handle(BlockSyncPacket.class, packet -> {
+            if(!gotEntities) return;
+
             DataInputStream stream = new DataInputStream(packet.stream);
 
-            try{
-                while(stream.available() > 0){
-                    int pos = stream.readInt();
+            Gdx.app.postRunnable(() -> {
+                try {
+                    while (stream.available() > 0) {
+                        int pos = stream.readInt();
 
-                    Tile tile = Vars.world.tile(pos % Vars.world.width(), pos / Vars.world.width());
+                        //TODO what if there's no entity?
+                        Tile tile = Vars.world.tile(pos % Vars.world.width(), pos / Vars.world.width());
 
-                    byte times = stream.readByte();
+                        byte times = stream.readByte();
 
-                    for(int i = 0; i < times; i ++){
-                        tile.entity.timer.getTimes()[i] = stream.readFloat();
+                        for (int i = 0; i < times; i++) {
+                            tile.entity.timer.getTimes()[i] = stream.readFloat();
+                        }
+
+                        tile.entity.read(stream);
                     }
-
-                    tile.entity.read(stream);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
-            }catch (IOException e){
-                e.printStackTrace();
-            }
+            });
+
         });
 
         Net.handle(DisconnectPacket.class, packet -> {
@@ -247,17 +253,24 @@ public class NetClient extends Module {
         });
 
         Net.handle(WeaponSwitchPacket.class, packet -> {
-            Player player = Vars.control.playerGroup.getByID(packet.playerid);
+            Gdx.app.postRunnable(() -> {
+                Player player = Vars.control.playerGroup.getByID(packet.playerid);
 
-            if(player == null) return;
+                if(player == null) return;
 
-            player.weaponLeft = (Weapon)Upgrade.getByID(packet.left);
-            player.weaponRight = (Weapon)Upgrade.getByID(packet.right);
+                player.weaponLeft = (Weapon)Upgrade.getByID(packet.left);
+                player.weaponRight = (Weapon)Upgrade.getByID(packet.right);
+            });
         });
 
         Net.handle(BlockTapPacket.class, packet -> {
             Tile tile = Vars.world.tile(packet.position);
-            tile.block().tapped(tile);
+            if(tile != null) tile.block().tapped(tile);
+        });
+
+        Net.handle(BlockConfigPacket.class, packet -> {
+            Tile tile = Vars.world.tile(packet.position);
+            if(tile != null) tile.block().configure(tile, packet.data);
         });
     }
 
@@ -270,6 +283,13 @@ public class NetClient extends Module {
         }else if(!connecting){
             Net.disconnect();
         }
+    }
+
+    public void handleBlockConfig(Tile tile, byte data){
+        BlockConfigPacket packet = new BlockConfigPacket();
+        packet.data = data;
+        packet.position = tile.packedPosition();
+        Net.send(packet, SendMode.tcp);
     }
 
     public void handleBlockTap(Tile tile){

@@ -74,6 +74,7 @@ public class SaveIO{
 		}
 	}
 
+	/**Returns whether or not conversion was succesful.*/
 	public static boolean checkConvert(int slot){
 
 		try{
@@ -88,12 +89,12 @@ public class SaveIO{
 				target.read(stream);
 				stream.close();
 				saveToSlot(slot);
-				return true;
 			}
-			return false;
 
-		}catch (IOException e){
-			throw new RuntimeException(e);
+			return true;
+
+		}catch (Exception e){
+			return false;
 		}
 	}
 

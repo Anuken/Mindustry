@@ -53,8 +53,7 @@ public class KryoClient implements ClientProvider{
                 try{
                     Net.handleClientReceived(c);
                 }catch (Exception e){
-                    Gdx.app.exit();
-                    throw new RuntimeException(e);
+                    Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
                 }
             }
 
@@ -65,8 +64,7 @@ public class KryoClient implements ClientProvider{
                 try{
                     Net.handleClientReceived(c);
                 }catch (Exception e){
-                    Gdx.app.exit();
-                    throw new RuntimeException(e);
+                    Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
                 }
             }
 
@@ -77,8 +75,7 @@ public class KryoClient implements ClientProvider{
                 try{
                     Net.handleClientReceived(object);
                 }catch (Exception e){
-                    Gdx.app.exit();
-                    throw new RuntimeException(e);
+                    Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
                 }
 
             }
