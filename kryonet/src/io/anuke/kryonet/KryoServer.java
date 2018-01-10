@@ -29,7 +29,7 @@ public class KryoServer implements ServerProvider {
     IntArray connections = new IntArray();
 
     public KryoServer(){
-        server = new Server();
+        server = new Server(4096, 1024); //TODO tweak
         server.setDiscoveryHandler(new ServerDiscoveryHandler() {
             private ByteBuffer buffer = ByteBuffer.allocate(4);
 

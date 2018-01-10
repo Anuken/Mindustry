@@ -356,7 +356,7 @@ public class Control extends Module{
 				for(int i = 0; i < spawnamount; i ++){
 					float range = 12f;
 					
-					Timers.run(i*5f, ()->{
+					Timers.run(i*5f, () -> {
 
 						Enemy enemy = new Enemy(spawn.type);
 						enemy.set(tile.worldx() + Mathf.range(range), tile.worldy() + Mathf.range(range));

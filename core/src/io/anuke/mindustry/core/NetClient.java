@@ -2,7 +2,6 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.compression.Lzma;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Bullet;
@@ -28,8 +27,6 @@ import io.anuke.ucore.entities.BaseBulletType;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.modules.Module;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Arrays;
@@ -82,16 +79,8 @@ public class NetClient extends Module {
 
         Net.handle(WorldData.class, data -> {
             Gdx.app.postRunnable(() -> {
-                ByteArrayOutputStream outc = new ByteArrayOutputStream();
-
-                try {
-                    Lzma.decompress(data.stream, outc);
-                }catch (IOException e){
-                    throw new RuntimeException(e);
-                }
-
                 UCore.log("Recieved world data: " + data.stream.available() + " bytes.");
-                NetworkIO.load(new ByteArrayInputStream(outc.toByteArray()));
+                NetworkIO.load(data.stream);
                 Vars.player.set(Vars.control.core.worldx(), Vars.control.core.worldy() - Vars.tilesize*2);
 
                 GameState.set(State.playing);

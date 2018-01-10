@@ -4,18 +4,19 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
 
 //TODO add port specification
-public class HostDialog extends Dialog{
+public class HostDialog extends FloatingDialog{
     float w = 300;
 
     public HostDialog(){
-        super("$text.hostserver", "dialog");
+        super("$text.hostserver");
+
+        addCloseButton();
 
         content().table(t -> {
             t.add("$text.name").padRight(10);

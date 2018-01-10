@@ -8,14 +8,20 @@ import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.entities.Entity;
+import io.anuke.ucore.entities.SolidEntity;
+import io.anuke.ucore.function.Consumer;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Physics;
 
 public class DamageArea{
 	private static Rectangle rect = new Rectangle();
 
 	//only for entities, not tiles (yet!)
-	public static void damageLine(boolean enemies, Effect effect, float x, float y, float angle, float length, int damage){
+	public static void damageLine(Entity owner, Effect effect, float x, float y, float angle, float length, int damage){
 		Angles.translation(angle, length);
 		rect.setPosition(x, y).setSize(Angles.x(), Angles.y());
 		float x2 = Angles.x() + x, y2 = Angles.y() + y;
@@ -37,23 +43,25 @@ public class DamageArea{
 		rect.width += expand*2;
 		rect.height += expand*2;
 
-		if(enemies){
-			Entities.getNearby(Vars.control.enemyGroup, rect, e -> {
-				Enemy enemy = (Enemy)e;
-				Rectangle other = enemy.hitbox.getRect(enemy.x, enemy.y);
-				other.y -= expand;
-				other.x -= expand;
-				other.width += expand*2;
-				other.height += expand*2;
+        Consumer<SolidEntity> cons = e -> {
+            if(e == owner || (e instanceof  Player && ((Player)e).isAndroid)) return;
+            DestructibleEntity enemy = (DestructibleEntity) e;
+            Rectangle other = enemy.hitbox.getRect(enemy.x, enemy.y);
+            other.y -= expand;
+            other.x -= expand;
+            other.width += expand * 2;
+            other.height += expand * 2;
 
-                Vector2 vec = Physics.raycastRect(x, y, x2, y2, other);
+            Vector2 vec = Physics.raycastRect(x, y, x2, y2, other);
 
-				if(vec != null){
-                    Effects.effect(effect, vec.x, vec.y);
-					enemy.damage(damage);
-				}
-			});
-		}//TODO else damage players and blocks?
+            if (vec != null) {
+                Effects.effect(effect, vec.x, vec.y);
+                enemy.damage(damage);
+            }
+        };
+
+		Entities.getNearby(Vars.control.enemyGroup, rect, cons);
+        Entities.getNearby(Vars.control.playerGroup, rect, cons);
 	}
 	
 	public static void damageEntities(float x, float y, float radius, int damage){

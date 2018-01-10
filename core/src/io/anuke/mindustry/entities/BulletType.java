@@ -448,7 +448,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		}
 
 		public void init(Bullet b) {
-			DamageArea.damageLine(true, Fx.beamhit, b.x, b.y, b.angle(), length, damage);
+			DamageArea.damageLine(b.owner, Fx.beamhit, b.x, b.y, b.angle(), length, damage);
 		}
 
 		public void draw(Bullet b) {

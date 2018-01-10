@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.compression.Lzma;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.BulletType;
@@ -50,19 +49,7 @@ public class NetServer extends Module{
             NetworkIO.write(stream);
 
             UCore.log("Packed " + stream.size() + " uncompressed bytes of data.");
-
-            ByteArrayInputStream inc = new ByteArrayInputStream(stream.toByteArray());
-            ByteArrayOutputStream outc = new ByteArrayOutputStream();
-
-            try {
-                Lzma.compress(inc, outc);
-            }catch (IOException e){
-                throw new RuntimeException(e);
-            }
-
-            UCore.log("Packed " + outc.size() + " COMPRESSED bytes of data.");
-
-            data.stream = new ByteArrayInputStream(outc.toByteArray());
+            data.stream = new ByteArrayInputStream(stream.toByteArray());
 
             Net.sendStream(id, data);
 

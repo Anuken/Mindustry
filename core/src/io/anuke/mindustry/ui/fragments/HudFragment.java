@@ -22,7 +22,7 @@ import io.anuke.ucore.util.Bundles;
 import static io.anuke.mindustry.Vars.*;
 
 public class HudFragment implements Fragment{
-	private ImageButton menu, flip, pause;
+	private ImageButton menu, flip;
 	private Table respawntable;
 	private Table wavetable;
 	private boolean shown = true;
@@ -43,7 +43,7 @@ public class HudFragment implements Fragment{
 
 				menu = new imagebutton("icon-menu", isize, ui.paused::show).get();
 
-				flip = new imagebutton("icon-arrow-up", isize, ()->{
+				flip = new imagebutton("icon-arrow-up", isize, () -> {
 					if(wavetable.getActions().size != 0) return;
 
 					float dur = 0.3f;
@@ -62,7 +62,7 @@ public class HudFragment implements Fragment{
 
 				}).get();
 
-				pause = new imagebutton("icon-pause", isize, ()->{
+				new imagebutton("icon-pause", isize, () -> {
 					if(Net.active() && Vars.android){
 						if(ui.chatfrag.chatOpen()){
 							ui.chatfrag.hide();
@@ -72,7 +72,7 @@ public class HudFragment implements Fragment{
 					}else {
 						GameState.set(GameState.is(State.paused) ? State.playing : State.paused);
 					}
-				}).update(i ->{
+				}).update(i -> {
 					if(Net.active() && Vars.android){
 						i.getStyle().imageUp = Core.skin.getDrawable("icon-chat");
 					}else {
@@ -194,7 +194,7 @@ public class HudFragment implements Fragment{
 					getEnemiesRemaining() :
 						(control.getTutorial().active() || Vars.control.getMode().toggleWaves) ? "$text.waiting"
 								: Bundles.format("text.wave.waiting", (int) (control.getWaveCountdown() / 60f)))
-				.minWidth(140).padLeft(-6).padRight(-12).left();
+				.minWidth(126).padLeft(-6).padRight(-12).left();
 
 				margin(10f);
 				get().marginLeft(6);
@@ -208,8 +208,7 @@ public class HudFragment implements Fragment{
 	private void playButton(float uheight){
 		new imagebutton("icon-play", 30f, ()->{
 			Vars.control.runWave();
-		}).height(uheight).fillX().right().padTop(-8f).padBottom(-12f).padRight(-36)
-				.padLeft(-10f).width(40f).update(l->{
+		}).height(uheight).fillX().right().padTop(-8f).padBottom(-12f).padRight(-36).width(40f).update(l->{
 			boolean vis = Vars.control.getMode().toggleWaves && Vars.control.getEnemiesRemaining() <= 0;
 			boolean paused = GameState.is(State.paused) || !vis;
 			

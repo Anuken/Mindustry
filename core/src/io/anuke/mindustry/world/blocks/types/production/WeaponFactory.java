@@ -99,7 +99,7 @@ public class WeaponFactory extends Block{
                 }
             }).size(49f, 54f).padBottom(-5).get();
 
-            button.setDisabled(() -> control.hasWeapon(weapon));
+            button.setDisabled(() -> control.hasWeapon(weapon) || !control.hasItems(requirements));
             button.getStyle().imageUp = new TextureRegionDrawable(Draw.region(weapon.name));
             button.addListener(tip);
 

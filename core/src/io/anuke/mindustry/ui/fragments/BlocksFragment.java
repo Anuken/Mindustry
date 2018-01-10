@@ -44,7 +44,7 @@ public class BlocksFragment implements Fragment{
 			blocks = new table(){{
 
 				itemtable = new Table("button");
-				itemtable.setVisible(() -> input.recipe == null);
+				itemtable.setVisible(() -> input.recipe == null && !Vars.control.getMode().infiniteResources);
 
 				desctable = new Table("button");
 				desctable.setVisible(() -> input.recipe != null);

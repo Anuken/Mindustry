@@ -118,7 +118,7 @@ public class KryoClient implements ClientProvider{
 
     @Override
     public Array<Address> discover(){
-        List<InetAddress> list = client.discoverHosts(Vars.port, 5000);
+        List<InetAddress> list = client.discoverHosts(Vars.port, 3000);
         ObjectSet<String> hostnames = new ObjectSet<>();
         Array<Address> result = new Array<>();
 

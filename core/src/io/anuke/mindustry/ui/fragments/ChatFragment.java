@@ -79,8 +79,9 @@ public class ChatFragment extends Table implements Fragment{
         bottom().left().marginBottom(offsety).marginLeft(offsetx*2).add(fieldlabel).padBottom(4f);
 
         add(chatfield).padBottom(offsety).padLeft(offsetx).growX().padRight(offsetx).height(28);
+
         if(Vars.android) {
-            addImageButton("icon-chat", 14 * 2, this::toggle).size(30f).visible(() -> chatOpen);
+            addImageButton("icon-arrow-right", 14 * 2, this::toggle).size(50f, 55f).visible(() -> chatOpen);
         }
     }
 

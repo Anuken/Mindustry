@@ -50,7 +50,7 @@ public class Player extends DestructibleEntity implements Syncable{
 
 	@Override
 	public void damage(int amount){
-		if(!Vars.debug)
+		if(!Vars.debug && !isAndroid)
 			super.damage(amount);
 	}
 
