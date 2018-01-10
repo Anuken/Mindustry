@@ -34,6 +34,7 @@ public class NetServer extends Module{
     /**Maps connection IDs to players.*/
     IntMap<Player> connections = new IntMap<>();
     float serverSyncTime = 4, itemSyncTime = 10, blockSyncTime = 120;
+    boolean closing = false;
 
     public NetServer(){
 
@@ -225,8 +226,14 @@ public class NetServer extends Module{
 
         if(!GameState.is(State.menu) && Net.active()){
             sync();
-        }else{
-            Net.closeServer();
+        }else if(!closing){
+            closing = true;
+            Vars.ui.loadfrag.show("$text.server.closing");
+            Timers.runTask(5f, () -> {
+                Net.closeServer();
+                Vars.ui.loadfrag.hide();
+                closing = false;
+            });
         }
     }
 
