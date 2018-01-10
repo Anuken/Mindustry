@@ -4,6 +4,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.mindustry.world.Block;
@@ -141,7 +142,11 @@ public class MapEditorDialog extends Dialog{
 			blockgroup.getButtons().get(2).setChecked(true);
 			Core.scene.setScrollFocus(view);
 			view.clearStack();
+
+			Mindustry.platforms.updateRPC();
 		});
+
+		hidden(() -> Mindustry.platforms.updateRPC());
 	}
 
 	public MapView getView() {

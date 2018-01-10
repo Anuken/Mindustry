@@ -26,7 +26,7 @@ public class Generator extends PowerBlock{
 
 	public int laserRange = 6;
 	public int laserDirections = 4;
-	public float powerSpeed = 0.1f;
+	public float powerSpeed = 0.5f;
 	public boolean explosive = true;
 	public boolean hasLasers = true;
 	public boolean outputOnly = false;

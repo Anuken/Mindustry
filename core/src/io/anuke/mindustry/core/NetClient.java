@@ -191,8 +191,10 @@ public class NetClient extends Module {
 
         Net.handle(BlockDestroyPacket.class, packet -> {
             Tile tile = Vars.world.tile(packet.position % Vars.world.width(), packet.position / Vars.world.width());
-            if(tile.entity != null){
-                Gdx.app.postRunnable(() -> tile.entity.onDeath(true));
+            if(tile != null && tile.entity != null){
+                Gdx.app.postRunnable(() ->{
+                    if(tile.entity != null) tile.entity.onDeath(true);
+                });
             }
         });
 

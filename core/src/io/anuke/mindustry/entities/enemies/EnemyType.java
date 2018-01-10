@@ -211,13 +211,13 @@ public class EnemyType {
     public void onDeath(Enemy enemy){
         if(Net.active() && Net.server()){
             Vars.netServer.handleEnemyDeath(enemy);
-        }else if(!Net.active()){ //must be client
-            Effects.effect(Fx.explosion, enemy);
-            Effects.shake(3f, 4f, enemy);
-            Effects.sound("bang2", enemy);
-            enemy.remove();
-            enemy.dead = true;
         }
+
+        Effects.effect(Fx.explosion, enemy);
+        Effects.shake(3f, 4f, enemy);
+        Effects.sound("bang2", enemy);
+        enemy.remove();
+        enemy.dead = true;
     }
 
     public void removed(Enemy enemy){

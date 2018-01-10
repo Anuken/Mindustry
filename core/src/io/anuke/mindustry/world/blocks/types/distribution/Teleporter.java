@@ -30,7 +30,7 @@ public class Teleporter extends PowerBlock{
 	private Array<Tile> removal = new Array<>();
 	private Array<Tile> returns = new Array<>();
 
-	protected float powerPerItem = 1f;
+	protected float powerPerItem = 0.8f;
 
 	static{
 		for(int i = 0; i < colors; i ++){

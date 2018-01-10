@@ -95,7 +95,11 @@ public class DesktopLauncher {
 						presence.state = Strings.capitalize(Vars.control.getMode().toString());
 					}
 				}else{
-					presence.state = "In Menu";
+					if(Vars.ui.editor != null && Vars.ui.editor.isShown()){
+						presence.state = "In Editor";
+					}else {
+						presence.state = "In Menu";
+					}
 				}
 
 				presence.largeImageKey = "logo";

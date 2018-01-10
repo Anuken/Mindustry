@@ -56,7 +56,10 @@ public class AndroidInput extends InputHandler{
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button){
-		if(ui.hasMouse()) return false;
+		if(ui.hasMouse()){
+			brokeBlock = true;
+			return false;
+		}
 
 		lmousex = screenX;
 		lmousey = screenY;

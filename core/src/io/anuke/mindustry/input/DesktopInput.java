@@ -10,6 +10,8 @@ import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.core.Inputs.DeviceType;
+import io.anuke.ucore.core.KeyBinds;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
@@ -21,7 +23,7 @@ public class DesktopInput extends InputHandler{
 	int endx, endy;
 	private boolean enableHold = false;
 	private boolean beganBreak;
-	private boolean rotated = false, rotatedAlt;
+	private boolean rotated = false, rotatedAlt, zoomed;
 	
 	@Override public float getCursorEndX(){ return endx; }
 	@Override public float getCursorEndY(){ return endy; }
@@ -54,9 +56,17 @@ public class DesktopInput extends InputHandler{
 		
 		endx = Gdx.input.getX();
 		endy = Gdx.input.getY();
+
+		boolean controller = KeyBinds.getSection("default").device.type == DeviceType.controller;
 		
-		if(Inputs.getAxisActive("zoom") && Inputs.keyDown("zoom_hold") && !GameState.is(State.menu) && !ui.hasDialog()){
-			renderer.scaleCamera((int)Inputs.getAxis("zoom"));
+		if(Inputs.getAxisActive("zoom") && (Inputs.keyDown("zoom_hold") || controller)
+				&& !GameState.is(State.menu) && !ui.hasDialog()){
+			if((!zoomed || !controller)) {
+				renderer.scaleCamera((int) Inputs.getAxis("zoom"));
+			}
+			zoomed = true;
+		}else{
+			zoomed = false;
 		}
 
 		if(!rotated) {

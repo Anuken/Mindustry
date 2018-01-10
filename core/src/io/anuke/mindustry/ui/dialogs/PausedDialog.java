@@ -51,7 +51,7 @@ public class PausedDialog extends FloatingDialog{
 			content().row();
 			content().addButton("$text.loadgame", () -> {
 				load.show();
-			}).disabled(Net.active());
+			}).disabled(b -> Net.active());
 
 			content().row();
 
@@ -93,16 +93,19 @@ public class PausedDialog extends FloatingDialog{
 
 			content().row();
 			
-			new imagebutton("icon-load", isize, load::show).text("$text.load").padTop(4f).disabled(Net.active());
+			imagebutton lo = new imagebutton("icon-load", isize, load::show);
+			lo.text("$text.load").padTop(4f);
+			lo.cell.disabled(b -> Net.active());
 
-			new imagebutton("icon-host", isize, () -> {
+			imagebutton ho = new imagebutton("icon-host", isize, () -> {
 				if(Vars.world.getMap().custom){
 					ui.showError("$text.nohost");
 				}else {
 					ui.host.show();
 				}
-			}).text("$text.host")
-					.disabled(b -> Net.active()).padTop(4f);
+			});
+			ho.text("$text.host").padTop(4f);
+			ho.cell.disabled(b -> Net.active());
 			
 			new imagebutton("icon-quit", isize, () -> {
 				Vars.ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {

@@ -52,6 +52,10 @@ public class ChatFragment extends Table implements Fragment{
             if(Net.active() && Inputs.keyTap("chat")){
                 toggle();
             }
+
+            if(GameState.is(State.menu) && messages.size > 0){
+                messages.clear();
+            }
         });
 
         setup();
@@ -80,7 +84,7 @@ public class ChatFragment extends Table implements Fragment{
         add(chatfield).padBottom(offsety).padLeft(offsetx).growX().padRight(offsetx).height(28);
 
         if(Vars.android) {
-            marginBottom(110f);
+            marginBottom(105f);
             marginRight(240f);
         }
 

@@ -31,7 +31,7 @@ public class JoinDialog extends FloatingDialog {
         Mindustry.platforms.addDialog(join.content().addField(Settings.getString("ip"),text ->{
             Settings.putString("ip", text);
             Settings.save();
-        }).size(180f, 54f).get());
+        }).size(180f, 54f).get(), 100);
 
         join.content().row();
         join.content().add("$text.server.port").left();

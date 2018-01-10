@@ -131,7 +131,11 @@ public class PlacementFragment implements Fragment{
 							new imagebutton("icon-" + mode.name(), "toggle", 10 * 3, () -> {
 								control.getInput().resetCursor();
 								input.breakMode = mode;
-								if (!mode.both) input.placeMode = mode;
+								if (!mode.both){
+									input.placeMode = mode;
+								}else{
+									input.placeMode = input.lastPlaceMode;
+								}
 								modeText(Bundles.format("text.mode.break", mode.toString()));
 							}).group(breakGroup).get().setName(mode.name());
 						}

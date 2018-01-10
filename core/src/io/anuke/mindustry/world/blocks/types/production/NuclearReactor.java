@@ -45,6 +45,7 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		explosionEffect = Fx.nuclearShockwave;
 		explosive = true;
 		powerCapacity = 80f;
+		powerSpeed = 0.5f;
 	}
 
 	@Override
@@ -63,7 +64,7 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		if(fuel > 0){
 			entity.heat += fullness * heating;
 			entity.power += powerMultiplier * fullness * Timers.delta();
-			entity.power = Mathf.clamp(entity.power);
+			entity.power = Mathf.clamp(entity.power, 0f, powerCapacity);
 			if(entity.timer.get(timerFuel, fuelUseTime)){
 				entity.removeItem(generateItem, 1);
 			}
