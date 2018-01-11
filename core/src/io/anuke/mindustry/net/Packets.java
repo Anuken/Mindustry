@@ -21,6 +21,7 @@ public class Packets {
 
     public static class EntityDataPacket{
         public Player[] players;
+        public byte[] playerWeapons;
         public int playerid;
         public byte[] weapons;
     }
@@ -106,6 +107,7 @@ public class Packets {
     public static class ChatPacket{
         public String name;
         public String text;
+        public int id;
     }
 
     public static class KickPacket{

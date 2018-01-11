@@ -4,10 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -214,12 +216,21 @@ public class Renderer extends RendererModule{
 	}
 
 	void drawPlayerNames(){
+		GlyphLayout layout = Pools.obtain(GlyphLayout.class);
+
         Draw.tscl(0.25f/2);
 	    for(Player player : Vars.control.playerGroup.all()){
-	        if(!player.isLocal){
-	            Draw.text(player.name, player.x, player.y + 7);
+	       if(!player.isLocal){
+	        	layout.setText(Core.font, player.name);
+				Draw.color(0f, 0f, 0f, 0.3f);
+				Draw.rect("blank", player.x, player.y + 8 - layout.height/2, layout.width + 2, layout.height + 2);
+				Draw.color();
+				Draw.tcolor(NetClient.colorArray[player.id % NetClient.colorArray.length]);
+	            Draw.text(player.name, player.x, player.y + 8);
+	            Draw.tcolor();
             }
         }
+		Pools.free(layout);
         Draw.tscl(Vars.fontscale);
     }
 

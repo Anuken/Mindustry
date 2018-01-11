@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.graphics.Shaders;
@@ -182,7 +183,7 @@ public class EnemyType {
 
             //no tile found
             if(enemy.target == null){
-                enemy.target = Entities.getClosest(Vars.control.playerGroup, enemy.x, enemy.y, range, e -> true);
+                enemy.target = Entities.getClosest(Vars.control.playerGroup, enemy.x, enemy.y, range, e -> !((Player)e).isAndroid);
             }
         }else if(nearCore){
             enemy.target = Vars.control.getCore().entity;

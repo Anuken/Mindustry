@@ -1,6 +1,7 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
@@ -32,8 +33,10 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class NetClient extends Module {
+    public static final Color[] colorArray = {Color.ORANGE, Color.SCARLET, Color.LIME,
+            Color.GOLD, Color.PINK, Color.SKY, Color.GOLD};
     boolean connecting = false;
-    boolean gotEntities = false;
+    boolean gotEntities = false, gotData = false;
     boolean kicked = false;
     float playerSyncTime = 2;
     float dataTimeout = 60*10;
@@ -43,6 +46,7 @@ public class NetClient extends Module {
         Net.handle(Connect.class, packet -> {
             connecting = true;
             gotEntities = false;
+            gotData = false;
             kicked = false;
 
             Gdx.app.postRunnable(() -> {
@@ -87,6 +91,7 @@ public class NetClient extends Module {
                 connecting = false;
                 Vars.ui.loadfrag.hide();
                 Vars.ui.join.hide();
+                gotData = true;
             });
         });
 
@@ -96,8 +101,10 @@ public class NetClient extends Module {
                 Timers.run(10f, () -> { //TODO hack. should only run once world data is recieved
                     Vars.control.playerGroup.remap(Vars.player, data.playerid);
 
-                    for (Player player : data.players) {
+                    for (int i = 0; i < data.players.length; i ++) {
+                        Player player = data.players[i];
                         if (player.id != data.playerid) {
+                            player.weaponLeft = player.weaponRight = (Weapon) Upgrade.getByID(data.playerWeapons[i]);
                             player.add();
                         }
                     }
@@ -249,7 +256,7 @@ public class NetClient extends Module {
 
         Net.handle(Player.class, Player::add);
 
-        Net.handle(ChatPacket.class, packet -> Gdx.app.postRunnable(() -> Vars.ui.chatfrag.addMessage(packet.text, packet.name)));
+        Net.handle(ChatPacket.class, packet -> Gdx.app.postRunnable(() -> Vars.ui.chatfrag.addMessage(packet.text, Vars.netClient.colorizeName(packet.id, packet.name))));
 
         Net.handle(KickPacket.class, packet -> {
             kicked = true;
@@ -285,10 +292,14 @@ public class NetClient extends Module {
         if(!Net.client() || !Net.active()) return;
 
         if(!GameState.is(State.menu) && Net.active()){
-            sync();
+            if(gotEntities && gotData) sync();
         }else if(!connecting){
             Net.disconnect();
         }
+    }
+
+    public String colorizeName(int id, String name){
+        return name == null ? null : "[#" + colorArray[id % colorArray.length].toString().toUpperCase() + "]" + name;
     }
 
     public void handleBlockConfig(Tile tile, byte data){
@@ -322,9 +333,10 @@ public class NetClient extends Module {
         ChatPacket packet = new ChatPacket();
         packet.text = message;
         packet.name = Vars.player.name;
+        packet.id = Vars.player.id;
         Net.send(packet, SendMode.tcp);
 
-        Vars.ui.chatfrag.addMessage(packet.text, Vars.player.name);
+        Vars.ui.chatfrag.addMessage(packet.text, colorizeName(Vars.player.id, Vars.player.name));
     }
 
     public void handleShoot(Weapon weapon, float x, float y, float angle){

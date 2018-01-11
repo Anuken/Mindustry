@@ -66,7 +66,12 @@ public class NetServer extends Module{
 
                 dp.playerid = player.id;
                 dp.players = Vars.control.playerGroup.all().toArray(Player.class);
+                dp.playerWeapons = new byte[dp.players.length];
                 dp.weapons = weapons.get(packet.name, new ByteArray()).toArray();
+
+                for(int i = 0; i < dp.playerWeapons.length; i ++){
+                    dp.playerWeapons[i] = dp.players[i].weaponLeft.id;
+                }
 
                 UCore.log("Sending entities: " + Arrays.toString(dp.players));
 
@@ -140,8 +145,9 @@ public class NetServer extends Module{
             }
 
             packet.name = player.name;
+            packet.id = player.id;
             Net.sendExcept(player.clientid, packet, SendMode.tcp);
-            Gdx.app.postRunnable(() -> Vars.ui.chatfrag.addMessage(packet.text, packet.name));
+            Gdx.app.postRunnable(() -> Vars.ui.chatfrag.addMessage(packet.text, Vars.netClient.colorizeName(packet.id, packet.name)));
         });
 
         Net.handleServer(UpgradePacket.class, packet -> {
