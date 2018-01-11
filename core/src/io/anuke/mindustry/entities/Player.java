@@ -61,15 +61,15 @@ public class Player extends DestructibleEntity implements Syncable{
 	
 	@Override
 	public void onDeath(){
+		Effects.effect(Fx.explosion, this);
+		Effects.shake(4f, 5f, this);
+		Effects.sound("die", this);
+
 		if(isLocal){
 			remove();
 		}else{
 			set(-9999, -9999);
 		}
-
-		Effects.effect(Fx.explosion, this);
-		Effects.shake(4f, 5f, this);
-		Effects.sound("die", this);
 
 		//TODO respawning doesn't work properly for multiplayer at all
 		if(isLocal) {

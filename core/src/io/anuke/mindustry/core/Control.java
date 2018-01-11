@@ -393,9 +393,6 @@ public class Control extends Module{
 	}
 	
 	public void coreDestroyed(){
-		if(Net.active() && Net.server()){
-			Net.closeServer();
-		}
 
 		Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
 		Sounds.play("corexplode");
@@ -404,7 +401,9 @@ public class Control extends Module{
 		}
 		Effects.effect(Fx.coreexplosion, core.worldx(), core.worldy());
 		
-		Timers.run(60, ()-> ui.restart.show());
+		Timers.run(60, () -> {
+			ui.restart.show();
+		});
 	}
 
 	public boolean isGameOver(){

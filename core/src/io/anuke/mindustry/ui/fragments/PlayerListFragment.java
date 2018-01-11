@@ -10,6 +10,7 @@ import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
+import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
@@ -25,7 +26,11 @@ public class PlayerListFragment implements Fragment{
                 new label(() -> Bundles.format(Vars.control.playerGroup.amount() == 1 ? "text.players.single" :
                         "text.players", Vars.control.playerGroup.amount()));
                 row();
-                add(content).grow();
+                content.marginRight(13f).marginLeft(13f);
+                ScrollPane pane = new ScrollPane(content, "clear");
+                pane.setScrollingDisabled(true, false);
+                pane.setFadeScrollBars(false);
+                add(pane).grow();
             }}.end();
 
             update(t -> {

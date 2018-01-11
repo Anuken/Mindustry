@@ -33,8 +33,9 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class NetClient extends Module {
-    public static final Color[] colorArray = {Color.ORANGE, Color.SCARLET, Color.LIME,
-            Color.GOLD, Color.PINK, Color.SKY, Color.GOLD};
+    public static final Color[] colorArray = {Color.ORANGE, Color.SCARLET, Color.LIME, Color.PURPLE,
+            Color.GOLD, Color.PINK, Color.SKY, Color.GOLD, Color.VIOLET,
+            Color.GREEN, Color.CORAL, Color.CYAN, Color.CHARTREUSE};
     boolean connecting = false;
     boolean gotEntities = false, gotData = false;
     boolean kicked = false;
@@ -228,7 +229,7 @@ public class NetClient extends Module {
                     while (stream.available() > 0) {
                         int pos = stream.readInt();
 
-                        //TODO what if there's no entity?
+                        //TODO what if there's no entity? new code
                         Tile tile = Vars.world.tile(pos % Vars.world.width(), pos / Vars.world.width());
 
                         byte times = stream.readByte();
@@ -241,6 +242,10 @@ public class NetClient extends Module {
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
+                } catch (Exception e){
+                    e.printStackTrace();
+                    //do nothing else...
+                    //TODO fix
                 }
             });
 

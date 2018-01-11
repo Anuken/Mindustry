@@ -67,6 +67,7 @@ public class PausedDialog extends FloatingDialog{
 
 			content().addButton("$text.quit", () -> {
                 ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
+                	if(Net.active() && Net.client()) Net.disconnect();
 					runSave();
 					hide();
 					GameState.set(State.menu);
@@ -109,6 +110,7 @@ public class PausedDialog extends FloatingDialog{
 			
 			new imagebutton("icon-quit", isize, () -> {
 				Vars.ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
+					if(Net.active() && Net.client()) Net.disconnect();
 					runSave();
 					hide();
 					GameState.set(State.menu);

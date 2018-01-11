@@ -68,6 +68,11 @@ public class Pathfind{
 			return vector.set(enemy.x, enemy.y);
 		}
 
+		if(enemy.node >= path.length){
+			enemy.node = -1;
+			return vector.set(enemy.x, enemy.y);
+		}
+
 		//TODO documentation on what this does
 		Tile prev = path[enemy.node - 1];
 
