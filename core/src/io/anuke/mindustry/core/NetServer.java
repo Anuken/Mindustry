@@ -26,7 +26,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 
 public class NetServer extends Module{
     /**Maps connection IDs to players.*/
@@ -67,31 +66,7 @@ public class NetServer extends Module{
                 connections.put(id, player);
 
                 dp.playerid = player.id;
-                dp.players = Vars.control.playerGroup.all().toArray(Player.class);
-                dp.playerWeapons = new byte[dp.players.length];
                 dp.weapons = weapons.get(packet.name, new ByteArray()).toArray();
-
-                for(int i = 0; i < dp.playerWeapons.length; i ++){
-                    dp.playerWeapons[i] = dp.players[i].weaponLeft.id;
-                }
-
-                dp.enemies = new EnemySpawnPacket[Vars.control.enemyGroup.amount()];
-
-                for(int i = 0; i < Vars.control.enemyGroup.amount(); i ++){
-                    Enemy enemy = Vars.control.enemyGroup.all().get(i);
-                    EnemySpawnPacket e = new EnemySpawnPacket();
-                    e.x = enemy.x;
-                    e.y = enemy.y;
-                    e.id = enemy.id;
-                    e.tier = (byte)enemy.tier;
-                    e.lane = (byte)enemy.lane;
-                    e.type = enemy.type.id;
-                    dp.enemies[i] = e;
-                }
-
-                UCore.log("Sending entities: " + Arrays.toString(dp.players));
-
-                Net.sendExcept(id, player, SendMode.tcp);
 
                 Net.sendTo(id, dp, SendMode.tcp);
 
@@ -118,7 +93,6 @@ public class NetServer extends Module{
 
         Net.handleServer(PositionPacket.class, pos -> {
             Player player = connections.get(Net.getLastConnection());
-            UCore.log("Recieving data: " + Arrays.toString(pos.data), "Player pos: " +player.x, player.y);
             player.getInterpolator().type.read(player, pos.data);
         });
 
@@ -248,17 +222,6 @@ public class NetServer extends Module{
         packet.owner = owner.id;
         packet.type = type.id;
         Net.send(packet, SendMode.udp);
-    }
-
-    public void handleEnemySpawn(Enemy enemy){
-        EnemySpawnPacket packet = new EnemySpawnPacket();
-        packet.type = enemy.type.id;
-        packet.lane = (byte)enemy.lane;
-        packet.tier = (byte)enemy.tier;
-        packet.x = enemy.x;
-        packet.y = enemy.y;
-        packet.id = enemy.id;
-        Net.send(packet, SendMode.tcp);
     }
 
     public void handleEnemyDeath(Enemy enemy){

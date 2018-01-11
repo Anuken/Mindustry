@@ -31,7 +31,6 @@ import io.anuke.ucore.modules.Module;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Arrays;
 
 public class NetClient extends Module {
     public static final Color[] colorArray = {Color.ORANGE, Color.SCARLET, Color.LIME, Color.PURPLE,
@@ -105,25 +104,11 @@ public class NetClient extends Module {
                 Timers.run(10f, () -> { //TODO hack. should only run once world data is recieved
                     Vars.control.playerGroup.remap(Vars.player, data.playerid);
 
-                    for (int i = 0; i < data.players.length; i ++) {
-                        Player player = data.players[i];
-                        if (player.id != data.playerid) {
-                            player.weaponLeft = player.weaponRight = (Weapon) Upgrade.getByID(data.playerWeapons[i]);
-                            player.add();
-                        }
-                    }
-
-                    for(int i = 0; i < data.enemies.length; i ++){
-                        Net.handleClientReceived(data.enemies[i]);
-                    }
-
                     for(int i = 0; i < data.weapons.length; i ++){
                         Vars.control.addWeapon((Weapon) Upgrade.getByID(data.weapons[i]));
                     }
                     Vars.player.weaponLeft = Vars.player.weaponRight = Vars.control.getWeapons().peek();
                     Vars.ui.hudfrag.updateWeapons();
-
-                    UCore.log("Recieved entities: " + Arrays.toString(data.players) + " player ID: " + data.playerid);
                     gotEntities = true;
                 });
             });

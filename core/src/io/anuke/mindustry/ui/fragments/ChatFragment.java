@@ -138,7 +138,7 @@ public class ChatFragment extends Table implements Fragment{
         batch.setColor(Color.WHITE);
 
         if(fadetime > 0 && !chatOpen)
-            fadetime -= Timers.delta()/120f;
+            fadetime -= Timers.delta()/180f;
     }
 
     private void sendMessage(){

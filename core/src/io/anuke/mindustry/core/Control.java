@@ -368,7 +368,6 @@ public class Control extends Module{
 						enemy.add();
 
 						Effects.effect(Fx.spawn, enemy);
-						Vars.netServer.handleEnemySpawn(enemy);
 
 						enemies ++;
 					});
