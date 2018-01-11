@@ -3,7 +3,7 @@ package io.anuke.mindustry.ui.dialogs;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.world.GameMode;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;

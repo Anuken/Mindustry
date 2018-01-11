@@ -10,7 +10,7 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.BlockLoader;
-import io.anuke.mindustry.world.GameMode;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.Core;

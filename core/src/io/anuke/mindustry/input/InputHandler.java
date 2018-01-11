@@ -13,7 +13,7 @@ import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Recipes;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.SpawnPoint;
+import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
@@ -109,9 +109,11 @@ public abstract class InputHandler extends InputAdapter{
 			}
 		}
 
-		for(Player player : Vars.control.playerGroup.all()){
-			if(!player.isAndroid && Tmp.r2.overlaps(player.hitbox.getRect(player.x, player.y))){
-				return false;
+		if(type.solid || type.solidifes) {
+			for (Player player : Vars.control.playerGroup.all()) {
+				if (!player.isAndroid && Tmp.r2.overlaps(player.hitbox.getRect(player.x, player.y))) {
+					return false;
+				}
 			}
 		}
 		

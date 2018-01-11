@@ -1,4 +1,4 @@
-package io.anuke.mindustry.entities;
+package io.anuke.mindustry.game;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.enemies.EnemyTypes;
@@ -6,6 +6,7 @@ import io.anuke.mindustry.entities.enemies.EnemyTypes;
 public class WaveCreator{
 	
 	public static Array<EnemySpawn> getSpawns(){
+
 		return Array.with(
 			new EnemySpawn(EnemyTypes.standard){{
 				scaling = 1;

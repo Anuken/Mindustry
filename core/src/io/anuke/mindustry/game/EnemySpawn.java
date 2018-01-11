@@ -1,13 +1,10 @@
-package io.anuke.mindustry.entities;
+package io.anuke.mindustry.game;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.EnemyType;
-import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.util.Mathf;
 
 public class EnemySpawn{
-	/**Scaling multiplier for each difficulty. Easy, normal, hard.*/
-	private static float[] scalings = {4f, 2.5f, 1.5f};
-	
 	/**The enemy type spawned*/
 	public final EnemyType type;
 	/**When this spawns should end*/
@@ -37,7 +34,7 @@ public class EnemySpawn{
 		if(wave < after || wave > before || (wave - after) % spacing != 0){
 			return 0;
 		}
-		float scaling = this.scaling * scalings[(Settings.getInt("difficulty"))];
+		float scaling = this.scaling * Vars.control.getDifficulty().enemyScaling;
 		
 		return Math.min(amount-1 + Math.max((int)((wave / spacing) / scaling), 1) - (tier(wave, lane)-1) * tierscaleback, max);
 	}

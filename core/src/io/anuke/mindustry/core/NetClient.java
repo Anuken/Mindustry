@@ -2,6 +2,7 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
@@ -39,12 +40,14 @@ public class NetClient extends Module {
     boolean connecting = false;
     boolean gotEntities = false, gotData = false;
     boolean kicked = false;
+    IntSet requests = new IntSet();
     float playerSyncTime = 2;
     float dataTimeout = 60*10;
 
     public NetClient(){
 
         Net.handle(Connect.class, packet -> {
+            requests.clear();
             connecting = true;
             gotEntities = false;
             gotData = false;
@@ -110,6 +113,10 @@ public class NetClient extends Module {
                         }
                     }
 
+                    for(int i = 0; i < data.enemies.length; i ++){
+                        Net.handleClientReceived(data.enemies[i]);
+                    }
+
                     for(int i = 0; i < data.weapons.length; i ++){
                         Vars.control.addWeapon((Weapon) Upgrade.getByID(data.weapons[i]));
                     }
@@ -129,7 +136,7 @@ public class NetClient extends Module {
             for(int i = 0; i < packet.ids.length; i ++){
                 int id = packet.ids[i];
                 if(id != Vars.player.id){
-                    Entity entity = null;
+                    Entity entity;
                     if(i >= packet.enemyStart){
                         entity = Vars.control.enemyGroup.getByID(id);
                     }else {
@@ -140,6 +147,13 @@ public class NetClient extends Module {
 
                     if(sync == null){
                         Gdx.app.error("Mindustry", "Unknown entity ID: " + id + " " + (i >= packet.enemyStart ? "(enemy)" : "(player)"));
+                        if(!requests.contains(id)){
+                            Gdx.app.error("Mindustry", "Sending entity request: " + id);
+                            requests.add(id);
+                            EntityRequestPacket req = new EntityRequestPacket();
+                            req.id = id;
+                            Net.send(req, SendMode.tcp);
+                        }
                         continue;
                     }
 
@@ -175,6 +189,7 @@ public class NetClient extends Module {
         });
 
         Net.handle(EnemySpawnPacket.class, spawn -> {
+            requests.remove(spawn.id);
             Gdx.app.postRunnable(() -> {
                 Enemy enemy = new Enemy(EnemyType.getByID(spawn.type));
                 enemy.set(spawn.x, spawn.y);
@@ -259,7 +274,12 @@ public class NetClient extends Module {
             }
         });
 
-        Net.handle(Player.class, Player::add);
+        Net.handle(Player.class, player -> {
+            requests.remove(player.id);
+            player.getInterpolator().last.set(player.x, player.y);
+            player.getInterpolator().target.set(player.x, player.y);
+            player.add();
+        });
 
         Net.handle(ChatPacket.class, packet -> Gdx.app.postRunnable(() -> Vars.ui.chatfrag.addMessage(packet.text, Vars.netClient.colorizeName(packet.id, packet.name))));
 
@@ -301,6 +321,11 @@ public class NetClient extends Module {
         }else if(!connecting){
             Net.disconnect();
         }
+    }
+
+    public void disconnectQuietly(){
+        kicked = true;
+        Net.disconnect();
     }
 
     public String colorizeName(int id, String name){

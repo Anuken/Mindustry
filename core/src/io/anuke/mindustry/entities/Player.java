@@ -125,10 +125,13 @@ public class Player extends DestructibleEntity implements Syncable{
 		
 		float speed = dashing ? Player.dashSpeed : Player.speed;
 		
-		if(health < maxhealth && Timers.get(this, "regen", 50))
+		if(health < maxhealth && Timers.get(this, "regen", 20))
 			health ++;
 
+		health = Mathf.clamp(health, -1, maxhealth);
+
 		Tile tile = world.tileWorld(x, y);
+
 		if(tile != null && tile.floor().liquid && tile.block() == Blocks.air){
 			damage(health+1); //drown
 		}

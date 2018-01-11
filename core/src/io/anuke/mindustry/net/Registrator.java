@@ -38,6 +38,7 @@ public class Registrator {
                 WeaponSwitchPacket.class,
                 BlockTapPacket.class,
                 BlockConfigPacket.class,
+                EntityRequestPacket.class,
 
                 Class.class,
                 byte[].class,
@@ -49,6 +50,7 @@ public class Registrator {
                 Player[].class,
                 Array.class,
                 Vector2.class,
+                EnemySpawnPacket[].class,
 
                 Entity.class,
                 Player.class,

@@ -21,6 +21,7 @@ public class Packets {
 
     public static class EntityDataPacket{
         public Player[] players;
+        public EnemySpawnPacket[] enemies;
         public byte[] playerWeapons;
         public int playerid;
         public byte[] weapons;
@@ -134,5 +135,9 @@ public class Packets {
     public static class BlockConfigPacket{
         public int position;
         public byte data;
+    }
+
+    public static class EntityRequestPacket{
+        public int id;
     }
 }

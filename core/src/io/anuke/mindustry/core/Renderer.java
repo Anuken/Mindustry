@@ -19,7 +19,7 @@ import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.ui.fragments.ToolFragment;
-import io.anuke.mindustry.world.SpawnPoint;
+import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;

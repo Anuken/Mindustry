@@ -28,7 +28,7 @@ public class ChatFragment extends Table implements Fragment{
     private final static int messagesShown = 10;
     private final static int maxLength = 150;
     private Array<ChatMessage> messages = new Array<>();
-    private float fadetime;
+    private float fadetime, lastfade;
     private boolean chatOpen = false;
     private TextField chatfield;
     private Label fieldlabel = new Label(">");
@@ -157,12 +157,13 @@ public class ChatFragment extends Table implements Fragment{
             scene.setKeyboardFocus(chatfield);
             chatfield.fireClick();
             chatOpen = !chatOpen;
+            lastfade = fadetime;
             fadetime = messagesShown + 1;
         }else if(chatOpen){
             scene.setKeyboardFocus(null);
             chatOpen = !chatOpen;
+            fadetime = lastfade;
             sendMessage();
-            fadetime = messagesShown + 1;
         }
     }
 
@@ -180,7 +181,7 @@ public class ChatFragment extends Table implements Fragment{
         messages.insert(0, new ChatMessage(message, sender));
 
         fadetime += 1f;
-        fadetime = Math.min(fadetime, messagesShown) + 2f;
+        fadetime = Math.min(fadetime, messagesShown) + 1f;
     }
 
     private static class ChatMessage{

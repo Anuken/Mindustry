@@ -9,7 +9,7 @@ import io.anuke.mindustry.core.Tutorial.Stage;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.GameMode;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.core.KeyBinds;

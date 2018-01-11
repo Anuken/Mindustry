@@ -2,7 +2,7 @@ package io.anuke.mindustry.io;
 
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.world.GameMode;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.world.Map;
 
 import java.util.Date;

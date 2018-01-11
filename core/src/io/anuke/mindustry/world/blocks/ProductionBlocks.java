@@ -35,8 +35,8 @@ public class ProductionBlocks{
 			inputs = new Item[]{Item.titanium, Item.steel};
 			fuel = Item.coal;
 			result = Item.dirium;
-			burnDuration = 80f;
-			craftTime = 40f;
+			burnDuration = 40f;
+			craftTime = 20f;
 		}
 	},
 	

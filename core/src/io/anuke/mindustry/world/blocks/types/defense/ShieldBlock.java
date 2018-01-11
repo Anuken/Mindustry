@@ -17,14 +17,14 @@ import io.anuke.ucore.util.Strings;
 public class ShieldBlock extends PowerBlock{
 	public float shieldRadius = 40f;
 	public float powerDrain = 0.005f;
-	public float powerPerDamage = 0.07f;
+	public float powerPerDamage = 0.06f;
 	public float maxRadius = 40f;
 	public float radiusScale = 300f;
 	
 	public ShieldBlock(String name) {
 		super(name);
 		voltage = powerDrain;
-		powerCapacity = 40f;
+		powerCapacity = 80f;
 	}
 	
 	@Override

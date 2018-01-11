@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.async.AsyncExecutor;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.world.GameMode;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;

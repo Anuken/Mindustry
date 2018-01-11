@@ -61,6 +61,8 @@ public class NetServer extends Module{
                 player.name = packet.name;
                 player.isAndroid = packet.android;
                 player.set(Vars.control.core.worldx(), Vars.control.core.worldy() - Vars.tilesize*2);
+                player.getInterpolator().last.set(player.x, player.y);
+                player.getInterpolator().target.set(player.x, player.y);
                 player.add();
                 connections.put(id, player);
 
@@ -71,6 +73,20 @@ public class NetServer extends Module{
 
                 for(int i = 0; i < dp.playerWeapons.length; i ++){
                     dp.playerWeapons[i] = dp.players[i].weaponLeft.id;
+                }
+
+                dp.enemies = new EnemySpawnPacket[Vars.control.enemyGroup.amount()];
+
+                for(int i = 0; i < Vars.control.enemyGroup.amount(); i ++){
+                    Enemy enemy = Vars.control.enemyGroup.all().get(i);
+                    EnemySpawnPacket e = new EnemySpawnPacket();
+                    e.x = enemy.x;
+                    e.y = enemy.y;
+                    e.id = enemy.id;
+                    e.tier = (byte)enemy.tier;
+                    e.lane = (byte)enemy.lane;
+                    e.type = enemy.type.id;
+                    dp.enemies[i] = e;
                 }
 
                 UCore.log("Sending entities: " + Arrays.toString(dp.players));
@@ -102,6 +118,7 @@ public class NetServer extends Module{
 
         Net.handleServer(PositionPacket.class, pos -> {
             Player player = connections.get(Net.getLastConnection());
+            UCore.log("Recieving data: " + Arrays.toString(pos.data), "Player pos: " +player.x, player.y);
             player.getInterpolator().type.read(player, pos.data);
         });
 
@@ -186,6 +203,30 @@ public class NetServer extends Module{
             if(tile != null) tile.block().configure(tile, packet.data);
 
             Net.sendExcept(Net.getLastConnection(), packet, SendMode.tcp);
+        });
+
+        Net.handleServer(EntityRequestPacket.class, packet -> {
+            int id = packet.id;
+            int dest = Net.getLastConnection();
+            Gdx.app.postRunnable(() -> {
+                if(Vars.control.playerGroup.getByID(id) != null){
+                    Net.sendTo(dest, Vars.control.playerGroup.getByID(id), SendMode.tcp);
+                    Gdx.app.error("Mindustry", "Replying to entity request: player, " + id);
+                }else if (Vars.control.enemyGroup.getByID(id) != null){
+                    Enemy enemy = Vars.control.enemyGroup.getByID(id);
+                    EnemySpawnPacket e = new EnemySpawnPacket();
+                    e.x = enemy.x;
+                    e.y = enemy.y;
+                    e.id = enemy.id;
+                    e.tier = (byte)enemy.tier;
+                    e.lane = (byte)enemy.lane;
+                    e.type = enemy.type.id;
+                    Net.sendTo(dest, e, SendMode.tcp);
+                    Gdx.app.error("Mindustry", "Replying to entity request: enemy, " + id);
+                }else{
+                    Gdx.app.error("Mindustry", "Entity request target not found!");
+                }
+            });
         });
     }
 

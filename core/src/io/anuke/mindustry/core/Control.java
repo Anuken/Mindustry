@@ -12,6 +12,10 @@ import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.Shield;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyTypes;
+import io.anuke.mindustry.game.Difficulty;
+import io.anuke.mindustry.game.EnemySpawn;
+import io.anuke.mindustry.game.SpawnPoint;
+import io.anuke.mindustry.game.WaveCreator;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.DesktopInput;
@@ -53,16 +57,16 @@ public class Control extends Module{
 	public final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
 	public final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class);
 	
-	Array<EnemySpawn> spawns;
+	Array<io.anuke.mindustry.game.EnemySpawn> spawns;
 	int wave = 1;
 	int lastUpdated = -1;
 	float wavetime;
 	float extrawavetime;
 	int enemies = 0;
-	GameMode mode = GameMode.waves;
+	io.anuke.mindustry.game.GameMode mode = io.anuke.mindustry.game.GameMode.waves;
 	
 	Tile core;
-	Array<SpawnPoint> spawnpoints = new Array<>();
+	Array<io.anuke.mindustry.game.SpawnPoint> spawnpoints = new Array<>();
 	boolean shouldUpdateItems = false;
 	boolean wasPaused = false;
 
@@ -275,7 +279,7 @@ public class Control extends Module{
 		return core;
 	}
 	
-	public Array<SpawnPoint> getSpawnPoints(){
+	public Array<io.anuke.mindustry.game.SpawnPoint> getSpawnPoints(){
 		return spawnpoints;
 	}
 	
@@ -288,7 +292,7 @@ public class Control extends Module{
 	}
 	
 	public void addSpawnPoint(Tile tile){
-		SpawnPoint point = new SpawnPoint();
+		io.anuke.mindustry.game.SpawnPoint point = new SpawnPoint();
 		point.start = tile;
 		spawnpoints.add(point);
 	}
@@ -306,11 +310,11 @@ public class Control extends Module{
 		Timers.run(18, ()-> ui.loadfrag.hide());
 	}
 	
-	public GameMode getMode(){
+	public io.anuke.mindustry.game.GameMode getMode(){
 		return mode;
 	}
 	
-	public void setMode(GameMode mode){
+	public void setMode(io.anuke.mindustry.game.GameMode mode){
 		this.mode = mode;
 	}
 	
@@ -411,9 +415,11 @@ public class Control extends Module{
 	}
 	
 	float waveSpacing(){
-		int scale = Settings.getInt("difficulty");
-		float out = (scale == 0 ? 2f : scale == 1f ? 1f : 0.5f);
-		return wavespace*out;
+		return wavespace*getDifficulty().timeScaling;
+	}
+
+	public Difficulty getDifficulty(){
+		return Difficulty.values()[Settings.getInt("difficulty")];
 	}
 	
 	public boolean isHighScore(){

@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
-import io.anuke.mindustry.world.SpawnPoint;
+import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;

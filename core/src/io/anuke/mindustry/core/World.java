@@ -1,5 +1,6 @@
 package io.anuke.mindustry.core;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -24,7 +25,8 @@ import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class World extends Module{
 	private int seed;
@@ -108,7 +110,7 @@ public class World extends Module{
 	
 	public Tile tile(int x, int y){
 		if(tiles == null){
-			ui.showError("$text.error.crashmessage");
+			Gdx.app.postRunnable(() -> Vars.ui.showError("$text.error.crashmessage"));
 			GameState.set(State.menu);
 			return null;
 		}

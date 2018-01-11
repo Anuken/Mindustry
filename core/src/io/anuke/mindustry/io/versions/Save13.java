@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.io.SaveFileVersion;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Upgrade;

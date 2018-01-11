@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world;
+package io.anuke.mindustry.game;
 
 import io.anuke.ucore.util.Bundles;
 
