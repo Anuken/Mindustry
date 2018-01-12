@@ -83,12 +83,14 @@ public class NetServer extends Module{
             }
 
             sendMessage("[accent]"+Bundles.format("text.server.disconnected", player.name));
-            Gdx.app.postRunnable(player::remove);
+            Gdx.app.postRunnable(() -> {
+                player.remove();
 
-            DisconnectPacket dc = new DisconnectPacket();
-            dc.playerid = player.id;
+                DisconnectPacket dc = new DisconnectPacket();
+                dc.playerid = player.id;
 
-            Net.send(dc, SendMode.tcp);
+                Net.send(dc, SendMode.tcp);
+            });
         });
 
         Net.handleServer(PositionPacket.class, pos -> {
@@ -185,7 +187,7 @@ public class NetServer extends Module{
             Gdx.app.postRunnable(() -> {
                 if(Vars.control.playerGroup.getByID(id) != null){
                     Net.sendTo(dest, Vars.control.playerGroup.getByID(id), SendMode.tcp);
-                    Gdx.app.error("Mindustry", "Replying to entity request: player, " + id);
+                    Gdx.app.error("Mindustry", "Replying to entity request ("+Net.getLastConnection()+"): player, " + id);
                 }else if (Vars.control.enemyGroup.getByID(id) != null){
                     Enemy enemy = Vars.control.enemyGroup.getByID(id);
                     EnemySpawnPacket e = new EnemySpawnPacket();
@@ -196,7 +198,7 @@ public class NetServer extends Module{
                     e.lane = (byte)enemy.lane;
                     e.type = enemy.type.id;
                     Net.sendTo(dest, e, SendMode.tcp);
-                    Gdx.app.error("Mindustry", "Replying to entity request: enemy, " + id);
+                    Gdx.app.error("Mindustry", "Replying to entity request("+Net.getLastConnection()+"): enemy, " + id);
                 }else{
                     Gdx.app.error("Mindustry", "Entity request target not found!");
                 }

@@ -86,7 +86,9 @@ public class KryoServer implements ServerProvider {
                 try{
                     Net.handleServerReceived(object, connection.getID());
                 }catch (Exception e){
-                    Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
+                    //...do absolutely nothing.
+                    e.printStackTrace();
+                    //Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
                 }
             }
         });
@@ -133,7 +135,6 @@ public class KryoServer implements ServerProvider {
     @Override
     public void sendStream(int id, Streamable stream) {
         Connection connection = getByID(id);
-        UCore.log("Sending stream: " + stream.getClass().getSimpleName() + " / " + stream.stream.available());
 
         connection.addListener(new InputStreamSender(stream.stream, 512) {
             int id;

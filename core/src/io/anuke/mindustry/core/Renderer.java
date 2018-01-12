@@ -103,9 +103,9 @@ public class Renderer extends RendererModule{
 			
 			//TODO identify the source of this bug
 			if(control.core == null){
-				ui.showError("$text.error.crashmessage");
-				GameState.set(State.menu);
-				return;
+			//	ui.showError("$text.error.crashmessage");
+			//	GameState.set(State.menu);
+			//	return;
 			}
 
 			if(control.core.block() == ProductionBlocks.core){

@@ -133,8 +133,8 @@ public class NetClient extends Module {
                     if(sync == null){
                         Gdx.app.error("Mindustry", "Unknown entity ID: " + id + " " + (i >= packet.enemyStart ? "(enemy)" : "(player)"));
                         if(!requests.contains(id)){
-                            Gdx.app.error("Mindustry", "Sending entity request: " + id);
                             requests.add(id);
+                            Gdx.app.error("Mindustry", "Sending entity request: " + id);
                             EntityRequestPacket req = new EntityRequestPacket();
                             req.id = id;
                             Net.send(req, SendMode.tcp);
@@ -174,8 +174,9 @@ public class NetClient extends Module {
         });
 
         Net.handle(EnemySpawnPacket.class, spawn -> {
-            requests.remove(spawn.id);
             Gdx.app.postRunnable(() -> {
+                //duplicates.
+                if(Vars.control.enemyGroup.getByID(spawn.id) != null) return;
                 Enemy enemy = new Enemy(EnemyType.getByID(spawn.type));
                 enemy.set(spawn.x, spawn.y);
                 enemy.tier = spawn.tier;
@@ -260,10 +261,13 @@ public class NetClient extends Module {
         });
 
         Net.handle(Player.class, player -> {
-            requests.remove(player.id);
-            player.getInterpolator().last.set(player.x, player.y);
-            player.getInterpolator().target.set(player.x, player.y);
-            player.add();
+            Gdx.app.postRunnable(() -> {
+                //duplicates.
+                if(Vars.control.enemyGroup.getByID(player.id) != null) return;
+                player.getInterpolator().last.set(player.x, player.y);
+                player.getInterpolator().target.set(player.x, player.y);
+                player.add();
+            });
         });
 
         Net.handle(ChatPacket.class, packet -> Gdx.app.postRunnable(() -> Vars.ui.chatfrag.addMessage(packet.text, Vars.netClient.colorizeName(packet.id, packet.name))));
@@ -385,6 +389,10 @@ public class NetClient extends Module {
             PositionPacket packet = new PositionPacket();
             packet.data = Vars.player.getInterpolator().type.write(Vars.player);
             Net.send(packet, SendMode.udp);
+        }
+
+        if(Timers.get("updatePing", 60)){
+            Net.updatePing();
         }
     }
 }

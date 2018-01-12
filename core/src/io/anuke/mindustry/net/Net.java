@@ -157,6 +157,16 @@ public class Net{
 		}
 	}
 
+	/**Update client ping.*/
+	public static void updatePing(){
+		clientProvider.updatePing();
+	}
+
+	/**Get the client ping. Only valid after updatePing().*/
+	public static int getPing(){
+		return clientProvider.getPing();
+	}
+
 	/**Returns the last connection that sent a packet to this server.*/
 	public static int getLastConnection(){
 		return lastConnection;

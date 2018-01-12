@@ -1,13 +1,11 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
-import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.io.Maps;
 import io.anuke.mindustry.net.Net;
@@ -109,11 +107,9 @@ public class World extends Module{
 	}
 	
 	public Tile tile(int x, int y){
-		if(tiles == null){
-			Gdx.app.postRunnable(() -> Vars.ui.showError("$text.error.crashmessage"));
-			GameState.set(State.menu);
-			return null;
-		}
+		//if(tiles == null){
+		//	return null;
+		//}
 		if(!Mathf.inBounds(x, y, tiles)) return null;
 		return tiles[x][y];
 	}

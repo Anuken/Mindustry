@@ -48,6 +48,11 @@ public class Pathfind{
 
 		Tile[] path = Vars.control.getSpawnPoints().get(enemy.lane).pathTiles;
 
+		if(enemy.node >= path.length){
+			enemy.node = -1;
+			return vector.set(enemy.x, enemy.y);
+		}
+
 		//if an enemy is idle for a while, it's probably stuck
 		if(enemy.idletime > EnemyType.maxIdle){
 

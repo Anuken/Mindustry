@@ -95,7 +95,8 @@ public class HudFragment implements Fragment{
 
 			visible(()->!GameState.is(State.menu));
 			
-			Label fps = new Label(()->(Settings.getBool("fps") ? (Gdx.graphics.getFramesPerSecond() + " FPS") : ""));
+			Label fps = new Label(()->(Settings.getBool("fps") ? (Gdx.graphics.getFramesPerSecond() + " FPS") +
+					(Net.active() ? " / Ping: " + Net.getPing() : ""): ""));
 			row();
 			add(fps).size(-1);
 			
@@ -122,6 +123,11 @@ public class HudFragment implements Fragment{
 		new table("white"){{
 			respawntable = get();
 			respawntable.setColor(Color.CLEAR);
+			update(t -> {
+				if(GameState.is(State.menu)){
+					respawntable.setColor(Color.CLEAR);
+				}
+			});
 		}}.end();
 		
 		//respawn table
