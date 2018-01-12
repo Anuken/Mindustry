@@ -27,7 +27,7 @@ public enum Difficulty {
     public final float enemyScaling;
     /**Multiplier of the time between waves.*/
     public final float timeScaling;
-
+    /**Pathfdining heuristic for calculating tile costs.*/
     public final Heuristic<Tile> heuristic;
 
     Difficulty(float enemyScaling, float timeScaling, Heuristic<Tile> heuristic){

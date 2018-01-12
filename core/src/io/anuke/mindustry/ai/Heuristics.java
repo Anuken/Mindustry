@@ -4,11 +4,6 @@ import com.badlogic.gdx.ai.pfa.Heuristic;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.defense.Turret;
-import io.anuke.mindustry.world.blocks.types.production.Drill;
-import io.anuke.mindustry.world.blocks.types.production.Generator;
-import io.anuke.mindustry.world.blocks.types.production.Pump;
-import io.anuke.mindustry.world.blocks.types.production.Smelter;
 import io.anuke.ucore.function.Predicate;
 
 public class Heuristics {
@@ -17,6 +12,7 @@ public class Heuristics {
     /**How many times more it costs to go through a tile that touches a solid block.*/
     static final float occludedMultiplier = 5f;
 
+    /**Calculates the fastest path. No priorities, just avoids solid blocks.*/
     public static class FastestHeuristic implements Heuristic<Tile> {
 
         @Override
@@ -37,7 +33,9 @@ public class Heuristics {
         }
     }
 
+    /**Calculates the fastest and most destructive path based on a block predicate.*/
     public static class DestrutiveHeuristic implements Heuristic<Tile> {
+        /**Should return whether a block if "free", e.g. whether it's an important target*/
         private final Predicate<Block> frees;
 
         public DestrutiveHeuristic(Predicate<Block> frees){
@@ -61,15 +59,10 @@ public class Heuristics {
             if(other.getLinked() != null) other = other.getLinked();
             if(node.getLinked() != null) node = node.getLinked();
 
-            //generators are free!
+            //check if it's free
             if(frees.test(other.block()) || frees.test(node.block())) cost = 0;
 
             return cost;
-        }
-
-        private boolean generator(Tile tile){
-            return tile.block() instanceof Generator || tile.block() instanceof Turret
-                    || tile.block() instanceof Pump || tile.block() instanceof Drill || tile.block() instanceof Smelter;
         }
     }
 }
