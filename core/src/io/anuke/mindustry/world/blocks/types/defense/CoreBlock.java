@@ -19,7 +19,7 @@ public class CoreBlock extends Block {
 
     @Override
     public int handleDamage(Tile tile, int amount){
-        return Vars.debug ? amount : amount;
+        return Vars.debug ? 0 : amount;
     }
 
     @Override

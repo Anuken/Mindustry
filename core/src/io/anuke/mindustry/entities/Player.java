@@ -123,7 +123,7 @@ public class Player extends DestructibleEntity implements Syncable{
 
 		dashing = Inputs.keyDown("dash");
 		
-		float speed = dashing ? Player.dashSpeed : Player.speed;
+		float speed = dashing ? (debug ? Player.dashSpeed * 5f : Player.dashSpeed) : Player.speed;
 		
 		if(health < maxhealth && Timers.get(this, "regen", 20))
 			health ++;

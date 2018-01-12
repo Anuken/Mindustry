@@ -8,6 +8,7 @@ public abstract class PlatformFunction{
 	public String format(Date date){return "invalid";}
 	public String format(int number){return "invalid";}
 	public void openLink(String link){}
+	public void showError(String text){}
 	public void addDialog(TextField field){
 		addDialog(field, 16);
 	}

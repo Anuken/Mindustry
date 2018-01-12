@@ -148,7 +148,7 @@ public class Save13 extends SaveFileVersion {
         for(int i = 0; i < rocks; i ++){
             int pos = stream.readInt();
             Tile tile = Vars.world.tile(pos % Vars.world.width(), pos / Vars.world.width());
-            Block result = Generator.rocks.get(tile.floor());
+            Block result = WorldGenerator.rocks.get(tile.floor());
             if(result != null) tile.setBlock(result);
         }
 

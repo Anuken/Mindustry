@@ -45,10 +45,17 @@ public class Mindustry extends ModuleCore {
 		I18NBundle.setExceptionOnMissingKey(false);
 
 		if(externalBundle){
-			FileHandle handle = Gdx.files.local("bundle");
+			try {
+				FileHandle handle = Gdx.files.local("bundle");
 
-			Locale locale = Locale.ENGLISH;
-			Core.bundle = I18NBundle.createBundle(handle, locale);
+				Locale locale = Locale.ENGLISH;
+				Core.bundle = I18NBundle.createBundle(handle, locale);
+			}catch (Exception e){
+				e.printStackTrace();
+				platforms.showError("Failed to find bundle!\nMake sure you have bundle.properties in the same directory\nas the jar file.\n\nIf the problem persists, try running it through the command prompt:\n" +
+						"Hold left-shift, then right click and select 'open command prompt here'.\nThen, type in 'java -jar mindustry.jar' without quotes.");
+				Gdx.app.exit();
+			}
 		}else{
 			FileHandle handle = Gdx.files.internal("bundles/bundle");
 

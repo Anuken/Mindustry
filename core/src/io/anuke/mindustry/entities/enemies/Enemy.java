@@ -30,6 +30,7 @@ public class Enemy extends DestructibleEntity implements Syncable{
 	public Entity target;
 	public float hitTime;
 	public int tier = 1;
+	public Vector2 totalMove = new Vector2();
 
 	public Enemy(EnemyType type){
 		this.type = type;

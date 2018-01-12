@@ -26,6 +26,7 @@ import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BaseBulletType;
+import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.modules.Module;
 
@@ -37,7 +38,7 @@ public class NetClient extends Module {
             Color.GOLD, Color.PINK, Color.SKY, Color.GOLD, Color.VIOLET,
             Color.GREEN, Color.CORAL, Color.CYAN, Color.CHARTREUSE};
     boolean connecting = false;
-    boolean gotEntities = false, gotData = false;
+    boolean gotData = false;
     boolean kicked = false;
     IntSet requests = new IntSet();
     float playerSyncTime = 2;
@@ -48,22 +49,23 @@ public class NetClient extends Module {
         Net.handle(Connect.class, packet -> {
             requests.clear();
             connecting = true;
-            gotEntities = false;
             gotData = false;
             kicked = false;
 
             Gdx.app.postRunnable(() -> {
                 Vars.ui.loadfrag.hide();
                 Vars.ui.loadfrag.show("$text.connecting.data");
+
+                Entities.clear();
+
+                ConnectPacket c = new ConnectPacket();
+                c.name = Vars.player.name;
+                c.android = Vars.android;
+                Net.send(c, SendMode.tcp);
             });
 
-            ConnectPacket c = new ConnectPacket();
-            c.name = Vars.player.name;
-            c.android = Vars.android;
-            Net.send(c, SendMode.tcp);
-
             Timers.runTask(dataTimeout, () -> {
-                if(!gotEntities){
+                if(!gotData){
                     Gdx.app.error("Mindustry", "Failed to load data!");
                     Vars.ui.loadfrag.hide();
                     Net.disconnect();
@@ -90,32 +92,18 @@ public class NetClient extends Module {
                 NetworkIO.load(data.stream);
                 Vars.player.set(Vars.control.core.worldx(), Vars.control.core.worldy() - Vars.tilesize*2);
 
-                GameState.set(State.playing);
                 connecting = false;
                 Vars.ui.loadfrag.hide();
                 Vars.ui.join.hide();
                 gotData = true;
-            });
-        });
 
-        Net.handle(EntityDataPacket.class, data -> {
-
-            Gdx.app.postRunnable(() -> {
-                Timers.run(10f, () -> { //TODO hack. should only run once world data is recieved
-                    Vars.control.playerGroup.remap(Vars.player, data.playerid);
-
-                    for(int i = 0; i < data.weapons.length; i ++){
-                        Vars.control.addWeapon((Weapon) Upgrade.getByID(data.weapons[i]));
-                    }
-                    Vars.player.weaponLeft = Vars.player.weaponRight = Vars.control.getWeapons().peek();
-                    Vars.ui.hudfrag.updateWeapons();
-                    gotEntities = true;
-                });
+                Net.send(new ConnectConfirmPacket(), SendMode.tcp);
+                GameState.set(State.playing);
             });
         });
 
         Net.handle(SyncPacket.class, packet -> {
-            if(!gotEntities) return;
+            if(!gotData) return;
 
             //TODO awful code
             for(int i = 0; i < packet.ids.length; i ++){
@@ -177,11 +165,13 @@ public class NetClient extends Module {
             Gdx.app.postRunnable(() -> {
                 //duplicates.
                 if(Vars.control.enemyGroup.getByID(spawn.id) != null) return;
+
                 Enemy enemy = new Enemy(EnemyType.getByID(spawn.type));
                 enemy.set(spawn.x, spawn.y);
                 enemy.tier = spawn.tier;
                 enemy.lane = spawn.lane;
                 enemy.id = spawn.id;
+                enemy.health = spawn.health;
                 enemy.add();
 
                 Effects.effect(Fx.spawn, enemy);
@@ -221,7 +211,7 @@ public class NetClient extends Module {
         });
 
         Net.handle(BlockSyncPacket.class, packet -> {
-            if(!gotEntities) return;
+            if(!gotData) return;
 
             DataInputStream stream = new DataInputStream(packet.stream);
 
@@ -306,7 +296,7 @@ public class NetClient extends Module {
         if(!Net.client() || !Net.active()) return;
 
         if(!GameState.is(State.menu) && Net.active()){
-            if(gotEntities && gotData) sync();
+            if(gotData) sync();
         }else if(!connecting){
             Net.disconnect();
         }

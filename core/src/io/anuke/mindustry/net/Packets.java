@@ -17,11 +17,6 @@ public class Packets {
 
     }
 
-    public static class EntityDataPacket{
-        public int playerid;
-        public byte[] weapons;
-    }
-
     public static class SyncPacket{
         public int[] ids;
         public float[][] data;
@@ -35,6 +30,10 @@ public class Packets {
     public static class ConnectPacket{
         public String name;
         public boolean android;
+    }
+
+    public static class ConnectConfirmPacket{
+
     }
 
     public static class DisconnectPacket{
@@ -85,6 +84,7 @@ public class Packets {
     public static class EnemySpawnPacket{
         public byte type, lane, tier;
         public float x, y;
+        public short health;
         public int id;
     }
 

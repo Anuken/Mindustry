@@ -16,7 +16,7 @@ import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.noise.Noise;
 import io.anuke.ucore.util.Mathf;
 
-public class Generator{
+public class WorldGenerator {
 	public static final ObjectMap<Block, Block> rocks = new ObjectMap(){{
 		put(Blocks.stone, Blocks.rock);
 		put(Blocks.snow, Blocks.icerock);

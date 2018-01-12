@@ -18,6 +18,7 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Strings;
 import io.anuke.ucore.util.Tmp;
 
 import static io.anuke.mindustry.Vars.world;
@@ -30,8 +31,7 @@ public class EnemyType {
 
     public final static Color[] tierColors = { Color.valueOf("ffe451"), Color.valueOf("f48e20"), Color.valueOf("ff6757"), Color.valueOf("ff2d86") };
     public final static int maxtier = 4;
-    public final static float maxIdle = 60*1.5f;
-    public final static float maxIdleLife = 60f*13f; //13 seconds idle = death
+    public final static float maxIdleLife = 60f*2f; //2 seconds idle = death
     public final static float hitDuration = 5f;
 
     public final String name;
@@ -56,6 +56,7 @@ public class EnemyType {
 
     protected final int timerTarget = timeid ++;
     protected final int timerReload = timeid ++;
+    protected final int timerReset = timeid ++;
 
     public EnemyType(String name){
         this.id = lastid++;
@@ -76,6 +77,14 @@ public class EnemyType {
         Draw.color();
 
         Graphics.flush();
+
+        if(Vars.showPaths){
+            Draw.tscl(0.25f);
+            Draw.text((int)enemy.idletime + "\n" + Strings.toFixed(enemy.totalMove.x, 2) + ", "
+                    + Strings.toFixed(enemy.totalMove.x, 2), enemy.x, enemy.y);
+            Draw.tscl(Vars.fontscale);
+        }
+
         Shaders.outline.lighten = 0f;
     }
 
@@ -90,13 +99,22 @@ public class EnemyType {
         move(enemy);
 
         enemy.velocity.set(enemy.x - lastx, enemy.y - lasty).scl(1f / Timers.delta());
+        enemy.totalMove.add(enemy.velocity);
 
         float minv = 0.07f;
+
+        if(enemy.timer.get(timerReset, 60)){
+            enemy.totalMove.setZero();
+        }
 
         if(enemy.velocity.len() < minv && enemy.node > 0 && enemy.target == null){
             enemy.idletime += Timers.delta();
         }else{
             enemy.idletime = 0;
+        }
+
+        if(enemy.timer.getTime(timerReset) > 40 && enemy.totalMove.len() < 0.3f && enemy.node > 0 && enemy.target == null){
+            enemy.idletime = 999999f;
         }
 
         Tile tile = world.tileWorld(enemy.x, enemy.y);

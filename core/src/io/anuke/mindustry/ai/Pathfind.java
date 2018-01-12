@@ -1,12 +1,13 @@
 package io.anuke.mindustry.ai;
 
+import com.badlogic.gdx.ai.pfa.Heuristic;
 import com.badlogic.gdx.ai.pfa.PathFinderRequest;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.ai.Heuristics.DestrutiveHeuristic;
 import io.anuke.mindustry.entities.enemies.Enemy;
-import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.UCore;
@@ -20,7 +21,7 @@ public class Pathfind{
 	private static final long maxTime = 1000000 * 5;
 
 	/**Heuristic for determining cost between two tiles*/
-	HeuristicImpl heuristic = new HeuristicImpl();
+	Heuristic<Tile> heuristic = new DestrutiveHeuristic();
 	/**Tile graph, for determining conenctions between two tiles*/
 	TileGraph graph = new TileGraph();
 	/**Smoother that removes extra nodes from a path.*/
@@ -54,17 +55,17 @@ public class Pathfind{
 		}
 
 		//if an enemy is idle for a while, it's probably stuck
-		if(enemy.idletime > EnemyType.maxIdle){
+		//if(enemy.idletime > EnemyType.maxIdle){
 
-			Tile target = path[enemy.node];
-			if(Vars.world.raycastWorld(enemy.x, enemy.y, target.worldx(), target.worldy()) != null) {
-				if (enemy.node > 1)
-					enemy.node = enemy.node - 1;
-				enemy.idletime = 0;
-			}
+			//Tile target = path[enemy.node];
+			//if(Vars.world.raycastWorld(enemy.x, enemy.y, target.worldx(), target.worldy()) != null) {
+			//	if (enemy.node > 1)
+			//		enemy.node = enemy.node - 1;
+			//	enemy.idletime = 0;
+			//}
 
 			//else, must be blocked by a playermade block, do nothing
-		}
+		//}
 		
 		//-1 is only possible here if both pathfindings failed, which should NOT happen
 		//check graph code
@@ -82,6 +83,12 @@ public class Pathfind{
 		Tile prev = path[enemy.node - 1];
 
 		Tile target = path[enemy.node];
+
+		//a bridge has broken
+		if(!Vars.world.passable(target.x, target.y)){
+			remakePath();
+			return vector.set(enemy.x, enemy.y);
+		}
 		
 		float projectLen = Vector2.dst(prev.worldx(), prev.worldy(), target.worldx(), target.worldy()) / 6f;
 		
@@ -122,6 +129,15 @@ public class Pathfind{
 			
 		return vector;
 		
+	}
+
+	private void remakePath(){
+		for(int i = 0; i < Vars.control.enemyGroup.amount(); i ++){
+			Enemy enemy = Vars.control.enemyGroup.all().get(i);
+			enemy.node = -1;
+		}
+
+		resetPaths();
 	}
 
 	/**Update the pathfinders and continue calculating the path if it hasn't been calculated yet.

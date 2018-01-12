@@ -7,23 +7,10 @@ import io.anuke.mindustry.world.Tile;
 
 /**Tilegraph that ignores player-made tiles.*/
 public class TileGraph implements OptimizedGraph<Tile> {
-	private Array<Connection<Tile>> tempConnections = new Array<Connection<Tile>>(4);
 
-	/**Used for the default Graph implementation. Returns a result similar to connectionsOf()*/
+	/**return nothing, as this isn't used*/
 	@Override
-	public Array<Connection<Tile>> getConnections(Tile fromNode){
-		tempConnections.clear();
-		
-		if(!fromNode.passable())
-			return tempConnections;
-		
-		for(Tile tile : fromNode.getNearby()){
-			if(tile != null && (tile.passable()))
-				tempConnections.add(new TileConnection(fromNode, tile));
-		}
-		
-		return tempConnections;
-	}
+	public Array<Connection<Tile>> getConnections(Tile fromNode){ return null; }
 
 	/**Used for the OptimizedPathFinder implementation.*/
 	@Override

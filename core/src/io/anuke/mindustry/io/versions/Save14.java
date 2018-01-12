@@ -12,7 +12,7 @@ import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.game.GameMode;
-import io.anuke.mindustry.world.Generator;
+import io.anuke.mindustry.world.WorldGenerator;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
@@ -165,7 +165,7 @@ public class Save14 extends SaveFileVersion{
         for(int i = 0; i < rocks; i ++){
             int pos = stream.readInt();
             Tile tile = Vars.world.tile(pos % Vars.world.width(), pos / Vars.world.width());
-            Block result = Generator.rocks.get(tile.floor());
+            Block result = WorldGenerator.rocks.get(tile.floor());
             if(result != null) tile.setBlock(result);
         }
 

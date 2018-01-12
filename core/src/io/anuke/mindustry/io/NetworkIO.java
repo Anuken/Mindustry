@@ -1,15 +1,15 @@
 package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ByteArray;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.enemies.Enemy;
-import io.anuke.mindustry.entities.enemies.EnemyType;
+import io.anuke.mindustry.game.GameMode;
+import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.WorldGenerator;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.mindustry.world.blocks.types.Rock;
@@ -19,9 +19,9 @@ import io.anuke.ucore.entities.Entities;
 import java.io.*;
 
 public class NetworkIO {
-    private static final int fileVersionID = 13;
+    private static final int fileVersionID = 14;
 
-    public static void write(OutputStream os){
+    public static void write(int playerID, ByteArray upgrades, OutputStream os){
 
         try(DataOutputStream stream = new DataOutputStream(os)){
 
@@ -36,28 +36,20 @@ public class NetworkIO {
 
             stream.writeInt(Vars.control.getWave()); //wave
             stream.writeFloat(Vars.control.getWaveCountdown()); //wave countdown
+            stream.writeInt(Vars.control.enemyGroup.amount()); //enemy amount
+
+            stream.writeInt(playerID); //player remap ID
 
             //--INVENTORY--
 
-            for(int i = 0; i < Vars.control.getItems().length; i ++){
+            for(int i = 0; i < Vars.control.getItems().length; i ++){ //items
                 stream.writeInt(Vars.control.getItems()[i]);
             }
 
-            //--ENEMIES--
-            Array<Enemy> enemies = Vars.control.enemyGroup.all();
+            stream.writeByte(upgrades.size); //upgrade data
 
-            stream.writeInt(enemies.size); //enemy amount
-
-            for(int i = 0; i < enemies.size; i ++){
-                Enemy enemy = enemies.get(i);
-                stream.writeInt(enemy.id);
-                stream.writeByte(enemy.type.id); //type
-                stream.writeByte(enemy.lane); //lane
-                stream.writeFloat(enemy.x); //x
-                stream.writeFloat(enemy.y); //y
-                stream.writeByte(enemy.tier); //tier
-                stream.writeShort(enemy.health); //health
-                stream.writeShort(enemy.node); //current node
+            for(int i = 0; i < upgrades.size; i ++){
+                stream.writeByte(upgrades.get(i));
             }
 
             //--MAP DATA--
@@ -166,7 +158,7 @@ public class NetworkIO {
             Timers.resetTime(timerTime + (TimeUtils.timeSinceMillis(timestamp) / 1000f) * 60f);
 
             if(version != fileVersionID){
-                throw new RuntimeException("Save file version mismatch!");
+                throw new RuntimeException("Netcode version mismatch!");
             }
 
             //general state
@@ -175,8 +167,12 @@ public class NetworkIO {
 
             int wave = stream.readInt();
             float wavetime = stream.readFloat();
+            int enemies = stream.readInt();
 
+            Vars.control.setWaveData(enemies, wave, wavetime);
             Vars.control.setMode(GameMode.values()[mode]);
+
+            int pid = stream.readInt();
 
             //inventory
             for(int i = 0; i < Vars.control.getItems().length; i ++){
@@ -187,38 +183,18 @@ public class NetworkIO {
 
             Vars.control.getWeapons().clear();
             Vars.control.getWeapons().add(Weapon.blaster);
-            Vars.player.weaponLeft = Vars.player.weaponRight = Weapon.blaster;
-            Vars.ui.hudfrag.updateWeapons();
 
-            //enemies
+            byte weapons = stream.readByte();
 
-            Entities.clear();
-
-            int enemies = stream.readInt();
-
-            for(int i = 0; i < enemies; i ++){
-                int id = stream.readInt();
-                byte type = stream.readByte();
-                int lane = stream.readByte();
-                float x = stream.readFloat();
-                float y = stream.readFloat();
-                byte tier = stream.readByte();
-                short health = stream.readShort();
-                short node = stream.readShort();
-
-                Enemy enemy = new Enemy(EnemyType.getByID(type));
-                enemy.id = id;
-                enemy.lane = lane;
-                enemy.health = health;
-                enemy.x = x;
-                enemy.y = y;
-                enemy.tier = tier;
-                enemy.node = node;
-                enemy.add(Vars.control.enemyGroup);
+            for(int i = 0; i < weapons; i ++){
+                Vars.control.getWeapons().add((Weapon) Upgrade.getByID(stream.readByte()));
             }
 
-            Vars.control.setWaveData(enemies, wave, wavetime);
+            Vars.player.weaponLeft = Vars.player.weaponRight = Vars.control.getWeapons().peek();
+            Vars.ui.hudfrag.updateWeapons();
 
+            Entities.clear();
+            Vars.player.id = pid;
             Vars.player.add();
 
             //map
@@ -246,7 +222,7 @@ public class NetworkIO {
             for(int i = 0; i < rocks; i ++){
                 int pos = stream.readInt();
                 Tile tile = Vars.world.tile(pos % Vars.world.width(), pos / Vars.world.width());
-                Block result = io.anuke.mindustry.world.Generator.rocks.get(tile.floor());
+                Block result = WorldGenerator.rocks.get(tile.floor());
                 if(result != null) tile.setBlock(result);
             }
 

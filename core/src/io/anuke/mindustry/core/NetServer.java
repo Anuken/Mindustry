@@ -43,18 +43,7 @@ public class NetServer extends Module{
 
             UCore.log("Sending world data to client (ID="+id+")");
 
-            WorldData data = new WorldData();
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            NetworkIO.write(stream);
-
-            UCore.log("Packed " + stream.size() + " uncompressed bytes of data.");
-            data.stream = new ByteArrayInputStream(stream.toByteArray());
-
-            Net.sendStream(id, data);
-
             Gdx.app.postRunnable(() -> {
-                EntityDataPacket dp = new EntityDataPacket();
-
                 Player player = new Player();
                 player.clientid = id;
                 player.name = packet.name;
@@ -62,16 +51,27 @@ public class NetServer extends Module{
                 player.set(Vars.control.core.worldx(), Vars.control.core.worldy() - Vars.tilesize*2);
                 player.getInterpolator().last.set(player.x, player.y);
                 player.getInterpolator().target.set(player.x, player.y);
-                player.add();
                 connections.put(id, player);
 
-                dp.playerid = player.id;
-                dp.weapons = weapons.get(packet.name, new ByteArray()).toArray();
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                NetworkIO.write(player.id, weapons.get(packet.name, new ByteArray()), stream);
 
-                Net.sendTo(id, dp, SendMode.tcp);
+                UCore.log("Packed " + stream.size() + " uncompressed bytes of data.");
 
-                sendMessage("[accent]"+Bundles.format("text.server.connected", packet.name));
+                WorldData data = new WorldData();
+                data.stream = new ByteArrayInputStream(stream.toByteArray());
+
+                Net.sendStream(id, data);
             });
+        });
+
+        Net.handleServer(ConnectConfirmPacket.class, packet -> {
+            Player player = connections.get(Net.getLastConnection());
+
+            if(player == null) return;
+
+            Gdx.app.postRunnable(player::add);
+            sendMessage("[accent]"+Bundles.format("text.server.connected", player.name));
         });
 
         Net.handleServer(Disconnect.class, packet -> {
@@ -197,6 +197,7 @@ public class NetServer extends Module{
                     e.tier = (byte)enemy.tier;
                     e.lane = (byte)enemy.lane;
                     e.type = enemy.type.id;
+                    e.health = (short)enemy.health;
                     Net.sendTo(dest, e, SendMode.tcp);
                     Gdx.app.error("Mindustry", "Replying to entity request("+Net.getLastConnection()+"): enemy, " + id);
                 }else{

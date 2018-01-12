@@ -18,7 +18,6 @@ public class Registrator {
                 StreamChunk.class,
                 WorldData.class,
                 SyncPacket.class,
-                EntityDataPacket.class,
                 PositionPacket.class,
                 ShootPacket.class,
                 PlacePacket.class,
@@ -39,6 +38,7 @@ public class Registrator {
                 BlockTapPacket.class,
                 BlockConfigPacket.class,
                 EntityRequestPacket.class,
+                ConnectConfirmPacket.class,
 
                 Class.class,
                 byte[].class,

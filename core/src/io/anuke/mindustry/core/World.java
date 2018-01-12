@@ -10,7 +10,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.io.Maps;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Generator;
+import io.anuke.mindustry.world.WorldGenerator;
 import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
@@ -180,7 +180,7 @@ public class World extends Module{
 		Entities.resizeTree(0, 0, map.getWidth() * tilesize, map.getHeight() * tilesize);
 		
 		this.seed = seed;
-		Generator.generate(map.pixmap, tiles);
+		WorldGenerator.generate(map.pixmap, tiles);
 		
 		if(control.getCore() == null) return;
 

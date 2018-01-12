@@ -8,14 +8,13 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.Bullet;
+import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Shield;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyTypes;
-import io.anuke.mindustry.game.Difficulty;
-import io.anuke.mindustry.game.EnemySpawn;
-import io.anuke.mindustry.game.SpawnPoint;
-import io.anuke.mindustry.game.WaveCreator;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.DesktopInput;
@@ -25,7 +24,9 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
-import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Map;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
@@ -63,7 +64,7 @@ public class Control extends Module{
 	float wavetime;
 	float extrawavetime;
 	int enemies = 0;
-	io.anuke.mindustry.game.GameMode mode = io.anuke.mindustry.game.GameMode.waves;
+	GameMode mode = GameMode.waves;
 	
 	Tile core;
 	Array<io.anuke.mindustry.game.SpawnPoint> spawnpoints = new Array<>();
@@ -180,6 +181,7 @@ public class Control extends Module{
 				"rotate_alt", new Axis(Input.CONTROLLER_DPAD_RIGHT, Input.CONTROLLER_DPAD_LEFT),
 				"rotate", new Axis(Input.CONTROLLER_A, Input.CONTROLLER_B),
 				"player_list", Input.CONTROLLER_START,
+				"chat", Input.ENTER,
 				"weapon_1", Input.NUM_1,
 				"weapon_2", Input.NUM_2,
 				"weapon_3", Input.NUM_3,
@@ -279,7 +281,7 @@ public class Control extends Module{
 		return core;
 	}
 	
-	public Array<io.anuke.mindustry.game.SpawnPoint> getSpawnPoints(){
+	public Array<SpawnPoint> getSpawnPoints(){
 		return spawnpoints;
 	}
 	
@@ -292,7 +294,7 @@ public class Control extends Module{
 	}
 	
 	public void addSpawnPoint(Tile tile){
-		io.anuke.mindustry.game.SpawnPoint point = new SpawnPoint();
+		SpawnPoint point = new SpawnPoint();
 		point.start = tile;
 		spawnpoints.add(point);
 	}
@@ -310,11 +312,11 @@ public class Control extends Module{
 		Timers.run(18, ()-> ui.loadfrag.hide());
 	}
 	
-	public io.anuke.mindustry.game.GameMode getMode(){
+	public GameMode getMode(){
 		return mode;
 	}
 	
-	public void setMode(io.anuke.mindustry.game.GameMode mode){
+	public void setMode(GameMode mode){
 		this.mode = mode;
 	}
 	
@@ -597,7 +599,7 @@ public class Control extends Module{
 			}
 
 			if(Inputs.keyTap(Keys.U)){
-				Vars.showUI = !Vars.showUI;
+				Vars.showPaths = !Vars.showPaths;
 			}
 			
 			if(Inputs.keyTap(Keys.O)){

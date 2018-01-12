@@ -82,6 +82,11 @@ public class DesktopLauncher {
 			}
 
 			@Override
+			public void showError(String text){
+				JOptionPane.showMessageDialog(null, text);
+			}
+
+			@Override
 			public void updateRPC() {
 				DiscordRichPresence presence = new DiscordRichPresence();
 
