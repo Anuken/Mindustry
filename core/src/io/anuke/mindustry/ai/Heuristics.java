@@ -2,12 +2,14 @@ package io.anuke.mindustry.ai;
 
 import com.badlogic.gdx.ai.pfa.Heuristic;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.defense.Turret;
 import io.anuke.mindustry.world.blocks.types.production.Drill;
 import io.anuke.mindustry.world.blocks.types.production.Generator;
 import io.anuke.mindustry.world.blocks.types.production.Pump;
 import io.anuke.mindustry.world.blocks.types.production.Smelter;
+import io.anuke.ucore.function.Predicate;
 
 public class Heuristics {
     /**How many times more it costs to go through a destructible block than an empty block.*/
@@ -36,6 +38,11 @@ public class Heuristics {
     }
 
     public static class DestrutiveHeuristic implements Heuristic<Tile> {
+        private final Predicate<Block> frees;
+
+        public DestrutiveHeuristic(Predicate<Block> frees){
+            this.frees = frees;
+        }
 
         @Override
         public float estimate(Tile node, Tile other){
@@ -51,8 +58,11 @@ public class Heuristics {
             //if this block has solid blocks near it, increase the cost, as we don't want enemies hugging walls
             if(node.occluded) cost += Vars.tilesize*occludedMultiplier;
 
+            if(other.getLinked() != null) other = other.getLinked();
+            if(node.getLinked() != null) node = node.getLinked();
+
             //generators are free!
-            if(generator(other) || generator(node)) cost = 0;
+            if(frees.test(other.block()) || frees.test(node.block())) cost = 0;
 
             return cost;
         }

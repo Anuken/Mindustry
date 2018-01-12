@@ -1,12 +1,10 @@
 package io.anuke.mindustry.ai;
 
-import com.badlogic.gdx.ai.pfa.Heuristic;
 import com.badlogic.gdx.ai.pfa.PathFinderRequest;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.ai.Heuristics.DestrutiveHeuristic;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
@@ -20,8 +18,6 @@ public class Pathfind{
 	/**Maximum time taken per frame on pathfinding for a single path.*/
 	private static final long maxTime = 1000000 * 5;
 
-	/**Heuristic for determining cost between two tiles*/
-	Heuristic<Tile> heuristic = new DestrutiveHeuristic();
 	/**Tile graph, for determining conenctions between two tiles*/
 	TileGraph graph = new TileGraph();
 	/**Smoother that removes extra nodes from a path.*/
@@ -53,29 +49,8 @@ public class Pathfind{
 			enemy.node = -1;
 			return vector.set(enemy.x, enemy.y);
 		}
-
-		//if an enemy is idle for a while, it's probably stuck
-		//if(enemy.idletime > EnemyType.maxIdle){
-
-			//Tile target = path[enemy.node];
-			//if(Vars.world.raycastWorld(enemy.x, enemy.y, target.worldx(), target.worldy()) != null) {
-			//	if (enemy.node > 1)
-			//		enemy.node = enemy.node - 1;
-			//	enemy.idletime = 0;
-			//}
-
-			//else, must be blocked by a playermade block, do nothing
-		//}
-		
-		//-1 is only possible here if both pathfindings failed, which should NOT happen
-		//check graph code
 		
 		if(enemy.node <= -1){
-			return vector.set(enemy.x, enemy.y);
-		}
-
-		if(enemy.node >= path.length){
-			enemy.node = -1;
 			return vector.set(enemy.x, enemy.y);
 		}
 
@@ -84,7 +59,7 @@ public class Pathfind{
 
 		Tile target = path[enemy.node];
 
-		//a bridge has broken
+		//a bridge has been broken, re-path
 		if(!Vars.world.passable(target.x, target.y)){
 			remakePath();
 			return vector.set(enemy.x, enemy.y);
@@ -131,6 +106,7 @@ public class Pathfind{
 		
 	}
 
+	/**Re-calculate paths for all enemies. Runs when a path changes while moving.*/
 	private void remakePath(){
 		for(int i = 0; i < Vars.control.enemyGroup.amount(); i ++){
 			Enemy enemy = Vars.control.enemyGroup.all().get(i);
@@ -169,13 +145,13 @@ public class Pathfind{
 
 		//warmup
 		for(int i = 0; i < 100; i ++){
-			point.finder.searchNodePath(point.start, Vars.control.getCore(), heuristic, point.path);
+			point.finder.searchNodePath(point.start, Vars.control.getCore(), Vars.control.getDifficulty().heuristic, point.path);
 			point.path.clear();
 		}
 
 		Timers.mark();
 		for(int i = 0; i < amount; i ++){
-			point.finder.searchNodePath(point.start, Vars.control.getCore(), heuristic, point.path);
+			point.finder.searchNodePath(point.start, Vars.control.getCore(), Vars.control.getDifficulty().heuristic, point.path);
 			point.path.clear();
 		}
 		UCore.log("Time elapsed: " + Timers.elapsed() + "ms\nAverage MS per path: " + Timers.elapsed()/amount);
@@ -190,7 +166,7 @@ public class Pathfind{
 			
 			point.pathTiles = null;
 			
-			point.request = new PathFinderRequest<>(point.start, Vars.control.getCore(), heuristic, point.path);
+			point.request = new PathFinderRequest<>(point.start, Vars.control.getCore(), Vars.control.getDifficulty().heuristic, point.path);
 			point.request.statusChanged = true; //IMPORTANT!
 		}
 	}

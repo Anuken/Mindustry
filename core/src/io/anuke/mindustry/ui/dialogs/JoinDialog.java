@@ -117,6 +117,7 @@ public class JoinDialog extends FloatingDialog {
                 while(t.getCause() != null){
                     t = t.getCause();
                 }
+                //TODO localize
                 String error = t.getMessage() == null ? "" : t.getMessage().toLowerCase();
                 if(error.contains("connection refused")) {
                     error = "connection refused";
@@ -125,7 +126,7 @@ public class JoinDialog extends FloatingDialog {
                 }else if(error.contains("invalid argument")) {
                     error = "invalid IP or port!";
                 }else if(t.getClass().toString().toLowerCase().contains("sockettimeout")){
-                    error = "timed out!";
+                    error = "timed out!\nmake sure the host has port forwarding set up,\nand that the address is correct!";
                 }else{
                     error = Strings.parseException(e, false);
                 }

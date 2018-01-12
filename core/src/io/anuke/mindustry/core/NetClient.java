@@ -254,6 +254,7 @@ public class NetClient extends Module {
             Gdx.app.postRunnable(() -> {
                 //duplicates.
                 if(Vars.control.enemyGroup.getByID(player.id) != null) return;
+
                 player.getInterpolator().last.set(player.x, player.y);
                 player.getInterpolator().target.set(player.x, player.y);
                 player.add();
