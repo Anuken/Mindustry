@@ -46,9 +46,6 @@ public class KryoServer implements ServerProvider {
             }
         });
 
-        Thread thread = new Thread(server, "Kryonet Server");
-        thread.setDaemon(true);
-        thread.start();
         server.addListener(new Listener(){
 
             @Override
@@ -125,11 +122,17 @@ public class KryoServer implements ServerProvider {
     @Override
     public void host(int port) throws IOException {
         server.bind(port, port);
+
+        Thread thread = new Thread(server, "Kryonet Server");
+        thread.setDaemon(true);
+        thread.start();
     }
 
     @Override
     public void close() {
-        server.close();
+        UCore.setPrivate(server, "shutdown", true);
+
+        new Thread(() -> server.close()).run();
     }
 
     @Override
