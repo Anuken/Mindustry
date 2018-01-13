@@ -336,6 +336,8 @@ public class NetServer extends Module{
         try {
             DataOutputStream stream = new DataOutputStream(bs);
 
+            stream.writeLong(TimeUtils.millis());
+
             for (int rx = -viewx / 2; rx <= viewx / 2; rx++) {
                 for (int ry = -viewy / 2; ry <= viewy / 2; ry++) {
                     Tile tile = Vars.world.tile(x + rx, y + ry);

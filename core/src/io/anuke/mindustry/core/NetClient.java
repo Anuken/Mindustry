@@ -158,13 +158,16 @@ public class NetClient extends Module {
         });
 
         Net.handle(StateSyncPacket.class, packet -> {
-            System.arraycopy(packet.items, 0, Vars.control.items, 0, packet.items.length);
+            Gdx.app.postRunnable(() -> {
 
-            Vars.control.setWaveData(packet.enemies, packet.wave, packet.countdown);
+                System.arraycopy(packet.items, 0, Vars.control.items, 0, packet.items.length);
 
-            Timers.resetTime(packet.time + (float)(TimeUtils.timeSinceMillis(packet.timestamp) / 1000.0 * 60.0));
+                Vars.control.setWaveData(packet.enemies, packet.wave, packet.countdown);
 
-            Gdx.app.postRunnable(Vars.ui.hudfrag::updateItems);
+                Timers.resetTime(packet.time + (float) (TimeUtils.timeSinceMillis(packet.timestamp) / 1000.0 * 60.0));
+
+                Gdx.app.postRunnable(Vars.ui.hudfrag::updateItems);
+            });
         });
 
         Net.handle(EnemySpawnPacket.class, spawn -> {
@@ -226,6 +229,9 @@ public class NetClient extends Module {
 
             Gdx.app.postRunnable(() -> {
                 try {
+                    long timestamp = stream.readLong();
+                    float elapsed = TimeUtils.timeSinceMillis(timestamp) / 1000f * 60f;
+
                     while (stream.available() > 0) {
                         int pos = stream.readInt();
 
@@ -235,7 +241,7 @@ public class NetClient extends Module {
                         byte times = stream.readByte();
 
                         for (int i = 0; i < times; i++) {
-                            tile.entity.timer.getTimes()[i] = stream.readFloat();
+                            tile.entity.timer.getTimes()[i] = stream.readFloat() + elapsed;
                         }
 
                         tile.entity.read(stream);

@@ -137,8 +137,7 @@ public class JoinDialog extends FloatingDialog {
             server.content.add("[lightgray]" + Bundles.format("text.server.hostname", host.name)).pad(4);
             server.content.row();
             server.content.add("[lightgray]" + (host.players != 1 ? Bundles.format("text.players", host.players) :
-                    Bundles.format("text.players.single", host.players))).left();
-
+                    Bundles.format("text.players.single", host.players)));
         }, e -> {
             server.content.clear();
             server.content.add("$text.host.invalid");
@@ -179,7 +178,7 @@ public class JoinDialog extends FloatingDialog {
         content().row();
         content().add(pane).width(w).pad(0);
         content().row();
-        content().addButton("$text.server.add", "clear", () -> {
+        content().addCenteredImageTextButton("$text.server.add", "icon-add", "clear", 14*3, () -> {
             renaming = null;
             join.show();
         }).width(w).height(80f);
