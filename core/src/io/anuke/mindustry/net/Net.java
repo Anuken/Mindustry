@@ -7,9 +7,12 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
 import io.anuke.mindustry.Mindustry;
+import io.anuke.mindustry.net.Packets.Connect;
+import io.anuke.mindustry.net.Packets.Disconnect;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamBuilder;
 import io.anuke.mindustry.net.Streamable.StreamChunk;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Consumer;
 
@@ -147,7 +150,11 @@ public class Net{
 				handleClientReceived(builder.build());
 			}
 		}else if(clientListeners.get(object.getClass()) != null){
-			if(clientLoaded) clientListeners.get(object.getClass()).accept(object);
+			if(clientLoaded || object instanceof Connect || object instanceof Disconnect || object instanceof Streamable){
+				clientListeners.get(object.getClass()).accept(object);
+			}else{
+				UCore.log("Recieved " + object, "but ignoring data, as client is not loaded.");
+			}
 		}else{
 			Gdx.app.error("Mindustry::Net", "Unhandled packet type: '" + object.getClass() + "'!");
 		}
