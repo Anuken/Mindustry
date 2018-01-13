@@ -43,6 +43,7 @@ public class NetClient extends Module {
     boolean gotData = false;
     boolean kicked = false;
     IntSet requests = new IntSet();
+    IntSet recieved = new IntSet();
     float playerSyncTime = 2;
     float dataTimeout = 60*10;
 
@@ -51,6 +52,7 @@ public class NetClient extends Module {
         Net.handle(Connect.class, packet -> {
             Net.setClientLoaded(false);
             requests.clear();
+            recieved.clear();
             connecting = true;
             gotData = false;
             kicked = false;
@@ -168,7 +170,10 @@ public class NetClient extends Module {
         Net.handle(EnemySpawnPacket.class, spawn -> {
             Gdx.app.postRunnable(() -> {
                 //duplicates.
-                if(Vars.control.enemyGroup.getByID(spawn.id) != null) return;
+                if(Vars.control.enemyGroup.getByID(spawn.id) != null ||
+                        recieved.contains(spawn.id)) return;
+
+                recieved.add(spawn.id);
 
                 Enemy enemy = new Enemy(EnemyType.getByID(spawn.type));
                 enemy.set(spawn.x, spawn.y);
@@ -257,7 +262,9 @@ public class NetClient extends Module {
         Net.handle(Player.class, player -> {
             Gdx.app.postRunnable(() -> {
                 //duplicates.
-                if(Vars.control.enemyGroup.getByID(player.id) != null) return;
+                if(Vars.control.enemyGroup.getByID(player.id) != null ||
+                        recieved.contains(player.id)) return;
+                recieved.add(player.id);
 
                 player.getInterpolator().last.set(player.x, player.y);
                 player.getInterpolator().target.set(player.x, player.y);

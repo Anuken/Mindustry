@@ -409,7 +409,7 @@ public class Control extends Module{
 		
 		Timers.run(60, () -> {
 			ui.restart.show();
-			netServer.handleGameOver();
+			if(Net.active() && Net.server()) netServer.handleGameOver();
 		});
 	}
 

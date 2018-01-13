@@ -39,7 +39,7 @@ public class Player extends DestructibleEntity implements Syncable{
 		hitbox.setSize(5);
 		hitboxTile.setSize(4f);
 		
-		maxhealth = 150;
+		maxhealth = 200;
 		heal();
 	}
 
