@@ -28,6 +28,7 @@ public class Net{
 	private static IntMap<StreamBuilder> streams = new IntMap<>();
 	private static AsyncExecutor executor = new AsyncExecutor(4);
 
+	/**Sets the client loaded status, or whether it will recieve normal packets from the server.*/
 	public static void setClientLoaded(boolean loaded){
 		clientLoaded = loaded;
 	}

@@ -31,17 +31,13 @@ public class KryoServer implements ServerProvider {
     public KryoServer(){
         server = new Server(4096*2, 2048); //TODO tweak
         server.setDiscoveryHandler(new ServerDiscoveryHandler() {
-            private ByteBuffer buffer = ByteBuffer.allocate(4);
-
-            {
-                buffer.putInt(987264236);
-            }
 
             @Override
             public boolean onDiscoverHost(DatagramChannel datagramChannel, InetSocketAddress fromAddress) throws IOException {
-                //TODO doesn't send data
-                UCore.log("SENDING DATA: " + Arrays.toString(buffer.array()));
-                datagramChannel.send(this.buffer, fromAddress);
+                ByteBuffer buffer = KryoRegistrator.writeServerData();
+                UCore.log("Replying to discover request with buffer of size " + buffer.capacity());
+                buffer.position(0);
+                datagramChannel.send(buffer, fromAddress);
                 return true;
             }
         });
@@ -123,7 +119,13 @@ public class KryoServer implements ServerProvider {
     public void host(int port) throws IOException {
         server.bind(port, port);
 
-        Thread thread = new Thread(server, "Kryonet Server");
+        Thread thread = new Thread(() -> {
+            try{
+                server.run();
+            }catch (Exception e){
+                handleException(e);
+            }
+        }, "Kryonet Server");
         thread.setDaemon(true);
         thread.start();
     }
@@ -207,6 +209,10 @@ public class KryoServer implements ServerProvider {
         }catch (IOException e){
             throw new RuntimeException(e);
         }
+    }
+
+    private void handleException(Exception e){
+        Gdx.app.postRunnable(() -> { throw new RuntimeException(e);});
     }
 
     Connection getByID(int id){

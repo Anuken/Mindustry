@@ -96,6 +96,9 @@ public class JoinDialog extends FloatingDialog {
                 }).width(w).height(80f).pad(4f).get();
                 button.left();
                 button.row();
+                button.add("[lightgray]" + (a.players != 1 ? Bundles.format("text.players", a.players) :
+                        Bundles.format("text.players.single", a.players)));
+                button.row();
                 button.add("[lightgray]" + a.address + " / " + Vars.port).pad(4).left();
 
                 hosts.row();

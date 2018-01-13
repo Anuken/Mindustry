@@ -2,6 +2,7 @@ package io.anuke.kryonet;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.esotericsoftware.kryonet.*;
 import io.anuke.mindustry.Vars;
@@ -17,24 +18,28 @@ import io.anuke.ucore.UCore;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 
 public class KryoClient implements ClientProvider{
     Client client;
+    ObjectMap<InetAddress, Address> addresses = new ObjectMap<>();
 
     public KryoClient(){
         client = new Client();
         client.setDiscoveryHandler(new ClientDiscoveryHandler() {
             @Override
             public DatagramPacket onRequestNewDatagramPacket() {
-                return new DatagramPacket(new byte[4], 4);
+                return new DatagramPacket(new byte[32], 32);
             }
 
             @Override
             public void onDiscoveredHost(DatagramPacket datagramPacket) {
-                //TODO doesn't send data
-                UCore.log("DATA HOST FOUND: " + Arrays.toString(datagramPacket.getData()));
+                ByteBuffer buffer = ByteBuffer.wrap(datagramPacket.getData());
+                Address address = KryoRegistrator.readServerData(datagramPacket.getAddress(), buffer);
+                addresses.put(datagramPacket.getAddress(), address);
+                UCore.log("Host data found: " + Arrays.toString(datagramPacket.getData()));
             }
 
             @Override
@@ -139,8 +144,11 @@ public class KryoClient implements ClientProvider{
         Array<Address> result = new Array<>();
 
         for(InetAddress a : list){
-            if(!hostnames.contains(a.getHostName()))
-                result.add(new Address(a.getCanonicalHostName(), a.getHostAddress()));
+            if(!hostnames.contains(a.getHostName())) {
+                Address address = addresses.get(a);
+                if(address != null) result.add(address);
+
+            }
             hostnames.add(a.getHostName());
         }
 
