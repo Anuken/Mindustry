@@ -33,6 +33,8 @@ import io.anuke.ucore.modules.Module;
 import java.io.DataInputStream;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.ui;
+
 public class NetClient extends Module {
     public static final Color[] colorArray = {Color.ORANGE, Color.SCARLET, Color.LIME, Color.PURPLE,
             Color.GOLD, Color.PINK, Color.SKY, Color.GOLD, Color.VIOLET,
@@ -291,6 +293,11 @@ public class NetClient extends Module {
         Net.handle(BlockConfigPacket.class, packet -> {
             Tile tile = Vars.world.tile(packet.position);
             if(tile != null) tile.block().configure(tile, packet.data);
+        });
+
+        Net.handle(GameOverPacket.class, packet -> {
+            kicked = true;
+            Gdx.app.postRunnable(ui.restart::show);
         });
     }
 

@@ -38,6 +38,7 @@ public class Registrator {
                 BlockConfigPacket.class,
                 EntityRequestPacket.class,
                 ConnectConfirmPacket.class,
+                GameOverPacket.class,
 
                 Class.class,
                 byte[].class,

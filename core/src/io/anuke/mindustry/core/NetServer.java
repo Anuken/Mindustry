@@ -216,6 +216,11 @@ public class NetServer extends Module{
         Gdx.app.postRunnable(() -> Vars.ui.chatfrag.addMessage(message, null));
     }
 
+    public void handleGameOver(){
+        Net.send(new GameOverPacket(), SendMode.tcp);
+        Timers.runTask(30f, () -> GameState.set(State.menu));
+    }
+
     public void handleBullet(BulletType type, Entity owner, float x, float y, float angle, short damage){
         BulletPacket packet = new BulletPacket();
         packet.x = x;

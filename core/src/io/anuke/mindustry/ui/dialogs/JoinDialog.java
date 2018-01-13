@@ -64,13 +64,17 @@ public class JoinDialog extends FloatingDialog {
             }
             join.hide();
         }).disabled(b -> Settings.getString("ip").isEmpty() || Strings.parseInt(Settings.getString("port")) == Integer.MIN_VALUE || Net.active());
+
         join.shown(() -> {
             join.getTitleLabel().setText(renaming != null ? "$text.server.edit" : "$text.server.add");
         });
 
         setup();
 
-        shown(this::refreshLocal);
+        shown(() -> {
+            refreshLocal();
+            refreshRemote();
+        });
     }
 
     void setupRemote(){

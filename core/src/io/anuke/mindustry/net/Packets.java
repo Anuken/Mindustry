@@ -135,4 +135,8 @@ public class Packets {
     public static class EntityRequestPacket{
         public int id;
     }
+
+    public static class GameOverPacket{
+
+    }
 }
