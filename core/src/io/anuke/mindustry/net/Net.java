@@ -18,6 +18,7 @@ import java.io.IOException;
 public class Net{
 	private static boolean server;
 	private static boolean active;
+	private static boolean clientLoaded;
 	private static ObjectMap<Class<?>, Consumer> clientListeners = new ObjectMap<>();
 	private static ObjectMap<Class<?>, Consumer> serverListeners = new ObjectMap<>();
 	private static ClientProvider clientProvider;
@@ -26,6 +27,10 @@ public class Net{
 	private static int lastConnection = -1;
 	private static IntMap<StreamBuilder> streams = new IntMap<>();
 	private static AsyncExecutor executor = new AsyncExecutor(4);
+
+	public static void setClientLoaded(boolean loaded){
+		clientLoaded = loaded;
+	}
 	
 	/**Connect to an address.*/
 	public static void connect(String ip, int port) throws IOException{
@@ -141,7 +146,7 @@ public class Net{
 				handleClientReceived(builder.build());
 			}
 		}else if(clientListeners.get(object.getClass()) != null){
-			clientListeners.get(object.getClass()).accept(object);
+			if(clientLoaded) clientListeners.get(object.getClass()).accept(object);
 		}else{
 			Gdx.app.error("Mindustry::Net", "Unhandled packet type: '" + object.getClass() + "'!");
 		}

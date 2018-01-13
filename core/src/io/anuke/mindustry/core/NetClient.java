@@ -47,6 +47,7 @@ public class NetClient extends Module {
     public NetClient(){
 
         Net.handle(Connect.class, packet -> {
+            Net.setClientLoaded(false);
             requests.clear();
             connecting = true;
             gotData = false;
@@ -99,6 +100,7 @@ public class NetClient extends Module {
 
                 Net.send(new ConnectConfirmPacket(), SendMode.tcp);
                 GameState.set(State.playing);
+                Net.setClientLoaded(true);
             });
         });
 

@@ -25,6 +25,7 @@ public class HostDialog extends FloatingDialog{
                 Vars.player.name = text;
                 Settings.put("name", text);
                 Settings.save();
+                Vars.ui.listfrag.rebuild();
             }).grow().pad(8);
         }).width(w).height(70f).pad(4);
 

@@ -7,7 +7,6 @@ import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamChunk;
-import io.anuke.mindustry.resource.Mech;
 import io.anuke.ucore.entities.Entity;
 
 public class Registrator {
@@ -47,15 +46,11 @@ public class Registrator {
                 int[].class,
                 int[][].class,
                 Entity[].class,
-                Player[].class,
                 Array.class,
                 Vector2.class,
-                EnemySpawnPacket[].class,
 
                 Entity.class,
                 Player.class,
-                Mech.class,
-
                 Enemy.class
         };
     }

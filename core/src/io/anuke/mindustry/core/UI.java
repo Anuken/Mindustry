@@ -180,6 +180,10 @@ public class UI extends SceneModule{
 	}
 
 	public void showError(String text){
+		if(hasDialog()){
+			Dialog dialog = scene.getScrollFocus() instanceof  Dialog ? (Dialog)scene.getScrollFocus() : (Dialog)scene.getKeyboardFocus();
+			dialog.hide();
+		}
 		new Dialog("$text.error.title", "dialog"){{
 			content().margin(15).add(text);
 			buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);

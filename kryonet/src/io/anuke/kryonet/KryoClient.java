@@ -42,7 +42,7 @@ public class KryoClient implements ClientProvider{
 
             }
         });
-        client.start();
+
         client.addListener(new Listener(){
             @Override
             public void connected (Connection connection) {
@@ -75,7 +75,13 @@ public class KryoClient implements ClientProvider{
                 try{
                     Net.handleClientReceived(object);
                 }catch (Exception e){
-                    Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
+                    if(e instanceof KryoNetException && e.getMessage() != null && e.getMessage().toLowerCase().contains("incorrect")) {
+                        UCore.log("Mismatch!");
+                    }else{
+                        Gdx.app.postRunnable(() -> {
+                            throw new RuntimeException(e);
+                        });
+                    }
                 }
 
             }
@@ -86,6 +92,19 @@ public class KryoClient implements ClientProvider{
 
     @Override
     public void connect(String ip, int port) throws IOException {
+        //just in case
+        client.stop();
+
+        Thread updateThread = new Thread(() -> {
+            try{
+                client.run();
+            }catch (Exception e){
+                handleException(e);
+            }
+        }, "Kryonet Client");
+        updateThread.setDaemon(true);
+        updateThread.start();
+
         client.connect(5000, ip, port, port);
     }
 
@@ -142,6 +161,16 @@ public class KryoClient implements ClientProvider{
             client.dispose();
         }catch (IOException e){
             throw new RuntimeException(e);
+        }
+    }
+
+    private void handleException(Exception e){
+        e.printStackTrace();
+        if(e instanceof KryoNetException){
+            Gdx.app.postRunnable(() -> Vars.ui.showError("$text.server.mismatch"));
+        }else{
+            //TODO better exception handling.
+            disconnect();
         }
     }
 

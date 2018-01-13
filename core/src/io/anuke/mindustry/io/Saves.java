@@ -51,6 +51,10 @@ public class Saves {
     }
 
     public void update(){
+        if(GameState.is(State.menu)){
+            current = null;
+        }
+
         if(!GameState.is(State.menu) && !Vars.control.isGameOver() && current != null && current.isAutosave()){
             time += Timers.delta();
             if(time > Settings.getInt("saveinterval")*60) {

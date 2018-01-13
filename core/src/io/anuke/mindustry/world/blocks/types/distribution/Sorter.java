@@ -48,8 +48,7 @@ public class Sorter extends Junction{
 	public void handleItem(Item item, Tile tile, Tile source){
 		Tile to = getTileTarget(item, tile, source, true);
 		
-		Timers.run(15, ()->{
-			if(to == null || to.entity == null) return;
+		Timers.run(15, () -> {
 			to.block().handleItem(item, to, tile);
 		});
 		
