@@ -199,7 +199,8 @@ public class Control extends Module{
 		Settings.defaultList(
 			"ip", "localhost",
 			"port", Vars.port+"",
-			"name", Vars.android ? "player" : UCore.getProperty("user.name")
+			"name", Vars.android ? "player" : UCore.getProperty("user.name"),
+			"servers", ""
 		);
 		
 		Settings.loadAll("io.anuke.moment");

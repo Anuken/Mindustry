@@ -5,8 +5,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.esotericsoftware.kryonet.*;
+import com.esotericsoftware.kryonet.FrameworkMessage.DiscoverHost;
+import com.esotericsoftware.kryonet.serialization.Serialization;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.net.Address;
+import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.ClientProvider;
 import io.anuke.mindustry.net.Net.SendMode;
@@ -14,21 +16,22 @@ import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
 import io.anuke.mindustry.net.Registrator;
 import io.anuke.ucore.UCore;
+import io.anuke.ucore.function.Consumer;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.List;
 
 public class KryoClient implements ClientProvider{
     Client client;
-    ObjectMap<InetAddress, Address> addresses = new ObjectMap<>();
+    ObjectMap<InetAddress, Host> addresses = new ObjectMap<>();
+    ClientDiscoveryHandler handler;
 
     public KryoClient(){
-        client = new Client();
-        client.setDiscoveryHandler(new ClientDiscoveryHandler() {
+        handler = new ClientDiscoveryHandler() {
             @Override
             public DatagramPacket onRequestNewDatagramPacket() {
                 return new DatagramPacket(new byte[32], 32);
@@ -37,16 +40,19 @@ public class KryoClient implements ClientProvider{
             @Override
             public void onDiscoveredHost(DatagramPacket datagramPacket) {
                 ByteBuffer buffer = ByteBuffer.wrap(datagramPacket.getData());
-                Address address = KryoRegistrator.readServerData(datagramPacket.getAddress(), buffer);
+                Host address = KryoRegistrator.readServerData(datagramPacket.getAddress(), buffer);
                 addresses.put(datagramPacket.getAddress(), address);
-                UCore.log("Host data found: " + Arrays.toString(datagramPacket.getData()));
+                UCore.log("Host data found: " + buffer.capacity() + " bytes.");
             }
 
             @Override
             public void onFinally() {
 
             }
-        });
+        };
+
+        client = new Client();
+        client.setDiscoveryHandler(handler);
 
         client.addListener(new Listener(){
             @Override
@@ -81,7 +87,8 @@ public class KryoClient implements ClientProvider{
                     Net.handleClientReceived(object);
                 }catch (Exception e){
                     if(e instanceof KryoNetException && e.getMessage() != null && e.getMessage().toLowerCase().contains("incorrect")) {
-                        UCore.log("Mismatch!");
+                        Gdx.app.postRunnable(() -> Vars.ui.showError("$text.server.mismatch"));
+                        Vars.netClient.disconnectQuietly();
                     }else{
                         Gdx.app.postRunnable(() -> {
                             throw new RuntimeException(e);
@@ -138,14 +145,56 @@ public class KryoClient implements ClientProvider{
     }
 
     @Override
-    public Array<Address> discover(){
+    public void pingHost(String address, int port, Consumer<Host> valid, Consumer<IOException> invalid){
+        Thread thread = new Thread(() -> {
+            try {
+
+                Serialization ser = (Serialization) UCore.getPrivate(client, "serialization");
+                DatagramSocket socket = new DatagramSocket();
+                ByteBuffer dataBuffer = ByteBuffer.allocate(64);
+                ser.write(dataBuffer, new DiscoverHost());
+
+                dataBuffer.flip();
+                byte[] data = new byte[dataBuffer.limit()];
+                dataBuffer.get(data);
+                socket.send(new DatagramPacket(data, data.length, InetAddress.getByName(address), port));
+
+                socket.setSoTimeout(2000);
+
+                addresses.clear();
+
+                DatagramPacket packet = handler.onRequestNewDatagramPacket();
+
+                socket.receive(packet);
+
+                handler.onDiscoveredHost(packet);
+
+                Host host = addresses.values().next();
+
+                if (host != null) {
+                    Gdx.app.postRunnable(() -> valid.accept(host));
+                } else {
+                    Gdx.app.postRunnable(() -> invalid.accept(new IOException("Outdated server.")));
+                }
+            } catch (IOException e) {
+                Gdx.app.postRunnable(() -> invalid.accept(e));
+            }
+        });
+
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    @Override
+    public Array<Host> discover(){
+        addresses.clear();
         List<InetAddress> list = client.discoverHosts(Vars.port, 3000);
         ObjectSet<String> hostnames = new ObjectSet<>();
-        Array<Address> result = new Array<>();
+        Array<Host> result = new Array<>();
 
         for(InetAddress a : list){
             if(!hostnames.contains(a.getHostName())) {
-                Address address = addresses.get(a);
+                Host address = addresses.get(a);
                 if(address != null) result.add(address);
 
             }

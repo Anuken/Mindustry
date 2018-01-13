@@ -2,7 +2,10 @@ package io.anuke.kryonet;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.IntArray;
-import com.esotericsoftware.kryonet.*;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.FrameworkMessage;
+import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.util.InputStreamSender;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
@@ -19,9 +22,7 @@ import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.DatagramChannel;
 import java.util.Arrays;
 
 public class KryoServer implements ServerProvider {
@@ -30,16 +31,12 @@ public class KryoServer implements ServerProvider {
 
     public KryoServer(){
         server = new Server(4096*2, 2048); //TODO tweak
-        server.setDiscoveryHandler(new ServerDiscoveryHandler() {
-
-            @Override
-            public boolean onDiscoverHost(DatagramChannel datagramChannel, InetSocketAddress fromAddress) throws IOException {
-                ByteBuffer buffer = KryoRegistrator.writeServerData();
-                UCore.log("Replying to discover request with buffer of size " + buffer.capacity());
-                buffer.position(0);
-                datagramChannel.send(buffer, fromAddress);
-                return true;
-            }
+        server.setDiscoveryHandler((datagramChannel, fromAddress) -> {
+            ByteBuffer buffer = KryoRegistrator.writeServerData();
+            UCore.log("Replying to discover request with buffer of size " + buffer.capacity());
+            buffer.position(0);
+            datagramChannel.send(buffer, fromAddress);
+            return true;
         });
 
         server.addListener(new Listener(){

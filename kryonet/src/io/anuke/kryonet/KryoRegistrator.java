@@ -2,7 +2,7 @@ package io.anuke.kryonet;
 
 import com.esotericsoftware.kryo.Kryo;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.net.Address;
+import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
 
 import java.net.InetAddress;
@@ -22,7 +22,7 @@ public class KryoRegistrator {
         return buffer;
     }
 
-    public static Address readServerData(InetAddress ia, ByteBuffer buffer){
+    public static Host readServerData(InetAddress ia, ByteBuffer buffer){
         //old version address.
         if(buffer.capacity() == 4) return null;
 
@@ -31,6 +31,6 @@ public class KryoRegistrator {
         buffer.get(sname);
         int players = buffer.getInt();
 
-        return new Address(new String(sname), ia.getHostAddress(), players);
+        return new Host(new String(sname), ia.getHostAddress(), players);
     }
 }

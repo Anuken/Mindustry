@@ -3,7 +3,7 @@ package io.anuke.mindustry.ui.dialogs;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.net.Address;
+import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
@@ -17,12 +17,18 @@ import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Strings;
 
 public class JoinDialog extends FloatingDialog {
+    Array<Server> servers = new Array<>();
     Dialog join;
+    Server renaming;
+    Table local = new Table();
+    Table remote = new Table();
     Table hosts = new Table();
-    float w = 400;
+    float w = 500;
 
     public JoinDialog(){
         super("$text.joingame");
+
+        loadServers();
 
         addCloseButton();
 
@@ -31,7 +37,7 @@ public class JoinDialog extends FloatingDialog {
         Mindustry.platforms.addDialog(join.content().addField(Settings.getString("ip"),text ->{
             Settings.putString("ip", text);
             Settings.save();
-        }).size(180f, 54f).get(), 100);
+        }).size(240f, 54f).get(), 100);
 
         join.content().row();
         join.content().add("$text.server.port").left();
@@ -39,32 +45,122 @@ public class JoinDialog extends FloatingDialog {
                 .addField(Settings.getString("port"), new DigitsOnlyFilter(), text ->{
                     Settings.putString("port", text);
                     Settings.save();
-                })
-                .size(180f, 54f).get());
+                }).size(240f, 54f).get());
         join.buttons().defaults().size(140f, 60f).pad(4f);
         join.buttons().addButton("$text.cancel", join::hide);
-        join.buttons().addButton("$text.ok", () ->
-            connect(Settings.getString("ip"), Strings.parseInt(Settings.getString("port")))
-        ).disabled(b -> Settings.getString("ip").isEmpty() || Strings.parseInt(Settings.getString("port")) == Integer.MIN_VALUE || Net.active());
+        join.buttons().addButton("$text.ok", () -> {
+            if(renaming == null) {
+                Server server = new Server(Settings.getString("ip"), Strings.parseInt(Settings.getString("port")));
+                servers.add(server);
+                saveServers();
+                setupRemote();
+                refreshRemote();
+            }else{
+                renaming.port = Strings.parseInt(Settings.getString("port"));
+                renaming.ip = Settings.getString("ip");
+                saveServers();
+                setupRemote();
+                refreshRemote();
+            }
+            join.hide();
+        }).disabled(b -> Settings.getString("ip").isEmpty() || Strings.parseInt(Settings.getString("port")) == Integer.MIN_VALUE || Net.active());
+        join.shown(() -> {
+            join.getTitleLabel().setText(renaming != null ? "$text.server.edit" : "$text.server.add");
+        });
 
         setup();
 
-        shown(this::refresh);
+        shown(this::refreshLocal);
     }
 
-    void refresh(){
-        hosts.clear();
-        hosts.background("button");
-        hosts.label(() -> "[accent]" + Bundles.get("text.hosts.discovering") + new String(new char[(int)(Timers.time() / 10) % 4]).replace("\0", ".")).pad(10f);
-        Net.discoverServers(this::addHosts);
+    void setupRemote(){
+        remote.clear();
+        for (Server server : servers) {
+            //why are java lambdas this bad
+            TextButton[] buttons = {null};
+
+            TextButton button = buttons[0] = remote.addButton("[accent]"+server.ip + " / " + server.port, "clear", () -> {
+                if(!buttons[0].childrenPressed()) connect(server.ip, server.port);
+            }).width(w).height(120f).pad(4f).get();
+
+            button.getLabel().setWrap(true);
+
+            Table inner = new Table();
+            button.clearChildren();
+            button.add(inner).growX();
+
+            inner.add(button.getLabel()).growX();
+
+            inner.addImageButton("icon-loading", "empty", 16*2, () -> {
+                refreshServer(server);
+            }).margin(3f).padTop(6f).top().right();
+
+            inner.addImageButton("icon-pencil", "empty", 16*2, () -> {
+                renaming = server;
+                join.show();
+            }).margin(3f).padTop(6f).top().right();
+
+            inner.addImageButton("icon-trash-16", "empty", 16*2, () -> {
+                Vars.ui.showConfirm("$text.confirm", "$text.server.delete", () -> {
+                    servers.removeValue(server, true);
+                    saveServers();
+                    setupRemote();
+                    refreshRemote();
+                });
+            }).margin(3f).pad(6).top().right();
+
+            button.row();
+
+            server.content = button.table(t -> {}).grow().get();
+
+            remote.row();
+        }
+    }
+
+    void refreshRemote(){
+        for(Server server : servers){
+            refreshServer(server);
+        }
+    }
+
+    void refreshServer(Server server){
+        server.content.clear();
+        server.content.label(() -> Bundles.get("text.server.refreshing") + Strings.animated(4, 11, "."));
+
+        Net.pingHost(server.ip, server.port, host -> {
+            server.content.clear();
+
+            server.content.add("[lightgray]" + Bundles.format("text.server.hostname", host.name)).pad(4);
+            server.content.row();
+            server.content.add("[lightgray]" + (host.players != 1 ? Bundles.format("text.players", host.players) :
+                    Bundles.format("text.players.single", host.players))).left();
+
+        }, e -> {
+            server.content.clear();
+            server.content.add("$text.host.invalid");
+        });
+    }
+
+    void refreshLocal(){
+        local.clear();
+        local.background("button");
+        local.label(() -> "[accent]" + Bundles.get("text.hosts.discovering") + new String(new char[(int)(Timers.time() / 10) % 4]).replace("\0", ".")).pad(10f);
+        Net.discoverServers(this::addLocalHosts);
     }
 
     void setup(){
-        hosts.background("button");
+        hosts.clear();
+
+        hosts.add(remote).growX();
+        hosts.row();
+        hosts.add(local).growX();
 
         ScrollPane pane = new ScrollPane(hosts, "clear");
         pane.setFadeScrollBars(false);
         pane.setScrollingDisabled(true, false);
+
+        setupRemote();
+        refreshRemote();
 
         content().clear();
         content().table(t -> {
@@ -79,19 +175,22 @@ public class JoinDialog extends FloatingDialog {
         content().row();
         content().add(pane).width(w).pad(0);
         content().row();
-        content().addButton("$text.joingame.byip", "clear", join::show).width(w).height(80f);
+        content().addButton("$text.server.add", "clear", () -> {
+            renaming = null;
+            join.show();
+        }).width(w).height(80f);
     }
 
-    void addHosts(Array<Address> array){
-        hosts.clear();
+    void addLocalHosts(Array<Host> array){
+        local.clear();
 
         if(array.size == 0){
-            hosts.add("$text.hosts.none").pad(10f);
-            hosts.add().growX();
-            hosts.addImageButton("icon-loading", 16*2f, this::refresh).pad(-10f).padLeft(0).padTop(-6).size(70f, 74f);
+            local.add("$text.hosts.none").pad(10f);
+            local.add().growX();
+            local.addImageButton("icon-loading", 16*2f, this::refreshLocal).pad(-10f).padLeft(0).padTop(-6).size(70f, 74f);
         }else {
-            for (Address a : array) {
-                TextButton button = hosts.addButton("[accent]"+a.name, "clear", () -> {
+            for (Host a : array) {
+                TextButton button = local.addButton("[accent]"+a.name, "clear", () -> {
                     connect(a.address, Vars.port);
                 }).width(w).height(80f).pad(4f).get();
                 button.left();
@@ -101,8 +200,8 @@ public class JoinDialog extends FloatingDialog {
                 button.row();
                 button.add("[lightgray]" + a.address + " / " + Vars.port).pad(4).left();
 
-                hosts.row();
-                hosts.background((Drawable) null);
+                local.row();
+                local.background((Drawable) null);
             }
         }
     }
@@ -139,5 +238,42 @@ public class JoinDialog extends FloatingDialog {
                 e.printStackTrace();
             }
         });
+    }
+
+    private void loadServers(){
+        String h = Settings.getString("servers");
+        String[] list = h.split("\\|\\|\\|");
+        for(String fname : list){
+            if(fname.isEmpty()) continue;
+            String[] split = fname.split(":");
+            String host = split[0];
+            int port = Strings.parseInt(split[1]);
+
+            if(port != Integer.MIN_VALUE) servers.add(new Server(host, port));
+        }
+    }
+
+    private void saveServers(){
+        StringBuilder out = new StringBuilder();
+        for(Server server : servers){
+            out.append(server.ip);
+            out.append(":");
+            out.append(server.port);
+            out.append("|||");
+        }
+        Settings.putString("servers", out.toString());
+        Settings.save();
+    }
+
+    private class Server{
+        public String ip;
+        public int port;
+        public Host host;
+        public Table content;
+
+        public Server(String ip, int port){
+            this.ip = ip;
+            this.port = port;
+        }
     }
 }

@@ -66,9 +66,9 @@ public class Net{
 
 	/**Starts discovering servers on a different thread. Does not work with GWT.
 	 * Callback is run on the main libGDX thread.*/
-	public static void discoverServers(Consumer<Array<Address>> cons){
+	public static void discoverServers(Consumer<Array<Host>> cons){
 		executor.submit(() -> {
-			Array<Address> arr = clientProvider.discover();
+			Array<Host> arr = clientProvider.discover();
 			Gdx.app.postRunnable(() -> {
 				cons.accept(arr);
 			});
@@ -163,6 +163,11 @@ public class Net{
 		}
 	}
 
+	/**Pings a host in an new thread. If an error occured, failed() should be called with the exception. */
+	public static void pingHost(String address, int port, Consumer<Host> valid, Consumer<IOException> failed){
+		clientProvider.pingHost(address, port, valid, failed);
+	}
+
 	/**Update client ping.*/
 	public static void updatePing(){
 		clientProvider.updatePing();
@@ -218,7 +223,9 @@ public class Net{
 		/**Disconnect from the server.*/
 		public void disconnect();
         /**Discover servers. This should block for a certain amount of time, and will most likely be run in a different thread.*/
-        public Array<Address> discover();
+        public Array<Host> discover();
+        /**Ping a host. If an error occured, failed() should be called with the exception. */
+        public void pingHost(String address, int port, Consumer<Host> valid, Consumer<IOException> failed);
 		/**Register classes to be sent.*/
 		public void register(Class<?>... types);
 		/**Close all connections.*/
