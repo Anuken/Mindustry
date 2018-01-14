@@ -9,6 +9,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.label;
@@ -154,6 +155,8 @@ public class HudFragment implements Fragment{
 				new label(() -> "[purple]enemies: " + Vars.control.enemyGroup.amount()).left();
 				row();
 				new label(() -> "[orange]noclip: " + Vars.noclip).left();
+				row();
+				new label(() -> "[purple]time: " + (int)(Timers.time() / 10f) % 50).left();
 				row();
 				new label("[red]DEBUG MODE").scale(0.5f).left();
 			}}.end();

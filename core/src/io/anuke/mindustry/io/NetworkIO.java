@@ -19,7 +19,7 @@ import io.anuke.ucore.entities.Entities;
 import java.io.*;
 
 public class NetworkIO {
-    private static final int fileVersionID = 14;
+    private static final int fileVersionID = 15;
 
     public static void write(int playerID, ByteArray upgrades, OutputStream os){
 
@@ -106,7 +106,7 @@ public class NetworkIO {
                         }
 
                         if(tile.entity != null){
-                            stream.writeByte(tile.getRotation()); //placerot
+                            stream.writeShort(tile.getPackedData());
                             stream.writeShort(tile.entity.health); //health
 
                             //items
@@ -240,11 +240,11 @@ public class NetworkIO {
                 }
 
                 if(tile.entity != null){
-                    byte rotation = stream.readByte();
+                    short data = stream.readShort();
                     short health = stream.readShort();
 
                     tile.entity.health = health;
-                    tile.setRotation(rotation);
+                    tile.setPackedData(data);
 
                     for(int j = 0; j < tile.entity.items.length; j ++){
                         tile.entity.items[j] = stream.readInt();

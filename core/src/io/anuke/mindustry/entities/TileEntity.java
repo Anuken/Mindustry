@@ -53,6 +53,10 @@ public class TileEntity extends Entity{
 	public void read(DataInputStream stream) throws IOException{
 		
 	}
+
+	public void readNetwork(DataInputStream stream, float elapsed) throws IOException{
+		read(stream);
+	}
 	
 	public void onDeath(){
 		onDeath(false);

@@ -336,7 +336,7 @@ public class NetServer extends Module{
         try {
             DataOutputStream stream = new DataOutputStream(bs);
 
-            stream.writeLong(TimeUtils.millis());
+            stream.writeFloat(Timers.time());
 
             for (int rx = -viewx / 2; rx <= viewx / 2; rx++) {
                 for (int ry = -viewy / 2; ry <= viewy / 2; ry++) {
@@ -358,6 +358,8 @@ public class NetServer extends Module{
                     for(int i = 0; i < times; i ++){
                         stream.writeFloat(tile.entity.timer.getTimes()[i]);
                     }
+
+                    stream.writeShort(tile.getPackedData());
 
                     tile.entity.write(stream);
                 }

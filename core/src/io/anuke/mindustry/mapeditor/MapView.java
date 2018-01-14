@@ -143,7 +143,7 @@ public class MapView extends Element implements GestureListener{
 					if(op == null) op = new DrawOperation(editor.pixmap());
 					Pixmap next = Pixmaps.copy(editor.pixmap());
 					op.add(current, next);
-					current = next;
+					current = null;
 					stack.add(op);
 					op = null;
 				}

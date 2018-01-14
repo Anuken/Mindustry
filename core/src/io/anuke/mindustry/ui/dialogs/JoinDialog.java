@@ -214,6 +214,7 @@ public class JoinDialog extends FloatingDialog {
 
         Timers.runTask(2f, () -> {
             try{
+                Vars.netClient.beginConnecting();
                 Net.connect(ip, port);
                 hide();
                 join.hide();

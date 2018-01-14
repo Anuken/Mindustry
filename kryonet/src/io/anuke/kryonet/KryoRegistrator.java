@@ -9,9 +9,12 @@ import java.net.InetAddress;
 import java.nio.ByteBuffer;
 
 public class KryoRegistrator {
+    public static boolean fakeLag = true;
+    public static final int fakeLagAmount = 500;
 
     public static void register(Kryo kryo){
         //TODO register stuff?
+        //Log.set(Log.LEVEL_DEBUG);
     }
 
     public static ByteBuffer writeServerData(){

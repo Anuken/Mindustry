@@ -24,7 +24,7 @@ public class MapGenerateDialog extends FloatingDialog{
 	private boolean loading;
 	
 	public MapGenerateDialog(MapEditor editor) {
-		super("$text.generate");
+		super("$text.editor.generate");
 		this.editor = editor;
 		
 		Stack stack = new Stack();

@@ -154,6 +154,14 @@ public class Tile{
 		return Bits.getRightByte(Bits.getRightByte(data));
 	}
 
+	public short getPackedData(){
+		return data;
+	}
+
+	public void setPackedData(short data){
+		this.data = data;
+	}
+
 	public boolean passable(){
 		Block block = block();
 		Block floor = floor();

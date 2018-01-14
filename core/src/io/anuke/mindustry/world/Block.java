@@ -186,7 +186,7 @@ public class Block{
 			i++;
 			i %= 4;
 		}
-		tile.setDump((byte)pdump);
+		tile.setDump(pdump);
 		handleItem(item, tile, tile);
 	}
 

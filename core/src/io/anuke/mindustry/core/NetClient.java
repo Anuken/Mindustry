@@ -18,6 +18,8 @@ import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.net.Syncable;
 import io.anuke.mindustry.net.Syncable.Interpolator;
+import io.anuke.mindustry.resource.Recipe;
+import io.anuke.mindustry.resource.Recipes;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
@@ -125,7 +127,6 @@ public class NetClient extends Module {
                     Syncable sync = ((Syncable)entity);
 
                     if(sync == null){
-                        Gdx.app.error("Mindustry", "Unknown entity ID: " + id + " " + (i >= packet.enemyStart ? "(enemy)" : "(player)"));
                         if(!requests.contains(id)){
                             requests.add(id);
                             Gdx.app.error("Mindustry", "Sending entity request: " + id);
@@ -150,7 +151,11 @@ public class NetClient extends Module {
         });
 
         Net.handle(PlacePacket.class, packet -> {
-            Gdx.app.postRunnable(() -> Vars.control.input.placeBlockInternal(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false));
+            Gdx.app.postRunnable(() ->{
+                Recipe recipe = Recipes.getByResult(Block.getByID(packet.block));
+                if(recipe != null) Vars.control.removeItems(recipe.requirements);
+                Vars.control.input.placeBlockInternal(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false);
+            });
         });
 
         Net.handle(BreakPacket.class, packet -> {
@@ -229,8 +234,9 @@ public class NetClient extends Module {
 
             Gdx.app.postRunnable(() -> {
                 try {
-                    long timestamp = stream.readLong();
-                    float elapsed = TimeUtils.timeSinceMillis(timestamp) / 1000f * 60f;
+
+                    float time = stream.readFloat();
+                    float elapsed = Timers.time() - time;
 
                     while (stream.available() > 0) {
                         int pos = stream.readInt();
@@ -241,10 +247,13 @@ public class NetClient extends Module {
                         byte times = stream.readByte();
 
                         for (int i = 0; i < times; i++) {
-                            tile.entity.timer.getTimes()[i] = stream.readFloat() + elapsed;
+                            tile.entity.timer.getTimes()[i] = stream.readFloat();
                         }
 
-                        tile.entity.read(stream);
+                        short data = stream.readShort();
+                        tile.setPackedData(data);
+
+                        tile.entity.readNetwork(stream, elapsed);
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -323,6 +332,10 @@ public class NetClient extends Module {
         }else if(!connecting){
             Net.disconnect();
         }
+    }
+
+    public void beginConnecting(){
+        connecting = true;
     }
 
     public void disconnectQuietly(){

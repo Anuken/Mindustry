@@ -92,6 +92,8 @@ public class Conveyor extends Block{
 		
 		removals.clear();
 
+		float shift = entity.elapsed * speed;
+
 		for(int i = 0; i < entity.convey.size; i ++){
 			int value = entity.convey.get(i);
 			ItemPos pos = pos1.set(value);
@@ -100,7 +102,7 @@ public class Conveyor extends Block{
 					!(pos2.set(entity.convey.get(i + 1)).y - pos.y < itemSpace * Timers.delta());
 			
 			if(canmove){
-				pos.y += Math.max(speed * Timers.delta(), 1f/252f); //TODO fix precision issues when at high FPS?
+				pos.y += Math.max(speed * Timers.delta() + shift, 1f/252f); //TODO fix precision issues when at high FPS?
 				pos.x = Mathf.lerpDelta(pos.x, 0, 0.06f);
 			}else{
 				pos.x = Mathf.lerpDelta(pos.x, pos.seed/offsetScl, 0.1f);
@@ -119,6 +121,8 @@ public class Conveyor extends Block{
 			}
 			
 		}
+
+		entity.elapsed = 0f;
 		entity.convey.removeAll(removals);
 	}
 	
@@ -174,7 +178,7 @@ public class Conveyor extends Block{
 	 */
 	public static class ConveyorEntity extends TileEntity{
 		IntArray convey = new IntArray();
-		float minitem = 1;
+		float minitem = 1, elapsed;
 		
 		@Override
 		public void write(DataOutputStream stream) throws IOException{
@@ -196,6 +200,12 @@ public class Conveyor extends Block{
 			}
 			
 			sort(convey.items, convey.size);
+		}
+
+		@Override
+		public void readNetwork(DataInputStream stream, float elapsed) throws IOException{
+			read(stream);
+			this.elapsed = elapsed;
 		}
 	}
 	

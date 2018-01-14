@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.IntArray;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.FrameworkMessage;
 import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.kryonet.Listener.LagListener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.util.InputStreamSender;
 import io.anuke.mindustry.net.Net;
@@ -23,14 +24,13 @@ import io.anuke.ucore.core.Timers;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 public class KryoServer implements ServerProvider {
     Server server;
     IntArray connections = new IntArray();
 
     public KryoServer(){
-        server = new Server(4096*2, 2048); //TODO tweak
+        server = new Server(4096*2, 2048*2); //TODO tweak
         server.setDiscoveryHandler((datagramChannel, fromAddress) -> {
             ByteBuffer buffer = KryoRegistrator.writeServerData();
             UCore.log("Replying to discover request with buffer of size " + buffer.capacity());
@@ -39,7 +39,7 @@ public class KryoServer implements ServerProvider {
             return true;
         });
 
-        server.addListener(new Listener(){
+        Listener listener = new Listener(){
 
             @Override
             public void connected (Connection connection) {
@@ -81,7 +81,13 @@ public class KryoServer implements ServerProvider {
                     //Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
                 }
             }
-        });
+        };
+
+        if(KryoRegistrator.fakeLag){
+            server.addListener(new LagListener(0, KryoRegistrator.fakeLagAmount, listener));
+        }else{
+            server.addListener(listener);
+        }
 
         register(Registrator.getClasses());
     }
@@ -93,14 +99,13 @@ public class KryoServer implements ServerProvider {
 
     @Override
     public void kick(int connection) {
-        Connection conn;
-        try {
-            conn = getByID(connection);
-        }catch (Exception e){
-            e.printStackTrace();
+        Connection conn = getByID(connection);
+
+        if(conn == null){
             connections.removeValue(connection);
             return;
         }
+
         KickPacket p = new KickPacket();
         p.reason = (byte)KickReason.kick.ordinal();
 
@@ -137,6 +142,7 @@ public class KryoServer implements ServerProvider {
     @Override
     public void sendStream(int id, Streamable stream) {
         Connection connection = getByID(id);
+        if(connection == null) return;
 
         connection.addListener(new InputStreamSender(stream.stream, 512) {
             int id;
@@ -219,7 +225,6 @@ public class KryoServer implements ServerProvider {
             }
         }
 
-        throw new RuntimeException("Unable to find connection with ID " + id + "! Current connections: "
-                + Arrays.toString(server.getConnections()));
+        return null;
     }
 }

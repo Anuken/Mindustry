@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.esotericsoftware.kryonet.*;
 import com.esotericsoftware.kryonet.FrameworkMessage.DiscoverHost;
+import com.esotericsoftware.kryonet.Listener.LagListener;
 import com.esotericsoftware.kryonet.serialization.Serialization;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.net.Host;
@@ -51,15 +52,15 @@ public class KryoClient implements ClientProvider{
             }
         };
 
-        client = new Client();
+        client = new Client(8192, 2048*2);
         client.setDiscoveryHandler(handler);
 
-        client.addListener(new Listener(){
+        Listener listener = new Listener(){
             @Override
             public void connected (Connection connection) {
                 Connect c = new Connect();
                 c.id = connection.getID();
-                c.addressTCP = connection.getRemoteAddressTCP().toString();
+                if(connection.getRemoteAddressTCP() != null) c.addressTCP = connection.getRemoteAddressTCP().toString();
 
                 try{
                     Net.handleClientReceived(c);
@@ -95,9 +96,14 @@ public class KryoClient implements ClientProvider{
                         });
                     }
                 }
-
             }
-        });
+        };
+
+        if(KryoRegistrator.fakeLag){
+            client.addListener(new LagListener(0, KryoRegistrator.fakeLagAmount, listener));
+        }else{
+            client.addListener(listener);
+        }
 
         register(Registrator.getClasses());
     }
