@@ -68,9 +68,8 @@ public class PausedDialog extends FloatingDialog{
 			content().addButton("$text.quit", () -> {
                 ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
                 	if(Net.active() && Net.client()) Vars.netClient.disconnectQuietly();
-					runSave();
+					runExitSave();
 					hide();
-					GameState.set(State.menu);
 				});
 			});
 
@@ -111,9 +110,8 @@ public class PausedDialog extends FloatingDialog{
 			new imagebutton("icon-quit", isize, () -> {
 				Vars.ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
 					if(Net.active() && Net.client()) Vars.netClient.disconnectQuietly();
-					runSave();
+					runExitSave();
 					hide();
-					GameState.set(State.menu);
 				});
 			}).text("Quit").padTop(4f);
 			
@@ -127,9 +125,13 @@ public class PausedDialog extends FloatingDialog{
 		}
 	}
 
-	private void runSave(){
+	private void runExitSave(){
 		if(Vars.control.getSaves().getCurrent() == null ||
-				!Vars.control.getSaves().getCurrent().isAutosave()) return;
+				!Vars.control.getSaves().getCurrent().isAutosave()){
+			GameState.set(State.menu);
+			Vars.control.getTutorial().reset();
+			return;
+		}
 
 		Vars.ui.loadfrag.show("$text.saveload");
 
@@ -141,6 +143,7 @@ public class PausedDialog extends FloatingDialog{
 				e = (e.getCause() == null ? e : e.getCause());
 				Vars.ui.showError("[orange]"+ Bundles.get("text.savefail")+"\n[white]" + ClassReflection.getSimpleName(e.getClass()) + ": " + e.getMessage() + "\n" + "at " + e.getStackTrace()[0].getFileName() + ":" + e.getStackTrace()[0].getLineNumber());
 			}
+			GameState.set(State.menu);
 		});
 	}
 }

@@ -278,8 +278,6 @@ public class NetServer extends Module{
             for(EntityGroup<?> group : Entities.getAllGroups()) {
                 if(group.amount() == 0 || !(group.all().first() instanceof SyncEntity)) continue;
 
-                UCore.log("Writing group " + group.getType(), "amount: " + group.amount());
-
                 //get write size for one entity (adding 4, as you need to write the ID as well)
                 int writesize = SyncEntity.getWriteSize((Class<? extends SyncEntity>)group.getType()) + 4;
                 //amount of entities
@@ -308,7 +306,6 @@ public class NetServer extends Module{
                     }
 
                     SyncEntity entity = (SyncEntity) group.all().get(i);
-                    UCore.log("Writing entity: " + entity.id);
 
                     //write ID to the buffer
                     current.putInt(entity.id);

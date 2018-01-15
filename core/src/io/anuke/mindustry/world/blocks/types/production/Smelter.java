@@ -25,8 +25,8 @@ public class Smelter extends Block{
 	protected Item fuel;
 	protected Item result;
 
-	protected float craftTime = 15f; //time to craft one item, so max 4 items per second by default
-	protected float burnDuration = 45f; //by default, the fuel will burn 45 frames, so that's 4 items/fuel at most
+	protected float craftTime = 20f; //time to craft one item, so max 3 items per second by default
+	protected float burnDuration = 50f; //by default, the fuel will burn 45 frames, so that's 2.5 items/fuel at most
 	protected Effect craftEffect = Fx.smelt, burnEffect = Fx.fuelburn;
 
 	protected int capacity = 20;

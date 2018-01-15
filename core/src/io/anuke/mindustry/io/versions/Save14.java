@@ -6,14 +6,14 @@ import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.io.SaveFileVersion;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.game.GameMode;
-import io.anuke.mindustry.world.WorldGenerator;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.WorldGenerator;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.mindustry.world.blocks.types.Rock;
@@ -165,6 +165,7 @@ public class Save14 extends SaveFileVersion{
         for(int i = 0; i < rocks; i ++){
             int pos = stream.readInt();
             Tile tile = Vars.world.tile(pos % Vars.world.width(), pos / Vars.world.width());
+            if(tile == null) continue;
             Block result = WorldGenerator.rocks.get(tile.floor());
             if(result != null) tile.setBlock(result);
         }

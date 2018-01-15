@@ -31,7 +31,7 @@ public class Tutorial{
 	}
 	
 	public boolean active(){
-		return world.getMap().name.equals("tutorial") && !GameState.is(State.menu);
+		return world.getMap() != null && world.getMap().name.equals("tutorial") && !GameState.is(State.menu);
 	}
 	
 	public void buildUI(table table){
