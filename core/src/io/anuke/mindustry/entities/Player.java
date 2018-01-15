@@ -2,20 +2,20 @@ package io.anuke.mindustry.entities;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.graphics.Fx;
-import io.anuke.mindustry.net.Syncable;
 import io.anuke.mindustry.resource.Mech;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.*;
-import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
+import java.nio.ByteBuffer;
+
 import static io.anuke.mindustry.Vars.*;
 
-public class Player extends DestructibleEntity implements Syncable{
+public class Player extends SyncEntity{
 	static final float speed = 1.1f;
 	static final float dashSpeed = 1.8f;
 
@@ -33,7 +33,6 @@ public class Player extends DestructibleEntity implements Syncable{
 
 	public transient int clientid;
 	public transient boolean isLocal = false;
-	public transient Interpolator<Player> inter = new Interpolator<>(SyncType.player);
 	
 	public Player(){
 		hitbox.setSize(5);
@@ -41,11 +40,6 @@ public class Player extends DestructibleEntity implements Syncable{
 		
 		maxhealth = 200;
 		heal();
-	}
-
-	@Override
-	public Interpolator<Player> getInterpolator() {
-		return inter;
 	}
 
 	@Override
@@ -117,7 +111,7 @@ public class Player extends DestructibleEntity implements Syncable{
 	@Override
 	public void update(){
 		if(!isLocal || isAndroid || Vars.ui.chatfrag.chatOpen()){
-			if(!isDead() && !isLocal) inter.update(this);
+			if(!isDead() && !isLocal) interpolate();
 			return;
 		}
 
@@ -186,4 +180,49 @@ public class Player extends DestructibleEntity implements Syncable{
     public String toString() {
         return "Player{" + id + ", android=" + isAndroid + ", local=" + isLocal + ", " + x + ", " + y + "}\n";
     }
+
+	@Override
+	public void write(ByteBuffer data) {
+		data.putFloat(x);
+		data.putFloat(y);
+		data.putFloat(angle);
+		data.putShort((short)health);
+		data.put((byte)(dashing ? 1 : 0));
+	}
+
+	@Override
+	public void read(ByteBuffer data) {
+		float x = data.getFloat();
+		float y = data.getFloat();
+		float angle = data.getFloat();
+		short health = data.getShort();
+		byte dashing = data.get();
+
+		interpolator.target.set(x, y);
+		interpolator.targetrot = angle;
+		this.health = health;
+		this.dashing = dashing == 1;
+	}
+
+	@Override
+	public void interpolate() {
+		Interpolator i = interpolator;
+		if(i.target.dst(x, y) > 16 && !isAndroid){
+			set(i.target.x, i.target.y);
+		}
+
+		if(isAndroid && i.target.dst(x, y) > 2f && Timers.get(this, "dashfx", 2)){
+			Angles.translation(angle + 180, 3f);
+			Effects.effect(Fx.dashsmoke, x + Angles.x(), y + Angles.y());
+		}
+
+		if(dashing && Timers.get(this, "dashfx", 3)){
+			Angles.translation(angle + 180, 3f);
+			Effects.effect(Fx.dashsmoke, x + Angles.x(), y + Angles.y());
+		}
+
+		x = Mathf.lerpDelta(x, i.target.x, 0.4f);
+		y = Mathf.lerpDelta(y, i.target.y, 0.4f);
+		angle = Mathf.lerpAngDelta(angle, i.targetrot, 0.6f);
+	}
 }

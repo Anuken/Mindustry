@@ -52,7 +52,7 @@ public class KryoClient implements ClientProvider{
             }
         };
 
-        client = new Client(8192, 2048*2);
+        client = new Client(8192, 2048);
         client.setDiscoveryHandler(handler);
 
         Listener listener = new Listener(){

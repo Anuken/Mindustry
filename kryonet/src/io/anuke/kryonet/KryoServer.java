@@ -30,7 +30,7 @@ public class KryoServer implements ServerProvider {
     IntArray connections = new IntArray();
 
     public KryoServer(){
-        server = new Server(4096*2, 2048*2); //TODO tweak
+        server = new Server(4096*2, 2048); //TODO tweak
         server.setDiscoveryHandler((datagramChannel, fromAddress) -> {
             ByteBuffer buffer = KryoRegistrator.writeServerData();
             UCore.log("Replying to discover request with buffer of size " + buffer.capacity());

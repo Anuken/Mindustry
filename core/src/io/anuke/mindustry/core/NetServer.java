@@ -6,6 +6,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.io.NetworkIO;
@@ -17,7 +18,9 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
+import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
@@ -26,6 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 public class NetServer extends Module{
     /**Maps connection IDs to players.*/
@@ -49,8 +53,8 @@ public class NetServer extends Module{
                 player.name = packet.name;
                 player.isAndroid = packet.android;
                 player.set(Vars.control.core.worldx(), Vars.control.core.worldy() - Vars.tilesize*2);
-                player.getInterpolator().last.set(player.x, player.y);
-                player.getInterpolator().target.set(player.x, player.y);
+                player.interpolator.last.set(player.x, player.y);
+                player.interpolator.target.set(player.x, player.y);
                 connections.put(id, player);
 
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -95,7 +99,7 @@ public class NetServer extends Module{
 
         Net.handleServer(PositionPacket.class, pos -> {
             Player player = connections.get(Net.getLastConnection());
-            player.getInterpolator().type.read(player, pos.data);
+            player.read(ByteBuffer.wrap(pos.data));
         });
 
         Net.handleServer(ShootPacket.class, packet -> {
@@ -270,32 +274,71 @@ public class NetServer extends Module{
     void sync(){
 
         if(Timers.get("serverSync", serverSyncTime)){
-            SyncPacket packet = new SyncPacket();
-            int amount = Vars.control.playerGroup.amount() + Vars.control.enemyGroup.amount();
-            packet.ids = new int[amount];
-            packet.data = new float[amount][0];
+            //scan through all groups with syncable entities
+            for(EntityGroup<?> group : Entities.getAllGroups()) {
+                if(group.amount() == 0 || !(group.all().first() instanceof SyncEntity)) continue;
 
-            short index = 0;
+                UCore.log("Writing group " + group.getType(), "amount: " + group.amount());
 
-            for(Player player : Vars.control.playerGroup.all()){
-                float[] out = player.getInterpolator().type.write(player);
-                packet.data[index] = out;
-                packet.ids[index] = player.id;
+                //get write size for one entity (adding 4, as you need to write the ID as well)
+                int writesize = SyncEntity.getWriteSize((Class<? extends SyncEntity>)group.getType()) + 4;
+                //amount of entities
+                int amount = group.amount();
+                //maximum amount of entities per packet
+                int maxsize = 64;
 
-                index ++;
+                //current buffer you're writing to
+                ByteBuffer current = null;
+                //number of entities written to this packet/buffer
+                int written = 0;
+
+                //for all the entities...
+                for (int i = 0; i < amount; i++) {
+                    //if the buffer is null, create a new one
+                    if(current == null){
+                        //calculate amount of entities to go into this packet
+                        int csize = Math.min(amount-i, maxsize);
+                        //create a byte array to write to
+                        byte[] bytes = new byte[csize*writesize + 1];
+                        //wrap it for easy writing
+                        current = ByteBuffer.wrap(bytes);
+                        //write the group ID so the client knows which group this is
+                        current.put((byte)group.getID());
+                        UCore.log("    Writing new packet: " + i);
+                    }
+
+                    SyncEntity entity = (SyncEntity) group.all().get(i);
+                    UCore.log("Writing entity: " + entity.id);
+
+                    //write ID to the buffer
+                    current.putInt(entity.id);
+
+                    int previous = current.position();
+                    //write extra data to the buffer
+                    entity.write(current);
+
+                    written ++;
+
+                    //if the packet is too big now...
+                    if(written >= maxsize){
+                        //send the packet.
+                        SyncPacket packet = new SyncPacket();
+                        packet.data = current.array();
+                        Net.send(packet, SendMode.udp);
+
+                        //reset data, send the next packet
+                        current = null;
+                        written = 0;
+                    }
+                }
+
+                //make sure to send incomplete packets too
+                if(current != null){
+                    SyncPacket packet = new SyncPacket();
+                    packet.data = current.array();
+                    Net.send(packet, SendMode.udp);
+                }
             }
-
-            packet.enemyStart = index;
-
-            for(Enemy enemy : Vars.control.enemyGroup.all()){
-                float[] out = enemy.getInterpolator().type.write(enemy);
-                packet.data[index] = out;
-                packet.ids[index] = enemy.id;
-
-                index ++;
-            }
-
-            Net.send(packet, SendMode.udp);
         }
 
         if(Timers.get("serverItemSync", itemSyncTime)){

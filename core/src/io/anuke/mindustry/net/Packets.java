@@ -18,9 +18,7 @@ public class Packets {
     }
 
     public static class SyncPacket{
-        public int[] ids;
-        public float[][] data;
-        public short enemyStart;
+        public byte[] data;
     }
 
     public static class BlockSyncPacket extends Streamable{
@@ -48,7 +46,7 @@ public class Packets {
     }
 
     public static class PositionPacket{
-        public float[] data;
+        public byte[] data;
     }
 
     public static class EffectPacket{

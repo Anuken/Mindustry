@@ -3,7 +3,6 @@ package io.anuke.mindustry.world;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import io.anuke.mindustry.world.blocks.*;
-import io.anuke.ucore.UCore;
 
 public class BlockLoader {
     static final ObjectIntMap<String> defaultMap = map(

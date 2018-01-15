@@ -9,6 +9,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.mindustry.graphics.Fx;
@@ -16,8 +17,6 @@ import io.anuke.mindustry.io.NetworkIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.net.Syncable;
-import io.anuke.mindustry.net.Syncable.Interpolator;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Recipes;
 import io.anuke.mindustry.resource.Upgrade;
@@ -30,10 +29,12 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BaseBulletType;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
+import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import static io.anuke.mindustry.Vars.ui;
 
@@ -113,33 +114,30 @@ public class NetClient extends Module {
         Net.handle(SyncPacket.class, packet -> {
             if(!gotData) return;
 
-            //TODO awful code
-            for(int i = 0; i < packet.ids.length; i ++){
-                int id = packet.ids[i];
-                if(id != Vars.player.id){
-                    Entity entity;
-                    if(i >= packet.enemyStart){
-                        entity = Vars.control.enemyGroup.getByID(id);
-                    }else {
-                        entity = Vars.control.playerGroup.getByID(id);
+            ByteBuffer data = ByteBuffer.wrap(packet.data);
+
+            byte groupid = data.get();
+
+            EntityGroup<?> group = Entities.getGroup(groupid);
+
+            while(data.position() < data.capacity()){
+                int id = data.getInt();
+
+                SyncEntity entity = (SyncEntity) group.getByID(id);
+
+                if (entity == null || id == Vars.player.id) {
+                    if (!requests.contains(id) && id != Vars.player.id) {
+                        UCore.log("Requesting entity " + id, "group " + group.getType());
+                        requests.add(id);
+                        EntityRequestPacket req = new EntityRequestPacket();
+                        req.id = id;
+                        Net.send(req, SendMode.tcp);
                     }
-
-                    Syncable sync = ((Syncable)entity);
-
-                    if(sync == null){
-                        if(!requests.contains(id)){
-                            requests.add(id);
-                            Gdx.app.error("Mindustry", "Sending entity request: " + id);
-                            EntityRequestPacket req = new EntityRequestPacket();
-                            req.id = id;
-                            Net.send(req, SendMode.tcp);
-                        }
-                        continue;
-                    }
-
-                    //augh
-                    ((Interpolator)sync.getInterpolator()).type.read(entity, packet.data[i]);
+                    data.position(data.position() + SyncEntity.getWriteSize((Class<? extends SyncEntity>) group.getType()));
+                } else {
+                    entity.read(data);
                 }
+
             }
         });
 
@@ -281,8 +279,8 @@ public class NetClient extends Module {
                         recieved.contains(player.id)) return;
                 recieved.add(player.id);
 
-                player.getInterpolator().last.set(player.x, player.y);
-                player.getInterpolator().target.set(player.x, player.y);
+                player.interpolator.last.set(player.x, player.y);
+                player.interpolator.target.set(player.x, player.y);
                 player.add();
             });
         });
@@ -412,8 +410,12 @@ public class NetClient extends Module {
 
     void sync(){
         if(Timers.get("syncPlayer", playerSyncTime)){
+            byte[] bytes = new byte[Vars.player.getWriteSize()];
+            ByteBuffer buffer = ByteBuffer.wrap(bytes);
+            Vars.player.write(buffer);
+
             PositionPacket packet = new PositionPacket();
-            packet.data = Vars.player.getInterpolator().type.write(Vars.player);
+            packet.data = bytes;
             Net.send(packet, SendMode.udp);
         }
 

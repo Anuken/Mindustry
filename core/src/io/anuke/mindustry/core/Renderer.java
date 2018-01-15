@@ -100,15 +100,8 @@ public class Renderer extends RendererModule{
 			clearScreen();
 		}else{
 			boolean smoothcam = Settings.getBool("smoothcam");
-			
-			//TODO identify the source of this bug
-			if(control.core == null){
-			//	ui.showError("$text.error.crashmessage");
-			//	GameState.set(State.menu);
-			//	return;
-			}
 
-			if(control.core.block() == ProductionBlocks.core){
+			if(control.core == null || control.core.block() == ProductionBlocks.core){
 				if(!smoothcam){
 					setCamera(player.x, player.y);
 				}else{

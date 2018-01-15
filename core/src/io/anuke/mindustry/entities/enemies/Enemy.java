@@ -4,17 +4,17 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.Syncable;
-import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
 
-public class Enemy extends DestructibleEntity implements Syncable{
-	protected Interpolator<Enemy> inter = new Interpolator<>(SyncType.enemy);
+import java.nio.ByteBuffer;
 
+public class Enemy extends SyncEntity {
 	public final EnemyType type;
 
 	public Timer timer = new Timer(5);
@@ -92,8 +92,36 @@ public class Enemy extends DestructibleEntity implements Syncable{
 	}
 
 	@Override
-	public Interpolator<Enemy> getInterpolator() {
-		return inter;
+	public void write(ByteBuffer data) {
+		data.putFloat(x);
+		data.putFloat(y);
+		data.putShort((short)(angle*2));
+		data.putShort((short)health);
+	}
+
+	@Override
+	public void read(ByteBuffer data) {
+
+		float x = data.getFloat();
+		float y = data.getFloat();
+		short angle = data.getShort();
+		short health = data.getShort();
+
+		interpolator.target.set(x, y);
+		interpolator.targetrot = angle/2f;
+		this.health = health;
+	}
+
+	@Override
+	public void interpolate() {
+		Interpolator i = interpolator;
+		if(i.target.dst(x, y) > 16){
+			set(i.target.x, i.target.y);
+		}
+
+		x = Mathf.lerpDelta(x, i.target.x, 0.4f);
+		y = Mathf.lerpDelta(y, i.target.y, 0.4f);
+		angle = Mathf.lerpAngDelta(angle, i.targetrot, 0.6f);
 	}
 
 	public void shoot(BulletType bullet){

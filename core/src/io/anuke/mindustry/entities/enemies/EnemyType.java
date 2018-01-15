@@ -138,7 +138,7 @@ public class EnemyType {
         float range = this.range + enemy.tier * 5;
 
         if(Net.client() && Net.active()){
-            enemy.inter.update(enemy); //TODO? better structure for interpolation
+            enemy.interpolate(); //TODO? better structure for interpolation
             return;
         }
 
