@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit trunk//EN" "https://raw.githubusercontent.com/gwtproject/gwt/master/distro-source/core/src/gwt-module.dtd">
 <module>
 	<source path="io/anuke/mindustry" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.Tile" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.io.Maps" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.Map" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.game.EnemySpawn" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.io.SaveFileVersion" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.resource.Recipe" />
 </module>

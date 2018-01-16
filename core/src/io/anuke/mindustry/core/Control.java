@@ -58,7 +58,7 @@ public class Control extends Module{
 	public final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
 	public final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class);
 	
-	Array<io.anuke.mindustry.game.EnemySpawn> spawns;
+	Array<EnemySpawn> spawns;
 	int wave = 1;
 	int lastUpdated = -1;
 	float wavetime;
@@ -67,7 +67,7 @@ public class Control extends Module{
 	GameMode mode = GameMode.waves;
 	
 	Tile core;
-	Array<io.anuke.mindustry.game.SpawnPoint> spawnpoints = new Array<>();
+	Array<SpawnPoint> spawnpoints = new Array<>();
 	boolean shouldUpdateItems = false;
 	boolean wasPaused = false;
 
@@ -191,7 +191,7 @@ public class Control extends Module{
 		);
 		
 		for(int i = 0; i < Vars.saveSlots; i ++){
-			Settings.defaults("save-" + i + "-autosave", true);
+			Settings.defaults("save-" + i + "-autosave", !Vars.gwt);
 			Settings.defaults("save-" + i + "-name", "untitled");
 			Settings.defaults("save-" + i + "-data", "empty");
 		}
@@ -199,7 +199,7 @@ public class Control extends Module{
 		Settings.defaultList(
 			"ip", "localhost",
 			"port", Vars.port+"",
-			"name", Vars.android ? "player" : UCore.getProperty("user.name"),
+			"name", Vars.android || Vars.gwt ? "player" : UCore.getProperty("user.name"),
 			"servers", ""
 		);
 		

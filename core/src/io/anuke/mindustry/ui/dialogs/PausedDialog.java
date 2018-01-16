@@ -55,13 +55,15 @@ public class PausedDialog extends FloatingDialog{
 
 			content().row();
 
-			content().addButton("$text.hostserver", () ->{
-				if(Vars.world.getMap().custom){
-					ui.showError("$text.nohost");
-				}else {
-					ui.host.show();
-				}
-			}).disabled(b -> Net.active());
+			if(!Vars.gwt) {
+				content().addButton("$text.hostserver", () -> {
+					if (Vars.world.getMap().custom) {
+						ui.showError("$text.nohost");
+					} else {
+						ui.host.show();
+					}
+				}).disabled(b -> Net.active());
+			}
 
             content().row();
 

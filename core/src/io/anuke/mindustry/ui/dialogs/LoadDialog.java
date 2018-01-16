@@ -142,6 +142,8 @@ public class LoadDialog extends FloatingDialog{
 
 		slots.row();
 
+		if(Vars.gwt) return;
+
 		slots.addImageTextButton("$text.save.import", "icon-add", "clear", 14*3, () -> {
 			new FileChooser("$text.save.import", f -> f.extension().equals("mins"), true, file -> {
 				if(SaveIO.isSaveValid(file)){
