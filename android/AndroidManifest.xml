@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.anuke.mindustry"
-    android:versionCode="54"
-    android:versionName="3.3b6" >
+    android:versionCode="55"
+    android:versionName="3.3b7" >
 
     <uses-permission android:name="com.android.vending.BILLING" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
