@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
 import com.badlogic.gdx.graphics.Color;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.production.Generator;
 
@@ -15,7 +16,12 @@ public class PowerLaser extends Generator{
 		laserDirections = 1;
 		health = 50;
 	}
-	
+
+	@Override
+	public boolean canReplace(Block other) {
+		return other instanceof  PowerLaser && other != this;
+	}
+
 	@Override
 	public void update(Tile tile){
 		distributeLaserPower(tile);

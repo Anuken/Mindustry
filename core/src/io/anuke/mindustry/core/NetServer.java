@@ -262,6 +262,7 @@ public class NetServer extends Module{
             sync();
         }else if(!closing){
             closing = true;
+            weapons.clear();
             Vars.ui.loadfrag.show("$text.server.closing");
             Timers.runTask(5f, () -> {
                 Net.closeServer();

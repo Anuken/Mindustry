@@ -5,7 +5,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidBlock;
 import io.anuke.ucore.core.Draw;
 
-public class LiquidJunction extends LiquidBlock{
+public class LiquidJunction extends Conduit{
 
 	public LiquidJunction(String name) {
 		super(name);

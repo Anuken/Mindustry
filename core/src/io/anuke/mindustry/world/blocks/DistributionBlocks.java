@@ -1,18 +1,17 @@
 package io.anuke.mindustry.world.blocks;
 
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.LiquidBlock;
 import io.anuke.mindustry.world.blocks.types.distribution.*;
 
 public class DistributionBlocks{
 	
 	public static final Block
 	
-	conduit = new LiquidBlock("conduit"){{
+	conduit = new Conduit("conduit"){{
 		health = 45;
 	}},
 	
-	pulseconduit = new LiquidBlock("pulseconduit"){{
+	pulseconduit = new Conduit("pulseconduit"){{
 		liquidCapacity = 16f;
 		flowfactor = 4.9f;
 		health = 65;
