@@ -39,6 +39,7 @@ public class Registrator {
                 EntityRequestPacket.class,
                 ConnectConfirmPacket.class,
                 GameOverPacket.class,
+                FriendlyFireChangePacket.class,
 
                 Class.class,
                 byte[].class,

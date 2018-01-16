@@ -13,7 +13,7 @@ import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.mindustry.graphics.Fx;
-import io.anuke.mindustry.io.NetworkIO;
+import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
@@ -319,6 +319,8 @@ public class NetClient extends Module {
             kicked = true;
             Gdx.app.postRunnable(ui.restart::show);
         });
+
+        Net.handle(FriendlyFireChangePacket.class, packet -> Vars.control.setFriendlyFire(packet.enabled));
     }
 
     @Override

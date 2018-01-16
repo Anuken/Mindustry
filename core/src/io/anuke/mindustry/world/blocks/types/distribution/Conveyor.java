@@ -18,8 +18,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.AbstractList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import static io.anuke.mindustry.Vars.tilesize;
@@ -74,6 +72,8 @@ public class Conveyor extends Block{
 		
 		for(int i = 0; i < entity.convey.size; i ++){
 			ItemPos pos = pos1.set(entity.convey.get(i));
+
+			if(pos.item == null) continue;
 			
 			Tmp.v1.set(tilesize, 0).rotate(rotation * 90);
 			Tmp.v2.set(-tilesize / 2, pos.x*tilesize/2).rotate(rotation * 90);
@@ -97,6 +97,11 @@ public class Conveyor extends Block{
 		for(int i = 0; i < entity.convey.size; i ++){
 			int value = entity.convey.get(i);
 			ItemPos pos = pos1.set(value);
+
+			if(pos.item == null){
+				removals.add(value);
+				continue;
+			}
 			
 			boolean canmove = i == entity.convey.size - 1 || 
 					!(pos2.set(entity.convey.get(i + 1)).y - pos.y < itemSpace * Timers.delta());
@@ -230,10 +235,10 @@ public class Conveyor extends Block{
 	        }
 	    };
 	    
-	    Collections.sort(wrapper, new Comparator(){public int compare(Object a, Object b){ return compareItems((Integer)a, (Integer)b); }});
+	    wrapper.sort(Conveyor::compareItems);
 	}
 	
-	private static int compareItems(int a, int b){
+	private static int compareItems(Integer a, Integer b){
 		pos1.set(a);
 		pos2.set(b);
 		return Float.compare(pos1.y, pos2.y);
@@ -249,7 +254,12 @@ public class Conveyor extends Block{
 		
 		ItemPos set(int value){
 			byte[] values = Bits.getBytes(value);
-			item = Item.getAllItems().get(values[0]);
+
+			if(values[0] > Item.getAllItems().size)
+				item = null;
+			else
+				item = Item.getAllItems().get(values[0]);
+
 			x = values[1] / 127f;
 			y = ((int)values[2] + 128) / 255f;
 			seed = values[3];

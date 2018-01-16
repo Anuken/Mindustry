@@ -75,6 +75,7 @@ public class Control extends Module{
 
 	float respawntime;
 	InputHandler input;
+	boolean friendlyFire;
 
     private InputProxy proxy;
     private float controlx, controly;
@@ -218,14 +219,6 @@ public class Control extends Module{
 
 		saves.load();
 	}
-
-	public Saves getSaves(){
-		return saves;
-	}
-
-	public boolean showCursor(){
-		return controlling;
-	}
 	
 	public void reset(){
 		weapons.clear();
@@ -277,7 +270,26 @@ public class Control extends Module{
 		
 		GameState.set(State.playing);
 	}
-	
+
+	public Saves getSaves(){
+		return saves;
+	}
+
+	public boolean showCursor(){
+		return controlling;
+	}
+
+	public boolean isFriendlyFire() {
+		return friendlyFire;
+	}
+
+	public void setFriendlyFire(boolean friendlyFire) {
+		if(this.friendlyFire != friendlyFire && Net.active() && Net.server()){
+			Vars.netServer.handleFriendlyFireChange(friendlyFire);
+		}
+		this.friendlyFire = friendlyFire;
+	}
+
 	public Tile getCore(){
 		return core;
 	}

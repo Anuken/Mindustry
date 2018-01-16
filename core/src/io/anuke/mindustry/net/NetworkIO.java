@@ -1,4 +1,4 @@
-package io.anuke.mindustry.io;
+package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.ByteArray;
@@ -19,7 +19,7 @@ import io.anuke.ucore.entities.Entities;
 import java.io.*;
 
 public class NetworkIO {
-    private static final int fileVersionID = 15;
+    private static final int fileVersionID = 16;
 
     public static void write(int playerID, ByteArray upgrades, OutputStream os){
 
@@ -38,6 +38,7 @@ public class NetworkIO {
             stream.writeFloat(Vars.control.getWaveCountdown()); //wave countdown
             stream.writeInt(Vars.control.enemyGroup.amount()); //enemy amount
 
+            stream.writeBoolean(Vars.control.isFriendlyFire()); //friendly fire state
             stream.writeInt(playerID); //player remap ID
 
             //--INVENTORY--
@@ -168,9 +169,11 @@ public class NetworkIO {
             int wave = stream.readInt();
             float wavetime = stream.readFloat();
             int enemies = stream.readInt();
+            boolean friendlyfire = stream.readBoolean();
 
             Vars.control.setWaveData(enemies, wave, wavetime);
             Vars.control.setMode(GameMode.values()[mode]);
+            Vars.control.setFriendlyFire(friendlyfire);
 
             int pid = stream.readInt();
 

@@ -9,7 +9,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
-import io.anuke.mindustry.io.NetworkIO;
+import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
@@ -220,6 +220,15 @@ public class NetServer extends Module{
         Gdx.app.postRunnable(() -> Vars.ui.chatfrag.addMessage(message, null));
     }
 
+    public void handleFriendlyFireChange(boolean enabled){
+        FriendlyFireChangePacket packet = new FriendlyFireChangePacket();
+        packet.enabled = enabled;
+
+        sendMessage(enabled ? "[accent]Friendly fire enabled." : "[accent]Friendly fire disabled.");
+
+        Net.send(packet, SendMode.tcp);
+    }
+
     public void handleGameOver(){
         Net.send(new GameOverPacket(), SendMode.tcp);
         Timers.runTask(30f, () -> GameState.set(State.menu));
@@ -303,7 +312,6 @@ public class NetServer extends Module{
                         current = ByteBuffer.wrap(bytes);
                         //write the group ID so the client knows which group this is
                         current.put((byte)group.getID());
-                        UCore.log("    Writing new packet: " + i);
                     }
 
                     SyncEntity entity = (SyncEntity) group.all().get(i);

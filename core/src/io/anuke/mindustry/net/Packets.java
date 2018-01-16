@@ -137,4 +137,8 @@ public class Packets {
     public static class GameOverPacket{
 
     }
+
+    public static class FriendlyFireChangePacket{
+        public boolean enabled;
+    }
 }

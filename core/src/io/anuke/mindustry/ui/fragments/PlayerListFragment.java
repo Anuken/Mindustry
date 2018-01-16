@@ -31,6 +31,13 @@ public class PlayerListFragment implements Fragment{
                 pane.setScrollingDisabled(true, false);
                 pane.setFadeScrollBars(false);
                 add(pane).grow();
+                row();
+                new table("pane"){{
+                    margin(12f);
+                    get().addCheck("$text.server.friendlyfire", b -> {
+                        Vars.control.setFriendlyFire(b);
+                    }).growX().update(i -> i.setChecked(Vars.control.isFriendlyFire())).disabled(b -> Net.client());
+                }}.pad(10f).growX().end();
             }}.end();
 
             update(t -> {

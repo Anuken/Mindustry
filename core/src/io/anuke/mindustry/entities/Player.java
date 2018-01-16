@@ -50,6 +50,12 @@ public class Player extends SyncEntity{
 
 	@Override
 	public boolean collides(SolidEntity other){
+		if(other instanceof Bullet){
+			Bullet b = (Bullet)other;
+			if(!Vars.control.isFriendlyFire() && b.owner instanceof Player){
+				return false;
+			}
+		}
 		return super.collides(other) && !isAndroid;
 	}
 	
