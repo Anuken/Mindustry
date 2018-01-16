@@ -15,6 +15,7 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
 public class PlayerListFragment implements Fragment{
+    public boolean visible = false;
     Table content = new Table();
     int last = 0;
 
@@ -41,13 +42,19 @@ public class PlayerListFragment implements Fragment{
             }}.end();
 
             update(t -> {
-               if(Vars.control.playerGroup.amount() != last){
-                   rebuild();
-                   last = Vars.control.playerGroup.amount();
-               }
+                if(!Vars.android){
+                    visible = Inputs.keyDown("player_list");
+                }
+                if(!(Net.active() && !GameState.is(State.menu))){
+                    visible = false;
+                }
+                if(Vars.control.playerGroup.amount() != last){
+                    rebuild();
+                    last = Vars.control.playerGroup.amount();
+                }
             });
 
-            visible(() -> Inputs.keyDown("player_list") && Net.active() && !GameState.is(State.menu));
+            visible(() -> visible);
         }}.end();
 
         rebuild();

@@ -35,72 +35,80 @@ public class HudFragment implements Fragment{
 		new table(){{
 			atop();
 			aleft();
-			
+
 			new table(){{
-				left();
-				float dsize = 58;
-				defaults().size(dsize).left();
-				float isize = 40;
 
-				menu = new imagebutton("icon-menu", isize, ui.paused::show).get();
+				new table() {{
+					left();
+					float dsize = 58;
+					defaults().size(dsize).left();
+					float isize = 40;
 
-				flip = new imagebutton("icon-arrow-up", isize, () -> {
-					if(wavetable.getActions().size != 0) return;
+					menu = new imagebutton("icon-menu", isize, ui.paused::show).get();
 
-					float dur = 0.3f;
-					Interpolation in = Interpolation.pow3Out;
+					flip = new imagebutton("icon-arrow-up", isize, () -> {
+						if (wavetable.getActions().size != 0) return;
 
-					flip.getStyle().imageUp = Core.skin.getDrawable(shown ? "icon-arrow-down" : "icon-arrow-up");
+						float dur = 0.3f;
+						Interpolation in = Interpolation.pow3Out;
 
-					if(shown){
-						blockfrag.toggle(false, dur, in);
-						wavetable.actions(Actions.translateBy(0, wavetable.getHeight() + dsize, dur, in), Actions.call(() -> shown = false));
-					}else{
-						shown = true;
-						blockfrag.toggle(true, dur, in);
-						wavetable.actions(Actions.translateBy(0, -wavetable.getTranslation().y, dur, in));
-					}
+						flip.getStyle().imageUp = Core.skin.getDrawable(shown ? "icon-arrow-down" : "icon-arrow-up");
 
-				}).get();
-
-				new imagebutton("icon-pause", isize, () -> {
-					if(Net.active() && Vars.android){
-						if(ui.chatfrag.chatOpen()){
-							ui.chatfrag.hide();
-						}else{
-							ui.chatfrag.toggle();
+						if (shown) {
+							blockfrag.toggle(false, dur, in);
+							wavetable.actions(Actions.translateBy(0, wavetable.getHeight() + dsize, dur, in), Actions.call(() -> shown = false));
+						} else {
+							shown = true;
+							blockfrag.toggle(true, dur, in);
+							wavetable.actions(Actions.translateBy(0, -wavetable.getTranslation().y, dur, in));
 						}
-					}else {
-						GameState.set(GameState.is(State.paused) ? State.playing : State.paused);
-					}
-				}).update(i -> {
-					if(Net.active() && Vars.android){
-						i.getStyle().imageUp = Core.skin.getDrawable("icon-chat");
-					}else {
-						i.setDisabled(Net.active());
-						i.getStyle().imageUp = Core.skin.getDrawable(GameState.is(State.paused) ? "icon-play" : "icon-pause");
-					}
-				}).get();
+
+					}).get();
+
+					new imagebutton("icon-pause", isize, () -> {
+						if (Net.active() && Vars.android) {
+							ui.listfrag.visible = !ui.listfrag.visible;
+						} else {
+							GameState.set(GameState.is(State.paused) ? State.playing : State.paused);
+						}
+					}).update(i -> {
+						if (Net.active() && Vars.android) {
+							i.getStyle().imageUp = Core.skin.getDrawable("icon-players");
+						} else {
+							i.setDisabled(Net.active());
+							i.getStyle().imageUp = Core.skin.getDrawable(GameState.is(State.paused) ? "icon-play" : "icon-pause");
+						}
+					}).get();
+
+				}}.end();
+
+				row();
+
+				new table() {{
+					touchable(Touchable.enabled);
+					visible(() -> shown);
+					addWaveTable();
+				}}.fillX().end();
+
+				row();
+
+				visible(() -> !GameState.is(State.menu));
+
+				Label fps = new Label(() -> (Settings.getBool("fps") ? (Gdx.graphics.getFramesPerSecond() + " FPS") +
+						(Net.active() ? " / Ping: " + Net.getPing() : "") : ""));
+				row();
+				add(fps).size(-1);
 
 			}}.end();
 
-			row();
-			
-			new table(){{
-				touchable(Touchable.enabled);
-				visible(() -> shown);
-				addWaveTable();
-			}}.fillX().end();
-			
-			row();
+			new imagebutton("icon-chat", 40f, () -> {
+				if (ui.chatfrag.chatOpen()) {
+					ui.chatfrag.hide();
+				} else {
+					ui.chatfrag.toggle();
+				}
+			}).visible(() -> Net.active() && android).top().left().size(58f).get();
 
-			visible(()->!GameState.is(State.menu));
-			
-			Label fps = new Label(()->(Settings.getBool("fps") ? (Gdx.graphics.getFramesPerSecond() + " FPS") +
-					(Net.active() ? " / Ping: " + Net.getPing() : ""): ""));
-			row();
-			add(fps).size(-1);
-			
 		}}.end();
 		
 		//tutorial ui table
