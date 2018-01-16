@@ -18,6 +18,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.AbstractList;
+import java.util.Collections;
 import java.util.List;
 
 import static io.anuke.mindustry.Vars.tilesize;
@@ -235,7 +236,7 @@ public class Conveyor extends Block{
 	        }
 	    };
 	    
-	    wrapper.sort(Conveyor::compareItems);
+	    Collections.sort(wrapper, Conveyor::compareItems);
 	}
 	
 	private static int compareItems(Integer a, Integer b){

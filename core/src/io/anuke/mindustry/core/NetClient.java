@@ -48,7 +48,7 @@ public class NetClient extends Module {
     IntSet requests = new IntSet();
     IntSet recieved = new IntSet();
     float playerSyncTime = 2;
-    float dataTimeout = 60*13; //13 seconds timeout
+    float dataTimeout = 60*15; //13 seconds timeout
 
     public NetClient(){
 

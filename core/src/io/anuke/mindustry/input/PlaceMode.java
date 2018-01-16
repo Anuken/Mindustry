@@ -1,8 +1,6 @@
 package io.anuke.mindustry.input;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Buttons;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -11,7 +9,6 @@ import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Draw;
-import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Bundles;
@@ -97,12 +94,9 @@ public enum PlaceMode{
 				Vector2 offset = tile.block().getPlaceOffset();
 				float fract = control.getInput().breaktime / tile.getBreakTime();
 				
-				if(Inputs.buttonDown(Buttons.RIGHT)){
-					Draw.color(Color.YELLOW, Color.SCARLET, fract);
-					Draw.linecrect(tile.worldx() + offset.x, tile.worldy() + offset.y, tile.block().width * Vars.tilesize, tile.block().height * Vars.tilesize);
-				}else if(android && control.getInput().breaktime > 0){
+				if(android && control.getInput().breaktime > 0){
 					Draw.color(Colors.get("breakStart"), Colors.get("break"), fract);
-					Draw.polygon(tile.worldy() + offset.y, tile.worldx() + offset.x, 25, 4 + (1f - fract) * 26);
+					Draw.polygon(tile.worldx() + offset.y, tile.worldy() + offset.x, 25, 4 + (1f - fract) * 26);
 				}
 				Draw.reset();
 			}

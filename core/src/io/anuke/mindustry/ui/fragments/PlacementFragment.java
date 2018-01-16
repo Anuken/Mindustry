@@ -54,6 +54,7 @@ public class PlacementFragment implements Fragment{
 						placing = false;
 						container.clearActions();
 						container.actions(Actions.translateBy(0, -(container.getTranslation().y + translation), i, n));
+						if (!input.lastBreakMode.both) input.placeMode = input.lastBreakMode;
 					}else{
 						placing = true;
 						container.clearActions();
@@ -131,6 +132,7 @@ public class PlacementFragment implements Fragment{
 							new imagebutton("icon-" + mode.name(), "toggle", 10 * 3, () -> {
 								control.getInput().resetCursor();
 								input.breakMode = mode;
+								input.lastBreakMode = mode;
 								if (!mode.both){
 									input.placeMode = mode;
 								}else{

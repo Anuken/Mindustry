@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.blocks.types.production;
 import com.badlogic.gdx.utils.Array;
 
 import io.anuke.mindustry.resource.Liquid;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidBlock;
@@ -24,7 +25,12 @@ public class Pump extends LiquidBlock{
 		layer = Layer.overlay;
 		flowfactor = 3f;
 	}
-	
+
+	@Override
+	public boolean canReplace(Block other) {
+		return other instanceof Pump && other != this;
+	}
+
 	@Override
 	public void getStats(Array<String> list){
 		super.getStats(list);
