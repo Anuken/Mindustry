@@ -31,7 +31,7 @@ public class HostDialog extends FloatingDialog{
 
         content().row();
 
-        content().addButton("Host", () -> {
+        content().addButton("$text.host", () -> {
             Vars.ui.loadfrag.show("$text.hosting");
             Timers.runTask(5f, () -> {
                 try{
