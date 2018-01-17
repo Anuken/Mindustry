@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class KryoServer implements ServerProvider {
+    final boolean debug = false;
     final Server server;
     final SocketServer webServer;
     final ByteSerializer serializer = new ByteSerializer();
@@ -311,14 +312,14 @@ public class KryoServer implements ServerProvider {
                 try {
                     synchronized (buffer) {
                         buffer.position(0);
-                        UCore.log("Sending object with ID " + Registrator.getID(object.getClass()));
+                        if(debug) UCore.log("Sending object with ID " + Registrator.getID(object.getClass()));
                         serializer.write(buffer, object);
                         int pos = buffer.position();
                         buffer.position(0);
                         byte[] out = new byte[pos];
                         buffer.get(out);
                         String string = new String(Base64Coder.encode(out));
-                        UCore.log("Sending string: " + string);
+                        if(debug) UCore.log("Sending string: " + string);
                         socket.send(string);
                     }
                 }catch (Exception e){
@@ -371,12 +372,12 @@ public class KryoServer implements ServerProvider {
         @Override
         public void onMessage(WebSocket conn, String message) {
             try {
-                UCore.log("Got message: " + message);
+                if(debug) UCore.log("Got message: " + message);
                 KryoConnection k = getBySocket(conn);
                 if (k == null) return;
 
                 byte[] out = Base64Coder.decode(message);
-                UCore.log("Decoded: " + Arrays.toString(out));
+                if(debug) UCore.log("Decoded: " + Arrays.toString(out));
                 ByteBuffer buffer = ByteBuffer.wrap(out);
                 Object o = serializer.read(buffer);
                 Net.handleServerReceived(o, k.id);
