@@ -30,7 +30,7 @@ public class KryoServer implements ServerProvider {
     IntArray connections = new IntArray();
 
     public KryoServer(){
-        server = new Server(4096*2, 2048); //TODO tweak
+        server = new Server(4096*2, 2048, connection -> new ByteSerializer()); //TODO tweak
         server.setDiscoveryHandler((datagramChannel, fromAddress) -> {
             ByteBuffer buffer = KryoRegistrator.writeServerData();
             UCore.log("Replying to discover request with buffer of size " + buffer.capacity());
@@ -107,7 +107,7 @@ public class KryoServer implements ServerProvider {
         }
 
         KickPacket p = new KickPacket();
-        p.reason = (byte)KickReason.kick.ordinal();
+        p.reason = KickReason.kick;
 
         conn.sendTCP(p);
         Timers.runTask(1f, () -> {
@@ -198,12 +198,7 @@ public class KryoServer implements ServerProvider {
     }
 
     @Override
-    public void register(Class<?>... types) {
-        for(Class<?> c : types){
-            server.getKryo().register(c);
-        }
-        KryoRegistrator.register(server.getKryo());
-    }
+    public void register(Class<?>... types) { }
 
     @Override
     public void dispose(){

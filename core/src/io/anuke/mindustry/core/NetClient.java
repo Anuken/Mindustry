@@ -272,12 +272,21 @@ public class NetClient extends Module {
             }
         });
 
-        Net.handle(Player.class, player -> {
+        Net.handle(PlayerSpawnPacket.class, packet -> {
             Gdx.app.postRunnable(() -> {
                 //duplicates.
-                if(Vars.control.enemyGroup.getByID(player.id) != null ||
-                        recieved.contains(player.id)) return;
-                recieved.add(player.id);
+                if(Vars.control.enemyGroup.getByID(packet.id) != null ||
+                        recieved.contains(packet.id)) return;
+                recieved.add(packet.id);
+
+                Player player = new Player();
+                player.x = packet.x;
+                player.y = packet.y;
+                player.isAndroid = packet.android;
+                player.name = packet.name;
+                player.id = packet.id;
+                player.weaponLeft = (Weapon) Upgrade.getByID(packet.weaponleft);
+                player.weaponRight = (Weapon) Upgrade.getByID(packet.weaponright);
 
                 player.interpolator.last.set(player.x, player.y);
                 player.interpolator.target.set(player.x, player.y);
@@ -291,7 +300,7 @@ public class NetClient extends Module {
             kicked = true;
             Net.disconnect();
             GameState.set(State.menu);
-            Gdx.app.postRunnable(() -> Vars.ui.showError("$text.server.kicked." + KickReason.values()[packet.reason].name()));
+            Gdx.app.postRunnable(() -> Vars.ui.showError("$text.server.kicked." + packet.reason.name()));
         });
 
         Net.handle(WeaponSwitchPacket.class, packet -> {

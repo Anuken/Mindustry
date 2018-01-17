@@ -121,7 +121,7 @@ public class Fx{
 	nuclearShockwave = new Effect(10f, 200f, e -> {
 		Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.ifract());
 		Draw.thick(e.fract()*3f + 0.2f);
-		Draw.polygon(e.y, e.x, 40, e.ifract()*140f);
+		Draw.polygon(e.x, e.y, 40, e.ifract()*140f);
 		Draw.reset();
 	}),
 	
@@ -452,7 +452,7 @@ public class Fx{
 	clusterbomb = new Effect(10f, e -> {
 		Draw.color(Color.WHITE, lightOrange, e.ifract());
 		Draw.thick(e.fract()*1.5f);
-		Draw.polygon(e.y, e.x, 4, e.fract()*8f);
+		Draw.polygon(e.x, e.y, 4, e.fract()*8f);
 		Draw.circle(e.x, e.y, e.ifract()*14f);
 		Draw.reset();
 	}),

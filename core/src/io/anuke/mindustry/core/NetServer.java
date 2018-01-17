@@ -190,7 +190,16 @@ public class NetServer extends Module{
             int dest = Net.getLastConnection();
             Gdx.app.postRunnable(() -> {
                 if(Vars.control.playerGroup.getByID(id) != null){
-                    Net.sendTo(dest, Vars.control.playerGroup.getByID(id), SendMode.tcp);
+                    Player player = Vars.control.playerGroup.getByID(id);
+                    PlayerSpawnPacket p = new PlayerSpawnPacket();
+                    p.x = player.x;
+                    p.y = player.y;
+                    p.id = player.id;
+                    p.name = player.name;
+                    p.weaponleft = player.weaponLeft.id;
+                    p.weaponright = player.weaponRight.id;
+                    p.android = player.isAndroid;
+                    Net.sendTo(dest, p, SendMode.tcp);
                     Gdx.app.error("Mindustry", "Replying to entity request ("+Net.getLastConnection()+"): player, " + id);
                 }else if (Vars.control.enemyGroup.getByID(id) != null){
                     Enemy enemy = Vars.control.enemyGroup.getByID(id);

@@ -1,59 +1,62 @@
 package io.anuke.mindustry.net;
 
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.enemies.Enemy;
+import com.badlogic.gdx.utils.ObjectIntMap;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamChunk;
-import io.anuke.ucore.entities.Entity;
 
 public class Registrator {
+    private static Class<?>[] classes = {
+            StreamBegin.class,
+            StreamChunk.class,
+            WorldData.class,
+            SyncPacket.class,
+            PositionPacket.class,
+            ShootPacket.class,
+            PlacePacket.class,
+            BreakPacket.class,
+            StateSyncPacket.class,
+            BlockSyncPacket.class,
+            EnemySpawnPacket.class,
+            PlayerSpawnPacket.class,
+            BulletPacket.class,
+            EnemyDeathPacket.class,
+            BlockUpdatePacket.class,
+            BlockDestroyPacket.class,
+            ConnectPacket.class,
+            DisconnectPacket.class,
+            ChatPacket.class,
+            KickPacket.class,
+            UpgradePacket.class,
+            WeaponSwitchPacket.class,
+            BlockTapPacket.class,
+            BlockConfigPacket.class,
+            EntityRequestPacket.class,
+            ConnectConfirmPacket.class,
+            GameOverPacket.class,
+            FriendlyFireChangePacket.class,
+    };
+    private static ObjectIntMap<Class<?>> ids = new ObjectIntMap<>();
+
+    static{
+        if(classes.length > 127) throw new RuntimeException("Can't have more than 127 registered classes!");
+        for(int i = 0; i < classes.length; i ++){
+            if(!ClassReflection.isAssignableFrom(Packet.class, classes[i]) &&
+                    !ClassReflection.isAssignableFrom(Streamable.class, classes[i])) throw new RuntimeException("Not a packet: " + classes[i]);
+            ids.put(classes[i], i);
+        }
+    }
+
+    public static Class<?> getByID(byte id){
+        return classes[id];
+    }
+
+    public static byte getID(Class<?> type){
+        return (byte)ids.get(type, -1);
+    }
 
     public static Class<?>[] getClasses(){
-        return new Class<?>[]{
-                StreamBegin.class,
-                StreamChunk.class,
-                WorldData.class,
-                SyncPacket.class,
-                PositionPacket.class,
-                ShootPacket.class,
-                PlacePacket.class,
-                BreakPacket.class,
-                StateSyncPacket.class,
-                BlockSyncPacket.class,
-                EnemySpawnPacket.class,
-                BulletPacket.class,
-                EnemyDeathPacket.class,
-                BlockUpdatePacket.class,
-                BlockDestroyPacket.class,
-                ConnectPacket.class,
-                DisconnectPacket.class,
-                ChatPacket.class,
-                KickPacket.class,
-                UpgradePacket.class,
-                WeaponSwitchPacket.class,
-                BlockTapPacket.class,
-                BlockConfigPacket.class,
-                EntityRequestPacket.class,
-                ConnectConfirmPacket.class,
-                GameOverPacket.class,
-                FriendlyFireChangePacket.class,
-
-                Class.class,
-                byte[].class,
-                float[].class,
-                float[][].class,
-                int[].class,
-                int[][].class,
-                Entity[].class,
-                Array.class,
-                Vector2.class,
-
-                Entity.class,
-                Player.class,
-                Enemy.class
-        };
+        return classes;
     }
 }

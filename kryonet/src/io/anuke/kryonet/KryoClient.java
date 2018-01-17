@@ -52,7 +52,7 @@ public class KryoClient implements ClientProvider{
             }
         };
 
-        client = new Client(8192, 2048);
+        client = new Client(8192, 2048, connection -> new ByteSerializer());
         client.setDiscoveryHandler(handler);
 
         Listener listener = new Listener(){
@@ -211,12 +211,7 @@ public class KryoClient implements ClientProvider{
     }
 
     @Override
-    public void register(Class<?>... types) {
-        for(Class<?> c : types){
-            client.getKryo().register(c);
-        }
-        KryoRegistrator.register(client.getKryo());
-    }
+    public void register(Class<?>... types) { }
 
     @Override
     public void dispose(){
