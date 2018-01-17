@@ -6,7 +6,7 @@ import club.minnced.discord.rpc.DiscordRichPresence;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.kryonet.KryoClient;
+import io.anuke.kryonet.JavaWebsocketClient;
 import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
@@ -120,7 +120,8 @@ public class DesktopLauncher {
 		
 		Mindustry.args = Array.with(arg);
 
-		Net.setClientProvider(new KryoClient());
+		//Net.setClientProvider(new KryoClient());
+		Net.setClientProvider(new JavaWebsocketClient());
 		Net.setServerProvider(new KryoServer());
 
 		try {

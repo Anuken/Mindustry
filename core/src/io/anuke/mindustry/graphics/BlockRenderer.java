@@ -1,21 +1,17 @@
 package io.anuke.mindustry.graphics;
 
-import static io.anuke.mindustry.Vars.*;
-import static io.anuke.ucore.core.Core.camera;
-
-import java.util.Arrays;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Array;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.SpawnPoint;
-import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Layer;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.StaticBlock;
 import io.anuke.ucore.core.Core;
@@ -23,6 +19,11 @@ import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.CacheBatch;
 import io.anuke.ucore.util.Mathf;
+
+import java.util.Arrays;
+
+import static io.anuke.mindustry.Vars.*;
+import static io.anuke.ucore.core.Core.camera;
 
 public class BlockRenderer{
 	private final static int chunksize = 32;
@@ -269,6 +270,6 @@ public class BlockRenderer{
 		cache = null;
 		if(cbatch != null)
 			cbatch.dispose();
-		cbatch = new CacheBatch(Vars.world.width() * Vars.world.height() * 3);
+		cbatch = new CacheBatch(Vars.world.width() * Vars.world.height() * 4);
 	}
 }

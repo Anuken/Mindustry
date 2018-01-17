@@ -2,7 +2,6 @@ package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
@@ -85,7 +84,7 @@ public class Net{
 	}
 
 	/**Returns a list of all connections IDs.*/
-	public static IntArray getConnections(){
+	public static Array<? extends NetConnection> getConnections(){
 		return serverProvider.getConnections();
 	}
 	
@@ -206,8 +205,8 @@ public class Net{
 	}
 
 	public static void dispose(){
-		clientProvider.dispose();
-		serverProvider.dispose();
+		if(clientProvider != null) clientProvider.dispose();
+		if(serverProvider != null) serverProvider.dispose();
 		executor.dispose();
 	}
 
@@ -218,51 +217,51 @@ public class Net{
 	}
 
 	/**Client implementation.*/
-	public static interface ClientProvider {
+	public interface ClientProvider {
 		/**Connect to a server.*/
-		public void connect(String ip, int port) throws IOException;
+		void connect(String ip, int port) throws IOException;
 		/**Send an object to the server.*/
-		public void send(Object object, SendMode mode);
+		void send(Object object, SendMode mode);
 		/**Update the ping. Should be done every second or so.*/
-		public void updatePing();
+		void updatePing();
 		/**Get ping in milliseconds. Will only be valid after a call to updatePing.*/
-		public int getPing();
+		int getPing();
 		/**Disconnect from the server.*/
-		public void disconnect();
+		void disconnect();
         /**Discover servers. This should block for a certain amount of time, and will most likely be run in a different thread.*/
-        public Array<Host> discover();
+        Array<Host> discover();
         /**Ping a host. If an error occured, failed() should be called with the exception. */
-        public void pingHost(String address, int port, Consumer<Host> valid, Consumer<IOException> failed);
+        void pingHost(String address, int port, Consumer<Host> valid, Consumer<IOException> failed);
 		/**Register classes to be sent.*/
-		public void register(Class<?>... types);
+		void register(Class<?>... types);
 		/**Close all connections.*/
-		public void dispose();
+		void dispose();
 	}
 
 	/**Server implementation.*/
-	public static interface ServerProvider {
+	public interface ServerProvider {
 		/**Host a server at specified port.*/
-		public void host(int port) throws IOException;
+		void host(int port) throws IOException;
 		/**Sends a large stream of data to a specific client.*/
-		public void sendStream(int id, Streamable stream);
+		void sendStream(int id, Streamable stream);
 		/**Send an object to everyone connected.*/
-		public void send(Object object, SendMode mode);
+		void send(Object object, SendMode mode);
 		/**Send an object to a specific client ID.*/
-		public void sendTo(int id, Object object, SendMode mode);
+		void sendTo(int id, Object object, SendMode mode);
 		/**Send an object to everyone <i>except</i> a client ID.*/
-		public void sendExcept(int id, Object object, SendMode mode);
+		void sendExcept(int id, Object object, SendMode mode);
 		/**Close the server connection.*/
-		public void close();
+		void close();
 		/**Return all connected users.*/
-		public IntArray getConnections();
+		Array<? extends NetConnection> getConnections();
 		/**Kick a certain connection.*/
-		public void kick(int connection);
+		void kick(int connection);
 		/**Returns the ping for a certain connection.*/
-		public int getPingFor(int connection);
+		int getPingFor(NetConnection connection);
 		/**Register classes to be sent.*/
-		public void register(Class<?>... types);
+		void register(Class<?>... types);
 		/**Close all connections.*/
-		public void dispose();
+		void dispose();
 	}
 
 	public enum SendMode{

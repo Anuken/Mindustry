@@ -9,6 +9,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
@@ -370,10 +371,10 @@ public class NetServer extends Module{
 
         if(Timers.get("serverBlockSync", blockSyncTime)){
 
-            IntArray connections = Net.getConnections();
+            Array<NetConnection> connections = new Array<>();
 
             for(int i = 0; i < connections.size; i ++){
-                int id = connections.get(i);
+                int id = connections.get(i).id;
                 Player player = this.connections.get(id);
                 if(player == null) continue;
                 int x = Mathf.scl2(player.x, Vars.tilesize);

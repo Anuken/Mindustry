@@ -75,6 +75,7 @@ public class Vars{
 
 	//server port
 	public static final int port = 6567;
+	public static final int webPort = 6568;
 	
 	public static Control control;
 	public static Renderer renderer;

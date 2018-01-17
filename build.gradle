@@ -61,6 +61,8 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion:sources"
+        compile "com.sksamuel.gwt:gwt-websockets:1.0.4"
+        compile "com.sksamuel.gwt:gwt-websockets:1.0.4:sources"
     }
 }
 
@@ -116,6 +118,7 @@ project(":kryonet") {
     dependencies {
         compile project(":core")
         compile 'com.github.crykn:kryonet:2.22.1'
+        compile "org.java-websocket:Java-WebSocket:1.3.7"
     }
 }
 
