@@ -29,6 +29,7 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -156,7 +157,7 @@ public class KryoServer implements ServerProvider {
         Thread thread = new Thread(() ->{
             try {
                 server.close();
-                webServer.stop(1); //please die, right now
+                if(webServer != null) webServer.stop(1); //please die, right now
                 //kill them all
                 for(Thread worker : Thread.getAllStackTraces().keySet()){
                     if(worker.getName().contains("WebSocketWorker")){
@@ -255,7 +256,7 @@ public class KryoServer implements ServerProvider {
     public void dispose(){
         try {
             server.dispose();
-            webServer.stop(1);
+            if(webServer != null) webServer.stop(1);
             //kill them all
             for(Thread thread : Thread.getAllStackTraces().keySet()){
                 if(thread.getName().contains("WebSocketWorker")){
@@ -378,20 +379,24 @@ public class KryoServer implements ServerProvider {
         @Override
         public void onClose(WebSocket conn, int code, String reason, boolean remote) {
             if (conn == null) return;
-            Disconnect disconnect = new Disconnect();
             KryoConnection k = getBySocket(conn);
-            if(k != null) Net.handleServerReceived(disconnect, k.id);
+            if(k == null) return;
+            Disconnect disconnect = new Disconnect();
+            disconnect.id = k.id;
+            Net.handleServerReceived(disconnect, k.id);
         }
 
         @Override
         public void onMessage(WebSocket conn, String message) {
             try {
+                KryoConnection k = getBySocket(conn);
+                if (k == null) return;
+
                 if(message.equals("_ping_")){
                     conn.send(connections.size() + "|" + Vars.player.name);
+                    connections.remove(k);
                 }else {
                     if (debug) UCore.log("Got message: " + message);
-                    KryoConnection k = getBySocket(conn);
-                    if (k == null) return;
 
                     byte[] out = Base64Coder.decode(message);
                     if (debug) UCore.log("Decoded: " + Arrays.toString(out));
@@ -409,6 +414,10 @@ public class KryoServer implements ServerProvider {
         public void onError(WebSocket conn, Exception ex) {
             UCore.log("WS error:");
             ex.printStackTrace();
+            if(ex instanceof BindException){
+                Net.closeServer();
+                Vars.ui.showError("$text.server.addressinuse");
+            }
         }
 
         @Override

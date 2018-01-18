@@ -32,7 +32,7 @@ public class JoinDialog extends FloatingDialog {
         addCloseButton();
 
         join = new FloatingDialog("$text.joingame.title");
-        join.content().add("$text.joingame.ip").left();
+        join.content().add("$text.joingame.ip").padRight(5f).left();
         Mindustry.platforms.addDialog(join.content().addField(Settings.getString("ip"),text ->{
             Settings.putString("ip", text);
             Settings.save();
