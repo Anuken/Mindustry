@@ -256,7 +256,7 @@ public class Conveyor extends Block{
 		ItemPos set(int value){
 			byte[] values = Bits.getBytes(value);
 
-			if(values[0] > Item.getAllItems().size)
+			if(values[0] >= Item.getAllItems().size || values[0] < 0)
 				item = null;
 			else
 				item = Item.getAllItems().get(values[0]);

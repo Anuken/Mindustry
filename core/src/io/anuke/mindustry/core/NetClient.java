@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Bullet;
@@ -270,6 +271,8 @@ public class NetClient extends Module {
             if(player != null){
                 Gdx.app.postRunnable(player::remove);
             }
+
+            Mindustry.platforms.updateRPC();
         });
 
         Net.handle(PlayerSpawnPacket.class, packet -> {
@@ -291,6 +294,8 @@ public class NetClient extends Module {
                 player.interpolator.last.set(player.x, player.y);
                 player.interpolator.target.set(player.x, player.y);
                 player.add();
+
+                Mindustry.platforms.updateRPC();
             });
         });
 

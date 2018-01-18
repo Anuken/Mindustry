@@ -29,7 +29,6 @@ import static io.anuke.mindustry.Vars.android;
 
 public class Save14 extends SaveFileVersion{
 
-
     public Save14(){
         super(14);
     }

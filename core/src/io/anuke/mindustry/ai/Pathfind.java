@@ -173,7 +173,7 @@ public class Pathfind{
 
 	/**For an enemy that was just loaded from a save, find the node in the path it should be following.*/
 	void findNode(Enemy enemy){
-		if(enemy.lane >= Vars.control.getSpawnPoints().size){
+		if(enemy.lane >= Vars.control.getSpawnPoints().size || enemy.lane < 0){
 			enemy.lane = 0;
 		}
 		
