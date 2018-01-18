@@ -15,7 +15,9 @@ import io.anuke.mindustry.net.Packet;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
 import io.anuke.mindustry.net.Registrator;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Consumer;
+import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -103,6 +105,35 @@ public class WebsocketClient implements ClientProvider {
     @Override
     public void pingHost(String address, int port, Consumer<Host> valid, Consumer<IOException> failed) {
         failed.accept(new IOException());
+        Websocket socket = new Websocket("ws://" + address + ":" + Vars.webPort);
+        final boolean[] accepted = {false};
+        socket.addListener(new WebsocketListener() {
+            @Override
+            public void onClose() {
+                if(!accepted[0]) failed.accept(new IOException("Failed to connect to host."));
+            }
+
+            @Override
+            public void onMessage(String msg) {
+                String[] text = msg.split("\\|");
+                Host host = new Host(text[1], address, Strings.parseInt(text[0]));
+                valid.accept(host);
+                accepted[0] = true;
+                socket.close();
+            }
+
+            @Override
+            public void onOpen() {
+                socket.send("_ping_");
+            }
+        });
+        socket.open();
+        Timers.runTask(60f*5, () -> {
+            if(!accepted[0]){
+                failed.accept(new IOException("Failed to connect to host."));
+                socket.close();
+            }
+        });
     }
 
     @Override

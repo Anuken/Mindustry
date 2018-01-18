@@ -37,11 +37,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class KryoServer implements ServerProvider {
     final boolean debug = false;
     final Server server;
-    final SocketServer webServer;
     final ByteSerializer serializer = new ByteSerializer();
     final ByteBuffer buffer = ByteBuffer.allocate(4096);
     final CopyOnWriteArrayList<KryoConnection> connections = new CopyOnWriteArrayList<>();
     final Array<KryoConnection> array = new Array<>();
+    SocketServer webServer;
 
     int lastconnection = 0;
 
@@ -54,7 +54,6 @@ public class KryoServer implements ServerProvider {
             datagramChannel.send(buffer, fromAddress);
             return true;
         });
-        webServer = new SocketServer(Vars.webPort);
 
         Listener listener = new Listener(){
 
@@ -136,6 +135,7 @@ public class KryoServer implements ServerProvider {
     public void host(int port) throws IOException {
         lastconnection = 0;
         server.bind(port, port);
+        webServer = new SocketServer(Vars.webPort);
         webServer.start();
 
         Thread thread = new Thread(() -> {
@@ -153,14 +153,22 @@ public class KryoServer implements ServerProvider {
     public void close() {
         UCore.setPrivate(server, "shutdown", true);
 
-        new Thread(() ->{
+        Thread thread = new Thread(() ->{
             try {
                 server.close();
-                webServer.stop();
+                webServer.stop(1); //please die, right now
+                //kill them all
+                for(Thread worker : Thread.getAllStackTraces().keySet()){
+                    if(worker.getName().contains("WebSocketWorker")){
+                        worker.interrupt();
+                    }
+                }
             }catch (Exception e){
                 Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
             }
-        }).run();
+        });
+        thread.setDaemon(true);
+        thread.start();
     }
 
     @Override
@@ -247,7 +255,13 @@ public class KryoServer implements ServerProvider {
     public void dispose(){
         try {
             server.dispose();
-            webServer.stop();
+            webServer.stop(1);
+            //kill them all
+            for(Thread thread : Thread.getAllStackTraces().keySet()){
+                if(thread.getName().contains("WebSocketWorker")){
+                    thread.interrupt();
+                }
+            }
         }catch (Exception e){
             throw new RuntimeException(e);
         }
@@ -372,15 +386,19 @@ public class KryoServer implements ServerProvider {
         @Override
         public void onMessage(WebSocket conn, String message) {
             try {
-                if(debug) UCore.log("Got message: " + message);
-                KryoConnection k = getBySocket(conn);
-                if (k == null) return;
+                if(message.equals("_ping_")){
+                    conn.send(connections.size() + "|" + Vars.player.name);
+                }else {
+                    if (debug) UCore.log("Got message: " + message);
+                    KryoConnection k = getBySocket(conn);
+                    if (k == null) return;
 
-                byte[] out = Base64Coder.decode(message);
-                if(debug) UCore.log("Decoded: " + Arrays.toString(out));
-                ByteBuffer buffer = ByteBuffer.wrap(out);
-                Object o = serializer.read(buffer);
-                Net.handleServerReceived(o, k.id);
+                    byte[] out = Base64Coder.decode(message);
+                    if (debug) UCore.log("Decoded: " + Arrays.toString(out));
+                    ByteBuffer buffer = ByteBuffer.wrap(out);
+                    Object o = serializer.read(buffer);
+                    Net.handleServerReceived(o, k.id);
+                }
             }catch (Exception e){
                 UCore.log("Error reading message!");
                 e.printStackTrace();
