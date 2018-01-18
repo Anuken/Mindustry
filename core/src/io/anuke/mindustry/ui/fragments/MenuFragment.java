@@ -28,10 +28,9 @@ public class MenuFragment implements Fragment{
 					add(new MenuButton("$text.play", group, ui.levels::show));
 					row();
 
-					if(!gwt){
-						add(new MenuButton("$text.joingame", group, ui.join::show));
-						row();
-					}
+					add(new MenuButton("$text.joingame", group, ui.join::show));
+					row();
+
 					
 					add(new MenuButton("$text.tutorial", group, ()-> control.playMap(world.maps().getMap("tutorial"))));
 					row();

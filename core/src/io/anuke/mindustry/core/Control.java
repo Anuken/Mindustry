@@ -546,7 +546,6 @@ public class Control extends Module{
 	
 	@Override
 	public void update(){
-		//UCore.log(input.placeMode, input.breakMode, input.lastPlaceMode);
 
         if(Gdx.input != proxy){
             Gdx.input = proxy;

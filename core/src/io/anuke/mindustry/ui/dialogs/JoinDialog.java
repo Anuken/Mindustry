@@ -11,7 +11,6 @@ import io.anuke.ucore.scene.style.Drawable;
 import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
-import io.anuke.ucore.scene.ui.TextField.TextFieldFilter.DigitsOnlyFilter;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Strings;
@@ -33,19 +32,20 @@ public class JoinDialog extends FloatingDialog {
         addCloseButton();
 
         join = new FloatingDialog("$text.joingame.title");
-        join.content().add("$text.joingame.ip").left();
+        join.content().add("$text.joingame.ip").padRight(5f).left();
         Mindustry.platforms.addDialog(join.content().addField(Settings.getString("ip"),text ->{
             Settings.putString("ip", text);
             Settings.save();
         }).size(240f, 54f).get(), 100);
 
         join.content().row();
+        /*
         join.content().add("$text.server.port").left();
         Mindustry.platforms.addDialog(join.content()
                 .addField(Settings.getString("port"), new DigitsOnlyFilter(), text ->{
                     Settings.putString("port", text);
                     Settings.save();
-                }).size(240f, 54f).get());
+                }).size(240f, 54f).get());*/
         join.buttons().defaults().size(140f, 60f).pad(4f);
         join.buttons().addButton("$text.cancel", join::hide);
         join.buttons().addButton("$text.ok", () -> {
@@ -56,14 +56,14 @@ public class JoinDialog extends FloatingDialog {
                 setupRemote();
                 refreshRemote();
             }else{
-                renaming.port = Strings.parseInt(Settings.getString("port"));
+                //renaming.port = Strings.parseInt(Settings.getString("port"));
                 renaming.ip = Settings.getString("ip");
                 saveServers();
                 setupRemote();
                 refreshRemote();
             }
             join.hide();
-        }).disabled(b -> Settings.getString("ip").isEmpty() || Strings.parseInt(Settings.getString("port")) == Integer.MIN_VALUE || Net.active());
+        }).disabled(b -> Settings.getString("ip").isEmpty() || Net.active());
 
         join.shown(() -> {
             join.getTitleLabel().setText(renaming != null ? "$text.server.edit" : "$text.server.add");
@@ -83,8 +83,8 @@ public class JoinDialog extends FloatingDialog {
             //why are java lambdas this bad
             TextButton[] buttons = {null};
 
-            TextButton button = buttons[0] = remote.addButton("[accent]"+server.ip + " / " + server.port, "clear", () -> {
-                if(!buttons[0].childrenPressed()) connect(server.ip, server.port);
+            TextButton button = buttons[0] = remote.addButton("[accent]"+server.ip, "clear", () -> {
+                if(!buttons[0].childrenPressed()) connect(server.ip, Vars.port);
             }).width(w).height(120f).pad(4f).get();
 
             button.getLabel().setWrap(true);
@@ -145,10 +145,12 @@ public class JoinDialog extends FloatingDialog {
     }
 
     void refreshLocal(){
-        local.clear();
-        local.background("button");
-        local.label(() -> "[accent]" + Bundles.get("text.hosts.discovering") + new String(new char[(int)(Timers.time() / 10) % 4]).replace("\0", ".")).pad(10f);
-        Net.discoverServers(this::addLocalHosts);
+        if(!Vars.gwt) {
+            local.clear();
+            local.background("button");
+            local.label(() -> "[accent]" + Bundles.get("text.hosts.discovering") + new String(new char[(int) (Timers.time() / 10) % 4]).replace("\0", ".")).pad(10f);
+            Net.discoverServers(this::addLocalHosts);
+        }
     }
 
     void setup(){
@@ -201,7 +203,7 @@ public class JoinDialog extends FloatingDialog {
                 button.add("[lightgray]" + (a.players != 1 ? Bundles.format("text.players", a.players) :
                         Bundles.format("text.players.single", a.players)));
                 button.row();
-                button.add("[lightgray]" + a.address + " / " + Vars.port).pad(4).left();
+                button.add("[lightgray]" + a.address).pad(4).left();
 
                 local.row();
                 local.background((Drawable) null);

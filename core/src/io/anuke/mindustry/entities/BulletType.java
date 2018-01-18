@@ -352,7 +352,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		public void draw(Bullet b){
 			Draw.thick(2f);
 			Draw.color(lightOrange, Color.WHITE, 0.4f);
-			Draw.polygon(b.y, b.x, 3, 1.6f, b.angle());
+			Draw.polygon(b.x, b.y, 3, 1.6f, b.angle());
 			Draw.thick(1f);
 			Draw.color(Color.WHITE, lightOrange, b.ifract()/2f);
 			Draw.alpha(b.ifract());

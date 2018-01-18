@@ -9,6 +9,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
@@ -190,7 +191,16 @@ public class NetServer extends Module{
             int dest = Net.getLastConnection();
             Gdx.app.postRunnable(() -> {
                 if(Vars.control.playerGroup.getByID(id) != null){
-                    Net.sendTo(dest, Vars.control.playerGroup.getByID(id), SendMode.tcp);
+                    Player player = Vars.control.playerGroup.getByID(id);
+                    PlayerSpawnPacket p = new PlayerSpawnPacket();
+                    p.x = player.x;
+                    p.y = player.y;
+                    p.id = player.id;
+                    p.name = player.name;
+                    p.weaponleft = player.weaponLeft.id;
+                    p.weaponright = player.weaponRight.id;
+                    p.android = player.isAndroid;
+                    Net.sendTo(dest, p, SendMode.tcp);
                     Gdx.app.error("Mindustry", "Replying to entity request ("+Net.getLastConnection()+"): player, " + id);
                 }else if (Vars.control.enemyGroup.getByID(id) != null){
                     Enemy enemy = Vars.control.enemyGroup.getByID(id);
@@ -361,10 +371,10 @@ public class NetServer extends Module{
 
         if(Timers.get("serverBlockSync", blockSyncTime)){
 
-            IntArray connections = Net.getConnections();
+            Array<NetConnection> connections = new Array<>();
 
             for(int i = 0; i < connections.size; i ++){
-                int id = connections.get(i);
+                int id = connections.get(i).id;
                 Player player = this.connections.get(id);
                 if(player == null) continue;
                 int x = Mathf.scl2(player.x, Vars.tilesize);

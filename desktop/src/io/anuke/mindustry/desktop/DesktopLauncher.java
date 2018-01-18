@@ -120,6 +120,7 @@ public class DesktopLauncher {
 		
 		Mindustry.args = Array.with(arg);
 
+        //Net.setClientProvider(new JavaWebsocketClient());
 		Net.setClientProvider(new KryoClient());
 		Net.setServerProvider(new KryoServer());
 

@@ -96,7 +96,7 @@ public enum PlaceMode{
 				
 				if(android && control.getInput().breaktime > 0){
 					Draw.color(Colors.get("breakStart"), Colors.get("break"), fract);
-					Draw.polygon(tile.worldx() + offset.y, tile.worldy() + offset.x, 25, 4 + (1f - fract) * 26);
+					Draw.polygon(tile.worldx() + offset.x, tile.worldy() + offset.y, 25, 4 + (1f - fract) * 26);
 				}
 				Draw.reset();
 			}

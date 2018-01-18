@@ -38,6 +38,7 @@ public class Mindustry extends ModuleCore {
 	@Override
 	public void dispose() {
 		platforms.onGameExit();
+		Net.dispose();
 		super.dispose();
 	}
 
