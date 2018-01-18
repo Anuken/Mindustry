@@ -65,6 +65,7 @@ public class Control extends Module{
 	float extrawavetime;
 	int enemies = 0;
 	GameMode mode = GameMode.waves;
+	Difficulty difficulty = Difficulty.normal;
 	
 	Tile core;
 	Array<SpawnPoint> spawnpoints = new Array<>();
@@ -434,7 +435,11 @@ public class Control extends Module{
 	}
 
 	public Difficulty getDifficulty(){
-		return Difficulty.values()[Settings.getInt("difficulty")];
+		return difficulty;
+	}
+
+	public void setDifficulty(Difficulty d){
+		this.difficulty = d;
 	}
 	
 	public boolean isHighScore(){

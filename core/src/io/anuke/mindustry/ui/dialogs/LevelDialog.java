@@ -1,20 +1,22 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.scene.event.ClickListener;
 import io.anuke.ucore.scene.event.InputEvent;
+import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.event.ClickListener;
 import io.anuke.ucore.scene.utils.Elements;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
 public class LevelDialog extends FloatingDialog{
@@ -56,7 +58,34 @@ public class LevelDialog extends FloatingDialog{
 		
 		content().add(selmode);
 		content().row();
-		
+
+		Difficulty[] ds = Difficulty.values();
+
+		float s = 50f;
+
+		Table sdif = new Table();
+
+		sdif.add("$setting.difficulty.name").padRight(15f);
+
+		sdif.defaults().height(s+4);
+		sdif.addImageButton("icon-arrow-left", 10*3, () -> {
+			Vars.control.setDifficulty(ds[Mathf.mod(Vars.control.getDifficulty().ordinal() - 1, ds.length)]);
+		}).width(s);
+
+		sdif.addButton("", () -> {
+
+		}).update(t -> {
+			t.setText(Vars.control.getDifficulty().toString());
+			t.setTouchable(Touchable.disabled);
+		}).width(180f);
+
+		sdif.addImageButton("icon-arrow-right", 10*3, () -> {
+			Vars.control.setDifficulty(ds[Mathf.mod(Vars.control.getDifficulty().ordinal() + 1, ds.length)]);
+		}).width(s);
+
+		content().add(sdif);
+		content().row();
+
 		int i = 0;
 		for(Map map : Vars.world.maps().list()){
 			

@@ -8,6 +8,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.versions.Save12;
 import io.anuke.mindustry.io.versions.Save13;
 import io.anuke.mindustry.io.versions.Save14;
+import io.anuke.mindustry.io.versions.Save15;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Settings;
 
@@ -18,7 +19,8 @@ public class SaveIO{
 	public static final Array<SaveFileVersion> versionArray = Array.with(
 			new Save12(),
 			new Save13(),
-			new Save14()
+			new Save14(),
+			new Save15()
 	);
 
 	static{
