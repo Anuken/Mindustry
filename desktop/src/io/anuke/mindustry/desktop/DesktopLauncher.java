@@ -27,6 +27,7 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class DesktopLauncher {
 	
@@ -84,6 +85,11 @@ public class DesktopLauncher {
 			@Override
 			public void showError(String text){
 				JOptionPane.showMessageDialog(null, text);
+			}
+
+			@Override
+			public String getLocaleName(Locale locale){
+				return locale.getDisplayName(locale);
 			}
 
 			@Override

@@ -21,6 +21,7 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class AndroidLauncher extends AndroidApplication{
 	boolean doubleScaleTablets = true;
@@ -58,6 +59,11 @@ public class AndroidLauncher extends AndroidApplication{
 			@Override
 			public void addDialog(TextField field, int length){
 				TextFieldDialogListener.add(field, 0, length);
+			}
+
+			@Override
+			public String getLocaleName(Locale locale){
+				return locale.getDisplayName(locale);
 			}
 
 			@Override

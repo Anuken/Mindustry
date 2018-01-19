@@ -3,6 +3,7 @@ package io.anuke.mindustry.io;
 import io.anuke.ucore.scene.ui.TextField;
 
 import java.util.Date;
+import java.util.Locale;
 
 public abstract class PlatformFunction{
 	public String format(Date date){return "invalid";}
@@ -17,4 +18,5 @@ public abstract class PlatformFunction{
 	public void onGameExit(){}
 	public void openDonations(){}
 	public void requestWritePerms(){}
+	public String getLocaleName(Locale locale){return locale.toString();}
 }

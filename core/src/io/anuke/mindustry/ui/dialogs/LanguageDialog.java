@@ -1,5 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Settings;
@@ -29,8 +30,7 @@ public class LanguageDialog extends FloatingDialog{
         ButtonGroup<TextButton> group = new ButtonGroup<>();
 
         for(Locale loc : locales){
-            TextButton button = new TextButton(loc.getDisplayName(loc), "toggle");
-            UCore.log(loc.getDisplayName(loc));
+            TextButton button = new TextButton(Mindustry.platforms.getLocaleName(loc), "toggle");
             button.setChecked(Vars.ui.getLocale().equals(loc));
             button.clicked(() -> {
                 if(Vars.ui.getLocale().equals(loc)) return;
