@@ -181,7 +181,7 @@ public class Net{
 
 	/**Get the client ping. Only valid after updatePing().*/
 	public static int getPing(){
-		return clientProvider.getPing();
+		return server() ? 0 : clientProvider.getPing();
 	}
 
 	/**Returns the last connection that sent a packet to this server.*/

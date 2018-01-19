@@ -422,6 +422,7 @@ public class Renderer extends RendererModule{
 	
 	//TODO optimize!
 	public void drawBar(Color color, float x, float y, float fraction){
+		fraction = Mathf.clamp(fraction);
 		float len = 3;
 
 		float w = (int) (len * 2 * fraction) + 0.5f;

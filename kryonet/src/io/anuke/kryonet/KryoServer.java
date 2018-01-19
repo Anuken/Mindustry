@@ -66,12 +66,8 @@ public class KryoServer implements ServerProvider {
                 c.id = kn.id;
                 c.addressTCP = connection.getRemoteAddressTCP().toString();
 
-                try {
-                    Net.handleServerReceived(c, kn.id);
-                    connections.add(kn);
-                }catch (Exception e){
-                    Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
-                }
+                connections.add(kn);
+                Gdx.app.postRunnable(() ->  Net.handleServerReceived(c, kn.id));
             }
 
             @Override
@@ -83,11 +79,7 @@ public class KryoServer implements ServerProvider {
                 Disconnect c = new Disconnect();
                 c.id = k.id;
 
-                try{
-                    Net.handleServerReceived(c, c.id);
-                }catch (Exception e){
-                    Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
-                }
+                Gdx.app.postRunnable(() -> Net.handleServerReceived(c, c.id));
             }
 
             @Override
@@ -95,11 +87,13 @@ public class KryoServer implements ServerProvider {
                 KryoConnection k = getByKryoID(connection.getID());
                 if(object instanceof FrameworkMessage || k == null) return;
 
-                try{
-                    Net.handleServerReceived(object, k.id);
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
+                Gdx.app.postRunnable(() -> {
+                    try{
+                        Net.handleServerReceived(object, k.id);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                });
             }
         };
 

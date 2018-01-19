@@ -46,56 +46,53 @@ public class NetServer extends Module{
         Net.handleServer(ConnectPacket.class, packet -> {
             int id = Net.getLastConnection();
 
-            UCore.log("Sending world data to client (ID="+id+")");
+            UCore.log("Sending world data to client (ID=" + id + ")");
 
-            Gdx.app.postRunnable(() -> {
-                Player player = new Player();
-                player.clientid = id;
-                player.name = packet.name;
-                player.isAndroid = packet.android;
-                player.set(Vars.control.core.worldx(), Vars.control.core.worldy() - Vars.tilesize*2);
-                player.interpolator.last.set(player.x, player.y);
-                player.interpolator.target.set(player.x, player.y);
-                connections.put(id, player);
+            Player player = new Player();
+            player.clientid = id;
+            player.name = packet.name;
+            player.isAndroid = packet.android;
+            player.set(Vars.control.core.worldx(), Vars.control.core.worldy() - Vars.tilesize * 2);
+            player.interpolator.last.set(player.x, player.y);
+            player.interpolator.target.set(player.x, player.y);
+            connections.put(id, player);
 
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                NetworkIO.write(player.id, weapons.get(packet.name, new ByteArray()), stream);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            NetworkIO.write(player.id, weapons.get(packet.name, new ByteArray()), stream);
 
-                UCore.log("Packed " + stream.size() + " uncompressed bytes of data.");
+            UCore.log("Packed " + stream.size() + " uncompressed bytes of data.");
 
-                WorldData data = new WorldData();
-                data.stream = new ByteArrayInputStream(stream.toByteArray());
+            WorldData data = new WorldData();
+            data.stream = new ByteArrayInputStream(stream.toByteArray());
 
-                Net.sendStream(id, data);
-            });
+            Net.sendStream(id, data);
+
         });
 
         Net.handleServer(ConnectConfirmPacket.class, packet -> {
             Player player = connections.get(Net.getLastConnection());
 
-            if(player == null) return;
+            if (player == null) return;
 
-            Gdx.app.postRunnable(player::add);
-            sendMessage("[accent]"+Bundles.format("text.server.connected", player.name));
+            player.add();
+            sendMessage("[accent]" + Bundles.format("text.server.connected", player.name));
         });
 
         Net.handleServer(Disconnect.class, packet -> {
             Player player = connections.get(packet.id);
 
-            if(player == null) {
-                sendMessage("[accent]"+Bundles.format("text.server.disconnected", "<???>"));
+            if (player == null) {
+                sendMessage("[accent]" + Bundles.format("text.server.disconnected", "<???>"));
                 return;
             }
 
-            sendMessage("[accent]"+Bundles.format("text.server.disconnected", player.name));
-            Gdx.app.postRunnable(() -> {
-                player.remove();
+            sendMessage("[accent]" + Bundles.format("text.server.disconnected", player.name));
+            player.remove();
 
-                DisconnectPacket dc = new DisconnectPacket();
-                dc.playerid = player.id;
+            DisconnectPacket dc = new DisconnectPacket();
+            dc.playerid = player.id;
 
-                Net.send(dc, SendMode.tcp);
-            });
+            Net.send(dc, SendMode.tcp);
         });
 
         Net.handleServer(PositionPacket.class, pos -> {
@@ -106,7 +103,7 @@ public class NetServer extends Module{
         Net.handleServer(ShootPacket.class, packet -> {
             Player player = connections.get(Net.getLastConnection());
 
-            Weapon weapon = (Weapon)Upgrade.getByID(packet.weaponid);
+            Weapon weapon = (Weapon) Upgrade.getByID(packet.weaponid);
             weapon.shoot(player, packet.x, packet.y, packet.rotation);
             packet.playerid = player.id;
 
@@ -114,12 +111,12 @@ public class NetServer extends Module{
         });
 
         Net.handleServer(PlacePacket.class, packet -> {
-            Gdx.app.postRunnable(() -> Vars.control.input.placeBlockInternal(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false));
+            Vars.control.input.placeBlockInternal(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false);
             packet.playerid = connections.get(Net.getLastConnection()).id;
 
             Recipe recipe = Recipes.getByResult(Block.getByID(packet.block));
-            if(recipe != null){
-                for(ItemStack stack : recipe.requirements){
+            if (recipe != null) {
+                for (ItemStack stack : recipe.requirements) {
                     Vars.control.removeItem(stack);
                 }
             }
@@ -128,7 +125,7 @@ public class NetServer extends Module{
         });
 
         Net.handleServer(BreakPacket.class, packet -> {
-            Gdx.app.postRunnable(() -> Vars.control.input.breakBlockInternal(packet.x, packet.y, false));
+            Vars.control.input.breakBlockInternal(packet.x, packet.y, false);
             packet.playerid = connections.get(Net.getLastConnection()).id;
 
             Net.sendExcept(Net.getLastConnection(), packet, SendMode.tcp);
@@ -137,7 +134,7 @@ public class NetServer extends Module{
         Net.handleServer(ChatPacket.class, packet -> {
             Player player = connections.get(Net.getLastConnection());
 
-            if(player == null){
+            if (player == null) {
                 Gdx.app.error("Mindustry", "Could not find player for chat: " + Net.getLastConnection());
                 return; //GHOSTS AAAA
             }
@@ -145,16 +142,16 @@ public class NetServer extends Module{
             packet.name = player.name;
             packet.id = player.id;
             Net.sendExcept(player.clientid, packet, SendMode.tcp);
-            Gdx.app.postRunnable(() -> Vars.ui.chatfrag.addMessage(packet.text, Vars.netClient.colorizeName(packet.id, packet.name)));
+            Vars.ui.chatfrag.addMessage(packet.text, Vars.netClient.colorizeName(packet.id, packet.name));
         });
 
         Net.handleServer(UpgradePacket.class, packet -> {
             Player player = connections.get(Net.getLastConnection());
 
-            Weapon weapon = (Weapon)Upgrade.getByID(packet.id);
+            Weapon weapon = (Weapon) Upgrade.getByID(packet.id);
 
-            if(!weapons.containsKey(player.name)) weapons.put(player.name, new ByteArray());
-            if(!weapons.get(player.name).contains(weapon.id)) weapons.get(player.name).add(weapon.id);
+            if (!weapons.containsKey(player.name)) weapons.put(player.name, new ByteArray());
+            if (!weapons.get(player.name).contains(weapon.id)) weapons.get(player.name).add(weapon.id);
 
             Vars.control.removeItems(UpgradeRecipes.get(weapon));
         });
@@ -162,12 +159,12 @@ public class NetServer extends Module{
         Net.handleServer(WeaponSwitchPacket.class, packet -> {
             Player player = connections.get(Net.getLastConnection());
 
-            if(player == null) return;
+            if (player == null) return;
 
             packet.playerid = player.id;
 
-            player.weaponLeft = (Weapon)Upgrade.getByID(packet.left);
-            player.weaponRight = (Weapon)Upgrade.getByID(packet.right);
+            player.weaponLeft = (Weapon) Upgrade.getByID(packet.left);
+            player.weaponRight = (Weapon) Upgrade.getByID(packet.right);
 
             Net.sendExcept(player.clientid, packet, SendMode.tcp);
         });
@@ -181,7 +178,7 @@ public class NetServer extends Module{
 
         Net.handleServer(BlockConfigPacket.class, packet -> {
             Tile tile = Vars.world.tile(packet.position);
-            if(tile != null) tile.block().configure(tile, packet.data);
+            if (tile != null) tile.block().configure(tile, packet.data);
 
             Net.sendExcept(Net.getLastConnection(), packet, SendMode.tcp);
         });
@@ -189,35 +186,33 @@ public class NetServer extends Module{
         Net.handleServer(EntityRequestPacket.class, packet -> {
             int id = packet.id;
             int dest = Net.getLastConnection();
-            Gdx.app.postRunnable(() -> {
-                if(Vars.control.playerGroup.getByID(id) != null){
-                    Player player = Vars.control.playerGroup.getByID(id);
-                    PlayerSpawnPacket p = new PlayerSpawnPacket();
-                    p.x = player.x;
-                    p.y = player.y;
-                    p.id = player.id;
-                    p.name = player.name;
-                    p.weaponleft = player.weaponLeft.id;
-                    p.weaponright = player.weaponRight.id;
-                    p.android = player.isAndroid;
-                    Net.sendTo(dest, p, SendMode.tcp);
-                    Gdx.app.error("Mindustry", "Replying to entity request ("+Net.getLastConnection()+"): player, " + id);
-                }else if (Vars.control.enemyGroup.getByID(id) != null){
-                    Enemy enemy = Vars.control.enemyGroup.getByID(id);
-                    EnemySpawnPacket e = new EnemySpawnPacket();
-                    e.x = enemy.x;
-                    e.y = enemy.y;
-                    e.id = enemy.id;
-                    e.tier = (byte)enemy.tier;
-                    e.lane = (byte)enemy.lane;
-                    e.type = enemy.type.id;
-                    e.health = (short)enemy.health;
-                    Net.sendTo(dest, e, SendMode.tcp);
-                    Gdx.app.error("Mindustry", "Replying to entity request("+Net.getLastConnection()+"): enemy, " + id);
-                }else{
-                    Gdx.app.error("Mindustry", "Entity request target not found!");
-                }
-            });
+            if (Vars.control.playerGroup.getByID(id) != null) {
+                Player player = Vars.control.playerGroup.getByID(id);
+                PlayerSpawnPacket p = new PlayerSpawnPacket();
+                p.x = player.x;
+                p.y = player.y;
+                p.id = player.id;
+                p.name = player.name;
+                p.weaponleft = player.weaponLeft.id;
+                p.weaponright = player.weaponRight.id;
+                p.android = player.isAndroid;
+                Net.sendTo(dest, p, SendMode.tcp);
+                Gdx.app.error("Mindustry", "Replying to entity request (" + Net.getLastConnection() + "): player, " + id);
+            } else if (Vars.control.enemyGroup.getByID(id) != null) {
+                Enemy enemy = Vars.control.enemyGroup.getByID(id);
+                EnemySpawnPacket e = new EnemySpawnPacket();
+                e.x = enemy.x;
+                e.y = enemy.y;
+                e.id = enemy.id;
+                e.tier = (byte) enemy.tier;
+                e.lane = (byte) enemy.lane;
+                e.type = enemy.type.id;
+                e.health = (short) enemy.health;
+                Net.sendTo(dest, e, SendMode.tcp);
+                Gdx.app.error("Mindustry", "Replying to entity request(" + Net.getLastConnection() + "): enemy, " + id);
+            } else {
+                Gdx.app.error("Mindustry", "Entity request target not found!");
+            }
         });
     }
 
@@ -226,8 +221,6 @@ public class NetServer extends Module{
         packet.name = null;
         packet.text = message;
         Net.send(packet, SendMode.tcp);
-
-        Gdx.app.postRunnable(() -> Vars.ui.chatfrag.addMessage(message, null));
     }
 
     public void handleFriendlyFireChange(boolean enabled){

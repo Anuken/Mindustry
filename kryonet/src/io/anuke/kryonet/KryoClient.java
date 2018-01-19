@@ -62,40 +62,33 @@ public class KryoClient implements ClientProvider{
                 c.id = connection.getID();
                 if(connection.getRemoteAddressTCP() != null) c.addressTCP = connection.getRemoteAddressTCP().toString();
 
-                try{
-                    Net.handleClientReceived(c);
-                }catch (Exception e){
-                    Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
-                }
+                Gdx.app.postRunnable(() -> Net.handleClientReceived(c));
             }
 
             @Override
             public void disconnected (Connection connection) {
                 Disconnect c = new Disconnect();
 
-                try{
-                    Net.handleClientReceived(c);
-                }catch (Exception e){
-                    Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
-                }
+                Gdx.app.postRunnable(() -> Net.handleClientReceived(c));
             }
 
             @Override
             public void received (Connection connection, Object object) {
                 if(object instanceof FrameworkMessage) return;
 
-                try{
-                    Net.handleClientReceived(object);
-                }catch (Exception e){
-                    if(e instanceof KryoNetException && e.getMessage() != null && e.getMessage().toLowerCase().contains("incorrect")) {
-                        Gdx.app.postRunnable(() -> Vars.ui.showError("$text.server.mismatch"));
-                        Vars.netClient.disconnectQuietly();
-                    }else{
-                        Gdx.app.postRunnable(() -> {
+                Gdx.app.postRunnable(() -> {
+                    try{
+                        Net.handleClientReceived(object);
+                    }catch (Exception e){
+                        if(e instanceof KryoNetException && e.getMessage() != null && e.getMessage().toLowerCase().contains("incorrect")) {
+                            Vars.ui.showError("$text.server.mismatch");
+                            Vars.netClient.disconnectQuietly();
+                        }else{
                             throw new RuntimeException(e);
-                        });
+                        }
                     }
-                }
+                });
+
             }
         };
 

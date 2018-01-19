@@ -49,7 +49,7 @@ public class Packets {
 
         @Override
         public void write(ByteBuffer buffer) {
-            buffer.put((byte)name.length());
+            buffer.put((byte)name.getBytes().length);
             buffer.put(name.getBytes());
             buffer.put(android ? (byte)1 : 0);
         }
@@ -275,7 +275,7 @@ public class Packets {
 
         @Override
         public void write(ByteBuffer buffer) {
-            buffer.put((byte)name.length());
+            buffer.put((byte)name.getBytes().length);
             buffer.put(name.getBytes());
             buffer.put(weaponleft);
             buffer.put(weaponright);
@@ -352,12 +352,12 @@ public class Packets {
         @Override
         public void write(ByteBuffer buffer) {
             if(name != null) {
-                buffer.putShort((short) name.length());
+                buffer.putShort((short) name.getBytes().length);
                 buffer.put(name.getBytes());
             }else{
                 buffer.putShort((short)-1);
             }
-            buffer.putShort((short)text.length());
+            buffer.putShort((short)text.getBytes().length);
             buffer.put(text.getBytes());
             buffer.putInt(id);
         }

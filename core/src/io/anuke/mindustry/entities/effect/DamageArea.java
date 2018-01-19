@@ -60,7 +60,7 @@ public class DamageArea{
         };
 
 		Entities.getNearby(Vars.control.enemyGroup, rect, cons);
-        if(!Vars.control.isFriendlyFire()) Entities.getNearby(Vars.control.playerGroup, rect, cons);
+        if(Vars.control.isFriendlyFire()) Entities.getNearby(Vars.control.playerGroup, rect, cons);
 	}
 	
 	public static void damageEntities(float x, float y, float radius, int damage){
