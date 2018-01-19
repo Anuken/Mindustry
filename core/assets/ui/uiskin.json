@@ -10,6 +10,11 @@ com.badlogic.gdx.graphics.g2d.BitmapFont: {
 		markupEnabled: false,
 		scale: 0.5
 	},
+	korean: {
+		file: korean.fnt,
+		markupEnabled: true,
+		scale: 0.5
+	},
 	title: {
 		file: title.fnt,
 		markupEnabled: true,

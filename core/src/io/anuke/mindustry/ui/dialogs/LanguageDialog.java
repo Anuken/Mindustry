@@ -11,7 +11,8 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import java.util.Locale;
 
 public class LanguageDialog extends FloatingDialog{
-    private Locale[] locales = {Locale.ENGLISH, new Locale("fr", "FR"), new Locale("es", "LA"), new Locale("pt", "BR")};
+    private Locale[] locales = {Locale.ENGLISH, new Locale("fr", "FR"),
+            new Locale("es", "LA"), new Locale("pt", "BR"), new Locale("ko")};
 
     public LanguageDialog(){
         super("$text.settings.language");
@@ -29,6 +30,7 @@ public class LanguageDialog extends FloatingDialog{
 
         for(Locale loc : locales){
             TextButton button = new TextButton(loc.getDisplayName(loc), "toggle");
+            UCore.log(loc.getDisplayName(loc));
             button.setChecked(Vars.ui.getLocale().equals(loc));
             button.clicked(() -> {
                 if(Vars.ui.getLocale().equals(loc)) return;
