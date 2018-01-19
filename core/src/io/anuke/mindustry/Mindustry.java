@@ -9,8 +9,10 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.PlatformFunction;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.BlockLoader;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.modules.ModuleCore;
 
@@ -24,6 +26,8 @@ public class Mindustry extends ModuleCore {
 	
 	@Override
 	public void init(){
+		Settings.defaults("locale", "default");
+		Settings.load("io.anuke.moment");
 		loadBundle();
 		BlockLoader.load();
 
@@ -40,6 +44,23 @@ public class Mindustry extends ModuleCore {
 		platforms.onGameExit();
 		Net.dispose();
 		super.dispose();
+	}
+
+	public Locale getLocale(){
+		String loc = Settings.getString("locale");
+		if(loc.equals("default")){
+			return Locale.getDefault();
+		}else{
+			Locale lastLocale;
+			if (loc.contains("_")) {
+				String[] split = loc.split("_");
+				lastLocale = new Locale(split[0], split[1]);
+			} else {
+				lastLocale = new Locale(loc);
+			}
+
+			return lastLocale;
+		}
 	}
 
 	public void loadBundle(){
@@ -60,7 +81,8 @@ public class Mindustry extends ModuleCore {
 		}else{
 			FileHandle handle = Gdx.files.internal("bundles/bundle");
 
-			Locale locale = Locale.getDefault();
+			Locale locale = getLocale();
+			UCore.log("Got locale: " + locale);
 			Core.bundle = I18NBundle.createBundle(handle, locale);
 		}
 	}

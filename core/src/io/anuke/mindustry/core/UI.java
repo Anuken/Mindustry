@@ -15,7 +15,6 @@ import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.Skin;
-import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.TextField;
@@ -23,6 +22,8 @@ import io.anuke.ucore.scene.ui.TextField.TextFieldFilter;
 import io.anuke.ucore.scene.ui.TooltipManager;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
+
+import java.util.Locale;
 
 import static io.anuke.mindustry.Vars.control;
 import static io.anuke.ucore.scene.actions.Actions.*;
@@ -39,6 +40,7 @@ public class UI extends SceneModule{
 	public SettingsMenuDialog settings;
 	public ControlsDialog controls;
 	public MapEditorDialog editor;
+	public LanguageDialog language;
 
 	public final MenuFragment menufrag = new MenuFragment();
     public final ToolFragment toolfrag = new ToolFragment();
@@ -49,6 +51,8 @@ public class UI extends SceneModule{
     public final BackgroundFragment backfrag = new BackgroundFragment();
     public final LoadingFragment loadfrag = new LoadingFragment();
     public final BlockConfigFragment configfrag = new BlockConfigFragment();
+
+    private Locale lastLocale;
 	
 	public UI() {
 		Dialog.setShowAction(()-> sequence(
@@ -136,6 +140,7 @@ public class UI extends SceneModule{
 		discord = new DiscordDialog();
 		load = new LoadDialog();
 		levels = new LevelDialog();
+		language = new LanguageDialog();
 		settings = new SettingsMenuDialog();
 		paused = new PausedDialog();
 		about = new AboutDialog();
@@ -154,6 +159,24 @@ public class UI extends SceneModule{
 		loadfrag.build();
 
 		build.end();
+	}
+
+	public Locale getLocale(){
+		String loc = Settings.getString("locale");
+		if(loc.equals("default")){
+			return Locale.getDefault();
+		}else{
+			if(lastLocale == null || !lastLocale.toString().equals(loc)){
+				if(loc.contains("_")){
+					String[] split = loc.split("_");
+					lastLocale = new Locale(split[0], split[1]);
+				}else{
+					lastLocale = new Locale(loc);
+				}
+			}
+
+			return lastLocale;
+		}
 	}
 
 	public void showTextInput(String title, String text, String def, TextFieldFilter filter, Consumer<String> confirmed){
@@ -176,14 +199,13 @@ public class UI extends SceneModule{
 	}
 
 	public void showInfo(String info){
-		scene.table().add("[accent]" + info).padBottom(Gdx.graphics.getHeight()/2+100f).get().getParent().actions(Actions.fadeOut(4f), Actions.removeActor());
+		new Dialog("$text.info.title", "dialog"){{
+			content().margin(15).add(info);
+			buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4).get().getLabelCell().width(400f).get().setWrap(true);
+		}}.show();
 	}
 
 	public void showError(String text){
-		if(hasDialog()){
-			Dialog dialog = scene.getScrollFocus() instanceof  Dialog ? (Dialog)scene.getScrollFocus() : (Dialog)scene.getKeyboardFocus();
-			dialog.hide();
-		}
 		new Dialog("$text.error.title", "dialog"){{
 			content().margin(15).add(text);
 			buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);

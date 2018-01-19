@@ -23,7 +23,7 @@ public class MenuFragment implements Fragment{
 					PressGroup group = new PressGroup();
 					
 					float scale = 4f;
-					defaults().size(100*scale, 21*scale).pad(-10f);
+					defaults().size(140*scale, 21*scale).pad(-10f);
 
 					add(new MenuButton("$text.play", group, ui.levels::show));
 					row();

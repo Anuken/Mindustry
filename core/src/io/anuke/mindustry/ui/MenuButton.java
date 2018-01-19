@@ -1,6 +1,8 @@
 package io.anuke.mindustry.ui;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.scene.ui.Button;
@@ -34,11 +36,15 @@ public class MenuButton extends Button{
 		added = true;
 		String style = "title";
 		float scale = 4f;
-		BitmapFont font = Core.skin.getFont("title");
 		if(hasInvalid){
 			style = "default";
 			scale = Unit.dp.scl(1f);
 		}
-		add(text, style, scale);
+		add(text, style, scale).color(hasInvalid ? Color.DARK_GRAY : Color.WHITE);
+		if(hasInvalid){
+			row();
+			UCore.log(Core.font.getData().capHeight, Core.font.getData().down, Core.font.getData().lineHeight, Core.font.getData().ascent);
+			add(text, style, scale).padTop(Unit.dp.scl(-Core.font.getData().lineHeight * scale * 2f - 4f)).color(Color.WHITE);
+		}
 	}
 }

@@ -205,8 +205,8 @@ public class Control extends Module{
 			"name", Vars.android || Vars.gwt ? "player" : UCore.getProperty("user.name"),
 			"servers", ""
 		);
-		
-		Settings.loadAll("io.anuke.moment");
+
+		KeyBinds.load();
 		
 		for(Map map : Vars.world.maps().list()){
 			Settings.defaults("hiscore" + map.name, 0);
