@@ -1,7 +1,8 @@
-package io.anuke.mindustry.core;
+package io.anuke.mindustry.game;
 
 import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
@@ -72,7 +73,7 @@ public class Tutorial{
 		//info.setText(stage.text);
 		
 		if(stage.showBlock){
-			Tile tile = world.tile(control.core.x + stage.blockPlaceX, control.core.y + stage.blockPlaceY);
+			Tile tile = world.tile(control.getCore().x + stage.blockPlaceX, control.getCore().y + stage.blockPlaceY);
 			
 			if(tile.block() == stage.targetBlock && (tile.getRotation() == stage.blockRotation || stage.blockRotation == -1)){
 				move(true);
@@ -156,8 +157,8 @@ public class Tutorial{
 		world.tile(corex, corey - 3).setBlock(Blocks.air);
 		world.tile(corex, corey - 3).setFloor(Blocks.stone);
 		
-		world.tile(corex + 1, corey - 7).setFloor(Blocks.iron);
-		world.tile(corex - 1, corey - 7).setFloor(Blocks.coal);
+		world.tile(corex + 1, corey - 8).setFloor(Blocks.iron);
+		world.tile(corex - 1, corey - 8).setFloor(Blocks.coal);
 		
 		int r = 10;
 		
@@ -290,12 +291,12 @@ public class Tutorial{
 			
 			void onSwitch(){
 				for(int flip : new int[]{1, -1}){
-					world.tile(control.core.x + flip, control.core.y - 2).setBlock(DistributionBlocks.conveyor, 2 * flip);
-					world.tile(control.core.x + flip*2, control.core.y - 2).setBlock(DistributionBlocks.conveyor, 2 * flip);
-					world.tile(control.core.x + flip*2, control.core.y - 3).setBlock(DistributionBlocks.conveyor, 2 * flip);
-					world.tile(control.core.x + flip*2, control.core.y - 3).setBlock(DistributionBlocks.conveyor, 1);
-					world.tile(control.core.x + flip*2, control.core.y - 4).setFloor(Blocks.stone);
-					world.tile(control.core.x + flip*2, control.core.y - 4).setBlock(ProductionBlocks.stonedrill);
+					world.tile(control.getCore().x + flip, control.getCore().y - 2).setBlock(DistributionBlocks.conveyor, 2 * flip);
+					world.tile(control.getCore().x + flip*2, control.getCore().y - 2).setBlock(DistributionBlocks.conveyor, 2 * flip);
+					world.tile(control.getCore().x + flip*2, control.getCore().y - 3).setBlock(DistributionBlocks.conveyor, 2 * flip);
+					world.tile(control.getCore().x + flip*2, control.getCore().y - 3).setBlock(DistributionBlocks.conveyor, 1);
+					world.tile(control.getCore().x + flip*2, control.getCore().y - 4).setFloor(Blocks.stone);
+					world.tile(control.getCore().x + flip*2, control.getCore().y - 4).setBlock(ProductionBlocks.stonedrill);
 					
 				}
 			}
@@ -344,7 +345,7 @@ public class Tutorial{
 			
 			void onSwitch(){
 				for(int i = 0; i < 4; i ++){
-					world.tile(control.core.x + 2, control.core.y - 2 + i).setBlock(DistributionBlocks.conveyor, 1);
+					world.tile(control.getCore().x + 2, control.getCore().y - 2 + i).setBlock(DistributionBlocks.conveyor, 1);
 				}
 
 				control.getInput().recipe = null;
@@ -454,7 +455,7 @@ public class Tutorial{
 			
 			void onSwitch(){
 				Vars.ui.<ImageButton>find("sectionbuttondistribution").fireClick();
-				world.tile(blockPlaceX + control.core.x, blockPlaceY + control.core.y).setBlock(Blocks.air);
+				world.tile(blockPlaceX + control.getCore().x, blockPlaceY + control.getCore().y).setBlock(Blocks.air);
 			}
 		},
 		conduitUse2{
@@ -470,7 +471,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				world.tile(blockPlaceX + control.core.x, blockPlaceY + control.core.y).setBlock(Blocks.air);
+				world.tile(blockPlaceX + control.getCore().x, blockPlaceY + control.getCore().y).setBlock(Blocks.air);
 			}
 		},
 		conduitUse3{
@@ -486,7 +487,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				world.tile(blockPlaceX + control.core.x, blockPlaceY + control.core.y).setBlock(Blocks.air);
+				world.tile(blockPlaceX + control.getCore().x, blockPlaceY + control.getCore().y).setBlock(Blocks.air);
 			}
 		},
 		generator{
@@ -501,7 +502,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				world.tile(blockPlaceX + control.core.x, blockPlaceY + control.core.y).setBlock(Blocks.air);
+				world.tile(blockPlaceX + control.getCore().x, blockPlaceY + control.getCore().y).setBlock(Blocks.air);
 				Vars.ui.<ImageButton>find("sectionbuttonpower").fireClick();
 				Vars.control.addItem(Item.steel, 60);
 				Vars.control.addItem(Item.iron, 60);
@@ -567,7 +568,7 @@ public class Tutorial{
 				canPlace = true;
 				canBack = false;
 				blockPlaceX = 0;
-				blockPlaceY = -6;
+				blockPlaceY = -7;
 				targetBlock = ProductionBlocks.smelter;
 			}
 			
@@ -584,14 +585,24 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				for(int i = 0; i < 4; i ++){
-					world.tile(control.core.x, control.core.y - 5 + i).setBlock(DistributionBlocks.conveyor, 1);
+				for(int i = 0; i < 5; i ++){
+					world.tile(control.getCore().x, control.getCore().y - 6 + i).setBlock(DistributionBlocks.conveyor, 1);
 				}
-				world.tile(control.core.x+1, control.core.y - 7).setBlock(ProductionBlocks.irondrill);
-				world.tile(control.core.x-1, control.core.y - 7).setBlock(ProductionBlocks.coaldrill);
+
+				world.tile(control.getCore().x, control.getCore().y - 6 + 1).setBlock(DistributionBlocks.tunnel, 3);
+				world.tile(control.getCore().x, control.getCore().y - 6 + 2).setBlock(DefenseBlocks.stonewall, 0);
+				world.tile(control.getCore().x, control.getCore().y - 6 + 3).setBlock(DistributionBlocks.tunnel, 1);
+
+				world.tile(control.getCore().x+1, control.getCore().y - 8).setBlock(ProductionBlocks.irondrill);
+				world.tile(control.getCore().x-1, control.getCore().y - 8).setBlock(ProductionBlocks.coaldrill);
 				
-				world.tile(control.core.x+1, control.core.y - 6).setBlock(DistributionBlocks.conveyor, 2);
-				world.tile(control.core.x-1, control.core.y - 6).setBlock(DistributionBlocks.conveyor, 0);
+				world.tile(control.getCore().x+1, control.getCore().y - 7).setBlock(DistributionBlocks.conveyor, 2);
+				world.tile(control.getCore().x-1, control.getCore().y - 7).setBlock(DistributionBlocks.conveyor, 0);
+			}
+		},
+		tunnelExplain{
+			{
+				canBack = false;
 			}
 		},
 		end{

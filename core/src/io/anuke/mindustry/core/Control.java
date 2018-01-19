@@ -15,6 +15,7 @@ import io.anuke.mindustry.entities.effect.Shield;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyTypes;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.Tutorial;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.DesktopInput;
@@ -46,7 +47,7 @@ import java.util.Arrays;
 import static io.anuke.mindustry.Vars.*;
 
 public class Control extends Module{
-	Tutorial tutorial = new Tutorial();
+	io.anuke.mindustry.game.Tutorial tutorial = new io.anuke.mindustry.game.Tutorial();
 	boolean hiscore = false;
 	
 	final Array<Weapon> weapons = new Array<>();

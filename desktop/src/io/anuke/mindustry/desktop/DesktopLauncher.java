@@ -114,7 +114,7 @@ public class DesktopLauncher {
 
       		@Override
       		public void onGameExit() {
-        		DiscordRPC.INSTANCE.Discord_Shutdown();
+        		lib.Discord_Shutdown();
       		}
 		};
 		

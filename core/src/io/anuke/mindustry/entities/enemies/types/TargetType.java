@@ -16,13 +16,13 @@ public class TargetType extends EnemyType {
 		super("targetenemy");
 
 		speed = 0f;
-		health = 25;
+		health = 40;
 		shootsound = null;
 	}
 	
 	@Override
 	public void move(Enemy enemy){
-		super.move(enemy);
+
 	}
 	
 	@Override

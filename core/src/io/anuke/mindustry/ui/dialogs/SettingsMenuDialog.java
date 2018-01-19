@@ -106,7 +106,6 @@ public class SettingsMenuDialog extends SettingsDialog{
 	void addSettings(){
 		sound.volumePrefs();
 
-		//game.sliderPref("difficulty", 1, 0, Difficulty.values().length-1, i -> Difficulty.values()[i].toString());
 		game.screenshakePref();
 		game.checkPref("smoothcam", true);
 		game.checkPref("effects", true);
