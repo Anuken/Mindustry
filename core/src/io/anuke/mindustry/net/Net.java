@@ -13,6 +13,7 @@ import io.anuke.mindustry.net.Streamable.StreamBuilder;
 import io.anuke.mindustry.net.Streamable.StreamChunk;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.function.BiConsumer;
 import io.anuke.ucore.function.Consumer;
 
 import java.io.IOException;
@@ -22,11 +23,10 @@ public class Net{
 	private static boolean active;
 	private static boolean clientLoaded;
 	private static ObjectMap<Class<?>, Consumer> clientListeners = new ObjectMap<>();
-	private static ObjectMap<Class<?>, Consumer> serverListeners = new ObjectMap<>();
+	private static ObjectMap<Class<?>, BiConsumer<Integer, Object>> serverListeners = new ObjectMap<>();
 	private static ClientProvider clientProvider;
 	private static ServerProvider serverProvider;
 
-	private static int lastConnection = -1;
 	private static IntMap<StreamBuilder> streams = new IntMap<>();
 	private static AsyncExecutor executor = new AsyncExecutor(4);
 
@@ -128,8 +128,8 @@ public class Net{
 	}
 
 	/**Registers a server listener for when an object is recieved.*/
-	public static <T> void handleServer(Class<T> type, Consumer<T> listener){
-		serverListeners.put(type, listener);
+	public static <T> void handleServer(Class<T> type, BiConsumer<Integer, T> listener){
+		serverListeners.put(type, (BiConsumer<Integer, Object>) listener);
 	}
 	
 	/**Call to handle a packet being recieved for the client.*/
@@ -160,10 +160,9 @@ public class Net{
 	}
 
 	/**Call to handle a packet being recieved for the server.*/
-	public static void handleServerReceived(Object object, int connection){
+	public static void handleServerReceived(int connection, Object object){
 		if(serverListeners.get(object.getClass()) != null){
-			lastConnection = connection;
-			serverListeners.get(object.getClass()).accept(object);
+			serverListeners.get(object.getClass()).accept(connection, object);
 		}else{
 			Gdx.app.error("Mindustry::Net", "Unhandled packet type: '" + object.getClass() + "'!");
 		}
@@ -182,11 +181,6 @@ public class Net{
 	/**Get the client ping. Only valid after updatePing().*/
 	public static int getPing(){
 		return server() ? 0 : clientProvider.getPing();
-	}
-
-	/**Returns the last connection that sent a packet to this server.*/
-	public static int getLastConnection(){
-		return lastConnection;
 	}
 	
 	/**Whether the net is active, e.g. whether this is a multiplayer game.*/

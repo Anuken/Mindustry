@@ -5,9 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.esotericsoftware.kryonet.*;
-import com.esotericsoftware.kryonet.FrameworkMessage.DiscoverHost;
 import com.esotericsoftware.kryonet.Listener.LagListener;
-import com.esotericsoftware.kryonet.serialization.Serialization;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
@@ -147,16 +145,8 @@ public class KryoClient implements ClientProvider{
     public void pingHost(String address, int port, Consumer<Host> valid, Consumer<IOException> invalid){
         Thread thread = new Thread(() -> {
             try {
-
-                Serialization ser = (Serialization) UCore.getPrivate(client, "serialization");
                 DatagramSocket socket = new DatagramSocket();
-                ByteBuffer dataBuffer = ByteBuffer.allocate(64);
-                ser.write(dataBuffer, new DiscoverHost());
-
-                dataBuffer.flip();
-                byte[] data = new byte[dataBuffer.limit()];
-                dataBuffer.get(data);
-                socket.send(new DatagramPacket(data, data.length, InetAddress.getByName(address), port));
+                socket.send(new DatagramPacket(new byte[]{-2, 1}, 2, InetAddress.getByName(address), Vars.port));
 
                 socket.setSoTimeout(2000);
 
@@ -166,9 +156,8 @@ public class KryoClient implements ClientProvider{
 
                 socket.receive(packet);
 
-                handler.onDiscoveredHost(packet);
-
-                Host host = addresses.values().next();
+                ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
+                Host host = KryoRegistrator.readServerData(packet.getAddress(), buffer);
 
                 if (host != null) {
                     Gdx.app.postRunnable(() -> valid.accept(host));

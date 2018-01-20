@@ -67,7 +67,7 @@ public class KryoServer implements ServerProvider {
                 c.addressTCP = connection.getRemoteAddressTCP().toString();
 
                 connections.add(kn);
-                Gdx.app.postRunnable(() ->  Net.handleServerReceived(c, kn.id));
+                Gdx.app.postRunnable(() ->  Net.handleServerReceived(kn.id, c));
             }
 
             @Override
@@ -79,7 +79,7 @@ public class KryoServer implements ServerProvider {
                 Disconnect c = new Disconnect();
                 c.id = k.id;
 
-                Gdx.app.postRunnable(() -> Net.handleServerReceived(c, c.id));
+                Gdx.app.postRunnable(() -> Net.handleServerReceived(k.id, c));
             }
 
             @Override
@@ -89,7 +89,7 @@ public class KryoServer implements ServerProvider {
 
                 Gdx.app.postRunnable(() -> {
                     try{
-                        Net.handleServerReceived(object, k.id);
+                        Net.handleServerReceived(k.id, object);
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -377,7 +377,7 @@ public class KryoServer implements ServerProvider {
             if(k == null) return;
             Disconnect disconnect = new Disconnect();
             disconnect.id = k.id;
-            Net.handleServerReceived(disconnect, k.id);
+            Net.handleServerReceived(k.id, disconnect);
         }
 
         @Override
@@ -396,7 +396,7 @@ public class KryoServer implements ServerProvider {
                     if (debug) UCore.log("Decoded: " + Arrays.toString(out));
                     ByteBuffer buffer = ByteBuffer.wrap(out);
                     Object o = serializer.read(buffer);
-                    Net.handleServerReceived(o, k.id);
+                    Net.handleServerReceived(k.id, o);
                 }
             }catch (Exception e){
                 UCore.log("Error reading message!");
