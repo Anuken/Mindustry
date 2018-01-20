@@ -82,7 +82,7 @@ public class Saves {
     }
 
     public boolean canAddSave(){
-        return nextSlot <= Vars.saveSlots;
+        return nextSlot < Vars.saveSlots;
     }
 
     public void addSave(String name){
