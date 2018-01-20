@@ -25,7 +25,6 @@ import io.anuke.mindustry.net.Streamable.StreamChunk;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 import org.java_websocket.WebSocket;
-import org.java_websocket.WebSocketServerFactory;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
@@ -43,7 +42,6 @@ public class KryoServer implements ServerProvider {
     final ByteBuffer buffer = ByteBuffer.allocate(4096);
     final CopyOnWriteArrayList<KryoConnection> connections = new CopyOnWriteArrayList<>();
     final Array<KryoConnection> array = new Array<>();
-    final WebSocketServerFactory factory = SSLGen.getFactory();
     SocketServer webServer;
 
     int lastconnection = 0;

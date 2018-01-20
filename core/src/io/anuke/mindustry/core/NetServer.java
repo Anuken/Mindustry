@@ -68,7 +68,6 @@ public class NetServer extends Module{
             Net.sendStream(id, data);
 
             Mindustry.platforms.updateRPC();
-
         });
 
         Net.handleServer(ConnectConfirmPacket.class, (id, packet) -> {
@@ -95,6 +94,8 @@ public class NetServer extends Module{
             dc.playerid = player.id;
 
             Net.send(dc, SendMode.tcp);
+
+            Mindustry.platforms.updateRPC();
         });
 
         Net.handleServer(PositionPacket.class, (id, packet) -> {

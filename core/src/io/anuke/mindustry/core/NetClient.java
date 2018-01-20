@@ -87,6 +87,8 @@ public class NetClient extends Module {
 
             Vars.ui.showError("$text.disconnect");
             connecting = false;
+
+            Mindustry.platforms.updateRPC();
         });
 
         Net.handle(WorldData.class, data -> {

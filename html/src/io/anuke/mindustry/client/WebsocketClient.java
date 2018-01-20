@@ -28,7 +28,7 @@ public class WebsocketClient implements ClientProvider {
 
     @Override
     public void connect(String ip, int port) throws IOException {
-        socket = new Websocket("wss://" + ip + ":" + Vars.webPort);
+        socket = new Websocket("ws://" + ip + ":" + Vars.webPort);
         socket.addListener(new WebsocketListener() {
             public void onMessage(byte[] bytes) {
                 try {
@@ -105,7 +105,7 @@ public class WebsocketClient implements ClientProvider {
     @Override
     public void pingHost(String address, int port, Consumer<Host> valid, Consumer<IOException> failed) {
         failed.accept(new IOException());
-        Websocket socket = new Websocket("wss://" + address + ":" + Vars.webPort);
+        Websocket socket = new Websocket("ws://" + address + ":" + Vars.webPort);
         final boolean[] accepted = {false};
         socket.addListener(new WebsocketListener() {
             @Override
