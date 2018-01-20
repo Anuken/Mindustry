@@ -67,6 +67,7 @@ public class KryoServer implements ServerProvider {
                 c.addressTCP = connection.getRemoteAddressTCP().toString();
 
                 connections.add(kn);
+                UCore.log("Adding connection #" + kn.id + " to list.");
                 Gdx.app.postRunnable(() ->  Net.handleServerReceived(kn.id, c));
             }
 
@@ -129,6 +130,7 @@ public class KryoServer implements ServerProvider {
     @Override
     public void host(int port) throws IOException {
         lastconnection = 0;
+        connections.clear();
         server.bind(port, port);
         webServer = new SocketServer(Vars.webPort);
         webServer.start();
@@ -147,6 +149,8 @@ public class KryoServer implements ServerProvider {
     @Override
     public void close() {
         UCore.setPrivate(server, "shutdown", true);
+        connections.clear();
+        lastconnection = 0;
 
         Thread thread = new Thread(() ->{
             try {
@@ -226,6 +230,7 @@ public class KryoServer implements ServerProvider {
     @Override
     public void sendTo(int id, Object object, SendMode mode) {
         NetConnection conn = getByID(id);
+        if(conn == null) throw new RuntimeException("Unable to find connection with ID " + id + "!");
         conn.send(object, mode);
     }
 

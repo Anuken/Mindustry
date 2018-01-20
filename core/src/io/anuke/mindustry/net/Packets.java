@@ -496,4 +496,18 @@ public class Packets {
             enabled = buffer.get() == 1;
         }
     }
+
+    public static class PlayerDeathPacket implements Packet{
+        public int id;
+
+        @Override
+        public void write(ByteBuffer buffer) {
+            buffer.putInt(id);
+        }
+
+        @Override
+        public void read(ByteBuffer buffer) {
+            id = buffer.getInt();
+        }
+    }
 }

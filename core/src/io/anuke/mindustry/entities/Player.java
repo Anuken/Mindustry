@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Mech;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
@@ -61,26 +62,36 @@ public class Player extends SyncEntity{
 	
 	@Override
 	public void onDeath(){
-		Effects.effect(Fx.explosion, this);
-		Effects.shake(4f, 5f, this);
-		Effects.sound("die", this);
 
 		if(isLocal){
 			remove();
-		}else{
-			set(-9999, -9999);
+			if(Net.active()){
+				Vars.netClient.handlePlayerDeath();
+			}
+
+			Effects.effect(Fx.explosion, this);
+			Effects.shake(4f, 5f, this);
+			Effects.sound("die", this);
 		}
 
 		//TODO respawning doesn't work properly for multiplayer at all
 		if(isLocal) {
 			Vars.control.setRespawnTime(respawnduration);
 			ui.hudfrag.fadeRespawn(true);
-		}else{
-			Timers.run(respawnduration, () -> {
-				heal();
-				set(Vars.control.getCore().worldx(), Vars.control.getCore().worldy());
-			});
 		}
+	}
+
+	public void doRespawn(){
+		dead = true;
+		Effects.effect(Fx.explosion, this);
+		Effects.shake(4f, 5f, this);
+		Effects.sound("die", this);
+
+		set(-9999, -9999);
+		Timers.run(respawnduration, () -> {
+			heal();
+			set(Vars.control.getCore().worldx(), Vars.control.getCore().worldy());
+		});
 	}
 	
 	@Override

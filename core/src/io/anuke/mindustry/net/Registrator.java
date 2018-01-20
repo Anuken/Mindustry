@@ -36,6 +36,7 @@ public class Registrator {
             ConnectConfirmPacket.class,
             GameOverPacket.class,
             FriendlyFireChangePacket.class,
+            PlayerDeathPacket.class,
     };
     private static ObjectIntMap<Class<?>> ids = new ObjectIntMap<>();
 

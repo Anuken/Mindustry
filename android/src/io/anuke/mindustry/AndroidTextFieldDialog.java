@@ -1,16 +1,14 @@
 package io.anuke.mindustry;
 
 
-import com.badlogic.gdx.Gdx;
-
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager.LayoutParams;
 import android.widget.EditText;
+import com.badlogic.gdx.Gdx;
 
 public class AndroidTextFieldDialog{
 	private Activity activity;
@@ -26,51 +24,43 @@ public class AndroidTextFieldDialog{
 
 	public AndroidTextFieldDialog show() {
 
-		activity.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				Gdx.app.error("Android Dialogs", AndroidTextFieldDialog.class.getSimpleName() + " now shown.");
-				AlertDialog dialog = builder.create();
-				
-				dialog.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-				
-				dialog.show();
-				
-			}
-		});
+		activity.runOnUiThread(() -> {
+            Gdx.app.error("Android Dialogs", AndroidTextFieldDialog.class.getSimpleName() + " now shown.");
+            AlertDialog dialog = builder.create();
+
+            dialog.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+
+            dialog.show();
+
+        });
 
 		return this;
 	}
 
 	private AndroidTextFieldDialog load() {
 
-		activity.runOnUiThread(new Runnable() {
+		activity.runOnUiThread(() -> {
 
-			@Override
-			public void run() {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+            LayoutInflater li = LayoutInflater.from(activity);
 
-				AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
-				LayoutInflater li = LayoutInflater.from(activity);
+            View promptsView = li.inflate(getResourceId("gdxdialogs_inputtext", "layout"), null);
 
-				View promptsView = li.inflate(getResourceId("gdxdialogs_inputtext", "layout"), null);
-				
-				alertDialogBuilder.setView(promptsView);
+            alertDialogBuilder.setView(promptsView);
 
-				userInput = (EditText) promptsView.findViewById(getResourceId("gdxDialogsEditTextInput", "id"));
+            userInput = (EditText) promptsView.findViewById(getResourceId("gdxDialogsEditTextInput", "id"));
 
-				alertDialogBuilder.setCancelable(false);
-				builder = alertDialogBuilder;
+            alertDialogBuilder.setCancelable(false);
+            builder = alertDialogBuilder;
 
-				isBuild = true;
-			}
-		});
+            isBuild = true;
+        });
 
 		// Wait till TextPrompt is built.
 		while (!isBuild) {
 			try {
 				Thread.sleep(10);
-			} catch (InterruptedException e) {
-			}
+			} catch (InterruptedException e) { }
 		}
 
 		return this;
@@ -93,23 +83,17 @@ public class AndroidTextFieldDialog{
 	}
 
 	public AndroidTextFieldDialog setCancelButtonLabel(CharSequence label) {
-		builder.setNegativeButton(label, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				dialog.cancel();
-			}
-		});
+		builder.setNegativeButton(label, (dialog, id) -> dialog.cancel());
 		return this;
 	}
 
 	public AndroidTextFieldDialog setConfirmButtonLabel(CharSequence label) {
-		builder.setPositiveButton(label, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				if (listener != null && !userInput.getText().toString().isEmpty()) {
-					listener.confirm(userInput.getText().toString());
-				}
-				
-			}
-		});
+		builder.setPositiveButton(label, (dialog, id) -> {
+            if (listener != null && !userInput.getText().toString().isEmpty()) {
+                listener.confirm(userInput.getText().toString());
+            }
+
+        });
 		return this;
 	}
 
@@ -128,8 +112,8 @@ public class AndroidTextFieldDialog{
 		return this;
 	}
 	
-	public static interface TextPromptListener{
-		public void confirm(String text);
+	public  interface TextPromptListener{
+		void confirm(String text);
 	}
 
 }

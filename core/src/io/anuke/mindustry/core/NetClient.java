@@ -46,7 +46,6 @@ public class NetClient extends Module {
     boolean connecting = false;
     boolean gotData = false;
     boolean kicked = false;
-    IntSet requests = new IntSet();
     IntSet recieved = new IntSet();
     float playerSyncTime = 2;
     float dataTimeout = 60*18; //18 seconds timeout
@@ -55,7 +54,6 @@ public class NetClient extends Module {
 
         Net.handle(Connect.class, packet -> {
             Net.setClientLoaded(false);
-            requests.clear();
             recieved.clear();
             connecting = true;
             gotData = false;
@@ -121,12 +119,11 @@ public class NetClient extends Module {
                 SyncEntity entity = (SyncEntity) group.getByID(id);
 
                 if (entity == null || id == Vars.player.id) {
-                    if (!requests.contains(id) && id != Vars.player.id) {
+                    if (id != Vars.player.id) {
                         UCore.log("Requesting entity " + id, "group " + group.getType());
-                        requests.add(id);
                         EntityRequestPacket req = new EntityRequestPacket();
                         req.id = id;
-                        Net.send(req, SendMode.tcp);
+                        Net.send(req, SendMode.udp);
                     }
                     data.position(data.position() + SyncEntity.getWriteSize((Class<? extends SyncEntity>) group.getType()));
                 } else {
@@ -311,6 +308,13 @@ public class NetClient extends Module {
         });
 
         Net.handle(FriendlyFireChangePacket.class, packet -> Vars.control.setFriendlyFire(packet.enabled));
+
+        Net.handle(PlayerDeathPacket.class, packet -> {
+            Player player = Vars.control.playerGroup.getByID(packet.id);
+            if(player == null) return;
+
+            player.doRespawn();
+        });
     }
 
     @Override
@@ -335,6 +339,12 @@ public class NetClient extends Module {
 
     public String colorizeName(int id, String name){
         return name == null ? null : "[#" + colorArray[id % colorArray.length].toString().toUpperCase() + "]" + name;
+    }
+
+    public void handlePlayerDeath(){
+        PlayerDeathPacket packet = new PlayerDeathPacket();
+        packet.id = Vars.player.id;
+        Net.send(packet, SendMode.tcp);
     }
 
     public void handleBlockConfig(Tile tile, byte data){

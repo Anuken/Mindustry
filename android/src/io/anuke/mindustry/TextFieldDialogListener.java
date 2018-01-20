@@ -1,16 +1,14 @@
 package io.anuke.mindustry;
 
 
+import android.text.InputType;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
-
-import android.text.InputType;
-import io.anuke.mindustry.AndroidTextFieldDialog.TextPromptListener;
+import io.anuke.ucore.scene.event.ChangeListener;
+import io.anuke.ucore.scene.event.ClickListener;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.InputListener;
 import io.anuke.ucore.scene.ui.TextField;
-import io.anuke.ucore.scene.event.ChangeListener;
-import io.anuke.ucore.scene.event.ClickListener;
 
 public class TextFieldDialogListener extends ClickListener{
 	private TextField field;
@@ -44,14 +42,12 @@ public class TextFieldDialogListener extends ClickListener{
 		
 		AndroidTextFieldDialog dialog = new AndroidTextFieldDialog();
 
-		dialog.setTextPromptListener(new TextPromptListener(){
-			public void confirm(String text){
-				field.clearText();
-				field.appendText(text);
-				field.fire(new ChangeListener.ChangeEvent());
-				Gdx.graphics.requestRendering();
-			}
-		});
+		dialog.setTextPromptListener(text -> {
+            field.clearText();
+            field.appendText(text);
+            field.fire(new ChangeListener.ChangeEvent());
+            Gdx.graphics.requestRendering();
+        });
 
 		if(type == 0){
 			dialog.setInputType(InputType.TYPE_CLASS_TEXT);

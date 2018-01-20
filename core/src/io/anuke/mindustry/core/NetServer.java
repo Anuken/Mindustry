@@ -2,6 +2,7 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.*;
+import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.BulletType;
@@ -65,6 +66,8 @@ public class NetServer extends Module{
             data.stream = new ByteArrayInputStream(stream.toByteArray());
 
             Net.sendStream(id, data);
+
+            Mindustry.platforms.updateRPC();
 
         });
 
@@ -184,7 +187,7 @@ public class NetServer extends Module{
 
         Net.handleServer(EntityRequestPacket.class, (cid, packet) -> {
             int id = packet.id;
-            int dest = id;
+            int dest = cid;
             if (Vars.control.playerGroup.getByID(id) != null) {
                 Player player = Vars.control.playerGroup.getByID(id);
                 PlayerSpawnPacket p = new PlayerSpawnPacket();
@@ -195,6 +198,7 @@ public class NetServer extends Module{
                 p.weaponleft = player.weaponLeft.id;
                 p.weaponright = player.weaponRight.id;
                 p.android = player.isAndroid;
+
                 Net.sendTo(dest, p, SendMode.tcp);
                 Gdx.app.error("Mindustry", "Replying to entity request (" + id + "): player, " + id);
             } else if (Vars.control.enemyGroup.getByID(id) != null) {
@@ -212,6 +216,16 @@ public class NetServer extends Module{
             } else {
                 Gdx.app.error("Mindustry", "Entity request target not found!");
             }
+        });
+
+        Net.handleServer(PlayerDeathPacket.class, (id, packet) -> {
+            Player player = connections.get(id);
+            if(player == null) return;
+
+            packet.id = player.id;
+
+            player.doRespawn();
+            Net.sendExcept(id, packet, SendMode.tcp);
         });
     }
 
