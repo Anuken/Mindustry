@@ -25,6 +25,7 @@ import io.anuke.mindustry.net.Streamable.StreamChunk;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 import org.java_websocket.WebSocket;
+import org.java_websocket.WebSocketServerFactory;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
@@ -42,6 +43,7 @@ public class KryoServer implements ServerProvider {
     final ByteBuffer buffer = ByteBuffer.allocate(4096);
     final CopyOnWriteArrayList<KryoConnection> connections = new CopyOnWriteArrayList<>();
     final Array<KryoConnection> array = new Array<>();
+    final WebSocketServerFactory factory = SSLGen.getFactory();
     SocketServer webServer;
 
     int lastconnection = 0;
@@ -155,7 +157,11 @@ public class KryoServer implements ServerProvider {
         Thread thread = new Thread(() ->{
             try {
                 server.close();
-                if(webServer != null) webServer.stop(1); //please die, right now
+                try {
+                    if (webServer != null) webServer.stop(1); //please die, right now
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
                 //kill them all
                 for(Thread worker : Thread.getAllStackTraces().keySet()){
                     if(worker.getName().contains("WebSocketWorker")){
@@ -364,6 +370,7 @@ public class KryoServer implements ServerProvider {
 
         public SocketServer(int port) {
             super(new InetSocketAddress(port));
+            //setWebSocketFactory(factory);
         }
 
         @Override
@@ -416,6 +423,9 @@ public class KryoServer implements ServerProvider {
             if(ex instanceof BindException){
                 Net.closeServer();
                 Vars.ui.showError("$text.server.addressinuse");
+            }else if(ex.getMessage().equals("Permission denied")){
+                Net.closeServer();
+                Vars.ui.showError("Permission denied.");
             }
         }
 

@@ -234,6 +234,7 @@ public class NetServer extends Module{
         packet.name = null;
         packet.text = message;
         Net.send(packet, SendMode.tcp);
+        Vars.ui.chatfrag.addMessage(message, null);
     }
 
     public void handleFriendlyFireChange(boolean enabled){
