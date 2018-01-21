@@ -90,7 +90,6 @@ public class Mindustry extends ModuleCore {
 	@Override
 	public void postInit(){
 		Vars.control.reset();
-		Vars.control.getSaves().convertSaves();
 	}
 	
 	@Override

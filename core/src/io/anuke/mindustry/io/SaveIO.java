@@ -108,7 +108,9 @@ public class SaveIO{
 	public static boolean isSaveValid(DataInputStream stream){
 
 		try{
-			SaveMeta meta = getData(stream);
+			int version = stream.readInt();
+			SaveFileVersion ver = versions.get(version);
+			SaveMeta meta = ver.getData(stream);
 			return meta.map != null;
 		}catch (Exception e){
 			return false;
@@ -122,7 +124,7 @@ public class SaveIO{
 	public static SaveMeta getData(DataInputStream stream){
 		
 		try{
-			SaveMeta meta =  getVersion().getData(stream);
+			SaveMeta meta = getVersion().getData(stream);
 			stream.close();
 			return meta;
 		}catch (IOException e){
@@ -146,7 +148,7 @@ public class SaveIO{
 			stream = new DataOutputStream(os);
 			getVersion().write(stream);
 			stream.close();
-		}catch (IOException e){
+		}catch (Exception e){
 			throw new RuntimeException(e);
 		}
 	}
@@ -161,9 +163,13 @@ public class SaveIO{
 		
 		try{
 			stream = new DataInputStream(is);
-			getVersion().read(stream);
+			int version = stream.readInt();
+			SaveFileVersion ver = versions.get(version);
+
+			ver.read(stream);
+
 			stream.close();
-		}catch (IOException e){
+		}catch (Exception e){
 			throw new RuntimeException(e);
 		}
 	}

@@ -32,13 +32,7 @@ public class Save13 extends SaveFileVersion {
 
     @Override
     public void read(DataInputStream stream) throws IOException {
-
-        int version = stream.readInt();
         /*long loadTime = */stream.readLong();
-
-        if(version != this.version){
-            throw new RuntimeException("Save file version mismatch!");
-        }
 
         //general state
         byte mode = stream.readByte();
