@@ -46,6 +46,11 @@ public class NetServer extends Module{
 
         Net.handleServer(ConnectPacket.class, (id, packet) -> {
 
+            if(packet.version != Net.version){
+                Net.kickConnection(id, KickReason.outdated);
+                return;
+            }
+
             UCore.log("Sending world data to client (ID=" + id + ")");
 
             Player player = new Player();
@@ -83,7 +88,7 @@ public class NetServer extends Module{
             Player player = connections.get(packet.id);
 
             if (player == null) {
-                sendMessage("[accent]" + Bundles.format("text.server.disconnected", "<???>"));
+                Gdx.app.error("Mindustry", "Unknown client has disconnected (ID=" + id + ")");
                 return;
             }
 

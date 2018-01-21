@@ -44,11 +44,13 @@ public class Packets {
     }
 
     public static class ConnectPacket implements Packet{
+        public int version;
         public String name;
         public boolean android;
 
         @Override
         public void write(ByteBuffer buffer) {
+            buffer.putInt(Net.version);
             buffer.put((byte)name.getBytes().length);
             buffer.put(name.getBytes());
             buffer.put(android ? (byte)1 : 0);
@@ -56,6 +58,7 @@ public class Packets {
 
         @Override
         public void read(ByteBuffer buffer) {
+            version = buffer.getInt();
             byte length = buffer.get();
             byte[] bytes = new byte[length];
             buffer.get(bytes);
@@ -394,7 +397,7 @@ public class Packets {
     }
 
     public enum KickReason{
-        kick, invalidPassword
+        kick, invalidPassword, outdated
     }
 
     public static class UpgradePacket implements Packet{

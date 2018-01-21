@@ -17,7 +17,7 @@ import io.anuke.ucore.util.Strings;
 
 public class JoinDialog extends FloatingDialog {
     Array<Server> servers = new Array<>();
-    Dialog join;
+    Dialog add;
     Server renaming;
     Table local = new Table();
     Table remote = new Table();
@@ -31,24 +31,18 @@ public class JoinDialog extends FloatingDialog {
 
         addCloseButton();
 
-        join = new FloatingDialog("$text.joingame.title");
-        join.content().add("$text.joingame.ip").padRight(5f).left();
-        Mindustry.platforms.addDialog(join.content().addField(Settings.getString("ip"),text ->{
+        add = new FloatingDialog("$text.joingame.title");
+        add.content().add("$text.joingame.ip").padRight(5f).left();
+
+        Mindustry.platforms.addDialog(add.content().addField(Settings.getString("ip"), text ->{
             Settings.putString("ip", text);
             Settings.save();
         }).size(340f, 54f).get(), 100);
 
-        join.content().row();
-        /*
-        join.content().add("$text.server.port").left();
-        Mindustry.platforms.addDialog(join.content()
-                .addField(Settings.getString("port"), new DigitsOnlyFilter(), text ->{
-                    Settings.putString("port", text);
-                    Settings.save();
-                }).size(240f, 54f).get());*/
-        join.buttons().defaults().size(140f, 60f).pad(4f);
-        join.buttons().addButton("$text.cancel", join::hide);
-        join.buttons().addButton("$text.ok", () -> {
+        add.content().row();
+        add.buttons().defaults().size(140f, 60f).pad(4f);
+        add.buttons().addButton("$text.cancel", add::hide);
+        add.buttons().addButton("$text.ok", () -> {
             if(renaming == null) {
                 Server server = new Server(Settings.getString("ip"), Strings.parseInt(Settings.getString("port")));
                 servers.add(server);
@@ -62,11 +56,11 @@ public class JoinDialog extends FloatingDialog {
                 setupRemote();
                 refreshRemote();
             }
-            join.hide();
+            add.hide();
         }).disabled(b -> Settings.getString("ip").isEmpty() || Net.active());
 
-        join.shown(() -> {
-            join.getTitleLabel().setText(renaming != null ? "$text.server.edit" : "$text.server.add");
+        add.shown(() -> {
+            add.getTitleLabel().setText(renaming != null ? "$text.server.edit" : "$text.server.add");
         });
 
         setup();
@@ -101,7 +95,7 @@ public class JoinDialog extends FloatingDialog {
 
             inner.addImageButton("icon-pencil", "empty", 16*2, () -> {
                 renaming = server;
-                join.show();
+                add.show();
             }).margin(3f).padTop(6f).top().right();
 
             inner.addImageButton("icon-trash-16", "empty", 16*2, () -> {
@@ -182,7 +176,7 @@ public class JoinDialog extends FloatingDialog {
         content().row();
         content().addCenteredImageTextButton("$text.server.add", "icon-add", "clear", 14*3, () -> {
             renaming = null;
-            join.show();
+            add.show();
         }).width(w).height(80f);
     }
 
@@ -219,7 +213,7 @@ public class JoinDialog extends FloatingDialog {
                 Vars.netClient.beginConnecting();
                 Net.connect(ip, port);
                 hide();
-                join.hide();
+                add.hide();
             }catch (Exception e) {
                 Throwable t = e;
                 while(t.getCause() != null){

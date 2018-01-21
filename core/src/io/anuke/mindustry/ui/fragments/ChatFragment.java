@@ -49,6 +49,10 @@ public class ChatFragment extends Table implements Fragment{
 
         //TODO put it in input?
         update(() -> {
+            if(!Net.active()){
+                hide();
+            }
+
             if(Net.active() && Inputs.keyTap("chat")){
                 toggle();
             }

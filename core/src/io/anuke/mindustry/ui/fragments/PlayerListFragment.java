@@ -5,6 +5,7 @@ import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.ucore.core.Draw;
 import io.anuke.ucore.core.Inputs;
@@ -77,7 +78,7 @@ public class PlayerListFragment implements Fragment{
             if(Net.server() && !player.isLocal){
                 button.add().growY();
                 button.addImageButton("icon-cancel", 14*3, () ->
-                    Net.kickConnection(player.clientid)
+                    Net.kickConnection(player.clientid, KickReason.kick)
                 ).pad(-5).padBottom(-10).size(h+10, h+14);
             }
 

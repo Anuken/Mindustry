@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.async.AsyncExecutor;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
+import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamBuilder;
 import io.anuke.mindustry.net.Streamable.StreamChunk;
@@ -19,6 +20,8 @@ import io.anuke.ucore.function.Consumer;
 import java.io.IOException;
 
 public class Net{
+	public static final int version = 9;
+
 	private static boolean server;
 	private static boolean active;
 	private static boolean clientLoaded;
@@ -79,8 +82,8 @@ public class Net{
 	}
 
 	/**Kick a specified connection from the server.*/
-	public static void kickConnection(int id){
-		serverProvider.kick(id);
+	public static void kickConnection(int id, KickReason reason){
+		serverProvider.kick(id, reason);
 	}
 
 	/**Returns a list of all connections IDs.*/
@@ -249,7 +252,7 @@ public class Net{
 		/**Return all connected users.*/
 		Array<? extends NetConnection> getConnections();
 		/**Kick a certain connection.*/
-		void kick(int connection);
+		void kick(int connection, KickReason reason);
 		/**Returns the ping for a certain connection.*/
 		int getPingFor(NetConnection connection);
 		/**Register classes to be sent.*/

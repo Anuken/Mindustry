@@ -477,7 +477,7 @@ public class Control extends Module{
 		addItem(Item.stone, 40);
 		
 		if(debug){
-			Arrays.fill(items, 999900);
+			Arrays.fill(items, 99999);
 		}
 	}
 	
@@ -611,7 +611,7 @@ public class Control extends Module{
 			}
 
 			if(Inputs.keyTap(Keys.G)){
-				world.pathfinder().benchmark();
+				addItem(Item.stone, 1000);
 			}
 
 			if(Inputs.keyDown(Keys.I)){
@@ -653,8 +653,12 @@ public class Control extends Module{
 					ui.paused.hide();
 					GameState.set(State.playing);
 				}else if (!ui.restart.isShown()){
-					ui.paused.show();
-					GameState.set(State.paused);
+					if(ui.chatfrag.chatOpen()) {
+						ui.chatfrag.hide();
+					}else{
+						ui.paused.show();
+						GameState.set(State.paused);
+					}
 				}
 			}
 		

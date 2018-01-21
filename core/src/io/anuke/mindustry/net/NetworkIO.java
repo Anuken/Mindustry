@@ -19,14 +19,10 @@ import io.anuke.ucore.entities.Entities;
 import java.io.*;
 
 public class NetworkIO {
-    private static final int fileVersionID = 16;
 
     public static void write(int playerID, ByteArray upgrades, OutputStream os){
 
         try(DataOutputStream stream = new DataOutputStream(os)){
-
-            //--META--
-            stream.writeInt(fileVersionID); //version id
             stream.writeFloat(Timers.time()); //timer time
             stream.writeLong(TimeUtils.millis()); //timestamp
 
@@ -151,16 +147,10 @@ public class NetworkIO {
     public static void load(InputStream is){
 
         try(DataInputStream stream = new DataInputStream(is)){
-
-            int version = stream.readInt();
             float timerTime = stream.readFloat();
             long timestamp = stream.readLong();
 
             Timers.resetTime(timerTime + (TimeUtils.timeSinceMillis(timestamp) / 1000f) * 60f);
-
-            if(version != fileVersionID){
-                throw new RuntimeException("Netcode version mismatch!");
-            }
 
             //general state
             byte mode = stream.readByte();

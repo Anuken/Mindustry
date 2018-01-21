@@ -117,11 +117,11 @@ public class KryoServer implements ServerProvider {
     }
 
     @Override
-    public void kick(int connection) {
+    public void kick(int connection, KickReason reason) {
         KryoConnection con = getByID(connection);
 
         KickPacket p = new KickPacket();
-        p.reason = KickReason.kick;
+        p.reason = reason;
 
         con.send(p, SendMode.tcp);
         Timers.runTask(1f, con::close);
@@ -345,10 +345,16 @@ public class KryoServer implements ServerProvider {
                     connections.remove(this);
                 }
             }else if (connection != null) {
-                if (mode == SendMode.tcp) {
-                    connection.sendTCP(object);
-                } else {
-                    connection.sendUDP(object);
+                try {
+                    if (mode == SendMode.tcp) {
+                        connection.sendTCP(object);
+                    } else {
+                        connection.sendUDP(object);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                    UCore.log("Disconnecting invalid client!");
+                    connection.close();
                 }
             }
         }
