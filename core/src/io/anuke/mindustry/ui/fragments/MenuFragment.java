@@ -28,7 +28,7 @@ public class MenuFragment implements Fragment{
 					add(new MenuButton("$text.play", group, ui.levels::show));
 					row();
 
-					if(!Vars.gwt) {
+					if(Mindustry.platforms.canJoinGame()) {
 						add(new MenuButton("$text.joingame", group, ui.join::show));
 						row();
 					}

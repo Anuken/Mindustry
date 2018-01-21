@@ -49,7 +49,7 @@ public class ChatFragment extends Table implements Fragment{
 
         //TODO put it in input?
         update(() -> {
-            if(!Net.active()){
+            if(!Net.active() && chatOpen){
                 hide();
             }
 

@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.sksamuel.gwt.websockets.Websocket;
 import com.sksamuel.gwt.websockets.WebsocketListener;
+import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
@@ -104,36 +105,40 @@ public class WebsocketClient implements ClientProvider {
 
     @Override
     public void pingHost(String address, int port, Consumer<Host> valid, Consumer<IOException> failed) {
-        failed.accept(new IOException());
-        Websocket socket = new Websocket("ws://" + address + ":" + Vars.webPort);
-        final boolean[] accepted = {false};
-        socket.addListener(new WebsocketListener() {
-            @Override
-            public void onClose() {
-                if(!accepted[0]) failed.accept(new IOException("Failed to connect to host."));
-            }
+        if(!Mindustry.platforms.canJoinGame()) {
+            failed.accept(new IOException());
+        }else {
+            Websocket socket = new Websocket("ws://" + address + ":" + Vars.webPort);
+            final boolean[] accepted = {false};
+            socket.addListener(new WebsocketListener() {
+                @Override
+                public void onClose() {
+                    if (!accepted[0]) failed.accept(new IOException("Failed to connect to host."));
+                }
 
-            @Override
-            public void onMessage(String msg) {
-                String[] text = msg.split("\\|");
-                Host host = new Host(text[1], address, Strings.parseInt(text[0]));
-                valid.accept(host);
-                accepted[0] = true;
-                socket.close();
-            }
+                @Override
+                public void onMessage(String msg) {
+                    if(!msg.startsWith("---")) return;
+                    String[] text = msg.substring(3).split("\\|");
+                    Host host = new Host(text[1], address, Strings.parseInt(text[0]));
+                    valid.accept(host);
+                    accepted[0] = true;
+                    socket.close();
+                }
 
-            @Override
-            public void onOpen() {
-                socket.send("_ping_");
-            }
-        });
-        socket.open();
-        Timers.runTask(60f*5, () -> {
-            if(!accepted[0]){
-                failed.accept(new IOException("Failed to connect to host."));
-                socket.close();
-            }
-        });
+                @Override
+                public void onOpen() {
+                    socket.send("_ping_");
+                }
+            });
+            socket.open();
+            Timers.runTask(60f * 5, () -> {
+                if (!accepted[0]) {
+                    failed.accept(new IOException("Failed to connect to host."));
+                    socket.close();
+                }
+            });
+        }
     }
 
     @Override

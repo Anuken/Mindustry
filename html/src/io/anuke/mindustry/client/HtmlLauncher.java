@@ -25,6 +25,7 @@ public class HtmlLauncher extends GwtApplication {
     static final int WIDTH = 800;
     static final int HEIGHT = 600;
     static HtmlLauncher instance;
+    boolean canJoin = true;
     
     @Override
     public PreloaderCallback getPreloaderCallback () {
@@ -111,6 +112,12 @@ public class HtmlLauncher extends GwtApplication {
 			public void openLink(String link){
 				Window.open(link, "_blank", "");
 			}
+
+			@Override
+            public boolean canJoinGame(){
+			    String ref = Document.get().getReferrer();
+			    return !ref.startsWith("https") && !ref.contains("itch.io");
+            }
         };
         
         return new Mindustry();

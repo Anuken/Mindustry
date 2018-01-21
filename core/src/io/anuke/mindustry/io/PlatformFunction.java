@@ -18,5 +18,10 @@ public abstract class PlatformFunction{
 	public void onGameExit(){}
 	public void openDonations(){}
 	public void requestWritePerms(){}
-	public String getLocaleName(Locale locale){return locale.toString();}
+	public String getLocaleName(Locale locale){
+		return locale.toString();
+	}
+	public boolean canJoinGame(){
+		return true;
+	}
 }

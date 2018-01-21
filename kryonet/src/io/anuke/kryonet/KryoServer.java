@@ -259,6 +259,7 @@ public class KryoServer implements ServerProvider {
     public void dispose(){
         try {
             server.dispose();
+            UCore.log("Disposing web server...");
             if(webServer != null) webServer.stop(1);
             //kill them all
             for(Thread thread : Thread.getAllStackTraces().keySet()){
@@ -266,6 +267,7 @@ public class KryoServer implements ServerProvider {
                     thread.interrupt();
                 }
             }
+            UCore.log("Killed web server.");
         }catch (Exception e){
             throw new RuntimeException(e);
         }
@@ -403,7 +405,7 @@ public class KryoServer implements ServerProvider {
                 if (k == null) return;
 
                 if(message.equals("_ping_")){
-                    conn.send(connections.size() + "|" + Vars.player.name);
+                    conn.send("---" + connections.size() + "|" + Vars.player.name);
                     connections.remove(k);
                 }else {
                     if (debug) UCore.log("Got message: " + message);
