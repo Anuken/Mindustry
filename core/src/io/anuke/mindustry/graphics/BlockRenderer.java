@@ -246,6 +246,10 @@ public class BlockRenderer{
 	}
 
 	void cacheChunk(int cx, int cy, boolean floor){
+		if(cbatch == null){
+			createBatch();
+		}
+
 		cbatch.begin();
 		Graphics.useBatch(cbatch);
 
@@ -268,6 +272,10 @@ public class BlockRenderer{
 
 	public void clearTiles(){
 		cache = null;
+		createBatch();
+	}
+
+	private void createBatch(){
 		if(cbatch != null)
 			cbatch.dispose();
 		cbatch = new CacheBatch(Vars.world.width() * Vars.world.height() * 4);

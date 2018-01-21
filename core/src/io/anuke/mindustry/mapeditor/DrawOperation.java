@@ -17,11 +17,11 @@ public class DrawOperation implements Disposable{
 	}
 
 	public void undo() {
-		pixmap.drawPixmap(from, 0, 0);
+		if(from != null) pixmap.drawPixmap(from, 0, 0);
 	}
 
 	public void redo() {
-		pixmap.drawPixmap(to, 0, 0);
+		if(to != null) pixmap.drawPixmap(to, 0, 0);
 	}
 
 	@Override
