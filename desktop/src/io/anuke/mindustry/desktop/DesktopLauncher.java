@@ -136,8 +136,7 @@ public class DesktopLauncher {
 			e.printStackTrace();
 
 			//attempt to close connections
-			try{ Net.closeServer(); }catch (Exception p){}
-			try{ Net.disconnect(); }catch (Exception p){}
+			try{ Net.dispose(); }catch (Exception p){}
 
 			//don't create crash logs for me (anuke), as it's expected
 			if(System.getProperty("user.name").equals("anuke")) return;

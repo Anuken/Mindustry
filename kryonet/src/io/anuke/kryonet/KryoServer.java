@@ -25,6 +25,7 @@ import io.anuke.mindustry.net.Streamable.StreamChunk;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 import org.java_websocket.WebSocket;
+import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
@@ -259,7 +260,13 @@ public class KryoServer implements ServerProvider {
     public void dispose(){
         try {
             server.dispose();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        try {
             UCore.log("Disposing web server...");
+
             if(webServer != null) webServer.stop(1);
             //kill them all
             for(Thread thread : Thread.getAllStackTraces().keySet()){
@@ -269,7 +276,7 @@ public class KryoServer implements ServerProvider {
             }
             UCore.log("Killed web server.");
         }catch (Exception e){
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
@@ -342,9 +349,12 @@ public class KryoServer implements ServerProvider {
                         if(debug) UCore.log("Sending string: " + string);
                         socket.send(string);
                     }
-                }catch (Exception e){
-                    e.printStackTrace();
+                }catch (WebsocketNotConnectedException e){
+                    //don't log anything, it's not important
                     connections.remove(this);
+                }catch (Exception e){
+                    connections.remove(this);
+                    e.printStackTrace();
                 }
             }else if (connection != null) {
                 try {
