@@ -81,8 +81,10 @@ public class SettingsMenuDialog extends SettingsDialog{
 		menu.addButton("$text.settings.graphics", () -> visible(1));
 		menu.row();
 		menu.addButton("$text.settings.sound", () -> visible(2));
-		menu.row();
-		menu.addButton("$text.settings.controls", Vars.ui.controls::show);
+		if(!Vars.android) {
+			menu.row();
+			menu.addButton("$text.settings.controls", Vars.ui.controls::show);
+		}
 		menu.row();
 		menu.addButton("$text.settings.language", Vars.ui.language::show);
 
