@@ -143,7 +143,9 @@ public class MapEditorDialog extends Dialog{
 			Core.scene.setScrollFocus(view);
 			view.clearStack();
 
-			Mindustry.platforms.updateRPC();
+			Timers.runTask(3f, () -> {
+				Mindustry.platforms.updateRPC();
+			});
 		});
 
 		hidden(() -> Mindustry.platforms.updateRPC());

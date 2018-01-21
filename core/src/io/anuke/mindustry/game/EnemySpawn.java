@@ -15,8 +15,8 @@ public class EnemySpawn{
 	protected int spacing = 1;
 	/**How many waves need to pass after the start of this spawn for the tier to increase by one*/
 	protected int tierscale = 14;
-	/**How many less enemies there are, every time the tier increases*/
-	protected int tierscaleback = 1;
+	/**How many more enemies there are, every time the tier increases*/
+	protected int tierscaleback = 0;
 	/**The tier this spawn starts at.*/
 	protected int tier = 1;
 	/**Maximum amount of enemies that spawn*/
@@ -36,7 +36,7 @@ public class EnemySpawn{
 		}
 		float scaling = this.scaling * Vars.control.getDifficulty().enemyScaling;
 		
-		return Math.min(amount-1 + Math.max((int)((wave / spacing) / scaling), 1) - (tier(wave, lane)-1) * tierscaleback, max);
+		return Math.min(amount-1 + Math.max((int)((wave / spacing) / scaling), 1) + (tier(wave, lane)-1) * tierscaleback, max);
 	}
 	
 	public int tier(int wave, int lane){

@@ -26,7 +26,7 @@ public class WaveCreator{
 				amount = 2;
 				spacing = 5;
 				scaling = 2;
-				tierscaleback = 0;
+				tierscaleback = 1;
 			}},
 			
 			new EnemySpawn(EnemyTypes.tank){{

@@ -432,6 +432,9 @@ public class Renderer extends RendererModule{
 
 		Draw.thickness(3f);
 		Draw.color(Color.SLATE);
+		Draw.line(x - len + 1, y, x + len + 1.5f, y);
+		Draw.thickness(1f);
+		Draw.color(Color.BLACK);
 		Draw.line(x - len + 1, y, x + len + 0.5f, y);
 		Draw.color(color);
 		if(w >= 1)
