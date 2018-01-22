@@ -2,6 +2,7 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.Mindustry;
@@ -14,9 +15,9 @@ import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.mindustry.graphics.Fx;
-import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
+import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Recipes;
@@ -93,17 +94,22 @@ public class NetClient extends Module {
 
         Net.handle(WorldData.class, data -> {
             UCore.log("Recieved world data: " + data.stream.available() + " bytes.");
-            NetworkIO.load(data.stream);
+            NetworkIO.loadWorld(data.stream);
             Vars.player.set(Vars.control.core.worldx(), Vars.control.core.worldy() - Vars.tilesize * 2);
 
-            connecting = false;
-            Vars.ui.loadfrag.hide();
-            Vars.ui.join.hide();
             gotData = true;
 
-            Net.send(new ConnectConfirmPacket(), SendMode.tcp);
-            GameState.set(State.playing);
-            Net.setClientLoaded(true);
+            finishConnecting();
+        });
+
+        Net.handle(CustomMapPacket.class, packet -> {
+            //custom map is always sent before world data
+            Pixmap pixmap = NetworkIO.loadMap(packet.stream);
+
+            Vars.world.maps().setNetworkMap(pixmap);
+
+            MapAckPacket ack = new MapAckPacket();
+            Net.send(ack, SendMode.tcp);
         });
 
         Net.handle(SyncPacket.class, packet -> {
@@ -131,7 +137,6 @@ public class NetClient extends Module {
                 } else {
                     entity.read(data);
                 }
-
             }
         });
 
@@ -328,6 +333,15 @@ public class NetClient extends Module {
         }else if(!connecting){
             Net.disconnect();
         }
+    }
+
+    private void finishConnecting(){
+        Net.send(new ConnectConfirmPacket(), SendMode.tcp);
+        GameState.set(State.playing);
+        Net.setClientLoaded(true);
+        connecting = false;
+        Vars.ui.loadfrag.hide();
+        Vars.ui.join.hide();
     }
 
     public void beginConnecting(){

@@ -1,34 +1,74 @@
 package io.anuke.mindustry.net;
 
-import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.utils.ByteArray;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.WorldGenerator;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.mindustry.world.blocks.types.Rock;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 
 import java.io.*;
+import java.nio.ByteBuffer;
 
 public class NetworkIO {
 
-    public static void write(int playerID, ByteArray upgrades, OutputStream os){
+    public static void writeMap(Map map, OutputStream os){
+        try(DataOutputStream stream = new DataOutputStream(os)){
+            Pixmap pix = map.pixmap;
+            ByteBuffer buffer = pix.getPixels();
+            UCore.log("Buffer position: " + buffer.position());
+            stream.writeShort(map.getWidth());
+            stream.writeShort(map.getHeight());
+            for(int i = 0; i < map.getWidth() * map.getHeight(); i ++){
+                int color = buffer.getInt();
+                byte id = ColorMapper.getColorID(color);
+                if(id == -1) id = 0;
+                stream.writeByte(id);
+            }
+            buffer.position(0);
+        }catch (IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Pixmap loadMap(InputStream is){
+        try(DataInputStream stream = new DataInputStream(is)){
+            short width = stream.readShort();
+            short height = stream.readShort();
+            Pixmap pixmap = new Pixmap(width, height, Format.RGBA8888);
+            ByteBuffer buffer = pixmap.getPixels();
+            buffer.position(0);
+
+            for(int i = 0; i < width * height; i ++){
+                byte id = stream.readByte();
+                buffer.putInt(ColorMapper.getColorByID(id));
+            }
+
+            return pixmap;
+        }catch (IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void writeWorld(int playerID, ByteArray upgrades, OutputStream os){
 
         try(DataOutputStream stream = new DataOutputStream(os)){
+
             stream.writeFloat(Timers.time()); //timer time
             stream.writeLong(TimeUtils.millis()); //timestamp
 
             //--GENERAL STATE--
             stream.writeByte(Vars.control.getMode().ordinal()); //gamemode
-            stream.writeByte(Vars.world.getMap().id); //map ID
+            stream.writeByte(Vars.world.getMap().custom ? -1 : Vars.world.getMap().id); //map ID
 
             stream.writeInt(Vars.control.getWave()); //wave
             stream.writeFloat(Vars.control.getWaveCountdown()); //wave countdown
@@ -139,12 +179,8 @@ public class NetworkIO {
         }
     }
 
-    public static void load(FileHandle file){
-        load(file.read());
-    }
-
-
-    public static void load(InputStream is){
+    /**Return whether a custom map is expected, and thus whether the client should wait for additional data.*/
+    public static void loadWorld(InputStream is){
 
         try(DataInputStream stream = new DataInputStream(is)){
             float timerTime = stream.readFloat();

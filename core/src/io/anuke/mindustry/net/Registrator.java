@@ -37,6 +37,8 @@ public class Registrator {
             GameOverPacket.class,
             FriendlyFireChangePacket.class,
             PlayerDeathPacket.class,
+            CustomMapPacket.class,
+            MapAckPacket.class
     };
     private static ObjectIntMap<Class<?>> ids = new ObjectIntMap<>();
 

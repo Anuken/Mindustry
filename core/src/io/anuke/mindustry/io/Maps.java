@@ -17,6 +17,7 @@ import io.anuke.ucore.graphics.Pixmaps;
 public class Maps implements Disposable{
 	private IntMap<Map> maps = new IntMap<>();
 	private ObjectMap<String, Map> mapNames = new ObjectMap<>();
+	private Map networkMap;
 	private int lastID;
 	private Json json = new Json();
 
@@ -30,7 +31,23 @@ public class Maps implements Disposable{
 		return maps.values();
 	}
 
+	public void setNetworkMap(Pixmap pixmap){
+		if(networkMap != null){
+			networkMap.pixmap.dispose();
+			networkMap = null;
+		}
+		networkMap = new Map();
+		networkMap.custom = true;
+		networkMap.pixmap = pixmap;
+		networkMap.visible = false;
+		networkMap.name = "network map";
+		networkMap.id = -1;
+	}
+
 	public Map getMap(int id){
+		if(id == -1){
+			return networkMap;
+		}
 		return maps.get(id);
 	}
 

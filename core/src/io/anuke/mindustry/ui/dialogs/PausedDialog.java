@@ -57,11 +57,7 @@ public class PausedDialog extends FloatingDialog{
 
 			if(!Vars.gwt) {
 				content().addButton("$text.hostserver", () -> {
-					if (Vars.world.getMap().custom) {
-						ui.showError("$text.nohost");
-					} else {
-						ui.host.show();
-					}
+					ui.host.show();
 				}).disabled(b -> Net.active());
 			}
 
@@ -100,11 +96,7 @@ public class PausedDialog extends FloatingDialog{
 			lo.cell.disabled(b -> Net.active());
 
 			imagebutton ho = new imagebutton("icon-host", isize, () -> {
-				if(Vars.world.getMap().custom){
-					ui.showError("$text.nohost");
-				}else {
-					ui.host.show();
-				}
+				ui.host.show();
 			});
 			ho.text("$text.host").padTop(4f);
 			ho.cell.disabled(b -> Net.active());
