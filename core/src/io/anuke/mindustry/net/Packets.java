@@ -513,4 +513,16 @@ public class Packets {
             id = buffer.getInt();
         }
     }
+
+    public static class CustomMapPacket extends Streamable{
+
+    }
+
+    public static class MapAckPacket implements Packet{
+        @Override
+        public void write(ByteBuffer buffer) { }
+
+        @Override
+        public void read(ByteBuffer buffer) { }
+    }
 }

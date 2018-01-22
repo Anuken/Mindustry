@@ -2,6 +2,7 @@ package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntIntMap;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntMap.Entry;
 import com.badlogic.gdx.utils.ObjectIntMap;
@@ -10,6 +11,11 @@ import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.SpecialBlocks;
 
 public class ColorMapper{
+	/**maps color IDs to their actual RGBA8888 colors*/
+	private static int[] colorIDS;
+	/**Maps RGBA8888 colors to pair IDs.*/
+	private static IntIntMap reverseIDs = new IntIntMap();
+
 	private static ObjectIntMap<Block> reverseColors = new ObjectIntMap<>();
 	private static Array<BlockPair> pairs = new Array<>();
 	private static IntMap<BlockPair> colors = map(
@@ -40,6 +46,14 @@ public class ColorMapper{
 	public static BlockPair get(int color){
 		return colors.get(color);
 	}
+
+	public static int getColorByID(byte id){
+		return colorIDS[id];
+	}
+
+	public static byte getColorID(int color){
+		return (byte)reverseIDs.get(color, -1);
+	}
 	
 	public static IntMap<BlockPair> getColors(){
 		return colors;
@@ -62,10 +76,14 @@ public class ColorMapper{
 	}
 	
 	private static IntMap<BlockPair> map(Object...objects){
+		colorIDS = new int[objects.length/2];
 		IntMap<BlockPair> colors = new IntMap<>();
 		for(int i = 0; i < objects.length/2; i ++){
-			colors.put(Color.rgba8888(Color.valueOf((String)objects[i*2])), (BlockPair)objects[i*2+1]);
+			int color = Color.rgba8888(Color.valueOf((String)objects[i*2]));
+			colors.put(color, (BlockPair)objects[i*2+1]);
 			pairs.add((BlockPair)objects[i*2+1]);
+			colorIDS[i] = color;
+			reverseIDs.put(color, i);
 		}
 		for(Entry<BlockPair> e : colors.entries()){
 			reverseColors.put(e.value.wall == Blocks.air ? e.value.floor : e.value.wall, e.key);

@@ -62,17 +62,32 @@ public class NetServer extends Module{
             player.interpolator.target.set(player.x, player.y);
             connections.put(id, player);
 
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            NetworkIO.write(player.id, weapons.get(packet.name, new ByteArray()), stream);
+            if(Vars.world.getMap().custom){
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                NetworkIO.writeMap(Vars.world.getMap(), stream);
+                CustomMapPacket data = new CustomMapPacket();
+                data.stream = new ByteArrayInputStream(stream.toByteArray());
+                Net.sendStream(id, data);
 
-            UCore.log("Packed " + stream.size() + " uncompressed bytes of data.");
-
-            WorldData data = new WorldData();
-            data.stream = new ByteArrayInputStream(stream.toByteArray());
-
-            Net.sendStream(id, data);
+                UCore.log("Sending custom map: Packed " + stream.size() + " uncompressed bytes of MAP data.");
+            }else{
+                //hack-- simulate the map ack packet recieved to send the world data to the client.
+                Net.handleServerReceived(id, new MapAckPacket());
+            }
 
             Mindustry.platforms.updateRPC();
+        });
+
+        Net.handleServer(MapAckPacket.class, (id, packet) -> {
+            Player player = connections.get(id);
+
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            NetworkIO.writeWorld(player.id, weapons.get(player.name, new ByteArray()), stream);
+            WorldData data = new WorldData();
+            data.stream = new ByteArrayInputStream(stream.toByteArray());
+            Net.sendStream(id, data);
+
+            UCore.log("Packed " + stream.size() + " uncompressed bytes of WORLD data.");
         });
 
         Net.handleServer(ConnectConfirmPacket.class, (id, packet) -> {
