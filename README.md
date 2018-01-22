@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/Anuken/Mindustry.svg?branch=master)](https://travis-ci.org/Anuken/Mindustry)
 [![Waffle.io - Columns and their card count](https://badge.waffle.io/Anuken/Mindustry.svg?columns=all)](https://waffle.io/Anuken/Mindustry)
-
+[![Discord](https://img.shields.io/discord/102860784329052160.svg)](https://discord.gg/r8BkXNd)
 
 A pixelated sandbox tower defense game made using [LibGDX](https://libgdx.badlogicgames.com/). Winner of the [GDL Metal Monstrosity Jam](https://itch.io/jam/gdl---metal-monstrosity-jam).
 
