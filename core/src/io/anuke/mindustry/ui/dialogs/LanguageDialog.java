@@ -13,7 +13,7 @@ import java.util.Locale;
 
 public class LanguageDialog extends FloatingDialog{
     private Locale[] locales = {Locale.ENGLISH, new Locale("fr", "FR"),
-            new Locale("es", "LA"), new Locale("pt", "BR"), new Locale("ko")};
+            new Locale("es", "LA"), new Locale("pt", "BR"), new Locale("ko"), new Locale("in", "ID")};
 
     public LanguageDialog(){
         super("$text.settings.language");

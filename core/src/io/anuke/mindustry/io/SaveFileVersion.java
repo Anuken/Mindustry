@@ -12,7 +12,6 @@ public abstract class SaveFileVersion {
     }
 
     public SaveMeta getData(DataInputStream stream) throws IOException{
-        int version = stream.readInt(); //read version
         long time = stream.readLong(); //read last saved time
         byte mode = stream.readByte(); //read the gamemode
         byte map = stream.readByte(); //read the map

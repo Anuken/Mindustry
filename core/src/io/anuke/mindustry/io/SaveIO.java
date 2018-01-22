@@ -9,7 +9,6 @@ import io.anuke.mindustry.io.versions.Save12;
 import io.anuke.mindustry.io.versions.Save13;
 import io.anuke.mindustry.io.versions.Save14;
 import io.anuke.mindustry.io.versions.Save15;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Settings;
 
 import java.io.*;
@@ -58,7 +57,7 @@ public class SaveIO{
 		}
 	}
 
-	public static DataInputStream readSlotMeta(int slot){
+	public static DataInputStream getSlotStream(int slot){
 		if(Vars.gwt){
 			String string = Settings.getString("save-"+slot+"-data");
 			byte[] bytes = Base64Coder.decode(string);
@@ -70,33 +69,8 @@ public class SaveIO{
 	
 	public static boolean isSaveValid(int slot){
 		try {
-			return isSaveValid(readSlotMeta(slot));
+			return isSaveValid(getSlotStream(slot));
 		}catch (Exception e){
-			return false;
-		}
-	}
-
-	/**Returns whether or not conversion was succesful.*/
-	public static boolean checkConvert(int slot){
-
-		try{
-			DataInputStream stream = readSlotMeta(slot);
-			int version = stream.readInt();
-			stream.close();
-
-			if(version != getVersion().version){
-				UCore.log("Converting slot " + slot + ": " + version + " -> " + getVersion().version);
-				stream = readSlotMeta(slot);
-				SaveFileVersion target = versions.get(version);
-				target.read(stream);
-				stream.close();
-				saveToSlot(slot);
-			}
-
-			return true;
-
-		}catch (Exception e){
-			e.printStackTrace();
 			return false;
 		}
 	}
@@ -118,13 +92,14 @@ public class SaveIO{
 	}
 
 	public static SaveMeta getData(int slot){
-		return getData(readSlotMeta(slot));
+		return getData(getSlotStream(slot));
 	}
 	
 	public static SaveMeta getData(DataInputStream stream){
 		
 		try{
-			SaveMeta meta = getVersion().getData(stream);
+			int version = stream.readInt();
+			SaveMeta meta = versions.get(version).getData(stream);
 			stream.close();
 			return meta;
 		}catch (IOException e){

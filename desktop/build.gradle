@@ -49,6 +49,10 @@ task clearOut(type: Delete){
 ext.getPlatform = {
 	if(project.gradle.startParameter.taskNames.size() == 0 || !project.gradle.startParameter.taskNames.first().contains("packr")) return;
 
+    if(!project.hasProperty("version")){
+        throw new InvalidUserDataException("No version set. Set version with -Pversion=name");
+    }
+
 	if (project.hasProperty("platform")) {
 		def lc = platform.toLowerCase()
 		if(lc.equals("windows64")) {
@@ -65,6 +69,16 @@ ext.getPlatform = {
 	}else{
 		throw new InvalidUserDataException("No platform defined. Set platform with -Pplatform=windows/linux/mac");
 	}
+}
+
+ext.getDeployVersion = {
+    if(project.gradle.startParameter.taskNames.size() == 0 || !project.gradle.startParameter.taskNames.first().contains("packr")) return;
+
+    if(!project.hasProperty("deployversion")){
+        throw new InvalidUserDataException("No version set. Set version with -Pdeployversion=name");
+    }
+
+    return deployversion;
 }
 
 ext.getPackage = {
@@ -133,7 +147,7 @@ task packrZip(type: Zip) {
     }
 
     from "packr-out/"
-    archiveName appName + "-" + getPlatform() + ".zip"
+    archiveName appName + "-" + getPlatform() + "-" + getDeployVersion() + ".zip"
     destinationDir(file("packr-export"))
 }
 
