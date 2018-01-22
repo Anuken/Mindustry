@@ -514,6 +514,7 @@ public class Control extends Module{
 	
 	public void removeItem(ItemStack req){
 		items[req.item.id] -= req.amount;
+		if(items[req.item.id] < 0) items[req.item.id] = 0; //prevents negative item glitches in multiplayer
 		shouldUpdateItems = true;
 	}
 	

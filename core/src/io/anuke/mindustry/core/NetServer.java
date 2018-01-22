@@ -123,11 +123,7 @@ public class NetServer extends Module{
             packet.playerid = connections.get(id).id;
 
             Recipe recipe = Recipes.getByResult(Block.getByID(packet.block));
-            if (recipe != null) {
-                for (ItemStack stack : recipe.requirements) {
-                    Vars.control.removeItem(stack);
-                }
-            }
+            if (recipe != null) Vars.control.removeItems(recipe.requirements);
 
             Net.sendExcept(id, packet, SendMode.tcp);
         });
