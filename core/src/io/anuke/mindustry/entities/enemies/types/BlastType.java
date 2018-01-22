@@ -15,7 +15,7 @@ public class BlastType extends EnemyType {
 	public BlastType() {
 		super("blastenemy");
 		health = 30;
-		speed = 0.7f;
+		speed = 0.8f;
 		bullet = null;
 		turretrotatespeed = 0f;
 		mass = 0.8f;

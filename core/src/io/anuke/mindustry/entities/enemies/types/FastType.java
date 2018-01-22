@@ -8,10 +8,10 @@ public class FastType extends EnemyType {
 		super("fastenemy");
 		
 		speed = 0.73f;
-		reload = 25;
+		reload = 20;
 		mass = 0.2f;
 		
-		health = 40;
+		health = 50;
 	}
 
 }

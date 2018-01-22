@@ -56,7 +56,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			}
 		}
 	},
-	emp = new BulletType(1.6f, 6){
+	emp = new BulletType(1.6f, 8){
 		{
 			lifetime = 50f;
 			hitsize = 6f;
@@ -235,7 +235,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			DamageArea.damage(!(b.owner instanceof Enemy), b.x, b.y, 25f, (int)(damage * 2f/3f));
 		}
 	},
-	blast = new BulletType(1.1f, 80){
+	blast = new BulletType(1.1f, 90){
 		{
 			lifetime = 0f;
 			hitsize = 8f;
@@ -329,7 +329,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			Draw.reset();
 		}
 	},
-	spread = new BulletType(2.4f, 7) {
+	spread = new BulletType(2.4f, 8) {
 		{
 			lifetime = 70;
 		}

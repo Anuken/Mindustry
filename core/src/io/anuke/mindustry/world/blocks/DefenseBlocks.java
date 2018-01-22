@@ -11,7 +11,7 @@ public class DefenseBlocks{
 	public static final Block
 
 	stonewall = new Wall("stonewall"){{
-		health = 50*wallHealthMultiplier;
+		health = 40*wallHealthMultiplier;
 	}},
 
 	ironwall = new Wall("ironwall"){{
@@ -50,7 +50,7 @@ public class DefenseBlocks{
 	repairturret = new RepairTurret("repairturret"){
 		{
 			range = 30;
-			reload = 40f;
+			reload = 25f;
 			health = 60;
 			powerUsed = 0.08f;
 		}
@@ -59,7 +59,7 @@ public class DefenseBlocks{
 	megarepairturret = new RepairTurret("megarepairturret"){
 		{
 			range = 44;
-      		reload = 20f;
+      		reload = 12f;
 			health = 90;
 			powerUsed = 0.13f;
 		}

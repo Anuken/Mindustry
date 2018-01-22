@@ -25,7 +25,7 @@ public class WeaponBlocks{
 			range = 52;
 			reload = 15f;
 			bullet = BulletType.stone;
-			health = 50;
+			health = 45;
 			ammo = Item.stone;
 		}
 	},
@@ -37,7 +37,7 @@ public class WeaponBlocks{
 			bullet = BulletType.stone;
 			ammo = Item.stone;
 			health = 55;
-			health = 50;
+			health = 45;
 		}
 		
 		@Override
@@ -163,7 +163,7 @@ public class WeaponBlocks{
 			shootsound = "bigshot";
 			inaccuracy = 8f;
 			range = 80f;
-			reload = 8f;
+			reload = 5f;
 			bullet = BulletType.chain;
 			ammo = Item.uranium;
 			health = 430;

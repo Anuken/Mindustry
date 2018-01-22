@@ -21,7 +21,7 @@ public class Weapon extends Upgrade{
 			effect =  Fx.laserShoot;
 		}
 	},
-	triblaster = new Weapon("triblaster", 20, BulletType.spread){
+	triblaster = new Weapon("triblaster", 16, BulletType.spread){
 		{
 			shots = 3;
 			effect = Fx.spreadShoot;
