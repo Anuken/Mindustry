@@ -29,8 +29,11 @@ public class EnemyType {
     private static byte lastid = 0;
     private static Array<EnemyType> types = new Array<>();
 
-    public final static Color[] tierColors = { Color.valueOf("ffe451"), Color.valueOf("f48e20"), Color.valueOf("ff6757"), Color.valueOf("ff2d86") };
-    public final static int maxtier = 4;
+    public final static Color[] tierColors = {
+            Color.valueOf("ffe451"), Color.valueOf("f48e20"), Color.valueOf("ff6757"),
+            Color.valueOf("ff2d86"), Color.valueOf("cb2dff"), Color.valueOf("c83333"),
+            Color.valueOf("251616") };
+    public final static int maxtier = tierColors.length;
     public final static float maxIdleLife = 60f*2f; //2 seconds idle = death
     public final static float hitDuration = 5f;
 
