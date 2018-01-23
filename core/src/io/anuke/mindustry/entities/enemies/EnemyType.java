@@ -131,6 +131,9 @@ public class EnemyType {
         }else{
             enemy.angle = Mathf.slerp(enemy.angle, enemy.angleTo(enemy.target), turretrotatespeed * Timers.delta());
         }
+
+        enemy.x = Mathf.clamp(enemy.x, 0, Vars.world.width() * Vars.tilesize);
+        enemy.y = Mathf.clamp(enemy.y, 0, Vars.world.height() * Vars.tilesize);
     }
 
     public void move(Enemy enemy){

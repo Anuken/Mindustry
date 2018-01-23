@@ -186,6 +186,9 @@ public class Player extends SyncEntity{
 			float angle = Angles.mouseAngle(x, y);
 			this.angle = Mathf.lerpAngDelta(this.angle, angle, 0.1f);
 		}
+
+		x = Mathf.clamp(x, 0, Vars.world.width() * Vars.tilesize);
+		y = Mathf.clamp(y, 0, Vars.world.height() * Vars.tilesize);
 	}
 
 	@Override
