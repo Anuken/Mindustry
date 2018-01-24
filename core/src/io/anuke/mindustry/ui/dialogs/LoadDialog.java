@@ -6,6 +6,7 @@ import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.Saves.SaveSlot;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.ScrollPane;
@@ -173,7 +174,7 @@ public class LoadDialog extends FloatingDialog{
 						GameState.set(State.playing);
 						Vars.ui.paused.hide();
 					}catch(Exception e){
-						e.printStackTrace();
+						UCore.error(e);
 						Vars.ui.paused.hide();
 						GameState.set(State.menu);
 						Vars.control.reset();

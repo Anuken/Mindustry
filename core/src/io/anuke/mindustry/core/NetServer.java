@@ -217,7 +217,7 @@ public class NetServer extends Module{
                 p.android = player.isAndroid;
 
                 Net.sendTo(dest, p, SendMode.tcp);
-                Gdx.app.error("Mindustry", "Replying to entity request (" + id + "): player, " + id);
+                log("Replying to entity request (" + id + "): player, " + id);
             } else if (Vars.control.enemyGroup.getByID(id) != null) {
                 Enemy enemy = Vars.control.enemyGroup.getByID(id);
                 EnemySpawnPacket e = new EnemySpawnPacket();
@@ -229,7 +229,7 @@ public class NetServer extends Module{
                 e.type = enemy.type.id;
                 e.health = (short) enemy.health;
                 Net.sendTo(dest, e, SendMode.tcp);
-                Gdx.app.error("Mindustry", "Replying to entity request(" + id + "): enemy, " + id);
+                log("Replying to entity request(" + id + "): enemy, " + id);
             } else {
                 Gdx.app.error("Mindustry", "Entity request target not found!");
             }

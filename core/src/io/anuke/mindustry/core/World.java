@@ -107,9 +107,9 @@ public class World extends Module{
 	}
 	
 	public Tile tile(int x, int y){
-		//if(tiles == null){
-		//	return null;
-		//}
+		if(tiles == null){
+			return null;
+		}
 		if(!Mathf.inBounds(x, y, tiles)) return null;
 		return tiles[x][y];
 	}

@@ -5,6 +5,7 @@ import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.style.Drawable;
@@ -235,7 +236,7 @@ public class JoinDialog extends FloatingDialog {
                 Vars.ui.showError(Bundles.format("text.connectfail", error));
                 Vars.ui.loadfrag.hide();
 
-                e.printStackTrace();
+                UCore.error(e);
             }
         });
     }

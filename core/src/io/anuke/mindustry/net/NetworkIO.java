@@ -8,7 +8,10 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
-import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.ColorMapper;
+import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.WorldGenerator;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.mindustry.world.blocks.types.Rock;
@@ -23,7 +26,7 @@ public class NetworkIO {
 
     public static void writeMap(Pixmap map, OutputStream os){
         try(DataOutputStream stream = new DataOutputStream(os)){
-            ByteBuffer buffer = map.getPixels();
+            ByteBuffer buffer = (ByteBuffer) map.getPixels();
             UCore.log("Buffer position: " + buffer.position());
             stream.writeShort(map.getWidth());
             stream.writeShort(map.getHeight());
@@ -44,12 +47,19 @@ public class NetworkIO {
             short width = stream.readShort();
             short height = stream.readShort();
             Pixmap pixmap = new Pixmap(width, height, Format.RGBA8888);
-            ByteBuffer buffer = pixmap.getPixels();
-            buffer.position(0);
+            if(!Vars.gwt) {
+                ByteBuffer buffer = (ByteBuffer) pixmap.getPixels();
+                buffer.position(0);
 
-            for(int i = 0; i < width * height; i ++){
-                byte id = stream.readByte();
-                buffer.putInt(ColorMapper.getColorByID(id));
+                for (int i = 0; i < width * height; i++) {
+                    byte id = stream.readByte();
+                    buffer.putInt(ColorMapper.getColorByID(id));
+                }
+            }else{
+                for(int i = 0; i < width * height; i++){
+                    byte id = stream.readByte();
+                    pixmap.drawPixel(i % width, i /width, ColorMapper.getColorByID(id));
+                }
             }
 
             return pixmap;

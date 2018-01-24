@@ -8,9 +8,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Json.Serializer;
 import com.badlogic.gdx.utils.JsonWriter.OutputType;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Map;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.graphics.Pixmaps;
 
@@ -154,7 +154,7 @@ public class Maps implements Disposable{
 			}
 			return true;
 		}catch(Exception e){
-			if(!Vars.android) e.printStackTrace();
+			if(!Vars.android) UCore.error(e);
 			Gdx.app.error("Mindustry-Maps", "Failed loading map file: " + file);
 			return false;
 		}

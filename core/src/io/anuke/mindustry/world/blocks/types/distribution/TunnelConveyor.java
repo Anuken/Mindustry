@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.blocks.types.distribution;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 
 public class TunnelConveyor extends Block{
@@ -34,7 +35,7 @@ public class TunnelConveyor extends Block{
 			try {
 				to.block().handleItem(item, to, tunnel);
 			}catch (NullPointerException e){
-				e.printStackTrace();
+				UCore.error(e);
 			}
 		});
 	}

@@ -13,6 +13,7 @@ import io.anuke.mindustry.world.ColorMapper.BlockPair;
 import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.SpecialBlocks;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Timers;
@@ -61,7 +62,7 @@ public class MapEditorDialog extends Dialog{
 					}
 				}catch (Exception e){
 					Vars.ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
-					e.printStackTrace();
+					UCore.error(e);
 				}
 				Vars.ui.loadfrag.hide();
 			});
@@ -78,7 +79,7 @@ public class MapEditorDialog extends Dialog{
 					Pixmaps.write(editor.pixmap(), result);
 				}catch (Exception e){
 					Vars.ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
-					if(!Vars.android) e.printStackTrace();
+					if(!Vars.android) UCore.error(e);
 				}
 				Vars.ui.loadfrag.hide();
 			});

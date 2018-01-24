@@ -103,6 +103,7 @@ public class NetClient extends Module {
         });
 
         Net.handle(CustomMapPacket.class, packet -> {
+
             //custom map is always sent before world data
             Pixmap pixmap = NetworkIO.loadMap(packet.stream);
 
@@ -242,7 +243,7 @@ public class NetClient extends Module {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } catch (Exception e) {
-                e.printStackTrace();
+                UCore.error(e);
                 //do nothing else...
                 //TODO fix
             }

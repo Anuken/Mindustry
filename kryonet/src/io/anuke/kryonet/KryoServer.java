@@ -156,6 +156,7 @@ public class KryoServer implements ServerProvider {
         Thread thread = new Thread(() ->{
             try {
                 server.close();
+                UCore.log("Killing web server...");
                 try {
                     if (webServer != null) webServer.stop(1); //please die, right now
                 }catch(Exception e){
@@ -167,6 +168,7 @@ public class KryoServer implements ServerProvider {
                         worker.interrupt();
                     }
                 }
+                UCore.log("Killed web server.");
             }catch (Exception e){
                 Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
             }
