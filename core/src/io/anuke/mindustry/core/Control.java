@@ -48,7 +48,7 @@ import java.util.Arrays;
 import static io.anuke.mindustry.Vars.*;
 
 public class Control extends Module{
-	io.anuke.mindustry.game.Tutorial tutorial = new io.anuke.mindustry.game.Tutorial();
+	Tutorial tutorial = new Tutorial();
 	boolean hiscore = false;
 	
 	final Array<Weapon> weapons = new Array<>();

@@ -21,7 +21,7 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 public class Block{
 	private static int lastid;
-	private static Array<Block> blocks = new Array<Block>();
+	private static Array<Block> blocks = new Array<>();
 	private static ObjectMap<String, Block> map = new ObjectMap<>();
 	
 	protected static TextureRegion temp = new TextureRegion();

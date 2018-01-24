@@ -21,7 +21,7 @@ public class Junction extends Block{
 	@Override
 	public void handleItem(Item item, Tile tile, Tile source){
 		int dir = source.relativeTo(tile.x, tile.y);
-		Tile to = tile.getNearby()[dir];
+		Tile to = tile.getNearby(temptiles)[dir];
 		
 		Timers.run(30, ()->{
 			if(to == null) return;
@@ -34,7 +34,7 @@ public class Junction extends Block{
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		int dir = source.relativeTo(tile.x, tile.y);
 		if(dir == -1) return false;
-		Tile to = tile.getNearby()[dir];
+		Tile to = tile.getNearby(temptiles)[dir];
 		return to != null && to.block().acceptItem(item, to, tile);
 	}
 	
