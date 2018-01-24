@@ -20,7 +20,7 @@ import io.anuke.ucore.function.Consumer;
 import java.io.IOException;
 
 public class Net{
-	public static final int version = 11;
+	public static final int version = 12;
 
 	private static boolean server;
 	private static boolean active;

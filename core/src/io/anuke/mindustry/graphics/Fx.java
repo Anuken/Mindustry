@@ -3,9 +3,11 @@ package io.anuke.mindustry.graphics;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import io.anuke.mindustry.Vars;
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Hue;
+import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
@@ -60,82 +62,82 @@ public class Fx{
 	
 	chainshot = new Effect(9f, e -> {
 		Draw.color(Color.WHITE, lightOrange, e.ifract());
-		Draw.thick(e.fract()*4f);
-		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*7f);
-		Draw.thick(e.fract()*2f);
-		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*10f);
+		Lines.stroke(e.fract()*4f);
+		Lines.lineAngle(e.x, e.y, e.rotation, e.fract()*7f);
+		Lines.stroke(e.fract()*2f);
+		Lines.lineAngle(e.x, e.y, e.rotation, e.fract()*10f);
 		Draw.reset();
 	}),
 	
 	mortarshot = new Effect(10f, e -> {
 		Draw.color(Color.WHITE, Color.DARK_GRAY, e.ifract());
-		Draw.thick(e.fract()*6f);
-		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*10f);
-		Draw.thick(e.fract()*5f);
-		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*14f);
-		Draw.thick(e.fract()*1f);
-		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*16f);
+		Lines.stroke(e.fract()*6f);
+		Lines.lineAngle(e.x, e.y, e.rotation, e.fract()*10f);
+		Lines.stroke(e.fract()*5f);
+		Lines.lineAngle(e.x, e.y, e.rotation, e.fract()*14f);
+		Lines.stroke(e.fract()*1f);
+		Lines.lineAngle(e.x, e.y, e.rotation, e.fract()*16f);
 		Draw.reset();
 	}),
 	
 	railshot = new Effect(9f, e -> {
 		Draw.color(Color.WHITE, Color.DARK_GRAY, e.ifract());
-		Draw.thick(e.fract()*5f);
-		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*8f);
-		Draw.thick(e.fract()*4f);
-		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*12f);
-		Draw.thick(e.fract()*1f);
-		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*14f);
+		Lines.stroke(e.fract()*5f);
+		Lines.lineAngle(e.x, e.y, e.rotation, e.fract()*8f);
+		Lines.stroke(e.fract()*4f);
+		Lines.lineAngle(e.x, e.y, e.rotation, e.fract()*12f);
+		Lines.stroke(e.fract()*1f);
+		Lines.lineAngle(e.x, e.y, e.rotation, e.fract()*14f);
 		Draw.reset();
 	}),
 	
 	titanshot = new Effect(12f, e -> {
 		Draw.color(Color.WHITE, lightOrange, e.ifract());
-		Draw.thick(e.fract()*7f);
-		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*12f);
-		Draw.thick(e.fract()*4f);
-		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*16f);
-		Draw.thick(e.fract()*2f);
-		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*18f);
+		Lines.stroke(e.fract()*7f);
+		Lines.lineAngle(e.x, e.y, e.rotation, e.fract()*12f);
+		Lines.stroke(e.fract()*4f);
+		Lines.lineAngle(e.x, e.y, e.rotation, e.fract()*16f);
+		Lines.stroke(e.fract()*2f);
+		Lines.lineAngle(e.x, e.y, e.rotation, e.fract()*18f);
 		Draw.reset();
 	}),
 	
 	largeCannonShot = new Effect(11f, e -> {
 		Draw.color(Color.WHITE, whiteYellow, e.ifract());
-		Draw.thick(e.fract()*6f);
-		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*12f);
-		Draw.thick(e.fract()*3f);
-		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*16f);
-		Draw.thick(e.fract()*1f);
-		Draw.lineAngle(e.x, e.y, e.rotation, e.fract()*18f);
+		Lines.stroke(e.fract()*6f);
+		Lines.lineAngle(e.x, e.y, e.rotation, e.fract()*12f);
+		Lines.stroke(e.fract()*3f);
+		Lines.lineAngle(e.x, e.y, e.rotation, e.fract()*16f);
+		Lines.stroke(e.fract()*1f);
+		Lines.lineAngle(e.x, e.y, e.rotation, e.fract()*18f);
 		Draw.reset();
 	}),
 	
 	shockwave = new Effect(10f, 80f, e -> {
 		Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.ifract());
-		Draw.thick(e.fract()*2f + 0.2f);
-		Draw.circle(e.x, e.y, e.ifract()*28f);
+		Lines.stroke(e.fract()*2f + 0.2f);
+		Lines.circle(e.x, e.y, e.ifract()*28f);
 		Draw.reset();
 	}),
 	
 	nuclearShockwave = new Effect(10f, 200f, e -> {
 		Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.ifract());
-		Draw.thick(e.fract()*3f + 0.2f);
-		Draw.polygon(e.x, e.y, 40, e.ifract()*140f);
+		Lines.stroke(e.fract()*3f + 0.2f);
+		Lines.poly(e.x, e.y, 40, e.ifract()*140f);
 		Draw.reset();
 	}),
 	
 	shockwaveSmall = new Effect(10f, e -> {
 		Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.ifract());
-		Draw.thick(e.fract()*2f + 0.1f);
-		Draw.circle(e.x, e.y, e.ifract()*15f);
+		Lines.stroke(e.fract()*2f + 0.1f);
+		Lines.circle(e.x, e.y, e.ifract()*15f);
 		Draw.reset();
 	}),
 	
 	empshockwave = new Effect(7f, e -> {
 		Draw.color(Color.WHITE, Color.SKY, e.ifract());
-		Draw.thick(e.fract()*2f);
-		Draw.circle(e.x, e.y, e.ifract()*40f);
+		Lines.stroke(e.fract()*2f);
+		Lines.circle(e.x, e.y, e.ifract()*40f);
 		Draw.reset();
 	}),
 	
@@ -143,7 +145,7 @@ public class Fx{
 		Angles.randLenVectors(e.id, 7, 1f + e.ifract()*12f, (x, y)->{
 			float len = 1f+e.fract()*6f;
 			Draw.color(Color.SKY);
-			Draw.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), len);
+			Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), len);
 			Draw.reset();
 		});
 	}),
@@ -183,7 +185,7 @@ public class Fx{
 			float len = 1f+e.fract()*5f;
 			Draw.color(Color.WHITE, Color.CORAL, e.ifract());
 			Draw.alpha(e.ifract()/1.3f);
-			Draw.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), len);
+			Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), len);
 			Draw.reset();
 		});
 	}),
@@ -218,191 +220,191 @@ public class Fx{
 	lavabubble = new Effect(45f, e -> {
 		Draw.color(Color.ORANGE);
 		float scl = 0.35f;
-		Draw.thick(1f - Mathf.clamp(e.ifract() - (1f-scl)) * (1f/scl));
-		Draw.circle(e.x, e.y, e.ifract()*4f);
+		Lines.stroke(1f - Mathf.clamp(e.ifract() - (1f-scl)) * (1f/scl));
+		Lines.circle(e.x, e.y, e.ifract()*4f);
 		Draw.reset();
 	}),
 	
 	oilbubble = new Effect(64f, e -> {
 		Draw.color(Color.DARK_GRAY);
 		float scl = 0.25f;
-		Draw.thick(1f - Mathf.clamp(e.ifract() - (1f-scl)) * (1f/scl));
-		Draw.circle(e.x, e.y, e.ifract()*3f);
+		Lines.stroke(1f - Mathf.clamp(e.ifract() - (1f-scl)) * (1f/scl));
+		Lines.circle(e.x, e.y, e.ifract()*3f);
 		Draw.reset();
 	}),
 	
 	shellexplosion = new Effect(9, e -> {
-		Draw.thickness(2f - e.ifract()*1.7f);
+		Lines.stroke(2f - e.ifract()*1.7f);
 		Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.ifract());
-		Draw.circle(e.x, e.y, 3f + e.ifract() * 9f);
+		Lines.circle(e.x, e.y, 3f + e.ifract() * 9f);
 		Draw.reset();
 	}),
 	
 	blastexplosion = new Effect(16, e -> {
-		Draw.thickness(1.2f - e.ifract());
+		Lines.stroke(1.2f - e.ifract());
 		Draw.color(Color.WHITE, Color.SCARLET, e.ifract());
-		Draw.circle(e.x, e.y, 1.5f + e.ifract() * 9f);
+		Lines.circle(e.x, e.y, 1.5f + e.ifract() * 9f);
 		Draw.reset();
 	}),
 	
 	place = new Effect(16, e -> {
-		Draw.thickness(3f - e.ifract() * 2f);
-		Draw.square(e.x, e.y, Vars.tilesize / 2f + e.ifract() * 3f);
+		Lines.stroke(3f - e.ifract() * 2f);
+		Lines.square(e.x, e.y, Vars.tilesize / 2f + e.ifract() * 3f);
 		Draw.reset();
 	}),
 	
 	dooropen = new Effect(10, e -> {
-		Draw.thickness(e.fract() * 1.6f);
-		Draw.square(e.x, e.y, Vars.tilesize / 2f + e.ifract() * 2f);
+		Lines.stroke(e.fract() * 1.6f);
+		Lines.square(e.x, e.y, Vars.tilesize / 2f + e.ifract() * 2f);
 		Draw.reset();
 	}),
 	
 	doorclose= new Effect(10, e -> {
-		Draw.thickness(e.fract() * 1.6f);
-		Draw.square(e.x, e.y, Vars.tilesize / 2f + e.fract() * 2f);
+		Lines.stroke(e.fract() * 1.6f);
+		Lines.square(e.x, e.y, Vars.tilesize / 2f + e.fract() * 2f);
 		Draw.reset();
 	}),
 	
 	dooropenlarge = new Effect(10, e -> {
-		Draw.thickness(e.fract() * 1.6f);
-		Draw.square(e.x, e.y, Vars.tilesize + e.ifract() * 2f);
+		Lines.stroke(e.fract() * 1.6f);
+		Lines.square(e.x, e.y, Vars.tilesize + e.ifract() * 2f);
 		Draw.reset();
 	}),
 			
 	doorcloselarge = new Effect(10, e -> {
-		Draw.thickness(e.fract() * 1.6f);
-		Draw.square(e.x, e.y, Vars.tilesize + e.fract() * 2f);
+		Lines.stroke(e.fract() * 1.6f);
+		Lines.square(e.x, e.y, Vars.tilesize + e.fract() * 2f);
 		Draw.reset();
 	}),
 	
 	purify = new Effect(10, e -> {
 		Draw.color(Color.ROYAL, Color.GRAY, e.ifract());
-		Draw.thickness(2f);
-		Draw.spikes(e.x, e.y, e.ifract() * 4f, 2, 6);
+		Lines.stroke(2f);
+		Lines.spikes(e.x, e.y, e.ifract() * 4f, 2, 6);
 		Draw.reset();
 	}),
 	
 	purifyoil = new Effect(10, e -> {
 		Draw.color(Color.BLACK, Color.GRAY, e.ifract());
-		Draw.thickness(2f);
-		Draw.spikes(e.x, e.y, e.ifract() * 4f, 2, 6);
+		Lines.stroke(2f);
+		Lines.spikes(e.x, e.y, e.ifract() * 4f, 2, 6);
 		Draw.reset();
 	}),
 	
 	purifystone = new Effect(10, e -> {
 		Draw.color(Color.ORANGE, Color.GRAY, e.ifract());
-		Draw.thickness(2f);
-		Draw.spikes(e.x, e.y, e.ifract() * 4f, 2, 6);
+		Lines.stroke(2f);
+		Lines.spikes(e.x, e.y, e.ifract() * 4f, 2, 6);
 		Draw.reset();
 	}),
 	
 	generate = new Effect(11, e -> {
 		Draw.color(Color.ORANGE, Color.YELLOW, e.ifract());
-		Draw.thickness(1f);
-		Draw.spikes(e.x, e.y, e.ifract() * 5f, 2, 8);
+		Lines.stroke(1f);
+		Lines.spikes(e.x, e.y, e.ifract() * 5f, 2, 8);
 		Draw.reset();
 	}),
 
 	spark = new Effect(10, e -> {
-		Draw.thickness(1f);
+		Lines.stroke(1f);
 		Draw.color(Color.WHITE, Color.GRAY, e.ifract());
-		Draw.spikes(e.x, e.y, e.ifract() * 5f, 2, 8);
+		Lines.spikes(e.x, e.y, e.ifract() * 5f, 2, 8);
 		Draw.reset();
 	}),
 	
 	sparkbig = new Effect(11, e -> {
-		Draw.thickness(1f);
+		Lines.stroke(1f);
 		Draw.color(lightRed, Color.GRAY, e.ifract());
-		Draw.spikes(e.x, e.y, e.ifract() * 5f, 2.3f, 8);
+		Lines.spikes(e.x, e.y, e.ifract() * 5f, 2.3f, 8);
 		Draw.reset();
 	}),
 	
 	smelt = new Effect(10, e -> {
-		Draw.thickness(1f);
+		Lines.stroke(1f);
 		Draw.color(Color.YELLOW, Color.RED, e.ifract());
-		Draw.spikes(e.x, e.y, e.ifract() * 5f, 1f, 8);
+		Lines.spikes(e.x, e.y, e.ifract() * 5f, 1f, 8);
 		Draw.reset();
 	}),
 
 	breakBlock = new Effect(12, e -> {
-		Draw.thickness(2f);
+		Lines.stroke(2f);
 		Draw.color(Color.WHITE, Colors.get("break"), e.ifract());
-		Draw.spikes(e.x, e.y, e.ifract() * 6f, 2, 5, 90);
+		Lines.spikes(e.x, e.y, e.ifract() * 6f, 2, 5, 90);
 		Draw.reset();
 	}),
 
 	hit = new Effect(10, e -> {
-		Draw.thickness(1f);
+		Lines.stroke(1f);
 		Draw.color(Color.WHITE, Color.ORANGE, e.ifract());
-		Draw.spikes(e.x, e.y, e.ifract() * 3f, 2, 8);
+		Lines.spikes(e.x, e.y, e.ifract() * 3f, 2, 8);
 		Draw.reset();
 	}),
 	
 	laserhit = new Effect(10, e -> {
-		Draw.thickness(1f);
+		Lines.stroke(1f);
 		Draw.color(Color.WHITE, Color.SKY, e.ifract());
-		Draw.spikes(e.x, e.y, e.ifract() * 2f, 2, 6);
+		Lines.spikes(e.x, e.y, e.ifract() * 2f, 2, 6);
 		Draw.reset();
 	}),
 	
 	shieldhit = new Effect(9, e -> {
-		Draw.thickness(1f);
+		Lines.stroke(1f);
 		Draw.color(Color.WHITE, Color.SKY, e.ifract());
-		Draw.spikes(e.x, e.y, e.ifract() * 5f, 2, 6);
-		Draw.thickness(4f*e.fract());
-		Draw.circle(e.x, e.y, e.ifract()*14f);
+		Lines.spikes(e.x, e.y, e.ifract() * 5f, 2, 6);
+		Lines.stroke(4f*e.fract());
+		Lines.circle(e.x, e.y, e.ifract()*14f);
 		Draw.reset();
 	}),
 	
 	laserShoot = new Effect(8, e -> {
 		Draw.color(Color.WHITE, lightOrange, e.ifract());
-		Draw.lineShot(e.x, e.y, e.rotation, 3, e.fract(), 6f, 2f, 0.8f);
+		Shapes.lineShot(e.x, e.y, e.rotation, 3, e.fract(), 6f, 2f, 0.8f);
 		Draw.reset();
 	}),
 
 	spreadShoot = new Effect(12, e -> {
 		Draw.color(Color.WHITE, Color.PURPLE, e.ifract());
-		Draw.lineShot(e.x, e.y, e.rotation, 3, e.fract(), 9f, 3.5f, 0.8f);
+		Shapes.lineShot(e.x, e.y, e.rotation, 3, e.fract(), 9f, 3.5f, 0.8f);
 		Draw.reset();
 	}),
 
 	clusterShoot = new Effect(12, e -> {
 		Draw.color(Color.WHITE, lightOrange, e.ifract());
-		Draw.lineShot(e.x, e.y, e.rotation, 3, e.fract(), 10f, 2.5f, 0.7f);
+		Shapes.lineShot(e.x, e.y, e.rotation, 3, e.fract(), 10f, 2.5f, 0.7f);
 		Draw.reset();
 	}),
 	
 	vulcanShoot = new Effect(8, e -> {
 		Draw.color(lighterOrange, lightOrange, e.ifract());
-		Draw.lineShot(e.x, e.y, e.rotation, 3, e.fract(), 10f, 2f, 0.7f);
+		Shapes.lineShot(e.x, e.y, e.rotation, 3, e.fract(), 10f, 2f, 0.7f);
 		Draw.reset();
 	}),
 	
 	shockShoot = new Effect(8, e -> {
 		Draw.color(Color.WHITE, Color.ORANGE, e.ifract());
-		Draw.lineShot(e.x, e.y, e.rotation, 3, e.fract(), 14f, 4f, 0.8f);
+		Shapes.lineShot(e.x, e.y, e.rotation, 3, e.fract(), 14f, 4f, 0.8f);
 		Draw.reset();
 	}),
 
 	beamShoot = new Effect(8, e -> {
 		Draw.color(beamLight, beam, e.ifract());
-		Draw.lineShot(e.x, e.y, e.rotation - 70, 3, e.fract(), 12f, 1f, 0.5f);
-		Draw.lineShot(e.x, e.y, e.rotation + 70, 3, e.fract(), 12f, 1f, 0.5f);
+		Shapes.lineShot(e.x, e.y, e.rotation - 70, 3, e.fract(), 12f, 1f, 0.5f);
+		Shapes.lineShot(e.x, e.y, e.rotation + 70, 3, e.fract(), 12f, 1f, 0.5f);
 		Draw.reset();
 	}),
 
     beamhit = new Effect(8, e -> {
         Draw.color(beamLight, beam, e.ifract());
-        Draw.thick(e.fract()*3f+0.5f);
-        Draw.circle(e.x, e.y, e.ifract()*8f);
-        Draw.spikes(e.x, e.y, e.ifract()*6f, 2f, 4, 45);
+        Lines.stroke(e.fract()*3f+0.5f);
+        Lines.circle(e.x, e.y, e.ifract()*8f);
+        Lines.spikes(e.x, e.y, e.ifract()*6f, 2f, 4, 45);
         Draw.reset();
     }),
 
 	titanExplosion = new Effect(11, 48f, e -> {
-		Draw.thickness(2f*e.fract()+0.5f);
+		Lines.stroke(2f*e.fract()+0.5f);
 		Draw.color(Color.WHITE, Color.DARK_GRAY, e.powfract());
-		Draw.circle(e.x, e.y, 5f + e.powfract() * 8f);
+		Lines.circle(e.x, e.y, 5f + e.powfract() * 8f);
 		
 		Draw.color(e.ifract() < 0.5f ? whiteOrange : Color.DARK_GRAY);
 		float rad = e.fract()*10f + 5f;
@@ -414,9 +416,9 @@ public class Fx{
 	}),
 
 	explosion = new Effect(11, e -> {
-		Draw.thickness(2f*e.fract()+0.5f);
+		Lines.stroke(2f*e.fract()+0.5f);
 		Draw.color(Color.WHITE, Color.DARK_GRAY, e.powfract());
-		Draw.circle(e.x, e.y, 5f + e.powfract() * 6f);
+		Lines.circle(e.x, e.y, 5f + e.powfract() * 6f);
 		
 		Draw.color(e.ifract() < 0.5f ? Color.WHITE : Color.DARK_GRAY);
 		float rad = e.fract()*10f + 5f;
@@ -436,9 +438,9 @@ public class Fx{
 			Draw.reset();
 		});
 		
-		Draw.thickness(2f*e.fract()+0.4f);
+		Lines.stroke(2f*e.fract()+0.4f);
 		Draw.color(Color.WHITE, Color.ORANGE, e.powfract());
-		Draw.circle(e.x, e.y, 2f + e.powfract() * 9f);
+		Lines.circle(e.x, e.y, 2f + e.powfract() * 9f);
 		
 		Draw.color(e.ifract() < 0.5f ? Color.WHITE : Color.DARK_GRAY);
 		float rad = e.fract()*10f + 2f;
@@ -451,17 +453,17 @@ public class Fx{
 
 	clusterbomb = new Effect(10f, e -> {
 		Draw.color(Color.WHITE, lightOrange, e.ifract());
-		Draw.thick(e.fract()*1.5f);
-		Draw.polygon(e.x, e.y, 4, e.fract()*8f);
-		Draw.circle(e.x, e.y, e.ifract()*14f);
+		Lines.stroke(e.fract()*1.5f);
+		Lines.poly(e.x, e.y, 4, e.fract()*8f);
+		Lines.circle(e.x, e.y, e.ifract()*14f);
 		Draw.reset();
 	}),
 	
 	coreexplosion = new Effect(13, e -> {
-		Draw.thickness(3f-e.ifract()*2f);
+		Lines.stroke(3f-e.ifract()*2f);
 		Draw.color(Color.ORANGE, Color.WHITE, e.ifract());
-		Draw.spikes(e.x, e.y, 5f + e.ifract() * 40f, 6, 6);
-		Draw.circle(e.x, e.y, 4f + e.ifract() * 40f);
+		Lines.spikes(e.x, e.y, 5f + e.ifract() * 40f, 6, 6);
+		Lines.circle(e.x, e.y, 4f + e.ifract() * 40f);
 		Draw.reset();
 	}),
 	
@@ -494,9 +496,9 @@ public class Fx{
 	}),
 	
 	spawn = new Effect(23, e -> {
-		Draw.thickness(2f);
+		Lines.stroke(2f);
 		Draw.color(Color.DARK_GRAY, Color.SCARLET, e.ifract());
-		Draw.circle(e.x, e.y, 7f - e.ifract() * 6f);
+		Lines.circle(e.x, e.y, 7f - e.ifract() * 6f);
 		Draw.reset();
 	}),
 	

@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.types.distribution;
 
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
 
 public class LiquidRouter extends Conduit{
 	protected final int timerDump = timers++;

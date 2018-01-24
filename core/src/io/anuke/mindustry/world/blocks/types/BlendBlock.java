@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.types;
 
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.util.Mathf;
 

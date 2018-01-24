@@ -15,9 +15,10 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.StaticBlock;
 import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.CacheBatch;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 
 import java.util.Arrays;
@@ -195,7 +196,7 @@ public class BlockRenderer{
 
 		if(Vars.debug && Vars.debugChunks){
 			Draw.color(Color.YELLOW);
-			Draw.thick(1f);
+			Lines.stroke(1f);
 			for(int x = -crangex; x <= crangex; x++){
 				for(int y = -crangey; y <= crangey; y++){
 					int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
@@ -203,7 +204,7 @@ public class BlockRenderer{
 
 					if(!Mathf.inBounds(worldx, worldy, cache))
 						continue;
-					Draw.linerect(worldx * chunksize * tilesize, worldy * chunksize * tilesize, chunksize * tilesize, chunksize * tilesize);
+					Lines.rect(worldx * chunksize * tilesize, worldy * chunksize * tilesize, chunksize * tilesize, chunksize * tilesize);
 				}
 			}
 			Draw.reset();
@@ -215,9 +216,9 @@ public class BlockRenderer{
 		for(SpawnPoint point : control.getSpawnPoints()){
 			if(point.pathTiles != null){
 				for(int i = 1; i < point.pathTiles.length; i ++){
-					Draw.line(point.pathTiles[i-1].worldx(), point.pathTiles[i-1].worldy(), 
+					Lines.line(point.pathTiles[i-1].worldx(), point.pathTiles[i-1].worldy(),
 							point.pathTiles[i].worldx(), point.pathTiles[i].worldy());
-					Draw.circle(point.pathTiles[i-1].worldx(), point.pathTiles[i-1].worldy(), 6f);
+					Lines.circle(point.pathTiles[i-1].worldx(), point.pathTiles[i-1].worldy(), 6f);
 				}
 			}
 		}

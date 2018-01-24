@@ -21,7 +21,7 @@ allprojects {
         appName = "Mindustry"
         gdxVersion = '1.9.8'
         aiVersion = '1.8.1'
-        uCoreVersion = 'e78aec7';
+        uCoreVersion = '298c4a4';
     }
 
     repositories {
@@ -42,7 +42,7 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
-        compile "com.github.MinnDevelopment:Java-DiscordRPC:dbd4aac"
+        compile 'com.github.MinnDevelopment:java-discord-rpc:v1.3.2'
     }
 }
 

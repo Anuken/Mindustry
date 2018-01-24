@@ -14,7 +14,7 @@ import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.SpecialBlocks;
 import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Pixmaps;
 import io.anuke.ucore.scene.builders.build;

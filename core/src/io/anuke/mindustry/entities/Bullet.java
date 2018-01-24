@@ -10,12 +10,17 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class Bullet extends BulletEntity{
-	BulletType type;
+	public boolean absorbed = false;
 	
 	public Bullet(BulletType type, Entity owner, float x, float y, float angle){
 		super(type, owner, angle);
 		set(x, y);
 		this.type = type;
+	}
+
+	public void absorb(){
+		absorbed = true;
+		remove();
 	}
 	
 	public void draw(){

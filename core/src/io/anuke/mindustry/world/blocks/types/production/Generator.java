@@ -13,11 +13,13 @@ import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Hue;
+import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.*;
 
 public class Generator extends PowerBlock{
@@ -59,15 +61,15 @@ public class Generator extends PowerBlock{
 			int rotation = tile.getRotation();
 			if(hasLasers){
 				Draw.color(Color.YELLOW);
-				Draw.thick(2f);
+				Lines.stroke(2f);
 
 				for(int i = 0; i < laserDirections; i++){
 					int dir = Mathf.mod(i + rotation - laserDirections / 2, 4);
-					float lx = Geometry.getD4Points()[dir].x, ly = Geometry.getD4Points()[dir].y;
+					float lx = Geometry.d4[dir].x, ly = Geometry.d4[dir].y;
 					float dx = lx * laserRange * Vars.tilesize;
 					float dy = ly * laserRange * Vars.tilesize;
 					
-					Draw.dashLine(
+					Lines.dashLine(
 							tile.worldx() + lx * Vars.tilesize / 2, 
 							tile.worldy() + ly * Vars.tilesize / 2, 
 							tile.worldx() + dx - lx * Vars.tilesize, 
@@ -83,14 +85,14 @@ public class Generator extends PowerBlock{
 	public void drawPlace(int x, int y, int rotation, boolean valid){
 		if(hasLasers){
 			Draw.color(Color.PURPLE);
-			Draw.thick(2f);
+			Lines.stroke(2f);
 
 			for(int i = 0; i < laserDirections; i++){
 				int dir = Mathf.mod(i + rotation - laserDirections / 2, 4);
-				float lx = Geometry.getD4Points()[dir].x, ly = Geometry.getD4Points()[dir].y;
+				float lx = Geometry.d4[dir].x, ly = Geometry.d4[dir].y;
 				float dx = lx * laserRange * Vars.tilesize;
 				float dy = ly * laserRange * Vars.tilesize;
-				Draw.dashLine(
+				Lines.dashLine(
 						x * Vars.tilesize + lx * Vars.tilesize / 2,
 						y * Vars.tilesize + ly * Vars.tilesize / 2, 
 						x * Vars.tilesize + dx - lx * Vars.tilesize, 
@@ -193,13 +195,13 @@ public class Generator extends PowerBlock{
 			int relative = tile.relativeTo(target.x, target.y);
 			
 			if(relative == -1){
-				Draw.laser("laser", "laserend", tile.worldx() + Angles.x(), tile.worldy() + Angles.y(), 
+				Shapes.laser("laser", "laserend", tile.worldx() + Angles.x(), tile.worldy() + Angles.y(),
 						target.worldx() - Tmp.v1.x + Mathf.range(r), 
 						target.worldy() - Tmp.v1.y + Mathf.range(r), 0.7f);
 			}else{
 				Draw.rect("laserfull", 
-						tile.worldx() + Geometry.getD4Points()[relative].x * width * Vars.tilesize / 2f, 
-						tile.worldy() + Geometry.getD4Points()[relative].y * width * Vars.tilesize / 2f);
+						tile.worldx() + Geometry.d4[relative].x * width * Vars.tilesize / 2f,
+						tile.worldy() + Geometry.d4[relative].y * width * Vars.tilesize / 2f);
 			}
 			
 			Draw.color();
@@ -223,7 +225,7 @@ public class Generator extends PowerBlock{
 
 	protected Tile laserTarget(Tile tile, int rotation){
 		rotation = Mathf.mod(rotation, 4);
-		GridPoint2 point = Geometry.getD4Points()[rotation];
+		GridPoint2 point = Geometry.d4[rotation];
 
 		int i = 0;
 

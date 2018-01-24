@@ -1,6 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.mindustry.Mindustry;
+import com.badlogic.gdx.Gdx;
 import io.anuke.mindustry.Vars;
 import io.anuke.ucore.scene.ui.Dialog;
 
@@ -13,7 +13,7 @@ public class DiscordDialog extends Dialog {
         content().row();
         content().add("[orange]"+ Vars.discordURL);
         buttons().defaults().size(200f, 50);
-        buttons().addButton("$text.openlink", () -> Mindustry.platforms.openLink(Vars.discordURL));
+        buttons().addButton("$text.openlink", () -> Gdx.net.openURI(Vars.discordURL));
         buttons().addButton("$text.back", this::hide);
     }
 }

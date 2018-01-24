@@ -6,8 +6,9 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.mindustry.entities.enemies.EnemyTypes;
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 
 public class TargetType extends EnemyType {
@@ -42,7 +43,7 @@ public class TargetType extends EnemyType {
 		Draw.color(Color.YELLOW);
 		
 		if(Vars.control.getTutorial().showTarget()){
-			Draw.spikes(enemy.x, enemy.y, 11f + Mathf.sin(Timers.time(), 7f, 1f), 4f, 8, Timers.time());
+			Lines.spikes(enemy.x, enemy.y, 11f + Mathf.sin(Timers.time(), 7f, 1f), 4f, 8, Timers.time());
 		}
 		
 		Draw.color();

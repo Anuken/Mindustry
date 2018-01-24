@@ -35,7 +35,8 @@ import io.anuke.ucore.core.Inputs.Axis;
 import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.graphics.Atlas;
+import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.util.Atlas;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Input;
@@ -97,7 +98,7 @@ public class Control extends Module{
 			block.postInit();
 		}
 		
-		Draw.setCircleVertices(14);
+		Lines.setCircleVertices(14);
 		
 		Gdx.input.setCatchBackKey(true);
 		

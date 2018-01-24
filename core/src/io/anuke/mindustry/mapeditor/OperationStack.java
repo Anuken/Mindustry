@@ -1,9 +1,6 @@
 package io.anuke.mindustry.mapeditor;
 
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.ucore.core.Draw;
-import io.anuke.ucore.graphics.Pixmaps;
 
 public class OperationStack{
 	private final static int maxSize = 10;

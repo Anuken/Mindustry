@@ -11,7 +11,9 @@ import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
+import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.Angles;
 
 public class HealerType extends EnemyType {
@@ -75,7 +77,7 @@ public class HealerType extends EnemyType {
 		if(target.health < target.maxhealth){
 			Draw.color(Hue.rgb(138, 244, 138, (MathUtils.sin(Timers.time()) + 1f) / 13f));
 			Draw.alpha(0.9f);
-			Draw.laser("laser", "laserend", enemy.x + Angles.x(), enemy.y + Angles.y(), target.x - Angles.x()/1.5f, target.y - Angles.y()/1.5f);
+			Shapes.laser("laser", "laserend", enemy.x + Angles.x(), enemy.y + Angles.y(), target.x - Angles.x()/1.5f, target.y - Angles.y()/1.5f);
 			Draw.color();
 		}
 		Graphics.shader(Shaders.outline);

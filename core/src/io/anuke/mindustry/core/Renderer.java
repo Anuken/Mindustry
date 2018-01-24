@@ -28,7 +28,9 @@ import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.function.Callable;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Surface;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.scene.ui.layout.Unit;
@@ -317,14 +319,14 @@ public class Renderer extends RendererModule{
 			int y = control.core.y + Vars.control.tutorial.getPlacePoint().y;
 			int rot = Vars.control.tutorial.getPlaceRotation();
 
-			Draw.thick(1f);
+			Lines.stroke(1f);
 			Draw.color(Color.YELLOW);
-			Draw.square(x * tilesize, y * tilesize, tilesize / 2f + Mathf.sin(Timers.time(), 4f, 1f));
+			Lines.square(x * tilesize, y * tilesize, tilesize / 2f + Mathf.sin(Timers.time(), 4f, 1f));
 
 			Draw.color(Color.ORANGE);
-			Draw.thick(2f);
+			Lines.stroke(2f);
 			if(rot != -1){
-				Draw.lineAngle(x * tilesize, y * tilesize, rot * 90, 6);
+				Lines.lineAngle(x * tilesize, y * tilesize, rot * 90, 6);
 			}
 			Draw.reset();
 		}
@@ -333,8 +335,8 @@ public class Renderer extends RendererModule{
 		if(Vars.ui.configfrag.isShown()){
 			Tile tile = ui.configfrag.getSelectedTile();
 			Draw.color(Colors.get("accent"));
-			Draw.thick(1f);
-			Draw.square(tile.worldx() + tile.block().getPlaceOffset().x, tile.worldy() + tile.block().getPlaceOffset().y,
+			Lines.stroke(1f);
+			Lines.square(tile.worldx() + tile.block().getPlaceOffset().x, tile.worldy() + tile.block().getPlaceOffset().y,
 					tile.block().width * Vars.tilesize / 2f + 1f);
 			Draw.reset();
 		}
@@ -356,10 +358,10 @@ public class Renderer extends RendererModule{
 
 			input.placeMode.draw(control.input.getBlockX(), control.input.getBlockY(), control.input.getBlockEndX(), control.input.getBlockEndY());
 
-			Draw.thickness(1f);
+			Lines.stroke(1f);
 			Draw.color(Color.SCARLET);
 			for(SpawnPoint spawn : control.getSpawnPoints()){
-				Draw.dashCircle(spawn.start.worldx(), spawn.start.worldy(), enemyspawnspace);
+				Lines.dashCircle(spawn.start.worldx(), spawn.start.worldy(), enemyspawnspace);
 			}
 			
 			if(input.breakMode == PlaceMode.holdDelete)
@@ -430,15 +432,15 @@ public class Renderer extends RendererModule{
 		x -= 0.5f;
 		y += 0.5f;
 
-		Draw.thickness(3f);
+		Lines.stroke(3f);
 		Draw.color(Color.SLATE);
-		Draw.line(x - len + 1, y, x + len + 1.5f, y);
-		Draw.thickness(1f);
+		Lines.line(x - len + 1, y, x + len + 1.5f, y);
+		Lines.stroke(1f);
 		Draw.color(Color.BLACK);
-		Draw.line(x - len + 1, y, x + len + 0.5f, y);
+		Lines.line(x - len + 1, y, x + len + 0.5f, y);
 		Draw.color(color);
 		if(w >= 1)
-			Draw.line(x - len + 1, y, x - len + w, y);
+			Lines.line(x - len + 1, y, x - len + w, y);
 		Draw.reset();
 	}
 

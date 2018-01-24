@@ -13,11 +13,12 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
@@ -103,7 +104,7 @@ public class Turret extends Block{
 		Vector2 offset = getPlaceOffset();
 		
 		Draw.color(Color.GREEN);
-		Draw.dashCircle(tile.worldx() + offset.x, tile.worldy() + offset.y, range);
+		Lines.dashCircle(tile.worldx() + offset.x, tile.worldy() + offset.y, range);
 		Draw.reset();
 		
 		TurretEntity entity = tile.entity();
@@ -118,8 +119,8 @@ public class Turret extends Block{
 	@Override
 	public void drawPlace(int x, int y, int rotation, boolean valid){
 		Draw.color(Color.PURPLE);
-		Draw.thick(1f);
-		Draw.dashCircle(x*Vars.tilesize, y*Vars.tilesize, range);
+		Lines.stroke(1f);
+		Lines.dashCircle(x*Vars.tilesize, y*Vars.tilesize, range);
 	}
 	
 	@Override
@@ -198,15 +199,15 @@ public class Turret extends Block{
 				predictY = entity.target.y + entity.target.velocity.y * hittime;
 		
 		Draw.color(Color.GREEN);
-		Draw.line(tile.worldx(), tile.worldy(), entity.target.x, entity.target.y);
+		Lines.line(tile.worldx(), tile.worldy(), entity.target.x, entity.target.y);
 		
 		Draw.color(Color.RED);
-		Draw.line(tile.worldx(), tile.worldy(), entity.target.x + entity.target.velocity.x * hittime,
+		Lines.line(tile.worldx(), tile.worldy(), entity.target.x + entity.target.velocity.x * hittime,
 				entity.target.y + entity.target.velocity.y * hittime);
 		
 		Draw.color(Color.PURPLE);
-		Draw.thick(2f);
-		Draw.lineAngle(tile.worldx(), tile.worldy(), angle, 7f);
+		Lines.stroke(2f);
+		Lines.lineAngle(tile.worldx(), tile.worldy(), angle, 7f);
 		
 		Draw.reset();
 		

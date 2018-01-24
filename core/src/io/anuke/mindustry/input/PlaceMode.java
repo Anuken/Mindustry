@@ -8,8 +8,9 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
@@ -36,17 +37,17 @@ public enum PlaceMode{
 			float si = MathUtils.sin(Timers.time() / 6f) + 1.5f;
 
 			Draw.color(valid ? Colors.get("place") : Colors.get("placeInvalid"));
-			Draw.thickness(2f);
-			Draw.linecrect(x + offset.x, y + offset.y, tilesize * control.getInput().recipe.result.width + si, 
+			Lines.stroke(2f);
+			Lines.crect(x + offset.x, y + offset.y, tilesize * control.getInput().recipe.result.width + si,
 					tilesize * control.getInput().recipe.result.height + si);
 
 			control.getInput().recipe.result.drawPlace(tilex, tiley, control.getInput().rotation, valid);
-			Draw.thickness(2f);
+			Lines.stroke(2f);
 
 			if(control.getInput().recipe.result.rotate){
 				Draw.color(Colors.get("placeRotate"));
 				Tmp.v1.set(7, 0).rotate(control.getInput().rotation * 90);
-				Draw.line(x, y, x + Tmp.v1.x, y + Tmp.v1.y);
+				Lines.line(x, y, x + Tmp.v1.x, y + Tmp.v1.y);
 			}
 			
 			if(valid)
@@ -96,7 +97,7 @@ public enum PlaceMode{
 				
 				if(android && control.getInput().breaktime > 0){
 					Draw.color(Colors.get("breakStart"), Colors.get("break"), fract);
-					Draw.polygon(tile.worldx() + offset.x, tile.worldy() + offset.y, 25, 4 + (1f - fract) * 26);
+					Lines.poly(tile.worldx() + offset.x, tile.worldy() + offset.y, 25, 4 + (1f - fract) * 26);
 				}
 				Draw.reset();
 			}
@@ -149,7 +150,7 @@ public enum PlaceMode{
 			}
 			
 			Draw.color(Colors.get("break"));
-			Draw.thick(1f);
+			Lines.stroke(1f);
 			for(int cx = tilex; cx <= endx; cx ++){
 				for(int cy = tiley; cy <= endy; cy ++){
 					Tile tile = Vars.world.tile(cx, cy);
@@ -157,15 +158,15 @@ public enum PlaceMode{
 						tile = tile.getLinked();
 					if(tile != null && control.getInput().validBreak(tile.x, tile.y)){
 						Vector2 offset = tile.block().getPlaceOffset();
-						Draw.linecrect(tile.worldx() + offset.x, tile.worldy() + offset.y, 
+						Lines.crect(tile.worldx() + offset.x, tile.worldy() + offset.y,
 								tile.block().width * t, tile.block().height * t);
 					}
 				}
 			}
 			
-			Draw.thick(2f);
+			Lines.stroke(2f);
 			Draw.color(control.getInput().cursorNear() ? Colors.get("break") : Colors.get("breakInvalid"));
-			Draw.linerect(x, y, x2 - x, y2 - y);
+			Lines.rect(x, y, x2 - x, y2 - y);
 			Draw.alpha(0.3f);
 			Draw.crect("blank", x, y, x2 - x, y2 - y);
 			Draw.reset();
@@ -276,9 +277,9 @@ public enum PlaceMode{
 			if(tilex == endx && tiley == endy){
 				cursor.draw(tilex, tiley, endx, endy);
 			}else{
-				Draw.thick(2f);
+				Lines.stroke(2f);
 				Draw.color(control.getInput().cursorNear() ? Colors.get("place") : Colors.get("placeInvalid"));
-				Draw.linerect(x, y, x2 - x, y2 - y);
+				Lines.rect(x, y, x2 - x, y2 - y);
 				Draw.alpha(0.3f);
 				Draw.crect("blank", x, y, x2 - x, y2 - y);
 
@@ -292,7 +293,7 @@ public enum PlaceMode{
 						
 						if(!control.getInput().validPlace(px, py, control.getInput().recipe.result) 
 								|| !control.hasItems(control.getInput().recipe.requirements, amount)){
-							Draw.linecrect(px * t + offset.x, py * t + offset.y, t*block.width, t*block.height);
+							Lines.crect(px * t + offset.x, py * t + offset.y, t*block.width, t*block.height);
 						}
 						amount ++;
 					}
@@ -302,7 +303,7 @@ public enum PlaceMode{
 					float cx = tx * t, cy = ty * t;
 					Draw.color(Colors.get("placeRotate"));
 					Tmp.v1.set(7, 0).rotate(rotation * 90);
-					Draw.line(cx, cy, cx + Tmp.v1.x, cy + Tmp.v1.y);
+					Lines.line(cx, cy, cx + Tmp.v1.x, cy + Tmp.v1.y);
 				}
 				Draw.reset();
 			}

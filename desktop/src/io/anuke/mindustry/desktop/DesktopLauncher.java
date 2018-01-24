@@ -17,10 +17,8 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.util.Strings;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DateFormat;
@@ -70,16 +68,6 @@ public class DesktopLauncher {
 			@Override
 			public String format(int number){
 				return NumberFormat.getIntegerInstance().format(number);
-			}
-			
-			@Override
-			public void openLink(String link){
-				try{
-					Desktop.getDesktop().browse(URI.create(link));
-				}catch(IOException e){
-					e.printStackTrace();
-					Vars.ui.showError("Error opening link.");
-				}
 			}
 
 			@Override

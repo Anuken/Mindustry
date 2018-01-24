@@ -13,7 +13,8 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
@@ -38,7 +39,7 @@ public class PowerTurret extends Turret implements PowerAcceptor{
 		Vector2 offset = getPlaceOffset();
 		
 		Draw.color(Color.GREEN);
-		Draw.dashCircle(tile.worldx() + offset.x, tile.worldy() + offset.y, range);
+		Lines.dashCircle(tile.worldx() + offset.x, tile.worldy() + offset.y, range);
 		Draw.reset();
 		
 		drawPowerBar(tile);

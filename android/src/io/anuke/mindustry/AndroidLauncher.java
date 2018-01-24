@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
@@ -47,13 +46,6 @@ public class AndroidLauncher extends AndroidApplication{
 			@Override
 			public String format(int number){
 				return NumberFormat.getIntegerInstance().format(number);
-			}
-
-			@Override
-			public void openLink(String link){
-				Uri marketUri = Uri.parse(link);
-			    Intent intent = new Intent( Intent.ACTION_VIEW, marketUri );
-			    startActivity(intent); 
 			}
 
 			@Override

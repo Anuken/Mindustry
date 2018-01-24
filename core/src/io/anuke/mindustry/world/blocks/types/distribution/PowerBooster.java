@@ -8,7 +8,8 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
 import io.anuke.mindustry.world.blocks.types.production.Generator;
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 
 public class PowerBooster extends Generator{
@@ -28,15 +29,15 @@ public class PowerBooster extends Generator{
 		super.drawSelect(tile);
 
 		Draw.color(Color.YELLOW);
-		Draw.dashCircle(tile.worldx(), tile.worldy(), powerRange * Vars.tilesize);
+		Lines.dashCircle(tile.worldx(), tile.worldy(), powerRange * Vars.tilesize);
 		Draw.reset();
 	}
 
 	@Override
 	public void drawPlace(int x, int y, int rotation, boolean valid){
 		Draw.color(Color.PURPLE);
-		Draw.thick(1f);
-		Draw.dashCircle(x * Vars.tilesize, y * Vars.tilesize, powerRange * Vars.tilesize);
+		Lines.stroke(1f);
+		Lines.dashCircle(x * Vars.tilesize, y * Vars.tilesize, powerRange * Vars.tilesize);
 		Draw.reset();
 	}
 

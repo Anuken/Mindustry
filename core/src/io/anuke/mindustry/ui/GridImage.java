@@ -3,7 +3,7 @@ package io.anuke.mindustry.ui;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.Element;
 
 public class GridImage extends Element{

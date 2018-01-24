@@ -64,7 +64,7 @@ public class NetServer extends Module{
 
             if(Vars.world.getMap().custom){
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                NetworkIO.writeMap(Vars.world.getMap(), stream);
+                NetworkIO.writeMap(Vars.world.getMap().pixmap, stream);
                 CustomMapPacket data = new CustomMapPacket();
                 data.stream = new ByteArrayInputStream(stream.toByteArray());
                 Net.sendStream(id, data);

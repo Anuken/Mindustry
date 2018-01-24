@@ -8,9 +8,10 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.TimedEntity;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
@@ -83,8 +84,8 @@ public class EMP extends TimedEntity{
 			drawLine(x + Angles.x(), y + Angles.y());
 		}
 	
-		Draw.thick(fract()*2f);
-		Draw.polygon(x, y, 34, radius * Vars.tilesize);
+		Lines.stroke(fract()*2f);
+		Lines.poly(x, y, 34, radius * Vars.tilesize);
 		
 		Draw.reset();
 	}
@@ -111,7 +112,7 @@ public class EMP extends TimedEntity{
 	}
 	
 	private void drawLaser(float x, float y, float x2, float y2){
-		Draw.thick(fract() * 2f);
-		Draw.line(x, y, x2, y2);
+		Lines.stroke(fract() * 2f);
+		Lines.line(x, y, x2, y2);
 	}
 }

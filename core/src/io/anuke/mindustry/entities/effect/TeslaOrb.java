@@ -8,12 +8,13 @@ import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.graphics.Fx;
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
@@ -95,8 +96,8 @@ public class TeslaOrb extends Entity{
 			Draw.color(Color.WHITE);
 			Draw.alpha(1f-life/lifetime);
 			
-			Draw.thick(3f - life/lifetime*2f);
-			Draw.line(x1, y1, x2, y2);
+			Lines.stroke(3f - life/lifetime*2f);
+			Lines.line(x1, y1, x2, y2);
 			
 			float rad = 7f - life/lifetime*5f;
 			
@@ -108,7 +109,7 @@ public class TeslaOrb extends Entity{
 			
 			//Draw.color(Color.WHITE);
 			
-			//Draw.thick(2f - life/lifetime*2f);
+			//Draw.stroke(2f - life/lifetime*2f);
 			//Draw.line(x1, y1, x2, y2);
 			
 			Draw.reset();

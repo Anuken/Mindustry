@@ -15,9 +15,10 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ui.GridImage;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Pixmaps;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.event.InputEvent;
@@ -235,12 +236,12 @@ public class MapView extends Element implements GestureListener{
 			Vector2 v2 = unproject(lastx, lasty).add(x, y);
 
 			Draw.color(Tmp.c1.set(ColorMapper.getColor(editor.getDrawBlock())));
-			Draw.thick(Unit.dp.scl(3f * zoom));
-			Draw.line(sx, sy, v2.x, v2.y);
+			Lines.stroke(Unit.dp.scl(3f * zoom));
+			Lines.line(sx, sy, v2.x, v2.y);
 
-			Draw.polygon(sx, sy, 40, editor.getBrushSize() * zoom * 3);
+			Lines.poly(sx, sy, 40, editor.getBrushSize() * zoom * 3);
 
-            Draw.polygon(v2.x, v2.y, 40, editor.getBrushSize() * zoom * 3);
+            Lines.poly(v2.x, v2.y, 40, editor.getBrushSize() * zoom * 3);
 		}
 
 		batch.flush();
@@ -248,8 +249,8 @@ public class MapView extends Element implements GestureListener{
 		if(pop) ScissorStack.popScissors();
 		
 		Draw.color(Colors.get("accent"));
-		Draw.thick(Unit.dp.scl(3f));
-		Draw.linerect(x + width/2 - size/2, y + height/2 - size/2, size, size);
+		Lines.stroke(Unit.dp.scl(3f));
+		Lines.rect(x + width/2 - size/2, y + height/2 - size/2, size, size);
 		Draw.reset();
 	}
 	

@@ -13,7 +13,6 @@ import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.shared.DateTimeFormat;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.io.PlatformFunction;
@@ -106,11 +105,6 @@ public class HtmlLauncher extends GwtApplication {
 			@Override
 			public String format(int number){
 				return NumberFormat.getDecimalFormat().format(number);
-			}
-
-			@Override
-			public void openLink(String link){
-				Window.open(link, "_blank", "");
 			}
 
 			@Override

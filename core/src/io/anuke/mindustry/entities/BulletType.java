@@ -5,10 +5,11 @@ import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.entities.effect.EMP;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.graphics.Fx;
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BaseBulletType;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
@@ -45,8 +46,8 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 	sniper = new BulletType(3f, 25){
 		public void draw(Bullet b){
 			Draw.color(Color.LIGHT_GRAY);
-			Draw.thick(1f);
-			Draw.lineAngleCenter(b.x, b.y, b.angle(), 3f);
+			Lines.stroke(1f);
+			Lines.lineAngleCenter(b.x, b.y, b.angle(), 3f);
 			Draw.reset();
 		}
 		
@@ -66,7 +67,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			float rad = 6f + Mathf.sin(Timers.time(), 5f, 2f);
 			
 			Draw.color(Color.SKY);
-			Draw.circle(b.x, b.y, 4f);
+			Lines.circle(b.x, b.y, 4f);
 			Draw.rect("circle", b.x, b.y, rad, rad);
 			Draw.reset();
 		}
@@ -138,10 +139,10 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 
 		public void draw(Bullet b) {
 			Draw.color(Color.GRAY);
-			Draw.thick(3f);
-			Draw.lineAngleCenter(b.x, b.y, b.angle(), 2f);
-			Draw.thick(1.5f);
-			Draw.lineAngleCenter(b.x, b.y, b.angle(), 5f);
+			Lines.stroke(3f);
+			Lines.lineAngleCenter(b.x, b.y, b.angle(), 2f);
+			Lines.stroke(1.5f);
+			Lines.lineAngleCenter(b.x, b.y, b.angle(), 5f);
 			Draw.reset();
 		}
 
@@ -168,8 +169,8 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 
 		public void draw(Bullet b) {
 			Draw.color(Color.LIGHT_GRAY, Color.GRAY, b.ifract());
-			Draw.thick(2f - b.ifract());
-			Draw.lineAngleCenter(b.x, b.y, b.angle(), 2f);
+			Lines.stroke(2f - b.ifract());
+			Lines.lineAngleCenter(b.x, b.y, b.angle(), 2f);
 			Draw.reset();
 		}
 	},
@@ -324,8 +325,8 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 
 		public void draw(Bullet b){
 			Draw.color(Color.WHITE, lightOrange, b.fract()/2f + 0.25f);
-			Draw.thick(1.5f);
-			Draw.lineAngle(b.x, b.y, b.angle(), 3f);
+			Lines.stroke(1.5f);
+			Lines.lineAngle(b.x, b.y, b.angle(), 3f);
 			Draw.reset();
 		}
 	},
@@ -338,8 +339,8 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			float size = 3f - b.ifract()*1f;
 
 			Draw.color(Color.PURPLE, Color.WHITE, 0.8f);
-			Draw.thick(1f);
-			Draw.circle(b.x, b.y, size);
+			Lines.stroke(1f);
+			Lines.circle(b.x, b.y, size);
 			Draw.reset();
 		}
 	},
@@ -350,13 +351,13 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		}
 
 		public void draw(Bullet b){
-			Draw.thick(2f);
+			Lines.stroke(2f);
 			Draw.color(lightOrange, Color.WHITE, 0.4f);
-			Draw.polygon(b.x, b.y, 3, 1.6f, b.angle());
-			Draw.thick(1f);
+			Lines.poly(b.x, b.y, 3, 1.6f, b.angle());
+			Lines.stroke(1f);
 			Draw.color(Color.WHITE, lightOrange, b.ifract()/2f);
 			Draw.alpha(b.ifract());
-			Draw.spikes(b.x, b.y, 1.5f, 2f, 6);
+			Lines.spikes(b.x, b.y, 1.5f, 2f, 6);
 			Draw.reset();
 		}
 
@@ -383,8 +384,8 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 
 		public void draw(Bullet b){
             Draw.color(lightGray);
-            Draw.thick(1f);
-            Draw.lineAngleCenter(b.x, b.y, b.angle(), 2f);
+            Lines.stroke(1f);
+            Lines.lineAngleCenter(b.x, b.y, b.angle(), 2f);
             Draw.reset();
         }
 
@@ -407,8 +408,8 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 
 		public void draw(Bullet b) {
 			Draw.color(Color.WHITE, Color.ORANGE, b.ifract());
-			Draw.thick(2f);
-			Draw.lineAngleCenter(b.x, b.y, b.angle(), b.fract()*5f);
+			Lines.stroke(2f);
+			Lines.lineAngleCenter(b.x, b.y, b.angle(), b.fract()*5f);
 			Draw.reset();
 		}
 
@@ -435,8 +436,8 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 
 		public void draw(Bullet b) {
 			Draw.color(Color.WHITE, Color.ORANGE, b.ifract());
-			Draw.thick(1f);
-			Draw.lineAngleCenter(b.x, b.y, b.angle(), b.fract()*4f);
+			Lines.stroke(1f);
+			Lines.lineAngleCenter(b.x, b.y, b.angle(), b.fract()*4f);
 			Draw.reset();
 		}
 	},
@@ -456,18 +457,18 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 
 			Draw.color(beam);
 			Draw.rect("circle", b.x, b.y, 6f*f, 6f*f);
-			Draw.thick(3f * f);
-			Draw.lineAngle(b.x, b.y, b.angle(), length);
+			Lines.stroke(3f * f);
+			Lines.lineAngle(b.x, b.y, b.angle(), length);
 
-			Draw.thick(2f * f);
-            Draw.lineAngle(b.x, b.y, b.angle(), length + 6f);
-			Draw.thick(1f * f);
-			Draw.lineAngle(b.x, b.y, b.angle(), length + 12f);
+			Lines.stroke(2f * f);
+            Lines.lineAngle(b.x, b.y, b.angle(), length + 6f);
+			Lines.stroke(1f * f);
+			Lines.lineAngle(b.x, b.y, b.angle(), length + 12f);
 
 			Draw.color(beamLight);
-			Draw.thick(1.5f * f);
+			Lines.stroke(1.5f * f);
 			Draw.rect("circle", b.x, b.y, 3f*f, 3f*f);
-			Draw.lineAngle(b.x, b.y, b.angle(), length);
+			Lines.lineAngle(b.x, b.y, b.angle(), length);
 		}
 	};
 	

@@ -8,7 +8,7 @@ import io.anuke.mindustry.resource.UpgradeRecipes;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.scene.style.TextureRegionDrawable;

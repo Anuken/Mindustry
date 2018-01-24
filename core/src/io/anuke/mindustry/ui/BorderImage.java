@@ -5,7 +5,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
@@ -36,8 +37,8 @@ public class BorderImage extends Image{
 		float scaleY = getScaleY();
 		
 		Draw.color(Colors.get("accent"));
-		Draw.thick(Unit.dp.scl(thickness));
-		Draw.linerect(x + imageX, y + imageY, imageWidth * scaleX, imageHeight * scaleY);
+		Lines.stroke(Unit.dp.scl(thickness));
+		Lines.rect(x + imageX, y + imageY, imageWidth * scaleX, imageHeight * scaleY);
 		Draw.reset();
 	}
 }

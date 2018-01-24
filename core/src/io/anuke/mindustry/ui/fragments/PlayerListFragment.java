@@ -7,7 +7,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.ui.BorderImage;
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;

@@ -8,9 +8,10 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Draw;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Hue;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
@@ -70,7 +71,7 @@ public class RepairTurret extends PowerTurret{
 	@Override
 	public void drawSelect(Tile tile){
 		Draw.color(Color.GREEN);
-		Draw.dashCircle(tile.worldx(), tile.worldy(), range);
+		Lines.dashCircle(tile.worldx(), tile.worldy(), range);
 		Draw.reset();
 		
 		drawPowerBar(tile);
@@ -89,14 +90,14 @@ public class RepairTurret extends PowerTurret{
 
 			Draw.color(Hue.rgb(138, 244, 138, (MathUtils.sin(Timers.time()) + 1f) / 14f));
 			Draw.alpha(0.3f);
-			Draw.thickness(4f);
-			Draw.line(x, y, x2, y2);
-			Draw.thickness(2f);
+			Lines.stroke(4f);
+			Lines.line(x, y, x2, y2);
+			Lines.stroke(2f);
 			Draw.rect("circle", x2, y2, 7f, 7f);
 			Draw.alpha(1f);
-			Draw.thickness(2f);
-			Draw.line(x, y, x2, y2);
-			Draw.thickness(1f);
+			Lines.stroke(2f);
+			Lines.line(x, y, x2, y2);
+			Lines.stroke(1f);
 			Draw.rect("circle", x2, y2, 5f, 5f);
 			Draw.reset();
 		}

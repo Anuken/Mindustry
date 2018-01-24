@@ -21,10 +21,9 @@ import java.nio.ByteBuffer;
 
 public class NetworkIO {
 
-    public static void writeMap(Map map, OutputStream os){
+    public static void writeMap(Pixmap map, OutputStream os){
         try(DataOutputStream stream = new DataOutputStream(os)){
-            Pixmap pix = map.pixmap;
-            ByteBuffer buffer = pix.getPixels();
+            ByteBuffer buffer = map.getPixels();
             UCore.log("Buffer position: " + buffer.position());
             stream.writeShort(map.getWidth());
             stream.writeShort(map.getHeight());
