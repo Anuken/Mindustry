@@ -546,7 +546,7 @@ public class Control extends Module{
 		
 		Entities.initPhysics();
 		
-		Entities.setCollider(tilesize, world::solid);
+		Entities.collisions().setCollider(tilesize, world::solid);
 
 		Mindustry.platforms.updateRPC();
 	}

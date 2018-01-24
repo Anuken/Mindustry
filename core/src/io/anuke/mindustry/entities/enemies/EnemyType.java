@@ -31,8 +31,7 @@ public class EnemyType {
 
     public final static Color[] tierColors = {
             Color.valueOf("ffe451"), Color.valueOf("f48e20"), Color.valueOf("ff6757"),
-            Color.valueOf("ff2d86"), Color.valueOf("cb2dff"), Color.valueOf("c83333"),
-            Color.valueOf("251616") };
+            Color.valueOf("ff2d86"), Color.valueOf("cb2dff"), Color.valueOf("362020") };
     public final static int maxtier = tierColors.length;
     public final static float maxIdleLife = 60f*2f; //2 seconds idle = death
     public final static float hitDuration = 5f;
@@ -106,7 +105,7 @@ public class EnemyType {
 
         float minv = 0.07f;
 
-        if(enemy.timer.get(timerReset, 60)){
+        if(enemy.timer.get(timerReset, 80)){
             enemy.totalMove.setZero();
         }
 
@@ -116,7 +115,7 @@ public class EnemyType {
             enemy.idletime = 0;
         }
 
-        if(enemy.timer.getTime(timerReset) > 40 && enemy.totalMove.len() < 0.3f && enemy.node > 0 && enemy.target == null){
+        if(enemy.timer.getTime(timerReset) > 50 && enemy.totalMove.len() < 0.2f && enemy.node > 0 && enemy.target == null){
             enemy.idletime = 999999f;
         }
 

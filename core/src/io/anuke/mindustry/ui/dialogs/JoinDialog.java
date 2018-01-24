@@ -142,7 +142,7 @@ public class JoinDialog extends FloatingDialog {
         if(!Vars.gwt) {
             local.clear();
             local.background("button");
-            local.label(() -> "[accent]" + Bundles.get("text.hosts.discovering") + new String(new char[(int) (Timers.time() / 10) % 4]).replace("\0", ".")).pad(10f);
+            local.label(() -> "[accent]" + Bundles.get("text.hosts.discovering") + Strings.animated(4, 10f, ".")).pad(10f);
             Net.discoverServers(this::addLocalHosts);
         }
     }

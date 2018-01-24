@@ -14,7 +14,7 @@ public class EnemySpawn{
 	/**The spacing, in waves, of spawns. 2 = spawns every other wave*/
 	protected int spacing = 1;
 	/**How many waves need to pass after the start of this spawn for the tier to increase by one*/
-	protected int tierscale = 14;
+	protected int tierscale = 17;
 	/**How many more enemies there are, every time the tier increases*/
 	protected int tierscaleback = 0;
 	/**The tier this spawn starts at.*/
