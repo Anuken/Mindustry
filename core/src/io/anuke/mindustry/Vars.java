@@ -85,18 +85,4 @@ public class Vars{
 	public static NetClient netClient;
 	
 	public static Player player;
-	
-	public static String[] aboutText = {
-		"Created by [ROYAL]Anuken.[]",
-		"Originally an entry in the [orange]GDL[] MM Jam.",
-		"",
-		"Credits:",
-		"- SFX made with [YELLOW]bfxr[]",
-		"- Music made by [GREEN]RoccoW[] / found on [lime]FreeMusicArchive.org[]",
-		"",
-		"Special thanks to:",
-		"- [coral]MitchellFJN[]: extensive playtesting and feedback",
-		"- [sky]Luxray5474[]: wiki work, code contributions",
-		"- All the beta testers on itch.io and Google Play"
-	};
 }
