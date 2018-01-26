@@ -15,7 +15,6 @@ import io.anuke.mindustry.entities.effect.Shield;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyTypes;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.game.Tutorial;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.DesktopInput;
@@ -36,9 +35,9 @@ import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Atlas;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.Atlas;
 import io.anuke.ucore.util.Input;
 import io.anuke.ucore.util.InputProxy;
 import io.anuke.ucore.util.Mathf;
@@ -87,7 +86,6 @@ public class Control extends Module{
 	public Control(){
 		if(Mindustry.args.contains("-debug", false))
 			Vars.debug = true;
-
 		saves = new Saves();
 
 		Inputs.useControllers(!Vars.gwt);

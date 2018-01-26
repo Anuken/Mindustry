@@ -96,6 +96,7 @@ public class NetClient extends Module {
             UCore.log("Recieved world data: " + data.stream.available() + " bytes.");
             NetworkIO.loadWorld(data.stream);
             Vars.player.set(Vars.control.core.worldx(), Vars.control.core.worldy() - Vars.tilesize * 2);
+            UCore.log(Vars.control.core);
 
             gotData = true;
 
@@ -103,6 +104,7 @@ public class NetClient extends Module {
         });
 
         Net.handle(CustomMapPacket.class, packet -> {
+            UCore.log("Recieved custom map: " + packet.stream.available() + " bytes.");
 
             //custom map is always sent before world data
             Pixmap pixmap = NetworkIO.loadMap(packet.stream);

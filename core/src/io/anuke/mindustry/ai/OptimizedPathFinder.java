@@ -8,7 +8,6 @@ import com.badlogic.gdx.utils.TimeUtils;
 /**An IndexedAStarPathfinder that uses an OptimizedGraph, and therefore has less allocations.*/
 public class OptimizedPathFinder<N> implements PathFinder<N> {
     OptimizedGraph<N> graph;
-    //NodeRecord<N>[] nodeRecords; //TODO remove.
     IntMap<NodeRecord<N>> records = new IntMap<>();
     BinaryHeap<NodeRecord<N>> openList;
     NodeRecord<N> current;
@@ -25,7 +24,6 @@ public class OptimizedPathFinder<N> implements PathFinder<N> {
     @SuppressWarnings("unchecked")
     public OptimizedPathFinder(OptimizedGraph<N> graph) {
         this.graph = graph;
-        //this.nodeRecords = (NodeRecord<N>[]) new NodeRecord[graph.getNodeCount()];
         this.openList = new BinaryHeap<>();
     }
 
@@ -218,20 +216,6 @@ public class OptimizedPathFinder<N> implements PathFinder<N> {
         }else{
             return records.get(graph.getIndex(node));
         }
-        /*
-        int index = graph.getIndex(node);
-        NodeRecord<N> nr = nodeRecords[index];
-        if (nr != null) {
-            if (nr.searchId != searchId) {
-                nr.category = UNVISITED;
-                nr.searchId = searchId;
-            }
-            return nr;
-        }
-        nr = nodeRecords[index] = new NodeRecord<>();
-        nr.node = node;
-        nr.searchId = searchId;
-        return nr;*/
     }
 
     /**

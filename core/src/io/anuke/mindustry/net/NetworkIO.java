@@ -26,17 +26,40 @@ public class NetworkIO {
 
     public static void writeMap(Pixmap map, OutputStream os){
         try(DataOutputStream stream = new DataOutputStream(os)){
-            ByteBuffer buffer = (ByteBuffer) map.getPixels();
-            UCore.log("Buffer position: " + buffer.position());
             stream.writeShort(map.getWidth());
             stream.writeShort(map.getHeight());
-            for(int i = 0; i < map.getWidth() * map.getHeight(); i ++){
-                int color = buffer.getInt();
+
+            int width = map.getWidth();
+            int cap = map.getWidth() * map.getHeight();
+            int pos = 0;
+
+            while(pos < cap){
+                int color = map.getPixel(pos % width, pos / width);
                 byte id = ColorMapper.getColorID(color);
+
+                int length = 1;
+                while(true){
+                    if(pos >= cap || length > 254){
+                        break;
+                    }
+
+                    pos ++;
+
+                    int next = map.getPixel(pos % width, pos / width);
+                    if(next != color){
+                        pos --;
+                        break;
+                    }else{
+                        length ++;
+                    }
+                }
+
                 if(id == -1) id = 0;
+                stream.writeByte((byte)(length > 127 ? length - 256 : length));
                 stream.writeByte(id);
+
+                pos ++;
             }
-            buffer.position(0);
         }catch (IOException e){
             throw new RuntimeException(e);
         }
@@ -47,20 +70,20 @@ public class NetworkIO {
             short width = stream.readShort();
             short height = stream.readShort();
             Pixmap pixmap = new Pixmap(width, height, Format.RGBA8888);
-            if(!Vars.gwt) {
-                ByteBuffer buffer = (ByteBuffer) pixmap.getPixels();
-                buffer.position(0);
 
-                for (int i = 0; i < width * height; i++) {
-                    byte id = stream.readByte();
-                    buffer.putInt(ColorMapper.getColorByID(id));
-                }
-            }else{
-                for(int i = 0; i < width * height; i++){
-                    byte id = stream.readByte();
-                    pixmap.drawPixel(i % width, i /width, ColorMapper.getColorByID(id));
+            int pos = 0;
+            while(stream.available() > 0){
+                int length = stream.readByte();
+                byte id = stream.readByte();
+                if(length < 0) length += 256;
+                int color = ColorMapper.getColorByID(id);
+
+                for(int p = 0; p < length; p ++){
+                    pixmap.drawPixel(pos % width, pos / width,color);
+                    pos ++;
                 }
             }
+
 
             return pixmap;
         }catch (IOException e){
