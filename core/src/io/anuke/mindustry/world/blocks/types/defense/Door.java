@@ -1,18 +1,17 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Wall;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.SolidEntity;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Tmp;
 
 import java.io.DataInputStream;
@@ -36,12 +35,10 @@ public class Door extends Wall{
 	public void draw(Tile tile){
 		DoorEntity entity = tile.entity();
 		
-		Vector2 offset = getPlaceOffset();
-		
 		if(!entity.open){
-			Draw.rect(name, tile.worldx() + offset.x, tile.worldy() + offset.y);
+			Draw.rect(name, tile.drawx(), tile.drawy());
 		}else{
-			Draw.rect(name + "-open", tile.worldx() + offset.x, tile.worldy() + offset.y);
+			Draw.rect(name + "-open", tile.drawx(), tile.drawy());
 		}
 	}
 	
@@ -59,13 +56,11 @@ public class Door extends Wall{
 			return;
 		}
 		
-		Vector2 offset = getPlaceOffset();
-		
 		entity.open = !entity.open;
 		if(!entity.open){
-			Effects.effect(closefx, tile.worldx() + offset.x, tile.worldy() + offset.y);
+			Effects.effect(closefx, tile.drawx(), tile.drawy());
 		}else{
-			Effects.effect(openfx, tile.worldx() + offset.x, tile.worldy() + offset.y);
+			Effects.effect(openfx, tile.drawx(), tile.drawy());
 		}
 	}
 	
@@ -73,8 +68,7 @@ public class Door extends Wall{
 		int x = tile.x, y = tile.y;
 		Block type = tile.block();
 		Tmp.r2.setSize(type.width * Vars.tilesize, type.height * Vars.tilesize);
-		Vector2 offset = type.getPlaceOffset();
-		Tmp.r2.setCenter(offset.x + x * Vars.tilesize, offset.y + y * Vars.tilesize);
+		Tmp.r2.setCenter(tile.drawx(), tile.drawy());
 		
 		for(SolidEntity e : Entities.getNearby(Vars.control.enemyGroup, x * tilesize, y * tilesize, tilesize * 2f)){
 			Rectangle rect = e.hitbox.getRect(e.x, e.y);

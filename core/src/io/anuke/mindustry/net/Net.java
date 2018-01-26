@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.async.AsyncExecutor;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packets.KickReason;
@@ -30,7 +29,6 @@ public class Net{
 	private static ServerProvider serverProvider;
 
 	private static IntMap<StreamBuilder> streams = new IntMap<>();
-	private static AsyncExecutor executor = new AsyncExecutor(4);
 
 	/**Sets the client loaded status, or whether it will recieve normal packets from the server.*/
 	public static void setClientLoaded(boolean loaded){
@@ -71,13 +69,7 @@ public class Net{
 	/**Starts discovering servers on a different thread. Does not work with GWT.
 	 * Callback is run on the main libGDX thread.*/
 	public static void discoverServers(Consumer<Array<Host>> cons){
-		executor.submit(() -> {
-			Array<Host> arr = clientProvider.discover();
-			Gdx.app.postRunnable(() -> {
-				cons.accept(arr);
-			});
-			return false;
-		});
+		clientProvider.discover(cons);
 	}
 
 	/**Kick a specified connection from the server.*/
@@ -203,13 +195,8 @@ public class Net{
 	public static void dispose(){
 		if(clientProvider != null) clientProvider.dispose();
 		if(serverProvider != null) serverProvider.dispose();
-		executor.dispose();
-	}
-
-	/**Register classes that will be sent. Must be done for all classes.*/
-	public static void registerClasses(Class<?>... classes){
-		clientProvider.register(classes);
-		serverProvider.register(classes);
+		clientProvider = null;
+		serverProvider = null;
 	}
 
 	/**Client implementation.*/
@@ -224,12 +211,11 @@ public class Net{
 		int getPing();
 		/**Disconnect from the server.*/
 		void disconnect();
-        /**Discover servers. This should block for a certain amount of time, and will most likely be run in a different thread.*/
-        Array<Host> discover();
+        /**Discover servers. This should run the callback regardless of whether any servers are found. Should not block.
+		 * Callback should be run on libGDX main thread.*/
+        void discover(Consumer<Array<Host>> callback);
         /**Ping a host. If an error occured, failed() should be called with the exception. */
         void pingHost(String address, int port, Consumer<Host> valid, Consumer<IOException> failed);
-		/**Register classes to be sent.*/
-		void register(Class<?>... types);
 		/**Close all connections.*/
 		void dispose();
 	}
@@ -254,8 +240,6 @@ public class Net{
 		void kick(int connection, KickReason reason);
 		/**Returns the ping for a certain connection.*/
 		int getPingFor(NetConnection connection);
-		/**Register classes to be sent.*/
-		void register(Class<?>... types);
 		/**Close all connections.*/
 		void dispose();
 	}

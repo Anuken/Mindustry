@@ -245,9 +245,7 @@ public class Block{
 					tile.worldx(), tile.worldy(), rotate ? tile.getRotation() * 90 : 0);
 		}else{
 			//if multiblock, make sure to draw even block sizes offset, since the core block is at the BOTTOM LEFT
-			Vector2 offset = getPlaceOffset();
-			
-			Draw.rect(name(), tile.worldx() + offset.x, tile.worldy() + offset.y);
+			Draw.rect(name(), tile.drawx(), tile.drawy());
 		}
 		
 		//update the tile entity through the draw method, only if it's an entity without updating

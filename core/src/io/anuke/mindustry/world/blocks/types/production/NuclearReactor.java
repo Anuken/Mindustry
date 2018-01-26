@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
@@ -10,9 +9,9 @@ import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 import io.anuke.ucore.util.Tmp;
@@ -99,8 +98,7 @@ public class NuclearReactor extends LiquidPowerGenerator{
 	
 	@Override
 	public void drawLiquidCenter(Tile tile){
-		Vector2 offset = getPlaceOffset();
-		Draw.rect(name + "-center", tile.worldx() + offset.x, tile.worldy() + offset.y);
+		Draw.rect(name + "-center", tile.drawx(), tile.drawy());
 	}
 	
 	@Override
@@ -154,18 +152,17 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		super.drawSelect(tile);
 
 		NuclearReactorEntity entity = tile.entity();
-		Vector2 offset = getPlaceOffset();
 
-		Vars.renderer.drawBar(Color.GREEN, tile.worldx() + offset.x, tile.worldy() + 6 +
-				offset.y + height*Vars.tilesize/2f, (float)entity.getItem(generateItem) / itemCapacity);
+		Vars.renderer.drawBar(Color.GREEN, tile.drawx(), tile.drawy() + 6 +
+				height*Vars.tilesize/2f, (float)entity.getItem(generateItem) / itemCapacity);
 		Draw.reset();
 		
 		float fract = entity.heat;
 		if(fract > 0)
 			fract = Mathf.clamp(fract + 0.2f, 0.24f, 1f);
 		
-		Vars.renderer.drawBar(Color.ORANGE, tile.worldx() + offset.x, 
-				tile.worldy() + Vars.tilesize * height/2f + 10 + offset.y, fract);
+		Vars.renderer.drawBar(Color.ORANGE, tile.drawx(),
+				tile.drawy() + Vars.tilesize * height/2f + 10, fract);
 	}
 
 	@Override
@@ -178,17 +175,16 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		super.draw(tile);
 		
 		NuclearReactorEntity entity = tile.entity();
-		Vector2 offset = getPlaceOffset();
 		
 		Draw.color(coolColor, hotColor, entity.heat);
-		Draw.rect("white", tile.worldx() + offset.x, tile.worldy() + offset.y, width * Vars.tilesize, height * Vars.tilesize);
+		Draw.rect("white", tile.drawx(), tile.drawy(), width * Vars.tilesize, height * Vars.tilesize);
 		
 		if(entity.heat > flashThreshold){
 			float flash = 1f + ((entity.heat - flashThreshold) / (1f - flashThreshold)) * 5.4f;
 			entity.flash += flash * Timers.delta();
 			Draw.color(Color.RED, Color.YELLOW, Mathf.absin(entity.flash, 9f, 1f));
 			Draw.alpha(0.6f);
-			Draw.rect(name + "-lights", tile.worldx() + offset.x, tile.worldy() + offset.y);
+			Draw.rect(name + "-lights", tile.drawx(), tile.drawy());
 		}
 		
 		Draw.reset();

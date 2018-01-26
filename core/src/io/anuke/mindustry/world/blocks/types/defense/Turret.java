@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Bullet;
@@ -13,11 +12,11 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
@@ -78,21 +77,18 @@ public class Turret extends Block{
 	
 	@Override
 	public void draw(Tile tile){
-		Vector2 offset = getPlaceOffset();
-		
 		if(isMultiblock()){
-			Draw.rect("block-" + width + "x" + height, tile.worldx() + offset.x, tile.worldy() + offset.y);
+			Draw.rect("block-" + width + "x" + height, tile.drawx(), tile.drawy());
 		}else{
-			Draw.rect("block", tile.worldx() + offset.x, tile.worldy() + offset.y);
+			Draw.rect("block", tile.drawx(), tile.drawy());
 		}
 	}
 	
 	@Override
 	public void drawLayer(Tile tile){
 		TurretEntity entity = tile.entity();
-		Vector2 offset = getPlaceOffset();
-		
-		Draw.rect(name(), tile.worldx() + offset.x, tile.worldy() + offset.y, entity.rotation - 90);
+
+		Draw.rect(name(), tile.drawx(), tile.drawy(), entity.rotation - 90);
 		
 		if(Vars.debug && drawDebug){
 			drawTargeting(tile);
@@ -101,10 +97,8 @@ public class Turret extends Block{
 	
 	@Override
 	public void drawSelect(Tile tile){
-		Vector2 offset = getPlaceOffset();
-		
 		Draw.color(Color.GREEN);
-		Lines.dashCircle(tile.worldx() + offset.x, tile.worldy() + offset.y, range);
+		Lines.dashCircle(tile.drawx(), tile.drawy(), range);
 		Draw.reset();
 		
 		TurretEntity entity = tile.entity();
@@ -113,7 +107,7 @@ public class Turret extends Block{
 		if(fract > 0)
 			fract = Mathf.clamp(fract, 0.24f, 1f);
 		
-		Vars.renderer.drawBar(Color.GREEN, tile.worldx() + offset.x, 2 + tile.worldy() + height/2f*Vars.tilesize + offset.y, fract);
+		Vars.renderer.drawBar(Color.GREEN, tile.drawx(), 2 + tile.drawy() + height/2f*Vars.tilesize, fract);
 	}
 	
 	@Override
@@ -221,7 +215,7 @@ public class Turret extends Block{
 	protected void shoot(Tile tile){
 		TurretEntity entity = tile.entity();
 		
-		Vector2 offset = getPlaceOffset();
+		
 		
 		Angles.translation(entity.rotation, width * Vars.tilesize / 2f);
 		
@@ -238,8 +232,8 @@ public class Turret extends Block{
 		}
 		
 		if(shootEffect != null){
-			Effects.effect(shootEffect, tile.worldx() + Angles.x() + offset.x, 
-				tile.worldy()+ Angles.y() + offset.y, entity.rotation);
+			Effects.effect(shootEffect, tile.drawx() + Angles.x(),
+				tile.drawy()+ Angles.y(), entity.rotation);
 		}
 		
 		if(shootShake > 0){
@@ -248,8 +242,7 @@ public class Turret extends Block{
 	}
 	
 	protected void bullet(Tile tile, float angle){
-		Vector2 offset = getPlaceOffset();
-		Bullet out = new Bullet(bullet, tile.entity, tile.worldx() + Angles.x() + offset.x, tile.worldy() + Angles.y() + offset.y, angle).add();
+		Bullet out = new Bullet(bullet, tile.entity, tile.drawx() + Angles.x(), tile.drawy() + Angles.y(), angle).add();
 		out.damage = (int)(bullet.damage*Vars.multiplier);
 	}
 	

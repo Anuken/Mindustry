@@ -1,8 +1,6 @@
 package io.anuke.mindustry.world.blocks;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.effect.TeslaOrb;
@@ -177,7 +175,6 @@ public class WeaponBlocks{
 		@Override
 		protected void shoot(Tile tile){
 			TurretEntity entity = tile.entity();
-			Vector2 offset = getPlaceOffset();
 			
 			float len = 8;
 			float space = 3.5f;
@@ -185,8 +182,8 @@ public class WeaponBlocks{
 			for(int i = -1; i < 1; i ++){
 				Angles.vector.set(len, Mathf.sign(i) * space).rotate(entity.rotation);
 				bullet(tile, entity.rotation);
-				Effects.effect(shootEffect, tile.worldx() + Angles.x() + offset.x, 
-						tile.worldy()+ Angles.y() + offset.y, entity.rotation);
+				Effects.effect(shootEffect, tile.drawx() + Angles.x(),
+						tile.drawy()+ Angles.y(), entity.rotation);
 			}
 			
 			Effects.shake(1f, 1f, tile.worldx(), tile.worldy());

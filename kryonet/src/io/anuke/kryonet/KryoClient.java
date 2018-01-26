@@ -13,7 +13,6 @@ import io.anuke.mindustry.net.Net.ClientProvider;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
-import io.anuke.mindustry.net.Registrator;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.function.Consumer;
 
@@ -95,8 +94,6 @@ public class KryoClient implements ClientProvider{
         }else{
             client.addListener(listener);
         }
-
-        register(Registrator.getClasses());
     }
 
     @Override
@@ -143,7 +140,7 @@ public class KryoClient implements ClientProvider{
 
     @Override
     public void pingHost(String address, int port, Consumer<Host> valid, Consumer<IOException> invalid){
-        Thread thread = new Thread(() -> {
+        runAsync(() -> {
             try {
                 DatagramSocket socket = new DatagramSocket();
                 socket.send(new DatagramPacket(new byte[]{-2, 1}, 2, InetAddress.getByName(address), Vars.port));
@@ -168,32 +165,28 @@ public class KryoClient implements ClientProvider{
                 Gdx.app.postRunnable(() -> invalid.accept(e));
             }
         });
-
-        thread.setDaemon(true);
-        thread.start();
     }
 
     @Override
-    public Array<Host> discover(){
-        addresses.clear();
-        List<InetAddress> list = client.discoverHosts(Vars.port, 3000);
-        ObjectSet<String> hostnames = new ObjectSet<>();
-        Array<Host> result = new Array<>();
+    public void discover(Consumer<Array<Host>> callback){
+        runAsync(() -> {
+            addresses.clear();
+            List<InetAddress> list = client.discoverHosts(Vars.port, 3000);
+            ObjectSet<String> hostnames = new ObjectSet<>();
+            Array<Host> result = new Array<>();
 
-        for(InetAddress a : list){
-            if(!hostnames.contains(a.getHostName())) {
-                Host address = addresses.get(a);
-                if(address != null) result.add(address);
+            for(InetAddress a : list){
+                if(!hostnames.contains(a.getHostName())) {
+                    Host address = addresses.get(a);
+                    if(address != null) result.add(address);
 
+                }
+                hostnames.add(a.getHostName());
             }
-            hostnames.add(a.getHostName());
-        }
 
-        return result;
+            Gdx.app.postRunnable(() -> callback.accept(result));
+        });
     }
-
-    @Override
-    public void register(Class<?>... types) { }
 
     @Override
     public void dispose(){
@@ -202,6 +195,12 @@ public class KryoClient implements ClientProvider{
         }catch (IOException e){
             throw new RuntimeException(e);
         }
+    }
+
+    private void runAsync(Runnable run){
+        Thread thread = new Thread(run, "Client Async Run");
+        thread.setDaemon(true);
+        thread.start();
     }
 
     private void handleException(Exception e){

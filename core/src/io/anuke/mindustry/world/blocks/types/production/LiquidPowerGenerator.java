@@ -1,23 +1,21 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidAcceptor;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 	public int generateTime = 15;
@@ -57,8 +55,7 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 	}
 	
 	public void drawLiquidCenter(Tile tile){
-		Vector2 offset = getPlaceOffset();
-		Draw.rect("blank", tile.worldx() + offset.x, tile.worldy() + offset.y, 2, 2);
+		Draw.rect("blank", tile.drawx(), tile.drawy(), 2, 2);
 	}
 	
 	@Override
@@ -73,8 +70,8 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 			entity.power += used * powerPerLiquid;
 			
 			if(used > 0.001f && Mathf.chance(0.05 * Timers.delta())){
-				Vector2 offset = getPlaceOffset();
-				Effects.effect(generateEffect, tile.worldx() + offset.x + Mathf.range(3f), tile.worldy() + offset.y + Mathf.range(3f));
+				
+				Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
 			}
 		}
 		

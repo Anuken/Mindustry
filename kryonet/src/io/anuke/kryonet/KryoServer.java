@@ -103,8 +103,6 @@ public class KryoServer implements ServerProvider {
         }else{
             server.addListener(listener);
         }
-
-        register(Registrator.getClasses());
     }
 
     @Override
@@ -254,9 +252,6 @@ public class KryoServer implements ServerProvider {
     }
 
     @Override
-    public void register(Class<?>... types) { }
-
-    @Override
     public void dispose(){
         try {
             server.dispose();
@@ -386,7 +381,6 @@ public class KryoServer implements ServerProvider {
 
         public SocketServer(int port) {
             super(new InetSocketAddress(port));
-            //setWebSocketFactory(factory);
         }
 
         @Override

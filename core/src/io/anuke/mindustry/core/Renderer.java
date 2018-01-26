@@ -338,7 +338,7 @@ public class Renderer extends RendererModule{
 			Tile tile = ui.configfrag.getSelectedTile();
 			Draw.color(Colors.get("accent"));
 			Lines.stroke(1f);
-			Lines.square(tile.worldx() + tile.block().getPlaceOffset().x, tile.worldy() + tile.block().getPlaceOffset().y,
+			Lines.square(tile.drawx(), tile.drawy(),
 					tile.block().width * Vars.tilesize / 2f + 1f);
 			Draw.reset();
 		}
@@ -390,10 +390,8 @@ public class Renderer extends RendererModule{
 				if(tile.isLinked())
 					target = tile.getLinked();
 
-				Vector2 offset = target.block().getPlaceOffset();
-
 				if(target.entity != null)
-					drawHealth(target.entity.x + offset.x, target.entity.y - 3f - target.block().height / 2f * Vars.tilesize + offset.y, target.entity.health, target.entity.maxhealth);
+					drawHealth(target.drawx(), target.drawy() - 3f - target.block().height / 2f * Vars.tilesize, target.entity.health, target.entity.maxhealth);
 
 				target.block().drawSelect(target);
 			}

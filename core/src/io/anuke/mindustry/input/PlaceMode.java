@@ -92,12 +92,11 @@ public enum PlaceMode{
 			if(tile != null && control.getInput().validBreak(tilex, tiley)){
 				if(tile.isLinked())
 					tile = tile.getLinked();
-				Vector2 offset = tile.block().getPlaceOffset();
 				float fract = control.getInput().breaktime / tile.getBreakTime();
 				
 				if(android && control.getInput().breaktime > 0){
 					Draw.color(Colors.get("breakStart"), Colors.get("break"), fract);
-					Lines.poly(tile.worldx() + offset.x, tile.worldy() + offset.y, 25, 4 + (1f - fract) * 26);
+					Lines.poly(tile.drawx(), tile.drawy(), 25, 4 + (1f - fract) * 26);
 				}
 				Draw.reset();
 			}
@@ -157,8 +156,7 @@ public enum PlaceMode{
 					if(tile != null && tile.getLinked() != null)
 						tile = tile.getLinked();
 					if(tile != null && control.getInput().validBreak(tile.x, tile.y)){
-						Vector2 offset = tile.block().getPlaceOffset();
-						Lines.crect(tile.worldx() + offset.x, tile.worldy() + offset.y,
+						Lines.crect(tile.drawx(), tile.drawy(),
 								tile.block().width * t, tile.block().height * t);
 					}
 				}

@@ -42,7 +42,7 @@ public class BlockConfigFragment implements  Fragment {
 
         table.update(()->{
             table.setOrigin(Align.center);
-            Vector2 pos = Graphics.screen(tile.worldx() + tile.block().getPlaceOffset().x, tile.worldy() + tile.block().getPlaceOffset().y);
+            Vector2 pos = Graphics.screen(tile.drawx(), tile.drawy());
             table.setPosition(pos.x, pos.y, Align.center);
             if(configTile == null || configTile.block() == Blocks.air){
                 hideConfig();

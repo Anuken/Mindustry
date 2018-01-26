@@ -96,6 +96,14 @@ public class Tile{
 	public float worldy(){
 		return y * tilesize;
 	}
+
+	public float drawx(){
+		return block().getPlaceOffset().x + worldx();
+	}
+
+	public float drawy(){
+		return block().getPlaceOffset().y + worldy();
+	}
 	
 	public Block floor(){
 		return Block.getByID(getFloorID());

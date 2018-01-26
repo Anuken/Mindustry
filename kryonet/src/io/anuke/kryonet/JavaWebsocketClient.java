@@ -125,17 +125,14 @@ public class JavaWebsocketClient implements ClientProvider {
     }
 
     @Override
-    public Array<Host> discover() {
-        return new Array<>();
+    public void discover(Consumer<Array<Host>> callback){
+        callback.accept(new Array<>());
     }
 
     @Override
     public void pingHost(String address, int port, Consumer<Host> valid, Consumer<IOException> failed) {
         failed.accept(new IOException());
     }
-
-    @Override
-    public void register(Class<?>... types) { }
 
     @Override
     public void dispose() {

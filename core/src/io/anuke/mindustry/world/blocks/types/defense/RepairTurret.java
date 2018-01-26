@@ -2,14 +2,12 @@ package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
@@ -83,10 +81,9 @@ public class RepairTurret extends PowerTurret{
 		
 		if(entity.power >= powerUsed && entity.blockTarget != null && Angles.angleDist(entity.angleTo(entity.blockTarget), entity.rotation) < 10){
 			Tile targetTile = entity.blockTarget.tile;
-			Vector2 offset = targetTile.block().getPlaceOffset();
 			Angles.translation(entity.rotation, 4f);
-			float x = tile.worldx() + Angles.x(), y = tile.worldy() + Angles.y();
-			float x2 = entity.blockTarget.x + offset.x, y2 = entity.blockTarget.y + offset.y;
+			float x = tile.drawx() + Angles.x(), y = tile.drawy() + Angles.y();
+			float x2 = targetTile.drawx(), y2 = targetTile.drawy();
 
 			Draw.color(Hue.rgb(138, 244, 138, (MathUtils.sin(Timers.time()) + 1f) / 14f));
 			Draw.alpha(0.3f);

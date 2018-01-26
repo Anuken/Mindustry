@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
@@ -50,16 +49,14 @@ public class LiquidCrafter extends LiquidBlock{
 	
 	@Override
 	public void draw(Tile tile){
-		Vector2 v = getPlaceOffset();
-
 		LiquidEntity entity = tile.entity();
-		Draw.rect(name(), tile.worldx() + v.x, tile.worldy() + v.y);
+		Draw.rect(name(), tile.drawx(), tile.drawy());
 		
 		if(entity.liquid == null) return;
 		
 		Draw.color(entity.liquid.color);
 		Draw.alpha(entity.liquidAmount / liquidCapacity);
-		Draw.rect("blank", tile.worldx() + v.x, tile.worldy() + v.y, 2, 2);
+		Draw.rect("blank", tile.drawx(), tile.drawy(), 2, 2);
 		Draw.color();
 	}
 	

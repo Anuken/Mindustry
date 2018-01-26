@@ -28,16 +28,14 @@ public class WebsocketClient implements ClientProvider {
     ByteBuffer buffer = ByteBuffer.allocate(1024);
 
     @Override
-    public void connect(String ip, int port) throws IOException {
+    public void connect(String ip, int port){
         socket = new Websocket("ws://" + ip + ":" + Vars.webPort);
         socket.addListener(new WebsocketListener() {
             public void onMessage(byte[] bytes) {
                 try {
                     ByteBuffer buffer = ByteBuffer.wrap(bytes);
                     byte id = buffer.get();
-                    if(id == -2){
-                    //this is a framework message... do nothing yet?
-                    }else {
+                    if(id != -2){ //ignore framework messages
                         Class<?> type = Registrator.getByID(id);
                         Packet packet = (Packet) ClassReflection.newInstance(type);
                         packet.read(buffer);
@@ -99,8 +97,8 @@ public class WebsocketClient implements ClientProvider {
     }
 
     @Override
-    public Array<Host> discover() {
-        return new Array<>();
+    public void discover(Consumer<Array<Host>> callback){
+        callback.accept(new Array<>());
     }
 
     @Override
@@ -140,9 +138,6 @@ public class WebsocketClient implements ClientProvider {
             });
         }
     }
-
-    @Override
-    public void register(Class<?>... types) { }
 
     @Override
     public void dispose() {
