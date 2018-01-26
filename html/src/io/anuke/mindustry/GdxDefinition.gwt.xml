@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit trunk//EN" "https://raw.githubusercontent.com/gwtproject/gwt/master/distro-source/core/src/gwt-module.dtd">
 <module rename-to="html">
 	<inherits name='com.badlogic.gdx.backends.gdx_backends_gwt' />
 	<inherits name='com.badlogic.gdx.ai' />

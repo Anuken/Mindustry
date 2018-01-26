@@ -3,14 +3,18 @@ sourceCompatibility = 1.8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 sourceSets.main.java.srcDirs = ["src/"]
 
-def TEXPACK_DIR = "$System.env.TEXPACK_DIR"
+import com.badlogic.gdx.tools.texturepacker.TexturePacker
 
-task packSprites(type: Exec){
-	commandLine "java", "-cp", TEXPACK_DIR, "com.badlogic.gdx.tools.texturepacker.TexturePacker", "assets-raw/sprites/", "assets/sprites/", "sprites.atlas"
+task packSprites(){
+	doLast {
+		TexturePacker.process("core/assets-raw/sprites/", "core/assets/sprites/", "sprites.atlas")
+	}
 }
 
-task packUI(type: Exec){
-	commandLine "java", "-cp", TEXPACK_DIR, "com.badlogic.gdx.tools.texturepacker.TexturePacker", "assets-raw/ui/", "assets/ui/", "uiskin.atlas"
+task packUI(){
+	doLast {
+		TexturePacker.process("core/assets-raw/ui/", "core/assets/ui/", "uiskin.atlas")
+	}
 }
 
 task pack(){
