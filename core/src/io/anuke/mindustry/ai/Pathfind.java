@@ -127,6 +127,7 @@ public class Pathfind{
 					if(point.finder.search(point.request, maxTime)){
 						smoother.smoothPath(point.path);
 						point.pathTiles = point.path.nodes.toArray(Tile.class);
+						point.finder = null;
 					}
 				}catch (ArrayIndexOutOfBoundsException e){
 					//no path

@@ -57,8 +57,8 @@ public class WorldGenerator {
 					block = rocks.get(floor);
 				}
 				
-				if(floor == Blocks.stone || floor == Blocks.grass || floor == Blocks.blackstone ||
-						floor == Blocks.snow || floor == Blocks.sand){
+				if(Vars.world.getMap().oreGen && (floor == Blocks.stone || floor == Blocks.grass || floor == Blocks.blackstone ||
+						floor == Blocks.snow || floor == Blocks.sand)){
 					if(Noise.nnoise(x, y, 8, 1) > 0.21){
 						floor = Blocks.iron;
 					}

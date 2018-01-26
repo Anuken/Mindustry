@@ -20,7 +20,7 @@ public class EnemySpawn{
 	/**The tier this spawn starts at.*/
 	protected int tier = 1;
 	/**Maximum amount of enemies that spawn*/
-	protected int max = 17;
+	protected int max = 60;
 	/**How many waves need to pass before the amount of enemies increases by 1*/
 	protected float scaling = 9999f;
 	/**Amount of enemies spawned initially, with no scaling*/

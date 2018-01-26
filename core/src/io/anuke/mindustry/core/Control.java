@@ -421,11 +421,9 @@ public class Control extends Module{
 			Timers.run(i*2, ()-> Effects.effect(Fx.explosion, core.worldx()+Mathf.range(40), core.worldy()+Mathf.range(40)));
 		}
 		Effects.effect(Fx.coreexplosion, core.worldx(), core.worldy());
-		
-		Timers.run(60, () -> {
-			ui.restart.show();
-			if(Net.active() && Net.server()) netServer.handleGameOver();
-		});
+
+		ui.restart.show();
+		if(Net.active() && Net.server()) netServer.handleGameOver();
 	}
 
 	public boolean isGameOver(){
@@ -613,7 +611,7 @@ public class Control extends Module{
 			}
 
 			if(Inputs.keyTap(Keys.G)){
-				addItem(Item.stone, 1000);
+				Vars.world.pathfinder().benchmark();
 			}
 
 			if(Inputs.keyDown(Keys.I)){
@@ -645,6 +643,10 @@ public class Control extends Module{
 		
 		if(!GameState.is(State.menu)){
 			input.update();
+
+			if(core.block() != ProductionBlocks.core && !ui.restart.isShown()){
+				coreDestroyed();
+			}
 			
 			if(Inputs.keyTap("pause") && !ui.restart.isShown() && !Net.active() && (GameState.is(State.paused) || GameState.is(State.playing))){
 				GameState.set(GameState.is(State.playing) ? State.paused : State.playing);
