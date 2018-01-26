@@ -2,6 +2,7 @@ package io.anuke.mindustry.net;
 
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
+import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.resource.Item;
 
 import java.nio.ByteBuffer;
@@ -9,12 +10,12 @@ import java.nio.ByteBuffer;
 /**Class for storing all packets.*/
 public class Packets {
 
-    public static class Connect{
+    public static class Connect implements ImportantPacket{
         public int id;
         public String addressTCP;
     }
 
-    public static class Disconnect {
+    public static class Disconnect implements ImportantPacket{
         public int id;
         public String addressTCP;
     }
@@ -382,7 +383,7 @@ public class Packets {
         }
     }
 
-    public static class KickPacket implements Packet{
+    public static class KickPacket implements Packet, ImportantPacket{
         public KickReason reason;
 
         @Override

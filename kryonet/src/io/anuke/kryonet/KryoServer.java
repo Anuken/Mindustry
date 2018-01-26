@@ -23,7 +23,6 @@ import io.anuke.mindustry.net.Streamable;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamChunk;
 import io.anuke.ucore.UCore;
-import io.anuke.ucore.core.Timers;
 import org.java_websocket.WebSocket;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.handshake.ClientHandshake;
@@ -125,7 +124,6 @@ public class KryoServer implements ServerProvider {
         p.reason = reason;
 
         con.send(p, SendMode.tcp);
-        Timers.runTask(1f, con::close);
     }
 
     @Override

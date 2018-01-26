@@ -257,6 +257,7 @@ public class BlockRenderer{
 		for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
 			for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
 				Tile tile = world.tile(tilex, tiley);
+				if(tile == null) continue;
 				if(floor){
 					if(!(tile.block() instanceof StaticBlock)){
 						tile.floor().draw(tile);

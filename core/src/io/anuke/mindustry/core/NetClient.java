@@ -291,6 +291,7 @@ public class NetClient extends Module {
             Net.disconnect();
             GameState.set(State.menu);
             Vars.ui.showError("$text.server.kicked." + packet.reason.name());
+            Vars.ui.loadfrag.hide();
         });
 
         Net.handle(WeaponSwitchPacket.class, packet -> {

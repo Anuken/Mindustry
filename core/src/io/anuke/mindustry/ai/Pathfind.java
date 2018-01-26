@@ -122,6 +122,10 @@ public class Pathfind{
 
 		//go through each spawnpoint, and if it's not found a path yet, update it
 		for(SpawnPoint point : Vars.control.getSpawnPoints()){
+			if(point.request == null){
+				resetPathFor(point);
+			}
+
 			if(!point.request.pathFound){
 				try{
 					if(point.finder.search(point.request, maxTime)){
@@ -161,15 +165,19 @@ public class Pathfind{
 	/**Reset and clear the paths.*/
 	public void resetPaths(){
 		for(SpawnPoint point : Vars.control.getSpawnPoints()){
-			point.finder = new OptimizedPathFinder<>(graph);
-			
-			point.path.clear();
-			
-			point.pathTiles = null;
-			
-			point.request = new PathFinderRequest<>(point.start, Vars.control.getCore(), Vars.control.getDifficulty().heuristic, point.path);
-			point.request.statusChanged = true; //IMPORTANT!
+			resetPathFor(point);
 		}
+	}
+
+	private void resetPathFor(SpawnPoint point){
+		point.finder = new OptimizedPathFinder<>(graph);
+
+		point.path.clear();
+
+		point.pathTiles = null;
+
+		point.request = new PathFinderRequest<>(point.start, Vars.control.getCore(), Vars.control.getDifficulty().heuristic, point.path);
+		point.request.statusChanged = true; //IMPORTANT!
 	}
 
 	/**For an enemy that was just loaded from a save, find the node in the path it should be following.*/

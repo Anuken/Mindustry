@@ -15,12 +15,10 @@ import io.anuke.mindustry.world.WorldGenerator;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.mindustry.world.blocks.types.Rock;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 
 import java.io.*;
-import java.nio.ByteBuffer;
 
 public class NetworkIO {
 

@@ -6,8 +6,7 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
 import io.anuke.mindustry.Mindustry;
-import io.anuke.mindustry.net.Packets.Connect;
-import io.anuke.mindustry.net.Packets.Disconnect;
+import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamBuilder;
@@ -20,7 +19,7 @@ import io.anuke.ucore.function.Consumer;
 import java.io.IOException;
 
 public class Net{
-	public static final int version = 12;
+	public static final int version = 13;
 
 	private static boolean server;
 	private static boolean active;
@@ -152,7 +151,7 @@ public class Net{
 				handleClientReceived(builder.build());
 			}
 		}else if(clientListeners.get(object.getClass()) != null){
-			if(clientLoaded || object instanceof Connect || object instanceof Disconnect || object instanceof Streamable){
+			if(clientLoaded || object instanceof ImportantPacket){
 				clientListeners.get(object.getClass()).accept(object);
 			}else{
 				UCore.log("Recieved " + object, "but ignoring data, as client is not loaded.");

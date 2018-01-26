@@ -2,13 +2,14 @@ package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import io.anuke.mindustry.net.Packet.ImportantPacket;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public class Streamable{
+public class Streamable implements ImportantPacket{
     public transient ByteArrayInputStream stream;
 
     /**Marks the beginning of a stream.*/
