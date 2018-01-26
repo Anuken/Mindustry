@@ -22,7 +22,7 @@ allprojects {
         appName = "Mindustry"
         gdxVersion = '1.9.8'
         aiVersion = '1.8.1'
-        uCoreVersion = 'd5ca764';
+        uCoreVersion = 'd5ca764'
     }
 
     repositories {
@@ -90,12 +90,12 @@ project(":core") {
     apply plugin: "java"
 
     dependencies {
-        boolean comp = System.properties["release"] == null || System.properties["release"].equals("false");
+        boolean comp = System.properties["release"] == null || System.properties["release"].equals("false")
 
         if(!comp){
             println("NOTICE: Compiling release build.")
         }else{
-            println("Compiling DEBUG build.");
+            println("Compiling DEBUG build.")
         }
 
         if(new File('../uCore').exists() && comp){

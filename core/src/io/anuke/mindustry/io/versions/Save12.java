@@ -261,7 +261,7 @@ public class Save12 extends SaveFileVersion {
 
                     if(tile.entity != null){
                         stream.writeByte(tile.getRotation()); //rotation
-                        stream.writeInt(tile.entity.health); //health
+                        stream.writeInt((int)tile.entity.health); //health
                         int amount = 0;
                         for(int i = 0; i < tile.entity.items.length; i ++){
                             if(tile.entity.items[i] > 0) amount ++;

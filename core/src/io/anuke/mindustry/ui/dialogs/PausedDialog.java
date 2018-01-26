@@ -26,6 +26,12 @@ public class PausedDialog extends FloatingDialog{
 	}
 
 	void setup(){
+		update(() -> {
+			if(GameState.is(State.menu) && isShown()){
+				hide();
+			}
+		});
+
 		shown(() -> {
 			wasPaused = GameState.is(State.paused);
 			if(!Net.active()) GameState.set(State.paused);
@@ -36,7 +42,7 @@ public class PausedDialog extends FloatingDialog{
 
 			content().addButton("$text.back", () -> {
 				hide();
-				if(!wasPaused || Net.active())
+				if((!wasPaused || Net.active()) && !GameState.is(State.menu))
 					GameState.set(State.playing);
 			});
 
@@ -46,7 +52,7 @@ public class PausedDialog extends FloatingDialog{
 			content().row();
 			content().addButton("$text.savegame", () -> {
 				save.show();
-			});
+			}).disabled(b -> Vars.world.getMap().id == -1);
 
 			content().row();
 			content().addButton("$text.loadgame", () -> {
@@ -81,13 +87,15 @@ public class PausedDialog extends FloatingDialog{
 			
 			new imagebutton("icon-play-2", isize, () -> {
 				hide();
-				if(!wasPaused)
+				if(!wasPaused && !GameState.is(State.menu))
 					GameState.set(State.playing);
 			}).text("$text.back").padTop(4f);
 			
 			new imagebutton("icon-tools", isize, ui.settings::show).text("$text.settings").padTop(4f);
 			
-			new imagebutton("icon-save", isize, save::show).text("$text.save").padTop(4f);
+			imagebutton sa = new imagebutton("icon-save", isize, save::show);
+			sa.text("$text.save").padTop(4f);
+			sa.cell.disabled(b -> Vars.world.getMap().id == -1);
 
 			content().row();
 			

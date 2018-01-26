@@ -223,10 +223,10 @@ public class HudFragment implements Fragment{
 	}
 	
 	private void playButton(float uheight){
-		new imagebutton("icon-play", 30f, ()->{
+		new imagebutton("icon-play", 30f, () -> {
 			Vars.control.runWave();
 		}).height(uheight).fillX().right().padTop(-8f).padBottom(-12f).padRight(-36).width(40f).update(l->{
-			boolean vis = Vars.control.getMode().toggleWaves && Vars.control.getEnemiesRemaining() <= 0 && (Net.server() || !Net.active());
+			boolean vis = Vars.control.getEnemiesRemaining() <= 0 && (Net.server() || !Net.active());
 			boolean paused = GameState.is(State.paused) || !vis;
 			
 			l.setVisible(vis);

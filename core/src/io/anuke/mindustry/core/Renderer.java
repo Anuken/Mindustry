@@ -391,7 +391,7 @@ public class Renderer extends RendererModule{
 					target = tile.getLinked();
 
 				if(target.entity != null)
-					drawHealth(target.drawx(), target.drawy() - 3f - target.block().height / 2f * Vars.tilesize, target.entity.health, target.entity.maxhealth);
+					drawHealth(target.drawx(), target.drawy() - 3f - target.block().height / 2f * Vars.tilesize, target.entity.health, target.entity.tile.block().health);
 
 				target.block().drawSelect(target);
 			}

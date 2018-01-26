@@ -174,7 +174,7 @@ public class NetworkIO {
 
                         if(tile.entity != null){
                             stream.writeShort(tile.getPackedData());
-                            stream.writeShort(tile.entity.health); //health
+                            stream.writeShort((short)tile.entity.health); //health
 
                             //items
                             for(int i = 0; i < tile.entity.items.length; i ++){

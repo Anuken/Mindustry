@@ -293,7 +293,7 @@ public class NetServer extends Module{
 
     public void handleBlockDamaged(TileEntity entity){
         BlockUpdatePacket packet = new BlockUpdatePacket();
-        packet.health = entity.health;
+        packet.health = (int)entity.health;
         packet.position = entity.tile.packedPosition();
         Net.send(packet, SendMode.udp);
     }

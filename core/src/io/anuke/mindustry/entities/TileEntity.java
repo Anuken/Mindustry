@@ -20,10 +20,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class TileEntity extends Entity{
+	private static final boolean friendlyFire = false;
+
 	public Tile tile;
 	public int[] items = new int[Item.getAllItems().size];
 	public Timer timer;
-	public int maxhealth, health;
+	public float health;
 	public boolean dead = false;
 	public boolean added;
 	
@@ -33,9 +35,8 @@ public class TileEntity extends Entity{
 		this.added = added;
 		x = tile.worldx();
 		y = tile.worldy();
-		
-		maxhealth = tile.block().health;
-		health = maxhealth;
+
+		health = tile.block().health;
 		
 		timer = new Timer(tile.block().timers);
 		
@@ -101,13 +102,13 @@ public class TileEntity extends Entity{
 	}
 	
 	public boolean collide(Bullet other){
-		return other.owner instanceof Enemy;
+		return other.owner instanceof Enemy || friendlyFire;
 	}
 	
 	@Override
 	public void update(){
 		if(health != 0 && health < tile.block().health && !(tile.block() instanceof Wall) &&
-				Mathf.chance(0.009f*Timers.delta()*(1f-(float)health/maxhealth))){
+				Mathf.chance(0.009f*Timers.delta()*(1f-health/tile.block().health))){
 			
 			Effects.effect(Fx.smoke, x+Mathf.range(4), y+Mathf.range(4));
 		}

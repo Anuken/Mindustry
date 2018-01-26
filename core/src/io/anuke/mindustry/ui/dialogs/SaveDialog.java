@@ -1,8 +1,9 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.utils.reflect.ClassReflection;
-
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.GameState;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.Saves.SaveSlot;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.TextButton;
@@ -12,6 +13,12 @@ public class SaveDialog extends LoadDialog{
 
 	public SaveDialog() {
 		super("$text.savegame");
+
+		update(() -> {
+			if(GameState.is(State.menu) && isShown()){
+				hide();
+			}
+		});
 	}
 
 	public void addSetup(){

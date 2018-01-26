@@ -319,7 +319,7 @@ public class Save14 extends SaveFileVersion{
 
                     if(tile.entity != null){
                         stream.writeByte(tile.getRotation()); //rotation
-                        stream.writeShort(tile.entity.health); //health
+                        stream.writeShort((short)tile.entity.health); //health
                         byte amount = 0;
                         for(int i = 0; i < tile.entity.items.length; i ++){
                             if(tile.entity.items[i] > 0) amount ++;
