@@ -78,8 +78,8 @@ public class Net{
 	}
 
 	/**Returns a list of all connections IDs.*/
-	public static Array<? extends NetConnection> getConnections(){
-		return serverProvider.getConnections();
+	public static Array<NetConnection> getConnections(){
+		return (Array<NetConnection>)serverProvider.getConnections();
 	}
 	
 	/**Send an object to all connected clients, or to the server if this is a client.*/

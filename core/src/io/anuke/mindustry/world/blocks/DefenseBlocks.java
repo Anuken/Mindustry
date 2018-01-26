@@ -50,7 +50,7 @@ public class DefenseBlocks{
 	repairturret = new RepairTurret("repairturret"){
 		{
 			range = 30;
-			reload = 25f;
+			reload = 20f;
 			health = 60;
 			powerUsed = 0.08f;
 		}

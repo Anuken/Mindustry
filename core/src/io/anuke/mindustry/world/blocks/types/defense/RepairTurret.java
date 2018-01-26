@@ -15,7 +15,7 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 public class RepairTurret extends PowerTurret{
-	float repairPercent = 1f / 150f;
+	protected float repairFrac = 1f / 135f;
 
 	public RepairTurret(String name) {
 		super(name);
@@ -59,7 +59,7 @@ public class RepairTurret extends PowerTurret{
 			int maxhealth = entity.blockTarget.tile.block().health;
 
 			if(entity.timer.get(timerReload, reload) && Angles.angleDist(target, entity.rotation) < shootCone){
-				entity.blockTarget.health += maxhealth * repairPercent;
+				entity.blockTarget.health += maxhealth * repairFrac;
 				
 				if(entity.blockTarget.health > maxhealth)
 					entity.blockTarget.health = maxhealth;

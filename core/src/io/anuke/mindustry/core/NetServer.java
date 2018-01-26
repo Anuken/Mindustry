@@ -395,7 +395,7 @@ public class NetServer extends Module{
 
         if(Timers.get("serverBlockSync", blockSyncTime)){
 
-            Array<NetConnection> connections = new Array<>();
+            Array<NetConnection> connections = Net.getConnections();
 
             for(int i = 0; i < connections.size; i ++){
                 int id = connections.get(i).id;
@@ -453,6 +453,7 @@ public class NetServer extends Module{
         }
 
         packet.stream = new ByteArrayInputStream(bs.toByteArray());
+        //UCore.log("Sent block update stream to " + client + " / " + packet.stream.available());
 
         Net.sendStream(client, packet);
     }
