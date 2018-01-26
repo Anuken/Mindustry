@@ -1,8 +1,8 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
@@ -10,9 +10,9 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidBlock;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Strings;
 
 public class LiquidCrafter extends LiquidBlock{
@@ -50,14 +50,16 @@ public class LiquidCrafter extends LiquidBlock{
 	
 	@Override
 	public void draw(Tile tile){
+		Vector2 v = getPlaceOffset();
+
 		LiquidEntity entity = tile.entity();
-		Draw.rect(name(), tile.worldx(), tile.worldy());
+		Draw.rect(name(), tile.worldx() + v.x, tile.worldy() + v.y);
 		
 		if(entity.liquid == null) return;
 		
 		Draw.color(entity.liquid.color);
 		Draw.alpha(entity.liquidAmount / liquidCapacity);
-		Draw.rect("blank", tile.worldx(), tile.worldy(), 2, 2);
+		Draw.rect("blank", tile.worldx() + v.x, tile.worldy() + v.y, 2, 2);
 		Draw.color();
 	}
 	

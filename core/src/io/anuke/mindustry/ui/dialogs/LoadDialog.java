@@ -74,36 +74,25 @@ public class LoadDialog extends FloatingDialog{
 					});
 				}).size(14*3).right();
 
-				t.addImageButton("icon-dots", "empty", 14*3, () -> {
-					FloatingDialog dialog = new FloatingDialog("Save Options");
-					dialog.addCloseButton();
-
-					dialog.content().defaults().left().uniformX().size(230f, 60f);
-
-					dialog.content().addImageTextButton("$text.save.rename", "icon-rename", 14*3, () -> {
-						Vars.ui.showTextInput("$text.save.rename", "$text.save.rename.text", slot.getName(), text -> {
-							slot.setName(text);
-							dialog.hide();
-							setup();
-						});
+				t.addImageButton("icon-pencil-small", "empty", 14*3, () -> {
+					Vars.ui.showTextInput("$text.save.rename", "$text.save.rename.text", slot.getName(), text -> {
+						slot.setName(text);
+						setup();
 					});
+				}).size(14*3).right();
 
-					dialog.content().row();
-
-					dialog.content().addImageTextButton("$text.save.export", "icon-load", 14*3, () -> {
+				if(!Vars.gwt) {
+					t.addImageButton("icon-save", "empty", 14 * 3, () -> {
 						new FileChooser("$text.save.export", false, file -> {
-							try{
+							try {
 								slot.exportFile(file);
 								setup();
-							}catch (IOException e){
+							} catch (IOException e) {
 								Vars.ui.showError(Bundles.format("text.save.export.fail", Strings.parseException(e, false)));
 							}
-							dialog.hide();
 						}).show();
-					});
-
-					dialog.show();
-				}).size(14*3).right();
+					}).size(14 * 3).right();
+				}
 
 			}).padRight(-10).growX();
 

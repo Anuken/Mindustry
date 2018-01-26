@@ -96,6 +96,8 @@ public class Renderer extends RendererModule{
 				Graphics.setCameraScale(targetscale);
 				control.input.resetCursor();
 			}
+		}else{
+			camera.zoom = Mathf.lerp(camera.zoom, 1f, 0.2f * Timers.delta());
 		}
 
 		if(GameState.is(State.menu)){

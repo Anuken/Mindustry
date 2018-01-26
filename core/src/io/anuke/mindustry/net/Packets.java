@@ -398,7 +398,7 @@ public class Packets {
     }
 
     public enum KickReason{
-        kick, invalidPassword, outdated
+        kick, invalidPassword, clientOutdated, serverOutdated
     }
 
     public static class UpgradePacket implements Packet{
