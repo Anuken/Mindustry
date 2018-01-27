@@ -104,7 +104,6 @@ public class Block{
 	public void drawLayer2(Tile tile){}
 	public void drawSelect(Tile tile){}
 	public void drawPlace(int x, int y, int rotation, boolean valid){}
-	public void postInit(){}
 	public void placed(Tile tile){}
 
 	public void tapped(Tile tile){}

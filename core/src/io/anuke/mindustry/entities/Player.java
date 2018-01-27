@@ -38,7 +38,7 @@ public class Player extends SyncEntity{
 	
 	public Player(){
 		hitbox.setSize(5);
-		hitboxTile.setSize(4f);
+		hitboxTile.setSize(5f);
 		
 		maxhealth = 200;
 		heal();
@@ -144,8 +144,9 @@ public class Player extends SyncEntity{
 
 		Tile tile = world.tileWorld(x, y);
 
-		if(tile != null && tile.floor().liquid && tile.block() == Blocks.air){
-			damage(health+1); //drown
+		//if player is in solid block
+		if(tile != null && ((tile.floor().liquid && tile.block() == Blocks.air) || tile.solid())){
+			damage(health+1); //die instantly
 		}
 		
 		vector.set(0, 0);

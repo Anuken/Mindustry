@@ -78,6 +78,7 @@ public class Vars{
 	public static final int webPort = 6568;
 	
 	public static Control control;
+	public static Logic logic;
 	public static Renderer renderer;
 	public static UI ui;
 	public static World world;

@@ -33,6 +33,7 @@ public class Mindustry extends ModuleCore {
 
 		module(Vars.world = new World());
 		module(Vars.control = new Control());
+		module(Vars.logic = new Logic());
 		module(Vars.renderer = new Renderer());
 		module(Vars.ui = new UI());
 		module(Vars.netServer = new NetServer());

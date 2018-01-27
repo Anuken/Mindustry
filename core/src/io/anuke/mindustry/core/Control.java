@@ -92,10 +92,6 @@ public class Control extends Module{
 		
 		log("Total blocks loaded: " + Block.getAllBlocks().size);
 		
-		for(Block block : Block.getAllBlocks()){
-			block.postInit();
-		}
-		
 		Lines.setCircleVertices(14);
 		
 		Gdx.input.setCatchBackKey(true);
@@ -429,7 +425,7 @@ public class Control extends Module{
 	}
 	
 	float waveSpacing(){
-		return wavespace*getDifficulty().timeScaling;
+		return wavespace * getDifficulty().timeScaling;
 	}
 
 	public Difficulty getDifficulty(){
@@ -478,7 +474,7 @@ public class Control extends Module{
 		}
 	}
 	
-	public  int getAmount(Item item){
+	public int getAmount(Item item){
 		return items[item.id];
 	}
 	
