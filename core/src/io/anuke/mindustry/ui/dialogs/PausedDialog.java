@@ -34,7 +34,7 @@ public class PausedDialog extends FloatingDialog{
 
 		shown(() -> {
 			wasPaused = GameState.is(State.paused);
-			if(!Net.active()) GameState.set(State.paused);
+			if(!Net.active()) state.set(State.paused);
 		});
 		
 		if(!Vars.android){
@@ -43,7 +43,7 @@ public class PausedDialog extends FloatingDialog{
 			content().addButton("$text.back", () -> {
 				hide();
 				if((!wasPaused || Net.active()) && !GameState.is(State.menu))
-					GameState.set(State.playing);
+					state.set(State.playing);
 			});
 
 			content().row();
@@ -88,7 +88,7 @@ public class PausedDialog extends FloatingDialog{
 			new imagebutton("icon-play-2", isize, () -> {
 				hide();
 				if(!wasPaused && !GameState.is(State.menu))
-					GameState.set(State.playing);
+					state.set(State.playing);
 			}).text("$text.back").padTop(4f);
 			
 			new imagebutton("icon-tools", isize, ui.settings::show).text("$text.settings").padTop(4f);
@@ -130,7 +130,7 @@ public class PausedDialog extends FloatingDialog{
 	private void runExitSave(){
 		if(Vars.control.getSaves().getCurrent() == null ||
 				!Vars.control.getSaves().getCurrent().isAutosave()){
-			GameState.set(State.menu);
+			state.set(State.menu);
 			Vars.control.getTutorial().reset();
 			return;
 		}
@@ -145,7 +145,7 @@ public class PausedDialog extends FloatingDialog{
 				e = (e.getCause() == null ? e : e.getCause());
 				Vars.ui.showError("[orange]"+ Bundles.get("text.savefail")+"\n[white]" + ClassReflection.getSimpleName(e.getClass()) + ": " + e.getMessage() + "\n" + "at " + e.getStackTrace()[0].getFileName() + ":" + e.getStackTrace()[0].getLineNumber());
 			}
-			GameState.set(State.menu);
+			state.set(State.menu);
 		});
 	}
 }

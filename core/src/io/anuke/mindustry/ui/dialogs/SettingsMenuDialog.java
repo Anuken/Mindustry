@@ -35,7 +35,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 		hidden(()->{
 			if(!GameState.is(State.menu)){
 				if(!wasPaused || Net.active())
-					GameState.set(State.playing);
+					state.set(State.playing);
 			}
 		});
 
@@ -45,7 +45,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 				if(menu.getScene() != null){
 					wasPaused = ((PausedDialog)menu).wasPaused;
 				}
-				if(!Net.active()) GameState.set(State.paused);
+				if(!Net.active()) state.set(State.paused);
 				Vars.ui.paused.hide();
 			}
 		});

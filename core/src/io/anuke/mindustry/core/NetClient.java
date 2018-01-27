@@ -48,6 +48,7 @@ public class NetClient extends Module {
     boolean gotData = false;
     boolean kicked = false;
     IntSet recieved = new IntSet();
+    IntSet dead = new IntSet();
     float playerSyncTime = 2;
     float dataTimeout = 60*18; //18 seconds timeout
 
@@ -56,6 +57,7 @@ public class NetClient extends Module {
         Net.handle(Connect.class, packet -> {
             Net.setClientLoaded(false);
             recieved.clear();
+            dead.clear();
             connecting = true;
             gotData = false;
             kicked = false;
@@ -84,7 +86,7 @@ public class NetClient extends Module {
 
             Timers.runFor(3f, Vars.ui.loadfrag::hide);
 
-            GameState.set(State.menu);
+            state.set(State.menu);
 
             Vars.ui.showError("$text.disconnect");
             connecting = false;
@@ -174,7 +176,7 @@ public class NetClient extends Module {
         Net.handle(EnemySpawnPacket.class, spawn -> {
             //duplicates.
             if (Vars.control.enemyGroup.getByID(spawn.id) != null ||
-                    recieved.contains(spawn.id)) return;
+                    recieved.contains(spawn.id) || dead.contains(spawn.id)) return;
 
             recieved.add(spawn.id);
 
@@ -192,6 +194,7 @@ public class NetClient extends Module {
         Net.handle(EnemyDeathPacket.class, spawn -> {
             Enemy enemy = Vars.control.enemyGroup.getByID(spawn.id);
             if (enemy != null) enemy.onDeath();
+            dead.add(spawn.id);
         });
 
         Net.handle(BulletPacket.class, packet -> {
@@ -289,7 +292,7 @@ public class NetClient extends Module {
         Net.handle(KickPacket.class, packet -> {
             kicked = true;
             Net.disconnect();
-            GameState.set(State.menu);
+            state.set(State.menu);
             Vars.ui.showError("$text.server.kicked." + packet.reason.name());
             Vars.ui.loadfrag.hide();
         });
@@ -341,7 +344,7 @@ public class NetClient extends Module {
 
     private void finishConnecting(){
         Net.send(new ConnectConfirmPacket(), SendMode.tcp);
-        GameState.set(State.playing);
+        state.set(State.playing);
         Net.setClientLoaded(true);
         connecting = false;
         Vars.ui.loadfrag.hide();

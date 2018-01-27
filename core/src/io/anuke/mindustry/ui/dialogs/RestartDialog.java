@@ -24,7 +24,7 @@ public class RestartDialog extends Dialog {
 
         getButtonTable().addButton("$text.menu", ()-> {
             hide();
-            GameState.set(State.menu);
+            state.set(State.menu);
             control.reset();
         }).size(130f, 60f);
     }

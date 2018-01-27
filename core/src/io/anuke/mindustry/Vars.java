@@ -3,10 +3,15 @@ package io.anuke.mindustry;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-
 import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.effect.Shield;
+import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.ucore.UCore;
+import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class Vars{
@@ -76,7 +81,9 @@ public class Vars{
 	//server port
 	public static final int port = 6567;
 	public static final int webPort = 6568;
-	
+
+	public static final GameState state = new GameState();
+
 	public static Control control;
 	public static Logic logic;
 	public static Renderer renderer;
@@ -86,4 +93,10 @@ public class Vars{
 	public static NetClient netClient;
 	
 	public static Player player;
+
+	public static final EntityGroup<Player> playerGroup = Entities.addGroup(Player.class).enableMapping();
+	public static final EntityGroup<Enemy> enemyGroup = Entities.addGroup(Enemy.class).enableMapping();
+	public static final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);
+	public static final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
+	public static final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class);
 }

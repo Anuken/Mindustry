@@ -3,50 +3,33 @@ package io.anuke.mindustry.core;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Bullet;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.effect.Shield;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.EventType.GameOver;
+import io.anuke.mindustry.game.EventType.PlayEvent;
+import io.anuke.mindustry.game.EventType.ResetEvent;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
 
-import java.util.Arrays;
-
 import static io.anuke.mindustry.Vars.*;
 
+/**Logic module.
+ * Handles all logic for entities and waves.
+ * Handles game state events.
+ * Does not store any game state itself.
+ *
+ * This class should <i>not</i> call any outside methods to change state of modules, but instead fire events.
+ */
 public class Logic extends Module {
-    public final EntityGroup<Player> playerGroup = Entities.addGroup(Player.class).enableMapping();
-    public final EntityGroup<Enemy> enemyGroup = Entities.addGroup(Enemy.class).enableMapping();
-    public final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);
-    public final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
-    public final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class);
-
-    public final int[] items = new int[Item.getAllItems().size];
-
-    Array<EnemySpawn> spawns = WaveCreator.getSpawns();
-    int wave = 1;
-    int lastUpdated = -1;
-    float wavetime;
-    float extrawavetime;
-    int enemies = 0;
-    GameMode mode = GameMode.waves;
-    Difficulty difficulty = Difficulty.normal;
-    boolean friendlyFire;
-
-    Tile core;
-    Array<SpawnPoint> spawnpoints = new Array<>();
+    private final Array<EnemySpawn> spawns = WaveCreator.getSpawns();
 
     @Override
     public void init(){
@@ -55,44 +38,43 @@ public class Logic extends Module {
     }
 
     public void play(){
-        wavetime = wavespace * difficulty.timeScaling * 2;
+        state.wavetime = wavespace * state.difficulty.timeScaling * 2;
 
-        if(mode.infiniteResources){
-            Arrays.fill(items, 999999999);
+        if(state.mode.infiniteResources){
+            state.inventory.fill();
         }
+
+        Events.fire(PlayEvent.class);
     }
 
     public void reset(){
-        lastUpdated = -1;
-        wave = 1;
-        extrawavetime = maxwavespace;
-        wavetime = wavespace * difficulty.timeScaling;
-        enemies = 0;
+        state.wave = 1;
+        state.extrawavetime = maxwavespace;
+        state.wavetime = wavespace * state.difficulty.timeScaling;
+        state.enemies = 0;
+        state.lastUpdated = -1;
+        state.gameOver = false;
+        state.inventory.clearItems();
+
         Entities.clear();
 
-        Arrays.fill(items, 0);
-        spawnpoints.clear();
-
-        for(Block block : Block.getAllBlocks()){
-            block.onReset();
-        }
-
-        ui.hudfrag.updateItems();
-        ui.hudfrag.updateWeapons();
+        Events.fire(ResetEvent.class);
     }
 
     public void runWave(){
 
-        if(lastUpdated < wave + 1){
+        if(state.lastUpdated < state.wave + 1){
             world.pathfinder().resetPaths();
-            lastUpdated = wave + 1;
+            state.lastUpdated = state.wave + 1;
         }
 
         for(EnemySpawn spawn : spawns){
-            for(int lane = 0; lane < spawnpoints.size; lane ++){
+            Array<SpawnPoint> spawns = world.getSpawns();
+
+            for(int lane = 0; lane < spawns.size; lane ++){
                 int fl = lane;
-                Tile tile = spawnpoints.get(lane).start;
-                int spawnamount = spawn.evaluate(wave, lane);
+                Tile tile = spawns.get(lane).start;
+                int spawnamount = spawn.evaluate(state.wave, lane);
 
                 for(int i = 0; i < spawnamount; i ++){
                     float range = 12f;
@@ -102,51 +84,47 @@ public class Logic extends Module {
                         Enemy enemy = new Enemy(spawn.type);
                         enemy.set(tile.worldx() + Mathf.range(range), tile.worldy() + Mathf.range(range));
                         enemy.lane = fl;
-                        enemy.tier = spawn.tier(wave, fl);
+                        enemy.tier = spawn.tier(state.wave, fl);
                         enemy.add();
 
                         Effects.effect(Fx.spawn, enemy);
 
-                        enemies ++;
+                        state.enemies ++;
                     });
                 }
             }
         }
 
-        wave ++;
-
-        wavetime = wavespace * difficulty.timeScaling;
-        extrawavetime = maxwavespace;
-    }
-
-    public void coreDestroyed(){
-        if(Net.active() && Net.server()) netServer.handleGameOver();
+        state.wave ++;
+        state.wavetime = wavespace * state.difficulty.timeScaling;
+        state.extrawavetime = maxwavespace;
     }
 
     public void updateLogic(){
-        if(!GameState.is(State.menu)){
+        if(!state.is(State.menu)){
 
-            if(core.block() != ProductionBlocks.core && !ui.restart.isShown()){
-                coreDestroyed();
+            if(world.getCore().block() != ProductionBlocks.core && !state.gameOver){
+                state.gameOver = true;
+                Events.fire(GameOver.class);
             }
 
-            if(!GameState.is(State.paused) || Net.active()){
+            if(!state.is(State.paused) || Net.active()){
 
-                if(!mode.toggleWaves){
+                if(!state.mode.toggleWaves){
 
-                    if(enemies <= 0){
-                        wavetime -= delta();
+                    if(state.enemies <= 0){
+                        state.wavetime -= delta();
 
-                        if(lastUpdated < wave + 1 && wavetime < Vars.aheadPathfinding){ //start updating beforehand
+                        if(state.lastUpdated < state.wave + 1 && state.wavetime < Vars.aheadPathfinding){ //start updating beforehand
                             world.pathfinder().resetPaths();
-                            lastUpdated = wave + 1;
+                            state.lastUpdated = state.wave + 1;
                         }
                     }else{
-                        extrawavetime -= delta();
+                        state.extrawavetime -= delta();
                     }
                 }
 
-                if(wavetime <= 0 || extrawavetime <= 0){
+                if(state.wavetime <= 0 || state.extrawavetime <= 0){
                     runWave();
                 }
 

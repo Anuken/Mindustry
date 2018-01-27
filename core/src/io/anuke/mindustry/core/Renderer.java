@@ -53,6 +53,8 @@ public class Renderer extends RendererModule{
 	private BlockRenderer blocks = new BlockRenderer();
 
 	public Renderer() {
+		Lines.setCircleVertices(14);
+
 		Core.cameraScale = baseCameraScale;
 		Effects.setEffectProvider((name, color, x, y, rotation) -> {
 			if(Settings.getBool("effects")){
@@ -353,7 +355,7 @@ public class Renderer extends RendererModule{
 			tiley = Mathf.scl2(vec.y, tilesize);
 		}
 
-		InputHandler input = control.getInput();
+		InputHandler input = control.input();
 
 		//draw placement box
 		if((input.recipe != null && Vars.control.hasItems(input.recipe.requirements) && (!ui.hasMouse() || android)

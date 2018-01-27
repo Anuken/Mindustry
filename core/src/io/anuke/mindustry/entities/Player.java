@@ -54,7 +54,7 @@ public class Player extends SyncEntity{
 	public boolean collides(SolidEntity other){
 		if(other instanceof Bullet){
 			Bullet b = (Bullet)other;
-			if(!Vars.control.isFriendlyFire() && b.owner instanceof Player){
+			if(!Vars.logic.friendlyFire && b.owner instanceof Player){
 				return false;
 			}
 		}
@@ -91,7 +91,7 @@ public class Player extends SyncEntity{
 		set(-9999, -9999);
 		Timers.run(respawnduration, () -> {
 			heal();
-			set(Vars.control.getCore().worldx(), Vars.control.getCore().worldy());
+			set(logic.getSpawnX(), logic.getSpawnY());
 		});
 	}
 	
@@ -159,8 +159,8 @@ public class Player extends SyncEntity{
 		vector.y += ya*speed;
 		vector.x += xa*speed;
 		
-		boolean shooting = !Inputs.keyDown("dash") && Inputs.keyDown("shoot") && control.getInput().recipe == null
-				&& !ui.hasMouse() && !control.getInput().onConfigurable();
+		boolean shooting = !Inputs.keyDown("dash") && Inputs.keyDown("shoot") && control.input().recipe == null
+				&& !ui.hasMouse() && !control.input().onConfigurable();
 		
 		if(shooting){
 			weaponLeft.update(player, true);

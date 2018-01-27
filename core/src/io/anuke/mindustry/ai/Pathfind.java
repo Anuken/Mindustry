@@ -122,7 +122,7 @@ public class Pathfind{
 
 		//go through each spawnpoint, and if it's not found a path yet, update it
 		for(SpawnPoint point : Vars.control.getSpawnPoints()){
-			if(point.request == null){
+			if(point.request == null || point.finder == null){
 				resetPathFor(point);
 			}
 
@@ -150,13 +150,13 @@ public class Pathfind{
 
 		//warmup
 		for(int i = 0; i < 100; i ++){
-			point.finder.searchNodePath(point.start, Vars.control.getCore(), Vars.control.getDifficulty().heuristic, point.path);
+			point.finder.searchNodePath(point.start, Vars.world.getCore(), Vars.control.getDifficulty().heuristic, point.path);
 			point.path.clear();
 		}
 
 		Timers.mark();
 		for(int i = 0; i < amount; i ++){
-			point.finder.searchNodePath(point.start, Vars.control.getCore(), Vars.control.getDifficulty().heuristic, point.path);
+			point.finder.searchNodePath(point.start, Vars.world.getCore(), Vars.control.getDifficulty().heuristic, point.path);
 			point.path.clear();
 		}
 		UCore.log("Time elapsed: " + Timers.elapsed() + "ms\nAverage MS per path: " + Timers.elapsed()/amount);
@@ -176,7 +176,7 @@ public class Pathfind{
 
 		point.pathTiles = null;
 
-		point.request = new PathFinderRequest<>(point.start, Vars.control.getCore(), Vars.control.getDifficulty().heuristic, point.path);
+		point.request = new PathFinderRequest<>(point.start, Vars.world.getCore(), Vars.control.getDifficulty().heuristic, point.path);
 		point.request.statusChanged = true; //IMPORTANT!
 	}
 

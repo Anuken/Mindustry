@@ -20,7 +20,7 @@ public class ToolFragment implements Fragment{
 	public boolean confirming;
 	
 	public void build(){
-		InputHandler input = control.getInput();
+		InputHandler input = control.input();
 		
 		float isize = 14*3;
 		
@@ -44,7 +44,7 @@ public class ToolFragment implements Fragment{
 				input.placeMode.released(px, py, px2, py2);
 				confirming = false;
 			}else{
-				input.placeMode.tapped(control.getInput().getBlockX(), control.getInput().getBlockY());
+				input.placeMode.tapped(control.input().getBlockX(), control.input().getBlockY());
 			}
 		});
 		
@@ -61,8 +61,8 @@ public class ToolFragment implements Fragment{
 				tools.setPosition(v.x, v.y, Align.top);
 
 			}else{
-				tools.setPosition(control.getInput().getCursorX(),
-						Gdx.graphics.getHeight() - control.getInput().getCursorY() - 15*Core.cameraScale, Align.top);
+				tools.setPosition(control.input().getCursorX(),
+						Gdx.graphics.getHeight() - control.input().getCursorY() - 15*Core.cameraScale, Align.top);
 			}
 
 			if(input.placeMode != PlaceMode.areaDelete){

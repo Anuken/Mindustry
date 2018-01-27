@@ -32,7 +32,7 @@ public class PlacementFragment implements Fragment{
 	public void build(){
 		if(!Vars.android) return;
 
-		InputHandler input = control.getInput();
+		InputHandler input = control.input();
 
 		float s = 50f;
 		float translation = Unit.dp.scl(54f);
@@ -130,7 +130,7 @@ public class PlacementFragment implements Fragment{
 							defaults().padBottom(-5.5f);
 
 							new imagebutton("icon-" + mode.name(), "toggle", 10 * 3, () -> {
-								control.getInput().resetCursor();
+								control.input().resetCursor();
 								input.breakMode = mode;
 								input.lastBreakMode = mode;
 								if (!mode.both){
@@ -174,7 +174,7 @@ public class PlacementFragment implements Fragment{
 							if (!mode.shown || mode.delete) continue;
 
 							new imagebutton("icon-" + mode.name(), "toggle", 10 * 3, () -> {
-								control.getInput().resetCursor();
+								control.input().resetCursor();
 								input.placeMode = mode;
 								input.lastPlaceMode = mode;
 								modeText(Bundles.format("text.mode.place", mode.toString()));

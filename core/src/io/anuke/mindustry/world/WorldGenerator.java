@@ -2,13 +2,13 @@ package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState;
-import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyTypes;
+import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.world.ColorMapper.BlockPair;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.SpecialBlocks;
@@ -24,11 +24,11 @@ public class WorldGenerator {
 		put(Blocks.blackstone, Blocks.blackrock);
 	}};
 	
-	/**Returns world size.*/
-	public static void generate(Pixmap pixmap, Tile[][] tiles){
-		boolean hasenemies = true, hascore = false;
-		
+	/**Returns the core (starting) block. Should fill spawns with the correct spawnpoints.*/
+	public static Tile generate(Pixmap pixmap, Tile[][] tiles, Array<SpawnPoint> spawns){
 		Noise.setSeed(Vars.world.getSeed());
+
+		Tile core = null;
 		
 		for(int x = 0; x < pixmap.getWidth(); x ++){
 			for(int y = 0; y < pixmap.getHeight(); y ++){
@@ -45,12 +45,10 @@ public class WorldGenerator {
 					
 				if(block == SpecialBlocks.playerSpawn){
 					block = Blocks.air;
-					Vars.control.setCore(Vars.world.tile(x, y));
-					hascore = true;
+					core = Vars.world.tile(x, y);
 				}else if(block == SpecialBlocks.enemySpawn){
 					block = Blocks.air;
-					Vars.control.addSpawnPoint(Vars.world.tile(x, y));
-					hasenemies = true;
+					spawns.add(new SpawnPoint(tiles[x][y]));
 				}
 				
 				if(block == Blocks.air && Mathf.chance(0.025) && rocks.containsKey(floor)){
@@ -91,16 +89,8 @@ public class WorldGenerator {
 				tiles[x][y].updateOcclusion();
 			}
 		}
-		
-		if(!hascore){
-			GameState.set(State.menu);
-			Vars.ui.showError("[orange]Invalid map:[] this map has no core!");
-		}
-		
-		if(!hasenemies){
-			GameState.set(State.menu);
-			Vars.ui.showError("[orange]Invalid map:[] this map has no enemy spawnpoints!");
-		}
+
+		return core;
 	}
 	
 	private static IntMap<Block> map(Object...objects){

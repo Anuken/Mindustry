@@ -160,12 +160,12 @@ public class LoadDialog extends FloatingDialog{
 					hide();
 					try{
 						slot.load();
-						GameState.set(State.playing);
+						state.set(State.playing);
 						Vars.ui.paused.hide();
 					}catch(Exception e){
 						UCore.error(e);
 						Vars.ui.paused.hide();
-						GameState.set(State.menu);
+						state.set(State.menu);
 						Vars.control.reset();
 						Vars.ui.showError("$text.save.corrupted");
 					}

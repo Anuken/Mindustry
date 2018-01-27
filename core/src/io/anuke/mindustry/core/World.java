@@ -7,12 +7,13 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.io.Maps;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.WorldGenerator;
 import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.WorldGenerator;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.DistributionBlocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
@@ -23,17 +24,20 @@ import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
-import static io.anuke.mindustry.Vars.control;
 import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class World extends Module{
 	private int seed;
 	
 	private Map currentMap;
 	private Tile[][] tiles;
-	private Tile[] temptiles = new Tile[4];
 	private Pathfind pathfind = new Pathfind();
-	private io.anuke.mindustry.io.Maps maps = new io.anuke.mindustry.io.Maps();
+	private Maps maps = new Maps();
+	private Tile core;
+	private Array<SpawnPoint> spawns = new Array<>();
+
+	private Tile[] temptiles = new Tile[4];
 	
 	public World(){
 		maps.loadMaps();
@@ -50,6 +54,14 @@ public class World extends Module{
 	public void dispose(){
 		maps.dispose();
 	}
+
+	public Array<SpawnPoint> getSpawns(){
+		return spawns;
+	}
+
+	public Tile getCore(){
+		return core;
+	}
 	
 	public Maps maps(){
 		return maps;
@@ -57,6 +69,14 @@ public class World extends Module{
 	
 	public Pathfind pathfinder(){
 		return pathfind;
+	}
+
+	public float getSpawnX(){
+		return core.worldx();
+	}
+
+	public float getSpawnY(){
+		return core.worldy() - Vars.tilesize/2;
 	}
 	
 	public boolean solid(int x, int y){
@@ -175,28 +195,27 @@ public class World extends Module{
 			createTiles();
 		}
 		
-		Vars.control.getSpawnPoints().clear();
+		spawns.clear();
 		
 		Entities.resizeTree(0, 0, map.getWidth() * tilesize, map.getHeight() * tilesize);
 		
 		this.seed = seed;
-		WorldGenerator.generate(map.pixmap, tiles);
 		
-		if(control.getCore() == null) return;
+		core = WorldGenerator.generate(map.pixmap, tiles, spawns);
 
-		control.getInput().placeBlock(control.getCore().x, control.getCore().y, ProductionBlocks.core, 0, false, false);
+		placeBlock(core.x, core.y, ProductionBlocks.core, 0);
 		
 		if(!map.name.equals("tutorial")){
 			setDefaultBlocks();
 		}else{
-			Vars.control.getTutorial().setDefaultBlocks(control.getCore().x, control.getCore().y);
+			Vars.control.getTutorial().setDefaultBlocks(core.x, core.y);
 		}
 		
 		pathfind.resetPaths();
 	}
 	
 	void setDefaultBlocks(){
-		int x = control.getCore().x, y = control.getCore().y;
+		int x = core.x, y = core.y;
 		int flip = Mathf.sign(!currentMap.flipBase);
 		int fr = currentMap.flipBase ? 2 : 0;
 		
@@ -248,6 +267,32 @@ public class World extends Module{
 			}
 		}
 	}
+
+	public void placeBlock(int x, int y, Block result, int rotation){
+		Tile tile = world.tile(x, y);
+
+		//just in case
+		if(tile == null) return;
+
+		tile.setBlock(result, rotation);
+
+		if(result.isMultiblock()){
+			int offsetx = -(result.width-1)/2;
+			int offsety = -(result.height-1)/2;
+
+			for(int dx = 0; dx < result.width; dx ++){
+				for(int dy = 0; dy < result.height; dy ++){
+					int worldx = dx + offsetx + x;
+					int worldy = dy + offsety + y;
+					if(!(worldx == x && worldy == y)){
+						Tile toplace = world.tile(worldx, worldy);
+						if(toplace != null)
+							toplace.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
+					}
+				}
+			}
+		}
+	}
 	
 	public TileEntity findTileTarget(float x, float y, Tile tile, float range, boolean damaged){
 		Entity closest = null;
@@ -282,7 +327,8 @@ public class World extends Module{
 
 		return (TileEntity) closest;
 	}
-	
+
+	/**Raycast, but with world coordinates.*/
 	public GridPoint2 raycastWorld(float x, float y, float x2, float y2){
 		return raycast(Mathf.scl2(x, tilesize), Mathf.scl2(y, tilesize),
 				Mathf.scl2(x2, tilesize), Mathf.scl2(y2, tilesize));
@@ -290,8 +336,7 @@ public class World extends Module{
 	
 	/**
 	 * Input is in block coordinates, not world coordinates.
-	 * @return null if no collisions found, block position otherwise.
-	 */
+	 * @return null if no collisions found, block position otherwise.*/
 	public GridPoint2 raycast(int x0f, int y0f, int x1, int y1){
 		int x0 = x0f;
 		int y0 = y0f;

@@ -88,7 +88,7 @@ public class Enemy extends SyncEntity {
 	
 	@Override
 	public Enemy add(){
-		return add(Vars.control.enemyGroup);
+		return add(Vars.enemyGroup);
 	}
 
 	@Override

@@ -129,7 +129,7 @@ public abstract class InputHandler extends InputAdapter{
 			int rotation = Vars.control.getTutorial().getPlaceRotation();
 			Block block = Vars.control.getTutorial().getPlaceBlock();
 			
-			if(type != block || point.x != x - control.getCore().x || point.y != y - control.getCore().y 
+			if(type != block || point.x != x - world.getCore().x || point.y != y - world.getCore().y
 					|| (rotation != -1 && rotation != this.rotation)){
 				return false;
 			}
@@ -173,7 +173,7 @@ public abstract class InputHandler extends InputAdapter{
 				int rotation = Vars.control.getTutorial().getPlaceRotation();
 				Block block = Vars.control.getTutorial().getPlaceBlock();
 			
-				if(block != Blocks.air || point.x != x - control.getCore().x || point.y != y - control.getCore().y 
+				if(block != Blocks.air || point.x != x - world.getCore().x || point.y != y - world.getCore().y
 						|| (rotation != -1 && rotation != this.rotation)){
 					return false;
 				}

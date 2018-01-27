@@ -82,7 +82,7 @@ public class Bullet extends BulletEntity{
 	
 	@Override
 	public Bullet add(){
-		return super.add(Vars.control.bulletGroup);
+		return super.add(Vars.bulletGroup);
 	}
 
 }

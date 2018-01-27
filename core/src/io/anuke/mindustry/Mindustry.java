@@ -8,6 +8,7 @@ import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.PlatformFunction;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockLoader;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Core;
@@ -15,6 +16,8 @@ import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.modules.ModuleCore;
+
+import static io.anuke.mindustry.Vars.*;
 
 import java.util.Locale;
 
@@ -26,23 +29,26 @@ public class Mindustry extends ModuleCore {
 	
 	@Override
 	public void init(){
+		if(args.contains("-debug", false)) debug = true;
+
 		Settings.defaults("locale", "default");
 		Settings.load("io.anuke.moment");
 		loadBundle();
 		BlockLoader.load();
+		UCore.log("Total blocks loaded: " + Block.getAllBlocks().size);
 
-		module(Vars.world = new World());
-		module(Vars.control = new Control());
-		module(Vars.logic = new Logic());
-		module(Vars.renderer = new Renderer());
-		module(Vars.ui = new UI());
-		module(Vars.netServer = new NetServer());
-		module(Vars.netClient = new NetClient());
+		module(world = new World());
+		module(control = new Control());
+		module(logic = new Logic());
+		module(renderer = new Renderer());
+		module(ui = new UI());
+		module(netServer = new NetServer());
+		module(netClient = new NetClient());
 	}
 
 	@Override
 	public void dispose() {
-		GameState.set(State.menu);
+		state.set(State.menu);
 		platforms.onGameExit();
 		Net.dispose();
 		super.dispose();
@@ -91,7 +97,7 @@ public class Mindustry extends ModuleCore {
 	
 	@Override
 	public void postInit(){
-		Vars.control.reset();
+		control.reset();
 	}
 	
 	@Override

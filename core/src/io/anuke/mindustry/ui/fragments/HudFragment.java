@@ -69,7 +69,7 @@ public class HudFragment implements Fragment{
 						if (Net.active() && Vars.android) {
 							ui.listfrag.visible = !ui.listfrag.visible;
 						} else {
-							GameState.set(GameState.is(State.paused) ? State.playing : State.paused);
+							state.set(GameState.is(State.paused) ? State.playing : State.paused);
 						}
 					}).update(i -> {
 						if (Net.active() && Vars.android) {

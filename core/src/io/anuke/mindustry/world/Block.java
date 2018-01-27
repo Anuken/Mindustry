@@ -127,10 +127,6 @@ public class Block{
 		return name;
 	}
 	
-	public void onReset(){
-		
-	}
-	
 	public boolean isSolidFor(Tile tile){
 		return false;
 	}

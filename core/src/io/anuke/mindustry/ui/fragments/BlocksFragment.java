@@ -33,7 +33,7 @@ public class BlocksFragment implements Fragment{
 	private boolean shown = true;
 	
 	public void build(){
-		InputHandler input = control.getInput();
+		InputHandler input = control.input();
 
 		new table(){{
 			abottom();
@@ -197,7 +197,7 @@ public class BlocksFragment implements Fragment{
     }
 	
 	void updateRecipe(){
-		Recipe recipe = Vars.control.getInput().recipe;
+		Recipe recipe = Vars.control.input().recipe;
 		desctable.clear();
 		desctable.setTouchable(Touchable.enabled);
 		
@@ -229,7 +229,7 @@ public class BlocksFragment implements Fragment{
 				desclabel.setWrap(true);
 				
 				boolean wasPaused = GameState.is(State.paused);
-				GameState.set(State.paused);
+				state.set(State.paused);
 				
 				FloatingDialog d = new FloatingDialog("$text.blocks.blockinfo");
 				Table table = new Table();
@@ -264,7 +264,7 @@ public class BlocksFragment implements Fragment{
 				}
 				
 				d.buttons().addButton("$text.ok", ()->{
-					if(!wasPaused) GameState.set(State.playing);
+					if(!wasPaused) state.set(State.playing);
 					d.hide();
 				}).size(110, 50).pad(10f);
 				

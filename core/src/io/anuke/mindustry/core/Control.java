@@ -1,98 +1,62 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
-import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.effect.Shield;
-import io.anuke.mindustry.entities.enemies.Enemy;
-import io.anuke.mindustry.entities.enemies.EnemyTypes;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.DefaultKeybinds;
+import io.anuke.mindustry.game.EventType.GameOver;
+import io.anuke.mindustry.game.EventType.PlayEvent;
+import io.anuke.mindustry.game.EventType.ResetEvent;
+import io.anuke.mindustry.game.EventType.WaveEvent;
+import io.anuke.mindustry.game.Tutorial;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.io.Saves;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Weapon;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Map;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
-import io.anuke.ucore.core.Inputs.Axis;
 import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Atlas;
-import io.anuke.ucore.util.Input;
 import io.anuke.ucore.util.InputProxy;
 import io.anuke.ucore.util.Mathf;
 
-import java.util.Arrays;
-
 import static io.anuke.mindustry.Vars.*;
 
+/**Control module.
+ * Handles all input, saving, keybinds and keybinds.
+ * Should <i>not</i> handle any game-critical state.
+ * This class is not created in the headless server.
+ */
 public class Control extends Module{
-	Tutorial tutorial = new Tutorial();
-	boolean hiscore = false;
-	
-	final Array<Weapon> weapons = new Array<>();
-	final int[] items = new int[Item.getAllItems().size];
+	private Tutorial tutorial = new Tutorial();
+	private boolean hiscore = false;
 
-	public final EntityGroup<Player> playerGroup = Entities.addGroup(Player.class).enableMapping();
-	public final EntityGroup<Enemy> enemyGroup = Entities.addGroup(Enemy.class).enableMapping();
-	public final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);
-	public final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
-	public final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class);
-	
-	Array<EnemySpawn> spawns;
-	int wave = 1;
-	int lastUpdated = -1;
-	float wavetime;
-	float extrawavetime;
-	int enemies = 0;
-	GameMode mode = GameMode.waves;
-	Difficulty difficulty = Difficulty.normal;
-	
-	Tile core;
-	Array<SpawnPoint> spawnpoints = new Array<>();
-	boolean shouldUpdateItems = false;
-	boolean wasPaused = false;
+	private boolean shouldUpdateItems = false;
+	private boolean wasPaused = false;
 
-	Saves saves;
+	private Saves saves;
 
-	float respawntime;
-	InputHandler input;
-	boolean friendlyFire;
+	private float respawntime;
+	private InputHandler input;
 
     private InputProxy proxy;
     private float controlx, controly;
     private boolean controlling;
 	
 	public Control(){
-		if(Mindustry.args.contains("-debug", false))
-			Vars.debug = true;
 		saves = new Saves();
 
 		Inputs.useControllers(!Vars.gwt);
-		
-		log("Total blocks loaded: " + Block.getAllBlocks().size);
-		
-		Lines.setCircleVertices(14);
 		
 		Gdx.input.setCatchBackKey(true);
 		
@@ -138,55 +102,8 @@ public class Control extends Module{
 		Sounds.setFalloff(9000f);
 		
 		Musics.load("1.ogg", "2.ogg", "3.ogg", "4.ogg");
-		
-		KeyBinds.defaults(
-				"move_x", new Axis(Input.A, Input.D),
-				"move_y", new Axis(Input.S, Input.W),
-				"select", Input.MOUSE_LEFT,
-				"break", Input.MOUSE_RIGHT,
-				"shoot", Input.MOUSE_LEFT,
-				"zoom_hold", Input.CONTROL_LEFT,
-				"zoom", new Axis(Input.SCROLL),
-				"menu", Gdx.app.getType() == ApplicationType.Android ? Input.BACK : Input.ESCAPE,
-				"pause", Input.SPACE,
-				"dash", Input.SHIFT_LEFT,
-				"rotate_alt", new Axis(Input.R, Input.E),
-				"rotate", new Axis(Input.SCROLL),
-				"player_list", Input.TAB,
-				"chat", Input.ENTER,
-				"weapon_1", Input.NUM_1,
-				"weapon_2", Input.NUM_2,
-				"weapon_3", Input.NUM_3,
-				"weapon_4", Input.NUM_4,
-				"weapon_5", Input.NUM_5,
-				"weapon_6", Input.NUM_6
-		);
 
-		KeyBinds.defaults(
-				DeviceType.controller,
-				"move_x", new Axis(Input.CONTROLLER_L_STICK_HORIZONTAL_AXIS),
-				"move_y", new Axis(Input.CONTROLLER_L_STICK_VERTICAL_AXIS),
-				"cursor_x", new Axis(Input.CONTROLLER_R_STICK_HORIZONTAL_AXIS),
-				"cursor_y", new Axis(Input.CONTROLLER_R_STICK_VERTICAL_AXIS),
-				"select", Input.CONTROLLER_R_BUMPER,
-				"break", Input.CONTROLLER_L_BUMPER,
-				"shoot", Input.CONTROLLER_R_TRIGGER,
-				"zoom_hold", Input.ANY_KEY,
-				"zoom", new Axis(Input.CONTROLLER_DPAD_DOWN, Input.CONTROLLER_DPAD_UP),
-				"menu", Input.CONTROLLER_X,
-				"pause", Input.CONTROLLER_L_TRIGGER,
-				"dash", Input.CONTROLLER_Y,
-				"rotate_alt", new Axis(Input.CONTROLLER_DPAD_RIGHT, Input.CONTROLLER_DPAD_LEFT),
-				"rotate", new Axis(Input.CONTROLLER_A, Input.CONTROLLER_B),
-				"player_list", Input.CONTROLLER_START,
-				"chat", Input.ENTER,
-				"weapon_1", Input.NUM_1,
-				"weapon_2", Input.NUM_2,
-				"weapon_3", Input.NUM_3,
-				"weapon_4", Input.NUM_4,
-				"weapon_5", Input.NUM_5,
-				"weapon_6", Input.NUM_6
-		);
+        DefaultKeybinds.load();
 		
 		for(int i = 0; i < Vars.saveSlots; i ++){
 			Settings.defaults("save-" + i + "-autosave", !Vars.gwt);
@@ -211,61 +128,59 @@ public class Control extends Module{
 		player.name = Settings.getString("name");
 		player.isAndroid = Vars.android;
 		player.isLocal = true;
-		
-		spawns = WaveCreator.getSpawns();
 
 		saves.load();
-	}
-	
-	public void reset(){
-		weapons.clear();
-		
-		weapons.add(Weapon.blaster);
-		player.weaponLeft = player.weaponRight = weapons.first();
-		
-		lastUpdated = -1;
-		wave = 1;
-		extrawavetime = maxwavespace;
-		wavetime = waveSpacing();
-		Entities.clear();
-		enemies = 0;
 
-		player.add();
-		
-		player.heal();
-		clearItems();
-		spawnpoints.clear();
-		respawntime = -1;
-		hiscore = false;
-		
-		for(Block block : Block.getAllBlocks()){
-			block.onReset();
-		}
+		Events.on(PlayEvent.class, () -> {
+			renderer.clearTiles();
 
-		ui.hudfrag.updateItems();
-        ui.hudfrag.updateWeapons();
-	}
-	
-	public void play(){
-		if(core == null) return;
-		renderer.clearTiles();
-		
-		player.x = core.worldx();
-		player.y = core.worldy() - Vars.tilesize*2;
-		
-		Core.camera.position.set(player.x, player.y, 0);
-		
-		//multiplying by 2 so you start with more time in the beginning
-		wavetime = waveSpacing()*2;
+			player.x = world.getCore().worldx();
+			player.y = world.getCore().worldy() - Vars.tilesize*2;
 
-		//hacky, but I doubt anyone will use this many resources
-		if(mode.infiniteResources){
-			Arrays.fill(items, 999999999);
-		}
+			Core.camera.position.set(player.x, player.y, 0);
 
-		ui.hudfrag.updateItems();
-		
-		GameState.set(State.playing);
+			ui.hudfrag.updateItems();
+
+			state.set(State.playing);
+		});
+
+		Events.on(ResetEvent.class, () -> {
+			player.weaponLeft = player.weaponRight = Weapon.blaster;
+
+			player.add();
+			player.heal();
+
+			respawntime = -1;
+			hiscore = false;
+
+			ui.hudfrag.updateItems();
+			ui.hudfrag.updateWeapons();
+		});
+
+		Events.on(WaveEvent.class, () -> {
+			Sounds.play("spawn");
+
+			int last = Settings.getInt("hiscore" + world.getMap().name);
+
+			if(state.wave > last && !state.mode.infiniteResources && !state.mode.toggleWaves){
+				Settings.putInt("hiscore" + world.getMap().name, state.wave);
+				Settings.save();
+				hiscore = true;
+			}
+
+			Mindustry.platforms.updateRPC();
+		});
+
+		Events.on(GameOver.class, () -> {
+			Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
+			Sounds.play("corexplode");
+			for(int i = 0; i < 16; i ++){
+				Timers.run(i*2, ()-> Effects.effect(Fx.explosion, world.getCore().worldx()+Mathf.range(40), world.getCore().worldy()+Mathf.range(40)));
+			}
+			Effects.effect(Fx.coreexplosion, world.getCore().worldx(), world.getCore().worldy());
+
+			ui.restart.show();
+		});
 	}
 
 	public Saves getSaves(){
@@ -275,38 +190,9 @@ public class Control extends Module{
 	public boolean showCursor(){
 		return controlling;
 	}
-
-	public boolean isFriendlyFire() {
-		return friendlyFire;
-	}
-
-	public void setFriendlyFire(boolean friendlyFire) {
-		if(this.friendlyFire != friendlyFire && Net.active() && Net.server()){
-			Vars.netServer.handleFriendlyFireChange(friendlyFire);
-		}
-		this.friendlyFire = friendlyFire;
-	}
-
-	public Tile getCore(){
-		return core;
-	}
 	
-	public Array<SpawnPoint> getSpawnPoints(){
-		return spawnpoints;
-	}
-	
-	public void setCore(Tile tile){
-		this.core = tile;
-	}
-	
-	public InputHandler getInput(){
+	public InputHandler input(){
 		return input;
-	}
-	
-	public void addSpawnPoint(Tile tile){
-		SpawnPoint point = new SpawnPoint();
-		point.start = tile;
-		spawnpoints.add(point);
 	}
 	
 	public void playMap(Map map){
@@ -314,140 +200,18 @@ public class Control extends Module{
 		saves.resetSave();
 		
 		Timers.run(16, ()->{
-			reset();
+			logic.reset();
 			world.loadMap(map);
-			play();
+			logic.play();
 		});
 		
 		Timers.run(18, ()-> ui.loadfrag.hide());
 	}
 	
-	public GameMode getMode(){
-		return mode;
-	}
-	
-	public void setMode(GameMode mode){
-		this.mode = mode;
-	}
-	
-	public boolean hasWeapon(Weapon weapon){
-		return weapons.contains(weapon, true);
-	}
-	
-	public void addWeapon(Weapon weapon){
-		weapons.add(weapon);
-	}
-	
-	public Array<Weapon> getWeapons(){
-		return weapons;
-	}
-	
-	public void setWaveData(int enemies, int wave, float wavetime){
-		this.wave = wave;
-		this.wavetime = wavetime;
-		this.enemies = enemies;
-		this.extrawavetime = maxwavespace;
-	}
-	
-	public void runWave(){
-
-		if(Net.client() && Net.active()){
-			return;
-		}
-
-		Sounds.play("spawn");
-		
-		if(lastUpdated < wave + 1){
-			world.pathfinder().resetPaths();
-			lastUpdated = wave + 1;
-		}
-		
-		for(EnemySpawn spawn : spawns){
-			for(int lane = 0; lane < spawnpoints.size; lane ++){
-				int fl = lane;
-				Tile tile = spawnpoints.get(lane).start;
-				int spawnamount = spawn.evaluate(wave, lane);
-				
-				for(int i = 0; i < spawnamount; i ++){
-					float range = 12f;
-					
-					Timers.run(i*5f, () -> {
-
-						Enemy enemy = new Enemy(spawn.type);
-						enemy.set(tile.worldx() + Mathf.range(range), tile.worldy() + Mathf.range(range));
-						enemy.lane = fl;
-						enemy.tier = spawn.tier(wave, fl);
-						enemy.add();
-
-						Effects.effect(Fx.spawn, enemy);
-
-						enemies ++;
-					});
-				}
-			}
-		}
-		
-		wave ++;
-		
-		int last = Settings.getInt("hiscore" + world.getMap().name);
-		
-		if(wave > last && !mode.infiniteResources && !mode.toggleWaves){
-			Settings.putInt("hiscore" + world.getMap().name, wave);
-			Settings.save();
-			hiscore = true;
-		}
-		
-		wavetime = waveSpacing();
-		extrawavetime = maxwavespace;
-
-        Mindustry.platforms.updateRPC();
-	}
-	
-	public void enemyDeath(){
-		enemies --;
-	}
-	
-	public void coreDestroyed(){
-
-		Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
-		Sounds.play("corexplode");
-		for(int i = 0; i < 16; i ++){
-			Timers.run(i*2, ()-> Effects.effect(Fx.explosion, core.worldx()+Mathf.range(40), core.worldy()+Mathf.range(40)));
-		}
-		Effects.effect(Fx.coreexplosion, core.worldx(), core.worldy());
-
-		ui.restart.show();
-		if(Net.active() && Net.server()) netServer.handleGameOver();
-	}
-
-	public boolean isGameOver(){
-		return core != null && core.block() != ProductionBlocks.core;
-	}
-	
-	float waveSpacing(){
-		return wavespace * getDifficulty().timeScaling;
-	}
-
-	public Difficulty getDifficulty(){
-		return difficulty;
-	}
-
-	public void setDifficulty(Difficulty d){
-		this.difficulty = d;
-	}
-	
 	public boolean isHighScore(){
 		return hiscore;
 	}
-	
-	public int getEnemiesRemaining(){
-		return enemies;
-	}
-	
-	public float getWaveCountdown(){
-		return wavetime;
-	}
-	
+
 	public float getRespawnTime(){
 		return respawntime;
 	}
@@ -456,80 +220,20 @@ public class Control extends Module{
 		this.respawntime = respawntime;
 	}
 	
-	public int getWave(){
-		return wave;
-	}
-	
 	public Tutorial getTutorial(){
 		return tutorial;
 	}
 	
-	public void clearItems(){
-		Arrays.fill(items, 0);
-		
-		addItem(Item.stone, 40);
-		
-		if(debug){
-			Arrays.fill(items, 99999);
-		}
-	}
-	
-	public int getAmount(Item item){
-		return items[item.id];
-	}
-	
-	public void addItem(Item item, int amount){
-		items[item.id] += amount;
-		shouldUpdateItems = true;
-	}
-	
-	public boolean hasItems(ItemStack[] items){
-		for(ItemStack stack : items)
-			if(!hasItem(stack))
-				return false;
-		return true;
-	}
-	
-	public boolean hasItems(ItemStack[] items, int scaling){
-		for(ItemStack stack : items)
-			if(!hasItem(stack.item, stack.amount * scaling))
-				return false;
-		return true;
-	}
-	
-	public boolean hasItem(ItemStack req){
-		return items[req.item.id] >= req.amount;
-	}
-	
-	public boolean hasItem(Item item, int amount){
-		return items[item.id] >= amount;
-	}
-	
-	public void removeItem(ItemStack req){
-		items[req.item.id] -= req.amount;
-		if(items[req.item.id] < 0) items[req.item.id] = 0; //prevents negative item glitches in multiplayer
-		shouldUpdateItems = true;
-	}
-	
-	public void removeItems(ItemStack... reqs){
-		for(ItemStack req : reqs)
-			removeItem(req);
-	}
-	
-	public int[] getItems(){
-		return items;
-	}
-	
 	@Override
 	public void pause(){
-		wasPaused = GameState.is(State.paused);
-		if(GameState.is(State.playing)) GameState.set(State.paused);
+		wasPaused = state.is(State.paused);
+		if(state.is(State.playing)) state.set(State.paused);
 	}
 	
 	@Override
 	public void resume(){
-		if(GameState.is(State.paused) && !wasPaused){
-			GameState.set(State.playing);
+		if(state.is(State.paused) && !wasPaused){
+            state.set(State.playing);
 		}
 	}
 	
@@ -588,86 +292,40 @@ public class Control extends Module{
 
         saves.update();
 		
-		if(debug && GameState.is(State.playing)){
-			//debug actions
-			if(Inputs.keyTap(Keys.P)){
-				Effects.effect(Fx.shellsmoke, player);
-				Effects.effect(Fx.shellexplosion, player);
-			}
-			
-			if(Inputs.keyTap(Keys.C)){
-				enemyGroup.clear();
-				enemies = 0;
-			}
-			
-			if(Inputs.keyTap(Keys.F)){
-				wavetime = 0f;
-			}
-
-			if(Inputs.keyTap(Keys.G)){
-				Vars.world.pathfinder().benchmark();
-			}
-
-			if(Inputs.keyDown(Keys.I)){
-				wavetime -= delta() * 10f;
-			}
-
-			if(Inputs.keyTap(Keys.U)){
-				Vars.showPaths = !Vars.showPaths;
-			}
-			
-			if(Inputs.keyTap(Keys.O)){
-				Vars.noclip = !Vars.noclip;
-			}
-			
-			if(Inputs.keyTap(Keys.Y)){
-				if(Inputs.keyDown(Keys.SHIFT_LEFT)){
-					new Enemy(EnemyTypes.healer).set(player.x, player.y).add();
-				}else{
-					float px = player.x, py = player.y;
-					Timers.run(30f, ()-> new Enemy(EnemyTypes.fortress).set(px, py).add());
-				}
-			}
-		}
-		
-		if(shouldUpdateItems && (Timers.get("updateItems", 8) || GameState.is(State.paused))){
+		if(shouldUpdateItems && (Timers.get("updateItems", 8) || state.is(State.paused))){
 			ui.hudfrag.updateItems();
 			shouldUpdateItems = false;
 		}
 		
-		if(!GameState.is(State.menu)){
+		if(!state.is(State.menu)){
 			input.update();
-
-			if(core.block() != ProductionBlocks.core && !ui.restart.isShown()){
-				coreDestroyed();
-			}
 			
-			if(Inputs.keyTap("pause") && !ui.restart.isShown() && !Net.active() && (GameState.is(State.paused) || GameState.is(State.playing))){
-				GameState.set(GameState.is(State.playing) ? State.paused : State.playing);
+			if(Inputs.keyTap("pause") && !ui.restart.isShown() && !Net.active() && (state.is(State.paused) || state.is(State.playing))){
+                state.set(state.is(State.playing) ? State.paused : State.playing);
 			}
 			
 			if(Inputs.keyTap("menu")){
-				if(GameState.is(State.paused)){
+				if(state.is(State.paused)){
 					ui.paused.hide();
-					GameState.set(State.playing);
+                    state.set(State.playing);
 				}else if (!ui.restart.isShown()){
 					if(ui.chatfrag.chatOpen()) {
 						ui.chatfrag.hide();
 					}else{
 						ui.paused.show();
-						GameState.set(State.paused);
+                        state.set(State.paused);
 					}
 				}
 			}
 		
-			if(!GameState.is(State.paused) || Net.active()){
+			if(!state.is(State.paused) || Net.active()){
 				
 				if(respawntime > 0){
 					
 					respawntime -= delta();
 					
 					if(respawntime <= 0){
-						player.set(core.worldx(), core.worldy()-Vars.tilesize*2);
+						player.set(world.getSpawnX(), world.getSpawnY());
 						player.heal();
 						player.add();
 						Effects.sound("respawn");
@@ -678,34 +336,6 @@ public class Control extends Module{
 				if(tutorial.active()){
 					tutorial.update();
 				}
-				
-				if(!tutorial.active() && !mode.toggleWaves){
-				
-					if(enemies <= 0){
-						wavetime -= delta();
-
-						if(lastUpdated < wave + 1 && wavetime < Vars.aheadPathfinding){ //start updating beforehand
-							world.pathfinder().resetPaths();
-							lastUpdated = wave + 1;
-						}
-					}else{
-						extrawavetime -= delta();
-					}
-				}
-			
-				if(wavetime <= 0 || extrawavetime <= 0){
-					runWave();
-				}
-				
-				Entities.update(Entities.defaultGroup());
-				Entities.update(bulletGroup);
-				Entities.update(enemyGroup);
-				Entities.update(tileGroup);
-				Entities.update(shieldGroup);
-				Entities.update(playerGroup);
-				
-				Entities.collideGroups(enemyGroup, bulletGroup);
-				Entities.collideGroups(playerGroup, bulletGroup);
 			}
 		}
 	}

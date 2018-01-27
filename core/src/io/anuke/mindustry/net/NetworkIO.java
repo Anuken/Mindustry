@@ -263,7 +263,7 @@ public class NetworkIO {
             Vars.world.loadMap(Vars.world.maps().getMap(mapid), seed);
             Vars.renderer.clearTiles();
 
-            Vars.player.set(Vars.control.getCore().worldx(), Vars.control.getCore().worldy());
+            Vars.player.set(Vars.world.getCore().worldx(), Vars.world.getCore().worldy());
 
             for(int x = 0; x < Vars.world.width(); x ++){
                 for(int y = 0; y < Vars.world.height(); y ++){
