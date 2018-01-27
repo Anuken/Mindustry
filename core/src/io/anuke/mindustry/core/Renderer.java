@@ -178,11 +178,12 @@ public class Renderer extends RendererModule{
 		Entities.draw(control.enemyGroup);
 		Graphics.shader();
 
-		Entities.draw(control.playerGroup);
+		Entities.draw(control.playerGroup, p -> !p.isAndroid);
 		Entities.draw(Entities.defaultGroup());
 
 		blocks.drawBlocks(true);
-		
+
+		Entities.draw(control.playerGroup, p -> p.isAndroid);
 		Entities.draw(control.bulletGroup);
 
 		drawShield();
