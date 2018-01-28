@@ -73,12 +73,12 @@ public class Pump extends LiquidBlock{
 		LiquidEntity entity = tile.entity();
 		
 		if(tile.floor().liquidDrop != null){
-			float maxPump = Math.min(liquidCapacity - entity.liquidAmount, pumpAmount);
+			float maxPump = Math.min(liquidCapacity - entity.liquidAmount, pumpAmount * Timers.delta());
 			entity.liquid = tile.floor().liquidDrop;
 			entity.liquidAmount += maxPump;
 		}
 		
-		if(entity.timer.get(timerDump, 2)){
+		if(entity.timer.get(timerDump, 1)){
 			tryDumpLiquid(tile);
 		}
 	}

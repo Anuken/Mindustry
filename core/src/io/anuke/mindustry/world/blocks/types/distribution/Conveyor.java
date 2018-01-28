@@ -1,14 +1,14 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.LongArray;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
@@ -26,7 +26,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 public class Conveyor extends Block{
 	private static ItemPos pos1 = new ItemPos();
 	private static ItemPos pos2 = new ItemPos();
-	private static IntArray removals = new IntArray();
+	private static LongArray removals = new LongArray();
 	private static final float itemSpace = 0.135f;
 	private static final float offsetScl = 128f*3f;
 	private static final float itemSize = 4f;
@@ -96,7 +96,7 @@ public class Conveyor extends Block{
 		float shift = entity.elapsed * speed;
 
 		for(int i = 0; i < entity.convey.size; i ++){
-			int value = entity.convey.get(i);
+			long value = entity.convey.get(i);
 			ItemPos pos = pos1.set(value);
 
 			if(pos.item == null){
@@ -105,10 +105,12 @@ public class Conveyor extends Block{
 			}
 			
 			boolean canmove = i == entity.convey.size - 1 || 
-					!(pos2.set(entity.convey.get(i + 1)).y - pos.y < itemSpace * Timers.delta());
-			
+					!(pos2.set(entity.convey.get(i + 1)).y - pos.y < itemSpace);
+
+			float minmove = 1f / (Short.MAX_VALUE - 2);
+
 			if(canmove){
-				pos.y += Math.max(speed * Timers.delta() + shift, 1f/252f); //TODO fix precision issues when at high FPS?
+				pos.y += Math.max(speed * Timers.delta() + shift, minmove); //TODO fix precision issues when at high FPS?
 				pos.x = Mathf.lerpDelta(pos.x, 0, 0.06f);
 			}else{
 				pos.x = Mathf.lerpDelta(pos.x, pos.seed/offsetScl, 0.1f);
@@ -157,7 +159,7 @@ public class Conveyor extends Block{
 		float y = (ang == -1 || ang == 3) ? 1 : (ang == 1 || ang == -3) ? -1 : 0;
 		
 		ConveyorEntity entity = tile.entity();
-		int result = ItemPos.packItem(item, y*0.9f, pos, (byte)Mathf.random(255));
+		long result = ItemPos.packItem(item, y*0.9f, pos, (byte)Mathf.random(255));
 		boolean inserted = false;
 		
 		for(int i = 0; i < entity.convey.size; i ++){
@@ -183,7 +185,7 @@ public class Conveyor extends Block{
 	 * Size is 4 bytes, or one int.
 	 */
 	public static class ConveyorEntity extends TileEntity{
-		IntArray convey = new IntArray();
+		LongArray convey = new LongArray();
 		float minitem = 1, elapsed;
 		
 		@Override
@@ -191,7 +193,7 @@ public class Conveyor extends Block{
 			stream.writeInt(convey.size);
 			
 			for(int i = 0; i < convey.size; i ++){
-				stream.writeInt(convey.get(i));
+				stream.writeInt(pos1.toInt(convey.get(i)));
 			}
 		}
 		
@@ -202,7 +204,7 @@ public class Conveyor extends Block{
 			convey.ensureCapacity(amount);
 			
 			for(int i = 0; i < amount; i ++){
-				convey.add(stream.readInt());
+				convey.add(pos1.getValue(stream.readInt()));
 			}
 			
 			sort(convey.items, convey.size);
@@ -215,11 +217,11 @@ public class Conveyor extends Block{
 		}
 	}
 	
-	private static void sort(int[] elements, int length){
-		List<Integer> wrapper = new AbstractList<Integer>() {
+	private static void sort(long[] elements, int length){
+		List<Long> wrapper = new AbstractList<Long>() {
 
 	        @Override
-	        public Integer get(int index) {
+	        public Long get(int index) {
 	            return elements[index];
 	        }
 
@@ -229,8 +231,8 @@ public class Conveyor extends Block{
 	        }
 
 	        @Override
-	        public Integer set(int index, Integer element) {
-	            int v = elements[index];
+	        public Long set(int index, Long element) {
+	            long v = elements[index];
 	            elements[index] = element;
 	            return v;
 	        }
@@ -239,7 +241,7 @@ public class Conveyor extends Block{
 	    Collections.sort(wrapper, Conveyor::compareItems);
 	}
 	
-	private static int compareItems(Integer a, Integer b){
+	private static int compareItems(Long a, Long b){
 		pos1.set(a);
 		pos2.set(b);
 		return Float.compare(pos1.y, pos2.y);
@@ -266,20 +268,50 @@ public class Conveyor extends Block{
 			seed = values[3];
 			return this;
 		}
+
+		ItemPos set(long lvalue){
+			short[] values = Bits.getShorts(lvalue);
+
+			if(values[0] >= Item.getAllItems().size || values[0] < 0)
+				item = null;
+			else
+				item = Item.getAllItems().get(values[0]);
+
+			x = values[1] / (float)Short.MAX_VALUE;
+			y = ((float)values[2]) / Short.MAX_VALUE + 1f;
+			seed = (byte)values[3];
+			return this;
+		}
 		
-		int pack(){
+		long pack(){
 			return packItem(item, x, y, seed);
 		}
 		
-		static int packItem(Item item, float x, float y, byte seed){
+		static long packItem(Item item, float x, float y, byte seed){
+			short[] shorts = Bits.getShorts(0);
+			shorts[0] = (short)item.id;
+			shorts[1] = (short)(x*Short.MAX_VALUE);
+			shorts[2] = (short)((y - 1f)*Short.MAX_VALUE);
+			shorts[3] = seed;
+			return Bits.packLong(shorts);
+		}
+
+		static int packItemInt(Item item, float x, float y, byte seed){
 			byte[] bytes = Bits.getBytes(0);
 			bytes[0] = (byte)item.id;
 			bytes[1] = (byte)(x*127);
 			bytes[2] = (byte)(y*255-128);
 			bytes[3] = seed;
-			//UCore.log("Packing item: ", item, x, y, seed, "\n", Arrays.toString(bytes));
-			//UCore.log(Arrays.toString(Bits.getBytes(Bits.packInt(bytes))));
 			return Bits.packInt(bytes);
+		}
+
+		int toInt(long value){
+			set(value);
+			return packItemInt(item, x, y, seed);
+		}
+
+		long getValue(int value){
+			return set(value).pack();
 		}
 	}
 }

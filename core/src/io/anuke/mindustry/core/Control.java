@@ -38,7 +38,6 @@ public class Control extends Module{
 	private Tutorial tutorial = new Tutorial();
 	private boolean hiscore = false;
 
-	private boolean shouldUpdateItems = false;
 	private boolean wasPaused = false;
 
 	private Saves saves;
@@ -304,9 +303,9 @@ public class Control extends Module{
 
         saves.update();
 		
-		if(shouldUpdateItems && (Timers.get("updateItems", 8) || state.is(State.paused))){
+		if(state.inventory.isUpdated() && (Timers.get("updateItems", 8) || state.is(State.paused))){
 			ui.hudfrag.updateItems();
-			shouldUpdateItems = false;
+			state.inventory.setUpdated(false);
 		}
 		
 		if(!state.is(State.menu)){

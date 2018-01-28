@@ -2,7 +2,6 @@ package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.graphics.Fx;
@@ -19,6 +18,8 @@ import io.anuke.ucore.util.Tmp;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class NuclearReactor extends LiquidPowerGenerator{
 	protected final int timerFuel = timers++;
@@ -65,7 +66,7 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		float fullness = (float)fuel / itemCapacity;
 		
 		if(fuel > 0){
-			entity.heat += fullness * heating;
+			entity.heat += fullness * heating * Timers.delta();
 			entity.power += powerMultiplier * fullness * Timers.delta();
 			entity.power = Mathf.clamp(entity.power, 0f, powerCapacity);
 			if(entity.timer.get(timerFuel, fuelUseTime)){

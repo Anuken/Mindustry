@@ -53,7 +53,7 @@ public class NetworkIO {
                     }
                 }
 
-                if(id == -1) id = 0;
+                if(id == -1) id = 2;
                 stream.writeByte((byte)(length > 127 ? length - 256 : length));
                 stream.writeByte(id);
 

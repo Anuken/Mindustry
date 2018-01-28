@@ -124,7 +124,7 @@ public class Pathfind{
 		//go through each spawnpoint, and if it's not found a path yet, update it
 		for(SpawnPoint point : world.getSpawns()){
 			if(point.request == null || point.finder == null){
-				resetPathFor(point);
+				continue;
 			}
 
 			if(!point.request.pathFound){

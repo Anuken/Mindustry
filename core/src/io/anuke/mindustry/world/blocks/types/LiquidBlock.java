@@ -1,17 +1,16 @@
 package io.anuke.mindustry.world.blocks.types;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import com.badlogic.gdx.utils.Array;
-
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class LiquidBlock extends Block implements LiquidAcceptor{
 	protected final int timerFlow = timers++;
@@ -57,7 +56,7 @@ public class LiquidBlock extends Block implements LiquidAcceptor{
 	public void update(Tile tile){
 		LiquidEntity entity = tile.entity();
 		
-		if(entity.liquidAmount > 0.01f && entity.timer.get(timerFlow, 3)){
+		if(entity.liquidAmount > 0.01f && entity.timer.get(timerFlow, 1)){
 			tryMoveLiquid(tile, tile.getNearby()[tile.getRotation()]);
 		}
 		
