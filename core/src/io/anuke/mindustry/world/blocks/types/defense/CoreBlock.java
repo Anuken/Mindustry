@@ -1,9 +1,11 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+
+import static io.anuke.mindustry.Vars.debug;
+import static io.anuke.mindustry.Vars.state;
 
 public class CoreBlock extends Block {
 
@@ -19,12 +21,12 @@ public class CoreBlock extends Block {
 
     @Override
     public int handleDamage(Tile tile, int amount){
-        return Vars.debug ? 0 : amount;
+        return debug ? 0 : amount;
     }
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
-        Vars.control.addItem(item, 1);
+        state.inventory.addItem(item, 1);
     }
 
     @Override

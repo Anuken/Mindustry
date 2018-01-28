@@ -4,23 +4,23 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState;
+import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.*;
+
+import static io.anuke.mindustry.Vars.state;
 
 public class Generator extends PowerBlock{
 	public static final int powerTime = 2;
@@ -66,14 +66,14 @@ public class Generator extends PowerBlock{
 				for(int i = 0; i < laserDirections; i++){
 					int dir = Mathf.mod(i + rotation - laserDirections / 2, 4);
 					float lx = Geometry.d4[dir].x, ly = Geometry.d4[dir].y;
-					float dx = lx * laserRange * Vars.tilesize;
-					float dy = ly * laserRange * Vars.tilesize;
+					float dx = lx * laserRange * tilesize;
+					float dy = ly * laserRange * tilesize;
 					
 					Lines.dashLine(
-							tile.worldx() + lx * Vars.tilesize / 2, 
-							tile.worldy() + ly * Vars.tilesize / 2, 
-							tile.worldx() + dx - lx * Vars.tilesize, 
-							tile.worldy() + dy - ly * Vars.tilesize, 9);
+							tile.worldx() + lx * tilesize / 2,
+							tile.worldy() + ly * tilesize / 2,
+							tile.worldx() + dx - lx * tilesize,
+							tile.worldy() + dy - ly * tilesize, 9);
 				}
 
 				Draw.reset();
@@ -90,13 +90,13 @@ public class Generator extends PowerBlock{
 			for(int i = 0; i < laserDirections; i++){
 				int dir = Mathf.mod(i + rotation - laserDirections / 2, 4);
 				float lx = Geometry.d4[dir].x, ly = Geometry.d4[dir].y;
-				float dx = lx * laserRange * Vars.tilesize;
-				float dy = ly * laserRange * Vars.tilesize;
+				float dx = lx * laserRange * tilesize;
+				float dy = ly * laserRange * tilesize;
 				Lines.dashLine(
-						x * Vars.tilesize + lx * Vars.tilesize / 2,
-						y * Vars.tilesize + ly * Vars.tilesize / 2, 
-						x * Vars.tilesize + dx - lx * Vars.tilesize, 
-						y * Vars.tilesize + dy - ly * Vars.tilesize, 9);
+						x * tilesize + lx * tilesize / 2,
+						y * tilesize + ly * tilesize / 2,
+						x * tilesize + dx - lx * tilesize,
+						y * tilesize + dy - ly * tilesize, 9);
 			}
 
 			Draw.reset();
@@ -177,15 +177,16 @@ public class Generator extends PowerBlock{
 		if(target != null){
 			boolean interfering = isInterfering(target, rotation);
 
-			Tmp.v1.set(Angles.translation(rotation * 90, target.block().width * Vars.tilesize / 2 + 2f + (interfering ? Vector2.dst(tile.worldx(), tile.worldy(), target.worldx(), target.worldy()) / 2f - Vars.tilesize / 2f * target.block().width - 1 : 0)));
+			Tmp.v1.set(Angles.translation(rotation * 90, target.block().width * tilesize / 2 + 2f + (interfering ? Vector2.dst(tile.worldx(), tile.worldy(), target.worldx(), target.worldy()) / 2f - tilesize / 2f * target.block().width - 1 : 0)));
 
-			Angles.translation(rotation * 90, width * Vars.tilesize / 2 + 2f);
+			Angles.translation(rotation * 90, width * tilesize / 2 + 2f);
 
 			if(!interfering){
 				Draw.tint(Hue.mix(Color.GRAY, Color.WHITE, 0.904f + Mathf.sin(Timers.time(), 1.7f, 0.06f)));
 			}else{
 				Draw.tint(Hue.mix(Color.SCARLET, Color.WHITE, 0.902f + Mathf.sin(Timers.time(), 1.7f, 0.08f)));
-				if(GameState.is(State.playing) && Mathf.chance(Timers.delta() * 0.033)){
+
+				if(state.is(State.playing) && Mathf.chance(Timers.delta() * 0.033)){
 					Effects.effect(Fx.laserspark, target.worldx() - Tmp.v1.x, target.worldy() - Tmp.v1.y);
 				}
 			}
@@ -200,8 +201,8 @@ public class Generator extends PowerBlock{
 						target.worldy() - Tmp.v1.y + Mathf.range(r), 0.7f);
 			}else{
 				Draw.rect("laserfull", 
-						tile.worldx() + Geometry.d4[relative].x * width * Vars.tilesize / 2f,
-						tile.worldy() + Geometry.d4[relative].y * width * Vars.tilesize / 2f);
+						tile.worldx() + Geometry.d4[relative].x * width * tilesize / 2f,
+						tile.worldy() + Geometry.d4[relative].y * width * tilesize / 2f);
 			}
 			
 			Draw.color();
@@ -230,7 +231,7 @@ public class Generator extends PowerBlock{
 		int i = 0;
 
 		for(i = 1; i < laserRange; i++){
-			Tile other = Vars.world.tile(tile.x + i * point.x, tile.y + i * point.y);
+			Tile other = world.tile(tile.x + i * point.x, tile.y + i * point.y);
 
 			if(other != null && other.block() instanceof PowerAcceptor){
 				Tile linked = other.getLinked();

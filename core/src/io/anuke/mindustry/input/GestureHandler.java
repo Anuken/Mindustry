@@ -3,7 +3,6 @@ package io.anuke.mindustry.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.input.GestureDetector.GestureAdapter;
 import com.badlogic.gdx.math.Vector2;
-import io.anuke.mindustry.Vars;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.scene.ui.layout.Unit;
@@ -45,9 +44,10 @@ public class GestureHandler extends GestureAdapter{
 	
 	@Override
 	public boolean pan(float x, float y, float deltaX, float deltaY){
-		if(Vars.control.showCursor() && !Inputs.keyDown("select")) return false;
+		if(control.showCursor() && !Inputs.keyDown("select")) return false;
 
-		if(!Vars.control.showCursor() && !(control.input().recipe != null && Vars.control.hasItems(control.input().recipe.requirements) && control.input().placeMode.lockCamera) &&
+		if(!control.showCursor() && !(control.input().recipe != null
+				&& state.inventory.hasItems(control.input().recipe.requirements) && control.input().placeMode.lockCamera) &&
 				!(control.input().recipe == null && control.input().breakMode.lockCamera)){
 			float dx = deltaX*Core.camera.zoom/Core.cameraScale, dy = deltaY*Core.camera.zoom/Core.cameraScale;
 			player.x -= dx;

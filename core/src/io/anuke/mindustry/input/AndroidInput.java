@@ -3,10 +3,9 @@ package io.anuke.mindustry.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Graphics;
@@ -73,7 +72,7 @@ public class AndroidInput extends InputHandler{
 		
 		warmup = 0;
 
-		if(!GameState.is(State.menu)){
+		if(!state.is(State.menu)){
 			Tile cursor = world.tile(Mathf.scl2(Graphics.mouseWorld().x, tilesize), Mathf.scl2(Graphics.mouseWorld().y, tilesize));
 			if(cursor != null && !ui.hasMouse(screenX, screenY)){
 				Tile linked = cursor.isLinked() ? cursor.getLinked() : cursor;
@@ -85,7 +84,7 @@ public class AndroidInput extends InputHandler{
 
 				if(linked != null) {
 					linked.block().tapped(linked);
-					if(Net.active()) netClient.handleBlockTap(linked);
+					if(Net.active()) NetEvents.handleBlockTap(linked);
 				}
 			}
 		}
@@ -125,8 +124,8 @@ public class AndroidInput extends InputHandler{
 
 		float xa = Inputs.getAxis("move_x");
 		float ya = Inputs.getAxis("move_y");
-		if(Math.abs(xa) < Vars.controllerMin) xa = 0;
-		if(Math.abs(ya) < Vars.controllerMin) ya = 0;
+		if(Math.abs(xa) < controllerMin) xa = 0;
+		if(Math.abs(ya) < controllerMin) ya = 0;
 
 		player.x += xa * 4f;
 		player.y += ya * 4f;
@@ -173,15 +172,15 @@ public class AndroidInput extends InputHandler{
 	public boolean tryPlaceBlock(int x, int y, boolean sound){
 		if(recipe != null && 
 				validPlace(x, y, recipe.result) && cursorNear() &&
-				Vars.control.hasItems(recipe.requirements)){
+				state.inventory.hasItems(recipe.requirements)){
 			
 			placeBlock(x, y, recipe.result, rotation, true, sound);
 			
 			for(ItemStack stack : recipe.requirements){
-				Vars.control.removeItem(stack);
+				state.inventory.removeItem(stack);
 			}
 			
-			if(!Vars.control.hasItems(recipe.requirements)){
+			if(!state.inventory.hasItems(recipe.requirements)){
 				Cursors.restoreCursor();
 			}
 			return true;

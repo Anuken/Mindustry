@@ -1,10 +1,9 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.ucore.scene.ui.Dialog;
 
-import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.*;
 
 public class RestartDialog extends Dialog {
     
@@ -18,14 +17,14 @@ public class RestartDialog extends Dialog {
                 content().row();
             }
             content().add("$text.lasted").pad(12).get();
-            content().add("[accent]" + control.getWave());
+            content().add("[accent]" + state.wave);
             pack();
         });
 
         getButtonTable().addButton("$text.menu", ()-> {
             hide();
             state.set(State.menu);
-            control.reset();
+            logic.reset();
         }).size(130f, 60f);
     }
 }

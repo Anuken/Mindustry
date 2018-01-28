@@ -1,7 +1,7 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.mindustry.Mindustry;
-import io.anuke.mindustry.Vars;
+import static io.anuke.mindustry.Vars.*;
+import io.anuke.mindustry.io.Platform;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.scene.ui.ButtonGroup;
@@ -30,17 +30,17 @@ public class LanguageDialog extends FloatingDialog{
         ButtonGroup<TextButton> group = new ButtonGroup<>();
 
         for(Locale loc : locales){
-            TextButton button = new TextButton(Mindustry.platforms.getLocaleName(loc), "toggle");
-            button.setChecked(Vars.ui.getLocale().equals(loc));
+            TextButton button = new TextButton(Platform.instance.getLocaleName(loc), "toggle");
+            button.setChecked(ui.getLocale().equals(loc));
             button.clicked(() -> {
-                if(Vars.ui.getLocale().equals(loc)) return;
+                if(ui.getLocale().equals(loc)) return;
                 Settings.putString("locale", loc.toString());
                 Settings.save();
                 UCore.log("Setting locale: " + loc.toString());
-                Vars.ui.showInfo("$text.language.restart");
+                ui.showInfo("$text.language.restart");
             });
             langs.add(button).group(group).update(t -> {
-                t.setChecked(loc.equals(Vars.ui.getLocale()));
+                t.setChecked(loc.equals(ui.getLocale()));
             }).size(400f, 60f).row();
         }
 

@@ -1,8 +1,9 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.ucore.util.Mathf;
+
+import static io.anuke.mindustry.Vars.state;
 
 public class EnemySpawn{
 	/**The enemy type spawned*/
@@ -34,7 +35,7 @@ public class EnemySpawn{
 		if(wave < after || wave > before || (wave - after) % spacing != 0){
 			return 0;
 		}
-		float scaling = this.scaling * Vars.control.getDifficulty().enemyScaling;
+		float scaling = this.scaling * state.difficulty.enemyScaling;
 		
 		return Math.min(amount-1 + Math.max((int)((wave / spacing) / scaling), 1) + (tier(wave, lane)-1) * tierscaleback, max);
 	}

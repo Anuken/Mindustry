@@ -2,20 +2,17 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
-import io.anuke.mindustry.Mindustry;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.DefaultKeybinds;
-import io.anuke.mindustry.game.EventType.GameOver;
-import io.anuke.mindustry.game.EventType.PlayEvent;
-import io.anuke.mindustry.game.EventType.ResetEvent;
-import io.anuke.mindustry.game.EventType.WaveEvent;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Tutorial;
+import io.anuke.mindustry.game.UpgradeInventory;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
+import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.io.Saves;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Weapon;
@@ -35,9 +32,9 @@ import static io.anuke.mindustry.Vars.*;
 /**Control module.
  * Handles all input, saving, keybinds and keybinds.
  * Should <i>not</i> handle any game-critical state.
- * This class is not created in the headless server.
- */
+ * This class is not created in the headless server.*/
 public class Control extends Module{
+	private UpgradeInventory upgrades = new UpgradeInventory();
 	private Tutorial tutorial = new Tutorial();
 	private boolean hiscore = false;
 
@@ -56,7 +53,7 @@ public class Control extends Module{
 	public Control(){
 		saves = new Saves();
 
-		Inputs.useControllers(!Vars.gwt);
+		Inputs.useControllers(!gwt);
 		
 		Gdx.input.setCatchBackKey(true);
 		
@@ -105,37 +102,43 @@ public class Control extends Module{
 
         DefaultKeybinds.load();
 		
-		for(int i = 0; i < Vars.saveSlots; i ++){
-			Settings.defaults("save-" + i + "-autosave", !Vars.gwt);
+		for(int i = 0; i < saveSlots; i ++){
+			Settings.defaults("save-" + i + "-autosave", !gwt);
 			Settings.defaults("save-" + i + "-name", "untitled");
 			Settings.defaults("save-" + i + "-data", "empty");
 		}
 
 		Settings.defaultList(
 			"ip", "localhost",
-			"port", Vars.port+"",
-			"name", Vars.android || Vars.gwt ? "player" : UCore.getProperty("user.name"),
+			"port", port+"",
+			"name", android || gwt ? "player" : UCore.getProperty("user.name"),
 			"servers", ""
 		);
 
 		KeyBinds.load();
 		
-		for(Map map : Vars.world.maps().list()){
+		for(Map map : world.maps().list()){
 			Settings.defaults("hiscore" + map.name, 0);
 		}
 		
 		player = new Player();
 		player.name = Settings.getString("name");
-		player.isAndroid = Vars.android;
+		player.isAndroid = android;
 		player.isLocal = true;
 
 		saves.load();
+
+		Events.on(StateChangeEvent.class, (from, to) -> {
+			if((from == State.playing && to == State.menu) || (from == State.menu && to != State.menu)){
+				Timers.runTask(5f, Platform.instance::updateRPC);
+			}
+		});
 
 		Events.on(PlayEvent.class, () -> {
 			renderer.clearTiles();
 
 			player.x = world.getCore().worldx();
-			player.y = world.getCore().worldy() - Vars.tilesize*2;
+			player.y = world.getCore().worldy() - tilesize*2;
 
 			Core.camera.position.set(player.x, player.y, 0);
 
@@ -168,10 +171,10 @@ public class Control extends Module{
 				hiscore = true;
 			}
 
-			Mindustry.platforms.updateRPC();
+			Platform.instance.updateRPC();
 		});
 
-		Events.on(GameOver.class, () -> {
+		Events.on(GameOverEvent.class, () -> {
 			Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
 			Sounds.play("corexplode");
 			for(int i = 0; i < 16; i ++){
@@ -181,6 +184,10 @@ public class Control extends Module{
 
 			ui.restart.show();
 		});
+	}
+
+	public UpgradeInventory upgrades() {
+		return upgrades;
 	}
 
 	public Saves getSaves(){
@@ -220,8 +227,14 @@ public class Control extends Module{
 		this.respawntime = respawntime;
 	}
 	
-	public Tutorial getTutorial(){
+	public Tutorial tutorial(){
 		return tutorial;
+	}
+
+	@Override
+	public void dispose(){
+		Platform.instance.onGameExit();
+		Net.dispose();
 	}
 	
 	@Override
@@ -245,11 +258,12 @@ public class Control extends Module{
 		
 		Entities.collisions().setCollider(tilesize, world::solid);
 
-		Mindustry.platforms.updateRPC();
+		Platform.instance.updateRPC();
 	}
 	
 	@Override
 	public void update(){
+		Inputs.update();
 
         if(Gdx.input != proxy){
             Gdx.input = proxy;
@@ -267,10 +281,10 @@ public class Control extends Module{
             float xa = Inputs.getAxis("cursor_x");
             float ya = Inputs.getAxis("cursor_y");
 
-            if(Math.abs(xa) > Vars.controllerMin || Math.abs(ya) > Vars.controllerMin) {
+            if(Math.abs(xa) > controllerMin || Math.abs(ya) > controllerMin) {
             	float scl = Settings.getInt("sensitivity")/100f * Unit.dp.scl(1f);
-                controlx += xa*Vars.baseControllerSpeed*scl;
-                controly -= ya*Vars.baseControllerSpeed*scl;
+                controlx += xa*baseControllerSpeed*scl;
+                controly -= ya*baseControllerSpeed*scl;
                 controlling = true;
 
 				Inputs.getProcessor().touchDragged(Gdx.input.getX(), Gdx.input.getY(), 0);

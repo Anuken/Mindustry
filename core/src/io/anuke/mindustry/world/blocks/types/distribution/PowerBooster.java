@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
-import io.anuke.mindustry.Vars;
+import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
 import io.anuke.mindustry.world.blocks.types.production.Generator;
@@ -29,7 +29,7 @@ public class PowerBooster extends Generator{
 		super.drawSelect(tile);
 
 		Draw.color(Color.YELLOW);
-		Lines.dashCircle(tile.worldx(), tile.worldy(), powerRange * Vars.tilesize);
+		Lines.dashCircle(tile.worldx(), tile.worldy(), powerRange * tilesize);
 		Draw.reset();
 	}
 
@@ -37,7 +37,7 @@ public class PowerBooster extends Generator{
 	public void drawPlace(int x, int y, int rotation, boolean valid){
 		Draw.color(Color.PURPLE);
 		Lines.stroke(1f);
-		Lines.dashCircle(x * Vars.tilesize, y * Vars.tilesize, powerRange * Vars.tilesize);
+		Lines.dashCircle(x * tilesize, y * tilesize, powerRange * tilesize);
 		Draw.reset();
 	}
 
@@ -82,7 +82,7 @@ public class PowerBooster extends Generator{
 					}
 
 					if(Vector2.dst(x, y, 0, 0) < powerRange){
-						Tile dest = Vars.world.tile(tile.x + x, tile.y + y);
+						Tile dest = world.tile(tile.x + x, tile.y + y);
 						if(dest != null && dest.block() instanceof PowerAcceptor && ((PowerAcceptor) dest.block()).acceptsPower(dest)){
 							if(i == 1){
 								PowerAcceptor block = (PowerAcceptor) dest.block();

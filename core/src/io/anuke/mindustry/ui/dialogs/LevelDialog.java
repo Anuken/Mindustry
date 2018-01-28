@@ -1,7 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.world.Map;
@@ -19,8 +18,10 @@ import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
+import static io.anuke.mindustry.Vars.*;
+
 public class LevelDialog extends FloatingDialog{
-	private Map selectedMap = Vars.world.maps().getMap(0);
+	private Map selectedMap = world.maps().getMap(0);
 	private TextureRegion region = new TextureRegion();
 	private ScrollPane pane;
 	
@@ -50,7 +51,7 @@ public class LevelDialog extends FloatingDialog{
 		
 		for(GameMode mode : GameMode.values()){
 			TextButton b = Elements.newButton("$mode."+mode.name()+".name", "toggle", ()->{
-				Vars.control.setMode(mode);
+				state.mode = mode;
 			});
 			group.add(b);
 			selmode.add(b).size(130f, 54f);
@@ -69,27 +70,27 @@ public class LevelDialog extends FloatingDialog{
 
 		sdif.defaults().height(s+4);
 		sdif.addImageButton("icon-arrow-left", 10*3, () -> {
-			Vars.control.setDifficulty(ds[Mathf.mod(Vars.control.getDifficulty().ordinal() - 1, ds.length)]);
+			state.difficulty = (ds[Mathf.mod(state.difficulty.ordinal() - 1, ds.length)]);
 		}).width(s);
 
 		sdif.addButton("", () -> {
 
 		}).update(t -> {
-			t.setText(Vars.control.getDifficulty().toString());
+			t.setText(state.difficulty.toString());
 			t.setTouchable(Touchable.disabled);
 		}).width(180f);
 
 		sdif.addImageButton("icon-arrow-right", 10*3, () -> {
-			Vars.control.setDifficulty(ds[Mathf.mod(Vars.control.getDifficulty().ordinal() + 1, ds.length)]);
+			state.difficulty = (ds[Mathf.mod(state.difficulty.ordinal() + 1, ds.length)]);
 		}).width(s);
 
 		content().add(sdif);
 		content().row();
 
 		int i = 0;
-		for(Map map : Vars.world.maps().list()){
+		for(Map map : world.maps().list()){
 			
-			if(!map.visible && !Vars.debug) continue;
+			if(!map.visible && !debug) continue;
 			
 			if(i % maxwidth == 0){
 				maps.row();
@@ -122,8 +123,8 @@ public class LevelDialog extends FloatingDialog{
 				image.row();
 				delete[0] = image.addButton("Delete", () -> {
 					Timers.run(1f, () -> {
-						Vars.ui.showConfirm("$text.level.delete.title", Bundles.format("text.level.delete", Bundles.get("map."+map.name+".name", map.name)), () -> {
-							Vars.world.maps().removeMap(map);
+						ui.showConfirm("$text.level.delete.title", Bundles.format("text.level.delete", Bundles.get("map."+map.name+".name", map.name)), () -> {
+							world.maps().removeMap(map);
 							reload();
 							Core.scene.setScrollFocus(pane);
 						});
@@ -142,7 +143,7 @@ public class LevelDialog extends FloatingDialog{
 					
 					selectedMap = map;
 					hide();
-					Vars.control.playMap(selectedMap);
+					control.playMap(selectedMap);
 				}
 			});
 			image.getImageCell().size(images);

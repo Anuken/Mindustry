@@ -3,8 +3,7 @@ package io.anuke.mindustry.ui.fragments;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState;
+import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.PlaceMode;
@@ -51,13 +50,13 @@ public class ToolFragment implements Fragment{
 		Core.scene.add(tools);
 		
 		tools.setVisible(() ->
-			!GameState.is(State.menu) && android && ((input.recipe != null && control.hasItems(input.recipe.requirements) &&
+			!state.is(State.menu) && android && ((input.recipe != null && state.inventory.hasItems(input.recipe.requirements) &&
 			input.placeMode == PlaceMode.cursor) || confirming)
 		);
 		
 		tools.update(() -> {
 			if(confirming){
-				Vector2 v = Graphics.screen((px + px2)/2f * Vars.tilesize, Math.min(py, py2) * Vars.tilesize - Vars.tilesize*1.5f);
+				Vector2 v = Graphics.screen((px + px2)/2f * tilesize, Math.min(py, py2) * tilesize - tilesize*1.5f);
 				tools.setPosition(v.x, v.y, Align.top);
 
 			}else{

@@ -5,12 +5,15 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
-import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.mapeditor.MapEditorDialog;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
-import io.anuke.ucore.core.*;
+import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.graphics.Draw;
@@ -185,7 +188,7 @@ public class UI extends SceneModule{
 			content().margin(30).add(text).padRight(6f);
 			TextField field = content().addField(def, t->{}).size(170f, 50f).get();
 			field.setTextFieldFilter((f, c) -> field.getText().length() < 12 && filter.acceptChar(f, c));
-			Mindustry.platforms.addDialog(field);
+			Platform.instance.addDialog(field);
 			buttons().defaults().size(120, 54).pad(4);
 			buttons().addButton("$text.ok", () -> {
 				confirmed.accept(field.getText());

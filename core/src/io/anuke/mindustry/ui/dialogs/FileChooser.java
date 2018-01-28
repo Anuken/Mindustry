@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
-import io.anuke.mindustry.Mindustry;
+import io.anuke.mindustry.io.Platform;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Consumer;
@@ -49,7 +49,7 @@ public class FileChooser extends FloatingDialog {
 		
 		filefield = new TextField();
 		filefield.setOnlyFontChars(false);
-		if(!open) Mindustry.platforms.addDialog(filefield);
+		if(!open) Platform.instance.addDialog(filefield);
 		filefield.setDisabled(open);
 
 		ok = new TextButton(open ? "$text.load" : "$text.save");
@@ -251,7 +251,7 @@ public class FileChooser extends FloatingDialog {
 
 	@Override
 	public Dialog show(){
-		Mindustry.platforms.requestWritePerms();
+		Platform.instance.requestWritePerms();
 		Timers.runTask(2f, () -> {
 			content().clear();
 			setupWidgets();
@@ -316,8 +316,8 @@ public class FileChooser extends FloatingDialog {
 		}
 	}
 
-	public static interface FileHandleFilter{
-		public boolean accept(FileHandle file);
+	public interface FileHandleFilter{
+		boolean accept(FileHandle file);
 	}
 
 	public static Predicate<FileHandle> pngFilter = file -> file.extension().equalsIgnoreCase("png");

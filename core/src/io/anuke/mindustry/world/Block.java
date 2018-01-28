@@ -4,21 +4,24 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
+
+import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.tilesize;
+
 public class Block{
 	private static int lastid;
 	private static Array<Block> blocks = new Array<>();
@@ -111,7 +114,7 @@ public class Block{
 	public void configure(Tile tile, byte data){}
 
 	public void setConfigure(Tile tile, byte data){
-		Vars.netClient.handleBlockConfig(tile, data);
+		NetEvents.handleBlockConfig(tile, data);
 	}
 
 	public boolean isConfigurable(Tile tile){
@@ -244,7 +247,7 @@ public class Block{
 		}
 		
 		//update the tile entity through the draw method, only if it's an entity without updating
-		if(destructible && !update && !GameState.is(State.paused)){
+		if(destructible && !update && !state.is(State.paused)){
 			tile.entity.update();
 		}
 	}
@@ -260,7 +263,7 @@ public class Block{
 	
 	/**Offset for placing and drawing multiblocks.*/
 	public Vector2 getPlaceOffset(){
-		return Tmp.v3.set(((width + 1) % 2) * Vars.tilesize/2, ((height + 1) % 2) * Vars.tilesize/2);
+		return Tmp.v3.set(((width + 1) % 2) * tilesize/2, ((height + 1) % 2) * tilesize/2);
 	}
 	
 	public boolean isMultiblock(){

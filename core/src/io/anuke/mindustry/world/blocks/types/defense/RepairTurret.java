@@ -3,7 +3,6 @@ package io.anuke.mindustry.world.blocks.types.defense;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
@@ -13,6 +12,8 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
+
+import static io.anuke.mindustry.Vars.world;
 
 public class RepairTurret extends PowerTurret{
 	protected float repairFrac = 1f / 135f;
@@ -45,7 +46,7 @@ public class RepairTurret extends PowerTurret{
 		}
 		
 		if(entity.timer.get(timerTarget, targetInterval)){
-			entity.blockTarget = Vars.world.findTileTarget(tile.worldx(), tile.worldy(), tile, range, true);
+			entity.blockTarget = world.findTileTarget(tile.worldx(), tile.worldy(), tile, range, true);
 		}
 
 		if(entity.blockTarget != null){

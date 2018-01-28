@@ -5,7 +5,9 @@ import io.anuke.ucore.scene.ui.TextField;
 import java.util.Date;
 import java.util.Locale;
 
-public abstract class PlatformFunction{
+public abstract class Platform {
+	public static Platform instance = new Platform() {};
+
 	public String format(Date date){return "invalid";}
 	public String format(int number){return "invalid";}
 	public void showError(String text){}
@@ -16,6 +18,7 @@ public abstract class PlatformFunction{
 	public void updateRPC(){}
 	public void onGameExit(){}
 	public void openDonations(){}
+	public boolean hasDiscord(){return true;}
 	public void requestWritePerms(){}
 	public String getLocaleName(Locale locale){
 		return locale.toString();

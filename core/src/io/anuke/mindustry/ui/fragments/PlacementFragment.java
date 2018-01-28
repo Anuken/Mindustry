@@ -3,8 +3,6 @@ package io.anuke.mindustry.ui.fragments;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.PlaceMode;
@@ -22,7 +20,7 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.*;
 
 public class PlacementFragment implements Fragment{
 	boolean shown = false, placing = false;
@@ -30,7 +28,7 @@ public class PlacementFragment implements Fragment{
 	Label modelabel;
 	
 	public void build(){
-		if(!Vars.android) return;
+		if(!android) return;
 
 		InputHandler input = control.input();
 
@@ -38,7 +36,7 @@ public class PlacementFragment implements Fragment{
 		float translation = Unit.dp.scl(54f);
 
 		new table(){{
-			visible(() -> !GameState.is(State.menu));
+			visible(() -> !state.is(State.menu));
 
 			abottom();
 			aleft();

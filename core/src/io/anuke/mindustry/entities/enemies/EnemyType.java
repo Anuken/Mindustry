@@ -3,20 +3,20 @@ package io.anuke.mindustry.entities.enemies;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 import io.anuke.ucore.util.Tmp;
@@ -220,7 +220,7 @@ public class EnemyType {
     public void updateShooting(Enemy enemy){
         float reload = this.reload / Math.max(enemy.tier / 1.5f, 1f);
 
-        if(enemy.timer.get(timerReload, reload * multiplier)){
+        if(enemy.timer.get(timerReload, reload)){
             shoot(enemy);
         }
     }
@@ -233,8 +233,8 @@ public class EnemyType {
     public void onShoot(Enemy enemy, BulletType type, float rotation){}
 
     public void onDeath(Enemy enemy){
-        if(Net.active() && Net.server()){
-            netServer.handleEnemyDeath(enemy);
+        if(Net.server()){
+            NetEvents.handleEnemyDeath(enemy);
         }
 
         Effects.effect(Fx.explosion, enemy);
@@ -249,7 +249,7 @@ public class EnemyType {
             if(enemy.spawner != null){
                 enemy.spawner.spawned --;
             }else{
-                Vars.control.enemyDeath(); //TODO
+                state.enemies --;
             }
         }
     }

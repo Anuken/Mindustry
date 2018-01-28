@@ -2,14 +2,16 @@ package io.anuke.mindustry.graphics;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
-import io.anuke.mindustry.Vars;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
+
+import static io.anuke.mindustry.Vars.respawnduration;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class Fx{
 	public static Color lightRed = Hue.mix(Color.WHITE, Color.FIREBRICK, 0.1f);
@@ -249,31 +251,31 @@ public class Fx{
 	
 	place = new Effect(16, e -> {
 		Lines.stroke(3f - e.ifract() * 2f);
-		Lines.square(e.x, e.y, Vars.tilesize / 2f + e.ifract() * 3f);
+		Lines.square(e.x, e.y, tilesize / 2f + e.ifract() * 3f);
 		Draw.reset();
 	}),
 	
 	dooropen = new Effect(10, e -> {
 		Lines.stroke(e.fract() * 1.6f);
-		Lines.square(e.x, e.y, Vars.tilesize / 2f + e.ifract() * 2f);
+		Lines.square(e.x, e.y, tilesize / 2f + e.ifract() * 2f);
 		Draw.reset();
 	}),
 	
 	doorclose= new Effect(10, e -> {
 		Lines.stroke(e.fract() * 1.6f);
-		Lines.square(e.x, e.y, Vars.tilesize / 2f + e.fract() * 2f);
+		Lines.square(e.x, e.y, tilesize / 2f + e.fract() * 2f);
 		Draw.reset();
 	}),
 	
 	dooropenlarge = new Effect(10, e -> {
 		Lines.stroke(e.fract() * 1.6f);
-		Lines.square(e.x, e.y, Vars.tilesize + e.ifract() * 2f);
+		Lines.square(e.x, e.y, tilesize + e.ifract() * 2f);
 		Draw.reset();
 	}),
 			
 	doorcloselarge = new Effect(10, e -> {
 		Lines.stroke(e.fract() * 1.6f);
-		Lines.square(e.x, e.y, Vars.tilesize + e.fract() * 2f);
+		Lines.square(e.x, e.y, tilesize + e.fract() * 2f);
 		Draw.reset();
 	}),
 	
@@ -502,7 +504,7 @@ public class Fx{
 		Draw.reset();
 	}),
 	
-	respawn = new Effect(Vars.respawnduration, e -> {
+	respawn = new Effect(respawnduration, e -> {
 		Draw.tcolor(Color.SCARLET);
 		Draw.tscl(0.25f);
 		Draw.text("Respawning in " + (int)((e.lifetime-e.time)/60), e.x, e.y);

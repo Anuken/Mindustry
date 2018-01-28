@@ -6,7 +6,6 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.esotericsoftware.kryonet.*;
 import com.esotericsoftware.kryonet.Listener.LagListener;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.ClientProvider;
@@ -22,6 +21,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.List;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class KryoClient implements ClientProvider{
     Client client;
@@ -78,8 +79,8 @@ public class KryoClient implements ClientProvider{
                         Net.handleClientReceived(object);
                     }catch (Exception e){
                         if(e instanceof KryoNetException && e.getMessage() != null && e.getMessage().toLowerCase().contains("incorrect")) {
-                            Vars.ui.showError("$text.server.mismatch");
-                            Vars.netClient.disconnectQuietly();
+                            ui.showError("$text.server.mismatch");
+                            netClient.disconnectQuietly();
                         }else{
                             throw new RuntimeException(e);
                         }
@@ -143,7 +144,7 @@ public class KryoClient implements ClientProvider{
         runAsync(() -> {
             try {
                 DatagramSocket socket = new DatagramSocket();
-                socket.send(new DatagramPacket(new byte[]{-2, 1}, 2, InetAddress.getByName(address), Vars.port));
+                socket.send(new DatagramPacket(new byte[]{-2, 1}, 2, InetAddress.getByName(address), port));
 
                 socket.setSoTimeout(2000);
 
@@ -171,7 +172,7 @@ public class KryoClient implements ClientProvider{
     public void discover(Consumer<Array<Host>> callback){
         runAsync(() -> {
             addresses.clear();
-            List<InetAddress> list = client.discoverHosts(Vars.port, 3000);
+            List<InetAddress> list = client.discoverHosts(port, 3000);
             ObjectSet<String> hostnames = new ObjectSet<>();
             Array<Host> result = new Array<>();
 
@@ -206,7 +207,7 @@ public class KryoClient implements ClientProvider{
     private void handleException(Exception e){
         e.printStackTrace();
         if(e instanceof KryoNetException){
-            Gdx.app.postRunnable(() -> Vars.ui.showError("$text.server.mismatch"));
+            Gdx.app.postRunnable(() -> ui.showError("$text.server.mismatch"));
         }else{
             //TODO better exception handling.
             disconnect();

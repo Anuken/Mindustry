@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Vars;
+import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
@@ -125,7 +125,7 @@ public class Smelter extends Block{
 		for(int i = 0; i < inputs.length; i ++){
 			float fract = ((float)tile.entity.getItem(inputs[i]))/capacity;
 
-			Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 6 + i*4, fract);
+			renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 6 + i*4, fract);
 		}
 	}
 

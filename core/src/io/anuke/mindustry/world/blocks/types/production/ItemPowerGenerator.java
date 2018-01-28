@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.types.production;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 
-import io.anuke.mindustry.Vars;
+import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
@@ -60,7 +60,7 @@ public class ItemPowerGenerator extends Generator{
 		TileEntity entity = tile.entity;
 		
 		//TODO maybe don't draw it due to clutter
-		Vars.renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 10, (float)entity.getItem(generateItem) / itemCapacity);
+		renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 10, (float)entity.getItem(generateItem) / itemCapacity);
 	}
 	
 	@Override

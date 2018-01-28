@@ -2,11 +2,9 @@ package io.anuke.mindustry.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.resource.Weapon;
+import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
@@ -60,7 +58,7 @@ public class DesktopInput extends InputHandler{
 		boolean controller = KeyBinds.getSection("default").device.type == DeviceType.controller;
 		
 		if(Inputs.getAxisActive("zoom") && (Inputs.keyDown("zoom_hold") || controller)
-				&& !GameState.is(State.menu) && !ui.hasDialog()){
+				&& !state.is(State.menu) && !ui.hasDialog()){
 			if((!zoomed || !controller)) {
 				renderer.scaleCamera((int) Inputs.getAxis("zoom"));
 			}
@@ -89,11 +87,11 @@ public class DesktopInput extends InputHandler{
 			breakMode = PlaceMode.hold;
 		}
 		
-		for(int i = 1; i <= 6 && i <= control.getWeapons().size; i ++){
+		for(int i = 1; i <= 6 && i <= control.upgrades().getWeapons().size; i ++){
 			if(Inputs.keyTap("weapon_" + i)){
-				player.weaponLeft = player.weaponRight = control.getWeapons().get(i - 1);
-                if(Net.active()) Vars.netClient.handleWeaponSwitch();
-				Vars.ui.hudfrag.updateWeapons();
+				player.weaponLeft = player.weaponRight = control.upgrades().getWeapons().get(i - 1);
+                if(Net.active()) NetEvents.handleWeaponSwitch();
+				ui.hudfrag.updateWeapons();
 			}
 		}
 		
@@ -109,7 +107,7 @@ public class DesktopInput extends InputHandler{
 
 			if(linked != null) {
 				linked.block().tapped(linked);
-				if(Net.active()) netClient.handleBlockTap(linked);
+				if(Net.active()) NetEvents.handleBlockTap(linked);
 			}
 		}
 		
@@ -150,16 +148,6 @@ public class DesktopInput extends InputHandler{
 		return (recipe != null && recipe.result.isMultiblock() &&
 				recipe.result.height % 2 == 0) ?
 				Mathf.scl(Graphics.mouseWorld().y, tilesize) : Mathf.scl2(Graphics.mouseWorld().y, tilesize);
-	}
-	
-	public int currentWeapon(){
-		int i = 0;
-		for(Weapon weapon : control.getWeapons()){
-			if(weapon == weapon)
-				return i;
-			i ++;
-		}
-		return 0;
 	}
 
 	@Override

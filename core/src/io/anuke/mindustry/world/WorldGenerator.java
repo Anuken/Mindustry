@@ -16,6 +16,9 @@ import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.noise.Noise;
 import io.anuke.ucore.util.Mathf;
 
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
+
 public class WorldGenerator {
 	public static final ObjectMap<Block, Block> rocks = new ObjectMap(){{
 		put(Blocks.stone, Blocks.rock);
@@ -26,7 +29,7 @@ public class WorldGenerator {
 	
 	/**Returns the core (starting) block. Should fill spawns with the correct spawnpoints.*/
 	public static Tile generate(Pixmap pixmap, Tile[][] tiles, Array<SpawnPoint> spawns){
-		Noise.setSeed(Vars.world.getSeed());
+		Noise.setSeed(world.getSeed());
 
 		Tile core = null;
 		
@@ -45,7 +48,7 @@ public class WorldGenerator {
 					
 				if(block == SpecialBlocks.playerSpawn){
 					block = Blocks.air;
-					core = Vars.world.tile(x, y);
+					core = world.tile(x, y);
 				}else if(block == SpecialBlocks.enemySpawn){
 					block = Blocks.air;
 					spawns.add(new SpawnPoint(tiles[x][y]));
@@ -55,7 +58,7 @@ public class WorldGenerator {
 					block = rocks.get(floor);
 				}
 				
-				if(Vars.world.getMap().oreGen && (floor == Blocks.stone || floor == Blocks.grass || floor == Blocks.blackstone ||
+				if(world.getMap().oreGen && (floor == Blocks.stone || floor == Blocks.grass || floor == Blocks.blackstone ||
 						floor == Blocks.snow || floor == Blocks.sand)){
 					if(Noise.nnoise(x, y, 8, 1) > 0.21){
 						floor = Blocks.iron;
@@ -75,7 +78,7 @@ public class WorldGenerator {
 				}
 				
 				if(color == Hue.rgb(Color.PURPLE)){
-					if(!Vars.android) new Enemy(EnemyTypes.target).set(x * Vars.tilesize, y * Vars.tilesize).add();
+					if(!Vars.android) new Enemy(EnemyTypes.target).set(x * tilesize, y * tilesize).add();
 					floor = Blocks.stone;
 				}
 				

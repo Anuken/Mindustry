@@ -73,9 +73,6 @@ public class Vars{
 	//only if smoothCamera
 	public static boolean snapCamera = true;
 	
-	//turret and enemy shootInternal speed inverse multiplier
-	public static final float multiplier = android ? 3 : 2;
-	
 	public static final int tilesize = 8;
 
 	//server port
@@ -89,6 +86,7 @@ public class Vars{
 	public static Renderer renderer;
 	public static UI ui;
 	public static World world;
+	public static NetCommon netCommon;
 	public static NetServer netServer;
 	public static NetClient netClient;
 	

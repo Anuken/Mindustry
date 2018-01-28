@@ -5,8 +5,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.world.Block;
@@ -15,9 +13,9 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.StaticBlock;
 import io.anuke.ucore.core.Core;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.CacheBatch;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 
@@ -89,7 +87,7 @@ public class BlockRenderer{
 					
 					if(!(block instanceof StaticBlock)){
 						if(block == Blocks.air){
-							if(!GameState.is(State.paused)) tile.floor().update(tile);
+							if(!state.is(State.paused)) tile.floor().update(tile);
 						}else{
 						
 							if(!expanded){
@@ -190,11 +188,11 @@ public class BlockRenderer{
 
 		Draw.reset();
 		
-		if(Vars.showPaths && Vars.debug){
+		if(showPaths && debug){
 			drawPaths();
 		}
 
-		if(Vars.debug && Vars.debugChunks){
+		if(debug && debugChunks){
 			Draw.color(Color.YELLOW);
 			Lines.stroke(1f);
 			for(int x = -crangex; x <= crangex; x++){
@@ -213,7 +211,7 @@ public class BlockRenderer{
 	
 	void drawPaths(){
 		Draw.color(Color.RED);
-		for(SpawnPoint point : control.getSpawnPoints()){
+		for(SpawnPoint point : world.getSpawns()){
 			if(point.pathTiles != null){
 				for(int i = 1; i < point.pathTiles.length; i ++){
 					Lines.line(point.pathTiles[i-1].worldx(), point.pathTiles[i-1].worldy(),
@@ -280,6 +278,6 @@ public class BlockRenderer{
 	private void createBatch(){
 		if(cbatch != null)
 			cbatch.dispose();
-		cbatch = new CacheBatch(Vars.world.width() * Vars.world.height() * 4);
+		cbatch = new CacheBatch(world.width() * world.height() * 4);
 	}
 }

@@ -5,7 +5,7 @@ import com.badlogic.gdx.ai.utils.Ray;
 import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
 import com.badlogic.gdx.math.Vector2;
 
-import io.anuke.mindustry.Vars;
+import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
@@ -17,7 +17,7 @@ public class Raycaster implements RaycastCollisionDetector<Vector2>{
 	public boolean collides(Ray<Vector2> ray){
 		found = false;
 		
-		Geometry.iterateLine(0f, ray.start.x, ray.start.y, ray.end.x, ray.end.y, Vars.tilesize, (x, y)->{
+		Geometry.iterateLine(0f, ray.start.x, ray.start.y, ray.end.x, ray.end.y, tilesize, (x, y)->{
 			if(solid(x, y)){
 				found = true;
 				return;
@@ -71,7 +71,7 @@ public class Raycaster implements RaycastCollisionDetector<Vector2>{
 	}
 	
 	private boolean solid(float x, float y){
-		Tile tile = Vars.world.tile(Mathf.scl2(x, Vars.tilesize), Mathf.scl2(y, Vars.tilesize));
+		Tile tile = world.tile(Mathf.scl2(x, tilesize), Mathf.scl2(y, tilesize));
 		
 		if(tile == null || tile.solid()) return true;
 		

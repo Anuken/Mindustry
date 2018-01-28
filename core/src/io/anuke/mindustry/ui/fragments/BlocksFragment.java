@@ -5,8 +5,6 @@ import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.resource.*;
@@ -23,8 +21,7 @@ import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
-import static io.anuke.mindustry.Vars.control;
-import static io.anuke.mindustry.Vars.fontscale;
+import static io.anuke.mindustry.Vars.*;
 
 public class BlocksFragment implements Fragment{
 	private Table desctable, itemtable, blocks, weapons;
@@ -39,12 +36,12 @@ public class BlocksFragment implements Fragment{
 			abottom();
 			aright();
 
-            visible(() -> !GameState.is(State.menu) && shown);
+            visible(() -> !state.is(State.menu) && shown);
 
 			blocks = new table(){{
 
 				itemtable = new Table("button");
-				itemtable.setVisible(() -> input.recipe == null && !Vars.control.getMode().infiniteResources);
+				itemtable.setVisible(() -> input.recipe == null && !state.mode.infiniteResources);
 
 				desctable = new Table("button");
 				desctable.setVisible(() -> input.recipe != null);
@@ -121,8 +118,8 @@ public class BlocksFragment implements Fragment{
 							image.getImageCell().size(size);
 
 							image.update(() -> {
-								boolean canPlace = !control.getTutorial().active() || control.getTutorial().canPlace();
-								boolean has = (control.hasItems(r.requirements)) && canPlace;
+								boolean canPlace = !control.tutorial().active() || control.tutorial().canPlace();
+								boolean has = (state.inventory.hasItems(r.requirements)) && canPlace;
 								image.setChecked(input.recipe == r);
 								image.setTouchable(canPlace ? Touchable.enabled : Touchable.disabled);
 								image.getImage().setColor(has ? Color.WHITE : Hue.lightness(0.33f));
@@ -152,11 +149,11 @@ public class BlocksFragment implements Fragment{
 
 				row();
 
-				if(!Vars.android) {
+				if(!android) {
 					weapons = new table("button").margin(0).fillX().end().get();
 				}
 
-				visible(() -> !GameState.is(State.menu) && shown);
+				visible(() -> !state.is(State.menu) && shown);
 
 			}}.end().get();
 		}}.end();
@@ -165,21 +162,21 @@ public class BlocksFragment implements Fragment{
 	}
 
 	public void updateWeapons(){
-		if(Vars.android) return;
+		if(android) return;
 
 		weapons.clearChildren();
 		weapons.left();
 
 		ButtonGroup<ImageButton> group = new ButtonGroup<>();
 
-		for(int i = 0; i < Vars.control.getWeapons().size; i ++){
-			Weapon weapon = Vars.control.getWeapons().get(i);
+		for(int i = 0; i < control.upgrades().getWeapons().size; i ++){
+			Weapon weapon = control.upgrades().getWeapons().get(i);
 			weapons.addImageButton(weapon.name, "toggle", 8*3, () -> {
-				Vars.player.weaponLeft = Vars.player.weaponRight = weapon;
+				player.weaponLeft = player.weaponRight = weapon;
 			}).left().size(40f, 45f).padRight(-1).group(group);
 		}
 
-		int idx = Vars.control.getWeapons().indexOf(Vars.player.weaponLeft, true);
+		int idx = control.upgrades().getWeapons().indexOf(player.weaponLeft, true);
 
 		if(idx != -1)
 			group.getButtons().get(idx).setChecked(true);
@@ -197,7 +194,7 @@ public class BlocksFragment implements Fragment{
     }
 	
 	void updateRecipe(){
-		Recipe recipe = Vars.control.input().recipe;
+		Recipe recipe = control.input().recipe;
 		desctable.clear();
 		desctable.setTouchable(Touchable.enabled);
 		
@@ -228,7 +225,7 @@ public class BlocksFragment implements Fragment{
 				Label desclabel = new Label(recipe.result.fullDescription);
 				desclabel.setWrap(true);
 				
-				boolean wasPaused = GameState.is(State.paused);
+				boolean wasPaused = state.is(State.paused);
 				state.set(State.paused);
 				
 				FloatingDialog d = new FloatingDialog("$text.blocks.blockinfo");
@@ -286,7 +283,7 @@ public class BlocksFragment implements Fragment{
 			Label reqlabel = new Label("");
 			
 			reqlabel.update(()->{
-				int current = control.getAmount(stack.item);
+				int current = state.inventory.getAmount(stack.item);
 				String text = Mathf.clamp(current, 0, stack.amount) + "/" + stack.amount;
 				
 				reqlabel.setColor(current < stack.amount ? Colors.get("missingitems") : Color.WHITE);
@@ -311,12 +308,12 @@ public class BlocksFragment implements Fragment{
 		itemtable.clear();
 		itemtable.left();
 
-		if(control.getMode().infiniteResources){
+		if(state.mode.infiniteResources){
 			return;
 		}
 
-		for(int i = 0; i < control.getItems().length; i ++){
-			int amount = control.getItems()[i];
+		for(int i = 0; i < state.inventory.getItems().length; i ++){
+			int amount = state.inventory.getItems()[i];
 			if(amount == 0) continue;
 			String formatted = amount > 99999999 ? "inf" : format(amount);
 			Image image = new Image(Draw.hasRegion("icon-" + Item.getByID(i).name) ?

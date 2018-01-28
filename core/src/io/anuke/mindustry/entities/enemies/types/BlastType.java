@@ -1,8 +1,7 @@
 package io.anuke.mindustry.entities.enemies.types;
 
 import com.badlogic.gdx.math.Vector2;
-
-import io.anuke.mindustry.Vars;
+import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.TileEntity;
@@ -31,7 +30,7 @@ public class BlastType extends EnemyType {
 
 		if(enemy.target instanceof TileEntity){
 			TileEntity e = (TileEntity)enemy.target;
-			range = (e.tile.block().width * Vars.tilesize) /2f + 8f;
+			range = (e.tile.block().width * tilesize) /2f + 8f;
 			offset.set(e.tile.block().getPlaceOffset());
 		}
 		

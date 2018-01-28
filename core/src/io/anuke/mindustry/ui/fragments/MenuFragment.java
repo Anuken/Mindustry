@@ -1,10 +1,9 @@
 package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.Gdx;
-import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.ui.MenuButton;
 import io.anuke.mindustry.ui.PressGroup;
 import io.anuke.ucore.scene.builders.imagebutton;
@@ -28,7 +27,7 @@ public class MenuFragment implements Fragment{
 					add(new MenuButton("$text.play", group, ui.levels::show));
 					row();
 
-					if(Mindustry.platforms.canJoinGame()) {
+					if(Platform.instance.canJoinGame()) {
 						add(new MenuButton("$text.joingame", group, ui.join::show));
 						row();
 					}
@@ -53,7 +52,7 @@ public class MenuFragment implements Fragment{
 					get().margin(16);
 				}}.end();
 	
-				visible(()-> GameState.is(State.menu));
+				visible(() -> state.is(State.menu));
 			}}.end();
 		}else{
 			new table(){{
@@ -77,9 +76,9 @@ public class MenuFragment implements Fragment{
 
 					new imagebutton("icon-info", isize, ui.about::show).text("$text.about.button").padTop(4f);
 
-					new imagebutton("icon-donate", isize, Mindustry.platforms::openDonations).text("$text.donate").padTop(4f);
+					new imagebutton("icon-donate", isize, Platform.instance::openDonations).text("$text.donate").padTop(4f);
 
-					visible(()->GameState.is(State.menu));
+					visible(() -> state.is(State.menu));
 				}}.end();
 			}}.end();
 		}
@@ -87,12 +86,12 @@ public class MenuFragment implements Fragment{
 		//extra icons in top right
 		new table(){{
 			atop().aright();
-			if(Mindustry.hasDiscord){
+			if(Platform.instance.hasDiscord()){
 				new imagebutton("icon-discord", 30f, ui.discord::show).margin(14);
 			}
 			if(!Vars.android) {
 				new imagebutton("icon-info", 30f, ui.about::show).margin(14);
 			}
-		}}.end().visible(()->GameState.is(State.menu));
+		}}.end().visible(()->state.is(State.menu));
 	}
 }

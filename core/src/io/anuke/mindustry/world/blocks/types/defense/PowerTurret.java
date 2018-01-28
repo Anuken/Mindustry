@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Vars;
+import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
@@ -48,7 +48,7 @@ public class PowerTurret extends Turret implements PowerAcceptor{
 		if(fract > 0)
 			fract = Mathf.clamp(fract, 0.24f, 1f);
 		
-		Vars.renderer.drawBar(Color.YELLOW, tile.drawx(), tile.drawy() + 6, fract);
+		renderer.drawBar(Color.YELLOW, tile.drawx(), tile.drawy() + 6, fract);
 	}
 	
 	@Override

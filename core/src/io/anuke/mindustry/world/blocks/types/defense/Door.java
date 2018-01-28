@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.math.Rectangle;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Block;
@@ -18,8 +17,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.player;
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.*;
 
 public class Door extends Wall{
 	protected Effect openfx = Fx.dooropen;
@@ -67,10 +65,10 @@ public class Door extends Wall{
 	boolean anyEntities(Tile tile){
 		int x = tile.x, y = tile.y;
 		Block type = tile.block();
-		Tmp.r2.setSize(type.width * Vars.tilesize, type.height * Vars.tilesize);
+		Tmp.r2.setSize(type.width * tilesize, type.height * tilesize);
 		Tmp.r2.setCenter(tile.drawx(), tile.drawy());
 		
-		for(SolidEntity e : Entities.getNearby(Vars.control.enemyGroup, x * tilesize, y * tilesize, tilesize * 2f)){
+		for(SolidEntity e : Entities.getNearby(enemyGroup, x * tilesize, y * tilesize, tilesize * 2f)){
 			Rectangle rect = e.hitbox.getRect(e.x, e.y);
 
 			if(Tmp.r2.overlaps(rect)){

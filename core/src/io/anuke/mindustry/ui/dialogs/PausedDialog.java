@@ -1,8 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.utils.reflect.ClassReflection;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.PressGroup;
@@ -13,7 +11,7 @@ import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.util.Bundles;
 
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 
 public class PausedDialog extends FloatingDialog{
 	private SaveDialog save = new SaveDialog();
@@ -27,22 +25,22 @@ public class PausedDialog extends FloatingDialog{
 
 	void setup(){
 		update(() -> {
-			if(GameState.is(State.menu) && isShown()){
+			if(state.is(State.menu) && isShown()){
 				hide();
 			}
 		});
 
 		shown(() -> {
-			wasPaused = GameState.is(State.paused);
+			wasPaused = state.is(State.paused);
 			if(!Net.active()) state.set(State.paused);
 		});
 		
-		if(!Vars.android){
+		if(!android){
 			content().defaults().width(220).height(50);
 
 			content().addButton("$text.back", () -> {
 				hide();
-				if((!wasPaused || Net.active()) && !GameState.is(State.menu))
+				if((!wasPaused || Net.active()) && !state.is(State.menu))
 					state.set(State.playing);
 			});
 
@@ -52,7 +50,7 @@ public class PausedDialog extends FloatingDialog{
 			content().row();
 			content().addButton("$text.savegame", () -> {
 				save.show();
-			}).disabled(b -> Vars.world.getMap().id == -1);
+			}).disabled(b -> world.getMap().id == -1);
 
 			content().row();
 			content().addButton("$text.loadgame", () -> {
@@ -61,7 +59,7 @@ public class PausedDialog extends FloatingDialog{
 
 			content().row();
 
-			if(!Vars.gwt) {
+			if(!gwt) {
 				content().addButton("$text.hostserver", () -> {
 					ui.host.show();
 				}).disabled(b -> Net.active());
@@ -71,7 +69,7 @@ public class PausedDialog extends FloatingDialog{
 
 			content().addButton("$text.quit", () -> {
                 ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
-                	if(Net.active() && Net.client()) Vars.netClient.disconnectQuietly();
+                	if(Net.client()) netClient.disconnectQuietly();
 					runExitSave();
 					hide();
 				});
@@ -87,7 +85,7 @@ public class PausedDialog extends FloatingDialog{
 			
 			new imagebutton("icon-play-2", isize, () -> {
 				hide();
-				if(!wasPaused && !GameState.is(State.menu))
+				if(!wasPaused && !state.is(State.menu))
 					state.set(State.playing);
 			}).text("$text.back").padTop(4f);
 			
@@ -95,7 +93,7 @@ public class PausedDialog extends FloatingDialog{
 			
 			imagebutton sa = new imagebutton("icon-save", isize, save::show);
 			sa.text("$text.save").padTop(4f);
-			sa.cell.disabled(b -> Vars.world.getMap().id == -1);
+			sa.cell.disabled(b -> world.getMap().id == -1);
 
 			content().row();
 			
@@ -110,8 +108,8 @@ public class PausedDialog extends FloatingDialog{
 			ho.cell.disabled(b -> Net.active());
 			
 			new imagebutton("icon-quit", isize, () -> {
-				Vars.ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
-					if(Net.active() && Net.client()) Vars.netClient.disconnectQuietly();
+				ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
+					if(Net.client()) netClient.disconnectQuietly();
 					runExitSave();
 					hide();
 				});
@@ -128,22 +126,22 @@ public class PausedDialog extends FloatingDialog{
 	}
 
 	private void runExitSave(){
-		if(Vars.control.getSaves().getCurrent() == null ||
-				!Vars.control.getSaves().getCurrent().isAutosave()){
+		if(control.getSaves().getCurrent() == null ||
+				!control.getSaves().getCurrent().isAutosave()){
 			state.set(State.menu);
-			Vars.control.getTutorial().reset();
+			control.tutorial().reset();
 			return;
 		}
 
-		Vars.ui.loadfrag.show("$text.saveload");
+		ui.loadfrag.show("$text.saveload");
 
 		Timers.runTask(5f, () -> {
-			Vars.ui.loadfrag.hide();
+			ui.loadfrag.hide();
 			try{
-				Vars.control.getSaves().getCurrent().save();
+				control.getSaves().getCurrent().save();
 			}catch(Throwable e){
 				e = (e.getCause() == null ? e : e.getCause());
-				Vars.ui.showError("[orange]"+ Bundles.get("text.savefail")+"\n[white]" + ClassReflection.getSimpleName(e.getClass()) + ": " + e.getMessage() + "\n" + "at " + e.getStackTrace()[0].getFileName() + ":" + e.getStackTrace()[0].getLineNumber());
+				ui.showError("[orange]"+ Bundles.get("text.savefail")+"\n[white]" + ClassReflection.getSimpleName(e.getClass()) + ": " + e.getMessage() + "\n" + "at " + e.getStackTrace()[0].getFileName() + ":" + e.getStackTrace()[0].getLineNumber());
 			}
 			state.set(State.menu);
 		});

@@ -2,7 +2,6 @@ package io.anuke.mindustry.entities.effect;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -15,6 +14,8 @@ import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Physics;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class DamageArea{
 	private static Rectangle rect = new Rectangle();
@@ -59,14 +60,14 @@ public class DamageArea{
             }
         };
 
-		Entities.getNearby(Vars.control.enemyGroup, rect, cons);
-        if(Vars.control.isFriendlyFire()) Entities.getNearby(Vars.control.playerGroup, rect, cons);
+		Entities.getNearby(enemyGroup, rect, cons);
+        if(state.friendlyFire) Entities.getNearby(playerGroup, rect, cons);
 	}
 	
 	public static void damageEntities(float x, float y, float radius, int damage){
 		damage(true, x, y, radius, damage);
 
-		for(Player player : Vars.control.playerGroup.all()){
+		for(Player player : playerGroup.all()){
 			if(player.isAndroid) continue;
 			int amount = calculateDamage(x, y, player.x, player.y, radius, damage);
 			player.damage(amount);
@@ -84,12 +85,12 @@ public class DamageArea{
 		};
 		
 		if(enemies){
-			Entities.getNearby(Vars.control.enemyGroup, x, y, radius*2, cons);
+			Entities.getNearby(enemyGroup, x, y, radius*2, cons);
 		}else{
-			int trad = (int)(radius / Vars.tilesize);
+			int trad = (int)(radius / tilesize);
 			for(int dx = -trad; dx <= trad; dx ++){
 				for(int dy= -trad; dy <= trad; dy ++){
-					Tile tile = Vars.world.tile(Mathf.scl2(x, Vars.tilesize) + dx, Mathf.scl2(y, Vars.tilesize) + dy);
+					Tile tile = world.tile(Mathf.scl2(x, tilesize) + dx, Mathf.scl2(y, tilesize) + dy);
 					if(tile != null && tile.entity != null && Vector2.dst(dx, dy, 0, 0) <= trad){
 						int amount = calculateDamage(x, y, tile.worldx(), tile.worldy(), radius, damage);
 						tile.entity.damage(amount);
@@ -97,7 +98,7 @@ public class DamageArea{
 				}
 			}
 
-			Entities.getNearby(Vars.control.playerGroup, x, y, radius*2, cons);
+			Entities.getNearby(playerGroup, x, y, radius*2, cons);
 		}
 	}
 	

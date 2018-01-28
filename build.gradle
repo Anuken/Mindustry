@@ -113,6 +113,16 @@ project(":core") {
     }
 }
 
+project(":server") {
+    apply plugin: "java"
+
+    dependencies {
+        compile project(":core")
+        compile project(":kryonet")
+        compile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+    }
+}
+
 project(":kryonet") {
     apply plugin: "java"
 

@@ -1,11 +1,12 @@
 package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Unit;
+
+import static io.anuke.mindustry.Vars.state;
 
 public class BackgroundFragment implements Fragment {
 
@@ -29,6 +30,6 @@ public class BackgroundFragment implements Fragment {
 
             Draw.color();
             Core.batch.draw(logo, w/2 - logow/2, h - logoh + 15, logow, logoh);
-        }).visible(() -> GameState.is(State.menu)).grow();
+        }).visible(() -> state.is(State.menu)).grow();
     }
 }

@@ -1,8 +1,10 @@
-package io.anuke.mindustry.world;
+package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectIntMap;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.*;
+import io.anuke.ucore.UCore;
 
 public class BlockLoader {
     static final ObjectIntMap<String> defaultMap = map(
@@ -120,6 +122,8 @@ public class BlockLoader {
             Block block = Block.getByName(string);
             blockmap.put(defaultMap.get(string, -1), block);
         }
+
+        UCore.log("Total blocks loaded: " + Block.getAllBlocks().size);
     }
 
     public static Block getByOldID(int id){

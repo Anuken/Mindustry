@@ -1,10 +1,11 @@
 package io.anuke.mindustry.ai;
 
 import com.badlogic.gdx.ai.pfa.Heuristic;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.function.Predicate;
+
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class Heuristics {
     /**How many times more it costs to go through a destructible block than an empty block.*/
@@ -23,11 +24,11 @@ public class Heuristics {
             //If either one of the tiles is a breakable solid block (that is, it's player-made),
             //increase the cost by the tilesize times the solid block multiplier
             //Also add the block health, so blocks with more health cost more to traverse
-            if(node.breakable() && node.block().solid) cost += Vars.tilesize* solidMultiplier + node.block().health;
-            if(other.breakable() && other.block().solid) cost += Vars.tilesize* solidMultiplier + other.block().health;
+            if(node.breakable() && node.block().solid) cost += tilesize* solidMultiplier + node.block().health;
+            if(other.breakable() && other.block().solid) cost += tilesize* solidMultiplier + other.block().health;
 
             //if this block has solid blocks near it, increase the cost, as we don't want enemies hugging walls
-            if(node.occluded) cost += Vars.tilesize*occludedMultiplier;
+            if(node.occluded) cost += tilesize*occludedMultiplier;
 
             return cost;
         }
@@ -50,11 +51,11 @@ public class Heuristics {
             //If either one of the tiles is a breakable solid block (that is, it's player-made),
             //increase the cost by the tilesize times the solid block multiplier
             //Also add the block health, so blocks with more health cost more to traverse
-            if(node.breakable() && node.block().solid) cost += Vars.tilesize* solidMultiplier + node.block().health;
-            if(other.breakable() && other.block().solid) cost += Vars.tilesize* solidMultiplier + other.block().health;
+            if(node.breakable() && node.block().solid) cost += tilesize* solidMultiplier + node.block().health;
+            if(other.breakable() && other.block().solid) cost += tilesize* solidMultiplier + other.block().health;
 
             //if this block has solid blocks near it, increase the cost, as we don't want enemies hugging walls
-            if(node.occluded) cost += Vars.tilesize*occludedMultiplier;
+            if(node.occluded) cost += tilesize*occludedMultiplier;
 
             if(other.getLinked() != null) other = other.getLinked();
             if(node.getLinked() != null) node = node.getLinked();

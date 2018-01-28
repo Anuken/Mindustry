@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.types;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
-import io.anuke.mindustry.Vars;
+import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.graphics.Draw;
@@ -31,7 +31,7 @@ public class Floor extends Block{
 				
 				if(dx == 0 && dy == 0) continue;
 				
-				Tile other = Vars.world.tile(tile.x+dx, tile.y+dy);
+				Tile other = world.tile(tile.x+dx, tile.y+dy);
 				
 				if(other == null) continue;
 				

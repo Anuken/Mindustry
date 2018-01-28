@@ -35,6 +35,8 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static io.anuke.mindustry.Vars.ui;
+
 public class KryoServer implements ServerProvider {
     final boolean debug = false;
     final Server server;
@@ -432,10 +434,10 @@ public class KryoServer implements ServerProvider {
             ex.printStackTrace();
             if(ex instanceof BindException){
                 Net.closeServer();
-                Vars.ui.showError("$text.server.addressinuse");
+                ui.showError("$text.server.addressinuse");
             }else if(ex.getMessage().equals("Permission denied")){
                 Net.closeServer();
-                Vars.ui.showError("Permission denied.");
+                ui.showError("Permission denied.");
             }
         }
 

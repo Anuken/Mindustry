@@ -8,11 +8,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Json.Serializer;
 import com.badlogic.gdx.utils.JsonWriter.OutputType;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.graphics.Pixmaps;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class Maps implements Disposable{
 	private IntMap<Map> maps = new IntMap<>();
@@ -60,10 +61,10 @@ public class Maps implements Disposable{
 			throw new RuntimeException("Failed to load maps!");
 		}
 
-		if(!Vars.gwt) {
-			if (!loadMapFile(Vars.customMapDirectory.child("maps.json"))) {
+		if(!gwt) {
+			if (!loadMapFile(customMapDirectory.child("maps.json"))) {
 				try {
-					Vars.customMapDirectory.child("maps.json").writeString("{}", false);
+					customMapDirectory.child("maps.json").writeString("{}", false);
 				} catch (Exception e) {
 					throw new RuntimeException("Failed to create custom map directory!");
 				}
@@ -80,7 +81,7 @@ public class Maps implements Disposable{
 				out.add(m);
 			}
 		}
-		saveMaps(out, Vars.customMapDirectory.child("maps.json"));
+		saveMaps(out, customMapDirectory.child("maps.json"));
 	}
 	
 	public void saveAndReload(Map map, Pixmap out){
@@ -107,7 +108,7 @@ public class Maps implements Disposable{
 		}
 		
 		saveCustomMap(map);
-		Vars.ui.levels.reload();
+		ui.levels.reload();
 	}
 
 	public void saveMaps(Array<Map> array, FileHandle file){
@@ -136,8 +137,8 @@ public class Maps implements Disposable{
 		mapNames.remove(toSave.name);
 		maps.put(toSave.id, toSave);
 		mapNames.put(toSave.name, toSave);
-		Pixmaps.write(toSave.pixmap, Vars.customMapDirectory.child(toSave.name + ".png"));
-		saveMaps(out, Vars.customMapDirectory.child("maps.json"));
+		Pixmaps.write(toSave.pixmap, customMapDirectory.child(toSave.name + ".png"));
+		saveMaps(out, customMapDirectory.child("maps.json"));
 	}
 
 	private boolean loadMapFile(FileHandle file){
@@ -154,7 +155,7 @@ public class Maps implements Disposable{
 			}
 			return true;
 		}catch(Exception e){
-			if(!Vars.android) UCore.error(e);
+			if(!android) UCore.error(e);
 			Gdx.app.error("Mindustry-Maps", "Failed loading map file: " + file);
 			return false;
 		}

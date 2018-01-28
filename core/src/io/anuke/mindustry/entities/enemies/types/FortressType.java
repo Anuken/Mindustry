@@ -1,6 +1,6 @@
 package io.anuke.mindustry.entities.enemies.types;
 
-import io.anuke.mindustry.Vars;
+import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
@@ -30,8 +30,8 @@ public class FortressType extends EnemyType {
 	
 	@Override
 	public void move(Enemy enemy){
-		if(enemy.distanceTo(Vars.world.getCore().worldx(),
-				Vars.world.getCore().worldy()) <= 90f){
+		if(enemy.distanceTo(world.getCore().worldx(),
+				world.getCore().worldy()) <= 90f){
 
 			if(Timers.get(this, "spawn", spawnTime) && enemy.spawned < maxSpawn){
 				Angles.translation(enemy.angle, 20f);

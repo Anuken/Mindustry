@@ -11,7 +11,7 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Vars;
+import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.ui.GridImage;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.ucore.core.Core;
@@ -116,7 +116,7 @@ public class MapView extends Element implements GestureListener{
 				
 				if(tool.edit){
 					updated = true;
-					Vars.ui.editor.resetSaved();
+					ui.editor.resetSaved();
 				}
 
 				op = new DrawOperation(editor.pixmap());
@@ -132,7 +132,7 @@ public class MapView extends Element implements GestureListener{
 				GridPoint2 p = project(x, y);
 
 				if(tool == EditorTool.line){
-					Vars.ui.editor.resetSaved();
+					ui.editor.resetSaved();
 					Array<GridPoint2> points = br.line(startx, starty, p.x, p.y);
 					for(GridPoint2 point : points){
 						editor.draw(point.x, point.y);
@@ -155,7 +155,7 @@ public class MapView extends Element implements GestureListener{
 				GridPoint2 p = project(x, y);
 				
 				if(drawing && tool == EditorTool.pencil){
-					Vars.ui.editor.resetSaved();
+					ui.editor.resetSaved();
 					Array<GridPoint2> points = br.line(lastx, lasty, p.x, p.y);
 					for(GridPoint2 point : points){
 						editor.draw(point.x, point.y);
@@ -256,8 +256,8 @@ public class MapView extends Element implements GestureListener{
 	
 	private boolean active(){
 		return Core.scene.getKeyboardFocus() != null 
-				&& Core.scene.getKeyboardFocus().isDescendantOf(Vars.ui.editor)
-				&& Vars.ui.editor.isShown() && tool == EditorTool.zoom &&
+				&& Core.scene.getKeyboardFocus().isDescendantOf(ui.editor)
+				&& ui.editor.isShown() && tool == EditorTool.zoom &&
 				Core.scene.hit(Graphics.mouse().x, Graphics.mouse().y, true) == this;
 	}
 

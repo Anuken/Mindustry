@@ -4,10 +4,12 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.enemies.Enemy;
-import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.game.EventType.GameOver;
+import io.anuke.mindustry.game.EnemySpawn;
+import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.game.EventType.PlayEvent;
 import io.anuke.mindustry.game.EventType.ResetEvent;
+import io.anuke.mindustry.game.SpawnPoint;
+import io.anuke.mindustry.game.WaveCreator;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Tile;
@@ -100,12 +102,17 @@ public class Logic extends Module {
         state.extrawavetime = maxwavespace;
     }
 
-    public void updateLogic(){
+    @Override
+    public void update(){
+        if(!state.is(State.paused) || Net.active()){
+            Timers.update();
+        }
+
         if(!state.is(State.menu)){
 
             if(world.getCore().block() != ProductionBlocks.core && !state.gameOver){
                 state.gameOver = true;
-                Events.fire(GameOver.class);
+                Events.fire(GameOverEvent.class);
             }
 
             if(!state.is(State.paused) || Net.active()){

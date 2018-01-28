@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.SpawnPoint;
@@ -24,8 +23,7 @@ import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class World extends Module{
 	private int seed;
@@ -46,7 +44,7 @@ public class World extends Module{
 	
 	@Override
 	public void update(){
-		if(!(Net.active() && Net.client()))
+		if(!(Net.client()))
 			pathfind.update();
 	}
 	
@@ -76,7 +74,7 @@ public class World extends Module{
 	}
 
 	public float getSpawnY(){
-		return core.worldy() - Vars.tilesize/2;
+		return core.worldy() - tilesize/2;
 	}
 	
 	public boolean solid(int x, int y){
@@ -208,7 +206,7 @@ public class World extends Module{
 		if(!map.name.equals("tutorial")){
 			setDefaultBlocks();
 		}else{
-			Vars.control.getTutorial().setDefaultBlocks(core.x, core.y);
+			control.tutorial().setDefaultBlocks(core.x, core.y);
 		}
 		
 		pathfind.resetPaths();

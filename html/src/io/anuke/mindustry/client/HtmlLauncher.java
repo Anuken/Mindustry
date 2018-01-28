@@ -15,7 +15,7 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.shared.DateTimeFormat;
 import com.google.gwt.user.client.ui.*;
 import io.anuke.mindustry.Mindustry;
-import io.anuke.mindustry.io.PlatformFunction;
+import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
 
 import java.util.Date;
@@ -94,7 +94,7 @@ public class HtmlLauncher extends GwtApplication {
 
         Net.setClientProvider(new WebsocketClient());
         
-        Mindustry.platforms = new PlatformFunction(){
+        Platform.instance = new Platform(){
         	DateTimeFormat format = DateTimeFormat.getFormat("EEE, dd MMM yyyy HH:mm:ss");
 			
 			@Override

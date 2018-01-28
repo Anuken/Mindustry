@@ -4,12 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Bundles;
@@ -27,8 +26,8 @@ public enum PlaceMode{
 		}
 		
 		public void draw(int tilex, int tiley, int endx, int endy){
-			float x = tilex * Vars.tilesize;
-			float y = tiley * Vars.tilesize;
+			float x = tilex * tilesize;
+			float y = tiley * tilesize;
 			
 			boolean valid = control.input().validPlace(tilex, tiley, control.input().recipe.result) && (android || control.input().cursorNear());
 
@@ -152,7 +151,7 @@ public enum PlaceMode{
 			Lines.stroke(1f);
 			for(int cx = tilex; cx <= endx; cx ++){
 				for(int cy = tiley; cy <= endy; cy ++){
-					Tile tile = Vars.world.tile(cx, cy);
+					Tile tile = world.tile(cx, cy);
 					if(tile != null && tile.getLinked() != null)
 						tile = tile.getLinked();
 					if(tile != null && control.input().validBreak(tile.x, tile.y)){
@@ -176,8 +175,8 @@ public enum PlaceMode{
 			tilex = this.tilex; tiley = this.tiley; 
 			endx = this.endx; endy = this.endy;
 
-			if(Vars.android){
-				ToolFragment t = Vars.ui.toolfrag;
+			if(android){
+				ToolFragment t = ui.toolfrag;
 				if(!t.confirming || t.px != tilex || t.py != tiley || t.px2 != endx || t.py2 != endy) {
 					t.confirming = true;
 					t.px = tilex;
@@ -242,11 +241,11 @@ public enum PlaceMode{
 		}
 		
 		public void draw(int tilex, int tiley, int endx, int endy){
-			if(Vars.android && !Gdx.input.isTouched(0) && !Vars.control.showCursor()){
+			if(android && !Gdx.input.isTouched(0) && !control.showCursor()){
 				return;
 			}
 			
-			float t = Vars.tilesize;
+			float t = tilesize;
 			Block block = control.input().recipe.result;
 			Vector2 offset = block.getPlaceOffset();
 			
@@ -290,7 +289,7 @@ public enum PlaceMode{
 						py = ty + cy * Mathf.sign(ey - ty);
 						
 						if(!control.input().validPlace(px, py, control.input().recipe.result)
-								|| !control.hasItems(control.input().recipe.requirements, amount)){
+								|| !state.inventory.hasItems(control.input().recipe.requirements, amount)){
 							Lines.crect(px * t + offset.x, py * t + offset.y, t*block.width, t*block.height);
 						}
 						amount ++;

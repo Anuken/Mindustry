@@ -1,13 +1,12 @@
 package io.anuke.mindustry.entities;
 
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.BulletEntity;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.*;
 
 public class Bullet extends BulletEntity{
 	public boolean absorbed = false;
@@ -36,7 +35,7 @@ public class Bullet extends BulletEntity{
 		
 		int tilex = Mathf.scl2(x, tilesize);
 		int tiley = Mathf.scl2(y, tilesize);
-		Tile tile = Vars.world.tile(tilex, tiley);
+		Tile tile = world.tile(tilex, tiley);
 		TileEntity targetEntity = null;
 		
 		if(tile != null){
@@ -61,7 +60,7 @@ public class Bullet extends BulletEntity{
 		
 		super.update();
 	}
-	
+
 	@Override
 	public boolean collides(SolidEntity other){
 		if(owner instanceof TileEntity && other instanceof Player)
@@ -82,7 +81,7 @@ public class Bullet extends BulletEntity{
 	
 	@Override
 	public Bullet add(){
-		return super.add(Vars.bulletGroup);
+		return super.add(bulletGroup);
 	}
 
 }

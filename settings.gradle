@@ -1,4 +1,4 @@
-include 'desktop', 'html', 'core', 'android', 'kryonet'
+include 'desktop', 'html', 'core', 'android', 'kryonet', 'server'
 
 if(System.properties["release"] == null || System.properties["release"].equals("false")){
     if (new File(settingsDir, '../uCore').exists()) {

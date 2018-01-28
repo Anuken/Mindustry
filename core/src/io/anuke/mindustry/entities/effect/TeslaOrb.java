@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 
-import io.anuke.mindustry.Vars;
+import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.ucore.graphics.Draw;
@@ -44,7 +44,7 @@ public class TeslaOrb extends Entity{
 				break;
 			}
 			
-			Array<SolidEntity> enemies = Entities.getNearby(Vars.control.enemyGroup, curx, cury, range*2f);
+			Array<SolidEntity> enemies = Entities.getNearby(enemyGroup, curx, cury, range*2f);
 			
 			for(SolidEntity entity : enemies){
 				if(entity.distanceTo(curx, cury) < range && !hit.contains((Enemy)entity)){

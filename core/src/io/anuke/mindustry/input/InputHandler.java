@@ -5,15 +5,15 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Recipes;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
@@ -27,7 +27,6 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.mindustry.Vars.player;
 
 public abstract class InputHandler extends InputAdapter{
 	public float breaktime = 0;
@@ -43,15 +42,15 @@ public abstract class InputHandler extends InputAdapter{
 	public abstract float getCursorY();
 	public abstract float getCursorEndX();
 	public abstract float getCursorEndY();
-	public int getBlockX(){ return Mathf.sclb(Graphics.world(getCursorX(), getCursorY()).x, Vars.tilesize, round2()); }
-	public int getBlockY(){ return Mathf.sclb(Graphics.world(getCursorX(), getCursorY()).y, Vars.tilesize, round2()); }
-	public int getBlockEndX(){ return Mathf.sclb(Graphics.world(getCursorEndX(), getCursorEndY()).x, Vars.tilesize, round2()); }
-	public int getBlockEndY(){ return Mathf.sclb(Graphics.world(getCursorEndX(), getCursorEndY()).y, Vars.tilesize, round2()); }
+	public int getBlockX(){ return Mathf.sclb(Graphics.world(getCursorX(), getCursorY()).x, tilesize, round2()); }
+	public int getBlockY(){ return Mathf.sclb(Graphics.world(getCursorX(), getCursorY()).y, tilesize, round2()); }
+	public int getBlockEndX(){ return Mathf.sclb(Graphics.world(getCursorEndX(), getCursorEndY()).x, tilesize, round2()); }
+	public int getBlockEndY(){ return Mathf.sclb(Graphics.world(getCursorEndX(), getCursorEndY()).y, tilesize, round2()); }
 	public void resetCursor(){}
 	public boolean drawPlace(){ return true; }
 	
 	public boolean onConfigurable(){
-		Tile tile = Vars.world.tile(getBlockX(), getBlockY());
+		Tile tile = world.tile(getBlockX(), getBlockY());
 		return tile != null && (tile.block().isConfigurable(tile) || (tile.isLinked() && tile.getLinked().block().isConfigurable(tile)));
 	}
 	
@@ -62,15 +61,15 @@ public abstract class InputHandler extends InputAdapter{
 	public boolean tryPlaceBlock(int x, int y, boolean sound){
 		if(recipe != null && 
 				validPlace(x, y, recipe.result) && !ui.hasMouse() && cursorNear() &&
-				Vars.control.hasItems(recipe.requirements)){
+				state.inventory.hasItems(recipe.requirements)){
 			
 			placeBlock(x, y, recipe.result, rotation, true, sound);
 			
 			for(ItemStack stack : recipe.requirements){
-				Vars.control.removeItem(stack);
+				state.inventory.removeItem(stack);
 			}
 			
-			if(!Vars.control.hasItems(recipe.requirements)){
+			if(!state.inventory.hasItems(recipe.requirements)){
 				Cursors.restoreCursor();
 			}
 			return true;
@@ -92,17 +91,17 @@ public abstract class InputHandler extends InputAdapter{
 	
 	public boolean validPlace(int x, int y, Block type){
 		
-		for(SpawnPoint spawn : control.getSpawnPoints()){
+		for(SpawnPoint spawn : world.getSpawns()){
 			if(Vector2.dst(x * tilesize, y * tilesize, spawn.start.worldx(), spawn.start.worldy()) < enemyspawnspace){
 				return false;
 			}
 		}
 		
-		Tmp.r2.setSize(type.width * Vars.tilesize, type.height * Vars.tilesize);
+		Tmp.r2.setSize(type.width * tilesize, type.height * tilesize);
 		Vector2 offset = type.getPlaceOffset();
-		Tmp.r2.setCenter(offset.x + x * Vars.tilesize, offset.y + y * Vars.tilesize);
+		Tmp.r2.setCenter(offset.x + x * tilesize, offset.y + y * tilesize);
 
-		for(SolidEntity e : Entities.getNearby(control.enemyGroup, x * tilesize, y * tilesize, tilesize * 2f)){
+		for(SolidEntity e : Entities.getNearby(enemyGroup, x * tilesize, y * tilesize, tilesize * 2f)){
 			Rectangle rect = e.hitbox.getRect(e.x, e.y);
 
 			if(Tmp.r2.overlaps(rect)){
@@ -111,7 +110,7 @@ public abstract class InputHandler extends InputAdapter{
 		}
 
 		if(type.solid || type.solidifes) {
-			for (Player player : Vars.control.playerGroup.all()) {
+			for (Player player : playerGroup.all()) {
 				if (!player.isAndroid && Tmp.r2.overlaps(player.hitbox.getRect(player.x, player.y))) {
 					return false;
 				}
@@ -122,18 +121,18 @@ public abstract class InputHandler extends InputAdapter{
 		
 		if(tile == null) return false;
 		
-		if(!type.isMultiblock() && Vars.control.getTutorial().active() &&
-				Vars.control.getTutorial().showBlock()){
+		if(!type.isMultiblock() && control.tutorial().active() &&
+				control.tutorial().showBlock()){
 			
-			GridPoint2 point = Vars.control.getTutorial().getPlacePoint();
-			int rotation = Vars.control.getTutorial().getPlaceRotation();
-			Block block = Vars.control.getTutorial().getPlaceBlock();
+			GridPoint2 point = control.tutorial().getPlacePoint();
+			int rotation = control.tutorial().getPlaceRotation();
+			Block block = control.tutorial().getPlaceBlock();
 			
 			if(type != block || point.x != x - world.getCore().x || point.y != y - world.getCore().y
 					|| (rotation != -1 && rotation != this.rotation)){
 				return false;
 			}
-		}else if(Vars.control.getTutorial().active()){
+		}else if(control.tutorial().active()){
 			return false;
 		}
 		
@@ -166,12 +165,12 @@ public abstract class InputHandler extends InputAdapter{
 			return false;
 		}
 		
-		if(Vars.control.getTutorial().active()){
+		if(control.tutorial().active()){
 			
-			if(Vars.control.getTutorial().showBlock()){
-				GridPoint2 point = Vars.control.getTutorial().getPlacePoint();
-				int rotation = Vars.control.getTutorial().getPlaceRotation();
-				Block block = Vars.control.getTutorial().getPlaceBlock();
+			if(control.tutorial().showBlock()){
+				GridPoint2 point = control.tutorial().getPlacePoint();
+				int rotation = control.tutorial().getPlaceRotation();
+				Block block = control.tutorial().getPlaceBlock();
 			
 				if(block != Blocks.air || point.x != x - world.getCore().x || point.y != y - world.getCore().y
 						|| (rotation != -1 && rotation != this.rotation)){
@@ -190,7 +189,7 @@ public abstract class InputHandler extends InputAdapter{
 		placeBlockInternal(x, y, result, rotation, effects, sound);
 
 		if(Net.active() && result != ProductionBlocks.core){
-			Vars.netClient.handlePlace(x, y, result, rotation);
+			NetEvents.handlePlace(x, y, result, rotation);
 		}
 	}
 
@@ -217,11 +216,11 @@ public abstract class InputHandler extends InputAdapter{
 							toplace.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
 					}
 
-					if(effects) Effects.effect(Fx.place, worldx * Vars.tilesize, worldy * Vars.tilesize);
+					if(effects) Effects.effect(Fx.place, worldx * tilesize, worldy * tilesize);
 				}
 			}
 		}else{
-			if(effects) Effects.effect(Fx.place, x * Vars.tilesize, y * Vars.tilesize);
+			if(effects) Effects.effect(Fx.place, x * tilesize, y * tilesize);
 		}
 
 		if(effects && sound) Sounds.play("place");
@@ -233,7 +232,7 @@ public abstract class InputHandler extends InputAdapter{
 		breakBlockInternal(x, y, sound);
 
 		if(Net.active()){
-			Vars.netClient.handleBreak(x, y);
+			NetEvents.handleBreak(x, y);
 		}
 	}
 
@@ -254,12 +253,12 @@ public abstract class InputHandler extends InputAdapter{
 
 		if(result != null){
 			for(ItemStack stack : result.requirements){
-				Vars.control.addItem(stack.item, (int)(stack.amount * Vars.breakDropAmount));
+				state.inventory.addItem(stack.item, (int)(stack.amount * breakDropAmount));
 			}
 		}
 
 		if(tile.block().drops != null){
-			Vars.control.addItem(tile.block().drops.item, tile.block().drops.amount);
+			state.inventory.addItem(tile.block().drops.item, tile.block().drops.amount);
 		}
 
 		//Effects.shake(3f, 1f, player);

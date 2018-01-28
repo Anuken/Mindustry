@@ -1,13 +1,16 @@
 package io.anuke.mindustry.entities;
 
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.Mech;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.ucore.core.*;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Angles;
@@ -46,7 +49,7 @@ public class Player extends SyncEntity{
 
 	@Override
 	public void damage(int amount){
-		if(!Vars.debug && !isAndroid)
+		if(!debug && !isAndroid)
 			super.damage(amount);
 	}
 
@@ -54,7 +57,7 @@ public class Player extends SyncEntity{
 	public boolean collides(SolidEntity other){
 		if(other instanceof Bullet){
 			Bullet b = (Bullet)other;
-			if(!Vars.logic.friendlyFire && b.owner instanceof Player){
+			if(!state.friendlyFire && b.owner instanceof Player){
 				return false;
 			}
 		}
@@ -67,7 +70,7 @@ public class Player extends SyncEntity{
 		if(isLocal){
 			remove();
 			if(Net.active()){
-				Vars.netClient.handlePlayerDeath();
+				NetEvents.handlePlayerDeath();
 			}
 
 			Effects.effect(Fx.explosion, this);
@@ -77,7 +80,7 @@ public class Player extends SyncEntity{
 
 		//TODO respawning doesn't work properly for multiplayer at all
 		if(isLocal) {
-			Vars.control.setRespawnTime(respawnduration);
+			control.setRespawnTime(respawnduration);
 			ui.hudfrag.fadeRespawn(true);
 		}
 	}
@@ -91,7 +94,7 @@ public class Player extends SyncEntity{
 		set(-9999, -9999);
 		Timers.run(respawnduration, () -> {
 			heal();
-			set(logic.getSpawnX(), logic.getSpawnY());
+			set(world.getSpawnX(), world.getSpawnY());
 		});
 	}
 	
@@ -101,8 +104,8 @@ public class Player extends SyncEntity{
             angle = Mathf.lerpAngDelta(angle, targetAngle, 0.2f);
         }
 
-		if((Vars.debug && (!Vars.showPlayer || !Vars.showUI)) || (isAndroid && isLocal) ) return;
-        boolean snap = Vars.snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate") && isLocal;
+		if((debug && (!showPlayer || !showUI)) || (isAndroid && isLocal) ) return;
+        boolean snap = snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate") && isLocal;
 
 		String part = isAndroid ? "ship" : "mech";
 		
@@ -128,7 +131,7 @@ public class Player extends SyncEntity{
 	
 	@Override
 	public void update(){
-		if(!isLocal || isAndroid || Vars.ui.chatfrag.chatOpen()){
+		if(!isLocal || isAndroid || ui.chatfrag.chatOpen()){
 			if(!isDead() && !isLocal) interpolate();
 			return;
 		}
@@ -174,7 +177,7 @@ public class Player extends SyncEntity{
 		
 		vector.limit(speed);
 		
-		if(!Vars.noclip){
+		if(!noclip){
 			move(vector.x*Timers.delta(), vector.y*Timers.delta());
 		}else{
 			x += vector.x*Timers.delta();
@@ -189,13 +192,13 @@ public class Player extends SyncEntity{
 			this.angle = Mathf.lerpAngDelta(this.angle, angle, 0.1f);
 		}
 
-		x = Mathf.clamp(x, 0, Vars.world.width() * Vars.tilesize);
-		y = Mathf.clamp(y, 0, Vars.world.height() * Vars.tilesize);
+		x = Mathf.clamp(x, 0, world.width() * tilesize);
+		y = Mathf.clamp(y, 0, world.height() * tilesize);
 	}
 
 	@Override
 	public Player add(){
-		return add(Vars.control.playerGroup);
+		return add(playerGroup);
 	}
 
     @Override

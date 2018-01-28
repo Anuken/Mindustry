@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Vars;
+import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.graphics.Fx;
@@ -82,14 +82,14 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		if(entity.heat > smokeThreshold){
 			float smoke = 1.0f + (entity.heat - smokeThreshold) / (1f - smokeThreshold); //ranges from 1.0 to 2.0
 			if(Mathf.chance(smoke / 20.0 * Timers.delta())){
-				Effects.effect(Fx.reactorsmoke, tile.worldx() + Mathf.range(width * Vars.tilesize / 2f),
-						tile.worldy() + Mathf.random(height * Vars.tilesize / 2f));
+				Effects.effect(Fx.reactorsmoke, tile.worldx() + Mathf.range(width * tilesize / 2f),
+						tile.worldy() + Mathf.random(height * tilesize / 2f));
 			}
 		}
 		
 		if(entity.heat >= 1f){
 			onDestroyed(tile);
-			Vars.world.removeBlock(tile);
+			world.removeBlock(tile);
 			
 		}else{
 			distributeLaserPower(tile);
@@ -129,7 +129,7 @@ public class NuclearReactor extends LiquidPowerGenerator{
 			});
 		}
 		
-		DamageArea.damageEntities(tile.worldx(), tile.worldy(), explosionRadius * Vars.tilesize, explosionDamage * 4);
+		DamageArea.damageEntities(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);
 		
 		
 		for(int i = 0; i < 20; i ++){
@@ -153,16 +153,16 @@ public class NuclearReactor extends LiquidPowerGenerator{
 
 		NuclearReactorEntity entity = tile.entity();
 
-		Vars.renderer.drawBar(Color.GREEN, tile.drawx(), tile.drawy() + 6 +
-				height*Vars.tilesize/2f, (float)entity.getItem(generateItem) / itemCapacity);
+		renderer.drawBar(Color.GREEN, tile.drawx(), tile.drawy() + 6 +
+				height*tilesize/2f, (float)entity.getItem(generateItem) / itemCapacity);
 		Draw.reset();
 		
 		float fract = entity.heat;
 		if(fract > 0)
 			fract = Mathf.clamp(fract + 0.2f, 0.24f, 1f);
 		
-		Vars.renderer.drawBar(Color.ORANGE, tile.drawx(),
-				tile.drawy() + Vars.tilesize * height/2f + 10, fract);
+		renderer.drawBar(Color.ORANGE, tile.drawx(),
+				tile.drawy() + tilesize * height/2f + 10, fract);
 	}
 
 	@Override
@@ -177,7 +177,7 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		NuclearReactorEntity entity = tile.entity();
 		
 		Draw.color(coolColor, hotColor, entity.heat);
-		Draw.rect("white", tile.drawx(), tile.drawy(), width * Vars.tilesize, height * Vars.tilesize);
+		Draw.rect("white", tile.drawx(), tile.drawy(), width * tilesize, height * tilesize);
 		
 		if(entity.heat > flashThreshold){
 			float flash = 1f + ((entity.heat - flashThreshold) / (1f - flashThreshold)) * 5.4f;

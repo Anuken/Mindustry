@@ -10,16 +10,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Pools;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.graphics.BlockRenderer;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.ui.fragments.ToolFragment;
-import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
@@ -96,25 +95,25 @@ public class Renderer extends RendererModule{
 			if(Mathf.in(camera.zoom, targetzoom, 0.005f)){
 				camera.zoom = 1f;
 				Graphics.setCameraScale(targetscale);
-				control.input.resetCursor();
+				control.input().resetCursor();
 			}
 		}else{
 			camera.zoom = Mathf.lerp(camera.zoom, 1f, 0.2f * Timers.delta());
 		}
 
-		if(GameState.is(State.menu)){
+		if(state.is(State.menu)){
 			clearScreen();
 		}else{
 			boolean smoothcam = Settings.getBool("smoothcam");
 
-			if(control.core == null || control.core.block() == ProductionBlocks.core){
+			if(world.getCore() == null || world.getCore().block() == ProductionBlocks.core){
 				if(!smoothcam){
 					setCamera(player.x, player.y);
 				}else{
 					smoothCamera(player.x, player.y, android ? 0.3f : 0.14f);
 				}
 			}else{
-				smoothCamera(control.core.worldx(), control.core.worldy(), 0.4f);
+				smoothCamera(world.getCore().worldx(), world.getCore().worldy(), 0.4f);
 			}
 
 			if(Settings.getBool("pixelate"))
@@ -135,7 +134,7 @@ public class Renderer extends RendererModule{
 
 			float lastx = camera.position.x, lasty = camera.position.y;
 			
-			if(Vars.snapCamera && smoothcam && Settings.getBool("pixelate")){
+			if(snapCamera && smoothcam && Settings.getBool("pixelate")){
 				camera.position.set((int) camera.position.x, (int) camera.position.y, 0);
 			}
 			
@@ -151,7 +150,7 @@ public class Renderer extends RendererModule{
 
 			camera.position.set(lastx - deltax, lasty - deltay, 0);
 
-			if(Vars.debug) record(); //this only does something if GdxGifRecorder is on the class path, which it usually isn't
+			if(debug) record(); //this only does something if GdxGifRecorder is on the class path, which it usually isn't
 		}
 	}
 
@@ -177,22 +176,22 @@ public class Renderer extends RendererModule{
 		blocks.drawBlocks(false);
 
 		Graphics.shader(Shaders.outline, false);
-		Entities.draw(control.enemyGroup);
+		Entities.draw(enemyGroup);
 		Graphics.shader();
 
-		Entities.draw(control.playerGroup, p -> !p.isAndroid);
+		Entities.draw(playerGroup, p -> !p.isAndroid);
 		Entities.draw(Entities.defaultGroup());
 
 		blocks.drawBlocks(true);
 
-		Entities.draw(control.playerGroup, p -> p.isAndroid);
-		Entities.draw(control.bulletGroup);
+		Entities.draw(playerGroup, p -> p.isAndroid);
+		Entities.draw(bulletGroup);
 
 		drawShield();
 
 		drawOverlay();
 
-		if(Settings.getBool("indicators") && Vars.showUI){
+		if(Settings.getBool("indicators") && showUI){
 			drawEnemyMarkers();
 		}
 
@@ -207,7 +206,7 @@ public class Renderer extends RendererModule{
 	@Override
 	public void resize(int width, int height){
 		super.resize(width, height);
-		control.input.resetCursor();
+		control.input().resetCursor();
 		camera.position.set(player.x, player.y, 0);
 	}
 	
@@ -219,7 +218,7 @@ public class Renderer extends RendererModule{
 		GlyphLayout layout = Pools.obtain(GlyphLayout.class);
 
         Draw.tscl(0.25f/2);
-	    for(Player player : Vars.control.playerGroup.all()){
+	    for(Player player : playerGroup.all()){
 	       if(!player.isLocal){
 	        	layout.setText(Core.font, player.name);
 				Draw.color(0f, 0f, 0f, 0.3f);
@@ -231,13 +230,13 @@ public class Renderer extends RendererModule{
             }
         }
 		Pools.free(layout);
-        Draw.tscl(Vars.fontscale);
+        Draw.tscl(fontscale);
     }
 
 	void drawEnemyMarkers(){
 		Graphics.surface(indicatorSurface);
 		Draw.color(Color.RED);
-		for(Enemy enemy : control.enemyGroup.all()){
+		for(Enemy enemy : enemyGroup.all()){
 
 			if(Tmp.r1.setSize(camera.viewportWidth, camera.viewportHeight).setCenter(camera.position.x, camera.position.y).overlaps(enemy.hitbox.getRect(enemy.x, enemy.y))){
 				continue;
@@ -254,11 +253,11 @@ public class Renderer extends RendererModule{
 	}
 
 	void drawShield(){
-		if(control.shieldGroup.amount() == 0 && shieldDraws.size == 0) return;
+		if(shieldGroup.amount() == 0 && shieldDraws.size == 0) return;
 		
-		Graphics.surface(Vars.renderer.shieldSurface, false);
+		Graphics.surface(renderer.shieldSurface, false);
 		Draw.color(Color.ROYAL);
-		Entities.draw(control.shieldGroup);
+		Entities.draw(shieldGroup);
 		for(Callable c : shieldDraws){
 			c.run();
 		}
@@ -319,10 +318,10 @@ public class Renderer extends RendererModule{
 	void drawOverlay(){
 
 		//draw tutorial placement point
-		if(Vars.world.getMap().name.equals("tutorial") && Vars.control.tutorial.showBlock()){
-			int x = control.core.x + Vars.control.tutorial.getPlacePoint().x;
-			int y = control.core.y + Vars.control.tutorial.getPlacePoint().y;
-			int rot = Vars.control.tutorial.getPlaceRotation();
+		if(world.getMap().name.equals("tutorial") && control.tutorial().showBlock()){
+			int x = world.getCore().x + control.tutorial().getPlacePoint().x;
+			int y = world.getCore().y + control.tutorial().getPlacePoint().y;
+			int rot = control.tutorial().getPlaceRotation();
 
 			Lines.stroke(1f);
 			Draw.color(Color.YELLOW);
@@ -337,19 +336,19 @@ public class Renderer extends RendererModule{
 		}
 
 		//draw config selected block
-		if(Vars.ui.configfrag.isShown()){
+		if(ui.configfrag.isShown()){
 			Tile tile = ui.configfrag.getSelectedTile();
 			Draw.color(Colors.get("accent"));
 			Lines.stroke(1f);
 			Lines.square(tile.drawx(), tile.drawy(),
-					tile.block().width * Vars.tilesize / 2f + 1f);
+					tile.block().width * tilesize / 2f + 1f);
 			Draw.reset();
 		}
 		
-		int tilex = control.input.getBlockX();
-		int tiley = control.input.getBlockY();
+		int tilex = control.input().getBlockX();
+		int tiley = control.input().getBlockY();
 		
-		if(Vars.android){
+		if(android){
 			Vector2 vec = Graphics.world(Gdx.input.getX(0), Gdx.input.getY(0));
 			tilex = Mathf.scl2(vec.x, tilesize);
 			tiley = Mathf.scl2(vec.y, tilesize);
@@ -358,27 +357,27 @@ public class Renderer extends RendererModule{
 		InputHandler input = control.input();
 
 		//draw placement box
-		if((input.recipe != null && Vars.control.hasItems(input.recipe.requirements) && (!ui.hasMouse() || android)
-				&& control.input.drawPlace())){
+		if((input.recipe != null && state.inventory.hasItems(input.recipe.requirements) && (!ui.hasMouse() || android)
+				&& control.input().drawPlace())){
 
-			input.placeMode.draw(control.input.getBlockX(), control.input.getBlockY(), control.input.getBlockEndX(), control.input.getBlockEndY());
+			input.placeMode.draw(control.input().getBlockX(), control.input().getBlockY(), control.input().getBlockEndX(), control.input().getBlockEndY());
 
 			Lines.stroke(1f);
 			Draw.color(Color.SCARLET);
-			for(SpawnPoint spawn : control.getSpawnPoints()){
+			for(SpawnPoint spawn : world.getSpawns()){
 				Lines.dashCircle(spawn.start.worldx(), spawn.start.worldy(), enemyspawnspace);
 			}
 			
 			if(input.breakMode == PlaceMode.holdDelete)
 				input.breakMode.draw(tilex, tiley, 0, 0);
 			
-		}else if(input.breakMode.delete && control.input.drawPlace() && input.recipe == null){
-			input.breakMode.draw(control.input.getBlockX(), control.input.getBlockY(),
-					control.input.getBlockEndX(), control.input.getBlockEndY());
+		}else if(input.breakMode.delete && control.input().drawPlace() && input.recipe == null){
+			input.breakMode.draw(control.input().getBlockX(), control.input().getBlockY(),
+					control.input().getBlockEndX(), control.input().getBlockEndY());
 		}
 
-		if(Vars.ui.toolfrag.confirming){
-			ToolFragment t = Vars.ui.toolfrag;
+		if(ui.toolfrag.confirming){
+			ToolFragment t = ui.toolfrag;
 			PlaceMode.areaDelete.draw(t.px, t.py, t.px2, t.py2);
 		}
 		
@@ -394,27 +393,27 @@ public class Renderer extends RendererModule{
 					target = tile.getLinked();
 
 				if(target.entity != null)
-					drawHealth(target.drawx(), target.drawy() - 3f - target.block().height / 2f * Vars.tilesize, target.entity.health, target.entity.tile.block().health);
+					drawHealth(target.drawx(), target.drawy() - 3f - target.block().height / 2f * tilesize, target.entity.health, target.entity.tile.block().health);
 
 				target.block().drawSelect(target);
 			}
 		}
 		
-		if((!Vars.debug || Vars.showUI) && Settings.getBool("healthbars")){
+		if((!debug || showUI) && Settings.getBool("healthbars")){
 
 			//draw entity health bars
-			for(Enemy entity : control.enemyGroup.all()){
+			for(Enemy entity : enemyGroup.all()){
 				drawHealth(entity);
 			}
 
-			for(Player player : Vars.control.playerGroup.all()){
+			for(Player player : playerGroup.all()){
 				if(!player.isDead() && !player.isAndroid) drawHealth(player);
 			}
 		}
 	}
 
 	void drawHealth(DestructibleEntity dest){
-		if(dest instanceof Player && Vars.snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate")){
+		if(dest instanceof Player && snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate")){
 			drawHealth((int) dest.x, (int) dest.y - 7f, dest.health, dest.maxhealth);
 		}else{
 			drawHealth(dest.x, dest.y - 7f, dest.health, dest.maxhealth);

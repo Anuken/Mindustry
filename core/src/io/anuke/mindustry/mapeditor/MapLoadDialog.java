@@ -1,6 +1,6 @@
 package io.anuke.mindustry.mapeditor;
 
-import io.anuke.mindustry.Vars;
+import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Map;
@@ -11,7 +11,7 @@ import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 
 public class MapLoadDialog extends FloatingDialog{
-	private Map selected = Vars.world.maps().getMap(0);
+	private Map selected = world.maps().getMap(0);
 
 	public MapLoadDialog(Consumer<Map> loader) {
 		super("$text.editor.loadmap");
@@ -35,7 +35,7 @@ public class MapLoadDialog extends FloatingDialog{
 	public void rebuild(){
 		content().clear();
 
-		selected = Vars.world.maps().getMap(0);
+		selected = world.maps().getMap(0);
 
 		ButtonGroup<TextButton> group = new ButtonGroup<>();
 
@@ -50,7 +50,7 @@ public class MapLoadDialog extends FloatingDialog{
 		ScrollPane pane = new ScrollPane(table, "horizontal");
 		pane.setFadeScrollBars(false);
 
-		for (Map map : Vars.world.maps().list()) {
+		for (Map map : world.maps().list()) {
 			if (!map.visible) continue;
 
 			TextButton button = new TextButton(map.localized(), "toggle");

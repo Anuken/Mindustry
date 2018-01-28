@@ -1,13 +1,12 @@
 package io.anuke.mindustry.entities;
 
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.mindustry.world.blocks.types.Wall;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
@@ -18,6 +17,9 @@ import io.anuke.ucore.util.Timer;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+
+import static io.anuke.mindustry.Vars.tileGroup;
+import static io.anuke.mindustry.Vars.world;
 
 public class TileEntity extends Entity{
 	private static final boolean friendlyFire = false;
@@ -64,14 +66,11 @@ public class TileEntity extends Entity{
 	}
 
 	public void onDeath(boolean force){
-		if(Net.active() && Net.server()){
-			Vars.netServer.handleBlockDestroyed(this);
+		if(Net.server()){
+			NetEvents.handleBlockDestroyed(this);
 		}
 
 		if(!Net.active() || Net.server() || force){
-			if(tile.block() == ProductionBlocks.core){
-				Vars.control.coreDestroyed();
-			}
 
 			if(!dead) {
 				dead = true;
@@ -79,7 +78,7 @@ public class TileEntity extends Entity{
 
 				block.onDestroyed(tile);
 
-				Vars.world.removeBlock(tile);
+				world.removeBlock(tile);
 				remove();
 			}
 		}
@@ -96,8 +95,8 @@ public class TileEntity extends Entity{
 		health -= amount;
 		if(health <= 0) onDeath();
 
-		if(Net.active() && Net.server()){
-			Vars.netServer.handleBlockDamaged(this);
+		if(Net.server()){
+			NetEvents.handleBlockDamaged(this);
 		}
 	}
 	
@@ -150,6 +149,6 @@ public class TileEntity extends Entity{
 	
 	@Override
 	public TileEntity add(){
-		return add(Vars.control.tileGroup);
+		return add(tileGroup);
 	}
 }
