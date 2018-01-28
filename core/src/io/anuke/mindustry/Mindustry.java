@@ -1,8 +1,9 @@
 package io.anuke.mindustry;
 
 import io.anuke.mindustry.core.*;
-import io.anuke.mindustry.io.BundleLoader;
 import io.anuke.mindustry.io.BlockLoader;
+import io.anuke.mindustry.io.BundleLoader;
+import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.modules.ModuleCore;
 
 import static io.anuke.mindustry.Vars.*;
@@ -22,5 +23,12 @@ public class Mindustry extends ModuleCore {
 		module(netServer = new NetServer());
 		module(netClient = new NetClient());
 		module(netCommon = new NetCommon());
+	}
+
+	//hack
+	@Override
+	public void render() {
+		super.render();
+		Inputs.update();
 	}
 }

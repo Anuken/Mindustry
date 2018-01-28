@@ -137,8 +137,7 @@ public class Control extends Module{
 		Events.on(PlayEvent.class, () -> {
 			renderer.clearTiles();
 
-			player.x = world.getCore().worldx();
-			player.y = world.getCore().worldy() - tilesize*2;
+			player.set(world.getSpawnX(), world.getSpawnY());
 
 			Core.camera.position.set(player.x, player.y, 0);
 
@@ -263,7 +262,6 @@ public class Control extends Module{
 	
 	@Override
 	public void update(){
-		Inputs.update();
 
         if(Gdx.input != proxy){
             Gdx.input = proxy;
@@ -352,5 +350,6 @@ public class Control extends Module{
 				}
 			}
 		}
+
 	}
 }

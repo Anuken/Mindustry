@@ -3,7 +3,7 @@ package io.anuke.mindustry.server;
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
-import io.anuke.mindustry.Mindustry;
+import io.anuke.mindustry.MindustryServer;
 import io.anuke.mindustry.net.Net;
 
 public class ServerLauncher{
@@ -13,6 +13,6 @@ public class ServerLauncher{
         Net.setClientProvider(new KryoClient());
         Net.setServerProvider(new KryoServer());
 
-        new HeadlessApplication(new Mindustry());
+        new HeadlessApplication(new MindustryServer());
     }
 }

@@ -62,6 +62,8 @@ public class Vars{
 	//whether to hide ui, only on debug
 	public static boolean showUI = true;
 
+	public static boolean headless = false;
+
 	public static float controllerMin = 0.25f;
 
 	public static float baseControllerSpeed = 11f;
@@ -89,6 +91,7 @@ public class Vars{
 	public static NetCommon netCommon;
 	public static NetServer netServer;
 	public static NetClient netClient;
+	public static ServerControl serverControl;
 	
 	public static Player player;
 

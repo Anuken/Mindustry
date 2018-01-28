@@ -44,7 +44,7 @@ public class World extends Module{
 	
 	@Override
 	public void update(){
-		if(!(Net.client()))
+		if(!Net.client())
 			pathfind.update();
 	}
 	
@@ -74,7 +74,7 @@ public class World extends Module{
 	}
 
 	public float getSpawnY(){
-		return core.worldy() - tilesize/2;
+		return core.worldy() - tilesize*2;
 	}
 	
 	public boolean solid(int x, int y){

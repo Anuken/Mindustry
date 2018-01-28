@@ -22,7 +22,7 @@ allprojects {
         appName = "Mindustry"
         gdxVersion = '1.9.8'
         aiVersion = '1.8.1'
-        uCoreVersion = 'ab9f87c'
+        uCoreVersion = '09bbb56'
     }
 
     repositories {
@@ -120,6 +120,7 @@ project(":server") {
         compile project(":core")
         compile project(":kryonet")
         compile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     }
 }
 

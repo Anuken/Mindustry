@@ -266,7 +266,7 @@ public class NetworkIO {
             world.loadMap(world.maps().getMap(mapid), seed);
             renderer.clearTiles();
 
-            player.set(world.getCore().worldx(), world.getCore().worldy());
+            player.set(world.getSpawnX(), world.getSpawnY());
 
             for(int x = 0; x < world.width(); x ++){
                 for(int y = 0; y < world.height(); y ++){

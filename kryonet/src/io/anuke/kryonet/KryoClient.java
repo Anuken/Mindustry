@@ -79,7 +79,7 @@ public class KryoClient implements ClientProvider{
                         Net.handleClientReceived(object);
                     }catch (Exception e){
                         if(e instanceof KryoNetException && e.getMessage() != null && e.getMessage().toLowerCase().contains("incorrect")) {
-                            ui.showError("$text.server.mismatch");
+                            Net.showError("$text.server.mismatch");
                             netClient.disconnectQuietly();
                         }else{
                             throw new RuntimeException(e);
@@ -207,7 +207,7 @@ public class KryoClient implements ClientProvider{
     private void handleException(Exception e){
         e.printStackTrace();
         if(e instanceof KryoNetException){
-            Gdx.app.postRunnable(() -> ui.showError("$text.server.mismatch"));
+            Gdx.app.postRunnable(() -> Net.showError("$text.server.mismatch"));
         }else{
             //TODO better exception handling.
             disconnect();

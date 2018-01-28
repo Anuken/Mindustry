@@ -15,6 +15,9 @@ import io.anuke.ucore.function.Consumer;
 
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.headless;
+import static io.anuke.mindustry.Vars.ui;
+
 public class Net{
 	public static final int version = 13;
 
@@ -28,6 +31,15 @@ public class Net{
 	private static ServerProvider serverProvider;
 
 	private static IntMap<StreamBuilder> streams = new IntMap<>();
+
+	/**Display a network error.*/
+	public static void showError(String text){
+		if(!headless){
+			ui.showError(text);
+		}else{
+			UCore.log(text);
+		}
+	}
 
 	/**Sets the client loaded status, or whether it will recieve normal packets from the server.*/
 	public static void setClientLoaded(boolean loaded){

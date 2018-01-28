@@ -22,29 +22,29 @@ public class NetCommon extends Module {
 
     public NetCommon(){
 
-        Net.handleServer(ShootPacket.class, (id, packet) -> {
+        Net.handle(ShootPacket.class, (packet) -> {
             Player player = playerGroup.getByID(packet.playerid);
 
             Weapon weapon = (Weapon) Upgrade.getByID(packet.weaponid);
             weapon.shoot(player, packet.x, packet.y, packet.rotation);
         });
 
-        Net.handleServer(PlacePacket.class, (id, packet) -> {
+        Net.handle(PlacePacket.class, (packet) -> {
             control.input().placeBlockInternal(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false);
 
             Recipe recipe = Recipes.getByResult(Block.getByID(packet.block));
             if (recipe != null) state.inventory.removeItems(recipe.requirements);
         });
 
-        Net.handleServer(BreakPacket.class, (id, packet) -> {
+        Net.handle(BreakPacket.class, (packet) -> {
             control.input().breakBlockInternal(packet.x, packet.y, false);
         });
 
-        Net.handleServer(ChatPacket.class, (id, packet) -> {
+        Net.handle(ChatPacket.class, (packet) -> {
             ui.chatfrag.addMessage(packet.text, colorizeName(packet.id, packet.name));
         });
 
-        Net.handleServer(WeaponSwitchPacket.class, (id, packet) -> {
+        Net.handle(WeaponSwitchPacket.class, (packet) -> {
             Player player = playerGroup.getByID(packet.playerid);
 
             if (player == null) return;
@@ -53,17 +53,17 @@ public class NetCommon extends Module {
             player.weaponRight = (Weapon) Upgrade.getByID(packet.right);
         });
 
-        Net.handleServer(BlockTapPacket.class, (id, packet) -> {
+        Net.handle(BlockTapPacket.class, (packet) -> {
             Tile tile = world.tile(packet.position);
             tile.block().tapped(tile);
         });
 
-        Net.handleServer(BlockConfigPacket.class, (id, packet) -> {
+        Net.handle(BlockConfigPacket.class, (packet) -> {
             Tile tile = world.tile(packet.position);
             if (tile != null) tile.block().configure(tile, packet.data);
         });
 
-        Net.handleServer(PlayerDeathPacket.class, (id, packet) -> {
+        Net.handle(PlayerDeathPacket.class, (packet) -> {
             Player player = playerGroup.getByID(packet.id);
             if(player == null) return;
 
@@ -76,7 +76,7 @@ public class NetCommon extends Module {
         packet.name = null;
         packet.text = message;
         Net.send(packet, SendMode.tcp);
-        ui.chatfrag.addMessage(message, null);
+        if(!headless) ui.chatfrag.addMessage(message, null);
     }
 
     public String colorizeName(int id, String name){

@@ -287,7 +287,7 @@ public class NetClient extends Module {
     public void update(){
         if(!Net.client()) return;
 
-        if(!state.is(State.menu) && Net.active()){
+        if(!state.is(State.menu)){
             if(gotData) sync();
         }else if(!connecting){
             Net.disconnect();

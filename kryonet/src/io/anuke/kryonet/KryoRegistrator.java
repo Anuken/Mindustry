@@ -18,9 +18,11 @@ public class KryoRegistrator {
     }
 
     public static ByteBuffer writeServerData(){
-        ByteBuffer buffer = ByteBuffer.allocate(1 + Vars.player.name.length() + 4);
-        buffer.put((byte)Vars.player.name.length());
-        buffer.put(Vars.player.name.getBytes());
+        String host = Vars.headless ? "Server" : Vars.player.name;
+
+        ByteBuffer buffer = ByteBuffer.allocate(1 + host.getBytes().length + 4);
+        buffer.put((byte)host.getBytes().length);
+        buffer.put(host.getBytes());
         buffer.putInt(Net.getConnections().size + 1);
         return buffer;
     }

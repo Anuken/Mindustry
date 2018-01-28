@@ -147,7 +147,7 @@ public class Maps implements Disposable{
 			if(arr != null){ //can be an empty map file
 				for(Map map : arr){
 					map.pixmap = new Pixmap(file.sibling(map.name + ".png"));
-					map.texture = new Texture(map.pixmap);
+					if(!headless) map.texture = new Texture(map.pixmap);
 					maps.put(map.id, map);
 					mapNames.put(map.name, map);
 					lastID = Math.max(lastID, map.id);
@@ -164,7 +164,7 @@ public class Maps implements Disposable{
 	@Override
 	public void dispose(){
 		for(Map map : maps.values()){
-			map.texture.dispose();
+			if(map.texture != null) map.texture.dispose();
 			map.pixmap.dispose();
 		}
 		maps.clear();
