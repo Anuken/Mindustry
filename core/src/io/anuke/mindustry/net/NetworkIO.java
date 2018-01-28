@@ -7,10 +7,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.ColorMapper;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.WorldGenerator;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.mindustry.world.blocks.types.Rock;
@@ -23,8 +20,10 @@ import static io.anuke.mindustry.Vars.*;
 
 public class NetworkIO {
 
-    public static void writeMap(Pixmap map, OutputStream os){
+    public static void writeMap(Map map, OutputStream os){
         try(DataOutputStream stream = new DataOutputStream(os)){
+            stream.writeBoolean(map.oreGen);
+
             stream.writeShort(map.getWidth());
             stream.writeShort(map.getHeight());
 
@@ -33,7 +32,7 @@ public class NetworkIO {
             int pos = 0;
 
             while(pos < cap){
-                int color = map.getPixel(pos % width, pos / width);
+                int color = map.pixmap.getPixel(pos % width, pos / width);
                 byte id = ColorMapper.getColorID(color);
 
                 int length = 1;
@@ -44,7 +43,7 @@ public class NetworkIO {
 
                     pos ++;
 
-                    int next = map.getPixel(pos % width, pos / width);
+                    int next = map.pixmap.getPixel(pos % width, pos / width);
                     if(next != color){
                         pos --;
                         break;
@@ -64,8 +63,10 @@ public class NetworkIO {
         }
     }
 
-    public static Pixmap loadMap(InputStream is){
+    public static Map loadMap(InputStream is){
         try(DataInputStream stream = new DataInputStream(is)){
+            boolean ores = stream.readBoolean();
+
             short width = stream.readShort();
             short height = stream.readShort();
             Pixmap pixmap = new Pixmap(width, height, Format.RGBA8888);
@@ -83,8 +84,15 @@ public class NetworkIO {
                 }
             }
 
+            Map map = new Map();
+            map.oreGen = ores;
+            map.custom = true;
+            map.pixmap = pixmap;
+            map.visible = false;
+            map.name = "network map";
+            map.id = -1;
 
-            return pixmap;
+            return map;
         }catch (IOException e){
             throw new RuntimeException(e);
         }

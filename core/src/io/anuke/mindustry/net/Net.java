@@ -4,14 +4,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamBuilder;
 import io.anuke.mindustry.net.Streamable.StreamChunk;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.function.BiConsumer;
 import io.anuke.ucore.function.Consumer;
+import io.anuke.ucore.util.Log;
 
 import java.io.IOException;
 
@@ -37,7 +38,7 @@ public class Net{
 		if(!headless){
 			ui.showError(text);
 		}else{
-			UCore.log(text);
+			Log.err(text);
 		}
 	}
 
@@ -92,9 +93,9 @@ public class Net{
 	/**Send an object to all connected clients, or to the server if this is a client.*/
 	public static void send(Object object, SendMode mode){
 		if(server){
-			serverProvider.send(object, mode);
+			if(serverProvider != null) serverProvider.send(object, mode);
 		}else {
-			clientProvider.send(object, mode);
+			if(clientProvider != null) clientProvider.send(object, mode);
 		}
 	}
 
@@ -160,7 +161,7 @@ public class Net{
 				if(clientListeners.get(object.getClass()) != null) clientListeners.get(object.getClass()).accept(object);
 				if(listeners.get(object.getClass()) != null) listeners.get(object.getClass()).accept(object);
 			}else{
-				UCore.log("Recieved " + object, "but ignoring data, as client is not loaded.");
+				Log.info("Recieved {0}, but ignoring data, as client is not loaded.", ClassReflection.getSimpleName(object.getClass()));
 			}
 		}else{
 			Gdx.app.error("Mindustry::Net", "Unhandled packet type: '" + object.getClass() + "'!");

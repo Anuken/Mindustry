@@ -253,7 +253,7 @@ public class Renderer extends RendererModule{
 	}
 
 	void drawShield(){
-		if(shieldGroup.amount() == 0 && shieldDraws.size == 0) return;
+		if(shieldGroup.size() == 0 && shieldDraws.size == 0) return;
 		
 		Graphics.surface(renderer.shieldSurface, false);
 		Draw.color(Color.ROYAL);

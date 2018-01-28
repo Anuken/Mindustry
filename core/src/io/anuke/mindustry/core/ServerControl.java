@@ -1,25 +1,32 @@
 package io.anuke.mindustry.core;
 
+import com.badlogic.gdx.ApplicationLogger;
 import com.badlogic.gdx.Gdx;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.game.Difficulty;
+import io.anuke.mindustry.game.GameMode;
+import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.ChatPacket;
 import io.anuke.mindustry.world.Map;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Sounds;
 import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.ColorCodes;
 import io.anuke.ucore.util.CommandHandler;
 import io.anuke.ucore.util.CommandHandler.Command;
 import io.anuke.ucore.util.CommandHandler.Response;
 import io.anuke.ucore.util.CommandHandler.ResponseType;
+import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
 import java.util.Scanner;
 
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.ucore.util.ColorCodes.*;
+import static io.anuke.ucore.util.Log.*;
+
+;
 
 public class ServerControl extends Module {
     private final CommandHandler handler = new CommandHandler("");
@@ -29,9 +36,19 @@ public class ServerControl extends Module {
         Effects.setEffectProvider((a, b, c, d, e) -> {});
         Sounds.setHeadless(true);
 
-        //override default handling
+        //override default handling of chat packets
         Net.handle(ChatPacket.class, (packet) -> {
             info("&y" + (packet.name == null ? "" : packet.name) +  ": &lb{0}", packet.text);
+        });
+
+        //don't do anything at all for GDX logging
+        Gdx.app.setApplicationLogger(new ApplicationLogger() {
+            @Override public void log(String tag, String message) { }
+            @Override public void log(String tag, String message, Throwable exception) { }
+            @Override public void error(String tag, String message) { }
+            @Override public void error(String tag, String message, Throwable exception) { }
+            @Override public void debug(String tag, String message) { }
+            @Override public void debug(String tag, String message, Throwable exception) { }
         });
 
         registerCommands();
@@ -61,9 +78,10 @@ public class ServerControl extends Module {
             state.set(State.menu);
         });
 
-        handler.register("host", "<mapname>", "Open the server with a specific map.", arg -> {
+        handler.register("host", "<mapname> <mode>", "Open the server with a specific map.", arg -> {
             if(state.is(State.playing)){
                 err("Already hosting. Type 'stop' to stop hosting first.");
+                return;
             }
 
             String search = arg[0];
@@ -78,24 +96,102 @@ public class ServerControl extends Module {
                 return;
             }
 
+            GameMode mode = null;
+            try{
+                mode = GameMode.valueOf(arg[1]);
+            }catch (IllegalArgumentException e){
+                err("No gamemode '{0}' found.", arg[1]);
+                return;
+            }
+
             info("Loading map...");
+            state.mode = mode;
+
             logic.reset();
             world.loadMap(result);
             state.set(State.playing);
             info("Map loaded.");
 
-            try {
-                Net.host(port);
-                info("Server opened.");
-            }catch (IOException e){
-                UCore.error(e);
+            host();
+        });
+
+        handler.register("status", "", "Display server status.", arg -> {
+            if(state.is(State.menu)){
+                info("&lyStatus: &rserver closed");
+            }else{
+                info("&lyStatus: &lcPlaying on map &fi{0}&fb &lb/&lc Wave {1} &lb/&lcDifficulty {2}", Strings.capitalize(world.getMap().name), state.wave, state.difficulty.name());
+                if(playerGroup.size() > 0) {
+                    info("&lyPlayers: {0}", playerGroup.size());
+                    for (Player p : playerGroup.all()) {
+                        print("   &y" + p.name);
+                    }
+                }else{
+                    info("&lyNo players connected.");
+                }
             }
+        });
+
+        handler.register("say", "<message>", "Send a message to all players.", arg -> {
+            if(!state.is(State.playing)) {
+                err("Not hosting. Host a game first.");
+                return;
+            }
+
+            netCommon.sendMessage("[pink][[Server]:[] " + arg[0]);
+            info("&ly[Server]: &lb{0}", arg[0]);
+        }).mergeArgs();
+
+        handler.register("difficulty", "<difficulty>", "Set game difficulty.", arg -> {
+            try{
+                Difficulty diff = Difficulty.valueOf(arg[0]);
+                state.difficulty = diff;
+                info("Difficulty set to '{0}'.", arg[0]);
+            }catch (IllegalArgumentException e){
+                err("No difficulty with name '{0}' found.", arg[0]);
+            }
+        });
+
+        handler.register("load", "<slot>", "Load a save from a slot.", arg -> {
+            if(state.is(State.playing)){
+                err("Already hosting. Type 'stop' to stop hosting first.");
+                return;
+            }else if(!Strings.canParseInt(arg[0])){
+                err("Invalid save slot '{0}'.", arg[0]);
+                return;
+            }
+
+            int slot = Strings.parseInt(arg[0]);
+
+            if(!SaveIO.isSaveValid(slot)){
+                err("No save data found for slot.");
+                return;
+            }
+
+            SaveIO.loadFromSlot(slot);
+            info("Save loaded.");
+            host();
+            state.set(State.playing);
+        });
+
+        handler.register("save", "<slot>", "Save game state to a slot.", arg -> {
+            if(!state.is(State.playing)){
+                err("Not hosting. Host a game first.");
+                return;
+            }else if(!Strings.canParseInt(arg[0])){
+                err("Invalid save slot '{0}'.", arg[0]);
+                return;
+            }
+
+            int slot = Strings.parseInt(arg[0]);
+
+            SaveIO.saveToSlot(slot);
+
+            info("Saved to slot {0}.", slot);
         });
     }
 
     private void readCommands(){
         Scanner scan = new Scanner(System.in);
-        System.out.print(LIGHT_BLUE + "> " + RESET);
         while(true){
             String line = scan.nextLine();
 
@@ -107,32 +203,16 @@ public class ServerControl extends Module {
                 } else if (response.type == ResponseType.invalidArguments) {
                     err("Invalid command arguments. Usage: " + response.command.text + " " + response.command.params);
                 }
-
-                System.out.print(LIGHT_BLUE + "> " + RESET);
             });
         }
     }
 
-    private void print(String text, Object... args){
-        System.out.println(format(text, args) + RESET);
-    }
-
-    private void info(String text, Object... args){
-        print(LIGHT_GREEN + BOLD + format(text, args));
-    }
-
-    private void err(String text, Object... args){
-        print(LIGHT_RED + BOLD + format(text, args));
-    }
-
-    private String format(String text, Object... args){
-        for(int i = 0; i < args.length; i ++){
-            text = text.replace("{" + i + "}", args[i].toString());
+    private void host(){
+        try {
+            Net.host(port);
+        }catch (IOException e){
+            Log.err(e);
+            state.set(State.menu);
         }
-
-        for(String color : ColorCodes.getColorCodes()){
-            text = text.replace("&" + color, ColorCodes.getColorText(color));
-        }
-        return text;
     }
 }

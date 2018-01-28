@@ -12,17 +12,19 @@ import io.anuke.mindustry.net.Net.ClientProvider;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.function.Consumer;
+import io.anuke.ucore.util.Log;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedSelectorException;
 import java.util.List;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.netClient;
+import static io.anuke.mindustry.Vars.port;
 
 public class KryoClient implements ClientProvider{
     Client client;
@@ -41,7 +43,7 @@ public class KryoClient implements ClientProvider{
                 ByteBuffer buffer = ByteBuffer.wrap(datagramPacket.getData());
                 Host address = KryoRegistrator.readServerData(datagramPacket.getAddress(), buffer);
                 addresses.put(datagramPacket.getAddress(), address);
-                UCore.log("Host data found: " + buffer.capacity() + " bytes.");
+                Log.info("Host data found: {0} bytes.", buffer.capacity());
             }
 
             @Override
@@ -106,7 +108,7 @@ public class KryoClient implements ClientProvider{
             try{
                 client.run();
             }catch (Exception e){
-                handleException(e);
+                if(!(e instanceof ClosedSelectorException)) handleException(e);
             }
         }, "Kryonet Client");
         updateThread.setDaemon(true);

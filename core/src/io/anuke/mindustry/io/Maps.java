@@ -9,9 +9,9 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Json.Serializer;
 import com.badlogic.gdx.utils.JsonWriter.OutputType;
 import io.anuke.mindustry.world.Map;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.graphics.Pixmaps;
+import io.anuke.ucore.util.Log;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -32,17 +32,13 @@ public class Maps implements Disposable{
 		return maps.values();
 	}
 
-	public void setNetworkMap(Pixmap pixmap){
+	public void setNetworkMap(Map map){
 		if(networkMap != null){
 			networkMap.pixmap.dispose();
 			networkMap = null;
 		}
-		networkMap = new Map();
-		networkMap.custom = true;
-		networkMap.pixmap = pixmap;
-		networkMap.visible = false;
-		networkMap.name = "network map";
-		networkMap.id = -1;
+
+		networkMap = map;
 	}
 
 	public Map getMap(int id){
@@ -155,7 +151,7 @@ public class Maps implements Disposable{
 			}
 			return true;
 		}catch(Exception e){
-			if(!android) UCore.error(e);
+			if(!android) Log.err(e);
 			Gdx.app.error("Mindustry-Maps", "Failed loading map file: " + file);
 			return false;
 		}

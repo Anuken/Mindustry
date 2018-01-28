@@ -3,11 +3,13 @@ package io.anuke.mindustry.io;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.I18NBundle;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.util.Log;
 
 import java.util.Locale;
+
+import static io.anuke.mindustry.Vars.headless;
 
 public class BundleLoader {
     private static boolean externalBundle = false;
@@ -17,7 +19,6 @@ public class BundleLoader {
         Settings.load("io.anuke.moment");
         loadBundle();
     }
-
 
     private static Locale getLocale(){
         String loc = Settings.getString("locale");
@@ -46,7 +47,7 @@ public class BundleLoader {
                 Locale locale = Locale.ENGLISH;
                 Core.bundle = I18NBundle.createBundle(handle, locale);
             }catch (Exception e){
-                UCore.error(e);
+                Log.err(e);
                 Platform.instance.showError("Failed to find bundle!\nMake sure you have bundle.properties in the same directory\nas the jar file.\n\nIf the problem persists, try running it through the command prompt:\n" +
                         "Hold left-shift, then right click and select 'open command prompt here'.\nThen, type in 'java -jar mindustry.jar' without quotes.");
                 Gdx.app.exit();
@@ -55,7 +56,7 @@ public class BundleLoader {
             FileHandle handle = Gdx.files.internal("bundles/bundle");
 
             Locale locale = getLocale();
-            UCore.log("Got locale: " + locale);
+            if(!headless) Log.info("Got locale: {0}", locale);
             Core.bundle = I18NBundle.createBundle(handle, locale);
         }
     }

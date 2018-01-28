@@ -66,25 +66,30 @@ public class Save15 extends SaveFileVersion {
 
         int playerhealth = stream.readInt();
 
-        player.x = playerx;
-        player.y = playery;
-        player.health = playerhealth;
-        state.mode = GameMode.values()[mode];
-        Core.camera.position.set(playerx, playery, 0);
+        if(!headless) {
+            player.x = playerx;
+            player.y = playery;
+            player.health = playerhealth;
+            state.mode = GameMode.values()[mode];
+            Core.camera.position.set(playerx, playery, 0);
 
-        //weapons
+            //weapons
 
-        control.upgrades().getWeapons().clear();
-        control.upgrades().getWeapons().add(Weapon.blaster);
-        player.weaponLeft = player.weaponRight = Weapon.blaster;
+            control.upgrades().getWeapons().clear();
+            control.upgrades().getWeapons().add(Weapon.blaster);
+            player.weaponLeft = player.weaponRight = Weapon.blaster;
 
-        int weapons = stream.readByte();
+            int weapons = stream.readByte();
 
-        for(int i = 0; i < weapons; i ++){
-            control.upgrades().addWeapon((Weapon) Upgrade.getByID(stream.readByte()));
+            for (int i = 0; i < weapons; i++) {
+                control.upgrades().addWeapon((Weapon) Upgrade.getByID(stream.readByte()));
+            }
+
+            ui.hudfrag.updateWeapons();
+        }else{
+            byte b = stream.readByte();
+            for(int i = 0; i < b; i ++) stream.readByte();
         }
-
-        ui.hudfrag.updateWeapons();
 
         //inventory
 
@@ -98,7 +103,7 @@ public class Save15 extends SaveFileVersion {
             state.inventory.getItems()[item.id] = amount;
         }
 
-        ui.hudfrag.updateItems();
+        if(!headless) ui.hudfrag.updateItems();
 
         //enemies
 
@@ -134,7 +139,7 @@ public class Save15 extends SaveFileVersion {
         state.wave = wave;
         state.wavetime = wavetime;
 
-        if(!android)
+        if(!android && !headless)
             player.add();
 
         //map
@@ -142,7 +147,7 @@ public class Save15 extends SaveFileVersion {
         int seed = stream.readInt();
 
         world.loadMap(world.maps().getMap(mapid), seed);
-        renderer.clearTiles();
+        if(!headless) renderer.clearTiles();
 
         for(Enemy enemy : enemiesToUpdate){
             enemy.node = -2;
@@ -225,16 +230,23 @@ public class Save15 extends SaveFileVersion {
             stream.writeShort(block.id);
         }
 
-        stream.writeFloat(player.x); //player x/y
-        stream.writeFloat(player.y);
+        if(!headless) {
+            stream.writeFloat(player.x); //player x/y
+            stream.writeFloat(player.y);
 
-        stream.writeInt(player.health); //player health
+            stream.writeInt(player.health); //player health
 
-        stream.writeByte(control.upgrades().getWeapons().size - 1); //amount of weapons
+            stream.writeByte(control.upgrades().getWeapons().size - 1); //amount of weapons
 
-        //start at 1, because the first weapon is always the starter - ignore that
-        for(int i = 1; i < control.upgrades().getWeapons().size; i ++){
-            stream.writeByte(control.upgrades().getWeapons().get(i).id); //weapon ordinal
+            //start at 1, because the first weapon is always the starter - ignore that
+            for (int i = 1; i < control.upgrades().getWeapons().size; i++) {
+                stream.writeByte(control.upgrades().getWeapons().get(i).id); //weapon ordinal
+            }
+        }else{
+            stream.writeFloat(0);
+            stream.writeFloat(0);
+            stream.writeInt(0);
+            stream.writeByte(0);
         }
 
         //--INVENTORY--

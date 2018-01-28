@@ -30,14 +30,20 @@ public class NetCommon extends Module {
         });
 
         Net.handle(PlacePacket.class, (packet) -> {
-            control.input().placeBlockInternal(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false);
+            if(headless)
+                world.placeBlock(packet.x, packet.y, Block.getByID(packet.block), packet.rotation);
+            else
+                control.input().placeBlockInternal(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false);
 
             Recipe recipe = Recipes.getByResult(Block.getByID(packet.block));
             if (recipe != null) state.inventory.removeItems(recipe.requirements);
         });
 
         Net.handle(BreakPacket.class, (packet) -> {
-            control.input().breakBlockInternal(packet.x, packet.y, false);
+            if(headless)
+                world.removeBlock(world.tile(packet.x, packet.y));
+            else
+                control.input().breakBlockInternal(packet.x, packet.y, false);
         });
 
         Net.handle(ChatPacket.class, (packet) -> {

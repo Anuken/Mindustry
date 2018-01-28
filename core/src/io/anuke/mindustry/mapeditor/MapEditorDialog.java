@@ -12,7 +12,6 @@ import io.anuke.mindustry.world.ColorMapper.BlockPair;
 import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.SpecialBlocks;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -24,6 +23,7 @@ import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
 import java.util.Arrays;
@@ -63,7 +63,7 @@ public class MapEditorDialog extends Dialog{
 					}
 				}catch (Exception e){
 					ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
-					UCore.error(e);
+					Log.err(e);
 				}
 				ui.loadfrag.hide();
 			});
@@ -80,7 +80,7 @@ public class MapEditorDialog extends Dialog{
 					Pixmaps.write(editor.pixmap(), result);
 				}catch (Exception e){
 					ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
-					if(!android) UCore.error(e);
+					if(!android) Log.err(e);
 				}
 				ui.loadfrag.hide();
 			});
@@ -96,6 +96,7 @@ public class MapEditorDialog extends Dialog{
 				copy.id = -1;
 				copy.pixmap = Pixmaps.copy(map.pixmap);
 				copy.texture = new Texture(copy.pixmap);
+				copy.oreGen = map.oreGen;
 				editor.beginEdit(copy);
 				ui.loadfrag.hide();
 				view.clearStack();
@@ -277,8 +278,16 @@ public class MapEditorDialog extends Dialog{
 					new label(() -> Bundles.format("text.editor.brushsize", MapEditor.brushSizes[(int)slider.getValue()])).left();
 					row();
 					add(slider).growX().padTop(4f);
-				}}.growX().end();
+				}}.growX().padBottom(-6).end();
 				
+				row();
+
+				new table("button"){{
+					get().addCheck("$text.oregen", b -> {
+						editor.getMap().oreGen = b;
+					}).update(c -> c.setChecked(editor.getMap().oreGen)).padTop(3).padBottom(3);
+				}}.growX().padBottom(-6).end();
+
 				row();
 				
 				addBlockSelection(get());
@@ -362,7 +371,7 @@ public class MapEditorDialog extends Dialog{
 		
 		Table extra = new Table("button");
 		extra.labelWrap(() -> editor.getDrawBlock().formalName).width(180f).center();
-		table.add(extra).growX();
+		table.add(extra).padBottom(-6).growX();
 		table.row();
 		table.add(pane).growY().fillX();
 	}

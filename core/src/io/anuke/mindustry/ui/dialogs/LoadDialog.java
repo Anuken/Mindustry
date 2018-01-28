@@ -4,13 +4,13 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.Saves.SaveSlot;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
@@ -163,7 +163,7 @@ public class LoadDialog extends FloatingDialog{
 						state.set(State.playing);
 						ui.paused.hide();
 					}catch(Exception e){
-						UCore.error(e);
+						Log.err(e);
 						ui.paused.hide();
 						state.set(State.menu);
 						logic.reset();

@@ -16,12 +16,12 @@ import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.UpgradeRecipes;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
 import java.io.ByteArrayInputStream;
@@ -41,7 +41,7 @@ public class NetServer extends Module{
 
     public NetServer(){
 
-        Net.handleServer(Connect.class, (id, connect) -> UCore.log("Connection found: " + connect.addressTCP));
+        Net.handleServer(Connect.class, (id, connect) -> {});
 
         Net.handleServer(ConnectPacket.class, (id, packet) -> {
 
@@ -50,7 +50,7 @@ public class NetServer extends Module{
                 return;
             }
 
-            UCore.log("Sending world data to client (ID=" + id + ")");
+            Log.info("Sending world data to client (ID = {0})", id);
 
             Player player = new Player();
             player.clientid = id;
@@ -63,12 +63,12 @@ public class NetServer extends Module{
 
             if(world.getMap().custom){
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                NetworkIO.writeMap(world.getMap().pixmap, stream);
+                NetworkIO.writeMap(world.getMap(), stream);
                 CustomMapPacket data = new CustomMapPacket();
                 data.stream = new ByteArrayInputStream(stream.toByteArray());
                 Net.sendStream(id, data);
 
-                UCore.log("Sending custom map: Packed " + stream.size() + " uncompressed bytes of MAP data.");
+                Log.info("Sending custom map: Packed {0}uncompressed bytes of MAP data.", stream.size());
             }else{
                 //hack-- simulate the map ack packet recieved to send the world data to the client.
                 Net.handleServerReceived(id, new MapAckPacket());
@@ -86,7 +86,7 @@ public class NetServer extends Module{
             data.stream = new ByteArrayInputStream(stream.toByteArray());
             Net.sendStream(id, data);
 
-            UCore.log("Packed " + stream.size() + " uncompressed bytes of WORLD data.");
+            Log.info("Packed {0} uncompressed bytes of WORLD data.", stream.size());
         });
 
         Net.handleServer(ConnectConfirmPacket.class, (id, packet) -> {
@@ -183,7 +183,6 @@ public class NetServer extends Module{
                 p.android = player.isAndroid;
 
                 Net.sendTo(dest, p, SendMode.tcp);
-                log("Replying to entity request (" + id + "): player, " + id);
             } else if (enemyGroup.getByID(id) != null) {
                 Enemy enemy = enemyGroup.getByID(id);
                 EnemySpawnPacket e = new EnemySpawnPacket();
@@ -195,9 +194,8 @@ public class NetServer extends Module{
                 e.type = enemy.type.id;
                 e.health = (short) enemy.health;
                 Net.sendTo(dest, e, SendMode.tcp);
-                log("Replying to entity request(" + id + "): enemy, " + id);
             } else {
-                Gdx.app.error("Mindustry", "Entity request target not found!");
+                Log.err("Entity request target not found!");
             }
         });
 
@@ -229,12 +227,12 @@ public class NetServer extends Module{
         if(Timers.get("serverSync", serverSyncTime)){
             //scan through all groups with syncable entities
             for(EntityGroup<?> group : Entities.getAllGroups()) {
-                if(group.amount() == 0 || !(group.all().first() instanceof SyncEntity)) continue;
+                if(group.size() == 0 || !(group.all().first() instanceof SyncEntity)) continue;
 
                 //get write size for one entity (adding 4, as you need to write the ID as well)
                 int writesize = SyncEntity.getWriteSize((Class<? extends SyncEntity>)group.getType()) + 4;
                 //amount of entities
-                int amount = group.amount();
+                int amount = group.size();
                 //maximum amount of entities per packet
                 int maxsize = 64;
 
@@ -362,7 +360,6 @@ public class NetServer extends Module{
         }
 
         packet.stream = new ByteArrayInputStream(bs.toByteArray());
-        //UCore.log("Sent block update stream to " + client + " / " + packet.stream.available());
 
         Net.sendStream(client, packet);
     }

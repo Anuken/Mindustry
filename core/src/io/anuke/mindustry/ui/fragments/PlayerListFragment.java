@@ -26,8 +26,8 @@ public class PlayerListFragment implements Fragment{
         new table(){{
             new table("pane"){{
                 margin(14f);
-                new label(() -> Bundles.format(playerGroup.amount() == 1 ? "text.players.single" :
-                        "text.players", playerGroup.amount()));
+                new label(() -> Bundles.format(playerGroup.size() == 1 ? "text.players.single" :
+                        "text.players", playerGroup.size()));
                 row();
                 content.marginRight(13f).marginLeft(13f);
                 ScrollPane pane = new ScrollPane(content, "clear");
@@ -51,9 +51,9 @@ public class PlayerListFragment implements Fragment{
                 if(!(Net.active() && !state.is(State.menu))){
                     visible = false;
                 }
-                if(playerGroup.amount() != last){
+                if(playerGroup.size() != last){
                     rebuild();
-                    last = playerGroup.amount();
+                    last = playerGroup.size();
                 }
             });
 

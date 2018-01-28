@@ -1,15 +1,16 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.io.Platform;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.util.Log;
 
 import java.util.Locale;
+
+import static io.anuke.mindustry.Vars.ui;
 
 public class LanguageDialog extends FloatingDialog{
     private Locale[] locales = {Locale.ENGLISH, new Locale("fr", "FR"),
@@ -36,7 +37,7 @@ public class LanguageDialog extends FloatingDialog{
                 if(ui.getLocale().equals(loc)) return;
                 Settings.putString("locale", loc.toString());
                 Settings.save();
-                UCore.log("Setting locale: " + loc.toString());
+                Log.info("Setting locale: {0}", loc.toString());
                 ui.showInfo("$text.language.restart");
             });
             langs.add(button).group(group).update(t -> {

@@ -7,9 +7,9 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
@@ -109,7 +109,7 @@ public class Pathfind{
 
 	/**Re-calculate paths for all enemies. Runs when a path changes while moving.*/
 	private void remakePath(){
-		for(int i = 0; i < enemyGroup.amount(); i ++){
+		for(int i = 0; i < enemyGroup.size(); i ++){
 			Enemy enemy = enemyGroup.all().get(i);
 			enemy.node = -1;
 		}
@@ -160,7 +160,7 @@ public class Pathfind{
 			point.finder.searchNodePath(point.start, world.getCore(), state.difficulty.heuristic, point.path);
 			point.path.clear();
 		}
-		UCore.log("Time elapsed: " + Timers.elapsed() + "ms\nAverage MS per path: " + Timers.elapsed()/amount);
+		Log.info("Time elapsed: {0}ms\nAverage MS per path: {1}", Timers.elapsed(), Timers.elapsed()/amount);
 	}
 
 	/**Reset and clear the paths.*/

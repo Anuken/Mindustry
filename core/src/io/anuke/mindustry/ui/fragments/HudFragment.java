@@ -156,9 +156,9 @@ public class HudFragment implements Fragment{
 				row();
 				new label(() -> "[blue]requests: " + renderer.getBlocks().getRequests()).left();
 				row();
-				new label(() -> "[purple]tiles: " + tileGroup.amount()).left();
+				new label(() -> "[purple]tiles: " + tileGroup.size()).left();
 				row();
-				new label(() -> "[purple]enemies: " + enemyGroup.amount()).left();
+				new label(() -> "[purple]enemies: " + enemyGroup.size()).left();
 				row();
 				new label(() -> "[orange]noclip: " + noclip).left();
 				row();
@@ -178,7 +178,7 @@ public class HudFragment implements Fragment{
 
 		if(debugNet) {
             new table() {{
-                new label(() -> "players: " + playerGroup.amount());
+                new label(() -> "players: " + playerGroup.size());
                 row();
                 new label(() -> "" + playerGroup.all());
             }}.end();

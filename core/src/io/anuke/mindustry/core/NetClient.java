@@ -2,7 +2,6 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.core.GameState.State;
@@ -20,8 +19,8 @@ import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
+import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BaseBulletType;
@@ -29,6 +28,7 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
+import io.anuke.ucore.util.Log;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -91,7 +91,7 @@ public class NetClient extends Module {
         });
 
         Net.handleClient(WorldData.class, data -> {
-            UCore.log("Recieved world data: " + data.stream.available() + " bytes.");
+            Log.info("Recieved world data: {0} bytes.", data.stream.available());
             NetworkIO.loadWorld(data.stream);
             player.set(world.getSpawnX(), world.getSpawnY());
 
@@ -101,12 +101,12 @@ public class NetClient extends Module {
         });
 
         Net.handleClient(CustomMapPacket.class, packet -> {
-            UCore.log("Recieved custom map: " + packet.stream.available() + " bytes.");
+            Log.info("Recieved custom map: {0} bytes.", packet.stream.available());
 
             //custom map is always sent before world data
-            Pixmap pixmap = NetworkIO.loadMap(packet.stream);
+            Map map = NetworkIO.loadMap(packet.stream);
 
-            world.maps().setNetworkMap(pixmap);
+            world.maps().setNetworkMap(map);
 
             MapAckPacket ack = new MapAckPacket();
             Net.send(ack, SendMode.tcp);
@@ -128,7 +128,7 @@ public class NetClient extends Module {
 
                 if (entity == null || id == player.id) {
                     if (id != player.id) {
-                        UCore.log("Requesting entity " + id, "group " + group.getType());
+                        Log.info("Requesting entity {0}, group {1}.", id, group.getType().toString().replace("class io.anuke.mindustry.entities.", ""));
                         EntityRequestPacket req = new EntityRequestPacket();
                         req.id = id;
                         Net.send(req, SendMode.udp);
@@ -228,7 +228,7 @@ public class NetClient extends Module {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } catch (Exception e) {
-                UCore.error(e);
+                Log.err(e);
                 //do nothing else...
                 //TODO fix
             }
