@@ -139,13 +139,13 @@ public class EnemyType {
     }
 
     public void move(Enemy enemy){
-        float speed = this.speed + 0.04f * enemy.tier;
-        float range = this.range + enemy.tier * 5;
-
-        if(Net.client() && Net.active()){
+        if(Net.client()){
             enemy.interpolate(); //TODO? better structure for interpolation
             return;
         }
+
+        float speed = this.speed + 0.04f * enemy.tier;
+        float range = this.range + enemy.tier * 5;
 
         Tile core = world.getCore();
 
@@ -194,7 +194,11 @@ public class EnemyType {
         enemy.move(vec.x * Timers.delta(), vec.y * Timers.delta());
 
         updateTargeting(enemy, nearCore);
+
+        behavior(enemy);
     }
+
+    public void behavior(Enemy enemy){}
 
     public void updateTargeting(Enemy enemy, boolean nearCore){
         if(enemy.target != null && enemy.target instanceof TileEntity && ((TileEntity)enemy.target).dead){

@@ -13,7 +13,6 @@ import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
 import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.util.Log;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -43,7 +42,6 @@ public class KryoClient implements ClientProvider{
                 ByteBuffer buffer = ByteBuffer.wrap(datagramPacket.getData());
                 Host address = KryoRegistrator.readServerData(datagramPacket.getAddress(), buffer);
                 addresses.put(datagramPacket.getAddress(), address);
-                Log.info("Host data found: {0} bytes.", buffer.capacity());
             }
 
             @Override

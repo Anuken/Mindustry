@@ -9,6 +9,7 @@ import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.ChatPacket;
+import io.anuke.mindustry.ui.fragments.DebugFragment;
 import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Sounds;
@@ -119,7 +120,8 @@ public class ServerControl extends Module {
             if(state.is(State.menu)){
                 info("&lyStatus: &rserver closed");
             }else{
-                info("&lyStatus: &lcPlaying on map &fi{0}&fb &lb/&lc Wave {1} &lb/&lcDifficulty {2}", Strings.capitalize(world.getMap().name), state.wave, state.difficulty.name());
+                info("&lyStatus: &lcPlaying on map &fi{0}&fb &lb/&lc Wave {1} &lb/&lc {2}",
+                        Strings.capitalize(world.getMap().name), state.wave, Strings.capitalize(state.difficulty.name()));
                 if(playerGroup.size() > 0) {
                     info("&lyPlayers: {0}", playerGroup.size());
                     for (Player p : playerGroup.all()) {
@@ -138,7 +140,7 @@ public class ServerControl extends Module {
             }
 
             netCommon.sendMessage("[pink][[Server]:[] " + arg[0]);
-            info("&ly[Server]: &lb{0}", arg[0]);
+            info("&lyServer: &lb{0}", arg[0]);
         }).mergeArgs();
 
         handler.register("difficulty", "<difficulty>", "Set game difficulty.", arg -> {
@@ -187,6 +189,10 @@ public class ServerControl extends Module {
             SaveIO.saveToSlot(slot);
 
             info("Saved to slot {0}.", slot);
+        });
+
+        handler.register("info", "", "Print debug info", arg -> {
+            info(DebugFragment.debugInfo());
         });
     }
 

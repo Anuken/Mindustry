@@ -55,6 +55,7 @@ public class UI extends SceneModule{
     public final BackgroundFragment backfrag = new BackgroundFragment();
     public final LoadingFragment loadfrag = new LoadingFragment();
     public final BlockConfigFragment configfrag = new BlockConfigFragment();
+    public final DebugFragment debugfrag = new DebugFragment();
 
     private Locale lastLocale;
 	
@@ -160,6 +161,7 @@ public class UI extends SceneModule{
 		toolfrag.build();
 		chatfrag.build();
 		listfrag.build();
+		debugfrag.build();
 		loadfrag.build();
 
 		build.end();

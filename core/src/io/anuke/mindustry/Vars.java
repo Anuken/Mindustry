@@ -9,6 +9,8 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Shield;
 import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.net.ClientDebug;
+import io.anuke.mindustry.net.ServerDebug;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
@@ -47,8 +49,9 @@ public class Vars{
 	//how much the zoom changes every zoom button press
 	public static final int zoomScale = Math.round(Unit.dp.scl(1));
 	//if true, player speed will be increased, massive amounts of resources will be given on start, and other debug options will be available
-	public static boolean debug = false;
-	public static boolean debugNet = false;
+	public static boolean debug = true;
+	public static boolean debugNet = true;
+	public static boolean console = false;
 	//whether the player can clip through walls
 	public static boolean noclip = false;
 	//whether to draw chunk borders
@@ -82,6 +85,9 @@ public class Vars{
 	public static final int webPort = 6568;
 
 	public static final GameState state = new GameState();
+
+	public static final ServerDebug serverDebug = new ServerDebug();
+	public static final ClientDebug clientDebug = new ClientDebug();
 
 	public static Control control;
 	public static Logic logic;

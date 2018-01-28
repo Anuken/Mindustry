@@ -75,9 +75,13 @@ public class Door extends Wall{
 				return true;
 			}
 		}
-		
-		if(Tmp.r2.overlaps(player.hitbox.getRect(player.x, player.y))){
-			return true;
+
+		for(SolidEntity e : Entities.getNearby(playerGroup, x * tilesize, y * tilesize, tilesize * 2f)){
+			Rectangle rect = e.hitbox.getRect(e.x, e.y);
+
+			if(Tmp.r2.overlaps(rect)){
+				return true;
+			}
 		}
 		
 		return false;

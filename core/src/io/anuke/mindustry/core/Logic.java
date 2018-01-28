@@ -131,7 +131,7 @@ public class Logic extends Module {
                     }
                 }
 
-                if(state.wavetime <= 0 || state.extrawavetime <= 0){
+                if(!Net.client() && (state.wavetime <= 0 || state.extrawavetime <= 0)){
                     runWave();
                 }
 

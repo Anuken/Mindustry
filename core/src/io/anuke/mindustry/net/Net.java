@@ -16,11 +16,10 @@ import io.anuke.ucore.util.Log;
 
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.headless;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 
 public class Net{
-	public static final int version = 13;
+	public static final int version = 14;
 
 	private static boolean server;
 	private static boolean active;
@@ -141,6 +140,8 @@ public class Net{
 	
 	/**Call to handle a packet being recieved for the client.*/
 	public static void handleClientReceived(Object object){
+		if(debugNet) clientDebug.handle(object);
+
 		if(object instanceof StreamBegin) {
 			StreamBegin b = (StreamBegin) object;
 			streams.put(b.id, new StreamBuilder(b));
@@ -170,6 +171,8 @@ public class Net{
 
 	/**Call to handle a packet being recieved for the server.*/
 	public static void handleServerReceived(int connection, Object object){
+		if(debugNet) serverDebug.handle(object);
+
 		if(serverListeners.get(object.getClass()) != null || listeners.get(object.getClass()) != null){
 			if(serverListeners.get(object.getClass()) != null) serverListeners.get(object.getClass()).accept(connection, object);
 			if(listeners.get(object.getClass()) != null) listeners.get(object.getClass()).accept(object);

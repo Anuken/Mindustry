@@ -1,13 +1,14 @@
 package io.anuke.mindustry.entities.enemies.types;
 
 import com.badlogic.gdx.math.Vector2;
-import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.ucore.util.Tmp;
+
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class BlastType extends EnemyType {
 
@@ -22,8 +23,7 @@ public class BlastType extends EnemyType {
 	}
 
 	@Override
-	public void move(Enemy enemy){
-		super.move(enemy);
+	public void behavior(Enemy enemy){
 
 		float range = 10f;
 		Vector2 offset = Tmp.v3.setZero();

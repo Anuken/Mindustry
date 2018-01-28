@@ -157,7 +157,7 @@ public class NetServer extends Module{
 
         Net.handleServer(WeaponSwitchPacket.class, (id, packet) -> {
             packet.playerid = connections.get(id).id;
-            Net.sendExcept(player.clientid, packet, SendMode.tcp);
+            Net.sendExcept(id, packet, SendMode.tcp);
         });
 
         Net.handleServer(BlockTapPacket.class, (id, packet) -> {
@@ -194,8 +194,6 @@ public class NetServer extends Module{
                 e.type = enemy.type.id;
                 e.health = (short) enemy.health;
                 Net.sendTo(dest, e, SendMode.tcp);
-            } else {
-                Log.err("Entity request target not found!");
             }
         });
 

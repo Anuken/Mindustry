@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Layer;
@@ -20,7 +19,7 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.*;
 
-import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.*;
 
 public class Generator extends PowerBlock{
 	public static final int powerTime = 2;
@@ -177,7 +176,8 @@ public class Generator extends PowerBlock{
 		if(target != null){
 			boolean interfering = isInterfering(target, rotation);
 
-			Tmp.v1.set(Angles.translation(rotation * 90, target.block().width * tilesize / 2 + 2f + (interfering ? Vector2.dst(tile.worldx(), tile.worldy(), target.worldx(), target.worldy()) / 2f - tilesize / 2f * target.block().width - 1 : 0)));
+			Tmp.v1.set(Angles.translation(rotation * 90, target.block().width * tilesize / 2 + 2f +
+					(interfering ? Vector2.dst(tile.worldx(), tile.worldy(), target.worldx(), target.worldy()) / 2f - tilesize / 2f * target.block().width + 1 : 0)));
 
 			Angles.translation(rotation * 90, width * tilesize / 2 + 2f);
 
@@ -191,7 +191,7 @@ public class Generator extends PowerBlock{
 				}
 			}
 
-			float r = interfering ? 0.8f : 0f;
+			float r = interfering ? 0f : 0f;
 			
 			int relative = tile.relativeTo(target.x, target.y);
 			

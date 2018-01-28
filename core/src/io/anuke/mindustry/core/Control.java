@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.game.DefaultKeybinds;
+import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Tutorial;
 import io.anuke.mindustry.game.UpgradeInventory;
@@ -265,6 +265,10 @@ public class Control extends Module{
         if(Gdx.input != proxy){
             Gdx.input = proxy;
         }
+
+        if(Inputs.keyTap("console")){
+			console = !console;
+		}
 
         if(KeyBinds.getSection("default").device.type == DeviceType.controller){
             if(Inputs.keyTap("select")){

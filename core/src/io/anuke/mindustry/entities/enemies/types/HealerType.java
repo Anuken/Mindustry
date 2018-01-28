@@ -35,8 +35,7 @@ public class HealerType extends EnemyType {
 	}
 	
 	@Override
-	public void move(Enemy enemy){
-		super.move(enemy);
+	public void behavior(Enemy enemy){
 		
 		if(enemy.idletime > 60f*3){ //explode after 3 seconds of stillness
 			explode(enemy);

@@ -51,7 +51,6 @@ public class KryoServer implements ServerProvider {
         server = new Server(4096*2, 2048, connection -> new ByteSerializer()); //TODO tweak
         server.setDiscoveryHandler((datagramChannel, fromAddress) -> {
             ByteBuffer buffer = KryoRegistrator.writeServerData();
-            Log.info("Replying to discover request with buffer of size {0}.", buffer.capacity());
             buffer.position(0);
             datagramChannel.send(buffer, fromAddress);
             return true;

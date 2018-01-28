@@ -7,7 +7,6 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.label;
@@ -148,26 +147,6 @@ public class HudFragment implements Fragment{
 			}}.end();
 		}}.end();
 
-		//profiling table
-		if(debug){
-			new table(){{
-				atop();
-				new label("[green]density: " + Gdx.graphics.getDensity()).left();
-				row();
-				new label(() -> "[blue]requests: " + renderer.getBlocks().getRequests()).left();
-				row();
-				new label(() -> "[purple]tiles: " + tileGroup.size()).left();
-				row();
-				new label(() -> "[purple]enemies: " + enemyGroup.size()).left();
-				row();
-				new label(() -> "[orange]noclip: " + noclip).left();
-				row();
-				new label(() -> "[purple]time: " + (int)(Timers.time() / 10f) % 50).left();
-				row();
-				new label("[red]DEBUG MODE").scale(0.5f).left();
-			}}.end();
-		}
-
 		new table(){{
 			abottom();
 			visible(() -> !state.is(State.menu) && control.getSaves().isSaving());
@@ -175,14 +154,6 @@ public class HudFragment implements Fragment{
 			new label("$text.saveload");
 
 		}}.end();
-
-		if(debugNet) {
-            new table() {{
-                new label(() -> "players: " + playerGroup.size());
-                row();
-                new label(() -> "" + playerGroup.all());
-            }}.end();
-        }
 
 		blockfrag.build();
 	}

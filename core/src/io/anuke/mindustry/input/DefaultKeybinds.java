@@ -1,4 +1,4 @@
-package io.anuke.mindustry.game;
+package io.anuke.mindustry.input;
 
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
@@ -25,6 +25,7 @@ public class DefaultKeybinds {
                 "rotate", new Axis(Input.SCROLL),
                 "player_list", Input.TAB,
                 "chat", Input.ENTER,
+                "console", Input.GRAVE,
                 "weapon_1", Input.NUM_1,
                 "weapon_2", Input.NUM_2,
                 "weapon_3", Input.NUM_3,
@@ -51,6 +52,7 @@ public class DefaultKeybinds {
                 "rotate", new Axis(Input.CONTROLLER_A, Input.CONTROLLER_B),
                 "player_list", Input.CONTROLLER_START,
                 "chat", Input.ENTER,
+                "console", Input.GRAVE,
                 "weapon_1", Input.NUM_1,
                 "weapon_2", Input.NUM_2,
                 "weapon_3", Input.NUM_3,

@@ -114,6 +114,8 @@ public class NetClient extends Module {
 
         Net.handleClient(SyncPacket.class, packet -> {
             if (!gotData) return;
+            int players = 0;
+            int enemies = 0;
 
             ByteBuffer data = ByteBuffer.wrap(packet.data);
 
@@ -126,9 +128,11 @@ public class NetClient extends Module {
 
                 SyncEntity entity = (SyncEntity) group.getByID(id);
 
+                if(entity instanceof Player) players ++;
+                if(entity instanceof Enemy) enemies ++;
+
                 if (entity == null || id == player.id) {
                     if (id != player.id) {
-                        Log.info("Requesting entity {0}, group {1}.", id, group.getType().toString().replace("class io.anuke.mindustry.entities.", ""));
                         EntityRequestPacket req = new EntityRequestPacket();
                         req.id = id;
                         Net.send(req, SendMode.udp);
@@ -137,6 +141,10 @@ public class NetClient extends Module {
                 } else {
                     entity.read(data);
                 }
+            }
+
+            if(debugNet){
+                clientDebug.setSyncDebug(players, enemies);
             }
         });
 
@@ -161,6 +169,7 @@ public class NetClient extends Module {
             recieved.add(spawn.id);
 
             Enemy enemy = new Enemy(EnemyType.getByID(spawn.type));
+            enemy.interpolator.target.set(spawn.x, spawn.y);
             enemy.set(spawn.x, spawn.y);
             enemy.tier = spawn.tier;
             enemy.lane = spawn.lane;
@@ -169,6 +178,8 @@ public class NetClient extends Module {
             enemy.add();
 
             Effects.effect(Fx.spawn, enemy);
+
+            Log.info("Recieved enemy {0}", spawn.id);
         });
 
         Net.handleClient(EnemyDeathPacket.class, spawn -> {
@@ -264,6 +275,8 @@ public class NetClient extends Module {
             player.interpolator.target.set(player.x, player.y);
             player.add();
 
+            Log.info("Recieved player {0}", packet.id);
+
             Platform.instance.updateRPC();
         });
 
@@ -314,6 +327,11 @@ public class NetClient extends Module {
 
     public String colorizeName(int id, String name){
         return name == null ? null : "[#" + colorArray[id % colorArray.length].toString().toUpperCase() + "]" + name;
+    }
+
+    public void clearRecieved(){
+        recieved.clear();
+        dead.clear();
     }
 
     void sync(){

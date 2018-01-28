@@ -1,6 +1,5 @@
 package io.anuke.mindustry.entities.enemies.types;
 
-import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
@@ -9,6 +8,8 @@ import io.anuke.mindustry.graphics.Fx;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Angles;
+
+import static io.anuke.mindustry.Vars.world;
 
 public class FortressType extends EnemyType {
 	final int maxSpawn = 6;
@@ -29,7 +30,7 @@ public class FortressType extends EnemyType {
 	}
 	
 	@Override
-	public void move(Enemy enemy){
+	public void behavior(Enemy enemy){
 		if(enemy.distanceTo(world.getCore().worldx(),
 				world.getCore().worldy()) <= 90f){
 
@@ -47,8 +48,6 @@ public class FortressType extends EnemyType {
 				enemy.spawned ++;
 			}
 
-		}else {
-			super.move(enemy);
 		}
 	}
 
