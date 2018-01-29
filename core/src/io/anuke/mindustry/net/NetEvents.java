@@ -1,7 +1,6 @@
 package io.anuke.mindustry.net;
 
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
@@ -27,8 +26,6 @@ public class NetEvents {
 
     public static void handleGameOver(){
         Net.send(new GameOverPacket(), SendMode.tcp);
-        state.gameOver = true;
-        state.set(State.menu);
     }
 
     public static void handleBullet(BulletType type, Entity owner, float x, float y, float angle, short damage){

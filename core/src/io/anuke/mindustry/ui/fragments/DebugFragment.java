@@ -106,13 +106,14 @@ public class DebugFragment implements Fragment {
         return join(
                 "net.active: " + Net.active(),
                 "net.server: " + Net.server(),
-                "chat.open: " + ui.chatfrag.chatOpen(),
-                "chat.messages: " + ui.chatfrag.getMessagesSize(),
+                Net.client() ? "chat.open: " + ui.chatfrag.chatOpen() : "",
+                Net.client() ? "chat.messages: " + ui.chatfrag.getMessagesSize() : "",
                 "players: " + playerGroup.size(),
                 "enemies: " + enemyGroup.size(),
                 "tiles: " + tileGroup.size(),
+                world.getCore() != null ? "core.health: " + world.getCore().entity.health : "",
                 "",
-                clientDebug.getOut()
+                !Net.server() ? clientDebug.getOut() : serverDebug.getOut()
         );
     }
 

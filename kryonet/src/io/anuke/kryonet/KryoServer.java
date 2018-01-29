@@ -44,6 +44,7 @@ public class KryoServer implements ServerProvider {
     final CopyOnWriteArrayList<KryoConnection> connections = new CopyOnWriteArrayList<>();
     final Array<KryoConnection> array = new Array<>();
     SocketServer webServer;
+    Thread serverThread;
 
     int lastconnection = 0;
 
@@ -131,15 +132,15 @@ public class KryoServer implements ServerProvider {
         webServer = new SocketServer(Vars.webPort);
         webServer.start();
 
-        Thread thread = new Thread(() -> {
+        serverThread = new Thread(() -> {
             try{
                 server.run();
             }catch (Exception e){
                 if(!(e instanceof ClosedSelectorException)) handleException(e);
             }
         }, "Kryonet Server");
-        thread.setDaemon(true);
-        thread.start();
+        serverThread.setDaemon(true);
+        serverThread.start();
     }
 
     @Override
@@ -151,7 +152,6 @@ public class KryoServer implements ServerProvider {
         Thread thread = new Thread(() ->{
             try {
                 server.close();
-                Log.info("Killing web server...");
                 try {
                     if (webServer != null) webServer.stop(1); //please die, right now
                 }catch(Exception e){
@@ -163,7 +163,6 @@ public class KryoServer implements ServerProvider {
                         worker.interrupt();
                     }
                 }
-                Log.info("Killed web server.");
             }catch (Exception e){
                 Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
             }
@@ -252,14 +251,15 @@ public class KryoServer implements ServerProvider {
 
     @Override
     public void dispose(){
+        Log.info("Disposing server.");
         try {
+            if(serverThread != null) serverThread.interrupt();
             server.dispose();
         }catch (Exception e){
             e.printStackTrace();
         }
 
         try {
-            Log.info("Disposing web server...");
 
             if(webServer != null) webServer.stop(1);
             //kill them all
@@ -268,7 +268,6 @@ public class KryoServer implements ServerProvider {
                     thread.interrupt();
                 }
             }
-            Log.info("Killed web server.");
         }catch (Exception e){
             e.printStackTrace();
         }

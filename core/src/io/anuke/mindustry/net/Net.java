@@ -171,7 +171,7 @@ public class Net{
 
 	/**Call to handle a packet being recieved for the server.*/
 	public static void handleServerReceived(int connection, Object object){
-		if(debugNet) serverDebug.handle(object);
+		if(debugNet) serverDebug.handle(connection, object);
 
 		if(serverListeners.get(object.getClass()) != null || listeners.get(object.getClass()) != null){
 			if(serverListeners.get(object.getClass()) != null) serverListeners.get(object.getClass()).accept(connection, object);

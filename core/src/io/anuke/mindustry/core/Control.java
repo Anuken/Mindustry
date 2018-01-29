@@ -181,6 +181,10 @@ public class Control extends Module{
 			Effects.effect(Fx.coreexplosion, world.getCore().worldx(), world.getCore().worldy());
 
 			ui.restart.show();
+
+			Timers.runTask(30f, () -> {
+				state.set(State.menu);
+			});
 		});
 	}
 

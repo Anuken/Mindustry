@@ -66,7 +66,8 @@ public class ServerControl extends Module {
         Events.on(GameOverEvent.class, () -> {
             info("Game over!");
 
-            Timers.runTask(10f, () -> {
+            Timers.runTask(30f, () -> {
+                state.set(State.menu);
                 Net.closeServer();
 
                 if(shuffle) {
@@ -79,8 +80,6 @@ public class ServerControl extends Module {
                     logic.reset();
                     world.loadMap(map);
                     host();
-                }else{
-                    state.set(State.menu);
                 }
             });
         });
@@ -290,6 +289,11 @@ public class ServerControl extends Module {
             SaveIO.saveToSlot(slot);
 
             info("Saved to slot {0}.", slot);
+        });
+
+        handler.register("gameover", "Force a game over.", arg -> {
+            world.removeBlock(world.getCore());
+            info("Core destroyed.");
         });
 
         handler.register("info", "Print debug info", arg -> {
