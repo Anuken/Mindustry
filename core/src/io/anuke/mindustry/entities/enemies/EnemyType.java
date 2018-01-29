@@ -236,16 +236,18 @@ public class EnemyType {
 
     public void onShoot(Enemy enemy, BulletType type, float rotation){}
 
-    public void onDeath(Enemy enemy){
+    public void onDeath(Enemy enemy, boolean force){
         if(Net.server()){
             NetEvents.handleEnemyDeath(enemy);
         }
 
-        Effects.effect(Fx.explosion, enemy);
-        Effects.shake(3f, 4f, enemy);
-        Effects.sound("bang2", enemy);
-        enemy.remove();
-        enemy.dead = true;
+        if(!Net.client() || force) {
+            Effects.effect(Fx.explosion, enemy);
+            Effects.shake(3f, 4f, enemy);
+            Effects.sound("bang2", enemy);
+            enemy.remove();
+            enemy.dead = true;
+        }
     }
 
     public void removed(Enemy enemy){

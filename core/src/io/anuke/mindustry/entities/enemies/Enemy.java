@@ -71,7 +71,7 @@ public class Enemy extends SyncEntity {
 
 	@Override
 	public void onDeath(){
-		type.onDeath(this);
+		type.onDeath(this, false);
 	}
 
 	@Override

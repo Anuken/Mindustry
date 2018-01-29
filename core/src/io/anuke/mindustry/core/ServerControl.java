@@ -5,14 +5,19 @@ import com.badlogic.gdx.Gdx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Difficulty;
+import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.net.Packets.ChatPacket;
+import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.ui.fragments.DebugFragment;
 import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Sounds;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.CommandHandler;
 import io.anuke.ucore.util.CommandHandler.Command;
@@ -31,6 +36,7 @@ import static io.anuke.ucore.util.Log.*;
 
 public class ServerControl extends Module {
     private final CommandHandler handler = new CommandHandler("");
+    private boolean shuffle = true;
 
     public ServerControl(){
         Effects.setScreenShakeProvider((a, b) -> {});
@@ -57,24 +63,46 @@ public class ServerControl extends Module {
         thread.setDaemon(true);
         thread.start();
 
+        Events.on(GameOverEvent.class, () -> {
+            info("Game over!");
+
+            Timers.runTask(10f, () -> {
+                Net.closeServer();
+
+                if(shuffle) {
+                    Map previous = world.getMap();
+                    Map map = previous;
+                    while(map == previous) map = world.maps().getDefaultMaps().random();
+
+                    info("Selected next map to be {0}.", map.name);
+                    state.set(State.playing);
+                    logic.reset();
+                    world.loadMap(map);
+                    host();
+                }else{
+                    state.set(State.menu);
+                }
+            });
+        });
+
         info("&lcServer loaded. Type &ly'help'&lc for help.");
     }
 
     private void registerCommands(){
-        handler.register("help", "", "Displays this command list.", arg -> {
+        handler.register("help", "Displays this command list.", arg -> {
             info("Commands:");
             for(Command command : handler.getCommandList()){
                 print("   &y" + command.text + (command.params.isEmpty() ? "" : " ") + command.params + " - &lm" + command.description);
             }
         });
 
-        handler.register("exit", "", "Exit the server application.", arg -> {
+        handler.register("exit", "Exit the server application.", arg -> {
             info("Shutting down server.");
             Net.dispose();
             Gdx.app.exit();
         });
 
-        handler.register("stop", "", "Stop hosting the server.", arg -> {
+        handler.register("stop", "Stop hosting the server.", arg -> {
             Net.closeServer();
             state.set(State.menu);
         });
@@ -93,7 +121,7 @@ public class ServerControl extends Module {
             }
 
             if(result == null){
-                err("No map with name &y'{0}'&lg found.", search);
+                err("No map with name &y'{0}'&lr found.", search);
                 return;
             }
 
@@ -116,12 +144,18 @@ public class ServerControl extends Module {
             host();
         });
 
-        handler.register("status", "", "Display server status.", arg -> {
+        handler.register("status", "Display server status.", arg -> {
             if(state.is(State.menu)){
                 info("&lyStatus: &rserver closed");
             }else{
                 info("&lyStatus: &lcPlaying on map &fi{0}&fb &lb/&lc Wave {1} &lb/&lc {2}",
                         Strings.capitalize(world.getMap().name), state.wave, Strings.capitalize(state.difficulty.name()));
+                if(state.enemies > 0){
+                    info("&ly{0} enemies remaining.", state.enemies);
+                }else{
+                    info("&ly{0} seconds until next wave.", (int)(state.wavetime / 60));
+                }
+
                 if(playerGroup.size() > 0) {
                     info("&lyPlayers: {0}", playerGroup.size());
                     for (Player p : playerGroup.all()) {
@@ -150,6 +184,73 @@ public class ServerControl extends Module {
                 info("Difficulty set to '{0}'.", arg[0]);
             }catch (IllegalArgumentException e){
                 err("No difficulty with name '{0}' found.", arg[0]);
+            }
+        });
+
+        handler.register("friendlyfire", "<on/off>", "Enable or disable friendly fire", arg -> {
+            String s = arg[0];
+            if(s.equalsIgnoreCase("on")){
+                NetEvents.handleFriendlyFireChange(true);
+                state.friendlyFire = true;
+                info("Friendly fire enabled.");
+            }else if(s.equalsIgnoreCase("off")){
+                NetEvents.handleFriendlyFireChange(false);
+                state.friendlyFire = false;
+                info("Friendly fire disabled.");
+            }else{
+                err("Incorrect command usage.");
+            }
+        });
+
+        handler.register("shuffle", "<on/off>", "Enable or disable automatic random map shuffling after gameovers.", arg -> {
+            String s = arg[0];
+            if(s.equalsIgnoreCase("on")){
+                shuffle = true;
+                info("Map shuffling enabled.");
+            }else if(s.equalsIgnoreCase("off")){
+                shuffle = false;
+                info("Map shuffling disabled.");
+            }else{
+                err("Incorrect command usage.");
+            }
+        });
+
+        handler.register("kick", "<username>", "Kick a person by name.", arg -> {
+            if(!state.is(State.playing)) {
+                err("Not hosting a game yet. Calm down.");
+                return;
+            }
+
+            if(playerGroup.size() == 0){
+                err("But this server is empty. A barren wasteland.");
+                return;
+            }
+
+            Player target = null;
+
+            for(Player player : playerGroup.all()){
+                if(player.name.equalsIgnoreCase(arg[0])){
+                    target = player;
+                    break;
+                }
+            }
+
+            if(target != null){
+                Net.kickConnection(target.clientid, KickReason.kick);
+                info("It is done.");
+            }else{
+                info("Nobody with that name could be found...");
+            }
+        });
+
+        handler.register("runwave", "Trigger the next wave.", arg -> {
+            if(!state.is(State.playing)) {
+                err("Not hosting. Host a game first.");
+            }else if(state.enemies > 0){
+                err("There are still {0} enemies remaining.", state.enemies);
+            }else{
+                logic.runWave();
+                info("Wave spawned.");
             }
         });
 
@@ -191,7 +292,7 @@ public class ServerControl extends Module {
             info("Saved to slot {0}.", slot);
         });
 
-        handler.register("info", "", "Print debug info", arg -> {
+        handler.register("info", "Print debug info", arg -> {
             info(DebugFragment.debugInfo());
         });
     }

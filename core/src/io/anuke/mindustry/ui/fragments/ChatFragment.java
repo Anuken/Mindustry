@@ -178,6 +178,10 @@ public class ChatFragment extends Table implements Fragment{
         return chatOpen;
     }
 
+    public int getMessagesSize(){
+        return messages.size;
+    }
+
     public void addMessage(String message, String sender){
         messages.insert(0, new ChatMessage(message, sender));
 

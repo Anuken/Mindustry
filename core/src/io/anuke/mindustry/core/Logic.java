@@ -12,6 +12,7 @@ import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.game.WaveCreator;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.Effects;
@@ -112,6 +113,7 @@ public class Logic extends Module {
 
             if(world.getCore().block() != ProductionBlocks.core && !state.gameOver){
                 state.gameOver = true;
+                NetEvents.handleGameOver();
                 Events.fire(GameOverEvent.class);
             }
 

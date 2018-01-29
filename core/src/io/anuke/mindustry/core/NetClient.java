@@ -1,7 +1,6 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.core.GameState.State;
@@ -37,9 +36,6 @@ import java.nio.ByteBuffer;
 import static io.anuke.mindustry.Vars.*;
 
 public class NetClient extends Module {
-    public static final Color[] colorArray = {Color.ORANGE, Color.SCARLET, Color.LIME, Color.PURPLE,
-            Color.GOLD, Color.PINK, Color.SKY, Color.GOLD, Color.VIOLET,
-            Color.GREEN, Color.CORAL, Color.CYAN, Color.CHARTREUSE};
     boolean connecting = false;
     boolean gotData = false;
     boolean kicked = false;
@@ -184,7 +180,7 @@ public class NetClient extends Module {
 
         Net.handleClient(EnemyDeathPacket.class, spawn -> {
             Enemy enemy = enemyGroup.getByID(spawn.id);
-            if (enemy != null) enemy.onDeath();
+            if (enemy != null) enemy.type.onDeath(enemy, true);
             dead.add(spawn.id);
         });
 
@@ -260,6 +256,7 @@ public class NetClient extends Module {
             //duplicates.
             if (enemyGroup.getByID(packet.id) != null ||
                     recieved.contains(packet.id)) return;
+
             recieved.add(packet.id);
 
             Player player = new Player();
@@ -323,10 +320,6 @@ public class NetClient extends Module {
     public void disconnectQuietly(){
         kicked = true;
         Net.disconnect();
-    }
-
-    public String colorizeName(int id, String name){
-        return name == null ? null : "[#" + colorArray[id % colorArray.length].toString().toUpperCase() + "]" + name;
     }
 
     public void clearRecieved(){

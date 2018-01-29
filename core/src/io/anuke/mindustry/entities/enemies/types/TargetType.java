@@ -50,8 +50,8 @@ public class TargetType extends EnemyType {
 	}
 	
 	@Override
-	public void onDeath(Enemy enemy){
-		super.onDeath(enemy);
+	public void onDeath(Enemy enemy, boolean force){
+		super.onDeath(enemy, force);
 		Timers.run(100f, ()->{
 			new Enemy(EnemyTypes.target).set(enemy.x, enemy.y).add();
 		});

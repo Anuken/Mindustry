@@ -10,7 +10,6 @@ import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entity;
 
 import static io.anuke.mindustry.Vars.*;
@@ -29,7 +28,7 @@ public class NetEvents {
     public static void handleGameOver(){
         Net.send(new GameOverPacket(), SendMode.tcp);
         state.gameOver = true;
-        Timers.runTask(30f, () -> state.set(State.menu));
+        state.set(State.menu);
     }
 
     public static void handleBullet(BulletType type, Entity owner, float x, float y, float angle, short damage){

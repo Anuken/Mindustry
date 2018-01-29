@@ -18,6 +18,7 @@ import static io.anuke.mindustry.Vars.*;
 public class Maps implements Disposable{
 	private IntMap<Map> maps = new IntMap<>();
 	private ObjectMap<String, Map> mapNames = new ObjectMap<>();
+	private Array<Map> defaultMaps = new Array<>();
 	private Map networkMap;
 	private int lastID;
 	private Json json = new Json();
@@ -30,6 +31,10 @@ public class Maps implements Disposable{
 
 	public Iterable<Map> list(){
 		return maps.values();
+	}
+
+	public Array<Map> getDefaultMaps(){
+		return defaultMaps;
 	}
 
 	public void setNetworkMap(Map map){
@@ -147,6 +152,9 @@ public class Maps implements Disposable{
 					maps.put(map.id, map);
 					mapNames.put(map.name, map);
 					lastID = Math.max(lastID, map.id);
+					if(!map.custom){
+						defaultMaps.add(map);
+					}
 				}
 			}
 			return true;

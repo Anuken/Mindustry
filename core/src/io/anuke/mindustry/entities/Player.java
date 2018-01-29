@@ -164,7 +164,7 @@ public class Player extends SyncEntity{
 		
 		boolean shooting = !Inputs.keyDown("dash") && Inputs.keyDown("shoot") && control.input().recipe == null
 				&& !ui.hasMouse() && !control.input().onConfigurable();
-		
+
 		if(shooting){
 			weaponLeft.update(player, true);
 			weaponRight.update(player, false);

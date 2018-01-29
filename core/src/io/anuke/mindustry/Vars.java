@@ -49,7 +49,7 @@ public class Vars{
 	//how much the zoom changes every zoom button press
 	public static final int zoomScale = Math.round(Unit.dp.scl(1));
 	//if true, player speed will be increased, massive amounts of resources will be given on start, and other debug options will be available
-	public static boolean debug = true;
+	public static boolean debug = false;
 	public static boolean debugNet = true;
 	public static boolean console = false;
 	//whether the player can clip through walls

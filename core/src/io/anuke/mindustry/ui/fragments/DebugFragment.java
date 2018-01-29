@@ -1,6 +1,7 @@
 package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyTypes;
 import io.anuke.mindustry.net.Net;
@@ -75,7 +76,11 @@ public class DebugFragment implements Fragment {
                 row();
                 new button("dump", () -> {
                     try{
-                        Gdx.files.local("packet-dump.txt").writeString(debugInfo(), false);
+                        FileHandle file = Gdx.files.local("packet-dump.txt");
+                        file.writeString("--INFO--\n", false);
+                        file.writeString(debugInfo(), true);
+                        file.writeString("--LOG--\n\n", true);
+                        file.writeString(log.toString(), true);
                     }catch (Exception e){
                         ui.showError("Error dumping log.");
                     }
@@ -101,6 +106,8 @@ public class DebugFragment implements Fragment {
         return join(
                 "net.active: " + Net.active(),
                 "net.server: " + Net.server(),
+                "chat.open: " + ui.chatfrag.chatOpen(),
+                "chat.messages: " + ui.chatfrag.getMessagesSize(),
                 "players: " + playerGroup.size(),
                 "enemies: " + enemyGroup.size(),
                 "tiles: " + tileGroup.size(),

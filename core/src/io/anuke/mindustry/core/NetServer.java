@@ -204,7 +204,7 @@ public class NetServer extends Module{
     }
 
     public void update(){
-        if(!closing && Net.server() && state.is(State.menu)){
+        if(!headless && !closing && Net.server() && state.is(State.menu)){
             closing = true;
             weapons.clear();
             ui.loadfrag.show("$text.server.closing");

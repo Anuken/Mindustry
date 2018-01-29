@@ -224,7 +224,7 @@ public class Renderer extends RendererModule{
 				Draw.color(0f, 0f, 0f, 0.3f);
 				Draw.rect("blank", player.x, player.y + 8 - layout.height/2, layout.width + 2, layout.height + 2);
 				Draw.color();
-				Draw.tcolor(NetClient.colorArray[player.id % NetClient.colorArray.length]);
+				Draw.tcolor(NetCommon.colorArray[player.id % NetCommon.colorArray.length]);
 	            Draw.text(player.name, player.x, player.y + 8);
 	            Draw.tcolor();
             }
@@ -385,7 +385,7 @@ public class Renderer extends RendererModule{
 
 		//draw selected block health
 		if(input.recipe == null && !ui.hasMouse()){
-			Tile tile = world.tile(tilex, tiley);
+			Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y);
 
 			if(tile != null && tile.block() != Blocks.air){
 				Tile target = tile;
