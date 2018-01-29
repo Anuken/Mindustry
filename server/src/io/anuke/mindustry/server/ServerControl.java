@@ -1,4 +1,4 @@
-package io.anuke.mindustry.core;
+package io.anuke.mindustry.server;
 
 import com.badlogic.gdx.ApplicationLogger;
 import com.badlogic.gdx.Gdx;

@@ -1,6 +1,9 @@
-package io.anuke.mindustry;
+package io.anuke.mindustry.server;
 
-import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.core.Logic;
+import io.anuke.mindustry.core.NetCommon;
+import io.anuke.mindustry.core.NetServer;
+import io.anuke.mindustry.core.World;
 import io.anuke.mindustry.io.BlockLoader;
 import io.anuke.mindustry.io.BundleLoader;
 import io.anuke.ucore.modules.ModuleCore;
@@ -20,6 +23,6 @@ public class MindustryServer extends ModuleCore {
         module(world = new World());
         module(netServer = new NetServer());
         module(netCommon = new NetCommon());
-        module(serverControl = new ServerControl());
+        module(new ServerControl());
     }
 }

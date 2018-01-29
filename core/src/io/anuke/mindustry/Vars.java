@@ -97,7 +97,6 @@ public class Vars{
 	public static NetCommon netCommon;
 	public static NetServer netServer;
 	public static NetClient netClient;
-	public static ServerControl serverControl;
 	
 	public static Player player;
 

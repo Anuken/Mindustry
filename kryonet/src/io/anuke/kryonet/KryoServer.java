@@ -153,7 +153,7 @@ public class KryoServer implements ServerProvider {
             try {
                 server.close();
                 try {
-                    if (webServer != null) webServer.stop(1); //please die, right now
+                    if (webServer != null) webServer.stop(1);
                 }catch(Exception e){
                     e.printStackTrace();
                 }
@@ -251,12 +251,11 @@ public class KryoServer implements ServerProvider {
 
     @Override
     public void dispose(){
-        Log.info("Disposing server.");
         try {
             if(serverThread != null) serverThread.interrupt();
             server.dispose();
         }catch (Exception e){
-            e.printStackTrace();
+            Log.err(e);
         }
 
         try {
@@ -269,8 +268,9 @@ public class KryoServer implements ServerProvider {
                 }
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Log.err(e);
         }
+        Log.info("Disposed server.");
     }
 
     private void handleException(Exception e){
