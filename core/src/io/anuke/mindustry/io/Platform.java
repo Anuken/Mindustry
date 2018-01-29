@@ -26,4 +26,5 @@ public abstract class Platform {
 	public boolean canJoinGame(){
 		return true;
 	}
+	public boolean isDebug(){return false;}
 }

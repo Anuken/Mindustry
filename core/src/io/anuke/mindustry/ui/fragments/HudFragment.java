@@ -63,6 +63,7 @@ public class HudFragment implements Fragment{
 					}).get();
 
 					new imagebutton("icon-pause", isize, () -> {
+						if(android) DebugFragment.printDebugInfo();
 						if (Net.active() && android) {
 							ui.listfrag.visible = !ui.listfrag.visible;
 						} else {

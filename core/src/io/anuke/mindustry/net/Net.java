@@ -5,11 +5,13 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
+import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamBuilder;
 import io.anuke.mindustry.net.Streamable.StreamChunk;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.BiConsumer;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Log;
@@ -51,6 +53,8 @@ public class Net{
 		clientProvider.connect(ip, port);
 		active = true;
 		server = false;
+
+		Timers.runTask(60f, Platform.instance::updateRPC);
 	}
 
 	/**Host a server at an address*/
@@ -58,6 +62,8 @@ public class Net{
 		serverProvider.host(port);
 		active = true;
 		server = true;
+
+		Timers.runTask(60f, Platform.instance::updateRPC);
 	}
 
 	/**Closes the server.*/

@@ -146,6 +146,7 @@ public class Control extends Module{
 		});
 
 		Events.on(ResetEvent.class, () -> {
+			upgrades.reset();
 			player.weaponLeft = player.weaponRight = Weapon.blaster;
 
 			player.add();

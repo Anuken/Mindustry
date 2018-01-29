@@ -304,6 +304,20 @@ public class NetClient extends Module {
         }
     }
 
+    //TODO remove.
+    public void test(){
+        gotData = false;
+        connecting = true;
+    }
+
+    public boolean hasData(){
+        return gotData;
+    }
+
+    public boolean isConnecting(){
+        return connecting;
+    }
+
     private void finishConnecting(){
         Net.send(new ConnectConfirmPacket(), SendMode.tcp);
         state.set(State.playing);

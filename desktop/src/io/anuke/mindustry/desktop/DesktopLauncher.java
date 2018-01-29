@@ -18,7 +18,7 @@ public class DesktopLauncher {
 		config.setWindowedMode(960, 540);
 		config.setWindowIcon("sprites/icon.png");
 
-        Platform.instance = new DesktopPlatform();
+        Platform.instance = new DesktopPlatform(arg);
 
 		Net.setClientProvider(new KryoClient());
 		Net.setServerProvider(new KryoServer());

@@ -8,6 +8,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.scene.ui.Image;
@@ -114,6 +115,13 @@ public class SettingsMenuDialog extends SettingsDialog{
 
 		graphics.checkPref("fps", false);
 		graphics.checkPref("vsync", true, b -> Gdx.graphics.setVSync(b));
+		graphics.checkPref("fullscreen", false, b -> {
+			if(b){
+				Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+			}else{
+				Gdx.graphics.setWindowedMode(600, 480);
+			}
+		});
 		graphics.checkPref("lasers", true);
 		graphics.checkPref("indicators", true);
 		graphics.checkPref("healthbars", true);
@@ -122,14 +130,21 @@ public class SettingsMenuDialog extends SettingsDialog{
 				renderer.pixelSurface.setScale(Core.cameraScale);
 				renderer.shadowSurface.setScale(Core.cameraScale);
 				renderer.shieldSurface.setScale(Core.cameraScale);
+				Graphics.getEffects1().setScale(Core.cameraScale);
+				Graphics.getEffects2().setScale(Core.cameraScale);
 			}else{
 				renderer.shadowSurface.setScale(1);
 				renderer.shieldSurface.setScale(1);
+				Graphics.getEffects1().setScale(1);
+				Graphics.getEffects2().setScale(1);
 			}
 			renderer.setPixelate(b);
 		});
 
 		Gdx.graphics.setVSync(Settings.getBool("vsync"));
+		if(!gwt && Settings.getBool("fullscreen")){
+			Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+		}
 	}
 
 	private void back(){

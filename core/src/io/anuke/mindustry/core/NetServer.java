@@ -68,7 +68,7 @@ public class NetServer extends Module{
                 data.stream = new ByteArrayInputStream(stream.toByteArray());
                 Net.sendStream(id, data);
 
-                Log.info("Sending custom map: Packed {0}uncompressed bytes of MAP data.", stream.size());
+                Log.info("Sending custom map: Packed {0} uncompressed bytes of MAP data.", stream.size());
             }else{
                 //hack-- simulate the map ack packet recieved to send the world data to the client.
                 Net.handleServerReceived(id, new MapAckPacket());

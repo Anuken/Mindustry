@@ -1,16 +1,16 @@
 package io.anuke.mindustry.entities;
 
+import com.badlogic.gdx.graphics.Color;
+import io.anuke.mindustry.core.NetCommon;
 import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.Mech;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Angles;
@@ -108,25 +108,33 @@ public class Player extends SyncEntity{
         boolean snap = snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate") && isLocal;
 
 		String part = isAndroid ? "ship" : "mech";
-		
+
+		Shaders.outline.color.set(getColor());
+		Shaders.outline.lighten = 0f;
+		Shaders.outline.region = Draw.region(part + "-" + mech.name);
+
+		Shaders.outline.apply();
+
+		if(!isAndroid) {
+			for (int i : Mathf.signs) {
+				Weapon weapon = i < 0 ? weaponLeft : weaponRight;
+				Angles.vector.set(3 * i, 2).rotate(angle - 90);
+				float w = i > 0 ? -8 : 8;
+				if(snap){
+					Draw.rect(weapon.name + "-equip", (int)x + Angles.x(), (int)y + Angles.y(), w, 8, angle - 90);
+				}else{
+					Draw.rect(weapon.name + "-equip", x + Angles.x(), y + Angles.y(), w, 8, angle - 90);
+				}
+			}
+		}
+
 		if(snap){
 			Draw.rect(part + "-" + mech.name, (int)x, (int)y, angle-90);
 		}else{
 			Draw.rect(part + "-" + mech.name, x, y, angle-90);
 		}
 
-		if(!isAndroid) {
-			for (boolean b : new boolean[]{true, false}) {
-				Weapon weapon = b ? weaponLeft : weaponRight;
-				Angles.translation(angle + Mathf.sign(b) * -50f, 3.5f);
-				float s = 5f;
-				if(snap){
-					Draw.rect(weapon.name, (int)x + Angles.x(), (int)y + Angles.y(), s, s, angle- 90);
-				}else{
-					Draw.rect(weapon.name, x + Angles.x(), y + Angles.y(), s, s, angle - 90);
-				}
-			}
-		}
+		Graphics.flush();
 	}
 	
 	@Override
@@ -249,5 +257,9 @@ public class Player extends SyncEntity{
 		x = Mathf.lerpDelta(x, i.target.x, 0.4f);
 		y = Mathf.lerpDelta(y, i.target.y, 0.4f);
 		angle = Mathf.lerpAngDelta(angle, i.targetrot, 0.6f);
+	}
+
+	public Color getColor(){
+		return NetCommon.colorArray[id % NetCommon.colorArray.length];
 	}
 }

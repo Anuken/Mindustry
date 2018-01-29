@@ -177,14 +177,17 @@ public class Renderer extends RendererModule{
 
 		Graphics.shader(Shaders.outline, false);
 		Entities.draw(enemyGroup);
+		Entities.draw(playerGroup, p -> !p.isAndroid);
 		Graphics.shader();
 
-		Entities.draw(playerGroup, p -> !p.isAndroid);
 		Entities.draw(Entities.defaultGroup());
 
 		blocks.drawBlocks(true);
 
+		Graphics.shader(Shaders.outline, false);
 		Entities.draw(playerGroup, p -> p.isAndroid);
+		Graphics.shader();
+
 		Entities.draw(bulletGroup);
 
 		drawShield();
@@ -208,6 +211,10 @@ public class Renderer extends RendererModule{
 		super.resize(width, height);
 		control.input().resetCursor();
 		camera.position.set(player.x, player.y, 0);
+
+		int scale = Settings.getBool("pixelate") ? Core.cameraScale : 1;
+		Graphics.getEffects1().setScale(scale);
+		Graphics.getEffects2().setScale(scale);
 	}
 	
 	public void clearTiles(){
@@ -224,7 +231,7 @@ public class Renderer extends RendererModule{
 				Draw.color(0f, 0f, 0f, 0.3f);
 				Draw.rect("blank", player.x, player.y + 8 - layout.height/2, layout.width + 2, layout.height + 2);
 				Draw.color();
-				Draw.tcolor(NetCommon.colorArray[player.id % NetCommon.colorArray.length]);
+				Draw.tcolor(player.getColor());
 	            Draw.text(player.name, player.x, player.y + 8);
 	            Draw.tcolor();
             }

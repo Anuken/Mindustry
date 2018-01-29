@@ -3,7 +3,6 @@ package io.anuke.mindustry.desktop;
 import club.minnced.discord.rpc.DiscordEventHandlers;
 import club.minnced.discord.rpc.DiscordRPC;
 import club.minnced.discord.rpc.DiscordRichPresence;
-import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
@@ -16,14 +15,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class DesktopPlatform extends Platform {
     DateFormat format = SimpleDateFormat.getDateTimeInstance();
     DiscordRPC lib = DiscordRPC.INSTANCE;
+    String[] args;
 
-    public DesktopPlatform(){
+    public DesktopPlatform(String[] args){
+        this.args = args;
         String applicationId = "398246104468291591";
         DiscordEventHandlers handlers = new DiscordEventHandlers();
 
@@ -79,5 +79,10 @@ public class DesktopPlatform extends Platform {
     @Override
     public void onGameExit() {
         lib.Discord_Shutdown();
+    }
+
+    @Override
+    public boolean isDebug() {
+        return args.length > 0 && args[0].equalsIgnoreCase("-debug");
     }
 }

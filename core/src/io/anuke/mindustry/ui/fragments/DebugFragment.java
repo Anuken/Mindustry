@@ -57,6 +57,8 @@ public class DebugFragment implements Fragment {
                row();
                new button("spawn", () -> new Enemy(EnemyTypes.standard).set(player.x, player.y).add());
                row();
+               new button("stuff", () -> netClient.test());
+               row();
            }}.end();
 
            row();
@@ -102,16 +104,23 @@ public class DebugFragment implements Fragment {
         }}.end();
     }
 
+    public static void printDebugInfo(){
+        Gdx.app.error("Minudstry Info Dump", debugInfo());
+    }
+
     public static String debugInfo(){
         return join(
                 "net.active: " + Net.active(),
                 "net.server: " + Net.server(),
-                Net.client() ? "chat.open: " + ui.chatfrag.chatOpen() : "",
-                Net.client() ? "chat.messages: " + ui.chatfrag.getMessagesSize() : "",
+                Net.client() ?
+                "chat.open: " + ui.chatfrag.chatOpen() + "\n" +
+                "chat.messages: " + ui.chatfrag.getMessagesSize() + "\n" +
+                "client.connecting: " + netClient.isConnecting() + "\n" +
+                "client.hasdata: " + netClient.hasData() : "",
                 "players: " + playerGroup.size(),
                 "enemies: " + enemyGroup.size(),
                 "tiles: " + tileGroup.size(),
-                world.getCore() != null ? "core.health: " + world.getCore().entity.health : "",
+                world.getCore() != null && world.getCore().entity != null ? "core.health: " + world.getCore().entity.health : "",
                 "",
                 !Net.server() ? clientDebug.getOut() : serverDebug.getOut()
         );

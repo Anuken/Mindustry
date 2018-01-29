@@ -22,6 +22,7 @@ public class NetworkIO {
 
     public static void writeMap(Map map, OutputStream os){
         try(DataOutputStream stream = new DataOutputStream(os)){
+            stream.writeUTF(map.name);
             stream.writeBoolean(map.oreGen);
 
             stream.writeShort(map.getWidth());
@@ -65,6 +66,7 @@ public class NetworkIO {
 
     public static Map loadMap(InputStream is){
         try(DataInputStream stream = new DataInputStream(is)){
+            String name = stream.readUTF();
             boolean ores = stream.readBoolean();
 
             short width = stream.readShort();
@@ -85,11 +87,11 @@ public class NetworkIO {
             }
 
             Map map = new Map();
+            map.name = name;
             map.oreGen = ores;
             map.custom = true;
             map.pixmap = pixmap;
             map.visible = false;
-            map.name = "network map";
             map.id = -1;
 
             return map;
