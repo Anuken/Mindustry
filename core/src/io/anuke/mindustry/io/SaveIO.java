@@ -4,7 +4,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.IntMap;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.versions.Save12;
 import io.anuke.mindustry.io.versions.Save13;
 import io.anuke.mindustry.io.versions.Save14;
@@ -13,13 +12,16 @@ import io.anuke.ucore.core.Settings;
 
 import java.io.*;
 
+import static io.anuke.mindustry.Vars.gwt;
+import static io.anuke.mindustry.Vars.saveDirectory;
+
 public class SaveIO{
 	public static final IntMap<SaveFileVersion> versions = new IntMap<>();
 	public static final Array<SaveFileVersion> versionArray = Array.with(
-			new Save12(),
-			new Save13(),
-			new Save14(),
-			new Save15()
+		new Save12(),
+		new Save13(),
+		new Save14(),
+		new Save15()
 	);
 
 	static{
@@ -29,7 +31,7 @@ public class SaveIO{
 	}
 
 	public static void saveToSlot(int slot){
-		if(Vars.gwt){
+		if(gwt){
 			ByteArrayOutputStream stream = new ByteArrayOutputStream();
 			write(stream);
 			Settings.putString("save-"+slot+"-data", new String(Base64Coder.encode(stream.toByteArray())));
@@ -48,7 +50,7 @@ public class SaveIO{
 	}
 	
 	public static void loadFromSlot(int slot){
-		if(Vars.gwt){
+		if(gwt){
 			String string = Settings.getString("save-"+slot+"-data");
 			ByteArrayInputStream stream = new ByteArrayInputStream(Base64Coder.decode(string));
 			load(stream);
@@ -58,7 +60,7 @@ public class SaveIO{
 	}
 
 	public static DataInputStream getSlotStream(int slot){
-		if(Vars.gwt){
+		if(gwt){
 			String string = Settings.getString("save-"+slot+"-data");
 			byte[] bytes = Base64Coder.decode(string);
 			return new DataInputStream(new ByteArrayInputStream(bytes));
@@ -108,7 +110,7 @@ public class SaveIO{
 	}
 	
 	public static FileHandle fileFor(int slot){
-		return Vars.saveDirectory.child(slot  + ".mins");
+		return saveDirectory.child(slot  + ".mins");
 	}
 
 	public static void write(FileHandle file){

@@ -1,7 +1,7 @@
 package io.anuke.mindustry.mapeditor;
 
-import io.anuke.mindustry.Mindustry;
-import io.anuke.mindustry.Vars;
+import static io.anuke.mindustry.Vars.*;
+import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.function.Consumer;
@@ -15,12 +15,12 @@ public class MapSaveDialog extends FloatingDialog{
 		super("$text.editor.savemap");
 		field = new TextField();
 		
-		Mindustry.platforms.addDialog(field);
+		Platform.instance.addDialog(field);
 		
 		shown(() -> {
 			content().clear();
 			content().label(() ->{ 
-				Map map = Vars.world.maps().getMap(field.getText());
+				Map map = world.maps().getMap(field.getText());
 				if(map != null){
 					if(map.custom){
 						return "$text.editor.overwrite";
@@ -58,7 +58,7 @@ public class MapSaveDialog extends FloatingDialog{
 		if(field.getText().isEmpty()){
 			return true;
 		}
-		Map map = Vars.world.maps().getMap(field.getText());
+		Map map = world.maps().getMap(field.getText());
 		return map != null && !map.custom;
 	}
 }

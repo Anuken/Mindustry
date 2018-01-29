@@ -3,7 +3,6 @@ package io.anuke.mindustry.io.versions;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.mindustry.game.Difficulty;
@@ -26,7 +25,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Vars.android;
+import static io.anuke.mindustry.Vars.*;
 
 public class Save15 extends SaveFileVersion {
 
@@ -47,7 +46,7 @@ public class Save15 extends SaveFileVersion {
         float wavetime = stream.readFloat();
         byte difficulty = stream.readByte();
 
-        Vars.control.setDifficulty(Difficulty.values()[difficulty]);
+        state.difficulty = Difficulty.values()[difficulty];
 
         //block header
 
@@ -67,39 +66,44 @@ public class Save15 extends SaveFileVersion {
 
         int playerhealth = stream.readInt();
 
-        Vars.player.x = playerx;
-        Vars.player.y = playery;
-        Vars.player.health = playerhealth;
-        Vars.control.setMode(GameMode.values()[mode]);
-        Core.camera.position.set(playerx, playery, 0);
+        if(!headless) {
+            player.x = playerx;
+            player.y = playery;
+            player.health = playerhealth;
+            state.mode = GameMode.values()[mode];
+            Core.camera.position.set(playerx, playery, 0);
 
-        //weapons
+            //weapons
 
-        Vars.control.getWeapons().clear();
-        Vars.control.getWeapons().add(Weapon.blaster);
-        Vars.player.weaponLeft = Vars.player.weaponRight = Weapon.blaster;
+            control.upgrades().getWeapons().clear();
+            control.upgrades().getWeapons().add(Weapon.blaster);
+            player.weaponLeft = player.weaponRight = Weapon.blaster;
 
-        int weapons = stream.readByte();
+            int weapons = stream.readByte();
 
-        for(int i = 0; i < weapons; i ++){
-            Vars.control.addWeapon((Weapon) Upgrade.getByID(stream.readByte()));
+            for (int i = 0; i < weapons; i++) {
+                control.upgrades().addWeapon((Weapon) Upgrade.getByID(stream.readByte()));
+            }
+
+            ui.hudfrag.updateWeapons();
+        }else{
+            byte b = stream.readByte();
+            for(int i = 0; i < b; i ++) stream.readByte();
         }
-
-        Vars.ui.hudfrag.updateWeapons();
 
         //inventory
 
         int totalItems = stream.readByte();
 
-        Arrays.fill(Vars.control.getItems(), 0);
+        Arrays.fill(state.inventory.getItems(), 0);
 
         for(int i = 0; i < totalItems; i ++){
             Item item = Item.getByID(stream.readByte());
             int amount = stream.readInt();
-            Vars.control.getItems()[item.id] = amount;
+            state.inventory.getItems()[item.id] = amount;
         }
 
-        Vars.ui.hudfrag.updateItems();
+        if(!headless) ui.hudfrag.updateItems();
 
         //enemies
 
@@ -124,24 +128,26 @@ public class Save15 extends SaveFileVersion {
                 enemy.x = x;
                 enemy.y = y;
                 enemy.tier = tier;
-                enemy.add(Vars.control.enemyGroup);
+                enemy.add(enemyGroup);
                 enemiesToUpdate.add(enemy);
             }catch (Exception e){
                 throw new RuntimeException(e);
             }
         }
 
-        Vars.control.setWaveData(enemies, wave, wavetime);
+        state.enemies = enemies;
+        state.wave = wave;
+        state.wavetime = wavetime;
 
-        if(!android)
-            Vars.player.add();
+        if(!android && !headless)
+            player.add();
 
         //map
 
         int seed = stream.readInt();
 
-        Vars.world.loadMap(Vars.world.maps().getMap(mapid), seed);
-        Vars.renderer.clearTiles();
+        world.loadMap(world.maps().getMap(mapid), seed);
+        if(!headless) renderer.clearTiles();
 
         for(Enemy enemy : enemiesToUpdate){
             enemy.node = -2;
@@ -149,20 +155,20 @@ public class Save15 extends SaveFileVersion {
 
         int rocks = stream.readInt();
 
-        for(int x = 0; x < Vars.world.width(); x ++){
-            for(int y = 0; y < Vars.world.height(); y ++){
-                Tile tile = Vars.world.tile(x, y);
+        for(int x = 0; x < world.width(); x ++){
+            for(int y = 0; y < world.height(); y ++){
+                Tile tile = world.tile(x, y);
 
                 //remove breakables like rocks
                 if(tile.breakable()){
-                    Vars.world.tile(x, y).setBlock(Blocks.air);
+                    world.tile(x, y).setBlock(Blocks.air);
                 }
             }
         }
 
         for(int i = 0; i < rocks; i ++){
             int pos = stream.readInt();
-            Tile tile = Vars.world.tile(pos % Vars.world.width(), pos / Vars.world.width());
+            Tile tile = world.tile(pos % world.width(), pos / world.width());
             if(tile == null) continue;
             Block result = WorldGenerator.rocks.get(tile.floor());
             if(result != null) tile.setBlock(result);
@@ -174,7 +180,7 @@ public class Save15 extends SaveFileVersion {
             int pos = stream.readInt();
             int blockid = stream.readInt();
 
-            Tile tile = Vars.world.tile(pos % Vars.world.width(), pos / Vars.world.width());
+            Tile tile = world.tile(pos % world.width(), pos / world.width());
             tile.setBlock(map.get(blockid));
 
             if(blockid == Blocks.blockpart.id){
@@ -207,12 +213,12 @@ public class Save15 extends SaveFileVersion {
         stream.writeLong(TimeUtils.millis()); //last saved
 
         //--GENERAL STATE--
-        stream.writeByte(Vars.control.getMode().ordinal()); //gamemode
-        stream.writeByte(Vars.world.getMap().id); //map ID
+        stream.writeByte(state.mode.ordinal()); //gamemode
+        stream.writeByte(world.getMap().id); //map ID
 
-        stream.writeInt(Vars.control.getWave()); //wave
-        stream.writeFloat(Vars.control.getWaveCountdown()); //wave countdown
-        stream.writeByte(Vars.control.getDifficulty().ordinal());
+        stream.writeInt(state.wave); //wave
+        stream.writeFloat(state.wavetime); //wave countdown
+        stream.writeByte(state.difficulty.ordinal());
 
         //--BLOCK HEADER--
 
@@ -224,25 +230,32 @@ public class Save15 extends SaveFileVersion {
             stream.writeShort(block.id);
         }
 
-        stream.writeFloat(Vars.player.x); //player x/y
-        stream.writeFloat(Vars.player.y);
+        if(!headless) {
+            stream.writeFloat(player.x); //player x/y
+            stream.writeFloat(player.y);
 
-        stream.writeInt(Vars.player.health); //player health
+            stream.writeInt(player.health); //player health
 
-        stream.writeByte(Vars.control.getWeapons().size - 1); //amount of weapons
+            stream.writeByte(control.upgrades().getWeapons().size - 1); //amount of weapons
 
-        //start at 1, because the first weapon is always the starter - ignore that
-        for(int i = 1; i < Vars.control.getWeapons().size; i ++){
-            stream.writeByte(Vars.control.getWeapons().get(i).id); //weapon ordinal
+            //start at 1, because the first weapon is always the starter - ignore that
+            for (int i = 1; i < control.upgrades().getWeapons().size; i++) {
+                stream.writeByte(control.upgrades().getWeapons().get(i).id); //weapon ordinal
+            }
+        }else{
+            stream.writeFloat(0);
+            stream.writeFloat(0);
+            stream.writeInt(0);
+            stream.writeByte(0);
         }
 
         //--INVENTORY--
 
-        int l = Vars.control.getItems().length;
+        int l = state.inventory.getItems().length;
         int itemsize = 0;
 
         for(int i = 0; i < l; i ++){
-            if(Vars.control.getItems()[i] > 0){
+            if(state.inventory.getItems()[i] > 0){
                 itemsize ++;
             }
         }
@@ -250,15 +263,15 @@ public class Save15 extends SaveFileVersion {
         stream.writeByte(itemsize); //amount of items
 
         for(int i = 0; i < l; i ++){
-            if(Vars.control.getItems()[i] > 0){
+            if(state.inventory.getItems()[i] > 0){
                 stream.writeByte(i); //item ID
-                stream.writeInt(Vars.control.getItems()[i]); //item amount
+                stream.writeInt(state.inventory.getItems()[i]); //item amount
             }
         }
 
         //--ENEMIES--
 
-        Array<Enemy> enemies = Vars.control.enemyGroup.all();
+        Array<Enemy> enemies = enemyGroup.all();
 
         stream.writeInt(enemies.size); //enemy amount
 
@@ -275,14 +288,14 @@ public class Save15 extends SaveFileVersion {
         //--MAP DATA--
 
         //seed
-        stream.writeInt(Vars.world.getSeed());
+        stream.writeInt(world.getSeed());
 
         int totalblocks = 0;
         int totalrocks = 0;
 
-        for(int x = 0; x < Vars.world.width(); x ++){
-            for(int y = 0; y < Vars.world.height(); y ++){
-                Tile tile = Vars.world.tile(x, y);
+        for(int x = 0; x < world.width(); x ++){
+            for(int y = 0; y < world.height(); y ++){
+                Tile tile = world.tile(x, y);
 
                 if(tile.breakable()){
                     if(tile.block() instanceof Rock){
@@ -298,9 +311,9 @@ public class Save15 extends SaveFileVersion {
         stream.writeInt(totalrocks);
 
         //write all rocks
-        for(int x = 0; x < Vars.world.width(); x ++) {
-            for (int y = 0; y < Vars.world.height(); y++) {
-                Tile tile = Vars.world.tile(x, y);
+        for(int x = 0; x < world.width(); x ++) {
+            for (int y = 0; y < world.height(); y++) {
+                Tile tile = world.tile(x, y);
 
                 if (tile.block() instanceof Rock) {
                     stream.writeInt(tile.packedPosition());
@@ -311,13 +324,13 @@ public class Save15 extends SaveFileVersion {
         //write all blocks
         stream.writeInt(totalblocks);
 
-        for(int x = 0; x < Vars.world.width(); x ++){
-            for(int y = 0; y < Vars.world.height(); y ++){
-                Tile tile = Vars.world.tile(x, y);
+        for(int x = 0; x < world.width(); x ++){
+            for(int y = 0; y < world.height(); y ++){
+                Tile tile = world.tile(x, y);
 
                 if(tile.breakable() && !(tile.block() instanceof Rock)){
 
-                    stream.writeInt(x + y*Vars.world.width()); //tile pos
+                    stream.writeInt(x + y*world.width()); //tile pos
                     stream.writeInt(tile.block().id); //block ID
 
                     if(tile.block() instanceof BlockPart) stream.writeByte(tile.link);

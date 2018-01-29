@@ -1,7 +1,6 @@
 package io.anuke.mindustry.game;
 
 import com.badlogic.gdx.math.GridPoint2;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Item;
@@ -19,8 +18,7 @@ import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
-import static io.anuke.mindustry.Vars.control;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Tutorial{
 	private Stage stage;
@@ -32,7 +30,7 @@ public class Tutorial{
 	}
 	
 	public boolean active(){
-		return world.getMap() != null && world.getMap().name.equals("tutorial") && !GameState.is(State.menu);
+		return world.getMap() != null && world.getMap().name.equals("tutorial") && !state.is(State.menu);
 	}
 	
 	public void buildUI(table table){
@@ -73,7 +71,7 @@ public class Tutorial{
 		//info.setText(stage.text);
 		
 		if(stage.showBlock){
-			Tile tile = world.tile(control.getCore().x + stage.blockPlaceX, control.getCore().y + stage.blockPlaceY);
+			Tile tile = world.tile(world.getCore().x + stage.blockPlaceX, world.getCore().y + stage.blockPlaceY);
 			
 			if(tile.block() == stage.targetBlock && (tile.getRotation() == stage.blockRotation || stage.blockRotation == -1)){
 				move(true);
@@ -88,7 +86,7 @@ public class Tutorial{
 	
 	public void complete(){
 		//new TextDialog("Congratulations!", "You have completed the tutorial!").padText(Unit.dp.inPixels(10f)).show();
-		GameState.set(State.menu);
+		state.set(State.menu);
 		reset();
 	}
 	
@@ -104,7 +102,7 @@ public class Tutorial{
 				
 				if(current < 0 || current >= Stage.values().length){
 					break;
-				}else if(Vars.android == Stage.values()[current].androidOnly || Vars.android != Stage.values()[current].desktopOnly){
+				}else if(android == Stage.values()[current].androidOnly || android != Stage.values()[current].desktopOnly){
 					stage = Stage.values()[current];
 					stage.onSwitch();
 					break;
@@ -121,7 +119,7 @@ public class Tutorial{
 			
 			if(current < 0 || current >= Stage.values().length){
 				return false;
-			}else if(Vars.android == Stage.values()[current].androidOnly || Vars.android != Stage.values()[current].desktopOnly){
+			}else if(android == Stage.values()[current].androidOnly || android != Stage.values()[current].desktopOnly){
 				return true;
 			}
 		}
@@ -198,7 +196,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				Vars.ui.<ImageButton>find("sectionbuttondistribution").fireClick();
+				ui.<ImageButton>find("sectionbuttondistribution").fireClick();
 			}
 		},
 		placeConveyorDesktop{
@@ -232,7 +230,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				//Vars.player.recipe = null;
+				//player.recipe = null;
 			}
 		},
 		placeDrill{
@@ -247,7 +245,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				Vars.ui.<ImageButton>find("sectionbuttonproduction").fireClick();
+				ui.<ImageButton>find("sectionbuttonproduction").fireClick();
 			}
 		},
 		blockInfo{
@@ -273,7 +271,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				control.getInput().recipe = null;
+				control.input().recipe = null;
 			}
 		},
 		drillInfo{
@@ -291,12 +289,12 @@ public class Tutorial{
 			
 			void onSwitch(){
 				for(int flip : new int[]{1, -1}){
-					world.tile(control.getCore().x + flip, control.getCore().y - 2).setBlock(DistributionBlocks.conveyor, 2 * flip);
-					world.tile(control.getCore().x + flip*2, control.getCore().y - 2).setBlock(DistributionBlocks.conveyor, 2 * flip);
-					world.tile(control.getCore().x + flip*2, control.getCore().y - 3).setBlock(DistributionBlocks.conveyor, 2 * flip);
-					world.tile(control.getCore().x + flip*2, control.getCore().y - 3).setBlock(DistributionBlocks.conveyor, 1);
-					world.tile(control.getCore().x + flip*2, control.getCore().y - 4).setFloor(Blocks.stone);
-					world.tile(control.getCore().x + flip*2, control.getCore().y - 4).setBlock(ProductionBlocks.stonedrill);
+					world.tile(world.getCore().x + flip, world.getCore().y - 2).setBlock(DistributionBlocks.conveyor, 2 * flip);
+					world.tile(world.getCore().x + flip*2, world.getCore().y - 2).setBlock(DistributionBlocks.conveyor, 2 * flip);
+					world.tile(world.getCore().x + flip*2, world.getCore().y - 3).setBlock(DistributionBlocks.conveyor, 2 * flip);
+					world.tile(world.getCore().x + flip*2, world.getCore().y - 3).setBlock(DistributionBlocks.conveyor, 1);
+					world.tile(world.getCore().x + flip*2, world.getCore().y - 4).setFloor(Blocks.stone);
+					world.tile(world.getCore().x + flip*2, world.getCore().y - 4).setBlock(ProductionBlocks.stonedrill);
 					
 				}
 			}
@@ -335,7 +333,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				Vars.ui.<ImageButton>find("sectionbuttonweapon").fireClick();
+				ui.<ImageButton>find("sectionbuttonweapon").fireClick();
 			}
 		},
 		placedTurretAmmo{
@@ -345,10 +343,10 @@ public class Tutorial{
 			
 			void onSwitch(){
 				for(int i = 0; i < 4; i ++){
-					world.tile(control.getCore().x + 2, control.getCore().y - 2 + i).setBlock(DistributionBlocks.conveyor, 1);
+					world.tile(world.getCore().x + 2, world.getCore().y - 2 + i).setBlock(DistributionBlocks.conveyor, 1);
 				}
 
-				control.getInput().recipe = null;
+				control.input().recipe = null;
 			}
 		},
 		turretExplanation{
@@ -375,31 +373,7 @@ public class Tutorial{
 			}
 		},
 		//TODO re-add tutorial on weapons
-		/*
-		purchaseWeapons{
-			{
-				desktopOnly = true;
-				canBack = false;
-			}
-			
-			void onSwitch(){
-				Vars.control.addItem(Item.steel, 60);
-				Vars.control.addItem(Item.iron, 60);
-			}
-		},
-		switchWeapons{
-			{
-				canBack = false;
-				desktopOnly = true;
-			}
-			
-			void onSwitch(){
-				if(!Vars.control.getWeapons().contains(Weapon.triblaster, true)){
-					Vars.control.getWeapons().add(Weapon.triblaster);
-					Vars.ui.hudfrag.updateWeapons();
-				}
-			}
-		},*/
+
 		spawnWave{
 			float warmup = 0f;
 			{
@@ -409,14 +383,14 @@ public class Tutorial{
 			
 			void update(Tutorial t){
 				warmup += Timers.delta();
-				if(Vars.control.getEnemiesRemaining() == 0 && warmup > 60f){
+				if(state.enemies == 0 && warmup > 60f){
 					t.move(true);
 				}
 			}
 			
 			void onSwitch(){
 				warmup = 0f;
-				Vars.control.runWave();
+				logic.runWave();
 			}
 		},
 		pumpDesc{
@@ -436,9 +410,9 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				Vars.ui.<ImageButton>find("sectionbuttonproduction").fireClick();
-				Vars.control.addItem(Item.steel, 60);
-				Vars.control.addItem(Item.iron, 60);
+				ui.<ImageButton>find("sectionbuttonproduction").fireClick();
+				state.inventory.addItem(Item.steel, 60);
+				state.inventory.addItem(Item.iron, 60);
 			}
 		},
 		conduitUse{
@@ -454,8 +428,8 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				Vars.ui.<ImageButton>find("sectionbuttondistribution").fireClick();
-				world.tile(blockPlaceX + control.getCore().x, blockPlaceY + control.getCore().y).setBlock(Blocks.air);
+				ui.<ImageButton>find("sectionbuttondistribution").fireClick();
+				world.tile(blockPlaceX + world.getCore().x, blockPlaceY + world.getCore().y).setBlock(Blocks.air);
 			}
 		},
 		conduitUse2{
@@ -471,7 +445,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				world.tile(blockPlaceX + control.getCore().x, blockPlaceY + control.getCore().y).setBlock(Blocks.air);
+				world.tile(blockPlaceX + world.getCore().x, blockPlaceY + world.getCore().y).setBlock(Blocks.air);
 			}
 		},
 		conduitUse3{
@@ -487,7 +461,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				world.tile(blockPlaceX + control.getCore().x, blockPlaceY + control.getCore().y).setBlock(Blocks.air);
+				world.tile(blockPlaceX + world.getCore().x, blockPlaceY + world.getCore().y).setBlock(Blocks.air);
 			}
 		},
 		generator{
@@ -502,10 +476,10 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				world.tile(blockPlaceX + control.getCore().x, blockPlaceY + control.getCore().y).setBlock(Blocks.air);
-				Vars.ui.<ImageButton>find("sectionbuttonpower").fireClick();
-				Vars.control.addItem(Item.steel, 60);
-				Vars.control.addItem(Item.iron, 60);
+				world.tile(blockPlaceX + world.getCore().x, blockPlaceY + world.getCore().y).setBlock(Blocks.air);
+				ui.<ImageButton>find("sectionbuttonpower").fireClick();
+				state.inventory.addItem(Item.steel, 60);
+				state.inventory.addItem(Item.iron, 60);
 			}
 		},
 		generatorExplain{
@@ -526,7 +500,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				Vars.ui.<ImageButton>find("sectionbuttonpower").fireClick();
+				ui.<ImageButton>find("sectionbuttonpower").fireClick();
 			}
 		},
 		laserExplain{
@@ -552,7 +526,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				Vars.ui.<ImageButton>find("sectionbuttonpower").fireClick();
+				ui.<ImageButton>find("sectionbuttonpower").fireClick();
 			}
 		},
 		healingTurretExplain{
@@ -573,9 +547,9 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				Vars.control.addItem(Item.stone, 40);
-				Vars.control.addItem(Item.iron, 40);
-				Vars.ui.<ImageButton>find("sectionbuttoncrafting").fireClick();
+				state.inventory.addItem(Item.stone, 40);
+				state.inventory.addItem(Item.iron, 40);
+				ui.<ImageButton>find("sectionbuttoncrafting").fireClick();
 				
 			}
 		},
@@ -586,18 +560,18 @@ public class Tutorial{
 			
 			void onSwitch(){
 				for(int i = 0; i < 5; i ++){
-					world.tile(control.getCore().x, control.getCore().y - 6 + i).setBlock(DistributionBlocks.conveyor, 1);
+					world.tile(world.getCore().x, world.getCore().y - 6 + i).setBlock(DistributionBlocks.conveyor, 1);
 				}
 
-				world.tile(control.getCore().x, control.getCore().y - 6 + 1).setBlock(DistributionBlocks.tunnel, 3);
-				world.tile(control.getCore().x, control.getCore().y - 6 + 2).setBlock(DefenseBlocks.stonewall, 0);
-				world.tile(control.getCore().x, control.getCore().y - 6 + 3).setBlock(DistributionBlocks.tunnel, 1);
+				world.tile(world.getCore().x, world.getCore().y - 6 + 1).setBlock(DistributionBlocks.tunnel, 3);
+				world.tile(world.getCore().x, world.getCore().y - 6 + 2).setBlock(DefenseBlocks.stonewall, 0);
+				world.tile(world.getCore().x, world.getCore().y - 6 + 3).setBlock(DistributionBlocks.tunnel, 1);
 
-				world.tile(control.getCore().x+1, control.getCore().y - 8).setBlock(ProductionBlocks.irondrill);
-				world.tile(control.getCore().x-1, control.getCore().y - 8).setBlock(ProductionBlocks.coaldrill);
+				world.tile(world.getCore().x+1, world.getCore().y - 8).setBlock(ProductionBlocks.irondrill);
+				world.tile(world.getCore().x-1, world.getCore().y - 8).setBlock(ProductionBlocks.coaldrill);
 				
-				world.tile(control.getCore().x+1, control.getCore().y - 7).setBlock(DistributionBlocks.conveyor, 2);
-				world.tile(control.getCore().x-1, control.getCore().y - 7).setBlock(DistributionBlocks.conveyor, 0);
+				world.tile(world.getCore().x+1, world.getCore().y - 7).setBlock(DistributionBlocks.conveyor, 2);
+				world.tile(world.getCore().x-1, world.getCore().y - 7).setBlock(DistributionBlocks.conveyor, 0);
 			}
 		},
 		tunnelExplain{

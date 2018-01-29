@@ -12,8 +12,8 @@ import io.anuke.mindustry.net.Packet;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
 import io.anuke.mindustry.net.Registrator;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.function.Consumer;
+import io.anuke.ucore.util.Log;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
@@ -32,7 +32,7 @@ public class JavaWebsocketClient implements ClientProvider {
     public void connect(String ip, int port) throws IOException {
         try {
             URI i = new URI("ws://" + ip + ":" + Vars.webPort);
-            UCore.log("Connecting: " + i);
+            Log.info("Connecting: {0}", i);
             socket = new WebSocketClient(i, new Draft_6455(), null, 5000) {
                 Thread thread;
 
@@ -47,14 +47,13 @@ public class JavaWebsocketClient implements ClientProvider {
 
                 @Override
                 public void onOpen(ServerHandshake handshakedata) {
-                    UCore.log("Connected!");
+                    Log.info("Connected!");
                     Connect connect = new Connect();
                     Net.handleClientReceived(connect);
                 }
 
                 @Override
                 public void onMessage(String message) {
-                    if(debug) UCore.log("Got message: " + message);
                     try {
                         byte[] bytes = Base64Coder.decode(message);
                         ByteBuffer buffer = ByteBuffer.wrap(bytes);
@@ -63,7 +62,6 @@ public class JavaWebsocketClient implements ClientProvider {
                             //this is a framework message... do nothing yet?
                         } else {
                             Class<?> type = Registrator.getByID(id);
-                            if(debug) UCore.log("Got class ID: " + type);
                             Packet packet = (Packet) ClassReflection.newInstance(type);
                             packet.read(buffer);
                             Net.handleClientReceived(packet);
@@ -76,7 +74,6 @@ public class JavaWebsocketClient implements ClientProvider {
 
                 @Override
                 public void onClose(int code, String reason, boolean remote) {
-                    if(debug) UCore.log("Closed.");
                     Disconnect disconnect = new Disconnect();
                     Net.handleClientReceived(disconnect);
                 }
@@ -105,7 +102,6 @@ public class JavaWebsocketClient implements ClientProvider {
         byte[] out = new byte[pos];
         buffer.get(out);
         String string = new String(Base64Coder.encode(out));
-        if(debug) UCore.log("Sending string: " + string);
         socket.send(string);
     }
 

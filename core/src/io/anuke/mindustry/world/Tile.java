@@ -2,13 +2,13 @@ package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 
 public class Tile{
@@ -37,7 +37,7 @@ public class Tile{
 	}
 
 	public int packedPosition(){
-		return x + y * Vars.world.width();
+		return x + y * world.width();
 	}
 	
 	private void iSetFloor(Block floor){
@@ -77,7 +77,7 @@ public class Tile{
 				float dst = Vector2.dst(dx, dy, 0, 0);
 				if(dst > rad || (dx == 0 && dy == 0)) continue;
 				
-				Tile other = Vars.world.tile(x + dx, y + dy);
+				Tile other = world.tile(x + dx, y + dy);
 				if(other != null && other.entity != null){
 					other.entity.damage((int)(amount * Mathf.lerp(1f-dst/rad, 1f, falloff)));
 				}
@@ -86,7 +86,7 @@ public class Tile{
 	}
 	
 	public int id(){
-		return x + y * Vars.world.width();
+		return x + y * world.width();
 	}
 	
 	public float worldx(){
@@ -211,7 +211,7 @@ public class Tile{
 			int offsety = -(block.height-1)/2;
 			for(int dx = 0; dx < block.width; dx ++){
 				for(int dy = 0; dy < block.height; dy ++){
-					Tile other = Vars.world.tile(x + dx + offsetx, y + dy + offsety);
+					Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
 					tmpArray.add(other);
 				}
 			}
@@ -226,23 +226,23 @@ public class Tile{
 		}else{
 			byte dx = Bits.getLeftByte(link);
 			byte dy = Bits.getRightByte(link);
-			return Vars.world.tile(x - (dx - 8), y - (dy - 8));
+			return world.tile(x - (dx - 8), y - (dy - 8));
 		}
 	}
 	
 	public Tile[] getNearby(){
-		return Vars.world.getNearby(x, y);
+		return world.getNearby(x, y);
 	}
 
 	public Tile[] getNearby(Tile[] copy){
-		return Vars.world.getNearby(x, y, copy);
+		return world.getNearby(x, y, copy);
 	}
 
 	public void updateOcclusion(){
 		occluded = false;
 		for(int dx = -1; dx <= 1; dx ++){
 			for(int dy = -1; dy <= 1; dy ++){
-				Tile tile = Vars.world.tile(x + dx, y + dy);
+				Tile tile = world.tile(x + dx, y + dy);
 				if(tile != null && tile.solid()){
 					occluded = true;
 					break;

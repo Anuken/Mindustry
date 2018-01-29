@@ -1,11 +1,10 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.style.Drawable;
@@ -14,7 +13,10 @@ import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
+
+import static io.anuke.mindustry.Vars.ui;
 
 public class JoinDialog extends FloatingDialog {
     Array<Server> servers = new Array<>();
@@ -35,7 +37,7 @@ public class JoinDialog extends FloatingDialog {
         add = new FloatingDialog("$text.joingame.title");
         add.content().add("$text.joingame.ip").padRight(5f).left();
 
-        Mindustry.platforms.addDialog(add.content().addField(Settings.getString("ip"), text ->{
+        Platform.instance.addDialog(add.content().addField(Settings.getString("ip"), text ->{
             Settings.putString("ip", text);
             Settings.save();
         }).size(340f, 54f).get(), 100);
@@ -100,7 +102,7 @@ public class JoinDialog extends FloatingDialog {
             }).margin(3f).padTop(6f).top().right();
 
             inner.addImageButton("icon-trash-16", "empty", 16*2, () -> {
-                Vars.ui.showConfirm("$text.confirm", "$text.server.delete", () -> {
+                ui.showConfirm("$text.confirm", "$text.server.delete", () -> {
                     servers.removeValue(server, true);
                     saveServers();
                     setupRemote();
@@ -207,7 +209,7 @@ public class JoinDialog extends FloatingDialog {
     }
 
     void connect(String ip, int port){
-        Vars.ui.loadfrag.show("$text.connecting");
+        ui.loadfrag.show("$text.connecting");
 
         Timers.runTask(2f, () -> {
             try{
@@ -233,10 +235,10 @@ public class JoinDialog extends FloatingDialog {
                 }else{
                     error = Strings.parseException(e, false);
                 }
-                Vars.ui.showError(Bundles.format("text.connectfail", error));
-                Vars.ui.loadfrag.hide();
+                ui.showError(Bundles.format("text.connectfail", error));
+                ui.loadfrag.hide();
 
-                UCore.error(e);
+                Log.err(e);
             }
         });
     }

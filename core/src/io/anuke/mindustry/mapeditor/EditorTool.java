@@ -3,7 +3,7 @@ package io.anuke.mindustry.mapeditor;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.IntSet;
-import io.anuke.mindustry.Vars;
+import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.ColorMapper.BlockPair;
@@ -17,7 +17,7 @@ public enum EditorTool{
 			if(pair == null) return;
 			Block block = pair.dominant();
 			editor.setDrawBlock(block);
-			Vars.ui.editor.updateSelectedBlock();
+			ui.editor.updateSelectedBlock();
 		}
 	},
 	pencil{

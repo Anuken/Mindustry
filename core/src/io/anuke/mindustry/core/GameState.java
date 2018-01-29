@@ -1,21 +1,33 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.mindustry.Mindustry;
-import io.anuke.ucore.core.Timers;
+import io.anuke.mindustry.game.Difficulty;
+import io.anuke.mindustry.game.EventType.StateChangeEvent;
+import io.anuke.mindustry.game.GameMode;
+import io.anuke.mindustry.game.Inventory;
+import io.anuke.ucore.core.Events;
 
 public class GameState{
-	private static State state = State.menu;
+	private State state = State.menu;
+
+	public final Inventory inventory = new Inventory();
+
+	public int wave = 1;
+	public int lastUpdated = -1;
+	public float wavetime;
+	public float extrawavetime;
+	public int enemies = 0;
+	public boolean gameOver = false;
+	public GameMode mode = GameMode.waves;
+	public Difficulty difficulty = Difficulty.normal;
+	public boolean friendlyFire;
 	
-	public static void set(State astate){
-
-		if((astate == State.playing && state == State.menu) || (astate == State.menu && state != State.menu)){
-			Timers.runTask(5f, Mindustry.platforms::updateRPC);
-		}
-
+	public void set(State astate){
+		//TODO update RPC handler
+		Events.fire(StateChangeEvent.class, state, astate);
 		state = astate;
 	}
 	
-	public static boolean is(State astate){
+	public boolean is(State astate){
 		return state == astate;
 	}
 	

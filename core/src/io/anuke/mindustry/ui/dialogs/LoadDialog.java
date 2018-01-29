@@ -1,21 +1,21 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.Saves.SaveSlot;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class LoadDialog extends FloatingDialog{
 	ScrollPane pane;
@@ -49,7 +49,7 @@ public class LoadDialog extends FloatingDialog{
 
 		Timers.runTask(2f, () -> Core.scene.setScrollFocus(pane));
 
-		Array<SaveSlot> array = Vars.control.getSaves().getSaveSlots();
+		Array<SaveSlot> array = control.getSaves().getSaveSlots();
 
 		for(SaveSlot slot : array){
 
@@ -68,27 +68,27 @@ public class LoadDialog extends FloatingDialog{
 				}).checked(slot.isAutosave()).right();
 
 				t.addImageButton("icon-trash", "empty", 14*3, () -> {
-					Vars.ui.showConfirm("$text.confirm", "$text.save.delete.confirm", () -> {
+					ui.showConfirm("$text.confirm", "$text.save.delete.confirm", () -> {
 						slot.delete();
 						setup();
 					});
 				}).size(14*3).right();
 
 				t.addImageButton("icon-pencil-small", "empty", 14*3, () -> {
-					Vars.ui.showTextInput("$text.save.rename", "$text.save.rename.text", slot.getName(), text -> {
+					ui.showTextInput("$text.save.rename", "$text.save.rename.text", slot.getName(), text -> {
 						slot.setName(text);
 						setup();
 					});
 				}).size(14*3).right();
 
-				if(!Vars.gwt) {
+				if(!gwt) {
 					t.addImageButton("icon-save", "empty", 14 * 3, () -> {
 						new FileChooser("$text.save.export", false, file -> {
 							try {
 								slot.exportFile(file);
 								setup();
 							} catch (IOException e) {
-								Vars.ui.showError(Bundles.format("text.save.export.fail", Strings.parseException(e, false)));
+								ui.showError(Bundles.format("text.save.export.fail", Strings.parseException(e, false)));
 							}
 						}).show();
 					}).size(14 * 3).right();
@@ -123,7 +123,7 @@ public class LoadDialog extends FloatingDialog{
 	}
 
 	public void addSetup(){
-		if(Vars.control.getSaves().getSaveSlots().size == 0) {
+		if(control.getSaves().getSaveSlots().size == 0) {
 
 			slots.row();
 			slots.addButton("$text.save.none", "clear", () -> {
@@ -132,19 +132,19 @@ public class LoadDialog extends FloatingDialog{
 
 		slots.row();
 
-		if(Vars.gwt) return;
+		if(gwt) return;
 
 		slots.addImageTextButton("$text.save.import", "icon-add", "clear", 14*3, () -> {
 			new FileChooser("$text.save.import", f -> f.extension().equals("mins"), true, file -> {
 				if(SaveIO.isSaveValid(file)){
 					try{
-						Vars.control.getSaves().importSave(file);
+						control.getSaves().importSave(file);
 						setup();
 					}catch (IOException e){
-						Vars.ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e, false)));
+						ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e, false)));
 					}
 				}else{
-					Vars.ui.showError("$text.save.import.invalid");
+					ui.showError("$text.save.import.invalid");
 				}
 			}).show();
 		}).fillX().margin(10f).minWidth(300f).height(70f).pad(4f).padRight(-4);
@@ -153,21 +153,21 @@ public class LoadDialog extends FloatingDialog{
 	public void modifyButton(TextButton button, SaveSlot slot){
 		button.clicked(() -> {
 			if(!button.childrenPressed()){
-				Vars.ui.loadfrag.show();
+				ui.loadfrag.show();
 
 				Timers.runTask(3f, () -> {
-					Vars.ui.loadfrag.hide();
+					ui.loadfrag.hide();
 					hide();
 					try{
 						slot.load();
-						GameState.set(State.playing);
-						Vars.ui.paused.hide();
+						state.set(State.playing);
+						ui.paused.hide();
 					}catch(Exception e){
-						UCore.error(e);
-						Vars.ui.paused.hide();
-						GameState.set(State.menu);
-						Vars.control.reset();
-						Vars.ui.showError("$text.save.corrupted");
+						Log.err(e);
+						ui.paused.hide();
+						state.set(State.menu);
+						logic.reset();
+						ui.showError("$text.save.corrupted");
 					}
 				});
 			}

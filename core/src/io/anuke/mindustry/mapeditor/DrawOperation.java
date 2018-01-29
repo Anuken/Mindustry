@@ -34,7 +34,7 @@ public class DrawOperation implements Disposable{
 	}
 
 	public void disposeFrom(){
-		from.dispose();
+		if(from != null) from.dispose();
 	}
 
 }

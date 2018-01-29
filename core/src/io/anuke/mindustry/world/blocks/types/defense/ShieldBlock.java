@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.utils.Array;
-
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Shield;
@@ -13,6 +12,9 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BulletEntity;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
+
+import static io.anuke.mindustry.Vars.headless;
+import static io.anuke.mindustry.Vars.renderer;
 
 public class ShieldBlock extends PowerBlock{
 	public float shieldRadius = 40f;
@@ -75,7 +77,7 @@ public class ShieldBlock extends PowerBlock{
 		
 		bullet.remove();
 		Effects.effect(bullet.damage > 5 ? Fx.shieldhit : Fx.laserhit, bullet);
-		Vars.renderer.addShieldHit(bullet.x, bullet.y);
+		if(!headless) renderer.addShieldHit(bullet.x, bullet.y);
 		
 		entity.power -= bullet.getDamage() * powerPerDamage;
 	}

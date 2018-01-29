@@ -6,11 +6,11 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.NetEvents;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
@@ -21,6 +21,7 @@ import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
+import static io.anuke.mindustry.Vars.state;
 import static io.anuke.ucore.core.Core.scene;
 import static io.anuke.ucore.core.Core.skin;
 
@@ -45,7 +46,7 @@ public class ChatFragment extends Table implements Fragment{
         setFillParent(true);
         font = Core.skin.getFont("default-font");
 
-        setVisible(() -> !GameState.is(State.menu) && Net.active());
+        setVisible(() -> !state.is(State.menu) && Net.active());
 
         //TODO put it in input?
         update(() -> {
@@ -57,7 +58,7 @@ public class ChatFragment extends Table implements Fragment{
                 toggle();
             }
 
-            if(GameState.is(State.menu) && messages.size > 0){
+            if(state.is(State.menu) && messages.size > 0){
                 messages.clear();
             }
         });
@@ -81,7 +82,7 @@ public class ChatFragment extends Table implements Fragment{
         chatfield.getStyle().fontColor = Color.WHITE;
         chatfield.getStyle().font = skin.getFont("default-font-chat");
         chatfield.setStyle(chatfield.getStyle());
-        Mindustry.platforms.addDialog(chatfield, maxLength);
+        Platform.instance.addDialog(chatfield, maxLength);
 
         bottom().left().marginBottom(offsety).marginLeft(offsetx*2).add(fieldlabel).padBottom(4f);
 
@@ -104,10 +105,6 @@ public class ChatFragment extends Table implements Fragment{
 
         if(chatOpen)
             batch.draw(skin.getRegion("white"), offsetx, chatfield.getY(), chatfield.getWidth() + 15f, chatfield.getHeight()-1);
-
-        //font.getData().down = Unit.dp.scl(-21.5f);
-        //font.getData().lineHeight = 22f;
-        //chatfield.getStyle().font.getData().setScale(Vars.fontscale);
 
         super.draw(batch, alpha);
 
@@ -151,7 +148,7 @@ public class ChatFragment extends Table implements Fragment{
 
         if(message.replaceAll(" ", "").isEmpty()) return;
 
-        Vars.netClient.handleSendMessage(message);
+        NetEvents.handleSendMessage(message);
     }
 
     public void toggle(){
@@ -179,6 +176,10 @@ public class ChatFragment extends Table implements Fragment{
 
     public boolean chatOpen(){
         return chatOpen;
+    }
+
+    public int getMessagesSize(){
+        return messages.size;
     }
 
     public void addMessage(String message, String sender){

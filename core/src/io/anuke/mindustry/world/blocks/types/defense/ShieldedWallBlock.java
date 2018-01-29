@@ -2,13 +2,15 @@ package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Vars;
+import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Strings;
+
+import static io.anuke.mindustry.Vars.renderer;
 
 public class ShieldedWallBlock extends PowerBlock{
 	static final float hitTime = 18f;
@@ -54,12 +56,12 @@ public class ShieldedWallBlock extends PowerBlock{
 		ShieldedWallEntity entity = tile.entity();
 		
 		if(entity.power > powerPerDamage){
-			Vars.renderer.addShield(() -> Draw.rect("blank", tile.worldx(), tile.worldy(), Vars.tilesize, Vars.tilesize));
+			renderer.addShield(() -> Draw.rect("blank", tile.worldx(), tile.worldy(), tilesize, tilesize));
 		}
 		
 		Draw.color(hitColor);
 		Draw.alpha(entity.hit / hitTime * 0.9f);
-		Draw.rect("blank", tile.worldx(), tile.worldy(), Vars.tilesize, Vars.tilesize);
+		Draw.rect("blank", tile.worldx(), tile.worldy(), tilesize, tilesize);
 		Draw.reset();
 		
 		entity.hit -= Timers.delta();

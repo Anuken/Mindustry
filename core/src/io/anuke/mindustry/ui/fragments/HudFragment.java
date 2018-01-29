@@ -3,13 +3,10 @@ package io.anuke.mindustry.ui.fragments;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.label;
@@ -28,7 +25,7 @@ public class HudFragment implements Fragment{
 	private Table wavetable;
 	private boolean shown = true;
 	private BlocksFragment blockfrag = new BlocksFragment();
-	
+
 	public void build(){
 
 		//menu at top left
@@ -66,17 +63,17 @@ public class HudFragment implements Fragment{
 					}).get();
 
 					new imagebutton("icon-pause", isize, () -> {
-						if (Net.active() && Vars.android) {
+						if (Net.active() && android) {
 							ui.listfrag.visible = !ui.listfrag.visible;
 						} else {
-							GameState.set(GameState.is(State.paused) ? State.playing : State.paused);
+							state.set(state.is(State.paused) ? State.playing : State.paused);
 						}
 					}).update(i -> {
-						if (Net.active() && Vars.android) {
+						if (Net.active() && android) {
 							i.getStyle().imageUp = Core.skin.getDrawable("icon-players");
 						} else {
 							i.setDisabled(Net.active());
-							i.getStyle().imageUp = Core.skin.getDrawable(GameState.is(State.paused) ? "icon-play" : "icon-pause");
+							i.getStyle().imageUp = Core.skin.getDrawable(state.is(State.paused) ? "icon-play" : "icon-pause");
 						}
 					}).get();
 
@@ -92,10 +89,10 @@ public class HudFragment implements Fragment{
 
 				row();
 
-				visible(() -> !GameState.is(State.menu));
+				visible(() -> !state.is(State.menu));
 
 				Label fps = new Label(() -> (Settings.getBool("fps") ? (Gdx.graphics.getFramesPerSecond() + " FPS") +
-						(Net.active() && !Vars.gwt && !Net.server() ? " / Ping: " + Net.getPing() : "") : ""));
+						(Net.client() && !gwt ? " / Ping: " + Net.getPing() : "") : ""));
 				row();
 				add(fps).size(-1);
 
@@ -110,124 +107,96 @@ public class HudFragment implements Fragment{
 			}).visible(() -> Net.active() && android).top().left().size(58f).get();
 
 		}}.end();
-		
+
 		//tutorial ui table
 		new table(){{
-			control.getTutorial().buildUI(this);
-			
-			visible(()->control.getTutorial().active());
+			control.tutorial().buildUI(this);
+
+			visible(() -> control.tutorial().active());
 		}}.end();
-		
+
 		//paused table
 		new table(){{
-			visible(()->GameState.is(State.paused) && !Net.active());
+			visible(() -> state.is(State.paused) && !Net.active());
 			atop();
-			
+
 			new table("pane"){{
 				new label("[orange]< "+ Bundles.get("text.paused") + " >").scale(0.75f).pad(6);
 			}}.end();
 		}}.end();
-		
+
 		//respawn background table
 		new table("white"){{
 			respawntable = get();
 			respawntable.setColor(Color.CLEAR);
 			update(t -> {
-				if(GameState.is(State.menu)){
+				if(state.is(State.menu)){
 					respawntable.setColor(Color.CLEAR);
 				}
 			});
 		}}.end();
-		
+
 		//respawn table
 		new table(){{
 			new table("pane"){{
-				
+
 				new label(()->"[orange]"+Bundles.get("text.respawn")+" " + (int)(control.getRespawnTime()/60)).scale(0.75f).pad(10);
-				
-				visible(()->control.getRespawnTime() > 0 && !GameState.is(State.menu));
-				
+
+				visible(()->control.getRespawnTime() > 0 && !state.is(State.menu));
+
 			}}.end();
 		}}.end();
-		
-		//profiling table
-		if(debug){
-			new table(){{
-				atop();
-				new label("[green]density: " + Gdx.graphics.getDensity()).left();
-				row();
-				new label(() -> "[blue]requests: " + renderer.getBlocks().getRequests()).left();
-				row();
-				new label(() -> "[purple]tiles: " + Vars.control.tileGroup.amount()).left();
-				row();
-				new label(() -> "[purple]enemies: " + Vars.control.enemyGroup.amount()).left();
-				row();
-				new label(() -> "[orange]noclip: " + Vars.noclip).left();
-				row();
-				new label(() -> "[purple]time: " + (int)(Timers.time() / 10f) % 50).left();
-				row();
-				new label("[red]DEBUG MODE").scale(0.5f).left();
-			}}.end();
-		}
 
 		new table(){{
 			abottom();
-			visible(() -> !GameState.is(State.menu) && Vars.control.getSaves().isSaving());
+			visible(() -> !state.is(State.menu) && control.getSaves().isSaving());
 
 			new label("$text.saveload");
 
 		}}.end();
 
-		if(Vars.debugNet) {
-            new table() {{
-                new label(() -> "players: " + Vars.control.playerGroup.amount());
-                row();
-                new label(() -> "" + Vars.control.playerGroup.all());
-            }}.end();
-        }
-
 		blockfrag.build();
 	}
 
 	private String getEnemiesRemaining() {
-		if(control.getEnemiesRemaining() == 1) {
-			return Bundles.format("text.enemies.single", control.getEnemiesRemaining());
-		} else return Bundles.format("text.enemies", control.getEnemiesRemaining());
+		if(state.enemies == 1) {
+			return Bundles.format("text.enemies.single", state.enemies);
+		} else return Bundles.format("text.enemies", state.enemies);
 	}
-	
+
 	private void addWaveTable(){
 		float uheight = 66f;
-		
+
 		wavetable = new table("button"){{
 			aleft();
 			new table(){{
 				aleft();
 
-				new label(() -> Bundles.format("text.wave", control.getWave())).scale(fontscale*1.5f).left().padLeft(-6);
+				new label(() -> Bundles.format("text.wave", state.wave)).scale(fontscale*1.5f).left().padLeft(-6);
 
 				row();
-			
-				new label(()-> control.getEnemiesRemaining() > 0 ?
+
+				new label(()-> state.enemies > 0 ?
 					getEnemiesRemaining() :
-						(control.getTutorial().active() || Vars.control.getMode().toggleWaves) ? "$text.waiting"
-								: Bundles.format("text.wave.waiting", (int) (control.getWaveCountdown() / 60f)))
+						(control.tutorial().active() || state.mode.toggleWaves) ? "$text.waiting"
+								: Bundles.format("text.wave.waiting", (int) (state.wavetime / 60f)))
 				.minWidth(126).padLeft(-6).padRight(-12).left();
 
 				margin(10f);
 				get().marginLeft(6);
 			}}.left().end();
-			
+
 			playButton(uheight);
 		}}.height(uheight).fillX().expandX().end().get();
 		wavetable.getParent().getParent().swapActor(wavetable.getParent(), menu.getParent());
 	}
-	
+
 	private void playButton(float uheight){
 		new imagebutton("icon-play", 30f, () -> {
-			Vars.control.runWave();
+			logic.runWave();
 		}).height(uheight).fillX().right().padTop(-8f).padBottom(-12f).padRight(-36).width(40f).update(l->{
-			boolean vis = Vars.control.getEnemiesRemaining() <= 0 && (Net.server() || !Net.active());
-			boolean paused = GameState.is(State.paused) || !vis;
+			boolean vis = state.enemies <= 0 && (Net.server() || !Net.active());
+			boolean paused = state.is(State.paused) || !vis;
 			
 			l.setVisible(vis);
 			l.getStyle().imageUp = Core.skin.getDrawable(vis ? "icon-play" : "clear");

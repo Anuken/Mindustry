@@ -2,7 +2,6 @@ package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.TileEntity;
@@ -25,6 +24,8 @@ import io.anuke.ucore.util.Strings;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class Turret extends Block{
 	static final int targetInterval = 15;
@@ -90,7 +91,7 @@ public class Turret extends Block{
 
 		Draw.rect(name(), tile.drawx(), tile.drawy(), entity.rotation - 90);
 		
-		if(Vars.debug && drawDebug){
+		if(debug && drawDebug){
 			drawTargeting(tile);
 		}
 	}
@@ -107,14 +108,14 @@ public class Turret extends Block{
 		if(fract > 0)
 			fract = Mathf.clamp(fract, 0.24f, 1f);
 		
-		Vars.renderer.drawBar(Color.GREEN, tile.drawx(), 2 + tile.drawy() + height/2f*Vars.tilesize, fract);
+		renderer.drawBar(Color.GREEN, tile.drawx(), 2 + tile.drawy() + height/2f * tilesize, fract);
 	}
 	
 	@Override
 	public void drawPlace(int x, int y, int rotation, boolean valid){
 		Draw.color(Color.PURPLE);
 		Lines.stroke(1f);
-		Lines.dashCircle(x*Vars.tilesize, y*Vars.tilesize, range);
+		Lines.dashCircle(x * tilesize, y * tilesize, range);
 	}
 	
 	@Override
@@ -134,10 +135,10 @@ public class Turret extends Block{
 		if(entity.target != null && entity.target.isDead())
 			entity.target = null;
 		
-		if(hasAmmo(tile) || (Vars.debug && Vars.infiniteAmmo)){
+		if(hasAmmo(tile) || (debug && infiniteAmmo)){
 			
 			if(entity.timer.get(timerTarget, targetInterval)){
-				entity.target = (Enemy)Entities.getClosest(Vars.control.enemyGroup, 
+				entity.target = (Enemy)Entities.getClosest(enemyGroup,
 						tile.worldx(), tile.worldy(), range, e-> e instanceof Enemy && !((Enemy)e).isDead());
 			}
 			
@@ -151,8 +152,7 @@ public class Turret extends Block{
 				}
 				entity.rotation = Mathf.slerp(entity.rotation, targetRot, 
 						rotatespeed*Timers.delta());
-				
-				float reload = Vars.multiplier*this.reload;
+
 				if(Angles.angleDist(entity.rotation, targetRot) < shootCone && entity.timer.get(timerReload, reload)){
 					if(shootsound != null && entity.timer.get(timerSound, soundReload)) Effects.sound(shootsound, entity);
 					shoot(tile);
@@ -214,17 +214,15 @@ public class Turret extends Block{
 	
 	protected void shoot(Tile tile){
 		TurretEntity entity = tile.entity();
-		
-		
-		
-		Angles.translation(entity.rotation, width * Vars.tilesize / 2f);
+
+		Angles.translation(entity.rotation, width * tilesize / 2f);
 		
 		for(int i = 0; i < shots; i ++){
 			if(Mathf.zero(shotDelayScale)){
 				bullet(tile, entity.rotation + Mathf.range(inaccuracy));
 			}else{
 				Timers.run(i * shotDelayScale, ()->{
-					Angles.translation(entity.rotation, width * Vars.tilesize / 2f);
+					Angles.translation(entity.rotation, width * tilesize / 2f);
 					bullet(tile, entity.rotation + Mathf.range(inaccuracy));
 				});
 			}
@@ -243,7 +241,6 @@ public class Turret extends Block{
 	
 	protected void bullet(Tile tile, float angle){
 		Bullet out = new Bullet(bullet, tile.entity, tile.drawx() + Angles.x(), tile.drawy() + Angles.y(), angle).add();
-		out.damage = (int)(bullet.damage*Vars.multiplier);
 	}
 	
 	public static class TurretEntity extends TileEntity{

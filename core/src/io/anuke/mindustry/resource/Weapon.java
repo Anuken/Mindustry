@@ -6,6 +6,7 @@ import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.NetEvents;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -112,7 +113,7 @@ public class Weapon extends Upgrade{
 		shootInternal(p, x, y, angle);
 
 		if(Net.active() && p == Vars.player){
-			Vars.netClient.handleShoot(this, x, y, angle);
+			NetEvents.handleShoot(this, x, y, angle);
 		}
 	}
 	

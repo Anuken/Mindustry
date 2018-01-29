@@ -4,8 +4,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import io.anuke.mindustry.Mindustry;
-import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
@@ -13,10 +12,9 @@ import io.anuke.mindustry.world.ColorMapper.BlockPair;
 import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.SpecialBlocks;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Core;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Pixmaps;
 import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.builders.imagebutton;
@@ -25,9 +23,12 @@ import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
 import java.util.Arrays;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class MapEditorDialog extends Dialog{
 	private MapEditor editor;
@@ -43,14 +44,14 @@ public class MapEditorDialog extends Dialog{
 	
 	public MapEditorDialog(){
 		super("$text.mapeditor", "dialog");
-		if(Vars.gwt) return;
+		if(gwt) return;
 
 		editor = new MapEditor();
 		dialog = new MapGenerateDialog(editor);
 		view = new MapView(editor);
 		
 		openFile = new FileChooser("$text.loadimage", FileChooser.pngFilter, true, file -> {
-			Vars.ui.loadfrag.show();
+			ui.loadfrag.show();
 			Timers.run(3f, () -> {
 				try{
 					Pixmap pixmap = new Pixmap(file);
@@ -58,13 +59,13 @@ public class MapEditorDialog extends Dialog{
 						editor.setPixmap(pixmap);
 						view.clearStack();
 					}else{
-						Vars.ui.showError(Bundles.format("text.editor.badsize", Arrays.toString(MapEditor.validMapSizes)));
+						ui.showError(Bundles.format("text.editor.badsize", Arrays.toString(MapEditor.validMapSizes)));
 					}
 				}catch (Exception e){
-					Vars.ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
-					UCore.error(e);
+					ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
+					Log.err(e);
 				}
-				Vars.ui.loadfrag.hide();
+				ui.loadfrag.hide();
 			});
 		});
 		
@@ -73,21 +74,21 @@ public class MapEditorDialog extends Dialog{
 				file = file.parent().child(file.nameWithoutExtension() + ".png");
 			}
 			FileHandle result = file;
-			Vars.ui.loadfrag.show();
+			ui.loadfrag.show();
 			Timers.run(3f, () -> {
 				try{
 					Pixmaps.write(editor.pixmap(), result);
 				}catch (Exception e){
-					Vars.ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
-					if(!Vars.android) UCore.error(e);
+					ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
+					if(!android) Log.err(e);
 				}
-				Vars.ui.loadfrag.hide();
+				ui.loadfrag.hide();
 			});
 		});
 		
 		loadDialog = new MapLoadDialog(map -> {
 			saveDialog.setFieldText(map.name);
-			Vars.ui.loadfrag.show();
+			ui.loadfrag.show();
 			
 			Timers.run(3f, () -> {
 				Map copy = new Map();
@@ -95,8 +96,9 @@ public class MapEditorDialog extends Dialog{
 				copy.id = -1;
 				copy.pixmap = Pixmaps.copy(map.pixmap);
 				copy.texture = new Texture(copy.pixmap);
+				copy.oreGen = map.oreGen;
 				editor.beginEdit(copy);
-				Vars.ui.loadfrag.hide();
+				ui.loadfrag.hide();
 				view.clearStack();
 			});
 		});
@@ -104,28 +106,28 @@ public class MapEditorDialog extends Dialog{
 		resizeDialog = new MapResizeDialog(editor, (x, y) -> {
 			Pixmap pix = editor.pixmap();
 			if(!(pix.getWidth() == x && pix.getHeight() == y)){
-				Vars.ui.loadfrag.show();
+				ui.loadfrag.show();
 				Timers.run(10f, ()->{
 					editor.resize(x, y);
 					view.clearStack();
-					Vars.ui.loadfrag.hide();
+					ui.loadfrag.hide();
 				});
 			}
 		});
 		
 		saveDialog = new MapSaveDialog(name -> {
-			Vars.ui.loadfrag.show();
+			ui.loadfrag.show();
 			if(verifyMap()){
 				saved = true;
 				editor.getMap().name = name;
 				Timers.run(10f, () -> {
-					Vars.world.maps().saveAndReload(editor.getMap(), editor.pixmap());
+					world.maps().saveAndReload(editor.getMap(), editor.pixmap());
 					loadDialog.rebuild();
-					Vars.ui.loadfrag.hide();
+					ui.loadfrag.hide();
 					view.clearStack();
 				});
 			}else{
-				Vars.ui.loadfrag.hide();
+				ui.loadfrag.hide();
 			}
 		});
 		
@@ -145,11 +147,11 @@ public class MapEditorDialog extends Dialog{
 			view.clearStack();
 
 			Timers.runTask(3f, () -> {
-				Mindustry.platforms.updateRPC();
+				Platform.instance.updateRPC();
 			});
 		});
 
-		hidden(() -> Mindustry.platforms.updateRPC());
+		hidden(() -> Platform.instance.updateRPC());
 	}
 
 	public MapView getView() {
@@ -220,7 +222,7 @@ public class MapEditorDialog extends Dialog{
 				
 				new imagebutton("icon-back", isize, () -> {
 					if(!saved){
-						Vars.ui.showConfirm("$text.confirm", "$text.editor.unsaved",
+						ui.showConfirm("$text.confirm", "$text.editor.unsaved",
 								MapEditorDialog.this::hide);
 					}else{
 						hide();
@@ -276,8 +278,16 @@ public class MapEditorDialog extends Dialog{
 					new label(() -> Bundles.format("text.editor.brushsize", MapEditor.brushSizes[(int)slider.getValue()])).left();
 					row();
 					add(slider).growX().padTop(4f);
-				}}.growX().end();
+				}}.growX().padBottom(-6).end();
 				
+				row();
+
+				new table("button"){{
+					get().addCheck("$text.oregen", b -> {
+						editor.getMap().oreGen = b;
+					}).update(c -> c.setChecked(editor.getMap().oreGen)).padTop(3).padBottom(3);
+				}}.growX().padBottom(-6).end();
+
 				row();
 				
 				addBlockSelection(get());
@@ -317,15 +327,15 @@ public class MapEditorDialog extends Dialog{
 		}
 		
 		if(playerSpawns == 0){
-			Vars.ui.showError("$text.editor.noplayerspawn");
+			ui.showError("$text.editor.noplayerspawn");
 			return false;
 		}else if(playerSpawns > 1){
-			Vars.ui.showError("$text.editor.manyplayerspawns");
+			ui.showError("$text.editor.manyplayerspawns");
 			return false;
 		}
 		
 		if(enemySpawns > MapEditor.maxSpawnpoints){
-			Vars.ui.showError(Bundles.format("text.editor.manyenemyspawns", MapEditor.maxSpawnpoints));
+			ui.showError(Bundles.format("text.editor.manyenemyspawns", MapEditor.maxSpawnpoints));
 			return false;
 		}
 		
@@ -361,7 +371,7 @@ public class MapEditorDialog extends Dialog{
 		
 		Table extra = new Table("button");
 		extra.labelWrap(() -> editor.getDrawBlock().formalName).width(180f).center();
-		table.add(extra).growX();
+		table.add(extra).padBottom(-6).growX();
 		table.row();
 		table.add(pane).growY().fillX();
 	}

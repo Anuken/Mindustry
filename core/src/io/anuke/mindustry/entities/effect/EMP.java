@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
-import io.anuke.mindustry.Vars;
+import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
@@ -29,15 +29,15 @@ public class EMP extends TimedEntity{
 		
 		lifetime = 30f;
 		
-		int worldx = Mathf.scl2(x, Vars.tilesize);
-		int worldy = Mathf.scl2(y, Vars.tilesize);
+		int worldx = Mathf.scl2(x, tilesize);
+		int worldy = Mathf.scl2(y, tilesize);
 		
 		array.clear();
 		
 		for(int dx = -radius; dx <= radius; dx ++){
 			for(int dy = -radius; dy <= radius; dy ++){
 				if(Vector2.dst(dx, dy, 0, 0) < radius){
-					Tile tile = Vars.world.tile(worldx + dx, worldy + dy);
+					Tile tile = world.tile(worldx + dx, worldy + dy);
 					
 					if(tile != null && tile.block().destructible){
 						array.add(tile);
@@ -80,12 +80,12 @@ public class EMP extends TimedEntity{
 		}
 		
 		for(int i = 0; i < 14 - targets.size; i ++){
-			Angles.translation(Mathf.randomSeed(i + id*77)*360f, radius * Vars.tilesize);
+			Angles.translation(Mathf.randomSeed(i + id*77)*360f, radius * tilesize);
 			drawLine(x + Angles.x(), y + Angles.y());
 		}
 	
 		Lines.stroke(fract()*2f);
-		Lines.poly(x, y, 34, radius * Vars.tilesize);
+		Lines.poly(x, y, 34, radius * tilesize);
 		
 		Draw.reset();
 	}

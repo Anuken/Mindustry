@@ -3,10 +3,17 @@ package io.anuke.mindustry;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-
 import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.effect.Shield;
+import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.net.ClientDebug;
+import io.anuke.mindustry.net.ServerDebug;
 import io.anuke.ucore.UCore;
+import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 public class Vars{
@@ -43,7 +50,8 @@ public class Vars{
 	public static final int zoomScale = Math.round(Unit.dp.scl(1));
 	//if true, player speed will be increased, massive amounts of resources will be given on start, and other debug options will be available
 	public static boolean debug = false;
-	public static boolean debugNet = false;
+	public static boolean debugNet = true;
+	public static boolean console = false;
 	//whether the player can clip through walls
 	public static boolean noclip = false;
 	//whether to draw chunk borders
@@ -57,6 +65,8 @@ public class Vars{
 	//whether to hide ui, only on debug
 	public static boolean showUI = true;
 
+	public static boolean headless = false;
+
 	public static float controllerMin = 0.25f;
 
 	public static float baseControllerSpeed = 11f;
@@ -68,21 +78,32 @@ public class Vars{
 	//only if smoothCamera
 	public static boolean snapCamera = true;
 	
-	//turret and enemy shootInternal speed inverse multiplier
-	public static final float multiplier = android ? 3 : 2;
-	
 	public static final int tilesize = 8;
 
 	//server port
 	public static final int port = 6567;
 	public static final int webPort = 6568;
-	
+
+	public static final GameState state = new GameState();
+
+	public static final ServerDebug serverDebug = new ServerDebug();
+	public static final ClientDebug clientDebug = new ClientDebug();
+
 	public static Control control;
+	public static Logic logic;
 	public static Renderer renderer;
 	public static UI ui;
 	public static World world;
+	public static NetCommon netCommon;
 	public static NetServer netServer;
 	public static NetClient netClient;
+	public static ServerControl serverControl;
 	
 	public static Player player;
+
+	public static final EntityGroup<Player> playerGroup = Entities.addGroup(Player.class).enableMapping();
+	public static final EntityGroup<Enemy> enemyGroup = Entities.addGroup(Enemy.class).enableMapping();
+	public static final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);
+	public static final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
+	public static final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class);
 }

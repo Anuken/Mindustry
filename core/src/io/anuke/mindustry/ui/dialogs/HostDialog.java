@@ -9,6 +9,8 @@ import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.ui;
+
 //TODO add port specification
 public class HostDialog extends FloatingDialog{
     float w = 300;
@@ -25,21 +27,21 @@ public class HostDialog extends FloatingDialog{
                 Vars.player.name = text;
                 Settings.put("name", text);
                 Settings.save();
-                Vars.ui.listfrag.rebuild();
+                ui.listfrag.rebuild();
             }).grow().pad(8);
         }).width(w).height(70f).pad(4);
 
         content().row();
 
         content().addButton("$text.host", () -> {
-            Vars.ui.loadfrag.show("$text.hosting");
+            ui.loadfrag.show("$text.hosting");
             Timers.runTask(5f, () -> {
                 try{
                     Net.host(Vars.port);
                 }catch (IOException e){
-                    Vars.ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
+                    ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
                 }
-                Vars.ui.loadfrag.hide();
+                ui.loadfrag.hide();
                 hide();
             });
         }).width(w).height(70f);
@@ -49,12 +51,12 @@ public class HostDialog extends FloatingDialog{
     showTextInput("$text.hostserver", "$text.server.port", Vars.port + "", new DigitsOnlyFilter(), text -> {
 			int result = Strings.parseInt(text);
 			if(result == Integer.MIN_VALUE || result >= 65535){
-				Vars.ui.showError("$text.server.invalidport");
+				ui.showError("$text.server.invalidport");
 			}else{
 				try{
 					Net.host(result);
 				}catch (IOException e){
-					Vars.ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
+					ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
 				}
 			}
 		});

@@ -1,15 +1,16 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.mindustry.Mindustry;
-import io.anuke.mindustry.Vars;
-import io.anuke.ucore.UCore;
+import io.anuke.mindustry.io.Platform;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.util.Log;
 
 import java.util.Locale;
+
+import static io.anuke.mindustry.Vars.ui;
 
 public class LanguageDialog extends FloatingDialog{
     private Locale[] locales = {Locale.ENGLISH, new Locale("fr", "FR"),
@@ -30,17 +31,17 @@ public class LanguageDialog extends FloatingDialog{
         ButtonGroup<TextButton> group = new ButtonGroup<>();
 
         for(Locale loc : locales){
-            TextButton button = new TextButton(Mindustry.platforms.getLocaleName(loc), "toggle");
-            button.setChecked(Vars.ui.getLocale().equals(loc));
+            TextButton button = new TextButton(Platform.instance.getLocaleName(loc), "toggle");
+            button.setChecked(ui.getLocale().equals(loc));
             button.clicked(() -> {
-                if(Vars.ui.getLocale().equals(loc)) return;
+                if(ui.getLocale().equals(loc)) return;
                 Settings.putString("locale", loc.toString());
                 Settings.save();
-                UCore.log("Setting locale: " + loc.toString());
-                Vars.ui.showInfo("$text.language.restart");
+                Log.info("Setting locale: {0}", loc.toString());
+                ui.showInfo("$text.language.restart");
             });
             langs.add(button).group(group).update(t -> {
-                t.setChecked(loc.equals(Vars.ui.getLocale()));
+                t.setChecked(loc.equals(ui.getLocale()));
             }).size(400f, 60f).row();
         }
 

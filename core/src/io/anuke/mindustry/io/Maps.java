@@ -8,15 +8,17 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Json.Serializer;
 import com.badlogic.gdx.utils.JsonWriter.OutputType;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Map;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.graphics.Pixmaps;
+import io.anuke.ucore.util.Log;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class Maps implements Disposable{
 	private IntMap<Map> maps = new IntMap<>();
 	private ObjectMap<String, Map> mapNames = new ObjectMap<>();
+	private Array<Map> defaultMaps = new Array<>();
 	private Map networkMap;
 	private int lastID;
 	private Json json = new Json();
@@ -31,17 +33,17 @@ public class Maps implements Disposable{
 		return maps.values();
 	}
 
-	public void setNetworkMap(Pixmap pixmap){
+	public Array<Map> getDefaultMaps(){
+		return defaultMaps;
+	}
+
+	public void setNetworkMap(Map map){
 		if(networkMap != null){
 			networkMap.pixmap.dispose();
 			networkMap = null;
 		}
-		networkMap = new Map();
-		networkMap.custom = true;
-		networkMap.pixmap = pixmap;
-		networkMap.visible = false;
-		networkMap.name = "network map";
-		networkMap.id = -1;
+
+		networkMap = map;
 	}
 
 	public Map getMap(int id){
@@ -60,10 +62,10 @@ public class Maps implements Disposable{
 			throw new RuntimeException("Failed to load maps!");
 		}
 
-		if(!Vars.gwt) {
-			if (!loadMapFile(Vars.customMapDirectory.child("maps.json"))) {
+		if(!gwt) {
+			if (!loadMapFile(customMapDirectory.child("maps.json"))) {
 				try {
-					Vars.customMapDirectory.child("maps.json").writeString("{}", false);
+					customMapDirectory.child("maps.json").writeString("{}", false);
 				} catch (Exception e) {
 					throw new RuntimeException("Failed to create custom map directory!");
 				}
@@ -80,7 +82,7 @@ public class Maps implements Disposable{
 				out.add(m);
 			}
 		}
-		saveMaps(out, Vars.customMapDirectory.child("maps.json"));
+		saveMaps(out, customMapDirectory.child("maps.json"));
 	}
 	
 	public void saveAndReload(Map map, Pixmap out){
@@ -107,7 +109,7 @@ public class Maps implements Disposable{
 		}
 		
 		saveCustomMap(map);
-		Vars.ui.levels.reload();
+		ui.levels.reload();
 	}
 
 	public void saveMaps(Array<Map> array, FileHandle file){
@@ -136,8 +138,8 @@ public class Maps implements Disposable{
 		mapNames.remove(toSave.name);
 		maps.put(toSave.id, toSave);
 		mapNames.put(toSave.name, toSave);
-		Pixmaps.write(toSave.pixmap, Vars.customMapDirectory.child(toSave.name + ".png"));
-		saveMaps(out, Vars.customMapDirectory.child("maps.json"));
+		Pixmaps.write(toSave.pixmap, customMapDirectory.child(toSave.name + ".png"));
+		saveMaps(out, customMapDirectory.child("maps.json"));
 	}
 
 	private boolean loadMapFile(FileHandle file){
@@ -146,15 +148,18 @@ public class Maps implements Disposable{
 			if(arr != null){ //can be an empty map file
 				for(Map map : arr){
 					map.pixmap = new Pixmap(file.sibling(map.name + ".png"));
-					map.texture = new Texture(map.pixmap);
+					if(!headless) map.texture = new Texture(map.pixmap);
 					maps.put(map.id, map);
 					mapNames.put(map.name, map);
 					lastID = Math.max(lastID, map.id);
+					if(!map.custom){
+						defaultMaps.add(map);
+					}
 				}
 			}
 			return true;
 		}catch(Exception e){
-			if(!Vars.android) UCore.error(e);
+			if(!android) Log.err(e);
 			Gdx.app.error("Mindustry-Maps", "Failed loading map file: " + file);
 			return false;
 		}
@@ -163,7 +168,7 @@ public class Maps implements Disposable{
 	@Override
 	public void dispose(){
 		for(Map map : maps.values()){
-			map.texture.dispose();
+			if(map.texture != null) map.texture.dispose();
 			map.pixmap.dispose();
 		}
 		maps.clear();

@@ -1,12 +1,8 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.TimeUtils;
-import io.anuke.mindustry.Mindustry;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
@@ -15,17 +11,15 @@ import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.resource.Recipe;
-import io.anuke.mindustry.resource.Recipes;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
-import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BaseBulletType;
@@ -33,90 +27,91 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
+import io.anuke.ucore.util.Log;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 
 public class NetClient extends Module {
-    public static final Color[] colorArray = {Color.ORANGE, Color.SCARLET, Color.LIME, Color.PURPLE,
-            Color.GOLD, Color.PINK, Color.SKY, Color.GOLD, Color.VIOLET,
-            Color.GREEN, Color.CORAL, Color.CYAN, Color.CHARTREUSE};
     boolean connecting = false;
     boolean gotData = false;
     boolean kicked = false;
     IntSet recieved = new IntSet();
+    IntSet dead = new IntSet();
     float playerSyncTime = 2;
     float dataTimeout = 60*18; //18 seconds timeout
 
     public NetClient(){
 
-        Net.handle(Connect.class, packet -> {
+        Net.handleClient(Connect.class, packet -> {
             Net.setClientLoaded(false);
             recieved.clear();
+            dead.clear();
             connecting = true;
             gotData = false;
             kicked = false;
 
-            Vars.ui.loadfrag.hide();
-            Vars.ui.loadfrag.show("$text.connecting.data");
+            ui.loadfrag.hide();
+            ui.loadfrag.show("$text.connecting.data");
 
             Entities.clear();
 
             ConnectPacket c = new ConnectPacket();
-            c.name = Vars.player.name;
-            c.android = Vars.android;
+            c.name = player.name;
+            c.android = android;
             Net.send(c, SendMode.tcp);
 
             Timers.runTask(dataTimeout, () -> {
                 if (!gotData) {
                     Gdx.app.error("Mindustry", "Failed to load data!");
-                    Vars.ui.loadfrag.hide();
+                    ui.loadfrag.hide();
                     Net.disconnect();
                 }
             });
         });
 
-        Net.handle(Disconnect.class, packet -> {
+        Net.handleClient(Disconnect.class, packet -> {
             if (kicked) return;
 
-            Timers.runFor(3f, Vars.ui.loadfrag::hide);
+            Timers.runFor(3f, ui.loadfrag::hide);
 
-            GameState.set(State.menu);
+            state.set(State.menu);
 
-            Vars.ui.showError("$text.disconnect");
+            ui.showError("$text.disconnect");
             connecting = false;
 
-            Mindustry.platforms.updateRPC();
+            Platform.instance.updateRPC();
         });
 
-        Net.handle(WorldData.class, data -> {
-            UCore.log("Recieved world data: " + data.stream.available() + " bytes.");
+        Net.handleClient(WorldData.class, data -> {
+            Log.info("Recieved world data: {0} bytes.", data.stream.available());
             NetworkIO.loadWorld(data.stream);
-            Vars.player.set(Vars.control.core.worldx(), Vars.control.core.worldy() - Vars.tilesize * 2);
-            UCore.log(Vars.control.core);
+            player.set(world.getSpawnX(), world.getSpawnY());
 
             gotData = true;
 
             finishConnecting();
         });
 
-        Net.handle(CustomMapPacket.class, packet -> {
-            UCore.log("Recieved custom map: " + packet.stream.available() + " bytes.");
+        Net.handleClient(CustomMapPacket.class, packet -> {
+            Log.info("Recieved custom map: {0} bytes.", packet.stream.available());
 
             //custom map is always sent before world data
-            Pixmap pixmap = NetworkIO.loadMap(packet.stream);
+            Map map = NetworkIO.loadMap(packet.stream);
 
-            Vars.world.maps().setNetworkMap(pixmap);
+            world.maps().setNetworkMap(map);
 
             MapAckPacket ack = new MapAckPacket();
             Net.send(ack, SendMode.tcp);
         });
 
-        Net.handle(SyncPacket.class, packet -> {
+        Net.handleClient(SyncPacket.class, packet -> {
             if (!gotData) return;
+            int players = 0;
+            int enemies = 0;
 
             ByteBuffer data = ByteBuffer.wrap(packet.data);
 
@@ -129,9 +124,11 @@ public class NetClient extends Module {
 
                 SyncEntity entity = (SyncEntity) group.getByID(id);
 
-                if (entity == null || id == Vars.player.id) {
-                    if (id != Vars.player.id) {
-                        UCore.log("Requesting entity " + id, "group " + group.getType());
+                if(entity instanceof Player) players ++;
+                if(entity instanceof Enemy) enemies ++;
+
+                if (entity == null || id == player.id) {
+                    if (id != player.id) {
                         EntityRequestPacket req = new EntityRequestPacket();
                         req.id = id;
                         Net.send(req, SendMode.udp);
@@ -141,44 +138,34 @@ public class NetClient extends Module {
                     entity.read(data);
                 }
             }
+
+            if(debugNet){
+                clientDebug.setSyncDebug(players, enemies);
+            }
         });
 
-        Net.handle(ShootPacket.class, packet -> {
-            Player player = Vars.control.playerGroup.getByID(packet.playerid);
+        Net.handleClient(StateSyncPacket.class, packet -> {
 
-            Weapon weapon = (Weapon) Upgrade.getByID(packet.weaponid);
-            weapon.shoot(player, packet.x, packet.y, packet.rotation);
-        });
+            System.arraycopy(packet.items, 0, state.inventory.getItems(), 0, packet.items.length);
 
-        Net.handle(PlacePacket.class, packet -> {
-            Recipe recipe = Recipes.getByResult(Block.getByID(packet.block));
-            if (recipe != null) Vars.control.removeItems(recipe.requirements);
-            Vars.control.input.placeBlockInternal(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false);
-        });
-
-        Net.handle(BreakPacket.class, packet -> {
-            Vars.control.input.breakBlockInternal(packet.x, packet.y, false);
-        });
-
-        Net.handle(StateSyncPacket.class, packet -> {
-
-            System.arraycopy(packet.items, 0, Vars.control.items, 0, packet.items.length);
-
-            Vars.control.setWaveData(packet.enemies, packet.wave, packet.countdown);
+            state.enemies = packet.enemies;
+            state.wavetime = packet.countdown;
+            state.wave = packet.wave;
 
             Timers.resetTime(packet.time + (float) (TimeUtils.timeSinceMillis(packet.timestamp) / 1000.0 * 60.0));
 
-            Vars.ui.hudfrag.updateItems();
+            ui.hudfrag.updateItems();
         });
 
-        Net.handle(EnemySpawnPacket.class, spawn -> {
+        Net.handleClient(EnemySpawnPacket.class, spawn -> {
             //duplicates.
-            if (Vars.control.enemyGroup.getByID(spawn.id) != null ||
-                    recieved.contains(spawn.id)) return;
+            if (enemyGroup.getByID(spawn.id) != null ||
+                    recieved.contains(spawn.id) || dead.contains(spawn.id)) return;
 
             recieved.add(spawn.id);
 
             Enemy enemy = new Enemy(EnemyType.getByID(spawn.type));
+            enemy.interpolator.target.set(spawn.x, spawn.y);
             enemy.set(spawn.x, spawn.y);
             enemy.tier = spawn.tier;
             enemy.lane = spawn.lane;
@@ -187,35 +174,38 @@ public class NetClient extends Module {
             enemy.add();
 
             Effects.effect(Fx.spawn, enemy);
+
+            Log.info("Recieved enemy {0}", spawn.id);
         });
 
-        Net.handle(EnemyDeathPacket.class, spawn -> {
-            Enemy enemy = Vars.control.enemyGroup.getByID(spawn.id);
-            if (enemy != null) enemy.onDeath();
+        Net.handleClient(EnemyDeathPacket.class, spawn -> {
+            Enemy enemy = enemyGroup.getByID(spawn.id);
+            if (enemy != null) enemy.type.onDeath(enemy, true);
+            dead.add(spawn.id);
         });
 
-        Net.handle(BulletPacket.class, packet -> {
+        Net.handleClient(BulletPacket.class, packet -> {
             //TODO shoot effects for enemies, clientside as well as serverside
             BulletType type = (BulletType) BaseBulletType.getByID(packet.type);
-            Entity owner = Vars.control.enemyGroup.getByID(packet.owner);
+            Entity owner = enemyGroup.getByID(packet.owner);
             new Bullet(type, owner, packet.x, packet.y, packet.angle).add();
         });
 
-        Net.handle(BlockDestroyPacket.class, packet -> {
-            Tile tile = Vars.world.tile(packet.position % Vars.world.width(), packet.position / Vars.world.width());
+        Net.handleClient(BlockDestroyPacket.class, packet -> {
+            Tile tile = world.tile(packet.position % world.width(), packet.position / world.width());
             if (tile != null && tile.entity != null) {
-                if (tile.entity != null) tile.entity.onDeath(true);
+                tile.entity.onDeath(true);
             }
         });
 
-        Net.handle(BlockUpdatePacket.class, packet -> {
-            Tile tile = Vars.world.tile(packet.position % Vars.world.width(), packet.position / Vars.world.width());
+        Net.handleClient(BlockUpdatePacket.class, packet -> {
+            Tile tile = world.tile(packet.position % world.width(), packet.position / world.width());
             if (tile != null && tile.entity != null) {
                 tile.entity.health = packet.health;
             }
         });
 
-        Net.handle(BlockSyncPacket.class, packet -> {
+        Net.handleClient(BlockSyncPacket.class, packet -> {
             if (!gotData) return;
 
             DataInputStream stream = new DataInputStream(packet.stream);
@@ -229,7 +219,7 @@ public class NetClient extends Module {
                     int pos = stream.readInt();
 
                     //TODO what if there's no entity? new code
-                    Tile tile = Vars.world.tile(pos % Vars.world.width(), pos / Vars.world.width());
+                    Tile tile = world.tile(pos % world.width(), pos / world.width());
 
                     byte times = stream.readByte();
 
@@ -245,27 +235,28 @@ public class NetClient extends Module {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } catch (Exception e) {
-                UCore.error(e);
+                Log.err(e);
                 //do nothing else...
                 //TODO fix
             }
 
         });
 
-        Net.handle(DisconnectPacket.class, packet -> {
-            Player player = Vars.control.playerGroup.getByID(packet.playerid);
+        Net.handleClient(DisconnectPacket.class, packet -> {
+            Player player = playerGroup.getByID(packet.playerid);
 
             if (player != null) {
                 player.remove();
             }
 
-            Mindustry.platforms.updateRPC();
+            Platform.instance.updateRPC();
         });
 
-        Net.handle(PlayerSpawnPacket.class, packet -> {
+        Net.handleClient(PlayerSpawnPacket.class, packet -> {
             //duplicates.
-            if (Vars.control.enemyGroup.getByID(packet.id) != null ||
+            if (enemyGroup.getByID(packet.id) != null ||
                     recieved.contains(packet.id)) return;
+
             recieved.add(packet.id);
 
             Player player = new Player();
@@ -281,58 +272,32 @@ public class NetClient extends Module {
             player.interpolator.target.set(player.x, player.y);
             player.add();
 
-            Mindustry.platforms.updateRPC();
+            Log.info("Recieved player {0}", packet.id);
+
+            Platform.instance.updateRPC();
         });
 
-        Net.handle(ChatPacket.class, packet -> Vars.ui.chatfrag.addMessage(packet.text, Vars.netClient.colorizeName(packet.id, packet.name)));
-
-        Net.handle(KickPacket.class, packet -> {
+        Net.handleClient(KickPacket.class, packet -> {
             kicked = true;
             Net.disconnect();
-            GameState.set(State.menu);
-            Vars.ui.showError("$text.server.kicked." + packet.reason.name());
-            Vars.ui.loadfrag.hide();
+            state.set(State.menu);
+            ui.showError("$text.server.kicked." + packet.reason.name());
+            ui.loadfrag.hide();
         });
 
-        Net.handle(WeaponSwitchPacket.class, packet -> {
-            Player player = Vars.control.playerGroup.getByID(packet.playerid);
-
-            if (player == null) return;
-
-            player.weaponLeft = (Weapon) Upgrade.getByID(packet.left);
-            player.weaponRight = (Weapon) Upgrade.getByID(packet.right);
-        });
-
-        Net.handle(BlockTapPacket.class, packet -> {
-            Tile tile = Vars.world.tile(packet.position);
-            if (tile != null) tile.block().tapped(tile);
-        });
-
-        Net.handle(BlockConfigPacket.class, packet -> {
-            Tile tile = Vars.world.tile(packet.position);
-            if (tile != null) tile.block().configure(tile, packet.data);
-        });
-
-        Net.handle(GameOverPacket.class, packet -> {
+        Net.handleClient(GameOverPacket.class, packet -> {
             kicked = true;
             ui.restart.show();
         });
 
-        Net.handle(FriendlyFireChangePacket.class, packet -> Vars.control.setFriendlyFire(packet.enabled));
-
-        Net.handle(PlayerDeathPacket.class, packet -> {
-            Player player = Vars.control.playerGroup.getByID(packet.id);
-            if(player == null) return;
-
-            player.doRespawn();
-        });
+        Net.handleClient(FriendlyFireChangePacket.class, packet -> state.friendlyFire = packet.enabled);
     }
 
     @Override
     public void update(){
-        if(!Net.client() || !Net.active()) return;
+        if(!Net.client()) return;
 
-        if(!GameState.is(State.menu) && Net.active()){
+        if(!state.is(State.menu)){
             if(gotData) sync();
         }else if(!connecting){
             Net.disconnect();
@@ -341,11 +306,11 @@ public class NetClient extends Module {
 
     private void finishConnecting(){
         Net.send(new ConnectConfirmPacket(), SendMode.tcp);
-        GameState.set(State.playing);
+        state.set(State.playing);
         Net.setClientLoaded(true);
         connecting = false;
-        Vars.ui.loadfrag.hide();
-        Vars.ui.join.hide();
+        ui.loadfrag.hide();
+        ui.join.hide();
     }
 
     public void beginConnecting(){
@@ -357,85 +322,16 @@ public class NetClient extends Module {
         Net.disconnect();
     }
 
-    public String colorizeName(int id, String name){
-        return name == null ? null : "[#" + colorArray[id % colorArray.length].toString().toUpperCase() + "]" + name;
-    }
-
-    public void handlePlayerDeath(){
-        PlayerDeathPacket packet = new PlayerDeathPacket();
-        packet.id = Vars.player.id;
-        Net.send(packet, SendMode.tcp);
-    }
-
-    public void handleBlockConfig(Tile tile, byte data){
-        BlockConfigPacket packet = new BlockConfigPacket();
-        packet.data = data;
-        packet.position = tile.packedPosition();
-        Net.send(packet, SendMode.tcp);
-    }
-
-    public void handleBlockTap(Tile tile){
-        BlockTapPacket packet = new BlockTapPacket();
-        packet.position = tile.packedPosition();
-        Net.send(packet, SendMode.tcp);
-    }
-
-    public void handleWeaponSwitch(){
-        WeaponSwitchPacket packet = new WeaponSwitchPacket();
-        packet.left = Vars.player.weaponLeft.id;
-        packet.right = Vars.player.weaponRight.id;
-        packet.playerid = Vars.player.id;
-        Net.send(packet, SendMode.tcp);
-    }
-
-    public void handleUpgrade(Weapon weapon){
-        UpgradePacket packet = new UpgradePacket();
-        packet.id = weapon.id;
-        Net.send(packet, SendMode.tcp);
-    }
-
-    public void handleSendMessage(String message){
-        ChatPacket packet = new ChatPacket();
-        packet.text = message;
-        packet.name = Vars.player.name;
-        packet.id = Vars.player.id;
-        Net.send(packet, SendMode.tcp);
-
-        Vars.ui.chatfrag.addMessage(packet.text, colorizeName(Vars.player.id, Vars.player.name));
-    }
-
-    public void handleShoot(Weapon weapon, float x, float y, float angle){
-        ShootPacket packet = new ShootPacket();
-        packet.weaponid = weapon.id;
-        packet.x = x;
-        packet.y = y;
-        packet.rotation = angle;
-        packet.playerid = Vars.player.id;
-        Net.send(packet, SendMode.udp);
-    }
-
-    public void handlePlace(int x, int y, Block block, int rotation){
-        PlacePacket packet = new PlacePacket();
-        packet.x = (short)x;
-        packet.y = (short)y;
-        packet.rotation = (byte)rotation;
-        packet.playerid = Vars.player.id;
-        packet.block = block.id;
-        Net.send(packet, SendMode.tcp);
-    }
-
-    public void handleBreak(int x, int y){
-        BreakPacket packet = new BreakPacket();
-        packet.x = (short)x;
-        packet.y = (short)y;
-        Net.send(packet, SendMode.tcp);
+    public void clearRecieved(){
+        recieved.clear();
+        dead.clear();
     }
 
     void sync(){
         if(Timers.get("syncPlayer", playerSyncTime)){
-            byte[] bytes = new byte[Vars.player.getWriteSize()];
+            byte[] bytes = new byte[player.getWriteSize()];
             ByteBuffer buffer = ByteBuffer.wrap(bytes);
-            Vars.player.write(buffer);
+            player.write(buffer);
 
             PositionPacket packet = new PositionPacket();
             packet.data = bytes;

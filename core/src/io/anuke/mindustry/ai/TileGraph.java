@@ -2,7 +2,7 @@ package io.anuke.mindustry.ai;
 
 import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Vars;
+import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.world.Tile;
 
 /**Tilegraph that ignores player-made tiles.*/
@@ -31,6 +31,6 @@ public class TileGraph implements OptimizedGraph<Tile> {
 
 	@Override
 	public int getNodeCount(){
-		return Vars.world.width() * Vars.world.height();
+		return world.width() * world.height();
 	}
 }

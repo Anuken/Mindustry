@@ -3,8 +3,6 @@ package io.anuke.mindustry.io;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.world.Map;
@@ -12,6 +10,9 @@ import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 
 import java.io.IOException;
+
+import static io.anuke.mindustry.Vars.saveSlots;
+import static io.anuke.mindustry.Vars.state;
 
 public class Saves {
     private int nextSlot;
@@ -24,7 +25,7 @@ public class Saves {
 
     public void load(){
         saves.clear();
-        for(int i = 0; i < Vars.saveSlots; i ++){
+        for(int i = 0; i < saveSlots; i ++){
             if(SaveIO.isSaveValid(i)){
                 SaveSlot slot = new SaveSlot(i);
                 saves.add(slot);
@@ -39,11 +40,11 @@ public class Saves {
     }
 
     public void update(){
-        if(GameState.is(State.menu)){
+        if(state.is(State.menu)){
             current = null;
         }
 
-        if(!GameState.is(State.menu) && !Vars.control.isGameOver() && current != null && current.isAutosave()){
+        if(!state.is(State.menu) && !state.gameOver && current != null && current.isAutosave()){
             time += Timers.delta();
             if(time > Settings.getInt("saveinterval")*60) {
                 saving = true;
@@ -70,7 +71,7 @@ public class Saves {
     }
 
     public boolean canAddSave(){
-        return nextSlot < Vars.saveSlots;
+        return nextSlot < saveSlots;
     }
 
     public void addSave(String name){

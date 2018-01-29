@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Core;
@@ -18,7 +17,7 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.renderer;
+import static io.anuke.mindustry.Vars.*;
 
 public class SettingsMenuDialog extends SettingsDialog{
 	public SettingsTable graphics;
@@ -33,20 +32,20 @@ public class SettingsMenuDialog extends SettingsDialog{
 		setStyle(Core.skin.get("dialog", WindowStyle.class));
 
 		hidden(()->{
-			if(!GameState.is(State.menu)){
+			if(!state.is(State.menu)){
 				if(!wasPaused || Net.active())
-					GameState.set(State.playing);
+					state.set(State.playing);
 			}
 		});
 
 		shown(()->{
-			if(!GameState.is(State.menu)){
-				wasPaused = GameState.is(State.paused);
+			if(!state.is(State.menu)){
+				wasPaused = state.is(State.paused);
 				if(menu.getScene() != null){
 					wasPaused = ((PausedDialog)menu).wasPaused;
 				}
-				if(!Net.active()) GameState.set(State.paused);
-				Vars.ui.paused.hide();
+				if(!Net.active()) state.set(State.paused);
+				ui.paused.hide();
 			}
 		});
 
@@ -83,10 +82,10 @@ public class SettingsMenuDialog extends SettingsDialog{
 		menu.addButton("$text.settings.sound", () -> visible(2));
 		if(!Vars.android) {
 			menu.row();
-			menu.addButton("$text.settings.controls", Vars.ui.controls::show);
+			menu.addButton("$text.settings.controls", ui.controls::show);
 		}
 		menu.row();
-		menu.addButton("$text.settings.language", Vars.ui.language::show);
+		menu.addButton("$text.settings.language", ui.language::show);
 
 		prefs.clearChildren();
 		prefs.add(menu);

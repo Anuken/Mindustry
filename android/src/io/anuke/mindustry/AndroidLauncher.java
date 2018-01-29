@@ -11,7 +11,7 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
-import io.anuke.mindustry.io.PlatformFunction;
+import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Unit;
@@ -24,7 +24,6 @@ import java.util.Locale;
 
 public class AndroidLauncher extends AndroidApplication{
 	boolean doubleScaleTablets = true;
-
 	int WRITE_REQUEST_CODE = 1;
 
 	@Override
@@ -33,10 +32,14 @@ public class AndroidLauncher extends AndroidApplication{
 
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		config.useImmersiveMode = true;
-		
-		Mindustry.hasDiscord = isPackageInstalled("com.discord");
-		Mindustry.platforms = new PlatformFunction(){
+
+		Platform.instance = new Platform(){
 			DateFormat format = SimpleDateFormat.getDateTimeInstance();
+
+			@Override
+			public boolean hasDiscord() {
+				return isPackageInstalled("com.discord");
+			}
 
 			@Override
 			public String format(Date date){

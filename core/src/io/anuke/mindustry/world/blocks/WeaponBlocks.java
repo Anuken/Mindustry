@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks;
 
 import com.badlogic.gdx.graphics.Color;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.effect.TeslaOrb;
 import io.anuke.mindustry.graphics.Fx;
@@ -138,8 +137,7 @@ public class WeaponBlocks{
 			TurretEntity entity = tile.entity();
 			Angles.translation(entity.rotation, 4);
 
-			new TeslaOrb(tile.worldx() + Angles.x(), tile.worldy() + Angles.y(), 
-					range, (int)(9*Vars.multiplier)).add();
+			new TeslaOrb(tile.worldx() + Angles.x(), tile.worldy() + Angles.y(), range, 9).add();
 		}
 	},
 		

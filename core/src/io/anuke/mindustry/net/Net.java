@@ -4,31 +4,42 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
-import io.anuke.mindustry.Mindustry;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamBuilder;
 import io.anuke.mindustry.net.Streamable.StreamChunk;
-import io.anuke.ucore.UCore;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.BiConsumer;
 import io.anuke.ucore.function.Consumer;
+import io.anuke.ucore.util.Log;
 
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.*;
+
 public class Net{
-	public static final int version = 13;
+	public static final int version = 14;
 
 	private static boolean server;
 	private static boolean active;
 	private static boolean clientLoaded;
+	private static ObjectMap<Class<?>, Consumer> listeners = new ObjectMap<>();
 	private static ObjectMap<Class<?>, Consumer> clientListeners = new ObjectMap<>();
 	private static ObjectMap<Class<?>, BiConsumer<Integer, Object>> serverListeners = new ObjectMap<>();
 	private static ClientProvider clientProvider;
 	private static ServerProvider serverProvider;
 
 	private static IntMap<StreamBuilder> streams = new IntMap<>();
+
+	/**Display a network error.*/
+	public static void showError(String text){
+		if(!headless){
+			ui.showError(text);
+		}else{
+			Log.err(text);
+		}
+	}
 
 	/**Sets the client loaded status, or whether it will recieve normal packets from the server.*/
 	public static void setClientLoaded(boolean loaded){
@@ -40,8 +51,6 @@ public class Net{
 		clientProvider.connect(ip, port);
 		active = true;
 		server = false;
-
-		Timers.runTask(60f, Mindustry.platforms::updateRPC);
 	}
 
 	/**Host a server at an address*/
@@ -49,8 +58,6 @@ public class Net{
 		serverProvider.host(port);
 		active = true;
 		server = true;
-
-		Timers.runTask(60f, Mindustry.platforms::updateRPC);
 	}
 
 	/**Closes the server.*/
@@ -85,9 +92,9 @@ public class Net{
 	/**Send an object to all connected clients, or to the server if this is a client.*/
 	public static void send(Object object, SendMode mode){
 		if(server){
-			serverProvider.send(object, mode);
+			if(serverProvider != null) serverProvider.send(object, mode);
 		}else {
-			clientProvider.send(object, mode);
+			if(clientProvider != null) clientProvider.send(object, mode);
 		}
 	}
 
@@ -115,9 +122,14 @@ public class Net{
 	public static void setServerProvider(ServerProvider provider){
 		Net.serverProvider = provider;
 	}
-	
-	/**Registers a client listener for when an object is recieved.*/
+
+	/**Registers a common listener for when an object is recieved. Fired on both client and serve.r*/
 	public static <T> void handle(Class<T> type, Consumer<T> listener){
+		listeners.put(type, listener);
+	}
+
+	/**Registers a client listener for when an object is recieved.*/
+	public static <T> void handleClient(Class<T> type, Consumer<T> listener){
 		clientListeners.put(type, listener);
 	}
 
@@ -128,6 +140,8 @@ public class Net{
 	
 	/**Call to handle a packet being recieved for the client.*/
 	public static void handleClientReceived(Object object){
+		if(debugNet) clientDebug.handle(object);
+
 		if(object instanceof StreamBegin) {
 			StreamBegin b = (StreamBegin) object;
 			streams.put(b.id, new StreamBuilder(b));
@@ -142,11 +156,13 @@ public class Net{
 				streams.remove(builder.id);
 				handleClientReceived(builder.build());
 			}
-		}else if(clientListeners.get(object.getClass()) != null){
+		}else if(clientListeners.get(object.getClass()) != null ||
+					listeners.get(object.getClass()) != null){
 			if(clientLoaded || object instanceof ImportantPacket){
-				clientListeners.get(object.getClass()).accept(object);
+				if(clientListeners.get(object.getClass()) != null) clientListeners.get(object.getClass()).accept(object);
+				if(listeners.get(object.getClass()) != null) listeners.get(object.getClass()).accept(object);
 			}else{
-				UCore.log("Recieved " + object, "but ignoring data, as client is not loaded.");
+				Log.info("Recieved {0}, but ignoring data, as client is not loaded.", ClassReflection.getSimpleName(object.getClass()));
 			}
 		}else{
 			Gdx.app.error("Mindustry::Net", "Unhandled packet type: '" + object.getClass() + "'!");
@@ -155,8 +171,11 @@ public class Net{
 
 	/**Call to handle a packet being recieved for the server.*/
 	public static void handleServerReceived(int connection, Object object){
-		if(serverListeners.get(object.getClass()) != null){
-			serverListeners.get(object.getClass()).accept(connection, object);
+		if(debugNet) serverDebug.handle(object);
+
+		if(serverListeners.get(object.getClass()) != null || listeners.get(object.getClass()) != null){
+			if(serverListeners.get(object.getClass()) != null) serverListeners.get(object.getClass()).accept(connection, object);
+			if(listeners.get(object.getClass()) != null) listeners.get(object.getClass()).accept(object);
 		}else{
 			Gdx.app.error("Mindustry::Net", "Unhandled packet type: '" + object.getClass() + "'!");
 		}
@@ -184,12 +203,12 @@ public class Net{
 	
 	/**Whether this is a server or not.*/
 	public static boolean server(){
-		return server;
+		return server && active;
 	}
 
 	/**Whether this is a client or not.*/
 	public static boolean client(){
-		return !server;
+		return !server && active;
 	}
 
 	public static void dispose(){

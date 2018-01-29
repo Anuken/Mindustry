@@ -1,19 +1,20 @@
 package io.anuke.mindustry.ui.fragments;
 
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.ui.BorderImage;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class PlayerListFragment implements Fragment{
     public boolean visible = false;
@@ -25,8 +26,8 @@ public class PlayerListFragment implements Fragment{
         new table(){{
             new table("pane"){{
                 margin(14f);
-                new label(() -> Bundles.format(Vars.control.playerGroup.amount() == 1 ? "text.players.single" :
-                        "text.players", Vars.control.playerGroup.amount()));
+                new label(() -> Bundles.format(playerGroup.size() == 1 ? "text.players.single" :
+                        "text.players", playerGroup.size()));
                 row();
                 content.marginRight(13f).marginLeft(13f);
                 ScrollPane pane = new ScrollPane(content, "clear");
@@ -37,21 +38,22 @@ public class PlayerListFragment implements Fragment{
                 new table("pane"){{
                     margin(12f);
                     get().addCheck("$text.server.friendlyfire", b -> {
-                        Vars.control.setFriendlyFire(b);
-                    }).growX().update(i -> i.setChecked(Vars.control.isFriendlyFire())).disabled(b -> Net.client());
+                        state.friendlyFire = b;
+                        NetEvents.handleFriendlyFireChange(b);
+                    }).growX().update(i -> i.setChecked(state.friendlyFire)).disabled(b -> Net.client());
                 }}.pad(10f).growX().end();
             }}.end();
 
             update(t -> {
-                if(!Vars.android){
+                if(!android){
                     visible = Inputs.keyDown("player_list");
                 }
-                if(!(Net.active() && !GameState.is(State.menu))){
+                if(!(Net.active() && !state.is(State.menu))){
                     visible = false;
                 }
-                if(Vars.control.playerGroup.amount() != last){
+                if(playerGroup.size() != last){
                     rebuild();
-                    last = Vars.control.playerGroup.amount();
+                    last = playerGroup.size();
                 }
             });
 
@@ -66,7 +68,7 @@ public class PlayerListFragment implements Fragment{
 
         float h = 60f;
 
-        for(Player player : Vars.control.playerGroup.all()){
+        for(Player player : playerGroup.all()){
             Table button = new Table("button");
             button.left();
             button.margin(5).marginBottom(10);

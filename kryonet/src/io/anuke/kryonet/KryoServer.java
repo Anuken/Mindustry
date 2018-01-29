@@ -23,6 +23,7 @@ import io.anuke.mindustry.net.Streamable;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamChunk;
 import io.anuke.ucore.UCore;
+import io.anuke.ucore.util.Log;
 import org.java_websocket.WebSocket;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.handshake.ClientHandshake;
@@ -32,7 +33,7 @@ import java.io.IOException;
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
+import java.nio.channels.ClosedSelectorException;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class KryoServer implements ServerProvider {
@@ -50,7 +51,6 @@ public class KryoServer implements ServerProvider {
         server = new Server(4096*2, 2048, connection -> new ByteSerializer()); //TODO tweak
         server.setDiscoveryHandler((datagramChannel, fromAddress) -> {
             ByteBuffer buffer = KryoRegistrator.writeServerData();
-            UCore.log("Replying to discover request with buffer of size " + buffer.capacity());
             buffer.position(0);
             datagramChannel.send(buffer, fromAddress);
             return true;
@@ -67,7 +67,6 @@ public class KryoServer implements ServerProvider {
                 c.addressTCP = connection.getRemoteAddressTCP().toString();
 
                 connections.add(kn);
-                UCore.log("Adding connection #" + kn.id + " to list.");
                 Gdx.app.postRunnable(() ->  Net.handleServerReceived(kn.id, c));
             }
 
@@ -136,7 +135,7 @@ public class KryoServer implements ServerProvider {
             try{
                 server.run();
             }catch (Exception e){
-                handleException(e);
+                if(!(e instanceof ClosedSelectorException)) handleException(e);
             }
         }, "Kryonet Server");
         thread.setDaemon(true);
@@ -152,7 +151,7 @@ public class KryoServer implements ServerProvider {
         Thread thread = new Thread(() ->{
             try {
                 server.close();
-                UCore.log("Killing web server...");
+                Log.info("Killing web server...");
                 try {
                     if (webServer != null) webServer.stop(1); //please die, right now
                 }catch(Exception e){
@@ -164,7 +163,7 @@ public class KryoServer implements ServerProvider {
                         worker.interrupt();
                     }
                 }
-                UCore.log("Killed web server.");
+                Log.info("Killed web server.");
             }catch (Exception e){
                 Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
             }
@@ -260,7 +259,7 @@ public class KryoServer implements ServerProvider {
         }
 
         try {
-            UCore.log("Disposing web server...");
+            Log.info("Disposing web server...");
 
             if(webServer != null) webServer.stop(1);
             //kill them all
@@ -269,7 +268,7 @@ public class KryoServer implements ServerProvider {
                     thread.interrupt();
                 }
             }
-            UCore.log("Killed web server.");
+            Log.info("Killed web server.");
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -334,14 +333,14 @@ public class KryoServer implements ServerProvider {
                 try {
                     synchronized (buffer) {
                         buffer.position(0);
-                        if(debug) UCore.log("Sending object with ID " + Registrator.getID(object.getClass()));
+                        if(debug) Log.info("Sending object with ID {0}", Registrator.getID(object.getClass()));
                         serializer.write(buffer, object);
                         int pos = buffer.position();
                         buffer.position(0);
                         byte[] out = new byte[pos];
                         buffer.get(out);
                         String string = new String(Base64Coder.encode(out));
-                        if(debug) UCore.log("Sending string: " + string);
+                        if(debug) Log.info("Sending string: {0}", string);
                         socket.send(string);
                     }
                 }catch (WebsocketNotConnectedException e){
@@ -360,7 +359,7 @@ public class KryoServer implements ServerProvider {
                     }
                 }catch (Exception e){
                     e.printStackTrace();
-                    UCore.log("Disconnecting invalid client!");
+                    Log.info("Disconnecting invalid client!");
                     connection.close();
                 }
             }
@@ -387,7 +386,7 @@ public class KryoServer implements ServerProvider {
         public void onOpen(WebSocket conn, ClientHandshake handshake) {
             Connect connect = new Connect();
             connect.addressTCP = conn.getRemoteSocketAddress().toString();
-            UCore.log("Websocket connection recieved: " + connect.addressTCP);
+            Log.info("Websocket connection recieved: {0}", connect.addressTCP);
             KryoConnection kn = new KryoConnection(lastconnection ++, connect.addressTCP, conn);
             connections.add(kn);
         }
@@ -412,36 +411,33 @@ public class KryoServer implements ServerProvider {
                     conn.send("---" + connections.size() + "|" + Vars.player.name);
                     connections.remove(k);
                 }else {
-                    if (debug) UCore.log("Got message: " + message);
 
                     byte[] out = Base64Coder.decode(message);
-                    if (debug) UCore.log("Decoded: " + Arrays.toString(out));
                     ByteBuffer buffer = ByteBuffer.wrap(out);
                     Object o = serializer.read(buffer);
                     Net.handleServerReceived(k.id, o);
                 }
             }catch (Exception e){
-                UCore.log("Error reading message!");
-                e.printStackTrace();
+                Log.err(e);
             }
         }
 
         @Override
         public void onError(WebSocket conn, Exception ex) {
-            UCore.log("WS error:");
+            Log.info("WS error:");
             ex.printStackTrace();
             if(ex instanceof BindException){
                 Net.closeServer();
-                Vars.ui.showError("$text.server.addressinuse");
+                Net.showError("$text.server.addressinuse");
             }else if(ex.getMessage().equals("Permission denied")){
                 Net.closeServer();
-                Vars.ui.showError("Permission denied.");
+                Net.showError("Permission denied.");
             }
         }
 
         @Override
         public void onStart() {
-            UCore.log("Web server started.");
+            Log.info("Web server started.");
         }
     }
 

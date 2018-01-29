@@ -1,11 +1,11 @@
 package io.anuke.mindustry.entities.enemies;
 
 import com.badlogic.gdx.math.Vector2;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.NetEvents;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.util.Angles;
@@ -13,6 +13,8 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
 
 import java.nio.ByteBuffer;
+
+import static io.anuke.mindustry.Vars.enemyGroup;
 
 public class Enemy extends SyncEntity {
 	public final EnemyType type;
@@ -69,7 +71,7 @@ public class Enemy extends SyncEntity {
 
 	@Override
 	public void onDeath(){
-		type.onDeath(this);
+		type.onDeath(this, false);
 	}
 
 	@Override
@@ -88,7 +90,7 @@ public class Enemy extends SyncEntity {
 	
 	@Override
 	public Enemy add(){
-		return add(Vars.control.enemyGroup);
+		return add(enemyGroup);
 	}
 
 	@Override
@@ -130,14 +132,14 @@ public class Enemy extends SyncEntity {
 
 	public void shoot(BulletType bullet, float rotation){
 
-		if(!(Net.active() && Net.client())) {
+		if(!(Net.client())) {
 			Angles.translation(angle + rotation, type.length);
 			Bullet out = new Bullet(bullet, this, x + Angles.x(), y + Angles.y(), this.angle + rotation).add();
-			out.damage = (int) ((bullet.damage * (1 + (tier - 1) * 1f)) * Vars.multiplier);
+			out.damage = (int) ((bullet.damage * (1 + (tier - 1) * 1f)));
 			type.onShoot(this, bullet, rotation);
 
-			if(Net.active() && Net.server()){
-				Vars.netServer.handleBullet(bullet, this, x + Angles.x(), y + Angles.y(), this.angle + rotation, (short)out.damage);
+			if(Net.server()){
+				NetEvents.handleBullet(bullet, this, x + Angles.x(), y + Angles.y(), this.angle + rotation, (short)out.damage);
 			}
 		}
 	}

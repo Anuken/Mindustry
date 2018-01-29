@@ -3,25 +3,25 @@ package io.anuke.mindustry.entities.enemies;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 import io.anuke.ucore.util.Tmp;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class EnemyType {
 
@@ -80,11 +80,11 @@ public class EnemyType {
 
         Graphics.flush();
 
-        if(Vars.showPaths){
+        if(showPaths){
             Draw.tscl(0.25f);
             Draw.text((int)enemy.idletime + "\n" + Strings.toFixed(enemy.totalMove.x, 2) + ", "
                     + Strings.toFixed(enemy.totalMove.x, 2), enemy.x, enemy.y);
-            Draw.tscl(Vars.fontscale);
+            Draw.tscl(fontscale);
         }
 
         Shaders.outline.lighten = 0f;
@@ -134,20 +134,20 @@ public class EnemyType {
             enemy.angle = Mathf.slerp(enemy.angle, enemy.angleTo(enemy.target), turretrotatespeed * Timers.delta());
         }
 
-        enemy.x = Mathf.clamp(enemy.x, 0, Vars.world.width() * Vars.tilesize);
-        enemy.y = Mathf.clamp(enemy.y, 0, Vars.world.height() * Vars.tilesize);
+        enemy.x = Mathf.clamp(enemy.x, 0, world.width() * tilesize);
+        enemy.y = Mathf.clamp(enemy.y, 0, world.height() * tilesize);
     }
 
     public void move(Enemy enemy){
-        float speed = this.speed + 0.04f * enemy.tier;
-        float range = this.range + enemy.tier * 5;
-
-        if(Net.client() && Net.active()){
+        if(Net.client()){
             enemy.interpolate(); //TODO? better structure for interpolation
             return;
         }
 
-        Tile core = Vars.control.getCore();
+        float speed = this.speed + 0.04f * enemy.tier;
+        float range = this.range + enemy.tier * 5;
+
+        Tile core = world.getCore();
 
         if(enemy.idletime > maxIdleLife){
             enemy.onDeath();
@@ -161,7 +161,7 @@ public class EnemyType {
             vec = Tmp.v1.setZero();
             if(targetCore) enemy.target = core.entity;
         }else{
-            vec = Vars.world.pathfinder().find(enemy);
+            vec = world.pathfinder().find(enemy);
             vec.sub(enemy.x, enemy.y).limit(speed);
         }
 
@@ -171,7 +171,7 @@ public class EnemyType {
         float attractRange = avoidRange + 7f;
         float avoidSpeed = this.speed/2.7f;
 
-        Entities.getNearby(Vars.control.enemyGroup, enemy.x, enemy.y, range, en -> {
+        Entities.getNearby(enemyGroup, enemy.x, enemy.y, range, en -> {
             Enemy other = (Enemy)en;
             if(other == enemy) return;
             float dst = other.distanceTo(enemy);
@@ -194,7 +194,11 @@ public class EnemyType {
         enemy.move(vec.x * Timers.delta(), vec.y * Timers.delta());
 
         updateTargeting(enemy, nearCore);
+
+        behavior(enemy);
     }
+
+    public void behavior(Enemy enemy){}
 
     public void updateTargeting(Enemy enemy, boolean nearCore){
         if(enemy.target != null && enemy.target instanceof TileEntity && ((TileEntity)enemy.target).dead){
@@ -202,14 +206,14 @@ public class EnemyType {
         }
 
         if(enemy.timer.get(timerTarget, 15) && !nearCore){
-            enemy.target = Vars.world.findTileTarget(enemy.x, enemy.y, null, range, false);
+            enemy.target = world.findTileTarget(enemy.x, enemy.y, null, range, false);
 
             //no tile found
             if(enemy.target == null){
-                enemy.target = Entities.getClosest(Vars.control.playerGroup, enemy.x, enemy.y, range, e -> !((Player)e).isAndroid);
+                enemy.target = Entities.getClosest(playerGroup, enemy.x, enemy.y, range, e -> !((Player)e).isAndroid);
             }
         }else if(nearCore){
-            enemy.target = Vars.control.getCore().entity;
+            enemy.target = world.getCore().entity;
         }
 
         if(enemy.target != null && bullet != null){
@@ -220,7 +224,7 @@ public class EnemyType {
     public void updateShooting(Enemy enemy){
         float reload = this.reload / Math.max(enemy.tier / 1.5f, 1f);
 
-        if(enemy.timer.get(timerReload, reload * Vars.multiplier)){
+        if(enemy.timer.get(timerReload, reload)){
             shoot(enemy);
         }
     }
@@ -232,16 +236,18 @@ public class EnemyType {
 
     public void onShoot(Enemy enemy, BulletType type, float rotation){}
 
-    public void onDeath(Enemy enemy){
-        if(Net.active() && Net.server()){
-            Vars.netServer.handleEnemyDeath(enemy);
+    public void onDeath(Enemy enemy, boolean force){
+        if(Net.server()){
+            NetEvents.handleEnemyDeath(enemy);
         }
 
-        Effects.effect(Fx.explosion, enemy);
-        Effects.shake(3f, 4f, enemy);
-        Effects.sound("bang2", enemy);
-        enemy.remove();
-        enemy.dead = true;
+        if(!Net.client() || force) {
+            Effects.effect(Fx.explosion, enemy);
+            Effects.shake(3f, 4f, enemy);
+            Effects.sound("bang2", enemy);
+            enemy.remove();
+            enemy.dead = true;
+        }
     }
 
     public void removed(Enemy enemy){
@@ -249,7 +255,7 @@ public class EnemyType {
             if(enemy.spawner != null){
                 enemy.spawner.spawned --;
             }else{
-                Vars.control.enemyDeath();
+                state.enemies --;
             }
         }
     }

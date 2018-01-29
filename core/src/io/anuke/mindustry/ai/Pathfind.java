@@ -4,15 +4,16 @@ import com.badlogic.gdx.ai.pfa.PathFinderRequest;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class Pathfind{
 	/**Maximum time taken per frame on pathfinding for a single path.*/
@@ -39,11 +40,11 @@ public class Pathfind{
 			enemy.node = -1;
 		}
 
-		if(enemy.node < 0 || Vars.control.getSpawnPoints().get(enemy.lane).pathTiles == null){
+		if(enemy.node < 0 || world.getSpawns().get(enemy.lane).pathTiles == null){
 			return vector.set(enemy.x, enemy.y);
 		}
 
-		Tile[] path = Vars.control.getSpawnPoints().get(enemy.lane).pathTiles;
+		Tile[] path = world.getSpawns().get(enemy.lane).pathTiles;
 
 		if(enemy.node >= path.length){
 			enemy.node = -1;
@@ -60,7 +61,7 @@ public class Pathfind{
 		Tile target = path[enemy.node];
 
 		//a bridge has been broken, re-path
-		if(!Vars.world.passable(target.x, target.y)){
+		if(!world.passable(target.x, target.y)){
 			remakePath();
 			return vector.set(enemy.x, enemy.y);
 		}
@@ -108,8 +109,8 @@ public class Pathfind{
 
 	/**Re-calculate paths for all enemies. Runs when a path changes while moving.*/
 	private void remakePath(){
-		for(int i = 0; i < Vars.control.enemyGroup.amount(); i ++){
-			Enemy enemy = Vars.control.enemyGroup.all().get(i);
+		for(int i = 0; i < enemyGroup.size(); i ++){
+			Enemy enemy = enemyGroup.all().get(i);
 			enemy.node = -1;
 		}
 
@@ -121,9 +122,9 @@ public class Pathfind{
 	public void update(){
 
 		//go through each spawnpoint, and if it's not found a path yet, update it
-		for(SpawnPoint point : Vars.control.getSpawnPoints()){
-			if(point.request == null){
-				resetPathFor(point);
+		for(SpawnPoint point : world.getSpawns()){
+			if(point.request == null || point.finder == null){
+				continue;
 			}
 
 			if(!point.request.pathFound){
@@ -145,26 +146,26 @@ public class Pathfind{
 	//1300-1500ms, usually 1400 unoptimized on Caldera
 	/**Benchmark pathfinding speed. Debugging stuff.*/
 	public void benchmark(){
-		SpawnPoint point = Vars.control.getSpawnPoints().first();
+		SpawnPoint point = world.getSpawns().first();
 		int amount = 100;
 
 		//warmup
 		for(int i = 0; i < 100; i ++){
-			point.finder.searchNodePath(point.start, Vars.control.getCore(), Vars.control.getDifficulty().heuristic, point.path);
+			point.finder.searchNodePath(point.start, world.getCore(), state.difficulty.heuristic, point.path);
 			point.path.clear();
 		}
 
 		Timers.mark();
 		for(int i = 0; i < amount; i ++){
-			point.finder.searchNodePath(point.start, Vars.control.getCore(), Vars.control.getDifficulty().heuristic, point.path);
+			point.finder.searchNodePath(point.start, world.getCore(), state.difficulty.heuristic, point.path);
 			point.path.clear();
 		}
-		UCore.log("Time elapsed: " + Timers.elapsed() + "ms\nAverage MS per path: " + Timers.elapsed()/amount);
+		Log.info("Time elapsed: {0}ms\nAverage MS per path: {1}", Timers.elapsed(), Timers.elapsed()/amount);
 	}
 
 	/**Reset and clear the paths.*/
 	public void resetPaths(){
-		for(SpawnPoint point : Vars.control.getSpawnPoints()){
+		for(SpawnPoint point : world.getSpawns()){
 			resetPathFor(point);
 		}
 	}
@@ -176,21 +177,21 @@ public class Pathfind{
 
 		point.pathTiles = null;
 
-		point.request = new PathFinderRequest<>(point.start, Vars.control.getCore(), Vars.control.getDifficulty().heuristic, point.path);
+		point.request = new PathFinderRequest<>(point.start, world.getCore(), state.difficulty.heuristic, point.path);
 		point.request.statusChanged = true; //IMPORTANT!
 	}
 
 	/**For an enemy that was just loaded from a save, find the node in the path it should be following.*/
 	void findNode(Enemy enemy){
-		if(enemy.lane >= Vars.control.getSpawnPoints().size || enemy.lane < 0){
+		if(enemy.lane >= world.getSpawns().size || enemy.lane < 0){
 			enemy.lane = 0;
 		}
 		
-		if(Vars.control.getSpawnPoints().get(enemy.lane).pathTiles == null){
+		if(world.getSpawns().get(enemy.lane).pathTiles == null){
 			return;
 		}
 		
-		Tile[] path = Vars.control.getSpawnPoints().get(enemy.lane).pathTiles;
+		Tile[] path = world.getSpawns().get(enemy.lane).pathTiles;
 		
 		int closest = findClosest(path, enemy.x, enemy.y);
 		

@@ -6,8 +6,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.sksamuel.gwt.websockets.Websocket;
 import com.sksamuel.gwt.websockets.WebsocketListener;
-import io.anuke.mindustry.Mindustry;
-import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.ClientProvider;
@@ -23,13 +22,15 @@ import io.anuke.ucore.util.Strings;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import static io.anuke.mindustry.Vars.*;
+
 public class WebsocketClient implements ClientProvider {
     Websocket socket;
     ByteBuffer buffer = ByteBuffer.allocate(1024);
 
     @Override
     public void connect(String ip, int port){
-        socket = new Websocket("ws://" + ip + ":" + Vars.webPort);
+        socket = new Websocket("ws://" + ip + ":" + webPort);
         socket.addListener(new WebsocketListener() {
             public void onMessage(byte[] bytes) {
                 try {
@@ -103,10 +104,10 @@ public class WebsocketClient implements ClientProvider {
 
     @Override
     public void pingHost(String address, int port, Consumer<Host> valid, Consumer<IOException> failed) {
-        if(!Mindustry.platforms.canJoinGame()) {
+        if(!Platform.instance.canJoinGame()) {
             failed.accept(new IOException());
         }else {
-            Websocket socket = new Websocket("ws://" + address + ":" + Vars.webPort);
+            Websocket socket = new Websocket("ws://" + address + ":" + webPort);
             final boolean[] accepted = {false};
             socket.addListener(new WebsocketListener() {
                 @Override
