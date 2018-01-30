@@ -17,7 +17,10 @@ public class ServerLauncher{
         //find and handle uncaught exceptions in libGDX thread
         for(Thread thread : Thread.getAllStackTraces().keySet()){
             if(thread.getName().equals("HeadlessApplication")){
-                thread.setUncaughtExceptionHandler((t, throwable) -> System.exit(-1));
+                thread.setUncaughtExceptionHandler((t, throwable) ->{
+                    throwable.printStackTrace();
+                    System.exit(-1);
+                });
                 break;
             }
         }

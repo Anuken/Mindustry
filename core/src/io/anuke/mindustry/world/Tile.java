@@ -271,7 +271,7 @@ public class Tile{
 		Block block = block();
 		Block floor = floor();
 		
-		return floor.name() + ":" + block.name() + "[" + x + "," + y + "] " +
+		return floor.name() + ":" + block.name() + "[" + x + "," + y + "] " + "entity=" + entity +
 				(link != 0 ? " link=[" + (Bits.getLeftByte(link) - 8) + ", " + (Bits.getRightByte(link) - 8) +  "]" : "");
 	}
 }

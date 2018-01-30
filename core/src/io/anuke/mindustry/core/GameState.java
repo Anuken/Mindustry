@@ -22,13 +22,16 @@ public class GameState{
 	public boolean friendlyFire;
 	
 	public void set(State astate){
-		//TODO update RPC handler
 		Events.fire(StateChangeEvent.class, state, astate);
 		state = astate;
 	}
 	
 	public boolean is(State astate){
 		return state == astate;
+	}
+
+	public State getState(){
+		return state;
 	}
 	
 	public enum State{

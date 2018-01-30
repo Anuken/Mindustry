@@ -121,7 +121,9 @@ public class DebugFragment implements Fragment {
                 "enemies: " + enemyGroup.size(),
                 "tiles: " + tileGroup.size(),
                 world.getCore() != null && world.getCore().entity != null ? "core.health: " + world.getCore().entity.health : "",
-                "",
+                "core: " + world.getCore(),
+                "state.gameover: " + state.gameOver,
+                "state: " + state.getState(),
                 !Net.server() ? clientDebug.getOut() : serverDebug.getOut()
         );
     }

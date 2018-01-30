@@ -42,7 +42,6 @@ public class NetEvents {
     public static void handleEnemyDeath(Enemy enemy){
         EnemyDeathPacket packet = new EnemyDeathPacket();
         packet.id = enemy.id;
-        state.gameOver = true;
         Net.send(packet, SendMode.tcp);
     }
 
