@@ -18,7 +18,6 @@ import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.mindustry.world.blocks.types.Rock;
 import io.anuke.ucore.core.Core;
-import io.anuke.ucore.entities.Entities;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -106,8 +105,6 @@ public class Save15 extends SaveFileVersion {
         if(!headless) ui.hudfrag.updateItems();
 
         //enemies
-
-        Entities.clear();
 
         int enemies = stream.readInt();
 

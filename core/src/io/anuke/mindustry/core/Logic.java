@@ -52,13 +52,14 @@ public class Logic extends Module {
 
     public void reset(){
         state.wave = 1;
-        state.extrawavetime = maxwavespace;
+        state.extrawavetime = maxwavespace * state.difficulty.maxTimeScaling;
         state.wavetime = wavespace * state.difficulty.timeScaling;
         state.enemies = 0;
         state.lastUpdated = -1;
         state.gameOver = false;
         state.inventory.clearItems();
 
+        Timers.clear();
         Entities.clear();
 
         Events.fire(ResetEvent.class);
@@ -100,7 +101,7 @@ public class Logic extends Module {
 
         state.wave ++;
         state.wavetime = wavespace * state.difficulty.timeScaling;
-        state.extrawavetime = maxwavespace;
+        state.extrawavetime = maxwavespace * state.difficulty.maxTimeScaling;
     }
 
     @Override

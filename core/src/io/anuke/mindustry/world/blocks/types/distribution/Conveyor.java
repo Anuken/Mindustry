@@ -185,6 +185,8 @@ public class Conveyor extends Block{
 	 * Size is 4 bytes, or one int.
 	 */
 	public static class ConveyorEntity extends TileEntity{
+		private static ItemPos writePos = new ItemPos();
+
 		LongArray convey = new LongArray();
 		float minitem = 1, elapsed;
 		
@@ -193,7 +195,7 @@ public class Conveyor extends Block{
 			stream.writeInt(convey.size);
 			
 			for(int i = 0; i < convey.size; i ++){
-				stream.writeInt(pos1.toInt(convey.get(i)));
+				stream.writeInt(writePos.toInt(convey.get(i)));
 			}
 		}
 		
@@ -204,7 +206,7 @@ public class Conveyor extends Block{
 			convey.ensureCapacity(amount);
 			
 			for(int i = 0; i < amount; i ++){
-				convey.add(pos1.getValue(stream.readInt()));
+				convey.add(writePos.getValue(stream.readInt()));
 			}
 			
 			sort(convey.items, convey.size);

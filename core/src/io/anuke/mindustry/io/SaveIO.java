@@ -13,6 +13,7 @@ import io.anuke.ucore.core.Settings;
 import java.io.*;
 
 import static io.anuke.mindustry.Vars.gwt;
+import static io.anuke.mindustry.Vars.logic;
 import static io.anuke.mindustry.Vars.saveDirectory;
 
 public class SaveIO{
@@ -135,6 +136,7 @@ public class SaveIO{
 	}
 
 	public static void load(InputStream is){
+		logic.reset();
 
 		DataInputStream stream;
 		
