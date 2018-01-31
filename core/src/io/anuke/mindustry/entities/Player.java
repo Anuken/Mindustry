@@ -1,7 +1,6 @@
 package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.graphics.Color;
-import io.anuke.mindustry.core.NetCommon;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
@@ -27,18 +26,18 @@ public class Player extends SyncEntity{
 
 	public String name = "name";
 	public boolean isAndroid;
+	public Color color = new Color();
 
-	//TODO send these.
-	public transient Weapon weaponLeft = Weapon.blaster;
-	public transient Weapon weaponRight = Weapon.blaster;
-	public transient Mech mech = Mech.standard;
+	public Weapon weaponLeft = Weapon.blaster;
+	public Weapon weaponRight = Weapon.blaster;
+	public Mech mech = Mech.standard;
 
 	public float angle;
-	public transient float targetAngle = 0f;
-	public transient boolean dashing = false;
+	public float targetAngle = 0f;
+	public boolean dashing = false;
 
-	public transient int clientid;
-	public transient boolean isLocal = false;
+	public int clientid;
+	public boolean isLocal = false;
 	
 	public Player(){
 		hitbox.setSize(5);
@@ -137,10 +136,19 @@ public class Player extends SyncEntity{
 	
 	@Override
 	public void update(){
-		if(!isLocal || isAndroid || ui.chatfrag.chatOpen()){
+		if(!isLocal || isAndroid){
 			if(!isLocal) interpolate();
 			return;
 		}
+
+		Tile tile = world.tileWorld(x, y);
+
+		//if player is in solid block
+		if(tile != null && ((tile.floor().liquid && tile.block() == Blocks.air) || tile.solid())){
+			damage(health+1); //die instantly
+		}
+
+		if(ui.chatfrag.chatOpen()) return;
 
 		dashing = Inputs.keyDown("dash");
 		
@@ -150,13 +158,6 @@ public class Player extends SyncEntity{
 			health ++;
 
 		health = Mathf.clamp(health, -1, maxhealth);
-
-		Tile tile = world.tileWorld(x, y);
-
-		//if player is in solid block
-		if(tile != null && ((tile.floor().liquid && tile.block() == Blocks.air) || tile.solid())){
-			damage(health+1); //die instantly
-		}
 		
 		vector.set(0, 0);
 
@@ -219,6 +220,7 @@ public class Player extends SyncEntity{
 		buffer.put(weaponLeft.id);
 		buffer.put(weaponRight.id);
 		buffer.put(isAndroid ? 1 : (byte)0);
+		buffer.putInt(Color.rgba8888(color));
 		buffer.putFloat(x);
 		buffer.putFloat(y);
 	}
@@ -232,6 +234,7 @@ public class Player extends SyncEntity{
 		weaponLeft = (Weapon) Upgrade.getByID(buffer.get());
 		weaponRight = (Weapon) Upgrade.getByID(buffer.get());
 		isAndroid = buffer.get() == 1;
+		color.set(buffer.getInt());
 		x = buffer.getFloat();
 		y = buffer.getFloat();
 	}
@@ -282,6 +285,6 @@ public class Player extends SyncEntity{
 	}
 
 	public Color getColor(){
-		return NetCommon.colorArray[id % NetCommon.colorArray.length];
+		return color;
 	}
 }

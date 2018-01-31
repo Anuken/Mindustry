@@ -73,7 +73,7 @@ public class ServerControl extends Module {
                 if(shuffle) {
                     Map previous = world.getMap();
                     Map map = previous;
-                    while(map == previous) map = world.maps().getDefaultMaps().random();
+                    while(map == previous || !map.visible) map = world.maps().getDefaultMaps().random();
 
                     info("Selected next map to be {0}.", map.name);
                     state.set(State.playing);
@@ -172,7 +172,7 @@ public class ServerControl extends Module {
                 return;
             }
 
-            netCommon.sendMessage("[pink][[Server]:[] " + arg[0]);
+            netCommon.sendMessage("[DARK_GRAY][[Server]:[] " + arg[0]);
             info("&lyServer: &lb{0}", arg[0]);
         }).mergeArgs();
 

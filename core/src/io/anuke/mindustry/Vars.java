@@ -3,6 +3,7 @@ package io.anuke.mindustry;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.Player;
@@ -79,6 +80,25 @@ public class Vars{
 	public static boolean snapCamera = true;
 	
 	public static final int tilesize = 8;
+
+	public static final Color[] playerColors = {
+			Color.valueOf("82759a"),
+			Color.valueOf("c0c1c5"),
+			Color.valueOf("fff0e7"),
+			Color.valueOf("7d2953"),
+			Color.valueOf("ff074e"),
+			Color.valueOf("ff072a"),
+			Color.valueOf("ff76a6"),
+			Color.valueOf("a95238"),
+			Color.valueOf("ffa108"),
+			Color.valueOf("feeb2c"),
+			Color.valueOf("ffcaa8"),
+			Color.valueOf("008551"),
+			Color.valueOf("00e339"),
+			Color.valueOf("222e53"),
+			Color.valueOf("4b5ef1"),
+			Color.valueOf("2cabfe"),
+	};
 
 	//server port
 	public static final int port = 6567;

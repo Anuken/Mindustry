@@ -119,7 +119,7 @@ public abstract class InputHandler extends InputAdapter{
 		
 		Tile tile = world.tile(x, y);
 		
-		if(tile == null) return false;
+		if(tile == null || (isSpawnPoint(tile) && (type.solidifes || type.solid))) return false;
 		
 		if(!type.isMultiblock() && control.tutorial().active() &&
 				control.tutorial().showBlock()){
@@ -142,7 +142,7 @@ public abstract class InputHandler extends InputAdapter{
 			for(int dx = 0; dx < type.width; dx ++){
 				for(int dy = 0; dy < type.height; dy ++){
 					Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-					if(other == null || other.block() != Blocks.air){
+					if(other == null || other.block() != Blocks.air || isSpawnPoint(other)){
 						return false;
 					}
 				}
@@ -152,8 +152,12 @@ public abstract class InputHandler extends InputAdapter{
 			if(tile.block() != type && type.canReplace(tile.block()) && tile.block().isMultiblock() == type.isMultiblock()){
 				return true;
 			}
-			return tile != null && tile.block() == Blocks.air;
+			return tile.block() == Blocks.air;
 		}
+	}
+
+	public boolean isSpawnPoint(Tile tile){
+		return tile != null && tile.x == world.getCore().x && tile.y == world.getCore().y - 2;
 	}
 	
 	public boolean validBreak(int x, int y){

@@ -1,14 +1,17 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.player;
 import static io.anuke.mindustry.Vars.ui;
 
 //TODO add port specification
@@ -29,6 +32,15 @@ public class HostDialog extends FloatingDialog{
                 Settings.save();
                 ui.listfrag.rebuild();
             }).grow().pad(8);
+
+            ImageButton button = t.addImageButton("white", 40, () -> {
+                new ColorPickDialog().show(color -> {
+                    player.color.set(color);
+                    Settings.putInt("color", Color.rgba8888(color));
+                    Settings.save();;
+                });
+            }).size(50f, 54f).get();
+            button.update(() -> button.getStyle().imageUpColor = player.getColor());
         }).width(w).height(70f).pad(4);
 
         content().row();

@@ -243,9 +243,9 @@ public class Renderer extends RendererModule{
 	void drawEnemyMarkers(){
 		Graphics.surface(indicatorSurface);
 		Draw.color(Color.RED);
-		for(Enemy enemy : enemyGroup.all()){
+		for(Enemy enemy : enemyGroup.all()) {
 
-			if(Tmp.r1.setSize(camera.viewportWidth, camera.viewportHeight).setCenter(camera.position.x, camera.position.y).overlaps(enemy.hitbox.getRect(enemy.x, enemy.y))){
+			if (Tmp.r1.setSize(camera.viewportWidth, camera.viewportHeight).setCenter(camera.position.x, camera.position.y).overlaps(enemy.hitbox.getRect(enemy.x, enemy.y))) {
 				continue;
 			}
 
@@ -253,6 +253,7 @@ public class Renderer extends RendererModule{
 			Angles.translation(angle, Unit.dp.scl(20f));
 			Draw.rect("enemyarrow", camera.position.x + Angles.x(), camera.position.y + Angles.y(), angle);
 		}
+
 		Draw.color();
 		Draw.alpha(0.4f);
 		Graphics.flushSurface();
@@ -374,6 +375,9 @@ public class Renderer extends RendererModule{
 			for(SpawnPoint spawn : world.getSpawns()){
 				Lines.dashCircle(spawn.start.worldx(), spawn.start.worldy(), enemyspawnspace);
 			}
+
+			Draw.color(Color.LIME);
+			Lines.poly(world.getSpawnX(), world.getSpawnY(), 4, 6f, Timers.time()*2f);
 			
 			if(input.breakMode == PlaceMode.holdDelete)
 				input.breakMode.draw(tilex, tiley, 0, 0);

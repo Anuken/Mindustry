@@ -2,6 +2,7 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.input.DefaultKeybinds;
@@ -111,7 +112,8 @@ public class Control extends Module{
 			"ip", "localhost",
 			"port", port+"",
 			"name", android || gwt ? "player" : UCore.getProperty("user.name"),
-			"servers", ""
+			"servers", "",
+			"color", Color.rgba8888(playerColors[9])
 		);
 
 		KeyBinds.load();
@@ -123,6 +125,7 @@ public class Control extends Module{
 		player = new Player();
 		player.name = Settings.getString("name");
 		player.isAndroid = android;
+		player.color.set(Settings.getInt("color"));
 		player.isLocal = true;
 
 		saves.load();

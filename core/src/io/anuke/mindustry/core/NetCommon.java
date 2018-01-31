@@ -1,6 +1,5 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
@@ -16,9 +15,6 @@ import io.anuke.ucore.modules.Module;
 import static io.anuke.mindustry.Vars.*;
 
 public class NetCommon extends Module {
-    public static final Color[] colorArray = {Color.ORANGE, Color.SCARLET, Color.LIME, Color.PURPLE,
-            Color.GOLD, Color.PINK, Color.SKY, Color.GOLD, Color.VIOLET,
-            Color.GREEN, Color.CORAL, Color.CYAN, Color.CHARTREUSE};
 
     public NetCommon(){
 
@@ -86,6 +82,8 @@ public class NetCommon extends Module {
     }
 
     public String colorizeName(int id, String name){
-        return name == null ? null : "[#" + colorArray[id % colorArray.length].toString().toUpperCase() + "]" + name;
+        Player player = playerGroup.getByID(id);
+        if(name == null || player == null) return null;
+        return "[#" + player.color.toString().toUpperCase() + "]" + name;
     }
 }

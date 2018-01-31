@@ -52,6 +52,7 @@ public class Packets {
         public int version;
         public String name;
         public boolean android;
+        public int color;
 
         @Override
         public void write(ByteBuffer buffer) {
@@ -59,6 +60,7 @@ public class Packets {
             buffer.put((byte)name.getBytes().length);
             buffer.put(name.getBytes());
             buffer.put(android ? (byte)1 : 0);
+            buffer.putInt(color);
         }
 
         @Override
@@ -69,6 +71,7 @@ public class Packets {
             buffer.get(bytes);
             name = new String(bytes);
             android = buffer.get() == 1;
+            color = buffer.getInt();
         }
     }
 

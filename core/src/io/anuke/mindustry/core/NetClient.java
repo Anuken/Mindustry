@@ -1,6 +1,7 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.core.GameState.State;
@@ -57,6 +58,7 @@ public class NetClient extends Module {
             ConnectPacket c = new ConnectPacket();
             c.name = player.name;
             c.android = android;
+            c.color = Color.rgba8888(player.color);
             Net.send(c, SendMode.tcp);
 
             Timers.runTask(dataTimeout, () -> {

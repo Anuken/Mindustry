@@ -115,8 +115,24 @@ public class KryoServer implements ServerProvider {
     }
 
     @Override
+    public KryoConnection getByID(int id){
+        for(int i = 0; i < connections.size(); i ++){
+            KryoConnection con = connections.get(i);
+            if(con.id == id){
+                return con;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
     public void kick(int connection, KickReason reason) {
         KryoConnection con = getByID(connection);
+        if(con == null){
+            Log.err("Cannot kick unknown player!");
+            return;
+        }
 
         KickPacket p = new KickPacket();
         p.reason = reason;
@@ -277,17 +293,6 @@ public class KryoServer implements ServerProvider {
         Gdx.app.postRunnable(() -> { throw new RuntimeException(e);});
     }
 
-    KryoConnection getByID(int id){
-        for(int i = 0; i < connections.size(); i ++){
-            KryoConnection con = connections.get(i);
-            if(con.id == id){
-                return con;
-            }
-        }
-
-        return null;
-    }
-
     KryoConnection getByKryoID(int id){
         for(int i = 0; i < connections.size(); i ++){
             KryoConnection con = connections.get(i);
@@ -407,7 +412,7 @@ public class KryoServer implements ServerProvider {
                 if (k == null) return;
 
                 if(message.equals("_ping_")){
-                    conn.send("---" + connections.size() + "|" + Vars.player.name);
+                    conn.send("---" + Vars.playerGroup.size() + "|" + (Vars.headless ? "Server" : Vars.player.name));
                     connections.remove(k);
                 }else {
 

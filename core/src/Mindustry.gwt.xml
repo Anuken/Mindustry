@@ -4,9 +4,11 @@
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.Tile" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.io.Maps" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.Player" />
-	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.types.Enemy" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.enemies.Enemy" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.Map" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.game.EnemySpawn" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.core.GameState" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.game.EventType" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.io.SaveFileVersion" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.resource.Recipe" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.net.Packets" />

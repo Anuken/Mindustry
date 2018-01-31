@@ -21,7 +21,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class Net{
-	public static final int version = 14;
+	public static final int version = 15;
 
 	private static boolean server;
 	private static boolean active;
@@ -93,6 +93,11 @@ public class Net{
 	/**Returns a list of all connections IDs.*/
 	public static Array<NetConnection> getConnections(){
 		return (Array<NetConnection>)serverProvider.getConnections();
+	}
+
+	/**Returns a connection by ID*/
+	public static NetConnection getConnection(int id){
+		return serverProvider.getByID(id);
 	}
 	
 	/**Send an object to all connected clients, or to the server if this is a client.*/
@@ -261,6 +266,8 @@ public class Net{
 		void close();
 		/**Return all connected users.*/
 		Array<? extends NetConnection> getConnections();
+		/**Returns a connection by ID.*/
+		NetConnection getByID(int id);
 		/**Kick a certain connection.*/
 		void kick(int connection, KickReason reason);
 		/**Returns the ping for a certain connection.*/
