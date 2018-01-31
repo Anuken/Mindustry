@@ -227,6 +227,8 @@ public class Net{
 		if(serverProvider != null) serverProvider.dispose();
 		clientProvider = null;
 		serverProvider = null;
+		server = false;
+		active = false;
 	}
 
 	/**Client implementation.*/
