@@ -105,7 +105,7 @@ public class Conveyor extends Block{
 			}
 			
 			boolean canmove = i == entity.convey.size - 1 || 
-					!(pos2.set(entity.convey.get(i + 1)).y - pos.y < itemSpace);
+					!(pos2.set(entity.convey.get(i + 1)).y - pos.y < itemSpace  * Math.max(Timers.delta(), 1f));
 
 			float minmove = 1f / (Short.MAX_VALUE - 2);
 
