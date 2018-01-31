@@ -396,7 +396,7 @@ public class KryoServer implements ServerProvider {
             connect.addressTCP = conn.getRemoteSocketAddress().toString();
             KryoConnection kn = new KryoConnection(lastconnection ++, connect.addressTCP, conn);
 
-            Log.info("&Recieved web connection: {0} {1}", kn.id, connect.addressTCP);
+            Log.info("&bRecieved web connection: {0} {1}", kn.id, connect.addressTCP);
             connections.add(kn);
         }
 

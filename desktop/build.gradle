@@ -149,6 +149,12 @@ task packrZip(type: Zip) {
     from "packr-out/"
     archiveName appName + "-" + getPlatform() + "-" + getDeployVersion() + ".zip"
     destinationDir(file("packr-export"))
+
+    doLast{
+        delete{
+            delete "null/"
+        }
+    }
 }
 
 eclipse {
