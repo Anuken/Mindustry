@@ -135,7 +135,7 @@ public class KryoServer implements ServerProvider {
         serverThread = new Thread(() -> {
             try{
                 server.run();
-            }catch (Exception e){
+            }catch (Throwable e){
                 if(!(e instanceof ClosedSelectorException)) handleException(e);
             }
         }, "Kryonet Server");
@@ -273,7 +273,7 @@ public class KryoServer implements ServerProvider {
         Log.info("Disposed server.");
     }
 
-    private void handleException(Exception e){
+    private void handleException(Throwable e){
         Gdx.app.postRunnable(() -> { throw new RuntimeException(e);});
     }
 
@@ -435,9 +435,7 @@ public class KryoServer implements ServerProvider {
         }
 
         @Override
-        public void onStart() {
-            Log.info("Web server started.");
-        }
+        public void onStart() {}
     }
 
 }

@@ -3,6 +3,8 @@
 	<source path="io/anuke/mindustry" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.Tile" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.io.Maps" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.Player" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.types.Enemy" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.Map" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.game.EnemySpawn" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.io.SaveFileVersion" />

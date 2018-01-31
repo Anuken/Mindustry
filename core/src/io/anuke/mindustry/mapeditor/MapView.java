@@ -11,13 +11,12 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import com.badlogic.gdx.utils.Array;
-import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.ui.GridImage;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.ucore.core.Core;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Pixmaps;
 import io.anuke.ucore.scene.Element;
@@ -27,6 +26,8 @@ import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
+
+import static io.anuke.mindustry.Vars.ui;
 
 public class MapView extends Element implements GestureListener{
 	private MapEditor editor;
@@ -47,6 +48,10 @@ public class MapView extends Element implements GestureListener{
 
 	public void setTool(EditorTool tool){
 		this.tool = tool;
+	}
+
+	public EditorTool getTool() {
+		return tool;
 	}
 
 	public void clearStack(){
@@ -85,7 +90,6 @@ public class MapView extends Element implements GestureListener{
 			stack.redo();
 			editor.updateTexture();
 		}
-
 	}
 
 	public MapView(MapEditor editor){
@@ -171,19 +175,20 @@ public class MapView extends Element implements GestureListener{
 	@Override
 	public void act(float delta){
 		super.act(delta);
-		
-		float size = Math.min(width, height);
-		offsetx = Mathf.clamp(offsetx, -size, size);
-		offsety = Mathf.clamp(offsety, -size, size);
-		
-		if(tool != EditorTool.zoom) return;
+
+		float ax = Inputs.getAxis("move_x");
+		float ay = Inputs.getAxis("move_y");
+		offsetx -= ax * 15f / zoom;
+		offsety -= ay * 15f / zoom;
+
+		if(ui.editor.hasPane()) return;
 		
 		zoom += Inputs.scroll()/10f * zoom;
 		clampZoom();
 	}
 	
 	private void clampZoom(){
-		zoom = Mathf.clamp(zoom, 0.4f, 6f);
+		zoom = Mathf.clamp(zoom, 0.4f, 8f);
 	}
 	
 	private GridPoint2 project(float x, float y){

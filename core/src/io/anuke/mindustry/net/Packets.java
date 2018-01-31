@@ -1,9 +1,13 @@
 package io.anuke.mindustry.net;
 
+import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.ReflectionException;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.entities.EntityGroup;
 
 import java.nio.ByteBuffer;
 
@@ -241,66 +245,29 @@ public class Packets {
         }
     }
 
-    public static class EnemySpawnPacket implements Packet{
-        public byte type, lane, tier;
-        public float x, y;
-        public short health;
-        public int id;
+    public static class EntitySpawnPacket implements Packet{
+        public SyncEntity entity;
+        public EntityGroup<?> group;
 
         @Override
-        public void write(ByteBuffer buffer) {
-            buffer.put(type);
-            buffer.put(lane);
-            buffer.put(tier);
-            buffer.putFloat(x);
-            buffer.putFloat(y);
-            buffer.putShort(health);
-            buffer.putInt(id);
+        public void write(ByteBuffer buffer){
+            buffer.put((byte)entity.getGroup().getID());
+            buffer.putInt(entity.id);
+            entity.writeSpawn(buffer);
         }
 
         @Override
         public void read(ByteBuffer buffer) {
-            type = buffer.get();
-            lane = buffer.get();
-            tier = buffer.get();
-            x = buffer.getFloat();
-            y = buffer.getFloat();
-            health = buffer.getShort();
-            id = buffer.getInt();
-        }
-    }
-
-    public static class PlayerSpawnPacket implements Packet{
-        public byte weaponleft, weaponright;
-        public boolean android;
-        public String name;
-        public float x, y;
-        public int id;
-
-        @Override
-        public void write(ByteBuffer buffer) {
-            buffer.put((byte)name.getBytes().length);
-            buffer.put(name.getBytes());
-            buffer.put(weaponleft);
-            buffer.put(weaponright);
-            buffer.put(android ? 1 : (byte)0);
-            buffer.putFloat(x);
-            buffer.putFloat(y);
-            buffer.putInt(id);
-        }
-
-        @Override
-        public void read(ByteBuffer buffer) {
-            byte nlength = buffer.get();
-            byte[] n = new byte[nlength];
-            buffer.get(n);
-            name = new String(n);
-            weaponleft = buffer.get();
-            weaponright = buffer.get();
-            android = buffer.get() == 1;
-            x = buffer.getFloat();
-            y = buffer.getFloat();
-            id = buffer.getInt();
+            byte groupid = buffer.get();
+            int id = buffer.getInt();
+            group = Entities.getGroup(groupid);
+            try {
+                entity = (SyncEntity) ClassReflection.newInstance(group.getType());
+                entity.id = id;
+                entity.readSpawn(buffer);
+            }catch (ReflectionException e){
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -467,15 +434,18 @@ public class Packets {
 
     public static class EntityRequestPacket implements Packet{
         public int id;
+        public byte group;
 
         @Override
         public void write(ByteBuffer buffer) {
             buffer.putInt(id);
+            buffer.put(group);
         }
 
         @Override
         public void read(ByteBuffer buffer) {
             id = buffer.getInt();
+            group = buffer.get();
         }
     }
 

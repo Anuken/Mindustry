@@ -281,4 +281,9 @@ public class Block{
 	public static Block getByID(int id){
 		return blocks.get(id);
 	}
+
+	@Override
+	public String toString(){
+		return name;
+	}
 }

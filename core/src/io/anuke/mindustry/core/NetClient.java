@@ -9,18 +9,13 @@ import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
-import io.anuke.mindustry.entities.enemies.EnemyType;
-import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.resource.Upgrade;
-import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BaseBulletType;
 import io.anuke.ucore.entities.Entities;
@@ -131,6 +126,7 @@ public class NetClient extends Module {
                     if (id != player.id) {
                         EntityRequestPacket req = new EntityRequestPacket();
                         req.id = id;
+                        req.group = groupid;
                         Net.send(req, SendMode.udp);
                     }
                     data.position(data.position() + SyncEntity.getWriteSize((Class<? extends SyncEntity>) group.getType()));
@@ -157,25 +153,18 @@ public class NetClient extends Module {
             ui.hudfrag.updateItems();
         });
 
-        Net.handleClient(EnemySpawnPacket.class, spawn -> {
+        Net.handleClient(EntitySpawnPacket.class, packet -> {
+            EntityGroup group = packet.group;
+
             //duplicates.
-            if (enemyGroup.getByID(spawn.id) != null ||
-                    recieved.contains(spawn.id) || dead.contains(spawn.id)) return;
+            if (group.getByID(packet.entity.id) != null ||
+                    recieved.contains(packet.entity.id) || dead.contains(packet.entity.id)) return;
 
-            recieved.add(spawn.id);
+            recieved.add(packet.entity.id);
 
-            Enemy enemy = new Enemy(EnemyType.getByID(spawn.type));
-            enemy.interpolator.target.set(spawn.x, spawn.y);
-            enemy.set(spawn.x, spawn.y);
-            enemy.tier = spawn.tier;
-            enemy.lane = spawn.lane;
-            enemy.id = spawn.id;
-            enemy.health = spawn.health;
-            enemy.add();
+            packet.entity.add();
 
-            Effects.effect(Fx.spawn, enemy);
-
-            Log.info("Recieved enemy {0}", spawn.id);
+            Log.info("Recieved entity {0}", packet.entity.id);
         });
 
         Net.handleClient(EnemyDeathPacket.class, spawn -> {
@@ -248,31 +237,6 @@ public class NetClient extends Module {
             if (player != null) {
                 player.remove();
             }
-
-            Platform.instance.updateRPC();
-        });
-
-        Net.handleClient(PlayerSpawnPacket.class, packet -> {
-            //duplicates.
-            if (enemyGroup.getByID(packet.id) != null ||
-                    recieved.contains(packet.id)) return;
-
-            recieved.add(packet.id);
-
-            Player player = new Player();
-            player.x = packet.x;
-            player.y = packet.y;
-            player.isAndroid = packet.android;
-            player.name = packet.name;
-            player.id = packet.id;
-            player.weaponLeft = (Weapon) Upgrade.getByID(packet.weaponleft);
-            player.weaponRight = (Weapon) Upgrade.getByID(packet.weaponright);
-
-            player.interpolator.last.set(player.x, player.y);
-            player.interpolator.target.set(player.x, player.y);
-            player.add();
-
-            Log.info("Recieved player {0}", packet.id);
 
             Platform.instance.updateRPC();
         });

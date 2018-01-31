@@ -17,7 +17,7 @@ import java.nio.ByteBuffer;
 import static io.anuke.mindustry.Vars.enemyGroup;
 
 public class Enemy extends SyncEntity {
-	public final EnemyType type;
+	public EnemyType type;
 
 	public Timer timer = new Timer(5);
 	public float idletime = 0f;
@@ -37,6 +37,9 @@ public class Enemy extends SyncEntity {
 	public Enemy(EnemyType type){
 		this.type = type;
 	}
+
+	/**internal constructor used for deserialization, DO NOT USE*/
+	public Enemy(){}
 
 	@Override
 	public void update(){
@@ -91,6 +94,26 @@ public class Enemy extends SyncEntity {
 	@Override
 	public Enemy add(){
 		return add(enemyGroup);
+	}
+
+	@Override
+	public void writeSpawn(ByteBuffer buffer) {
+		buffer.put(type.id);
+		buffer.put((byte)lane);
+		buffer.put((byte)tier);
+		buffer.putFloat(x);
+		buffer.putFloat(y);
+		buffer.putShort((short)health);
+	}
+
+	@Override
+	public void readSpawn(ByteBuffer buffer) {
+		type = EnemyType.getByID(buffer.get());
+		lane = buffer.get();
+		tier = buffer.get();
+		x = buffer.getFloat();
+		y = buffer.getFloat();
+		health = buffer.getShort();
 	}
 
 	@Override

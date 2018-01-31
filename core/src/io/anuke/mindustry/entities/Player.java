@@ -7,6 +7,7 @@ import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.Mech;
+import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
@@ -66,33 +67,29 @@ public class Player extends SyncEntity{
 	
 	@Override
 	public void onDeath(){
+		if(!isLocal) return;
 
-		if(isLocal){
-			remove();
-			if(Net.active()){
-				NetEvents.handlePlayerDeath();
-			}
-
-			Effects.effect(Fx.explosion, this);
-			Effects.shake(4f, 5f, this);
-			Effects.sound("die", this);
+		remove();
+		if(Net.active()){
+			NetEvents.handlePlayerDeath();
 		}
 
-		//TODO respawning doesn't work properly for multiplayer at all
-		if(isLocal) {
-			control.setRespawnTime(respawnduration);
-			ui.hudfrag.fadeRespawn(true);
-		}
+		Effects.effect(Fx.explosion, this);
+		Effects.shake(4f, 5f, this);
+		Effects.sound("die", this);
+
+		control.setRespawnTime(respawnduration);
+		ui.hudfrag.fadeRespawn(true);
 	}
 
+	/**called when a remote player death event is recieved*/
 	public void doRespawn(){
 		dead = true;
 		Effects.effect(Fx.explosion, this);
 		Effects.shake(4f, 5f, this);
 		Effects.sound("die", this);
 
-		set(-9999, -9999);
-		Timers.run(respawnduration, () -> {
+		Timers.run(respawnduration + 5f, () -> {
 			heal();
 			set(world.getSpawnX(), world.getSpawnY());
 		});
@@ -104,7 +101,7 @@ public class Player extends SyncEntity{
             angle = Mathf.lerpAngDelta(angle, targetAngle, 0.2f);
         }
 
-		if((debug && (!showPlayer || !showUI)) || (isAndroid && isLocal) ) return;
+		if((debug && (!showPlayer || !showUI)) || (isAndroid && isLocal) || dead) return;
         boolean snap = snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate") && isLocal;
 
 		String part = isAndroid ? "ship" : "mech";
@@ -140,7 +137,7 @@ public class Player extends SyncEntity{
 	@Override
 	public void update(){
 		if(!isLocal || isAndroid || ui.chatfrag.chatOpen()){
-			if(!isDead() && !isLocal) interpolate();
+			if(!isLocal) interpolate();
 			return;
 		}
 
@@ -213,6 +210,30 @@ public class Player extends SyncEntity{
     public String toString() {
         return "Player{" + id + ", android=" + isAndroid + ", local=" + isLocal + ", " + x + ", " + y + "}\n";
     }
+
+	@Override
+	public void writeSpawn(ByteBuffer buffer) {
+		buffer.put((byte)name.getBytes().length);
+		buffer.put(name.getBytes());
+		buffer.put(weaponLeft.id);
+		buffer.put(weaponRight.id);
+		buffer.put(isAndroid ? 1 : (byte)0);
+		buffer.putFloat(x);
+		buffer.putFloat(y);
+	}
+
+	@Override
+	public void readSpawn(ByteBuffer buffer) {
+		byte nlength = buffer.get();
+		byte[] n = new byte[nlength];
+		buffer.get(n);
+		name = new String(n);
+		weaponLeft = (Weapon) Upgrade.getByID(buffer.get());
+		weaponRight = (Weapon) Upgrade.getByID(buffer.get());
+		isAndroid = buffer.get() == 1;
+		x = buffer.getFloat();
+		y = buffer.getFloat();
+	}
 
 	@Override
 	public void write(ByteBuffer data) {

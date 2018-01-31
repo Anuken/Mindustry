@@ -1,11 +1,9 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
-import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
@@ -20,7 +18,6 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
@@ -95,18 +92,18 @@ public class NetServer extends Module{
             if (player == null) return;
 
             player.add();
-            netCommon.sendMessage("[accent]" + Bundles.format("text.server.connected", player.name));
+            netCommon.sendMessage("[accent]" + player.name + " has connected.");
         });
 
         Net.handleServer(Disconnect.class, (id, packet) -> {
             Player player = connections.get(packet.id);
 
             if (player == null) {
-                Gdx.app.error("Mindustry", "Unknown client has disconnected (ID=" + id + ")");
+                Log.err("Unknown client has disconnected (ID={0})", id);
                 return;
             }
 
-            netCommon.sendMessage("[accent]" + Bundles.format("text.server.disconnected", player.name));
+            netCommon.sendMessage("[accent]" + player.name + " has disconnected.");
             player.remove();
 
             DisconnectPacket dc = new DisconnectPacket();
@@ -171,29 +168,12 @@ public class NetServer extends Module{
         Net.handleServer(EntityRequestPacket.class, (cid, packet) -> {
             int id = packet.id;
             int dest = cid;
-            if (playerGroup.getByID(id) != null) {
-                Player player = playerGroup.getByID(id);
-                PlayerSpawnPacket p = new PlayerSpawnPacket();
-                p.x = player.x;
-                p.y = player.y;
-                p.id = player.id;
-                p.name = player.name;
-                p.weaponleft = player.weaponLeft.id;
-                p.weaponright = player.weaponRight.id;
-                p.android = player.isAndroid;
-
+            EntityGroup group = Entities.getGroup(packet.group);
+            if(group.getByID(id) != null){
+                EntitySpawnPacket p = new EntitySpawnPacket();
+                p.entity = (SyncEntity)group.getByID(id);
                 Net.sendTo(dest, p, SendMode.tcp);
-            } else if (enemyGroup.getByID(id) != null) {
-                Enemy enemy = enemyGroup.getByID(id);
-                EnemySpawnPacket e = new EnemySpawnPacket();
-                e.x = enemy.x;
-                e.y = enemy.y;
-                e.id = enemy.id;
-                e.tier = (byte) enemy.tier;
-                e.lane = (byte) enemy.lane;
-                e.type = enemy.type.id;
-                e.health = (short) enemy.health;
-                Net.sendTo(dest, e, SendMode.tcp);
+                return;
             }
         });
 

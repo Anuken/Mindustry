@@ -1,5 +1,6 @@
 package io.anuke.mindustry.mapeditor;
 
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -13,9 +14,12 @@ import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.SpecialBlocks;
 import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Pixmaps;
+import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.label;
@@ -37,6 +41,7 @@ public class MapEditorDialog extends Dialog{
 	private MapLoadDialog loadDialog;
 	private MapSaveDialog saveDialog;
 	private MapResizeDialog resizeDialog;
+	private ScrollPane pane;
 	private FileChooser openFile, saveFile;
 	private boolean saved = false;
 	
@@ -138,6 +143,17 @@ public class MapEditorDialog extends Dialog{
 		build.begin(this);
 		build();
 		build.end();
+
+		tapped(() -> {
+			Element e = getScene().hit(Graphics.mouse().x, Graphics.mouse().y, true);
+			if(e == null || !e.isDescendantOf(pane)) getScene().setScrollFocus(null);
+		});
+
+		update(() -> {
+			if(getScene().getKeyboardFocus() == this){
+				doInput();
+			}
+		});
 		
 		shown(() -> {
 			saved = true;
@@ -146,9 +162,7 @@ public class MapEditorDialog extends Dialog{
 			Core.scene.setScrollFocus(view);
 			view.clearStack();
 
-			Timers.runTask(3f, () -> {
-				Platform.instance.updateRPC();
-			});
+			Timers.runTask(10f, Platform.instance::updateRPC);
 		});
 
 		hidden(() -> Platform.instance.updateRPC());
@@ -172,6 +186,10 @@ public class MapEditorDialog extends Dialog{
 			}
 			i++;
 		}
+	}
+
+	public boolean hasPane(){
+		return getScene().getScrollFocus() == pane;
 	}
 	
 	public void build(){
@@ -247,18 +265,20 @@ public class MapEditorDialog extends Dialog{
 
 				ImageButton undo = tools.addImageButton("icon-undo", 16*2f, () -> view.undo()).get();
 				ImageButton redo = tools.addImageButton("icon-redo", 16*2f, () -> view.redo()).get();
-                tools.addImageButton("icon-grid", "toggle", 16*2f, () -> view.setGrid(!view.isGrid())).get();
+				ImageButton grid = tools.addImageButton("icon-grid", "toggle", 16*2f, () -> view.setGrid(!view.isGrid())).get();
 
 				undo.setDisabled(() -> !view.getStack().canUndo());
 				redo.setDisabled(() -> !view.getStack().canRedo());
 
 				undo.update(() -> undo.getImage().setColor(undo.isDisabled() ? Color.GRAY : Color.WHITE));
 				redo.update(() -> redo.getImage().setColor(redo.isDisabled() ? Color.GRAY : Color.WHITE));
+				grid.update(() -> grid.setChecked(view.isGrid()));
 				
 				for(EditorTool tool : EditorTool.values()){
 					ImageButton button = new ImageButton("icon-" + tool.name(), "toggle");
 					button.clicked(() -> view.setTool(tool));
 					button.resizeImage(16*2f);
+					button.update(() -> button.setChecked(view.getTool() == tool));
 					group.add(button);
 					if (tool == EditorTool.pencil)
 						button.setChecked(true);
@@ -283,9 +303,8 @@ public class MapEditorDialog extends Dialog{
 				row();
 
 				new table("button"){{
-					get().addCheck("$text.oregen", b -> {
-						editor.getMap().oreGen = b;
-					}).update(c -> c.setChecked(editor.getMap().oreGen)).padTop(3).padBottom(3);
+					get().addCheck("$text.oregen", b -> editor.getMap().oreGen = b)
+							.update(c -> c.setChecked(editor.getMap().oreGen)).padTop(3).padBottom(3);
 				}}.growX().padBottom(-6).end();
 
 				row();
@@ -296,6 +315,36 @@ public class MapEditorDialog extends Dialog{
 				
 			}}.right().growY().end();
 		}}.grow().end();
+	}
+
+	private void doInput(){
+		//tool select
+		for(int i = 0; i < EditorTool.values().length; i ++){
+			int code = i == 0 ? 5 : i;
+			if(Inputs.keyTap("weapon_" + code)){
+				view.setTool(EditorTool.values()[i]);
+				break;
+			}
+		}
+
+		//ctrl keys (undo, redo, save)
+		if(Inputs.keyDown(Keys.CONTROL_LEFT)){
+			if(Inputs.keyTap(Keys.Z)){
+				view.undo();
+			}
+
+			if(Inputs.keyTap(Keys.Y)){
+				view.redo();
+			}
+
+			if(Inputs.keyTap(Keys.S)){
+				saveDialog.save();
+			}
+
+			if(Inputs.keyTap(Keys.G)){
+				view.setGrid(!view.isGrid());
+			}
+		}
 	}
 	
 	private boolean verifySize(Pixmap pix){
@@ -344,7 +393,7 @@ public class MapEditorDialog extends Dialog{
 	
 	private void addBlockSelection(Table table){
 		Table content = new Table();
-		ScrollPane pane = new ScrollPane(content, "volume");
+		pane = new ScrollPane(content, "volume");
 		pane.setScrollingDisabled(true, false);
 		pane.setFadeScrollBars(false);
 		pane.setOverscroll(true, false);

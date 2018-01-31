@@ -18,8 +18,6 @@ public class Registrator {
             BreakPacket.class,
             StateSyncPacket.class,
             BlockSyncPacket.class,
-            EnemySpawnPacket.class,
-            PlayerSpawnPacket.class,
             BulletPacket.class,
             EnemyDeathPacket.class,
             BlockUpdatePacket.class,
@@ -38,7 +36,8 @@ public class Registrator {
             FriendlyFireChangePacket.class,
             PlayerDeathPacket.class,
             CustomMapPacket.class,
-            MapAckPacket.class
+            MapAckPacket.class,
+            EntitySpawnPacket.class,
     };
     private static ObjectIntMap<Class<?>> ids = new ObjectIntMap<>();
 

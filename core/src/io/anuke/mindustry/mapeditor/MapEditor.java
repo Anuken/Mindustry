@@ -11,6 +11,7 @@ import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.graphics.Pixmaps;
+import io.anuke.ucore.util.Log;
 
 public class MapEditor{
 	public static final int[] validMapSizes = {128, 256, 512};
@@ -103,6 +104,7 @@ public class MapEditor{
 	}
 	
 	public void setDrawBlock(Block block){
+		Log.info("Setting draw block {0}", block);
 		this.drawBlock = block;
 		pixmap.setColor(ColorMapper.getColor(block));
 	}
