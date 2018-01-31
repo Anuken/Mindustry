@@ -67,6 +67,8 @@ public class KryoServer implements ServerProvider {
                 c.id = kn.id;
                 c.addressTCP = connection.getRemoteAddressTCP().toString();
 
+                Log.info("&bRecieved connection: {0} {1}", c.id, c.addressTCP);
+
                 connections.add(kn);
                 Gdx.app.postRunnable(() ->  Net.handleServerReceived(kn.id, c));
             }
@@ -79,6 +81,8 @@ public class KryoServer implements ServerProvider {
 
                 Disconnect c = new Disconnect();
                 c.id = k.id;
+
+                Log.info("&bLost connection: {0}", k.id);
 
                 Gdx.app.postRunnable(() -> Net.handleServerReceived(k.id, c));
             }
@@ -390,18 +394,22 @@ public class KryoServer implements ServerProvider {
         public void onOpen(WebSocket conn, ClientHandshake handshake) {
             Connect connect = new Connect();
             connect.addressTCP = conn.getRemoteSocketAddress().toString();
-            Log.info("Websocket connection recieved: {0}", connect.addressTCP);
             KryoConnection kn = new KryoConnection(lastconnection ++, connect.addressTCP, conn);
+
+            Log.info("&Recieved web connection: {0} {1}", kn.id, connect.addressTCP);
             connections.add(kn);
         }
 
         @Override
         public void onClose(WebSocket conn, int code, String reason, boolean remote) {
             if (conn == null) return;
+
             KryoConnection k = getBySocket(conn);
             if(k == null) return;
+
             Disconnect disconnect = new Disconnect();
             disconnect.id = k.id;
+            Log.info("&bLost web connection: {0}", k.id);
             Net.handleServerReceived(k.id, disconnect);
         }
 
@@ -415,7 +423,6 @@ public class KryoServer implements ServerProvider {
                     conn.send("---" + Vars.playerGroup.size() + "|" + (Vars.headless ? "Server" : Vars.player.name));
                     connections.remove(k);
                 }else {
-
                     byte[] out = Base64Coder.decode(message);
                     ByteBuffer buffer = ByteBuffer.wrap(out);
                     Object o = serializer.read(buffer);
@@ -428,7 +435,7 @@ public class KryoServer implements ServerProvider {
 
         @Override
         public void onError(WebSocket conn, Exception ex) {
-            Log.info("WS error:");
+            Log.info("WS error: ");
             ex.printStackTrace();
             if(ex instanceof BindException){
                 Net.closeServer();

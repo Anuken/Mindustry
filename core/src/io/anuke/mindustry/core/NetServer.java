@@ -47,7 +47,7 @@ public class NetServer extends Module{
                 return;
             }
 
-            Log.info("Sending world data to client (ID = {0})", id);
+            Log.info("Sending data to player '{0}' / {1}", packet.name, id);
 
             Player player = new Player();
             player.clientid = id;
@@ -93,6 +93,7 @@ public class NetServer extends Module{
             if (player == null) return;
 
             player.add();
+            Log.info("&y{0} has connected.", player.name);
             netCommon.sendMessage("[accent]" + player.name + " has connected.");
         });
 
@@ -104,6 +105,7 @@ public class NetServer extends Module{
                 return;
             }
 
+            Log.info("&y{0} has disconnected.", player.name);
             netCommon.sendMessage("[accent]" + player.name + " has disconnected.");
             player.remove();
 

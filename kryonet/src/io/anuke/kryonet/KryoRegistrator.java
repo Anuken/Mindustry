@@ -19,6 +19,8 @@ public class KryoRegistrator {
     public static final int fakeLagAmount = 500;
 
     static{
+        Log.set(Log.LEVEL_ERROR);
+
         Log.setLogger(new Logger(){
             public void log (int level, String category, String message, Throwable ex) {
                 StringBuilder builder = new StringBuilder(256);
@@ -26,7 +28,7 @@ public class KryoRegistrator {
                 if(headless)
                     builder.append(ColorCodes.BLUE);
 
-                builder.append("Net: ");
+                builder.append("Net Error: ");
 
                 builder.append(message);
 
