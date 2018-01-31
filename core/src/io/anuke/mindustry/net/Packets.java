@@ -265,6 +265,7 @@ public class Packets {
                 entity = (SyncEntity) ClassReflection.newInstance(group.getType());
                 entity.id = id;
                 entity.readSpawn(buffer);
+                entity.interpolator.target.set(entity.x, entity.y);
             }catch (ReflectionException e){
                 throw new RuntimeException(e);
             }

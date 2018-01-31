@@ -145,12 +145,12 @@ public class MapEditorDialog extends Dialog{
 		build.end();
 
 		tapped(() -> {
-			Element e = getScene().hit(Graphics.mouse().x, Graphics.mouse().y, true);
-			if(e == null || !e.isDescendantOf(pane)) getScene().setScrollFocus(null);
+			Element e = Core.scene.hit(Graphics.mouse().x, Graphics.mouse().y, true);
+			if(e == null || !e.isDescendantOf(pane)) Core.scene.setScrollFocus(null);
 		});
 
 		update(() -> {
-			if(getScene().getKeyboardFocus() == this){
+			if(Core.scene != null && Core.scene.getKeyboardFocus() == this){
 				doInput();
 			}
 		});
@@ -189,7 +189,7 @@ public class MapEditorDialog extends Dialog{
 	}
 
 	public boolean hasPane(){
-		return getScene().getScrollFocus() == pane;
+		return Core.scene.getScrollFocus() == pane;
 	}
 	
 	public void build(){

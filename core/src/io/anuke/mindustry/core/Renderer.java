@@ -226,7 +226,7 @@ public class Renderer extends RendererModule{
 
         Draw.tscl(0.25f/2);
 	    for(Player player : playerGroup.all()){
-	       if(!player.isLocal){
+	       if(!player.isLocal && !player.isDead()){
 	        	layout.setText(Core.font, player.name);
 				Draw.color(0f, 0f, 0f, 0.3f);
 				Draw.rect("blank", player.x, player.y + 8 - layout.height/2, layout.width + 2, layout.height + 2);

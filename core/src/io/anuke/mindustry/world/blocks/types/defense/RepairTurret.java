@@ -30,7 +30,7 @@ public class RepairTurret extends PowerTurret{
 		list.add("[powerinfo]Power Capacity: " + (int)powerCapacity);
 		list.add("[powerinfo]Power/shot: " + Strings.toFixed(powerUsed, 1));
 		list.add("[turretinfo]Range: " + (int)range);
-		list.add("[turretinfo]Repairs/Second: " + Strings.toFixed(60f/reload, 1));
+		list.add("[turretinfo]Repairs/Second: " + Strings.toFixed(60f/reload * repairFrac * 100, 1) + "%");
 	}
 	
 	@Override

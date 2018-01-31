@@ -8,11 +8,14 @@ import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.ScrollPane;
+import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -72,9 +75,27 @@ public class PlayerListFragment implements Fragment{
             Table button = new Table("button");
             button.left();
             button.margin(5).marginBottom(10);
-            BorderImage image = new BorderImage(Draw.region(player.isAndroid ? "ship-standard" : "mech-standard"), 3f);
-            button.add(image).size(h);
-            button.add(player.name).pad(10);
+
+            Stack stack = new Stack();
+            BorderImage image = new BorderImage(Draw.region(player.isAndroid ? "ship-standard" : "mech-standard-icon"), 3f);
+
+            stack.add(image);
+
+            if(!player.isAndroid) {
+
+                stack.add(new Element(){
+                    public void draw(){
+                        float s = getWidth() / 12f;
+                        for(int i : Mathf.signs){
+                            Draw.rect((i < 0 ? player.weaponLeft.name : player.weaponRight.name)
+                                    + "-equip", x + s * 6 + i * 3*s, y + s*6 + 2*s, -8*s*i, 8*s);
+                        }
+                    }
+                });
+            }
+
+            button.add(stack).size(h);
+            button.add("[#" + player.getColor().toString().toUpperCase() + "]" + player.name).pad(10);
             button.add().grow();
 
             if(Net.server() && !player.isLocal){

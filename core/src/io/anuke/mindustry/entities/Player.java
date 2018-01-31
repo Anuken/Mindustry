@@ -62,7 +62,7 @@ public class Player extends SyncEntity{
 				return false;
 			}
 		}
-		return super.collides(other) && !isAndroid;
+		return !isDead() && super.collides(other) && !isAndroid;
 	}
 	
 	@Override
@@ -92,6 +92,7 @@ public class Player extends SyncEntity{
 		Timers.run(respawnduration + 5f, () -> {
 			heal();
 			set(world.getSpawnX(), world.getSpawnY());
+			interpolator.target.set(x, y);
 		});
 	}
 	
