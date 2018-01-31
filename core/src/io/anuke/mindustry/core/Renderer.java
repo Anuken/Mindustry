@@ -211,10 +211,6 @@ public class Renderer extends RendererModule{
 		super.resize(width, height);
 		control.input().resetCursor();
 		camera.position.set(player.x, player.y, 0);
-
-		int scale = Settings.getBool("pixelate") ? Core.cameraScale : 1;
-		Graphics.getEffects1().setScale(scale);
-		Graphics.getEffects2().setScale(scale);
 	}
 	
 	public void clearTiles(){

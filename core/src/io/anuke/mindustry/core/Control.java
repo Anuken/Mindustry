@@ -113,7 +113,7 @@ public class Control extends Module{
 			"port", port+"",
 			"name", android || gwt ? "player" : UCore.getProperty("user.name"),
 			"servers", "",
-			"color", Color.rgba8888(playerColors[9])
+			"color", Color.rgba8888(playerColors[8])
 		);
 
 		KeyBinds.load();
