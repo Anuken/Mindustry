@@ -175,8 +175,8 @@ public class NetServer extends Module{
             if(group.getByID(id) != null){
                 EntitySpawnPacket p = new EntitySpawnPacket();
                 p.entity = (SyncEntity)group.getByID(id);
+                p.group = group;
                 Net.sendTo(dest, p, SendMode.tcp);
-                return;
             }
         });
 

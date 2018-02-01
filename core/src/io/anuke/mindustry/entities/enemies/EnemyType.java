@@ -149,7 +149,7 @@ public class EnemyType {
 
         Tile core = world.getCore();
 
-        if(enemy.idletime > maxIdleLife){
+        if(enemy.idletime > maxIdleLife && enemy.node >= 0){
             enemy.onDeath();
             return;
         }

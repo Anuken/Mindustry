@@ -55,7 +55,7 @@ public class DebugFragment implements Fragment {
                    netClient.clearRecieved();
                });
                row();
-               new button("spawn", () -> new Enemy(EnemyTypes.standard).set(player.x, player.y).add());
+               new button("spawn", () -> new Enemy(EnemyTypes.blast).set(player.x, player.y).add());
                row();
                new button("stuff", () -> netClient.test());
                row();

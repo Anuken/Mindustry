@@ -34,6 +34,7 @@ public class Player extends SyncEntity{
 
 	public float angle;
 	public float targetAngle = 0f;
+	public float stucktime = 0f;
 	public boolean dashing = false;
 
 	public int clientid;
@@ -145,6 +146,12 @@ public class Player extends SyncEntity{
 
 		//if player is in solid block
 		if(tile != null && ((tile.floor().liquid && tile.block() == Blocks.air) || tile.solid())){
+			stucktime += Timers.delta();
+		}else{
+			stucktime = 0f;
+		}
+
+		if(stucktime > 10f){
 			damage(health+1); //die instantly
 		}
 

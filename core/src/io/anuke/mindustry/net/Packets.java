@@ -254,7 +254,7 @@ public class Packets {
 
         @Override
         public void write(ByteBuffer buffer){
-            buffer.put((byte)entity.getGroup().getID());
+            buffer.put((byte)group.getID());
             buffer.putInt(entity.id);
             entity.writeSpawn(buffer);
         }
