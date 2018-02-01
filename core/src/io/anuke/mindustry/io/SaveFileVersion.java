@@ -1,5 +1,7 @@
 package io.anuke.mindustry.io;
 
+import io.anuke.mindustry.game.Difficulty;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -16,7 +18,7 @@ public abstract class SaveFileVersion {
         byte mode = stream.readByte(); //read the gamemode
         byte map = stream.readByte(); //read the map
         int wave = stream.readInt(); //read the wave
-        return new SaveMeta(version, time, mode, map, wave);
+        return new SaveMeta(version, time, mode, map, wave, Difficulty.normal);
     }
 
     public abstract void read(DataInputStream stream) throws IOException;

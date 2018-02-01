@@ -13,7 +13,7 @@ import java.util.Locale;
 import static io.anuke.mindustry.Vars.ui;
 
 public class LanguageDialog extends FloatingDialog{
-    private Locale[] locales = {Locale.ENGLISH, new Locale("fr", "FR"), new Locale("ru"), new Locale("pl", "PL"),
+    private Locale[] locales = {new Locale("en"), new Locale("fr", "FR"), new Locale("ru"), new Locale("pl", "PL"),
             new Locale("es", "LA"), new Locale("pt", "BR"), new Locale("ko"), new Locale("in", "ID")};
 
     public LanguageDialog(){

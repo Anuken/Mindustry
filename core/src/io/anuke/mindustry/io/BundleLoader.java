@@ -12,7 +12,7 @@ import java.util.Locale;
 import static io.anuke.mindustry.Vars.headless;
 
 public class BundleLoader {
-    private static boolean externalBundle = false;
+    private static final boolean externalBundle = false;
 
     public static void load(){
         Settings.defaults("locale", "default");

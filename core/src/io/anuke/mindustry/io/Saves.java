@@ -4,6 +4,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.core.Settings;
@@ -137,6 +138,10 @@ public class Saves {
 
         public int getWave(){
             return meta.wave;
+        }
+
+        public Difficulty getDifficulty(){
+            return meta.difficulty;
         }
 
         public GameMode getMode(){

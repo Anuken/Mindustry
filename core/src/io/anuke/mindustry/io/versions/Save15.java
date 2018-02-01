@@ -8,6 +8,7 @@ import io.anuke.mindustry.entities.enemies.EnemyType;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.io.SaveFileVersion;
+import io.anuke.mindustry.io.SaveMeta;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
@@ -30,6 +31,16 @@ public class Save15 extends SaveFileVersion {
 
     public Save15(){
         super(15);
+    }
+
+    public SaveMeta getData(DataInputStream stream) throws IOException{
+        long time = stream.readLong(); //read last saved time
+        byte mode = stream.readByte(); //read the gamemode
+        byte map = stream.readByte(); //read the map
+        int wave = stream.readInt(); //read the wave
+        stream.readFloat(); //wave time
+        byte difficulty = stream.readByte();
+        return new SaveMeta(version, time, mode, map, wave, Difficulty.values()[difficulty]);
     }
 
     @Override
@@ -240,9 +251,9 @@ public class Save15 extends SaveFileVersion {
                 stream.writeByte(control.upgrades().getWeapons().get(i).id); //weapon ordinal
             }
         }else{
-            stream.writeFloat(0);
-            stream.writeFloat(0);
-            stream.writeInt(0);
+            stream.writeFloat(world.getSpawnX());
+            stream.writeFloat(world.getSpawnY());
+            stream.writeInt(150);
             stream.writeByte(0);
         }
 
