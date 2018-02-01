@@ -113,15 +113,22 @@ public class SettingsMenuDialog extends SettingsDialog{
 		game.sliderPref("sensitivity", 100, 10, 300, i -> i + "%");
 		game.sliderPref("saveinterval", 90, 10, 5*120, i -> Bundles.format("setting.seconds", i));
 
-		graphics.checkPref("fps", false);
-		graphics.checkPref("vsync", true, b -> Gdx.graphics.setVSync(b));
-		graphics.checkPref("fullscreen", false, b -> {
-			if(b){
+		if(!android && !gwt) {
+			graphics.checkPref("vsync", true, b -> Gdx.graphics.setVSync(b));
+			graphics.checkPref("fullscreen", false, b -> {
+				if (b) {
+					Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+				} else {
+					Gdx.graphics.setWindowedMode(600, 480);
+				}
+			});
+
+			Gdx.graphics.setVSync(Settings.getBool("vsync"));
+			if(Settings.getBool("fullscreen")){
 				Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
-			}else{
-				Gdx.graphics.setWindowedMode(600, 480);
 			}
-		});
+		}
+		graphics.checkPref("fps", false);
 		graphics.checkPref("lasers", true);
 		graphics.checkPref("indicators", true);
 		graphics.checkPref("healthbars", true);
@@ -140,11 +147,6 @@ public class SettingsMenuDialog extends SettingsDialog{
 			}
 			renderer.setPixelate(b);
 		});
-
-		Gdx.graphics.setVSync(Settings.getBool("vsync"));
-		if(!gwt && Settings.getBool("fullscreen")){
-			Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
-		}
 	}
 
 	private void back(){
