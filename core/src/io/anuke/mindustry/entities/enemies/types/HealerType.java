@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities.enemies.types;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
@@ -22,7 +23,6 @@ public class HealerType extends EnemyType {
 
 	public HealerType() {
 		super("healerenemy");
-		
 		speed = 0.25f;
 		reload = 10;
 		health = 200;
@@ -33,6 +33,7 @@ public class HealerType extends EnemyType {
 		stopNearCore = true;
 		mass = 1.1f;
 	}
+
 	
 	@Override
 	public void behavior(Enemy enemy){
@@ -55,6 +56,7 @@ public class HealerType extends EnemyType {
 			updateShooting(enemy);
 		}
 	}
+
 	
 	@Override
 	public void updateShooting(Enemy enemy){
@@ -69,19 +71,22 @@ public class HealerType extends EnemyType {
 	@Override
 	public void drawOver(Enemy enemy){
 		Enemy target = (Enemy)enemy.target;
-		
+
 		if(target == null) return;
-		
+
 		Angles.translation(enemy.angleTo(target), 5f);
-		
-		Graphics.shader();
+
+		Shaders.outline.color.set(Color.CLEAR);
+		Shaders.outline.apply();
+
 		if(target.health < target.maxhealth){
 			Draw.color(Hue.rgb(138, 244, 138, (MathUtils.sin(Timers.time()) + 1f) / 13f));
 			Draw.alpha(0.9f);
 			Shapes.laser("laser", "laserend", enemy.x + Angles.x(), enemy.y + Angles.y(), target.x - Angles.x()/1.5f, target.y - Angles.y()/1.5f);
 			Draw.color();
 		}
-		Graphics.shader(Shaders.outline);
+
+		Graphics.flush();
 	}
 	
 	void explode(Enemy enemy){
