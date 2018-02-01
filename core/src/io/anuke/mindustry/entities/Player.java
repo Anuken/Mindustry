@@ -102,7 +102,7 @@ public class Player extends SyncEntity{
             angle = Mathf.lerpAngDelta(angle, targetAngle, 0.2f);
         }
 
-		if((debug && (!showPlayer || !showUI)) || (isAndroid && isLocal) || dead) return;
+		if((debug && (!showPlayer || !showUI)) || (isAndroid && isLocal) || (dead && !isLocal)) return;
         boolean snap = snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate") && isLocal;
 
 		String part = isAndroid ? "ship" : "mech";

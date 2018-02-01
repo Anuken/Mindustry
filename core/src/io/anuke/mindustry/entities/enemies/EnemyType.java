@@ -82,7 +82,7 @@ public class EnemyType {
 
         if(showPaths){
             Draw.tscl(0.25f);
-            Draw.text((int)enemy.idletime + "\n" + Strings.toFixed(enemy.totalMove.x, 2) + ", "
+            Draw.text((int)enemy.idletime + " " + enemy.node + "\n" + Strings.toFixed(enemy.totalMove.x, 2) + ", "
                     + Strings.toFixed(enemy.totalMove.x, 2), enemy.x, enemy.y);
             Draw.tscl(fontscale);
         }
@@ -98,6 +98,8 @@ public class EnemyType {
             enemy.hitTime -= Timers.delta();
         }
 
+        boolean waiting = world.getSpawns().get(enemy.lane).pathTiles == null || enemy.node <= 0;
+
         move(enemy);
 
         enemy.velocity.set(enemy.x - lastx, enemy.y - lasty).scl(1f / Timers.delta());
@@ -109,13 +111,13 @@ public class EnemyType {
             enemy.totalMove.setZero();
         }
 
-        if(enemy.velocity.len() < minv && enemy.node > 0 && enemy.target == null){
+        if(enemy.velocity.len() < minv && !waiting && enemy.target == null){
             enemy.idletime += Timers.delta();
         }else{
             enemy.idletime = 0;
         }
 
-        if(enemy.timer.getTime(timerReset) > 50 && enemy.totalMove.len() < 0.2f && enemy.node > 0 && enemy.target == null){
+        if(enemy.timer.getTime(timerReset) > 50 && enemy.totalMove.len() < 0.2f && !waiting && enemy.target == null){
             enemy.idletime = 999999f;
         }
 
@@ -149,7 +151,7 @@ public class EnemyType {
 
         Tile core = world.getCore();
 
-        if(enemy.idletime > maxIdleLife && enemy.node >= 0){
+        if(enemy.idletime > maxIdleLife && enemy.node > 0){
             enemy.onDeath();
             return;
         }
