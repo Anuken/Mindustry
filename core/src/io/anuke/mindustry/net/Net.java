@@ -1,6 +1,5 @@
 package io.anuke.mindustry.net;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -48,7 +47,7 @@ public class Net{
 	public static void setClientLoaded(boolean loaded){
 		clientLoaded = loaded;
 
-		if(loaded){
+		if(loaded && false){ //TODO enable.
 			//handle all packets that were skipped while loading
 			for(int i = 0; i < packetQueue.size; i ++){
                 Log.info("Processing {0} packet post-load.", ClassReflection.getSimpleName(packetQueue.get(i).getClass()));
@@ -185,10 +184,10 @@ public class Net{
 				if(listeners.get(object.getClass()) != null) listeners.get(object.getClass()).accept(object);
 			}else{
 				packetQueue.add(object);
-				Log.info("Recieved {0}, but ignoring data, as client is not loaded.", ClassReflection.getSimpleName(object.getClass()));
+				Log.info("Queuing packet {0}.", ClassReflection.getSimpleName(object.getClass()));
 			}
 		}else{
-			Gdx.app.error("Mindustry::Net", "Unhandled packet type: '" + object.getClass() + "'!");
+			Log.err("Unhandled packet type: '{0}'!", ClassReflection.getSimpleName(object.getClass()));
 		}
 	}
 
@@ -200,7 +199,7 @@ public class Net{
 			if(serverListeners.get(object.getClass()) != null) serverListeners.get(object.getClass()).accept(connection, object);
 			if(listeners.get(object.getClass()) != null) listeners.get(object.getClass()).accept(object);
 		}else{
-			Gdx.app.error("Mindustry::Net", "Unhandled packet type: '" + object.getClass() + "'!");
+			Log.err("Unhandled packet type: '{0}'!", ClassReflection.getSimpleName(object.getClass()));
 		}
 	}
 

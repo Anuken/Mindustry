@@ -36,6 +36,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ClosedSelectorException;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static io.anuke.mindustry.Vars.headless;
+
 public class KryoServer implements ServerProvider {
     final boolean debug = false;
     final Server server;
@@ -420,7 +422,7 @@ public class KryoServer implements ServerProvider {
                 if (k == null) return;
 
                 if(message.equals("_ping_")){
-                    conn.send("---" + Vars.playerGroup.size() + "|" + (Vars.headless ? "Server" : Vars.player.name));
+                    conn.send("---" + Vars.playerGroup.size() + "|" + (headless ? "Server" : Vars.player.name));
                     connections.remove(k);
                 }else {
                     byte[] out = Base64Coder.decode(message);
@@ -436,10 +438,14 @@ public class KryoServer implements ServerProvider {
         @Override
         public void onError(WebSocket conn, Exception ex) {
             Log.info("WS error: ");
-            ex.printStackTrace();
+            Log.err(ex);
             if(ex instanceof BindException){
                 Net.closeServer();
-                Net.showError("$text.server.addressinuse");
+                if(!headless) {
+                    Net.showError("$text.server.addressinuse");
+                }else{
+                    Log.err("Web address in use!");
+                }
             }else if(ex.getMessage().equals("Permission denied")){
                 Net.closeServer();
                 Net.showError("Permission denied.");

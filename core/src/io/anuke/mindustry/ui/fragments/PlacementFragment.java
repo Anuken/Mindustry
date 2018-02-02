@@ -33,7 +33,7 @@ public class PlacementFragment implements Fragment{
 		InputHandler input = control.input();
 
 		float s = 50f;
-		float translation = Unit.dp.scl(54f);
+		float translation = Unit.dp.scl(58f);
 
 		new table(){{
 			visible(() -> !state.is(State.menu));
@@ -96,6 +96,7 @@ public class PlacementFragment implements Fragment{
 
 				row();
 
+				//break menu
 				new table() {{
 					abottom();
 					aleft();
@@ -116,7 +117,7 @@ public class PlacementFragment implements Fragment{
 					breaktable = new table("pane") {{
 						visible(() -> shown);
 						margin(5f);
-						marginLeft(0f);
+						marginLeft(-(Unit.dp.scl(1f) - 1f) * 2.5f);
 						touchable(Touchable.enabled);
 						aleft();
 
@@ -150,6 +151,7 @@ public class PlacementFragment implements Fragment{
 
 				row();
 
+				//place menu
 				new table() {{
 					touchable(Touchable.enabled);
 

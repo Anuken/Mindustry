@@ -23,6 +23,7 @@ import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.InputListener;
 import io.anuke.ucore.scene.event.Touchable;
+import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
@@ -176,10 +177,12 @@ public class MapView extends Element implements GestureListener{
 	public void act(float delta){
 		super.act(delta);
 
-		float ax = Inputs.getAxis("move_x");
-		float ay = Inputs.getAxis("move_y");
-		offsetx -= ax * 15f / zoom;
-		offsety -= ay * 15f / zoom;
+		if(Core.scene.getKeyboardFocus() == null || !(Core.scene.getKeyboardFocus() instanceof TextField)) {
+			float ax = Inputs.getAxis("move_x");
+			float ay = Inputs.getAxis("move_y");
+			offsetx -= ax * 15f / zoom;
+			offsety -= ay * 15f / zoom;
+		}
 
 		if(ui.editor.hasPane()) return;
 		
