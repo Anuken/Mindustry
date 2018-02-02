@@ -17,7 +17,7 @@ if [ ! -e $FILE1 ]; then
     touch $FILE1
 fi
 
-NEWLINE=$'\n'
+NEWLINE='\n'
 echo "### Commit #"$TRAVIS_COMMIT".${NEWLINE}Desktop JAR download: [Link]("$DESKFILE")" >> $FILE1
 
 git add $FILE1
