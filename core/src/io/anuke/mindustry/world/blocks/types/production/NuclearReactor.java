@@ -89,9 +89,7 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		}
 		
 		if(entity.heat >= 1f){
-			onDestroyed(tile);
-			world.removeBlock(tile);
-			
+			entity.damage((int)entity.health);
 		}else{
 			distributeLaserPower(tile);
 		}
