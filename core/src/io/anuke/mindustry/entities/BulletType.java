@@ -330,7 +330,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			Draw.reset();
 		}
 	},
-	spread = new BulletType(2.4f, 8) {
+	spread = new BulletType(2.4f, 9) {
 		{
 			lifetime = 70;
 		}
@@ -344,10 +344,10 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			Draw.reset();
 		}
 	},
-	cluster = new BulletType(4.4f, 13){
+	cluster = new BulletType(4.5f, 12){
 		{
 			lifetime = 60;
-			drag = 0.06f;
+			drag = 0.05f;
 		}
 
 		public void draw(Bullet b){
@@ -370,10 +370,10 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 
 			Effects.effect(Fx.clusterbomb, b);
 
-			DamageArea.damage(!(b.owner instanceof Enemy), b.x, b.y, 22f, damage);
+			DamageArea.damage(!(b.owner instanceof Enemy), b.x, b.y, 35f, damage);
 		}
 	},
-    vulcan = new BulletType(4.5f, 11) {
+    vulcan = new BulletType(4.5f, 12) {
 		{
 			lifetime = 50;
 		}
@@ -395,7 +395,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
             }
         }
     },
-	shockshell = new BulletType(5.4f, 10) {
+	shockshell = new BulletType(5.5f, 11) {
 
 		{
 			drag = 0.03f;
@@ -441,7 +441,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			Draw.reset();
 		}
 	},
-	beamlaser = new BulletType(0.001f, 35) {
+	beamlaser = new BulletType(0.001f, 38) {
 		float length = 230f;
 		{
 			drawSize = length*2f+20f;

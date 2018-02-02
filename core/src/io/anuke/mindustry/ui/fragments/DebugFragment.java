@@ -2,12 +2,14 @@ package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyTypes;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.scene.builders.button;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
+import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Log;
@@ -74,7 +76,9 @@ public class DebugFragment implements Fragment {
             new table("pane") {{
                 defaults().fillX();
 
-                new label(DebugFragment::debugInfo);
+                ScrollPane pane = new ScrollPane(new Label(DebugFragment::debugInfo), "clear");
+
+                add(pane);
                 row();
                 new button("dump", () -> {
                     try{
@@ -109,7 +113,7 @@ public class DebugFragment implements Fragment {
     }
 
     public static String debugInfo(){
-        return join(
+        StringBuilder result = join(
                 "net.active: " + Net.active(),
                 "net.server: " + Net.server(),
                 Net.client() ?
@@ -126,14 +130,46 @@ public class DebugFragment implements Fragment {
                 "state: " + state.getState(),
                 !Net.server() ? clientDebug.getOut() : serverDebug.getOut()
         );
+
+        result.append("players: ");
+
+        for(Player player : playerGroup.all()){
+            result.append("   name: ");
+            result.append(player.name);
+            result.append("\n");
+            result.append("   id: ");
+            result.append(player.id);
+            result.append("\n");
+            result.append("   cid: ");
+            result.append(player.clientid);
+            result.append("\n");
+            result.append("   dead: ");
+            result.append(player.isDead());
+            result.append("\n");
+            result.append("   pos: ");
+            result.append(player.x);
+            result.append(", ");
+            result.append(player.y);
+            result.append("\n");
+            result.append("   android: ");
+            result.append(player.isAndroid);
+            result.append("\n");
+            result.append("   local: ");
+            result.append(player.isLocal);
+            result.append("\n");
+
+            result.append("\n");
+        }
+
+        return result.toString();
     }
 
-    private static String join(String... strings){
+    private static StringBuilder join(String... strings){
         StringBuilder builder = new StringBuilder();
         for (String string : strings) {
             builder.append(string);
             builder.append("\n");
         }
-        return builder.toString();
+        return builder;
     }
 }

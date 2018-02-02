@@ -51,6 +51,7 @@ public class NetClient extends Module {
             gotData = false;
             kicked = false;
 
+            ui.chatfrag.clearMessages();
             ui.loadfrag.hide();
             ui.loadfrag.show("$text.connecting.data");
 

@@ -47,7 +47,7 @@ public class Net{
 	public static void setClientLoaded(boolean loaded){
 		clientLoaded = loaded;
 
-		if(loaded && false){ //TODO enable.
+		if(loaded){
 			//handle all packets that were skipped while loading
 			for(int i = 0; i < packetQueue.size; i ++){
                 Log.info("Processing {0} packet post-load.", ClassReflection.getSimpleName(packetQueue.get(i).getClass()));

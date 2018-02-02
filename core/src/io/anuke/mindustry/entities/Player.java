@@ -151,8 +151,9 @@ public class Player extends SyncEntity{
 			stucktime = 0f;
 		}
 
-		if(stucktime > 10f){
+		if(stucktime > 20f){
 			damage(health+1); //die instantly
+			stucktime = 0f;
 		}
 
 		if(ui.chatfrag.chatOpen()) return;
@@ -281,7 +282,7 @@ public class Player extends SyncEntity{
 			Effects.effect(Fx.dashsmoke, x + Angles.x(), y + Angles.y());
 		}
 
-		if(dashing && Timers.get(this, "dashfx", 3)){
+		if(dashing && !dead && Timers.get(this, "dashfx", 3)){
 			Angles.translation(angle + 180, 3f);
 			Effects.effect(Fx.dashsmoke, x + Angles.x(), y + Angles.y());
 		}

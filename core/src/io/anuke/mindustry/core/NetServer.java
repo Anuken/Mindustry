@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
+import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
@@ -14,6 +15,7 @@ import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.UpgradeRecipes;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
@@ -37,6 +39,8 @@ public class NetServer extends Module{
     boolean closing = false;
 
     public NetServer(){
+
+        Events.on(GameOverEvent.class, () -> weapons.clear());
 
         Net.handleServer(Connect.class, (id, connect) -> {});
 
@@ -189,7 +193,7 @@ public class NetServer extends Module{
     public void update(){
         if(!headless && !closing && Net.server() && state.is(State.menu)){
             closing = true;
-            weapons.clear();
+            reset();
             ui.loadfrag.show("$text.server.closing");
             Timers.runTask(5f, () -> {
                 Net.closeServer();
@@ -201,6 +205,10 @@ public class NetServer extends Module{
         if(!state.is(State.menu) && Net.server()){
             sync();
         }
+    }
+
+    public void reset(){
+        weapons.clear();
     }
 
     void sync(){
@@ -291,8 +299,8 @@ public class NetServer extends Module{
                 if(player == null) continue;
                 int x = Mathf.scl2(player.x, tilesize);
                 int y = Mathf.scl2(player.y, tilesize);
-                int w = 16;
-                int h = 12;
+                int w = 22;
+                int h = 16;
                 sendBlockSync(id, x, y, w, h);
             }
         }

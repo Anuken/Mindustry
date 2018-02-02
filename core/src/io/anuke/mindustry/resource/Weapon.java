@@ -33,7 +33,7 @@ public class Weapon extends Upgrade{
 	clustergun = new Weapon("clustergun", 26f, BulletType.cluster){
 		{
 			effect = Fx.clusterShoot;
-			inaccuracy = 20f;
+			inaccuracy = 17f;
 			roundrobin = true;
 			shots = 2;
 			spacing = 0;

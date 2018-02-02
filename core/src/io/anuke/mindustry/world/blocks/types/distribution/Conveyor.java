@@ -99,6 +99,8 @@ public class Conveyor extends Block{
 			long value = entity.convey.get(i);
 			ItemPos pos = pos1.set(value);
 
+			pos.y += shift;
+
 			if(pos.item == null){
 				removals.add(value);
 				continue;
@@ -110,7 +112,7 @@ public class Conveyor extends Block{
 			float minmove = 1f / (Short.MAX_VALUE - 2);
 
 			if(canmove){
-				pos.y += Math.max(speed * Timers.delta() + shift, minmove); //TODO fix precision issues when at high FPS?
+				pos.y += Math.max(speed * Timers.delta(), minmove); //TODO fix precision issues when at high FPS?
 				pos.x = Mathf.lerpDelta(pos.x, 0, 0.06f);
 			}else{
 				pos.x = Mathf.lerpDelta(pos.x, pos.seed/offsetScl, 0.1f);

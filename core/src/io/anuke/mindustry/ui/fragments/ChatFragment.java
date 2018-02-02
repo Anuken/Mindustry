@@ -14,12 +14,12 @@ import io.anuke.mindustry.net.NetEvents;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.Scene;
 import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.Label.LabelStyle;
 import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.Log;
 
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.ucore.core.Core.scene;
@@ -57,10 +57,6 @@ public class ChatFragment extends Table implements Fragment{
             if(Net.active() && Inputs.keyTap("chat")){
                 toggle();
             }
-
-            if(state.is(State.menu) && messages.size > 0){
-                messages.clear();
-            }
         });
 
         setup();
@@ -69,6 +65,10 @@ public class ChatFragment extends Table implements Fragment{
     @Override
     public void build() {
         scene.add(this);
+    }
+
+    public void clearMessages(){
+        messages.clear();
     }
 
     private void setup(){
@@ -152,15 +152,15 @@ public class ChatFragment extends Table implements Fragment{
     }
 
     public void toggle(){
-        Scene scene = getScene();
+        Log.info("open");
 
-        if(!chatOpen && (scene.getKeyboardFocus() == null || !scene.getKeyboardFocus().getParent().isVisible())){
+        if(!chatOpen){
             scene.setKeyboardFocus(chatfield);
             chatfield.fireClick();
             chatOpen = !chatOpen;
             lastfade = fadetime;
             fadetime = messagesShown + 1;
-        }else if(chatOpen){
+        }else{
             scene.setKeyboardFocus(null);
             chatOpen = !chatOpen;
             fadetime = lastfade;
