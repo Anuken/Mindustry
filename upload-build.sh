@@ -25,6 +25,6 @@ git add $DESKFILE
 git commit -m "Added a new bleeding edge build"
 
 # now remove old build
-./cleanup_builds.sh
+bash ../cleanup_builds.sh
 
 git push https://$GHUSERNAME:$GHPASSWORD@github.com/Anuken/Mindustry.wiki.git --all
