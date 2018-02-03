@@ -57,7 +57,7 @@ public class LiquidBlock extends Block implements LiquidAcceptor{
 		LiquidEntity entity = tile.entity();
 		
 		if(entity.liquidAmount > 0.01f && entity.timer.get(timerFlow, 1)){
-			tryMoveLiquid(tile, tile.getNearby()[tile.getRotation()]);
+			tryMoveLiquid(tile, tile.getNearby(tile.getRotation()));
 		}
 		
 	}
@@ -66,7 +66,7 @@ public class LiquidBlock extends Block implements LiquidAcceptor{
 		LiquidEntity entity = tile.entity();
 		
 		if(entity.liquidAmount > 0.01f){
-			tryMoveLiquid(tile, tile.getNearby()[tile.getDump()]);
+			tryMoveLiquid(tile, tile.getNearby(tile.getDump()));
 			tile.setDump((byte)Mathf.mod(tile.getDump() + 1, 4));
 		}
 	}

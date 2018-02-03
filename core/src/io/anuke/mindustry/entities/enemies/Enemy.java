@@ -114,6 +114,7 @@ public class Enemy extends SyncEntity {
 		x = buffer.getFloat();
 		y = buffer.getFloat();
 		health = buffer.getShort();
+		setNet(x, y);
 	}
 
 	@Override

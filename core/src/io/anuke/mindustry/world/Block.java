@@ -179,10 +179,8 @@ public class Block{
 		byte i = tile.getDump();
 		byte pdump = (byte)(i % 4);
 		
-		Tile[] tiles = tile.getNearby(temptiles);
-		
 		for(int j = 0; j < 4; j ++){
-			Tile other = tiles[i];
+			Tile other = tile.getNearby(i);
 			if(other != null && other.block().acceptItem(item, other, tile)){
 				other.block().handleItem(item, other, tile);
 				tile.setDump((byte)((i+1)%4));
@@ -209,10 +207,8 @@ public class Block{
 
 		int i = tile.getDump()%4;
 		
-		Tile[] tiles = tile.getNearby(temptiles);
-		
 		for(int j = 0; j < 4; j ++){
-			Tile other = tiles[i];
+			Tile other = tile.getNearby(i);
 			
 			if(i == direction || direction == -1){
 				for(Item item : Item.getAllItems()){
@@ -239,7 +235,7 @@ public class Block{
 	 * Try offloading an item to a nearby container. Returns true if success.
 	 */
 	protected boolean offloadDir(Tile tile, Item item){
-		Tile other = tile.getNearby()[tile.getRotation()];
+		Tile other = tile.getNearby(tile.getRotation());
 		if(other != null && other.block().acceptItem(item, other, tile)){
 			other.block().handleItem(item, other, tile);
 			return true;

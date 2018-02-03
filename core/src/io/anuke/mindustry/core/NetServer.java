@@ -59,8 +59,8 @@ public class NetServer extends Module{
             player.name = packet.name;
             player.isAndroid = packet.android;
             player.set(world.getSpawnX(), world.getSpawnY());
-            player.interpolator.last.set(player.x, player.y);
-            player.interpolator.target.set(player.x, player.y);
+            player.setNet(player.x, player.y);
+            player.setNet(player.x, player.y);
             player.color.set(packet.color);
             connections.put(id, player);
 

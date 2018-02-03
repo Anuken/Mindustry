@@ -16,7 +16,6 @@ import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
@@ -252,6 +251,7 @@ public class Player extends SyncEntity{
 		color.set(buffer.getInt());
 		x = buffer.getFloat();
 		y = buffer.getFloat();
+		setNet(x, y);
 	}
 
 	@Override
@@ -261,6 +261,7 @@ public class Player extends SyncEntity{
 		data.putFloat(angle);
 		data.putShort((short)health);
 		data.put((byte)(dashing ? 1 : 0));
+		data.putLong(TimeUtils.millis());
 	}
 
 	@Override
@@ -270,30 +271,16 @@ public class Player extends SyncEntity{
 		float angle = data.getFloat();
 		short health = data.getShort();
 		byte dashing = data.get();
+		long time = data.getLong();
 
 		interpolator.targetrot = angle;
 		this.health = health;
 		this.dashing = dashing == 1;
 
-		if(interpolator.lastread == 0){
-			interpolator.lastread = TimeUtils.millis();
-			interpolator.spacing = 1f;
-			interpolator.target.set(x, y);
-			interpolator.last.set(x, y);
-
-			this.x = x;
-			this.y = y;
-
-			return;
-		}
-
 		interpolator.time = 0f;
-		interpolator.spacing = Math.max(TimeUtils.timeSinceMillis(interpolator.lastread) / 1000f * 60f, 0.1f);
 		interpolator.last.set(this.x, this.y);
 		interpolator.target.set(x, y);
-
-		interpolator.lastread = TimeUtils.millis();
-		Log.info("Taken {0} frames to move {1}", interpolator.spacing, interpolator.last.dst(interpolator.target));
+		interpolator.spacing = Math.max(((TimeUtils.timeSinceMillis(time) / 1000f) * 60f), 1f);
 	}
 
 	@Override
@@ -304,29 +291,22 @@ public class Player extends SyncEntity{
 
 		lerp2(Tmp.v2.set(i.last), i.target, i.time);
 
-		/*
 
-		if(isAndroid && i.target.dst(x, y) > 2f && Timers.get(this, "dashfx", 2)){
+
+		if(isAndroid && i.target.dst(i.last) > 2f && Timers.get(this, "dashfx", 2)){
 			Angles.translation(angle + 180, 3f);
 			Effects.effect(Fx.dashsmoke, x + Angles.x(), y + Angles.y());
 		}
 
-		if(dashing && !dead && Timers.get(this, "dashfx", 3)){
+		if(dashing && !dead && Timers.get(this, "dashfx", 3) && i.target.dst(i.last) > 1f){
 			Angles.translation(angle + 180, 3f);
 			Effects.effect(Fx.dashsmoke, x + Angles.x(), y + Angles.y());
-		}*/
+		}
 
 		x = Tmp.v2.x;
 		y = Tmp.v2.y;
 
 		angle = Mathf.lerpAngDelta(angle, i.targetrot, 0.6f);
-
-		Log.info("{0}, {1}, t={2}, s={5}, l={3}, t={4}", x, y, i.time, i.last, i.target, i.spacing);
-
-		if(i.target.dst(x, y) > 24 && !isAndroid){
-			Log.info("clamping");
-		//	set(i.target.x, i.target.y);
-		}
 	}
 
 	private Vector2 lerp2 (Vector2 v, Vector2 target, float alpha) {

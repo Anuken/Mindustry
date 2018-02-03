@@ -28,7 +28,7 @@ public class TunnelConveyor extends Junction{
 	public void handleItem(Item item, Tile tile, Tile source){
 		Tile tunnel = getDestTunnel(tile, item);
 		if(tunnel == null) return;
-		Tile to = tunnel.getNearby()[tunnel.getRotation()];
+		Tile to = tunnel.getNearby(tunnel.getRotation());
 		if(to == null) return;
 		Block before = to.block();
 		
@@ -76,7 +76,7 @@ public class TunnelConveyor extends Junction{
 		Tile tunnel = getDestTunnel(tile, item);
 
 		if(tunnel != null){
-			Tile to = tunnel.getNearby()[tunnel.getRotation()];
+			Tile to = tunnel.getNearby(tunnel.getRotation());
 			return to != null && !(to.block() instanceof TunnelConveyor) && to.block().acceptItem(item, to, tunnel);
 		}else{
 			return false;
@@ -87,10 +87,10 @@ public class TunnelConveyor extends Junction{
 		Tile dest = tile;
 		int rel = (tile.getRotation() + 2)%4;
 		for(int i = 0; i < maxdist; i ++){
-			dest = dest.getNearby()[rel];
+			dest = dest.getNearby(rel);
 			if(dest != null && dest.block() instanceof TunnelConveyor && dest.getRotation() == rel
-					&& dest.getNearby()[rel] != null
-					&& dest.getNearby()[rel].block().acceptItem(item, dest.getNearby()[rel], dest)){
+					&& dest.getNearby(rel) != null
+					&& dest.getNearby(rel).block().acceptItem(item, dest.getNearby(rel), dest)){
 				return dest;
 			}
 		}

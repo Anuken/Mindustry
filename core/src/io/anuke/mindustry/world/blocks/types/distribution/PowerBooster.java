@@ -3,14 +3,16 @@ package io.anuke.mindustry.world.blocks.types.distribution;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-
-import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
 import io.anuke.mindustry.world.blocks.types.production.Generator;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
+
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class PowerBooster extends Generator{
 	protected final int timerGenerate = timers++;
@@ -101,7 +103,7 @@ public class PowerBooster extends Generator{
 
 			//TODO better distribution scheme
 			if(i == 0 && acceptors > 0){
-				flow = Mathf.clamp(p.power / acceptors, 0f, powerSpeed / acceptors);
+				flow = Mathf.clamp(p.power / acceptors, 0f, powerSpeed / acceptors * Timers.delta());
 			}
 		}
 	}

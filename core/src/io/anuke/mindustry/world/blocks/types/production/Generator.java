@@ -161,9 +161,10 @@ public class Generator extends PowerBlock{
 				continue;
 
 			PowerAcceptor p = (PowerAcceptor) target.block();
-			if(p.acceptsPower(target) && entity.power >= powerSpeed){
-				float accepted = p.addPower(target, powerSpeed);
-				entity.power -= (accepted);
+			float transmit = entity.power * Timers.delta();
+			if(p.acceptsPower(target) && entity.power >= transmit){
+				float accepted = p.addPower(target, transmit);
+				entity.power -= accepted;
 			}
 
 		}
@@ -228,9 +229,7 @@ public class Generator extends PowerBlock{
 		rotation = Mathf.mod(rotation, 4);
 		GridPoint2 point = Geometry.d4[rotation];
 
-		int i = 0;
-
-		for(i = 1; i < laserRange; i++){
+		for(int i = 1; i < laserRange; i++){
 			Tile other = world.tile(tile.x + i * point.x, tile.y + i * point.y);
 
 			if(other != null && other.block() instanceof PowerAcceptor){

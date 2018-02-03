@@ -10,11 +10,11 @@ import java.nio.ByteBuffer;
 public abstract class SyncEntity extends DestructibleEntity{
     private static ObjectIntMap<Class<? extends SyncEntity>> writeSizes = new ObjectIntMap<>();
 
-    public transient Interpolator interpolator = new Interpolator();
+    protected transient Interpolator interpolator = new Interpolator();
 
     static{
         setWriteSize(Enemy.class, 4 + 4 + 2 + 2);
-        setWriteSize(Player.class, 4 + 4 + 4 + 2 + 1);
+        setWriteSize(Player.class, 4 + 4 + 4 + 2 + 1 + 8);
     }
 
     public abstract void writeSpawn(ByteBuffer data);
@@ -38,12 +38,19 @@ public abstract class SyncEntity extends DestructibleEntity{
         writeSizes.put(type, size);
     }
 
+    public <T extends SyncEntity> T setNet(float x, float y){
+        set(x, y);
+        interpolator.target.set(x, y);
+        interpolator.last.set(x, y);
+        interpolator.spacing = 1f;
+        interpolator.time = 0f;
+        return (T)this;
+    }
+
     public class Interpolator {
         public Vector2 target = new Vector2();
-        public Vector2 delta = new Vector2();
         public Vector2 last = new Vector2();
         public float targetrot;
-        public long lastread;
         public float spacing = 1f;
         public float time;
     }
