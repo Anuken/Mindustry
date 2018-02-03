@@ -37,6 +37,8 @@ public class Vars{
 	public static final float enemyspawnspace = 65;
 	//discord group URL
 	public static final String discordURL = "https://discord.gg/r8BkXNd";
+
+	public static final String serverURL = "http://localhost:3000";
 	//directory for user-created map data
 	public static final FileHandle customMapDirectory = gwt ? null : UCore.isAssets ?
 			Gdx.files.local("../../desktop/mindustry-maps") : Gdx.files.local("mindustry-maps/");

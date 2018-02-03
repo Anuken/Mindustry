@@ -289,6 +289,7 @@ public class NetServer extends Module{
             Net.send(packet, SendMode.udp);
         }
 
+
         if(Timers.get("serverBlockSync", blockSyncTime)){
 
             Array<NetConnection> connections = Net.getConnections();

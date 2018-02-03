@@ -1,5 +1,10 @@
 package io.anuke.mindustry.net;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Net.HttpRequest;
+import com.badlogic.gdx.Net.HttpResponse;
+import com.badlogic.gdx.Net.HttpResponseListener;
+import com.badlogic.gdx.net.HttpRequestBuilder;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -240,6 +245,27 @@ public class Net{
 		serverProvider = null;
 		server = false;
 		active = false;
+	}
+
+	public static void http(String method, String content, Consumer<String> listener){
+		HttpRequest req = new HttpRequestBuilder().newRequest()
+				.method(method).content(content).url(serverURL + "/servers").build();
+
+		Gdx.net.sendHttpRequest(req, new HttpResponseListener() {
+			@Override
+			public void handleHttpResponse(HttpResponse httpResponse) {
+				listener.accept(httpResponse.getResultAsString());
+			}
+
+			@Override
+			public void failed(Throwable t) {
+				Log.err("HTTP error:");
+				Log.err(t);
+			}
+
+			@Override
+			public void cancelled() {}
+		});
 	}
 
 	/**Client implementation.*/
