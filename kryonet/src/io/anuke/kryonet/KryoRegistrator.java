@@ -15,7 +15,7 @@ import static io.anuke.mindustry.Vars.headless;
 import static io.anuke.mindustry.Vars.playerGroup;
 
 public class KryoRegistrator {
-    public static boolean fakeLag = false;
+    public static boolean fakeLag = true;
     public static final int fakeLagAmount = 500;
 
     static{

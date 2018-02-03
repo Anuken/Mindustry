@@ -1,6 +1,8 @@
 package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
@@ -14,7 +16,9 @@ import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Tmp;
 
 import java.nio.ByteBuffer;
 
@@ -50,8 +54,13 @@ public class Player extends SyncEntity{
 
 	@Override
 	public void damage(int amount){
-		if(!debug && !isAndroid)
-			super.damage(amount);
+		if(debug || isAndroid) return;
+
+		health -= amount;
+		if(health <= 0 && !dead && isLocal){ //remote players don't die normally
+			onDeath();
+			dead = true;
+		}
 	}
 
 	@Override
@@ -67,8 +76,6 @@ public class Player extends SyncEntity{
 	
 	@Override
 	public void onDeath(){
-		if(!isLocal) return;
-
 		remove();
 		if(Net.active()){
 			NetEvents.handlePlayerDeath();
@@ -264,18 +271,40 @@ public class Player extends SyncEntity{
 		short health = data.getShort();
 		byte dashing = data.get();
 
-		interpolator.target.set(x, y);
 		interpolator.targetrot = angle;
 		this.health = health;
 		this.dashing = dashing == 1;
+
+		if(interpolator.lastread == 0){
+			interpolator.lastread = TimeUtils.millis();
+			interpolator.spacing = 1f;
+			interpolator.target.set(x, y);
+			interpolator.last.set(x, y);
+
+			this.x = x;
+			this.y = y;
+
+			return;
+		}
+
+		interpolator.time = 0f;
+		interpolator.spacing = Math.max(TimeUtils.timeSinceMillis(interpolator.lastread) / 1000f * 60f, 0.1f);
+		interpolator.last.set(this.x, this.y);
+		interpolator.target.set(x, y);
+
+		interpolator.lastread = TimeUtils.millis();
+		Log.info("Taken {0} frames to move {1}", interpolator.spacing, interpolator.last.dst(interpolator.target));
 	}
 
 	@Override
 	public void interpolate() {
 		Interpolator i = interpolator;
-		if(i.target.dst(x, y) > 16 && !isAndroid){
-			set(i.target.x, i.target.y);
-		}
+
+		i.time += 1f / i.spacing * Timers.delta();
+
+		lerp2(Tmp.v2.set(i.last), i.target, i.time);
+
+		/*
 
 		if(isAndroid && i.target.dst(x, y) > 2f && Timers.get(this, "dashfx", 2)){
 			Angles.translation(angle + 180, 3f);
@@ -285,11 +314,25 @@ public class Player extends SyncEntity{
 		if(dashing && !dead && Timers.get(this, "dashfx", 3)){
 			Angles.translation(angle + 180, 3f);
 			Effects.effect(Fx.dashsmoke, x + Angles.x(), y + Angles.y());
-		}
+		}*/
 
-		x = Mathf.lerpDelta(x, i.target.x, 0.4f);
-		y = Mathf.lerpDelta(y, i.target.y, 0.4f);
+		x = Tmp.v2.x;
+		y = Tmp.v2.y;
+
 		angle = Mathf.lerpAngDelta(angle, i.targetrot, 0.6f);
+
+		Log.info("{0}, {1}, t={2}, s={5}, l={3}, t={4}", x, y, i.time, i.last, i.target, i.spacing);
+
+		if(i.target.dst(x, y) > 24 && !isAndroid){
+			Log.info("clamping");
+		//	set(i.target.x, i.target.y);
+		}
+	}
+
+	private Vector2 lerp2 (Vector2 v, Vector2 target, float alpha) {
+		v.x = (v.x) + ((target.x - v.x) * alpha);
+		v.y = (v.y) + ((target.y - v.y) * alpha);
+		return v;
 	}
 
 	public Color getColor(){

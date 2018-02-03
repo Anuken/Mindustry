@@ -37,7 +37,6 @@ public class NetClient extends Module {
     boolean gotData = false;
     boolean kicked = false;
     IntSet recieved = new IntSet();
-    IntSet dead = new IntSet();
     float playerSyncTime = 2;
     float dataTimeout = 60*18; //18 seconds timeout
 
@@ -46,7 +45,6 @@ public class NetClient extends Module {
         Net.handleClient(Connect.class, packet -> {
             Net.setClientLoaded(false);
             recieved.clear();
-            dead.clear();
             connecting = true;
             gotData = false;
             kicked = false;
@@ -162,7 +160,7 @@ public class NetClient extends Module {
 
             //duplicates.
             if (group.getByID(packet.entity.id) != null ||
-                    recieved.contains(packet.entity.id) || dead.contains(packet.entity.id)) return;
+                    recieved.contains(packet.entity.id)) return;
 
             recieved.add(packet.entity.id);
 
@@ -171,10 +169,14 @@ public class NetClient extends Module {
             Log.info("Recieved entity {0}", packet.entity.id);
         });
 
-        Net.handleClient(EnemyDeathPacket.class, spawn -> {
-            Enemy enemy = enemyGroup.getByID(spawn.id);
-            if (enemy != null) enemy.type.onDeath(enemy, true);
-            dead.add(spawn.id);
+        Net.handleClient(EnemyDeathPacket.class, packet -> {
+            Enemy enemy = enemyGroup.getByID(packet.id);
+            if (enemy != null){
+                enemy.type.onDeath(enemy, true);
+            }else{
+                Log.err("Got remove for null entity! {0}", packet.id);
+            }
+            recieved.add(packet.id);
         });
 
         Net.handleClient(BulletPacket.class, packet -> {
@@ -310,7 +312,6 @@ public class NetClient extends Module {
 
     public void clearRecieved(){
         recieved.clear();
-        dead.clear();
     }
 
     void sync(){

@@ -23,7 +23,7 @@ public class Junction extends Block{
 		int dir = source.relativeTo(tile.x, tile.y);
 		Tile to = tile.getNearby(temptiles)[dir];
 		
-		Timers.run(30, ()->{
+		Timers.run(30, () -> {
 			if(to == null) return;
 			to.block().handleItem(item, to, tile);
 		});

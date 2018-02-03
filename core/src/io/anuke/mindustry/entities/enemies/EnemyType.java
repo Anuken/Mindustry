@@ -82,7 +82,7 @@ public class EnemyType {
 
         if(showPaths){
             Draw.tscl(0.25f);
-            Draw.text((int)enemy.idletime + " " + enemy.node + "\n" + Strings.toFixed(enemy.totalMove.x, 2) + ", "
+            Draw.text((int)enemy.idletime + " " + enemy.node + " " + enemy.id + "\n" + Strings.toFixed(enemy.totalMove.x, 2) + ", "
                     + Strings.toFixed(enemy.totalMove.x, 2), enemy.x, enemy.y);
             Draw.tscl(fontscale);
         }

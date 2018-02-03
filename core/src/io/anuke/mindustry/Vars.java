@@ -97,7 +97,7 @@ public class Vars{
 			Color.valueOf("ffcaa8"),
 			Color.valueOf("008551"),
 			Color.valueOf("00e339"),
-			Color.valueOf("222e53"),
+			Color.valueOf("423c7b"),
 			Color.valueOf("4b5ef1"),
 			Color.valueOf("2cabfe"),
 	};

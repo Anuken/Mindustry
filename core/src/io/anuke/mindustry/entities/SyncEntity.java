@@ -43,5 +43,8 @@ public abstract class SyncEntity extends DestructibleEntity{
         public Vector2 delta = new Vector2();
         public Vector2 last = new Vector2();
         public float targetrot;
+        public long lastread;
+        public float spacing = 1f;
+        public float time;
     }
 }

@@ -25,8 +25,10 @@ public class DebugFragment implements Fragment {
             @Override
             public void print(String text, Object... args){
                 super.print(text, args);
-                log.append(Log.format(text, args));
-                log.append("\n");
+                if(log.length() < 1000) {
+                    log.append(Log.format(text, args));
+                    log.append("\n");
+                }
             }
         });
     }
@@ -57,7 +59,7 @@ public class DebugFragment implements Fragment {
                    netClient.clearRecieved();
                });
                row();
-               new button("spawn", () -> new Enemy(EnemyTypes.blast).set(player.x, player.y).add());
+               new button("spawn", () -> new Enemy(EnemyTypes.standard).set(player.x, player.y).add());
                row();
                new button("stuff", () -> netClient.test());
                row();

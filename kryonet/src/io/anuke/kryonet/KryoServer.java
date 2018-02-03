@@ -293,6 +293,13 @@ public class KryoServer implements ServerProvider {
             Log.err(e);
         }
         Log.info("Disposed server.");
+
+        for(Thread thread : Thread.getAllStackTraces().keySet()){
+            if(!thread.isDaemon()){
+                Log.info(thread.toString());
+                thread.interrupt();
+            }
+        }
     }
 
     private void handleException(Throwable e){
