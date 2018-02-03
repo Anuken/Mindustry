@@ -6,12 +6,14 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
+import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.Entity;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.netCommon;
+import static io.anuke.mindustry.Vars.ui;
 
 public class NetEvents {
 
@@ -126,5 +128,13 @@ public class NetEvents {
         packet.x = (short)x;
         packet.y = (short)y;
         Net.send(packet, SendMode.tcp);
+    }
+
+    public static void handleTransfer(Tile tile, byte rotation, Item item){
+        ItemTransferPacket packet = new ItemTransferPacket();
+        packet.position = tile.packedPosition();
+        packet.rotation = rotation;
+        packet.itemid = (byte)item.id;
+        Net.send(packet, SendMode.udp);
     }
 }

@@ -1,6 +1,9 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.ByteArray;
+import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
@@ -8,7 +11,6 @@ import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
-import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.resource.Upgrade;
@@ -21,7 +23,6 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Mathf;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -288,8 +289,7 @@ public class NetServer extends Module{
 
             Net.send(packet, SendMode.udp);
         }
-
-
+        /*
         if(Timers.get("serverBlockSync", blockSyncTime)){
 
             Array<NetConnection> connections = Net.getConnections();
@@ -304,7 +304,7 @@ public class NetServer extends Module{
                 int h = 16;
                 sendBlockSync(id, x, y, w, h);
             }
-        }
+        }*/
     }
 
     public void sendBlockSync(int client, int x, int y, int viewx, int viewy){

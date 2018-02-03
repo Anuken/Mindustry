@@ -500,4 +500,24 @@ public class Packets {
         @Override
         public void read(ByteBuffer buffer) { }
     }
+
+    public static class ItemTransferPacket implements Packet{
+        public int position;
+        public byte rotation;
+        public byte itemid;
+
+        @Override
+        public void write(ByteBuffer buffer) {
+            buffer.putInt(position);
+            buffer.put(rotation);
+            buffer.put(itemid);
+        }
+
+        @Override
+        public void read(ByteBuffer buffer) {
+            position = buffer.getInt();
+            rotation = buffer.get();
+            itemid = buffer.get();
+        }
+    }
 }
