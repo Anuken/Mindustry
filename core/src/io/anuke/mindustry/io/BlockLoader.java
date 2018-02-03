@@ -123,6 +123,10 @@ public class BlockLoader {
             blockmap.put(defaultMap.get(string, -1), block);
         }
 
+        for(Block block : Block.getAllBlocks()){
+            block.init();
+        }
+
         Log.info("Total blocks loaded: {0}", Block.getAllBlocks().size);
     }
 

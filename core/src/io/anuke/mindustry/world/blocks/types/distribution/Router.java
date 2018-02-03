@@ -2,10 +2,9 @@ package io.anuke.mindustry.world.blocks.types.distribution;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-
-import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.util.Mathf;
 
@@ -18,6 +17,7 @@ public class Router extends Block{
 		super(name);
 		update = true;
 		solid = true;
+		bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.totalItems()/capacity));
 	}
 	
 	@Override
@@ -55,14 +55,6 @@ public class Router extends Block{
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		int items = tile.entity.totalItems();
 		return items < capacity;
-	}
-	
-	@Override
-	public void drawSelect(Tile tile){
-		
-		float fract = (float)tile.entity.totalItems()/capacity;
-		
-		renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 6, fract);
 	}
 
 }

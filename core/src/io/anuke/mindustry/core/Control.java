@@ -186,9 +186,7 @@ public class Control extends Module{
 
 			ui.restart.show();
 
-			Timers.runTask(30f, () -> {
-				state.set(State.menu);
-			});
+			Timers.runTask(30f, () -> state.set(State.menu));
 		});
 	}
 

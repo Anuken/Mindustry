@@ -19,6 +19,7 @@ import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.ui.fragments.ToolFragment;
+import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
@@ -399,8 +400,27 @@ public class Renderer extends RendererModule{
 				if(tile.isLinked())
 					target = tile.getLinked();
 
-				if(target.entity != null)
-					drawHealth(target.drawx(), target.drawy() - 3f - target.block().height / 2f * tilesize, target.entity.health, target.entity.tile.block().health);
+				//if(target.entity != null)
+				//	drawHealth(target.drawx(), target.drawy() - 3f - target.block().height / 2f * tilesize, target.entity.health, target.entity.tile.block().health);
+
+				if(target.entity != null) {
+					int bot = 0, top = 0;
+					for (BlockBar bar : tile.block().bars) {
+						float offset = Mathf.sign(bar.top) * (target.block().height / 2f * tilesize + 3f + 4f * ((bar.top ? top : bot))) +
+								(bar.top ? -1f : 0f);
+
+						float value = bar.value.get(target);
+
+						if(value <= -1f) continue;
+
+						drawBar(bar.color, target.drawx(), target.drawy() + offset, value);
+
+						if (bar.top)
+							top++;
+						else
+							bot++;
+					}
+				}
 
 				target.block().drawSelect(target);
 			}
@@ -434,6 +454,10 @@ public class Renderer extends RendererModule{
 	//TODO optimize!
 	public void drawBar(Color color, float x, float y, float fraction){
 		fraction = Mathf.clamp(fraction);
+
+		if(fraction > 0)
+			fraction = Mathf.clamp(fraction + 0.2f, 0.24f, 1f);
+
 		float len = 3;
 
 		float w = (int) (len * 2 * fraction) + 0.5f;

@@ -291,7 +291,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			Draw.reset();
 		}
 	},
-	flame = new BulletType(0.6f, 5){ //for turrets
+	flame = new BulletType(0.7f, 5){ //for turrets
 		public void draw(Bullet b){
 			Draw.color(Color.YELLOW, Color.SCARLET, b.time/lifetime);
 			float size = 6f-b.time/lifetime*5f;

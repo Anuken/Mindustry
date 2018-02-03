@@ -7,6 +7,7 @@ import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
+import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
@@ -19,7 +20,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class NuclearReactor extends LiquidPowerGenerator{
 	protected final int timerFuel = timers++;
@@ -47,6 +48,9 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		explosive = true;
 		powerCapacity = 80f;
 		powerSpeed = 0.5f;
+
+		bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.getItem(generateItem) / itemCapacity));
+		bars.add(new BlockBar(Color.ORANGE, true, tile -> tile.<NuclearReactorEntity>entity().heat));
 	}
 
 	@Override
@@ -144,24 +148,6 @@ public class NuclearReactor extends LiquidPowerGenerator{
 				Effects.effect(Fx.nuclearsmoke, Tmp.v1.x + tile.worldx(), Tmp.v1.y + tile.worldy());
 			});
 		}
-	}
-	
-	@Override
-	public void drawSelect(Tile tile){
-		super.drawSelect(tile);
-
-		NuclearReactorEntity entity = tile.entity();
-
-		renderer.drawBar(Color.GREEN, tile.drawx(), tile.drawy() + 6 +
-				height*tilesize/2f, (float)entity.getItem(generateItem) / itemCapacity);
-		Draw.reset();
-		
-		float fract = entity.heat;
-		if(fract > 0)
-			fract = Mathf.clamp(fract + 0.2f, 0.24f, 1f);
-		
-		renderer.drawBar(Color.ORANGE, tile.drawx(),
-				tile.drawy() + tilesize * height/2f + 10, fract);
 	}
 
 	@Override

@@ -74,11 +74,12 @@ public class WeaponBlocks{
 	
 	flameturret = new Turret("flameturret"){
 		{
-			range = 35f;
+			range = 45f;
 			reload = 5f;
 			bullet = BulletType.flame;
 			ammo = Item.coal;
 			health = 90;
+			inaccuracy = 4f;
 		}
 	},
 	

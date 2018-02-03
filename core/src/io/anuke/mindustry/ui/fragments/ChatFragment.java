@@ -152,7 +152,6 @@ public class ChatFragment extends Table implements Fragment{
     }
 
     public void toggle(){
-        Log.info("open");
 
         if(!chatOpen){
             scene.setKeyboardFocus(chatfield);

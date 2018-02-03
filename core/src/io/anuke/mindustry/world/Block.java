@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -84,6 +85,8 @@ public class Block{
 	public Layer layer = null;
 	/**Extra layer to draw extra extra stuff on.*/
 	public Layer layer2 = null;
+	/**list of displayed block status bars. Defaults to health bar.*/
+	public Array<BlockBar> bars = Array.with(new BlockBar(Color.RED, false, tile -> tile.entity.health / (float)tile.block().health));
 
 	public Block(String name) {
 		this.name = name;
@@ -108,6 +111,7 @@ public class Block{
 	public void drawSelect(Tile tile){}
 	public void drawPlace(int x, int y, int rotation, boolean valid){}
 	public void placed(Tile tile){}
+	public void init(){}
 
 	public void tapped(Tile tile){}
 	public void buildTable(Tile tile, Table table) {}

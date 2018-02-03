@@ -2,14 +2,13 @@ package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 import java.io.DataInputStream;
@@ -23,6 +22,8 @@ public class PowerTurret extends Turret implements PowerAcceptor{
 	public PowerTurret(String name) {
 		super(name);
 		ammo = null;
+
+		bars.set(1, new BlockBar(Color.YELLOW, true, tile -> tile.<PowerTurretEntity>entity().power / powerCapacity));
 	}
 	
 	@Override
@@ -37,18 +38,6 @@ public class PowerTurret extends Turret implements PowerAcceptor{
 		Draw.color(Color.GREEN);
 		Lines.dashCircle(tile.drawx(), tile.drawy(), range);
 		Draw.reset();
-		
-		drawPowerBar(tile);
-	}
-	
-	public void drawPowerBar(Tile tile){
-		PowerTurretEntity entity = tile.entity();
-		
-		float fract = (float)entity.power / powerCapacity;
-		if(fract > 0)
-			fract = Mathf.clamp(fract, 0.24f, 1f);
-		
-		renderer.drawBar(Color.YELLOW, tile.drawx(), tile.drawy() + 6, fract);
 	}
 	
 	@Override

@@ -2,16 +2,14 @@ package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-
-import static io.anuke.mindustry.Vars.*;
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
@@ -26,6 +24,8 @@ public class ItemPowerGenerator extends Generator{
 	public ItemPowerGenerator(String name) {
 		super(name);
 		outputOnly = true;
+
+		bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.getItem(generateItem) / itemCapacity));
 	}
 	
 	@Override
@@ -51,16 +51,6 @@ public class ItemPowerGenerator extends Generator{
 			Draw.rect(name + "-top", tile.worldx(), tile.worldy());
 			Draw.reset();
 		}
-	}
-	
-	@Override
-	public void drawSelect(Tile tile){
-		super.drawSelect(tile);
-		
-		TileEntity entity = tile.entity;
-		
-		//TODO maybe don't draw it due to clutter
-		renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 10, (float)entity.getItem(generateItem) / itemCapacity);
 	}
 	
 	@Override

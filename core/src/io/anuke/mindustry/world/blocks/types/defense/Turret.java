@@ -9,6 +9,7 @@ import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -56,6 +57,8 @@ public class Turret extends Block{
 		update = true;
 		solid = true;
 		layer = Layer.turret;
+
+		bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.<TurretEntity>entity().ammo / maxammo));
 	}
 	
 	@Override
@@ -101,14 +104,6 @@ public class Turret extends Block{
 		Draw.color(Color.GREEN);
 		Lines.dashCircle(tile.drawx(), tile.drawy(), range);
 		Draw.reset();
-		
-		TurretEntity entity = tile.entity();
-		
-		float fract = (float)entity.ammo/maxammo;
-		if(fract > 0)
-			fract = Mathf.clamp(fract, 0.24f, 1f);
-		
-		renderer.drawBar(Color.GREEN, tile.drawx(), 2 + tile.drawy() + height/2f * tilesize, fract);
 	}
 	
 	@Override

@@ -2,11 +2,11 @@ package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
+import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidBlock;
 import io.anuke.ucore.core.Effects;
@@ -35,6 +35,8 @@ public class LiquidCrafter extends LiquidBlock{
 		solid = true;
 		health = 60;
 		liquidCapacity = 21f;
+
+		bars.add(new BlockBar(Color.GREEN, true, tile -> input == null ? -1f : (float)tile.entity.getItem(input) / itemCapacity));
 	}
 	
 	@Override
@@ -77,15 +79,6 @@ public class LiquidCrafter extends LiquidBlock{
 		if(entity.timer.get(timerDump, 15)){
 			tryDump(tile, -1, output);
 		}
-	}
-	
-	@Override
-	public void drawSelect(Tile tile){
-		if(input == null) return;
-		
-		float fract = (float)tile.entity.getItem(input) / itemCapacity;
-		
-		renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 6, fract);
 	}
 	
 	@Override

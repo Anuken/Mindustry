@@ -75,8 +75,6 @@ public class RepairTurret extends PowerTurret{
 		Draw.color(Color.GREEN);
 		Lines.dashCircle(tile.worldx(), tile.worldy(), range);
 		Draw.reset();
-		
-		drawPowerBar(tile);
 	}
 	
 	@Override

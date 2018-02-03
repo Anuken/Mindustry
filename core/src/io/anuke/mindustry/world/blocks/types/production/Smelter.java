@@ -2,16 +2,16 @@ package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
@@ -35,6 +35,14 @@ public class Smelter extends Block{
 		super(name);
 		update = true;
 		solid = true;
+	}
+
+	@Override
+	public void init(){
+		for(int i = 0; i < inputs.length; i ++){
+			final Item item = inputs[i];
+			bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.getItem(item)/capacity));
+		}
 	}
 	
 	@Override
@@ -117,17 +125,6 @@ public class Smelter extends Block{
             Draw.color();
         }
     }
-
-
-	@Override
-	public void drawSelect(Tile tile){
-		//draw a separate bar for each requirement
-		for(int i = 0; i < inputs.length; i ++){
-			float fract = ((float)tile.entity.getItem(inputs[i]))/capacity;
-
-			renderer.drawBar(Color.GREEN, tile.worldx(), tile.worldy() + 6 + i*4, fract);
-		}
-	}
 
 	@Override
 	public TileEntity getEntity() {
