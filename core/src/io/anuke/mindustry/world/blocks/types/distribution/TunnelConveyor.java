@@ -4,9 +4,10 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Log;
 
-public class TunnelConveyor extends Block{
+public class TunnelConveyor extends Junction{
 	protected int maxdist = 3;
 
 	protected TunnelConveyor(String name) {
@@ -15,6 +16,7 @@ public class TunnelConveyor extends Block{
 		update = true;
 		solid = true;
 		health = 70;
+		speed = 25;
 	}
 	
 	@Override
@@ -39,6 +41,32 @@ public class TunnelConveyor extends Block{
 				Log.err(e);
 			}
 		});
+	}
+
+	@Override
+	public void update(Tile tile){
+		JunctionEntity entity = tile.entity();
+
+		if(entity.index > 0){
+			entity.time += Timers.delta();
+			if(entity.time >= speed){
+				int i = entity.items[-- entity.index];
+				entity.time = 0f;
+
+				int itemid = Bits.getLeftShort(i);
+
+				Item item = Item.getByID(itemid);
+
+				Tile tunnel = getDestTunnel(tile, item);
+				if(tunnel == null) return;
+				Tile target = tunnel.getNearby(tunnel.getRotation());
+				if(target == null) return;
+
+				target.block().handleItem(item, target, tunnel);
+			}
+		}else{
+			entity.time = 0f;
+		}
 	}
 
 	@Override
@@ -67,13 +95,5 @@ public class TunnelConveyor extends Block{
 			}
 		}
 		return null;
-	}
-	
-	Tile getOther(Tile tile, int dir, int amount){
-		for(int i = 0; i < amount; i ++){
-			if(tile == null) return null;
-			tile = tile.getNearby()[dir];
-		}
-		return tile;
 	}
 }

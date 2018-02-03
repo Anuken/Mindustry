@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Timers;
@@ -18,7 +19,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class Sorter extends Junction{
+public class Sorter extends Block{
 	
 	public Sorter(String name) {
 		super(name);
@@ -34,6 +35,11 @@ public class Sorter extends Junction{
 		Tmp.tr1.setRegion(region, 4, 4, 1, 1);
 		
 		Draw.rect(Tmp.tr1, tile.worldx(), tile.worldy(), 4f, 4f);
+	}
+
+	@Override
+	public boolean canReplace(Block other){
+		return other instanceof Conveyor || other instanceof Router;
 	}
 	
 	@Override

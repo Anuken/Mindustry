@@ -189,6 +189,7 @@ public class Save15 extends SaveFileVersion {
             int blockid = stream.readInt();
 
             Tile tile = world.tile(pos % world.width(), pos / world.width());
+
             tile.setBlock(map.get(blockid));
 
             if(blockid == Blocks.blockpart.id){

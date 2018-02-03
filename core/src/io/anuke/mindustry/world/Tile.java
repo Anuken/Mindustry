@@ -59,7 +59,7 @@ public class Tile{
 	}
 	
 	/**Return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile.*/
-	public int relativeTo(int cx, int cy){
+	public byte relativeTo(int cx, int cy){
 		if(x == cx && y == cy - 1) return 1;
 		if(x == cx && y == cy + 1) return 3;
 		if(x == cx - 1 && y == cy) return 0;
