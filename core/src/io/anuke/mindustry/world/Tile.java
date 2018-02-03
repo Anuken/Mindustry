@@ -229,6 +229,14 @@ public class Tile{
 			return world.tile(x - (dx - 8), y - (dy - 8));
 		}
 	}
+
+	public Tile getNearby(int rotation){
+		if(rotation == 0) return world.tile(x + 1, y);
+		if(rotation == 1) return world.tile(x, y + 1);
+		if(rotation == 2) return world.tile(x - 1, y);
+		if(rotation == 3) return world.tile(x, y - 1);
+		return null;
+	}
 	
 	public Tile[] getNearby(){
 		return world.getNearby(x, y);

@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
@@ -173,6 +174,8 @@ public class Block{
 	 * Tries to put this item into a nearby container, if there are no available
 	 * containers, it gets added to the block's inventory.*/
 	protected void offloadNear(Tile tile, Item item){
+		if(Net.client()) return;
+
 		byte i = tile.getDump();
 		byte pdump = (byte)(i % 4);
 		
@@ -183,6 +186,7 @@ public class Block{
 			if(other != null && other.block().acceptItem(item, other, tile)){
 				other.block().handleItem(item, other, tile);
 				tile.setDump((byte)((i+1)%4));
+				if(Net.server()) NetEvents.handleTransfer(tile, i, item);
 				return;
 			}
 			i++;
@@ -201,6 +205,8 @@ public class Block{
 	 * Try dumping any item near the tile. -1 = any direction
 	 */
 	protected boolean tryDump(Tile tile, int direction, Item todump){
+		if(Net.client()) return false;
+
 		int i = tile.getDump()%4;
 		
 		Tile[] tiles = tile.getNearby(temptiles);
@@ -217,6 +223,7 @@ public class Block{
 						other.block().handleItem(item, other, tile);
 						tile.entity.removeItem(item, 1);
 						tile.setDump((byte)((i+1)%4));
+						if(Net.server()) NetEvents.handleTransfer(tile, (byte)i, item);
 						return true;
 					}
 				}

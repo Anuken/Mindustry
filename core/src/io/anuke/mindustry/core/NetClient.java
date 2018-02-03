@@ -15,6 +15,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
+import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
@@ -263,6 +264,13 @@ public class NetClient extends Module {
         });
 
         Net.handleClient(FriendlyFireChangePacket.class, packet -> state.friendlyFire = packet.enabled);
+
+        Net.handleClient(ItemTransferPacket.class, packet -> {
+            Tile tile = world.tile(packet.position);
+            Tile next = tile.getNearby(packet.rotation);
+            tile.entity.items[packet.itemid] --;
+            next.block().handleItem(Item.getByID(packet.itemid), next, tile);
+        });
     }
 
     @Override
