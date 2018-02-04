@@ -23,6 +23,7 @@ public class DefaultKeybinds {
                 "dash", Input.SHIFT_LEFT,
                 "rotate_alt", new Axis(Input.R, Input.E),
                 "rotate", new Axis(Input.SCROLL),
+                "block_info", Input.CONTROL_LEFT,
                 "player_list", Input.TAB,
                 "chat", Input.ENTER,
                 "console", Input.GRAVE,

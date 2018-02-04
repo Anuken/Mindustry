@@ -96,19 +96,27 @@ public class DesktopInput extends InputHandler{
 		}
 		
 		Tile cursor = world.tile(tilex(), tiley());
+		Tile target = cursor == null ? null : cursor.isLinked() ? cursor.getLinked() : cursor;
+		boolean showCursor = false;
+
+		if(recipe == null && target != null && !ui.hasMouse() && Inputs.keyDown("block_info")
+				&& target.block().fullDescription != null){
+			showCursor = true;
+			if(Inputs.keyTap("select")){
+			    ui.hudfrag.blockfrag.showBlockInfo(target.block());
+                Cursors.restoreCursor();
+            }
+		}
 		
-		if(Inputs.keyTap("select") && cursor != null && !ui.hasMouse()){
-			Tile linked = cursor.isLinked() ? cursor.getLinked() : cursor;
-			if(linked != null && linked.block().isConfigurable(linked)){
-				ui.configfrag.showConfig(linked);
+		if(target != null && Inputs.keyTap("select") && !ui.hasMouse()){
+			if(target.block().isConfigurable(target)){
+				ui.configfrag.showConfig(target);
 			}else if(!ui.configfrag.hasConfigMouse()){
 				ui.configfrag.hideConfig();
 			}
 
-			if(linked != null) {
-				linked.block().tapped(linked);
-				if(Net.active()) NetEvents.handleBlockTap(linked);
-			}
+			target.block().tapped(target);
+			if(Net.active()) NetEvents.handleBlockTap(target);
 		}
 		
 		if(Inputs.keyTap("break")){
@@ -122,7 +130,6 @@ public class DesktopInput extends InputHandler{
 		if(recipe != null && Inputs.keyTap("break")){
 			beganBreak = true;
 			recipe = null;
-			Cursors.restoreCursor();
 		}
 
 		//block breaking
@@ -134,6 +141,17 @@ public class DesktopInput extends InputHandler{
 			}
 		}else{
 			breaktime = 0f;
+		}
+
+		if(recipe != null){
+			showCursor = validPlace(tilex(), tiley(), control.input().recipe.result) && control.input().cursorNear();
+		}
+
+		if(!ui.hasMouse()) {
+			if (showCursor)
+				Cursors.setHand();
+			else
+				Cursors.restoreCursor();
 		}
 
 	}

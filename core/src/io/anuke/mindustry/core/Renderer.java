@@ -400,6 +400,12 @@ public class Renderer extends RendererModule{
 				if(tile.isLinked())
 					target = tile.getLinked();
 
+				if(Inputs.keyDown("block_info") && target.block().fullDescription != null){
+					Draw.color(Colors.get("accent"));
+					Lines.crect(target.drawx(), target.drawy(), target.block().width * tilesize, target.block().height * tilesize);
+					Draw.color();
+				}
+
 				//if(target.entity != null)
 				//	drawHealth(target.drawx(), target.drawy() - 3f - target.block().height / 2f * tilesize, target.entity.health, target.entity.tile.block().health);
 

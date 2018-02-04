@@ -19,6 +19,7 @@ import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.mindustry.world.blocks.types.Rock;
 import io.anuke.ucore.core.Core;
+import io.anuke.ucore.util.Log;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -189,6 +190,8 @@ public class Save15 extends SaveFileVersion {
             int blockid = stream.readInt();
 
             Tile tile = world.tile(pos % world.width(), pos / world.width());
+
+            Log.info("Load tile {0} {1}", pos, blockid > Block.getAllBlocks().size || blockid < 0 ? null : Block.getByID(blockid));
 
             tile.setBlock(map.get(blockid));
 

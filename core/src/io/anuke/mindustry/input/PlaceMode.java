@@ -10,7 +10,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
@@ -48,11 +47,6 @@ public enum PlaceMode{
 				Tmp.v1.set(7, 0).rotate(control.input().rotation * 90);
 				Lines.line(x, y, x + Tmp.v1.x, y + Tmp.v1.y);
 			}
-			
-			if(valid)
-				Cursors.setHand();
-			else
-				Cursors.restoreCursor();
 		}
 		
 		public void tapped(int tilex, int tiley){

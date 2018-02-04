@@ -23,6 +23,8 @@ public class Sorter extends Block{
 	
 	public Sorter(String name) {
 		super(name);
+		update = true;
+		solid = true;
 	}
 	
 	@Override
@@ -65,7 +67,7 @@ public class Sorter extends Block{
 		
 		int dir = source.relativeTo(dest.x, dest.y);
 		if(dir == -1) return null;
-		Tile to = null;
+		Tile to;
 		
 		if(item == entity.sortItem){
 			to = dest.getNearby()[dir];

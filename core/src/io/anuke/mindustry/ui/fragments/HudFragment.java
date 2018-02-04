@@ -20,11 +20,11 @@ import io.anuke.ucore.util.Bundles;
 import static io.anuke.mindustry.Vars.*;
 
 public class HudFragment implements Fragment{
+	public final BlocksFragment blockfrag = new BlocksFragment();
 	private ImageButton menu, flip;
 	private Table respawntable;
 	private Table wavetable;
 	private boolean shown = true;
-	private BlocksFragment blockfrag = new BlocksFragment();
 
 	public void build(){
 

@@ -22,7 +22,6 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Sounds;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.SolidEntity;
-import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
@@ -68,10 +67,7 @@ public abstract class InputHandler extends InputAdapter{
 			for(ItemStack stack : recipe.requirements){
 				state.inventory.removeItem(stack);
 			}
-			
-			if(!state.inventory.hasItems(recipe.requirements)){
-				Cursors.restoreCursor();
-			}
+
 			return true;
 		}
 		return false;

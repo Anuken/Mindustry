@@ -12,7 +12,6 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
@@ -179,10 +178,7 @@ public class AndroidInput extends InputHandler{
 			for(ItemStack stack : recipe.requirements){
 				state.inventory.removeItem(stack);
 			}
-			
-			if(!state.inventory.hasItems(recipe.requirements)){
-				Cursors.restoreCursor();
-			}
+
 			return true;
 		}
 		return false;

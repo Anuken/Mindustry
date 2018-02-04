@@ -9,6 +9,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
+import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.scene.actions.Actions;
@@ -218,55 +219,7 @@ public class BlocksFragment implements Fragment{
 		
 		//extra info
 		if(recipe.result.fullDescription != null){
-			header.addButton("?", ()->{
-				statlist.clear();
-				recipe.result.getStats(statlist);
-				
-				Label desclabel = new Label(recipe.result.fullDescription);
-				desclabel.setWrap(true);
-				
-				boolean wasPaused = state.is(State.paused);
-				state.set(State.paused);
-				
-				FloatingDialog d = new FloatingDialog("$text.blocks.blockinfo");
-				Table table = new Table();
-				table.defaults().pad(1f);
-				ScrollPane pane = new ScrollPane(table, "clear");
-				pane.setFadeScrollBars(false);
-				Table top = new Table();
-				top.left();
-				top.add(new Image(Draw.region(recipe.result.name))).size(8*5 * recipe.result.width);
-				top.add("[accent]"+recipe.result.formalName).padLeft(6f);
-				table.add(top).fill().left();
-				table.row();
-				table.add(desclabel).width(600);
-				table.row();
-				
-				d.content().add(pane).grow();
-				
-				if(statlist.size > 0){
-					table.add("$text.blocks.extrainfo").padTop(6).padBottom(5).left();
-					table.row();
-				}
-				
-				for(String s : statlist){
-					if(s.contains(":")) {
-					    String color = s.substring(0, s.indexOf("]")+1);
-						String first = s.substring(color.length(), s.indexOf(":")).replace("/", "").replace(" ", "").toLowerCase();
-						String last = s.substring(s.indexOf(":"), s.length());
-						s = color + Bundles.get("text.blocks." + first) + last;
-					}
-					table.add(s).left();
-					table.row();
-				}
-				
-				d.buttons().addButton("$text.ok", ()->{
-					if(!wasPaused) state.set(State.playing);
-					d.hide();
-				}).size(110, 50).pad(10f);
-				
-				d.show();
-			}).expandX().padLeft(3).top().right().size(40f, 44f).padTop(-2);
+			header.addButton("?", () -> showBlockInfo(recipe.result)).expandX().padLeft(3).top().right().size(40f, 44f).padTop(-2);
 		}
 		
 		desctable.add().pad(2);
@@ -300,7 +253,56 @@ public class BlocksFragment implements Fragment{
 		Label label = new Label("[health]"+ Bundles.get("text.health")+": " + recipe.result.health);
 		label.setWrap(true);
 		desctable.add(label).width(200).padTop(4).padBottom(2);
-		
+	}
+
+	public void showBlockInfo(Block block){
+		statlist.clear();
+		block.getStats(statlist);
+
+		Label desclabel = new Label(block.fullDescription);
+		desclabel.setWrap(true);
+
+		boolean wasPaused = state.is(State.paused);
+		state.set(State.paused);
+
+		FloatingDialog d = new FloatingDialog("$text.blocks.blockinfo");
+		Table table = new Table();
+		table.defaults().pad(1f);
+		ScrollPane pane = new ScrollPane(table, "clear");
+		pane.setFadeScrollBars(false);
+		Table top = new Table();
+		top.left();
+		top.add(new Image(Draw.region(block.name))).size(8*5 * block.width);
+		top.add("[accent]"+block.formalName).padLeft(6f);
+		table.add(top).fill().left();
+		table.row();
+		table.add(desclabel).width(600);
+		table.row();
+
+		d.content().add(pane).grow();
+
+		if(statlist.size > 0){
+			table.add("$text.blocks.extrainfo").padTop(6).padBottom(5).left();
+			table.row();
+		}
+
+		for(String s : statlist){
+			if(s.contains(":")) {
+				String color = s.substring(0, s.indexOf("]")+1);
+				String first = s.substring(color.length(), s.indexOf(":")).replace("/", "").replace(" ", "").toLowerCase();
+				String last = s.substring(s.indexOf(":"), s.length());
+				s = color + Bundles.get("text.blocks." + first) + last;
+			}
+			table.add(s).left();
+			table.row();
+		}
+
+		d.buttons().addButton("$text.ok", ()->{
+			if(!wasPaused) state.set(State.playing);
+			d.hide();
+		}).size(110, 50).pad(10f);
+
+		d.show();
 	}
 
 	public void updateItems(){
