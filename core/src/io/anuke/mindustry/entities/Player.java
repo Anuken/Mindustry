@@ -277,7 +277,7 @@ public class Player extends SyncEntity{
 		interpolator.time = 0f;
 		interpolator.last.set(this.x, this.y);
 		interpolator.target.set(x, y);
-		interpolator.spacing = Math.max(((TimeUtils.timeSinceMillis(time) / 1000f) * 60f), 4f);
+		interpolator.spacing = Math.min(Math.max(((TimeUtils.timeSinceMillis(time) / 1000f) * 60f), 4f), 10);
 	}
 
 	@Override
@@ -290,6 +290,12 @@ public class Player extends SyncEntity{
 
 		x = Tmp.v2.x;
 		y = Tmp.v2.y;
+
+		if(i.target.dst(x, y) > 128){
+			set(i.target.x, i.target.y);
+			i.time = 0f;
+			i.last.set(i.target);
+		}
 
 		angle = Mathf.lerpAngDelta(angle, i.targetrot, 0.6f);
 

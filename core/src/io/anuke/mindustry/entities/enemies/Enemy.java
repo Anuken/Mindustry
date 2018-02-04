@@ -142,7 +142,7 @@ public class Enemy extends SyncEntity {
 		interpolator.time = 0f;
 		interpolator.last.set(this.x, this.y);
 		interpolator.target.set(x, y);
-		interpolator.spacing = Math.max(((TimeUtils.timeSinceMillis(time) / 1000f) * 60f), 4f);
+		interpolator.spacing = Math.min(Math.max(((TimeUtils.timeSinceMillis(time) / 1000f) * 60f), 4f), 10f);
 	}
 
 	@Override

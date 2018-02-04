@@ -10,7 +10,6 @@ import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
-import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
@@ -20,7 +19,6 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
-import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BaseBulletType;
 import io.anuke.ucore.entities.Entities;
@@ -272,10 +270,10 @@ public class NetClient extends Module {
 
         Net.handleClient(ItemTransferPacket.class, packet -> {
             Tile tile = world.tile(packet.position);
+            if(tile == null || tile.entity == null) return;
             Tile next = tile.getNearby(packet.rotation);
             tile.entity.items[packet.itemid] --;
             next.block().handleItem(Item.getByID(packet.itemid), next, tile);
-            Effects.effect(Fx.transfer, tile.drawx(), tile.drawy(), packet.rotation * 90);
         });
     }
 
