@@ -77,7 +77,7 @@ public class Recipes {
 
 			new Recipe(power, DefenseBlocks.shieldgenerator, stack(Item.titanium, 30), stack(Item.dirium, 30)),
 
-			new Recipe(distribution, DistributionBlocks.teleporter, stack(Item.steel, 20), stack(Item.dirium, 15)),
+			new Recipe(distribution, DistributionBlocks.teleporter, stack(Item.steel, 30), stack(Item.dirium, 40)),
 
 			new Recipe(power, DefenseBlocks.repairturret, stack(Item.iron, 30)),
 			new Recipe(power, DefenseBlocks.megarepairturret, stack(Item.iron, 20), stack(Item.steel, 30)),

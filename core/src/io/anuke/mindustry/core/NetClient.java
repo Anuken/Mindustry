@@ -270,6 +270,7 @@ public class NetClient extends Module {
 
         Net.handleClient(ItemTransferPacket.class, packet -> {
             Tile tile = world.tile(packet.position);
+            if(tile == null || tile.entity == null) return;
             Tile next = tile.getNearby(packet.rotation);
             tile.entity.items[packet.itemid] --;
             next.block().handleItem(Item.getByID(packet.itemid), next, tile);

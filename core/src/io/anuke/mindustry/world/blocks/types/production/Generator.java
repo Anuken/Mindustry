@@ -161,8 +161,8 @@ public class Generator extends PowerBlock{
 				continue;
 
 			PowerAcceptor p = (PowerAcceptor) target.block();
-			float transmit = entity.power * Timers.delta();
-			if(p.acceptsPower(target) && entity.power >= transmit){
+			float transmit = Math.min(powerSpeed * Timers.delta(), entity.power);
+			if(p.acceptsPower(target)){
 				float accepted = p.addPower(target, transmit);
 				entity.power -= accepted;
 			}

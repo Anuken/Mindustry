@@ -91,7 +91,7 @@ public class KryoClient implements ClientProvider{
         };
 
         if(KryoRegistrator.fakeLag){
-            client.addListener(new LagListener(0, KryoRegistrator.fakeLagAmount, listener));
+            client.addListener(new LagListener(KryoRegistrator.fakeLagMin, KryoRegistrator.fakeLagMax, listener));
         }else{
             client.addListener(listener);
         }

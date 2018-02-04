@@ -105,7 +105,7 @@ public class KryoServer implements ServerProvider {
         };
 
         if(KryoRegistrator.fakeLag){
-            server.addListener(new LagListener(0, KryoRegistrator.fakeLagAmount, listener));
+            server.addListener(new LagListener(KryoRegistrator.fakeLagMin, KryoRegistrator.fakeLagMax, listener));
         }else{
             server.addListener(listener);
         }

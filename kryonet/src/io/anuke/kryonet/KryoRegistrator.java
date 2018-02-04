@@ -16,7 +16,8 @@ import static io.anuke.mindustry.Vars.playerGroup;
 
 public class KryoRegistrator {
     public static boolean fakeLag = false;
-    public static final int fakeLagAmount = 500;
+    public static final int fakeLagMax = 1000;
+    public static final int fakeLagMin = 0;
 
     static{
         Log.set(Log.LEVEL_WARN);
