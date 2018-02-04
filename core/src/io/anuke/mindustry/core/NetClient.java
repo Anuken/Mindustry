@@ -112,6 +112,7 @@ public class NetClient extends Module {
             int enemies = 0;
 
             ByteBuffer data = ByteBuffer.wrap(packet.data);
+            long time = data.getLong();
 
             byte groupid = data.get();
 
@@ -134,7 +135,7 @@ public class NetClient extends Module {
                     }
                     data.position(data.position() + SyncEntity.getWriteSize((Class<? extends SyncEntity>) group.getType()));
                 } else {
-                    entity.read(data);
+                    entity.read(data, time);
                 }
             }
 
@@ -324,8 +325,9 @@ public class NetClient extends Module {
 
     void sync(){
         if(Timers.get("syncPlayer", playerSyncTime)){
-            byte[] bytes = new byte[player.getWriteSize()];
+            byte[] bytes = new byte[player.getWriteSize() + 8];
             ByteBuffer buffer = ByteBuffer.wrap(bytes);
+            buffer.putLong(TimeUtils.millis());
             player.write(buffer);
 
             PositionPacket packet = new PositionPacket();

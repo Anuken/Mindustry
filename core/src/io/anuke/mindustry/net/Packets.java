@@ -142,7 +142,7 @@ public class Packets {
 
         @Override
         public void read(ByteBuffer buffer) {
-            data = new byte[SyncEntity.getWriteSize(Player.class)];
+            data = new byte[SyncEntity.getWriteSize(Player.class) + 8];
             buffer.get(data);
         }
     }

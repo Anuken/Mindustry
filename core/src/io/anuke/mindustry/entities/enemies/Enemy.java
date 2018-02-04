@@ -1,16 +1,19 @@
 package io.anuke.mindustry.entities.enemies;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
+import io.anuke.ucore.util.Tmp;
 
 import java.nio.ByteBuffer;
 
@@ -126,27 +129,33 @@ public class Enemy extends SyncEntity {
 	}
 
 	@Override
-	public void read(ByteBuffer data) {
+	public void read(ByteBuffer data, long time) {
 
 		float x = data.getFloat();
 		float y = data.getFloat();
 		short angle = data.getShort();
 		short health = data.getShort();
 
-		interpolator.target.set(x, y);
-		interpolator.targetrot = angle/2f;
 		this.health = health;
+
+		interpolator.targetrot = angle / 2f;
+		interpolator.time = 0f;
+		interpolator.last.set(this.x, this.y);
+		interpolator.target.set(x, y);
+		interpolator.spacing = Math.max(((TimeUtils.timeSinceMillis(time) / 1000f) * 60f), 1f);
 	}
 
 	@Override
 	public void interpolate() {
 		Interpolator i = interpolator;
-		if(i.target.dst(x, y) > 16){
-			set(i.target.x, i.target.y);
-		}
 
-		x = Mathf.lerpDelta(x, i.target.x, 0.4f);
-		y = Mathf.lerpDelta(y, i.target.y, 0.4f);
+		i.time += 1f / i.spacing * Timers.delta();
+
+		Mathf.lerp2(Tmp.v2.set(i.last), i.target, i.time);
+
+		x = Tmp.v2.x;
+		y = Tmp.v2.y;
+
 		angle = Mathf.lerpAngDelta(angle, i.targetrot, 0.6f);
 	}
 

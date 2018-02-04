@@ -14,14 +14,14 @@ public abstract class SyncEntity extends DestructibleEntity{
 
     static{
         setWriteSize(Enemy.class, 4 + 4 + 2 + 2);
-        setWriteSize(Player.class, 4 + 4 + 4 + 2 + 1 + 8);
+        setWriteSize(Player.class, 4 + 4 + 4 + 2 + 1);
     }
 
     public abstract void writeSpawn(ByteBuffer data);
     public abstract void readSpawn(ByteBuffer data);
 
     public abstract void write(ByteBuffer data);
-    public abstract void read(ByteBuffer data);
+    public abstract void read(ByteBuffer data, long time);
     public abstract void interpolate();
 
     public int getWriteSize(){

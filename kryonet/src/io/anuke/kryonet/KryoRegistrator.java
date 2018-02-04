@@ -15,11 +15,11 @@ import static io.anuke.mindustry.Vars.headless;
 import static io.anuke.mindustry.Vars.playerGroup;
 
 public class KryoRegistrator {
-    public static boolean fakeLag = true;
+    public static boolean fakeLag = false;
     public static final int fakeLagAmount = 500;
 
     static{
-        Log.set(Log.LEVEL_ERROR);
+        Log.set(Log.LEVEL_WARN);
 
         Log.setLogger(new Logger(){
             public void log (int level, String category, String message, Throwable ex) {

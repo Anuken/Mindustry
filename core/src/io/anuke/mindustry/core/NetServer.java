@@ -123,8 +123,11 @@ public class NetServer extends Module{
         });
 
         Net.handleServer(PositionPacket.class, (id, packet) -> {
+            ByteBuffer buffer = ByteBuffer.wrap(packet.data);
+            long time = buffer.getLong();
+
             Player player = connections.get(id);
-            player.read(ByteBuffer.wrap(packet.data));
+            player.read(buffer, time);
         });
 
         Net.handleServer(ShootPacket.class, (id, packet) -> {
@@ -238,9 +241,10 @@ public class NetServer extends Module{
                         //calculate amount of entities to go into this packet
                         int csize = Math.min(amount-i, maxsize);
                         //create a byte array to write to
-                        byte[] bytes = new byte[csize*writesize + 1];
+                        byte[] bytes = new byte[csize*writesize + 1 + 8];
                         //wrap it for easy writing
                         current = ByteBuffer.wrap(bytes);
+                        current.putLong(TimeUtils.millis());
                         //write the group ID so the client knows which group this is
                         current.put((byte)group.getID());
                     }

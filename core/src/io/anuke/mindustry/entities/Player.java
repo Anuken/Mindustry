@@ -1,7 +1,6 @@
 package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.graphics.Shaders;
@@ -261,22 +260,20 @@ public class Player extends SyncEntity{
 		data.putFloat(angle);
 		data.putShort((short)health);
 		data.put((byte)(dashing ? 1 : 0));
-		data.putLong(TimeUtils.millis());
 	}
 
 	@Override
-	public void read(ByteBuffer data) {
+	public void read(ByteBuffer data, long time) {
 		float x = data.getFloat();
 		float y = data.getFloat();
 		float angle = data.getFloat();
 		short health = data.getShort();
 		byte dashing = data.get();
-		long time = data.getLong();
 
-		interpolator.targetrot = angle;
 		this.health = health;
 		this.dashing = dashing == 1;
 
+		interpolator.targetrot = angle;
 		interpolator.time = 0f;
 		interpolator.last.set(this.x, this.y);
 		interpolator.target.set(x, y);
@@ -289,9 +286,12 @@ public class Player extends SyncEntity{
 
 		i.time += 1f / i.spacing * Timers.delta();
 
-		lerp2(Tmp.v2.set(i.last), i.target, i.time);
+		Mathf.lerp2(Tmp.v2.set(i.last), i.target, i.time);
 
+		x = Tmp.v2.x;
+		y = Tmp.v2.y;
 
+		angle = Mathf.lerpAngDelta(angle, i.targetrot, 0.6f);
 
 		if(isAndroid && i.target.dst(i.last) > 2f && Timers.get(this, "dashfx", 2)){
 			Angles.translation(angle + 180, 3f);
@@ -302,17 +302,6 @@ public class Player extends SyncEntity{
 			Angles.translation(angle + 180, 3f);
 			Effects.effect(Fx.dashsmoke, x + Angles.x(), y + Angles.y());
 		}
-
-		x = Tmp.v2.x;
-		y = Tmp.v2.y;
-
-		angle = Mathf.lerpAngDelta(angle, i.targetrot, 0.6f);
-	}
-
-	private Vector2 lerp2 (Vector2 v, Vector2 target, float alpha) {
-		v.x = (v.x) + ((target.x - v.x) * alpha);
-		v.y = (v.y) + ((target.y - v.y) * alpha);
-		return v;
 	}
 
 	public Color getColor(){
