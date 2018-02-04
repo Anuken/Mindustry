@@ -150,7 +150,7 @@ public class ServerControl extends Module {
         handler.register("maps", "Display all available maps.", arg -> {
             Log.info("Maps:");
             for(Map map : world.maps().getAllMaps()){
-                Log.info("    &ly{0}: &fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.getWidth(), map.getHeight());
+                Log.info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.getWidth(), map.getHeight());
             }
         });
 
@@ -213,7 +213,7 @@ public class ServerControl extends Module {
             }
         });
 
-        handler.register("shuffle", "<on/off> <custom maps on/off>", "Enable or disable automatic random map shuffling after gameovers.", arg -> {
+        handler.register("shuffle", "<on/off> <custom>", "Enable or disable automatic random map shuffling after gameovers.", arg -> {
             String s = arg[0];
             String custom = arg[1];
             if(s.equalsIgnoreCase("on")){
