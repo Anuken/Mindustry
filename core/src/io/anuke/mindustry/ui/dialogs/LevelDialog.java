@@ -95,16 +95,18 @@ public class LevelDialog extends FloatingDialog{
 			if(i % maxwidth == 0){
 				maps.row();
 			}
-
-			//TODO this is a hack
-			if(!Settings.has("hiscore" + map.name)){
-				Settings.defaults("hiscore" + map.name, 1);
-			}
 			
 			Table inset = new Table("pane-button");
 			inset.add("[accent]" + Bundles.get("map."+map.name+".name", map.name)).pad(3f);
 			inset.row();
-			inset.label((() -> Bundles.format("text.level.highscore", Settings.getInt("hiscore" + map.name))))
+			inset.label((() ->{
+				try{
+					return Bundles.format("text.level.highscore", Settings.getInt("hiscore" + map.name));
+				}catch (Exception e){
+					Settings.defaults("hiscore" + map.name, 1);
+					return Bundles.format("text.level.highscore", 0);
+				}
+			}))
 			.pad(3f);
 			inset.pack();
 			

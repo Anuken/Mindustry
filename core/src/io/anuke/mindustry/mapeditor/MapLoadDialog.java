@@ -1,6 +1,5 @@
 package io.anuke.mindustry.mapeditor;
 
-import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Map;
@@ -10,12 +9,15 @@ import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 
+import static io.anuke.mindustry.Vars.world;
+
 public class MapLoadDialog extends FloatingDialog{
 	private Map selected = world.maps().getMap(0);
 
 	public MapLoadDialog(Consumer<Map> loader) {
 		super("$text.editor.loadmap");
 
+		shown(this::rebuild);
 		rebuild();
 
 		TextButton button = new TextButton("$text.load");

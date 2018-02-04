@@ -2,6 +2,7 @@ package io.anuke.mindustry.server;
 
 import com.badlogic.gdx.ApplicationLogger;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Difficulty;
@@ -37,6 +38,7 @@ import static io.anuke.ucore.util.Log.*;
 public class ServerControl extends Module {
     private final CommandHandler handler = new CommandHandler("");
     private boolean shuffle = true;
+    private boolean shuffleCustom = false;
 
     public ServerControl(){
         Effects.setScreenShakeProvider((a, b) -> {});
@@ -48,7 +50,7 @@ public class ServerControl extends Module {
             info("&y" + (packet.name == null ? "" : packet.name) +  ": &lb{0}", packet.text);
         });
 
-        //don't do anything at all for GDX logging
+        //don't do anything at all for GDX logging: don't want controller info and such
         Gdx.app.setApplicationLogger(new ApplicationLogger() {
             @Override public void log(String tag, String message) { }
             @Override public void log(String tag, String message, Throwable exception) { }
@@ -71,9 +73,10 @@ public class ServerControl extends Module {
                 Net.closeServer();
 
                 if(shuffle) {
+                    Array<Map> maps = shuffleCustom ? world.maps().getAllMaps() : world.maps().getDefaultMaps();
                     Map previous = world.getMap();
                     Map map = previous;
-                    while(map == previous || !map.visible) map = world.maps().getDefaultMaps().random();
+                    while(map == previous || !map.visible) map = maps.random();
 
                     info("Selected next map to be {0}.", map.name);
                     state.set(State.playing);
@@ -144,6 +147,13 @@ public class ServerControl extends Module {
             host();
         });
 
+        handler.register("maps", "Display all available maps.", arg -> {
+            Log.info("Maps:");
+            for(Map map : world.maps().getAllMaps()){
+                Log.info("    &ly{0}: &fi{1} / {2}x{3} {4}", map.name, map.custom ? "Custom" : "Default", );
+            }
+        });
+
         handler.register("status", "Display server status.", arg -> {
             if(state.is(State.menu)){
                 info("&lyStatus: &rserver closed");
@@ -203,8 +213,9 @@ public class ServerControl extends Module {
             }
         });
 
-        handler.register("shuffle", "<on/off>", "Enable or disable automatic random map shuffling after gameovers.", arg -> {
+        handler.register("shuffle", "<on/off> <custom maps on/off>", "Enable or disable automatic random map shuffling after gameovers.", arg -> {
             String s = arg[0];
+            String custom = arg[1];
             if(s.equalsIgnoreCase("on")){
                 shuffle = true;
                 info("Map shuffling enabled.");
@@ -212,7 +223,17 @@ public class ServerControl extends Module {
                 shuffle = false;
                 info("Map shuffling disabled.");
             }else{
-                err("Incorrect command usage.");
+                err("Incorrect enable/disable usage.");
+            }
+
+            if(custom.equalsIgnoreCase("on")){
+                shuffleCustom = true;
+                info("Custom map shuffling enabled.");
+            }else if(custom.equalsIgnoreCase("off")){
+                shuffleCustom = false;
+                info("Custom map shuffling disabled.");
+            }else{
+                err("Incorrect enable/disable custom map usage.");
             }
         });
 

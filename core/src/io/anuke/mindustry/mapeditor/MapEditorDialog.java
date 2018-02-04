@@ -124,13 +124,25 @@ public class MapEditorDialog extends Dialog{
 			ui.loadfrag.show();
 			if(verifyMap()){
 				saved = true;
+				String before = editor.getMap().name;
 				editor.getMap().name = name;
 				Timers.run(10f, () -> {
 					world.maps().saveAndReload(editor.getMap(), editor.pixmap());
 					loadDialog.rebuild();
 					ui.loadfrag.hide();
 					view.clearStack();
+
+					if(!name.equals(before)) {
+						Map map = new Map();
+						map.name = editor.getMap().name;
+						map.oreGen = editor.getMap().oreGen;
+						map.pixmap = Pixmaps.copy(editor.getMap().pixmap);
+						map.texture = new Texture(map.pixmap);
+						map.custom = true;
+						editor.beginEdit(map);
+					}
 				});
+
 			}else{
 				ui.loadfrag.hide();
 			}

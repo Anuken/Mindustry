@@ -22,6 +22,7 @@ public class Maps implements Disposable{
 	private Map networkMap;
 	private int lastID;
 	private Json json = new Json();
+	private Array<Map> array = new Array<>();
 
 	public Maps() {
 		json.setOutputType(OutputType.json);
@@ -35,6 +36,14 @@ public class Maps implements Disposable{
 
 	public Array<Map> getDefaultMaps(){
 		return defaultMaps;
+	}
+
+	public Array<Map> getAllMaps(){
+		array.clear();
+		for(Map map : list()){
+			array.add(map);
+		}
+		return array;
 	}
 
 	public void setNetworkMap(Map map){
