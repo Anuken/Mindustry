@@ -12,8 +12,11 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
+import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.table;
+import io.anuke.ucore.scene.event.ClickListener;
+import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
@@ -29,6 +32,7 @@ public class BlocksFragment implements Fragment{
 	private Stack stack = new Stack();
 	private Array<String> statlist = new Array<>();
 	private boolean shown = true;
+	private Recipe hoveredDescriptionRecipe;
 	
 	public void build(){
 		InputHandler input = control.input();
@@ -45,9 +49,15 @@ public class BlocksFragment implements Fragment{
 				itemtable.setVisible(() -> input.recipe == null && !state.mode.infiniteResources);
 
 				desctable = new Table("button");
-				desctable.setVisible(() -> input.recipe != null);
+				desctable.setVisible(() -> hoveredDescriptionRecipe != null || input.recipe != null);
 				desctable.update(() -> {
-					if(input.recipe == null && desctable.getChildren().size != 0){
+					// note: This is required because there is no direct connection between
+					// input.recipe and the description ui. If input.recipe gets set to null
+					// a proper cleanup of the ui elements is required.
+					boolean anyRecipeShown = input.recipe != null || hoveredDescriptionRecipe != null;
+					boolean descriptionTableClean = desctable.getChildren().size == 0;
+					boolean cleanupRequired = !anyRecipeShown && !descriptionTableClean;
+					if(cleanupRequired){
 						desctable.clear();
 					}
 				});
@@ -106,12 +116,38 @@ public class BlocksFragment implements Fragment{
 									Draw.region(r.result.name() + "-icon") : Draw.region(r.result.name());
 							ImageButton image = new ImageButton(region, "select");
 
+							image.addListener(new ClickListener(){
+								@Override
+								public void enter(InputEvent event, float x, float y, int pointer, Element fromActor) {
+									super.enter(event, x, y, pointer, fromActor);
+									if (hoveredDescriptionRecipe != r) {
+										hoveredDescriptionRecipe = r;
+										updateRecipe(r);
+									}
+								}
+
+								@Override
+								public void exit(InputEvent event, float x, float y, int pointer, Element toActor) {
+									super.exit(event, x, y, pointer, toActor);
+									hoveredDescriptionRecipe = null;
+									updateRecipe(input.recipe);
+								}
+							});
+
 							image.clicked(() -> {
-								if (input.recipe == r) {
-									input.recipe = null;
-								} else {
+								// note: input.recipe only gets set here during a click.
+								// during a hover only the visual description will be updated.
+								boolean nothingSelectedYet = input.recipe == null;
+								boolean selectedSomethingElse = !nothingSelectedYet && input.recipe != r;
+								boolean shouldMakeSelection = nothingSelectedYet || selectedSomethingElse;
+								if (shouldMakeSelection) {
 									input.recipe = r;
-									updateRecipe();
+									hoveredDescriptionRecipe = r;
+									updateRecipe(r);
+								} else {
+									input.recipe = null;
+									hoveredDescriptionRecipe = null;
+									updateRecipe(null);
 								}
 							});
 
@@ -193,9 +229,13 @@ public class BlocksFragment implements Fragment{
             blocks.actions(Actions.translateBy(0, -blocks.getTranslation().y, t, ip));
         }
     }
-	
-	void updateRecipe(){
-		Recipe recipe = control.input().recipe;
+
+	void updateRecipe(Recipe recipe){
+		if (recipe == null) {
+			desctable.clear();
+			return;
+		}
+
 		desctable.clear();
 		desctable.setTouchable(Touchable.enabled);
 		
