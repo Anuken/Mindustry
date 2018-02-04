@@ -150,7 +150,7 @@ public class ServerControl extends Module {
         handler.register("maps", "Display all available maps.", arg -> {
             Log.info("Maps:");
             for(Map map : world.maps().getAllMaps()){
-                Log.info("    &ly{0}: &fi{1} / {2}x{3} {4}", map.name, map.custom ? "Custom" : "Default", );
+                Log.info("    &ly{0}: &fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.getWidth(), map.getHeight());
             }
         });
 
