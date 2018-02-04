@@ -10,11 +10,10 @@ import io.anuke.ucore.util.Log;
 
 import java.util.Locale;
 
+import static io.anuke.mindustry.Vars.locales;
 import static io.anuke.mindustry.Vars.ui;
 
 public class LanguageDialog extends FloatingDialog{
-    private Locale[] locales = {new Locale("en"), new Locale("fr", "FR"), new Locale("ru"), new Locale("pl", "PL"),
-            new Locale("es", "LA"), new Locale("pt", "BR"), new Locale("ko"), new Locale("in", "ID")};
 
     public LanguageDialog(){
         super("$text.settings.language");

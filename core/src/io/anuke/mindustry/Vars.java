@@ -17,6 +17,8 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
+import java.util.Locale;
+
 public class Vars{
 	public static final boolean testAndroid = false;
 	//shorthand for whether or not this is running on android
@@ -82,6 +84,9 @@ public class Vars{
 	public static boolean snapCamera = true;
 	
 	public static final int tilesize = 8;
+
+	public static final Locale[] locales = {new Locale("en"), new Locale("fr", "FR"), new Locale("ru"), new Locale("pl", "PL"),
+			new Locale("es", "LA"), new Locale("pt", "BR"), new Locale("ko"), new Locale("in", "ID")};
 
 	public static final Color[] playerColors = {
 			Color.valueOf("82759a"),

@@ -39,10 +39,10 @@ public class Smelter extends Block{
 
 	@Override
 	public void init(){
-		for(int i = 0; i < inputs.length; i ++){
-			final Item item = inputs[i];
+		for(Item item : inputs){
 			bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.getItem(item)/capacity));
 		}
+		//fuel and output bars, respectively: should these be added, or is it too cluttery?
 		//bars.add(new BlockBar(Color.ORANGE, true, tile -> (float)tile.entity.getItem(fuel)/capacity));
 		//bars.add(new BlockBar(Color.LIGHT_GRAY, true, tile -> (float)tile.entity.getItem(result)/capacity));
 	}
