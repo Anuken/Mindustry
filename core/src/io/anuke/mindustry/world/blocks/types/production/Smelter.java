@@ -43,6 +43,8 @@ public class Smelter extends Block{
 			final Item item = inputs[i];
 			bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.getItem(item)/capacity));
 		}
+		//bars.add(new BlockBar(Color.ORANGE, true, tile -> (float)tile.entity.getItem(fuel)/capacity));
+		//bars.add(new BlockBar(Color.LIGHT_GRAY, true, tile -> (float)tile.entity.getItem(result)/capacity));
 	}
 	
 	@Override

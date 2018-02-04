@@ -510,5 +510,11 @@ public class Fx{
 		Draw.text("Respawning in " + (int)((e.lifetime-e.time)/60), e.x, e.y);
 		Draw.tscl(0.5f);
 		Draw.reset();
+	}),
+	transfer = new Effect(20, e -> {
+		Draw.color(Color.SCARLET, Color.CLEAR, e.fract());
+		Lines.square(e.x, e.y, 4);
+		Lines.lineAngle(e.x, e.y, e.rotation, 5f);
+		Draw.reset();
 	});
 }

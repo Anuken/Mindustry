@@ -65,11 +65,15 @@ public class Net{
 	
 	/**Connect to an address.*/
 	public static void connect(String ip, int port) throws IOException{
-		clientProvider.connect(ip, port);
-		active = true;
-		server = false;
+		if(!active) {
+			clientProvider.connect(ip, port);
+			active = true;
+			server = false;
 
-		Timers.runTask(60f, Platform.instance::updateRPC);
+			Timers.runTask(60f, Platform.instance::updateRPC);
+		}else{
+			throw new IOException("Already connected!");
+		}
 	}
 
 	/**Host a server at an address*/
