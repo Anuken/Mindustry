@@ -174,7 +174,7 @@ public class ServerControl extends Module {
                 }else{
                     info("&lyNo players connected.");
                 }
-                info("&lbFPS: {0}", Gdx.graphics.getFramesPerSecond());
+                info("&lbFPS: {0}", (int)(60f/Timers.delta()));
             }
         });
 
