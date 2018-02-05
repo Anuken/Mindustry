@@ -25,7 +25,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class Net{
-	public static final int version = 18;
+	public static final int version = 19;
 
 	private static boolean server;
 	private static boolean active;
