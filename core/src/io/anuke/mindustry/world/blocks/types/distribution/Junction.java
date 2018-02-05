@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
+import com.badlogic.gdx.utils.NumberUtils;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
@@ -8,8 +9,8 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Bits;
 
 public class Junction extends Block{
-	protected float speed = 15; //frames taken to go through this junction
-	protected int capacity = 16;
+	protected float speed = 26; //frames taken to go through this junction
+	protected int capacity = 32;
 
 	public Junction(String name) {
 		super(name);
@@ -26,10 +27,10 @@ public class Junction extends Block{
 	public void handleItem(Item item, Tile tile, Tile source){
 		JunctionEntity entity = tile.entity();
 		boolean x = tile.x == source.x;
-		int value = Bits.packInt((short)item.id, source.relativeTo(tile.x, tile.y));
+		long value = Bits.packLong(NumberUtils.floatToIntBits(Timers.time()), Bits.packInt((short)item.id, source.relativeTo(tile.x, tile.y)));
 		if(x){
 			entity.bx.add(value);
-		}else{
+		}else {
 			entity.by.add(value);
 		}
 	}
@@ -41,10 +42,13 @@ public class Junction extends Block{
 		for(int i = 0; i < 2; i ++){
 			Buffer buffer = (i == 0 ? entity.bx : entity.by);
 			if(buffer.index > 0){
-				buffer.time += Timers.delta();
-				if(buffer.time >= speed){
-					if(buffer.index > buffer.items.length) buffer.index = buffer.items.length;
-					int val = buffer.items[buffer.index - 1];
+				if(buffer.index > buffer.items.length) buffer.index = buffer.items.length;
+				long l = buffer.items[0];
+				float time = NumberUtils.intBitsToFloat(Bits.getLeftInt(l));
+
+				if(Timers.time() >= time + speed){
+
+					int val = Bits.getRightInt(l);
 
 					Item item = Item.getByID(Bits.getLeftShort(val));
 					int direction = Bits.getRightShort(val);
@@ -53,12 +57,9 @@ public class Junction extends Block{
 					if(dest == null || !dest.block().acceptItem(item, dest, tile)) continue;
 
 					dest.block().handleItem(item, dest, tile);
-
-					buffer.time = 0f;
+					System.arraycopy(buffer.items, 1, buffer.items, 0, buffer.index - 1);
 					buffer.index --;
 				}
-			}else{
-				buffer.time = 0f;
 			}
 		}
 	}
@@ -86,12 +87,11 @@ public class Junction extends Block{
 	}
 
 	class Buffer{
-		int[] items = new int[capacity];
+		long[] items = new long[capacity];
 		int index;
-		float time;
 
-		void add(int id){
-			items[index ++] = id;
+		void add(long id){
+			items[index++] = id;
 		}
 
 		boolean full(){
