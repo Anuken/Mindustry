@@ -7,7 +7,6 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.style.TextureRegionDrawable;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
@@ -55,11 +54,8 @@ public class Sorter extends Block{
 	@Override
 	public void handleItem(Item item, Tile tile, Tile source){
 		Tile to = getTileTarget(item, tile, source, true);
-		
-		Timers.run(15, () -> {
-			to.block().handleItem(item, to, tile);
-		});
-		
+
+		to.block().handleItem(item, to, tile);
 	}
 	
 	Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){

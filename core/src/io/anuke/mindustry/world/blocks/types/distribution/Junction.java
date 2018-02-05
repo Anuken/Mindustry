@@ -8,7 +8,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Bits;
 
 public class Junction extends Block{
-	protected float speed = 20; //frames taken to go through this junction
+	protected float speed = 15; //frames taken to go through this junction
 	protected int capacity = 16;
 
 	public Junction(String name) {
@@ -43,6 +43,7 @@ public class Junction extends Block{
 			if(buffer.index > 0){
 				buffer.time += Timers.delta();
 				if(buffer.time >= speed){
+					if(buffer.index > buffer.items.length) buffer.index = buffer.items.length;
 					int val = buffer.items[buffer.index - 1];
 
 					Item item = Item.getByID(Bits.getLeftShort(val));

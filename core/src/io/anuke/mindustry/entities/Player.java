@@ -156,7 +156,7 @@ public class Player extends SyncEntity{
 			stucktime = 0f;
 		}
 
-		if(stucktime > 20f){
+		if(stucktime > 15f){
 			damage(health+1); //die instantly
 			stucktime = 0f;
 		}

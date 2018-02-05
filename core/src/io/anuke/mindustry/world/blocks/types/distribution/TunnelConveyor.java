@@ -8,7 +8,7 @@ import io.anuke.ucore.core.Timers;
 
 public class TunnelConveyor extends Block{
 	protected int maxdist = 3;
-	protected float speed = 20; //frames taken to go through this tunnel
+	protected float speed = 18; //frames taken to go through this tunnel
 	protected int capacity = 16;
 
 	protected TunnelConveyor(String name) {
@@ -43,6 +43,7 @@ public class TunnelConveyor extends Block{
 		if(entity.index > 0){
 			entity.time += Timers.delta();
 			if(entity.time >= speed){
+				if(entity.index > entity.buffer.length) entity.index = entity.buffer.length;
 				int i = entity.buffer[entity.index - 1];
 
 				Item item = Item.getByID(i);
