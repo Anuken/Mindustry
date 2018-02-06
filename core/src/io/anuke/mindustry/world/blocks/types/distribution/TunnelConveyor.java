@@ -35,7 +35,7 @@ public class TunnelConveyor extends Block{
 		Tile to = tunnel.getNearby(tunnel.getRotation());
 		if(to == null) return;
 
-		entity.buffer[entity.index ++] = item.id;
+		entity.buffer[entity.index ++] = Bits.packLong(NumberUtils.floatToIntBits(Timers.time()), item.id);
 	}
 
 	@Override
@@ -48,9 +48,7 @@ public class TunnelConveyor extends Block{
 
 			if(Timers.time() >= time + speed){
 
-				int val = Bits.getRightInt(l);
-
-				Item item = Item.getByID(Bits.getLeftShort(val));
+				Item item = Item.getByID(Bits.getRightInt(l));
 
 				Tile tunnel = getDestTunnel(tile, item);
 				if(tunnel == null) return;
