@@ -12,8 +12,11 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
+import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.table;
+import io.anuke.ucore.scene.event.ClickListener;
+import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
@@ -29,7 +32,8 @@ public class BlocksFragment implements Fragment{
 	private Stack stack = new Stack();
 	private Array<String> statlist = new Array<>();
 	private boolean shown = true;
-
+	private Recipe hoveredDescriptionRecipe;
+	
 	public void build(){
 		InputHandler input = control.input();
 
@@ -45,9 +49,15 @@ public class BlocksFragment implements Fragment{
 				itemtable.setVisible(() -> input.recipe == null && !state.mode.infiniteResources);
 
 				desctable = new Table("button");
-				desctable.setVisible(() -> input.recipe != null);
+				desctable.setVisible(() -> hoveredDescriptionRecipe != null || input.recipe != null);
 				desctable.update(() -> {
-					if(input.recipe == null && desctable.getChildren().size != 0){
+					// note: This is required because there is no direct connection between
+					// input.recipe and the description ui. If input.recipe gets set to null
+					// a proper cleanup of the ui elements is required.
+					boolean anyRecipeShown = input.recipe != null || hoveredDescriptionRecipe != null;
+					boolean descriptionTableClean = desctable.getChildren().size == 0;
+					boolean cleanupRequired = !anyRecipeShown && !descriptionTableClean;
+					if(cleanupRequired){
 						desctable.clear();
 					}
 				});
@@ -106,12 +116,38 @@ public class BlocksFragment implements Fragment{
 									Draw.region(r.result.name() + "-icon") : Draw.region(r.result.name());
 							ImageButton image = new ImageButton(region, "select");
 
+							image.addListener(new ClickListener(){
+								@Override
+								public void enter(InputEvent event, float x, float y, int pointer, Element fromActor) {
+									super.enter(event, x, y, pointer, fromActor);
+									if (hoveredDescriptionRecipe != r) {
+										hoveredDescriptionRecipe = r;
+										updateRecipe(r);
+									}
+								}
+
+								@Override
+								public void exit(InputEvent event, float x, float y, int pointer, Element toActor) {
+									super.exit(event, x, y, pointer, toActor);
+									hoveredDescriptionRecipe = null;
+									updateRecipe(input.recipe);
+								}
+							});
+
 							image.clicked(() -> {
-								if (input.recipe == r) {
-									input.recipe = null;
-								} else {
+								// note: input.recipe only gets set here during a click.
+								// during a hover only the visual description will be updated.
+								boolean nothingSelectedYet = input.recipe == null;
+								boolean selectedSomethingElse = !nothingSelectedYet && input.recipe != r;
+								boolean shouldMakeSelection = nothingSelectedYet || selectedSomethingElse;
+								if (shouldMakeSelection) {
 									input.recipe = r;
-									updateRecipe();
+									hoveredDescriptionRecipe = r;
+									updateRecipe(r);
+								} else {
+									input.recipe = null;
+									hoveredDescriptionRecipe = null;
+									updateRecipe(null);
 								}
 							});
 
@@ -194,62 +230,66 @@ public class BlocksFragment implements Fragment{
         }
     }
 
-	void updateRecipe(){
-		Recipe recipe = control.input().recipe;
+	void updateRecipe(Recipe recipe){
+		if (recipe == null) {
+			desctable.clear();
+			return;
+		}
+
 		desctable.clear();
 		desctable.setTouchable(Touchable.enabled);
-
+		
 		desctable.defaults().left();
 		desctable.left();
 		desctable.margin(12);
-
+		
 		Table header = new Table();
-
+		
 		desctable.add(header).left();
-
+		
 		desctable.row();
-
-		TextureRegion region = Draw.hasRegion(recipe.result.name() + "-icon") ?
+		
+		TextureRegion region = Draw.hasRegion(recipe.result.name() + "-icon") ? 
 				Draw.region(recipe.result.name() + "-icon") : Draw.region(recipe.result.name());
-
+		
 		header.addImage(region).size(8*5).padTop(4);
 		Label nameLabel = new Label(recipe.result.formalName);
 		nameLabel.setWrap(true);
 		header.add(nameLabel).padLeft(2).width(120f);
-
+		
 		//extra info
 		if(recipe.result.fullDescription != null){
 			header.addButton("?", () -> showBlockInfo(recipe.result)).expandX().padLeft(3).top().right().size(40f, 44f).padTop(-2);
 		}
-
+		
 		desctable.add().pad(2);
-
+		
 		Table requirements = new Table();
-
+		
 		desctable.row();
-
+		
 		desctable.add(requirements);
 		desctable.left();
-
+		
 		for(ItemStack stack : recipe.requirements){
-			requirements.addImage(stack.item.region).size(8*3);
+			requirements.addImage(Draw.region("icon-"+stack.item.name)).size(8*3);
 			Label reqlabel = new Label("");
-
+			
 			reqlabel.update(()->{
 				int current = state.inventory.getAmount(stack.item);
 				String text = Mathf.clamp(current, 0, stack.amount) + "/" + stack.amount;
-
+				
 				reqlabel.setColor(current < stack.amount ? Colors.get("missingitems") : Color.WHITE);
-
+				
 				reqlabel.setText(text);
 			});
-
+			
 			requirements.add(reqlabel).left();
 			requirements.row();
 		}
-
+		
 		desctable.row();
-
+		
 		Label label = new Label("[health]"+ Bundles.get("text.health")+": " + recipe.result.health);
 		label.setWrap(true);
 		desctable.add(label).width(200).padTop(4).padBottom(2);
