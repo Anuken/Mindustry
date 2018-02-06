@@ -79,7 +79,7 @@ public class Conveyor extends Block{
 			Tmp.v1.set(tilesize, 0).rotate(rotation * 90);
 			Tmp.v2.set(-tilesize / 2, pos.x*tilesize/2).rotate(rotation * 90);
 			
-			Draw.rect("icon-" + pos.item.name,
+			Draw.rect(pos.item.region,
 					tile.x * tilesize + Tmp.v1.x * pos.y + Tmp.v2.x, 
 					tile.y * tilesize + Tmp.v1.y * pos.y + Tmp.v2.y, itemSize, itemSize);
 		}

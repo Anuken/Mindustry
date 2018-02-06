@@ -1,6 +1,8 @@
 package io.anuke.mindustry.resource;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Bundles;
 
 public class Item{
@@ -20,12 +22,17 @@ public class Item{
 
 	public final int id;
 	public final String name;
+	public TextureRegion region;
 
 	public Item(String name) {
 		this.id = items.size;
 		this.name = name;
 
-		Item.items.add(this);
+		items.add(this);
+	}
+
+	public void init(){
+		this.region = Draw.region("icon-" + name);
 	}
 
 	public String localizedName(){

@@ -3,7 +3,6 @@ package io.anuke.mindustry.world.blocks.types.distribution;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 
 public class Splitter extends Block{
@@ -14,7 +13,7 @@ public class Splitter extends Block{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        if(source.block() instanceof Sorter) return false;
+        if(source.block() instanceof Sorter || source.block() instanceof Splitter) return false;
         Tile to = getTileTarget(item, tile, source, false);
 
         return to != null && to.block().acceptItem(item, to, tile);
@@ -24,9 +23,7 @@ public class Splitter extends Block{
     public void handleItem(Item item, Tile tile, Tile source){
         Tile to = getTileTarget(item, tile, source, true);
 
-        Timers.run(15, () -> {
-            to.block().handleItem(item, to, tile);
-        });
+        to.block().handleItem(item, to, tile);
     }
 
     Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){

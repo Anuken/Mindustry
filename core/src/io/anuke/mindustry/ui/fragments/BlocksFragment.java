@@ -29,7 +29,7 @@ public class BlocksFragment implements Fragment{
 	private Stack stack = new Stack();
 	private Array<String> statlist = new Array<>();
 	private boolean shown = true;
-	
+
 	public void build(){
 		InputHandler input = control.input();
 
@@ -193,63 +193,63 @@ public class BlocksFragment implements Fragment{
             blocks.actions(Actions.translateBy(0, -blocks.getTranslation().y, t, ip));
         }
     }
-	
+
 	void updateRecipe(){
 		Recipe recipe = control.input().recipe;
 		desctable.clear();
 		desctable.setTouchable(Touchable.enabled);
-		
+
 		desctable.defaults().left();
 		desctable.left();
 		desctable.margin(12);
-		
+
 		Table header = new Table();
-		
+
 		desctable.add(header).left();
-		
+
 		desctable.row();
-		
-		TextureRegion region = Draw.hasRegion(recipe.result.name() + "-icon") ? 
+
+		TextureRegion region = Draw.hasRegion(recipe.result.name() + "-icon") ?
 				Draw.region(recipe.result.name() + "-icon") : Draw.region(recipe.result.name());
-		
+
 		header.addImage(region).size(8*5).padTop(4);
 		Label nameLabel = new Label(recipe.result.formalName);
 		nameLabel.setWrap(true);
 		header.add(nameLabel).padLeft(2).width(120f);
-		
+
 		//extra info
 		if(recipe.result.fullDescription != null){
 			header.addButton("?", () -> showBlockInfo(recipe.result)).expandX().padLeft(3).top().right().size(40f, 44f).padTop(-2);
 		}
-		
+
 		desctable.add().pad(2);
-		
+
 		Table requirements = new Table();
-		
+
 		desctable.row();
-		
+
 		desctable.add(requirements);
 		desctable.left();
-		
+
 		for(ItemStack stack : recipe.requirements){
-			requirements.addImage(Draw.region("icon-"+stack.item.name)).size(8*3);
+			requirements.addImage(stack.item.region).size(8*3);
 			Label reqlabel = new Label("");
-			
+
 			reqlabel.update(()->{
 				int current = state.inventory.getAmount(stack.item);
 				String text = Mathf.clamp(current, 0, stack.amount) + "/" + stack.amount;
-				
+
 				reqlabel.setColor(current < stack.amount ? Colors.get("missingitems") : Color.WHITE);
-				
+
 				reqlabel.setText(text);
 			});
-			
+
 			requirements.add(reqlabel).left();
 			requirements.row();
 		}
-		
+
 		desctable.row();
-		
+
 		Label label = new Label("[health]"+ Bundles.get("text.health")+": " + recipe.result.health);
 		label.setWrap(true);
 		desctable.add(label).width(200).padTop(4).padBottom(2);

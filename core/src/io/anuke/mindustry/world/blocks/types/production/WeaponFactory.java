@@ -63,7 +63,7 @@ public class WeaponFactory extends Block{
                     for(ItemStack s : requirements){
 
                         int amount = Math.min(state.inventory.getAmount(s.item), s.amount);
-                        reqtable.addImage(Draw.region("icon-" + s.item.name)).padRight(3).size(8*2);
+                        reqtable.addImage(s.item.region).padRight(3).size(8*2);
                         reqtable.add(
                                 (amount >= s.amount ? "" : "[RED]")
                                         + amount + " / " +s.amount, 0.5f).left();

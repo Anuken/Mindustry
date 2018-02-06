@@ -1,14 +1,16 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
+import com.badlogic.gdx.utils.NumberUtils;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Bits;
 
 public class TunnelConveyor extends Block{
 	protected int maxdist = 3;
-	protected float speed = 12; //frames taken to go through this tunnel
+	protected float speed = 50; //frames taken to go through this tunnel
 	protected int capacity = 32;
 
 	protected TunnelConveyor(String name) {
@@ -41,12 +43,14 @@ public class TunnelConveyor extends Block{
 		TunnelEntity entity = tile.entity();
 
 		if(entity.index > 0){
-			entity.time += Timers.delta();
-			if(entity.time >= speed){
-				if(entity.index > entity.buffer.length) entity.index = entity.buffer.length;
-				int i = entity.buffer[entity.index - 1];
+			long l = entity.buffer[0];
+			float time = NumberUtils.intBitsToFloat(Bits.getLeftInt(l));
 
-				Item item = Item.getByID(i);
+			if(Timers.time() >= time + speed){
+
+				int val = Bits.getRightInt(l);
+
+				Item item = Item.getByID(Bits.getLeftShort(val));
 
 				Tile tunnel = getDestTunnel(tile, item);
 				if(tunnel == null) return;
@@ -56,12 +60,9 @@ public class TunnelConveyor extends Block{
 				if(!target.block().acceptItem(item, target, tunnel)) return;
 
 				target.block().handleItem(item, target, tunnel);
-
+				System.arraycopy(entity.buffer, 1, entity.buffer, 0, entity.index - 1);
 				entity.index --;
-				entity.time = 0f;
 			}
-		}else{
-			entity.time = 0f;
 		}
 	}
 
@@ -103,8 +104,7 @@ public class TunnelConveyor extends Block{
 	}
 
 	class TunnelEntity extends TileEntity {
-		int[] buffer = new int[capacity];
+		long[] buffer = new long[capacity];
 		int index;
-		float time;
 	}
 }

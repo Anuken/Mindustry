@@ -26,7 +26,7 @@ public class Omnidrill extends Drill {
         if(tile.floor().drops == null) return;
         Item item = tile.floor().drops.item;
 
-        TextureRegion region = Draw.region("icon-" + item.name);
+        TextureRegion region = item.region;
         Tmp.tr1.setRegion(region, 4, 4, 1, 1);
 
         Draw.rect(Tmp.tr1, tile.worldx(), tile.worldy(), 2f, 2f);

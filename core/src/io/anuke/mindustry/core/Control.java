@@ -5,17 +5,18 @@ import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Tutorial;
 import io.anuke.mindustry.game.UpgradeInventory;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.input.AndroidInput;
+import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.io.Saves;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.UCore;
@@ -90,6 +91,10 @@ public class Control extends Module{
 		Effects.setShakeFalloff(10000f);
 		
 		Core.atlas = new Atlas("sprites.atlas");
+
+		for(Item item : Item.getAllItems()){
+			item.init();
+		}
 		
 		Sounds.load("shoot.ogg", "place.ogg", "explosion.ogg", "enemyshoot.ogg",
 				"corexplode.ogg", "break.ogg", "spawn.ogg", "flame.ogg", "die.ogg", 

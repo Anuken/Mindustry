@@ -89,6 +89,9 @@ public class Block{
 	/**list of displayed block status bars. Defaults to health bar.*/
 	public Array<BlockBar> bars = Array.with(new BlockBar(Color.RED, false, tile -> tile.entity.health / (float)tile.block().health));
 
+	/**texture info*/
+	TextureRegion[] regions;
+
 	public Block(String name) {
 		this.name = name;
 		this.formalName = Bundles.get("block." + name + ".name", name);
