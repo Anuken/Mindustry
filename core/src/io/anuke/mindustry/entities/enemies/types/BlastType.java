@@ -1,12 +1,10 @@
 package io.anuke.mindustry.entities.enemies.types;
 
-import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
-import io.anuke.ucore.util.Tmp;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -26,15 +24,16 @@ public class BlastType extends EnemyType {
 	public void behavior(Enemy enemy){
 
 		float range = 10f;
-		Vector2 offset = Tmp.v3.setZero();
+		float ox = 0, oy = 0;
 
 		if(enemy.target instanceof TileEntity){
 			TileEntity e = (TileEntity)enemy.target;
 			range = (e.tile.block().width * tilesize) /2f + 8f;
-			offset.set(e.tile.block().getPlaceOffset());
+			ox = e.tile.block().getPlaceOffset().x;
+			oy = e.tile.block().getPlaceOffset().y;
 		}
 		
-		if(enemy.target != null && enemy.target.distanceTo(enemy.x - offset.x, enemy.y - offset.y) < range){
+		if(enemy.target != null && enemy.target.distanceTo(enemy.x - ox, enemy.y - oy) < range){
 			explode(enemy);
 		}
 	}

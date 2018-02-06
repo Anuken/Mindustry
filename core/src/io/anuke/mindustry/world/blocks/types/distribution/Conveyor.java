@@ -9,10 +9,7 @@ import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Bits;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
-import io.anuke.ucore.util.Tmp;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -31,6 +28,9 @@ public class Conveyor extends Block{
 	private static final float itemSpace = 0.135f;
 	private static final float offsetScl = 128f*3f;
 	private static final float itemSize = 4f;
+
+	private final Translator tr1 = new Translator();
+	private final Translator tr2 = new Translator();
 	
 	public float speed = 0.02f;
 	
@@ -76,13 +76,13 @@ public class Conveyor extends Block{
 			ItemPos pos = drawpos.set(entity.convey.get(i));
 
 			if(pos.item == null) continue;
-			
-			Tmp.v1.set(tilesize, 0).rotate(rotation * 90);
-			Tmp.v2.set(-tilesize / 2, pos.x*tilesize/2).rotate(rotation * 90);
+
+			tr1.trns(rotation * 90, tilesize, 0);
+			tr2.trns(rotation * 90, -tilesize / 2, pos.x*tilesize/2);
 			
 			Draw.rect(pos.item.region,
-					tile.x * tilesize + Tmp.v1.x * pos.y + Tmp.v2.x, 
-					tile.y * tilesize + Tmp.v1.y * pos.y + Tmp.v2.y, itemSize, itemSize);
+					tile.x * tilesize + tr1.x * pos.y + tr2.x,
+					tile.y * tilesize + tr1.y * pos.y + tr2.y, itemSize, itemSize);
 		}
 	}
 	

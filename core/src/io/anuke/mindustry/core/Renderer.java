@@ -50,6 +50,7 @@ public class Renderer extends RendererModule{
 	private int targetscale = baseCameraScale;
 	private FloatArray shieldHits = new FloatArray();
 	private Array<Callable> shieldDraws = new Array<>();
+	private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
 	private BlockRenderer blocks = new BlockRenderer();
 
 	public Renderer() {
@@ -58,9 +59,9 @@ public class Renderer extends RendererModule{
 		Core.cameraScale = baseCameraScale;
 		Effects.setEffectProvider((name, color, x, y, rotation) -> {
 			if(Settings.getBool("effects")){
-				Rectangle view = Tmp.r1.setSize(camera.viewportWidth, camera.viewportHeight)
+				Rectangle view = rect.setSize(camera.viewportWidth, camera.viewportHeight)
 						.setCenter(camera.position.x, camera.position.y);
-				Rectangle pos = Tmp.r2.setSize(name.size).setCenter(x, y);
+				Rectangle pos = rect2.setSize(name.size).setCenter(x, y);
 				if(view.overlaps(pos)){
 					new EffectEntity(name, color, rotation).set(x, y).add();
 				}
@@ -242,7 +243,8 @@ public class Renderer extends RendererModule{
 		Draw.color(Color.RED);
 		for(Enemy enemy : enemyGroup.all()) {
 
-			if (Tmp.r1.setSize(camera.viewportWidth, camera.viewportHeight).setCenter(camera.position.x, camera.position.y).overlaps(enemy.hitbox.getRect(enemy.x, enemy.y))) {
+			if (rect.setSize(camera.viewportWidth, camera.viewportHeight).setCenter(camera.position.x, camera.position.y)
+					.overlaps(enemy.hitbox.getRect(enemy.x, enemy.y))) {
 				continue;
 			}
 

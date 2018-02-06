@@ -19,7 +19,6 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
 
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.tilesize;
@@ -30,6 +29,7 @@ public class Block{
 	private static ObjectMap<String, Block> map = new ObjectMap<>();
 	
 	protected static TextureRegion temp = new TextureRegion();
+	protected Vector2 offset = new Vector2();
 
 	/**internal name*/
 	public final String name;
@@ -272,7 +272,7 @@ public class Block{
 	
 	/**Offset for placing and drawing multiblocks.*/
 	public Vector2 getPlaceOffset(){
-		return Tmp.v3.set(((width + 1) % 2) * tilesize/2, ((height + 1) % 2) * tilesize/2);
+		return offset.set(((width + 1) % 2) * tilesize/2, ((height + 1) % 2) * tilesize/2);
 	}
 	
 	public boolean isMultiblock(){

@@ -17,7 +17,6 @@ import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
 import io.anuke.ucore.util.Translator;
 
 import java.nio.ByteBuffer;
@@ -290,10 +289,10 @@ public class Player extends SyncEntity{
 
 		i.time += 1f / i.spacing * Timers.delta();
 
-		Mathf.lerp2(Tmp.v2.set(i.last), i.target, i.time);
+		Mathf.lerp2(movement.set(i.last), i.target, i.time);
 
-		x = Tmp.v2.x;
-		y = Tmp.v2.y;
+		x = movement.x;
+		y = movement.y;
 
 		if(i.target.dst(x, y) > 128){
 			set(i.target.x, i.target.y);

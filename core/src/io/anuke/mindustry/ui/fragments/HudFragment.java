@@ -194,7 +194,7 @@ public class HudFragment implements Fragment{
 
 	private void playButton(float uheight){
 		new imagebutton("icon-play", 30f, () -> {
-			logic.runWave();
+			state.wavetime = 0f;
 		}).height(uheight).fillX().right().padTop(-8f).padBottom(-12f).padRight(-36).width(40f).update(l->{
 			boolean vis = state.enemies <= 0 && (Net.server() || !Net.active());
 			boolean paused = state.is(State.paused) || !vis;

@@ -9,6 +9,7 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Bresenham2;
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import com.badlogic.gdx.utils.Array;
@@ -43,6 +44,8 @@ public class MapView extends Element implements GestureListener{
 	private float zoom = 1f;
 	private boolean grid = false;
 	private GridImage image = new GridImage(0, 0);
+	private Vector2 vec = new Vector2();
+	private Rectangle rect = new Rectangle();
 
 	private boolean drawing;
 	private int lastx, lasty;
@@ -214,7 +217,7 @@ public class MapView extends Element implements GestureListener{
 		float px = ((float)x / editor.texture().getWidth()) * sclwidth + offsetx*zoom - sclwidth/2 + getWidth()/2;
 		float py = (float)((float)(editor.texture().getHeight() - 1 -  y) / editor.texture().getHeight()) * sclheight
 				+ offsety*zoom - sclheight/2 + getHeight()/2;
-		return Tmp.v1.set(px, py);
+		return vec.set(px, py);
 	}
 
 	@Override
@@ -229,7 +232,7 @@ public class MapView extends Element implements GestureListener{
 		image.setImageSize(editor.pixmap().getWidth(), editor.pixmap().getHeight());
 		
 		batch.flush();
-		boolean pop = ScissorStack.pushScissors(Tmp.r1.set(x + width/2 - size/2, y + height/2 - size/2, size, size));
+		boolean pop = ScissorStack.pushScissors(rect.set(x + width/2 - size/2, y + height/2 - size/2, size, size));
 		
 		batch.draw(editor.texture(), centerx - sclwidth/2, centery - sclheight/2, sclwidth, sclheight);
 

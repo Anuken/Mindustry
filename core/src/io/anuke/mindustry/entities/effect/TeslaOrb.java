@@ -4,19 +4,18 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
-
-import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.graphics.Fx;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
+
+import static io.anuke.mindustry.Vars.enemyGroup;
 
 public class TeslaOrb extends Entity{
 	private Array<Vector2> points = new Array<>();
@@ -25,6 +24,7 @@ public class TeslaOrb extends Entity{
 	private float range = 0;
 	private float lifetime = 30f;
 	private float life = 0f;
+	private Vector2 vector = new Vector2();
 	
 	public TeslaOrb(float x, float y, float range, int damage){
 		set(x, y);
@@ -83,7 +83,7 @@ public class TeslaOrb extends Entity{
 		
 		float range = 1f;
 		
-		Vector2 previous = Tmp.v1.set(x, y);
+		Vector2 previous = vector.set(x, y);
 		
 		for(Vector2 enemy : points){
 			

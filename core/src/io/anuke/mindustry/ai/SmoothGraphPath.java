@@ -3,16 +3,15 @@ package io.anuke.mindustry.ai;
 import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.ai.pfa.SmoothableGraphPath;
 import com.badlogic.gdx.math.Vector2;
-
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.util.Tmp;
 
 public class SmoothGraphPath extends DefaultGraphPath<Tile> implements SmoothableGraphPath<Tile, Vector2>{
+	private Vector2 vector = new Vector2();
 
 	@Override
 	public Vector2 getNodePosition(int index){
 		Tile tile = nodes.get(index);
-		return Tmp.v3.set(tile.worldx(), tile.worldy());
+		return vector.set(tile.worldx(), tile.worldy());
 	}
 
 	@Override

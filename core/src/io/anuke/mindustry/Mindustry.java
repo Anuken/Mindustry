@@ -25,7 +25,6 @@ public class Mindustry extends ModuleCore {
 		BundleLoader.load();
 		BlockLoader.load();
 
-
 		logic = new Logic();
 
 		if(!multithread) module(logic);

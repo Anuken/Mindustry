@@ -11,7 +11,6 @@ import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Tmp;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -20,6 +19,8 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class Door extends Wall{
+	protected final Rectangle rect = new Rectangle();
+
 	protected Effect openfx = Fx.dooropen;
 	protected Effect closefx = Fx.doorclose;
 
@@ -65,13 +66,13 @@ public class Door extends Wall{
 	boolean anyEntities(Tile tile){
 		int x = tile.x, y = tile.y;
 		Block type = tile.block();
-		Tmp.r2.setSize(type.width * tilesize, type.height * tilesize);
-		Tmp.r2.setCenter(tile.drawx(), tile.drawy());
+		rect.setSize(type.width * tilesize, type.height * tilesize);
+		rect.setCenter(tile.drawx(), tile.drawy());
 		
 		for(SolidEntity e : Entities.getNearby(enemyGroup, x * tilesize, y * tilesize, tilesize * 2f)){
 			Rectangle rect = e.hitbox.getRect(e.x, e.y);
 
-			if(Tmp.r2.overlaps(rect)){
+			if(rect.overlaps(rect)){
 				return true;
 			}
 		}
@@ -79,7 +80,7 @@ public class Door extends Wall{
 		for(SolidEntity e : Entities.getNearby(playerGroup, x * tilesize, y * tilesize, tilesize * 2f)){
 			Rectangle rect = e.hitbox.getRect(e.x, e.y);
 
-			if(Tmp.r2.overlaps(rect)){
+			if(rect.overlaps(rect)){
 				return true;
 			}
 		}

@@ -154,10 +154,10 @@ public class Enemy extends SyncEntity {
 
 		i.time += 1f / i.spacing * Timers.delta();
 
-		Mathf.lerp2(Tmp.v2.set(i.last), i.target, i.time);
+		Mathf.lerp2(i.vec.set(i.last), i.target, i.time);
 
-		x = Tmp.v2.x;
-		y = Tmp.v2.y;
+		x = i.vec.x;
+		y = i.vec.y;
 
 		angle = Mathf.lerpAngDelta(angle, i.targetrot, 0.6f);
 	}

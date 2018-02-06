@@ -50,6 +50,7 @@ public abstract class SyncEntity extends DestructibleEntity{
     public class Interpolator {
         public Vector2 target = new Vector2();
         public Vector2 last = new Vector2();
+        public Vector2 vec = new Vector2();
         public float targetrot;
         public float spacing = 1f;
         public float time;

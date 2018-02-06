@@ -79,8 +79,8 @@ public class Pathfind{
 		if(projectLen < 8 || !onLine(projection, prev.worldx(), prev.worldy(), target.worldx(), target.worldy())){
 			canProject = false;
 		}else{
-			projection.add(v1.set(Angles.angle(prev.worldx(), prev.worldy(),
-					target.worldx(), target.worldy()), projectLen));
+			projection.add(v1.set(projectLen, 0).rotate(Angles.angle(prev.worldx(), prev.worldy(),
+					target.worldx(), target.worldy())));
 		}
 			
 		float dst = Vector2.dst(enemy.x, enemy.y, target.worldx(), target.worldy());
