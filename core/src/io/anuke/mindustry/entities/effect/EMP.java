@@ -3,21 +3,23 @@ package io.anuke.mindustry.entities.effect;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-
-import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.TimedEntity;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Translator;
+
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class EMP extends TimedEntity{
 	static final int maxTargets = 8;
 	static Array<Tile> array = new Array<>();
+	static Translator tr = new Translator();
 	
 	int radius = 4;
 	int damage = 6;
@@ -80,8 +82,8 @@ public class EMP extends TimedEntity{
 		}
 		
 		for(int i = 0; i < 14 - targets.size; i ++){
-			Angles.translation(Mathf.randomSeed(i + id*77)*360f, radius * tilesize);
-			drawLine(x + Angles.x(), y + Angles.y());
+			tr.trns(Mathf.randomSeed(i + id*77)*360f, radius * tilesize);
+			drawLine(x + tr.x, y + tr.y);
 		}
 	
 		Lines.stroke(fract()*2f);

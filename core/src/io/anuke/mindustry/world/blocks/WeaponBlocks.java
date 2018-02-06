@@ -40,12 +40,11 @@ public class WeaponBlocks{
 		@Override
 		protected void shoot(Tile tile){
 			TurretEntity entity = tile.entity();
-			
-			Angles.vector.set(4, -2).rotate(entity.rotation);
-			bullet(tile, entity.rotation);
-				
-			Angles.vector.set(4, 2).rotate(entity.rotation);
-			bullet(tile, entity.rotation);
+
+			for(int i : Mathf.signs){
+				tr.trns(entity.rotation, 4, -2 * i);
+				bullet(tile, entity.rotation);
+			}
 		}
 	},
 	
@@ -136,9 +135,10 @@ public class WeaponBlocks{
 		@Override
 		public void shoot(Tile tile){
 			TurretEntity entity = tile.entity();
-			Angles.translation(entity.rotation, 4);
 
-			new TeslaOrb(tile.worldx() + Angles.x(), tile.worldy() + Angles.y(), range, 9).add();
+			float len = 4f;
+
+			new TeslaOrb(tile.drawx() + Angles.trnsx(entity.rotation, len), tile.drawy() + Angles.trnsy(entity.rotation, len), range, 9).add();
 		}
 	},
 		
@@ -179,10 +179,10 @@ public class WeaponBlocks{
 			float space = 3.5f;
 			
 			for(int i = -1; i < 1; i ++){
-				Angles.vector.set(len, Mathf.sign(i) * space).rotate(entity.rotation);
+				tr.trns(entity.rotation, len, Mathf.sign(i) * space);
 				bullet(tile, entity.rotation);
-				Effects.effect(shootEffect, tile.drawx() + Angles.x(),
-						tile.drawy()+ Angles.y(), entity.rotation);
+				Effects.effect(shootEffect, tile.drawx() + tr.x,
+						tile.drawy() + tr.y, entity.rotation);
 			}
 			
 			Effects.shake(1f, 1f, tile.worldx(), tile.worldy());

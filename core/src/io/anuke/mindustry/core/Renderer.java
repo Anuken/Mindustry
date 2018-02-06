@@ -247,8 +247,9 @@ public class Renderer extends RendererModule{
 			}
 
 			float angle = Angles.angle(camera.position.x, camera.position.y, enemy.x, enemy.y);
-			Angles.translation(angle, Unit.dp.scl(20f));
-			Draw.rect("enemyarrow", camera.position.x + Angles.x(), camera.position.y + Angles.y(), angle);
+			float tx = Angles.trnsx(angle, Unit.dp.scl(20f));
+			float ty = Angles.trnsy(angle, Unit.dp.scl(20f));
+			Draw.rect("enemyarrow", camera.position.x + tx, camera.position.y + ty, angle);
 		}
 
 		Draw.color();

@@ -24,6 +24,7 @@ import java.util.List;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class Conveyor extends Block{
+	private static ItemPos drawpos = new ItemPos();
 	private static ItemPos pos1 = new ItemPos();
 	private static ItemPos pos2 = new ItemPos();
 	private static LongArray removals = new LongArray();
@@ -72,7 +73,7 @@ public class Conveyor extends Block{
 		byte rotation = tile.getRotation();
 		
 		for(int i = 0; i < entity.convey.size; i ++){
-			ItemPos pos = pos1.set(entity.convey.get(i));
+			ItemPos pos = drawpos.set(entity.convey.get(i));
 
 			if(pos.item == null) continue;
 			

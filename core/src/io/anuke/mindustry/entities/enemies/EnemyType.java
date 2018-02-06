@@ -67,15 +67,13 @@ public class EnemyType {
     }
 
     public void draw(Enemy enemy){
-        String region = name + "-t" + Mathf.clamp(enemy.tier, 1, 3);
-
         Shaders.outline.color.set(tierColors[enemy.tier - 1]);
         Shaders.outline.lighten = Mathf.clamp(enemy.hitTime/hitDuration);
-        Shaders.outline.region = Draw.region(region);
+        Shaders.outline.region = enemy.region;
 
         Shaders.outline.apply();
 
-        Draw.rect(region, enemy.x, enemy.y, enemy.angle - 90);
+        Draw.rect(enemy.region, enemy.x, enemy.y, enemy.angle - 90);
         Draw.color();
 
         Graphics.flush();

@@ -46,8 +46,6 @@ public class DistributionBlocks{
 	liquidjunction = new LiquidJunction("liquidjunction"){{
 
 	}},
-	liquiditemjunction = new LiquidItemJunction("liquiditemjunction"){{
-	}},
 	powerbooster = new PowerBooster("powerbooster"){{
 		powerRange = 4;
 	}},

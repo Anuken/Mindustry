@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities.enemies;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.entities.Bullet;
@@ -10,10 +11,8 @@ import io.anuke.mindustry.net.NetEvents;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Timer;
-import io.anuke.ucore.util.Tmp;
+import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.util.*;
 
 import java.nio.ByteBuffer;
 
@@ -36,6 +35,9 @@ public class Enemy extends SyncEntity {
 	public float hitTime;
 	public int tier = 1;
 	public Vector2 totalMove = new Vector2();
+
+	public TextureRegion region;
+	public Translator tr = new Translator();
 
 	public Enemy(EnemyType type){
 		this.type = type;
@@ -90,6 +92,7 @@ public class Enemy extends SyncEntity {
 		hitbox.setSize(type.hitsize);
 		hitboxTile.setSize(type.hitsizeTile);
 		maxhealth = type.health * tier;
+		region = Draw.region(type.name + "-t" + Mathf.clamp(tier, 1, 3));
 
 		heal();
 	}
@@ -166,13 +169,13 @@ public class Enemy extends SyncEntity {
 	public void shoot(BulletType bullet, float rotation){
 
 		if(!(Net.client())) {
-			Angles.translation(angle + rotation, type.length);
-			Bullet out = new Bullet(bullet, this, x + Angles.x(), y + Angles.y(), this.angle + rotation).add();
+			tr.trns(angle + rotation, type.length);
+			Bullet out = new Bullet(bullet, this, x + tr.x, y + tr.y, this.angle + rotation).add();
 			out.damage = (int) ((bullet.damage * (1 + (tier - 1) * 1f)));
 			type.onShoot(this, bullet, rotation);
 
 			if(Net.server()){
-				NetEvents.handleBullet(bullet, this, x + Angles.x(), y + Angles.y(), this.angle + rotation, (short)out.damage);
+				NetEvents.handleBullet(bullet, this, x + tr.x, y + tr.y, this.angle + rotation, (short)out.damage);
 			}
 		}
 	}

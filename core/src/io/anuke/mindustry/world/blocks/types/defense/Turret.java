@@ -21,6 +21,7 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
+import io.anuke.ucore.util.Translator;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -51,6 +52,7 @@ public class Turret extends Block{
 	protected Effect shootEffect = null;
 	protected float shootShake = 0f;
 	protected int soundReload = 0;
+	protected Translator tr = new Translator();
 
 	public Turret(String name) {
 		super(name);
@@ -210,14 +212,14 @@ public class Turret extends Block{
 	protected void shoot(Tile tile){
 		TurretEntity entity = tile.entity();
 
-		Angles.translation(entity.rotation, width * tilesize / 2f);
+		tr.trns(entity.rotation, width * tilesize/2);
 		
 		for(int i = 0; i < shots; i ++){
 			if(Mathf.zero(shotDelayScale)){
 				bullet(tile, entity.rotation + Mathf.range(inaccuracy));
 			}else{
-				Timers.run(i * shotDelayScale, ()->{
-					Angles.translation(entity.rotation, width * tilesize / 2f);
+				Timers.run(i * shotDelayScale, () -> {
+					tr.trns(entity.rotation, width * tilesize/2f);
 					bullet(tile, entity.rotation + Mathf.range(inaccuracy));
 				});
 			}
@@ -225,8 +227,8 @@ public class Turret extends Block{
 		}
 		
 		if(shootEffect != null){
-			Effects.effect(shootEffect, tile.drawx() + Angles.x(),
-				tile.drawy()+ Angles.y(), entity.rotation);
+			Effects.effect(shootEffect, tile.drawx() + tr.x,
+				tile.drawy() + tr.y, entity.rotation);
 		}
 		
 		if(shootShake > 0){
@@ -235,7 +237,7 @@ public class Turret extends Block{
 	}
 	
 	protected void bullet(Tile tile, float angle){
-		Bullet out = new Bullet(bullet, tile.entity, tile.drawx() + Angles.x(), tile.drawy() + Angles.y(), angle).add();
+		new Bullet(bullet, tile.entity, tile.drawx() + tr.x, tile.drawy() + tr.y, angle).add();
 	}
 	
 	public static class TurretEntity extends TileEntity{

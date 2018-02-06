@@ -23,7 +23,7 @@ public class LiquidJunction extends Conduit{
 	public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
 		int dir = source.relativeTo(tile.x, tile.y);
 		dir = (dir+4)%4;
-		Tile to = tile.getNearby()[dir];
+		Tile to = tile.getNearby(dir);
 		
 		((LiquidBlock)to.block()).handleLiquid(to, tile, liquid, amount);
 		
@@ -33,7 +33,7 @@ public class LiquidJunction extends Conduit{
 	public boolean acceptLiquid(Tile dest, Tile source, Liquid liquid, float amount){
 		int dir = source.relativeTo(dest.x, dest.y);
 		dir = (dir+4)%4;
-		Tile to = dest.getNearby()[dir];
+		Tile to = dest.getNearby(dir);
 		return to != null && to.block() != this && to.block() instanceof LiquidBlock &&
 				((LiquidBlock)to.block()).acceptLiquid(to, dest, liquid, amount);
 	}

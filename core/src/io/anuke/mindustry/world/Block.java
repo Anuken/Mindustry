@@ -31,7 +31,6 @@ public class Block{
 	
 	protected static TextureRegion temp = new TextureRegion();
 
-	public Tile[] temptiles = new Tile[4];
 	/**internal name*/
 	public final String name;
 	/**internal ID*/

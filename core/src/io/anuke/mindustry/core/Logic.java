@@ -117,6 +117,9 @@ public class Logic extends Module {
 
         if(!state.is(State.menu)){
 
+            if(!Net.client())
+                world.pathfinder().update();
+
             if(world.getCore().block() != ProductionBlocks.core && !state.gameOver){
                 state.gameOver = true;
                 NetEvents.handleGameOver();

@@ -237,13 +237,13 @@ public class Tile{
 		if(rotation == 3) return world.tile(x, y - 1);
 		return null;
 	}
-	
-	public Tile[] getNearby(){
-		return world.getNearby(x, y);
-	}
 
-	public Tile[] getNearby(Tile[] copy){
-		return world.getNearby(x, y, copy);
+	public Tile[] getNearby(Tile[] temptiles){
+		temptiles[0] = world.tile(x+1, y);
+		temptiles[1] = world.tile(x, y+1);
+		temptiles[2] = world.tile(x-1, y);
+		temptiles[3] = world.tile(x, y-1);
+		return temptiles;
 	}
 
 	public void updateOcclusion(){

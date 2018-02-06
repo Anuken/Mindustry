@@ -20,10 +20,9 @@ public class BlendBlock extends Block{
 		Draw.rect(variants > 0 ? (name() + Mathf.randomSeed(tile.id(), 1, variants))  : name(), 
 				tile.worldx(), tile.worldy());
 		
-		Tile[] nearby = tile.getNearby();
-		
 		for(int i = 0; i < 4; i ++){
-			if(nearby[i] != null && !blend.test(nearby[i].block())){
+			Tile near = tile.getNearby(i);
+			if(near != null && !blend.test(near.block())){
 				Draw.rect(edge + "-" + i, tile.worldx(), tile.worldy());
 			}
 		}

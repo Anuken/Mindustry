@@ -252,10 +252,11 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			
 			Effects.effect(Fx.blastsmoke, b);
 			Effects.effect(Fx.blastexplosion, b);
-			
-			Angles.circle(30, f->{
-				Angles.translation(f, 6f);
-				Bullet o = new Bullet(blastshot, b.owner, b.x + Angles.x(), b.y + Angles.y(), f).add();
+
+			//TODO remove translation() usage
+			Angles.circleVectors(30, 6f, (x, y) -> {
+				float ang = Mathf.atan2(x, y);
+				Bullet o = new Bullet(blastshot, b.owner, b.x + x, b.y + y, ang).add();
 				o.damage = b.damage/9;
 			});
 		}

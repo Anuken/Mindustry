@@ -13,6 +13,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Translator;
 
 public class Weapon extends Upgrade{
 	public static final Weapon
@@ -87,6 +88,8 @@ public class Weapon extends Upgrade{
 	float length = 3f;
 	/**whether to shoot the weapons in different arms one after another, rather an all at once*/
 	boolean roundrobin = false;
+	/**translator for vector calulations*/
+	Translator tr = new Translator();
 	
 	private Weapon(String name, float reload, BulletType type){
 		super(name);
@@ -100,15 +103,15 @@ public class Weapon extends Upgrade{
 				Timers.reset(p, "reload" + !left, reload/2f);
 			}
 			float ang = Angles.mouseAngle(p.x, p.y);
-			Angles.vector.set(3f * Mathf.sign(left), length).rotate(ang - 90);
-			shoot(p, p.x + Angles.x(), p.y + Angles.y(), Angles.mouseAngle(p.x + Angles.x(), p.y + Angles.y()));
+			tr.trns(ang - 90, 3f * Mathf.sign(left), length);
+			shoot(p, p.x + tr.x, p.y + tr.y, Angles.mouseAngle(p.x + tr.x, p.y + tr.y));
 		}
 	}
 
 	void shootInternal(Player p, float x, float y, float rotation){
 		Angles.shotgun(shots, spacing, rotation, f -> bullet(p, x, y, f + Mathf.range(inaccuracy)));
-		Angles.translation(rotation, 3f);
-		if(effect != null) Effects.effect(effect, x + Angles.x(), y + Angles.y(), rotation);
+		tr.trns(rotation, 3f);
+		if(effect != null) Effects.effect(effect, x + tr.x, y + tr.y, rotation);
 		Effects.shake(shake, shake, x, y);
 		Effects.sound(shootsound, x, y);
 	}
@@ -122,7 +125,7 @@ public class Weapon extends Upgrade{
 	}
 	
 	void bullet(Entity owner, float x, float y, float angle){
-		Angles.translation(angle, 3f);
-		new Bullet(type, owner,  x + Angles.x(), y + Angles.y(), angle).add();
+		tr.trns(angle, 3f);
+		new Bullet(type, owner,  x + tr.x, y + tr.y, angle).add();
 	}
 }

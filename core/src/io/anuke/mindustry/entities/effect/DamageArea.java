@@ -11,20 +11,21 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Physics;
+import io.anuke.ucore.util.Translator;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class DamageArea{
 	private static Rectangle rect = new Rectangle();
+	private static Translator tr = new Translator();
 
 	//only for entities, not tiles (yet!)
 	public static void damageLine(Entity owner, Effect effect, float x, float y, float angle, float length, int damage){
-		Angles.translation(angle, length);
-		rect.setPosition(x, y).setSize(Angles.x(), Angles.y());
-		float x2 = Angles.x() + x, y2 = Angles.y() + y;
+		tr.trns(angle, length);
+		rect.setPosition(x, y).setSize(tr.x, tr.y);
+		float x2 = tr.x + x, y2 = tr.y + y;
 
 		if(rect.width < 0){
 			rect.x += rect.width;
