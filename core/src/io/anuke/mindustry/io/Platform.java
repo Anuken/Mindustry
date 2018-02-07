@@ -1,5 +1,6 @@
 package io.anuke.mindustry.io;
 
+import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.ucore.scene.ui.TextField;
 
 import java.util.Date;
@@ -27,4 +28,27 @@ public abstract class Platform {
 		return true;
 	}
 	public boolean isDebug(){return false;}
+	public ThreadProvider getThreadProvider(){
+		return new ThreadProvider() {
+			@Override
+			public boolean isOnThread() {
+				return true;
+			}
+
+			@Override
+			public void sleep(long ms) {
+
+			}
+
+			@Override
+			public void start(Runnable run) {
+
+			}
+
+			@Override
+			public void stop() {
+
+			}
+		};
+	}
 }

@@ -1,6 +1,5 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
@@ -34,10 +33,6 @@ import static io.anuke.mindustry.Vars.*;
  */
 public class Logic extends Module {
     private final Array<EnemySpawn> spawns = WaveCreator.getSpawns();
-
-    public Logic(){
-        Timers.setDeltaProvider(() -> Math.min(Gdx.graphics.getDeltaTime()*60f, 60));
-    }
 
     @Override
     public void init(){
@@ -111,6 +106,7 @@ public class Logic extends Module {
 
     @Override
     public void update(){
+
         if(!state.is(State.paused) || Net.active()){
             Timers.update();
         }

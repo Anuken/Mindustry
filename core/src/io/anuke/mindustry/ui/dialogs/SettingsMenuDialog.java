@@ -113,6 +113,14 @@ public class SettingsMenuDialog extends SettingsDialog{
 		game.sliderPref("sensitivity", 100, 10, 300, i -> i + "%");
 		game.sliderPref("saveinterval", 90, 10, 5*120, i -> Bundles.format("setting.seconds", i));
 
+		if(!gwt){
+			graphics.checkPref("multithread", false, threads::setEnabled);
+
+			if(Settings.getBool("multithread")){
+				threads.setEnabled(true);
+			}
+		}
+
 		if(!android && !gwt) {
 			graphics.checkPref("vsync", true, b -> Gdx.graphics.setVSync(b));
 			graphics.checkPref("fullscreen", false, b -> {
@@ -128,6 +136,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 				Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
 			}
 		}
+
 		graphics.checkPref("fps", false);
 		graphics.checkPref("lasers", true);
 		graphics.checkPref("indicators", true);
