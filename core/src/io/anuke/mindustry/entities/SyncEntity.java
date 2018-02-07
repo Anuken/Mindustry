@@ -1,16 +1,26 @@
 package io.anuke.mindustry.entities;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.ucore.entities.DestructibleEntity;
+import io.anuke.ucore.util.Mathf;
 
 import java.nio.ByteBuffer;
+
+import static io.anuke.mindustry.Vars.threads;
 
 public abstract class SyncEntity extends DestructibleEntity{
     private static ObjectIntMap<Class<? extends SyncEntity>> writeSizes = new ObjectIntMap<>();
 
     protected transient Interpolator interpolator = new Interpolator();
+
+    //for interpolating at low tick speeds.
+    private transient Vector2 tpos = new Vector2(-999, -999);
+    private transient float tang = 0f;
+
+    public float angle;
 
     static{
         setWriteSize(Enemy.class, 4 + 4 + 2 + 2);
@@ -23,6 +33,40 @@ public abstract class SyncEntity extends DestructibleEntity{
     public abstract void write(ByteBuffer data);
     public abstract void read(ByteBuffer data, long time);
     public abstract void interpolate();
+
+    @Override
+    public final void draw(){
+        float x = this.x, y = this.y, angle = this.angle;
+
+        //interpolates data at low tick speeds.
+        if(isSmoothing()){
+            if(tpos.dst(x, y) > 100){
+                tpos.set(x, y);
+            }
+            tpos.x = Mathf.lerpDelta(tpos.x, x, 0.3f);
+            tpos.y = Mathf.lerpDelta(tpos.y, y, 0.3f);
+            tang = Mathf.lerpAngDelta(tang, angle, 0.3f);
+            this.x = tpos.x;
+            this.y = tpos.y;
+            this.angle = tang;
+        }
+
+        drawSmooth();
+
+        this.x = x;
+        this.y = y;
+        this.angle = angle;
+    }
+
+    private boolean isSmoothing(){
+        return threads.isEnabled() && threads.getFPS() <= Gdx.graphics.getFramesPerSecond() / 2f;
+    }
+
+    public Vector2 getDrawPosition(){
+        return isSmoothing() ? tpos : tpos.set(x, y);
+    }
+
+    public void drawSmooth(){}
 
     public int getWriteSize(){
         return getWriteSize(getClass());

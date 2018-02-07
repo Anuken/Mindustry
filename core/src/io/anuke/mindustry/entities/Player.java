@@ -35,7 +35,6 @@ public class Player extends SyncEntity{
 	public Weapon weaponRight = Weapon.blaster;
 	public Mech mech = Mech.standard;
 
-	public float angle;
 	public float targetAngle = 0f;
 	public float stucktime = 0f;
 	public boolean dashing = false;
@@ -106,7 +105,7 @@ public class Player extends SyncEntity{
 	}
 	
 	@Override
-	public void draw(){
+	public void drawSmooth(){
         if(isAndroid && isLocal){
             angle = Mathf.lerpAngDelta(angle, targetAngle, 0.2f);
         }

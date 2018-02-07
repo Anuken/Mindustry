@@ -29,12 +29,12 @@ public class Enemy extends SyncEntity {
 	public Enemy spawner;
 	public int spawned;
 
-	public float angle;
 	public Vector2 velocity = new Vector2();
+	public Vector2 totalMove = new Vector2();
+	public Vector2 tpos = new Vector2(-999, -999);
 	public Entity target;
 	public float hitTime;
 	public int tier = 1;
-	public Vector2 totalMove = new Vector2();
 
 	public TextureRegion region;
 	public Translator tr = new Translator();
@@ -52,7 +52,7 @@ public class Enemy extends SyncEntity {
 	}
 
 	@Override
-	public void draw(){
+	public void drawSmooth(){
 		type.draw(this);
 	}
 

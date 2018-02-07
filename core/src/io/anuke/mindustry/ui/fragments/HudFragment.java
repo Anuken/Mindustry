@@ -93,7 +93,7 @@ public class HudFragment implements Fragment{
 				visible(() -> !state.is(State.menu));
 
 				Label fps = new Label(() -> (Settings.getBool("fps") ? (Gdx.graphics.getFramesPerSecond() + " FPS") +
-						(Net.client() && !gwt ? " / Ping: " + Net.getPing() : "") : ""));
+						(threads.isEnabled() ?  " / " + threads.getFPS() + " TPS" : "") + (Net.client() && !gwt ? " / Ping: " + Net.getPing() : "") : ""));
 				row();
 				add(fps).size(-1);
 

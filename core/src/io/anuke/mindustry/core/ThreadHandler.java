@@ -10,6 +10,7 @@ import static io.anuke.mindustry.Vars.logic;
 public class ThreadHandler {
     private final ThreadProvider impl;
     private float delta = 1f;
+    private long frame = 0;
     private boolean enabled;
 
     private final Object updateLock = new Object();
@@ -19,6 +20,14 @@ public class ThreadHandler {
         this.impl = impl;
 
         Timers.setDeltaProvider(() -> impl.isOnThread() ? delta : Gdx.graphics.getDeltaTime()*60f);
+    }
+
+    public int getFPS(){
+        return (int)(60/delta);
+    }
+
+    public long getFrameID(){
+        return frame;
     }
 
     public void handleRender(){
@@ -55,6 +64,7 @@ public class ThreadHandler {
             while (true) {
                 long time = TimeUtils.millis();
                 logic.update();
+                //impl.sleep(130);
 
                 long elapsed = TimeUtils.timeSinceMillis(time);
                 long target = (long) (1000 / 60f);
@@ -71,6 +81,8 @@ public class ThreadHandler {
                     }
                     rendered = false;
                 }
+
+                frame ++;
             }
         } catch (InterruptedException ex) {
             Log.info("Stopping logic thread.");

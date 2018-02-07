@@ -352,6 +352,7 @@ public class Control extends Module{
 			}
 		
 			if(!state.is(State.paused) || Net.active()){
+				Entities.update(effectGroup);
 				
 				if(respawntime > 0){
 					
