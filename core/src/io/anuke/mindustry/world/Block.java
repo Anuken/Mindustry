@@ -87,6 +87,8 @@ public class Block{
 	public Layer layer2 = null;
 	/**list of displayed block status bars. Defaults to health bar.*/
 	public Array<BlockBar> bars = Array.with(new BlockBar(Color.RED, false, tile -> tile.entity.health / (float)tile.block().health));
+	/**whether this block can be replaced in all cases*/
+	public boolean alwaysReplace = false;
 
 	public Block(String name) {
 		this.name = name;

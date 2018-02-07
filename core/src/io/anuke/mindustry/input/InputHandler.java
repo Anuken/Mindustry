@@ -139,14 +139,14 @@ public abstract class InputHandler extends InputAdapter{
 			for(int dx = 0; dx < type.width; dx ++){
 				for(int dy = 0; dy < type.height; dy ++){
 					Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-					if(other == null || other.block() != Blocks.air || isSpawnPoint(other)){
+					if(other == null || (other.block() != Blocks.air && !other.block().alwaysReplace) || isSpawnPoint(other)){
 						return false;
 					}
 				}
 			}
 			return true;
 		}else{
-			if(tile.block() != type && type.canReplace(tile.block()) && tile.block().isMultiblock() == type.isMultiblock()){
+			if(tile.block() != type && (type.canReplace(tile.block()) || tile.block().alwaysReplace) && tile.block().isMultiblock() == type.isMultiblock()){
 				return true;
 			}
 			return tile.block() == Blocks.air;

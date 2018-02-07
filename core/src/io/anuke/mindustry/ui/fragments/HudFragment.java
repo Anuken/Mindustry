@@ -179,7 +179,7 @@ public class HudFragment implements Fragment{
 
 				new label(()-> state.enemies > 0 ?
 					getEnemiesRemaining() :
-						(control.tutorial().active() || state.mode.toggleWaves) ? "$text.waiting"
+						(control.tutorial().active() || state.mode.disableWaveTimer) ? "$text.waiting"
 								: Bundles.format("text.wave.waiting", (int) (state.wavetime / 60f)))
 				.minWidth(126).padLeft(-6).padRight(-12).left();
 

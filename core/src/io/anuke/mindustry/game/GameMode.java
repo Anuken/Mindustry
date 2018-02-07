@@ -7,16 +7,16 @@ public enum GameMode{
 	sandbox{
 		{
 			infiniteResources = true;
-			toggleWaves = true;
+			disableWaveTimer = true;
 		}
 	},
     freebuild{
         {
-            toggleWaves = true;
+            disableWaveTimer = true;
         }
     };
 	public boolean infiniteResources;
-	public boolean toggleWaves;
+	public boolean disableWaveTimer;
 
 	@Override
 	public String toString(){

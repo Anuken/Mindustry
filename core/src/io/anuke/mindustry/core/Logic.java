@@ -8,6 +8,7 @@ import io.anuke.mindustry.game.EnemySpawn;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.game.EventType.PlayEvent;
 import io.anuke.mindustry.game.EventType.ResetEvent;
+import io.anuke.mindustry.game.EventType.WaveEvent;
 import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.game.WaveCreator;
 import io.anuke.mindustry.graphics.Fx;
@@ -102,6 +103,8 @@ public class Logic extends Module {
         state.wave ++;
         state.wavetime = wavespace * state.difficulty.timeScaling;
         state.extrawavetime = maxwavespace * state.difficulty.maxTimeScaling;
+
+        Events.fire(WaveEvent.class);
     }
 
     @Override
@@ -116,7 +119,7 @@ public class Logic extends Module {
             if(!Net.client())
                 world.pathfinder().update();
 
-            if(world.getCore().block() != ProductionBlocks.core && !state.gameOver){
+            if(world.getCore() != null && world.getCore().block() != ProductionBlocks.core && !state.gameOver){
                 state.gameOver = true;
                 NetEvents.handleGameOver();
                 Events.fire(GameOverEvent.class);
@@ -124,7 +127,7 @@ public class Logic extends Module {
 
             if(!state.is(State.paused) || Net.active()){
 
-                if(!state.mode.toggleWaves){
+                if(!state.mode.disableWaveTimer){
 
                     if(state.enemies <= 0){
                         state.wavetime -= delta();

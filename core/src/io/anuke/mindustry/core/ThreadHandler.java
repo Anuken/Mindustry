@@ -9,10 +9,11 @@ import static io.anuke.mindustry.Vars.logic;
 
 public class ThreadHandler {
     private final ThreadProvider impl;
-    private final Object lock = new Object();
     private float delta = 1f;
-    private boolean finished;
     private boolean enabled;
+
+    private final Object updateLock = new Object();
+    private boolean rendered = true;
 
     public ThreadHandler(ThreadProvider impl){
         this.impl = impl;
@@ -21,21 +22,28 @@ public class ThreadHandler {
     }
 
     public void handleRender(){
-        synchronized(lock) {
-            finished = true;
-            lock.notify();
+        if(!enabled) return;
+
+        synchronized (updateLock) {
+            rendered = true;
+            updateLock.notify();
         }
     }
 
     public void setEnabled(boolean enabled){
         if(enabled){
             logic.doUpdate = false;
-            Timers.runTask(2f, () -> impl.start(this::runLogic));
+            Timers.runTask(2f, () -> {
+                impl.start(this::runLogic);
+                this.enabled = true;
+            });
         }else{
+            this.enabled = false;
             impl.stop();
-            Timers.runTask(2f, () -> logic.doUpdate = true);
+            Timers.runTask(2f, () -> {
+                logic.doUpdate = true;
+            });
         }
-        this.enabled = enabled;
     }
 
     public boolean isEnabled(){
@@ -57,11 +65,11 @@ public class ThreadHandler {
                     impl.sleep(target - elapsed);
                 }
 
-                synchronized(lock) {
-                    while(!finished) {
-                        lock.wait();
+                synchronized(updateLock) {
+                    while(!rendered) {
+                        updateLock.wait();
                     }
-                    finished = false;
+                    rendered = false;
                 }
             }
         } catch (InterruptedException ex) {

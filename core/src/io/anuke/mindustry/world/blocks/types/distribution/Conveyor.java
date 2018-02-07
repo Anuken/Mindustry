@@ -24,7 +24,6 @@ public class Conveyor extends Block{
 	private static ItemPos drawpos = new ItemPos();
 	private static ItemPos pos1 = new ItemPos();
 	private static ItemPos pos2 = new ItemPos();
-	private static LongArray removals = new LongArray();
 	private static final float itemSpace = 0.135f;
 	private static final float offsetScl = 128f*3f;
 	private static final float itemSize = 4f;
@@ -93,9 +92,8 @@ public class Conveyor extends Block{
 		ConveyorEntity entity = tile.entity();
 		entity.minitem = 1f;
 
-		removals.clear();
-
 		float shift = entity.elapsed * speed;
+		int minremove = Integer.MAX_VALUE;
 
 		for(int i = 0; i < entity.convey.size; i ++){
 			long value = entity.convey.get(i);
@@ -103,9 +101,10 @@ public class Conveyor extends Block{
 
 			pos.y += shift;
 
+			//..this should never happen, but in case it does, remove it and stop here
 			if(pos.item == null){
-				removals.add(value);
-				continue;
+				entity.convey.removeValue(value);
+				break;
 			}
 
 			float nextpos = (i == entity.convey.size - 1 ? 100f : pos2.set(entity.convey.get(i + 1)).y) - itemSpace;
@@ -121,7 +120,7 @@ public class Conveyor extends Block{
 			pos.y = Mathf.clamp(pos.y);
 
 			if(pos.y >= 0.9999f && offloadDir(tile, pos.item)){
-				removals.add(value);
+				minremove = Math.min(i, minremove);
 			}else{
 				value = pos.pack();
 
@@ -133,7 +132,7 @@ public class Conveyor extends Block{
 		}
 
 		entity.elapsed = 0f;
-		entity.convey.removeAll(removals);
+		if(minremove != Integer.MAX_VALUE) entity.convey.truncate(minremove);
 	}
 
 	@Override
@@ -155,7 +154,6 @@ public class Conveyor extends Block{
 
 		int ch = Math.abs(source.relativeTo(tile.x, tile.y) - rotation);
 		int ang = ((source.relativeTo(tile.x, tile.y) - rotation));
-
 
 		float pos = ch == 0 ? 0 : ch % 2 == 1 ? 0.5f : 1f;
 		float y = (ang == -1 || ang == 3) ? 1 : (ang == 1 || ang == -3) ? -1 : 0;
