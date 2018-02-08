@@ -2,17 +2,17 @@ package io.anuke.mindustry.entities.enemies;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Timer;
+import io.anuke.ucore.util.Translator;
 
 import java.nio.ByteBuffer;
 
@@ -141,25 +141,7 @@ public class Enemy extends SyncEntity {
 
 		this.health = health;
 
-		interpolator.targetrot = angle / 2f;
-		interpolator.time = 0f;
-		interpolator.last.set(this.x, this.y);
-		interpolator.target.set(x, y);
-		interpolator.spacing = Math.min(Math.max(((TimeUtils.timeSinceMillis(time) / 1000f) * 60f), 4f), 10f);
-	}
-
-	@Override
-	public void interpolate() {
-		Interpolator i = interpolator;
-
-		i.time += 1f / i.spacing * Timers.delta();
-
-		Mathf.lerp2(i.vec.set(i.last), i.target, i.time);
-
-		x = i.vec.x;
-		y = i.vec.y;
-
-		angle = Mathf.lerpAngDelta(angle, i.targetrot, 0.6f);
+		interpolator.read(this.x, this.y, x, y, angle, time);
 	}
 
 	public void shoot(BulletType bullet){

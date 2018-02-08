@@ -2,7 +2,6 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
@@ -275,31 +274,14 @@ public class Player extends SyncEntity{
 		this.health = health;
 		this.dashing = dashing == 1;
 
-		interpolator.targetrot = angle;
-		interpolator.time = 0f;
-		interpolator.last.set(this.x, this.y);
-		interpolator.target.set(x, y);
-		interpolator.spacing = Math.min(Math.max(((TimeUtils.timeSinceMillis(time) / 1000f) * 60f), 4f), 10);
+		interpolator.read(this.x, this.y, x, y, angle, time);
 	}
 
 	@Override
 	public void interpolate() {
+		super.interpolate();
+
 		Interpolator i = interpolator;
-
-		i.time += 1f / i.spacing * Timers.delta();
-
-		Mathf.lerp2(movement.set(i.last), i.target, i.time);
-
-		x = movement.x;
-		y = movement.y;
-
-		if(i.target.dst(x, y) > 128){
-			set(i.target.x, i.target.y);
-			i.time = 0f;
-			i.last.set(i.target);
-		}
-
-		angle = Mathf.lerpAngDelta(angle, i.targetrot, 0.6f);
 
 		float tx = x + Angles.trnsx(angle + 180f, 3f);
 		float ty = y + Angles.trnsy(angle + 180f, 3f);

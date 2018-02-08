@@ -9,21 +9,26 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.*;
 
 public class Bullet extends BulletEntity{
-	public boolean absorbed = false;
 	
 	public Bullet(BulletType type, Entity owner, float x, float y, float angle){
 		super(type, owner, angle);
 		set(x, y);
 		this.type = type;
 	}
-
-	public void absorb(){
-		absorbed = true;
-		remove();
-	}
 	
 	public void draw(){
-		type.draw(this);
+		//interpolate position linearly at low tick speeds
+		if(SyncEntity.isSmoothing()){
+			x += threads.getFramesSinceUpdate() * velocity.x;
+			y += threads.getFramesSinceUpdate() * velocity.y;
+
+			type.draw(this);
+
+			x -= threads.getFramesSinceUpdate() * velocity.x;
+			y -= threads.getFramesSinceUpdate() * velocity.y;
+		}else{
+			type.draw(this);
+		}
 	}
 	
 	public float drawSize(){

@@ -268,13 +268,6 @@ public class Control extends Module{
 		Entities.collisions().setCollider(tilesize, world::solid);
 
 		Platform.instance.updateRPC();
-
-		//TODO remove
-		/*
-		Timers.runTask(2, () -> {
-			state.set(State.playing);
-			SaveIO.loadFromSlot(0);
-		});*/
 	}
 	
 	@Override

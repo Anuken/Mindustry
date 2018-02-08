@@ -67,13 +67,13 @@ public class Conveyor extends Block{
 	}
 
 	@Override
-	public synchronized void drawLayer(Tile tile){
+	public void drawLayer(Tile tile){
 		ConveyorEntity entity = tile.entity();
 
 		byte rotation = tile.getRotation();
 
 		for(int i = 0; i < entity.convey.size; i ++){
-			ItemPos pos = drawpos.set(entity.convey.get(i));
+			ItemPos pos = drawpos.set(entity.convey.get(i), ItemPos.drawShorts);
 
 			if(pos.item == null) continue;
 
@@ -87,19 +87,16 @@ public class Conveyor extends Block{
 	}
 
 	@Override
-	public synchronized void update(Tile tile){
+	public void update(Tile tile){
 
 		ConveyorEntity entity = tile.entity();
 		entity.minitem = 1f;
 
-		float shift = entity.elapsed * speed;
 		int minremove = Integer.MAX_VALUE;
 
 		for(int i = 0; i < entity.convey.size; i ++){
 			long value = entity.convey.get(i);
-			ItemPos pos = pos1.set(value);
-
-			pos.y += shift;
+			ItemPos pos = pos1.set(value, ItemPos.updateShorts);
 
 			//..this should never happen, but in case it does, remove it and stop here
 			if(pos.item == null){
@@ -107,7 +104,7 @@ public class Conveyor extends Block{
 				break;
 			}
 
-			float nextpos = (i == entity.convey.size - 1 ? 100f : pos2.set(entity.convey.get(i + 1)).y) - itemSpace;
+			float nextpos = (i == entity.convey.size - 1 ? 100f : pos2.set(entity.convey.get(i + 1), ItemPos.updateShorts).y) - itemSpace;
 			float maxmove = Math.min(nextpos - pos.y, speed * Timers.delta());
 
 			if(maxmove > minmove){
@@ -128,10 +125,8 @@ public class Conveyor extends Block{
 					entity.minitem = pos.y;
 				entity.convey.set(i, value);
 			}
-
 		}
 
-		entity.elapsed = 0f;
 		if(minremove != Integer.MAX_VALUE) entity.convey.truncate(minremove);
 	}
 
@@ -187,7 +182,7 @@ public class Conveyor extends Block{
 	public static class ConveyorEntity extends TileEntity{
 
 		LongArray convey = new LongArray();
-		float minitem = 1, elapsed;
+		float minitem = 1;
 
 		@Override
 		public void write(DataOutputStream stream) throws IOException{
@@ -209,12 +204,6 @@ public class Conveyor extends Block{
 			}
 
 			sort(convey.items, convey.size);
-		}
-
-		@Override
-		public void readNetwork(DataInputStream stream, float elapsed) throws IOException{
-			read(stream);
-			this.elapsed = elapsed;
 		}
 	}
 
@@ -243,8 +232,8 @@ public class Conveyor extends Block{
 	}
 
 	private static int compareItems(Long a, Long b){
-		pos1.set(a);
-		pos2.set(b);
+		pos1.set(a, ItemPos.packShorts);
+		pos2.set(b, ItemPos.packShorts);
 		return Float.compare(pos1.y, pos2.y);
 	}
 
@@ -253,14 +242,18 @@ public class Conveyor extends Block{
 		private static short[] writeShort = new short[4];
 		private static byte[] writeByte = new byte[4];
 
+		private static short[] packShorts = new short[4];
+		private static short[] drawShorts = new short[4];
+		private static short[] updateShorts = new short[4];
+
 		Item item;
 		float x, y;
 		byte seed;
 
 		private ItemPos(){}
 
-		ItemPos set(long lvalue){
-			short[] values = Bits.getShorts(lvalue);
+		ItemPos set(long lvalue, short[] values){
+			Bits.getShorts(lvalue, values);
 
 			if(values[0] >= Item.getAllItems().size || values[0] < 0)
 				item = null;
@@ -278,7 +271,7 @@ public class Conveyor extends Block{
 		}
 
 		static long packItem(Item item, float x, float y, byte seed){
-			short[] shorts = Bits.getShorts();
+			short[] shorts = packShorts;
 			shorts[0] = (short)item.id;
 			shorts[1] = (short)(x*Short.MAX_VALUE);
 			shorts[2] = (short)((y - 1f)*Short.MAX_VALUE);

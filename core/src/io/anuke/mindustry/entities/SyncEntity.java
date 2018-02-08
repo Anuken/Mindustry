@@ -2,8 +2,11 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ObjectIntMap;
+import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.util.Mathf;
 
@@ -16,9 +19,8 @@ public abstract class SyncEntity extends DestructibleEntity{
 
     protected transient Interpolator interpolator = new Interpolator();
 
-    //for interpolating at low tick speeds.
-    private transient Vector2 tpos = new Vector2(-999, -999);
-    private transient float tang = 0f;
+    //smoothed position/angle
+    private Vector3 spos = new Vector3();
 
     public float angle;
 
@@ -27,12 +29,23 @@ public abstract class SyncEntity extends DestructibleEntity{
         setWriteSize(Player.class, 4 + 4 + 4 + 2 + 1);
     }
 
+    public static boolean isSmoothing(){
+        return threads.isEnabled() && threads.getFPS() <= Gdx.graphics.getFramesPerSecond() / 2f;
+    }
+
     public abstract void writeSpawn(ByteBuffer data);
     public abstract void readSpawn(ByteBuffer data);
 
     public abstract void write(ByteBuffer data);
     public abstract void read(ByteBuffer data, long time);
-    public abstract void interpolate();
+
+    public void interpolate(){
+        interpolator.update();
+
+        x = interpolator.pos.x;
+        y = interpolator.pos.y;
+        angle = interpolator.angle;
+    }
 
     @Override
     public final void draw(){
@@ -40,15 +53,13 @@ public abstract class SyncEntity extends DestructibleEntity{
 
         //interpolates data at low tick speeds.
         if(isSmoothing()){
-            if(tpos.dst(x, y) > 100){
-                tpos.set(x, y);
+            if(Vector2.dst(spos.x, spos.y, x, y) > 128){
+                spos.set(x, y, angle);
             }
-            tpos.x = Mathf.lerpDelta(tpos.x, x, 0.3f);
-            tpos.y = Mathf.lerpDelta(tpos.y, y, 0.3f);
-            tang = Mathf.lerpAngDelta(tang, angle, 0.3f);
-            this.x = tpos.x;
-            this.y = tpos.y;
-            this.angle = tang;
+
+            this.x = spos.x = Mathf.lerpDelta(spos.x, x, 0.2f);
+            this.y = spos.y = Mathf.lerpDelta(spos.y, y, 0.2f);
+            this.angle = spos.z = Mathf.lerpAngDelta(spos.z, angle, 0.3f);
         }
 
         drawSmooth();
@@ -58,12 +69,8 @@ public abstract class SyncEntity extends DestructibleEntity{
         this.angle = angle;
     }
 
-    private boolean isSmoothing(){
-        return threads.isEnabled() && threads.getFPS() <= Gdx.graphics.getFramesPerSecond() / 2f;
-    }
-
-    public Vector2 getDrawPosition(){
-        return isSmoothing() ? tpos : tpos.set(x, y);
+    public Vector3 getDrawPosition(){
+        return isSmoothing() ? spos : spos.set(x, y, angle);
     }
 
     public void drawSmooth(){}
@@ -91,12 +98,40 @@ public abstract class SyncEntity extends DestructibleEntity{
         return (T)this;
     }
 
-    public class Interpolator {
+    public static class Interpolator {
+        //used for movement
         public Vector2 target = new Vector2();
         public Vector2 last = new Vector2();
-        public Vector2 vec = new Vector2();
         public float targetrot;
         public float spacing = 1f;
         public float time;
+
+        //current state
+        public Vector2 pos = new Vector2();
+        public float angle;
+
+        public void read(float cx, float cy, float x, float y, float angle, long sent){
+            targetrot = angle;
+            time = 0f;
+            last.set(cx, cy);
+            target.set(x, y);
+            spacing = Math.min(Math.max(((TimeUtils.timeSinceMillis(sent) / 1000f) * 60f), 4f), 10);
+        }
+
+        public void update(){
+
+            time += 1f / spacing * Timers.delta();
+
+            Mathf.lerp2(pos.set(last), target, time);
+
+            angle = Mathf.lerpAngDelta(angle, targetrot, 0.6f);
+
+            if(target.dst(pos) > 128){
+                pos.set(target);
+                last.set(target);
+                time = 0f;
+            }
+
+        }
     }
 }

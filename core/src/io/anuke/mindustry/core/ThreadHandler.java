@@ -11,6 +11,7 @@ public class ThreadHandler {
     private final ThreadProvider impl;
     private float delta = 1f;
     private long frame = 0;
+    private float framesSinceUpdate;
     private boolean enabled;
 
     private final Object updateLock = new Object();
@@ -30,8 +31,14 @@ public class ThreadHandler {
         return frame;
     }
 
+    public float getFramesSinceUpdate(){
+        return framesSinceUpdate;
+    }
+
     public void handleRender(){
         if(!enabled) return;
+
+        framesSinceUpdate += Timers.delta();
 
         synchronized (updateLock) {
             rendered = true;
@@ -64,7 +71,6 @@ public class ThreadHandler {
             while (true) {
                 long time = TimeUtils.millis();
                 logic.update();
-                //impl.sleep(130);
 
                 long elapsed = TimeUtils.timeSinceMillis(time);
                 long target = (long) (1000 / 60f);
@@ -83,6 +89,7 @@ public class ThreadHandler {
                 }
 
                 frame ++;
+                framesSinceUpdate = 0;
             }
         } catch (InterruptedException ex) {
             Log.info("Stopping logic thread.");
