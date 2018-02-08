@@ -49,7 +49,7 @@ public abstract class SyncEntity extends DestructibleEntity{
 
     @Override
     public final void draw(){
-        float x = this.x, y = this.y, angle = this.angle;
+        final float x = this.x, y = this.y, angle = this.angle;
 
         //interpolates data at low tick speeds.
         if(isSmoothing()){

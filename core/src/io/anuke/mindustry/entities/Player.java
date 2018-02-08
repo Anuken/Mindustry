@@ -105,10 +105,6 @@ public class Player extends SyncEntity{
 	
 	@Override
 	public void drawSmooth(){
-        if(isAndroid && isLocal){
-            angle = Mathf.lerpAngDelta(angle, targetAngle, 0.2f);
-        }
-
 		if((debug && (!showPlayer || !showUI)) || (isAndroid && isLocal) || (dead && !isLocal)) return;
         boolean snap = snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate") && isLocal;
 
@@ -145,6 +141,9 @@ public class Player extends SyncEntity{
 	@Override
 	public void update(){
 		if(!isLocal || isAndroid){
+			if(isAndroid && isLocal){
+				angle = Mathf.lerpAngDelta(angle, targetAngle, 0.2f);
+			}
 			if(!isLocal) interpolate();
 			return;
 		}
