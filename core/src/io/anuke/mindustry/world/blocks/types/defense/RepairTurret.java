@@ -73,7 +73,7 @@ public class RepairTurret extends PowerTurret{
 	@Override
 	public void drawSelect(Tile tile){
 		Draw.color(Color.GREEN);
-		Lines.dashCircle(tile.worldx(), tile.worldy(), range);
+		Lines.dashCircle(tile.drawx(), tile.drawy(), range);
 		Draw.reset();
 	}
 	
@@ -83,8 +83,9 @@ public class RepairTurret extends PowerTurret{
 		
 		if(entity.power >= powerUsed && entity.blockTarget != null && Angles.angleDist(entity.angleTo(entity.blockTarget), entity.rotation) < 10){
 			Tile targetTile = entity.blockTarget.tile;
-			Angles.translation(entity.rotation, 4f);
-			float x = tile.drawx() + Angles.x(), y = tile.drawy() + Angles.y();
+			float len = 4f;
+
+			float x = tile.drawx() + Angles.trnsx(entity.rotation, len), y = tile.drawy() + Angles.trnsy(entity.rotation, len);
 			float x2 = targetTile.drawx(), y2 = targetTile.drawy();
 
 			Draw.color(Hue.rgb(138, 244, 138, (MathUtils.sin(Timers.time()) + 1f) / 14f));

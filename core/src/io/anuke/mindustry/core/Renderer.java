@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.graphics.BlockRenderer;
@@ -24,7 +25,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.*;
-import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.function.Callable;
@@ -50,6 +50,7 @@ public class Renderer extends RendererModule{
 	private int targetscale = baseCameraScale;
 	private FloatArray shieldHits = new FloatArray();
 	private Array<Callable> shieldDraws = new Array<>();
+	private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
 	private BlockRenderer blocks = new BlockRenderer();
 
 	public Renderer() {
@@ -58,11 +59,11 @@ public class Renderer extends RendererModule{
 		Core.cameraScale = baseCameraScale;
 		Effects.setEffectProvider((name, color, x, y, rotation) -> {
 			if(Settings.getBool("effects")){
-				Rectangle view = Tmp.r1.setSize(camera.viewportWidth, camera.viewportHeight)
+				Rectangle view = rect.setSize(camera.viewportWidth, camera.viewportHeight)
 						.setCenter(camera.position.x, camera.position.y);
-				Rectangle pos = Tmp.r2.setSize(name.size).setCenter(x, y);
+				Rectangle pos = rect2.setSize(name.size).setCenter(x, y);
 				if(view.overlaps(pos)){
-					new EffectEntity(name, color, rotation).set(x, y).add();
+					new EffectEntity(name, color, rotation).set(x, y).add(effectGroup);
 				}
 			}
 		});
@@ -190,6 +191,7 @@ public class Renderer extends RendererModule{
 		Graphics.shader();
 
 		Entities.draw(bulletGroup);
+        Entities.draw(effectGroup);
 
 		drawShield();
 
@@ -242,13 +244,15 @@ public class Renderer extends RendererModule{
 		Draw.color(Color.RED);
 		for(Enemy enemy : enemyGroup.all()) {
 
-			if (Tmp.r1.setSize(camera.viewportWidth, camera.viewportHeight).setCenter(camera.position.x, camera.position.y).overlaps(enemy.hitbox.getRect(enemy.x, enemy.y))) {
+			if (rect.setSize(camera.viewportWidth, camera.viewportHeight).setCenter(camera.position.x, camera.position.y)
+					.overlaps(enemy.hitbox.getRect(enemy.x, enemy.y))) {
 				continue;
 			}
 
 			float angle = Angles.angle(camera.position.x, camera.position.y, enemy.x, enemy.y);
-			Angles.translation(angle, Unit.dp.scl(20f));
-			Draw.rect("enemyarrow", camera.position.x + Angles.x(), camera.position.y + Angles.y(), angle);
+			float tx = Angles.trnsx(angle, Unit.dp.scl(20f));
+			float ty = Angles.trnsy(angle, Unit.dp.scl(20f));
+			Draw.rect("enemyarrow", camera.position.x + tx, camera.position.y + ty, angle);
 		}
 
 		Draw.color();
@@ -445,11 +449,13 @@ public class Renderer extends RendererModule{
 		}
 	}
 
-	void drawHealth(DestructibleEntity dest){
+	void drawHealth(SyncEntity dest){
+		float x = dest.getDrawPosition().x;
+		float y = dest.getDrawPosition().y;
 		if(dest instanceof Player && snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate")){
-			drawHealth((int) dest.x, (int) dest.y - 7f, dest.health, dest.maxhealth);
+			drawHealth((int) x, (int) y - 7f, dest.health, dest.maxhealth);
 		}else{
-			drawHealth(dest.x, dest.y - 7f, dest.health, dest.maxhealth);
+			drawHealth(x, y - 7f, dest.health, dest.maxhealth);
 		}
 	}
 

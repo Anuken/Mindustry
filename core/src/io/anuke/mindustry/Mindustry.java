@@ -28,4 +28,11 @@ public class Mindustry extends ModuleCore {
 		module(netClient = new NetClient());
 		module(netCommon = new NetCommon());
 	}
+
+	@Override
+	public void render(){
+		super.render();
+		threads.handleRender();
+	}
+
 }

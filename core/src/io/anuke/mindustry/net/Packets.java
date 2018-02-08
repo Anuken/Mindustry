@@ -508,15 +508,15 @@ public class Packets {
 
         @Override
         public void write(ByteBuffer buffer) {
-            buffer.putInt(position);
-            buffer.put(rotation);
+            buffer.putInt((rotation) | (position << 2));
             buffer.put(itemid);
         }
 
         @Override
         public void read(ByteBuffer buffer) {
-            position = buffer.getInt();
-            rotation = buffer.get();
+            int i = buffer.getInt();
+            rotation = (byte)(i & 0x3);
+            position = i >> 2;
             itemid = buffer.get();
         }
     }

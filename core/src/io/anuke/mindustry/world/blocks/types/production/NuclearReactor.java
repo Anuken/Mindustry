@@ -14,7 +14,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
-import io.anuke.ucore.util.Tmp;
+import io.anuke.ucore.util.Translator;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -24,6 +24,8 @@ import static io.anuke.mindustry.Vars.tilesize;
 
 public class NuclearReactor extends LiquidPowerGenerator{
 	protected final int timerFuel = timers++;
+
+	protected final Translator tr = new Translator();
 
 	protected Item generateItem;
 	protected int itemCapacity = 30;
@@ -137,15 +139,15 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		
 		for(int i = 0; i < 20; i ++){
 			Timers.run(Mathf.random(50), ()->{
-				Tmp.v1.setToRandomDirection().setLength(Mathf.random(40f));
-				Effects.effect(Fx.explosion, Tmp.v1.x + tile.worldx(), Tmp.v1.y + tile.worldy());
+				tr.rnd(Mathf.random(40f));
+				Effects.effect(Fx.explosion, tr.x + tile.worldx(), tr.y + tile.worldy());
 			});
 		}
 		
 		for(int i = 0; i < 70; i ++){
 			Timers.run(Mathf.random(80), ()->{
-				Tmp.v1.setToRandomDirection().setLength(Mathf.random(120f));
-				Effects.effect(Fx.nuclearsmoke, Tmp.v1.x + tile.worldx(), Tmp.v1.y + tile.worldy());
+				tr.rnd(Mathf.random(120f));
+				Effects.effect(Fx.nuclearsmoke, tr.x + tile.worldx(), tr.y + tile.worldy());
 			});
 		}
 	}

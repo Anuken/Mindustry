@@ -19,7 +19,6 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
-import io.anuke.ucore.util.Tmp;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -60,6 +59,10 @@ public class EnemyType {
     protected final int timerReload = timeid ++;
     protected final int timerReset = timeid ++;
 
+    protected final Vector2 shift = new Vector2();
+    protected final Vector2 move = new Vector2();
+    protected final Vector2 calc = new Vector2();
+
     public EnemyType(String name){
         this.id = lastid++;
         this.name = name;
@@ -67,15 +70,13 @@ public class EnemyType {
     }
 
     public void draw(Enemy enemy){
-        String region = name + "-t" + Mathf.clamp(enemy.tier, 1, 3);
-
         Shaders.outline.color.set(tierColors[enemy.tier - 1]);
         Shaders.outline.lighten = Mathf.clamp(enemy.hitTime/hitDuration);
-        Shaders.outline.region = Draw.region(region);
+        Shaders.outline.region = enemy.region;
 
         Shaders.outline.apply();
 
-        Draw.rect(region, enemy.x, enemy.y, enemy.angle - 90);
+        Draw.rect(enemy.region, enemy.x, enemy.y, enemy.angle - 90);
         Draw.color();
 
         Graphics.flush();
@@ -160,14 +161,14 @@ public class EnemyType {
         Vector2 vec;
 
         if(nearCore){
-            vec = Tmp.v1.setZero();
+            vec = move.setZero();
             if(targetCore) enemy.target = core.entity;
         }else{
             vec = world.pathfinder().find(enemy);
             vec.sub(enemy.x, enemy.y).limit(speed);
         }
 
-        Vector2 shift = Tmp.v3.setZero();
+        shift.setZero();
         float shiftRange = enemy.hitbox.width + 2f;
         float avoidRange = shiftRange + 4f;
         float attractRange = avoidRange + 7f;
@@ -182,11 +183,11 @@ public class EnemyType {
                 float scl = Mathf.clamp(1.4f - dst / shiftRange) * mass * 1f/mass;
                 shift.add((enemy.x - other.x) * scl, (enemy.y - other.y) * scl);
             }else if(dst < avoidRange){
-                Tmp.v2.set((enemy.x - other.x), (enemy.y - other.y)).setLength(avoidSpeed);
-                shift.add(Tmp.v2.scl(1.1f));
+                calc.set((enemy.x - other.x), (enemy.y - other.y)).setLength(avoidSpeed);
+                shift.add(calc.scl(1.1f));
             }else if(dst < attractRange && !nearCore){
-                Tmp.v2.set((enemy.x - other.x), (enemy.y - other.y)).setLength(avoidSpeed);
-                shift.add(Tmp.v2.scl(-1));
+                calc.set((enemy.x - other.x), (enemy.y - other.y)).setLength(avoidSpeed);
+                shift.add(calc.scl(-1));
             }
         });
 

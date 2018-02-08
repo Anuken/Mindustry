@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
@@ -16,7 +16,7 @@ import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
+import io.anuke.ucore.util.Translator;
 
 import java.nio.ByteBuffer;
 
@@ -34,13 +34,15 @@ public class Player extends SyncEntity{
 	public Weapon weaponRight = Weapon.blaster;
 	public Mech mech = Mech.standard;
 
-	public float angle;
 	public float targetAngle = 0f;
 	public float stucktime = 0f;
 	public boolean dashing = false;
 
 	public int clientid;
 	public boolean isLocal = false;
+
+	private Vector2 movement = new Vector2();
+	private Translator tr = new Translator();
 	
 	public Player(){
 		hitbox.setSize(5);
@@ -102,7 +104,7 @@ public class Player extends SyncEntity{
 	}
 	
 	@Override
-	public void draw(){
+	public void drawSmooth(){
         if(isAndroid && isLocal){
             angle = Mathf.lerpAngDelta(angle, targetAngle, 0.2f);
         }
@@ -121,12 +123,12 @@ public class Player extends SyncEntity{
 		if(!isAndroid) {
 			for (int i : Mathf.signs) {
 				Weapon weapon = i < 0 ? weaponLeft : weaponRight;
-				Angles.vector.set(3 * i, 2).rotate(angle - 90);
+				tr.trns(angle - 90, 3*i, 2);
 				float w = i > 0 ? -8 : 8;
 				if(snap){
-					Draw.rect(weapon.name + "-equip", (int)x + Angles.x(), (int)y + Angles.y(), w, 8, angle - 90);
+					Draw.rect(weapon.name + "-equip", (int)x + tr.x, (int)y + tr.y, w, 8, angle - 90);
 				}else{
-					Draw.rect(weapon.name + "-equip", x + Angles.x(), y + Angles.y(), w, 8, angle - 90);
+					Draw.rect(weapon.name + "-equip", x + tr.x, y + tr.y, w, 8, angle - 90);
 				}
 			}
 		}
@@ -172,15 +174,15 @@ public class Player extends SyncEntity{
 
 		health = Mathf.clamp(health, -1, maxhealth);
 		
-		vector.set(0, 0);
+		movement.set(0, 0);
 
 		float xa = Inputs.getAxis("move_x");
 		float ya = Inputs.getAxis("move_y");
 		if(Math.abs(xa) < 0.3) xa = 0;
 		if(Math.abs(ya) < 0.3) ya = 0;
 
-		vector.y += ya*speed;
-		vector.x += xa*speed;
+		movement.y += ya*speed;
+		movement.x += xa*speed;
 		
 		boolean shooting = !Inputs.keyDown("dash") && Inputs.keyDown("shoot") && control.input().recipe == null
 				&& !ui.hasMouse() && !control.input().onConfigurable();
@@ -190,23 +192,22 @@ public class Player extends SyncEntity{
 			weaponRight.update(player, false);
 		}
 		
-		if(dashing && Timers.get(this, "dashfx", 3) && vector.len() > 0){
-			Angles.translation(angle + 180, 3f);
-			Effects.effect(Fx.dashsmoke, x + Angles.x(), y + Angles.y());
+		if(dashing && Timers.get(this, "dashfx", 3) && movement.len() > 0){
+			Effects.effect(Fx.dashsmoke, x + Angles.trnsx(angle + 180f, 3f), y + Angles.trnsy(angle + 180f, 3f));
 		}
 		
-		vector.limit(speed);
+		movement.limit(speed);
 		
 		if(!noclip){
-			move(vector.x*Timers.delta(), vector.y*Timers.delta());
+			move(movement.x*Timers.delta(), movement.y*Timers.delta());
 		}else{
-			x += vector.x*Timers.delta();
-			y += vector.y*Timers.delta();
+			x += movement.x*Timers.delta();
+			y += movement.y*Timers.delta();
 		}
 		
 		if(!shooting){
-			if(!vector.isZero())
-				angle = Mathf.lerpAngDelta(angle, vector.angle(), 0.13f);
+			if(!movement.isZero())
+				angle = Mathf.lerpAngDelta(angle, movement.angle(), 0.13f);
 		}else{
 			float angle = Angles.mouseAngle(x, y);
 			this.angle = Mathf.lerpAngDelta(this.angle, angle, 0.1f);
@@ -273,40 +274,24 @@ public class Player extends SyncEntity{
 		this.health = health;
 		this.dashing = dashing == 1;
 
-		interpolator.targetrot = angle;
-		interpolator.time = 0f;
-		interpolator.last.set(this.x, this.y);
-		interpolator.target.set(x, y);
-		interpolator.spacing = Math.min(Math.max(((TimeUtils.timeSinceMillis(time) / 1000f) * 60f), 4f), 10);
+		interpolator.read(this.x, this.y, x, y, angle, time);
 	}
 
 	@Override
 	public void interpolate() {
+		super.interpolate();
+
 		Interpolator i = interpolator;
 
-		i.time += 1f / i.spacing * Timers.delta();
-
-		Mathf.lerp2(Tmp.v2.set(i.last), i.target, i.time);
-
-		x = Tmp.v2.x;
-		y = Tmp.v2.y;
-
-		if(i.target.dst(x, y) > 128){
-			set(i.target.x, i.target.y);
-			i.time = 0f;
-			i.last.set(i.target);
-		}
-
-		angle = Mathf.lerpAngDelta(angle, i.targetrot, 0.6f);
+		float tx = x + Angles.trnsx(angle + 180f, 3f);
+		float ty = y + Angles.trnsy(angle + 180f, 3f);
 
 		if(isAndroid && i.target.dst(i.last) > 2f && Timers.get(this, "dashfx", 2)){
-			Angles.translation(angle + 180, 3f);
-			Effects.effect(Fx.dashsmoke, x + Angles.x(), y + Angles.y());
+			Effects.effect(Fx.dashsmoke, tx, ty);
 		}
 
 		if(dashing && !dead && Timers.get(this, "dashfx", 3) && i.target.dst(i.last) > 1f){
-			Angles.translation(angle + 180, 3f);
-			Effects.effect(Fx.dashsmoke, x + Angles.x(), y + Angles.y());
+			Effects.effect(Fx.dashsmoke, tx, ty);
 		}
 	}
 

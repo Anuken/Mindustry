@@ -12,7 +12,7 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
+import io.anuke.ucore.util.Translator;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -44,8 +44,8 @@ public enum PlaceMode{
 
 			if(control.input().recipe.result.rotate){
 				Draw.color(Colors.get("placeRotate"));
-				Tmp.v1.set(7, 0).rotate(control.input().rotation * 90);
-				Lines.line(x, y, x + Tmp.v1.x, y + Tmp.v1.y);
+				tr.trns(control.input().rotation * 90, 7, 0);
+				Lines.line(x, y, x + tr.x, y + tr.y);
 			}
 		}
 		
@@ -293,8 +293,8 @@ public enum PlaceMode{
 				if(control.input().recipe.result.rotate){
 					float cx = tx * t, cy = ty * t;
 					Draw.color(Colors.get("placeRotate"));
-					Tmp.v1.set(7, 0).rotate(rotation * 90);
-					Lines.line(cx, cy, cx + Tmp.v1.x, cy + Tmp.v1.y);
+					tr.trns(rotation * 90, 7, 0);
+					Lines.line(cx, cy, cx + tr.x, cy + tr.y);
 				}
 				Draw.reset();
 			}
@@ -368,6 +368,8 @@ public enum PlaceMode{
 	public boolean showCancel;
 	public boolean delete = false;
 	public boolean both = false;
+
+	private static final Translator tr = new Translator();
 	
 	public void draw(int tilex, int tiley, int endx, int endy){
 		

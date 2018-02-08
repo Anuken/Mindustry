@@ -31,8 +31,8 @@ public class Splitter extends Block{
         if(dir == -1) return null;
         Tile to;
 
-        Tile a = dest.getNearby()[Mathf.mod(dir - 1, 4)];
-        Tile b = dest.getNearby()[Mathf.mod(dir + 1, 4)];
+        Tile a = dest.getNearby(Mathf.mod(dir - 1, 4));
+        Tile b = dest.getNearby(Mathf.mod(dir + 1, 4));
         boolean ac = a.block().acceptItem(item, a, dest);
         boolean bc = b.block().acceptItem(item, b, dest);
 

@@ -93,7 +93,7 @@ public class HudFragment implements Fragment{
 				visible(() -> !state.is(State.menu));
 
 				Label fps = new Label(() -> (Settings.getBool("fps") ? (Gdx.graphics.getFramesPerSecond() + " FPS") +
-						(Net.client() && !gwt ? " / Ping: " + Net.getPing() : "") : ""));
+						(threads.isEnabled() ?  " / " + threads.getFPS() + " TPS" : "") + (Net.client() && !gwt ? " / Ping: " + Net.getPing() : "") : ""));
 				row();
 				add(fps).size(-1);
 
@@ -179,7 +179,7 @@ public class HudFragment implements Fragment{
 
 				new label(()-> state.enemies > 0 ?
 					getEnemiesRemaining() :
-						(control.tutorial().active() || state.mode.toggleWaves) ? "$text.waiting"
+						(control.tutorial().active() || state.mode.disableWaveTimer) ? "$text.waiting"
 								: Bundles.format("text.wave.waiting", (int) (state.wavetime / 60f)))
 				.minWidth(126).padLeft(-6).padRight(-12).left();
 
@@ -194,7 +194,7 @@ public class HudFragment implements Fragment{
 
 	private void playButton(float uheight){
 		new imagebutton("icon-play", 30f, () -> {
-			logic.runWave();
+			state.wavetime = 0f;
 		}).height(uheight).fillX().right().padTop(-8f).padBottom(-12f).padRight(-36).width(40f).update(l->{
 			boolean vis = state.enemies <= 0 && (Net.server() || !Net.active());
 			boolean paused = state.is(State.paused) || !vis;

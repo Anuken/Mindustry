@@ -10,9 +10,11 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Shield;
 import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.ClientDebug;
 import io.anuke.mindustry.net.ServerDebug;
 import io.anuke.ucore.UCore;
+import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.scene.ui.layout.Unit;
@@ -112,6 +114,7 @@ public class Vars{
 	public static final int webPort = 6568;
 
 	public static final GameState state = new GameState();
+	public static final ThreadHandler threads = new ThreadHandler(Platform.instance.getThreadProvider());
 
 	public static final ServerDebug serverDebug = new ServerDebug();
 	public static final ClientDebug clientDebug = new ClientDebug();
@@ -132,4 +135,5 @@ public class Vars{
 	public static final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);
 	public static final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
 	public static final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class);
+	public static final EntityGroup<EffectEntity> effectGroup = Entities.addGroup(EffectEntity.class);
 }

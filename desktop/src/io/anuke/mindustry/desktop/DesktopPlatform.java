@@ -3,7 +3,9 @@ package io.anuke.mindustry.desktop;
 import club.minnced.discord.rpc.DiscordEventHandlers;
 import club.minnced.discord.rpc.DiscordRPC;
 import club.minnced.discord.rpc.DiscordRichPresence;
+import io.anuke.kryonet.DefaultThreadImpl;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.util.Strings;
@@ -84,5 +86,10 @@ public class DesktopPlatform extends Platform {
     @Override
     public boolean isDebug() {
         return args.length > 0 && args[0].equalsIgnoreCase("-debug");
+    }
+
+    @Override
+    public ThreadProvider getThreadProvider() {
+        return new DefaultThreadImpl();
     }
 }

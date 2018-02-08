@@ -23,7 +23,6 @@ import io.anuke.ucore.core.Sounds;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -35,6 +34,8 @@ public abstract class InputHandler extends InputAdapter{
 	public PlaceMode breakMode = android ? PlaceMode.none : PlaceMode.holdDelete;
 	public PlaceMode lastPlaceMode = placeMode;
 	public PlaceMode lastBreakMode = breakMode;
+
+	private Rectangle rect = new Rectangle();
 
 	public abstract void update();
 	public abstract float getCursorX();
@@ -93,21 +94,21 @@ public abstract class InputHandler extends InputAdapter{
 			}
 		}
 		
-		Tmp.r2.setSize(type.width * tilesize, type.height * tilesize);
+		rect.setSize(type.width * tilesize, type.height * tilesize);
 		Vector2 offset = type.getPlaceOffset();
-		Tmp.r2.setCenter(offset.x + x * tilesize, offset.y + y * tilesize);
+		rect.setCenter(offset.x + x * tilesize, offset.y + y * tilesize);
 
 		for(SolidEntity e : Entities.getNearby(enemyGroup, x * tilesize, y * tilesize, tilesize * 2f)){
 			Rectangle rect = e.hitbox.getRect(e.x, e.y);
 
-			if(Tmp.r2.overlaps(rect)){
+			if(this.rect.overlaps(rect)){
 				return false;
 			}
 		}
 
 		if(type.solid || type.solidifes) {
 			for (Player player : playerGroup.all()) {
-				if (!player.isAndroid && Tmp.r2.overlaps(player.hitbox.getRect(player.x, player.y))) {
+				if (!player.isAndroid && rect.overlaps(player.hitbox.getRect(player.x, player.y))) {
 					return false;
 				}
 			}
@@ -138,14 +139,14 @@ public abstract class InputHandler extends InputAdapter{
 			for(int dx = 0; dx < type.width; dx ++){
 				for(int dy = 0; dy < type.height; dy ++){
 					Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-					if(other == null || other.block() != Blocks.air || isSpawnPoint(other)){
+					if(other == null || (other.block() != Blocks.air && !other.block().alwaysReplace) || isSpawnPoint(other)){
 						return false;
 					}
 				}
 			}
 			return true;
 		}else{
-			if(tile.block() != type && type.canReplace(tile.block()) && tile.block().isMultiblock() == type.isMultiblock()){
+			if(tile.block() != type && (type.canReplace(tile.block()) || tile.block().alwaysReplace) && tile.block().isMultiblock() == type.isMultiblock()){
 				return true;
 			}
 			return tile.block() == Blocks.air;

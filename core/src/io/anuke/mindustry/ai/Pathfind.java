@@ -11,7 +11,6 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -25,6 +24,10 @@ public class Pathfind{
 	PathSmoother<Tile, Vector2> smoother = new PathSmoother<Tile, Vector2>(new Raycaster());
 	/**temporary vector2 for calculations*/
 	Vector2 vector = new Vector2();
+
+	Vector2 v1 = new Vector2();
+	Vector2 v2 = new Vector2();
+	Vector2 v3 = new Vector2();
 
 	/**Finds the position on the path an enemy should move to.
 	 * If the path is not yet calculated, this returns the enemy's position (i. e. "don't move")
@@ -76,8 +79,8 @@ public class Pathfind{
 		if(projectLen < 8 || !onLine(projection, prev.worldx(), prev.worldy(), target.worldx(), target.worldy())){
 			canProject = false;
 		}else{
-			projection.add(Angles.translation(Angles.angle(prev.worldx(), prev.worldy(), 
-					target.worldx(), target.worldy()), projectLen));
+			projection.add(v1.set(projectLen, 0).rotate(Angles.angle(prev.worldx(), prev.worldy(),
+					target.worldx(), target.worldy())));
 		}
 			
 		float dst = Vector2.dst(enemy.x, enemy.y, target.worldx(), target.worldy());
@@ -122,7 +125,8 @@ public class Pathfind{
 	public void update(){
 
 		//go through each spawnpoint, and if it's not found a path yet, update it
-		for(SpawnPoint point : world.getSpawns()){
+		for(int i = 0; i < world.getSpawns().size; i ++){
+			SpawnPoint point = world.getSpawns().get(i);
 			if(point.request == null || point.finder == null){
 				continue;
 			}
@@ -204,7 +208,7 @@ public class Pathfind{
 	}
 
 	/**Finds the closest tile to a position, in an array of tiles.*/
-	private static int findClosest(Tile[] tiles, float x, float y){
+	private int findClosest(Tile[] tiles, float x, float y){
 		int cindex = -2;
 		float dst = Float.MAX_VALUE;
 
@@ -222,23 +226,23 @@ public class Pathfind{
 	}
 
 	/**Returns whether a point is on a line.*/
-	private static boolean onLine(Vector2 vector, float x1, float y1, float x2, float y2){
+	private boolean onLine(Vector2 vector, float x1, float y1, float x2, float y2){
 		return MathUtils.isEqual(vector.dst(x1, y1) + vector.dst(x2, y2), Vector2.dst(x1, y1, x2, y2), 0.01f);
 	}
 
 	/**Returns distance from a point to a line segment.*/
-	private static float pointLineDist(float x, float y, float x2, float y2, float px, float py){
+	private float pointLineDist(float x, float y, float x2, float y2, float px, float py){
 		float l2 = Vector2.dst2(x, y, x2, y2);
 		float t = Math.max(0, Math.min(1, Vector2.dot(px - x, py - y, x2 - x, y2 - y) / l2));
-		Vector2 projection = Tmp.v1.set(x, y).add(Tmp.v2.set(x2, y2).sub(x, y).scl(t)); // Projection falls on the segment
+		Vector2 projection = v1.set(x, y).add(v2.set(x2, y2).sub(x, y).scl(t)); // Projection falls on the segment
 		return projection.dst(px, py);
 	}
 
 	//TODO documentation
-	private static Vector2 projectPoint(float x1, float y1, float x2, float y2, float pointx, float pointy){
+	private Vector2 projectPoint(float x1, float y1, float x2, float y2, float pointx, float pointy){
 	    float px = x2-x1, py = y2-y1, dAB = px*px + py*py;
 	    float u = ((pointx - x1) * px + (pointy - y1) * py) / dAB;
 	    float x = x1 + u * px, y = y1 + u * py;
-	    return Tmp.v3.set(x, y); //this is D
+	    return v3.set(x, y); //this is D
 	}
 }

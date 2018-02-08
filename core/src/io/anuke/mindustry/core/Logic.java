@@ -1,6 +1,5 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
@@ -9,6 +8,7 @@ import io.anuke.mindustry.game.EnemySpawn;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.game.EventType.PlayEvent;
 import io.anuke.mindustry.game.EventType.ResetEvent;
+import io.anuke.mindustry.game.EventType.WaveEvent;
 import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.game.WaveCreator;
 import io.anuke.mindustry.graphics.Fx;
@@ -34,10 +34,6 @@ import static io.anuke.mindustry.Vars.*;
  */
 public class Logic extends Module {
     private final Array<EnemySpawn> spawns = WaveCreator.getSpawns();
-
-    public Logic(){
-        Timers.setDeltaProvider(() -> Math.min(Gdx.graphics.getDeltaTime()*60f, 60));
-    }
 
     @Override
     public void init(){
@@ -107,17 +103,23 @@ public class Logic extends Module {
         state.wave ++;
         state.wavetime = wavespace * state.difficulty.timeScaling;
         state.extrawavetime = maxwavespace * state.difficulty.maxTimeScaling;
+
+        Events.fire(WaveEvent.class);
     }
 
     @Override
     public void update(){
+
         if(!state.is(State.paused) || Net.active()){
             Timers.update();
         }
 
         if(!state.is(State.menu)){
 
-            if(world.getCore().block() != ProductionBlocks.core && !state.gameOver){
+            if(!Net.client())
+                world.pathfinder().update();
+
+            if(world.getCore() != null && world.getCore().block() != ProductionBlocks.core && !state.gameOver){
                 state.gameOver = true;
                 NetEvents.handleGameOver();
                 Events.fire(GameOverEvent.class);
@@ -125,7 +127,7 @@ public class Logic extends Module {
 
             if(!state.is(State.paused) || Net.active()){
 
-                if(!state.mode.toggleWaves){
+                if(!state.mode.disableWaveTimer){
 
                     if(state.enemies <= 0){
                         state.wavetime -= delta();

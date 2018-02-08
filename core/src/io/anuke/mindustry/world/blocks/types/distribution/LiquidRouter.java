@@ -19,7 +19,7 @@ public class LiquidRouter extends Conduit{
 		
 		if(entity.liquidAmount > 0){
 			if(tile.getExtra() != tile.getRotation()){
-				tryMoveLiquid(tile, tile.getNearby()[tile.getRotation()]);
+				tryMoveLiquid(tile, tile.getNearby(tile.getRotation()));
 			}
 			
 			tile.setRotation((byte)((tile.getRotation() + 1) % 4));

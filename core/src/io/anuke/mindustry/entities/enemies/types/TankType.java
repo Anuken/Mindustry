@@ -17,17 +17,14 @@ public class TankType extends EnemyType {
 		bullet = BulletType.small;
 		length = 3f;
 		mass = 1.4f;
+		length = 8f;
 	}
 
 	@Override
 	public void shoot(Enemy enemy){
 		super.shoot(enemy);
 
-		Angles.translation(enemy.angle, 8f);
-
-		Angles.shotgun(3, 8f, enemy.angle, f -> {
-			enemy.shoot(bullet, f);
-		});
+		Angles.shotgun(3, 8f, enemy.angle, f -> enemy.shoot(bullet, f));
 	}
 
 }

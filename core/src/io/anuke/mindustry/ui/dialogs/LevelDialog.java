@@ -1,6 +1,7 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.world.Map;
@@ -16,7 +17,6 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.utils.Elements;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -133,13 +133,15 @@ public class LevelDialog extends FloatingDialog{
 					});
 				}).width(images+16).padBottom(-10f).grow().get();
 			}
+
+			Vector2 hit = new Vector2();
 			
 			image.addListener(new ClickListener(){
 				public void clicked(InputEvent event, float x, float y){
-					image.localToStageCoordinates(Tmp.v1.set(x, y));
+					image.localToStageCoordinates(hit.set(x, y));
 					if(delete[0] != null && (delete[0].getClickListener().isOver() || delete[0].getClickListener().isPressed()
-							|| (Core.scene.hit(Tmp.v1.x, Tmp.v1.y, true) != null && 
-							Core.scene.hit(Tmp.v1.x, Tmp.v1.y, true).isDescendantOf(delete[0])))){
+							|| (Core.scene.hit(hit.x, hit.y, true) != null &&
+							Core.scene.hit(hit.x, hit.y, true).isDescendantOf(delete[0])))){
 						return;
 					}
 					

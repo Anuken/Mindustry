@@ -34,7 +34,7 @@ public class LaserTurret extends PowerTurret{
 		TurretEntity entity = tile.entity();
 		Enemy enemy = entity.target;
 		
-		if(Angles.angleDist(entity.rotation, Angles.angle(tile.worldx(), tile.worldy(), enemy.x, enemy.y)) < cone){
+		if(Angles.angleDist(entity.rotation, Angles.angle(tile.drawx(), tile.drawy(), enemy.x, enemy.y)) < cone){
 			enemy.damage(damage);
 			Effects.effect(hiteffect, enemy.x + Mathf.range(3), enemy.y + Mathf.range(3));
 		}
@@ -45,10 +45,10 @@ public class LaserTurret extends PowerTurret{
 		TurretEntity entity = tile.entity();
 		
 		if(entity.target != null &&
-				Angles.angleDist(entity.rotation, Angles.angle(tile.worldx(), tile.worldy(), entity.target.x, entity.target.y)) <= cone){
-			Angles.translation(entity.rotation, 4f);
+				Angles.angleDist(entity.rotation, Angles.angle(tile.drawx(), tile.drawy(), entity.target.x, entity.target.y)) <= cone){
+			float len = 4f;
 			
-			float x = tile.worldx() + Angles.x(), y = tile.worldy() + Angles.y();
+			float x = tile.drawx() + Angles.trnsx(entity.rotation, len), y = tile.drawy() + Angles.trnsy(entity.rotation, len);
 			float x2 = entity.target.x, y2 = entity.target.y;
 
 			float lighten = (MathUtils.sin(Timers.time()/1.2f) + 1f) / 10f;

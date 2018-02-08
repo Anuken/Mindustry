@@ -9,8 +9,10 @@ import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import io.anuke.kryonet.DefaultThreadImpl;
 import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
+import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.scene.ui.TextField;
@@ -84,6 +86,11 @@ public class AndroidLauncher extends AndroidApplication{
 						}
 					}
 				}
+			}
+
+			@Override
+			public ThreadProvider getThreadProvider() {
+				return new DefaultThreadImpl();
 			}
 		};
 

@@ -19,7 +19,6 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
 
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.tilesize;
@@ -30,8 +29,8 @@ public class Block{
 	private static ObjectMap<String, Block> map = new ObjectMap<>();
 	
 	protected static TextureRegion temp = new TextureRegion();
+	protected Vector2 offset = new Vector2();
 
-	public Tile[] temptiles = new Tile[4];
 	/**internal name*/
 	public final String name;
 	/**internal ID*/
@@ -88,6 +87,8 @@ public class Block{
 	public Layer layer2 = null;
 	/**list of displayed block status bars. Defaults to health bar.*/
 	public Array<BlockBar> bars = Array.with(new BlockBar(Color.RED, false, tile -> tile.entity.health / (float)tile.block().health));
+	/**whether this block can be replaced in all cases*/
+	public boolean alwaysReplace = false;
 
 	public Block(String name) {
 		this.name = name;
@@ -273,7 +274,7 @@ public class Block{
 	
 	/**Offset for placing and drawing multiblocks.*/
 	public Vector2 getPlaceOffset(){
-		return Tmp.v3.set(((width + 1) % 2) * tilesize/2, ((height + 1) % 2) * tilesize/2);
+		return offset.set(((width + 1) % 2) * tilesize/2, ((height + 1) % 2) * tilesize/2);
 	}
 	
 	public boolean isMultiblock(){

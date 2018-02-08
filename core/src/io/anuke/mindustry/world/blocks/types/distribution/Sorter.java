@@ -66,10 +66,10 @@ public class Sorter extends Block{
 		Tile to;
 		
 		if(item == entity.sortItem){
-			to = dest.getNearby()[dir];
+			to = dest.getNearby(dir);
 		}else{
-			Tile a = dest.getNearby()[Mathf.mod(dir - 1, 4)];
-			Tile b = dest.getNearby()[Mathf.mod(dir + 1, 4)];
+			Tile a = dest.getNearby(Mathf.mod(dir - 1, 4));
+			Tile b = dest.getNearby(Mathf.mod(dir + 1, 4));
 			boolean ac = a.block().acceptItem(item, a, dest);
 			boolean bc = b.block().acceptItem(item, b, dest);
 			

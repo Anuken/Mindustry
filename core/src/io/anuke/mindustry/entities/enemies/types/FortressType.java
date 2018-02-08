@@ -35,13 +35,13 @@ public class FortressType extends EnemyType {
 				world.getCore().worldy()) <= 90f){
 
 			if(Timers.get(this, "spawn", spawnTime) && enemy.spawned < maxSpawn){
-				Angles.translation(enemy.angle, 20f);
+				enemy.tr.trns(enemy.angle, 20f);
 
 				Enemy s = new Enemy(EnemyTypes.fast);
 				s.lane = enemy.lane;
 				s.tier = enemy.tier;
 				s.spawner = enemy;
-				s.set(enemy.x + Angles.x(), enemy.y + Angles.y());
+				s.set(enemy.x + enemy.tr.x, enemy.y + enemy.tr.y);
 				s.add();
 
 				Effects.effect(Fx.spawn, enemy);
@@ -53,7 +53,7 @@ public class FortressType extends EnemyType {
 
 
 	public void onShoot(Enemy enemy, BulletType type, float rotation){
-		Effects.effect(Fx.largeCannonShot, enemy.x + Angles.x(), enemy.y + Angles.y(), enemy.angle);
+		Effects.effect(Fx.largeCannonShot, enemy.x + enemy.tr.x, enemy.y + enemy.tr.y, enemy.angle);
 		Effects.shake(3f, 3f, enemy);
 	}
 

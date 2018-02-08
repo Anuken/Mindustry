@@ -25,6 +25,9 @@ public class Generator extends PowerBlock{
 	public static final int powerTime = 2;
 	public static boolean drawRangeOverlay = false;
 
+	protected Translator t1 = new Translator();
+	protected Translator t2 = new Translator();
+
 	public int laserRange = 6;
 	public int laserDirections = 4;
 	public float powerSpeed = 0.5f;
@@ -177,10 +180,10 @@ public class Generator extends PowerBlock{
 		if(target != null){
 			boolean interfering = isInterfering(target, rotation);
 
-			Tmp.v1.set(Angles.translation(rotation * 90, target.block().width * tilesize / 2 + 2f +
-					(interfering ? Vector2.dst(tile.worldx(), tile.worldy(), target.worldx(), target.worldy()) / 2f - tilesize / 2f * target.block().width + 1 : 0)));
+			t1.trns(rotation * 90, target.block().width * tilesize / 2 + 2f +
+					(interfering ? Vector2.dst(tile.worldx(), tile.worldy(), target.worldx(), target.worldy()) / 2f - tilesize / 2f * target.block().width + 1 : 0));
 
-			Angles.translation(rotation * 90, width * tilesize / 2 + 2f);
+			t2.trns(rotation * 90, width * tilesize / 2 + 2f);
 
 			if(!interfering){
 				Draw.tint(Hue.mix(Color.GRAY, Color.WHITE, 0.904f + Mathf.sin(Timers.time(), 1.7f, 0.06f)));
@@ -188,7 +191,7 @@ public class Generator extends PowerBlock{
 				Draw.tint(Hue.mix(Color.SCARLET, Color.WHITE, 0.902f + Mathf.sin(Timers.time(), 1.7f, 0.08f)));
 
 				if(state.is(State.playing) && Mathf.chance(Timers.delta() * 0.033)){
-					Effects.effect(Fx.laserspark, target.worldx() - Tmp.v1.x, target.worldy() - Tmp.v1.y);
+					Effects.effect(Fx.laserspark, target.worldx() - t1.x, target.worldy() - t1.y);
 				}
 			}
 
@@ -197,9 +200,9 @@ public class Generator extends PowerBlock{
 			int relative = tile.relativeTo(target.x, target.y);
 			
 			if(relative == -1){
-				Shapes.laser("laser", "laserend", tile.worldx() + Angles.x(), tile.worldy() + Angles.y(),
-						target.worldx() - Tmp.v1.x + Mathf.range(r), 
-						target.worldy() - Tmp.v1.y + Mathf.range(r), 0.7f);
+				Shapes.laser("laser", "laserend", tile.worldx() + t2.x, tile.worldy() + t2.y,
+						target.worldx() - t1.x + Mathf.range(r),
+						target.worldy() - t1.y + Mathf.range(r), 0.7f);
 			}else{
 				Draw.rect("laserfull", 
 						tile.worldx() + Geometry.d4[relative].x * width * tilesize / 2f,

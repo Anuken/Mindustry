@@ -22,18 +22,6 @@ public class Junction extends Block{
 	public boolean canReplace(Block other){
 		return other instanceof Conveyor || other instanceof Router;
 	}
-	
-	@Override
-	public void handleItem(Item item, Tile tile, Tile source){
-		JunctionEntity entity = tile.entity();
-		boolean x = tile.x == source.x;
-		long value = Bits.packLong(NumberUtils.floatToIntBits(Timers.time()), Bits.packInt((short)item.id, source.relativeTo(tile.x, tile.y)));
-		if(x){
-			entity.bx.add(value);
-		}else {
-			entity.by.add(value);
-		}
-	}
 
 	@Override
 	public void update(Tile tile){
@@ -65,6 +53,18 @@ public class Junction extends Block{
 	}
 
 	@Override
+	public void handleItem(Item item, Tile tile, Tile source){
+		JunctionEntity entity = tile.entity();
+		boolean x = tile.x == source.x;
+		long value = Bits.packLong(NumberUtils.floatToIntBits(Timers.time()), Bits.packInt((short)item.id, source.relativeTo(tile.x, tile.y)));
+		if(x){
+			entity.bx.add(value);
+		}else {
+			entity.by.add(value);
+		}
+	}
+
+	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		JunctionEntity entity = tile.entity();
 		boolean x = tile.x == source.x;
@@ -91,6 +91,7 @@ public class Junction extends Block{
 		int index;
 
 		void add(long id){
+			if(full()) return;
 			items[index++] = id;
 		}
 

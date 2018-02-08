@@ -9,5 +9,6 @@ public class Rock extends Block {
         shadow = name+"shadow";
         breakable = true;
         breaktime = 10;
+        alwaysReplace = true;
     }
 }

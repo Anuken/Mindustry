@@ -172,7 +172,7 @@ public class Control extends Module{
 
 			int last = Settings.getInt("hiscore" + world.getMap().name);
 
-			if(state.wave > last && !state.mode.infiniteResources && !state.mode.toggleWaves){
+			if(state.wave > last && !state.mode.infiniteResources && !state.mode.disableWaveTimer){
 				Settings.putInt("hiscore" + world.getMap().name, state.wave);
 				Settings.save();
 				hiscore = true;
@@ -345,6 +345,7 @@ public class Control extends Module{
 			}
 		
 			if(!state.is(State.paused) || Net.active()){
+				Entities.update(effectGroup);
 				
 				if(respawntime > 0){
 					

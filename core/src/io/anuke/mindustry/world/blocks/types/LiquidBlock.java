@@ -5,6 +5,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
@@ -80,7 +81,7 @@ public class LiquidBlock extends Block implements LiquidAcceptor{
 			LiquidAcceptor other = (LiquidAcceptor)next.block();
 			
 			float flow = Math.min(other.getLiquidCapacity(next) - other.getLiquid(next) - 0.001f, 
-					Math.min(entity.liquidAmount/flowfactor, entity.liquidAmount));
+					Math.min(entity.liquidAmount/flowfactor * Timers.delta(), entity.liquidAmount));
 			
 			if(flow <= 0f || entity.liquidAmount < flow) return;
 			

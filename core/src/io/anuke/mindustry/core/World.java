@@ -8,7 +8,6 @@ import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.io.Maps;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.Tile;
@@ -40,12 +39,6 @@ public class World extends Module{
 	public World(){
 		maps.loadMaps();
 		currentMap = maps.getMap(0);
-	}
-	
-	@Override
-	public void update(){
-		if(!Net.client())
-			pathfind.update();
 	}
 	
 	@Override
@@ -138,18 +131,6 @@ public class World extends Module{
 	
 	public Tile[][] getTiles(){
 		return tiles;
-	}
-	
-	public Tile[] getNearby(int x, int y){
-		return getNearby(x, y, temptiles);
-	}
-
-	public Tile[] getNearby(int x, int y, Tile[] temptiles){
-		temptiles[0] = tile(x+1, y);
-		temptiles[1] = tile(x, y+1);
-		temptiles[2] = tile(x-1, y);
-		temptiles[3] = tile(x, y-1);
-		return temptiles;
 	}
 	
 	private void createTiles(){

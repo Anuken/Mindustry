@@ -74,7 +74,7 @@ public class HealerType extends EnemyType {
 
 		if(target == null) return;
 
-		Angles.translation(enemy.angleTo(target), 5f);
+		enemy.tr.trns(enemy.angleTo(target), 5f);
 
 		Shaders.outline.color.set(Color.CLEAR);
 		Shaders.outline.apply();
@@ -82,7 +82,7 @@ public class HealerType extends EnemyType {
 		if(target.health < target.maxhealth){
 			Draw.color(Hue.rgb(138, 244, 138, (MathUtils.sin(Timers.time()) + 1f) / 13f));
 			Draw.alpha(0.9f);
-			Shapes.laser("laser", "laserend", enemy.x + Angles.x(), enemy.y + Angles.y(), target.x - Angles.x()/1.5f, target.y - Angles.y()/1.5f);
+			Shapes.laser("laser", "laserend", enemy.x + enemy.tr.x, enemy.y + enemy.tr.y, target.x - enemy.tr.x/1.5f, target.y - enemy.tr.y/1.5f);
 			Draw.color();
 		}
 

@@ -2,7 +2,6 @@ package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.scene.builders.button;
@@ -50,7 +49,7 @@ public class DebugFragment implements Fragment {
                row();
                new button("infammo", "toggle", () -> infiniteAmmo = !infiniteAmmo);
                row();
-               new button("wave", () -> logic.runWave());
+               new button("wave", () -> state.wavetime = 0f);
                row();
                new button("clear", () -> {
                    enemyGroup.clear();
@@ -58,9 +57,7 @@ public class DebugFragment implements Fragment {
                    netClient.clearRecieved();
                });
                row();
-               new button("spawn", () -> {try{ Net.connect("localhost", Vars.port); }catch (Exception e){e.printStackTrace();}});
-               row();
-               new button("stuff", () -> netClient.test());
+               new button("spawn", () -> {});
                row();
            }}.end();
 

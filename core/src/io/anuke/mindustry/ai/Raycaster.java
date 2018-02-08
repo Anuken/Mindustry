@@ -4,11 +4,12 @@ import com.badlogic.gdx.ai.utils.Collision;
 import com.badlogic.gdx.ai.utils.Ray;
 import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
 import com.badlogic.gdx.math.Vector2;
-
-import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
+
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class Raycaster implements RaycastCollisionDetector<Vector2>{
 	private boolean found = false;
@@ -75,7 +76,8 @@ public class Raycaster implements RaycastCollisionDetector<Vector2>{
 		
 		if(tile == null || tile.solid()) return true;
 		
-		for(Tile near : tile.getNearby()){
+		for(int i = 0; i < 4; i ++){
+			Tile near = tile.getNearby(i);
 			if(near == null || near.solid()) return true;
 		}
 		
