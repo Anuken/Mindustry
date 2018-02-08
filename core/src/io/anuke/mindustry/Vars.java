@@ -23,10 +23,10 @@ import java.util.Locale;
 
 public class Vars{
 	public static final String versionName = "Mindustry";
+	public static final String versionType = "Beta";
 	public static final byte versionBuild = 20;
 	public static final byte versionMajor = 3;
 	public static final byte versionMinor = 3;
-	public static final String versionType = "Beta";
 
 	public static final boolean testAndroid = false;
 	//shorthand for whether or not this is running on android

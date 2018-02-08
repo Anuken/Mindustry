@@ -97,8 +97,9 @@ public class MenuFragment implements Fragment{
 
 		//version info
 		new table(){{
+			visible(() -> state.is(State.menu));
 			abottom().aleft();
-			new label(versionName + " " + versionMajor + "." + versionMinor + " " + versionType + " | build " + versionBuild);
+			new label(versionName + " " + versionMajor + "." + versionMinor + " " + versionType + " / build " + versionBuild);
 		}}.end();
 	}
 }

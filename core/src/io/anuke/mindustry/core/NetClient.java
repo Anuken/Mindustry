@@ -34,12 +34,13 @@ import java.nio.ByteBuffer;
 import static io.anuke.mindustry.Vars.*;
 
 public class NetClient extends Module {
-    boolean connecting = false;
-    boolean gotData = false;
-    boolean kicked = false;
-    IntSet recieved = new IntSet();
-    float playerSyncTime = 2;
-    float dataTimeout = 60*18; //18 seconds timeout
+    private final static float dataTimeout = 60*18; //18 seconds timeout
+    private final static float playerSyncTime = 2;
+
+    private boolean connecting = false;
+    private boolean gotData = false;
+    private boolean kicked = false;
+    private IntSet recieved = new IntSet();
 
     public NetClient(){
 

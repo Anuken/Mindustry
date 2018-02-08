@@ -256,6 +256,8 @@ public class Player extends SyncEntity{
 
 	@Override
 	public void write(ByteBuffer data) {
+		//TODO written angle is always 0
+
 		data.putFloat(x);
 		data.putFloat(y);
 		data.putFloat(angle);

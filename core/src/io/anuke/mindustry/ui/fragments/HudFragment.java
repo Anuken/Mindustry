@@ -24,6 +24,7 @@ public class HudFragment implements Fragment{
 	private ImageButton menu, flip;
 	private Table respawntable;
 	private Table wavetable;
+	private Label infolabel;
 	private boolean shown = true;
 
 	public void build(){
@@ -54,10 +55,12 @@ public class HudFragment implements Fragment{
 						if (shown) {
 							blockfrag.toggle(false, dur, in);
 							wavetable.actions(Actions.translateBy(0, wavetable.getHeight() + dsize, dur, in), Actions.call(() -> shown = false));
+							infolabel.actions(Actions.translateBy(0, wavetable.getHeight(), dur, in), Actions.call(() -> shown = false));
 						} else {
 							shown = true;
 							blockfrag.toggle(true, dur, in);
 							wavetable.actions(Actions.translateBy(0, -wavetable.getTranslation().y, dur, in));
+							infolabel.actions(Actions.translateBy(0, -infolabel.getTranslation().y, dur, in));
 						}
 
 					}).get();
@@ -78,6 +81,24 @@ public class HudFragment implements Fragment{
 						}
 					}).get();
 
+					new imagebutton("icon-settings", isize, () -> {
+						if (Net.active() && android) {
+							if (ui.chatfrag.chatOpen()) {
+								ui.chatfrag.hide();
+							} else {
+								ui.chatfrag.toggle();
+							}
+						} else {
+							ui.settings.show();
+						}
+					}).update(i -> {
+						if (Net.active() && android) {
+							i.getStyle().imageUp = Core.skin.getDrawable("icon-chat");
+						} else {
+							i.getStyle().imageUp = Core.skin.getDrawable("icon-settings");
+						}
+					}).get();
+
 				}}.end();
 
 				row();
@@ -92,20 +113,14 @@ public class HudFragment implements Fragment{
 
 				visible(() -> !state.is(State.menu));
 
-				Label fps = new Label(() -> (Settings.getBool("fps") ? (Gdx.graphics.getFramesPerSecond() + " FPS") +
-						(threads.isEnabled() ?  " / " + threads.getFPS() + " TPS" : "") + (Net.client() && !gwt ? " / Ping: " + Net.getPing() : "") : ""));
+				infolabel = new Label(() -> (Settings.getBool("fps") ? (Gdx.graphics.getFramesPerSecond() + " FPS") +
+						(threads.isEnabled() ?  " / " + threads.getFPS() + " TPS" : "") + (Net.client() && !gwt ? "\nPing: " + Net.getPing() : "") : ""));
 				row();
-				add(fps).size(-1);
+				add(infolabel).size(-1);
 
 			}}.end();
 
-			new imagebutton("icon-chat", 40f, () -> {
-				if (ui.chatfrag.chatOpen()) {
-					ui.chatfrag.hide();
-				} else {
-					ui.chatfrag.toggle();
-				}
-			}).visible(() -> Net.active() && android).top().left().size(58f).get();
+
 
 		}}.end();
 
@@ -181,11 +196,13 @@ public class HudFragment implements Fragment{
 					getEnemiesRemaining() :
 						(control.tutorial().active() || state.mode.disableWaveTimer) ? "$text.waiting"
 								: Bundles.format("text.wave.waiting", (int) (state.wavetime / 60f)))
-				.minWidth(126).padLeft(-6).padRight(-12).left();
+				.minWidth(126).padLeft(-6).left();
 
 				margin(10f);
 				get().marginLeft(6);
 			}}.left().end();
+
+			add().growX();
 
 			playButton(uheight);
 		}}.height(uheight).fillX().expandX().end().get();
@@ -195,7 +212,7 @@ public class HudFragment implements Fragment{
 	private void playButton(float uheight){
 		new imagebutton("icon-play", 30f, () -> {
 			state.wavetime = 0f;
-		}).height(uheight).fillX().right().padTop(-8f).padBottom(-12f).padRight(-36).width(40f).update(l->{
+		}).height(uheight).fillX().right().padTop(-8f).padBottom(-12f).padLeft(-15).padRight(-10).width(40f).update(l->{
 			boolean vis = state.enemies <= 0 && (Net.server() || !Net.active());
 			boolean paused = state.is(State.paused) || !vis;
 			
