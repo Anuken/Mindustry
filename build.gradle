@@ -22,7 +22,7 @@ allprojects {
         appName = "Mindustry"
         gdxVersion = '1.9.8'
         aiVersion = '1.8.1'
-        uCoreVersion = 'f40fdf3'
+        uCoreVersion = 'a480029'
     }
 
     repositories {
