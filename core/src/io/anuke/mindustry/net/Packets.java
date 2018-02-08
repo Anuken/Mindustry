@@ -11,6 +11,8 @@ import io.anuke.ucore.entities.EntityGroup;
 
 import java.nio.ByteBuffer;
 
+import static io.anuke.mindustry.Vars.versionBuild;
+
 /**Class for storing all packets.*/
 public class Packets {
 
@@ -56,7 +58,7 @@ public class Packets {
 
         @Override
         public void write(ByteBuffer buffer) {
-            buffer.putInt(Net.version);
+            buffer.putInt(versionBuild);
             buffer.put((byte)name.getBytes().length);
             buffer.put(name.getBytes());
             buffer.put(android ? (byte)1 : 0);

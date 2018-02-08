@@ -25,8 +25,6 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class Net{
-	public static final int version = 20;
-
 	private static boolean server;
 	private static boolean active;
 	private static boolean clientLoaded;

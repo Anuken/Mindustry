@@ -7,6 +7,7 @@ import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.ui.MenuButton;
 import io.anuke.mindustry.ui.PressGroup;
 import io.anuke.ucore.scene.builders.imagebutton;
+import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
 
 import static io.anuke.mindustry.Vars.*;
@@ -93,5 +94,11 @@ public class MenuFragment implements Fragment{
 				new imagebutton("icon-info", 30f, ui.about::show).margin(14);
 			}
 		}}.end().visible(()->state.is(State.menu));
+
+		//version info
+		new table(){{
+			abottom().aleft();
+			new label(versionName + " " + versionMajor + "." + versionMinor + " " + versionType + " | build " + versionBuild);
+		}}.end();
 	}
 }

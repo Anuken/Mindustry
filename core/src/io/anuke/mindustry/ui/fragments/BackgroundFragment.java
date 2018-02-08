@@ -1,5 +1,6 @@
 package io.anuke.mindustry.ui.fragments;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.ucore.core.Core;
@@ -17,7 +18,7 @@ public class BackgroundFragment implements Fragment {
             Draw.color();
 
             TextureRegion back = Draw.region("background");
-            float backscl = Unit.dp.scl(5f);
+            float backscl = Math.max(Gdx.graphics.getWidth() / (float)back.getRegionWidth() * 1.5f, Unit.dp.scl(5f));
 
             Draw.alpha(0.7f);
             Core.batch.draw(back, w/2 - back.getRegionWidth()*backscl/2 +240f, h/2 - back.getRegionHeight()*backscl/2 + 250f,

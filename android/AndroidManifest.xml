@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.anuke.mindustry"
-    android:versionCode="70"
-    android:versionName="3.3b19" >
+    android:versionCode="71"
+    android:versionName="3.3b20" >
 
     <uses-feature android:glEsVersion="0x00020000" android:required="true" />
     <uses-permission android:name="com.android.vending.BILLING" />
