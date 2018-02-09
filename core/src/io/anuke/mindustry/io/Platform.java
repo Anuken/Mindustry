@@ -30,25 +30,12 @@ public abstract class Platform {
 	public boolean isDebug(){return false;}
 	public ThreadProvider getThreadProvider(){
 		return new ThreadProvider() {
-			@Override
-			public boolean isOnThread() {
-				return true;
-			}
-
-			@Override
-			public void sleep(long ms) {
-
-			}
-
-			@Override
-			public void start(Runnable run) {
-
-			}
-
-			@Override
-			public void stop() {
-
-			}
+			@Override public boolean isOnThread() {return true;}
+			@Override public void sleep(long ms) {}
+			@Override public void start(Runnable run) {}
+			@Override public void stop() {}
+			@Override public void notify(Object object) {}
+			@Override public void wait(Object object) {}
 		};
 	}
 }

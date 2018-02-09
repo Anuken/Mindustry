@@ -30,6 +30,8 @@ public class TunnelConveyor extends Block{
 	public void handleItem(Item item, Tile tile, Tile source){
 		TunnelEntity entity = tile.entity();
 
+		if(entity.index >= entity.buffer.length) return;
+
 		Tile tunnel = getDestTunnel(tile, item);
 		if(tunnel == null) return;
 		Tile to = tunnel.getNearby(tunnel.getRotation());

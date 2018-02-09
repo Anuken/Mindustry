@@ -6,16 +6,6 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 project.ext.mainClassName = "io.anuke.mindustry.server.ServerLauncher"
 project.ext.assetsDir = new File("../core/assets");
 
-ext.getDeployVersion = {
-    if(project.gradle.startParameter.taskNames.size() == 0 || !project.gradle.startParameter.taskNames.first().contains("deploy")) return;
-
-    if(!project.hasProperty("deployversion")){
-        throw new InvalidUserDataException("No version set. Set version with -Pdeployversion=name");
-    }
-
-    return deployversion;
-}
-
 task run(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
@@ -52,7 +42,7 @@ task deploy(type: Copy){
     
     from "build/libs/server-release.jar"
     into "../deploy/";
-    rename ("server-release.jar", appName + "-server-" + getDeployVersion() + ".jar");
+    rename ("server-release.jar", appName + "-server-" + getVersionString() + ".jar");
 }
 
 dist.dependsOn classes

@@ -9,6 +9,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.io.Platform;
+import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
@@ -47,8 +48,8 @@ public class NetServer extends Module{
 
         Net.handleServer(ConnectPacket.class, (id, packet) -> {
 
-            if(packet.version != versionBuild){
-                Net.kickConnection(id, packet.version > versionBuild ? KickReason.serverOutdated : KickReason.clientOutdated);
+            if(packet.version != Version.build && packet.version != -1){ //ignore 'custom builds'
+                Net.kickConnection(id, packet.version > Version.build ? KickReason.serverOutdated : KickReason.clientOutdated);
                 return;
             }
 

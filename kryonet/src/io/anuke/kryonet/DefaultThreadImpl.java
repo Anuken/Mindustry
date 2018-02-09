@@ -37,4 +37,14 @@ public class DefaultThreadImpl implements ThreadProvider {
             thread = null;
         }
     }
+
+    @Override
+    public void wait(Object object) throws InterruptedException{
+        object.wait();
+    }
+
+    @Override
+    public void notify(Object object) {
+        object.notify();
+    }
 }

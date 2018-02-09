@@ -4,14 +4,13 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
+import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 
 import java.nio.ByteBuffer;
-
-import static io.anuke.mindustry.Vars.versionBuild;
 
 /**Class for storing all packets.*/
 public class Packets {
@@ -58,7 +57,7 @@ public class Packets {
 
         @Override
         public void write(ByteBuffer buffer) {
-            buffer.putInt(versionBuild);
+            buffer.putInt(Version.build);
             buffer.put((byte)name.getBytes().length);
             buffer.put(name.getBytes());
             buffer.put(android ? (byte)1 : 0);

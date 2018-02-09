@@ -19,10 +19,26 @@ allprojects {
 
     version = 'release'
     ext {
-        appName = "Mindustry"
+        versionNumber = '3.3'
+        versionType = 'beta'
+        appName = 'Mindustry'
         gdxVersion = '1.9.8'
         aiVersion = '1.8.1'
         uCoreVersion = 'a480029'
+
+        getVersionString = {
+            String buildVersion = getBuildVersion()
+            return "$versionNumber-$versionType-$buildVersion"
+        }
+
+        getBuildVersion = {
+            if(!project.hasProperty("buildversion")) return "custom build"
+            return project.getProperties()["buildversion"]
+        }
+
+        getPackage = {
+            return project.ext.mainClassName.substring(0, project.ext.mainClassName.indexOf("desktop") - 1)
+        }
     }
 
     repositories {

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.Platform;
+import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.ui.MenuButton;
 import io.anuke.mindustry.ui.PressGroup;
 import io.anuke.ucore.scene.builders.imagebutton;
@@ -99,7 +100,7 @@ public class MenuFragment implements Fragment{
 		new table(){{
 			visible(() -> state.is(State.menu));
 			abottom().aleft();
-			new label(versionName + " " + versionMajor + "." + versionMinor + " " + versionType + " / build " + versionBuild);
+			new label("Mindustry " + Version.code + " " + Version.type + " / " + Version.buildName);
 		}}.end();
 	}
 }

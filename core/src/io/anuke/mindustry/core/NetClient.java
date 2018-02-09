@@ -304,12 +304,12 @@ public class NetClient extends Module {
     }
 
     private void finishConnecting(){
-        Net.send(new ConnectConfirmPacket(), SendMode.tcp);
         state.set(State.playing);
         connecting = false;
         ui.loadfrag.hide();
         ui.join.hide();
         Net.setClientLoaded(true);
+        Timers.runTask(1f, () -> Net.send(new ConnectConfirmPacket(), SendMode.tcp));
     }
 
     public void beginConnecting(){

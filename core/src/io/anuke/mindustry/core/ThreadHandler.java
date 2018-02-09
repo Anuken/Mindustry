@@ -42,7 +42,7 @@ public class ThreadHandler {
 
         synchronized (updateLock) {
             rendered = true;
-            updateLock.notify();
+            impl.notify(updateLock);
         }
     }
 
@@ -83,7 +83,7 @@ public class ThreadHandler {
 
                 synchronized(updateLock) {
                     while(!rendered) {
-                        updateLock.wait();
+                        impl.wait(updateLock);
                     }
                     rendered = false;
                 }
@@ -105,5 +105,7 @@ public class ThreadHandler {
         void sleep(long ms) throws InterruptedException;
         void start(Runnable run);
         void stop();
+        void wait(Object object) throws InterruptedException;
+        void notify(Object object);
     }
 }
