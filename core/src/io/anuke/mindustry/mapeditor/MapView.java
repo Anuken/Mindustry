@@ -196,7 +196,7 @@ public class MapView extends Element implements GestureListener{
 	}
 	
 	private void clampZoom(){
-		zoom = Mathf.clamp(zoom, 0.4f, 8f);
+		zoom = Mathf.clamp(zoom, 0.2f, 12f);
 	}
 	
 	private GridPoint2 project(float x, float y){
