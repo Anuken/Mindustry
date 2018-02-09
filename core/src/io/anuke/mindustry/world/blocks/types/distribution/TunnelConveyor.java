@@ -10,7 +10,7 @@ import io.anuke.ucore.util.Bits;
 
 public class TunnelConveyor extends Block{
 	protected int maxdist = 3;
-	protected float speed = 50; //frames taken to go through this tunnel
+	protected float speed = 53; //frames taken to go through this tunnel
 	protected int capacity = 32;
 
 	protected TunnelConveyor(String name) {
@@ -78,7 +78,7 @@ public class TunnelConveyor extends Block{
 
 		if(tunnel != null){
 			Tile to = tunnel.getNearby(tunnel.getRotation());
-			return to != null && !(to.block() instanceof TunnelConveyor) && to.block().acceptItem(item, to, tunnel);
+			return to != null && to.block().acceptItem(item, to, tunnel);
 		}else{
 			return false;
 		}
