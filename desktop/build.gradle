@@ -65,7 +65,7 @@ task debug(dependsOn: classes, type: JavaExec) {
 
 task dist(type: Jar) {
     dependsOn classes
-
+    
     writeVersion()
 
     from files(sourceSets.main.output.classesDirs)

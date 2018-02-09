@@ -141,7 +141,7 @@ public class Enemy extends SyncEntity {
 
 		this.health = health;
 
-		interpolator.read(this.x, this.y, x, y, angle, time);
+		interpolator.read(this.x, this.y, x, y, angle/2f, time);
 	}
 
 	public void shoot(BulletType bullet){

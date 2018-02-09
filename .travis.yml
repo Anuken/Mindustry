@@ -14,7 +14,7 @@ android:
     - addon-google_apis-google-26
 
 script: 
-    - ./gradlew desktop:dist
+    - ./gradlew desktop:dist -Pbuildversion=bleeding edge build
 
 after_success:
     - chmod +x upload-build.sh

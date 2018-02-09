@@ -48,7 +48,7 @@ public class NetServer extends Module{
 
         Net.handleServer(ConnectPacket.class, (id, packet) -> {
 
-            if(packet.version != Version.build && packet.version != -1){ //ignore 'custom builds'
+            if(packet.version != Version.build && packet.version != -1 && Version.build != -1){ //ignore 'custom builds' on both ends
                 Net.kickConnection(id, packet.version > Version.build ? KickReason.serverOutdated : KickReason.clientOutdated);
                 return;
             }
