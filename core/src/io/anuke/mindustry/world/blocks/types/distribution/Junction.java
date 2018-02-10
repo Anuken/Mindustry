@@ -69,7 +69,7 @@ public class Junction extends Block{
 		JunctionEntity entity = tile.entity();
 		boolean x = tile.x == source.x;
 
-		if((x && entity.bx.full()) || (!x && entity.by.full())) return false;
+		if(entity == null || entity.bx == null || entity.by == null || (x && entity.bx.full()) || (!x && entity.by.full())) return false;
 		int dir = source.relativeTo(tile.x, tile.y);
 		if(dir == -1) return false;
 		Tile to = tile.getNearby(dir);
