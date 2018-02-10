@@ -63,6 +63,7 @@ public class Teleporter extends PowerBlock{
 	@Override
 	public void placed(Tile tile){
 		tile.<TeleporterEntity>entity().color = lastColor;
+		Timers.run(1f, () -> setConfigure(tile, lastColor));
 	}
 	
 	@Override

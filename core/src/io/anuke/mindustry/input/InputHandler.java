@@ -189,6 +189,10 @@ public abstract class InputHandler extends InputAdapter{
 
 		placeBlockInternal(x, y, result, rotation, effects, sound);
 
+		Tile tile = world.tile(x, y);
+
+		if(tile != null) result.placed(tile);
+
 		if(Net.active() && result != ProductionBlocks.core){
 			NetEvents.handlePlace(x, y, result, rotation);
 		}
@@ -225,8 +229,6 @@ public abstract class InputHandler extends InputAdapter{
 		}
 
 		if(effects && sound) Sounds.play("place");
-
-		result.placed(tile);
 	}
 	
 	public void breakBlock(int x, int y, boolean sound){
