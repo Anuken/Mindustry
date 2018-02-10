@@ -15,10 +15,7 @@ import io.anuke.mindustry.net.Packets.ChatPacket;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.ui.fragments.DebugFragment;
 import io.anuke.mindustry.world.Map;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Sounds;
-import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.CommandHandler;
 import io.anuke.ucore.util.CommandHandler.Command;
@@ -37,10 +34,12 @@ import static io.anuke.ucore.util.Log.*;
 
 public class ServerControl extends Module {
     private final CommandHandler handler = new CommandHandler("");
-    private boolean shuffle = true;
-    private boolean shuffleCustom = false;
+    private ShuffleMode mode = ShuffleMode.both;
 
     public ServerControl(){
+        Settings.defaults("shufflemode", "normal");
+        mode = ShuffleMode.valueOf(Settings.getString("shufflemode"));
+
         Effects.setScreenShakeProvider((a, b) -> {});
         Effects.setEffectProvider((a, b, c, d, e) -> {});
         Sounds.setHeadless(true);
@@ -72,8 +71,10 @@ public class ServerControl extends Module {
                 state.set(State.menu);
                 Net.closeServer();
 
-                if(shuffle) {
-                    Array<Map> maps = shuffleCustom ? world.maps().getAllMaps() : world.maps().getDefaultMaps();
+                if(mode != ShuffleMode.off) {
+                    Array<Map> maps = mode == ShuffleMode.both ? world.maps().getAllMaps() :
+                            mode == ShuffleMode.normal ? world.maps().getDefaultMaps() : world.maps().getCustomMaps();
+
                     Map previous = world.getMap();
                     Map map = previous;
                     while(map == previous || !map.visible) map = maps.random();
@@ -213,27 +214,13 @@ public class ServerControl extends Module {
             }
         });
 
-        handler.register("shuffle", "<on/off> <custom>", "Enable or disable automatic random map shuffling after gameovers.", arg -> {
-            String s = arg[0];
-            String custom = arg[1];
-            if(s.equalsIgnoreCase("on")){
-                shuffle = true;
-                info("Map shuffling enabled.");
-            }else if(s.equalsIgnoreCase("off")){
-                shuffle = false;
-                info("Map shuffling disabled.");
-            }else{
-                err("Incorrect enable/disable usage.");
-            }
+        handler.register("shuffle", "<normal/custom/both/off>", "Set map shuffling.", arg -> {
 
-            if(custom.equalsIgnoreCase("on")){
-                shuffleCustom = true;
-                info("Custom map shuffling enabled.");
-            }else if(custom.equalsIgnoreCase("off")){
-                shuffleCustom = false;
-                info("Custom map shuffling disabled.");
-            }else{
-                err("Incorrect enable/disable custom map usage.");
+            try{
+                mode = ShuffleMode.valueOf(arg[0]);
+                info("Shuffle mode set to '{0}'.", arg[0]);
+            }catch (Exception e){
+                err("Unknown shuffle mode '{0}'.", arg[0]);
             }
         });
 
@@ -348,5 +335,9 @@ public class ServerControl extends Module {
             Log.err(e);
             state.set(State.menu);
         }
+    }
+
+    enum ShuffleMode{
+        normal, custom, both, off
     }
 }

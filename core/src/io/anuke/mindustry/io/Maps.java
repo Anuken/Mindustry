@@ -38,6 +38,14 @@ public class Maps implements Disposable{
 		return defaultMaps;
 	}
 
+	public Array<Map> getCustomMaps(){
+		array.clear();
+		for(Map map : list()){
+			if(map.custom) array.add(map);
+		}
+		return array;
+	}
+
 	public Array<Map> getAllMaps(){
 		array.clear();
 		for(Map map : list()){
