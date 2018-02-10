@@ -364,6 +364,10 @@ public class Control extends Module{
 					tutorial.update();
 				}
 			}
+		}else{
+			if(!state.is(State.paused) || Net.active()){
+				Timers.update();
+			}
 		}
 
 	}

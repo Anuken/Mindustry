@@ -110,11 +110,11 @@ public class Logic extends Module {
     @Override
     public void update(){
 
-        if(!state.is(State.paused) || Net.active()){
-            Timers.update();
-        }
-
         if(!state.is(State.menu)){
+
+            if(!state.is(State.paused) || Net.active()){
+                Timers.update();
+            }
 
             if(!Net.client())
                 world.pathfinder().update();
