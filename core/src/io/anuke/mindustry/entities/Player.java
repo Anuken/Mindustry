@@ -255,10 +255,13 @@ public class Player extends SyncEntity{
 
 	@Override
 	public void write(ByteBuffer data) {
-		//TODO written angle is always 0
-
-		data.putFloat(x);
-		data.putFloat(y);
+		if(Net.client()) {
+			data.putFloat(x);
+			data.putFloat(y);
+		}else{
+			data.putFloat(interpolator.target.x);
+			data.putFloat(interpolator.target.y);
+		}
 		data.putFloat(angle);
 		data.putShort((short)health);
 		data.put((byte)(dashing ? 1 : 0));

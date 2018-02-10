@@ -7,4 +7,5 @@ public interface Packet {
     void write(ByteBuffer buffer);
 
     interface ImportantPacket{}
+    interface UnimportantPacket{}
 }

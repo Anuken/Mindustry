@@ -270,11 +270,19 @@ public class NetClient extends Module {
         Net.handleClient(FriendlyFireChangePacket.class, packet -> state.friendlyFire = packet.enabled);
 
         Net.handleClient(ItemTransferPacket.class, packet -> {
-            Tile tile = world.tile(packet.position);
-            if(tile == null || tile.entity == null) return;
-            Tile next = tile.getNearby(packet.rotation);
-            tile.entity.items[packet.itemid] --;
-            next.block().handleItem(Item.getByID(packet.itemid), next, tile);
+            Runnable r = () -> {
+                Tile tile = world.tile(packet.position);
+                if (tile == null || tile.entity == null) return;
+                Tile next = tile.getNearby(packet.rotation);
+                tile.entity.items[packet.itemid]--;
+                next.block().handleItem(Item.getByID(packet.itemid), next, tile);
+            };
+
+            if(threads.isEnabled()){
+                threads.run(r);
+            }else{
+                r.run();
+            }
         });
     }
 

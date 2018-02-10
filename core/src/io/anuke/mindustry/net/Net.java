@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
+import io.anuke.mindustry.net.Packet.UnimportantPacket;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamBuilder;
@@ -189,7 +190,7 @@ public class Net{
 			if(clientLoaded || object instanceof ImportantPacket){
 				if(clientListeners.get(object.getClass()) != null) clientListeners.get(object.getClass()).accept(object);
 				if(listeners.get(object.getClass()) != null) listeners.get(object.getClass()).accept(object);
-			}else{
+			}else if(!(object instanceof UnimportantPacket)){
 				packetQueue.add(object);
 				Log.info("Queuing packet {0}.", ClassReflection.getSimpleName(object.getClass()));
 			}

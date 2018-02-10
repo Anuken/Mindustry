@@ -6,6 +6,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
+import io.anuke.mindustry.net.Packet.UnimportantPacket;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
@@ -502,7 +503,7 @@ public class Packets {
         public void read(ByteBuffer buffer) { }
     }
 
-    public static class ItemTransferPacket implements Packet{
+    public static class ItemTransferPacket implements Packet, UnimportantPacket{
         public int position;
         public byte rotation;
         public byte itemid;

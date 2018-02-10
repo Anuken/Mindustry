@@ -1,6 +1,7 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Log;
@@ -8,6 +9,7 @@ import io.anuke.ucore.util.Log;
 import static io.anuke.mindustry.Vars.logic;
 
 public class ThreadHandler {
+    private final Array<Runnable> toRun = new Array<>();
     private final ThreadProvider impl;
     private float delta = 1f;
     private long frame = 0;
@@ -21,6 +23,12 @@ public class ThreadHandler {
         this.impl = impl;
 
         Timers.setDeltaProvider(() -> impl.isOnThread() ? delta : Gdx.graphics.getDeltaTime()*60f);
+    }
+
+    public void run(Runnable r){
+        synchronized (toRun) {
+            toRun.add(r);
+        }
     }
 
     public int getFPS(){
@@ -70,6 +78,14 @@ public class ThreadHandler {
         try {
             while (true) {
                 long time = TimeUtils.millis();
+
+                synchronized (toRun) {
+                    for(Runnable r : toRun){
+                        r.run();
+                    }
+                    toRun.clear();
+                }
+
                 logic.update();
 
                 long elapsed = TimeUtils.timeSinceMillis(time);
