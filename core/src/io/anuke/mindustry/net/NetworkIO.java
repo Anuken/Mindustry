@@ -227,6 +227,7 @@ public class NetworkIO {
             float timerTime = stream.readFloat();
             long timestamp = stream.readLong();
 
+            Timers.clear();
             Timers.resetTime(timerTime + (TimeUtils.timeSinceMillis(timestamp) / 1000f) * 60f);
 
             //general state

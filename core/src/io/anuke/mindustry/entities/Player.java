@@ -16,6 +16,7 @@ import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Timer;
 import io.anuke.ucore.util.Translator;
 
 import java.nio.ByteBuffer;
@@ -25,6 +26,11 @@ import static io.anuke.mindustry.Vars.*;
 public class Player extends SyncEntity{
 	static final float speed = 1.1f;
 	static final float dashSpeed = 1.8f;
+
+	static final int timerDash = 0;
+	static final int timerShootLeft = 1;
+	static final int timerShootRight = 2;
+	static final int timerRegen = 20;
 
 	public String name = "name";
 	public boolean isAndroid;
@@ -40,6 +46,7 @@ public class Player extends SyncEntity{
 
 	public int clientid;
 	public boolean isLocal = false;
+	public Timer timer = new Timer(4);
 
 	private Vector2 movement = new Vector2();
 	private Translator tr = new Translator();
@@ -168,7 +175,7 @@ public class Player extends SyncEntity{
 		
 		float speed = dashing ? (debug ? Player.dashSpeed * 5f : Player.dashSpeed) : Player.speed;
 		
-		if(health < maxhealth && Timers.get(this, "regen", 20))
+		if(health < maxhealth && timer.get(timerRegen, 20 ))
 			health ++;
 
 		health = Mathf.clamp(health, -1, maxhealth);
@@ -191,7 +198,7 @@ public class Player extends SyncEntity{
 			weaponRight.update(player, false);
 		}
 		
-		if(dashing && Timers.get(this, "dashfx", 3) && movement.len() > 0){
+		if(dashing && timer.get(timerDash, 3) && movement.len() > 0){
 			Effects.effect(Fx.dashsmoke, x + Angles.trnsx(angle + 180f, 3f), y + Angles.trnsy(angle + 180f, 3f));
 		}
 		
@@ -255,7 +262,7 @@ public class Player extends SyncEntity{
 
 	@Override
 	public void write(ByteBuffer data) {
-		if(Net.client()) {
+		if(Net.client() || isLocal) {
 			data.putFloat(x);
 			data.putFloat(y);
 		}else{
@@ -290,11 +297,11 @@ public class Player extends SyncEntity{
 		float tx = x + Angles.trnsx(angle + 180f, 3f);
 		float ty = y + Angles.trnsy(angle + 180f, 3f);
 
-		if(isAndroid && i.target.dst(i.last) > 2f && Timers.get(this, "dashfx", 2)){
+		if(isAndroid && i.target.dst(i.last) > 2f && timer.get(timerDash, 1)){
 			Effects.effect(Fx.dashsmoke, tx, ty);
 		}
 
-		if(dashing && !dead && Timers.get(this, "dashfx", 3) && i.target.dst(i.last) > 1f){
+		if(dashing && !dead && timer.get(timerDash, 3) && i.target.dst(i.last) > 1f){
 			Effects.effect(Fx.dashsmoke, tx, ty);
 		}
 	}

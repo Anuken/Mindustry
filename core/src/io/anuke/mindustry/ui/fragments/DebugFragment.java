@@ -3,7 +3,10 @@ package io.anuke.mindustry.ui.fragments;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.entities.enemies.EnemyTypes;
 import io.anuke.mindustry.net.Net;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.builders.button;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
@@ -12,6 +15,7 @@ import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Log.LogHandler;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -57,8 +61,19 @@ public class DebugFragment implements Fragment {
                    netClient.clearRecieved();
                });
                row();
-               new button("spawn", () -> {});
+               new button("spawn", () -> {
+                   for(int i = 0; i < 30; i ++){
+                       new Enemy(EnemyTypes.blast).set(player.x + Mathf.range(50f), player.y + Mathf.range(50f)).add();
+                   }
+               });
                row();
+               new button("time", () -> {
+                   Timers.resetTime(10368000);
+               });
+               row();
+               new button("time2", () -> {
+                   Timers.resetTime(0);
+               });
            }}.end();
 
            row();
@@ -114,6 +129,8 @@ public class DebugFragment implements Fragment {
         StringBuilder result = join(
                 "net.active: " + Net.active(),
                 "net.server: " + Net.server(),
+                "net.client: " + Net.client(),
+                "state: " + state.getState(),
                 Net.client() ?
                 "chat.open: " + ui.chatfrag.chatOpen() + "\n" +
                 "chat.messages: " + ui.chatfrag.getMessagesSize() + "\n" +
@@ -122,6 +139,7 @@ public class DebugFragment implements Fragment {
                 "players: " + playerGroup.size(),
                 "enemies: " + enemyGroup.size(),
                 "tiles: " + tileGroup.size(),
+                "time: " + Timers.time(),
                 world.getCore() != null && world.getCore().entity != null ? "core.health: " + world.getCore().entity.health : "",
                 "core: " + world.getCore(),
                 "state.gameover: " + state.gameOver,

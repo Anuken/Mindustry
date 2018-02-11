@@ -24,6 +24,7 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Timer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -34,11 +35,16 @@ import java.nio.ByteBuffer;
 import static io.anuke.mindustry.Vars.*;
 
 public class NetServer extends Module{
+    private final static float serverSyncTime = 4, itemSyncTime = 10, blockSyncTime = 120;
+
+    private final static int timerEntitySync = 0;
+    private final static int timerStateSync = 1;
+
     /**Maps connection IDs to players.*/
-    IntMap<Player> connections = new IntMap<>();
-    ObjectMap<String, ByteArray> weapons = new ObjectMap<>();
-    float serverSyncTime = 4, itemSyncTime = 10, blockSyncTime = 120;
-    boolean closing = false;
+    private IntMap<Player> connections = new IntMap<>();
+    private ObjectMap<String, ByteArray> weapons = new ObjectMap<>();
+    private boolean closing = false;
+    private Timer timer = new Timer(5);
 
     public NetServer(){
 
@@ -218,7 +224,7 @@ public class NetServer extends Module{
 
     void sync(){
 
-        if(Timers.get("serverSync", serverSyncTime)){
+        if(timer.get(timerEntitySync, serverSyncTime)){
             //scan through all groups with syncable entities
             for(EntityGroup<?> group : Entities.getAllGroups()) {
                 if(group.size() == 0 || !(group.all().first() instanceof SyncEntity)) continue;
@@ -283,7 +289,7 @@ public class NetServer extends Module{
             }
         }
 
-        if(Timers.get("serverItemSync", itemSyncTime)){
+        if(timer.get(timerStateSync, itemSyncTime)){
             StateSyncPacket packet = new StateSyncPacket();
             packet.items = state.inventory.getItems();
             packet.countdown = state.wavetime;
@@ -294,6 +300,7 @@ public class NetServer extends Module{
 
             Net.send(packet, SendMode.udp);
         }
+
         /*
         if(Timers.get("serverBlockSync", blockSyncTime)){
 

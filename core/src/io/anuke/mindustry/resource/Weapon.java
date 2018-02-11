@@ -9,7 +9,6 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
@@ -98,9 +97,11 @@ public class Weapon extends Upgrade{
 	}
 
 	public void update(Player p, boolean left){
-		if(Timers.get(p, "reload"+left, reload)){
+		int t = left ? 1 : 2;
+		int t2 = !left ? 1 : 2;
+		if(p.timer.get(t, reload)){
 			if(roundrobin){
-				Timers.reset(p, "reload" + !left, reload/2f);
+				p.timer.reset(t2, reload/2f);
 			}
 			float ang = Angles.mouseAngle(p.x, p.y);
 			tr.trns(ang - 90, 3f * Mathf.sign(left), length);

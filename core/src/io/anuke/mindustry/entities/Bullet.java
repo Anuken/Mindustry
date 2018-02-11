@@ -5,10 +5,12 @@ import io.anuke.ucore.entities.BulletEntity;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Timer;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class Bullet extends BulletEntity{
+	public Timer timer = new Timer(3);
 	
 	public Bullet(BulletType type, Entity owner, float x, float y, float angle){
 		super(type, owner, angle);

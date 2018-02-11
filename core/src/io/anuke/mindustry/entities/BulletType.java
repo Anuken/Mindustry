@@ -52,7 +52,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		}
 		
 		public void update(Bullet b){
-			if(Timers.get(b, "smoke", 4)){
+			if(b.timer.get(0, 4)){
 				Effects.effect(Fx.railsmoke, b.x, b.y);
 			}
 		}
@@ -73,7 +73,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		}
 		
 		public void update(Bullet b){
-			if(Timers.get(b, "smoke", 2)){
+			if(b.timer.get(0, 2)){
 				Effects.effect(Fx.empspark, b.x + Mathf.range(2), b.y + Mathf.range(2));
 			}
 		}
@@ -107,7 +107,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		}
 		
 		public void update(Bullet b){
-			if(Timers.get(b, "smoke", 7)){
+			if(b.timer.get(0, 7)){
 				Effects.effect(Fx.smoke, b.x + Mathf.range(2), b.y + Mathf.range(2));
 			}
 		}
@@ -132,7 +132,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		}
 
 		public void update(Bullet b){
-			if(Timers.get(b, "smoke", 7)){
+			if(b.timer.get(0, 7)){
 				Effects.effect(Fx.smoke, b.x + Mathf.range(2), b.y + Mathf.range(2));
 			}
 		}
@@ -187,7 +187,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		}
 		
 		public void update(Bullet b){
-			if(Timers.get(b, "smoke", 4)){
+			if(b.timer.get(0, 4)){
 				Effects.effect(Fx.smoke, b.x + Mathf.range(2), b.y + Mathf.range(2));
 			}
 		}
@@ -218,7 +218,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		}
 		
 		public void update(Bullet b){
-			if(Timers.get(b, "smoke", 4)){
+			if(b.timer.get(0, 4)){
 				Effects.effect(Fx.smoke, b.x + Mathf.range(2), b.y + Mathf.range(2));
 			}
 		}
@@ -391,7 +391,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
         }
 
         public void update(Bullet b){
-            if(Timers.get(b, "smoke", 4)){
+            if(b.timer.get(0, 4)){
                 Effects.effect(Fx.chainsmoke, b.x, b.y);
             }
         }

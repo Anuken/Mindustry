@@ -26,6 +26,7 @@ import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Timer;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -37,6 +38,7 @@ public class NetClient extends Module {
     private final static float dataTimeout = 60*18; //18 seconds timeout
     private final static float playerSyncTime = 2;
 
+    private Timer timer = new Timer(5);
     private boolean connecting = false;
     private boolean gotData = false;
     private boolean kicked = false;
@@ -75,7 +77,7 @@ public class NetClient extends Module {
         Net.handleClient(Disconnect.class, packet -> {
             if (kicked) return;
 
-            Timers.runFor(3f, ui.loadfrag::hide);
+            Timers.runTask(3f, ui.loadfrag::hide);
 
             state.set(State.menu);
 
@@ -153,7 +155,8 @@ public class NetClient extends Module {
             state.wavetime = packet.countdown;
             state.wave = packet.wave;
 
-            Timers.resetTime(packet.time + (float) (TimeUtils.timeSinceMillis(packet.timestamp) / 1000.0 * 60.0));
+            //removed: messing with time isn't necessary anymore
+            //Timers.resetTime(packet.time + (float) (TimeUtils.timeSinceMillis(packet.timestamp) / 1000.0 * 60.0));
 
             ui.hudfrag.updateItems();
         });
@@ -334,7 +337,9 @@ public class NetClient extends Module {
     }
 
     void sync(){
-        if(Timers.get("syncPlayer", playerSyncTime)){
+
+        if(timer.get(0, playerSyncTime)){
+
             byte[] bytes = new byte[player.getWriteSize() + 8];
             ByteBuffer buffer = ByteBuffer.wrap(bytes);
             buffer.putLong(TimeUtils.millis());
@@ -345,7 +350,7 @@ public class NetClient extends Module {
             Net.send(packet, SendMode.udp);
         }
 
-        if(Timers.get("updatePing", 60)){
+        if(timer.get(1, playerSyncTime)){
             Net.updatePing();
         }
     }

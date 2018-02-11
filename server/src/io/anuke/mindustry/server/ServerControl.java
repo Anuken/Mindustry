@@ -34,7 +34,7 @@ import static io.anuke.ucore.util.Log.*;
 
 public class ServerControl extends Module {
     private final CommandHandler handler = new CommandHandler("");
-    private ShuffleMode mode = ShuffleMode.both;
+    private ShuffleMode mode;
 
     public ServerControl(){
         Settings.defaults("shufflemode", "normal");
