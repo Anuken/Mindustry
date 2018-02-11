@@ -294,8 +294,8 @@ public class Player extends SyncEntity{
 
 		Interpolator i = interpolator;
 
-		float tx = x + Angles.trnsx(angle + 180f, 3f);
-		float ty = y + Angles.trnsy(angle + 180f, 3f);
+		float tx = x + Angles.trnsx(angle + 180f, 4f);
+		float ty = y + Angles.trnsy(angle + 180f, 4f);
 
 		if(isAndroid && i.target.dst(i.last) > 2f && timer.get(timerDash, 1)){
 			Effects.effect(Fx.dashsmoke, tx, ty);

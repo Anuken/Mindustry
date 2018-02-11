@@ -120,7 +120,7 @@ public abstract class SyncEntity extends DestructibleEntity{
 
         public void update(){
 
-            time += 1f / spacing * Timers.delta();
+            time += 1f / spacing * Math.min(Timers.delta(), 1f);
 
             Mathf.lerp2(pos.set(last), target, time);
 

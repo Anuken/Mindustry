@@ -2,6 +2,7 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.core.GameState.State;
@@ -43,12 +44,15 @@ public class NetClient extends Module {
     private boolean gotData = false;
     private boolean kicked = false;
     private IntSet recieved = new IntSet();
+    private IntMap<Entity> recent = new IntMap<>();
 
     public NetClient(){
 
         Net.handleClient(Connect.class, packet -> {
+
             Net.setClientLoaded(false);
             recieved.clear();
+            recent.clear();
             connecting = true;
             gotData = false;
             kicked = false;
@@ -169,6 +173,7 @@ public class NetClient extends Module {
                     recieved.contains(packet.entity.id)) return;
 
             recieved.add(packet.entity.id);
+            recent.put(packet.entity.id, packet.entity);
 
             packet.entity.add();
 
@@ -179,6 +184,8 @@ public class NetClient extends Module {
             Enemy enemy = enemyGroup.getByID(packet.id);
             if (enemy != null){
                 enemy.type.onDeath(enemy, true);
+            }else if(recent.get(packet.id) != null){
+                recent.get(packet.id).remove();
             }else{
                 Log.err("Got remove for null entity! {0}", packet.id);
             }
