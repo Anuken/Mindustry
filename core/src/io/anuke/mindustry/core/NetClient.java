@@ -350,7 +350,7 @@ public class NetClient extends Module {
             Net.send(packet, SendMode.udp);
         }
 
-        if(timer.get(1, playerSyncTime)){
+        if(timer.get(1, 60)){
             Net.updatePing();
         }
     }

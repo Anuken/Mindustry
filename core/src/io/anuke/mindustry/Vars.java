@@ -41,7 +41,7 @@ public class Vars{
 	//how far away from spawn points the player can't place blocks
 	public static final float enemyspawnspace = 65;
 	//discord group URL
-	public static final String discordURL = "https://discord.gg/r8BkXNd";
+	public static final String discordURL = "https://discord.gg/BKADYds";
 
 	public static final String serverURL = "http://localhost:3000";
 	//directory for user-created map data
