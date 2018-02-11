@@ -218,6 +218,8 @@ public class ServerControl extends Module {
 
             try{
                 mode = ShuffleMode.valueOf(arg[0]);
+                Settings.putString("shufflemode", arg[0]);
+                Settings.save();
                 info("Shuffle mode set to '{0}'.", arg[0]);
             }catch (Exception e){
                 err("Unknown shuffle mode '{0}'.", arg[0]);

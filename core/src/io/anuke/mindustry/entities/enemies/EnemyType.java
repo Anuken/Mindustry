@@ -99,6 +99,8 @@ public class EnemyType {
             enemy.hitTime -= Timers.delta();
         }
 
+        if(enemy.lane >= world.getSpawns().size) enemy.lane = 0;
+
         boolean waiting = world.getSpawns().get(enemy.lane).pathTiles == null || enemy.node <= 0;
 
         move(enemy);
