@@ -92,7 +92,7 @@ public class Renderer extends RendererModule{
 
 		if(Core.cameraScale != targetscale){
 			float targetzoom = (float) Core.cameraScale / targetscale;
-			camera.zoom = Mathf.lerp(camera.zoom, targetzoom, 0.2f * Timers.delta());
+			camera.zoom = Mathf.lerpDelta(camera.zoom, targetzoom, 0.2f);
 
 			if(Mathf.in(camera.zoom, targetzoom, 0.005f)){
 				camera.zoom = 1f;
@@ -100,7 +100,7 @@ public class Renderer extends RendererModule{
 				control.input().resetCursor();
 			}
 		}else{
-			camera.zoom = Mathf.lerp(camera.zoom, 1f, 0.2f * Timers.delta());
+			camera.zoom = Mathf.lerpDelta(camera.zoom, 1f, 0.2f);
 		}
 
 		if(state.is(State.menu)){
