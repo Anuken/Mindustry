@@ -15,7 +15,6 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Shapes;
-import io.anuke.ucore.util.Angles;
 
 import static io.anuke.mindustry.Vars.enemyGroup;
 
@@ -31,6 +30,7 @@ public class HealerType extends EnemyType {
 		alwaysRotate = false;
 		targetCore = false;
 		stopNearCore = true;
+		targetClient = true;
 		mass = 1.1f;
 	}
 

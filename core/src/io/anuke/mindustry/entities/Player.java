@@ -30,7 +30,7 @@ public class Player extends SyncEntity{
 	static final int timerDash = 0;
 	static final int timerShootLeft = 1;
 	static final int timerShootRight = 2;
-	static final int timerRegen = 20;
+	static final int timerRegen = 3;
 
 	public String name = "name";
 	public boolean isAndroid;
@@ -175,7 +175,7 @@ public class Player extends SyncEntity{
 		
 		float speed = dashing ? (debug ? Player.dashSpeed * 5f : Player.dashSpeed) : Player.speed;
 		
-		if(health < maxhealth && timer.get(timerRegen, 20 ))
+		if(health < maxhealth && timer.get(timerRegen, 20))
 			health ++;
 
 		health = Mathf.clamp(health, -1, maxhealth);

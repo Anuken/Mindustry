@@ -242,9 +242,9 @@ public class Fx{
 		Draw.reset();
 	}),
 	
-	blastexplosion = new Effect(16, e -> {
+	blastexplosion = new Effect(14, e -> {
 		Lines.stroke(1.2f - e.ifract());
-		Draw.color(Color.WHITE, Color.SCARLET, e.ifract());
+		Draw.color(Color.WHITE, lightOrange, e.ifract());
 		Lines.circle(e.x, e.y, 1.5f + e.ifract() * 9f);
 		Draw.reset();
 	}),

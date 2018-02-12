@@ -63,7 +63,7 @@ public class DebugFragment implements Fragment {
                row();
                new button("spawn", () -> {
                    for(int i = 0; i < 30; i ++){
-                       new Enemy(EnemyTypes.blast).set(player.x + Mathf.range(50f), player.y + Mathf.range(50f)).add();
+                       new Enemy(EnemyTypes.healer).set(player.x + Mathf.range(50f), player.y + Mathf.range(50f)).add();
                    }
                });
                row();

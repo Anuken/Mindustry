@@ -53,6 +53,7 @@ public class EnemyType {
     protected String shootsound = "enemyshoot";
     protected boolean targetCore = false;
     protected boolean stopNearCore = true;
+    protected boolean targetClient = false;
     protected float mass = 1f;
 
     protected final int timerTarget = timeid ++;
@@ -145,7 +146,8 @@ public class EnemyType {
 
     public void move(Enemy enemy){
         if(Net.client()){
-            enemy.interpolate(); //TODO? better structure for interpolation
+            enemy.interpolate();
+            if(targetClient) updateTargeting(enemy, false);
             return;
         }
 
