@@ -4,8 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
@@ -135,13 +133,8 @@ public class Teleporter extends PowerBlock{
 		Array<Tile> links = findLinks(tile);
 		
 		if(links.size > 0){
-
-            if(Net.server() || !Net.active()){
-                Tile target = links.random();
-                target.entity.addItem(item, 1);
-
-                if(Net.server()) NetEvents.handleItemAdd(target, item);
-            }
+			Tile target = links.random();
+			target.entity.addItem(item, 1);
 		}
 
 		entity.power -= powerPerItem;
