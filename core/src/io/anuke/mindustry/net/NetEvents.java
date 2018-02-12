@@ -137,4 +137,11 @@ public class NetEvents {
         packet.itemid = (byte)item.id;
         Net.send(packet, SendMode.udp);
     }
+
+    public static void handleItemAdd(Tile tile, Item item){
+        ItemAddPacket packet = new ItemAddPacket();
+        packet.position = tile.packedPosition();
+        packet.itemid = (byte)item.id;
+        Net.send(packet, SendMode.udp);
+    }
 }

@@ -150,7 +150,12 @@ public class Block{
 
 	public void handleItem(Item item, Tile tile, Tile source){
 		if(tile.entity == null) return;
-		tile.entity.addItem(item, 1);
+
+		if(Net.server() || !Net.active()){
+			tile.entity.addItem(item, 1);
+
+			if(Net.server()) NetEvents.handleItemAdd(tile, item);
+		}
 	}
 	
 	public boolean acceptItem(Item item, Tile tile, Tile source){

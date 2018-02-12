@@ -284,8 +284,22 @@ public class NetClient extends Module {
                 Tile tile = world.tile(packet.position);
                 if (tile == null || tile.entity == null) return;
                 Tile next = tile.getNearby(packet.rotation);
-                tile.entity.items[packet.itemid]--;
+                tile.entity.items[packet.itemid] --;
                 next.block().handleItem(Item.getByID(packet.itemid), next, tile);
+            };
+
+            if(threads.isEnabled()){
+                threads.run(r);
+            }else{
+                r.run();
+            }
+        });
+
+        Net.handleClient(ItemAddPacket.class, packet -> {
+            Runnable r = () -> {
+                Tile tile = world.tile(packet.position);
+                if (tile == null || tile.entity == null) return;
+                tile.entity.items[packet.itemid] ++;
             };
 
             if(threads.isEnabled()){

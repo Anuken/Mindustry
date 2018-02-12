@@ -522,4 +522,21 @@ public class Packets {
             itemid = buffer.get();
         }
     }
+
+    public static class ItemAddPacket implements Packet{
+        public int position;
+        public byte itemid;
+
+        @Override
+        public void write(ByteBuffer buffer) {
+            buffer.putInt(position);
+            buffer.put(itemid);
+        }
+
+        @Override
+        public void read(ByteBuffer buffer) {
+            position = buffer.getInt();
+            itemid = buffer.get();
+        }
+    }
 }
