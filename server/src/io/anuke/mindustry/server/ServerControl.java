@@ -71,20 +71,23 @@ public class ServerControl extends Module {
                 state.set(State.menu);
                 Net.closeServer();
 
-                if(mode != ShuffleMode.off) {
-                    Array<Map> maps = mode == ShuffleMode.both ? world.maps().getAllMaps() :
-                            mode == ShuffleMode.normal ? world.maps().getDefaultMaps() : world.maps().getCustomMaps();
+                Timers.runTask(30f, () -> {
 
-                    Map previous = world.getMap();
-                    Map map = previous;
-                    while(map == previous || !map.visible) map = maps.random();
+                    if (mode != ShuffleMode.off) {
+                        Array<Map> maps = mode == ShuffleMode.both ? world.maps().getAllMaps() :
+                                mode == ShuffleMode.normal ? world.maps().getDefaultMaps() : world.maps().getCustomMaps();
 
-                    info("Selected next map to be {0}.", map.name);
-                    state.set(State.playing);
-                    logic.reset();
-                    world.loadMap(map);
-                    host();
-                }
+                        Map previous = world.getMap();
+                        Map map = previous;
+                        while (map == previous || !map.visible) map = maps.random();
+
+                        info("Selected next map to be {0}.", map.name);
+                        state.set(State.playing);
+                        logic.reset();
+                        world.loadMap(map);
+                        host();
+                    }
+                });
             });
         });
 
