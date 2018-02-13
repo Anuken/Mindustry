@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -48,6 +49,7 @@ public class Renderer extends RendererModule{
 	public Surface shadowSurface, shieldSurface, indicatorSurface;
 	
 	private int targetscale = baseCameraScale;
+	private Texture background = new Texture("sprites/background.png");
 	private FloatArray shieldHits = new FloatArray();
 	private Array<Callable> shieldDraws = new Array<>();
 	private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
@@ -67,9 +69,11 @@ public class Renderer extends RendererModule{
 				}
 			}
 		});
-		
+
 		clearColor = Hue.lightness(0.4f);
 		clearColor.a = 1f;
+
+		background.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 	}
 
 	@Override
@@ -172,6 +176,8 @@ public class Renderer extends RendererModule{
 		//clears shield surface
 		Graphics.surface(shieldSurface);
 		Graphics.surface();
+
+		drawPadding();
 		
 		blocks.drawFloor();
 		blocks.processBlocks();
@@ -215,9 +221,37 @@ public class Renderer extends RendererModule{
 		control.input().resetCursor();
 		camera.position.set(player.x, player.y, 0);
 	}
-	
+
+	@Override
+	public void dispose() {
+		background.dispose();
+	}
+
 	public void clearTiles(){
 		blocks.clearTiles();
+	}
+
+	void drawPadding(){
+		float vw = world.width() * tilesize;
+		float cw = camera.viewportWidth * camera.zoom;
+		float ch = camera.viewportHeight * camera.zoom;
+		if(vw < cw){
+			batch.draw(background,
+					camera.position.x + vw/2,
+					Mathf.round(camera.position.y - ch/2, tilesize),
+					(cw - vw) /2,
+					ch + tilesize,
+					0, ch / tilesize + 1,
+					((cw - vw) / 2 / tilesize), 0);
+
+			batch.draw(background,
+					camera.position.x - vw/2,
+					Mathf.round(camera.position.y - ch/2, tilesize),
+					-(cw - vw) /2,
+					ch + tilesize,
+					0, ch / tilesize + 1,
+					-((cw - vw) / 2 / tilesize), 0);
+		}
 	}
 
 	void drawPlayerNames(){
@@ -505,7 +539,7 @@ public class Renderer extends RendererModule{
 	}
 
 	public void clampScale(){
-		targetscale = Mathf.clamp(targetscale, Math.round(Unit.dp.scl(2)), Math.round(Unit.dp.scl((5))));
+		targetscale = Mathf.clamp(targetscale, Math.round(Unit.dp.scl(1)), Math.round(Unit.dp.scl((5))));
 	}
 
 }

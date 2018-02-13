@@ -92,6 +92,11 @@ public class AndroidLauncher extends AndroidApplication{
 			public ThreadProvider getThreadProvider() {
 				return new DefaultThreadImpl();
 			}
+
+			@Override
+			public boolean isDebug() {
+				return false;
+			}
 		};
 
 		if(doubleScaleTablets && isTablet(this.getContext())){
