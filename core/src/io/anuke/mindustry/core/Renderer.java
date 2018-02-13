@@ -241,16 +241,16 @@ public class Renderer extends RendererModule{
 					Mathf.round(camera.position.y - ch/2, tilesize),
 					(cw - vw) /2,
 					ch + tilesize,
-					0, ch / tilesize + 1,
-					((cw - vw) / 2 / tilesize), 0);
+					0, 0,
+					((cw - vw) / 2 / tilesize), -ch / tilesize + 1);
 
 			batch.draw(background,
 					camera.position.x - vw/2,
 					Mathf.round(camera.position.y - ch/2, tilesize),
 					-(cw - vw) /2,
 					ch + tilesize,
-					0, ch / tilesize + 1,
-					-((cw - vw) / 2 / tilesize), 0);
+					0, 0,
+					-((cw - vw) / 2 / tilesize), -ch / tilesize + 1);
 		}
 	}
 
@@ -539,7 +539,7 @@ public class Renderer extends RendererModule{
 	}
 
 	public void clampScale(){
-		targetscale = Mathf.clamp(targetscale, Math.round(Unit.dp.scl(1)), Math.round(Unit.dp.scl((5))));
+		targetscale = Mathf.clamp(targetscale, Math.round(Unit.dp.scl(2)), Math.round(Unit.dp.scl((5))));
 	}
 
 }

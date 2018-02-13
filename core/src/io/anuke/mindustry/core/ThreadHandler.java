@@ -4,6 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.entities.Entity;
+import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.entities.EntityGroup.ArrayContainer;
 import io.anuke.ucore.util.Log;
 
 import static io.anuke.mindustry.Vars.logic;
@@ -57,6 +61,9 @@ public class ThreadHandler {
     public void setEnabled(boolean enabled){
         if(enabled){
             logic.doUpdate = false;
+            for(EntityGroup<?> group : Entities.getAllGroups()){
+                impl.switchContainer(group);
+            }
             Timers.runTask(2f, () -> {
                 impl.start(this::runLogic);
                 this.enabled = true;
@@ -64,6 +71,9 @@ public class ThreadHandler {
         }else{
             this.enabled = false;
             impl.stop();
+            for(EntityGroup<?> group : Entities.getAllGroups()){
+                group.setContainer(new ArrayContainer<>());
+            }
             Timers.runTask(2f, () -> {
                 logic.doUpdate = true;
             });
@@ -110,7 +120,7 @@ public class ThreadHandler {
         } catch (InterruptedException ex) {
             Log.info("Stopping logic thread.");
         } catch (Exception ex) {
-            Gdx.app.postRunnable(() -> {
+            Timers.run(0f, () -> {
                 throw new RuntimeException(ex);
             });
         }
@@ -123,5 +133,6 @@ public class ThreadHandler {
         void stop();
         void wait(Object object) throws InterruptedException;
         void notify(Object object);
+        <T extends Entity> void switchContainer(EntityGroup<T> group);
     }
 }

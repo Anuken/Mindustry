@@ -15,6 +15,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.entities.EntityGroup.EntityContainer;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -216,11 +217,11 @@ public class Save12 extends SaveFileVersion {
 
         //--ENEMIES--
 
-        Array<Enemy> enemies = enemyGroup.all();
+        EntityContainer<Enemy> enemies = enemyGroup.all();
 
-        stream.writeInt(enemies.size); //enemy amount
+        stream.writeInt(enemies.size()); //enemy amount
 
-        for(int i = 0; i < enemies.size; i ++){
+        for(int i = 0; i < enemies.size(); i ++){
             Enemy enemy = enemies.get(i);
             stream.writeByte(enemy.type.id); //type
             stream.writeByte(enemy.lane); //lane

@@ -227,7 +227,7 @@ public class NetServer extends Module{
         if(timer.get(timerEntitySync, serverSyncTime)){
             //scan through all groups with syncable entities
             for(EntityGroup<?> group : Entities.getAllGroups()) {
-                if(group.size() == 0 || !(group.all().first() instanceof SyncEntity)) continue;
+                if(group.size() == 0 || !(group.all().iterator().next() instanceof SyncEntity)) continue;
 
                 //get write size for one entity (adding 4, as you need to write the ID as well)
                 int writesize = SyncEntity.getWriteSize((Class<? extends SyncEntity>)group.getType()) + 4;

@@ -23,6 +23,7 @@ import io.anuke.mindustry.net.Streamable;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamChunk;
 import io.anuke.ucore.UCore;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Log;
 import org.java_websocket.WebSocket;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
@@ -296,7 +297,7 @@ public class KryoServer implements ServerProvider {
     }
 
     private void handleException(Throwable e){
-        Gdx.app.postRunnable(() -> { throw new RuntimeException(e);});
+        Timers.run(0f, () -> { throw new RuntimeException(e);});
     }
 
     KryoConnection getByKryoID(int id){
