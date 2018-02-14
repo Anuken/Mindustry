@@ -40,6 +40,7 @@ public class Registrator {
             EntitySpawnPacket.class,
             ItemTransferPacket.class,
             ItemAddPacket.class,
+            ItemOffloadPacket.class
     };
     private static ObjectIntMap<Class<?>> ids = new ObjectIntMap<>();
 

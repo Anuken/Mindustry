@@ -144,4 +144,11 @@ public class NetEvents {
         packet.itemid = (byte)item.id;
         Net.send(packet, SendMode.udp);
     }
+
+    public static void handleOffload(Tile tile, Item item){
+        ItemOffloadPacket packet = new ItemOffloadPacket();
+        packet.position = tile.packedPosition();
+        packet.itemid = (byte)item.id;
+        Net.send(packet, SendMode.udp);
+    }
 }

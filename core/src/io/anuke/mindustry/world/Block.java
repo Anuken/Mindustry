@@ -172,6 +172,10 @@ public class Block{
 		return new TileEntity();
 	}
 
+	public boolean syncEntity(){
+		return true;
+	}
+
 	/**
 	 * Tries to put this item into a nearby container, if there are no available
 	 * containers, it gets added to the block's inventory.*/
@@ -237,7 +241,7 @@ public class Block{
 	}
 
 	/**
-	 * Try offloading an item to a nearby container. Returns true if success.
+	 * Try offloading an item to a nearby container in its facing direction. Returns true if success.
 	 */
 	protected boolean offloadDir(Tile tile, Item item){
 		Tile other = tile.getNearby(tile.getRotation());

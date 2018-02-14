@@ -72,17 +72,23 @@ public class Conveyor extends Block{
 
 		byte rotation = tile.getRotation();
 
-		for(int i = 0; i < entity.convey.size; i ++){
-			ItemPos pos = drawpos.set(entity.convey.get(i), ItemPos.drawShorts);
+		try {
 
-			if(pos.item == null) continue;
+			for (int i = 0; i < entity.convey.size; i++) {
+				ItemPos pos = drawpos.set(entity.convey.get(i), ItemPos.drawShorts);
 
-			tr1.trns(rotation * 90, tilesize, 0);
-			tr2.trns(rotation * 90, -tilesize / 2, pos.x*tilesize/2);
+				if (pos.item == null) continue;
 
-			Draw.rect(pos.item.region,
-					tile.x * tilesize + tr1.x * pos.y + tr2.x,
-					tile.y * tilesize + tr1.y * pos.y + tr2.y, itemSize, itemSize);
+				tr1.trns(rotation * 90, tilesize, 0);
+				tr2.trns(rotation * 90, -tilesize / 2, pos.x * tilesize / 2);
+
+				Draw.rect(pos.item.region,
+						tile.x * tilesize + tr1.x * pos.y + tr2.x,
+						tile.y * tilesize + tr1.y * pos.y + tr2.y, itemSize, itemSize);
+			}
+
+		}catch (IndexOutOfBoundsException e){
+			Log.err(e);
 		}
 	}
 
@@ -94,7 +100,7 @@ public class Conveyor extends Block{
 
 		int minremove = Integer.MAX_VALUE;
 
-		for(int i = 0; i < entity.convey.size; i ++){
+		for(int i = entity.convey.size - 1; i >= 0; i --){
 			long value = entity.convey.get(i);
 			ItemPos pos = pos1.set(value, ItemPos.updateShorts);
 
@@ -169,6 +175,11 @@ public class Conveyor extends Block{
 		if(!inserted){
 			entity.convey.add(result);
 		}
+	}
+
+	@Override
+	public boolean syncEntity(){
+		return false;
 	}
 
 	/**

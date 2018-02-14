@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -429,7 +430,7 @@ public class Renderer extends RendererModule{
 		
 		Draw.reset();
 
-		//draw selected block health
+		//draw selected block bars and info
 		if(input.recipe == null && !ui.hasMouse()){
 			Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y);
 
@@ -444,9 +445,6 @@ public class Renderer extends RendererModule{
 					Draw.color();
 				}
 
-				//if(target.entity != null)
-				//	drawHealth(target.drawx(), target.drawy() - 3f - target.block().height / 2f * tilesize, target.entity.health, target.entity.tile.block().health);
-
 				if(target.entity != null) {
 					int bot = 0, top = 0;
 					for (BlockBar bar : target.block().bars) {
@@ -455,7 +453,7 @@ public class Renderer extends RendererModule{
 
 						float value = bar.value.get(target);
 
-						if(value <= -1f) continue;
+						if(MathUtils.isEqual(value, -1f)) continue;
 
 						drawBar(bar.color, target.drawx(), target.drawy() + offset, value);
 

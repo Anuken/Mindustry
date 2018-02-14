@@ -7,6 +7,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Timers;
@@ -46,6 +47,8 @@ public class Teleporter extends PowerBlock{
 		solid = true;
 		health = 80;
 		powerCapacity = 30f;
+
+		bars.add(new BlockBar(Color.RED, true, tile -> tile.entity.totalItems() / 4f));
 	}
 
 	@Override
@@ -135,7 +138,6 @@ public class Teleporter extends PowerBlock{
 		Array<Tile> links = findLinks(tile);
 		
 		if(links.size > 0){
-
             if(Net.server() || !Net.active()){
                 Tile target = links.random();
                 target.entity.addItem(item, 1);
@@ -169,7 +171,7 @@ public class Teleporter extends PowerBlock{
 				if(other.block() instanceof Teleporter){
 					if(other.<TeleporterEntity>entity().color != entity.color){
 						removal.add(other);
-					}else if(other.entity.totalItems() == 0){
+					}else if(other.entity.totalItems() <= 0){
 						returns.add(other);
 					}
 				}else{

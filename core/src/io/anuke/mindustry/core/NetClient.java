@@ -20,6 +20,7 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
+import io.anuke.mindustry.world.blocks.types.distribution.Teleporter;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BaseBulletType;
 import io.anuke.ucore.entities.Entities;
@@ -226,14 +227,7 @@ public class NetClient extends Module {
                 while (stream.available() > 0) {
                     int pos = stream.readInt();
 
-                    //TODO what if there's no entity? new code
-                    Tile tile = world.tile(pos % world.width(), pos / world.width());
-
-                    byte times = stream.readByte();
-
-                    for (int i = 0; i < times; i++) {
-                        tile.entity.timer.getTimes()[i] = stream.readFloat();
-                    }
+                    Tile tile = world.tile(pos);
 
                     short data = stream.readShort();
                     tile.setPackedData(data);
@@ -286,6 +280,9 @@ public class NetClient extends Module {
                 Tile next = tile.getNearby(packet.rotation);
                 tile.entity.items[packet.itemid] --;
                 next.block().handleItem(Item.getByID(packet.itemid), next, tile);
+
+                if(tile.block() instanceof Teleporter)
+                    Log.info("Recieved dump for teleporter! items: {0}", tile.entity.totalItems());
             };
 
             if(threads.isEnabled()){
@@ -300,6 +297,21 @@ public class NetClient extends Module {
                 Tile tile = world.tile(packet.position);
                 if (tile == null || tile.entity == null) return;
                 tile.entity.items[packet.itemid] ++;
+            };
+
+            if(threads.isEnabled()){
+                threads.run(r);
+            }else{
+                r.run();
+            }
+        });
+
+        Net.handleClient(ItemOffloadPacket.class, packet -> {
+            Runnable r = () -> {
+                Tile tile = world.tile(packet.position);
+                if (tile == null || tile.entity == null) return;
+                Tile next = tile.getNearby(tile.getRotation());
+                next.block().handleItem(Item.getByID(packet.itemid), next, tile);
             };
 
             if(threads.isEnabled()){

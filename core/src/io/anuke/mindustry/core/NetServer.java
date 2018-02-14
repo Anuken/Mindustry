@@ -1,9 +1,6 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.utils.ByteArray;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
@@ -12,6 +9,7 @@ import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
+import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.resource.Upgrade;
@@ -24,6 +22,7 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
 
 import java.io.ByteArrayInputStream;
@@ -36,9 +35,11 @@ import static io.anuke.mindustry.Vars.*;
 
 public class NetServer extends Module{
     private final static float serverSyncTime = 4, itemSyncTime = 10, blockSyncTime = 120;
+    private final static boolean sendBlockSync = false;
 
     private final static int timerEntitySync = 0;
     private final static int timerStateSync = 1;
+    private final static int timerBlockSync = 2;
 
     /**Maps connection IDs to players.*/
     private IntMap<Player> connections = new IntMap<>();
@@ -301,8 +302,8 @@ public class NetServer extends Module{
             Net.send(packet, SendMode.udp);
         }
 
-        /*
-        if(Timers.get("serverBlockSync", blockSyncTime)){
+
+        if(sendBlockSync && timer.get(timerBlockSync, blockSyncTime)){
 
             Array<NetConnection> connections = Net.getConnections();
 
@@ -316,7 +317,7 @@ public class NetServer extends Module{
                 int h = 16;
                 sendBlockSync(id, x, y, w, h);
             }
-        }*/
+        }
     }
 
     public void sendBlockSync(int client, int x, int y, int viewx, int viewy){
@@ -334,28 +335,16 @@ public class NetServer extends Module{
                 for (int ry = -viewy / 2; ry <= viewy / 2; ry++) {
                     Tile tile = world.tile(x + rx, y + ry);
 
-                    if (tile == null || tile.entity == null) continue;
+                    if (tile == null || tile.entity == null || !tile.block().syncEntity()) continue;
 
                     stream.writeInt(tile.packedPosition());
-                    byte times = 0;
-
-                    for(; times < tile.entity.timer.getTimes().length; times ++){
-                        if(tile.entity.timer.getTimes()[times] <= 1f){
-                            break;
-                        }
-                    }
-
-                    stream.writeByte(times);
-
-                    for(int i = 0; i < times; i ++){
-                        stream.writeFloat(tile.entity.timer.getTimes()[i]);
-                    }
-
                     stream.writeShort(tile.getPackedData());
 
                     tile.entity.write(stream);
                 }
             }
+
+            Log.info("Sent {0} bytes of block data.", stream.size());
 
         }catch (IOException e){
             throw new RuntimeException(e);
