@@ -344,8 +344,6 @@ public class NetServer extends Module{
                 }
             }
 
-            Log.info("Sent {0} bytes of block data.", stream.size());
-
         }catch (IOException e){
             throw new RuntimeException(e);
         }
