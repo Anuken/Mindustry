@@ -2,13 +2,13 @@ package io.anuke.mindustry.world.blocks.types;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-
-import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.function.Predicate;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
+
+import static io.anuke.mindustry.Vars.world;
 
 public class Floor extends Block{
 	protected Predicate<Block> blends = block -> block != this;
@@ -45,7 +45,7 @@ public class Floor extends Block{
 				int sx = -dx*8+2, sy = -dy*8+2;
 				int x = Mathf.clamp(sx, 0, 12);
 				int y = Mathf.clamp(sy, 0, 12);
-				int w = Mathf.clamp(sx+8, 0, 12)-x, h = Mathf.clamp(sy+8, 0, 12)-y;
+				int w = Mathf.clamp(sx+8, 0, 12) - x, h = Mathf.clamp(sy+8, 0, 12) - y;
 				
 				float rx = Mathf.clamp(dx*8, 0, 8-w);
 				float ry = Mathf.clamp(dy*8, 0, 8-h);

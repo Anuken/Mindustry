@@ -112,6 +112,7 @@ public class ServerControl extends Module {
             Net.closeServer();
             state.set(State.menu);
             netServer.reset();
+            Log.info("Stopped server.");
         });
 
         handler.register("host", "<mapname> <mode>", "Open the server with a specific map.", arg -> {

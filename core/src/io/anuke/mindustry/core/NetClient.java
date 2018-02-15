@@ -20,7 +20,6 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
-import io.anuke.mindustry.world.blocks.types.distribution.Teleporter;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BaseBulletType;
 import io.anuke.ucore.entities.Entities;
@@ -281,8 +280,8 @@ public class NetClient extends Module {
                 tile.entity.items[packet.itemid] --;
                 next.block().handleItem(Item.getByID(packet.itemid), next, tile);
 
-                if(tile.block() instanceof Teleporter)
-                    Log.info("Recieved dump for teleporter! items: {0}", tile.entity.totalItems());
+                //if(tile.block() instanceof Teleporter)
+                //    Log.info("Recieved dump for teleporter! items: {0}", tile.entity.totalItems());
             };
 
             if(threads.isEnabled()){
@@ -292,11 +291,11 @@ public class NetClient extends Module {
             }
         });
 
-        Net.handleClient(ItemAddPacket.class, packet -> {
+        Net.handleClient(ItemSetPacket.class, packet -> {
             Runnable r = () -> {
                 Tile tile = world.tile(packet.position);
                 if (tile == null || tile.entity == null) return;
-                tile.entity.items[packet.itemid] ++;
+                tile.entity.items[packet.itemid] = packet.amount;
             };
 
             if(threads.isEnabled()){

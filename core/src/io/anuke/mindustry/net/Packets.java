@@ -523,20 +523,22 @@ public class Packets {
         }
     }
 
-    public static class ItemAddPacket implements Packet, UnimportantPacket{
+    public static class ItemSetPacket implements Packet, UnimportantPacket{
         public int position;
-        public byte itemid;
+        public byte itemid, amount;
 
         @Override
         public void write(ByteBuffer buffer) {
             buffer.putInt(position);
             buffer.put(itemid);
+            buffer.put(amount);
         }
 
         @Override
         public void read(ByteBuffer buffer) {
             position = buffer.getInt();
             itemid = buffer.get();
+            amount = buffer.get();
         }
     }
 

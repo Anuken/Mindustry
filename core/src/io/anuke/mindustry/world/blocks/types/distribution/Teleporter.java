@@ -142,7 +142,7 @@ public class Teleporter extends PowerBlock{
                 Tile target = links.random();
                 target.entity.addItem(item, 1);
 
-                if(Net.server()) NetEvents.handleItemAdd(target, item);
+                if(Net.server()) NetEvents.handleItemSet(target, item, (byte)1);
             }
 		}
 
@@ -181,7 +181,7 @@ public class Teleporter extends PowerBlock{
 		}
 
 		for(Tile remove : removal)
-			teleporters[entity.color].remove(remove);
+		teleporters[entity.color].remove(remove);
 		
 		return returns;
 	}
