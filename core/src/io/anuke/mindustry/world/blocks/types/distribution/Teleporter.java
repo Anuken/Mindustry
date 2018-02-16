@@ -5,9 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Timers;
@@ -47,8 +45,6 @@ public class Teleporter extends PowerBlock{
 		solid = true;
 		health = 80;
 		powerCapacity = 30f;
-
-		bars.add(new BlockBar(Color.RED, true, tile -> tile.entity.totalItems() / 4f));
 	}
 
 	@Override
@@ -90,10 +86,6 @@ public class Teleporter extends PowerBlock{
 		TeleporterEntity entity = tile.entity();
 		
 		teleporters[entity.color].add(tile);
-		
-		if(entity.totalItems() > 0){
-			tryDump(tile);
-		}
 	}
 
 	@Override
@@ -135,14 +127,12 @@ public class Teleporter extends PowerBlock{
 	public void handleItem(Item item, Tile tile, Tile source){
 		PowerEntity entity = tile.entity();
 
-		Array<Tile> links = findLinks(tile);
+		Array<Tile> links = findLinks(tile, item);
 		
 		if(links.size > 0){
             if(Net.server() || !Net.active()){
                 Tile target = links.random();
-                target.entity.addItem(item, 1);
-
-                if(Net.server()) NetEvents.handleItemSet(target, item, (byte)1);
+                target.block().offloadNear(target, item);
             }
 		}
 
@@ -152,15 +142,25 @@ public class Teleporter extends PowerBlock{
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		PowerEntity entity = tile.entity();
-		return entity.power >= powerPerItem && findLinks(tile).size > 0;
+		return entity.power >= powerPerItem && findLinks(tile, item).size > 0;
 	}
 	
 	@Override
 	public TileEntity getEntity(){
 		return new TeleporterEntity();
 	}
+
+	public boolean available(Tile tile, Item item){
+		for(int i = 0; i < 4; i ++){
+			Tile next = tile.getNearby(i);
+			if(next != null && next.block().acceptItem(item, next, tile)){
+				return true;
+			}
+		}
+		return false;
+	}
 	
-	private Array<Tile> findLinks(Tile tile){
+	private Array<Tile> findLinks(Tile tile, Item output){
 		TeleporterEntity entity = tile.entity();
 		
 		removal.clear();
@@ -171,7 +171,7 @@ public class Teleporter extends PowerBlock{
 				if(other.block() instanceof Teleporter){
 					if(other.<TeleporterEntity>entity().color != entity.color){
 						removal.add(other);
-					}else if(other.entity.totalItems() <= 0){
+					}else if(((Teleporter)other.block()).available(other, output)){
 						returns.add(other);
 					}
 				}else{

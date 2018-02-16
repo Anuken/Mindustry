@@ -179,7 +179,7 @@ public class Block{
 	/**
 	 * Tries to put this item into a nearby container, if there are no available
 	 * containers, it gets added to the block's inventory.*/
-	protected void offloadNear(Tile tile, Item item){
+	public void offloadNear(Tile tile, Item item){
 		if(Net.client()){
 			handleItem(item, tile, tile);
 			return;

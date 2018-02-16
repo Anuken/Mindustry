@@ -279,9 +279,6 @@ public class NetClient extends Module {
                 Tile next = tile.getNearby(packet.rotation);
                 tile.entity.items[packet.itemid] --;
                 next.block().handleItem(Item.getByID(packet.itemid), next, tile);
-
-                //if(tile.block() instanceof Teleporter)
-                //    Log.info("Recieved dump for teleporter! items: {0}", tile.entity.totalItems());
             };
 
             if(threads.isEnabled()){
