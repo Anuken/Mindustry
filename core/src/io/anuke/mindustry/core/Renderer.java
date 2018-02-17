@@ -127,7 +127,6 @@ public class Renderer extends RendererModule{
 				limitCamera(4f, player.x, player.y);
 
 			float prex = camera.position.x, prey = camera.position.y;
-
 			updateShake(0.75f);
 			float prevx = camera.position.x, prevy = camera.position.y;
 			clampCamera(-tilesize / 2f, -tilesize / 2f + 1, world.width() * tilesize - tilesize / 2f, world.height() * tilesize - tilesize / 2f);
