@@ -143,6 +143,7 @@ public class Conveyor extends Block{
 
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
+		if(tile.entity == null) return false;
 		int direction = source == null ? 0 : Math.abs(source.relativeTo(tile.x, tile.y) - tile.getRotation());
 		float minitem = tile.<ConveyorEntity>entity().minitem;
 		return (((direction == 0) && minitem > 0.05f) ||

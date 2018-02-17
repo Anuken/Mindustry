@@ -142,7 +142,7 @@ public class Teleporter extends PowerBlock{
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		PowerEntity entity = tile.entity();
-		return entity.power >= powerPerItem && findLinks(tile, item).size > 0;
+		return !(source.block() instanceof Teleporter) && entity.power >= powerPerItem && findLinks(tile, item).size > 0;
 	}
 	
 	@Override

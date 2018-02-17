@@ -99,6 +99,7 @@ public abstract class InputHandler extends InputAdapter{
 		rect.setCenter(offset.x + x * tilesize, offset.y + y * tilesize);
 
 		for(SolidEntity e : Entities.getNearby(enemyGroup, x * tilesize, y * tilesize, tilesize * 2f)){
+			if(e == null) continue; //not sure why this happens?
 			Rectangle rect = e.hitbox.getRect(e.x, e.y);
 
 			if(this.rect.overlaps(rect)){

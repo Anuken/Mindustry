@@ -10,6 +10,7 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.EntityGroup.ArrayContainer;
 import io.anuke.ucore.util.Log;
 
+import static io.anuke.mindustry.Vars.control;
 import static io.anuke.mindustry.Vars.logic;
 
 public class ThreadHandler {
@@ -119,10 +120,8 @@ public class ThreadHandler {
             }
         } catch (InterruptedException ex) {
             Log.info("Stopping logic thread.");
-        } catch (Exception ex) {
-            Timers.run(0f, () -> {
-                throw new RuntimeException(ex);
-            });
+        } catch (Throwable ex) {
+            control.setError(ex);
         }
     }
 

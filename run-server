@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+./gradlew server:dist
+java -jar server/build/libs/server-release.jar

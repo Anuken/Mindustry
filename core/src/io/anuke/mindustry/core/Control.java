@@ -50,6 +50,7 @@ public class Control extends Module{
     private InputProxy proxy;
     private float controlx, controly;
     private boolean controlling;
+    private Throwable error;
 	
 	public Control(){
 		saves = new Saves();
@@ -195,6 +196,10 @@ public class Control extends Module{
 		});
 	}
 
+	public void setError(Throwable error){
+		this.error = error;
+	}
+
 	public UpgradeInventory upgrades() {
 		return upgrades;
 	}
@@ -272,6 +277,10 @@ public class Control extends Module{
 	
 	@Override
 	public void update(){
+
+		if(error != null){
+			throw new RuntimeException(error);
+		}
 
         if(Gdx.input != proxy){
             Gdx.input = proxy;
