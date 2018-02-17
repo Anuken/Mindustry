@@ -38,6 +38,8 @@ import java.nio.channels.ClosedSelectorException;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static io.anuke.mindustry.Vars.headless;
+import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.world;
 
 public class KryoServer implements ServerProvider {
     final boolean debug = false;
@@ -423,7 +425,8 @@ public class KryoServer implements ServerProvider {
                 if (k == null) return;
 
                 if(message.equals("_ping_")){
-                    conn.send("---" + Vars.playerGroup.size() + "|" + (headless ? "Server" : Vars.player.name));
+                    conn.send("---" + Vars.playerGroup.size() + "|" + (headless ? "Server" : Vars.player.name)
+                    + "|" + world.getMap().name + "|" + state.wave);
                     connections.remove(k);
                 }else {
                     byte[] out = Base64Coder.decode(message);
