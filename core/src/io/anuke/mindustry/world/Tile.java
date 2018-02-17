@@ -260,18 +260,20 @@ public class Tile{
 	}
 	
 	public void changed(){
-		if(entity != null){
-			entity.remove();
-			entity = null;
-		}
-		
-		Block block = block();
-		
-		if(block.destructible || block.update){
-			entity = block.getEntity().init(this, block.update);
-		}
+		synchronized (this) {
+			if (entity != null) {
+				entity.remove();
+				entity = null;
+			}
 
-		updateOcclusion();
+			Block block = block();
+
+			if (block.destructible || block.update) {
+				entity = block.getEntity().init(this, block.update);
+			}
+
+			updateOcclusion();
+		}
 	}
 	
 	@Override

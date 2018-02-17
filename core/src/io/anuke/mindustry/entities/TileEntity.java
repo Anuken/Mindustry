@@ -106,17 +106,19 @@ public class TileEntity extends Entity{
 	
 	@Override
 	public void update(){
-		if(health != 0 && health < tile.block().health && !(tile.block() instanceof Wall) &&
-				Mathf.chance(0.009f*Timers.delta()*(1f-health/tile.block().health))){
+		synchronized (tile) {
+			if (health != 0 && health < tile.block().health && !(tile.block() instanceof Wall) &&
+					Mathf.chance(0.009f * Timers.delta() * (1f - health / tile.block().health))) {
 
-			Effects.effect(Fx.smoke, x+Mathf.range(4), y+Mathf.range(4));
-		}
+				Effects.effect(Fx.smoke, x + Mathf.range(4), y + Mathf.range(4));
+			}
 
-		if(health <= 0){
-			onDeath();
+			if (health <= 0) {
+				onDeath();
+			}
+
+			tile.block().update(tile);
 		}
-		
-		tile.block().update(tile);
 	}
 	
 	public int totalItems(){
