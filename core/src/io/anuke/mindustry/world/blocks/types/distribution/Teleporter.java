@@ -47,6 +47,7 @@ public class Teleporter extends PowerBlock{
 		solid = true;
 		health = 80;
 		powerCapacity = 30f;
+		instantTransfer = true;
 	}
 
 	@Override
@@ -155,7 +156,7 @@ public class Teleporter extends PowerBlock{
 	public boolean available(Tile tile, Item item){
 		for(int i = 0; i < 4; i ++){
 			Tile next = tile.getNearby(i);
-			if(next != null && next.block().acceptItem(item, next, tile)){
+			if(next != null && !(next.block().instantTransfer) && next.block().acceptItem(item, next, tile)){
 				return true;
 			}
 		}

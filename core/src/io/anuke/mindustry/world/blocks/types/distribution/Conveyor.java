@@ -163,10 +163,6 @@ public class Conveyor extends Block{
 		long result = ItemPos.packItem(item, y*0.9f, pos, (byte)Mathf.random(255));
 		boolean inserted = false;
 
-		if(pos <= 0.00001f && entity.minitem <= 0.001f){
-			return; //TODO low fps stacked items: what now?
-		}
-
 		for(int i = 0; i < entity.convey.size; i ++){
 			if(compareItems(result, entity.convey.get(i)) < 0){
 				entity.convey.insert(i, result);
