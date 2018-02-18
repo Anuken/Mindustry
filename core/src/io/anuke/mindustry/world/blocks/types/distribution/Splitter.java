@@ -15,7 +15,6 @@ public class Splitter extends Block{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        if(source.block() instanceof Sorter || source.block() instanceof Splitter) return false;
         Tile to = getTileTarget(item, tile, source, false);
 
         return to != null && to.block().acceptItem(item, to, tile);
@@ -35,8 +34,10 @@ public class Splitter extends Block{
 
         Tile a = dest.getNearby(Mathf.mod(dir - 1, 4));
         Tile b = dest.getNearby(Mathf.mod(dir + 1, 4));
-        boolean ac = a.block().acceptItem(item, a, dest);
-        boolean bc = b.block().acceptItem(item, b, dest);
+        boolean ac = !(a.block().instantTransfer && source.block().instantTransfer) &&
+                a.block().acceptItem(item, a, dest);
+        boolean bc = !(b.block().instantTransfer && source.block().instantTransfer) &&
+                b.block().acceptItem(item, b, dest);
 
         if(ac && !bc){
             to = a;

@@ -46,7 +46,6 @@ public class Sorter extends Block{
 	
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
-		if(source.block() instanceof Sorter || source.block() instanceof Splitter) return false;
 		Tile to = getTileTarget(item, tile, source, false);
 		
 		return to != null && to.block().acceptItem(item, to, tile);
@@ -80,7 +79,7 @@ public class Sorter extends Block{
 				to = a;
 			}else if(bc && !ac){
 				to = b;
-			}else if(!bc && !ac){
+			}else if(!bc){
 				return null;
 			}else{
 				if(dest.getDump() == 0){
