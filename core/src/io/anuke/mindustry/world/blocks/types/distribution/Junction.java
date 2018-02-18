@@ -16,6 +16,7 @@ public class Junction extends Block{
 		super(name);
 		update = true;
 		solid = true;
+		instantTransfer = true;
 	}
 	
 	@Override

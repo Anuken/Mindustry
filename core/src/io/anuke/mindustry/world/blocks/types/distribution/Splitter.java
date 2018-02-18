@@ -9,6 +9,8 @@ public class Splitter extends Block{
 
     public Splitter(String name){
         super(name);
+        solid = true;
+        instantTransfer = true;
     }
 
     @Override

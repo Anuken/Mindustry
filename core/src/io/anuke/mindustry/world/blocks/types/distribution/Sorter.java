@@ -24,6 +24,7 @@ public class Sorter extends Block{
 		super(name);
 		update = true;
 		solid = true;
+		instantTransfer = true;
 	}
 	
 	@Override
@@ -70,13 +71,17 @@ public class Sorter extends Block{
 		}else{
 			Tile a = dest.getNearby(Mathf.mod(dir - 1, 4));
 			Tile b = dest.getNearby(Mathf.mod(dir + 1, 4));
-			boolean ac = a.block().acceptItem(item, a, dest);
-			boolean bc = b.block().acceptItem(item, b, dest);
+			boolean ac = !(a.block().instantTransfer && source.block().instantTransfer) &&
+								a.block().acceptItem(item, a, dest);
+			boolean bc = !(b.block().instantTransfer && source.block().instantTransfer) &&
+								b.block().acceptItem(item, b, dest);
 			
 			if(ac && !bc){
 				to = a;
 			}else if(bc && !ac){
 				to = b;
+			}else if(!bc && !ac){
+				return null;
 			}else{
 				if(dest.getDump() == 0){
 					to = a;

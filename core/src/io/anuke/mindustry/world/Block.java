@@ -90,6 +90,8 @@ public class Block{
 	public Array<BlockBar> bars = Array.with(new BlockBar(Color.RED, false, tile -> tile.entity.health / (float)tile.block().health));
 	/**whether this block can be replaced in all cases*/
 	public boolean alwaysReplace = false;
+	/**whether this block has instant transfer checking. used for calculations to prevent infinite loops.*/
+	public boolean instantTransfer = false;
 
 	public Block(String name) {
 		this.name = name;

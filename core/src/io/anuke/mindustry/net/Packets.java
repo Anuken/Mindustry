@@ -30,7 +30,7 @@ public class Packets {
 
     }
 
-    public static class SyncPacket implements Packet{
+    public static class SyncPacket implements Packet, UnimportantPacket{
         public byte[] data;
 
         @Override
@@ -99,7 +99,7 @@ public class Packets {
         }
     }
 
-    public static class StateSyncPacket implements Packet{
+    public static class StateSyncPacket implements Packet, UnimportantPacket{
         public int[] items;
         public float countdown, time;
         public int enemies, wave;

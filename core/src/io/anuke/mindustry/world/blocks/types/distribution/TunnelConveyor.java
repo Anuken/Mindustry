@@ -19,6 +19,7 @@ public class TunnelConveyor extends Block{
 		update = true;
 		solid = true;
 		health = 70;
+		instantTransfer = true;
 	}
 	
 	@Override
