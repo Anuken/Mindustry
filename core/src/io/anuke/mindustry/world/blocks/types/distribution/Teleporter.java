@@ -87,8 +87,12 @@ public class Teleporter extends PowerBlock{
 	@Override
 	public void update(Tile tile){
 		TeleporterEntity entity = tile.entity();
-		
+
 		teleporters[entity.color].add(tile);
+
+		if(entity.totalItems() > 0){
+			tryDump(tile);
+		}
 	}
 
 	@Override
@@ -130,12 +134,12 @@ public class Teleporter extends PowerBlock{
 	public void handleItem(Item item, Tile tile, Tile source){
 		PowerEntity entity = tile.entity();
 
-		Array<Tile> links = findLinks(tile, item);
+		Array<Tile> links = findLinks(tile);
 		
 		if(links.size > 0){
             if(!syncBlockState || Net.server() || !Net.active()){
                 Tile target = links.random();
-                target.block().offloadNear(target, item);
+                target.entity.addItem(item, 1);
             }
 		}
 
@@ -145,25 +149,15 @@ public class Teleporter extends PowerBlock{
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		PowerEntity entity = tile.entity();
-		return !(source.block() instanceof Teleporter) && entity.power >= powerPerItem && findLinks(tile, item).size > 0;
+		return !(source.block() instanceof Teleporter) && entity.power >= powerPerItem && findLinks(tile).size > 0;
 	}
 	
 	@Override
 	public TileEntity getEntity(){
 		return new TeleporterEntity();
 	}
-
-	public boolean available(Tile tile, Item item){
-		for(int i = 0; i < 4; i ++){
-			Tile next = tile.getNearby(i);
-			if(next != null && !(next.block().instantTransfer) && next.block().acceptItem(item, next, tile)){
-				return true;
-			}
-		}
-		return false;
-	}
 	
-	private Array<Tile> findLinks(Tile tile, Item output){
+	private Array<Tile> findLinks(Tile tile){
 		TeleporterEntity entity = tile.entity();
 		
 		removal.clear();
@@ -174,7 +168,7 @@ public class Teleporter extends PowerBlock{
 				if(other.block() instanceof Teleporter){
 					if(other.<TeleporterEntity>entity().color != entity.color){
 						removal.add(other);
-					}else if(((Teleporter)other.block()).available(other, output)){
+					}else if(other.entity.totalItems() == 0){
 						returns.add(other);
 					}
 				}else{
