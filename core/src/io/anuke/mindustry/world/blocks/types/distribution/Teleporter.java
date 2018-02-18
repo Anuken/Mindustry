@@ -20,6 +20,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.syncBlockState;
+
 public class Teleporter extends PowerBlock{
 	public static final Color[] colorArray = {Color.ROYAL, Color.ORANGE, Color.SCARLET, Color.FOREST,
 			Color.PURPLE, Color.GOLD, Color.PINK, Color.BLACK};
@@ -130,7 +132,7 @@ public class Teleporter extends PowerBlock{
 		Array<Tile> links = findLinks(tile, item);
 		
 		if(links.size > 0){
-            if(Net.server() || !Net.active()){
+            if(!syncBlockState || Net.server() || !Net.active()){
                 Tile target = links.random();
                 target.block().offloadNear(target, item);
             }
@@ -181,7 +183,7 @@ public class Teleporter extends PowerBlock{
 		}
 
 		for(Tile remove : removal)
-		teleporters[entity.color].remove(remove);
+			teleporters[entity.color].remove(remove);
 		
 		return returns;
 	}

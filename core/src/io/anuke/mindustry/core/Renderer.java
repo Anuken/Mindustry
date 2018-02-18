@@ -498,8 +498,7 @@ public class Renderer extends RendererModule{
 	public void drawBar(Color color, float x, float y, float fraction){
 		fraction = Mathf.clamp(fraction);
 
-		if(fraction > 0)
-			fraction = Mathf.clamp(fraction + 0.2f, 0.24f, 1f);
+		if(fraction > 0) fraction = Mathf.clamp(fraction + 0.2f, 0.24f, 1f);
 
 		float len = 3;
 

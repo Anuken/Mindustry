@@ -28,6 +28,8 @@ public class Vars{
 	public static final boolean android = (Gdx.app.getType() == ApplicationType.Android) || testAndroid;
 	//shorthand for whether or not this is running on GWT
 	public static final boolean gwt = (Gdx.app.getType() == ApplicationType.WebGL);
+	//whether to send block state change events to players
+	public static final boolean syncBlockState = false;
 	//how far away from the player blocks can be placed
 	public static final float placerange = 66;
 	//respawn time in frames

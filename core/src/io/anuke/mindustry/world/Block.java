@@ -21,6 +21,7 @@ import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.syncBlockState;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class Block{
@@ -180,7 +181,7 @@ public class Block{
 	 * Tries to put this item into a nearby container, if there are no available
 	 * containers, it gets added to the block's inventory.*/
 	public void offloadNear(Tile tile, Item item){
-		if(Net.client()){
+		if(Net.client() && syncBlockState){
 			handleItem(item, tile, tile);
 			return;
 		}
@@ -193,7 +194,7 @@ public class Block{
 			if(other != null && other.block().acceptItem(item, other, tile)){
 				other.block().handleItem(item, other, tile);
 				tile.setDump((byte)((i+1)%4));
-				if(Net.server()) NetEvents.handleTransfer(tile, i, item);
+				if(Net.server() && syncBlockState) NetEvents.handleTransfer(tile, i, item);
 				return;
 			}
 			i++;
@@ -212,7 +213,7 @@ public class Block{
 	 * Try dumping any item near the tile. -1 = any direction
 	 */
 	protected boolean tryDump(Tile tile, int direction, Item todump){
-		if(Net.client()) return false;
+		if(Net.client() && syncBlockState) return false;
 
 		int i = tile.getDump()%4;
 		
@@ -228,7 +229,7 @@ public class Block{
 						other.block().handleItem(item, other, tile);
 						tile.entity.removeItem(item, 1);
 						tile.setDump((byte)((i+1)%4));
-						if(Net.server()) NetEvents.handleTransfer(tile, (byte)i, item);
+						if(Net.server() && syncBlockState) NetEvents.handleTransfer(tile, (byte)i, item);
 						return true;
 					}
 				}
