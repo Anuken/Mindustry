@@ -208,7 +208,7 @@ public class Tile{
 	
 	/**Returns the list of all tiles linked to this multiblock, or an empty array if it's not a multiblock.
 	 * This array contains all linked tiles, including this tile itself.*/
-	public Array<Tile> getLinkedTiles(){
+	public synchronized Array<Tile> getLinkedTiles(){
 		Block block = block();
 		tmpArray.clear();
 		if(!(block.width == 1 && block.height == 1)){
