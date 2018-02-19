@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
@@ -20,9 +21,7 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.syncBlockState;
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.*;
 
 public class Block{
 	private static int lastid;
@@ -299,6 +298,20 @@ public class Block{
 	
 	public static Block getByID(int id){
 		return blocks.get(id);
+	}
+
+	public Array<Object> getDebugInfo(Tile tile){
+		return Array.with(
+				"block", tile.block().name,
+				"floor", tile.floor().name,
+				"x", tile.x,
+				"y", tile.y,
+				"entity.name", ClassReflection.getSimpleName(tile.entity.getClass()),
+				"entity.x", tile.entity.x,
+				"entity.y", tile.entity.y,
+				"entity.id", tile.entity.id,
+				"entity.items.total", tile.entity.totalItems()
+		);
 	}
 
 	@Override

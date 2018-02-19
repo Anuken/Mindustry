@@ -15,6 +15,7 @@ import io.anuke.mindustry.net.Packets.ChatPacket;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.ui.fragments.DebugFragment;
 import io.anuke.mindustry.world.Map;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.CommandHandler;
@@ -314,6 +315,33 @@ public class ServerControl extends Module {
 
         handler.register("info", "Print debug info", arg -> {
             info(DebugFragment.debugInfo());
+        });
+
+        handler.register("trace", "<x> <y>", "Prints debug info about a block", arg -> {
+            try{
+                int x = Integer.parseInt(arg[0]);
+                int y = Integer.parseInt(arg[1]);
+                Tile tile = world.tile(x, y);
+                if(tile != null){
+                    if(tile.entity != null){
+                        Array<Object> arr = tile.block().getDebugInfo(tile);
+                        StringBuilder result = new StringBuilder();
+                        for(int i = 0; i < arr.size/2; i ++){
+                            result.append(arr.get(i*2));
+                            result.append(": ");
+                            result.append(arr.get(i*2 + 1));
+                            result.append("\n");
+                        }
+                        Log.info("&ly{0}", result);
+                    }else{
+                        Log.info("No tile entity for that block.");
+                    }
+                }else{
+                    Log.info("No tile at that location.");
+                }
+            }catch (NumberFormatException e){
+                Log.err("Invalid coordinates passed.");
+            }
         });
     }
 

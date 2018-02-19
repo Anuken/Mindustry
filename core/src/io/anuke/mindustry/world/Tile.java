@@ -2,6 +2,7 @@ package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.util.Bits;
@@ -285,7 +286,7 @@ public class Tile{
 		Block block = block();
 		Block floor = floor();
 		
-		return floor.name() + ":" + block.name() + "[" + x + "," + y + "] " + "entity=" + entity +
+		return floor.name() + ":" + block.name() + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : ClassReflection.getSimpleName(entity.getClass())) +
 				(link != 0 ? " link=[" + (Bits.getLeftByte(link) - 8) + ", " + (Bits.getRightByte(link) - 8) +  "]" : "");
 	}
 }

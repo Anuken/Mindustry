@@ -74,6 +74,8 @@ public class Vars{
 	public static boolean showPlayer = true;
 	//whether to hide ui, only on debug
 	public static boolean showUI = true;
+    //whether to show block debug
+    public static boolean showBlockDebug = false;
 
 	public static boolean headless = false;
 

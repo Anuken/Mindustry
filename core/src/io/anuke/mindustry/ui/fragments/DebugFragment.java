@@ -51,6 +51,8 @@ public class DebugFragment implements Fragment {
                row();
                new button("hideplayer", "toggle", () -> showPlayer = !showPlayer);
                row();
+               new button("blocks", "toggle", () -> showBlockDebug = !showBlockDebug);
+               row();
                new button("paths", "toggle", () -> showPaths = !showPaths);
                row();
                new button("infammo", "toggle", () -> infiniteAmmo = !infiniteAmmo);

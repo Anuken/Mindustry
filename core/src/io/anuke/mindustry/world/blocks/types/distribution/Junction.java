@@ -1,11 +1,13 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.NumberUtils;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Bits;
 
 public class Junction extends Block{
@@ -80,6 +82,36 @@ public class Junction extends Block{
 	@Override
 	public TileEntity getEntity() {
 		return new JunctionEntity();
+	}
+
+	public Array<Object> getDebugInfo(Tile tile){
+		JunctionEntity entity = tile.entity();
+		Array<Object> arr = super.getDebugInfo(tile);
+		for(int i = 0; i < 4; i ++){
+			arr.add("nearby." + i);
+			arr.add(tile.getNearby(i));
+		}
+        Consumer<Buffer> write = b -> {
+            for(int i = 0; i < b.index; i++){
+                long l = b.items[i];
+                float time = NumberUtils.intBitsToFloat(Bits.getLeftInt(l));
+                int val = Bits.getRightInt(l);
+                Item item = Item.getByID(Bits.getLeftShort(val));
+                int direction = Bits.getRightShort(val);
+                Tile dest = tile.getNearby(direction);
+                arr.add("  bufferx.item");
+                arr.add(time + " | " + item.name + " | " + dest.block() + ":" + dest.floor());
+            }
+        };
+
+		arr.add("buffer.bx");
+		arr.add(entity.bx.index);
+		write.accept(entity.bx);
+        arr.add("buffer.by");
+        arr.add(entity.bx.index);
+		write.accept(entity.by);
+
+		return arr;
 	}
 
 	class JunctionEntity extends TileEntity{

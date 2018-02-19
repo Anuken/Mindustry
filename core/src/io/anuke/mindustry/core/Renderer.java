@@ -30,10 +30,7 @@ import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.function.Callable;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Hue;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.graphics.Surface;
+import io.anuke.ucore.graphics.*;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Angles;
@@ -438,6 +435,31 @@ public class Renderer extends RendererModule{
 				Tile target = tile;
 				if(tile.isLinked())
 					target = tile.getLinked();
+
+				if(showBlockDebug && target.entity != null){
+					Draw.color(Color.RED);
+					Lines.crect(target.drawx(), target.drawy(), target.block().width * tilesize, target.block().height * tilesize);
+					Vector2 v = new Vector2();
+
+
+
+					Draw.tcolor(Color.YELLOW);
+					Draw.tscl(0.25f);
+					Array<Object> arr = target.block().getDebugInfo(target);
+					StringBuilder result = new StringBuilder();
+					for(int i = 0; i < arr.size/2; i ++){
+						result.append(arr.get(i*2));
+						result.append(": ");
+						result.append(arr.get(i*2 + 1));
+						result.append("\n");
+					}
+					Draw.textc(result.toString(), target.drawx(), target.drawy(), v);
+					Draw.color(0f, 0f, 0f, 0.5f);
+					Fill.rect(target.drawx(), target.drawy(), v.x, v.y);
+					Draw.textc(result.toString(), target.drawx(), target.drawy(), v);
+					Draw.tscl(fontscale);
+					Draw.reset();
+				}
 
 				if(Inputs.keyDown("block_info") && target.block().fullDescription != null){
 					Draw.color(Colors.get("accent"));
