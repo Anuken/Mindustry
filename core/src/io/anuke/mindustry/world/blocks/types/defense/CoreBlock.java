@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -26,7 +27,7 @@ public class CoreBlock extends Block {
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
-        state.inventory.addItem(item, 1);
+        if(Net.server() || !Net.active()) state.inventory.addItem(item, 1);
     }
 
     @Override
