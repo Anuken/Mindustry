@@ -49,6 +49,8 @@ public class DebugFragment implements Fragment {
                row();
                new button("noclip", "toggle", () -> noclip = !noclip);
                row();
+               new button("hideplayer", "toggle", () -> showPlayer = !showPlayer);
+               row();
                new button("paths", "toggle", () -> showPaths = !showPaths);
                row();
                new button("infammo", "toggle", () -> infiniteAmmo = !infiniteAmmo);

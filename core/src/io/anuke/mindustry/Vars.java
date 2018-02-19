@@ -47,10 +47,10 @@ public class Vars{
 
 	public static final String serverURL = "http://localhost:3000";
 	//directory for user-created map data
-	public static final FileHandle customMapDirectory = gwt ? null : UCore.isAssets ?
+	public static final FileHandle customMapDirectory = gwt ? null : UCore.isAssets() ?
 			Gdx.files.local("../../desktop/mindustry-maps") : Gdx.files.local("mindustry-maps/");
 	//save file directory
-	public static final FileHandle saveDirectory = gwt ? null : UCore.isAssets ?
+	public static final FileHandle saveDirectory = gwt ? null : UCore.isAssets() ?
 			Gdx.files.local("../../desktop/mindustry-saves") : Gdx.files.local("mindustry-saves/");
 	//scale of the font
 	public static float fontscale = Math.max(Unit.dp.scl(1f)/2f, 0.5f);
