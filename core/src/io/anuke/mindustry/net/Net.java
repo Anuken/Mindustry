@@ -68,8 +68,6 @@ public class Net{
 			clientProvider.connect(ip, port);
 			active = true;
 			server = false;
-
-			Timers.runTask(60f, Platform.instance::updateRPC);
 		}else{
 			throw new IOException("Already connected!");
 		}

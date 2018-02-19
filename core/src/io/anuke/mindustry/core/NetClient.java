@@ -350,6 +350,7 @@ public class NetClient extends Module {
         ui.join.hide();
         Net.setClientLoaded(true);
         Timers.runTask(1f, () -> Net.send(new ConnectConfirmPacket(), SendMode.tcp));
+        Timers.runTask(40f, Platform.instance::updateRPC);
     }
 
     public void beginConnecting(){

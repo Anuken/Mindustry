@@ -65,9 +65,10 @@ public class DesktopPlatform extends Platform {
             presence.state = Strings.capitalize(state.mode.name()) + ", Solo";
             presence.details = Strings.capitalize(world.getMap().name) + " | Wave " + state.wave;
             presence.largeImageText = "Wave " + state.wave;
-            if(Net.active() ){
+
+            if(Net.active()){
                 presence.partyMax = 16;
-                presence.partySize = Net.getConnections().size;
+                presence.partySize = playerGroup.size();
                 presence.state = Strings.capitalize(state.mode.name());
             }
         }else{
