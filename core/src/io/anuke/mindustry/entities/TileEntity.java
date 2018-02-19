@@ -106,7 +106,7 @@ public class TileEntity extends Entity{
 	
 	@Override
 	public void update(){
-		synchronized (tile) {
+		synchronized (Tile.tileSetLock) {
 			if (health != 0 && health < tile.block().health && !(tile.block() instanceof Wall) &&
 					Mathf.chance(0.009f * Timers.delta() * (1f - health / tile.block().health))) {
 

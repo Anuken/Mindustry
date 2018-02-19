@@ -12,6 +12,7 @@ import static io.anuke.mindustry.Vars.world;
 
 
 public class Tile{
+	public static final Object tileSetLock = new Object();
 	private static final Array<Tile> tmpArray = new Array<>();
 	
 	/**Packed block data. Left is floor, right is block.*/
@@ -120,18 +121,21 @@ public class Tile{
 	}
 	
 	public void setBlock(Block type, int rotation){
-		if(rotation < 0) rotation = (-rotation + 2);
-		rotation %= 4;
-		iSetBlock(type);
-		setRotation((byte)rotation);
-		this.link = 0;
-		changed();
+		synchronized (tileSetLock) {
+			if(rotation < 0) rotation = (-rotation + 2);
+			iSetBlock(type);
+			setRotation((byte) (rotation % 4));
+			this.link = 0;
+			changed();
+		}
 	}
 	
 	public void setBlock(Block type){
-		iSetBlock(type);
-		this.link = 0;
-		changed();
+		synchronized (tileSetLock) {
+			iSetBlock(type);
+			this.link = 0;
+			changed();
+		}
 	}
 	
 	public void setFloor(Block type){
@@ -260,7 +264,7 @@ public class Tile{
 	}
 	
 	public void changed(){
-		synchronized (this) {
+		synchronized (tileSetLock) {
 			if (entity != null) {
 				entity.remove();
 				entity = null;

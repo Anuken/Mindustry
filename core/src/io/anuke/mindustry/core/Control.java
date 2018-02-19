@@ -378,6 +378,5 @@ public class Control extends Module{
 				Timers.update();
 			}
 		}
-
 	}
 }

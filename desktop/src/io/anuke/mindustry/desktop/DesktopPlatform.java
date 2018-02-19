@@ -8,6 +8,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.util.Strings;
 
 import javax.swing.*;
@@ -20,16 +21,18 @@ import java.util.Locale;
 import static io.anuke.mindustry.Vars.*;
 
 public class DesktopPlatform extends Platform {
-    DateFormat format = SimpleDateFormat.getDateTimeInstance();
-    DiscordRPC lib = DiscordRPC.INSTANCE;
+    final static boolean useDiscord = UCore.getPropertyNotNull("sun.arch.data.model").equals("64");
+    final static String applicationId = "398246104468291591";
+    final static DateFormat format = SimpleDateFormat.getDateTimeInstance();
     String[] args;
 
     public DesktopPlatform(String[] args){
         this.args = args;
-        String applicationId = "398246104468291591";
-        DiscordEventHandlers handlers = new DiscordEventHandlers();
 
-        lib.Discord_Initialize(applicationId, handlers, true, "");
+        if(useDiscord) {
+            DiscordEventHandlers handlers = new DiscordEventHandlers();
+            DiscordRPC.INSTANCE.Discord_Initialize(applicationId, handlers, true, "");
+        }
     }
 
     @Override
@@ -54,6 +57,8 @@ public class DesktopPlatform extends Platform {
 
     @Override
     public void updateRPC() {
+        if(!useDiscord) return;
+
         DiscordRichPresence presence = new DiscordRichPresence();
 
         if(!state.is(State.menu)){
@@ -75,12 +80,12 @@ public class DesktopPlatform extends Platform {
 
         presence.largeImageKey = "logo";
 
-        lib.Discord_UpdatePresence(presence);
+        DiscordRPC.INSTANCE.Discord_UpdatePresence(presence);
     }
 
     @Override
     public void onGameExit() {
-        lib.Discord_Shutdown();
+        if(useDiscord) DiscordRPC.INSTANCE.Discord_Shutdown();
     }
 
     @Override
