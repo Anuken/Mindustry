@@ -37,7 +37,7 @@ public class Junction extends Block{
 				long l = buffer.items[0];
 				float time = NumberUtils.intBitsToFloat(Bits.getLeftInt(l));
 
-				if(Timers.time() >= time + speed){
+				if(Timers.time() >= time + speed || Timers.time() < time){
 
 					int val = Bits.getRightInt(l);
 
@@ -91,6 +91,7 @@ public class Junction extends Block{
 			arr.add("nearby." + i);
 			arr.add(tile.getNearby(i));
 		}
+
         Consumer<Buffer> write = b -> {
             for(int i = 0; i < b.index; i++){
                 long l = b.items[i];

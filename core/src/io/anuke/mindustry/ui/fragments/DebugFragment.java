@@ -72,7 +72,7 @@ public class DebugFragment implements Fragment {
                });
                row();
                new button("time", () -> {
-                   Timers.resetTime(1080000/2f);
+                   Timers.resetTime(1080000 - 60*10);
                });
                row();
                new button("time2", () -> {

@@ -49,7 +49,7 @@ public class TunnelConveyor extends Block{
 			long l = entity.buffer[0];
 			float time = NumberUtils.intBitsToFloat(Bits.getLeftInt(l));
 
-			if(Timers.time() >= time + speed){
+			if(Timers.time() >= time + speed || Timers.time() < time){
 
 				Item item = Item.getByID(Bits.getRightInt(l));
 
