@@ -354,7 +354,7 @@ public class Control extends Module{
 		if(!state.is(State.menu)){
 			input.update();
 			
-			if(Inputs.keyTap("pause") && !ui.restart.isShown() && !Net.active() && (state.is(State.paused) || state.is(State.playing))){
+			if(Inputs.keyTap("pause") && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
                 state.set(state.is(State.playing) ? State.paused : State.playing);
 			}
 			
