@@ -51,14 +51,14 @@ public class Control extends Module{
     private float controlx, controly;
     private boolean controlling;
     private Throwable error;
-	
+
 	public Control(){
 		saves = new Saves();
 
 		Inputs.useControllers(!gwt);
-		
+
 		Gdx.input.setCatchBackKey(true);
-		
+
 		if(android){
 			input = new AndroidInput();
 		}else{
@@ -86,28 +86,28 @@ public class Control extends Module{
 				return pointer == 0 ? getX() : super.getX(pointer);
 			}
         };
-		
+
 		Inputs.addProcessor(input);
-		
+
 		Effects.setShakeFalloff(10000f);
-		
+
 		Core.atlas = new Atlas("sprites.atlas");
 
 		for(Item item : Item.getAllItems()){
 			item.init();
 		}
-		
+
 		Sounds.load("shoot.ogg", "place.ogg", "explosion.ogg", "enemyshoot.ogg",
-				"corexplode.ogg", "break.ogg", "spawn.ogg", "flame.ogg", "die.ogg", 
+				"corexplode.ogg", "break.ogg", "spawn.ogg", "flame.ogg", "die.ogg",
 				"respawn.ogg", "purchase.ogg", "flame2.ogg", "bigshot.ogg", "laser.ogg", "lasershot.ogg",
 				"ping.ogg", "tesla.ogg", "waveend.ogg", "railgun.ogg", "blast.ogg", "bang2.ogg");
-		
+
 		Sounds.setFalloff(9000f);
-		
+
 		Musics.load("1.ogg", "2.ogg", "3.ogg", "4.ogg");
 
         DefaultKeybinds.load();
-		
+
 		for(int i = 0; i < saveSlots; i ++){
 			Settings.defaults("save-" + i + "-autosave", !gwt);
 			Settings.defaults("save-" + i + "-name", "untitled");
@@ -124,11 +124,11 @@ public class Control extends Module{
 		);
 
 		KeyBinds.load();
-		
+
 		for(Map map : world.maps().list()){
 			Settings.defaults("hiscore" + map.name, 0);
 		}
-		
+
 		player = new Player();
 		player.name = Settings.getString("name");
 		player.isAndroid = android;
@@ -167,6 +167,7 @@ public class Control extends Module{
 
 			ui.hudfrag.updateItems();
 			ui.hudfrag.updateWeapons();
+			ui.hudfrag.fadeRespawn(false);
 		});
 
 		Events.on(WaveEvent.class, () -> {
@@ -212,24 +213,24 @@ public class Control extends Module{
 	public boolean showCursor(){
 		return controlling;
 	}
-	
+
 	public InputHandler input(){
 		return input;
 	}
-	
+
 	public void playMap(Map map){
 		ui.loadfrag.show();
 		saves.resetSave();
-		
+
 		Timers.runTask(10, () -> {
 			logic.reset();
 			world.loadMap(map);
 			logic.play();
 		});
-		
+
 		Timers.runTask(18, () -> ui.loadfrag.hide());
 	}
-	
+
 	public boolean isHighScore(){
 		return hiscore;
 	}
@@ -237,11 +238,11 @@ public class Control extends Module{
 	public float getRespawnTime(){
 		return respawntime;
 	}
-	
+
 	public void setRespawnTime(float respawntime){
 		this.respawntime = respawntime;
 	}
-	
+
 	public Tutorial tutorial(){
 		return tutorial;
 	}
@@ -268,24 +269,24 @@ public class Control extends Module{
 		Platform.instance.onGameExit();
 		Net.dispose();
 	}
-	
+
 	@Override
 	public void pause(){
 		wasPaused = state.is(State.paused);
 		if(state.is(State.playing)) state.set(State.paused);
 	}
-	
+
 	@Override
 	public void resume(){
 		if(state.is(State.paused) && !wasPaused){
             state.set(State.playing);
 		}
 	}
-	
+
 	@Override
 	public void init(){
 		Timers.run(1f, Musics::shuffleAll);
-		
+
 		Entities.initPhysics();
 		Entities.collisions().setCollider(tilesize, world::solid);
 
@@ -293,7 +294,7 @@ public class Control extends Module{
 
 		checkOldUser();
 	}
-	
+
 	@Override
 	public void update(){
 
@@ -345,19 +346,19 @@ public class Control extends Module{
         }
 
         saves.update();
-		
+
 		if(state.inventory.isUpdated() && (Timers.get("updateItems", 8) || state.is(State.paused))){
 			ui.hudfrag.updateItems();
 			state.inventory.setUpdated(false);
 		}
-		
+
 		if(!state.is(State.menu)){
 			input.update();
-			
+
 			if(Inputs.keyTap("pause") && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
                 state.set(state.is(State.playing) ? State.paused : State.playing);
 			}
-			
+
 			if(Inputs.keyTap("menu")){
 				if(state.is(State.paused)){
 					ui.paused.hide();
@@ -371,14 +372,14 @@ public class Control extends Module{
 					}
 				}
 			}
-		
+
 			if(!state.is(State.paused) || Net.active()){
 				Entities.update(effectGroup);
-				
+
 				if(respawntime > 0){
-					
+
 					respawntime -= delta();
-					
+
 					if(respawntime <= 0){
 						player.set(world.getSpawnX(), world.getSpawnY());
 						player.heal();
@@ -387,7 +388,7 @@ public class Control extends Module{
 						ui.hudfrag.fadeRespawn(false);
 					}
 				}
-				
+
 				if(tutorial.active()){
 					tutorial.update();
 				}
