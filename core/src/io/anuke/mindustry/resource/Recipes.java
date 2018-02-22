@@ -25,9 +25,11 @@ public class Recipes {
 			new Recipe(defense, DefenseBlocks.titaniumshieldwall, stack(Item.titanium, 16)),
 
 			new Recipe(distribution, DistributionBlocks.conveyor, stack(Item.stone, 1)),
+			new Recipe(distribution, DistributionBlocks.combiner, stack(Item.stone, 1)),
 			new Recipe(distribution, DistributionBlocks.steelconveyor, stack(Item.steel, 1)),
 			new Recipe(distribution, DistributionBlocks.pulseconveyor, stack(Item.dirium, 1)),
 			new Recipe(distribution, DistributionBlocks.router, stack(Item.stone, 2)),
+			new Recipe(distribution, DistributionBlocks.buffer, stack(Item.steel, 2)),
 			new Recipe(distribution, DistributionBlocks.junction, stack(Item.iron, 2)),
 			new Recipe(distribution, DistributionBlocks.tunnel, stack(Item.iron, 2)),
 			new Recipe(distribution, DistributionBlocks.conduit, stack(Item.steel, 1)),
@@ -48,6 +50,7 @@ public class Recipes {
 			new Recipe(weapon, WeaponBlocks.plasmaturret, stack(Item.steel, 10), stack(Item.titanium, 20), stack(Item.dirium, 15)),
 			new Recipe(weapon, WeaponBlocks.chainturret, stack(Item.steel, 50), stack(Item.titanium, 25), stack(Item.dirium, 40)),
 			new Recipe(weapon, WeaponBlocks.titanturret, stack(Item.steel, 70), stack(Item.titanium, 50), stack(Item.dirium, 55)),
+			new Recipe(weapon, WeaponBlocks.artilleryturret, stack(Item.steel, 170), stack(Item.titanium, 150), stack(Item.dirium, 155)),
 
 			new Recipe(crafting, ProductionBlocks.smelter, stack(Item.stone, 40), stack(Item.iron, 40)),
 			new Recipe(crafting, ProductionBlocks.crucible, stack(Item.titanium, 50), stack(Item.steel, 50)),

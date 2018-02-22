@@ -154,7 +154,23 @@ public class WeaponBlocks{
 			ammoMultiplier = 40;
 		}
 	},
-	
+
+	artilleryturret = new Turret("artilleryturret"){
+		{
+			shootsound = "blast";
+			range = 600f;
+			reload = 123f;
+			bullet = BulletType.artilleryshell;
+			ammo = Item.dirium;
+			health = 1800;
+			width = height = 3;
+			rotatespeed = 0.007f;
+			shootCone = 9f;
+			shootEffect = Fx.titanshot;
+			shootShake = 6f;
+		}
+	},
+
 	chainturret = new Turret("chainturret"){
 		{
 			shootsound = "bigshot";

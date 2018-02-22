@@ -37,6 +37,14 @@ public class DistributionBlocks{
 	router = new Router("router"){{
 
 	}},
+
+	buffer = new Buffer("buffer"){{
+
+	}},
+
+	combiner = new Combiner("combiner"){{
+
+	}},
 	
 	junction = new Junction("junction"){{
 		
