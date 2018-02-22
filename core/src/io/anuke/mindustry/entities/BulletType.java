@@ -57,6 +57,38 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			}
 		}
 	},
+
+	artilleryshell = new BulletType(2f, 600) {
+		{
+			lifetime = 270f;
+			hitsize = 80f;
+		}
+		public void draw(Bullet b) {
+			Draw.color(whiteOrange);
+			Draw.rect("chainbullet", b.x, b.y, b.angle());
+			Draw.reset();
+		}
+
+		public void update(Bullet b){
+			if(b.timer.get(0, 4)){
+				Effects.effect(Fx.smoke, b.x + Mathf.range(2), b.y + Mathf.range(2));
+			}
+		}
+
+		public void despawned(Bullet b){
+			removed(b);
+		}
+
+		public void removed(Bullet b){
+			Effects.shake(6f, 5f, b);
+
+			Effects.effect(Fx.shellsmoke, b);
+			Effects.effect(Fx.shockwave, b);
+
+			DamageArea.damage(!(b.owner instanceof Enemy), b.x, b.y, 80f, (int)(damage * 2));
+		}
+	},
+
 	emp = new BulletType(1.6f, 8){
 		{
 			lifetime = 50f;
