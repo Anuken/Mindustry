@@ -18,14 +18,14 @@ allprojects {
     apply plugin: "idea"
 
     version = 'release'
-    
+
     ext {
         versionNumber = '3.3'
         versionType = 'release'
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         aiVersion = '1.8.1'
-        uCoreVersion = 'a95630d'
+        uCoreVersion = '23e8c1c'
 
         getVersionString = {
             String buildVersion = getBuildVersion()

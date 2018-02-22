@@ -15,7 +15,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class PowerTurret extends Turret implements PowerAcceptor{
+public abstract class PowerTurret extends Turret implements PowerAcceptor{
 	public float powerCapacity = 20f;
 	public float powerUsed = 0.5f;
 

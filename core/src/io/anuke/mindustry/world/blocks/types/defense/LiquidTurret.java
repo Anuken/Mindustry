@@ -9,7 +9,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class LiquidTurret extends Turret implements LiquidAcceptor{
+public abstract class LiquidTurret extends Turret implements LiquidAcceptor{
     public Liquid ammoLiquid = Liquid.water;
     public float liquidCapacity = 20f;
     public float liquidPerShot = 1f;
