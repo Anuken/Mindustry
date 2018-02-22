@@ -109,7 +109,7 @@ public class LiquidPowerGenerator extends Generator implements LiquidAcceptor{
 		return liquidCapacity;
 	}
 	
-	public static class LiquidPowerEntity extends PowerEntity{
+	public static class LiquidPowerEntity extends GeneratorEntity{
 		public Liquid liquid;
 		public float liquidAmount;
 		

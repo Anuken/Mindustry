@@ -6,7 +6,7 @@ public class Recipe {
     public Block result;
     public ItemStack[] requirements;
     public Section section;
-    public boolean desktopOnly = false;
+    public boolean desktopOnly = false, debugOnly = false;
 
     public Recipe(Section section, Block result, ItemStack... requirements){
         this.result = result;
@@ -16,6 +16,11 @@ public class Recipe {
 
     public Recipe setDesktop(){
         desktopOnly = true;
+        return this;
+    }
+
+    public Recipe setDebug(){
+        debugOnly = true;
         return this;
     }
 }

@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks;
 
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.defense.CoreBlock;
@@ -104,15 +105,13 @@ public class ProductionBlocks{
 		}
 	},
 
-	pulverizer = new LiquidCrafter("siliconextractor"){
+	pulverizer = new PowerSmelter("pulverizer"){
 		{
-			input = Item.sand;
-			inputAmount = 5;
-			inputLiquid = Liquid.water;
-			liquidAmount = 18.99f;
-			output = Item.sand;
+			inputs = new ItemStack[]{new ItemStack(Item.stone, 5)};
+			result = Item.sand;
 			health = 50;
-			purifyTime = 50;
+			craftTime = 60f;
+			powerDrain = 0.02f;
 		}
 	},
 
@@ -173,7 +172,7 @@ public class ProductionBlocks{
 		}
 	},
 
-	sandextractor = new Omnidrill("omnidrill"){
+	sandextractor = new Omnidrill("sandextractor"){
 		{
 			time = 4;
 		}

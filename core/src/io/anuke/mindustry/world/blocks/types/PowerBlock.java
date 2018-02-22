@@ -29,17 +29,6 @@ public abstract class PowerBlock extends Block implements PowerAcceptor{
 		list.add("[powerinfo]Power Capacity: " + powerCapacity);
 	}
 	
-	/**Tries adding all the power with no remainder, returns success.*/
-	public boolean tryAddPower(Tile tile, float amount){
-		PowerEntity entity = tile.entity();
-		
-		if(entity.power + amount <= powerCapacity){
-			entity.power += amount;
-			return true;
-		}
-		return false;
-	}
-	
 	@Override
 	public boolean acceptsPower(Tile tile){
 		PowerEntity entity = tile.entity();

@@ -3,11 +3,9 @@ package io.anuke.mindustry.resource;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.DefenseBlocks;
-import io.anuke.mindustry.world.blocks.DistributionBlocks;
-import io.anuke.mindustry.world.blocks.ProductionBlocks;
-import io.anuke.mindustry.world.blocks.WeaponBlocks;
+import io.anuke.mindustry.world.blocks.*;
 
+import static io.anuke.mindustry.Vars.debug;
 import static io.anuke.mindustry.resource.Section.*;
 
 public class Recipes {
@@ -85,7 +83,10 @@ public class Recipes {
 			new Recipe(liquid, DistributionBlocks.liquidjunction, stack(Item.steel, 2)),
 
 			new Recipe(production, ProductionBlocks.pump, stack(Item.steel, 10)),
-			new Recipe(production, ProductionBlocks.fluxpump, stack(Item.steel, 10), stack(Item.dirium, 5))
+			new Recipe(production, ProductionBlocks.fluxpump, stack(Item.steel, 10), stack(Item.dirium, 5)),
+
+			new Recipe(units, DebugBlocks.powerVoid, stack(Item.steel, 10)).setDebug(),
+			new Recipe(units, DebugBlocks.powerInfinite, stack(Item.steel, 10), stack(Item.dirium, 5)).setDebug()
 	);
 	
 	private static ItemStack stack(Item item, int amount){
@@ -107,8 +108,9 @@ public class Recipes {
 	
 	public static Array<Recipe> getBy(Section section, Array<Recipe> r){
 		for(Recipe recipe : list){
-			if(recipe.section == section && !(Vars.android && recipe.desktopOnly))
+			if(recipe.section == section && !(Vars.android && recipe.desktopOnly) && !(!debug && recipe.debugOnly)) {
 				r.add(recipe);
+			}
 		}
 		
 		return r;

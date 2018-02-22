@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
@@ -134,13 +135,13 @@ public class Generator extends PowerBlock{
 	public void drawLayer(Tile tile){
 		if(!Settings.getBool("lasers")) return;
 
-		PowerEntity entity = tile.entity();
+		GeneratorEntity entity = tile.entity();
 
 		for(int i = 0; i < laserDirections; i++){
 			if(entity.power > powerSpeed){
-				Draw.alpha(1f);
+				entity.laserThickness = Mathf.lerpDelta(entity.laserThickness, 1f, 0.05f);
 			}else{
-				Draw.alpha(0.5f);
+				entity.laserThickness = Mathf.lerpDelta(entity.laserThickness, 0.2f, 0.05f);
 			}
 			drawLaserTo(tile, (tile.getRotation() + i) - laserDirections / 2);
 		}
@@ -151,6 +152,15 @@ public class Generator extends PowerBlock{
 	@Override
 	public boolean acceptsPower(Tile tile){
 		return false;
+	}
+
+	@Override
+	public TileEntity getEntity() {
+		return new GeneratorEntity();
+	}
+
+	public static class GeneratorEntity extends PowerEntity{
+		float laserThickness = 0.5f;
 	}
 
 	protected void distributeLaserPower(Tile tile){
@@ -177,6 +187,10 @@ public class Generator extends PowerBlock{
 
 		Tile target = laserTarget(tile, rotation);
 
+		GeneratorEntity entity = tile.entity();
+
+		float scale = 1f * entity.laserThickness;
+
 		if(target != null){
 			boolean interfering = isInterfering(target, rotation);
 
@@ -202,11 +216,14 @@ public class Generator extends PowerBlock{
 			if(relative == -1){
 				Shapes.laser("laser", "laserend", tile.worldx() + t2.x, tile.worldy() + t2.y,
 						target.worldx() - t1.x + Mathf.range(r),
-						target.worldy() - t1.y + Mathf.range(r), 0.7f);
+						target.worldy() - t1.y + Mathf.range(r), scale);
 			}else{
+				float s = 18f;
+				float sclx = (relative == 1 || relative == 3) ? entity.laserThickness : 1f;
+				float scly = (relative == 1 || relative == 3) ? 1f : entity.laserThickness;
 				Draw.rect("laserfull", 
 						tile.worldx() + Geometry.d4[relative].x * width * tilesize / 2f,
-						tile.worldy() + Geometry.d4[relative].y * width * tilesize / 2f);
+						tile.worldy() + Geometry.d4[relative].y * width * tilesize / 2f , s * sclx, s * scly);
 			}
 			
 			Draw.color();

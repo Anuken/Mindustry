@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
@@ -21,7 +22,7 @@ public class PowerSmelter extends PowerBlock {
     protected final int timerDump = timers++;
     protected final int timerCraft = timers++;
 
-    protected Item[] inputs;
+    protected ItemStack[] inputs;
     protected Item result;
     protected float powerDrain = 0.01f;
 
@@ -43,8 +44,8 @@ public class PowerSmelter extends PowerBlock {
 
     @Override
     public void init(){
-        for(Item item : inputs){
-            bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.getItem(item)/capacity));
+        for(ItemStack item : inputs){
+            bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.getItem(item.item)/capacity));
         }
     }
 
@@ -82,8 +83,8 @@ public class PowerSmelter extends PowerBlock {
         entity.heat = Mathf.clamp(entity.heat);
 
         //make sure it has all the items
-        for(Item item : inputs){
-            if(!entity.hasItem(item)){
+        for(ItemStack item : inputs){
+            if(!entity.hasItem(item.item, item.amount)){
                 return;
             }
         }
@@ -94,8 +95,8 @@ public class PowerSmelter extends PowerBlock {
             return;
         }
 
-        for(Item item : inputs){
-            entity.removeItem(item, 1);
+        for(ItemStack item : inputs){
+            entity.removeItem(item.item, item.amount);
         }
 
         offloadNear(tile, result);
@@ -106,8 +107,8 @@ public class PowerSmelter extends PowerBlock {
     public boolean acceptItem(Item item, Tile tile, Tile source){
         boolean isInput = false;
 
-        for(Item req : inputs){
-            if(req == item){
+        for(ItemStack req : inputs){
+            if(req.item == item){
                 isInput = true;
                 break;
             }
@@ -120,12 +121,12 @@ public class PowerSmelter extends PowerBlock {
     public void draw(Tile tile){
         super.draw(tile);
 
-        Smelter.CrafterEntity entity = tile.entity();
+        PowerSmelterEntity entity = tile.entity();
 
         //draw glowing center
-        if(entity.burnTime > 0){
+        if(entity.heat > 0f){
             Draw.color(1f, 1f, 1f, Mathf.absin(Timers.time(), 9f, 0.4f) + Mathf.random(0.05f));
-            Draw.rect("smelter-middle", tile.worldx(), tile.worldy());
+            Draw.rect("smelter-middle", tile.drawx(), tile.drawy());
             Draw.color();
         }
     }
