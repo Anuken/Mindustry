@@ -86,6 +86,8 @@ public class BlocksFragment implements Fragment{
 					}
 
 					for (Section sec : Section.values()) {
+						int secrows = 4;
+
 						recipes.clear();
 						Recipes.getBy(sec, recipes);
 
@@ -97,12 +99,13 @@ public class BlocksFragment implements Fragment{
 								input.recipe = null;
 							}
 						});
+
 						button.setName("sectionbutton" + sec.name());
-						add(button).growX().height(54).padLeft(-1).padTop(sec.ordinal() <= 2 ? -10 : -5);
+						add(button).growX().height(54).padLeft(-1).padTop(sec.ordinal() <= secrows-1 ? -10 : -5);
 						button.getImageCell().size(40).padBottom(4).padTop(2);
 						group.add(button);
 
-						if (sec.ordinal() % 3 == 2 && sec.ordinal() > 0) {
+						if (sec.ordinal() % secrows == secrows-1) {
 							row();
 						}
 

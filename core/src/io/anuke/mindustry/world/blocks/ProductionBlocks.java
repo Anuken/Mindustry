@@ -104,6 +104,18 @@ public class ProductionBlocks{
 		}
 	},
 
+	pulverizer = new LiquidCrafter("siliconextractor"){
+		{
+			input = Item.sand;
+			inputAmount = 5;
+			inputLiquid = Liquid.water;
+			liquidAmount = 18.99f;
+			output = Item.sand;
+			health = 50;
+			purifyTime = 50;
+		}
+	},
+
 	siliconextractor = new LiquidCrafter("siliconextractor"){
 		{
 			input = Item.sand;
@@ -160,6 +172,13 @@ public class ProductionBlocks{
 			time = 4;
 		}
 	},
+
+	sandextractor = new Omnidrill("omnidrill"){
+		{
+			time = 4;
+		}
+	},
+
 	coalgenerator = new ItemPowerGenerator("coalgenerator"){
 		{
 			generateItem = Item.coal;

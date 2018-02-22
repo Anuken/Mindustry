@@ -30,22 +30,19 @@ public class Recipes {
 			new Recipe(distribution, DistributionBlocks.router, stack(Item.stone, 2)),
 			new Recipe(distribution, DistributionBlocks.junction, stack(Item.iron, 2)),
 			new Recipe(distribution, DistributionBlocks.tunnel, stack(Item.iron, 2)),
-			new Recipe(distribution, DistributionBlocks.conduit, stack(Item.steel, 1)),
-			new Recipe(distribution, DistributionBlocks.pulseconduit, stack(Item.titanium, 1), stack(Item.steel, 1)),
-			new Recipe(distribution, DistributionBlocks.liquidrouter, stack(Item.steel, 2)),
-			new Recipe(distribution, DistributionBlocks.liquidjunction, stack(Item.steel, 2)),
 			new Recipe(distribution, DistributionBlocks.sorter, stack(Item.steel, 2)),
+			new Recipe(distribution, DistributionBlocks.splitter, stack(Item.steel, 1)),
 
-			new Recipe(weapon, WeaponBlocks.turret, stack(Item.stone, 4)),
+			//new Recipe(weapon, WeaponBlocks.turret, stack(Item.stone, 4)),
 			new Recipe(weapon, WeaponBlocks.doubleturret, stack(Item.stone, 7)),
 			new Recipe(weapon, WeaponBlocks.machineturret, stack(Item.iron, 8), stack(Item.stone, 10)),
-			new Recipe(weapon, WeaponBlocks.shotgunturret, stack(Item.iron, 10), stack(Item.stone, 10)),
+			//new Recipe(weapon, WeaponBlocks.shotgunturret, stack(Item.iron, 10), stack(Item.stone, 10)),
 			new Recipe(weapon, WeaponBlocks.flameturret, stack(Item.iron, 12), stack(Item.steel, 9)),
 			new Recipe(weapon, WeaponBlocks.sniperturret, stack(Item.iron, 15), stack(Item.steel, 10)),
 			new Recipe(weapon, WeaponBlocks.laserturret, stack(Item.steel, 12), stack(Item.titanium, 12)),
 			new Recipe(weapon, WeaponBlocks.mortarturret, stack(Item.steel, 25), stack(Item.titanium, 15)),
 			new Recipe(weapon, WeaponBlocks.teslaturret, stack(Item.steel, 20), stack(Item.titanium, 25), stack(Item.dirium, 15)),
-			new Recipe(weapon, WeaponBlocks.plasmaturret, stack(Item.steel, 10), stack(Item.titanium, 20), stack(Item.dirium, 15)),
+			//new Recipe(weapon, WeaponBlocks.plasmaturret, stack(Item.steel, 10), stack(Item.titanium, 20), stack(Item.dirium, 15)),
 			new Recipe(weapon, WeaponBlocks.chainturret, stack(Item.steel, 50), stack(Item.titanium, 25), stack(Item.dirium, 40)),
 			new Recipe(weapon, WeaponBlocks.titanturret, stack(Item.steel, 70), stack(Item.titanium, 50), stack(Item.dirium, 55)),
 
@@ -81,6 +78,11 @@ public class Recipes {
 
 			new Recipe(power, DefenseBlocks.repairturret, stack(Item.iron, 30)),
 			new Recipe(power, DefenseBlocks.megarepairturret, stack(Item.iron, 20), stack(Item.steel, 30)),
+
+			new Recipe(liquid, DistributionBlocks.conduit, stack(Item.steel, 1)),
+			new Recipe(liquid, DistributionBlocks.pulseconduit, stack(Item.titanium, 1), stack(Item.steel, 1)),
+			new Recipe(liquid, DistributionBlocks.liquidrouter, stack(Item.steel, 2)),
+			new Recipe(liquid, DistributionBlocks.liquidjunction, stack(Item.steel, 2)),
 
 			new Recipe(production, ProductionBlocks.pump, stack(Item.steel, 10)),
 			new Recipe(production, ProductionBlocks.fluxpump, stack(Item.steel, 10), stack(Item.dirium, 5))

@@ -59,5 +59,7 @@ public class DistributionBlocks{
 	teleporter = new Teleporter("teleporter"){{
 	}},
 	sorter = new Sorter("sorter"){{
+	}},
+	splitter = new Splitter("splitter"){{
 	}};
 }
