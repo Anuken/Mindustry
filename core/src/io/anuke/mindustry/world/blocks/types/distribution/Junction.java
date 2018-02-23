@@ -84,6 +84,7 @@ public class Junction extends Block{
 		return new JunctionEntity();
 	}
 
+	@Override
 	public Array<Object> getDebugInfo(Tile tile){
 		JunctionEntity entity = tile.entity();
 		Array<Object> arr = super.getDebugInfo(tile);
