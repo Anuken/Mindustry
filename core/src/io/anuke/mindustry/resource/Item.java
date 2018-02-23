@@ -11,20 +11,41 @@ public class Item{
 	public static final Item
 		stone = new Item("stone"),
 		iron = new Item("iron"),
-		coal = new Item("coal"),
+		coal = new Item("coal"){
+			{
+				explosiveness = 0.2f;
+				flammability = 0.5f;
+				material = false;
+			}
+		},
 		steel = new Item("steel"),
 		titanium = new Item("titanium"),
 		dirium = new Item("dirium"),
-		uranium = new Item("uranium"),
-		sand = new Item("sand");
-		/*glass = new Item("glass"),
-		silicon = new Item("silicon");*/
+		uranium = new Item("uranium"){
+			{
+				explosiveness = 0.1f;
+				material = false;
+			}
+		},
+		quartz = new Item("quartz") {
+			{
+				material = false;
+			}
+		},
+		glass = new Item("glass"),
+		silicon = new Item("silicon"){
+			{
+				material = false;
+			}
+		};
 
 	public final int id;
 	public final String name;
 	public TextureRegion region;
+
 	public float explosiveness = 0f;
 	public float flammability = 0f;
+	public boolean material = true;
 
 	public Item(String name) {
 		this.id = items.size;

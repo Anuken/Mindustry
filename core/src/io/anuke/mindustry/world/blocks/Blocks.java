@@ -103,7 +103,9 @@ public class Blocks{
 	
 	dirt = new Floor("dirt"){},
 	
-	sand = new Floor("sand"){},
+	sand = new Floor("sand"){{
+		drops = new ItemStack(Item.quartz, 1);
+	}},
 	
 	ice = new Floor("ice"){},
 	

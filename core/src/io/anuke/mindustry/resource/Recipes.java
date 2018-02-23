@@ -51,6 +51,8 @@ public class Recipes {
 			new Recipe(crafting, ProductionBlocks.oilrefinery, stack(Item.steel, 15), stack(Item.iron, 15)),
 			new Recipe(crafting, ProductionBlocks.stoneformer, stack(Item.steel, 10), stack(Item.iron, 10)),
 			new Recipe(crafting, ProductionBlocks.lavasmelter, stack(Item.steel, 30), stack(Item.titanium, 15)),
+			new Recipe(crafting, ProductionBlocks.pulverizer, stack(Item.steel, 30), stack(Item.titanium, 15)),
+			new Recipe(crafting, ProductionBlocks.siliconextractor, stack(Item.steel, 30), stack(Item.titanium, 15)),
 			new Recipe(crafting, ProductionBlocks.weaponFactory, stack(Item.steel, 60), stack(Item.iron, 60)).setDesktop(),
 
 			new Recipe(production, ProductionBlocks.stonedrill, stack(Item.stone, 12)),
@@ -58,6 +60,7 @@ public class Recipes {
 			new Recipe(production, ProductionBlocks.coaldrill, stack(Item.stone, 25), stack(Item.iron, 40)),
 			new Recipe(production, ProductionBlocks.titaniumdrill, stack(Item.iron, 50), stack(Item.steel, 50)),
 			new Recipe(production, ProductionBlocks.uraniumdrill, stack(Item.iron, 40), stack(Item.steel, 40)),
+			new Recipe(production, ProductionBlocks.quartzextractor, stack(Item.titanium, 40), stack(Item.dirium, 40)),
 			new Recipe(production, ProductionBlocks.omnidrill, stack(Item.titanium, 40), stack(Item.dirium, 40)),
 
 			new Recipe(power, ProductionBlocks.coalgenerator, stack(Item.iron, 30), stack(Item.stone, 20)),
@@ -82,8 +85,8 @@ public class Recipes {
 			new Recipe(liquid, DistributionBlocks.liquidrouter, stack(Item.steel, 2)),
 			new Recipe(liquid, DistributionBlocks.liquidjunction, stack(Item.steel, 2)),
 
-			new Recipe(production, ProductionBlocks.pump, stack(Item.steel, 10)),
-			new Recipe(production, ProductionBlocks.fluxpump, stack(Item.steel, 10), stack(Item.dirium, 5)),
+			new Recipe(liquid, ProductionBlocks.pump, stack(Item.steel, 10)),
+			new Recipe(liquid, ProductionBlocks.fluxpump, stack(Item.steel, 10), stack(Item.dirium, 5)),
 
 			new Recipe(units, DebugBlocks.powerVoid, stack(Item.steel, 10)).setDebug(),
 			new Recipe(units, DebugBlocks.powerInfinite, stack(Item.steel, 10), stack(Item.dirium, 5)).setDebug()

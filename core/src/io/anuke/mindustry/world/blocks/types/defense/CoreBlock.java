@@ -32,6 +32,6 @@ public class CoreBlock extends Block {
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return true;
+        return item.material;
     }
 }

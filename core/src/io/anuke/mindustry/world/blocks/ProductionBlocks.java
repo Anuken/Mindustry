@@ -108,20 +108,21 @@ public class ProductionBlocks{
 	pulverizer = new PowerSmelter("pulverizer"){
 		{
 			inputs = new ItemStack[]{new ItemStack(Item.stone, 5)};
-			result = Item.sand;
+			result = Item.quartz;
 			health = 50;
 			craftTime = 60f;
 			powerDrain = 0.02f;
+			craftEffect = Fx.pulverize;
 		}
 	},
 
 	siliconextractor = new LiquidCrafter("siliconextractor"){
 		{
-			input = Item.sand;
+			input = Item.quartz;
 			inputAmount = 5;
 			inputLiquid = Liquid.water;
 			liquidAmount = 18.99f;
-			output = Item.sand;
+			output = Item.silicon;
 			health = 50;
 			purifyTime = 50;
 		}
@@ -172,9 +173,11 @@ public class ProductionBlocks{
 		}
 	},
 
-	sandextractor = new Omnidrill("sandextractor"){
+	quartzextractor = new Drill("quartzextractor"){
 		{
-			time = 4;
+			resource = Blocks.sand;
+			result = Item.quartz;
+			time = 5;
 		}
 	},
 

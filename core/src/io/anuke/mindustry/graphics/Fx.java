@@ -3,10 +3,7 @@ package io.anuke.mindustry.graphics;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Hue;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.graphics.Shapes;
+import io.anuke.ucore.graphics.*;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
@@ -166,7 +163,6 @@ public class Fx{
 		Angles.randLenVectors(e.id, 5, e.ifract()*8f, (x, y)->{
 			float len = e.fract()*4f;
 			Draw.color(Color.valueOf("d2b29c"), Color.GRAY, e.ifract());
-					//Draw.alpha(e.fract());
 			Draw.rect("circle", e.x + x, e.y + y, len, len);
 			Draw.reset();
 		});
@@ -176,8 +172,15 @@ public class Fx{
 		Angles.randLenVectors(e.id, 5, e.ifract()*9f, (x, y)->{
 			float len = e.fract()*4f;
 			Draw.color(Color.LIGHT_GRAY, Color.GRAY, e.ifract());
-			//Draw.alpha(e.fract());
 			Draw.rect("circle", e.x + x, e.y + y, len, len);
+			Draw.reset();
+		});
+	}),
+
+	pulverize = new Effect(25, e -> {
+		Angles.randLenVectors(e.id, 5, 3f + e.ifract()*5f, (x, y)->{
+			Draw.color(Color.valueOf("eae4f0"), Color.GRAY, e.ifract());
+			Fill.poly(e.x + x, e.y + y, 4, e.fract() * 2f + 0.5f, 45);
 			Draw.reset();
 		});
 	}),
@@ -403,29 +406,14 @@ public class Fx{
         Draw.reset();
     }),
 
-	titanExplosion = new Effect(11, 48f, e -> {
-		Lines.stroke(2f*e.fract()+0.5f);
-		Draw.color(Color.WHITE, Color.DARK_GRAY, e.powfract());
-		Lines.circle(e.x, e.y, 5f + e.powfract() * 8f);
-		
-		Draw.color(e.ifract() < 0.5f ? whiteOrange : Color.DARK_GRAY);
-		float rad = e.fract()*10f + 5f;
-		Angles.randLenVectors(e.id, 5, 9f, (x, y)->{
-			Draw.rect("circle2", e.x + x, e.y + y, rad, rad);
-		});
-		
-		Draw.reset();
-	}),
-
 	explosion = new Effect(11, e -> {
 		Lines.stroke(2f*e.fract()+0.5f);
 		Draw.color(Color.WHITE, Color.DARK_GRAY, e.powfract());
 		Lines.circle(e.x, e.y, 5f + e.powfract() * 6f);
 		
 		Draw.color(e.ifract() < 0.5f ? Color.WHITE : Color.DARK_GRAY);
-		float rad = e.fract()*10f + 5f;
 		Angles.randLenVectors(e.id, 5, 8f, (x, y)->{
-			Draw.rect("circle2", e.x + x, e.y + y, rad, rad);
+			Fill.circle(e.x + x, e.y + y, e.fract()*5f + 2.5f);
 		});
 		
 		Draw.reset();
@@ -445,9 +433,8 @@ public class Fx{
 		Lines.circle(e.x, e.y, 2f + e.powfract() * 9f);
 		
 		Draw.color(e.ifract() < 0.5f ? Color.WHITE : Color.DARK_GRAY);
-		float rad = e.fract()*10f + 2f;
 		Angles.randLenVectors(e.id, 5, 8f, (x, y)->{
-			Draw.rect("circle2", e.x + x, e.y + y, rad, rad);
+			Fill.circle(e.x + x, e.y + y, e.fract()*5f + 1f);
 		});
 		
 		Draw.reset();

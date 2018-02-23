@@ -35,8 +35,7 @@ public abstract class PowerBlock extends Block implements PowerAcceptor{
 		
 		return entity.power + 0.001f <= powerCapacity;
 	}
-	
-	//TODO voltage requirement so blocks need specific voltage
+
 	@Override
 	public float addPower(Tile tile, float amount){
 		if(amount < voltage){

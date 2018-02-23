@@ -8,7 +8,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BulletEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
-import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.bulletGroup;
@@ -71,13 +71,12 @@ public class Shield extends Entity{
 		if(!(tile.block() instanceof ShieldBlock) || radius <= 1f){
 			return;
 		}
-		
-		float rad = drawRadius();
-		Draw.rect("circle2", x, y, rad, rad);
+
+		Fill.circle(x, y, drawRadius());
 	}
 	
 	float drawRadius(){
-		return (radius*2 + Mathf.sin(Timers.time(), 25f, 2f));
+		return (radius + Mathf.sin(Timers.time(), 25f, 1f));
 	}
 	
 	public void removeDelay(){
