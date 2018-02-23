@@ -409,8 +409,10 @@ public class Renderer extends RendererModule{
 				Lines.dashCircle(spawn.start.worldx(), spawn.start.worldy(), enemyspawnspace);
 			}
 
-			Draw.color(Color.LIME);
-			Lines.poly(world.getSpawnX(), world.getSpawnY(), 4, 6f, Timers.time()*2f);
+			if(world.getCore() != null) {
+				Draw.color(Color.LIME);
+				Lines.poly(world.getSpawnX(), world.getSpawnY(), 4, 6f, Timers.time() * 2f);
+			}
 			
 			if(input.breakMode == PlaceMode.holdDelete)
 				input.breakMode.draw(tilex, tiley, 0, 0);
