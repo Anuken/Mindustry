@@ -94,6 +94,7 @@ public class TunnelConveyor extends Block{
 		Tile dest = tile;
 		int rel = (tile.getRotation() + 2)%4;
 		for(int i = 0; i < maxdist; i ++){
+			if(dest == null) return null;
 			dest = dest.getNearby(rel);
 			if(dest != null && dest.block() instanceof TunnelConveyor && dest.getRotation() == rel
 					&& dest.getNearby(rel) != null
