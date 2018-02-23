@@ -43,13 +43,14 @@ public class LaserTurret extends PowerTurret{
 	@Override
 	public void drawLayer2(Tile tile){
 		TurretEntity entity = tile.entity();
+		Enemy enemy = entity.target;
 		
-		if(entity.target != null &&
-				Angles.angleDist(entity.rotation, Angles.angle(tile.drawx(), tile.drawy(), entity.target.x, entity.target.y)) <= cone){
+		if(enemy != null &&
+				Angles.angleDist(entity.rotation, Angles.angle(tile.drawx(), tile.drawy(), enemy.x, enemy.y)) <= cone){
 			float len = 4f;
 			
 			float x = tile.drawx() + Angles.trnsx(entity.rotation, len), y = tile.drawy() + Angles.trnsy(entity.rotation, len);
-			float x2 = entity.target.x, y2 = entity.target.y;
+			float x2 = enemy.x, y2 = enemy.y;
 
 			float lighten = (MathUtils.sin(Timers.time()/1.2f) + 1f) / 10f;
 			

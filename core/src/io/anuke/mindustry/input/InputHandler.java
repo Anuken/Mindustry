@@ -88,7 +88,8 @@ public abstract class InputHandler extends InputAdapter{
 	
 	public boolean validPlace(int x, int y, Block type){
 		
-		for(SpawnPoint spawn : world.getSpawns()){
+		for(int i = 0; i < world.getSpawns().size; i ++){
+			SpawnPoint spawn = world.getSpawns().get(i);
 			if(Vector2.dst(x * tilesize, y * tilesize, spawn.start.worldx(), spawn.start.worldy()) < enemyspawnspace){
 				return false;
 			}

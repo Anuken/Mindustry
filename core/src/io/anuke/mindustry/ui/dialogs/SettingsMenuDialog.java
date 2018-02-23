@@ -42,9 +42,6 @@ public class SettingsMenuDialog extends SettingsDialog{
 		shown(()->{
 			if(!state.is(State.menu)){
 				wasPaused = state.is(State.paused);
-				if(menu.getScene() != null){
-					wasPaused = ((PausedDialog)menu).wasPaused;
-				}
 				if(!Net.active()) state.set(State.paused);
 				ui.paused.hide();
 			}
