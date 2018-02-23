@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks.types.defense;
+package io.anuke.mindustry.world.blocks.types.storage;
 
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Item;

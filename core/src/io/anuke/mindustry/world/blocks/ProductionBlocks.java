@@ -5,7 +5,7 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.defense.CoreBlock;
+import io.anuke.mindustry.world.blocks.types.storage.CoreBlock;
 import io.anuke.mindustry.world.blocks.types.production.*;
 
 public class ProductionBlocks{

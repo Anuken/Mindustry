@@ -42,7 +42,7 @@ public class Router extends Block{
 
 			if (tile.entity.totalItems() > 0) {
 				if (tile.getExtra() != tile.getRotation()
-						|| Mathf.chance(0.35)) { //sometimes dump backwards at a 1/4 chance... this somehow works?
+						|| Mathf.chance(0.35)) { //sometimes dump backwards at a 0.35 chance... this somehow works?
 					tryDump(tile, tile.getRotation(), null);
 				}
 
