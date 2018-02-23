@@ -109,7 +109,7 @@ public class TunnelConveyor extends Block{
 			Item item = Item.getByID(Bits.getRightInt(l));
 			Tile dest = getDestTunnel(tile, item);
 			arr.add("  buffer.item");
-			arr.add(time + " | " + item.name + " | " + dest.block() + ":" + dest.floor());
+			arr.add(time + " | " + item.name + " | " + ( dest == null ? "no dest" : dest.block() + ":" + dest.floor()));
 		}
 
 		return arr;

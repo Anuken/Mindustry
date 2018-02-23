@@ -55,8 +55,6 @@ public class DebugFragment implements Fragment {
                row();
                new button("paths", "toggle", () -> showPaths = !showPaths);
                row();
-               new button("infammo", "toggle", () -> infiniteAmmo = !infiniteAmmo);
-               row();
                new button("wave", () -> state.wavetime = 0f);
                row();
                new button("time 0", () -> Timers.resetTime(0f));
@@ -75,13 +73,6 @@ public class DebugFragment implements Fragment {
                    }
                });
                row();
-               new button("time", () -> {
-                   Timers.resetTime(1080000 - 60*10);
-               });
-               row();
-               new button("time2", () -> {
-                   Timers.resetTime(0);
-               });
            }}.end();
 
            row();
