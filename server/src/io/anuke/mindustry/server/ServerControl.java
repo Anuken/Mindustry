@@ -99,7 +99,7 @@ public class ServerControl extends Module {
         handler.register("help", "Displays this command list.", arg -> {
             info("Commands:");
             for(Command command : handler.getCommandList()){
-                print("   &y" + command.text + (command.params.isEmpty() ? "" : " ") + command.params + " - &lm" + command.description);
+                print("   &y" + command.text + (command.paramText.isEmpty() ? "" : " ") + command.paramText + " - &lm" + command.description);
             }
         });
 
@@ -184,7 +184,7 @@ public class ServerControl extends Module {
             }
         });
 
-        handler.register("say", "<message>", "Send a message to all players.", arg -> {
+        handler.register("say", "<message...>", "Send a message to all players.", arg -> {
             if(!state.is(State.playing)) {
                 err("Not hosting. Host a game first.");
                 return;
@@ -192,7 +192,7 @@ public class ServerControl extends Module {
 
             netCommon.sendMessage("[GRAY][[Server]:[] " + arg[0]);
             info("&lyServer: &lb{0}", arg[0]);
-        }).mergeArgs();
+        });
 
         handler.register("difficulty", "<difficulty>", "Set game difficulty.", arg -> {
             try{
@@ -355,8 +355,10 @@ public class ServerControl extends Module {
 
                 if (response.type == ResponseType.unknownCommand) {
                     err("Invalid command. Type 'help' for help.");
-                } else if (response.type == ResponseType.invalidArguments) {
-                    err("Invalid command arguments. Usage: " + response.command.text + " " + response.command.params);
+                }else if (response.type == ResponseType.fewArguments) {
+                    err("Too few command arguments. Usage: " + response.command.text + " " + response.command.paramText);
+                }else if (response.type == ResponseType.manyArguments) {
+                    err("Too many command arguments. Usage: " + response.command.text + " " + response.command.paramText);
                 }
             });
         }

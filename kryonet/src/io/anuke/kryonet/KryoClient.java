@@ -13,6 +13,7 @@ import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
 import io.anuke.ucore.function.Consumer;
+import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -140,7 +141,7 @@ public class KryoClient implements ClientProvider{
     }
 
     @Override
-    public void pingHost(String address, int port, Consumer<Host> valid, Consumer<IOException> invalid){
+    public void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> invalid){
         runAsync(() -> {
             try {
                 DatagramSocket socket = new DatagramSocket();
@@ -162,7 +163,7 @@ public class KryoClient implements ClientProvider{
                 } else {
                     Gdx.app.postRunnable(() -> invalid.accept(new IOException("Outdated server.")));
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Gdx.app.postRunnable(() -> invalid.accept(e));
             }
         });
@@ -209,7 +210,7 @@ public class KryoClient implements ClientProvider{
         if(e instanceof KryoNetException){
             Gdx.app.postRunnable(() -> Net.showError("$text.server.mismatch"));
         }else{
-            //TODO better exception handling.
+            Net.showError(Strings.parseException(e, true));
             disconnect();
         }
     }
