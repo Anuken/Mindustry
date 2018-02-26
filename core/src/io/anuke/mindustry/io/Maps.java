@@ -75,13 +75,14 @@ public class Maps implements Disposable{
 	}
 
 	public void loadMaps(){
-		if(!loadMapFile(Gdx.files.internal("maps/maps.json"))){
+		if(!loadMapFile(Gdx.files.internal("maps/maps.json"), true)){
 			throw new RuntimeException("Failed to load maps!");
 		}
 
 		if(!gwt) {
-			if (!loadMapFile(customMapDirectory.child("maps.json"))) {
+			if (!loadMapFile(customMapDirectory.child("maps.json"), false)) {
 				try {
+					Log.info("Failed to find custom map directory. Creating one instead.");
 					customMapDirectory.child("maps.json").writeString("{}", false);
 				} catch (Exception e) {
 					throw new RuntimeException("Failed to create custom map directory!");
@@ -159,7 +160,7 @@ public class Maps implements Disposable{
 		saveMaps(out, customMapDirectory.child("maps.json"));
 	}
 
-	private boolean loadMapFile(FileHandle file){
+	private boolean loadMapFile(FileHandle file, boolean logException){
 		try{
 			Array<Map> arr = json.fromJson(ArrayContainer.class, file).maps;
 			if(arr != null){ //can be an empty map file
@@ -176,8 +177,10 @@ public class Maps implements Disposable{
 			}
 			return true;
 		}catch(Exception e){
-			Log.err(e);
-			Log.err("Failed loading map file: {0}", file);
+			if(logException) {
+				Log.err(e);
+				Log.err("Failed loading map file: {0}", file);
+			}
 			return false;
 		}
 	}

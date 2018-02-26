@@ -371,7 +371,7 @@ public class Packets {
     }
 
     public enum KickReason{
-        kick, invalidPassword, clientOutdated, serverOutdated
+        kick, invalidPassword, clientOutdated, serverOutdated, banned
     }
 
     public static class UpgradePacket implements Packet{
@@ -556,6 +556,24 @@ public class Packets {
         public void read(ByteBuffer buffer) {
             position = buffer.getInt();
             itemid = buffer.get();
+        }
+    }
+
+    public static class NetErrorPacket implements Packet{
+        public String message;
+
+        @Override
+        public void write(ByteBuffer buffer) {
+            buffer.putShort((short)message.getBytes().length);
+            buffer.put(message.getBytes());
+        }
+
+        @Override
+        public void read(ByteBuffer buffer) {
+            short length = buffer.getShort();
+            byte[] bytes = new byte[length];
+            buffer.get(bytes);
+            message = new String(bytes);
         }
     }
 }

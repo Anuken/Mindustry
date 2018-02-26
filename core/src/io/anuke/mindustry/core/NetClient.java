@@ -17,7 +17,9 @@ import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Map;
+import io.anuke.mindustry.world.Placement;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.Timers;
@@ -163,6 +165,14 @@ public class NetClient extends Module {
             //Timers.resetTime(packet.time + (float) (TimeUtils.timeSinceMillis(packet.timestamp) / 1000.0 * 60.0));
 
             ui.hudfrag.updateItems();
+        });
+
+        Net.handleClient(PlacePacket.class, (packet) -> {
+            Placement.placeBlock(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false);
+        });
+
+        Net.handleClient(BreakPacket.class, (packet) -> {
+            Placement.breakBlock(packet.x, packet.y, true, false);
         });
 
         Net.handleClient(EntitySpawnPacket.class, packet -> {
@@ -315,6 +325,11 @@ public class NetClient extends Module {
             }else{
                 r.run();
             }
+        });
+
+        Net.handleClient(NetErrorPacket.class, packet -> {
+            ui.showError(packet.message);
+            disconnectQuietly();
         });
     }
 

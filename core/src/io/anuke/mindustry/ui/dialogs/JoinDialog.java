@@ -85,7 +85,7 @@ public class JoinDialog extends FloatingDialog {
 
             TextButton button = buttons[0] = remote.addButton("[accent]"+server.ip, "clear", () -> {
                 if(!buttons[0].childrenPressed()) connect(server.ip, Vars.port);
-            }).width(w).height(120f).pad(4f).get();
+            }).width(w).height(140f).pad(4f).get();
 
             button.getLabel().setWrap(true);
 
@@ -134,10 +134,14 @@ public class JoinDialog extends FloatingDialog {
         Net.pingHost(server.ip, server.port, host -> {
             server.content.clear();
 
-            server.content.add("[lightgray]" + Bundles.format("text.server.hostname", host.name)).pad(4);
+            server.content.add("[lightgray]" + Bundles.format("text.server.hostname", host.name)).left();
             server.content.row();
             server.content.add("[lightgray]" + (host.players != 1 ? Bundles.format("text.players", host.players) :
-                    Bundles.format("text.players.single", host.players)));
+                    Bundles.format("text.players.single", host.players))).left();
+            server.content.row();
+            server.content.add("[lightgray]" + Bundles.format("text.save.map", host.mapname)).left();
+            server.content.row();
+            server.content.add("[lightgray]" + Bundles.format("text.save.wave", host.wave)).left();
         }, e -> {
             server.content.clear();
             server.content.add("$text.host.invalid");
@@ -175,7 +179,7 @@ public class JoinDialog extends FloatingDialog {
                 Vars.player.name = text;
                 Settings.put("name", text);
                 Settings.save();
-            }).grow().pad(8);
+            }).grow().pad(8).get().setMaxLength(48);
 
             ImageButton button = t.addImageButton("white", 40, () -> {
                 new ColorPickDialog().show(color -> {

@@ -2,7 +2,6 @@ package io.anuke.kryonet;
 
 import com.esotericsoftware.minlog.Log;
 import com.esotericsoftware.minlog.Log.Logger;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.net.Host;
 import io.anuke.ucore.util.ColorCodes;
 
@@ -11,8 +10,7 @@ import java.io.StringWriter;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 
-import static io.anuke.mindustry.Vars.headless;
-import static io.anuke.mindustry.Vars.playerGroup;
+import static io.anuke.mindustry.Vars.*;
 
 public class KryoRegistrator {
     public static boolean fakeLag = false;
@@ -49,24 +47,44 @@ public class KryoRegistrator {
     }
 
     public static ByteBuffer writeServerData(){
-        String host = headless ? "Server" : Vars.player.name;
+        int maxlen = 32;
 
-        ByteBuffer buffer = ByteBuffer.allocate(1 + host.getBytes().length + 4);
+        String host = (headless ? "Server" : player.name);
+        String map = world.getMap().name;
+
+        host = host.substring(0, Math.min(host.length(), maxlen));
+        map = map.substring(0, Math.min(map.length(), maxlen));
+
+        ByteBuffer buffer = ByteBuffer.allocate(128);
+
         buffer.put((byte)host.getBytes().length);
         buffer.put(host.getBytes());
+
+        buffer.put((byte)map.getBytes().length);
+        buffer.put(map.getBytes());
+
         buffer.putInt(playerGroup.size());
+        buffer.putInt(state.wave);
         return buffer;
     }
 
     public static Host readServerData(InetAddress ia, ByteBuffer buffer){
-        //old version address.
-        if(buffer.capacity() == 4) return null;
+        if(buffer.capacity() < 128) return null; //old version address.
 
-        byte length = buffer.get();
-        byte[] sname = new byte[length];
-        buffer.get(sname);
+        byte hlength = buffer.get();
+        byte[] hb = new byte[hlength];
+        buffer.get(hb);
+
+        byte mlength = buffer.get();
+        byte[] mb = new byte[mlength];
+        buffer.get(mb);
+
+        String host = new String(hb);
+        String map = new String(mb);
+
         int players = buffer.getInt();
+        int wave = buffer.getInt();
 
-        return new Host(new String(sname), ia.getHostAddress(), players);
+        return new Host(host, ia.getHostAddress(), map, wave, players);
     }
 }

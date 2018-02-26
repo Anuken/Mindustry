@@ -7,14 +7,15 @@ import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.io.Version;
+import io.anuke.mindustry.net.Administration;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.resource.Upgrade;
-import io.anuke.mindustry.resource.UpgradeRecipes;
-import io.anuke.mindustry.resource.Weapon;
+import io.anuke.mindustry.resource.*;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Placement;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
@@ -41,6 +42,8 @@ public class NetServer extends Module{
     private final static int timerStateSync = 1;
     private final static int timerBlockSync = 2;
 
+    public final Administration admins = new Administration();
+
     /**Maps connection IDs to players.*/
     private IntMap<Player> connections = new IntMap<>();
     private ObjectMap<String, ByteArray> weapons = new ObjectMap<>();
@@ -51,12 +54,26 @@ public class NetServer extends Module{
 
         Events.on(GameOverEvent.class, () -> weapons.clear());
 
-        Net.handleServer(Connect.class, (id, connect) -> {});
+        Net.handleServer(Connect.class, (id, connect) -> {
+            if(admins.isBanned(connect.addressTCP)){
+                Net.kickConnection(id, KickReason.banned);
+            }
+        });
 
         Net.handleServer(ConnectPacket.class, (id, packet) -> {
+            if(Net.getConnection(id) == null ||
+                    admins.isBanned(Net.getConnection(id).address)) return;
 
-            if(packet.version != Version.build && packet.version != -1 && Version.build != -1){ //ignore 'custom builds' on both ends
-                Net.kickConnection(id, packet.version > Version.build ? KickReason.serverOutdated : KickReason.clientOutdated);
+            admins.setKnownName(Net.getConnection(id).address, packet.name);
+
+            if(packet.version != Version.build && Version.build != -1){
+                if(packet.version == -1){
+                    admins.banPlayer(Net.getConnection(id).address);
+                    Net.kickConnection(id, KickReason.banned);
+                }else {
+                    Net.kickConnection(id, packet.version > Version.build ? KickReason.serverOutdated : KickReason.clientOutdated);
+                }
+
                 return;
             }
 
@@ -145,19 +162,41 @@ public class NetServer extends Module{
 
         Net.handleServer(PlacePacket.class, (id, packet) -> {
             packet.playerid = connections.get(id).id;
-            Net.sendExcept(id, packet, SendMode.tcp);
+
+            if(!Placement.validPlace(packet.x, packet.y, Block.getByID(packet.block))) return;
+
+            Recipe recipe = Recipes.getByResult(Block.getByID(packet.block));
+
+            if(recipe == null) return;
+
+            state.inventory.removeItems(recipe.requirements);
+
+            Placement.placeBlock(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false);
+
+            Net.send(packet, SendMode.tcp);
         });
 
         Net.handleServer(BreakPacket.class, (id, packet) -> {
             packet.playerid = connections.get(id).id;
-            Net.sendExcept(id, packet, SendMode.tcp);
+
+            if(!Placement.validBreak(packet.x, packet.y)) return;
+
+            Placement.breakBlock(packet.x, packet.y, true, false);
+
+            Net.send(packet, SendMode.tcp);
         });
 
         Net.handleServer(ChatPacket.class, (id, packet) -> {
+            if(!Timers.get("chatFlood" + id, 20)){
+                ChatPacket warn = new ChatPacket();
+                warn.text = "[scarlet]You are sending messages too quickly.";
+                Net.sendTo(id, warn, SendMode.tcp);
+                return;
+            }
             Player player = connections.get(id);
             packet.name = player.name;
             packet.id = player.id;
-            Net.sendExcept(player.clientid, packet, SendMode.tcp);
+            Net.send(packet, SendMode.tcp);
         });
 
         Net.handleServer(UpgradePacket.class, (id, packet) -> {

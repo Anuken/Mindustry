@@ -274,6 +274,7 @@ public class Renderer extends RendererModule{
 	void drawEnemyMarkers(){
 		Graphics.surface(indicatorSurface);
 		Draw.color(Color.RED);
+
 		for(Enemy enemy : enemyGroup.all()) {
 
 			if (rect.setSize(camera.viewportWidth, camera.viewportHeight).setCenter(camera.position.x, camera.position.y)

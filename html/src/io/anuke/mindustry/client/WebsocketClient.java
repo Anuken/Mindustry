@@ -103,7 +103,7 @@ public class WebsocketClient implements ClientProvider {
     }
 
     @Override
-    public void pingHost(String address, int port, Consumer<Host> valid, Consumer<IOException> failed) {
+    public void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> failed) {
         if(!Platform.instance.canJoinGame()) {
             failed.accept(new IOException());
         }else {
@@ -119,7 +119,7 @@ public class WebsocketClient implements ClientProvider {
                 public void onMessage(String msg) {
                     if(!msg.startsWith("---")) return;
                     String[] text = msg.substring(3).split("\\|");
-                    Host host = new Host(text[1], address, Strings.parseInt(text[0]));
+                    Host host = new Host(text[1], address, text[2], Strings.parseInt(text[3]), Strings.parseInt(text[0]));
                     valid.accept(host);
                     accepted[0] = true;
                     socket.close();

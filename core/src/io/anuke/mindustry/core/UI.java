@@ -45,6 +45,8 @@ public class UI extends SceneModule{
 	public ControlsDialog controls;
 	public MapEditorDialog editor;
 	public LanguageDialog language;
+	public BansDialog bans;
+	public AdminsDialog admins;
 
 	public final MenuFragment menufrag = new MenuFragment();
     public final ToolFragment toolfrag = new ToolFragment();
@@ -150,6 +152,8 @@ public class UI extends SceneModule{
 		paused = new PausedDialog();
 		about = new AboutDialog();
 		host = new HostDialog();
+		bans = new BansDialog();
+		admins = new AdminsDialog();
 		
 		build.begin(scene);
 

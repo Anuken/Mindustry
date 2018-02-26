@@ -35,7 +35,7 @@ public class KryoClient implements ClientProvider{
         handler = new ClientDiscoveryHandler() {
             @Override
             public DatagramPacket onRequestNewDatagramPacket() {
-                return new DatagramPacket(new byte[32], 32);
+                return new DatagramPacket(new byte[128], 128);
             }
 
             @Override

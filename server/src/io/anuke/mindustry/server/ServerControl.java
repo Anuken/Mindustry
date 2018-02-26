@@ -38,7 +38,12 @@ public class ServerControl extends Module {
     private ShuffleMode mode;
 
     public ServerControl(){
-        Settings.defaults("shufflemode", "normal");
+        Settings.defaultList(
+            "shufflemode", "normal",
+            "bans", "",
+            "admins", ""
+        );
+
         mode = ShuffleMode.valueOf(Settings.getString("shufflemode"));
 
         Effects.setScreenShakeProvider((a, b) -> {});
@@ -184,6 +189,21 @@ public class ServerControl extends Module {
             }
         });
 
+        handler.register("players", "Display player info.", arg -> {
+            if(state.is(State.menu)){
+                info("&lyServer is closed.");
+            }else{
+                if(playerGroup.size() > 0) {
+                    info("&lyPlayers: {0}", playerGroup.size());
+                    for (Player p : playerGroup.all()) {
+                        print("   &y{0} / Connection {1} / IP: {2}", p.name, p.clientid, Net.getConnection(p.clientid).address);
+                    }
+                }else{
+                    info("&lyNo players connected.");
+                }
+            }
+        });
+
         handler.register("say", "<message...>", "Send a message to all players.", arg -> {
             if(!state.is(State.playing)) {
                 err("Not hosting. Host a game first.");
@@ -237,11 +257,6 @@ public class ServerControl extends Module {
                 return;
             }
 
-            if(playerGroup.size() == 0){
-                err("But this server is empty. A barren wasteland.");
-                return;
-            }
-
             Player target = null;
 
             for(Player player : playerGroup.all()){
@@ -256,6 +271,130 @@ public class ServerControl extends Module {
                 info("It is done.");
             }else{
                 info("Nobody with that name could be found...");
+            }
+        });
+
+        handler.register("ban", "<username>", "Ban a person by name.", arg -> {
+            if(!state.is(State.playing)) {
+                err("Can't ban people by name with no players.");
+                return;
+            }
+
+            Player target = null;
+
+            for(Player player : playerGroup.all()){
+                if(player.name.equalsIgnoreCase(arg[0])){
+                    target = player;
+                    break;
+                }
+            }
+
+            if(target != null){
+                String ip = Net.getConnection(player.clientid).address;
+                netServer.admins.banPlayer(ip);
+                Net.kickConnection(target.clientid, KickReason.banned);
+                info("Banned player by IP: {0}", ip);
+            }else{
+                info("Nobody with that name could be found.");
+            }
+        });
+
+        handler.register("bans", "List all banned IPs.", arg -> {
+            Array<String> bans = netServer.admins.getBanned();
+
+            if(bans.size == 0){
+                Log.info("No banned players have been found.");
+            }else{
+                Log.info("&lyBanned players:");
+                for(String string : bans){
+                    Log.info(" &luy {0} / Last known name: '{1}'", string, netServer.admins.getLastName(string));
+                }
+            }
+        });
+
+        handler.register("banip", "<ip>", "Ban a person by IP.", arg -> {
+            if(netServer.admins.banPlayer(arg[0])) {
+                info("Banned player by IP: {0}.", arg[0]);
+
+                for(Player player : playerGroup.all()){
+                    if(Net.getConnection(player.clientid).address.equals(arg[0])){
+                        Net.kickConnection(player.clientid, KickReason.banned);
+                        break;
+                    }
+                }
+            }else{
+                err("That IP is already banned!");
+            }
+        });
+
+        handler.register("unbanip", "<ip>", "Unban a person by IP.", arg -> {
+            if(netServer.admins.unbanPlayer(arg[0])) {
+                info("Unbanned player by IP: {0}.", arg[0]);
+            }else{
+                err("That IP is not banned!");
+            }
+        });
+
+        //assadsad
+
+        handler.register("admin", "<username>", "Make a user admin", arg -> {
+            if(!state.is(State.playing)) {
+                err("Open the server first.");
+                return;
+            }
+
+            Player target = null;
+
+            for(Player player : playerGroup.all()){
+                if(player.name.equalsIgnoreCase(arg[0])){
+                    target = player;
+                    break;
+                }
+            }
+
+            if(target != null){
+                String ip = Net.getConnection(player.clientid).address;
+                netServer.admins.adminPlayer(ip);
+                info("Admin-ed player by IP: {0} / {1}", ip, arg[0]);
+            }else{
+                info("Nobody with that name could be found.");
+            }
+        });
+
+        handler.register("unadmin", "<username>", "Removes admin status from a player", arg -> {
+            if(!state.is(State.playing)) {
+                err("Open the server first.");
+                return;
+            }
+
+            Player target = null;
+
+            for(Player player : playerGroup.all()){
+                if(player.name.equalsIgnoreCase(arg[0])){
+                    target = player;
+                    break;
+                }
+            }
+
+            if(target != null){
+                String ip = Net.getConnection(player.clientid).address;
+                netServer.admins.unAdminPlayer(ip);
+                info("Un-admin-ed player by IP: {0} / {1}", ip, arg[0]);
+            }else{
+                info("Nobody with that name could be found.");
+            }
+        });
+
+        handler.register("admins", "List all banned IPs.", arg -> {
+            Array<String> admins = netServer.admins.getAdmins();
+
+            if(admins.size == 0){
+                Log.info("No admins have been found.");
+            }else{
+                Log.info("&lyAdmins:");
+                for(String string : admins){
+                    Log.info(" &luy {0} / Name: '{1}'", string, netServer.admins.getLastName(string));
+                }
             }
         });
 

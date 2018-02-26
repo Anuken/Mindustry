@@ -13,7 +13,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.Entity;
 
 import static io.anuke.mindustry.Vars.netCommon;
-import static io.anuke.mindustry.Vars.ui;
 
 public class NetEvents {
 
@@ -99,8 +98,6 @@ public class NetEvents {
         packet.name = Vars.player.name;
         packet.id = Vars.player.id;
         Net.send(packet, SendMode.tcp);
-
-        ui.chatfrag.addMessage(packet.text, netCommon.colorizeName(Vars.player.id, Vars.player.name));
     }
 
     public static void handleShoot(Weapon weapon, float x, float y, float angle){
