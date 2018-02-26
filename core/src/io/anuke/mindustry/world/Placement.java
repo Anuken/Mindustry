@@ -27,14 +27,7 @@ public class Placement {
         if(tile == null) return;
 
         Block block = tile.isLinked() ? tile.getLinked().block() : tile.block();
-        Recipe result = null;
-
-        for(Recipe recipe : Recipes.all()){
-            if(recipe.result == block){
-                result = recipe;
-                break;
-            }
-        }
+        Recipe result = Recipes.getByResult(block);
 
         if(result != null){
             for(ItemStack stack : result.requirements){
@@ -98,6 +91,12 @@ public class Placement {
             if(Vector2.dst(x * tilesize, y * tilesize, spawn.start.worldx(), spawn.start.worldy()) < enemyspawnspace){
                 return false;
             }
+        }
+
+        Recipe recipe = Recipes.getByResult(type);
+
+        if(recipe == null || !state.inventory.hasItems(recipe.requirements)){
+            return false;
         }
 
         rect.setSize(type.width * tilesize, type.height * tilesize);

@@ -170,6 +170,11 @@ public class NetClient extends Module {
 
         Net.handleClient(PlacePacket.class, (packet) -> {
             Placement.placeBlock(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false);
+
+            if(packet.playerid == player.id){
+                Tile tile = world.tile(packet.x, packet.y);
+                if(tile != null) Block.getByID(packet.block).placed(tile);
+            }
         });
 
         Net.handleClient(BreakPacket.class, (packet) -> {

@@ -115,10 +115,11 @@ public abstract class InputHandler extends InputAdapter{
 	}
 	
 	public void placeBlock(int x, int y, Block result, int rotation, boolean effects, boolean sound){
-		if(!Net.client()) Placement.placeBlock(x, y, result, rotation, effects, sound);
-
-		Tile tile = world.tile(x, y);
-		if(tile != null) result.placed(tile);
+		if(!Net.client()){
+			Placement.placeBlock(x, y, result, rotation, effects, sound);
+			Tile tile = world.tile(x, y);
+			if(tile != null) result.placed(tile);
+		}
 
 		if(Net.active()){
 			NetEvents.handlePlace(x, y, result, rotation);

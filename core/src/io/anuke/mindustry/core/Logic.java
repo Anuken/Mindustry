@@ -121,7 +121,7 @@ public class Logic extends Module {
 
             if(world.getCore() != null && world.getCore().block() != ProductionBlocks.core && !state.gameOver){
                 state.gameOver = true;
-                NetEvents.handleGameOver();
+                if(Net.server()) NetEvents.handleGameOver();
                 Events.fire(GameOverEvent.class);
             }
 
