@@ -504,14 +504,14 @@ public class ServerControl extends Module {
                 Log.info("&lcTrace info for player '{0}':", target.name);
                 Log.info("  &lyEntity ID: {0}", info. playerid);
                 Log.info("  &lyIP: {0}", info.ip);
-                Log.info("  &lymodded client: {0}", info.modclient);
+                Log.info("  &lycustom client: {0}", info.modclient);
                 Log.info("");
                 Log.info("  &lytotal blocks broken: {0}", info.totalBlocksBroken);
                 Log.info("  &lystructure blocks broken: {0}", info.structureBlocksBroken);
-                Log.info("  &lylast block broken: {0}", info.lastBlockBroken);
+                Log.info("  &lylast block broken: {0}", info.lastBlockBroken.formalName);
                 Log.info("");
                 Log.info("  &lytotal blocks placed: {0}", info.totalBlocksPlaced);
-                Log.info("  &lylast block placed: {0}", info.lastBlockPlaced);
+                Log.info("  &lylast block placed: {0}", info.lastBlockPlaced.formalName);
             }else{
                 info("Nobody with that name could be found.");
             }

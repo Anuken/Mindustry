@@ -35,7 +35,7 @@ public class TraceDialog extends FloatingDialog {
         table.row();
         table.add(Bundles.format("text.trace.structureblocksbroken", info.structureBlocksBroken));
         table.row();
-        table.add(Bundles.format("text.trace.lastblockbroken", info.lastBlockBroken));
+        table.add(Bundles.format("text.trace.lastblockbroken", info.lastBlockBroken.formalName));
         table.row();
 
         table.add().pad(5);
@@ -43,7 +43,7 @@ public class TraceDialog extends FloatingDialog {
 
         table.add(Bundles.format("text.trace.totalblocksplaced", info.totalBlocksPlaced));
         table.row();
-        table.add(Bundles.format("text.trace.lastblockplaced", info.lastBlockPlaced));
+        table.add(Bundles.format("text.trace.lastblockplaced", info.lastBlockPlaced.formalName));
         table.row();
 
         content().add(table);

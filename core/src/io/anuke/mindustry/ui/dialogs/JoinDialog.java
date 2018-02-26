@@ -56,7 +56,6 @@ public class JoinDialog extends FloatingDialog {
                 setupRemote();
                 refreshRemote();
             }else{
-                //renaming.port = Strings.parseInt(Settings.getString("port"));
                 renaming.ip = Settings.getString("ip");
                 saveServers();
                 setupRemote();
@@ -179,7 +178,7 @@ public class JoinDialog extends FloatingDialog {
                 Vars.player.name = text;
                 Settings.put("name", text);
                 Settings.save();
-            }).grow().pad(8).get().setMaxLength(48);
+            }).grow().pad(8).get().setMaxLength(40);
 
             ImageButton button = t.addImageButton("white", 40, () -> {
                 new ColorPickDialog().show(color -> {

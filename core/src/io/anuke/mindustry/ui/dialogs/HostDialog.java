@@ -14,7 +14,6 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.player;
 import static io.anuke.mindustry.Vars.ui;
 
-//TODO add port specification
 public class HostDialog extends FloatingDialog{
     float w = 300;
 
@@ -31,7 +30,7 @@ public class HostDialog extends FloatingDialog{
                 Settings.put("name", text);
                 Settings.save();
                 ui.listfrag.rebuild();
-            }).grow().pad(8).get().setMaxLength(48);
+            }).grow().pad(8).get().setMaxLength(40);
 
             ImageButton button = t.addImageButton("white", 40, () -> {
                 new ColorPickDialog().show(color -> {
