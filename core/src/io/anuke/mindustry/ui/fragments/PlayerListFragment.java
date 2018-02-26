@@ -117,7 +117,7 @@ public class PlayerListFragment implements Fragment{
 
             button.addImage("icon-admin").size(14*2).visible(() -> player.isAdmin && !(!player.isLocal && Net.server())).padRight(5);
 
-            if((Net.server() || Vars.player.isAdmin) && !player.isLocal && !player.isAdmin){
+            if((Net.server() || Vars.player.isAdmin) && !player.isLocal && (!player.isAdmin || Net.server())){
                 button.add().growY();
 
                 float bs = (h + 14)/2f;
@@ -163,8 +163,8 @@ public class PlayerListFragment implements Fragment{
                     }).update(b -> b.setChecked(connection != null && netServer.admins.isAdmin(connection.address)))
                             .disabled(Net.client());
 
-                    //TODO unused?
-                    t.addImageButton("icon-cancel", 14*2, () -> {});
+                    //TODO trace info for player
+                    t.addImageButton("icon-zoom-small", 14*2, () -> NetEvents.handleTraceRequest(player));
 
                 }).padRight(12).padTop(-5).padLeft(0).padBottom(-10).size(bs + 10f, bs);
 

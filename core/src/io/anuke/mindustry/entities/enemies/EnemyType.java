@@ -85,7 +85,8 @@ public class EnemyType {
 
         if(isCalculating(enemy)){
             Draw.color(Color.SKY);
-            Lines.polySeg(20, 0, 5, enemy.x, enemy.y, 11f, Timers.time() * 2f + enemy.id*52153f);
+            Lines.polySeg(20, 0, 4, enemy.x, enemy.y, 11f, Timers.time() * 2f + enemy.id*52f);
+            Lines.polySeg(20, 0, 4, enemy.x, enemy.y, 11f, Timers.time() * 2f + enemy.id*52f + 180f);
             Draw.color();
         }
 

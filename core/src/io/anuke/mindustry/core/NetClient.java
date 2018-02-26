@@ -162,9 +162,6 @@ public class NetClient extends Module {
             state.wavetime = packet.countdown;
             state.wave = packet.wave;
 
-            //removed: messing with time isn't necessary anymore
-            //Timers.resetTime(packet.time + (float) (TimeUtils.timeSinceMillis(packet.timestamp) / 1000.0 * 60.0));
-
             ui.hudfrag.updateItems();
         });
 
@@ -342,6 +339,11 @@ public class NetClient extends Module {
             Player player = playerGroup.getByID(packet.id);
             player.isAdmin = packet.admin;
             ui.listfrag.rebuild();
+        });
+
+        Net.handleClient(TracePacket.class, packet -> {
+            Player player = playerGroup.getByID(packet.info.playerid);
+            ui.traces.show(player, packet.info);
         });
     }
 

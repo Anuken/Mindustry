@@ -13,7 +13,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.Entity;
 
-import static io.anuke.mindustry.Vars.netCommon;
+import static io.anuke.mindustry.Vars.*;
 
 public class NetEvents {
 
@@ -164,5 +164,13 @@ public class NetEvents {
         packet.id = target.id;
         packet.action = action;
         Net.send(packet, SendMode.tcp);
+    }
+
+    public static void handleTraceRequest(Player target){
+        if(Net.client()) {
+            handleAdministerRequest(target, AdminAction.trace);
+        }else{
+            ui.traces.show(target, netServer.admins.getTrace(Net.getConnection(target.clientid).address));
+        }
     }
 }

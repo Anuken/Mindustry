@@ -64,17 +64,17 @@ public class NetServer extends Module{
             if(Net.getConnection(id) == null ||
                     admins.isBanned(Net.getConnection(id).address)) return;
 
-            admins.setKnownName(Net.getConnection(id).address, packet.name);
+            String ip = Net.getConnection(id).address;
 
-            if(packet.version != Version.build && Version.build != -1){
-                if(packet.version == -1){
-                    admins.banPlayer(Net.getConnection(id).address);
-                    Net.kickConnection(id, KickReason.banned);
-                }else {
-                    Net.kickConnection(id, packet.version > Version.build ? KickReason.serverOutdated : KickReason.clientOutdated);
-                }
+            admins.setKnownName(ip, packet.name);
 
+            if(packet.version != Version.build && Version.build != -1 && packet.version != -1){
+                Net.kickConnection(id, packet.version > Version.build ? KickReason.serverOutdated : KickReason.clientOutdated);
                 return;
+            }
+
+            if(packet.version == -1){
+                admins.getTrace(ip).modclient = true;
             }
 
             Log.info("Sending data to player '{0}' / {1}", packet.name, id);
@@ -89,6 +89,8 @@ public class NetServer extends Module{
             player.setNet(player.x, player.y);
             player.color.set(packet.color);
             connections.put(id, player);
+
+            admins.getTrace(ip).playerid = player.id;
 
             if(world.getMap().custom){
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -164,15 +166,20 @@ public class NetServer extends Module{
         Net.handleServer(PlacePacket.class, (id, packet) -> {
             packet.playerid = connections.get(id).id;
 
-            if(!Placement.validPlace(packet.x, packet.y, Block.getByID(packet.block))) return;
+            Block block = Block.getByID(packet.block);
 
-            Recipe recipe = Recipes.getByResult(Block.getByID(packet.block));
+            if(!Placement.validPlace(packet.x, packet.y, block)) return;
+
+            Recipe recipe = Recipes.getByResult(block);
 
             if(recipe == null) return;
 
             state.inventory.removeItems(recipe.requirements);
 
-            Placement.placeBlock(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false);
+            Placement.placeBlock(packet.x, packet.y, block, packet.rotation, true, false);
+
+            admins.getTrace(Net.getConnection(id).address).lastBlockPlaced = block;
+            admins.getTrace(Net.getConnection(id).address).totalBlocksPlaced ++;
 
             Net.send(packet, SendMode.tcp);
         });
@@ -182,7 +189,14 @@ public class NetServer extends Module{
 
             if(!Placement.validBreak(packet.x, packet.y)) return;
 
-            Placement.breakBlock(packet.x, packet.y, true, false);
+            Block block = Placement.breakBlock(packet.x, packet.y, true, false);
+
+            if(block != null) {
+                admins.getTrace(Net.getConnection(id).address).lastBlockBroken = block;
+                admins.getTrace(Net.getConnection(id).address).totalBlocksBroken++;
+                if (block.update || block.destructible)
+                    admins.getTrace(Net.getConnection(id).address).structureBlocksBroken++;
+            }
 
             Net.send(packet, SendMode.tcp);
         });
@@ -252,18 +266,25 @@ public class NetServer extends Module{
 
             Player other = playerGroup.getByID(packet.id);
 
-            if(other == null){
-                Log.err("{0} attempted to perform admin action on nonexistant player.", player.name);
+            if(other == null || other.isAdmin){
+                Log.err("{0} attempted to perform admin action on nonexistant or admin player.", player.name);
                 return;
             }
 
+            String ip = Net.getConnection(other.clientid).address;
+
             if(packet.action == AdminAction.ban){
-                admins.banPlayer(Net.getConnection(other.clientid).address);
+                admins.banPlayer(ip);
                 Net.kickConnection(other.clientid, KickReason.banned);
                 Log.info("&lc{0} has banned {1}.", player.name, other.name);
             }else if(packet.action == AdminAction.kick){
                 Net.kickConnection(other.clientid, KickReason.kick);
                 Log.info("&lc{0} has kicked {1}.", player.name, other.name);
+            }else if(packet.action == AdminAction.trace){
+                TracePacket trace = new TracePacket();
+                trace.info = admins.getTrace(ip);
+                Net.sendTo(other.clientid, trace, SendMode.tcp);
+                Log.info("&lc{0} has requested trace info of {1}.", player.name, other.name);
             }
         });
     }
@@ -287,6 +308,7 @@ public class NetServer extends Module{
 
     public void reset(){
         weapons.clear();
+        admins.clearTraces();
     }
 
     void sync(){

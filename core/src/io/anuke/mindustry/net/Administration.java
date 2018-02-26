@@ -10,6 +10,7 @@ public class Administration {
     private Array<String> bannedIPS = new Array<>();
     private Array<String> admins = new Array<>();
     private ObjectMap<String, String> known = new ObjectMap<>();
+    private ObjectMap<String, TraceInfo> traces = new ObjectMap<>();
 
     public Administration(){
         Settings.defaultList(
@@ -19,6 +20,16 @@ public class Administration {
         );
 
         load();
+    }
+
+    public TraceInfo getTrace(String ip){
+        if(!traces.containsKey(ip)) traces.put(ip, new TraceInfo(ip));
+
+        return traces.get(ip);
+    }
+
+    public void clearTraces(){
+        traces.clear();
     }
 
     /**Sets last known name for an IP.*/

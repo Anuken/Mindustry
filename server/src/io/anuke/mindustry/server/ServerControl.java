@@ -13,6 +13,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.net.Packets.ChatPacket;
 import io.anuke.mindustry.net.Packets.KickReason;
+import io.anuke.mindustry.net.TraceInfo;
 import io.anuke.mindustry.ui.fragments.DebugFragment;
 import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.Tile;
@@ -335,8 +336,6 @@ public class ServerControl extends Module {
             }
         });
 
-        //assadsad
-
         handler.register("admin", "<username>", "Make a user admin", arg -> {
             if(!state.is(State.playing)) {
                 err("Open the server first.");
@@ -458,7 +457,7 @@ public class ServerControl extends Module {
             info(DebugFragment.debugInfo());
         });
 
-        handler.register("trace", "<x> <y>", "Prints debug info about a block", arg -> {
+        handler.register("traceblock", "<x> <y>", "Prints debug info about a block", arg -> {
             try{
                 int x = Integer.parseInt(arg[0]);
                 int y = Integer.parseInt(arg[1]);
@@ -482,6 +481,39 @@ public class ServerControl extends Module {
                 }
             }catch (NumberFormatException e){
                 Log.err("Invalid coordinates passed.");
+            }
+        });
+
+        handler.register("trace", "<username>", "Trace a player's actions", arg -> {
+            if(!state.is(State.playing)) {
+                err("Open the server first.");
+                return;
+            }
+
+            Player target = null;
+
+            for(Player player : playerGroup.all()){
+                if(player.name.equalsIgnoreCase(arg[0])){
+                    target = player;
+                    break;
+                }
+            }
+
+            if(target != null){
+                TraceInfo info = netServer.admins.getTrace(Net.getConnection(target.clientid).address);
+                Log.info("&lcTrace info for player '{0}':", target.name);
+                Log.info("  &lyEntity ID: {0}", info. playerid);
+                Log.info("  &lyIP: {0}", info.ip);
+                Log.info("  &lymodded client: {0}", info.modclient);
+                Log.info("");
+                Log.info("  &lytotal blocks broken: {0}", info.totalBlocksBroken);
+                Log.info("  &lystructure blocks broken: {0}", info.structureBlocksBroken);
+                Log.info("  &lylast block broken: {0}", info.lastBlockBroken);
+                Log.info("");
+                Log.info("  &lytotal blocks placed: {0}", info.totalBlocksPlaced);
+                Log.info("  &lylast block placed: {0}", info.lastBlockPlaced);
+            }else{
+                info("Nobody with that name could be found.");
             }
         });
     }

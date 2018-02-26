@@ -8,6 +8,7 @@ import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packet.UnimportantPacket;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 
@@ -612,6 +613,43 @@ public class Packets {
     }
 
     public enum AdminAction{
-        kick, ban
+        kick, ban, trace
+    }
+
+    public static class TracePacket implements Packet{
+        public TraceInfo info;
+
+        @Override
+        public void write(ByteBuffer buffer) {
+            buffer.putInt(info.playerid);
+            buffer.putShort((short)info.ip.getBytes().length);
+            buffer.put(info.ip.getBytes());
+            buffer.put(info.modclient ? (byte)1 : 0);
+
+            buffer.putInt(info.totalBlocksBroken);
+            buffer.putInt(info.structureBlocksBroken);
+            buffer.putInt(info.lastBlockBroken.id);
+
+            buffer.putInt(info.totalBlocksPlaced);
+            buffer.putInt(info.lastBlockPlaced.id);
+        }
+
+        @Override
+        public void read(ByteBuffer buffer) {
+            int id = buffer.getInt();
+            short iplen = buffer.getShort();
+            byte[] ipb = new byte[iplen];
+            buffer.get(ipb);
+
+            info = new TraceInfo(new String(ipb));
+
+            info.playerid = id;
+            info.modclient = buffer.get() == 1;
+            info.totalBlocksBroken = buffer.getInt();
+            info.structureBlocksBroken = buffer.getInt();
+            info.lastBlockBroken = Block.getByID(buffer.getInt());
+            info.totalBlocksPlaced = buffer.getInt();
+            info.lastBlockPlaced = Block.getByID(buffer.getInt());
+        }
     }
 }

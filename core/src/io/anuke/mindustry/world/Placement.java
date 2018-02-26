@@ -21,10 +21,11 @@ import static io.anuke.mindustry.Vars.*;
 public class Placement {
     private static final Rectangle rect = new Rectangle();
 
-    public static void breakBlock(int x, int y, boolean effect, boolean sound){
+    /**Returns block type that was broken, or null if unsuccesful.*/
+    public static Block breakBlock(int x, int y, boolean effect, boolean sound){
         Tile tile = world.tile(x, y);
 
-        if(tile == null) return;
+        if(tile == null) return null;
 
         Block block = tile.isLinked() ? tile.getLinked().block() : tile.block();
         Recipe result = Recipes.getByResult(block);
@@ -53,6 +54,8 @@ public class Placement {
                 if(effect) Effects.effect(Fx.breakBlock, toremove.worldx(), toremove.worldy());
             }
         }
+
+        return block;
     }
 
     public static void placeBlock(int x, int y, Block result, int rotation, boolean effects, boolean sound){

@@ -47,6 +47,7 @@ public class UI extends SceneModule{
 	public LanguageDialog language;
 	public BansDialog bans;
 	public AdminsDialog admins;
+	public TraceDialog traces;
 
 	public final MenuFragment menufrag = new MenuFragment();
     public final ToolFragment toolfrag = new ToolFragment();
@@ -154,6 +155,7 @@ public class UI extends SceneModule{
 		host = new HostDialog();
 		bans = new BansDialog();
 		admins = new AdminsDialog();
+		traces = new TraceDialog();
 		
 		build.begin(scene);
 

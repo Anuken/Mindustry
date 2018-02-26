@@ -56,4 +56,9 @@ public class TargetType extends EnemyType {
 			new Enemy(EnemyTypes.target).set(enemy.x, enemy.y).add();
 		});
 	}
+
+	@Override
+	public boolean isCalculating(Enemy enemy){
+		return false;
+	}
 }
