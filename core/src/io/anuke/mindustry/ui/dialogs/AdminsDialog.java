@@ -1,10 +1,13 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.NetConnection;
+import io.anuke.mindustry.net.NetEvents;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Table;
 
-import static io.anuke.mindustry.Vars.netServer;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 
 public class AdminsDialog extends FloatingDialog {
 
@@ -40,6 +43,13 @@ public class AdminsDialog extends FloatingDialog {
             res.addImageButton("icon-cancel", 14*3, () -> {
                 ui.showConfirm("$text.confirm", "$text.confirmunadmin", () -> {
                     netServer.admins.unAdminPlayer(ip);
+                    for(Player player : playerGroup.all()){
+                        NetConnection c = Net.getConnection(player.clientid);
+                        if(c != null){
+                            NetEvents.handleAdminSet(player, false);
+                            break;
+                        }
+                    }
                     setup();
                 });
             }).size(h).pad(-14f);

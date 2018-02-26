@@ -1,10 +1,12 @@
 package io.anuke.mindustry.ui.fragments;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.NetEvents;
+import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.ucore.core.Inputs;
@@ -86,7 +88,7 @@ public class PlayerListFragment implements Fragment{
         for(Player player : playerGroup.all()){
             NetConnection connection = Net.getConnection(player.clientid);
 
-            if(connection == null && !player.isLocal) continue;
+            if(connection == null && Net.server() && !player.isLocal) continue;
 
             Table button = new Table("button");
             button.left();
@@ -113,7 +115,9 @@ public class PlayerListFragment implements Fragment{
             button.labelWrap("[#" + player.getColor().toString().toUpperCase() + "]" + player.name).width(170f).pad(10);
             button.add().grow();
 
-            if(Net.server() && !player.isLocal){
+            button.addImage("icon-admin").size(14*2).visible(() -> player.isAdmin && !(!player.isLocal && Net.server())).padRight(5);
+
+            if((Net.server() || Vars.player.isAdmin) && !player.isLocal && !player.isAdmin){
                 button.add().growY();
 
                 float bs = (h + 14)/2f;
@@ -123,30 +127,45 @@ public class PlayerListFragment implements Fragment{
 
                     t.addImageButton("icon-ban", 14*2, () -> {
                         ui.showConfirm("$text.confirm", "$text.confirmban", () -> {
-                            netServer.admins.banPlayer(connection.address);
-                            Net.kickConnection(player.clientid, KickReason.banned);
+                            if(Net.server()) {
+                                netServer.admins.banPlayer(connection.address);
+                                Net.kickConnection(player.clientid, KickReason.banned);
+                            }else{
+                                NetEvents.handleAdministerRequest(player, AdminAction.ban);
+                            }
                         });
                     }).padBottom(-5.1f);
 
-                    t.addImageButton("icon-cancel", 14*2, () -> Net.kickConnection(player.clientid, KickReason.kick)).padBottom(-5.1f);
+                    t.addImageButton("icon-cancel", 14*2, () -> {
+                        if(Net.server()) {
+                            Net.kickConnection(player.clientid, KickReason.kick);
+                        }else{
+                            NetEvents.handleAdministerRequest(player, AdminAction.kick);
+                        }
+                    }).padBottom(-5.1f);
 
                     t.row();
 
                     t.addImageButton("icon-admin", "toggle", 14*2, () -> {
+                        if(Net.client()) return;
+
                         if(netServer.admins.isAdmin(connection.address)){
                             ui.showConfirm("$text.confirm", "$text.confirmunadmin", () -> {
                                 netServer.admins.unAdminPlayer(connection.address);
-                                //TODO send aproppriate packets.
+                                NetEvents.handleAdminSet(player, false);
                             });
                         }else{
                             ui.showConfirm("$text.confirm", "$text.confirmadmin", () -> {
                                 netServer.admins.adminPlayer(connection.address);
-                                //TODO send aproppriate packets.
+                                NetEvents.handleAdminSet(player, true);
                             });
                         }
-                    }).update(b -> b.setChecked(netServer.admins.isAdmin(connection.address)));
+                    }).update(b -> b.setChecked(connection != null && netServer.admins.isAdmin(connection.address)))
+                            .disabled(Net.client());
 
-                    t.addImageButton("icon-cancel", 14*2, () -> Net.kickConnection(player.clientid, KickReason.kick));
+                    //TODO unused?
+                    t.addImageButton("icon-cancel", 14*2, () -> {});
+
                 }).padRight(12).padTop(-5).padLeft(0).padBottom(-10).size(bs + 10f, bs);
 
 

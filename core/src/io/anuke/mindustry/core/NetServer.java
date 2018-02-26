@@ -80,6 +80,7 @@ public class NetServer extends Module{
             Log.info("Sending data to player '{0}' / {1}", packet.name, id);
 
             Player player = new Player();
+            player.isAdmin = admins.isAdmin(Net.getConnection(id).address);
             player.clientid = id;
             player.name = packet.name;
             player.isAndroid = packet.android;
@@ -109,7 +110,7 @@ public class NetServer extends Module{
             Player player = connections.get(id);
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            NetworkIO.writeWorld(player.id, weapons.get(player.name, new ByteArray()), stream);
+            NetworkIO.writeWorld(player, weapons.get(player.name, new ByteArray()), stream);
             WorldData data = new WorldData();
             data.stream = new ByteArrayInputStream(stream.toByteArray());
             Net.sendStream(id, data);
@@ -238,6 +239,32 @@ public class NetServer extends Module{
         Net.handleServer(PlayerDeathPacket.class, (id, packet) -> {
             packet.id = connections.get(id).id;
             Net.sendExcept(id, packet, SendMode.tcp);
+        });
+
+        Net.handleServer(AdministerRequestPacket.class, (id, packet) -> {
+            Player player = connections.get(id);
+
+            if(!player.isAdmin){
+                Log.err("ACCESS DENIED: Player {0} / {1} attempted to perform admin action without proper security access.",
+                        player.name, Net.getConnection(player.clientid).address);
+                return;
+            }
+
+            Player other = playerGroup.getByID(packet.id);
+
+            if(other == null){
+                Log.err("{0} attempted to perform admin action on nonexistant player.", player.name);
+                return;
+            }
+
+            if(packet.action == AdminAction.ban){
+                admins.banPlayer(Net.getConnection(other.clientid).address);
+                Net.kickConnection(other.clientid, KickReason.banned);
+                Log.info("&lc{0} has banned {1}.", player.name, other.name);
+            }else if(packet.action == AdminAction.kick){
+                Net.kickConnection(other.clientid, KickReason.kick);
+                Log.info("&lc{0} has kicked {1}.", player.name, other.name);
+            }
         });
     }
 

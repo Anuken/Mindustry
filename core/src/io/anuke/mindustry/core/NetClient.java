@@ -51,6 +51,7 @@ public class NetClient extends Module {
     public NetClient(){
 
         Net.handleClient(Connect.class, packet -> {
+            player.isAdmin = false;
 
             Net.setClientLoaded(false);
             recieved.clear();
@@ -330,6 +331,12 @@ public class NetClient extends Module {
         Net.handleClient(NetErrorPacket.class, packet -> {
             ui.showError(packet.message);
             disconnectQuietly();
+        });
+
+        Net.handleClient(PlayerAdminPacket.class, packet -> {
+            Player player = playerGroup.getByID(packet.id);
+            player.isAdmin = packet.admin;
+            ui.listfrag.rebuild();
         });
     }
 

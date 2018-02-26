@@ -355,6 +355,7 @@ public class ServerControl extends Module {
             if(target != null){
                 String ip = Net.getConnection(player.clientid).address;
                 netServer.admins.adminPlayer(ip);
+                NetEvents.handleAdminSet(target, true);
                 info("Admin-ed player by IP: {0} / {1}", ip, arg[0]);
             }else{
                 info("Nobody with that name could be found.");
@@ -379,6 +380,7 @@ public class ServerControl extends Module {
             if(target != null){
                 String ip = Net.getConnection(player.clientid).address;
                 netServer.admins.unAdminPlayer(ip);
+                NetEvents.handleAdminSet(target, false);
                 info("Un-admin-ed player by IP: {0} / {1}", ip, arg[0]);
             }else{
                 info("Nobody with that name could be found.");

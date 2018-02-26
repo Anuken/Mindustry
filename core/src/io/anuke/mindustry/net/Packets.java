@@ -576,4 +576,42 @@ public class Packets {
             message = new String(bytes);
         }
     }
+
+    public static class PlayerAdminPacket implements Packet{
+        public boolean admin;
+        public int id;
+
+        @Override
+        public void write(ByteBuffer buffer) {
+            buffer.put(admin ? (byte)1 : 0);
+            buffer.putInt(id);
+        }
+
+        @Override
+        public void read(ByteBuffer buffer) {
+            admin = buffer.get() == 1;
+            id = buffer.getInt();
+        }
+    }
+
+    public static class AdministerRequestPacket implements Packet{
+        public AdminAction action;
+        public int id;
+
+        @Override
+        public void write(ByteBuffer buffer) {
+            buffer.put((byte)action.ordinal());
+            buffer.putInt(id);
+        }
+
+        @Override
+        public void read(ByteBuffer buffer) {
+            action = AdminAction.values()[buffer.get()];
+            id = buffer.getInt();
+        }
+    }
+
+    public enum AdminAction{
+        kick, ban
+    }
 }

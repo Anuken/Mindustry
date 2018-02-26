@@ -2,6 +2,7 @@ package io.anuke.mindustry.net;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.net.Net.SendMode;
@@ -148,5 +149,20 @@ public class NetEvents {
         packet.position = tile.packedPosition();
         packet.itemid = (byte)item.id;
         Net.send(packet, SendMode.udp);
+    }
+
+    public static void handleAdminSet(Player player, boolean admin){
+        PlayerAdminPacket packet = new PlayerAdminPacket();
+        packet.admin = admin;
+        packet.id = player.id;
+        player.isAdmin = admin;
+        Net.send(packet, SendMode.tcp);
+    }
+
+    public static void handleAdministerRequest(Player target, AdminAction action){
+        AdministerRequestPacket packet = new AdministerRequestPacket();
+        packet.id = target.id;
+        packet.action = action;
+        Net.send(packet, SendMode.tcp);
     }
 }

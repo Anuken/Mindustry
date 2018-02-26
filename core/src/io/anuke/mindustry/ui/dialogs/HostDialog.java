@@ -50,6 +50,7 @@ public class HostDialog extends FloatingDialog{
             Timers.runTask(5f, () -> {
                 try{
                     Net.host(Vars.port);
+                    player.isAdmin = true;
                 }catch (IOException e){
                     ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
                 }
@@ -58,19 +59,4 @@ public class HostDialog extends FloatingDialog{
             });
         }).width(w).height(70f);
     }
-
-    /*
-    showTextInput("$text.hostserver", "$text.server.port", Vars.port + "", new DigitsOnlyFilter(), text -> {
-			int result = Strings.parseInt(text);
-			if(result == Integer.MIN_VALUE || result >= 65535){
-				ui.showError("$text.server.invalidport");
-			}else{
-				try{
-					Net.host(result);
-				}catch (IOException e){
-					ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
-				}
-			}
-		});
-     */
 }

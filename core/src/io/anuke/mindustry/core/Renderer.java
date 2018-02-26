@@ -264,8 +264,14 @@ public class Renderer extends RendererModule{
 				Draw.color();
 				Draw.tcolor(player.getColor());
 	            Draw.text(player.name, player.x, player.y + 8);
-	            Draw.tcolor();
-            }
+
+	            if(player.isAdmin){
+	            	Draw.color(player.getColor());
+	            	float s = 3f;
+					Draw.rect("icon-admin-small", player.x + layout.width/2f + 2 + 1, player.y + 7f, s, s);
+				}
+				Draw.reset();
+           }
         }
 		Pools.free(layout);
         Draw.tscl(fontscale);
