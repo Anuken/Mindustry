@@ -283,7 +283,7 @@ public class NetServer extends Module{
             }else if(packet.action == AdminAction.trace){
                 TracePacket trace = new TracePacket();
                 trace.info = admins.getTrace(ip);
-                Net.sendTo(other.clientid, trace, SendMode.tcp);
+                Net.sendTo(id, trace, SendMode.tcp);
                 Log.info("&lc{0} has requested trace info of {1}.", player.name, other.name);
             }
         });

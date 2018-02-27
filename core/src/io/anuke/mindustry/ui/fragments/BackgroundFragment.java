@@ -24,13 +24,14 @@ public class BackgroundFragment implements Fragment {
             Core.batch.draw(back, w/2 - back.getRegionWidth()*backscl/2 +240f, h/2 - back.getRegionHeight()*backscl/2 + 250f,
                     back.getRegionWidth()*backscl, back.getRegionHeight()*backscl);
 
-            float logoscl = (int)Unit.dp.scl(7);
+            boolean portrait = Gdx.graphics.getWidth() < Gdx.graphics.getHeight();
+            float logoscl = (int)Unit.dp.scl(7) * (portrait ? 5f/7f : 1f);
             TextureRegion logo = Core.skin.getRegion("logotext");
             float logow = logo.getRegionWidth()*logoscl;
             float logoh = logo.getRegionHeight()*logoscl;
 
             Draw.color();
-            Core.batch.draw(logo, w/2 - logow/2, h - logoh + 15, logow, logoh);
+            Core.batch.draw(logo, w/2 - logow/2, h - logoh + 15 + (portrait ? -Unit.dp.scl(30f) : 0f), logow, logoh);
         }).visible(() -> state.is(State.menu)).grow();
     }
 }

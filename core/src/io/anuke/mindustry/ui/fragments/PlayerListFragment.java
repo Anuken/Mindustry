@@ -15,6 +15,7 @@ import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.builders.button;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
+import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
@@ -160,8 +161,10 @@ public class PlayerListFragment implements Fragment{
                                 NetEvents.handleAdminSet(player, true);
                             });
                         }
-                    }).update(b -> b.setChecked(connection != null && netServer.admins.isAdmin(connection.address)))
-                            .disabled(Net.client());
+                    }).update(b ->{
+                        b.setChecked(connection != null && netServer.admins.isAdmin(connection.address));
+                        b.setDisabled(Net.client());
+                    }).get().setTouchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled);
 
                     //TODO trace info for player
                     t.addImageButton("icon-zoom-small", 14*2, () -> NetEvents.handleTraceRequest(player));
