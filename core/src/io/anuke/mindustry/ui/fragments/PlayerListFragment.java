@@ -166,7 +166,6 @@ public class PlayerListFragment implements Fragment{
                         b.setDisabled(Net.client());
                     }).get().setTouchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled);
 
-                    //TODO trace info for player
                     t.addImageButton("icon-zoom-small", 14*2, () -> NetEvents.handleTraceRequest(player));
 
                 }).padRight(12).padTop(-5).padLeft(0).padBottom(-10).size(bs + 10f, bs);
