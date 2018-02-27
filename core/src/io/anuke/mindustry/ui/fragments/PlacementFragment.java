@@ -214,6 +214,7 @@ public class PlacementFragment implements Fragment{
 		breaktable.getParent().swapActor(breaktable, next);
 
 		if(!show){
+			control.input().breakMode = PlaceMode.none;
 			breaktable.actions(Actions.translateBy(-breaktable.getWidth() - 5, 0, dur, in), Actions.call(() -> shown = false));
 		}else{
 			shown = true;
