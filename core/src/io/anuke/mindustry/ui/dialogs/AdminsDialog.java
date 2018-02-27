@@ -23,6 +23,8 @@ public class AdminsDialog extends FloatingDialog {
     private void setup(){
         content().clear();
 
+        if(gwt) return;
+
         float w = 400f, h = 80f;
 
         Table table = new Table();

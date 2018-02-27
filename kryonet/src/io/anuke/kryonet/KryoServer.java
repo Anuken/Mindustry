@@ -404,8 +404,6 @@ public class KryoServer implements ServerProvider {
 
     }
 
-
-
     class SocketServer extends WebSocketServer {
 
         public SocketServer(int port) {
@@ -415,7 +413,7 @@ public class KryoServer implements ServerProvider {
         @Override
         public void onOpen(WebSocket conn, ClientHandshake handshake) {
             Connect connect = new Connect();
-            connect.addressTCP = conn.getRemoteSocketAddress().toString();
+            connect.addressTCP = conn.getRemoteSocketAddress().getAddress().getHostAddress();
             KryoConnection kn = new KryoConnection(lastconnection ++, connect.addressTCP, conn);
 
             Log.info("&bRecieved web connection: {0} {1}", kn.id, connect.addressTCP);

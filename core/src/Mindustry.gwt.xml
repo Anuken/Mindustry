@@ -15,4 +15,5 @@
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.net.Packet" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.net.Streamable" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.BlockBar" />
+	<extend-configuration-property name="gdx.reflect.include" value="com.badlogic.gdx.utils.Predicate" />
 </module>

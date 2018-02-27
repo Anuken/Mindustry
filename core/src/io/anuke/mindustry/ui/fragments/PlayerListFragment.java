@@ -87,7 +87,7 @@ public class PlayerListFragment implements Fragment{
         float h = 74f;
 
         for(Player player : playerGroup.all()){
-            NetConnection connection = Net.getConnection(player.clientid);
+            NetConnection connection = gwt ? null : Net.getConnection(player.clientid);
 
             if(connection == null && Net.server() && !player.isLocal) continue;
 
@@ -162,7 +162,7 @@ public class PlayerListFragment implements Fragment{
                             });
                         }
                     }).update(b ->{
-                        b.setChecked(connection != null && netServer.admins.isAdmin(connection.address));
+                        b.setChecked(player.isAdmin);
                         b.setDisabled(Net.client());
                     }).get().setTouchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled);
 
