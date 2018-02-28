@@ -25,7 +25,7 @@ allprojects {
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         aiVersion = '1.8.1'
-        uCoreVersion = '1b29d6c'
+        uCoreVersion = '0a15aeb'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
