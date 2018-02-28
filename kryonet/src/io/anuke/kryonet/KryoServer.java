@@ -259,7 +259,20 @@ public class KryoServer implements ServerProvider {
     @Override
     public void sendTo(int id, Object object, SendMode mode) {
         NetConnection conn = getByID(id);
-        if(conn == null) throw new RuntimeException("Unable to find connection with ID " + id + "!");
+        if(conn == null){
+            Log.err("KRYONET CONNECTIONS:");
+            for(Connection c : server.getConnections()){
+                NetConnection k = getByKryoID(c.getID());
+                Log.err(" - Kryonet connection / ID {0} / IP {1} / NetConnection ID {2}",
+                        c.getID(), c.getRemoteAddressTCP().getHostName(), k == null ? "NOT FOUND" : k.id);
+            }
+            Log.err("NET CONNECTIONS:");
+            for(NetConnection c : connections){
+                Log.err(" - NetConnection / ID {0} / IP {1}", c.id, c.address);
+            }
+            System.exit(1); //TODO remove
+            throw new RuntimeException("Unable to find connection with ID " + id + "!");
+        }
         conn.send(object, mode);
     }
 
