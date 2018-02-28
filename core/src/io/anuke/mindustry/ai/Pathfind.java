@@ -169,8 +169,8 @@ public class Pathfind{
 
 	/**Reset and clear the paths.*/
 	public void resetPaths(){
-		for(SpawnPoint point : world.getSpawns()){
-			resetPathFor(point);
+		for(int i = 0; i < world.getSpawns().size; i ++){
+			resetPathFor(world.getSpawns().get(i));
 		}
 	}
 

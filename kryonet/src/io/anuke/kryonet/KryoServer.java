@@ -14,10 +14,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Net.ServerProvider;
 import io.anuke.mindustry.net.NetConnection;
-import io.anuke.mindustry.net.Packets.Connect;
-import io.anuke.mindustry.net.Packets.Disconnect;
-import io.anuke.mindustry.net.Packets.KickPacket;
-import io.anuke.mindustry.net.Packets.KickReason;
+import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.net.Registrator;
 import io.anuke.mindustry.net.Streamable;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
@@ -25,6 +22,7 @@ import io.anuke.mindustry.net.Streamable.StreamChunk;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Strings;
 import org.java_websocket.WebSocket;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.handshake.ClientHandshake;
@@ -66,13 +64,15 @@ public class KryoServer implements ServerProvider {
 
             @Override
             public void connected (Connection connection) {
-                KryoConnection kn = new KryoConnection(lastconnection ++, connection.getRemoteAddressTCP().toString(), connection);
+                String ip = connection.getRemoteAddressTCP().getAddress().getHostAddress();
+
+                KryoConnection kn = new KryoConnection(lastconnection ++, ip, connection);
 
                 Connect c = new Connect();
                 c.id = kn.id;
-                c.addressTCP = connection.getRemoteAddressTCP().toString();
+                c.addressTCP = ip;
 
-                Log.info("&bRecieved connection: {0} {1}", c.id, c.addressTCP);
+                Log.info("&bRecieved connection: {0} / {1}", c.id, c.addressTCP);
 
                 connections.add(kn);
                 Gdx.app.postRunnable(() ->  Net.handleServerReceived(kn.id, c));
@@ -141,12 +141,15 @@ public class KryoServer implements ServerProvider {
         if(con == null){
             Log.err("Cannot kick unknown player!");
             return;
+        }else{
+            Log.info("Kicking connection #{0} / IP: {1}. Reason: {2}", connection, con.address, reason);
         }
 
         KickPacket p = new KickPacket();
         p.reason = reason;
 
         con.send(p, SendMode.tcp);
+        Timers.runTask(2f, con::close);
     }
 
     @Override
@@ -371,9 +374,21 @@ public class KryoServer implements ServerProvider {
                         connection.sendUDP(object);
                     }
                 }catch (Exception e){
-                    e.printStackTrace();
+                    Log.err(e);
                     Log.info("Disconnecting invalid client!");
+                    try{
+                        NetErrorPacket packet = new NetErrorPacket();
+                        packet.message = Strings.parseException(e, true);
+                        Timers.runTask(5f, connection::close);
+                    }catch (Exception e2){
+                        Log.err(e2);
+                        connection.close();
+                    }
                     connection.close();
+
+                    KryoConnection k = getByKryoID(connection.getID());
+                    if(k != null) connections.remove(k);
+                    Log.info("Connection removed {0}", k);
                 }
             }
         }
@@ -398,7 +413,7 @@ public class KryoServer implements ServerProvider {
         @Override
         public void onOpen(WebSocket conn, ClientHandshake handshake) {
             Connect connect = new Connect();
-            connect.addressTCP = conn.getRemoteSocketAddress().toString();
+            connect.addressTCP = conn.getRemoteSocketAddress().getAddress().getHostAddress();
             KryoConnection kn = new KryoConnection(lastconnection ++, connect.addressTCP, conn);
 
             Log.info("&bRecieved web connection: {0} {1}", kn.id, connect.addressTCP);

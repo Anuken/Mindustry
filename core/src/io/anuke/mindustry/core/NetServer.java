@@ -7,14 +7,15 @@ import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.io.Version;
+import io.anuke.mindustry.net.Administration;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.resource.Upgrade;
-import io.anuke.mindustry.resource.UpgradeRecipes;
-import io.anuke.mindustry.resource.Weapon;
+import io.anuke.mindustry.resource.*;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Placement;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
@@ -41,6 +42,8 @@ public class NetServer extends Module{
     private final static int timerStateSync = 1;
     private final static int timerBlockSync = 2;
 
+    public final Administration admins = new Administration();
+
     /**Maps connection IDs to players.*/
     private IntMap<Player> connections = new IntMap<>();
     private ObjectMap<String, ByteArray> weapons = new ObjectMap<>();
@@ -51,18 +54,33 @@ public class NetServer extends Module{
 
         Events.on(GameOverEvent.class, () -> weapons.clear());
 
-        Net.handleServer(Connect.class, (id, connect) -> {});
+        Net.handleServer(Connect.class, (id, connect) -> {
+            if(admins.isBanned(connect.addressTCP)){
+                Net.kickConnection(id, KickReason.banned);
+            }
+        });
 
         Net.handleServer(ConnectPacket.class, (id, packet) -> {
+            if(Net.getConnection(id) == null ||
+                    admins.isBanned(Net.getConnection(id).address)) return;
 
-            if(packet.version != Version.build && packet.version != -1 && Version.build != -1){ //ignore 'custom builds' on both ends
+            String ip = Net.getConnection(id).address;
+
+            admins.setKnownName(ip, packet.name);
+
+            if(packet.version != Version.build && Version.build != -1 && packet.version != -1){
                 Net.kickConnection(id, packet.version > Version.build ? KickReason.serverOutdated : KickReason.clientOutdated);
                 return;
+            }
+
+            if(packet.version == -1){
+                admins.getTrace(ip).modclient = true;
             }
 
             Log.info("Sending data to player '{0}' / {1}", packet.name, id);
 
             Player player = new Player();
+            player.isAdmin = admins.isAdmin(Net.getConnection(id).address);
             player.clientid = id;
             player.name = packet.name;
             player.isAndroid = packet.android;
@@ -71,6 +89,8 @@ public class NetServer extends Module{
             player.setNet(player.x, player.y);
             player.color.set(packet.color);
             connections.put(id, player);
+
+            admins.getTrace(ip).playerid = player.id;
 
             if(world.getMap().custom){
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -92,7 +112,7 @@ public class NetServer extends Module{
             Player player = connections.get(id);
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            NetworkIO.writeWorld(player.id, weapons.get(player.name, new ByteArray()), stream);
+            NetworkIO.writeWorld(player, weapons.get(player.name, new ByteArray()), stream);
             WorldData data = new WorldData();
             data.stream = new ByteArrayInputStream(stream.toByteArray());
             Net.sendStream(id, data);
@@ -145,19 +165,53 @@ public class NetServer extends Module{
 
         Net.handleServer(PlacePacket.class, (id, packet) -> {
             packet.playerid = connections.get(id).id;
-            Net.sendExcept(id, packet, SendMode.tcp);
+
+            Block block = Block.getByID(packet.block);
+
+            if(!Placement.validPlace(packet.x, packet.y, block)) return;
+
+            Recipe recipe = Recipes.getByResult(block);
+
+            if(recipe == null) return;
+
+            state.inventory.removeItems(recipe.requirements);
+
+            Placement.placeBlock(packet.x, packet.y, block, packet.rotation, true, false);
+
+            admins.getTrace(Net.getConnection(id).address).lastBlockPlaced = block;
+            admins.getTrace(Net.getConnection(id).address).totalBlocksPlaced ++;
+
+            Net.send(packet, SendMode.tcp);
         });
 
         Net.handleServer(BreakPacket.class, (id, packet) -> {
             packet.playerid = connections.get(id).id;
-            Net.sendExcept(id, packet, SendMode.tcp);
+
+            if(!Placement.validBreak(packet.x, packet.y)) return;
+
+            Block block = Placement.breakBlock(packet.x, packet.y, true, false);
+
+            if(block != null) {
+                admins.getTrace(Net.getConnection(id).address).lastBlockBroken = block;
+                admins.getTrace(Net.getConnection(id).address).totalBlocksBroken++;
+                if (block.update || block.destructible)
+                    admins.getTrace(Net.getConnection(id).address).structureBlocksBroken++;
+            }
+
+            Net.send(packet, SendMode.tcp);
         });
 
         Net.handleServer(ChatPacket.class, (id, packet) -> {
+            if(!Timers.get("chatFlood" + id, 20)){
+                ChatPacket warn = new ChatPacket();
+                warn.text = "[scarlet]You are sending messages too quickly.";
+                Net.sendTo(id, warn, SendMode.tcp);
+                return;
+            }
             Player player = connections.get(id);
             packet.name = player.name;
             packet.id = player.id;
-            Net.sendExcept(player.clientid, packet, SendMode.tcp);
+            Net.send(packet, SendMode.tcp);
         });
 
         Net.handleServer(UpgradePacket.class, (id, packet) -> {
@@ -200,6 +254,39 @@ public class NetServer extends Module{
             packet.id = connections.get(id).id;
             Net.sendExcept(id, packet, SendMode.tcp);
         });
+
+        Net.handleServer(AdministerRequestPacket.class, (id, packet) -> {
+            Player player = connections.get(id);
+
+            if(!player.isAdmin){
+                Log.err("ACCESS DENIED: Player {0} / {1} attempted to perform admin action without proper security access.",
+                        player.name, Net.getConnection(player.clientid).address);
+                return;
+            }
+
+            Player other = playerGroup.getByID(packet.id);
+
+            if(other == null || other.isAdmin){
+                Log.err("{0} attempted to perform admin action on nonexistant or admin player.", player.name);
+                return;
+            }
+
+            String ip = Net.getConnection(other.clientid).address;
+
+            if(packet.action == AdminAction.ban){
+                admins.banPlayer(ip);
+                Net.kickConnection(other.clientid, KickReason.banned);
+                Log.info("&lc{0} has banned {1}.", player.name, other.name);
+            }else if(packet.action == AdminAction.kick){
+                Net.kickConnection(other.clientid, KickReason.kick);
+                Log.info("&lc{0} has kicked {1}.", player.name, other.name);
+            }else if(packet.action == AdminAction.trace){
+                TracePacket trace = new TracePacket();
+                trace.info = admins.getTrace(ip);
+                Net.sendTo(id, trace, SendMode.tcp);
+                Log.info("&lc{0} has requested trace info of {1}.", player.name, other.name);
+            }
+        });
     }
 
     public void update(){
@@ -221,6 +308,7 @@ public class NetServer extends Module{
 
     public void reset(){
         weapons.clear();
+        admins.clearTraces();
     }
 
     void sync(){

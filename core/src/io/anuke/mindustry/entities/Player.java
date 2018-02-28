@@ -34,6 +34,7 @@ public class Player extends SyncEntity{
 
 	public String name = "name";
 	public boolean isAndroid;
+	public boolean isAdmin;
 	public Color color = new Color();
 
 	public Weapon weaponLeft = Weapon.blaster;
@@ -44,7 +45,7 @@ public class Player extends SyncEntity{
 	public float stucktime = 0f;
 	public boolean dashing = false;
 
-	public int clientid;
+	public int clientid = -1;
 	public boolean isLocal = false;
 	public Timer timer = new Timer(4);
 
@@ -83,7 +84,7 @@ public class Player extends SyncEntity{
 	
 	@Override
 	public void onDeath(){
-		remove();
+		dead = true;
 		if(Net.active()){
 			NetEvents.handlePlayerDeath();
 		}
@@ -112,7 +113,7 @@ public class Player extends SyncEntity{
 	
 	@Override
 	public void drawSmooth(){
-		if((debug && (!showPlayer || !showUI)) || (isAndroid && isLocal) || (dead && !isLocal)) return;
+		if((debug && (!showPlayer || !showUI)) || (isAndroid && isLocal) || dead) return;
         boolean snap = snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate") && isLocal;
 
 		String part = isAndroid ? "ship" : "mech";
@@ -154,6 +155,8 @@ public class Player extends SyncEntity{
 			if(!isLocal) interpolate();
 			return;
 		}
+
+		if(isDead()) return;
 
 		Tile tile = world.tileWorld(x, y);
 
@@ -240,6 +243,7 @@ public class Player extends SyncEntity{
 		buffer.put(weaponLeft.id);
 		buffer.put(weaponRight.id);
 		buffer.put(isAndroid ? 1 : (byte)0);
+		buffer.put(isAdmin ? 1 : (byte)0);
 		buffer.putInt(Color.rgba8888(color));
 		buffer.putFloat(x);
 		buffer.putFloat(y);
@@ -254,6 +258,7 @@ public class Player extends SyncEntity{
 		weaponLeft = (Weapon) Upgrade.getByID(buffer.get());
 		weaponRight = (Weapon) Upgrade.getByID(buffer.get());
 		isAndroid = buffer.get() == 1;
+		isAdmin = buffer.get() == 1;
 		color.set(buffer.getInt());
 		x = buffer.getFloat();
 		y = buffer.getFloat();

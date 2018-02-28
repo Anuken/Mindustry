@@ -264,8 +264,14 @@ public class Renderer extends RendererModule{
 				Draw.color();
 				Draw.tcolor(player.getColor());
 	            Draw.text(player.name, player.x, player.y + 8);
-	            Draw.tcolor();
-            }
+
+	            if(player.isAdmin){
+	            	Draw.color(player.getColor());
+	            	float s = 3f;
+					Draw.rect("icon-admin-small", player.x + layout.width/2f + 2 + 1, player.y + 7f, s, s);
+				}
+				Draw.reset();
+           }
         }
 		Pools.free(layout);
         Draw.tscl(fontscale);
@@ -274,6 +280,7 @@ public class Renderer extends RendererModule{
 	void drawEnemyMarkers(){
 		Graphics.surface(indicatorSurface);
 		Draw.color(Color.RED);
+
 		for(Enemy enemy : enemyGroup.all()) {
 
 			if (rect.setSize(camera.viewportWidth, camera.viewportHeight).setCenter(camera.position.x, camera.position.y)
@@ -409,8 +416,10 @@ public class Renderer extends RendererModule{
 				Lines.dashCircle(spawn.start.worldx(), spawn.start.worldy(), enemyspawnspace);
 			}
 
-			Draw.color(Color.LIME);
-			Lines.poly(world.getSpawnX(), world.getSpawnY(), 4, 6f, Timers.time()*2f);
+			if(world.getCore() != null) {
+				Draw.color(Color.LIME);
+				Lines.poly(world.getSpawnX(), world.getSpawnY(), 4, 6f, Timers.time() * 2f);
+			}
 			
 			if(input.breakMode == PlaceMode.holdDelete)
 				input.breakMode.draw(tilex, tiley, 0, 0);

@@ -8,10 +8,7 @@ import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.io.Maps;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Map;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.WorldGenerator;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.DistributionBlocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
@@ -22,7 +19,8 @@ import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class World extends Module{
 	private int seed;
@@ -182,7 +180,7 @@ public class World extends Module{
 		
 		core = WorldGenerator.generate(map.pixmap, tiles, spawns);
 
-		placeBlock(core.x, core.y, ProductionBlocks.core, 0);
+		Placement.placeBlock(core.x, core.y, ProductionBlocks.core, 0, false, false);
 		
 		if(!map.name.equals("tutorial")){
 			setDefaultBlocks();
@@ -233,7 +231,7 @@ public class World extends Module{
 	public int getSeed(){
 		return seed;
 	}
-	
+
 	public void removeBlock(Tile tile){
 		if(!tile.block().isMultiblock() && !tile.isLinked()){
 			tile.setBlock(Blocks.air);
@@ -243,32 +241,6 @@ public class World extends Module{
 			for(Tile toremove : removals){
 				//note that setting a new block automatically unlinks it
 				toremove.setBlock(Blocks.air);
-			}
-		}
-	}
-
-	public void placeBlock(int x, int y, Block result, int rotation){
-		Tile tile = world.tile(x, y);
-
-		//just in case
-		if(tile == null) return;
-
-		tile.setBlock(result, rotation);
-
-		if(result.isMultiblock()){
-			int offsetx = -(result.width-1)/2;
-			int offsety = -(result.height-1)/2;
-
-			for(int dx = 0; dx < result.width; dx ++){
-				for(int dy = 0; dy < result.height; dy ++){
-					int worldx = dx + offsetx + x;
-					int worldy = dy + offsety + y;
-					if(!(worldx == x && worldy == y)){
-						Tile toplace = world.tile(worldx, worldy);
-						if(toplace != null)
-							toplace.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
-					}
-				}
 			}
 		}
 	}

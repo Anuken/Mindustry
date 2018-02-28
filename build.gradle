@@ -20,12 +20,12 @@ allprojects {
     version = 'release'
 
     ext {
-        versionNumber = '3.3'
+        versionNumber = '3.4'
         versionType = 'release'
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         aiVersion = '1.8.1'
-        uCoreVersion = '23e8c1c'
+        uCoreVersion = '0a15aeb'
 
         getVersionString = {
             String buildVersion = getBuildVersion()

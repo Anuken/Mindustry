@@ -8,6 +8,7 @@ import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packet.UnimportantPacket;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 
@@ -371,7 +372,7 @@ public class Packets {
     }
 
     public enum KickReason{
-        kick, invalidPassword, clientOutdated, serverOutdated
+        kick, invalidPassword, clientOutdated, serverOutdated, banned
     }
 
     public static class UpgradePacket implements Packet{
@@ -556,6 +557,99 @@ public class Packets {
         public void read(ByteBuffer buffer) {
             position = buffer.getInt();
             itemid = buffer.get();
+        }
+    }
+
+    public static class NetErrorPacket implements Packet{
+        public String message;
+
+        @Override
+        public void write(ByteBuffer buffer) {
+            buffer.putShort((short)message.getBytes().length);
+            buffer.put(message.getBytes());
+        }
+
+        @Override
+        public void read(ByteBuffer buffer) {
+            short length = buffer.getShort();
+            byte[] bytes = new byte[length];
+            buffer.get(bytes);
+            message = new String(bytes);
+        }
+    }
+
+    public static class PlayerAdminPacket implements Packet{
+        public boolean admin;
+        public int id;
+
+        @Override
+        public void write(ByteBuffer buffer) {
+            buffer.put(admin ? (byte)1 : 0);
+            buffer.putInt(id);
+        }
+
+        @Override
+        public void read(ByteBuffer buffer) {
+            admin = buffer.get() == 1;
+            id = buffer.getInt();
+        }
+    }
+
+    public static class AdministerRequestPacket implements Packet{
+        public AdminAction action;
+        public int id;
+
+        @Override
+        public void write(ByteBuffer buffer) {
+            buffer.put((byte)action.ordinal());
+            buffer.putInt(id);
+        }
+
+        @Override
+        public void read(ByteBuffer buffer) {
+            action = AdminAction.values()[buffer.get()];
+            id = buffer.getInt();
+        }
+    }
+
+    public enum AdminAction{
+        kick, ban, trace
+    }
+
+    public static class TracePacket implements Packet{
+        public TraceInfo info;
+
+        @Override
+        public void write(ByteBuffer buffer) {
+            buffer.putInt(info.playerid);
+            buffer.putShort((short)info.ip.getBytes().length);
+            buffer.put(info.ip.getBytes());
+            buffer.put(info.modclient ? (byte)1 : 0);
+
+            buffer.putInt(info.totalBlocksBroken);
+            buffer.putInt(info.structureBlocksBroken);
+            buffer.putInt(info.lastBlockBroken.id);
+
+            buffer.putInt(info.totalBlocksPlaced);
+            buffer.putInt(info.lastBlockPlaced.id);
+        }
+
+        @Override
+        public void read(ByteBuffer buffer) {
+            int id = buffer.getInt();
+            short iplen = buffer.getShort();
+            byte[] ipb = new byte[iplen];
+            buffer.get(ipb);
+
+            info = new TraceInfo(new String(ipb));
+
+            info.playerid = id;
+            info.modclient = buffer.get() == 1;
+            info.totalBlocksBroken = buffer.getInt();
+            info.structureBlocksBroken = buffer.getInt();
+            info.lastBlockBroken = Block.getByID(buffer.getInt());
+            info.totalBlocksPlaced = buffer.getInt();
+            info.lastBlockPlaced = Block.getByID(buffer.getInt());
         }
     }
 }

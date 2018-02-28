@@ -17,7 +17,9 @@ import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Map;
+import io.anuke.mindustry.world.Placement;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.Timers;
@@ -49,6 +51,7 @@ public class NetClient extends Module {
     public NetClient(){
 
         Net.handleClient(Connect.class, packet -> {
+            player.isAdmin = false;
 
             Net.setClientLoaded(false);
             recieved.clear();
@@ -159,10 +162,20 @@ public class NetClient extends Module {
             state.wavetime = packet.countdown;
             state.wave = packet.wave;
 
-            //removed: messing with time isn't necessary anymore
-            //Timers.resetTime(packet.time + (float) (TimeUtils.timeSinceMillis(packet.timestamp) / 1000.0 * 60.0));
-
             ui.hudfrag.updateItems();
+        });
+
+        Net.handleClient(PlacePacket.class, (packet) -> {
+            Placement.placeBlock(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false);
+
+            if(packet.playerid == player.id){
+                Tile tile = world.tile(packet.x, packet.y);
+                if(tile != null) Block.getByID(packet.block).placed(tile);
+            }
+        });
+
+        Net.handleClient(BreakPacket.class, (packet) -> {
+            Placement.breakBlock(packet.x, packet.y, true, false);
         });
 
         Net.handleClient(EntitySpawnPacket.class, packet -> {
@@ -316,6 +329,22 @@ public class NetClient extends Module {
                 r.run();
             }
         });
+
+        Net.handleClient(NetErrorPacket.class, packet -> {
+            ui.showError(packet.message);
+            disconnectQuietly();
+        });
+
+        Net.handleClient(PlayerAdminPacket.class, packet -> {
+            Player player = playerGroup.getByID(packet.id);
+            player.isAdmin = packet.admin;
+            ui.listfrag.rebuild();
+        });
+
+        Net.handleClient(TracePacket.class, packet -> {
+            Player player = playerGroup.getByID(packet.info.playerid);
+            ui.traces.show(player, packet.info);
+        });
     }
 
     @Override
@@ -327,12 +356,6 @@ public class NetClient extends Module {
         }else if(!connecting){
             Net.disconnect();
         }
-    }
-
-    //TODO remove.
-    public void test(){
-        gotData = false;
-        connecting = true;
     }
 
     public boolean hasData(){

@@ -57,11 +57,22 @@ public class DebugFragment implements Fragment {
                row();
                new button("wave", () -> state.wavetime = 0f);
                row();
+               new button("time 0", () -> Timers.resetTime(0f));
+               row();
+               new button("time max", () -> Timers.resetTime(1080000 - 60*10));
+               row();
+               new button("clear", () -> {
+                   enemyGroup.clear();
+                   state.enemies = 0;
+                   netClient.clearRecieved();
+               });
+               row();
                new button("spawn", () -> {
                    for(int i = 0; i < 30; i ++){
                        new Enemy(EnemyTypes.healer).set(player.x + Mathf.range(50f), player.y + Mathf.range(50f)).add();
                    }
                });
+               row();
            }}.end();
 
            row();

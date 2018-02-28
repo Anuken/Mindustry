@@ -4,11 +4,8 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.resource.Recipe;
-import io.anuke.mindustry.resource.Recipes;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.modules.Module;
 
@@ -23,23 +20,6 @@ public class NetCommon extends Module {
 
             Weapon weapon = (Weapon) Upgrade.getByID(packet.weaponid);
             weapon.shoot(player, packet.x, packet.y, packet.rotation);
-        });
-
-        Net.handle(PlacePacket.class, (packet) -> {
-            if(headless)
-                world.placeBlock(packet.x, packet.y, Block.getByID(packet.block), packet.rotation);
-            else
-                control.input().placeBlockInternal(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false);
-
-            Recipe recipe = Recipes.getByResult(Block.getByID(packet.block));
-            if (recipe != null) state.inventory.removeItems(recipe.requirements);
-        });
-
-        Net.handle(BreakPacket.class, (packet) -> {
-            if(headless)
-                world.removeBlock(world.tile(packet.x, packet.y));
-            else
-                control.input().breakBlockInternal(packet.x, packet.y, false);
         });
 
         Net.handle(ChatPacket.class, (packet) -> {

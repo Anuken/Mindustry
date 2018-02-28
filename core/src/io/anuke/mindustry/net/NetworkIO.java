@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.utils.ByteArray;
 import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
@@ -100,7 +101,7 @@ public class NetworkIO {
         }
     }
 
-    public static void writeWorld(int playerID, ByteArray upgrades, OutputStream os){
+    public static void writeWorld(Player player, ByteArray upgrades, OutputStream os){
 
         try(DataOutputStream stream = new DataOutputStream(os)){
 
@@ -116,7 +117,8 @@ public class NetworkIO {
             stream.writeInt(state.enemies); //enemy amount
 
             stream.writeBoolean(state.friendlyFire); //friendly fire state
-            stream.writeInt(playerID); //player remap ID
+            stream.writeInt(player.id); //player remap ID
+            stream.writeBoolean(player.isAdmin);
 
             //--INVENTORY--
 
@@ -246,6 +248,7 @@ public class NetworkIO {
             state.friendlyFire = friendlyfire;
 
             int pid = stream.readInt();
+            boolean admin = stream.readBoolean();
 
             //inventory
             for(int i = 0; i < state.inventory.getItems().length; i ++){
@@ -268,6 +271,7 @@ public class NetworkIO {
 
             Entities.clear();
             player.id = pid;
+            player.isAdmin = admin;
             player.add();
 
             //map

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.NumberUtils;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
@@ -90,10 +91,35 @@ public class TunnelConveyor extends Block{
 		return new TunnelEntity();
 	}
 
+	@Override
+	public Array<Object> getDebugInfo(Tile tile){
+		TunnelEntity entity = tile.entity();
+		Array<Object> arr = super.getDebugInfo(tile);
+		for(int i = 0; i < 4; i ++){
+			arr.add("nearby." + i);
+			arr.add(tile.getNearby(i));
+		}
+
+		arr.add("buffer");
+		arr.add(entity.index);
+
+		for(int i = 0; i < entity.index; i++){
+			long l = entity.items[i];
+			float time = NumberUtils.intBitsToFloat(Bits.getLeftInt(l));
+			Item item = Item.getByID(Bits.getRightInt(l));
+			Tile dest = getDestTunnel(tile, item);
+			arr.add("  buffer.item");
+			arr.add(time + " | " + item.name + " | " + ( dest == null ? "no dest" : dest.block() + ":" + dest.floor()));
+		}
+
+		return arr;
+	}
+
 	Tile getDestTunnel(Tile tile, Item item){
 		Tile dest = tile;
 		int rel = (tile.getRotation() + 2)%4;
 		for(int i = 0; i < maxdist; i ++){
+			if(dest == null) return null;
 			dest = dest.getNearby(rel);
 			if(dest != null && dest.block() instanceof TunnelConveyor && dest.getRotation() == rel
 					&& dest.getNearby(rel) != null

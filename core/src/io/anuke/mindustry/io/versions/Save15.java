@@ -307,7 +307,7 @@ public class Save15 extends SaveFileVersion {
             for(int y = 0; y < world.height(); y ++){
                 Tile tile = world.tile(x, y);
 
-                if(tile.breakable()){
+                if(tile != null && tile.breakable()){
                     if(tile.block() instanceof Rock){
                         totalrocks ++;
                     }else{
@@ -325,7 +325,7 @@ public class Save15 extends SaveFileVersion {
             for (int y = 0; y < world.height(); y++) {
                 Tile tile = world.tile(x, y);
 
-                if (tile.block() instanceof Rock) {
+                if (tile != null && tile.block() instanceof Rock) {
                     stream.writeInt(tile.packedPosition());
                 }
             }
@@ -338,7 +338,7 @@ public class Save15 extends SaveFileVersion {
             for(int y = 0; y < world.height(); y ++){
                 Tile tile = world.tile(x, y);
 
-                if(tile.breakable() && !(tile.block() instanceof Rock)){
+                if(tile != null && tile.breakable() && !(tile.block() instanceof Rock)){
 
                     stream.writeInt(x + y*world.width()); //tile pos
                     stream.writeInt(tile.block().id); //block ID

@@ -40,7 +40,11 @@ public class Registrator {
             EntitySpawnPacket.class,
             ItemTransferPacket.class,
             ItemSetPacket.class,
-            ItemOffloadPacket.class
+            ItemOffloadPacket.class,
+            NetErrorPacket.class,
+            PlayerAdminPacket.class,
+            AdministerRequestPacket.class,
+            TracePacket.class,
     };
     private static ObjectIntMap<Class<?>> ids = new ObjectIntMap<>();
 

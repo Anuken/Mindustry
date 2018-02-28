@@ -210,7 +210,7 @@ public class Net{
 	}
 
 	/**Pings a host in an new thread. If an error occured, failed() should be called with the exception. */
-	public static void pingHost(String address, int port, Consumer<Host> valid, Consumer<IOException> failed){
+	public static void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> failed){
 		clientProvider.pingHost(address, port, valid, failed);
 	}
 
@@ -285,7 +285,7 @@ public class Net{
 		 * Callback should be run on libGDX main thread.*/
         void discover(Consumer<Array<Host>> callback);
         /**Ping a host. If an error occured, failed() should be called with the exception. */
-        void pingHost(String address, int port, Consumer<Host> valid, Consumer<IOException> failed);
+        void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> failed);
 		/**Close all connections.*/
 		void dispose();
 	}

@@ -62,7 +62,7 @@ io.anuke.ucore.scene.ui.ImageButton$ImageButtonStyle: {
 	emptytoggle: {imageCheckedColor: white, imageDownColor: white, imageUpColor: lightgray},
 	static: {up: button },
 	static-down: {up: button-down },
-	toggle: {checked: button-down, down: button-down, up: button },
+	toggle: {checked: button-down, down: button-down, up: button, imageDisabledColor: lightgray, imageUpColor: white  },
 	togglemap: {down: button-map-down, up: button-map },
 	select: {checked: button-select, up: clear },
 	close-window: {up: button, imageUp: icon-close, imageOver: icon-close-over, imageDown: icon-close-down, disabled: button }
@@ -83,7 +83,7 @@ io.anuke.ucore.scene.ui.Window$WindowStyle: {
 	dialog: {stageBackground: dialogDim, titleFont: default-font, background: window-empty, titleFontColor: accent }
 },
 io.anuke.ucore.scene.ui.KeybindDialog$KeybindDialogStyle: {
-	default: {keyColor: accent, keyNameColor: white, paneStyle: clear},
+	default: {keyColor: accent, keyNameColor: white, controllerColor: menuitem, paneStyle: clear},
 },
 io.anuke.ucore.scene.ui.Slider$SliderStyle: {
 	default-horizontal: {background: slider, knob: slider-knob, knobOver: slider-knob-over, knobDown: slider-knob-down},

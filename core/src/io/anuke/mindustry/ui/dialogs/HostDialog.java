@@ -14,7 +14,6 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.player;
 import static io.anuke.mindustry.Vars.ui;
 
-//TODO add port specification
 public class HostDialog extends FloatingDialog{
     float w = 300;
 
@@ -31,13 +30,13 @@ public class HostDialog extends FloatingDialog{
                 Settings.put("name", text);
                 Settings.save();
                 ui.listfrag.rebuild();
-            }).grow().pad(8);
+            }).grow().pad(8).get().setMaxLength(40);
 
             ImageButton button = t.addImageButton("white", 40, () -> {
                 new ColorPickDialog().show(color -> {
                     player.color.set(color);
                     Settings.putInt("color", Color.rgba8888(color));
-                    Settings.save();;
+                    Settings.save();
                 });
             }).size(50f, 54f).get();
             button.update(() -> button.getStyle().imageUpColor = player.getColor());
@@ -50,6 +49,7 @@ public class HostDialog extends FloatingDialog{
             Timers.runTask(5f, () -> {
                 try{
                     Net.host(Vars.port);
+                    player.isAdmin = true;
                 }catch (IOException e){
                     ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
                 }
@@ -58,19 +58,4 @@ public class HostDialog extends FloatingDialog{
             });
         }).width(w).height(70f);
     }
-
-    /*
-    showTextInput("$text.hostserver", "$text.server.port", Vars.port + "", new DigitsOnlyFilter(), text -> {
-			int result = Strings.parseInt(text);
-			if(result == Integer.MIN_VALUE || result >= 65535){
-				ui.showError("$text.server.invalidport");
-			}else{
-				try{
-					Net.host(result);
-				}catch (IOException e){
-					ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
-				}
-			}
-		});
-     */
 }

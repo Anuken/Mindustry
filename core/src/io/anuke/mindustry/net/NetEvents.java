@@ -2,6 +2,7 @@ package io.anuke.mindustry.net;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.net.Net.SendMode;
@@ -12,8 +13,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.Entity;
 
-import static io.anuke.mindustry.Vars.netCommon;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 
 public class NetEvents {
 
@@ -99,8 +99,6 @@ public class NetEvents {
         packet.name = Vars.player.name;
         packet.id = Vars.player.id;
         Net.send(packet, SendMode.tcp);
-
-        ui.chatfrag.addMessage(packet.text, netCommon.colorizeName(Vars.player.id, Vars.player.name));
     }
 
     public static void handleShoot(Weapon weapon, float x, float y, float angle){
@@ -151,5 +149,28 @@ public class NetEvents {
         packet.position = tile.packedPosition();
         packet.itemid = (byte)item.id;
         Net.send(packet, SendMode.udp);
+    }
+
+    public static void handleAdminSet(Player player, boolean admin){
+        PlayerAdminPacket packet = new PlayerAdminPacket();
+        packet.admin = admin;
+        packet.id = player.id;
+        player.isAdmin = admin;
+        Net.send(packet, SendMode.tcp);
+    }
+
+    public static void handleAdministerRequest(Player target, AdminAction action){
+        AdministerRequestPacket packet = new AdministerRequestPacket();
+        packet.id = target.id;
+        packet.action = action;
+        Net.send(packet, SendMode.tcp);
+    }
+
+    public static void handleTraceRequest(Player target){
+        if(Net.client()) {
+            handleAdministerRequest(target, AdminAction.trace);
+        }else{
+            ui.traces.show(target, netServer.admins.getTrace(Net.getConnection(target.clientid).address));
+        }
     }
 }
