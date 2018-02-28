@@ -82,7 +82,7 @@ public class Maps implements Disposable{
 		if(!gwt) {
 			if (!loadMapFile(customMapDirectory.child("maps.json"), false)) {
 				try {
-					Log.info("Failed to find custom map directory. Creating one instead.");
+					Log.info("Failed to find custom map directory.");
 					customMapDirectory.child("maps.json").writeString("{}", false);
 				} catch (Exception e) {
 					throw new RuntimeException("Failed to create custom map directory!");
@@ -161,20 +161,23 @@ public class Maps implements Disposable{
 	}
 
 	private boolean loadMapFile(FileHandle file, boolean logException){
-		try{
+		try {
 			Array<Map> arr = json.fromJson(ArrayContainer.class, file).maps;
-			if(arr != null){ //can be an empty map file
-				for(Map map : arr){
+			if (arr != null) { //can be an empty map file
+				for (Map map : arr) {
 					map.pixmap = new Pixmap(file.sibling(map.name + ".png"));
-					if(!headless) map.texture = new Texture(map.pixmap);
+					if (!headless) map.texture = new Texture(map.pixmap);
 					maps.put(map.id, map);
 					mapNames.put(map.name, map);
 					lastID = Math.max(lastID, map.id);
-					if(!map.custom){
+					if (!map.custom) {
 						defaultMaps.add(map);
 					}
 				}
 			}
+			return true;
+		}catch (GdxRuntimeException e){
+			Log.err(e);
 			return true;
 		}catch(Exception e){
 			if(logException) {

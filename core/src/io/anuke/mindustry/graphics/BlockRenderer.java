@@ -177,7 +177,7 @@ public class BlockRenderer{
 
 		OrthographicCamera camera = Core.camera;
 
-		Graphics.end();
+		if(Graphics.drawing()) Graphics.end();
 
 		int crangex = (int)(camera.viewportWidth * camera.zoom / (chunksize * tilesize))+1;
 		int crangey = (int)(camera.viewportHeight * camera.zoom / (chunksize * tilesize))+1;

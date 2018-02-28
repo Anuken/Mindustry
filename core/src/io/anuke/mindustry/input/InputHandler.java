@@ -127,7 +127,7 @@ public abstract class InputHandler extends InputAdapter{
 	}
 
 	public void breakBlock(int x, int y, boolean sound){
-		if(!Net.client()) Placement.breakBlock(x, y, sound, sound);
+		if(!Net.client()) Placement.breakBlock(x, y, true, sound);
 
 		if(Net.active()){
 			NetEvents.handleBreak(x, y);

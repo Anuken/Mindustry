@@ -228,7 +228,8 @@ public class EnemyType {
 
             //no tile found
             if(enemy.target == null){
-                enemy.target = Entities.getClosest(playerGroup, enemy.x, enemy.y, range, e -> !((Player)e).isAndroid);
+                enemy.target = Entities.getClosest(playerGroup, enemy.x, enemy.y, range, e -> !((Player)e).isAndroid &&
+                    !((Player)e).isDead());
             }
         }else if(nearCore){
             enemy.target = world.getCore().entity;

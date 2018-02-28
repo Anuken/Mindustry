@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.blocks.types.defense;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
@@ -80,9 +81,10 @@ public class RepairTurret extends PowerTurret{
 	@Override
 	public void drawLayer2(Tile tile){
 		PowerTurretEntity entity = tile.entity();
+		TileEntity target = entity.blockTarget;
 		
-		if(entity.power >= powerUsed && entity.blockTarget != null && Angles.angleDist(entity.angleTo(entity.blockTarget), entity.rotation) < 10){
-			Tile targetTile = entity.blockTarget.tile;
+		if(entity.power >= powerUsed && target != null && Angles.angleDist(entity.angleTo(target), entity.rotation) < 10){
+			Tile targetTile = target.tile;
 			float len = 4f;
 
 			float x = tile.drawx() + Angles.trnsx(entity.rotation, len), y = tile.drawy() + Angles.trnsy(entity.rotation, len);

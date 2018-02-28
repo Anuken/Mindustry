@@ -156,6 +156,8 @@ public class Player extends SyncEntity{
 			return;
 		}
 
+		if(isDead()) return;
+
 		Tile tile = world.tileWorld(x, y);
 
 		//if player is in solid block
