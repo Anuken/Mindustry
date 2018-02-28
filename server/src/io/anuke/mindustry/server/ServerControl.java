@@ -291,7 +291,7 @@ public class ServerControl extends Module {
             }
 
             if(target != null){
-                String ip = Net.getConnection(player.clientid).address;
+                String ip = Net.getConnection(target.clientid).address;
                 netServer.admins.banPlayer(ip);
                 Net.kickConnection(target.clientid, KickReason.banned);
                 info("Banned player by IP: {0}", ip);
@@ -352,7 +352,7 @@ public class ServerControl extends Module {
             }
 
             if(target != null){
-                String ip = Net.getConnection(player.clientid).address;
+                String ip = Net.getConnection(target.clientid).address;
                 netServer.admins.adminPlayer(ip);
                 NetEvents.handleAdminSet(target, true);
                 info("Admin-ed player by IP: {0} / {1}", ip, arg[0]);
@@ -377,7 +377,7 @@ public class ServerControl extends Module {
             }
 
             if(target != null){
-                String ip = Net.getConnection(player.clientid).address;
+                String ip = Net.getConnection(target.clientid).address;
                 netServer.admins.unAdminPlayer(ip);
                 NetEvents.handleAdminSet(target, false);
                 info("Un-admin-ed player by IP: {0} / {1}", ip, arg[0]);
