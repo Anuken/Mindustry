@@ -166,7 +166,7 @@ public class NetClient extends Module {
         });
 
         Net.handleClient(PlacePacket.class, (packet) -> {
-            Placement.placeBlock(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false);
+            Placement.placeBlock(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, Timers.get("placeblocksound", 10));
 
             if(packet.playerid == player.id){
                 Tile tile = world.tile(packet.x, packet.y);
@@ -175,7 +175,7 @@ public class NetClient extends Module {
         });
 
         Net.handleClient(BreakPacket.class, (packet) -> {
-            Placement.breakBlock(packet.x, packet.y, true, false);
+            Placement.breakBlock(packet.x, packet.y, true, Timers.get("breakblocksound", 10));
         });
 
         Net.handleClient(EntitySpawnPacket.class, packet -> {

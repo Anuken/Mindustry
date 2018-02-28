@@ -81,7 +81,7 @@ public class LiquidBlock extends Block implements LiquidAcceptor{
 			LiquidAcceptor other = (LiquidAcceptor)next.block();
 			
 			float flow = Math.min(other.getLiquidCapacity(next) - other.getLiquid(next) - 0.001f, 
-					Math.min(entity.liquidAmount/flowfactor * Timers.delta(), entity.liquidAmount));
+					Math.min(entity.liquidAmount/flowfactor * Math.max(Timers.delta(), 1f), entity.liquidAmount));
 			
 			if(flow <= 0f || entity.liquidAmount < flow) return;
 			

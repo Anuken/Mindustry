@@ -52,6 +52,7 @@ public class ThreadHandler {
     }
 
     public void handleRender(){
+
         if(!enabled) return;
 
         framesSinceUpdate += Timers.delta();
