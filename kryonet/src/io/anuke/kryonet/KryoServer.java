@@ -72,7 +72,7 @@ public class KryoServer implements ServerProvider {
                 c.id = kn.id;
                 c.addressTCP = ip;
 
-                Log.info("&bRecieved connection: {0} / {1}", c.id, c.addressTCP);
+                Log.info("&bRecieved connection: {0} / {1}. Kryonet ID: {2}", c.id, c.addressTCP, connection.getID());
 
                 connections.add(kn);
                 Gdx.app.postRunnable(() ->  Net.handleServerReceived(kn.id, c));
@@ -81,15 +81,18 @@ public class KryoServer implements ServerProvider {
             @Override
             public void disconnected (Connection connection) {
                 KryoConnection k = getByKryoID(connection.getID());
+                Log.info("&bLost kryonet connection {0}", connection.getID());
                 if(k == null) return;
-                connections.remove(k);
 
                 Disconnect c = new Disconnect();
                 c.id = k.id;
 
                 Log.info("&bLost connection: {0}", k.id);
 
-                Gdx.app.postRunnable(() -> Net.handleServerReceived(k.id, c));
+                Gdx.app.postRunnable(() -> {
+                    Net.handleServerReceived(k.id, c);
+                    connections.remove(k);
+                });
             }
 
             @Override
