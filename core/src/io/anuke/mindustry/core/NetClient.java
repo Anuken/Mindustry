@@ -31,8 +31,6 @@ import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Timer;
 
-import java.io.DataInputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import static io.anuke.mindustry.Vars.*;
@@ -224,36 +222,6 @@ public class NetClient extends Module {
             if (tile != null && tile.entity != null) {
                 tile.entity.health = packet.health;
             }
-        });
-
-        Net.handleClient(BlockSyncPacket.class, packet -> {
-            if (!gotData) return;
-
-            DataInputStream stream = new DataInputStream(packet.stream);
-
-            try {
-
-                float time = stream.readFloat();
-                float elapsed = Timers.time() - time;
-
-                while (stream.available() > 0) {
-                    int pos = stream.readInt();
-
-                    Tile tile = world.tile(pos);
-
-                    short data = stream.readShort();
-                    tile.setPackedData(data);
-
-                    tile.entity.readNetwork(stream, elapsed);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (Exception e) {
-                Log.err(e);
-                //do nothing else...
-                //TODO fix
-            }
-
         });
 
         Net.handleClient(DisconnectPacket.class, packet -> {

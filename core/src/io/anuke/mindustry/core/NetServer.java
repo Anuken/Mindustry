@@ -1,6 +1,9 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.ByteArray;
+import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
@@ -10,26 +13,21 @@ import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Administration;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
-import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Placement;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import static io.anuke.mindustry.Vars.*;
@@ -389,55 +387,5 @@ public class NetServer extends Module{
 
             Net.send(packet, SendMode.udp);
         }
-
-
-        if(sendBlockSync && timer.get(timerBlockSync, blockSyncTime)){
-
-            Array<NetConnection> connections = Net.getConnections();
-
-            for(int i = 0; i < connections.size; i ++){
-                int id = connections.get(i).id;
-                Player player = this.connections.get(id);
-                if(player == null) continue;
-                int x = Mathf.scl2(player.x, tilesize);
-                int y = Mathf.scl2(player.y, tilesize);
-                int w = 22;
-                int h = 16;
-                sendBlockSync(id, x, y, w, h);
-            }
-        }
-    }
-
-    public void sendBlockSync(int client, int x, int y, int viewx, int viewy){
-        BlockSyncPacket packet = new BlockSyncPacket();
-        ByteArrayOutputStream bs = new ByteArrayOutputStream();
-
-        //TODO compress stream
-
-        try {
-            DataOutputStream stream = new DataOutputStream(bs);
-
-            stream.writeFloat(Timers.time());
-
-            for (int rx = -viewx / 2; rx <= viewx / 2; rx++) {
-                for (int ry = -viewy / 2; ry <= viewy / 2; ry++) {
-                    Tile tile = world.tile(x + rx, y + ry);
-
-                    if (tile == null || tile.entity == null || !tile.block().syncEntity()) continue;
-
-                    stream.writeInt(tile.packedPosition());
-                    stream.writeShort(tile.getPackedData());
-
-                    tile.entity.write(stream);
-                }
-            }
-
-        }catch (IOException e){
-            throw new RuntimeException(e);
-        }
-
-        packet.stream = new ByteArrayInputStream(bs.toByteArray());
-
-        Net.sendStream(client, packet);
     }
 }

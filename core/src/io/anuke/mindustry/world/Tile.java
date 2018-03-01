@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world;
 
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -16,10 +17,11 @@ public class Tile{
 	public static final Object tileSetLock = new Object();
 	private static final Array<Tile> tmpArray = new Array<>();
 	
-	/**Packed block data. Left is floor, right is block.*/
-	private short blocks;
-	/**Packed data. Left is rotation, right is extra data, packed into two half-bytes: left is dump, right is extra.*/
-	private short data;
+	/**Block ID data.*/
+	private byte floor, wall;
+	private byte rotation;
+	private byte dump;
+	private byte extra;
 	/**The coordinates of the core tile this is linked to, in the form of two bytes packed into one.
 	 * This is relative to the block it is linked to; negate coords to find the link.*/
 	public byte link = 0;
@@ -43,21 +45,19 @@ public class Tile{
 	}
 	
 	private void iSetFloor(Block floor){
-		byte id = (byte)floor.id;
-		blocks = Bits.packShort(id, getWallID());
+		this.floor =  (byte)floor.id;
 	}
 	
 	private void iSetBlock(Block wall){
-		byte id = (byte)wall.id;
-		blocks = Bits.packShort(getFloorID(), id);
+		this.wall = (byte)wall.id;
 	}
 	
 	public byte getWallID(){
-		return Bits.getRightByte(blocks);
+		return wall;
 	}
 	
 	public byte getFloorID(){
-		return Bits.getLeftByte(blocks);
+		return floor;
 	}
 	
 	/**Return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile.*/
@@ -144,36 +144,39 @@ public class Tile{
 	}
 	
 	public void setRotation(byte rotation){
-		data = Bits.packShort(rotation, Bits.getRightByte(data));
+		this.rotation = rotation;
 	}
 	
 	public void setDump(byte dump){
-		data = Bits.packShort(getRotation(), Bits.packByte(dump, getExtra()));
+		this.dump = dump;
 	}
 	
 	public void setExtra(byte extra){
-		data = Bits.packShort(getRotation(), Bits.packByte(getDump(), extra));
+		this.extra = extra;
 	}
 	
 	public byte getRotation(){
-		return Bits.getLeftByte(data);
+		return rotation;
 	}
 	
 	public byte getDump(){
-		return Bits.getLeftByte(Bits.getRightByte(data));
+		return dump;
 	}
 	
 	public byte getExtra(){
-		return Bits.getRightByte(Bits.getRightByte(data));
+		return extra;
 	}
 
+	//TODO fix
+	/*
 	public short getPackedData(){
-		return data;
+		return Bits.packShort(dump, extra);
 	}
 
 	public void setPackedData(short data){
-		this.data = data;
-	}
+		this.dump = Bits.getLeftByte(data);
+		this.extra = Bits.getRightByte(data);
+	}*/
 
 	public boolean passable(){
 		Block block = block();
@@ -233,6 +236,10 @@ public class Tile{
 			byte dy = Bits.getRightByte(link);
 			return world.tile(x - (dx - 8), y - (dy - 8));
 		}
+	}
+
+	public Tile getNearby(GridPoint2 relative){
+		return world.tile(x + relative.x, y + relative.y);
 	}
 
 	public Tile getNearby(int rotation){
