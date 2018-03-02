@@ -186,7 +186,9 @@ public class NetworkIO {
                         }
 
                         if(tile.entity != null){
-                            stream.writeShort(tile.getPackedData());
+                            stream.writeByte(tile.getRotation());
+                            stream.writeByte(tile.getDump());
+                            stream.writeByte(tile.getExtra());
                             stream.writeShort((short)tile.entity.health); //health
 
                             //items
@@ -317,11 +319,12 @@ public class NetworkIO {
                 }
 
                 if(tile.entity != null){
-                    short data = stream.readShort();
+                    tile.setRotation(stream.readByte());
+                    tile.setDump(stream.readByte());
+                    tile.setExtra(stream.readByte());
                     short health = stream.readShort();
 
                     tile.entity.health = health;
-                    tile.setPackedData(data);
 
                     for(int j = 0; j < tile.entity.items.length; j ++){
                         tile.entity.items[j] = stream.readInt();

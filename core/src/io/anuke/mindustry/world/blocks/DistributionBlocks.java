@@ -37,6 +37,10 @@ public class DistributionBlocks{
 	router = new Router("router"){{
 
 	}},
+
+	vault = new Router("vault"){{
+		width = height = 2;
+	}},
 	
 	junction = new Junction("junction"){{
 		

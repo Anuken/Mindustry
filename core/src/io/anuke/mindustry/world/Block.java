@@ -2,6 +2,7 @@ package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -182,61 +183,52 @@ public class Block{
 	 * Tries to put this item into a nearby container, if there are no available
 	 * containers, it gets added to the block's inventory.*/
 	public void offloadNear(Tile tile, Item item){
-		if(Net.client() && syncBlockState){
-			handleItem(item, tile, tile);
-			return;
-		}
-
-		byte i = tile.getDump();
-		byte pdump = (byte)(i % 4);
+		GridPoint2[] nearby = Edges.getEdges(width);
 		
-		for(int j = 0; j < 4; j ++){
-			Tile other = tile.getNearby(i);
-			if(other != null && other.block().acceptItem(item, other, tile)){
-				other.block().handleItem(item, other, tile);
-				tile.setDump((byte)((i+1)%4));
-				if(Net.server() && syncBlockState) NetEvents.handleTransfer(tile, i, item);
+		for(int j = 0; j < nearby.length; j ++){
+			Tile other = tile.getNearby(nearby[j]);
+			Tile in = tile.getNearby(Edges.getInsideEdges(width)[j]);
+			if(other != null && other.block().acceptItem(item, other, in)){
+				other.block().handleItem(item, other, in);
 				return;
 			}
-			i++;
-			i %= 4;
 		}
-		tile.setDump(pdump);
+
 		handleItem(item, tile, tile);
 	}
 
-	/** Try dumping any item near the tile. */
+	/**Try dumping any item near the tile.*/
 	protected boolean tryDump(Tile tile){
-		return tryDump(tile, -1, null);
+		return tryDump(tile, null);
 	}
 
-	/**
-	 * Try dumping any item near the tile. -1 = any direction
-	 */
-	protected boolean tryDump(Tile tile, int direction, Item todump){
-		if(Net.client() && syncBlockState) return false;
-
-		int i = tile.getDump()%4;
+	/**Try dumping a specific item near the tile.*/
+	protected boolean tryDump(Tile tile, Item todump){
+		GridPoint2[] nearby = Edges.getEdges(width);
+		byte i = (byte)(tile.getDump() % nearby.length);
 		
-		for(int j = 0; j < 4; j ++){
-			Tile other = tile.getNearby(i);
-			
-			if(i == direction || direction == -1){
-				for(Item item : Item.getAllItems()){
-					
-					if(todump != null && item != todump) continue;
-					
-					if(tile.entity.hasItem(item) && other != null && other.block().acceptItem(item, other, tile)){
-						other.block().handleItem(item, other, tile);
-						tile.entity.removeItem(item, 1);
-						tile.setDump((byte)((i+1)%4));
-						if(Net.server() && syncBlockState) NetEvents.handleTransfer(tile, (byte)i, item);
-						return true;
-					}
+		for(int j = 0; j < nearby.length; j ++){
+			Tile other;
+			Tile in;
+
+			for(Item item : Item.getAllItems()){
+				other = tile.getNearby(nearby[i]);
+				in = tile.getNearby(Edges.getInsideEdges(width)[i]);
+
+				if(todump != null && item != todump) continue;
+
+				if(tile.entity.hasItem(item) && other != null && other.block().acceptItem(item, other, in)){
+					other.block().handleItem(item, other, in);
+					tile.entity.removeItem(item, 1);
+					i = (byte)((i + 1) % nearby.length);
+					tile.setDump(i);
+					return true;
 				}
 			}
-			i++;
-			i %= 4;
+
+
+			i = (byte)((i + 1) % nearby.length);
+			tile.setDump(i);
 		}
 
 		return false;

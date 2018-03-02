@@ -66,7 +66,7 @@ public class PowerSmelter extends PowerBlock {
         PowerSmelterEntity entity = tile.entity();
 
         if(entity.timer.get(timerDump, 5) && entity.hasItem(result)){
-            tryDump(tile, -1, result);
+            tryDump(tile, result);
         }
 
         float used = powerDrain * Timers.delta();

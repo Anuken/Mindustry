@@ -61,7 +61,7 @@ public class Smelter extends Block{
 		CrafterEntity entity = tile.entity();
 		
 		if(entity.timer.get(timerDump, 5) && entity.hasItem(result)){
-			tryDump(tile, -1, result);
+			tryDump(tile, result);
 		}
 
 		//add fuel

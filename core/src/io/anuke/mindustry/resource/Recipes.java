@@ -26,6 +26,7 @@ public class Recipes {
 			new Recipe(distribution, DistributionBlocks.steelconveyor, stack(Item.steel, 1)),
 			new Recipe(distribution, DistributionBlocks.pulseconveyor, stack(Item.dirium, 1)),
 			new Recipe(distribution, DistributionBlocks.router, stack(Item.stone, 2)),
+			new Recipe(distribution, DistributionBlocks.vault, stack(Item.iron, 8)),
 			new Recipe(distribution, DistributionBlocks.junction, stack(Item.iron, 2)),
 			new Recipe(distribution, DistributionBlocks.tunnel, stack(Item.iron, 2)),
 			new Recipe(distribution, DistributionBlocks.sorter, stack(Item.steel, 2)),

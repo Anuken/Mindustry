@@ -77,7 +77,7 @@ public class LiquidCrafter extends LiquidBlock{
 		}
 		
 		if(entity.timer.get(timerDump, 15)){
-			tryDump(tile, -1, output);
+			tryDump(tile, output);
 		}
 	}
 	
