@@ -274,9 +274,16 @@ public class KryoServer implements ServerProvider {
             for(NetConnection c : connections){
                 Log.err(" - NetConnection / ID {0} / IP {1}", c.id, c.address);
             }
-            //TODO remove
-            Timers.runTask(0.1f, () -> System.exit(-1));
-            throw new RuntimeException("Unable to find connection with ID " + id + "!");
+
+            Log.err("\nSTACK TRACE:");
+
+            StackTraceElement[] e = Thread.getAllStackTraces().get(Thread.currentThread());
+            for(StackTraceElement s : e){
+                Log.err("- {0}", s);
+            }
+            System.exit(-1);
+            return;
+            //throw new RuntimeException("Unable to find connection with ID " + id + "!");
         }
         conn.send(object, mode);
     }
