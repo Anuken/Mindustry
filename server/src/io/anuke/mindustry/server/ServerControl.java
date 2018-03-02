@@ -386,7 +386,7 @@ public class ServerControl extends Module {
             }
         });
 
-        handler.register("admins", "List all banned IPs.", arg -> {
+        handler.register("admins", "List all admins.", arg -> {
             Array<String> admins = netServer.admins.getAdmins();
 
             if(admins.size == 0){
