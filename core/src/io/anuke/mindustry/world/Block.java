@@ -188,7 +188,7 @@ public class Block{
 		for(int j = 0; j < nearby.length; j ++){
 			Tile other = tile.getNearby(nearby[j]);
 			Tile in = tile.getNearby(Edges.getInsideEdges(width)[j]);
-			if(other != null && other.block().acceptItem(item, other, in)){
+			if(other != null && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
 				other.block().handleItem(item, other, in);
 				return;
 			}
@@ -217,7 +217,7 @@ public class Block{
 
 				if(todump != null && item != todump) continue;
 
-				if(tile.entity.hasItem(item) && other != null && other.block().acceptItem(item, other, in)){
+				if(tile.entity.hasItem(item) && other != null && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
 					other.block().handleItem(item, other, in);
 					tile.entity.removeItem(item, 1);
 					i = (byte)((i + 1) % nearby.length);
@@ -232,6 +232,11 @@ public class Block{
 		}
 
 		return false;
+	}
+
+	/**Used for dumping items.*/
+	public boolean canDump(Tile tile, Tile to, Item item){
+		return true;
 	}
 
 	/**

@@ -1250,9 +1250,16 @@ blocks/vault
   orig: 16, 16
   offset: 0, 0
   index: -1
+blocks/vault-icon
+  rotate: false
+  xy: 927, 424
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
 blocks/water
   rotate: false
-  xy: 947, 424
+  xy: 737, 302
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -1280,7 +1287,7 @@ blocks/weaponfactory
   index: -1
 blocks/weaponfactory-icon
   rotate: false
-  xy: 737, 302
+  xy: 737, 292
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -2637,14 +2644,14 @@ weapons/triblaster-equip
   index: -1
 weapons/vulcan
   rotate: false
-  xy: 927, 424
+  xy: 937, 424
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 weapons/vulcan-equip
   rotate: false
-  xy: 937, 424
+  xy: 947, 424
   size: 8, 8
   orig: 8, 8
   offset: 0, 0

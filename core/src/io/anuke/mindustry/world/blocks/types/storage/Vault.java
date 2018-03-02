@@ -46,7 +46,8 @@ public class Vault extends Block {
         return tile.entity.totalItems() < capacity;
     }
 
-    boolean canOutput(Tile tile, Tile to){
+    @Override
+    public boolean canDump(Tile tile, Tile to, Item item){
         return to != null && (to.block() instanceof Vault || to.block() instanceof CoreBlock);
     }
 }
