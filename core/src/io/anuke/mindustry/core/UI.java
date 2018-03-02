@@ -1,6 +1,7 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.math.Interpolation;
@@ -121,7 +122,7 @@ public class UI extends SceneModule{
 	}
 
 	@Override
-	public void update(){
+	public synchronized void update(){
 		if(Vars.debug && !Vars.showUI) return;
 		
 		scene.act();
@@ -171,6 +172,11 @@ public class UI extends SceneModule{
 		loadfrag.build();
 
 		build.end();
+	}
+
+	@Override
+	public synchronized boolean hasMouse() {
+		return super.hasMouse();
 	}
 
 	public Locale getLocale(){
@@ -233,6 +239,8 @@ public class UI extends SceneModule{
 			dialog.hide();
 			confirmed.listen();
 		});
+		dialog.keyDown(Keys.ESCAPE, dialog::hide);
+		dialog.keyDown(Keys.BACK, dialog::hide);
 		dialog.show();
 	}
 

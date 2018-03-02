@@ -253,7 +253,6 @@ public class NetClient extends Module {
                 //do nothing else...
                 //TODO fix
             }
-
         });
 
         Net.handleClient(DisconnectPacket.class, packet -> {
@@ -294,11 +293,7 @@ public class NetClient extends Module {
                 next.block().handleItem(Item.getByID(packet.itemid), next, tile);
             };
 
-            if(threads.isEnabled()){
-                threads.run(r);
-            }else{
-                r.run();
-            }
+            threads.run(r);
         });
 
         Net.handleClient(ItemSetPacket.class, packet -> {
@@ -308,11 +303,7 @@ public class NetClient extends Module {
                 tile.entity.items[packet.itemid] = packet.amount;
             };
 
-            if(threads.isEnabled()){
-                threads.run(r);
-            }else{
-                r.run();
-            }
+            threads.run(r);
         });
 
         Net.handleClient(ItemOffloadPacket.class, packet -> {
@@ -323,11 +314,7 @@ public class NetClient extends Module {
                 next.block().handleItem(Item.getByID(packet.itemid), next, tile);
             };
 
-            if(threads.isEnabled()){
-                threads.run(r);
-            }else{
-                r.run();
-            }
+            threads.run(r);
         });
 
         Net.handleClient(NetErrorPacket.class, packet -> {

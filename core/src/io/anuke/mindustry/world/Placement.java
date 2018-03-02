@@ -40,7 +40,7 @@ public class Placement {
             state.inventory.addItem(tile.block().drops.item, tile.block().drops.amount);
         }
 
-        if(sound) Sounds.play("break");
+        if(sound) threads.run(() -> Sounds.play("break"));
 
         if(!tile.block().isMultiblock() && !tile.isLinked()){
             tile.setBlock(Blocks.air);
@@ -85,7 +85,7 @@ public class Placement {
             }
         }else if(effects) Effects.effect(Fx.place, x * tilesize, y * tilesize);
 
-        if(effects && sound) Sounds.play("place");
+        if(effects && sound) threads.run(() -> Sounds.play("place"));
     }
 
     public static boolean validPlace(int x, int y, Block type){

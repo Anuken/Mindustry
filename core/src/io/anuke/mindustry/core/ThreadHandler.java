@@ -34,8 +34,12 @@ public class ThreadHandler {
     }
 
     public void run(Runnable r){
-        synchronized (toRun) {
-            toRun.add(r);
+        if(enabled) {
+            synchronized (toRun) {
+                toRun.add(r);
+            }
+        }else{
+            r.run();
         }
     }
 
