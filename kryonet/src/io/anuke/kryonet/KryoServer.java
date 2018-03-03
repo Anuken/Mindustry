@@ -34,6 +34,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedSelectorException;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import static io.anuke.mindustry.Vars.headless;
 import static io.anuke.mindustry.Vars.state;
@@ -45,6 +46,7 @@ public class KryoServer implements ServerProvider {
     final ByteSerializer serializer = new ByteSerializer();
     final ByteBuffer buffer = ByteBuffer.allocate(4096);
     final CopyOnWriteArrayList<KryoConnection> connections = new CopyOnWriteArrayList<>();
+    final CopyOnWriteArraySet<Integer> missing = new CopyOnWriteArraySet<>();
     final Array<KryoConnection> array = new Array<>();
     SocketServer webServer;
     Thread serverThread;
@@ -159,6 +161,7 @@ public class KryoServer implements ServerProvider {
     public void host(int port) throws IOException {
         lastconnection = 0;
         connections.clear();
+        missing.clear();
         server.bind(port, port);
         webServer = new SocketServer(Vars.webPort);
         webServer.start();
@@ -263,27 +266,10 @@ public class KryoServer implements ServerProvider {
     public void sendTo(int id, Object object, SendMode mode) {
         NetConnection conn = getByID(id);
         if(conn == null){
-            Log.info("Failed to find connection with ID {0}!", id);
-            Log.err("KRYONET CONNECTIONS:");
-            for(Connection c : server.getConnections()){
-                NetConnection k = getByKryoID(c.getID());
-                Log.err(" - Kryonet connection / ID {0} / IP {1} / NetConnection ID {2}",
-                        c.getID(), c.getRemoteAddressTCP().getAddress().getHostAddress(), k == null ? "NOT FOUND" : k.id);
-            }
-            Log.err("NET CONNECTIONS:");
-            for(NetConnection c : connections){
-                Log.err(" - NetConnection / ID {0} / IP {1}", c.id, c.address);
-            }
-
-            Log.err("\nSTACK TRACE:");
-
-            StackTraceElement[] e = Thread.getAllStackTraces().get(Thread.currentThread());
-            for(StackTraceElement s : e){
-                Log.err("- {0}", s);
-            }
-            System.exit(-1);
+            if(!missing.contains(id))
+                Log.err("Failed to find connection with ID {0}.", id);
+            missing.add(id);
             return;
-            //throw new RuntimeException("Unable to find connection with ID " + id + "!");
         }
         conn.send(object, mode);
     }
@@ -350,6 +336,27 @@ public class KryoServer implements ServerProvider {
         }
 
         return null;
+    }
+
+    void throwErrorAndExit(){
+        Log.err("KRYONET CONNECTIONS:");
+        for(Connection c : server.getConnections()){
+            NetConnection k = getByKryoID(c.getID());
+            Log.err(" - Kryonet connection / ID {0} / IP {1} / NetConnection ID {2}",
+                    c.getID(), c.getRemoteAddressTCP().getAddress().getHostAddress(), k == null ? "NOT FOUND" : k.id);
+        }
+        Log.err("NET CONNECTIONS:");
+        for(NetConnection c : connections){
+            Log.err(" - NetConnection / ID {0} / IP {1}", c.id, c.address);
+        }
+
+        Log.err("\nSTACK TRACE:");
+
+        StackTraceElement[] e = Thread.getAllStackTraces().get(Thread.currentThread());
+        for(StackTraceElement s : e){
+            Log.err("- {0}", s);
+        }
+        System.exit(-1);
     }
 
     class KryoConnection extends NetConnection{
