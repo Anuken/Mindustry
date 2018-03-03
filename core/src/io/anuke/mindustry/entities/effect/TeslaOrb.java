@@ -47,7 +47,7 @@ public class TeslaOrb extends Entity{
 			Array<SolidEntity> enemies = Entities.getNearby(enemyGroup, curx, cury, range*2f);
 			
 			for(SolidEntity entity : enemies){
-				if(entity.distanceTo(curx, cury) < range && !hit.contains((Enemy)entity)){
+				if(entity != null && entity.distanceTo(curx, cury) < range && !hit.contains((Enemy)entity)){
 					hit.add((Enemy)entity);
 					points.add(new Vector2(entity.x + Mathf.range(shake), entity.y + Mathf.range(shake)));
 					damageEnemy((Enemy)entity);

@@ -1,7 +1,6 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.game.EnemySpawn;
@@ -130,9 +129,9 @@ public class Logic extends Module {
                 if(!state.mode.disableWaveTimer){
 
                     if(state.enemies <= 0){
-                        state.wavetime -= delta();
+                        if(!world.getMap().name.equals("tutorial")) state.wavetime -= delta();
 
-                        if(state.lastUpdated < state.wave + 1 && state.wavetime < Vars.aheadPathfinding){ //start updating beforehand
+                        if(state.lastUpdated < state.wave + 1 && state.wavetime < aheadPathfinding){ //start updating beforehand
                             world.pathfinder().resetPaths();
                             state.lastUpdated = state.wave + 1;
                         }
@@ -152,8 +151,8 @@ public class Logic extends Module {
                 Entities.update(shieldGroup);
                 Entities.update(playerGroup);
 
-                Entities.collideGroups(enemyGroup, bulletGroup);
-                Entities.collideGroups(playerGroup, bulletGroup);
+                Entities.collideGroups(bulletGroup, enemyGroup);
+                Entities.collideGroups(bulletGroup, playerGroup);
             }
         }
     }

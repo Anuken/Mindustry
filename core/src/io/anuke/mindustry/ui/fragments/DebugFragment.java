@@ -15,7 +15,6 @@ import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Log.LogHandler;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -68,9 +67,7 @@ public class DebugFragment implements Fragment {
                });
                row();
                new button("spawn", () -> {
-                   for(int i = 0; i < 30; i ++){
-                       new Enemy(EnemyTypes.healer).set(player.x + Mathf.range(50f), player.y + Mathf.range(50f)).add();
-                   }
+                   new Enemy(EnemyTypes.healer).set(player.x, player.y).add();
                });
                row();
            }}.end();

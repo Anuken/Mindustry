@@ -27,15 +27,19 @@ public class ThreadHandler {
     public ThreadHandler(ThreadProvider impl){
         this.impl = impl;
 
-        Timers.setDeltaProvider(() ->{
+        Timers.setDeltaProvider(() -> {
             float result = impl.isOnThread() ? delta : Gdx.graphics.getDeltaTime()*60f;
-            return Float.isNaN(result) ? 1f : result;
+            return Math.min(Float.isNaN(result) ? 1f : result, 12f);
         });
     }
 
     public void run(Runnable r){
-        synchronized (toRun) {
-            toRun.add(r);
+        if(enabled) {
+            synchronized (toRun) {
+                toRun.add(r);
+            }
+        }else{
+            r.run();
         }
     }
 
@@ -52,6 +56,7 @@ public class ThreadHandler {
     }
 
     public void handleRender(){
+
         if(!enabled) return;
 
         framesSinceUpdate += Timers.delta();

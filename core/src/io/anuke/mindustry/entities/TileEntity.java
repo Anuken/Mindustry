@@ -1,6 +1,5 @@
 package io.anuke.mindustry.entities;
 
-import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
@@ -22,8 +21,6 @@ import static io.anuke.mindustry.Vars.tileGroup;
 import static io.anuke.mindustry.Vars.world;
 
 public class TileEntity extends Entity{
-	private static final boolean friendlyFire = false;
-
 	public Tile tile;
 	public int[] items = new int[Item.getAllItems().size];
 	public Timer timer;
@@ -101,7 +98,7 @@ public class TileEntity extends Entity{
 	}
 	
 	public boolean collide(Bullet other){
-		return other.owner instanceof Enemy || friendlyFire;
+		return true;
 	}
 	
 	@Override

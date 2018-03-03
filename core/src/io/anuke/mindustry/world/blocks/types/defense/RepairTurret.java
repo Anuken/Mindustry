@@ -56,7 +56,7 @@ public class RepairTurret extends PowerTurret{
 			}
 
 			float target = entity.angleTo(entity.blockTarget);
-			entity.rotation = Mathf.slerp(entity.rotation, target, 0.16f*Timers.delta());
+			entity.rotation = Mathf.slerpDelta(entity.rotation, target, 0.16f);
 
 			int maxhealth = entity.blockTarget.tile.block().health;
 

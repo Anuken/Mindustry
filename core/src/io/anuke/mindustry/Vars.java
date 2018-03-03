@@ -139,6 +139,6 @@ public class Vars{
 	public static final EntityGroup<Enemy> enemyGroup = Entities.addGroup(Enemy.class).enableMapping();
 	public static final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);
 	public static final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
-	public static final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class);
-	public static final EntityGroup<EffectEntity> effectGroup = Entities.addGroup(EffectEntity.class);
+	public static final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class, false);
+	public static final EntityGroup<EffectEntity> effectGroup = Entities.addGroup(EffectEntity.class, false);
 }

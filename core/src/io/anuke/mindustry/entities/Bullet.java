@@ -1,10 +1,10 @@
 package io.anuke.mindustry.entities;
 
+import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.BulletEntity;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
-import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
 
 import static io.anuke.mindustry.Vars.*;
@@ -36,49 +36,38 @@ public class Bullet extends BulletEntity{
 	public float drawSize(){
 		return 8;
 	}
+
+	public boolean collidesTiles(){
+		return owner instanceof Enemy;
+	}
 	
 	@Override
 	public void update(){
-		
-		int tilex = Mathf.scl2(x, tilesize);
-		int tiley = Mathf.scl2(y, tilesize);
-		Tile tile = world.tile(tilex, tiley);
-		TileEntity targetEntity = null;
-		
-		if(tile != null){
-			if(tile.entity != null && tile.entity.collide(this) && !tile.entity.dead){
-				targetEntity = tile.entity;
-			}else{
-				//make sure to check for linked block collisions
-				Tile linked = tile.getLinked();
-				if(linked != null &&
-						linked.entity != null && linked.entity.collide(this) && !linked.entity.dead){
-					targetEntity = linked.entity;
-				}
-			}
-		}
-		
-		if(targetEntity != null){
-			
-			targetEntity.collision(this);
-			remove();
-			type.removed(this);
-		}
-		
 		super.update();
+
+		if (collidesTiles()) {
+			world.raycastEach(world.toTile(lastX), world.toTile(lastY), world.toTile(x), world.toTile(y), (x, y) -> {
+
+				Tile tile = world.tile(x, y);
+				if (tile == null) return false;
+				tile = tile.target();
+
+				if (tile.entity != null && tile.entity.collide(this) && !tile.entity.dead) {
+					tile.entity.collision(this);
+					remove();
+					type.hit(this);
+
+					return true;
+				}
+
+				return false;
+			});
+		}
 	}
 
 	@Override
 	public boolean collides(SolidEntity other){
-		if(owner instanceof TileEntity && other instanceof Player)
-			return false;
-		return super.collides(other);
-	}
-	
-	@Override
-	public void collision(SolidEntity other){
-		super.collision(other);
-		type.removed(this);
+		return true;
 	}
 
 	@Override
@@ -90,5 +79,4 @@ public class Bullet extends BulletEntity{
 	public Bullet add(){
 		return super.add(bulletGroup);
 	}
-
 }

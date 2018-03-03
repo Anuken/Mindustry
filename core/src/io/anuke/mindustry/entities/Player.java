@@ -150,7 +150,7 @@ public class Player extends SyncEntity{
 	public void update(){
 		if(!isLocal || isAndroid){
 			if(isAndroid && isLocal){
-				angle = Mathf.lerpAngDelta(angle, targetAngle, 0.2f);
+				angle = Mathf.slerpDelta(angle, targetAngle, 0.2f);
 			}
 			if(!isLocal) interpolate();
 			return;
@@ -216,10 +216,10 @@ public class Player extends SyncEntity{
 		
 		if(!shooting){
 			if(!movement.isZero())
-				angle = Mathf.lerpAngDelta(angle, movement.angle(), 0.13f);
+				angle = Mathf.slerpDelta(angle, movement.angle(), 0.13f);
 		}else{
 			float angle = Angles.mouseAngle(x, y);
-			this.angle = Mathf.lerpAngDelta(this.angle, angle, 0.1f);
+			this.angle = Mathf.slerpDelta(this.angle, angle, 0.1f);
 		}
 
 		x = Mathf.clamp(x, 0, world.width() * tilesize);
