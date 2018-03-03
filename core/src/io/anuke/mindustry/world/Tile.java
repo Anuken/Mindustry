@@ -231,6 +231,11 @@ public class Tile{
 		return world.tile(x + relative.x, y + relative.y);
 	}
 
+	public Tile target(){
+		Tile link = getLinked();
+		return link == null ? this : link;
+	}
+
 	public Tile getNearby(int rotation){
 		if(rotation == 0) return world.tile(x + 1, y);
 		if(rotation == 1) return world.tile(x, y + 1);

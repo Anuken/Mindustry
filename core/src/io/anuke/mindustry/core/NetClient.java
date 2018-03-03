@@ -164,7 +164,7 @@ public class NetClient extends Module {
         });
 
         Net.handleClient(PlacePacket.class, (packet) -> {
-            Placement.placeBlock(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, false);
+            Placement.placeBlock(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, Timers.get("placeblocksound", 10));
 
             if(packet.playerid == player.id){
                 Tile tile = world.tile(packet.x, packet.y);
@@ -173,7 +173,7 @@ public class NetClient extends Module {
         });
 
         Net.handleClient(BreakPacket.class, (packet) -> {
-            Placement.breakBlock(packet.x, packet.y, true, false);
+            Placement.breakBlock(packet.x, packet.y, true, Timers.get("breakblocksound", 10));
         });
 
         Net.handleClient(EntitySpawnPacket.class, packet -> {
@@ -262,11 +262,7 @@ public class NetClient extends Module {
                 next.block().handleItem(Item.getByID(packet.itemid), next, tile);
             };
 
-            if(threads.isEnabled()){
-                threads.run(r);
-            }else{
-                r.run();
-            }
+            threads.run(r);
         });
 
         Net.handleClient(ItemSetPacket.class, packet -> {
@@ -276,11 +272,7 @@ public class NetClient extends Module {
                 tile.entity.items[packet.itemid] = packet.amount;
             };
 
-            if(threads.isEnabled()){
-                threads.run(r);
-            }else{
-                r.run();
-            }
+            threads.run(r);
         });
 
         Net.handleClient(ItemOffloadPacket.class, packet -> {
@@ -291,11 +283,7 @@ public class NetClient extends Module {
                 next.block().handleItem(Item.getByID(packet.itemid), next, tile);
             };
 
-            if(threads.isEnabled()){
-                threads.run(r);
-            }else{
-                r.run();
-            }
+            threads.run(r);
         });
 
         Net.handleClient(NetErrorPacket.class, packet -> {
