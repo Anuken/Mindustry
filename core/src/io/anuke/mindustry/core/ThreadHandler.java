@@ -29,7 +29,7 @@ public class ThreadHandler {
 
         Timers.setDeltaProvider(() ->{
             float result = impl.isOnThread() ? delta : Gdx.graphics.getDeltaTime()*60f;
-            return Float.isNaN(result) ? 1f : result;
+            return Math.min(Float.isNaN(result) ? 1f : result, 12f);
         });
     }
 

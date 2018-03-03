@@ -126,6 +126,10 @@ public class World extends Module{
 	public Tile tileWorld(float x, float y){
 		return tile(Mathf.scl2(x, tilesize), Mathf.scl2(y, tilesize));
 	}
+
+	public int toTile(float coord){
+		return Mathf.scl2(coord, tilesize);
+	}
 	
 	public Tile[][] getTiles(){
 		return tiles;
@@ -318,5 +322,38 @@ public class World extends Module{
 			}
 		}
 		return null;
+	}
+
+	public void raycastEach(int x0f, int y0f, int x1, int y1, Raycaster cons){
+		int x0 = x0f;
+		int y0 = y0f;
+		int dx = Math.abs(x1 - x0);
+		int dy = Math.abs(y1 - y0);
+
+		int sx = x0 < x1 ? 1 : -1;
+		int sy = y0 < y1 ? 1 : -1;
+
+		int err = dx - dy;
+		int e2;
+		while(true){
+
+			if(cons.accept(x0, y0)) break;
+			if(x0 == x1 && y0 == y1) break;
+
+			e2 = 2 * err;
+			if(e2 > -dy){
+				err = err - dy;
+				x0 = x0 + sx;
+			}
+
+			if(e2 < dx){
+				err = err + dx;
+				y0 = y0 + sy;
+			}
+		}
+	}
+
+	public interface Raycaster{
+		boolean accept(int x, int y);
 	}
 }

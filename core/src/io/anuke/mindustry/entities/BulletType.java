@@ -79,10 +79,10 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		}
 		
 		public void despawned(Bullet b){
-			removed(b);
+			hit(b);
 		}
 		
-		public void removed(Bullet b){
+		public void hit(Bullet b, float hitx, float hity){
 			Timers.run(5f, ()-> new EMP(b.x, b.y, b.getDamage()).add());
 			Effects.effect(Fx.empshockwave, b);
 			Effects.shake(3f, 3f, b);
@@ -113,10 +113,10 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		}
 		
 		public void despawned(Bullet b){
-			removed(b);
+			hit(b);
 		}
 		
-		public void removed(Bullet b){
+		public void hit(Bullet b, float hitx, float hity){
 			Effects.shake(3f, 3f, b);
 			
 			Effects.effect(Fx.shellsmoke, b);
@@ -146,16 +146,16 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			Draw.reset();
 		}
 
-		public void removed(Bullet b) {
-			despawned(b);
+		public void hit(Bullet b, float hitx, float hity) {
+			Effects.effect(shellsmoke, b);
+			for(int i = 0; i < 3; i ++){
+				Bullet bullet = new Bullet(flakspark, b.owner, hitx, hity, b.angle() + Mathf.range(120f));
+				bullet.add();
+			}
 		}
 
 		public void despawned(Bullet b) {
-			Effects.effect(shellsmoke, b);
-			for(int i = 0; i < 3; i ++){
-				Bullet bullet = new Bullet(flakspark, b.owner, b.x, b.y, b.angle() + Mathf.range(120f));
-				bullet.add();
-			}
+			hit(b, b.x, b.y);
 		}
 	},
 	flakspark = new BulletType(2f, 2) {
@@ -193,10 +193,10 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		}
 		
 		public void despawned(Bullet b){
-			removed(b);
+			hit(b);
 		}
 		
-		public void removed(Bullet b){
+		public void hit(Bullet b, float hitx, float hity){
 			Effects.shake(3f, 3f, b);
 			
 			Effects.effect(Fx.shellsmoke, b);
@@ -224,10 +224,10 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		}
 		
 		public void despawned(Bullet b){
-			removed(b);
+			hit(b);
 		}
 		
-		public void removed(Bullet b){
+		public void hit(Bullet b, float hitx, float hity){
 			Effects.shake(3f, 3f, b);
 			
 			Effects.effect(Fx.shellsmoke, b);
@@ -244,19 +244,19 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		}
 		
 		public void despawned(Bullet b){
-			removed(b);
+			hit(b);
 		}
 		
-		public void removed(Bullet b){
+		public void hit(Bullet b, float hitx, float hity){
 			Effects.shake(3f, 3f, b);
 			
 			Effects.effect(Fx.blastsmoke, b);
 			Effects.effect(Fx.blastexplosion, b);
 
 			//TODO remove translation() usage
-			Angles.circleVectors(30, 6f, (x, y) -> {
-				float ang = Mathf.atan2(x, y);
-				Bullet o = new Bullet(blastshot, b.owner, b.x + x, b.y + y, ang).add();
+			Angles.circleVectors(30, 6f, (nx, ny) -> {
+				float ang = Mathf.atan2(nx, ny);
+				Bullet o = new Bullet(blastshot, b.owner, b.x + nx, b.y + ny, ang).add();
 				o.damage = b.damage/9;
 			});
 		}
@@ -363,10 +363,10 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		}
 
 		public void despawned(Bullet b){
-			removed(b);
+			hit(b);
 		}
 
-		public void removed(Bullet b){
+		public void hit(Bullet b, float hitx, float hity){
 			Effects.shake(1.5f, 1.5f, b);
 
 			Effects.effect(Fx.clusterbomb, b);
@@ -415,10 +415,10 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		}
 
 		public void despawned(Bullet b) {
-			removed(b);
+			hit(b);
 		}
 
-		public void removed(Bullet b) {
+		public void hit(Bullet b, float hitx, float hity) {
 			for(int i = 0; i < 4; i ++){
 				Bullet bullet = new Bullet(scrap, b.owner, b.x, b.y, b.angle() + Mathf.range(80f));
 				bullet.add();
@@ -479,7 +479,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 	}
 	
 	@Override
-	public void removed(Bullet b){
-		Effects.effect(Fx.hit, b);
+	public void hit(Bullet b, float hitx, float hity){
+		Effects.effect(Fx.hit, hitx, hity);
 	}
 }

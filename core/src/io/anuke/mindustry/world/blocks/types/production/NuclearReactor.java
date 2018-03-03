@@ -72,7 +72,7 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		float fullness = (float)fuel / itemCapacity;
 		
 		if(fuel > 0){
-			entity.heat += fullness * heating * Timers.delta();
+			entity.heat += fullness * heating * Math.min(Timers.delta(), 4f);
 			entity.power += powerMultiplier * fullness * Timers.delta();
 			entity.power = Mathf.clamp(entity.power, 0f, powerCapacity);
 			if(entity.timer.get(timerFuel, fuelUseTime)){

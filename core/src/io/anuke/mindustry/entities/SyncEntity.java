@@ -59,7 +59,7 @@ public abstract class SyncEntity extends DestructibleEntity{
 
             this.x = spos.x = Mathf.lerpDelta(spos.x, x, 0.2f);
             this.y = spos.y = Mathf.lerpDelta(spos.y, y, 0.2f);
-            this.angle = spos.z = Mathf.lerpAngDelta(spos.z, angle, 0.3f);
+            this.angle = spos.z = Mathf.slerpDelta(spos.z, angle, 0.3f);
         }
 
         drawSmooth();
@@ -124,7 +124,7 @@ public abstract class SyncEntity extends DestructibleEntity{
 
             Mathf.lerp2(pos.set(last), target, time);
 
-            angle = Mathf.lerpAngDelta(angle, targetrot, 0.6f);
+            angle = Mathf.slerpDelta(angle, targetrot, 0.6f);
 
             if(target.dst(pos) > 128){
                 pos.set(target);
