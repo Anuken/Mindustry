@@ -124,6 +124,8 @@ public class UI extends SceneModule{
 	@Override
 	public synchronized void update(){
 		if(Vars.debug && !Vars.showUI) return;
+
+		if(Graphics.drawing()) Graphics.end();
 		
 		scene.act();
 		scene.draw();

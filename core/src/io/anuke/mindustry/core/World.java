@@ -240,7 +240,7 @@ public class World extends Module{
 		if(!tile.block().isMultiblock() && !tile.isLinked()){
 			tile.setBlock(Blocks.air);
 		}else{
-			Tile target = tile.isLinked() ? tile.getLinked() : tile;
+			Tile target = tile.target();
 			Array<Tile> removals = target.getLinkedTiles();
 			for(Tile toremove : removals){
 				//note that setting a new block automatically unlinks it

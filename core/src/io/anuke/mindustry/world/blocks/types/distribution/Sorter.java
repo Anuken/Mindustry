@@ -70,9 +70,9 @@ public class Sorter extends Block{
 		}else{
 			Tile a = dest.getNearby(Mathf.mod(dir - 1, 4));
 			Tile b = dest.getNearby(Mathf.mod(dir + 1, 4));
-			boolean ac = !(a.block().instantTransfer && source.block().instantTransfer) &&
+			boolean ac = a != null && !(a.block().instantTransfer && source.block().instantTransfer) &&
 								a.block().acceptItem(item, a, dest);
-			boolean bc = !(b.block().instantTransfer && source.block().instantTransfer) &&
+			boolean bc = b != null && !(b.block().instantTransfer && source.block().instantTransfer) &&
 								b.block().acceptItem(item, b, dest);
 			
 			if(ac && !bc){
