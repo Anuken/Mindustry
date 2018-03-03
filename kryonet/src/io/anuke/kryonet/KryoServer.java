@@ -450,6 +450,8 @@ public class KryoServer implements ServerProvider {
 
             Log.info("&bRecieved web connection: {0} {1}", kn.id, connect.addressTCP);
             connections.add(kn);
+
+            Gdx.app.postRunnable(() -> Net.handleServerReceived(kn.id, connect));
         }
 
         @Override
@@ -462,7 +464,7 @@ public class KryoServer implements ServerProvider {
             Disconnect disconnect = new Disconnect();
             disconnect.id = k.id;
             Log.info("&bLost web connection: {0}", k.id);
-            Net.handleServerReceived(k.id, disconnect);
+            Gdx.app.postRunnable(() -> Net.handleServerReceived(k.id, disconnect));
         }
 
         @Override
@@ -479,7 +481,7 @@ public class KryoServer implements ServerProvider {
                     byte[] out = Base64Coder.decode(message);
                     ByteBuffer buffer = ByteBuffer.wrap(out);
                     Object o = serializer.read(buffer);
-                    Net.handleServerReceived(k.id, o);
+                    Gdx.app.postRunnable(() -> Net.handleServerReceived(k.id, o));
                 }
             }catch (Exception e){
                 Log.err(e);

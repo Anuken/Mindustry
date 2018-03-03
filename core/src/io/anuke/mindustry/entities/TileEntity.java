@@ -21,8 +21,6 @@ import static io.anuke.mindustry.Vars.tileGroup;
 import static io.anuke.mindustry.Vars.world;
 
 public class TileEntity extends Entity{
-	private static final boolean friendlyFire = true;
-
 	public Tile tile;
 	public int[] items = new int[Item.getAllItems().size];
 	public Timer timer;
