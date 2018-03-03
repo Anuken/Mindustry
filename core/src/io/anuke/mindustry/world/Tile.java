@@ -167,17 +167,6 @@ public class Tile{
 		return extra;
 	}
 
-	//TODO fix
-	/*
-	public short getPackedData(){
-		return Bits.packShort(dump, extra);
-	}
-
-	public void setPackedData(short data){
-		this.dump = Bits.getLeftByte(data);
-		this.extra = Bits.getRightByte(data);
-	}*/
-
 	public boolean passable(){
 		Block block = block();
 		Block floor = floor();
