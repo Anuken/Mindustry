@@ -87,6 +87,7 @@ public class Recipes {
 			new Recipe(liquid, DistributionBlocks.pulseconduit, stack(Item.titanium, 1), stack(Item.steel, 1)),
 			new Recipe(liquid, DistributionBlocks.liquidrouter, stack(Item.steel, 2)),
 			new Recipe(liquid, DistributionBlocks.liquidjunction, stack(Item.steel, 2)),
+			new Recipe(liquid, DistributionBlocks.conduittunnel, stack(Item.titanium, 2), stack(Item.steel, 2)),
 
 			new Recipe(liquid, ProductionBlocks.pump, stack(Item.steel, 10)),
 			new Recipe(liquid, ProductionBlocks.fluxpump, stack(Item.steel, 10), stack(Item.dirium, 5)),

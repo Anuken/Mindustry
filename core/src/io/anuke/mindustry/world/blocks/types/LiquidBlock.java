@@ -60,7 +60,6 @@ public class LiquidBlock extends Block implements LiquidAcceptor{
 		if(entity.liquidAmount > 0.01f && entity.timer.get(timerFlow, 1)){
 			tryMoveLiquid(tile, tile.getNearby(tile.getRotation()));
 		}
-		
 	}
 	
 	public void tryDumpLiquid(Tile tile){
