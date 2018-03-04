@@ -2,6 +2,8 @@ package io.anuke.mindustry.world.blocks;
 
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.distribution.*;
+import io.anuke.mindustry.world.blocks.types.storage.Unloader;
+import io.anuke.mindustry.world.blocks.types.storage.Vault;
 
 public class DistributionBlocks{
 	
@@ -38,8 +40,17 @@ public class DistributionBlocks{
 
 	}},
 
-	vault = new Router("vault"){{
+	multiplexer = new Router("multiplexer"){{
 		width = height = 2;
+		capacity = 80;
+	}},
+
+	vault = new Vault("vault"){{
+		width = height = 3;
+	}},
+
+	unloader = new Unloader("unloader"){{
+
 	}},
 	
 	junction = new Junction("junction"){{

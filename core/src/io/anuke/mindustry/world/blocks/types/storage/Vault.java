@@ -3,13 +3,12 @@ package io.anuke.mindustry.world.blocks.types.storage;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 
-public class Vault extends Block {
-    public int capacity;
+public class Vault extends StorageBlock {
+    public int capacity = 1000;
 
     public Vault(String name){
         super(name);
@@ -29,7 +28,7 @@ public class Vault extends Block {
         int iterations = Math.max(1, (int) (Timers.delta() + 0.4f));
 
         for(int i = 0; i < iterations; i ++) {
-            if (tile.entity.totalItems() > 0) { //TODO only output to the right blocks
+            if (tile.entity.totalItems() > 0) {
                 tryDump(tile);
             }
         }
@@ -48,6 +47,6 @@ public class Vault extends Block {
 
     @Override
     public boolean canDump(Tile tile, Tile to, Item item){
-        return to != null && (to.block() instanceof Vault || to.block() instanceof CoreBlock);
+        return to.target().block() instanceof StorageBlock;
     }
 }

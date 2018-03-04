@@ -160,7 +160,7 @@ public class WeaponBlocks{
 			shootsound = "bigshot";
 			inaccuracy = 8f;
 			range = 80f;
-			reload = 5f;
+			reload = 8f;
 			bullet = BulletType.chain;
 			ammo = Item.uranium;
 			health = 430;

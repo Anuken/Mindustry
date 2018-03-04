@@ -33,12 +33,10 @@ import java.nio.ByteBuffer;
 import static io.anuke.mindustry.Vars.*;
 
 public class NetServer extends Module{
-    private final static float serverSyncTime = 4, itemSyncTime = 10, blockSyncTime = 120;
-    private final static boolean sendBlockSync = false;
+    private final static float serverSyncTime = 4, itemSyncTime = 10;
 
     private final static int timerEntitySync = 0;
     private final static int timerStateSync = 1;
-    private final static int timerBlockSync = 2;
 
     public final Administration admins = new Administration();
 

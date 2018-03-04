@@ -2,7 +2,6 @@ package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
@@ -115,9 +114,7 @@ public class BlocksFragment implements Fragment{
 						int i = 0;
 
 						for (Recipe r : recipes) {
-							TextureRegion region = Draw.hasRegion(r.result.name() + "-icon") ?
-									Draw.region(r.result.name() + "-icon") : Draw.region(r.result.name());
-							ImageButton image = new ImageButton(region, "select");
+							ImageButton image = new ImageButton(r.result.getIcon(), "select");
 
 							image.addListener(new ClickListener(){
 								@Override
@@ -252,10 +249,7 @@ public class BlocksFragment implements Fragment{
 		
 		desctable.row();
 		
-		TextureRegion region = Draw.hasRegion(recipe.result.name() + "-icon") ? 
-				Draw.region(recipe.result.name() + "-icon") : Draw.region(recipe.result.name());
-		
-		header.addImage(region).size(8*5).padTop(4);
+		header.addImage(recipe.result.getIcon()).size(8*5).padTop(4);
 		Label nameLabel = new Label(recipe.result.formalName);
 		nameLabel.setWrap(true);
 		header.add(nameLabel).padLeft(2).width(120f);
@@ -357,6 +351,8 @@ public class BlocksFragment implements Fragment{
 			return;
 		}
 
+		int index = 0;
+
 		for(int i = 0; i < state.inventory.getItems().length; i ++){
 			int amount = state.inventory.getItems()[i];
 			if(amount == 0) continue;
@@ -367,7 +363,7 @@ public class BlocksFragment implements Fragment{
 			label.setFontScale(fontscale*1.5f);
 			itemtable.add(image).size(8*3);
 			itemtable.add(label).expandX().left();
-			if(i % 2 == 1 && i > 0) itemtable.row();
+			if(index++ % 2 == 1 && index > 0) itemtable.row();
 		}
 	}
 

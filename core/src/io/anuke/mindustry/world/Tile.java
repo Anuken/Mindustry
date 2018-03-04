@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Mathf;
 
@@ -227,13 +228,31 @@ public class Tile{
 		}
 	}
 
-	public Tile getNearby(GridPoint2 relative){
-		return world.tile(x + relative.x, y + relative.y);
+	public void allNearby(Consumer<Tile> cons){
+		for(GridPoint2 point : Edges.getEdges(block().width)){
+			Tile tile = world.tile(x + point.x, y + point.y);
+			if(tile != null){
+				cons.accept(tile.target());
+			}
+		}
+	}
+
+	public void allInside(Consumer<Tile> cons){
+		for(GridPoint2 point : Edges.getInsideEdges(block().width)){
+			Tile tile = world.tile(x + point.x, y + point.y);
+			if(tile != null){
+				cons.accept(tile);
+			}
+		}
 	}
 
 	public Tile target(){
 		Tile link = getLinked();
 		return link == null ? this : link;
+	}
+
+	public Tile getNearby(GridPoint2 relative){
+		return world.tile(x + relative.x, y + relative.y);
 	}
 
 	public Tile getNearby(int rotation){

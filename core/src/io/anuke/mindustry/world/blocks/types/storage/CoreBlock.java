@@ -2,13 +2,13 @@ package io.anuke.mindustry.world.blocks.types.storage;
 
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.debug;
 import static io.anuke.mindustry.Vars.state;
 
-public class CoreBlock extends Block {
+public class CoreBlock extends StorageBlock {
+    protected int capacity = 1000;
 
     public CoreBlock(String name) {
         super(name);
@@ -32,6 +32,6 @@ public class CoreBlock extends Block {
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return item.material;
+        return item.material && tile.entity.getItem(item) < capacity;
     }
 }

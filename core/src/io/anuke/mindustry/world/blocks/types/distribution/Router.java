@@ -9,9 +9,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 
 public class Router extends Block{
-	protected final int timerDump = timers++;
-	
-	int capacity = 20;
+	protected int capacity = 20;
 
 	public Router(String name) {
 		super(name);

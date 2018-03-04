@@ -26,7 +26,9 @@ public class Inventory {
         addItem(Item.stone, 40);
 
         if(debug){
-            Arrays.fill(items, 99999);
+            for(Item item : Item.getAllItems()){
+                if(item.material) items[item.id] = 99999;
+            }
         }
     }
 
