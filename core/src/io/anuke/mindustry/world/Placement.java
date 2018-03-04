@@ -12,7 +12,6 @@ import io.anuke.mindustry.resource.Recipes;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Sounds;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.SolidEntity;
 
@@ -40,7 +39,7 @@ public class Placement {
             state.inventory.addItem(tile.block().drops.item, tile.block().drops.amount);
         }
 
-        if(sound) threads.run(() -> Sounds.play("break"));
+        if(sound) threads.run(() -> Effects.sound("break", x * tilesize, y * tilesize));
 
         if(!tile.block().isMultiblock() && !tile.isLinked()){
             tile.setBlock(Blocks.air);
@@ -85,7 +84,7 @@ public class Placement {
             }
         }else if(effects) Effects.effect(Fx.place, x * tilesize, y * tilesize);
 
-        if(effects && sound) threads.run(() -> Sounds.play("place"));
+        if(effects && sound) threads.run(() -> Effects.sound("place", x * tilesize, y * tilesize));
     }
 
     public static boolean validPlace(int x, int y, Block type){
