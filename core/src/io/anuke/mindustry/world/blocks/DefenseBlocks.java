@@ -62,6 +62,7 @@ public class DefenseBlocks{
       		reload = 12f;
 			health = 90;
 			powerUsed = 0.13f;
+			width = height = 2;
 		}
 	},
 

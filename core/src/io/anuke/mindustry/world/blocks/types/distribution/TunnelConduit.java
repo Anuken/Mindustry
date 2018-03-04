@@ -4,7 +4,6 @@ import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidAcceptor;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Log;
 
 public class TunnelConduit extends Conduit {
     protected int maxdist = 3;
@@ -25,7 +24,6 @@ public class TunnelConduit extends Conduit {
 
     @Override
     public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
-        Log.info("handle");
         Tile tunnel = getDestTunnel(tile);
         if (tunnel == null) return;
         Tile to = tunnel.getNearby(tunnel.getRotation());

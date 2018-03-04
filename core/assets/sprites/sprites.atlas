@@ -20,623 +20,623 @@ blank
   index: -1
 blocks/environment/blackrock1
   rotate: false
-  xy: 535, 57
+  xy: 580, 158
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/blackrockshadow1
   rotate: false
-  xy: 171, 4
+  xy: 596, 215
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/blackstone1
   rotate: false
-  xy: 532, 121
+  xy: 596, 205
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/blackstone2
   rotate: false
-  xy: 542, 125
+  xy: 596, 195
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/blackstone3
   rotate: false
-  xy: 552, 125
+  xy: 596, 185
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/blackstoneblock1
   rotate: false
-  xy: 584, 214
+  xy: 594, 175
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/blackstoneblock2
   rotate: false
-  xy: 584, 204
+  xy: 590, 165
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/blackstoneblock3
   rotate: false
-  xy: 584, 194
+  xy: 590, 155
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/blackstoneedge
   rotate: false
-  xy: 191, 44
+  xy: 207, 42
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 blocks/environment/coal1
   rotate: false
-  xy: 593, 165
+  xy: 809, 402
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/coal2
   rotate: false
-  xy: 604, 211
+  xy: 819, 412
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/coal3
   rotate: false
-  xy: 604, 201
+  xy: 809, 392
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/deepwater
   rotate: false
-  xy: 183, 28
+  xy: 539, 103
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/dirt1
   rotate: false
-  xy: 183, 18
+  xy: 539, 93
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/dirt2
   rotate: false
-  xy: 793, 426
+  xy: 539, 83
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/dirt3
   rotate: false
-  xy: 803, 426
+  xy: 549, 103
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/dirtedge
   rotate: false
-  xy: 207, 58
+  xy: 171, 4
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 blocks/environment/grass1
   rotate: false
-  xy: 285, 47
+  xy: 559, 83
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/grass2
   rotate: false
-  xy: 295, 47
+  xy: 621, 216
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/grass3
   rotate: false
-  xy: 305, 47
+  xy: 721, 234
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/grassblock1
   rotate: false
-  xy: 315, 47
+  xy: 600, 165
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/grassblock2
   rotate: false
-  xy: 325, 47
+  xy: 600, 155
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/grassedge
   rotate: false
-  xy: 205, 44
+  xy: 191, 28
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 blocks/environment/ice1
   rotate: false
-  xy: 335, 47
+  xy: 604, 175
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/ice2
   rotate: false
-  xy: 345, 49
+  xy: 797, 376
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/ice3
   rotate: false
-  xy: 355, 49
+  xy: 807, 373
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/iceedge
   rotate: false
-  xy: 451, 67
+  xy: 205, 28
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 blocks/environment/icerock1
   rotate: false
-  xy: 365, 49
+  xy: 817, 372
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/icerock2
   rotate: false
-  xy: 375, 49
+  xy: 827, 372
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/icerockshadow1
   rotate: false
-  xy: 385, 49
+  xy: 839, 432
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/rockshadow1
   rotate: false
-  xy: 385, 49
+  xy: 839, 432
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/icerockshadow2
   rotate: false
-  xy: 395, 49
+  xy: 839, 422
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/rockshadow2
   rotate: false
-  xy: 395, 49
+  xy: 839, 422
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/iron1
   rotate: false
-  xy: 203, 34
+  xy: 849, 383
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/iron2
   rotate: false
-  xy: 203, 24
+  xy: 535, 73
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/iron3
   rotate: false
-  xy: 193, 14
+  xy: 545, 73
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/lava
   rotate: false
-  xy: 203, 4
+  xy: 609, 209
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/lavaedge
   rotate: false
-  xy: 465, 67
+  xy: 965, 437
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 blocks/environment/mossblock
   rotate: false
-  xy: 435, 49
+  xy: 616, 196
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/oil
   rotate: false
-  xy: 213, 30
+  xy: 616, 186
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/oiledge
   rotate: false
-  xy: 507, 67
+  xy: 525, 99
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 blocks/environment/rock1
   rotate: false
-  xy: 724, 332
+  xy: 869, 397
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/rock2
   rotate: false
-  xy: 724, 322
+  xy: 879, 407
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/sand1
   rotate: false
-  xy: 734, 325
+  xy: 869, 387
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/sand2
   rotate: false
-  xy: 623, 155
+  xy: 879, 397
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/sand3
   rotate: false
-  xy: 233, 3
+  xy: 889, 407
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/sandblock1
   rotate: false
-  xy: 243, 3
+  xy: 899, 417
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/sandblock2
   rotate: false
-  xy: 734, 315
+  xy: 909, 427
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/sandblock3
   rotate: false
-  xy: 730, 305
+  xy: 919, 437
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/sandedge
   rotate: false
-  xy: 521, 67
+  xy: 525, 85
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 blocks/environment/shrub
   rotate: false
-  xy: 634, 199
+  xy: 899, 397
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/shrubshadow
   rotate: false
-  xy: 634, 189
+  xy: 909, 407
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/snow1
   rotate: false
-  xy: 653, 234
+  xy: 919, 407
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/snow2
   rotate: false
-  xy: 663, 234
+  xy: 909, 387
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/snow3
   rotate: false
-  xy: 673, 234
+  xy: 919, 397
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/snowblock1
   rotate: false
-  xy: 683, 234
+  xy: 919, 387
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/snowblock2
   rotate: false
-  xy: 644, 224
+  xy: 929, 434
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/snowblock3
   rotate: false
-  xy: 644, 214
+  xy: 939, 434
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/snowedge
   rotate: false
-  xy: 965, 437
+  xy: 623, 235
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 blocks/environment/stone1
   rotate: false
-  xy: 654, 204
+  xy: 939, 414
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/stone2
   rotate: false
-  xy: 664, 214
+  xy: 949, 424
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/stone3
   rotate: false
-  xy: 674, 224
+  xy: 929, 394
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/stoneblock1
   rotate: false
-  xy: 644, 184
+  xy: 939, 404
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/stoneblock2
   rotate: false
-  xy: 654, 194
+  xy: 949, 414
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/stoneblock3
   rotate: false
-  xy: 664, 204
+  xy: 939, 394
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/stoneedge
   rotate: false
-  xy: 231, 55
+  xy: 781, 430
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 blocks/environment/titanium1
   rotate: false
-  xy: 664, 184
+  xy: 959, 427
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/titanium2
   rotate: false
-  xy: 674, 194
+  xy: 959, 417
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/titanium3
   rotate: false
-  xy: 664, 174
+  xy: 969, 427
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/uranium1
   rotate: false
-  xy: 644, 164
+  xy: 969, 397
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/uranium2
   rotate: false
-  xy: 654, 164
+  xy: 979, 407
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/uranium3
   rotate: false
-  xy: 664, 164
+  xy: 989, 417
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/water
   rotate: false
-  xy: 654, 154
+  xy: 999, 417
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/environment/wateredge
   rotate: false
-  xy: 245, 55
+  xy: 795, 434
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 blocks/extra/block-middle
   rotate: false
-  xy: 594, 195
+  xy: 809, 422
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/extra/conduitliquid
   rotate: false
-  xy: 624, 215
+  xy: 829, 392
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/extra/cross
   rotate: false
-  xy: 613, 161
+  xy: 785, 372
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/extra/enemyspawn
   rotate: false
-  xy: 265, 47
+  xy: 559, 103
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/extra/playerspawn
   rotate: false
-  xy: 223, 30
+  xy: 859, 423
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/extra/shadow
   rotate: false
-  xy: 463, 55
+  xy: 685, 232
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 blocks/production/coaldrill
   rotate: false
-  xy: 604, 191
+  xy: 819, 402
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/coalgenerator
   rotate: false
-  xy: 604, 181
+  xy: 819, 392
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/coalgenerator-top
   rotate: false
-  xy: 614, 211
+  xy: 819, 382
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/coalpurifier
   rotate: false
-  xy: 614, 201
+  xy: 833, 442
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/combustiongenerator
   rotate: false
-  xy: 614, 191
+  xy: 829, 432
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/crucible
   rotate: false
-  xy: 1007, 437
+  xy: 544, 113
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/fluxpump
   rotate: false
-  xy: 275, 47
+  xy: 559, 93
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/irondrill
   rotate: false
-  xy: 203, 14
+  xy: 555, 73
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/lavasmelter
   rotate: false
-  xy: 837, 430
+  xy: 606, 199
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -664,175 +664,175 @@ blocks/production/nuclearreactor-lights
   index: -1
 blocks/production/nuclearreactor-small
   rotate: false
-  xy: 411, 87
+  xy: 231, 69
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 blocks/production/oilrefinery
   rotate: false
-  xy: 213, 20
+  xy: 614, 176
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/omnidrill
   rotate: false
-  xy: 213, 10
+  xy: 859, 433
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/powerbooster
   rotate: false
-  xy: 223, 20
+  xy: 859, 413
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/pulverizer
   rotate: false
-  xy: 721, 294
+  xy: 879, 417
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/pump
   rotate: false
-  xy: 724, 352
+  xy: 889, 427
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/quartzextractor
   rotate: false
-  xy: 724, 342
+  xy: 899, 437
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/rtgenerator
   rotate: false
-  xy: 734, 345
+  xy: 899, 427
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/rtgenerator-top
   rotate: false
-  xy: 734, 335
+  xy: 909, 437
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/siliconextractor
   rotate: false
-  xy: 634, 179
+  xy: 919, 417
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/smelter
   rotate: false
-  xy: 634, 169
+  xy: 899, 387
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/smelter-middle
   rotate: false
-  xy: 643, 234
+  xy: 909, 397
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/stonedrill
   rotate: false
-  xy: 674, 214
+  xy: 949, 404
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/stoneformer
   rotate: false
-  xy: 644, 174
+  xy: 949, 394
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/thermalgenerator
   rotate: false
-  xy: 654, 174
+  xy: 565, 73
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/titaniumdrill
   rotate: false
-  xy: 674, 184
+  xy: 959, 407
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/titaniumpurifier
   rotate: false
-  xy: 674, 174
+  xy: 969, 417
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/production/uraniumdrill
   rotate: false
-  xy: 674, 164
+  xy: 999, 427
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/conduit
   rotate: false
-  xy: 604, 171
+  xy: 829, 412
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/conduitbottom
   rotate: false
-  xy: 614, 171
+  xy: 829, 402
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/conduittop
   rotate: false
-  xy: 624, 205
+  xy: 829, 382
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/conduittunnel
   rotate: false
-  xy: 624, 195
+  xy: 843, 443
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/conveyor
   rotate: false
-  xy: 624, 185
+  xy: 853, 443
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/conveyormove
   rotate: false
-  xy: 624, 175
+  xy: 1007, 437
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/conveyortunnel
   rotate: false
-  xy: 603, 161
+  xy: 525, 75
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -846,161 +846,161 @@ blocks/tech/core
   index: -1
 blocks/tech/junction
   rotate: false
-  xy: 193, 4
+  xy: 610, 155
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/liquidjunction
   rotate: false
-  xy: 847, 431
+  xy: 606, 189
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/liquidrouter
   rotate: false
-  xy: 857, 431
+  xy: 619, 206
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/multiplexer
   rotate: false
-  xy: 393, 87
+  xy: 411, 87
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 blocks/tech/poweredconveyor
   rotate: false
-  xy: 223, 10
+  xy: 859, 403
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/poweredconveyormove
   rotate: false
-  xy: 233, 33
+  xy: 859, 393
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/powerinfinite
   rotate: false
-  xy: 233, 23
+  xy: 859, 383
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/powerlaser
   rotate: false
-  xy: 243, 33
+  xy: 869, 437
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/powerlasercorner
   rotate: false
-  xy: 233, 13
+  xy: 869, 427
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/powerlaserrouter
   rotate: false
-  xy: 243, 23
+  xy: 879, 437
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/powervoid
   rotate: false
-  xy: 243, 13
+  xy: 869, 417
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/pulseconduit
   rotate: false
-  xy: 691, 294
+  xy: 879, 427
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/pulseconduitbottom
   rotate: false
-  xy: 701, 294
+  xy: 889, 437
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/pulseconduittop
   rotate: false
-  xy: 711, 294
+  xy: 869, 407
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/router
   rotate: false
-  xy: 734, 355
+  xy: 889, 417
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/shieldgenerator
   rotate: false
-  xy: 740, 305
+  xy: 889, 397
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/sorter
   rotate: false
-  xy: 654, 224
+  xy: 929, 424
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/splitter
   rotate: false
-  xy: 644, 204
+  xy: 949, 434
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/steelconveyor
   rotate: false
-  xy: 654, 214
+  xy: 929, 414
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/steelconveyormove
   rotate: false
-  xy: 664, 224
+  xy: 939, 424
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/teleporter
   rotate: false
-  xy: 664, 194
+  xy: 939, 384
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/teleporter-top
   rotate: false
-  xy: 674, 204
+  xy: 949, 384
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/unloader
   rotate: false
-  xy: 684, 174
+  xy: 959, 387
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -1014,21 +1014,21 @@ blocks/tech/vault
   index: -1
 blocks/tech/vault-icon
   rotate: false
-  xy: 684, 164
+  xy: 969, 387
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/tech/weaponfactory
   rotate: false
-  xy: 321, 69
+  xy: 339, 69
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 blocks/turrets/block
   rotate: false
-  xy: 594, 205
+  xy: 809, 432
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -1070,63 +1070,63 @@ blocks/turrets/doubleturret
   index: -1
 blocks/turrets/flameturret
   rotate: false
-  xy: 259, 57
+  xy: 185, 2
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 blocks/turrets/laserturret
   rotate: false
-  xy: 841, 441
+  xy: 544, 123
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 blocks/turrets/machineturret
   rotate: false
-  xy: 853, 441
+  xy: 637, 232
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 blocks/turrets/megarepairturret
   rotate: false
-  xy: 219, 40
-  size: 10, 10
-  orig: 10, 10
+  xy: 393, 87
+  size: 16, 16
+  orig: 16, 16
   offset: 0, 0
   index: -1
 blocks/turrets/mortarturret
   rotate: false
-  xy: 231, 43
+  xy: 649, 232
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 blocks/turrets/plasmaturret
   rotate: false
-  xy: 243, 43
+  xy: 661, 232
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 blocks/turrets/repairturret
   rotate: false
-  xy: 451, 55
+  xy: 673, 232
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 blocks/turrets/shotgunturret
   rotate: false
-  xy: 475, 55
+  xy: 697, 232
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 blocks/turrets/sniperturret
   rotate: false
-  xy: 487, 55
+  xy: 709, 232
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
@@ -1140,35 +1140,35 @@ blocks/turrets/titancannon
   index: -1
 blocks/turrets/titancannon-icon
   rotate: false
-  xy: 499, 55
+  xy: 584, 212
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 blocks/turrets/turret
   rotate: false
-  xy: 511, 55
+  xy: 584, 200
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 blocks/turrets/waveturret
   rotate: false
-  xy: 523, 55
+  xy: 584, 188
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 blocks/walls/compositewall
   rotate: false
-  xy: 614, 181
+  xy: 829, 422
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/walls/door
   rotate: false
-  xy: 817, 430
+  xy: 549, 93
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -1189,14 +1189,14 @@ blocks/walls/door-large-open
   index: -1
 blocks/walls/door-open
   rotate: false
-  xy: 827, 430
+  xy: 549, 83
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/walls/duriumwall
   rotate: false
-  xy: 255, 45
+  xy: 554, 113
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -1210,147 +1210,147 @@ blocks/walls/duriumwall-large
   index: -1
 blocks/walls/ironwall
   rotate: false
-  xy: 183, 8
+  xy: 610, 165
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/walls/steelwall
   rotate: false
-  xy: 644, 194
+  xy: 929, 404
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/walls/steelwall-large
   rotate: false
-  xy: 231, 69
+  xy: 249, 69
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 blocks/walls/stonewall
   rotate: false
-  xy: 654, 184
+  xy: 929, 384
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/walls/titaniumshieldwall
   rotate: false
-  xy: 684, 224
+  xy: 979, 427
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/walls/titaniumwall
   rotate: false
-  xy: 684, 214
+  xy: 959, 397
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 blocks/walls/titaniumwall-large
   rotate: false
-  xy: 303, 69
+  xy: 321, 69
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 bullet
   rotate: false
-  xy: 594, 185
+  xy: 819, 432
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 chainbullet
   rotate: false
-  xy: 584, 175
+  xy: 809, 383
   size: 8, 7
   orig: 8, 7
   offset: 0, 0
   index: -1
 enemies/blastenemy-t1
   rotate: false
-  xy: 339, 71
+  xy: 357, 71
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/blastenemy-t2
   rotate: false
-  xy: 355, 71
+  xy: 373, 71
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/blastenemy-t3
   rotate: false
-  xy: 371, 71
+  xy: 389, 71
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/empenemy-t1
   rotate: false
-  xy: 387, 71
+  xy: 405, 71
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/empenemy-t2
   rotate: false
-  xy: 403, 71
+  xy: 429, 89
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/empenemy-t3
   rotate: false
-  xy: 429, 89
+  xy: 641, 276
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/fastenemy-t1
   rotate: false
-  xy: 641, 276
+  xy: 641, 260
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/fastenemy-t2
   rotate: false
-  xy: 641, 260
+  xy: 657, 276
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/fastenemy-t3
   rotate: false
-  xy: 657, 276
+  xy: 657, 260
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/flamerenemy-t1
   rotate: false
-  xy: 657, 260
+  xy: 673, 276
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/flamerenemy-t2
   rotate: false
-  xy: 673, 276
+  xy: 673, 260
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/flamerenemy-t3
   rotate: false
-  xy: 673, 260
+  xy: 641, 244
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -1378,217 +1378,217 @@ enemies/fortressenemy-t3
   index: -1
 enemies/healerenemy-t1
   rotate: false
-  xy: 641, 244
+  xy: 657, 244
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/healerenemy-t2
   rotate: false
-  xy: 657, 244
+  xy: 673, 244
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/healerenemy-t3
   rotate: false
-  xy: 673, 244
+  xy: 698, 304
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/mortarenemy-t1
   rotate: false
-  xy: 509, 97
+  xy: 191, 58
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/mortarenemy-t2
   rotate: false
-  xy: 435, 73
+  xy: 445, 81
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/mortarenemy-t3
   rotate: false
-  xy: 191, 58
+  xy: 461, 81
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/rapidenemy-t1
   rotate: false
-  xy: 451, 81
+  xy: 477, 81
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/rapidenemy-t2
   rotate: false
-  xy: 467, 81
+  xy: 493, 81
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/rapidenemy-t3
   rotate: false
-  xy: 483, 81
+  xy: 509, 81
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/standardenemy-t1
   rotate: false
-  xy: 499, 81
+  xy: 191, 42
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/targetenemy-t1
   rotate: false
-  xy: 499, 81
+  xy: 191, 42
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/standardenemy-t2
   rotate: false
-  xy: 979, 437
+  xy: 187, 14
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 enemies/standardenemy-t3
   rotate: false
-  xy: 993, 437
+  xy: 201, 14
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 enemies/tankenemy-t1
   rotate: false
-  xy: 515, 81
+  xy: 175, 34
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/tankenemy-t2
   rotate: false
-  xy: 525, 97
+  xy: 171, 18
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/tankenemy-t3
   rotate: false
-  xy: 531, 81
+  xy: 207, 56
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 enemies/titanenemy-t1
   rotate: false
-  xy: 249, 69
+  xy: 267, 69
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 enemies/titanenemy-t2
   rotate: false
-  xy: 267, 69
+  xy: 285, 69
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 enemies/titanenemy-t3
   rotate: false
-  xy: 285, 69
+  xy: 303, 69
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 enemyarrow
   rotate: false
-  xy: 542, 116
+  xy: 623, 226
   size: 8, 7
   orig: 8, 7
   offset: 0, 0
   index: -1
 icon-coal
   rotate: false
-  xy: 405, 49
+  xy: 839, 412
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 icon-dirium
   rotate: false
-  xy: 415, 49
+  xy: 839, 402
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 icon-glass
   rotate: false
-  xy: 425, 49
+  xy: 839, 392
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 icon-iron
   rotate: false
-  xy: 552, 115
+  xy: 839, 382
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 icon-quartz
   rotate: false
-  xy: 541, 106
+  xy: 837, 372
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 icon-silicon
   rotate: false
-  xy: 551, 105
+  xy: 849, 433
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 icon-steel
   rotate: false
-  xy: 545, 57
+  xy: 849, 423
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 icon-stone
   rotate: false
-  xy: 624, 165
+  xy: 849, 413
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 icon-titanium
   rotate: false
-  xy: 193, 34
+  xy: 849, 403
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 icon-uranium
   rotate: false
-  xy: 193, 24
+  xy: 849, 393
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 laser
   rotate: false
-  xy: 580, 164
+  xy: 215, 14
   size: 1, 12
   orig: 1, 12
   offset: 0, 0
@@ -1609,21 +1609,21 @@ laserfull
   index: -1
 mechs/mech-standard
   rotate: false
-  xy: 479, 67
+  xy: 979, 437
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 mechs/mech-standard-icon
   rotate: false
-  xy: 493, 67
+  xy: 993, 437
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 mechs/ship-standard
   rotate: false
-  xy: 535, 67
+  xy: 609, 231
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -1672,28 +1672,28 @@ shapes/shape-7
   index: -1
 shell
   rotate: false
-  xy: 731, 295
+  xy: 879, 387
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 shot
   rotate: false
-  xy: 634, 219
+  xy: 919, 427
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 shot-long
   rotate: false
-  xy: 634, 209
+  xy: 889, 387
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 titanshell
   rotate: false
-  xy: 684, 204
+  xy: 969, 407
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -1799,7 +1799,7 @@ ui/clear
   index: -1
 ui/cursor
   rotate: false
-  xy: 445, 91
+  xy: 691, 304
   size: 4, 4
   orig: 4, 4
   offset: 0, 0
@@ -1813,21 +1813,21 @@ ui/icons/controller-cursor
   index: -1
 ui/icons/icon-about
   rotate: false
-  xy: 698, 304
+  xy: 753, 409
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-add
   rotate: false
-  xy: 753, 409
+  xy: 753, 393
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-admin
   rotate: false
-  xy: 753, 393
+  xy: 769, 410
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -1841,42 +1841,42 @@ ui/icons/icon-admin-small
   index: -1
 ui/icons/icon-areaDelete
   rotate: false
-  xy: 271, 57
+  xy: 197, 2
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-arrow
   rotate: false
-  xy: 769, 410
+  xy: 769, 394
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-arrow-down
   rotate: false
-  xy: 283, 57
+  xy: 609, 219
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-arrow-left
   rotate: false
-  xy: 295, 57
+  xy: 209, 2
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-arrow-right
   rotate: false
-  xy: 307, 57
+  xy: 785, 418
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-arrow-up
   rotate: false
-  xy: 319, 57
+  xy: 785, 406
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
@@ -1890,28 +1890,28 @@ ui/icons/icon-back
   index: -1
 ui/icons/icon-ban
   rotate: false
-  xy: 769, 394
+  xy: 714, 304
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-cancel
   rotate: false
-  xy: 419, 71
+  xy: 753, 377
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-chat
   rotate: false
-  xy: 331, 57
+  xy: 785, 394
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-check
   rotate: false
-  xy: 714, 304
+  xy: 769, 378
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -1939,63 +1939,63 @@ ui/icons/icon-close-over
   index: -1
 ui/icons/icon-crafting
   rotate: false
-  xy: 343, 59
+  xy: 785, 382
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-cursor
   rotate: false
-  xy: 355, 59
+  xy: 797, 422
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-defense
   rotate: false
-  xy: 367, 59
+  xy: 797, 410
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-discord
   rotate: false
-  xy: 753, 377
+  xy: 869, 463
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-distribution
   rotate: false
-  xy: 379, 59
+  xy: 797, 398
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-donate
   rotate: false
-  xy: 769, 378
+  xy: 885, 463
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-dots
   rotate: false
-  xy: 869, 463
+  xy: 901, 463
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-editor
   rotate: false
-  xy: 885, 463
+  xy: 917, 463
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-file-text
   rotate: false
-  xy: 901, 463
+  xy: 869, 447
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -2009,21 +2009,21 @@ ui/icons/icon-fill
   index: -1
 ui/icons/icon-floppy
   rotate: false
-  xy: 917, 463
+  xy: 885, 447
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-folder
   rotate: false
-  xy: 869, 447
+  xy: 901, 447
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-folder-parent
   rotate: false
-  xy: 885, 447
+  xy: 917, 447
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -2037,35 +2037,35 @@ ui/icons/icon-grid
   index: -1
 ui/icons/icon-hold
   rotate: false
-  xy: 391, 59
+  xy: 797, 386
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-holdDelete
   rotate: false
-  xy: 403, 59
+  xy: 691, 292
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-home
   rotate: false
-  xy: 901, 447
+  xy: 933, 460
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-host
   rotate: false
-  xy: 917, 447
+  xy: 949, 460
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-info
   rotate: false
-  xy: 415, 59
+  xy: 689, 280
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
@@ -2079,14 +2079,14 @@ ui/icons/icon-line
   index: -1
 ui/icons/icon-liquid
   rotate: false
-  xy: 427, 59
+  xy: 703, 292
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-load
   rotate: false
-  xy: 933, 460
+  xy: 933, 444
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -2114,28 +2114,28 @@ ui/icons/icon-loading
   index: -1
 ui/icons/icon-logic
   rotate: false
-  xy: 439, 61
+  xy: 689, 268
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-menu
   rotate: false
-  xy: 609, 233
+  xy: 701, 280
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-none
   rotate: false
-  xy: 621, 237
+  xy: 715, 292
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-pause
   rotate: false
-  xy: 609, 221
+  xy: 689, 256
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
@@ -2149,7 +2149,7 @@ ui/icons/icon-pencil
   index: -1
 ui/icons/icon-pencil-small
   rotate: false
-  xy: 949, 460
+  xy: 949, 444
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -2163,42 +2163,42 @@ ui/icons/icon-pick
   index: -1
 ui/icons/icon-play
   rotate: false
-  xy: 621, 225
+  xy: 701, 268
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-play-2
   rotate: false
-  xy: 933, 444
+  xy: 965, 467
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-players
   rotate: false
-  xy: 175, 38
+  xy: 713, 280
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-power
   rotate: false
-  xy: 171, 26
+  xy: 689, 244
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-production
   rotate: false
-  xy: 171, 14
+  xy: 701, 256
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-quit
   rotate: false
-  xy: 949, 444
+  xy: 965, 451
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -2212,14 +2212,14 @@ ui/icons/icon-redo
   index: -1
 ui/icons/icon-refresh
   rotate: false
-  xy: 965, 467
+  xy: 981, 467
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-rename
   rotate: false
-  xy: 965, 451
+  xy: 981, 451
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -2233,35 +2233,35 @@ ui/icons/icon-resize
   index: -1
 ui/icons/icon-rotate
   rotate: false
-  xy: 981, 467
+  xy: 997, 467
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-rotate-arrow
   rotate: false
-  xy: 981, 451
+  xy: 997, 451
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-rotate-left
   rotate: false
-  xy: 997, 467
+  xy: 175, 50
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-rotate-right
   rotate: false
-  xy: 997, 451
+  xy: 421, 71
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-save
   rotate: false
-  xy: 175, 50
+  xy: 445, 97
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -2282,7 +2282,7 @@ ui/icons/icon-save-map
   index: -1
 ui/icons/icon-settings
   rotate: false
-  xy: 781, 432
+  xy: 713, 268
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
@@ -2296,28 +2296,28 @@ ui/icons/icon-terrain
   index: -1
 ui/icons/icon-tools
   rotate: false
-  xy: 445, 97
+  xy: 461, 97
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 ui/icons/icon-touch
   rotate: false
-  xy: 793, 436
+  xy: 701, 244
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-touchDelete
   rotate: false
-  xy: 805, 436
+  xy: 713, 256
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-trash
   rotate: false
-  xy: 461, 97
+  xy: 477, 97
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -2331,7 +2331,7 @@ ui/icons/icon-trash-16
   index: -1
 ui/icons/icon-tutorial
   rotate: false
-  xy: 477, 97
+  xy: 493, 97
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -2345,14 +2345,14 @@ ui/icons/icon-undo
   index: -1
 ui/icons/icon-units
   rotate: false
-  xy: 817, 440
+  xy: 713, 244
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 ui/icons/icon-weapon
   rotate: false
-  xy: 829, 440
+  xy: 532, 119
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
@@ -2366,7 +2366,7 @@ ui/icons/icon-zoom
   index: -1
 ui/icons/icon-zoom-small
   rotate: false
-  xy: 493, 97
+  xy: 509, 97
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -2437,14 +2437,14 @@ ui/scroll-knob-vertical-black
   index: -1
 ui/selection
   rotate: false
-  xy: 933, 476
+  xy: 616, 206
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 ui/slider
   rotate: false
-  xy: 633, 239
+  xy: 606, 215
   size: 1, 8
   orig: 1, 8
   offset: 0, 0
@@ -2472,7 +2472,7 @@ ui/slider-knob-over
   index: -1
 ui/slider-vertical
   rotate: false
-  xy: 532, 118
+  xy: 606, 186
   size: 8, 1
   orig: 8, 1
   offset: 0, 0
@@ -2516,7 +2516,7 @@ ui/textfield-over
   index: -1
 ui/white
   rotate: false
-  xy: 532, 113
+  xy: 745, 378
   size: 3, 3
   orig: 3, 3
   offset: 0, 0
@@ -2539,84 +2539,84 @@ ui/window-empty
   index: -1
 weapons/beam
   rotate: false
-  xy: 221, 62
+  xy: 584, 178
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 weapons/beam-equip
   rotate: false
-  xy: 221, 52
+  xy: 580, 168
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 weapons/blaster
   rotate: false
-  xy: 584, 184
+  xy: 813, 442
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 weapons/blaster-equip
   rotate: false
-  xy: 594, 215
+  xy: 823, 442
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 weapons/clustergun
   rotate: false
-  xy: 594, 175
+  xy: 809, 412
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 weapons/clustergun-equip
   rotate: false
-  xy: 583, 165
+  xy: 819, 422
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 weapons/shockgun
   rotate: false
-  xy: 741, 295
+  xy: 899, 407
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 weapons/shockgun-equip
   rotate: false
-  xy: 633, 229
+  xy: 909, 417
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 weapons/triblaster
   rotate: false
-  xy: 684, 194
+  xy: 979, 417
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 weapons/triblaster-equip
   rotate: false
-  xy: 684, 184
+  xy: 989, 427
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 weapons/vulcan
   rotate: false
-  xy: 634, 159
+  xy: 979, 397
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 weapons/vulcan-equip
   rotate: false
-  xy: 644, 154
+  xy: 989, 407
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
