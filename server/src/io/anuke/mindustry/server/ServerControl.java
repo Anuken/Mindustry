@@ -308,7 +308,7 @@ public class ServerControl extends Module {
             }else{
                 Log.info("&lyBanned players:");
                 for(String string : bans){
-                    Log.info(" &luy {0} / Last known name: '{1}'", string, netServer.admins.getLastName(string));
+                    Log.info(" &ly {0} / Last known name: '{1}'", string, netServer.admins.getLastName(string));
                 }
             }
         });

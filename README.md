@@ -6,7 +6,7 @@
 A pixelated sandbox tower defense game made using [LibGDX](https://libgdx.badlogicgames.com/). Winner of the [GDL Metal Monstrosity Jam](https://itch.io/jam/gdl---metal-monstrosity-jam).
 
 _[Issue tracker](https://waffle.io/Anuken/Mindustry)_  
-_[TODO list](TODO.md)_  
+_[Trello Board](https://trello.com/b/aE2tcUwF/mindustry-40-plans)_  
 _[Wiki](http://mindustry.wikia.com/wiki/Mindustry_Wiki)_  
 _[Discord](https://discord.gg/r8BkXNd)_  
 
