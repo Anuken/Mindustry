@@ -140,6 +140,7 @@ public class ProductionBlocks{
 		{
 			resource = Blocks.iron;
 			result = Item.iron;
+			time = 6;
 		}
 	},
 	
@@ -177,6 +178,15 @@ public class ProductionBlocks{
 		{
 			resource = Blocks.sand;
 			result = Item.quartz;
+			time = 5;
+			size = 2;
+		}
+	},
+
+	biomatterextractor = new Drill("biomatterextractor"){
+		{
+			resource = Blocks.grass;
+			result = Item.biomatter;
 			time = 5;
 			size = 2;
 		}

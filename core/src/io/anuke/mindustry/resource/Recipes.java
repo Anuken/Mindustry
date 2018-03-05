@@ -64,7 +64,7 @@ public class Recipes {
 			new Recipe(production, ProductionBlocks.titaniumdrill, stack(Item.iron, 50), stack(Item.steel, 50)),
 			new Recipe(production, ProductionBlocks.uraniumdrill, stack(Item.iron, 40), stack(Item.steel, 40)),
 			new Recipe(production, ProductionBlocks.quartzextractor, stack(Item.titanium, 40), stack(Item.dirium, 40)),
-			new Recipe(production, ProductionBlocks.omnidrill, stack(Item.titanium, 40), stack(Item.dirium, 40)),
+			new Recipe(production, ProductionBlocks.biomatterextractor, stack(Item.titanium, 40), stack(Item.dirium, 40)),
 
 			new Recipe(power, ProductionBlocks.coalgenerator, stack(Item.iron, 30), stack(Item.stone, 20)),
 			new Recipe(power, ProductionBlocks.thermalgenerator, stack(Item.steel, 30), stack(Item.iron, 30)),
