@@ -198,5 +198,38 @@ public class WeaponBlocks{
 			shootEffect = Fx.titanshot;
 			shootShake = 3f;
 		}
+	},
+
+	fornaxcannon = new PowerTurret("fornaxcannon") {
+		{
+			shootsound = "blast";
+			range = 120f;
+			reload = 23f;
+			bullet = BulletType.titanshell;
+			ammo = Item.uranium;
+			health = 800;
+			ammoMultiplier = 4;
+			size = 3;
+			rotatespeed = 0.07f;
+			shootCone = 9f;
+			shootEffect = Fx.titanshot;
+			shootShake = 3f;
+		}
+	},
+	missileturret = new PowerTurret("missileturret") {
+		{
+			shootsound = "blast";
+			range = 120f;
+			reload = 23f;
+			bullet = BulletType.titanshell;
+			ammo = Item.uranium;
+			health = 800;
+			ammoMultiplier = 4;
+			size = 2;
+			rotatespeed = 0.07f;
+			shootCone = 9f;
+			shootEffect = Fx.titanshot;
+			shootShake = 3f;
+		}
 	};
 }

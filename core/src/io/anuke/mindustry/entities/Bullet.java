@@ -67,7 +67,7 @@ public class Bullet extends BulletEntity{
 
 	@Override
 	public boolean collides(SolidEntity other){
-		return true;
+		return (other instanceof Player) == (owner instanceof Enemy);
 	}
 
 	@Override
