@@ -389,7 +389,7 @@ public class Renderer extends RendererModule{
 			Draw.color(Colors.get("accent"));
 			Lines.stroke(1f);
 			Lines.square(tile.drawx(), tile.drawy(),
-					tile.block().width * tilesize / 2f + 1f);
+					tile.block().size * tilesize / 2f + 1f);
 			Draw.reset();
 		}
 		
@@ -447,7 +447,7 @@ public class Renderer extends RendererModule{
 
 				if(showBlockDebug && target.entity != null){
 					Draw.color(Color.RED);
-					Lines.crect(target.drawx(), target.drawy(), target.block().width * tilesize, target.block().height * tilesize);
+					Lines.crect(target.drawx(), target.drawy(), target.block().size * tilesize, target.block().size * tilesize);
 					Vector2 v = new Vector2();
 
 
@@ -472,14 +472,14 @@ public class Renderer extends RendererModule{
 
 				if(Inputs.keyDown("block_info") && target.block().fullDescription != null){
 					Draw.color(Colors.get("accent"));
-					Lines.crect(target.drawx(), target.drawy(), target.block().width * tilesize, target.block().height * tilesize);
+					Lines.crect(target.drawx(), target.drawy(), target.block().size * tilesize, target.block().size * tilesize);
 					Draw.color();
 				}
 
 				if(target.entity != null) {
 					int bot = 0, top = 0;
 					for (BlockBar bar : target.block().bars) {
-						float offset = Mathf.sign(bar.top) * (target.block().height / 2f * tilesize + 3f + 4f * ((bar.top ? top : bot))) +
+						float offset = Mathf.sign(bar.top) * (target.block().size / 2f * tilesize + 3f + 4f * ((bar.top ? top : bot))) +
 								(bar.top ? -1f : 0f);
 
 						float value = bar.value.get(target);

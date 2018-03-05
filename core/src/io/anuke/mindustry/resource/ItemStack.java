@@ -9,7 +9,7 @@ public class ItemStack{
 		this.item = item;
 		this.amount = amount;
 	}
-	
+
 	public boolean equals(ItemStack other){
 		return other != null && other.item == item && other.amount == amount;
 	}

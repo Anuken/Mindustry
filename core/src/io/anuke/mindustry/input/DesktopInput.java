@@ -158,13 +158,13 @@ public class DesktopInput extends InputHandler{
 
 	public int tilex(){
 		return (recipe != null && recipe.result.isMultiblock() &&
-				recipe.result.width % 2 == 0) ?
+				recipe.result.size % 2 == 0) ?
 				Mathf.scl(Graphics.mouseWorld().x, tilesize) : Mathf.scl2(Graphics.mouseWorld().x, tilesize);
 	}
 
 	public int tiley(){
 		return (recipe != null && recipe.result.isMultiblock() &&
-				recipe.result.height % 2 == 0) ?
+				recipe.result.size % 2 == 0) ?
 				Mathf.scl(Graphics.mouseWorld().y, tilesize) : Mathf.scl2(Graphics.mouseWorld().y, tilesize);
 	}
 

@@ -178,6 +178,7 @@ public class ProductionBlocks{
 			resource = Blocks.sand;
 			result = Item.quartz;
 			time = 5;
+			size = 2;
 		}
 	},
 
@@ -215,15 +216,14 @@ public class ProductionBlocks{
 	},
 	nuclearReactor = new NuclearReactor("nuclearreactor"){
 		{
-			width = 3;
-			height = 3;
+			size = 3;
 			health = 600;
 			breaktime *= 2.3f;
 		}
 	},
 	weaponFactory = new WeaponFactory("weaponfactory"){
 		{
-			width = height = 2;
+			size = 2;
 			health = 250;
 		}
 	};

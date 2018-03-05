@@ -71,7 +71,7 @@ public abstract class InputHandler extends InputAdapter{
 	}
 	
 	public boolean round2(){
-		return !(recipe != null && recipe.result.isMultiblock() && recipe.result.height % 2 == 0);
+		return !(recipe != null && recipe.result.isMultiblock() && recipe.result.size % 2 == 0);
 	}
 	
 	public boolean validPlace(int x, int y, Block type){

@@ -1,7 +1,6 @@
 package io.anuke.mindustry.game;
 
 import com.badlogic.gdx.math.GridPoint2;
-import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
@@ -327,7 +326,7 @@ public class Tutorial{
 				canForward = false;
 				showBlock = true;
 				canPlace = true;
-				targetBlock = WeaponBlocks.turret;
+				targetBlock = WeaponBlocks.doubleturret;
 				blockPlaceX = 2;
 				blockPlaceY = 2;
 			}

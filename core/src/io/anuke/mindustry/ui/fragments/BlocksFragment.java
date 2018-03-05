@@ -269,7 +269,7 @@ public class BlocksFragment implements Fragment{
 		desctable.left();
 		
 		for(ItemStack stack : recipe.requirements){
-			requirements.addImage(Draw.region("icon-"+stack.item.name)).size(8*3);
+			requirements.addImage(stack.item.region).size(8*3);
 			Label reqlabel = new Label("");
 			
 			reqlabel.update(()->{
@@ -309,7 +309,7 @@ public class BlocksFragment implements Fragment{
 		pane.setFadeScrollBars(false);
 		Table top = new Table();
 		top.left();
-		top.add(new Image(Draw.region(block.name))).size(8*5 * block.width);
+		top.add(new Image(Draw.region(block.name))).size(8*5 * block.size);
 		top.add("[accent]"+block.formalName).padLeft(6f);
 		table.add(top).fill().left();
 		table.row();
@@ -357,8 +357,7 @@ public class BlocksFragment implements Fragment{
 			int amount = state.inventory.getItems()[i];
 			if(amount == 0) continue;
 			String formatted = amount > 99999999 ? "inf" : format(amount);
-			Image image = new Image(Draw.hasRegion("icon-" + Item.getByID(i).name) ?
-					Draw.region("icon-" + Item.getByID(i).name) : Draw.region("blank"));
+			Image image = new Image(Item.getByID(i).region);
 			Label label = new Label(formatted);
 			label.setFontScale(fontscale*1.5f);
 			itemtable.add(image).size(8*3);

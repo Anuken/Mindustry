@@ -9,35 +9,37 @@ public class Item{
 	private static final Array<Item> items = new Array<>();
 
 	public static final Item
-		stone = new Item("stone"),
-		iron = new Item("iron"),
-		coal = new Item("coal"){
-			{
-				explosiveness = 0.2f;
-				flammability = 0.5f;
-				material = false;
-			}
-		},
-		steel = new Item("steel"),
-		titanium = new Item("titanium"),
-		dirium = new Item("dirium"),
-		uranium = new Item("uranium"){
-			{
-				explosiveness = 0.1f;
-				material = false;
-			}
-		},
-		quartz = new Item("quartz") {
-			{
-				material = false;
-			}
-		},
-		glass = new Item("glass"),
-		silicon = new Item("silicon"){
-			{
-				material = false;
-			}
-		};
+	stone = new Item("stone"),
+	iron = new Item("iron"),
+	coal = new Item("coal"){
+		{
+			explosiveness = 0.2f;
+			flammability = 0.5f;
+			material = false;
+		}
+	},
+	steel = new Item("steel"),
+	titanium = new Item("titanium"),
+	dirium = new Item("dirium"),
+	uranium = new Item("uranium"){
+		{
+			explosiveness = 0.1f;
+			material = false;
+		}
+	},
+	quartz = new Item("quartz") {
+		{
+			material = false;
+		}
+	},
+	glass = new Item("glass"),
+	silicon = new Item("silicon"),
+	biomatter = new Item("biomatter"){
+		{
+			material = false;
+			flammability = 0.4f;
+		}
+	};
 
 	public final int id;
 	public final String name;
@@ -55,7 +57,7 @@ public class Item{
 	}
 
 	public void init(){
-		this.region = Draw.region("icon-" + name);
+		this.region = Draw.region("item-" + name);
 	}
 
 	public String localizedName(){

@@ -11,6 +11,7 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.world;
 
 public class Floor extends Block{
+	protected TextureRegion tempRegion = new TextureRegion();
 	protected Predicate<Block> blends = block -> block != this;
 	protected boolean blend = true;
 	
@@ -50,10 +51,10 @@ public class Floor extends Block{
 				float rx = Mathf.clamp(dx*8, 0, 8-w);
 				float ry = Mathf.clamp(dy*8, 0, 8-h);
 				
-				temp.setTexture(region.getTexture());
-				temp.setRegion(region.getRegionX()+x, region.getRegionY()+y+h, w, -h);
+				tempRegion.setTexture(region.getTexture());
+				tempRegion.setRegion(region.getRegionX()+x, region.getRegionY()+y+h, w, -h);
 				
-				Draw.crect(temp, tile.worldx()-4 + rx, tile.worldy()-4 + ry, w, h);
+				Draw.crect(tempRegion, tile.worldx()-4 + rx, tile.worldy()-4 + ry, w, h);
 			}
 		}
 	}

@@ -41,12 +41,12 @@ public class DistributionBlocks{
 	}},
 
 	multiplexer = new Router("multiplexer"){{
-		width = height = 2;
+		size = 2;
 		capacity = 80;
 	}},
 
 	vault = new Vault("vault"){{
-		width = height = 3;
+		size = 3;
 	}},
 
 	unloader = new Unloader("unloader"){{

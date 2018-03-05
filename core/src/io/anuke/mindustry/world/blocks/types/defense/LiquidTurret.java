@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public abstract class LiquidTurret extends Turret implements LiquidAcceptor{
     public Liquid ammoLiquid = Liquid.water;
-    public float liquidCapacity = 20f;
+    public float liquidCapacity = 60f;
     public float liquidPerShot = 1f;
 
     public LiquidTurret(String name) {

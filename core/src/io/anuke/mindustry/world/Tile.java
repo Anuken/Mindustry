@@ -16,7 +16,6 @@ import static io.anuke.mindustry.Vars.world;
 
 public class Tile{
 	public static final Object tileSetLock = new Object();
-	private static final Array<Tile> tmpArray = new Array<>();
 	
 	/**Block ID data.*/
 	private byte floor, wall;
@@ -201,18 +200,20 @@ public class Tile{
 	
 	/**Returns the list of all tiles linked to this multiblock, or an empty array if it's not a multiblock.
 	 * This array contains all linked tiles, including this tile itself.*/
-	public synchronized Array<Tile> getLinkedTiles(){
+	public synchronized Array<Tile> getLinkedTiles(Array<Tile> tmpArray){
 		Block block = block();
 		tmpArray.clear();
-		if(!(block.width == 1 && block.height == 1)){
-			int offsetx = -(block.width-1)/2;
-			int offsety = -(block.height-1)/2;
-			for(int dx = 0; dx < block.width; dx ++){
-				for(int dy = 0; dy < block.height; dy ++){
+		if(block.isMultiblock()){
+			int offsetx = -(block.size-1)/2;
+			int offsety = -(block.size-1)/2;
+			for(int dx = 0; dx < block.size; dx ++){
+				for(int dy = 0; dy < block.size; dy ++){
 					Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
 					tmpArray.add(other);
 				}
 			}
+		}else{
+			tmpArray.add(this);
 		}
 		return tmpArray;
 	}
@@ -229,7 +230,7 @@ public class Tile{
 	}
 
 	public void allNearby(Consumer<Tile> cons){
-		for(GridPoint2 point : Edges.getEdges(block().width)){
+		for(GridPoint2 point : Edges.getEdges(block().size)){
 			Tile tile = world.tile(x + point.x, y + point.y);
 			if(tile != null){
 				cons.accept(tile.target());
@@ -238,7 +239,7 @@ public class Tile{
 	}
 
 	public void allInside(Consumer<Tile> cons){
-		for(GridPoint2 point : Edges.getInsideEdges(block().width)){
+		for(GridPoint2 point : Edges.getInsideEdges(block().size)){
 			Tile tile = world.tile(x + point.x, y + point.y);
 			if(tile != null){
 				cons.accept(tile);

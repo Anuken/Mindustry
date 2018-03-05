@@ -36,8 +36,8 @@ public enum PlaceMode{
 
 			Draw.color(valid ? Colors.get("place") : Colors.get("placeInvalid"));
 			Lines.stroke(2f);
-			Lines.crect(x + offset.x, y + offset.y, tilesize * control.input().recipe.result.width + si,
-					tilesize * control.input().recipe.result.height + si);
+			Lines.crect(x + offset.x, y + offset.y, tilesize * control.input().recipe.result.size + si,
+					tilesize * control.input().recipe.result.size + si);
 
 			control.input().recipe.result.drawPlace(tilex, tiley, control.input().rotation, valid);
 			Lines.stroke(2f);
@@ -150,7 +150,7 @@ public enum PlaceMode{
 						tile = tile.getLinked();
 					if(tile != null && control.input().validBreak(tile.x, tile.y)){
 						Lines.crect(tile.drawx(), tile.drawy(),
-								tile.block().width * t, tile.block().height * t);
+								tile.block().size* t, tile.block().size * t);
 					}
 				}
 			}
@@ -251,13 +251,13 @@ public enum PlaceMode{
 					x2 = this.endx * t, y2 = this.endy * t;
 			
 			if(x2 >= x){
-				x -= block.width * t/2;
-				x2 += block.width * t/2;
+				x -= block.size * t/2;
+				x2 += block.size * t/2;
 			}
 			
 			if(y2 >= y){
-				y -= block.height * t/2;
-				y2 += block.height * t/2;
+				y -= block.size * t/2;
+				y2 += block.size * t/2;
 			}
 			
 			x += offset.x;
@@ -284,7 +284,7 @@ public enum PlaceMode{
 						
 						if(!control.input().validPlace(px, py, control.input().recipe.result)
 								|| !state.inventory.hasItems(control.input().recipe.requirements, amount)){
-							Lines.crect(px * t + offset.x, py * t + offset.y, t*block.width, t*block.height);
+							Lines.crect(px * t + offset.x, py * t + offset.y, t*block.size, t*block.size);
 						}
 						amount ++;
 					}

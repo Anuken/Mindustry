@@ -288,7 +288,6 @@ public class Control extends Module{
 		Timers.run(1f, Musics::shuffleAll);
 
 		Entities.initPhysics();
-		Entities.collisions().setCollider(tilesize, world::solid);
 
 		Platform.instance.updateRPC();
 

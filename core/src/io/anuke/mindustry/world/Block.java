@@ -28,8 +28,8 @@ public class Block{
 	private static int lastid;
 	private static Array<Block> blocks = new Array<>();
 	private static ObjectMap<String, Block> map = new ObjectMap<>();
-	
-	protected static TextureRegion temp = new TextureRegion();
+
+	protected Array<Tile> tempTiles = new Array<>();
 	protected Vector2 offset = new Vector2();
 
 	/**internal name*/
@@ -72,8 +72,8 @@ public class Block{
 	public ItemStack drops = null;
 	/**liquids that drop from this block, used for pumps*/
 	public Liquid liquidDrop = null;
-	/**multiblock width/height*/
-	public int width = 1, height = 1;
+	/**multiblock size*/
+	public int size = 1;
 	/**Brief block description. Should be short enough fit in the place menu.*/
 	public final String description;
 	/**Detailed description of the block. Can be as long as necesary.*/
@@ -131,7 +131,7 @@ public class Block{
 	}
 	
 	public void getStats(Array<String> list){
-		list.add("[gray]size: " + width + "x" + height);
+		list.add("[gray]size: " + size);
 		list.add("[healthstats]health: " + health);
 	}
 	
@@ -194,11 +194,11 @@ public class Block{
 	 * Tries to put this item into a nearby container, if there are no available
 	 * containers, it gets added to the block's inventory.*/
 	public void offloadNear(Tile tile, Item item){
-		GridPoint2[] nearby = Edges.getEdges(width);
+		GridPoint2[] nearby = Edges.getEdges(size);
 		
 		for(int j = 0; j < nearby.length; j ++){
 			Tile other = tile.getNearby(nearby[j]);
-			Tile in = tile.getNearby(Edges.getInsideEdges(width)[j]);
+			Tile in = tile.getNearby(Edges.getInsideEdges(size)[j]);
 			if(other != null && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
 				other.block().handleItem(item, other, in);
 				return;
@@ -215,7 +215,7 @@ public class Block{
 
 	/**Try dumping a specific item near the tile.*/
 	protected boolean tryDump(Tile tile, Item todump){
-		GridPoint2[] nearby = Edges.getEdges(width);
+		GridPoint2[] nearby = Edges.getEdges(size);
 		byte i = (byte)(tile.getDump() % nearby.length);
 		
 		for(int j = 0; j < nearby.length; j ++){
@@ -224,7 +224,7 @@ public class Block{
 
 			for(Item item : Item.getAllItems()){
 				other = tile.getNearby(nearby[i]);
-				in = tile.getNearby(Edges.getInsideEdges(width)[i]);
+				in = tile.getNearby(Edges.getInsideEdges(size)[i]);
 
 				if(todump != null && item != todump) continue;
 
@@ -289,11 +289,11 @@ public class Block{
 	
 	/**Offset for placing and drawing multiblocks.*/
 	public Vector2 getPlaceOffset(){
-		return offset.set(((width + 1) % 2) * tilesize/2, ((height + 1) % 2) * tilesize/2);
+		return offset.set(((size + 1) % 2) * tilesize/2, ((size + 1) % 2) * tilesize/2);
 	}
 	
 	public boolean isMultiblock(){
-		return width != 1 || height != 1;
+		return size > 1;
 	}
 	
 	public static Array<Block> getAllBlocks(){

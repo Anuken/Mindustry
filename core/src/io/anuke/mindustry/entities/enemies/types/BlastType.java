@@ -28,7 +28,7 @@ public class BlastType extends EnemyType {
 
 		if(enemy.target instanceof TileEntity){
 			TileEntity e = (TileEntity)enemy.target;
-			range = (e.tile.block().width * tilesize) /2f + 8f;
+			range = (e.tile.block().size * tilesize) /2f + 8f;
 			ox = e.tile.block().getPlaceOffset().x;
 			oy = e.tile.block().getPlaceOffset().y;
 		}

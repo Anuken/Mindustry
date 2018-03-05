@@ -66,7 +66,7 @@ public class Door extends Wall{
 	boolean anyEntities(Tile tile){
 		int x = tile.x, y = tile.y;
 		Block type = tile.block();
-		rect.setSize(type.width * tilesize, type.height * tilesize);
+		rect.setSize(type.size * tilesize, type.size * tilesize);
 		rect.setCenter(tile.drawx(), tile.drawy());
 		
 		for(SolidEntity e : Entities.getNearby(enemyGroup, x * tilesize, y * tilesize, tilesize * 2f)){

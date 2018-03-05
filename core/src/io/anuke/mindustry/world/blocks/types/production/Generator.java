@@ -194,10 +194,10 @@ public class Generator extends PowerBlock{
 		if(target != null){
 			boolean interfering = isInterfering(target, rotation);
 
-			t1.trns(rotation * 90, target.block().width * tilesize / 2 + 2f +
-					(interfering ? Vector2.dst(tile.worldx(), tile.worldy(), target.worldx(), target.worldy()) / 2f - tilesize / 2f * target.block().width + 1 : 0));
+			t1.trns(rotation * 90, target.block().size * tilesize / 2 + 2f +
+					(interfering ? Vector2.dst(tile.worldx(), tile.worldy(), target.worldx(), target.worldy()) / 2f - tilesize / 2f * target.block().size + 1 : 0));
 
-			t2.trns(rotation * 90, width * tilesize / 2 + 2f);
+			t2.trns(rotation * 90, size * tilesize / 2 + 2f);
 
 			if(!interfering){
 				Draw.tint(Hue.mix(Color.GRAY, Color.WHITE, 0.904f + Mathf.sin(Timers.time(), 1.7f, 0.06f)));
@@ -222,8 +222,8 @@ public class Generator extends PowerBlock{
 				float sclx = (relative == 1 || relative == 3) ? entity.laserThickness : 1f;
 				float scly = (relative == 1 || relative == 3) ? 1f : entity.laserThickness;
 				Draw.rect("laserfull", 
-						tile.worldx() + Geometry.d4[relative].x * width * tilesize / 2f,
-						tile.worldy() + Geometry.d4[relative].y * width * tilesize / 2f , s * sclx, s * scly);
+						tile.worldx() + Geometry.d4[relative].x * size * tilesize / 2f,
+						tile.worldy() + Geometry.d4[relative].y * size * tilesize / 2f , s * sclx, s * scly);
 			}
 			
 			Draw.color();

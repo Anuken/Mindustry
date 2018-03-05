@@ -5,9 +5,11 @@ import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.effect.TeslaOrb;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.defense.LaserTurret;
+import io.anuke.mindustry.world.blocks.types.defense.LiquidTurret;
 import io.anuke.mindustry.world.blocks.types.defense.PowerTurret;
 import io.anuke.mindustry.world.blocks.types.defense.Turret;
 import io.anuke.ucore.core.Effects;
@@ -16,16 +18,6 @@ import io.anuke.ucore.util.Mathf;
 
 public class WeaponBlocks{
 	public static Block
-	
-	turret = new Turret("turret"){
-		{
-			range = 52;
-			reload = 15f;
-			bullet = BulletType.stone;
-			health = 45;
-			ammo = Item.stone;
-		}
-	},
 	
 	doubleturret = new Turret("doubleturret"){
 		{
@@ -48,26 +40,13 @@ public class WeaponBlocks{
 		}
 	},
 	
-	machineturret = new Turret("machineturret"){
+	gatlingturret = new Turret("gatlingturret"){
 		{
 			range = 65;
 			reload = 7f;
 			bullet = BulletType.iron;
 			ammo = Item.iron;
 			health = 65;
-		}
-	},
-	
-	shotgunturret = new Turret("shotgunturret"){
-		{
-			range = 50;
-			reload = 30f;
-			bullet = BulletType.iron;
-			ammo = Item.iron;
-			health = 70;
-			shots = 5;
-			inaccuracy = 15f;
-			shotDelayScale = 0.7f;
 		}
 	},
 	
@@ -82,7 +61,7 @@ public class WeaponBlocks{
 		}
 	},
 	
-	sniperturret = new Turret("sniperturret"){
+	railgunturret = new Turret("railgunturret"){
 		{
 			shootsound = "railgun";
 			range = 120;
@@ -94,7 +73,7 @@ public class WeaponBlocks{
 		}
 	},
 	
-	mortarturret = new Turret("mortarturret"){
+	flakturret = new Turret("flakturret"){
 		{
 			shootsound = "bigshot";
 			rotatespeed = 0.2f;
@@ -108,6 +87,7 @@ public class WeaponBlocks{
 			health = 110;
 			shootEffect = Fx.mortarshot;
 			shootShake = 2f;
+			size = 2;
 		}
 	},
 	
@@ -123,7 +103,7 @@ public class WeaponBlocks{
 		}
 	},
 	
-	teslaturret = new PowerTurret("waveturret"){
+	teslaturret = new PowerTurret("teslaturret"){
 		{
 			shootsound = "tesla";
 			range = 70;
@@ -139,6 +119,20 @@ public class WeaponBlocks{
 			float len = 4f;
 
 			new TeslaOrb(tile.drawx() + Angles.trnsx(entity.rotation, len), tile.drawy() + Angles.trnsy(entity.rotation, len), range, 9).add();
+		}
+	},
+
+	magmaturret = new LiquidTurret("magmaturret") {
+		{
+			shootsound = "flame2";
+			inaccuracy = 7f;
+			range = 90f;
+			reload = 7f;
+			bullet = BulletType.plasmaflame;
+			ammoLiquid = Liquid.lava;
+			liquidPerShot = 3f;
+			health = 180*3;
+			size = 2;
 		}
 	},
 		
@@ -164,7 +158,7 @@ public class WeaponBlocks{
 			bullet = BulletType.chain;
 			ammo = Item.uranium;
 			health = 430;
-			width = height = 2;
+			size = 2;
 			shootCone = 9f;
 			ammoMultiplier = 8;
 			shots = 2;
@@ -198,7 +192,7 @@ public class WeaponBlocks{
 			ammo = Item.uranium;
 			health = 800;
 			ammoMultiplier = 4;
-			width = height = 3;
+			size = 3;
 			rotatespeed = 0.07f;
 			shootCone = 9f;
 			shootEffect = Fx.titanshot;

@@ -20,6 +20,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Placement {
     private static final Rectangle rect = new Rectangle();
+    private static Array<Tile> tempTiles = new Array<>();
 
     /**Returns block type that was broken, or null if unsuccesful.*/
     public static Block breakBlock(int x, int y, boolean effect, boolean sound){
@@ -47,7 +48,7 @@ public class Placement {
             if(effect) Effects.effect(Fx.breakBlock, tile.worldx(), tile.worldy());
         }else{
             Tile target = tile.isLinked() ? tile.getLinked() : tile;
-            Array<Tile> removals = target.getLinkedTiles();
+            Array<Tile> removals = target.getLinkedTiles(tempTiles);
             for(Tile toremove : removals){
                 //note that setting a new block automatically unlinks it
                 toremove.setBlock(Blocks.air);
@@ -67,11 +68,11 @@ public class Placement {
         tile.setBlock(result, rotation);
 
         if(result.isMultiblock()){
-            int offsetx = -(result.width-1)/2;
-            int offsety = -(result.height-1)/2;
+            int offsetx = -(result.size-1)/2;
+            int offsety = -(result.size-1)/2;
 
-            for(int dx = 0; dx < result.width; dx ++){
-                for(int dy = 0; dy < result.height; dy ++){
+            for(int dx = 0; dx < result.size; dx ++){
+                for(int dy = 0; dy < result.size; dy ++){
                     int worldx = dx + offsetx + x;
                     int worldy = dy + offsety + y;
                     if(!(worldx == x && worldy == y)){
@@ -102,7 +103,7 @@ public class Placement {
             return false;
         }
 
-        rect.setSize(type.width * tilesize, type.height * tilesize);
+        rect.setSize(type.size * tilesize, type.size * tilesize);
         Vector2 offset = type.getPlaceOffset();
         rect.setCenter(offset.x + x * tilesize, offset.y + y * tilesize);
 
@@ -130,10 +131,10 @@ public class Placement {
         if(tile == null || (isSpawnPoint(tile) && (type.solidifes || type.solid))) return false;
 
         if(type.isMultiblock()){
-            int offsetx = -(type.width-1)/2;
-            int offsety = -(type.height-1)/2;
-            for(int dx = 0; dx < type.width; dx ++){
-                for(int dy = 0; dy < type.height; dy ++){
+            int offsetx = -(type.size-1)/2;
+            int offsety = -(type.size-1)/2;
+            for(int dx = 0; dx < type.size; dx ++){
+                for(int dy = 0; dy < type.size; dy ++){
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
                     if(other == null || (other.block() != Blocks.air && !other.block().alwaysReplace) || isSpawnPoint(other)){
                         return false;

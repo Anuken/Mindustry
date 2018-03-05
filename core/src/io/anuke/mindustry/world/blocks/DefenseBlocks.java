@@ -33,15 +33,15 @@ public class DefenseBlocks{
 	}},
 	steelwalllarge = new Wall("steelwall-large"){{
 		health = 110*4*wallHealthMultiplier;
-		width = height = 2;
+		size = 2;
 	}},
 	titaniumwalllarge = new Wall("titaniumwall-large"){{
 		health = 150*4*wallHealthMultiplier;
-		width = height = 2;
+		size = 2;
 	}},
 	diriumwalllarge = new Wall("duriumwall-large"){{
 		health = 190*4*wallHealthMultiplier;
-		width = height = 2;
+		size = 2;
 	}},
 	titaniumshieldwall = new ShieldedWallBlock("titaniumshieldwall"){{
 		health = 150*wallHealthMultiplier;
@@ -62,7 +62,7 @@ public class DefenseBlocks{
       		reload = 12f;
 			health = 90;
 			powerUsed = 0.13f;
-			width = height = 2;
+			size = 2;
 		}
 	},
 
@@ -78,6 +78,6 @@ public class DefenseBlocks{
 		openfx = Fx.dooropenlarge;
 		closefx = Fx.doorcloselarge;
 		health = 90*4*wallHealthMultiplier;
-		width = height = 2;
+		size = 2;
 	}};
 }

@@ -53,6 +53,7 @@ public class Turret extends Block{
 	protected float shootShake = 0f;
 	protected int soundReload = 0;
 	protected Translator tr = new Translator();
+	protected String base = null; //name of the region to draw under turret, usually null
 
 	public Turret(String name) {
 		super(name);
@@ -83,10 +84,10 @@ public class Turret extends Block{
 	
 	@Override
 	public void draw(Tile tile){
-		if(isMultiblock()){
-			Draw.rect("block-" + width + "x" + height, tile.drawx(), tile.drawy());
+		if(base == null) {
+			Draw.rect("block-" + size, tile.drawx(), tile.drawy());
 		}else{
-			Draw.rect("block", tile.drawx(), tile.drawy());
+			Draw.rect(base, tile.drawx(), tile.drawy());
 		}
 	}
 	
@@ -212,14 +213,14 @@ public class Turret extends Block{
 	protected void shoot(Tile tile){
 		TurretEntity entity = tile.entity();
 
-		tr.trns(entity.rotation, width * tilesize/2);
+		tr.trns(entity.rotation, size * tilesize/2);
 		
 		for(int i = 0; i < shots; i ++){
 			if(Mathf.zero(shotDelayScale)){
 				bullet(tile, entity.rotation + Mathf.range(inaccuracy));
 			}else{
 				Timers.run(i * shotDelayScale, () -> {
-					tr.trns(entity.rotation, width * tilesize/2f);
+					tr.trns(entity.rotation, size * tilesize/2f);
 					bullet(tile, entity.rotation + Mathf.range(inaccuracy));
 				});
 			}

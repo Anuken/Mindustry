@@ -89,8 +89,8 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		if(entity.heat > smokeThreshold){
 			float smoke = 1.0f + (entity.heat - smokeThreshold) / (1f - smokeThreshold); //ranges from 1.0 to 2.0
 			if(Mathf.chance(smoke / 20.0 * Timers.delta())){
-				Effects.effect(Fx.reactorsmoke, tile.worldx() + Mathf.range(width * tilesize / 2f),
-						tile.worldy() + Mathf.random(height * tilesize / 2f));
+				Effects.effect(Fx.reactorsmoke, tile.worldx() + Mathf.range(size * tilesize / 2f),
+						tile.worldy() + Mathf.random(size * tilesize / 2f));
 			}
 		}
 
@@ -166,7 +166,7 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		NuclearReactorEntity entity = tile.entity();
 		
 		Draw.color(coolColor, hotColor, entity.heat);
-		Draw.rect("white", tile.drawx(), tile.drawy(), width * tilesize, height * tilesize);
+		Draw.rect("white", tile.drawx(), tile.drawy(), size * tilesize, size * tilesize);
 		
 		if(entity.heat > flashThreshold){
 			float flash = 1f + ((entity.heat - flashThreshold) / (1f - flashThreshold)) * 5.4f;

@@ -16,8 +16,7 @@ public class CoreBlock extends StorageBlock {
         health = 800;
         solid = true;
         destructible = true;
-        width = 3;
-        height = 3;
+        size = 3;
     }
 
     @Override
