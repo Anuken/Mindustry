@@ -86,7 +86,7 @@ public class Drill extends Block{
 		Draw.color();
 	}
 
-	boolean isValid(Tile tile){
+	protected boolean isValid(Tile tile){
 		return tile.floor() == resource || (resource != null && resource.drops != null && resource.drops.equals(tile.floor().drops));
 	}
 

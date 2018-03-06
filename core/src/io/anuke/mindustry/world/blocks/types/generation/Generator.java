@@ -194,8 +194,9 @@ public class Generator extends PowerBlock{
 		if(target != null){
 			boolean interfering = isInterfering(target, rotation);
 
-			t1.trns(rotation * 90, target.block().size * tilesize / 2 + 2f +
-					(interfering ? Vector2.dst(tile.worldx(), tile.worldy(), target.worldx(), target.worldy()) / 2f - tilesize / 2f * target.block().size + 1 : 0));
+			t1.trns(rotation * 90, 1 * tilesize / 2 + 2f +
+					(interfering ? Vector2.dst(tile.worldx(), tile.worldy(), target.worldx(),
+							target.worldy()) / 2f - tilesize / 2f * 1 + 1 : 0));
 
 			t2.trns(rotation * 90, size * tilesize / 2 + 2f);
 
@@ -254,7 +255,7 @@ public class Generator extends PowerBlock{
 
 			if(other != null && other.block() instanceof PowerAcceptor){
 				Tile linked = other.getLinked();
-				if(linked == null || linked instanceof PowerAcceptor){
+				if(linked == null || linked.block() instanceof PowerAcceptor){
 					return other;
 				}
 			}

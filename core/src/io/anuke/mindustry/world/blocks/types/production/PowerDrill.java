@@ -1,6 +1,10 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.resource.ItemStack;
+import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
 import io.anuke.mindustry.world.blocks.types.PowerBlock.PowerEntity;
@@ -12,35 +16,35 @@ public class PowerDrill extends Drill implements PowerAcceptor {
     /**power use per frame.*/
     public float powerUse = 0.08f;
 
+    private Array<ItemStack> toAdd = new Array<>();
+
     public PowerDrill(String name){
         super(name);
+
+        bars.add(new BlockBar(Color.YELLOW, true, tile -> tile.<PowerEntity>entity().power / powerCapacity));
     }
 
     @Override
     public void update(Tile tile){
+        toAdd.clear();
+
         PowerEntity entity = tile.entity();
 
-        int mines = 0;
-
-        float used = Math.min(entity.power * Timers.delta(), powerCapacity-0.1f);
+        float used = Math.min(powerUse * Timers.delta(), powerCapacity-0.1f);
 
         if(entity.power >= used){
             entity.power -= used;
         }
 
-        if(isMultiblock()){
-            for(Tile other : tile.getLinkedTiles(tempTiles)){
-                if(isValid(other)){
-                    mines ++;
-                }
+        for(Tile other : tile.getLinkedTiles(tempTiles)){
+            if(isValid(other)){
+                toAdd.add(other.floor().drops);
             }
-        }else{
-            if(isValid(tile)) mines = 1;
         }
 
-        if(mines > 0 && entity.power > powerUse && entity.timer.get(timerDrill, 60 * time)
-                && tile.entity.getItem(result) < capacity){
-            for(int i = 0; i < mines; i ++) offloadNear(tile, result);
+        if(toAdd.size > 0 && entity.power > powerUse && entity.timer.get(timerDrill, 60 * time)
+                && tile.entity.totalItems() < capacity){
+            for(ItemStack stack : toAdd) offloadNear(tile, stack.item);
             Effects.effect(drillEffect, tile.drawx(), tile.drawy());
         }
 
@@ -76,5 +80,10 @@ public class PowerDrill extends Drill implements PowerAcceptor {
     @Override
     public TileEntity getEntity() {
         return new PowerEntity();
+    }
+
+    @Override
+    protected boolean isValid(Tile tile){
+        return tile.floor().drops != null;
     }
 }
