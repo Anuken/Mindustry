@@ -5,6 +5,8 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.blocks.types.generation.*;
+import io.anuke.mindustry.world.blocks.types.generation.SolarGenerator;
 import io.anuke.mindustry.world.blocks.types.storage.CoreBlock;
 import io.anuke.mindustry.world.blocks.types.production.*;
 
@@ -30,7 +32,7 @@ public class ProductionBlocks{
 		}
 	},
 	
-	crucible = new Smelter("crucible"){
+	alloysmelter = new Smelter("alloysmelter"){
 		{
 			health = 90;
 			inputs = new Item[]{Item.titanium, Item.steel};
@@ -41,7 +43,7 @@ public class ProductionBlocks{
 		}
 	},
 	
-	coalpurifier = new LiquidCrafter("coalpurifier"){
+	coalextractor = new LiquidCrafter("coalextractor"){
 		{
 			input = Item.stone;
 			inputAmount = 5;
@@ -53,7 +55,7 @@ public class ProductionBlocks{
 		}
 	},
 	
-	titaniumpurifier = new LiquidCrafter("titaniumpurifier"){
+	titaniumextractor = new LiquidCrafter("titaniumextractor"){
 		{
 			input = Item.iron;
 			inputAmount = 6;
@@ -62,6 +64,19 @@ public class ProductionBlocks{
 			liquidCapacity = 41f;
 			purifyTime = 60;
 			output = Item.titanium;
+			health = 70;
+		}
+	},
+
+	uraniumextractor = new LiquidCrafter("uraniumextractor"){
+		{
+			input = Item.iron;
+			inputAmount = 6;
+			inputLiquid = Liquid.water;
+			liquidAmount = 40f;
+			liquidCapacity = 41f;
+			purifyTime = 60;
+			output = Item.uranium;
 			health = 70;
 		}
 	},
@@ -168,9 +183,27 @@ public class ProductionBlocks{
 		}
 	},
 	
-	omnidrill = new Omnidrill("omnidrill"){
+	laserdrill = new PowerDrill("laserdrill"){
 		{
 			time = 4;
+			size = 2;
+			powerUse = 0.08f;
+		}
+	},
+
+	plasmadrill = new PowerDrill("plasmadrill"){
+		{
+			time = 4;
+			size = 3;
+			powerUse = 0.16f;
+		}
+	},
+
+	nucleardrill = new PowerDrill("nucleardrill"){
+		{
+			time = 4;
+			size = 4;
+			powerUse = 0.32f;
 		}
 	},
 
@@ -223,6 +256,9 @@ public class ProductionBlocks{
 			powerOutput = 0.03f;
 			itemDuration = 240f;
 		}
+	},
+	solarpanel = new SolarGenerator("solarpanel"){
+
 	},
 	nuclearReactor = new NuclearReactor("nuclearreactor"){
 		{

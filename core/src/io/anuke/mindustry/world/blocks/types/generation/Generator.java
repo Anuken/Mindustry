@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks.types.production;
+package io.anuke.mindustry.world.blocks.types.generation;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.GridPoint2;

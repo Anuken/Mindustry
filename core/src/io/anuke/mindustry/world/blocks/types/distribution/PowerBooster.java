@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
-import io.anuke.mindustry.world.blocks.types.production.Generator;
+import io.anuke.mindustry.world.blocks.types.generation.Generator;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;

@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks.types.production;
+package io.anuke.mindustry.world.blocks.types.generation;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.TileEntity;
