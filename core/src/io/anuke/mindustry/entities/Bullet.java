@@ -4,7 +4,6 @@ import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.BulletEntity;
 import io.anuke.ucore.entities.Entity;
-import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.util.Timer;
 
 import static io.anuke.mindustry.Vars.*;
@@ -63,11 +62,6 @@ public class Bullet extends BulletEntity{
 				return false;
 			});
 		}
-	}
-
-	@Override
-	public boolean collides(SolidEntity other){
-		return true;
 	}
 
 	@Override
