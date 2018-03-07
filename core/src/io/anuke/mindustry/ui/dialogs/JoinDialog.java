@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.Platform;
+import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Settings;
@@ -84,7 +85,7 @@ public class JoinDialog extends FloatingDialog {
 
             TextButton button = buttons[0] = remote.addButton("[accent]"+server.ip, "clear", () -> {
                 if(!buttons[0].childrenPressed()) connect(server.ip, Vars.port);
-            }).width(w).height(140f).pad(4f).get();
+            }).width(w).height(150f).pad(4f).get();
 
             button.getLabel().setWrap(true);
 
@@ -131,16 +132,37 @@ public class JoinDialog extends FloatingDialog {
         server.content.label(() -> Bundles.get("text.server.refreshing") + Strings.animated(4, 11, "."));
 
         Net.pingHost(server.ip, server.port, host -> {
+            String versionString;
+
+            if(host.version == -1) {
+                versionString = Bundles.format("text.server.version", Bundles.get("text.server.custombuild"));
+            }else if(host.version == 0){
+                versionString = Bundles.get("text.server.outdated");
+            }else if(host.version < Version.build && Version.build != -1){
+                versionString = Bundles.get("text.server.outdated") + "\n" +
+                        Bundles.format("text.server.version", host.version);
+            }else if(host.version > Version.build && Version.build != -1){
+                versionString = Bundles.get("text.server.outdated.client") + "\n" +
+                        Bundles.format("text.server.version", host.version);
+            }else{
+                versionString = Bundles.format("text.server.version", host.version);
+            }
+
             server.content.clear();
 
-            server.content.add("[lightgray]" + Bundles.format("text.server.hostname", host.name)).left();
-            server.content.row();
-            server.content.add("[lightgray]" + (host.players != 1 ? Bundles.format("text.players", host.players) :
-                    Bundles.format("text.players.single", host.players))).left();
-            server.content.row();
-            server.content.add("[lightgray]" + Bundles.format("text.save.map", host.mapname)).left();
-            server.content.row();
-            server.content.add("[lightgray]" + Bundles.format("text.save.wave", host.wave)).left();
+            server.content.table(t -> {
+                t.add(versionString).left();
+                t.row();
+                t.add("[lightgray]" + Bundles.format("text.server.hostname", host.name)).left();
+                t.row();
+                t.add("[lightgray]" + (host.players != 1 ? Bundles.format("text.players", host.players) :
+                        Bundles.format("text.players.single", host.players))).left();
+                t.row();
+                t.add("[lightgray]" + Bundles.format("text.save.map", host.mapname) + " / " + Bundles.format("text.save.wave", host.wave)).left();
+            }).expand().left().bottom().padLeft(12f).padBottom(8);
+
+            //server.content.add(versionString).top().expandY().top().expandX();
+
         }, e -> {
             server.content.clear();
             server.content.add("$text.host.invalid");
@@ -161,7 +183,7 @@ public class JoinDialog extends FloatingDialog {
 
         hosts.add(remote).growX();
         hosts.row();
-        hosts.add(local).growX();
+        hosts.add(local).width(w);
 
         ScrollPane pane = new ScrollPane(hosts, "clear");
         pane.setFadeScrollBars(false);
@@ -188,10 +210,9 @@ public class JoinDialog extends FloatingDialog {
                 });
             }).size(50f, 54f).get();
             button.update(() -> button.getStyle().imageUpColor = player.getColor());
-
         }).width(w).height(70f).pad(4);
         content().row();
-        content().add(pane).width(w).pad(0);
+        content().add(pane).width(w + 34).pad(0);
         content().row();
         content().addCenteredImageTextButton("$text.server.add", "icon-add", "clear", 14*3, () -> {
             renaming = null;

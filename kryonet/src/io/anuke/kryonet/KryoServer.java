@@ -10,6 +10,7 @@ import com.esotericsoftware.kryonet.Listener.LagListener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.util.InputStreamSender;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Net.ServerProvider;
@@ -475,7 +476,7 @@ public class KryoServer implements ServerProvider {
 
                 if(message.equals("_ping_")){
                     conn.send("---" + Vars.playerGroup.size() + "|" + (headless ? "Server" : Vars.player.name)
-                    + "|" + world.getMap().name + "|" + state.wave);
+                    + "|" + world.getMap().name + "|" + state.wave + "|" + Version.build);
                     connections.remove(k);
                 }else {
                     byte[] out = Base64Coder.decode(message);

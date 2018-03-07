@@ -2,6 +2,7 @@ package io.anuke.kryonet;
 
 import com.esotericsoftware.minlog.Log;
 import com.esotericsoftware.minlog.Log.Logger;
+import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Host;
 import io.anuke.ucore.util.ColorCodes;
 
@@ -65,6 +66,7 @@ public class KryoRegistrator {
 
         buffer.putInt(playerGroup.size());
         buffer.putInt(state.wave);
+        buffer.putInt(Version.build);
         return buffer;
     }
 
@@ -84,7 +86,8 @@ public class KryoRegistrator {
 
         int players = buffer.getInt();
         int wave = buffer.getInt();
+        int version = buffer.getInt();
 
-        return new Host(host, ia.getHostAddress(), map, wave, players);
+        return new Host(host, ia.getHostAddress(), map, wave, players, version);
     }
 }
