@@ -184,26 +184,20 @@ public class KryoServer implements ServerProvider {
         connections.clear();
         lastconnection = 0;
 
-        Thread thread = new Thread(() -> {
+        async(server::close);
+        async(() -> {
             try {
-                server.close();
-                try {
-                    if (webServer != null) webServer.stop(1);
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
+                if (webServer != null) webServer.stop(1);
                 //kill them all
-                for(Thread worker : Thread.getAllStackTraces().keySet()){
-                    if(worker.getName().contains("WebSocketWorker")){
+                for (Thread worker : Thread.getAllStackTraces().keySet()) {
+                    if (worker.getName().contains("WebSocketWorker")) {
                         worker.interrupt();
                     }
                 }
             }catch (Exception e){
-                Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
+                handleException(e);
             }
         });
-        thread.setDaemon(true);
-        thread.start();
     }
 
     @Override
@@ -291,25 +285,7 @@ public class KryoServer implements ServerProvider {
 
     @Override
     public void dispose(){
-        try {
-            if(serverThread != null) serverThread.interrupt();
-            server.dispose();
-        }catch (Exception e){
-            Log.err(e);
-        }
-
-        try {
-
-            if(webServer != null) webServer.stop(1);
-            //kill them all
-            for(Thread thread : Thread.getAllStackTraces().keySet()){
-                if(thread.getName().contains("WebSocketWorker")){
-                    thread.interrupt();
-                }
-            }
-        }catch (Exception e){
-            Log.err(e);
-        }
+        close();
         Log.info("Disposed server.");
     }
 
@@ -339,25 +315,10 @@ public class KryoServer implements ServerProvider {
         return null;
     }
 
-    void throwErrorAndExit(){
-        Log.err("KRYONET CONNECTIONS:");
-        for(Connection c : server.getConnections()){
-            NetConnection k = getByKryoID(c.getID());
-            Log.err(" - Kryonet connection / ID {0} / IP {1} / NetConnection ID {2}",
-                    c.getID(), c.getRemoteAddressTCP().getAddress().getHostAddress(), k == null ? "NOT FOUND" : k.id);
-        }
-        Log.err("NET CONNECTIONS:");
-        for(NetConnection c : connections){
-            Log.err(" - NetConnection / ID {0} / IP {1}", c.id, c.address);
-        }
-
-        Log.err("\nSTACK TRACE:");
-
-        StackTraceElement[] e = Thread.getAllStackTraces().get(Thread.currentThread());
-        for(StackTraceElement s : e){
-            Log.err("- {0}", s);
-        }
-        System.exit(-1);
+    void async(Runnable run){
+        Thread thread = new Thread(run);
+        thread.setDaemon(true);
+        thread.start();
     }
 
     class KryoConnection extends NetConnection{
