@@ -252,7 +252,7 @@ public class ServerControl extends Module {
             }
         });
 
-        handler.register("kick", "<username>", "Kick a person by name.", arg -> {
+        handler.register("kick", "<username...>", "Kick a person by name.", arg -> {
             if(!state.is(State.playing)) {
                 err("Not hosting a game yet. Calm down.");
                 return;
@@ -275,7 +275,7 @@ public class ServerControl extends Module {
             }
         });
 
-        handler.register("ban", "<username>", "Ban a person by name.", arg -> {
+        handler.register("ban", "<username...>", "Ban a person by name.", arg -> {
             if(!state.is(State.playing)) {
                 err("Can't ban people by name with no players.");
                 return;
@@ -292,29 +292,42 @@ public class ServerControl extends Module {
 
             if(target != null){
                 String ip = Net.getConnection(target.clientid).address;
-                netServer.admins.banPlayer(ip);
+                netServer.admins.banPlayerIP(ip);
+                netServer.admins.banPlayerID(netServer.admins.getTrace(ip).uuid);
                 Net.kickConnection(target.clientid, KickReason.banned);
-                info("Banned player by IP: {0}", ip);
+                info("Banned player by IP and ID: {0} / {1}", ip, netServer.admins.getTrace(ip).uuid);
             }else{
                 info("Nobody with that name could be found.");
             }
         });
 
-        handler.register("bans", "List all banned IPs.", arg -> {
+        handler.register("bans", "List all banned IPs and IDs.", arg -> {
             Array<String> bans = netServer.admins.getBanned();
 
             if(bans.size == 0){
-                Log.info("No banned players have been found.");
+                Log.info("No IP-banned players have been found.");
             }else{
-                Log.info("&lyBanned players:");
+                Log.info("&lyBanned players [IP]:");
                 for(String string : bans){
                     Log.info(" &ly {0} / Last known name: '{1}'", string, netServer.admins.getLastName(string));
+                }
+            }
+
+            Array<String> idbans = netServer.admins.getBannedIDs();
+
+            if(idbans.size == 0){
+                Log.info("No ID-banned players have been found.");
+            }else{
+                Log.info("&lmBanned players [ID]:");
+                for(String string : idbans){
+                    Log.info(" &lm '{0}' / Last known name: '{1}' / Last known IP: '{2}'", string,
+                            netServer.admins.getLastName(netServer.admins.getLastIP(string)), netServer.admins.getLastIP(string));
                 }
             }
         });
 
         handler.register("banip", "<ip>", "Ban a person by IP.", arg -> {
-            if(netServer.admins.banPlayer(arg[0])) {
+            if(netServer.admins.banPlayerIP(arg[0])) {
                 info("Banned player by IP: {0}.", arg[0]);
 
                 for(Player player : playerGroup.all()){
@@ -328,15 +341,49 @@ public class ServerControl extends Module {
             }
         });
 
-        handler.register("unbanip", "<ip>", "Unban a person by IP.", arg -> {
-            if(netServer.admins.unbanPlayer(arg[0])) {
+        handler.register("banid", "<id>", "Ban a person by their unique ID.", arg -> {
+            if(netServer.admins.banPlayerID(arg[0])) {
+                info("Banned player by ID: {0}.", arg[0]);
+
+                for(Player player : playerGroup.all()){
+                    if(netServer.admins.getTrace(Net.getConnection(player.clientid).address).uuid.equals(arg[0])){
+                        Net.kickConnection(player.clientid, KickReason.banned);
+                        break;
+                    }
+                }
+            }else{
+                err("That ID is already banned!");
+            }
+        });
+
+        handler.register("unbanip", "<ip>", "Completely unban a person by IP.", arg -> {
+            if(netServer.admins.unbanPlayerIP(arg[0])) {
                 info("Unbanned player by IP: {0}.", arg[0]);
+                for(String s : netServer.admins.getBannedIDs()){
+                    if(netServer.admins.getLastIP(s).equals(arg[0])){
+                         netServer.admins.unbanPlayerID(s);
+                         Log.info("Also unbanned UUID '{0}' as it corresponds to this IP.", s);
+                    }
+                }
             }else{
                 err("That IP is not banned!");
             }
         });
 
-        handler.register("admin", "<username>", "Make a user admin", arg -> {
+        handler.register("unbanid", "<id>", "Completely unban a person by ID.", arg -> {
+            if(netServer.admins.unbanPlayerID(arg[0])) {
+                info("&lmUnbanned player by ID: {0}.", arg[0]);
+                String ip = netServer.admins.getLastIP(arg[0]);
+                if(!ip.equals("unknown")) {
+                    netServer.admins.unbanPlayerIP(ip);
+                    Log.info("Also unbanned IP '{0}' as it corresponds to this ID.", ip);
+                }
+            }else{
+                err("That IP is not banned!");
+            }
+        });
+
+        handler.register("admin", "<username...>", "Make a user admin", arg -> {
             if(!state.is(State.playing)) {
                 err("Open the server first.");
                 return;
@@ -361,7 +408,7 @@ public class ServerControl extends Module {
             }
         });
 
-        handler.register("unadmin", "<username>", "Removes admin status from a player", arg -> {
+        handler.register("unadmin", "<username...>", "Removes admin status from a player", arg -> {
             if(!state.is(State.playing)) {
                 err("Open the server first.");
                 return;
@@ -484,7 +531,7 @@ public class ServerControl extends Module {
             }
         });
 
-        handler.register("trace", "<username>", "Trace a player's actions", arg -> {
+        handler.register("trace", "<username...>", "Trace a player's actions", arg -> {
             if(!state.is(State.playing)) {
                 err("Open the server first.");
                 return;
@@ -504,7 +551,9 @@ public class ServerControl extends Module {
                 Log.info("&lcTrace info for player '{0}':", target.name);
                 Log.info("  &lyEntity ID: {0}", info. playerid);
                 Log.info("  &lyIP: {0}", info.ip);
+                Log.info("  &lyUUID: {0}", info.uuid);
                 Log.info("  &lycustom client: {0}", info.modclient);
+                Log.info("  &lyandroid: {0}", info.android);
                 Log.info("");
                 Log.info("  &lytotal blocks broken: {0}", info.totalBlocksBroken);
                 Log.info("  &lystructure blocks broken: {0}", info.structureBlocksBroken);

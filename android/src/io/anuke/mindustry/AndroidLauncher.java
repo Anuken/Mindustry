@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
@@ -96,6 +97,24 @@ public class AndroidLauncher extends AndroidApplication{
 			@Override
 			public boolean isDebug() {
 				return false;
+			}
+
+			@Override
+			public byte[] getUUID() {
+				try {
+					String s = Secure.getString(getContext().getContentResolver(),
+							Secure.ANDROID_ID);
+					int len = s.length();
+					byte[] data = new byte[len / 2];
+					for (int i = 0; i < len; i += 2) {
+						data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+								+ Character.digit(s.charAt(i + 1), 16));
+					}
+
+					return data;
+				}catch (Exception e){
+					return null;
+				}
 			}
 		};
 

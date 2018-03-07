@@ -7,16 +7,20 @@ import io.anuke.ucore.core.Settings;
 
 public class Administration {
     private Json json = new Json();
-    private Array<String> bannedIPS = new Array<>();
+    private Array<String> bannedIPs = new Array<>();
+    private Array<String> bannedIDs = new Array<>();
     private Array<String> admins = new Array<>();
-    private ObjectMap<String, String> known = new ObjectMap<>();
+    private ObjectMap<String, String> ipNames = new ObjectMap<>();
+    private ObjectMap<String, String> idIPs = new ObjectMap<>();
     private ObjectMap<String, TraceInfo> traces = new ObjectMap<>();
 
     public Administration(){
         Settings.defaultList(
             "bans", "{}",
+            "bannedIDs", "{}",
             "admins", "{}",
-            "knownIPs", "{}"
+            "knownIPs", "{}",
+            "knownIDs", "{}"
         );
 
         load();
@@ -34,35 +38,81 @@ public class Administration {
 
     /**Sets last known name for an IP.*/
     public void setKnownName(String ip, String name){
-        known.put(ip, name);
+        ipNames.put(ip, name);
+        saveKnown();
+    }
+
+    /**Sets last known UUID for an IP.*/
+    public void setKnownIP(String id, String ip){
+        idIPs.put(id, ip);
         saveKnown();
     }
 
     /**Returns the last known name for an IP. Returns 'unknown' if this IP has an unknown username.*/
     public String getLastName(String ip){
-        return known.get(ip, "unknown");
+        return ipNames.get(ip, "unknown");
+    }
+
+    /**Returns the last known IP for a UUID. Returns 'unknown' if this IP has an unknown IP.*/
+    public String getLastIP(String id){
+        return idIPs.get(id, "unknown");
+    }
+
+    /**Return the last known device ID associated with an IP.  Returns 'unknown' if this IP has an unknown device.*/
+    public String getLastID(String ip){
+        for(String id : idIPs.keys()){
+            if(idIPs.get(id).equals(ip)){
+                return id;
+            }
+        }
+        return "unknown";
     }
 
     /**Returns list of banned IPs.*/
     public Array<String> getBanned(){
-        return bannedIPS;
+        return bannedIPs;
+    }
+
+    /**Returns list of banned IDs.*/
+    public Array<String> getBannedIDs(){
+        return bannedIDs;
     }
 
     /**Bans a player by IP; returns whether this player was already banned.*/
-    public boolean banPlayer(String ip){
-        if(bannedIPS.contains(ip, false))
+    public boolean banPlayerIP(String ip){
+        if(bannedIPs.contains(ip, false))
             return false;
-        bannedIPS.add(ip);
+        bannedIPs.add(ip);
+        saveBans();
+
+        return true;
+    }
+
+    /**Bans a player by UUID.*/
+    public boolean banPlayerID(String id){
+        if(bannedIDs.contains(id, false))
+            return false;
+        bannedIDs.add(id);
         saveBans();
 
         return true;
     }
 
     /**Unbans a player by IP; returns whether this player was banned in the first place..*/
-    public boolean unbanPlayer(String ip){
-        if(!bannedIPS.contains(ip, false))
+    public boolean unbanPlayerIP(String ip){
+        if(!bannedIPs.contains(ip, false))
             return false;
-        bannedIPS.removeValue(ip, false);
+        bannedIPs.removeValue(ip, false);
+        saveBans();
+
+        return true;
+    }
+
+    /**Unbans a player by IP; returns whether this player was banned in the first place..*/
+    public boolean unbanPlayerID(String ip){
+        if(!bannedIDs.contains(ip, false))
+            return false;
+        bannedIDs.removeValue(ip, false);
         saveBans();
 
         return true;
@@ -93,8 +143,12 @@ public class Administration {
         return true;
     }
 
-    public boolean isBanned(String ip){
-        return bannedIPS.contains(ip, false);
+    public boolean isIPBanned(String ip){
+        return bannedIPs.contains(ip, false);
+    }
+
+    public boolean isIDBanned(String uuid){
+        return bannedIDs.contains(uuid, false);
     }
 
     public boolean isAdmin(String ip){
@@ -102,12 +156,14 @@ public class Administration {
     }
 
     private void saveKnown(){
-        Settings.putString("knownIPs", json.toJson(known));
+        Settings.putString("knownIPs", json.toJson(ipNames));
+        Settings.putString("knownIDs", json.toJson(idIPs));
         Settings.save();
     }
 
     private void saveBans(){
-        Settings.putString("bans", json.toJson(bannedIPS));
+        Settings.putString("bans", json.toJson(bannedIPs));
+        Settings.putString("bannedIDs", json.toJson(bannedIDs));
         Settings.save();
     }
 
@@ -117,9 +173,11 @@ public class Administration {
     }
 
     private void load(){
-        bannedIPS = json.fromJson(Array.class, Settings.getString("bans"));
+        bannedIPs = json.fromJson(Array.class, Settings.getString("bans"));
+        bannedIDs = json.fromJson(Array.class, Settings.getString("bannedIDs"));
         admins = json.fromJson(Array.class, Settings.getString("admins"));
-        known = json.fromJson(ObjectMap.class, Settings.getString("knownIPs"));
+        ipNames = json.fromJson(ObjectMap.class, Settings.getString("knownIPs"));
+        idIPs = json.fromJson(ObjectMap.class, Settings.getString("knownIDs"));
     }
 
 }

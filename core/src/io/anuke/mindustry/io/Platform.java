@@ -30,6 +30,8 @@ public abstract class Platform {
 		return true;
 	}
 	public boolean isDebug(){return false;}
+	/**Must be 8 bytes in length.*/
+	public byte[] getUUID(){return null;}
 	public ThreadProvider getThreadProvider(){
 		return new ThreadProvider() {
 			@Override public boolean isOnThread() {return true;}

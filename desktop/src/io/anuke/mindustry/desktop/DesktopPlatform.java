@@ -12,6 +12,7 @@ import io.anuke.ucore.UCore;
 import io.anuke.ucore.util.Strings;
 
 import javax.swing.*;
+import java.net.NetworkInterface;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -97,5 +98,18 @@ public class DesktopPlatform extends Platform {
     @Override
     public ThreadProvider getThreadProvider() {
         return new DefaultThreadImpl();
+    }
+
+    @Override
+    public byte[] getUUID() {
+        try {
+            byte[] bytes = NetworkInterface.getNetworkInterfaces().nextElement().getHardwareAddress();
+            byte[] result = new byte[8];
+            System.arraycopy(bytes, 0, result, 0, bytes.length);
+            return result;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 }
