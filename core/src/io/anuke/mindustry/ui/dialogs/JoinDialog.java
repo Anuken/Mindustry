@@ -1,6 +1,7 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.Platform;
@@ -14,6 +15,7 @@ import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
+import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
@@ -217,7 +219,22 @@ public class JoinDialog extends FloatingDialog {
         content().addCenteredImageTextButton("$text.server.add", "icon-add", "clear", 14*3, () -> {
             renaming = null;
             add.show();
-        }).width(w).height(80f);
+        }).marginLeft(6).width(w).height(80f).update(button -> {
+            float pw = w;
+            float pad = 0f;
+            if(pane.getChildren().first().getPrefHeight() > pane.getHeight()){
+                pw = w + 30;
+                pad = 6;
+            }
+
+            Cell<TextButton> cell = ((Table)pane.getParent()).getCell(button);
+
+            if(!MathUtils.isEqual(cell.getMinWidth(), pw)){
+                cell.width(pw);
+                cell.padLeft(pad);
+                pane.getParent().invalidateHierarchy();
+            }
+        });
     }
 
     void addLocalHosts(Array<Host> array){

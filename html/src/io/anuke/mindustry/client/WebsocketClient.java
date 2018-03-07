@@ -121,7 +121,8 @@ public class WebsocketClient implements ClientProvider {
                         if (!msg.startsWith("---")) return;
                         String[] text = msg.substring(3).split("\\|");
                         Host host = new Host(text[1], address, text[2], Strings.parseInt(text[3]),
-                                Strings.parseInt(text[0]), Strings.parseInt(text[4]));
+                                Strings.parseInt(text[0]),
+                                text.length > 4 && Strings.canParsePostiveInt(text[4]) ? Strings.parseInt(text[4]) : 0);
                         valid.accept(host);
                         accepted[0] = true;
                         socket.close();
