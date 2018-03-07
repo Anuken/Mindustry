@@ -17,6 +17,7 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Locale;
 
 import static io.anuke.mindustry.Vars.*;
@@ -103,7 +104,11 @@ public class DesktopPlatform extends Platform {
     @Override
     public byte[] getUUID() {
         try {
-            byte[] bytes = NetworkInterface.getNetworkInterfaces().nextElement().getHardwareAddress();
+            Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
+            NetworkInterface out;
+            for(out = e.nextElement(); out.getHardwareAddress() == null && e.hasMoreElements(); out = e.nextElement());
+
+            byte[] bytes = out.getHardwareAddress();
             byte[] result = new byte[8];
             System.arraycopy(bytes, 0, result, 0, bytes.length);
             return result;
