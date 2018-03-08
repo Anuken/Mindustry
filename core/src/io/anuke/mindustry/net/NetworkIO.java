@@ -191,10 +191,9 @@ public class NetworkIO {
                             stream.writeByte(tile.getExtra());
                             stream.writeShort((short)tile.entity.health); //health
 
-                            //items
-                            for(int i = 0; i < tile.entity.items.length; i ++){
-                                stream.writeInt(tile.entity.items[i]);
-                            }
+                            if(tile.entity.inventory != null) tile.entity.inventory.write(stream);
+                            if(tile.entity.power != null) tile.entity.power.write(stream);
+                            if(tile.entity.liquid != null) tile.entity.liquid.write(stream);
 
                             //timer data
 
@@ -326,9 +325,9 @@ public class NetworkIO {
 
                     tile.entity.health = health;
 
-                    for(int j = 0; j < tile.entity.items.length; j ++){
-                        tile.entity.items[j] = stream.readInt();
-                    }
+                    if(tile.entity.inventory != null) tile.entity.inventory.read(stream);
+                    if(tile.entity.power != null) tile.entity.power.read(stream);
+                    if(tile.entity.liquid != null) tile.entity.liquid.read(stream);
 
                     byte timers = stream.readByte();
                     for(int time = 0; time < timers; time ++){

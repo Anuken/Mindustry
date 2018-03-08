@@ -1,15 +1,9 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.LiquidAcceptor;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-public abstract class LiquidTurret extends Turret implements LiquidAcceptor{
+public abstract class LiquidTurret extends Turret{
     public Liquid ammoLiquid = Liquid.water;
     public float liquidCapacity = 60f;
     public float liquidPerShot = 1f;
@@ -20,62 +14,20 @@ public abstract class LiquidTurret extends Turret implements LiquidAcceptor{
 
     @Override
     public boolean hasAmmo(Tile tile){
-        LiquidTurretEntity entity = tile.entity();
-        return entity.liquidAmount > liquidPerShot;
+        TurretEntity entity = tile.entity();
+        return entity.liquid.amount > liquidPerShot;
     }
 
     @Override
     public void consumeAmmo(Tile tile){
-        LiquidTurretEntity entity = tile.entity();
-        entity.liquidAmount -= liquidPerShot;
+        TurretEntity entity = tile.entity();
+        entity.liquid.amount -= liquidPerShot;
     }
 
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        LiquidTurretEntity entity = tile.entity();
-        return ammoLiquid == liquid && entity.liquidAmount + amount < liquidCapacity && (entity.liquid == liquid || entity.liquidAmount <= 0.01f);
+        return ammoLiquid == liquid && super.acceptLiquid(tile, source, liquid, amount);
     }
 
-    @Override
-    public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        LiquidTurretEntity entity = tile.entity();
-        entity.liquid = liquid;
-        entity.liquidAmount += amount;
-    }
 
-    @Override
-    public float getLiquid(Tile tile){
-        LiquidTurretEntity entity = tile.entity();
-        return entity.liquidAmount;
-    }
-
-    @Override
-    public float getLiquidCapacity(Tile tile){
-        return liquidCapacity;
-    }
-
-    @Override
-    public TileEntity getEntity() {
-        return new LiquidTurretEntity();
-    }
-
-    static class LiquidTurretEntity extends TurretEntity{
-        public Liquid liquid;
-        public float liquidAmount;
-
-        @Override
-        public void write(DataOutputStream stream) throws IOException {
-            super.write(stream);
-            stream.writeByte(liquid == null ? -1 : liquid.id);
-            stream.writeByte((byte)(liquidAmount));
-        }
-
-        @Override
-        public void read(DataInputStream stream) throws IOException{
-            super.read(stream);
-            byte id = stream.readByte();
-            liquid = id == -1 ? null : Liquid.getByID(id);
-            liquidAmount = stream.readByte();
-        }
-    }
 }

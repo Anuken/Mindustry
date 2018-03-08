@@ -7,7 +7,6 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -126,29 +125,6 @@ public class NetEvents {
         packet.x = (short)x;
         packet.y = (short)y;
         Net.send(packet, SendMode.tcp);
-    }
-
-    public static void handleTransfer(Tile tile, byte rotation, Item item){
-        ItemTransferPacket packet = new ItemTransferPacket();
-        packet.position = tile.packedPosition();
-        packet.rotation = rotation;
-        packet.itemid = (byte)item.id;
-        Net.send(packet, SendMode.udp);
-    }
-
-    public static void handleItemSet(Tile tile, Item item, byte amount){
-        ItemSetPacket packet = new ItemSetPacket();
-        packet.position = tile.packedPosition();
-        packet.itemid = (byte)item.id;
-        packet.amount = amount;
-        Net.send(packet, SendMode.udp);
-    }
-
-    public static void handleOffload(Tile tile, Item item){
-        ItemOffloadPacket packet = new ItemOffloadPacket();
-        packet.position = tile.packedPosition();
-        packet.itemid = (byte)item.id;
-        Net.send(packet, SendMode.udp);
     }
 
     public static void handleAdminSet(Player player, boolean admin){

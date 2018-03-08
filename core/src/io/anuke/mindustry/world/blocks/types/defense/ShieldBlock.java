@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Shield;
@@ -30,11 +29,11 @@ public class ShieldBlock extends PowerBlock{
 	}
 	
 	@Override
-	public void getStats(Array<String> list){
-		super.getStats(list);
-		list.add("[powerinfo]Power/second: " + Strings.toFixed(powerDrain*60, 2));
-		list.add("[powerinfo]Power Drain/damage: " + Strings.toFixed(powerPerDamage, 2));
-		list.add("[powerinfo]Shield Radius: " + (int)shieldRadius);
+	public void setStats(){
+		super.setStats();
+		stats.add("powersecond", Strings.toFixed(powerDrain*60, 2));
+		stats.add("powerdraindamage", Strings.toFixed(powerPerDamage, 2));
+		stats.add("shieldradius", (int)shieldRadius);
 	}
 
 	@Override
@@ -47,19 +46,19 @@ public class ShieldBlock extends PowerBlock{
 				entity.shield.add();
 		}
 
-		if(entity.power > powerPerDamage){
+		if(entity.power.amount > powerPerDamage){
 			if(!entity.shield.active){
 				entity.shield.add();
 			}
 
-			entity.power -= powerDrain * Timers.delta();
+			entity.power.amount -= powerDrain * Timers.delta();
 		}else{
 			if(entity.shield.active && !(Vars.infiniteAmmo && Vars.debug)){
 				entity.shield.removeDelay();
 			}
 		}
 		
-		entity.shield.radius = Mathf.lerp(entity.shield.radius, Math.min(entity.power / powerCapacity * radiusScale, maxRadius), Timers.delta() * 0.05f);
+		entity.shield.radius = Mathf.lerp(entity.shield.radius, Math.min(entity.power.amount / powerCapacity * radiusScale, maxRadius), Timers.delta() * 0.05f);
 
 	}
 
@@ -71,7 +70,7 @@ public class ShieldBlock extends PowerBlock{
 	public void handleBullet(Tile tile, BulletEntity bullet){
 		ShieldEntity entity = tile.entity();
 		
-		if(entity.power < bullet.getDamage() * powerPerDamage){
+		if(entity.power.amount < bullet.getDamage() * powerPerDamage){
 			return;
 		}
 		
@@ -79,7 +78,7 @@ public class ShieldBlock extends PowerBlock{
 		Effects.effect(bullet.damage > 5 ? Fx.shieldhit : Fx.laserhit, bullet);
 		if(!headless) renderer.addShieldHit(bullet.x, bullet.y);
 		
-		entity.power -= bullet.getDamage() * powerPerDamage;
+		entity.power.amount -= bullet.getDamage() * powerPerDamage;
 	}
 
 	static class ShieldEntity extends PowerEntity{

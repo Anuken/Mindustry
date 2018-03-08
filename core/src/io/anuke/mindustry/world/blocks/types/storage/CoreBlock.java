@@ -31,6 +31,6 @@ public class CoreBlock extends StorageBlock {
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return item.material && tile.entity.getItem(item) < capacity;
+        return item.material && tile.entity.inventory.getItem(item) < capacity;
     }
 }

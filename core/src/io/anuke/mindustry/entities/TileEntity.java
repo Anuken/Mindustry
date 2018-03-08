@@ -3,10 +3,12 @@ package io.anuke.mindustry.entities;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
-import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Wall;
+import io.anuke.mindustry.world.blocks.types.modules.InventoryModule;
+import io.anuke.mindustry.world.blocks.types.modules.LiquidModule;
+import io.anuke.mindustry.world.blocks.types.modules.PowerModule;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entity;
@@ -22,11 +24,14 @@ import static io.anuke.mindustry.Vars.world;
 
 public class TileEntity extends Entity{
 	public Tile tile;
-	public int[] items = new int[Item.getAllItems().size];
 	public Timer timer;
 	public float health;
 	public boolean dead = false;
 	public boolean added;
+
+	public PowerModule power;
+	public InventoryModule inventory;
+	public LiquidModule liquid;
 	
 	/**Sets this tile entity data to this tile, and adds it if necessary.*/
 	public TileEntity init(Tile tile, boolean added){
@@ -52,10 +57,6 @@ public class TileEntity extends Entity{
 	
 	public void read(DataInputStream stream) throws IOException{
 		
-	}
-
-	public void readNetwork(DataInputStream stream, float elapsed) throws IOException{
-		read(stream);
 	}
 	
 	public void onDeath(){
@@ -116,34 +117,6 @@ public class TileEntity extends Entity{
 
 			tile.block().update(tile);
 		}
-	}
-	
-	public int totalItems(){
-		int sum = 0;
-		for(int i = 0; i < items.length; i ++){
-			sum += items[i];
-		}
-		return sum;
-	}
-	
-	public int getItem(Item item){
-		return items[item.id];
-	}
-	
-	public boolean hasItem(Item item){
-		return getItem(item) > 0;
-	}
-	
-	public boolean hasItem(Item item, int amount){
-		return getItem(item) >= amount;
-	}
-	
-	public void addItem(Item item, int amount){
-		items[item.id] += amount;
-	}
-	
-	public void removeItem(Item item, int amount){
-		items[item.id] -= amount;
 	}
 	
 	@Override

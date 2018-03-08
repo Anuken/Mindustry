@@ -10,6 +10,7 @@ public class Liquid {
 
 	public static final Liquid
 
+	none = new Liquid("none", Color.CLEAR),
 	water = new Liquid("water", Color.ROYAL),
 	plasma = new Liquid("plasma", Color.CORAL){
 		{

@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongArray;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
@@ -42,9 +41,9 @@ public class Conveyor extends Block{
 	}
 
 	@Override
-	public void getStats(Array<String> list){
-		super.getStats(list);
-		list.add("[iteminfo]Item Speed/second: " + Strings.toFixed(speed * 60, 1));
+	public void setStats(){
+		super.setStats();
+		stats.add("itemspeedsecond", Strings.toFixed(speed * 60, 1));
 	}
 
 	@Override
@@ -175,11 +174,6 @@ public class Conveyor extends Block{
 		if(!inserted){
 			entity.convey.add(result);
 		}
-	}
-
-	@Override
-	public boolean syncEntity(){
-		return false;
 	}
 
 	/**

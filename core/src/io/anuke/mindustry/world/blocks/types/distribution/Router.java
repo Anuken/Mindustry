@@ -1,27 +1,17 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 
 public class Router extends Block{
-	protected int capacity = 20;
 
 	public Router(String name) {
 		super(name);
 		update = true;
 		solid = true;
-		bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.totalItems()/capacity));
-	}
-
-	@Override
-	public void getStats(Array<String> list){
-		super.getStats(list);
-		list.add("[iteminfo]Capacity: " + capacity);
+		itemCapacity = 20;
 	}
 	
 	@Override
@@ -34,7 +24,7 @@ public class Router extends Block{
 		int iterations = Math.max(1, (int) (Timers.delta() + 0.4f));
 
 		for(int i = 0; i < iterations; i ++) {
-			if (tile.entity.totalItems() > 0) {
+			if (tile.entity.inventory.totalItems() > 0) {
 				tryDump(tile);
 			}
 		}
@@ -48,8 +38,8 @@ public class Router extends Block{
 
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
-		int items = tile.entity.totalItems();
-		return items < capacity;
+		int items = tile.entity.inventory.totalItems();
+		return items < itemCapacity;
 	}
 
 }

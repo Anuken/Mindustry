@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
@@ -40,33 +39,33 @@ public class Smelter extends Block{
 	@Override
 	public void init(){
 		for(Item item : inputs){
-			bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.getItem(item)/capacity));
+			bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.inventory.getItem(item)/capacity));
 		}
 	}
 	
 	@Override
-	public void getStats(Array<String> list){
-		super.getStats(list);
-		list.add("[craftinfo]Input: " + Arrays.toString(inputs));
-		list.add("[craftinfo]Fuel: " + fuel);
-		list.add("[craftinfo]Output: " + result);
-		list.add("[craftinfo]Fuel Duration: " + Strings.toFixed(burnDuration/60f, 1));
-		list.add("[craftinfo]Max output/second: " + Strings.toFixed(60f/craftTime, 1));
-		list.add("[craftinfo]Input Capacity: " + capacity);
-		list.add("[craftinfo]Output Capacity: " + capacity);
+	public void setStats(){
+		super.setStats();
+		stats.add("input", Arrays.toString(inputs));
+		stats.add("fuel", fuel);
+		stats.add("output", result);
+		stats.add("fuelduration", Strings.toFixed(burnDuration/60f, 1));
+		stats.add("maxoutputsecond", Strings.toFixed(60f/craftTime, 1));
+		stats.add("input capacity", capacity);
+		stats.add("outputcapacity", capacity);
 	}
 	
 	@Override
 	public void update(Tile tile){
 		CrafterEntity entity = tile.entity();
 		
-		if(entity.timer.get(timerDump, 5) && entity.hasItem(result)){
+		if(entity.timer.get(timerDump, 5) && entity.inventory.hasItem(result)){
 			tryDump(tile, result);
 		}
 
 		//add fuel
-		if(entity.getItem(fuel) > 0 && entity.burnTime <= 0f){
-			entity.removeItem(fuel, 1);
+		if(entity.inventory.getItem(fuel) > 0 && entity.burnTime <= 0f){
+			entity.inventory.removeItem(fuel, 1);
 			entity.burnTime += burnDuration;
 			Effects.effect(burnEffect, entity.x + Mathf.range(2f), entity.y + Mathf.range(2f));
 		}
@@ -78,19 +77,19 @@ public class Smelter extends Block{
 
 		//make sure it has all the items
 		for(Item item : inputs){
-			if(!entity.hasItem(item)){
+			if(!entity.inventory.hasItem(item)){
 				return;
 			}
 		}
 
-		if(entity.getItem(result) >= capacity //output full
+		if(entity.inventory.getItem(result) >= capacity //output full
 				|| entity.burnTime <= 0 //not burning
 				|| !entity.timer.get(timerCraft, craftTime)){ //not yet time
 			return;
 		}
 
 		for(Item item : inputs){
-			entity.removeItem(item, 1);
+			entity.inventory.removeItem(item, 1);
 		}
 		
 		offloadNear(tile, result);
@@ -108,7 +107,7 @@ public class Smelter extends Block{
 			}
 		}
 
-		return (isInput && tile.entity.getItem(item) < capacity) || (item == fuel && tile.entity.getItem(fuel) < capacity);
+		return (isInput && tile.entity.inventory.getItem(item) < capacity) || (item == fuel && tile.entity.inventory.getItem(fuel) < capacity);
 	}
 
 	@Override

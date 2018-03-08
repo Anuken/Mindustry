@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.generation;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.graphics.Fx;
@@ -28,7 +27,6 @@ public class NuclearReactor extends LiquidPowerGenerator{
 	protected final Translator tr = new Translator();
 
 	protected Item generateItem;
-	protected int itemCapacity = 30;
 	protected Color coolColor = new Color(1, 1, 1, 0f);
 	protected Color hotColor = Color.valueOf("ff9575a3");
 	protected int fuelUseTime = 130; //time to consume 1 fuel
@@ -51,39 +49,40 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		powerCapacity = 80f;
 		powerSpeed = 0.5f;
 
-		bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.getItem(generateItem) / itemCapacity));
+		bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.inventory.getItem(generateItem) / itemCapacity));
 		bars.add(new BlockBar(Color.ORANGE, true, tile -> tile.<NuclearReactorEntity>entity().heat));
 	}
 
 	@Override
-	public void getStats(Array<String> list){
-		super.getStats(list);
-		list.add("[powerinfo]Input Item: " + generateItem);
-		list.add("[powerinfo]Max Power Generation/second: " + Strings.toFixed(powerMultiplier*60f, 2));
-		list.removeValue(list.select(s -> s.contains("Power/Liquid")).iterator().next(), true);
-		list.removeValue(list.select(s -> s.contains("Max liquid/second:")).iterator().next(), true);
+	public void setStats(){
+		super.setStats();
+		stats.add("inputitem", generateItem);
+		stats.add("maxpowergenerationsecond", Strings.toFixed(powerMultiplier*60f, 2));
+
+		stats.remove("powerliquid");
+		stats.remove("maxliquidsecond");
 	}
 	
 	@Override
 	public void update(Tile tile){
 		NuclearReactorEntity entity = tile.entity();
 		
-		int fuel = entity.getItem(generateItem);
+		int fuel = entity.inventory.getItem(generateItem);
 		float fullness = (float)fuel / itemCapacity;
 		
 		if(fuel > 0){
 			entity.heat += fullness * heating * Math.min(Timers.delta(), 4f);
-			entity.power += powerMultiplier * fullness * Timers.delta();
-			entity.power = Mathf.clamp(entity.power, 0f, powerCapacity);
+			entity.power.amount += powerMultiplier * fullness * Timers.delta();
+			entity.power.amount = Mathf.clamp(entity.power.amount, 0f, powerCapacity);
 			if(entity.timer.get(timerFuel, fuelUseTime)){
-				entity.removeItem(generateItem, 1);
+				entity.inventory.removeItem(generateItem, 1);
 			}
 		}
 		
-		if(entity.liquidAmount > 0){
-			float maxCool = Math.min(entity.liquidAmount * coolantPower, entity.heat);
+		if(entity.liquid.amount > 0){
+			float maxCool = Math.min(entity.liquid.amount * coolantPower, entity.heat);
 			entity.heat -= maxCool; //TODO steam when cooling large amounts?
-			entity.liquidAmount -= maxCool / coolantPower;
+			entity.liquid.amount -= maxCool / coolantPower;
 		}
 		
 		if(entity.heat > smokeThreshold){
@@ -114,7 +113,7 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		
 		NuclearReactorEntity entity = tile.entity();
 		
-		int fuel = entity.getItem(generateItem);
+		int fuel = entity.inventory.getItem(generateItem);
 		
 		if(fuel < 5 && entity.heat < 0.5f) return;
 		
@@ -131,7 +130,7 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		Effects.shake(6f, 16f, tile.worldx(), tile.worldy());
 		Effects.effect(explosionEffect, tile.worldx(), tile.worldy());
 		for(int i = 0; i < 6; i ++){
-			Timers.run(Mathf.random(40), ()->{
+			Timers.run(Mathf.random(40), () -> {
 				Effects.effect(Fx.nuclearcloud, tile.worldx(), tile.worldy());
 			});
 		}
@@ -156,7 +155,7 @@ public class NuclearReactor extends LiquidPowerGenerator{
 
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
-		return item == generateItem && tile.entity.getItem(generateItem) < itemCapacity;
+		return item == generateItem && tile.entity.inventory.getItem(generateItem) < itemCapacity;
 	}
 	
 	@Override
@@ -184,7 +183,7 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		return new NuclearReactorEntity();
 	}
 	
-	public static class NuclearReactorEntity extends LiquidPowerEntity{
+	public static class NuclearReactorEntity extends PowerEntity{
 		public float heat;
 		public float flash;
 		

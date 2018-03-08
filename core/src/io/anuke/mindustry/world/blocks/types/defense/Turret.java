@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.TileEntity;
@@ -65,16 +64,16 @@ public class Turret extends Block{
 	}
 	
 	@Override
-	public void getStats(Array<String> list){
-		super.getStats(list);
-		if(ammo != null) list.add("[turretinfo]Ammo: " + ammo);
-		if(ammo != null) list.add("[turretinfo]Ammo Capacity: " + maxammo);
-		if(ammo != null) list.add("[turretinfo]Ammo/Item: " + ammoMultiplier);
-		list.add("[turretinfo]Range: " + (int)range);
-		list.add("[turretinfo]Inaccuracy: " + (int)inaccuracy);
-		list.add("[turretinfo]Damage/Shot: " + bullet.damage);
-		list.add("[turretinfo]Shots/Second: " + Strings.toFixed(60f/reload, 1));
-		list.add("[turretinfo]Shots: " + shots);
+	public void setStats(){
+		super.setStats();
+		if(ammo != null) stats.add("ammo", ammo);
+		if(ammo != null) stats.add("ammocapacity", maxammo);
+		if(ammo != null) stats.add("ammoitem", ammoMultiplier);
+		stats.add("range", (int)range);
+		stats.add("inaccuracy", (int)inaccuracy);
+		stats.add("damageshot", bullet.damage);
+		stats.add("shotssecond", Strings.toFixed(60f/reload, 1));
+		stats.add("shots", shots);
 	}
 	
 	@Override
@@ -125,9 +124,9 @@ public class Turret extends Block{
 	public void update(Tile tile){
 		TurretEntity entity = tile.entity();
 		
-		if(ammo != null && entity.hasItem(ammo)){
+		if(ammo != null && entity.inventory.hasItem(ammo)){
 			entity.ammo += ammoMultiplier;
-			entity.removeItem(ammo, 1);
+			entity.inventory.removeItem(ammo, 1);
 		}
 		
 		if(entity.target != null && entity.target.isDead())

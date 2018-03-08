@@ -28,9 +28,9 @@ public class PowerLaser extends Generator{
 	}
 	
 	@Override
-	public boolean acceptsPower(Tile tile){
+	public boolean acceptPower(Tile tile, Tile from, float amount){
 		PowerEntity entity = tile.entity();
 		
-		return entity.power + 0.001f <= powerCapacity;
+		return entity.power.amount <= powerCapacity;
 	}
 }

@@ -21,14 +21,9 @@ public class DebugBlocks {
         }
 
         @Override
-        public boolean acceptsPower(Tile tile) {
-            return false;
-        }
-
-        @Override
         public void update(Tile tile){
             super.update(tile);
-            tile.<GeneratorEntity>entity().power = powerCapacity;
+            tile.entity.power.amount = powerCapacity;
         }
     };
 }

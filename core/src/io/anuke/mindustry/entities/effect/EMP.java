@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.TimedEntity;
 import io.anuke.ucore.graphics.Draw;
@@ -54,9 +53,8 @@ public class EMP extends TimedEntity{
 			Tile tile = array.get(i);
 			targets.add(tile);
 			
-			if(tile != null && tile.block() instanceof PowerAcceptor){
-				PowerAcceptor p = (PowerAcceptor)tile.block();
-				p.setPower(tile, 0f);
+			if(tile != null && tile.block().hasPower){
+				tile.entity.power.amount = 0f;
 				tile.entity.damage((int)(damage*2f)); //extra damage
 			}
 

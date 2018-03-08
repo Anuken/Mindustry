@@ -2,7 +2,6 @@ package io.anuke.mindustry.world.blocks.types.distribution;
 
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.LiquidAcceptor;
 import io.anuke.ucore.graphics.Draw;
 
 public class TunnelConduit extends Conduit {
@@ -27,11 +26,9 @@ public class TunnelConduit extends Conduit {
         Tile tunnel = getDestTunnel(tile);
         if (tunnel == null) return;
         Tile to = tunnel.getNearby(tunnel.getRotation());
-        if (to == null || !(to.block() instanceof LiquidAcceptor)) return;
+        if (to == null || !(to.block().hasLiquids)) return;
 
-        LiquidAcceptor a = (LiquidAcceptor) to.block();
-
-        if (a.acceptLiquid(tile, source, liquid, amount)) a.handleLiquid(to, tunnel, liquid, amount);
+        if (to.block().acceptLiquid(tile, source, liquid, amount)) to.block().handleLiquid(to, tunnel, liquid, amount);
     }
 
     @Override
@@ -42,8 +39,8 @@ public class TunnelConduit extends Conduit {
 
         if (tunnel != null) {
             Tile to = tunnel.getNearby(tunnel.getRotation());
-            return to != null && (to.block() instanceof LiquidAcceptor) &&
-                    ((LiquidAcceptor) to.block()).acceptLiquid(to, tunnel, liquid, amount);
+            return to != null && (to.block().hasLiquids) &&
+                    (to.block()).acceptLiquid(to, tunnel, liquid, amount);
         } else {
             return false;
         }

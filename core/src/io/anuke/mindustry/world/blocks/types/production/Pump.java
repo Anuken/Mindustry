@@ -1,14 +1,12 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
-import com.badlogic.gdx.utils.Array;
-
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidBlock;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
@@ -23,7 +21,7 @@ public class Pump extends LiquidBlock{
 		rotate = false;
 		solid = true;
 		layer = Layer.overlay;
-		flowfactor = 3f;
+		liquidFlowFactor = 3f;
 	}
 
 	@Override
@@ -32,9 +30,9 @@ public class Pump extends LiquidBlock{
 	}
 
 	@Override
-	public void getStats(Array<String> list){
-		super.getStats(list);
-		list.add("[liquidinfo]Liquid/second: " + Strings.toFixed(60f*pumpAmount, 1));
+	public void setStats(){
+		super.setStats();
+		stats.add("liquidsecond", Strings.toFixed(60f*pumpAmount, 1));
 	}
 	
 	@Override
@@ -46,12 +44,8 @@ public class Pump extends LiquidBlock{
 	public void draw(Tile tile){
 		Draw.rect(name(), tile.worldx(), tile.worldy());
 		
-		LiquidEntity entity = tile.entity();
-		
-		if(entity.liquid == null) return;
-		
-		Draw.color(entity.liquid.color);
-		Draw.alpha(entity.liquidAmount / liquidCapacity);
+		Draw.color(tile.entity.liquid.liquid.color);
+		Draw.alpha(tile.entity.liquid.amount / liquidCapacity);
 		Draw.rect("blank", tile.worldx(), tile.worldy(), 2, 2);
 		Draw.color();
 	}
@@ -70,15 +64,14 @@ public class Pump extends LiquidBlock{
 	
 	@Override
 	public void update(Tile tile){
-		LiquidEntity entity = tile.entity();
 		
 		if(tile.floor().liquidDrop != null){
-			float maxPump = Math.min(liquidCapacity - entity.liquidAmount, pumpAmount * Timers.delta());
-			entity.liquid = tile.floor().liquidDrop;
-			entity.liquidAmount += maxPump;
+			float maxPump = Math.min(liquidCapacity - tile.entity.liquid.amount, pumpAmount * Timers.delta());
+			tile.entity.liquid.liquid = tile.floor().liquidDrop;
+			tile.entity.liquid.amount += maxPump;
 		}
 		
-		if(entity.timer.get(timerDump, 1)){
+		if(tile.entity.timer.get(timerDump, 1)){
 			tryDumpLiquid(tile);
 		}
 	}

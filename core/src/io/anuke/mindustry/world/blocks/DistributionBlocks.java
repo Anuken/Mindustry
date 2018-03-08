@@ -15,7 +15,7 @@ public class DistributionBlocks{
 	
 	pulseconduit = new Conduit("pulseconduit"){{
 		liquidCapacity = 16f;
-		flowfactor = 4.9f;
+		liquidFlowFactor = 4.9f;
 		health = 65;
 	}},
 	
@@ -42,7 +42,7 @@ public class DistributionBlocks{
 
 	multiplexer = new Router("multiplexer"){{
 		size = 2;
-		capacity = 80;
+		itemCapacity = 80;
 	}},
 
 	vault = new Vault("vault"){{
@@ -63,9 +63,6 @@ public class DistributionBlocks{
 	}},
 	liquidjunction = new LiquidJunction("liquidjunction"){{
 
-	}},
-	powerbooster = new PowerBooster("powerbooster"){{
-		powerRange = 4;
 	}},
 	powerlaser = new PowerLaser("powerlaser"){{
 	}},

@@ -8,7 +8,7 @@ import io.anuke.mindustry.world.Tile;
 /**Used for multiblocks. Each block that is not the center of the multiblock is a blockpart.
  * Think of these as delegates to the actual block; all events are passed to the target block.
  * They are made to share all properties from the linked tile/block.*/
-public class BlockPart extends Block implements PowerAcceptor, LiquidAcceptor{
+public class BlockPart extends Block{
 
 	public BlockPart() {
 		super("blockpart");
@@ -40,54 +40,33 @@ public class BlockPart extends Block implements PowerAcceptor, LiquidAcceptor{
 	@Override
 	public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
 		Block block = linked(tile);
-		return block instanceof LiquidAcceptor 
-				&& ((LiquidAcceptor)block).acceptLiquid(tile.getLinked(), source, liquid, amount);
+		return block.hasLiquids
+				&& block.acceptLiquid(tile.getLinked(), source, liquid, amount);
 	}
 
 	@Override
 	public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
 		Block block = linked(tile);
-		((LiquidAcceptor)block).handleLiquid(tile.getLinked(), source, liquid, amount);
-	}
-	
-	@Override
-	public float getLiquid(Tile tile){
-		Block block = linked(tile);
-		return block instanceof LiquidAcceptor ? ((LiquidAcceptor)block).getLiquid(tile.getLinked()) : 0;
-	}
-
-	@Override
-	public float getLiquidCapacity(Tile tile){
-		Block block = linked(tile);
-		return block instanceof LiquidAcceptor ? ((LiquidAcceptor)block).getLiquidCapacity(tile.getLinked()) : 0;
+		block.handleLiquid(tile.getLinked(), source, liquid, amount);
 	}
 
 	@Override
 	public float addPower(Tile tile, float amount){
 		Block block = linked(tile);
-		if(block instanceof PowerAcceptor){
-			return ((PowerAcceptor)block).addPower(tile.getLinked(), amount);
+		if(block.hasPower){
+			return block.addPower(tile.getLinked(), amount);
 		}else{
 			return amount;
 		}
 	}
 	
 	@Override
-	public boolean acceptsPower(Tile tile){
+	public boolean acceptPower(Tile tile, Tile from, float amount){
 		Block block = linked(tile);
-		if(block instanceof PowerAcceptor){
-			return ((PowerAcceptor)block).acceptsPower(tile.getLinked());
+		if(block.hasPower){
+			return block.acceptPower(tile.getLinked(), from, amount);
 		}else{
 			return false;
-		}
-	}
-
-	@Override
-	public void setPower(Tile tile, float power){
-		Block block = linked(tile);
-		
-		if(block instanceof PowerAcceptor){
-			((PowerAcceptor)block).setPower(tile.getLinked(), power);
 		}
 	}
 	

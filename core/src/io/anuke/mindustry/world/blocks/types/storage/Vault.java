@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.storage;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
@@ -14,13 +13,7 @@ public class Vault extends StorageBlock {
         super(name);
         solid = true;
         update = true;
-        bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.totalItems()/capacity));
-    }
-
-    @Override
-    public void getStats(Array<String> list){
-        super.getStats(list);
-        list.add("[iteminfo]Capacity: " + capacity);
+        bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.inventory.totalItems()/capacity));
     }
 
     @Override
@@ -28,7 +21,7 @@ public class Vault extends StorageBlock {
         int iterations = Math.max(1, (int) (Timers.delta() + 0.4f));
 
         for(int i = 0; i < iterations; i ++) {
-            if (tile.entity.totalItems() > 0) {
+            if (tile.entity.inventory.totalItems() > 0) {
                 tryDump(tile);
             }
         }
@@ -42,7 +35,7 @@ public class Vault extends StorageBlock {
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return tile.entity.totalItems() < capacity;
+        return tile.entity.inventory.totalItems() < capacity;
     }
 
     @Override

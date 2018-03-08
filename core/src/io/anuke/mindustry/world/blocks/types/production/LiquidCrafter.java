@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
@@ -36,47 +35,44 @@ public class LiquidCrafter extends LiquidBlock{
 		health = 60;
 		liquidCapacity = 21f;
 
-		bars.add(new BlockBar(Color.GREEN, true, tile -> input == null ? -1f : (float)tile.entity.getItem(input) / itemCapacity));
+		bars.add(new BlockBar(Color.GREEN, true, tile -> input == null ? -1f : (float)tile.entity.inventory.getItem(input) / itemCapacity));
 	}
 	
 	@Override
-	public void getStats(Array<String> list){
-		super.getStats(list);
-		list.add("[liquidinfo]Max items/second: " + Strings.toFixed(60f/purifyTime, 1));
-		list.add("[liquidinfo]Input liquid: " + inputLiquid + " x " + (int)liquidAmount);
-		if(input != null) list.add("[iteminfo]Item Capacity: " + itemCapacity);
-		if(input != null) list.add("[iteminfo]Input item: " + input + " x " + inputAmount);
-		list.add("[iteminfo]Output: " + output);
+	public void setStats(){
+		super.setStats();
+		stats.add("maxitemssecond", Strings.toFixed(60f/purifyTime, 1));
+		stats.add("inputliquid", inputLiquid + " x " + (int)liquidAmount);
+		if(input != null) stats.add("itemcapacity", itemCapacity);
+		if(input != null) stats.add("inputitem", input + " x " + inputAmount);
+		stats.add("output", output);
 	}
 	
 	@Override
 	public void draw(Tile tile){
-		LiquidEntity entity = tile.entity();
 		Draw.rect(name(), tile.drawx(), tile.drawy());
 		
-		if(entity.liquid == null) return;
+		if(tile.entity.liquid.liquid == null) return;
 		
-		Draw.color(entity.liquid.color);
-		Draw.alpha(entity.liquidAmount / liquidCapacity);
+		Draw.color(tile.entity.liquid.liquid.color);
+		Draw.alpha(tile.entity.liquid.amount / liquidCapacity);
 		Draw.rect("blank", tile.drawx(), tile.drawy(), 2, 2);
 		Draw.color();
 	}
 	
 	@Override
 	public void update(Tile tile){
-		LiquidEntity entity = tile.entity();
-		
-		if(entity.timer.get(timerPurify, purifyTime) && entity.liquidAmount >= liquidAmount &&
-				(input == null || entity.hasItem(input, inputAmount))){
+		if(tile.entity.timer.get(timerPurify, purifyTime) && tile.entity.liquid.amount >= liquidAmount &&
+				(input == null || tile.entity.inventory.hasItem(input, inputAmount))){
 			
 			if(input != null)
-				entity.removeItem(input, inputAmount);
-			entity.liquidAmount -= liquidAmount;
+				tile.entity.inventory.removeItem(input, inputAmount);
+			tile.entity.liquid.amount -= liquidAmount;
 			offloadNear(tile, output);
 			Effects.effect(craftEffect, tile.worldx(), tile.worldy());
 		}
 		
-		if(entity.timer.get(timerDump, 15)){
+		if(tile.entity.timer.get(timerDump, 15)){
 			tryDump(tile, output);
 		}
 	}
@@ -89,7 +85,7 @@ public class LiquidCrafter extends LiquidBlock{
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		TileEntity entity = tile.entity();
-		return input != null && item == input && entity.getItem(input) < itemCapacity;
+		return input != null && item == input && entity.inventory.getItem(input) < itemCapacity;
 	}
 
 }

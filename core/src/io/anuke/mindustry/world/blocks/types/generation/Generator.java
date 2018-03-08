@@ -3,13 +3,11 @@ package io.anuke.mindustry.world.blocks.types.generation;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.PowerAcceptor;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Settings;
@@ -18,7 +16,10 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Shapes;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Geometry;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Strings;
+import io.anuke.ucore.util.Translator;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -43,16 +44,17 @@ public class Generator extends PowerBlock{
 	}
 
 	@Override
-	public void getStats(Array<String> list){
-		super.getStats(list);
+	public void setStats(){
+		super.setStats();
 
 		if(hasLasers){
-			list.add("[powerinfo]Laser tile range: " + laserRange);
-			list.add("[powerinfo]Max power transfer/second: " + Strings.toFixed(powerSpeed * 60, 2));
+			stats.add("lasertilerange", laserRange);
+			stats.add("maxpowertransfersecond", Strings.toFixed(powerSpeed * 60, 2));
 		}
 
+		//TODO fix this
 		if(explosive){
-			list.add("[orange]" + Bundles.get("text.blocks.explosive"));
+			stats.add("explosive", "!!! //TODO");
 		}
 	}
 
@@ -138,7 +140,7 @@ public class Generator extends PowerBlock{
 		GeneratorEntity entity = tile.entity();
 
 		for(int i = 0; i < laserDirections; i++){
-			if(entity.power > powerSpeed){
+			if(entity.power.amount > powerSpeed){
 				entity.laserThickness = Mathf.lerpDelta(entity.laserThickness, 1f, 0.05f);
 			}else{
 				entity.laserThickness = Mathf.lerpDelta(entity.laserThickness, 0.2f, 0.05f);
@@ -150,7 +152,7 @@ public class Generator extends PowerBlock{
 	}
 
 	@Override
-	public boolean acceptsPower(Tile tile){
+	public boolean acceptPower(Tile tile, Tile source, float amount){
 		return false;
 	}
 
@@ -173,11 +175,10 @@ public class Generator extends PowerBlock{
 			if(target == null || isInterfering(target, rot))
 				continue;
 
-			PowerAcceptor p = (PowerAcceptor) target.block();
-			float transmit = Math.min(powerSpeed * Timers.delta(), entity.power);
-			if(p.acceptsPower(target)){
-				float accepted = p.addPower(target, transmit);
-				entity.power -= accepted;
+			float transmit = Math.min(powerSpeed * Timers.delta(), entity.power.amount);
+			if(target.block().acceptPower(target, tile, transmit)){
+				float accepted = target.block().addPower(target, transmit);
+				entity.power.amount -= accepted;
 			}
 
 		}
@@ -253,9 +254,9 @@ public class Generator extends PowerBlock{
 		for(int i = 1; i < laserRange; i++){
 			Tile other = world.tile(tile.x + i * point.x, tile.y + i * point.y);
 
-			if(other != null && other.block() instanceof PowerAcceptor){
+			if(other != null && other.block().hasPower){
 				Tile linked = other.getLinked();
-				if(linked == null || linked.block() instanceof PowerAcceptor){
+				if(linked == null || linked.block().hasPower){
 					return other;
 				}
 			}

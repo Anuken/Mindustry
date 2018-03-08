@@ -10,14 +10,13 @@ public class LiquidRouter extends Conduit{
 		super(name);
 		rotate = false;
 		solid = true;
-		flowfactor = 2f;
+		liquidFlowFactor = 2f;
 	}
 	
 	@Override
 	public void update(Tile tile){
-		LiquidEntity entity = tile.entity();
 		
-		if(entity.liquidAmount > 0){
+		if(tile.entity.liquid.amount > 0){
 			if(tile.getExtra() != tile.getRotation()){
 				tryMoveLiquid(tile, tile.getNearby(tile.getRotation()));
 			}
@@ -29,18 +28,15 @@ public class LiquidRouter extends Conduit{
 	@Override
 	public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
 		super.handleLiquid(tile, source, liquid, amount);
-		tile.setExtra((byte)tile.relativeTo(source.x, source.y));
+		tile.setExtra(tile.relativeTo(source.x, source.y));
 	}
 	
 	@Override
 	public void draw(Tile tile){
-		LiquidEntity entity = tile.entity();
 		Draw.rect(name(), tile.worldx(), tile.worldy());
 		
-		if(entity.liquid == null) return;
-		
-		Draw.color(entity.liquid.color);
-		Draw.alpha(entity.liquidAmount / liquidCapacity);
+		Draw.color(tile.entity.liquid.liquid.color);
+		Draw.alpha(tile.entity.liquid.amount / liquidCapacity);
 		Draw.rect("blank", tile.worldx(), tile.worldy(), 2, 2);
 		Draw.color();
 	}

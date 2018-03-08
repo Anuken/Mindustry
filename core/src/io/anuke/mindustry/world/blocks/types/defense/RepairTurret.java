@@ -2,7 +2,6 @@ package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
@@ -26,19 +25,18 @@ public class RepairTurret extends PowerTurret{
 	}
 	
 	@Override
-	public void getStats(Array<String> list){
-		list.add("[health]health: " + health);
-		list.add("[powerinfo]Power Capacity: " + (int)powerCapacity);
-		list.add("[powerinfo]Power/shot: " + Strings.toFixed(powerUsed, 1));
-		list.add("[turretinfo]Range: " + (int)range);
-		list.add("[turretinfo]Repairs/Second: " + Strings.toFixed(60f/reload * repairFrac * 100, 1) + "%");
+	public void setStats(){
+		super.setStats();
+
+		//TODO remove extra crap
+		stats.add("repairssecond", Strings.toFixed(60f/reload * repairFrac * 100, 1) + "%");
 	}
 	
 	@Override
 	public void update(Tile tile){
-		PowerTurretEntity entity = tile.entity();
-		
-		if(entity.power < powerUsed){
+		TurretEntity entity = tile.entity();
+
+		if(entity.power.amount < powerUsed){
 			return;
 		}
 		
@@ -66,7 +64,7 @@ public class RepairTurret extends PowerTurret{
 				if(entity.blockTarget.health > maxhealth)
 					entity.blockTarget.health = maxhealth;
 				
-				entity.power -= powerUsed;
+				entity.power.amount -= powerUsed;
 			}
 		}
 	}
@@ -80,10 +78,10 @@ public class RepairTurret extends PowerTurret{
 	
 	@Override
 	public void drawLayer2(Tile tile){
-		PowerTurretEntity entity = tile.entity();
+		TurretEntity entity = tile.entity();
 		TileEntity target = entity.blockTarget;
 		
-		if(entity.power >= powerUsed && target != null && Angles.angleDist(entity.angleTo(target), entity.rotation) < 10){
+		if(entity.power.amount >= powerUsed && target != null && Angles.angleDist(entity.angleTo(target), entity.rotation) < 10){
 			Tile targetTile = target.tile;
 			float len = 4f;
 

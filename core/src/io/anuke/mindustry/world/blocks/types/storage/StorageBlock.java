@@ -14,9 +14,9 @@ public abstract class StorageBlock extends Block {
     /**Removes any one item and returns it. Returns null if no items are there.*/
     public Item removeItem(Tile tile){
         TileEntity entity = tile.entity;
-        for(int i = 0; i < entity.items.length; i ++){
-            if(entity.items[i] > 0){
-                entity.items[i] --;
+        for(int i = 0; i < entity.inventory.items.length; i ++){
+            if(entity.inventory.items[i] > 0){
+                entity.inventory.items[i] --;
                 return Item.getByID(i);
             }
         }

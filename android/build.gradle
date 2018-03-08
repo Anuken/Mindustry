@@ -22,7 +22,7 @@ task deploy(type: Copy){
 
 android {
     buildToolsVersion '26.0.2'
-    compileSdkVersion 26
+    compileSdkVersion 27
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -51,7 +51,7 @@ android {
 
         applicationId "io.anuke.mindustry"
         minSdkVersion 9
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode code
         versionName "$versionNumber-$versionType-${props['build'].replace(" ", "-")}"
     }

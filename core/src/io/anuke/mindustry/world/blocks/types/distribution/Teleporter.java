@@ -59,9 +59,9 @@ public class Teleporter extends PowerBlock{
 	}
 
 	@Override
-	public void getStats(Array<String> list){
-		super.getStats(list);
-		list.add("[powerinfo]Power/item: " + Strings.toFixed(powerPerItem, 1));
+	public void setStats(){
+		super.setStats();
+		stats.add("poweritem", Strings.toFixed(powerPerItem, 1));
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class Teleporter extends PowerBlock{
 
 		teleporters[entity.color].add(tile);
 
-		if(entity.totalItems() > 0){
+		if(entity.inventory.totalItems() > 0){
 			tryDump(tile);
 		}
 	}
@@ -139,17 +139,17 @@ public class Teleporter extends PowerBlock{
 		if(links.size > 0){
             if(!syncBlockState || Net.server() || !Net.active()){
                 Tile target = links.random();
-                target.entity.addItem(item, 1);
+                target.entity.inventory.addItem(item, 1);
             }
 		}
 
-		entity.power -= powerPerItem;
+		entity.power.amount -= powerPerItem;
 	}
 	
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		PowerEntity entity = tile.entity();
-		return !(source.block() instanceof Teleporter) && entity.power >= powerPerItem && findLinks(tile).size > 0;
+		return !(source.block() instanceof Teleporter) && entity.power.amount >= powerPerItem && findLinks(tile).size > 0;
 	}
 	
 	@Override
@@ -168,7 +168,7 @@ public class Teleporter extends PowerBlock{
 				if(other.block() instanceof Teleporter){
 					if(other.<TeleporterEntity>entity().color != entity.color){
 						removal.add(other);
-					}else if(other.entity.totalItems() == 0){
+					}else if(other.entity.inventory.totalItems() == 0){
 						returns.add(other);
 					}
 				}else{

@@ -1,13 +1,14 @@
 package io.anuke.mindustry.io.versions;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.entities.enemies.EnemyType;
+import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
-import io.anuke.mindustry.io.BlockLoader;
 import io.anuke.mindustry.io.SaveFileVersion;
+import io.anuke.mindustry.io.SaveMeta;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
@@ -18,7 +19,6 @@ import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.mindustry.world.blocks.types.Rock;
 import io.anuke.ucore.core.Core;
-import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup.EntityContainer;
 
 import java.io.DataInputStream;
@@ -28,15 +28,26 @@ import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Save13 extends SaveFileVersion {
+public class Save16 extends SaveFileVersion {
 
-    public Save13(){
-        super(13);
+    public Save16(){
+        super(16);
+    }
+
+    public SaveMeta getData(DataInputStream stream) throws IOException{
+        long time = stream.readLong(); //read last saved time
+        byte mode = stream.readByte(); //read the gamemode
+        byte map = stream.readByte(); //read the map
+        int wave = stream.readInt(); //read the wave
+        stream.readFloat(); //wave time
+        byte difficulty = stream.readByte();
+        return new SaveMeta(version, time, mode, map, wave, Difficulty.values()[difficulty]);
     }
 
     @Override
     public void read(DataInputStream stream) throws IOException {
-        /*long loadTime = */stream.readLong();
+        /*long loadTime = */
+        stream.readLong();
 
         //general state
         byte mode = stream.readByte();
@@ -44,31 +55,52 @@ public class Save13 extends SaveFileVersion {
 
         int wave = stream.readInt();
         float wavetime = stream.readFloat();
+        byte difficulty = stream.readByte();
+
+        state.difficulty = Difficulty.values()[difficulty];
+
+        //block header
+
+        int blocksize = stream.readInt();
+
+        IntMap<Block> map = new IntMap<>();
+
+        for(int i = 0; i < blocksize; i ++){
+            String name = readString(stream);
+            int id = stream.readShort();
+
+            map.put(id, Block.getByName(name));
+        }
 
         float playerx = stream.readFloat();
         float playery = stream.readFloat();
 
         int playerhealth = stream.readInt();
 
-        Vars.player.x = playerx;
-        Vars.player.y = playery;
-        Vars.player.health = playerhealth;
-        state.mode = GameMode.values()[mode];
-        Core.camera.position.set(playerx, playery, 0);
+        if(!headless) {
+            player.x = playerx;
+            player.y = playery;
+            player.health = playerhealth;
+            state.mode = GameMode.values()[mode];
+            Core.camera.position.set(playerx, playery, 0);
 
-        //weapons
+            //weapons
 
-        control.upgrades().getWeapons().clear();
-        control.upgrades().getWeapons().add(Weapon.blaster);
-        Vars.player.weaponLeft = Vars.player.weaponRight = Weapon.blaster;
+            control.upgrades().getWeapons().clear();
+            control.upgrades().getWeapons().add(Weapon.blaster);
+            player.weaponLeft = player.weaponRight = Weapon.blaster;
 
-        int weapons = stream.readByte();
+            int weapons = stream.readByte();
 
-        for(int i = 0; i < weapons; i ++){
-            control.upgrades().addWeapon((Weapon) Upgrade.getByID(stream.readByte()));
+            for (int i = 0; i < weapons; i++) {
+                control.upgrades().addWeapon((Weapon) Upgrade.getByID(stream.readByte()));
+            }
+
+            ui.hudfrag.updateWeapons();
+        }else{
+            byte b = stream.readByte();
+            for(int i = 0; i < b; i ++) stream.readByte();
         }
-
-        ui.hudfrag.updateWeapons();
 
         //inventory
 
@@ -82,11 +114,9 @@ public class Save13 extends SaveFileVersion {
             state.inventory.getItems()[item.id] = amount;
         }
 
-        ui.hudfrag.updateItems();
+        if(!headless) ui.hudfrag.updateItems();
 
         //enemies
-
-        Entities.clear();
 
         int enemies = stream.readInt();
 
@@ -118,15 +148,15 @@ public class Save13 extends SaveFileVersion {
         state.wave = wave;
         state.wavetime = wavetime;
 
-        if(!android)
-            Vars.player.add();
+        if(!android && !headless)
+            player.add();
 
         //map
 
         int seed = stream.readInt();
 
         world.loadMap(world.maps().getMap(mapid), seed);
-        renderer.clearTiles();
+        if(!headless) renderer.clearTiles();
 
         for(Enemy enemy : enemiesToUpdate){
             enemy.node = -2;
@@ -148,6 +178,7 @@ public class Save13 extends SaveFileVersion {
         for(int i = 0; i < rocks; i ++){
             int pos = stream.readInt();
             Tile tile = world.tile(pos % world.width(), pos / world.width());
+            if(tile == null) continue;
             Block result = WorldGenerator.rocks.get(tile.floor());
             if(result != null) tile.setBlock(result);
         }
@@ -159,7 +190,8 @@ public class Save13 extends SaveFileVersion {
             int blockid = stream.readInt();
 
             Tile tile = world.tile(pos % world.width(), pos / world.width());
-            tile.setBlock(BlockLoader.getByOldID(blockid));
+
+            tile.setBlock(map.get(blockid));
 
             if(blockid == Blocks.blockpart.id){
                 tile.link = stream.readByte();
@@ -173,11 +205,9 @@ public class Save13 extends SaveFileVersion {
                 tile.entity.health = health;
                 tile.setRotation(rotation);
 
-                for(int j = 0; j < items; j ++){
-                    int itemid = stream.readByte();
-                    int itemamount = stream.readInt();
-                    tile.entity.items[itemid] = itemamount;
-                }
+                if(tile.entity.inventory != null) tile.entity.inventory.read(stream);
+                if(tile.entity.power != null) tile.entity.power.read(stream);
+                if(tile.entity.liquid != null) tile.entity.liquid.read(stream);
 
                 tile.entity.read(stream);
             }
@@ -196,17 +226,35 @@ public class Save13 extends SaveFileVersion {
 
         stream.writeInt(state.wave); //wave
         stream.writeFloat(state.wavetime); //wave countdown
+        stream.writeByte(state.difficulty.ordinal());
 
-        stream.writeFloat(Vars.player.x); //player x/y
-        stream.writeFloat(Vars.player.y);
+        //--BLOCK HEADER--
 
-        stream.writeInt(Vars.player.health); //player health
+        stream.writeInt(Block.getAllBlocks().size);
 
-        stream.writeByte(control.upgrades().getWeapons().size - 1); //amount of weapons
+        for(int i = 0; i < Block.getAllBlocks().size; i ++){
+            Block block = Block.getAllBlocks().get(i);
+            writeString(stream, block.name);
+            stream.writeShort(block.id);
+        }
 
-        //start at 1, because the first weapon is always the starter - ignore that
-        for(int i = 1; i < control.upgrades().getWeapons().size; i ++){
-            stream.writeByte(control.upgrades().getWeapons().get(i).id); //weapon ordinal
+        if(!headless) {
+            stream.writeFloat(player.x); //player x/y
+            stream.writeFloat(player.y);
+
+            stream.writeInt(player.health); //player health
+
+            stream.writeByte(control.upgrades().getWeapons().size - 1); //amount of weapons
+
+            //start at 1, because the first weapon is always the starter - ignore that
+            for (int i = 1; i < control.upgrades().getWeapons().size; i++) {
+                stream.writeByte(control.upgrades().getWeapons().get(i).id); //weapon ordinal
+            }
+        }else{
+            stream.writeFloat(world.getSpawnX());
+            stream.writeFloat(world.getSpawnY());
+            stream.writeInt(150);
+            stream.writeByte(0);
         }
 
         //--INVENTORY--
@@ -230,6 +278,7 @@ public class Save13 extends SaveFileVersion {
         }
 
         //--ENEMIES--
+
         EntityContainer<Enemy> enemies = enemyGroup.all();
 
         stream.writeInt(enemies.size()); //enemy amount
@@ -256,7 +305,7 @@ public class Save13 extends SaveFileVersion {
             for(int y = 0; y < world.height(); y ++){
                 Tile tile = world.tile(x, y);
 
-                if(tile.breakable()){
+                if(tile != null && tile.breakable()){
                     if(tile.block() instanceof Rock){
                         totalrocks ++;
                     }else{
@@ -274,7 +323,7 @@ public class Save13 extends SaveFileVersion {
             for (int y = 0; y < world.height(); y++) {
                 Tile tile = world.tile(x, y);
 
-                if (tile.block() instanceof Rock) {
+                if (tile != null && tile.block() instanceof Rock) {
                     stream.writeInt(tile.packedPosition());
                 }
             }
@@ -287,7 +336,7 @@ public class Save13 extends SaveFileVersion {
             for(int y = 0; y < world.height(); y ++){
                 Tile tile = world.tile(x, y);
 
-                if(tile.breakable() && !(tile.block() instanceof Rock)){
+                if(tile != null && tile.breakable() && !(tile.block() instanceof Rock)){
 
                     stream.writeInt(x + y*world.width()); //tile pos
                     stream.writeInt(tile.block().id); //block ID
@@ -297,18 +346,10 @@ public class Save13 extends SaveFileVersion {
                     if(tile.entity != null){
                         stream.writeByte(tile.getRotation()); //rotation
                         stream.writeShort((short)tile.entity.health); //health
-                        byte amount = 0;
-                        for(int i = 0; i < tile.entity.items.length; i ++){
-                            if(tile.entity.items[i] > 0) amount ++;
-                        }
-                        stream.writeByte(amount); //amount of items
 
-                        for(int i = 0; i < tile.entity.items.length; i ++){
-                            if(tile.entity.items[i] > 0){
-                                stream.writeByte(i); //item ID
-                                stream.writeInt(tile.entity.items[i]); //item amount
-                            }
-                        }
+                        if(tile.entity.inventory != null) tile.entity.inventory.write(stream);
+                        if(tile.entity.power != null) tile.entity.power.write(stream);
+                        if(tile.entity.liquid != null) tile.entity.liquid.write(stream);
 
                         tile.entity.write(stream);
                     }
@@ -316,5 +357,4 @@ public class Save13 extends SaveFileVersion {
             }
         }
     }
-
 }

@@ -104,7 +104,7 @@ public class TunnelConveyor extends Block{
 		arr.add(entity.index);
 
 		for(int i = 0; i < entity.index; i++){
-			long l = entity.items[i];
+			long l = entity.inventory.items[i];
 			float time = NumberUtils.intBitsToFloat(Bits.getLeftInt(l));
 			Item item = Item.getByID(Bits.getRightInt(l));
 			Tile dest = getDestTunnel(tile, item);

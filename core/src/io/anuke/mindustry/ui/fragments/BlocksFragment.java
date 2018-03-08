@@ -9,6 +9,7 @@ import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.blocks.types.BlockStats;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.scene.Element;
@@ -29,7 +30,6 @@ import static io.anuke.mindustry.Vars.*;
 public class BlocksFragment implements Fragment{
 	private Table desctable, itemtable, blocks, weapons;
 	private Stack stack = new Stack();
-	private Array<String> statlist = new Array<>();
 	private boolean shown = true;
 	private Recipe hoveredDescriptionRecipe;
 	
@@ -293,8 +293,12 @@ public class BlocksFragment implements Fragment{
 	}
 
 	public void showBlockInfo(Block block){
-		statlist.clear();
-		block.getStats(statlist);
+		Array<String> statlist = new Array<String>();
+		BlockStats stats = block.stats;
+
+		for(String s : stats.getMap().orderedKeys()){
+			statlist.add(Bundles.get("text.blocks." + s) + ": []" + stats.getMap().get(s));
+		}
 
 		Label desclabel = new Label(block.fullDescription);
 		desclabel.setWrap(true);
@@ -324,12 +328,6 @@ public class BlocksFragment implements Fragment{
 		}
 
 		for(String s : statlist){
-			if(s.contains(":")) {
-				String color = s.substring(0, s.indexOf("]")+1);
-				String first = s.substring(color.length(), s.indexOf(":")).replace("/", "").replace(" ", "").toLowerCase();
-				String last = s.substring(s.indexOf(":"), s.length());
-				s = color + Bundles.get("text.blocks." + first) + last;
-			}
 			table.add(s).left();
 			table.row();
 		}
