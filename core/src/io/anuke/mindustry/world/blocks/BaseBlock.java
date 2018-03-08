@@ -9,8 +9,8 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 
 public abstract class BaseBlock {
+    public boolean hasInventory = true;
     public boolean hasLiquids;
-    public boolean hasInventory;
     public boolean hasPower;
 
     public int itemCapacity;

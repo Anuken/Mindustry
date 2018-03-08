@@ -6,6 +6,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.mindustry.world.blocks.types.modules.InventoryModule;
+import io.anuke.mindustry.world.blocks.types.modules.LiquidModule;
+import io.anuke.mindustry.world.blocks.types.modules.PowerModule;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Mathf;
@@ -296,6 +299,9 @@ public class Tile{
 
 			if (block.destructible || block.update) {
 				entity = block.getEntity().init(this, block.update);
+				if(block.hasInventory) entity.inventory = new InventoryModule();
+				if(block.hasLiquids) entity.liquid = new LiquidModule();
+				if(block.hasPower) entity.power = new PowerModule();
 			}
 
 			updateOcclusion();
