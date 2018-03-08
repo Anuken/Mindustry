@@ -7,22 +7,18 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.sksamuel.gwt.websockets.Websocket;
 import com.sksamuel.gwt.websockets.WebsocketListener;
 import io.anuke.mindustry.io.Platform;
-import io.anuke.mindustry.net.Host;
-import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.ClientProvider;
 import io.anuke.mindustry.net.Net.SendMode;
-import io.anuke.mindustry.net.Packet;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
-import io.anuke.mindustry.net.Registrator;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.webPort;
 
 public class WebsocketClient implements ClientProvider {
     Websocket socket;
@@ -118,11 +114,7 @@ public class WebsocketClient implements ClientProvider {
 
                     @Override
                     public void onMessage(String msg) {
-                        if (!msg.startsWith("---")) return;
-                        String[] text = msg.substring(3).split("\\|");
-                        Host host = new Host(text[1], address, text[2], Strings.parseInt(text[3]),
-                                Strings.parseInt(text[0]),
-                                text.length > 4 && Strings.canParsePostiveInt(text[4]) ? Strings.parseInt(text[4]) : 0);
+                        Host host = NetworkIO.readServerData(address, ByteBuffer.wrap(Base64Coder.decode(msg)));
                         valid.accept(host);
                         accepted[0] = true;
                         socket.close();
@@ -130,7 +122,7 @@ public class WebsocketClient implements ClientProvider {
 
                     @Override
                     public void onOpen() {
-                        socket.send("_ping_");
+                        socket.send("ping");
                     }
                 });
                 socket.open();

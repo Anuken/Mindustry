@@ -10,6 +10,7 @@ import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.ClientProvider;
 import io.anuke.mindustry.net.Net.SendMode;
+import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
 import io.anuke.ucore.function.Consumer;
@@ -41,7 +42,7 @@ public class KryoClient implements ClientProvider{
             @Override
             public void onDiscoveredHost(DatagramPacket datagramPacket) {
                 ByteBuffer buffer = ByteBuffer.wrap(datagramPacket.getData());
-                Host address = KryoRegistrator.readServerData(datagramPacket.getAddress(), buffer);
+                Host address = NetworkIO.readServerData(datagramPacket.getAddress().getHostAddress(), buffer);
                 addresses.put(datagramPacket.getAddress(), address);
             }
 
@@ -156,7 +157,7 @@ public class KryoClient implements ClientProvider{
                 socket.receive(packet);
 
                 ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
-                Host host = KryoRegistrator.readServerData(packet.getAddress(), buffer);
+                Host host = NetworkIO.readServerData(packet.getAddress().getHostAddress(), buffer);
 
                 if (host != null) {
                     Gdx.app.postRunnable(() -> valid.accept(host));

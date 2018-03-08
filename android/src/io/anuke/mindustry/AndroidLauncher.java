@@ -10,12 +10,14 @@ import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.badlogic.gdx.utils.Base64Coder;
 import io.anuke.kryonet.DefaultThreadImpl;
 import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
@@ -24,6 +26,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Random;
 
 public class AndroidLauncher extends AndroidApplication{
 	boolean doubleScaleTablets = true;
@@ -104,6 +107,22 @@ public class AndroidLauncher extends AndroidApplication{
 				try {
 					String s = Secure.getString(getContext().getContentResolver(),
 							Secure.ANDROID_ID);
+
+					if(s == null){
+						Settings.defaults("uuid", "");
+
+						String uuid = Settings.getString("uuid");
+						if(uuid.isEmpty()){
+							byte[] result = new byte[8];
+							new Random().nextBytes(result);
+							uuid = new String(Base64Coder.encode(result));
+							Settings.putString("uuid", uuid);
+							Settings.save();
+							return result;
+						}
+						return Base64Coder.decode(uuid);
+					}
+
 					int len = s.length();
 					byte[] data = new byte[len / 2];
 					for (int i = 0; i < len; i += 2) {

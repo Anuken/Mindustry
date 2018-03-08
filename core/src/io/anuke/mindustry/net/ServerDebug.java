@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Packets.Disconnect;
+import io.anuke.ucore.util.Log;
 
 import static io.anuke.mindustry.Vars.playerGroup;
 
@@ -13,12 +14,16 @@ public class ServerDebug {
     private IntMap<OrderedMap<Class<?>, Long>> last = new IntMap<>();
 
     public void handle(int connection, Object packet){
-        if(!last.containsKey(connection))
-            last.put(connection, new OrderedMap<>());
-        if(packet instanceof Disconnect)
-            last.remove(connection);
-        else
-            last.get(connection).put(packet.getClass(), TimeUtils.millis());
+        try {
+            if (!last.containsKey(connection))
+                last.put(connection, new OrderedMap<>());
+            if (packet instanceof Disconnect)
+                last.remove(connection);
+            else
+                last.get(connection).put(packet.getClass(), TimeUtils.millis());
+        }catch (Exception e){
+            Log.err("<An internal debug error has occurred.>");
+        }
     }
 
     public String getOut(){
