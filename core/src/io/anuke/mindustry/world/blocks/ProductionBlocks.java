@@ -216,10 +216,12 @@ public class ProductionBlocks{
 		}
 	},
 
-	biomatterextractor = new Drill("biomatterextractor"){
+	cultivator = new LiquidDrill("cultivator"){
 		{
 			resource = Blocks.grass;
 			result = Item.biomatter;
+			inputLiquid = Liquid.water;
+			inputLiquidAmount = 0.1f;
 			time = 5;
 			size = 2;
 		}

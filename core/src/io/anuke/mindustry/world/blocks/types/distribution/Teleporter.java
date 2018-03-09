@@ -56,7 +56,7 @@ public class Teleporter extends PowerBlock{
 		TeleporterEntity entity = tile.entity();
 		if(entity != null){
 			entity.color = data;
-			Arrays.fill(entity.items, 0);
+			Arrays.fill(entity.inventory.items, 0);
 		}
 	}
 
