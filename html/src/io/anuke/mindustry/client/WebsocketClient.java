@@ -114,8 +114,12 @@ public class WebsocketClient implements ClientProvider {
 
                     @Override
                     public void onMessage(String msg) {
-                        Host host = NetworkIO.readServerData(address, ByteBuffer.wrap(Base64Coder.decode(msg)));
-                        valid.accept(host);
+                        byte[] bytes = Base64Coder.decode(msg);
+                        Host host = NetworkIO.readServerData(address, ByteBuffer.wrap(bytes));
+                        if(bytes.length != 128)
+                            valid.accept(new Host("Unknown", address, "Unknown", 0, 0, 0));
+                        else
+                            valid.accept(host);
                         accepted[0] = true;
                         socket.close();
                     }

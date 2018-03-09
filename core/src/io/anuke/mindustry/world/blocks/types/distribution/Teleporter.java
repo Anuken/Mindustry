@@ -19,6 +19,7 @@ import io.anuke.ucore.util.Strings;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.syncBlockState;
 
@@ -55,6 +56,7 @@ public class Teleporter extends PowerBlock{
 		TeleporterEntity entity = tile.entity();
 		if(entity != null){
 			entity.color = data;
+			Arrays.fill(entity.items, 0);
 		}
 	}
 
