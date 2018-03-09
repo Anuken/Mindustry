@@ -108,21 +108,6 @@ public class AndroidLauncher extends AndroidApplication{
 					String s = Secure.getString(getContext().getContentResolver(),
 							Secure.ANDROID_ID);
 
-					if(s == null){
-						Settings.defaults("uuid", "");
-
-						String uuid = Settings.getString("uuid");
-						if(uuid.isEmpty()){
-							byte[] result = new byte[8];
-							new Random().nextBytes(result);
-							uuid = new String(Base64Coder.encode(result));
-							Settings.putString("uuid", uuid);
-							Settings.save();
-							return result;
-						}
-						return Base64Coder.decode(uuid);
-					}
-
 					int len = s.length();
 					byte[] data = new byte[len / 2];
 					for (int i = 0; i < len; i += 2) {
@@ -132,7 +117,18 @@ public class AndroidLauncher extends AndroidApplication{
 
 					return data;
 				}catch (Exception e){
-					return null;
+                    Settings.defaults("uuid", "");
+
+                    String uuid = Settings.getString("uuid");
+                    if(uuid.isEmpty()){
+                        byte[] result = new byte[8];
+                        new Random().nextBytes(result);
+                        uuid = new String(Base64Coder.encode(result));
+                        Settings.putString("uuid", uuid);
+                        Settings.save();
+                        return result;
+                    }
+                    return Base64Coder.decode(uuid);
 				}
 			}
 		};
