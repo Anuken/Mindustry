@@ -24,7 +24,7 @@ fi
 
 touch $FILE1
 
-echo "### Commit #"$TRAVIS_COMMIT"." >> $FILE1
+echo "###Build #"$TRAVIS_BUILD_NUMBER", Commit #"$TRAVIS_COMMIT"." >> $FILE1
 echo >> $FILE1
 echo "Desktop JAR download: [Link]("$DESKFILE")" >> $FILE1
 
