@@ -23,10 +23,10 @@ public class DesktopInput extends InputHandler{
 	private boolean beganBreak;
 	private boolean rotated = false, rotatedAlt, zoomed;
 	
-	@Override public float getCursorEndX(){ return endx; }
-	@Override public float getCursorEndY(){ return endy; }
-	@Override public float getCursorX(){ return (int)(Graphics.screen(mousex, mousey).x + 2); }
-	@Override public float getCursorY(){ return (int)(Gdx.graphics.getHeight() - 1 - Graphics.screen(mousex, mousey).y); }
+	@Override public float getCursorEndX(){ return select() ? getCursorX() : endx; }
+	@Override public float getCursorEndY(){ return select() ? getCursorY() : endy; }
+	@Override public float getCursorX(){ return (int)(Graphics.screen(mousex, mousey).x); }
+	@Override public float getCursorY(){ return (int)(Gdx.graphics.getHeight() - Graphics.screen(mousex, mousey).y); }
 	@Override public boolean drawPlace(){ return !beganBreak; }
 
 	@Override
@@ -154,6 +154,10 @@ public class DesktopInput extends InputHandler{
 				Cursors.restoreCursor();
 		}
 
+	}
+
+	boolean select(){
+		return !Inputs.keyDown("select") && !Inputs.keyRelease("select");
 	}
 
 	public int tilex(){

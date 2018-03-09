@@ -25,7 +25,11 @@ public class TraceDialog extends FloatingDialog {
         table.row();
         table.add(Bundles.format("text.trace.ip", info.ip));
         table.row();
+        table.add(Bundles.format("text.trace.id", info.uuid));
+        table.row();
         table.add(Bundles.format("text.trace.modclient", info.modclient));
+        table.row();
+        table.add(Bundles.format("text.trace.android", info.android));
         table.row();
 
         table.add().pad(5);

@@ -7,6 +7,7 @@ public class TraceInfo {
     public int playerid;
     public String ip;
     public boolean modclient;
+    public boolean android;
 
     public int totalBlocksBroken;
     public int structureBlocksBroken;
@@ -14,6 +15,8 @@ public class TraceInfo {
 
     public int totalBlocksPlaced;
     public Block lastBlockPlaced = Blocks.air;
+
+    public String uuid;
 
     public TraceInfo(String ip){
         this.ip = ip;

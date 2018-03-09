@@ -1,5 +1,6 @@
 package io.anuke.mindustry.net;
 
+import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import io.anuke.mindustry.entities.Player;
@@ -56,6 +57,7 @@ public class Packets {
         public String name;
         public boolean android;
         public int color;
+        public byte[] uuid;
 
         @Override
         public void write(ByteBuffer buffer) {
@@ -64,6 +66,7 @@ public class Packets {
             buffer.put(name.getBytes());
             buffer.put(android ? (byte)1 : 0);
             buffer.putInt(color);
+            buffer.put(uuid);
         }
 
         @Override
@@ -75,6 +78,8 @@ public class Packets {
             name = new String(bytes);
             android = buffer.get() == 1;
             color = buffer.getInt();
+            uuid = new byte[8];
+            buffer.get(uuid);
         }
     }
 
@@ -569,6 +574,7 @@ public class Packets {
             buffer.putShort((short)info.ip.getBytes().length);
             buffer.put(info.ip.getBytes());
             buffer.put(info.modclient ? (byte)1 : 0);
+            buffer.put(info.android ? (byte)1 : 0);
 
             buffer.putInt(info.totalBlocksBroken);
             buffer.putInt(info.structureBlocksBroken);
@@ -576,6 +582,7 @@ public class Packets {
 
             buffer.putInt(info.totalBlocksPlaced);
             buffer.putInt(info.lastBlockPlaced.id);
+            buffer.put(Base64Coder.decode(info.uuid));
         }
 
         @Override
@@ -589,11 +596,16 @@ public class Packets {
 
             info.playerid = id;
             info.modclient = buffer.get() == 1;
+            info.android = buffer.get() == 1;
             info.totalBlocksBroken = buffer.getInt();
             info.structureBlocksBroken = buffer.getInt();
             info.lastBlockBroken = Block.getByID(buffer.getInt());
             info.totalBlocksPlaced = buffer.getInt();
             info.lastBlockPlaced = Block.getByID(buffer.getInt());
+            byte[] uuid = new byte[8];
+            buffer.get(uuid);
+
+            info.uuid = new String(Base64Coder.encode(uuid));
         }
     }
 }

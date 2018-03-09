@@ -3,7 +3,6 @@ package io.anuke.mindustry.world;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.enemies.Enemy;
@@ -94,16 +93,5 @@ public class WorldGenerator {
 		}
 
 		return core;
-	}
-	
-	private static IntMap<Block> map(Object...objects){
-		
-		IntMap<Block> out = new IntMap<>();
-		
-		for(int i = 0; i < objects.length; i += 2){
-			out.put(Hue.rgb((Color)objects[i]), (Block)objects[i+1]);
-		}
-		
-		return out;
 	}
 }

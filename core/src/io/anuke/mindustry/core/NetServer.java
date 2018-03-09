@@ -51,18 +51,27 @@ public class NetServer extends Module{
         Events.on(GameOverEvent.class, () -> weapons.clear());
 
         Net.handleServer(Connect.class, (id, connect) -> {
-            if(admins.isBanned(connect.addressTCP)){
+            if(admins.isIPBanned(connect.addressTCP)){
                 Net.kickConnection(id, KickReason.banned);
             }
         });
 
         Net.handleServer(ConnectPacket.class, (id, packet) -> {
+            String uuid = new String(Base64Coder.encode(packet.uuid));
             if(Net.getConnection(id) == null ||
-                    admins.isBanned(Net.getConnection(id).address)) return;
+                    admins.isIPBanned(Net.getConnection(id).address)) return;
+
+            if(admins.isIDBanned(uuid)){
+                Net.kickConnection(id, KickReason.banned);
+                return;
+            }
 
             String ip = Net.getConnection(id).address;
 
             admins.setKnownName(ip, packet.name);
+            admins.setKnownIP(uuid, ip);
+            admins.getTrace(ip).uuid = uuid;
+            admins.getTrace(ip).android = packet.android;
 
             if(packet.version != Version.build && Version.build != -1 && packet.version != -1){
                 Net.kickConnection(id, packet.version > Version.build ? KickReason.serverOutdated : KickReason.clientOutdated);
@@ -270,7 +279,7 @@ public class NetServer extends Module{
             String ip = Net.getConnection(other.clientid).address;
 
             if(packet.action == AdminAction.ban){
-                admins.banPlayer(ip);
+                admins.banPlayerIP(ip);
                 Net.kickConnection(other.clientid, KickReason.banned);
                 Log.info("&lc{0} has banned {1}.", player.name, other.name);
             }else if(packet.action == AdminAction.kick){

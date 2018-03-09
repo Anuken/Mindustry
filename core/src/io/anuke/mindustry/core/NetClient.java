@@ -1,6 +1,5 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
@@ -67,11 +66,20 @@ public class NetClient extends Module {
             c.name = player.name;
             c.android = android;
             c.color = Color.rgba8888(player.color);
+            c.uuid = Platform.instance.getUUID();
+
+            if(c.uuid == null){
+                ui.showError("$text.invalidid");
+                ui.loadfrag.hide();
+                disconnectQuietly();
+                return;
+            }
+
             Net.send(c, SendMode.tcp);
 
             Timers.runTask(dataTimeout, () -> {
                 if (!gotData) {
-                    Gdx.app.error("Mindustry", "Failed to load data!");
+                    Log.err("Failed to load data!");
                     ui.loadfrag.hide();
                     Net.disconnect();
                 }

@@ -129,7 +129,7 @@ public class PlayerListFragment implements Fragment{
                     t.addImageButton("icon-ban", 14*2, () -> {
                         ui.showConfirm("$text.confirm", "$text.confirmban", () -> {
                             if(Net.server()) {
-                                netServer.admins.banPlayer(connection.address);
+                                netServer.admins.banPlayerIP(connection.address);
                                 Net.kickConnection(player.clientid, KickReason.banned);
                             }else{
                                 NetEvents.handleAdministerRequest(player, AdminAction.ban);

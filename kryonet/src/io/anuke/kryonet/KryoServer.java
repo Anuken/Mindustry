@@ -10,13 +10,10 @@ import com.esotericsoftware.kryonet.Listener.LagListener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.util.InputStreamSender;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Net.ServerProvider;
-import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.net.Registrator;
-import io.anuke.mindustry.net.Streamable;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamChunk;
 import io.anuke.ucore.UCore;
@@ -37,11 +34,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import static io.anuke.mindustry.Vars.headless;
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.world;
 
 public class KryoServer implements ServerProvider {
-    final boolean debug = false;
     final Server server;
     final ByteSerializer serializer = new ByteSerializer();
     final ByteBuffer buffer = ByteBuffer.allocate(4096);
@@ -56,7 +50,7 @@ public class KryoServer implements ServerProvider {
     public KryoServer(){
         server = new Server(4096*2, 2048, connection -> new ByteSerializer());
         server.setDiscoveryHandler((datagramChannel, fromAddress) -> {
-            ByteBuffer buffer = KryoRegistrator.writeServerData();
+            ByteBuffer buffer = NetworkIO.writeServerData();
             buffer.position(0);
             datagramChannel.send(buffer, fromAddress);
             return true;
@@ -183,26 +177,28 @@ public class KryoServer implements ServerProvider {
         connections.clear();
         lastconnection = 0;
 
-        Thread thread = new Thread(() -> {
-            try {
-                server.close();
-                try {
-                    if (webServer != null) webServer.stop(1);
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-                //kill them all
-                for(Thread worker : Thread.getAllStackTraces().keySet()){
-                    if(worker.getName().contains("WebSocketWorker")){
-                        worker.interrupt();
-                    }
-                }
-            }catch (Exception e){
-                Gdx.app.postRunnable(() -> {throw new RuntimeException(e);});
+        async(server::close);
+
+        //kill them all
+        for (Thread worker : Thread.getAllStackTraces().keySet()) {
+            if (worker.getName().contains("WebSocketWorker")) {
+                worker.interrupt();
             }
-        });
-        thread.setDaemon(true);
-        thread.start();
+        }
+
+        try {
+            if (webServer != null) webServer.stop(1);
+        }catch (NullPointerException e){
+            try {
+                synchronized (webServer) {
+                    ((Thread) UCore.getPrivate(WebSocketServer.class, webServer, "selectorthread")).join(1);
+                }
+            }catch (InterruptedException j){
+                handleException(j);
+            }
+        }catch (InterruptedException e){
+            handleException(e);
+        }
     }
 
     @Override
@@ -290,25 +286,7 @@ public class KryoServer implements ServerProvider {
 
     @Override
     public void dispose(){
-        try {
-            if(serverThread != null) serverThread.interrupt();
-            server.dispose();
-        }catch (Exception e){
-            Log.err(e);
-        }
-
-        try {
-
-            if(webServer != null) webServer.stop(1);
-            //kill them all
-            for(Thread thread : Thread.getAllStackTraces().keySet()){
-                if(thread.getName().contains("WebSocketWorker")){
-                    thread.interrupt();
-                }
-            }
-        }catch (Exception e){
-            Log.err(e);
-        }
+        close();
         Log.info("Disposed server.");
     }
 
@@ -338,25 +316,10 @@ public class KryoServer implements ServerProvider {
         return null;
     }
 
-    void throwErrorAndExit(){
-        Log.err("KRYONET CONNECTIONS:");
-        for(Connection c : server.getConnections()){
-            NetConnection k = getByKryoID(c.getID());
-            Log.err(" - Kryonet connection / ID {0} / IP {1} / NetConnection ID {2}",
-                    c.getID(), c.getRemoteAddressTCP().getAddress().getHostAddress(), k == null ? "NOT FOUND" : k.id);
-        }
-        Log.err("NET CONNECTIONS:");
-        for(NetConnection c : connections){
-            Log.err(" - NetConnection / ID {0} / IP {1}", c.id, c.address);
-        }
-
-        Log.err("\nSTACK TRACE:");
-
-        StackTraceElement[] e = Thread.getAllStackTraces().get(Thread.currentThread());
-        for(StackTraceElement s : e){
-            Log.err("- {0}", s);
-        }
-        System.exit(-1);
+    void async(Runnable run){
+        Thread thread = new Thread(run);
+        thread.setDaemon(true);
+        thread.start();
     }
 
     class KryoConnection extends NetConnection{
@@ -381,14 +344,12 @@ public class KryoServer implements ServerProvider {
                 try {
                     synchronized (buffer) {
                         buffer.position(0);
-                        if(debug) Log.info("Sending object with ID {0}", Registrator.getID(object.getClass()));
                         serializer.write(buffer, object);
                         int pos = buffer.position();
                         buffer.position(0);
                         byte[] out = new byte[pos];
                         buffer.get(out);
                         String string = new String(Base64Coder.encode(out));
-                        if(debug) Log.info("Sending string: {0}", string);
                         socket.send(string);
                     }
                 }catch (WebsocketNotConnectedException e){
@@ -443,16 +404,7 @@ public class KryoServer implements ServerProvider {
         }
 
         @Override
-        public void onOpen(WebSocket conn, ClientHandshake handshake) {
-            Connect connect = new Connect();
-            connect.addressTCP = conn.getRemoteSocketAddress().getAddress().getHostAddress();
-            KryoConnection kn = new KryoConnection(lastconnection ++, connect.addressTCP, conn);
-
-            Log.info("&bRecieved web connection: {0} {1}", kn.id, connect.addressTCP);
-            connections.add(kn);
-
-            Gdx.app.postRunnable(() -> Net.handleServerReceived(kn.id, connect));
-        }
+        public void onOpen(WebSocket conn, ClientHandshake handshake) {}
 
         @Override
         public void onClose(WebSocket conn, int code, String reason, boolean remote) {
@@ -470,18 +422,31 @@ public class KryoServer implements ServerProvider {
         @Override
         public void onMessage(WebSocket conn, String message) {
             try {
-                KryoConnection k = getBySocket(conn);
-                if (k == null) return;
-
-                if(message.equals("_ping_")){
-                    conn.send("---" + Vars.playerGroup.size() + "|" + (headless ? "Server" : Vars.player.name)
-                    + "|" + world.getMap().name + "|" + state.wave);
-                    connections.remove(k);
+                if(message.equals("ping")){
+                    ByteBuffer ping = NetworkIO.writeServerData();
+                    conn.send(new String(Base64Coder.encode(ping.array())));
                 }else {
+                    KryoConnection k = getBySocket(conn);
+
+                    if (k == null){
+                        Connect connect = new Connect();
+                        connect.addressTCP = conn.getRemoteSocketAddress().getAddress().getHostAddress();
+                        k = new KryoConnection(lastconnection ++, connect.addressTCP, conn);
+
+                        Log.info("&bRecieved web connection: {0} {1}", k.id, connect.addressTCP);
+                        connections.add(k);
+
+                        int id = k.id;
+
+                        Gdx.app.postRunnable(() -> Net.handleServerReceived(id, connect));
+                    }
+
+                    int id = k.id;
+
                     byte[] out = Base64Coder.decode(message);
                     ByteBuffer buffer = ByteBuffer.wrap(out);
                     Object o = serializer.read(buffer);
-                    Gdx.app.postRunnable(() -> Net.handleServerReceived(k.id, o));
+                    Gdx.app.postRunnable(() -> Net.handleServerReceived(id, o));
                 }
             }catch (Exception e){
                 Log.err(e);

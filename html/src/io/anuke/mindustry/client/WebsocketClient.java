@@ -7,22 +7,18 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.sksamuel.gwt.websockets.Websocket;
 import com.sksamuel.gwt.websockets.WebsocketListener;
 import io.anuke.mindustry.io.Platform;
-import io.anuke.mindustry.net.Host;
-import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.ClientProvider;
 import io.anuke.mindustry.net.Net.SendMode;
-import io.anuke.mindustry.net.Packet;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
-import io.anuke.mindustry.net.Registrator;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.webPort;
 
 public class WebsocketClient implements ClientProvider {
     Websocket socket;
@@ -104,39 +100,45 @@ public class WebsocketClient implements ClientProvider {
 
     @Override
     public void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> failed) {
-        if(!Platform.instance.canJoinGame()) {
-            failed.accept(new IOException());
-        }else {
-            Websocket socket = new Websocket("ws://" + address + ":" + webPort);
-            final boolean[] accepted = {false};
-            socket.addListener(new WebsocketListener() {
-                @Override
-                public void onClose() {
-                    if (!accepted[0]) failed.accept(new IOException("Failed to connect to host."));
-                }
+        try {
+            if (!Platform.instance.canJoinGame()) {
+                failed.accept(new IOException());
+            } else {
+                Websocket socket = new Websocket("ws://" + address + ":" + webPort);
+                final boolean[] accepted = {false};
+                socket.addListener(new WebsocketListener() {
+                    @Override
+                    public void onClose() {
+                        if (!accepted[0]) failed.accept(new IOException("Failed to connect to host."));
+                    }
 
-                @Override
-                public void onMessage(String msg) {
-                    if(!msg.startsWith("---")) return;
-                    String[] text = msg.substring(3).split("\\|");
-                    Host host = new Host(text[1], address, text[2], Strings.parseInt(text[3]), Strings.parseInt(text[0]));
-                    valid.accept(host);
-                    accepted[0] = true;
-                    socket.close();
-                }
+                    @Override
+                    public void onMessage(String msg) {
+                        byte[] bytes = Base64Coder.decode(msg);
+                        Host host = NetworkIO.readServerData(address, ByteBuffer.wrap(bytes));
+                        if(bytes.length != 128)
+                            valid.accept(new Host("Unknown", address, "Unknown", 0, 0, 0));
+                        else
+                            valid.accept(host);
+                        accepted[0] = true;
+                        socket.close();
+                    }
 
-                @Override
-                public void onOpen() {
-                    socket.send("_ping_");
-                }
-            });
-            socket.open();
-            Timers.runTask(60f * 5, () -> {
-                if (!accepted[0]) {
-                    failed.accept(new IOException("Failed to connect to host."));
-                    socket.close();
-                }
-            });
+                    @Override
+                    public void onOpen() {
+                        socket.send("ping");
+                    }
+                });
+                socket.open();
+                Timers.runTask(60f * 5, () -> {
+                    if (!accepted[0]) {
+                        failed.accept(new IOException("Failed to connect to host."));
+                        socket.close();
+                    }
+                });
+            }
+        }catch (Exception e){
+            failed.accept(new IOException("Failed to connect to host."));
         }
     }
 

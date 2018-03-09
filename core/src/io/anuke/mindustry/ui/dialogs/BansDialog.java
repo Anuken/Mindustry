@@ -41,7 +41,7 @@ public class BansDialog extends FloatingDialog {
             res.add().growX();
             res.addImageButton("icon-cancel", 14*3, () -> {
                 ui.showConfirm("$text.confirm", "$text.confirmunban", () -> {
-                    netServer.admins.unbanPlayer(ip);
+                    netServer.admins.unbanPlayerIP(ip);
                     setup();
                 });
             }).size(h).pad(-14f);

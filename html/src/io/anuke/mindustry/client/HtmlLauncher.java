@@ -5,6 +5,7 @@ import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
 import com.badlogic.gdx.backends.gwt.preloader.Preloader.PreloaderCallback;
 import com.badlogic.gdx.backends.gwt.preloader.Preloader.PreloaderState;
+import com.badlogic.gdx.utils.Base64Coder;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
@@ -17,8 +18,10 @@ import com.google.gwt.user.client.ui.*;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
+import io.anuke.ucore.core.Settings;
 
 import java.util.Date;
+import java.util.Random;
 
 public class HtmlLauncher extends GwtApplication {
     static final int WIDTH = 800;
@@ -111,6 +114,22 @@ public class HtmlLauncher extends GwtApplication {
             public boolean canJoinGame(){
 			    String ref = Document.get().getReferrer();
 			    return !ref.startsWith("https") && !ref.contains("itch.io");
+            }
+
+            @Override
+            public byte[] getUUID(){
+                Settings.defaults("uuid", "");
+
+                String uuid = Settings.getString("uuid");
+                if(uuid.isEmpty()){
+                    byte[] result = new byte[8];
+                    new Random().nextBytes(result);
+                    uuid = new String(Base64Coder.encode(result));
+                    Settings.putString("uuid", uuid);
+                    Settings.save();
+                    return result;
+                }
+                return Base64Coder.decode(uuid);
             }
         };
         

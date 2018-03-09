@@ -147,8 +147,8 @@ public class Turret extends Block{
 				if(Float.isNaN(entity.rotation)){
 					entity.rotation = 0;
 				}
-				entity.rotation = Mathf.slerp(entity.rotation, targetRot, 
-						rotatespeed*Timers.delta());
+				entity.rotation = Mathf.slerpDelta(entity.rotation, targetRot,
+						rotatespeed);
 
 				if(Angles.angleDist(entity.rotation, targetRot) < shootCone && entity.timer.get(timerReload, reload)){
 					if(shootsound != null && entity.timer.get(timerSound, soundReload)) Effects.sound(shootsound, entity);
