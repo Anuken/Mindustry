@@ -157,7 +157,8 @@ public class DesktopInput extends InputHandler{
 	}
 
 	boolean select(){
-		return !Inputs.keyDown("select") && !Inputs.keyRelease("select");
+		return !Inputs.keyDown("select") && !Inputs.keyRelease("select") &&
+				!Inputs.keyDown("break") && !Inputs.keyRelease("break");
 	}
 
 	public int tilex(){

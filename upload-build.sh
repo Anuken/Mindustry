@@ -24,9 +24,11 @@ fi
 
 touch $FILE1
 
-echo "### Build "$TRAVIS_BUILD_NUMBER", Commit "$TRAVIS_COMMIT"." >> $FILE1
+echo "#### Latest Bleeding Edge Build: "$TRAVIS_BUILD_NUMBER"" >> $FILE1
+echo "###### Commit: "$TRAVIS_COMMIT"" >> $FILE1
 echo >> $FILE1
-echo "Desktop JAR download: [Link]("$DESKFILE")" >> $FILE1
+echo "[Desktop JAR download.]("$DESKFILE")" >> $FILE1
+echo "*Requires Java to run, as usual.*" >> $FILE1
 
 git add $FILE1
 git add $DESKFILE
