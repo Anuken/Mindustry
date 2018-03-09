@@ -120,7 +120,8 @@ public class Control extends Module{
 			"name", android || gwt ? "player" : UCore.getProperty("user.name"),
 			"servers", "",
 			"color", Color.rgba8888(playerColors[8]),
-			"lastVersion", "3.2"
+			"lastVersion", "3.2",
+			"lastBuild", 0
 		);
 
 		KeyBinds.load();

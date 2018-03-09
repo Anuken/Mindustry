@@ -89,6 +89,7 @@ public class MenuFragment implements Fragment{
 			if(!Vars.android) {
 				new imagebutton("icon-info", 30f, ui.about::show).margin(14);
 			}
+			new imagebutton("icon-menu", 30f, ui.changelog::show).margin(14);
 		}}.end().visible(()->state.is(State.menu));
 
 		//version info
