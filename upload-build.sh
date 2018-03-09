@@ -16,7 +16,7 @@ fi
 
 cp ../desktop/build/libs/desktop-release.jar $DESKFILE
 
-FILE1="Bleeding-Edge-Build.md"
+FILE1="Home.md"
 
 if [ -e $FILE1 ]; then
     rm $FILE1
@@ -24,7 +24,7 @@ fi
 
 touch $FILE1
 
-echo "###Build #"$TRAVIS_BUILD_NUMBER", Commit #"$TRAVIS_COMMIT"." >> $FILE1
+echo "### Build "$TRAVIS_BUILD_NUMBER", Commit "$TRAVIS_COMMIT"." >> $FILE1
 echo >> $FILE1
 echo "Desktop JAR download: [Link]("$DESKFILE")" >> $FILE1
 
