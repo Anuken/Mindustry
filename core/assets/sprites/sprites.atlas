@@ -552,7 +552,7 @@ blocks/extra/cross-1
   index: -1
 blocks/extra/cross-2
   rotate: false
-  xy: 468, 113
+  xy: 213, 90
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -583,13 +583,6 @@ blocks/production/alloysmelter
   xy: 713, 282
   size: 8, 8
   orig: 8, 8
-  offset: 0, 0
-  index: -1
-blocks/production/biomatterextractor
-  rotate: false
-  xy: 763, 426
-  size: 16, 16
-  orig: 16, 16
   offset: 0, 0
   index: -1
 blocks/production/coaldrill
@@ -625,6 +618,13 @@ blocks/production/combustiongenerator
   xy: 604, 179
   size: 8, 8
   orig: 8, 8
+  offset: 0, 0
+  index: -1
+blocks/production/cultivator
+  rotate: false
+  xy: 468, 113
+  size: 16, 16
+  orig: 16, 16
   offset: 0, 0
   index: -1
 blocks/production/fluxpump
@@ -1063,7 +1063,7 @@ blocks/turrets/block-1
   index: -1
 blocks/turrets/block-2
   rotate: false
-  xy: 727, 365
+  xy: 763, 426
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -1077,7 +1077,7 @@ blocks/turrets/block-3
   index: -1
 blocks/turrets/chainturret
   rotate: false
-  xy: 637, 292
+  xy: 727, 365
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -1869,7 +1869,7 @@ ui/cursor
   index: -1
 ui/icons/controller-cursor
   rotate: false
-  xy: 213, 90
+  xy: 637, 292
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

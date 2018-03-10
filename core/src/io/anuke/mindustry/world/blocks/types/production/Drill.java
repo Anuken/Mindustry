@@ -21,7 +21,7 @@ public class Drill extends Block{
 	
 	protected Block resource;
 	protected Item result;
-	protected float time = 5;
+	protected float drillTime = 5;
 	protected Effect drillEffect = Fx.spark;
 
 	public Drill(String name) {
@@ -35,7 +35,7 @@ public class Drill extends Block{
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add("secondsitem", time);
+		stats.add("secondsitem", drillTime);
 	}
 	
 	@Override
@@ -54,7 +54,7 @@ public class Drill extends Block{
 			if(isValid(tile)) mines = 1;
 		}
 
-		if(mines > 0 && entity.timer.get(timerDrill, 60 * time) && tile.entity.inventory.getItem(result) < itemCapacity){
+		if(mines > 0 && entity.timer.get(timerDrill, drillTime) && tile.entity.inventory.getItem(result) < itemCapacity){
 			for(int i = 0; i < mines; i ++) offloadNear(tile, result);
 			Effects.effect(drillEffect, tile.drawx(), tile.drawy());
 		}
