@@ -200,7 +200,6 @@ public class Save16 extends SaveFileVersion {
             if(tile.entity != null){
                 byte rotation = stream.readByte();
                 short health = stream.readShort();
-                int items = stream.readByte();
 
                 tile.entity.health = health;
                 tile.setRotation(rotation);

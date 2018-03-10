@@ -1,15 +1,13 @@
 package io.anuke.mindustry.world;
 
-import com.badlogic.gdx.graphics.Color;
-
 public class BlockBar {
     public final ValueSupplier value;
-    public final Color color;
+    public final BarType type;
     public final boolean top;
 
-    public BlockBar(Color color, boolean top, ValueSupplier value) {
+    public BlockBar(BarType type, boolean top, ValueSupplier value) {
         this.value = value;
-        this.color = color;
+        this.type = type;
         this.top = top;
     }
 

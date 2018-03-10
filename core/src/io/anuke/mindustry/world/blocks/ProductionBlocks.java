@@ -147,7 +147,7 @@ public class ProductionBlocks{
 		{
 			resource = Blocks.stone;
 			result = Item.stone;
-			drillTime = 40;
+			drillTime = 240;
 		}
 	},
 	
@@ -155,7 +155,7 @@ public class ProductionBlocks{
 		{
 			resource = Blocks.iron;
 			result = Item.iron;
-			drillTime = 60;
+			drillTime = 360;
 		}
 	},
 	
@@ -163,7 +163,7 @@ public class ProductionBlocks{
 		{
 			resource = Blocks.coal;
 			result = Item.coal;
-			drillTime = 60;
+			drillTime = 360;
 		}
 	},
 	
@@ -171,7 +171,7 @@ public class ProductionBlocks{
 		{
 			resource = Blocks.uranium;
 			result = Item.uranium;
-			drillTime = 70;
+			drillTime = 540;
 		}
 	},
 	
@@ -179,13 +179,13 @@ public class ProductionBlocks{
 		{
 			resource = Blocks.titanium;
 			result = Item.titanium;
-			drillTime = 70;
+			drillTime = 540;
 		}
 	},
 	
 	laserdrill = new GenericDrill("laserdrill"){
 		{
-			drillTime = 40;
+			drillTime = 240;
 			size = 2;
 			powerUse = 0.08f;
 		}
@@ -193,7 +193,7 @@ public class ProductionBlocks{
 
 	nucleardrill = new GenericDrill("nucleardrill"){
 		{
-			drillTime = 40;
+			drillTime = 240;
 			size = 3;
 			powerUse = 0.32f;
 		}
@@ -202,7 +202,7 @@ public class ProductionBlocks{
 	plasmadrill = new GenericDrill("plasmadrill"){
 		{
 			inputLiquid = Liquid.plasma;
-			drillTime = 40;
+			drillTime = 240;
 			size = 4;
 			powerUse = 0.16f;
 		}
@@ -212,7 +212,7 @@ public class ProductionBlocks{
 		{
 			resource = Blocks.sand;
 			result = Item.quartz;
-			drillTime = 50;
+			drillTime = 300;
 			size = 2;
 		}
 	},

@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks.types;
+package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.utils.OrderedMap;
 import io.anuke.ucore.util.Bundles;

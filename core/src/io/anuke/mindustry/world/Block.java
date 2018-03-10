@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -14,7 +13,6 @@ import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.blocks.BaseBlock;
-import io.anuke.mindustry.world.blocks.types.BlockStats;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
@@ -87,13 +85,13 @@ public class Block extends BaseBlock {
 	public Layer layer = null;
 	/**Extra layer to draw extra extra stuff on.*/
 	public Layer layer2 = null;
-	/**list of displayed block status bars. Defaults to health bar.*/
-	public Array<BlockBar> bars = Array.with(new BlockBar(Color.RED, false, tile -> tile.entity.health / (float)tile.block().health));
 	/**whether this block can be replaced in all cases*/
 	public boolean alwaysReplace = false;
 	/**whether this block has instant transfer checking. used for calculations to prevent infinite loops.*/
 	public boolean instantTransfer = false;
-
+	/**list of displayed block status bars. Defaults to health bar.*/
+	public BlockBars bars = new BlockBars();
+	/**List of block stats.*/
 	public BlockStats stats = new BlockStats();
 
 	public Block(String name) {
@@ -148,9 +146,9 @@ public class Block extends BaseBlock {
 
 	//TODO make this easier to config.
 	public void setBars(){
-		if(hasPower) bars.add(new BlockBar(Color.YELLOW, true, tile -> tile.entity.power.amount / powerCapacity));
-		if(hasLiquids) bars.add(new BlockBar(Color.ROYAL, true, tile -> tile.entity.liquid.amount / liquidCapacity));
-		if(hasInventory) bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.inventory.totalItems() / itemCapacity));
+		if(hasPower) bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.amount / powerCapacity));
+		if(hasLiquids) bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquid.amount / liquidCapacity));
+		if(hasInventory) bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.inventory.totalItems() / itemCapacity));
 	}
 	
 	public String name(){

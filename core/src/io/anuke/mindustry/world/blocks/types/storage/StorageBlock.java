@@ -22,4 +22,14 @@ public abstract class StorageBlock extends Block {
         }
         return null;
     }
+
+    public boolean hasItem(Tile tile){
+        TileEntity entity = tile.entity;
+        for(int i = 0; i < entity.inventory.items.length; i ++){
+            if(entity.inventory.items[i] > 0){
+                return true;
+            }
+        }
+        return false;
+    }
 }

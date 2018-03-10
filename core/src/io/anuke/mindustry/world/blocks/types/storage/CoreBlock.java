@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.storage;
 
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
@@ -17,6 +18,7 @@ public class CoreBlock extends StorageBlock {
         solid = true;
         destructible = true;
         size = 3;
+        hasInventory = false;
     }
 
     @Override
@@ -31,6 +33,28 @@ public class CoreBlock extends StorageBlock {
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return item.material && tile.entity.inventory.getItem(item) < capacity;
+        return item.material && state.inventory.getAmount(item) < capacity;
+    }
+
+    @Override
+    public Item removeItem(Tile tile){
+        for(int i = 0; i < state.inventory.getItems().length; i ++){
+            if(state.inventory.getItems()[i] > 0){
+                if(Net.server() || !Net.active()) state.inventory.getItems()[i] --;
+                return Item.getByID(i);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean hasItem(Tile tile){
+        TileEntity entity = tile.entity;
+        for(int i = 0; i < state.inventory.getItems().length; i ++){
+            if(state.inventory.getItems()[i] > 0){
+                return true;
+            }
+        }
+        return false;
     }
 }

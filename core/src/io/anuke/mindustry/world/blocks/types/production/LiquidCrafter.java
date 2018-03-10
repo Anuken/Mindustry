@@ -1,10 +1,10 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
-import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
+import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidBlock;
@@ -34,8 +34,15 @@ public class LiquidCrafter extends LiquidBlock{
 		solid = true;
 		health = 60;
 		liquidCapacity = 21f;
+	}
 
-		bars.add(new BlockBar(Color.GREEN, true, tile -> input == null ? -1f : (float)tile.entity.inventory.getItem(input) / itemCapacity));
+	@Override
+	public void setBars(){
+		super.setBars();
+		bars.remove(BarType.inventory);
+
+		bars.add(new BlockBar(BarType.inventory, true,
+				tile -> input == null ? -1f : (float)tile.entity.inventory.getItem(input) / itemCapacity));
 	}
 	
 	@Override

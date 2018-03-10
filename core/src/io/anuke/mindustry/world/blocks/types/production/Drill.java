@@ -21,7 +21,7 @@ public class Drill extends Block{
 	
 	protected Block resource;
 	protected Item result;
-	protected float drillTime = 5;
+	protected float drillTime = 300;
 	protected Effect drillEffect = Fx.spark;
 
 	public Drill(String name) {

@@ -11,6 +11,7 @@ public abstract class PowerBlock extends Block{
 		super(name);
 		update = true;
 		solid = true;
+		hasPower = true;
 	}
 	
 	@Override

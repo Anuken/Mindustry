@@ -23,12 +23,12 @@ public class LiquidPowerGenerator extends Generator{
 		super(name);
 		outputOnly = true;
 		liquidCapacity = 30f;
+		hasLiquids = true;
 	}
 	
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add("liquidcapacity", (int)liquidCapacity);
 		stats.add("powerliquid", Strings.toFixed(powerPerLiquid, 2) + " power/liquid");
 		stats.add("maxliquidsecond", Strings.toFixed(maxLiquidGenerate*60f, 2) + " liquid/s");
 		stats.add("input", generateLiquid);
@@ -39,8 +39,6 @@ public class LiquidPowerGenerator extends Generator{
 		super.draw(tile);
 
 		TileEntity entity = tile.entity();
-		
-		if(entity.liquid.liquid == null) return;
 		
 		Draw.color(entity.liquid.liquid.color);
 		Draw.alpha(entity.liquid.amount / liquidCapacity);

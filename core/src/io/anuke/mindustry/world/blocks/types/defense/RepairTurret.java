@@ -28,7 +28,6 @@ public class RepairTurret extends PowerTurret{
 	public void setStats(){
 		super.setStats();
 
-		//TODO remove extra crap
 		stats.add("repairssecond", Strings.toFixed(60f/reload * repairFrac * 100, 1) + "%");
 	}
 	

@@ -9,7 +9,7 @@ import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.BlockStats;
+import io.anuke.mindustry.world.BlockStats;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.scene.Element;

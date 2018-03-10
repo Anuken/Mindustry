@@ -46,7 +46,7 @@ public class GenericDrill extends Drill{
             }
         }
 
-        if(toAdd.size > 0 && entity.power.amount > powerUse && entity.time >= drillTime
+        if(toAdd.size > 0 && entity.time >= drillTime
                 && tile.entity.inventory.totalItems() < itemCapacity){
             for(Item item : toAdd) offloadNear(tile, item);
             Effects.effect(drillEffect, tile.drawx(), tile.drawy());

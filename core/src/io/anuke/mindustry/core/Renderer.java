@@ -478,7 +478,7 @@ public class Renderer extends RendererModule{
 
 				if(target.entity != null) {
 					int bot = 0, top = 0;
-					for (BlockBar bar : target.block().bars) {
+					for (BlockBar bar : target.block().bars.list()) {
 						float offset = Mathf.sign(bar.top) * (target.block().size / 2f * tilesize + 3f + 4f * ((bar.top ? top : bot))) +
 								(bar.top ? -1f : 0f);
 
@@ -486,7 +486,7 @@ public class Renderer extends RendererModule{
 
 						if(MathUtils.isEqual(value, -1f)) continue;
 
-						drawBar(bar.color, target.drawx(), target.drawy() + offset, value);
+						drawBar(bar.type.color, target.drawx(), target.drawy() + offset, value);
 
 						if (bar.top)
 							top++;

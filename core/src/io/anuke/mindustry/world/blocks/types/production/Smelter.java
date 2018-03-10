@@ -1,9 +1,9 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
-import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
@@ -37,9 +37,9 @@ public class Smelter extends Block{
 	}
 
 	@Override
-	public void init(){
+	public void setBars(){
 		for(Item item : inputs){
-			bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.inventory.getItem(item)/capacity));
+			bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.inventory.getItem(item)/capacity));
 		}
 	}
 	
@@ -51,7 +51,7 @@ public class Smelter extends Block{
 		stats.add("output", result);
 		stats.add("fuelduration", Strings.toFixed(burnDuration/60f, 1));
 		stats.add("maxoutputsecond", Strings.toFixed(60f/craftTime, 1));
-		stats.add("input capacity", capacity);
+		stats.add("inputcapacity", capacity);
 		stats.add("outputcapacity", capacity);
 	}
 	

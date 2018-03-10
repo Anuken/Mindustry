@@ -19,7 +19,7 @@ public class Unloader extends Block {
         if(tile.entity.inventory.totalItems() == 0 && tile.entity.timer.get(timerUnload, 5)){
             tile.allNearby(other -> {
                 if(other.block() instanceof StorageBlock && tile.entity.inventory.totalItems() == 0 &&
-                        other.entity.inventory.totalItems() > 0){
+                        ((StorageBlock)other.block()).hasItem(other)){
                     offloadNear(tile, ((StorageBlock)other.block()).removeItem(other));
                 }
             });
@@ -35,4 +35,7 @@ public class Unloader extends Block {
         Block block = to.target().block();
         return !(block instanceof StorageBlock);
     }
+
+    @Override
+    public void setBars(){}
 }

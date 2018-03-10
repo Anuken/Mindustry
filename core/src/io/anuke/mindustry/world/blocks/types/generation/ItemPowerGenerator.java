@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.blocks.types.generation;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -23,8 +24,12 @@ public class ItemPowerGenerator extends Generator{
 	public ItemPowerGenerator(String name) {
 		super(name);
 		outputOnly = true;
+	}
 
-		bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.inventory.getItem(generateItem) / itemCapacity));
+	@Override
+	public void setBars(){
+		super.setBars();
+		bars.replace(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.inventory.getItem(generateItem) / itemCapacity));
 	}
 	
 	@Override

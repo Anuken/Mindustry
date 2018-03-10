@@ -1,10 +1,10 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
-import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
+import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
@@ -42,9 +42,12 @@ public class PowerSmelter extends PowerBlock {
     }
 
     @Override
-    public void init(){
+    public void setBars(){
+        super.setBars();
+        bars.remove(BarType.inventory);
+
         for(ItemStack item : inputs){
-            bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.inventory.getItem(item.item)/capacity));
+            bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.inventory.getItem(item.item)/capacity));
         }
     }
 
@@ -52,7 +55,7 @@ public class PowerSmelter extends PowerBlock {
     public void setStats(){
         super.setStats();
         stats.add("input", Arrays.toString(inputs));
-        stats.add("powerdrainsecond", Strings.toFixed(powerDrain*60f, 2));
+        stats.add("powersecond", Strings.toFixed(powerDrain*60f, 2));
         stats.add("output", result);
         stats.add("fuelduration", Strings.toFixed(burnDuration/60f, 1));
         stats.add("maxoutputsecond", Strings.toFixed(60f/craftTime, 1));

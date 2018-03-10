@@ -6,6 +6,7 @@ import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
+import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -48,9 +49,13 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		explosive = true;
 		powerCapacity = 80f;
 		powerSpeed = 0.5f;
+	}
 
-		bars.add(new BlockBar(Color.GREEN, true, tile -> (float)tile.entity.inventory.getItem(generateItem) / itemCapacity));
-		bars.add(new BlockBar(Color.ORANGE, true, tile -> tile.<NuclearReactorEntity>entity().heat));
+	@Override
+	public void setBars(){
+		super.setBars();
+		bars.replace(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.inventory.getItem(generateItem) / itemCapacity));
+		bars.add(new BlockBar(BarType.heat, true, tile -> tile.<NuclearReactorEntity>entity().heat));
 	}
 
 	@Override
@@ -183,7 +188,7 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		return new NuclearReactorEntity();
 	}
 	
-	public static class NuclearReactorEntity extends PowerEntity{
+	public static class NuclearReactorEntity extends GeneratorEntity{
 		public float heat;
 		public float flash;
 		

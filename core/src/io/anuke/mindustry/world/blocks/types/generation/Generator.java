@@ -24,7 +24,6 @@ import io.anuke.ucore.util.Translator;
 import static io.anuke.mindustry.Vars.*;
 
 public class Generator extends PowerBlock{
-	public static final int powerTime = 2;
 	public static boolean drawRangeOverlay = false;
 
 	protected Translator t1 = new Translator();
