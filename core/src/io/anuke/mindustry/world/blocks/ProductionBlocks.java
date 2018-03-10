@@ -191,19 +191,20 @@ public class ProductionBlocks{
 		}
 	},
 
-	plasmadrill = new GenericDrill("plasmadrill"){
-		{
-			drillTime = 40;
-			size = 3;
-			powerUse = 0.16f;
-		}
-	},
-
 	nucleardrill = new GenericDrill("nucleardrill"){
 		{
 			drillTime = 40;
-			size = 4;
+			size = 3;
 			powerUse = 0.32f;
+		}
+	},
+
+	plasmadrill = new GenericDrill("plasmadrill"){
+		{
+			inputLiquid = Liquid.plasma;
+			drillTime = 40;
+			size = 4;
+			powerUse = 0.16f;
 		}
 	},
 
