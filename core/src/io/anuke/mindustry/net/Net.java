@@ -248,9 +248,9 @@ public class Net{
 		active = false;
 	}
 
-	public static void http(String method, String content, Consumer<String> listener){
+	public static void http(String url, String method, Consumer<String> listener, Consumer<Throwable> failure){
 		HttpRequest req = new HttpRequestBuilder().newRequest()
-				.method(method).content(content).url(serverURL + "/servers").build();
+				.method(method).url(url).build();
 
 		Gdx.net.sendHttpRequest(req, new HttpResponseListener() {
 			@Override
@@ -260,8 +260,7 @@ public class Net{
 
 			@Override
 			public void failed(Throwable t) {
-				Log.err("HTTP error:");
-				Log.err(t);
+				failure.accept(t);
 			}
 
 			@Override

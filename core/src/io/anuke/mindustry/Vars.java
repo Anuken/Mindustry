@@ -45,7 +45,7 @@ public class Vars{
 	//discord group URL
 	public static final String discordURL = "https://discord.gg/BKADYds";
 
-	public static final String serverURL = "http://localhost:3000";
+	public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
 	//directory for user-created map data
 	public static final FileHandle customMapDirectory = gwt ? null : UCore.isAssets() ?
 			Gdx.files.local("../../desktop/mindustry-maps") : Gdx.files.local("mindustry-maps/");

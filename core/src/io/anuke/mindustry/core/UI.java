@@ -49,6 +49,7 @@ public class UI extends SceneModule{
 	public BansDialog bans;
 	public AdminsDialog admins;
 	public TraceDialog traces;
+	public ChangelogDialog changelog;
 
 	public final MenuFragment menufrag = new MenuFragment();
     public final ToolFragment toolfrag = new ToolFragment();
@@ -159,6 +160,7 @@ public class UI extends SceneModule{
 		bans = new BansDialog();
 		admins = new AdminsDialog();
 		traces = new TraceDialog();
+		changelog = new ChangelogDialog();
 		
 		build.begin(scene);
 
