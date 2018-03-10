@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
 import io.anuke.mindustry.resource.Liquid;
-import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.BlockGroup;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidBlock;
@@ -22,11 +22,7 @@ public class Pump extends LiquidBlock{
 		solid = true;
 		layer = Layer.overlay;
 		liquidFlowFactor = 3f;
-	}
-
-	@Override
-	public boolean canReplace(Block other) {
-		return other instanceof Pump && other != this;
+		group = BlockGroup.liquids;
 	}
 
 	@Override
@@ -58,7 +54,7 @@ public class Pump extends LiquidBlock{
 	@Override
 	public void drawLayer(Tile tile){
 		Draw.colorl(0.85f + Mathf.absin(Timers.time(), 6f, 0.15f));
-		Draw.rect("cross", tile.worldx(), tile.worldy());
+		Draw.rect("cross-"+size, tile.worldx(), tile.worldy());
 		Draw.color();
 	}
 	

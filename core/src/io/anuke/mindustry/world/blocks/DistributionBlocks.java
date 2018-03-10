@@ -1,7 +1,9 @@
 package io.anuke.mindustry.world.blocks;
 
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.blocks.types.LiquidBlock;
 import io.anuke.mindustry.world.blocks.types.distribution.*;
+import io.anuke.mindustry.world.blocks.types.storage.SortedUnloader;
 import io.anuke.mindustry.world.blocks.types.storage.Unloader;
 import io.anuke.mindustry.world.blocks.types.storage.Vault;
 
@@ -9,11 +11,11 @@ public class DistributionBlocks{
 	
 	public static final Block
 	
-	conduit = new Conduit("conduit"){{
+	conduit = new LiquidBlock("conduit"){{
 		health = 45;
 	}},
 	
-	pulseconduit = new Conduit("pulseconduit"){{
+	pulseconduit = new LiquidBlock("pulseconduit"){{
 		liquidCapacity = 16f;
 		liquidFlowFactor = 4.9f;
 		health = 65;
@@ -50,6 +52,10 @@ public class DistributionBlocks{
 	}},
 
 	unloader = new Unloader("unloader"){{
+
+	}},
+
+	sortedunloader = new SortedUnloader("sortedunloader"){{
 
 	}},
 	

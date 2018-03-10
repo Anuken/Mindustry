@@ -2,9 +2,10 @@ package io.anuke.mindustry.world.blocks.types.distribution;
 
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.LiquidBlock;
 import io.anuke.ucore.graphics.Draw;
 
-public class LiquidRouter extends Conduit{
+public class LiquidRouter extends LiquidBlock{
 
 	public LiquidRouter(String name) {
 		super(name);

@@ -56,6 +56,7 @@ public class Turret extends Block{
 		update = true;
 		solid = true;
 		layer = Layer.turret;
+		group = BlockGroup.turrets;
 	}
 
 	@Override
@@ -74,11 +75,6 @@ public class Turret extends Block{
 		stats.add("damageshot", bullet.damage);
 		stats.add("shotssecond", Strings.toFixed(60f/reload, 1));
 		stats.add("shots", shots);
-	}
-	
-	@Override
-	public boolean canReplace(Block other){
-		return other instanceof Turret;
 	}
 	
 	@Override

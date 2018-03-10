@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.NumberUtils;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.BlockGroup;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Consumer;
@@ -19,11 +20,7 @@ public class Junction extends Block{
 		update = true;
 		solid = true;
 		instantTransfer = true;
-	}
-	
-	@Override
-	public boolean canReplace(Block other){
-		return other instanceof Conveyor || other instanceof Router;
+		group = BlockGroup.transportation;
 	}
 
 	@Override

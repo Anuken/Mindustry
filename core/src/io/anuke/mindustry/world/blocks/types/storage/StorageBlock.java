@@ -11,11 +11,12 @@ public abstract class StorageBlock extends Block {
         super(name);
     }
 
-    /**Removes any one item and returns it. Returns null if no items are there.*/
-    public Item removeItem(Tile tile){
+    /**Removes an item and returns it. If item is not null, it should return the item.
+     * Returns null if no items are there.*/
+    public Item removeItem(Tile tile, Item item){
         TileEntity entity = tile.entity;
         for(int i = 0; i < entity.inventory.items.length; i ++){
-            if(entity.inventory.items[i] > 0){
+            if(entity.inventory.items[i] > 0 && (item == null || i == item.id)){
                 entity.inventory.items[i] --;
                 return Item.getByID(i);
             }
@@ -23,10 +24,12 @@ public abstract class StorageBlock extends Block {
         return null;
     }
 
-    public boolean hasItem(Tile tile){
+    /**Returns whether this storage block has the specified item.
+     * If the item is null, it should return whether it has ANY items.*/
+    public boolean hasItem(Tile tile, Item item){
         TileEntity entity = tile.entity;
         for(int i = 0; i < entity.inventory.items.length; i ++){
-            if(entity.inventory.items[i] > 0){
+            if(entity.inventory.items[i] > 0 && (item == null || i == item.id)){
                 return true;
             }
         }

@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.types;
 
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.BlockGroup;
 
 public abstract class PowerBlock extends Block{
 	public float powerCapacity = 10f;
@@ -12,6 +13,7 @@ public abstract class PowerBlock extends Block{
 		update = true;
 		solid = true;
 		hasPower = true;
+		group = BlockGroup.power;
 	}
 	
 	@Override

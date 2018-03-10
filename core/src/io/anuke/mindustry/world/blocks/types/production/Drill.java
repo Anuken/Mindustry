@@ -5,6 +5,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.BlockGroup;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -31,6 +32,7 @@ public class Drill extends Block{
 		solid = true;
 		layer = Layer.overlay;
 		itemCapacity = 5;
+		group = BlockGroup.drills;
 	}
 	
 	@Override

@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.NumberUtils;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.BlockGroup;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Bits;
@@ -21,13 +22,9 @@ public class TunnelConveyor extends Block{
 		solid = true;
 		health = 70;
 		instantTransfer = true;
+		group = BlockGroup.transportation;
 	}
-	
-	@Override
-	public boolean canReplace(Block other){
-		return other instanceof Conveyor || other instanceof Router || other instanceof Junction;
-	}
-	
+
 	@Override
 	public void handleItem(Item item, Tile tile, Tile source){
 		TunnelEntity entity = tile.entity();

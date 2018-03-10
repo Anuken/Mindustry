@@ -14,9 +14,9 @@ public abstract class BaseBlock {
     public boolean hasPower;
 
     public int itemCapacity;
-    public float liquidCapacity;
+    public float liquidCapacity = 10f;
     public float liquidFlowFactor = 4.9f;
-    public float powerCapacity;
+    public float powerCapacity = 10f;
 
     public void handleItem(Item item, Tile tile, Tile source){
         tile.entity.inventory.addItem(item, 1);

@@ -73,8 +73,6 @@ public class Block extends BaseBlock {
 	public Liquid liquidDrop = null;
 	/**multiblock size*/
 	public int size = 1;
-	/**Brief block description. Should be short enough fit in the place menu.*/
-	public final String description;
 	/**Detailed description of the block. Can be as long as necesary.*/
 	public final String fullDescription;
 	/**Whether to draw this block in the expanded draw range.*/
@@ -89,6 +87,8 @@ public class Block extends BaseBlock {
 	public boolean alwaysReplace = false;
 	/**whether this block has instant transfer checking. used for calculations to prevent infinite loops.*/
 	public boolean instantTransfer = false;
+	/**The block group. Unless {@link #canReplace} is overriden, blocks in the same group can replace each other.*/
+	public BlockGroup group = BlockGroup.none;
 	/**list of displayed block status bars. Defaults to health bar.*/
 	public BlockBars bars = new BlockBars();
 	/**List of block stats.*/
@@ -97,7 +97,6 @@ public class Block extends BaseBlock {
 	public Block(String name) {
 		this.name = name;
 		this.formalName = Bundles.get("block." + name + ".name", name);
-		this.description = Bundles.getOrNull("block." + name + ".description");
 		this.fullDescription = Bundles.getOrNull("block." + name + ".fulldescription");
 		this.solid = false;
 		this.id = lastid++;
@@ -129,6 +128,7 @@ public class Block extends BaseBlock {
 
 	public void setConfigure(Tile tile, byte data){
 		if(Net.active()) NetEvents.handleBlockConfig(tile, data);
+		configure(tile, data);
 	}
 
 	public boolean isConfigurable(Tile tile){
@@ -160,7 +160,7 @@ public class Block extends BaseBlock {
 	}
 	
 	public boolean canReplace(Block other){
-		return false;
+		return other != this && this.group != BlockGroup.none && other.group == this.group;
 	}
 	
 	public int handleDamage(Tile tile, int amount){

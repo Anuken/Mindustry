@@ -426,42 +426,42 @@ snowedge
   index: -1
 stone1
   rotate: false
-  xy: 721, 252
+  xy: 701, 248
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 stone2
   rotate: false
-  xy: 701, 248
+  xy: 711, 242
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 stone3
   rotate: false
-  xy: 711, 242
+  xy: 721, 242
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 stoneblock1
   rotate: false
-  xy: 721, 242
+  xy: 867, 437
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 stoneblock2
   rotate: false
-  xy: 867, 437
+  xy: 877, 437
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 stoneblock3
   rotate: false
-  xy: 877, 437
+  xy: 887, 437
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -475,49 +475,49 @@ stoneedge
   index: -1
 titanium1
   rotate: false
-  xy: 887, 427
+  xy: 897, 427
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 titanium2
   rotate: false
-  xy: 897, 427
+  xy: 907, 427
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 titanium3
   rotate: false
-  xy: 907, 427
+  xy: 917, 427
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 uranium1
   rotate: false
-  xy: 733, 284
+  xy: 733, 274
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 uranium2
   rotate: false
-  xy: 733, 274
+  xy: 733, 264
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 uranium3
   rotate: false
-  xy: 733, 264
+  xy: 261, 33
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 water
   rotate: false
-  xy: 313, 37
+  xy: 323, 37
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -762,49 +762,49 @@ solarpanel
   index: -1
 stonedrill
   rotate: false
-  xy: 887, 437
+  xy: 897, 437
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 stoneformer
   rotate: false
-  xy: 897, 437
+  xy: 907, 437
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 thermalgenerator
   rotate: false
-  xy: 877, 427
+  xy: 887, 427
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 titaniumdrill
   rotate: false
-  xy: 917, 427
+  xy: 927, 434
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 titaniumextractor
   rotate: false
-  xy: 927, 434
+  xy: 937, 434
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 uraniumdrill
   rotate: false
-  xy: 261, 33
+  xy: 273, 37
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 uraniumextractor
   rotate: false
-  xy: 273, 37
+  xy: 283, 37
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -984,51 +984,58 @@ shieldprojector
   orig: 16, 16
   offset: 0, 0
   index: -1
-sorter
+sortedunloader
   rotate: false
   xy: 835, 380
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-splitter
+sorter
   rotate: false
   xy: 815, 370
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-steelconveyor
+splitter
   rotate: false
   xy: 825, 370
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-steelconveyormove
+steelconveyor
   rotate: false
   xy: 835, 370
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-teleporter
+steelconveyormove
   rotate: false
-  xy: 917, 437
+  xy: 711, 252
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-teleporter-top
+teleporter
   rotate: false
   xy: 867, 427
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
+teleporter-top
+  rotate: false
+  xy: 877, 427
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
 unloader
   rotate: false
-  xy: 545, 57
+  xy: 733, 284
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -1042,7 +1049,7 @@ vault
   index: -1
 vault-icon
   rotate: false
-  xy: 283, 37
+  xy: 293, 37
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -1266,7 +1273,7 @@ ironwall
   index: -1
 steelwall
   rotate: false
-  xy: 711, 252
+  xy: 721, 252
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -1280,21 +1287,21 @@ steelwall-large
   index: -1
 stonewall
   rotate: false
-  xy: 907, 437
+  xy: 917, 437
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 titaniumshieldwall
   rotate: false
-  xy: 937, 434
+  xy: 947, 434
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 titaniumwall
   rotate: false
-  xy: 947, 434
+  xy: 927, 424
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -1378,7 +1385,7 @@ shot-long
   index: -1
 titanshell
   rotate: false
-  xy: 927, 424
+  xy: 937, 424
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -2658,28 +2665,28 @@ shockgun-equip
   index: -1
 triblaster
   rotate: false
-  xy: 937, 424
+  xy: 947, 424
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 triblaster-equip
   rotate: false
-  xy: 947, 424
+  xy: 545, 57
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 vulcan
   rotate: false
-  xy: 293, 37
+  xy: 303, 37
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 vulcan-equip
   rotate: false
-  xy: 303, 37
+  xy: 313, 37
   size: 8, 8
   orig: 8, 8
   offset: 0, 0

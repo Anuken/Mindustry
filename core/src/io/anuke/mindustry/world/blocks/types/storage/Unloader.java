@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.types.storage;
 
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.BlockGroup;
 import io.anuke.mindustry.world.Tile;
 
 public class Unloader extends Block {
@@ -12,6 +13,7 @@ public class Unloader extends Block {
         update = true;
         solid = true;
         health = 70;
+        group = BlockGroup.transportation;
     }
 
     @Override
@@ -19,8 +21,8 @@ public class Unloader extends Block {
         if(tile.entity.inventory.totalItems() == 0 && tile.entity.timer.get(timerUnload, 5)){
             tile.allNearby(other -> {
                 if(other.block() instanceof StorageBlock && tile.entity.inventory.totalItems() == 0 &&
-                        ((StorageBlock)other.block()).hasItem(other)){
-                    offloadNear(tile, ((StorageBlock)other.block()).removeItem(other));
+                        ((StorageBlock)other.block()).hasItem(other, null)){
+                    offloadNear(tile, ((StorageBlock)other.block()).removeItem(other, null));
                 }
             });
         }

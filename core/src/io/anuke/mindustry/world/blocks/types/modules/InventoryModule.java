@@ -6,6 +6,7 @@ import io.anuke.mindustry.world.blocks.types.BlockModule;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class InventoryModule extends BlockModule{
     public int[] items = new int[Item.getAllItems().size];
@@ -36,6 +37,10 @@ public class InventoryModule extends BlockModule{
 
     public void removeItem(Item item, int amount){
         items[item.id] -= amount;
+    }
+
+    public void clear(){
+        Arrays.fill(items, 0);
     }
 
     @Override

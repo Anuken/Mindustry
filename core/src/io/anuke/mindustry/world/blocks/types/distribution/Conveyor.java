@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.LongArray;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.BlockGroup;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
@@ -38,17 +39,13 @@ public class Conveyor extends Block{
 		rotate = true;
 		update = true;
 		layer = Layer.overlay;
+		group = BlockGroup.transportation;
 	}
 
 	@Override
 	public void setStats(){
 		super.setStats();
 		stats.add("itemspeedsecond", Strings.toFixed(speed * 60, 1));
-	}
-
-	@Override
-	public boolean canReplace(Block other){
-		return other instanceof Conveyor || other instanceof Router || other instanceof Junction;
 	}
 
 	@Override

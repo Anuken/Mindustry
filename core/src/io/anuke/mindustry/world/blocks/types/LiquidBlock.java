@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.types;
 
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.BlockGroup;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.modules.LiquidModule;
 import io.anuke.ucore.graphics.Draw;
@@ -12,6 +13,8 @@ public class LiquidBlock extends Block{
 		super(name);
 		rotate = true;
 		update = true;
+		hasLiquids = true;
+		group = BlockGroup.liquids;
 	}
 	
 	@Override

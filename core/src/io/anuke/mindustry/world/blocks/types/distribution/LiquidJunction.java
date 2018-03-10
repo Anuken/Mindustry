@@ -6,7 +6,7 @@ import io.anuke.mindustry.world.blocks.types.LiquidBlock;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 
-public class LiquidJunction extends Conduit{
+public class LiquidJunction extends LiquidBlock{
 
 	public LiquidJunction(String name) {
 		super(name);

@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.types;
 
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.BlockGroup;
 
 public class Wall extends Block{
 
@@ -8,10 +9,12 @@ public class Wall extends Block{
 		super(name);
 		solid = true;
 		destructible = true;
+		group = BlockGroup.walls;
 	}
-	
+
+	@Override
 	public boolean canReplace(Block other){
-		return other instanceof Wall && health > other.health;
+		return super.canReplace(other) && health > other.health;
 	}
 
 }

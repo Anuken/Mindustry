@@ -188,6 +188,7 @@ public class ProductionBlocks{
 			drillTime = 240;
 			size = 2;
 			powerUse = 0.08f;
+			hasPower = true;
 		}
 	},
 
@@ -196,6 +197,7 @@ public class ProductionBlocks{
 			drillTime = 240;
 			size = 3;
 			powerUse = 0.32f;
+			hasPower = true;
 		}
 	},
 
@@ -205,6 +207,8 @@ public class ProductionBlocks{
 			drillTime = 240;
 			size = 4;
 			powerUse = 0.16f;
+			hasLiquids = true;
+			hasPower = true;
 		}
 	},
 
@@ -223,8 +227,10 @@ public class ProductionBlocks{
 			result = Item.biomatter;
 			inputLiquid = Liquid.water;
 			liquidUse = 0.1f;
-			drillTime = 50;
+			drillTime = 300;
 			size = 2;
+			hasLiquids = true;
+			hasPower = true;
 		}
 	},
 

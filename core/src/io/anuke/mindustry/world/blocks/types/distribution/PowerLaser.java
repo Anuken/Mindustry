@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
 import com.badlogic.gdx.graphics.Color;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.generation.Generator;
 
@@ -15,11 +14,6 @@ public class PowerLaser extends Generator{
 		explosive = false;
 		laserDirections = 1;
 		health = 50;
-	}
-
-	@Override
-	public boolean canReplace(Block other) {
-		return other instanceof  PowerLaser && other != this;
 	}
 
 	@Override
