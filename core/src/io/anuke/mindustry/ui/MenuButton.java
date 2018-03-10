@@ -40,6 +40,7 @@ public class MenuButton extends Button{
 			scale = Unit.dp.scl(1f);
 		}
 		add(text, style, scale).color(hasInvalid ? Color.DARK_GRAY : Color.WHITE);
+
 		if(hasInvalid){
 			row();
 			add(text, style, scale).padTop(Unit.dp.scl(-Core.font.getData().lineHeight * scale * 2f - 4f)).color(Color.WHITE);
