@@ -12,6 +12,7 @@ import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Strings;
 
 public class Drill extends Block{
 	protected final int timerDrill = timers++;
@@ -35,7 +36,7 @@ public class Drill extends Block{
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add("secondsitem", drillTime);
+		stats.add("secondsitem", Strings.toFixed(drillTime/60, 1));
 	}
 	
 	@Override
