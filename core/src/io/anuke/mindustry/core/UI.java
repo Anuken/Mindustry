@@ -128,8 +128,7 @@ public class UI extends SceneModule{
 
 		if(Graphics.drawing()) Graphics.end();
 		
-		scene.act();
-		scene.draw();
+		act();
 
 		if(control.showCursor()) {
 			Draw.color();
