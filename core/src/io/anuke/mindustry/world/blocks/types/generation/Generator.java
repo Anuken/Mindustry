@@ -3,7 +3,6 @@ package io.anuke.mindustry.world.blocks.types.generation;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
-import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Layer;
@@ -21,10 +20,13 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 import io.anuke.ucore.util.Translator;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class Generator extends PowerBlock{
 	public static boolean drawRangeOverlay = false;
+	public static final float thicknessScl = 0.85f;
+	public static final float laserMinValue = 0.7f;
 
 	protected Translator t1 = new Translator();
 	protected Translator t2 = new Translator();
@@ -142,7 +144,7 @@ public class Generator extends PowerBlock{
 			if(entity.power.amount > powerSpeed){
 				entity.laserThickness = Mathf.lerpDelta(entity.laserThickness, 1f, 0.05f);
 			}else{
-				entity.laserThickness = Mathf.lerpDelta(entity.laserThickness, 0.2f, 0.05f);
+				entity.laserThickness = Mathf.lerpDelta(entity.laserThickness, laserMinValue, 0.05f);
 			}
 			drawLaserTo(tile, (tile.getRotation() + i) - laserDirections / 2);
 		}
@@ -161,7 +163,7 @@ public class Generator extends PowerBlock{
 	}
 
 	public static class GeneratorEntity extends PowerEntity{
-		float laserThickness = 0.5f;
+		float laserThickness = laserMinValue;
 	}
 
 	protected void distributeLaserPower(Tile tile){
@@ -189,7 +191,7 @@ public class Generator extends PowerBlock{
 
 		GeneratorEntity entity = tile.entity();
 
-		float scale = 1f * entity.laserThickness;
+		float scale = thicknessScl * entity.laserThickness;
 
 		if(target != null){
 			boolean interfering = isInterfering(target, rotation);
@@ -205,9 +207,9 @@ public class Generator extends PowerBlock{
 			}else{
 				Draw.tint(Hue.mix(Color.SCARLET, Color.WHITE, 0.902f + Mathf.sin(Timers.time(), 1.7f, 0.08f)));
 
-				if(state.is(State.playing) && Mathf.chance(Timers.delta() * 0.033)){
-					Effects.effect(Fx.laserspark, target.worldx() - t1.x, target.worldy() - t1.y);
-				}
+				//if(state.is(State.playing) && Mathf.chance(Timers.delta() * 0.033)){
+				//	Effects.effect(Fx.laserspark, target.worldx() - t1.x, target.worldy() - t1.y);
+				//}
 			}
 
 			float r = interfering ? 0f : 0f;
