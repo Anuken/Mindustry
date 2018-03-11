@@ -13,6 +13,7 @@ public class BlockPart extends Block{
 	public BlockPart() {
 		super("blockpart");
 		solid = false;
+		hasPower = hasInventory = hasLiquids = true;
 	}
 	
 	@Override

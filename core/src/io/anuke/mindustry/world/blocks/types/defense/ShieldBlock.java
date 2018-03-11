@@ -26,6 +26,7 @@ public class ShieldBlock extends PowerBlock{
 		super(name);
 		voltage = powerDrain;
 		powerCapacity = 80f;
+		hasInventory = false;
 	}
 	
 	@Override

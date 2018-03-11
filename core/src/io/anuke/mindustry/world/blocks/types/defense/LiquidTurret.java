@@ -10,6 +10,7 @@ public abstract class LiquidTurret extends Turret{
 
     public LiquidTurret(String name) {
         super(name);
+        hasLiquids = true;
     }
 
     @Override

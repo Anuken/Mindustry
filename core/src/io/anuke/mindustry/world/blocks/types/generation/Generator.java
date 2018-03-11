@@ -255,7 +255,7 @@ public class Generator extends PowerBlock{
 
 			if(other != null && other.block().hasPower){
 				Tile linked = other.getLinked();
-				if(linked == null || linked.block().hasPower){
+				if((linked == null || linked.block().hasPower) && linked != tile){
 					return other;
 				}
 			}

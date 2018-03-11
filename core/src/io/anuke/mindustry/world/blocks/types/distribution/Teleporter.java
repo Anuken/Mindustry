@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Timers;
@@ -13,7 +14,6 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 import java.io.DataInputStream;
@@ -47,7 +47,7 @@ public class Teleporter extends PowerBlock{
 		solid = true;
 		health = 80;
 		powerCapacity = 30f;
-		instantTransfer = true;
+		size = 3;
 	}
 
 	@Override
@@ -57,6 +57,12 @@ public class Teleporter extends PowerBlock{
 			entity.color = data;
 			entity.inventory.clear();
 		}
+	}
+
+	@Override
+	public void setBars(){
+		super.setBars();
+		bars.remove(BarType.inventory);
 	}
 
 	@Override
@@ -78,10 +84,10 @@ public class Teleporter extends PowerBlock{
 		super.draw(tile);
 		
 		Draw.color(colorArray[entity.color]);
-		Draw.rect("blank", tile.worldx(), tile.worldy(), 2, 2);
-		Draw.color(Color.WHITE);
-		Draw.alpha(0.45f + Mathf.absin(Timers.time(), 7f, 0.26f));
-		Draw.rect("teleporter-top", tile.worldx(), tile.worldy());
+		Draw.rect("teleporter-top", tile.drawx(), tile.drawy());
+		//Draw.color(Color.WHITE);
+		//Draw.alpha(0.45f + Mathf.absin(Timers.time(), 7f, 0.26f));
+		//Draw.rect("teleporter-top", tile.worldx(), tile.worldy());
 		Draw.reset();
 	}
 	

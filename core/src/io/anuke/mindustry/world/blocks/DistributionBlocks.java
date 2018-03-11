@@ -72,10 +72,20 @@ public class DistributionBlocks{
 	}},
 	powerlaser = new PowerLaser("powerlaser"){{
 	}},
-	powerlaserrouter = new PowerLaserRouter("powerlaserrouter"){{
+	powerlaserrouter = new PowerLaser("powerlaserrouter"){{
+		laserDirections = 3;
 	}},
-	powerlasercorner = new PowerLaserRouter("powerlasercorner"){{
+	powerlasercorner = new PowerLaser("powerlasercorner"){{
 		laserDirections = 2;
+	}},
+	battery = new PowerLaser("battery"){{
+		laserDirections = 1;
+		powerCapacity = 320f;
+	}},
+	batteryLarge = new PowerLaser("batterylarge"){{
+		laserDirections = 1;
+		size = 3;
+		powerCapacity = 2000f;
 	}},
 	teleporter = new Teleporter("teleporter"){{
 	}},

@@ -5,7 +5,6 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockGroup;
 
 public abstract class PowerBlock extends Block{
-	public float powerCapacity = 10f;
 	public float voltage = 0.001f;
 	
 	public PowerBlock(String name) {

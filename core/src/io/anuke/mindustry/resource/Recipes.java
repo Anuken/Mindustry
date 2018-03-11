@@ -78,6 +78,8 @@ public class Recipes {
 			new Recipe(power, DistributionBlocks.powerlaser, stack(Item.steel, 3), stack(Item.iron, 3)),
 			new Recipe(power, DistributionBlocks.powerlasercorner, stack(Item.steel, 4), stack(Item.iron, 4)),
 			new Recipe(power, DistributionBlocks.powerlaserrouter, stack(Item.steel, 5), stack(Item.iron, 5)),
+			new Recipe(power, DistributionBlocks.battery, stack(Item.steel, 5), stack(Item.iron, 5)),
+			new Recipe(power, DistributionBlocks.batteryLarge, stack(Item.steel, 5), stack(Item.iron, 5)),
 
 			new Recipe(power, DefenseBlocks.shieldgenerator, stack(Item.titanium, 30), stack(Item.dirium, 30)),
 

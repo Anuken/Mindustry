@@ -10,6 +10,7 @@ public class Wall extends Block{
 		solid = true;
 		destructible = true;
 		group = BlockGroup.walls;
+		hasInventory = false;
 	}
 
 	@Override
