@@ -71,6 +71,14 @@ public class Tile{
 		if(x == cx + 1 && y == cy) return 2;
 		return -1;
 	}
+
+	public byte sizedRelativeTo(int cx, int cy){
+		if(x == cx && y == cy - 1 - block().size/2) return 1;
+		if(x == cx && y == cy + 1 + block().size/2) return 3;
+		if(x == cx - 1 - block().size/2 && y == cy) return 0;
+		if(x == cx + 1 + block().size/2 && y == cy) return 2;
+		return -1;
+	}
 	
 	public <T extends TileEntity> T entity(){
 		return (T)entity;

@@ -214,7 +214,7 @@ public class Generator extends PowerBlock{
 
 			float r = interfering ? 0f : 0f;
 			
-			int relative = tile.relativeTo(target.x, target.y);
+			int relative = tile.sizedRelativeTo(target.x, target.y);
 			
 			if(relative == -1){
 				Shapes.laser("laser", "laserend", tile.worldx() + t2.x, tile.worldy() + t2.y,
