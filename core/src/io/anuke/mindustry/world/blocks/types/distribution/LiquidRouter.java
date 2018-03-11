@@ -12,6 +12,7 @@ public class LiquidRouter extends LiquidBlock{
 		rotate = false;
 		solid = true;
 		liquidFlowFactor = 2f;
+		hasInventory = false;
 	}
 	
 	@Override

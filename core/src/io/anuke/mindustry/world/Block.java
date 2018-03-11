@@ -177,16 +177,20 @@ public class Block extends BaseBlock {
 		Effects.sound(explosionSound, x, y);
 	}
 
-	public TextureRegion getIcon(){
+	public TextureRegion[] getIcon(boolean compact){
 		if(Draw.hasRegion(name + "-icon")){
-			return Draw.region(name + "-icon");
+			return new TextureRegion[]{Draw.region(name + "-icon")};
 		}else{
-			TextureRegion region = new TextureRegion(Draw.region(name));
-			region.setRegionWidth(8);
-			region.setRegionHeight(8);
-			return region;
+			return new TextureRegion[]{compact ? iconRegion(name) : Draw.region(name)};
 		}
 	}
+
+	protected TextureRegion iconRegion(String name){
+        TextureRegion region = new TextureRegion(Draw.region(name));
+        region.setRegionWidth(8);
+        region.setRegionHeight(8);
+        return region;
+    }
 	
 	public TileEntity getEntity(){
 		return new TileEntity();

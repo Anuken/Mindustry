@@ -86,6 +86,7 @@ public class DistributionBlocks{
 		laserDirections = 1;
 		size = 3;
 		powerCapacity = 2000f;
+		base = "batterylarge-base";
 	}},
 	teleporter = new Teleporter("teleporter"){{
 	}},

@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
@@ -114,7 +115,17 @@ public class BlocksFragment implements Fragment{
 						int i = 0;
 
 						for (Recipe r : recipes) {
-							ImageButton image = new ImageButton(r.result.getIcon(), "select");
+							ImageButton image = new ImageButton(new TextureRegion(), "select");
+
+							TextureRegion[] regions = r.result.getIcon(true);
+							Stack istack = new Stack();
+							for(TextureRegion region : regions){
+								istack.add(new Image(region));
+							}
+
+							image.getImageCell().setActor(istack).size(size);
+							image.addChild(istack);
+							image.getImage().remove();
 
 							image.addListener(new ClickListener(){
 								@Override
@@ -152,14 +163,13 @@ public class BlocksFragment implements Fragment{
 							});
 
 							table.add(image).size(size + 8);
-							image.getImageCell().size(size);
 
 							image.update(() -> {
 								boolean canPlace = !control.tutorial().active() || control.tutorial().canPlace();
 								boolean has = (state.inventory.hasItems(r.requirements)) && canPlace;
 								image.setChecked(input.recipe == r);
 								image.setTouchable(canPlace ? Touchable.enabled : Touchable.disabled);
-								image.getImage().setColor(has ? Color.WHITE : Hue.lightness(0.33f));
+								for(Element e : istack.getChildren()) e.setColor(has ? Color.WHITE : Hue.lightness(0.33f));
 							});
 
 							if (i % rows == rows - 1)
@@ -248,8 +258,14 @@ public class BlocksFragment implements Fragment{
 		desctable.add(header).left();
 		
 		desctable.row();
+
+		TextureRegion[] regions = recipe.result.getIcon(true);
+
+		Stack istack = new Stack();
+
+		for(TextureRegion region : regions) istack.add(new Image(region));
 		
-		header.addImage(recipe.result.getIcon()).size(8*5).padTop(4);
+		header.add(istack).size(8*5).padTop(4);
 		Label nameLabel = new Label(recipe.result.formalName);
 		nameLabel.setWrap(true);
 		header.add(nameLabel).padLeft(2).width(120f);
