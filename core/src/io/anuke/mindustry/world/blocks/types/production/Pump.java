@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.BlockGroup;
 import io.anuke.mindustry.world.Layer;
@@ -11,9 +12,6 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 public class Pump extends LiquidBlock{
-	protected final int timerPump = timers++;
-	protected final int timerDump = timers++;
-	
 	protected float pumpAmount = 2f;
 
 	public Pump(String name) {
@@ -47,6 +45,11 @@ public class Pump extends LiquidBlock{
 	}
 
 	@Override
+	public TextureRegion[] getIcon(){
+		return new TextureRegion[]{Draw.region(name)};
+	}
+
+	@Override
 	public boolean isLayer(Tile tile) {
 		return tile.floor().liquidDrop == null;
 	}
@@ -66,10 +69,8 @@ public class Pump extends LiquidBlock{
 			tile.entity.liquid.liquid = tile.floor().liquidDrop;
 			tile.entity.liquid.amount += maxPump;
 		}
-		
-		if(tile.entity.timer.get(timerDump, 1)){
-			tryDumpLiquid(tile);
-		}
+
+		tryDumpLiquid(tile);
 	}
 
 }

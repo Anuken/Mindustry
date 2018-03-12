@@ -21,10 +21,9 @@ public class PowerLaser extends Generator{
 	}
 
 	@Override
-	public TextureRegion[] getIcon(boolean compact){
+	public TextureRegion[] getIcon(){
 		String bname = base == null ? "laser-base" : base;
-		return new TextureRegion[]{compact ? iconRegion(bname) : Draw.region(bname),
-				compact ? iconRegion(name) : Draw.region(name)};
+		return new TextureRegion[]{Draw.region(bname), Draw.region(name)};
 	}
 
 	@Override

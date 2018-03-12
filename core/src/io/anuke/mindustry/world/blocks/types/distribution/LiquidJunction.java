@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidBlock;
@@ -19,7 +20,12 @@ public class LiquidJunction extends LiquidBlock{
 	public void draw(Tile tile){
 		Draw.rect(name(), tile.worldx(), tile.worldy());
 	}
-	
+
+	@Override
+	public TextureRegion[] getIcon(){
+		return new TextureRegion[]{Draw.region(name)};
+	}
+
 	@Override
 	public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
 		int dir = source.relativeTo(tile.x, tile.y);

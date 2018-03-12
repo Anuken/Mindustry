@@ -11,6 +11,8 @@ public class Splitter extends Block{
         super(name);
         solid = true;
         instantTransfer = true;
+        destructible = true;
+        hasInventory = false;
     }
 
     @Override

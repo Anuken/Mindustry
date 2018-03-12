@@ -14,7 +14,7 @@ public class Edges {
     static{
 
         for(int i = 0; i < maxSize; i ++){
-            int bot = -(int)(i/2f-0.5f) - 1;
+            int bot = -(int)(i/2f) - 1;
             int top = (int)(i/2f+0.5f) + 1;
             edges[i] = new GridPoint2[(i + 1) * 4];
 

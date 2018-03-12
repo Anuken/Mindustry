@@ -117,7 +117,7 @@ public class BlocksFragment implements Fragment{
 						for (Recipe r : recipes) {
 							ImageButton image = new ImageButton(new TextureRegion(), "select");
 
-							TextureRegion[] regions = r.result.getIcon(true);
+							TextureRegion[] regions = r.result.getCompactIcon();
 							Stack istack = new Stack();
 							for(TextureRegion region : regions){
 								istack.add(new Image(region));
@@ -259,7 +259,7 @@ public class BlocksFragment implements Fragment{
 		
 		desctable.row();
 
-		TextureRegion[] regions = recipe.result.getIcon(true);
+		TextureRegion[] regions = recipe.result.getCompactIcon();
 
 		Stack istack = new Stack();
 

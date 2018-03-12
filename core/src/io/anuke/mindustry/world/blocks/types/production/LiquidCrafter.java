@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
@@ -23,7 +24,6 @@ public class LiquidCrafter extends LiquidBlock{
 	public Liquid inputLiquid = null;
 	public float liquidAmount = 20f;
 	public Item output = null;
-	public int itemCapacity = 90;
 	public int purifyTime = 80;
 	public Effect craftEffect = Fx.purify;
 
@@ -33,6 +33,8 @@ public class LiquidCrafter extends LiquidBlock{
 		rotate = false;
 		solid = true;
 		health = 60;
+		hasInventory = true;
+		itemCapacity = 90;
 		liquidCapacity = 21f;
 	}
 
@@ -65,6 +67,11 @@ public class LiquidCrafter extends LiquidBlock{
 		Draw.alpha(tile.entity.liquid.amount / liquidCapacity);
 		Draw.rect("blank", tile.drawx(), tile.drawy(), 2, 2);
 		Draw.color();
+	}
+
+	@Override
+	public TextureRegion[] getIcon(){
+		return new TextureRegion[]{Draw.region(name)};
 	}
 	
 	@Override
