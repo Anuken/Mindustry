@@ -56,6 +56,7 @@ public class Recipes {
 		new Recipe(crafting, ProductionBlocks.stoneformer, stack(Item.steel, 10), stack(Item.iron, 10)),
 		new Recipe(crafting, ProductionBlocks.lavasmelter, stack(Item.steel, 30), stack(Item.titanium, 15)),
 		new Recipe(crafting, ProductionBlocks.siliconextractor, stack(Item.steel, 30), stack(Item.titanium, 15)),
+		new Recipe(crafting, ProductionBlocks.cryofluidmixer, stack(Item.steel, 30), stack(Item.titanium, 15)),
 		new Recipe(crafting, ProductionBlocks.weaponFactory, stack(Item.steel, 60), stack(Item.iron, 60)).setDesktop(),
 		//new Recipe(crafting, ProductionBlocks.centrifuge, stack(Item.steel, 30), stack(Item.iron, 30)),
 

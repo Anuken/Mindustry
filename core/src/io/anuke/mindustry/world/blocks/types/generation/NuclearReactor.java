@@ -33,7 +33,7 @@ public class NuclearReactor extends LiquidPowerGenerator{
 	protected int fuelUseTime = 130; //time to consume 1 fuel
 	protected float powerMultiplier = 0.45f; //power per frame, depends on full capacity
 	protected float heating = 0.007f; //heating per frame
-	protected float coolantPower = 0.007f; //how much heat decreases per coolant unit
+	protected float coolantPower = 0.015f; //how much heat decreases per coolant unit
 	protected float smokeThreshold = 0.3f; //threshold at which block starts smoking
 	protected int explosionRadius = 19;
 	protected int explosionDamage = 135;
@@ -85,12 +85,17 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		}
 		
 		if(entity.liquid.amount > 0){
-			//TODO proper coolant usage
-			float coolDirection = Mathf.clamp(10f * (0.6f - entity.liquid.liquid.temperature), -2f, 2f);
-			float maxCool = entity.liquid.amount * coolantPower * entity.liquid.liquid.heatCapacity;
-			entity.heat -= maxCool * coolDirection; //TODO steam when cooling large amounts?
-			entity.heat = Mathf.clamp(entity.heat);
-			entity.liquid.amount -= Math.min(entity.liquid.amount, entity.heat / coolantPower);
+			//TODO steam when cooling large amounts?
+			float liquidPower = 1f;
+
+			if(liquidPower > 0){ //is coolant
+				float pow = coolantPower * entity.liquid.liquid.heatCapacity;
+				float maxCool = Math.min(entity.liquid.amount, entity.heat / pow); //max that can be cooled in terms of liquid
+				entity.heat -= maxCool * pow;
+				entity.liquid.amount -= maxCool;
+			}else{ //is heater
+				//TODO
+			}
 		}
 		
 		if(entity.heat > smokeThreshold){

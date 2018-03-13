@@ -13,7 +13,7 @@ public class Liquid {
 	none = new Liquid("none", Color.CLEAR),
 	water = new Liquid("water", Color.ROYAL){
 		{
-			heatCapacity = 0.7f;
+			heatCapacity = 0.4f;
 		}
 	},
 	plasma = new Liquid("plasma", Color.CORAL){
@@ -38,8 +38,8 @@ public class Liquid {
 	},
 	cryofluid = new Liquid("cryofluid", Color.SKY){
 		{
-			heatCapacity = 0.8f;
-			temperature = 0.1f;
+			heatCapacity = 0.75f;
+			temperature = 0.5f;
 		}
 	},
 	sulfuricAcid = new Liquid("sulfuricAcid", Color.YELLOW){

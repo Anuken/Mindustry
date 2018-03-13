@@ -91,7 +91,7 @@ public abstract class BaseBlock {
 
             if(ofract > fract) return;
 
-            float flow = Math.min((fract - ofract) * liquidCapacity/2f,
+            float flow = Math.min((fract - ofract) * (liquidCapacity/(1.3f + tile.entity.liquid.liquid.viscosity)),
                     Math.min(tile.entity.liquid.amount/liquidFlowFactor * Math.max(Timers.delta(), 1f), tile.entity.liquid.amount));
 
             if(flow <= 0f || tile.entity.liquid.amount < flow) return;

@@ -8,8 +8,7 @@ import io.anuke.mindustry.world.blocks.types.modules.LiquidModule;
 import io.anuke.ucore.graphics.Draw;
 
 public class LiquidBlock extends Block{
-	protected final int timerFlow = timers++;
-	protected String liquidRegion = "conduitliquid";
+	protected String liquidRegion = name() + "-liquid";
 	
 	public LiquidBlock(String name) {
 		super(name);
@@ -31,22 +30,15 @@ public class LiquidBlock extends Block{
 
 		int rotation = rotate ? tile.getRotation() * 90 : 0;
 		
-		Draw.rect(name() + "-bottom", tile.worldx(), tile.worldy(), rotation);
+		Draw.rect(name() + "-bottom", tile.drawx(), tile.drawy(), rotation);
 		
-		if(mod.amount > 0.01f){
+		if(mod.amount > 0.001f){
 			Draw.color(mod.liquid.color);
 			Draw.alpha(mod.amount / liquidCapacity);
-			Draw.rect(liquidRegion, tile.worldx(), tile.worldy(), rotation);
+			Draw.rect(liquidRegion, tile.drawx(), tile.drawy(), rotation);
 			Draw.color();
 		}
 		
-		Draw.rect(name() + "-top", tile.worldx(), tile.worldy(), rotation);
-	}
-	
-	@Override
-	public void update(Tile tile){
-		if(tile.entity.liquid.amount > 0.01f && tile.entity.timer.get(timerFlow, 1)){
-			tryMoveLiquid(tile, tile.getNearby(tile.getRotation()));
-		}
+		Draw.rect(name() + "-top", tile.drawx(), tile.drawy(), rotation);
 	}
 }

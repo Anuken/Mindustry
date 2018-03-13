@@ -61,6 +61,19 @@ public class ProductionBlocks{
 			size = 2;*/
 		}
 	},
+
+	cryofluidmixer = new LiquidMixer("cryofluidmixer"){
+		{
+			health = 200;
+			inputLiquid = Liquid.water;
+			outputLiquid = Liquid.cryofluid;
+			inputItem = Item.titanium;
+			liquidPerItem = 70f;
+			itemCapacity = 50;
+			powerUse = 0.1f;
+			size = 2;
+		}
+	},
 	
 	coalextractor = new LiquidCrafter("coalextractor"){
 		{
@@ -181,9 +194,9 @@ public class ProductionBlocks{
 	
 	laserdrill = new GenericDrill("laserdrill"){
 		{
-			drillTime = 240;
+			drillTime = 200;
 			size = 2;
-			powerUse = 0.08f;
+			powerUse = 0.2f;
 			hasPower = true;
 		}
 	},
