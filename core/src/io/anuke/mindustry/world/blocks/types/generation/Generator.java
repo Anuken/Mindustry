@@ -25,8 +25,10 @@ import static io.anuke.mindustry.Vars.world;
 
 public class Generator extends PowerBlock{
 	public static boolean drawRangeOverlay = false;
-	public static final float thicknessScl = 0.85f;
-	public static final float laserMinValue = 0.7f;
+	public static final float thicknessScl = 0.85f * 0.7f;
+	public static final float laserMinValue = 0f;
+	public static final Color laserFrom = Color.valueOf("d0bdd2");
+	public static final Color laserTo = Color.valueOf("ffe7a8");
 
 	protected Translator t1 = new Translator();
 	protected Translator t2 = new Translator();
@@ -140,22 +142,23 @@ public class Generator extends PowerBlock{
 
 		GeneratorEntity entity = tile.entity();
 
+		if(entity.power.amount > powerSpeed){
+			entity.laserThickness = Mathf.lerpDelta(entity.laserThickness, 1f, 0.05f);
+		}else{
+			entity.laserThickness = Mathf.lerpDelta(entity.laserThickness, laserMinValue, 0.05f);
+		}
+
 		for(int i = 0; i < laserDirections; i++){
-			if(entity.power.amount > powerSpeed){
-				entity.laserThickness = Mathf.lerpDelta(entity.laserThickness, 1f, 0.05f);
-			}else{
-				entity.laserThickness = Mathf.lerpDelta(entity.laserThickness, laserMinValue, 0.05f);
-			}
 			drawLaserTo(tile, (tile.getRotation() + i) - laserDirections / 2);
 		}
 
 		Draw.color();
 	}
 
-	@Override
-	public boolean acceptPower(Tile tile, Tile source, float amount){
-		return false;
-	}
+	//@Override
+	//public boolean acceptPower(Tile tile, Tile source, float amount){
+	//	return false;
+	//}
 
 	@Override
 	public TileEntity getEntity() {
@@ -173,8 +176,14 @@ public class Generator extends PowerBlock{
 			int rot = (tile.getRotation() + i) - laserDirections / 2;
 			Tile target = laserTarget(tile, rot);
 
-			if(target == null || isInterfering(target, rot))
+			if(target == null)
 				continue;
+
+			if(isInterfering(target, rot)){
+				float fract = tile.entity.power.amount / powerCapacity;
+				float ofract = target.entity.power.amount / target.block().powerCapacity;
+				if(ofract > fract) continue;
+			}
 
 			float transmit = Math.min(powerSpeed * Timers.delta(), entity.power.amount);
 			if(target.block().acceptPower(target, tile, transmit)){
@@ -191,39 +200,30 @@ public class Generator extends PowerBlock{
 
 		GeneratorEntity entity = tile.entity();
 
-		float scale = thicknessScl * entity.laserThickness;
+		float scale = thicknessScl;
 
 		if(target != null){
 			boolean interfering = isInterfering(target, rotation);
 
-			t1.trns(rotation * 90, 1 * tilesize / 2 + 2f +
+			t1.trns(rotation * 90, tilesize / 2 + 2f +
 					(interfering ? Vector2.dst(tile.worldx(), tile.worldy(), target.worldx(),
 							target.worldy()) / 2f - tilesize / 2f * 1 : 0));
 
 			t2.trns(rotation * 90, size * tilesize / 2 + 2f);
 
-			if(!interfering){
-				Draw.tint(Hue.mix(Color.GRAY, Color.WHITE, 0.904f + Mathf.sin(Timers.time(), 1.7f, 0.06f)));
-			}else{
-				Draw.tint(Hue.mix(Color.SCARLET, Color.WHITE, 0.902f + Mathf.sin(Timers.time(), 1.7f, 0.08f)));
-
-				//if(state.is(State.playing) && Mathf.chance(Timers.delta() * 0.033)){
-				//	Effects.effect(Fx.laserspark, target.worldx() - t1.x, target.worldy() - t1.y);
-				//}
-			}
-
-			float r = interfering ? 0f : 0f;
+			Draw.tint(Hue.mix(laserFrom, laserTo, entity.laserThickness * 0.93f + Mathf.sin(Timers.time(), 1.7f, 0.07f)));
 			
 			int relative = tile.sizedRelativeTo(target.x, target.y);
 			
 			if(relative == -1){
 				Shapes.laser("laser", "laserend", tile.worldx() + t2.x, tile.worldy() + t2.y,
-						target.worldx() - t1.x + Mathf.range(r),
-						target.worldy() - t1.y + Mathf.range(r), scale);
+						target.worldx() - t1.x,
+						target.worldy() - t1.y, scale);
 			}else{
-				float s = 18f;
-				float sclx = (relative == 1 || relative == 3) ? entity.laserThickness : 1f;
-				float scly = (relative == 1 || relative == 3) ? 1f : entity.laserThickness;
+				float lf = 1f;
+				float s = interfering ? 12f : 18f;
+				float sclx = (relative == 1 || relative == 3) ? lf : 1f;
+				float scly = (relative == 1 || relative == 3) ? 1f : lf;
 				Draw.rect("laserfull", 
 						tile.worldx() + Geometry.d4[relative].x * size * tilesize / 2f,
 						tile.worldy() + Geometry.d4[relative].y * size * tilesize / 2f , s * sclx, s * scly);
