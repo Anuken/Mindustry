@@ -17,16 +17,16 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.*;
 
 public class DesktopInput extends InputHandler{
-	int mousex, mousey;
-	int endx, endy;
+	float mousex, mousey;
+	float endx, endy;
 	private boolean enableHold = false;
 	private boolean beganBreak;
 	private boolean rotated = false, rotatedAlt, zoomed;
 	
-	@Override public float getCursorEndX(){ return select() ? getCursorX() : endx; }
-	@Override public float getCursorEndY(){ return select() ? getCursorY() : endy; }
-	@Override public float getCursorX(){ return (int)(Graphics.screen(mousex, mousey).x); }
-	@Override public float getCursorY(){ return (int)(Gdx.graphics.getHeight() - Graphics.screen(mousex, mousey).y); }
+	@Override public float getCursorEndX(){ return endx; }
+	@Override public float getCursorEndY(){ return endy; }
+	@Override public float getCursorX(){ return (Graphics.screen(mousex, mousey).x); }
+	@Override public float getCursorY(){ return (Gdx.graphics.getHeight() - 1 - Graphics.screen(mousex, mousey).y); }
 	@Override public boolean drawPlace(){ return !beganBreak; }
 
 	@Override
@@ -48,8 +48,8 @@ public class DesktopInput extends InputHandler{
 		}
 
 		if(!Inputs.keyDown("select") && !Inputs.keyDown("break")){
-			mousex = (int)Graphics.mouseWorld().x;
-			mousey = (int)Graphics.mouseWorld().y;
+			mousex = Graphics.mouseWorld().x;
+			mousey = Graphics.mouseWorld().y;
 		}
 		
 		endx = Gdx.input.getX();
@@ -154,11 +154,6 @@ public class DesktopInput extends InputHandler{
 				Cursors.restoreCursor();
 		}
 
-	}
-
-	boolean select(){
-		return !Inputs.keyDown("select") && !Inputs.keyRelease("select") &&
-				!Inputs.keyDown("break") && !Inputs.keyRelease("break");
 	}
 
 	public int tilex(){
