@@ -72,7 +72,7 @@ public abstract class BaseBlock {
     }
 
     public void tryMoveLiquid(Tile tile, Tile tileSource, Tile next, float amount){
-        float flow = Math.min(next.block().liquidCapacity - next.entity.liquid.amount, amount);
+        float flow = Math.min(next.block().liquidCapacity - next.entity.liquid.amount - 0.001f, amount);
 
         if(next.block().acceptLiquid(next, tileSource, tile.entity.liquid.liquid, flow)){
             next.block().handleLiquid(next, tileSource, tile.entity.liquid.liquid, flow);

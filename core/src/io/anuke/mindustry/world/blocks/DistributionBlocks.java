@@ -22,14 +22,14 @@ public class DistributionBlocks{
 	}},
 	
 	liquidrouter = new LiquidRouter("liquidrouter"){{
-		liquidCapacity = 30f;
+		liquidCapacity = 40f;
 		liquidRegion = "liquidrouter-liquid";
 	}},
 
 	liquidtank = new LiquidRouter("liquidtank"){{
 		size = 3;
 		liquidRegion = "liquidtank-liquid";
-		liquidCapacity = 1300f;
+		liquidCapacity = 1500f;
 	}},
 	
 	conveyor = new Conveyor("conveyor"){{

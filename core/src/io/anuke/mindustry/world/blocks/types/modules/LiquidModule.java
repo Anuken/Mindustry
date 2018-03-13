@@ -14,13 +14,13 @@ public class LiquidModule extends BlockModule {
     @Override
     public void write(DataOutputStream stream) throws IOException {
         stream.writeByte(liquid.id);
-        stream.writeByte((byte)(amount));
+        stream.writeFloat(amount);
     }
 
     @Override
     public void read(DataInputStream stream) throws IOException{
         byte id = stream.readByte();
         liquid = Liquid.getByID(id);
-        amount = stream.readByte();
+        amount = stream.readFloat();
     }
 }

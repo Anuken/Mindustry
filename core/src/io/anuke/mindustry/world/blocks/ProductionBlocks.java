@@ -16,11 +16,15 @@ public class ProductionBlocks{
 	
 	core = new CoreBlock("core"){},
 	
-	pump = new Pump("pump"){},
+	pump = new Pump("pump"){
+		{
+			pumpAmount = 0.8f;
+		}
+	},
 	
 	fluxpump = new Pump("fluxpump"){
 		{
-			pumpAmount = 3f;
+			pumpAmount = 1.2f;
 		}
 	},
 	
@@ -87,9 +91,9 @@ public class ProductionBlocks{
 	oilrefinery = new LiquidCrafter("oilrefinery"){
 		{
 			inputLiquid = Liquid.oil;
-			liquidAmount = 45f;
-			liquidCapacity = 46f;
-			purifyTime = 60;
+			liquidAmount = 55f;
+			liquidCapacity = 56f;
+			purifyTime = 65;
 			output = Item.coal;
 			health = 80;
 			craftEffect = Fx.purifyoil;
@@ -213,12 +217,23 @@ public class ProductionBlocks{
 		}
 	},
 
-	//TODO test it
 	waterextractor = new SolidPump("waterextractor"){
 		{
 			result = Liquid.water;
 			powerUse = 0.1f;
+			pumpAmount = 0.4f;
 			size = 2;
+			liquidCapacity = 30f;
+		}
+	},
+
+	oilextractor = new SolidPump("oilextractor"){
+		{
+			result = Liquid.oil;
+			powerUse = 0.5f;
+			pumpAmount = 0.4f;
+			size = 3;
+			liquidCapacity = 80f;
 		}
 	},
 

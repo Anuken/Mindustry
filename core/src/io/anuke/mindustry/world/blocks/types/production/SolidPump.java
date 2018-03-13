@@ -8,6 +8,7 @@ import io.anuke.ucore.core.Timers;
 /**Pump that makes liquid from solids and takes in power. Only works on solid floor blocks.*/
 public class SolidPump extends Pump {
     protected Liquid result = Liquid.water;
+    /**Power use per liquid unit.*/
     protected float powerUse = 0.1f;
 
     protected final Array<Tile> drawTiles = new Array<>();

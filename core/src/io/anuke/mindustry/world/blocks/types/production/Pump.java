@@ -12,7 +12,7 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 public class Pump extends LiquidBlock{
-	protected float pumpAmount = 2f;
+	protected float pumpAmount = 1f;
 
 	public Pump(String name) {
 		super(name);
