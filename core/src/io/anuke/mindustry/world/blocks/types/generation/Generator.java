@@ -198,7 +198,7 @@ public class Generator extends PowerBlock{
 
 			t1.trns(rotation * 90, 1 * tilesize / 2 + 2f +
 					(interfering ? Vector2.dst(tile.worldx(), tile.worldy(), target.worldx(),
-							target.worldy()) / 2f - tilesize / 2f * 1 + 1 : 0));
+							target.worldy()) / 2f - tilesize / 2f * 1 : 0));
 
 			t2.trns(rotation * 90, size * tilesize / 2 + 2f);
 

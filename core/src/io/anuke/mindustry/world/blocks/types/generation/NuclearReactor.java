@@ -85,9 +85,12 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		}
 		
 		if(entity.liquid.amount > 0){
-			float maxCool = Math.min(entity.liquid.amount * coolantPower, entity.heat);
-			entity.heat -= maxCool; //TODO steam when cooling large amounts?
-			entity.liquid.amount -= maxCool / coolantPower;
+			//TODO proper coolant usage
+			float coolDirection = Mathf.clamp(10f * (0.6f - entity.liquid.liquid.temperature), -2f, 2f);
+			float maxCool = entity.liquid.amount * coolantPower * entity.liquid.liquid.heatCapacity;
+			entity.heat -= maxCool * coolDirection; //TODO steam when cooling large amounts?
+			entity.heat = Mathf.clamp(entity.heat);
+			entity.liquid.amount -= Math.min(entity.liquid.amount, entity.heat / coolantPower);
 		}
 		
 		if(entity.heat > smokeThreshold){
@@ -162,7 +165,13 @@ public class NuclearReactor extends LiquidPowerGenerator{
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		return item == generateItem && tile.entity.inventory.getItem(generateItem) < itemCapacity;
 	}
-	
+
+	@Override
+	public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+		return tile.entity.liquid.amount + amount < liquidCapacity
+				&& (tile.entity.liquid.liquid == liquid || tile.entity.liquid.amount <= 0.001f);
+	}
+
 	@Override
 	public void draw(Tile tile){
 		super.draw(tile);

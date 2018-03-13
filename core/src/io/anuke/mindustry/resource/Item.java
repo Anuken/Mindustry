@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Bundles;
 
-public class Item{
+public class Item implements Comparable<Item>{
 	private static final Array<Item> items = new Array<>();
 
 	public static final Item
@@ -15,6 +15,7 @@ public class Item{
 		{
 			explosiveness = 0.2f;
 			flammability = 0.5f;
+			fluxiness = 0.5f;
 			material = false;
 		}
 	},
@@ -30,6 +31,7 @@ public class Item{
 	quartz = new Item("quartz") {
 		{
 			material = false;
+			fluxiness = 0.65f;
 		}
 	},
 	glass = new Item("glass"),
@@ -47,6 +49,8 @@ public class Item{
 
 	public float explosiveness = 0f;
 	public float flammability = 0f;
+	/**how effective this item is as flux for smelting. 0 = not a flux, 0.5 = normal flux, 1 = very good*/
+	public float fluxiness = 0f;
 	public boolean material = true;
 
 	public Item(String name) {
@@ -67,6 +71,11 @@ public class Item{
 	@Override
 	public String toString() {
 		return localizedName();
+	}
+
+	@Override
+	public int compareTo(Item item) {
+		return Integer.compare(id, item.id);
 	}
 
 	public static Array<Item> getAllItems() {

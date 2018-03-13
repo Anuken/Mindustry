@@ -35,7 +35,7 @@ public class LiquidCrafter extends LiquidBlock{
 		health = 60;
 		hasInventory = true;
 		itemCapacity = 90;
-		liquidCapacity = 21f;
+		liquidCapacity = 20f;
 	}
 
 	@Override

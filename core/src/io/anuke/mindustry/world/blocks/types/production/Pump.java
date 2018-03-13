@@ -21,6 +21,7 @@ public class Pump extends LiquidBlock{
 		layer = Layer.overlay;
 		liquidFlowFactor = 3f;
 		group = BlockGroup.liquids;
+		liquidRegion = "pump-liquid";
 	}
 
 	@Override
@@ -36,11 +37,11 @@ public class Pump extends LiquidBlock{
 	
 	@Override
 	public void draw(Tile tile){
-		Draw.rect(name(), tile.worldx(), tile.worldy());
+		Draw.rect(name(), tile.drawx(), tile.drawy());
 		
 		Draw.color(tile.entity.liquid.liquid.color);
 		Draw.alpha(tile.entity.liquid.amount / liquidCapacity);
-		Draw.rect("blank", tile.worldx(), tile.worldy(), 2, 2);
+		Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
 		Draw.color();
 	}
 
@@ -57,7 +58,7 @@ public class Pump extends LiquidBlock{
 	@Override
 	public void drawLayer(Tile tile){
 		Draw.colorl(0.85f + Mathf.absin(Timers.time(), 6f, 0.15f));
-		Draw.rect("cross-"+size, tile.worldx(), tile.worldy());
+		Draw.rect("cross-"+size, tile.drawx(), tile.drawy());
 		Draw.color();
 	}
 	

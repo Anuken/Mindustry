@@ -11,7 +11,11 @@ public class Liquid {
 	public static final Liquid
 
 	none = new Liquid("none", Color.CLEAR),
-	water = new Liquid("water", Color.ROYAL),
+	water = new Liquid("water", Color.ROYAL){
+		{
+			heatCapacity = 0.7f;
+		}
+	},
 	plasma = new Liquid("plasma", Color.CORAL){
 		{
 			flammability = 0.4f;
@@ -28,7 +32,7 @@ public class Liquid {
 	oil = new Liquid("oil", Color.valueOf("292929")){
 		{
 			viscosity = 0.7f;
-			flammability = 0.5f;
+			flammability = 0.6f;
 			explosiveness = 0.6f;
 		}
 	},
@@ -50,10 +54,15 @@ public class Liquid {
 	public final String name;
 	public final int id;
 
+	/**0-1, 0 is completely inflammable, anything above that may catch fire when exposed to heat, 0.5+ is very flammable.*/
 	public float flammability;
+	/**temperature: 0.5 is 'room' temperature, 0 is very cold, 1 is molten hot*/
 	public float temperature = 0.5f;
+	/**how much heat this liquid can store. 0.75=water (high), anything lower is probably less dense and bad at cooling.*/
 	public float heatCapacity = 0.5f;
+	/**how thick this liquid is. 0.5=water (relatively viscous), 1 would be something like tar (very slow)*/
 	public float viscosity = 0.5f;
+	/**how prone to exploding this liquid is, when heated. 0 = nothing, 1 = nuke*/
 	public float explosiveness;
 	
 	public Liquid(String name, Color color) {

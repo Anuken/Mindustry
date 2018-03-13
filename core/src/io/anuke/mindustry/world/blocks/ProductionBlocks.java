@@ -2,13 +2,14 @@ package io.anuke.mindustry.world.blocks;
 
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.generation.*;
+import io.anuke.mindustry.world.blocks.types.generation.ItemPowerGenerator;
+import io.anuke.mindustry.world.blocks.types.generation.LiquidPowerGenerator;
+import io.anuke.mindustry.world.blocks.types.generation.NuclearReactor;
 import io.anuke.mindustry.world.blocks.types.generation.SolarGenerator;
-import io.anuke.mindustry.world.blocks.types.storage.CoreBlock;
 import io.anuke.mindustry.world.blocks.types.production.*;
+import io.anuke.mindustry.world.blocks.types.storage.CoreBlock;
 
 public class ProductionBlocks{
 	public static final Block
@@ -29,6 +30,7 @@ public class ProductionBlocks{
 			inputs = new Item[]{Item.iron};
 			fuel = Item.coal;
 			result = Item.steel;
+			craftTime = 25f;
 		}
 	},
 	
@@ -38,45 +40,46 @@ public class ProductionBlocks{
 			inputs = new Item[]{Item.titanium, Item.steel};
 			fuel = Item.coal;
 			result = Item.dirium;
-			burnDuration = 40f;
-			craftTime = 20f;
+			burnDuration = 45f;
+			craftTime = 25f;
+		}
+	},
+
+	powersmelter = new PowerSmelter("powersmelter"){
+		{
+			/*
+			health = 90;
+			inputs = new Item[]{Item.titanium, Item.steel};
+			fuel = Item.coal;
+			results = Item.dirium;
+			burnDuration = 45f;
+			craftTime = 25f;
+			size = 2;*/
 		}
 	},
 	
 	coalextractor = new LiquidCrafter("coalextractor"){
 		{
 			input = Item.stone;
-			inputAmount = 5;
+			inputAmount = 6;
 			inputLiquid = Liquid.water;
-			liquidAmount = 18.99f;
+			liquidAmount = 19f;
 			output = Item.coal;
 			health = 50;
 			purifyTime = 50;
+			health = 60;
 		}
 	},
 	
 	titaniumextractor = new LiquidCrafter("titaniumextractor"){
 		{
 			input = Item.iron;
-			inputAmount = 6;
+			inputAmount = 8;
 			inputLiquid = Liquid.water;
 			liquidAmount = 40f;
 			liquidCapacity = 41f;
 			purifyTime = 60;
 			output = Item.titanium;
-			health = 70;
-		}
-	},
-
-	uraniumextractor = new LiquidCrafter("uraniumextractor"){
-		{
-			input = Item.iron;
-			inputAmount = 6;
-			inputLiquid = Liquid.water;
-			liquidAmount = 40f;
-			liquidCapacity = 41f;
-			purifyTime = 60;
-			output = Item.uranium;
 			health = 70;
 		}
 	},
@@ -117,17 +120,6 @@ public class ProductionBlocks{
 			output = Item.steel;
 			health = 80;
 			craftEffect = Fx.purifystone;
-		}
-	},
-
-	pulverizer = new PowerSmelter("pulverizer"){
-		{
-			inputs = new ItemStack[]{new ItemStack(Item.stone, 5)};
-			result = Item.quartz;
-			health = 50;
-			craftTime = 60f;
-			powerDrain = 0.02f;
-			craftEffect = Fx.pulverize;
 		}
 	},
 
@@ -221,6 +213,15 @@ public class ProductionBlocks{
 		}
 	},
 
+	//TODO test it
+	waterextractor = new SolidPump("waterextractor"){
+		{
+			result = Liquid.water;
+			powerUse = 0.1f;
+			size = 2;
+		}
+	},
+
 	cultivator = new GenericDrill("cultivator"){
 		{
 			resource = Blocks.grass;
@@ -267,7 +268,15 @@ public class ProductionBlocks{
 		}
 	},
 	solarpanel = new SolarGenerator("solarpanel"){
-
+		{
+			generation = 0.003f;
+		}
+	},
+	largesolarpanel = new SolarGenerator("largesolarpanel"){
+		{
+			size = 3;
+			generation = 0.012f;
+		}
 	},
 	nuclearReactor = new NuclearReactor("nuclearreactor"){
 		{

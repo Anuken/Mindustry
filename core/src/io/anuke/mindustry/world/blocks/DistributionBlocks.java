@@ -26,9 +26,9 @@ public class DistributionBlocks{
 		liquidRegion = "liquidrouter-liquid";
 	}},
 
-	liquidsilo = new LiquidRouter("liquidsilo"){{
+	liquidtank = new LiquidRouter("liquidtank"){{
 		size = 3;
-		liquidRegion = "liquidsilo-liquid";
+		liquidRegion = "liquidtank-liquid";
 		liquidCapacity = 1300f;
 	}},
 	

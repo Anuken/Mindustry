@@ -9,6 +9,7 @@ public class SolarGenerator extends Generator {
 
     public SolarGenerator(String name){
         super(name);
+        hasInventory = false;
     }
 
     @Override

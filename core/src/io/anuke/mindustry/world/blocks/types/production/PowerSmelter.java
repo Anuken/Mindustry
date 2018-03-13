@@ -1,28 +1,28 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
-import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
-import java.util.Arrays;
-
 public class PowerSmelter extends PowerBlock {
     protected final int timerDump = timers++;
     protected final int timerCraft = timers++;
 
-    protected ItemStack[] inputs;
-    protected Item result;
+    /**Recipe format:
+     * First item in each array: result
+     * Everything else in each array: requirements. Can have duplicates.*/
+    protected Item[][] recipes;
     protected float powerDrain = 0.01f;
 
     protected float heatUpTime = 80f;
@@ -46,17 +46,35 @@ public class PowerSmelter extends PowerBlock {
         super.setBars();
         bars.remove(BarType.inventory);
 
-        for(ItemStack item : inputs){
-            bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.inventory.getItem(item.item)/capacity));
+        if(true) return;
+
+        //TODO
+
+        ObjectSet<Item> set = new ObjectSet<>();
+
+        for(Item[] items : recipes){
+            for(int i = 1; i < items.length; i ++) {
+                set.add(items[i]);
+            }
+        }
+
+        Array<Item> items = new Array<>();
+        set.forEach(items::add);
+
+        items.sort();
+
+        for(Item item : items){
+            bars.add(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.inventory.getItem(item) / capacity));
         }
     }
 
     @Override
     public void setStats(){
         super.setStats();
-        stats.add("input", Arrays.toString(inputs));
+        //TODO input/outputs
+       // stats.add("input", Arrays.toString(inputs));
         stats.add("powersecond", Strings.toFixed(powerDrain*60f, 2));
-        stats.add("output", result);
+        //stats.add("output", result);
         stats.add("fuelduration", Strings.toFixed(burnDuration/60f, 1));
         stats.add("maxoutputsecond", Strings.toFixed(60f/craftTime, 1));
         stats.add("inputcapacity", capacity);
@@ -65,6 +83,7 @@ public class PowerSmelter extends PowerBlock {
 
     @Override
     public void update(Tile tile){
+        /*
         PowerSmelterEntity entity = tile.entity();
 
         if(entity.timer.get(timerDump, 5) && entity.inventory.hasItem(result)){
@@ -102,17 +121,20 @@ public class PowerSmelter extends PowerBlock {
         }
 
         offloadNear(tile, result);
-        Effects.effect(craftEffect, entity);
+        Effects.effect(craftEffect, entity);*/
     }
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         boolean isInput = false;
 
-        for(ItemStack req : inputs){
-            if(req.item == item){
-                isInput = true;
-                break;
+        out:
+        for(Item[] items : recipes){
+            for(int i = 1; i < items.length; i ++){
+                if(items[i] == item){
+                    isInput = true;
+                    break out;
+                }
             }
         }
 

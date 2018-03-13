@@ -12,7 +12,6 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 public class LiquidPowerGenerator extends Generator{
-	public int generateTime = 15;
 	public Liquid generateLiquid;
 	public float powerPerLiquid = 0.13f;
 	/**Maximum liquid used per frame.*/
