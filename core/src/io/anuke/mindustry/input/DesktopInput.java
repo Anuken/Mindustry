@@ -25,8 +25,8 @@ public class DesktopInput extends InputHandler{
 	
 	@Override public float getCursorEndX(){ return endx; }
 	@Override public float getCursorEndY(){ return endy; }
-	@Override public float getCursorX(){ return (Graphics.screen(mousex, mousey).x); }
-	@Override public float getCursorY(){ return (Gdx.graphics.getHeight() - 1 - Graphics.screen(mousex, mousey).y); }
+	@Override public float getCursorX(){ return Graphics.screen(mousex, mousey).x; }
+	@Override public float getCursorY(){ return Gdx.graphics.getHeight() - 1 - Graphics.screen(mousex, mousey).y; }
 	@Override public boolean drawPlace(){ return !beganBreak; }
 
 	@Override

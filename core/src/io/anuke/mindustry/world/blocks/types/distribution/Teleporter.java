@@ -117,7 +117,6 @@ public class Teleporter extends PowerBlock{
 		for(int i = 0; i < colors; i ++){
 			final int f = i;
 			ImageButton button = cont.addImageButton("white", "toggle", 24, () -> {
-				entity.color = (byte)f;
 				lastColor = (byte)f;
 				setConfigure(tile, (byte)f);
 			}).size(34, 38).padBottom(-5.1f).group(group).get();
