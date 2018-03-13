@@ -33,7 +33,6 @@ public class WeaponBlocks{
 			reload = 13f;
 			bullet = BulletType.stone;
 			ammo = Item.stone;
-			health = 55;
 			health = 45;
 		}
 		
