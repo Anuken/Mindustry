@@ -53,7 +53,7 @@ public class ChangelogDialog extends FloatingDialog{
                 if(info.build == Version.build){
                     in.row();
                     in.add("$text.changelog.current");
-                }else if(info == versions.peek()){
+                }else if(info == versions.first()){
                     in.row();
                     in.add("$text.changelog.latest");
                 }
