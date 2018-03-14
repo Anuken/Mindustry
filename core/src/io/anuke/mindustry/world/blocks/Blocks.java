@@ -49,6 +49,7 @@ public class Blocks{
 			solid = true;
 			liquidDrop = Liquid.lava;
 			liquid = true;
+			drawLayer = DrawLayer.lava;
 		}
 		
 		@Override
@@ -69,6 +70,7 @@ public class Blocks{
 			solid = true;
 			liquidDrop = Liquid.oil;
 			liquid = true;
+			drawLayer = DrawLayer.oil;
 		}
 		
 		@Override

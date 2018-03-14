@@ -13,24 +13,11 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 public class Shaders{
 	public static final Outline outline = new Outline();
 	public static final Shield shield = new Shield();
-	public static final Water water = new Water();
+	public static final SurfaceShader water = new SurfaceShader("water");
+	public static final SurfaceShader lava = new SurfaceShader("lava");
+	public static final SurfaceShader oil = new SurfaceShader("oil");
 
 	private static final Vector2 vec = new Vector2();
-
-	public static class Water extends Shader{
-
-		public Water(){
-			super("water", "default");
-		}
-
-		@Override
-		public void apply(){
-			shader.setUniformf("camerapos", Core.camera.position.x + Core.camera.zoom, Core.camera.position.y);
-			shader.setUniformf("screensize", Gdx.graphics.getWidth() / Core.cameraScale * Core.camera.zoom,
-					Gdx.graphics.getHeight() / Core.cameraScale * Core.camera.zoom);
-			shader.setUniformf("time", Timers.time());
-		}
-	}
 
 	public static class Outline extends Shader{
 		public Color color = new Color();
@@ -46,7 +33,6 @@ public class Shaders{
 			shader.setUniformf("u_lighten", lighten);
 			shader.setUniformf("u_texsize", vec.set(region.getTexture().getWidth(), region.getTexture().getHeight()));
 		}
-		
 	}
 	
 	public static class Shield extends Shader{
@@ -74,6 +60,20 @@ public class Shaders{
 			shader.setUniformf("u_texsize", vec.set(region.getTexture().getWidth() / scale,
 					region.getTexture().getHeight() / scale));
 		}
-		
+	}
+
+	public static class SurfaceShader extends Shader{
+
+		public SurfaceShader(String frag){
+			super(frag, "default");
+		}
+
+		@Override
+		public void apply(){
+			shader.setUniformf("camerapos", Core.camera.position.x + Core.camera.zoom, Core.camera.position.y);
+			shader.setUniformf("screensize", Gdx.graphics.getWidth() / Core.cameraScale * Core.camera.zoom,
+					Gdx.graphics.getHeight() / Core.cameraScale * Core.camera.zoom);
+			shader.setUniformf("time", Timers.time());
+		}
 	}
 }

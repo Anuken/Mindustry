@@ -23,7 +23,7 @@ public class Liquid {
 			heatCapacity = 0.2f;
 		}
 	},
-	lava = new Liquid("lava", Color.valueOf("ed5334")){
+	lava = new Liquid("lava", Color.valueOf("e37341")){
 		{
 			temperature = 0.7f;
 			viscosity = 0.8f;
