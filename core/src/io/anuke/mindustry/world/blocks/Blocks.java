@@ -1,16 +1,12 @@
 package io.anuke.mindustry.world.blocks;
 
 import io.anuke.mindustry.graphics.DrawLayer;
-import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.*;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Mathf;
 
 public class Blocks{
 	public static final Block
@@ -51,17 +47,6 @@ public class Blocks{
 			liquid = true;
 			drawLayer = DrawLayer.lava;
 		}
-		
-		@Override
-		public void update(Tile tile){
-			if(Mathf.chance(0.001 * Timers.delta())){
-				Effects.effect(Fx.lava, tile.worldx() + Mathf.range(5f), tile.worldy() + Mathf.range(5f));
-			}
-			
-			if(Mathf.chance(0.002 * Timers.delta())){
-				Effects.effect(Fx.lavabubble, tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
-			}
-		}
 	},
 	
 	oil = new Floor("oil"){
@@ -71,13 +56,6 @@ public class Blocks{
 			liquidDrop = Liquid.oil;
 			liquid = true;
 			drawLayer = DrawLayer.oil;
-		}
-		
-		@Override
-		public void update(Tile tile){
-			if(Mathf.chance(0.0022 * Timers.delta())){
-				Effects.effect(Fx.oilbubble, tile.worldx() + Mathf.range(2f), tile.worldy() + Mathf.range(2f));
-			}
 		}
 	},
 	

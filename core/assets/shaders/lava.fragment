@@ -1,5 +1,5 @@
 #ifdef GL_ES
-precision mediump float;
+precision highp float;
 precision mediump int;
 #endif
 
@@ -72,14 +72,17 @@ void main() {
 	        color = old;
 	    }
 	    
-	    float n1 = snoise(coords / 20.0 + vec2(time) / 250.0);
-	    float n2 = snoise((coords + vec2(632.0)) / 9.0 + vec2(0.0, -time) / 220.0);
+	    const float bs = 1.0;
 	    
-	    float r = (n1 + n2) / 2.0;
+	    float n1 = snoise(coords / (20.0 * bs) + vec2(time) / 250.0);
+	    float n2 = snoise((coords + vec2(632.0)) / (9.0 * bs) + vec2(0.0, -time) / 220.0);
+	    float n3 = snoise((coords + vec2(2233.0)) / (15.0 * bs) + vec2(time, 0.0) / 290.0);
 	    
-	    if(r < -0.6){
+	    float r = (n1 + n2 + n3) / 3.0;
+	    
+	    if(r < -0.5){
 	        color = s2;
-	    }else if(r < -0.2 && r > -0.6){
+	    }else if(r < -0.2){
 	        color = s1;
 	    }
 	}
