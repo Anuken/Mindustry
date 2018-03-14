@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.graphics.DrawLayer;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
@@ -79,6 +80,8 @@ public class Block extends BaseBlock {
 	public boolean expanded = false;
 	/**Max of timers used.*/
 	public int timers = 0;
+	/**Draw layer. Only used for 'cached' rendering.*/
+	public DrawLayer drawLayer = DrawLayer.normal;
 	/**Layer to draw extra stuff on.*/
 	public Layer layer = null;
 	/**Extra layer to draw extra extra stuff on.*/
@@ -219,6 +222,8 @@ public class Block extends BaseBlock {
 			tile.entity.update();
 		}
 	}
+
+	public void drawNonLayer(Tile tile){}
 	
 	public void drawShadow(Tile tile){
 		

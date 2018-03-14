@@ -44,7 +44,7 @@ import static io.anuke.ucore.core.Core.camera;
 public class Renderer extends RendererModule{
 	private final static float shieldHitDuration = 18f;
 	
-	public Surface shadowSurface, shieldSurface, indicatorSurface;
+	public Surface shadowSurface, shieldSurface, indicatorSurface, waterSurface;
 	
 	private int targetscale = baseCameraScale;
 	private Texture background = new Texture("sprites/background.png");
@@ -83,6 +83,7 @@ public class Renderer extends RendererModule{
 		shieldSurface = Graphics.createSurface(scale);
 		indicatorSurface = Graphics.createSurface(scale);
 		pixelSurface = Graphics.createSurface(scale);
+		waterSurface = Graphics.createSurface(scale);
 	}
 
 	public void setPixelate(boolean pixelate){

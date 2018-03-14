@@ -114,7 +114,7 @@ public class BlockRenderer{
 		Draw.color();
 		
 		Graphics.end();
-		drawCache(1, crangex, crangey);
+		drawCache(DrawLayer.walls, crangex, crangey);
 		Graphics.begin();
 		
 		Arrays.sort(requests.items, 0, requestidx);
@@ -165,12 +165,13 @@ public class BlockRenderer{
 
 		//render the entire map
 		if(cache == null || cache.length != chunksx || cache[0].length != chunksy){
-			cache = new int[chunksx][chunksy][2];
+			cache = new int[chunksx][chunksy][DrawLayer.values().length];
 
-			for(int x = 0; x < chunksx; x++){
-				for(int y = 0; y < chunksy; y++){
-					cacheChunk(x, y, true);
-					cacheChunk(x, y, false);
+			for(DrawLayer layer : DrawLayer.values()){
+				for(int x = 0; x < chunksx; x++){
+					for(int y = 0; y < chunksy; y++){
+						cacheChunk(x, y, layer);
+					}
 				}
 			}
 		}
@@ -182,7 +183,11 @@ public class BlockRenderer{
 		int crangex = (int)(camera.viewportWidth * camera.zoom / (chunksize * tilesize))+1;
 		int crangey = (int)(camera.viewportHeight * camera.zoom / (chunksize * tilesize))+1;
 
-		drawCache(0, crangex, crangey);
+		DrawLayer[] layers = DrawLayer.values();
+
+		for(int i = 0; i < layers.length - 1; i ++) {
+			drawCache(layers[i], crangex, crangey);
+		}
 
 		Graphics.begin();
 
@@ -224,11 +229,11 @@ public class BlockRenderer{
 	}
 	
 
-	void drawCache(int layer, int crangex, int crangey){
+	void drawCache(DrawLayer layer, int crangex, int crangey){
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 
-		cbatch.setProjectionMatrix(Core.camera.combined);
-		cbatch.beginDraw();
+		layer.begin(cbatch);
+
 		for(int x = -crangex; x <= crangex; x++){
 			for(int y = -crangey; y <= crangey; y++){
 				int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
@@ -237,14 +242,14 @@ public class BlockRenderer{
 				if(!Mathf.inBounds(worldx, worldy, cache))
 					continue;
 
-				cbatch.drawCache(cache[worldx][worldy][layer]);
+				cbatch.drawCache(cache[worldx][worldy][layer.ordinal()]);
 			}
 		}
 
-		cbatch.endDraw();
+		layer.end(cbatch);
 	}
 
-	void cacheChunk(int cx, int cy, boolean floor){
+	void cacheChunk(int cx, int cy, DrawLayer layer){
 		if(cbatch == null){
 			createBatch();
 		}
@@ -256,18 +261,21 @@ public class BlockRenderer{
 			for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
 				Tile tile = world.tile(tilex, tiley);
 				if(tile == null) continue;
-				if(floor){
-					if(!(tile.block() instanceof StaticBlock)){
-						tile.floor().draw(tile);
-					}
-				}else if(tile.block() instanceof StaticBlock){
+
+				if(tile.floor().drawLayer == layer && tile.block().drawLayer != DrawLayer.walls){
+					tile.floor().draw(tile);
+				}else if(tile.floor().drawLayer.ordinal() < layer.ordinal() && tile.block().drawLayer != DrawLayer.walls){
+					tile.floor().drawNonLayer(tile);
+				}
+
+				if(tile.block().drawLayer == layer && layer == DrawLayer.walls){
 					tile.block().draw(tile);
 				}
 			}
 		}
 		Graphics.popBatch();
 		cbatch.end();
-		cache[cx][cy][floor ? 0 : 1] = cbatch.getLastCache();
+		cache[cx][cy][layer.ordinal()] = cbatch.getLastCache();
 	}
 
 	public void clearTiles(){

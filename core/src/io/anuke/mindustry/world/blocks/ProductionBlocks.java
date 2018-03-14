@@ -67,8 +67,8 @@ public class ProductionBlocks{
 			health = 200;
 			inputLiquid = Liquid.water;
 			outputLiquid = Liquid.cryofluid;
-			inputItem = Item.titanium;
-			liquidPerItem = 70f;
+			inputItem = Item.quartz;
+			liquidPerItem = 50f;
 			itemCapacity = 50;
 			powerUse = 0.1f;
 			size = 2;

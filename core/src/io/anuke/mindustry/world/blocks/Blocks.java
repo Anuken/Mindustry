@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks;
 
+import io.anuke.mindustry.graphics.DrawLayer;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
@@ -31,6 +32,7 @@ public class Blocks{
 		solid = true;
 		liquidDrop = Liquid.water;
 		liquid = true;
+		drawLayer = DrawLayer.water;
 	}},
 	
 	water = new Floor("water"){{
@@ -38,6 +40,7 @@ public class Blocks{
 		solid = true;
 		liquidDrop = Liquid.water;
 		liquid = true;
+		drawLayer = DrawLayer.water;
 	}},
 	
 	lava = new Floor("lava"){

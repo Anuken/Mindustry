@@ -1,5 +1,6 @@
 package io.anuke.mindustry.graphics;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.FloatArray;
@@ -12,9 +13,25 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 public class Shaders{
 	public static final Outline outline = new Outline();
 	public static final Shield shield = new Shield();
+	public static final Water water = new Water();
 
 	private static final Vector2 vec = new Vector2();
-	
+
+	public static class Water extends Shader{
+
+		public Water(){
+			super("water", "default");
+		}
+
+		@Override
+		public void apply(){
+			shader.setUniformf("camerapos", Core.camera.position.x + Core.camera.zoom, Core.camera.position.y);
+			shader.setUniformf("screensize", Gdx.graphics.getWidth() / Core.cameraScale * Core.camera.zoom,
+					Gdx.graphics.getHeight() / Core.cameraScale * Core.camera.zoom);
+			shader.setUniformf("time", Timers.time());
+		}
+	}
+
 	public static class Outline extends Shader{
 		public Color color = new Color();
 		public float lighten = 0f;
