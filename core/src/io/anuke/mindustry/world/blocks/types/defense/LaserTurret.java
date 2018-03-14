@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.types.defense;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 
-import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.entities.enemies.BaseUnit;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
@@ -32,7 +32,7 @@ public class LaserTurret extends PowerTurret{
 	@Override
 	public void shoot(Tile tile){
 		TurretEntity entity = tile.entity();
-		Enemy enemy = entity.target;
+		BaseUnit enemy = entity.target;
 		
 		if(Angles.angleDist(entity.rotation, Angles.angle(tile.drawx(), tile.drawy(), enemy.x, enemy.y)) < cone){
 			enemy.damage(damage);
@@ -43,7 +43,7 @@ public class LaserTurret extends PowerTurret{
 	@Override
 	public void drawLayer2(Tile tile){
 		TurretEntity entity = tile.entity();
-		Enemy enemy = entity.target;
+		BaseUnit enemy = entity.target;
 		
 		if(enemy != null &&
 				Angles.angleDist(entity.rotation, Angles.angle(tile.drawx(), tile.drawy(), enemy.x, enemy.y)) <= cone){

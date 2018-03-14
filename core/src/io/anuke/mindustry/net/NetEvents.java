@@ -4,7 +4,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.entities.enemies.BaseUnit;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.resource.Weapon;
@@ -40,7 +40,7 @@ public class NetEvents {
         Net.send(packet, SendMode.udp);
     }
 
-    public static void handleEnemyDeath(Enemy enemy){
+    public static void handleEnemyDeath(BaseUnit enemy){
         EnemyDeathPacket packet = new EnemyDeathPacket();
         packet.id = enemy.id;
         Net.send(packet, SendMode.tcp);

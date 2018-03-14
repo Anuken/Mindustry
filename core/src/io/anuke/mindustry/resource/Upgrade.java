@@ -23,8 +23,8 @@ public abstract class Upgrade {
         return Bundles.get("upgrade." + name + ".name");
     }
 
-    public static Upgrade getByID(byte id){
-        return upgrades.get(id);
+    public static <T extends Upgrade> T getByID(byte id){
+        return (T)upgrades.get(id);
     }
 
     public static Array<Upgrade> getAllUpgrades() {

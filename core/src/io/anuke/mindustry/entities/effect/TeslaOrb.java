@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
-import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.entities.enemies.BaseUnit;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
@@ -19,7 +19,7 @@ import static io.anuke.mindustry.Vars.enemyGroup;
 
 public class TeslaOrb extends Entity{
 	private Array<Vector2> points = new Array<>();
-	private ObjectSet<Enemy> hit = new ObjectSet<>();
+	private ObjectSet<BaseUnit> hit = new ObjectSet<>();
 	private int damage = 0;
 	private float range = 0;
 	private float lifetime = 30f;
@@ -47,10 +47,10 @@ public class TeslaOrb extends Entity{
 			Array<SolidEntity> enemies = Entities.getNearby(enemyGroup, curx, cury, range*2f);
 			
 			for(SolidEntity entity : enemies){
-				if(entity != null && entity.distanceTo(curx, cury) < range && !hit.contains((Enemy)entity)){
-					hit.add((Enemy)entity);
+				if(entity != null && entity.distanceTo(curx, cury) < range && !hit.contains((BaseUnit)entity)){
+					hit.add((BaseUnit)entity);
 					points.add(new Vector2(entity.x + Mathf.range(shake), entity.y + Mathf.range(shake)));
-					damageEnemy((Enemy)entity);
+					damageEnemy((BaseUnit)entity);
 					curx = entity.x;
 					cury = entity.y;
 					break;
@@ -63,7 +63,7 @@ public class TeslaOrb extends Entity{
 		}
 	}
 	
-	void damageEnemy(Enemy enemy){
+	void damageEnemy(BaseUnit enemy){
 		enemy.damage(damage);
 		Effects.effect(Fx.laserhit, enemy.x + Mathf.range(2f), enemy.y + Mathf.range(2f));
 	}

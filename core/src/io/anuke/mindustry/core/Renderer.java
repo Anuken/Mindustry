@@ -15,7 +15,7 @@ import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
-import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.entities.enemies.BaseUnit;
 import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.graphics.BlockRenderer;
 import io.anuke.mindustry.graphics.Shaders;
@@ -282,7 +282,7 @@ public class Renderer extends RendererModule{
 		Graphics.surface(indicatorSurface);
 		Draw.color(Color.RED);
 
-		for(Enemy enemy : enemyGroup.all()) {
+		for(BaseUnit enemy : enemyGroup.all()) {
 
 			if (rect.setSize(camera.viewportWidth, camera.viewportHeight).setCenter(camera.position.x, camera.position.y)
 					.overlaps(enemy.hitbox.getRect(enemy.x, enemy.y))) {
@@ -503,7 +503,7 @@ public class Renderer extends RendererModule{
 		if((!debug || showUI) && Settings.getBool("healthbars")){
 
 			//draw entity health bars
-			for(Enemy entity : enemyGroup.all()){
+			for(BaseUnit entity : enemyGroup.all()){
 				drawHealth(entity);
 			}
 

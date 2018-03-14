@@ -3,7 +3,7 @@ package io.anuke.mindustry.entities;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.entities.effect.EMP;
-import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.entities.enemies.BaseUnit;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
@@ -122,7 +122,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			Effects.effect(Fx.shellsmoke, b);
 			Effects.effect(Fx.shellexplosion, b);
 			
-			DamageArea.damage(!(b.owner instanceof Enemy), b.x, b.y, 25f, (int)(damage * 2f/3f));
+			DamageArea.damage(!(b.owner instanceof BaseUnit), b.x, b.y, 25f, (int)(damage * 2f/3f));
 		}
 	},
 	flak = new BulletType(2.9f, 8) {
@@ -202,7 +202,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			Effects.effect(Fx.shellsmoke, b);
 			Effects.effect(Fx.shockwaveSmall, b);
 			
-			DamageArea.damage(!(b.owner instanceof Enemy), b.x, b.y, 50f, (int)(damage * 2f/3f));
+			DamageArea.damage(!(b.owner instanceof BaseUnit), b.x, b.y, 50f, (int)(damage * 2f/3f));
 		}
 	},
 	yellowshell = new BulletType(1.2f, 20){
@@ -233,7 +233,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			Effects.effect(Fx.shellsmoke, b);
 			Effects.effect(Fx.shockwaveSmall, b);
 			
-			DamageArea.damage(!(b.owner instanceof Enemy), b.x, b.y, 25f, (int)(damage * 2f/3f));
+			DamageArea.damage(!(b.owner instanceof BaseUnit), b.x, b.y, 25f, (int)(damage * 2f/3f));
 		}
 	},
 	blast = new BulletType(1.1f, 90){
@@ -371,7 +371,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 
 			Effects.effect(Fx.clusterbomb, b);
 
-			DamageArea.damage(!(b.owner instanceof Enemy), b.x, b.y, 35f, damage);
+			DamageArea.damage(!(b.owner instanceof BaseUnit), b.x, b.y, 35f, damage);
 		}
 	},
     vulcan = new BulletType(4.5f, 12) {

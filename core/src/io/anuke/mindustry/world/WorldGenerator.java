@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.enemies.Enemy;
-import io.anuke.mindustry.entities.enemies.EnemyTypes;
+import io.anuke.mindustry.entities.enemies.BaseUnit;
+import io.anuke.mindustry.entities.enemies.UnitTypes;
 import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.world.ColorMapper.BlockPair;
 import io.anuke.mindustry.world.blocks.Blocks;
@@ -77,7 +77,7 @@ public class WorldGenerator {
 				}
 				
 				if(color == Hue.rgb(Color.PURPLE)){
-					if(!Vars.android) new Enemy(EnemyTypes.target).set(x * tilesize, y * tilesize).add();
+					if(!Vars.android) new BaseUnit(UnitTypes.target).set(x * tilesize, y * tilesize).add();
 					floor = Blocks.stone;
 				}
 				

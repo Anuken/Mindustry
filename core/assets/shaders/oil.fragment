@@ -71,8 +71,8 @@ void main() {
 	        color = old;
 	    }
 	    
-	    float n1 = snoise(coords / 20.0 + vec2(-time) / 340.0);
-	    float n2 = snoise((coords + vec2(632.0)) / 7.0 + vec2(0.0, time) / 310.0);
+	    float n1 = snoise(coords / 22.0 + vec2(-time) / 540.0);
+	    float n2 = snoise((coords + vec2(632.0)) / 8.0 + vec2(0.0, time) / 510.0);
 	    
 	    float r = (n1 + n2) / 2.0;
 	    

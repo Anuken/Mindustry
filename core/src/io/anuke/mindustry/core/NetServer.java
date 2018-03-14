@@ -85,7 +85,7 @@ public class NetServer extends Module{
             player.isAdmin = admins.isAdmin(Net.getConnection(id).address);
             player.clientid = id;
             player.name = packet.name;
-            player.isAndroid = packet.android;
+            player.mech = packet.android ? Mech.standardShip : Mech.standard;
             player.set(world.getSpawnX(), world.getSpawnY());
             player.setNet(player.x, player.y);
             player.setNet(player.x, player.y);
@@ -219,7 +219,7 @@ public class NetServer extends Module{
         Net.handleServer(UpgradePacket.class, (id, packet) -> {
             Player player = connections.get(id);
 
-            Weapon weapon = (Weapon) Upgrade.getByID(packet.id);
+            Weapon weapon = Upgrade.getByID(packet.id);
 
             if (!weapons.containsKey(player.name)) weapons.put(player.name, new ByteArray());
             if (!weapons.get(player.name).contains(weapon.id)) weapons.get(player.name).add(weapon.id);

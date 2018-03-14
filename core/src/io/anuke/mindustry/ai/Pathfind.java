@@ -4,15 +4,14 @@ import com.badlogic.gdx.ai.pfa.PathFinderRequest;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.entities.enemies.BaseUnit;
 import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.world;
 
 public class Pathfind{
 	/**Maximum time taken per frame on pathfinding for a single path.*/
@@ -33,91 +32,9 @@ public class Pathfind{
 	 * If the path is not yet calculated, this returns the enemy's position (i. e. "don't move")
 	 * @param enemy The enemy to find a path for
 	 * @return The position the enemy should move to.*/
-	public Vector2 find(Enemy enemy){
-		//TODO fix -1/-2 node usage
-		if(enemy.node == -1 || enemy.node == -2){
-			findNode(enemy);
-		}
-		
-		if(enemy.node == -2){
-			enemy.node = -1;
-		}
-
-		if(enemy.node < 0 || world.getSpawns().get(enemy.lane).pathTiles == null){
-			return vector.set(enemy.x, enemy.y);
-		}
-
-		Tile[] path = world.getSpawns().get(enemy.lane).pathTiles;
-
-		if(enemy.node >= path.length){
-			enemy.node = -1;
-			return vector.set(enemy.x, enemy.y);
-		}
-		
-		if(enemy.node <= -1){
-			return vector.set(enemy.x, enemy.y);
-		}
-
-		//TODO documentation on what this does
-		Tile prev = path[enemy.node - 1];
-
-		Tile target = path[enemy.node];
-
-		//a bridge has been broken, re-path
-		if(!world.passable(target.x, target.y)){
-			remakePath();
-			return vector.set(enemy.x, enemy.y);
-		}
-		
-		float projectLen = Vector2.dst(prev.worldx(), prev.worldy(), target.worldx(), target.worldy()) / 6f;
-		
-		Vector2 projection = projectPoint(prev.worldx(), prev.worldy(), 
-				target.worldx(), target.worldy(), enemy.x, enemy.y);
-		
-		boolean canProject = true;
-		
-		if(projectLen < 8 || !onLine(projection, prev.worldx(), prev.worldy(), target.worldx(), target.worldy())){
-			canProject = false;
-		}else{
-			projection.add(v1.set(projectLen, 0).rotate(Angles.angle(prev.worldx(), prev.worldy(),
-					target.worldx(), target.worldy())));
-		}
-			
-		float dst = Vector2.dst(enemy.x, enemy.y, target.worldx(), target.worldy());
-		float nlinedist = enemy.node >= path.length - 1 ? 9999 :
-			pointLineDist(path[enemy.node].worldx(), path[enemy.node].worldy(), 
-					path[enemy.node + 1].worldx(), path[enemy.node + 1].worldy(), enemy.x, enemy.y);
-			
-		if(dst < 8 || nlinedist < 8){
-			if(enemy.node <= path.length-2)
-				enemy.node ++;
-				
-			target = path[enemy.node];
-		}
-		
-		if(canProject && projection.dst(enemy.x, enemy.y) < Vector2.dst(target.x, target.y, enemy.x, enemy.y)){
-			vector.set(projection);
-		}else{
-			vector.set(target.worldx(), target.worldy());
-		}
-		
-		//near the core, stop
-		if(enemy.node == path.length - 1){
-			vector.set(target.worldx(), target.worldy());
-		}
-			
-		return vector;
-		
-	}
-
-	/**Re-calculate paths for all enemies. Runs when a path changes while moving.*/
-	private void remakePath(){
-		for(int i = 0; i < enemyGroup.size(); i ++){
-			Enemy enemy = enemyGroup.all().get(i);
-			enemy.node = -1;
-		}
-
-		resetPaths();
+	public Vector2 find(BaseUnit enemy){
+		//TODO!
+		return v1.set(enemy.x, enemy.y);
 	}
 
 	/**Update the pathfinders and continue calculating the path if it hasn't been calculated yet.
@@ -183,28 +100,6 @@ public class Pathfind{
 
 		point.request = new PathFinderRequest<>(point.start, world.getCore(), state.difficulty.heuristic, point.path);
 		point.request.statusChanged = true; //IMPORTANT!
-	}
-
-	/**For an enemy that was just loaded from a save, find the node in the path it should be following.*/
-	void findNode(Enemy enemy){
-		if(enemy.lane >= world.getSpawns().size || enemy.lane < 0){
-			enemy.lane = 0;
-		}
-		
-		if(world.getSpawns().get(enemy.lane).pathTiles == null){
-			return;
-		}
-		
-		Tile[] path = world.getSpawns().get(enemy.lane).pathTiles;
-		
-		int closest = findClosest(path, enemy.x, enemy.y);
-		
-		closest = Mathf.clamp(closest, 1, path.length-1);
-		if(closest == -1){
-			return;
-		}
-
-		enemy.node = closest;
 	}
 
 	/**Finds the closest tile to a position, in an array of tiles.*/

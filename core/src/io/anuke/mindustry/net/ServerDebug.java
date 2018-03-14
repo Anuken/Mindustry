@@ -34,8 +34,8 @@ public class ServerDebug {
             build.append(player.clientid);
             build.append(" / player '");
             build.append(player.name);
-            build.append(" android: ");
-            build.append(player.isAndroid);
+            build.append(" mech: ");
+            build.append(player.mech);
             build.append("'\n");
 
             for(Class<?> type : map.orderedKeys()){

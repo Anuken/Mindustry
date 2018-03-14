@@ -2,25 +2,19 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.mindustry.game.EnemySpawn;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.game.EventType.PlayEvent;
 import io.anuke.mindustry.game.EventType.ResetEvent;
 import io.anuke.mindustry.game.EventType.WaveEvent;
-import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.game.WaveCreator;
-import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
-import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -73,30 +67,7 @@ public class Logic extends Module {
         }
 
         for(EnemySpawn spawn : spawns){
-            Array<SpawnPoint> spawns = world.getSpawns();
-
-            for(int lane = 0; lane < spawns.size; lane ++){
-                int fl = lane;
-                Tile tile = spawns.get(lane).start;
-                int spawnamount = spawn.evaluate(state.wave, lane);
-
-                for(int i = 0; i < spawnamount; i ++){
-                    float range = 12f;
-
-                    Timers.runTask(i*5f, () -> {
-
-                        Enemy enemy = new Enemy(spawn.type);
-                        enemy.set(tile.worldx() + Mathf.range(range), tile.worldy() + Mathf.range(range));
-                        enemy.lane = fl;
-                        enemy.tier = spawn.tier(state.wave, fl);
-                        enemy.add();
-
-                        Effects.effect(Fx.spawn, enemy);
-
-                        state.enemies ++;
-                    });
-                }
-            }
+            //TODO spawn enemies for that spawnpoint
         }
 
         state.wave ++;

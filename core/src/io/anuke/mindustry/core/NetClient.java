@@ -9,7 +9,7 @@ import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
-import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.entities.enemies.BaseUnit;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
@@ -139,7 +139,7 @@ public class NetClient extends Module {
                 SyncEntity entity = (SyncEntity) group.getByID(id);
 
                 if(entity instanceof Player) players ++;
-                if(entity instanceof Enemy) enemies ++;
+                if(entity instanceof BaseUnit) enemies ++;
 
                 if (entity == null || id == player.id) {
                     if (id != player.id) {
@@ -199,7 +199,7 @@ public class NetClient extends Module {
         });
 
         Net.handleClient(EnemyDeathPacket.class, packet -> {
-            Enemy enemy = enemyGroup.getByID(packet.id);
+            BaseUnit enemy = enemyGroup.getByID(packet.id);
             if (enemy != null){
                 enemy.type.onDeath(enemy, true);
             }else if(recent.get(packet.id) != null){

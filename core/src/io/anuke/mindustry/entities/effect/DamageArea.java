@@ -45,7 +45,7 @@ public class DamageArea{
 		rect.height += expand*2;
 
         Consumer<SolidEntity> cons = e -> {
-            if(e == owner || (e instanceof  Player && ((Player)e).isAndroid)) return;
+            if(e == owner) return;
             DestructibleEntity enemy = (DestructibleEntity) e;
             Rectangle other = enemy.hitbox.getRect(enemy.x, enemy.y);
             other.y -= expand;
@@ -69,7 +69,7 @@ public class DamageArea{
 		damage(true, x, y, radius, damage);
 
 		for(Player player : playerGroup.all()){
-			if(player.isAndroid) continue;
+			//if(player.isAndroid) continue;
 			int amount = calculateDamage(x, y, player.x, player.y, radius, damage);
 			player.damage(amount);
 		}
@@ -78,7 +78,7 @@ public class DamageArea{
 	public static void damage(boolean enemies, float x, float y, float radius, int damage){
 		Consumer<SolidEntity> cons = entity -> {
 			DestructibleEntity enemy = (DestructibleEntity)entity;
-			if(enemy.distanceTo(x, y) > radius || (entity instanceof Player && ((Player)entity).isAndroid)){
+			if(enemy.distanceTo(x, y) > radius){
 				return;
 			}
 			int amount = calculateDamage(x, y, enemy.x, enemy.y, radius, damage);

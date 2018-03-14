@@ -17,6 +17,7 @@ import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.io.Saves;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.Mech;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.UCore;
@@ -132,7 +133,7 @@ public class Control extends Module{
 
 		player = new Player();
 		player.name = Settings.getString("name");
-		player.isAndroid = android;
+		player.mech = android ? Mech.standardShip : Mech.standard;
 		player.color.set(Settings.getInt("color"));
 		player.isLocal = true;
 

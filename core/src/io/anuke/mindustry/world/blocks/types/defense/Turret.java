@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.entities.enemies.BaseUnit;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.*;
@@ -131,8 +131,8 @@ public class Turret extends Block{
 		if(hasAmmo(tile) || (debug && infiniteAmmo)){
 			
 			if(entity.timer.get(timerTarget, targetInterval)){
-				entity.target = (Enemy)Entities.getClosest(enemyGroup,
-						tile.worldx(), tile.worldy(), range, e-> e instanceof Enemy && !((Enemy)e).isDead());
+				entity.target = (BaseUnit)Entities.getClosest(enemyGroup,
+						tile.worldx(), tile.worldy(), range, e-> e instanceof BaseUnit && !((BaseUnit)e).isDead());
 			}
 			
 			if(entity.target != null){
@@ -240,7 +240,7 @@ public class Turret extends Block{
 		public TileEntity blockTarget;
 		public int ammo;
 		public float rotation = 90;
-		public Enemy target;
+		public BaseUnit target;
 		
 		@Override
 		public void write(DataOutputStream stream) throws IOException{

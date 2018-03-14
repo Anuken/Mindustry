@@ -180,7 +180,7 @@ public class ProductionBlocks{
 		{
 			resource = Blocks.uranium;
 			result = Item.uranium;
-			drillTime = 540;
+			drillTime = 600;
 		}
 	},
 	

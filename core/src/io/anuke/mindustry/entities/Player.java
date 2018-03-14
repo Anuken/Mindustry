@@ -23,17 +23,14 @@ import java.nio.ByteBuffer;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Player extends SyncEntity{
+public class Player extends Unit{
 	static final float speed = 1.1f;
 	static final float dashSpeed = 1.8f;
 
 	static final int timerDash = 0;
-	static final int timerShootLeft = 1;
-	static final int timerShootRight = 2;
 	static final int timerRegen = 3;
 
 	public String name = "name";
-	public boolean isAndroid;
 	public boolean isAdmin;
 	public Color color = new Color();
 
@@ -61,8 +58,13 @@ public class Player extends SyncEntity{
 	}
 
 	@Override
+	public float getMass(){
+	    return mech.mass;
+    }
+
+	@Override
 	public void damage(int amount){
-		if(debug || isAndroid) return;
+		if(debug || mech.flying) return;
 
 		health -= amount;
 		if(health <= 0 && !dead && isLocal){ //remote players don't die normally
@@ -79,7 +81,7 @@ public class Player extends SyncEntity{
 				return false;
 			}
 		}
-		return !isDead() && super.collides(other) && !isAndroid;
+		return !isDead() && super.collides(other) && !mech.flying;
 	}
 	
 	@Override
@@ -113,34 +115,33 @@ public class Player extends SyncEntity{
 	
 	@Override
 	public void drawSmooth(){
-		if((debug && (!showPlayer || !showUI)) || (isAndroid && isLocal) || dead) return;
+		if((debug && (!showPlayer || !showUI)) || dead) return;
         boolean snap = snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate") && isLocal;
 
-		String part = isAndroid ? "ship" : "mech";
+        String mname = "mech-" + mech.name;
 
 		Shaders.outline.color.set(getColor());
 		Shaders.outline.lighten = 0f;
-		Shaders.outline.region = Draw.region(part + "-" + mech.name);
+		Shaders.outline.region = Draw.region(mname);
 
 		Shaders.outline.apply();
 
-		if(!isAndroid) {
-			for (int i : Mathf.signs) {
-				Weapon weapon = i < 0 ? weaponLeft : weaponRight;
-				tr.trns(angle - 90, 3*i, 2);
-				float w = i > 0 ? -8 : 8;
-				if(snap){
-					Draw.rect(weapon.name + "-equip", (int)x + tr.x, (int)y + tr.y, w, 8, angle - 90);
-				}else{
-					Draw.rect(weapon.name + "-equip", x + tr.x, y + tr.y, w, 8, angle - 90);
-				}
+		for (int i : Mathf.signs) {
+			Weapon weapon = i < 0 ? weaponLeft : weaponRight;
+			tr.trns(rotation - 90, 3*i, 2);
+			float w = i > 0 ? -8 : 8;
+			if(snap){
+				Draw.rect(weapon.name + "-equip", (int)x + tr.x, (int)y + tr.y, w, 8, rotation - 90);
+			}else{
+				Draw.rect(weapon.name + "-equip", x + tr.x, y + tr.y, w, 8, rotation - 90);
 			}
 		}
 
+
 		if(snap){
-			Draw.rect(part + "-" + mech.name, (int)x, (int)y, angle-90);
+			Draw.rect(mname, (int)x, (int)y, rotation -90);
 		}else{
-			Draw.rect(part + "-" + mech.name, x, y, angle-90);
+			Draw.rect(mname, x, y, rotation -90);
 		}
 
 		Graphics.flush();
@@ -148,15 +149,24 @@ public class Player extends SyncEntity{
 	
 	@Override
 	public void update(){
-		if(!isLocal || isAndroid){
-			if(isAndroid && isLocal){
-				angle = Mathf.slerpDelta(angle, targetAngle, 0.2f);
-			}
-			if(!isLocal) interpolate();
+		if(!isLocal){
+			interpolate();
 			return;
 		}
 
 		if(isDead()) return;
+
+		if(mech.flying){
+			updateFlying();
+		}else{
+			updateMech();
+		}
+
+		x = Mathf.clamp(x, 0, world.width() * tilesize);
+		y = Mathf.clamp(y, 0, world.height() * tilesize);
+	}
+
+	protected void updateMech(){
 
 		Tile tile = world.tileWorld(x, y);
 
@@ -175,14 +185,14 @@ public class Player extends SyncEntity{
 		if(ui.chatfrag.chatOpen()) return;
 
 		dashing = Inputs.keyDown("dash");
-		
+
 		float speed = dashing ? (debug ? Player.dashSpeed * 5f : Player.dashSpeed) : Player.speed;
-		
+
 		if(health < maxhealth && timer.get(timerRegen, 20))
 			health ++;
 
 		health = Mathf.clamp(health, -1, maxhealth);
-		
+
 		movement.set(0, 0);
 
 		float xa = Inputs.getAxis("move_x");
@@ -192,7 +202,7 @@ public class Player extends SyncEntity{
 
 		movement.y += ya*speed;
 		movement.x += xa*speed;
-		
+
 		boolean shooting = !Inputs.keyDown("dash") && Inputs.keyDown("shoot") && control.input().recipe == null
 				&& !ui.hasMouse() && !control.input().onConfigurable();
 
@@ -200,30 +210,31 @@ public class Player extends SyncEntity{
 			weaponLeft.update(player, true);
 			weaponRight.update(player, false);
 		}
-		
+
 		if(dashing && timer.get(timerDash, 3) && movement.len() > 0){
-			Effects.effect(Fx.dashsmoke, x + Angles.trnsx(angle + 180f, 3f), y + Angles.trnsy(angle + 180f, 3f));
+			Effects.effect(Fx.dashsmoke, x + Angles.trnsx(rotation + 180f, 3f), y + Angles.trnsy(rotation + 180f, 3f));
 		}
-		
+
 		movement.limit(speed);
-		
+
 		if(!noclip){
 			move(movement.x*Timers.delta(), movement.y*Timers.delta());
 		}else{
 			x += movement.x*Timers.delta();
 			y += movement.y*Timers.delta();
 		}
-		
+
 		if(!shooting){
 			if(!movement.isZero())
-				angle = Mathf.slerpDelta(angle, movement.angle(), 0.13f);
+				rotation = Mathf.slerpDelta(rotation, movement.angle(), 0.13f);
 		}else{
 			float angle = Angles.mouseAngle(x, y);
-			this.angle = Mathf.slerpDelta(this.angle, angle, 0.1f);
+			this.rotation = Mathf.slerpDelta(this.rotation, angle, 0.1f);
 		}
+	}
 
-		x = Mathf.clamp(x, 0, world.width() * tilesize);
-		y = Mathf.clamp(y, 0, world.height() * tilesize);
+	protected void updateFlying(){
+		rotation = Mathf.slerpDelta(rotation, targetAngle, 0.2f);
 	}
 
 	@Override
@@ -233,7 +244,7 @@ public class Player extends SyncEntity{
 
     @Override
     public String toString() {
-        return "Player{" + id + ", android=" + isAndroid + ", local=" + isLocal + ", " + x + ", " + y + "}\n";
+        return "Player{" + id + ", mech=" + mech.name + ", local=" + isLocal + ", " + x + ", " + y + "}\n";
     }
 
 	@Override
@@ -242,7 +253,7 @@ public class Player extends SyncEntity{
 		buffer.put(name.getBytes());
 		buffer.put(weaponLeft.id);
 		buffer.put(weaponRight.id);
-		buffer.put(isAndroid ? 1 : (byte)0);
+		buffer.put(mech.id);
 		buffer.put(isAdmin ? 1 : (byte)0);
 		buffer.putInt(Color.rgba8888(color));
 		buffer.putFloat(x);
@@ -255,9 +266,9 @@ public class Player extends SyncEntity{
 		byte[] n = new byte[nlength];
 		buffer.get(n);
 		name = new String(n);
-		weaponLeft = (Weapon) Upgrade.getByID(buffer.get());
-		weaponRight = (Weapon) Upgrade.getByID(buffer.get());
-		isAndroid = buffer.get() == 1;
+		weaponLeft = Upgrade.getByID(buffer.get());
+		weaponRight = Upgrade.getByID(buffer.get());
+		mech = Upgrade.getByID(buffer.get());
 		isAdmin = buffer.get() == 1;
 		color.set(buffer.getInt());
 		x = buffer.getFloat();
@@ -274,7 +285,7 @@ public class Player extends SyncEntity{
 			data.putFloat(interpolator.target.x);
 			data.putFloat(interpolator.target.y);
 		}
-		data.putFloat(angle);
+		data.putFloat(rotation);
 		data.putShort((short)health);
 		data.put((byte)(dashing ? 1 : 0));
 	}
@@ -299,10 +310,10 @@ public class Player extends SyncEntity{
 
 		Interpolator i = interpolator;
 
-		float tx = x + Angles.trnsx(angle + 180f, 4f);
-		float ty = y + Angles.trnsy(angle + 180f, 4f);
+		float tx = x + Angles.trnsx(rotation + 180f, 4f);
+		float ty = y + Angles.trnsy(rotation + 180f, 4f);
 
-		if(isAndroid && i.target.dst(i.last) > 2f && timer.get(timerDash, 1)){
+		if(mech.flying && i.target.dst(i.last) > 2f && timer.get(timerDash, 1)){
 			Effects.effect(Fx.dashsmoke, tx, ty);
 		}
 

@@ -3,8 +3,8 @@ package io.anuke.mindustry.ui.fragments;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.enemies.Enemy;
-import io.anuke.mindustry.entities.enemies.EnemyTypes;
+import io.anuke.mindustry.entities.enemies.BaseUnit;
+import io.anuke.mindustry.entities.enemies.UnitTypes;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.builders.button;
@@ -67,7 +67,7 @@ public class DebugFragment implements Fragment {
                });
                row();
                new button("spawn", () -> {
-                   new Enemy(EnemyTypes.healer).set(player.x, player.y).add();
+                   new BaseUnit(UnitTypes.healer).set(player.x, player.y).add();
                });
                row();
            }}.end();
@@ -163,8 +163,8 @@ public class DebugFragment implements Fragment {
             result.append(", ");
             result.append(player.y);
             result.append("\n");
-            result.append("   android: ");
-            result.append(player.isAndroid);
+            result.append("   mech: ");
+            result.append(player.mech);
             result.append("\n");
             result.append("   local: ");
             result.append(player.isLocal);

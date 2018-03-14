@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.modules.InventoryModule;
 import io.anuke.mindustry.world.blocks.types.modules.LiquidModule;
@@ -25,6 +26,7 @@ public class Tile{
 	private byte rotation;
 	private byte dump;
 	private byte extra;
+	private byte team;
 	/**The coordinates of the core tile this is linked to, in the form of two bytes packed into one.
 	 * This is relative to the block it is linked to; negate coords to find the link.*/
 	public byte link = 0;
@@ -124,6 +126,15 @@ public class Tile{
 	
 	public Block block(){
 		return Block.getByID(getWallID());
+	}
+
+	//TODO save team
+	public Team getTeam(){
+		return Team.values()[team];
+	}
+
+	public void setTeam(Team team){
+		this.team = (byte)team.ordinal();
 	}
 	
 	/**Returns the breaktime of the block, <i>or</i> the breaktime of the linked block, if this tile is linked.*/

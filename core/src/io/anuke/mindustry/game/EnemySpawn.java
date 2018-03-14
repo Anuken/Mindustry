@@ -1,13 +1,13 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.mindustry.entities.enemies.EnemyType;
+import io.anuke.mindustry.entities.enemies.UnitType;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.state;
 
 public class EnemySpawn{
 	/**The enemy type spawned*/
-	public final EnemyType type;
+	public final UnitType type;
 	/**When this spawns should end*/
 	protected int before = Integer.MAX_VALUE;
 	/**When this spawns should start*/
@@ -27,7 +27,7 @@ public class EnemySpawn{
 	/**Amount of enemies spawned initially, with no scaling*/
 	protected int amount = 1;
 	
-	public EnemySpawn(EnemyType type){
+	public EnemySpawn(UnitType type){
 		this.type = type;
 	}
 	
@@ -41,6 +41,6 @@ public class EnemySpawn{
 	}
 	
 	public int tier(int wave, int lane){
-		return Mathf.clamp(tier + (wave-after)/tierscale, 1, EnemyType.maxtier);
+		return Mathf.clamp(tier + (wave-after)/tierscale, 1, UnitType.maxtier);
 	}
 }

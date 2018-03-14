@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities.effect;
 
 import com.badlogic.gdx.math.Interpolation;
-import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.entities.enemies.BaseUnit;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.defense.ShieldBlock;
 import io.anuke.ucore.core.Timers;
@@ -55,7 +55,7 @@ public class Shield extends Entity{
 		
 		Entities.getNearby(bulletGroup, x, y, block.shieldRadius * 2*uptime + 10, entity->{
 			BulletEntity bullet = (BulletEntity)entity;
-			if((bullet.owner instanceof Enemy || hitPlayers)){
+			if((bullet.owner instanceof BaseUnit || hitPlayers)){
 				
 				float dst =  entity.distanceTo(this);
 				

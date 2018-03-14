@@ -1,6 +1,6 @@
 package io.anuke.mindustry.entities;
 
-import io.anuke.mindustry.entities.enemies.Enemy;
+import io.anuke.mindustry.entities.enemies.BaseUnit;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.BulletEntity;
 import io.anuke.ucore.entities.Entity;
@@ -37,7 +37,7 @@ public class Bullet extends BulletEntity{
 	}
 
 	public boolean collidesTiles(){
-		return owner instanceof Enemy;
+		return owner instanceof BaseUnit;
 	}
 	
 	@Override

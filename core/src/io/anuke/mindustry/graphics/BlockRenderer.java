@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Layer;
@@ -86,10 +85,7 @@ public class BlockRenderer{
 					}
 					
 					if(!(block instanceof StaticBlock)){
-						if(block == Blocks.air){
-							if(!state.is(State.paused)) tile.floor().update(tile);
-						}else{
-						
+						if(block != Blocks.air){
 							if(!expanded){
 								addRequest(tile, Layer.block);
 							}

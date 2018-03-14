@@ -3,8 +3,8 @@ package io.anuke.mindustry.io.versions;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
-import io.anuke.mindustry.entities.enemies.Enemy;
-import io.anuke.mindustry.entities.enemies.EnemyType;
+import io.anuke.mindustry.entities.enemies.BaseUnit;
+import io.anuke.mindustry.entities.enemies.UnitType;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.io.SaveFileVersion;
@@ -120,7 +120,7 @@ public class Save16 extends SaveFileVersion {
 
         int enemies = stream.readInt();
 
-        Array<Enemy> enemiesToUpdate = new Array<>();
+        Array<BaseUnit> enemiesToUpdate = new Array<>();
 
         for(int i = 0; i < enemies; i ++){
             byte type = stream.readByte();
@@ -131,7 +131,7 @@ public class Save16 extends SaveFileVersion {
             int health = stream.readShort();
 
             try{
-                Enemy enemy = new Enemy(EnemyType.getByID(type));
+                BaseUnit enemy = new BaseUnit(UnitType.getByID(type));
                 enemy.lane = lane;
                 enemy.health = health;
                 enemy.x = x;
@@ -158,7 +158,7 @@ public class Save16 extends SaveFileVersion {
         world.loadMap(world.maps().getMap(mapid), seed);
         if(!headless) renderer.clearTiles();
 
-        for(Enemy enemy : enemiesToUpdate){
+        for(BaseUnit enemy : enemiesToUpdate){
             enemy.node = -2;
         }
 
@@ -278,12 +278,12 @@ public class Save16 extends SaveFileVersion {
 
         //--ENEMIES--
 
-        EntityContainer<Enemy> enemies = enemyGroup.all();
+        EntityContainer<BaseUnit> enemies = enemyGroup.all();
 
         stream.writeInt(enemies.size()); //enemy amount
 
         for(int i = 0; i < enemies.size(); i ++){
-            Enemy enemy = enemies.get(i);
+            BaseUnit enemy = enemies.get(i);
             stream.writeByte(enemy.type.id); //type
             stream.writeByte(enemy.lane); //lane
             stream.writeFloat(enemy.x); //x

@@ -3,9 +3,7 @@ package io.anuke.mindustry.entities;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.TimeUtils;
-import io.anuke.mindustry.entities.enemies.Enemy;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.util.Mathf;
@@ -14,24 +12,13 @@ import java.nio.ByteBuffer;
 
 import static io.anuke.mindustry.Vars.threads;
 
+/**Base class for any entity that needs to be synced across clients.*/
 public abstract class SyncEntity extends DestructibleEntity{
-    private static ObjectIntMap<Class<? extends SyncEntity>> writeSizes = new ObjectIntMap<>();
-
     protected transient Interpolator interpolator = new Interpolator();
-
-    //smoothed position/angle
+    /**smoothed position and rotation*/
     private Vector3 spos = new Vector3();
-
-    public float angle;
-
-    static{
-        setWriteSize(Enemy.class, 4 + 4 + 2 + 2);
-        setWriteSize(Player.class, 4 + 4 + 4 + 2 + 1);
-    }
-
-    public static boolean isSmoothing(){
-        return threads.isEnabled() && threads.getFPS() <= Gdx.graphics.getFramesPerSecond() / 2f;
-    }
+    /**the general rotation.*/
+    public float rotation;
 
     public abstract void writeSpawn(ByteBuffer data);
     public abstract void readSpawn(ByteBuffer data);
@@ -39,56 +26,47 @@ public abstract class SyncEntity extends DestructibleEntity{
     public abstract void write(ByteBuffer data);
     public abstract void read(ByteBuffer data, long time);
 
+    /**Interpolate everything needed. Should be called in update() for non-local entities.*/
     public void interpolate(){
         interpolator.update();
 
         x = interpolator.pos.x;
         y = interpolator.pos.y;
-        angle = interpolator.angle;
+        rotation = interpolator.rotation;
     }
 
+    /**Same as draw, but for interpolated drawing at low tick speeds.*/
+    public abstract void drawSmooth();
+
+    /**Do not override, use drawSmooth instead.*/
     @Override
     public final void draw(){
-        final float x = this.x, y = this.y, angle = this.angle;
+        final float x = this.x, y = this.y, rotation = this.rotation;
 
         //interpolates data at low tick speeds.
         if(isSmoothing()){
             if(Vector2.dst(spos.x, spos.y, x, y) > 128){
-                spos.set(x, y, angle);
+                spos.set(x, y, rotation);
             }
 
             this.x = spos.x = Mathf.lerpDelta(spos.x, x, 0.2f);
             this.y = spos.y = Mathf.lerpDelta(spos.y, y, 0.2f);
-            this.angle = spos.z = Mathf.slerpDelta(spos.z, angle, 0.3f);
+            this.rotation = spos.z = Mathf.slerpDelta(spos.z, rotation, 0.3f);
         }
 
         drawSmooth();
 
         this.x = x;
         this.y = y;
-        this.angle = angle;
+        this.rotation = rotation;
     }
 
+    /**Returns smoothed position. x = x, y = y, z = rotation.*/
     public Vector3 getDrawPosition(){
-        return isSmoothing() ? spos : spos.set(x, y, angle);
+        return isSmoothing() ? spos : spos.set(x, y, rotation);
     }
 
-    public void drawSmooth(){}
-
-    public int getWriteSize(){
-        return getWriteSize(getClass());
-    }
-
-    public static int getWriteSize(Class<? extends SyncEntity> type){
-        int i = writeSizes.get(type, -1);
-        if(i == -1) throw new RuntimeException("Write size for class \"" + type + "\" is not defined!");
-        return i;
-    }
-
-    protected static void setWriteSize(Class<? extends SyncEntity> type, int size){
-        writeSizes.put(type, size);
-    }
-
+    /**Set position and interpolator position.*/
     public <T extends SyncEntity> T setNet(float x, float y){
         set(x, y);
         interpolator.target.set(x, y);
@@ -96,6 +74,10 @@ public abstract class SyncEntity extends DestructibleEntity{
         interpolator.spacing = 1f;
         interpolator.time = 0f;
         return (T)this;
+    }
+
+    private static boolean isSmoothing(){
+        return threads.isEnabled() && threads.getFPS() <= Gdx.graphics.getFramesPerSecond() / 2f;
     }
 
     public static class Interpolator {
@@ -108,7 +90,7 @@ public abstract class SyncEntity extends DestructibleEntity{
 
         //current state
         public Vector2 pos = new Vector2();
-        public float angle;
+        public float rotation;
 
         public void read(float cx, float cy, float x, float y, float angle, long sent){
             targetrot = angle;
@@ -124,7 +106,7 @@ public abstract class SyncEntity extends DestructibleEntity{
 
             Mathf.lerp2(pos.set(last), target, time);
 
-            angle = Mathf.slerpDelta(angle, targetrot, 0.6f);
+            rotation = Mathf.slerpDelta(rotation, targetrot, 0.6f);
 
             if(target.dst(pos) > 128){
                 pos.set(target);
