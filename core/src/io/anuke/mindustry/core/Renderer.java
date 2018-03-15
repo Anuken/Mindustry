@@ -408,7 +408,8 @@ public class Renderer extends RendererModule{
 		if((input.recipe != null && state.inventory.hasItems(input.recipe.requirements) && (!ui.hasMouse() || android)
 				&& control.input().drawPlace())){
 
-			input.placeMode.draw(control.input().getBlockX(), control.input().getBlockY(), control.input().getBlockEndX(), control.input().getBlockEndY());
+			input.placeMode.draw(control.input().getBlockX(), control.input().getBlockY(),
+					control.input().getBlockEndX(), control.input().getBlockEndY());
 
 			Lines.stroke(1f);
 			Draw.color(Color.SCARLET);
@@ -424,9 +425,15 @@ public class Renderer extends RendererModule{
 			if(input.breakMode == PlaceMode.holdDelete)
 				input.breakMode.draw(tilex, tiley, 0, 0);
 			
-		}else if(input.breakMode.delete && control.input().drawPlace() && input.recipe == null){
-			input.breakMode.draw(control.input().getBlockX(), control.input().getBlockY(),
-					control.input().getBlockEndX(), control.input().getBlockEndY());
+		}else if(input.breakMode.delete && control.input().drawPlace()
+				&& (input.recipe == null || !state.inventory.hasItems(input.recipe.requirements))
+				&& (input.placeMode.delete || input.breakMode.both)){
+
+            if(input.breakMode == PlaceMode.holdDelete)
+                input.breakMode.draw(tilex, tiley, 0, 0);
+            else
+				input.breakMode.draw(control.input().getBlockX(), control.input().getBlockY(),
+						control.input().getBlockEndX(), control.input().getBlockEndY());
 		}
 
 		if(ui.toolfrag.confirming){

@@ -47,7 +47,7 @@ public class GestureHandler extends GestureAdapter{
 		if(control.showCursor() && !Inputs.keyDown("select")) return false;
 
 		if(!control.showCursor() && !(control.input().recipe != null
-				&& state.inventory.hasItems(control.input().recipe.requirements) && control.input().placeMode.lockCamera) &&
+				&& control.input().placeMode.lockCamera) &&
 				!(control.input().recipe == null && control.input().breakMode.lockCamera)){
 			float dx = deltaX*Core.camera.zoom/Core.cameraScale, dy = deltaY*Core.camera.zoom/Core.cameraScale;
 			player.x -= dx;

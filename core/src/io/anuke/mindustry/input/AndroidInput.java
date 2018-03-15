@@ -20,9 +20,9 @@ public class AndroidInput extends InputHandler{
 	public float lmousex, lmousey;
 	public float mousex, mousey;
 	public boolean brokeBlock = false;
+	public boolean placing = false;
 	
 	private boolean enableHold = false;
-	private boolean placing = false;
 	private float warmup;
 	private float warmupDelay = 20;
 	
@@ -48,6 +48,7 @@ public class AndroidInput extends InputHandler{
 		}else if(pointer == 0 && !breakMode.pan && breaking() && drawPlace()){
 			breakMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
 		}
+
 		placing = false;
 		return false;
 	}
