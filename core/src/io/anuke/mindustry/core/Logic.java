@@ -14,6 +14,7 @@ import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
 
 import static io.anuke.mindustry.Vars.*;
@@ -115,12 +116,17 @@ public class Logic extends Module {
 
                 Entities.update(Entities.defaultGroup());
                 Entities.update(bulletGroup);
-                Entities.update(enemyGroup);
+                for(EntityGroup group : unitGroups){
+                    if(!group.isEmpty()) Entities.update(group);
+                }
                 Entities.update(tileGroup);
                 Entities.update(shieldGroup);
                 Entities.update(playerGroup);
 
-                Entities.collideGroups(bulletGroup, enemyGroup);
+                for(EntityGroup group : unitGroups){
+                    if(!group.isEmpty()) Entities.collideGroups(bulletGroup, group);
+                }
+
                 Entities.collideGroups(bulletGroup, playerGroup);
             }
         }

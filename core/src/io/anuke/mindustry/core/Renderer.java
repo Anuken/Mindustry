@@ -17,6 +17,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.SpawnPoint;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.BlockRenderer;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.InputHandler;
@@ -29,11 +30,11 @@ import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.graphics.*;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
@@ -182,18 +183,12 @@ public class Renderer extends RendererModule{
 		blocks.processBlocks();
 		blocks.drawBlocks(false);
 
-		Graphics.shader(Shaders.outline, false);
-		Entities.draw(enemyGroup);
-		Graphics.shader();
-		Entities.draw(playerGroup, p -> !p.mech.flying);
-
+		drawAllTeams(false);
 		Entities.draw(Entities.defaultGroup());
 
 		blocks.drawBlocks(true);
 
-		Graphics.shader(Shaders.outline, false);
-		Entities.draw(playerGroup, p -> p.mech.flying);
-		Graphics.shader();
+		drawAllTeams(true);
 
 		Entities.draw(bulletGroup);
         Entities.draw(effectGroup);
@@ -212,6 +207,24 @@ public class Renderer extends RendererModule{
 		drawPlayerNames();
 		
 		batch.end();
+	}
+
+	private void drawAllTeams(boolean flying){
+		for(Team team : Team.values()){
+			EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
+			if(group.all().size() < 0) continue;
+
+			Shaders.outline.color.set(team.color);
+
+			Graphics.beginShaders(Shaders.outline);
+			drawTeam(team, flying);
+			Graphics.endShaders();
+		}
+	}
+
+	private void drawTeam(Team team, boolean flying){
+		Entities.draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying);
+		Entities.draw(playerGroup, p -> p.isFlying() == flying && p.team == team);
 	}
 
 	@Override
@@ -278,7 +291,9 @@ public class Renderer extends RendererModule{
         Draw.tscl(fontscale);
     }
 
+    //TODO implement
 	void drawEnemyMarkers(){
+		/*
 		Graphics.surface(indicatorSurface);
 		Draw.color(Color.RED);
 
@@ -298,7 +313,7 @@ public class Renderer extends RendererModule{
 		Draw.color();
 		Draw.alpha(0.4f);
 		Graphics.flushSurface();
-		Draw.color();
+		Draw.color();*/
 	}
 
 	void drawShield(){
@@ -499,7 +514,10 @@ public class Renderer extends RendererModule{
 				target.block().drawSelect(target);
 			}
 		}
-		
+
+		//TODO draw health bars
+
+		/*
 		if((!debug || showUI) && Settings.getBool("healthbars")){
 
 			//draw entity health bars
@@ -510,7 +528,7 @@ public class Renderer extends RendererModule{
 			for(Player player : playerGroup.all()){
 				if(!player.isDead()) drawHealth(player);
 			}
-		}
+		}*/
 	}
 
 	void drawHealth(SyncEntity dest){

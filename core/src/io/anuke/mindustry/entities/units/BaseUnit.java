@@ -8,7 +8,7 @@ import io.anuke.ucore.util.Timer;
 
 import java.nio.ByteBuffer;
 
-import static io.anuke.mindustry.Vars.enemyGroup;
+import static io.anuke.mindustry.Vars.unitGroups;
 
 public class BaseUnit extends Unit {
 	public UnitType type;
@@ -25,6 +25,11 @@ public class BaseUnit extends Unit {
 	@Override
 	public float getMass() {
 		return type.mass;
+	}
+
+	@Override
+	public boolean isFlying() {
+		return type.isFlying;
 	}
 
 	@Override
@@ -76,7 +81,7 @@ public class BaseUnit extends Unit {
 	
 	@Override
 	public BaseUnit add(){
-		return add(enemyGroup);
+		return add(unitGroups[team.ordinal()]);
 	}
 
 	@Override

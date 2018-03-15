@@ -20,7 +20,6 @@ public class Shaders{
 
 	public static class Outline extends Shader{
 		public Color color = new Color();
-		public float lighten = 0f;
 
 		public Outline(){
 			super("outline", "default");
@@ -29,7 +28,6 @@ public class Shaders{
 		@Override
 		public void apply(){
 			shader.setUniformf("u_color", color);
-			shader.setUniformf("u_lighten", lighten);
 			shader.setUniformf("u_texsize", vec.set(region.getTexture().getWidth(), region.getTexture().getHeight()));
 		}
 	}

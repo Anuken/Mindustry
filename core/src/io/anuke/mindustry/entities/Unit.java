@@ -12,4 +12,5 @@ public abstract class Unit extends SyncEntity {
     public float hitTime;
 
     public abstract float getMass();
+    public abstract boolean isFlying();
 }

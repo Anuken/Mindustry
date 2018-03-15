@@ -10,6 +10,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Shield;
 import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.ClientDebug;
 import io.anuke.mindustry.net.ServerDebug;
@@ -136,9 +137,15 @@ public class Vars{
 	public static Player player;
 
 	public static final EntityGroup<Player> playerGroup = Entities.addGroup(Player.class).enableMapping();
-	public static final EntityGroup<BaseUnit> enemyGroup = Entities.addGroup(BaseUnit.class).enableMapping();
 	public static final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);
 	public static final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
 	public static final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class, false);
 	public static final EntityGroup<EffectEntity> effectGroup = Entities.addGroup(EffectEntity.class, false);
+	public static final EntityGroup<BaseUnit>[] unitGroups = new EntityGroup[Team.values().length];
+
+	static{
+		for(Team team : Team.values()){
+			unitGroups[team.ordinal()] = Entities.addGroup(BaseUnit.class).enableMapping();
+		}
+	}
 }

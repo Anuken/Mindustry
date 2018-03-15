@@ -3,7 +3,6 @@ package io.anuke.mindustry.entities;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.graphics.Fx;
-import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.Mech;
@@ -63,9 +62,15 @@ public class Player extends Unit{
 	    return mech.mass;
     }
 
+    @Override
+	public boolean isFlying(){
+		return mech.flying;
+	}
+
 	@Override
 	public void damage(int amount){
 		if(debug || mech.flying) return;
+		hitTime = hitDuration;
 
 		health -= amount;
 		if(health <= 0 && !dead && isLocal){ //remote players don't die normally
@@ -118,14 +123,9 @@ public class Player extends Unit{
 	public void drawSmooth(){
 		if((debug && (!showPlayer || !showUI)) || dead) return;
 
-		Graphics.beginShaders(Shaders.outline);
-
         boolean snap = snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate") && isLocal;
 
         String mname = mech.name;
-
-		Shaders.outline.color.set(getColor());
-		Shaders.outline.lighten = 0f;
 
 		float px = x, py =y;
 
@@ -135,6 +135,8 @@ public class Player extends Unit{
 		}
 
 		float ft = Mathf.sin(walktime, 6f, 2f);
+
+		Draw.alpha(hitTime / hitDuration);
 
 		for(int i : Mathf.signs){
 			tr.trns(footRotation, ft * i);
@@ -152,8 +154,7 @@ public class Player extends Unit{
 			Draw.rect(weapon.name + "-equip", x + tr.x, y + tr.y, w, 8, rotation - 90);
 		}
 
-
-		Graphics.endShaders();
+		Draw.alpha(1f);
 
 		x = px;
 		y = py;
@@ -161,6 +162,12 @@ public class Player extends Unit{
 	
 	@Override
 	public void update(){
+		if(hitTime > 0){
+			hitTime -= Timers.delta();
+		}
+
+		if(hitTime < 0) hitTime = 0;
+
 		if(!isLocal){
 			interpolate();
 			return;
