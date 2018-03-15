@@ -11,6 +11,7 @@ import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.net.Packets.ChatPacket;
 import io.anuke.mindustry.net.Packets.KickReason;
@@ -75,25 +76,26 @@ public class ServerControl extends Module {
         Events.on(GameOverEvent.class, () -> {
             info("Game over!");
 
-            Timers.runTask(10f, () -> {
+            for(NetConnection connection : Net.getConnections()){
+                Net.kickConnection(connection.id, KickReason.gameover);
+            }
+
+            if (mode != ShuffleMode.off) {
+                Array<Map> maps = mode == ShuffleMode.both ? world.maps().getAllMaps() :
+                        mode == ShuffleMode.normal ? world.maps().getDefaultMaps() : world.maps().getCustomMaps();
+
+                Map previous = world.getMap();
+                Map map = previous;
+                while (map == previous || !map.visible) map = maps.random();
+
+                info("Selected next map to be {0}.", map.name);
+                state.set(State.playing);
+                logic.reset();
+                world.loadMap(map);
+            }else{
                 state.set(State.menu);
                 Net.closeServer();
-
-                if (mode != ShuffleMode.off) {
-                    Array<Map> maps = mode == ShuffleMode.both ? world.maps().getAllMaps() :
-                            mode == ShuffleMode.normal ? world.maps().getDefaultMaps() : world.maps().getCustomMaps();
-
-                    Map previous = world.getMap();
-                    Map map = previous;
-                    while (map == previous || !map.visible) map = maps.random();
-
-                    info("Selected next map to be {0}.", map.name);
-                    state.set(State.playing);
-                    logic.reset();
-                    world.loadMap(map);
-                    host();
-                }
-            });
+            }
         });
 
         info("&lcServer loaded. Type &ly'help'&lc for help.");

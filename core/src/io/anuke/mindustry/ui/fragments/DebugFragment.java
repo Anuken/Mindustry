@@ -130,8 +130,7 @@ public class DebugFragment implements Fragment {
                 Net.client() ?
                 "chat.open: " + ui.chatfrag.chatOpen() + "\n" +
                 "chat.messages: " + ui.chatfrag.getMessagesSize() + "\n" +
-                "client.connecting: " + netClient.isConnecting() + "\n" +
-                "client.hasdata: " + netClient.hasData() : "",
+                "client.connecting: " + netClient.isConnecting() + "\n" : "",
                 "players: " + playerGroup.size(),
                 "enemies: " + enemyGroup.size(),
                 "tiles: " + tileGroup.size(),
