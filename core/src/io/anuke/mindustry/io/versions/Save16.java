@@ -65,7 +65,7 @@ public class Save16 extends SaveFileVersion {
         IntMap<Block> map = new IntMap<>();
 
         for(int i = 0; i < blocksize; i ++){
-            String name = readString(stream);
+            String name = stream.readUTF();
             int id = stream.readShort();
 
             map.put(id, Block.getByName(name));
@@ -221,7 +221,7 @@ public class Save16 extends SaveFileVersion {
 
         for(int i = 0; i < Block.getAllBlocks().size; i ++){
             Block block = Block.getAllBlocks().get(i);
-            writeString(stream, block.name);
+            stream.writeUTF(block.name);
             stream.writeShort(block.id);
         }
 
