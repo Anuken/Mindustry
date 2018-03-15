@@ -1,10 +1,9 @@
 package io.anuke.mindustry.io.versions;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
-import io.anuke.mindustry.entities.enemies.BaseUnit;
-import io.anuke.mindustry.entities.enemies.UnitType;
+import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.io.SaveFileVersion;
@@ -120,25 +119,18 @@ public class Save16 extends SaveFileVersion {
 
         int enemies = stream.readInt();
 
-        Array<BaseUnit> enemiesToUpdate = new Array<>();
-
         for(int i = 0; i < enemies; i ++){
             byte type = stream.readByte();
-            int lane = stream.readByte();
             float x = stream.readFloat();
             float y = stream.readFloat();
-            byte tier = stream.readByte();
             int health = stream.readShort();
 
             try{
                 BaseUnit enemy = new BaseUnit(UnitType.getByID(type));
-                enemy.lane = lane;
                 enemy.health = health;
                 enemy.x = x;
                 enemy.y = y;
-                enemy.tier = tier;
                 enemy.add(enemyGroup);
-                enemiesToUpdate.add(enemy);
             }catch (Exception e){
                 throw new RuntimeException(e);
             }
@@ -157,10 +149,6 @@ public class Save16 extends SaveFileVersion {
 
         world.loadMap(world.maps().getMap(mapid), seed);
         if(!headless) renderer.clearTiles();
-
-        for(BaseUnit enemy : enemiesToUpdate){
-            enemy.node = -2;
-        }
 
         int rocks = stream.readInt();
 
@@ -285,10 +273,8 @@ public class Save16 extends SaveFileVersion {
         for(int i = 0; i < enemies.size(); i ++){
             BaseUnit enemy = enemies.get(i);
             stream.writeByte(enemy.type.id); //type
-            stream.writeByte(enemy.lane); //lane
             stream.writeFloat(enemy.x); //x
             stream.writeFloat(enemy.y); //y
-            stream.writeByte(enemy.tier); //tier
             stream.writeShort(enemy.health); //health
         }
 

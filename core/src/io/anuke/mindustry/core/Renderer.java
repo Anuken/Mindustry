@@ -15,7 +15,7 @@ import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
-import io.anuke.mindustry.entities.enemies.BaseUnit;
+import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.graphics.BlockRenderer;
 import io.anuke.mindustry.graphics.Shaders;
@@ -184,7 +184,7 @@ public class Renderer extends RendererModule{
 
 		Graphics.shader(Shaders.outline, false);
 		Entities.draw(enemyGroup);
-		Entities.draw(playerGroup, p -> !p.isAndroid);
+		Entities.draw(playerGroup, p -> !p.mech.flying);
 		Graphics.shader();
 
 		Entities.draw(Entities.defaultGroup());
@@ -192,7 +192,7 @@ public class Renderer extends RendererModule{
 		blocks.drawBlocks(true);
 
 		Graphics.shader(Shaders.outline, false);
-		Entities.draw(playerGroup, p -> p.isAndroid);
+		Entities.draw(playerGroup, p -> p.mech.flying);
 		Graphics.shader();
 
 		Entities.draw(bulletGroup);
@@ -508,7 +508,7 @@ public class Renderer extends RendererModule{
 			}
 
 			for(Player player : playerGroup.all()){
-				if(!player.isDead() && !player.isAndroid) drawHealth(player);
+				if(!player.isDead()) drawHealth(player);
 			}
 		}
 	}

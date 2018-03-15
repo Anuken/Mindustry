@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities.effect;
 
 import com.badlogic.gdx.math.Interpolation;
-import io.anuke.mindustry.entities.enemies.BaseUnit;
+import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.defense.ShieldBlock;
 import io.anuke.ucore.core.Timers;

@@ -3,7 +3,7 @@ package io.anuke.mindustry.entities;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.entities.effect.EMP;
-import io.anuke.mindustry.entities.enemies.BaseUnit;
+import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;

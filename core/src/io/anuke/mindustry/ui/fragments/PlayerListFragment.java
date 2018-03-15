@@ -96,22 +96,21 @@ public class PlayerListFragment implements Fragment{
             button.margin(5).marginBottom(10);
 
             Stack stack = new Stack();
-            BorderImage image = new BorderImage(Draw.region(player.isAndroid ? "ship-standard" : "mech-standard-icon"), 3f);
+            BorderImage image = new BorderImage(Draw.region("mech-" + player.mech.name), 3f);
 
             stack.add(image);
 
-            if(!player.isAndroid) {
 
-                stack.add(new Element(){
-                    public void draw(){
-                        float s = getWidth() / 12f;
-                        for(int i : Mathf.signs){
-                            Draw.rect((i < 0 ? player.weaponLeft.name : player.weaponRight.name)
-                                    + "-equip", x + s * 6 + i * 3*s, y + s*6 + 2*s, -8*s*i, 8*s);
-                        }
+            stack.add(new Element(){
+                public void draw(){
+                    float s = getWidth() / 12f;
+                    for(int i : Mathf.signs){
+                        Draw.rect((i < 0 ? player.weaponLeft.name : player.weaponRight.name)
+                                + "-equip", x + s * 6 + i * 3*s, y + s*6 + 2*s, -8*s*i, 8*s);
                     }
-                });
-            }
+                }
+            });
+
             button.add(stack).size(h);
             button.labelWrap("[#" + player.getColor().toString().toUpperCase() + "]" + player.name).width(170f).pad(10);
             button.add().grow();

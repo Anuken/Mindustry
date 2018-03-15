@@ -1,4 +1,4 @@
-package io.anuke.mindustry.entities.enemies;
+package io.anuke.mindustry.entities.units;
 
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.Unit;

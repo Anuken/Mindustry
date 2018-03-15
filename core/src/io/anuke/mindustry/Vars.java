@@ -9,7 +9,7 @@ import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Shield;
-import io.anuke.mindustry.entities.enemies.BaseUnit;
+import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.ClientDebug;
 import io.anuke.mindustry.net.ServerDebug;

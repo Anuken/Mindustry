@@ -4,7 +4,7 @@ import com.badlogic.gdx.ai.pfa.PathFinderRequest;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import io.anuke.mindustry.entities.enemies.BaseUnit;
+import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;

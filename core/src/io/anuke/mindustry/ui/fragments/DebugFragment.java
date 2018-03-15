@@ -3,8 +3,6 @@ package io.anuke.mindustry.ui.fragments;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.enemies.BaseUnit;
-import io.anuke.mindustry.entities.enemies.UnitTypes;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.builders.button;
@@ -64,10 +62,6 @@ public class DebugFragment implements Fragment {
                    enemyGroup.clear();
                    state.enemies = 0;
                    netClient.clearRecieved();
-               });
-               row();
-               new button("spawn", () -> {
-                   new BaseUnit(UnitTypes.healer).set(player.x, player.y).add();
                });
                row();
            }}.end();

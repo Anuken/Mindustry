@@ -1,6 +1,6 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.mindustry.entities.enemies.UnitType;
+import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.state;
@@ -30,7 +30,8 @@ public class EnemySpawn{
 	public EnemySpawn(UnitType type){
 		this.type = type;
 	}
-	
+
+	//TODO
 	public int evaluate(int wave, int lane){
 		if(wave < after || wave > before || (wave - after) % spacing != 0){
 			return 0;
@@ -41,6 +42,6 @@ public class EnemySpawn{
 	}
 	
 	public int tier(int wave, int lane){
-		return Mathf.clamp(tier + (wave-after)/tierscale, 1, UnitType.maxtier);
+		return Mathf.clamp(tier + (wave-after)/tierscale, 1, 5);
 	}
 }

@@ -42,6 +42,7 @@ public class NetServer extends Module{
     private ObjectMap<String, ByteArray> weapons = new ObjectMap<>();
     private boolean closing = false;
     private Timer timer = new Timer(5);
+    private ByteBuffer writeBuffer = ByteBuffer.allocate(32);
 
     public NetServer(){
 
@@ -153,11 +154,7 @@ public class NetServer extends Module{
         });
 
         Net.handleServer(PositionPacket.class, (id, packet) -> {
-            ByteBuffer buffer = ByteBuffer.wrap(packet.data);
-            long time = buffer.getLong();
-
-            Player player = connections.get(id);
-            player.read(buffer, time);
+            //...don't do anything here as it's already handled by the packet itself
         });
 
         Net.handleServer(ShootPacket.class, (id, packet) -> {
@@ -320,8 +317,12 @@ public class NetServer extends Module{
             for(EntityGroup<?> group : Entities.getAllGroups()) {
                 if(group.size() == 0 || !(group.all().iterator().next() instanceof SyncEntity)) continue;
 
+                ((SyncEntity)group.all().get(0)).write(writeBuffer);
+
                 //get write size for one entity (adding 4, as you need to write the ID as well)
-                int writesize = SyncEntity.getWriteSize((Class<? extends SyncEntity>)group.getType()) + 4;
+                int writesize = writeBuffer.position() + 4;
+
+                writeBuffer.position(0);
                 //amount of entities
                 int amount = group.size();
                 //maximum amount of entities per packet
@@ -339,12 +340,14 @@ public class NetServer extends Module{
                         //calculate amount of entities to go into this packet
                         int csize = Math.min(amount-i, maxsize);
                         //create a byte array to write to
-                        byte[] bytes = new byte[csize*writesize + 1 + 8];
+                        byte[] bytes = new byte[csize*writesize + 1 + 1 + 8];
                         //wrap it for easy writing
                         current = ByteBuffer.wrap(bytes);
                         current.putLong(TimeUtils.millis());
                         //write the group ID so the client knows which group this is
                         current.put((byte)group.getID());
+                        //write size of each entity write here
+                        current.put((byte)writesize);
                     }
 
                     SyncEntity entity = (SyncEntity) group.all().get(i);

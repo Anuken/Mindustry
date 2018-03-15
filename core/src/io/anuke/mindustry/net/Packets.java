@@ -1,8 +1,10 @@
 package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.utils.Base64Coder;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.io.Version;
@@ -141,17 +143,21 @@ public class Packets {
     }
 
     public static class PositionPacket implements Packet{
-        public byte[] data;
+        public Player player;
 
         @Override
         public void write(ByteBuffer buffer) {
-            buffer.put(data);
+            buffer.putInt(player.id);
+            buffer.putLong(TimeUtils.millis());
+            player.write(buffer);
         }
 
         @Override
         public void read(ByteBuffer buffer) {
-            data = new byte[SyncEntity.getWriteSize(Player.class) + 8];
-            buffer.get(data);
+            int id = buffer.getInt();
+            long time = buffer.getLong();
+            player = Vars.playerGroup.getByID(id);
+            player.read(buffer, time);
         }
     }
 

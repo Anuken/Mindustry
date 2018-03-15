@@ -76,7 +76,7 @@ public abstract class SyncEntity extends DestructibleEntity{
         return (T)this;
     }
 
-    private static boolean isSmoothing(){
+    public static boolean isSmoothing(){
         return threads.isEnabled() && threads.getFPS() <= Gdx.graphics.getFramesPerSecond() / 2f;
     }
 

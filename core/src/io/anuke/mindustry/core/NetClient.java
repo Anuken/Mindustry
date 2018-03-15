@@ -3,13 +3,12 @@ package io.anuke.mindustry.core;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
-import io.anuke.mindustry.entities.enemies.BaseUnit;
+import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
@@ -130,6 +129,7 @@ public class NetClient extends Module {
             long time = data.getLong();
 
             byte groupid = data.get();
+            byte writesize = data.get();
 
             EntityGroup<?> group = Entities.getGroup(groupid);
 
@@ -148,7 +148,7 @@ public class NetClient extends Module {
                         req.group = groupid;
                         Net.send(req, SendMode.udp);
                     }
-                    data.position(data.position() + SyncEntity.getWriteSize((Class<? extends SyncEntity>) group.getType()));
+                    data.position(data.position() + writesize);
                 } else {
                     entity.read(data, time);
                 }
@@ -322,14 +322,8 @@ public class NetClient extends Module {
     void sync(){
 
         if(timer.get(0, playerSyncTime)){
-
-            byte[] bytes = new byte[player.getWriteSize() + 8];
-            ByteBuffer buffer = ByteBuffer.wrap(bytes);
-            buffer.putLong(TimeUtils.millis());
-            player.write(buffer);
-
             PositionPacket packet = new PositionPacket();
-            packet.data = bytes;
+            packet.player = player;
             Net.send(packet, SendMode.udp);
         }
 

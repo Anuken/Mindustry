@@ -1,4 +1,4 @@
-package io.anuke.mindustry.entities.enemies;
+package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.BulletType;

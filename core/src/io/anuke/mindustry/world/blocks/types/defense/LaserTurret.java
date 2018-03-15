@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.types.defense;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 
-import io.anuke.mindustry.entities.enemies.BaseUnit;
+import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
