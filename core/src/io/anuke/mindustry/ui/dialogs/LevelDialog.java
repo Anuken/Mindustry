@@ -56,6 +56,7 @@ public class LevelDialog extends FloatingDialog{
 			group.add(b[0]);
 			selmode.add(b[0]).size(130f, 54f);
 		}
+		selmode.addButton("?", () -> displayGameModeHelp()).size(54f, 54f).padLeft(15f);
 		
 		content().add(selmode);
 		content().row();
@@ -171,4 +172,27 @@ public class LevelDialog extends FloatingDialog{
 			});
 		});
 	}
+
+	private void displayGameModeHelp() {
+		FloatingDialog d = new FloatingDialog(Bundles.get("mode.text.help.title"));
+		d.setFillParent(false);
+		Table table = new Table();
+		table.defaults().pad(1f);
+		ScrollPane pane = new ScrollPane(table, "clear");
+		pane.setFadeScrollBars(false);
+		table.row();
+		Label desclabel = new Label(
+				Bundles.format("mode.text.help.description",
+						Bundles.get("mode.waves.name"),
+						Bundles.get("mode.sandbox.name"),
+						Bundles.get("mode.freebuild.name")));
+		desclabel.setWrap(true);
+		table.add(desclabel).width(600);
+		table.row();
+
+		d.content().add(pane);
+		d.buttons().addButton("$text.ok", ()-> d.hide()).size(110, 50).pad(10f);
+		d.show();
+	}
+
 }
