@@ -184,8 +184,8 @@ public class Renderer extends RendererModule{
 
 		Graphics.shader(Shaders.outline, false);
 		Entities.draw(enemyGroup);
-		Entities.draw(playerGroup, p -> !p.mech.flying);
 		Graphics.shader();
+		Entities.draw(playerGroup, p -> !p.mech.flying);
 
 		Entities.draw(Entities.defaultGroup());
 

@@ -66,9 +66,7 @@ public class Logic extends Module {
             state.lastUpdated = state.wave + 1;
         }
 
-        for(EnemySpawn spawn : spawns){
-            //TODO spawn enemies for that spawnpoint
-        }
+        //TODO spawn enemies
 
         state.wave ++;
         state.wavetime = wavespace * state.difficulty.timeScaling;

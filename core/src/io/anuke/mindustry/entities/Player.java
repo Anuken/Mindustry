@@ -45,6 +45,7 @@ public class Player extends Unit{
 	public int clientid = -1;
 	public boolean isLocal = false;
 	public Timer timer = new Timer(4);
+	public float footRotation, walktime;
 
 	private Vector2 movement = new Vector2();
 	private Translator tr = new Translator();
@@ -116,35 +117,46 @@ public class Player extends Unit{
 	@Override
 	public void drawSmooth(){
 		if((debug && (!showPlayer || !showUI)) || dead) return;
+
+		Graphics.beginShaders(Shaders.outline);
+
         boolean snap = snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate") && isLocal;
 
-        String mname = "mech-" + mech.name;
+        String mname = mech.name;
 
 		Shaders.outline.color.set(getColor());
 		Shaders.outline.lighten = 0f;
-		Shaders.outline.region = Draw.region(mname);
 
-		Shaders.outline.apply();
+		float px = x, py =y;
+
+		if(snap){
+			x = (int)x;
+			y = (int)y;
+		}
+
+		float ft = Mathf.sin(walktime, 6f, 2f);
+
+		for(int i : Mathf.signs){
+			tr.trns(footRotation, ft * i);
+			Draw.rect(mname + "-leg", x + tr.x, y + tr.y, 12f * i, 12f - Mathf.clamp(ft*i, 0, 2), footRotation- 90);
+		}
+
+		Draw.rect(mname + "-base", x, y,footRotation- 90);
+
+		Draw.rect(mname, x, y, rotation -90);
 
 		for (int i : Mathf.signs) {
 			Weapon weapon = i < 0 ? weaponLeft : weaponRight;
-			tr.trns(rotation - 90, 3*i, 2);
+			tr.trns(rotation - 90, 4*i, 3);
 			float w = i > 0 ? -8 : 8;
-			if(snap){
-				Draw.rect(weapon.name + "-equip", (int)x + tr.x, (int)y + tr.y, w, 8, rotation - 90);
-			}else{
-				Draw.rect(weapon.name + "-equip", x + tr.x, y + tr.y, w, 8, rotation - 90);
-			}
+			Draw.rect(weapon.name + "-equip", x + tr.x, y + tr.y, w, 8, rotation - 90);
 		}
 
 
-		if(snap){
-			Draw.rect(mname, (int)x, (int)y, rotation -90);
-		}else{
-			Draw.rect(mname, x, y, rotation -90);
-		}
+		Graphics.endShaders();
 
-		Graphics.flush();
+		x = px;
+		y = py;
 	}
 	
 	@Override
@@ -224,9 +236,15 @@ public class Player extends Unit{
 			y += movement.y*Timers.delta();
 		}
 
+		if(!movement.isZero()){
+			walktime += Timers.delta();
+			footRotation = Mathf.slerpDelta(footRotation, movement.angle(), 0.13f);
+		}
+
 		if(!shooting){
-			if(!movement.isZero())
+			if(!movement.isZero()) {
 				rotation = Mathf.slerpDelta(rotation, movement.angle(), 0.13f);
+			}
 		}else{
 			float angle = Angles.mouseAngle(x, y);
 			this.rotation = Mathf.slerpDelta(this.rotation, angle, 0.1f);

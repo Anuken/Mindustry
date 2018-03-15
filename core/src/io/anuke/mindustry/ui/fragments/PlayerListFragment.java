@@ -96,10 +96,9 @@ public class PlayerListFragment implements Fragment{
             button.margin(5).marginBottom(10);
 
             Stack stack = new Stack();
-            BorderImage image = new BorderImage(Draw.region("mech-" + player.mech.name), 3f);
+            BorderImage image = new BorderImage(Draw.region(player.mech.name), 3f);
 
             stack.add(image);
-
 
             stack.add(new Element(){
                 public void draw(){

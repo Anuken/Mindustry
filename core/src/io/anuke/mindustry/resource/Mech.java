@@ -3,7 +3,7 @@ package io.anuke.mindustry.resource;
 public class Mech extends Upgrade{
 	public static final Mech
 
-	standard = new Mech("standard", false),
+	standard = new Mech("standard-mech", false),
 	standardShip = new Mech("standard-ship", true);
 
 	public boolean flying;
