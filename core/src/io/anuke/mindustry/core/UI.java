@@ -127,7 +127,7 @@ public class UI extends SceneModule{
 		if(Vars.debug && !Vars.showUI) return;
 
 		if(Graphics.drawing()) Graphics.end();
-
+		
 		act();
 
 		if(control.showCursor()) {

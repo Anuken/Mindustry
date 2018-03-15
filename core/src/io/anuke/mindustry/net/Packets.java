@@ -383,7 +383,14 @@ public class Packets {
     }
 
     public enum KickReason{
-        kick, invalidPassword, clientOutdated, serverOutdated, banned
+        kick, invalidPassword, clientOutdated, serverOutdated, banned, gameover(true);
+        public final boolean quiet;
+
+        KickReason(){ quiet = false; }
+
+        KickReason(boolean quiet){
+            this.quiet = quiet;
+        }
     }
 
     public static class UpgradePacket implements Packet{

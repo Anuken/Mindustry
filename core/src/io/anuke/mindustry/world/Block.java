@@ -130,6 +130,7 @@ public class Block extends BaseBlock {
 	public void configure(Tile tile, byte data){}
 
 	public void setConfigure(Tile tile, byte data){
+		configure(tile, data);
 		if(Net.active()) NetEvents.handleBlockConfig(tile, data);
 		configure(tile, data);
 	}

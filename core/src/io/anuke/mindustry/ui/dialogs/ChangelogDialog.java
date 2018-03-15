@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.Changelogs;
 import io.anuke.mindustry.io.Changelogs.VersionInfo;
 import io.anuke.mindustry.io.Version;
@@ -17,6 +18,10 @@ public class ChangelogDialog extends FloatingDialog{
     public ChangelogDialog(){
         super("$text.changelog.title");
 
+        addCloseButton();
+
+        content().add("$text.changelog.loading");
+
         Changelogs.getChangelog(result -> {
             versions = result;
             Gdx.app.postRunnable(this::setup);
@@ -30,12 +35,15 @@ public class ChangelogDialog extends FloatingDialog{
         Table table = new Table();
         ScrollPane pane = new ScrollPane(table, "clear");
 
+        content().clear();
         content().add(pane).grow();
-
-        addCloseButton();
 
         if(versions == null){
             table.add("$text.changelog.error");
+            if(Vars.android){
+                table.row();
+                table.add("$text.changelog.error.android").padTop(8);
+            }
         }else{
             for(VersionInfo info : versions){
                 Table in = new Table("clear");
@@ -45,7 +53,7 @@ public class ChangelogDialog extends FloatingDialog{
                 if(info.build == Version.build){
                     in.row();
                     in.add("$text.changelog.current");
-                }else if(info == versions.peek()){
+                }else if(info == versions.first()){
                     in.row();
                     in.add("$text.changelog.latest");
                 }
