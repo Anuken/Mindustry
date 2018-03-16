@@ -1,49 +1,25 @@
 package io.anuke.mindustry.ui;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import io.anuke.ucore.core.Core;
 import io.anuke.ucore.function.Listenable;
-import io.anuke.ucore.scene.ui.Button;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.scene.ui.TextButton;
 
-public class MenuButton extends Button{
-	private static boolean hasInvalid = false;
-	private String text;
-	private boolean added = false;
+public class MenuButton extends TextButton{
 	
-	public MenuButton(String text, PressGroup group, Listenable clicked){
-		super("menu");
-		this.text = text;
-		BitmapFont font = Core.skin.getFont("title");
-		for(char c : Bundles.get(text.substring(1)).toCharArray()){
-			if(!font.getData().hasGlyph(c)){
-				hasInvalid = true;
-				break;
-			}
-		}
+	public MenuButton(String icon, String text, Listenable clicked){
+		super("default");
+		float s = 70f;
+
 		clicked(clicked);
-		group.add(this);
-	}
 
-	@Override
-	public void layout() {
-		super.layout();
-		if(added)
-			return;
-		added = true;
-		String style = "title";
-		float scale = 4f;
-		if(hasInvalid){
-			style = "default";
-			scale = Unit.dp.scl(1f);
-		}
-		add(text, style, scale).color(hasInvalid ? Color.DARK_GRAY : Color.WHITE);
+		clearChildren();
 
-		if(hasInvalid){
-			row();
-			add(text, style, scale).padTop(Unit.dp.scl(-Core.font.getData().lineHeight * scale * 2f - 4f)).color(Color.WHITE);
-		}
+		margin(0);
+
+		table(t -> {
+			t.addImage(icon).size(14*3);
+			t.update(() -> t.setBackground(getClickListener().isOver() || getClickListener().isVisualPressed() ? "button-over" : "button"));
+		}).size(s - 5, s);
+
+		add(text).padLeft(5).growX();
 	}
 }
