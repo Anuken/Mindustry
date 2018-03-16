@@ -33,6 +33,7 @@ import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.graphics.*;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
@@ -67,6 +68,12 @@ public class Renderer extends RendererModule{
 				}
 			}
 		});
+
+		Cursors.cursorScaling = 3;
+		Cursors.outlineColor = Color.valueOf("444444");
+		Cursors.arrow = Cursors.loadCursor("cursor");
+		Cursors.hand = Cursors.loadCursor("hand");
+		Cursors.ibeam = Cursors.loadCursor("ibar");
 
 		clearColor = Hue.lightness(0.4f);
 		clearColor.a = 1f;
@@ -427,7 +434,7 @@ public class Renderer extends RendererModule{
 			
 		}else if(input.breakMode.delete && control.input().drawPlace()
 				&& (input.recipe == null || !state.inventory.hasItems(input.recipe.requirements))
-				&& (input.placeMode.delete || input.breakMode.both)){
+				&& (input.placeMode.delete || input.breakMode.both || !android)){
 
             if(input.breakMode == PlaceMode.holdDelete)
                 input.breakMode.draw(tilex, tiley, 0, 0);
