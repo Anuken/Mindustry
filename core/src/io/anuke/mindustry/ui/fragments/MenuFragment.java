@@ -5,6 +5,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.ui.MenuButton;
+import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
@@ -25,23 +26,17 @@ public class MenuFragment implements Fragment{
 
 					defaults().size(w, 70f).padTop(5).padRight(5);
 
-					add(new MenuButton("icon-play-2", "$text.play", ui.levels::show)).width(bw).colspan(2);
+					add(new MenuButton("icon-play-2", "$text.play", MenuFragment.this::showPlaySelect)).width(bw).colspan(2);
 
 					row();
 
-					//TODO submenu!
-
-					/*if(Platform.instance.canJoinGame()) {
-						add(new MenuButton("icon-add", "$text.joingame", ui.join::show));
-						row();
-					}
-					
-					add(new MenuButton("icon-tutorial", "$text.tutorial", ()-> control.playMap(world.maps().getMap("tutorial"))));
-
-					add(new MenuButton("icon-load", "$text.loadgame", ui.load::show));
-					*/
-
-					add(new MenuButton("icon-editor", "$text.editor", ui.editor::show));
+					add(new MenuButton("icon-editor", "$text.editor", () -> {
+						if(gwt){
+							ui.showInfo("$text.editor.web");
+						}else{
+							ui.editor.show();
+						}
+					}));
 					
 					add(new MenuButton("icon-tools", "$text.settings", ui.settings::show));
 
@@ -85,19 +80,14 @@ public class MenuFragment implements Fragment{
 				}}.end();
 			}
 		}}.end();
-		
-		//extra icons in top right
-		new table(){{
-			abottom().atop().aright();
-			get().addButton("", "discord", ui.discord::show);
-			//if(Platform.instance.hasDiscord()){
-			//	new imagebutton("icon-discord", 30f, ui.discord::show).margin(14);
-			//}
-			//if(!Vars.android) {
-			//	new imagebutton("icon-info", 30f, ui.about::show).margin(14);
-			//}
-			//new imagebutton("icon-menu", 30f, ui.changelog::show).margin(14);
-		}}.end().visible(()->state.is(State.menu));
+
+		//discord icon in top right
+		if(Platform.instance.hasDiscord()) {
+			new table() {{
+				abottom().atop().aright();
+				get().addButton("", "discord", ui.discord::show);
+			}}.end().visible(() -> state.is(State.menu));
+		}
 
 		//version info
 		new table(){{
@@ -105,5 +95,42 @@ public class MenuFragment implements Fragment{
 			abottom().aleft();
 			new label("Mindustry " + Version.code + " " + Version.type + " / " + Version.buildName);
 		}}.end();
+	}
+
+	private void showPlaySelect(){
+		float w = 200f;
+		float bw = w * 2f + 10f;
+
+		FloatingDialog dialog = new FloatingDialog("$text.play");
+		dialog.addCloseButton();
+		dialog.content().defaults().height(70f).width(w).padRight(5f);
+
+		dialog.content().add(new MenuButton("icon-play-2", "$text.newgame", () -> {
+			dialog.hide();
+			ui.levels.show();
+		})).width(bw).colspan(2);
+		dialog.content().row();
+
+		dialog.content().add(new MenuButton("icon-add", "$text.joingame", () -> {
+			if(Platform.instance.canJoinGame()){
+				ui.join.show();
+				dialog.hide();
+			}else{
+				ui.showInfo("$text.multiplayer.web");
+			}
+		}));
+		dialog.content().add(new MenuButton("icon-tutorial", "$text.tutorial", ()-> {
+			control.playMap(world.maps().getMap("tutorial"));
+			dialog.hide();
+		}));
+
+		dialog.content().row();
+
+		dialog.content().add(new MenuButton("icon-load", "$text.loadgame", () -> {
+			ui.load.show();
+			dialog.hide();
+		})).width(bw).colspan(2);
+
+		dialog.show();
 	}
 }

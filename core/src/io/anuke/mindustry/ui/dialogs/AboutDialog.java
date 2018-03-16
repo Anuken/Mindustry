@@ -52,5 +52,14 @@ public class AboutDialog extends FloatingDialog {
         }
 
         content().add(pane).growX();
+
+        buttons().addButton("$text.credits", this::showCredits).size(200f, 64f);
+    }
+
+    private void showCredits(){
+        FloatingDialog dialog = new FloatingDialog("$text.credits");
+        dialog.addCloseButton();
+        dialog.content().add("$text.about");
+        dialog.show();
     }
 }
