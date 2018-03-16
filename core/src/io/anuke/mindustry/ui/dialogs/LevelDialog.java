@@ -22,7 +22,6 @@ import static io.anuke.mindustry.Vars.*;
 
 public class LevelDialog extends FloatingDialog{
 	private Map selectedMap = world.maps().getMap(0);
-	private TextureRegion region = new TextureRegion();
 	private ScrollPane pane;
 	
 	public LevelDialog(){
@@ -56,7 +55,7 @@ public class LevelDialog extends FloatingDialog{
 			group.add(b[0]);
 			selmode.add(b[0]).size(130f, 54f);
 		}
-		selmode.addButton("?", () -> displayGameModeHelp()).size(54f, 54f).padLeft(15f);
+		selmode.addButton("?", this::displayGameModeHelp).size(50f, 54f).padLeft(18f);
 		
 		content().add(selmode);
 		content().row();
@@ -181,17 +180,13 @@ public class LevelDialog extends FloatingDialog{
 		ScrollPane pane = new ScrollPane(table, "clear");
 		pane.setFadeScrollBars(false);
 		table.row();
-		Label desclabel = new Label(
-				Bundles.format("mode.text.help.description",
-						Bundles.get("mode.waves.name"),
-						Bundles.get("mode.sandbox.name"),
-						Bundles.get("mode.freebuild.name")));
-		desclabel.setWrap(true);
-		table.add(desclabel).width(600);
-		table.row();
+		for(GameMode mode : GameMode.values()){
+			table.labelWrap("[accent]" + mode.toString() + ":[] [lightgray]" + mode.description()).width(600f);
+			table.row();
+		}
 
 		d.content().add(pane);
-		d.buttons().addButton("$text.ok", ()-> d.hide()).size(110, 50).pad(10f);
+		d.buttons().addButton("$text.ok", d::hide).size(110, 50).pad(10f);
 		d.show();
 	}
 
