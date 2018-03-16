@@ -2,21 +2,20 @@ package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.math.Rectangle;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Wall;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class Door extends Wall{
 	protected final Rectangle rect = new Rectangle();
@@ -68,24 +67,17 @@ public class Door extends Wall{
 		Block type = tile.block();
 		rect.setSize(type.size * tilesize, type.size * tilesize);
 		rect.setCenter(tile.drawx(), tile.drawy());
-		
-		for(SolidEntity e : Entities.getNearby(enemyGroup, x * tilesize, y * tilesize, tilesize * 2f)){
-			Rectangle rect = e.hitbox.getRect(e.x, e.y);
 
-			if(this.rect.overlaps(rect)){
-				return true;
+		boolean[] value = new boolean[1];
+
+		Units.getNearby(rect, unit -> {
+			if(value[0]) return;
+			if(unit.hitbox.getRect(unit.x, unit.y).overlaps(rect)){
+				value[0] = true;
 			}
-		}
-
-		for(SolidEntity e : Entities.getNearby(playerGroup, x * tilesize, y * tilesize, tilesize * 2f)){
-			Rectangle rect = e.hitbox.getRect(e.x, e.y);
-
-			if(this.rect.overlaps(rect)){
-				return true;
-			}
-		}
+		});
 		
-		return false;
+		return value[0];
 	}
 	
 	@Override

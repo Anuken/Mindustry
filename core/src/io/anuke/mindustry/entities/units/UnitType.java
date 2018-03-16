@@ -67,7 +67,11 @@ public class UnitType {
         //TODO
     }
 
-    public void onDeath(BaseUnit enemy, boolean force){
+    public void onDeath(BaseUnit enemy){
+        //TODO
+    }
+
+    public void onRemoteDeath(BaseUnit enemy){
         //TODO
     }
 

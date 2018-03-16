@@ -124,9 +124,7 @@ public class Generator extends PowerBlock{
 				Effects.effect(Fx.generatorexplosion, x, y);
 				Effects.effect(Fx.shockwave, x, y);
 
-				Timers.run(12f + Mathf.random(20f), () -> {
-					tile.damageNearby(4, 60, 0f);
-				});
+				//TODO better explosion effect!
 
 				Effects.sound(explosionSound, x, y);
 			});

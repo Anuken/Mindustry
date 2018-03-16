@@ -130,16 +130,6 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		
 		if(fuel < 5 && entity.heat < 0.5f) return;
 		
-		int waves = 6;
-		float delay = 8f;
-		
-		for(int i = 0; i < waves; i ++){
-			float rad = (float)i /waves * explosionRadius;
-			Timers.run(i * delay, ()->{
-				tile.damageNearby((int)rad, explosionDamage / waves, 0.4f);
-			});
-		}
-		
 		Effects.shake(6f, 16f, tile.worldx(), tile.worldy());
 		Effects.effect(explosionEffect, tile.worldx(), tile.worldy());
 		for(int i = 0; i < 6; i ++){
@@ -148,7 +138,7 @@ public class NuclearReactor extends LiquidPowerGenerator{
 			});
 		}
 		
-		DamageArea.damageEntities(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);
+		DamageArea.damage(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);
 		
 		
 		for(int i = 0; i < 20; i ++){

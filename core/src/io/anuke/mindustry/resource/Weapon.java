@@ -121,7 +121,7 @@ public class Weapon extends Upgrade{
 		shootInternal(p, x, y, angle);
 
 		if(Net.active() && p == Vars.player){
-			NetEvents.handleShoot(this, x, y, angle);
+			NetEvents.handleShoot(Vars.player, x, y, angle, id);
 		}
 	}
 	

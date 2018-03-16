@@ -2,15 +2,14 @@ package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
-
-import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
@@ -32,7 +31,7 @@ public class LaserTurret extends PowerTurret{
 	@Override
 	public void shoot(Tile tile){
 		TurretEntity entity = tile.entity();
-		BaseUnit enemy = entity.target;
+		Unit enemy = entity.target;
 		
 		if(Angles.angleDist(entity.rotation, Angles.angle(tile.drawx(), tile.drawy(), enemy.x, enemy.y)) < cone){
 			enemy.damage(damage);
@@ -43,7 +42,7 @@ public class LaserTurret extends PowerTurret{
 	@Override
 	public void drawLayer2(Tile tile){
 		TurretEntity entity = tile.entity();
-		BaseUnit enemy = entity.target;
+		Unit enemy = entity.target;
 		
 		if(enemy != null &&
 				Angles.angleDist(entity.rotation, Angles.angle(tile.drawx(), tile.drawy(), enemy.x, enemy.y)) <= cone){

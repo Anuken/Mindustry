@@ -6,6 +6,7 @@ import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.SaveFileVersion;
 import io.anuke.mindustry.io.SaveMeta;
 import io.anuke.mindustry.resource.Item;
@@ -18,7 +19,7 @@ import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.mindustry.world.blocks.types.Rock;
 import io.anuke.ucore.core.Core;
-import io.anuke.ucore.entities.EntityGroup.EntityContainer;
+import io.anuke.ucore.entities.EntityGroup;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -84,7 +85,6 @@ public class Save16 extends SaveFileVersion {
             Core.camera.position.set(playerx, playery, 0);
 
             //weapons
-
             control.upgrades().getWeapons().clear();
             control.upgrades().getWeapons().add(Weapon.blaster);
             player.weaponLeft = player.weaponRight = Weapon.blaster;
@@ -117,26 +117,28 @@ public class Save16 extends SaveFileVersion {
 
         //enemies
 
-        int enemies = stream.readInt();
+        byte teams = stream.readByte();
 
-        for(int i = 0; i < enemies; i ++){
-            byte type = stream.readByte();
-            float x = stream.readFloat();
-            float y = stream.readFloat();
-            int health = stream.readShort();
+        for(int i = 0; i < teams; i ++){
+            EntityGroup<BaseUnit> group = unitGroups[i];
 
-            try{
+            int amount = stream.readInt();
+
+            for(int j = 0; j < amount; j ++){
+                byte type = stream.readByte();
+                float x = stream.readFloat();
+                float y = stream.readFloat();
+                int health = stream.readShort();
+
                 BaseUnit enemy = new BaseUnit(UnitType.getByID(type));
                 enemy.health = health;
                 enemy.x = x;
                 enemy.y = y;
-                enemy.add(enemyGroup);
-            }catch (Exception e){
-                throw new RuntimeException(e);
+                enemy.add(group);
             }
         }
 
-        state.enemies = enemies;
+        state.enemies = 0; //TODO display enemies correctly!
         state.wave = wave;
         state.wavetime = wavetime;
 
@@ -186,9 +188,11 @@ public class Save16 extends SaveFileVersion {
             }
 
             if(tile.entity != null){
+                byte team = stream.readByte();
                 byte rotation = stream.readByte();
                 short health = stream.readShort();
 
+                tile.setTeam(Team.values()[team]);
                 tile.entity.health = health;
                 tile.setRotation(rotation);
 
@@ -265,17 +269,18 @@ public class Save16 extends SaveFileVersion {
         }
 
         //--ENEMIES--
+        stream.writeByte(Team.values().length); //amount of total teams (backwards compatibility)
 
-        EntityContainer<BaseUnit> enemies = enemyGroup.all();
+        for(Team team : Team.values()){
+            EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
+            stream.writeInt(group.size()); //amount of units in the team group
 
-        stream.writeInt(enemies.size()); //enemy amount
-
-        for(int i = 0; i < enemies.size(); i ++){
-            BaseUnit enemy = enemies.get(i);
-            stream.writeByte(enemy.type.id); //type
-            stream.writeFloat(enemy.x); //x
-            stream.writeFloat(enemy.y); //y
-            stream.writeShort(enemy.health); //health
+            for(BaseUnit unit : group.all()){
+                stream.writeByte(unit.type.id); //type
+                stream.writeFloat(unit.x); //x
+                stream.writeFloat(unit.y); //y
+                stream.writeShort(unit.health); //health
+            }
         }
 
         //--MAP DATA--
@@ -329,6 +334,7 @@ public class Save16 extends SaveFileVersion {
                     if(tile.block() instanceof BlockPart) stream.writeByte(tile.link);
 
                     if(tile.entity != null){
+                        stream.writeByte(tile.getTeam().ordinal());
                         stream.writeByte(tile.getRotation()); //rotation
                         stream.writeShort((short)tile.entity.health); //health
 

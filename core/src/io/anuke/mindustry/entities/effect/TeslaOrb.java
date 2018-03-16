@@ -1,40 +1,45 @@
 package io.anuke.mindustry.entities.effect;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
-import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.enemyGroup;
-
 public class TeslaOrb extends Entity{
-	private Array<Vector2> points = new Array<>();
-	private ObjectSet<BaseUnit> hit = new ObjectSet<>();
-	private int damage = 0;
-	private float range = 0;
-	private float lifetime = 30f;
+	private final static Rectangle rect = new Rectangle();
+
+	private final Array<Vector2> points = new Array<>();
+	private final ObjectSet<BaseUnit> hit = new ObjectSet<>();
+	private final int damage;
+	private final float range;
+	private final float lifetime = 30f;
+	private final Vector2 vector = new Vector2();
+	private final Team team;
+
 	private float life = 0f;
-	private Vector2 vector = new Vector2();
+	private float curx = x, cury = y;
+	private boolean done = false;
 	
-	public TeslaOrb(float x, float y, float range, int damage){
+	public TeslaOrb(Team team, float x, float y, float range, int damage){
 		set(x, y);
+		this.team = team;
 		this.damage = damage;
 		this.range = range;
 	}
 	
 	void shock(){
 		float stopchance = 0.1f;
-		float curx = x, cury = y;
 		float shake = 3f;
 		
 		int max = 7;
@@ -43,19 +48,19 @@ public class TeslaOrb extends Entity{
 			if(Mathf.chance(stopchance)){
 				break;
 			}
-			
-			Array<SolidEntity> enemies = Entities.getNearby(enemyGroup, curx, cury, range*2f);
-			
-			for(SolidEntity entity : enemies){
-				if(entity != null && entity.distanceTo(curx, cury) < range && !hit.contains((BaseUnit)entity)){
+
+			rect.setSize(range*2f).setCenter(curx, cury);
+
+			Units.getNearbyEnemies(team, rect, entity -> {
+				if(!done && entity != null && entity.distanceTo(curx, cury) < range && !hit.contains((BaseUnit)entity)){
 					hit.add((BaseUnit)entity);
 					points.add(new Vector2(entity.x + Mathf.range(shake), entity.y + Mathf.range(shake)));
 					damageEnemy((BaseUnit)entity);
 					curx = entity.x;
 					cury = entity.y;
-					break;
+					done = true;
 				}
-			}
+			});
 		}
 		
 		if(points.size == 0){
@@ -106,11 +111,6 @@ public class TeslaOrb extends Entity{
 			if(previous.epsilonEquals(x, y, 0.001f)){
 				Draw.rect("circle", x, y, rad, rad);
 			}
-			
-			//Draw.color(Color.WHITE);
-			
-			//Draw.stroke(2f - life/lifetime*2f);
-			//Draw.line(x1, y1, x2, y2);
 			
 			Draw.reset();
 			

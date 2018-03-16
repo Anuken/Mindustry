@@ -15,6 +15,7 @@ public class Shaders{
 	public static final SurfaceShader water = new SurfaceShader("water");
 	public static final SurfaceShader lava = new SurfaceShader("lava");
 	public static final SurfaceShader oil = new SurfaceShader("oil");
+	public static final Shader hit = new Shader("hit", "default") { protected void apply() {}};
 
 	private static final Vector2 vec = new Vector2();
 

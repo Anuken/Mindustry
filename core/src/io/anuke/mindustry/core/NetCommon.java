@@ -3,9 +3,11 @@ package io.anuke.mindustry.core;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
-import io.anuke.mindustry.net.Packets.*;
+import io.anuke.mindustry.net.Packets.BlockConfigPacket;
+import io.anuke.mindustry.net.Packets.BlockTapPacket;
+import io.anuke.mindustry.net.Packets.ChatPacket;
+import io.anuke.mindustry.net.Packets.WeaponSwitchPacket;
 import io.anuke.mindustry.resource.Upgrade;
-import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.modules.Module;
 
@@ -14,13 +16,6 @@ import static io.anuke.mindustry.Vars.*;
 public class NetCommon extends Module {
 
     public NetCommon(){
-
-        Net.handle(ShootPacket.class, (packet) -> {
-            Player player = playerGroup.getByID(packet.playerid);
-
-            Weapon weapon = (Weapon) Upgrade.getByID(packet.weaponid);
-            weapon.shoot(player, packet.x, packet.y, packet.rotation);
-        });
 
         Net.handle(ChatPacket.class, (packet) -> {
             ui.chatfrag.addMessage(packet.text, colorizeName(packet.id, packet.name));
@@ -31,8 +26,8 @@ public class NetCommon extends Module {
 
             if (player == null) return;
 
-            player.weaponLeft = (Weapon) Upgrade.getByID(packet.left);
-            player.weaponRight = (Weapon) Upgrade.getByID(packet.right);
+            player.weaponLeft = Upgrade.getByID(packet.left);
+            player.weaponRight = Upgrade.getByID(packet.right);
         });
 
         Net.handle(BlockTapPacket.class, (packet) -> {
@@ -43,13 +38,6 @@ public class NetCommon extends Module {
         Net.handle(BlockConfigPacket.class, (packet) -> {
             Tile tile = world.tile(packet.position);
             if (tile != null) tile.block().configure(tile, packet.data);
-        });
-
-        Net.handle(PlayerDeathPacket.class, (packet) -> {
-            Player player = playerGroup.getByID(packet.id);
-            if(player == null) return;
-
-            player.doRespawn();
         });
     }
 

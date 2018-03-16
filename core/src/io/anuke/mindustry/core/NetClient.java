@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
@@ -22,7 +21,6 @@ import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BaseBulletType;
 import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Log;
@@ -33,15 +31,20 @@ import java.nio.ByteBuffer;
 import static io.anuke.mindustry.Vars.*;
 
 public class NetClient extends Module {
-    private final static float dataTimeout = 60*18; //18 seconds timeout
+    private final static float dataTimeout = 60*18;
     private final static float playerSyncTime = 2;
 
     private Timer timer = new Timer(5);
+    /**Whether the client is currently conencting.*/
     private boolean connecting = false;
-    private boolean kicked = false;
+    /**If true, no message will be shown on disconnect.*/
+    private boolean quiet = false;
+    /**List of all recieved entitity IDs, to prevent duplicates.*/
     private IntSet recieved = new IntSet();
-    private IntMap<Entity> recent = new IntMap<>();
-    private float timeoutTime = 0f; //data timeout counter
+    /**List of recently recieved entities that have not been added to the queue yet.*/
+    private IntMap<SyncEntity> recent = new IntMap<>();
+    /**Counter for data timeout.*/
+    private float timeoutTime = 0f;
 
     public NetClient(){
 
@@ -53,7 +56,7 @@ public class NetClient extends Module {
             recent.clear();
             timeoutTime = 0f;
             connecting = true;
-            kicked = false;
+            quiet = false;
 
             ui.chatfrag.clearMessages();
             ui.loadfrag.hide();
@@ -78,7 +81,7 @@ public class NetClient extends Module {
         });
 
         Net.handleClient(Disconnect.class, packet -> {
-            if (kicked) return;
+            if (quiet) return;
 
             Timers.runTask(3f, ui.loadfrag::hide);
 
@@ -187,23 +190,29 @@ public class NetClient extends Module {
             Log.info("Recieved entity {0}", packet.entity.id);
         });
 
-        Net.handleClient(EnemyDeathPacket.class, packet -> {
-            BaseUnit enemy = enemyGroup.getByID(packet.id);
-            if (enemy != null){
-                enemy.type.onDeath(enemy, true);
-            }else if(recent.get(packet.id) != null){
-                recent.get(packet.id).remove();
-            }else{
-                Log.err("Got remove for null entity! {0}", packet.id);
-            }
+        Net.handleClient(EntityDeathPacket.class, packet -> {
+            EntityGroup group = Entities.getGroup(packet.group);
+            SyncEntity entity = (SyncEntity) group.getByID(packet.id);
+
             recieved.add(packet.id);
+
+            if(entity != null) {
+                entity.onRemoteDeath();
+            }else{
+                if(recent.get(packet.id) != null){
+                    recent.get(packet.id).onRemoteDeath();
+                }else{
+                    Log.err("Got remove for null entity! {0} / group type {1}", packet.id, group.getType());
+                }
+            }
         });
 
-        Net.handleClient(BulletPacket.class, packet -> {
-            //TODO shoot effects for enemies, clientside as well as serverside
-            BulletType type = (BulletType) BaseBulletType.getByID(packet.type);
-            Entity owner = enemyGroup.getByID(packet.owner);
-            new Bullet(type, owner, packet.x, packet.y, packet.angle).add();
+        Net.handleClient(EntityShootPacket.class, packet -> {
+            BulletType type = BaseBulletType.getByID(packet.bulletid);
+            EntityGroup group = Entities.getGroup(packet.groupid);
+            SyncEntity owner = (SyncEntity) group.getByID(packet.entityid);
+
+            owner.onRemoteShoot(type, packet.x, packet.y, packet.rotation, packet.data);
         });
 
         Net.handleClient(BlockDestroyPacket.class, packet -> {
@@ -231,7 +240,7 @@ public class NetClient extends Module {
         });
 
         Net.handleClient(KickPacket.class, packet -> {
-            kicked = true;
+            quiet = true;
             Net.disconnect();
             state.set(State.menu);
             if(!packet.reason.quiet) ui.showError("$text.server.kicked." + packet.reason.name());
@@ -243,7 +252,7 @@ public class NetClient extends Module {
                     world.getCore().entity != null){
                 world.getCore().entity.onDeath(true);
             }
-            kicked = true;
+            quiet = true;
             ui.restart.show();
         });
 
@@ -279,7 +288,7 @@ public class NetClient extends Module {
             if(timeoutTime > dataTimeout){
                 Log.err("Failed to load data!");
                 ui.loadfrag.hide();
-                kicked = true;
+                quiet = true;
                 ui.showError("$text.disconnect.data");
                 Net.disconnect();
                 timeoutTime = 0f;
@@ -306,7 +315,7 @@ public class NetClient extends Module {
     }
 
     public void disconnectQuietly(){
-        kicked = true;
+        quiet = true;
         Net.disconnect();
     }
 

@@ -161,60 +161,31 @@ public class Packets {
         }
     }
 
-    //not a real packet.
-    public static class EffectPacket{
-        public int id;
+    public static class EntityShootPacket implements Packet{
         public float x, y, rotation;
-        public int color;
-    }
-
-    public static class ShootPacket implements Packet{
-        public byte weaponid;
-        public float x, y, rotation;
-        public int playerid;
+        public short bulletid;
+        public byte groupid;
+        public short data;
+        public int entityid;
 
         @Override
         public void write(ByteBuffer buffer) {
-            buffer.put(weaponid);
+            buffer.put(groupid);
+            buffer.putInt(entityid);
             buffer.putFloat(x);
             buffer.putFloat(y);
             buffer.putFloat(rotation);
-            buffer.putInt(playerid);
+            buffer.putShort(bulletid);
         }
 
         @Override
         public void read(ByteBuffer buffer) {
-            weaponid = buffer.get();
+            groupid = buffer.get();
+            entityid = buffer.getInt();
             x = buffer.getFloat();
             y = buffer.getFloat();
             rotation = buffer.getFloat();
-            playerid = buffer.getInt();
-        }
-    }
-
-    public static class BulletPacket implements Packet{
-        public int type, owner;
-        public float x, y, angle;
-        public short damage;
-
-        @Override
-        public void write(ByteBuffer buffer) {
-            buffer.putShort((short)type);
-            buffer.putInt(owner);
-            buffer.putFloat(x);
-            buffer.putFloat(y);
-            buffer.putFloat(angle);
-            buffer.putShort(damage);
-        }
-
-        @Override
-        public void read(ByteBuffer buffer) {
-            type = buffer.getShort();
-            owner = buffer.getInt();
-            x = buffer.getFloat();
-            y = buffer.getFloat();
-            angle = buffer.getFloat();
-            damage = buffer.getShort();
+            bulletid = buffer.getShort();
         }
     }
 
@@ -289,16 +260,19 @@ public class Packets {
         }
     }
 
-    public static class EnemyDeathPacket implements Packet{
+    public static class EntityDeathPacket implements Packet{
+        public byte group;
         public int id;
 
         @Override
         public void write(ByteBuffer buffer) {
+            buffer.put(group);
             buffer.putInt(id);
         }
 
         @Override
         public void read(ByteBuffer buffer) {
+            group = buffer.get();
             id = buffer.getInt();
         }
     }
@@ -493,20 +467,6 @@ public class Packets {
         @Override
         public void read(ByteBuffer buffer) {
             enabled = buffer.get() == 1;
-        }
-    }
-
-    public static class PlayerDeathPacket implements Packet{
-        public int id;
-
-        @Override
-        public void write(ByteBuffer buffer) {
-            buffer.putInt(id);
-        }
-
-        @Override
-        public void read(ByteBuffer buffer) {
-            id = buffer.getInt();
         }
     }
 

@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.ItemStack;
@@ -13,7 +14,6 @@ import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.SolidEntity;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -107,14 +107,19 @@ public class Placement {
         rect.setCenter(offset.x + x * tilesize, offset.y + y * tilesize);
 
         synchronized (Entities.entityLock) {
-            for (SolidEntity e : Entities.getNearby(enemyGroup, x * tilesize, y * tilesize, tilesize * 2f)) {
-                if (e == null) continue; //not sure why this happens?
+            rect.setSize(tilesize*2f).setCenter(x*tilesize, y*tilesize);
+            boolean[] result = {false};
+
+            Units.getNearby(rect, e -> {
+                if (e == null) return; //not sure why this happens?
                 Rectangle rect = e.hitbox.getRect(e.x, e.y);
 
                 if (Placement.rect.overlaps(rect)) {
-                    return false;
+                    result[0] = true;
                 }
-            }
+            });
+
+            if(result[0]) return false;
         }
 
         if(type.solid || type.solidifes) {

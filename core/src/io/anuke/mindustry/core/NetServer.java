@@ -2,6 +2,7 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.utils.*;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
@@ -17,6 +18,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Placement;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.entities.BaseBulletType;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
@@ -157,8 +159,15 @@ public class NetServer extends Module{
             //...don't do anything here as it's already handled by the packet itself
         });
 
-        Net.handleServer(ShootPacket.class, (id, packet) -> {
-            packet.playerid = connections.get(id).id;
+        Net.handleServer(EntityShootPacket.class, (id, packet) -> {
+            Player player = connections.get(id);
+
+            BulletType type = BaseBulletType.getByID(packet.bulletid);
+
+            player.onRemoteShoot(type, packet.x, packet.y, packet.rotation, packet.data);
+
+            packet.entityid = player.id;
+            packet.groupid = (byte)player.getGroup().getID();
             Net.sendExcept(id, packet, SendMode.udp);
         });
 
@@ -201,7 +210,7 @@ public class NetServer extends Module{
         });
 
         Net.handleServer(ChatPacket.class, (id, packet) -> {
-            if(!Timers.get("chatFlood" + id, 20)){
+            if(!Timers.get("chatFlood" + id, 30)){
                 ChatPacket warn = new ChatPacket();
                 warn.text = "[scarlet]You are sending messages too quickly.";
                 Net.sendTo(id, warn, SendMode.tcp);
@@ -249,8 +258,9 @@ public class NetServer extends Module{
             }
         });
 
-        Net.handleServer(PlayerDeathPacket.class, (id, packet) -> {
+        Net.handleServer(EntityDeathPacket.class, (id, packet) -> {
             packet.id = connections.get(id).id;
+            packet.group = (byte)connections.get(id).getGroup().getID();
             Net.sendExcept(id, packet, SendMode.tcp);
         });
 

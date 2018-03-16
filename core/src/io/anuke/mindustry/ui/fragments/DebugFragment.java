@@ -58,12 +58,6 @@ public class DebugFragment implements Fragment {
                row();
                new button("time max", () -> Timers.resetTime(1080000 - 60*10));
                row();
-               new button("clear", () -> {
-                   enemyGroup.clear();
-                   state.enemies = 0;
-                   netClient.clearRecieved();
-               });
-               row();
            }}.end();
 
            row();
@@ -126,7 +120,6 @@ public class DebugFragment implements Fragment {
                 "chat.messages: " + ui.chatfrag.getMessagesSize() + "\n" +
                 "client.connecting: " + netClient.isConnecting() + "\n" : "",
                 "players: " + playerGroup.size(),
-                "enemies: " + enemyGroup.size(),
                 "tiles: " + tileGroup.size(),
                 "time: " + Timers.time(),
                 world.getCore() != null && world.getCore().entity != null ? "core.health: " + world.getCore().entity.health : "",

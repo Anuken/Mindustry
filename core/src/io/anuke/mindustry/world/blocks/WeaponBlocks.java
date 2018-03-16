@@ -117,7 +117,7 @@ public class WeaponBlocks{
 
 			float len = 4f;
 
-			new TeslaOrb(tile.drawx() + Angles.trnsx(entity.rotation, len), tile.drawy() + Angles.trnsy(entity.rotation, len), range, 9).add();
+			new TeslaOrb(tile.getTeam(), tile.drawx() + Angles.trnsx(entity.rotation, len), tile.drawy() + Angles.trnsy(entity.rotation, len), range, 9).add();
 		}
 	},
 

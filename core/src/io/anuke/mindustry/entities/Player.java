@@ -58,6 +58,13 @@ public class Player extends Unit{
 	}
 
 	@Override
+	public void onRemoteShoot(BulletType type, float x, float y, float rotation, short data) {
+		//TODO shoot!
+		Weapon weapon = Upgrade.getByID((byte)data);
+		weapon.shoot(player, x, y, rotation);
+	}
+
+	@Override
 	public float getMass(){
 	    return mech.mass;
     }
@@ -105,8 +112,8 @@ public class Player extends Unit{
 		ui.hudfrag.fadeRespawn(true);
 	}
 
-	/**called when a remote player death event is recieved*/
-	public void doRespawn(){
+	@Override
+	public void onRemoteDeath(){
 		dead = true;
 		Effects.effect(Fx.explosion, this);
 		Effects.shake(4f, 5f, this);
@@ -136,7 +143,7 @@ public class Player extends Unit{
 
 		float ft = Mathf.sin(walktime, 6f, 2f);
 
-		Draw.alpha(hitTime / hitDuration);
+		//Draw.alpha(hitTime / hitDuration);
 
 		for(int i : Mathf.signs){
 			tr.trns(footRotation, ft * i);
@@ -154,7 +161,7 @@ public class Player extends Unit{
 			Draw.rect(weapon.name + "-equip", x + tr.x, y + tr.y, w, 8, rotation - 90);
 		}
 
-		Draw.alpha(1f);
+		//Draw.alpha(1f);
 
 		x = px;
 		y = py;

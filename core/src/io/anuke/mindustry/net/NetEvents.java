@@ -1,16 +1,15 @@
 package io.anuke.mindustry.net;
 
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.entities.Entity;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -29,20 +28,11 @@ public class NetEvents {
         Net.send(new GameOverPacket(), SendMode.tcp);
     }
 
-    public static void handleBullet(BulletType type, Entity owner, float x, float y, float angle, short damage){
-        BulletPacket packet = new BulletPacket();
-        packet.x = x;
-        packet.y = y;
-        packet.angle = angle;
-        packet.damage = damage;
-        packet.owner = owner.id;
-        packet.type = type.id;
-        Net.send(packet, SendMode.udp);
-    }
 
-    public static void handleEnemyDeath(BaseUnit enemy){
-        EnemyDeathPacket packet = new EnemyDeathPacket();
+    public static void handleUnitDeath(Unit enemy){
+        EntityDeathPacket packet = new EntityDeathPacket();
         packet.id = enemy.id;
+        packet.group = (byte)enemy.getGroup().getID();
         Net.send(packet, SendMode.tcp);
     }
 
@@ -60,7 +50,7 @@ public class NetEvents {
     }
 
     public static void handlePlayerDeath(){
-        PlayerDeathPacket packet = new PlayerDeathPacket();
+        EntityDeathPacket packet = new EntityDeathPacket();
         packet.id = Vars.player.id;
         Net.send(packet, SendMode.tcp);
     }
@@ -100,13 +90,14 @@ public class NetEvents {
         Net.send(packet, SendMode.tcp);
     }
 
-    public static void handleShoot(Weapon weapon, float x, float y, float angle){
-        ShootPacket packet = new ShootPacket();
-        packet.weaponid = weapon.id;
+    public static void handleShoot(SyncEntity entity, float x, float y, float angle, short data){
+        EntityShootPacket packet = new EntityShootPacket();
+        packet.groupid = (byte)entity.getGroup().getID();
         packet.x = x;
         packet.y = y;
+        packet.data = data;
         packet.rotation = angle;
-        packet.playerid = Vars.player.id;
+        packet.entityid = entity.id;
         Net.send(packet, SendMode.udp);
     }
 

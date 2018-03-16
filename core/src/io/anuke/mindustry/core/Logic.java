@@ -7,6 +7,7 @@ import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.game.EventType.PlayEvent;
 import io.anuke.mindustry.game.EventType.ResetEvent;
 import io.anuke.mindustry.game.EventType.WaveEvent;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.WaveCreator;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
@@ -53,6 +54,10 @@ public class Logic extends Module {
         state.lastUpdated = -1;
         state.gameOver = false;
         state.inventory.clearItems();
+        state.allyTeams.clear();
+        state.enemyTeams.clear();
+        state.enemyTeams.add(Team.red);
+        state.team = Team.none;
 
         Timers.clear();
         Entities.clear();

@@ -1,6 +1,7 @@
 package io.anuke.mindustry.entities.units;
 
 import io.anuke.mindustry.entities.Bullet;
+import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
@@ -64,8 +65,18 @@ public class BaseUnit extends Unit {
 	}
 
 	@Override
+	public void onRemoteShoot(BulletType type, float x, float y, float rotation, short data) {
+		new Bullet(type, this, x, y, rotation).add().damage = data;
+	}
+
+	@Override
 	public void onDeath(){
-		type.onDeath(this, false);
+		type.onDeath(this);
+	}
+
+	@Override
+	public void onRemoteDeath(){
+		type.onRemoteDeath(this);
 	}
 
 	@Override

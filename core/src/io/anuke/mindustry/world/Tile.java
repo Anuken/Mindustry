@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.entities.TileEntity;
@@ -12,7 +11,6 @@ import io.anuke.mindustry.world.blocks.types.modules.LiquidModule;
 import io.anuke.mindustry.world.blocks.types.modules.PowerModule;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Bits;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
@@ -84,20 +82,6 @@ public class Tile{
 	
 	public <T extends TileEntity> T entity(){
 		return (T)entity;
-	}
-	
-	public void damageNearby(int rad, int amount, float falloff){
-		for(int dx = -rad; dx <= rad; dx ++){
-			for(int dy = -rad; dy <= rad; dy ++){
-				float dst = Vector2.dst(dx, dy, 0, 0);
-				if(dst > rad || (dx == 0 && dy == 0)) continue;
-				
-				Tile other = world.tile(x + dx, y + dy);
-				if(other != null && other.entity != null){
-					other.entity.damage((int)(amount * Mathf.lerp(1f-dst/rad, 1f, falloff)));
-				}
-			}
-		}
 	}
 	
 	public int id(){

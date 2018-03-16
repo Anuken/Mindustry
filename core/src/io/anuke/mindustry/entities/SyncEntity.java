@@ -14,15 +14,24 @@ import static io.anuke.mindustry.Vars.threads;
 
 /**Base class for any entity that needs to be synced across clients.*/
 public abstract class SyncEntity extends DestructibleEntity{
-    protected transient Interpolator interpolator = new Interpolator();
+    /**Interpolator, used for smoothing position.*/
+    protected Interpolator interpolator = new Interpolator();
     /**smoothed position and rotation*/
     private Vector3 spos = new Vector3();
     /**the general rotation.*/
     public float rotation;
 
+    /**Called when a death event is recieved remotely.*/
+    public abstract void onRemoteDeath();
+
+    /**Called when a shoot event is recieved remotely.*/
+    public abstract void onRemoteShoot(BulletType type, float x, float y, float rotation, short data);
+
+    //Read and write spawn data, which is sent when the entity is requested
     public abstract void writeSpawn(ByteBuffer data);
     public abstract void readSpawn(ByteBuffer data);
 
+    //Read and write sync data, usually position
     public abstract void write(ByteBuffer data);
     public abstract void read(ByteBuffer data, long time);
 
@@ -101,6 +110,7 @@ public abstract class SyncEntity extends DestructibleEntity{
         }
 
         public void update(){
+            //TODO prevent rubberbanding from getting too bad, clamp values?
 
             time += 1f / spacing * Math.min(Timers.delta(), 1f);
 

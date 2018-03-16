@@ -35,9 +35,6 @@ void main() {
 	if(any){
 		gl_FragColor = u_color;
 	}else{
-	    if((c.r < 0.01 && c.g < 0.01 && c.b < 0.01)){
-            c = vec4(0.0);
-	    }
-		gl_FragColor = mix(c, vec4(1.0, 1.0, 1.0, c.a), c.a) * v_color;
+		gl_FragColor = c * v_color;
 	}
 }
