@@ -18,8 +18,11 @@ public abstract class SyncEntity extends DestructibleEntity{
     protected Interpolator interpolator = new Interpolator();
     /**smoothed position and rotation*/
     private Vector3 spos = new Vector3();
-    /**the general rotation.*/
+
+    /**rotation of the top, usually used as the 'shoot' direction.*/
     public float rotation;
+    /**rotation of the base, usually leg rotation for mechs.*/
+    public float baseRotation;
 
     /**Called when a death event is recieved remotely.*/
     public abstract void onRemoteDeath();
@@ -42,6 +45,7 @@ public abstract class SyncEntity extends DestructibleEntity{
         x = interpolator.pos.x;
         y = interpolator.pos.y;
         rotation = interpolator.rotation;
+        baseRotation = interpolator.baseRotation;
     }
 
     /**Same as draw, but for interpolated drawing at low tick speeds.*/
@@ -93,16 +97,17 @@ public abstract class SyncEntity extends DestructibleEntity{
         //used for movement
         public Vector2 target = new Vector2();
         public Vector2 last = new Vector2();
-        public float targetrot;
+        public float targetrot, targetBaseRot;
         public float spacing = 1f;
         public float time;
 
         //current state
         public Vector2 pos = new Vector2();
-        public float rotation;
+        public float rotation, baseRotation;
 
-        public void read(float cx, float cy, float x, float y, float angle, long sent){
-            targetrot = angle;
+        public void read(float cx, float cy, float x, float y, float rotation, float baseRotation, long sent){
+            targetrot = rotation;
+            targetBaseRot = baseRotation;
             time = 0f;
             last.set(cx, cy);
             target.set(x, y);
@@ -117,6 +122,7 @@ public abstract class SyncEntity extends DestructibleEntity{
             Mathf.lerp2(pos.set(last), target, time);
 
             rotation = Mathf.slerpDelta(rotation, targetrot, 0.6f);
+            baseRotation = Mathf.slerpDelta(baseRotation, targetBaseRot, 0.6f);
 
             if(target.dst(pos) > 128){
                 pos.set(target);

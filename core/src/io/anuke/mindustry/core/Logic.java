@@ -57,7 +57,7 @@ public class Logic extends Module {
         state.allyTeams.clear();
         state.enemyTeams.clear();
         state.enemyTeams.add(Team.red);
-        state.team = Team.none;
+        state.team = Team.blue;
 
         Timers.clear();
         Entities.clear();

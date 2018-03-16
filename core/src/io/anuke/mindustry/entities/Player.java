@@ -44,7 +44,7 @@ public class Player extends Unit{
 	public int clientid = -1;
 	public boolean isLocal = false;
 	public Timer timer = new Timer(4);
-	public float footRotation, walktime;
+	public float walktime;
 
 	private Vector2 movement = new Vector2();
 	private Translator tr = new Translator();
@@ -59,7 +59,6 @@ public class Player extends Unit{
 
 	@Override
 	public void onRemoteShoot(BulletType type, float x, float y, float rotation, short data) {
-		//TODO shoot!
 		Weapon weapon = Upgrade.getByID((byte)data);
 		weapon.shoot(player, x, y, rotation);
 	}
@@ -101,7 +100,7 @@ public class Player extends Unit{
 	public void onDeath(){
 		dead = true;
 		if(Net.active()){
-			NetEvents.handlePlayerDeath();
+			NetEvents.handleUnitDeath(this);
 		}
 
 		Effects.effect(Fx.explosion, this);
@@ -145,12 +144,14 @@ public class Player extends Unit{
 
 		//Draw.alpha(hitTime / hitDuration);
 
-		for(int i : Mathf.signs){
-			tr.trns(footRotation, ft * i);
-			Draw.rect(mname + "-leg", x + tr.x, y + tr.y, 12f * i, 12f - Mathf.clamp(ft*i, 0, 2), footRotation- 90);
-		}
+		if(!mech.flying) {
+			for (int i : Mathf.signs) {
+				tr.trns(baseRotation, ft * i);
+				Draw.rect(mname + "-leg", x + tr.x, y + tr.y, 12f * i, 12f - Mathf.clamp(ft * i, 0, 2), baseRotation - 90);
+			}
 
-		Draw.rect(mname + "-base", x, y,footRotation- 90);
+			Draw.rect(mname + "-base", x, y,baseRotation- 90);
+		}
 
 		Draw.rect(mname, x, y, rotation -90);
 
@@ -252,7 +253,7 @@ public class Player extends Unit{
 
 		if(!movement.isZero()){
 			walktime += Timers.delta();
-			footRotation = Mathf.slerpDelta(footRotation, movement.angle(), 0.13f);
+			baseRotation = Mathf.slerpDelta(baseRotation, movement.angle(), 0.13f);
 		}
 
 		if(!shooting){
@@ -318,6 +319,7 @@ public class Player extends Unit{
 			data.putFloat(interpolator.target.y);
 		}
 		data.putFloat(rotation);
+		data.putFloat(baseRotation);
 		data.putShort((short)health);
 		data.put((byte)(dashing ? 1 : 0));
 	}
@@ -326,14 +328,15 @@ public class Player extends Unit{
 	public void read(ByteBuffer data, long time) {
 		float x = data.getFloat();
 		float y = data.getFloat();
-		float angle = data.getFloat();
+		float rot = data.getFloat();
+		float baseRot = data.getFloat();
 		short health = data.getShort();
 		byte dashing = data.get();
 
 		this.health = health;
 		this.dashing = dashing == 1;
 
-		interpolator.read(this.x, this.y, x, y, angle, time);
+		interpolator.read(this.x, this.y, x, y, rot, baseRot, time);
 	}
 
 	@Override

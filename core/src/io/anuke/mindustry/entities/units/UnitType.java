@@ -2,12 +2,17 @@ package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.NetEvents;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
-public class UnitType {
+public abstract class UnitType {
     private static byte lastid = 0;
     private static Array<UnitType> types = new Array<>();
 
@@ -22,6 +27,7 @@ public class UnitType {
     protected float rotatespeed = 0.1f;
     protected float mass = 1f;
     protected boolean isFlying;
+    protected float drag = 0.1f;
 
     public UnitType(String name){
         this.id = lastid++;
@@ -29,53 +35,56 @@ public class UnitType {
         types.add(this);
     }
 
-    public void draw(BaseUnit enemy){
+    public abstract void draw(BaseUnit unit);
+
+    public void drawOver(BaseUnit unit){
+        //TODO doesn't do anything
+    }
+
+    public void update(BaseUnit unit){
+        if(Net.client()){
+            unit.interpolate();
+            return;
+        }
+
+        //TODO logic
+
+        unit.x += unit.velocity.x / mass;
+        unit.y += unit.velocity.y / mass;
+
+        unit.velocity.scl(Mathf.clamp(1f-drag* Timers.delta()));
+
+        behavior(unit);
+
+        unit.x = Mathf.clamp(unit.x, 0, world.width() * tilesize);
+        unit.y = Mathf.clamp(unit.y, 0, world.height() * tilesize);
+    }
+
+    public abstract void behavior(BaseUnit unit);
+
+    public void updateTargeting(BaseUnit unit){
         //TODO
     }
 
-    public void drawOver(BaseUnit enemy){
+    public void onShoot(BaseUnit unit, BulletType type, float rotation){
         //TODO
     }
 
-    public void update(BaseUnit enemy){
-        //TODO
-        enemy.x = Mathf.clamp(enemy.x, 0, world.width() * tilesize);
-        enemy.y = Mathf.clamp(enemy.y, 0, world.height() * tilesize);
+    public void onDeath(BaseUnit unit){
+        //TODO other things, such as enemies?
+        Effects.effect(Fx.explosion, unit);
+
+        if(Net.server()){
+            NetEvents.handleUnitDeath(unit);
+        }
     }
 
-    public void move(BaseUnit enemy){
-        //TODO
+    public void onRemoteDeath(BaseUnit unit){
+        onDeath(unit);
+        unit.remove();
     }
 
-    public void behavior(BaseUnit enemy){
-        //TODO
-    }
-
-    public void updateTargeting(BaseUnit enemy){
-        //TODO
-    }
-
-    public void updateShooting(BaseUnit enemy){
-        //TODO
-    }
-
-    public void shoot(BaseUnit enemy){
-        //TODO
-    }
-
-    public void onShoot(BaseUnit enemy, BulletType type, float rotation){
-        //TODO
-    }
-
-    public void onDeath(BaseUnit enemy){
-        //TODO
-    }
-
-    public void onRemoteDeath(BaseUnit enemy){
-        //TODO
-    }
-
-    public void removed(BaseUnit enemy){
+    public void removed(BaseUnit unit){
         //TODO
     }
 

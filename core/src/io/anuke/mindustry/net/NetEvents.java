@@ -28,11 +28,10 @@ public class NetEvents {
         Net.send(new GameOverPacket(), SendMode.tcp);
     }
 
-
-    public static void handleUnitDeath(Unit enemy){
+    public static void handleUnitDeath(Unit entity){
         EntityDeathPacket packet = new EntityDeathPacket();
-        packet.id = enemy.id;
-        packet.group = (byte)enemy.getGroup().getID();
+        packet.id = entity.id;
+        packet.group = (byte)entity.getGroup().getID();
         Net.send(packet, SendMode.tcp);
     }
 
@@ -47,12 +46,6 @@ public class NetEvents {
         packet.health = (int)entity.health;
         packet.position = entity.tile.packedPosition();
         Net.send(packet, SendMode.udp);
-    }
-
-    public static void handlePlayerDeath(){
-        EntityDeathPacket packet = new EntityDeathPacket();
-        packet.id = Vars.player.id;
-        Net.send(packet, SendMode.tcp);
     }
 
     public static void handleBlockConfig(Tile tile, byte data){

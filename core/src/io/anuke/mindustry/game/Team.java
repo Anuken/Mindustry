@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.Color;
 
 public enum Team {
     none(Color.DARK_GRAY),
-    blue(Color.BLUE),
-    red(Color.RED);
+    blue(Color.ROYAL),
+    red(Color.SCARLET);
 
     public final Color color;
 
