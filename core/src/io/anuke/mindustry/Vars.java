@@ -57,7 +57,7 @@ public class Vars{
 	public static float fontscale = Math.max(Unit.dp.scl(1f)/2f, 0.5f);
 	//camera zoom displayed on startup
 	public static final int baseCameraScale = Math.round(Unit.dp.scl(4));
-	//how much the zoom changes every zoom button press
+	//how much the zoom changes every zoom button press (unused?)
 	public static final int zoomScale = Math.round(Unit.dp.scl(1));
 	//if true, player speed will be increased, massive amounts of resources will be given on start, and other debug options will be available
 	public static boolean debug = false;

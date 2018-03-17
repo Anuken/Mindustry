@@ -20,8 +20,8 @@ public class BackgroundFragment implements Fragment {
             TextureRegion back = Draw.region("background");
             float backscl = Math.max(Gdx.graphics.getWidth() / (float)back.getRegionWidth() * 1.5f, Unit.dp.scl(5f));
 
-            Draw.alpha(0.7f);
-            Core.batch.draw(back, w/2 - back.getRegionWidth()*backscl/2 +240f, h/2 - back.getRegionHeight()*backscl/2 + 250f,
+            Draw.alpha(0.5f);
+            Core.batch.draw(back, w/2 - back.getRegionWidth()*backscl/2, h/2 - back.getRegionHeight()*backscl/2,
                     back.getRegionWidth()*backscl, back.getRegionHeight()*backscl);
 
             boolean portrait = Gdx.graphics.getWidth() < Gdx.graphics.getHeight();
@@ -31,7 +31,7 @@ public class BackgroundFragment implements Fragment {
             float logoh = logo.getRegionHeight()*logoscl;
 
             Draw.color();
-            Core.batch.draw(logo, w/2 - logow/2, h - logoh + 15 + (portrait ? -Unit.dp.scl(30f) : 0f), logow, logoh);
+            Core.batch.draw(logo, w/2 - logow/2, h - logoh + 15 - Unit.dp.scl(portrait ? 30f : 30), logow, logoh);
         }).visible(() -> state.is(State.menu)).grow();
     }
 }

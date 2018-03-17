@@ -22,7 +22,6 @@ import static io.anuke.mindustry.Vars.*;
 
 public class LevelDialog extends FloatingDialog{
 	private Map selectedMap = world.maps().getMap(0);
-	private TextureRegion region = new TextureRegion();
 	private ScrollPane pane;
 	
 	public LevelDialog(){
@@ -56,6 +55,7 @@ public class LevelDialog extends FloatingDialog{
 			group.add(b[0]);
 			selmode.add(b[0]).size(130f, 54f);
 		}
+		selmode.addButton("?", this::displayGameModeHelp).size(50f, 54f).padLeft(18f);
 		
 		content().add(selmode);
 		content().row();
@@ -171,4 +171,23 @@ public class LevelDialog extends FloatingDialog{
 			});
 		});
 	}
+
+	private void displayGameModeHelp() {
+		FloatingDialog d = new FloatingDialog(Bundles.get("mode.text.help.title"));
+		d.setFillParent(false);
+		Table table = new Table();
+		table.defaults().pad(1f);
+		ScrollPane pane = new ScrollPane(table, "clear");
+		pane.setFadeScrollBars(false);
+		table.row();
+		for(GameMode mode : GameMode.values()){
+			table.labelWrap("[accent]" + mode.toString() + ":[] [lightgray]" + mode.description()).width(600f);
+			table.row();
+		}
+
+		d.content().add(pane);
+		d.buttons().addButton("$text.ok", d::hide).size(110, 50).pad(10f);
+		d.show();
+	}
+
 }

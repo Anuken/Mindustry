@@ -164,7 +164,6 @@ public enum PlaceMode{
 		}
 		
 		public void released(int tilex, int tiley, int endx, int endy){
-
 			process(tilex, tiley, endx, endy);
 			tilex = this.tilex; tiley = this.tiley; 
 			endx = this.endx; endy = this.endy;

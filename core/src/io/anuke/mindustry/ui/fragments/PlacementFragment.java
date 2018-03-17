@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.ucore.core.Core;
@@ -128,7 +129,7 @@ public class PlacementFragment implements Fragment{
 
 							defaults().padBottom(-5.5f);
 
-							new imagebutton("icon-" + mode.name(), "toggle", 10 * 3, () -> {
+							ImageButton button = new imagebutton("icon-" + mode.name(), "toggle", 10 * 3, () -> {
 								control.input().resetCursor();
 								input.breakMode = mode;
 								input.lastBreakMode = mode;
@@ -138,7 +139,15 @@ public class PlacementFragment implements Fragment{
 									input.placeMode = input.lastPlaceMode;
 								}
 								modeText(Bundles.format("text.mode.break", mode.toString()));
-							}).group(breakGroup).get().setName(mode.name());
+							}).group(breakGroup).get();
+
+							button.setName(mode.name());
+							button.released(() -> {
+								//TODO hack
+								if(mode == PlaceMode.areaDelete){
+									((AndroidInput)input).placing = false;
+								}
+							});
 						}
 
 					}}.end().get();
@@ -215,6 +224,7 @@ public class PlacementFragment implements Fragment{
 
 		if(!show){
 			control.input().breakMode = PlaceMode.none;
+			if(control.input().placeMode.delete) control.input().placeMode = PlaceMode.none;
 			breaktable.actions(Actions.translateBy(-breaktable.getWidth() - 5, 0, dur, in), Actions.call(() -> shown = false));
 		}else{
 			shown = true;
