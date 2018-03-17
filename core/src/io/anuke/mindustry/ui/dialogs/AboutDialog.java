@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ui.Links;
 import io.anuke.mindustry.ui.Links.LinkEntry;
+import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Table;
 
@@ -50,6 +52,8 @@ public class AboutDialog extends FloatingDialog {
 
             in.add(table).size(w, h).padTop(5).row();
         }
+
+        shown(() -> Timers.run(1f, () -> Core.scene.setScrollFocus(pane)));
 
         content().add(pane).growX();
 
