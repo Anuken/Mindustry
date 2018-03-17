@@ -8,6 +8,7 @@ import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.scene.event.ClickListener;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.Touchable;
@@ -19,8 +20,6 @@ import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
-
-import java.util.function.Consumer;
 
 public class LevelDialog extends FloatingDialog{
 	private Map selectedMap = world.maps().getMap(0);
