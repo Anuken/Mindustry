@@ -36,7 +36,6 @@ import io.anuke.ucore.graphics.*;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
-import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
