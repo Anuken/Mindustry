@@ -114,7 +114,6 @@ public class BlockLoader {
             DistributionBlocks.conduit,
             ProductionBlocks.coaldrill,
             WeaponBlocks.chainturret,
-            SpecialBlocks.enemySpawn,
             DebugBlocks.powerVoid
             //add any new block sections here
         };

@@ -143,7 +143,7 @@ public class Player extends Unit{
 
 		float ft = Mathf.sin(walktime, 6f, 2f);
 
-		//Draw.alpha(hitTime / hitDuration);
+		Draw.alpha(hitTime / hitDuration);
 
 		if(!mech.flying) {
 			for (int i : Mathf.signs) {
@@ -163,7 +163,7 @@ public class Player extends Unit{
 			Draw.rect(weapon.name + "-equip", x + tr.x, y + tr.y, w, 8, rotation - 90);
 		}
 
-		//Draw.alpha(1f);
+		Draw.alpha(1f);
 
 		x = px;
 		y = py;

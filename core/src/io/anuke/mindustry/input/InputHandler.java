@@ -91,7 +91,7 @@ public abstract class InputHandler extends InputAdapter{
 			return false;
 		}
 
-		return Placement.validPlace(x, y, type);
+		return Placement.validPlace(player.team, x, y, type);
 	}
 	
 	public boolean validBreak(int x, int y){
@@ -111,12 +111,12 @@ public abstract class InputHandler extends InputAdapter{
 			}
 		}
 		
-		return Placement.validBreak(x, y);
+		return Placement.validBreak(player.team, x, y);
 	}
 	
 	public void placeBlock(int x, int y, Block result, int rotation, boolean effects, boolean sound){
 		if(!Net.client()){
-			Placement.placeBlock(x, y, result, rotation, effects, sound);
+			Placement.placeBlock(player.team, x, y, result, rotation, effects, sound);
 			Tile tile = world.tile(x, y);
 			if(tile != null) result.placed(tile);
 		}
@@ -127,7 +127,7 @@ public abstract class InputHandler extends InputAdapter{
 	}
 
 	public void breakBlock(int x, int y, boolean sound){
-		if(!Net.client()) Placement.breakBlock(x, y, true, sound);
+		if(!Net.client()) Placement.breakBlock(player.team, x, y, true, sound);
 
 		if(Net.active()){
 			NetEvents.handleBreak(x, y);

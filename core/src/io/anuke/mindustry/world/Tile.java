@@ -298,6 +298,8 @@ public class Tile{
 				entity = null;
 			}
 
+			team = 0;
+
 			Block block = block();
 
 			if (block.destructible || block.update) {

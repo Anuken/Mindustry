@@ -103,7 +103,7 @@ public class BaseUnit extends Unit {
 	public void added(){
 		maxhealth = type.health;
 
-		//hitbox.solid = true;
+		hitbox.solid = true;
 		hitbox.setSize(type.hitsize);
 		hitboxTile.setSize(type.hitsizeTile);
 

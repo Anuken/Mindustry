@@ -10,6 +10,9 @@ import io.anuke.mindustry.world.blocks.types.*;
 
 public class Blocks{
 	public static final Block
+
+	//player/enemy spawnpoint
+	spawn = new Block("spawn"){},
 	
 	air = new Block("air"){
 		//no drawing here

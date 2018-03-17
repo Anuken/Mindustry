@@ -9,7 +9,11 @@ public class Item implements Comparable<Item>{
 	private static final Array<Item> items = new Array<>();
 
 	public static final Item
-	stone = new Item("stone"),
+	stone = new Item("stone"){
+		{
+			material = false;
+		}
+	},
 	iron = new Item("iron"),
 	coal = new Item("coal"){
 		{

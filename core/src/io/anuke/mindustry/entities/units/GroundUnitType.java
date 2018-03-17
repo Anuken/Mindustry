@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities.units;
 
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
@@ -16,6 +17,8 @@ public abstract class GroundUnitType extends UnitType{
 
     @Override
     public void draw(BaseUnit unit) {
+        Draw.alpha(unit.hitTime / Unit.hitDuration);
+
         float walktime = unit.walkTime; //TODO!
 
         float ft = Mathf.sin(walktime, 6f, 2f);
@@ -28,6 +31,8 @@ public abstract class GroundUnitType extends UnitType{
         Draw.rect(name + "-base", unit.x, unit.y, unit.baseRotation- 90);
 
         Draw.rect(name, unit.x, unit.y, unit.rotation -90);
+
+        Draw.alpha(1f);
     }
 
     @Override

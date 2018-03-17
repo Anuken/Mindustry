@@ -15,7 +15,7 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.world;
 
 public class WorldGenerator {
-	public static final ObjectMap<Block, Block> rocks = new ObjectMap(){{
+	public static final ObjectMap<Block, Block> rocks = new ObjectMap<Block, Block>(){{
 		put(Blocks.stone, Blocks.rock);
 		put(Blocks.snow, Blocks.icerock);
 		put(Blocks.grass, Blocks.shrub);
@@ -23,10 +23,8 @@ public class WorldGenerator {
 	}};
 	
 	/**Returns the core (starting) block. Should fill spawns with the correct spawnpoints.*/
-	public static Tile generate(Pixmap pixmap, Tile[][] tiles, Array<SpawnPoint> spawns){
+	public static void generate(Tile[][] tiles, Map map){
 		Noise.setSeed(world.getSeed());
-
-		Tile core = null;
 		
 		for(int x = 0; x < pixmap.getWidth(); x ++){
 			for(int y = 0; y < pixmap.getHeight(); y ++){
@@ -88,7 +86,5 @@ public class WorldGenerator {
 				tiles[x][y].updateOcclusion();
 			}
 		}
-
-		return core;
 	}
 }

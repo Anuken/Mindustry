@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.SpawnPoint;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
@@ -22,7 +23,7 @@ public class Placement {
     private static Array<Tile> tempTiles = new Array<>();
 
     /**Returns block type that was broken, or null if unsuccesful.*/
-    public static Block breakBlock(int x, int y, boolean effect, boolean sound){
+    public static Block breakBlock(Team team, int x, int y, boolean effect, boolean sound){
         Tile tile = world.tile(x, y);
 
         if(tile == null) return null;
@@ -58,13 +59,14 @@ public class Placement {
         return block;
     }
 
-    public static void placeBlock(int x, int y, Block result, int rotation, boolean effects, boolean sound){
+    public static void placeBlock(Team team, int x, int y, Block result, int rotation, boolean effects, boolean sound){
         Tile tile = world.tile(x, y);
 
         //just in case
         if(tile == null) return;
 
         tile.setBlock(result, rotation);
+        tile.setTeam(team);
 
         if(result.isMultiblock()){
             int offsetx = -(result.size-1)/2;
@@ -76,8 +78,10 @@ public class Placement {
                     int worldy = dy + offsety + y;
                     if(!(worldx == x && worldy == y)){
                         Tile toplace = world.tile(worldx, worldy);
-                        if(toplace != null)
-                            toplace.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
+                        if(toplace != null) {
+                            toplace.setLinked((byte) (dx + offsetx), (byte) (dy + offsety));
+                            toplace.setTeam(team);
+                        }
                     }
 
                     if(effects) Effects.effect(Fx.place, worldx * tilesize, worldy * tilesize);
@@ -88,7 +92,7 @@ public class Placement {
         if(effects && sound) threads.run(() -> Effects.sound("place", x * tilesize, y * tilesize));
     }
 
-    public static boolean validPlace(int x, int y, Block type){
+    public static boolean validPlace(Team team, int x, int y, Block type){
         for(int i = 0; i < world.getSpawns().size; i ++){
             SpawnPoint spawn = world.getSpawns().get(i);
             if(Vector2.dst(x * tilesize, y * tilesize, spawn.start.worldx(), spawn.start.worldy()) < enemyspawnspace){
@@ -147,7 +151,7 @@ public class Placement {
             }
             return true;
         }else {
-            return tile.block() != type
+            return tile.block() != type && (tile.getTeam() == Team.none || tile.getTeam() == team)
                     && (type.canReplace(tile.block()) || tile.block().alwaysReplace)
                     && tile.block().isMultiblock() == type.isMultiblock() || tile.block() == Blocks.air;
         }
@@ -157,7 +161,7 @@ public class Placement {
         return tile != null && tile.x == world.getCore().x && tile.y == world.getCore().y - 2;
     }
 
-    public static boolean validBreak(int x, int y){
+    public static boolean validBreak(Team team, int x, int y){
         Tile tile = world.tile(x, y);
 
         if(tile == null || tile.block() == ProductionBlocks.core) return false;
@@ -166,6 +170,6 @@ public class Placement {
             return false;
         }
 
-        return tile.breakable();
+        return tile.breakable() && (tile.getTeam() == Team.none || tile.getTeam() == team);
     }
 }

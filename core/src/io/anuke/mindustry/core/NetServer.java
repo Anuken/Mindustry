@@ -172,11 +172,12 @@ public class NetServer extends Module{
         });
 
         Net.handleServer(PlacePacket.class, (id, packet) -> {
-            packet.playerid = connections.get(id).id;
+            Player placer = connections.get(id);
+            packet.playerid = placer.id;
 
             Block block = Block.getByID(packet.block);
 
-            if(!Placement.validPlace(packet.x, packet.y, block)) return;
+            if(!Placement.validPlace(placer.team, packet.x, packet.y, block)) return;
 
             Recipe recipe = Recipes.getByResult(block);
 
@@ -184,7 +185,7 @@ public class NetServer extends Module{
 
             state.inventory.removeItems(recipe.requirements);
 
-            Placement.placeBlock(packet.x, packet.y, block, packet.rotation, true, false);
+            Placement.placeBlock(placer.team, packet.x, packet.y, block, packet.rotation, true, false);
 
             admins.getTrace(Net.getConnection(id).address).lastBlockPlaced = block;
             admins.getTrace(Net.getConnection(id).address).totalBlocksPlaced ++;
@@ -193,11 +194,12 @@ public class NetServer extends Module{
         });
 
         Net.handleServer(BreakPacket.class, (id, packet) -> {
-            packet.playerid = connections.get(id).id;
+            Player placer = connections.get(id);
+            packet.playerid = placer.id;
 
-            if(!Placement.validBreak(packet.x, packet.y)) return;
+            if(!Placement.validBreak(placer.team, packet.x, packet.y)) return;
 
-            Block block = Placement.breakBlock(packet.x, packet.y, true, false);
+            Block block = Placement.breakBlock(placer.team, packet.x, packet.y, true, false);
 
             if(block != null) {
                 admins.getTrace(Net.getConnection(id).address).lastBlockBroken = block;

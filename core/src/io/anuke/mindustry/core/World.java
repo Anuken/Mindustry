@@ -29,7 +29,8 @@ public class World extends Module{
 	private Tile[][] tiles;
 	private Pathfind pathfind = new Pathfind();
 	private Maps maps = new Maps();
-	private Tile core;
+	private Array<Tile> allyCores = new Array<>();
+	private Array<Tile> enemyCores = new Array<>();
 	private Array<SpawnPoint> spawns = new Array<>();
 
 	private Array<Tile> tempTiles = new Array<>();
@@ -185,41 +186,10 @@ public class World extends Module{
 		core = WorldGenerator.generate(map.pixmap, tiles, spawns);
 
 		Placement.placeBlock(core.x, core.y, ProductionBlocks.core, 0, false, false);
-		
-		if(!map.name.equals("tutorial")){
-			setDefaultBlocks();
-		}else{
-			control.tutorial().setDefaultBlocks(core.x, core.y);
-		}
+
+		control.tutorial().setDefaultBlocks(core.x, core.y);
 		
 		pathfind.resetPaths();
-	}
-	
-	void setDefaultBlocks(){
-		int x = core.x, y = core.y;
-		int flip = Mathf.sign(!currentMap.flipBase);
-		int fr = currentMap.flipBase ? 2 : 0;
-		
-		set(x, y-2*flip, DistributionBlocks.conveyor, 1 + fr);
-		set(x, y-3*flip, DistributionBlocks.conveyor, 1 + fr);
-		
-		for(int i = 0; i < 2; i ++){
-			int d = Mathf.sign(i-0.5f);
-			
-			set(x+2*d, y-2*flip, ProductionBlocks.stonedrill, d);
-			set(x+2*d, y-1*flip, DistributionBlocks.conveyor, 1 + fr);
-			set(x+2*d, y, DistributionBlocks.conveyor, 1 + fr);
-			set(x+2*d, y+1*flip, WeaponBlocks.doubleturret, 0 + fr);
-			
-			set(x+1*d, y-3*flip, DistributionBlocks.conveyor, 2*d);
-			set(x+2*d, y-3*flip, DistributionBlocks.conveyor, 2*d);
-			set(x+2*d, y-4*flip, DistributionBlocks.conveyor, 1 + fr);
-			set(x+2*d, y-5*flip, DistributionBlocks.conveyor, 1 + fr);
-			
-			set(x+3*d, y-5*flip, ProductionBlocks.stonedrill, 0 + fr);
-			set(x+3*d, y-4*flip, ProductionBlocks.stonedrill, 0 + fr);
-			set(x+3*d, y-3*flip, ProductionBlocks.stonedrill, 0 + fr);
-		}
 	}
 	
 	void set(int x, int y, Block type, int rot){

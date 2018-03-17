@@ -48,6 +48,12 @@ public abstract class UnitType {
     }
 
     public void update(BaseUnit unit){
+        if(unit.hitTime > 0){
+            unit.hitTime -= Timers.delta();
+        }
+
+        if(unit.hitTime < 0) unit.hitTime = 0;
+
         if(Net.client()){
             unit.interpolate();
             return;

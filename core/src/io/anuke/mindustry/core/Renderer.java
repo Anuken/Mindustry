@@ -224,9 +224,9 @@ public class Renderer extends RendererModule{
 			Shaders.outline.color.set(team.color);
 
 			Graphics.beginShaders(Shaders.outline);
-			//Graphics.shader(Shaders.hit);
+			Graphics.shader(Shaders.hit, false);
 			drawTeam(team, flying);
-			//Graphics.shader();
+			Graphics.shader();
 			Graphics.endShaders();
 		}
 	}

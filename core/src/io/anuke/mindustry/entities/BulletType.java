@@ -148,7 +148,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		public void hit(Bullet b, float hitx, float hity) {
 			Effects.effect(shellsmoke, b);
 			for(int i = 0; i < 3; i ++){
-				Bullet bullet = new Bullet(flakspark, b.owner, hitx, hity, b.angle() + Mathf.range(120f));
+				Bullet bullet = new Bullet(flakspark, b.owner(), hitx, hity, b.angle() + Mathf.range(120f));
 				bullet.add();
 			}
 		}
@@ -255,7 +255,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			//TODO remove translation() usage
 			Angles.circleVectors(30, 6f, (nx, ny) -> {
 				float ang = Mathf.atan2(nx, ny);
-				Bullet o = new Bullet(blastshot, b.owner, b.x + nx, b.y + ny, ang).add();
+				Bullet o = new Bullet(blastshot, b.owner(), b.x + nx, b.y + ny, ang).add();
 				o.damage = b.damage/9;
 			});
 		}
@@ -419,7 +419,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 
 		public void hit(Bullet b, float hitx, float hity) {
 			for(int i = 0; i < 4; i ++){
-				Bullet bullet = new Bullet(scrap, b.owner, b.x, b.y, b.angle() + Mathf.range(80f));
+				Bullet bullet = new Bullet(scrap, b.owner(), b.x, b.y, b.angle() + Mathf.range(80f));
 				bullet.add();
 			}
 		}
