@@ -22,9 +22,8 @@ public class GameState{
 	public GameMode mode = GameMode.waves;
 	public Difficulty difficulty = Difficulty.normal;
 	public boolean friendlyFire;
-	public Team team = Team.none; //the team that the player is on
 	public ObjectSet<Team> enemyTeams = new ObjectSet<>(), //enemies to the player team
-			allyTeams = new ObjectSet<>(); //allies to the player team
+			allyTeams = new ObjectSet<>(); //allies to the player team, includes the player team
 	
 	public void set(State astate){
 		Events.fire(StateChangeEvent.class, state, astate);

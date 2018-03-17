@@ -5,6 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitTypes;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.builders.button;
@@ -54,7 +55,7 @@ public class DebugFragment implements Fragment {
                row();
                new button("wave", () -> state.wavetime = 0f);
                row();
-               new button("spawn", () -> new BaseUnit(UnitTypes.scout).set(player.x, player.y).add());
+               new button("spawn", () -> new BaseUnit(UnitTypes.scout, Team.red).set(player.x, player.y).add());
                row();
            }}.end();
 

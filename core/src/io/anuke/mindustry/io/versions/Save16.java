@@ -120,6 +120,7 @@ public class Save16 extends SaveFileVersion {
         byte teams = stream.readByte();
 
         for(int i = 0; i < teams; i ++){
+            Team team = Team.values()[i];
             EntityGroup<BaseUnit> group = unitGroups[i];
 
             int amount = stream.readInt();
@@ -130,7 +131,7 @@ public class Save16 extends SaveFileVersion {
                 float y = stream.readFloat();
                 int health = stream.readShort();
 
-                BaseUnit enemy = new BaseUnit(UnitType.getByID(type));
+                BaseUnit enemy = new BaseUnit(UnitType.getByID(type), team);
                 enemy.health = health;
                 enemy.x = x;
                 enemy.y = y;

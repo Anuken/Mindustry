@@ -127,7 +127,7 @@ public class Turret extends Block{
 		if(hasAmmo(tile) || (debug && infiniteAmmo)){
 			
 			if(entity.timer.get(timerTarget, targetInterval)){
-				entity.target = Units.getClosestEnemies(tile.getTeam(),
+				entity.target = Units.getClosestEnemy(tile.getTeam(),
 						tile.worldx(), tile.worldy(), range, e -> !e.isDead());
 			}
 			

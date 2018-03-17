@@ -33,7 +33,8 @@ public class Units {
         }
     }
 
-    public static Unit getClosestEnemies(Team team, float x, float y, float range, Predicate<Unit> predicate){
+    /**Returns the closest enemy of this team. Filter by predicate.*/
+    public static Unit getClosestEnemy(Team team, float x, float y, float range, Predicate<Unit> predicate){
         Unit[] result = {null};
         float[] cdist = {0};
 
@@ -70,7 +71,11 @@ public class Units {
     /**Iterates over all units that are enemies of this team.*/
     public static void getNearbyEnemies(Team team, Rectangle rect, Consumer<Unit> cons){
         //check if it's an ally team to the 'main team'
-        boolean ally = state.team == team || state.allyTeams.contains(team);
+        boolean ally = state.allyTeams.contains(team);
+        boolean enemy = state.enemyTeams.contains(team);
+
+        //this team isn't even in the game, so target nothing!
+        if(!ally && !enemy) return;
 
         ObjectSet<Team> targets = ally ? state.enemyTeams : state.allyTeams;
 
@@ -92,8 +97,8 @@ public class Units {
     /**Returns whether these two teams are enemies.*/
     public static boolean areEnemies(Team team, Team other){
         if(team == other) return false; //fast fail to be more efficient
-        boolean ally = state.team == team || state.allyTeams.contains(team);
-        boolean ally2 = state.team == other || state.allyTeams.contains(other);
+        boolean ally = state.allyTeams.contains(team);
+        boolean ally2 = state.allyTeams.contains(other);
         return ally == ally2;
     }
 }

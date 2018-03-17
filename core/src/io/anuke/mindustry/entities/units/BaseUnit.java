@@ -3,8 +3,10 @@ package io.anuke.mindustry.entities.units;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.ucore.entities.Entity;
+import io.anuke.mindustry.game.Team;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.SolidEntity;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
 
 import java.nio.ByteBuffer;
@@ -14,14 +16,27 @@ import static io.anuke.mindustry.Vars.unitGroups;
 public class BaseUnit extends Unit {
 	public UnitType type;
 	public Timer timer = new Timer(5);
-	public Entity target;
+	public float walkTime = 0f;
+	public Unit target;
 
-	public BaseUnit(UnitType type){
+	public BaseUnit(UnitType type, Team team){
 		this.type = type;
+		this.team = team;
 	}
 
 	/**internal constructor used for deserialization, DO NOT USE*/
 	public BaseUnit(){}
+
+	public void rotate(float angle){
+		rotation = Mathf.slerpDelta(rotation, angle, type.rotatespeed);
+	}
+
+	@Override
+	public void move(float x, float y){
+		walkTime += Timers.delta();
+		baseRotation = Mathf.slerpDelta(baseRotation, Mathf.atan2(x, y), type.baseRotateSpeed);
+		super.move(x, y);
+	}
 
 	@Override
 	public float getMass() {
@@ -88,6 +103,7 @@ public class BaseUnit extends Unit {
 	public void added(){
 		maxhealth = type.health;
 
+		//hitbox.solid = true;
 		hitbox.setSize(type.hitsize);
 		hitboxTile.setSize(type.hitsizeTile);
 
@@ -102,6 +118,7 @@ public class BaseUnit extends Unit {
 	@Override
 	public void writeSpawn(ByteBuffer buffer) {
 		buffer.put(type.id);
+		buffer.put((byte)team.ordinal());
 		buffer.putFloat(x);
 		buffer.putFloat(y);
 		buffer.putShort((short)health);
@@ -110,6 +127,7 @@ public class BaseUnit extends Unit {
 	@Override
 	public void readSpawn(ByteBuffer buffer) {
 		type = UnitType.getByID(buffer.get());
+		team = Team.values()[buffer.get()];
 		x = buffer.getFloat();
 		y = buffer.getFloat();
 		health = buffer.getShort();

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Tutorial;
 import io.anuke.mindustry.game.UpgradeInventory;
 import io.anuke.mindustry.graphics.Fx;
@@ -158,7 +159,7 @@ public class Control extends Module{
 		Events.on(ResetEvent.class, () -> {
 			upgrades.reset();
 			player.weaponLeft = player.weaponRight = Weapon.blaster;
-			player.team = state.team;
+			player.team = Team.blue;
 
 			player.add();
 			player.heal();

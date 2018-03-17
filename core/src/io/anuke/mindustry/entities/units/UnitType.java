@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
@@ -16,6 +17,10 @@ public abstract class UnitType {
     private static byte lastid = 0;
     private static Array<UnitType> types = new Array<>();
 
+    private static int timerIndex = 0;
+
+    protected static final int timerTarget = timerIndex++;
+
     public final String name;
     public final byte id;
 
@@ -23,8 +28,9 @@ public abstract class UnitType {
     protected float hitsize = 5f;
     protected float hitsizeTile = 4f;
     protected float speed = 0.4f;
-    protected float range = 60;
+    protected float range = 160;
     protected float rotatespeed = 0.1f;
+    protected float baseRotateSpeed = 0.1f;
     protected float mass = 1f;
     protected boolean isFlying;
     protected float drag = 0.1f;
@@ -47,6 +53,8 @@ public abstract class UnitType {
             return;
         }
 
+        updateTargeting(unit);
+
         //TODO logic
 
         unit.x += unit.velocity.x / mass;
@@ -54,20 +62,27 @@ public abstract class UnitType {
 
         unit.velocity.scl(Mathf.clamp(1f-drag* Timers.delta()));
 
-        behavior(unit);
+        if(unit.target != null) behavior(unit);
 
         unit.x = Mathf.clamp(unit.x, 0, world.width() * tilesize);
         unit.y = Mathf.clamp(unit.y, 0, world.height() * tilesize);
     }
 
+    /**Only runs when the unit has a target.*/
     public abstract void behavior(BaseUnit unit);
 
     public void updateTargeting(BaseUnit unit){
-        //TODO
+        if(unit.target == null || unit.target.isDead()){
+            unit.target = null;
+        }
+
+        if(unit.timer.get(timerTarget, 30)){
+            unit.target = Units.getClosestEnemy(unit.team, unit.x, unit.y, range, e -> true);
+        }
     }
 
     public void onShoot(BaseUnit unit, BulletType type, float rotation){
-        //TODO
+        //TODO remove?
     }
 
     public void onDeath(BaseUnit unit){

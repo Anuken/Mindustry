@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
@@ -291,6 +292,7 @@ public class Player extends Unit{
 		buffer.putInt(Color.rgba8888(color));
 		buffer.putFloat(x);
 		buffer.putFloat(y);
+		buffer.put((byte)team.ordinal());
 	}
 
 	@Override
@@ -306,6 +308,7 @@ public class Player extends Unit{
 		color.set(buffer.getInt());
 		x = buffer.getFloat();
 		y = buffer.getFloat();
+		team = Team.values()[buffer.get()];
 		setNet(x, y);
 	}
 

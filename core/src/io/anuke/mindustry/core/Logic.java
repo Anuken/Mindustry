@@ -55,9 +55,9 @@ public class Logic extends Module {
         state.gameOver = false;
         state.inventory.clearItems();
         state.allyTeams.clear();
+        state.allyTeams.add(Team.blue);
         state.enemyTeams.clear();
         state.enemyTeams.add(Team.red);
-        state.team = Team.blue;
 
         Timers.clear();
         Entities.clear();
@@ -129,7 +129,15 @@ public class Logic extends Module {
                 Entities.update(playerGroup);
 
                 for(EntityGroup group : unitGroups){
-                    if(!group.isEmpty()) Entities.collideGroups(bulletGroup, group);
+                    if(!group.isEmpty()){
+                        Entities.collideGroups(bulletGroup, group);
+
+                        for(EntityGroup other : unitGroups){
+                            if(!other.isEmpty()){
+                                Entities.collideGroups(group, other);
+                            }
+                        }
+                    }
                 }
 
                 Entities.collideGroups(bulletGroup, playerGroup);
