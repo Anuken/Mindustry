@@ -3,6 +3,8 @@ package io.anuke.mindustry.ui.fragments;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.units.UnitTypes;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.builders.button;
@@ -46,17 +48,13 @@ public class DebugFragment implements Fragment {
                row();
                new button("noclip", "toggle", () -> noclip = !noclip);
                row();
-               new button("hideplayer", "toggle", () -> showPlayer = !showPlayer);
-               row();
                new button("blocks", "toggle", () -> showBlockDebug = !showBlockDebug);
                row();
                new button("paths", "toggle", () -> showPaths = !showPaths);
                row();
                new button("wave", () -> state.wavetime = 0f);
                row();
-               new button("time 0", () -> Timers.resetTime(0f));
-               row();
-               new button("time max", () -> Timers.resetTime(1080000 - 60*10));
+               new button("spawn", () -> new BaseUnit(UnitTypes.scout).set(player.x, player.y).add());
                row();
            }}.end();
 

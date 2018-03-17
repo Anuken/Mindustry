@@ -86,8 +86,12 @@ public class BaseUnit extends Unit {
 
 	@Override
 	public void added(){
+		maxhealth = type.health;
+
 		hitbox.setSize(type.hitsize);
 		hitboxTile.setSize(type.hitsizeTile);
+
+		heal();
 	}
 	
 	@Override
@@ -117,6 +121,7 @@ public class BaseUnit extends Unit {
 		data.putFloat(x);
 		data.putFloat(y);
 		data.putShort((short)(rotation *2));
+		data.putShort((short)(baseRotation *2));
 		data.putShort((short)health);
 	}
 
@@ -124,10 +129,11 @@ public class BaseUnit extends Unit {
 	public void read(ByteBuffer data, long time) {
 		float x = data.getFloat();
 		float y = data.getFloat();
-		short angle = data.getShort();
+		short rotation = data.getShort();
+		short baserotation = data.getShort();
 		short health = data.getShort();
 
+		interpolator.read(this.x, this.y, x, y, rotation/2f, baserotation/2f, time);
 		this.health = health;
-		interpolator.read(this.x, this.y, x, y, angle/2f, time);
 	}
 }

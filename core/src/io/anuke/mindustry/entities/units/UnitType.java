@@ -77,11 +77,12 @@ public abstract class UnitType {
         if(Net.server()){
             NetEvents.handleUnitDeath(unit);
         }
+
+        unit.remove();
     }
 
     public void onRemoteDeath(BaseUnit unit){
         onDeath(unit);
-        unit.remove();
     }
 
     public void removed(BaseUnit unit){

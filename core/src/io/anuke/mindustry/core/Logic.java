@@ -122,7 +122,7 @@ public class Logic extends Module {
                 Entities.update(Entities.defaultGroup());
                 Entities.update(bulletGroup);
                 for(EntityGroup group : unitGroups){
-                    if(!group.isEmpty()) Entities.update(group);
+                    Entities.update(group);
                 }
                 Entities.update(tileGroup);
                 Entities.update(shieldGroup);
