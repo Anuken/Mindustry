@@ -8,7 +8,6 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.Platform;
-import io.anuke.mindustry.mapeditor.MapEditorDialog;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.ucore.core.Core;
@@ -44,7 +43,7 @@ public class UI extends SceneModule{
 	public PausedDialog paused;
 	public SettingsMenuDialog settings;
 	public ControlsDialog controls;
-	public MapEditorDialog editor;
+	public FloatingDialog editor; //TODO change back to map editor dialog
 	public LanguageDialog language;
 	public BansDialog bans;
 	public AdminsDialog admins;
@@ -144,7 +143,7 @@ public class UI extends SceneModule{
 	@Override
 	public void init(){
 
-		editor = new MapEditorDialog();
+		(editor = new FloatingDialog("The editor is currently broken.")).addCloseButton();
 		controls = new ControlsDialog();
 		restart = new RestartDialog();
 		join = new JoinDialog();

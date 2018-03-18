@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.builders.button;
@@ -70,11 +69,12 @@ public class Tutorial{
 		//info.setText(stage.text);
 		
 		if(stage.showBlock){
+			/*
 			Tile tile = world.tile(world.getCore().x + stage.blockPlaceX, world.getCore().y + stage.blockPlaceY);
 			
 			if(tile.block() == stage.targetBlock && (tile.getRotation() == stage.blockRotation || stage.blockRotation == -1)){
 				move(true);
-			}
+			}*/
 		}
 	}
 	
@@ -287,6 +287,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
+				/*
 				for(int flip : new int[]{1, -1}){
 					world.tile(world.getCore().x + flip, world.getCore().y - 2).setBlock(DistributionBlocks.conveyor, 2 * flip);
 					world.tile(world.getCore().x + flip*2, world.getCore().y - 2).setBlock(DistributionBlocks.conveyor, 2 * flip);
@@ -295,7 +296,7 @@ public class Tutorial{
 					world.tile(world.getCore().x + flip*2, world.getCore().y - 4).setFloor(Blocks.stone);
 					world.tile(world.getCore().x + flip*2, world.getCore().y - 4).setBlock(ProductionBlocks.stonedrill);
 					
-				}
+				}*/
 			}
 		},
 		deleteBlock{
@@ -342,7 +343,7 @@ public class Tutorial{
 			
 			void onSwitch(){
 				for(int i = 0; i < 4; i ++){
-					world.tile(world.getCore().x + 2, world.getCore().y - 2 + i).setBlock(DistributionBlocks.conveyor, 1);
+					//world.tile(world.getCore().x + 2, world.getCore().y - 2 + i).setBlock(DistributionBlocks.conveyor, 1);
 				}
 
 				control.input().recipe = null;
@@ -428,7 +429,7 @@ public class Tutorial{
 			
 			void onSwitch(){
 				ui.<ImageButton>find("sectionbuttondistribution").fireClick();
-				world.tile(blockPlaceX + world.getCore().x, blockPlaceY + world.getCore().y).setBlock(Blocks.air);
+				//world.tile(blockPlaceX + world.getCore().x, blockPlaceY + world.getCore().y).setBlock(Blocks.air);
 			}
 		},
 		conduitUse2{
@@ -444,7 +445,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				world.tile(blockPlaceX + world.getCore().x, blockPlaceY + world.getCore().y).setBlock(Blocks.air);
+				//world.tile(blockPlaceX + world.getCore().x, blockPlaceY + world.getCore().y).setBlock(Blocks.air);
 			}
 		},
 		conduitUse3{
@@ -460,7 +461,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				world.tile(blockPlaceX + world.getCore().x, blockPlaceY + world.getCore().y).setBlock(Blocks.air);
+				//world.tile(blockPlaceX + world.getCore().x, blockPlaceY + world.getCore().y).setBlock(Blocks.air);
 			}
 		},
 		generator{
@@ -475,7 +476,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				world.tile(blockPlaceX + world.getCore().x, blockPlaceY + world.getCore().y).setBlock(Blocks.air);
+				//world.tile(blockPlaceX + world.getCore().x, blockPlaceY + world.getCore().y).setBlock(Blocks.air);
 				ui.<ImageButton>find("sectionbuttonpower").fireClick();
 				state.inventory.addItem(Item.steel, 60);
 				state.inventory.addItem(Item.iron, 60);
@@ -558,6 +559,7 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
+				/*
 				for(int i = 0; i < 5; i ++){
 					world.tile(world.getCore().x, world.getCore().y - 6 + i).setBlock(DistributionBlocks.conveyor, 1);
 				}
@@ -570,7 +572,7 @@ public class Tutorial{
 				world.tile(world.getCore().x-1, world.getCore().y - 8).setBlock(ProductionBlocks.coaldrill);
 				
 				world.tile(world.getCore().x+1, world.getCore().y - 7).setBlock(DistributionBlocks.conveyor, 2);
-				world.tile(world.getCore().x-1, world.getCore().y - 7).setBlock(DistributionBlocks.conveyor, 0);
+				world.tile(world.getCore().x-1, world.getCore().y - 7).setBlock(DistributionBlocks.conveyor, 0);*/
 			}
 		},
 		tunnelExplain{

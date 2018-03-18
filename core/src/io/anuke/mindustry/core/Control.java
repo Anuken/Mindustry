@@ -9,25 +9,26 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Tutorial;
 import io.anuke.mindustry.game.UpgradeInventory;
-import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
+import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.io.Saves;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Mech;
 import io.anuke.mindustry.resource.Weapon;
-import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Atlas;
+import io.anuke.ucore.util.InputProxy;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -126,10 +127,6 @@ public class Control extends Module{
 
 		KeyBinds.load();
 
-		for(Map map : world.maps().list()){
-			Settings.defaults("hiscore" + map.name, 0);
-		}
-
 		player = new Player();
 		player.name = Settings.getString("name");
 		player.mech = android ? Mech.standardShip : Mech.standard;
@@ -188,11 +185,15 @@ public class Control extends Module{
 
 		Events.on(GameOverEvent.class, () -> {
 			Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
-			Sounds.play("corexplode");
+
+
+			//TODO effects???
+            //Sounds.play("corexplode");
+			/*
 			for(int i = 0; i < 16; i ++){
 				Timers.run(i*2, ()-> Effects.effect(Fx.explosion, world.getCore().worldx()+Mathf.range(40), world.getCore().worldy()+Mathf.range(40)));
 			}
-			Effects.effect(Fx.coreexplosion, world.getCore().worldx(), world.getCore().worldy());
+			Effects.effect(Fx.coreexplosion, world.getCore().worldx(), world.getCore().worldy());*/
 
 			ui.restart.show();
 
@@ -249,23 +250,6 @@ public class Control extends Module{
 		return tutorial;
 	}
 
-	private void checkOldUser(){
-		boolean hasPlayed = false;
-
-		for(Map map : world.maps().getAllMaps()){
-			if(Settings.getInt("hiscore" + map.name) != 0){
-				hasPlayed = true;
-				break;
-			}
-		}
-
-		if(hasPlayed && Settings.getString("lastVersion").equals("3.2")){
-			Timers.runTask(1f, () -> ui.showInfo("$text.changes"));
-			Settings.putString("lastVersion", "3.3");
-			Settings.save();
-		}
-	}
-
 	@Override
 	public void dispose(){
 		Platform.instance.onGameExit();
@@ -292,8 +276,6 @@ public class Control extends Module{
 		Entities.initPhysics();
 
 		Platform.instance.updateRPC();
-
-		checkOldUser();
 	}
 
 	@Override

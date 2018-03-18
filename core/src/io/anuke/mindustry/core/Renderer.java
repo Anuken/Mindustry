@@ -16,7 +16,6 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.entities.units.BaseUnit;
-import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.BlockRenderer;
 import io.anuke.mindustry.graphics.Shaders;
@@ -26,7 +25,6 @@ import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
@@ -119,14 +117,11 @@ public class Renderer extends RendererModule{
 		}else{
 			boolean smoothcam = Settings.getBool("smoothcam");
 
-			if(world.getCore() == null || world.getCore().block() == ProductionBlocks.core){
-				if(!smoothcam){
-					setCamera(player.x, player.y);
-				}else{
-					smoothCamera(player.x, player.y, android ? 0.3f : 0.14f);
-				}
+
+			if(!smoothcam){
+				setCamera(player.x, player.y);
 			}else{
-				smoothCamera(world.getCore().worldx(), world.getCore().worldy(), 0.4f);
+				smoothCamera(player.x, player.y, android ? 0.3f : 0.14f);
 			}
 
 			if(Settings.getBool("pixelate"))
@@ -392,6 +387,8 @@ public class Renderer extends RendererModule{
 
 		//draw tutorial placement point
 		if(world.getMap().name.equals("tutorial") && control.tutorial().showBlock()){
+			//TODO draw placement point for tutorial
+			/*
 			int x = world.getCore().x + control.tutorial().getPlacePoint().x;
 			int y = world.getCore().y + control.tutorial().getPlacePoint().y;
 			int rot = control.tutorial().getPlaceRotation();
@@ -405,7 +402,7 @@ public class Renderer extends RendererModule{
 			if(rot != -1){
 				Lines.lineAngle(x * tilesize, y * tilesize, rot * 90, 6);
 			}
-			Draw.reset();
+			Draw.reset();*/
 		}
 
 		//draw config selected block
@@ -435,17 +432,6 @@ public class Renderer extends RendererModule{
 
 			input.placeMode.draw(control.input().getBlockX(), control.input().getBlockY(),
 					control.input().getBlockEndX(), control.input().getBlockEndY());
-
-			Lines.stroke(1f);
-			Draw.color(Color.SCARLET);
-			for(SpawnPoint spawn : world.getSpawns()){
-				Lines.dashCircle(spawn.start.worldx(), spawn.start.worldy(), enemyspawnspace);
-			}
-
-			if(world.getCore() != null) {
-				Draw.color(Color.LIME);
-				Lines.poly(world.getSpawnX(), world.getSpawnY(), 4, 6f, Timers.time() * 2f);
-			}
 			
 			if(input.breakMode == PlaceMode.holdDelete)
 				input.breakMode.draw(tilex, tiley, 0, 0);

@@ -97,25 +97,7 @@ public class NetServer extends Module{
 
             admins.getTrace(ip).playerid = player.id;
 
-            if(world.getMap().custom){
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                NetworkIO.writeMap(world.getMap(), stream);
-                CustomMapPacket data = new CustomMapPacket();
-                data.stream = new ByteArrayInputStream(stream.toByteArray());
-                Net.sendStream(id, data);
-
-                Log.info("Sending custom map: Packed {0} uncompressed bytes of MAP data.", stream.size());
-            }else{
-                //hack-- simulate the map ack packet recieved to send the world data to the client.
-                Net.handleServerReceived(id, new MapAckPacket());
-            }
-
-            Platform.instance.updateRPC();
-        });
-
-        Net.handleServer(MapAckPacket.class, (id, packet) -> {
-            Player player = connections.get(id);
-
+            //TODO try DeflaterOutputStream
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             NetworkIO.writeWorld(player, weapons.get(player.name, new ByteArray()), stream);
             WorldData data = new WorldData();
@@ -123,6 +105,8 @@ public class NetServer extends Module{
             Net.sendStream(id, data);
 
             Log.info("Packed {0} uncompressed bytes of WORLD data.", stream.size());
+
+            Platform.instance.updateRPC();
         });
 
         Net.handleServer(ConnectConfirmPacket.class, (id, packet) -> {

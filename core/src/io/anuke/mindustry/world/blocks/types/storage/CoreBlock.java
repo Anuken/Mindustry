@@ -6,6 +6,7 @@ import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.debug;
 import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.world;
 
 public class CoreBlock extends StorageBlock {
     protected int capacity = 1000;
@@ -23,6 +24,12 @@ public class CoreBlock extends StorageBlock {
     @Override
     public int handleDamage(Tile tile, int amount){
         return debug ? 0 : amount;
+    }
+
+    public void onDestroyed(Tile tile){
+        //TODO more dramatic effects
+        super.onDestroyed(tile);
+        world.getAllyCores().removeValue(tile, true);
     }
 
     @Override

@@ -229,7 +229,7 @@ public class Turret extends Block{
 	}
 	
 	protected void bullet(Tile tile, float angle){
-		new Bullet(bullet, tile.entity, tile.drawx() + tr.x, tile.drawy() + tr.y, angle).add();
+		new Bullet(bullet, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle).add();
 	}
 	
 	public static class TurretEntity extends TileEntity{

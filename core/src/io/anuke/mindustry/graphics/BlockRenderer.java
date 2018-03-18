@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
@@ -188,10 +187,6 @@ public class BlockRenderer{
 		Graphics.begin();
 
 		Draw.reset();
-		
-		if(showPaths && debug){
-			drawPaths();
-		}
 
 		if(debug && debugChunks){
 			Draw.color(Color.YELLOW);
@@ -209,21 +204,6 @@ public class BlockRenderer{
 			Draw.reset();
 		}
 	}
-	
-	void drawPaths(){
-		Draw.color(Color.RED);
-		for(SpawnPoint point : world.getSpawns()){
-			if(point.pathTiles != null){
-				for(int i = 1; i < point.pathTiles.length; i ++){
-					Lines.line(point.pathTiles[i-1].worldx(), point.pathTiles[i-1].worldy(),
-							point.pathTiles[i].worldx(), point.pathTiles[i].worldy());
-					Lines.circle(point.pathTiles[i-1].worldx(), point.pathTiles[i-1].worldy(), 6f);
-				}
-			}
-		}
-		Draw.reset();
-	}
-	
 
 	void drawCache(DrawLayer layer, int crangex, int crangey){
 		Gdx.gl.glEnable(GL20.GL_BLEND);

@@ -14,6 +14,7 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.util.IOUtils;
 
 import java.nio.ByteBuffer;
 
@@ -64,8 +65,7 @@ public class Packets {
         @Override
         public void write(ByteBuffer buffer) {
             buffer.putInt(Version.build);
-            buffer.put((byte)name.getBytes().length);
-            buffer.put(name.getBytes());
+            IOUtils.writeString(buffer, name);
             buffer.put(android ? (byte)1 : 0);
             buffer.putInt(color);
             buffer.put(uuid);
@@ -74,10 +74,7 @@ public class Packets {
         @Override
         public void read(ByteBuffer buffer) {
             version = buffer.getInt();
-            byte length = buffer.get();
-            byte[] bytes = new byte[length];
-            buffer.get(bytes);
-            name = new String(bytes);
+            name = IOUtils.readString(buffer);
             android = buffer.get() == 1;
             color = buffer.getInt();
             uuid = new byte[8];
@@ -320,8 +317,7 @@ public class Packets {
             }else{
                 buffer.putShort((short)-1);
             }
-            buffer.putShort((short)text.getBytes().length);
-            buffer.put(text.getBytes());
+            IOUtils.writeString(buffer, text);
             buffer.putInt(id);
         }
 
@@ -333,12 +329,9 @@ public class Packets {
                 buffer.get(n);
                 name = new String(n);
             }
-            short tlength = buffer.getShort();
-            byte[] t = new byte[tlength];
-            buffer.get(t);
 
+            text = IOUtils.readString(buffer);
             id = buffer.getInt();
-            text = new String(t);
         }
     }
 
@@ -487,16 +480,12 @@ public class Packets {
 
         @Override
         public void write(ByteBuffer buffer) {
-            buffer.putShort((short)message.getBytes().length);
-            buffer.put(message.getBytes());
+            IOUtils.writeString(buffer, message);
         }
 
         @Override
         public void read(ByteBuffer buffer) {
-            short length = buffer.getShort();
-            byte[] bytes = new byte[length];
-            buffer.get(bytes);
-            message = new String(bytes);
+            message = IOUtils.readString(buffer);
         }
     }
 

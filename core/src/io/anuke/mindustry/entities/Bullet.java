@@ -3,17 +3,31 @@ package io.anuke.mindustry.entities;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.BulletEntity;
+import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.util.Timer;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class Bullet extends BulletEntity{
 	public Timer timer = new Timer(3);
+	public Team team;
 	
 	public Bullet(BulletType type, Unit owner, float x, float y, float angle){
 		super(type, owner, angle);
-		set(x, y);
 		this.type = type;
+		this.team = owner.team;
+		set(x, y);
+	}
+
+	public Bullet(BulletType type, Entity owner, Team team, float x, float y, float angle){
+		super(type, owner, angle);
+		this.team = team;
+		this.type = type;
+		set(x, y);
+	}
+
+	public Bullet(BulletType type, Bullet parent, float x, float y, float angle){
+		this(type, parent.owner, parent.team, x, y, angle);
 	}
 	
 	public void draw(){
@@ -39,14 +53,6 @@ public class Bullet extends BulletEntity{
 		return true;
 	}
 
-	public Unit owner(){
-		return (Unit)owner;
-	}
-
-	public Team team(){
-		return ((Unit)owner).team;
-	}
-	
 	@Override
 	public void update(){
 		super.update();
@@ -58,7 +64,7 @@ public class Bullet extends BulletEntity{
 				if (tile == null) return false;
 				tile = tile.target();
 
-				if (tile.entity != null && tile.entity.collide(this) && !tile.entity.dead && tile.entity.tile.getTeam() != team()) {
+				if (tile.entity != null && tile.entity.collide(this) && !tile.entity.dead && tile.entity.tile.getTeam() != team) {
 					tile.entity.collision(this);
 					remove();
 					type.hit(this);

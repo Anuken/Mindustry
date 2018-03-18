@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.ItemStack;
@@ -93,13 +92,6 @@ public class Placement {
     }
 
     public static boolean validPlace(Team team, int x, int y, Block type){
-        for(int i = 0; i < world.getSpawns().size; i ++){
-            SpawnPoint spawn = world.getSpawns().get(i);
-            if(Vector2.dst(x * tilesize, y * tilesize, spawn.start.worldx(), spawn.start.worldy()) < enemyspawnspace){
-                return false;
-            }
-        }
-
         Recipe recipe = Recipes.getByResult(type);
 
         if(recipe == null || !state.inventory.hasItems(recipe.requirements)){
@@ -157,8 +149,9 @@ public class Placement {
         }
     }
 
+    //TODO make this work!
     public static boolean isSpawnPoint(Tile tile){
-        return tile != null && tile.x == world.getCore().x && tile.y == world.getCore().y - 2;
+        return false;
     }
 
     public static boolean validBreak(Team team, int x, int y){

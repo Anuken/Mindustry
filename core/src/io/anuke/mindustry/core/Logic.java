@@ -11,7 +11,6 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.WaveCreator;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
-import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
@@ -51,7 +50,6 @@ public class Logic extends Module {
         state.extrawavetime = maxwavespace * state.difficulty.maxTimeScaling;
         state.wavetime = wavespace * state.difficulty.timeScaling;
         state.enemies = 0;
-        state.lastUpdated = -1;
         state.gameOver = false;
         state.inventory.clearItems();
         state.allyTeams.clear();
@@ -66,11 +64,6 @@ public class Logic extends Module {
     }
 
     public void runWave(){
-
-        if(state.lastUpdated < state.wave + 1){
-            world.pathfinder().resetPaths();
-            state.lastUpdated = state.wave + 1;
-        }
 
         //TODO spawn enemies
 
@@ -93,7 +86,7 @@ public class Logic extends Module {
             if(!Net.client())
                 world.pathfinder().update();
 
-            if(world.getCore() != null && world.getCore().block() != ProductionBlocks.core && !state.gameOver){
+            if(world.getAllyCores().size == 0 && !state.gameOver){
                 state.gameOver = true;
                 if(Net.server()) NetEvents.handleGameOver();
                 Events.fire(GameOverEvent.class);
@@ -105,11 +98,6 @@ public class Logic extends Module {
 
                     if(state.enemies <= 0){
                         if(!world.getMap().name.equals("tutorial")) state.wavetime -= delta();
-
-                        if(state.lastUpdated < state.wave + 1 && state.wavetime < aheadPathfinding){ //start updating beforehand
-                            world.pathfinder().resetPaths();
-                            state.lastUpdated = state.wave + 1;
-                        }
                     }else{
                         state.extrawavetime -= delta();
                     }

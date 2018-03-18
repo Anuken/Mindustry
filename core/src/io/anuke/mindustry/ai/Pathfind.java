@@ -1,17 +1,11 @@
 package io.anuke.mindustry.ai;
 
-import com.badlogic.gdx.ai.pfa.PathFinderRequest;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.SpawnPoint;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Log;
-
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.world;
 
 public class Pathfind{
 	/**Maximum time taken per frame on pathfinding for a single path.*/
@@ -40,6 +34,7 @@ public class Pathfind{
 	/**Update the pathfinders and continue calculating the path if it hasn't been calculated yet.
 	 *  This method is run each frame.*/
 	public void update(){
+		/*
 
 		//go through each spawnpoint, and if it's not found a path yet, update it
 		for(int i = 0; i < world.getSpawns().size; i ++){
@@ -60,46 +55,20 @@ public class Pathfind{
 					point.request.pathFound = true;
 				}
 			}
-		}
+		}*/
 
-	}
-
-	//1300-1500ms, usually 1400 unoptimized on Caldera
-	/**Benchmark pathfinding speed. Debugging stuff.*/
-	public void benchmark(){
-		SpawnPoint point = world.getSpawns().first();
-		int amount = 100;
-
-		//warmup
-		for(int i = 0; i < 100; i ++){
-			point.finder.searchNodePath(point.start, world.getCore(), state.difficulty.heuristic, point.path);
-			point.path.clear();
-		}
-
-		Timers.mark();
-		for(int i = 0; i < amount; i ++){
-			point.finder.searchNodePath(point.start, world.getCore(), state.difficulty.heuristic, point.path);
-			point.path.clear();
-		}
-		Log.info("Time elapsed: {0}ms\nAverage MS per path: {1}", Timers.elapsed(), Timers.elapsed()/amount);
-	}
-
-	/**Reset and clear the paths.*/
-	public void resetPaths(){
-		for(int i = 0; i < world.getSpawns().size; i ++){
-			resetPathFor(world.getSpawns().get(i));
-		}
 	}
 
 	private void resetPathFor(SpawnPoint point){
+		/*
 		point.finder = new OptimizedPathFinder<>(graph);
 
 		point.path.clear();
 
 		point.pathTiles = null;
-
+		//TODO
 		point.request = new PathFinderRequest<>(point.start, world.getCore(), state.difficulty.heuristic, point.path);
-		point.request.statusChanged = true; //IMPORTANT!
+		point.request.statusChanged = true; //IMPORTANT!*/
 	}
 
 	/**Finds the closest tile to a position, in an array of tiles.*/

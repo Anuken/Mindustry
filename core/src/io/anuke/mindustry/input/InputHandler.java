@@ -78,13 +78,13 @@ public abstract class InputHandler extends InputAdapter{
 		
 		if(!type.isMultiblock() && control.tutorial().active() &&
 				control.tutorial().showBlock()){
-			
+
+			//TODO placepoint control, make sure it's correct.
 			GridPoint2 point = control.tutorial().getPlacePoint();
 			int rotation = control.tutorial().getPlaceRotation();
 			Block block = control.tutorial().getPlaceBlock();
 			
-			if(type != block || point.x != x - world.getCore().x || point.y != y - world.getCore().y
-					|| (rotation != -1 && rotation != this.rotation)){
+			if(type != block || (rotation != -1 && rotation != this.rotation)){
 				return false;
 			}
 		}else if(control.tutorial().active()){
@@ -98,11 +98,12 @@ public abstract class InputHandler extends InputAdapter{
 		if(control.tutorial().active()){
 			
 			if(control.tutorial().showBlock()){
+				//TODO placepoint control, make sure it's correct
 				GridPoint2 point = control.tutorial().getPlacePoint();
 				int rotation = control.tutorial().getPlaceRotation();
 				Block block = control.tutorial().getPlaceBlock();
 			
-				if(block != Blocks.air || point.x != x - world.getCore().x || point.y != y - world.getCore().y
+				if(block != Blocks.air
 						|| (rotation != -1 && rotation != this.rotation)){
 					return false;
 				}

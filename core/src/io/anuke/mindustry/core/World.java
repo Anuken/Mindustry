@@ -6,20 +6,19 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.game.SpawnPoint;
+import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.Maps;
-import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.WorldGenerator;
 import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.mindustry.world.blocks.DistributionBlocks;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
-import io.anuke.mindustry.world.blocks.WeaponBlocks;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
-import static io.anuke.mindustry.Vars.control;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class World extends Module{
@@ -31,42 +30,41 @@ public class World extends Module{
 	private Maps maps = new Maps();
 	private Array<Tile> allyCores = new Array<>();
 	private Array<Tile> enemyCores = new Array<>();
-	private Array<SpawnPoint> spawns = new Array<>();
 
 	private Array<Tile> tempTiles = new Array<>();
 	
 	public World(){
-		maps.loadMaps();
-		currentMap = maps.getMap(0);
+		maps.load();
 	}
 	
 	@Override
 	public void dispose(){
 		maps.dispose();
 	}
-
-	public Array<SpawnPoint> getSpawns(){
-		return spawns;
-	}
-
-	public Tile getCore(){
-		return core;
-	}
 	
 	public Maps maps(){
 		return maps;
 	}
-	
+
 	public Pathfind pathfinder(){
 		return pathfind;
 	}
 
+    public Array<Tile> getAllyCores() {
+        return allyCores;
+    }
+
+    public Array<Tile> getEnemyCores() {
+        return enemyCores;
+    }
+
+    //TODO proper spawnpoints!
 	public float getSpawnX(){
-		return core.worldx();
+		return width() * tilesize/2f;
 	}
 
 	public float getSpawnY(){
-		return core.worldy() - tilesize*2;
+		return height() * tilesize/2f;
 	}
 	
 	public boolean solid(int x, int y){
@@ -105,11 +103,11 @@ public class World extends Module{
 	}
 	
 	public int width(){
-		return currentMap.getWidth();
+		return currentMap.meta.width;
 	}
 	
 	public int height(){
-		return currentMap.getHeight();
+		return currentMap.meta.height;
 	}
 
 	public Tile tile(int packed){
@@ -136,16 +134,6 @@ public class World extends Module{
 		return tiles;
 	}
 	
-	private void createTiles(){
-		for(int x = 0; x < tiles.length; x ++){
-			for(int y = 0; y < tiles[0].length; y ++){
-				if(tiles[x][y] == null){
-					tiles[x][y] = new Tile(x, y, Blocks.stone);
-				}
-			}
-		}
-	}
-	
 	private void clearTileEntities(){
 		for(int x = 0; x < tiles.length; x ++){
 			for(int y = 0; y < tiles[0].length; y ++){
@@ -155,43 +143,40 @@ public class World extends Module{
 			}
 		}
 	}
+
+	/**Resizes the tile array to the specified size and returns the resulting tile array.
+     * Only use for loading saves!*/
+    public Tile[][] createTiles(int width, int height){
+        if(tiles != null){
+            clearTileEntities();
+
+            if(tiles.length != width || tiles[0].length != height){
+                tiles = new Tile[width][height];
+            }
+        }else{
+            tiles = new Tile[width][height];
+        }
+
+        return tiles;
+    }
 	
 	public void loadMap(Map map){
-		loadMap(map, MathUtils.random(0, 99999));
+		loadMap(map, MathUtils.random(0, 999999));
 	}
 	
 	public void loadMap(Map map, int seed){
-		currentMap = map;
-		
-		if(tiles != null){
-			clearTileEntities();
-			
-			if(tiles.length != map.getWidth() || tiles[0].length != map.getHeight()){
-				tiles = new Tile[map.getWidth()][map.getHeight()];
-			}
-			
-			createTiles();
-		}else{
-			tiles = new Tile[map.getWidth()][map.getHeight()];
-			
-			createTiles();
-		}
-		
-		spawns.clear();
-		
-		Entities.resizeTree(0, 0, map.getWidth() * tilesize, map.getHeight() * tilesize);
-		
+		this.currentMap = map;
 		this.seed = seed;
-		
-		core = WorldGenerator.generate(map.pixmap, tiles, spawns);
 
-		Placement.placeBlock(core.x, core.y, ProductionBlocks.core, 0, false, false);
-
-		control.tutorial().setDefaultBlocks(core.x, core.y);
+		int width = map.meta.width, height = map.meta.height;
 		
-		pathfind.resetPaths();
+		createTiles(width, height);
+		
+		Entities.resizeTree(0, 0, width * tilesize, height * tilesize);
+		
+		WorldGenerator.generate(tiles, maps.readTileData(map));
 	}
-	
+
 	void set(int x, int y, Block type, int rot){
 		if(!Mathf.inBounds(x, y, tiles)){
 			return;
@@ -201,7 +186,7 @@ public class World extends Module{
 		}
 		tiles[x][y].setBlock(type, rot);
 	}
-	
+
 	public int getSeed(){
 		return seed;
 	}

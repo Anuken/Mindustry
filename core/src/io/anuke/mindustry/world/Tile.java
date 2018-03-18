@@ -37,22 +37,23 @@ public class Tile{
 		this.x = (short)x;
 		this.y = (short)y;
 	}
-	
-	public Tile(int x, int y, Block floor){
+
+	public Tile(int x, int y, byte floor, byte wall){
 		this(x, y);
-		iSetFloor(floor);
+		this.floor = floor;
+		this.wall = wall;
+	}
+	
+	public Tile(int x, int y, byte floor, byte wall, byte rotation, byte team){
+		this(x, y);
+		this.floor = floor;
+		this.wall = wall;
+		this.rotation = rotation;
+		this.team = team;
 	}
 
 	public int packedPosition(){
 		return x + y * world.width();
-	}
-	
-	private void iSetFloor(Block floor){
-		this.floor =  (byte)floor.id;
-	}
-	
-	private void iSetBlock(Block wall){
-		this.wall = (byte)wall.id;
 	}
 	
 	public byte getWallID(){
@@ -130,23 +131,23 @@ public class Tile{
 	public void setBlock(Block type, int rotation){
 		synchronized (tileSetLock) {
 			if(rotation < 0) rotation = (-rotation + 2);
-			iSetBlock(type);
-			setRotation((byte) (rotation % 4));
+			this.wall = (byte)type.id;
 			this.link = 0;
+			setRotation((byte) (rotation % 4));
 			changed();
 		}
 	}
 	
 	public void setBlock(Block type){
 		synchronized (tileSetLock) {
-			iSetBlock(type);
+			this.wall = (byte)type.id;
 			this.link = 0;
 			changed();
 		}
 	}
 	
 	public void setFloor(Block type){
-		iSetFloor(type);
+		this.floor = (byte)type.id;
 	}
 	
 	public void setRotation(byte rotation){

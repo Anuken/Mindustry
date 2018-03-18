@@ -14,10 +14,8 @@ import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.Placement;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BaseBulletType;
 import io.anuke.ucore.entities.Entities;
@@ -99,18 +97,6 @@ public class NetClient extends Module {
             player.set(world.getSpawnX(), world.getSpawnY());
 
             finishConnecting();
-        });
-
-        Net.handleClient(CustomMapPacket.class, packet -> {
-            Log.info("Recieved custom map: {0} bytes.", packet.stream.available());
-
-            //custom map is always sent before world data
-            Map map = NetworkIO.loadMap(packet.stream);
-
-            world.maps().setNetworkMap(map);
-
-            MapAckPacket ack = new MapAckPacket();
-            Net.send(ack, SendMode.tcp);
         });
 
         Net.handleClient(SyncPacket.class, packet -> {
@@ -253,10 +239,7 @@ public class NetClient extends Module {
         });
 
         Net.handleClient(GameOverPacket.class, packet -> {
-            if(world.getCore().block() != ProductionBlocks.core &&
-                    world.getCore().entity != null){
-                world.getCore().entity.onDeath(true);
-            }
+            //TODO core death effects
             quiet = true;
             ui.restart.show();
         });

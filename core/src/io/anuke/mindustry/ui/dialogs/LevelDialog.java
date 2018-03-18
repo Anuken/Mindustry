@@ -1,15 +1,13 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
-import io.anuke.mindustry.world.Map;
+import io.anuke.mindustry.io.Map;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.event.ClickListener;
-import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
@@ -21,7 +19,6 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.*;
 
 public class LevelDialog extends FloatingDialog{
-	private Map selectedMap = world.maps().getMap(0);
 	private ScrollPane pane;
 	
 	public LevelDialog(){
@@ -88,10 +85,8 @@ public class LevelDialog extends FloatingDialog{
 		content().row();
 
 		int i = 0;
-		for(Map map : world.maps().list()){
-			
-			if(!map.visible && !debug) continue;
-			
+		for(Map map : world.maps().all()){
+
 			if(i % maxwidth == 0){
 				maps.row();
 			}
@@ -115,40 +110,16 @@ public class LevelDialog extends FloatingDialog{
 			Stack stack = new Stack();
 			
 			Image back = new Image("white");
-			back.setColor(map.backgroundColor);
+			back.setColor(Color.valueOf("646464"));
 			
 			ImageButton image = new ImageButton(new TextureRegion(map.texture), "togglemap");
 			image.row();
 			image.add(inset).width(images+6);
-			TextButton[] delete = new TextButton[1];
-			if(map.custom){
-				image.row();
-				delete[0] = image.addButton("Delete", () -> {
-					Timers.run(1f, () -> {
-						ui.showConfirm("$text.level.delete.title", Bundles.format("text.level.delete", Bundles.get("map."+map.name+".name", map.name)), () -> {
-							world.maps().removeMap(map);
-							reload();
-							Core.scene.setScrollFocus(pane);
-						});
-					});
-				}).width(images+16).padBottom(-10f).grow().get();
-			}
+			//TODO custom map delete button
 
-			Vector2 hit = new Vector2();
-			
-			image.addListener(new ClickListener(){
-				public void clicked(InputEvent event, float x, float y){
-					image.localToStageCoordinates(hit.set(x, y));
-					if(delete[0] != null && (delete[0].getClickListener().isOver() || delete[0].getClickListener().isPressed()
-							|| (Core.scene.hit(hit.x, hit.y, true) != null &&
-							Core.scene.hit(hit.x, hit.y, true).isDescendantOf(delete[0])))){
-						return;
-					}
-					
-					selectedMap = map;
-					hide();
-					control.playMap(selectedMap);
-				}
+			image.clicked(() -> {
+				hide();
+				control.playMap(map);
 			});
 			image.getImageCell().size(images);
 			

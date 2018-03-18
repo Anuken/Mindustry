@@ -4,12 +4,12 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
@@ -125,7 +125,7 @@ public class Weapon extends Upgrade{
 		}
 	}
 	
-	void bullet(Entity owner, float x, float y, float angle){
+	void bullet(Unit owner, float x, float y, float angle){
 		tr.trns(angle, 3f);
 		new Bullet(type, owner,  x + tr.x, y + tr.y, angle).add();
 	}

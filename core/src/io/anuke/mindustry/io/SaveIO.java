@@ -79,8 +79,8 @@ public class SaveIO{
 		try{
 			int version = stream.readInt();
 			SaveFileVersion ver = versions.get(version);
-			SaveMeta meta = ver.getData(stream);
-			return meta.map != null;
+			ver.getData(stream);
+			return true;
 		}catch (Exception e){
 			return false;
 		}

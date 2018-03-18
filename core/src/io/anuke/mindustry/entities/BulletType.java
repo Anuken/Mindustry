@@ -121,7 +121,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			Effects.effect(Fx.shellsmoke, b);
 			Effects.effect(Fx.shellexplosion, b);
 			
-			DamageArea.damage(b.team(), b.x, b.y, 25f, (int)(damage * 2f/3f));
+			DamageArea.damage(b.team, b.x, b.y, 25f, (int)(damage * 2f/3f));
 		}
 	},
 	flak = new BulletType(2.9f, 8) {
@@ -148,7 +148,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		public void hit(Bullet b, float hitx, float hity) {
 			Effects.effect(shellsmoke, b);
 			for(int i = 0; i < 3; i ++){
-				Bullet bullet = new Bullet(flakspark, b.owner(), hitx, hity, b.angle() + Mathf.range(120f));
+				Bullet bullet = new Bullet(flakspark, b, hitx, hity, b.angle() + Mathf.range(120f));
 				bullet.add();
 			}
 		}
@@ -201,7 +201,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			Effects.effect(Fx.shellsmoke, b);
 			Effects.effect(Fx.shockwaveSmall, b);
 			
-			DamageArea.damage(b.team(), b.x, b.y, 50f, (int)(damage * 2f/3f));
+			DamageArea.damage(b.team, b.x, b.y, 50f, (int)(damage * 2f/3f));
 		}
 	},
 	yellowshell = new BulletType(1.2f, 20){
@@ -232,7 +232,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			Effects.effect(Fx.shellsmoke, b);
 			Effects.effect(Fx.shockwaveSmall, b);
 			
-			DamageArea.damage(b.team(), b.x, b.y, 25f, (int)(damage * 2f/3f));
+			DamageArea.damage(b.team, b.x, b.y, 25f, (int)(damage * 2f/3f));
 		}
 	},
 	blast = new BulletType(1.1f, 90){
@@ -255,7 +255,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 			//TODO remove translation() usage
 			Angles.circleVectors(30, 6f, (nx, ny) -> {
 				float ang = Mathf.atan2(nx, ny);
-				Bullet o = new Bullet(blastshot, b.owner(), b.x + nx, b.y + ny, ang).add();
+				Bullet o = new Bullet(blastshot, b, b.x + nx, b.y + ny, ang).add();
 				o.damage = b.damage/9;
 			});
 		}
@@ -370,7 +370,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 
 			Effects.effect(Fx.clusterbomb, b);
 
-			DamageArea.damage(b.team(), b.x, b.y, 35f, damage);
+			DamageArea.damage(b.team, b.x, b.y, 35f, damage);
 		}
 	},
     vulcan = new BulletType(4.5f, 12) {
@@ -419,7 +419,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 
 		public void hit(Bullet b, float hitx, float hity) {
 			for(int i = 0; i < 4; i ++){
-				Bullet bullet = new Bullet(scrap, b.owner(), b.x, b.y, b.angle() + Mathf.range(80f));
+				Bullet bullet = new Bullet(scrap, b, b.x, b.y, b.angle() + Mathf.range(80f));
 				bullet.add();
 			}
 		}
@@ -449,7 +449,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		}
 
 		public void init(Bullet b) {
-			DamageArea.damageLine(b.team(), Fx.beamhit, b.x, b.y, b.angle(), length, damage);
+			DamageArea.damageLine(b.team, Fx.beamhit, b.x, b.y, b.angle(), length, damage);
 		}
 
 		public void draw(Bullet b) {
