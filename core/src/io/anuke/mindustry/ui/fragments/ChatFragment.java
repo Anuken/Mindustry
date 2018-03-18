@@ -62,14 +62,12 @@ public class ChatFragment extends Table implements Fragment{
             }
 
             if (chatOpen) {
-                // up arrow key
-                if (Inputs.keyTap(19) && historyPos < history.size - 1) {
+                if (Inputs.keyTap("chat_scroll_up") && historyPos < history.size - 1) {
                     if (historyPos == 0) history.set(0, chatfield.getText());
                     historyPos++;
                     updateChat();
                 }
-                // down arrow key
-                if (Inputs.keyTap(20) && historyPos > 0) {
+                if (Inputs.keyTap("chat_scroll_down") && historyPos > 0) {
                     historyPos--;
                     updateChat();
                 }
