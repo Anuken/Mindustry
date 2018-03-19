@@ -1,8 +1,7 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.utils.Align;
-
+import io.anuke.mindustry.io.MapTileData;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.function.BiConsumer;
 import io.anuke.ucore.scene.ui.ButtonGroup;
@@ -10,29 +9,30 @@ import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 
 public class MapResizeDialog extends FloatingDialog{
+	int[] validMapSizes = {128, 256, 512};
 	int width, height;
 	
 	public MapResizeDialog(MapEditor editor, BiConsumer<Integer, Integer> cons){
 		super("$text.editor.resizemap");
 		shown(() -> {
 			content().clear();
-			Pixmap pix = editor.pixmap();
-			width = pix.getWidth();
-			height = pix.getHeight();
+			MapTileData data = editor.getMap();
+			width = data.width();
+			height = data.height();
 			
 			Table table = new Table();
 			
 			for(int d = 0; d < 2; d ++){
 				boolean w = d == 0;
-				int curr = d == 0 ? pix.getWidth() : pix.getHeight();
+				int curr = d == 0 ? data.width() : data.height();
 				int idx = 0;
-				for(int i = 0; i < MapEditor.validMapSizes.length; i ++)
-					if(MapEditor.validMapSizes[i] == curr) idx = i;
+				for(int i = 0; i < validMapSizes.length; i ++)
+					if(validMapSizes[i] == curr) idx = i;
 				
 				table.add(d == 0 ? "$text.width": "$text.height").padRight(8f);
 				ButtonGroup<TextButton> group = new ButtonGroup<>();
-				for(int i = 0; i < MapEditor.validMapSizes.length; i ++){
-					int size = MapEditor.validMapSizes[i];
+				for(int i = 0; i < validMapSizes.length; i ++){
+					int size = validMapSizes[i];
 					TextButton button = new TextButton(size + "", "toggle");
 					button.clicked(() -> {
 						if(w)

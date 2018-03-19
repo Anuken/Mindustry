@@ -1,22 +1,8 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Scaling;
-
-import static io.anuke.mindustry.Vars.*;
-import io.anuke.mindustry.editor.MapFilter.GenPref;
-import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Pixmaps;
-import io.anuke.ucore.scene.style.TextureRegionDrawable;
-import io.anuke.ucore.scene.ui.CheckBox;
 import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.layout.Stack;
-import io.anuke.ucore.scene.ui.layout.Table;
 
 public class MapGenerateDialog extends FloatingDialog{
 	private MapEditor editor;
@@ -26,6 +12,8 @@ public class MapGenerateDialog extends FloatingDialog{
 	public MapGenerateDialog(MapEditor editor) {
 		super("$text.editor.generate");
 		this.editor = editor;
+		//TODO implement!
+		/*
 		
 		Stack stack = new Stack();
 		stack.add(image = new BorderImage());
@@ -90,13 +78,13 @@ public class MapGenerateDialog extends FloatingDialog{
 				image.setDrawable(new TextureRegionDrawable(new TextureRegion(editor.getFilterTexture())));
 				loading = false;
 			});
-		});
+		});*/
 	}
 	
 	private void apply(){
 		loading = true;
 		Timers.run(3f, () -> {
-			editor.applyFilterPreview();
+			//editor.applyFilterPreview();
 			loading = false;
 		});
 		
