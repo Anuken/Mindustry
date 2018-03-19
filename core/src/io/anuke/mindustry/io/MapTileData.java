@@ -12,7 +12,7 @@ public class MapTileData {
     private final static int TILE_SIZE = 3;
 
     private final ByteBuffer buffer;
-    private final TileData tile = new TileData();
+    private final TileDataWriter tile = new TileDataWriter();
     private final int width, height;
 
     public MapTileData(int width, int height){
@@ -36,15 +36,22 @@ public class MapTileData {
     }
 
     /**Reads and returns the next tile data.*/
-    public TileData read(){
-        tile.read();
+    public TileDataWriter read(){
+        tile.read(buffer);
         return tile;
     }
 
-    /**Writes tile data at a specified position. Uses the tile data returned by read().*/
-    public void write(int x, int y){
+    /**Reads and returns the next tile data.*/
+    public TileDataWriter readAt(int x, int y){
         position(x, y);
-        tile.write();
+        tile.read(buffer);
+        return tile;
+    }
+
+    /**Writes tile data at a specified position.*/
+    public void write(int x, int y, TileDataWriter writer){
+        position(x, y);
+        writer.write(buffer);
     }
 
     /**Sets read position to the specified coordinates*/
@@ -52,12 +59,12 @@ public class MapTileData {
         buffer.position((x + width * y) * TILE_SIZE);
     }
 
-    public class TileData{
+    public static class TileDataWriter {
         public byte floor, wall;
         public byte rotation;
         public byte team;
 
-        private void read(){
+        public void read(ByteBuffer buffer){
             floor = buffer.get();
             wall = buffer.get();
             byte rt = buffer.get();
@@ -65,7 +72,7 @@ public class MapTileData {
             team = Bits.getRightByte(rt);
         }
 
-        private void write(){
+        public void write(ByteBuffer buffer){
             buffer.put(floor);
             buffer.put(wall);
             byte rt = Bits.packByte(rotation, team);

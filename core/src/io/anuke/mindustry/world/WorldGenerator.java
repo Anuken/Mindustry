@@ -2,7 +2,7 @@ package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.io.MapTileData;
-import io.anuke.mindustry.io.MapTileData.TileData;
+import io.anuke.mindustry.io.MapTileData.TileDataWriter;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.noise.Noise;
 
@@ -23,7 +23,7 @@ public class WorldGenerator {
 		
 		for(int x = 0; x < data.width(); x ++){
 			for(int y = 0; y < data.height(); y ++){
-				TileData tile = data.read();
+				TileDataWriter tile = data.read();
 				tiles[x][y] = new Tile(x, y, tile.floor, tile.wall, tile.rotation, tile.team);
 
 				//TODO ores, plants, extra decoration?

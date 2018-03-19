@@ -8,6 +8,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.game.GameMode;
+import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Net;
@@ -17,7 +18,6 @@ import io.anuke.mindustry.net.Packets.ChatPacket;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.net.TraceInfo;
 import io.anuke.mindustry.ui.fragments.DebugFragment;
-import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.modules.Module;
@@ -33,8 +33,6 @@ import java.util.Scanner;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.util.Log.*;
-
-;
 
 public class ServerControl extends Module {
     private final CommandHandler handler = new CommandHandler("");
@@ -81,12 +79,12 @@ public class ServerControl extends Module {
             }
 
             if (mode != ShuffleMode.off) {
-                Array<Map> maps = mode == ShuffleMode.both ? world.maps().getAllMaps() :
-                        mode == ShuffleMode.normal ? world.maps().getDefaultMaps() : world.maps().getCustomMaps();
+                Array<Map> maps = mode == ShuffleMode.both ? world.maps().all() :
+                        mode == ShuffleMode.normal ? world.maps().defaultMaps() : world.maps().customMaps();
 
                 Map previous = world.getMap();
                 Map map = previous;
-                while (map == previous || !map.visible) map = maps.random();
+                while (map == previous) map = maps.random();
 
                 info("Selected next map to be {0}.", map.name);
                 state.set(State.playing);
@@ -134,7 +132,7 @@ public class ServerControl extends Module {
 
             String search = arg[0];
             Map result = null;
-            for(Map map : world.maps().list()){
+            for(Map map : world.maps().all()){
                 if(map.name.equalsIgnoreCase(search))
                     result = map;
             }
@@ -165,8 +163,8 @@ public class ServerControl extends Module {
 
         handler.register("maps", "Display all available maps.", arg -> {
             Log.info("Maps:");
-            for(Map map : world.maps().getAllMaps()){
-                Log.info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.getWidth(), map.getHeight());
+            for(Map map : world.maps().all()){
+                Log.info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.meta.width, map.meta.height);
             }
         });
 
@@ -505,7 +503,8 @@ public class ServerControl extends Module {
                return;
             }
 
-            world.removeBlock(world.getCore());
+            Events.fire(GameOverEvent.class);
+
             info("Core destroyed.");
         });
 

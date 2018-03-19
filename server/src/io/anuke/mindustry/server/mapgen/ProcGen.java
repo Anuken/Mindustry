@@ -1,6 +1,6 @@
 package io.anuke.mindustry.server.mapgen;
 
-import io.anuke.mindustry.world.Map;
+import io.anuke.mindustry.io.Map;
 import io.anuke.ucore.noise.RidgedPerlin;
 import io.anuke.ucore.noise.Simplex;
 

@@ -1,9 +1,11 @@
 package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.ucore.util.Log;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -13,22 +15,34 @@ import static io.anuke.mindustry.Vars.customMapDirectory;
 import static io.anuke.mindustry.Vars.mapExtension;
 
 public class Maps implements Disposable{
+	/**List of all built-in maps.*/
+	private static final String[] defaultMapNames = {};
+
 	private ObjectMap<String, Map> maps = new ObjectMap<>();
 	private Array<Map> allMaps = new Array<>();
-	private Array<Map> customMaps = new Array<>();
-	private Array<Map> defaultMaps = new Array<>();
-
-	public void load(){
-		//TODO
-	}
-
-	public void save(){
-		//TODO?
-	}
+	private Array<Map> returnArray = new Array<>();
 
 	/**Returns a list of all maps, including custom ones.*/
 	public Array<Map> all(){
 		return allMaps;
+	}
+
+	/**Returns a list of only custo maps.*/
+	public Array<Map> customMaps(){
+		returnArray.clear();
+		for(Map map : allMaps){
+			if(map.custom) returnArray.add(map);
+		}
+		return returnArray;
+	}
+
+	/**Returns a list of only default maps.*/
+	public Array<Map> defaultMaps(){
+		returnArray.clear();
+		for(Map map : allMaps){
+			if(!map.custom) returnArray.add(map);
+		}
+		return returnArray;
 	}
 
 	/**Returns map by internal name.*/
@@ -37,6 +51,7 @@ public class Maps implements Disposable{
 	}
 
 	//TODO GWT support: read from prefs string if custom
+	/**Reads all tile data from a map. Should be used sparingly.*/
 	public MapTileData readTileData(Map map){
 		try {
 			InputStream stream;
@@ -54,6 +69,35 @@ public class Maps implements Disposable{
 		}catch (IOException e){
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**Load all maps. Should be called at application start.*/
+	public void load(){
+		try {
+			for (String name : defaultMapNames) {
+				loadMap(Gdx.files.internal("maps/" + name + "." + mapExtension), false);
+			}
+		}catch (IOException e){
+			throw new RuntimeException(e);
+		}
+
+		for(FileHandle file : customMapDirectory.list()){
+			try{
+				loadMap(file, true);
+			}catch (IOException e){
+				Log.err("Failed to load custom map file '{0}'!", file);
+				Log.err(e);
+			}
+		}
+	}
+
+	private void loadMap(FileHandle file, boolean custom) throws IOException{
+		DataInputStream ds = new DataInputStream(file.read());
+		MapMeta meta = readMapMeta(ds);
+		Map map = new Map(file.nameWithoutExtension(), meta, custom);
+
+		maps.put(map.name, map);
+		allMaps.add(map);
 	}
 
 	private MapTileData readTileData(DataInputStream stream) throws IOException{
