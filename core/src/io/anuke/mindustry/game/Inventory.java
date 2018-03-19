@@ -23,12 +23,13 @@ public class Inventory {
         updated = true;
         Arrays.fill(items, 0);
 
-        addItem(Item.stone, 40);
 
         if(debug){
             for(Item item : Item.getAllItems()){
                 if(item.material) items[item.id] = 99999;
             }
+        }else{
+            addItem(Item.iron, 40);
         }
     }
 

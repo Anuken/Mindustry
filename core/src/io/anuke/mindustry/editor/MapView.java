@@ -3,7 +3,6 @@ package io.anuke.mindustry.editor;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
@@ -20,7 +19,6 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.graphics.Pixmaps;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.InputListener;
@@ -37,7 +35,6 @@ public class MapView extends Element implements GestureListener{
 	private EditorTool tool = EditorTool.pencil;
 	private OperationStack stack = new OperationStack();
 	private DrawOperation op;
-	private Pixmap current;
 	private Bresenham2 br = new Bresenham2();
 	private boolean updated = false;
 	private float offsetx, offsety;
@@ -61,7 +58,7 @@ public class MapView extends Element implements GestureListener{
 
 	public void clearStack(){
 		stack.clear();
-		current = null;
+		//TODO clear und obuffer
 	}
 
 	public OperationStack getStack() {
@@ -76,24 +73,15 @@ public class MapView extends Element implements GestureListener{
 		return grid;
 	}
 
-	public void push(Pixmap previous, Pixmap add){
-		DrawOperation op = new DrawOperation(editor.pixmap());
-		op.add(previous, add);
-		stack.add(op);
-		this.current = add;
-	}
-
 	public void undo(){
 		if(stack.canUndo()){
 			stack.undo();
-			editor.updateTexture();
 		}
 	}
 
 	public void redo(){
 		if(stack.canRedo()){
 			stack.redo();
-			editor.updateTexture();
 		}
 	}
 
@@ -111,9 +99,6 @@ public class MapView extends Element implements GestureListener{
 					return false;
 				}
 
-				if(current == null){
-					current = Pixmaps.copy(editor.pixmap());
-				}
 				updated = false;
 
 				GridPoint2 p = project(x, y);
@@ -127,8 +112,6 @@ public class MapView extends Element implements GestureListener{
 					updated = true;
 					ui.editor.resetSaved();
 				}
-
-				op = new DrawOperation(editor.pixmap());
 
 				drawing = true;
 				return true;
@@ -147,15 +130,6 @@ public class MapView extends Element implements GestureListener{
 						editor.draw(point.x, point.y);
 					}
 					updated = true;
-				}
-
-				if(updated){
-					if(op == null) op = new DrawOperation(editor.pixmap());
-					Pixmap next = Pixmaps.copy(editor.pixmap());
-					op.add(current, next);
-					current = null;
-					stack.add(op);
-					op = null;
 				}
 			}
 			
@@ -200,41 +174,42 @@ public class MapView extends Element implements GestureListener{
 	}
 	
 	private GridPoint2 project(float x, float y){
-		float ratio = 1f / ((float)editor.pixmap().getWidth() / editor.pixmap().getHeight());
+		float ratio = 1f / ((float)editor.getMap().width() / editor.getMap().height());
 		float size = Math.min(width, height);
 		float sclwidth = size * zoom;
 		float sclheight = size * zoom * ratio;
-		x = (x - getWidth()/2 + sclwidth/2 - offsetx*zoom) / sclwidth * editor.texture().getWidth();
-		y = (y - getHeight()/2 + sclheight/2 - offsety*zoom) / sclheight * editor.texture().getHeight();
-		return Tmp.g1.set((int)x, editor.texture().getHeight() - 1 - (int)y);
+		x = (x - getWidth()/2 + sclwidth/2 - offsetx*zoom) / sclwidth * editor.getMap().width();
+		y = (y - getHeight()/2 + sclheight/2 - offsety*zoom) / sclheight * editor.getMap().height();
+		return Tmp.g1.set((int)x, editor.getMap().height() - 1 - (int)y);
 	}
 
 	private Vector2 unproject(int x, int y){
-		float ratio = 1f / ((float)editor.pixmap().getWidth() / editor.pixmap().getHeight());
+		float ratio = 1f / ((float)editor.getMap().width() / editor.getMap().height());
 		float size = Math.min(width, height);
 		float sclwidth = size * zoom;
 		float sclheight = size * zoom * ratio;
-		float px = ((float)x / editor.texture().getWidth()) * sclwidth + offsetx*zoom - sclwidth/2 + getWidth()/2;
-		float py = (float)((float)(editor.texture().getHeight() - 1 -  y) / editor.texture().getHeight()) * sclheight
+		float px = ((float)x / editor.getMap().width()) * sclwidth + offsetx*zoom - sclwidth/2 + getWidth()/2;
+		float py = (float)((float)(editor.getMap().height() - 1 -  y) / editor.getMap().height()) * sclheight
 				+ offsety*zoom - sclheight/2 + getHeight()/2;
 		return vec.set(px, py);
 	}
 
 	@Override
 	public void draw(Batch batch, float alpha){
-		float ratio = 1f / ((float)editor.pixmap().getWidth() / editor.pixmap().getHeight());
+		float ratio = 1f / ((float)editor.getMap().width() / editor.getMap().height());
 		float size = Math.min(width, height);
 		float sclwidth = size * zoom;
 		float sclheight = size * zoom * ratio;
 		float centerx = x + width/2 + offsetx * zoom;
 		float centery = y + height/2 + offsety * zoom;
 
-		image.setImageSize(editor.pixmap().getWidth(), editor.pixmap().getHeight());
+		image.setImageSize(editor.getMap().width(), editor.getMap().height());
 		
 		batch.flush();
 		boolean pop = ScissorStack.pushScissors(rect.set(x + width/2 - size/2, y + height/2 - size/2, size, size));
 		
-		batch.draw(editor.texture(), centerx - sclwidth/2, centery - sclheight/2, sclwidth, sclheight);
+		//batch.draw(editor.texture(), centerx - sclwidth/2, centery - sclheight/2, sclwidth, sclheight);
+		//TODO actually render the map here?
 
 		if(grid){
 			Draw.color(Color.GRAY);

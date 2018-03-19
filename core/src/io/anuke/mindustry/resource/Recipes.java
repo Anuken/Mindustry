@@ -10,7 +10,7 @@ import static io.anuke.mindustry.resource.Section.*;
 
 public class Recipes {
 	private static final Array<Recipe> list = Array.with(
-		new Recipe(defense, DefenseBlocks.stonewall, stack(Item.stone, 12)),
+		//new Recipe(defense, DefenseBlocks.stonewall, stack(Item.stone, 12)),
 		new Recipe(defense, DefenseBlocks.ironwall, stack(Item.iron, 12)),
 		new Recipe(defense, DefenseBlocks.steelwall, stack(Item.steel, 12)),
 		new Recipe(defense, DefenseBlocks.titaniumwall, stack(Item.titanium, 12)),
@@ -22,7 +22,7 @@ public class Recipes {
 		new Recipe(defense, DefenseBlocks.largedoor, stack(Item.steel, 3*4), stack(Item.iron, 3*4*4)).setDesktop(),
 		new Recipe(defense, DefenseBlocks.titaniumshieldwall, stack(Item.titanium, 16)),
 
-		new Recipe(distribution, DistributionBlocks.conveyor, stack(Item.stone, 1)),
+		new Recipe(distribution, DistributionBlocks.conveyor, stack(Item.iron, 1)),
 		new Recipe(distribution, DistributionBlocks.steelconveyor, stack(Item.steel, 1)),
 		new Recipe(distribution, DistributionBlocks.pulseconveyor, stack(Item.dirium, 1)),
 		new Recipe(distribution, DistributionBlocks.router, stack(Item.stone, 2)),
@@ -60,7 +60,7 @@ public class Recipes {
 		new Recipe(crafting, ProductionBlocks.weaponFactory, stack(Item.steel, 60), stack(Item.iron, 60)).setDesktop(),
 		//new Recipe(crafting, ProductionBlocks.centrifuge, stack(Item.steel, 30), stack(Item.iron, 30)),
 
-		new Recipe(production, ProductionBlocks.stonedrill, stack(Item.stone, 12)),
+		//new Recipe(production, ProductionBlocks.stonedrill, stack(Item.stone, 12)),
 		new Recipe(production, ProductionBlocks.irondrill, stack(Item.stone, 25)),
 		new Recipe(production, ProductionBlocks.coaldrill, stack(Item.stone, 25), stack(Item.iron, 40)),
 		new Recipe(production, ProductionBlocks.titaniumdrill, stack(Item.iron, 50), stack(Item.steel, 50)),
