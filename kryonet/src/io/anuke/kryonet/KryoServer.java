@@ -135,23 +135,6 @@ public class KryoServer implements ServerProvider {
     }
 
     @Override
-    public void kick(int connection, KickReason reason) {
-        KryoConnection con = getByID(connection);
-        if(con == null){
-            Log.err("Cannot kick unknown player!");
-            return;
-        }else{
-            Log.info("Kicking connection #{0} / IP: {1}. Reason: {2}", connection, con.address, reason);
-        }
-
-        KickPacket p = new KickPacket();
-        p.reason = reason;
-
-        con.send(p, SendMode.tcp);
-        Timers.runTask(2f, con::close);
-    }
-
-    @Override
     public void host(int port) throws IOException {
         lastconnection = 0;
         connections.clear();
@@ -276,12 +259,6 @@ public class KryoServer implements ServerProvider {
             KryoConnection conn = connections.get(i);
             if(conn.id != id) conn.send(object, mode);
         }
-    }
-
-    @Override
-    public int getPingFor(NetConnection con) {
-        KryoConnection k = (KryoConnection)con;
-        return k.connection == null ? 0 : k.connection.getReturnTripTime();
     }
 
     @Override

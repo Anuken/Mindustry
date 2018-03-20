@@ -12,7 +12,6 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packet.UnimportantPacket;
-import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamBuilder;
 import io.anuke.mindustry.net.Streamable.StreamChunk;
@@ -99,11 +98,6 @@ public class Net{
 	 * Callback is run on the main libGDX thread.*/
 	public static void discoverServers(Consumer<Array<Host>> cons){
 		clientProvider.discover(cons);
-	}
-
-	/**Kick a specified connection from the server.*/
-	public static void kickConnection(int id, KickReason reason){
-		serverProvider.kick(id, reason);
 	}
 
 	/**Returns a list of all connections IDs.*/
@@ -307,10 +301,6 @@ public class Net{
 		Array<? extends NetConnection> getConnections();
 		/**Returns a connection by ID.*/
 		NetConnection getByID(int id);
-		/**Kick a certain connection.*/
-		void kick(int connection, KickReason reason);
-		/**Returns the ping for a certain connection.*/
-		int getPingFor(NetConnection connection);
 		/**Close all connections.*/
 		void dispose();
 	}

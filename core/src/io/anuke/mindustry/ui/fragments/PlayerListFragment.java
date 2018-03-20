@@ -130,7 +130,7 @@ public class PlayerListFragment implements Fragment{
                         ui.showConfirm("$text.confirm", "$text.confirmban", () -> {
                             if(Net.server()) {
                                 netServer.admins.banPlayerIP(connection.address);
-                                Net.kickConnection(player.clientid, KickReason.banned);
+                                netServer.kick(player.clientid, KickReason.banned);
                             }else{
                                 NetEvents.handleAdministerRequest(player, AdminAction.ban);
                             }
@@ -139,7 +139,7 @@ public class PlayerListFragment implements Fragment{
 
                     t.addImageButton("icon-cancel", 14*2, () -> {
                         if(Net.server()) {
-                            Net.kickConnection(player.clientid, KickReason.kick);
+                            netServer.kick(player.clientid, KickReason.kick);
                         }else{
                             NetEvents.handleAdministerRequest(player, AdminAction.kick);
                         }
@@ -150,14 +150,16 @@ public class PlayerListFragment implements Fragment{
                     t.addImageButton("icon-admin", "toggle", 14*2, () -> {
                         if(Net.client()) return;
 
-                        if(netServer.admins.isAdmin(connection.address)){
+                        String id = netServer.admins.getTrace(connection.address).uuid;
+
+                        if(netServer.admins.isAdmin(id, connection.address)){
                             ui.showConfirm("$text.confirm", "$text.confirmunadmin", () -> {
-                                netServer.admins.unAdminPlayer(connection.address);
+                                netServer.admins.unAdminPlayer(id);
                                 NetEvents.handleAdminSet(player, false);
                             });
                         }else{
                             ui.showConfirm("$text.confirm", "$text.confirmadmin", () -> {
-                                netServer.admins.adminPlayer(connection.address);
+                                netServer.admins.adminPlayer(id, connection.address);
                                 NetEvents.handleAdminSet(player, true);
                             });
                         }

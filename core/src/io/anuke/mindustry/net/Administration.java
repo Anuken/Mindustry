@@ -133,12 +133,13 @@ public class Administration {
     }
 
     /**Makes a player an admin. Returns whether this player was already an admin.*/
-    public boolean adminPlayer(String id){
+    public boolean adminPlayer(String id, String ip){
         PlayerInfo info = getCreateInfo(id);
 
         if(info.admin)
             return false;
 
+        info.validAdminIP = ip;
         info.admin = true;
         save();
 
@@ -166,8 +167,9 @@ public class Administration {
         return getCreateInfo(uuid).banned;
     }
 
-    public boolean isAdmin(String id){
-        return getCreateInfo(id).admin;
+    public boolean isAdmin(String id, String ip){
+        PlayerInfo info = getCreateInfo(id);
+        return info.admin && ip.equals(info.validAdminIP);
     }
 
     public PlayerInfo getInfo(String id){
@@ -212,6 +214,7 @@ public class Administration {
     public static class PlayerInfo{
         public String id;
         public String lastName = "<unknown>", lastIP = "<unknown>";
+        public String validAdminIP;
         public Array<String> ips = new Array<>();
         public Array<String> names = new Array<>();
         public int timesKicked; //TODO not implemented!
@@ -219,6 +222,7 @@ public class Administration {
         public int totalBlockPlaced;
         public int totalBlocksBroken;
         public boolean banned, admin;
+        public long lastKicked; //last kicked timestamp
 
         PlayerInfo(String id){
             this.id = id;

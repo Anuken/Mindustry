@@ -78,7 +78,7 @@ public class ServerControl extends Module {
             info("Game over!");
 
             for(NetConnection connection : Net.getConnections()){
-                Net.kickConnection(connection.id, KickReason.gameover);
+                netServer.kick(connection.id, KickReason.gameover);
             }
 
             if (mode != ShuffleMode.off) {
@@ -127,22 +127,28 @@ public class ServerControl extends Module {
             Log.info("Stopped server.");
         });
 
-        handler.register("host", "<mapname> [mode]", "Open the server with a specific map.", arg -> {
+        handler.register("host", "[mapname] [mode]", "Open the server with a specific map.", arg -> {
             if(state.is(State.playing)){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
             }
 
-            String search = arg[0];
             Map result = null;
-            for(Map map : world.maps().list()){
-                if(map.name.equalsIgnoreCase(search))
-                    result = map;
-            }
 
-            if(result == null){
-                err("No map with name &y'{0}'&lr found.", search);
-                return;
+            if(arg.length > 0) {
+                String search = arg[0];
+                for (Map map : world.maps().list()) {
+                    if (map.name.equalsIgnoreCase(search))
+                        result = map;
+                }
+
+                if(result == null){
+                    err("No map with name &y'{0}'&lr found.", search);
+                    return;
+                }
+            }else{
+                while(result == null || result.visible)
+                    result = world.maps().getAllMaps().random();
             }
 
             GameMode mode = null;
@@ -273,7 +279,7 @@ public class ServerControl extends Module {
             }
 
             if(target != null){
-                Net.kickConnection(target.clientid, KickReason.kick);
+                netServer.kick(target.clientid, KickReason.kick);
                 info("It is done.");
             }else{
                 info("Nobody with that name could be found...");
@@ -299,7 +305,7 @@ public class ServerControl extends Module {
                 String ip = Net.getConnection(target.clientid).address;
                 netServer.admins.banPlayerIP(ip);
                 netServer.admins.banPlayerID(netServer.admins.getTrace(ip).uuid);
-                Net.kickConnection(target.clientid, KickReason.banned);
+                netServer.kick(target.clientid, KickReason.banned);
                 info("Banned player by IP and ID: {0} / {1}", ip, netServer.admins.getTrace(ip).uuid);
             }else{
                 info("Nobody with that name could be found.");
@@ -337,7 +343,7 @@ public class ServerControl extends Module {
 
                 for(Player player : playerGroup.all()){
                     if(Net.getConnection(player.clientid).address.equals(arg[0])){
-                        Net.kickConnection(player.clientid, KickReason.banned);
+                        netServer.kick(player.clientid, KickReason.banned);
                         break;
                     }
                 }
@@ -352,7 +358,7 @@ public class ServerControl extends Module {
 
                 for(Player player : playerGroup.all()){
                     if(netServer.admins.getTrace(Net.getConnection(player.clientid).address).uuid.equals(arg[0])){
-                        Net.kickConnection(player.clientid, KickReason.banned);
+                        netServer.kick(player.clientid, KickReason.banned);
                         break;
                     }
                 }
@@ -394,7 +400,7 @@ public class ServerControl extends Module {
 
             if(target != null){
                 String id = netServer.admins.getTrace(Net.getConnection(target.clientid).address).uuid;
-                netServer.admins.adminPlayer(id);
+                netServer.admins.adminPlayer(id, Net.getConnection(target.clientid).address);
                 NetEvents.handleAdminSet(target, true);
                 info("Admin-ed player by ID: {0} / {1}", id, arg[0]);
             }else{
