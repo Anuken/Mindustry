@@ -180,7 +180,7 @@ public class MapView extends Element implements GestureListener{
 		float sclheight = size * zoom * ratio;
 		x = (x - getWidth()/2 + sclwidth/2 - offsetx*zoom) / sclwidth * editor.getMap().width();
 		y = (y - getHeight()/2 + sclheight/2 - offsety*zoom) / sclheight * editor.getMap().height();
-		return Tmp.g1.set((int)x, editor.getMap().height() - 1 - (int)y);
+		return Tmp.g1.set((int)x, (int)y);
 	}
 
 	private Vector2 unproject(int x, int y){
@@ -189,7 +189,7 @@ public class MapView extends Element implements GestureListener{
 		float sclwidth = size * zoom;
 		float sclheight = size * zoom * ratio;
 		float px = ((float)x / editor.getMap().width()) * sclwidth + offsetx*zoom - sclwidth/2 + getWidth()/2;
-		float py = (float)((float)(editor.getMap().height() - 1 -  y) / editor.getMap().height()) * sclheight
+		float py = (float)((float)(y) / editor.getMap().height()) * sclheight
 				+ offsety*zoom - sclheight/2 + getHeight()/2;
 		return vec.set(px, py);
 	}
@@ -210,6 +210,11 @@ public class MapView extends Element implements GestureListener{
 		
 		//batch.draw(editor.texture(), centerx - sclwidth/2, centery - sclheight/2, sclwidth, sclheight);
 		//TODO actually render the map here?
+		Draw.color(Color.LIGHT_GRAY);
+		Lines.stroke(-2f);
+		Lines.rect(centerx - sclwidth/2 - 1, centery - sclheight/2 - 1, sclwidth + 2, sclheight + 2);
+		editor.renderer().draw(centerx - sclwidth/2, centery - sclheight/2, sclwidth, sclheight);
+		Draw.reset();
 
 		if(grid){
 			Draw.color(Color.GRAY);

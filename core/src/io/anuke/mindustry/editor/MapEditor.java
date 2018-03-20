@@ -29,6 +29,7 @@ public class MapEditor{
 		drawBlock = Blocks.stone;
 		this.map = map;
 		this.brushSize = 1;
+		renderer.resize(map.width(), map.height());
 	}
 	
 	public Block getDrawBlock(){
@@ -61,7 +62,10 @@ public class MapEditor{
 
 		for(int rx = -brushSize + 1; rx <= brushSize - 1; rx ++){
 			for(int ry = -brushSize + 1; ry <= brushSize - 1; ry ++){
-				if(Mathf.dst(rx, ry) < brushSize){
+				if(Mathf.dst(rx, ry) <= brushSize){
+					if(dx + rx < 0 || dy + ry < 0 || dx + rx >= map.width() || dy + ry >= map.height()){
+						continue;
+					}
 					map.write(dx + rx, dy + ry, writer);
 					renderer.updatePoint(dx + rx, dy + ry);
 				}

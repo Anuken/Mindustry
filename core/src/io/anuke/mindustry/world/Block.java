@@ -184,6 +184,8 @@ public class Block extends BaseBlock {
 	public TextureRegion[] getIcon(){
 		if(Draw.hasRegion(name + "-icon")){
 			return new TextureRegion[]{Draw.region(name + "-icon")};
+		}else if(Draw.hasRegion(name + "1")){
+			return new TextureRegion[]{Draw.region(name+ "1")};
 		}else{
 			return new TextureRegion[]{Draw.region(name)};
 		}

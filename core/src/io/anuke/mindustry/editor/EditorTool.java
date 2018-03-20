@@ -21,7 +21,8 @@ public enum EditorTool{
 		{
 			edit = true;
 		}
-		
+
+		@Override
 		public void touched(MapEditor editor, int x, int y){
 			editor.draw(x, y);
 		}
@@ -62,9 +63,9 @@ public enum EditorTool{
 
 				if((floor ? writer.floor : writer.wall) == dest){
 					if(floor)
-						writer.floor = dest;
+						writer.floor = (byte)editor.getDrawBlock().id;
 					else
-						writer.wall = dest;
+						writer.wall = (byte)editor.getDrawBlock().id;
 
 					editor.getMap().write(px, py, writer);
 					editor.renderer().updatePoint(px, py);

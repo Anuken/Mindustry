@@ -2,6 +2,7 @@ package io.anuke.mindustry.editor;
 
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.io.MapTileData;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.world.Block;
@@ -12,13 +13,13 @@ import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.Element;
+import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.build;
-import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.*;
+import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
@@ -171,6 +172,12 @@ public class MapEditorDialog extends Dialog{
 		hidden(() -> Platform.instance.updateRPC());
 	}
 
+
+	@Override
+	public Dialog show(){
+		return super.show(Core.scene, Actions.sequence(Actions.alpha(0f), Actions.fadeIn(0.3f)));
+	}
+
 	public MapView getView() {
 		return view;
 	}
@@ -200,7 +207,7 @@ public class MapEditorDialog extends Dialog{
 		new table(){{
 			float isize = 16*2f;
 			aleft();
-			
+			/*
 			new table(){{
 				
 				defaults().growY().width(130f).padBottom(-6);
@@ -237,7 +244,7 @@ public class MapEditorDialog extends Dialog{
 				
 				new imagebutton("icon-save-image", isize, () ->
 					saveFile.show()
-				).text("$text.editor.saveimage");*/
+				).text("$text.editor.saveimage");
 				
 				row();
 				
@@ -251,6 +258,7 @@ public class MapEditorDialog extends Dialog{
 				}).padBottom(0).text("$text.back");
 				
 			}}.left().growY().end();
+		*/
 			
 			new table("button"){{
 				add(view).grow();
@@ -388,7 +396,7 @@ public class MapEditorDialog extends Dialog{
 	private void addBlockSelection(Table table){
 		Table content = new Table();
 		pane = new ScrollPane(content, "volume");
-		pane.setScrollingDisabled(true, false);
+		//pane.setScrollingDisabled(true, false);
 		pane.setFadeScrollBars(false);
 		pane.setOverscroll(true, false);
 		ButtonGroup<ImageButton> group = new ButtonGroup<>();
@@ -396,12 +404,26 @@ public class MapEditorDialog extends Dialog{
 		
 		int i = 0;
 		
-		for(BlockPair pair : ColorMapper.getPairs()){
-			Block block = pair.wall == Blocks.air ? pair.floor : pair.wall;
+		for(Block block : Block.getAllBlocks()){
+			TextureRegion[] regions;
+			try {
+				regions = block.getCompactIcon();
+			}catch (Exception e){
+				continue;
+			}
+
+			Stack stack = new Stack();
+
+			for(TextureRegion region : regions){
+				stack.add(new Image(region));
+			}
 			
-			ImageButton button = new ImageButton(Draw.hasRegion(block.name) ? Draw.region(block.name) : Draw.region(block.name + "1"), "toggle");
+			ImageButton button = new ImageButton("white", "toggle");
 			button.clicked(() -> editor.setDrawBlock(block));
 			button.resizeImage(8*4f);
+			button.getImageCell().setActor(stack);
+			button.addChild(stack);
+			button.getImage().remove();
 			group.add(button);
 			content.add(button).pad(4f).size(53f, 58f);
 			
