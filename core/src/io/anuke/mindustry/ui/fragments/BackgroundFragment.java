@@ -31,7 +31,7 @@ public class BackgroundFragment implements Fragment {
             float logoh = logo.getRegionHeight()*logoscl;
 
             Draw.color();
-            Core.batch.draw(logo, w/2 - logow/2, h - logoh + 15 - Unit.dp.scl(portrait ? 30f : 30), logow, logoh);
+            Core.batch.draw(logo, w/2 - logow/2, h - logoh + 15 - Unit.dp.scl(portrait ? 30f : 0), logow, logoh);
         }).visible(() -> state.is(State.menu)).grow();
     }
 }
