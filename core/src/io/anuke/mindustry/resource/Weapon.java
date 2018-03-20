@@ -117,6 +117,10 @@ public class Weapon extends Upgrade{
 		Effects.sound(shootsound, x, y);
 	}
 
+	public float getReload(){
+		return reload;
+	}
+
 	public void shoot(Player p, float x, float y, float angle){
 		shootInternal(p, x, y, angle);
 

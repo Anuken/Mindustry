@@ -12,6 +12,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
+import io.anuke.mindustry.net.TraceInfo;
 import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Placement;
@@ -65,8 +66,7 @@ public class NetServer extends Module{
 
             String ip = Net.getConnection(id).address;
 
-            admins.setKnownName(ip, packet.name);
-            admins.setKnownIP(uuid, ip);
+            admins.updatePlayerJoined(uuid, ip, packet.name);
             admins.getTrace(ip).uuid = uuid;
             admins.getTrace(ip).android = packet.android;
 
@@ -150,6 +150,7 @@ public class NetServer extends Module{
             Net.send(dc, SendMode.tcp);
 
             Platform.instance.updateRPC();
+            admins.save();
         });
 
         Net.handleServer(PositionPacket.class, (id, packet) -> {
@@ -161,6 +162,22 @@ public class NetServer extends Module{
         });
 
         Net.handleServer(ShootPacket.class, (id, packet) -> {
+            TraceInfo info = admins.getTrace(Net.getConnection(id).address);
+            Weapon weapon = (Weapon)Upgrade.getByID(packet.weaponid);
+
+            float wtrc = 45f;
+
+            if(!Timers.get(info.ip + "-weapontrace", wtrc)){
+                info.fastShots ++;
+            }else{
+
+                if(info.fastShots - 2 > (int)(wtrc / (weapon.getReload() / 2f))){
+                    Net.kickConnection(id, KickReason.kick);
+                }
+
+                info.fastShots = 0;
+            }
+
             packet.playerid = connections.get(id).id;
             Net.sendExcept(id, packet, SendMode.udp);
         });
@@ -182,6 +199,7 @@ public class NetServer extends Module{
 
             admins.getTrace(Net.getConnection(id).address).lastBlockPlaced = block;
             admins.getTrace(Net.getConnection(id).address).totalBlocksPlaced ++;
+            admins.getInfo(admins.getTrace(Net.getConnection(id).address).uuid).totalBlockPlaced ++;
 
             Net.send(packet, SendMode.tcp);
         });
@@ -196,6 +214,7 @@ public class NetServer extends Module{
             if(block != null) {
                 admins.getTrace(Net.getConnection(id).address).lastBlockBroken = block;
                 admins.getTrace(Net.getConnection(id).address).totalBlocksBroken++;
+                admins.getInfo(admins.getTrace(Net.getConnection(id).address).uuid).totalBlocksBroken ++;
                 if (block.update || block.destructible)
                     admins.getTrace(Net.getConnection(id).address).structureBlocksBroken++;
             }

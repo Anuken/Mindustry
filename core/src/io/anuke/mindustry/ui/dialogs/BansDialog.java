@@ -1,5 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Table;
 
@@ -33,15 +34,15 @@ public class BansDialog extends FloatingDialog {
             table.add("$text.server.bans.none");
         }
 
-        for(String ip : netServer.admins.getBanned()){
+        for(PlayerInfo info : netServer.admins.getBanned()){
             Table res = new Table("button");
             res.margin(14f);
 
-            res.labelWrap("IP: [LIGHT_GRAY]" + ip + "\n[]Name: [LIGHT_GRAY]" + netServer.admins.getLastName(ip)).width(w - h - 24f);
+            res.labelWrap("IP: [LIGHT_GRAY]" + info.lastIP + "\n[]Name: [LIGHT_GRAY]" + info.lastName).width(w - h - 24f);
             res.add().growX();
             res.addImageButton("icon-cancel", 14*3, () -> {
                 ui.showConfirm("$text.confirm", "$text.confirmunban", () -> {
-                    netServer.admins.unbanPlayerIP(ip);
+                    netServer.admins.unbanPlayerID(info.id);
                     setup();
                 });
             }).size(h).pad(-14f);
