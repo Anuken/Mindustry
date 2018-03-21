@@ -16,12 +16,10 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.build;
-import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.gwt;
 import static io.anuke.mindustry.Vars.ui;
@@ -205,77 +203,23 @@ public class MapEditorDialog extends Dialog{
 	public void build(){
 		
 		new table(){{
-			float isize = 16*2f;
 			aleft();
-			/*
-			new table(){{
-				
-				defaults().growY().width(130f).padBottom(-6);
-				
-				new imagebutton("icon-terrain", isize, () ->
-					dialog.show()
-				).text("$text.editor.generate");
-				
-				row();
-				
-				new imagebutton("icon-resize", isize, () ->
-					resizeDialog.show()
-				).text("$text.editor.resize").padTop(4f);
-				
-				row();
-				
-				new imagebutton("icon-load-map", isize, () ->
-					loadDialog.show()
-				).text("$text.editor.loadmap");
-				
-				row();
-				
-				new imagebutton("icon-save-map", isize, ()->
-					saveDialog.show()
-				).text("$text.editor.savemap");
-				
-				row();
-				/*
-				new imagebutton("icon-load-image", isize, () ->
-					openFile.show()
-				).text("$text.editor.loadimage");
-				
-				row();
-				
-				new imagebutton("icon-save-image", isize, () ->
-					saveFile.show()
-				).text("$text.editor.saveimage");
-				
-				row();
-				
-				new imagebutton("icon-back", isize, () -> {
-					if(!saved){
-						ui.showConfirm("$text.confirm", "$text.editor.unsaved",
-								MapEditorDialog.this::hide);
-					}else{
-						hide();
-					}
-				}).padBottom(0).text("$text.back");
-				
-			}}.left().growY().end();
-		*/
-			
+
 			new table("button"){{
-				add(view).grow();
-			}}.grow().end();
-			
-			new table(){{
-				Table tools = new Table("button");
+				margin(0);
+				Table tools = new Table();
 				tools.top();
-				tools.marginTop(0).marginBottom(6);
-				
+
 				ButtonGroup<ImageButton> group = new ButtonGroup<>();
 				int i = 1;
 
-				tools.defaults().size(53f, 58f).padBottom(-6);
+				tools.defaults().size(60f, 64f).padBottom(-5.1f);
 
 				ImageButton undo = tools.addImageButton("icon-undo", 16*2f, () -> view.undo()).get();
 				ImageButton redo = tools.addImageButton("icon-redo", 16*2f, () -> view.redo()).get();
+
+				tools.row();
+
 				ImageButton grid = tools.addImageButton("icon-grid", "toggle", 16*2f, () -> view.setGrid(!view.isGrid())).get();
 
 				undo.setDisabled(() -> !view.getStack().canUndo());
@@ -284,7 +228,7 @@ public class MapEditorDialog extends Dialog{
 				undo.update(() -> undo.getImage().setColor(undo.isDisabled() ? Color.GRAY : Color.WHITE));
 				redo.update(() -> redo.getImage().setColor(redo.isDisabled() ? Color.GRAY : Color.WHITE));
 				grid.update(() -> grid.setChecked(view.isGrid()));
-				
+
 				for(EditorTool tool : EditorTool.values()){
 					ImageButton button = new ImageButton("icon-" + tool.name(), "toggle");
 					button.clicked(() -> view.setTool(tool));
@@ -293,31 +237,33 @@ public class MapEditorDialog extends Dialog{
 					group.add(button);
 					if (tool == EditorTool.pencil)
 						button.setChecked(true);
-					
+
 					tools.add(button).padBottom(-6f);
-					if(i++ % 4 == 1) tools.row();
+					if(i++ % 2 == 1) tools.row();
 				}
-				
-				add(tools).width(53*4).padBottom(-6);
-				
+
+				add(tools).growY().top().padBottom(-6);
+
 				row();
-				
+				/*
 				new table("button"){{
-					margin(10f);
-					Slider slider = new Slider(0, MapEditor.brushSizes.length-1, 1, false);
+					Slider slider = new Slider(0, MapEditor.brushSizes.length-1, 1, true);
 					slider.moved(f -> editor.setBrushSize(MapEditor.brushSizes[(int)(float)f]));
 					new label(() -> Bundles.format("text.editor.brushsize", MapEditor.brushSizes[(int)slider.getValue()])).left();
 					row();
 					add(slider).growX().padTop(4f);
-				}}.growX().padBottom(-6).end();
-				
-				row();
-
-				/*
-				new table("button"){{
-					get().addCheck("$text.oregen", b -> editor.getMap().oreGen = b)
-							.update(c -> c.setChecked(editor.getMap().oreGen)).padTop(3).padBottom(3);
 				}}.growX().padBottom(-6).end();*/
+				
+			}}.left().growY().end();
+
+			
+			new table("button"){{
+				margin(5);
+				marginBottom(10);
+				add(view).grow();
+			}}.grow().end();
+			
+			new table(){{
 
 				row();
 				
@@ -427,7 +373,7 @@ public class MapEditorDialog extends Dialog{
 			group.add(button);
 			content.add(button).pad(4f).size(53f, 58f);
 			
-			if(i++ % 2 == 1){
+			if(i++ % 3 == 2){
 				content.row();
 			}
 		}
@@ -435,8 +381,8 @@ public class MapEditorDialog extends Dialog{
 		group.getButtons().get(2).setChecked(true);
 		
 		Table extra = new Table("button");
-		extra.labelWrap(() -> editor.getDrawBlock().formalName).width(180f).center();
-		table.add(extra).padBottom(-6).growX();
+		extra.labelWrap(() -> editor.getDrawBlock().formalName).width(220f).center();
+		table.add(extra).growX();
 		table.row();
 		table.add(pane).growY().fillX();
 	}

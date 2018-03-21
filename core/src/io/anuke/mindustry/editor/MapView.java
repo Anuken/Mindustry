@@ -206,7 +206,7 @@ public class MapView extends Element implements GestureListener{
 		image.setImageSize(editor.getMap().width(), editor.getMap().height());
 		
 		batch.flush();
-		boolean pop = ScissorStack.pushScissors(rect.set(x + width/2 - size/2, y + height/2 - size/2, size, size));
+		boolean pop = ScissorStack.pushScissors(rect.set(x, y, width, height));
 		
 		//batch.draw(editor.texture(), centerx - sclwidth/2, centery - sclheight/2, sclwidth, sclheight);
 		//TODO actually render the map here?
@@ -243,7 +243,7 @@ public class MapView extends Element implements GestureListener{
 		
 		Draw.color(Colors.get("accent"));
 		Lines.stroke(Unit.dp.scl(3f));
-		Lines.rect(x + width/2 - size/2, y + height/2 - size/2, size, size);
+		Lines.rect(x, y, width, height);
 		Draw.reset();
 	}
 	

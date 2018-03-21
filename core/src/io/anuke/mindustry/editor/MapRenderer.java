@@ -2,6 +2,7 @@ package io.anuke.mindustry.editor;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
 import io.anuke.mindustry.io.MapTileData.TileDataWriter;
@@ -9,8 +10,10 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.CacheBatch;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
@@ -21,6 +24,7 @@ public class MapRenderer {
     private int[][] chunks;
     private IntSet updates = new IntSet();
     private MapEditor editor;
+    private Matrix4 matrix = new Matrix4();
 
     public MapRenderer(MapEditor editor){
         this.editor = editor;
@@ -41,6 +45,7 @@ public class MapRenderer {
         updateAll();
     }
 
+
     public void draw(float tx, float ty, float tw, float th){
         Graphics.end();
         Graphics.useBatch(batch);
@@ -57,8 +62,6 @@ public class MapRenderer {
         Graphics.popBatch();
 
         Gdx.gl.glEnable(GL20.GL_BLEND);
-
-
 
         batch.getTransformMatrix().setToTranslation(tx, ty, 0).scl(tw / (chunks.length * chunksize * tilesize),
                 th / (chunks[0].length * chunksize * tilesize), 1f);
@@ -99,6 +102,7 @@ public class MapRenderer {
     }
 
     private void render(int chunkx, int chunky, int previousID){
+        Timers.mark();
         if(previousID == -1){
             batch.begin();
         }else{
@@ -140,5 +144,6 @@ public class MapRenderer {
 
         batch.end();
         if(previousID == -1) chunks[chunkx][chunky] = batch.getLastCache();
+        Log.info("Time to render cache: {0}", Timers.elapsed());
     }
 }
