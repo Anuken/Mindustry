@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
@@ -120,8 +121,7 @@ public class BlockRenderer{
 		return requestidx;
 	}
 	
-	public void drawBlocks(boolean top){
-		Layer stopAt = top ? Layer.laser : Layer.overlay;
+	public void drawBlocks(Layer stopAt){
 		
 		for(; iterateidx < requestidx; iterateidx ++){
 
@@ -138,6 +138,36 @@ public class BlockRenderer{
 				block.drawLayer(req.tile);
 			}else if(req.layer == block.layer2){
 				block.drawLayer2(req.tile);
+			}
+		}
+	}
+
+	public void drawTeamBlocks(Layer layer, Team team){
+		int iterateidx = this.iterateidx;
+
+		for(; iterateidx < requestidx; iterateidx ++){
+
+			if(iterateidx < requests.size - 1 && requests.get(iterateidx).layer.ordinal() > layer.ordinal()){
+				break;
+			}
+
+			BlockRequest req = requests.get(iterateidx);
+			if(req.tile.getTeam() != team) continue;
+			Block block = req.tile.block();
+
+			if(req.layer == block.layer){
+				block.drawLayer(req.tile);
+			}else if(req.layer == block.layer2){
+				block.drawLayer2(req.tile);
+			}
+		}
+	}
+
+	public void skipLayer(Layer stopAt){
+
+		for(; iterateidx < requestidx; iterateidx ++){
+			if(iterateidx < requests.size - 1 && requests.get(iterateidx).layer.ordinal() > stopAt.ordinal()){
+				break;
 			}
 		}
 	}

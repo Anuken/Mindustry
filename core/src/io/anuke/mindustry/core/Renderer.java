@@ -23,6 +23,7 @@ import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.BlockBar;
+import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.*;
@@ -183,12 +184,13 @@ public class Renderer extends RendererModule{
 		
 		blocks.drawFloor();
 		blocks.processBlocks();
-		blocks.drawBlocks(false);
+		blocks.drawBlocks(Layer.overlay);
 
 		drawAllTeams(false);
 		Entities.draw(Entities.defaultGroup());
 
-		blocks.drawBlocks(true);
+		blocks.skipLayer(Layer.turret);
+		blocks.drawBlocks(Layer.laser);
 
 		drawAllTeams(true);
 
@@ -221,6 +223,9 @@ public class Renderer extends RendererModule{
 			Graphics.beginShaders(Shaders.outline);
 			Graphics.shader(Shaders.hit, false);
 			drawTeam(team, flying);
+			Draw.alpha(0f);
+			blocks.drawTeamBlocks(Layer.turret, team);
+			Draw.alpha(1f);
 			Graphics.shader();
 			Graphics.endShaders();
 		}

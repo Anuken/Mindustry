@@ -29,6 +29,8 @@ import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
+import java.io.DataInputStream;
+
 import static io.anuke.mindustry.Vars.*;
 
 public class MapEditorDialog extends Dialog{
@@ -70,39 +72,14 @@ public class MapEditorDialog extends Dialog{
 			});
 		});
 
-		menu = new FloatingDialog("$text.menu");
-		menu.addCloseButton();
-
-		menu.content().defaults().size(240f, 60f).padBottom(5);
-
-		float isize = 16*2f;
-
-		menu.content().addImageButton("icon-back", isize, () -> {
-			if(!saved){
-				ui.showConfirm("$text.confirm", "$text.editor.unsaved", this::hide);
-			}else{
-				hide();
-			}
-		});
-
-		menu.content().row();
-
-		menu.content().addImageButton("icon-save", isize, () -> {
-			saveFile.show();
-		});
-
-		/*
-		openFile = new FileChooser("$text.loadimage", FileChooser.pngFilter, true, file -> {
+		openFile = new FileChooser("$text.loadimage", FileChooser.mapFilter, true, file -> {
 			ui.loadfrag.show();
 			Timers.run(3f, () -> {
 				try{
-					Pixmap pixmap = new Pixmap(file);
-					if(verifySize(pixmap)){
-						editor.setPixmap(pixmap);
-						view.clearStack();
-					}else{
-						ui.showError(Bundles.format("text.editor.badsize", Arrays.toString(MapEditor.validMapSizes)));
-					}
+					MapTileData data = MapIO.readTileData(new DataInputStream(file.read()));
+
+					editor.beginEdit(data);
+					view.clearStack();
 				}catch (Exception e){
 					ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
 					Log.err(e);
@@ -110,8 +87,39 @@ public class MapEditorDialog extends Dialog{
 				ui.loadfrag.hide();
 			});
 		});
+
+		menu = new FloatingDialog("$text.menu");
+		menu.addCloseButton();
+
+		menu.content().defaults().size(280f, 60f).padBottom(5);
+
+		float isize = 16*2f;
+
+		menu.content().addImageTextButton("$text.quit", "icon-back", isize, () -> {
+			if(!saved){
+				ui.showConfirm("$text.confirm", "$text.editor.unsaved", this::hide);
+			}else{
+				hide();
+			}
+			menu.hide();
+		});
+
+		menu.content().row();
+
+		menu.content().addImageTextButton("$text.editor.savemap", "icon-save-map", isize, () -> {
+			saveFile.show();
+			menu.hide();
+		});
+
+		menu.content().row();
+
+		menu.content().addImageTextButton("$text.editor.loadmap", "icon-load-map", isize, () -> {
+			openFile.show();
+			menu.hide();
+		});
+
 		
-		*/
+
 		/*
 		loadDialog = new MapLoadDialog(map -> {
 			saveDialog.setFieldText(map.name);
@@ -205,7 +213,7 @@ public class MapEditorDialog extends Dialog{
 
 	@Override
 	public Dialog show(){
-		return super.show(Core.scene, Actions.sequence(Actions.scaleTo(1f, 1f), Actions.alpha(0f), Actions.fadeIn(0.3f)));
+		return super.show(Core.scene, Actions.sequence(Actions.alpha(0f), Actions.scaleTo(1f, 1f),  Actions.fadeIn(0.3f)));
 	}
 
 	public MapView getView() {
@@ -247,9 +255,9 @@ public class MapEditorDialog extends Dialog{
 
 				tools.defaults().size(60f, 64f).padBottom(-5.1f);
 
-				tools.addImageButton("icon-arrow-left", 14*3f, () -> hide());
+				tools.addImageButton("icon-back", 16*2, () -> hide());
 
-				tools.addImageButton("icon-menu", 14*3f, menu::show);
+				tools.addImageButton("icon-menu-large", 16*2f, menu::show);
 
 				tools.row();
 
