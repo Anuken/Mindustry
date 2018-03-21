@@ -12,7 +12,7 @@ public class MapTileData {
     private final static int TILE_SIZE = 3;
 
     private final ByteBuffer buffer;
-    private final TileDataWriter tile = new TileDataWriter();
+    private final TileDataMarker tile = new TileDataMarker();
     private final int width, height;
 
     public MapTileData(int width, int height){
@@ -27,6 +27,10 @@ public class MapTileData {
         this.height = height;
     }
 
+    public byte[] toArray(){
+        return buffer.array();
+    }
+
     public int width(){
         return width;
     }
@@ -36,20 +40,20 @@ public class MapTileData {
     }
 
     /**Reads and returns the next tile data.*/
-    public TileDataWriter read(){
+    public TileDataMarker read(){
         tile.read(buffer);
         return tile;
     }
 
     /**Reads and returns the next tile data.*/
-    public TileDataWriter readAt(int x, int y){
+    public TileDataMarker readAt(int x, int y){
         position(x, y);
         tile.read(buffer);
         return tile;
     }
 
     /**Writes tile data at a specified position.*/
-    public void write(int x, int y, TileDataWriter writer){
+    public void write(int x, int y, TileDataMarker writer){
         position(x, y);
         writer.write(buffer);
     }
@@ -59,7 +63,7 @@ public class MapTileData {
         buffer.position((x + width * y) * TILE_SIZE);
     }
 
-    public static class TileDataWriter {
+    public static class TileDataMarker {
         public byte floor, wall;
         public byte rotation;
         public byte team;

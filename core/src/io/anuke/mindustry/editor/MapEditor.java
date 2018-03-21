@@ -1,7 +1,7 @@
 package io.anuke.mindustry.editor;
 
 import io.anuke.mindustry.io.MapTileData;
-import io.anuke.mindustry.io.MapTileData.TileDataWriter;
+import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.Floor;
@@ -53,7 +53,7 @@ public class MapEditor{
 			return;
 		}
 
-		TileDataWriter writer = map.readAt(dx, dy);
+		TileDataMarker writer = map.readAt(dx, dy);
 		if(drawBlock instanceof Floor){
 			writer.floor = (byte)drawBlock.id;
 		}else{

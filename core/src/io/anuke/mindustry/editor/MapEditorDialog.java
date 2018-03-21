@@ -1,10 +1,15 @@
 package io.anuke.mindustry.editor;
 
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.io.MapTileData;
 import io.anuke.mindustry.io.Platform;
+import io.anuke.mindustry.ui.dialogs.FileChooser;
+import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.ColorMapper.BlockPair;
@@ -20,9 +25,11 @@ import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Strings;
 
-import static io.anuke.mindustry.Vars.gwt;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 
 public class MapEditorDialog extends Dialog{
 	private MapEditor editor;
@@ -32,7 +39,9 @@ public class MapEditorDialog extends Dialog{
 	private MapSaveDialog saveDialog;
 	private MapResizeDialog resizeDialog;
 	private ScrollPane pane;
-	//private FileChooser openFile, saveFile;
+	private FloatingDialog menu;
+	private FileChooser openFile, saveFile;
+	private ObjectMap<String, String> tags = new ObjectMap<>();
 	private boolean saved = false;
 	
 	private ButtonGroup<ImageButton> blockgroup;
@@ -44,6 +53,44 @@ public class MapEditorDialog extends Dialog{
 		editor = new MapEditor();
 		dialog = new MapGenerateDialog(editor);
 		view = new MapView(editor);
+
+		saveFile = new FileChooser("$saveimage", false, file -> {
+			file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
+			FileHandle result = file;
+			ui.loadfrag.show();
+			Timers.run(3f, () -> {
+
+				try{
+					MapIO.writeMap(result, tags, editor.getMap());
+				}catch (Exception e){
+					ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
+					Log.err(e);
+				}
+				ui.loadfrag.hide();
+			});
+		});
+
+		menu = new FloatingDialog("$text.menu");
+		menu.addCloseButton();
+
+		menu.content().defaults().size(240f, 60f).padBottom(5);
+
+		float isize = 16*2f;
+
+		menu.content().addImageButton("icon-back", isize, () -> {
+			if(!saved){
+				ui.showConfirm("$text.confirm", "$text.editor.unsaved", this::hide);
+			}else{
+				hide();
+			}
+		});
+
+		menu.content().row();
+
+		menu.content().addImageButton("icon-save", isize, () -> {
+			saveFile.show();
+		});
+
 		/*
 		openFile = new FileChooser("$text.loadimage", FileChooser.pngFilter, true, file -> {
 			ui.loadfrag.show();
@@ -64,22 +111,7 @@ public class MapEditorDialog extends Dialog{
 			});
 		});
 		
-		saveFile = new FileChooser("$saveimage", false, file -> {
-			if(!file.extension().toLowerCase().equals(".png")){
-				file = file.parent().child(file.nameWithoutExtension() + ".png");
-			}
-			FileHandle result = file;
-			ui.loadfrag.show();
-			Timers.run(3f, () -> {
-				try{
-					Pixmaps.write(editor.pixmap(), result);
-				}catch (Exception e){
-					ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
-					if(!android) Log.err(e);
-				}
-				ui.loadfrag.hide();
-			});
-		});*/
+		*/
 		/*
 		loadDialog = new MapLoadDialog(map -> {
 			saveDialog.setFieldText(map.name);
@@ -173,7 +205,7 @@ public class MapEditorDialog extends Dialog{
 
 	@Override
 	public Dialog show(){
-		return super.show(Core.scene, Actions.sequence(Actions.alpha(0f), Actions.fadeIn(0.3f)));
+		return super.show(Core.scene, Actions.sequence(Actions.scaleTo(1f, 1f), Actions.alpha(0f), Actions.fadeIn(0.3f)));
 	}
 
 	public MapView getView() {
@@ -214,6 +246,12 @@ public class MapEditorDialog extends Dialog{
 				int i = 1;
 
 				tools.defaults().size(60f, 64f).padBottom(-5.1f);
+
+				tools.addImageButton("icon-arrow-left", 14*3f, () -> hide());
+
+				tools.addImageButton("icon-menu", 14*3f, menu::show);
+
+				tools.row();
 
 				ImageButton undo = tools.addImageButton("icon-undo", 16*2f, () -> view.undo()).get();
 				ImageButton redo = tools.addImageButton("icon-redo", 16*2f, () -> view.redo()).get();

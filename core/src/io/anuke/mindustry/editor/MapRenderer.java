@@ -3,7 +3,7 @@ package io.anuke.mindustry.editor;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
-import io.anuke.mindustry.io.MapTileData.TileDataWriter;
+import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.Core;
@@ -11,7 +11,6 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.IndexedRenderer;
-import io.anuke.ucore.util.Log;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -50,8 +49,6 @@ public class MapRenderer {
 
 
     public void draw(float tx, float ty, float tw, float th){
-        Timers.mark();
-
         Graphics.end();
 
         IntSetIterator it = updates.iterator();
@@ -78,8 +75,6 @@ public class MapRenderer {
         Graphics.begin();
 
         long i = Timers.elapsed();
-
-        if(i > 2) Log.info("Time to render: {0}", i);
     }
 
     public void updatePoint(int x, int y){
@@ -98,7 +93,7 @@ public class MapRenderer {
     private void render(int wx, int wy){
         int x = wx/chunksize, y = wy/chunksize;
         IndexedRenderer mesh = chunks[x][y];
-        TileDataWriter data = editor.getMap().readAt(wx, wy);
+        TileDataMarker data = editor.getMap().readAt(wx, wy);
         Block floor = Block.getByID(data.floor);
         Block wall = Block.getByID(data.wall);
 

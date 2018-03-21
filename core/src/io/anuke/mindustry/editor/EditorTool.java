@@ -2,7 +2,7 @@ package io.anuke.mindustry.editor;
 
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
-import io.anuke.mindustry.io.MapTileData.TileDataWriter;
+import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.Floor;
 
@@ -11,7 +11,7 @@ import static io.anuke.mindustry.Vars.ui;
 public enum EditorTool{
 	pick{
 		public void touched(MapEditor editor, int x, int y){
-			TileDataWriter writer = editor.getMap().readAt(x, y);
+			TileDataMarker writer = editor.getMap().readAt(x, y);
 			Block block = Block.getByID(writer.wall == 0 ? writer.floor : writer.wall);
 			editor.setDrawBlock(block);
 			ui.editor.updateSelectedBlock();
@@ -42,7 +42,7 @@ public enum EditorTool{
 			//TODO select floor/block properly instead of using this method!
 			boolean floor = editor.getDrawBlock() instanceof Floor;
 
-			TileDataWriter writer = editor.getMap().readAt(x, y);
+			TileDataMarker writer = editor.getMap().readAt(x, y);
 
 			byte dest = floor ? writer.floor : writer.wall;
 
