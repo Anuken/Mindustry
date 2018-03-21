@@ -1,149 +1,86 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.IntSet.IntSetIterator;
 import io.anuke.mindustry.io.MapTileData.TileDataWriter;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.CacheBatch;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.MeshBatch;
 import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class MapRenderer {
     private static final int chunksize = 32;
-    private CacheBatch batch;
+    private MeshBatch mesh = new MeshBatch(0);
     private int[][] chunks;
     private IntSet updates = new IntSet();
     private MapEditor editor;
-    private Matrix4 matrix = new Matrix4();
+    private int width, height;
 
     public MapRenderer(MapEditor editor){
         this.editor = editor;
     }
 
     public void resize(int width, int height){
-        if(batch != null) batch.dispose();
-        batch = new CacheBatch(width * height * 5);
-        chunks = new int[width / chunksize][height / chunksize];
-        updates.clear();
-
-        for(int x = 0; x < width / chunksize; x ++){
-            for(int y = 0; y < height / chunksize; y ++){
-                chunks[x][y] = -1;
-            }
-        }
-
+        mesh.resize(width * height * 3);
+        this.width = width;
+        this.height = height;
         updateAll();
     }
 
 
     public void draw(float tx, float ty, float tw, float th){
+        Timers.mark();
+
         Graphics.end();
-        Graphics.useBatch(batch);
 
-        IntSetIterator it = updates.iterator();
-        while(it.hasNext){
-            int i = it.next();
-            int x = i % chunks.length;
-            int y = i / chunks.length;
-            render(x, y, chunks[x][y]);
-        }
-        updates.clear();
+        mesh.getTransformMatrix().setToTranslation(tx, ty, 0).scl(tw / (width * tilesize),
+                th / (height * tilesize), 1f);
+        mesh.setProjectionMatrix(Core.batch.getProjectionMatrix());
 
-        Graphics.popBatch();
-
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-
-        batch.getTransformMatrix().setToTranslation(tx, ty, 0).scl(tw / (chunks.length * chunksize * tilesize),
-                th / (chunks[0].length * chunksize * tilesize), 1f);
-        batch.setProjectionMatrix(Core.batch.getProjectionMatrix());
-        batch.beginDraw();
-
-        for(int x = 0; x < chunks.length; x ++){
-            for(int y = 0; y < chunks[0].length; y ++){
-                int id = chunks[x][y];
-                if(id != -1){
-                    batch.drawCache(id);
-                }
-            }
-        }
-
-        batch.endDraw();
+        mesh.render(Core.atlas.getTextures().first());
 
         Graphics.begin();
+
+        long i = Timers.elapsed();
+
+        if(i > 2) Log.info("Time to render: {0}", i);
     }
 
     public void updatePoint(int x, int y){
-        x /= chunksize;
-        y /= chunksize;
-        if(Mathf.inBounds(x, y, chunks))
-            updates.add(x + y * chunks.length);
+        render(x, y);
     }
 
     public void updateAll(){
-        Graphics.useBatch(batch);
-
-        for(int x = 0; x < chunks.length; x ++){
-            for(int y = 0; y < chunks[0].length; y ++){
-                render(x, y, chunks[x][y]);
+        for(int x = 0; x < width; x ++){
+            for(int y = 0; y < height; y ++){
+                render(x, y);
             }
         }
-
-        Graphics.popBatch();
     }
 
-    private void render(int chunkx, int chunky, int previousID){
-        Timers.mark();
-        if(previousID == -1){
-            batch.begin();
-        }else{
-            batch.begin(previousID);
+    private void render(int wx, int wy){
+        TileDataWriter data = editor.getMap().readAt(wx, wy);
+        Block floor = Block.getByID(data.floor);
+        Block wall = Block.getByID(data.wall);
+
+        String fregion = Draw.hasRegion(floor.name) ? floor.name : floor.name + "1";
+
+        if (floor != Blocks.air && Draw.hasRegion(fregion)) {
+            TextureRegion region = Draw.region(fregion);
+            mesh.draw(wx + wy*width, region, wx * tilesize, wy * tilesize, 8, 8);
         }
 
-        for(int i = 0; i < 2; i ++) {
-            for(int x = 0; x < chunksize; x ++){
-                for(int y = 0; y < chunksize; y ++){
+        String wregion = Draw.hasRegion(wall.name) ? wall.name : wall.name + "1";
 
-                    int wx = chunkx*chunksize + x;
-                    int wy = chunky*chunksize + y;
-
-                    TileDataWriter data = editor.getMap().readAt(wx, wy);
-                    Block floor = Block.getByID(data.floor);
-                    Block wall = Block.getByID(data.wall);
-
-                    if(i == 0) {
-                        String fregion = Draw.hasRegion(floor.name) ? floor.name : floor.name + "1";
-
-                        if (floor != Blocks.air && Draw.hasRegion(fregion)) {
-                            Draw.crect(fregion, wx * tilesize, wy * tilesize);
-                        } else {
-                            Draw.rect("blank", wx * tilesize, wy * tilesize, 0, 0);
-                        }
-
-                    }else{
-                        String wregion = Draw.hasRegion(wall.name) ? wall.name : wall.name + "1";
-
-                        if (wall != Blocks.air && Draw.hasRegion(wregion)) {
-                            Draw.crect(wregion, wx * tilesize, wy * tilesize);
-                        } else {
-                            Draw.rect("blank", wx * tilesize, wy * tilesize, 0, 0);
-                        }
-                    }
-                }
-            }
+        if (wall != Blocks.air && Draw.hasRegion(wregion)) {
+            TextureRegion region = Draw.region(wregion);
+            mesh.draw(wx + wy*width + (width*height), region, wx * tilesize, wy * tilesize, 8, 8);
         }
-
-        batch.end();
-        if(previousID == -1) chunks[chunkx][chunky] = batch.getLastCache();
-        Log.info("Time to render cache: {0}", Timers.elapsed());
     }
 }

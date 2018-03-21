@@ -245,14 +245,14 @@ public class MapEditorDialog extends Dialog{
 				add(tools).growY().top().padBottom(-6);
 
 				row();
-				/*
-				new table("button"){{
+
+				new table(){{
 					Slider slider = new Slider(0, MapEditor.brushSizes.length-1, 1, true);
 					slider.moved(f -> editor.setBrushSize(MapEditor.brushSizes[(int)(float)f]));
-					new label(() -> Bundles.format("text.editor.brushsize", MapEditor.brushSizes[(int)slider.getValue()])).left();
+					//new label(() -> Bundles.format("text.editor.brushsize", MapEditor.brushSizes[(int)slider.getValue()])).left();
 					row();
 					add(slider).growX().padTop(4f);
-				}}.growX().padBottom(-6).end();*/
+				}}.growX().padBottom(10).end();
 				
 			}}.left().growY().end();
 
