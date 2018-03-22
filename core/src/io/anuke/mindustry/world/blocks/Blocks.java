@@ -74,6 +74,10 @@ public class Blocks{
 	iron = new Ore("iron"){{
 		drops = new ItemStack(Item.iron, 1);
 	}},
+
+	copper = new Ore("copper"){{
+		drops = new ItemStack(Item.copper, 1);
+	}},
 	
 	coal = new Ore("coal"){{
 		drops = new ItemStack(Item.coal, 1);

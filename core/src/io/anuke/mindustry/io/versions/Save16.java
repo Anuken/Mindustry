@@ -81,7 +81,7 @@ public class Save16 extends SaveFileVersion {
             int weapons = stream.readByte();
 
             for (int i = 0; i < weapons; i++) {
-                control.upgrades().addWeapon((Weapon) Upgrade.getByID(stream.readByte()));
+                control.upgrades().addWeapon(Upgrade.getByID(stream.readByte()));
             }
 
             ui.hudfrag.updateWeapons();
