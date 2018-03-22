@@ -62,6 +62,7 @@ public class Recipes {
 
 		//new Recipe(production, ProductionBlocks.stonedrill, stack(Item.stone, 12)),
 		new Recipe(production, ProductionBlocks.irondrill, stack(Item.iron, 25)),
+		new Recipe(production, ProductionBlocks.copperdrill, stack(Item.iron, 25)),
 		new Recipe(production, ProductionBlocks.coaldrill, stack(Item.iron, 25), stack(Item.iron, 40)),
 		new Recipe(production, ProductionBlocks.titaniumdrill, stack(Item.iron, 50), stack(Item.steel, 50)),
 		new Recipe(production, ProductionBlocks.uraniumdrill, stack(Item.iron, 40), stack(Item.steel, 40)),

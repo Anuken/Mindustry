@@ -167,12 +167,20 @@ public class ProductionBlocks{
 			drillTime = 360;
 		}
 	},
+
+	copperdrill = new Drill("copperdrill"){
+		{
+			resource = Blocks.copper;
+			result = Item.copper;
+			drillTime = 400;
+		}
+	},
 	
 	coaldrill = new Drill("coaldrill"){
 		{
 			resource = Blocks.coal;
 			result = Item.coal;
-			drillTime = 360;
+			drillTime = 420;
 		}
 	},
 	
