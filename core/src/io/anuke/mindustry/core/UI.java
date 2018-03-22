@@ -103,12 +103,13 @@ public class UI extends SceneModule{
 		Colors.put("healthstats", Color.SCARLET);
 		Colors.put("interact", Color.ORANGE);
 		Colors.put("accent", Color.valueOf("f4ba6e"));
-		Colors.put("place", Color.PURPLE);
+		Colors.put("place", Color.valueOf("6335f8"));
 		Colors.put("placeInvalid", Color.RED);
 		Colors.put("placeRotate", Color.ORANGE);
 		Colors.put("break", Color.CORAL);
 		Colors.put("breakStart", Color.YELLOW);
 		Colors.put("breakInvalid", Color.RED);
+		Colors.put("range", Colors.get("accent"));
 	}
 
 	@Override

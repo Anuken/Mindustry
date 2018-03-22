@@ -1,10 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
-import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Strings;
 
 public abstract class PowerTurret extends Turret{
@@ -20,13 +17,6 @@ public abstract class PowerTurret extends Turret{
 	public void setStats(){
 		super.setStats();
 		stats.add("powershot", Strings.toFixed(powerUsed, 1));
-	}
-	
-	@Override
-	public void drawSelect(Tile tile){
-		Draw.color(Color.GREEN);
-		Lines.dashCircle(tile.drawx(), tile.drawy(), range);
-		Draw.reset();
 	}
 	
 	@Override

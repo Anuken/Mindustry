@@ -160,6 +160,10 @@ public class World extends Module{
 
         return tiles;
     }
+
+    public void setMap(Map map){
+    	this.currentMap = map;
+	}
 	
 	public void loadMap(Map map){
 		loadMap(map, MathUtils.random(0, 999999));

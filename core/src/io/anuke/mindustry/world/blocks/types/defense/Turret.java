@@ -77,6 +77,11 @@ public class Turret extends Block{
 	public void draw(Tile tile){
 		if(base == null) {
 			Draw.rect("block-" + size, tile.drawx(), tile.drawy());
+			if(Draw.hasRegion("block-" + size + "-top")) {
+				Draw.color(tile.getTeam().color, Color.WHITE, 0.45f);
+				Draw.rect("block-" + size + "-top", tile.drawx(), tile.drawy());
+				Draw.color();
+			}
 		}else{
 			Draw.rect(base, tile.drawx(), tile.drawy());
 		}
@@ -95,14 +100,14 @@ public class Turret extends Block{
 	
 	@Override
 	public void drawSelect(Tile tile){
-		Draw.color(Color.GREEN);
+		Draw.color(tile.getTeam().color);
 		Lines.dashCircle(tile.drawx(), tile.drawy(), range);
 		Draw.reset();
 	}
 	
 	@Override
 	public void drawPlace(int x, int y, int rotation, boolean valid){
-		Draw.color(Color.PURPLE);
+		Draw.color("place");
 		Lines.stroke(1f);
 		Lines.dashCircle(x * tilesize, y * tilesize, range);
 	}

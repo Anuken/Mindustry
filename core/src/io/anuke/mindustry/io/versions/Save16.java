@@ -40,6 +40,7 @@ public class Save16 extends SaveFileVersion {
         //general state
         byte mode = stream.readByte();
         String mapname = stream.readUTF();
+        world.setMap(world.maps().getByName(mapname));
 
         int wave = stream.readInt();
         byte difficulty = stream.readByte();
@@ -141,12 +142,13 @@ public class Save16 extends SaveFileVersion {
 
         Tile[][] tiles = world.createTiles(width, height);
 
-        for(int x = 0; x < world.width(); x ++){
-            for(int y = 0; y < world.height(); y ++) {
+        for(int x = 0; x < width; x ++){
+            for(int y = 0; y < height; y ++) {
                 byte floorid = stream.readByte();
                 byte wallid = stream.readByte();
 
                 Tile tile = new Tile(x, y, floorid, wallid);
+
 
                 if (wallid == Blocks.blockpart.id) {
                     tile.link = stream.readByte();
@@ -154,9 +156,10 @@ public class Save16 extends SaveFileVersion {
 
                 if (tile.entity != null) {
                     byte tr = stream.readByte();
+                    short health = stream.readShort();
+
                     byte team = Bits.getLeftByte(tr);
                     byte rotation = Bits.getRightByte(tr);
-                    short health = stream.readShort();
 
                     tile.setTeam(Team.values()[team]);
                     tile.entity.health = health;

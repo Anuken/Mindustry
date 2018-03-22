@@ -15,6 +15,7 @@ public class Item implements Comparable<Item>{
 		}
 	},
 	iron = new Item("iron"),
+	copper = new Item("copper"),
 	coal = new Item("coal"){
 		{
 			explosiveness = 0.2f;
@@ -38,7 +39,6 @@ public class Item implements Comparable<Item>{
 			fluxiness = 0.65f;
 		}
 	},
-	glass = new Item("glass"),
 	silicon = new Item("silicon"),
 	biomatter = new Item("biomatter"){
 		{

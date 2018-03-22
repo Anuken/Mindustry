@@ -42,6 +42,7 @@ public class Tile{
 		this(x, y);
 		this.floor = floor;
 		this.wall = wall;
+		changed();
 	}
 	
 	public Tile(int x, int y, byte floor, byte wall, byte rotation, byte team){
@@ -50,6 +51,7 @@ public class Tile{
 		this.wall = wall;
 		this.rotation = rotation;
 		this.team = team;
+		changed();
 	}
 
 	public int packedPosition(){

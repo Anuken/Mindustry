@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Layer;
@@ -66,13 +65,6 @@ public class RepairTurret extends PowerTurret{
 				entity.power.amount -= powerUsed;
 			}
 		}
-	}
-	
-	@Override
-	public void drawSelect(Tile tile){
-		Draw.color(Color.GREEN);
-		Lines.dashCircle(tile.drawx(), tile.drawy(), range);
-		Draw.reset();
 	}
 	
 	@Override

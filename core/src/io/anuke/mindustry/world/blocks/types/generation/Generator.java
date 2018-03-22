@@ -92,7 +92,7 @@ public class Generator extends PowerBlock{
 	@Override
 	public void drawPlace(int x, int y, int rotation, boolean valid){
 		if(hasLasers){
-			Draw.color(Color.PURPLE);
+			Draw.color("place");
 			Lines.stroke(2f);
 
 			for(int i = 0; i < laserDirections; i++){
