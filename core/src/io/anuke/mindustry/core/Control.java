@@ -122,8 +122,6 @@ public class Control extends Module{
 			"lastBuild", 0
 		);
 
-		Log.info("{0}", (int)'ї');
-
 		KeyBinds.load();
 
 		for(Map map : world.maps().list()){
