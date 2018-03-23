@@ -43,7 +43,7 @@ public class ProductionBlocks{
 			health = 90;
 			inputs = new Item[]{Item.titanium, Item.steel};
 			fuel = Item.coal;
-			result = Item.dirium;
+			result = Item.densealloy;
 			burnDuration = 45f;
 			craftTime = 25f;
 		}
@@ -67,7 +67,7 @@ public class ProductionBlocks{
 			health = 200;
 			inputLiquid = Liquid.water;
 			outputLiquid = Liquid.cryofluid;
-			inputItem = Item.quartz;
+			inputItem = Item.titanium;
 			liquidPerItem = 50f;
 			itemCapacity = 50;
 			powerUse = 0.1f;
@@ -90,7 +90,7 @@ public class ProductionBlocks{
 	
 	titaniumextractor = new LiquidCrafter("titaniumextractor"){
 		{
-			input = Item.iron;
+			input = Item.stone;
 			inputAmount = 8;
 			inputLiquid = Liquid.water;
 			liquidAmount = 40f;
@@ -142,7 +142,7 @@ public class ProductionBlocks{
 
 	siliconextractor = new LiquidCrafter("siliconextractor"){
 		{
-			input = Item.quartz;
+			input = Item.stone;
 			inputAmount = 5;
 			inputLiquid = Liquid.water;
 			liquidAmount = 18.99f;
@@ -229,11 +229,12 @@ public class ProductionBlocks{
 		}
 	},
 
-	quartzextractor = new Drill("quartzextractor"){
+	quartzextractor = new GenericDrill("quartzextractor"){
 		{
+			powerUse = 0.1f;
 			resource = Blocks.sand;
-			result = Item.quartz;
-			drillTime = 300;
+			result = Item.silicon;
+			drillTime = 320;
 			size = 2;
 		}
 	},

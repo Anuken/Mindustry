@@ -9,8 +9,8 @@ public class UpgradeRecipes {
             Weapon.triblaster, list(stack(Item.iron, 60), stack(Item.steel, 80)),
             Weapon.clustergun, list(stack(Item.iron, 300), stack(Item.steel, 80)),
             Weapon.vulcan, list(stack(Item.iron, 100), stack(Item.steel, 150), stack(Item.titanium, 80)),
-            Weapon.beam, list(stack(Item.steel, 260), stack(Item.titanium, 160), stack(Item.dirium, 120)),
-            Weapon.shockgun, list(stack(Item.steel, 240), stack(Item.titanium, 160), stack(Item.dirium, 160))
+            Weapon.beam, list(stack(Item.steel, 260), stack(Item.titanium, 160), stack(Item.densealloy, 120)),
+            Weapon.shockgun, list(stack(Item.steel, 240), stack(Item.titanium, 160), stack(Item.densealloy, 160))
     );
 
     private static final ItemStack[] empty = {};
