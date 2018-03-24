@@ -10,6 +10,7 @@ public class TraceInfo {
     public boolean android;
 
     public int fastShots;
+    public long lastFastShot;
 
     public int totalBlocksBroken;
     public int structureBlocksBroken;

@@ -172,9 +172,9 @@ public class NetServer extends Module{
             TraceInfo info = admins.getTrace(Net.getConnection(id).address);
             Weapon weapon = (Weapon)Upgrade.getByID(packet.weaponid);
 
-            float wtrc = 60f;
+            float wtrc = 60;
 
-            if(!Timers.get(info.uuid + "-weapontrace", wtrc)){
+            if(TimeUtils.millis() < info.lastFastShot + wtrc*1000){
                 info.fastShots ++;
 
                 if(info.fastShots - 10 > (int)(wtrc / (weapon.getReload() / 2f))){
@@ -182,6 +182,7 @@ public class NetServer extends Module{
                 }
             }else{
                 info.fastShots = 0;
+                info.lastFastShot = TimeUtils.millis();
             }
 
             packet.playerid = connections.get(id).id;
@@ -264,6 +265,10 @@ public class NetServer extends Module{
         });
 
         Net.handleServer(WeaponSwitchPacket.class, (id, packet) -> {
+            TraceInfo info = admins.getTrace(Net.getConnection(id).address);
+            info.fastShots = 0;
+            info.lastFastShot = TimeUtils.millis();
+
             packet.playerid = connections.get(id).id;
             Net.sendExcept(id, packet, SendMode.tcp);
         });
