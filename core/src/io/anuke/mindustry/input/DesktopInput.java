@@ -43,8 +43,8 @@ public class DesktopInput extends InputHandler{
 
 		if((Inputs.keyTap("select") && recipe != null) || Inputs.keyTap("break")){
 			Vector2 vec = Graphics.world(Gdx.input.getX(), Gdx.input.getY());
-			mousex = (int)vec.x;
-			mousey = (int)vec.y;
+			mousex = vec.x;
+			mousey = vec.y;
 		}
 
 		if(!Inputs.keyDown("select") && !Inputs.keyDown("break")){
