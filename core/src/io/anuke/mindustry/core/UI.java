@@ -156,12 +156,12 @@ public class UI extends SceneModule{
 		language = new LanguageDialog();
 		settings = new SettingsMenuDialog();
 		paused = new PausedDialog();
+		changelog = new ChangelogDialog();
 		about = new AboutDialog();
 		host = new HostDialog();
 		bans = new BansDialog();
 		admins = new AdminsDialog();
 		traces = new TraceDialog();
-		changelog = new ChangelogDialog();
 		
 		build.begin(scene);
 

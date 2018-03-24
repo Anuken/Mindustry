@@ -1,6 +1,7 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.NetEvents;
@@ -36,15 +37,15 @@ public class AdminsDialog extends FloatingDialog {
             table.add("$text.server.admins.none");
         }
 
-        for(String ip : netServer.admins.getAdmins()){
+        for(PlayerInfo info : netServer.admins.getAdmins()){
             Table res = new Table("button");
             res.margin(14f);
 
-            res.labelWrap("[LIGHT_GRAY]" + netServer.admins.getLastName(ip)).width(w - h - 24f);
+            res.labelWrap("[LIGHT_GRAY]" + info.lastName).width(w - h - 24f);
             res.add().growX();
             res.addImageButton("icon-cancel", 14*3, () -> {
                 ui.showConfirm("$text.confirm", "$text.confirmunadmin", () -> {
-                    netServer.admins.unAdminPlayer(ip);
+                    netServer.admins.unAdminPlayer(info.id);
                     for(Player player : playerGroup.all()){
                         NetConnection c = Net.getConnection(player.clientid);
                         if(c != null){

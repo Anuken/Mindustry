@@ -20,6 +20,7 @@ import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Log;
+import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.ucore.core.Core.scene;
@@ -39,6 +40,8 @@ public class ChatFragment extends Table implements Fragment{
     private float textWidth = Unit.dp.scl(600);
     private Color shadowColor = new Color(0, 0, 0, 0.4f);
     private float textspacing = Unit.dp.scl(10);
+    private Array<String> history = new Array<String>();
+    private int historyPos = 0;
 
     public ChatFragment(){
         super();
@@ -57,8 +60,21 @@ public class ChatFragment extends Table implements Fragment{
             if(Net.active() && Inputs.keyTap("chat")){
                 toggle();
             }
+
+            if (chatOpen) {
+                if (Inputs.keyTap("chat_scroll_up") && historyPos < history.size - 1) {
+                    if (historyPos == 0) history.set(0, chatfield.getText());
+                    historyPos++;
+                    updateChat();
+                }
+                if (Inputs.keyTap("chat_scroll_down") && historyPos > 0) {
+                    historyPos--;
+                    updateChat();
+                }
+            }
         });
 
+        history.insert(0, "");
         setup();
     }
 
@@ -69,6 +85,8 @@ public class ChatFragment extends Table implements Fragment{
 
     public void clearMessages(){
         messages.clear();
+        history.clear();
+        history.insert(0, "");
     }
 
     private void setup(){
@@ -144,7 +162,8 @@ public class ChatFragment extends Table implements Fragment{
 
     private void sendMessage(){
         String message = chatfield.getText();
-        chatfield.clearText();
+        clearChatInput();
+        history.insert(1, message);
 
         if(message.replaceAll(" ", "").isEmpty()) return;
 
@@ -170,6 +189,17 @@ public class ChatFragment extends Table implements Fragment{
     public void hide(){
         scene.setKeyboardFocus(null);
         chatOpen = false;
+        clearChatInput();
+    }
+
+    public void updateChat() {
+        chatfield.setText(history.get(historyPos));
+        chatfield.setCursorPosition(chatfield.getText().length());
+    }
+
+    public void clearChatInput() {
+        historyPos = 0;
+        history.set(0, "");
         chatfield.setText("");
     }
 

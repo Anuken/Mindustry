@@ -7,177 +7,228 @@ import io.anuke.ucore.core.Settings;
 
 public class Administration {
     private Json json = new Json();
+    /**All player info. Maps UUIDs to info. This persists throughout restarts.*/
+    private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
+    /**Maps UUIDs to trace infos. This is wiped when a player logs off.*/
+    private ObjectMap<String, TraceInfo> traceInfo = new ObjectMap<>();
     private Array<String> bannedIPs = new Array<>();
-    private Array<String> bannedIDs = new Array<>();
-    private Array<String> admins = new Array<>();
-    private ObjectMap<String, String> ipNames = new ObjectMap<>();
-    private ObjectMap<String, String> idIPs = new ObjectMap<>();
-    private ObjectMap<String, TraceInfo> traces = new ObjectMap<>();
 
     public Administration(){
-        Settings.defaultList(
-            "bans", "{}",
-            "bannedIDs", "{}",
-            "admins", "{}",
-            "knownIPs", "{}",
-            "knownIDs", "{}"
-        );
+        Settings.defaults("playerInfo", "{}");
+        Settings.defaults("bannedIPs", "{}");
 
         load();
     }
 
-    public TraceInfo getTrace(String ip){
-        if(!traces.containsKey(ip)) traces.put(ip, new TraceInfo(ip));
+    /**Call when a player joins to update their information here.*/
+    public void updatePlayerJoined(String id, String ip, String name){
+        PlayerInfo info = getCreateInfo(id);
+        info.lastName = name;
+        info.lastIP = ip;
+        info.timesJoined ++;
+        if(!info.names.contains(name, false)) info.names.add(name);
+        if(!info.ips.contains(ip, false)) info.ips.add(ip);
+    }
 
-        return traces.get(ip);
+    /**Returns trace info by IP.*/
+    public TraceInfo getTrace(String ip){
+        if(!traceInfo.containsKey(ip)) traceInfo.put(ip, new TraceInfo(ip));
+
+        return traceInfo.get(ip);
     }
 
     public void clearTraces(){
-        traces.clear();
+        traceInfo.clear();
     }
 
-    /**Sets last known name for an IP.*/
-    public void setKnownName(String ip, String name){
-        ipNames.put(ip, name);
-        saveKnown();
-    }
-
-    /**Sets last known UUID for an IP.*/
-    public void setKnownIP(String id, String ip){
-        idIPs.put(id, ip);
-        saveKnown();
-    }
-
-    /**Returns the last known name for an IP. Returns 'unknown' if this IP has an unknown username.*/
-    public String getLastName(String ip){
-        return ipNames.get(ip, "unknown");
-    }
-
-    /**Returns the last known IP for a UUID. Returns 'unknown' if this IP has an unknown IP.*/
-    public String getLastIP(String id){
-        return idIPs.get(id, "unknown");
-    }
-
-    /**Return the last known device ID associated with an IP.  Returns 'unknown' if this IP has an unknown device.*/
-    public String getLastID(String ip){
-        for(String id : idIPs.keys()){
-            if(idIPs.get(id).equals(ip)){
-                return id;
-            }
-        }
-        return "unknown";
-    }
-
-    /**Returns list of banned IPs.*/
-    public Array<String> getBanned(){
-        return bannedIPs;
-    }
-
-    /**Returns list of banned IDs.*/
-    public Array<String> getBannedIDs(){
-        return bannedIDs;
-    }
-
-    /**Bans a player by IP; returns whether this player was already banned.*/
+    /**Bans a player by IP; returns whether this player was already banned.
+     * If there are players who at any point had this IP, they will be UUID banned as well.*/
     public boolean banPlayerIP(String ip){
         if(bannedIPs.contains(ip, false))
             return false;
+
+        for(PlayerInfo info : playerInfo.values()){
+            if(info.ips.contains(ip, false)){
+                info.banned = true;
+            }
+        }
+
         bannedIPs.add(ip);
-        saveBans();
+        save();
 
         return true;
     }
 
-    /**Bans a player by UUID.*/
+    /**Bans a player by UUID; returns whether this player was already banned.*/
     public boolean banPlayerID(String id){
-        if(bannedIDs.contains(id, false))
+        if(playerInfo.containsKey(id) && playerInfo.get(id).banned)
             return false;
-        bannedIDs.add(id);
-        saveBans();
+
+        getCreateInfo(id).banned = true;
+
+        save();
 
         return true;
     }
 
-    /**Unbans a player by IP; returns whether this player was banned in the first place..*/
+    /**Unbans a player by IP; returns whether this player was banned in the first place.
+     * This method also unbans any player that was banned and had this IP.*/
     public boolean unbanPlayerIP(String ip){
-        if(!bannedIPs.contains(ip, false))
-            return false;
+        boolean found = bannedIPs.contains(ip, false);
+
+        for(PlayerInfo info : playerInfo.values()){
+            if(info.ips.contains(ip, false)){
+                info.banned = false;
+                found = true;
+            }
+        }
+
         bannedIPs.removeValue(ip, false);
-        saveBans();
 
-        return true;
+        if(found) save();
+
+        return found;
     }
 
-    /**Unbans a player by IP; returns whether this player was banned in the first place..*/
-    public boolean unbanPlayerID(String ip){
-        if(!bannedIDs.contains(ip, false))
+    /**Unbans a player by ID; returns whether this player was banned in the first place.
+     * This also unbans all IPs the player used.*/
+    public boolean unbanPlayerID(String id){
+        PlayerInfo info = getCreateInfo(id);
+
+        if(!info.banned)
             return false;
-        bannedIDs.removeValue(ip, false);
-        saveBans();
+
+        info.banned = false;
+        bannedIPs.removeAll(info.ips, false);
+        save();
 
         return true;
     }
 
-    /**Returns list of banned IPs.*/
-    public Array<String> getAdmins(){
-        return admins;
+    /**Returns list of all players with admin status*/
+    public Array<PlayerInfo> getAdmins(){
+        Array<PlayerInfo> result = new Array<>();
+        for(PlayerInfo info : playerInfo.values()){
+            if(info.admin){
+                result.add(info);
+            }
+        }
+        return result;
+    }
+
+    /**Returns list of all players with admin status*/
+    public Array<PlayerInfo> getBanned(){
+        Array<PlayerInfo> result = new Array<>();
+        for(PlayerInfo info : playerInfo.values()){
+            if(info.banned){
+                result.add(info);
+            }
+        }
+        return result;
+    }
+
+    /**Returns all banned IPs. This does not include the IPs of ID-banned players.*/
+    public Array<String> getBannedIPs(){
+        return bannedIPs;
     }
 
     /**Makes a player an admin. Returns whether this player was already an admin.*/
-    public boolean adminPlayer(String ip){
-        if(admins.contains(ip, false))
+    public boolean adminPlayer(String id, String ip){
+        PlayerInfo info = getCreateInfo(id);
+
+        if(info.admin)
             return false;
-        admins.add(ip);
-        saveAdmins();
+
+        info.validAdminIP = ip;
+        info.admin = true;
+        save();
 
         return true;
     }
 
     /**Makes a player no longer an admin. Returns whether this player was an admin in the first place.*/
-    public boolean unAdminPlayer(String ip){
-        if(!admins.contains(ip, false))
+    public boolean unAdminPlayer(String id){
+        PlayerInfo info = getCreateInfo(id);
+
+        if(!info.admin)
             return false;
-        admins.removeValue(ip, false);
-        saveAdmins();
+
+        info.admin = false;
+        save();
 
         return true;
     }
 
     public boolean isIPBanned(String ip){
-        return bannedIPs.contains(ip, false);
+        return bannedIPs.contains(ip, false) || (findByIP(ip) != null && findByIP(ip).banned);
     }
 
     public boolean isIDBanned(String uuid){
-        return bannedIDs.contains(uuid, false);
+        return getCreateInfo(uuid).banned;
     }
 
-    public boolean isAdmin(String ip){
-        return admins.contains(ip, false);
+    public boolean isAdmin(String id, String ip){
+        PlayerInfo info = getCreateInfo(id);
+        return info.admin && ip.equals(info.validAdminIP);
     }
 
-    private void saveKnown(){
-        Settings.putString("knownIPs", json.toJson(ipNames));
-        Settings.putString("knownIDs", json.toJson(idIPs));
-        Settings.save();
+    public PlayerInfo getInfo(String id){
+        return getCreateInfo(id);
     }
 
-    private void saveBans(){
-        Settings.putString("bans", json.toJson(bannedIPs));
-        Settings.putString("bannedIDs", json.toJson(bannedIDs));
-        Settings.save();
+    public PlayerInfo getInfoOptional(String id){
+        return playerInfo.get(id);
     }
 
-    private void saveAdmins(){
-        Settings.putString("admins", json.toJson(admins));
+    public PlayerInfo findByIP(String ip){
+        for(PlayerInfo info : playerInfo.values()){
+            if(info.ips.contains(ip, false)){
+                return info;
+            }
+        }
+        return null;
+    }
+
+    private PlayerInfo getCreateInfo(String id){
+        if(playerInfo.containsKey(id)){
+            return playerInfo.get(id);
+        }else{
+            PlayerInfo info = new PlayerInfo(id);
+            playerInfo.put(id, info);
+            save();
+            return info;
+        }
+    }
+
+    public void save(){
+        Settings.putString("playerInfo", json.toJson(playerInfo));
+        Settings.putString("bannedIPs", json.toJson(bannedIPs));
         Settings.save();
     }
 
     private void load(){
-        bannedIPs = json.fromJson(Array.class, Settings.getString("bans"));
-        bannedIDs = json.fromJson(Array.class, Settings.getString("bannedIDs"));
-        admins = json.fromJson(Array.class, Settings.getString("admins"));
-        ipNames = json.fromJson(ObjectMap.class, Settings.getString("knownIPs"));
-        idIPs = json.fromJson(ObjectMap.class, Settings.getString("knownIDs"));
+        playerInfo = json.fromJson(ObjectMap.class, Settings.getString("playerInfo"));
+        bannedIPs = json.fromJson(Array.class, Settings.getString("bannedIPs"));
+    }
+
+    public static class PlayerInfo{
+        public String id;
+        public String lastName = "<unknown>", lastIP = "<unknown>";
+        public String validAdminIP;
+        public Array<String> ips = new Array<>();
+        public Array<String> names = new Array<>();
+        public int timesKicked; //TODO not implemented!
+        public int timesJoined;
+        public int totalBlockPlaced;
+        public int totalBlocksBroken;
+        public boolean banned, admin;
+        public long lastKicked; //last kicked timestamp
+
+        PlayerInfo(String id){
+            this.id = id;
+        }
+
+        private PlayerInfo(){}
     }
 
 }

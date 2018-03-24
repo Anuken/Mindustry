@@ -2,13 +2,14 @@ package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ui.Links;
 import io.anuke.mindustry.ui.Links.LinkEntry;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Table;
+
+import static io.anuke.mindustry.Vars.ui;
 
 public class AboutDialog extends FloatingDialog {
 
@@ -45,7 +46,7 @@ public class AboutDialog extends FloatingDialog {
 
             table.addImageButton("icon-link", 14*3, () -> {
                 if(!Gdx.net.openURI(link.link)){
-                    Vars.ui.showError("$text.linkfail");
+                    ui.showError("$text.linkfail");
                     Gdx.app.getClipboard().setContents(link.link);
                 }
             }).size(h-5, h);
@@ -58,6 +59,7 @@ public class AboutDialog extends FloatingDialog {
         content().add(pane).growX();
 
         buttons().addButton("$text.credits", this::showCredits).size(200f, 64f);
+        buttons().addButton("$text.changelog.title", ui.changelog::show).size(200f, 64f);
     }
 
     private void showCredits(){

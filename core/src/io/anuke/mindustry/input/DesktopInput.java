@@ -107,6 +107,10 @@ public class DesktopInput extends InputHandler{
                 Cursors.restoreCursor();
             }
 		}
+
+        if(target != null && target.block().isConfigurable(target)){
+		    showCursor = true;
+        }
 		
 		if(target != null && Inputs.keyTap("select") && !ui.hasMouse()){
 			if(target.block().isConfigurable(target)){
