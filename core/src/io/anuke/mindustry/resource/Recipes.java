@@ -32,6 +32,7 @@ public class Recipes {
 		new Recipe(distribution, DistributionBlocks.sorter, stack(Item.steel, 2)),
 		new Recipe(distribution, DistributionBlocks.splitter, stack(Item.steel, 1)),
 		new Recipe(distribution, DistributionBlocks.vault, stack(Item.steel, 50)),
+		new Recipe(distribution, ProductionBlocks.core, stack(Item.steel, 50)),
 		new Recipe(distribution, DistributionBlocks.unloader, stack(Item.steel, 5)),
 		new Recipe(distribution, DistributionBlocks.sortedunloader, stack(Item.steel, 5)),
 
@@ -65,7 +66,7 @@ public class Recipes {
 		new Recipe(production, ProductionBlocks.leaddrill, stack(Item.iron, 25)),
 		new Recipe(production, ProductionBlocks.coaldrill, stack(Item.iron, 25), stack(Item.iron, 40)),
 		new Recipe(production, ProductionBlocks.titaniumdrill, stack(Item.iron, 50), stack(Item.steel, 50)),
-		new Recipe(production, ProductionBlocks.uraniumdrill, stack(Item.iron, 40), stack(Item.steel, 40)),
+		new Recipe(production, ProductionBlocks.thoriumdrill, stack(Item.iron, 40), stack(Item.steel, 40)),
 		new Recipe(production, ProductionBlocks.quartzextractor, stack(Item.titanium, 40), stack(Item.densealloy, 40)),
 		new Recipe(production, ProductionBlocks.cultivator, stack(Item.titanium, 40), stack(Item.densealloy, 40)),
 		new Recipe(production, ProductionBlocks.laserdrill, stack(Item.titanium, 40), stack(Item.densealloy, 40)),

@@ -86,9 +86,9 @@ public class Blocks{
 	titanium = new Ore("titanium"){{
 		drops = new ItemStack(Item.titanium, 1);
 	}},
-	
-	uranium = new Ore("uranium"){{
-		drops = new ItemStack(Item.uranium, 1);
+
+	thorium = new Ore("thorium"){{
+		drops = new ItemStack(Item.thorium, 1);
 	}},
 	
 	dirt = new Floor("dirt"){},

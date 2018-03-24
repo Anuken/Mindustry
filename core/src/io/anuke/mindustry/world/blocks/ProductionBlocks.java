@@ -184,10 +184,10 @@ public class ProductionBlocks{
 		}
 	},
 	
-	uraniumdrill = new Drill("uraniumdrill"){
+	thoriumdrill = new Drill("thoriumdrill"){
 		{
-			resource = Blocks.uranium;
-			result = Item.uranium;
+			resource = Blocks.thorium;
+			result = Item.thorium;
 			drillTime = 600;
 		}
 	},
@@ -298,7 +298,7 @@ public class ProductionBlocks{
 	},
 	rtgenerator = new ItemPowerGenerator("rtgenerator"){
 		{
-			generateItem = Item.uranium;
+			generateItem = Item.thorium;
 			powerCapacity = 40f;
 			powerOutput = 0.03f;
 			itemDuration = 240f;

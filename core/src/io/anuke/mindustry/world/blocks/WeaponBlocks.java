@@ -155,7 +155,7 @@ public class WeaponBlocks{
 			range = 80f;
 			reload = 8f;
 			bullet = BulletType.chain;
-			ammo = Item.uranium;
+			ammo = Item.thorium;
 			health = 430;
 			size = 2;
 			shootCone = 9f;
@@ -188,7 +188,7 @@ public class WeaponBlocks{
 			range = 120f;
 			reload = 23f;
 			bullet = BulletType.titanshell;
-			ammo = Item.uranium;
+			ammo = Item.thorium;
 			health = 800;
 			ammoMultiplier = 4;
 			size = 3;
@@ -205,7 +205,7 @@ public class WeaponBlocks{
 			range = 120f;
 			reload = 23f;
 			bullet = BulletType.titanshell;
-			ammo = Item.uranium;
+			ammo = Item.thorium;
 			health = 800;
 			ammoMultiplier = 4;
 			size = 3;
@@ -221,7 +221,7 @@ public class WeaponBlocks{
 			range = 120f;
 			reload = 23f;
 			bullet = BulletType.titanshell;
-			ammo = Item.uranium;
+			ammo = Item.thorium;
 			health = 800;
 			ammoMultiplier = 4;
 			size = 2;

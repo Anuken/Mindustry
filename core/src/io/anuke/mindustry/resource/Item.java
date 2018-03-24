@@ -26,10 +26,9 @@ public class Item implements Comparable<Item>{
 	},
 	steel = new Item("steel"),
 	titanium = new Item("titanium"),
-	uranium = new Item("uranium"){
+	thorium = new Item("thorium"){
 		{
 			explosiveness = 0.1f;
-			material = false;
 		}
 	},
 	silicon = new Item("silicon"),

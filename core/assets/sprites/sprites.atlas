@@ -494,44 +494,44 @@ stoneedge
   orig: 12, 12
   offset: 0, 0
   index: -1
-titanium1
+thorium1
   rotate: false
   xy: 672, 279
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-titanium2
+thorium2
   rotate: false
   xy: 682, 279
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-titanium3
+thorium3
   rotate: false
   xy: 650, 269
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-uranium1
+titanium1
   rotate: false
-  xy: 660, 249
+  xy: 660, 269
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-uranium2
+titanium2
   rotate: false
-  xy: 670, 249
+  xy: 660, 259
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-uranium3
+titanium3
   rotate: false
-  xy: 680, 249
+  xy: 670, 269
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -858,23 +858,23 @@ thermalgenerator
   orig: 8, 8
   offset: 0, 0
   index: -1
-titaniumdrill
+thoriumdrill
   rotate: false
   xy: 650, 259
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-titaniumextractor
+titaniumdrill
   rotate: false
-  xy: 660, 269
+  xy: 670, 259
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-uraniumdrill
+titaniumextractor
   rotate: false
-  xy: 492, 168
+  xy: 680, 269
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -1154,7 +1154,7 @@ teleporter-top
   index: -1
 unloader
   rotate: false
-  xy: 650, 249
+  xy: 492, 168
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -1399,14 +1399,14 @@ stonewall
   index: -1
 titaniumshieldwall
   rotate: false
-  xy: 660, 259
+  xy: 680, 259
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 titaniumwall
   rotate: false
-  xy: 670, 269
+  xy: 650, 249
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -1490,7 +1490,7 @@ shot-long
   index: -1
 titanshell
   rotate: false
-  xy: 670, 259
+  xy: 660, 249
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -1600,14 +1600,14 @@ item-stone
   orig: 8, 8
   offset: 0, 0
   index: -1
-item-titanium
+item-thorium
   rotate: false
   xy: 620, 266
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-item-uranium
+item-titanium
   rotate: false
   xy: 630, 276
   size: 8, 8
@@ -2644,14 +2644,14 @@ shockgun-equip
   index: -1
 triblaster
   rotate: false
-  xy: 680, 269
+  xy: 670, 249
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 triblaster-equip
   rotate: false
-  xy: 680, 259
+  xy: 680, 249
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
