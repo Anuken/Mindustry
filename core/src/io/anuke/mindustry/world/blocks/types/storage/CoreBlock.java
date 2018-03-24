@@ -4,7 +4,6 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Vars.debug;
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
@@ -19,11 +18,6 @@ public class CoreBlock extends StorageBlock {
         destructible = true;
         size = 3;
         hasInventory = false;
-    }
-
-    @Override
-    public int handleDamage(Tile tile, int amount){
-        return debug ? 0 : amount;
     }
 
     public void onDestroyed(Tile tile){

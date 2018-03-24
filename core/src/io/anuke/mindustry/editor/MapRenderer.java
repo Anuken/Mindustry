@@ -101,14 +101,16 @@ public class MapRenderer {
 
         if (floor != Blocks.air && Draw.hasRegion(fregion)) {
             TextureRegion region = Draw.region(fregion);
-            mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize, region, wx * tilesize, wy * tilesize, 8, 8);
+            mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize, region, wx * tilesize, wy * tilesize, -1f, 8, 8);
         }
 
         String wregion = Draw.hasRegion(wall.name) ? wall.name : wall.name + "1";
 
         if (wall != Blocks.air && Draw.hasRegion(wregion)) {
             TextureRegion region = Draw.region(wregion);
-            mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize + chunksize*chunksize, region, wx * tilesize, wy * tilesize, 8, 8);
+            mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize + chunksize*chunksize, region,
+                    wx * tilesize - Math.max(region.getRegionWidth()-16f, 0), wy * tilesize - Math.max(region.getRegionHeight()-16f, 0), 0f,
+                    region.getRegionWidth(), region.getRegionHeight());
         }
     }
 }
