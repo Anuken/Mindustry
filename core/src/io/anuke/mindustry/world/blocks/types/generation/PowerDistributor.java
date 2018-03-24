@@ -13,22 +13,19 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Shapes;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
-import io.anuke.ucore.util.Translator;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.threads;
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
 public class PowerDistributor extends PowerBlock{
 	public static final float thicknessScl = 0.7f;
-    public static final float flashScl = 0.07f;
-	public static final float laserMinValue = 0f;
+    public static final float flashScl = 0.12f;
 	public static final Color laserFrom = Color.valueOf("e3e3e3");
 	public static final Color laserTo = Color.valueOf("ffe7a8");
 
@@ -46,7 +43,7 @@ public class PowerDistributor extends PowerBlock{
 		expanded = true;
 		layer = Layer.power;
 		hasInventory = false;
-		powerCapacity = 1f;
+		powerCapacity = 5f;
 	}
 
 	@Override
@@ -159,11 +156,7 @@ public class PowerDistributor extends PowerBlock{
 
 		DistributorEntity entity = tile.entity();
 
-		if(entity.power.amount > powerSpeed){
-			entity.laserColor = Mathf.lerpDelta(entity.laserColor, 1f, 0.05f);
-		}else{
-			entity.laserColor = Mathf.lerpDelta(entity.laserColor, laserMinValue, 0.05f);
-		}
+		entity.laserColor = Mathf.lerpDelta(entity.laserColor, Mathf.clamp(entity.powerRecieved/(powerSpeed)), 0.08f);
 
 		Draw.color(laserFrom, laserTo, entity.laserColor * (1f-flashScl) + Mathf.sin(Timers.time(), 1.7f, flashScl));
 
@@ -175,8 +168,32 @@ public class PowerDistributor extends PowerBlock{
 		Draw.color();
 	}
 
+	@Override
+	public float addPower(Tile tile, float amount){
+		DistributorEntity entity = tile.entity();
+
+		if(entity.lastRecieved != threads.getFrameID()){
+			entity.lastRecieved = threads.getFrameID();
+			entity.powerRecieved = 0f;
+		}
+
+		float added = super.addPower(tile, amount);
+		entity.powerRecieved += added;
+		return added;
+	}
+
+	protected boolean shouldDistribute(Tile tile, Tile other){
+		if(other.block() instanceof PowerDistributor){
+			return other.entity.power.amount / other.block().powerCapacity <
+					tile.entity.power.amount / powerCapacity;
+		}
+		return true;
+	}
+
 	protected void distributeLaserPower(Tile tile){
 		DistributorEntity entity = tile.entity();
+
+		int targets = 0;
 
 		//validate everything first.
 		for(int i = 0; i < entity.links.size; i ++){
@@ -184,13 +201,17 @@ public class PowerDistributor extends PowerBlock{
 			if(!linkValid(tile, target)) {
 				entity.links.removeIndex(i);
 				i --;
+			}else if(shouldDistribute(tile, target)){
+				targets ++;
 			}
 		}
 
-		float result = Math.min(entity.power.amount / entity.links.size, powerSpeed * Timers.delta());
+		float result = Math.min(entity.power.amount / targets, powerSpeed * Timers.delta());
 
 		for(int i = 0; i < entity.links.size; i ++){
 			Tile target = world.tile(entity.links.get(i));
+			if(!shouldDistribute(tile, target)) continue;
+
 			float transmit = Math.min(result * Timers.delta(), entity.power.amount);
 			if(target.block().acceptPower(target, tile, transmit)){
 				entity.power.amount -= target.block().addPower(target, transmit);
@@ -261,7 +282,9 @@ public class PowerDistributor extends PowerBlock{
     }
 
     public static class DistributorEntity extends TileEntity{
-        public float laserColor = laserMinValue;
+        public float laserColor = 0f;
+        public float powerRecieved = 0f;
+        public long lastRecieved = 0;
         public IntArray links = new IntArray();
 
 		@Override

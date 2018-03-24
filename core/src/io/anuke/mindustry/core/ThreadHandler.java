@@ -48,7 +48,7 @@ public class ThreadHandler {
     }
 
     public long getFrameID(){
-        return frame;
+        return enabled ? frame : Gdx.graphics.getFrameId();
     }
 
     public float getFramesSinceUpdate(){

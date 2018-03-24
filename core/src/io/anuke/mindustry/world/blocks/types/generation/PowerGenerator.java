@@ -22,7 +22,8 @@ public class PowerGenerator extends PowerBlock {
 
         for(GridPoint2 point : Edges.getEdges(size)){
             Tile target = tile.getNearby(point);
-            if(target != null && target.block().hasPower) sources ++;
+            if(target != null && target.block().hasPower &&
+                    shouldDistribute(tile, target)) sources ++;
         }
 
         if(sources == 0) return;
@@ -34,13 +35,21 @@ public class PowerGenerator extends PowerBlock {
             if(target == null) continue;
             target = target.target();
 
-            if(target.block().hasPower){
+            if(target.block().hasPower && shouldDistribute(tile, target)){
                 float transmit = Math.min(result * Timers.delta(), entity.power.amount);
                 if(target.block().acceptPower(target, tile, transmit)){
                     entity.power.amount -= target.block().addPower(target, transmit);
                 }
             }
         }
+    }
+
+    protected boolean shouldDistribute(Tile tile, Tile other){
+        if(other.block() instanceof PowerGenerator){
+            return other.entity.power.amount / other.block().powerCapacity <
+                    tile.entity.power.amount / powerCapacity;
+        }
+        return true;
     }
 
     @Override
