@@ -96,7 +96,7 @@ public class DesktopInput extends InputHandler{
 		}
 		
 		Tile cursor = world.tile(tilex(), tiley());
-		Tile target = cursor == null ? null : cursor.isLinked() ? cursor.getLinked() : cursor;
+		Tile target = cursor == null ? null : cursor.target();
 		boolean showCursor = false;
 
 		if(recipe == null && target != null && !ui.hasMouse() && Inputs.keyDown("block_info")
@@ -111,10 +111,11 @@ public class DesktopInput extends InputHandler{
 		if(target != null && Inputs.keyTap("select") && !ui.hasMouse()){
 			if(target.block().isConfigurable(target)){
 				if((!ui.configfrag.isShown()
-						|| ui.configfrag.getSelectedTile().block().onConfigureTileTapped(ui.configfrag.getSelectedTile(), target)))
+						|| ui.configfrag.getSelectedTile().block().onConfigureTileTapped(ui.configfrag.getSelectedTile(), cursor)))
 					ui.configfrag.showConfig(target);
 			}else if(!ui.configfrag.hasConfigMouse()){
-				ui.configfrag.hideConfig();
+				if(ui.configfrag.isShown() && ui.configfrag.getSelectedTile().block().onConfigureTileTapped(ui.configfrag.getSelectedTile(), cursor))
+					ui.configfrag.hideConfig();
 			}
 
 			target.block().tapped(target);

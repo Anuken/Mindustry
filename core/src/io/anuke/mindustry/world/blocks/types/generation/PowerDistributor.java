@@ -46,13 +46,17 @@ public class PowerDistributor extends PowerBlock{
 		expanded = true;
 		layer = Layer.power;
 		hasInventory = false;
+		powerCapacity = 1f;
 	}
+
+	@Override
+	public void setBars(){}
 
 	@Override
 	public void placed(Tile tile) {
 		Tile before = world.tile(lastPlaced);
-		if(linkValid(tile, before)){
-			tile.<DistributorEntity>entity().links.add(before.packedPosition());
+		if(linkValid(tile, before) && before.block() instanceof PowerDistributor){
+			link(tile, before);
 		}
 
 		lastPlaced = tile.packedPosition();
@@ -78,13 +82,13 @@ public class PowerDistributor extends PowerBlock{
 
     @Override
     public boolean onConfigureTileTapped(Tile tile, Tile other){
-		DistributorEntity entity = tile.entity();
+		other = other.target();
 
 		if(linkValid(tile, other)){
-			if(entity.links.contains(other.packedPosition())){
-				entity.links.removeValue(other.packedPosition());
+			if(linked(tile, other)){
+				unlink(tile, other);
 			}else{
-				entity.links.add(other.packedPosition());
+				link(tile, other);
 			}
 			return false;
 		}
@@ -105,11 +109,12 @@ public class PowerDistributor extends PowerBlock{
 
 	@Override
 	public void drawConfigure(Tile tile){
+
 		Draw.color("accent");
 
 		Lines.stroke(1f);
 		Lines.square(tile.drawx(), tile.drawy(),
-				tile.block().size * tilesize / 2f + 1f);
+				tile.block().size * tilesize / 2f + 1f + Mathf.absin(Timers.time(), 4f, 1f));
 
 		Lines.stroke(1f);
 
@@ -120,9 +125,17 @@ public class PowerDistributor extends PowerBlock{
 		for(int x = tile.x - laserRange; x <= tile.x + laserRange; x ++){
 			for(int y = tile.y - laserRange; y <= tile.y + laserRange; y ++){
 				Tile link = world.tile(x, y);
+				if(link != null) link = link.target();
+
 				if(link != tile && linkValid(tile, link)){
+					if(linked(tile, link)){
+						Draw.color("place");
+					}else{
+						Draw.color(Color.SCARLET);
+					}
+
 					Lines.square(link.drawx(), link.drawy(),
-							link.block().size * tilesize / 2f + 1f);
+							link.block().size * tilesize / 2f + 1f + Mathf.absin(Timers.time(), 4f, 1f));
 				}
 			}
 		}
@@ -165,13 +178,67 @@ public class PowerDistributor extends PowerBlock{
 	protected void distributeLaserPower(Tile tile){
 		DistributorEntity entity = tile.entity();
 
-		//TODO implement
+		//validate everything first.
+		for(int i = 0; i < entity.links.size; i ++){
+			Tile target = world.tile(entity.links.get(i));
+			if(!linkValid(tile, target)) {
+				entity.links.removeIndex(i);
+				i --;
+			}
+		}
+
+		float result = Math.min(entity.power.amount / entity.links.size, powerSpeed * Timers.delta());
+
+		for(int i = 0; i < entity.links.size; i ++){
+			Tile target = world.tile(entity.links.get(i));
+			float transmit = Math.min(result * Timers.delta(), entity.power.amount);
+			if(target.block().acceptPower(target, tile, transmit)){
+				entity.power.amount -= target.block().addPower(target, transmit);
+			}
+		}
+	}
+
+	protected void link(Tile tile, Tile other){
+		DistributorEntity entity = tile.entity();
+
+		if(!entity.links.contains(other.packedPosition())){
+			entity.links.add(other.packedPosition());
+		}
+
+		if(other.block() instanceof PowerDistributor){
+			DistributorEntity oe = other.entity();
+
+			if(!oe.links.contains(tile.packedPosition())){
+				oe.links.add(tile.packedPosition());
+			}
+		}
+	}
+
+	protected void unlink(Tile tile, Tile other){
+		DistributorEntity entity = tile.entity();
+
+		entity.links.removeValue(other.packedPosition());
+
+		if(other.block() instanceof PowerDistributor){
+			DistributorEntity oe = other.entity();
+
+			oe.links.removeValue(tile.packedPosition());
+		}
+	}
+
+	protected boolean linked(Tile tile, Tile other){
+		return tile.<DistributorEntity>entity().links.contains(other.packedPosition());
 	}
 
 	protected boolean linkValid(Tile tile, Tile link){
-		return tile != link && link != null && link.block() instanceof PowerDistributor &&
-				Vector2.dst(tile.worldx(), tile.worldy(), link.worldx(), link.worldy()) < Math.max(laserRange * tilesize,
-						((PowerDistributor)link.block()).laserRange * tilesize);
+		if(!(tile != link && link != null && link.block().hasPower)) return false;
+
+		if(link.block() instanceof PowerDistributor){
+			return Vector2.dst(tile.worldx(), tile.worldy(), link.worldx(), link.worldy()) <= Math.max(laserRange * tilesize,
+					((PowerDistributor)link.block()).laserRange * tilesize) - tilesize/2f;
+		}else{
+			return Vector2.dst(tile.worldx(), tile.worldy(), link.worldx(), link.worldy()) <= laserRange * tilesize - tilesize/2f;
+		}
 	}
 
 	protected void drawLaser(Tile tile, Tile target){
@@ -182,7 +249,7 @@ public class PowerDistributor extends PowerBlock{
         float angle2 = angle1 + 180f;
 
         t1.trns(angle1, tile.block().size * tilesize/2f + 1f);
-        t2.trns(angle2,tile.block().size * tilesize/2f + 1f);
+        t2.trns(angle2, target.block().size * tilesize/2f + 1f);
 
         Shapes.laser("laser", "laser-end", x1 + t1.x, y1 + t1.y,
                 x2 + t2.x, y2 + t2.y, thicknessScl);

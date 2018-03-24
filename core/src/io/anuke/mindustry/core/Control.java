@@ -109,12 +109,6 @@ public class Control extends Module{
 
         DefaultKeybinds.load();
 
-		for(int i = 0; i < saveSlots; i ++){
-			Settings.defaults("save-" + i + "-autosave", !gwt);
-			Settings.defaults("save-" + i + "-name", "untitled");
-			Settings.defaults("save-" + i + "-data", "empty");
-		}
-
 		Settings.defaultList(
 			"ip", "localhost",
 			"port", port+"",
@@ -172,7 +166,7 @@ public class Control extends Module{
 		Events.on(WaveEvent.class, () -> {
 			Sounds.play("spawn");
 
-			int last = Settings.getInt("hiscore" + world.getMap().name);
+			int last = Settings.getInt("hiscore" + world.getMap().name, 0);
 
 			if(state.wave > last && !state.mode.infiniteResources && !state.mode.disableWaveTimer){
 				Settings.putInt("hiscore" + world.getMap().name, state.wave);

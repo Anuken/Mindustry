@@ -47,7 +47,6 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		liquidCapacity = 50;
 		explosionEffect = Fx.nuclearShockwave;
 		powerCapacity = 80f;
-		powerSpeed = 0.5f;
 	}
 
 	@Override

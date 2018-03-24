@@ -1,9 +1,9 @@
 package io.anuke.mindustry.world.blocks;
 
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.mindustry.world.blocks.types.distribution.*;
 import io.anuke.mindustry.world.blocks.types.generation.PowerDistributor;
+import io.anuke.mindustry.world.blocks.types.generation.PowerGenerator;
 import io.anuke.mindustry.world.blocks.types.storage.SortedUnloader;
 import io.anuke.mindustry.world.blocks.types.storage.Unloader;
 import io.anuke.mindustry.world.blocks.types.storage.Vault;
@@ -78,10 +78,10 @@ public class DistributionBlocks{
 	}},
 	powernode = new PowerDistributor("powernode"){{
 	}},
-	battery = new PowerBlock("battery"){{
+	battery = new PowerGenerator("battery"){{
 		powerCapacity = 320f;
 	}},
-	batteryLarge = new PowerBlock("batterylarge"){{
+	batteryLarge = new PowerGenerator("batterylarge"){{
 		size = 3;
 		powerCapacity = 2000f;
 	}},

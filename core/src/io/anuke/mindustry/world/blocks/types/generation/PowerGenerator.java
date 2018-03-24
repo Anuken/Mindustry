@@ -1,7 +1,9 @@
 package io.anuke.mindustry.world.blocks.types.generation;
 
+import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Effects;
@@ -9,14 +11,41 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 
 public class PowerGenerator extends PowerBlock {
-    protected float powerSpeed = 1f;
 
     public PowerGenerator(String name) {
         super(name);
     }
 
     protected void distributePower(Tile tile){
-        //TODO!
+        TileEntity entity = tile.entity;
+        int sources = 0;
+
+        for(GridPoint2 point : Edges.getEdges(size)){
+            Tile target = tile.getNearby(point);
+            if(target != null && target.block().hasPower) sources ++;
+        }
+
+        if(sources == 0) return;
+
+        float result = entity.power.amount / sources;
+
+        for(GridPoint2 point : Edges.getEdges(size)){
+            Tile target = tile.getNearby(point);
+            if(target == null) continue;
+            target = target.target();
+
+            if(target.block().hasPower){
+                float transmit = Math.min(result * Timers.delta(), entity.power.amount);
+                if(target.block().acceptPower(target, tile, transmit)){
+                    entity.power.amount -= target.block().addPower(target, transmit);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void update(Tile tile) {
+        distributePower(tile);
     }
 
     @Override

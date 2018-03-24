@@ -44,7 +44,7 @@ public class SaveIO{
 	
 	public static void loadFromSlot(int slot){
 		if(gwt){
-			String string = Settings.getString("save-"+slot+"-data");
+			String string = Settings.getString("save-"+slot+"-data", "");
 			ByteArrayInputStream stream = new ByteArrayInputStream(Base64Coder.decode(string));
 			load(stream);
 		}else{
@@ -54,7 +54,7 @@ public class SaveIO{
 
 	public static DataInputStream getSlotStream(int slot){
 		if(gwt){
-			String string = Settings.getString("save-"+slot+"-data");
+			String string = Settings.getString("save-"+slot+"-data", "");
 			byte[] bytes = Base64Coder.decode(string);
 			return new DataInputStream(new ByteArrayInputStream(bytes));
 		}else{

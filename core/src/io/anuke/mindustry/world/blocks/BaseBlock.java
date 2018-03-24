@@ -36,7 +36,7 @@ public abstract class BaseBlock {
     }
 
     public boolean acceptPower(Tile tile, Tile source, float amount){
-        return amount + tile.entity.power.amount <= powerCapacity;
+        return true;
     }
 
     public float addPower(Tile tile, float amount){

@@ -11,6 +11,7 @@ import io.anuke.ucore.core.Timers;
 
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.gwt;
 import static io.anuke.mindustry.Vars.saveSlots;
 import static io.anuke.mindustry.Vars.state;
 
@@ -127,7 +128,7 @@ public class Saves {
         }
 
         public String getName(){
-            return Settings.getString("save-"+index+"-name");
+            return Settings.getString("save-"+index+"-name", "untittled");
         }
 
         public void setName(String name){
@@ -148,7 +149,7 @@ public class Saves {
         }
 
         public boolean isAutosave(){
-            return Settings.getBool("save-"+index+"-autosave");
+            return Settings.getBool("save-"+index+"-autosave", !gwt);
         }
 
         public void setAutosave(boolean save){
