@@ -89,14 +89,15 @@ public class WeaponFactory extends Block{
             tip.setInstant(true);
 
             ImageButton button = content.addImageButton("white", 8*4, () -> {
-                state.inventory.removeItems(requirements);
-                control.upgrades().addWeapon(weapon);
-                ui.hudfrag.updateWeapons();
-                run.listen();
-                Effects.sound("purchase");
 
                 if(Net.client()){
                     NetEvents.handleUpgrade(weapon);
+                }else{
+                    state.inventory.removeItems(requirements);
+                    control.upgrades().addWeapon(weapon);
+                    ui.hudfrag.updateWeapons();
+                    run.listen();
+                    Effects.sound("purchase");
                 }
             }).size(49f, 54f).padBottom(-5).get();
 

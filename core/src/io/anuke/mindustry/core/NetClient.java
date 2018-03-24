@@ -16,11 +16,15 @@ import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.Upgrade;
+import io.anuke.mindustry.resource.UpgradeRecipes;
+import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Map;
 import io.anuke.mindustry.world.Placement;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.ProductionBlocks;
+import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BaseBulletType;
 import io.anuke.ucore.entities.Entities;
@@ -297,6 +301,15 @@ public class NetClient extends Module {
         Net.handleClient(TracePacket.class, packet -> {
             Player player = playerGroup.getByID(packet.info.playerid);
             ui.traces.show(player, packet.info);
+        });
+
+        Net.handleClient(UpgradePacket.class, packet -> {
+            Weapon weapon = (Weapon) Upgrade.getByID(packet.id);
+
+            state.inventory.removeItems(UpgradeRecipes.get(weapon));
+            control.upgrades().addWeapon(weapon);
+            ui.hudfrag.updateWeapons();
+            Effects.sound("purchase");
         });
     }
 

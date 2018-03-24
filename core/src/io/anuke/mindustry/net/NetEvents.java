@@ -96,9 +96,13 @@ public class NetEvents {
     public static void handleSendMessage(String message){
         ChatPacket packet = new ChatPacket();
         packet.text = message;
-        packet.name = Vars.player.name;
-        packet.id = Vars.player.id;
+        packet.name = player.name;
+        packet.id = player.id;
         Net.send(packet, SendMode.tcp);
+
+        if(Net.server() && !headless){
+            ui.chatfrag.addMessage(message, netCommon.colorizeName(player.id, player.name));
+        }
     }
 
     public static void handleShoot(Weapon weapon, float x, float y, float angle){

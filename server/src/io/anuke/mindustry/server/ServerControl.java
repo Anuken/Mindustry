@@ -147,11 +147,12 @@ public class ServerControl extends Module {
                     return;
                 }
             }else{
-                while(result == null || result.visible)
+                while(result == null || !result.visible)
                     result = world.maps().getAllMaps().random();
+                Log.info("&ly&fiNo map specified, so &lb{0}&ly was chosen randomly.", result.name);
             }
 
-            GameMode mode = null;
+            GameMode mode;
             try{
                 mode = arg.length < 2 ? GameMode.waves : GameMode.valueOf(arg[1]);
             }catch (IllegalArgumentException e){
@@ -441,7 +442,7 @@ public class ServerControl extends Module {
             }else{
                 Log.info("&lyAdmins:");
                 for(PlayerInfo info : admins){
-                    Log.info(" &luy {0} /  ID: '{1}' / IP: '{2}'", info.lastName, info.id, info.lastIP);
+                    Log.info(" &lm {0} /  ID: '{1}' / IP: '{2}'", info.lastName, info.id, info.lastIP);
                 }
             }
         });
@@ -545,6 +546,7 @@ public class ServerControl extends Module {
                 Log.info("  &lyIP: {0}", info.lastIP);
                 Log.info("  &lyall IPs used: {0}", info.ips);
                 Log.info("  &lytimes joined: {0}", info.timesJoined);
+                Log.info("  &lytimes kicked: {0}", info.timesKicked);
                 Log.info("");
                 Log.info("  &lytotal blocks broken: {0}", info.totalBlocksBroken);
                 Log.info("  &lytotal blocks placed: {0}", info.totalBlockPlaced);
