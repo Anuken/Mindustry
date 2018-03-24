@@ -172,13 +172,13 @@ public class NetServer extends Module{
             TraceInfo info = admins.getTrace(Net.getConnection(id).address);
             Weapon weapon = (Weapon)Upgrade.getByID(packet.weaponid);
 
-            float wtrc = 40f;
+            float wtrc = 60f;
 
             if(!Timers.get(info.ip + "-weapontrace", wtrc)){
                 info.fastShots ++;
             }else{
 
-                if(info.fastShots - 1 > (int)(wtrc / (weapon.getReload() / 2f))){
+                if(info.fastShots - 6 > (int)(wtrc / (weapon.getReload() / 2f))){
                     kick(id, KickReason.kick);
                 }
 
