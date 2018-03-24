@@ -145,8 +145,7 @@ public class ServerControl extends Module {
                     return;
                 }
             }else{
-                while(result == null || result.visible)
-                    result = world.maps().getAllMaps().random();
+                result = world.maps().all().random();
             }
 
             GameMode mode = null;
