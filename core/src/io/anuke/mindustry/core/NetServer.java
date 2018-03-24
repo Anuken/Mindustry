@@ -174,14 +174,13 @@ public class NetServer extends Module{
 
             float wtrc = 60f;
 
-            if(!Timers.get(info.ip + "-weapontrace", wtrc)){
+            if(!Timers.get(info.uuid + "-weapontrace", wtrc)){
                 info.fastShots ++;
-            }else{
 
-                if(info.fastShots - 6 > (int)(wtrc / (weapon.getReload() / 2f))){
+                if(info.fastShots - 10 > (int)(wtrc / (weapon.getReload() / 2f))){
                     kick(id, KickReason.kick);
                 }
-
+            }else{
                 info.fastShots = 0;
             }
 
