@@ -38,7 +38,13 @@ public class JoinDialog extends FloatingDialog {
 
         loadServers();
 
+        buttons().add().width(60f);
+        buttons().add().growX();
+
         addCloseButton();
+
+        buttons().add().growX();
+        buttons().addButton("?", () -> ui.showInfo("$text.join.info")).size(60f, 64f);
 
         add = new FloatingDialog("$text.joingame.title");
         add.content().add("$text.joingame.ip").padRight(5f).left();

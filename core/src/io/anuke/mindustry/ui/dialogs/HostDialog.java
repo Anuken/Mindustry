@@ -40,9 +40,11 @@ public class HostDialog extends FloatingDialog{
                 });
             }).size(50f, 54f).get();
             button.update(() -> button.getStyle().imageUpColor = player.getColor());
-        }).width(w).height(70f).pad(4);
+        }).width(w).height(70f).pad(4).colspan(3);
 
         content().row();
+
+        content().add().width(65f);
 
         content().addButton("$text.host", () -> {
             ui.loadfrag.show("$text.hosting");
@@ -57,5 +59,7 @@ public class HostDialog extends FloatingDialog{
                 hide();
             });
         }).width(w).height(70f);
+
+        content().addButton("?", () -> ui.showInfo("$text.host.info")).size(65f, 70f).padLeft(6f);
     }
 }
