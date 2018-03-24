@@ -62,7 +62,7 @@ public class Recipes {
 
 		//new Recipe(production, ProductionBlocks.stonedrill, stack(Item.stone, 12)),
 		new Recipe(production, ProductionBlocks.irondrill, stack(Item.iron, 25)),
-		new Recipe(production, ProductionBlocks.copperdrill, stack(Item.iron, 25)),
+		new Recipe(production, ProductionBlocks.leaddrill, stack(Item.iron, 25)),
 		new Recipe(production, ProductionBlocks.coaldrill, stack(Item.iron, 25), stack(Item.iron, 40)),
 		new Recipe(production, ProductionBlocks.titaniumdrill, stack(Item.iron, 50), stack(Item.steel, 50)),
 		new Recipe(production, ProductionBlocks.uraniumdrill, stack(Item.iron, 40), stack(Item.steel, 40)),
@@ -79,9 +79,7 @@ public class Recipes {
         new Recipe(power, ProductionBlocks.largesolarpanel, stack(Item.iron, 30), stack(Item.silicon, 20)),
 		new Recipe(power, ProductionBlocks.rtgenerator, stack(Item.titanium, 20), stack(Item.steel, 20)),
 		new Recipe(power, ProductionBlocks.nuclearReactor, stack(Item.titanium, 40), stack(Item.densealloy, 40), stack(Item.steel, 50)),
-		new Recipe(power, DistributionBlocks.powerlaser, stack(Item.steel, 3), stack(Item.iron, 3)),
-		new Recipe(power, DistributionBlocks.powerlasercorner, stack(Item.steel, 4), stack(Item.iron, 4)),
-		new Recipe(power, DistributionBlocks.powerlaserrouter, stack(Item.steel, 5), stack(Item.iron, 5)),
+		new Recipe(power, DistributionBlocks.powernode, stack(Item.steel, 3), stack(Item.iron, 3)),
 		new Recipe(power, DistributionBlocks.battery, stack(Item.steel, 5), stack(Item.iron, 5)),
 		new Recipe(power, DistributionBlocks.batteryLarge, stack(Item.steel, 5), stack(Item.iron, 5)),
 

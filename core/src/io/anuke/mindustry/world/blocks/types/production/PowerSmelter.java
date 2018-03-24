@@ -160,7 +160,7 @@ public class PowerSmelter extends PowerBlock {
         return new PowerSmelterEntity();
     }
 
-    class PowerSmelterEntity extends PowerEntity{
+    class PowerSmelterEntity extends TileEntity{
         public float heat;
     }
 }

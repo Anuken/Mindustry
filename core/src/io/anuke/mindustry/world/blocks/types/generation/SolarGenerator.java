@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.types.generation;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 
-public class SolarGenerator extends Generator {
+public class SolarGenerator extends PowerGenerator {
     /**power generated per frame*/
     protected float generation = 0.005f;
 
@@ -16,7 +16,7 @@ public class SolarGenerator extends Generator {
     public void update(Tile tile){
         addPower(tile, generation * Timers.delta());
 
-        distributeLaserPower(tile);
+        distributePower(tile);
     }
 
 }

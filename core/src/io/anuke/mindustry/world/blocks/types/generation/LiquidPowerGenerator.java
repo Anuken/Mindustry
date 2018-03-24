@@ -11,7 +11,7 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
-public class LiquidPowerGenerator extends Generator{
+public class LiquidPowerGenerator extends PowerGenerator {
 	public Liquid generateLiquid;
 	public float powerPerLiquid = 0.13f;
 	/**Maximum liquid used per frame.*/
@@ -20,7 +20,6 @@ public class LiquidPowerGenerator extends Generator{
 
 	public LiquidPowerGenerator(String name) {
 		super(name);
-		outputOnly = true;
 		liquidCapacity = 30f;
 		hasLiquids = true;
 	}
@@ -66,8 +65,7 @@ public class LiquidPowerGenerator extends Generator{
 			}
 		}
 		
-		distributeLaserPower(tile);
-		
+		distributePower(tile);
 	}
 	
 	@Override

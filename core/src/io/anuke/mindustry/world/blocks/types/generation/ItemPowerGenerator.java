@@ -6,6 +6,7 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.generation.PowerGenerator.GeneratorEntity;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -13,7 +14,7 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
-public class ItemPowerGenerator extends Generator{
+public class ItemPowerGenerator extends PowerGenerator {
 	public int itemCapacity = 20;
 	public Item generateItem;
 	public float powerOutput;
@@ -23,7 +24,6 @@ public class ItemPowerGenerator extends Generator{
 
 	public ItemPowerGenerator(String name) {
 		super(name);
-		outputOnly = true;
 	}
 
 	@Override
@@ -43,12 +43,12 @@ public class ItemPowerGenerator extends Generator{
 	@Override
 	public void draw(Tile tile){
 		super.draw(tile);
+
+		GeneratorEntity entity = tile.entity();
 		
-		PowerEntity entity = tile.entity();
-		
-		if(entity.time > 0){
+		if(entity.generateTime > 0){
 			Draw.color(heatColor);
-			float alpha = (entity.inventory.hasItem(generateItem) ? 1f : Mathf.clamp(entity.time));
+			float alpha = (entity.inventory.hasItem(generateItem) ? 1f : Mathf.clamp(entity.generateTime));
 			alpha = alpha * 0.7f + Mathf.absin(Timers.time(), 12f, 0.3f) * alpha;
 			Draw.alpha(alpha);
 			Draw.rect(name + "-top", tile.worldx(), tile.worldy());
@@ -63,24 +63,24 @@ public class ItemPowerGenerator extends Generator{
 	
 	@Override
 	public void update(Tile tile){
-		PowerEntity entity = tile.entity();
+		GeneratorEntity entity = tile.entity();
 		
 		float maxPower = Math.min(powerCapacity - entity.power.amount, powerOutput * Timers.delta());
 		float mfract = maxPower/(powerOutput);
 		
-		if(entity.time > 0f){
-			entity.time -= 1f/itemDuration*mfract;
+		if(entity.generateTime > 0f){
+			entity.generateTime -= 1f/itemDuration*mfract;
 			entity.power.amount += maxPower;
-			entity.time = Mathf.clamp(entity.time);
+			entity.generateTime = Mathf.clamp(entity.generateTime);
 		}
 		
-		if(entity.time <= 0f && entity.inventory.hasItem(generateItem)){
+		if(entity.generateTime <= 0f && entity.inventory.hasItem(generateItem)){
 			Effects.effect(generateEffect, tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
 			entity.inventory.removeItem(generateItem, 1);
-			entity.time = 1f;
+			entity.generateTime = 1f;
 		}
 		
-		distributeLaserPower(tile);
+		distributePower(tile);
 		
 	}
 

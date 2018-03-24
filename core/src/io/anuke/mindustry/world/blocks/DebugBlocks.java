@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
-import io.anuke.mindustry.world.blocks.types.distribution.PowerLaser;
+import io.anuke.mindustry.world.blocks.types.generation.PowerDistributor;
 
 public class DebugBlocks {
     public static final Block
@@ -14,10 +14,9 @@ public class DebugBlocks {
         }
     },
 
-    powerInfinite = new PowerLaser("powerinfinite") {
+    powerInfinite = new PowerDistributor("powerinfinite") {
         {
-            powerCapacity = 100f;
-            laserDirections = 4;
+            powerCapacity = 10000f;
         }
 
         @Override

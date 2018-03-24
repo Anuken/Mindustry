@@ -110,6 +110,7 @@ public class UI extends SceneModule{
 		Colors.put("breakStart", Color.YELLOW);
 		Colors.put("breakInvalid", Color.RED);
 		Colors.put("range", Colors.get("accent"));
+		Colors.put("power", Color.valueOf("fbd367"));
 	}
 
 	@Override

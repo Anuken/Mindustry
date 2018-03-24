@@ -43,8 +43,8 @@ public class DesktopInput extends InputHandler{
 
 		if((Inputs.keyTap("select") && recipe != null) || Inputs.keyTap("break")){
 			Vector2 vec = Graphics.world(Gdx.input.getX(), Gdx.input.getY());
-			mousex = (int)vec.x;
-			mousey = (int)vec.y;
+			mousex = vec.x;
+			mousey = vec.y;
 		}
 
 		if(!Inputs.keyDown("select") && !Inputs.keyDown("break")){
@@ -110,7 +110,9 @@ public class DesktopInput extends InputHandler{
 		
 		if(target != null && Inputs.keyTap("select") && !ui.hasMouse()){
 			if(target.block().isConfigurable(target)){
-				ui.configfrag.showConfig(target);
+				if((!ui.configfrag.isShown()
+						|| ui.configfrag.getSelectedTile().block().onConfigureTileTapped(ui.configfrag.getSelectedTile(), target)))
+					ui.configfrag.showConfig(target);
 			}else if(!ui.configfrag.hasConfigMouse()){
 				ui.configfrag.hideConfig();
 			}

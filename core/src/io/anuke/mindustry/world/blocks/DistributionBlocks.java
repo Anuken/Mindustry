@@ -1,7 +1,9 @@
 package io.anuke.mindustry.world.blocks;
 
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.mindustry.world.blocks.types.distribution.*;
+import io.anuke.mindustry.world.blocks.types.generation.PowerDistributor;
 import io.anuke.mindustry.world.blocks.types.storage.SortedUnloader;
 import io.anuke.mindustry.world.blocks.types.storage.Unloader;
 import io.anuke.mindustry.world.blocks.types.storage.Vault;
@@ -74,23 +76,14 @@ public class DistributionBlocks{
 	liquidjunction = new LiquidJunction("liquidjunction"){{
 
 	}},
-	powerlaser = new PowerLaser("powerlaser"){{
+	powernode = new PowerDistributor("powernode"){{
 	}},
-	powerlaserrouter = new PowerLaser("powerlaserrouter"){{
-		laserDirections = 3;
-	}},
-	powerlasercorner = new PowerLaser("powerlasercorner"){{
-		laserDirections = 2;
-	}},
-	battery = new PowerLaser("battery"){{
-		laserDirections = 1;
+	battery = new PowerBlock("battery"){{
 		powerCapacity = 320f;
 	}},
-	batteryLarge = new PowerLaser("batterylarge"){{
-		laserDirections = 1;
+	batteryLarge = new PowerBlock("batterylarge"){{
 		size = 3;
 		powerCapacity = 2000f;
-		base = "batterylarge-base";
 	}},
 	teleporter = new Teleporter("teleporter"){{
 	}},

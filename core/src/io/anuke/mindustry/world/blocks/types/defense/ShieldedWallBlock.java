@@ -20,7 +20,6 @@ public class ShieldedWallBlock extends PowerBlock{
 		super(name);
 		destructible = true;
 		update = false;
-		voltage = 0.00001f;
 	}
 	
 	@Override
@@ -72,7 +71,7 @@ public class ShieldedWallBlock extends PowerBlock{
 		return new ShieldedWallEntity();
 	}
 	
-	static class ShieldedWallEntity extends PowerEntity{
+	static class ShieldedWallEntity extends TileEntity{
 		public float hit;
 	}
 }

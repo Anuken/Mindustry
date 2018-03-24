@@ -17,6 +17,7 @@ import io.anuke.mindustry.world.blocks.BaseBlock;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
@@ -133,6 +134,20 @@ public class Block extends BaseBlock {
 		configure(tile, data);
 		if(Net.active()) NetEvents.handleBlockConfig(tile, data);
 		configure(tile, data);
+	}
+
+	/**Called when another tile is tapped while this block is selected.
+	 * Returns whether or not this block should be deselected.*/
+	public boolean onConfigureTileTapped(Tile tile, Tile other){
+		return true;
+	}
+
+	public void drawConfigure(Tile tile){
+		Draw.color("accent");
+		Lines.stroke(1f);
+		Lines.square(tile.drawx(), tile.drawy(),
+				tile.block().size * tilesize / 2f + 1f);
+		Draw.reset();
 	}
 
 	public boolean isConfigurable(Tile tile){

@@ -413,11 +413,7 @@ public class Renderer extends RendererModule{
 		//draw config selected block
 		if(ui.configfrag.isShown()){
 			Tile tile = ui.configfrag.getSelectedTile();
-			Draw.color(Colors.get("accent"));
-			Lines.stroke(1f);
-			Lines.square(tile.drawx(), tile.drawy(),
-					tile.block().size * tilesize / 2f + 1f);
-			Draw.reset();
+			tile.block().drawConfigure(tile);
 		}
 		
 		int tilex = control.input().getBlockX();
@@ -460,7 +456,7 @@ public class Renderer extends RendererModule{
 		Draw.reset();
 
 		//draw selected block bars and info
-		if(input.recipe == null && !ui.hasMouse()){
+		if(input.recipe == null && !ui.hasMouse() && !ui.configfrag.isShown()){
 			Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y);
 
 			if(tile != null && tile.block() != Blocks.air){

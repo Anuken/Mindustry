@@ -24,7 +24,6 @@ public class ShieldBlock extends PowerBlock{
 	
 	public ShieldBlock(String name) {
 		super(name);
-		voltage = powerDrain;
 		powerCapacity = 80f;
 		hasInventory = false;
 	}
@@ -82,7 +81,7 @@ public class ShieldBlock extends PowerBlock{
 		entity.power.amount -= bullet.getDamage() * powerPerDamage;
 	}
 
-	static class ShieldEntity extends PowerEntity{
+	static class ShieldEntity extends TileEntity{
 		Shield shield;
 	}
 }

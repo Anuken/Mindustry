@@ -46,7 +46,6 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		itemCapacity = 30;
 		liquidCapacity = 50;
 		explosionEffect = Fx.nuclearShockwave;
-		explosive = true;
 		powerCapacity = 80f;
 		powerSpeed = 0.5f;
 	}
@@ -111,7 +110,7 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		if(entity.heat >= 1f){
 			entity.damage((int)entity.health);
 		}else{
-			distributeLaserPower(tile);
+			distributePower(tile);
 		}
 	}
 	
@@ -192,7 +191,7 @@ public class NuclearReactor extends LiquidPowerGenerator{
 		return new NuclearReactorEntity();
 	}
 	
-	public static class NuclearReactorEntity extends GeneratorEntity{
+	public static class NuclearReactorEntity extends GeneratorEntity {
 		public float heat;
 		public float flash;
 		

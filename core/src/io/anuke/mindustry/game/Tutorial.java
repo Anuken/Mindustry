@@ -496,7 +496,7 @@ public class Tutorial{
 				blockPlaceX = 4;
 				blockPlaceY = 4;
 				blockRotation = 2;
-				targetBlock = DistributionBlocks.powerlaser;
+				//targetBlock = DistributionBlocks.powerlaser;
 			}
 			
 			void onSwitch(){

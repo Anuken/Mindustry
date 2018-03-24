@@ -1,11 +1,9 @@
 package io.anuke.mindustry.world.blocks.types;
 
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockGroup;
 
 public abstract class PowerBlock extends Block{
-	public float voltage = 0.001f;
 	
 	public PowerBlock(String name) {
 		super(name);
@@ -13,14 +11,5 @@ public abstract class PowerBlock extends Block{
 		solid = true;
 		hasPower = true;
 		group = BlockGroup.power;
-	}
-	
-	@Override
-	public TileEntity getEntity(){
-		return new PowerEntity();
-	}
-	
-	public static class PowerEntity extends TileEntity{
-		public float time; //generator time. this is a bit of a hack
 	}
 }

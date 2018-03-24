@@ -12,6 +12,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.customMapDirectory;
+import static io.anuke.mindustry.Vars.headless;
 import static io.anuke.mindustry.Vars.mapExtension;
 
 public class Maps implements Disposable{
@@ -76,7 +77,7 @@ public class Maps implements Disposable{
 		DataInputStream ds = new DataInputStream(file.read());
 		MapMeta meta = MapIO.readMapMeta(ds);
 		Map map = new Map(file.nameWithoutExtension(), meta, custom);
-		map.texture = new Texture(MapIO.generatePixmap(MapIO.readTileData(ds, meta)));
+		if(!headless) map.texture = new Texture(MapIO.generatePixmap(MapIO.readTileData(ds, meta)));
 
 		maps.put(map.name, map);
 		allMaps.add(map);

@@ -138,7 +138,7 @@ public class Teleporter extends PowerBlock{
 	
 	@Override
 	public void handleItem(Item item, Tile tile, Tile source){
-		PowerEntity entity = tile.entity();
+		TeleporterEntity entity = tile.entity();
 
 		Array<Tile> links = findLinks(tile);
 		
@@ -154,7 +154,7 @@ public class Teleporter extends PowerBlock{
 	
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
-		PowerEntity entity = tile.entity();
+		TeleporterEntity entity = tile.entity();
 		return !(source.block() instanceof Teleporter) && entity.power.amount >= powerPerItem && findLinks(tile).size > 0;
 	}
 	
@@ -189,7 +189,7 @@ public class Teleporter extends PowerBlock{
 		return returns;
 	}
 
-	public static class TeleporterEntity extends PowerEntity{
+	public static class TeleporterEntity extends TileEntity{
 		public byte color = 0;
 		
 		@Override

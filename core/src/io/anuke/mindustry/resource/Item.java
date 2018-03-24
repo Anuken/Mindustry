@@ -15,7 +15,7 @@ public class Item implements Comparable<Item>{
 		}
 	},
 	iron = new Item("iron"),
-	copper = new Item("copper"),
+	lead = new Item("lead"),
 	coal = new Item("coal"){
 		{
 			explosiveness = 0.2f;
