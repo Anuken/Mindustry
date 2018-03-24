@@ -26,7 +26,17 @@ public class Router extends Block{
 			}
 		}
 	}
-	
+
+	@Override
+	public boolean canDump(Tile tile, Tile to, Item item) {
+		if(to.block() instanceof Router){
+			return ((float)to.target().entity.inventory.totalItems() / to.target().block().itemCapacity) <
+					((float)tile.entity.inventory.totalItems() / to.target().block().itemCapacity);
+		}else{
+			return true;
+		}
+	}
+
 	@Override
 	public void handleItem(Item item, Tile tile, Tile source){
 		super.handleItem(item, tile, source);
