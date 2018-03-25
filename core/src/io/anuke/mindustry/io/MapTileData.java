@@ -39,6 +39,10 @@ public class MapTileData {
         return height;
     }
 
+    public TileDataMarker getMarker() {
+        return tile;
+    }
+
     /**Reads and returns the next tile data.*/
     public TileDataMarker read(){
         tile.read(buffer);
@@ -50,6 +54,11 @@ public class MapTileData {
         position(x, y);
         tile.read(buffer);
         return tile;
+    }
+
+    /**Writes and returns the next tile data.*/
+    public void write(){
+        tile.write(buffer);
     }
 
     /**Writes tile data at a specified position.*/

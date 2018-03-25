@@ -305,7 +305,7 @@ public class Tile{
 
 			Block block = block();
 
-			if (block.destructible || block.update) {
+			if (block.hasEntity()) {
 				entity = block.getEntity().init(this, block.update);
 				if(block.hasInventory) entity.inventory = new InventoryModule();
 				if(block.hasLiquids) entity.liquid = new LiquidModule();

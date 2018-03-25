@@ -1,11 +1,13 @@
 package io.anuke.mindustry.world;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapTileData;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.noise.Noise;
 
 import static io.anuke.mindustry.Vars.world;
@@ -20,7 +22,7 @@ public class WorldGenerator {
 	}};
 	
 	/**Should fill spawns with the correct spawnpoints.*/
-	public static void generate(Tile[][] tiles, MapTileData data){
+	public static void generate(Tile[][] tiles, MapTileData data, Array<Tile> cores){
 		Noise.setSeed(world.getSeed());
 
 		IntArray multiblocks = new IntArray();
@@ -32,6 +34,10 @@ public class WorldGenerator {
 
 				if(tiles[x][y].block().isMultiblock()){
 					multiblocks.add(tiles[x][y].packedPosition());
+				}
+
+				if(tiles[x][y].block() == ProductionBlocks.core){
+					cores.add(tiles[x][y]);
 				}
 
 				//TODO ores, plants, extra decoration?

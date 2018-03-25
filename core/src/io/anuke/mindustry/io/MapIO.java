@@ -9,6 +9,8 @@ import com.badlogic.gdx.utils.ObjectMap.Entry;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
+import io.anuke.mindustry.world.ColorMapper.BlockPair;
+import io.anuke.mindustry.world.blocks.Blocks;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -25,6 +27,7 @@ public class MapIO {
 
     public static Pixmap generatePixmap(MapTileData data){
         Pixmap pixmap = new Pixmap(data.width(), data.height(), Format.RGBA8888);
+        data.position(0, 0);
 
         for(int x = 0; x < data.width(); x ++){
             for(int y = 0; y < data.height(); y ++){
@@ -37,6 +40,31 @@ public class MapIO {
         }
 
         return pixmap;
+    }
+
+    public static MapTileData readPixmap(Pixmap pixmap){
+        MapTileData data = new MapTileData(pixmap.getWidth(), pixmap.getHeight());
+
+        data.position(0, 0);
+        TileDataMarker marker = data.getMarker();
+
+        for(int x = 0; x < data.width(); x ++){
+            for(int y = 0; y < data.height(); y ++){
+                BlockPair pair = ColorMapper.get(pixmap.getPixel(y, pixmap.getWidth() - 1 - x));
+
+                if(pair == null){
+                    marker.floor = (byte)Blocks.stone.id;
+                    marker.wall = (byte)Blocks.air.id;
+                }else{
+                    marker.floor = (byte)pair.floor.id;
+                    marker.wall = (byte)pair.wall.id;
+                }
+
+                data.write();
+            }
+        }
+
+        return data;
     }
 
     public static void writeMap(FileHandle file, ObjectMap<String, String> tags, MapTileData data) throws IOException{

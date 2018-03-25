@@ -220,6 +220,10 @@ public class Block extends BaseBlock {
         region.setRegionHeight(8);
         return region;
     }
+
+    public boolean hasEntity(){
+		return destructible || update;
+	}
 	
 	public TileEntity getEntity(){
 		return new TileEntity();

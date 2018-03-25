@@ -3,8 +3,10 @@ package io.anuke.mindustry.editor;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.io.MapTileData;
 import io.anuke.mindustry.io.Platform;
@@ -18,6 +20,7 @@ import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Pixmaps;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.build;
@@ -42,7 +45,7 @@ public class MapEditorDialog extends Dialog{
 	private MapResizeDialog resizeDialog;
 	private ScrollPane pane;
 	private FloatingDialog menu;
-	private FileChooser openFile, saveFile;
+	private FileChooser openFile, saveFile, openImage, saveImage;
 	private ObjectMap<String, String> tags = new ObjectMap<>();
 	private boolean saved = false;
 	
@@ -56,7 +59,7 @@ public class MapEditorDialog extends Dialog{
 		dialog = new MapGenerateDialog(editor);
 		view = new MapView(editor);
 
-		saveFile = new FileChooser("$saveimage", false, file -> {
+		saveFile = new FileChooser("$text.saveimage", false, file -> {
 			file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
 			FileHandle result = file;
 			ui.loadfrag.show();
@@ -77,6 +80,38 @@ public class MapEditorDialog extends Dialog{
 			Timers.run(3f, () -> {
 				try{
 					MapTileData data = MapIO.readTileData(new DataInputStream(file.read()));
+
+					editor.beginEdit(data);
+					view.clearStack();
+				}catch (Exception e){
+					ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
+					Log.err(e);
+				}
+				ui.loadfrag.hide();
+			});
+		});
+
+		saveImage = new FileChooser("$text.saveimage", false, file -> {
+			file = file.parent().child(file.nameWithoutExtension() + ".png");
+			FileHandle result = file;
+			ui.loadfrag.show();
+			Timers.run(3f, () -> {
+
+				try{
+					Pixmaps.write(MapIO.generatePixmap(editor.getMap()), result);
+				}catch (Exception e){
+					ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
+					Log.err(e);
+				}
+				ui.loadfrag.hide();
+			});
+		});
+
+		openImage = new FileChooser("$text.loadimage", FileChooser.pngFilter, true, file -> {
+			ui.loadfrag.show();
+			Timers.run(3f, () -> {
+				try{
+					MapTileData data = MapIO.readPixmap(new Pixmap(file));
 
 					editor.beginEdit(data);
 					view.clearStack();
@@ -118,6 +153,19 @@ public class MapEditorDialog extends Dialog{
 			menu.hide();
 		});
 
+		menu.content().row();
+
+		menu.content().addImageTextButton("$text.editor.saveimage", "icon-save-map", isize, () -> {
+			saveImage.show();
+			menu.hide();
+		});
+
+		menu.content().row();
+
+		menu.content().addImageTextButton("$text.editor.loadimage", "icon-load-map", isize, () -> {
+			openImage.show();
+			menu.hide();
+		});
 		
 
 		/*
@@ -284,7 +332,22 @@ public class MapEditorDialog extends Dialog{
 					if (tool == EditorTool.pencil)
 						button.setChecked(true);
 
-					tools.add(button).padBottom(-6f);
+					tools.add(button).padBottom(-5.1f);
+					if(i++ % 2 == 1) tools.row();
+				}
+
+				ButtonGroup<ImageButton> teamgroup = new ButtonGroup<>();
+
+				for(Team team : Team.values()){
+					ImageButton button = new ImageButton("white", "toggle");
+					button.margin(4f, 4f, 10f, 4f);
+					button.getImageCell().grow();
+					button.getStyle().imageUpColor = team.color;
+					button.clicked(() -> editor.setDrawTeam(team));
+					button.update(() -> button.setChecked(editor.getDrawTeam() == team));
+					teamgroup.add(button);
+					tools.add(button).padBottom(-5.1f);
+
 					if(i++ % 2 == 1) tools.row();
 				}
 
@@ -351,44 +414,9 @@ public class MapEditorDialog extends Dialog{
 		}
 	}
 	
-	private boolean verifyMap(){
-		//TODO make sure both teams have cores or something
-		/*
-		int psc = ColorMapper.getColor(SpecialBlocks.playerSpawn);
-		int esc = ColorMapper.getColor(SpecialBlocks.enemySpawn);
-		
-		int playerSpawns = 0;
-		int enemySpawns = 0;
-		Pixmap pix = editor.pixmap();
-		
-		for(int x = 0; x < pix.getWidth(); x ++){
-			for(int y = 0; y < pix.getHeight(); y ++){
-				int i = pix.getPixel(x, y);
-				if(i == psc) playerSpawns ++;
-				if(i == esc) enemySpawns ++;
-			}
-		}
-		
-		if(playerSpawns == 0){
-			ui.showError("$text.editor.noplayerspawn");
-			return false;
-		}else if(playerSpawns > 1){
-			ui.showError("$text.editor.manyplayerspawns");
-			return false;
-		}
-		
-		if(enemySpawns > MapEditor.maxSpawnpoints){
-			ui.showError(Bundles.format("text.editor.manyenemyspawns", MapEditor.maxSpawnpoints));
-			return false;
-		}*/
-		
-		return true;
-	}
-	
 	private void addBlockSelection(Table table){
 		Table content = new Table();
 		pane = new ScrollPane(content, "volume");
-		//pane.setScrollingDisabled(true, false);
 		pane.setFadeScrollBars(false);
 		pane.setOverscroll(true, false);
 		ButtonGroup<ImageButton> group = new ButtonGroup<>();

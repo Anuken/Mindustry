@@ -1,5 +1,6 @@
 package io.anuke.mindustry.editor;
 
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapTileData;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
@@ -16,6 +17,7 @@ public class MapEditor{
 
 	private int brushSize = 1;
 	private Block drawBlock = Blocks.stone;
+	private Team drawTeam = Team.none;
 	
 	public MapEditor(){
 
@@ -31,7 +33,15 @@ public class MapEditor{
 		this.brushSize = 1;
 		renderer.resize(map.width(), map.height());
 	}
-	
+
+	public void setDrawTeam(Team team){
+		this.drawTeam = team;
+	}
+
+	public Team getDrawTeam() {
+		return drawTeam;
+	}
+
 	public Block getDrawBlock(){
 		return drawBlock;
 	}
@@ -58,6 +68,10 @@ public class MapEditor{
 			writer.floor = (byte)drawBlock.id;
 		}else{
 			writer.wall = (byte)drawBlock.id;
+		}
+
+		if(drawBlock.hasEntity()){
+			writer.team = (byte)drawTeam.ordinal();
 		}
 
 		for(int rx = -brushSize + 1; rx <= brushSize - 1; rx ++){

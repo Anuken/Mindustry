@@ -87,7 +87,7 @@ public class Logic extends Module {
                 world.pathfinder().update();
 
 
-            if(world.getAllyCores().size == 0 && !state.gameOver && false){ //TODO gameover state
+            if(world.getAllyCores().size == 0 && !state.gameOver){ //TODO gameover state
                 state.gameOver = true;
                 if(Net.server()) NetEvents.handleGameOver();
                 Events.fire(GameOverEvent.class);

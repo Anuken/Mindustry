@@ -179,7 +179,7 @@ public class World extends Module{
 		
 		Entities.resizeTree(0, 0, width * tilesize, height * tilesize);
 		
-		WorldGenerator.generate(tiles, MapIO.readTileData(map));
+		WorldGenerator.generate(tiles, MapIO.readTileData(map), allyCores);
 	}
 
 	void set(int x, int y, Block type, int rot){
