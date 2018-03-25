@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
@@ -8,8 +9,8 @@ import io.anuke.mindustry.world.blocks.types.LiquidBlock;
 import io.anuke.ucore.core.Timers;
 
 public class LiquidMixer extends LiquidBlock{
-    protected Liquid inputLiquid = Liquid.none;
-    protected Liquid outputLiquid = Liquid.none;
+    protected Liquid inputLiquid = Liquids.none;
+    protected Liquid outputLiquid = Liquids.none;
     protected Item inputItem = null;
     protected float liquidPerItem = 50f;
     protected float powerUse = 0f;

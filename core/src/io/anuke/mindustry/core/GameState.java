@@ -1,11 +1,10 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Inventory;
-import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.TeamInfo;
 import io.anuke.ucore.core.Events;
 
 public class GameState{
@@ -21,8 +20,7 @@ public class GameState{
 	public GameMode mode = GameMode.waves;
 	public Difficulty difficulty = Difficulty.normal;
 	public boolean friendlyFire;
-	public ObjectSet<Team> enemyTeams = new ObjectSet<>(), //enemies to the player team
-			allyTeams = new ObjectSet<>(); //allies to the player team, includes the player team
+	public TeamInfo teams = new TeamInfo();
 	
 	public void set(State astate){
 		Events.fire(StateChangeEvent.class, state, astate);

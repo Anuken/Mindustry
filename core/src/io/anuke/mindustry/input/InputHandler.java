@@ -10,7 +10,7 @@ import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Placement;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.util.Mathf;
 

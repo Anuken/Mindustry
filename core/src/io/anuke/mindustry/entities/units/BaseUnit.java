@@ -5,6 +5,7 @@ import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
@@ -17,7 +18,7 @@ public class BaseUnit extends Unit {
 	public UnitType type;
 	public Timer timer = new Timer(5);
 	public float walkTime = 0f;
-	public Unit target;
+	public Entity target;
 
 	public BaseUnit(UnitType type, Team team){
 		this.type = type;

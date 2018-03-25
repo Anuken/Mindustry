@@ -1,5 +1,6 @@
 package io.anuke.mindustry.game;
 
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 
@@ -29,7 +30,7 @@ public class Inventory {
                 if(item.material) items[item.id] = 99999;
             }
         }else{
-            addItem(Item.iron, 40);
+            addItem(Items.iron, 40);
         }
     }
 

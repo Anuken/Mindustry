@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.OrderedMap;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.ColorMapper.BlockPair;
-import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.graphics.Pixmaps;
 import io.anuke.ucore.noise.RidgedPerlin;

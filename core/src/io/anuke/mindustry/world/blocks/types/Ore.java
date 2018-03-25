@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks.types;
 
-import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.mindustry.content.blocks.Blocks;
 
 public class Ore extends Floor{
 

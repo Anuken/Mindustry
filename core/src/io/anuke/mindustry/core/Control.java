@@ -3,6 +3,8 @@ package io.anuke.mindustry.core;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
+import io.anuke.mindustry.content.Mechs;
+import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.EventType.*;
@@ -18,8 +20,6 @@ import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.io.Saves;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.resource.Mech;
-import io.anuke.mindustry.resource.Weapon;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.core.Inputs.DeviceType;
@@ -123,7 +123,7 @@ public class Control extends Module{
 
 		player = new Player();
 		player.name = Settings.getString("name");
-		player.mech = android ? Mech.standardShip : Mech.standard;
+		player.mech = android ? Mechs.standardShip : Mechs.standard;
 		player.color.set(Settings.getInt("color"));
 		player.isLocal = true;
 
@@ -149,7 +149,7 @@ public class Control extends Module{
 
 		Events.on(ResetEvent.class, () -> {
 			upgrades.reset();
-			player.weaponLeft = player.weaponRight = Weapon.blaster;
+			player.weaponLeft = player.weaponRight = Weapons.blaster;
 			player.team = Team.blue;
 
 			player.add();

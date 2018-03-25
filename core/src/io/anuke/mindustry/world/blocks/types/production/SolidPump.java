@@ -1,13 +1,14 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 
 /**Pump that makes liquid from solids and takes in power. Only works on solid floor blocks.*/
 public class SolidPump extends Pump {
-    protected Liquid result = Liquid.water;
+    protected Liquid result = Liquids.water;
     /**Power use per liquid unit.*/
     protected float powerUse = 0.1f;
 

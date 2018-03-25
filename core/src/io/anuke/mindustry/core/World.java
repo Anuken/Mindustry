@@ -12,8 +12,8 @@ import io.anuke.mindustry.io.Maps;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.WorldGenerator;
-import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.mindustry.world.blocks.ProductionBlocks;
+import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.blocks.ProductionBlocks;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.modules.Module;
@@ -29,8 +29,6 @@ public class World extends Module{
 	private Tile[][] tiles;
 	private Pathfind pathfind = new Pathfind();
 	private Maps maps = new Maps();
-	private Array<Tile> allyCores = new Array<>();
-	private Array<Tile> enemyCores = new Array<>();
 
 	private Array<Tile> tempTiles = new Array<>();
 	
@@ -50,14 +48,6 @@ public class World extends Module{
 	public Pathfind pathfinder(){
 		return pathfind;
 	}
-
-    public Array<Tile> getAllyCores() {
-        return allyCores;
-    }
-
-    public Array<Tile> getEnemyCores() {
-        return enemyCores;
-    }
 
     //TODO proper spawnpoints!
 	public float getSpawnX(){
@@ -179,7 +169,7 @@ public class World extends Module{
 		
 		Entities.resizeTree(0, 0, width * tilesize, height * tilesize);
 		
-		WorldGenerator.generate(tiles, MapIO.readTileData(map), allyCores);
+		WorldGenerator.generate(tiles, MapIO.readTileData(map));
 	}
 
 	void set(int x, int y, Block type, int rot){

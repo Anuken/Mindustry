@@ -1,6 +1,9 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.utils.*;
+import io.anuke.mindustry.content.Mechs;
+import io.anuke.mindustry.content.Recipes;
+import io.anuke.mindustry.content.UpgradeRecipes;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
@@ -12,7 +15,9 @@ import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.resource.*;
+import io.anuke.mindustry.resource.Recipe;
+import io.anuke.mindustry.resource.Upgrade;
+import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Placement;
 import io.anuke.ucore.core.Events;
@@ -95,7 +100,7 @@ public class NetServer extends Module{
             player.isAdmin = admins.isAdmin(uuid, ip);
             player.clientid = id;
             player.name = packet.name;
-            player.mech = packet.android ? Mech.standardShip : Mech.standard;
+            player.mech = packet.android ? Mechs.standardShip : Mechs.standard;
             player.set(world.getSpawnX(), world.getSpawnY());
             player.setNet(player.x, player.y);
             player.setNet(player.x, player.y);

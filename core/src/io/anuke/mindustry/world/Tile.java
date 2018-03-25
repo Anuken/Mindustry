@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.modules.InventoryModule;
 import io.anuke.mindustry.world.blocks.types.modules.LiquidModule;
 import io.anuke.mindustry.world.blocks.types.modules.PowerModule;
@@ -50,8 +50,8 @@ public class Tile{
 		this.floor = floor;
 		this.wall = wall;
 		this.rotation = rotation;
-		this.team = team;
 		changed();
+		this.team = team;
 	}
 
 	public int packedPosition(){
@@ -115,7 +115,6 @@ public class Tile{
 		return Block.getByID(getWallID());
 	}
 
-	//TODO save team
 	public Team getTeam(){
 		return Team.values()[team];
 	}

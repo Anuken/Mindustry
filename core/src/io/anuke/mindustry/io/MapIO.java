@@ -10,7 +10,7 @@ import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.ColorMapper.BlockPair;
-import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.mindustry.content.blocks.Blocks;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -22,6 +22,7 @@ import static io.anuke.mindustry.Vars.mapExtension;
 
 /**Reads and writes map files.*/
 //TODO GWT support
+//TODO map header that maps block names to IDs for backwards compatibility
 public class MapIO {
     private static final int version = 0;
 

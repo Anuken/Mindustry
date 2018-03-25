@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.style.TextureRegionDrawable;
@@ -26,7 +27,7 @@ public class SortedUnloader extends Unloader {
     public void update(Tile tile){
         SortedUnloaderEntity entity = tile.entity();
 
-        if(entity.inventory.totalItems() == 0 && entity.timer.get(timerUnload, 5)){
+        if(entity.inventory.totalItems() == 0 && entity.timer.get(timerUnload, speed)){
             tile.allNearby(other -> {
                 if(other.block() instanceof StorageBlock && entity.inventory.totalItems() == 0 &&
                         ((StorageBlock)other.block()).hasItem(other, entity.sortItem)){
@@ -103,7 +104,7 @@ public class SortedUnloader extends Unloader {
     }
 
     public static class SortedUnloaderEntity extends TileEntity{
-        public Item sortItem = Item.iron;
+        public Item sortItem = Items.iron;
 
         @Override
         public void write(DataOutputStream stream) throws IOException {

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.modules;
 
+import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.blocks.types.BlockModule;
 
@@ -9,7 +10,7 @@ import java.io.IOException;
 
 public class LiquidModule extends BlockModule {
     public float amount;
-    public Liquid liquid = Liquid.none;
+    public Liquid liquid = Liquids.none;
 
     @Override
     public void write(DataOutputStream stream) throws IOException {

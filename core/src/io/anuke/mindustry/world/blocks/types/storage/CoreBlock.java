@@ -5,7 +5,6 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.world;
 
 public class CoreBlock extends StorageBlock {
     protected int capacity = 1000;
@@ -13,9 +12,9 @@ public class CoreBlock extends StorageBlock {
     public CoreBlock(String name) {
         super(name);
 
-        health = 800;
         solid = true;
         destructible = true;
+        unbreakable = true;
         size = 3;
         hasInventory = false;
     }
@@ -23,7 +22,10 @@ public class CoreBlock extends StorageBlock {
     public void onDestroyed(Tile tile){
         //TODO more dramatic effects
         super.onDestroyed(tile);
-        world.getAllyCores().removeValue(tile, true);
+
+        if(state.teams.has(tile.getTeam())){
+            state.teams.get(tile.getTeam()).cores.removeValue(tile, true);
+        }
     }
 
     @Override

@@ -71,7 +71,7 @@ public class KryoServer implements ServerProvider {
                 Log.info("&bRecieved connection: {0} / {1}. Kryonet ID: {2}", c.id, c.addressTCP, connection.getID());
 
                 connections.add(kn);
-                Gdx.app.postRunnable(() ->  Net.handleServerReceived(kn.id, c));
+                Gdx.app.postRunnable(() -> Net.handleServerReceived(kn.id, c));
             }
 
             @Override

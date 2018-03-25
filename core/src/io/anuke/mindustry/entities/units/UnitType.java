@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.net.Net;
@@ -78,11 +79,11 @@ public abstract class UnitType {
     public abstract void behavior(BaseUnit unit);
 
     public void updateTargeting(BaseUnit unit){
-        if(unit.target == null || unit.target.isDead()){
+        if(unit.target == null || (unit.target instanceof Unit && ((Unit)unit.target).isDead())){
             unit.target = null;
         }
 
-        if(unit.timer.get(timerTarget, 30)){
+        if(unit.timer.get(timerTarget, 20)){
             unit.target = Units.getClosestEnemy(unit.team, unit.x, unit.y, range, e -> true);
         }
     }
@@ -112,5 +113,9 @@ public abstract class UnitType {
 
     public static UnitType getByID(byte id){
         return types.get(id);
+    }
+
+    public static Array<UnitType> getAllTypes(){
+        return types;
     }
 }

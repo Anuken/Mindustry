@@ -1,10 +1,11 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
+import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
 
 public abstract class LiquidTurret extends Turret{
-    public Liquid ammoLiquid = Liquid.water;
+    public Liquid ammoLiquid = Liquids.water;
     public float liquidCapacity = 60f;
     public float liquidPerShot = 1f;
 

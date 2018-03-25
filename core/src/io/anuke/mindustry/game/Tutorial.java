@@ -1,10 +1,13 @@
 package io.anuke.mindustry.game;
 
 import com.badlogic.gdx.math.GridPoint2;
+import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.blocks.DistributionBlocks;
+import io.anuke.mindustry.content.blocks.ProductionBlocks;
+import io.anuke.mindustry.content.blocks.WeaponBlocks;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.*;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.builders.button;
 import io.anuke.ucore.scene.builders.label;
@@ -404,15 +407,15 @@ public class Tutorial{
 				canForward = false;
 				showBlock = true;
 				canPlace = true;
-				targetBlock = ProductionBlocks.pump;
+				//targetBlock = ProductionBlocks.pump;
 				blockPlaceX = 6;
 				blockPlaceY = -2;
 			}
 			
 			void onSwitch(){
 				ui.<ImageButton>find("sectionbuttonproduction").fireClick();
-				state.inventory.addItem(Item.steel, 60);
-				state.inventory.addItem(Item.iron, 60);
+				state.inventory.addItem(Items.steel, 60);
+				state.inventory.addItem(Items.iron, 60);
 			}
 		},
 		conduitUse{
@@ -421,7 +424,7 @@ public class Tutorial{
 				canForward = false;
 				showBlock = true;
 				canPlace = true;
-				targetBlock = DistributionBlocks.conduit;
+				//targetBlock = DistributionBlocks.conduit;
 				blockPlaceX = 5;
 				blockPlaceY = -2;
 				blockRotation = 2;
@@ -438,8 +441,8 @@ public class Tutorial{
 				canForward = false;
 				showBlock = true;
 				canPlace = true;
-				targetBlock = DistributionBlocks.conduit;
-				blockPlaceX = 4;
+				//targetBlock = DistributionBlocks.conduit;
+				//blockPlaceX = 4;
 				blockPlaceY = -2;
 				blockRotation = 1;
 			}
@@ -454,7 +457,7 @@ public class Tutorial{
 				canForward = false;
 				showBlock = true;
 				canPlace = true;
-				targetBlock = DistributionBlocks.conduit;
+				//targetBlock = DistributionBlocks.conduit;
 				blockPlaceX = 4;
 				blockPlaceY = -1;
 				blockRotation = 1;
@@ -470,7 +473,7 @@ public class Tutorial{
 				canForward = false;
 				showBlock = true;
 				canPlace = true;
-				targetBlock = ProductionBlocks.combustiongenerator;
+				//targetBlock = ProductionBlocks.combustiongenerator;
 				blockPlaceX = 4;
 				blockPlaceY = 0;
 			}
@@ -478,8 +481,8 @@ public class Tutorial{
 			void onSwitch(){
 				//world.tile(blockPlaceX + world.getCore().x, blockPlaceY + world.getCore().y).setBlock(Blocks.air);
 				ui.<ImageButton>find("sectionbuttonpower").fireClick();
-				state.inventory.addItem(Item.steel, 60);
-				state.inventory.addItem(Item.iron, 60);
+				state.inventory.addItem(Items.steel, 60);
+				state.inventory.addItem(Items.iron, 60);
 			}
 		},
 		generatorExplain{
@@ -522,7 +525,7 @@ public class Tutorial{
 				canBack = false;
 				blockPlaceX = 1;
 				blockPlaceY = 4;
-				targetBlock = DefenseBlocks.repairturret;
+				//targetBlock = DefenseBlocks.repairturret;
 			}
 			
 			void onSwitch(){
@@ -547,8 +550,8 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				state.inventory.addItem(Item.stone, 40);
-				state.inventory.addItem(Item.iron, 40);
+				state.inventory.addItem(Items.stone, 40);
+				state.inventory.addItem(Items.iron, 40);
 				ui.<ImageButton>find("sectionbuttoncrafting").fireClick();
 				
 			}

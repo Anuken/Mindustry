@@ -2,6 +2,9 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import io.anuke.mindustry.content.Mechs;
+import io.anuke.mindustry.content.Weapons;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.net.Net;
@@ -10,8 +13,10 @@ import io.anuke.mindustry.resource.Mech;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.ucore.core.*;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Angles;
@@ -34,9 +39,9 @@ public class Player extends Unit{
 	public boolean isAdmin;
 	public Color color = new Color();
 
-	public Weapon weaponLeft = Weapon.blaster;
-	public Weapon weaponRight = Weapon.blaster;
-	public Mech mech = Mech.standard;
+	public Weapon weaponLeft = Weapons.blaster;
+	public Weapon weaponRight = Weapons.blaster;
+	public Mech mech = Mechs.standard;
 
 	public float targetAngle = 0f;
 	public float stucktime = 0f;

@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.blocks.types.distribution;
 import com.badlogic.gdx.utils.LongArray;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockGroup;
 import io.anuke.mindustry.world.Layer;
@@ -32,7 +33,7 @@ public class Conveyor extends Block{
 	private final Translator tr1 = new Translator();
 	private final Translator tr2 = new Translator();
 
-	public float speed = 0.02f;
+	public float speed = 0f;
 
 	protected Conveyor(String name) {
 		super(name);
@@ -53,7 +54,7 @@ public class Conveyor extends Block{
 		byte rotation = tile.getRotation();
 
 		Draw.rect(name() +
-						(Timers.time() % ((20 / 100f) / speed) < (10 / 100f) / speed && acceptItem(Item.stone, tile, null) ? "" : "move"),
+						(Timers.time() % ((20 / 100f) / speed) < (10 / 100f) / speed && acceptItem(Items.stone, tile, null) ? "" : "move"),
 				tile.worldx(), tile.worldy(), rotation * 90);
 	}
 

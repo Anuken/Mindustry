@@ -8,39 +8,6 @@ import io.anuke.ucore.util.Bundles;
 public class Item implements Comparable<Item>{
 	private static final Array<Item> items = new Array<>();
 
-	public static final Item
-	stone = new Item("stone"){
-		{
-			material = false;
-		}
-	},
-	iron = new Item("iron"),
-	lead = new Item("lead"),
-	coal = new Item("coal"){
-		{
-			explosiveness = 0.2f;
-			flammability = 0.5f;
-			fluxiness = 0.5f;
-			material = false;
-		}
-	},
-	steel = new Item("steel"),
-	titanium = new Item("titanium"),
-	thorium = new Item("thorium"){
-		{
-			explosiveness = 0.1f;
-		}
-	},
-	silicon = new Item("silicon"),
-	plastic = new Item("plastic"),
-	densealloy = new Item("densealloy"),
-	biomatter = new Item("biomatter"){
-		{
-			material = false;
-			flammability = 0.4f;
-		}
-	};
-
 	public final int id;
 	public final String name;
 	public TextureRegion region;

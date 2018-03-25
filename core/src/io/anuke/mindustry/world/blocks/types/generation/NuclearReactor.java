@@ -1,10 +1,12 @@
 package io.anuke.mindustry.world.blocks.types.generation;
 
 import com.badlogic.gdx.graphics.Color;
+import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.BlockBar;
@@ -41,8 +43,8 @@ public class NuclearReactor extends LiquidPowerGenerator{
 
 	public NuclearReactor(String name) {
 		super(name);
-		generateItem = Item.thorium;
-		generateLiquid = Liquid.water;
+		generateItem = Items.thorium;
+		generateLiquid = Liquids.water;
 		itemCapacity = 30;
 		liquidCapacity = 50;
 		explosionEffect = Fx.nuclearShockwave;

@@ -1,6 +1,7 @@
 package io.anuke.mindustry.game;
 
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.resource.Weapon;
 
 public class UpgradeInventory {
@@ -20,6 +21,6 @@ public class UpgradeInventory {
 
     public void reset(){
         weapons.clear();
-        weapons.add(Weapon.blaster);
+        weapons.add(Weapons.blaster);
     }
 }

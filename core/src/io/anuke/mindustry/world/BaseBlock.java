@@ -1,10 +1,8 @@
-package io.anuke.mindustry.world.blocks;
+package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
-import io.anuke.mindustry.world.Edges;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 
 public abstract class BaseBlock {

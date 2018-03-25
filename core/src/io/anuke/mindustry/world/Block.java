@@ -13,7 +13,6 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
-import io.anuke.mindustry.world.blocks.BaseBlock;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
@@ -47,6 +46,8 @@ public class Block extends BaseBlock {
 	public boolean update;
 	/**whether this block has health and can be destroyed*/
 	public boolean destructible;
+	/**if true, this block cannot be broken by normal means.*/
+	public boolean unbreakable;
 	/**whether this is solid*/
 	public boolean solid;
 	/**whether this block CAN be solid.*/

@@ -1,16 +1,19 @@
-package io.anuke.mindustry.resource;
+package io.anuke.mindustry.content;
 
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Entries;
+import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.ItemStack;
+import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.ucore.util.Mathf;
 
 public class UpgradeRecipes {
     private static final ObjectMap<Upgrade, ItemStack[]> recipes = Mathf.map(
-            Weapon.triblaster, list(stack(Item.iron, 60), stack(Item.steel, 80)),
-            Weapon.clustergun, list(stack(Item.iron, 300), stack(Item.steel, 80)),
-            Weapon.vulcan, list(stack(Item.iron, 100), stack(Item.steel, 150), stack(Item.titanium, 80)),
-            Weapon.beam, list(stack(Item.steel, 260), stack(Item.titanium, 160), stack(Item.densealloy, 120)),
-            Weapon.shockgun, list(stack(Item.steel, 240), stack(Item.titanium, 160), stack(Item.densealloy, 160))
+            Weapons.triblaster, list(stack(Items.iron, 60), stack(Items.steel, 80)),
+            Weapons.clustergun, list(stack(Items.iron, 300), stack(Items.steel, 80)),
+            Weapons.vulcan, list(stack(Items.iron, 100), stack(Items.steel, 150), stack(Items.titanium, 80)),
+            Weapons.beam, list(stack(Items.steel, 260), stack(Items.titanium, 160), stack(Items.densealloy, 120)),
+            Weapons.shockgun, list(stack(Items.steel, 240), stack(Items.titanium, 160), stack(Items.densealloy, 160))
     );
 
     private static final ItemStack[] empty = {};

@@ -70,14 +70,7 @@ public class Units {
 
     /**Iterates over all units that are enemies of this team.*/
     public static void getNearbyEnemies(Team team, Rectangle rect, Consumer<Unit> cons){
-        //check if it's an ally team to the 'main team'
-        boolean ally = state.allyTeams.contains(team);
-        boolean enemy = state.enemyTeams.contains(team);
-
-        //this team isn't even in the game, so target nothing!
-        if(!ally && !enemy) return;
-
-        ObjectSet<Team> targets = ally ? state.enemyTeams : state.allyTeams;
+        ObjectSet<Team> targets = state.teams.enemiesOf(team);
 
         for(Team other : targets){
             EntityGroup<BaseUnit> group = unitGroups[other.ordinal()];
@@ -92,13 +85,5 @@ public class Units {
                 cons.accept((Unit)player);
             }
         });
-    }
-
-    /**Returns whether these two teams are enemies.*/
-    public static boolean areEnemies(Team team, Team other){
-        if(team == other) return false; //fast fail to be more efficient
-        boolean ally = state.allyTeams.contains(team);
-        boolean ally2 = state.allyTeams.contains(other);
-        return ally == ally2;
     }
 }

@@ -4,7 +4,7 @@ import io.anuke.mindustry.core.Logic;
 import io.anuke.mindustry.core.NetCommon;
 import io.anuke.mindustry.core.NetServer;
 import io.anuke.mindustry.core.World;
-import io.anuke.mindustry.io.BlockLoader;
+import io.anuke.mindustry.core.ContentLoader;
 import io.anuke.mindustry.io.BundleLoader;
 import io.anuke.ucore.modules.ModuleCore;
 
@@ -17,7 +17,7 @@ public class MindustryServer extends ModuleCore {
         headless = true;
 
         BundleLoader.load();
-        BlockLoader.load();
+        ContentLoader.load();
 
         module(logic = new Logic());
         module(world = new World());

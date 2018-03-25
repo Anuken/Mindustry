@@ -122,7 +122,7 @@ public class Vars{
 	public static final int port = 6567;
 	public static final int webPort = 6568;
 
-	public static final GameState state = new GameState();
+	public static GameState state;
 	public static final ThreadHandler threads = new ThreadHandler(Platform.instance.getThreadProvider());
 
 	public static final ServerDebug serverDebug = new ServerDebug();

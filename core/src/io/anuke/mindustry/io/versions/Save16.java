@@ -2,6 +2,7 @@ package io.anuke.mindustry.io.versions;
 
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.game.Difficulty;
@@ -10,10 +11,9 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.SaveFileVersion;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Upgrade;
-import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.entities.EntityGroup;
@@ -75,8 +75,8 @@ public class Save16 extends SaveFileVersion {
 
             //weapons
             control.upgrades().getWeapons().clear();
-            control.upgrades().getWeapons().add(Weapon.blaster);
-            player.weaponLeft = player.weaponRight = Weapon.blaster;
+            control.upgrades().getWeapons().add(Weapons.blaster);
+            player.weaponLeft = player.weaponRight = Weapons.blaster;
 
             int weapons = stream.readByte();
 

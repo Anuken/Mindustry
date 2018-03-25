@@ -7,6 +7,7 @@ import io.anuke.mindustry.world.Tile;
 
 public class Unloader extends Block {
     protected final int timerUnload = timers++;
+    protected int speed = 5;
 
     public Unloader(String name){
         super(name);
@@ -18,7 +19,7 @@ public class Unloader extends Block {
 
     @Override
     public void update(Tile tile){
-        if(tile.entity.inventory.totalItems() == 0 && tile.entity.timer.get(timerUnload, 5)){
+        if(tile.entity.inventory.totalItems() == 0 && tile.entity.timer.get(timerUnload, speed)){
             tile.allNearby(other -> {
                 if(other.block() instanceof StorageBlock && tile.entity.inventory.totalItems() == 0 &&
                         ((StorageBlock)other.block()).hasItem(other, null)){

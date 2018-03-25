@@ -1,11 +1,11 @@
-package io.anuke.mindustry.world.blocks;
+package io.anuke.mindustry.content.blocks;
 
 import com.badlogic.gdx.graphics.Color;
+import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.effect.TeslaOrb;
 import io.anuke.mindustry.graphics.Fx;
-import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.defense.LaserTurret;
@@ -24,7 +24,7 @@ public class WeaponBlocks{
 			range = 44;
 			reload = 13f;
 			bullet = BulletType.stone;
-			ammo = Item.stone;
+			ammo = Items.stone;
 			health = 45;
 		}
 		
@@ -44,7 +44,7 @@ public class WeaponBlocks{
 			range = 65;
 			reload = 7f;
 			bullet = BulletType.iron;
-			ammo = Item.iron;
+			ammo = Items.iron;
 			health = 65;
 		}
 	},
@@ -54,7 +54,7 @@ public class WeaponBlocks{
 			range = 45f;
 			reload = 5f;
 			bullet = BulletType.flame;
-			ammo = Item.coal;
+			ammo = Items.coal;
 			health = 90;
 			inaccuracy = 4f;
 		}
@@ -66,7 +66,7 @@ public class WeaponBlocks{
 			range = 120;
 			reload = 50f;
 			bullet = BulletType.sniper;
-			ammo = Item.steel;
+			ammo = Items.steel;
 			health = 70;
 			shootEffect = Fx.railshot;
 		}
@@ -81,7 +81,7 @@ public class WeaponBlocks{
 			bullet = BulletType.flak;
 			shots = 3;
 			inaccuracy = 9f;
-			ammo = Item.coal;
+			ammo = Items.coal;
 			ammoMultiplier = 5;
 			health = 110;
 			shootEffect = Fx.mortarshot;
@@ -128,7 +128,7 @@ public class WeaponBlocks{
 			range = 90f;
 			reload = 7f;
 			bullet = BulletType.plasmaflame;
-			ammoLiquid = Liquid.lava;
+			ammoLiquid = Liquids.lava;
 			liquidPerShot = 3f;
 			health = 180*3;
 			size = 2;
@@ -142,7 +142,7 @@ public class WeaponBlocks{
 			range = 60f;
 			reload = 3f;
 			bullet = BulletType.plasmaflame;
-			ammo = Item.coal;
+			ammo = Items.coal;
 			health = 180;
 			ammoMultiplier = 40;
 		}
@@ -155,7 +155,7 @@ public class WeaponBlocks{
 			range = 80f;
 			reload = 8f;
 			bullet = BulletType.chain;
-			ammo = Item.thorium;
+			ammo = Items.thorium;
 			health = 430;
 			size = 2;
 			shootCone = 9f;
@@ -188,7 +188,7 @@ public class WeaponBlocks{
 			range = 120f;
 			reload = 23f;
 			bullet = BulletType.titanshell;
-			ammo = Item.thorium;
+			ammo = Items.thorium;
 			health = 800;
 			ammoMultiplier = 4;
 			size = 3;
@@ -205,7 +205,7 @@ public class WeaponBlocks{
 			range = 120f;
 			reload = 23f;
 			bullet = BulletType.titanshell;
-			ammo = Item.thorium;
+			ammo = Items.thorium;
 			health = 800;
 			ammoMultiplier = 4;
 			size = 3;
@@ -221,7 +221,7 @@ public class WeaponBlocks{
 			range = 120f;
 			reload = 23f;
 			bullet = BulletType.titanshell;
-			ammo = Item.thorium;
+			ammo = Items.thorium;
 			health = 800;
 			ammoMultiplier = 4;
 			size = 2;

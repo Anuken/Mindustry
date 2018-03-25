@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks;
+package io.anuke.mindustry.content.blocks;
 
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;

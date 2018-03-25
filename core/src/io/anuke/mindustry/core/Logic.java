@@ -1,14 +1,13 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.game.EnemySpawn;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.game.EventType.PlayEvent;
 import io.anuke.mindustry.game.EventType.ResetEvent;
 import io.anuke.mindustry.game.EventType.WaveEvent;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.WaveCreator;
+import io.anuke.mindustry.game.TeamInfo;
+import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.ucore.core.Events;
@@ -27,7 +26,10 @@ import static io.anuke.mindustry.Vars.*;
  * This class should <i>not</i> call any outside methods to change state of modules, but instead fire events.
  */
 public class Logic extends Module {
-    private final Array<EnemySpawn> spawns = WaveCreator.getSpawns();
+
+    public Logic(){
+        state = new GameState();
+    }
 
     @Override
     public void init(){
@@ -52,10 +54,9 @@ public class Logic extends Module {
         state.enemies = 0;
         state.gameOver = false;
         state.inventory.clearItems();
-        state.allyTeams.clear();
-        state.allyTeams.add(Team.blue);
-        state.enemyTeams.clear();
-        state.enemyTeams.add(Team.red);
+        state.teams = new TeamInfo();
+        state.teams.add(Team.blue, true);
+        state.teams.add(Team.red, false);
 
         Timers.clear();
         Entities.clear();
@@ -86,8 +87,16 @@ public class Logic extends Module {
             if(!Net.client())
                 world.pathfinder().update();
 
+            boolean gameOver = true;
 
-            if(world.getAllyCores().size == 0 && !state.gameOver){ //TODO gameover state
+            for(TeamData data : state.teams.getTeams(true)){
+                if(data.cores.size > 0){
+                    gameOver = false;
+                    break;
+                }
+            }
+
+            if(gameOver && !state.gameOver){ //TODO better gameover state, victory state?
                 state.gameOver = true;
                 if(Net.server()) NetEvents.handleGameOver();
                 Events.fire(GameOverEvent.class);

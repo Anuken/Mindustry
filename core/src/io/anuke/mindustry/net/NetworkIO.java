@@ -2,14 +2,14 @@ package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.utils.ByteArray;
 import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.resource.Upgrade;
-import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
@@ -128,7 +128,7 @@ public class NetworkIO {
             ui.hudfrag.updateItems();
 
             control.upgrades().getWeapons().clear();
-            control.upgrades().getWeapons().add(Weapon.blaster);
+            control.upgrades().getWeapons().add(Weapons.blaster);
 
             byte weapons = stream.readByte();
 

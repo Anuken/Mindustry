@@ -1,7 +1,7 @@
 package io.anuke.mindustry.net;
 
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.Blocks;
+import io.anuke.mindustry.content.blocks.Blocks;
 
 public class TraceInfo {
     public int playerid;

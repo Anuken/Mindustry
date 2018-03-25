@@ -13,6 +13,7 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Physics;
 import io.anuke.ucore.util.Translator;
 
+import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
@@ -88,7 +89,7 @@ public class DamageArea{
 		for(int dx = -trad; dx <= trad; dx ++){
 			for(int dy= -trad; dy <= trad; dy ++){
 				Tile tile = world.tile(Mathf.scl2(x, tilesize) + dx, Mathf.scl2(y, tilesize) + dy);
-				if(tile != null && tile.entity != null && (team == null || Units.areEnemies(team, tile.getTeam())) && Vector2.dst(dx, dy, 0, 0) <= trad){
+				if(tile != null && tile.entity != null && (team == null || state.teams.areEnemies(team, tile.getTeam())) && Vector2.dst(dx, dy, 0, 0) <= trad){
 					int amount = calculateDamage(x, y, tile.worldx(), tile.worldy(), radius, damage);
 					tile.entity.damage(amount);
 				}

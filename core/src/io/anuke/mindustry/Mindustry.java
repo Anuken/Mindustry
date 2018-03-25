@@ -1,7 +1,7 @@
 package io.anuke.mindustry;
 
 import io.anuke.mindustry.core.*;
-import io.anuke.mindustry.io.BlockLoader;
+import io.anuke.mindustry.core.ContentLoader;
 import io.anuke.mindustry.io.BundleLoader;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.ucore.modules.ModuleCore;
@@ -17,7 +17,7 @@ public class Mindustry extends ModuleCore {
 
 		Log.setUseColors(false);
 		BundleLoader.load();
-		BlockLoader.load();
+		ContentLoader.load();
 
 		module(logic = new Logic());
 		module(world = new World());

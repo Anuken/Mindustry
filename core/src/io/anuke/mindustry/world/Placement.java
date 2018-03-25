@@ -3,15 +3,14 @@ package io.anuke.mindustry.world;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.content.Recipes;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
-import io.anuke.mindustry.resource.Recipes;
-import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.Entities;
 
@@ -157,9 +156,9 @@ public class Placement {
     public static boolean validBreak(Team team, int x, int y){
         Tile tile = world.tile(x, y);
 
-        if(tile == null || tile.block() == ProductionBlocks.core) return false;
+        if(tile == null || tile.block().unbreakable) return false;
 
-        if(tile.isLinked() && tile.getLinked().block() == ProductionBlocks.core){
+        if(tile.isLinked() && tile.getLinked().block().unbreakable){
             return false;
         }
 

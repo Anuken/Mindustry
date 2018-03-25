@@ -1,15 +1,16 @@
 package io.anuke.mindustry.world;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapTileData;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
-import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.mindustry.world.blocks.ProductionBlocks;
 import io.anuke.ucore.noise.Noise;
+import io.anuke.ucore.util.Log;
 
+import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
 
@@ -22,7 +23,7 @@ public class WorldGenerator {
 	}};
 	
 	/**Should fill spawns with the correct spawnpoints.*/
-	public static void generate(Tile[][] tiles, MapTileData data, Array<Tile> cores){
+	public static void generate(Tile[][] tiles, MapTileData data){
 		Noise.setSeed(world.getSeed());
 
 		IntArray multiblocks = new IntArray();
@@ -32,12 +33,15 @@ public class WorldGenerator {
 				TileDataMarker tile = data.read();
 				tiles[x][y] = new Tile(x, y, tile.floor, tile.wall, tile.rotation, tile.team);
 
+				Team team = Team.values()[tile.team];
+
 				if(tiles[x][y].block().isMultiblock()){
 					multiblocks.add(tiles[x][y].packedPosition());
 				}
 
-				if(tiles[x][y].block() == ProductionBlocks.core){
-					cores.add(tiles[x][y]);
+				if(tiles[x][y].block() == StorageBlocks.core &&
+						state.teams.has(team)){
+					state.teams.get(team).cores.add(tiles[x][y]);
 				}
 
 				//TODO ores, plants, extra decoration?

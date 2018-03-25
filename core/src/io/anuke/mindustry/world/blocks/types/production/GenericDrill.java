@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
@@ -14,7 +15,7 @@ public class GenericDrill extends Drill{
     public float powerUse = 0.08f;
     /**liquid use per frame.*/
     protected float liquidUse = 0.1f;
-    protected Liquid inputLiquid = Liquid.water;
+    protected Liquid inputLiquid = Liquids.water;
 
     private Array<Item> toAdd = new Array<>();
 
