@@ -9,7 +9,7 @@ import io.anuke.mindustry.world.blocks.types.defense.Turret;
 import io.anuke.mindustry.world.blocks.types.distribution.Conveyor;
 import io.anuke.mindustry.world.blocks.types.distribution.Router;
 import io.anuke.mindustry.world.blocks.types.production.Drill;
-import io.anuke.mindustry.world.blocks.types.generation.PowerDistributor;
+import io.anuke.mindustry.world.blocks.types.power.PowerDistributor;
 import io.anuke.mindustry.world.blocks.types.production.Smelter;
 import io.anuke.ucore.util.Bundles;
 

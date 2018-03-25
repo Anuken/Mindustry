@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks.types.generation;
+package io.anuke.mindustry.world.blocks.types.power;
 
 import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.entities.TileEntity;

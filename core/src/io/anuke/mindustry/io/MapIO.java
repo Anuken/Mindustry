@@ -30,8 +30,8 @@ public class MapIO {
         Pixmap pixmap = new Pixmap(data.width(), data.height(), Format.RGBA8888);
         data.position(0, 0);
 
-        for(int x = 0; x < data.width(); x ++){
-            for(int y = 0; y < data.height(); y ++){
+        for(int y = 0; y < data.height(); y ++){
+            for(int x = 0; x < data.width(); x ++){
                 TileDataMarker marker = data.read();
                 Block floor = Block.getByID(marker.floor);
                 Block wall = Block.getByID(marker.wall);

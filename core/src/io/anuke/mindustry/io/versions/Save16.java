@@ -3,6 +3,8 @@ package io.anuke.mindustry.io.versions;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.content.Weapons;
+import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.game.Difficulty;
@@ -13,9 +15,9 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.ucore.core.Core;
+import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.util.Bits;
 
@@ -140,6 +142,8 @@ public class Save16 extends SaveFileVersion {
         short width = stream.readShort();
         short height = stream.readShort();
 
+        Entities.resizeTree(0, 0, width * tilesize, height * tilesize);
+
         Tile[][] tiles = world.createTiles(width, height);
 
         for(int x = 0; x < width; x ++){
@@ -161,6 +165,8 @@ public class Save16 extends SaveFileVersion {
                     byte team = Bits.getLeftByte(tr);
                     byte rotation = Bits.getRightByte(tr);
 
+                    Team t = Team.values()[team];
+
                     tile.setTeam(Team.values()[team]);
                     tile.entity.health = health;
                     tile.setRotation(rotation);
@@ -170,6 +176,11 @@ public class Save16 extends SaveFileVersion {
                     if (tile.entity.liquid != null) tile.entity.liquid.read(stream);
 
                     tile.entity.read(stream);
+
+                    if(tile.block() == StorageBlocks.core &&
+                            state.teams.has(t)){
+                        state.teams.get(t).cores.add(tile);
+                    }
                 }
 
                 tiles[x][y] = tile;

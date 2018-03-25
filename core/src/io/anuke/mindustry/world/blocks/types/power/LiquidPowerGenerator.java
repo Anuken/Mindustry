@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks.types.generation;
+package io.anuke.mindustry.world.blocks.types.power;
 
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
@@ -11,7 +11,7 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
-public class LiquidPowerGenerator extends PowerGenerator {
+public class LiquidPowerGenerator extends io.anuke.mindustry.world.blocks.types.power.PowerGenerator {
 	public Liquid generateLiquid;
 	public float powerPerLiquid = 0.13f;
 	/**Maximum liquid used per frame.*/

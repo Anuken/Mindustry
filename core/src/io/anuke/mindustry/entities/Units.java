@@ -38,6 +38,8 @@ public class Units {
         Unit[] result = {null};
         float[] cdist = {0};
 
+        rect.setSize(range*2f).setCenter(x, y);
+
         getNearbyEnemies(team, rect, e -> {
             if (!predicate.test(e))
                 return;

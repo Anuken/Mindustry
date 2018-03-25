@@ -133,7 +133,7 @@ public class Turret extends Block{
 			
 			if(entity.timer.get(timerTarget, targetInterval)){
 				entity.target = Units.getClosestEnemy(tile.getTeam(),
-						tile.worldx(), tile.worldy(), range, e -> !e.isDead());
+						tile.drawx(), tile.drawy(), range, e -> !e.isDead());
 			}
 			
 			if(entity.target != null){

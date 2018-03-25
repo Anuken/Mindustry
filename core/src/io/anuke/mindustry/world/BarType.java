@@ -7,7 +7,8 @@ public enum BarType {
     inventory(Color.GREEN),
     power(Color.YELLOW),
     liquid(Color.ROYAL),
-    heat(Color.CORAL);
+    heat(Color.CORAL),
+    production(Color.PURPLE);
 
     public final Color color;
 

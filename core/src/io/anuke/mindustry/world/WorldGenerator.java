@@ -8,7 +8,6 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapTileData;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.ucore.noise.Noise;
-import io.anuke.ucore.util.Log;
 
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
@@ -27,9 +26,9 @@ public class WorldGenerator {
 		Noise.setSeed(world.getSeed());
 
 		IntArray multiblocks = new IntArray();
-		
-		for(int x = 0; x < data.width(); x ++){
-			for(int y = 0; y < data.height(); y ++){
+
+		for(int y = 0; y < data.height(); y ++){
+			for(int x = 0; x < data.width(); x ++){
 				TileDataMarker tile = data.read();
 				tiles[x][y] = new Tile(x, y, tile.floor, tile.wall, tile.rotation, tile.team);
 

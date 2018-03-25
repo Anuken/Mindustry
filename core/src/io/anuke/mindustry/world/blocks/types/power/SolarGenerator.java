@@ -1,9 +1,9 @@
-package io.anuke.mindustry.world.blocks.types.generation;
+package io.anuke.mindustry.world.blocks.types.power;
 
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 
-public class SolarGenerator extends PowerGenerator {
+public class SolarGenerator extends io.anuke.mindustry.world.blocks.types.power.PowerGenerator {
     /**power generated per frame*/
     protected float generation = 0.005f;
 

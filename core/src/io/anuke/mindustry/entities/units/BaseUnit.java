@@ -12,6 +12,7 @@ import io.anuke.ucore.util.Timer;
 
 import java.nio.ByteBuffer;
 
+import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.unitGroups;
 
 public class BaseUnit extends Unit {
@@ -71,7 +72,7 @@ public class BaseUnit extends Unit {
 
 	@Override
 	public boolean collides(SolidEntity other){
-		return (other instanceof Bullet) && !(((Bullet) other).owner instanceof BaseUnit);
+		return other instanceof Bullet && state.teams.areEnemies((((Bullet) other).team), team);
 	}
 
 	@Override

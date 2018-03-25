@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks.types.generation;
+package io.anuke.mindustry.world.blocks.types.power;
 
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.Liquids;
@@ -24,7 +24,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class NuclearReactor extends LiquidPowerGenerator{
+public class NuclearReactor extends io.anuke.mindustry.world.blocks.types.power.LiquidPowerGenerator {
 	protected final int timerFuel = timers++;
 
 	protected final Translator tr = new Translator();

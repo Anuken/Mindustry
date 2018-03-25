@@ -1,6 +1,7 @@
 package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
@@ -9,6 +10,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
@@ -21,6 +23,8 @@ public abstract class UnitType {
     private static int timerIndex = 0;
 
     protected static final int timerTarget = timerIndex++;
+    protected static final int timerBoost = timerIndex++;
+    protected static final int timerReload = timerIndex++;
 
     public final String name;
     public final byte id;
@@ -35,6 +39,8 @@ public abstract class UnitType {
     protected float mass = 1f;
     protected boolean isFlying;
     protected float drag = 0.1f;
+    protected float maxVelocity = 5f;
+    protected float reload = 40f;
 
     public UnitType(String name){
         this.id = lastid++;
@@ -64,6 +70,7 @@ public abstract class UnitType {
 
         //TODO logic
 
+        unit.velocity.limit(maxVelocity);
         unit.x += unit.velocity.x / mass;
         unit.y += unit.velocity.y / mass;
 
@@ -88,8 +95,10 @@ public abstract class UnitType {
         }
     }
 
-    public void onShoot(BaseUnit unit, BulletType type, float rotation){
-        //TODO remove?
+    public void shoot(BaseUnit unit, BulletType type, float rotation, float translation){
+        new Bullet(type, unit,
+                unit.x + Angles.trnsx(rotation, translation),
+                unit.y + Angles.trnsy(rotation, translation), rotation).add();
     }
 
     public void onDeath(BaseUnit unit){

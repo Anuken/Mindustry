@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks.types.generation;
+package io.anuke.mindustry.world.blocks.types.power;
 
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.graphics.Fx;
@@ -6,7 +6,6 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.generation.PowerGenerator.GeneratorEntity;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;

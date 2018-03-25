@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks.types.generation;
+package io.anuke.mindustry.world.blocks.types.power;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
@@ -258,7 +258,8 @@ public class PowerDistributor extends PowerBlock{
 			return Vector2.dst(tile.worldx(), tile.worldy(), link.worldx(), link.worldy()) <= Math.max(laserRange * tilesize,
 					((PowerDistributor)link.block()).laserRange * tilesize) - tilesize/2f;
 		}else{
-			return Vector2.dst(tile.worldx(), tile.worldy(), link.worldx(), link.worldy()) <= laserRange * tilesize - tilesize/2f;
+			return Vector2.dst(tile.worldx(), tile.worldy(), link.worldx(), link.worldy())
+					<= laserRange * tilesize - tilesize/2f + (link.block().size-1)*tilesize;
 		}
 	}
 
