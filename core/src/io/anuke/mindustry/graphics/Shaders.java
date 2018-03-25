@@ -2,6 +2,7 @@ package io.anuke.mindustry.graphics;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.FloatArray;
 import io.anuke.ucore.core.Core;
@@ -15,9 +16,30 @@ public class Shaders{
 	public static final SurfaceShader water = new SurfaceShader("water");
 	public static final SurfaceShader lava = new SurfaceShader("lava");
 	public static final SurfaceShader oil = new SurfaceShader("oil");
-	public static final Shader hit = new Shader("hit", "default") { protected void apply() {}};
+	public static final UnitBuild build = new UnitBuild();
+	public static final Shader hit = new Shader("hit", "default");
 
 	private static final Vector2 vec = new Vector2();
+
+	public static class UnitBuild extends Shader{
+		public float progress, time;
+		public Color color = new Color();
+		public TextureRegion region;
+
+		public UnitBuild() {
+			super("build", "default");
+		}
+
+		@Override
+		public void apply(){
+			shader.setUniformf("u_time", time);
+			shader.setUniformf("u_color", color);
+			shader.setUniformf("u_progress", progress);
+			shader.setUniformf("u_uv", region.getU(), region.getV());
+			shader.setUniformf("u_uv2", region.getU2(), region.getV2());
+			shader.setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
+		}
+	}
 
 	public static class Outline extends Shader{
 		public Color color = new Color();

@@ -1,10 +1,12 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
+import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.BarType;
@@ -12,11 +14,11 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.modules.InventoryModule;
+import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -49,21 +51,22 @@ public class UnitFactory extends Block {
         UnitFactoryEntity entity = tile.entity();
         TextureRegion region = Draw.region(unitRegion == null ? type.name : unitRegion);
 
-        int w = (int)(entity.buildTime/produceTime * region.getRegionWidth());
-
         Draw.rect(name(), tile.drawx(), tile.drawy());
 
-        Draw.alpha(0.2f);
-        //Draw.rect(region, tile.drawx(), tile.drawy());
-        Draw.color();
+        Shaders.build.region = region;
+        Shaders.build.progress = entity.buildTime/produceTime;
+        Shaders.build.color = Colors.get("accent");
+        Shaders.build.time = -entity.time / 10f;
 
-        Tmp.tr1.setRegion(region, region.getRegionWidth() - w, 0, w, region.getRegionHeight());
-        Draw.rect(Tmp.tr1, tile.drawx(), tile.drawy());
+        Graphics.shader(Shaders.build, false);
+        Shaders.build.apply();
+        Draw.rect(region, tile.drawx(), tile.drawy());
+        Graphics.shader();
 
         Draw.color("accent");
 
         Lines.lineAngleCenter(
-                tile.drawx() + Mathf.sin(Timers.time(), 5f, Vars.tilesize/2f*size - 2f),
+                tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize/2f*size - 2f),
                 tile.drawy(),
                 90,
                 size * Vars.tilesize - 4f);
@@ -83,17 +86,18 @@ public class UnitFactory extends Block {
                 entity.power.amount >= used){
 
             entity.buildTime += Timers.delta();
+            entity.time += Timers.delta();
             entity.power.amount -= used;
+        }
 
-            if(entity.buildTime >= produceTime){
-                BaseUnit unit = new BaseUnit(type, tile.getTeam());
-                unit.set(tile.drawx(), tile.drawy()).add();
-                unit.velocity.y = 4f;
-                entity.buildTime = 0f;
+        if(entity.buildTime >= produceTime){
+            BaseUnit unit = new BaseUnit(type, tile.getTeam());
+            unit.set(tile.drawx(), tile.drawy()).add();
+            unit.velocity.y = 4f;
+            entity.buildTime = 0f;
 
-                for(ItemStack stack : requirements){
-                    entity.inventory.removeItem(stack.item, stack.amount);
-                }
+            for(ItemStack stack : requirements){
+                entity.inventory.removeItem(stack.item, stack.amount);
             }
         }
     }
@@ -124,6 +128,7 @@ public class UnitFactory extends Block {
 
     public static class UnitFactoryEntity extends TileEntity{
         public float buildTime;
+        public float time;
 
         @Override
         public void write(DataOutputStream stream) throws IOException {

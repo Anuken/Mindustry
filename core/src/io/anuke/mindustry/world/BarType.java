@@ -3,12 +3,12 @@ package io.anuke.mindustry.world;
 import com.badlogic.gdx.graphics.Color;
 
 public enum BarType {
-    health(Color.RED),
+    health(Color.SCARLET),
     inventory(Color.GREEN),
-    power(Color.YELLOW),
+    power(Color.valueOf("fbeb67")),
     liquid(Color.ROYAL),
     heat(Color.CORAL),
-    production(Color.PURPLE);
+    production(Color.valueOf("f4ba6e"));
 
     public final Color color;
 

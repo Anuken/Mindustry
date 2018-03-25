@@ -11,7 +11,7 @@ public class UnitBlocks {
 
     flierFactory = new UnitFactory("flierfactory"){{
         type = UnitTypes.flier;
-        produceTime = 400;
+        produceTime = 200;
         size = 2;
         requirements = new ItemStack[]{
             new ItemStack(Items.stone, 5)
