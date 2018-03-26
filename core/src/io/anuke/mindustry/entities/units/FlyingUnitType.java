@@ -24,6 +24,7 @@ public class FlyingUnitType extends UnitType {
         speed = 0.2f;
         maxVelocity = 4f;
         drag = 0.01f;
+        isFlying = true;
     }
 
     @Override

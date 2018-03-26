@@ -37,8 +37,8 @@ public class TileEntity extends Entity{
 	public TileEntity init(Tile tile, boolean added){
 		this.tile = tile;
 		this.added = added;
-		x = tile.worldx();
-		y = tile.worldy();
+		x = tile.drawx();
+		y = tile.drawy();
 
 		health = tile.block().health;
 		

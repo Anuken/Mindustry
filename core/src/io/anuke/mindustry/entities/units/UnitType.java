@@ -54,6 +54,10 @@ public abstract class UnitType {
         //TODO doesn't do anything
     }
 
+    public boolean isFlying(){
+        return isFlying;
+    }
+
     public void update(BaseUnit unit){
         if(unit.hitTime > 0){
             unit.hitTime -= Timers.delta();

@@ -2,10 +2,13 @@ package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
+import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
@@ -14,6 +17,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.modules.InventoryModule;
+import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -24,18 +28,30 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.tilesize;
+
 public class UnitFactory extends Block {
+    private final Rectangle rect = new Rectangle();
+
     protected UnitType type;
     protected ItemStack[] requirements;
     protected float produceTime = 1000f;
     protected float powerUse = 0.1f;
+    protected float openDuration = 50f;
+    protected float launchVelocity = 4f;
     protected String unitRegion;
 
     public UnitFactory(String name) {
         super(name);
-        solid = true;
         update = true;
         hasPower = true;
+        solidifes = true;
+    }
+
+    @Override
+    public boolean isSolidFor(Tile tile) {
+        UnitFactoryEntity entity = tile.entity();
+        return !type.isFlying() || !entity.open;
     }
 
     @Override
@@ -47,6 +63,14 @@ public class UnitFactory extends Block {
     }
 
     @Override
+    public TextureRegion[] getIcon() {
+        return new TextureRegion[]{
+            Draw.region(name),
+            Draw.region(name + "-top")
+        };
+    }
+
+    @Override
     public void draw(Tile tile) {
         UnitFactoryEntity entity = tile.entity();
         TextureRegion region = Draw.region(unitRegion == null ? type.name : unitRegion);
@@ -55,7 +79,8 @@ public class UnitFactory extends Block {
 
         Shaders.build.region = region;
         Shaders.build.progress = entity.buildTime/produceTime;
-        Shaders.build.color = Colors.get("accent");
+        Shaders.build.color.set(Colors.get("accent"));
+        Shaders.build.color.a = entity.speedScl;
         Shaders.build.time = -entity.time / 10f;
 
         Graphics.shader(Shaders.build, false);
@@ -64,6 +89,7 @@ public class UnitFactory extends Block {
         Graphics.shader();
 
         Draw.color("accent");
+        Draw.alpha(entity.speedScl);
 
         Lines.lineAngleCenter(
                 tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize/2f*size - 2f),
@@ -73,7 +99,7 @@ public class UnitFactory extends Block {
 
         Draw.reset();
 
-        Draw.rect(name + "-top", tile.drawx(), tile.drawy());
+        Draw.rect(name + (entity.open ? "-top-open" : "-top"), tile.drawx(), tile.drawy());
     }
 
     @Override
@@ -82,19 +108,45 @@ public class UnitFactory extends Block {
 
         float used = Math.min(powerUse * Timers.delta(), powerCapacity);
 
-        if(hasRequirements(entity.inventory, entity.buildTime/produceTime) &&
-                entity.power.amount >= used){
+        entity.time += Timers.delta() * entity.speedScl;
 
-            entity.buildTime += Timers.delta();
-            entity.time += Timers.delta();
-            entity.power.amount -= used;
+        if(entity.openCountdown > 0){
+            if(entity.openCountdown > Timers.delta()){
+                entity.openCountdown -= Timers.delta();
+            }else{
+                if(type.isFlying() || !anyEntities(tile)) {
+                    entity.open = false;
+                    entity.openCountdown = -1;
+                }
+            }
         }
 
-        if(entity.buildTime >= produceTime){
-            BaseUnit unit = new BaseUnit(type, tile.getTeam());
-            unit.set(tile.drawx(), tile.drawy()).add();
-            unit.velocity.y = 4f;
-            entity.buildTime = 0f;
+        if(hasRequirements(entity.inventory, entity.buildTime/produceTime) &&
+                entity.power.amount >= used && !entity.open){
+
+            entity.buildTime += Timers.delta();
+            entity.power.amount -= used;
+            entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
+        }else{
+            if(!entity.open) entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
+        }
+
+        if(entity.buildTime >= produceTime && !entity.open){
+            entity.open = true;
+
+            Timers.run(openDuration/1.5f, () -> {
+                entity.buildTime = 0f;
+                Effects.shake(2f, 3f, entity);
+                Effects.effect(Fx.producesmoke, tile.drawx(), tile.drawy());
+
+                BaseUnit unit = new BaseUnit(type, tile.getTeam());
+                unit.set(tile.drawx(), tile.drawy()).add();
+                unit.velocity.y = launchVelocity;
+            });
+
+            entity.openCountdown = openDuration;
+
+            //Timers.run(openDuration, () -> entity.open = false);
 
             for(ItemStack stack : requirements){
                 entity.inventory.removeItem(stack.item, stack.amount);
@@ -117,6 +169,23 @@ public class UnitFactory extends Block {
         return new UnitFactoryEntity();
     }
 
+    boolean anyEntities(Tile tile){
+        Block type = tile.block();
+        rect.setSize(type.size * tilesize, type.size * tilesize);
+        rect.setCenter(tile.drawx(), tile.drawy());
+
+        boolean[] value = new boolean[1];
+
+        Units.getNearby(rect, unit -> {
+            if(value[0]) return;
+            if(unit.hitbox.getRect(unit.x, unit.y).overlaps(rect)){
+                value[0] = true;
+            }
+        });
+
+        return value[0];
+    }
+
     protected boolean hasRequirements(InventoryModule inv, float fraction){
         for(ItemStack stack : requirements){
             if(!inv.hasItem(stack.item, (int)(fraction * stack.amount))){
@@ -128,7 +197,10 @@ public class UnitFactory extends Block {
 
     public static class UnitFactoryEntity extends TileEntity{
         public float buildTime;
+        public boolean open;
+        public float openCountdown;
         public float time;
+        public float speedScl;
 
         @Override
         public void write(DataOutputStream stream) throws IOException {

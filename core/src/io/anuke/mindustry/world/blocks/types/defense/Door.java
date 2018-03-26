@@ -63,7 +63,6 @@ public class Door extends Wall{
 	}
 	
 	boolean anyEntities(Tile tile){
-		int x = tile.x, y = tile.y;
 		Block type = tile.block();
 		rect.setSize(type.size * tilesize, type.size * tilesize);
 		rect.setCenter(tile.drawx(), tile.drawy());

@@ -203,6 +203,14 @@ public class Fx{
 			Draw.reset();
 		});
 	}),
+
+	producesmoke = new Effect(12, e -> {
+		Angles.randLenVectors(e.id, 8, 4f + e.ifract()*18f, (x, y)->{
+			Draw.color(Color.WHITE, Colors.get("accent"), e.ifract());
+			Fill.poly(e.x + x, e.y + y, 4, 1f+e.fract()*3f, 45);
+			Draw.reset();
+		});
+	}),
 	
 	blastsmoke = new Effect(26, e -> {
 		Angles.randLenVectors(e.id, 12, 1f + e.ifract()*23f, (x, y)->{
