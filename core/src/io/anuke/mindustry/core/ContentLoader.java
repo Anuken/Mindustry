@@ -27,6 +27,7 @@ public class ContentLoader {
             new StorageBlocks(),
             new UnitBlocks(),
             new PowerBlocks(),
+            new CraftingBlocks(),
 
             //items
             new Items(),

@@ -75,8 +75,12 @@ public abstract class UnitType {
         //TODO logic
 
         unit.velocity.limit(maxVelocity);
-        unit.x += unit.velocity.x / mass;
-        unit.y += unit.velocity.y / mass;
+        if(isFlying) {
+            unit.x += unit.velocity.x / mass;
+            unit.y += unit.velocity.y / mass;
+        }else{
+            unit.move(unit.velocity.x / mass, unit.velocity.y / mass);
+        }
 
         unit.velocity.scl(Mathf.clamp(1f-drag* Timers.delta()));
 

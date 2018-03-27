@@ -35,10 +35,10 @@ public class MapRenderer {
             }
         }
 
-        chunks = new IndexedRenderer[width/chunksize][height/chunksize];
+        chunks = new IndexedRenderer[(int)Math.ceil((float)width/chunksize)][(int)Math.ceil((float)height/chunksize )];
 
-        for(int x = 0; x < width/chunksize; x ++){
-            for(int y = 0; y < height/chunksize; y ++){
+        for(int x = 0; x < chunks.length; x ++){
+            for(int y = 0; y < chunks[0].length; y ++){
                 chunks[x][y] = new IndexedRenderer(chunksize*chunksize*2);
             }
         }
@@ -60,8 +60,8 @@ public class MapRenderer {
         }
         updates.clear();
 
-        for(int x = 0; x < width/chunksize; x ++){
-            for(int y = 0; y < height/chunksize; y ++){
+        for(int x = 0; x < chunks.length; x ++){
+            for(int y = 0; y < chunks[0].length; y ++){
                 IndexedRenderer mesh = chunks[x][y];
 
                 mesh.getTransformMatrix().setToTranslation(tx, ty, 0).scl(tw / (width * tilesize),

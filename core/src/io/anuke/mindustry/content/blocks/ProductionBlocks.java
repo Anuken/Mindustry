@@ -2,117 +2,13 @@ package io.anuke.mindustry.content.blocks;
 
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.graphics.Fx;
-import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.production.*;
+import io.anuke.mindustry.world.blocks.types.production.Drill;
+import io.anuke.mindustry.world.blocks.types.production.GenericDrill;
+import io.anuke.mindustry.world.blocks.types.production.SolidPump;
 
 public class ProductionBlocks {
     public static final Block
-
-    smelter = new Smelter("smelter") {{
-        health = 70;
-        inputs = new Item[]{Items.iron};
-        fuel = Items.coal;
-        result = Items.steel;
-        craftTime = 25f;
-    }},
-
-    alloysmelter = new Smelter("alloysmelter") {{
-        health = 90;
-        inputs = new Item[]{Items.titanium, Items.steel};
-        fuel = Items.coal;
-        result = Items.densealloy;
-        burnDuration = 45f;
-        craftTime = 25f;
-    }},
-
-    powersmelter = new PowerSmelter("powersmelter") {{
-        /*
-        health = 90;
-        inputs = new Item[]{Item.titanium, Item.steel};
-        fuel = Item.coal;
-        results = Item.dirium;
-        burnDuration = 45f;
-        craftTime = 25f;
-        size = 2;*/
-    }},
-
-    cryofluidmixer = new LiquidMixer("cryofluidmixer") {{
-        health = 200;
-        inputLiquid = Liquids.water;
-        outputLiquid = Liquids.cryofluid;
-        inputItem = Items.titanium;
-        liquidPerItem = 50f;
-        itemCapacity = 50;
-        powerUse = 0.1f;
-        size = 2;
-    }},
-
-    coalextractor = new LiquidCrafter("coalextractor") {{
-        input = Items.stone;
-        inputAmount = 6;
-        inputLiquid = Liquids.water;
-        liquidAmount = 19f;
-        output = Items.coal;
-        health = 50;
-        purifyTime = 50;
-        health = 60;
-    }},
-
-    titaniumextractor = new LiquidCrafter("titaniumextractor") {{
-        input = Items.stone;
-        inputAmount = 8;
-        inputLiquid = Liquids.water;
-        liquidAmount = 40f;
-        liquidCapacity = 41f;
-        purifyTime = 60;
-        output = Items.titanium;
-        health = 70;
-    }},
-
-    oilrefinery = new LiquidCrafter("oilrefinery") {{
-        inputLiquid = Liquids.oil;
-        liquidAmount = 55f;
-        liquidCapacity = 56f;
-        purifyTime = 65;
-        output = Items.coal;
-        health = 80;
-        craftEffect = Fx.purifyoil;
-    }},
-
-    stoneformer = new LiquidCrafter("stoneformer") {{
-        input = null;
-        inputLiquid = Liquids.lava;
-        liquidAmount = 16f;
-        liquidCapacity = 21f;
-        purifyTime = 12;
-        output = Items.stone;
-        health = 80;
-        craftEffect = Fx.purifystone;
-    }},
-
-    lavasmelter = new LiquidCrafter("lavasmelter") {{
-        input = Items.iron;
-        inputAmount = 1;
-        inputLiquid = Liquids.lava;
-        liquidAmount = 40f;
-        liquidCapacity = 41f;
-        purifyTime = 30;
-        output = Items.steel;
-        health = 80;
-        craftEffect = Fx.purifystone;
-    }},
-
-    siliconextractor = new LiquidCrafter("siliconextractor") {{
-        input = Items.stone;
-        inputAmount = 5;
-        inputLiquid = Liquids.water;
-        liquidAmount = 18.99f;
-        output = Items.silicon;
-        health = 50;
-        purifyTime = 50;
-    }},
 
     stonedrill = new Drill("stonedrill") {{
         resource = Blocks.stone;
@@ -206,10 +102,5 @@ public class ProductionBlocks {
         size = 2;
         hasLiquids = true;
         hasPower = true;
-    }},
-
-    weaponFactory = new WeaponFactory("weaponfactory") {{
-        size = 2;
-        health = 250;
     }};
 }

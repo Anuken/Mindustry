@@ -192,7 +192,7 @@ public class NetServer extends Module{
 
             Recipe recipe = Recipes.getByResult(block);
 
-            if(recipe == null) return;
+            if(recipe == null || recipe.debugOnly != debug) return;
 
             state.inventory.removeItems(recipe.requirements);
 

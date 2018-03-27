@@ -1,14 +1,14 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
+import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -22,7 +22,8 @@ public class PowerSmelter extends PowerBlock {
     /**Recipe format:
      * First item in each array: result
      * Everything else in each array: requirements. Can have duplicates.*/
-    protected Item[][] recipes;
+    protected ItemStack[] inputs;
+    protected Item result;
     protected float powerDrain = 0.01f;
 
     protected float heatUpTime = 80f;
@@ -46,25 +47,8 @@ public class PowerSmelter extends PowerBlock {
         super.setBars();
         bars.remove(BarType.inventory);
 
-        if(true) return;
-
-        //TODO
-
-        ObjectSet<Item> set = new ObjectSet<>();
-
-        for(Item[] items : recipes){
-            for(int i = 1; i < items.length; i ++) {
-                set.add(items[i]);
-            }
-        }
-
-        Array<Item> items = new Array<>();
-        set.forEach(items::add);
-
-        items.sort();
-
-        for(Item item : items){
-            bars.add(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.inventory.getItem(item) / capacity));
+        for(ItemStack item : inputs){
+            bars.add(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.inventory.getItem(item.item) / capacity));
         }
     }
 
@@ -83,7 +67,7 @@ public class PowerSmelter extends PowerBlock {
 
     @Override
     public void update(Tile tile){
-        /*
+
         PowerSmelterEntity entity = tile.entity();
 
         if(entity.timer.get(timerDump, 5) && entity.inventory.hasItem(result)){
@@ -121,24 +105,19 @@ public class PowerSmelter extends PowerBlock {
         }
 
         offloadNear(tile, result);
-        Effects.effect(craftEffect, entity);*/
+        Effects.effect(craftEffect, entity);
     }
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        boolean isInput = false;
 
-        out:
-        for(Item[] items : recipes){
-            for(int i = 1; i < items.length; i ++){
-                if(items[i] == item){
-                    isInput = true;
-                    break out;
-                }
+        for(ItemStack stack : inputs){
+            if(stack.item == item){
+                return tile.entity.inventory.getItem(item) < capacity;
             }
         }
 
-        return (isInput && tile.entity.inventory.getItem(item) < capacity);
+        return false;
     }
 
     @Override

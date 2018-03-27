@@ -26,11 +26,11 @@ public class LiquidMixer extends LiquidBlock{
 
     @Override
     public void update(Tile tile){
-        if(tile.entity.liquid.amount > 0.001f){
-            tryDumpLiquid(tile);
-        }
+        float used = Math.min(Timers.delta() * powerUse, tile.entity.power.amount);
 
-        tile.entity.power.amount -= Math.min(Timers.delta() * powerUse, tile.entity.power.amount);
+        tryDumpLiquid(tile);
+
+        if(tile.entity.power.amount > used) tile.entity.power.amount -= used;
     }
 
     @Override

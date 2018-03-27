@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.modules;
 
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.blocks.types.BlockModule;
 
 import java.io.DataInputStream;
@@ -37,6 +38,10 @@ public class InventoryModule extends BlockModule{
 
     public void removeItem(Item item, int amount){
         items[item.id] -= amount;
+    }
+
+    public void removeItem(ItemStack stack){
+        items[stack.item.id] -= stack.amount;
     }
 
     public void clear(){

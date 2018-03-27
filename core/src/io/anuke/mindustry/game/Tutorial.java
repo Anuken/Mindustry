@@ -546,7 +546,7 @@ public class Tutorial{
 				canBack = false;
 				blockPlaceX = 0;
 				blockPlaceY = -7;
-				targetBlock = ProductionBlocks.smelter;
+				//targetBlock = ProductionBlocks.smelter;
 			}
 			
 			void onSwitch(){

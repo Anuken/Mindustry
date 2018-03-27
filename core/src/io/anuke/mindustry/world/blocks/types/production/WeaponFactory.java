@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
@@ -10,12 +11,14 @@ import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.style.TextureRegionDrawable;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.Tooltip;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -25,6 +28,22 @@ public class WeaponFactory extends Block{
         super(name);
         solid = true;
         destructible = true;
+    }
+
+    @Override
+    public void draw(Tile tile) {
+        super.draw(tile);
+
+        for(int i : Mathf.signs){
+            Draw.color(Color.YELLOW);
+            Draw.alpha(0.1f + Mathf.absin(Timers.time(), 12f, 0.2f));
+            Draw.rect("white", tile.drawx() + i*3.5f, tile.drawy(), 1, 8);
+            Draw.color(Color.ORANGE);
+            Draw.alpha(0.5f);
+            Draw.rect("white", tile.drawx() + i*3.5f, tile.drawy() + Mathf.sin(Timers.time() + i *77, 13f, 4f), 1, 2);
+        }
+
+        Draw.reset();
     }
 
     @Override

@@ -51,7 +51,7 @@ public class UnitFactory extends Block {
     @Override
     public boolean isSolidFor(Tile tile) {
         UnitFactoryEntity entity = tile.entity();
-        return !type.isFlying() || !entity.open;
+        return type.isFlying() || !entity.open;
     }
 
     @Override
@@ -117,6 +117,8 @@ public class UnitFactory extends Block {
                 if(type.isFlying() || !anyEntities(tile)) {
                     entity.open = false;
                     entity.openCountdown = -1;
+                }else{
+                    entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.1f);
                 }
             }
         }

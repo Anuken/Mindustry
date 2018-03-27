@@ -32,12 +32,12 @@ public class NetCommon extends Module {
 
         Net.handle(BlockTapPacket.class, (packet) -> {
             Tile tile = world.tile(packet.position);
-            tile.block().tapped(tile);
+            threads.run(() -> tile.block().tapped(tile));
         });
 
         Net.handle(BlockConfigPacket.class, (packet) -> {
             Tile tile = world.tile(packet.position);
-            if (tile != null) tile.block().configure(tile, packet.data);
+            if (tile != null) threads.run(() -> tile.block().configure(tile, packet.data));
         });
     }
 

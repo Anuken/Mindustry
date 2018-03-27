@@ -2,20 +2,17 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.ai.Pathfind;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.blocks.ProductionBlocks;
 import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.io.Maps;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.WorldGenerator;
-import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.content.blocks.ProductionBlocks;
 import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
@@ -197,40 +194,6 @@ public class World extends Module{
 				toremove.setBlock(Blocks.air);
 			}
 		}
-	}
-	
-	public TileEntity findTileTarget(float x, float y, Tile tile, float range, boolean damaged){
-		Entity closest = null;
-		float dst = 0;
-		
-		int rad = (int)(range/tilesize)+1;
-		int tilex = Mathf.scl2(x, tilesize);
-		int tiley = Mathf.scl2(y, tilesize);
-		
-		for(int rx = -rad; rx <= rad; rx ++){
-			for(int ry = -rad; ry <= rad; ry ++){
-				Tile other = tile(rx+tilex, ry+tiley);
-				
-				if(other != null && other.getLinked() != null){
-					other = other.getLinked();
-				}
-				
-				if(other == null || other.entity == null || (tile != null && other.entity == tile.entity)) continue;
-				
-				TileEntity e = other.entity;
-				
-				if(damaged && e.health >= e.tile.block().health)
-					continue;
-				
-				float ndst = Vector2.dst(x, y, e.x, e.y);
-				if(ndst < range && (closest == null || ndst < dst)){
-					dst = ndst;
-					closest = e;
-				}
-			}
-		}
-
-		return (TileEntity) closest;
 	}
 
 	/**Raycast, but with world coordinates.*/

@@ -4,7 +4,6 @@ import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.Team;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.util.Mathf;
@@ -35,7 +34,6 @@ public class BaseUnit extends Unit {
 
 	@Override
 	public void move(float x, float y){
-		walkTime += Timers.delta();
 		baseRotation = Mathf.slerpDelta(baseRotation, Mathf.atan2(x, y), type.baseRotateSpeed);
 		super.move(x, y);
 	}

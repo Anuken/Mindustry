@@ -16,5 +16,14 @@ public class UnitBlocks {
         requirements = new ItemStack[]{
             new ItemStack(Items.stone, 5)
         };
+    }},
+
+    walkerFactory = new UnitFactory("walkerfactory"){{
+        type = UnitTypes.scout;
+        produceTime = 20;
+        size = 2;
+        requirements = new ItemStack[]{
+            new ItemStack(Items.stone, 1)
+        };
     }};
 }

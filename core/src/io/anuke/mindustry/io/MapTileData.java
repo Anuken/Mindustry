@@ -1,5 +1,6 @@
 package io.anuke.mindustry.io;
 
+import com.badlogic.gdx.utils.IntIntMap;
 import io.anuke.ucore.util.Bits;
 
 import java.nio.ByteBuffer;
@@ -15,16 +16,20 @@ public class MapTileData {
     private final TileDataMarker tile = new TileDataMarker();
     private final int width, height;
 
+    private final IntIntMap map;
+
     public MapTileData(int width, int height){
         this.width = width;
         this.height = height;
+        this.map = null;
         buffer = ByteBuffer.allocate(width * height * TILE_SIZE);
     }
 
-    public MapTileData(byte[] bytes, int width, int height){
+    public MapTileData(byte[] bytes, int width, int height, IntIntMap mapping){
         buffer = ByteBuffer.wrap(bytes);
         this.width = width;
         this.height = height;
+        this.map = mapping;
     }
 
     public byte[] toArray(){
@@ -72,7 +77,7 @@ public class MapTileData {
         buffer.position((x + width * y) * TILE_SIZE);
     }
 
-    public static class TileDataMarker {
+    public class TileDataMarker {
         public byte floor, wall;
         public byte rotation;
         public byte team;
@@ -83,6 +88,11 @@ public class MapTileData {
             byte rt = buffer.get();
             rotation = Bits.getLeftByte(rt);
             team = Bits.getRightByte(rt);
+
+            if(map != null){
+                floor = (byte)map.get(floor, floor);
+                wall = (byte)map.get(wall, wall);
+            }
         }
 
         public void write(ByteBuffer buffer){

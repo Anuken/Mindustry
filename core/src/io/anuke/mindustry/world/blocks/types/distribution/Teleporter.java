@@ -9,7 +9,6 @@ import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
@@ -33,7 +32,7 @@ public class Teleporter extends PowerBlock{
 	private Array<Tile> removal = new Array<>();
 	private Array<Tile> returns = new Array<>();
 
-	protected float powerPerItem = 0.8f;
+	protected float powerPerItem = 5f;
 
 	static{
 		for(int i = 0; i < colors; i ++){

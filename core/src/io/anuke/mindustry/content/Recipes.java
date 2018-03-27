@@ -53,17 +53,18 @@ public class Recipes {
 		new Recipe(weapon, WeaponBlocks.missileturret, stack(Items.steel, 70), stack(Items.titanium, 50), stack(Items.densealloy, 55)),
 		new Recipe(weapon, WeaponBlocks.fornaxcannon, stack(Items.steel, 70), stack(Items.titanium, 50), stack(Items.densealloy, 55)),
 
-		new Recipe(crafting, ProductionBlocks.smelter, stack(Items.iron, 40)),
-		new Recipe(crafting, ProductionBlocks.alloysmelter, stack(Items.titanium, 50), stack(Items.steel, 50)),
-		new Recipe(crafting, ProductionBlocks.coalextractor, stack(Items.steel, 10), stack(Items.iron, 10)),
-		new Recipe(crafting, ProductionBlocks.titaniumextractor, stack(Items.steel, 30), stack(Items.iron, 30)),
-		new Recipe(crafting, ProductionBlocks.oilrefinery, stack(Items.steel, 15), stack(Items.iron, 15)),
-		new Recipe(crafting, ProductionBlocks.stoneformer, stack(Items.steel, 10), stack(Items.iron, 10)),
-		new Recipe(crafting, ProductionBlocks.lavasmelter, stack(Items.steel, 30), stack(Items.titanium, 15)),
-		new Recipe(crafting, ProductionBlocks.siliconextractor, stack(Items.steel, 30), stack(Items.titanium, 15)),
-		new Recipe(crafting, ProductionBlocks.cryofluidmixer, stack(Items.steel, 30), stack(Items.titanium, 15)),
-		new Recipe(crafting, ProductionBlocks.weaponFactory, stack(Items.steel, 60), stack(Items.iron, 60)).setDesktop(),
-		//new Recipe(crafting, ProductionBlocks.centrifuge, stack(Item.steel, 30), stack(Item.iron, 30)),
+		new Recipe(crafting, CraftingBlocks.smelter, stack(Items.iron, 40)),
+		new Recipe(crafting, CraftingBlocks.alloysmelter, stack(Items.titanium, 50), stack(Items.steel, 50)),
+		new Recipe(crafting, CraftingBlocks.powersmelter, stack(Items.steel, 30), stack(Items.iron, 30)),
+		new Recipe(crafting, CraftingBlocks.extractor, stack(Items.steel, 10), stack(Items.iron, 10)),
+		new Recipe(crafting, CraftingBlocks.separator, stack(Items.steel, 30), stack(Items.iron, 30)),
+		new Recipe(crafting, CraftingBlocks.centrifuge, stack(Items.steel, 30), stack(Items.iron, 30)),
+		new Recipe(crafting, CraftingBlocks.oilRefinery, stack(Items.steel, 15), stack(Items.iron, 15)),
+		new Recipe(crafting, CraftingBlocks.biomassCompressor, stack(Items.steel, 15), stack(Items.iron, 15)),
+		new Recipe(crafting, CraftingBlocks.stoneFormer, stack(Items.steel, 10), stack(Items.iron, 10)),
+		new Recipe(crafting, CraftingBlocks.plasticFormer, stack(Items.steel, 30), stack(Items.titanium, 15)),
+		new Recipe(crafting, CraftingBlocks.cryofluidmixer, stack(Items.steel, 30), stack(Items.titanium, 15)),
+		new Recipe(crafting, CraftingBlocks.weaponFactory, stack(Items.steel, 60), stack(Items.iron, 60)).setDesktop(),
 
 		//new Recipe(production, ProductionBlocks.stonedrill, stack(Item.stone, 12)),
 		new Recipe(production, ProductionBlocks.irondrill, stack(Items.iron, 25)),
@@ -106,6 +107,9 @@ public class Recipes {
 		new Recipe(liquid, LiquidBlocks.fluxpump, stack(Items.steel, 10), stack(Items.densealloy, 5)),
 
 		new Recipe(units, UnitBlocks.flierFactory, stack(Items.steel, 10)),
+		new Recipe(units, UnitBlocks.walkerFactory, stack(Items.steel, 10)),
+
+		new Recipe(units, DebugBlocks.itemSource, stack(Items.steel, 10)).setDebug(),
 		new Recipe(units, DebugBlocks.powerVoid, stack(Items.steel, 10)).setDebug(),
 		new Recipe(units, DebugBlocks.powerInfinite, stack(Items.steel, 10), stack(Items.densealloy, 5)).setDebug()
 	);

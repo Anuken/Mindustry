@@ -2,7 +2,6 @@ package io.anuke.mindustry.editor;
 
 import com.badlogic.gdx.utils.Disposable;
 import io.anuke.mindustry.io.MapTileData;
-import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 
 import java.nio.ByteBuffer;
 
@@ -15,7 +14,7 @@ public class DrawOperation implements Disposable{
 	 *  packed data TO (use TileDataMarker's read/write methods)
 	 */
 	ByteBuffer operation;
-	TileDataMarker writer = new TileDataMarker();
+	//TileDataMarker writer = new TileDataMarker();
 
 	public DrawOperation(MapTileData data){
 		this.data = data;

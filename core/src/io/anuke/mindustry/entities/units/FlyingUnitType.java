@@ -53,6 +53,7 @@ public class FlyingUnitType extends UnitType {
         vec.set(unit.target.x - unit.x, unit.target.y - unit.y);
 
         float ang = vec.angle();
+        float len = vec.len();
 
         float circleLength = 40f;
 
@@ -64,7 +65,7 @@ public class FlyingUnitType extends UnitType {
 
         unit.velocity.add(vec); //TODO clamp it so it doesn't glitch out at low fps
 
-        if(unit.timer.get(timerReload, reload)){
+        if(unit.timer.get(timerReload, reload) && len < range){
             shoot(unit, BulletType.shot, ang, 4f);
         }
     }

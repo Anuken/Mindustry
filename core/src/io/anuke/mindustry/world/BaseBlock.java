@@ -47,6 +47,8 @@ public abstract class BaseBlock {
     }
 
     public void tryDumpLiquid(Tile tile){
+        if(tile.entity.liquid.amount < 0.001f) return;
+
         int size = tile.block().size;
 
         GridPoint2[] nearby = Edges.getEdges(size);

@@ -5,16 +5,56 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Predicate;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
 /**Utility class for unit and team interactions.*/
 public class Units {
     private static Rectangle rect = new Rectangle();
+
+    public static TileEntity findAllyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
+        return findTile(x, y, range, tile -> !state.teams.areEnemies(team, tile.getTeam()) && pred.test(tile));
+    }
+
+    public static TileEntity findEnemyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
+        return findTile(x, y, range, tile -> state.teams.areEnemies(team, tile.getTeam()) && pred.test(tile));
+    }
+
+    public static TileEntity findTile(float x, float y, float range, Predicate<Tile> pred){
+        Entity closest = null;
+        float dst = 0;
+
+        int rad = (int)(range/tilesize)+1;
+        int tilex = Mathf.scl2(x, tilesize);
+        int tiley = Mathf.scl2(y, tilesize);
+
+        for(int rx = -rad; rx <= rad; rx ++){
+            for(int ry = -rad; ry <= rad; ry ++){
+                Tile other = world.tile(rx+tilex, ry+tiley);
+
+                if(other != null) other = other.target();
+
+                if(other == null || other.entity == null || !pred.test(other)) continue;
+
+                TileEntity e = other.entity;
+
+                float ndst = Vector2.dst(x, y, e.x, e.y);
+                if(ndst < range && (closest == null || ndst < dst)){
+                    dst = ndst;
+                    closest = e;
+                }
+            }
+        }
+
+        return (TileEntity) closest;
+    }
 
     /**Iterates over all units on all teams, including players.*/
     public static void allUnits(Consumer<Unit> cons){
