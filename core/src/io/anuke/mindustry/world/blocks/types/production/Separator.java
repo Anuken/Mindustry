@@ -10,7 +10,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 
 /**Extracts a random list of items from an input item and an input liquid.*/
-public class Filtrator extends Block {
+public class Separator extends Block {
     protected final int timerDump = timers ++;
 
     protected Liquid liquid;
@@ -19,7 +19,9 @@ public class Filtrator extends Block {
     protected float liquidUse;
     protected float filterTime;
 
-    public Filtrator(String name) {
+    protected boolean offloading = false;
+
+    public Separator(String name) {
         super(name);
         update = true;
         solid = true;
@@ -37,12 +39,18 @@ public class Filtrator extends Block {
 
         if(entity.liquid.amount >= liquidUsed && entity.inventory.hasItem(item)){
             entity.progress += 1f/filterTime;
+            entity.liquid.amount -= liquidUsed;
         }
 
         if(entity.progress >= 1f){
             entity.progress = 0f;
             Item item = Mathf.select(results);
-            if(item != null) offloadNear(tile, item);
+            entity.inventory.removeItem(this.item, 1);
+            if(item != null){
+                offloading = true;
+                offloadNear(tile, item);
+                offloading = false;
+            }
         }
 
         if(entity.timer.get(timerDump, 5)){
@@ -52,7 +60,7 @@ public class Filtrator extends Block {
 
     @Override
     public boolean canDump(Tile tile, Tile to, Item item) {
-        return item != this.item;
+        return offloading || item != this.item;
     }
 
     @Override

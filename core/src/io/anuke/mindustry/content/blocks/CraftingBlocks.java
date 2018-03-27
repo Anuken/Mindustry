@@ -60,20 +60,21 @@ public class CraftingBlocks {
         size = 2;
     }},
 
-    separator = new Filtrator("separator") {{
+    separator = new Separator("separator") {{
         liquid = Liquids.water;
         item = Items.stone;
         results = new Item[]{
-            null, null, null, null, null,
-            Items.stone, Items.stone, Items.stone, Items.stone,
-            Items.iron, Items.iron, Items.iron,
+            null, null, null, null, null, null, null, null, null, null, null, null,
+            Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone,
+            Items.iron, Items.iron, Items.iron, Items.iron,
             Items.lead, Items.lead,
             Items.coal, Items.coal,
             Items.titanium
         };
 
-        liquidUse = 0.1f;
+        liquidUse = 0.2f;
         filterTime = 40f;
+        itemCapacity = 40;
 
         health = 50;
     }},
@@ -111,7 +112,7 @@ public class CraftingBlocks {
         hasPower = hasLiquids = true;
     }},
 
-    biomassCompressor = new PowerCrafter("biomasscompressor") {{
+    biomatterCompressor = new PowerCrafter("biomattercompressor") {{
         input = new ItemStack(Items.biomatter, 1);
         liquidCapacity = 60f;
         powerUse = 0.05f;

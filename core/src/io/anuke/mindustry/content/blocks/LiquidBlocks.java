@@ -11,11 +11,11 @@ public class LiquidBlocks {
     public static final Block
 
     pump = new Pump("pump") {{
-        pumpAmount = 0.8f;
+        pumpAmount = 0.1f;
     }},
 
     fluxpump = new Pump("fluxpump") {{
-        pumpAmount = 1.2f;
+        pumpAmount = 0.2f;
     }},
 
     conduit = new Conduit("conduit") {{

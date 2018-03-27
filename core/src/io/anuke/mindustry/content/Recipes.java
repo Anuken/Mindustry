@@ -60,7 +60,7 @@ public class Recipes {
 		new Recipe(crafting, CraftingBlocks.separator, stack(Items.steel, 30), stack(Items.iron, 30)),
 		new Recipe(crafting, CraftingBlocks.centrifuge, stack(Items.steel, 30), stack(Items.iron, 30)),
 		new Recipe(crafting, CraftingBlocks.oilRefinery, stack(Items.steel, 15), stack(Items.iron, 15)),
-		new Recipe(crafting, CraftingBlocks.biomassCompressor, stack(Items.steel, 15), stack(Items.iron, 15)),
+		new Recipe(crafting, CraftingBlocks.biomatterCompressor, stack(Items.steel, 15), stack(Items.iron, 15)),
 		new Recipe(crafting, CraftingBlocks.stoneFormer, stack(Items.steel, 10), stack(Items.iron, 10)),
 		new Recipe(crafting, CraftingBlocks.plasticFormer, stack(Items.steel, 30), stack(Items.titanium, 15)),
 		new Recipe(crafting, CraftingBlocks.cryofluidmixer, stack(Items.steel, 30), stack(Items.titanium, 15)),

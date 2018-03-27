@@ -25,7 +25,7 @@ public class Conveyor extends Block{
 	private static ItemPos drawpos = new ItemPos();
 	private static ItemPos pos1 = new ItemPos();
 	private static ItemPos pos2 = new ItemPos();
-	private static final float itemSpace = 0.135f * 1.3f;
+	private static final float itemSpace = 0.135f * 2f;
 	private static final float offsetScl = 128f*3f;
 	private static final float itemSize = 5f;
 	private static final float minmove = 1f / (Short.MAX_VALUE - 2);
@@ -142,7 +142,7 @@ public class Conveyor extends Block{
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		int direction = source == null ? 0 : Math.abs(source.relativeTo(tile.x, tile.y) - tile.getRotation());
 		float minitem = tile.<ConveyorEntity>entity().minitem;
-		return (((direction == 0) && minitem > 0.05f) ||
+		return (((direction == 0) && minitem > itemSpace) ||
 				((direction %2 == 1) && minitem > 0.52f)) && (source == null || !(source.block().rotate && (source.getRotation() + 2) % 4 == tile.getRotation()));
 	}
 

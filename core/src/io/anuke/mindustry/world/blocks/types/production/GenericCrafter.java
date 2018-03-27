@@ -33,7 +33,6 @@ public class GenericCrafter extends Block{
 	public GenericCrafter(String name) {
 		super(name);
 		update = true;
-		rotate = false;
 		solid = true;
 		health = 60;
 	}
