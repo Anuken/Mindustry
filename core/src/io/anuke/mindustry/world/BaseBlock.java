@@ -111,10 +111,12 @@ public abstract class BaseBlock {
         int size = tile.block().size;
 
         GridPoint2[] nearby = Edges.getEdges(size);
+        byte i = (byte)(tile.getDump() % nearby.length);
 
         for(int j = 0; j < nearby.length; j ++){
-            Tile other = tile.getNearby(nearby[j]);
-            Tile in = tile.getNearby(Edges.getInsideEdges(size)[j]);
+            tile.setDump((byte)((i + 1) % nearby.length));
+            Tile other = tile.getNearby(nearby[i]);
+            Tile in = tile.getNearby(Edges.getInsideEdges(size)[i]);
             if(other != null && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
                 other.block().handleItem(item, other, in);
                 return;

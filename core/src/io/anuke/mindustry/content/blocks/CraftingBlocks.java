@@ -41,8 +41,9 @@ public class CraftingBlocks {
 
     powersmelter = new PowerSmelter("powersmelter") {{
         health = 90;
+        craftEffect = Fx.smeltsmoke;
         inputs = new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.iron, 1)};
-        result = Items.densealloy;
+        result = Items.steel;
         burnDuration = 45f;
         powerUse = 0.1f;
         craftTime = 25f;

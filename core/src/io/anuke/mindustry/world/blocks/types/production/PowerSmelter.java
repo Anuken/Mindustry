@@ -14,7 +14,6 @@ import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
@@ -131,21 +130,19 @@ public class PowerSmelter extends PowerBlock {
 
         PowerSmelterEntity entity = tile.entity();
 
-        Log.info(entity.heat + "");
-
         //draw glowing center
         if(entity.heat > 0f){
             float g = 0.3f;
             float r = 0.06f;
             float cr = Mathf.random(0.1f);
 
-            Draw.alpha(((1f-g) + Mathf.absin(Timers.time(), 9f, g) + Mathf.random(r) - r) * entity.heat);
+            Draw.alpha(((1f-g) + Mathf.absin(Timers.time(), 8f, g) + Mathf.random(r) - r) * entity.heat);
 
             Draw.tint(Color.valueOf("ffc999"));
-            Fill.circle(tile.drawx(), tile.drawy(), 3f + Mathf.absin(Timers.time(), 6f, 2f) + cr);
+            Fill.circle(tile.drawx(), tile.drawy(), 3f + Mathf.absin(Timers.time(), 5f, 2f) + cr);
             Draw.color(1f, 1f, 1f, entity.heat);
             Draw.rect(name + "-top", tile.drawx(), tile.drawy());
-            Fill.circle(tile.drawx(), tile.drawy(), 2f + Mathf.absin(Timers.time(), 6f, 1f) + cr);
+            Fill.circle(tile.drawx(), tile.drawy(), 1.9f + Mathf.absin(Timers.time(), 5f, 1f) + cr);
 
             Draw.color();
         }
