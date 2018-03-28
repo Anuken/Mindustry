@@ -17,6 +17,10 @@ import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 public class PowerSmelter extends PowerBlock {
     protected final int timerDump = timers++;
     protected final int timerCraft = timers++;
@@ -32,10 +36,10 @@ public class PowerSmelter extends PowerBlock {
     protected float minHeat = 0.5f;
 
     protected float craftTime = 20f; //time to craft one item, so max 3 items per second by default
-    protected float burnDuration = 50f; //by default, the fuel will burn 45 frames, so that's 2.5 items/fuel at most
     protected float burnEffectChance = 0.01f;
     protected Effect craftEffect = Fx.smelt,
             burnEffect = Fx.fuelburn;
+    protected Color flameColor = Color.valueOf("ffc999");
 
     protected int capacity = 20;
 
@@ -62,7 +66,6 @@ public class PowerSmelter extends PowerBlock {
        // stats.add("input", Arrays.toString(inputs));
         stats.add("powersecond", Strings.toFixed(powerUse *60f, 2));
         //stats.add("output", result);
-        stats.add("fuelduration", Strings.toFixed(burnDuration/60f, 1));
         stats.add("maxoutputsecond", Strings.toFixed(60f/craftTime, 1));
         stats.add("inputcapacity", capacity);
         stats.add("outputcapacity", capacity);
@@ -138,7 +141,7 @@ public class PowerSmelter extends PowerBlock {
 
             Draw.alpha(((1f-g) + Mathf.absin(Timers.time(), 8f, g) + Mathf.random(r) - r) * entity.heat);
 
-            Draw.tint(Color.valueOf("ffc999"));
+            Draw.tint(flameColor);
             Fill.circle(tile.drawx(), tile.drawy(), 3f + Mathf.absin(Timers.time(), 5f, 2f) + cr);
             Draw.color(1f, 1f, 1f, entity.heat);
             Draw.rect(name + "-top", tile.drawx(), tile.drawy());
@@ -155,5 +158,15 @@ public class PowerSmelter extends PowerBlock {
 
     class PowerSmelterEntity extends TileEntity{
         public float heat;
+
+        @Override
+        public void write(DataOutputStream stream) throws IOException {
+            stream.writeFloat(heat);
+        }
+
+        @Override
+        public void read(DataInputStream stream) throws IOException {
+            heat = stream.readFloat();
+        }
     }
 }

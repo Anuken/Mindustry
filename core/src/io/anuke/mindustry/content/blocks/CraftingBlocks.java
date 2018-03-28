@@ -34,7 +34,6 @@ public class CraftingBlocks {
         inputs = new ItemStack[]{new ItemStack(Items.titanium, 4), new ItemStack(Items.thorium, 4)};
         result = Items.densealloy;
         powerUse = 0.3f;
-        burnDuration = 45f;
         craftTime = 25f;
         size = 2;
     }},
@@ -44,7 +43,6 @@ public class CraftingBlocks {
         craftEffect = Fx.smeltsmoke;
         inputs = new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.iron, 1)};
         result = Items.steel;
-        burnDuration = 45f;
         powerUse = 0.1f;
         craftTime = 25f;
         size = 2;

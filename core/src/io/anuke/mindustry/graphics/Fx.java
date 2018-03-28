@@ -22,6 +22,8 @@ public class Fx{
 	public static Color beamLight = Color.valueOf("ddffe9");
 	
 	public static final Effect
+
+	none = new Effect(0, 0f, e->{}),
 	
 	generatorexplosion = new Effect(28, 40f, e -> {
 		Angles.randLenVectors(e.id, 16, 10f + e.ifract()*8f, (x, y)->{

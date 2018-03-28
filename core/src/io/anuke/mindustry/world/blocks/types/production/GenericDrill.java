@@ -29,6 +29,15 @@ public class GenericDrill extends Drill{
 
         DrillEntity entity = tile.entity();
 
+        float multiplier = 0f;
+
+        for(Tile other : tile.getLinkedTiles(tempTiles)){
+            if(isValid(other)){
+                toAdd.add(result == null ? other.floor().drops.item : result);
+                multiplier += 1f;
+            }
+        }
+
         float powerUsed = Math.min(powerCapacity, powerUse * Timers.delta());
         float liquidUsed = Math.min(liquidCapacity, liquidUse * Timers.delta());
 
@@ -36,25 +45,24 @@ public class GenericDrill extends Drill{
                 && (!hasLiquids || entity.liquid.amount >= liquidUsed)){
             if(hasPower) entity.power.amount -= powerUsed;
             if(hasLiquids) entity.liquid.amount -= liquidUsed;
-            entity.time += Timers.delta();
+            entity.time += Timers.delta() * multiplier;
         }else{
             return;
         }
 
-        for(Tile other : tile.getLinkedTiles(tempTiles)){
-            if(isValid(other)){
-                toAdd.add(result == null ? other.floor().drops.item : result);
-            }
-        }
-
         if(toAdd.size > 0 && entity.time >= drillTime
                 && tile.entity.inventory.totalItems() < itemCapacity){
-            for(Item item : toAdd) offloadNear(tile, item);
-            Effects.effect(drillEffect, tile.drawx(), tile.drawy());
+
+            int index = entity.index % toAdd.size;
+            offloadNear(tile, toAdd.get(index));
+
+            entity.index ++;
             entity.time = 0f;
+
+            Effects.effect(drillEffect, tile.drawx(), tile.drawy());
         }
 
-        if(entity.timer.get(timerDump, 30)){
+        if(entity.timer.get(timerDump, 15)){
             tryDump(tile);
         }
     }
@@ -78,7 +86,8 @@ public class GenericDrill extends Drill{
         return new DrillEntity();
     }
 
-    static class DrillEntity extends TileEntity{
+    public static class DrillEntity extends TileEntity{
         public float time;
+        public int index;
     }
 }

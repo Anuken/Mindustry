@@ -3,6 +3,7 @@ package io.anuke.mindustry.content.blocks;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.blocks.types.production.Cultivator;
 import io.anuke.mindustry.world.blocks.types.production.Drill;
 import io.anuke.mindustry.world.blocks.types.production.GenericDrill;
 import io.anuke.mindustry.world.blocks.types.production.SolidPump;
@@ -93,7 +94,7 @@ public class ProductionBlocks {
         liquidCapacity = 80f;
     }},
 
-    cultivator = new GenericDrill("cultivator") {{
+    cultivator = new Cultivator("cultivator") {{
         resource = Blocks.grass;
         result = Items.biomatter;
         inputLiquid = Liquids.water;
