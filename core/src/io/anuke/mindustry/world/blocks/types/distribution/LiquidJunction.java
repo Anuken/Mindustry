@@ -14,6 +14,7 @@ public class LiquidJunction extends LiquidBlock{
 		update = true;
 		solid = true;
 		rotate = false;
+		hasLiquids = false;
 	}
 	
 	@Override

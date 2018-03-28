@@ -112,13 +112,14 @@ public class CraftingBlocks {
         hasPower = hasLiquids = true;
     }},
 
-    biomatterCompressor = new PowerCrafter("biomattercompressor") {{
+    biomatterCompressor = new Compressor("biomattercompressor") {{
         input = new ItemStack(Items.biomatter, 1);
         liquidCapacity = 60f;
+        itemCapacity = 50;
         powerUse = 0.05f;
         craftTime = 10f;
         outputLiquid = Liquids.oil;
-        outputLiquidAmount = 0.4f;
+        outputLiquidAmount = 0.05f;
         size = 2;
         health = 320;
         hasLiquids = true;

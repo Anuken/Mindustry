@@ -41,6 +41,7 @@ public class Conveyor extends Block{
 		update = true;
 		layer = Layer.overlay;
 		group = BlockGroup.transportation;
+		hasInventory = false;
 	}
 
 	@Override
