@@ -79,8 +79,8 @@ public class GenericCrafter extends Block{
 		float liquidUsed = Math.min(liquidCapacity, liquidUse * Timers.delta());
 		int itemsUsed = (inputItem == null ? 0 : (int)(1 + inputItem.amount * entity.progress));
 
-		if((!hasLiquids || liquidUsed > entity.liquid.amount) &&
-				(!hasPower || powerUsed > entity.power.amount) &&
+		if((!hasLiquids || entity.liquid.amount >= liquidUsed) &&
+				(!hasPower || entity.power.amount >= powerUsed) &&
 				(inputItem == null || entity.inventory.hasItem(inputItem.item, itemsUsed))){
 
 			entity.progress += 1f / craftTime * Timers.delta();
@@ -92,7 +92,8 @@ public class GenericCrafter extends Block{
 			
 			if(inputItem != null) tile.entity.inventory.removeItem(inputItem);
 			offloadNear(tile, output);
-			Effects.effect(craftEffect, tile.worldx(), tile.worldy());
+			Effects.effect(craftEffect, tile.drawx(), tile.drawy());
+			entity.progress = 0f;
 		}
 		
 		if(tile.entity.timer.get(timerDump, 5)){

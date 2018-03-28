@@ -102,11 +102,12 @@ public class CraftingBlocks {
 
     plasticFormer = new GenericCrafter("plasticformer") {{
         inputLiquid = Liquids.oil;
-        liquidUse = 0.1f;
+        liquidUse = 0.3f;
         liquidCapacity = 60f;
-        powerUse = 0.05f;
-        craftTime = 70f;
+        powerUse = 0.3f;
+        craftTime = 80f;
         output = Items.plastic;
+        itemCapacity = 30;
         size = 2;
         health = 320;
         hasPower = hasLiquids = true;
@@ -119,7 +120,7 @@ public class CraftingBlocks {
         powerUse = 0.05f;
         craftTime = 10f;
         outputLiquid = Liquids.oil;
-        outputLiquidAmount = 0.05f;
+        outputLiquidAmount = 0.08f;
         size = 2;
         health = 320;
         hasLiquids = true;

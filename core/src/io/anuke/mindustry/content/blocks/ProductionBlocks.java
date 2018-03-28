@@ -80,16 +80,16 @@ public class ProductionBlocks {
 
     waterextractor = new SolidPump("waterextractor") {{
         result = Liquids.water;
-        powerUse = 0.1f;
-        pumpAmount = 0.4f;
+        powerUse = 0.2f;
+        pumpAmount = 0.1f;
         size = 2;
         liquidCapacity = 30f;
     }},
 
     oilextractor = new SolidPump("oilextractor") {{
         result = Liquids.oil;
-        powerUse = 0.5f;
-        pumpAmount = 0.4f;
+        powerUse = 0.6f;
+        pumpAmount = 0.06f;
         size = 3;
         liquidCapacity = 80f;
     }},
@@ -98,8 +98,8 @@ public class ProductionBlocks {
         resource = Blocks.grass;
         result = Items.biomatter;
         inputLiquid = Liquids.water;
-        liquidUse = 0.1f;
-        drillTime = 300;
+        liquidUse = 0.2f;
+        drillTime = 260;
         size = 2;
         hasLiquids = true;
         hasPower = true;
