@@ -201,13 +201,39 @@ public class FileChooser extends FloatingDialog {
 		
 		ButtonGroup<TextButton> group = new ButtonGroup<TextButton>();
 		group.setMinCheckCount(0);
-
-		for(FileHandle file : names){
+		
+		////////////////////////////////////////////////////////////////
+		// Contributer's name (On discord)://///////////////////////////
+		// we need moar missiles#6435 //////////////////////////////////
+		/*Sorting time!*/
+		String[] sortedNames = new String[names.length];
+		FileHandle[] sortedFiles = new FileHandle[names.length];
+		for (int i = 0; i < names.length; i++) {
+			sortedNames[i] = names[i].name().toLowerCase();
+			sortedFiles[i] = null;
+		}
+		Arrays.sort(sortedNames);
+		for (int i = 0; i < names.length; i++) {
+			for (int j = 0; j < sortedNames.length; j++) {
+				if(sortedNames[j].equals(names[i].name().toLowerCase())){
+					sortedFiles[j] = names[i];
+					break;
+				}
+			}
+		}
+		names = sortedFiles;
+		/*Sorting over.*/
+		// Contributer's name (On discord)://///////////////////////////
+		// we need moar missiles#6435 //////////////////////////////////
+		////////////////////////////////////////////////////////////////
+		
+		for(int i = 0; i < names.length; i++){
+			FileHandle file = names[i];
 			if( !file.isDirectory() && !filter.test(file)) continue; //skip non-filtered files
 
 			String filename = file.name();
 
-			TextButton button = new TextButton(shorten(filename), "toggle");
+			TextButton button = new TextButton(shorten(sortedFiles[i].name()), "toggle");
 			group.add(button);
 			
 			button.clicked(()->{
