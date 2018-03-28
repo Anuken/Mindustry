@@ -174,10 +174,10 @@ public class NetServer extends Module{
 
             float wtrc = 60;
 
-            if(TimeUtils.millis() < info.lastFastShot + wtrc*1000){
+            if(TimeUtils.millis() < info.lastFastShot + (int)(wtrc/60f*1000)){
                 info.fastShots ++;
 
-                if(info.fastShots - 10 > (int)(wtrc / (weapon.getReload() / 2f))){
+                if(info.fastShots - 6 > (int)(wtrc / (weapon.getReload() / 2f))){
                     kick(id, KickReason.kick);
                 }
             }else{
