@@ -159,7 +159,7 @@ public class FileChooser extends FloatingDialog {
 		Arrays.sort(handles, (a, b) ->{
 			if(a.isDirectory() && !b.isDirectory()) return -1;
 			if( !a.isDirectory() && b.isDirectory()) return 1;
-			return a.name().compareTo(b.name());
+			return a.name().toUpperCase().compareTo(b.name().toUpperCase());
 		});
 		return handles;
 	}
