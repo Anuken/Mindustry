@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
@@ -12,6 +13,8 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Fill;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
@@ -24,7 +27,7 @@ public class PowerSmelter extends PowerBlock {
      * Everything else in each array: requirements. Can have duplicates.*/
     protected ItemStack[] inputs;
     protected Item result;
-    protected float powerDrain = 0.01f;
+    protected float powerUse;
 
     protected float heatUpTime = 80f;
     protected float minHeat = 0.5f;
@@ -32,7 +35,8 @@ public class PowerSmelter extends PowerBlock {
     protected float craftTime = 20f; //time to craft one item, so max 3 items per second by default
     protected float burnDuration = 50f; //by default, the fuel will burn 45 frames, so that's 2.5 items/fuel at most
     protected float burnEffectChance = 0.01f;
-    protected Effect craftEffect = Fx.smelt, burnEffect = Fx.fuelburn;
+    protected Effect craftEffect = Fx.smelt,
+            burnEffect = Fx.fuelburn;
 
     protected int capacity = 20;
 
@@ -57,7 +61,7 @@ public class PowerSmelter extends PowerBlock {
         super.setStats();
         //TODO input/outputs
        // stats.add("input", Arrays.toString(inputs));
-        stats.add("powersecond", Strings.toFixed(powerDrain*60f, 2));
+        stats.add("powersecond", Strings.toFixed(powerUse *60f, 2));
         //stats.add("output", result);
         stats.add("fuelduration", Strings.toFixed(burnDuration/60f, 1));
         stats.add("maxoutputsecond", Strings.toFixed(60f/craftTime, 1));
@@ -74,15 +78,16 @@ public class PowerSmelter extends PowerBlock {
             tryDump(tile, result);
         }
 
-        float used = powerDrain * Timers.delta();
+        float used = powerUse * Timers.delta();
 
         //heat it up if there's enough power
         if(entity.power.amount > used){
             entity.power.amount -= used;
-            entity.heat += 1f /heatUpTime;
-            if(Mathf.chance(Timers.delta() * burnEffectChance)) Effects.effect(burnEffect, entity.x + Mathf.range(2f), entity.y + Mathf.range(2f));
+            entity.heat += 1f / heatUpTime;
+            if(Mathf.chance(Timers.delta() * burnEffectChance))
+                Effects.effect(burnEffect, entity.x + Mathf.range(size*4f), entity.y + Mathf.range(size*4));
         }else{
-            entity.heat -= 1f /heatUpTime;
+            entity.heat -= 1f / heatUpTime;
         }
 
         entity.heat = Mathf.clamp(entity.heat);
@@ -126,10 +131,22 @@ public class PowerSmelter extends PowerBlock {
 
         PowerSmelterEntity entity = tile.entity();
 
+        Log.info(entity.heat + "");
+
         //draw glowing center
         if(entity.heat > 0f){
-            Draw.color(1f, 1f, 1f, Mathf.absin(Timers.time(), 9f, 0.4f) + Mathf.random(0.05f));
-            Draw.rect("smelter-middle", tile.drawx(), tile.drawy());
+            float g = 0.3f;
+            float r = 0.06f;
+            float cr = Mathf.random(0.1f);
+
+            Draw.alpha(((1f-g) + Mathf.absin(Timers.time(), 9f, g) + Mathf.random(r) - r) * entity.heat);
+
+            Draw.tint(Color.valueOf("ffc999"));
+            Fill.circle(tile.drawx(), tile.drawy(), 3f + Mathf.absin(Timers.time(), 6f, 2f) + cr);
+            Draw.color(1f, 1f, 1f, entity.heat);
+            Draw.rect(name + "-top", tile.drawx(), tile.drawy());
+            Fill.circle(tile.drawx(), tile.drawy(), 2f + Mathf.absin(Timers.time(), 6f, 1f) + cr);
+
             Draw.color();
         }
     }

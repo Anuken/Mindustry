@@ -40,5 +40,19 @@ public class DebugBlocks {
         public boolean acceptItem(Item item, Tile tile, Tile source){
             return false;
         }
+    },
+
+    itemVoid = new Block("itemvoid"){
+        {
+            update = solid = true;
+        }
+
+        @Override
+        public void handleItem(Item item, Tile tile, Tile source) {}
+
+        @Override
+        public boolean acceptItem(Item item, Tile tile, Tile source){
+            return true;
+        }
     };
 }

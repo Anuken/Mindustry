@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntArray;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Edges;
-import io.anuke.mindustry.world.Layer;
+import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Settings;

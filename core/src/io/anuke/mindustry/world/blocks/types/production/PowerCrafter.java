@@ -13,6 +13,7 @@ import io.anuke.ucore.util.Mathf;
 public class PowerCrafter extends Block{
     protected final int timerDump = timers++;
 
+    /**Required.*/
     protected ItemStack input;
     /**Optional.*/
     protected Item outputItem;
@@ -26,6 +27,7 @@ public class PowerCrafter extends Block{
         super(name);
         solid = true;
         update = true;
+        hasPower = true;
     }
 
     @Override

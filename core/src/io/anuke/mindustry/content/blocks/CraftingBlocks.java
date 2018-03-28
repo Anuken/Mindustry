@@ -28,11 +28,23 @@ public class CraftingBlocks {
         craftTime = 25f;
     }},
 
-    powersmelter = new PowerSmelter("powersmelter") {{
+    poweralloysmelter = new PowerSmelter("poweralloysmelter") {{
         health = 90;
+        craftEffect = Fx.smeltsmoke;
         inputs = new ItemStack[]{new ItemStack(Items.titanium, 4), new ItemStack(Items.thorium, 4)};
         result = Items.densealloy;
+        powerUse = 0.3f;
         burnDuration = 45f;
+        craftTime = 25f;
+        size = 2;
+    }},
+
+    powersmelter = new PowerSmelter("powersmelter") {{
+        health = 90;
+        inputs = new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.iron, 1)};
+        result = Items.densealloy;
+        burnDuration = 45f;
+        powerUse = 0.1f;
         craftTime = 25f;
         size = 2;
     }},
@@ -48,23 +60,22 @@ public class CraftingBlocks {
         size = 2;
     }},
 
-    //TODO implement melter
-    melter = new LiquidMixer("melter") {{
+    melter = new PowerCrafter("melter") {{
         health = 200;
-        inputLiquid = Liquids.water;
-        outputLiquid = Liquids.cryofluid;
-        inputItem = Items.titanium;
-        liquidPerItem = 50f;
+        outputLiquid = Liquids.lava;
+        outputLiquidAmount = 0.05f;
+        input = new ItemStack(Items.stone, 1);
         itemCapacity = 50;
+        craftTime = 10f;
         powerUse = 0.1f;
-        size = 2;
+        hasLiquids = hasPower = true;
     }},
 
     separator = new Separator("separator") {{
         liquid = Liquids.water;
         item = Items.stone;
         results = new Item[]{
-            null, null, null, null, null, null, null, null, null, null, null, null,
+            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
             Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone,
             Items.iron, Items.iron, Items.iron, Items.iron,
             Items.lead, Items.lead,
@@ -77,16 +88,6 @@ public class CraftingBlocks {
         itemCapacity = 40;
 
         health = 50;
-    }},
-
-    extractor = new GenericCrafter("extractor") {{
-        inputItem = new ItemStack(Items.stone, 6);
-        inputLiquid = Liquids.water;
-        liquidUse = 0.1f;
-        output = Items.coal;
-        health = 50;
-        craftTime = 50;
-        hasInventory = hasLiquids = true;
     }},
 
     centrifuge = new GenericCrafter("centrifuge") {{

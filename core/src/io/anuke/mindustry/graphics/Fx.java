@@ -211,6 +211,14 @@ public class Fx{
 			Draw.reset();
 		});
 	}),
+
+	smeltsmoke = new Effect(15, e -> {
+		Angles.randLenVectors(e.id, 6, 4f + e.ifract()*5f, (x, y)->{
+			Draw.color(Color.WHITE, Color.valueOf("ffc999"), e.ifract());
+			Fill.poly(e.x + x, e.y + y, 4, 0.5f+e.fract()*2f, 45);
+			Draw.reset();
+		});
+	}),
 	
 	blastsmoke = new Effect(26, e -> {
 		Angles.randLenVectors(e.id, 12, 1f + e.ifract()*23f, (x, y)->{

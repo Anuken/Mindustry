@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world;
+package io.anuke.mindustry.graphics;
 
 public enum Layer{
 	/**Base block layer.*/

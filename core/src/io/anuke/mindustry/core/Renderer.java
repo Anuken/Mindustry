@@ -23,7 +23,7 @@ import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.BlockBar;
-import io.anuke.mindustry.world.Layer;
+import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.ucore.core.*;

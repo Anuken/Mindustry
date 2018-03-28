@@ -9,6 +9,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.DrawLayer;
 import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.ItemStack;
@@ -85,7 +86,7 @@ public class Block extends BaseBlock {
 	/**Draw layer. Only used for 'cached' rendering.*/
 	public DrawLayer drawLayer = DrawLayer.normal;
 	/**Layer to draw extra stuff on.*/
-	public Layer layer = null;
+	public io.anuke.mindustry.graphics.Layer layer = null;
 	/**Extra layer to draw extra extra stuff on.*/
 	public Layer layer2 = null;
 	/**whether this block can be replaced in all cases*/

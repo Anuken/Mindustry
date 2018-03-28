@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.types.production;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.BlockGroup;
-import io.anuke.mindustry.world.Layer;
+import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidBlock;
 import io.anuke.ucore.core.Timers;

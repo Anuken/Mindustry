@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.StaticBlock;
@@ -125,7 +124,7 @@ public class BlockRenderer{
 		
 		for(; iterateidx < requestidx; iterateidx ++){
 
-			if(iterateidx < requests.size - 1 && requests.get(iterateidx).layer.ordinal() > stopAt.ordinal()){
+			if(iterateidx < requests.size && requests.get(iterateidx).layer.ordinal() > stopAt.ordinal()){
 				break;
 			}
 			
@@ -143,15 +142,15 @@ public class BlockRenderer{
 	}
 
 	public void drawTeamBlocks(Layer layer, Team team){
-		int iterateidx = this.iterateidx;
+		int index = this.iterateidx;
 
-		for(; iterateidx < requestidx; iterateidx ++){
+		for(; index < requestidx; index ++){
 
-			if(iterateidx < requests.size - 1 && requests.get(iterateidx).layer.ordinal() > layer.ordinal()){
+			if(index < requests.size && requests.get(index).layer.ordinal() > layer.ordinal()){
 				break;
 			}
 
-			BlockRequest req = requests.get(iterateidx);
+			BlockRequest req = requests.get(index);
 			if(req.tile.getTeam() != team) continue;
 			Block block = req.tile.block();
 
@@ -166,7 +165,7 @@ public class BlockRenderer{
 	public void skipLayer(Layer stopAt){
 
 		for(; iterateidx < requestidx; iterateidx ++){
-			if(iterateidx < requests.size - 1 && requests.get(iterateidx).layer.ordinal() > stopAt.ordinal()){
+			if(iterateidx < requests.size && requests.get(iterateidx).layer.ordinal() > stopAt.ordinal()){
 				break;
 			}
 		}

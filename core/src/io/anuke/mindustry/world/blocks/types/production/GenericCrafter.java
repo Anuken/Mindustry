@@ -58,7 +58,7 @@ public class GenericCrafter extends Block{
 	public void draw(Tile tile){
 		Draw.rect(name(), tile.drawx(), tile.drawy());
 		
-		if(tile.entity.liquid.liquid == null) return;
+		if(!hasLiquids) return;
 		
 		Draw.color(tile.entity.liquid.liquid.color);
 		Draw.alpha(tile.entity.liquid.amount / liquidCapacity);
@@ -81,11 +81,11 @@ public class GenericCrafter extends Block{
 
 		if((!hasLiquids || liquidUsed > entity.liquid.amount) &&
 				(!hasPower || powerUsed > entity.power.amount) &&
-				(!hasInventory || entity.inventory.hasItem(inputItem.item, itemsUsed))){
+				(inputItem == null || entity.inventory.hasItem(inputItem.item, itemsUsed))){
 
 			entity.progress += 1f / craftTime * Timers.delta();
-			entity.power.amount -= powerUsed;
-			entity.liquid.amount -= liquidUsed;
+			if(hasPower) entity.power.amount -= powerUsed;
+			if(hasLiquids) entity.liquid.amount -= liquidUsed;
 		}
 
 		if(entity.progress >= 1f){
