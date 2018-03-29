@@ -3,10 +3,7 @@ package io.anuke.mindustry.content.blocks;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.production.Cultivator;
-import io.anuke.mindustry.world.blocks.types.production.Drill;
-import io.anuke.mindustry.world.blocks.types.production.GenericDrill;
-import io.anuke.mindustry.world.blocks.types.production.SolidPump;
+import io.anuke.mindustry.world.blocks.types.production.*;
 
 public class ProductionBlocks {
     public static final Block
@@ -86,8 +83,10 @@ public class ProductionBlocks {
         liquidCapacity = 30f;
     }},
 
-    oilextractor = new SolidPump("oilextractor") {{
+    oilextractor = new Fracker("oilextractor") {{
         result = Liquids.oil;
+        inputLiquid = Liquids.water;
+        inputLiquidUse = 0.3f;
         powerUse = 0.6f;
         pumpAmount = 0.06f;
         size = 3;

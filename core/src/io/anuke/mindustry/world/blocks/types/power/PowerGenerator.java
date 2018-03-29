@@ -82,5 +82,6 @@ public class PowerGenerator extends PowerBlock {
 
     public static class GeneratorEntity extends TileEntity{
         public float generateTime;
+        public float uptime;
     }
 }

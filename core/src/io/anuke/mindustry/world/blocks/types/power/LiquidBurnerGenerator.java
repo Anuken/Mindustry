@@ -4,6 +4,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.power.BurnerGenerator.BurnerEntity;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -11,14 +12,14 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
-public class LiquidPowerGenerator extends io.anuke.mindustry.world.blocks.types.power.PowerGenerator {
-	public Liquid generateLiquid;
-	public float powerPerLiquid = 0.13f;
+public class LiquidBurnerGenerator extends PowerGenerator {
+	protected float minEfficiency = 0.2f;
+	protected float powerPerLiquid = 0.13f;
 	/**Maximum liquid used per frame.*/
-	public float maxLiquidGenerate = 0.4f;
-	public Effect generateEffect = Fx.generatespark;
+	protected float maxLiquidGenerate = 0.4f;
+	protected Effect generateEffect = Fx.generatespark;
 
-	public LiquidPowerGenerator(String name) {
+	public LiquidBurnerGenerator(String name) {
 		super(name);
 		liquidCapacity = 30f;
 		hasLiquids = true;
@@ -29,7 +30,6 @@ public class LiquidPowerGenerator extends io.anuke.mindustry.world.blocks.types.
 		super.setStats();
 		stats.add("powerliquid", Strings.toFixed(powerPerLiquid, 2) + " power/liquid");
 		stats.add("maxliquidsecond", Strings.toFixed(maxLiquidGenerate*60f, 2) + " liquid/s");
-		stats.add("input", generateLiquid);
 	}
 	
 	@Override
@@ -53,6 +53,7 @@ public class LiquidPowerGenerator extends io.anuke.mindustry.world.blocks.types.
 		TileEntity entity = tile.entity();
 		
 		if(entity.liquid.amount > 0){
+			float powerPerLiquid = getEfficiency(entity.liquid.liquid)*this.powerPerLiquid;
 			float used = Math.min(entity.liquid.amount, maxLiquidGenerate * Timers.delta());
 			used = Math.min(used, (powerCapacity - entity.power.amount)/powerPerLiquid);
 			
@@ -60,7 +61,6 @@ public class LiquidPowerGenerator extends io.anuke.mindustry.world.blocks.types.
 			entity.power.amount += used * powerPerLiquid;
 			
 			if(used > 0.001f && Mathf.chance(0.05 * Timers.delta())){
-				
 				Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
 			}
 		}
@@ -70,6 +70,15 @@ public class LiquidPowerGenerator extends io.anuke.mindustry.world.blocks.types.
 	
 	@Override
 	public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-		return liquid == generateLiquid && super.acceptLiquid(tile, source, liquid, amount);
+		return getEfficiency(liquid) >= minEfficiency && super.acceptLiquid(tile, source, liquid, amount);
+	}
+
+	@Override
+	public TileEntity getEntity() {
+		return new BurnerEntity();
+	}
+
+	protected float getEfficiency(Liquid liquid){
+		return liquid.flammability;
 	}
 }

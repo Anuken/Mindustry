@@ -39,12 +39,14 @@ public class PowerCrafter extends Block{
 
         if(entity.power.amount > powerUsed && entity.inventory.hasItem(input.item, itemsUsed)){
             entity.progress += 1f/craftTime;
+            entity.totalProgress += Timers.delta();
         }
 
         if(entity.progress >= 1f){
             entity.inventory.removeItem(input);
             if(outputItem != null) offloadNear(tile, outputItem);
             if(outputLiquid != null) handleLiquid(tile, tile, outputLiquid, outputLiquidAmount);
+            entity.progress = 0f;
         }
 
         if(outputItem != null && entity.timer.get(timerDump, 5)){

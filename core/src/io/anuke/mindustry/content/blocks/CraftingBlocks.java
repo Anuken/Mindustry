@@ -100,27 +100,29 @@ public class CraftingBlocks {
         size = 2;
     }},
 
-    plasticFormer = new GenericCrafter("plasticformer") {{
+    plasticFormer = new PlasticFormer("plasticformer") {{
         inputLiquid = Liquids.oil;
         liquidUse = 0.3f;
         liquidCapacity = 60f;
-        powerUse = 0.3f;
+        powerUse = 0.5f;
         craftTime = 80f;
         output = Items.plastic;
         itemCapacity = 30;
         size = 2;
         health = 320;
         hasPower = hasLiquids = true;
+        craftEffect = Fx.formsmoke;
+        updateEffect = Fx.plasticburn;
     }},
 
     biomatterCompressor = new Compressor("biomattercompressor") {{
         input = new ItemStack(Items.biomatter, 1);
         liquidCapacity = 60f;
         itemCapacity = 50;
-        powerUse = 0.05f;
-        craftTime = 10f;
+        powerUse = 0.06f;
+        craftTime = 25f;
         outputLiquid = Liquids.oil;
-        outputLiquidAmount = 0.08f;
+        outputLiquidAmount = 0.1f;
         size = 2;
         health = 320;
         hasLiquids = true;

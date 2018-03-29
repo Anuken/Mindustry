@@ -179,6 +179,14 @@ public class Fx{
 		});
 	}),
 
+	plasticburn = new Effect(40, e -> {
+		Angles.randLenVectors(e.id, 5, 3f + e.ifract()*5f, (x, y)->{
+			Draw.color(Color.valueOf("e9ead3"), Color.GRAY, e.ifract());
+			Fill.circle(e.x + x, e.y + y, e.fract()*1f);
+			Draw.reset();
+		});
+	}),
+
 	pulverize = new Effect(25, e -> {
 		Angles.randLenVectors(e.id, 5, 3f + e.ifract()*5f, (x, y)->{
 			Draw.color(Color.valueOf("eae4f0"), Color.GRAY, e.ifract());
@@ -218,6 +226,14 @@ public class Fx{
 		Angles.randLenVectors(e.id, 6, 4f + e.ifract()*5f, (x, y)->{
 			Draw.color(Color.WHITE, Color.valueOf("ffc999"), e.ifract());
 			Fill.poly(e.x + x, e.y + y, 4, 0.5f+e.fract()*2f, 45);
+			Draw.reset();
+		});
+	}),
+
+	formsmoke = new Effect(40, e -> {
+		Angles.randLenVectors(e.id, 6, 5f + e.ifract()*8f, (x, y)->{
+			Draw.color(Color.valueOf("f1e479"), Color.LIGHT_GRAY, e.ifract());
+			Fill.poly(e.x + x, e.y + y, 4, 0.2f+e.fract()*2f, 45);
 			Draw.reset();
 		});
 	}),

@@ -3,7 +3,7 @@ package io.anuke.mindustry.world;
 import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
-import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Mathf;
 
 public abstract class BaseBlock {
     public boolean hasInventory = true;
@@ -92,14 +92,17 @@ public abstract class BaseBlock {
 
             if(ofract > fract) return;
 
-            float flow = Math.min((fract - ofract) * (liquidCapacity/(1.1f + tile.entity.liquid.liquid.viscosity)),
-                    Math.min(tile.entity.liquid.amount/liquidFlowFactor * Math.max(Timers.delta(), 1f), tile.entity.liquid.amount));
+            float flow = Math.min(Mathf.clamp((fract - ofract)*(1f)) * (liquidCapacity), tile.entity.liquid.amount);
 
-            if(flow <= 0f || tile.entity.liquid.amount < flow) return;
+            flow = Math.min(flow, next.block().liquidCapacity - next.entity.liquid.amount - 0.001f);
 
-            if(next.block().acceptLiquid(next, tile, tile.entity.liquid.liquid, flow)){
-                next.block().handleLiquid(next, tile, tile.entity.liquid.liquid, flow);
-                tile.entity.liquid.amount -= flow;
+            if(flow <= 0f) return;
+
+            float amount = flow;
+
+            if(next.block().acceptLiquid(next, tile, tile.entity.liquid.liquid, amount)){
+                next.block().handleLiquid(next, tile, tile.entity.liquid.liquid, amount);
+                tile.entity.liquid.amount -= amount;
             }
         }
     }

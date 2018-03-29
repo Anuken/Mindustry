@@ -14,6 +14,7 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 public class GenericCrafter extends Block{
@@ -29,6 +30,8 @@ public class GenericCrafter extends Block{
 	protected float powerUse;
 	protected float liquidUse;
 	protected Effect craftEffect = Fx.purify;
+	protected Effect updateEffect = Fx.none;
+	protected float updateEffectChance = 0.04f;
 
 	public GenericCrafter(String name) {
 		super(name);
@@ -84,8 +87,12 @@ public class GenericCrafter extends Block{
 				(inputItem == null || entity.inventory.hasItem(inputItem.item, itemsUsed))){
 
 			entity.progress += 1f / craftTime * Timers.delta();
+			entity.totalProgress += Timers.delta();
 			if(hasPower) entity.power.amount -= powerUsed;
 			if(hasLiquids) entity.liquid.amount -= liquidUsed;
+
+			if(Mathf.chance(Timers.delta() * updateEffectChance))
+				Effects.effect(updateEffect, entity.x + Mathf.range(size*4f), entity.y + Mathf.range(size*4));
 		}
 
 		if(entity.progress >= 1f){
@@ -119,5 +126,6 @@ public class GenericCrafter extends Block{
 
 	public static class GenericCrafterEntity extends TileEntity{
 		public float progress;
+		public float totalProgress;
 	}
 }

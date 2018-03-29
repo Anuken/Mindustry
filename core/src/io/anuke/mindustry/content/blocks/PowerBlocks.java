@@ -1,55 +1,51 @@
 package io.anuke.mindustry.content.blocks;
 
-import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.defense.RepairTurret;
 import io.anuke.mindustry.world.blocks.types.defense.ShieldBlock;
 import io.anuke.mindustry.world.blocks.types.distribution.Teleporter;
-import io.anuke.mindustry.world.blocks.types.power.ItemPowerGenerator;
+import io.anuke.mindustry.world.blocks.types.power.*;
 
 public class PowerBlocks {
     public static final Block
 
-    coalgenerator = new io.anuke.mindustry.world.blocks.types.power.ItemPowerGenerator("coalgenerator") {{
-        generateItem = Items.coal;
+    coalgenerator = new BurnerGenerator("coalgenerator") {{
+        //generateItem = Items.coal;
         powerOutput = 0.04f;
         powerCapacity = 40f;
     }},
 
-    thermalgenerator = new io.anuke.mindustry.world.blocks.types.power.LiquidPowerGenerator("thermalgenerator") {{
-        generateLiquid = Liquids.lava;
+    thermalgenerator = new LiquidHeatGenerator("thermalgenerator") {{
         maxLiquidGenerate = 0.5f;
         powerPerLiquid = 0.08f;
         powerCapacity = 40f;
         generateEffect = Fx.redgeneratespark;
     }},
 
-    combustiongenerator = new io.anuke.mindustry.world.blocks.types.power.LiquidPowerGenerator("combustiongenerator") {{
-        generateLiquid = Liquids.oil;
+    combustiongenerator = new LiquidBurnerGenerator("combustiongenerator") {{
         maxLiquidGenerate = 0.4f;
         powerPerLiquid = 0.12f;
         powerCapacity = 40f;
     }},
 
-    rtgenerator = new ItemPowerGenerator("rtgenerator") {{
-        generateItem = Items.thorium;
+    rtgenerator = new BurnerGenerator("rtgenerator") {{
+        //generateItem = Items.thorium;
         powerCapacity = 40f;
         powerOutput = 0.03f;
         itemDuration = 240f;
     }},
 
-    solarpanel = new io.anuke.mindustry.world.blocks.types.power.SolarGenerator("solarpanel") {{
+    solarpanel = new SolarGenerator("solarpanel") {{
         generation = 0.003f;
     }},
 
-    largesolarpanel = new io.anuke.mindustry.world.blocks.types.power.SolarGenerator("largesolarpanel") {{
+    largesolarpanel = new SolarGenerator("largesolarpanel") {{
         size = 3;
         generation = 0.012f;
     }},
 
-    nuclearReactor = new io.anuke.mindustry.world.blocks.types.power.NuclearReactor("nuclearreactor") {{
+    nuclearReactor = new NuclearReactor("nuclearreactor") {{
         size = 3;
         health = 600;
         breaktime *= 2.3f;
@@ -74,16 +70,16 @@ public class PowerBlocks {
         health = 400;
     }},
 
-    battery = new io.anuke.mindustry.world.blocks.types.power.PowerGenerator("battery") {{
+    battery = new PowerGenerator("battery") {{
         powerCapacity = 320f;
     }},
 
-    batteryLarge = new io.anuke.mindustry.world.blocks.types.power.PowerGenerator("batterylarge") {{
+    batteryLarge = new PowerGenerator("batterylarge") {{
         size = 3;
         powerCapacity = 2000f;
     }},
 
-    powernode = new io.anuke.mindustry.world.blocks.types.power.PowerDistributor("powernode"),
+    powernode = new PowerDistributor("powernode"),
 
     teleporter = new Teleporter("teleporter");
 }

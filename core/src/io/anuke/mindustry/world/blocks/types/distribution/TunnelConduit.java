@@ -35,7 +35,8 @@ public class TunnelConduit extends LiquidBlock {
         Tile to = tunnel.getNearby(tunnel.getRotation());
         if (to == null || !(to.block().hasLiquids)) return;
 
-        if (to.block().acceptLiquid(tile, source, liquid, amount)) to.block().handleLiquid(to, tunnel, liquid, amount);
+        if (to.block().acceptLiquid(to, tunnel, liquid, amount))
+            to.block().handleLiquid(to, tunnel, liquid, amount);
     }
 
     @Override
