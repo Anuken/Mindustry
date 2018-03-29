@@ -1,12 +1,13 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockGroup;
-import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
@@ -14,6 +15,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
+import io.anuke.ucore.util.Tmp;
 
 public class Drill extends Block{
 	protected final int timerDrill = timers++;
@@ -24,7 +26,8 @@ public class Drill extends Block{
 	protected Block resource;
 	protected Item result;
 	protected float drillTime = 300;
-	protected Effect drillEffect = Fx.spark;
+	protected Effect drillEffect = Fx.mine;
+	protected float rotateSpeed = 2f;
 
 	public Drill(String name) {
 		super(name);
@@ -33,6 +36,23 @@ public class Drill extends Block{
 		layer = Layer.overlay;
 		itemCapacity = 5;
 		group = BlockGroup.drills;
+	}
+
+	@Override
+	public void draw(Tile tile) {
+		Draw.rect(name, tile.drawx(), tile.drawy());
+		Draw.rect(name + "-rotator", tile.drawx(), tile.drawy(), Timers.time() * rotateSpeed);
+		Draw.rect(name + "-top", tile.drawx(), tile.drawy());
+
+		TextureRegion region = result.region;
+		Tmp.tr1.setRegion(region, 4, 4, 1, 1);
+
+		Draw.rect(Tmp.tr1, tile.drawx(), tile.drawy(), 2f, 2f);
+	}
+
+	@Override
+	public TextureRegion[] getIcon() {
+		return new TextureRegion[]{Draw.region(name), Draw.region(name + "-rotator"), Draw.region(name + "-top")};
 	}
 	
 	@Override

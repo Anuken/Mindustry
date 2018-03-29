@@ -19,15 +19,15 @@ public class Fracker extends SolidPump {
     public void draw(Tile tile) {
         FrackerEntity entity = tile.entity();
 
-        Draw.rect(name, tile.worldx(), tile.worldy());
+        Draw.rect(name, tile.drawx(), tile.drawy());
 
         Draw.color(tile.entity.liquid.liquid.color);
         Draw.alpha(tile.entity.liquid.amount/liquidCapacity);
-        Draw.rect(name + "-liquid", tile.worldx(), tile.worldy());
+        Draw.rect(name + "-liquid", tile.drawx(), tile.drawy());
         Draw.color();
 
-        Draw.rect(name + "-rotator", tile.worldx(), tile.worldy(), entity.pumpTime);
-        Draw.rect(name + "-top", tile.worldx(), tile.worldy());
+        Draw.rect(name + "-rotator", tile.drawx(), tile.drawy(), entity.pumpTime);
+        Draw.rect(name + "-top", tile.drawx(), tile.drawy());
     }
 
     @Override
@@ -42,6 +42,8 @@ public class Fracker extends SolidPump {
         if(entity.input >= inputLiquidUse * Timers.delta()){
             super.update(tile);
             entity.input -= inputLiquidUse * Timers.delta();
+        }else{
+            tryDumpLiquid(tile);
         }
     }
 

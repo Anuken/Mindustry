@@ -132,19 +132,16 @@ public class Blocks {
     rock = new Rock("rock") {{
         variants = 2;
         varyShadow = true;
-        drops = new ItemStack(Items.stone, 3);
     }},
 
     icerock = new Rock("icerock") {{
         variants = 2;
         varyShadow = true;
-        drops = new ItemStack(Items.stone, 3);
     }},
 
     blackrock = new Rock("blackrock") {{
         variants = 1;
         varyShadow = true;
-        drops = new ItemStack(Items.stone, 3);
     }},
 
     dirtblock = new StaticBlock("dirtblock") {{

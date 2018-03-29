@@ -93,7 +93,7 @@ public class ProductionBlocks {
         powerUse = 0.6f;
         pumpAmount = 0.06f;
         size = 3;
-        liquidCapacity = 80f;
+        liquidCapacity = 30f;
     }},
 
     cultivator = new Cultivator("cultivator") {{

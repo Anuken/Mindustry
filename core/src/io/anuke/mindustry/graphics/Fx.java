@@ -194,6 +194,14 @@ public class Fx{
 			Draw.reset();
 		});
 	}),
+
+	pulverizeSmall = new Effect(30, e -> {
+		Angles.randLenVectors(e.id, 5, 3f + e.ifract()*8f, (x, y)->{
+			Draw.color(Color.LIGHT_GRAY, Color.GRAY, e.ifract());
+			Fill.poly(e.x + x, e.y + y, 4, e.fract() * 1f + 0.5f, 45);
+			Draw.reset();
+		});
+	}),
 	
 	laserspark = new Effect(14, e -> {
 		Angles.randLenVectors(e.id, 8, 1f + e.ifract()*11f, (x, y)->{
@@ -344,18 +352,12 @@ public class Fx{
 		Draw.reset();
 	}),
 
-	spark = new Effect(10, e -> {
-		Lines.stroke(1f);
-		Draw.color(Color.WHITE, Color.GRAY, e.ifract());
-		Lines.spikes(e.x, e.y, e.ifract() * 5f, 2, 8);
-		Draw.reset();
-	}),
-	
-	sparkbig = new Effect(11, e -> {
-		Lines.stroke(1f);
-		Draw.color(lightRed, Color.GRAY, e.ifract());
-		Lines.spikes(e.x, e.y, e.ifract() * 5f, 2.3f, 8);
-		Draw.reset();
+	mine = new Effect(20, e -> {
+		Angles.randLenVectors(e.id, 6, 3f + e.ifract()*6f, (x, y)->{
+			Draw.color(Color.WHITE, Color.GRAY, e.ifract());
+			Fill.poly(e.x + x, e.y + y, 4, e.fract() * 2f, 45);
+			Draw.reset();
+		});
 	}),
 	
 	smelt = new Effect(10, e -> {
