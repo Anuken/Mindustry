@@ -1,9 +1,11 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Draw;
 
 public class Fracker extends SolidPump {
     protected Liquid inputLiquid;
@@ -11,6 +13,26 @@ public class Fracker extends SolidPump {
 
     public Fracker(String name) {
         super(name);
+    }
+
+    @Override
+    public void draw(Tile tile) {
+        FrackerEntity entity = tile.entity();
+
+        Draw.rect(name, tile.worldx(), tile.worldy());
+
+        Draw.color(tile.entity.liquid.liquid.color);
+        Draw.alpha(tile.entity.liquid.amount/liquidCapacity);
+        Draw.rect(name + "-liquid", tile.worldx(), tile.worldy());
+        Draw.color();
+
+        Draw.rect(name + "-rotator", tile.worldx(), tile.worldy(), entity.pumpTime);
+        Draw.rect(name + "-top", tile.worldx(), tile.worldy());
+    }
+
+    @Override
+    public TextureRegion[] getIcon() {
+        return new TextureRegion[]{Draw.region(name), Draw.region(name + "-rotator"), Draw.region(name + "-top")};
     }
 
     @Override
@@ -45,7 +67,7 @@ public class Fracker extends SolidPump {
         return new FrackerEntity();
     }
 
-    public static class FrackerEntity extends TileEntity{
+    public static class FrackerEntity extends SolidPumpEntity{
         public float input;
     }
 }

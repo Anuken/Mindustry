@@ -2,6 +2,7 @@ package io.anuke.mindustry.content.blocks;
 
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
+import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.production.*;
 
@@ -86,6 +87,8 @@ public class ProductionBlocks {
     oilextractor = new Fracker("oilextractor") {{
         result = Liquids.oil;
         inputLiquid = Liquids.water;
+        updateEffect = Fx.pulverize;
+        updateEffectChance = 0.05f;
         inputLiquidUse = 0.3f;
         powerUse = 0.6f;
         pumpAmount = 0.06f;

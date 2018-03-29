@@ -2,15 +2,22 @@ package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Liquids;
+import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Mathf;
 
 /**Pump that makes liquid from solids and takes in power. Only works on solid floor blocks.*/
 public class SolidPump extends Pump {
     protected Liquid result = Liquids.water;
     /**Power use per liquid unit.*/
     protected float powerUse = 0.1f;
+    protected Effect updateEffect = Fx.none;
+    protected float updateEffectChance = 0.02f;
 
     protected final Array<Tile> drawTiles = new Array<>();
 
@@ -22,6 +29,8 @@ public class SolidPump extends Pump {
 
     @Override
     public void update(Tile tile){
+        SolidPumpEntity entity = tile.entity();
+
         float used = Math.min(powerUse * Timers.delta(), powerCapacity);
 
         float fraction = 0f;
@@ -41,7 +50,14 @@ public class SolidPump extends Pump {
             tile.entity.liquid.liquid = result;
             tile.entity.liquid.amount += maxPump;
             tile.entity.power.amount -= used;
+            entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
+            if(Mathf.chance(Timers.delta() * updateEffectChance))
+                Effects.effect(updateEffect, entity.x + Mathf.range(size*2f), entity.y + Mathf.range(size*2f));
+        }else{
+            entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);
         }
+
+        entity.pumpTime += entity.warmup * Timers.delta();
 
         tryDumpLiquid(tile);
     }
@@ -62,5 +78,15 @@ public class SolidPump extends Pump {
 
     protected boolean isValid(Tile tile){
         return !tile.floor().liquid;
+    }
+
+    @Override
+    public TileEntity getEntity() {
+        return new SolidPumpEntity();
+    }
+
+    public static class SolidPumpEntity extends TileEntity{
+        public float warmup;
+        public float pumpTime;
     }
 }

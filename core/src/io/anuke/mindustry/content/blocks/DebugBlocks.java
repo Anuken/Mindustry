@@ -19,6 +19,7 @@ public class DebugBlocks {
     powerInfinite = new PowerDistributor("powerinfinite") {
         {
             powerCapacity = 10000f;
+            powerSpeed = 100f;
         }
 
         @Override

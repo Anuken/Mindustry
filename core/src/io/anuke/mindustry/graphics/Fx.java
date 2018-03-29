@@ -187,9 +187,9 @@ public class Fx{
 		});
 	}),
 
-	pulverize = new Effect(25, e -> {
-		Angles.randLenVectors(e.id, 5, 3f + e.ifract()*5f, (x, y)->{
-			Draw.color(Color.valueOf("eae4f0"), Color.GRAY, e.ifract());
+	pulverize = new Effect(40, e -> {
+		Angles.randLenVectors(e.id, 5, 3f + e.ifract()*8f, (x, y)->{
+			Draw.color(Color.LIGHT_GRAY, Color.GRAY, e.ifract());
 			Fill.poly(e.x + x, e.y + y, 4, e.fract() * 2f + 0.5f, 45);
 			Draw.reset();
 		});
@@ -532,6 +532,7 @@ public class Fx{
 		Draw.tscl(0.5f);
 		Draw.reset();
 	}),
+
 	transfer = new Effect(20, e -> {
 		Draw.color(Color.SCARLET, Color.CLEAR, e.fract());
 		Lines.square(e.x, e.y, 4);
