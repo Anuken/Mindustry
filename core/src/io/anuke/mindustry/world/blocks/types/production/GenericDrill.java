@@ -1,15 +1,12 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
-import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
@@ -23,13 +20,10 @@ public class GenericDrill extends Drill{
     protected Liquid inputLiquid = Liquids.water;
 
     protected float rotateSpeed = 1.5f;
-    protected Effect updateEffect = Fx.pulverizeSmall;
-    protected float updateEffectChance = 0.02f;
-
-    private Array<Item> toAdd = new Array<>();
 
     public GenericDrill(String name){
         super(name);
+        updateEffect = Fx.pulverizeMedium;
     }
 
     @Override
@@ -53,10 +47,12 @@ public class GenericDrill extends Drill{
         DrillEntity entity = tile.entity();
 
         float multiplier = 0f;
+        float totalHardness = 0f;
 
         for(Tile other : tile.getLinkedTiles(tempTiles)){
             if(isValid(other)){
-                toAdd.add(result == null ? other.floor().drops.item : result);
+                toAdd.add(other.floor().drops.item);
+                totalHardness += other.floor().drops.item.hardness;
                 multiplier += 1f;
             }
         }
@@ -81,7 +77,7 @@ public class GenericDrill extends Drill{
             return;
         }
 
-        if(toAdd.size > 0 && entity.progress >= drillTime
+        if(toAdd.size > 0 && entity.progress >= drillTime + hardnessDrillMultiplier*totalHardness
                 && tile.entity.inventory.totalItems() < itemCapacity){
 
             int index = entity.index % toAdd.size;
@@ -90,20 +86,11 @@ public class GenericDrill extends Drill{
             entity.index ++;
             entity.progress = 0f;
 
-            Effects.effect(drillEffect, tile.drawx(), tile.drawy());
+            Effects.effect(drillEffect, toAdd.get(index).color, tile.drawx(), tile.drawy());
         }
 
         if(entity.timer.get(timerDump, 15)){
             tryDump(tile);
-        }
-    }
-
-    @Override
-    protected boolean isValid(Tile tile){
-        if(resource == null) {
-            return tile.floor().drops != null;
-        }else{
-            return tile.floor() == resource || (resource.drops != null && resource.drops.equals(tile.floor().drops));
         }
     }
 

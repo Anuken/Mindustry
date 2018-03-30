@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -19,6 +20,8 @@ public class Cultivator extends GenericDrill {
     protected Color plantColor = Color.valueOf("648b55");
     protected Color plantColorLight = Color.valueOf("73a75f");
     protected Color bottomColor = Color.valueOf("474747");
+
+    protected Item result;
 
     protected SeedRandom random = new SeedRandom(0);
     protected float recurrence = 6f;
@@ -73,6 +76,11 @@ public class Cultivator extends GenericDrill {
     @Override
     public TileEntity getEntity() {
         return new CultivatorEntity();
+    }
+
+    @Override
+    public boolean isValid(Tile tile){
+        return tile.block().drops != null && tile.block().drops.item == result;
     }
 
     public static class CultivatorEntity extends DrillEntity{

@@ -20,6 +20,7 @@ public class Fx{
 	public static Color glowy = Color.valueOf("fdc056");
 	public static Color beam = Color.valueOf("9bffbe");
 	public static Color beamLight = Color.valueOf("ddffe9");
+	public static Color stoneGray = Color.valueOf("8f8f8f");
 	
 	public static final Effect
 
@@ -189,15 +190,23 @@ public class Fx{
 
 	pulverize = new Effect(40, e -> {
 		Angles.randLenVectors(e.id, 5, 3f + e.ifract()*8f, (x, y)->{
-			Draw.color(Color.LIGHT_GRAY, Color.GRAY, e.ifract());
+			Draw.color(stoneGray);
 			Fill.poly(e.x + x, e.y + y, 4, e.fract() * 2f + 0.5f, 45);
 			Draw.reset();
 		});
 	}),
 
 	pulverizeSmall = new Effect(30, e -> {
+		Angles.randLenVectors(e.id, 3, e.ifract()*5f, (x, y)->{
+			Draw.color(stoneGray);
+			Fill.poly(e.x + x, e.y + y, 4, e.fract() * 1f + 0.5f, 45);
+			Draw.reset();
+		});
+	}),
+
+	pulverizeMedium = new Effect(30, e -> {
 		Angles.randLenVectors(e.id, 5, 3f + e.ifract()*8f, (x, y)->{
-			Draw.color(Color.LIGHT_GRAY, Color.GRAY, e.ifract());
+			Draw.color(stoneGray);
 			Fill.poly(e.x + x, e.y + y, 4, e.fract() * 1f + 0.5f, 45);
 			Draw.reset();
 		});
@@ -352,12 +361,26 @@ public class Fx{
 		Draw.reset();
 	}),
 
+	spark = new Effect(10, e -> {
+		Lines.stroke(1f);
+		Draw.color(Color.WHITE, Color.GRAY, e.ifract());
+		Lines.spikes(e.x, e.y, e.ifract() * 5f, 2, 8);
+		Draw.reset();
+	}),
+
 	mine = new Effect(20, e -> {
 		Angles.randLenVectors(e.id, 6, 3f + e.ifract()*6f, (x, y)->{
-			Draw.color(Color.WHITE, Color.GRAY, e.ifract());
+			Draw.color(e.color, Color.LIGHT_GRAY, e.ifract());
 			Fill.poly(e.x + x, e.y + y, 4, e.fract() * 2f, 45);
 			Draw.reset();
 		});
+	}),
+
+	sparkbig = new Effect(11, e -> {
+		Lines.stroke(1f);
+		Draw.color(lightRed, Color.GRAY, e.ifract());
+		Lines.spikes(e.x, e.y, e.ifract() * 5f, 2.3f, 8);
+		Draw.reset();
 	}),
 	
 	smelt = new Effect(10, e -> {

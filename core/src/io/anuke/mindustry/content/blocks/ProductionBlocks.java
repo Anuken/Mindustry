@@ -9,51 +9,35 @@ import io.anuke.mindustry.world.blocks.types.production.*;
 public class ProductionBlocks {
     public static final Block
 
-    stonedrill = new Drill("stonedrill") {{
-        resource = Blocks.stone;
-        result = Items.stone;
-        drillTime = 240;
-    }},
-
-    irondrill = new Drill("irondrill") {{
-        resource = Blocks.iron;
-        result = Items.iron;
-        drillTime = 360;
-    }},
-
-    leaddrill = new Drill("leaddrill") {{
-        resource = Blocks.lead;
-        result = Items.lead;
+    ironDrill = new Drill("irondrill") {{
+        tier = 1;
         drillTime = 400;
     }},
 
-    coaldrill = new Drill("coaldrill") {{
-        resource = Blocks.coal;
-        result = Items.coal;
-        drillTime = 420;
+    reinforcedDrill = new Drill("reinforceddrill") {{
+        tier = 2;
+        drillTime = 360;
     }},
 
-    thoriumdrill = new Drill("thoriumdrill") {{
-        resource = Blocks.thorium;
-        result = Items.thorium;
-        drillTime = 600;
+    steelDrill = new Drill("steeldrill") {{
+        tier = 3;
+        drillTime = 320;
     }},
 
-    titaniumdrill = new Drill("titaniumdrill") {{
-        resource = Blocks.titanium;
-        result = Items.titanium;
-        drillTime = 540;
+    titaniumDrill = new Drill("titaniumdrill") {{
+        tier = 4;
+        drillTime = 280;
     }},
 
     laserdrill = new GenericDrill("laserdrill") {{
-        drillTime = 200;
+        drillTime = 220;
         size = 2;
         powerUse = 0.2f;
         hasPower = true;
     }},
 
     nucleardrill = new GenericDrill("nucleardrill") {{
-        drillTime = 240;
+        drillTime = 170;
         size = 3;
         powerUse = 0.32f;
         hasPower = true;
@@ -61,19 +45,11 @@ public class ProductionBlocks {
 
     plasmadrill = new GenericDrill("plasmadrill") {{
         inputLiquid = Liquids.plasma;
-        drillTime = 240;
+        drillTime = 110;
         size = 4;
         powerUse = 0.16f;
         hasLiquids = true;
         hasPower = true;
-    }},
-
-    quartzextractor = new GenericDrill("quartzextractor") {{
-        powerUse = 0.1f;
-        resource = Blocks.sand;
-        result = Items.silicon;
-        drillTime = 320;
-        size = 2;
     }},
 
     waterextractor = new SolidPump("waterextractor") {{
@@ -97,7 +73,6 @@ public class ProductionBlocks {
     }},
 
     cultivator = new Cultivator("cultivator") {{
-        resource = Blocks.grass;
         result = Items.biomatter;
         inputLiquid = Liquids.water;
         liquidUse = 0.2f;

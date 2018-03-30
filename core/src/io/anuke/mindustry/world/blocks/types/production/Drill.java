@@ -15,19 +15,22 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
-import io.anuke.ucore.util.Tmp;
 
 public class Drill extends Block{
+	protected final static float hardnessDrillMultiplier = 40f;
 	protected final int timerDrill = timers++;
 	protected final int timerDump = timers++;
 
 	protected final Array<Tile> drawTiles = new Array<>();
 	
-	protected Block resource;
-	protected Item result;
+	protected int tier;
 	protected float drillTime = 300;
 	protected Effect drillEffect = Fx.mine;
 	protected float rotateSpeed = 2f;
+	protected Effect updateEffect = Fx.pulverizeSmall;
+	protected float updateEffectChance = 0.02f;
+
+	protected Array<Item> toAdd = new Array<>();
 
 	public Drill(String name) {
 		super(name);
@@ -40,14 +43,17 @@ public class Drill extends Block{
 
 	@Override
 	public void draw(Tile tile) {
+		boolean valid = isMultiblock() || isValid(tile);
+
 		Draw.rect(name, tile.drawx(), tile.drawy());
-		Draw.rect(name + "-rotator", tile.drawx(), tile.drawy(), Timers.time() * rotateSpeed);
+		Draw.rect(name + "-rotator", tile.drawx(), tile.drawy(), valid ? Timers.time() * rotateSpeed : 0f);
 		Draw.rect(name + "-top", tile.drawx(), tile.drawy());
 
-		TextureRegion region = result.region;
-		Tmp.tr1.setRegion(region, 4, 4, 1, 1);
-
-		Draw.rect(Tmp.tr1, tile.drawx(), tile.drawy(), 2f, 2f);
+		if(!isMultiblock() && isValid(tile)) {
+			Draw.color(tile.floor().drops.item.color);
+			Draw.rect("blank", tile.worldx(), tile.worldy(), 2f, 2f);
+			Draw.color();
+		}
 	}
 
 	@Override
@@ -63,26 +69,37 @@ public class Drill extends Block{
 	
 	@Override
 	public void update(Tile tile){
+		toAdd.clear();
+
 		TileEntity entity = tile.entity;
 
-		int mines = 0;
+		float multiplier = 0f;
+		float totalHardness = 0f;
 
-		if(isMultiblock()){
-			for(Tile other : tile.getLinkedTiles(tempTiles)){
-				if(isValid(other)){
-					mines ++;
-				}
+		for(Tile other : tile.getLinkedTiles(tempTiles)){
+			if(isValid(other)){
+				toAdd.add(other.floor().drops.item);
+				totalHardness += other.floor().drops.item.hardness;
+				multiplier += 1f;
 			}
-		}else{
-			if(isValid(tile)) mines = 1;
 		}
 
-		if(mines > 0 && entity.timer.get(timerDrill, drillTime) && tile.entity.inventory.getItem(result) < itemCapacity){
-			for(int i = 0; i < mines; i ++) offloadNear(tile, result);
-			Effects.effect(drillEffect, tile.drawx(), tile.drawy());
+		if(toAdd.size > 0 && tile.entity.inventory.totalItems() < itemCapacity){
+
+			if(entity.timer.get(timerDrill, drillTime/multiplier + totalHardness*hardnessDrillMultiplier)) {
+				int extra = tile.getExtra() % toAdd.size;
+
+				offloadNear(tile, toAdd.get(extra));
+
+				tile.setExtra((byte)((extra + 1) % toAdd.size));
+				Effects.effect(drillEffect, toAdd.get(extra).color, tile.drawx(), tile.drawy());
+			}
+
+			if(Mathf.chance(Timers.delta() * updateEffectChance))
+				Effects.effect(updateEffect, entity.x + Mathf.range(size*2f), entity.y + Mathf.range(size*2f));
 		}
 
-		if(entity.timer.get(timerDump, 30)){
+		if(entity.timer.get(timerDump, 15)){
 			tryDump(tile);
 		}
 	}
@@ -109,7 +126,7 @@ public class Drill extends Block{
 	}
 
 	protected boolean isValid(Tile tile){
-		return tile.floor() == resource || (resource != null && resource.drops != null && resource.drops.equals(tile.floor().drops));
+		return tile.floor().drops != null && tile.floor().drops.item.hardness <= tier;
 	}
 
 }

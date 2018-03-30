@@ -2,16 +2,15 @@ package io.anuke.mindustry.world.blocks.types.storage;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.style.TextureRegionDrawable;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Tmp;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -47,10 +46,9 @@ public class SortedUnloader extends Unloader {
 
         SortedUnloaderEntity entity = tile.entity();
 
-        TextureRegion region = entity.sortItem.region;
-        Tmp.tr1.setRegion(region, 4, 4, 1, 1);
-
-        Draw.rect(Tmp.tr1, tile.worldx(), tile.worldy(), 2f, 2f);
+        Draw.color(entity.sortItem.color);
+        Draw.rect("blank", tile.worldx(), tile.worldy(), 2f, 2f);
+        Draw.color();
     }
 
     @Override

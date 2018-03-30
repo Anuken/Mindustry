@@ -169,16 +169,6 @@ public class World extends Module{
 		WorldGenerator.generate(tiles, MapIO.readTileData(map));
 	}
 
-	void set(int x, int y, Block type, int rot){
-		if(!Mathf.inBounds(x, y, tiles)){
-			return;
-		}
-		if(type == ProductionBlocks.stonedrill){
-			tiles[x][y].setFloor(Blocks.stone);
-		}
-		tiles[x][y].setBlock(type, rot);
-	}
-
 	public int getSeed(){
 		return seed;
 	}

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.resource;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.ucore.graphics.Draw;
@@ -10,17 +11,23 @@ public class Item implements Comparable<Item>{
 
 	public final int id;
 	public final String name;
+	public final Color color;
 	public TextureRegion region;
 
 	public float explosiveness = 0f;
+	/**flammability above 0.3 makes this eleigible for item burners.*/
 	public float flammability = 0f;
 	/**how effective this item is as flux for smelting. 0 = not a flux, 0.5 = normal flux, 1 = very good*/
 	public float fluxiness = 0f;
+	/**whether this material goes in the core*/
 	public boolean material = true;
+	/**drill hardness of the item*/
+	public int hardness = 0;
 
-	public Item(String name) {
+	public Item(String name, Color color) {
 		this.id = items.size;
 		this.name = name;
+		this.color = color;
 
 		items.add(this);
 	}

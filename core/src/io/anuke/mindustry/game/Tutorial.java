@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.DistributionBlocks;
-import io.anuke.mindustry.content.blocks.ProductionBlocks;
 import io.anuke.mindustry.content.blocks.WeaponBlocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.world.Block;
@@ -243,7 +242,7 @@ public class Tutorial{
 				canForward = false;
 				blockPlaceX = 0;
 				blockPlaceY = -3;
-				targetBlock = ProductionBlocks.stonedrill;
+				//targetBlock = ProductionBlocks.stonedrill;
 			}
 			
 			void onSwitch(){
