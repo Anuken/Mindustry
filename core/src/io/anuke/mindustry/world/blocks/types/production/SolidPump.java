@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.TileEntity;
@@ -9,6 +10,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
 /**Pump that makes liquid from solids and takes in power. Only works on solid floor blocks.*/
@@ -18,6 +20,7 @@ public class SolidPump extends Pump {
     protected float powerUse = 0.1f;
     protected Effect updateEffect = Fx.none;
     protected float updateEffectChance = 0.02f;
+    protected float rotateSpeed = 1f;
 
     protected final Array<Tile> drawTiles = new Array<>();
 
@@ -25,6 +28,24 @@ public class SolidPump extends Pump {
         super(name);
         hasPower = true;
         liquidRegion = name + "-liquid";
+    }
+
+    @Override
+    public void draw(Tile tile) {
+        SolidPumpEntity entity = tile.entity();
+
+        Draw.rect(name, tile.drawx(), tile.drawy());
+        Draw.color(tile.entity.liquid.liquid.color);
+        Draw.alpha(tile.entity.liquid.amount / liquidCapacity);
+        Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
+        Draw.color();
+        Draw.rect(name + "-rotator", tile.drawx(), tile.drawy(), entity.pumpTime * rotateSpeed);
+        Draw.rect(name + "-top", tile.drawx(), tile.drawy());
+    }
+
+    @Override
+    public TextureRegion[] getIcon() {
+        return new TextureRegion[]{Draw.region(name), Draw.region(name + "-rotator"), Draw.region(name + "-top")};
     }
 
     @Override
@@ -45,7 +66,7 @@ public class SolidPump extends Pump {
             if(isValid(tile)) fraction = 1f;
         }
 
-        if(tile.entity.power.amount >= used){
+        if(tile.entity.power.amount >= used && tile.entity.liquid.amount < liquidCapacity - 0.001f){
             float maxPump = Math.min(liquidCapacity - tile.entity.liquid.amount, pumpAmount * Timers.delta() * fraction);
             tile.entity.liquid.liquid = result;
             tile.entity.liquid.amount += maxPump;

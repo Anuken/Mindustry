@@ -8,7 +8,7 @@ public class Liquids {
     public static final Liquid
 
     none = new Liquid("none", Color.CLEAR),
-    water = new Liquid("water", Color.ROYAL) {
+    water = new Liquid("water", Color.valueOf("486acd")) {
         {
             heatCapacity = 0.4f;
         }
@@ -26,7 +26,7 @@ public class Liquids {
             viscosity = 0.8f;
         }
     },
-    oil = new Liquid("oil", Color.valueOf("292929")) {
+    oil = new Liquid("oil", Color.valueOf("313131")) {
         {
             viscosity = 0.7f;
             flammability = 0.6f;

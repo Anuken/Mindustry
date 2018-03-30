@@ -113,7 +113,7 @@ public class Drill extends Block{
 		float powerUsed = Math.min(powerCapacity, powerUse * Timers.delta());
 		float liquidUsed = Math.min(liquidCapacity, liquidUse * Timers.delta());
 
-		if(entity.inventory.totalItems() < itemCapacity &&
+		if(entity.inventory.totalItems() < itemCapacity && toAdd.size > 0 &&
 				(!hasPower || entity.power.amount >= powerUsed) &&
 				(!liquidRequired || entity.liquid.amount >= liquidUsed)){
 

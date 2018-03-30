@@ -71,6 +71,7 @@ public class ProductionBlocks {
         pumpAmount = 0.1f;
         size = 2;
         liquidCapacity = 30f;
+        rotateSpeed = 1.4f;
     }},
 
     oilextractor = new Fracker("oilextractor") {{
