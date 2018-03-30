@@ -71,19 +71,7 @@ public class TunnelConveyor extends Block{
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		TunnelEntity entity = tile.entity();
-
-		if(entity.index >= entity.buffer.length - 1) return false;
-
-		int rot = source.relativeTo(tile.x, tile.y);
-		if(rot != (tile.getRotation() + 2)%4) return false;
-		Tile tunnel = getDestTunnel(tile, item);
-
-		if(tunnel != null){
-			Tile to = tunnel.getNearby(tunnel.getRotation());
-			return to != null && to.block().acceptItem(item, to, tunnel);
-		}else{
-			return false;
-		}
+		return entity.index < entity.buffer.length - 1;
 	}
 
 	@Override
