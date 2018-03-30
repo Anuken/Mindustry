@@ -4,7 +4,10 @@ import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.production.*;
+import io.anuke.mindustry.world.blocks.types.production.Cultivator;
+import io.anuke.mindustry.world.blocks.types.production.Drill;
+import io.anuke.mindustry.world.blocks.types.production.Fracker;
+import io.anuke.mindustry.world.blocks.types.production.SolidPump;
 
 public class ProductionBlocks {
     public static final Block
@@ -29,27 +32,37 @@ public class ProductionBlocks {
         drillTime = 280;
     }},
 
-    laserdrill = new GenericDrill("laserdrill") {{
+    laserdrill = new Drill("laserdrill") {{
         drillTime = 220;
         size = 2;
         powerUse = 0.2f;
         hasPower = true;
+        tier = 5;
+        updateEffect = Fx.pulverizeMedium;
+        drillEffect = Fx.mineBig;
     }},
 
-    nucleardrill = new GenericDrill("nucleardrill") {{
+    nucleardrill = new Drill("nucleardrill") {{
         drillTime = 170;
         size = 3;
         powerUse = 0.32f;
         hasPower = true;
+        tier = 5;
+        updateEffect = Fx.pulverizeMedium;
+        drillEffect = Fx.mineBig;
     }},
 
-    plasmadrill = new GenericDrill("plasmadrill") {{
+    plasmadrill = new Drill("plasmadrill") {{
         inputLiquid = Liquids.plasma;
+        liquidRequired = true;
         drillTime = 110;
         size = 4;
         powerUse = 0.16f;
         hasLiquids = true;
         hasPower = true;
+        tier = 5;
+        updateEffect = Fx.pulverizeMedium;
+        drillEffect = Fx.mineBig;
     }},
 
     waterextractor = new SolidPump("waterextractor") {{

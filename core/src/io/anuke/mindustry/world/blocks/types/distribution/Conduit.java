@@ -12,6 +12,8 @@ public class Conduit extends LiquidBlock {
     public Conduit(String name) {
         super(name);
         liquidRegion = "conduit-liquid";
+        rotate = true;
+        solid = false;
     }
 
     @Override

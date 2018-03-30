@@ -2,10 +2,12 @@ package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockGroup;
 import io.anuke.mindustry.world.Tile;
@@ -17,20 +19,35 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 public class Drill extends Block{
-	protected final static float hardnessDrillMultiplier = 40f;
-	protected final int timerDrill = timers++;
+	protected final static float hardnessDrillMultiplier = 50f;
 	protected final int timerDump = timers++;
 
 	protected final Array<Tile> drawTiles = new Array<>();
-	
-	protected int tier;
-	protected float drillTime = 300;
-	protected Effect drillEffect = Fx.mine;
-	protected float rotateSpeed = 2f;
-	protected Effect updateEffect = Fx.pulverizeSmall;
-	protected float updateEffectChance = 0.02f;
+	protected final Array<Item> toAdd = new Array<>();
 
-	protected Array<Item> toAdd = new Array<>();
+	/**Maximum tier of blocks this drill can mine.*/
+	protected int tier;
+	/**Base time to drill one ore, in frames.*/
+	protected float drillTime = 300;
+	/**power use per frame.*/
+	public float powerUse = 0.08f;
+	/**liquid use per frame.*/
+	protected float liquidUse = 0.05f;
+	/**Input liquid. Set hasLiquids to true so this is used.*/
+	protected Liquid inputLiquid = Liquids.water;
+	/**Whether the liquid is required to drill. If false, then it will be used as a speed booster.*/
+	protected boolean liquidRequired = false;
+	/**How many times faster the drill will progress when booster by liquid.*/
+	protected float liquidBoostIntensity = 1.3f;
+
+	/**Effect played when an item is produced. This is colored.*/
+	protected Effect drillEffect = Fx.mine;
+	/**Speed the drill bit rotates at.*/
+	protected float rotateSpeed = 2f;
+	/**Effect randomly played while drilling.*/
+	protected Effect updateEffect = Fx.pulverizeSmall;
+	/**Chance the update effect will appear.*/
+	protected float updateEffectChance = 0.02f;
 
 	public Drill(String name) {
 		super(name);
@@ -39,14 +56,16 @@ public class Drill extends Block{
 		layer = Layer.overlay;
 		itemCapacity = 5;
 		group = BlockGroup.drills;
+		hasLiquids = true;
+		liquidCapacity = 5f;
 	}
 
 	@Override
 	public void draw(Tile tile) {
-		boolean valid = isMultiblock() || isValid(tile);
+		DrillEntity entity = tile.entity();
 
 		Draw.rect(name, tile.drawx(), tile.drawy());
-		Draw.rect(name + "-rotator", tile.drawx(), tile.drawy(), valid ? Timers.time() * rotateSpeed : 0f);
+		Draw.rect(name + "-rotator", tile.drawx(), tile.drawy(), entity.drillTime * rotateSpeed);
 		Draw.rect(name + "-top", tile.drawx(), tile.drawy());
 
 		if(!isMultiblock() && isValid(tile)) {
@@ -64,6 +83,7 @@ public class Drill extends Block{
 	@Override
 	public void setStats(){
 		super.setStats();
+		//TODO this is misleading, change it
 		stats.add("secondsitem", Strings.toFixed(drillTime/60, 1));
 	}
 	
@@ -71,7 +91,7 @@ public class Drill extends Block{
 	public void update(Tile tile){
 		toAdd.clear();
 
-		TileEntity entity = tile.entity;
+		DrillEntity entity = tile.entity();
 
 		float multiplier = 0f;
 		float totalHardness = 0f;
@@ -84,23 +104,49 @@ public class Drill extends Block{
 			}
 		}
 
-		if(toAdd.size > 0 && tile.entity.inventory.totalItems() < itemCapacity){
+		if(entity.timer.get(timerDump, 15)){
+			tryDump(tile);
+		}
 
-			if(entity.timer.get(timerDrill, drillTime/multiplier + totalHardness*hardnessDrillMultiplier)) {
-				int extra = tile.getExtra() % toAdd.size;
+		entity.drillTime += entity.warmup * Timers.delta();
 
-				offloadNear(tile, toAdd.get(extra));
+		float powerUsed = Math.min(powerCapacity, powerUse * Timers.delta());
+		float liquidUsed = Math.min(liquidCapacity, liquidUse * Timers.delta());
 
-				tile.setExtra((byte)((extra + 1) % toAdd.size));
-				Effects.effect(drillEffect, toAdd.get(extra).color, tile.drawx(), tile.drawy());
+		if(entity.inventory.totalItems() < itemCapacity &&
+				(!hasPower || entity.power.amount >= powerUsed) &&
+				(!liquidRequired || entity.liquid.amount >= liquidUsed)){
+
+			if(hasPower) entity.power.amount -= powerUsed;
+			if(liquidRequired) entity.liquid.amount -= liquidUsed;
+
+			float speed = 1f;
+
+			if(entity.liquid.amount >= liquidUsed && !liquidRequired){
+				entity.liquid.amount -= liquidUsed;
+				speed = liquidBoostIntensity;
 			}
+
+			entity.warmup = Mathf.lerpDelta(entity.warmup, speed, 0.02f);
+			entity.progress += Timers.delta() * multiplier * speed;
 
 			if(Mathf.chance(Timers.delta() * updateEffectChance))
 				Effects.effect(updateEffect, entity.x + Mathf.range(size*2f), entity.y + Mathf.range(size*2f));
+		}else{
+			entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);
+			return;
 		}
 
-		if(entity.timer.get(timerDump, 15)){
-			tryDump(tile);
+		if(toAdd.size > 0 && entity.progress >= drillTime + hardnessDrillMultiplier*totalHardness
+				&& tile.entity.inventory.totalItems() < itemCapacity){
+
+			int index = entity.index % toAdd.size;
+			offloadNear(tile, toAdd.get(index));
+
+			entity.index ++;
+			entity.progress = 0f;
+
+			Effects.effect(drillEffect, toAdd.get(index).color, tile.drawx(), tile.drawy());
 		}
 	}
 
@@ -123,6 +169,23 @@ public class Drill extends Block{
 		Draw.colorl(0.85f + Mathf.absin(Timers.time(), 6f, 0.15f));
 		Draw.rect("cross-" + size, tile.drawx(), tile.drawy());
 		Draw.color();
+	}
+
+	@Override
+	public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
+		return super.acceptLiquid(tile, source, liquid, amount) && liquid == inputLiquid;
+	}
+
+	@Override
+	public TileEntity getEntity() {
+		return new DrillEntity();
+	}
+
+	public static class DrillEntity extends TileEntity{
+		public float progress;
+		public int index;
+		public float warmup;
+		public float drillTime;
 	}
 
 	protected boolean isValid(Tile tile){

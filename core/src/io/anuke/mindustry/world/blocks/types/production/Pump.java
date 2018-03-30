@@ -16,8 +16,6 @@ public class Pump extends LiquidBlock{
 
 	public Pump(String name) {
 		super(name);
-		rotate = false;
-		solid = true;
 		layer = Layer.overlay;
 		liquidFlowFactor = 3f;
 		group = BlockGroup.liquids;

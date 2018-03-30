@@ -376,6 +376,14 @@ public class Fx{
 		});
 	}),
 
+	mineBig = new Effect(30, e -> {
+		Angles.randLenVectors(e.id, 6, 4f + e.ifract()*8f, (x, y)->{
+			Draw.color(e.color, Color.LIGHT_GRAY, e.ifract());
+			Fill.poly(e.x + x, e.y + y, 4, e.fract() * 2f + 0.2f, 45);
+			Draw.reset();
+		});
+	}),
+
 	sparkbig = new Effect(11, e -> {
 		Lines.stroke(1f);
 		Draw.color(lightRed, Color.GRAY, e.ifract());

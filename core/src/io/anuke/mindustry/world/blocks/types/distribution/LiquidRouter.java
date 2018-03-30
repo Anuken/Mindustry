@@ -7,10 +7,6 @@ public class LiquidRouter extends LiquidBlock{
 
 	public LiquidRouter(String name) {
 		super(name);
-		rotate = false;
-		solid = true;
-		liquidFlowFactor = 2f;
-		hasInventory = false;
 	}
 	
 	@Override

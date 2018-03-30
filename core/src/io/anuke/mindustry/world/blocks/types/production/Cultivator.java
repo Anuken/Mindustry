@@ -16,7 +16,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class Cultivator extends GenericDrill {
+public class Cultivator extends Drill {
     protected Color plantColor = Color.valueOf("648b55");
     protected Color plantColorLight = Color.valueOf("73a75f");
     protected Color bottomColor = Color.valueOf("474747");

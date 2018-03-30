@@ -11,9 +11,6 @@ public class LiquidJunction extends LiquidBlock{
 
 	public LiquidJunction(String name) {
 		super(name);
-		update = true;
-		solid = true;
-		rotate = false;
 		hasLiquids = false;
 	}
 	

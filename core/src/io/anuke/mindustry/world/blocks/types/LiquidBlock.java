@@ -12,8 +12,8 @@ public class LiquidBlock extends Block{
 	
 	public LiquidBlock(String name) {
 		super(name);
-		rotate = true;
 		update = true;
+		solid = true;
 		hasLiquids = true;
 		hasInventory = false;
 		group = BlockGroup.liquids;

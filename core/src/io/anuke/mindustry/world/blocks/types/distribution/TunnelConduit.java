@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.types.distribution;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.resource.Liquid;
+import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidBlock;
 import io.anuke.ucore.graphics.Draw;
@@ -16,6 +17,12 @@ public class TunnelConduit extends LiquidBlock {
         solid = true;
         health = 70;
         instantTransfer = true;
+    }
+
+    @Override
+    public void setBars() {
+        super.setBars();
+        bars.remove(BarType.liquid);
     }
 
     @Override
