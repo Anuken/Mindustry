@@ -26,7 +26,7 @@ public class Items {
         {
             explosiveness = 0.2f;
             flammability = 0.5f;
-            fluxiness = 0.5f;
+            fluxiness = 0.3f;
             material = false;
             hardness = 2;
         }
@@ -50,6 +50,13 @@ public class Items {
         {
             material = false;
             flammability = 0.4f;
+            fluxiness = 0.2f;
+        }
+    },
+    sand = new Item("sand", Color.valueOf("e3d39e")){
+        {
+            material = false;
+            fluxiness = 0.5f;
         }
     };
 }

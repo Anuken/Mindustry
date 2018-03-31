@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Fx;
 import io.anuke.mindustry.resource.Item;
@@ -11,6 +12,7 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
@@ -27,6 +29,7 @@ public class Smelter extends Block{
 	protected float craftTime = 20f; //time to craft one item, so max 3 items per second by default
 	protected float burnDuration = 50f; //by default, the fuel will burn 45 frames, so that's 2.5 items/fuel at most
 	protected Effect craftEffect = Fx.smelt, burnEffect = Fx.fuelburn;
+	protected Color flameColor = Color.valueOf("ffb879");
 
 	protected int capacity = 20;
 
@@ -57,7 +60,7 @@ public class Smelter extends Block{
 	
 	@Override
 	public void update(Tile tile){
-		CrafterEntity entity = tile.entity();
+		SmelterEntity entity = tile.entity();
 		
 		if(entity.timer.get(timerDump, 5) && entity.inventory.hasItem(result)){
 			tryDump(tile, result);
@@ -73,6 +76,9 @@ public class Smelter extends Block{
 		//decrement burntime
 		if(entity.burnTime > 0){
 			entity.burnTime -= Timers.delta();
+			entity.heat = Mathf.lerp(entity.heat, 1f, 0.02f);
+		}else{
+			entity.heat = Mathf.lerp(entity.heat, 0f, 0.02f);
 		}
 
 		//make sure it has all the items
@@ -93,7 +99,7 @@ public class Smelter extends Block{
 		}
 		
 		offloadNear(tile, result);
-		Effects.effect(craftEffect, entity);
+		Effects.effect(craftEffect, flameColor, entity);
 	}
 
 	@Override
@@ -114,22 +120,30 @@ public class Smelter extends Block{
 	public void draw(Tile tile){
 		super.draw(tile);
 
-        CrafterEntity entity = tile.entity();
+        SmelterEntity entity = tile.entity();
 
         //draw glowing center
-        if(entity.burnTime > 0){
-            Draw.color(1f, 1f, 1f, Mathf.absin(Timers.time(), 9f, 0.4f) + Mathf.random(0.05f));
-            Draw.rect("smelter-middle", tile.worldx(), tile.worldy());
-            Draw.color();
-        }
+		if(entity.heat > 0f){
+			float g = 0.1f;
+
+			Draw.alpha(((1f-g) + Mathf.absin(Timers.time(), 8f, g)) * entity.heat);
+
+			Draw.tint(flameColor);
+			Fill.circle(tile.drawx(), tile.drawy(), 2f + Mathf.absin(Timers.time(), 5f, 0.8f));
+			Draw.color(1f, 1f, 1f, entity.heat);
+			Fill.circle(tile.drawx(), tile.drawy(), 1f + Mathf.absin(Timers.time(), 5f, 0.7f));
+
+			Draw.color();
+		}
     }
 
 	@Override
 	public TileEntity getEntity() {
-		return new CrafterEntity();
+		return new SmelterEntity();
 	}
 
-	public class CrafterEntity extends TileEntity{
+	public class SmelterEntity extends TileEntity{
 		public float burnTime;
+		public float heat;
 	}
 }

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.content.blocks;
 
+import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.graphics.Fx;
@@ -26,6 +27,19 @@ public class CraftingBlocks {
         result = Items.densealloy;
         burnDuration = 45f;
         craftTime = 25f;
+        flameColor = Color.valueOf("fd896e");
+    }},
+
+    siliconsmelter = new PowerSmelter("siliconsmelter") {{
+        health = 90;
+        craftEffect = Fx.smeltsmoke;
+        inputs = new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.sand, 2)};
+        result = Items.silicon;
+        powerUse = 0.05f;
+        craftTime = 35f;
+        size = 2;
+        hasLiquids = false;
+        flameColor = Color.valueOf("ffef99");
     }},
 
     poweralloysmelter = new PowerSmelter("poweralloysmelter") {{
@@ -74,29 +88,44 @@ public class CraftingBlocks {
         liquid = Liquids.water;
         item = Items.stone;
         results = new Item[]{
-            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+            null, null, null, null, null, null, null, null, null, null,
+            Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand,
             Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone,
             Items.iron, Items.iron, Items.iron, Items.iron,
             Items.lead, Items.lead,
             Items.coal, Items.coal,
             Items.titanium
         };
-
         liquidUse = 0.2f;
         filterTime = 40f;
         itemCapacity = 40;
-
         health = 50;
     }},
 
-    centrifuge = new GenericCrafter("centrifuge") {{
-        inputItem = new ItemStack(Items.stone, 6);
-        inputLiquid = Liquids.water;
-        liquidUse = 0.1f;
-        output = Items.coal;
-        health = 50;
-        craftTime = 50;
-        hasInventory = hasLiquids = true;
+    centrifuge = new Separator("centrifuge") {{
+        liquid = Liquids.water;
+        item = Items.stone;
+        results = new Item[]{
+            null, null, null, null, null, null, null, null, null, null, null, null, null,
+            Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand,
+            Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone,
+            Items.iron, Items.iron, Items.iron, Items.iron, Items.iron,
+            Items.lead, Items.lead, Items.lead,
+            Items.coal, Items.coal, Items.coal,
+            Items.titanium, Items.titanium,
+            Items.thorium,
+        };
+
+        liquidUse = 0.3f;
+        hasPower = true;
+        powerUse = 0.2f;
+        filterTime = 15f;
+        itemCapacity = 60;
+        health = 50*4;
+        spinnerLength = 1.5f;
+        spinnerRadius = 3.5f;
+        spinnerThickness = 1.5f;
+        spinnerSpeed = 3f;
         size = 2;
     }},
 

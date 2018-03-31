@@ -16,7 +16,7 @@ public class PlasticFormer extends GenericCrafter {
 
         GenericCrafterEntity entity = tile.entity();
 
-        Draw.alpha(Mathf.absin(entity.totalProgress, 3f, 0.9f));
+        Draw.alpha(Mathf.absin(entity.totalProgress, 3f, 0.9f) * entity.warmup);
         Draw.rect(name + "-top", tile.drawx(), tile.drawy());
         Draw.reset();
     }

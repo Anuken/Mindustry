@@ -86,7 +86,7 @@ public class Blocks {
     },
 
     sand = new Floor("sand") {{
-        drops = new ItemStack(Items.silicon, 1);
+        drops = new ItemStack(Items.sand, 1);
     }},
 
     ice = new Floor("ice") {

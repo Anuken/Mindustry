@@ -112,7 +112,7 @@ public class PowerSmelter extends PowerBlock {
         }
 
         offloadNear(tile, result);
-        Effects.effect(craftEffect, entity);
+        Effects.effect(craftEffect, flameColor, entity);
     }
 
     @Override

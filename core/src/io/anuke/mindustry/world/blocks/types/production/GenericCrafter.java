@@ -88,11 +88,14 @@ public class GenericCrafter extends Block{
 
 			entity.progress += 1f / craftTime * Timers.delta();
 			entity.totalProgress += Timers.delta();
+			entity.warmup = Mathf.lerp(entity.warmup, 1f, 0.02f);
 			if(hasPower) entity.power.amount -= powerUsed;
 			if(hasLiquids) entity.liquid.amount -= liquidUsed;
 
 			if(Mathf.chance(Timers.delta() * updateEffectChance))
 				Effects.effect(updateEffect, entity.x + Mathf.range(size*4f), entity.y + Mathf.range(size*4));
+		}else{
+			entity.warmup = Mathf.lerp(entity.warmup, 0f, 0.02f);
 		}
 
 		if(entity.progress >= 1f){
@@ -127,5 +130,7 @@ public class GenericCrafter extends Block{
 	public static class GenericCrafterEntity extends TileEntity{
 		public float progress;
 		public float totalProgress;
+		public float warmup;
+		public float craftTime;
 	}
 }

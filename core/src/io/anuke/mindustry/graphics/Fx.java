@@ -241,7 +241,7 @@ public class Fx{
 
 	smeltsmoke = new Effect(15, e -> {
 		Angles.randLenVectors(e.id, 6, 4f + e.ifract()*5f, (x, y)->{
-			Draw.color(Color.WHITE, Color.valueOf("ffc999"), e.ifract());
+			Draw.color(Color.WHITE, e.color, e.ifract());
 			Fill.poly(e.x + x, e.y + y, 4, 0.5f+e.fract()*2f, 45);
 			Draw.reset();
 		});
@@ -391,11 +391,12 @@ public class Fx{
 		Draw.reset();
 	}),
 	
-	smelt = new Effect(10, e -> {
-		Lines.stroke(1f);
-		Draw.color(Color.YELLOW, Color.RED, e.ifract());
-		Lines.spikes(e.x, e.y, e.ifract() * 5f, 1f, 8);
-		Draw.reset();
+	smelt = new Effect(20, e -> {
+		Angles.randLenVectors(e.id, 6, 2f + e.ifract()*5f, (x, y)->{
+			Draw.color(Color.WHITE, e.color, e.ifract());
+			Fill.poly(e.x + x, e.y + y, 4, 0.5f+e.fract()*2f, 45);
+			Draw.reset();
+		});
 	}),
 
 	breakBlock = new Effect(12, e -> {
