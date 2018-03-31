@@ -3,7 +3,9 @@ package io.anuke.mindustry.entities;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.entities.effect.EMP;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.BlockFx;
+import io.anuke.mindustry.graphics.fx.BulletFx;
+import io.anuke.mindustry.graphics.fx.Fx;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BaseBulletType;
@@ -12,7 +14,7 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.graphics.Fx.*;
+import static io.anuke.mindustry.graphics.fx.Fx.*;
 
 public abstract class BulletType extends BaseBulletType<Bullet>{
 	
@@ -52,7 +54,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		
 		public void update(Bullet b){
 			if(b.timer.get(0, 4)){
-				Effects.effect(Fx.railsmoke, b.x, b.y);
+				Effects.effect(BulletFx.railsmoke, b.x, b.y);
 			}
 		}
 	},
@@ -73,7 +75,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		
 		public void update(Bullet b){
 			if(b.timer.get(0, 2)){
-				Effects.effect(Fx.empspark, b.x + Mathf.range(2), b.y + Mathf.range(2));
+				Effects.effect(BulletFx.empspark, b.x + Mathf.range(2), b.y + Mathf.range(2));
 			}
 		}
 		
@@ -83,7 +85,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		
 		public void hit(Bullet b, float hitx, float hity){
 			Timers.run(5f, ()-> new EMP(b.x, b.y, b.getDamage()).add());
-			Effects.effect(Fx.empshockwave, b);
+			Effects.effect(BulletFx.empshockwave, b);
 			Effects.shake(3f, 3f, b);
 		}
 	},
@@ -118,8 +120,8 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		public void hit(Bullet b, float hitx, float hity){
 			Effects.shake(3f, 3f, b);
 			
-			Effects.effect(Fx.shellsmoke, b);
-			Effects.effect(Fx.shellexplosion, b);
+			Effects.effect(BulletFx.shellsmoke, b);
+			Effects.effect(BulletFx.shellexplosion, b);
 			
 			DamageArea.damage(b.team, b.x, b.y, 25f, (int)(damage * 2f/3f));
 		}
@@ -146,7 +148,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		}
 
 		public void hit(Bullet b, float hitx, float hity) {
-			Effects.effect(shellsmoke, b);
+			Effects.effect(BulletFx.shellsmoke, b);
 			for(int i = 0; i < 3; i ++){
 				Bullet bullet = new Bullet(flakspark, b, hitx, hity, b.angle() + Mathf.range(120f));
 				bullet.add();
@@ -198,8 +200,8 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		public void hit(Bullet b, float hitx, float hity){
 			Effects.shake(3f, 3f, b);
 			
-			Effects.effect(Fx.shellsmoke, b);
-			Effects.effect(Fx.shockwaveSmall, b);
+			Effects.effect(BulletFx.shellsmoke, b);
+			Effects.effect(BulletFx.shockwaveSmall, b);
 			
 			DamageArea.damage(b.team, b.x, b.y, 50f, (int)(damage * 2f/3f));
 		}
@@ -229,8 +231,8 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		public void hit(Bullet b, float hitx, float hity){
 			Effects.shake(3f, 3f, b);
 			
-			Effects.effect(Fx.shellsmoke, b);
-			Effects.effect(Fx.shockwaveSmall, b);
+			Effects.effect(BulletFx.shellsmoke, b);
+			Effects.effect(BulletFx.shockwaveSmall, b);
 			
 			DamageArea.damage(b.team, b.x, b.y, 25f, (int)(damage * 2f/3f));
 		}
@@ -249,8 +251,8 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		public void hit(Bullet b, float hitx, float hity){
 			Effects.shake(3f, 3f, b);
 			
-			Effects.effect(Fx.blastsmoke, b);
-			Effects.effect(Fx.blastexplosion, b);
+			Effects.effect(BlockFx.blastsmoke, b);
+			Effects.effect(BulletFx.blastexplosion, b);
 
 			//TODO remove translation() usage
 			Angles.circleVectors(30, 6f, (nx, ny) -> {
@@ -368,7 +370,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		public void hit(Bullet b, float hitx, float hity){
 			Effects.shake(1.5f, 1.5f, b);
 
-			Effects.effect(Fx.clusterbomb, b);
+			Effects.effect(BulletFx.clusterbomb, b);
 
 			DamageArea.damage(b.team, b.x, b.y, 35f, damage);
 		}
@@ -391,7 +393,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 
         public void update(Bullet b){
             if(b.timer.get(0, 4)){
-                Effects.effect(Fx.chainsmoke, b.x, b.y);
+                Effects.effect(BulletFx.chainsmoke, b.x, b.y);
             }
         }
     },
@@ -449,7 +451,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 		}
 
 		public void init(Bullet b) {
-			DamageArea.damageLine(b.team, Fx.beamhit, b.x, b.y, b.angle(), length, damage);
+			DamageArea.damageLine(b.team, BulletFx.beamhit, b.x, b.y, b.angle(), length, damage);
 		}
 
 		public void draw(Bullet b) {

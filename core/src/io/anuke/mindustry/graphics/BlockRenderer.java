@@ -30,6 +30,7 @@ public class BlockRenderer{
 	private CacheBatch cbatch;
 	
 	private Array<BlockRequest> requests = new Array<BlockRequest>(initialRequests);
+	private Layer lastLayer;
 	private int requestidx = 0;
 	private int iterateidx = 0;
 	
@@ -57,6 +58,7 @@ public class BlockRenderer{
 	/**Process all blocks to draw, simultaneously drawing block shadows and static blocks.*/
 	public void processBlocks(){
 		requestidx = 0;
+		lastLayer = null;
 		
 		int crangex = (int) (camera.viewportWidth / (chunksize * tilesize)) + 1;
 		int crangey = (int) (camera.viewportHeight / (chunksize * tilesize)) + 1;
@@ -131,6 +133,11 @@ public class BlockRenderer{
 			BlockRequest req = requests.get(iterateidx);
 			Block block = req.tile.block();
 
+			if(req.layer != lastLayer){
+				if(lastLayer != null) layerEnds(lastLayer);
+				layerBegins(req.layer);
+			}
+
 			if(req.layer == Layer.block){
 				block.draw(req.tile);
 			}else if(req.layer == block.layer){
@@ -138,6 +145,8 @@ public class BlockRenderer{
 			}else if(req.layer == block.layer2){
 				block.drawLayer2(req.tile);
 			}
+
+			lastLayer = req.layer;
 		}
 	}
 
@@ -170,7 +179,11 @@ public class BlockRenderer{
 			}
 		}
 	}
-	
+
+	private void layerBegins(Layer layer){}
+
+	private void layerEnds(Layer layer){}
+
 	private void addRequest(Tile tile, Layer layer){
 		if(requestidx >= requests.size){
 			requests.add(new BlockRequest());

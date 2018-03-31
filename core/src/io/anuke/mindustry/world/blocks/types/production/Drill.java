@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.BlockFx;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
@@ -45,11 +45,11 @@ public class Drill extends Block{
 	protected float warmupSpeed = 0.02f;
 
 	/**Effect played when an item is produced. This is colored.*/
-	protected Effect drillEffect = Fx.mine;
+	protected Effect drillEffect = BlockFx.mine;
 	/**Speed the drill bit rotates at.*/
 	protected float rotateSpeed = 2f;
 	/**Effect randomly played while drilling.*/
-	protected Effect updateEffect = Fx.pulverizeSmall;
+	protected Effect updateEffect = BlockFx.pulverizeSmall;
 	/**Chance the update effect will appear.*/
 	protected float updateEffectChance = 0.02f;
 

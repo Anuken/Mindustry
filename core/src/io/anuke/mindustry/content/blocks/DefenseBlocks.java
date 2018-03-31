@@ -1,6 +1,6 @@
 package io.anuke.mindustry.content.blocks;
 
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.BlockFx;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.Wall;
 import io.anuke.mindustry.world.blocks.types.defense.*;
@@ -58,8 +58,8 @@ public class DefenseBlocks {
     }},
 
     largedoor = new Door("door-large") {{
-        openfx = Fx.dooropenlarge;
-        closefx = Fx.doorcloselarge;
+        openfx = BlockFx.dooropenlarge;
+        closefx = BlockFx.doorcloselarge;
         health = 90 * 4 * wallHealthMultiplier;
         size = 2;
     }};

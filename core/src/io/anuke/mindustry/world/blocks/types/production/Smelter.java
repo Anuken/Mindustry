@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.BlockFx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
@@ -28,7 +28,7 @@ public class Smelter extends Block{
 
 	protected float craftTime = 20f; //time to craft one item, so max 3 items per second by default
 	protected float burnDuration = 50f; //by default, the fuel will burn 45 frames, so that's 2.5 items/fuel at most
-	protected Effect craftEffect = Fx.smelt, burnEffect = Fx.fuelburn;
+	protected Effect craftEffect = BlockFx.smelt, burnEffect = BlockFx.fuelburn;
 	protected Color flameColor = Color.valueOf("ffb879");
 
 	protected int capacity = 20;

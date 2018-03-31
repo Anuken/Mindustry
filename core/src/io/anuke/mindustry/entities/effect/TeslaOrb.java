@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.BulletFx;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entity;
@@ -70,7 +70,7 @@ public class TeslaOrb extends Entity{
 	
 	void damageEnemy(BaseUnit enemy){
 		enemy.damage(damage);
-		Effects.effect(Fx.laserhit, enemy.x + Mathf.range(2f), enemy.y + Mathf.range(2f));
+		Effects.effect(BulletFx.laserhit, enemy.x + Mathf.range(2f), enemy.y + Mathf.range(2f));
 	}
 	
 	@Override

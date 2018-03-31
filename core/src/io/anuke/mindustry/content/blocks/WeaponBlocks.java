@@ -5,7 +5,7 @@ import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.effect.TeslaOrb;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.BulletFx;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.defense.LaserTurret;
@@ -68,7 +68,7 @@ public class WeaponBlocks{
 			bullet = BulletType.sniper;
 			ammo = Items.steel;
 			health = 70;
-			shootEffect = Fx.railshot;
+			shootEffect = BulletFx.railshot;
 		}
 	},
 	
@@ -84,7 +84,7 @@ public class WeaponBlocks{
 			ammo = Items.coal;
 			ammoMultiplier = 5;
 			health = 110;
-			shootEffect = Fx.mortarshot;
+			shootEffect = BulletFx.mortarshot;
 			shootShake = 2f;
 			size = 2;
 		}
@@ -161,7 +161,7 @@ public class WeaponBlocks{
 			shootCone = 9f;
 			ammoMultiplier = 8;
 			shots = 2;
-			shootEffect = Fx.chainshot;
+			shootEffect = BulletFx.chainshot;
 		}
 
 		@Override
@@ -194,7 +194,7 @@ public class WeaponBlocks{
 			size = 3;
 			rotatespeed = 0.07f;
 			shootCone = 9f;
-			shootEffect = Fx.titanshot;
+			shootEffect = BulletFx.titanshot;
 			shootShake = 3f;
 		}
 	},
@@ -211,7 +211,7 @@ public class WeaponBlocks{
 			size = 3;
 			rotatespeed = 0.07f;
 			shootCone = 9f;
-			shootEffect = Fx.titanshot;
+			shootEffect = BulletFx.titanshot;
 			shootShake = 3f;
 		}
 	},
@@ -227,7 +227,7 @@ public class WeaponBlocks{
 			size = 2;
 			rotatespeed = 0.07f;
 			shootCone = 9f;
-			shootEffect = Fx.titanshot;
+			shootEffect = BulletFx.titanshot;
 			shootShake = 3f;
 		}
 	};

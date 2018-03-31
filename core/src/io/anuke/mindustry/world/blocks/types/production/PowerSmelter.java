@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.BlockFx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.BarType;
@@ -37,8 +37,8 @@ public class PowerSmelter extends PowerBlock {
 
     protected float craftTime = 20f; //time to craft one item, so max 3 items per second by default
     protected float burnEffectChance = 0.01f;
-    protected Effect craftEffect = Fx.smelt,
-            burnEffect = Fx.fuelburn;
+    protected Effect craftEffect = BlockFx.smelt,
+            burnEffect = BlockFx.fuelburn;
     protected Color flameColor = Color.valueOf("ffc999");
 
     protected int capacity = 20;

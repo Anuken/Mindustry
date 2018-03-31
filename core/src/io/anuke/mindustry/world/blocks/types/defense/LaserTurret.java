@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.types.defense;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.BulletFx;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -17,7 +17,7 @@ import io.anuke.ucore.util.Tmp;
 
 public class LaserTurret extends PowerTurret{
 	protected Color beamColor = Color.WHITE.cpy();
-	protected Effect hiteffect = Fx.laserhit;
+	protected Effect hiteffect = BulletFx.laserhit;
 	protected int damage = 4;
 	protected float cone = 15f;
 

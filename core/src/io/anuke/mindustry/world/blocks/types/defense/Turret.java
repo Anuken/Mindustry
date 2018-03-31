@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.Fx;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.*;

@@ -8,7 +8,7 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.Fx;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.ucore.core.Effects;

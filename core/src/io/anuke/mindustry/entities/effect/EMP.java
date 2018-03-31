@@ -3,7 +3,7 @@ package io.anuke.mindustry.entities.effect;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.BulletFx;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.TimedEntity;
@@ -61,7 +61,7 @@ public class EMP extends TimedEntity{
 			if(tile == null) continue;
 
 			//entity may be null here, after the block is dead!
-			Effects.effect(Fx.empspark, tile.worldx(), tile.worldy());
+			Effects.effect(BulletFx.empspark, tile.worldx(), tile.worldy());
 			if(tile.entity != null) tile.entity.damage(damage);
 		}
 	}

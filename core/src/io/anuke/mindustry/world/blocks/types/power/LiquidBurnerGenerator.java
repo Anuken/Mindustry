@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.power;
 
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.BlockFx;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.power.BurnerGenerator.BurnerEntity;
@@ -17,7 +17,7 @@ public class LiquidBurnerGenerator extends PowerGenerator {
 	protected float powerPerLiquid = 0.13f;
 	/**Maximum liquid used per frame.*/
 	protected float maxLiquidGenerate = 0.4f;
-	protected Effect generateEffect = Fx.generatespark;
+	protected Effect generateEffect = BlockFx.generatespark;
 
 	public LiquidBurnerGenerator(String name) {
 		super(name);

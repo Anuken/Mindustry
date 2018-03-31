@@ -1,7 +1,7 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.mindustry.entities.BulletType;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.BulletFx;
 import io.anuke.mindustry.resource.Weapon;
 
 public class Weapons {
@@ -9,20 +9,20 @@ public class Weapons {
 
     blaster = new Weapon("blaster", 12, BulletType.shot) {
         {
-            effect = Fx.laserShoot;
+            effect = BulletFx.laserShoot;
             length = 2f;
         }
     },
     triblaster = new Weapon("triblaster", 16, BulletType.spread) {
         {
             shots = 3;
-            effect = Fx.spreadShoot;
+            effect = BulletFx.spreadShoot;
             roundrobin = true;
         }
     },
     clustergun = new Weapon("clustergun", 26f, BulletType.cluster) {
         {
-            effect = Fx.clusterShoot;
+            effect = BulletFx.clusterShoot;
             inaccuracy = 17f;
             roundrobin = true;
             shots = 2;
@@ -31,7 +31,7 @@ public class Weapons {
     },
     beam = new Weapon("beam", 30f, BulletType.beamlaser) {
         {
-            effect = Fx.beamShoot;
+            effect = BulletFx.beamShoot;
             inaccuracy = 0;
             roundrobin = true;
             shake = 2f;
@@ -39,7 +39,7 @@ public class Weapons {
     },
     vulcan = new Weapon("vulcan", 5, BulletType.vulcan) {
         {
-            effect = Fx.vulcanShoot;
+            effect = BulletFx.vulcanShoot;
             inaccuracy = 5;
             roundrobin = true;
             shake = 1f;
@@ -49,7 +49,7 @@ public class Weapons {
     shockgun = new Weapon("shockgun", 36, BulletType.shockshell) {
         {
             shootsound = "bigshot";
-            effect = Fx.shockShoot;
+            effect = BulletFx.shockShoot;
             shake = 2f;
             roundrobin = true;
             shots = 7;

@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.types.defense;
 import com.badlogic.gdx.math.Rectangle;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.BlockFx;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Wall;
@@ -20,8 +20,8 @@ import static io.anuke.mindustry.Vars.tilesize;
 public class Door extends Wall{
 	protected final Rectangle rect = new Rectangle();
 
-	protected Effect openfx = Fx.dooropen;
-	protected Effect closefx = Fx.doorclose;
+	protected Effect openfx = BlockFx.dooropen;
+	protected Effect closefx = BlockFx.doorclose;
 
 	public Door(String name) {
 		super(name);

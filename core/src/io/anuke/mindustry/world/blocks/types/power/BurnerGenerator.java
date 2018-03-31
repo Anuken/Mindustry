@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.types.power;
 
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.BlockFx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.BlockBar;
@@ -22,7 +22,7 @@ public class BurnerGenerator extends PowerGenerator {
 	protected float minFlammability = 0.2f;
 	protected float powerOutput;
 	protected float itemDuration = 70f;
-	protected Effect generateEffect = Fx.generatespark;
+	protected Effect generateEffect = BlockFx.generatespark;
 	protected Color heatColor = Color.valueOf("ff9b59");
 
 	public BurnerGenerator(String name) {

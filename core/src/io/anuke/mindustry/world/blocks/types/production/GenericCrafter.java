@@ -2,7 +2,8 @@ package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.BlockFx;
+import io.anuke.mindustry.graphics.fx.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
@@ -29,7 +30,7 @@ public class GenericCrafter extends Block{
 	protected float craftTime = 80;
 	protected float powerUse;
 	protected float liquidUse;
-	protected Effect craftEffect = Fx.purify;
+	protected Effect craftEffect = BlockFx.purify;
 	protected Effect updateEffect = Fx.none;
 	protected float updateEffectChance = 0.04f;
 

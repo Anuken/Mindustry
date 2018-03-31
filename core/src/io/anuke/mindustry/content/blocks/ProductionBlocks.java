@@ -3,7 +3,7 @@ package io.anuke.mindustry.content.blocks;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.BlockFx;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.production.Cultivator;
 import io.anuke.mindustry.world.blocks.types.production.Drill;
@@ -39,8 +39,8 @@ public class ProductionBlocks {
         powerUse = 0.2f;
         hasPower = true;
         tier = 5;
-        updateEffect = Fx.pulverizeMedium;
-        drillEffect = Fx.mineBig;
+        updateEffect = BlockFx.pulverizeMedium;
+        drillEffect = BlockFx.mineBig;
     }},
 
     nucleardrill = new Drill("nucleardrill") {{
@@ -50,9 +50,9 @@ public class ProductionBlocks {
         drawRim = true;
         hasPower = true;
         tier = 5;
-        updateEffect = Fx.pulverizeRed;
+        updateEffect = BlockFx.pulverizeRed;
         updateEffectChance = 0.03f;
-        drillEffect = Fx.mineHuge;
+        drillEffect = BlockFx.mineHuge;
         rotateSpeed = 6f;
         warmupSpeed = 0.01f;
     }},
@@ -70,9 +70,9 @@ public class ProductionBlocks {
         tier = 5;
         rotateSpeed = 9f;
         drawRim = true;
-        updateEffect = Fx.pulverizeRedder;
+        updateEffect = BlockFx.pulverizeRedder;
         updateEffectChance = 0.04f;
-        drillEffect = Fx.mineHuge;
+        drillEffect = BlockFx.mineHuge;
         warmupSpeed = 0.005f;
     }},
 
@@ -88,7 +88,7 @@ public class ProductionBlocks {
     oilextractor = new Fracker("oilextractor") {{
         result = Liquids.oil;
         inputLiquid = Liquids.water;
-        updateEffect = Fx.pulverize;
+        updateEffect = BlockFx.pulverize;
         updateEffectChance = 0.05f;
         inputLiquidUse = 0.3f;
         powerUse = 0.6f;

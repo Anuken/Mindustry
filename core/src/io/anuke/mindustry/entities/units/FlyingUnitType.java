@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.Fx;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
@@ -34,7 +34,7 @@ public class FlyingUnitType extends UnitType {
         unit.rotation = unit.velocity.angle();
 
         if(unit.velocity.len() > 0.2f && unit.timer.get(timerBoost, 2f)){
-            Effects.effect(Fx.dashsmoke, unit.x + Angles.trnsx(unit.rotation + 180f, boosterLength),
+            Effects.effect(Fx.dash, unit.x + Angles.trnsx(unit.rotation + 180f, boosterLength),
                     unit.y + Angles.trnsy(unit.rotation + 180f, boosterLength));
         }
     }

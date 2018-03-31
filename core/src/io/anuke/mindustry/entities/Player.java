@@ -6,7 +6,8 @@ import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.ExplosionFx;
+import io.anuke.mindustry.graphics.fx.Fx;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.Mech;
@@ -109,7 +110,7 @@ public class Player extends Unit{
 			NetEvents.handleUnitDeath(this);
 		}
 
-		Effects.effect(Fx.explosion, this);
+		Effects.effect(ExplosionFx.explosion, this);
 		Effects.shake(4f, 5f, this);
 		Effects.sound("die", this);
 
@@ -120,7 +121,7 @@ public class Player extends Unit{
 	@Override
 	public void onRemoteDeath(){
 		dead = true;
-		Effects.effect(Fx.explosion, this);
+		Effects.effect(ExplosionFx.explosion, this);
 		Effects.shake(4f, 5f, this);
 		Effects.sound("die", this);
 
@@ -245,7 +246,7 @@ public class Player extends Unit{
 		}
 
 		if(dashing && timer.get(timerDash, 3) && movement.len() > 0){
-			Effects.effect(Fx.dashsmoke, x + Angles.trnsx(rotation + 180f, 3f), y + Angles.trnsy(rotation + 180f, 3f));
+			Effects.effect(Fx.dash, x + Angles.trnsx(rotation + 180f, 3f), y + Angles.trnsy(rotation + 180f, 3f));
 		}
 
 		movement.limit(speed);
@@ -357,11 +358,11 @@ public class Player extends Unit{
 		float ty = y + Angles.trnsy(rotation + 180f, 4f);
 
 		if(mech.flying && i.target.dst(i.last) > 2f && timer.get(timerDash, 1)){
-			Effects.effect(Fx.dashsmoke, tx, ty);
+			Effects.effect(Fx.dash, tx, ty);
 		}
 
 		if(dashing && !dead && timer.get(timerDash, 3) && i.target.dst(i.last) > 1f){
-			Effects.effect(Fx.dashsmoke, tx, ty);
+			Effects.effect(Fx.dash, tx, ty);
 		}
 	}
 

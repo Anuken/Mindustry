@@ -8,7 +8,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.BlockFx;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
@@ -139,7 +139,7 @@ public class UnitFactory extends Block {
             Timers.run(openDuration/1.5f, () -> {
                 entity.buildTime = 0f;
                 Effects.shake(2f, 3f, entity);
-                Effects.effect(Fx.producesmoke, tile.drawx(), tile.drawy());
+                Effects.effect(BlockFx.producesmoke, tile.drawx(), tile.drawy());
 
                 BaseUnit unit = new BaseUnit(type, tile.getTeam());
                 unit.set(tile.drawx(), tile.drawy()).add();

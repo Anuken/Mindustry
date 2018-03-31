@@ -1,6 +1,6 @@
 package io.anuke.mindustry.content.blocks;
 
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.BlockFx;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.defense.RepairTurret;
 import io.anuke.mindustry.world.blocks.types.defense.ShieldBlock;
@@ -20,7 +20,7 @@ public class PowerBlocks {
         maxLiquidGenerate = 0.5f;
         powerPerLiquid = 0.08f;
         powerCapacity = 40f;
-        generateEffect = Fx.redgeneratespark;
+        generateEffect = BlockFx.redgeneratespark;
     }},
 
     combustiongenerator = new LiquidBurnerGenerator("combustiongenerator") {{

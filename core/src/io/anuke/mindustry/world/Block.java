@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.DrawLayer;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.BulletFx;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
@@ -40,7 +40,7 @@ public class Block extends BaseBlock {
 	/**display name*/
 	public final String formalName;
 	/**played on destroy*/
-	public Effect explosionEffect = Fx.blockexplosion;
+	public Effect explosionEffect = BulletFx.blockexplosion;
 	/**played on destroy*/
 	public String explosionSound = "break";
 	/**whether this block has a tile entity that updates*/

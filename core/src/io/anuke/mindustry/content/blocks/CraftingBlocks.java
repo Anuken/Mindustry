@@ -3,7 +3,7 @@ package io.anuke.mindustry.content.blocks;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.BlockFx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Block;
@@ -32,7 +32,7 @@ public class CraftingBlocks {
 
     siliconsmelter = new PowerSmelter("siliconsmelter") {{
         health = 90;
-        craftEffect = Fx.smeltsmoke;
+        craftEffect = BlockFx.smeltsmoke;
         inputs = new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.sand, 2)};
         result = Items.silicon;
         powerUse = 0.05f;
@@ -44,7 +44,7 @@ public class CraftingBlocks {
 
     poweralloysmelter = new PowerSmelter("poweralloysmelter") {{
         health = 90;
-        craftEffect = Fx.smeltsmoke;
+        craftEffect = BlockFx.smeltsmoke;
         inputs = new ItemStack[]{new ItemStack(Items.titanium, 4), new ItemStack(Items.thorium, 4)};
         result = Items.densealloy;
         powerUse = 0.3f;
@@ -54,7 +54,7 @@ public class CraftingBlocks {
 
     powersmelter = new PowerSmelter("powersmelter") {{
         health = 90;
-        craftEffect = Fx.smeltsmoke;
+        craftEffect = BlockFx.smeltsmoke;
         inputs = new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.iron, 1)};
         result = Items.steel;
         powerUse = 0.1f;
@@ -140,8 +140,8 @@ public class CraftingBlocks {
         size = 2;
         health = 320;
         hasPower = hasLiquids = true;
-        craftEffect = Fx.formsmoke;
-        updateEffect = Fx.plasticburn;
+        craftEffect = BlockFx.formsmoke;
+        updateEffect = BlockFx.plasticburn;
     }},
 
     biomatterCompressor = new Compressor("biomattercompressor") {{
@@ -163,9 +163,9 @@ public class CraftingBlocks {
         powerUse = 0.2f;
         output = Items.sand;
         health = 80;
-        craftEffect = Fx.pulverize;
+        craftEffect = BlockFx.pulverize;
         craftTime = 60f;
-        updateEffect = Fx.pulverizeSmall;
+        updateEffect = BlockFx.pulverizeSmall;
         hasInventory = hasPower = true;
     }},
 
@@ -176,7 +176,7 @@ public class CraftingBlocks {
         liquidCapacity = 56f;
         output = Items.coal;
         health = 80;
-        craftEffect = Fx.purifyoil;
+        craftEffect = BlockFx.purifyoil;
         hasInventory = hasLiquids = hasPower = true;
     }},
 
@@ -187,7 +187,7 @@ public class CraftingBlocks {
         craftTime = 12;
         output = Items.stone;
         health = 80;
-        craftEffect = Fx.purifystone;
+        craftEffect = BlockFx.purifystone;
     }},
 
     weaponFactory = new WeaponFactory("weaponfactory") {{

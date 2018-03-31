@@ -5,7 +5,7 @@ import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.graphics.Fx;
+import io.anuke.mindustry.graphics.fx.ExplosionFx;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.ucore.core.Effects;
@@ -111,7 +111,7 @@ public abstract class UnitType {
 
     public void onDeath(BaseUnit unit){
         //TODO other things, such as enemies?
-        Effects.effect(Fx.explosion, unit);
+        Effects.effect(ExplosionFx.explosion, unit);
 
         if(Net.server()){
             NetEvents.handleUnitDeath(unit);
