@@ -12,11 +12,11 @@ public class Edges {
     private static final int maxRadius = 12;
     private static GridPoint2[][] edges = new GridPoint2[maxSize][0];
     private static GridPoint2[][] edgeInside = new GridPoint2[maxSize][0];
-    private static Vector2[][] polygons = new Vector2[12][0];
+    private static Vector2[][] polygons = new Vector2[maxRadius*2][0];
 
     static{
-        for(int i = 0; i < maxRadius; i ++){
-            polygons[i] = Geometry.pixelCircle(i + 1);
+        for(int i = 0; i < maxRadius*2; i ++){
+            polygons[i] = Geometry.pixelCircle((i + 1)/2f);
         }
 
         for(int i = 0; i < maxSize; i ++){
@@ -49,9 +49,9 @@ public class Edges {
         }
     }
 
-    public static Vector2[] getPixelPolygon(int radius){
+    public static Vector2[] getPixelPolygon(float radius){
         if(radius < 1 || radius > maxRadius) throw new RuntimeException("Polygon size must be between 1 and " + maxRadius);
-        return polygons[radius - 1];
+        return polygons[(int)(radius*2) - 1];
     }
 
     public static synchronized GridPoint2[] getEdges(int size){

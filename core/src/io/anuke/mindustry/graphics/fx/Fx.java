@@ -11,7 +11,6 @@ import static io.anuke.mindustry.Vars.respawnduration;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class Fx{
-	public static Color lightRed = Hue.mix(Color.WHITE, Color.FIREBRICK, 0.1f);
     public static Color lightOrange = Color.valueOf("f68021");
     public static Color lighterOrange = Color.valueOf("f6e096");
     public static Color whiteOrange = Hue.mix(lightOrange, Color.WHITE, 0.6f);

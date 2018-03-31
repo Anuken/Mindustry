@@ -19,7 +19,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class BurnerGenerator extends PowerGenerator {
-	protected float minFlammability = 0.2f;
+	protected float minEfficiency = 0.2f;
 	protected float powerOutput;
 	protected float itemDuration = 70f;
 	protected Effect generateEffect = BlockFx.generatespark;
@@ -61,7 +61,7 @@ public class BurnerGenerator extends PowerGenerator {
 	
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
-		return item.flammability >= minFlammability && tile.entity.inventory.totalItems() < itemCapacity;
+		return getItemEfficiency(item) >= minEfficiency && tile.entity.inventory.totalItems() < itemCapacity;
 	}
 	
 	@Override
@@ -82,7 +82,7 @@ public class BurnerGenerator extends PowerGenerator {
 			for(int i = 0; i < entity.inventory.items.length; i ++){
 				if(entity.inventory.items[i] > 0){
 					entity.inventory.items[i] --;
-					entity.efficiency = Item.getByID(i).flammability;
+					entity.efficiency = getItemEfficiency(Item.getByID(i));
 					break;
 				}
 			}
@@ -91,6 +91,10 @@ public class BurnerGenerator extends PowerGenerator {
 		
 		distributePower(tile);
 		
+	}
+
+	protected float getItemEfficiency(Item item){
+		return item.flammability;
 	}
 
 	@Override

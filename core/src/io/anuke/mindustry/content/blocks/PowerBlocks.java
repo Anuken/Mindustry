@@ -10,8 +10,7 @@ import io.anuke.mindustry.world.blocks.types.power.*;
 public class PowerBlocks {
     public static final Block
 
-    coalgenerator = new BurnerGenerator("coalgenerator") {{
-        //generateItem = Items.coal;
+    combustiongenerator = new BurnerGenerator("combustiongenerator") {{
         powerOutput = 0.04f;
         powerCapacity = 40f;
     }},
@@ -23,17 +22,16 @@ public class PowerBlocks {
         generateEffect = BlockFx.redgeneratespark;
     }},
 
-    combustiongenerator = new LiquidBurnerGenerator("combustiongenerator") {{
+    liquidcombustiongenerator = new LiquidBurnerGenerator("liquidcombustiongenerator") {{
         maxLiquidGenerate = 0.4f;
         powerPerLiquid = 0.12f;
         powerCapacity = 40f;
     }},
 
-    rtgenerator = new BurnerGenerator("rtgenerator") {{
-        //generateItem = Items.thorium;
+    rtgenerator = new DecayGenerator("rtgenerator") {{
         powerCapacity = 40f;
-        powerOutput = 0.03f;
-        itemDuration = 240f;
+        powerOutput = 0.02f;
+        itemDuration = 500f;
     }},
 
     solarpanel = new SolarGenerator("solarpanel") {{
@@ -72,14 +70,23 @@ public class PowerBlocks {
 
     battery = new PowerGenerator("battery") {{
         powerCapacity = 320f;
+        hasInventory = false;
     }},
 
     batteryLarge = new PowerGenerator("batterylarge") {{
         size = 3;
         powerCapacity = 2000f;
+        hasInventory = false;
     }},
 
     powernode = new PowerDistributor("powernode"),
+
+    powernodelarge = new PowerDistributor("powernodelarge"){{
+        size = 2;
+        powerSpeed = 1f;
+        maxNodes = 5;
+        laserRange = 6.5f;
+    }},
 
     teleporter = new Teleporter("teleporter");
 }

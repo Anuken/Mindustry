@@ -17,6 +17,8 @@ public class Item implements Comparable<Item>{
 	public float explosiveness = 0f;
 	/**flammability above 0.3 makes this eleigible for item burners.*/
 	public float flammability = 0f;
+	/**how radioactive this item is. 0=none, 1=ridiculous*/
+	public float radioactivity;
 	/**how effective this item is as flux for smelting. 0 = not a flux, 0.5 = normal flux, 1 = very good*/
 	public float fluxiness = 0f;
 	/**whether this material goes in the core*/

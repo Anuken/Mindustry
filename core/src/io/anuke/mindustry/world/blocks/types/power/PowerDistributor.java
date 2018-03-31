@@ -35,8 +35,9 @@ public class PowerDistributor extends PowerBlock{
 	protected Translator t1 = new Translator();
 	protected Translator t2 = new Translator();
 
-	public int laserRange = 6;
-	public float powerSpeed = 0.5f;
+	protected float laserRange = 6;
+	protected float powerSpeed = 0.5f;
+	protected int maxNodes = 3;
 
 	public PowerDistributor(String name){
 		super(name);
@@ -79,12 +80,13 @@ public class PowerDistributor extends PowerBlock{
 
     @Override
     public boolean onConfigureTileTapped(Tile tile, Tile other){
+		DistributorEntity entity = tile.entity();
 		other = other.target();
 
 		if(linkValid(tile, other)){
 			if(linked(tile, other)){
 				unlink(tile, other);
-			}else{
+			}else if(entity.links.size < maxNodes){
 				link(tile, other);
 			}
 			return false;
@@ -106,6 +108,7 @@ public class PowerDistributor extends PowerBlock{
 
 	@Override
 	public void drawConfigure(Tile tile){
+		DistributorEntity entity = tile.entity();
 
 		Draw.color("accent");
 
@@ -119,13 +122,14 @@ public class PowerDistributor extends PowerBlock{
 
 		Draw.color("power");
 
-		for(int x = tile.x - laserRange; x <= tile.x + laserRange; x ++){
-			for(int y = tile.y - laserRange; y <= tile.y + laserRange; y ++){
+		for(int x = (int)(tile.x - laserRange); x <= tile.x + laserRange; x ++){
+			for(int y = (int)(tile.y - laserRange); y <= tile.y + laserRange; y ++){
 				Tile link = world.tile(x, y);
 				if(link != null) link = link.target();
 
 				if(link != tile && linkValid(tile, link)){
-					if(linked(tile, link)){
+					boolean linked = linked(tile, link);
+					if(linked){
 						Draw.color("place");
 					}else{
 						Draw.color(Color.SCARLET);
@@ -133,6 +137,11 @@ public class PowerDistributor extends PowerBlock{
 
 					Lines.square(link.drawx(), link.drawy(),
 							link.block().size * tilesize / 2f + 1f + Mathf.absin(Timers.time(), 4f, 1f));
+
+					if(entity.links.size >= maxNodes && !linked){
+						Draw.color();
+						Draw.rect("cross-" + link.block().size, link.drawx(), link.drawy());
+					}
 				}
 			}
 		}
@@ -229,7 +238,7 @@ public class PowerDistributor extends PowerBlock{
 		if(other.block() instanceof PowerDistributor){
 			DistributorEntity oe = other.entity();
 
-			if(!oe.links.contains(tile.packedPosition())){
+			if(!oe.links.contains(tile.packedPosition()) ){
 				oe.links.add(tile.packedPosition());
 			}
 		}
@@ -255,10 +264,13 @@ public class PowerDistributor extends PowerBlock{
 		if(!(tile != link && link != null && link.block().hasPower)) return false;
 
 		if(link.block() instanceof PowerDistributor){
-			return Vector2.dst(tile.worldx(), tile.worldy(), link.worldx(), link.worldy()) <= Math.max(laserRange * tilesize,
-					((PowerDistributor)link.block()).laserRange * tilesize) - tilesize/2f;
+			DistributorEntity oe = link.entity();
+
+			return Vector2.dst(tile.drawx(), tile.drawy(), link.worldx(), link.worldy()) <= Math.max(laserRange * tilesize,
+					((PowerDistributor)link.block()).laserRange * tilesize) - tilesize/2f &&
+					oe.links.size < ((PowerDistributor)link.block()).maxNodes;
 		}else{
-			return Vector2.dst(tile.worldx(), tile.worldy(), link.worldx(), link.worldy())
+			return Vector2.dst(tile.drawx(), tile.drawy(), link.worldx(), link.worldy())
 					<= laserRange * tilesize - tilesize/2f + (link.block().size-1)*tilesize;
 		}
 	}
