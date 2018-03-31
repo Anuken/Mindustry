@@ -157,14 +157,27 @@ public class CraftingBlocks {
         hasLiquids = true;
     }},
 
+    pulverizer = new GenericCrafter("pulverizer") {{
+        inputItem = new ItemStack(Items.stone, 2);
+        itemCapacity = 40;
+        powerUse = 0.2f;
+        output = Items.sand;
+        health = 80;
+        craftEffect = Fx.pulverize;
+        craftTime = 70f;
+        updateEffect = Fx.pulverizeSmall;
+        hasInventory = hasPower = true;
+    }},
+
     oilRefinery = new GenericCrafter("oilrefinery") {{
         inputLiquid = Liquids.oil;
+        powerUse = 0.05f;
         liquidUse = 0.1f;
         liquidCapacity = 56f;
         output = Items.coal;
         health = 80;
         craftEffect = Fx.purifyoil;
-        hasInventory = hasLiquids = true;
+        hasInventory = hasLiquids = hasPower = true;
     }},
 
     stoneFormer = new GenericCrafter("stoneformer") {{
