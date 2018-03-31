@@ -423,7 +423,13 @@ public class KryoServer implements ServerProvider {
                     byte[] out = Base64Coder.decode(message);
                     ByteBuffer buffer = ByteBuffer.wrap(out);
                     Object o = serializer.read(buffer);
-                    Gdx.app.postRunnable(() -> Net.handleServerReceived(id, o));
+                    Gdx.app.postRunnable(() -> {
+                        try {
+                            Net.handleServerReceived(id, o);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    });
                 }
             }catch (Exception e){
                 Log.err(e);
