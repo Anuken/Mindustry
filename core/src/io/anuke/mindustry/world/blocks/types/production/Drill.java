@@ -150,16 +150,16 @@ public class Drill extends Block{
 			}
 
 			entity.warmup = Mathf.lerpDelta(entity.warmup, speed, warmupSpeed);
-			entity.progress += Timers.delta() * multiplier * speed;
+			entity.progress += Timers.delta() * multiplier * speed * entity.warmup;
 
-			if(Mathf.chance(Timers.delta() * updateEffectChance))
+			if(Mathf.chance(Timers.delta() * updateEffectChance * entity.warmup))
 				Effects.effect(updateEffect, entity.x + Mathf.range(size*2f), entity.y + Mathf.range(size*2f));
 		}else{
 			entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, warmupSpeed);
 			return;
 		}
 
-		if(toAdd.size > 0 && entity.progress >= drillTime + hardnessDrillMultiplier*totalHardness
+		if(toAdd.size > 0 && entity.progress >= drillTime + hardnessDrillMultiplier*Math.max(totalHardness, 1f)/multiplier
 				&& tile.entity.inventory.totalItems() < itemCapacity){
 
 			int index = entity.index % toAdd.size;
@@ -168,7 +168,8 @@ public class Drill extends Block{
 			entity.index ++;
 			entity.progress = 0f;
 
-			Effects.effect(drillEffect, toAdd.get(index).color, tile.drawx(), tile.drawy());
+			Effects.effect(drillEffect, toAdd.get(index).color,
+					entity.x + Mathf.range(size), entity.y + Mathf.range(size));
 		}
 	}
 

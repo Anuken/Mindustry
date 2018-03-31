@@ -1,5 +1,6 @@
 package io.anuke.mindustry.content.blocks;
 
+import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.graphics.Fx;
@@ -43,7 +44,7 @@ public class ProductionBlocks {
     }},
 
     nucleardrill = new Drill("nucleardrill") {{
-        drillTime = 170;
+        drillTime = 160;
         size = 3;
         powerUse = 0.5f;
         drawRim = true;
@@ -57,19 +58,22 @@ public class ProductionBlocks {
     }},
 
     plasmadrill = new Drill("plasmadrill") {{
-        inputLiquid = Liquids.plasma;
-        liquidRequired = true;
+        heatColor = Color.valueOf("ff461b");
+        //TODO
+        //inputLiquid = Liquids.plasma;
+        //liquidRequired = true;
         drillTime = 110;
         size = 4;
         powerUse = 0.7f;
         hasLiquids = true;
         hasPower = true;
         tier = 5;
-        rotateSpeed = 8f;
+        rotateSpeed = 9f;
         drawRim = true;
-        updateEffect = Fx.pulverizeRed;
-        updateEffectChance = 0.03f;
+        updateEffect = Fx.pulverizeRedder;
+        updateEffectChance = 0.04f;
         drillEffect = Fx.mineHuge;
+        warmupSpeed = 0.005f;
     }},
 
     waterextractor = new SolidPump("waterextractor") {{
