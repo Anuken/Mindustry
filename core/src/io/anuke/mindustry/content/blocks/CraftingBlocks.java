@@ -157,7 +157,7 @@ public class CraftingBlocks {
         hasLiquids = true;
     }},
 
-    pulverizer = new GenericCrafter("pulverizer") {{
+    pulverizer = new Pulverizer("pulverizer") {{
         inputItem = new ItemStack(Items.stone, 2);
         itemCapacity = 40;
         powerUse = 0.2f;
