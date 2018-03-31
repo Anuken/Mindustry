@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Liquids;
@@ -13,6 +14,7 @@ import io.anuke.mindustry.world.BlockGroup;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
@@ -39,6 +41,8 @@ public class Drill extends Block{
 	protected boolean liquidRequired = false;
 	/**How many times faster the drill will progress when booster by liquid.*/
 	protected float liquidBoostIntensity = 1.3f;
+	/**Speed at which the drill speeds up.*/
+	protected float warmupSpeed = 0.02f;
 
 	/**Effect played when an item is produced. This is colored.*/
 	protected Effect drillEffect = Fx.mine;
@@ -48,6 +52,10 @@ public class Drill extends Block{
 	protected Effect updateEffect = Fx.pulverizeSmall;
 	/**Chance the update effect will appear.*/
 	protected float updateEffectChance = 0.02f;
+
+	protected boolean drawRim = false;
+
+	protected Color heatColor = Color.valueOf("ff5512");
 
 	public Drill(String name) {
 		super(name);
@@ -62,10 +70,24 @@ public class Drill extends Block{
 
 	@Override
 	public void draw(Tile tile) {
+		float s = 0.3f;
+		float ts = 0.6f;
+
 		DrillEntity entity = tile.entity();
 
 		Draw.rect(name, tile.drawx(), tile.drawy());
+
+		if(drawRim) {
+			Graphics.setAdditiveBlending();
+			Draw.color(heatColor);
+			Draw.alpha(entity.warmup * ts * (1f-s + Mathf.absin(Timers.time(), 3f, s)));
+			Draw.rect(name + "-rim", tile.drawx(), tile.drawy());
+			Draw.color();
+			Graphics.setNormalBlending();
+		}
+
 		Draw.rect(name + "-rotator", tile.drawx(), tile.drawy(), entity.drillTime * rotateSpeed);
+
 		Draw.rect(name + "-top", tile.drawx(), tile.drawy());
 
 		if(!isMultiblock() && isValid(tile)) {
@@ -127,13 +149,13 @@ public class Drill extends Block{
 				speed = liquidBoostIntensity;
 			}
 
-			entity.warmup = Mathf.lerpDelta(entity.warmup, speed, 0.02f);
+			entity.warmup = Mathf.lerpDelta(entity.warmup, speed, warmupSpeed);
 			entity.progress += Timers.delta() * multiplier * speed;
 
 			if(Mathf.chance(Timers.delta() * updateEffectChance))
 				Effects.effect(updateEffect, entity.x + Mathf.range(size*2f), entity.y + Mathf.range(size*2f));
 		}else{
-			entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);
+			entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, warmupSpeed);
 			return;
 		}
 

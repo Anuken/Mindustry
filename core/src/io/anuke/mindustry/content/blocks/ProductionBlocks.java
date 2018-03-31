@@ -45,11 +45,15 @@ public class ProductionBlocks {
     nucleardrill = new Drill("nucleardrill") {{
         drillTime = 170;
         size = 3;
-        powerUse = 0.32f;
+        powerUse = 0.5f;
+        drawRim = true;
         hasPower = true;
         tier = 5;
-        updateEffect = Fx.pulverizeMedium;
-        drillEffect = Fx.mineBig;
+        updateEffect = Fx.pulverizeRed;
+        updateEffectChance = 0.03f;
+        drillEffect = Fx.mineHuge;
+        rotateSpeed = 6f;
+        warmupSpeed = 0.01f;
     }},
 
     plasmadrill = new Drill("plasmadrill") {{
@@ -57,12 +61,15 @@ public class ProductionBlocks {
         liquidRequired = true;
         drillTime = 110;
         size = 4;
-        powerUse = 0.16f;
+        powerUse = 0.7f;
         hasLiquids = true;
         hasPower = true;
         tier = 5;
-        updateEffect = Fx.pulverizeMedium;
-        drillEffect = Fx.mineBig;
+        rotateSpeed = 8f;
+        drawRim = true;
+        updateEffect = Fx.pulverizeRed;
+        updateEffectChance = 0.03f;
+        drillEffect = Fx.mineHuge;
     }},
 
     waterextractor = new SolidPump("waterextractor") {{

@@ -196,6 +196,14 @@ public class Fx{
 		});
 	}),
 
+	pulverizeRed = new Effect(40, e -> {
+		Angles.randLenVectors(e.id, 5, 3f + e.ifract()*8f, (x, y)->{
+			Draw.color(Color.valueOf("ffa480"), stoneGray, e.ifract());
+			Fill.poly(e.x + x, e.y + y, 4, e.fract() * 2f + 0.5f, 45);
+			Draw.reset();
+		});
+	}),
+
 	pulverizeSmall = new Effect(30, e -> {
 		Angles.randLenVectors(e.id, 3, e.ifract()*5f, (x, y)->{
 			Draw.color(stoneGray);
@@ -380,6 +388,14 @@ public class Fx{
 		Angles.randLenVectors(e.id, 6, 4f + e.ifract()*8f, (x, y)->{
 			Draw.color(e.color, Color.LIGHT_GRAY, e.ifract());
 			Fill.poly(e.x + x, e.y + y, 4, e.fract() * 2f + 0.2f, 45);
+			Draw.reset();
+		});
+	}),
+
+	mineHuge = new Effect(40, e -> {
+		Angles.randLenVectors(e.id, 8, 5f + e.ifract()*10f, (x, y)->{
+			Draw.color(e.color, Color.LIGHT_GRAY, e.ifract());
+			Fill.poly(e.x + x, e.y + y, 4, e.fract() * 2f + 0.5f, 45);
 			Draw.reset();
 		});
 	}),

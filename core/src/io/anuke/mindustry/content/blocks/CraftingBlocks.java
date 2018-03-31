@@ -164,7 +164,7 @@ public class CraftingBlocks {
         output = Items.sand;
         health = 80;
         craftEffect = Fx.pulverize;
-        craftTime = 70f;
+        craftTime = 60f;
         updateEffect = Fx.pulverizeSmall;
         hasInventory = hasPower = true;
     }},
