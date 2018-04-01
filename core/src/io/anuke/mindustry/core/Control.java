@@ -172,7 +172,7 @@ public class Control extends Module{
 		Events.on(WaveEvent.class, () -> {
 			Sounds.play("spawn");
 
-			int last = Settings.getInt("hiscore" + world.getMap().name);
+			int last = Settings.getInt("hiscore" + world.getMap().name, 0);
 
 			if(state.wave > last && !state.mode.infiniteResources && !state.mode.disableWaveTimer){
 				Settings.putInt("hiscore" + world.getMap().name, state.wave);
