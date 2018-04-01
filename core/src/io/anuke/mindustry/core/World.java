@@ -244,7 +244,7 @@ public class World extends Module{
 			Array<Tile> removals = target.getLinkedTiles();
 			for(Tile toremove : removals){
 				//note that setting a new block automatically unlinks it
-				toremove.setBlock(Blocks.air);
+				if(toremove != null) toremove.setBlock(Blocks.air);
 			}
 		}
 	}
