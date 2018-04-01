@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Recipes;
 import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.fx.Fx;
@@ -101,28 +100,21 @@ public class Placement {
         Vector2 offset = type.getPlaceOffset();
         rect.setCenter(offset.x + x * tilesize, offset.y + y * tilesize);
 
+        if(type.solid || type.solidifes)
         synchronized (Entities.entityLock) {
-            rect.setSize(tilesize*2f).setCenter(x*tilesize, y*tilesize);
+            rect.setSize(tilesize*2f).setCenter(x*tilesize + type.getPlaceOffset().x, y*tilesize + type.getPlaceOffset().y);
             boolean[] result = {false};
 
             Units.getNearby(rect, e -> {
                 if (e == null) return; //not sure why this happens?
                 Rectangle rect = e.hitbox.getRect(e.x, e.y);
 
-                if (Placement.rect.overlaps(rect)) {
+                if (Placement.rect.overlaps(rect) && !e.isFlying()) {
                     result[0] = true;
                 }
             });
 
             if(result[0]) return false;
-        }
-
-        if(type.solid || type.solidifes) {
-            for (Player player : playerGroup.all()) {
-                if (!player.mech.flying && rect.overlaps(player.hitbox.getRect(player.x, player.y))) {
-                    return false;
-                }
-            }
         }
 
         Tile tile = world.tile(x, y);

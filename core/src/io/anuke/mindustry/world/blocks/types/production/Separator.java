@@ -49,7 +49,7 @@ public class Separator extends Block {
 
         Draw.color(Color.valueOf("858585"));
         Lines.stroke(spinnerThickness);
-        Lines.spikes(tile.drawx(), tile.drawy(), spinnerRadius, spinnerLength, 3, entity.craftTime*spinnerSpeed);
+        Lines.spikes(tile.drawx(), tile.drawy(), spinnerRadius, spinnerLength, 3, entity.totalProgress*spinnerSpeed);
         Draw.reset();
     }
 
@@ -62,7 +62,7 @@ public class Separator extends Block {
         float liquidUsed = Math.min(liquidCapacity, liquidUse * Timers.delta());
         float powerUsed = Math.min(powerCapacity, powerUse * Timers.delta());
 
-        entity.craftTime += entity.warmup*Timers.delta();
+        entity.totalProgress += entity.warmup*Timers.delta();
 
         if(entity.liquid.amount >= liquidUsed && entity.inventory.hasItem(item) &&
                 (!hasPower || entity.power.amount >= powerUsed)){

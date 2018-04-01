@@ -97,6 +97,7 @@ public class Recipes {
 		new Recipe(power, PowerBlocks.solarpanel, stack(Items.iron, 30), stack(Items.silicon, 20)),
         new Recipe(power, PowerBlocks.largesolarpanel, stack(Items.iron, 30), stack(Items.silicon, 20)),
 		new Recipe(power, PowerBlocks.nuclearReactor, stack(Items.titanium, 40), stack(Items.densealloy, 40), stack(Items.steel, 50)),
+		new Recipe(power, PowerBlocks.fusionReactor, stack(Items.titanium, 40), stack(Items.densealloy, 40), stack(Items.steel, 50)),
 
 		new Recipe(power, PowerBlocks.shieldgenerator, stack(Items.titanium, 30), stack(Items.densealloy, 30)),
 

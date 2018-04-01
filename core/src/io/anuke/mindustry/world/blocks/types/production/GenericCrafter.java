@@ -18,6 +18,10 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 public class GenericCrafter extends Block{
 	protected final int timerDump = timers++;
 	
@@ -132,6 +136,17 @@ public class GenericCrafter extends Block{
 		public float progress;
 		public float totalProgress;
 		public float warmup;
-		public float craftTime;
+
+		@Override
+		public void write(DataOutputStream stream) throws IOException {
+			stream.writeFloat(progress);
+			stream.writeFloat(warmup);
+		}
+
+		@Override
+		public void read(DataInputStream stream) throws IOException {
+			progress = stream.readFloat();
+			warmup = stream.readFloat();
+		}
 	}
 }

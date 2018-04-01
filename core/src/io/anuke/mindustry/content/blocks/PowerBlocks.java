@@ -49,6 +49,12 @@ public class PowerBlocks {
         breaktime *= 2.3f;
     }},
 
+    fusionReactor = new FusionReactor("fusionreactor") {{
+        size = 4;
+        health = 600;
+        breaktime *= 4f;
+    }},
+
     repairturret = new RepairTurret("repairturret") {{
         range = 30;
         reload = 20f;
@@ -85,7 +91,7 @@ public class PowerBlocks {
         size = 2;
         powerSpeed = 1f;
         maxNodes = 5;
-        laserRange = 6.5f;
+        laserRange = 7.5f;
     }},
 
     teleporter = new Teleporter("teleporter");

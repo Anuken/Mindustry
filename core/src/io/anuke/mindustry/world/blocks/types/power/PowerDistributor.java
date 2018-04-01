@@ -191,12 +191,9 @@ public class PowerDistributor extends PowerBlock{
 		return added;
 	}
 
-	protected boolean shouldDistribute(Tile tile, Tile other){
-		if(other.block() instanceof PowerDistributor){
-			return other.entity.power.amount / other.block().powerCapacity <
-					tile.entity.power.amount / powerCapacity;
-		}
-		return true;
+	protected boolean shouldDistribute(Tile tile, Tile other) {
+		return !(other.block() instanceof PowerDistributor)
+				|| other.entity.power.amount / other.block().powerCapacity < tile.entity.power.amount / powerCapacity;
 	}
 
 	protected void distributeLaserPower(Tile tile){
@@ -266,11 +263,12 @@ public class PowerDistributor extends PowerBlock{
 		if(link.block() instanceof PowerDistributor){
 			DistributorEntity oe = link.entity();
 
-			return Vector2.dst(tile.drawx(), tile.drawy(), link.worldx(), link.worldy()) <= Math.max(laserRange * tilesize,
-					((PowerDistributor)link.block()).laserRange * tilesize) - tilesize/2f &&
+			return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy()) <= Math.max(laserRange * tilesize,
+					((PowerDistributor)link.block()).laserRange * tilesize) - tilesize/2f
+					+ (link.block().size-1)*tilesize/2f + (tile.block().size-1)*tilesize/2f &&
 					oe.links.size < ((PowerDistributor)link.block()).maxNodes;
 		}else{
-			return Vector2.dst(tile.drawx(), tile.drawy(), link.worldx(), link.worldy())
+			return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy())
 					<= laserRange * tilesize - tilesize/2f + (link.block().size-1)*tilesize;
 		}
 	}
