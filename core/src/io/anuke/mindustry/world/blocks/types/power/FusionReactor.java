@@ -47,6 +47,8 @@ public class FusionReactor extends PowerGenerator {
         float powerAdded = Math.min(powerCapacity - entity.power.amount, maxPowerProduced * Mathf.pow(entity.warmup, 3f) * Timers.delta());
         entity.power.amount += powerAdded;
         entity.totalProgress += entity.warmup * Timers.delta();
+
+        distributePower(tile);
     }
 
     @Override

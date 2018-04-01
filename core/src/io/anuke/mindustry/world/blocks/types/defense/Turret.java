@@ -34,6 +34,7 @@ public class Turret extends Block{
 	protected float reload = 10f;
 	protected float inaccuracy = 0f;
 	protected int shots = 1;
+	protected float shotTransation = 2;
 	protected float shotDelayScale = 0;
 	protected String shootsound = "shoot";
 	protected BulletType bullet = BulletType.iron;
@@ -42,7 +43,7 @@ public class Turret extends Block{
 	protected int maxammo = 400;
 	protected float rotatespeed = 0.2f;
 	protected float shootCone = 5f;
-	protected Effect shootEffect = null;
+	protected Effect shootEffect = Fx.none;
 	protected float shootShake = 0f;
 	protected int soundReload = 0;
 	protected Translator tr = new Translator();
@@ -168,11 +169,6 @@ public class Turret extends Block{
 		entity.ammo --;
 	}
 	
-	@Override
-	public TileEntity getEntity(){
-		return new TurretEntity();
-	}
-	
 	void drawTargeting(Tile tile){
 		TurretEntity entity = tile.entity();
 		
@@ -201,9 +197,7 @@ public class Turret extends Block{
 		Draw.reset();
 		
 		if(Timers.getTime(tile, "reload") <= 0){
-			Timers.run(hittime, ()->{
-				Effects.effect(Fx.spawn, predictX, predictY);
-			});
+			Timers.run(hittime, () -> Effects.effect(Fx.spawn, predictX, predictY));
 		}
 	}
 	
@@ -214,6 +208,7 @@ public class Turret extends Block{
 		
 		for(int i = 0; i < shots; i ++){
 			if(Mathf.zero(shotDelayScale)){
+
 				bullet(tile, entity.rotation + Mathf.range(inaccuracy));
 			}else{
 				Timers.run(i * shotDelayScale, () -> {
@@ -223,11 +218,9 @@ public class Turret extends Block{
 			}
 			
 		}
-		
-		if(shootEffect != null){
-			Effects.effect(shootEffect, tile.drawx() + tr.x,
-				tile.drawy() + tr.y, entity.rotation);
-		}
+
+		Effects.effect(shootEffect, tile.drawx() + tr.x,
+			tile.drawy() + tr.y, entity.rotation);
 		
 		if(shootShake > 0){
 			Effects.shake(shootShake, shootShake, tile.entity);
@@ -236,6 +229,11 @@ public class Turret extends Block{
 	
 	protected void bullet(Tile tile, float angle){
 		new Bullet(bullet, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle).add();
+	}
+
+	@Override
+	public TileEntity getEntity(){
+		return new TurretEntity();
 	}
 	
 	public static class TurretEntity extends TileEntity{
