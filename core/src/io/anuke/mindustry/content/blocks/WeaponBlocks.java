@@ -3,7 +3,7 @@ package io.anuke.mindustry.content.blocks;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.bullets.BulletType;
 import io.anuke.mindustry.entities.effect.TeslaOrb;
 import io.anuke.mindustry.graphics.fx.BulletFx;
 import io.anuke.mindustry.world.Block;

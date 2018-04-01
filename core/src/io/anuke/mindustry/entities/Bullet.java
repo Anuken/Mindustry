@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities;
 
+import io.anuke.mindustry.entities.bullets.BulletType;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.BulletEntity;
@@ -12,14 +13,14 @@ public class Bullet extends BulletEntity{
 	public Timer timer = new Timer(3);
 	public Team team;
 	
-	public Bullet(BulletType type, Unit owner, float x, float y, float angle){
+	public Bullet(io.anuke.mindustry.entities.bullets.BulletType type, Unit owner, float x, float y, float angle){
 		super(type, owner, angle);
 		this.type = type;
 		this.team = owner.team;
 		set(x, y);
 	}
 
-	public Bullet(BulletType type, Entity owner, Team team, float x, float y, float angle){
+	public Bullet(io.anuke.mindustry.entities.bullets.BulletType type, Entity owner, Team team, float x, float y, float angle){
 		super(type, owner, angle);
 		this.team = team;
 		this.type = type;

@@ -2,7 +2,7 @@ package io.anuke.mindustry.resource;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Bullet;
-import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.bullets.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.net.Net;

@@ -1,6 +1,6 @@
 package io.anuke.mindustry.content;
 
-import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.bullets.BulletType;
 import io.anuke.mindustry.graphics.fx.BulletFx;
 import io.anuke.mindustry.resource.Weapon;
 

@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.bullets.BulletType;
 import io.anuke.mindustry.graphics.fx.Fx;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.resource.Item;
@@ -37,7 +38,7 @@ public class Turret extends Block{
 	protected float shotTransation = 2;
 	protected float shotDelayScale = 0;
 	protected String shootsound = "shoot";
-	protected BulletType bullet = BulletType.iron;
+	protected io.anuke.mindustry.entities.bullets.BulletType bullet = BulletType.iron;
 	protected Item ammo;
 	protected int ammoMultiplier = 20;
 	protected int maxammo = 400;
@@ -48,6 +49,7 @@ public class Turret extends Block{
 	protected int soundReload = 0;
 	protected Translator tr = new Translator();
 	protected String base = null; //name of the region to draw under turret, usually null
+	protected ShootStyle style = ShootStyle.normal;
 
 	public Turret(String name) {
 		super(name);
@@ -149,11 +151,8 @@ public class Turret extends Block{
 				entity.rotation = Mathf.slerpDelta(entity.rotation, targetRot,
 						rotatespeed);
 
-				if(Angles.angleDist(entity.rotation, targetRot) < shootCone && entity.timer.get(timerReload, reload)){
-					if(shootsound != null && entity.timer.get(timerSound, soundReload)) Effects.sound(shootsound, entity);
-					shoot(tile);
-					consumeAmmo(tile);
-					entity.ammo --;
+				if(Angles.angleDist(entity.rotation, targetRot) < shootCone/* && entity.timer.get(timerReload, reload)*/){
+					style.shoot(this, entity);
 				}
 			}
 		}
@@ -216,7 +215,6 @@ public class Turret extends Block{
 					bullet(tile, entity.rotation + Mathf.range(inaccuracy));
 				});
 			}
-			
 		}
 
 		Effects.effect(shootEffect, tile.drawx() + tr.x,
@@ -234,6 +232,32 @@ public class Turret extends Block{
 	@Override
 	public TileEntity getEntity(){
 		return new TurretEntity();
+	}
+
+	public enum ShootStyle{
+		normal{
+			void shoot(Turret turret, TurretEntity entity){
+				if(entity.timer.get(turret.timerReload, turret.reload)){
+					if(turret.shootsound != null && entity.timer.get(turret.timerSound, turret.soundReload))
+						Effects.sound(turret.shootsound, entity);
+					turret.consumeAmmo(entity.tile);
+					entity.ammo --;
+
+					turret.tr.trns(entity.rotation, turret.size * tilesize/2);
+
+					turret.bullet(entity.tile, entity.rotation + Mathf.range(turret.inaccuracy));
+
+					Effects.effect(turret.shootEffect, entity.tile.drawx() + turret.tr.x,
+							entity.tile.drawy() + turret.tr.y, entity.rotation);
+
+					if(turret.shootShake > 0){
+						Effects.shake(turret.shootShake, turret.shootShake, entity.tile.entity);
+					}
+				}
+			}
+		};
+
+		abstract void shoot(Turret turret, TurretEntity entity);
 	}
 	
 	public static class TurretEntity extends TileEntity{

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.mindustry.entities.bullets.BulletType;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.DestructibleEntity;
 import io.anuke.ucore.util.Mathf;

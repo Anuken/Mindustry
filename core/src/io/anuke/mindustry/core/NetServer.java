@@ -5,7 +5,7 @@ import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Recipes;
 import io.anuke.mindustry.content.UpgradeRecipes;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.bullets.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
