@@ -5,6 +5,7 @@ import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullets.BulletType;
 import io.anuke.mindustry.graphics.fx.Fx;
 import io.anuke.mindustry.graphics.Layer;
+import io.anuke.mindustry.resource.AmmoType;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.*;
 import io.anuke.ucore.core.Effects;
@@ -38,9 +39,7 @@ public class Turret extends Block{
 	protected float shotTransation = 2;
 	protected float shotDelayScale = 0;
 	protected String shootsound = "shoot";
-	protected io.anuke.mindustry.entities.bullets.BulletType bullet = BulletType.iron;
-	protected Item ammo;
-	protected int ammoMultiplier = 20;
+	protected AmmoType[] ammoTypes;
 	protected int maxammo = 400;
 	protected float rotatespeed = 0.2f;
 	protected float shootCone = 5f;
@@ -67,12 +66,13 @@ public class Turret extends Block{
 	@Override
 	public void setStats(){
 		super.setStats();
+		/*
 		if(ammo != null) stats.add("ammo", ammo);
 		if(ammo != null) stats.add("ammocapacity", maxammo);
-		if(ammo != null) stats.add("ammoitem", ammoMultiplier);
+		if(ammo != null) stats.add("ammoitem", ammoMultiplier);*/
 		stats.add("range", (int)range);
 		stats.add("inaccuracy", (int)inaccuracy);
-		stats.add("damageshot", bullet.damage);
+		//stats.add("damageshot", bullet.damage);
 		stats.add("shotssecond", Strings.toFixed(60f/reload, 1));
 		stats.add("shots", shots);
 	}
