@@ -5,6 +5,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.defense.turrets.PowerTurret;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
@@ -13,7 +14,7 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
-public class RepairTurret extends PowerTurret{
+public class RepairTurret extends PowerTurret {
 	protected float repairFrac = 1f / 135f;
 
 	public RepairTurret(String name) {
@@ -56,7 +57,8 @@ public class RepairTurret extends PowerTurret{
 
 			int maxhealth = entity.blockTarget.tile.block().health;
 
-			if(entity.timer.get(timerReload, reload) && Angles.angleDist(target, entity.rotation) < shootCone){
+			//TODO
+			if(entity.timer.get(100, reload) && Angles.angleDist(target, entity.rotation) < shootCone){
 				entity.blockTarget.health += maxhealth * repairFrac;
 				
 				if(entity.blockTarget.health > maxhealth)

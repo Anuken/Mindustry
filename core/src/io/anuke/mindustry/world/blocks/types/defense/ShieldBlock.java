@@ -3,10 +3,8 @@ package io.anuke.mindustry.world.blocks.types.defense;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Shield;
-import io.anuke.mindustry.graphics.fx.BulletFx;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
-import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BulletEntity;
 import io.anuke.ucore.util.Mathf;
@@ -75,7 +73,7 @@ public class ShieldBlock extends PowerBlock{
 		}
 		
 		bullet.remove();
-		Effects.effect(bullet.damage > 5 ? BulletFx.shieldhit : BulletFx.laserhit, bullet);
+		//Effects.effect(bullet.damage > 5 ? BulletFx.shieldhit : BulletFx.laserhit, bullet);
 		if(!headless) renderer.addShieldHit(bullet.x, bullet.y);
 		
 		entity.power.amount -= bullet.getDamage() * powerPerDamage;

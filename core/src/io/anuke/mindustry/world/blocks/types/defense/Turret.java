@@ -1,10 +1,11 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.bullets.BulletType;
-import io.anuke.mindustry.graphics.fx.Fx;
 import io.anuke.mindustry.graphics.Layer;
+import io.anuke.mindustry.graphics.fx.Fx;
 import io.anuke.mindustry.resource.AmmoType;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.*;
@@ -13,42 +14,40 @@ import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
-import io.anuke.ucore.util.Translator;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class Turret extends Block{
-	static final int targetInterval = 15;
-	static boolean drawDebug = false;
+	protected static final int targetInterval = 15;
 	
 	protected final int timerTarget = timers++;
-	protected final int timerReload = timers++;
-	protected final int timerSound = timers++;
-	
+
+    protected int maxammo = 100;
+    //TODO implement this!
+    /**A value of 'null' means this turret does not need ammo.*/
+    protected AmmoType[] ammoTypes;
+    protected ObjectMap<Item, AmmoType> ammoMap = new ObjectMap<>();
+
 	protected float range = 50f;
 	protected float reload = 10f;
 	protected float inaccuracy = 0f;
 	protected int shots = 1;
-	protected float shotTransation = 2;
-	protected float shotDelayScale = 0;
-	protected String shootsound = "shoot";
-	protected AmmoType[] ammoTypes;
-	protected int maxammo = 400;
+	protected float recoil = 1f;
+	protected float restitution = 0.02f;
 	protected float rotatespeed = 0.2f;
 	protected float shootCone = 5f;
-	protected Effect shootEffect = Fx.none;
 	protected float shootShake = 0f;
-	protected int soundReload = 0;
 	protected Translator tr = new Translator();
+	protected Translator tr2 = new Translator();
 	protected String base = null; //name of the region to draw under turret, usually null
-	protected ShootStyle style = ShootStyle.normal;
+
+	protected Effect shootEffect = Fx.none;
+    protected String shootsound = "shoot";
 
 	public Turret(String name) {
 		super(name);
@@ -56,11 +55,27 @@ public class Turret extends Block{
 		solid = true;
 		layer = Layer.turret;
 		group = BlockGroup.turrets;
+		hasInventory = false;
+	}
+
+	@Override
+	public void init(){
+	    super.init();
+
+	    if(ammoTypes != null) {
+            for (AmmoType type : ammoTypes) {
+                if (ammoMap.containsKey(type.item)) {
+                    throw new RuntimeException("Turret \"" + name + "\" has two conflicting ammo entries on item type " + type.item + "!");
+                } else {
+                    ammoMap.put(type.item, type);
+                }
+            }
+        }
 	}
 
 	@Override
 	public void setBars(){
-		bars.replace(new BlockBar(BarType.inventory, true, tile -> (float)tile.<TurretEntity>entity().ammo / maxammo));
+		bars.replace(new BlockBar(BarType.inventory, true, tile -> (float)tile.<TurretEntity>entity().totalAmmo / maxammo));
 	}
 	
 	@Override
@@ -95,11 +110,9 @@ public class Turret extends Block{
 	public void drawLayer(Tile tile){
 		TurretEntity entity = tile.entity();
 
-		Draw.rect(name(), tile.drawx(), tile.drawy(), entity.rotation - 90);
-		
-		if(debug && drawDebug){
-			drawTargeting(tile);
-		}
+		tr2.trns(entity.rotation, -entity.recoil);
+
+		Draw.rect(name(), tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
 	}
 	
 	@Override
@@ -115,25 +128,49 @@ public class Turret extends Block{
 		Lines.stroke(1f);
 		Lines.dashCircle(x * tilesize, y * tilesize, range);
 	}
-	
-	@Override
+
+    @Override
+    public void handleItem(Item item, Tile tile, Tile source) {
+        TurretEntity entity = tile.entity();
+
+        AmmoType type = ammoMap.get(item);
+        entity.totalAmmo += type.quantityMultiplier;
+
+        //find ammo entry by type
+        for(int i = 0; i < entity.ammo.size; i ++){
+            AmmoEntry entry = entity.ammo.get(i);
+
+            //if found, put it to the right
+            if(entry.type == type){
+                entry.amount += type.quantityMultiplier;
+                entity.ammo.swap(i, entity.ammo.size-1);
+                return;
+            }
+        }
+
+        //must not be found
+        AmmoEntry entry = new AmmoEntry(type, type.quantityMultiplier);
+        entity.ammo.add(entry);
+
+    }
+
+    @Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
-		return item == ammo && tile.<TurretEntity>entity().ammo < maxammo;
+        TurretEntity entity = tile.entity();
+
+        return ammoMap != null && ammoMap.get(item) != null && entity.totalAmmo + ammoMap.get(item).quantityMultiplier <= maxammo;
 	}
 	
 	@Override
 	public void update(Tile tile){
 		TurretEntity entity = tile.entity();
 		
-		if(ammo != null && entity.inventory.hasItem(ammo)){
-			entity.ammo += ammoMultiplier;
-			entity.inventory.removeItem(ammo, 1);
-		}
-		
 		if(entity.target != null && entity.target.isDead())
 			entity.target = null;
+
+		entity.recoil = Mathf.lerpDelta(entity.recoil, 0f, restitution);
 		
-		if(hasAmmo(tile) || (debug && infiniteAmmo)){
+		if(hasAmmo(tile)){
 			
 			if(entity.timer.get(timerTarget, targetInterval)){
 				entity.target = Units.getClosestEnemy(tile.getTeam(),
@@ -141,9 +178,10 @@ public class Turret extends Block{
 			}
 			
 			if(entity.target != null){
+			    AmmoType type = peekAmmo(tile);
 				
 				float targetRot = Angles.predictAngle(tile.worldx(), tile.worldy(), 
-						entity.target.x, entity.target.y, entity.target.velocity.x, entity.target.velocity.y, bullet.speed);
+						entity.target.x, entity.target.y, entity.target.velocity.x, entity.target.velocity.y, type.bullet.speed);
 				
 				if(Float.isNaN(entity.rotation)){
 					entity.rotation = 0;
@@ -151,82 +189,70 @@ public class Turret extends Block{
 				entity.rotation = Mathf.slerpDelta(entity.rotation, targetRot,
 						rotatespeed);
 
-				if(Angles.angleDist(entity.rotation, targetRot) < shootCone/* && entity.timer.get(timerReload, reload)*/){
-					style.shoot(this, entity);
+				if(Angles.angleDist(entity.rotation, targetRot) < shootCone){
+					updateShooting(tile);
 				}
 			}
 		}
 	}
-	
+
+	/**Consume ammo and return a type.*/
+	public AmmoType useAmmo(Tile tile){
+        TurretEntity entity = tile.entity();
+        AmmoEntry entry = entity.ammo.peek();
+        entry.amount --;
+        if(entry.amount == 0) entity.ammo.pop();
+        entity.totalAmmo --;
+        return entry.type;
+    }
+
+    /**Get the ammo type that will be returned if useAmmo is called.*/
+    public AmmoType peekAmmo(Tile tile){
+        TurretEntity entity = tile.entity();
+        return entity.ammo.peek().type;
+    }
+
+    /**Returns whether the turret has ammo.*/
 	public boolean hasAmmo(Tile tile){
 		TurretEntity entity = tile.entity();
-		return entity.ammo > 0;
+		return entity.ammo.size > 0 && entity.ammo.peek().amount > 0;
 	}
 	
-	public void consumeAmmo(Tile tile){
+	protected void updateShooting(Tile tile){
 		TurretEntity entity = tile.entity();
-		entity.ammo --;
-	}
-	
-	void drawTargeting(Tile tile){
-		TurretEntity entity = tile.entity();
-		
-		if(entity.target == null) return;
-		
-		float dst = entity.distanceTo(entity.target);
-		float hittime = dst / bullet.speed;
-		
-		float angle = Angles.predictAngle(tile.worldx(), tile.worldy(), 
-				entity.target.x, entity.target.y, entity.target.velocity.x, entity.target.velocity.y, bullet.speed);
-		
-		float predictX = entity.target.x + entity.target.velocity.x * hittime,
-				predictY = entity.target.y + entity.target.velocity.y * hittime;
-		
-		Draw.color(Color.GREEN);
-		Lines.line(tile.worldx(), tile.worldy(), entity.target.x, entity.target.y);
-		
-		Draw.color(Color.RED);
-		Lines.line(tile.worldx(), tile.worldy(), entity.target.x + entity.target.velocity.x * hittime,
-				entity.target.y + entity.target.velocity.y * hittime);
-		
-		Draw.color(Color.PURPLE);
-		Lines.stroke(2f);
-		Lines.lineAngle(tile.worldx(), tile.worldy(), angle, 7f);
-		
-		Draw.reset();
-		
-		if(Timers.getTime(tile, "reload") <= 0){
-			Timers.run(hittime, () -> Effects.effect(Fx.spawn, predictX, predictY));
+
+		if(entity.reload >= reload) {
+		    AmmoType type = useAmmo(tile);
+
+            shoot(tile, type);
+
+            entity.reload = 0f;
+        }else{
+			entity.reload += Timers.delta() * peekAmmo(tile).speedMultiplier;
 		}
 	}
-	
-	protected void shoot(Tile tile){
+
+	protected void shoot(Tile tile, AmmoType ammo){
 		TurretEntity entity = tile.entity();
 
-		tr.trns(entity.rotation, size * tilesize/2);
-		
-		for(int i = 0; i < shots; i ++){
-			if(Mathf.zero(shotDelayScale)){
+		entity.recoil = recoil;
 
-				bullet(tile, entity.rotation + Mathf.range(inaccuracy));
-			}else{
-				Timers.run(i * shotDelayScale, () -> {
-					tr.trns(entity.rotation, size * tilesize/2f);
-					bullet(tile, entity.rotation + Mathf.range(inaccuracy));
-				});
-			}
+		tr.trns(entity.rotation, size * tilesize / 2);
+
+		for (int i = 0; i < shots; i++) {
+			bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy));
 		}
 
 		Effects.effect(shootEffect, tile.drawx() + tr.x,
-			tile.drawy() + tr.y, entity.rotation);
-		
-		if(shootShake > 0){
+				tile.drawy() + tr.y, entity.rotation);
+
+		if (shootShake > 0) {
 			Effects.shake(shootShake, shootShake, tile.entity);
 		}
 	}
 	
-	protected void bullet(Tile tile, float angle){
-		new Bullet(bullet, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle).add();
+	protected void bullet(Tile tile, BulletType type, float angle){
+		new Bullet(type, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle).add();
 	}
 
 	@Override
@@ -234,46 +260,43 @@ public class Turret extends Block{
 		return new TurretEntity();
 	}
 
-	public enum ShootStyle{
-		normal{
-			void shoot(Turret turret, TurretEntity entity){
-				if(entity.timer.get(turret.timerReload, turret.reload)){
-					if(turret.shootsound != null && entity.timer.get(turret.timerSound, turret.soundReload))
-						Effects.sound(turret.shootsound, entity);
-					turret.consumeAmmo(entity.tile);
-					entity.ammo --;
+	public static class AmmoEntry{
+		public final AmmoType type;
+		public int amount;
 
-					turret.tr.trns(entity.rotation, turret.size * tilesize/2);
-
-					turret.bullet(entity.tile, entity.rotation + Mathf.range(turret.inaccuracy));
-
-					Effects.effect(turret.shootEffect, entity.tile.drawx() + turret.tr.x,
-							entity.tile.drawy() + turret.tr.y, entity.rotation);
-
-					if(turret.shootShake > 0){
-						Effects.shake(turret.shootShake, turret.shootShake, entity.tile.entity);
-					}
-				}
-			}
-		};
-
-		abstract void shoot(Turret turret, TurretEntity entity);
-	}
+        public AmmoEntry(AmmoType type, int amount) {
+            this.type = type;
+            this.amount = amount;
+        }
+    }
 	
 	public static class TurretEntity extends TileEntity{
 		public TileEntity blockTarget;
-		public int ammo;
+		public Array<AmmoEntry> ammo = new Array<>();
+		public int totalAmmo;
+		public float reload;
 		public float rotation = 90;
+		public float recoil = 0f;
 		public Unit target;
 		
 		@Override
 		public void write(DataOutputStream stream) throws IOException{
-			stream.writeInt(ammo);
+		    stream.writeByte(ammo.size);
+		    for(AmmoEntry entry : ammo){
+                stream.writeByte(entry.type.id);
+                stream.writeShort(entry.amount);
+            }
 		}
 		
 		@Override
 		public void read(DataInputStream stream) throws IOException{
-			this.ammo = stream.readInt();
+			byte amount = stream.readByte();
+			for(int i = 0; i < amount; i ++){
+			    AmmoType type = AmmoType.getByID(stream.readByte());
+			    short ta = stream.readShort();
+			    ammo.add(new AmmoEntry(type, ta));
+			    totalAmmo += ta;
+            }
 		}
 	}
 }

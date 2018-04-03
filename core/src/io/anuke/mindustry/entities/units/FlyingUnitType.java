@@ -2,7 +2,6 @@ package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectSet;
-import io.anuke.mindustry.entities.bullets.BulletType;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.graphics.fx.Fx;
@@ -66,7 +65,7 @@ public class FlyingUnitType extends UnitType {
         unit.velocity.add(vec); //TODO clamp it so it doesn't glitch out at low fps
 
         if(unit.timer.get(timerReload, reload) && len < range){
-            shoot(unit, BulletType.shot, ang, 4f);
+            //shoot(unit, BulletType.shot, ang, 4f);
         }
     }
 

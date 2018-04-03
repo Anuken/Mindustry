@@ -1,15 +1,15 @@
-package io.anuke.mindustry.world.blocks.types.defense;
+package io.anuke.mindustry.world.blocks.types.defense.turrets;
 
-import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.AmmoType;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.defense.Turret;
 import io.anuke.ucore.util.Strings;
 
-public abstract class PowerTurret extends Turret{
+public abstract class PowerTurret extends Turret {
 	public float powerUsed = 0.5f;
 
 	public PowerTurret(String name) {
 		super(name);
-		ammo = null;
 		hasPower = true;
 	}
 	
@@ -21,16 +21,12 @@ public abstract class PowerTurret extends Turret{
 	
 	@Override
 	public boolean hasAmmo(Tile tile){
-		return tile.entity.power.amount >= powerUsed;
+		return tile.entity.power.amount >= powerUsed && super.hasAmmo(tile);
 	}
-	
+
 	@Override
-	public void consumeAmmo(Tile tile){
+	public AmmoType useAmmo(Tile tile){
 		tile.entity.power.amount -= powerUsed;
-	}
-	
-	@Override
-	public boolean acceptItem(Item item, Tile tile, Tile source){
-		return false;
+		return super.useAmmo(tile);
 	}
 }

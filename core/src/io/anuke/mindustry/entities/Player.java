@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.entities.bullets.BulletType;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.fx.ExplosionFx;
 import io.anuke.mindustry.graphics.fx.Fx;

@@ -1,7 +1,7 @@
 package io.anuke.mindustry.game;
 
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.bullets.BulletType;
+import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.resource.Weapon;

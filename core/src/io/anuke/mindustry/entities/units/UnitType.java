@@ -2,7 +2,7 @@ package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.Bullet;
-import io.anuke.mindustry.entities.bullets.BulletType;
+import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.graphics.fx.ExplosionFx;

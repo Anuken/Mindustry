@@ -3,7 +3,6 @@ package io.anuke.mindustry.world.blocks.types.power;
 import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.fx.BlockFx;
-import io.anuke.mindustry.graphics.fx.BulletFx;
 import io.anuke.mindustry.graphics.fx.ExplosionFx;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
@@ -63,7 +62,6 @@ public class PowerGenerator extends PowerBlock {
     public void onDestroyed(Tile tile){
         float x = tile.worldx(), y = tile.worldy();
 
-        Effects.effect(BulletFx.shellsmoke, x, y);
         Effects.effect(BlockFx.blastsmoke, x, y);
 
         Timers.run(Mathf.random(8f + Mathf.random(6f)), () -> {

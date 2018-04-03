@@ -13,7 +13,7 @@ public class ExplosionFx {
     generatorexplosion = new Effect(28, 40f, e -> {
         Angles.randLenVectors(e.id, 16, 10f + e.ifract()*8f, (x, y)->{
             float size = e.fract()*12f + 1f;
-            Draw.color(Color.WHITE, Fx.lightOrange, e.ifract());
+            Draw.color(Color.WHITE, Color.PURPLE, e.ifract());
             Draw.rect("circle", e.x + x, e.y + y, size, size);
             Draw.reset();
         });

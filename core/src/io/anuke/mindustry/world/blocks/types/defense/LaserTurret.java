@@ -3,9 +3,10 @@ package io.anuke.mindustry.world.blocks.types.defense;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.graphics.fx.BulletFx;
 import io.anuke.mindustry.graphics.Layer;
+import io.anuke.mindustry.graphics.fx.Fx;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.defense.turrets.PowerTurret;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -15,9 +16,9 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
-public class LaserTurret extends PowerTurret{
+public class LaserTurret extends PowerTurret {
 	protected Color beamColor = Color.WHITE.cpy();
-	protected Effect hiteffect = BulletFx.laserhit;
+	protected Effect hiteffect = Fx.none;
 	protected int damage = 4;
 	protected float cone = 15f;
 
@@ -25,11 +26,11 @@ public class LaserTurret extends PowerTurret{
 		super(name);
 		shootsound = null;
 		layer2 = Layer.laser;
-		soundReload = 20;
+		//soundReload = 20;
 	}
 	
 	@Override
-	public void shoot(Tile tile){
+	public void updateShooting(Tile tile){
 		TurretEntity entity = tile.entity();
 		Unit enemy = entity.target;
 		
