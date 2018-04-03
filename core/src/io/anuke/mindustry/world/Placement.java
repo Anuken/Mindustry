@@ -87,7 +87,7 @@ public class Placement {
         if(effects && sound) threads.run(() -> Effects.sound("place", x * tilesize, y * tilesize));
     }
 
-    public static boolean validPlace(int x, int y, Block type){
+    public static boolean validPlace(int x, int y, Block type, byte rotation){
         for(int i = 0; i < world.getSpawns().size; i ++){
             SpawnPoint spawn = world.getSpawns().get(i);
             if(Vector2.dst(x * tilesize, y * tilesize, spawn.start.worldx(), spawn.start.worldy()) < enemyspawnspace){
@@ -146,7 +146,7 @@ public class Placement {
             }
             return true;
         }else {
-            return tile.block() != type
+            return (tile.block() == type && tile.block().rotate && tile.getRotation()!=rotation)
                     && (type.canReplace(tile.block()) || tile.block().alwaysReplace)
                     && tile.block().isMultiblock() == type.isMultiblock() || tile.block() == Blocks.air;
         }

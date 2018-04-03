@@ -19,10 +19,10 @@ public class PowerLaser extends Generator{
 
 	@Override
 	public boolean canReplace(Block other) {
-		return other instanceof  PowerLaser && other != this;
+		return other instanceof  PowerLaser;
 	}
 
-	@Override
+    @Override
 	public void update(Tile tile){
 		distributeLaserPower(tile);
 	}
