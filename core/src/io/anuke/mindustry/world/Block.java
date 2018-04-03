@@ -181,7 +181,7 @@ public class Block extends BaseBlock {
 	}
 	
 	public boolean canReplace(Block other){
-		return other != this && this.group != BlockGroup.none && other.group == this.group;
+		return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group;
 	}
 	
 	public int handleDamage(Tile tile, int amount){

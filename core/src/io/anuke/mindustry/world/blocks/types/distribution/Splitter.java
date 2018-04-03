@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.types.distribution;
 
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.BlockGroup;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.util.Mathf;
 
@@ -13,6 +14,7 @@ public class Splitter extends Block{
         instantTransfer = true;
         destructible = true;
         hasInventory = false;
+        group = BlockGroup.transportation;
     }
 
     @Override

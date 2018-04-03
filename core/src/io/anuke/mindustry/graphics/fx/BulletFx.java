@@ -55,5 +55,17 @@ public class BulletFx {
         });
 
         Draw.reset();
+    }),
+
+    despawn = new Effect(12, e -> {
+        Draw.color(lighterOrange, Color.GRAY, e.ifract());
+        Lines.stroke(e.fract());
+
+        Angles.randLenVectors(e.id, 7, e.ifract()*7f, e.rotation, 40f, (x, y) -> {
+            float ang = Mathf.atan2(x, y);
+            Lines.lineAngle(e.x + x, e.y + y, ang, e.fract()*2 + 1f);
+        });
+
+        Draw.reset();
     });
 }

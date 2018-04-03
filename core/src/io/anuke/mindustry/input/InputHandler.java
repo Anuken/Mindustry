@@ -91,7 +91,7 @@ public abstract class InputHandler extends InputAdapter{
 			return false;
 		}
 
-		return Placement.validPlace(player.team, x, y, type);
+		return Placement.validPlace(player.team, x, y, type, rotation);
 	}
 	
 	public boolean validBreak(int x, int y){

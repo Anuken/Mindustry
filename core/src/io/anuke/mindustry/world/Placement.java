@@ -89,7 +89,7 @@ public class Placement {
         if(effects && sound) threads.run(() -> Effects.sound("place", x * tilesize, y * tilesize));
     }
 
-    public static boolean validPlace(Team team, int x, int y, Block type){
+    public static boolean validPlace(Team team, int x, int y, Block type, int rotation){
         Recipe recipe = Recipes.getByResult(type);
 
         if(recipe == null || !state.inventory.hasItems(recipe.requirements)){
@@ -134,8 +134,8 @@ public class Placement {
             }
             return true;
         }else {
-            return tile.block() != type && (tile.getTeam() == Team.none || tile.getTeam() == team)
-                    && (type.canReplace(tile.block()) || tile.block().alwaysReplace)
+            return (tile.getTeam() == Team.none || tile.getTeam() == team)
+                    && ((type.canReplace(tile.block()) && !(type == tile.block() && rotation == tile.getRotation() && type.rotate)) || tile.block().alwaysReplace)
                     && tile.block().isMultiblock() == type.isMultiblock() || tile.block() == Blocks.air;
         }
     }

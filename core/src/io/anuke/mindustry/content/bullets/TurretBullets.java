@@ -12,7 +12,7 @@ public class TurretBullets {
         @Override
         public void draw(Bullet b) {
             Draw.color(Color.valueOf("f3d47f"));
-            Draw.rect("bullet", b.x, b.y, b.angle() - 90);
+            Draw.rect("bullet", b.x, b.y, 9f, 5f + b.fract()*7f, b.angle() - 90);
             Draw.color();
         }
     };
