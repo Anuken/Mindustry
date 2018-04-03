@@ -33,6 +33,8 @@ public class Turret extends Block{
     protected AmmoType[] ammoTypes;
     protected ObjectMap<Item, AmmoType> ammoMap = new ObjectMap<>();
 
+    protected int ammoPerShot = 1;
+    protected float ammoEjectBack = 1f;
 	protected float range = 50f;
 	protected float reload = 10f;
 	protected float inaccuracy = 0f;
@@ -47,6 +49,8 @@ public class Turret extends Block{
 	protected String base = null; //name of the region to draw under turret, usually null
 
 	protected Effect shootEffect = Fx.none;
+	protected Effect smokeEffect = Fx.none;
+	protected Effect ammoUseEffect = Fx.none;
     protected String shootsound = "shoot";
 
 	public Turret(String name) {
@@ -200,9 +204,10 @@ public class Turret extends Block{
 	public AmmoType useAmmo(Tile tile){
         TurretEntity entity = tile.entity();
         AmmoEntry entry = entity.ammo.peek();
-        entry.amount --;
+        entry.amount -= ammoPerShot;
         if(entry.amount == 0) entity.ammo.pop();
-        entity.totalAmmo --;
+        entity.totalAmmo -= ammoPerShot;
+        ejectEffects(tile);
         return entry.type;
     }
 
@@ -215,14 +220,14 @@ public class Turret extends Block{
     /**Returns whether the turret has ammo.*/
 	public boolean hasAmmo(Tile tile){
 		TurretEntity entity = tile.entity();
-		return entity.ammo.size > 0 && entity.ammo.peek().amount > 0;
+		return entity.ammo.size > 0 && entity.ammo.peek().amount >= ammoPerShot;
 	}
 	
 	protected void updateShooting(Tile tile){
 		TurretEntity entity = tile.entity();
 
 		if(entity.reload >= reload) {
-		    AmmoType type = useAmmo(tile);
+		    AmmoType type = peekAmmo(tile);
 
             shoot(tile, type);
 
@@ -237,11 +242,11 @@ public class Turret extends Block{
 
 		entity.recoil = recoil;
 
+		useAmmo(tile);
+
 		tr.trns(entity.rotation, size * tilesize / 2);
 
-		for (int i = 0; i < shots; i++) {
-			bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy));
-		}
+		bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy));
 
 		Effects.effect(shootEffect, tile.drawx() + tr.x,
 				tile.drawy() + tr.y, entity.rotation);
@@ -253,6 +258,26 @@ public class Turret extends Block{
 	
 	protected void bullet(Tile tile, BulletType type, float angle){
 		new Bullet(type, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle).add();
+	}
+
+	protected void effects(Tile tile){
+		TurretEntity entity = tile.entity();
+
+		Effects.effect(shootEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
+		Effects.effect(smokeEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
+
+		if (shootShake > 0) {
+			Effects.shake(shootShake, shootShake, tile.entity);
+		}
+
+		entity.recoil = recoil;
+	}
+
+	protected void ejectEffects(Tile tile){
+		TurretEntity entity = tile.entity();
+
+		Effects.effect(ammoUseEffect, tile.drawx() - Angles.trnsx(entity.rotation, ammoEjectBack),
+				tile.drawy() - Angles.trnsy(entity.rotation, ammoEjectBack), entity.rotation);
 	}
 
 	@Override
@@ -277,6 +302,7 @@ public class Turret extends Block{
 		public float reload;
 		public float rotation = 90;
 		public float recoil = 0f;
+		public int shots;
 		public Unit target;
 		
 		@Override

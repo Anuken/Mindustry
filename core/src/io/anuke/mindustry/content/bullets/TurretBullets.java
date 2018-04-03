@@ -8,10 +8,10 @@ import io.anuke.ucore.graphics.Draw;
 public class TurretBullets {
     public static final BulletType
 
-    basicIron = new BulletType(2f, 0) {
+    basicIron = new BulletType(3f, 0) {
         @Override
         public void draw(Bullet b) {
-            Draw.color(Color.valueOf("f6e096"));
+            Draw.color(Color.valueOf("f3d47f"));
             Draw.rect("bullet", b.x, b.y, b.angle() - 90);
             Draw.color();
         }

@@ -23,14 +23,30 @@ public class BulletFx {
         Draw.reset();
     }),
 
-    smokeParticleSmall = new Effect(20, e -> {
+    shootSmallSmoke = new Effect(20f, e -> {
         Draw.color(Color.GRAY);
-        Fill.circle(e.x, e.y, e.fract()*1.5f);
+
+        Angles.randLenVectors(e.id, 5, e.powfract()*6f, e.rotation, 20f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fract()*1.5f);
+        });
+
         Draw.reset();
     }),
 
+    shellEjectSmall = new Effect(30f, e -> {
+        Draw.color(Color.LIGHT_GRAY);
+        Draw.alpha(e.fract());
+        float rot = e.rotation + 90f;
+        for(int i : Mathf.signs){
+            float len = (2f + e.powfract()*6f) * i;
+            float lr = rot + e.ifract()*30f*i;
+            Draw.rect("white", e.x + Angles.trnsx(lr, len), e.y + Angles.trnsy(lr, len), 1f, 2f, rot + e.ifract()*50f*i);
+        }
+        Draw.color();
+    }),
+
     hit = new Effect(14, e -> {
-        Draw.color(Color.WHITE, lighterOrange, e.ifract());
+        Draw.color(Color.WHITE, lightOrange, e.ifract());
         Lines.stroke(0.5f + e.fract());
 
         Angles.randLenVectors(e.id, 5, e.ifract()*15f, e.rotation, 50f, (x, y) -> {

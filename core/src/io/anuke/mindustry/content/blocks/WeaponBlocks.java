@@ -6,6 +6,7 @@ import io.anuke.mindustry.resource.AmmoType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.defense.LaserTurret;
 import io.anuke.mindustry.world.blocks.types.defense.Turret;
+import io.anuke.mindustry.world.blocks.types.defense.turrets.BurstTurret;
 import io.anuke.mindustry.world.blocks.types.defense.turrets.DoubleTurret;
 import io.anuke.mindustry.world.blocks.types.defense.turrets.LiquidTurret;
 import io.anuke.mindustry.world.blocks.types.defense.turrets.PowerTurret;
@@ -15,13 +16,24 @@ public class WeaponBlocks{
 	
 	doubleturret = new DoubleTurret("doubleturret"){{
 		ammoTypes = new AmmoType[]{AmmoTypes.basicIron};
-		reload = 40f;
+		reload = 25f;
+		restitution = 0.03f;
 		shootEffect = BulletFx.shootSmall;
+		smokeEffect = BulletFx.shootSmallSmoke;
 	}},
 	
-	gatlingturret = new Turret("gatlingturret"){
-
-	},
+	gatlingturret = new BurstTurret("gatlingturret") {{
+		ammoTypes = new AmmoType[]{AmmoTypes.basicIron};
+		ammoPerShot = 1;
+		shots = 3;
+		reload = 60f;
+		restitution = 0.03f;
+		recoil = 1.5f;
+		burstSpacing = 6f;
+		shootEffect = BulletFx.shootSmall;
+		smokeEffect = BulletFx.shootSmallSmoke;
+		ammoUseEffect = BulletFx.shellEjectSmall;
+	}},
 	
 	flameturret = new Turret("flameturret"){
 
