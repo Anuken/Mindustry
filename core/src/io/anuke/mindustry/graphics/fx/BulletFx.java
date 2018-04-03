@@ -24,7 +24,7 @@ public class BulletFx {
     }),
 
     shootSmallSmoke = new Effect(20f, e -> {
-        Draw.color(Color.GRAY);
+        Draw.color(lighterOrange, Color.LIGHT_GRAY, Color.GRAY, e.ifract());
 
         Angles.randLenVectors(e.id, 5, e.powfract()*6f, e.rotation, 20f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fract()*1.5f);
@@ -34,7 +34,7 @@ public class BulletFx {
     }),
 
     shellEjectSmall = new Effect(30f, e -> {
-        Draw.color(Color.LIGHT_GRAY);
+        Draw.color(lightOrange, Color.LIGHT_GRAY, Color.GRAY, e.ifract());
         Draw.alpha(e.fract());
         float rot = e.rotation + 90f;
         for(int i : Mathf.signs){
