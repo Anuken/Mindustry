@@ -35,9 +35,14 @@ public class WeaponBlocks{
 		ammoUseEffect = BulletFx.shellEjectSmall;
 	}},
 	
-	flameturret = new Turret("flameturret"){
-
-	},
+	flameturret = new LiquidTurret("flameturret"){{
+		ammoTypes = new AmmoType[]{AmmoTypes.basicFlame};
+		recoil = 0f;
+		reload = 5f;
+		shootCone = 50f;
+		shootEffect = BulletFx.shootSmallFlame;
+		ammoUseEffect = BulletFx.shellEjectSmall;
+	}},
 	
 	railgunturret = new Turret("railgunturret"){
 
@@ -55,9 +60,9 @@ public class WeaponBlocks{
 
 	},
 
-	magmaturret = new LiquidTurret("magmaturret") {
-
-	},
+	magmaturret = new LiquidTurret("magmaturret") {{
+		ammoTypes = new AmmoType[]{AmmoTypes.basicFlame};
+	}},
 		
 	plasmaturret = new Turret("plasmaturret"){
 

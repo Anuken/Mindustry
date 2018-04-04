@@ -10,6 +10,8 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
 public class BulletFx {
+    public static Color lightFlame = Color.valueOf("ffdd55");
+    public static Color darkFlame = Color.valueOf("db401c");
     public static Color lightOrange = Color.valueOf("f68021");
     public static Color lighterOrange = Color.valueOf("f6e096");
 
@@ -33,6 +35,16 @@ public class BulletFx {
         Draw.reset();
     }),
 
+    shootSmallFlame = new Effect(30f, e -> {
+        Draw.color(lightFlame, darkFlame, Color.GRAY, e.ifract());
+
+        Angles.randLenVectors(e.id, 8, e.powfract()*26f, e.rotation, 10f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 0.65f + e.fract()*1.5f);
+        });
+
+        Draw.reset();
+    }),
+
     shellEjectSmall = new Effect(30f, e -> {
         Draw.color(lightOrange, Color.LIGHT_GRAY, Color.GRAY, e.ifract());
         Draw.alpha(e.fract());
@@ -45,8 +57,20 @@ public class BulletFx {
         Draw.color();
     }),
 
-    hit = new Effect(14, e -> {
+    hitBulletSmall = new Effect(14, e -> {
         Draw.color(Color.WHITE, lightOrange, e.ifract());
+        Lines.stroke(0.5f + e.fract());
+
+        Angles.randLenVectors(e.id, 5, e.ifract()*15f, e.rotation, 50f, (x, y) -> {
+            float ang = Mathf.atan2(x, y);
+            Lines.lineAngle(e.x + x, e.y + y, ang, e.fract()*3 + 1f);
+        });
+
+        Draw.reset();
+    }),
+
+    hitFlameSmall = new Effect(14, e -> {
+        Draw.color(lightFlame, darkFlame, e.ifract());
         Lines.stroke(0.5f + e.fract());
 
         Angles.randLenVectors(e.id, 5, e.ifract()*15f, e.rotation, 50f, (x, y) -> {

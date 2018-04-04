@@ -43,6 +43,9 @@ public class ContentLoader {
 
             //units
             new UnitTypes(),
+
+            //ammotypes
+            new AmmoTypes(),
         };
 
         for(Block block : Block.getAllBlocks()){

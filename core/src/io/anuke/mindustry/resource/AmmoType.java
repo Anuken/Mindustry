@@ -8,18 +8,37 @@ public class AmmoType {
     private static Array<AmmoType> allTypes = new Array<>();
 
     public final byte id;
+    /**The item used. Always null if liquid isn't.*/
     public final Item item;
+    /**The liquid used. Always null if item isn't.*/
+    public final Liquid liquid;
+    /**The resulting bullet.*/
     public final BulletType bullet;
-    public final int quantityMultiplier;
+    /**For item ammo, this is amount given per ammo item.
+     * For liquid ammo, this is amount used per shot.*/
+    public final float quantityMultiplier;
+    /**Turret shoot speed multiplier.*/
     public final float speedMultiplier;
 
-    public AmmoType(Item item, BulletType result, int multiplier, float speedMultiplier){
+    {
+        this.id = (byte)(lastID++);
+        allTypes.add(this);
+    }
+
+    public AmmoType(Item item, BulletType result, float multiplier, float speedMultiplier){
         this.item = item;
+        this.liquid = null;
         this.bullet = result;
         this.quantityMultiplier = multiplier;
         this.speedMultiplier = speedMultiplier;
-        this.id = (byte)(lastID++);
-        allTypes.add(this);
+    }
+
+    public AmmoType(Liquid liquid, BulletType result, float multiplier, float speedMultiplier){
+        this.item = null;
+        this.liquid = liquid;
+        this.bullet = result;
+        this.quantityMultiplier = multiplier;
+        this.speedMultiplier = speedMultiplier;
     }
 
     public static Array<AmmoType> getAllTypes() {

@@ -1,22 +1,22 @@
 package io.anuke.mindustry.entities;
 
+import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.BulletEntity;
 import io.anuke.ucore.entities.Entity;
+import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.util.Timer;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class Bullet extends BulletEntity{
+	public IntSet collided;
 	public Timer timer = new Timer(3);
 	public Team team;
 	
 	public Bullet(BulletType type, Unit owner, float x, float y, float angle){
-		super(type, owner, angle);
-		this.type = type;
-		this.team = owner.team;
-		set(x, y);
+		this(type, owner, owner.team, x, y, angle);
 	}
 
 	public Bullet(BulletType type, Entity owner, Team team, float x, float y, float angle){
@@ -24,6 +24,10 @@ public class Bullet extends BulletEntity{
 		this.team = team;
 		this.type = type;
 		set(x, y);
+
+		if(type.pierce){
+			collided = new IntSet();
+		}
 	}
 
 	public Bullet(BulletType type, Bullet parent, float x, float y, float angle){
@@ -44,13 +48,26 @@ public class Bullet extends BulletEntity{
 			type.draw(this);
 		}
 	}
-	
+
+	@Override
 	public float drawSize(){
 		return 8;
 	}
 
 	public boolean collidesTiles(){
 		return true;
+	}
+
+	@Override
+	public boolean collides(SolidEntity other){
+		return super.collides(other) && (!type.pierce || !collided.contains(other.id));
+	}
+
+	@Override
+	public void collision(SolidEntity other, float x, float y){
+		super.collision(other, x, y);
+		if(type.pierce)
+			collided.add(other.id);
 	}
 
 	@Override

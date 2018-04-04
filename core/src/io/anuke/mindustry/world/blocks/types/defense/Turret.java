@@ -68,6 +68,7 @@ public class Turret extends Block{
 
 	    if(ammoTypes != null) {
             for (AmmoType type : ammoTypes) {
+            	if(type.item == null) continue;
                 if (ammoMap.containsKey(type.item)) {
                     throw new RuntimeException("Turret \"" + name + "\" has two conflicting ammo entries on item type " + type.item + "!");
                 } else {
@@ -153,9 +154,8 @@ public class Turret extends Block{
         }
 
         //must not be found
-        AmmoEntry entry = new AmmoEntry(type, type.quantityMultiplier);
+        AmmoEntry entry = new AmmoEntry(type, (int)type.quantityMultiplier);
         entity.ammo.add(entry);
-
     }
 
     @Override

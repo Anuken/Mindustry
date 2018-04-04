@@ -10,6 +10,7 @@ import java.io.IOException;
 
 public class LiquidModule extends BlockModule {
     public float amount;
+    /**Should never be null.*/
     public Liquid liquid = Liquids.none;
 
     @Override

@@ -121,6 +121,7 @@ public class Recipes {
 
 		new Recipe(units, DebugBlocks.itemSource, stack(Items.steel, 10)).setDebug(),
 		new Recipe(units, DebugBlocks.itemVoid, stack(Items.steel, 10)).setDebug(),
+		new Recipe(units, DebugBlocks.liquidSource, stack(Items.steel, 10)).setDebug(),
 		new Recipe(units, DebugBlocks.powerVoid, stack(Items.steel, 10)).setDebug(),
 		new Recipe(units, DebugBlocks.powerInfinite, stack(Items.steel, 10), stack(Items.densealloy, 5)).setDebug()
 	);
