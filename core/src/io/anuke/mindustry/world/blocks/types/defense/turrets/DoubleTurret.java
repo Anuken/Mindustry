@@ -2,12 +2,11 @@ package io.anuke.mindustry.world.blocks.types.defense.turrets;
 
 import io.anuke.mindustry.resource.AmmoType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.defense.Turret;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class DoubleTurret extends Turret {
+public class DoubleTurret extends ItemTurret {
     protected float shotWidth = 2f;
 
     public DoubleTurret(String name) {

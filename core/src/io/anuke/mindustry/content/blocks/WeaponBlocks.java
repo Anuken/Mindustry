@@ -6,10 +6,7 @@ import io.anuke.mindustry.resource.AmmoType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.defense.LaserTurret;
 import io.anuke.mindustry.world.blocks.types.defense.Turret;
-import io.anuke.mindustry.world.blocks.types.defense.turrets.BurstTurret;
-import io.anuke.mindustry.world.blocks.types.defense.turrets.DoubleTurret;
-import io.anuke.mindustry.world.blocks.types.defense.turrets.LiquidTurret;
-import io.anuke.mindustry.world.blocks.types.defense.turrets.PowerTurret;
+import io.anuke.mindustry.world.blocks.types.defense.turrets.*;
 
 public class WeaponBlocks{
 	public static Block
@@ -44,13 +41,31 @@ public class WeaponBlocks{
 		ammoUseEffect = BulletFx.shellEjectSmall;
 	}},
 	
-	railgunturret = new Turret("railgunturret"){
-
-	},
+	railgunturret = new ItemTurret("railgunturret"){{
+		range = 100f;
+		ammoTypes = new AmmoType[]{AmmoTypes.basicSteel};
+		reload = 100f;
+		restitution = 0.03f;
+		ammoEjectBack = 2f;
+		recoil = 3f;
+		shootShake = 2f;
+		shootEffect = BulletFx.shootBig;
+		smokeEffect = BulletFx.shootBigSmoke;
+		ammoUseEffect = BulletFx.shellEjectBig;
+	}},
 	
-	flakturret = new Turret("flakturret"){
-
-	},
+	flakturret = new ItemTurret("flakturret"){{
+		range = 100f;
+		ammoTypes = new AmmoType[]{AmmoTypes.basicSteel};
+		reload = 100f;
+		restitution = 0.03f;
+		ammoEjectBack = 2f;
+		recoil = 3f;
+		shootShake = 2f;
+		shootEffect = BulletFx.shootBig;
+		smokeEffect = BulletFx.shootBigSmoke;
+		ammoUseEffect = BulletFx.shellEjectBig;
+	}},
 	
 	laserturret = new LaserTurret("laserturret"){
 

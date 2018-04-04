@@ -5,6 +5,7 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.BaseBulletType;
 
 public abstract class BulletType extends BaseBulletType<Bullet>{
+	public float knockback;
 	
 	public BulletType(float speed, int damage){
 		this.speed = speed;

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
@@ -11,6 +12,8 @@ import io.anuke.ucore.util.Timer;
 import static io.anuke.mindustry.Vars.*;
 
 public class Bullet extends BulletEntity{
+	private static Vector2 vector = new Vector2();
+
 	public IntSet collided;
 	public Timer timer = new Timer(3);
 	public Team team;
@@ -68,6 +71,11 @@ public class Bullet extends BulletEntity{
 		super.collision(other, x, y);
 		if(type.pierce)
 			collided.add(other.id);
+
+		if(other instanceof Unit){
+			float k =  ((BulletType)type).knockback;
+			((Unit) other).velocity.add(vector.set(other.x, other.y).sub(x, y).setLength(k));
+		}
 	}
 
 	@Override

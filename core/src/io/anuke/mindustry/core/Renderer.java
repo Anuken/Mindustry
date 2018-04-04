@@ -223,10 +223,8 @@ public class Renderer extends RendererModule{
 			Graphics.beginShaders(Shaders.outline);
 			Graphics.shader(Shaders.hit, false);
 			drawTeam(team, flying);
-			Draw.alpha(0f);
-			blocks.drawTeamBlocks(Layer.turret, team);
-			Draw.alpha(1f);
 			Graphics.shader();
+			blocks.drawTeamBlocks(Layer.turret, team);
 			Graphics.endShaders();
 		}
 	}

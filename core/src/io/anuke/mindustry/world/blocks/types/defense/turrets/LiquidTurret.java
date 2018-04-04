@@ -10,6 +10,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.defense.Turret;
 
 public abstract class LiquidTurret extends Turret {
+    protected AmmoType[] ammoTypes;
     protected ObjectMap<Liquid, AmmoType> liquidAmmoMap = new ObjectMap<>();
 
     public LiquidTurret(String name) {

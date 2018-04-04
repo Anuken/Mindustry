@@ -8,5 +8,7 @@ public class AmmoTypes {
 
     basicIron = new AmmoType(Items.iron, TurretBullets.basicIron, 5, 0.9f),
 
+    basicSteel = new AmmoType(Items.steel, TurretBullets.basicSteel, 5, 0.8f),
+
     basicFlame = new AmmoType(Liquids.oil, TurretBullets.basicFlame, 0.3f, 0.9f);
 }

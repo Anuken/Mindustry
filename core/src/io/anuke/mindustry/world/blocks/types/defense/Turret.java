@@ -2,19 +2,24 @@ package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.graphics.Layer;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.fx.Fx;
 import io.anuke.mindustry.resource.AmmoType;
-import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.BlockGroup;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Strings;
+import io.anuke.ucore.util.Translator;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -22,16 +27,10 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class Turret extends Block{
+public abstract class Turret extends Block{
 	protected static final int targetInterval = 15;
 	
 	protected final int timerTarget = timers++;
-
-    protected int maxammo = 100;
-    //TODO implement this!
-    /**A value of 'null' means this turret does not need ammo.*/
-    protected AmmoType[] ammoTypes;
-    protected ObjectMap<Item, AmmoType> ammoMap = new ObjectMap<>();
 
     protected int ammoPerShot = 1;
     protected float ammoEjectBack = 1f;
@@ -41,6 +40,7 @@ public class Turret extends Block{
 	protected int shots = 1;
 	protected float recoil = 1f;
 	protected float restitution = 0.02f;
+	protected float cooldown = 0.02f;
 	protected float rotatespeed = 0.2f;
 	protected float shootCone = 5f;
 	protected float shootShake = 0f;
@@ -60,27 +60,6 @@ public class Turret extends Block{
 		layer = Layer.turret;
 		group = BlockGroup.turrets;
 		hasInventory = false;
-	}
-
-	@Override
-	public void init(){
-	    super.init();
-
-	    if(ammoTypes != null) {
-            for (AmmoType type : ammoTypes) {
-            	if(type.item == null) continue;
-                if (ammoMap.containsKey(type.item)) {
-                    throw new RuntimeException("Turret \"" + name + "\" has two conflicting ammo entries on item type " + type.item + "!");
-                } else {
-                    ammoMap.put(type.item, type);
-                }
-            }
-        }
-	}
-
-	@Override
-	public void setBars(){
-		bars.replace(new BlockBar(BarType.inventory, true, tile -> (float)tile.<TurretEntity>entity().totalAmmo / maxammo));
 	}
 	
 	@Override
@@ -117,7 +96,19 @@ public class Turret extends Block{
 
 		tr2.trns(entity.rotation, -entity.recoil);
 
-		Draw.rect(name(), tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+		String region = entity.target != null && Draw.hasRegion(name + "-shoot") ? name + "-shoot" : name;
+
+		Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+
+		if(Draw.hasRegion(name + "-heat")){
+			Graphics.setAdditiveBlending();
+			Draw.color(Palette.turretHeat);
+			Draw.alpha(entity.heat);
+			Draw.rect(name + "-heat", tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+			Graphics.setNormalBlending();
+		}
+
+		Draw.color();
 	}
 	
 	@Override
@@ -134,37 +125,6 @@ public class Turret extends Block{
 		Lines.dashCircle(x * tilesize, y * tilesize, range);
 	}
 
-    @Override
-    public void handleItem(Item item, Tile tile, Tile source) {
-        TurretEntity entity = tile.entity();
-
-        AmmoType type = ammoMap.get(item);
-        entity.totalAmmo += type.quantityMultiplier;
-
-        //find ammo entry by type
-        for(int i = 0; i < entity.ammo.size; i ++){
-            AmmoEntry entry = entity.ammo.get(i);
-
-            //if found, put it to the right
-            if(entry.type == type){
-                entry.amount += type.quantityMultiplier;
-                entity.ammo.swap(i, entity.ammo.size-1);
-                return;
-            }
-        }
-
-        //must not be found
-        AmmoEntry entry = new AmmoEntry(type, (int)type.quantityMultiplier);
-        entity.ammo.add(entry);
-    }
-
-    @Override
-	public boolean acceptItem(Item item, Tile tile, Tile source){
-        TurretEntity entity = tile.entity();
-
-        return ammoMap != null && ammoMap.get(item) != null && entity.totalAmmo + ammoMap.get(item).quantityMultiplier <= maxammo;
-	}
-	
 	@Override
 	public void update(Tile tile){
 		TurretEntity entity = tile.entity();
@@ -173,6 +133,7 @@ public class Turret extends Block{
 			entity.target = null;
 
 		entity.recoil = Mathf.lerpDelta(entity.recoil, 0f, restitution);
+		entity.heat = Mathf.lerpDelta(entity.heat, 0f, cooldown);
 		
 		if(hasAmmo(tile)){
 			
@@ -207,7 +168,7 @@ public class Turret extends Block{
         entry.amount -= ammoPerShot;
         if(entry.amount == 0) entity.ammo.pop();
         entity.totalAmmo -= ammoPerShot;
-        ejectEffects(tile);
+        Timers.run(reload/2f, () -> ejectEffects(tile));
         return entry.type;
     }
 
@@ -241,6 +202,7 @@ public class Turret extends Block{
 		TurretEntity entity = tile.entity();
 
 		entity.recoil = recoil;
+		entity.heat = 1f;
 
 		useAmmo(tile);
 
@@ -248,12 +210,7 @@ public class Turret extends Block{
 
 		bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy));
 
-		Effects.effect(shootEffect, tile.drawx() + tr.x,
-				tile.drawy() + tr.y, entity.rotation);
-
-		if (shootShake > 0) {
-			Effects.shake(shootShake, shootShake, tile.entity);
-		}
+		effects(tile);
 	}
 	
 	protected void bullet(Tile tile, BulletType type, float angle){
@@ -274,6 +231,7 @@ public class Turret extends Block{
 	}
 
 	protected void ejectEffects(Tile tile){
+		if(!(tile.entity instanceof TurretEntity)) return;
 		TurretEntity entity = tile.entity();
 
 		Effects.effect(ammoUseEffect, tile.drawx() - Angles.trnsx(entity.rotation, ammoEjectBack),
@@ -302,6 +260,7 @@ public class Turret extends Block{
 		public float reload;
 		public float rotation = 90;
 		public float recoil = 0f;
+		public float heat;
 		public int shots;
 		public Unit target;
 		
