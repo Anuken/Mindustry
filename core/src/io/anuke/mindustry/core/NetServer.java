@@ -174,15 +174,14 @@ public class NetServer extends Module{
 
             float wtrc = 60;
 
-            if(TimeUtils.millis() < info.lastFastShot + (int)(wtrc/60f*1000)){
-                info.fastShots ++;
+            if(!Timers.get("fastshoot-" + id + "-" + weapon.id, wtrc)){
+                info.fastShots.getAndIncrement(weapon.id, 0, 1);
 
-                if(info.fastShots - 6 > (int)(wtrc / (weapon.getReload() / 2f))){
+                if(info.fastShots.get(weapon.id, 0) > (int)(wtrc / (weapon.getReload() / 2f)) + 2){
                     kick(id, KickReason.kick);
                 }
             }else{
-                info.fastShots = 0;
-                info.lastFastShot = TimeUtils.millis();
+                info.fastShots.put(weapon.id, 0);
             }
 
             packet.playerid = connections.get(id).id;
@@ -266,8 +265,6 @@ public class NetServer extends Module{
 
         Net.handleServer(WeaponSwitchPacket.class, (id, packet) -> {
             TraceInfo info = admins.getTrace(Net.getConnection(id).address);
-            info.fastShots = 0;
-            info.lastFastShot = TimeUtils.millis();
 
             packet.playerid = connections.get(id).id;
             Net.sendExcept(id, packet, SendMode.tcp);

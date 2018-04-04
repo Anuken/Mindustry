@@ -113,6 +113,8 @@ public class NetEvents {
         packet.rotation = angle;
         packet.playerid = Vars.player.id;
         Net.send(packet, SendMode.udp);
+
+        handleWeaponSwitch();
     }
 
     public static void handlePlace(int x, int y, Block block, int rotation){
