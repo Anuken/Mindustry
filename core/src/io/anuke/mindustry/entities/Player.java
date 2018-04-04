@@ -61,7 +61,7 @@ public class Player extends SyncEntity{
 
 	@Override
 	public void damage(int amount){
-		if(debug || isAndroid) return;
+		if(state.mode.noclip || debug || isAndroid) return;
 
 		health -= amount;
 		if(health <= 0 && !dead && isLocal){ //remote players don't die normally
@@ -199,7 +199,7 @@ public class Player extends SyncEntity{
 		
 		movement.limit(speed);
 		
-		if(!noclip){
+		if(!state.mode.noclip&&!noclip){
 			move(movement.x*Timers.delta(), movement.y*Timers.delta());
 		}else{
 			x += movement.x*Timers.delta();

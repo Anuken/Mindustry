@@ -43,7 +43,7 @@ public abstract class InputHandler extends InputAdapter{
 	}
 	
 	public boolean cursorNear(){
-		return Vector2.dst(player.x, player.y, getBlockX() * tilesize, getBlockY() * tilesize) <= placerange;
+		return state.mode.infinityReach||Vector2.dst(player.x, player.y, getBlockX() * tilesize, getBlockY() * tilesize) <= placerange;
 	}
 	
 	public boolean tryPlaceBlock(int x, int y, boolean sound){
@@ -91,7 +91,7 @@ public abstract class InputHandler extends InputAdapter{
 			return false;
 		}
 
-		return Placement.validPlace(x, y, type);
+		return Placement.validPlace(x, y, type, (byte)(rotation) );
 	}
 	
 	public boolean validBreak(int x, int y){

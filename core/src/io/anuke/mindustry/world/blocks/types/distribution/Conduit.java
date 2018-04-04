@@ -11,6 +11,7 @@ public class Conduit extends LiquidBlock {
 
     @Override
     public boolean canReplace(Block other) {
-        return other instanceof Conduit && other != this;
+        return other instanceof Conduit;
     }
+
 }

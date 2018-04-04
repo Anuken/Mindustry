@@ -193,7 +193,7 @@ public class NetServer extends Module{
 
             Block block = Block.getByID(packet.block);
 
-            if(!Placement.validPlace(packet.x, packet.y, block)) return;
+            if(!Placement.validPlace(packet.x, packet.y, block, packet.rotation )) return;
 
             Recipe recipe = Recipes.getByResult(block);
 

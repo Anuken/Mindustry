@@ -8,6 +8,8 @@ public enum GameMode{
 		{
 			infiniteResources = true;
 			disableWaveTimer = true;
+			infinityReach=true;
+			noclip=true;
 		}
 	},
     freebuild{
@@ -17,6 +19,8 @@ public enum GameMode{
     };
 	public boolean infiniteResources;
 	public boolean disableWaveTimer;
+	public boolean infinityReach;
+	public boolean noclip;
 
 	public String description(){
 		return Bundles.get("mode."+name()+".description");

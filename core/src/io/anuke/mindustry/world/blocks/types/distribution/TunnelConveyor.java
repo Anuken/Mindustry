@@ -28,10 +28,10 @@ public class TunnelConveyor extends Block{
 	
 	@Override
 	public boolean canReplace(Block other){
-		return other instanceof Conveyor || other instanceof Router || other instanceof Junction;
+		return other instanceof Conveyor || other instanceof Router || other instanceof Junction || other instanceof TunnelConveyor;
 	}
-	
-	@Override
+
+    @Override
 	public void handleItem(Item item, Tile tile, Tile source){
 		TunnelEntity entity = tile.entity();
 
