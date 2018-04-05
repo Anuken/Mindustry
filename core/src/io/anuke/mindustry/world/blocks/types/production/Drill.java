@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.graphics.fx.BlockFx;
+import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;

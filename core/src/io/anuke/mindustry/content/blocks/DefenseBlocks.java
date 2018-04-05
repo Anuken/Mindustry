@@ -1,6 +1,6 @@
 package io.anuke.mindustry.content.blocks;
 
-import io.anuke.mindustry.graphics.fx.BlockFx;
+import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.Wall;
 import io.anuke.mindustry.world.blocks.types.defense.*;

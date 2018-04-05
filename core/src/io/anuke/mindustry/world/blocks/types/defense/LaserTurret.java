@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.fx.Fx;
+import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.defense.turrets.PowerTurret;
 import io.anuke.ucore.core.Effects;

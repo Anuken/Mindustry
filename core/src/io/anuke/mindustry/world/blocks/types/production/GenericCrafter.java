@@ -2,8 +2,8 @@ package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.graphics.fx.BlockFx;
-import io.anuke.mindustry.graphics.fx.Fx;
+import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;

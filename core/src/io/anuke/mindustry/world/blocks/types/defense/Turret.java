@@ -2,10 +2,10 @@ package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.graphics.fx.Fx;
 import io.anuke.mindustry.resource.AmmoType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockGroup;
@@ -14,6 +14,7 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.function.BiConsumer;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
@@ -47,6 +48,7 @@ public abstract class Turret extends Block{
 	protected Translator tr = new Translator();
 	protected Translator tr2 = new Translator();
 	protected String base = null; //name of the region to draw under turret, usually null
+    protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) -> Draw.rect(name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
 
 	protected Effect shootEffect = Fx.none;
 	protected Effect smokeEffect = Fx.none;
@@ -96,9 +98,7 @@ public abstract class Turret extends Block{
 
 		tr2.trns(entity.rotation, -entity.recoil);
 
-		String region = entity.target != null && Draw.hasRegion(name + "-shoot") ? name + "-shoot" : name;
-
-		Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+		drawer.accept(tile, entity);
 
 		if(Draw.hasRegion(name + "-heat")){
 			Graphics.setAdditiveBlending();

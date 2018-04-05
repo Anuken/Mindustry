@@ -9,7 +9,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.DrawLayer;
 import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.fx.ExplosionFx;
+import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.ItemStack;

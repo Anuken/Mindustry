@@ -1,4 +1,4 @@
-package io.anuke.mindustry.graphics.fx;
+package io.anuke.mindustry.content.fx;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;

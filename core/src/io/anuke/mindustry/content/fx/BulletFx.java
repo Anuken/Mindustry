@@ -1,6 +1,7 @@
-package io.anuke.mindustry.graphics.fx;
+package io.anuke.mindustry.content.fx;
 
 import com.badlogic.gdx.graphics.Color;
+import io.anuke.mindustry.entities.effect.StaticEffectEntity.StaticEffect;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
@@ -40,11 +41,30 @@ public class BulletFx {
         Draw.reset();
     }),
 
+    shootBig2 = new Effect(10, e -> {
+        Draw.color(Palette.lightOrange, Color.GRAY, e.ifract());
+        float w = 1.2f + 8 * e.fract();
+        Shapes.tri(e.x, e.y, w, 29f * e.fract(), e.rotation);
+        Shapes.tri(e.x, e.y, w, 5f * e.fract(), e.rotation + 180f);
+        Draw.reset();
+    }),
+
+
     shootBigSmoke = new Effect(17f, e -> {
         Draw.color(Palette.lighterOrange, Color.LIGHT_GRAY, Color.GRAY, e.ifract());
 
         Angles.randLenVectors(e.id, 8, e.powfract()*19f, e.rotation, 10f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fract()*2f + 0.2f);
+        });
+
+        Draw.reset();
+    }),
+
+    shootBigSmoke2 = new Effect(18f, e -> {
+        Draw.color(Palette.lightOrange, Color.LIGHT_GRAY, Color.GRAY, e.ifract());
+
+        Angles.randLenVectors(e.id, 9, e.powfract()*23f, e.rotation, 20f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fract()*2.4f + 0.2f);
         });
 
         Draw.reset();
@@ -60,26 +80,31 @@ public class BulletFx {
         Draw.reset();
     }),
 
-    shellEjectSmall = new Effect(30f, e -> {
-        Draw.color(Palette.lightOrange, Color.LIGHT_GRAY, Color.GRAY, e.ifract());
-        Draw.alpha(e.fract());
+    shellEjectSmall = new StaticEffect(30f, 300f, e -> {
+        Draw.color(Palette.lightOrange, Color.LIGHT_GRAY, Palette.lightishGray, e.ifract());
         float rot = e.rotation + 90f;
         for(int i : Mathf.signs){
             float len = (2f + e.powfract()*6f) * i;
             float lr = rot + e.ifract()*30f*i;
-            Draw.rect("white", e.x + Angles.trnsx(lr, len), e.y + Angles.trnsy(lr, len), 1f, 2f, rot + e.ifract()*50f*i);
+            Draw.rect("white",
+                    e.x + Angles.trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.ifract()),
+                    e.y + Angles.trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.ifract()),
+                    1f, 2f, rot + e.ifract()*50f*i);
         }
 
         Draw.color();
     }),
 
-    shellEjectBig = new Effect(30f, e -> {
-        Draw.color(Palette.lightOrange, Color.LIGHT_GRAY, Color.GRAY, e.ifract());
+    shellEjectMedium = new StaticEffect(34f, 300f, e -> {
+        Draw.color(Palette.lightOrange, Color.LIGHT_GRAY, Palette.lightishGray, e.ifract());
         float rot = e.rotation + 90f;
         for(int i : Mathf.signs){
             float len = (2f + e.powfract()*10f) * i;
             float lr = rot + e.ifract()*20f*i;
-            Draw.rect("white", e.x + Angles.trnsx(lr, len), e.y + Angles.trnsy(lr, len), 2f, 3f, rot);
+            Draw.rect("casing",
+                    e.x + Angles.trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.ifract()),
+                    e.y + Angles.trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.ifract()),
+                    2f, 3f, rot);
         }
 
         Draw.color(Color.LIGHT_GRAY, Color.GRAY, e.ifract());
@@ -87,6 +112,30 @@ public class BulletFx {
         for(int i : Mathf.signs){
             Angles.randLenVectors(e.id, 4, 1f + e.powfract()*11f, e.rotation + 90f*i, 20f, (x, y) -> {
                 Fill.circle(e.x + x, e.y + y, e.fract()*1.5f);
+            });
+        }
+
+        Draw.color();
+    }),
+
+    shellEjectBig = new StaticEffect(22f, 300f, e -> {
+        Draw.color(Palette.lightOrange, Color.LIGHT_GRAY, Palette.lightishGray, e.ifract());
+        float rot = e.rotation + 90f;
+        for(int i : Mathf.signs){
+            float len = (4f + e.powfract()*8f) * i;
+            float lr = rot  + Mathf.randomSeedRange(e.id + i + 6, 20f * e.ifract())*i;
+            Draw.rect("casing",
+                    e.x + Angles.trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.ifract()),
+                    e.y + Angles.trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.ifract()),
+                    2.5f, 4f,
+                    rot+ e.ifract()*30f*i + Mathf.randomSeedRange(e.id + i + 9, 40f * e.ifract()));
+        }
+
+        Draw.color(Color.LIGHT_GRAY);
+
+        for(int i : Mathf.signs){
+            Angles.randLenVectors(e.id, 4, -e.powfract()*15f, e.rotation + 90f*i, 25f, (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, e.fract()*2f);
             });
         }
 
@@ -136,6 +185,30 @@ public class BulletFx {
         Angles.randLenVectors(e.id, 7, e.ifract()*7f, e.rotation, 40f, (x, y) -> {
             float ang = Mathf.atan2(x, y);
             Lines.lineAngle(e.x + x, e.y + y, ang, e.fract()*2 + 1f);
+        });
+
+        Draw.reset();
+    }),
+
+    flakExplosion = new Effect(20, e -> {
+
+        Draw.color(Palette.bulletYellow);
+        e.scaled(6, i -> {
+            Lines.stroke(3f * i.fract());
+            Lines.circle(e.x, e.y, 3f + i.ifract()*10f);
+        });
+
+        Draw.color(Color.GRAY);
+
+        Angles.randLenVectors(e.id, 5, 2f + 23f * e.powfract(), (x, y) ->{
+            Fill.circle(e.x + x, e.y + y, e.fract()*3f + 0.5f);
+        });
+
+        Draw.color(Palette.lighterOrange);
+        Lines.stroke(1f * e.fract());
+
+        Angles.randLenVectors(e.id + 1, 4, 1f + 23f * e.powfract(), (x, y) -> {
+            Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), 1f + e.fract()*3f);
         });
 
         Draw.reset();

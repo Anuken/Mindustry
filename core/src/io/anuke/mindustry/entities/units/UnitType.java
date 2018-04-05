@@ -5,7 +5,7 @@ import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.graphics.fx.ExplosionFx;
+import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.ucore.core.Effects;

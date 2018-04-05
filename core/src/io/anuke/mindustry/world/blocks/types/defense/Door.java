@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.types.defense;
 import com.badlogic.gdx.math.Rectangle;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.graphics.fx.BlockFx;
+import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Wall;

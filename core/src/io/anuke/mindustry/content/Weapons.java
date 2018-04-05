@@ -1,7 +1,7 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.mindustry.content.bullets.TurretBullets;
-import io.anuke.mindustry.graphics.fx.BulletFx;
+import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.resource.Weapon;
 
 public class Weapons {

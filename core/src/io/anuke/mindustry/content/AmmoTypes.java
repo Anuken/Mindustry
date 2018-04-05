@@ -10,5 +10,7 @@ public class AmmoTypes {
 
     basicSteel = new AmmoType(Items.steel, TurretBullets.basicSteel, 5, 0.8f),
 
-    basicFlame = new AmmoType(Liquids.oil, TurretBullets.basicFlame, 0.3f, 0.9f);
+    basicFlame = new AmmoType(Liquids.oil, TurretBullets.basicFlame, 0.3f, 0.9f),
+
+    basicLeadFrag = new AmmoType(Items.lead, TurretBullets.basicLeadFragShell, 1, 0.8f);
 }

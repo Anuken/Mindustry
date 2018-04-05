@@ -12,20 +12,22 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Pools;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
+import io.anuke.mindustry.entities.effect.StaticEffectEntity;
+import io.anuke.mindustry.entities.effect.StaticEffectEntity.StaticEffect;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.BlockRenderer;
+import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.BlockBar;
-import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
@@ -63,8 +65,13 @@ public class Renderer extends RendererModule{
 				Rectangle view = rect.setSize(camera.viewportWidth, camera.viewportHeight)
 						.setCenter(camera.position.x, camera.position.y);
 				Rectangle pos = rect2.setSize(name.size).setCenter(x, y);
+
 				if(view.overlaps(pos)){
-					new EffectEntity(name, color, rotation).set(x, y).add(effectGroup);
+					int id = new EffectEntity(name, color, rotation).set(x, y).add(effectGroup).id;
+
+					if(name instanceof StaticEffect){
+						new StaticEffectEntity((StaticEffect) name, color, rotation).set(x, y).add(staticEffectGroup).id = id;
+					}
 				}
 			}
 		});
@@ -183,6 +190,9 @@ public class Renderer extends RendererModule{
 		drawPadding();
 		
 		blocks.drawFloor();
+
+		Entities.draw(staticEffectGroup);
+
 		blocks.processBlocks();
 		blocks.drawBlocks(Layer.overlay);
 

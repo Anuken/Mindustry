@@ -1,6 +1,6 @@
 package io.anuke.mindustry.entities;
 
-import io.anuke.mindustry.graphics.fx.BulletFx;
+import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.BaseBulletType;
 

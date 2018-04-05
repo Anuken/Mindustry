@@ -2,8 +2,8 @@ package io.anuke.mindustry.world.blocks.types.power;
 
 import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.graphics.fx.BlockFx;
-import io.anuke.mindustry.graphics.fx.ExplosionFx;
+import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;

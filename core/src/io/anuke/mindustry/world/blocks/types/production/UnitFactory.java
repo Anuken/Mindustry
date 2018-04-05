@@ -8,7 +8,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
-import io.anuke.mindustry.graphics.fx.BlockFx;
+import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;

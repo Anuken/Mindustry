@@ -3,7 +3,7 @@ package io.anuke.mindustry.content.blocks;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.graphics.fx.BlockFx;
+import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Block;
