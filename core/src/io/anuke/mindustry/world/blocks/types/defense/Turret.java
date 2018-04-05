@@ -49,6 +49,14 @@ public abstract class Turret extends Block{
 	protected Translator tr2 = new Translator();
 	protected String base = null; //name of the region to draw under turret, usually null
     protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) -> Draw.rect(name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+	protected BiConsumer<Tile, TurretEntity> heatDrawer = (tile, entity) ->{
+		Graphics.setAdditiveBlending();
+		Draw.color(Palette.turretHeat);
+		Draw.alpha(entity.heat);
+		Draw.rect(name + "-heat", tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+		Graphics.setNormalBlending();
+	};
+
 
 	protected Effect shootEffect = Fx.none;
 	protected Effect smokeEffect = Fx.none;
@@ -101,11 +109,7 @@ public abstract class Turret extends Block{
 		drawer.accept(tile, entity);
 
 		if(Draw.hasRegion(name + "-heat")){
-			Graphics.setAdditiveBlending();
-			Draw.color(Palette.turretHeat);
-			Draw.alpha(entity.heat);
-			Draw.rect(name + "-heat", tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-			Graphics.setNormalBlending();
+			heatDrawer.accept(tile, entity);
 		}
 
 		Draw.color();
@@ -144,9 +148,11 @@ public abstract class Turret extends Block{
 			
 			if(entity.target != null){
 			    AmmoType type = peekAmmo(tile);
+			    float speed = type.bullet.speed;
+			    if(speed < 0.1f) speed = 9999999f;
 				
 				float targetRot = Angles.predictAngle(tile.worldx(), tile.worldy(), 
-						entity.target.x, entity.target.y, entity.target.velocity.x, entity.target.velocity.y, type.bullet.speed);
+						entity.target.x, entity.target.y, entity.target.velocity.x, entity.target.velocity.y, speed);
 				
 				if(Float.isNaN(entity.rotation)){
 					entity.rotation = 0;

@@ -5,8 +5,10 @@ import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
@@ -74,16 +76,17 @@ public class TurretBullets {
             hiteffect = Fx.none;
             despawneffect = Fx.none;
             hitsize = 4;
+            lifetime = 20f;
         }
 
         @Override
         public void draw(Bullet b) {
             drawBullet(Palette.bulletYellow, Palette.bulletYellowBack,
-                    "bullet", b.x, b.y, 10f, 1f + b.fract()*11f, b.angle() - 90);
+                    "bullet", b.x, b.y, 7f + b.fract()*3f, 1f + b.fract()*11f, b.angle() - 90);
         }
     },
 
-    basicFlame = new BulletType(2f, 4) {
+    basicFlame = new BulletType(2f, 0) {
         {
             hitsize = 7f;
             lifetime = 30f;
@@ -95,6 +98,39 @@ public class TurretBullets {
 
         @Override
         public void draw(Bullet b) {}
+    },
+
+    lancerLaser = new BulletType(0.001f, 1) {
+        Color[] colors = {Palette.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Palette.lancerLaser, Color.WHITE};
+        float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
+        float[] lenscales = {1f, 1.1f, 1.13f, 1.14f};
+        float length = 70f;
+
+        {
+            hiteffect = BulletFx.hitLancer;
+            despawneffect = Fx.none;
+            hitsize = 4;
+            lifetime = 12f;
+            pierce = true;
+        }
+
+        @Override
+        public void init(Bullet b) {
+            DamageArea.collideLine(b, b.team, hiteffect, b.x, b.y, b.angle(), length);
+        }
+
+        @Override
+        public void draw(Bullet b) {
+            Lines.lineAngle(b.x, b.y, b.angle(), length);
+            for(int s = 0; s < 3; s ++) {
+                Draw.color(colors[s]);
+                for (int i = 0; i < tscales.length; i++) {
+                    Lines.stroke(7f * b.fract() * (s == 0 ? 1.5f : s == 1 ? 1f : 0.3f) * tscales[i]);
+                    Lines.lineAngle(b.x, b.y, b.angle(), length * lenscales[i]);
+                }
+            }
+            Draw.reset();
+        }
     };
 
     private static void drawBullet(Color first, Color second, String name, float x, float y, float w, float h, float rot){

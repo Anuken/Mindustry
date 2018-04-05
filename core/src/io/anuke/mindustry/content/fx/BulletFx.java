@@ -80,7 +80,7 @@ public class BulletFx {
         Draw.reset();
     }),
 
-    shellEjectSmall = new StaticEffect(30f, 300f, e -> {
+    shellEjectSmall = new StaticEffect(30f, 400f, e -> {
         Draw.color(Palette.lightOrange, Color.LIGHT_GRAY, Palette.lightishGray, e.ifract());
         float rot = e.rotation + 90f;
         for(int i : Mathf.signs){
@@ -95,7 +95,7 @@ public class BulletFx {
         Draw.color();
     }),
 
-    shellEjectMedium = new StaticEffect(34f, 300f, e -> {
+    shellEjectMedium = new StaticEffect(34f, 400f, e -> {
         Draw.color(Palette.lightOrange, Color.LIGHT_GRAY, Palette.lightishGray, e.ifract());
         float rot = e.rotation + 90f;
         for(int i : Mathf.signs){
@@ -118,7 +118,7 @@ public class BulletFx {
         Draw.color();
     }),
 
-    shellEjectBig = new StaticEffect(22f, 300f, e -> {
+    shellEjectBig = new StaticEffect(22f, 400f, e -> {
         Draw.color(Palette.lightOrange, Color.LIGHT_GRAY, Palette.lightishGray, e.ifract());
         float rot = e.rotation + 90f;
         for(int i : Mathf.signs){
@@ -178,6 +178,18 @@ public class BulletFx {
         Draw.reset();
     }),
 
+    hitLancer = new Effect(12, e -> {
+        Draw.color(Color.WHITE);
+        Lines.stroke(e.fract()*1.5f);
+
+        Angles.randLenVectors(e.id, 8, e.powfract()*17f, e.rotation, 360f, (x, y) -> {
+            float ang = Mathf.atan2(x, y);
+            Lines.lineAngle(e.x + x, e.y + y, ang, e.fract()*4 + 1f);
+        });
+
+        Draw.reset();
+    }),
+
     despawn = new Effect(12, e -> {
         Draw.color(Palette.lighterOrange, Color.GRAY, e.ifract());
         Lines.stroke(e.fract());
@@ -209,6 +221,26 @@ public class BulletFx {
 
         Angles.randLenVectors(e.id + 1, 4, 1f + 23f * e.powfract(), (x, y) -> {
             Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), 1f + e.fract()*3f);
+        });
+
+        Draw.reset();
+    }),
+
+    lancerLaserShoot = new Effect(12f, e -> {
+        Draw.color(Palette.lancerLaser);
+
+        for(int i : Mathf.signs){
+            Shapes.tri(e.x, e.y, 4f * e.fract(), 29f, e.rotation + 90f*i);
+        }
+
+        Draw.reset();
+    }),
+
+    lancerLaserShootSmoke = new Effect(20f, e -> {
+        Draw.color(Palette.lancerLaser);
+
+        Angles.randLenVectors(e.id, 7, 80f, e.rotation, 0f, (x, y) -> {
+            Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), e.fract()*9f);
         });
 
         Draw.reset();

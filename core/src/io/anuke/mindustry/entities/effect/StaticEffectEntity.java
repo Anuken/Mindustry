@@ -31,7 +31,7 @@ public class StaticEffectEntity extends EffectEntity {
 
     @Override
     public void drawOver(){
-        if(once) Effects.renderEffect(id, renderer, color, once ? lifetime : time, rotation, x, y);
+        if(once) Effects.renderEffect(id, renderer, color, lifetime, rotation, x, y);
     }
 
     public static class StaticEffect extends Effect{

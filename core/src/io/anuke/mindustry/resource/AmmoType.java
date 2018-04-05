@@ -25,6 +25,14 @@ public class AmmoType {
         allTypes.add(this);
     }
 
+    public AmmoType(BulletType result){
+        this.item = null;
+        this.liquid = null;
+        this.bullet = result;
+        this.quantityMultiplier = 1f;
+        this.speedMultiplier = 1f;
+    }
+
     public AmmoType(Item item, BulletType result, float multiplier, float speedMultiplier){
         this.item = item;
         this.liquid = null;

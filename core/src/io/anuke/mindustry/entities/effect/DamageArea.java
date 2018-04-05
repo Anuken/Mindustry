@@ -8,6 +8,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Physics;
@@ -23,7 +24,7 @@ public class DamageArea{
 
 	/**Damages entities in a line.
 	 * Only enemies of the specified team are damaged.*/
-	public static void damageLine(Team team, Effect effect, float x, float y, float angle, float length, int damage){
+	public static void collideLine(SolidEntity hitter, Team team, Effect effect, float x, float y, float angle, float length){
 		tr.trns(angle, length);
 		rect.setPosition(x, y).setSize(tr.x, tr.y);
 		float x2 = tr.x + x, y2 = tr.y + y;
@@ -56,7 +57,8 @@ public class DamageArea{
 
             if (vec != null) {
                 Effects.effect(effect, vec.x, vec.y);
-                e.damage(damage);
+                e.collision(hitter, vec.x, vec.y);
+                hitter.collision(e, vec.x, vec.y);
             }
         };
 

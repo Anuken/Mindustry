@@ -4,7 +4,6 @@ import io.anuke.mindustry.content.AmmoTypes;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.resource.AmmoType;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.defense.LaserTurret;
 import io.anuke.mindustry.world.blocks.types.defense.Turret;
 import io.anuke.mindustry.world.blocks.types.defense.turrets.*;
 import io.anuke.ucore.graphics.Draw;
@@ -91,9 +90,14 @@ public class WeaponBlocks{
 		};
 	}},
 	
-	laserturret = new LaserTurret("laserturret"){
-
-	},
+	laserturret = new PowerTurret("laserturret"){{
+		range = 70f;
+		shootType = AmmoTypes.lancerLaser;
+		recoil = 2f;
+		reload = 80f;
+		shootEffect = BulletFx.lancerLaserShoot;
+		smokeEffect = BulletFx.lancerLaserShootSmoke;
+	}},
 	
 	teslaturret = new PowerTurret("teslaturret"){
 
