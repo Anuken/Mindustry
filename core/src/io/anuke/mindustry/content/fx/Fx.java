@@ -18,36 +18,36 @@ public class Fx{
 	none = new Effect(0, 0f, e->{}),
 
 	place = new Effect(16, e -> {
-		Lines.stroke(3f - e.ifract() * 2f);
-		Lines.square(e.x, e.y, tilesize / 2f + e.ifract() * 3f);
+		Lines.stroke(3f - e.fin() * 2f);
+		Lines.square(e.x, e.y, tilesize / 2f + e.fin() * 3f);
 		Draw.reset();
 	}),
 
 	breakBlock = new Effect(12, e -> {
 		Lines.stroke(2f);
-		Draw.color(Color.WHITE, Colors.get("break"), e.ifract());
-		Lines.spikes(e.x, e.y, e.ifract() * 6f, 2, 5, 90);
+		Draw.color(Color.WHITE, Colors.get("break"), e.fin());
+		Lines.spikes(e.x, e.y, e.fin() * 6f, 2, 5, 90);
 		Draw.reset();
 	}),
 
 	smoke = new Effect(100, e -> {
-		Draw.color(Color.GRAY, new Color(0.3f, 0.3f, 0.3f, 1f), e.ifract());
-		float size = 7f-e.ifract()*7f;
+		Draw.color(Color.GRAY, new Color(0.3f, 0.3f, 0.3f, 1f), e.fin());
+		float size = 7f-e.fin()*7f;
 		Draw.rect("circle", e.x, e.y, size, size);
 		Draw.reset();
 	}),
 
 	dash = new Effect(30, e -> {
-		Draw.color(Color.CORAL, Color.GRAY, e.ifract());
-		float size = e.fract()*4f;
+		Draw.color(Color.CORAL, Color.GRAY, e.fin());
+		float size = e.fout()*4f;
 		Draw.rect("circle", e.x, e.y, size, size);
 		Draw.reset();
 	}),
 
 	spawn = new Effect(23, e -> {
 		Lines.stroke(2f);
-		Draw.color(Color.DARK_GRAY, Color.SCARLET, e.ifract());
-		Lines.circle(e.x, e.y, 7f - e.ifract() * 6f);
+		Draw.color(Color.DARK_GRAY, Color.SCARLET, e.fin());
+		Lines.circle(e.x, e.y, 7f - e.fin() * 6f);
 		Draw.reset();
 	}),
 

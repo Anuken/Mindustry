@@ -110,7 +110,7 @@ public class TurretBullets {
             hiteffect = BulletFx.hitLancer;
             despawneffect = Fx.none;
             hitsize = 4;
-            lifetime = 12f;
+            lifetime = 20f;
             pierce = true;
         }
 

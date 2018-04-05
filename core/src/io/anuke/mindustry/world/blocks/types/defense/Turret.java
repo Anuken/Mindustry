@@ -33,6 +33,12 @@ public abstract class Turret extends Block{
 	
 	protected final int timerTarget = timers++;
 
+	protected Color heatColor = Palette.turretHeat;
+	protected Effect shootEffect = Fx.none;
+	protected Effect smokeEffect = Fx.none;
+	protected Effect ammoUseEffect = Fx.none;
+	protected String shootsound = "shoot";
+
     protected int ammoPerShot = 1;
     protected float ammoEjectBack = 1f;
 	protected float range = 50f;
@@ -51,17 +57,11 @@ public abstract class Turret extends Block{
     protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) -> Draw.rect(name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
 	protected BiConsumer<Tile, TurretEntity> heatDrawer = (tile, entity) ->{
 		Graphics.setAdditiveBlending();
-		Draw.color(Palette.turretHeat);
+		Draw.color(heatColor);
 		Draw.alpha(entity.heat);
 		Draw.rect(name + "-heat", tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
 		Graphics.setNormalBlending();
 	};
-
-
-	protected Effect shootEffect = Fx.none;
-	protected Effect smokeEffect = Fx.none;
-	protected Effect ammoUseEffect = Fx.none;
-    protected String shootsound = "shoot";
 
 	public Turret(String name) {
 		super(name);

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.content.blocks;
 
+import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.AmmoTypes;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.resource.AmmoType;
@@ -90,13 +91,20 @@ public class WeaponBlocks{
 		};
 	}},
 	
-	laserturret = new PowerTurret("laserturret"){{
+	laserturret = new LaserTurret("laserturret"){{
 		range = 70f;
+		chargeTime = 70f;
+		chargeMaxDelay = 30f;
+		chargeEffects = 7;
 		shootType = AmmoTypes.lancerLaser;
 		recoil = 2f;
-		reload = 80f;
+		reload = 130f;
+		cooldown = 0.03f;
 		shootEffect = BulletFx.lancerLaserShoot;
 		smokeEffect = BulletFx.lancerLaserShootSmoke;
+		chargeEffect = BulletFx.lancerLaserCharge;
+		chargeBeginEffect = BulletFx.lancerLaserChargeBegin;
+		heatColor = Color.RED;
 	}},
 	
 	teslaturret = new PowerTurret("teslaturret"){
