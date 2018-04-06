@@ -188,6 +188,16 @@ public class ShootFx {
         Fill.circle(e.x, e.y, e.fin() * 2f);
     }),
 
+    lightningCharge = new Effect(38f, e -> {
+        Draw.color(Palette.lancerLaser);
+
+        Angles.randLenVectors(e.id, 2, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) -> {
+            Shapes.tri(e.x + x, e.y + y, e.fslope()*3f + 1, e.fslope()*3f + 1, Mathf.atan2(x, y));
+        });
+
+        Draw.reset();
+    }),
+
     lightningShoot= new Effect(12f, e -> {
         Draw.color(Color.WHITE, Palette.lancerLaser, e.fin());
         Lines.stroke(e.fout() * 1.2f + 0.5f);

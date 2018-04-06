@@ -115,7 +115,7 @@ public class WeaponBlocks{
 		chargeMaxDelay = 30f;
 		chargeEffects = 7;
 		shootEffect = ShootFx.lightningShoot;
-		chargeEffect = ShootFx.lancerLaserCharge;
+		chargeEffect = ShootFx.lightningCharge;
 		chargeBeginEffect = ShootFx.lancerLaserChargeBegin;
 		heatColor = Color.RED;
 		recoil = 3f;

@@ -184,7 +184,7 @@ public class TurretBullets {
 
         @Override
         public void init(Bullet b) {
-            new Lightning(b.team, hiteffect, damage, b.x, b.y, b.angle(), 40).add();
+            new Lightning(b.team, hiteffect, damage, b.x, b.y, b.angle(), 30).add();
         }
     };
 

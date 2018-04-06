@@ -3,16 +3,22 @@ package io.anuke.mindustry.world.blocks.types.distribution;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
+import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Fill;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 import java.io.DataInputStream;
@@ -33,6 +39,8 @@ public class Teleporter extends PowerBlock{
 	private Array<Tile> returns = new Array<>();
 
 	protected float powerPerItem = 5f;
+	protected float warmupTime = 80f;
+	protected Effect teleportEffect = Fx.none;
 
 	static{
 		for(int i = 0; i < colors; i ++){
@@ -84,9 +92,21 @@ public class Teleporter extends PowerBlock{
 		
 		Draw.color(colorArray[entity.color]);
 		Draw.rect("teleporter-top", tile.drawx(), tile.drawy());
-		//Draw.color(Color.WHITE);
-		//Draw.alpha(0.45f + Mathf.absin(Timers.time(), 7f, 0.26f));
-		//Draw.rect("teleporter-top", tile.worldx(), tile.worldy());
+		Draw.reset();
+
+		Draw.color(Color.WHITE);
+
+		Fill.circle(tile.drawx(), tile.drawy(), 7f);
+
+		Draw.color(Color.PURPLE);
+
+		for(int i = 0; i < 11; i ++){
+			Lines.swirl(tile.drawx(), tile.drawy(),
+					3f + i/3f + Mathf.sin(Timers.time() + i *93, 20f + i, 3f),
+					0.2f + Mathf.sin(Timers.time() + i *33, 10f + i, 0.1f),
+					Timers.time() * (1f + Mathf.randomSeedRange(i + 1, 1f)) + Mathf.randomSeedRange(i, 360f));
+		}
+
 		Draw.reset();
 	}
 	
