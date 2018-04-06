@@ -25,7 +25,7 @@ public abstract class BaseBlock {
 
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         return tile.entity.liquid.amount + amount < liquidCapacity
-                && (tile.entity.liquid.liquid == liquid || tile.entity.liquid.amount <= 0.001f);
+                && (tile.entity.liquid.liquid == liquid || tile.entity.liquid.amount <= 0.1f);
     }
 
     public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){

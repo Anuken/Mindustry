@@ -11,7 +11,7 @@ import io.anuke.ucore.util.Timer;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Bullet extends BulletEntity{
+public class Bullet extends BulletEntity<BulletType>{
 	private static Vector2 vector = new Vector2();
 
 	public IntSet collided;
@@ -73,8 +73,9 @@ public class Bullet extends BulletEntity{
 			collided.add(other.id);
 
 		if(other instanceof Unit){
-			float k =  ((BulletType)type).knockback;
-			((Unit) other).velocity.add(vector.set(other.x, other.y).sub(x, y).setLength(k));
+			Unit unit = (Unit)other;
+			unit.velocity.add(vector.set(other.x, other.y).sub(x, y).setLength(type.knockback / unit.getMass()));
+			unit.status.handleApply(unit, type.status, type.statusIntensity);
 		}
 	}
 

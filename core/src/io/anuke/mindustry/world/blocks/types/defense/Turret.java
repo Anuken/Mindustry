@@ -126,7 +126,7 @@ public abstract class Turret extends Block{
 	public void drawPlace(int x, int y, int rotation, boolean valid){
 		Draw.color("place");
 		Lines.stroke(1f);
-		Lines.dashCircle(x * tilesize, y * tilesize, range);
+		Lines.dashCircle(x * tilesize + getPlaceOffset().x, y * tilesize + getPlaceOffset().y, range);
 	}
 
 	@Override
@@ -237,11 +237,15 @@ public abstract class Turret extends Block{
 	}
 
 	protected void ejectEffects(Tile tile){
-		if(!(tile.entity instanceof TurretEntity)) return;
+		if(!isTurret(tile)) return;
 		TurretEntity entity = tile.entity();
 
 		Effects.effect(ammoUseEffect, tile.drawx() - Angles.trnsx(entity.rotation, ammoEjectBack),
 				tile.drawy() - Angles.trnsy(entity.rotation, ammoEjectBack), entity.rotation);
+	}
+
+	protected boolean isTurret(Tile tile){
+		return (tile.entity instanceof TurretEntity);
 	}
 
 	@Override

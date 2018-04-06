@@ -47,7 +47,7 @@ public class Recipes {
 		new Recipe(weapon, WeaponBlocks.laserturret, stack(Items.steel, 12), stack(Items.titanium, 12)),
 		new Recipe(weapon, WeaponBlocks.flakturret, stack(Items.steel, 25), stack(Items.titanium, 15)),
 		new Recipe(weapon, WeaponBlocks.teslaturret, stack(Items.steel, 20), stack(Items.titanium, 25), stack(Items.densealloy, 15)),
-		new Recipe(weapon, WeaponBlocks.magmaturret, stack(Items.steel, 80), stack(Items.titanium, 70), stack(Items.densealloy, 60)),
+		new Recipe(weapon, WeaponBlocks.liquidturret, stack(Items.steel, 80), stack(Items.titanium, 70), stack(Items.densealloy, 60)),
 		new Recipe(weapon, WeaponBlocks.chainturret, stack(Items.steel, 50), stack(Items.titanium, 25), stack(Items.densealloy, 40)),
 		new Recipe(weapon, WeaponBlocks.titanturret, stack(Items.steel, 70), stack(Items.titanium, 50), stack(Items.densealloy, 55)),
 		new Recipe(weapon, WeaponBlocks.missileturret, stack(Items.steel, 70), stack(Items.titanium, 50), stack(Items.densealloy, 55)),

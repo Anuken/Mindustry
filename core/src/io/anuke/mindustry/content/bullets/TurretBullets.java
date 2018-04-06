@@ -1,13 +1,18 @@
 package io.anuke.mindustry.content.bullets;
 
 import com.badlogic.gdx.graphics.Color;
+import io.anuke.mindustry.content.Liquids;
+import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.resource.Liquid;
+import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
@@ -20,7 +25,7 @@ public class TurretBullets {
         @Override
         public void draw(Bullet b) {
             drawBullet(Palette.bulletYellow, Palette.bulletYellowBack,
-                    "bullet", b.x, b.y, 9f, 5f + b.fract()*7f, b.angle() - 90);
+                    "bullet", b.x, b.y, 9f, 5f + b.fout()*7f, b.angle() - 90);
         }
     },
 
@@ -33,7 +38,7 @@ public class TurretBullets {
         @Override
         public void draw(Bullet b) {
             drawBullet(Palette.bulletYellow, Palette.bulletYellowBack,
-                    "bullet", b.x, b.y, 11f, 9f + b.fract()*8f, b.angle() - 90);
+                    "bullet", b.x, b.y, 11f, 9f + b.fout()*8f, b.angle() - 90);
         }
     },
 
@@ -82,7 +87,7 @@ public class TurretBullets {
         @Override
         public void draw(Bullet b) {
             drawBullet(Palette.bulletYellow, Palette.bulletYellowBack,
-                    "bullet", b.x, b.y, 7f + b.fract()*3f, 1f + b.fract()*11f, b.angle() - 90);
+                    "bullet", b.x, b.y, 7f + b.fout()*3f, 1f + b.fout()*11f, b.angle() - 90);
         }
     },
 
@@ -125,11 +130,41 @@ public class TurretBullets {
             for(int s = 0; s < 3; s ++) {
                 Draw.color(colors[s]);
                 for (int i = 0; i < tscales.length; i++) {
-                    Lines.stroke(7f * b.fract() * (s == 0 ? 1.5f : s == 1 ? 1f : 0.3f) * tscales[i]);
+                    Lines.stroke(7f * b.fout() * (s == 0 ? 1.5f : s == 1 ? 1f : 0.3f) * tscales[i]);
                     Lines.lineAngle(b.x, b.y, b.angle(), length * lenscales[i]);
                 }
             }
             Draw.reset();
+        }
+    },
+
+    waterShot = new LiquidShot(Liquids.water) {
+        {
+            status = StatusEffects.wet;
+            statusIntensity = 0.5f;
+        }
+    },
+    cryoShot = new LiquidShot(Liquids.cryofluid) {
+        {
+            status = StatusEffects.freezing;
+            statusIntensity = 0.5f;
+        }
+    },
+    lavaShot = new LiquidShot(Liquids.lava) {
+        {
+            damage = 4;
+            speed = 1.9f;
+            drag = 0.03f;
+            status = StatusEffects.melting;
+            statusIntensity = 0.5f;
+        }
+    },
+    oilShot = new LiquidShot(Liquids.oil) {
+        {
+            speed = 2f;
+            drag = 0.03f;
+            status = StatusEffects.oiled;
+            statusIntensity = 0.5f;
         }
     };
 
@@ -139,5 +174,32 @@ public class TurretBullets {
         Draw.color(first);
         Draw.rect(name, x, y, w, h, rot);
         Draw.color();
+    }
+
+    private abstract static class LiquidShot extends BulletType{
+        Liquid liquid;
+
+        public LiquidShot(Liquid liquid) {
+            super(2.5f, 0);
+            this.liquid = liquid;
+
+            lifetime = 70f;
+            despawneffect = Fx.none;
+            hiteffect = BulletFx.hitLiquid;
+            drag = 0.01f;
+            knockback = 0.65f;
+        }
+
+        @Override
+        public void draw(Bullet b) {
+            Draw.color(liquid.color, Color.WHITE, b.fout() / 100f + Mathf.randomSeedRange(b.id, 0.1f));
+
+            Fill.circle(b.x, b.y, 0.5f + b.fout()*2.5f);
+        }
+
+        @Override
+        public void hit(Bullet b, float hitx, float hity) {
+            Effects.effect(hiteffect, liquid.color, hitx, hity);
+        }
     }
 }

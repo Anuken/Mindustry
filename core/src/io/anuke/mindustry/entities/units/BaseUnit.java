@@ -74,7 +74,7 @@ public class BaseUnit extends Unit {
 	}
 
 	@Override
-	public void damage(int amount){
+	public void damage(float amount){
 		super.damage(amount);
 		hitTime = hitDuration;
 	}

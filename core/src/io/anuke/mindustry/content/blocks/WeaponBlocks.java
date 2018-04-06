@@ -2,7 +2,7 @@ package io.anuke.mindustry.content.blocks;
 
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.AmmoTypes;
-import io.anuke.mindustry.content.fx.BulletFx;
+import io.anuke.mindustry.content.fx.ShootFx;
 import io.anuke.mindustry.resource.AmmoType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.defense.Turret;
@@ -19,9 +19,9 @@ public class WeaponBlocks{
 		ammoTypes = new AmmoType[]{AmmoTypes.basicIron};
 		reload = 25f;
 		restitution = 0.03f;
-		shootEffect = BulletFx.shootSmall;
-		smokeEffect = BulletFx.shootSmallSmoke;
-		ammoUseEffect = BulletFx.shellEjectSmall;
+		shootEffect = ShootFx.shootSmall;
+		smokeEffect = ShootFx.shootSmallSmoke;
+		ammoUseEffect = ShootFx.shellEjectSmall;
 	}},
 	
 	gatlingturret = new BurstTurret("gatlingturret") {{
@@ -32,9 +32,9 @@ public class WeaponBlocks{
 		restitution = 0.03f;
 		recoil = 1.5f;
 		burstSpacing = 6f;
-		shootEffect = BulletFx.shootSmall;
-		smokeEffect = BulletFx.shootSmallSmoke;
-		ammoUseEffect = BulletFx.shellEjectSmall;
+		shootEffect = ShootFx.shootSmall;
+		smokeEffect = ShootFx.shootSmallSmoke;
+		ammoUseEffect = ShootFx.shellEjectSmall;
 	}},
 	
 	flameturret = new LiquidTurret("flameturret"){{
@@ -42,8 +42,8 @@ public class WeaponBlocks{
 		recoil = 0f;
 		reload = 5f;
 		shootCone = 50f;
-		shootEffect = BulletFx.shootSmallFlame;
-		ammoUseEffect = BulletFx.shellEjectSmall;
+		shootEffect = ShootFx.shootSmallFlame;
+		ammoUseEffect = ShootFx.shellEjectSmall;
 
 		drawer = (tile, entity) -> {
 			Draw.rect(entity.target != null ? name + "-shoot" : name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
@@ -58,9 +58,9 @@ public class WeaponBlocks{
 		ammoEjectBack = 2f;
 		recoil = 3f;
 		shootShake = 2f;
-		shootEffect = BulletFx.shootBig;
-		smokeEffect = BulletFx.shootBigSmoke;
-		ammoUseEffect = BulletFx.shellEjectMedium;
+		shootEffect = ShootFx.shootBig;
+		smokeEffect = ShootFx.shootBigSmoke;
+		ammoUseEffect = ShootFx.shellEjectMedium;
 	}},
 	
 	flakturret = new ItemTurret("flakturret"){{
@@ -73,9 +73,9 @@ public class WeaponBlocks{
 		cooldown = 0.03f;
 		recoil = 3f;
 		shootShake = 2f;
-		shootEffect = BulletFx.shootBig2;
-		smokeEffect = BulletFx.shootBigSmoke2;
-		ammoUseEffect = BulletFx.shellEjectBig;
+		shootEffect = ShootFx.shootBig2;
+		smokeEffect = ShootFx.shootBigSmoke2;
+		ammoUseEffect = ShootFx.shellEjectBig;
 
 		drawer = (tile, entity) -> {
 			Draw.rect(name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
@@ -100,24 +100,36 @@ public class WeaponBlocks{
 		recoil = 2f;
 		reload = 130f;
 		cooldown = 0.03f;
-		shootEffect = BulletFx.lancerLaserShoot;
-		smokeEffect = BulletFx.lancerLaserShootSmoke;
-		chargeEffect = BulletFx.lancerLaserCharge;
-		chargeBeginEffect = BulletFx.lancerLaserChargeBegin;
+		shootEffect = ShootFx.lancerLaserShoot;
+		smokeEffect = ShootFx.lancerLaserShootSmoke;
+		chargeEffect = ShootFx.lancerLaserCharge;
+		chargeBeginEffect = ShootFx.lancerLaserChargeBegin;
 		heatColor = Color.RED;
 	}},
 	
-	teslaturret = new PowerTurret("teslaturret"){
+	teslaturret = new PowerTurret("teslaturret"){{
 
-	},
-
-	magmaturret = new LiquidTurret("magmaturret") {{
-		ammoTypes = new AmmoType[]{AmmoTypes.basicFlame};
 	}},
-		
-	plasmaturret = new Turret("plasmaturret"){
 
-	},
+	liquidturret = new LiquidTurret("liquidturret") {{
+		ammoTypes = new AmmoType[]{AmmoTypes.water, AmmoTypes.lava, AmmoTypes.cryofluid, AmmoTypes.oil};
+		size = 2;
+		recoil = 0f;
+		reload = 4f;
+		inaccuracy = 5f;
+		shootCone = 50f;
+		shootEffect = ShootFx.shootLiquid;
+		range = 70f;
+
+		drawer = (tile, entity) -> {
+			Draw.rect(name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+
+			Draw.color(entity.liquid.liquid.color);
+			Draw.alpha(entity.liquid.amount/liquidCapacity);
+			Draw.rect(name + "-liquid", tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+			Draw.color();
+		};
+	}},
 	
 	chainturret = new Turret("chainturret"){
 

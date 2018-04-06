@@ -46,6 +46,9 @@ public class ContentLoader {
 
             //ammotypes
             new AmmoTypes(),
+
+            //status effects
+            new StatusEffects(),
         };
 
         for(Block block : Block.getAllBlocks()){

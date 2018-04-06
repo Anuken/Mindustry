@@ -74,7 +74,10 @@ public abstract class UnitType {
 
         //TODO logic
 
+        unit.status.update(unit);
+
         unit.velocity.limit(maxVelocity);
+
         if(isFlying) {
             unit.x += unit.velocity.x / mass;
             unit.y += unit.velocity.y / mass;

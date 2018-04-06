@@ -33,12 +33,15 @@ public class LaserTurret extends PowerTurret {
 
         for(int i = 0; i < chargeEffects; i ++){
             Timers.run(Mathf.random(chargeMaxDelay), () -> {
+                if(!isTurret(tile)) return;
                 tr.trns(entity.rotation, size * tilesize / 2);
                 Effects.effect(chargeEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
             });
         }
 
         Timers.run(chargeTime, () -> {
+            if(!isTurret(tile)) return;
+            tr.trns(entity.rotation, size * tilesize / 2);
             entity.recoil = recoil;
             entity.heat = 1f;
             bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy));

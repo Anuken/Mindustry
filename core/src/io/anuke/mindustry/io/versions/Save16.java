@@ -218,7 +218,7 @@ public class Save16 extends SaveFileVersion {
             stream.writeFloat(player.x); //player x/y
             stream.writeFloat(player.y);
 
-            stream.writeInt(player.health); //player health
+            stream.writeShort((short)player.health); //player health
 
             stream.writeByte(control.upgrades().getWeapons().size - 1); //amount of weapons
 
@@ -264,7 +264,7 @@ public class Save16 extends SaveFileVersion {
                 stream.writeByte(unit.type.id); //type
                 stream.writeFloat(unit.x); //x
                 stream.writeFloat(unit.y); //y
-                stream.writeShort(unit.health); //health
+                stream.writeShort((short)unit.health); //health
             }
         }
 

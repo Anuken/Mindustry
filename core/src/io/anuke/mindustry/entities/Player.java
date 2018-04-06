@@ -81,7 +81,7 @@ public class Player extends Unit{
 	}
 
 	@Override
-	public void damage(int amount){
+	public void damage(float amount){
 		if(debug || mech.flying) return;
 		hitTime = hitDuration;
 
@@ -177,11 +177,9 @@ public class Player extends Unit{
 	
 	@Override
 	public void update(){
-		if(hitTime > 0){
-			hitTime -= Timers.delta();
-		}
+		hitTime = Math.max(0f, hitTime - Timers.delta());
 
-		if(hitTime < 0) hitTime = 0;
+		status.update(this);
 
 		if(!isLocal){
 			interpolate();

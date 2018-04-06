@@ -8,6 +8,7 @@ import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.defense.Turret;
+import io.anuke.ucore.core.Effects;
 
 public abstract class LiquidTurret extends Turret {
     protected AmmoType[] ammoTypes;
@@ -22,7 +23,23 @@ public abstract class LiquidTurret extends Turret {
     public void setBars() {
         super.setBars();
         bars.remove(BarType.inventory);
-        bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquid.amount / liquidCapacity));
+        bars.replace(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquid.amount / liquidCapacity));
+    }
+
+    @Override
+    protected void effects(Tile tile){
+        AmmoType type = peekAmmo(tile);
+
+        TurretEntity entity = tile.entity();
+
+        Effects.effect(shootEffect, type.liquid.color, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
+        Effects.effect(smokeEffect, type.liquid.color, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
+
+        if (shootShake > 0) {
+            Effects.shake(shootShake, shootShake, tile.entity);
+        }
+
+        entity.recoil = recoil;
     }
 
     @Override
