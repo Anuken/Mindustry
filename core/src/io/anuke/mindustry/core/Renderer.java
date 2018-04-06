@@ -541,14 +541,14 @@ public class Renderer extends RendererModule{
 	}
 	
 	//TODO optimize!
-	public void drawBar(Color color, float x, float y, float fraction){
-		fraction = Mathf.clamp(fraction);
+	public void drawBar(Color color, float x, float y, float finion){
+		finion = Mathf.clamp(finion);
 
-		if(fraction > 0) fraction = Mathf.clamp(fraction + 0.2f, 0.24f, 1f);
+		if(finion > 0) finion = Mathf.clamp(finion + 0.2f, 0.24f, 1f);
 
 		float len = 3;
 
-		float w = (int) (len * 2 * fraction) + 0.5f;
+		float w = (int) (len * 2 * finion) + 0.5f;
 
 		x -= 0.5f;
 		y += 0.5f;

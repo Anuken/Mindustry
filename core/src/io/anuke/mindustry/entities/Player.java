@@ -60,7 +60,7 @@ public class Player extends SyncEntity{
 	}
 
 	@Override
-	public void damage(int amount){
+	public void damage(float amount){
 		if(debug || isAndroid) return;
 
 		health -= amount;

@@ -63,10 +63,10 @@ public class ItemPowerGenerator extends Generator{
 		PowerEntity entity = tile.entity();
 		
 		float maxPower = Math.min(powerCapacity - entity.power, powerOutput * Timers.delta());
-		float mfract = maxPower/(powerOutput);
+		float mfin = maxPower/(powerOutput);
 		
 		if(entity.time > 0f){
-			entity.time -= 1f/itemDuration*mfract;
+			entity.time -= 1f/itemDuration*mfin;
 			entity.power += maxPower;
 			entity.time = Mathf.clamp(entity.time);
 		}

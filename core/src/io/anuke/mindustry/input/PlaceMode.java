@@ -85,11 +85,11 @@ public enum PlaceMode{
 			if(tile != null && control.input().validBreak(tilex, tiley)){
 				if(tile.isLinked())
 					tile = tile.getLinked();
-				float fract = control.input().breaktime / tile.getBreakTime();
+				float fin = control.input().breaktime / tile.getBreakTime();
 				
 				if(android && control.input().breaktime > 0){
-					Draw.color(Colors.get("breakStart"), Colors.get("break"), fract);
-					Lines.poly(tile.drawx(), tile.drawy(), 25, 4 + (1f - fract) * 26);
+					Draw.color(Colors.get("breakStart"), Colors.get("break"), fin);
+					Lines.poly(tile.drawx(), tile.drawy(), 25, 4 + (1f - fin) * 26);
 				}
 				Draw.reset();
 			}
