@@ -99,6 +99,7 @@ public class TurretBullets {
             drag = 0.07f;
             hiteffect = BulletFx.hitFlameSmall;
             despawneffect = Fx.none;
+            status = StatusEffects.burning;
         }
 
         @Override
@@ -142,6 +143,7 @@ public class TurretBullets {
         {
             status = StatusEffects.wet;
             statusIntensity = 0.5f;
+            knockback = 0.65f;
         }
     },
     cryoShot = new LiquidShot(Liquids.cryofluid) {
@@ -187,7 +189,7 @@ public class TurretBullets {
             despawneffect = Fx.none;
             hiteffect = BulletFx.hitLiquid;
             drag = 0.01f;
-            knockback = 0.65f;
+            knockback = 0.5f;
         }
 
         @Override

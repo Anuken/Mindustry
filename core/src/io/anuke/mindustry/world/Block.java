@@ -40,7 +40,7 @@ public class Block extends BaseBlock {
 	/**display name*/
 	public final String formalName;
 	/**played on destroy*/
-	public Effect explosionEffect = ExplosionFx.generatorexplosion;
+	public Effect explosionEffect = ExplosionFx.explosion; //TODO better explosion effect
 	/**played on destroy*/
 	public String explosionSound = "break";
 	/**whether this block has a tile entity that updates*/

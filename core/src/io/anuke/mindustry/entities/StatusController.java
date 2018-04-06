@@ -19,21 +19,23 @@ public class StatusController {
         }else {
 
             current.getTransition(unit, effect, time, newTime, globalResult);
+            time = globalResult.time;
 
             if (globalResult.result != current) {
                 current.onTransition(unit, globalResult.result);
-                time = globalResult.time;
                 current = globalResult.result;
             }
         }
     }
 
     public void update(Unit unit){
-        if(time > 0){
-            time = Math.max(time - Timers.delta(), 0);
-        }
+        time = Math.max(time - Timers.delta(), 0);
 
-        current.update(unit, time);
+        if(time <= 0){
+            current = StatusEffects.none;
+        }else{
+            current.update(unit, time);
+        }
     }
 
     public void set(StatusEffect current, float time){

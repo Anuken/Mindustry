@@ -1,15 +1,13 @@
 package io.anuke.mindustry.world.blocks.types.power;
 
 import com.badlogic.gdx.math.GridPoint2;
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.content.fx.ExplosionFx;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Mathf;
 
 public class PowerGenerator extends PowerBlock {
 
@@ -63,16 +61,7 @@ public class PowerGenerator extends PowerBlock {
         float x = tile.worldx(), y = tile.worldy();
 
         Effects.effect(BlockFx.blastsmoke, x, y);
-
-        Timers.run(Mathf.random(8f + Mathf.random(6f)), () -> {
-            Effects.shake(6f, 8f, x, y);
-            Effects.effect(ExplosionFx.generatorexplosion, x, y);
-            Effects.effect(ExplosionFx.shockwave, x, y);
-
-            //TODO better explosion effect!
-
-            Effects.sound(explosionSound, x, y);
-        });
+        //TODO better effect
     }
 
     @Override

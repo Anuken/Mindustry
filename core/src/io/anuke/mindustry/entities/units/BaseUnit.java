@@ -32,6 +32,12 @@ public class BaseUnit extends Unit {
 		rotation = Mathf.slerpDelta(rotation, angle, type.rotatespeed);
 	}
 
+	//TODO
+	@Override
+	public float getSize() {
+		return 8;
+	}
+
 	@Override
 	public void move(float x, float y){
 		baseRotation = Mathf.slerpDelta(baseRotation, Mathf.atan2(x, y), type.baseRotateSpeed);
@@ -71,12 +77,6 @@ public class BaseUnit extends Unit {
 	@Override
 	public boolean collides(SolidEntity other){
 		return other instanceof Bullet && state.teams.areEnemies((((Bullet) other).team), team);
-	}
-
-	@Override
-	public void damage(float amount){
-		super.damage(amount);
-		hitTime = hitDuration;
 	}
 
 	@Override

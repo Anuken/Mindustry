@@ -17,4 +17,6 @@ public class Palette {
     public static final Color lightishGray = Color.valueOf("a2a2a2");
 
     public static final Color lancerLaser = Color.valueOf("a9d8ff");
+
+    public static final Color stoneGray = Color.valueOf("8f8f8f");
 }

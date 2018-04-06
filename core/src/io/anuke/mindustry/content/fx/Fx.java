@@ -10,8 +10,7 @@ import static io.anuke.mindustry.Vars.respawnduration;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class Fx{
-	public static Color beam = Color.valueOf("9bffbe");
-	public static Color stoneGray = Color.valueOf("8f8f8f");
+
 	
 	public static final Effect
 

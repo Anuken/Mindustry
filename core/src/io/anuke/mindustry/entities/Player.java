@@ -81,6 +81,11 @@ public class Player extends Unit{
 	}
 
 	@Override
+	public float getSize() {
+		return 8;
+	}
+
+	@Override
 	public void damage(float amount){
 		if(debug || mech.flying) return;
 		hitTime = hitDuration;

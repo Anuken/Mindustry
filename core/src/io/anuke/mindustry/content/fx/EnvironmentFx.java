@@ -1,0 +1,65 @@
+package io.anuke.mindustry.content.fx;
+
+import com.badlogic.gdx.graphics.Color;
+import io.anuke.mindustry.content.Liquids;
+import io.anuke.mindustry.graphics.Palette;
+import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Fill;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
+
+public class EnvironmentFx {
+
+    public static final Effect
+
+    burning = new Effect(35f, e -> {
+        Draw.color(Palette.lightFlame, Palette.darkFlame, e.fin());
+
+        Angles.randLenVectors(e.id, 3, 2f + e.fin()*7f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 0.1f + e.fout() * 1.4f);
+        });
+
+        Draw.color();
+    }),
+
+    freezing = new Effect(40f, e -> {
+        Draw.color(Liquids.cryofluid.color);
+
+        Angles.randLenVectors(e.id, 2, 1f + e.fin()*2f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 1.2f);
+        });
+
+        Draw.color();
+    }),
+
+    melting = new Effect(40f, e -> {
+        Draw.color(Liquids.lava.color, Color.WHITE,  e.fout()/5f + Mathf.randomSeedRange(e.id, 0.12f));
+
+        Angles.randLenVectors(e.id, 2, 1f + e.fin()*3f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, .2f + e.fout() * 1.2f);
+        });
+
+        Draw.color();
+    }),
+
+    wet = new Effect(40f, e -> {
+        Draw.color(Liquids.water.color);
+
+        Angles.randLenVectors(e.id, 2, 1f + e.fin()*2f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 1f);
+        });
+
+        Draw.color();
+    }),
+
+    oily = new Effect(42f, e -> {
+        Draw.color(Liquids.oil.color);
+
+        Angles.randLenVectors(e.id, 2, 1f + e.fin()*2f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 1f);
+        });
+
+        Draw.color();
+    });
+}

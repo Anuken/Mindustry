@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
+import io.anuke.mindustry.entities.StatusEffect;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.game.Difficulty;
@@ -66,11 +67,14 @@ public class Save16 extends SaveFileVersion {
         float playerx = stream.readFloat();
         float playery = stream.readFloat();
 
-        int playerhealth = stream.readInt();
+        short playerhealth = stream.readShort();
+        byte peffect = stream.readByte();
+        float petime = stream.readFloat();
 
         if(!headless) {
             player.x = playerx;
             player.y = playery;
+            player.status.set(StatusEffect.getByID(peffect), petime);
             player.health = playerhealth;
             state.mode = GameMode.values()[mode];
             Core.camera.position.set(playerx, playery, 0);
@@ -121,11 +125,14 @@ public class Save16 extends SaveFileVersion {
                 float x = stream.readFloat();
                 float y = stream.readFloat();
                 int health = stream.readShort();
+                byte effect = stream.readByte();
+                float etime = stream.readFloat();
 
                 BaseUnit enemy = new BaseUnit(UnitType.getByID(type), team);
                 enemy.health = health;
                 enemy.x = x;
                 enemy.y = y;
+                enemy.status.set(StatusEffect.getByID(effect), etime);
                 enemy.add(group);
             }
         }
@@ -220,6 +227,9 @@ public class Save16 extends SaveFileVersion {
 
             stream.writeShort((short)player.health); //player health
 
+            stream.writeByte(player.status.current().id); //status effect info
+            stream.writeFloat(player.status.getTime());
+
             stream.writeByte(control.upgrades().getWeapons().size - 1); //amount of weapons
 
             //start at 1, because the first weapon is always the starter - ignore that
@@ -265,6 +275,8 @@ public class Save16 extends SaveFileVersion {
                 stream.writeFloat(unit.x); //x
                 stream.writeFloat(unit.y); //y
                 stream.writeShort((short)unit.health); //health
+                stream.writeByte(unit.status.current().id);
+                stream.writeFloat(unit.status.getTime());
             }
         }
 

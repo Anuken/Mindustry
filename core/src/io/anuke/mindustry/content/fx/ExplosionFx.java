@@ -12,15 +12,6 @@ import io.anuke.ucore.util.Mathf;
 public class ExplosionFx {
     public static final Effect
 
-    generatorexplosion = new Effect(28, 40f, e -> {
-        Angles.randLenVectors(e.id, 16, 10f + e.fin()*8f, (x, y) -> {
-            float size = e.fout()*12f + 1f;
-            Draw.color(Color.WHITE, Color.PURPLE, e.fin());
-            Draw.rect("circle", e.x + x, e.y + y, size, size);
-            Draw.reset();
-        });
-    }),
-
     shockwave = new Effect(10f, 80f, e -> {
         Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.fin());
         Lines.stroke(e.fout()*2f + 0.2f);

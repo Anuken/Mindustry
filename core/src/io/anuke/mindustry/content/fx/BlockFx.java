@@ -2,6 +2,7 @@ package io.anuke.mindustry.content.fx;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
@@ -71,35 +72,35 @@ public class BlockFx {
     }),
     pulverize = new Effect(40, e -> {
         Angles.randLenVectors(e.id, 5, 3f + e.fin()*8f, (x, y)->{
-            Draw.color(Fx.stoneGray);
+            Draw.color(Palette.stoneGray);
             Fill.poly(e.x + x, e.y + y, 4, e.fout() * 2f + 0.5f, 45);
             Draw.reset();
         });
     }),
     pulverizeRed = new Effect(40, e -> {
         Angles.randLenVectors(e.id, 5, 3f + e.fin()*8f, (x, y)->{
-            Draw.color(Color.valueOf("ffa480"), Fx.stoneGray, e.fin());
+            Draw.color(Color.valueOf("ffa480"), Palette.stoneGray, e.fin());
             Fill.poly(e.x + x, e.y + y, 4, e.fout() * 2f + 0.5f, 45);
             Draw.reset();
         });
     }),
     pulverizeRedder = new Effect(40, e -> {
         Angles.randLenVectors(e.id, 5, 3f + e.fin()*9f, (x, y)->{
-            Draw.color(Color.valueOf("ff7b69"), Fx.stoneGray, e.fin());
+            Draw.color(Color.valueOf("ff7b69"), Palette.stoneGray, e.fin());
             Fill.poly(e.x + x, e.y + y, 4, e.fout() * 2.5f + 0.5f, 45);
             Draw.reset();
         });
     }),
     pulverizeSmall = new Effect(30, e -> {
         Angles.randLenVectors(e.id, 3, e.fin()*5f, (x, y)->{
-            Draw.color(Fx.stoneGray);
+            Draw.color(Palette.stoneGray);
             Fill.poly(e.x + x, e.y + y, 4, e.fout() * 1f + 0.5f, 45);
             Draw.reset();
         });
     }),
     pulverizeMedium = new Effect(30, e -> {
         Angles.randLenVectors(e.id, 5, 3f + e.fin()*8f, (x, y)->{
-            Draw.color(Fx.stoneGray);
+            Draw.color(Palette.stoneGray);
             Fill.poly(e.x + x, e.y + y, 4, e.fout() * 1f + 0.5f, 45);
             Draw.reset();
         });
