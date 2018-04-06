@@ -1,5 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.scene.ui.Dialog;
@@ -35,6 +36,12 @@ public class ColorPickDialog extends Dialog{
                 table.row();
             }
         }
+
+        keyDown(key->{
+            if(key == Keys.ESCAPE || key == Keys.BACK)
+                hide();
+        });
+
     }
 
     public void show(Consumer<Color> cons){
