@@ -173,6 +173,8 @@ public class TurretBullets {
     lightning = new BulletType(0.001f, 5) {
         {
             lifetime = 1;
+            despawneffect = Fx.none;
+            hiteffect = BulletFx.hitLancer;
         }
 
         @Override
@@ -182,7 +184,7 @@ public class TurretBullets {
 
         @Override
         public void init(Bullet b) {
-            new Lightning(b.team, b, b.x, b.y, b.angle(), 30);
+            new Lightning(b.team, hiteffect, damage, b.x, b.y, b.angle(), 40).add();
         }
     };
 

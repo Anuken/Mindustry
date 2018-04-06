@@ -107,8 +107,18 @@ public class WeaponBlocks{
 		heatColor = Color.RED;
 	}},
 	
-	teslaturret = new PowerTurret("teslaturret"){{
-
+	teslaturret = new LaserTurret("teslaturret"){{
+		shootType = AmmoTypes.lightning;
+		reload = 100f;
+		chargeTime = 70f;
+		shootShake = 1f;
+		chargeMaxDelay = 30f;
+		chargeEffects = 7;
+		shootEffect = ShootFx.lightningShoot;
+		chargeEffect = ShootFx.lancerLaserCharge;
+		chargeBeginEffect = ShootFx.lancerLaserChargeBegin;
+		heatColor = Color.RED;
+		recoil = 3f;
 	}},
 
 	liquidturret = new LiquidTurret("liquidturret") {{

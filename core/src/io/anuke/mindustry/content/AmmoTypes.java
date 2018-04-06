@@ -16,6 +16,8 @@ public class AmmoTypes {
 
     lancerLaser = new AmmoType(TurretBullets.lancerLaser),
 
+    lightning = new AmmoType(TurretBullets.lightning),
+
     oil = new AmmoType(Liquids.oil, TurretBullets.oilShot, 0.3f, 1f),
 
     water = new AmmoType(Liquids.water, TurretBullets.waterShot, 0.3f, 1f),
