@@ -99,12 +99,6 @@ public class Player extends Unit{
 
 	@Override
 	public boolean collides(SolidEntity other){
-		if(other instanceof Bullet){
-			Bullet b = (Bullet)other;
-			if(!state.friendlyFire && b.owner instanceof Player){
-				return false;
-			}
-		}
 		return !isDead() && super.collides(other) && !mech.flying;
 	}
 	

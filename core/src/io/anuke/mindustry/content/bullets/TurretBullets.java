@@ -8,6 +8,7 @@ import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.effect.DamageArea;
+import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.ucore.core.Effects;
@@ -167,6 +168,21 @@ public class TurretBullets {
             drag = 0.03f;
             status = StatusEffects.oiled;
             statusIntensity = 0.5f;
+        }
+    },
+    lightning = new BulletType(0.001f, 5) {
+        {
+            lifetime = 1;
+        }
+
+        @Override
+        public void draw(Bullet b) {
+
+        }
+
+        @Override
+        public void init(Bullet b) {
+            new Lightning(b.team, b, b.x, b.y, b.angle(), 30);
         }
     };
 

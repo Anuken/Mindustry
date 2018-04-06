@@ -13,13 +13,6 @@ public class Liquids {
             heatCapacity = 0.4f;
         }
     },
-    plasma = new Liquid("plasma", Color.CORAL) {
-        {
-            flammability = 0.4f;
-            viscosity = 0.1f;
-            heatCapacity = 0.2f;
-        }
-    },
     lava = new Liquid("lava", Color.valueOf("e37341")) {
         {
             temperature = 0.7f;
@@ -37,13 +30,6 @@ public class Liquids {
         {
             heatCapacity = 0.75f;
             temperature = 0.5f;
-        }
-    },
-    sulfuricAcid = new Liquid("sulfuricAcid", Color.YELLOW) {
-        {
-            flammability = 0.4f;
-            explosiveness = 0.4f;
-            heatCapacity = 0.4f;
         }
     };
 }

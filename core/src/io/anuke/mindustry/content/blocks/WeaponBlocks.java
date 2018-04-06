@@ -131,17 +131,18 @@ public class WeaponBlocks{
 		};
 	}},
 	
-	chainturret = new Turret("chainturret"){
+	chainturret = new Turret("chainturret"){{
 
-	},
+	}},
 	
-	titanturret = new Turret("titancannon"){
+	titanturret = new Turret("titancannon"){{
 
-	},
+	}},
 
 	fornaxcannon = new PowerTurret("fornaxcannon") {
 
 	},
+
 	missileturret = new PowerTurret("missileturret") {
 
 	};

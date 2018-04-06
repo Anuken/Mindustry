@@ -5,13 +5,11 @@ import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.ucore.entities.Entity;
-import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
 
 import java.nio.ByteBuffer;
 
-import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.unitGroups;
 
 public class BaseUnit extends Unit {
@@ -72,11 +70,6 @@ public class BaseUnit extends Unit {
 	@Override
 	public float drawSize(){
 		return 14;
-	}
-
-	@Override
-	public boolean collides(SolidEntity other){
-		return other instanceof Bullet && state.teams.areEnemies((((Bullet) other).team), team);
 	}
 
 	@Override
