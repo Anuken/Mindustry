@@ -79,7 +79,7 @@ public class MapEditorDialog extends Dialog{
 			ui.loadfrag.show();
 			Timers.run(3f, () -> {
 				try{
-					MapTileData data = MapIO.readTileData(new DataInputStream(file.read()));
+					MapTileData data = MapIO.readTileData(new DataInputStream(file.read()), false);
 
 					editor.beginEdit(data);
 					view.clearStack();

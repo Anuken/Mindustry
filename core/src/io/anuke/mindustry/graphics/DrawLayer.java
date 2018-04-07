@@ -43,6 +43,17 @@ public enum DrawLayer {
             endShader(batch, Shaders.oil);
         }
     },
+    space{
+        @Override
+        public void begin(CacheBatch batch){
+            beginShader(batch);
+        }
+
+        @Override
+        public void end(CacheBatch batch){
+            endShader(batch, Shaders.space);
+        }
+    },
     normal,
     walls;
 

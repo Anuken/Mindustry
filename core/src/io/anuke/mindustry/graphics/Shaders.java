@@ -10,16 +10,33 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Shader;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
+
 public class Shaders{
 	public static final Outline outline = new Outline();
 	public static final Shield shield = new Shield();
 	public static final SurfaceShader water = new SurfaceShader("water");
 	public static final SurfaceShader lava = new SurfaceShader("lava");
 	public static final SurfaceShader oil = new SurfaceShader("oil");
+	public static final Space space = new Space();
 	public static final UnitBuild build = new UnitBuild();
 	public static final Shader hit = new Shader("hit", "default");
 
 	private static final Vector2 vec = new Vector2();
+
+	public static class Space extends SurfaceShader{
+
+		public Space(){
+			super("space2");
+		}
+
+		@Override
+		public void apply(){
+			super.apply();
+			shader.setUniformf("u_center", world.width() * tilesize/2f, world.height() * tilesize/2f);
+		}
+	}
 
 	public static class UnitBuild extends Shader{
 		public float progress, time;

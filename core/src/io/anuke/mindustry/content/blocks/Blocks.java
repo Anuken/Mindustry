@@ -21,6 +21,11 @@ public class Blocks {
 
     blockpart = new BlockPart(),
 
+    space = new Floor("space") {{
+        variants = 0;
+        drawLayer = DrawLayer.space;
+    }},
+
     deepwater = new Floor("deepwater") {{
         variants = 0;
         solid = true;

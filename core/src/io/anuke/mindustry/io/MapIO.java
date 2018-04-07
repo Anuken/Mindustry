@@ -90,20 +90,20 @@ public class MapIO {
     }
 
     /**Reads tile data, skipping meta.*/
-    public static MapTileData readTileData(DataInputStream stream) throws IOException {
+    public static MapTileData readTileData(DataInputStream stream, boolean readOnly) throws IOException {
         MapMeta meta = readMapMeta(stream);
-        return readTileData(stream, meta);
+        return readTileData(stream, meta, readOnly);
     }
 
     /**Does not skip meta. Call after reading meta.*/
-    public static MapTileData readTileData(DataInputStream stream, MapMeta meta) throws IOException {
+    public static MapTileData readTileData(DataInputStream stream, MapMeta meta, boolean readOnly) throws IOException {
         byte[] bytes = new byte[stream.available()];
         stream.read(bytes);
-        return new MapTileData(bytes, meta.width, meta.height, meta.blockMap);
+        return new MapTileData(bytes, meta.width, meta.height, meta.blockMap, readOnly);
     }
 
     /**Reads tile data, skipping meta tags.*/
-    public static MapTileData readTileData(Map map){
+    public static MapTileData readTileData(Map map, boolean readOnly){
         try {
             InputStream stream;
 
@@ -114,7 +114,7 @@ public class MapIO {
             }
 
             DataInputStream ds = new DataInputStream(stream);
-            MapTileData data = MapIO.readTileData(ds);
+            MapTileData data = MapIO.readTileData(ds, readOnly);
             ds.close();
             return data;
         }catch (IOException e){

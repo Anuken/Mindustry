@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.content.blocks.ProductionBlocks;
 import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.io.Maps;
@@ -166,7 +165,7 @@ public class World extends Module{
 		
 		Entities.resizeTree(0, 0, width * tilesize, height * tilesize);
 		
-		WorldGenerator.generate(tiles, MapIO.readTileData(map));
+		WorldGenerator.generate(tiles, MapIO.readTileData(map, true));
 	}
 
 	public int getSeed(){

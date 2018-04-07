@@ -15,21 +15,34 @@ public class MapTileData {
     private final ByteBuffer buffer;
     private final TileDataMarker tile = new TileDataMarker();
     private final int width, height;
+    private final boolean readOnly;
 
-    private final IntIntMap map;
+    private IntIntMap map;
 
     public MapTileData(int width, int height){
         this.width = width;
         this.height = height;
         this.map = null;
+        this.readOnly = false;
         buffer = ByteBuffer.allocate(width * height * TILE_SIZE);
     }
 
-    public MapTileData(byte[] bytes, int width, int height, IntIntMap mapping){
+    public MapTileData(byte[] bytes, int width, int height, IntIntMap mapping, boolean readOnly){
         buffer = ByteBuffer.wrap(bytes);
         this.width = width;
         this.height = height;
         this.map = mapping;
+        this.readOnly = readOnly;
+
+        if(mapping != null && !readOnly){
+            for(int i = 0; i < width * height; i ++){
+                read();
+                buffer.position(i * TILE_SIZE);
+                write();
+            }
+            buffer.position(0);
+            this.map = null;
+        }
     }
 
     public byte[] toArray(){
@@ -96,6 +109,7 @@ public class MapTileData {
         }
 
         public void write(ByteBuffer buffer){
+            if(readOnly) throw new IllegalArgumentException("This data is read-only.");
             buffer.put(floor);
             buffer.put(wall);
             byte rt = Bits.packByte(rotation, team);

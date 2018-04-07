@@ -17,7 +17,7 @@ import static io.anuke.mindustry.Vars.mapExtension;
 
 public class Maps implements Disposable{
 	/**List of all built-in maps.*/
-	private static final String[] defaultMapNames = {"test"};
+	private static final String[] defaultMapNames = {"test", "space", "hole"};
 	/**Tile format version.*/
 	private static final int version = 0;
 
@@ -77,7 +77,7 @@ public class Maps implements Disposable{
 		DataInputStream ds = new DataInputStream(file.read());
 		MapMeta meta = MapIO.readMapMeta(ds);
 		Map map = new Map(file.nameWithoutExtension(), meta, custom);
-		if(!headless) map.texture = new Texture(MapIO.generatePixmap(MapIO.readTileData(ds, meta)));
+		if(!headless) map.texture = new Texture(MapIO.generatePixmap(MapIO.readTileData(ds, meta, true)));
 
 		maps.put(map.name, map);
 		allMaps.add(map);

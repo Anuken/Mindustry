@@ -5,40 +5,36 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
+import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.syncBlockState;
-
 public class Teleporter extends PowerBlock{
-	public static final Color[] colorArray = {Color.ROYAL, Color.ORANGE, Color.SCARLET, Color.FOREST,
-			Color.PURPLE, Color.GOLD, Color.PINK, Color.BLACK};
+	public static final Color[] colorArray = {Color.ROYAL, Color.ORANGE, Color.SCARLET, Color.LIME,
+			Color.PURPLE, Color.GOLD, Color.PINK, Color.LIGHT_GRAY};
 	public static final int colors = colorArray.length;
 
 	private static ObjectSet<Tile>[] teleporters = new ObjectSet[colors];
+	private static Color color = new Color();
 	private static byte lastColor = 0;
 
 	private Array<Tile> removal = new Array<>();
 	private Array<Tile> returns = new Array<>();
 
-	protected float powerPerItem = 5f;
 	protected float warmupTime = 80f;
 	protected Effect teleportEffect = Fx.none;
 
@@ -55,6 +51,7 @@ public class Teleporter extends PowerBlock{
 		health = 80;
 		powerCapacity = 30f;
 		size = 3;
+		itemCapacity = 150;
 	}
 
 	@Override
@@ -67,15 +64,8 @@ public class Teleporter extends PowerBlock{
 	}
 
 	@Override
-	public void setBars(){
-		super.setBars();
-		bars.remove(BarType.inventory);
-	}
-
-	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add("poweritem", Strings.toFixed(powerPerItem, 1));
 	}
 
 	@Override
@@ -89,16 +79,37 @@ public class Teleporter extends PowerBlock{
 		TeleporterEntity entity = tile.entity();
 		
 		super.draw(tile);
-		
-		Draw.color(colorArray[entity.color]);
+
+		Color target = colorArray[entity.color];
+		float ss = 0.5f;
+		float bs = 0.2f;
+
+		Draw.color(Hue.shift(Hue.multiply(color.set(target), 1, ss), 2, 0));
 		Draw.rect("teleporter-top", tile.drawx(), tile.drawy());
-		Draw.reset();
 
-		Draw.color(Color.WHITE);
+		//Draw.color(Palette.portal);
+		Draw.color(Hue.shift(Hue.multiply(color.set(target), 1, ss), 2, 0));
 
-		Fill.circle(tile.drawx(), tile.drawy(), 7f);
+		Fill.circle(tile.drawx(), tile.drawy(), 7f + Mathf.absin(Timers.time()+55, 8f, 1f));
 
-		Draw.color(Color.PURPLE);
+        //Draw.color(Palette.portalDark);
+		Draw.color(Hue.shift(Hue.multiply(color.set(target), 1, ss), 2, -bs));
+
+		Fill.circle(tile.drawx(), tile.drawy(), 2f + Mathf.absin(Timers.time(), 7f, 3f));
+
+		for(int i = 0; i < 11; i ++){
+			Lines.swirl(tile.drawx(), tile.drawy(),
+					2f + i/3f + Mathf.sin(Timers.time() - i *75, 20f + i, 3f),
+					0.3f + Mathf.sin(Timers.time() + i *33, 10f + i, 0.1f),
+					Timers.time() * (1f + Mathf.randomSeedRange(i + 1, 1f)) + Mathf.randomSeedRange(i, 360f));
+		}
+
+        //Draw.color(Palette.portalLight);
+		Draw.color(Hue.shift(Hue.multiply(color.set(target), 1, ss), 2, bs));
+
+		Lines.stroke(2f);
+		Lines.circle(tile.drawx(), tile.drawy(), 7f + Mathf.absin(Timers.time()+55, 8f, 1f));
+		Lines.stroke(1f);
 
 		for(int i = 0; i < 11; i ++){
 			Lines.swirl(tile.drawx(), tile.drawy(),
@@ -119,6 +130,10 @@ public class Teleporter extends PowerBlock{
 		if(entity.inventory.totalItems() > 0){
 			tryDump(tile);
 		}
+
+		if(entity.inventory.totalItems() == itemCapacity && entity.power.amount >= powerCapacity){
+
+		}
 	}
 
 	@Override
@@ -135,7 +150,7 @@ public class Teleporter extends PowerBlock{
 		cont.margin(4);
 		cont.marginBottom(5);
 
-		cont.add().colspan(4).height(105f);
+		cont.add().colspan(4).height(145f);
 		cont.row();
 
 		for(int i = 0; i < colors; i ++){
@@ -156,25 +171,9 @@ public class Teleporter extends PowerBlock{
 	}
 	
 	@Override
-	public void handleItem(Item item, Tile tile, Tile source){
-		TeleporterEntity entity = tile.entity();
-
-		Array<Tile> links = findLinks(tile);
-		
-		if(links.size > 0){
-            if(!syncBlockState || Net.server() || !Net.active()){
-                Tile target = links.random();
-                target.entity.inventory.addItem(item, 1);
-            }
-		}
-
-		entity.power.amount -= powerPerItem;
-	}
-	
-	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		TeleporterEntity entity = tile.entity();
-		return !(source.block() instanceof Teleporter) && entity.power.amount >= powerPerItem && findLinks(tile).size > 0;
+		return entity.inventory.totalItems() < itemCapacity;
 	}
 	
 	@Override

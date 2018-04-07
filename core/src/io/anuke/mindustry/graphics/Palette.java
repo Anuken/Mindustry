@@ -19,4 +19,8 @@ public class Palette {
     public static final Color lancerLaser = Color.valueOf("a9d8ff");
 
     public static final Color stoneGray = Color.valueOf("8f8f8f");
+
+    public static final Color portalLight = Color.valueOf("9054ea");
+    public static final Color portal = Color.valueOf("6344d7");
+    public static final Color portalDark = Color.valueOf("3f3dac");
 }
