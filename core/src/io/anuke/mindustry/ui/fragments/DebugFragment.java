@@ -2,10 +2,10 @@ package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import io.anuke.mindustry.content.fx.ExplosionFx;
+import io.anuke.mindustry.content.UnitTypes;
+import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.units.BaseUnit;
-import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Effects;
@@ -53,7 +53,7 @@ public class DebugFragment implements Fragment {
                row();
                new button("blocks", "toggle", () -> showBlockDebug = !showBlockDebug);
                row();
-               new button("effect", () -> Effects.effect(ExplosionFx.explosion, player));
+               new button("effect", () -> Effects.effect(BlockFx.teleport, player));
                row();
                new button("wave", () -> state.wavetime = 0f);
                row();

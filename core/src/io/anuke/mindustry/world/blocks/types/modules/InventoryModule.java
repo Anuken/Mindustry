@@ -12,12 +12,23 @@ import java.util.Arrays;
 public class InventoryModule extends BlockModule{
     public int[] items = new int[Item.getAllItems().size];
 
+    //TODO optimize!
     public int totalItems(){
         int sum = 0;
         for(int i = 0; i < items.length; i ++){
             sum += items[i];
         }
         return sum;
+    }
+
+    public Item takeItem(){
+        for(int i = 0; i < items.length; i ++){
+            if(items[i] > 0){
+                items[i] --;
+                return Item.getByID(i);
+            }
+        }
+        return null;
     }
 
     public int getItem(Item item){

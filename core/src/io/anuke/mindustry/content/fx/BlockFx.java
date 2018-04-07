@@ -8,6 +8,7 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -213,5 +214,27 @@ public class BlockFx {
             Fill.poly(e.x + x, e.y + y, 4, 0.5f+e.fout()*2f, 45);
             Draw.reset();
         });
+    }),
+    teleport = new Effect(60, e -> {
+        Draw.color(e.color);
+        Lines.stroke(e.fin()*2f);
+        Lines.circle(e.x, e.y, 7f + e.fout()*8f);
+
+        Angles.randLenVectors(e.id, 20, 6f + 20f * e.fout(), (x, y) -> {
+            Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), e.fin()*4f + 1f);
+        });
+
+        Draw.reset();
+    }),
+    teleportOut = new Effect(20, e -> {
+        Draw.color(e.color);
+        Lines.stroke(e.fout()*2f);
+        Lines.circle(e.x, e.y, 7f + e.fin()*8f);
+
+        Angles.randLenVectors(e.id, 20, 4f + 20f * e.fin(), (x, y) -> {
+            Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), e.fslope()*4f + 1f);
+        });
+
+        Draw.reset();
     });
 }

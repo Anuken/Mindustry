@@ -3,11 +3,12 @@ package io.anuke.mindustry.world.blocks.types.distribution;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
-import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
+import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -28,6 +29,8 @@ public class Teleporter extends PowerBlock{
 			Color.PURPLE, Color.GOLD, Color.PINK, Color.LIGHT_GRAY};
 	public static final int colors = colorArray.length;
 
+	protected int timerTeleport = timers++;
+
 	private static ObjectSet<Tile>[] teleporters = new ObjectSet[colors];
 	private static Color color = new Color();
 	private static byte lastColor = 0;
@@ -35,8 +38,10 @@ public class Teleporter extends PowerBlock{
 	private Array<Tile> removal = new Array<>();
 	private Array<Tile> returns = new Array<>();
 
-	protected float warmupTime = 80f;
-	protected Effect teleportEffect = Fx.none;
+	protected float warmupTime = 60f;
+	protected float teleportMax = 400f;
+	protected Effect teleportEffect = BlockFx.teleport;
+	protected Effect teleportOutEffect = BlockFx.teleportOut;
 
 	static{
 		for(int i = 0; i < colors; i ++){
@@ -51,7 +56,7 @@ public class Teleporter extends PowerBlock{
 		health = 80;
 		powerCapacity = 30f;
 		size = 3;
-		itemCapacity = 150;
+		itemCapacity = 100;
 	}
 
 	@Override
@@ -77,45 +82,39 @@ public class Teleporter extends PowerBlock{
 	@Override
 	public void draw(Tile tile){
 		TeleporterEntity entity = tile.entity();
+		float time = entity.time;
 		
 		super.draw(tile);
 
-		Color target = colorArray[entity.color];
-		float ss = 0.5f;
-		float bs = 0.2f;
-
-		Draw.color(Hue.shift(Hue.multiply(color.set(target), 1, ss), 2, 0));
+		Draw.color(getColor(tile, 0));
 		Draw.rect("teleporter-top", tile.drawx(), tile.drawy());
 
-		//Draw.color(Palette.portal);
-		Draw.color(Hue.shift(Hue.multiply(color.set(target), 1, ss), 2, 0));
+		Draw.color(getColor(tile, 0));
 
-		Fill.circle(tile.drawx(), tile.drawy(), 7f + Mathf.absin(Timers.time()+55, 8f, 1f));
+		Fill.circle(tile.drawx(), tile.drawy(), 7f + Mathf.absin(time+55, 8f, 1f));
 
-        //Draw.color(Palette.portalDark);
-		Draw.color(Hue.shift(Hue.multiply(color.set(target), 1, ss), 2, -bs));
+		Draw.color(getColor(tile, -1));
 
-		Fill.circle(tile.drawx(), tile.drawy(), 2f + Mathf.absin(Timers.time(), 7f, 3f));
+		Fill.circle(tile.drawx(), tile.drawy(), 2f + Mathf.absin(time, 7f, 3f));
 
 		for(int i = 0; i < 11; i ++){
 			Lines.swirl(tile.drawx(), tile.drawy(),
-					2f + i/3f + Mathf.sin(Timers.time() - i *75, 20f + i, 3f),
-					0.3f + Mathf.sin(Timers.time() + i *33, 10f + i, 0.1f),
-					Timers.time() * (1f + Mathf.randomSeedRange(i + 1, 1f)) + Mathf.randomSeedRange(i, 360f));
+					2f + i/3f + Mathf.sin(time - i *75, 20f + i, 3f),
+					0.3f + Mathf.sin(time + i *33, 10f + i, 0.1f),
+					time * (1f + Mathf.randomSeedRange(i + 1, 1f)) + Mathf.randomSeedRange(i, 360f));
 		}
 
-        //Draw.color(Palette.portalLight);
-		Draw.color(Hue.shift(Hue.multiply(color.set(target), 1, ss), 2, bs));
+		Draw.color(getColor(tile, 1));
 
 		Lines.stroke(2f);
-		Lines.circle(tile.drawx(), tile.drawy(), 7f + Mathf.absin(Timers.time()+55, 8f, 1f));
+		Lines.circle(tile.drawx(), tile.drawy(), 7f + Mathf.absin(time+55, 8f, 1f));
 		Lines.stroke(1f);
 
 		for(int i = 0; i < 11; i ++){
 			Lines.swirl(tile.drawx(), tile.drawy(),
-					3f + i/3f + Mathf.sin(Timers.time() + i *93, 20f + i, 3f),
-					0.2f + Mathf.sin(Timers.time() + i *33, 10f + i, 0.1f),
-					Timers.time() * (1f + Mathf.randomSeedRange(i + 1, 1f)) + Mathf.randomSeedRange(i, 360f));
+					3f + i/3f + Mathf.sin(time + i *93, 20f + i, 3f),
+					0.2f + Mathf.sin(time + i *33, 10f + i, 0.1f),
+					time * (1f + Mathf.randomSeedRange(i + 1, 1f)) + Mathf.randomSeedRange(i, 360f));
 		}
 
 		Draw.reset();
@@ -131,8 +130,39 @@ public class Teleporter extends PowerBlock{
 			tryDump(tile);
 		}
 
-		if(entity.inventory.totalItems() == itemCapacity && entity.power.amount >= powerCapacity){
+		if(entity.teleporting){
+			entity.speedScl = Mathf.lerpDelta(entity.speedScl, 2f, 0.01f);
+		}else{
+			entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.04f);
+		}
 
+		entity.time += Timers.delta()*entity.speedScl;
+
+		if(entity.inventory.totalItems() == itemCapacity && entity.power.amount >= powerCapacity &&
+				entity.timer.get(timerTeleport, teleportMax)){
+			Array<Tile> testLinks = findLinks(tile);
+
+			if(testLinks.size == 0) return;
+
+			entity.teleporting = true;
+
+			Effects.effect(teleportEffect, getColor(tile, 0), tile.drawx(), tile.drawy());
+			Timers.run(warmupTime, () -> {
+				Array<Tile> links = findLinks(tile);
+
+				for(Tile other : links){
+					int canAccept = itemCapacity - other.entity.inventory.totalItems();
+					int total = entity.inventory.totalItems();
+					if(total == 0) break;
+					Effects.effect(teleportOutEffect, getColor(tile, 0), other.drawx(), other.drawy());
+					for(int i = 0; i < canAccept && i < total; i ++){
+						other.entity.inventory.addItem(entity.inventory.takeItem(), 1);
+					}
+				}
+				Effects.effect(teleportOutEffect, getColor(tile, 0), tile.drawx(), tile.drawy());
+				entity.power.amount = 0f;
+				entity.teleporting = false;
+			});
 		}
 	}
 
@@ -180,6 +210,16 @@ public class Teleporter extends PowerBlock{
 	public TileEntity getEntity(){
 		return new TeleporterEntity();
 	}
+
+	private Color getColor(Tile tile, int shift){
+		TeleporterEntity entity = tile.entity();
+
+		Color target = colorArray[entity.color];
+		float ss = 0.5f;
+		float bs = 0.2f;
+
+		return Hue.shift(Hue.multiply(color.set(target), 1, ss), 2, shift * bs + (entity.speedScl - 1f)/3f);
+	}
 	
 	private Array<Tile> findLinks(Tile tile){
 		TeleporterEntity entity = tile.entity();
@@ -209,6 +249,9 @@ public class Teleporter extends PowerBlock{
 
 	public static class TeleporterEntity extends TileEntity{
 		public byte color = 0;
+		public boolean teleporting;
+		public float speedScl = 1f;
+		public float time;
 		
 		@Override
 		public void write(DataOutputStream stream) throws IOException{

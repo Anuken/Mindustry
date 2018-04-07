@@ -14,7 +14,7 @@ varying vec4 v_color;
 varying vec2 v_texCoord;
 
 const float tau = 6.28318530717958647692;
-const float tscl = 0.5;
+const float tscl = 0.4;
 
 // Gamma correction
 #define GAMMA (2.2)
@@ -34,8 +34,7 @@ float srand(vec2 co){
 }
 
 vec4 Noise(ivec2 x ){
-    vec2 uv = (vec2(x)+0.5)/256.0;
-	return vec4(srand(uv), srand(uv + vec2(10.0, 0.0)), srand(uv + vec2(10.0, 0.0)), srand(uv + vec2(10.0, 10.0)));
+	return vec4(srand((vec2(x)+0.5)/256.0));
 }
 
 void main(){

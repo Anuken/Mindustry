@@ -24,6 +24,7 @@ public class Blocks {
     space = new Floor("space") {{
         variants = 0;
         drawLayer = DrawLayer.space;
+        solid = true;
     }},
 
     deepwater = new Floor("deepwater") {{
