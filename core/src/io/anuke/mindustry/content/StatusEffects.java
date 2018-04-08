@@ -102,7 +102,7 @@ public class StatusEffects {
                 Effects.effect(EnvironmentFx.oily, unit.x + Mathf.range(unit.getSize()/2f), unit.y + Mathf.range(unit.getSize()/2f));
             }
 
-            unit.velocity.scl(1.001f);
+            unit.velocity.scl(0.6f);
         }
 
         @Override

@@ -2,7 +2,9 @@ package io.anuke.mindustry.core;
 
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.blocks.*;
+import io.anuke.mindustry.entities.StatusEffect;
 import io.anuke.mindustry.entities.units.UnitType;
+import io.anuke.mindustry.resource.AmmoType;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.resource.Mech;
@@ -56,9 +58,9 @@ public class ContentLoader {
         }
 
         Log.info("--- CONTENT INFO ---");
-        Log.info("Blocks loaded: {0}\nItems loaded: {1}\nLiquids loaded: {2}\nUpgrades loaded: {3}\nUnits loaded: {4}",
+        Log.info("Blocks loaded: {0}\nItems loaded: {1}\nLiquids loaded: {2}\nUpgrades loaded: {3}\nUnits loaded: {4}\nAmmo types loaded: {5}\nStatus effects loaded: {6}",
                 Block.getAllBlocks().size, Item.getAllItems().size, Liquid.getAllLiquids().size,
-                Mech.getAllUpgrades().size, UnitType.getAllTypes().size);
+                Mech.getAllUpgrades().size, UnitType.getAllTypes().size, AmmoType.getAllTypes().size, StatusEffect.getAllEffects().size);
 
         Log.info("-------------------");
     }

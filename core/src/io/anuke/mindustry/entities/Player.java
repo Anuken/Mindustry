@@ -105,8 +105,8 @@ public class Player extends Unit{
 	
 	@Override
 	public void onDeath(){
+		super.onDeath();
 		dead = true;
-		drownTime = 0f;
 		if(Net.active()){
 			NetEvents.handleUnitDeath(this);
 		}
@@ -193,8 +193,6 @@ public class Player extends Unit{
 	public void update(){
 		hitTime = Math.max(0f, hitTime - Timers.delta());
 
-		status.update(this);
-
 		if(!isLocal){
 			interpolate();
 			return;
@@ -265,7 +263,7 @@ public class Player extends Unit{
 
 		velocity.add(movement);
 
-		updateVelocity(0.4f, speed);
+		updateVelocityStatus(0.4f, speed);
 
 		if(!movement.isZero()){
 			walktime += Timers.delta() * velocity.len()*(1f/0.5f)/speed * getFloorOn().speedMultiplier;

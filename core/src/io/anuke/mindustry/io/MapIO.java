@@ -12,7 +12,6 @@ import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.ColorMapper.BlockPair;
-import io.anuke.ucore.util.Log;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -142,7 +141,7 @@ public class MapIO {
             String name = stream.readUTF();
             Block block = Block.getByName(name);
             if(block == null){
-                Log.info("Map load info: No block with name {0} found.", name);
+                //Log.info("Map load info: No block with name {0} found.", name);
                 block = Blocks.air;
             }
             map.put(id, block.id);

@@ -79,6 +79,7 @@ public class BaseUnit extends Unit {
 
 	@Override
 	public void onDeath(){
+		super.onDeath();
 		type.onDeath(this);
 	}
 

@@ -34,15 +34,23 @@ public abstract class Unit extends SyncEntity {
         return other instanceof Bullet && state.teams.areEnemies((((Bullet) other).team), team);
     }
 
+    @Override
+    public void onDeath() {
+        drownTime = 0f;
+        status.clear();
+    }
+
     public Floor getFloorOn(){
         Tile tile = world.tileWorld(x, y);
         return (Floor)(tile == null || (!(tile.floor() instanceof Floor)) ? Blocks.defaultFloor : tile.floor());
     }
 
-    public void updateVelocity(float drag, float maxVelocity){
+    public void updateVelocityStatus(float drag, float maxVelocity){
         Floor floor = getFloorOn();
 
         velocity.limit(maxVelocity);
+
+        status.update(this);
 
         if(isFlying()) {
             x += velocity.x / getMass();

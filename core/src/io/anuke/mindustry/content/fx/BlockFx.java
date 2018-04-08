@@ -266,7 +266,7 @@ public class BlockFx {
     bubble = new Effect(20, e -> {
         Draw.color(Hue.shift(Tmp.c1.set(e.color), 2, 0.1f));
         Lines.stroke(e.fout() + 0.2f);
-        Angles.randLenVectors(e.id, 3, 11f, (x, y) -> {
+        Angles.randLenVectors(e.id, 2, 8f, (x, y) -> {
             Lines.circle(e.x + x, e.y + y, 1f + e.fin() * 3f);
         });
         Draw.reset();

@@ -72,11 +72,7 @@ public abstract class UnitType {
 
         updateTargeting(unit);
 
-        //TODO logic
-
-        unit.status.update(unit);
-
-        unit.updateVelocity(drag, maxVelocity);
+        unit.updateVelocityStatus(drag, maxVelocity);
 
         if(unit.target != null) behavior(unit);
 

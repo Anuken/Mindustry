@@ -28,6 +28,11 @@ public class StatusController {
         }
     }
 
+    public void clear(){
+        current = StatusEffects.none;
+        time = 0f;
+    }
+
     public void update(Unit unit){
         time = Math.max(time - Timers.delta(), 0);
 
