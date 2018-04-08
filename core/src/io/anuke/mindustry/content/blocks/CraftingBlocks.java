@@ -193,5 +193,9 @@ public class CraftingBlocks {
     weaponFactory = new WeaponFactory("weaponfactory") {{
         size = 2;
         health = 250;
+    }},
+
+    incinerator = new Incinerator("incinerator") {{
+        health = 90;
     }};
 }
