@@ -1,13 +1,16 @@
 package io.anuke.mindustry.entities.units;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
 
@@ -42,9 +45,21 @@ public abstract class GroundUnitType extends UnitType{
 
         float ft = Mathf.sin(walktime, 6f, 2f);
 
+        Floor floor = unit.getFloorOn();
+
+        if(floor.liquid){
+            Draw.tint(Hue.mix(Color.WHITE, floor.liquidColor, 0.5f));
+        }
+
         for (int i : Mathf.signs) {
             tr1.trns(unit.baseRotation, ft * i);
             Draw.rect(name + "-leg", unit.x + tr1.x, unit.y + tr1.y, 12f * i, 12f - Mathf.clamp(ft * i, 0, 2), unit.baseRotation - 90);
+        }
+
+        if(floor.liquid) {
+            Draw.tint(Color.WHITE, floor.liquidColor, unit.drownTime * 0.4f);
+        }else {
+            Draw.tint(Color.WHITE);
         }
 
         Draw.rect(name + "-base", unit.x, unit.y, unit.baseRotation- 90);

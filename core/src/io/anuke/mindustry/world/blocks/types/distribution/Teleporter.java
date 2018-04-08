@@ -166,6 +166,8 @@ public class Teleporter extends PowerBlock{
 				catastrophicFailure(tile);
 			}
 
+			//TODO draw warning info!
+
 			if (entity.teleporting) {
 				entity.speedScl = Mathf.lerpDelta(entity.speedScl, 2f, 0.01f);
 				float liquidUsed = Math.min(liquidCapacity, liquidUse * Timers.delta());

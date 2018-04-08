@@ -21,7 +21,7 @@ public class StatusEffects {
         @Override
         public TransitionResult getTransition(Unit unit, StatusEffect to, float time, float newTime, TransitionResult result){
             if(to == oiled){
-                unit.damage(1f, false);
+                unit.damage(1f);
                 Effects.effect(EnvironmentFx.burning, unit.x + Mathf.range(unit.getSize()/2f), unit.y + Mathf.range(unit.getSize()/2f));
                 return result.set(this, Math.min(time + newTime, baseDuration + oiled.baseDuration));
             }
@@ -31,7 +31,7 @@ public class StatusEffects {
 
         @Override
         public void update(Unit unit, float time){
-            unit.damage(0.04f * Timers.delta(), false);
+            unit.damagePeriodic(0.04f);
 
             if(Mathf.chance(Timers.delta() * 0.2f)){
                 Effects.effect(EnvironmentFx.burning, unit.x + Mathf.range(unit.getSize()/2f), unit.y + Mathf.range(unit.getSize()/2f));
@@ -87,7 +87,7 @@ public class StatusEffects {
         @Override
         public void update(Unit unit, float time){
             unit.velocity.scl(0.8f);
-            unit.damage(0.1f * Timers.delta(), false);
+            unit.damagePeriodic(0.1f);
 
             if(Mathf.chance(Timers.delta() * 0.2f)){
                 Effects.effect(EnvironmentFx.melting, unit.x + Mathf.range(unit.getSize()/2f), unit.y + Mathf.range(unit.getSize()/2f));

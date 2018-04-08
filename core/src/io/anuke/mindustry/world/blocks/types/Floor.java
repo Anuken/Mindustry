@@ -1,9 +1,14 @@
 package io.anuke.mindustry.world.blocks.types;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import io.anuke.mindustry.content.StatusEffects;
+import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.entities.StatusEffect;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
@@ -14,11 +19,31 @@ public class Floor extends Block{
 	protected TextureRegion tempRegion = new TextureRegion();
 	protected Predicate<Block> blends = block -> block != this;
 	protected boolean blend = true;
+
+	public float speedMultiplier = 1f;
+	public float dragMultiplier = 1f;
+	public float damageTaken = 0f;
+	public float drownTime = 0f;
+	public Effect walkEffect = BlockFx.ripple;
+    public Effect drownUpdateEffect = BlockFx.bubble;
+	public StatusEffect status = StatusEffects.none;
+	public float statusIntensity = 0.6f;
+	public Color liquidColor;
 	
 	public Floor(String name) {
 		super(name);
 		variants = 3;
 	}
+
+	@Override
+	public void init(){
+		super.init();
+
+		if(liquid && liquidColor == null){
+			throw new RuntimeException("All liquids must define a liquidColor! Problematic block: " + name);
+		}
+	}
+
 
 	@Override
 	public void drawNonLayer(Tile tile){

@@ -4,16 +4,16 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Weapons;
-import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.Mech;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Settings;
@@ -77,7 +77,7 @@ public class Player extends Unit{
 
     @Override
 	public boolean isFlying(){
-		return mech.flying;
+		return mech.flying || noclip;
 	}
 
 	@Override
@@ -87,13 +87,14 @@ public class Player extends Unit{
 
 	@Override
 	public void damage(float amount){
-		if(debug || mech.flying) return;
+		//if(debug || mech.flying) return;
 		hitTime = hitDuration;
-
-		health -= amount;
-		if(health <= 0 && !dead && isLocal){ //remote players don't die normally
-			onDeath();
-			dead = true;
+		if(!debug) {
+			health -= amount;
+			if(health <= 0 && !dead && isLocal){ //remote players don't die normally
+				onDeath();
+				dead = true;
+			}
 		}
 	}
 
@@ -105,6 +106,7 @@ public class Player extends Unit{
 	@Override
 	public void onDeath(){
 		dead = true;
+		drownTime = 0f;
 		if(Net.active()){
 			NetEvents.handleUnitDeath(this);
 		}
@@ -148,15 +150,28 @@ public class Player extends Unit{
 
 		float ft = Mathf.sin(walktime, 6f, 2f);
 
+		Floor floor = getFloorOn();
+
+		Draw.color();
 		Draw.alpha(hitTime / hitDuration);
 
 		if(!mech.flying) {
+			if(floor.liquid){
+				Draw.tint(Color.WHITE, floor.liquidColor, 0.5f);
+			}
+
 			for (int i : Mathf.signs) {
 				tr.trns(baseRotation, ft * i);
 				Draw.rect(mname + "-leg", x + tr.x, y + tr.y, 12f * i, 12f - Mathf.clamp(ft * i, 0, 2), baseRotation - 90);
 			}
 
 			Draw.rect(mname + "-base", x, y,baseRotation- 90);
+		}
+
+		if(floor.liquid) {
+			Draw.tint(Color.WHITE, floor.liquidColor, drownTime * 0.4f);
+		}else {
+			Draw.tint(Color.WHITE);
 		}
 
 		Draw.rect(mname, x, y, rotation -90);
@@ -202,7 +217,7 @@ public class Player extends Unit{
 		Tile tile = world.tileWorld(x, y);
 
 		//if player is in solid block
-		if(tile != null && ((tile.floor().liquid && tile.block() == Blocks.air) || tile.solid())){
+		if(tile != null && tile.solid()){
 			stucktime += Timers.delta();
 		}else{
 			stucktime = 0f;
@@ -248,15 +263,12 @@ public class Player extends Unit{
 
 		movement.limit(speed);
 
-		if(!noclip){
-			move(movement.x*Timers.delta(), movement.y*Timers.delta());
-		}else{
-			x += movement.x*Timers.delta();
-			y += movement.y*Timers.delta();
-		}
+		velocity.add(movement);
+
+		updateVelocity(0.4f, speed);
 
 		if(!movement.isZero()){
-			walktime += Timers.delta();
+			walktime += Timers.delta() * velocity.len()*(1f/0.5f)/speed * getFloorOn().speedMultiplier;
 			baseRotation = Mathf.slerpDelta(baseRotation, movement.angle(), 0.13f);
 		}
 

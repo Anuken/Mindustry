@@ -76,16 +76,7 @@ public abstract class UnitType {
 
         unit.status.update(unit);
 
-        unit.velocity.limit(maxVelocity);
-
-        if(isFlying) {
-            unit.x += unit.velocity.x / mass;
-            unit.y += unit.velocity.y / mass;
-        }else{
-            unit.move(unit.velocity.x / mass, unit.velocity.y / mass);
-        }
-
-        unit.velocity.scl(Mathf.clamp(1f-drag* Timers.delta()));
+        unit.updateVelocity(drag, maxVelocity);
 
         if(unit.target != null) behavior(unit);
 

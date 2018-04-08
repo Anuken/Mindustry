@@ -145,9 +145,13 @@ public class SettingsMenuDialog extends SettingsDialog{
 				renderer.pixelSurface.setScale(Core.cameraScale);
 				renderer.shadowSurface.setScale(Core.cameraScale);
 				renderer.shieldSurface.setScale(Core.cameraScale);
+				//Graphics.getEffects1().setScale(Core.cameraScale);
+				//Graphics.getEffects2().setScale(Core.cameraScale);
 			}else{
 				renderer.shadowSurface.setScale(1);
 				renderer.shieldSurface.setScale(1);
+				//Graphics.getEffects1().setScale(1);
+				//Graphics.getEffects2().setScale(1);
 			}
 			renderer.setPixelate(b);
 		});

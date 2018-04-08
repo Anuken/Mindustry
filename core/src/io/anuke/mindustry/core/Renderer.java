@@ -13,11 +13,12 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
-import io.anuke.mindustry.entities.effect.StaticEffectEntity;
-import io.anuke.mindustry.entities.effect.StaticEffectEntity.StaticEffect;
+import io.anuke.mindustry.entities.effect.GroundEffectEntity;
+import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.BlockRenderer;
@@ -60,17 +61,25 @@ public class Renderer extends RendererModule{
 		Lines.setCircleVertices(14);
 
 		Core.cameraScale = baseCameraScale;
-		Effects.setEffectProvider((name, color, x, y, rotation) -> {
+		Effects.setEffectProvider((effect, color, x, y, rotation) -> {
+			if(effect == Fx.none) return;
 			if(Settings.getBool("effects")){
 				Rectangle view = rect.setSize(camera.viewportWidth, camera.viewportHeight)
 						.setCenter(camera.position.x, camera.position.y);
-				Rectangle pos = rect2.setSize(name.size).setCenter(x, y);
+				Rectangle pos = rect2.setSize(effect.size).setCenter(x, y);
 
 				if(view.overlaps(pos)){
-					int id = new EffectEntity(name, color, rotation).set(x, y).add(effectGroup).id;
+					int id = 0;
 
-					if(name instanceof StaticEffect){
-						new StaticEffectEntity((StaticEffect) name, color, rotation).set(x, y).add(staticEffectGroup).id = id;
+					if(!(effect instanceof GroundEffect) || ((GroundEffect)effect).isStatic) {
+						id = new EffectEntity(effect, color, rotation).set(x, y).add(effectGroup).id;
+					}
+
+					if(effect instanceof GroundEffect){
+						GroundEffectEntity r = new GroundEffectEntity((GroundEffect) effect, color, rotation).set(x, y).add(groundEffectGroup);
+						if(((GroundEffect)effect).isStatic){
+							r.id = id;
+						}
 					}
 				}
 			}
@@ -191,7 +200,7 @@ public class Renderer extends RendererModule{
 		
 		blocks.drawFloor();
 
-		Entities.draw(staticEffectGroup);
+		Entities.draw(groundEffectGroup);
 
 		blocks.processBlocks();
 		blocks.drawBlocks(Layer.overlay);

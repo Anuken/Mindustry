@@ -1,7 +1,9 @@
 package io.anuke.mindustry.content.blocks;
 
+import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
+import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.graphics.DrawLayer;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Block;
@@ -21,6 +23,9 @@ public class Blocks {
 
     blockpart = new BlockPart(),
 
+    defaultFloor = new Floor("defaultfloor") {{
+    }},
+
     space = new Floor("space") {{
         variants = 0;
         drawLayer = DrawLayer.space;
@@ -32,32 +37,46 @@ public class Blocks {
     }},
 
     deepwater = new Floor("deepwater") {{
+        liquidColor = Color.valueOf("546bb3");
+        speedMultiplier = 0.3f;
         variants = 0;
-        solid = true;
         liquidDrop = Liquids.water;
         liquid = true;
+        status = StatusEffects.wet;
+        statusIntensity = 1f;
+        drownTime = 140f;
         drawLayer = DrawLayer.water;
     }},
 
     water = new Floor("water") {{
+        liquidColor = Color.valueOf("546bb3");
+        speedMultiplier = 0.5f;
         variants = 0;
-        solid = true;
+        status = StatusEffects.wet;
+        statusIntensity = 0.9f;
         liquidDrop = Liquids.water;
         liquid = true;
         drawLayer = DrawLayer.water;
     }},
 
     lava = new Floor("lava") {{
+        liquidColor = Color.valueOf("ed5334");
+        speedMultiplier = 0.2f;
+        damageTaken = 0.1f;
+        status = StatusEffects.melting;
+        statusIntensity = 0.8f;
         variants = 0;
-        solid = true;
         liquidDrop = Liquids.lava;
         liquid = true;
         drawLayer = DrawLayer.lava;
     }},
 
     oil = new Floor("oil") {{
+        liquidColor = Color.valueOf("292929");
+        status = StatusEffects.oiled;
+        statusIntensity = 1f;
+        speedMultiplier = 0.2f;
         variants = 0;
-        solid = true;
         liquidDrop = Liquids.oil;
         liquid = true;
         drawLayer = DrawLayer.oil;

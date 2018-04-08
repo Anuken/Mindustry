@@ -1,7 +1,7 @@
 package io.anuke.mindustry.content.fx;
 
 import com.badlogic.gdx.graphics.Color;
-import io.anuke.mindustry.entities.effect.StaticEffectEntity.StaticEffect;
+import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
@@ -88,7 +88,7 @@ public class ShootFx {
         Draw.reset();
     }),
 
-    shellEjectSmall = new StaticEffect(30f, 400f, e -> {
+    shellEjectSmall = new GroundEffect(30f, 400f, e -> {
         Draw.color(Palette.lightOrange, Color.LIGHT_GRAY, Palette.lightishGray, e.fin());
         float rot = e.rotation + 90f;
         for(int i : Mathf.signs){
@@ -103,7 +103,7 @@ public class ShootFx {
         Draw.color();
     }),
 
-    shellEjectMedium = new StaticEffect(34f, 400f, e -> {
+    shellEjectMedium = new GroundEffect(34f, 400f, e -> {
         Draw.color(Palette.lightOrange, Color.LIGHT_GRAY, Palette.lightishGray, e.fin());
         float rot = e.rotation + 90f;
         for(int i : Mathf.signs){
@@ -126,7 +126,7 @@ public class ShootFx {
         Draw.color();
     }),
 
-    shellEjectBig = new StaticEffect(22f, 400f, e -> {
+    shellEjectBig = new GroundEffect(22f, 400f, e -> {
         Draw.color(Palette.lightOrange, Color.LIGHT_GRAY, Palette.lightishGray, e.fin());
         float rot = e.rotation + 90f;
         for(int i : Mathf.signs){
