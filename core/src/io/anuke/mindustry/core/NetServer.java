@@ -88,8 +88,6 @@ public class NetServer extends Module{
                 trace.modclient = true;
             }
 
-            Log.info("Sending data to player '{0}' / {1}", packet.name, id);
-
             Player player = new Player();
             player.isAdmin = admins.isAdmin(uuid, ip);
             player.clientid = id;
