@@ -73,6 +73,8 @@ public class NetServer extends Module{
                 return;
             }
 
+            Log.info("Recieved connect packet for player '{0}' / UUID {1} / IP {2}", packet.name, uuid, trace.ip);
+
             String ip = Net.getConnection(id).address;
 
             admins.updatePlayerJoined(uuid, ip, packet.name);
