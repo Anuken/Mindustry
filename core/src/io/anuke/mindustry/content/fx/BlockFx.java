@@ -215,6 +215,22 @@ public class BlockFx {
             Draw.reset();
         });
     }),
+    teleportActivate = new Effect(50, e -> {
+        Draw.color(e.color);
+
+        e.scaled(8f, e2 -> {
+            Lines.stroke(e2.fout()*4f);
+            Lines.circle(e2.x, e2.y, 4f + e2.fin()*27f);
+        });
+
+        Lines.stroke(e.fout()*2f);
+
+        Angles.randLenVectors(e.id, 30, 4f + 40f * e.fin(), (x, y) -> {
+            Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), e.fin()*4f + 1f);
+        });
+
+        Draw.reset();
+    }),
     teleport = new Effect(60, e -> {
         Draw.color(e.color);
         Lines.stroke(e.fin()*2f);

@@ -27,6 +27,10 @@ public class Blocks {
         solid = true;
     }},
 
+    metalfloor = new Floor("metalfloor"){{
+        variants = 6;
+    }},
+
     deepwater = new Floor("deepwater") {{
         variants = 0;
         solid = true;

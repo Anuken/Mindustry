@@ -3,9 +3,11 @@ package io.anuke.mindustry.world.blocks.types.distribution;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Effects;
@@ -40,6 +42,10 @@ public class Teleporter extends PowerBlock{
 
 	protected float warmupTime = 60f;
 	protected float teleportMax = 400f;
+	protected float liquidUse = 0.3f;
+	protected float powerUse = 0.3f;
+	protected Liquid inputLiquid = Liquids.cryofluid;
+	protected Effect activateEffect = BlockFx.teleportActivate;
 	protected Effect teleportEffect = BlockFx.teleport;
 	protected Effect teleportOutEffect = BlockFx.teleportOut;
 
@@ -54,9 +60,11 @@ public class Teleporter extends PowerBlock{
 		update = true;
 		solid = true;
 		health = 80;
-		powerCapacity = 30f;
+		powerCapacity = 300f;
 		size = 3;
 		itemCapacity = 100;
+		hasLiquids = true;
+		liquidCapacity = 100f;
 	}
 
 	@Override
@@ -81,25 +89,29 @@ public class Teleporter extends PowerBlock{
 	
 	@Override
 	public void draw(Tile tile){
+		super.draw(tile);
+
 		TeleporterEntity entity = tile.entity();
 		float time = entity.time;
-		
-		super.draw(tile);
+		float rad = entity.activeScl;
 
 		Draw.color(getColor(tile, 0));
 		Draw.rect("teleporter-top", tile.drawx(), tile.drawy());
+		Draw.reset();
+
+		if(rad <= 0.0001f) return;
 
 		Draw.color(getColor(tile, 0));
 
-		Fill.circle(tile.drawx(), tile.drawy(), 7f + Mathf.absin(time+55, 8f, 1f));
+		Fill.circle(tile.drawx(), tile.drawy(), rad*(7f + Mathf.absin(time+55, 8f, 1f)));
 
 		Draw.color(getColor(tile, -1));
 
-		Fill.circle(tile.drawx(), tile.drawy(), 2f + Mathf.absin(time, 7f, 3f));
+		Fill.circle(tile.drawx(), tile.drawy(), rad*(2f + Mathf.absin(time, 7f, 3f)));
 
 		for(int i = 0; i < 11; i ++){
 			Lines.swirl(tile.drawx(), tile.drawy(),
-					2f + i/3f + Mathf.sin(time - i *75, 20f + i, 3f),
+					rad*(2f + i/3f + Mathf.sin(time - i *75, 20f + i, 3f)),
 					0.3f + Mathf.sin(time + i *33, 10f + i, 0.1f),
 					time * (1f + Mathf.randomSeedRange(i + 1, 1f)) + Mathf.randomSeedRange(i, 360f));
 		}
@@ -107,12 +119,12 @@ public class Teleporter extends PowerBlock{
 		Draw.color(getColor(tile, 1));
 
 		Lines.stroke(2f);
-		Lines.circle(tile.drawx(), tile.drawy(), 7f + Mathf.absin(time+55, 8f, 1f));
+		Lines.circle(tile.drawx(), tile.drawy(), rad*(7f + Mathf.absin(time+55, 8f, 1f)));
 		Lines.stroke(1f);
 
 		for(int i = 0; i < 11; i ++){
 			Lines.swirl(tile.drawx(), tile.drawy(),
-					3f + i/3f + Mathf.sin(time + i *93, 20f + i, 3f),
+					rad*(3f + i/3f + Mathf.sin(time + i *93, 20f + i, 3f)),
 					0.2f + Mathf.sin(time + i *33, 10f + i, 0.1f),
 					time * (1f + Mathf.randomSeedRange(i + 1, 1f)) + Mathf.randomSeedRange(i, 360f));
 		}
@@ -130,39 +142,71 @@ public class Teleporter extends PowerBlock{
 			tryDump(tile);
 		}
 
-		if(entity.teleporting){
-			entity.speedScl = Mathf.lerpDelta(entity.speedScl, 2f, 0.01f);
-		}else{
-			entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.04f);
-		}
+		if(!entity.active){
+			entity.activeScl = Mathf.lerpDelta(entity.activeScl, 0f, 0.01f);
 
-		entity.time += Timers.delta()*entity.speedScl;
-
-		if(entity.inventory.totalItems() == itemCapacity && entity.power.amount >= powerCapacity &&
-				entity.timer.get(timerTeleport, teleportMax)){
-			Array<Tile> testLinks = findLinks(tile);
-
-			if(testLinks.size == 0) return;
-
-			entity.teleporting = true;
-
-			Effects.effect(teleportEffect, getColor(tile, 0), tile.drawx(), tile.drawy());
-			Timers.run(warmupTime, () -> {
-				Array<Tile> links = findLinks(tile);
-
-				for(Tile other : links){
-					int canAccept = itemCapacity - other.entity.inventory.totalItems();
-					int total = entity.inventory.totalItems();
-					if(total == 0) break;
-					Effects.effect(teleportOutEffect, getColor(tile, 0), other.drawx(), other.drawy());
-					for(int i = 0; i < canAccept && i < total; i ++){
-						other.entity.inventory.addItem(entity.inventory.takeItem(), 1);
-					}
-				}
-				Effects.effect(teleportOutEffect, getColor(tile, 0), tile.drawx(), tile.drawy());
+			if(entity.power.amount >= powerCapacity){
+				entity.active = true;
 				entity.power.amount = 0f;
-				entity.teleporting = false;
-			});
+				Effects.effect(activateEffect, getColor(tile, 0), tile.drawx(), tile.drawy());
+			}
+		}else {
+			entity.activeScl = Mathf.lerpDelta(entity.activeScl, 1f, 0.015f);
+
+			float powerUsed = Math.min(powerCapacity, powerUse * Timers.delta());
+
+			if (entity.power.amount >= powerUsed) {
+				entity.power.amount -= powerUsed;
+				entity.powerLackScl = Mathf.lerpDelta(entity.powerLackScl, 0f, 0.01f);
+			}else{
+				entity.powerLackScl = Mathf.lerpDelta(entity.powerLackScl, 1f, 0.01f);
+			}
+
+			if(entity.powerLackScl >= 0.999f){
+				catastrophicFailure(tile);
+			}
+
+			if (entity.teleporting) {
+				entity.speedScl = Mathf.lerpDelta(entity.speedScl, 2f, 0.01f);
+				float liquidUsed = Math.min(liquidCapacity, liquidUse * Timers.delta());
+
+				if (entity.liquid.amount >= liquidUsed) {
+					entity.liquid.amount -= liquidUsed;
+				} else {
+					catastrophicFailure(tile);
+				}
+			} else {
+				entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.04f);
+			}
+
+			entity.time += Timers.delta() * entity.speedScl;
+
+			if (entity.inventory.totalItems() == itemCapacity && entity.power.amount >= powerCapacity &&
+					entity.timer.get(timerTeleport, teleportMax)) {
+				Array<Tile> testLinks = findLinks(tile);
+
+				if (testLinks.size == 0) return;
+
+				entity.teleporting = true;
+
+				Effects.effect(teleportEffect, getColor(tile, 0), tile.drawx(), tile.drawy());
+				Timers.run(warmupTime, () -> {
+					Array<Tile> links = findLinks(tile);
+
+					for (Tile other : links) {
+						int canAccept = itemCapacity - other.entity.inventory.totalItems();
+						int total = entity.inventory.totalItems();
+						if (total == 0) break;
+						Effects.effect(teleportOutEffect, getColor(tile, 0), other.drawx(), other.drawy());
+						for (int i = 0; i < canAccept && i < total; i++) {
+							other.entity.inventory.addItem(entity.inventory.takeItem(), 1);
+						}
+					}
+					Effects.effect(teleportOutEffect, getColor(tile, 0), tile.drawx(), tile.drawy());
+					entity.power.amount = 0f;
+					entity.teleporting = false;
+				});
+			}
 		}
 	}
 
@@ -211,6 +255,15 @@ public class Teleporter extends PowerBlock{
 		return new TeleporterEntity();
 	}
 
+	@Override
+	public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
+		return super.acceptLiquid(tile, source, liquid, amount) && liquid == inputLiquid;
+	}
+
+	private void catastrophicFailure(Tile tile){
+		//TODO fail gloriously
+	}
+
 	private Color getColor(Tile tile, int shift){
 		TeleporterEntity entity = tile.entity();
 
@@ -230,7 +283,9 @@ public class Teleporter extends PowerBlock{
 		for(Tile other : teleporters[entity.color]){
 			if(other != tile){
 				if(other.block() instanceof Teleporter){
-					if(other.<TeleporterEntity>entity().color != entity.color){
+					TeleporterEntity oe = other.entity();
+					if(!oe.active) continue;
+					if(oe.color != entity.color){
 						removal.add(other);
 					}else if(other.entity.inventory.totalItems() == 0){
 						returns.add(other);
@@ -250,7 +305,10 @@ public class Teleporter extends PowerBlock{
 	public static class TeleporterEntity extends TileEntity{
 		public byte color = 0;
 		public boolean teleporting;
+		public boolean active;
+		public float activeScl = 0f;
 		public float speedScl = 1f;
+		public float powerLackScl;
 		public float time;
 		
 		@Override
