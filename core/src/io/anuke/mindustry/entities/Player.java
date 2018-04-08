@@ -214,7 +214,7 @@ public class Player extends Unit{
 		Tile tile = world.tileWorld(x, y);
 
 		//if player is in solid block
-		if(tile != null && tile.solid())) {
+		if(tile != null && tile.solid()) {
 			damage(health + 1); //die instantly
 		}
 
