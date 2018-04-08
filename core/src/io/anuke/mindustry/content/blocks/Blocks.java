@@ -118,8 +118,9 @@ public class Blocks {
         drops = new ItemStack(Items.sand, 1);
     }},
 
-    ice = new Floor("ice") {
-    },
+    ice = new Floor("ice") {{
+        dragMultiplier = 0.2f;
+    }},
 
     snow = new Floor("snow") {
     },

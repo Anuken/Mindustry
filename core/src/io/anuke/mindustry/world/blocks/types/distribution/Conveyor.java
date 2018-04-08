@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.types.distribution;
 
 import com.badlogic.gdx.utils.LongArray;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.world.Block;
@@ -33,7 +34,8 @@ public class Conveyor extends Block{
 	private final Translator tr1 = new Translator();
 	private final Translator tr2 = new Translator();
 
-	public float speed = 0f;
+	protected float speed = 0f;
+	protected float carryCapacity = 8f;
 
 	protected Conveyor(String name) {
 		super(name);
@@ -91,12 +93,33 @@ public class Conveyor extends Block{
 	}
 
 	@Override
+	public void unitOn(Tile tile, Unit unit) {
+		ConveyorEntity entity = tile.entity();
+
+		float angle = tile.getRotation() * 90f;
+		float speed = this.speed * tilesize / 1.5f;
+		float tx = Angles.trnsx(angle, 1f), ty = Angles.trnsy(angle, 1f);
+		unit.velocity.add(tx * speed * Timers.delta(), ty * speed * Timers.delta());
+
+		if(Math.abs(tx) > Math.abs(ty)){
+			float rx = tile.worldx() + tx/2f*tilesize;
+			entity.minCarry = Math.min(entity.minCarry, Mathf.clamp((entity.x - rx) * tx / tilesize));
+		}else{
+			float ry = tile.worldy() + ty/2f*tilesize;
+			entity.minCarry = Math.min(entity.minCarry, Mathf.clamp((entity.y - ry) * ty / tilesize));
+		}
+
+		entity.carrying += unit.getMass();
+	}
+
+	@Override
 	public void update(Tile tile){
 
 		ConveyorEntity entity = tile.entity();
 		entity.minitem = 1f;
 
 		int minremove = Integer.MAX_VALUE;
+		float speed = Math.max(this.speed - (1f - (carryCapacity - entity.carrying)/carryCapacity), 0f);
 
 		for(int i = entity.convey.size - 1; i >= 0; i --){
 			long value = entity.convey.get(i);
@@ -109,6 +132,9 @@ public class Conveyor extends Block{
 			}
 
 			float nextpos = (i == entity.convey.size - 1 ? 100f : pos2.set(entity.convey.get(i + 1), ItemPos.updateShorts).y) - itemSpace;
+			if(entity.minCarry >= pos.y && entity.minCarry <= nextpos){
+				nextpos = entity.minCarry;
+			}
 			float maxmove = Math.min(nextpos - pos.y, speed * Timers.delta());
 
 			if(maxmove > minmove){
@@ -130,6 +156,9 @@ public class Conveyor extends Block{
 				entity.convey.set(i, value);
 			}
 		}
+
+		entity.carrying = 0f;
+		entity.minCarry = 2f;
 
 		if(minremove != Integer.MAX_VALUE) entity.convey.truncate(minremove);
 	}
@@ -175,18 +204,12 @@ public class Conveyor extends Block{
 		}
 	}
 
-	/**
-	 * Conveyor data format:
-	 * [0] item ordinal
-	 * [1] x: byte ranging from -128 to 127, scaled should be at [-1, 1], corresponds to relative X from the conveyor middle
-	 * [2] y: byte ranging from -128 to 127, scaled should be at [0, 1], corresponds to relative Y from the conveyor start
-	 * [3] seed: -128 to 127, unscaled
-	 * Size is 4 bytes, or one int.
-	 */
 	public static class ConveyorEntity extends TileEntity{
 
 		LongArray convey = new LongArray();
 		float minitem = 1;
+		float carrying;
+		float minCarry = 2f;
 
 		@Override
 		public void write(DataOutputStream stream) throws IOException{

@@ -47,6 +47,7 @@ public abstract class Unit extends SyncEntity {
 
     public void updateVelocityStatus(float drag, float maxVelocity){
         Floor floor = getFloorOn();
+        Tile tile = world.tileWorld(x, y);
 
         velocity.limit(maxVelocity);
 
@@ -56,7 +57,16 @@ public abstract class Unit extends SyncEntity {
             x += velocity.x / getMass();
             y += velocity.y / getMass();
         }else{
-            if(floor.liquid && velocity.len() > 0.4f && Timers.get(this, "flooreffect", 14 - (velocity.len() * floor.speedMultiplier)*2f)){
+            boolean onLiquid = floor.liquid;
+
+            if(tile != null){
+                tile.block().unitOn(tile, this);
+                if(tile.block() != Blocks.air){
+                    onLiquid = false;
+                }
+            }
+
+            if(onLiquid && velocity.len() > 0.4f && Timers.get(this, "flooreffect", 14 - (velocity.len() * floor.speedMultiplier)*2f)){
                 Effects.effect(floor.walkEffect, floor.liquidColor, x, y);
             }
 
@@ -66,7 +76,7 @@ public abstract class Unit extends SyncEntity {
                 damagePeriodic(floor.damageTaken);
             }
 
-            if(floor.drownTime > 0){
+            if(onLiquid && floor.drownTime > 0){
                 drownTime += Timers.delta() * 1f/floor.drownTime;
                 if(Timers.get(this, "drowneffect", 15)){
                     Effects.effect(floor.drownUpdateEffect, floor.liquidColor, x, y);

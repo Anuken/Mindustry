@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.graphics.DrawLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.content.fx.ExplosionFx;
@@ -122,6 +123,8 @@ public class Block extends BaseBlock {
 	public void drawSelect(Tile tile){}
 	public void drawPlace(int x, int y, int rotation, boolean valid){}
 	public void placed(Tile tile){}
+	public void unitOn(Tile tile, Unit unit){}
+
 	/**Called after all blocks are created.*/
 	public void init(){
 		setStats();
