@@ -19,8 +19,7 @@ import io.anuke.ucore.scene.ui.Label.LabelStyle;
 import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Log;
-import java.util.Arrays;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.ucore.core.Core.scene;
@@ -30,7 +29,7 @@ public class ChatFragment extends Table implements Fragment{
     private final static int messagesShown = 10;
     private final static int maxLength = 150;
     private Array<ChatMessage> messages = new Array<>();
-    private float fadetime, lastfade;
+    private float fadetime;
     private boolean chatOpen = false;
     private TextField chatfield;
     private Label fieldlabel = new Label(">");
@@ -42,6 +41,7 @@ public class ChatFragment extends Table implements Fragment{
     private float textspacing = Unit.dp.scl(10);
     private Array<String> history = new Array<String>();
     private int historyPos = 0;
+    private int scrollPos = 0;
 
     public ChatFragment(){
         super();
@@ -62,15 +62,16 @@ public class ChatFragment extends Table implements Fragment{
             }
 
             if (chatOpen) {
-                if (Inputs.keyTap("chat_scroll_up") && historyPos < history.size - 1) {
+                if (Inputs.keyTap("chat_history_prev") && historyPos < history.size - 1) {
                     if (historyPos == 0) history.set(0, chatfield.getText());
                     historyPos++;
                     updateChat();
                 }
-                if (Inputs.keyTap("chat_scroll_down") && historyPos > 0) {
+                if (Inputs.keyTap("chat_history_next") && historyPos > 0) {
                     historyPos--;
                     updateChat();
                 }
+                scrollPos = (int)Mathf.clamp(scrollPos + Inputs.getAxis("chat_scroll"), 0, Math.max(0, messages.size - messagesShown));
             }
         });
 
@@ -134,16 +135,16 @@ public class ChatFragment extends Table implements Fragment{
         batch.setColor(shadowColor);
 
         float theight = offsety + spacing + getMarginBottom();
-        for(int i = 0; i < messagesShown && i < messages.size && i < fadetime; i ++){
+        for(int i = scrollPos; i < messages.size && i < messagesShown + scrollPos && (i < fadetime || chatOpen); i++){
 
             layout.setText(font, messages.get(i).formattedMessage, Color.WHITE, textWidth, Align.bottomLeft, true);
             theight += layout.height+textspacing;
-            if(i == 0) theight -= textspacing+1;
+            if(i - scrollPos == 0) theight -= textspacing+1;
 
             font.getCache().clear();
             font.getCache().addText(messages.get(i).formattedMessage, fontoffsetx + offsetx, offsety + theight, textWidth, Align.bottomLeft, true);
 
-            if(fadetime-i < 1f && fadetime-i >= 0f){
+            if(!chatOpen && fadetime-i < 1f && fadetime-i >= 0f){
                 font.getCache().setAlphas(fadetime-i);
                 batch.setColor(0, 0, 0, shadowColor.a*(fadetime-i));
             }
@@ -163,10 +164,10 @@ public class ChatFragment extends Table implements Fragment{
     private void sendMessage(){
         String message = chatfield.getText();
         clearChatInput();
-        history.insert(1, message);
 
         if(message.replaceAll(" ", "").isEmpty()) return;
 
+        history.insert(1, message);
         NetEvents.handleSendMessage(message);
     }
 
@@ -176,12 +177,10 @@ public class ChatFragment extends Table implements Fragment{
             scene.setKeyboardFocus(chatfield);
             chatfield.fireClick();
             chatOpen = !chatOpen;
-            lastfade = fadetime;
-            fadetime = messagesShown + 1;
         }else{
             scene.setKeyboardFocus(null);
             chatOpen = !chatOpen;
-            fadetime = lastfade;
+            scrollPos = 0;
             sendMessage();
         }
     }

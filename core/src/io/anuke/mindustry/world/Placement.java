@@ -102,19 +102,24 @@ public class Placement {
 
         if(type.solid || type.solidifes)
         synchronized (Entities.entityLock) {
-            rect.setSize(tilesize*2f).setCenter(x*tilesize + type.getPlaceOffset().x, y*tilesize + type.getPlaceOffset().y);
-            boolean[] result = {false};
+            try {
 
-            Units.getNearby(rect, e -> {
-                if (e == null) return; //not sure why this happens?
-                Rectangle rect = e.hitbox.getRect(e.x, e.y);
+                rect.setSize(tilesize * 2f).setCenter(x * tilesize + type.getPlaceOffset().x, y * tilesize + type.getPlaceOffset().y);
+                boolean[] result = {false};
 
-                if (Placement.rect.overlaps(rect) && !e.isFlying()) {
-                    result[0] = true;
-                }
-            });
+                Units.getNearby(rect, e -> {
+                    if (e == null) return; //not sure why this happens?
+                    Rectangle rect = e.hitbox.getRect(e.x, e.y);
 
-            if(result[0]) return false;
+                    if (Placement.rect.overlaps(rect) && !e.isFlying()) {
+                        result[0] = true;
+                    }
+                });
+
+                if (result[0]) return false;
+            }catch (Exception e){
+                return false;
+            }
         }
 
         Tile tile = world.tile(x, y);

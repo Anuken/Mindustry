@@ -1,12 +1,11 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.NumberUtils;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.BlockGroup;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Bits;
 
@@ -22,6 +21,7 @@ public class TunnelConveyor extends Block{
 		solid = true;
 		health = 70;
 		instantTransfer = true;
+		bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.<TunnelEntity>entity().index/capacity));
 		group = BlockGroup.transportation;
 	}
 
@@ -30,11 +30,6 @@ public class TunnelConveyor extends Block{
 		TunnelEntity entity = tile.entity();
 
 		if(entity.index >= entity.buffer.length) return;
-
-		Tile tunnel = getDestTunnel(tile, item);
-		if(tunnel == null) return;
-		Tile to = tunnel.getNearby(tunnel.getRotation());
-		if(to == null) return;
 
 		entity.buffer[entity.index ++] = Bits.packLong(NumberUtils.floatToIntBits(Timers.time()), item.id);
 	}
@@ -68,19 +63,9 @@ public class TunnelConveyor extends Block{
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		TunnelEntity entity = tile.entity();
-
-		if(entity.index >= entity.buffer.length - 1) return false;
-
 		int rot = source.relativeTo(tile.x, tile.y);
 		if(rot != (tile.getRotation() + 2)%4) return false;
-		Tile tunnel = getDestTunnel(tile, item);
-
-		if(tunnel != null){
-			Tile to = tunnel.getNearby(tunnel.getRotation());
-			return to != null && to.block().acceptItem(item, to, tunnel);
-		}else{
-			return false;
-		}
+		return entity.index < entity.buffer.length - 1;
 	}
 
 	@Override

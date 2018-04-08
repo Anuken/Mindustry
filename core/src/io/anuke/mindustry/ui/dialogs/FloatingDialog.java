@@ -3,8 +3,6 @@ package io.anuke.mindustry.ui.dialogs;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.utils.Align;
-
-import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.scene.ui.Dialog;
 
 public class FloatingDialog extends Dialog{
@@ -25,12 +23,6 @@ public class FloatingDialog extends Dialog{
 		keyDown(key->{
 			if(key == Keys.ESCAPE || key == Keys.BACK)
 				hide();
-		});
-
-		update(() -> {
-			if(Inputs.keyTap("menu")){
-				hide();
-			}
 		});
 	}
 }

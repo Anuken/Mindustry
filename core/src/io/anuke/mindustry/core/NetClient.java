@@ -3,6 +3,7 @@ package io.anuke.mindustry.core;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
+import io.anuke.mindustry.content.UpgradeRecipes;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
@@ -13,9 +14,12 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
+import io.anuke.mindustry.resource.Upgrade;
+import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Placement;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BaseBulletType;
 import io.anuke.ucore.entities.Entities;
@@ -260,6 +264,15 @@ public class NetClient extends Module {
         Net.handleClient(TracePacket.class, packet -> {
             Player player = playerGroup.getByID(packet.info.playerid);
             ui.traces.show(player, packet.info);
+        });
+
+        Net.handleClient(UpgradePacket.class, packet -> {
+            Weapon weapon = Upgrade.getByID(packet.id);
+
+            state.inventory.removeItems(UpgradeRecipes.get(weapon));
+            control.upgrades().addWeapon(weapon);
+            ui.hudfrag.updateWeapons();
+            Effects.sound("purchase");
         });
     }
 

@@ -68,6 +68,8 @@ public class NetServer extends Module{
 
             TraceInfo trace = admins.getTrace(Net.getConnection(id).address);
             PlayerInfo info = admins.getInfo(uuid);
+            trace.uuid = uuid;
+            trace.android = packet.android;
 
             if(admins.isIDBanned(uuid)){
                 kick(id, KickReason.banned);
@@ -82,8 +84,6 @@ public class NetServer extends Module{
             String ip = Net.getConnection(id).address;
 
             admins.updatePlayerJoined(uuid, ip, packet.name);
-            trace.uuid = uuid;
-            trace.android = packet.android;
 
             if(packet.version != Version.build && Version.build != -1 && packet.version != -1){
                 kick(id, packet.version > Version.build ? KickReason.serverOutdated : KickReason.clientOutdated);
@@ -111,7 +111,7 @@ public class NetServer extends Module{
 
             //TODO try DeflaterOutputStream
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            NetworkIO.writeWorld(player, weapons.get(player.name, new ByteArray()), stream);
+            NetworkIO.writeWorld(player, weapons.get(admins.getTrace(Net.getConnection(id).address).uuid, new ByteArray()), stream);
             WorldData data = new WorldData();
             data.stream = new ByteArrayInputStream(stream.toByteArray());
             Net.sendStream(id, data);
@@ -165,17 +165,16 @@ public class NetServer extends Module{
             TraceInfo info = admins.getTrace(Net.getConnection(id).address);
             Weapon weapon = Upgrade.getByID((byte)packet.data);
 
-            float wtrc = 40f;
+            float wtrc = 60;
 
-            if(!Timers.get(info.ip + "-weapontrace", wtrc)){
-                info.fastShots ++;
-            }else{
+            if(!Timers.get("fastshoot-" + id + "-" + weapon.id, wtrc)){
+                info.fastShots.getAndIncrement(weapon.id, 0, 1);
 
-                if(info.fastShots - 2 > (int)(wtrc / (weapon.getReload() / 2f))){
+                if(info.fastShots.get(weapon.id, 0) > (int)(wtrc / (weapon.getReload() / 2f)) + 2){
                     kick(id, KickReason.kick);
                 }
-
-                info.fastShots = 0;
+            }else{
+                info.fastShots.put(weapon.id, 0);
             }
 
             packet.entityid = connections.get(id).id;
@@ -241,14 +240,27 @@ public class NetServer extends Module{
             Player player = connections.get(id);
 
             Weapon weapon = Upgrade.getByID(packet.id);
+            String uuid = admins.getTrace(Net.getConnection(id).address).uuid;
 
-            if (!weapons.containsKey(player.name)) weapons.put(player.name, new ByteArray());
-            if (!weapons.get(player.name).contains(weapon.id)) weapons.get(player.name).add(weapon.id);
+            if(!state.inventory.hasItems(UpgradeRecipes.get(weapon))){
+                return;
+            }
+
+            if (!weapons.containsKey(uuid)) weapons.put(uuid, new ByteArray());
+
+            if (!weapons.get(uuid).contains(weapon.id)){
+                weapons.get(uuid).add(weapon.id);
+            }else{
+                return;
+            }
 
             state.inventory.removeItems(UpgradeRecipes.get(weapon));
+            Net.sendTo(id, packet, SendMode.tcp);
         });
 
         Net.handleServer(WeaponSwitchPacket.class, (id, packet) -> {
+            TraceInfo info = admins.getTrace(Net.getConnection(id).address);
+
             packet.playerid = connections.get(id).id;
             Net.sendExcept(id, packet, SendMode.tcp);
         });
@@ -344,9 +356,8 @@ public class NetServer extends Module{
             Log.info("Kicking connection #{0} / IP: {1}. Reason: {2}", connection, con.address, reason);
         }
 
-        PlayerInfo info = admins.getInfo(admins.getTrace(con.address).uuid);
-
-        if(reason == KickReason.kick || reason == KickReason.banned){
+        if((reason == KickReason.kick || reason == KickReason.banned) && admins.getTrace(con.address).uuid != null){
+            PlayerInfo info = admins.getInfo(admins.getTrace(con.address).uuid);
             info.timesKicked ++;
             info.lastKicked = TimeUtils.millis();
         }

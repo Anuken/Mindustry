@@ -172,6 +172,18 @@ public class Administration {
         return info.admin && ip.equals(info.validAdminIP);
     }
 
+    public Array<PlayerInfo> findByName(String name, boolean last){
+        Array<PlayerInfo> result = new Array<>();
+
+        for(PlayerInfo info : playerInfo.values()){
+            if(info.lastName.toLowerCase().equals(name.toLowerCase()) || (last && info.names.contains(name, false))){
+                result.add(info);
+            }
+        }
+
+        return result;
+    }
+
     public PlayerInfo getInfo(String id){
         return getCreateInfo(id);
     }

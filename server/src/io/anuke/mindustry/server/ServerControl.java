@@ -146,9 +146,10 @@ public class ServerControl extends Module {
                 }
             }else{
                 result = world.maps().all().random();
+                Log.info("&ly&fiNo map specified, so &lb{0}&ly was chosen randomly.", result.name);
             }
 
-            GameMode mode = null;
+            GameMode mode;
             try{
                 mode = arg.length < 2 ? GameMode.waves : GameMode.valueOf(arg[1]);
             }catch (IllegalArgumentException e){
@@ -438,7 +439,7 @@ public class ServerControl extends Module {
             }else{
                 Log.info("&lyAdmins:");
                 for(PlayerInfo info : admins){
-                    Log.info(" &luy {0} /  ID: '{1}' / IP: '{2}'", info.lastName, info.id, info.lastIP);
+                    Log.info(" &lm {0} /  ID: '{1}' / IP: '{2}'", info.lastName, info.id, info.lastIP);
                 }
             }
         });
@@ -534,6 +535,33 @@ public class ServerControl extends Module {
             }
         });
 
+        handler.register("find", "<name> [check-all-names]", "Find player info(s) by name. Can optionally check for all names a player has had.", arg -> {
+            boolean checkAll = arg.length == 2 && arg[1].equals("true");
+
+            Array<PlayerInfo> infos = netServer.admins.findByName(arg[0], checkAll);
+
+            if(infos.size == 1) {
+                PlayerInfo info = infos.peek();
+                Log.info("&lcTrace info for player '{0}' / UUID {1}:", info.lastName, info.id);
+                Log.info("  &lyall names used: {0}", info.names);
+                Log.info("  &lyIP: {0}", info.lastIP);
+                Log.info("  &lyall IPs used: {0}", info.ips);
+                Log.info("  &lytimes joined: {0}", info.timesJoined);
+                Log.info("  &lytimes kicked: {0}", info.timesKicked);
+                Log.info("");
+                Log.info("  &lytotal blocks broken: {0}", info.totalBlocksBroken);
+                Log.info("  &lytotal blocks placed: {0}", info.totalBlockPlaced);
+            }else if(infos.size > 1){
+                Log.info("&lcMultiple people have been found with that name:");
+                for(PlayerInfo info : infos){
+                    Log.info("  &ly{0}", info.id);
+                }
+                Log.info("&lcUse the info command to examine each person individually.");
+            }else{
+                info("Nobody with that name could be found.");
+            }
+        });
+
         handler.register("info", "<UUID>", "Get global info for a player's UUID.", arg -> {
             PlayerInfo info = netServer.admins.getInfoOptional(arg[0]);
 
@@ -543,6 +571,7 @@ public class ServerControl extends Module {
                 Log.info("  &lyIP: {0}", info.lastIP);
                 Log.info("  &lyall IPs used: {0}", info.ips);
                 Log.info("  &lytimes joined: {0}", info.timesJoined);
+                Log.info("  &lytimes kicked: {0}", info.timesKicked);
                 Log.info("");
                 Log.info("  &lytotal blocks broken: {0}", info.totalBlocksBroken);
                 Log.info("  &lytotal blocks placed: {0}", info.totalBlockPlaced);
