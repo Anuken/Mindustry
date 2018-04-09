@@ -333,7 +333,11 @@ public class ServerControl extends Module {
                 Log.info("&lmBanned players [IP]:");
                 for(String string : ipbans){
                     PlayerInfo info = netServer.admins.findByIP(string);
-                    Log.info(" &lm '{0}' / Last known name: '{1}' / ID: '{2}'", string, info.lastName, info.id);
+                    if(info != null) {
+                        Log.info(" &lm '{0}' / Last known name: '{1}' / ID: '{2}'", string, info.lastName, info.id);
+                    }else{
+                        Log.info(" &lm '{0}' (No known name or info)", string);
+                    }
                 }
             }
         });
