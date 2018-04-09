@@ -1,10 +1,7 @@
 package io.anuke.mindustry.content.blocks;
 
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.distribution.Conduit;
-import io.anuke.mindustry.world.blocks.types.distribution.LiquidJunction;
-import io.anuke.mindustry.world.blocks.types.distribution.LiquidRouter;
-import io.anuke.mindustry.world.blocks.types.distribution.TunnelConduit;
+import io.anuke.mindustry.world.blocks.types.distribution.*;
 import io.anuke.mindustry.world.blocks.types.production.Pump;
 
 public class LiquidBlocks {
@@ -41,5 +38,9 @@ public class LiquidBlocks {
 
     conduittunnel = new TunnelConduit("conduittunnel") {{
         speed = 53;
+    }},
+
+    liquidbridge = new LiquidBridge("liquidbridge"){{
+        range = 7;
     }};
 }

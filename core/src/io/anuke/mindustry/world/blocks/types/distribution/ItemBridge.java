@@ -143,11 +143,11 @@ public class ItemBridge extends Block {
         Draw.color(Color.WHITE, Color.BLACK, Mathf.absin(Timers.time(), 6f, 0.07f));
         Draw.alpha(Math.max(entity.uptime, 0.25f));
 
-        Draw.rect("lightbridge-end", tile.drawx(), tile.drawy(), i*90 + 90);
-        Draw.rect("lightbridge-end", other.drawx(), other.drawy(), i*90 + 270);
+        Draw.rect(name + "-end", tile.drawx(), tile.drawy(), i*90 + 90);
+        Draw.rect(name + "-end", other.drawx(), other.drawy(), i*90 + 270);
 
         Lines.stroke(8f);
-        Lines.line(Draw.region("lightbridge"),
+        Lines.line(Draw.region(name + "-bridge"),
                 tile.worldx(),
                 tile.worldy(),
                 other.worldx(),
@@ -162,7 +162,7 @@ public class ItemBridge extends Block {
 
         for(int a = 0; a < arrows; a ++){
             Draw.alpha(Mathf.absin(a/(float)arrows - entity.time/100f, 0.1f, 1f) * entity.uptime);
-            Draw.rect("lightbridge-arrow",
+            Draw.rect(name + "-arrow",
                     tile.worldx() + Geometry.d4[i].x*(tilesize/2f + a*4f + time % 4f),
                     tile.worldy() + Geometry.d4[i].y*(tilesize/2f + a*4f + time % 4f),
                     i*90f);

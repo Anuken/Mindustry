@@ -81,8 +81,8 @@ public abstract class BaseBlock {
         }
     }
 
-    public void tryMoveLiquid(Tile tile, Tile next){
-        if(next == null) return;
+    public float tryMoveLiquid(Tile tile, Tile next){
+        if(next == null) return 0;
 
         next = next.target();
 
@@ -90,21 +90,23 @@ public abstract class BaseBlock {
             float ofract = next.entity.liquid.amount / next.block().liquidCapacity;
             float fract = tile.entity.liquid.amount / liquidCapacity;
 
-            if(ofract > fract) return;
+            if(ofract > fract) return 0;
 
             float flow = Math.min(Mathf.clamp((fract - ofract)*(1f)) * (liquidCapacity), tile.entity.liquid.amount);
 
             flow = Math.min(flow, next.block().liquidCapacity - next.entity.liquid.amount - 0.001f);
 
-            if(flow <= 0f) return;
+            if(flow <= 0f) return 0;
 
             float amount = flow;
 
             if(next.block().acceptLiquid(next, tile, tile.entity.liquid.liquid, amount)){
                 next.block().handleLiquid(next, tile, tile.entity.liquid.liquid, amount);
                 tile.entity.liquid.amount -= amount;
+                return flow;
             }
         }
+        return 0;
     }
 
     /**
