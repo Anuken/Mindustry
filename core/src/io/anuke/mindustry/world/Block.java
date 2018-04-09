@@ -279,6 +279,12 @@ public class Block extends BaseBlock {
 	}
 	
 	public static Block getByID(int id){
+	    if(id < 0){
+	        id += 256;
+        }
+        if(id >= blocks.size || id < 0){
+	    	throw new RuntimeException("No block with ID '" + id + "' found!");
+		}
 		return blocks.get(id);
 	}
 
