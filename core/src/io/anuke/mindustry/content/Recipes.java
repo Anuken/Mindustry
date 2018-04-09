@@ -39,6 +39,7 @@ public class Recipes {
 		new Recipe(distribution, StorageBlocks.core, stack(Items.steel, 50)),
 		new Recipe(distribution, StorageBlocks.unloader, stack(Items.steel, 5)),
 		new Recipe(distribution, StorageBlocks.sortedunloader, stack(Items.steel, 5)),
+		new Recipe(distribution, DistributionBlocks.itembridge, stack(Items.steel, 5)),
 
 		new Recipe(weapon, WeaponBlocks.doubleturret, stack(Items.iron, 7)),
 		new Recipe(weapon, WeaponBlocks.gatlingturret, stack(Items.iron, 8)),

@@ -57,6 +57,8 @@ public class ContentLoader {
             block.init();
         }
 
+        //TODO 128 blocks!
+
         Log.info("--- CONTENT INFO ---");
         Log.info("Blocks loaded: {0}\nItems loaded: {1}\nLiquids loaded: {2}\nUpgrades loaded: {3}\nUnits loaded: {4}\nAmmo types loaded: {5}\nStatus effects loaded: {6}",
                 Block.getAllBlocks().size, Item.getAllItems().size, Liquid.getAllLiquids().size,

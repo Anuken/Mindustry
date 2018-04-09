@@ -75,6 +75,14 @@ public class Tile{
 		return -1;
 	}
 
+	public byte absoluteRelativeTo(int cx, int cy){
+		if(x == cx && y <= cy - 1) return 1;
+		if(x == cx && y >= cy + 1) return 3;
+		if(x <= cx - 1 && y == cy) return 0;
+		if(x >= cx + 1 && y == cy) return 2;
+		return -1;
+	}
+
 	public byte sizedRelativeTo(int cx, int cy){
 		if(x == cx && y == cy - 1 - block().size/2) return 1;
 		if(x == cx && y == cy + 1 + block().size/2) return 3;
@@ -262,6 +270,10 @@ public class Tile{
 
 	public Tile getNearby(GridPoint2 relative){
 		return world.tile(x + relative.x, y + relative.y);
+	}
+
+	public Tile getNearby(int dx, int dy){
+		return world.tile(x + dx, y + dy);
 	}
 
 	public Tile getNearby(int rotation){

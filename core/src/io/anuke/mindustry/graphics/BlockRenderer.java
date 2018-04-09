@@ -66,7 +66,7 @@ public class BlockRenderer{
 		int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2)+2;
 		int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2)+2;
 			
-		int expandr = 3;
+		int expandr = 4;
 		
 		Graphics.surface(renderer.shadowSurface);
 

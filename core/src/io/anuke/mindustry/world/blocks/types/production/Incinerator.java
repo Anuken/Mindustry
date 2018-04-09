@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.Liquid;
+import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -22,8 +24,15 @@ public class Incinerator extends Block {
         super(name);
         hasPower = true;
         hasInventory = false;
+        hasLiquids = true;
         update = true;
         solid = true;
+    }
+
+    @Override
+    public void setBars() {
+        super.setBars();
+        bars.remove(BarType.liquid);
     }
 
     @Override
@@ -49,7 +58,6 @@ public class Incinerator extends Block {
         if(entity.heat > 0f){
             float g = 0.3f;
             float r = 0.06f;
-            float cr = Mathf.random(0.05f);
 
             Draw.alpha(((1f-g) + Mathf.absin(Timers.time(), 8f, g) + Mathf.random(r) - r) * entity.heat);
 
@@ -71,6 +79,19 @@ public class Incinerator extends Block {
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
+        IncineratorEntity entity = tile.entity();
+        return entity.heat > 0.5f;
+    }
+
+    @Override
+    public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
+        if(Mathf.chance(0.02)){
+            Effects.effect(effect, tile.drawx(), tile.drawy());
+        }
+    }
+
+    @Override
+    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
         IncineratorEntity entity = tile.entity();
         return entity.heat > 0.5f;
     }

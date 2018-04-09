@@ -38,6 +38,10 @@ public class DistributionBlocks{
 		speed = 53;
 	}},
 
+	itembridge = new ItemBridge("itembridge"){{
+		range = 7;
+	}},
+
 	sorter = new Sorter("sorter"),
 
 	splitter = new Splitter("splitter");

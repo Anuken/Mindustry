@@ -129,14 +129,10 @@ public class PowerDistributor extends PowerBlock{
 
 				if(link != tile && linkValid(tile, link)){
 					boolean linked = linked(tile, link);
-					if(linked){
-						Draw.color("place");
-					}else{
-						Draw.color(Color.SCARLET);
-					}
+					Draw.color(linked ? "place" : "breakInvalid");
 
 					Lines.square(link.drawx(), link.drawy(),
-							link.block().size * tilesize / 2f + 1f + Mathf.absin(Timers.time(), 4f, 1f));
+							link.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Timers.time(), 4f, 1f)));
 
 					if(entity.links.size >= maxNodes && !linked){
 						Draw.color();
@@ -266,7 +262,7 @@ public class PowerDistributor extends PowerBlock{
 			return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy()) <= Math.max(laserRange * tilesize,
 					((PowerDistributor)link.block()).laserRange * tilesize) - tilesize/2f
 					+ (link.block().size-1)*tilesize/2f + (tile.block().size-1)*tilesize/2f &&
-					oe.links.size < ((PowerDistributor)link.block()).maxNodes;
+					(oe.links.size < ((PowerDistributor)link.block()).maxNodes || oe.links.contains(tile.packedPosition()));
 		}else{
 			return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy())
 					<= laserRange * tilesize - tilesize/2f + (link.block().size-1)*tilesize;
