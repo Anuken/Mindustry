@@ -41,16 +41,16 @@ public enum PlaceMode{
 					tilesize * control.input().recipe.result.height + si);
 
 			control.input().recipe.result.drawPlace(tilex, tiley, control.input().rotation, valid);
-			Lines.stroke(2f);
 			
+            renderer.getBlocks().handlePreview(control.input().recipe.result, control.input().recipe.result.rotate ? control.input().rotation * 90 : 0f, x + offset.x, y + offset.y, tilex, tiley);
+            
 			if(control.input().recipe.result.rotate){
+			 
 				Draw.color(Colors.get("placeRotate"));
 				tr.trns(control.input().rotation * 90, 7, 0);
+                Lines.stroke(2f);
 				Lines.line(x, y, x + tr.x, y + tr.y);
-			}
-			
-			if(control.input().recipe != null && state.inventory.hasItems(control.input().recipe.requirements)) {
-                renderer.getBlocks().handlePreview(control.input().recipe.result, control.input().rotation, x + offset.x, y + offset.y, tilex, tiley);
+                renderer.getBlocks().handlePreview(control.input().recipe.result, control.input().recipe.result.rotate ? control.input().rotation * 90 : 0f, x + offset.x, y + offset.y, tilex, tiley);
 			}
 		}
 		
@@ -286,9 +286,7 @@ public enum PlaceMode{
 						int px = tx + cx * Mathf.sign(ex - tx), 
 						py = ty + cy * Mathf.sign(ey - ty);
 						
-						if(control.input().recipe != null && state.inventory.hasItems(control.input().recipe.requirements)) {
-							renderer.getBlocks().handlePreview(control.input().recipe.result, control.input().rotation, px * t + offset.x, py * t + offset.y, px, py);
-						}
+						renderer.getBlocks().handlePreview(control.input().recipe.result, control.input().recipe.result.rotate ? rotation * 90 : 0f, px * t + offset.x, py * t + offset.y, px, py);
 						
 						if(!control.input().validPlace(px, py, control.input().recipe.result)
 								|| !state.inventory.hasItems(control.input().recipe.requirements, amount)){
