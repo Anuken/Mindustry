@@ -293,7 +293,7 @@ public class BlockRenderer{
 	public void handlePreview(Block block, float rotation, float drawx, float drawy, int tilex, int tiley) {
 		if(control.input().recipe != null 
 			&& state.inventory.hasItems(control.input().recipe.requirements) 
-			&& control.input().validPlace(tilex,tiley,block)) {
+			&& control.input().validPlace(tilex, tiley, block) && (android || control.input().cursorNear())) {
 			
 			if(block.isMultiblock()) {
 				 if((tiley - control.input().getBlockY()) % block.height != 0
