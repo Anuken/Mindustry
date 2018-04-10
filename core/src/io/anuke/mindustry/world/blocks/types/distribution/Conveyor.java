@@ -96,20 +96,25 @@ public class Conveyor extends Block{
 	public void unitOn(Tile tile, Unit unit) {
 		ConveyorEntity entity = tile.entity();
 
-		float angle = tile.getRotation() * 90f;
-		float speed = this.speed * tilesize / 1.5f;
-		float tx = Angles.trnsx(angle, 1f), ty = Angles.trnsy(angle, 1f);
-		unit.velocity.add(tx * speed * Timers.delta(), ty * speed * Timers.delta());
+		float speed = this.speed * tilesize / 2.3f;
+		float tx = Geometry.d4[tile.getRotation()].x, ty = Geometry.d4[tile.getRotation()].y;
+
+		float min;
 
 		if(Math.abs(tx) > Math.abs(ty)){
-			float rx = tile.worldx() + tx/2f*tilesize;
-			entity.minCarry = Math.min(entity.minCarry, Mathf.clamp((entity.x - rx) * tx / tilesize));
+			float rx = tile.worldx() - tx/2f*tilesize;
+			min = Mathf.clamp((unit.x - rx) * tx / tilesize);
 		}else{
-			float ry = tile.worldy() + ty/2f*tilesize;
-			entity.minCarry = Math.min(entity.minCarry, Mathf.clamp((entity.y - ry) * ty / tilesize));
+			float ry = tile.worldy() - ty/2f*tilesize;
+			min = Mathf.clamp((unit.y - ry) * ty / tilesize);
 		}
 
+		entity.minCarry = Math.min(entity.minCarry, min);
 		entity.carrying += unit.getMass();
+
+		if(entity.convey.size * itemSpace < 0.9f){
+			unit.velocity.add(tx * speed * Timers.delta(), ty * speed * Timers.delta());
+		}
 	}
 
 	@Override

@@ -53,7 +53,7 @@ public class AmmoType {
         return allTypes;
     }
 
-    public static AmmoType getByID(byte id){
+    public static AmmoType getByID(int id){
         return allTypes.get(id);
     }
 }

@@ -162,7 +162,6 @@ public abstract class BaseBlock {
                 }
             }
 
-
             i = (byte)((i + 1) % nearby.length);
             tile.setDump(i);
         }

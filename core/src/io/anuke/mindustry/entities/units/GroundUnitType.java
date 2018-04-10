@@ -26,8 +26,9 @@ public abstract class GroundUnitType extends UnitType{
 
     public GroundUnitType(String name) {
         super(name);
-        maxVelocity = 2f;
+        maxVelocity = 1.1f;
         speed = 0.05f;
+        drag = 0.4f;
     }
 
     @Override

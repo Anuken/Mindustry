@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.defense.turrets;
 
 import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.mindustry.resource.AmmoEntry;
 import io.anuke.mindustry.resource.AmmoType;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.BarType;

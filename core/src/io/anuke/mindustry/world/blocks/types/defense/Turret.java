@@ -6,6 +6,7 @@ import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.resource.AmmoEntry;
 import io.anuke.mindustry.resource.AmmoType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockGroup;
@@ -252,16 +253,6 @@ public abstract class Turret extends Block{
 	public TileEntity getEntity(){
 		return new TurretEntity();
 	}
-
-	public static class AmmoEntry{
-		public final AmmoType type;
-		public int amount;
-
-        public AmmoEntry(AmmoType type, int amount) {
-            this.type = type;
-            this.amount = amount;
-        }
-    }
 	
 	public static class TurretEntity extends TileEntity{
 		public TileEntity blockTarget;

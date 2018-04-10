@@ -18,6 +18,7 @@ public abstract class Unit extends SyncEntity {
     public static final float hitDuration = 9f;
 
     public StatusController status = new StatusController();
+    public UnitInventory inventory = new UnitInventory();
     public Team team = Team.blue;
     public Vector2 velocity = new Vector2();
     public float hitTime;
