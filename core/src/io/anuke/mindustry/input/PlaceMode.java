@@ -41,11 +41,18 @@ public enum PlaceMode{
 
 			control.input().recipe.result.drawPlace(tilex, tiley, control.input().rotation, valid);
 			Lines.stroke(2f);
-
+			
 			if(control.input().recipe.result.rotate){
 				Draw.color(Colors.get("placeRotate"));
 				tr.trns(control.input().rotation * 90, 7, 0);
 				Lines.line(x, y, x + tr.x, y + tr.y);
+			}
+			
+			if(control.input().recipe != null && state.inventory.hasItems(control.input().recipe.requirements)) {
+				Draw.reset();
+				Draw.alpha(0.5f);
+				Draw.rect(control.input().recipe.result.name(), x + offset.x, y + offset.y, control.input().rotation);
+				Draw.reset();
 			}
 		}
 		
@@ -281,6 +288,20 @@ public enum PlaceMode{
 						int px = tx + cx * Mathf.sign(ex - tx), 
 						py = ty + cy * Mathf.sign(ey - ty);
 						
+						if(control.input().recipe != null && state.inventory.hasItems(control.input().recipe.requirements)) {
+							Block result = control.input().recipe.result;
+							if(result.isMultiblock()){
+								// TODO: Multiblock handling
+							}
+							else {
+								// TODO: Rotate support, ore not on ore tile support
+								Draw.reset();
+								Draw.alpha(0.5f);
+								Draw.rect(result.name(), px * t + offset.x, py * t + offset.y, control.input().rotation * 90);
+								Draw.reset();
+							}
+						}
+						
 						if(!control.input().validPlace(px, py, control.input().recipe.result)
 								|| !state.inventory.hasItems(control.input().recipe.requirements, amount)){
 							Lines.crect(px * t + offset.x, py * t + offset.y, t*block.width, t*block.height);
@@ -291,6 +312,7 @@ public enum PlaceMode{
 				
 				if(control.input().recipe.result.rotate){
 					float cx = tx * t, cy = ty * t;
+					Lines.stroke(2f);
 					Draw.color(Colors.get("placeRotate"));
 					tr.trns(rotation * 90, 7, 0);
 					Lines.line(cx, cy, cx + tr.x, cy + tr.y);
