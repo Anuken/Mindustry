@@ -13,6 +13,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.StaticBlock;
 import io.anuke.mindustry.world.blocks.types.production.Drill;
+import io.anuke.mindustry.world.blocks.types.production.Pump;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.CacheBatch;
@@ -291,23 +292,20 @@ public class BlockRenderer{
 	
 	public void handlePreview(Block block, float rotation, float drawx, float drawy, int tilex, int tiley) {
         if(control.input().recipe != null && state.inventory.hasItems(control.input().recipe.requirements)) {
-            Block result = control.input().recipe.result;
-            if(result.isMultiblock()) {
+            if(block.isMultiblock()) {
                 // TODO: Multiblock handling
                 drawPreview(block, drawx, drawy, rotation);
             }
-            else if(result instanceof Drill) {
+            else if(block instanceof Drill || block instanceof Pump) {
                 drawPreview(block, drawx, drawy, rotation);
-                Drill drill = (Drill) result;
                 Tile tile = world.tile(tilex, tiley);
-                if(drill.isLayer(tile)) {
+                if(block.isLayer(tile)) {
                     Draw.alpha(0.5f);
-                    drill.drawLayer(tile);
+                    block.drawLayer(tile);
                     Draw.reset();
                 }
             }
             else {
-                // TODO: Rotate support
                 drawPreview(block, drawx, drawy, rotation);
             }
         }
