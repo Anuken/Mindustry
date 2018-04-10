@@ -12,6 +12,7 @@ import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.StaticBlock;
+import io.anuke.mindustry.world.blocks.types.defense.Turret;
 import io.anuke.mindustry.world.blocks.types.production.Drill;
 import io.anuke.mindustry.world.blocks.types.production.Pump;
 import io.anuke.ucore.core.Core;
@@ -287,28 +288,36 @@ public class BlockRenderer{
 		Draw.reset();
 		Draw.alpha(0.5f);
 		Draw.rect(block.name(), drawx, drawy, rotation);
-		Draw.reset();
 	}
 	
 	public void handlePreview(Block block, float rotation, float drawx, float drawy, int tilex, int tiley) {
-        if(control.input().recipe != null && state.inventory.hasItems(control.input().recipe.requirements) && control.input().validPlace(tilex,tiley,block)) {
-            if(block.isMultiblock()) {
-				if((tiley - control.input().getBlockY()) % block.height != 0
-						|| (tilex - control.input().getBlockX()) % block.width != 0) return;
-                drawPreview(block, drawx, drawy, rotation);
-            }
-            else if(block instanceof Drill || block instanceof Pump) {
-                drawPreview(block, drawx, drawy, rotation);
-                Tile tile = world.tile(tilex, tiley);
-                if(block.isLayer(tile)) {
-                    Draw.alpha(0.5f);
-                    block.drawLayer(tile);
-                    Draw.reset();
-                }
-            }
-            else {
-                drawPreview(block, drawx, drawy, rotation);
-            }
-        }
-    }
+		if(control.input().recipe != null 
+			&& state.inventory.hasItems(control.input().recipe.requirements) 
+			&& control.input().validPlace(tilex,tiley,block)) {
+			
+			if(block.isMultiblock()) {
+				 if((tiley - control.input().getBlockY()) % block.height != 0
+					|| (tilex - control.input().getBlockX()) % block.width != 0) return;
+			}
+			
+			drawPreview(block, drawx, drawy, rotation);
+
+			//SPECIAL CASES
+			if(block instanceof Turret) {
+				if (block.isMultiblock()) {
+					Draw.rect("block-" + block.width + "x" + block.height, drawx, drawy);
+				} else {
+					Draw.rect("block", drawx, drawy);
+				}
+			}
+			else if(block instanceof Drill || block instanceof Pump) {
+				Tile tile = world.tile(tilex, tiley);
+				if(block.isLayer(tile)) {
+					block.drawLayer(tile);
+				}
+			}
+			
+			Draw.reset();
+		}
+	}
 }
