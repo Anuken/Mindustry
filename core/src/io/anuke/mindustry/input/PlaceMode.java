@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.production.Drill;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
@@ -49,10 +50,7 @@ public enum PlaceMode{
 			}
 			
 			if(control.input().recipe != null && state.inventory.hasItems(control.input().recipe.requirements)) {
-				Draw.reset();
-				Draw.alpha(0.5f);
-				Draw.rect(control.input().recipe.result.name(), x + offset.x, y + offset.y, control.input().rotation);
-				Draw.reset();
+                renderer.getBlocks().handlePreview(control.input().recipe.result, control.input().rotation, x + offset.x, y + offset.y, tilex, tiley);
 			}
 		}
 		
@@ -289,17 +287,7 @@ public enum PlaceMode{
 						py = ty + cy * Mathf.sign(ey - ty);
 						
 						if(control.input().recipe != null && state.inventory.hasItems(control.input().recipe.requirements)) {
-							Block result = control.input().recipe.result;
-							if(result.isMultiblock()){
-								// TODO: Multiblock handling
-							}
-							else {
-								// TODO: Rotate support, ore not on ore tile support
-								Draw.reset();
-								Draw.alpha(0.5f);
-								Draw.rect(result.name(), px * t + offset.x, py * t + offset.y, control.input().rotation * 90);
-								Draw.reset();
-							}
+							renderer.getBlocks().handlePreview(control.input().recipe.result, control.input().rotation, px * t + offset.x, py * t + offset.y, px, py);
 						}
 						
 						if(!control.input().validPlace(px, py, control.input().recipe.result)

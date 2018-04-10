@@ -12,6 +12,7 @@ import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.StaticBlock;
+import io.anuke.mindustry.world.blocks.types.production.Drill;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.CacheBatch;
@@ -279,5 +280,33 @@ public class BlockRenderer{
 		if(cbatch != null)
 			cbatch.dispose();
 		cbatch = new CacheBatch(world.width() * world.height() * 4);
+	}
+	
+	public void drawPreview(Block block, float drawx, float drawy, int rotation) {
+		Draw.reset();
+		Draw.alpha(0.5f);
+		Draw.rect(block.name(), drawx, drawy, rotation);
+		Draw.reset();
+	}
+	
+	public void handlePreview(Block block, int rotation, float drawx, float drawy, int tilex, int tiley) {
+		Block result = control.input().recipe.result;
+		if(result.isMultiblock()){
+			// TODO: Multiblock handling
+			drawPreview(block, drawx, drawy, rotation);
+		}
+		else if(result instanceof Drill) {
+			drawPreview(block, drawx, drawy, rotation);
+			Drill drill = (Drill) result;
+			Tile tile = world.tile(tilex, tiley);
+			if(drill.isLayer(tile)) {
+				Draw.alpha(0.5f);
+				drill.drawLayer(tile);
+			}
+		}
+		else {
+			// TODO: Rotate support
+			drawPreview(block, drawx, drawy, rotation);
+		}
 	}
 }
