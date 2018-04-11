@@ -592,7 +592,7 @@ public class ServerControl extends Module {
                 }
                 Log.info("&lcUse the info command to examine each person individually.");
             }else{
-                info("Nobody with that name could be found.");
+                info("Nobody with that IP could be found.");
             }
         });
 
