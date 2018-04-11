@@ -502,6 +502,37 @@ public class ServerControl extends Module {
             info("Saved to slot {0}.", slot);
         });
 
+        handler.register("griefers", "[min-break:place-ratio] [min-breakage]", "Find possible griefers currently online.", arg -> {
+            if(!state.is(State.playing)) {
+                err("Open the server first.");
+                return;
+            }
+
+            try {
+
+                float ratio = arg.length > 0 ? Float.parseFloat(arg[0]) : 0.9f;
+                int minbreak = arg.length > 1 ? Integer.parseInt(arg[1]) : 100;
+
+                boolean found = false;
+
+                for (Player player : playerGroup.all()) {
+                    TraceInfo info = netServer.admins.getTrace(Net.getConnection(player.clientid).address);
+                    if(info.totalBlocksBroken >= minbreak && info.totalBlocksBroken / Math.max(info.totalBlocksPlaced, 1f) >= ratio){
+                        info("&ly - Player '{0}' / UUID &lm{1}&ly found: &lc{2}&ly broken and &lc{3}&ly placed.",
+                                player.name, info.uuid, info.totalBlocksBroken, info.totalBlocksPlaced);
+                        found = true;
+                    }
+                }
+
+                if (!found) {
+                    info("No griefers matching the criteria have been found.");
+                }
+
+            }catch (NumberFormatException e){
+                err("Invalid number format.");
+            }
+        });
+
         handler.register("gameover", "Force a game over.", arg -> {
             if(state.is(State.menu)){
                info("Not playing a map.");
