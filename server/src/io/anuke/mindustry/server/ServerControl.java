@@ -510,7 +510,7 @@ public class ServerControl extends Module {
 
             try {
 
-                float ratio = arg.length > 0 ? Float.parseFloat(arg[0]) : 0.9f;
+                float ratio = arg.length > 0 ? Float.parseFloat(arg[0]) : 0.5f;
                 int minbreak = arg.length > 1 ? Integer.parseInt(arg[1]) : 100;
 
                 boolean found = false;
