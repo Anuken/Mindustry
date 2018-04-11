@@ -292,16 +292,17 @@ public class BlockRenderer{
 	}
 	
 	public void handlePreview(Block block, float rotation, float drawx, float drawy, int tilex, int tiley) {
-		if(control.input().recipe != null 
-			&& state.inventory.hasItems(control.input().recipe.requirements) 
+		
+		if(control.input().recipe != null && state.inventory.hasItems(control.input().recipe.requirements)
 			&& control.input().validPlace(tilex, tiley, block) && (android || control.input().cursorNear())) {
+		 
 			float opacity = (float)Settings.getInt("previewopacity")/100f;
+   
 			if(block.isMultiblock()) {
 				 if((tiley - control.input().getBlockY()) % block.height != 0
 					|| (tilex - control.input().getBlockX()) % block.width != 0) return;
 			}
-
-			//SPECIAL CASES
+			
 			if(block instanceof Turret) {
 				Draw.reset();
 				Draw.alpha(opacity);
