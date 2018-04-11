@@ -35,6 +35,7 @@ public class Recipes {
 		new Recipe(distribution, DistributionBlocks.tunnel, stack(Items.iron, 2)),
 		new Recipe(distribution, DistributionBlocks.sorter, stack(Items.steel, 2)),
 		new Recipe(distribution, DistributionBlocks.splitter, stack(Items.steel, 1)),
+		new Recipe(distribution, DistributionBlocks.overflowgate, stack(Items.steel, 1)),
 		new Recipe(distribution, StorageBlocks.vault, stack(Items.steel, 50)),
 		new Recipe(distribution, StorageBlocks.core, stack(Items.steel, 50)),
 		new Recipe(distribution, StorageBlocks.unloader, stack(Items.steel, 5)),

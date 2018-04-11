@@ -21,8 +21,9 @@ import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
 public class ItemBridge extends Block {
-    protected int timerTransport = timers++;
+    protected static int lastPlaced;
 
+    protected int timerTransport = timers++;
     protected int range;
     protected float powerUse = 0.05f;
     protected float transportTime = 2f;
@@ -35,6 +36,15 @@ public class ItemBridge extends Block {
         layer = Layer.power;
         expanded = true;
         itemCapacity = 30;
+    }
+
+    @Override
+    public void placed(Tile tile) {
+        if(linkValid(tile, world.tile(lastPlaced))){
+            ItemBridgeEntity entity = tile.entity();
+            entity.link = lastPlaced;
+        }
+        lastPlaced = tile.packedPosition();
     }
 
     @Override
@@ -111,9 +121,9 @@ public class ItemBridge extends Block {
         }else{
             float use = Math.min(powerCapacity, powerUse * Timers.delta());
 
-            if(entity.power.amount >= use){
+            if(!hasPower || entity.power.amount >= use){
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 1f, 0.04f);
-                entity.power.amount -= use;
+                if(hasPower) entity.power.amount -= use;
             }else{
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 0f, 0.02f);
             }
@@ -190,7 +200,7 @@ public class ItemBridge extends Block {
             return false;
         }
 
-        return other.block() instanceof ItemBridge && other.<ItemBridgeEntity>entity().link != tile.packedPosition();
+        return other.block() == this && other.<ItemBridgeEntity>entity().link != tile.packedPosition();
     }
 
     public static class ItemBridgeEntity extends TileEntity{

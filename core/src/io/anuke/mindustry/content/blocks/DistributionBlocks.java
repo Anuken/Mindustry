@@ -44,5 +44,7 @@ public class DistributionBlocks{
 
 	sorter = new Sorter("sorter"),
 
-	splitter = new Splitter("splitter");
+	splitter = new Splitter("splitter"),
+
+	overflowgate = new OverflowGate("overflowgate");
 }
