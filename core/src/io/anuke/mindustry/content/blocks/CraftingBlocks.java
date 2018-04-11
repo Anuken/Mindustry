@@ -182,12 +182,13 @@ public class CraftingBlocks {
 
     stoneFormer = new GenericCrafter("stoneformer") {{
         inputLiquid = Liquids.lava;
-        liquidUse = 0.1f;
+        liquidUse = 1f;
         liquidCapacity = 21f;
-        craftTime = 12;
+        craftTime = 14;
         output = Items.stone;
         health = 80;
         craftEffect = BlockFx.purifystone;
+        hasLiquids = hasInventory = true;
     }},
 
     weaponFactory = new WeaponFactory("weaponfactory") {{

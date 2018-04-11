@@ -32,7 +32,6 @@ public class Recipes {
 		new Recipe(distribution, DistributionBlocks.router, stack(Items.iron, 2)),
 		new Recipe(distribution, DistributionBlocks.multiplexer, stack(Items.iron, 8)),
 		new Recipe(distribution, DistributionBlocks.junction, stack(Items.iron, 2)),
-		new Recipe(distribution, DistributionBlocks.tunnel, stack(Items.iron, 2)),
 		new Recipe(distribution, DistributionBlocks.sorter, stack(Items.steel, 2)),
 		new Recipe(distribution, DistributionBlocks.splitter, stack(Items.steel, 1)),
 		new Recipe(distribution, DistributionBlocks.overflowgate, stack(Items.steel, 1)),
@@ -40,7 +39,7 @@ public class Recipes {
 		new Recipe(distribution, StorageBlocks.core, stack(Items.steel, 50)),
 		new Recipe(distribution, StorageBlocks.unloader, stack(Items.steel, 5)),
 		new Recipe(distribution, StorageBlocks.sortedunloader, stack(Items.steel, 5)),
-		new Recipe(distribution, DistributionBlocks.itembridge, stack(Items.steel, 5)),
+		new Recipe(distribution, DistributionBlocks.bridgeconveyor, stack(Items.steel, 5)),
 
 		new Recipe(weapon, WeaponBlocks.doubleturret, stack(Items.iron, 7)),
 		new Recipe(weapon, WeaponBlocks.gatlingturret, stack(Items.iron, 8)),
@@ -114,8 +113,7 @@ public class Recipes {
 		new Recipe(liquid, LiquidBlocks.liquidrouter, stack(Items.steel, 2)),
 		new Recipe(liquid, LiquidBlocks.liquidtank, stack(Items.steel, 2)),
 		new Recipe(liquid, LiquidBlocks.liquidjunction, stack(Items.steel, 2)),
-		new Recipe(liquid, LiquidBlocks.conduittunnel, stack(Items.titanium, 2), stack(Items.steel, 2)),
-		new Recipe(liquid, LiquidBlocks.liquidbridge, stack(Items.titanium, 2), stack(Items.steel, 2)),
+		new Recipe(liquid, LiquidBlocks.bridgeconduit, stack(Items.titanium, 2), stack(Items.steel, 2)),
 
 		new Recipe(liquid, LiquidBlocks.pump, stack(Items.steel, 10)),
 		new Recipe(liquid, LiquidBlocks.fluxpump, stack(Items.steel, 10), stack(Items.densealloy, 5)),

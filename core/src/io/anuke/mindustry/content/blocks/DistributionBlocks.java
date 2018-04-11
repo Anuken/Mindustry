@@ -34,11 +34,11 @@ public class DistributionBlocks{
 		capacity = 32;
 	}},
 
-	tunnel = new TunnelConveyor("conveyortunnel"){{
-		speed = 53;
+	bridgeconveyor = new ItemBridge("bridgeconveyor"){{
+		range = 2;
 	}},
 
-	itembridge = new ItemBridge("itembridge"){{
+	laserconveyor = new ItemBridge("laserconveyor"){{
 		range = 7;
 	}},
 

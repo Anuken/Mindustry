@@ -36,11 +36,11 @@ public class LiquidBlocks {
 
     liquidjunction = new LiquidJunction("liquidjunction"),
 
-    conduittunnel = new TunnelConduit("conduittunnel") {{
-        speed = 53;
+    bridgeconduit = new LiquidBridge("bridgeconduit"){{
+        range = 7;
     }},
 
-    liquidbridge = new LiquidBridge("liquidbridge"){{
+    laserconduit = new LiquidBridge("laserconduit"){{
         range = 7;
     }};
 }
