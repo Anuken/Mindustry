@@ -21,6 +21,7 @@ import io.anuke.ucore.graphics.CacheBatch;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.core.*;
 
 import java.util.Arrays;
 
@@ -284,9 +285,9 @@ public class BlockRenderer{
 		cbatch = new CacheBatch(world.width() * world.height() * 4);
 	}
 	
-	public void drawPreview(Block block, float drawx, float drawy, float rotation) {
+	public void drawPreview(Block block, float drawx, float drawy, float rotation, float opacity) {
 		Draw.reset();
-		Draw.alpha(0.5f);
+		Draw.alpha(opacity);
 		Draw.rect(block.name(), drawx, drawy, rotation);
 	}
 	
@@ -294,23 +295,26 @@ public class BlockRenderer{
 		if(control.input().recipe != null 
 			&& state.inventory.hasItems(control.input().recipe.requirements) 
 			&& control.input().validPlace(tilex, tiley, block) && (android || control.input().cursorNear())) {
-			
+			float opacity = (float)Settings.getInt("previewopacity")/100f;
 			if(block.isMultiblock()) {
 				 if((tiley - control.input().getBlockY()) % block.height != 0
 					|| (tilex - control.input().getBlockX()) % block.width != 0) return;
 			}
-			
-			drawPreview(block, drawx, drawy, rotation);
 
 			//SPECIAL CASES
 			if(block instanceof Turret) {
+				Draw.reset();
+				Draw.alpha(opacity);
 				if (block.isMultiblock()) {
 					Draw.rect("block-" + block.width + "x" + block.height, drawx, drawy);
 				} else {
 					Draw.rect("block", drawx, drawy);
 				}
 			}
-			else if(block instanceof Drill || block instanceof Pump) {
+
+			drawPreview(block, drawx, drawy, rotation, opacity);
+
+			if(block instanceof Drill || block instanceof Pump) {
 				Tile tile = world.tile(tilex, tiley);
 				if(block.isLayer(tile)) {
 					block.drawLayer(tile);
