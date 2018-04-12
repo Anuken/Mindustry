@@ -1,6 +1,9 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.IntSet;
+import com.badlogic.gdx.utils.IntSet.IntSetIterator;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.resource.Item;
@@ -27,6 +30,7 @@ public class ItemBridge extends Block {
     protected int range;
     protected float powerUse = 0.05f;
     protected float transportTime = 2f;
+    protected IntArray removals = new IntArray();
 
     public ItemBridge(String name) {
         super(name);
@@ -40,9 +44,12 @@ public class ItemBridge extends Block {
 
     @Override
     public void placed(Tile tile) {
-        if(linkValid(tile, world.tile(lastPlaced))){
-            ItemBridgeEntity entity = tile.entity();
-            entity.link = lastPlaced;
+        Tile last = world.tile(lastPlaced);
+        if(linkValid(tile, last)){
+            ItemBridgeEntity entity = last.entity();
+            if(!linkValid(last, world.tile(entity.link))){
+                link(last, tile);
+            }
         }
         lastPlaced = tile.packedPosition();
     }
@@ -99,9 +106,9 @@ public class ItemBridge extends Block {
 
         if(linkValid(tile, other)){
             if(entity.link == other.packedPosition()){
-                entity.link = -1;
+                unlink(tile, other);
             }else{
-                entity.link = other.packedPosition();
+                link(tile, other);
             }
             return false;
         }
@@ -115,9 +122,25 @@ public class ItemBridge extends Block {
         entity.time += entity.cycleSpeed*Timers.delta();
         entity.time2 += (entity.cycleSpeed-1f)*Timers.delta();
 
+        removals.clear();
+
+        IntSetIterator it = entity.incoming.iterator();
+
+        while(it.hasNext){
+            int i = it.next();
+            Tile other = world.tile(i);
+            if(!linkValid(tile, other, false)){
+                removals.add(i);
+            }
+        }
+
+        for(int j = 0; j < removals.size; j ++)
+            entity.incoming.remove(removals.get(j));
+
         Tile other = world.tile(entity.link);
         if(!linkValid(tile, other)){
             tryDump(tile);
+            entity.uptime = 0f;
         }else{
             float use = Math.min(powerCapacity, powerUse * Timers.delta());
 
@@ -128,15 +151,21 @@ public class ItemBridge extends Block {
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 0f, 0.02f);
             }
 
-            if(entity.uptime >= 0.5f && entity.timer.get(timerTransport, transportTime)){
-                Item item = entity.inventory.takeItem();
-                if(item != null && other.block().acceptItem(item, other, tile)){
-                    other.block().handleItem(item, other, tile);
-                    entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 4f, 0.05f);
-                }else{
-                    entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 1f, 0.01f);
-                    if(item != null) entity.inventory.addItem(item, 1);
-                }
+            updateTransport(tile, other);
+        }
+    }
+
+    public void updateTransport(Tile tile, Tile other){
+        ItemBridgeEntity entity = tile.entity();
+
+        if(entity.uptime >= 0.5f && entity.timer.get(timerTransport, transportTime)){
+            Item item = entity.inventory.takeItem();
+            if(item != null && other.block().acceptItem(item, other, tile)){
+                other.block().handleItem(item, other, tile);
+                entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 4f, 0.05f);
+            }else{
+                entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 1f, 0.01f);
+                if(item != null) entity.inventory.addItem(item, 1);
             }
         }
     }
@@ -186,25 +215,73 @@ public class ItemBridge extends Block {
     }
 
     @Override
+    public boolean canDump(Tile tile, Tile to, Item item) {
+        ItemBridgeEntity entity = tile.entity();
+
+        Tile other = world.tile(entity.link);
+        if(!linkValid(tile, other)){
+            int i = tile.absoluteRelativeTo(to.x, to.y);
+
+            IntSetIterator it = entity.incoming.iterator();
+
+            while(it.hasNext){
+                int v = it.next();
+                int x = v % world.width();
+                int y = v / world.width();
+                if(tile.absoluteRelativeTo(x, y) == i){
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        int rel = tile.absoluteRelativeTo(other.x, other.y);
+        int rel2 = tile.relativeTo(to.x, to.y);
+
+        return rel != rel2;
+    }
+
+    @Override
     public TileEntity getEntity() {
         return new ItemBridgeEntity();
     }
 
+    public void link(Tile tile, Tile other){
+        ItemBridgeEntity entity = tile.entity();
+        ItemBridgeEntity oe = other.entity();
+        entity.link = other.packedPosition();
+        oe.incoming.add(tile.packedPosition());
+    }
+
+    public void unlink(Tile tile, Tile other){
+        ItemBridgeEntity entity = tile.entity();
+        entity.link = -1;
+        if(other != null) {
+            ItemBridgeEntity oe = other.entity();
+            oe.incoming.remove(tile.packedPosition());
+        }
+    }
+
     public boolean linkValid(Tile tile, Tile other){
+        return linkValid(tile, other, true);
+    }
+
+    public boolean linkValid(Tile tile, Tile other, boolean checkDouble){
         if(other == null) return false;
         if(tile.x == other.x){
-            if(Math.abs(tile.x - other.x) > range) return false;
-        }else if(tile.y == other.y){
             if(Math.abs(tile.y - other.y) > range) return false;
+        }else if(tile.y == other.y){
+            if(Math.abs(tile.x - other.x) > range) return false;
         }else{
             return false;
         }
 
-        return other.block() == this && other.<ItemBridgeEntity>entity().link != tile.packedPosition();
+        return other.block() == this && (!checkDouble || other.<ItemBridgeEntity>entity().link != tile.packedPosition());
     }
 
     public static class ItemBridgeEntity extends TileEntity{
         public int link = -1;
+        public IntSet incoming = new IntSet();
         public float uptime;
         public float time;
         public float time2;
@@ -213,11 +290,24 @@ public class ItemBridge extends Block {
         @Override
         public void write(DataOutputStream stream) throws IOException {
             stream.writeInt(link);
+            stream.writeFloat(uptime);
+            stream.writeByte(incoming.size);
+
+            IntSetIterator it = incoming.iterator();
+
+            while(it.hasNext){
+                stream.writeInt(it.next());
+            }
         }
 
         @Override
         public void read(DataInputStream stream) throws IOException {
             link = stream.readInt();
+            uptime = stream.readFloat();
+            byte links = stream.readByte();
+            for(int i = 0; i < links; i ++){
+                incoming.add(stream.readInt());
+            }
         }
     }
 }

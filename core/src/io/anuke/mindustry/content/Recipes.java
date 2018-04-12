@@ -40,6 +40,7 @@ public class Recipes {
 		new Recipe(distribution, StorageBlocks.unloader, stack(Items.steel, 5)),
 		new Recipe(distribution, StorageBlocks.sortedunloader, stack(Items.steel, 5)),
 		new Recipe(distribution, DistributionBlocks.bridgeconveyor, stack(Items.steel, 5)),
+        new Recipe(distribution, DistributionBlocks.laserconveyor, stack(Items.steel, 5)),
 
 		new Recipe(weapon, WeaponBlocks.doubleturret, stack(Items.iron, 7)),
 		new Recipe(weapon, WeaponBlocks.gatlingturret, stack(Items.iron, 8)),
@@ -71,7 +72,6 @@ public class Recipes {
 		new Recipe(crafting, CraftingBlocks.incinerator, stack(Items.steel, 60), stack(Items.iron, 60)),
 		new Recipe(crafting, CraftingBlocks.weaponFactory, stack(Items.steel, 60), stack(Items.iron, 60)).setDesktop(),
 
-		//new Recipe(production, ProductionBlocks.stonedrill, stack(Item.stone, 12)),
 		new Recipe(production, ProductionBlocks.ironDrill, stack(Items.iron, 25)),
 		new Recipe(production, ProductionBlocks.reinforcedDrill, stack(Items.iron, 25)),
 		new Recipe(production, ProductionBlocks.steelDrill, stack(Items.iron, 25)),
@@ -79,11 +79,6 @@ public class Recipes {
 		new Recipe(production, ProductionBlocks.laserdrill, stack(Items.titanium, 40), stack(Items.densealloy, 40)),
 		new Recipe(production, ProductionBlocks.nucleardrill, stack(Items.titanium, 40), stack(Items.densealloy, 40)),
 		new Recipe(production, ProductionBlocks.plasmadrill, stack(Items.titanium, 40), stack(Items.densealloy, 40)),
-		//new Recipe(production, ProductionBlocks.leaddrill, stack(Items.iron, 25)),
-		//new Recipe(production, ProductionBlocks.coaldrill, stack(Items.iron, 25), stack(Items.iron, 40)),
-		//new Recipe(production, ProductionBlocks.titaniumdrill, stack(Items.iron, 50), stack(Items.steel, 50)),
-		//new Recipe(production, ProductionBlocks.thoriumdrill, stack(Items.iron, 40), stack(Items.steel, 40)),
-		//new Recipe(production, ProductionBlocks.quartzextractor, stack(Items.titanium, 40), stack(Items.densealloy, 40)),
 		new Recipe(production, ProductionBlocks.cultivator, stack(Items.titanium, 40), stack(Items.densealloy, 40)),
 		new Recipe(production, ProductionBlocks.waterextractor, stack(Items.titanium, 40), stack(Items.densealloy, 40)),
 		new Recipe(production, ProductionBlocks.oilextractor, stack(Items.titanium, 40), stack(Items.densealloy, 40)),

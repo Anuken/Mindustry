@@ -28,8 +28,9 @@ public class Conveyor extends Block{
 	private static ItemPos pos2 = new ItemPos();
 	private static final float itemSpace = 0.135f * 2.2f;
 	private static final float offsetScl = 128f*3f;
-	private static final float itemSize = 5f;
 	private static final float minmove = 1f / (Short.MAX_VALUE - 2);
+
+	public static final float itemSize = 5f;
 
 	private final Translator tr1 = new Translator();
 	private final Translator tr2 = new Translator();

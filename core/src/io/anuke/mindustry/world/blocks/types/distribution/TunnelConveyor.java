@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.NumberUtils;
 import io.anuke.mindustry.entities.TileEntity;
@@ -61,11 +60,10 @@ public class TunnelConveyor extends Block{
 	}
 
 	@Override
-	public boolean acceptItem(Item item, Tile tile, Tile source){
+	public boolean acceptItem(Item item, Tile tile, Tile source) {
 		TunnelEntity entity = tile.entity();
 		int rot = source.relativeTo(tile.x, tile.y);
-		if(rot != (tile.getRotation() + 2)%4) return false;
-		return entity.index < entity.buffer.length - 1;
+		return rot == (tile.getRotation() + 2) % 4 && entity.index < entity.buffer.length - 1;
 	}
 
 	@Override

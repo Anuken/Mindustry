@@ -37,7 +37,7 @@ public class LiquidBlocks {
     liquidjunction = new LiquidJunction("liquidjunction"),
 
     bridgeconduit = new LiquidBridge("bridgeconduit"){{
-        range = 7;
+        range = 3;
     }},
 
     laserconduit = new LiquidBridge("laserconduit"){{

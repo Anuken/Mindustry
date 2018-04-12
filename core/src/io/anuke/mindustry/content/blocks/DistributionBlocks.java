@@ -34,8 +34,9 @@ public class DistributionBlocks{
 		capacity = 32;
 	}},
 
-	bridgeconveyor = new ItemBridge("bridgeconveyor"){{
-		range = 2;
+	bridgeconveyor = new BufferedItemBridge("bridgeconveyor"){{
+		range = 3;
+		hasPower = false;
 	}},
 
 	laserconveyor = new ItemBridge("laserconveyor"){{
