@@ -7,9 +7,9 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.world;
 
-public class LiquidBridge extends ItemBridge {
+public class LiquidExtendingBridge extends ExtendingItemBridge {
 
-    public LiquidBridge(String name) {
+    public LiquidExtendingBridge(String name) {
         super(name);
         hasInventory = false;
         hasLiquids = true;
@@ -28,9 +28,9 @@ public class LiquidBridge extends ItemBridge {
         }else{
             float use = Math.min(powerCapacity, powerUse * Timers.delta());
 
-            if(entity.power.amount >= use){
+            if(!hasPower || entity.power.amount >= use){
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 1f, 0.04f);
-                entity.power.amount -= use;
+                if(hasPower) entity.power.amount -= use;
             }else{
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 0f, 0.02f);
             }

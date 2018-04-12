@@ -109,6 +109,7 @@ public class Recipes {
 		new Recipe(liquid, LiquidBlocks.liquidtank, stack(Items.steel, 2)),
 		new Recipe(liquid, LiquidBlocks.liquidjunction, stack(Items.steel, 2)),
 		new Recipe(liquid, LiquidBlocks.bridgeconduit, stack(Items.titanium, 2), stack(Items.steel, 2)),
+		new Recipe(liquid, LiquidBlocks.laserconduit, stack(Items.titanium, 2), stack(Items.steel, 2)),
 
 		new Recipe(liquid, LiquidBlocks.pump, stack(Items.steel, 10)),
 		new Recipe(liquid, LiquidBlocks.fluxpump, stack(Items.steel, 10), stack(Items.densealloy, 5)),

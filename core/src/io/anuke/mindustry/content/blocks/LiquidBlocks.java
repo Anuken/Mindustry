@@ -36,8 +36,9 @@ public class LiquidBlocks {
 
     liquidjunction = new LiquidJunction("liquidjunction"),
 
-    bridgeconduit = new LiquidBridge("bridgeconduit"){{
+    bridgeconduit = new LiquidExtendingBridge("bridgeconduit"){{
         range = 3;
+        hasPower = false;
     }},
 
     laserconduit = new LiquidBridge("laserconduit"){{
