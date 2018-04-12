@@ -99,7 +99,7 @@ public class Smelter extends Block{
 		}
 		
 		offloadNear(tile, result);
-		Effects.effect(craftEffect, flameColor, entity);
+		Effects.effect(craftEffect, flameColor, tile.drawx(), tile.drawy());
 	}
 
 	@Override
