@@ -5,10 +5,14 @@ import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.content.Recipes;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.InputHandler;
-import io.anuke.mindustry.resource.*;
+import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.ItemStack;
+import io.anuke.mindustry.resource.Recipe;
+import io.anuke.mindustry.resource.Section;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockStats;
@@ -24,6 +28,7 @@ import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
@@ -34,6 +39,7 @@ public class BlocksFragment implements Fragment{
 	private Stack stack = new Stack();
 	private boolean shown = true;
 	private Recipe hoveredDescriptionRecipe;
+	private IntSet itemset = new IntSet();
 	
 	public void build(){
 		InputHandler input = control.input();
@@ -48,6 +54,16 @@ public class BlocksFragment implements Fragment{
 
 				itemtable = new Table("button");
 				itemtable.setVisible(() -> input.recipe == null && !state.mode.infiniteResources);
+				itemtable.update(() -> {
+					int[] items = state.inventory.readItems();
+					for(int i = 0; i < items.length; i ++){
+						if(itemset.contains(items[i]) != (items[i] > 0)){
+							Log.info("Updating items.");
+							updateItems();
+							break;
+						}
+					}
+				});
 
 				desctable = new Table("button");
 				desctable.setVisible(() -> hoveredDescriptionRecipe != null || input.recipe != null);
@@ -326,23 +342,27 @@ public class BlocksFragment implements Fragment{
 		d.show();
 	}
 
-	public void updateItems(){
+	private void updateItems(){
 
 		itemtable.clear();
 		itemtable.left();
 
 		if(state.mode.infiniteResources){
 			return;
-		}
+		};
 
 		int index = 0;
+		int[] items = state.inventory.readItems();
 
-		for(int i = 0; i < state.inventory.getItems().length; i ++){
-			int amount = state.inventory.getItems()[i];
-			if(amount == 0) continue;
-			String formatted = amount > 99999999 ? "inf" : format(amount);
+		for(int i = 0; i < items.length; i ++){
+			int amount = items[i];
+			if(amount == 0){
+				itemset.remove(i);
+				continue;
+			}
+			itemset.add(i);
 			Image image = new Image(Item.getByID(i).region);
-			Label label = new Label(formatted);
+			Label label = new Label(() -> format(amount));
 			label.setFontScale(fontscale*1.5f);
 			itemtable.add(image).size(8*3);
 			itemtable.add(label).expandX().left();
@@ -351,7 +371,9 @@ public class BlocksFragment implements Fragment{
 	}
 
 	String format(int number){
-		if(number > 1000000) {
+		if(number > 99999999){
+			return "inf";
+		}else if(number > 1000000) {
 			return Strings.toFixed(number/1000000f, 1) + "[gray]mil";
 		}else if(number > 10000){
 			return number/1000 + "[gray]k";

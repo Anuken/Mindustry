@@ -94,15 +94,7 @@ public class LevelDialog extends FloatingDialog{
 			Table inset = new Table("pane-button");
 			inset.add("[accent]" + Bundles.get("map."+map.name+".name", map.name)).pad(3f);
 			inset.row();
-			inset.label((() ->{
-				try{
-					return Bundles.format("text.level.highscore", Settings.getInt("hiscore" + map.name));
-				}catch (Exception e){
-					Settings.defaults("hiscore" + map.name, 1);
-					return Bundles.format("text.level.highscore", 0);
-				}
-			}))
-			.pad(3f);
+			inset.label((() -> Bundles.format("text.level.highscore", Settings.getInt("hiscore" + map.name, 0)))).pad(3f);
 			inset.pack();
 			
 			float images = 154f;

@@ -185,7 +185,7 @@ public class Player extends Unit{
 		}
 
 		float backTrns = 4f, itemSize = 5f;
-		if(inventory.hasItem() && !control.input().isDroppingItem()){
+		if(inventory.hasItem()){
 			ItemStack stack = inventory.getItem();
 			Draw.rect(stack.item.region, x + Angles.trnsx(rotation + 180f, backTrns), y + Angles.trnsy(rotation + 180f, backTrns), itemSize, itemSize, rotation);
 			//Draw.tint(Color.WHITE);

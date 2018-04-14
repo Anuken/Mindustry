@@ -7,7 +7,6 @@ import io.anuke.mindustry.world.Tile;
 import static io.anuke.mindustry.Vars.state;
 
 public class CoreBlock extends StorageBlock {
-    protected int capacity = 1000;
 
     public CoreBlock(String name) {
         super(name);
@@ -16,7 +15,8 @@ public class CoreBlock extends StorageBlock {
         destructible = true;
         unbreakable = true;
         size = 3;
-        hasInventory = false;
+        hasInventory = true;
+        itemCapacity = 2000;
     }
 
     public void onDestroyed(Tile tile){
@@ -30,8 +30,9 @@ public class CoreBlock extends StorageBlock {
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
-        if(Net.server() || !Net.active()) state.inventory.addItem(item, 1);
+        if(Net.server() || !Net.active()) super.handleItem(item, tile, source);
     }
+    /*
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
@@ -57,5 +58,5 @@ public class CoreBlock extends StorageBlock {
             }
         }
         return false;
-    }
+    }*/
 }

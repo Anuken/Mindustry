@@ -446,7 +446,7 @@ public class NetServer extends Module{
 
         if(timer.get(timerStateSync, itemSyncTime)){
             StateSyncPacket packet = new StateSyncPacket();
-            packet.items = state.inventory.getItems();
+            packet.items = state.inventory.readItems();
             packet.countdown = state.wavetime;
             packet.enemies = state.enemies;
             packet.wave = state.wave;

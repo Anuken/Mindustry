@@ -221,10 +221,6 @@ public class HudFragment implements Fragment{
 			l.setTouchable(!paused ? Touchable.enabled : Touchable.disabled);
 		});
 	}
-
-	public void updateItems(){
-		blockfrag.updateItems();
-	}
 	
 	public void fadeRespawn(boolean in){
 		respawntable.addAction(Actions.color(in ? new Color(0, 0, 0, 0.3f) : Color.CLEAR, 0.3f));

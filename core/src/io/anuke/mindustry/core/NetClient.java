@@ -144,13 +144,11 @@ public class NetClient extends Module {
 
         Net.handleClient(StateSyncPacket.class, packet -> {
 
-            System.arraycopy(packet.items, 0, state.inventory.getItems(), 0, packet.items.length);
+            System.arraycopy(packet.items, 0, state.inventory.writeItems(), 0, packet.items.length);
 
             state.enemies = packet.enemies;
             state.wavetime = packet.countdown;
             state.wave = packet.wave;
-
-            ui.hudfrag.updateItems();
         });
 
         Net.handleClient(PlacePacket.class, (packet) -> {

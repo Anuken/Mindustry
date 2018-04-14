@@ -12,7 +12,6 @@ import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.SaveFileVersion;
-import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -25,7 +24,6 @@ import io.anuke.ucore.util.Bits;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -94,20 +92,6 @@ public class Save16 extends SaveFileVersion {
             byte b = stream.readByte();
             for(int i = 0; i < b; i ++) stream.readByte();
         }
-
-        //inventory
-
-        int totalItems = stream.readByte();
-
-        Arrays.fill(state.inventory.getItems(), 0);
-
-        for(int i = 0; i < totalItems; i ++){
-            Item item = Item.getByID(stream.readByte());
-            int amount = stream.readInt();
-            state.inventory.getItems()[item.id] = amount;
-        }
-
-        if(!headless) ui.hudfrag.updateItems();
 
         //enemies
 
@@ -240,26 +224,6 @@ public class Save16 extends SaveFileVersion {
             stream.writeFloat(world.getSpawnY());
             stream.writeInt(150);
             stream.writeByte(0);
-        }
-
-        //--INVENTORY--
-
-        int l = state.inventory.getItems().length;
-        int itemsize = 0;
-
-        for(int i = 0; i < l; i ++){
-            if(state.inventory.getItems()[i] > 0){
-                itemsize ++;
-            }
-        }
-
-        stream.writeByte(itemsize); //amount of items
-
-        for(int i = 0; i < l; i ++){
-            if(state.inventory.getItems()[i] > 0){
-                stream.writeByte(i); //item ID
-                stream.writeInt(state.inventory.getItems()[i]); //item amount
-            }
         }
 
         //--ENEMIES--

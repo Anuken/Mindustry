@@ -42,6 +42,8 @@ public class Logic extends Module {
 
         if(state.mode.infiniteResources){
             state.inventory.fill();
+        }else{
+            state.inventory.clearItems();
         }
 
         Events.fire(PlayEvent.class);
@@ -53,7 +55,6 @@ public class Logic extends Module {
         state.wavetime = wavespace * state.difficulty.timeScaling;
         state.enemies = 0;
         state.gameOver = false;
-        state.inventory.clearItems();
         state.teams = new TeamInfo();
         state.teams.add(Team.blue, true);
         state.teams.add(Team.red, false);

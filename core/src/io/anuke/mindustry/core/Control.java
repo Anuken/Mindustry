@@ -142,8 +142,6 @@ public class Control extends Module{
 
 			Core.camera.position.set(player.x, player.y, 0);
 
-			ui.hudfrag.updateItems();
-
 			state.set(State.playing);
 		});
 
@@ -159,7 +157,6 @@ public class Control extends Module{
 			respawntime = -1;
 			hiscore = false;
 
-			ui.hudfrag.updateItems();
 			ui.hudfrag.fadeRespawn(false);
 		});
 
@@ -323,11 +320,6 @@ public class Control extends Module{
         }
 
         saves.update();
-
-		if(state.inventory.isUpdated() && (Timers.get("updateItems", 8) || state.is(State.paused))){
-			ui.hudfrag.updateItems();
-			state.inventory.setUpdated(false);
-		}
 
 		if(!state.is(State.menu)){
 			input.update();

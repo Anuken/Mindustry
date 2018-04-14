@@ -41,12 +41,6 @@ public class NetworkIO {
             stream.writeInt(player.id); //player remap ID
             stream.writeBoolean(player.isAdmin);
 
-            //--INVENTORY--
-
-            for(int i = 0; i < state.inventory.getItems().length; i ++){ //items
-                stream.writeInt(state.inventory.getItems()[i]);
-            }
-
             stream.writeByte(upgrades.size); //upgrade data
 
             for(int i = 0; i < upgrades.size; i ++){
@@ -119,13 +113,6 @@ public class NetworkIO {
 
             int pid = stream.readInt();
             boolean admin = stream.readBoolean();
-
-            //inventory
-            for(int i = 0; i < state.inventory.getItems().length; i ++){
-                state.inventory.getItems()[i] = stream.readInt();
-            }
-
-            ui.hudfrag.updateItems();
 
             control.upgrades().getWeapons().clear();
             control.upgrades().getWeapons().add(Weapons.blaster);
