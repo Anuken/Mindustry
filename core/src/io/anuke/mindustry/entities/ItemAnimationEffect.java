@@ -17,6 +17,9 @@ public class ItemAnimationEffect extends TimedEntity {
     private final Vector2 to = new Vector2();
     private final Item item;
 
+    public Interpolation interp = Interpolation.fade;
+    public float endSize = 0.8f;
+
     public ItemAnimationEffect(Item item, float x, float y, float tox, float toy) {
         this.x = x;
         this.y = y;
@@ -30,14 +33,14 @@ public class ItemAnimationEffect extends TimedEntity {
     public void update() {
         super.update();
 
-        vec.set(from).interpolate(to, fin(), Interpolation.fade);
+        vec.set(from).interpolate(to, fin(), interp);
         x = vec.x;
         y = vec.y;
     }
 
     @Override
     public void draw() {
-        float s = size * Mathf.curve(fout(), 0.1f);
+        float s = size * (1f-Mathf.curve(fin(), endSize));
         Draw.rect(item.region, x, y, s, s);
     }
 

@@ -1,7 +1,9 @@
 package io.anuke.mindustry.input;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.ItemAnimationEffect;
@@ -77,6 +79,26 @@ public abstract class InputHandler extends InputAdapter{
 							player.x + Angles.trnsx(rotation + 180f, backTrns), player.y + Angles.trnsy(rotation + 180f, backTrns),
 							tile.drawx(), tile.drawy()).add();
 				});
+			}
+		}else{
+			Vector2 vec = Graphics.screen(player.x, player.y);
+
+			if(vec.dst(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY()) > playerSelectRange) {
+				int sent = Mathf.clamp(stack.amount / 4, 1, 8);
+				float backTrns = 3f;
+				for (int i = 0; i < sent; i++) {
+					Timers.run(i, () -> {
+						float x = player.x + Angles.trnsx(rotation + 180f, backTrns),
+								y = player.y + Angles.trnsy(rotation + 180f, backTrns);
+
+						ItemAnimationEffect e = new ItemAnimationEffect(stack.item,
+								x, y, x + Mathf.range(20f), y + Mathf.range(20f)).add();
+						e.interp = Interpolation.pow3Out;
+						e.endSize = 0.5f;
+						e.lifetime = 20;
+					});
+				}
+				player.inventory.clear();
 			}
 		}
 	}
