@@ -174,8 +174,7 @@ public class Renderer extends RendererModule{
 
 			camera.position.set(lastx - deltax, lasty - deltay, 0);
 
-			if(debug && !ui.chatfrag.chatOpen())
-				record(); //this only does something if GdxGifRecorder is on the class path, which it usually isn't
+
 		}
 	}
 
@@ -506,7 +505,7 @@ public class Renderer extends RendererModule{
 					Draw.reset();
 				}
 
-				if(Inputs.keyDown("block_info") && target.block().fullDescription != null){
+				if(Inputs.keyDown("block_info") && target.block().isAccessible()){
 					Draw.color(Colors.get("accent"));
 					Lines.crect(target.drawx(), target.drawy(), target.block().size * tilesize, target.block().size * tilesize);
 					Draw.color();

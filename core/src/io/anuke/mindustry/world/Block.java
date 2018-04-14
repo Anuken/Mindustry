@@ -192,6 +192,10 @@ public class Block extends BaseBlock {
 	}
 	
 	public void update(Tile tile){}
+
+	public boolean isAccessible(){
+		return (hasInventory && itemCapacity > 0) || hasLiquids || hasPower;
+	}
 	
 	public void onDestroyed(Tile tile){
 		float x = tile.worldx(), y = tile.worldy();

@@ -30,7 +30,7 @@ import io.anuke.ucore.util.Mathf;
 
 import java.util.Locale;
 
-import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.scene.actions.Actions.*;
 
 public class UI extends SceneModule{
@@ -61,6 +61,8 @@ public class UI extends SceneModule{
     public final LoadingFragment loadfrag = new LoadingFragment();
     public final BlockConfigFragment configfrag = new BlockConfigFragment();
     public final DebugFragment debugfrag = new DebugFragment();
+    public final BlockInventoryFragment blockinvfrag = new BlockInventoryFragment();
+	public final PlayerMenuFragment playermenufrag = new PlayerMenuFragment();
 
     private Locale lastLocale;
 	
@@ -132,6 +134,9 @@ public class UI extends SceneModule{
 		
 		act();
 
+		if(debug && !ui.chatfrag.chatOpen())
+			renderer.record(); //this only does something if GdxGifRecorder is on the class path, which it usually isn't
+
 		if(control.showCursor()) {
 			Draw.color();
 
@@ -174,6 +179,8 @@ public class UI extends SceneModule{
 		chatfrag.build();
 		listfrag.build();
 		debugfrag.build();
+		blockinvfrag.build();
+		playermenufrag.build();
 		loadfrag.build();
 
 		build.end();

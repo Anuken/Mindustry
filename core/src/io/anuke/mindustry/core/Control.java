@@ -159,7 +159,6 @@ public class Control extends Module{
 			hiscore = false;
 
 			ui.hudfrag.updateItems();
-			ui.hudfrag.updateWeapons();
 			ui.hudfrag.fadeRespawn(false);
 		});
 

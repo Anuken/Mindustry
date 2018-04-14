@@ -114,7 +114,6 @@ public class WeaponFactory extends Block{
                 }else{
                     state.inventory.removeItems(requirements);
                     control.upgrades().addWeapon(weapon);
-                    ui.hudfrag.updateWeapons();
                     run.listen();
                     Effects.sound("purchase");
                 }

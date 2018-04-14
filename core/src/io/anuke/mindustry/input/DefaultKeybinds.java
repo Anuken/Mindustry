@@ -29,6 +29,7 @@ public class DefaultKeybinds {
                 "chat_history_prev", Input.UP,
                 "chat_history_next", Input.DOWN,
                 "chat_scroll", new Axis(Input.SCROLL),
+                "item_withdraw", Input.SHIFT_LEFT,
                 "console", Input.GRAVE,
                 "weapon_1", Input.NUM_1,
                 "weapon_2", Input.NUM_2,

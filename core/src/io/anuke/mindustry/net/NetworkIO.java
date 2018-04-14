@@ -137,7 +137,6 @@ public class NetworkIO {
             }
 
             player.weaponLeft = player.weaponRight = control.upgrades().getWeapons().peek();
-            ui.hudfrag.updateWeapons();
 
             Entities.clear();
             player.id = pid;

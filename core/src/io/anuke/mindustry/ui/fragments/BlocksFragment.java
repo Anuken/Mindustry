@@ -30,7 +30,7 @@ import io.anuke.ucore.util.Strings;
 import static io.anuke.mindustry.Vars.*;
 
 public class BlocksFragment implements Fragment{
-	private Table desctable, itemtable, blocks, weapons;
+	private Table desctable, itemtable, blocks;
 	private Stack stack = new Stack();
 	private boolean shown = true;
 	private Recipe hoveredDescriptionRecipe;
@@ -195,41 +195,10 @@ public class BlocksFragment implements Fragment{
 					end();
 				}}.right().bottom().uniformX();
 
-				row();
-
-				if(!android) {
-					weapons = new table("button").margin(0).fillX().end().get();
-				}
-
 				visible(() -> !state.is(State.menu) && shown);
 
 			}}.end().get();
 		}}.end();
-
-		updateWeapons();
-	}
-
-	public void updateWeapons(){
-		if(android) return;
-
-		weapons.clearChildren();
-		weapons.left();
-
-		ButtonGroup<ImageButton> group = new ButtonGroup<>();
-
-		for(int i = 0; i < control.upgrades().getWeapons().size; i ++){
-			Weapon weapon = control.upgrades().getWeapons().get(i);
-			weapons.addImageButton(weapon.name, "toggle", 8*3, () -> {
-				player.weaponLeft = player.weaponRight = weapon;
-			}).left().size(40f, 45f).padRight(-1).group(group);
-		}
-
-		int idx = control.upgrades().getWeapons().indexOf(player.weaponLeft, true);
-
-		if(idx != -1)
-			group.getButtons().get(idx).setChecked(true);
-		else if(group.getButtons().size > 0)
-			group.getButtons().get(0).setChecked(true);
 	}
 
 	public void toggle(boolean show, float t, Interpolation ip){

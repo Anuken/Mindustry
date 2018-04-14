@@ -91,7 +91,6 @@ public class DesktopInput extends InputHandler{
 			if(Inputs.keyTap("weapon_" + i)){
 				player.weaponLeft = player.weaponRight = control.upgrades().getWeapons().get(i - 1);
                 if(Net.active()) NetEvents.handleWeaponSwitch();
-				ui.hudfrag.updateWeapons();
 			}
 		}
 		
@@ -99,13 +98,16 @@ public class DesktopInput extends InputHandler{
 		Tile target = cursor == null ? null : cursor.target();
 		boolean showCursor = false;
 
-		if(recipe == null && target != null && !ui.hasMouse() && Inputs.keyDown("block_info")
-				&& target.block().fullDescription != null){
+		if(recipe == null && target != null && !ui.hasMouse() && Inputs.keyDown("block_info") && target.block().isAccessible()){
 			showCursor = true;
 			if(Inputs.keyTap("select")){
-			    ui.hudfrag.blockfrag.showBlockInfo(target.block());
+				ui.blockinvfrag.showFor(target);
                 Cursors.restoreCursor();
             }
+		}
+
+		if(!ui.hasMouse() && (target == null || !target.block().isAccessible()) && Inputs.keyTap("select")){
+			ui.blockinvfrag.hide();
 		}
 
         if(target != null && target.block().isConfigurable(target)){

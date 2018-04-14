@@ -1,11 +1,11 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.io.MapTileData;
@@ -15,7 +15,6 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.ColorMapper.BlockPair;
-import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
@@ -29,6 +28,7 @@ import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Input;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
@@ -395,20 +395,20 @@ public class MapEditorDialog extends Dialog{
 		}
 
 		//ctrl keys (undo, redo, save)
-		if(Inputs.keyDown(Keys.CONTROL_LEFT)){
-			if(Inputs.keyTap(Keys.Z)){
+		if(Inputs.keyDown(Input.CONTROL_LEFT)){
+			if(Inputs.keyTap(Input.Z)){
 				view.undo();
 			}
 
-			if(Inputs.keyTap(Keys.Y)){
+			if(Inputs.keyTap(Input.Y)){
 				view.redo();
 			}
 
-			if(Inputs.keyTap(Keys.S)){
+			if(Inputs.keyTap(Input.S)){
 				saveDialog.save();
 			}
 
-			if(Inputs.keyTap(Keys.G)){
+			if(Inputs.keyTap(Input.G)){
 				view.setGrid(!view.isGrid());
 			}
 		}

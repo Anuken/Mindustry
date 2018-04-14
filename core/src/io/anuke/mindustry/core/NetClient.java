@@ -271,7 +271,6 @@ public class NetClient extends Module {
 
             state.inventory.removeItems(UpgradeRecipes.get(weapon));
             control.upgrades().addWeapon(weapon);
-            ui.hudfrag.updateWeapons();
             Effects.sound("purchase");
         });
     }
