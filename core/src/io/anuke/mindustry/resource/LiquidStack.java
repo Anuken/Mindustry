@@ -1,6 +1,6 @@
 package io.anuke.mindustry.resource;
 
-public class LiquidStack {
+public class LiquidStack implements CarryItem{
     public Liquid liquid;
     public float amount;
 

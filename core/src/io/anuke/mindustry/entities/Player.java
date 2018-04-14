@@ -9,6 +9,7 @@ import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
+import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Mech;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
@@ -46,6 +47,7 @@ public class Player extends Unit{
 
 	public float targetAngle = 0f;
 	public boolean dashing = false;
+	public boolean selectingItem;
 
 	public int clientid = -1;
 	public boolean isLocal = false;
@@ -182,6 +184,15 @@ public class Player extends Unit{
 			Draw.rect(weapon.name + "-equip", x + tr.x, y + tr.y, w, 8, rotation - 90);
 		}
 
+		float backTrns = 4f, itemSize = 5f;
+		if(inventory.hasItem() && !control.input().isDroppingItem()){
+			ItemStack stack = inventory.getItem();
+			Draw.rect(stack.item.region, x + Angles.trnsx(rotation + 180f, backTrns), y + Angles.trnsy(rotation + 180f, backTrns), itemSize, itemSize, rotation);
+			//Draw.tint(Color.WHITE);
+			//Lines.circle(x + Angles.trnsx(rotation + 180f, backTrns), y + Angles.trnsy(rotation + 180f, backTrns), 3f + Mathf.absin(Timers.time(), 3f, 0.8f));
+			//Draw.tint(Color.WHITE);
+		}
+
 		Draw.alpha(1f);
 
 		x = px;
@@ -239,8 +250,7 @@ public class Player extends Unit{
 		movement.y += ya*speed;
 		movement.x += xa*speed;
 
-		boolean shooting = !Inputs.keyDown("dash") && Inputs.keyDown("shoot") && control.input().recipe == null
-				&& !ui.hasMouse() && !control.input().onConfigurable();
+		boolean shooting = control.input().canShoot() && control.input().isShooting();
 
 		if(shooting){
 			weaponLeft.update(player, true);

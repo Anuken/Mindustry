@@ -151,6 +151,7 @@ public class Control extends Module{
 			upgrades.reset();
 			player.weaponLeft = player.weaponRight = Weapons.blaster;
 			player.team = Team.blue;
+			player.inventory.clear();
 
 			player.add();
 			player.heal();

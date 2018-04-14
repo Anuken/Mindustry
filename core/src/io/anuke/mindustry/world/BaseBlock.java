@@ -1,7 +1,9 @@
 package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.math.GridPoint2;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.ucore.util.Mathf;
 
@@ -14,6 +16,15 @@ public abstract class BaseBlock {
     public float liquidCapacity = 10f;
     public float liquidFlowFactor = 4.9f;
     public float powerCapacity = 10f;
+
+    public boolean acceptStack(ItemStack item, Tile tile, Unit source){
+        return acceptItem(item.item, tile, tile) && hasInventory && source.team == tile.getTeam()
+                && tile.entity.inventory.totalItems() + item.amount <= itemCapacity;
+    }
+
+    public void handleStack(ItemStack item, Tile tile, Unit source){
+        tile.entity.inventory.addItem(item.item, item.amount);
+    }
 
     public void handleItem(Item item, Tile tile, Tile source){
         tile.entity.inventory.addItem(item, 1);

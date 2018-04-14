@@ -534,6 +534,23 @@ public class Renderer extends RendererModule{
 			}
 		}
 
+		if(control.input().isDroppingItem()){
+			Vector2 v = Graphics.mouseWorld();
+			float size = 8;
+			Draw.rect(player.inventory.getItem().item.region, v.x, v.y, size, size);
+			Draw.color("accent");
+			Lines.circle(v.x, v.y, 6 + Mathf.absin(Timers.time(), 5f, 1f));
+			Draw.reset();
+
+			Tile tile = world.tileWorld(v.x, v.y);
+			if(tile != null) tile = tile.target();
+			if(tile != null && tile.block().acceptStack(player.inventory.getItem(), tile, player)){
+				Draw.color("place");
+				Lines.square(tile.drawx(), tile.drawy(), tile.block().size*tilesize/2f + 1 + Mathf.absin(Timers.time(), 5f, 1f));
+				Draw.color();
+			}
+		}
+
 		//TODO draw health bars
 
 		/*

@@ -41,6 +41,20 @@ public class DesktopInput extends InputHandler{
 			breakMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
 		}
 
+		if(!Inputs.keyDown("select")){
+			shooting = false;
+		}
+
+		boolean canBeginShoot = Inputs.keyTap("select") && canShoot();
+
+		if(Inputs.keyTap("select") && recipe == null && player.inventory.hasAnything()){
+			Vector2 vec = Graphics.screen(player.x, player.y);
+			if(vec.dst(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY()) <= playerSelectRange){
+				canBeginShoot = false;
+				droppingItem = true;
+			}
+		}
+
 		if((Inputs.keyTap("select") && recipe != null) || Inputs.keyTap("break")){
 			Vector2 vec = Graphics.world(Gdx.input.getX(), Gdx.input.getY());
 			mousex = vec.x;
@@ -98,9 +112,18 @@ public class DesktopInput extends InputHandler{
 		Tile target = cursor == null ? null : cursor.target();
 		boolean showCursor = false;
 
+		if(droppingItem && Inputs.keyRelease("select") && player.inventory.hasAnything() && target != null){
+			dropItem(target, player.inventory.getItem());
+		}
+
+		if(droppingItem && (!Inputs.keyDown("select") || !player.inventory.hasAnything())){
+			droppingItem = false;
+		}
+
 		if(recipe == null && target != null && !ui.hasMouse() && Inputs.keyDown("block_info") && target.block().isAccessible()){
 			showCursor = true;
 			if(Inputs.keyTap("select")){
+				canBeginShoot = false;
 				ui.blockinvfrag.showFor(target);
                 Cursors.restoreCursor();
             }
@@ -117,11 +140,15 @@ public class DesktopInput extends InputHandler{
 		if(target != null && Inputs.keyTap("select") && !ui.hasMouse()){
 			if(target.block().isConfigurable(target)){
 				if((!ui.configfrag.isShown()
-						|| ui.configfrag.getSelectedTile().block().onConfigureTileTapped(ui.configfrag.getSelectedTile(), cursor)))
+						|| ui.configfrag.getSelectedTile().block().onConfigureTileTapped(ui.configfrag.getSelectedTile(), cursor))) {
 					ui.configfrag.showConfig(target);
+					canBeginShoot = false;
+				}
 			}else if(!ui.configfrag.hasConfigMouse()){
-				if(ui.configfrag.isShown() && ui.configfrag.getSelectedTile().block().onConfigureTileTapped(ui.configfrag.getSelectedTile(), cursor))
+				if(ui.configfrag.isShown() && ui.configfrag.getSelectedTile().block().onConfigureTileTapped(ui.configfrag.getSelectedTile(), cursor)) {
 					ui.configfrag.hideConfig();
+					canBeginShoot = false;
+				}
 			}
 
 			target.block().tapped(target);
@@ -154,6 +181,10 @@ public class DesktopInput extends InputHandler{
 
 		if(recipe != null){
 			showCursor = validPlace(tilex(), tiley(), control.input().recipe.result) && control.input().cursorNear();
+		}
+
+		if(canBeginShoot){
+			shooting = true;
 		}
 
 		if(!ui.hasMouse()) {

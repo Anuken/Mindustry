@@ -2,22 +2,26 @@ package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.function.Callable;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.event.HandCursorListener;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Strings;
 
 import static io.anuke.mindustry.Vars.player;
@@ -72,43 +76,32 @@ public class BlockInventoryFragment implements Fragment {
         int cols = 3;
         int row = 0;
 
-        //table.label(() -> "[accent]"+tile.entity.inventory.totalItems() +"/"+ tile.block().itemCapacity).colspan(cols);
-        //table.row();
         table.margin(3f);
+        table.defaults().size(16 * 2).space(6f);
 
         if(tile.block().hasPower){
-            Table t = new Table();
-            t.left().bottom();
-            t.label(() -> round(tile.entity.power.amount)).color(Color.DARK_GRAY);
-            t.row();
-            t.label(() -> round(tile.entity.power.amount)).padTop(-22);
-
-            Image image = new Image("icon-power");
-            image.setColor(Colors.get("power"));
-
-            Stack stack = new Stack();
-            stack.add(image);
-            stack.add(t);
-            table.add(stack).size(16 * 2).space(6f);
+            table.add(new ItemImage(Draw.region("icon-power"), () -> round(tile.entity.power.amount), Colors.get("power")));
 
             if (row++ % cols == cols - 1) table.row();
         }
 
         if(tile.block().hasLiquids){
-            Table t = new Table();
-            t.left().bottom();
-            t.label(() -> round(tile.entity.liquid.amount)).color(Color.DARK_GRAY);
-            t.row();
-            t.label(() -> round(tile.entity.liquid.amount)).padTop(-22);
+            ItemImage image = new ItemImage(Draw.region("icon-liquid"),
+                    () -> round(tile.entity.liquid.amount),
+                    tile.entity.liquid.liquid == Liquids.none ? Color.GRAY : tile.entity.liquid.liquid.color);
 
-            Image image = new Image("icon-liquid");
-            image.setColor(tile.entity.liquid.liquid == Liquids.none ? Color.GRAY : tile.entity.liquid.liquid.color);
+            image.addListener(new HandCursorListener());
+            image.tapped(() -> {
+                if (tile.entity.liquid.amount > 0) {
+                    /*
+                    int amount = Inputs.keyDown("item_withdraw") ? items[f] : 1;
+                    items[f] -= amount;
 
-            Stack stack = new Stack();
-            stack.add(image);
-            stack.add(t);
-            table.add(stack).size(16 * 2).space(6f);
+                    move(item.region, image, () -> player.inventory.addItem(item, amount), Color.WHITE);*/
+                }
+            });
 
+            table.add(image);
             if (row++ % cols == cols - 1) table.row();
         }
 
@@ -129,37 +122,17 @@ public class BlockInventoryFragment implements Fragment {
                 t.row();
                 t.label(() -> round(items[f])).padTop(-22);
 
-                Stack stack = new Stack();
-                stack.add(new Image(item.region));
-                stack.add(t);
-                table.add(stack).size(16 * 2).space(6f);
-                stack.addListener(new HandCursorListener());
-                stack.tapped(() -> {
+                ItemImage image = new ItemImage(item.region, () -> round(items[f]), Color.WHITE);
+                image.addListener(new HandCursorListener());
+                image.tapped(() -> {
                     if (items[f] > 0) {
                         int amount = Inputs.keyDown("item_withdraw") ? items[f] : 1;
                         items[f] -= amount;
-                        Vector2 v = stack.localToStageCoordinates(new Vector2(stack.getWidth() / 2f, stack.getHeight() / 2f));
-                        Vector2 tv = Graphics.screen(player.x, player.y);
-                        float tx = tv.x, ty = tv.y;
-                        float dur = 40f / 60f;
 
-                        Image image = new Image(item.region);
-                        image.setSize(32f, 32f);
-                        image.setOrigin(Align.center);
-                        image.setPosition(v.x, v.y, Align.center);
-                        image.setTouchable(Touchable.disabled);
-                        image.actions(
-                                Actions.parallel(
-                                        Actions.moveToAligned(tx, ty, Align.center, dur, Interpolation.fade),
-                                        Actions.scaleTo(0.1f, 0.1f, dur, Interpolation.fade)
-                                ),
-                                Actions.call(() -> player.inventory.addItem(item, amount)),
-                                Actions.removeActor()
-                        );
-
-                        Core.scene.add(image);
+                        move(item.region, image, () -> player.inventory.addItem(item, amount), Color.WHITE);
                     }
                 });
+                table.add(image);
 
                 if (row++ % cols == cols - 1) table.row();
             }
@@ -172,7 +145,32 @@ public class BlockInventoryFragment implements Fragment {
         updateTablePosition();
     }
 
-    String round(float f){
+    private void move(TextureRegion region, ItemImage image, Callable c, Color color){
+        Vector2 v = image.localToStageCoordinates(new Vector2(image.getWidth() / 2f, image.getHeight() / 2f));
+        Vector2 tv = Graphics.screen(player.x + Angles.trnsx(player.rotation + 180f, 5f), player.y + Angles.trnsy(player.rotation + 180f, 5f));
+        float tx = tv.x, ty = tv.y;
+        float dur = 40f / 60f;
+
+        Image mover = new Image(region);
+        mover.setColor(color);
+        mover.setSize(32f, 32f);
+        mover.setOrigin(Align.center);
+        mover.setPosition(v.x, v.y, Align.center);
+        mover.setTouchable(Touchable.disabled);
+        mover.actions(
+            Actions.parallel(
+                Actions.moveToAligned(tx, ty, Align.center, dur, Interpolation.fade),
+                Actions.scaleTo(0.7f, 0.7f, dur, Interpolation.fade),
+                Actions.rotateTo(player.rotation, dur, Interpolation.fade)
+            ),
+            Actions.call(c),
+            Actions.removeActor()
+        );
+
+        Core.scene.add(mover);
+    }
+
+    private String round(float f){
         f = (int)f;
         if(f >= 1000){
             return Strings.toFixed(f/1000, 1) + "k";

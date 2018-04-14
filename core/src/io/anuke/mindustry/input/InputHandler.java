@@ -3,6 +3,8 @@ package io.anuke.mindustry.input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
+import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.entities.ItemAnimationEffect;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.ItemStack;
@@ -10,8 +12,10 @@ import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Placement;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
@@ -24,6 +28,9 @@ public abstract class InputHandler extends InputAdapter{
 	public PlaceMode breakMode = android ? PlaceMode.none : PlaceMode.holdDelete;
 	public PlaceMode lastPlaceMode = placeMode;
 	public PlaceMode lastBreakMode = breakMode;
+	public boolean droppingItem;
+	public boolean shooting;
+	public float playerSelectRange = Unit.dp.scl(60f);
 
 	public abstract void update();
 	public abstract float getCursorX();
@@ -35,11 +42,42 @@ public abstract class InputHandler extends InputAdapter{
 	public int getBlockEndX(){ return Mathf.sclb(Graphics.world(getCursorEndX(), getCursorEndY()).x, tilesize, round2()); }
 	public int getBlockEndY(){ return Mathf.sclb(Graphics.world(getCursorEndX(), getCursorEndY()).y, tilesize, round2()); }
 	public void resetCursor(){}
+
+	public boolean canShoot(){
+		return recipe == null && !ui.hasMouse() && !onConfigurable() && !isDroppingItem();
+	}
+
+	public boolean isShooting(){
+		return shooting;
+	}
+
 	public boolean drawPlace(){ return true; }
 	
 	public boolean onConfigurable(){
 		Tile tile = world.tile(getBlockX(), getBlockY());
 		return tile != null && (tile.block().isConfigurable(tile) || (tile.isLinked() && tile.getLinked().block().isConfigurable(tile)));
+	}
+
+	public boolean isDroppingItem(){
+		return droppingItem;
+	}
+
+	public void dropItem(Tile tile, ItemStack stack){
+		if(tile.block().acceptStack(stack, tile, player)){
+			tile.block().handleStack(stack, tile, player);
+			player.inventory.clear();
+
+			float backTrns = 3f;
+
+			int sent = Mathf.clamp(stack.amount/3, 1, 8);
+			for(int i = 0; i < sent; i ++){
+				Timers.run(i * 3, () -> {
+					new ItemAnimationEffect(stack.item,
+							player.x + Angles.trnsx(rotation + 180f, backTrns), player.y + Angles.trnsy(rotation + 180f, backTrns),
+							tile.drawx(), tile.drawy()).add();
+				});
+			}
+		}
 	}
 	
 	public boolean cursorNear(){
