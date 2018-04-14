@@ -8,12 +8,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.content.Liquids;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.function.BooleanProvider;
 import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.actions.Actions;
@@ -22,10 +25,10 @@ import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
-import static io.anuke.mindustry.Vars.player;
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.*;
 
 public class BlockInventoryFragment implements Fragment {
     private Table table;
@@ -34,6 +37,7 @@ public class BlockInventoryFragment implements Fragment {
     @Override
     public void build() {
         table = new Table();
+        table.setVisible(() -> !state.is(State.menu));
     }
 
     public void showFor(Tile t){
@@ -122,14 +126,30 @@ public class BlockInventoryFragment implements Fragment {
                 t.row();
                 t.label(() -> round(items[f])).padTop(-22);
 
+                BooleanProvider canPick = () -> player.inventory.canAcceptItem(item);
+
+                HandCursorListener l = new HandCursorListener();
+                l.setEnabled(canPick);
+
                 ItemImage image = new ItemImage(item.region, () -> round(items[f]), Color.WHITE);
-                image.addListener(new HandCursorListener());
+                image.addListener(l);
                 image.tapped(() -> {
+                    if(!canPick.get()) return;
                     if (items[f] > 0) {
-                        int amount = Inputs.keyDown("item_withdraw") ? items[f] : 1;
+                        int amount = Math.min(Inputs.keyDown("item_withdraw") ? items[f] : 1, player.inventory.itemCapacityUsed(item));
                         items[f] -= amount;
 
-                        move(item.region, image, () -> player.inventory.addItem(item, amount), Color.WHITE);
+                        int sent = Mathf.clamp(amount/3, 1, 8);
+                        int per = Math.min(amount/sent, 5);
+                        int[] soFar = {amount};
+                        Vector2 v = image.localToStageCoordinates(new Vector2(image.getWidth() / 2f, image.getHeight() / 2f));
+                        for(int j = 0; j < sent; j ++){
+                            boolean all = j == sent-1;
+                            Timers.run(j*5, () -> move(item.region, v, () -> {
+                                player.inventory.addItem(item, all ? soFar[0] : per);
+                                soFar[0] -= per;
+                            }, Color.WHITE));
+                        }
                     }
                 });
                 table.add(image);
@@ -145,8 +165,7 @@ public class BlockInventoryFragment implements Fragment {
         updateTablePosition();
     }
 
-    private void move(TextureRegion region, ItemImage image, Callable c, Color color){
-        Vector2 v = image.localToStageCoordinates(new Vector2(image.getWidth() / 2f, image.getHeight() / 2f));
+    private void move(TextureRegion region, Vector2 v, Callable c, Color color){
         Vector2 tv = Graphics.screen(player.x + Angles.trnsx(player.rotation + 180f, 5f), player.y + Angles.trnsy(player.rotation + 180f, 5f));
         float tx = tv.x, ty = tv.y;
         float dur = 40f / 60f;

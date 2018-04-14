@@ -21,10 +21,7 @@ import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Timer;
-import io.anuke.ucore.util.Translator;
+import io.anuke.ucore.util.*;
 
 import java.nio.ByteBuffer;
 
@@ -187,10 +184,16 @@ public class Player extends Unit{
 		float backTrns = 4f, itemSize = 5f;
 		if(inventory.hasItem()){
 			ItemStack stack = inventory.getItem();
-			Draw.rect(stack.item.region, x + Angles.trnsx(rotation + 180f, backTrns), y + Angles.trnsy(rotation + 180f, backTrns), itemSize, itemSize, rotation);
-			//Draw.tint(Color.WHITE);
-			//Lines.circle(x + Angles.trnsx(rotation + 180f, backTrns), y + Angles.trnsy(rotation + 180f, backTrns), 3f + Mathf.absin(Timers.time(), 3f, 0.8f));
-			//Draw.tint(Color.WHITE);
+			int stored = Mathf.clamp(stack.amount / 6, 1, 8);
+
+			for(int i = 0; i < stored; i ++) {
+				float angT = i == 0 ? 0 : Mathf.randomSeedRange(i + 1, 60f);
+				float lenT = i == 0 ? 0 : Mathf.randomSeedRange(i + 2, 1f) - 1f;
+				Draw.rect(stack.item.region,
+						x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
+						y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
+						itemSize, itemSize, rotation);
+			}
 		}
 
 		Draw.alpha(1f);

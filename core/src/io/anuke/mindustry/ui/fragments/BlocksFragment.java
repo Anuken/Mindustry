@@ -28,7 +28,6 @@ import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
@@ -58,7 +57,6 @@ public class BlocksFragment implements Fragment{
 					int[] items = state.inventory.readItems();
 					for(int i = 0; i < items.length; i ++){
 						if(itemset.contains(items[i]) != (items[i] > 0)){
-							Log.info("Updating items.");
 							updateItems();
 							break;
 						}

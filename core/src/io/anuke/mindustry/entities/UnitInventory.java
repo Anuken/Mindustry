@@ -4,8 +4,28 @@ import io.anuke.mindustry.resource.*;
 
 public class UnitInventory {
     private final AmmoEntry ammo = new AmmoEntry(AmmoType.getByID(0), 0);
-
     private CarryItem item;
+    private int capacity;
+
+    public UnitInventory(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public int capacity(){
+        return capacity;
+    }
+
+    public int itemCapacityUsed(Item type){
+        if(canAcceptItem(type)){
+            return !hasItem() ? capacity : (capacity - getItem().amount);
+        }else{
+            return capacity;
+        }
+    }
+
+    public boolean canAcceptItem(Item type){
+        return !hasItem() || (getItem().item == type && capacity - getItem().amount > 0);
+    }
 
     public void clear(){
         item = null;

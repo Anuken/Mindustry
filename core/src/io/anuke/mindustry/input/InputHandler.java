@@ -64,12 +64,13 @@ public abstract class InputHandler extends InputAdapter{
 
 	public void dropItem(Tile tile, ItemStack stack){
 		if(tile.block().acceptStack(stack, tile, player)){
-			tile.block().handleStack(stack, tile, player);
-			player.inventory.clear();
+			int accepted = tile.block().handleStack(stack, tile, player);
+			stack.amount -= accepted;
+			if(stack.amount == 0) player.inventory.clear();
 
 			float backTrns = 3f;
 
-			int sent = Mathf.clamp(stack.amount/3, 1, 8);
+			int sent = Mathf.clamp(accepted/4, 1, 8);
 			for(int i = 0; i < sent; i ++){
 				Timers.run(i * 3, () -> {
 					new ItemAnimationEffect(stack.item,

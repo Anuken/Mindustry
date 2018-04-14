@@ -18,12 +18,14 @@ public abstract class BaseBlock {
     public float powerCapacity = 10f;
 
     public boolean acceptStack(ItemStack item, Tile tile, Unit source){
-        return acceptItem(item.item, tile, tile) && hasInventory && source.team == tile.getTeam()
-                && tile.entity.inventory.totalItems() + item.amount <= itemCapacity;
+        return acceptItem(item.item, tile, tile) && hasInventory && source.team == tile.getTeam();
     }
 
-    public void handleStack(ItemStack item, Tile tile, Unit source){
-        tile.entity.inventory.addItem(item.item, item.amount);
+    public int handleStack(ItemStack item, Tile tile, Unit source){
+        int total = tile.entity.inventory.totalItems();
+        int canAccept = Math.min(itemCapacity - total, item.amount);
+        tile.entity.inventory.addItem(item.item, canAccept);
+        return canAccept;
     }
 
     public void handleItem(Item item, Tile tile, Tile source){
