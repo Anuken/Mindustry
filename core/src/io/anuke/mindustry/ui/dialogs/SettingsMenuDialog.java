@@ -139,6 +139,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
 		graphics.checkPref("fps", false);
 		graphics.checkPref("lasers", true);
+        graphics.sliderPref("previewopacity", 50, 0, 100, i -> i + "%");
 		graphics.checkPref("indicators", true);
 		graphics.checkPref("healthbars", true);
 		graphics.checkPref("pixelate", true, b -> {
