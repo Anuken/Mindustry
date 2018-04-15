@@ -132,14 +132,14 @@ public class Placement {
             for(int dx = 0; dx < type.size; dx ++){
                 for(int dy = 0; dy < type.size; dy ++){
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-                    if(other == null || (other.block() != Blocks.air && !other.block().alwaysReplace) || isSpawnPoint(other)){
+                    if(other == null || (other.block() != Blocks.air && !other.block().alwaysReplace) || isSpawnPoint(other) || !other.floor().placeableOn){
                         return false;
                     }
                 }
             }
             return true;
         }else {
-            return (tile.getTeam() == Team.none || tile.getTeam() == team)
+            return (tile.getTeam() == Team.none || tile.getTeam() == team) && tile.floor().placeableOn
                     && ((type.canReplace(tile.block()) && !(type == tile.block() && rotation == tile.getRotation() && type.rotate)) || tile.block().alwaysReplace)
                     && tile.block().isMultiblock() == type.isMultiblock() || tile.block() == Blocks.air;
         }

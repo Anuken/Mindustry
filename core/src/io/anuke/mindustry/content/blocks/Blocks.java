@@ -37,6 +37,7 @@ public class Blocks {
     }},
 
     deepwater = new Floor("deepwater") {{
+        placeableOn = false;
         liquidColor = Color.valueOf("546bb3");
         speedMultiplier = 0.2f;
         variants = 0;

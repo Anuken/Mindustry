@@ -236,7 +236,11 @@ public class Player extends Unit{
 
 		dashing = Inputs.keyDown("dash");
 
-		float speed = dashing ? (debug ? Player.dashSpeed * 5f : Player.dashSpeed) : Player.speed;
+		float speed = dashing ? (debug ? Player.dashSpeed * 5f : Player.dashSpeed) : Player.speed ;
+
+		float carrySlowdown = 0.3f;
+
+		speed *= ((1f-carrySlowdown) +  (inventory.hasItem() ? (float)inventory.getItem().amount/inventory.capacity(): 1f) * carrySlowdown);
 
 		if(health < maxhealth && timer.get(timerRegen, 20))
 			health ++;
