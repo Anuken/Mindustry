@@ -32,7 +32,6 @@ public class Junction extends Block{
 
 		for(int i = 0; i < 2; i ++){
 			Buffer buffer = (i == 0 ? entity.bx : entity.by);
-
 			if(buffer.index > 0){
 				if(buffer.index > buffer.items.length) buffer.index = buffer.items.length;
 				long l = buffer.items[0];
@@ -46,13 +45,7 @@ public class Junction extends Block{
 					int direction = Bits.getRightShort(val);
 					Tile dest = tile.getNearby(direction);
 
-					if(dest == null || !dest.block().acceptItem(item, dest, tile)){
-						if(buffer.index > 1){
-							System.arraycopy(buffer.items, 1, buffer.items, 0, buffer.index - 1);
-							buffer.index --;
-						}
-						continue;
-					}
+					if(dest == null || !dest.block().acceptItem(item, dest, tile)) continue;
 
 					dest.block().handleItem(item, dest, tile);
 					System.arraycopy(buffer.items, 1, buffer.items, 0, buffer.index - 1);
