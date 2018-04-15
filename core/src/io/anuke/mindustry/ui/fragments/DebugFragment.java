@@ -3,12 +3,12 @@ package io.anuke.mindustry.ui.fragments;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import io.anuke.mindustry.content.UnitTypes;
-import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.effect.Fireball;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.builders.button;
 import io.anuke.ucore.scene.builders.label;
@@ -18,6 +18,7 @@ import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Log.LogHandler;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -55,7 +56,11 @@ public class DebugFragment implements Fragment {
                row();
                new button("blocks", "toggle", () -> showBlockDebug = !showBlockDebug);
                row();
-               new button("effect", () -> Effects.effect(BlockFx.teleport, player));
+               new button("effect", () -> {
+                   for(int i = 0; i < 20; i ++){
+                        new Fireball(player.x, player.y, Palette.darkFlame, Mathf.random(360f)).add();
+                   }
+               });
                row();
                new button("wave", () -> state.wavetime = 0f);
                row();

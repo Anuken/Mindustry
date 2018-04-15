@@ -15,6 +15,7 @@ public class StorageBlocks {
 
     vault = new Vault("vault"){{
         size = 3;
+        health = 600;
     }},
 
     unloader = new Unloader("unloader"){{

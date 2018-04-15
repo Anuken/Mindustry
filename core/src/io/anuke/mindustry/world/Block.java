@@ -18,6 +18,7 @@ import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.DrawLayer;
 import io.anuke.mindustry.graphics.Layer;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.Item;
@@ -214,7 +215,7 @@ public class Block extends BaseBlock {
 		float heat = 0f;
 		float power = 0f;
 		int units = 1;
-		tempColor.set(Color.WHITE);
+		tempColor.set(Palette.darkFlame);
 
 		if(hasInventory){
 			for(Item item : Item.getAllItems()){
@@ -256,9 +257,9 @@ public class Block extends BaseBlock {
 			});
 		}
 
-		for(int i = 0; i < Mathf.clamp(flammability / 20, 0, 20); i ++){
-			Timers.run(i, () -> {
-				Fireball f = new Fireball(x, y, Mathf.choose(tempColor, Color.LIGHT_GRAY), Mathf.random(360f));
+		for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i ++){
+			Timers.run(i/2, () -> {
+				Fireball f = new Fireball(x, y, tempColor, Mathf.random(360f));
 				f.add();
 			});
 		}
@@ -272,6 +273,22 @@ public class Block extends BaseBlock {
 		Effects.effect(ExplosionFx.blockExplosion, x, y);
 
 		DamageArea.damage(x, y, Mathf.clamp(size * tilesize + explosiveness, 0, 60f), 5 + explosiveness);
+	}
+
+	public float getFlammability(Tile tile){
+		if(!hasInventory || tile.entity == null){
+			return 0;
+		}else{
+			float result = 0f;
+			for(Item item : Item.getAllItems()){
+				int amount = tile.entity.inventory.getItem(item);
+				result += item.flammability*amount;
+			}
+			if(hasLiquids){
+				result += tile.entity.liquid.amount * tile.entity.liquid.liquid.flammability/3f;
+			}
+			return result;
+		}
 	}
 
 	public TextureRegion[] getIcon(){
