@@ -1,6 +1,5 @@
 package io.anuke.mindustry.mapeditor;
 
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -27,6 +26,7 @@ import io.anuke.ucore.scene.event.InputListener;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.Input;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
@@ -182,7 +182,7 @@ public class MapView extends Element implements GestureListener{
 		super.act(delta);
 
 		if(Core.scene.getKeyboardFocus() == null || !(Core.scene.getKeyboardFocus() instanceof TextField) &&
-				!Inputs.keyDown(Keys.CONTROL_LEFT)) {
+				!Inputs.keyDown(Input.CONTROL_LEFT)) {
 			float ax = Inputs.getAxis("move_x");
 			float ay = Inputs.getAxis("move_y");
 			offsetx -= ax * 15f / zoom;

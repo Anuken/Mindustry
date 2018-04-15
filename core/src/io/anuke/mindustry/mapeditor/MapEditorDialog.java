@@ -1,6 +1,5 @@
 package io.anuke.mindustry.mapeditor;
 
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -27,6 +26,7 @@ import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Input;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
@@ -340,20 +340,20 @@ public class MapEditorDialog extends Dialog{
 		}
 
 		//ctrl keys (undo, redo, save)
-		if(Inputs.keyDown(Keys.CONTROL_LEFT)){
-			if(Inputs.keyTap(Keys.Z)){
+		if(Inputs.keyDown(Input.CONTROL_LEFT)){
+			if(Inputs.keyTap(Input.Z)){
 				view.undo();
 			}
 
-			if(Inputs.keyTap(Keys.Y)){
+			if(Inputs.keyTap(Input.Y)){
 				view.redo();
 			}
 
-			if(Inputs.keyTap(Keys.S)){
+			if(Inputs.keyTap(Input.S)){
 				saveDialog.save();
 			}
 
-			if(Inputs.keyTap(Keys.G)){
+			if(Inputs.keyTap(Input.G)){
 				view.setGrid(!view.isGrid());
 			}
 		}
