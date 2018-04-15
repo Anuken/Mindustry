@@ -30,7 +30,7 @@ public abstract class InputHandler extends InputAdapter{
 	public PlaceMode breakMode = android ? PlaceMode.none : PlaceMode.holdDelete;
 	public PlaceMode lastPlaceMode = placeMode;
 	public PlaceMode lastBreakMode = breakMode;
-	public boolean droppingItem;
+	public boolean droppingItem, transferring;
 	public boolean shooting;
 	public float playerSelectRange = Unit.dp.scl(60f);
 
@@ -66,18 +66,33 @@ public abstract class InputHandler extends InputAdapter{
 
 	public void dropItem(Tile tile, ItemStack stack){
 		if(tile.block().acceptStack(stack, tile, player)){
+			if(transferring) return;
+
+			transferring = true;
 			int accepted = tile.block().handleStack(stack, tile, player);
-			stack.amount -= accepted;
-			if(stack.amount == 0) player.inventory.clear();
+			boolean clear = stack.amount == accepted;
 
 			float backTrns = 3f;
 
 			int sent = Mathf.clamp(accepted/4, 1, 8);
+			int removed = accepted/sent;
+			int[] remaining = {accepted};
+
 			for(int i = 0; i < sent; i ++){
+				boolean end = i == sent-1;
 				Timers.run(i * 3, () -> {
 					new ItemAnimationEffect(stack.item,
 							player.x + Angles.trnsx(rotation + 180f, backTrns), player.y + Angles.trnsy(rotation + 180f, backTrns),
 							tile.drawx(), tile.drawy()).add();
+
+					stack.amount -= removed;
+					remaining[0] -= removed;
+
+					if(end){
+						stack.amount -= remaining[0];
+						if(clear) player.inventory.clear();
+						transferring = false;
+					}
 				});
 			}
 		}else{
