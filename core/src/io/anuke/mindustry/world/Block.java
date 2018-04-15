@@ -1,23 +1,32 @@
 package io.anuke.mindustry.world;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.content.fx.ExplosionFx;
+import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.effect.DamageArea;
+import io.anuke.mindustry.entities.effect.Fireball;
+import io.anuke.mindustry.entities.effect.Lightning;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.DrawLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
+import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
@@ -32,7 +41,8 @@ public class Block extends BaseBlock {
 	private static ObjectMap<String, Block> map = new ObjectMap<>();
 
 	protected Array<Tile> tempTiles = new Array<>();
-	protected Vector2 offset = new Vector2();
+	protected Vector2 tempVector = new Vector2();
+	protected Color tempColor = new Color();
 
 	/**internal name*/
 	public final String name;
@@ -40,10 +50,6 @@ public class Block extends BaseBlock {
 	public final int id;
 	/**display name*/
 	public final String formalName;
-	/**played on destroy*/
-	public Effect explosionEffect = ExplosionFx.explosion; //TODO better explosion effect
-	/**played on destroy*/
-	public String explosionSound = "break";
 	/**whether this block has a tile entity that updates*/
 	public boolean update;
 	/**whether this block has health and can be destroyed*/
@@ -66,6 +72,8 @@ public class Block extends BaseBlock {
 	public float breaktime = 18;
 	/**tile entity health*/
 	public int health = 40;
+	/**base block explosiveness*/
+	public float baseExplosiveness = 0f;
 	/**the shadow drawn under the block*/
 	public String shadow = "shadow";
 	/**whether to display a different shadow per variant*/
@@ -89,7 +97,7 @@ public class Block extends BaseBlock {
 	/**Draw layer. Only used for 'cached' rendering.*/
 	public DrawLayer drawLayer = DrawLayer.normal;
 	/**Layer to draw extra stuff on.*/
-	public io.anuke.mindustry.graphics.Layer layer = null;
+	public Layer layer = null;
 	/**Extra layer to draw extra extra stuff on.*/
 	public Layer layer2 = null;
 	/**whether this block can be replaced in all cases*/
@@ -189,7 +197,7 @@ public class Block extends BaseBlock {
 		return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group;
 	}
 	
-	public int handleDamage(Tile tile, int amount){
+	public float handleDamage(Tile tile, float amount){
 		return amount;
 	}
 	
@@ -201,10 +209,69 @@ public class Block extends BaseBlock {
 	
 	public void onDestroyed(Tile tile){
 		float x = tile.worldx(), y = tile.worldy();
-		
-		Effects.shake(4f, 4f, x, y);
-		Effects.effect(explosionEffect, x, y);
-		Effects.sound(explosionSound, x, y);
+		float explosiveness = baseExplosiveness;
+		float flammability = 0f;
+		float heat = 0f;
+		float power = 0f;
+		int units = 1;
+		tempColor.set(Color.WHITE);
+
+		if(hasInventory){
+			for(Item item : Item.getAllItems()){
+				int amount = tile.entity.inventory.getItem(item);
+				explosiveness += item.explosiveness*amount;
+				flammability += item.flammability*amount;
+
+				if(item.flammability*amount > 0.5){
+					units ++;
+					Hue.addu(tempColor, item.flameColor);
+				}
+			}
+		}
+
+		if(hasLiquids){
+			float amount = tile.entity.liquid.amount;
+			explosiveness += tile.entity.liquid.liquid.explosiveness*amount/2f;
+			flammability += tile.entity.liquid.liquid.flammability*amount/2f;
+			heat += Mathf.clamp(tile.entity.liquid.liquid.temperature-0.5f)*amount/2f;
+
+			if(tile.entity.liquid.liquid.flammability*amount > 2f){
+				units ++;
+				Hue.addu(tempColor, tile.entity.liquid.liquid.flameColor);
+			}
+		}
+
+		if(hasPower){
+			power += tile.entity.power.amount;
+		}
+
+		tempColor.mul(1f/units);
+
+		for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i ++){
+			int branches = 5 + Mathf.clamp((int)(power/30), 1, 20);
+			Timers.run(i*2f + Mathf.random(4f), () -> {
+				Lightning l = new Lightning(Team.none, Fx.none, 3, x, y, Mathf.random(360f), branches + Mathf.range(2));
+				l.color = Colors.get("power");
+				l.add();
+			});
+		}
+
+		for(int i = 0; i < Mathf.clamp(flammability / 20, 0, 20); i ++){
+			Timers.run(i, () -> {
+				Fireball f = new Fireball(x, y, Mathf.choose(tempColor, Color.LIGHT_GRAY), Mathf.random(360f));
+				f.add();
+			});
+		}
+
+		if(explosiveness > 15f){
+			Effects.effect(ExplosionFx.shockwave, x, y);
+		}
+
+		float shake = Math.min(explosiveness/4f + 3f, 9f);
+		Effects.shake(shake, shake, x, y);
+		Effects.effect(ExplosionFx.blockExplosion, x, y);
+
+		DamageArea.damage(x, y, Mathf.clamp(size * tilesize + explosiveness, 0, 60f), 5 + explosiveness);
 	}
 
 	public TextureRegion[] getIcon(){
@@ -269,7 +336,7 @@ public class Block extends BaseBlock {
 	
 	/**Offset for placing and drawing multiblocks.*/
 	public Vector2 getPlaceOffset(){
-		return offset.set(((size + 1) % 2) * tilesize/2, ((size + 1) % 2) * tilesize/2);
+		return tempVector.set(((size + 1) % 2) * tilesize/2, ((size + 1) % 2) * tilesize/2);
 	}
 	
 	public boolean isMultiblock(){

@@ -25,6 +25,8 @@ public class Lightning extends TimedEntity {
     private Array<Vector2> lines = new Array<>();
     private float angle;
 
+    public Color color = Palette.lancerLaser;
+
     public Lightning(Team team, Effect effect, int damage, float x, float y, float targetAngle, int length){
         this.x = x;
         this.y = y;
@@ -83,7 +85,7 @@ public class Lightning extends TimedEntity {
     @Override
     public void draw() {
         float lx = x, ly = y;
-        Draw.color(Palette.lancerLaser, Color.WHITE, fin());
+        Draw.color(color, Color.WHITE, fin());
         for(int i = 0; i < lines.size; i ++){
             Vector2 v = lines.get(i);
             Lines.stroke(fout() * 3f + 1f-(float)i/lines.size);

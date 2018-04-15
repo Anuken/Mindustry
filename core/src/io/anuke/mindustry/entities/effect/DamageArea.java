@@ -66,18 +66,19 @@ public class DamageArea{
 	}
 
 	/**Damages everything in a radius.*/
-	public static void damage(float x, float y, float radius, int damage){
+	public static void damage(float x, float y, float radius, float damage){
 		damage(null, x, y, radius, damage);
 	}
 
 	/**Damages all entities and blocks in a radius that are enemies of the team.*/
-	public static void damage(Team team, float x, float y, float radius, int damage){
+	public static void damage(Team team, float x, float y, float radius, float damage){
 		Consumer<Unit> cons = entity -> {
 			if(entity.distanceTo(x, y) > radius){
 				return;
 			}
-			int amount = calculateDamage(x, y, entity.x, entity.y, radius, damage);
+			float amount = calculateDamage(x, y, entity.x, entity.y, radius, damage);
 			entity.damage(amount);
+			entity.velocity.add(tr.set(entity.x - x, entity.y - y).setLength(Mathf.clamp(damage/2f, 0, 6)));
 		};
 
 		rect.setSize(radius *2).setCenter(x, y);
@@ -92,7 +93,7 @@ public class DamageArea{
 			for(int dy= -trad; dy <= trad; dy ++){
 				Tile tile = world.tile(Mathf.scl2(x, tilesize) + dx, Mathf.scl2(y, tilesize) + dy);
 				if(tile != null && tile.entity != null && (team == null || state.teams.areEnemies(team, tile.getTeam())) && Vector2.dst(dx, dy, 0, 0) <= trad){
-					int amount = calculateDamage(x, y, tile.worldx(), tile.worldy(), radius, damage);
+					float amount = calculateDamage(x, y, tile.worldx(), tile.worldy(), radius, damage);
 					tile.entity.damage(amount);
 				}
 			}
@@ -100,9 +101,9 @@ public class DamageArea{
 
 	}
 	
-	private static int calculateDamage(float x, float y, float tx, float ty, float radius, int damage){
+	private static float calculateDamage(float x, float y, float tx, float ty, float radius, float damage){
 		float dist = Vector2.dst(x, y, tx, ty);
 		float scaled = 1f - dist/radius;
-		return (int)(damage * scaled);
+		return damage * scaled;
 	}
 }

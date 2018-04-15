@@ -47,5 +47,28 @@ public class ExplosionFx {
         });
 
         Draw.reset();
+    }),
+
+    blockExplosion = new Effect(30, e -> {
+        e.scaled(7, i -> {
+            Lines.stroke(3f * i.fout());
+            Lines.circle(e.x, e.y, 3f + i.fin()*10f);
+        });
+
+        Draw.color(Color.GRAY);
+
+        Angles.randLenVectors(e.id, 6, 2f + 19f * e.finpow(), (x, y) ->{
+            Fill.circle(e.x + x, e.y + y, e.fout()*3f + 0.5f);
+            Fill.circle(e.x + x/2f, e.y + y/2f, e.fout()*1f);
+        });
+
+        Draw.color(Palette.lighterOrange, Palette.lightOrange, Color.GRAY, e.fin());
+        Lines.stroke(1.5f * e.fout());
+
+        Angles.randLenVectors(e.id + 1, 8, 1f + 23f * e.finpow(), (x, y) -> {
+            Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), 1f + e.fout()*3f);
+        });
+
+        Draw.reset();
     });
 }

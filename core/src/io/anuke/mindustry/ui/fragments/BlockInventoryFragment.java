@@ -79,33 +79,6 @@ public class BlockInventoryFragment implements Fragment {
 
         table.margin(3f);
         table.defaults().size(16 * 2).space(6f);
-        /*
-
-        if(tile.block().hasPower){
-            table.add(new ItemImage(Draw.region("icon-power"), () -> round(tile.entity.power.amount), Colors.get("power")));
-
-            if (row++ % cols == cols - 1) table.row();
-        }
-
-        if(tile.block().hasLiquids){
-            ItemImage image = new ItemImage(Draw.region("icon-liquid"),
-                    () -> round(tile.entity.liquid.amount),
-                    tile.entity.liquid.liquid == Liquids.none ? Color.GRAY : tile.entity.liquid.liquid.color);
-
-            image.addListener(new HandCursorListener());
-            image.tapped(() -> {
-                if (tile.entity.liquid.amount > 0) {
-                    /*
-                    int amount = Inputs.keyDown("item_withdraw") ? items[f] : 1;
-                    items[f] -= amount;
-
-                    move(item.region, image, () -> player.inventory.addItem(item, amount), Color.WHITE);
-                }
-            });
-
-            table.add(image);
-            if (row++ % cols == cols - 1) table.row();
-        }*/
 
         if(tile.block().hasInventory) {
             int[] items = tile.entity.inventory.items;

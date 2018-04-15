@@ -15,6 +15,8 @@ public class TeamInfo {
             enemies = new ObjectSet<>();
     private ObjectSet<TeamData> allyData = new ObjectSet<>(),
             enemyData = new ObjectSet<>();
+    private ObjectSet<TeamData> allTeamData = new ObjectSet<>();
+    private ObjectSet<Team> allTeams = new ObjectSet<>();
 
     public ObjectSet<TeamData> getTeams(boolean ally) {
         return ally ? allyData : enemyData;
@@ -38,6 +40,9 @@ public class TeamInfo {
             enemyData.add(data);
         }
 
+        allTeamData.add(data);
+        allTeams.add(team);
+
         map.put(team, data);
     }
 
@@ -59,8 +64,8 @@ public class TeamInfo {
         boolean ally = allies.contains(team);
         boolean enemy = enemies.contains(team);
 
-        //this team isn't even in the game, so target nothing!
-        if(!ally && !enemy) return empty;
+        //this team isn't even in the game, so target everything!
+        if(!ally && !enemy) return allTeams;
 
         return ally ? enemies : allies;
     }
@@ -72,8 +77,8 @@ public class TeamInfo {
         boolean ally = allies.contains(team);
         boolean enemy = enemies.contains(team);
 
-        //this team isn't even in the game, so target nothing!
-        if(!ally && !enemy) return emptyData;
+        //this team isn't even in the game, so target everything!
+        if(!ally && !enemy) return allTeamData;
 
         return ally ? enemyData : allyData;
     }
@@ -83,7 +88,7 @@ public class TeamInfo {
         if(team == other) return false; //fast fail to be more efficient
         boolean ally = allies.contains(team);
         boolean ally2 = enemies.contains(other);
-        return ally == ally2;
+        return (ally == ally2) || !allTeams.contains(team); //if it's not in the game, target everything.
     }
 
     public class TeamData {

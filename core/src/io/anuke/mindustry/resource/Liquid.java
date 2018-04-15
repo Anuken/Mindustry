@@ -22,6 +22,8 @@ public class Liquid {
 	public float viscosity = 0.5f;
 	/**how prone to exploding this liquid is, when heated. 0 = nothing, 1 = nuke*/
 	public float explosiveness;
+	/**the burning color of this liquid*/
+	public Color flameColor = Color.valueOf("ffb763");
 	
 	public Liquid(String name, Color color) {
 		this.name = name;

@@ -22,7 +22,7 @@ public class TurretBullets {
 
     public static final BulletType
 
-    basicIron = new BulletType(3f, 0) {
+    basicIron = new BulletType(3f, 5) {
         @Override
         public void draw(Bullet b) {
             drawBullet(Palette.bulletYellow, Palette.bulletYellowBack,

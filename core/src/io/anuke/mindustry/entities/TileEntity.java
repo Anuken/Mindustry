@@ -86,10 +86,10 @@ public class TileEntity extends Entity{
 		damage(other.getDamage());
 	}
 	
-	public void damage(int damage){
+	public void damage(float damage){
 		if(dead) return;
 		
-		int amount = tile.block().handleDamage(tile, damage);
+		float amount = tile.block().handleDamage(tile, damage);
 		health -= amount;
 		if(health <= 0) onDeath();
 

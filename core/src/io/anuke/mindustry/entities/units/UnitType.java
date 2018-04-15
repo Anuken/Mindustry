@@ -102,6 +102,7 @@ public abstract class UnitType {
     public void onDeath(BaseUnit unit){
         //TODO other things, such as enemies?
         Effects.effect(ExplosionFx.explosion, unit);
+        Effects.shake(2f, 2f, unit);
 
         if(Net.server()){
             NetEvents.handleUnitDeath(unit);

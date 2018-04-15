@@ -23,7 +23,7 @@ public class ShieldedWallBlock extends PowerBlock{
 	}
 	
 	@Override
-	public int handleDamage(Tile tile, int amount){
+	public float handleDamage(Tile tile, float amount){
 		float drain = amount * powerPerDamage;
 		ShieldedWallEntity entity = tile.entity();
 		

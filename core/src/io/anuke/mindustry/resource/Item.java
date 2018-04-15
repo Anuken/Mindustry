@@ -3,6 +3,7 @@ package io.anuke.mindustry.resource;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Bundles;
 
@@ -25,6 +26,8 @@ public class Item implements Comparable<Item>{
 	public boolean material = true;
 	/**drill hardness of the item*/
 	public int hardness = 0;
+	/**the burning color of this item*/
+	public Color flameColor = Palette.darkFlame.cpy();
 
 	public Item(String name, Color color) {
 		this.id = items.size;

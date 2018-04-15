@@ -51,6 +51,8 @@ public class DebugFragment implements Fragment {
                row();
                new button("noclip", "toggle", () -> noclip = !noclip);
                row();
+               new button("team", "toggle", () -> player.team = (player.team == Team.blue ? Team.red : Team.blue));
+               row();
                new button("blocks", "toggle", () -> showBlockDebug = !showBlockDebug);
                row();
                new button("effect", () -> Effects.effect(BlockFx.teleport, player));
