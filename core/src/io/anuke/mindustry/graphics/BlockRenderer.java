@@ -304,8 +304,7 @@ public class BlockRenderer{
 			}
 			
 			if(block instanceof Turret) {
-				Draw.reset();
-				Draw.alpha(opacity);
+                Draw.alpha(opacity);
 				if (block.isMultiblock()) {
 					Draw.rect("block-" + block.width + "x" + block.height, drawx, drawy);
 				} else {
@@ -314,12 +313,10 @@ public class BlockRenderer{
 			}
 
 			drawPreview(block, drawx, drawy, rotation, opacity);
-
-			if(block instanceof Drill || block instanceof Pump) {
-				Tile tile = world.tile(tilex, tiley);
-				if(block.isLayer(tile)) {
-					block.drawLayer(tile);
-				}
+			
+			Tile tile = world.tile(tilex, tiley);
+			if((block instanceof Drill || block instanceof Pump) && block.isLayer(tile)) {
+				block.drawLayer(tile);
 			}
 			
 			Draw.reset();
