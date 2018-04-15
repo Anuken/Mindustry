@@ -77,7 +77,7 @@ public class EMP extends TimedEntity{
 			
 			drawLine(target.worldx(), target.worldy());
 			
-			float rad = 5f*fin();
+			float rad = 5f*fout();
 			Draw.rect("circle", target.worldx(), target.worldy(), rad, rad);
 		}
 		
@@ -86,7 +86,7 @@ public class EMP extends TimedEntity{
 			drawLine(x + tr.x, y + tr.y);
 		}
 	
-		Lines.stroke(fin()*2f);
+		Lines.stroke(fout()*2f);
 		Lines.poly(x, y, 34, radius * tilesize);
 		
 		Draw.reset();
@@ -114,7 +114,7 @@ public class EMP extends TimedEntity{
 	}
 	
 	private void drawLaser(float x, float y, float x2, float y2){
-		Lines.stroke(fin() * 2f);
+		Lines.stroke(fout() * 2f);
 		Lines.line(x, y, x2, y2);
 	}
 }
