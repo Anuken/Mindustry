@@ -1,13 +1,11 @@
 package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.IntSet;
-import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.ui.ItemImage;
@@ -18,7 +16,6 @@ import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.BooleanProvider;
 import io.anuke.ucore.function.Callable;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.event.HandCursorListener;
 import io.anuke.ucore.scene.event.Touchable;
@@ -82,6 +79,7 @@ public class BlockInventoryFragment implements Fragment {
 
         table.margin(3f);
         table.defaults().size(16 * 2).space(6f);
+        /*
 
         if(tile.block().hasPower){
             table.add(new ItemImage(Draw.region("icon-power"), () -> round(tile.entity.power.amount), Colors.get("power")));
@@ -101,13 +99,13 @@ public class BlockInventoryFragment implements Fragment {
                     int amount = Inputs.keyDown("item_withdraw") ? items[f] : 1;
                     items[f] -= amount;
 
-                    move(item.region, image, () -> player.inventory.addItem(item, amount), Color.WHITE);*/
+                    move(item.region, image, () -> player.inventory.addItem(item, amount), Color.WHITE);
                 }
             });
 
             table.add(image);
             if (row++ % cols == cols - 1) table.row();
-        }
+        }*/
 
         if(tile.block().hasInventory) {
             int[] items = tile.entity.inventory.items;

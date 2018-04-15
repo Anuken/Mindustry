@@ -194,7 +194,7 @@ public class Block extends BaseBlock {
 	public void update(Tile tile){}
 
 	public boolean isAccessible(){
-		return (hasInventory && itemCapacity > 0) || hasLiquids || hasPower;
+		return (hasInventory && itemCapacity > 0);
 	}
 	
 	public void onDestroyed(Tile tile){

@@ -47,7 +47,7 @@ public class DesktopInput extends InputHandler{
 
 		boolean canBeginShoot = Inputs.keyTap("select") && canShoot();
 
-		if(Inputs.keyTap("select") && recipe == null && player.inventory.hasAnything()){
+		if(Inputs.keyTap("select") && recipe == null && player.inventory.hasItem()){
 			Vector2 vec = Graphics.screen(player.x, player.y);
 			if(vec.dst(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY()) <= playerSelectRange){
 				canBeginShoot = false;
@@ -112,11 +112,11 @@ public class DesktopInput extends InputHandler{
 		Tile target = cursor == null ? null : cursor.target();
 		boolean showCursor = false;
 
-		if(droppingItem && Inputs.keyRelease("select") && player.inventory.hasAnything() && target != null){
+		if(droppingItem && Inputs.keyRelease("select") && !player.inventory.isEmpty() && target != null){
 			dropItem(target, player.inventory.getItem());
 		}
 
-		if(droppingItem && (!Inputs.keyDown("select") || !player.inventory.hasAnything())){
+		if(droppingItem && (!Inputs.keyDown("select") || player.inventory.isEmpty())){
 			droppingItem = false;
 		}
 

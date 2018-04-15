@@ -4,7 +4,7 @@ import io.anuke.mindustry.resource.*;
 
 public class UnitInventory {
     private final AmmoEntry ammo = new AmmoEntry(AmmoType.getByID(0), 0);
-    private CarryItem item;
+    private ItemStack item;
     private int capacity;
 
     public UnitInventory(int capacity) {
@@ -15,32 +15,28 @@ public class UnitInventory {
         return capacity;
     }
 
+    public boolean isEmpty(){
+        return item == null;
+    }
+
     public int itemCapacityUsed(Item type){
         if(canAcceptItem(type)){
-            return !hasItem() ? capacity : (capacity - getItem().amount);
+            return !hasItem() ? capacity : (capacity - item.amount);
         }else{
             return capacity;
         }
     }
 
     public boolean canAcceptItem(Item type){
-        return !hasItem() || (getItem().item == type && capacity - getItem().amount > 0);
+        return !hasItem() || (item.item == type && capacity - item.amount > 0);
     }
 
     public void clear(){
         item = null;
     }
 
-    public boolean hasAnything(){
-        return item != null;
-    }
-
-    public boolean hasLiquid(){
-        return item instanceof LiquidStack;
-    }
-
     public boolean hasItem(){
-        return item instanceof ItemStack;
+        return item != null;
     }
 
     public void addItem(Item item, int amount){
@@ -52,22 +48,9 @@ public class UnitInventory {
         }
     }
 
-    public void addLiquid(Liquid liquid, float amount){
-        if(hasItem()){
-            getLiquid().liquid = liquid;
-            getLiquid().amount = amount;
-        }else{
-            this.item = new LiquidStack(liquid, amount);
-        }
-    }
 
     public ItemStack getItem(){
         if(!hasItem()) throw new RuntimeException("This inventory has no item! Check hasItem() first.");
-        return (ItemStack)item;
-    }
-
-    public LiquidStack getLiquid(){
-        if(!hasItem()) throw new RuntimeException("This inventory has no item! Check hasItem() first.");
-        return (LiquidStack)item;
+        return item;
     }
 }
