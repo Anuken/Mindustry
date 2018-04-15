@@ -2,6 +2,7 @@ package io.anuke.mindustry.graphics;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Array;
@@ -17,11 +18,11 @@ import io.anuke.mindustry.world.blocks.types.production.Drill;
 import io.anuke.mindustry.world.blocks.types.production.Pump;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.graphics.CacheBatch;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.core.*;
 
 import java.util.Arrays;
 
@@ -285,8 +286,7 @@ public class BlockRenderer{
 		cbatch = new CacheBatch(world.width() * world.height() * 4);
 	}
 	
-	public void drawPreview(Block block, float drawx, float drawy, float rotation, float opacity) {
-		Draw.reset();
+	 public void drawPreview(Block block, float drawx, float drawy, float rotation, float opacity) {
 		Draw.alpha(opacity);
 		Draw.rect(block.name(), drawx, drawy, rotation);
 	}
@@ -296,15 +296,17 @@ public class BlockRenderer{
 		if(control.input().recipe != null && state.inventory.hasItems(control.input().recipe.requirements)
 		   && control.input().validPlace(tilex, tiley, block) && (android || control.input().cursorNear())) {
 			
-			float opacity = (float)Settings.getInt("previewopacity")/100f;
-			
 			if(block.isMultiblock()) {
 				if((tiley - control.input().getBlockY()) % block.height != 0
 				   || (tilex - control.input().getBlockX()) % block.width != 0) return;
 			}
 			
+			
+			float opacity = (float) Settings.getInt("previewopacity") / 100f;
+			Draw.color(Color.WHITE);
+			Draw.alpha(opacity);
+			
 			if(block instanceof Turret) {
-				Draw.alpha(opacity);
 				if (block.isMultiblock()) {
 					Draw.rect("block-" + block.width + "x" + block.height, drawx, drawy);
 				} else {
@@ -313,11 +315,6 @@ public class BlockRenderer{
 			}
 			
 			drawPreview(block, drawx, drawy, rotation, opacity);
-			
-			Tile tile = world.tile(tilex, tiley);
-			if((block instanceof Drill || block instanceof Pump) && block.isLayer(tile)) {
-				block.drawLayer(tile);
-			}
 			
 			Draw.reset();
 		}

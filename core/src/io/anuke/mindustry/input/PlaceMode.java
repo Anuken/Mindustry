@@ -7,7 +7,6 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.production.Drill;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
@@ -35,6 +34,8 @@ public enum PlaceMode{
 			
 			float si = MathUtils.sin(Timers.time() / 6f) + 1.5f;
 			
+			renderer.getBlocks().handlePreview(control.input().recipe.result, control.input().recipe.result.rotate ? control.input().rotation * 90 : 0f, x + offset.x, y + offset.y, tilex, tiley);
+			
 			Draw.color(valid ? Colors.get("place") : Colors.get("placeInvalid"));
 			Lines.stroke(2f);
 			Lines.crect(x + offset.x, y + offset.y, tilesize * control.input().recipe.result.width + si,
@@ -42,13 +43,10 @@ public enum PlaceMode{
 			
 			control.input().recipe.result.drawPlace(tilex, tiley, control.input().rotation, valid);
 			
-			renderer.getBlocks().handlePreview(control.input().recipe.result, control.input().recipe.result.rotate ? control.input().rotation * 90 : 0f, x + offset.x, y + offset.y, tilex, tiley);
-			
 			if(control.input().recipe.result.rotate){
 				
 				Draw.color(Colors.get("placeRotate"));
 				tr.trns(control.input().rotation * 90, 7, 0);
-				Lines.stroke(2f);
 				Lines.line(x, y, x + tr.x, y + tr.y);
 			}
 		}
@@ -277,8 +275,6 @@ public enum PlaceMode{
 				Draw.alpha(0.3f);
 				Draw.crect("blank", x, y, x2 - x, y2 - y);
 				
-				Draw.color(Colors.get("placeInvalid"));
-				
 				int amount = 1;
 				for(int cx = 0; cx <= Math.abs(endx - tilex); cx ++){
 					for(int cy = 0; cy <= Math.abs(endy - tiley); cy ++){
@@ -288,9 +284,11 @@ public enum PlaceMode{
 						renderer.getBlocks().handlePreview(control.input().recipe.result, control.input().recipe.result.rotate ? rotation * 90 : 0f, px * t + offset.x, py * t + offset.y, px, py);
 						
 						if(!control.input().validPlace(px, py, control.input().recipe.result)
-						   || !state.inventory.hasItems(control.input().recipe.requirements, amount))
+						   || !state.inventory.hasItems(control.input().recipe.requirements, amount)){
+							Lines.stroke(2f);
+							Draw.color(Colors.get("placeInvalid"));
 							Lines.crect(px * t + offset.x, py * t + offset.y, t*block.width, t*block.height);
-						
+						}
 						amount ++;
 					}
 				}
