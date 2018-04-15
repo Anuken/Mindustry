@@ -3,9 +3,9 @@ package io.anuke.mindustry.world;
 import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Translator;
 
 public abstract class BaseBlock {
     public boolean hasInventory = true;
@@ -17,15 +17,29 @@ public abstract class BaseBlock {
     public float liquidFlowFactor = 4.9f;
     public float powerCapacity = 10f;
 
-    public boolean acceptStack(ItemStack item, Tile tile, Unit source){
-        return acceptItem(item.item, tile, tile) && hasInventory && source.team == tile.getTeam();
+    /**Returns the amount of items this block can accept.*/
+    public int acceptStack(Item item, int amount, Tile tile, Unit source){
+        if(acceptItem(item, tile, tile) && hasInventory && source.team == tile.getTeam()){
+            return Math.min(itemCapacity - tile.entity.inventory.totalItems(), amount);
+        }else{
+            return 0;
+        }
     }
 
-    public int handleStack(ItemStack item, Tile tile, Unit source){
-        int total = tile.entity.inventory.totalItems();
-        int canAccept = Math.min(itemCapacity - total, item.amount);
-        tile.entity.inventory.addItem(item.item, canAccept);
-        return canAccept;
+    /**Remove a stack from this inventory, and return the amount removed.*/
+    public int removeStack(Tile tile, Item item, int amount){
+        tile.entity.inventory.removeItem(item, amount);
+        return amount;
+    }
+
+    /**Handle a stack input.*/
+    public void handleStack(Item item, int amount, Tile tile, Unit source){
+        tile.entity.inventory.addItem(item, amount);
+    }
+
+    /**Returns offset for stack placement.*/
+    public void getStackOffset(Item item, Tile tile, Translator trns){
+
     }
 
     public void handleItem(Item item, Tile tile, Tile source){

@@ -1,13 +1,13 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
 import com.badlogic.gdx.utils.LongArray;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockGroup;
-import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -16,9 +16,6 @@ import io.anuke.ucore.util.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.AbstractList;
-import java.util.Collections;
-import java.util.List;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -26,11 +23,11 @@ public class Conveyor extends Block{
 	private static ItemPos drawpos = new ItemPos();
 	private static ItemPos pos1 = new ItemPos();
 	private static ItemPos pos2 = new ItemPos();
+
 	private static final float itemSpace = 0.135f * 2.2f;
 	private static final float offsetScl = 128f*3f;
 	private static final float minmove = 1f / (Short.MAX_VALUE - 2);
-
-	public static final float itemSize = 5f;
+	private static final float itemSize = 5f;
 
 	private final Translator tr1 = new Translator();
 	private final Translator tr2 = new Translator();
@@ -44,8 +41,11 @@ public class Conveyor extends Block{
 		update = true;
 		layer = Layer.overlay;
 		group = BlockGroup.transportation;
-		hasInventory = false;
+		hasInventory = true;
 	}
+
+	@Override
+	public void setBars() {}
 
 	@Override
 	public void setStats(){
@@ -119,45 +119,46 @@ public class Conveyor extends Block{
 	}
 
 	@Override
-	public void update(Tile tile){
+	public synchronized void update(Tile tile){
 
 		ConveyorEntity entity = tile.entity();
 		entity.minitem = 1f;
 
 		int minremove = Integer.MAX_VALUE;
-		float speed = Math.max(this.speed - (1f - (carryCapacity - entity.carrying)/carryCapacity), 0f);
+		float speed = Math.max(this.speed - (1f - (carryCapacity - entity.carrying) / carryCapacity), 0f);
 
-		for(int i = entity.convey.size - 1; i >= 0; i --){
+		for (int i = entity.convey.size - 1; i >= 0; i--) {
 			long value = entity.convey.get(i);
 			ItemPos pos = pos1.set(value, ItemPos.updateShorts);
 
 			//..this should never happen, but in case it does, remove it and stop here
-			if(pos.item == null){
+			if (pos.item == null) {
 				entity.convey.removeValue(value);
 				break;
 			}
 
 			float nextpos = (i == entity.convey.size - 1 ? 100f : pos2.set(entity.convey.get(i + 1), ItemPos.updateShorts).y) - itemSpace;
-			if(entity.minCarry >= pos.y && entity.minCarry <= nextpos){
+			if (entity.minCarry >= pos.y && entity.minCarry <= nextpos) {
 				nextpos = entity.minCarry;
 			}
 			float maxmove = Math.min(nextpos - pos.y, speed * Timers.delta());
 
-			if(maxmove > minmove){
+			if (maxmove > minmove) {
 				pos.y += maxmove;
 				pos.x = Mathf.lerpDelta(pos.x, 0, 0.06f);
-			}else{
-				pos.x = Mathf.lerpDelta(pos.x, pos.seed/offsetScl, 0.1f);
+			} else {
+				pos.x = Mathf.lerpDelta(pos.x, pos.seed / offsetScl, 0.1f);
 			}
 
 			pos.y = Mathf.clamp(pos.y);
 
-			if(pos.y >= 0.9999f && offloadDir(tile, pos.item)){
+			if (pos.y >= 0.9999f && offloadDir(tile, pos.item)) {
 				minremove = Math.min(i, minremove);
-			}else{
+				tile.entity.inventory.removeItem(pos.item, 1);
+			} else {
 				value = pos.pack();
 
-				if(pos.y < entity.minitem)
+				if (pos.y < entity.minitem)
 					entity.minitem = pos.y;
 				entity.convey.set(i, value);
 			}
@@ -166,12 +167,53 @@ public class Conveyor extends Block{
 		entity.carrying = 0f;
 		entity.minCarry = 2f;
 
-		if(minremove != Integer.MAX_VALUE) entity.convey.truncate(minremove);
+		if (minremove != Integer.MAX_VALUE) entity.convey.truncate(minremove);
+
 	}
 
 	@Override
-	public TileEntity getEntity(){
-		return new ConveyorEntity();
+	public boolean isAccessible(){
+		return true;
+	}
+
+	@Override
+	public synchronized int removeStack(Tile tile, Item item, int amount) {
+		ConveyorEntity entity = tile.entity();
+		int removed = 0;
+
+		for(int j = 0; j < amount; j ++) {
+			for (int i = 0; i < entity.convey.size; i++) {
+				long val = entity.convey.get(i);
+				ItemPos pos = pos1.set(val, ItemPos.drawShorts);
+				if(pos.item == item){
+					entity.convey.removeValue(val);
+					entity.inventory.removeItem(item, 1);
+					removed ++;
+					break;
+				}
+			}
+		}
+		return removed;
+	}
+
+	@Override
+	public void getStackOffset(Item item, Tile tile, Translator trns) {
+		trns.trns(tile.getRotation()*90 + 180f, tilesize/2f);
+	}
+
+	@Override
+	public synchronized int acceptStack(Item item, int amount, Tile tile, Unit source) {
+		ConveyorEntity entity = tile.entity();
+		return entity.minitem > itemSpace ? 1 : 0;
+	}
+
+	@Override
+	public synchronized void handleStack(Item item, int amount, Tile tile, Unit source) {
+		ConveyorEntity entity = tile.entity();
+
+		long result = ItemPos.packItem(item, 0f, 0f, (byte)Mathf.random(255));
+		entity.convey.insert(0, result);
+		entity.inventory.addItem(item, 1);
 	}
 
 	@Override
@@ -196,6 +238,8 @@ public class Conveyor extends Block{
 		long result = ItemPos.packItem(item, y*0.9f, pos, (byte)Mathf.random(255));
 		boolean inserted = false;
 
+		tile.entity.inventory.addItem(item, 1);
+
 		for(int i = 0; i < entity.convey.size; i ++){
 			if(compareItems(result, entity.convey.get(i)) < 0){
 				entity.convey.insert(i, result);
@@ -208,6 +252,11 @@ public class Conveyor extends Block{
 		if(!inserted){
 			entity.convey.add(result);
 		}
+	}
+
+	@Override
+	public TileEntity getEntity(){
+		return new ConveyorEntity();
 	}
 
 	public static class ConveyorEntity extends TileEntity{
@@ -235,33 +284,7 @@ public class Conveyor extends Block{
 			for(int i = 0; i < amount; i ++){
 				convey.add(ItemPos.toLong(stream.readInt()));
 			}
-
-			sort(convey.items, convey.size);
 		}
-	}
-
-	private static void sort(long[] elements, int length){
-		List<Long> wrapper = new AbstractList<Long>() {
-
-			@Override
-			public Long get(int index) {
-				return elements[index];
-			}
-
-			@Override
-			public int size() {
-				return length;
-			}
-
-			@Override
-			public Long set(int index, Long element) {
-				long v = elements[index];
-				elements[index] = element;
-				return v;
-			}
-		};
-
-		Collections.sort(wrapper, Conveyor::compareItems);
 	}
 
 	private static int compareItems(Long a, Long b){

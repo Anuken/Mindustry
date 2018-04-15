@@ -2,10 +2,8 @@ package io.anuke.mindustry.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
-import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.ItemAnimationEffect;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
@@ -19,6 +17,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Translator;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -33,6 +32,8 @@ public abstract class InputHandler extends InputAdapter{
 	public boolean droppingItem, transferring;
 	public boolean shooting;
 	public float playerSelectRange = Unit.dp.scl(60f);
+
+	private Translator stackTrns = new Translator();
 
 	public abstract void update();
 	public abstract float getCursorX();
@@ -65,25 +66,36 @@ public abstract class InputHandler extends InputAdapter{
 	}
 
 	public void dropItem(Tile tile, ItemStack stack){
-		if(tile.block().acceptStack(stack, tile, player)){
+		int accepted = tile.block().acceptStack(stack.item, stack.amount, tile, player);
+
+		if(accepted > 0){
 			if(transferring) return;
 
 			transferring = true;
-			int accepted = tile.block().handleStack(stack, tile, player);
 			boolean clear = stack.amount == accepted;
 
 			float backTrns = 3f;
 
 			int sent = Mathf.clamp(accepted/4, 1, 8);
 			int removed = accepted/sent;
-			int[] remaining = {accepted};
+			int[] remaining = {accepted, accepted};
 
 			for(int i = 0; i < sent; i ++){
 				boolean end = i == sent-1;
 				Timers.run(i * 3, () -> {
+					tile.block().getStackOffset(stack.item, tile, stackTrns);
+
 					new ItemAnimationEffect(stack.item,
 							player.x + Angles.trnsx(rotation + 180f, backTrns), player.y + Angles.trnsy(rotation + 180f, backTrns),
-							tile.drawx(), tile.drawy()).add();
+							tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y, () -> {
+
+						tile.block().handleStack(stack.item, removed, tile, player);
+						remaining[1] -= removed;
+
+						if(end && remaining[1] > 0) {
+							tile.block().handleStack(stack.item, remaining[1], tile, player);
+						}
+					}).add();
 
 					stack.amount -= removed;
 					remaining[0] -= removed;
@@ -107,7 +119,7 @@ public abstract class InputHandler extends InputAdapter{
 								y = player.y + Angles.trnsy(rotation + 180f, backTrns);
 
 						ItemAnimationEffect e = new ItemAnimationEffect(stack.item,
-								x, y, x + Mathf.range(20f), y + Mathf.range(20f)).add();
+								x, y, x + Mathf.range(20f), y + Mathf.range(20f), () -> {}).add();
 						e.interp = Interpolation.pow3Out;
 						e.endSize = 0.5f;
 						e.lifetime = 20;
@@ -151,43 +163,10 @@ public abstract class InputHandler extends InputAdapter{
 	}
 	
 	public boolean validPlace(int x, int y, Block type){
-		
-		if(!type.isMultiblock() && control.tutorial().active() &&
-				control.tutorial().showBlock()){
-
-			//TODO placepoint control, make sure it's correct.
-			GridPoint2 point = control.tutorial().getPlacePoint();
-			int rotation = control.tutorial().getPlaceRotation();
-			Block block = control.tutorial().getPlaceBlock();
-			
-			if(type != block || (rotation != -1 && rotation != this.rotation)){
-				return false;
-			}
-		}else if(control.tutorial().active()){
-			return false;
-		}
-
 		return Placement.validPlace(player.team, x, y, type, rotation);
 	}
 	
 	public boolean validBreak(int x, int y){
-		if(control.tutorial().active()){
-			
-			if(control.tutorial().showBlock()){
-				//TODO placepoint control, make sure it's correct
-				GridPoint2 point = control.tutorial().getPlacePoint();
-				int rotation = control.tutorial().getPlaceRotation();
-				Block block = control.tutorial().getPlaceBlock();
-			
-				if(block != Blocks.air
-						|| (rotation != -1 && rotation != this.rotation)){
-					return false;
-				}
-			}else{
-				return false;
-			}
-		}
-		
 		return Placement.validBreak(player.team, x, y);
 	}
 	

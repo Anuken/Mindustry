@@ -135,7 +135,7 @@ public class BlockInventoryFragment implements Fragment {
                     if(!canPick.get()) return;
                     if (items[f] > 0) {
                         int amount = Math.min(Inputs.keyDown("item_withdraw") ? items[f] : 1, player.inventory.itemCapacityUsed(item));
-                        items[f] -= amount;
+                        tile.block().removeStack(tile, item, amount);
 
                         int sent = Mathf.clamp(amount/3, 1, 8);
                         int per = Math.min(amount/sent, 5);

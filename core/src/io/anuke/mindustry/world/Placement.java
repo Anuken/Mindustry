@@ -150,15 +150,13 @@ public class Placement {
         return false;
     }
 
-    public static boolean validBreak(Team team, int x, int y){
+    public static boolean validBreak(Team team, int x, int y) {
         Tile tile = world.tile(x, y);
 
-        if(tile == null || tile.block().unbreakable) return false;
+        if (tile == null || tile.block().unbreakable) return false;
 
-        if(tile.isLinked() && tile.getLinked().block().unbreakable){
-            return false;
-        }
+        return (!tile.isLinked() || !tile.getLinked().block().unbreakable) && tile.breakable()
+                && (tile.getTeam() == Team.none || tile.getTeam() == team);
 
-        return tile.breakable() && (tile.getTeam() == Team.none || tile.getTeam() == team);
     }
 }
