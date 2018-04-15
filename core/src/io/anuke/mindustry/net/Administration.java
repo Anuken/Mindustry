@@ -184,6 +184,18 @@ public class Administration {
         return result;
     }
 
+    public Array<PlayerInfo> findByIPs(String ip){
+        Array<PlayerInfo> result = new Array<>();
+
+        for(PlayerInfo info : playerInfo.values()){
+            if(info.ips.contains(ip, false)){
+                result.add(info);
+            }
+        }
+
+        return result;
+    }
+
     public PlayerInfo getInfo(String id){
         return getCreateInfo(id);
     }

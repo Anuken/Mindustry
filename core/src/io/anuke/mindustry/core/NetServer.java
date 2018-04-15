@@ -81,6 +81,8 @@ public class NetServer extends Module{
                 return;
             }
 
+            Log.info("Recieved connect packet for player '{0}' / UUID {1} / IP {2}", packet.name, uuid, trace.ip);
+
             String ip = Net.getConnection(id).address;
 
             admins.updatePlayerJoined(uuid, ip, packet.name);
@@ -93,8 +95,6 @@ public class NetServer extends Module{
             if(packet.version == -1){
                 trace.modclient = true;
             }
-
-            Log.info("Sending data to player '{0}' / {1}", packet.name, id);
 
             Player player = new Player();
             player.isAdmin = admins.isAdmin(uuid, ip);
@@ -165,12 +165,12 @@ public class NetServer extends Module{
             TraceInfo info = admins.getTrace(Net.getConnection(id).address);
             Weapon weapon = Upgrade.getByID((byte)packet.data);
 
-            float wtrc = 60;
+            float wtrc = 80;
 
             if(!Timers.get("fastshoot-" + id + "-" + weapon.id, wtrc)){
                 info.fastShots.getAndIncrement(weapon.id, 0, 1);
 
-                if(info.fastShots.get(weapon.id, 0) > (int)(wtrc / (weapon.getReload() / 2f)) + 2){
+                if(info.fastShots.get(weapon.id, 0) > (int)(wtrc / (weapon.getReload() / 2f)) + 6){
                     kick(id, KickReason.kick);
                 }
             }else{

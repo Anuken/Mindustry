@@ -330,7 +330,11 @@ public class ServerControl extends Module {
                 Log.info("&lmBanned players [IP]:");
                 for(String string : ipbans){
                     PlayerInfo info = netServer.admins.findByIP(string);
-                    Log.info(" &lm '{0}' / Last known name: '{1}' / ID: '{2}'", string, info.lastName, info.id);
+                    if(info != null) {
+                        Log.info(" &lm '{0}' / Last known name: '{1}' / ID: '{2}'", string, info.lastName, info.id);
+                    }else{
+                        Log.info(" &lm '{0}' (No known name or info)", string);
+                    }
                 }
             }
         });
@@ -340,7 +344,9 @@ public class ServerControl extends Module {
                 info("Banned player by IP: {0}.", arg[0]);
 
                 for(Player player : playerGroup.all()){
-                    if(Net.getConnection(player.clientid).address.equals(arg[0])){
+                    if(Net.getConnection(player.clientid) != null &&
+                            Net.getConnection(player.clientid).address != null &&
+                            Net.getConnection(player.clientid).address.equals(arg[0])){
                         netServer.kick(player.clientid, KickReason.banned);
                         break;
                     }
@@ -493,6 +499,37 @@ public class ServerControl extends Module {
             info("Saved to slot {0}.", slot);
         });
 
+        handler.register("griefers", "[min-break:place-ratio] [min-breakage]", "Find possible griefers currently online.", arg -> {
+            if(!state.is(State.playing)) {
+                err("Open the server first.");
+                return;
+            }
+
+            try {
+
+                float ratio = arg.length > 0 ? Float.parseFloat(arg[0]) : 0.5f;
+                int minbreak = arg.length > 1 ? Integer.parseInt(arg[1]) : 100;
+
+                boolean found = false;
+
+                for (Player player : playerGroup.all()) {
+                    TraceInfo info = netServer.admins.getTrace(Net.getConnection(player.clientid).address);
+                    if(info.totalBlocksBroken >= minbreak && info.totalBlocksBroken / Math.max(info.totalBlocksPlaced, 1f) >= ratio){
+                        info("&ly - Player '{0}' / UUID &lm{1}&ly found: &lc{2}&ly broken and &lc{3}&ly placed.",
+                                player.name, info.uuid, info.totalBlocksBroken, info.totalBlocksPlaced);
+                        found = true;
+                    }
+                }
+
+                if (!found) {
+                    info("No griefers matching the criteria have been found.");
+                }
+
+            }catch (NumberFormatException e){
+                err("Invalid number format.");
+            }
+        });
+
         handler.register("gameover", "Force a game over.", arg -> {
             if(state.is(State.menu)){
                info("Not playing a map.");
@@ -535,8 +572,8 @@ public class ServerControl extends Module {
             }
         });
 
-        handler.register("find", "<name> [check-all-names]", "Find player info(s) by name. Can optionally check for all names a player has had.", arg -> {
-            boolean checkAll = arg.length == 2 && arg[1].equals("true");
+        handler.register("find", "<name...>", "Find player info(s) by name. Can optionally check for all names a player has had.", arg -> {
+            boolean checkAll = true;
 
             Array<PlayerInfo> infos = netServer.admins.findByName(arg[0], checkAll);
 
@@ -561,6 +598,33 @@ public class ServerControl extends Module {
                 info("Nobody with that name could be found.");
             }
         });
+
+        handler.register("findip", "<ip>", "Find player info(s) by IP.", arg -> {
+
+            Array<PlayerInfo> infos = netServer.admins.findByIPs(arg[0]);
+
+            if(infos.size == 1) {
+                PlayerInfo info = infos.peek();
+                Log.info("&lcTrace info for player '{0}' / UUID {1}:", info.lastName, info.id);
+                Log.info("  &lyall names used: {0}", info.names);
+                Log.info("  &lyIP: {0}", info.lastIP);
+                Log.info("  &lyall IPs used: {0}", info.ips);
+                Log.info("  &lytimes joined: {0}", info.timesJoined);
+                Log.info("  &lytimes kicked: {0}", info.timesKicked);
+                Log.info("");
+                Log.info("  &lytotal blocks broken: {0}", info.totalBlocksBroken);
+                Log.info("  &lytotal blocks placed: {0}", info.totalBlockPlaced);
+            }else if(infos.size > 1){
+                Log.info("&lcMultiple people have been found with that IP:");
+                for(PlayerInfo info : infos){
+                    Log.info("  &ly{0}", info.id);
+                }
+                Log.info("&lcUse the info command to examine each person individually.");
+            }else{
+                info("Nobody with that IP could be found.");
+            }
+        });
+
 
         handler.register("info", "<UUID>", "Get global info for a player's UUID.", arg -> {
             PlayerInfo info = netServer.admins.getInfoOptional(arg[0]);
