@@ -12,12 +12,16 @@ import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.StaticBlock;
+import io.anuke.mindustry.world.blocks.types.defense.Turret;
+import io.anuke.mindustry.world.blocks.types.production.Drill;
+import io.anuke.mindustry.world.blocks.types.production.Pump;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.CacheBatch;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.core.*;
 
 import java.util.Arrays;
 
@@ -279,5 +283,43 @@ public class BlockRenderer{
 		if(cbatch != null)
 			cbatch.dispose();
 		cbatch = new CacheBatch(world.width() * world.height() * 4);
+	}
+	
+	public void drawPreview(Block block, float drawx, float drawy, float rotation, float opacity) {
+		Draw.reset();
+		Draw.alpha(opacity);
+		Draw.rect(block.name(), drawx, drawy, rotation);
+	}
+	
+	public void handlePreview(Block block, float rotation, float drawx, float drawy, int tilex, int tiley) {
+		
+		if(control.input().recipe != null && state.inventory.hasItems(control.input().recipe.requirements)
+			&& control.input().validPlace(tilex, tiley, block) && (android || control.input().cursorNear())) {
+		 
+			float opacity = (float)Settings.getInt("previewopacity")/100f;
+   
+			if(block.isMultiblock()) {
+				 if((tiley - control.input().getBlockY()) % block.height != 0
+					|| (tilex - control.input().getBlockX()) % block.width != 0) return;
+			}
+			
+			if(block instanceof Turret) {
+                Draw.alpha(opacity);
+				if (block.isMultiblock()) {
+					Draw.rect("block-" + block.width + "x" + block.height, drawx, drawy);
+				} else {
+					Draw.rect("block", drawx, drawy);
+				}
+			}
+
+			drawPreview(block, drawx, drawy, rotation, opacity);
+			
+			Tile tile = world.tile(tilex, tiley);
+			if((block instanceof Drill || block instanceof Pump) && block.isLayer(tile)) {
+				block.drawLayer(tile);
+			}
+			
+			Draw.reset();
+		}
 	}
 }

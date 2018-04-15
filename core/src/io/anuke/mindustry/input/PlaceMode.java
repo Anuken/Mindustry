@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.production.Drill;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
@@ -40,11 +41,14 @@ public enum PlaceMode{
 					tilesize * control.input().recipe.result.height + si);
 
 			control.input().recipe.result.drawPlace(tilex, tiley, control.input().rotation, valid);
-			Lines.stroke(2f);
-
+			
+            renderer.getBlocks().handlePreview(control.input().recipe.result, control.input().recipe.result.rotate ? control.input().rotation * 90 : 0f, x + offset.x, y + offset.y, tilex, tiley);
+            
 			if(control.input().recipe.result.rotate){
+			 
 				Draw.color(Colors.get("placeRotate"));
 				tr.trns(control.input().rotation * 90, 7, 0);
+                Lines.stroke(2f);
 				Lines.line(x, y, x + tr.x, y + tr.y);
 			}
 		}
@@ -280,17 +284,20 @@ public enum PlaceMode{
 					for(int cy = 0; cy <= Math.abs(endy - tiley); cy ++){
 						int px = tx + cx * Mathf.sign(ex - tx), 
 						py = ty + cy * Mathf.sign(ey - ty);
-						
+
+						renderer.getBlocks().handlePreview(control.input().recipe.result, control.input().recipe.result.rotate ? rotation * 90 : 0f, px * t + offset.x, py * t + offset.y, px, py);
+
 						if(!control.input().validPlace(px, py, control.input().recipe.result)
-								|| !state.inventory.hasItems(control.input().recipe.requirements, amount)){
+								|| !state.inventory.hasItems(control.input().recipe.requirements, amount))
 							Lines.crect(px * t + offset.x, py * t + offset.y, t*block.width, t*block.height);
-						}
+
 						amount ++;
 					}
 				}
 				
 				if(control.input().recipe.result.rotate){
 					float cx = tx * t, cy = ty * t;
+					Lines.stroke(2f);
 					Draw.color(Colors.get("placeRotate"));
 					tr.trns(rotation * 90, 7, 0);
 					Lines.line(cx, cy, cx + tr.x, cy + tr.y);
