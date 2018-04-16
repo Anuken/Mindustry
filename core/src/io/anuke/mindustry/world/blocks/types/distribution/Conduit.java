@@ -46,7 +46,7 @@ public class Conduit extends LiquidBlock {
         entity.smoothLiquid = Mathf.lerpDelta(entity.smoothLiquid, entity.liquid.amount/liquidCapacity, 0.05f);
 
         if(tile.entity.liquid.amount > 0.001f && tile.entity.timer.get(timerFlow, 1)){
-            tryMoveLiquid(tile, tile.getNearby(tile.getRotation()));
+            tryMoveLiquid(tile, tile.getNearby(tile.getRotation()), true);
         }
     }
 

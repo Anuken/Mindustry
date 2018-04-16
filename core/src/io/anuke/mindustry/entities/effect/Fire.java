@@ -18,11 +18,17 @@ public class Fire extends TimedEntity {
     private static GridMap<Fire> map = new GridMap<>();
 
     private Tile tile;
-    private float flammability = -1;
+    private float baseFlammability = -1, puddleFlammability;
 
     public static void create(Tile tile){
         if(!map.containsKey(tile.x, tile.y)){
             new Fire(tile).add();
+        }
+    }
+
+    public static void extinguish(Tile tile, float intensity){
+        if(map.containsKey(tile.x, tile.y)){
+            map.get(tile.x, tile.y).time += intensity * Timers.delta();
         }
     }
 
@@ -38,12 +44,14 @@ public class Fire extends TimedEntity {
         TileEntity entity = tile.target().entity;
         boolean damage = entity != null;
 
+        float flammability = baseFlammability + puddleFlammability;
+
         if(!damage && flammability <= 0){
             time += Timers.delta()*8;
         }
 
-        if (flammability < 0){
-            flammability = tile.block().getFlammability(tile);
+        if (baseFlammability < 0){
+            baseFlammability = tile.block().getFlammability(tile);
         }
 
         if(damage) {
@@ -58,6 +66,13 @@ public class Fire extends TimedEntity {
 
         if(Mathf.chance(0.1 * Timers.delta())){
             Effects.effect(EnvironmentFx.fire, tile.worldx() + Mathf.range(4f), tile.worldy() + Mathf.range(4f));
+
+            Puddle p = Puddle.getPuddle(tile);
+            if(p != null){
+                puddleFlammability = p.getFlammability()/3f;
+            }else{
+                puddleFlammability = 0;
+            }
 
             if(damage){
                 entity.damage(0.4f);

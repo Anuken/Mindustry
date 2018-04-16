@@ -2,6 +2,8 @@ package io.anuke.mindustry.resource;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.content.StatusEffects;
+import io.anuke.mindustry.entities.StatusEffect;
 import io.anuke.ucore.util.Bundles;
 
 public class Liquid {
@@ -24,6 +26,8 @@ public class Liquid {
 	public float explosiveness;
 	/**the burning color of this liquid*/
 	public Color flameColor = Color.valueOf("ffb763");
+	/**The associated status effect.*/
+	public StatusEffect effect = StatusEffects.none;
 	
 	public Liquid(String name, Color color) {
 		this.name = name;

@@ -1,6 +1,7 @@
 package io.anuke.mindustry.content.bullets;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BulletFx;
@@ -8,7 +9,9 @@ import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.effect.DamageArea;
+import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
+import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.ucore.core.Effects;
@@ -16,7 +19,11 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
+
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class TurretBullets {
 
@@ -220,6 +227,15 @@ public class TurretBullets {
         @Override
         public void hit(Bullet b, float hitx, float hity) {
             Effects.effect(hiteffect, liquid.color, hitx, hity);
+            Puddle.deposit(world.tileWorld(hitx, hity), liquid, 5f);
+
+            if(liquid.temperature <= 0.5f && liquid.flammability < 0.3f){
+                float intensity = 400f;
+                Fire.extinguish(world.tileWorld(hitx, hity), intensity);
+                for(GridPoint2 p : Geometry.d4){
+                    Fire.extinguish(world.tileWorld(hitx + p.x*tilesize, hity + p.y*tilesize), intensity);
+                }
+            }
         }
     }
 }

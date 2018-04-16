@@ -43,6 +43,16 @@ public class EnvironmentFx {
         Draw.color();
     }),
 
+    steam = new Effect(35f, e -> {
+        Draw.color(Color.LIGHT_GRAY);
+
+        Angles.randLenVectors(e.id, 2, 2f + e.fin()*7f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 0.2f + e.fslope() * 1.5f);
+        });
+
+        Draw.color();
+    }),
+
     fireballsmoke = new Effect(25f, e -> {
         Draw.color(Color.GRAY);
 

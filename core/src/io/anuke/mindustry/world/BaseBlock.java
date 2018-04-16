@@ -2,6 +2,7 @@ package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.ucore.util.Mathf;
@@ -108,7 +109,7 @@ public abstract class BaseBlock {
         }
     }
 
-    public float tryMoveLiquid(Tile tile, Tile next){
+    public float tryMoveLiquid(Tile tile, Tile next, boolean leak){
         if(next == null) return 0;
 
         next = next.target();
@@ -132,6 +133,10 @@ public abstract class BaseBlock {
                 tile.entity.liquid.amount -= amount;
                 return flow;
             }
+        }else if(leak && !next.block().solid && !next.block().hasLiquids){
+            float leakAmount = Math.min(tile.entity.liquid.amount, tile.entity.liquid.amount/1.5f);
+            Puddle.deposit(next, tile, tile.entity.liquid.liquid, leakAmount);
+            tile.entity.liquid.amount -= leakAmount;
         }
         return 0;
     }
