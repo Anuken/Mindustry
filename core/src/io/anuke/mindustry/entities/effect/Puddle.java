@@ -36,14 +36,17 @@ public class Puddle extends Entity {
     private int generation;
     private float accepting;
 
+    /**Deposists a puddle between tile and source.*/
     public static void deposit(Tile tile, Tile source, Liquid liquid, float amount){
         deposit(tile, source, liquid, amount, 0);
     }
 
+    /**Deposists a puddle at a tile.*/
     public static void deposit(Tile tile, Liquid liquid, float amount){
         deposit(tile, tile, liquid, amount, 0);
     }
 
+    /**Returns the puddle on the specified tile. May return null.*/
     public static Puddle getPuddle(Tile tile){
         return map.get(tile.x, tile.y);
     }

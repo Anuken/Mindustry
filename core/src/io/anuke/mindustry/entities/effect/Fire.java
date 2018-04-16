@@ -15,17 +15,25 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.*;
 
 public class Fire extends TimedEntity {
-    private static GridMap<Fire> map = new GridMap<>();
+    private static final GridMap<Fire> map = new GridMap<>();
+    private static final float baseLifetime = 1000f;
 
     private Tile tile;
     private float baseFlammability = -1, puddleFlammability;
 
+    /**Start a fire on the tile. If there already is a file there, refreshes its lifetime..*/
     public static void create(Tile tile){
-        if(!map.containsKey(tile.x, tile.y)){
-            new Fire(tile).add();
+        Fire fire = map.get(tile.x, tile.y);
+
+        if(fire == null){
+            map.put(tile.x, tile.y, new Fire(tile).add());
+        }else{
+            fire.lifetime = baseLifetime;
+            fire.time = 0f;
         }
     }
 
+    /**Attempts to extinguish a fire by shortening its life. If there is no fire here, does nothing.*/
     public static void extinguish(Tile tile, float intensity){
         if(map.containsKey(tile.x, tile.y)){
             map.get(tile.x, tile.y).time += intensity * Timers.delta();
@@ -34,7 +42,7 @@ public class Fire extends TimedEntity {
 
     private Fire(Tile tile){
         this.tile = tile;
-        lifetime = 1000f;
+        lifetime = baseLifetime;
     }
 
     @Override
@@ -88,11 +96,6 @@ public class Fire extends TimedEntity {
     @Override
     public Fire add(){
         return add(effectGroup);
-    }
-
-    @Override
-    public void added() {
-        map.put(tile.x, tile.y, this);
     }
 
     @Override

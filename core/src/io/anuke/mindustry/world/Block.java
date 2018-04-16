@@ -243,6 +243,8 @@ public class Block extends BaseBlock {
 		DamageArea.dynamicExplosion(x, y, flammability, explosiveness, power, tilesize * size/2f, tempColor);
 	}
 
+	/**Returns the flammability of the tile. Used for fire calculations.
+	 * Takes flammability of floor liquid into account.*/
 	public float getFlammability(Tile tile){
 		if(!hasInventory || tile.entity == null){
 			if(tile.floor().liquid && !solid){
