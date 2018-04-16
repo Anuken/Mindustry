@@ -52,6 +52,7 @@ public class Saves {
 
                 exec.submit(() -> {
                     SaveIO.saveToSlot(current.index);
+                    current.meta = SaveIO.getData(current.index);
                     saving = false;
                     return true;
                 });
