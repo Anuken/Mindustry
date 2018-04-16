@@ -158,7 +158,7 @@ public class HudFragment implements Fragment{
 
 				new label(()->"[orange]"+Bundles.get("text.respawn")+" " + (int)(control.getRespawnTime()/60)).scale(0.75f).pad(10);
 
-				visible(()->control.getRespawnTime() > 0 && !state.is(State.menu));
+				visible(()->false);
 
 			}}.end();
 		}}.end();
@@ -223,6 +223,6 @@ public class HudFragment implements Fragment{
 	}
 	
 	public void fadeRespawn(boolean in){
-		respawntable.addAction(Actions.color(in ? new Color(0, 0, 0, 0.3f) : Color.CLEAR, 0.3f));
+		//respawntable.addAction(Actions.color(in ? new Color(0, 0, 0, 0.3f) : Color.CLEAR, 0.3f));
 	}
 }

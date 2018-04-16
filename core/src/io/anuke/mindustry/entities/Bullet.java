@@ -75,7 +75,7 @@ public class Bullet extends BulletEntity<BulletType>{
 		if(other instanceof Unit){
 			Unit unit = (Unit)other;
 			unit.velocity.add(vector.set(other.x, other.y).sub(x, y).setLength(type.knockback / unit.getMass()));
-			unit.status.handleApply(unit, type.status, type.statusIntensity);
+			unit.applyEffect(type.status, type.statusIntensity);
 		}
 	}
 

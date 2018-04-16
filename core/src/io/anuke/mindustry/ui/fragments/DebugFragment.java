@@ -64,6 +64,8 @@ public class DebugFragment implements Fragment {
                row();
                new button("wave", () -> state.wavetime = 0f);
                row();
+               new button("death", () -> player.damage(99999, false));
+               row();
                new button("spawn", () -> new BaseUnit(UnitTypes.scout, Team.red).set(player.x, player.y).add());
                row();
            }}.end();

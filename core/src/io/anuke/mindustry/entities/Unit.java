@@ -37,6 +37,7 @@ public abstract class Unit extends SyncEntity {
 
     @Override
     public void onDeath() {
+        inventory.clear();
         drownTime = 0f;
         status.clear();
     }
@@ -99,6 +100,7 @@ public abstract class Unit extends SyncEntity {
     }
 
     public void applyEffect(StatusEffect effect, float intensity){
+        if(dead) return;
         status.handleApply(this, effect, intensity);
     }
 

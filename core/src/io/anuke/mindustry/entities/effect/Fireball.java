@@ -39,7 +39,7 @@ public class Fireball extends TimedEntity {
         if(Mathf.chance(0.04 * Timers.delta())){
             Tile tile = world.tileWorld(x, y);
             if(tile != null){
-                new Fire(tile).add();
+                Fire.create(tile);
             }
         }
 

@@ -1,7 +1,6 @@
 package io.anuke.mindustry.entities;
 
 import io.anuke.mindustry.content.fx.Fx;
-import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.world.Block;
@@ -30,8 +29,6 @@ public class TileEntity extends Entity{
 	public boolean dead = false;
 	public boolean added;
 
-	public Fire fire;
-
 	public PowerModule power;
 	public InventoryModule inventory;
 	public LiquidModule liquid;
@@ -52,14 +49,6 @@ public class TileEntity extends Entity{
 		}
 		
 		return this;
-	}
-
-	public boolean hasFire(){
-		return fire != null;
-	}
-
-	public void setFire(){
-		this.fire = new Fire(tile).add();
 	}
 	
 	public void write(DataOutputStream stream) throws IOException{

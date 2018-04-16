@@ -1,21 +1,15 @@
 package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
-import io.anuke.mindustry.content.fx.ExplosionFx;
-import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.DamageArea;
-import io.anuke.mindustry.entities.effect.Fireball;
-import io.anuke.mindustry.entities.effect.Lightning;
-import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.DrawLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
@@ -24,8 +18,6 @@ import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
@@ -248,48 +240,14 @@ public class Block extends BaseBlock {
 
 		tempColor.mul(1f/units);
 
-		for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i ++){
-			int branches = 5 + Mathf.clamp((int)(power/30), 1, 20);
-			Timers.run(i*2f + Mathf.random(4f), () -> {
-				Lightning l = new Lightning(Team.none, Fx.none, 3, x, y, Mathf.random(360f), branches + Mathf.range(2));
-				l.color = Colors.get("power");
-				l.add();
-			});
-		}
-
-		for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i ++){
-			Timers.run(i/2, () -> {
-				Fireball f = new Fireball(x, y, tempColor, Mathf.random(360f));
-				f.add();
-			});
-		}
-
-		float e = explosiveness;
-		int waves = Mathf.clamp((int)(explosiveness / 4), 0, 30);
-
-		for(int i = 0; i < waves; i ++){
-			int f = i;
-			Timers.run(i*2f, () -> {
-				DamageArea.damage(x, y, Mathf.clamp(size * tilesize + e, 0, 50f) * ((f + 1f)/waves), e/2f);
-				Effects.effect(ExplosionFx.blockExplosionSmoke, x + Mathf.range(size * tilesize/2f), y + Mathf.range(size * tilesize/2f));
-			});
-		}
-
-		if(explosiveness > 15f){
-			Effects.effect(ExplosionFx.shockwave, x, y);
-		}
-
-		if(explosiveness > 30f){
-			Effects.effect(ExplosionFx.bigShockwave, x, y);
-		}
-
-		float shake = Math.min(explosiveness/4f + 3f, 9f);
-		Effects.shake(shake, shake, x, y);
-		Effects.effect(ExplosionFx.blockExplosion, x, y);
+		DamageArea.dynamicExplosion(x, y, flammability, explosiveness, power, tilesize * size/2f, tempColor);
 	}
 
 	public float getFlammability(Tile tile){
 		if(!hasInventory || tile.entity == null){
+			if(tile.floor().liquid && !solid){
+				return tile.floor().liquidDrop.flammability;
+			}
 			return 0;
 		}else{
 			float result = 0f;

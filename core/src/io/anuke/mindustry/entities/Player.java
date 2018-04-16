@@ -6,7 +6,9 @@ import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.ItemStack;
@@ -103,18 +105,19 @@ public class Player extends Unit{
 	
 	@Override
 	public void onDeath(){
-		super.onDeath();
 		dead = true;
 		if(Net.active()){
 			NetEvents.handleUnitDeath(this);
 		}
 
-		Effects.effect(ExplosionFx.explosion, this);
-		Effects.shake(4f, 5f, this);
+		float explosiveness = 2f + (inventory.hasItem() ? inventory.getItem().item.explosiveness * inventory.getItem().amount : 0f);
+		float flammability = (inventory.hasItem() ? inventory.getItem().item.flammability * inventory.getItem().amount : 0f);
+		DamageArea.dynamicExplosion(x, y, flammability, explosiveness, 0f, getSize()/2f, Palette.darkFlame);
 		Effects.sound("die", this);
 
 		control.setRespawnTime(respawnduration);
 		ui.hudfrag.fadeRespawn(true);
+		super.onDeath();
 	}
 
 	@Override

@@ -1,13 +1,18 @@
 package io.anuke.mindustry.entities.effect;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import io.anuke.mindustry.content.fx.ExplosionFx;
+import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Mathf;
@@ -19,6 +24,47 @@ import static io.anuke.mindustry.Vars.*;
 public class DamageArea{
 	private static Rectangle rect = new Rectangle();
 	private static Translator tr = new Translator();
+
+	public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color){
+		for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i ++){
+			int branches = 5 + Mathf.clamp((int)(power/30), 1, 20);
+			Timers.run(i*2f + Mathf.random(4f), () -> {
+				Lightning l = new Lightning(Team.none, Fx.none, 3, x, y, Mathf.random(360f), branches + Mathf.range(2));
+				l.color = Colors.get("power");
+				l.add();
+			});
+		}
+
+		for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i ++){
+			Timers.run(i/2, () -> {
+				Fireball f = new Fireball(x, y, color, Mathf.random(360f));
+				f.add();
+			});
+		}
+
+		float e = explosiveness;
+		int waves = Mathf.clamp((int)(explosiveness / 4), 0, 30);
+
+		for(int i = 0; i < waves; i ++){
+			int f = i;
+			Timers.run(i*2f, () -> {
+				DamageArea.damage(x, y, Mathf.clamp(radius + e, 0, 50f) * ((f + 1f)/waves), e/2f);
+				Effects.effect(ExplosionFx.blockExplosionSmoke, x + Mathf.range(radius), y + Mathf.range(radius));
+			});
+		}
+
+		if(explosiveness > 15f){
+			Effects.effect(ExplosionFx.shockwave, x, y);
+		}
+
+		if(explosiveness > 30f){
+			Effects.effect(ExplosionFx.bigShockwave, x, y);
+		}
+
+		float shake = Math.min(explosiveness/4f + 3f, 9f);
+		Effects.shake(shake, shake, x, y);
+		Effects.effect(ExplosionFx.blockExplosion, x, y);
+	}
 
 	/**Damages entities in a line.
 	 * Only enemies of the specified team are damaged.*/
