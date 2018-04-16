@@ -32,6 +32,7 @@ public class LiquidBlocks {
     liquidtank = new LiquidRouter("liquidtank") {{
         size = 3;
         liquidCapacity = 1500f;
+        health = 500;
     }},
 
     liquidjunction = new LiquidJunction("liquidjunction"),

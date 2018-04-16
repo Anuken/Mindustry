@@ -98,6 +98,10 @@ public abstract class Unit extends SyncEntity {
         velocity.scl(Mathf.clamp(1f-drag* floor.dragMultiplier* Timers.delta()));
     }
 
+    public void applyEffect(StatusEffect effect, float intensity){
+        status.handleApply(this, effect, intensity);
+    }
+
     public void damagePeriodic(float amount){
         damage(amount * Timers.delta(), Timers.get(this, "damageeffect", 20));
     }

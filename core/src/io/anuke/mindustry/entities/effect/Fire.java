@@ -1,6 +1,7 @@
 package io.anuke.mindustry.entities.effect;
 
 import com.badlogic.gdx.math.GridPoint2;
+import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Tile;
@@ -11,6 +12,7 @@ import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.effectGroup;
+import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
 public class Fire extends TimedEntity {
@@ -43,9 +45,6 @@ public class Fire extends TimedEntity {
                 GridPoint2 p = Mathf.select(Geometry.d4);
                 Tile other = world.tile(tile.x + p.x, tile.y + p.y);
                 new Fire(other).add();
-                //if(other != null && other.target().entity != null && !other.entity.hasFire()){
-                    //other.entity.setFire();
-                //}
             }
         }
 
@@ -55,6 +54,7 @@ public class Fire extends TimedEntity {
             if(damage){
                 entity.damage(0.4f);
             }
+            DamageArea.damageUnits(null, tile.worldx(), tile.worldy(), tilesize, 3f, unit -> unit.applyEffect(StatusEffects.burning, 0.8f));
         }
 
         if(Mathf.chance(0.05 * Timers.delta())){

@@ -1,8 +1,10 @@
 package io.anuke.mindustry.entities.effect;
 
 import com.badlogic.gdx.graphics.Color;
+import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.TimedEntity;
 import io.anuke.ucore.graphics.Draw;
@@ -22,8 +24,8 @@ public class Fireball extends TimedEntity {
         set(x, y);
         this.rotation = rotation;
         this.color = color;
-        lifetime = 40f + Mathf.random(40f);
-        speed = 0.3f + Mathf.random(2f);
+        lifetime = 30f + Mathf.random(40f);
+        speed = 0.6f + Mathf.random(2f);
     }
 
     @Override
@@ -39,6 +41,14 @@ public class Fireball extends TimedEntity {
             if(tile != null){
                 new Fire(tile).add();
             }
+        }
+
+        if(Mathf.chance(0.1 * Timers.delta())){
+            Effects.effect(EnvironmentFx.fireballsmoke, x, y);
+        }
+
+        if(Mathf.chance(0.1 * Timers.delta())){
+            Effects.effect(EnvironmentFx.ballfire, x, y);
         }
     }
 

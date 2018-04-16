@@ -264,15 +264,28 @@ public class Block extends BaseBlock {
 			});
 		}
 
+		float e = explosiveness;
+		int waves = Mathf.clamp((int)(explosiveness / 4), 0, 30);
+
+		for(int i = 0; i < waves; i ++){
+			int f = i;
+			Timers.run(i*2f, () -> {
+				DamageArea.damage(x, y, Mathf.clamp(size * tilesize + e, 0, 50f) * ((f + 1f)/waves), e/2f);
+				Effects.effect(ExplosionFx.blockExplosionSmoke, x + Mathf.range(size * tilesize/2f), y + Mathf.range(size * tilesize/2f));
+			});
+		}
+
 		if(explosiveness > 15f){
 			Effects.effect(ExplosionFx.shockwave, x, y);
+		}
+
+		if(explosiveness > 30f){
+			Effects.effect(ExplosionFx.bigShockwave, x, y);
 		}
 
 		float shake = Math.min(explosiveness/4f + 3f, 9f);
 		Effects.shake(shake, shake, x, y);
 		Effects.effect(ExplosionFx.blockExplosion, x, y);
-
-		DamageArea.damage(x, y, Mathf.clamp(size * tilesize + explosiveness, 0, 60f), 5 + explosiveness);
 	}
 
 	public float getFlammability(Tile tile){

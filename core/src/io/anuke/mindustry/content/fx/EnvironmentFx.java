@@ -43,6 +43,26 @@ public class EnvironmentFx {
         Draw.color();
     }),
 
+    fireballsmoke = new Effect(25f, e -> {
+        Draw.color(Color.GRAY);
+
+        Angles.randLenVectors(e.id, 1, 2f + e.fin()*7f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 0.2f + e.fout() * 1.5f);
+        });
+
+        Draw.color();
+    }),
+
+    ballfire = new Effect(25f, e -> {
+        Draw.color(Palette.lightFlame, Palette.darkFlame, e.fin());
+
+        Angles.randLenVectors(e.id, 2, 2f + e.fin()*7f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 0.2f + e.fout() * 1.5f);
+        });
+
+        Draw.color();
+    }),
+
     freezing = new Effect(40f, e -> {
         Draw.color(Liquids.cryofluid.color);
 

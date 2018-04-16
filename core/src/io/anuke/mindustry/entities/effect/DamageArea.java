@@ -14,9 +14,7 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Physics;
 import io.anuke.ucore.util.Translator;
 
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class DamageArea{
 	private static Rectangle rect = new Rectangle();
@@ -65,6 +63,24 @@ public class DamageArea{
 		Units.getNearbyEnemies(team, rect, cons);
 	}
 
+	/**Damages all entities and blocks in a radius that are enemies of the team.*/
+	public static void damageUnits(Team team, float x, float y, float size, float damage, Consumer<Unit> acceptor) {
+		Consumer<Unit> cons = entity -> {
+			if (!entity.hitbox.getRect(entity.x, entity.y).overlaps(rect)) {
+				return;
+			}
+			entity.damage(damage);
+			acceptor.accept(entity);
+		};
+
+		rect.setSize(size * 2).setCenter(x, y);
+		if (team != null) {
+			Units.getNearbyEnemies(team, rect, cons);
+		} else {
+			Units.getNearby(rect, cons);
+		}
+	}
+
 	/**Damages everything in a radius.*/
 	public static void damage(float x, float y, float radius, float damage){
 		damage(null, x, y, radius, damage);
@@ -78,7 +94,8 @@ public class DamageArea{
 			}
 			float amount = calculateDamage(x, y, entity.x, entity.y, radius, damage);
 			entity.damage(amount);
-			entity.velocity.add(tr.set(entity.x - x, entity.y - y).setLength(Mathf.clamp(damage/2f, 0, 6)));
+			//TODO better velocity displacement
+			entity.velocity.add(tr.set(entity.x - x, entity.y - y).setLength(damage*2f));
 		};
 
 		rect.setSize(radius *2).setCenter(x, y);
