@@ -1,6 +1,7 @@
 package io.anuke.mindustry.entities.effect;
 
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.utils.IntMap;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.TileEntity;
@@ -9,13 +10,12 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.TimedEntity;
 import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.GridMap;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class Fire extends TimedEntity {
-    private static final GridMap<Fire> map = new GridMap<>();
+    private static final IntMap<Fire> map = new IntMap<>();
     private static final float baseLifetime = 1000f;
 
     private Tile tile;
@@ -23,10 +23,10 @@ public class Fire extends TimedEntity {
 
     /**Start a fire on the tile. If there already is a file there, refreshes its lifetime..*/
     public static void create(Tile tile){
-        Fire fire = map.get(tile.x, tile.y);
+        Fire fire = map.get(tile.packedPosition());
 
         if(fire == null){
-            map.put(tile.x, tile.y, new Fire(tile).add());
+            map.put(tile.packedPosition(), new Fire(tile).add());
         }else{
             fire.lifetime = baseLifetime;
             fire.time = 0f;
@@ -35,8 +35,8 @@ public class Fire extends TimedEntity {
 
     /**Attempts to extinguish a fire by shortening its life. If there is no fire here, does nothing.*/
     public static void extinguish(Tile tile, float intensity){
-        if(map.containsKey(tile.x, tile.y)){
-            map.get(tile.x, tile.y).time += intensity * Timers.delta();
+        if(map.containsKey(tile.packedPosition())){
+            map.get(tile.packedPosition()).time += intensity * Timers.delta();
         }
     }
 
@@ -100,6 +100,6 @@ public class Fire extends TimedEntity {
 
     @Override
     public void removed() {
-        map.remove(tile.x, tile.y);
+        map.remove(tile.packedPosition());
     }
 }

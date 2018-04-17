@@ -3,6 +3,7 @@ package io.anuke.mindustry.entities.effect;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.IntMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.BlockFx;
@@ -18,13 +19,12 @@ import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.GridMap;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.world;
 
 public class Puddle extends Entity {
-    private static final GridMap<Puddle> map = new GridMap<>();
+    private static final IntMap<Puddle> map = new IntMap<>();
     private static final float maxLiquid = 70f;
     private static final int maxGeneration = 2;
     private static final Color tmp = new Color();
@@ -48,14 +48,14 @@ public class Puddle extends Entity {
 
     /**Returns the puddle on the specified tile. May return null.*/
     public static Puddle getPuddle(Tile tile){
-        return map.get(tile.x, tile.y);
+        return map.get(tile.packedPosition());
     }
 
     private static void deposit(Tile tile, Tile source, Liquid liquid, float amount, int generation){
-        Puddle p = map.get(tile.x, tile.y);
+        Puddle p = map.get(tile.packedPosition());
         if(p == null){
             Puddle puddle = new Puddle(tile, source, liquid, amount, generation).add();
-            map.put(tile.x, tile.y, puddle);
+            map.put(tile.packedPosition(), puddle);
         }else if(p.liquid == liquid){
             p.accepting = Math.max(amount, p.accepting);
 
@@ -156,7 +156,7 @@ public class Puddle extends Entity {
 
     @Override
     public void removed() {
-        map.remove(tile.x, tile.y);
+        map.remove(tile.packedPosition());
     }
 
     @Override
