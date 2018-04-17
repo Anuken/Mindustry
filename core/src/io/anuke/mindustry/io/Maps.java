@@ -65,7 +65,7 @@ public class Maps implements Disposable{
 
 		for(FileHandle file : customMapDirectory.list()){
 			try{
-				loadMap(file, true);
+				if(file.extension().toLowerCase().equals(mapExtension)) loadMap(file, true);
 			}catch (IOException e){
 				Log.err("Failed to load custom map file '{0}'!", file);
 				Log.err(e);

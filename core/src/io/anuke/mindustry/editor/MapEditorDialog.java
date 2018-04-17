@@ -66,6 +66,7 @@ public class MapEditorDialog extends Dialog{
 			Timers.run(3f, () -> {
 
 				try{
+					tags.put("name", result.nameWithoutExtension());
 					MapIO.writeMap(result, tags, editor.getMap());
 				}catch (Exception e){
 					ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
@@ -96,7 +97,6 @@ public class MapEditorDialog extends Dialog{
 			FileHandle result = file;
 			ui.loadfrag.show();
 			Timers.run(3f, () -> {
-
 				try{
 					Pixmaps.write(MapIO.generatePixmap(editor.getMap()), result);
 				}catch (Exception e){
