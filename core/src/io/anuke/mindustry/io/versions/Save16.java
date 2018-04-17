@@ -2,8 +2,6 @@ package io.anuke.mindustry.io.versions;
 
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.entities.SerializableEntity;
@@ -66,22 +64,16 @@ public class Save16 extends SaveFileVersion {
 
         //entities
 
-        try {
+        byte groups = stream.readByte();
 
-            byte groups = stream.readByte();
-
-            for (int i = 0; i < groups; i++) {
-                int amount = stream.readInt();
-                byte gid = stream.readByte();
-                EntityGroup<?> group = Entities.getGroup(gid);
-                for (int j = 0; j < amount; j++) {
-                    Entity entity = ClassReflection.newInstance(group.getType());
-                    ((SerializableEntity)entity).readSave(stream);
-                }
+        for (int i = 0; i < groups; i++) {
+            int amount = stream.readInt();
+            byte gid = stream.readByte();
+            EntityGroup<?> group = Entities.getGroup(gid);
+            for (int j = 0; j < amount; j++) {
+                Entity entity = construct(group.getType());
+                ((SerializableEntity)entity).readSave(stream);
             }
-
-        }catch (ReflectionException e){
-            throw new RuntimeException(e);
         }
 
         //map

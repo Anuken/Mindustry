@@ -94,9 +94,9 @@ public abstract class UnitType {
     }
 
     public void shoot(BaseUnit unit, BulletType type, float rotation, float translation){
-        new Bullet(type, unit,
+        Bullet.create(type, unit,
                 unit.x + Angles.trnsx(rotation, translation),
-                unit.y + Angles.trnsy(rotation, translation), rotation).add();
+                unit.y + Angles.trnsy(rotation, translation), rotation);
     }
 
     public void onDeath(BaseUnit unit){

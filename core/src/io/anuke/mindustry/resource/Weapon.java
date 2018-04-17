@@ -78,6 +78,7 @@ public class Weapon extends Upgrade{
 	
 	void bullet(Unit owner, float x, float y, float angle){
 		tr.trns(angle, 3f);
-		new Bullet(type, owner,  x + tr.x, y + tr.y, angle).add();
+
+		Bullet.create(type, owner,  x + tr.x, y + tr.y, angle);
 	}
 }

@@ -1,6 +1,5 @@
 package io.anuke.mindustry.entities.effect;
 
-import com.badlogic.gdx.graphics.Color;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -11,13 +10,9 @@ import io.anuke.ucore.util.Mathf;
 public class GroundEffectEntity extends EffectEntity {
     private boolean once;
 
-    public GroundEffectEntity(GroundEffect effect, Color color, float rotation) {
-        super(effect, color, rotation);
-    }
-
     @Override
     public void update(){
-        GroundEffect effect = (GroundEffect)renderer;
+        GroundEffect effect = (GroundEffect)this.effect;
 
         if(effect.isStatic) {
             time += Timers.delta();
@@ -36,13 +31,13 @@ public class GroundEffectEntity extends EffectEntity {
     }
 
     @Override
-    public void drawOver(){
-        GroundEffect effect = (GroundEffect)renderer;
+    public void draw(){
+        GroundEffect effect = (GroundEffect)this.effect;
 
         if(once && effect.isStatic)
-            Effects.renderEffect(id, renderer, color, lifetime, rotation, x, y);
+            Effects.renderEffect(id, effect, color, lifetime, rotation, x, y);
         else if(!effect.isStatic)
-            Effects.renderEffect(id, renderer, color, time, rotation, x, y);
+            Effects.renderEffect(id, effect, color, time, rotation, x, y);
     }
 
     public static class GroundEffect extends Effect{

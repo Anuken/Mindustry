@@ -64,18 +64,13 @@ public class BaseUnit extends Unit{
 	}
 
 	@Override
-	public void drawOver(){
-		type.drawOver(this);
-	}
-
-	@Override
 	public float drawSize(){
 		return 14;
 	}
 
 	@Override
 	public void onRemoteShoot(BulletType type, float x, float y, float rotation, short data) {
-		new Bullet(type, this, x, y, rotation).add().damage = data;
+		Bullet.create(type, this, x, y, rotation).damage = data;
 	}
 
 	@Override

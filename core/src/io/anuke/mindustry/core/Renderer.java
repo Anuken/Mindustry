@@ -72,13 +72,24 @@ public class Renderer extends RendererModule{
 					int id = 0;
 
 					if(!(effect instanceof GroundEffect) || ((GroundEffect)effect).isStatic) {
-						id = new EffectEntity(effect, color, rotation).set(x, y).add(effectGroup).id;
+						EffectEntity entity = Pools.obtain(EffectEntity.class);
+						entity.effect = effect;
+						entity.color = color;
+						entity.rotation = rotation;
+						entity.lifetime = effect.lifetime;
+						id = entity.set(x, y).add(effectGroup).id;
 					}
 
 					if(effect instanceof GroundEffect){
-						GroundEffectEntity r = new GroundEffectEntity((GroundEffect) effect, color, rotation).set(x, y).add(groundEffectGroup);
+						GroundEffectEntity entity = Pools.obtain(GroundEffectEntity.class);
+						entity.effect = effect;
+						entity.color = color;
+						entity.rotation = rotation;
+						entity.lifetime = effect.lifetime;
+						entity.set(x, y).add(groundEffectGroup);
+
 						if(((GroundEffect)effect).isStatic){
-							r.id = id;
+							entity.id = id;
 						}
 					}
 				}
@@ -199,6 +210,7 @@ public class Renderer extends RendererModule{
 		
 		blocks.drawFloor();
 
+		Entities.draw(groundItemGroup);
 		Entities.draw(groundEffectGroup);
 
 		blocks.processBlocks();
@@ -213,6 +225,7 @@ public class Renderer extends RendererModule{
 		drawAllTeams(true);
 
 		Entities.draw(bulletGroup);
+		Entities.draw(airItemGroup);
         Entities.draw(effectGroup);
 
 		drawShield();

@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.IntSet;
+import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.BulletEntity;
@@ -14,28 +14,32 @@ import static io.anuke.mindustry.Vars.*;
 public class Bullet extends BulletEntity<BulletType>{
 	private static Vector2 vector = new Vector2();
 
-	public IntSet collided;
 	public Timer timer = new Timer(3);
 	public Team team;
-	
-	public Bullet(BulletType type, Unit owner, float x, float y, float angle){
-		this(type, owner, owner.team, x, y, angle);
+
+	public static Bullet create(BulletType type, Unit owner, float x, float y, float angle){
+		return create(type, owner, owner.team, x, y, angle);
 	}
 
-	public Bullet(BulletType type, Entity owner, Team team, float x, float y, float angle){
-		super(type, owner, angle);
-		this.team = team;
-		this.type = type;
-		set(x, y);
+	public static Bullet create (BulletType type, Entity owner, Team team, float x, float y, float angle){
+		Bullet bullet = Pools.obtain(Bullet.class);
+		bullet.type = type;
+		bullet.owner = owner;
 
-		if(type.pierce){
-			collided = new IntSet();
-		}
+		bullet.velocity.set(0, type.speed).setAngle(angle);
+		bullet.hitbox.setSize(type.hitsize);
+
+		bullet.team = team;
+		bullet.type = type;
+		bullet.set(x, y);
+		return bullet.add();
 	}
 
-	public Bullet(BulletType type, Bullet parent, float x, float y, float angle){
-		this(type, parent.owner, parent.team, x, y, angle);
+	public static Bullet create(BulletType type, Bullet parent, float x, float y, float angle){
+		return create(type, parent.owner, parent.team, x, y, angle);
 	}
+
+	private Bullet(){}
 	
 	public void draw(){
 		//interpolate position linearly at low tick speeds
@@ -63,14 +67,12 @@ public class Bullet extends BulletEntity<BulletType>{
 
 	@Override
 	public boolean collides(SolidEntity other){
-		return super.collides(other) && (!type.pierce || !collided.contains(other.id));
+		return super.collides(other);
 	}
 
 	@Override
 	public void collision(SolidEntity other, float x, float y){
 		super.collision(other, x, y);
-		if(type.pierce)
-			collided.add(other.id);
 
 		if(other instanceof Unit){
 			Unit unit = (Unit)other;
@@ -107,7 +109,19 @@ public class Bullet extends BulletEntity<BulletType>{
 	public int getDamage(){
 		return damage == -1 ? type.damage : damage;
 	}
-	
+
+	@Override
+	public void reset() {
+		super.reset();
+		timer.clear();
+		team = null;
+	}
+
+	@Override
+	public void removed() {
+		Pools.free(this);
+	}
+
 	@Override
 	public Bullet add(){
 		return super.add(bulletGroup);

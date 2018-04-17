@@ -35,14 +35,12 @@ public class TileEntity extends Entity{
 	public InventoryModule items;
 	public LiquidModule liquids;
 
-	private boolean added;
 	private boolean sleeping;
 	private float sleepTime;
 	
 	/**Sets this tile entity data to this tile, and adds it if necessary.*/
 	public TileEntity init(Tile tile, boolean added){
 		this.tile = tile;
-		this.added = added;
 		x = tile.drawx();
 		y = tile.drawy();
 
@@ -51,12 +49,12 @@ public class TileEntity extends Entity{
 		timer = new Timer(tile.block().timers);
 		
 		if(added){
-			if(!tile.block().autoSleep) {
+			//if(!tile.block().autoSleep) { //TODO only autosleep when creating a fresh block!
 				add();
-			}else{
+			/*}else{
 				sleeping = true;
 				sleepingEntities ++;
-			}
+			}*/
 		}
 		
 		return this;

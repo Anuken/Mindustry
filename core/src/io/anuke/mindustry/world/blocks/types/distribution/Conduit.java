@@ -47,6 +47,9 @@ public class Conduit extends LiquidBlock {
 
         if(tile.entity.liquids.amount > 0.001f && tile.entity.timer.get(timerFlow, 1)){
             tryMoveLiquid(tile, tile.getNearby(tile.getRotation()), true);
+            entity.wakeUp();
+        }else{
+            entity.sleep();
         }
     }
 
@@ -57,6 +60,7 @@ public class Conduit extends LiquidBlock {
 
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
+        tile.entity.wakeUp();
         return super.acceptLiquid(tile, source, liquid, amount) && ((2 + source.relativeTo(tile.x, tile.y)) % 4 != tile.getRotation());
     }
 

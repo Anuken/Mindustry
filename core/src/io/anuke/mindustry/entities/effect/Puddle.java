@@ -4,10 +4,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.IntMap;
-import io.anuke.mindustry.Vars;
+import com.badlogic.gdx.utils.Pool.Poolable;
+import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
+import io.anuke.mindustry.entities.SerializableEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
@@ -21,15 +23,21 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+import static io.anuke.mindustry.Vars.groundItemGroup;
 import static io.anuke.mindustry.Vars.world;
 
-public class Puddle extends Entity {
+public class Puddle extends Entity implements SerializableEntity, Poolable{
     private static final IntMap<Puddle> map = new IntMap<>();
     private static final float maxLiquid = 70f;
     private static final int maxGeneration = 2;
     private static final Color tmp = new Color();
     private static final Rectangle rect = new Rectangle();
 
+    private int loadedPosition = -1;
     private Tile tile;
     private Liquid liquid;
     private float amount;
@@ -54,7 +62,12 @@ public class Puddle extends Entity {
     private static void deposit(Tile tile, Tile source, Liquid liquid, float amount, int generation){
         Puddle p = map.get(tile.packedPosition());
         if(p == null){
-            Puddle puddle = new Puddle(tile, source, liquid, amount, generation).add();
+            Puddle puddle = Pools.obtain(Puddle.class);
+            puddle.tile = tile;
+            puddle.liquid = liquid;
+            puddle.amount = amount;
+            puddle.generation = generation;
+            puddle.set((tile.worldx() + source.worldx())/2f, (tile.worldy() + source.worldy())/2f).add();
             map.put(tile.packedPosition(), puddle);
         }else if(p.liquid == liquid){
             p.accepting = Math.max(amount, p.accepting);
@@ -87,13 +100,8 @@ public class Puddle extends Entity {
         }
     }
 
-    private Puddle(Tile tile, Tile source, Liquid liquid, float amount, int generation) {
-        this.tile = tile;
-        this.liquid = liquid;
-        this.amount = amount;
-        this.generation = generation;
-        set((tile.worldx() + source.worldx())/2f, (tile.worldy() + source.worldy())/2f);
-    }
+    /**Deserialization use only!*/
+    private Puddle(){}
 
     public float getFlammability(){
         return liquid.flammability * amount;
@@ -155,12 +163,52 @@ public class Puddle extends Entity {
     }
 
     @Override
+    public void writeSave(DataOutputStream stream) throws IOException {
+        stream.writeInt(tile.packedPosition());
+        stream.writeFloat(x);
+        stream.writeFloat(y);
+        stream.writeByte(liquid.id);
+        stream.writeFloat(amount);
+        stream.writeByte(generation);
+    }
+
+    @Override
+    public void readSave(DataInputStream stream) throws IOException {
+        this.loadedPosition = stream.readInt();
+        this.x = stream.readFloat();
+        this.y = stream.readFloat();
+        this.liquid = Liquid.getByID(stream.readByte());
+        this.amount = stream.readFloat();
+        this.generation = stream.readByte();
+        add();
+    }
+
+    @Override
+    public void reset() {
+        loadedPosition = -1;
+        tile = null;
+        liquid = null;
+        amount = 0;
+        generation = 0;
+        accepting = 0;
+    }
+
+    @Override
+    public void added() {
+        if(loadedPosition != -1){
+            map.put(loadedPosition, this);
+            tile = world.tile(loadedPosition);
+        }
+    }
+
+    @Override
     public void removed() {
         map.remove(tile.packedPosition());
+        reset();
     }
 
     @Override
     public Puddle add() {
-        return add(Vars.groundEffectGroup);
+        return add(groundItemGroup);
     }
 }

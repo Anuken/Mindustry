@@ -2,8 +2,11 @@ package io.anuke.mindustry.entities.effect;
 
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.Pool.Poolable;
+import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
+import io.anuke.mindustry.entities.SerializableEntity;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -12,12 +15,17 @@ import io.anuke.ucore.entities.TimedEntity;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import static io.anuke.mindustry.Vars.*;
 
-public class Fire extends TimedEntity {
+public class Fire extends TimedEntity implements SerializableEntity, Poolable{
     private static final IntMap<Fire> map = new IntMap<>();
     private static final float baseLifetime = 1000f;
 
+    private int loadedPosition = -1;
     private Tile tile;
     private float baseFlammability = -1, puddleFlammability;
 
@@ -26,7 +34,10 @@ public class Fire extends TimedEntity {
         Fire fire = map.get(tile.packedPosition());
 
         if(fire == null){
-            map.put(tile.packedPosition(), new Fire(tile).add());
+            fire = Pools.obtain(Fire.class);
+            fire.tile = tile;
+            fire.lifetime = baseLifetime;
+            map.put(tile.packedPosition(), fire.add());
         }else{
             fire.lifetime = baseLifetime;
             fire.time = 0f;
@@ -40,10 +51,8 @@ public class Fire extends TimedEntity {
         }
     }
 
-    private Fire(Tile tile){
-        this.tile = tile;
-        lifetime = baseLifetime;
-    }
+    /**Deserialization use only!*/
+    private Fire(){}
 
     @Override
     public void update() {
@@ -94,12 +103,45 @@ public class Fire extends TimedEntity {
     }
 
     @Override
-    public Fire add(){
-        return add(effectGroup);
+    public void writeSave(DataOutputStream stream) throws IOException {
+        stream.writeInt(tile.packedPosition());
+        stream.writeFloat(lifetime);
+        stream.writeFloat(time);
+    }
+
+    @Override
+    public void readSave(DataInputStream stream) throws IOException {
+        this.loadedPosition = stream.readInt();
+        this.lifetime = stream.readFloat();
+        this.time = stream.readFloat();
+        add();
+    }
+
+    @Override
+    public void reset() {
+        loadedPosition = -1;
+        tile = null;
+        baseFlammability = -1;
+        puddleFlammability = 0f;
+    }
+
+    @Override
+    public void added() {
+        if(loadedPosition != -1){
+            map.put(loadedPosition, this);
+            tile = world.tile(loadedPosition);
+            set(tile.worldx(), tile.worldy());
+        }
     }
 
     @Override
     public void removed() {
         map.remove(tile.packedPosition());
+        reset();
+    }
+
+    @Override
+    public Fire add(){
+        return add(airItemGroup);
     }
 }

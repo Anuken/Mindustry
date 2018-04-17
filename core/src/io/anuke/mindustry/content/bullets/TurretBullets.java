@@ -70,10 +70,9 @@ public class TurretBullets {
             for(int i = 0; i < 9; i ++){
                 float len = Mathf.random(1f, 7f);
                 float a = Mathf.random(360f);
-                Bullet bullet = new Bullet(TurretBullets.basicLeadFrag, b,
+                Bullet bullet = Bullet.create(TurretBullets.basicLeadFrag, b,
                         x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a);
                 bullet.velocity.scl(Mathf.random(0.2f, 1f));
-                bullet.add();
             }
         }
 

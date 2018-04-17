@@ -125,7 +125,9 @@ public class Logic extends Module {
                 for(EntityGroup group : unitGroups){
                     Entities.update(group);
                 }
+                Entities.update(groundItemGroup);
                 Entities.update(tileGroup);
+                Entities.update(airItemGroup);
                 Entities.update(shieldGroup);
                 Entities.update(playerGroup);
 

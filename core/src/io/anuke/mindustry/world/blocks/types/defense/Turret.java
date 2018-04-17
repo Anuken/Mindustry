@@ -221,7 +221,7 @@ public abstract class Turret extends Block{
 	}
 	
 	protected void bullet(Tile tile, BulletType type, float angle){
-		new Bullet(type, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle).add();
+		Bullet.create(type, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
 	}
 
 	protected void effects(Tile tile){
