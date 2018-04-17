@@ -26,7 +26,7 @@ public class Conduit extends LiquidBlock {
     @Override
     public void draw(Tile tile){
         ConduitEntity entity = tile.entity();
-        LiquidModule mod = tile.entity.liquid;
+        LiquidModule mod = tile.entity.liquids;
 
         int rotation = rotate ? tile.getRotation() * 90 : 0;
 
@@ -43,9 +43,9 @@ public class Conduit extends LiquidBlock {
     @Override
     public void update(Tile tile){
         ConduitEntity entity = tile.entity();
-        entity.smoothLiquid = Mathf.lerpDelta(entity.smoothLiquid, entity.liquid.amount/liquidCapacity, 0.05f);
+        entity.smoothLiquid = Mathf.lerpDelta(entity.smoothLiquid, entity.liquids.amount/liquidCapacity, 0.05f);
 
-        if(tile.entity.liquid.amount > 0.001f && tile.entity.timer.get(timerFlow, 1)){
+        if(tile.entity.liquids.amount > 0.001f && tile.entity.timer.get(timerFlow, 1)){
             tryMoveLiquid(tile, tile.getNearby(tile.getRotation()), true);
         }
     }

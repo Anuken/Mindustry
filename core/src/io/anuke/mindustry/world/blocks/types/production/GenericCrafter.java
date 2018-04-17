@@ -50,7 +50,7 @@ public class GenericCrafter extends Block{
 		super.setBars();
 
 		if(inputItem != null) bars.replace(new BlockBar(BarType.inventory, true,
-				tile -> (float)tile.entity.inventory.getItem(inputItem.item) / itemCapacity));
+				tile -> (float)tile.entity.items.getItem(inputItem.item) / itemCapacity));
 	}
 	
 	@Override
@@ -68,8 +68,8 @@ public class GenericCrafter extends Block{
 		
 		if(!hasLiquids) return;
 		
-		Draw.color(tile.entity.liquid.liquid.color);
-		Draw.alpha(tile.entity.liquid.amount / liquidCapacity);
+		Draw.color(tile.entity.liquids.liquid.color);
+		Draw.alpha(tile.entity.liquids.amount / liquidCapacity);
 		Draw.rect("blank", tile.drawx(), tile.drawy(), 2, 2);
 		Draw.color();
 	}
@@ -87,15 +87,15 @@ public class GenericCrafter extends Block{
 		float liquidUsed = Math.min(liquidCapacity, liquidUse * Timers.delta());
 		int itemsUsed = (inputItem == null ? 0 : (int)(1 + inputItem.amount * entity.progress));
 
-		if((!hasLiquids || entity.liquid.amount >= liquidUsed) &&
+		if((!hasLiquids || entity.liquids.amount >= liquidUsed) &&
 				(!hasPower || entity.power.amount >= powerUsed) &&
-				(inputItem == null || entity.inventory.hasItem(inputItem.item, itemsUsed))){
+				(inputItem == null || entity.items.hasItem(inputItem.item, itemsUsed))){
 
 			entity.progress += 1f / craftTime * Timers.delta();
 			entity.totalProgress += Timers.delta();
 			entity.warmup = Mathf.lerp(entity.warmup, 1f, 0.02f);
 			if(hasPower) entity.power.amount -= powerUsed;
-			if(hasLiquids) entity.liquid.amount -= liquidUsed;
+			if(hasLiquids) entity.liquids.amount -= liquidUsed;
 
 			if(Mathf.chance(Timers.delta() * updateEffectChance))
 				Effects.effect(updateEffect, entity.x + Mathf.range(size*4f), entity.y + Mathf.range(size*4));
@@ -105,7 +105,7 @@ public class GenericCrafter extends Block{
 
 		if(entity.progress >= 1f){
 			
-			if(inputItem != null) tile.entity.inventory.removeItem(inputItem);
+			if(inputItem != null) tile.entity.items.removeItem(inputItem);
 			offloadNear(tile, output);
 			Effects.effect(craftEffect, tile.drawx(), tile.drawy());
 			entity.progress = 0f;
@@ -124,7 +124,7 @@ public class GenericCrafter extends Block{
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		TileEntity entity = tile.entity();
-		return inputItem != null && item == inputItem.item && entity.inventory.getItem(inputItem.item) < itemCapacity;
+		return inputItem != null && item == inputItem.item && entity.items.getItem(inputItem.item) < itemCapacity;
 	}
 
 	@Override

@@ -20,17 +20,17 @@ public class Compressor extends PowerCrafter {
         GenericCrafterEntity entity = tile.entity();
 
         float powerUsed = Math.min(Timers.delta() * powerUse, tile.entity.power.amount);
-        float liquidAdded = Math.min(outputLiquidAmount * Timers.delta(), liquidCapacity - entity.liquid.amount);
+        float liquidAdded = Math.min(outputLiquidAmount * Timers.delta(), liquidCapacity - entity.liquids.amount);
         int itemsUsed = Mathf.ceil(1 + input.amount * entity.progress);
 
-        if(entity.power.amount > powerUsed && entity.inventory.hasItem(input.item, itemsUsed) && liquidAdded > 0.001f){
+        if(entity.power.amount > powerUsed && entity.items.hasItem(input.item, itemsUsed) && liquidAdded > 0.001f){
             entity.progress += 1f/craftTime;
             entity.totalProgress += Timers.delta();
             handleLiquid(tile, tile, outputLiquid, liquidAdded);
         }
 
         if(entity.progress >= 1f){
-            entity.inventory.removeItem(input);
+            entity.items.removeItem(input);
             if(outputItem != null) offloadNear(tile, outputItem);
             entity.progress = 0f;
         }
@@ -50,7 +50,7 @@ public class Compressor extends PowerCrafter {
 
         Draw.rect(name, tile.drawx(), tile.drawy());
         Draw.rect(name + "-frame" + (int) Mathf.absin(entity.totalProgress, 5f, 2.999f), tile.drawx(), tile.drawy());
-        Draw.color(Color.CLEAR, tile.entity.liquid.liquid.color, tile.entity.liquid.amount / liquidCapacity);
+        Draw.color(Color.CLEAR, tile.entity.liquids.liquid.color, tile.entity.liquids.amount / liquidCapacity);
         Draw.rect(name + "-liquid", tile.drawx(), tile.drawy());
         Draw.color();
         Draw.rect(name + "-top", tile.drawx(), tile.drawy());

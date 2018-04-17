@@ -159,13 +159,13 @@ public class ItemBridge extends Block {
         ItemBridgeEntity entity = tile.entity();
 
         if(entity.uptime >= 0.5f && entity.timer.get(timerTransport, transportTime)){
-            Item item = entity.inventory.takeItem();
+            Item item = entity.items.takeItem();
             if(item != null && other.block().acceptItem(item, other, tile)){
                 other.block().handleItem(item, other, tile);
                 entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 4f, 0.05f);
             }else{
                 entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 1f, 0.01f);
-                if(item != null) entity.inventory.addItem(item, 1);
+                if(item != null) entity.items.addItem(item, 1);
             }
         }
     }
@@ -211,7 +211,7 @@ public class ItemBridge extends Block {
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return tile.entity.inventory.totalItems() < itemCapacity;
+        return tile.entity.items.totalItems() < itemCapacity;
     }
 
     @Override

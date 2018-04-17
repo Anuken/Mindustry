@@ -26,7 +26,7 @@ public class FusionReactor extends PowerGenerator {
         hasLiquids = true;
         powerCapacity = 100f;
         liquidCapacity = 30f;
-        hasInventory = true;
+        hasItems = true;
     }
 
     @Override
@@ -36,9 +36,9 @@ public class FusionReactor extends PowerGenerator {
         float powerUse = Math.min(powerCapacity, powerUsage * Timers.delta());
         float liquidUse = Math.min(liquidCapacity, liquidUsage * Timers.delta());
 
-        if(entity.power.amount >= powerUse && entity.liquid.amount >= liquidUse){
+        if(entity.power.amount >= powerUse && entity.liquids.amount >= liquidUse){
             entity.power.amount -= powerUse;
-            entity.liquid.amount -= liquidUse;
+            entity.liquids.amount -= liquidUse;
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, warmupSpeed);
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.01f);

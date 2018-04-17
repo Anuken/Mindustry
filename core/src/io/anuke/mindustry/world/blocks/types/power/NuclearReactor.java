@@ -52,7 +52,7 @@ public class NuclearReactor extends LiquidBurnerGenerator {
 	@Override
 	public void setBars(){
 		super.setBars();
-		bars.replace(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.inventory.getItem(generateItem) / itemCapacity));
+		bars.replace(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.getItem(generateItem) / itemCapacity));
 		bars.add(new BlockBar(BarType.heat, true, tile -> tile.<NuclearReactorEntity>entity().heat));
 	}
 
@@ -70,7 +70,7 @@ public class NuclearReactor extends LiquidBurnerGenerator {
 	public void update(Tile tile){
 		NuclearReactorEntity entity = tile.entity();
 		
-		int fuel = entity.inventory.getItem(generateItem);
+		int fuel = entity.items.getItem(generateItem);
 		float fullness = (float)fuel / itemCapacity;
 		
 		if(fuel > 0){
@@ -78,19 +78,19 @@ public class NuclearReactor extends LiquidBurnerGenerator {
 			entity.power.amount += powerMultiplier * fullness * Timers.delta();
 			entity.power.amount = Mathf.clamp(entity.power.amount, 0f, powerCapacity);
 			if(entity.timer.get(timerFuel, fuelUseTime)){
-				entity.inventory.removeItem(generateItem, 1);
+				entity.items.removeItem(generateItem, 1);
 			}
 		}
 		
-		if(entity.liquid.amount > 0){
+		if(entity.liquids.amount > 0){
 			//TODO steam when cooling large amounts?
 			float liquidPower = 1f;
 
 			if(liquidPower > 0){ //is coolant
-				float pow = coolantPower * entity.liquid.liquid.heatCapacity;
-				float maxCool = Math.min(entity.liquid.amount, entity.heat / pow); //max that can be cooled in terms of liquid
+				float pow = coolantPower * entity.liquids.liquid.heatCapacity;
+				float maxCool = Math.min(entity.liquids.amount, entity.heat / pow); //max that can be cooled in terms of liquid
 				entity.heat -= maxCool * pow;
-				entity.liquid.amount -= maxCool;
+				entity.liquids.amount -= maxCool;
 			}else{ //is heater
 				//TODO
 			}
@@ -124,7 +124,7 @@ public class NuclearReactor extends LiquidBurnerGenerator {
 		
 		NuclearReactorEntity entity = tile.entity();
 		
-		int fuel = entity.inventory.getItem(generateItem);
+		int fuel = entity.items.getItem(generateItem);
 		
 		if(fuel < 5 && entity.heat < 0.5f) return;
 		
@@ -156,13 +156,13 @@ public class NuclearReactor extends LiquidBurnerGenerator {
 
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
-		return item == generateItem && tile.entity.inventory.getItem(generateItem) < itemCapacity;
+		return item == generateItem && tile.entity.items.getItem(generateItem) < itemCapacity;
 	}
 
 	@Override
 	public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-		return tile.entity.liquid.amount + amount < liquidCapacity
-				&& (tile.entity.liquid.liquid == liquid || tile.entity.liquid.amount <= 0.001f);
+		return tile.entity.liquids.amount + amount < liquidCapacity
+				&& (tile.entity.liquids.liquid == liquid || tile.entity.liquids.amount <= 0.001f);
 	}
 
 	@Override

@@ -26,16 +26,16 @@ public class SortedUnloader extends Unloader {
     public void update(Tile tile){
         SortedUnloaderEntity entity = tile.entity();
 
-        if(entity.inventory.totalItems() == 0 && entity.timer.get(timerUnload, speed)){
+        if(entity.items.totalItems() == 0 && entity.timer.get(timerUnload, speed)){
             tile.allNearby(other -> {
-                if(other.block() instanceof StorageBlock && entity.inventory.totalItems() == 0 &&
+                if(other.block() instanceof StorageBlock && entity.items.totalItems() == 0 &&
                         ((StorageBlock)other.block()).hasItem(other, entity.sortItem)){
                     offloadNear(tile, ((StorageBlock)other.block()).removeItem(other, entity.sortItem));
                 }
             });
         }
 
-        if(entity.inventory.totalItems() > 0){
+        if(entity.items.totalItems() > 0){
             tryDump(tile);
         }
     }
@@ -61,7 +61,7 @@ public class SortedUnloader extends Unloader {
         SortedUnloaderEntity entity = tile.entity();
         if(entity != null){
             entity.sortItem = Item.getByID(data);
-            entity.inventory.clear();
+            entity.items.clear();
         }
     }
 

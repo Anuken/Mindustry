@@ -166,7 +166,7 @@ public class CraftingBlocks {
         craftEffect = BlockFx.pulverize;
         craftTime = 60f;
         updateEffect = BlockFx.pulverizeSmall;
-        hasInventory = hasPower = true;
+        hasItems = hasPower = true;
     }},
 
     oilRefinery = new GenericCrafter("oilrefinery") {{
@@ -177,7 +177,7 @@ public class CraftingBlocks {
         output = Items.coal;
         health = 80;
         craftEffect = BlockFx.purifyoil;
-        hasInventory = hasLiquids = hasPower = true;
+        hasItems = hasLiquids = hasPower = true;
     }},
 
     stoneFormer = new GenericCrafter("stoneformer") {{
@@ -188,7 +188,7 @@ public class CraftingBlocks {
         output = Items.stone;
         health = 80;
         craftEffect = BlockFx.purifystone;
-        hasLiquids = hasInventory = true;
+        hasLiquids = hasItems = true;
     }},
 
     weaponFactory = new WeaponFactory("weaponfactory") {{

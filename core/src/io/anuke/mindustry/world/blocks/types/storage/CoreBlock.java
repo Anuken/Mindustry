@@ -15,7 +15,7 @@ public class CoreBlock extends StorageBlock {
         destructible = true;
         unbreakable = true;
         size = 3;
-        hasInventory = true;
+        hasItems = true;
         itemCapacity = 2000;
     }
 

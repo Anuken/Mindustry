@@ -15,7 +15,7 @@ public class LiquidBlock extends Block{
 		update = true;
 		solid = true;
 		hasLiquids = true;
-		hasInventory = false;
+		hasItems = false;
 		group = BlockGroup.liquids;
 	}
 
@@ -26,7 +26,7 @@ public class LiquidBlock extends Block{
 	
 	@Override
 	public void draw(Tile tile){
-		LiquidModule mod = tile.entity.liquid;
+		LiquidModule mod = tile.entity.liquids;
 
 		int rotation = rotate ? tile.getRotation() * 90 : 0;
 		

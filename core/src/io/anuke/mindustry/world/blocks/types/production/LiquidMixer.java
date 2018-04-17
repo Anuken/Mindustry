@@ -17,7 +17,7 @@ public class LiquidMixer extends LiquidBlock{
 
     public LiquidMixer(String name) {
         super(name);
-        hasInventory = true;
+        hasItems = true;
         hasPower = true;
         rotate = false;
         liquidRegion = name() + "-liquid";
@@ -38,21 +38,21 @@ public class LiquidMixer extends LiquidBlock{
         LiquidMixerEntity entity = tile.entity();
         entity.accumulator += amount;
         int items = (int)(entity.accumulator / liquidPerItem);
-        entity.inventory.removeItem(inputItem, items);
+        entity.items.removeItem(inputItem, items);
         entity.accumulator %= liquidPerItem;
-        entity.liquid.liquid = outputLiquid;
-        entity.liquid.amount += amount;
+        entity.liquids.liquid = outputLiquid;
+        entity.liquids.amount += amount;
     }
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return item == inputItem && tile.entity.inventory.getItem(item) < itemCapacity;
+        return item == inputItem && tile.entity.items.getItem(item) < itemCapacity;
     }
 
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
-        return liquid == inputLiquid && tile.entity.liquid.amount + amount <= liquidCapacity &&
-                tile.entity.inventory.hasItem(inputItem, (int)((tile.<LiquidMixerEntity>entity().accumulator + amount)/amount)) &&
+        return liquid == inputLiquid && tile.entity.liquids.amount + amount <= liquidCapacity &&
+                tile.entity.items.hasItem(inputItem, (int)((tile.<LiquidMixerEntity>entity().accumulator + amount)/amount)) &&
                 tile.entity.power.amount >= powerUse;
     }
 

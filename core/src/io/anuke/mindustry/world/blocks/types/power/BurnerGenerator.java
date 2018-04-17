@@ -33,7 +33,7 @@ public class BurnerGenerator extends PowerGenerator {
 	@Override
 	public void setBars(){
 		super.setBars();
-		bars.replace(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.inventory.totalItems() / itemCapacity));
+		bars.replace(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.totalItems() / itemCapacity));
 	}
 	
 	@Override
@@ -51,7 +51,7 @@ public class BurnerGenerator extends PowerGenerator {
 		
 		if(entity.generateTime > 0){
 			Draw.color(heatColor);
-			float alpha = (entity.inventory.totalItems() > 0 ? 1f : Mathf.clamp(entity.generateTime));
+			float alpha = (entity.items.totalItems() > 0 ? 1f : Mathf.clamp(entity.generateTime));
 			alpha = alpha * 0.7f + Mathf.absin(Timers.time(), 12f, 0.3f) * alpha;
 			Draw.alpha(alpha);
 			Draw.rect(name + "-top", tile.worldx(), tile.worldy());
@@ -61,7 +61,7 @@ public class BurnerGenerator extends PowerGenerator {
 	
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
-		return getItemEfficiency(item) >= minEfficiency && tile.entity.inventory.totalItems() < itemCapacity;
+		return getItemEfficiency(item) >= minEfficiency && tile.entity.items.totalItems() < itemCapacity;
 	}
 	
 	@Override
@@ -77,11 +77,11 @@ public class BurnerGenerator extends PowerGenerator {
 			entity.generateTime = Mathf.clamp(entity.generateTime);
 		}
 		
-		if(entity.generateTime <= 0f && entity.inventory.totalItems() > 0){
+		if(entity.generateTime <= 0f && entity.items.totalItems() > 0){
 			Effects.effect(generateEffect, tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
-			for(int i = 0; i < entity.inventory.items.length; i ++){
-				if(entity.inventory.items[i] > 0){
-					entity.inventory.items[i] --;
+			for(int i = 0; i < entity.items.items.length; i ++){
+				if(entity.items.items[i] > 0){
+					entity.items.items[i] --;
 					entity.efficiency = getItemEfficiency(Item.getByID(i));
 					break;
 				}

@@ -33,7 +33,7 @@ public class Separator extends Block {
         super(name);
         update = true;
         solid = true;
-        hasInventory = true;
+        hasItems = true;
         hasLiquids = true;
     }
 
@@ -43,8 +43,8 @@ public class Separator extends Block {
 
         GenericCrafterEntity entity = tile.entity();
 
-        Draw.color(tile.entity.liquid.liquid.color);
-        Draw.alpha(tile.entity.liquid.amount / liquidCapacity);
+        Draw.color(tile.entity.liquids.liquid.color);
+        Draw.alpha(tile.entity.liquids.amount / liquidCapacity);
         Draw.rect(name + "-liquid", tile.drawx(), tile.drawy());
 
         Draw.color(Color.valueOf("858585"));
@@ -64,10 +64,10 @@ public class Separator extends Block {
 
         entity.totalProgress += entity.warmup*Timers.delta();
 
-        if(entity.liquid.amount >= liquidUsed && entity.inventory.hasItem(item) &&
+        if(entity.liquids.amount >= liquidUsed && entity.items.hasItem(item) &&
                 (!hasPower || entity.power.amount >= powerUsed)){
             entity.progress += 1f/filterTime;
-            entity.liquid.amount -= liquidUsed;
+            entity.liquids.amount -= liquidUsed;
             if(hasPower) entity.power.amount -= powerUsed;
 
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
@@ -78,7 +78,7 @@ public class Separator extends Block {
         if(entity.progress >= 1f){
             entity.progress = 0f;
             Item item = Mathf.select(results);
-            entity.inventory.removeItem(this.item, 1);
+            entity.items.removeItem(this.item, 1);
             if(item != null){
                 offloading = true;
                 offloadNear(tile, item);
@@ -103,7 +103,7 @@ public class Separator extends Block {
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return this.item == item && tile.entity.inventory.getItem(item) < itemCapacity;
+        return this.item == item && tile.entity.items.getItem(item) < itemCapacity;
     }
 
     @Override

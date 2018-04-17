@@ -21,8 +21,8 @@ public class Fracker extends SolidPump {
 
         Draw.rect(name, tile.drawx(), tile.drawy());
 
-        Draw.color(tile.entity.liquid.liquid.color);
-        Draw.alpha(tile.entity.liquid.amount/liquidCapacity);
+        Draw.color(tile.entity.liquids.liquid.color);
+        Draw.alpha(tile.entity.liquids.amount/liquidCapacity);
         Draw.rect(name + "-liquid", tile.drawx(), tile.drawy());
         Draw.color();
 

@@ -23,7 +23,7 @@ public class ShieldBlock extends PowerBlock{
 	public ShieldBlock(String name) {
 		super(name);
 		powerCapacity = 80f;
-		hasInventory = false;
+		hasItems = false;
 	}
 	
 	@Override

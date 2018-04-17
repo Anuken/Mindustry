@@ -42,7 +42,7 @@ public class Smelter extends Block{
 	@Override
 	public void setBars(){
 		for(Item item : inputs){
-			bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.inventory.getItem(item)/capacity));
+			bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.getItem(item)/capacity));
 		}
 	}
 	
@@ -62,13 +62,13 @@ public class Smelter extends Block{
 	public void update(Tile tile){
 		SmelterEntity entity = tile.entity();
 		
-		if(entity.timer.get(timerDump, 5) && entity.inventory.hasItem(result)){
+		if(entity.timer.get(timerDump, 5) && entity.items.hasItem(result)){
 			tryDump(tile, result);
 		}
 
 		//add fuel
-		if(entity.inventory.getItem(fuel) > 0 && entity.burnTime <= 0f){
-			entity.inventory.removeItem(fuel, 1);
+		if(entity.items.getItem(fuel) > 0 && entity.burnTime <= 0f){
+			entity.items.removeItem(fuel, 1);
 			entity.burnTime += burnDuration;
 			Effects.effect(burnEffect, entity.x + Mathf.range(2f), entity.y + Mathf.range(2f));
 		}
@@ -83,19 +83,19 @@ public class Smelter extends Block{
 
 		//make sure it has all the items
 		for(Item item : inputs){
-			if(!entity.inventory.hasItem(item)){
+			if(!entity.items.hasItem(item)){
 				return;
 			}
 		}
 
-		if(entity.inventory.getItem(result) >= capacity //output full
+		if(entity.items.getItem(result) >= capacity //output full
 				|| entity.burnTime <= 0 //not burning
 				|| !entity.timer.get(timerCraft, craftTime)){ //not yet time
 			return;
 		}
 
 		for(Item item : inputs){
-			entity.inventory.removeItem(item, 1);
+			entity.items.removeItem(item, 1);
 		}
 		
 		offloadNear(tile, result);
@@ -113,7 +113,7 @@ public class Smelter extends Block{
 			}
 		}
 
-		return (isInput && tile.entity.inventory.getItem(item) < capacity) || (item == fuel && tile.entity.inventory.getItem(fuel) < capacity);
+		return (isInput && tile.entity.items.getItem(item) < capacity) || (item == fuel && tile.entity.items.getItem(fuel) < capacity);
 	}
 
 	@Override

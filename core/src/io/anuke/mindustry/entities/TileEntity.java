@@ -19,19 +19,25 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.disabledTileGroup;
 import static io.anuke.mindustry.Vars.tileGroup;
 import static io.anuke.mindustry.Vars.world;
 
 public class TileEntity extends Entity{
+	public static final float timeToSleep = 60f*3; //3 seconds to fall asleep
+
 	public Tile tile;
 	public Timer timer;
 	public float health;
 	public boolean dead = false;
-	public boolean added;
 
 	public PowerModule power;
-	public InventoryModule inventory;
-	public LiquidModule liquid;
+	public InventoryModule items;
+	public LiquidModule liquids;
+
+	private boolean added;
+	private boolean sleeping;
+	private float sleepTime;
 	
 	/**Sets this tile entity data to this tile, and adds it if necessary.*/
 	public TileEntity init(Tile tile, boolean added){
@@ -50,14 +56,31 @@ public class TileEntity extends Entity{
 		
 		return this;
 	}
-	
-	public void write(DataOutputStream stream) throws IOException{
-		
+
+	/**Call when nothing is happening to the entity.
+	 * This increments the internal sleep timer.*/
+	public void sleep(){
+		sleepTime += Timers.delta();
+		if(!sleeping && sleepTime >= timeToSleep){
+			remove();
+			add(disabledTileGroup);
+			sleeping = true;
+		}
+	}
+
+	/**Call when something just happened to the entity.
+	 * If the entity was sleeping, this enables it. This also resets the sleep timer.*/
+	public void wakeUp(){
+		sleepTime = 0f;
+		if(sleeping){
+			remove();
+			add(tileGroup);
+			sleeping = false;
+		}
 	}
 	
-	public void read(DataInputStream stream) throws IOException{
-		
-	}
+	public void write(DataOutputStream stream) throws IOException{}
+	public void read(DataInputStream stream) throws IOException{}
 	
 	public void onDeath(){
 		onDeath(false);
@@ -81,6 +104,10 @@ public class TileEntity extends Entity{
 			}
 		}
 	}
+
+	public boolean collide(Bullet other){
+		return true;
+	}
 	
 	public void collision(Bullet other){
 		damage(other.getDamage());
@@ -98,13 +125,10 @@ public class TileEntity extends Entity{
 		}
 	}
 	
-	public boolean collide(Bullet other){
-		return true;
-	}
-	
 	@Override
 	public void update(){
 		synchronized (Tile.tileSetLock) {
+			//TODO better smoke effect, this one is awful
 			if (health != 0 && health < tile.block().health && !(tile.block() instanceof Wall) &&
 					Mathf.chance(0.009f * Timers.delta() * (1f - health / tile.block().health))) {
 

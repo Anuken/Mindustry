@@ -23,7 +23,7 @@ public class Incinerator extends Block {
     public Incinerator(String name) {
         super(name);
         hasPower = true;
-        hasInventory = false;
+        hasItems = false;
         hasLiquids = true;
         update = true;
         solid = true;

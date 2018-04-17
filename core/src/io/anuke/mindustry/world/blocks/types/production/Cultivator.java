@@ -37,7 +37,7 @@ public class Cultivator extends Drill {
 
         CultivatorEntity entity = tile.entity();
         entity.warmup = Mathf.lerpDelta(entity.warmup,
-                tile.entity.liquid.amount > liquidUse ? 1f : 0f, 0.015f);
+                tile.entity.liquids.amount > liquidUse ? 1f : 0f, 0.015f);
     }
 
     @Override

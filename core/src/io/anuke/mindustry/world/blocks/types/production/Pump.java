@@ -37,8 +37,8 @@ public class Pump extends LiquidBlock{
 	public void draw(Tile tile){
 		Draw.rect(name(), tile.drawx(), tile.drawy());
 		
-		Draw.color(tile.entity.liquid.liquid.color);
-		Draw.alpha(tile.entity.liquid.amount / liquidCapacity);
+		Draw.color(tile.entity.liquids.liquid.color);
+		Draw.alpha(tile.entity.liquids.amount / liquidCapacity);
 		Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
 		Draw.color();
 	}
@@ -64,9 +64,9 @@ public class Pump extends LiquidBlock{
 	public void update(Tile tile){
 		
 		if(tile.floor().liquidDrop != null){
-			float maxPump = Math.min(liquidCapacity - tile.entity.liquid.amount, pumpAmount * Timers.delta());
-			tile.entity.liquid.liquid = tile.floor().liquidDrop;
-			tile.entity.liquid.amount += maxPump;
+			float maxPump = Math.min(liquidCapacity - tile.entity.liquids.amount, pumpAmount * Timers.delta());
+			tile.entity.liquids.liquid = tile.floor().liquidDrop;
+			tile.entity.liquids.amount += maxPump;
 		}
 
 		tryDumpLiquid(tile);

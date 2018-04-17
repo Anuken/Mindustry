@@ -72,7 +72,7 @@ public class Teleporter extends PowerBlock{
 		TeleporterEntity entity = tile.entity();
 		if(entity != null){
 			entity.color = data;
-			entity.inventory.clear();
+			entity.items.clear();
 		}
 	}
 
@@ -138,7 +138,7 @@ public class Teleporter extends PowerBlock{
 
 		teleporters[entity.color].add(tile);
 
-		if(entity.inventory.totalItems() > 0){
+		if(entity.items.totalItems() > 0){
 			tryDump(tile);
 		}
 
@@ -172,8 +172,8 @@ public class Teleporter extends PowerBlock{
 				entity.speedScl = Mathf.lerpDelta(entity.speedScl, 2f, 0.01f);
 				float liquidUsed = Math.min(liquidCapacity, liquidUse * Timers.delta());
 
-				if (entity.liquid.amount >= liquidUsed) {
-					entity.liquid.amount -= liquidUsed;
+				if (entity.liquids.amount >= liquidUsed) {
+					entity.liquids.amount -= liquidUsed;
 				} else {
 					catastrophicFailure(tile);
 				}
@@ -183,7 +183,7 @@ public class Teleporter extends PowerBlock{
 
 			entity.time += Timers.delta() * entity.speedScl;
 
-			if (entity.inventory.totalItems() == itemCapacity && entity.power.amount >= powerCapacity &&
+			if (entity.items.totalItems() == itemCapacity && entity.power.amount >= powerCapacity &&
 					entity.timer.get(timerTeleport, teleportMax)) {
 				Array<Tile> testLinks = findLinks(tile);
 
@@ -196,12 +196,12 @@ public class Teleporter extends PowerBlock{
 					Array<Tile> links = findLinks(tile);
 
 					for (Tile other : links) {
-						int canAccept = itemCapacity - other.entity.inventory.totalItems();
-						int total = entity.inventory.totalItems();
+						int canAccept = itemCapacity - other.entity.items.totalItems();
+						int total = entity.items.totalItems();
 						if (total == 0) break;
 						Effects.effect(teleportOutEffect, getColor(tile, 0), other.drawx(), other.drawy());
 						for (int i = 0; i < canAccept && i < total; i++) {
-							other.entity.inventory.addItem(entity.inventory.takeItem(), 1);
+							other.entity.items.addItem(entity.items.takeItem(), 1);
 						}
 					}
 					Effects.effect(teleportOutEffect, getColor(tile, 0), tile.drawx(), tile.drawy());
@@ -249,7 +249,7 @@ public class Teleporter extends PowerBlock{
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		TeleporterEntity entity = tile.entity();
-		return entity.inventory.totalItems() < itemCapacity;
+		return entity.items.totalItems() < itemCapacity;
 	}
 	
 	@Override
@@ -289,7 +289,7 @@ public class Teleporter extends PowerBlock{
 					if(!oe.active) continue;
 					if(oe.color != entity.color){
 						removal.add(other);
-					}else if(other.entity.inventory.totalItems() == 0){
+					}else if(other.entity.items.totalItems() == 0){
 						returns.add(other);
 					}
 				}else{

@@ -318,8 +318,8 @@ public class Tile{
 
 			if (block.hasEntity()) {
 				entity = block.getEntity().init(this, block.update);
-				if(block.hasInventory) entity.inventory = new InventoryModule();
-				if(block.hasLiquids) entity.liquid = new LiquidModule();
+				if(block.hasItems) entity.items = new InventoryModule();
+				if(block.hasLiquids) entity.liquids = new LiquidModule();
 				if(block.hasPower) entity.power = new PowerModule();
 			}
 

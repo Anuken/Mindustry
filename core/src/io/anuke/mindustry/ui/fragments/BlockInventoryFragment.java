@@ -63,8 +63,8 @@ public class BlockInventoryFragment implements Fragment {
                 hide();
             }else {
                 updateTablePosition();
-                if(tile.block().hasInventory) {
-                    int[] items = tile.entity.inventory.items;
+                if(tile.block().hasItems) {
+                    int[] items = tile.entity.items.items;
                     for (int i = 0; i < items.length; i++) {
                         if ((items[i] == 0) == container.contains(i)) {
                             rebuild();
@@ -80,8 +80,8 @@ public class BlockInventoryFragment implements Fragment {
         table.margin(3f);
         table.defaults().size(16 * 2).space(6f);
 
-        if(tile.block().hasInventory) {
-            int[] items = tile.entity.inventory.items;
+        if(tile.block().hasItems) {
+            int[] items = tile.entity.items.items;
 
             for (int i = 0; i < items.length; i++) {
                 final int f = i;

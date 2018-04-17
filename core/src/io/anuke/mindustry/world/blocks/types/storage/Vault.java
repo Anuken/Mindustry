@@ -18,7 +18,7 @@ public class Vault extends StorageBlock {
         int iterations = Math.max(1, (int) (Timers.delta() + 0.4f));
 
         for(int i = 0; i < iterations; i ++) {
-            if (tile.entity.inventory.totalItems() > 0) {
+            if (tile.entity.items.totalItems() > 0) {
                 tryDump(tile);
             }
         }
@@ -32,7 +32,7 @@ public class Vault extends StorageBlock {
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return tile.entity.inventory.totalItems() < itemCapacity;
+        return tile.entity.items.totalItems() < itemCapacity;
     }
 
     @Override
@@ -41,8 +41,8 @@ public class Vault extends StorageBlock {
         if(!(to.block() instanceof StorageBlock)) return false;
 
         if(to.block() instanceof Vault){
-            return (float)to.entity.inventory.totalItems() / to.block().itemCapacity <
-                    (float)tile.entity.inventory.totalItems() / itemCapacity;
+            return (float)to.entity.items.totalItems() / to.block().itemCapacity <
+                    (float)tile.entity.items.totalItems() / itemCapacity;
         }
 
         return true;

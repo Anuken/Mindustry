@@ -45,7 +45,7 @@ public class DebugBlocks {
         @Override
         public void update(Tile tile) {
             SorterEntity entity = tile.entity();
-            entity.inventory.items[entity.sortItem.id] = 1;
+            entity.items.items[entity.sortItem.id] = 1;
             tryDump(tile, entity.sortItem);
         }
 
@@ -72,8 +72,8 @@ public class DebugBlocks {
         public void update(Tile tile) {
             LiquidSourceEntity entity = tile.entity();
 
-            tile.entity.liquid.amount = liquidCapacity;
-            tile.entity.liquid.liquid = entity.source;
+            tile.entity.liquids.amount = liquidCapacity;
+            tile.entity.liquids.liquid = entity.source;
             tryDumpLiquid(tile);
         }
 

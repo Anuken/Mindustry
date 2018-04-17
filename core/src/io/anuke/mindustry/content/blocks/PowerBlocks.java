@@ -76,13 +76,13 @@ public class PowerBlocks {
 
     battery = new PowerGenerator("battery") {{
         powerCapacity = 320f;
-        hasInventory = false;
+        hasItems = false;
     }},
 
     batteryLarge = new PowerGenerator("batterylarge") {{
         size = 3;
         powerCapacity = 2000f;
-        hasInventory = false;
+        hasItems = false;
     }},
 
     powernode = new PowerDistributor("powernode"),

@@ -171,14 +171,14 @@ public class Block extends BaseBlock {
 
 		if(hasPower) stats.add("powercapacity", powerCapacity);
 		if(hasLiquids) stats.add("liquidcapacity", liquidCapacity);
-		if(hasInventory) stats.add("capacity", itemCapacity);
+		if(hasItems) stats.add("capacity", itemCapacity);
 	}
 
 	//TODO make this easier to config.
 	public void setBars(){
 		if(hasPower) bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.amount / powerCapacity));
-		if(hasLiquids) bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquid.amount / liquidCapacity));
-		if(hasInventory) bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.inventory.totalItems() / itemCapacity));
+		if(hasLiquids) bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.amount / liquidCapacity));
+		if(hasItems) bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.totalItems() / itemCapacity));
 	}
 	
 	public String name(){
@@ -200,7 +200,7 @@ public class Block extends BaseBlock {
 	public void update(Tile tile){}
 
 	public boolean isAccessible(){
-		return (hasInventory && itemCapacity > 0);
+		return (hasItems && itemCapacity > 0);
 	}
 	
 	public void onDestroyed(Tile tile){
@@ -212,9 +212,9 @@ public class Block extends BaseBlock {
 		int units = 1;
 		tempColor.set(Palette.darkFlame);
 
-		if(hasInventory){
+		if(hasItems){
 			for(Item item : Item.getAllItems()){
-				int amount = tile.entity.inventory.getItem(item);
+				int amount = tile.entity.items.getItem(item);
 				explosiveness += item.explosiveness*amount;
 				flammability += item.flammability*amount;
 
@@ -226,14 +226,14 @@ public class Block extends BaseBlock {
 		}
 
 		if(hasLiquids){
-			float amount = tile.entity.liquid.amount;
-			explosiveness += tile.entity.liquid.liquid.explosiveness*amount/2f;
-			flammability += tile.entity.liquid.liquid.flammability*amount/2f;
-			heat += Mathf.clamp(tile.entity.liquid.liquid.temperature-0.5f)*amount/2f;
+			float amount = tile.entity.liquids.amount;
+			explosiveness += tile.entity.liquids.liquid.explosiveness*amount/2f;
+			flammability += tile.entity.liquids.liquid.flammability*amount/2f;
+			heat += Mathf.clamp(tile.entity.liquids.liquid.temperature-0.5f)*amount/2f;
 
-			if(tile.entity.liquid.liquid.flammability*amount > 2f){
+			if(tile.entity.liquids.liquid.flammability*amount > 2f){
 				units ++;
-				Hue.addu(tempColor, tile.entity.liquid.liquid.flameColor);
+				Hue.addu(tempColor, tile.entity.liquids.liquid.flameColor);
 			}
 		}
 
@@ -243,10 +243,10 @@ public class Block extends BaseBlock {
 
 		tempColor.mul(1f/units);
 
-		Liquid liquid = tile.entity.liquid.liquid;
-		float splash = Mathf.clamp(tile.entity.liquid.amount/4f, 0f, 10f);
+		Liquid liquid = tile.entity.liquids.liquid;
+		float splash = Mathf.clamp(tile.entity.liquids.amount/4f, 0f, 10f);
 
-		for(int i = 0; i < Mathf.clamp(tile.entity.liquid.amount / 5, 0, 30); i ++){
+		for(int i = 0; i < Mathf.clamp(tile.entity.liquids.amount / 5, 0, 30); i ++){
 			Timers.run(i/2, () -> {
 				Tile other = world.tile(tile.x + Mathf.range(size/2), tile.y + Mathf.range(size/2));
 				if(other != null){
@@ -261,7 +261,7 @@ public class Block extends BaseBlock {
 	/**Returns the flammability of the tile. Used for fire calculations.
 	 * Takes flammability of floor liquid into account.*/
 	public float getFlammability(Tile tile){
-		if(!hasInventory || tile.entity == null){
+		if(!hasItems || tile.entity == null){
 			if(tile.floor().liquid && !solid){
 				return tile.floor().liquidDrop.flammability;
 			}
@@ -269,11 +269,11 @@ public class Block extends BaseBlock {
 		}else{
 			float result = 0f;
 			for(Item item : Item.getAllItems()){
-				int amount = tile.entity.inventory.getItem(item);
+				int amount = tile.entity.items.getItem(item);
 				result += item.flammability*amount;
 			}
 			if(hasLiquids){
-				result += tile.entity.liquid.amount * tile.entity.liquid.liquid.flammability/3f;
+				result += tile.entity.liquids.amount * tile.entity.liquids.liquid.flammability/3f;
 			}
 			return result;
 		}
@@ -376,7 +376,7 @@ public class Block extends BaseBlock {
 				"entity.x", tile.entity.x,
 				"entity.y", tile.entity.y,
 				"entity.id", tile.entity.id,
-				"entity.items.total", hasInventory ? tile.entity.inventory.totalItems() : null
+				"entity.items.total", hasItems ? tile.entity.items.totalItems() : null
 		);
 	}
 

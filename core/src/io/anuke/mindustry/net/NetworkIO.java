@@ -69,9 +69,9 @@ public class NetworkIO {
                         stream.writeByte(Bits.packByte((byte)tile.getTeam().ordinal(), tile.getRotation()));
                         stream.writeShort((short)tile.entity.health); //health
 
-                        if(tile.entity.inventory != null) tile.entity.inventory.write(stream);
+                        if(tile.entity.items != null) tile.entity.items.write(stream);
                         if(tile.entity.power != null) tile.entity.power.write(stream);
-                        if(tile.entity.liquid != null) tile.entity.liquid.write(stream);
+                        if(tile.entity.liquids != null) tile.entity.liquids.write(stream);
 
                         tile.entity.write(stream);
                     }
@@ -156,9 +156,9 @@ public class NetworkIO {
 
                         tile.entity.health = health;
 
-                        if (tile.entity.inventory != null) tile.entity.inventory.read(stream);
+                        if (tile.entity.items != null) tile.entity.items.read(stream);
                         if (tile.entity.power != null) tile.entity.power.read(stream);
-                        if (tile.entity.liquid != null) tile.entity.liquid.read(stream);
+                        if (tile.entity.liquids != null) tile.entity.liquids.read(stream);
 
                         tile.entity.read(stream);
                     }

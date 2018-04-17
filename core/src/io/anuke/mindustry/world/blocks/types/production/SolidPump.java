@@ -35,8 +35,8 @@ public class SolidPump extends Pump {
         SolidPumpEntity entity = tile.entity();
 
         Draw.rect(name, tile.drawx(), tile.drawy());
-        Draw.color(tile.entity.liquid.liquid.color);
-        Draw.alpha(tile.entity.liquid.amount / liquidCapacity);
+        Draw.color(tile.entity.liquids.liquid.color);
+        Draw.alpha(tile.entity.liquids.amount / liquidCapacity);
         Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
         Draw.color();
         Draw.rect(name + "-rotator", tile.drawx(), tile.drawy(), entity.pumpTime * rotateSpeed);
@@ -66,10 +66,10 @@ public class SolidPump extends Pump {
             if(isValid(tile)) fraction = 1f;
         }
 
-        if(tile.entity.power.amount >= used && tile.entity.liquid.amount < liquidCapacity - 0.001f){
-            float maxPump = Math.min(liquidCapacity - tile.entity.liquid.amount, pumpAmount * Timers.delta() * fraction);
-            tile.entity.liquid.liquid = result;
-            tile.entity.liquid.amount += maxPump;
+        if(tile.entity.power.amount >= used && tile.entity.liquids.amount < liquidCapacity - 0.001f){
+            float maxPump = Math.min(liquidCapacity - tile.entity.liquids.amount, pumpAmount * Timers.delta() * fraction);
+            tile.entity.liquids.liquid = result;
+            tile.entity.liquids.amount += maxPump;
             tile.entity.power.amount -= used;
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
             if(Mathf.chance(Timers.delta() * updateEffectChance))

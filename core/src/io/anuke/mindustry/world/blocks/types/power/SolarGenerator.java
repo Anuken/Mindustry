@@ -9,7 +9,7 @@ public class SolarGenerator extends io.anuke.mindustry.world.blocks.types.power.
 
     public SolarGenerator(String name){
         super(name);
-        hasInventory = false;
+        hasItems = false;
     }
 
     @Override

@@ -38,8 +38,8 @@ public class LiquidBurnerGenerator extends PowerGenerator {
 
 		TileEntity entity = tile.entity();
 		
-		Draw.color(entity.liquid.liquid.color);
-		Draw.alpha(entity.liquid.amount / liquidCapacity);
+		Draw.color(entity.liquids.liquid.color);
+		Draw.alpha(entity.liquids.amount / liquidCapacity);
 		drawLiquidCenter(tile);
 		Draw.color();
 	}
@@ -52,12 +52,12 @@ public class LiquidBurnerGenerator extends PowerGenerator {
 	public void update(Tile tile){
 		TileEntity entity = tile.entity();
 		
-		if(entity.liquid.amount > 0){
-			float powerPerLiquid = getEfficiency(entity.liquid.liquid)*this.powerPerLiquid;
-			float used = Math.min(entity.liquid.amount, maxLiquidGenerate * Timers.delta());
+		if(entity.liquids.amount > 0){
+			float powerPerLiquid = getEfficiency(entity.liquids.liquid)*this.powerPerLiquid;
+			float used = Math.min(entity.liquids.amount, maxLiquidGenerate * Timers.delta());
 			used = Math.min(used, (powerCapacity - entity.power.amount)/powerPerLiquid);
 			
-			entity.liquid.amount -= used;
+			entity.liquids.amount -= used;
 			entity.power.amount += used * powerPerLiquid;
 			
 			if(used > 0.001f && Mathf.chance(0.05 * Timers.delta())){

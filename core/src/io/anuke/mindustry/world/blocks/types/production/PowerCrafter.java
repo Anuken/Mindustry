@@ -37,13 +37,13 @@ public class PowerCrafter extends Block{
         float powerUsed = Math.min(Timers.delta() * powerUse, tile.entity.power.amount);
         int itemsUsed = Mathf.ceil(1 + input.amount * entity.progress);
 
-        if(entity.power.amount > powerUsed && entity.inventory.hasItem(input.item, itemsUsed)){
+        if(entity.power.amount > powerUsed && entity.items.hasItem(input.item, itemsUsed)){
             entity.progress += 1f/craftTime;
             entity.totalProgress += Timers.delta();
         }
 
         if(entity.progress >= 1f){
-            entity.inventory.removeItem(input);
+            entity.items.removeItem(input);
             if(outputItem != null) offloadNear(tile, outputItem);
             if(outputLiquid != null) handleLiquid(tile, tile, outputLiquid, outputLiquidAmount);
             entity.progress = 0f;
@@ -60,7 +60,7 @@ public class PowerCrafter extends Block{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return item == input.item && tile.entity.inventory.getItem(input.item) < itemCapacity;
+        return item == input.item && tile.entity.items.getItem(input.item) < itemCapacity;
     }
 
     @Override

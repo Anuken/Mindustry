@@ -135,17 +135,17 @@ public class Drill extends Block{
 		float powerUsed = Math.min(powerCapacity, powerUse * Timers.delta());
 		float liquidUsed = Math.min(liquidCapacity, liquidUse * Timers.delta());
 
-		if(entity.inventory.totalItems() < itemCapacity && toAdd.size > 0 &&
+		if(entity.items.totalItems() < itemCapacity && toAdd.size > 0 &&
 				(!hasPower || entity.power.amount >= powerUsed) &&
-				(!liquidRequired || entity.liquid.amount >= liquidUsed)){
+				(!liquidRequired || entity.liquids.amount >= liquidUsed)){
 
 			if(hasPower) entity.power.amount -= powerUsed;
-			if(liquidRequired) entity.liquid.amount -= liquidUsed;
+			if(liquidRequired) entity.liquids.amount -= liquidUsed;
 
 			float speed = 1f;
 
-			if(entity.liquid.amount >= liquidUsed && !liquidRequired){
-				entity.liquid.amount -= liquidUsed;
+			if(entity.liquids.amount >= liquidUsed && !liquidRequired){
+				entity.liquids.amount -= liquidUsed;
 				speed = liquidBoostIntensity;
 			}
 
@@ -160,7 +160,7 @@ public class Drill extends Block{
 		}
 
 		if(toAdd.size > 0 && entity.progress >= drillTime + hardnessDrillMultiplier*Math.max(totalHardness, 1f)/multiplier
-				&& tile.entity.inventory.totalItems() < itemCapacity){
+				&& tile.entity.items.totalItems() < itemCapacity){
 
 			int index = entity.index % toAdd.size;
 			offloadNear(tile, toAdd.get(index));

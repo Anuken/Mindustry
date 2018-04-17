@@ -123,7 +123,7 @@ public class UnitFactory extends Block {
             }
         }
 
-        if(hasRequirements(entity.inventory, entity.buildTime/produceTime) &&
+        if(hasRequirements(entity.items, entity.buildTime/produceTime) &&
                 entity.power.amount >= used && !entity.open){
 
             entity.buildTime += Timers.delta();
@@ -151,7 +151,7 @@ public class UnitFactory extends Block {
             //Timers.run(openDuration, () -> entity.open = false);
 
             for(ItemStack stack : requirements){
-                entity.inventory.removeItem(stack.item, stack.amount);
+                entity.items.removeItem(stack.item, stack.amount);
             }
         }
     }
@@ -159,7 +159,7 @@ public class UnitFactory extends Block {
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
         for(ItemStack stack : requirements){
-            if(item == stack.item && tile.entity.inventory.getItem(item) <= stack.amount*2){
+            if(item == stack.item && tile.entity.items.getItem(item) <= stack.amount*2){
                 return true;
             }
         }

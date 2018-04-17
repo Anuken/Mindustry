@@ -19,16 +19,16 @@ public class Unloader extends Block {
 
     @Override
     public void update(Tile tile){
-        if(tile.entity.inventory.totalItems() == 0 && tile.entity.timer.get(timerUnload, speed)){
+        if(tile.entity.items.totalItems() == 0 && tile.entity.timer.get(timerUnload, speed)){
             tile.allNearby(other -> {
-                if(other.block() instanceof StorageBlock && tile.entity.inventory.totalItems() == 0 &&
+                if(other.block() instanceof StorageBlock && tile.entity.items.totalItems() == 0 &&
                         ((StorageBlock)other.block()).hasItem(other, null)){
                     offloadNear(tile, ((StorageBlock)other.block()).removeItem(other, null));
                 }
             });
         }
 
-        if(tile.entity.inventory.totalItems() > 0){
+        if(tile.entity.items.totalItems() > 0){
             tryDump(tile);
         }
     }

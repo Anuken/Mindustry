@@ -91,6 +91,6 @@ public class Inventory {
         if(set.size == 0) return empty;
         Array<Tile> tiles = set.first().cores;
         if(tiles.size == 0) return empty;
-        return tiles.first().entity.inventory.items;
+        return tiles.first().entity.items.items;
     }
 }

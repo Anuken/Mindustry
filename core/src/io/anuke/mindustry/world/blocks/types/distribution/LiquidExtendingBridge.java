@@ -11,7 +11,7 @@ public class LiquidExtendingBridge extends ExtendingItemBridge {
 
     public LiquidExtendingBridge(String name) {
         super(name);
-        hasInventory = false;
+        hasItems = false;
         hasLiquids = true;
     }
 

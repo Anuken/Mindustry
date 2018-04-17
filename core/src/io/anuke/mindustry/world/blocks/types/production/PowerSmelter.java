@@ -55,7 +55,7 @@ public class PowerSmelter extends PowerBlock {
         bars.remove(BarType.inventory);
 
         for(ItemStack item : inputs){
-            bars.add(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.inventory.getItem(item.item) / capacity));
+            bars.add(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.items.getItem(item.item) / capacity));
         }
     }
 
@@ -76,7 +76,7 @@ public class PowerSmelter extends PowerBlock {
 
         PowerSmelterEntity entity = tile.entity();
 
-        if(entity.timer.get(timerDump, 5) && entity.inventory.hasItem(result)){
+        if(entity.timer.get(timerDump, 5) && entity.items.hasItem(result)){
             tryDump(tile, result);
         }
 
@@ -96,19 +96,19 @@ public class PowerSmelter extends PowerBlock {
 
         //make sure it has all the items
         for(ItemStack item : inputs){
-            if(!entity.inventory.hasItem(item.item, item.amount)){
+            if(!entity.items.hasItem(item.item, item.amount)){
                 return;
             }
         }
 
-        if(entity.inventory.getItem(result) >= capacity //output full
+        if(entity.items.getItem(result) >= capacity //output full
                 || entity.heat <= minHeat //not burning
                 || !entity.timer.get(timerCraft, craftTime)){ //not yet time
             return;
         }
 
         for(ItemStack item : inputs){
-            entity.inventory.removeItem(item.item, item.amount);
+            entity.items.removeItem(item.item, item.amount);
         }
 
         offloadNear(tile, result);
@@ -120,7 +120,7 @@ public class PowerSmelter extends PowerBlock {
 
         for(ItemStack stack : inputs){
             if(stack.item == item){
-                return tile.entity.inventory.getItem(item) < capacity;
+                return tile.entity.items.getItem(item) < capacity;
             }
         }
 

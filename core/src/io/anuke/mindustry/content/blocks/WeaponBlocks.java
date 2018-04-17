@@ -134,8 +134,8 @@ public class WeaponBlocks{
 		drawer = (tile, entity) -> {
 			Draw.rect(name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
 
-			Draw.color(entity.liquid.liquid.color);
-			Draw.alpha(entity.liquid.amount/liquidCapacity);
+			Draw.color(entity.liquids.liquid.color);
+			Draw.alpha(entity.liquids.amount/liquidCapacity);
 			Draw.rect(name + "-liquid", tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
 			Draw.color();
 		};

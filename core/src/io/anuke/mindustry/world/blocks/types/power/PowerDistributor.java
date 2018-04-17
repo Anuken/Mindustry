@@ -43,7 +43,7 @@ public class PowerDistributor extends PowerBlock{
 		super(name);
 		expanded = true;
 		layer = Layer.power;
-		hasInventory = false;
+		hasItems = false;
 		powerCapacity = 5f;
 	}
 
