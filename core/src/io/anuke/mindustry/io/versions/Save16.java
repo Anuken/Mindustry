@@ -2,22 +2,20 @@ package io.anuke.mindustry.io.versions;
 
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
-import io.anuke.mindustry.content.Weapons;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.ReflectionException;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
-import io.anuke.mindustry.entities.StatusEffect;
-import io.anuke.mindustry.entities.units.BaseUnit;
-import io.anuke.mindustry.entities.units.UnitType;
+import io.anuke.mindustry.entities.SerializableEntity;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.SaveFileVersion;
-import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
-import io.anuke.ucore.core.Core;
 import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.util.Bits;
 
@@ -48,6 +46,10 @@ public class Save16 extends SaveFileVersion {
         float wavetime = stream.readFloat();
 
         state.difficulty = Difficulty.values()[difficulty];
+        state.mode = GameMode.values()[mode];
+        state.enemies = 0; //TODO display enemies correctly!
+        state.wave = wave;
+        state.wavetime = wavetime;
 
         //block header
 
@@ -62,70 +64,25 @@ public class Save16 extends SaveFileVersion {
             map.put(id, Block.getByName(name));
         }
 
-        float playerx = stream.readFloat();
-        float playery = stream.readFloat();
+        //entities
 
-        short playerhealth = stream.readShort();
-        byte peffect = stream.readByte();
-        float petime = stream.readFloat();
+        try {
 
-        if(!headless) {
-            player.x = playerx;
-            player.y = playery;
-            player.status.set(StatusEffect.getByID(peffect), petime);
-            player.health = playerhealth;
-            state.mode = GameMode.values()[mode];
-            Core.camera.position.set(playerx, playery, 0);
+            byte groups = stream.readByte();
 
-            //weapons
-            control.upgrades().getWeapons().clear();
-            control.upgrades().getWeapons().add(Weapons.blaster);
-            player.weaponLeft = player.weaponRight = Weapons.blaster;
-
-            int weapons = stream.readByte();
-
-            for (int i = 0; i < weapons; i++) {
-                control.upgrades().addWeapon(Upgrade.getByID(stream.readByte()));
+            for (int i = 0; i < groups; i++) {
+                int amount = stream.readInt();
+                byte gid = stream.readByte();
+                EntityGroup<?> group = Entities.getGroup(gid);
+                for (int j = 0; j < amount; j++) {
+                    Entity entity = ClassReflection.newInstance(group.getType());
+                    ((SerializableEntity)entity).readSave(stream);
+                }
             }
 
-        }else{
-            byte b = stream.readByte();
-            for(int i = 0; i < b; i ++) stream.readByte();
+        }catch (ReflectionException e){
+            throw new RuntimeException(e);
         }
-
-        //enemies
-
-        byte teams = stream.readByte();
-
-        for(int i = 0; i < teams; i ++){
-            Team team = Team.values()[i];
-            EntityGroup<BaseUnit> group = unitGroups[i];
-
-            int amount = stream.readInt();
-
-            for(int j = 0; j < amount; j ++){
-                byte type = stream.readByte();
-                float x = stream.readFloat();
-                float y = stream.readFloat();
-                int health = stream.readShort();
-                byte effect = stream.readByte();
-                float etime = stream.readFloat();
-
-                BaseUnit enemy = new BaseUnit(UnitType.getByID(type), team);
-                enemy.health = health;
-                enemy.x = x;
-                enemy.y = y;
-                enemy.status.set(StatusEffect.getByID(effect), etime);
-                enemy.add(group);
-            }
-        }
-
-        state.enemies = 0; //TODO display enemies correctly!
-        state.wave = wave;
-        state.wavetime = wavetime;
-
-        if(!android && !headless)
-            player.add();
 
         //map
 
@@ -204,42 +161,26 @@ public class Save16 extends SaveFileVersion {
             stream.writeShort(block.id);
         }
 
-        if(!headless) {
-            stream.writeFloat(player.x); //player x/y
-            stream.writeFloat(player.y);
+        //--ENTITIES--
+        //TODO synchronized block here
 
-            stream.writeShort((short)player.health); //player health
+        int groups = 0;
 
-            stream.writeByte(player.status.current().id); //status effect info
-            stream.writeFloat(player.status.getTime());
-
-            stream.writeByte(control.upgrades().getWeapons().size - 1); //amount of weapons
-
-            //start at 1, because the first weapon is always the starter - ignore that
-            for (int i = 1; i < control.upgrades().getWeapons().size; i++) {
-                stream.writeByte(control.upgrades().getWeapons().get(i).id); //weapon ordinal
+        for(EntityGroup<?> group : Entities.getAllGroups()){
+            if(!group.isEmpty() && group.all().get(0) instanceof SerializableEntity){
+                groups ++;
             }
-        }else{
-            stream.writeFloat(world.getSpawnX());
-            stream.writeFloat(world.getSpawnY());
-            stream.writeInt(150);
-            stream.writeByte(0);
         }
 
-        //--ENEMIES--
-        stream.writeByte(Team.values().length); //amount of total teams (backwards compatibility)
+        stream.writeByte(groups);
 
-        for(Team team : Team.values()){
-            EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
-            stream.writeInt(group.size()); //amount of units in the team group
-
-            for(BaseUnit unit : group.all()){
-                stream.writeByte(unit.type.id); //type
-                stream.writeFloat(unit.x); //x
-                stream.writeFloat(unit.y); //y
-                stream.writeShort((short)unit.health); //health
-                stream.writeByte(unit.status.current().id);
-                stream.writeFloat(unit.status.getTime());
+        for(EntityGroup<?> group : Entities.getAllGroups()){
+            if(!group.isEmpty() && group.all().get(0) instanceof SerializableEntity){
+                stream.writeInt(group.size());
+                stream.writeByte(group.getID());
+                for(Entity entity : group.all()){
+                    ((SerializableEntity)entity).writeSave(stream);
+                }
             }
         }
 

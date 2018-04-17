@@ -23,8 +23,14 @@ import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Timer;
+import io.anuke.ucore.util.Translator;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import static io.anuke.mindustry.Vars.*;
@@ -305,6 +311,26 @@ public class Player extends Unit{
     public String toString() {
         return "Player{" + id + ", mech=" + mech.name + ", local=" + isLocal + ", " + x + ", " + y + "}\n";
     }
+
+	@Override
+	public void writeSave(DataOutputStream stream) throws IOException {
+		stream.writeBoolean(isLocal);
+		if(isLocal) super.writeSave(stream);
+	}
+
+	@Override
+	public void readSave(DataInputStream stream) throws IOException {
+		boolean local = stream.readBoolean();
+
+		if(local){
+			player.readSaveSuper(stream);
+		}
+	}
+
+	private void readSaveSuper(DataInputStream stream) throws IOException {
+		super.readSave(stream);
+		add();
+	}
 
 	@Override
 	public void writeSpawn(ByteBuffer buffer) {

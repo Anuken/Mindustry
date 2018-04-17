@@ -1,18 +1,19 @@
 package io.anuke.mindustry.entities.units;
 
-import io.anuke.mindustry.entities.Bullet;
-import io.anuke.mindustry.entities.BulletType;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import static io.anuke.mindustry.Vars.unitGroups;
 
-public class BaseUnit extends Unit {
+public class BaseUnit extends Unit{
 	public UnitType type;
 	public Timer timer = new Timer(5);
 	public float walkTime = 0f;
@@ -107,6 +108,21 @@ public class BaseUnit extends Unit {
 	@Override
 	public BaseUnit add(){
 		return add(unitGroups[team.ordinal()]);
+	}
+
+	@Override
+	public void writeSave(DataOutputStream stream) throws IOException {
+		super.writeSave(stream);
+		stream.writeByte(type.id);
+	}
+
+	@Override
+	public void readSave(DataInputStream stream) throws IOException {
+		super.readSave(stream);
+		byte type = stream.readByte();
+
+		this.type = UnitType.getByID(type);
+		add(unitGroups[team.ordinal()]);
 	}
 
 	@Override

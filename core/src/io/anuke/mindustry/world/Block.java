@@ -10,6 +10,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.DamageArea;
+import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.graphics.DrawLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
@@ -18,6 +19,7 @@ import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
@@ -27,6 +29,7 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class Block extends BaseBlock {
 	private static int lastid;
@@ -239,6 +242,18 @@ public class Block extends BaseBlock {
 		}
 
 		tempColor.mul(1f/units);
+
+		Liquid liquid = tile.entity.liquid.liquid;
+		float splash = Mathf.clamp(tile.entity.liquid.amount/4f, 0f, 10f);
+
+		for(int i = 0; i < Mathf.clamp(tile.entity.liquid.amount / 5, 0, 30); i ++){
+			Timers.run(i/2, () -> {
+				Tile other = world.tile(tile.x + Mathf.range(size/2), tile.y + Mathf.range(size/2));
+				if(other != null){
+					Puddle.deposit(other, liquid, splash);
+				}
+			});
+		}
 
 		DamageArea.dynamicExplosion(x, y, flammability, explosiveness, power, tilesize * size/2f, tempColor);
 	}

@@ -10,10 +10,14 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.util.Mathf;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
-public abstract class Unit extends SyncEntity {
+public abstract class Unit extends SyncEntity implements SerializableEntity {
     //total duration of hit effect
     public static final float hitDuration = 9f;
 
@@ -40,6 +44,32 @@ public abstract class Unit extends SyncEntity {
         inventory.clear();
         drownTime = 0f;
         status.clear();
+    }
+
+    @Override
+    public void writeSave(DataOutputStream stream) throws IOException {
+        stream.writeByte(team.ordinal());
+        stream.writeFloat(x);
+        stream.writeFloat(y);
+        stream.writeShort((short)health);
+        stream.writeByte(status.current().id);
+        stream.writeFloat(status.getTime());
+    }
+
+    @Override
+    public void readSave(DataInputStream stream) throws IOException {
+        byte team = stream.readByte();
+        float x = stream.readFloat();
+        float y = stream.readFloat();
+        int health = stream.readShort();
+        byte effect = stream.readByte();
+        float etime = stream.readFloat();
+
+        this.team = Team.values()[team];
+        this.health = health;
+        this.x = x;
+        this.y = y;
+        this.status.set(StatusEffect.getByID(effect), etime);
     }
 
     public Floor getFloorOn(){
