@@ -315,7 +315,10 @@ public class Player extends Unit{
 	@Override
 	public void writeSave(DataOutputStream stream) throws IOException {
 		stream.writeBoolean(isLocal);
-		if(isLocal) super.writeSave(stream);
+
+		if(isLocal){
+			super.writeSave(stream);
+		}
 	}
 
 	@Override
