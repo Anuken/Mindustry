@@ -41,7 +41,7 @@ public class ServerControl extends Module {
     private final CommandHandler handler = new CommandHandler("");
     private ShuffleMode mode;
 
-    public ServerControl(){
+    public ServerControl(String[] args){
         Settings.defaultList(
             "shufflemode", "normal",
             "bans", "",
@@ -69,7 +69,24 @@ public class ServerControl extends Module {
             @Override public void debug(String tag, String message, Throwable exception) { }
         });
 
+        String[] commands = {};
+
+        if(args.length > 0){
+            commands = String.join(" ", args).split(",");
+            Log.info("&lmFound {0} command-line arguments to parse. {1}", commands.length);
+        }
+
         registerCommands();
+
+        for(String s : commands){
+            Response response = handler.handleMessage(s);
+            if(response.type != ResponseType.valid){
+                Log.err("Invalid command argument sent: '{0}': {1}", s, response.type.name());
+                Log.err("Argument usage: &lc<command-1> <command1-args...>,<command-2> <command-2-args2...>");
+                System.exit(1);
+            }
+        }
+
         Thread thread = new Thread(this::readCommands, "Server Controls");
         thread.setDaemon(true);
         thread.start();
