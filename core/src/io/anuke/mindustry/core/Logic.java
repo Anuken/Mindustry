@@ -1,6 +1,7 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.game.EventType.PlayEvent;
 import io.anuke.mindustry.game.EventType.ResetEvent;
@@ -61,6 +62,7 @@ public class Logic extends Module {
 
         Timers.clear();
         Entities.clear();
+        TileEntity.sleepingEntities = 0;
 
         Events.fire(ResetEvent.class);
     }

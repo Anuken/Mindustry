@@ -106,6 +106,8 @@ public class Block extends BaseBlock {
 	public BlockBars bars = new BlockBars();
 	/**List of block stats.*/
 	public BlockStats stats = new BlockStats();
+	/**Whether to automatically set the entity to 'sleeping' when created.*/
+	public boolean autoSleep;
 
 	public Block(String name) {
 		this.name = name;
@@ -243,16 +245,19 @@ public class Block extends BaseBlock {
 
 		tempColor.mul(1f/units);
 
-		Liquid liquid = tile.entity.liquids.liquid;
-		float splash = Mathf.clamp(tile.entity.liquids.amount/4f, 0f, 10f);
+		if(hasLiquids) {
 
-		for(int i = 0; i < Mathf.clamp(tile.entity.liquids.amount / 5, 0, 30); i ++){
-			Timers.run(i/2, () -> {
-				Tile other = world.tile(tile.x + Mathf.range(size/2), tile.y + Mathf.range(size/2));
-				if(other != null){
-					Puddle.deposit(other, liquid, splash);
-				}
-			});
+			Liquid liquid = tile.entity.liquids.liquid;
+			float splash = Mathf.clamp(tile.entity.liquids.amount / 4f, 0f, 10f);
+
+			for (int i = 0; i < Mathf.clamp(tile.entity.liquids.amount / 5, 0, 30); i++) {
+				Timers.run(i / 2, () -> {
+					Tile other = world.tile(tile.x + Mathf.range(size / 2), tile.y + Mathf.range(size / 2));
+					if (other != null) {
+						Puddle.deposit(other, liquid, splash);
+					}
+				});
+			}
 		}
 
 		DamageArea.dynamicExplosion(x, y, flammability, explosiveness, power, tilesize * size/2f, tempColor);

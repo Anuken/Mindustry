@@ -42,6 +42,7 @@ public class Conveyor extends Block{
 		layer = Layer.overlay;
 		group = BlockGroup.transportation;
 		hasItems = true;
+		autoSleep = true;
 	}
 
 	@Override
@@ -126,6 +127,7 @@ public class Conveyor extends Block{
 
 		int minremove = Integer.MAX_VALUE;
 		float speed = Math.max(this.speed - (1f - (carryCapacity - entity.carrying) / carryCapacity), 0f);
+		float totalMoved = 0f;
 
 		for (int i = entity.convey.size - 1; i >= 0; i--) {
 			long value = entity.convey.get(i);
@@ -146,6 +148,7 @@ public class Conveyor extends Block{
 			if (maxmove > minmove) {
 				pos.y += maxmove;
 				pos.x = Mathf.lerpDelta(pos.x, 0, 0.06f);
+				totalMoved += maxmove;
 			} else {
 				pos.x = Mathf.lerpDelta(pos.x, pos.seed / offsetScl, 0.1f);
 			}
@@ -154,6 +157,7 @@ public class Conveyor extends Block{
 
 			if (pos.y >= 0.9999f && offloadDir(tile, pos.item)) {
 				minremove = Math.min(i, minremove);
+				totalMoved = 1f;
 				tile.entity.items.removeItem(pos.item, 1);
 			} else {
 				value = pos.pack();
@@ -167,6 +171,10 @@ public class Conveyor extends Block{
 		entity.carrying = 0f;
 		entity.minCarry = 2f;
 
+		if(totalMoved <= 0.0001f){
+			entity.sleep();
+		}
+
 		if (minremove != Integer.MAX_VALUE) entity.convey.truncate(minremove);
 
 	}
@@ -179,6 +187,7 @@ public class Conveyor extends Block{
 	@Override
 	public synchronized int removeStack(Tile tile, Item item, int amount) {
 		ConveyorEntity entity = tile.entity();
+		entity.wakeUp();
 		int removed = 0;
 
 		for(int j = 0; j < amount; j ++) {
@@ -214,6 +223,7 @@ public class Conveyor extends Block{
 		long result = ItemPos.packItem(item, 0f, 0f, (byte)Mathf.random(255));
 		entity.convey.insert(0, result);
 		entity.items.addItem(item, 1);
+		entity.wakeUp();
 	}
 
 	@Override
@@ -235,6 +245,7 @@ public class Conveyor extends Block{
 		float y = (ang == -1 || ang == 3) ? 1 : (ang == 1 || ang == -3) ? -1 : 0;
 
 		ConveyorEntity entity = tile.entity();
+		entity.wakeUp();
 		long result = ItemPos.packItem(item, y*0.9f, pos, (byte)Mathf.random(255));
 		boolean inserted = false;
 

@@ -36,7 +36,8 @@ public class ColorMapper{
 		"c3a490", pair(Blocks.iron),
 		"161616", pair(Blocks.coal),
 		"6277bc", pair(Blocks.titanium),
-		"83bc58", pair(Blocks.thorium)
+		"83bc58", pair(Blocks.thorium),
+		"000000", pair(Blocks.space)
 	);
 	
 	public static BlockPair get(int color){

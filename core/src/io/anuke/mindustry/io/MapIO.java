@@ -2,12 +2,14 @@ package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.utils.IntIntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
@@ -45,6 +47,7 @@ public class MapIO {
                 Block floor = Block.getByID(marker.floor);
                 Block wall = Block.getByID(marker.wall);
                 int wallc = ColorMapper.getColor(wall);
+                if(wallc == 0 && (wall.update || wall.solid || wall.breakable)) wallc = Color.rgba8888(Team.values()[marker.team].color);
                 pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, wallc == 0 ? ColorMapper.getColor(floor) : wallc);
             }
         }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Fireball;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
@@ -131,6 +132,7 @@ public class DebugFragment implements Fragment {
                 "client.connecting: " + netClient.isConnecting() + "\n" : "",
                 "players: " + playerGroup.size(),
                 "tiles: " + tileGroup.size(),
+                "tiles.sleeping: " + TileEntity.sleepingEntities,
                 "time: " + Timers.time(),
                 "state.gameover: " + state.gameOver,
                 "state: " + state.getState(),

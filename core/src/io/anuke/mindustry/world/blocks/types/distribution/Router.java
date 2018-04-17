@@ -14,16 +14,23 @@ public class Router extends Block{
 		solid = true;
 		itemCapacity = 20;
 		group = BlockGroup.transportation;
+		autoSleep = true;
 	}
 	
 	@Override
 	public void update(Tile tile){
 		int iterations = Math.max(1, (int) (Timers.delta() + 0.4f));
+		boolean moved = false;
 
 		for(int i = 0; i < iterations; i ++) {
 			if (tile.entity.items.totalItems() > 0) {
 				tryDump(tile);
+				moved = true;
 			}
+		}
+
+		if(!moved){
+			tile.entity.sleep();
 		}
 	}
 
@@ -40,6 +47,7 @@ public class Router extends Block{
 	@Override
 	public void handleItem(Item item, Tile tile, Tile source){
 		super.handleItem(item, tile, source);
+		tile.entity.wakeUp();
 		tile.setExtra(tile.relativeTo(source.x, source.y));
 	}
 

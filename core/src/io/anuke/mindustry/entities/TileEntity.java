@@ -19,12 +19,12 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.disabledTileGroup;
 import static io.anuke.mindustry.Vars.tileGroup;
 import static io.anuke.mindustry.Vars.world;
 
 public class TileEntity extends Entity{
-	public static final float timeToSleep = 60f*3; //3 seconds to fall asleep
+	public static final float timeToSleep = 60f*4; //4 seconds to fall asleep
+	public static int sleepingEntities = 0;
 
 	public Tile tile;
 	public Timer timer;
@@ -51,7 +51,12 @@ public class TileEntity extends Entity{
 		timer = new Timer(tile.block().timers);
 		
 		if(added){
-			add();
+			if(!tile.block().autoSleep) {
+				add();
+			}else{
+				sleeping = true;
+				sleepingEntities ++;
+			}
 		}
 		
 		return this;
@@ -63,8 +68,8 @@ public class TileEntity extends Entity{
 		sleepTime += Timers.delta();
 		if(!sleeping && sleepTime >= timeToSleep){
 			remove();
-			add(disabledTileGroup);
 			sleeping = true;
+			sleepingEntities ++;
 		}
 	}
 
@@ -73,9 +78,9 @@ public class TileEntity extends Entity{
 	public void wakeUp(){
 		sleepTime = 0f;
 		if(sleeping){
-			remove();
 			add(tileGroup);
 			sleeping = false;
+			sleepingEntities --;
 		}
 	}
 	
