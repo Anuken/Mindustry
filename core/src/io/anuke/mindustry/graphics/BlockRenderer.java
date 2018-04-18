@@ -105,7 +105,7 @@ public class BlockRenderer{
 		Draw.color();
 
 		Graphics.end();
-		floorRenderer.drawCache(DrawLayer.walls, crangex, crangey);
+		//floorRenderer.drawCache(DrawLayer.walls, crangex, crangey);
 		Graphics.begin();
 		
 		Arrays.sort(requests.items, 0, requestidx);
