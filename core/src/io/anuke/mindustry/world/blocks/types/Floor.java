@@ -44,7 +44,6 @@ public class Floor extends Block{
 		}
 	}
 
-
 	@Override
 	public void drawNonLayer(Tile tile){
 		MathUtils.random.setSeed(tile.id());
@@ -63,6 +62,7 @@ public class Floor extends Block{
 
 	private void drawEdges(Tile tile, boolean sameLayer){
 		if(!blend) return;
+
 		for(int dx = -1; dx <= 1; dx ++){
 			for(int dy = -1; dy <= 1; dy ++){
 

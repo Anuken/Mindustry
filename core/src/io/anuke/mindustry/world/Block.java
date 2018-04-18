@@ -27,9 +27,7 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Block extends BaseBlock {
 	private static int lastid;
@@ -137,6 +135,11 @@ public class Block extends BaseBlock {
 	public void init(){
 		setStats();
 		setBars();
+	}
+
+	/**Called after texture atlas is loaded.*/
+	public void load(){
+
 	}
 
 	public void tapped(Tile tile){}

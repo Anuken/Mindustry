@@ -27,6 +27,7 @@ import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.ui.fragments.ToolFragment;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
@@ -106,6 +107,10 @@ public class Renderer extends RendererModule{
 		clearColor.a = 1f;
 
 		background.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+
+		for(Block block : Block.getAllBlocks()){
+			block.load();
+		}
 	}
 
 	@Override
@@ -141,7 +146,7 @@ public class Renderer extends RendererModule{
 		}
 
 		if(state.is(State.menu)){
-			clearScreen();
+			Graphics.clear(Color.BLACK);
 		}else{
 			boolean smoothcam = Settings.getBool("smoothcam");
 
@@ -190,8 +195,8 @@ public class Renderer extends RendererModule{
 	@Override
 	public void draw(){
 		camera.update();
-		
-		clearScreen(clearColor);
+
+		Graphics.clear(clearColor);
 		
 		batch.setProjectionMatrix(camera.combined);
 		
