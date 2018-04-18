@@ -49,7 +49,7 @@ import static io.anuke.ucore.core.Core.camera;
 public class Renderer extends RendererModule{
 	private final static float shieldHitDuration = 18f;
 	
-	public Surface shadowSurface, shieldSurface, indicatorSurface, waterSurface;
+	public Surface shadowSurface, shieldSurface, waterSurface;
 	
 	private int targetscale = baseCameraScale;
 	private Texture background = new Texture("sprites/background.png");
@@ -120,7 +120,6 @@ public class Renderer extends RendererModule{
 		
 		shadowSurface = Graphics.createSurface(scale);
 		shieldSurface = Graphics.createSurface(scale);
-		indicatorSurface = Graphics.createSurface(scale);
 		pixelSurface = Graphics.createSurface(scale);
 		waterSurface = Graphics.createSurface(scale);
 	}
@@ -220,7 +219,6 @@ public class Renderer extends RendererModule{
 		blocks.drawBlocks(Layer.overlay);
 
 		drawAllTeams(false);
-		Entities.draw(Entities.defaultGroup());
 
 		blocks.skipLayer(Layer.turret);
 		blocks.drawBlocks(Layer.laser);
@@ -250,7 +248,8 @@ public class Renderer extends RendererModule{
 	private void drawAllTeams(boolean flying){
 		for(Team team : Team.values()){
 			EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
-			if(group.all().size() < 0) continue;
+			if(group.count(p -> p.isFlying() == flying) +
+					playerGroup.count(p -> p.isFlying() == flying && p.team == team) == 0) continue;
 
 			Shaders.outline.color.set(team.color);
 

@@ -82,7 +82,7 @@ public class Puddle extends Entity implements SerializableEntity, Poolable{
 
     private static void reactPuddle(Puddle p, Liquid liquid, float amount){
         if((p.liquid.flammability > 0.3f && liquid.temperature > 0.7f) ||
-                liquid.flammability > 0.3f && p.liquid.temperature > 0.7f){ //flammable liquid + hot liquid
+                (liquid.flammability > 0.3f && p.liquid.temperature > 0.7f)){ //flammable liquid + hot liquid
             Fire.create(p.tile);
             if(Mathf.chance(0.006 * amount)){
                 new Fireball(p.x, p.y, p.liquid.flameColor, Mathf.random(360f)).add();

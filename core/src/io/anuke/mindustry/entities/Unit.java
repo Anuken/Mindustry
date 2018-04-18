@@ -86,8 +86,8 @@ public abstract class Unit extends SyncEntity implements SerializableEntity {
         status.update(this);
 
         if(isFlying()) {
-            x += velocity.x / getMass();
-            y += velocity.y / getMass();
+            x += velocity.x / getMass() * Timers.delta();
+            y += velocity.y / getMass() * Timers.delta();
         }else{
             boolean onLiquid = floor.liquid;
 
@@ -123,7 +123,7 @@ public abstract class Unit extends SyncEntity implements SerializableEntity {
                 damage(health + 1, false);
             }
 
-            move(velocity.x / getMass() * floor.speedMultiplier, velocity.y / getMass() * floor.speedMultiplier);
+            move(velocity.x / getMass() * floor.speedMultiplier * Timers.delta(), velocity.y / getMass() * floor.speedMultiplier * Timers.delta());
         }
 
         velocity.scl(Mathf.clamp(1f-drag* floor.dragMultiplier* Timers.delta()));

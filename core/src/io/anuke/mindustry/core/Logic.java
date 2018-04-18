@@ -120,7 +120,8 @@ public class Logic extends Module {
                     runWave();
                 }
 
-                Entities.update(Entities.defaultGroup());
+                if(!Entities.defaultGroup().isEmpty()) throw new RuntimeException("Do not add anything to the default group!");
+
                 Entities.update(bulletGroup);
                 for(EntityGroup group : unitGroups){
                     Entities.update(group);
