@@ -184,8 +184,6 @@ public class Renderer extends RendererModule{
 			draw();
 
 			camera.position.set(lastx - deltax, lasty - deltay, 0);
-
-
 		}
 	}
 

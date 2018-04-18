@@ -110,7 +110,7 @@ public class MapIO {
             InputStream stream;
 
             if (!map.custom) {
-                stream = Gdx.files.local("maps/" + map.name + "." + mapExtension).read();
+                stream = Gdx.files.internal("maps/" + map.name + "." + mapExtension).read();
             } else {
                 stream = customMapDirectory.child(map.name + "." + mapExtension).read();
             }

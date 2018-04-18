@@ -13,6 +13,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.WorldGenerator;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.modules.Module;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
@@ -156,15 +157,16 @@ public class World extends Module{
 	}
 	
 	public void loadMap(Map map, int seed){
+		Log.info("--BEGIN LOAD MAP--");
 		this.currentMap = map;
 		this.seed = seed;
 
 		int width = map.meta.width, height = map.meta.height;
-		
+
 		createTiles(width, height);
 		
 		Entities.resizeTree(0, 0, width * tilesize, height * tilesize);
-		
+
 		WorldGenerator.generate(tiles, MapIO.readTileData(map, true));
 	}
 
@@ -191,8 +193,7 @@ public class World extends Module{
 				Mathf.scl2(x2, tilesize), Mathf.scl2(y2, tilesize));
 	}
 	
-	/**
-	 * Input is in block coordinates, not world coordinates.
+	/**Input is in block coordinates, not world coordinates.
 	 * @return null if no collisions found, block position otherwise.*/
 	public GridPoint2 raycast(int x0f, int y0f, int x1, int y1){
 		int x0 = x0f;

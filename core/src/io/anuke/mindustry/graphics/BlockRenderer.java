@@ -5,16 +5,18 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.StaticBlock;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.CacheBatch;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
 import java.util.Arrays;
@@ -109,7 +111,7 @@ public class BlockRenderer{
 		Draw.color(0, 0, 0, 0.15f);
 		Graphics.flushSurface();
 		Draw.color();
-		
+
 		Graphics.end();
 		drawCache(DrawLayer.walls, crangex, crangey);
 		Graphics.begin();
@@ -204,6 +206,8 @@ public class BlockRenderer{
 		if(cache == null || cache.length != chunksx || cache[0].length != chunksy){
 			cache = new int[chunksx][chunksy][DrawLayer.values().length];
 
+			Timers.markNs();
+
 			for(DrawLayer layer : DrawLayer.values()){
 				for(int x = 0; x < chunksx; x++){
 					for(int y = 0; y < chunksy; y++){
@@ -211,6 +215,8 @@ public class BlockRenderer{
 					}
 				}
 			}
+
+			Log.info("CACHING ELAPSED: {0}", Timers.elapsedNs());
 		}
 
 		OrthographicCamera camera = Core.camera;
