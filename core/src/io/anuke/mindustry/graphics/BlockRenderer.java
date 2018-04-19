@@ -105,7 +105,9 @@ public class BlockRenderer{
 		Draw.color();
 
 		Graphics.end();
-		//floorRenderer.drawCache(DrawLayer.walls, crangex, crangey);
+		floorRenderer.beginDraw();
+		floorRenderer.drawLayer(DrawLayer.walls);
+		floorRenderer.endDraw();
 		Graphics.begin();
 		
 		Arrays.sort(requests.items, 0, requestidx);
@@ -176,6 +178,14 @@ public class BlockRenderer{
 
 	public void clearTiles(){
 		floorRenderer.clearTiles();
+	}
+
+	public void beginFloor(){
+		floorRenderer.beginDraw();
+	}
+
+	public void endFloor(){
+		floorRenderer.endDraw();
 	}
 
 	public void drawFloor(){

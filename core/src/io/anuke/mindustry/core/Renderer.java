@@ -205,8 +205,8 @@ public class Renderer extends RendererModule{
 			batch.begin();
 		
 		//clears shield surface
-		Graphics.surface(shieldSurface);
-		Graphics.surface();
+		//Graphics.surface(shieldSurface);
+		//Graphics.surface();
 
 		drawPadding();
 		
@@ -229,13 +229,9 @@ public class Renderer extends RendererModule{
 		Entities.draw(airItemGroup);
         Entities.draw(effectGroup);
 
-		drawShield();
+		//drawShield();
 
 		drawOverlay();
-
-		if(Settings.getBool("indicators") && showUI){
-			drawEnemyMarkers();
-		}
 
 		if(pixelate)
 			Graphics.flushSurface();
@@ -249,7 +245,7 @@ public class Renderer extends RendererModule{
 		for(Team team : Team.values()){
 			EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
 			if(group.count(p -> p.isFlying() == flying) +
-					playerGroup.count(p -> p.isFlying() == flying && p.team == team) == 0) continue;
+					playerGroup.count(p -> p.isFlying() == flying && p.team == team) == 0 && flying) continue;
 
 			Shaders.outline.color.set(team.color);
 
@@ -330,31 +326,6 @@ public class Renderer extends RendererModule{
 		Pools.free(layout);
         Draw.tscl(fontscale);
     }
-
-    //TODO implement
-	void drawEnemyMarkers(){
-		/*
-		Graphics.surface(indicatorSurface);
-		Draw.color(Color.RED);
-
-		for(BaseUnit enemy : enemyGroup.all()) {
-
-			if (rect.setSize(camera.viewportWidth, camera.viewportHeight).setCenter(camera.position.x, camera.position.y)
-					.overlaps(enemy.hitbox.getRect(enemy.x, enemy.y))) {
-				continue;
-			}
-
-			float angle = Angles.angle(camera.position.x, camera.position.y, enemy.x, enemy.y);
-			float tx = Angles.trnsx(angle, Unit.dp.scl(20f));
-			float ty = Angles.trnsy(angle, Unit.dp.scl(20f));
-			Draw.rect("enemyarrow", camera.position.x + tx, camera.position.y + ty, angle);
-		}
-
-		Draw.color();
-		Draw.alpha(0.4f);
-		Graphics.flushSurface();
-		Draw.color();*/
-	}
 
 	void drawShield(){
 		if(shieldGroup.size() == 0 && shieldDraws.size == 0) return;

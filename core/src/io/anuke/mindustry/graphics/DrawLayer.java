@@ -3,7 +3,6 @@ package io.anuke.mindustry.graphics;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.graphics.CacheBatch;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Shader;
 
@@ -12,78 +11,72 @@ import static io.anuke.mindustry.Vars.renderer;
 public enum DrawLayer {
     water{
         @Override
-        public void begin(CacheBatch batch){
-            beginShader(batch);
+        public void begin(){
+            beginShader();
         }
 
         @Override
-        public void end(CacheBatch batch){
-            endShader(batch, Shaders.water);
+        public void end(){
+            endShader(Shaders.water);
         }
     },
     lava{
         @Override
-        public void begin(CacheBatch batch){
-            beginShader(batch);
+        public void begin(){
+            beginShader();
         }
 
         @Override
-        public void end(CacheBatch batch){
-            endShader(batch, Shaders.lava);
+        public void end(){
+            endShader(Shaders.lava);
         }
     },
     oil{
         @Override
-        public void begin(CacheBatch batch){
-            beginShader(batch);
+        public void begin(){
+            beginShader();
         }
 
         @Override
-        public void end(CacheBatch batch){
-            endShader(batch, Shaders.oil);
+        public void end(){
+            endShader(Shaders.oil);
         }
     },
     space{
         @Override
-        public void begin(CacheBatch batch){
-            beginShader(batch);
+        public void begin(){
+            beginShader();
         }
 
         @Override
-        public void end(CacheBatch batch){
-            endShader(batch, Shaders.space);
+        public void end(){
+            endShader(Shaders.space);
         }
     },
     normal,
     walls;
 
-    public void begin(CacheBatch batch){
-        batch.setProjectionMatrix(Core.camera.combined);
-        Graphics.useBatch(batch.drawBatch());
-
-        Graphics.begin();
+    public void begin(){
+        
     }
 
-    public void end(CacheBatch batch){
-        Graphics.end();
-
-        Graphics.popBatch();
+    public void end(){
+        
     }
 
-    protected void beginShader(CacheBatch batch){
-        batch.setProjectionMatrix(Core.camera.combined);
-        Graphics.useBatch(batch.drawBatch());
-
-        Graphics.begin();
-        Graphics.surface(renderer.waterSurface);
+    protected void beginShader(){
+        renderer.getBlocks().endFloor();
+        renderer.waterSurface.getBuffer().begin();
         Graphics.clear(Color.CLEAR);
+        renderer.getBlocks().beginFloor();
     }
 
-    public void endShader(CacheBatch batch, Shader shader){
-        Graphics.surface();
-        Graphics.end();
+    public void endShader(Shader shader){
+        renderer.getBlocks().endFloor();
+        renderer.waterSurface.getBuffer().end();
 
-        Graphics.popBatch();
+        renderer.pixelSurface.getBuffer().begin();
+
 
         Graphics.shader(shader);
         Graphics.begin();
@@ -91,5 +84,6 @@ public enum DrawLayer {
                 Core.camera.viewportWidth * Core.camera.zoom, -Core.camera.viewportHeight * Core.camera.zoom);
         Graphics.end();
         Graphics.shader();
+        renderer.getBlocks().beginFloor();
     }
 }

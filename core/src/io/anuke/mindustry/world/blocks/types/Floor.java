@@ -17,7 +17,7 @@ import static io.anuke.mindustry.Vars.world;
 
 public class Floor extends Block{
 	protected TextureRegion tempRegion = new TextureRegion();
-	protected Predicate<Block> blends = block -> block != this;
+	public Predicate<Block> blends = block -> block != this;
 	protected boolean blend = true;
 
 	public float speedMultiplier = 1f;
