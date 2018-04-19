@@ -77,7 +77,6 @@ public enum DrawLayer {
 
         renderer.pixelSurface.getBuffer().begin();
 
-
         Graphics.shader(shader);
         Graphics.begin();
         Draw.rect(renderer.waterSurface.texture(), Core.camera.position.x, Core.camera.position.y,
