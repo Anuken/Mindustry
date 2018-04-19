@@ -65,10 +65,10 @@ public enum DrawLayer {
     }
 
     protected void beginShader(){
-        renderer.getBlocks().endFloor();
+        //renderer.getBlocks().endFloor();
         renderer.waterSurface.getBuffer().begin();
         Graphics.clear(Color.CLEAR);
-        renderer.getBlocks().beginFloor();
+        //renderer.getBlocks().beginFloor();
     }
 
     public void endShader(Shader shader){

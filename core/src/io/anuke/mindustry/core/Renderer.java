@@ -23,6 +23,7 @@ import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.BlockRenderer;
 import io.anuke.mindustry.graphics.Layer;
+import io.anuke.mindustry.graphics.MinimapRenderer;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.PlaceMode;
@@ -57,6 +58,7 @@ public class Renderer extends RendererModule{
 	private Array<Callable> shieldDraws = new Array<>();
 	private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
 	private BlockRenderer blocks = new BlockRenderer();
+	private MinimapRenderer minimap = new MinimapRenderer();
 
 	public Renderer() {
 		Lines.setCircleVertices(14);
@@ -203,17 +205,13 @@ public class Renderer extends RendererModule{
 			Graphics.surface(pixelSurface, false);
 		else
 			batch.begin();
-		
-		//clears shield surface
-		//Graphics.surface(shieldSurface);
-		//Graphics.surface();
 
 		drawPadding();
 		
 		blocks.drawFloor();
 
-		Entities.draw(groundItemGroup);
 		Entities.draw(groundEffectGroup);
+		Entities.draw(puddleGroup);
 
 		blocks.processBlocks();
 		blocks.drawBlocks(Layer.overlay);
@@ -273,6 +271,10 @@ public class Renderer extends RendererModule{
 	@Override
 	public void dispose() {
 		background.dispose();
+	}
+
+	public MinimapRenderer minimap() {
+		return minimap;
 	}
 
 	public void clearTiles(){

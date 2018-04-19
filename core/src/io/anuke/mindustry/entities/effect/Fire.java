@@ -8,6 +8,7 @@ import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.SerializableEntity;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
@@ -27,6 +28,7 @@ public class Fire extends TimedEntity implements SerializableEntity, Poolable{
 
     private int loadedPosition = -1;
     private Tile tile;
+    private Block block;
     private float baseFlammability = -1, puddleFlammability;
 
     /**Start a fire on the tile. If there already is a file there, refreshes its lifetime..*/
@@ -67,8 +69,9 @@ public class Fire extends TimedEntity implements SerializableEntity, Poolable{
             time += Timers.delta()*8;
         }
 
-        if (baseFlammability < 0){
+        if (baseFlammability < 0 || block != tile.block()){
             baseFlammability = tile.block().getFlammability(tile);
+            block = tile.block();
         }
 
         if(damage) {

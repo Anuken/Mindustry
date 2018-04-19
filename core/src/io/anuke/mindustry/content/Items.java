@@ -44,7 +44,12 @@ public class Items {
         }
     },
     silicon = new Item("silicon", Color.valueOf("53565c")),
-    plastic = new Item("plastic", Color.valueOf("e9ead3")),
+    plastic = new Item("plastic", Color.valueOf("e9ead3")){
+        {
+            flammability = 0.2f;
+            explosiveness = 0.1f;
+        }
+    },
     densealloy = new Item("densealloy", Color.valueOf("b4d5c7")),
     biomatter = new Item("biomatter", Color.valueOf("648b55")) {
         {

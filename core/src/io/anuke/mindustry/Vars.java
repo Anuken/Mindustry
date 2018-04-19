@@ -147,7 +147,7 @@ public class Vars{
 	public static final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class, false);
 	public static final EntityGroup<EffectEntity> effectGroup = Entities.addGroup(EffectEntity.class, false);
 	public static final EntityGroup<EffectEntity> groundEffectGroup = Entities.addGroup(EffectEntity.class, false);
-	public static final EntityGroup<Puddle> groundItemGroup = Entities.addGroup(Puddle.class, false);
+	public static final EntityGroup<Puddle> puddleGroup = Entities.addGroup(Puddle.class, false);
 	public static final EntityGroup<Fire> airItemGroup = Entities.addGroup(Fire.class, false);
 	public static final EntityGroup<BaseUnit>[] unitGroups = new EntityGroup[Team.values().length];
 

@@ -11,6 +11,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.entities.effect.Puddle;
+import io.anuke.mindustry.entities.effect.Rubble;
 import io.anuke.mindustry.graphics.DrawLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
@@ -264,6 +265,7 @@ public class Block extends BaseBlock {
 		}
 
 		DamageArea.dynamicExplosion(x, y, flammability, explosiveness, power, tilesize * size/2f, tempColor);
+		Rubble.create(tile.drawx(), tile.drawy(), size);
 	}
 
 	/**Returns the flammability of the tile. Used for fire calculations.

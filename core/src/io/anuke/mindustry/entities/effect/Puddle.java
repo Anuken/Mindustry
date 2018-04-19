@@ -27,7 +27,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.groundItemGroup;
+import static io.anuke.mindustry.Vars.puddleGroup;
 import static io.anuke.mindustry.Vars.world;
 
 public class Puddle extends Entity implements SerializableEntity, Poolable{
@@ -60,6 +60,16 @@ public class Puddle extends Entity implements SerializableEntity, Poolable{
     }
 
     private static void deposit(Tile tile, Tile source, Liquid liquid, float amount, int generation){
+        if(tile.floor().liquid){
+            reactPuddle(tile.floor().liquidDrop, liquid, amount, tile, tile.worldx(), tile.worldy());
+
+            if(generation == 0 && Timers.get(tile, "ripple", 50)){
+                Effects.effect(BlockFx.ripple, tile.floor().liquidDrop.color,
+                        (tile.worldx() + source.worldx())/2f, (tile.worldy() + source.worldy())/2f);
+            }
+            return;
+        }
+
         Puddle p = map.get(tile.packedPosition());
         if(p == null){
             Puddle puddle = Pools.obtain(Puddle.class);
@@ -76,28 +86,29 @@ public class Puddle extends Entity implements SerializableEntity, Poolable{
                 Effects.effect(BlockFx.ripple, p.liquid.color, (tile.worldx() + source.worldx())/2f, (tile.worldy() + source.worldy())/2f);
             }
         }else{
-            reactPuddle(p, liquid, amount);
+            p.amount -= reactPuddle(p.liquid, liquid, amount, p.tile, p.x, p.y);
         }
     }
 
-    private static void reactPuddle(Puddle p, Liquid liquid, float amount){
-        if((p.liquid.flammability > 0.3f && liquid.temperature > 0.7f) ||
-                (liquid.flammability > 0.3f && p.liquid.temperature > 0.7f)){ //flammable liquid + hot liquid
-            Fire.create(p.tile);
+    private static float reactPuddle(Liquid pliquid, Liquid liquid, float amount, Tile tile, float x, float y){
+        if((pliquid.flammability > 0.3f && liquid.temperature > 0.7f) ||
+                (liquid.flammability > 0.3f && pliquid.temperature > 0.7f)){ //flammable liquid + hot liquid
+            Fire.create(tile);
             if(Mathf.chance(0.006 * amount)){
-                new Fireball(p.x, p.y, p.liquid.flameColor, Mathf.random(360f)).add();
+                new Fireball(x, y, pliquid.flameColor, Mathf.random(360f)).add();
             }
-        }else if(p.liquid.temperature > 0.7f && liquid.temperature < 0.55f){ //cold liquid poured onto hot puddle
+        }else if(pliquid.temperature > 0.7f && liquid.temperature < 0.55f){ //cold liquid poured onto hot puddle
             if(Mathf.chance(0.5f * amount)){
-                Effects.effect(EnvironmentFx.steam, p.x, p.y);
+                Effects.effect(EnvironmentFx.steam, x, y);
             }
-            p.amount -= 0.1f * amount;
-        }else if(liquid.temperature > 0.7f && p.liquid.temperature < 0.55f){ //hot liquid poured onto cold puddle
+            return - 0.1f * amount;
+        }else if(liquid.temperature > 0.7f && pliquid.temperature < 0.55f){ //hot liquid poured onto cold puddle
             if(Mathf.chance(0.8f * amount)){
-                Effects.effect(EnvironmentFx.steam, p.x, p.y);
+                Effects.effect(EnvironmentFx.steam, x, y);
             }
-            p.amount -= 0.4f * amount;
+            return - 0.4f * amount;
         }
+        return 0f;
     }
 
     /**Deserialization use only!*/
@@ -209,6 +220,6 @@ public class Puddle extends Entity implements SerializableEntity, Poolable{
 
     @Override
     public Puddle add() {
-        return add(groundItemGroup);
+        return add(puddleGroup);
     }
 }

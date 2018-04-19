@@ -54,9 +54,6 @@ public class BlockRenderer{
 		requestidx = 0;
 		lastLayer = null;
 		
-		int crangex = (int) (camera.viewportWidth / (chunksize * tilesize)) + 1;
-		int crangey = (int) (camera.viewportHeight / (chunksize * tilesize)) + 1;
-		
 		int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2)+2;
 		int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2)+2;
 			
@@ -99,7 +96,8 @@ public class BlockRenderer{
 				}
 			}
 		}
-		
+
+		//TODO this actually isn't necessary
 		Draw.color(0, 0, 0, 0.15f);
 		Graphics.flushSurface();
 		Draw.color();

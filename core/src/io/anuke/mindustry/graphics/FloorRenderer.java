@@ -113,9 +113,8 @@ public class FloorRenderer {
     }
 
     public void beginDraw(){
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-
         Core.atlas.getTextures().first().bind();
+        Gdx.gl.glEnable(GL20.GL_BLEND);
 
         program.begin();
         program.setUniformMatrix("u_projTrans", Core.camera.combined);
@@ -187,6 +186,7 @@ public class FloorRenderer {
 
         int idx = chunk.idx;
         TextureRegion region = new TextureRegion(Core.atlas.getTextures().first());
+        IntArray edges = new IntArray();
 
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
@@ -194,9 +194,9 @@ public class FloorRenderer {
                 if(tile == null) continue;
 
                 if(tile.floor().drawLayer == layer && tile.block().drawLayer != DrawLayer.walls){
-                    idx = drawFloor(tile, idx, region, vertices, false);
-                }else if(tile.floor().drawLayer.ordinal() < layer.ordinal() && tile.block().drawLayer != DrawLayer.walls){
-                    idx = drawFloor(tile, idx, region, vertices, true);
+                    idx = drawFloor(tile, idx, region, vertices, false, edges);
+                }else if(tile.floor().drawLayer.ordinal() < layer.ordinal() && tile.block().drawLayer != DrawLayer.walls && layer != DrawLayer.walls){
+                    idx = drawFloor(tile, idx, region, vertices, true, edges);
                 }
 
                 if(tile.block().drawLayer == layer && layer == DrawLayer.walls){
@@ -214,7 +214,7 @@ public class FloorRenderer {
         chunk.idx = idx;
     }
 
-    private int drawFloor(Tile tile, int idx, TextureRegion region, float[] vertices, boolean edgesOnly){
+    private int drawFloor(Tile tile, int idx, TextureRegion region, float[] vertices, boolean edgesOnly, IntArray edges){
         MathUtils.random.setSeed(tile.id());
         Block block = tile.floor();
 

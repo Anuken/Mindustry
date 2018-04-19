@@ -1,5 +1,6 @@
 package io.anuke.mindustry.core;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
@@ -13,7 +14,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.WorldGenerator;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
@@ -157,7 +157,6 @@ public class World extends Module{
 	}
 	
 	public void loadMap(Map map, int seed){
-		Log.info("--BEGIN LOAD MAP--");
 		this.currentMap = map;
 		this.seed = seed;
 

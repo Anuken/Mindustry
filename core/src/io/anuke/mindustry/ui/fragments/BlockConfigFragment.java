@@ -33,6 +33,7 @@ public class BlockConfigFragment implements  Fragment {
     public void showConfig(Tile tile){
         configTile = tile;
 
+        table.setVisible(true);
         table.clear();
         tile.block().buildTable(tile, table);
         table.pack();
