@@ -26,26 +26,11 @@ public class FloorRenderer {
     private final static int vsize = 4;
     private final static int chunksize = 32;
 
-    private AsyncExecutor executor = new AsyncExecutor(4);
+    private AsyncExecutor executor = new AsyncExecutor(8);
     private ShaderProgram program = createDefaultShader();
     private Chunk[][] cache;
     private IntSet drawnLayerSet = new IntSet();
     private IntArray drawnLayers = new IntArray();
-    private short[] indices;
-
-    public FloorRenderer(){
-        int len = chunksize*chunksize*vsize * 6;
-        indices = new short[len];
-        short j = 0;
-        for (int i = 0; i < len; i += 6, j += 4) {
-            indices[i] = j;
-            indices[i + 1] = (short)(j + 1);
-            indices[i + 2] = (short)(j + 2);
-            indices[i + 3] = (short)(j + 2);
-            indices[i + 4] = (short)(j + 3);
-            indices[i + 5] = j;
-        }
-    }
 
     public void drawFloor(){
 
