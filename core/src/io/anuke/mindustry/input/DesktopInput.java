@@ -81,6 +81,8 @@ public class DesktopInput extends InputHandler{
 			zoomed = false;
 		}
 
+		renderer.minimap().zoomBy(-(int)Inputs.getAxisTapped("zoom_minimap"));
+
 		if(!rotated) {
 			rotation += Inputs.getAxis("rotate_alt");
 			rotated = true;

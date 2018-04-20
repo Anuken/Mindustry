@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.badlogic.gdx.utils.Pools;
+import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
@@ -60,8 +61,9 @@ public class Puddle extends Entity implements SerializableEntity, Poolable{
     }
 
     private static void deposit(Tile tile, Tile source, Liquid liquid, float amount, int generation){
-        if(tile.floor().liquid){
-            reactPuddle(tile.floor().liquidDrop, liquid, amount, tile, tile.worldx(), tile.worldy());
+        if(tile.floor().liquid && !canStayOn(liquid, tile.floor().liquidDrop)){
+            reactPuddle(tile.floor().liquidDrop, liquid, amount, tile,
+                    (tile.worldx() + source.worldx())/2f, (tile.worldy() + source.worldy())/2f);
 
             if(generation == 0 && Timers.get(tile, "ripple", 50)){
                 Effects.effect(BlockFx.ripple, tile.floor().liquidDrop.color,
@@ -90,19 +92,26 @@ public class Puddle extends Entity implements SerializableEntity, Poolable{
         }
     }
 
-    private static float reactPuddle(Liquid pliquid, Liquid liquid, float amount, Tile tile, float x, float y){
-        if((pliquid.flammability > 0.3f && liquid.temperature > 0.7f) ||
-                (liquid.flammability > 0.3f && pliquid.temperature > 0.7f)){ //flammable liquid + hot liquid
+    /**Returns whether the first liquid can 'stay' on the second one.
+     * Currently, the only place where this can happen is oil on water.*/
+    private static boolean canStayOn(Liquid liquid, Liquid other){
+        return liquid == Liquids.oil && other == Liquids.water;
+    }
+
+    /**Reacts two liquids together at a location.*/
+    private static float reactPuddle(Liquid dest, Liquid liquid, float amount, Tile tile, float x, float y){
+        if((dest.flammability > 0.3f && liquid.temperature > 0.7f) ||
+                (liquid.flammability > 0.3f && dest.temperature > 0.7f)){ //flammable liquid + hot liquid
             Fire.create(tile);
             if(Mathf.chance(0.006 * amount)){
-                new Fireball(x, y, pliquid.flameColor, Mathf.random(360f)).add();
+                new Fireball(x, y, dest.flameColor, Mathf.random(360f)).add();
             }
-        }else if(pliquid.temperature > 0.7f && liquid.temperature < 0.55f){ //cold liquid poured onto hot puddle
+        }else if(dest.temperature > 0.7f && liquid.temperature < 0.55f){ //cold liquid poured onto hot puddle
             if(Mathf.chance(0.5f * amount)){
                 Effects.effect(EnvironmentFx.steam, x, y);
             }
             return - 0.1f * amount;
-        }else if(liquid.temperature > 0.7f && pliquid.temperature < 0.55f){ //hot liquid poured onto cold puddle
+        }else if(liquid.temperature > 0.7f && dest.temperature < 0.55f){ //hot liquid poured onto cold puddle
             if(Mathf.chance(0.8f * amount)){
                 Effects.effect(EnvironmentFx.steam, x, y);
             }

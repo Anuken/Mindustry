@@ -6,12 +6,15 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.ai.Pathfind;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.game.EventType.TileChangeEvent;
+import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.io.Maps;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.WorldGenerator;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
@@ -28,6 +31,7 @@ public class World extends Module{
 	private Maps maps = new Maps();
 
 	private Array<Tile> tempTiles = new Array<>();
+	private boolean generating;
 	
 	public World(){
 		maps.load();
@@ -157,6 +161,7 @@ public class World extends Module{
 	}
 	
 	public void loadMap(Map map, int seed){
+    	generating = true;
 		this.currentMap = map;
 		this.seed = seed;
 
@@ -167,10 +172,19 @@ public class World extends Module{
 		Entities.resizeTree(0, 0, width * tilesize, height * tilesize);
 
 		WorldGenerator.generate(tiles, MapIO.readTileData(map, true));
+		generating = false;
+
+		Events.fire(WorldLoadEvent.class);
 	}
 
 	public int getSeed(){
 		return seed;
+	}
+
+	public void notifyChanged(Tile tile){
+    	if(!generating){
+    		Gdx.app.postRunnable(() -> Events.fire(TileChangeEvent.class, tile));
+		}
 	}
 
 	public void removeBlock(Tile tile){

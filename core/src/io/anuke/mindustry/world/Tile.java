@@ -325,6 +325,8 @@ public class Tile{
 
 			updateOcclusion();
 		}
+
+		world.notifyChanged(this);
 	}
 	
 	@Override

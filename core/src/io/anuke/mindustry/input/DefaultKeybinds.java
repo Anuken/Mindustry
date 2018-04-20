@@ -18,6 +18,7 @@ public class DefaultKeybinds {
                 "shoot", Input.MOUSE_LEFT,
                 "zoom_hold", Input.CONTROL_LEFT,
                 "zoom", new Axis(Input.SCROLL),
+                "zoom_minimap", new Axis(Input.MINUS, Input.PLUS),
                 "menu", Gdx.app.getType() == ApplicationType.Android ? Input.BACK : Input.ESCAPE,
                 "pause", Input.SPACE,
                 "dash", Input.SHIFT_LEFT,
