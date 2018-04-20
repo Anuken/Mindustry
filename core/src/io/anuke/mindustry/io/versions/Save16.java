@@ -83,6 +83,8 @@ public class Save16 extends SaveFileVersion {
 
         Entities.resizeTree(0, 0, width * tilesize, height * tilesize);
 
+        world.beginMapLoad();
+
         Tile[][] tiles = world.createTiles(width, height);
 
         for(int x = 0; x < width; x ++){
@@ -126,7 +128,7 @@ public class Save16 extends SaveFileVersion {
             }
         }
 
-        if(!headless) renderer.clearTiles();
+        world.endMapLoad();
     }
 
     @Override

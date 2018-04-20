@@ -265,7 +265,9 @@ public class Block extends BaseBlock {
 		}
 
 		DamageArea.dynamicExplosion(x, y, flammability, explosiveness, power, tilesize * size/2f, tempColor);
-		Rubble.create(tile.drawx(), tile.drawy(), size);
+		if(!tile.floor().solid && !tile.floor().liquid){
+			Rubble.create(tile.drawx(), tile.drawy(), size);
+		}
 	}
 
 	/**Returns the flammability of the tile. Used for fire calculations.

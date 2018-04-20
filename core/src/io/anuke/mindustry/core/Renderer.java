@@ -17,6 +17,7 @@ import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
+import io.anuke.mindustry.entities.effect.BelowLiquidEffect;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
 import io.anuke.mindustry.entities.units.BaseUnit;
@@ -210,8 +211,9 @@ public class Renderer extends RendererModule{
 		
 		blocks.drawFloor();
 
-		Entities.draw(groundEffectGroup);
+		Entities.draw(groundEffectGroup, e -> e instanceof BelowLiquidEffect);
 		Entities.draw(puddleGroup);
+		Entities.draw(groundEffectGroup, e -> !(e instanceof BelowLiquidEffect));
 
 		blocks.processBlocks();
 		blocks.drawBlocks(Layer.overlay);
@@ -275,10 +277,6 @@ public class Renderer extends RendererModule{
 
 	public MinimapRenderer minimap() {
 		return minimap;
-	}
-
-	public void clearTiles(){
-		blocks.clearTiles();
 	}
 
 	void drawPadding(){

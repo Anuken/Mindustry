@@ -17,7 +17,7 @@ import static io.anuke.mindustry.Vars.mapExtension;
 
 public class Maps implements Disposable{
 	/**List of all built-in maps.*/
-	private static final String[] defaultMapNames = {"test", "trinity", "routerhell", "conveyorhell"};
+	private static final String[] defaultMapNames = {"test", "trinity", "routerhell", "conveyorhell", "pathfind"};
 	/**Tile format version.*/
 	private static final int version = 0;
 

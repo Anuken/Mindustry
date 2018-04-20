@@ -130,6 +130,8 @@ public class NetworkIO {
             player.isAdmin = admin;
             player.add();
 
+            world.beginMapLoad();
+
             //map
             int width = stream.readShort();
             int height = stream.readShort();
@@ -168,6 +170,8 @@ public class NetworkIO {
             }
 
             player.set(world.getSpawnX(), world.getSpawnY());
+
+            world.endMapLoad();
 
         }catch (IOException e){
             throw new RuntimeException(e);

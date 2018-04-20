@@ -10,10 +10,12 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
+import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -31,6 +33,10 @@ public class FloorRenderer {
     private Chunk[][] cache;
     private IntSet drawnLayerSet = new IntSet();
     private IntArray drawnLayers = new IntArray();
+
+    public FloorRenderer(){
+        Events.on(WorldLoadEvent.class, this::clearTiles);
+    }
 
     public void drawFloor(){
 

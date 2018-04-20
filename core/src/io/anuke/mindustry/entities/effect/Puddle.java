@@ -37,6 +37,7 @@ public class Puddle extends Entity implements SerializableEntity, Poolable{
     private static final int maxGeneration = 2;
     private static final Color tmp = new Color();
     private static final Rectangle rect = new Rectangle();
+    private static int seeds;
 
     private int loadedPosition = -1;
     private Tile tile;
@@ -84,7 +85,7 @@ public class Puddle extends Entity implements SerializableEntity, Poolable{
         }else if(p.liquid == liquid){
             p.accepting = Math.max(amount, p.accepting);
 
-            if(generation == 0 && Timers.get(p, "ripple", 50) && p.amount >= maxLiquid/2f){
+            if(generation == 0 && Timers.get(p, "ripple2", 50) && p.amount >= maxLiquid/2f){
                 Effects.effect(BlockFx.ripple, p.liquid.color, (tile.worldx() + source.worldx())/2f, (tile.worldy() + source.worldy())/2f);
             }
         }else{
@@ -172,12 +173,18 @@ public class Puddle extends Entity implements SerializableEntity, Poolable{
 
     @Override
     public void draw() {
+        seeds = id;
+        boolean onLiquid = tile.floor().liquid;
         float f = Mathf.clamp(amount/(maxLiquid/1.5f));
+        float smag = onLiquid ? 0.8f : 0f;
+        float sscl = 20f;
 
         Draw.color(Hue.shift(tmp.set(liquid.color), 2, -0.05f));
-        Fill.circle(x, y, f * 8f);
+        Fill.circle(x + Mathf.sin(Timers.time() + seeds*532, sscl, smag), y + Mathf.sin(Timers.time() + seeds*53, sscl, smag), f * 8f);
         Angles.randLenVectors(id, 3, f * 6f, (ex, ey) -> {
-            Fill.circle(x + ex, y + ey, f * 5f);
+            Fill.circle(x + ex + Mathf.sin(Timers.time() + seeds*532, sscl, smag),
+                    y + ey + Mathf.sin(Timers.time() + seeds*53, sscl, smag), f * 5f);
+            seeds ++;
         });
         Draw.color();
     }

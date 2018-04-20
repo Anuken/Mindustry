@@ -105,8 +105,6 @@ public class Control extends Module{
 
 		Sounds.setFalloff(9000f);
 
-		Musics.load("1.ogg", "2.ogg", "3.ogg", "4.ogg");
-
         DefaultKeybinds.load();
 
 		Settings.defaultList(
@@ -136,8 +134,6 @@ public class Control extends Module{
 		});
 
 		Events.on(PlayEvent.class, () -> {
-			renderer.clearTiles();
-
 			player.set(world.getSpawnX(), world.getSpawnY());
 
 			Core.camera.position.set(player.x, player.y, 0);
@@ -262,8 +258,6 @@ public class Control extends Module{
 
 	@Override
 	public void init(){
-		Timers.run(1f, Musics::shuffleAll);
-
 		Entities.initPhysics();
 
 		Platform.instance.updateRPC();

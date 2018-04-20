@@ -87,9 +87,6 @@ public class Logic extends Module {
                 Timers.update();
             }
 
-            if(!Net.client())
-                world.pathfinder().update();
-
             boolean gameOver = true;
 
             for(TeamData data : state.teams.getTeams(true)){

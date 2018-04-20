@@ -12,6 +12,7 @@ import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.core.KeyBinds;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.utils.Cursors;
+import io.anuke.ucore.util.Input;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
@@ -187,6 +188,10 @@ public class DesktopInput extends InputHandler{
 
 		if(canBeginShoot){
 			shooting = true;
+		}
+
+		if(Inputs.keyTap(Input.P)){
+			world.pathfinder().test(world.tileWorld(player.x, player.y), world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y));
 		}
 
 		if(!ui.hasMouse()) {

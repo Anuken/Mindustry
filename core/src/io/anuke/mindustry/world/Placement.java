@@ -104,7 +104,7 @@ public class Placement {
         synchronized (Entities.entityLock) {
             try {
 
-                rect.setSize(tilesize * 2f).setCenter(x * tilesize + type.getPlaceOffset().x, y * tilesize + type.getPlaceOffset().y);
+                rect.setSize(tilesize * type.size).setCenter(x * tilesize + type.getPlaceOffset().x, y * tilesize + type.getPlaceOffset().y);
                 boolean[] result = {false};
 
                 Units.getNearby(rect, e -> {

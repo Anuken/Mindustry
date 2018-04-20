@@ -19,6 +19,7 @@ import io.anuke.mindustry.net.ServerDebug;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
@@ -146,7 +147,7 @@ public class Vars{
 	public static final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
 	public static final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class, false);
 	public static final EntityGroup<EffectEntity> effectGroup = Entities.addGroup(EffectEntity.class, false);
-	public static final EntityGroup<EffectEntity> groundEffectGroup = Entities.addGroup(EffectEntity.class, false);
+	public static final EntityGroup<Entity> groundEffectGroup = Entities.addGroup(Entity.class, false);
 	public static final EntityGroup<Puddle> puddleGroup = Entities.addGroup(Puddle.class, false);
 	public static final EntityGroup<Fire> airItemGroup = Entities.addGroup(Fire.class, false);
 	public static final EntityGroup<BaseUnit>[] unitGroups = new EntityGroup[Team.values().length];

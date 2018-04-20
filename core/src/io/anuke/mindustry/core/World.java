@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.ai.Pathfind;
+import io.anuke.mindustry.ai.Pathfinder;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
@@ -27,7 +27,7 @@ public class World extends Module{
 	
 	private Map currentMap;
 	private Tile[][] tiles;
-	private Pathfind pathfind = new Pathfind();
+	private Pathfinder pathfinder = new Pathfinder();
 	private Maps maps = new Maps();
 
 	private Array<Tile> tempTiles = new Array<>();
@@ -46,8 +46,8 @@ public class World extends Module{
 		return maps;
 	}
 
-	public Pathfind pathfinder(){
-		return pathfind;
+	public Pathfinder pathfinder(){
+		return pathfinder;
 	}
 
     //TODO proper spawnpoints!
@@ -152,6 +152,19 @@ public class World extends Module{
         return tiles;
     }
 
+	/**Call to signify the beginning of map loading.
+	 * TileChangeEvents will not be fired until endMapLoad().*/
+	public void beginMapLoad(){
+    	generating = true;
+	}
+
+	/**Call to signify the end of map loading.
+	 * A WorldLoadEvent will be fire.*/
+	public void endMapLoad(){
+    	generating = false;
+		Events.fire(WorldLoadEvent.class);
+	}
+
     public void setMap(Map map){
     	this.currentMap = map;
 	}
@@ -161,7 +174,7 @@ public class World extends Module{
 	}
 	
 	public void loadMap(Map map, int seed){
-    	generating = true;
+    	beginMapLoad();
 		this.currentMap = map;
 		this.seed = seed;
 
@@ -172,9 +185,8 @@ public class World extends Module{
 		Entities.resizeTree(0, 0, width * tilesize, height * tilesize);
 
 		WorldGenerator.generate(tiles, MapIO.readTileData(map, true));
-		generating = false;
 
-		Events.fire(WorldLoadEvent.class);
+		endMapLoad();
 	}
 
 	public int getSeed(){

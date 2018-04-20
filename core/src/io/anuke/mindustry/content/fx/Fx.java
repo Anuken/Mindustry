@@ -4,9 +4,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 
-import static io.anuke.mindustry.Vars.respawnduration;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class Fx{
@@ -49,12 +49,26 @@ public class Fx{
 		Lines.circle(e.x, e.y, 7f - e.fin() * 6f);
 		Draw.reset();
 	}),
-
-	respawn = new Effect(respawnduration, e -> {
-		Draw.tcolor(Color.SCARLET);
-		Draw.tscl(0.25f);
-		Draw.text("Respawning in " + (int)((e.lifetime-e.time)/60), e.x, e.y);
-		Draw.tscl(0.5f);
+	node1 = new Effect(50, e -> {
+		Lines.stroke(2f);
+		Draw.color(Color.RED);
+		Lines.circle(e.x, e.y, 3f);
+		Draw.reset();
+	}),
+	node2 = new Effect(50, e -> {
+		Draw.color(Color.GREEN);
+		Fill.circle(e.x, e.y, 3f);
+		Draw.reset();
+	}),
+	node3 = new Effect(50, e -> {
+        Lines.stroke(1f);
+        Draw.color(Color.BLUE);
+        Lines.circle(e.x, e.y, 5f);
+        Draw.reset();
+	}),
+	node4 = new Effect(50, e -> {
+		Draw.color(Color.YELLOW);
+		Fill.circle(e.x, e.y, 2f);
 		Draw.reset();
 	});
 }

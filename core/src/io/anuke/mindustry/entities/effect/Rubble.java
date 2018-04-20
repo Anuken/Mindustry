@@ -7,7 +7,7 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.groundEffectGroup;
 
-public class Rubble extends TimedEntity{
+public class Rubble extends TimedEntity implements BelowLiquidEffect{
     private static final Color color = Color.valueOf("52504e");
     private int size;
 
