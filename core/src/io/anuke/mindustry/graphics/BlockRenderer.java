@@ -2,7 +2,6 @@ package io.anuke.mindustry.graphics;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Array;
@@ -14,8 +13,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.StaticBlock;
 import io.anuke.mindustry.world.blocks.types.defense.Turret;
-import io.anuke.mindustry.world.blocks.types.production.Drill;
-import io.anuke.mindustry.world.blocks.types.production.Pump;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Settings;
@@ -23,7 +20,6 @@ import io.anuke.ucore.graphics.CacheBatch;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
-
 import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.*;
@@ -32,6 +28,8 @@ import static io.anuke.ucore.core.Core.camera;
 public class BlockRenderer{
 	private final static int chunksize = 32;
 	private final static int initialRequests = 32*32;
+	private static float storeX = 0;
+	private static float storeY = 0;
 	
 	private int[][][] cache;
 	private CacheBatch cbatch;
@@ -296,11 +294,22 @@ public class BlockRenderer{
 		if(control.input().recipe != null && state.inventory.hasItems(control.input().recipe.requirements)
 		   && control.input().validPlace(tilex, tiley, block) && (android || control.input().cursorNear())) {
 			
-			if(block.isMultiblock()) {
-				if((tiley - control.input().getBlockY()) % block.height != 0
-				   || (tilex - control.input().getBlockX()) % block.width != 0) return;
-			}
-			
+			 if(block.isMultiblock()) {
+				 float halfBlockWidth = (block.width * tilesize) / 2;
+				 float halfBlockHeight = (block.height * tilesize) / 2;
+			 	if((storeX == 0 && storeY == 0)) {
+			 		storeX = drawx;
+			 		storeY = drawy;
+				}
+				if((storeX == drawx - halfBlockWidth || storeX == drawx + halfBlockWidth || storeY == drawy - halfBlockHeight || storeY == drawy + halfBlockHeight) &&
+				   ((tiley - control.input().getBlockY()) % block.height != 0 || (tilex - control.input().getBlockX()) % block.width != 0)) {
+			 		return;
+			 	}
+			 	else {
+					storeX = drawx;
+					storeY = drawy;
+				}
+			 }
 			
 			float opacity = (float) Settings.getInt("previewopacity") / 100f;
 			Draw.color(Color.WHITE);
