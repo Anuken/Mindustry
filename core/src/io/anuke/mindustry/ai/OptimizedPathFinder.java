@@ -13,6 +13,8 @@ import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
+import static io.anuke.mindustry.Vars.tilesize;
+
 /**An IndexedAStarPathfinder that uses an OptimizedGraph, and therefore has less allocations.*/
 public class OptimizedPathFinder {
     IntMap<NodeRecord> records = new IntMap<>();
@@ -20,7 +22,6 @@ public class OptimizedPathFinder {
     NodeRecord current;
 
     private int searchId;
-    private Tile cameFrom = null;
 
     private static final byte UNVISITED = 0;
     private static final byte OPEN = 1;
@@ -63,28 +64,10 @@ public class OptimizedPathFinder {
 
             visitChildren(endNode);
 
-            cameFrom = current.node;
-
         } while (openList.size > 0);
 
         // We've run out of nodes without finding the goal, so there's no solution
         return false;
-    }
-
-    public void runStep(Tile startNode, Tile endNode){
-        if(openList.size > 0) {
-            // Retrieve the node with smallest estimated total cost from the open list
-            current = openList.pop();
-            current.category = CLOSED;
-
-            // Terminate if we reached the goal node
-            if (current.node == endNode) return;
-
-            visitChildren(endNode);
-
-            cameFrom = current.node;
-
-        }
     }
 
     public boolean search(PathFinderRequest<Tile> request, long timeToRun) {
@@ -138,7 +121,6 @@ public class OptimizedPathFinder {
 
         // Initialize the open list
         openList.clear();
-        cameFrom = null;
 
         // Initialize the record for the start node and add it to the open list
         NodeRecord startRecord = getNodeRecord(startNode);
@@ -233,11 +215,11 @@ public class OptimizedPathFinder {
         }else{ //moving diagonal
             //forced neighbor in the diagonal pattern
             if(obstacle(rel(current, direction + 3)) && !obstacle(rel(current, direction + 2)) && !obstacle(rel(current, direction -2))) {
-                cons.accept(rel(current, direction + 2));//jps(rel(current, direction + 2), Mathf.mod(direction + 2, 8), end, cons);
+                cons.accept(rel(current, direction + 2));
             }
 
             if(obstacle(rel(current, direction - 3)) && !obstacle(rel(current, direction - 2))&& !obstacle(rel(current, direction + 2))){
-                cons.accept(rel(current, direction - 2));//jps(rel(current, direction - 2), Mathf.mod(direction - 2, 8), end, cons);
+                cons.accept(rel(current, direction - 2));
             }
         }
 
@@ -246,10 +228,10 @@ public class OptimizedPathFinder {
             //moving straight
             if(direction % 2 == 0){
                 Tile sf = scanDir(rel(current, direction), end, direction); //check if there's anything of interest going straight
-                if(sf != null){ //if there is, jump to that location immediately and stop
+                if(sf != null){ //if there is, jump to that location immediately and stop. else, nothing must be there, end.
                     cons.accept(sf);
-                    return;
                 }
+                return;
             }else{ //moving diagonal
                 Tile sl = scanDir(rel(current, Mathf.mod(direction - 1, 8)), end, Mathf.mod(direction - 1, 8));
 
@@ -285,13 +267,16 @@ public class OptimizedPathFinder {
     }
 
     protected Tile scanDir(Tile tile, Tile end, int direction){
+
         while(!obstacle(tile)){
             if(debug) Effects.effect(Fx.node2, tile.worldx(), tile.worldy());
             if(tile == end) return tile;
             if(direction % 2 == 0){
+
                 //forced neighbor in the straight pattern
                 if((obstacle(rel(tile, direction + 2)) && !obstacle(rel(tile, direction + 1))) ||
                         (obstacle(rel(tile, direction - 2)) && !obstacle(rel(tile, direction - 1)))){
+                    //Log.info("Found forced linear neighbor {0} {1} // {2}", tile.x, tile.y, direction);
                     if(debug) Effects.effect(Fx.node4, tile.worldx(), tile.worldy());
                     return tile;
                 }
@@ -300,6 +285,7 @@ public class OptimizedPathFinder {
                 if((obstacle(rel(tile, direction + 3)) && !obstacle(rel(tile, direction + 2))  && !obstacle(rel(tile, direction - 2))) ||
                         (obstacle(rel(tile, direction - 3)) && !obstacle(rel(tile, direction - 2)) && !obstacle(rel(tile, direction + 2)))) {
                     if(debug) Effects.effect(Fx.node4, tile.worldx(), tile.worldy());
+                    //Log.info("Found forced diagonal neighbor {0} {1} // {2}", tile.x, tile.y, direction);
                     return tile;
                 }else{
                     return null;
@@ -321,7 +307,8 @@ public class OptimizedPathFinder {
     }
 
     protected float estimate(Tile tile, Tile other){
-        return Math.abs(tile.worldx() - other.worldx()) + Math.abs(tile.worldy() - other.worldy());
+        return Math.abs(tile.worldx() - other.worldx()) + Math.abs(tile.worldy() - other.worldy()) +
+                (tile.occluded ? tilesize*2 : 0) + (other.occluded ? tilesize*2 : 0);
     }
 
     protected int relDirection(Tile from, Tile current){
