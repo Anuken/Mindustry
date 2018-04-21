@@ -239,7 +239,7 @@ public enum PlaceMode{
 			if(android && !Gdx.input.isTouched(0) && !control.showCursor()){
 				return;
 			}
-			
+
 			float t = tilesize;
 			Block block = control.input().recipe.result;
 			Vector2 offset = block.getPlaceOffset();
@@ -270,29 +270,53 @@ public enum PlaceMode{
 				cursor.draw(tilex, tiley, endx, endy);
 			}else{
 				Lines.stroke(2f);
-				Draw.color(control.input().cursorNear() ? Colors.get("place") : Colors.get("placeInvalid"));
+				Draw.color(control.input().cursorNear() ? "place" : "placeInvalid");
 				Lines.rect(x, y, x2 - x, y2 - y);
 				Draw.alpha(0.3f);
 				Draw.crect("blank", x, y, x2 - x, y2 - y);
-				
+
 				int amount = 1;
-				for(int cx = 0; cx <= Math.abs(endx - tilex); cx ++){
-					for(int cy = 0; cy <= Math.abs(endy - tiley); cy ++){
+				boolean isX = Math.abs(endx - tilex) >= Math.abs(endy - tiley);
+
+				for(int cx = 0; cx <= Math.abs(endx - tilex); cx += (isX ? 0 : 1)){
+					for(int cy = 0; cy <= Math.abs(endy - tiley); cy += (isX ? 1 : 0)){
+
 						int px = tx + cx * Mathf.sign(ex - tx),
 								py = ty + cy * Mathf.sign(ey - ty);
-						
-						renderer.getBlocks().handlePreview(control.input().recipe.result, control.input().recipe.result.rotate ? rotation * 90 : 0f, px * t + offset.x, py * t + offset.y, px, py);
-						
-						if(!control.input().validPlace(px, py, control.input().recipe.result)
-						   || !state.inventory.hasItems(control.input().recipe.requirements, amount)){
-							Lines.stroke(2f);
-							Draw.color(Colors.get("placeInvalid"));
-							Lines.crect(px * t + offset.x, py * t + offset.y, t*block.width, t*block.height);
+
+						//step by the block size if it's valid
+						if(control.input().validPlace(px, py, control.input().recipe.result) && state.inventory.hasItems(control.input().recipe.requirements, amount)){
+
+							renderer.getBlocks().handlePreview(control.input().recipe.result, block.rotate ? rotation * 90 : 0f, px * t + offset.x, py * t + offset.y, px, py);
+
+							if(isX){
+								cx += block.width;
+							}else{
+								cy += block.width;
+							}
+							amount ++;
+						}else{ //otherwise, step by 1 until it is valid
+							if(control.input().cursorNear()){
+								Lines.stroke(2f);
+								Draw.color("placeInvalid");
+								Lines.crect(
+										px * t + (isX ? 0 : offset.x) + (ex < tx && isX ? t : 0) - (block.width == 3 && ex > tx && isX ? t : 0),
+										py * t + (isX ? offset.y : 0) + (ey < ty && !isX ? t : 0) - (block.height == 3 && ey > ty && !isX ? t : 0),
+										t*(isX ? 1 : block.width),
+										t*(isX ? block.height : 1));
+								Draw.color("place");
+							}
+
+							if(isX){
+								cx += 1;
+							}else{
+								cy += 1;
+							}
 						}
-						amount ++;
+
 					}
 				}
-				
+
 				if(control.input().recipe.result.rotate){
 					float cx = tx * t, cy = ty * t;
 					Lines.stroke(2f);
