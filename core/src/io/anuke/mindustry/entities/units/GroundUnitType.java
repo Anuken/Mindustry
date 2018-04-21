@@ -15,19 +15,23 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
 
 import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.world;
 
 public abstract class GroundUnitType extends UnitType{
+    private static final int nodeStateNone = -2;
+    private static final int nodeStateCalculating = -1;
+
     //only use for drawing!
     protected Translator tr1 = new Translator();
     //only use for updating!
     protected Translator tr2 = new Translator();
 
-    protected float stopDistance = 30f;
+    protected float jumpDistance = 4f;
 
     public GroundUnitType(String name) {
         super(name);
         maxVelocity = 1.1f;
-        speed = 0.05f;
+        speed = 0.1f;
         drag = 0.4f;
     }
 
@@ -103,15 +107,28 @@ public abstract class GroundUnitType extends UnitType{
     @Override
     public void behavior(BaseUnit unit) {
         //TODO actually pathfind
-        tr2.set(unit.target.x, unit.target.y).sub(unit.x, unit.y);
+        if(unit.node == nodeStateNone){
+            world.pathfinder().findPath(world.tileWorld(unit.x, unit.y), world.tileWorld(unit.target.x, unit.target.y), unit.path, unit.finder, () -> {
+                unit.node = 0;
+            });
 
-        if(tr2.len() > stopDistance){
-            tr2.limit(speed);
-
-            unit.walkTime += Timers.delta();
-
-            unit.velocity.add(tr2);
+            unit.node = nodeStateCalculating;
         }
+
+        if(!(unit.node >= 0 && unit.node < unit.path.nodes.size)) return;
+
+        Tile nodeTarget = unit.path.get(unit.node);
+
+        tr2.set(nodeTarget.worldx(), nodeTarget.worldy()).sub(unit.x, unit.y);
+
+        if(tr2.len() < jumpDistance){
+            unit.node ++;
+        }
+
+        tr2.limit(speed);
+        unit.walkTime += Timers.delta();
+        unit.velocity.add(tr2);
+
 
         if(unit.timer.get(timerReload, reload)){
             //shoot(unit, BulletType.shot, tr2.angle(), 4f);

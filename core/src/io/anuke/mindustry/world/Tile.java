@@ -23,7 +23,6 @@ public class Tile{
 	private byte floor, wall;
 	private byte rotation;
 	private byte dump;
-	private byte extra;
 	private byte team;
 	/**The coordinates of the core tile this is linked to, in the form of two bytes packed into one.
 	 * This is relative to the block it is linked to; negate coords to find the link.*/
@@ -32,6 +31,9 @@ public class Tile{
 	/**Whether this tile has any solid blocks near it.*/
 	public boolean occluded = false;
 	public TileEntity entity;
+
+	public float pathDistance = -1;
+	public float vecx, vecy;
 	
 	public Tile(int x, int y){
 		this.x = (short)x;
@@ -167,20 +169,12 @@ public class Tile{
 		this.dump = dump;
 	}
 	
-	public void setExtra(byte extra){
-		this.extra = extra;
-	}
-	
 	public byte getRotation(){
 		return rotation;
 	}
 	
 	public byte getDump(){
 		return dump;
-	}
-	
-	public byte getExtra(){
-		return extra;
 	}
 
 	public boolean passable(){

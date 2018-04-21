@@ -1,6 +1,10 @@
 package io.anuke.mindustry.entities.units;
 
-import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.ai.OptimizedPathFinder;
+import io.anuke.mindustry.ai.SmoothGraphPath;
+import io.anuke.mindustry.entities.Bullet;
+import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.util.Mathf;
@@ -18,6 +22,10 @@ public class BaseUnit extends Unit{
 	public Timer timer = new Timer(5);
 	public float walkTime = 0f;
 	public Entity target;
+
+	protected OptimizedPathFinder finder;
+	protected SmoothGraphPath path;
+	protected int node = -2;
 
 	public BaseUnit(UnitType type, Team team){
 		this.type = type;
@@ -96,6 +104,11 @@ public class BaseUnit extends Unit{
 		hitbox.solid = true;
 		hitbox.setSize(type.hitsize);
 		hitboxTile.setSize(type.hitsizeTile);
+
+		if(!isFlying()){
+			finder = new OptimizedPathFinder();
+			path = new SmoothGraphPath();
+		}
 
 		heal();
 	}

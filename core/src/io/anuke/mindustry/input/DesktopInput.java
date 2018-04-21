@@ -194,10 +194,6 @@ public class DesktopInput extends InputHandler{
 			world.pathfinder().test(world.tileWorld(player.x, player.y), world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y));
 		}
 
-		if(Inputs.keyTap(Input.L)){
-			world.pathfinder().step();
-		}
-
 		if(!ui.hasMouse()) {
 			if (showCursor)
 				Cursors.setHand();

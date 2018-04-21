@@ -48,7 +48,6 @@ public class Router extends Block{
 	public void handleItem(Item item, Tile tile, Tile source){
 		super.handleItem(item, tile, source);
 		tile.entity.wakeUp();
-		tile.setExtra(tile.relativeTo(source.x, source.y));
 	}
 
 	@Override

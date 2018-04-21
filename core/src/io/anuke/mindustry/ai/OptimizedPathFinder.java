@@ -22,6 +22,7 @@ public class OptimizedPathFinder {
     NodeRecord current;
 
     private int searchId;
+    private Tile end;
 
     private static final byte UNVISITED = 0;
     private static final byte OPEN = 1;
@@ -29,14 +30,12 @@ public class OptimizedPathFinder {
 
     private static final boolean debug = false;
 
-    public static boolean unop = false;
-    public static boolean step = true;
-
     public OptimizedPathFinder() {
         this.openList = new BinaryHeap<>();
     }
 
     public boolean searchNodePath(Tile startNode, Tile endNode, GraphPath<Tile> outPath) {
+        this.end = endNode;
 
         // Perform AStar
         boolean found = search(startNode, endNode);
@@ -135,13 +134,13 @@ public class OptimizedPathFinder {
     protected void visitChildren(Tile endNode) {
         if(debug) Effects.effect(Fx.node3, current.node.worldx(), current.node.worldy());
 
-        jps(current.node, current.from == null ? -1 : relDirection(current.node, current.from), endNode, node -> {
+        nodes(current.node, node -> {
             float addCost = estimate(current.node, node);
 
             float nodeCost = current.costSoFar + addCost;
 
             float nodeHeuristic;
-            NodeRecord nodeRecord = getNodeRecord(node);;
+            NodeRecord nodeRecord = getNodeRecord(node);
 
             if (nodeRecord.category == CLOSED) { // The node is closed
 
@@ -182,18 +181,16 @@ public class OptimizedPathFinder {
         });
     }
 
+    protected void nodes(Tile current, Consumer<Tile> cons){
+        if(obstacle(current)) return;
+        for(int i = 0; i < 4; i ++){
+            Tile n = current.getNearby(i);
+            if(!obstacle(n)) cons.accept(n);
+        }
+    }
 
     protected void jps(Tile current, int direction, Tile end, Consumer<Tile> cons){
         if(obstacle(current)) return; //skip solid or off-the-screen stuff
-
-        //Log.info("jps {0} {1} // {2}", current.x, current.y, direction);
-
-        if(unop){
-            for(int i = 0; i < 4; i ++){
-                if(!obstacle(current.getNearby(i))) cons.accept(current.getNearby(i));
-            }
-            return;
-        }
 
         //if there's no start point, scan everything.
         if(direction == -1){
@@ -267,7 +264,6 @@ public class OptimizedPathFinder {
     }
 
     protected Tile scanDir(Tile tile, Tile end, int direction){
-
         while(!obstacle(tile)){
             if(debug) Effects.effect(Fx.node2, tile.worldx(), tile.worldy());
             if(tile == end) return tile;
@@ -303,12 +299,12 @@ public class OptimizedPathFinder {
     }
 
     protected boolean obstacle(Tile tile){
-        return tile == null || tile.solid();
+        return tile == null || (tile.solid() && end.target() != tile && tile.target() != end);
     }
 
     protected float estimate(Tile tile, Tile other){
         return Math.abs(tile.worldx() - other.worldx()) + Math.abs(tile.worldy() - other.worldy()) +
-                (tile.occluded ? tilesize*2 : 0) + (other.occluded ? tilesize*2 : 0);
+                (tile.occluded ? tilesize : 0) + (other.occluded ? tilesize : 0);
     }
 
     protected int relDirection(Tile from, Tile current){

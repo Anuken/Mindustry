@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.sun.media.jfxmediaimpl.MediaDisposer.Disposable;
+import com.badlogic.gdx.utils.Disposable;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
