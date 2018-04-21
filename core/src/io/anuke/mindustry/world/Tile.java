@@ -3,9 +3,9 @@ package io.anuke.mindustry.world;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.modules.InventoryModule;
 import io.anuke.mindustry.world.blocks.types.modules.LiquidModule;
 import io.anuke.mindustry.world.blocks.types.modules.PowerModule;
@@ -328,7 +328,7 @@ public class Tile{
 
 		world.notifyChanged(this);
 	}
-	
+
 	@Override
 	public String toString(){
 		Block block = block();

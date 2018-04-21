@@ -26,9 +26,10 @@ public class OptimizedPathFinder {
     private static final byte OPEN = 1;
     private static final byte CLOSED = 2;
 
-    private static final boolean debug = true;
+    private static final boolean debug = false;
 
     public static boolean unop = false;
+    public static boolean step = true;
 
     public OptimizedPathFinder() {
         this.openList = new BinaryHeap<>();
@@ -68,6 +69,22 @@ public class OptimizedPathFinder {
 
         // We've run out of nodes without finding the goal, so there's no solution
         return false;
+    }
+
+    public void runStep(Tile startNode, Tile endNode){
+        if(openList.size > 0) {
+            // Retrieve the node with smallest estimated total cost from the open list
+            current = openList.pop();
+            current.category = CLOSED;
+
+            // Terminate if we reached the goal node
+            if (current.node == endNode) return;
+
+            visitChildren(endNode);
+
+            cameFrom = current.node;
+
+        }
     }
 
     public boolean search(PathFinderRequest<Tile> request, long timeToRun) {
@@ -234,13 +251,6 @@ public class OptimizedPathFinder {
                     return;
                 }
             }else{ //moving diagonal
-                Tile sf = scanDir(rel(current, direction), end, direction);
-
-                if(sf != null){
-                    cons.accept(sf);
-                    return;
-                }
-
                 Tile sl = scanDir(rel(current, Mathf.mod(direction - 1, 8)), end, Mathf.mod(direction - 1, 8));
 
                 if(sl != null){
@@ -253,7 +263,12 @@ public class OptimizedPathFinder {
                     cons.accept(sr);
                 }
 
+                Tile sf = scanDir(rel(current, direction), end, direction);
 
+                if(sf != null){
+                    cons.accept(sf);
+                    return;
+                }
             }
 
             if(current == end){
@@ -286,6 +301,8 @@ public class OptimizedPathFinder {
                         (obstacle(rel(tile, direction - 3)) && !obstacle(rel(tile, direction - 2)) && !obstacle(rel(tile, direction + 2)))) {
                     if(debug) Effects.effect(Fx.node4, tile.worldx(), tile.worldy());
                     return tile;
+                }else{
+                    return null;
                 }
             }
             Tile next = rel(tile, direction);
@@ -302,7 +319,7 @@ public class OptimizedPathFinder {
     protected boolean obstacle(Tile tile){
         return tile == null || tile.solid();
     }
-;
+
     protected float estimate(Tile tile, Tile other){
         return Math.abs(tile.worldx() - other.worldx()) + Math.abs(tile.worldy() - other.worldy());
     }
