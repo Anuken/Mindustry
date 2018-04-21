@@ -7,12 +7,12 @@ import io.anuke.mindustry.net.Net;
 
 public class ServerLauncher{
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args){
 
         Net.setClientProvider(new KryoClient());
         Net.setServerProvider(new KryoServer());
 
-        new HeadlessApplication(new MindustryServer());
+        new HeadlessApplication(new MindustryServer(args));
 
         //find and handle uncaught exceptions in libGDX thread
         for(Thread thread : Thread.getAllStackTraces().keySet()){
@@ -24,6 +24,5 @@ public class ServerLauncher{
                 break;
             }
         }
-
     }
 }

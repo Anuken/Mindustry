@@ -115,6 +115,8 @@ public class AndroidLauncher extends AndroidApplication{
 								+ Character.digit(s.charAt(i + 1), 16));
 					}
 
+					if(new String(Base64Coder.encode(data)).equals("AAAAAAAAAOA=")) throw new RuntimeException("Bad UUID.");
+
 					return data;
 				}catch (Exception e){
                     Settings.defaults("uuid", "");

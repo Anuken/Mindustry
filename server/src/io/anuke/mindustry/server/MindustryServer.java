@@ -11,6 +11,11 @@ import io.anuke.ucore.modules.ModuleCore;
 import static io.anuke.mindustry.Vars.*;
 
 public class MindustryServer extends ModuleCore {
+    private String[] args;
+
+    public MindustryServer(String[] args){
+        this.args = args;
+    }
 
     @Override
     public void init(){
@@ -23,6 +28,6 @@ public class MindustryServer extends ModuleCore {
         module(world = new World());
         module(netServer = new NetServer());
         module(netCommon = new NetCommon());
-        module(new ServerControl());
+        module(new ServerControl(args));
     }
 }
