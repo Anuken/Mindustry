@@ -20,8 +20,8 @@ allprojects {
     version = 'release'
 
     ext {
-        versionNumber = '3.5'
-        versionType = 'release'
+        versionNumber = '4.0'
+        versionType = 'pre-alpha'
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         aiVersion = '1.8.1'
