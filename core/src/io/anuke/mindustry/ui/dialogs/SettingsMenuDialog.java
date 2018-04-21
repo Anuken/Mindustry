@@ -11,9 +11,13 @@ import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.function.Consumer;
+import io.anuke.ucore.scene.Element;
+import io.anuke.ucore.scene.event.InputEvent;
+import io.anuke.ucore.scene.event.InputListener;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.SettingsDialog;
+import io.anuke.ucore.scene.ui.Slider;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
@@ -92,6 +96,24 @@ public class SettingsMenuDialog extends SettingsDialog{
 		prefs.add(menu);
 
 		ScrollPane pane = new ScrollPane(prefs, "clear");
+		pane.addCaptureListener(new InputListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				Element actor = pane.hit(x, y, true);
+				if (actor instanceof Slider) {
+					pane.setFlickScroll(false);
+					return true;
+				}
+
+				return super.touchDown(event, x, y, pointer, button);
+			}
+
+			@Override
+			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+				pane.setFlickScroll(true);
+				super.touchUp(event, x, y, pointer, button);
+			}
+		});
 		pane.setFadeScrollBars(false);
 
 		row();

@@ -313,7 +313,6 @@ public enum PlaceMode{
 								cy += 1;
 							}
 						}
-
 					}
 				}
 
