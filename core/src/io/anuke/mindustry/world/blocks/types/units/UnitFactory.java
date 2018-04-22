@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks.types.production;
+package io.anuke.mindustry.world.blocks.types.units;
 
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;

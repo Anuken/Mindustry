@@ -4,13 +4,22 @@ import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.production.UnitFactory;
+import io.anuke.mindustry.world.blocks.types.units.UnitFactory;
 
 public class UnitBlocks {
     public static final Block
 
-    flierFactory = new UnitFactory("flierfactory"){{
-        type = UnitTypes.flier;
+    droneFactory = new UnitFactory("dronefactory"){{
+        type = UnitTypes.drone;
+        produceTime = 200;
+        size = 2;
+        requirements = new ItemStack[]{
+            new ItemStack(Items.stone, 5)
+        };
+    }},
+
+    vtolFactory = new UnitFactory("vtolfactory"){{
+        type = UnitTypes.vtol;
         produceTime = 200;
         size = 2;
         requirements = new ItemStack[]{

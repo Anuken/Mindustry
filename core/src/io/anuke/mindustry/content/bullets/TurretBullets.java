@@ -123,7 +123,7 @@ public class TurretBullets {
             hiteffect = BulletFx.hitLancer;
             despawneffect = Fx.none;
             hitsize = 4;
-            lifetime = 20f;
+            lifetime = 16f;
             pierce = true;
         }
 
@@ -134,12 +134,15 @@ public class TurretBullets {
 
         @Override
         public void draw(Bullet b) {
-            Lines.lineAngle(b.x, b.y, b.angle(), length);
+            float f = Mathf.curve(b.fin(), 0f, 0.2f);
+            float baseLen = length * f;
+
+            Lines.lineAngle(b.x, b.y, b.angle(), baseLen);
             for(int s = 0; s < 3; s ++) {
                 Draw.color(colors[s]);
                 for (int i = 0; i < tscales.length; i++) {
                     Lines.stroke(7f * b.fout() * (s == 0 ? 1.5f : s == 1 ? 1f : 0.3f) * tscales[i]);
-                    Lines.lineAngle(b.x, b.y, b.angle(), length * lenscales[i]);
+                    Lines.lineAngle(b.x, b.y, b.angle(), baseLen * lenscales[i]);
                 }
             }
             Draw.reset();

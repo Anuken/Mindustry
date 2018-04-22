@@ -7,11 +7,11 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.StaticBlock;
-import io.anuke.mindustry.world.blocks.types.defense.Turret;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
+
 import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.*;
@@ -230,8 +230,7 @@ public class BlockRenderer{
                 if((storeX == drawx - halfBlockWidth || storeX == drawx + halfBlockWidth || storeY == drawy - halfBlockHeight || storeY == drawy + halfBlockHeight) &&
                         ((tiley - control.input().getBlockY()) % block.size != 0 || (tilex - control.input().getBlockX()) % block.size != 0)) {
                     return;
-                }
-                else {
+                }else{
                     storeX = drawx;
                     storeY = drawy;
                 }
@@ -240,14 +239,6 @@ public class BlockRenderer{
             float opacity = (float) Settings.getInt("previewopacity") / 100f;
             Draw.color(Color.WHITE);
             Draw.alpha(opacity);
-
-            if(block instanceof Turret) {
-                if (block.isMultiblock()) {
-                    Draw.rect("block-" + block.size + "x" + block.size, drawx, drawy);
-                } else {
-                    Draw.rect("block", drawx, drawy);
-                }
-            }
 
             drawPreview(block, drawx, drawy, rotation, opacity);
 
