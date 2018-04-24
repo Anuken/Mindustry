@@ -25,7 +25,7 @@ allprojects {
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         aiVersion = '1.8.1'
-        uCoreVersion = 'a6f9111'
+        uCoreVersion = '55f0d90'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -107,7 +107,7 @@ project(":core") {
     apply plugin: "java"
 
     dependencies {
-        boolean comp = System.properties["release"] == null || System.properties["release"] == "false"
+        boolean comp = false//System.properties["release"] == null || System.properties["release"] == "false"
 
         if(!comp){
             println("NOTICE: Compiling release build.")
