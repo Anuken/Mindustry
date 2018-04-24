@@ -1,8 +1,6 @@
 package io.anuke.mindustry.resource;
 
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.Bullet;
-import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.net.Net;
@@ -16,8 +14,6 @@ import io.anuke.ucore.util.Translator;
 public class Weapon extends Upgrade{
 	/**weapon reload in frames*/
 	protected float reload;
-	/**type of bullet shot*/
-	protected BulletType type;
 	/**sound made when shooting*/
 	protected String shootsound = "shoot";
 	/**amount of shots per fire*/
@@ -37,10 +33,9 @@ public class Weapon extends Upgrade{
 	/**translator for vector calulations*/
 	protected Translator tr = new Translator();
 
-	protected Weapon(String name, float reload, BulletType type){
+	protected Weapon(String name, float reload){
 		super(name);
 		this.reload = reload;
-		this.type = type;
 	}
 
 	public void update(Player p, boolean left){
@@ -78,7 +73,7 @@ public class Weapon extends Upgrade{
 	
 	void bullet(Unit owner, float x, float y, float angle){
 		tr.trns(angle, 3f);
-
-		Bullet.create(type, owner,  x + tr.x, y + tr.y, angle);
+		//TODO implement!
+		//Bullet.create(type, owner,  x + tr.x, y + tr.y, angle);
 	}
 }

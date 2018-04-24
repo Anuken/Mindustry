@@ -225,6 +225,9 @@ public abstract class Turret extends Block{
 	}
 
 	protected void effects(Tile tile){
+		Effect shootEffect = this.shootEffect == Fx.none ? peekAmmo(tile).shootEffect : this.shootEffect;
+		Effect smokeEffect = this.smokeEffect == Fx.none ? peekAmmo(tile).smokeEffect : this.smokeEffect;
+
 		TurretEntity entity = tile.entity();
 
 		Effects.effect(shootEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);

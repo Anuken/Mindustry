@@ -2,9 +2,10 @@ package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.mindustry.content.bullets.TurretBullets;
+import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
-import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
@@ -21,7 +22,7 @@ public class FlyingUnitType extends UnitType {
     public FlyingUnitType(String name) {
         super(name);
         speed = 0.2f;
-        maxVelocity = 4f;
+        maxVelocity = 2f;
         drag = 0.01f;
         isFlying = true;
     }
@@ -65,7 +66,7 @@ public class FlyingUnitType extends UnitType {
         unit.velocity.add(vec); //TODO clamp it so it doesn't glitch out at low fps
 
         if(unit.timer.get(timerReload, reload) && len < range){
-            //shoot(unit, BulletType.shot, ang, 4f);
+            shoot(unit, TurretBullets.basicIron, unit.rotation, 4f);
         }
     }
 

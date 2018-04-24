@@ -19,8 +19,6 @@ public class WeaponBlocks{
 		ammoTypes = new AmmoType[]{AmmoTypes.basicIron};
 		reload = 25f;
 		restitution = 0.03f;
-		shootEffect = ShootFx.shootSmall;
-		smokeEffect = ShootFx.shootSmallSmoke;
 		ammoUseEffect = ShootFx.shellEjectSmall;
 	}},
 	
@@ -32,8 +30,6 @@ public class WeaponBlocks{
 		restitution = 0.03f;
 		recoil = 1.5f;
 		burstSpacing = 6f;
-		shootEffect = ShootFx.shootSmall;
-		smokeEffect = ShootFx.shootSmallSmoke;
 		ammoUseEffect = ShootFx.shellEjectSmall;
 	}},
 	
@@ -42,7 +38,6 @@ public class WeaponBlocks{
 		recoil = 0f;
 		reload = 5f;
 		shootCone = 50f;
-		shootEffect = ShootFx.shootSmallFlame;
 		ammoUseEffect = ShootFx.shellEjectSmall;
 
 		drawer = (tile, entity) -> {
@@ -58,8 +53,6 @@ public class WeaponBlocks{
 		ammoEjectBack = 2f;
 		recoil = 3f;
 		shootShake = 2f;
-		shootEffect = ShootFx.shootBig;
-		smokeEffect = ShootFx.shootBigSmoke;
 		ammoUseEffect = ShootFx.shellEjectMedium;
 	}},
 	
@@ -73,8 +66,6 @@ public class WeaponBlocks{
 		cooldown = 0.03f;
 		recoil = 3f;
 		shootShake = 2f;
-		shootEffect = ShootFx.shootBig2;
-		smokeEffect = ShootFx.shootBigSmoke2;
 		ammoUseEffect = ShootFx.shellEjectBig;
 
 		drawer = (tile, entity) -> {
