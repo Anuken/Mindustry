@@ -26,8 +26,8 @@ public class NetCommon extends Module {
 
             if (player == null) return;
 
-            player.weaponLeft = Upgrade.getByID(packet.left);
-            player.weaponRight = Upgrade.getByID(packet.right);
+            player.weapon = Upgrade.getByID(packet.weapon);
+            player.weapon = Upgrade.getByID(packet.weapon);
         });
 
         Net.handle(BlockTapPacket.class, (packet) -> {

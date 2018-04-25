@@ -3,6 +3,7 @@ package io.anuke.mindustry.entities;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.Effects;
@@ -18,12 +19,13 @@ import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
 public abstract class Unit extends SyncEntity implements SerializableEntity {
-    //total duration of hit effect
+    /**total duration of hit flash effect*/
     public static final float hitDuration = 9f;
 
     public StatusController status = new StatusController();
-    public UnitInventory inventory = new UnitInventory(100);
+    public UnitInventory inventory = new UnitInventory(100, 100);
     public Team team = Team.blue;
+
     public Vector2 velocity = new Vector2();
     public float hitTime;
     public float drownTime;
@@ -146,6 +148,8 @@ public abstract class Unit extends SyncEntity implements SerializableEntity {
         }
     }
 
+    public abstract boolean acceptsAmmo(Item item);
+    public abstract void addAmmo(Item item);
     public abstract float getMass();
     public abstract boolean isFlying();
     public abstract float getSize();

@@ -63,8 +63,7 @@ public class NetEvents {
 
     public static void handleWeaponSwitch(){
         WeaponSwitchPacket packet = new WeaponSwitchPacket();
-        packet.left = Vars.player.weaponLeft.id;
-        packet.right = Vars.player.weaponRight.id;
+        packet.weapon = Vars.player.weapon.id;
         packet.playerid = Vars.player.id;
         Net.send(packet, SendMode.tcp);
     }

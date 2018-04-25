@@ -6,6 +6,7 @@ import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.resource.Item;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
@@ -39,6 +40,16 @@ public class BaseUnit extends Unit{
 		rotation = Mathf.slerpDelta(rotation, angle, type.rotatespeed);
 	}
 
+	//TODO
+	@Override
+	public boolean acceptsAmmo(Item item) {
+		return false;
+	}
+
+	@Override
+	public void addAmmo(Item item) {
+
+	}
 	//TODO
 	@Override
 	public float getSize() {

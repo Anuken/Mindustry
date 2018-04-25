@@ -90,15 +90,16 @@ public class ShootFx {
 
     shellEjectSmall = new GroundEffect(30f, 400f, e -> {
         Draw.color(Palette.lightOrange, Color.LIGHT_GRAY, Palette.lightishGray, e.fin());
-        float rot = e.rotation + 90f;
-        for(int i : Mathf.signs){
-            float len = (2f + e.finpow()*6f) * i;
-            float lr = rot + e.fin()*30f*i;
-            Draw.rect("white",
-                    e.x + Angles.trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.fin()),
-                    e.y + Angles.trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.fin()),
-                    1f, 2f, rot + e.fin()*50f*i);
-        }
+        float rot = Math.abs(e.rotation) + 90f;
+
+        int i = Mathf.sign(e.rotation);
+
+        float len = (2f + e.finpow()*6f) * i;
+        float lr = rot + e.fin()*30f*i;
+        Draw.rect("white",
+                e.x + Angles.trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.fin()),
+                e.y + Angles.trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.fin()),
+                1f, 2f, rot + e.fin()*50f*i);
 
         Draw.color();
     }),

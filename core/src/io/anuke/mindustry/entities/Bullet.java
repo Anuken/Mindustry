@@ -27,6 +27,7 @@ public class Bullet extends BulletEntity<BulletType>{
 		bullet.owner = owner;
 
 		bullet.velocity.set(0, type.speed).setAngle(angle);
+		bullet.velocity.add(owner instanceof Unit ? ((Unit)owner).velocity : Vector2.Zero);
 		bullet.hitbox.setSize(type.hitsize);
 
 		bullet.team = team;

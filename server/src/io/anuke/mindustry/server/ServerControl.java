@@ -49,7 +49,7 @@ public class ServerControl extends Module {
         mode = ShuffleMode.valueOf(Settings.getString("shufflemode"));
 
         Effects.setScreenShakeProvider((a, b) -> {});
-        Effects.setEffectProvider((a, b, c, d, e) -> {});
+        Effects.setEffectProvider((a, b, c, d, e, f) -> {});
         Sounds.setHeadless(true);
 
         //override default handling of chat packets

@@ -376,20 +376,18 @@ public class Packets {
 
     public static class WeaponSwitchPacket implements Packet{
         public int playerid;
-        public byte left, right;
+        public byte weapon;
 
         @Override
         public void write(ByteBuffer buffer) {
             buffer.putInt(playerid);
-            buffer.put(left);
-            buffer.put(right);
+            buffer.put(weapon);
         }
 
         @Override
         public void read(ByteBuffer buffer) {
             playerid = buffer.getInt();
-            left = buffer.get();
-            right = buffer.get();
+            weapon = buffer.get();
         }
     }
 

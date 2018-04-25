@@ -97,6 +97,20 @@ public class Units {
     }
 
     /**Iterates over all units in a rectangle.*/
+    public static void getNearby(Team team, Rectangle rect, Consumer<Unit> cons){
+
+        EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
+        if(!group.isEmpty()){
+            Entities.getNearby(group, rect, entity -> cons.accept((Unit)entity));
+        }
+
+        //now check all enemy players
+        Entities.getNearby(playerGroup, rect, player -> {
+            if(((Unit)player).team == team) cons.accept((Unit)player);
+        });
+    }
+
+    /**Iterates over all units in a rectangle.*/
     public static void getNearby(Rectangle rect, Consumer<Unit> cons){
 
         for(Team team : Team.values()){
@@ -128,4 +142,6 @@ public class Units {
             }
         });
     }
+
+
 }

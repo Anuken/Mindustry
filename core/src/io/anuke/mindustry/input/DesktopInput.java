@@ -106,7 +106,7 @@ public class DesktopInput extends InputHandler{
 		
 		for(int i = 1; i <= 6 && i <= control.upgrades().getWeapons().size; i ++){
 			if(Inputs.keyTap("weapon_" + i)){
-				player.weaponLeft = player.weaponRight = control.upgrades().getWeapons().get(i - 1);
+				player.weapon = control.upgrades().getWeapons().get(i - 1);
                 if(Net.active()) NetEvents.handleWeaponSwitch();
 			}
 		}

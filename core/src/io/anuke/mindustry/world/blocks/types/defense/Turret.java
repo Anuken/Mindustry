@@ -38,7 +38,6 @@ public abstract class Turret extends Block{
 	protected Effect shootEffect = Fx.none;
 	protected Effect smokeEffect = Fx.none;
 	protected Effect ammoUseEffect = Fx.none;
-	protected String shootsound = "shoot";
 
     protected int ammoPerShot = 1;
     protected float ammoEjectBack = 1f;

@@ -104,7 +104,7 @@ public class PlayerListFragment implements Fragment{
                 public void draw(){
                     float s = getWidth() / 12f;
                     for(int i : Mathf.signs){
-                        Draw.rect((i < 0 ? player.weaponLeft.name : player.weaponRight.name)
+                        Draw.rect((player.weapon.name)
                                 + "-equip", x + s * 6 + i * 3*s, y + s*6 + 2*s, -8*s*i, 8*s);
                     }
                 }

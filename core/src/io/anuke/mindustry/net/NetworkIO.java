@@ -123,7 +123,7 @@ public class NetworkIO {
                 control.upgrades().getWeapons().add(Upgrade.getByID(stream.readByte()));
             }
 
-            player.weaponLeft = player.weaponRight = control.upgrades().getWeapons().peek();
+            player.weapon = control.upgrades().getWeapons().peek();
 
             Entities.clear();
             player.id = pid;

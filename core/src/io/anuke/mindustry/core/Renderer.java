@@ -35,6 +35,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.graphics.*;
@@ -65,7 +66,7 @@ public class Renderer extends RendererModule{
 		Lines.setCircleVertices(14);
 
 		Core.cameraScale = baseCameraScale;
-		Effects.setEffectProvider((effect, color, x, y, rotation) -> {
+		Effects.setEffectProvider((effect, color, x, y, rotation, data) -> {
 			if(effect == Fx.none) return;
 			if(Settings.getBool("effects")){
 				Rectangle view = rect.setSize(camera.viewportWidth, camera.viewportHeight)
@@ -82,6 +83,10 @@ public class Renderer extends RendererModule{
 						entity.rotation = rotation;
 						entity.lifetime = effect.lifetime;
 						id = entity.set(x, y).add(effectGroup).id;
+
+						if(data instanceof Entity){
+							entity.setParent((Entity)data);
+						}
 					}
 
 					if(effect instanceof GroundEffect){

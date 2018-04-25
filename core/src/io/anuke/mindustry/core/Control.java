@@ -143,7 +143,7 @@ public class Control extends Module{
 
 		Events.on(ResetEvent.class, () -> {
 			upgrades.reset();
-			player.weaponLeft = player.weaponRight = Weapons.blaster;
+			player.weapon = Weapons.blaster;
 			player.team = Team.blue;
 			player.inventory.clear();
 

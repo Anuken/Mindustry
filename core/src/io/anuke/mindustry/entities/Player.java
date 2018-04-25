@@ -11,10 +11,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
-import io.anuke.mindustry.resource.ItemStack;
-import io.anuke.mindustry.resource.Mech;
-import io.anuke.mindustry.resource.Upgrade;
-import io.anuke.mindustry.resource.Weapon;
+import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.Effects;
@@ -23,10 +20,7 @@ import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Timer;
-import io.anuke.ucore.util.Translator;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -46,8 +40,7 @@ public class Player extends Unit{
 	public boolean isAdmin;
 	public Color color = new Color();
 
-	public Weapon weaponLeft = Weapons.blaster;
-	public Weapon weaponRight = Weapons.blaster;
+	public Weapon weapon = Weapons.blaster;
 	public Mech mech = Mechs.standard;
 
 	public float targetAngle = 0f;
@@ -72,8 +65,8 @@ public class Player extends Unit{
 
 	@Override
 	public void onRemoteShoot(BulletType type, float x, float y, float rotation, short data) {
-		Weapon weapon = Upgrade.getByID((byte)data);
-		weapon.shoot(player, x, y, rotation);
+		Weapon weapon = Upgrade.getByID(Bits.getLeftByte(data));
+		weapon.shoot(player, x, y, rotation, Bits.getRightByte(data) == 1);
 	}
 
 	@Override
@@ -184,8 +177,7 @@ public class Player extends Unit{
 		Draw.rect(mname, x, y, rotation -90);
 
 		for (int i : Mathf.signs) {
-			Weapon weapon = i < 0 ? weaponLeft : weaponRight;
-			tr.trns(rotation - 90, 4*i, 3);
+			tr.trns(rotation - 90, 4*i, 3 - weapon.getRecoil(this, i > 0)*1.5f);
 			float w = i > 0 ? -8 : 8;
 			Draw.rect(weapon.name + "-equip", x + tr.x, y + tr.y, w, 8, rotation - 90);
 		}
@@ -269,8 +261,8 @@ public class Player extends Unit{
 		boolean shooting = control.input().canShoot() && control.input().isShooting();
 
 		if(shooting){
-			weaponLeft.update(player, true);
-			weaponRight.update(player, false);
+			weapon.update(player, true);
+			weapon.update(player, false);
 		}
 
 		if(dashing && timer.get(timerDash, 3) && movement.len() > 0){
@@ -300,6 +292,16 @@ public class Player extends Unit{
 
 	protected void updateFlying(){
 		rotation = Mathf.slerpDelta(rotation, targetAngle, 0.2f);
+	}
+
+	@Override
+	public boolean acceptsAmmo(Item item) {
+		return weapon.getAmmoType(item) != null && inventory.canAcceptAmmo(weapon.getAmmoType(item));
+	}
+
+	@Override
+	public void addAmmo(Item item) {
+		inventory.addAmmo(weapon.getAmmoType(item));
 	}
 
 	@Override
@@ -339,8 +341,7 @@ public class Player extends Unit{
 	public void writeSpawn(ByteBuffer buffer) {
 		buffer.put((byte)name.getBytes().length);
 		buffer.put(name.getBytes());
-		buffer.put(weaponLeft.id);
-		buffer.put(weaponRight.id);
+		buffer.put(weapon.id);
 		buffer.put(mech.id);
 		buffer.put(isAdmin ? 1 : (byte)0);
 		buffer.putInt(Color.rgba8888(color));
@@ -355,8 +356,7 @@ public class Player extends Unit{
 		byte[] n = new byte[nlength];
 		buffer.get(n);
 		name = new String(n);
-		weaponLeft = Upgrade.getByID(buffer.get());
-		weaponRight = Upgrade.getByID(buffer.get());
+		weapon = Upgrade.getByID(buffer.get());
 		mech = Upgrade.getByID(buffer.get());
 		isAdmin = buffer.get() == 1;
 		color.set(buffer.getInt());
