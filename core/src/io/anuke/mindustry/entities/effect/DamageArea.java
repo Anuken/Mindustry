@@ -29,9 +29,7 @@ public class DamageArea{
 		for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i ++){
 			int branches = 5 + Mathf.clamp((int)(power/30), 1, 20);
 			Timers.run(i*2f + Mathf.random(4f), () -> {
-				Lightning l = new Lightning(Team.none, Fx.none, 3, x, y, Mathf.random(360f), branches + Mathf.range(2));
-				l.color = Colors.get("power");
-				l.add();
+				Lightning.create(Team.none, Fx.none, Colors.get("power"), 3, x, y, Mathf.random(360f), branches + Mathf.range(2));
 			});
 		}
 

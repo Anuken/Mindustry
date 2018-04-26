@@ -16,7 +16,7 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.SyncEntity;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.BelowLiquidEffect;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
@@ -40,7 +40,6 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.graphics.*;
 import io.anuke.ucore.modules.RendererModule;
-import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
@@ -543,33 +542,33 @@ public class Renderer extends RendererModule{
 		}
 
 		//TODO draw health bars
-
-		/*
 		if((!debug || showUI) && Settings.getBool("healthbars")){
-
-			//draw entity health bars
-			for(BaseUnit entity : enemyGroup.all()){
-				drawHealth(entity);
+			for(EntityGroup<BaseUnit> group : unitGroups){
+				drawHealth(group);
 			}
 
-			for(Player player : playerGroup.all()){
-				if(!player.isDead()) drawHealth(player);
-			}
-		}*/
+			drawHealth(playerGroup);
+		}
 	}
 
-	void drawHealth(SyncEntity dest){
-		float x = dest.getDrawPosition().x;
-		float y = dest.getDrawPosition().y;
-		if(dest instanceof Player && snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate")){
-			drawHealth((int) x, (int) y - 7f, dest.health, dest.maxhealth);
+	void drawHealth(EntityGroup<? extends Unit> group){
+		for(Unit e : group.all()){
+			drawHealth(e);
+		}
+	}
+
+	void drawHealth(Unit unit){
+		float x = unit.getDrawPosition().x;
+		float y = unit.getDrawPosition().y;
+		if(unit instanceof Player && snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate")){
+			drawHealth((int) x, (int) y - 7f, unit.health, unit.maxhealth);
 		}else{
-			drawHealth(x, y - 7f, dest.health, dest.maxhealth);
+			drawHealth(x, y - 7f, unit.health, unit.maxhealth);
 		}
 	}
 
 	void drawHealth(float x, float y, float health, float maxhealth){
-		drawBar(Color.RED, x, y, health / maxhealth);
+		drawBar(Color.SCARLET, x, y, health / maxhealth);
 	}
 	
 	//TODO optimize!
@@ -613,7 +612,8 @@ public class Renderer extends RendererModule{
 	}
 
 	public void clampScale(){
-		targetscale = Mathf.clamp(targetscale, Math.round(Unit.dp.scl(2)), Math.round(Unit.dp.scl((5))));
+		float s = io.anuke.ucore.scene.ui.layout.Unit.dp.scl(1f);
+		targetscale = Mathf.clamp(targetscale, Math.round(s*2), Math.round(s*5));
 	}
 
 }
