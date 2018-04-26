@@ -35,9 +35,9 @@ public class GroundEffectEntity extends EffectEntity {
         GroundEffect effect = (GroundEffect)this.effect;
 
         if(once && effect.isStatic)
-            Effects.renderEffect(id, effect, color, lifetime, rotation, x, y);
+            Effects.renderEffect(id, effect, color, lifetime, rotation, x, y, data);
         else if(!effect.isStatic)
-            Effects.renderEffect(id, effect, color, time, rotation, x, y);
+            Effects.renderEffect(id, effect, color, time, rotation, x, y, data);
     }
 
     public static class GroundEffect extends Effect{
