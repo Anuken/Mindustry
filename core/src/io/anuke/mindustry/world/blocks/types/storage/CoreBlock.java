@@ -31,6 +31,11 @@ public class CoreBlock extends StorageBlock {
     }
 
     @Override
+    public boolean acceptItem(Item item, Tile tile, Tile source) {
+        return tile.entity.items.totalItems() < itemCapacity;
+    }
+
+    @Override
     public void drawSelect(Tile tile){
         Draw.color("accent");
         Lines.dashCircle(tile.drawx(), tile.drawy(), supplyRadius);

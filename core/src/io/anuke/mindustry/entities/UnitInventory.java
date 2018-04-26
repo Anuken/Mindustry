@@ -1,9 +1,11 @@
 package io.anuke.mindustry.entities;
 
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.resource.*;
 
 public class UnitInventory {
-    private final AmmoEntry ammo = new AmmoEntry(AmmoType.getByID(0), 0);
+    private Array<AmmoEntry> ammos = new Array<>();
+    private int totalAmmo;
     private ItemStack item;
     private int capacity, ammoCapacity;
 
@@ -13,15 +15,18 @@ public class UnitInventory {
     }
 
     public AmmoType getAmmo() {
-        return ammo.type;
+        return ammos.size == 0 ? null : ammos.peek().type;
     }
 
     public boolean hasAmmo(){
-        return ammo.amount > 0;
+        return totalAmmo > 0;
     }
 
     public void useAmmo(){
-        ammo.amount --;
+        AmmoEntry entry = ammos.peek();
+        entry.amount --;
+        if(entry.amount == 0) ammos.pop();
+        totalAmmo --;
     }
 
     public int ammoCapacity(){
@@ -29,13 +34,27 @@ public class UnitInventory {
     }
 
     public boolean canAcceptAmmo(AmmoType type){
-        return ammo.amount + type.quantityMultiplier <= ammoCapacity;
+        return totalAmmo + type.quantityMultiplier <= ammoCapacity;
     }
 
     public void addAmmo(AmmoType type){
-        if(ammo.type != type) ammo.amount = 0;
-        ammo.type = type;
-        ammo.amount += Math.min((int)type.quantityMultiplier, ammoCapacity - ammo.amount);
+        totalAmmo += type.quantityMultiplier;
+
+        //find ammo entry by type
+        for(int i = ammos.size - 1; i >= 0; i --){
+            AmmoEntry entry = ammos.get(i);
+
+            //if found, put it to the right
+            if(entry.type == type){
+                entry.amount += type.quantityMultiplier;
+                ammos.swap(i, ammos.size-1);
+                return;
+            }
+        }
+
+        //must not be found
+        AmmoEntry entry = new AmmoEntry(type, (int)type.quantityMultiplier);
+        ammos.add(entry);
     }
 
     public int capacity(){
@@ -60,8 +79,8 @@ public class UnitInventory {
 
     public void clear(){
         item = null;
-        ammo.amount = 0;
-        ammo.type = AmmoType.getByID(0);
+        ammos.clear();
+        totalAmmo = 0;
     }
 
     public boolean hasItem(){

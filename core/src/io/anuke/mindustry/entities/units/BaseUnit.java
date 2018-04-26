@@ -40,17 +40,16 @@ public class BaseUnit extends Unit{
 		rotation = Mathf.slerpDelta(rotation, angle, type.rotatespeed);
 	}
 
-	//TODO
 	@Override
 	public boolean acceptsAmmo(Item item) {
-		return false;
+		return type.ammo.containsKey(item) && inventory.canAcceptAmmo(type.ammo.get(item));
 	}
 
 	@Override
 	public void addAmmo(Item item) {
-
+		inventory.addAmmo(type.ammo.get(item));
 	}
-	//TODO
+
 	@Override
 	public float getSize() {
 		return 8;

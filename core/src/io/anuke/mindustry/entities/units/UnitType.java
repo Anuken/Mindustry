@@ -1,13 +1,15 @@
 package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.entities.Bullet;
-import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
+import io.anuke.mindustry.resource.AmmoType;
+import io.anuke.mindustry.resource.Item;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Angles;
@@ -41,6 +43,7 @@ public abstract class UnitType {
     protected float drag = 0.1f;
     protected float maxVelocity = 5f;
     protected float reload = 40f;
+    protected ObjectMap<Item, AmmoType> ammo = new ObjectMap<>();
 
     public UnitType(String name){
         this.id = lastid++;
@@ -48,11 +51,13 @@ public abstract class UnitType {
         types.add(this);
     }
 
-    public abstract void draw(BaseUnit unit);
-
-    public void drawOver(BaseUnit unit){
-        //TODO doesn't do anything
+    protected void setAmmo(AmmoType... types){
+        for(AmmoType type : types){
+            ammo.put(type.item, type);
+        }
     }
+
+    public abstract void draw(BaseUnit unit);
 
     public boolean isFlying(){
         return isFlying;
@@ -93,10 +98,14 @@ public abstract class UnitType {
         }
     }
 
-    public void shoot(BaseUnit unit, BulletType type, float rotation, float translation){
-        Bullet.create(type, unit,
+    public void shoot(BaseUnit unit, AmmoType type, float rotation, float translation){
+        Bullet.create(type.bullet, unit,
                 unit.x + Angles.trnsx(rotation, translation),
                 unit.y + Angles.trnsy(rotation, translation), rotation);
+        Effects.effect(type.shootEffect, unit.x + Angles.trnsx(rotation, translation),
+                unit.y + Angles.trnsy(rotation, translation), rotation, unit);
+        Effects.effect(type.smokeEffect, unit.x + Angles.trnsx(rotation, translation),
+                unit.y + Angles.trnsy(rotation, translation), rotation, unit);
     }
 
     public void onDeath(BaseUnit unit){

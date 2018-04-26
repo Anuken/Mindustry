@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities.units.types;
 
+import io.anuke.mindustry.content.AmmoTypes;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.FlyingUnitType;
@@ -10,6 +11,7 @@ public class Vtol extends FlyingUnitType {
 
     public Vtol(){
         super("vtol");
+        setAmmo(AmmoTypes.basicIron);
     }
 
     @Override
