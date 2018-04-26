@@ -17,6 +17,8 @@
 /core/assets/version.properties
 *.gif
 
+version.properties
+
 .attach_*
 ## Java
 
