@@ -12,6 +12,9 @@ def ICON_DIR = new File("core/assets/sprites/icon.icns")
 ext.writeVersion = {
     def pfile = new File('core/assets/version.properties')
     def props = new Properties()
+
+    pfile.createNewFile()
+
     props.load(new FileInputStream(pfile))
 
     String code = getBuildVersion()
