@@ -10,7 +10,7 @@ def PACKR_DIR = "$System.env.PACKR_DIR"
 def ICON_DIR = new File("core/assets/sprites/icon.icns")
 
 ext.writeVersion = {
-    def pfile = new File('../core/assets/version.properties')
+    def pfile = new File('core/assets/version.properties')
     def props = new Properties()
 
     try{
