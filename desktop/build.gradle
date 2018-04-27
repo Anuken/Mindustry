@@ -10,7 +10,7 @@ def PACKR_DIR = "$System.env.PACKR_DIR"
 def ICON_DIR = new File("core/assets/sprites/icon.icns")
 
 ext.writeVersion = {
-    def pfile = new File('core/assets/version.properties')
+    def pfile = new File('../core/assets/version.properties')
     def props = new Properties()
 
     pfile.createNewFile()
@@ -51,6 +51,7 @@ task run(dependsOn: classes, type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = project.assetsDir
+    jvmArgs "-XstartOnFirstThread"
     ignoreExitValue = true
     if (project.hasProperty("appArgs")) {
         args Eval.me(appArgs)
