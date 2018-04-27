@@ -396,26 +396,6 @@ public class Renderer extends RendererModule{
 
 	void drawOverlay(){
 
-		//draw tutorial placement point
-		if(world.getMap().name.equals("tutorial") && control.tutorial().showBlock()){
-			//TODO draw placement point for tutorial
-			/*
-			int x = world.getCore().x + control.tutorial().getPlacePoint().x;
-			int y = world.getCore().y + control.tutorial().getPlacePoint().y;
-			int rot = control.tutorial().getPlaceRotation();
-
-			Lines.stroke(1f);
-			Draw.color(Color.YELLOW);
-			Lines.square(x * tilesize, y * tilesize, tilesize / 2f + Mathf.sin(Timers.time(), 4f, 1f));
-
-			Draw.color(Color.ORANGE);
-			Lines.stroke(2f);
-			if(rot != -1){
-				Lines.lineAngle(x * tilesize, y * tilesize, rot * 90, 6);
-			}
-			Draw.reset();*/
-		}
-
 		//draw config selected block
 		if(ui.configfrag.isShown()){
 			Tile tile = ui.configfrag.getSelectedTile();
@@ -474,8 +454,6 @@ public class Renderer extends RendererModule{
 					Draw.color(Color.RED);
 					Lines.crect(target.drawx(), target.drawy(), target.block().size * tilesize, target.block().size * tilesize);
 					Vector2 v = new Vector2();
-
-
 
 					Draw.tcolor(Color.YELLOW);
 					Draw.tscl(0.25f);
@@ -541,34 +519,30 @@ public class Renderer extends RendererModule{
 			}
 		}
 
-		//TODO draw health bars
 		if((!debug || showUI) && Settings.getBool("healthbars")){
 			for(EntityGroup<BaseUnit> group : unitGroups){
-				drawHealth(group);
+				for(Unit e : group.all()){
+					drawStats(e);
+				}
 			}
 
-			drawHealth(playerGroup);
+			for(Unit e : playerGroup.all()){
+				drawStats(e);
+			}
 		}
 	}
 
-	void drawHealth(EntityGroup<? extends Unit> group){
-		for(Unit e : group.all()){
-			drawHealth(e);
-		}
-	}
-
-	void drawHealth(Unit unit){
+	void drawStats(Unit unit){
 		float x = unit.getDrawPosition().x;
 		float y = unit.getDrawPosition().y;
-		if(unit instanceof Player && snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate")){
-			drawHealth((int) x, (int) y - 7f, unit.health, unit.maxhealth);
-		}else{
-			drawHealth(x, y - 7f, unit.health, unit.maxhealth);
-		}
-	}
 
-	void drawHealth(float x, float y, float health, float maxhealth){
-		drawBar(Color.SCARLET, x, y, health / maxhealth);
+		if(unit == player && snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate")) {
+			x = (int)x;
+			y = (int)y;
+		}
+
+		drawBar(Color.SCARLET, x, y - 7f, unit.health / unit.maxhealth);
+		drawBar(Color.valueOf("32cf6d"), x, y - 8f, unit.inventory.totalAmmo() / (float) unit.inventory.ammoCapacity());
 	}
 	
 	//TODO optimize!
@@ -583,11 +557,13 @@ public class Renderer extends RendererModule{
 
 		x -= 0.5f;
 		y += 0.5f;
-
+		/*
 		Lines.stroke(3f);
 		Draw.color(Color.SLATE);
 		Lines.line(x - len + 1, y, x + len + 1.5f, y);
-		Lines.stroke(1f);
+
+		Lines.stroke(1f);*/
+
 		Draw.color(Color.BLACK);
 		Lines.line(x - len + 1, y, x + len + 0.5f, y);
 		Draw.color(color);

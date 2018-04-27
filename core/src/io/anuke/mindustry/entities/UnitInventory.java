@@ -29,6 +29,10 @@ public class UnitInventory {
         totalAmmo --;
     }
 
+    public int totalAmmo(){
+        return totalAmmo;
+    }
+
     public int ammoCapacity(){
         return ammoCapacity;
     }
