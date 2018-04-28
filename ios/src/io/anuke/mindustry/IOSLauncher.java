@@ -2,12 +2,18 @@ package io.anuke.mindustry;
 
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
+import io.anuke.kryonet.KryoClient;
+import io.anuke.kryonet.KryoServer;
+import io.anuke.mindustry.net.Net;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.uikit.UIApplication;
 
 public class IOSLauncher extends IOSApplication.Delegate {
     @Override
     protected IOSApplication createApplication() {
+        Net.setClientProvider(new KryoClient());
+        Net.setServerProvider(new KryoServer());
+
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();
         return new IOSApplication(new Mindustry(), config);
     }

@@ -13,6 +13,7 @@ buildscript {
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.8"
     }
 }
+//1737
 
 allprojects {
     apply plugin: "eclipse"
@@ -112,10 +113,17 @@ project(":ios") {
 
     dependencies {
         compile project(":core")
+        implementation project(":kryonet")
+
         compile "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
         compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
         compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
+    }
+
+    robovm {
+        iosSignIdentity = "a"
+        iosProvisioningProfile = ""
     }
 }
 

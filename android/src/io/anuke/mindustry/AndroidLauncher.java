@@ -119,9 +119,8 @@ public class AndroidLauncher extends AndroidApplication{
 
 					return data;
 				}catch (Exception e){
-                    Settings.defaults("uuid", "");
 
-                    String uuid = Settings.getString("uuid");
+                    String uuid = Settings.getString("uuid", "");
                     if(uuid.isEmpty()){
                         byte[] result = new byte[8];
                         new Random().nextBytes(result);
