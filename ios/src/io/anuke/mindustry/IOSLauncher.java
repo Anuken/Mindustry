@@ -25,7 +25,7 @@ public class IOSLauncher extends IOSApplication.Delegate {
         Net.setClientProvider(new KryoClient());
         Net.setServerProvider(new KryoServer());
 
-        Unit.dp.addition -= 0.5f;
+        Unit.dp.addition -= 0.25f;
 
         Platform.instance = new Platform() {
             DateFormat format = SimpleDateFormat.getDateTimeInstance();
