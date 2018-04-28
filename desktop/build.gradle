@@ -56,7 +56,9 @@ task run(dependsOn: classes, type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = project.assetsDir
-    jvmArgs "-XstartOnFirstThread"
+    if(System.getProperty("os.name").toLowerCase().contains("mac")){
+        jvmArgs "-XstartOnFirstThread"
+    }
     ignoreExitValue = true
     if (project.hasProperty("appArgs")) {
         args Eval.me(appArgs)

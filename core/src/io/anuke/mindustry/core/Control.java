@@ -95,14 +95,14 @@ public class Control extends Module{
 			item.init();
 		}
 
-		Sounds.load("shoot.ogg", "place.ogg", "explosion.ogg", "enemyshoot.ogg",
-				"corexplode.ogg", "break.ogg", "spawn.ogg", "flame.ogg", "die.ogg",
-				"respawn.ogg", "purchase.ogg", "flame2.ogg", "bigshot.ogg", "laser.ogg", "lasershot.ogg",
-				"ping.ogg", "tesla.ogg", "waveend.ogg", "railgun.ogg", "blast.ogg", "bang2.ogg");
+		Sounds.load("shoot.mp3", "place.mp3", "explosion.mp3", "enemyshoot.mp3",
+				"corexplode.mp3", "break.mp3", "spawn.mp3", "flame.mp3", "die.mp3",
+				"respawn.mp3", "purchase.mp3", "flame2.mp3", "bigshot.mp3", "laser.mp3", "lasershot.mp3",
+				"ping.mp3", "tesla.mp3", "waveend.mp3", "railgun.mp3", "blast.mp3", "bang2.mp3");
 
 		Sounds.setFalloff(9000f);
 
-		Musics.load("1.ogg", "2.ogg", "3.ogg", "4.ogg");
+		Musics.load("1.mp3", "2.mp3", "3.mp3", "4.mp3");
 
         DefaultKeybinds.load();
 
