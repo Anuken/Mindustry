@@ -31,10 +31,10 @@ public class Administration {
     }
 
     /**Returns trace info by IP.*/
-    public TraceInfo getTrace(String ip){
-        if(!traceInfo.containsKey(ip)) traceInfo.put(ip, new TraceInfo(ip));
+    public TraceInfo getTraceByID(String uuid){
+        if(!traceInfo.containsKey(uuid)) traceInfo.put(uuid, new TraceInfo(uuid));
 
-        return traceInfo.get(ip);
+        return traceInfo.get(uuid);
     }
 
     public void clearTraces(){

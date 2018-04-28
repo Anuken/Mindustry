@@ -2,25 +2,12 @@ package io.anuke.mindustry.world.blocks.types.production;
 
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.NetEvents;
-import io.anuke.mindustry.resource.ItemStack;
-import io.anuke.mindustry.resource.Upgrade;
-import io.anuke.mindustry.content.UpgradeRecipes;
-import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.style.TextureRegionDrawable;
-import io.anuke.ucore.scene.ui.ImageButton;
-import io.anuke.ucore.scene.ui.Tooltip;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
-
-import static io.anuke.mindustry.Vars.*;
 
 public class WeaponFactory extends Block{
 
@@ -57,6 +44,7 @@ public class WeaponFactory extends Block{
 
         Table content = new Table();
 
+        /*
         for(Upgrade upgrade : Upgrade.getAllUpgrades()){
             if(!(upgrade instanceof Weapon)) continue;
             Weapon weapon = (Weapon)upgrade;
@@ -126,7 +114,7 @@ public class WeaponFactory extends Block{
             if(++i % 3 == 0){
                 content.row();
             }
-        }
+        }*/
 
         table.add(content).padTop(140f);
     }

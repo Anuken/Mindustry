@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
+import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
@@ -103,12 +104,20 @@ public class DesktopInput extends InputHandler{
 		}else{
 			breakMode = PlaceMode.hold;
 		}
+
+		int keyIndex = 1;
 		
-		for(int i = 1; i <= 6 && i <= control.upgrades().getWeapons().size; i ++){
-			if(Inputs.keyTap("weapon_" + i)){
-				player.weapon = control.upgrades().getWeapons().get(i - 1);
+		for(int i = 0; i < 6 && i < player.upgrades.size; i ++){
+			if(!(player.upgrades.get(i) instanceof Weapon)){
+				continue;
+			}
+
+			if(Inputs.keyTap("weapon_" + keyIndex)){
+				player.weapon = (Weapon) player.upgrades.get(i);
                 if(Net.active()) NetEvents.handleWeaponSwitch();
 			}
+
+			keyIndex ++;
 		}
 		
 		Tile cursor = world.tile(tilex(), tiley());

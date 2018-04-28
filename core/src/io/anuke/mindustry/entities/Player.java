@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.content.fx.ExplosionFx;
@@ -37,15 +38,16 @@ public class Player extends Unit{
 	static final int timerRegen = 3;
 
 	public String name = "name";
+	public String uuid;
 	public boolean isAdmin;
 	public Color color = new Color();
 
+	public Array<Upgrade> upgrades = new Array<>();
 	public Weapon weapon = Weapons.blaster;
 	public Mech mech = Mechs.standard;
 
 	public float targetAngle = 0f;
 	public boolean dashing = false;
-	public boolean selectingItem;
 
 	public int clientid = -1;
 	public boolean isLocal = false;
@@ -53,7 +55,6 @@ public class Player extends Unit{
 	public float walktime;
 
 	private Vector2 movement = new Vector2();
-	private Translator tr = new Translator();
 	
 	public Player(){
 		hitbox.setSize(5);
@@ -161,8 +162,10 @@ public class Player extends Unit{
 			}
 
 			for (int i : Mathf.signs) {
-				tr.trns(baseRotation, ft * i);
-				Draw.rect(mname + "-leg", x + tr.x, y + tr.y, 12f * i, 12f - Mathf.clamp(ft * i, 0, 2), baseRotation - 90);
+				Draw.rect(mname + "-leg",
+						x + Angles.trnsx(baseRotation, ft * i),
+						y + Angles.trnsy(baseRotation, ft * i),
+						12f * i, 12f - Mathf.clamp(ft * i, 0, 2), baseRotation - 90);
 			}
 
 			Draw.rect(mname + "-base", x, y,baseRotation- 90);
@@ -177,9 +180,12 @@ public class Player extends Unit{
 		Draw.rect(mname, x, y, rotation -90);
 
 		for (int i : Mathf.signs) {
-			tr.trns(rotation - 90, 4*i, 3 - weapon.getRecoil(this, i > 0)*1.5f);
+			float tra = rotation - 90,
+					trX = 4*i, trY = 3 - weapon.getRecoil(this, i > 0)*1.5f;
 			float w = i > 0 ? -8 : 8;
-			Draw.rect(weapon.name + "-equip", x + tr.x, y + tr.y, w, 8, rotation - 90);
+			Draw.rect(weapon.name + "-equip",
+					x + Angles.trnsx(tra, trX, trY),
+					y + Angles.trnsy(tra, trX, trY), w, 8, rotation - 90);
 		}
 
 		float backTrns = 4f, itemSize = 5f;

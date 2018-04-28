@@ -268,7 +268,7 @@ public class NetClient extends Module {
             Weapon weapon = Upgrade.getByID(packet.id);
 
             state.inventory.removeItems(UpgradeRecipes.get(weapon));
-            control.upgrades().addWeapon(weapon);
+            player.upgrades.add(weapon);
             Effects.sound("purchase");
         });
     }

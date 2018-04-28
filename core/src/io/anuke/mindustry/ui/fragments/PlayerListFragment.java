@@ -148,7 +148,7 @@ public class PlayerListFragment implements Fragment{
                     t.addImageButton("icon-admin", "toggle", 14*2, () -> {
                         if(Net.client()) return;
 
-                        String id = netServer.admins.getTrace(connection.address).uuid;
+                        String id = netServer.admins.getTraceByID(player.uuid).uuid;
 
                         if(netServer.admins.isAdmin(id, connection.address)){
                             ui.showConfirm("$text.confirm", "$text.confirmunadmin", () -> {

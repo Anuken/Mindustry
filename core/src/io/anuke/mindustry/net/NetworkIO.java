@@ -1,15 +1,14 @@
 package io.anuke.mindustry.net;
 
-import com.badlogic.gdx.utils.ByteArray;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.content.Weapons;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
@@ -22,7 +21,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class NetworkIO {
 
-    public static void writeWorld(Player player, ByteArray upgrades, OutputStream os){
+    public static void writeWorld(Player player, OutputStream os){
 
         try(DataOutputStream stream = new DataOutputStream(os)){
 
@@ -41,10 +40,9 @@ public class NetworkIO {
             stream.writeInt(player.id); //player remap ID
             stream.writeBoolean(player.isAdmin);
 
-            stream.writeByte(upgrades.size); //upgrade data
-
-            for(int i = 0; i < upgrades.size; i ++){
-                stream.writeByte(upgrades.get(i));
+            stream.writeByte(player.upgrades.size);
+            for(Upgrade u : player.upgrades){
+                stream.writeByte(u.id);
             }
 
             //--MAP DATA--
@@ -114,16 +112,13 @@ public class NetworkIO {
             int pid = stream.readInt();
             boolean admin = stream.readBoolean();
 
-            control.upgrades().getWeapons().clear();
-            control.upgrades().getWeapons().add(Weapons.blaster);
-
             byte weapons = stream.readByte();
 
             for(int i = 0; i < weapons; i ++){
-                control.upgrades().getWeapons().add(Upgrade.getByID(stream.readByte()));
+                player.upgrades.add(Upgrade.getByID(stream.readByte()));
             }
 
-            player.weapon = control.upgrades().getWeapons().peek();
+            player.weapon = Weapons.blaster;
 
             Entities.clear();
             player.id = pid;

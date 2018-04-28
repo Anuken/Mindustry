@@ -10,7 +10,6 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Tutorial;
-import io.anuke.mindustry.game.UpgradeInventory;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.input.DesktopInput;
@@ -37,7 +36,6 @@ import static io.anuke.mindustry.Vars.*;
  * Should <i>not</i> handle any game-critical state.
  * This class is not created in the headless server.*/
 public class Control extends Module{
-	private UpgradeInventory upgrades = new UpgradeInventory();
 	private Tutorial tutorial = new Tutorial();
 	private boolean hiscore = false;
 
@@ -144,10 +142,10 @@ public class Control extends Module{
 		});
 
 		Events.on(ResetEvent.class, () -> {
-			upgrades.reset();
 			player.weapon = Weapons.blaster;
 			player.team = Team.blue;
 			player.inventory.clear();
+			player.upgrades.clear();
 
 			player.add();
 			player.heal();
@@ -192,10 +190,6 @@ public class Control extends Module{
 
 	public void setError(Throwable error){
 		this.error = error;
-	}
-
-	public UpgradeInventory upgrades() {
-		return upgrades;
 	}
 
 	public Saves getSaves(){

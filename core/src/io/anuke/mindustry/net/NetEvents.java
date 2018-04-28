@@ -133,7 +133,7 @@ public class NetEvents {
         if(Net.client()) {
             handleAdministerRequest(target, AdminAction.trace);
         }else{
-            ui.traces.show(target, netServer.admins.getTrace(Net.getConnection(target.clientid).address));
+            ui.traces.show(target, netServer.admins.getTraceByID(target.uuid));
         }
     }
 }
