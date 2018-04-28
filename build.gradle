@@ -13,7 +13,6 @@ buildscript {
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.8"
     }
 }
-//1737
 
 allprojects {
     apply plugin: "eclipse"
