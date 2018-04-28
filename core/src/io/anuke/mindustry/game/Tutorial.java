@@ -15,7 +15,6 @@ import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
 import static io.anuke.mindustry.Vars.*;
@@ -92,38 +91,11 @@ public class Tutorial{
 	}
 	
 	void move(boolean forward){
-		
-		if(forward && !canMove(forward)){
-			complete();
-		}else{
-			int current = stage.ordinal();
-			
-			while(true){
-				current += Mathf.sign(forward);
-				
-				if(current < 0 || current >= Stage.values().length){
-					break;
-				}else if(android == Stage.values()[current].androidOnly || android != Stage.values()[current].desktopOnly){
-					stage = Stage.values()[current];
-					stage.onSwitch();
-					break;
-				}
-			}
-		}
+		//TODO
 	}
 	
 	boolean canMove(boolean forward){
-		int current = stage.ordinal();
-		
-		while(true){
-			current += Mathf.sign(forward);
-			
-			if(current < 0 || current >= Stage.values().length){
-				return false;
-			}else if(android == Stage.values()[current].androidOnly || android != Stage.values()[current].desktopOnly){
-				return true;
-			}
-		}
+		return true;
 		
 	}
 	

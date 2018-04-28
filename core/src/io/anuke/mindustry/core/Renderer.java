@@ -160,7 +160,7 @@ public class Renderer extends RendererModule{
 			if(!smoothcam){
 				setCamera(player.x, player.y);
 			}else{
-				smoothCamera(player.x, player.y, android ? 0.3f : 0.14f);
+				smoothCamera(player.x, player.y, mobile ? 0.3f : 0.14f);
 			}
 
 			if(Settings.getBool("pixelate"))

@@ -28,7 +28,7 @@ import java.util.Locale;
 public class Vars{
 
 	public static final boolean testMobile = false;
-	//shorthand for whether or not this is running on android
+	//shorthand for whether or not this is running on android or ios
 	public static final boolean mobile = (Gdx.app.getType() == ApplicationType.Android) ||
 											Gdx.app.getType() == ApplicationType.iOS || testMobile;
 	public static final boolean ios = Gdx.app.getType() == ApplicationType.iOS;
