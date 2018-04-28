@@ -72,7 +72,6 @@ public class TextFieldDialogListener {
             public boolean shouldEnableFirstOtherButton(UIAlertView alertView) {
                 return false;
             }
-
         };
 
         String[] otherButtons = new String[1];

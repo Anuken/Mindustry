@@ -177,7 +177,7 @@ public class NetServer extends Module{
             if(!Timers.get("fastshoot-" + id + "-" + weapon.id, wtrc)){
                 info.fastShots.getAndIncrement(weapon.id, 0, 1);
 
-                if(info.fastShots.get(weapon.id, 0) > (int)(wtrc / (weapon.getReload() / 2f)) + 6){
+                if(info.fastShots.get(weapon.id, 0) > (int)(wtrc / (weapon.getReload() / 2f)) + 8){
                     kick(id, KickReason.kick);
                 }
             }else{
