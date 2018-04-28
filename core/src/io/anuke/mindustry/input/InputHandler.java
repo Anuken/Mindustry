@@ -25,8 +25,8 @@ public abstract class InputHandler extends InputAdapter{
 	public float breaktime = 0;
 	public Recipe recipe;
 	public int rotation;
-	public PlaceMode placeMode = android ? PlaceMode.cursor : PlaceMode.hold;
-	public PlaceMode breakMode = android ? PlaceMode.none : PlaceMode.holdDelete;
+	public PlaceMode placeMode = mobile ? PlaceMode.cursor : PlaceMode.hold;
+	public PlaceMode breakMode = mobile ? PlaceMode.none : PlaceMode.holdDelete;
 	public PlaceMode lastPlaceMode = placeMode;
 	public PlaceMode lastBreakMode = breakMode;
 	public boolean droppingItem, transferring;

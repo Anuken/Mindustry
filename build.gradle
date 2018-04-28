@@ -7,6 +7,7 @@ buildscript {
         jcenter()
     }
     dependencies {
+        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.0'
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
         classpath 'com.android.tools.build:gradle:3.0.1'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.8"
@@ -24,6 +25,7 @@ allprojects {
         versionType = 'pre-alpha'
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
+        roboVMVersion = '2.3.0'
         aiVersion = '1.8.1'
         uCoreVersion = 'dd5eb72'
 
@@ -100,6 +102,27 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
         implementation "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         implementation "com.badlogicgames.gdx:gdx-controllers-android:$gdxVersion"
+    }
+}
+
+project(":ios") {
+    apply plugin: "java"
+    apply plugin: "robovm"
+
+
+    dependencies {
+        compile project(":core")
+        implementation project(":kryonet")
+
+        compile "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
+        compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
+        compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
+    }
+
+    robovm {
+        iosSignIdentity = "a"
+        iosProvisioningProfile = ""
     }
 }
 

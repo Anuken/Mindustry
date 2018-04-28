@@ -48,7 +48,7 @@ public class WeaponFactory extends Block{
 
     @Override
     public boolean isConfigurable(Tile tile){
-        return !Vars.android;
+        return !Vars.mobile;
     }
 
     @Override

@@ -28,8 +28,8 @@ public enum PlaceMode{
 			float x = tilex * tilesize;
 			float y = tiley * tilesize;
 			
-			boolean valid = control.input().validPlace(tilex, tiley, control.input().recipe.result) && (android || control.input().cursorNear());
-
+			boolean valid = control.input().validPlace(tilex, tiley, control.input().recipe.result) && (mobile || control.input().cursorNear());
+			
 			Vector2 offset = control.input().recipe.result.getPlaceOffset();
 
 			float si = MathUtils.sin(Timers.time() / 6f) + 1.5f;
@@ -89,7 +89,7 @@ public enum PlaceMode{
 					tile = tile.getLinked();
 				float fin = control.input().breaktime / tile.getBreakTime();
 				
-				if(android && control.input().breaktime > 0){
+				if(mobile && control.input().breaktime > 0){
 					Draw.color(Colors.get("breakStart"), Colors.get("break"), fin);
 					Lines.poly(tile.drawx(), tile.drawy(), 25, 4 + (1f - fin) * 26);
 				}
@@ -169,8 +169,8 @@ public enum PlaceMode{
 			process(tilex, tiley, endx, endy);
 			tilex = this.tilex; tiley = this.tiley;
 			endx = this.endx; endy = this.endy;
-
-			if(android){
+			
+			if(mobile){
 				ToolFragment t = ui.toolfrag;
 				if(!t.confirming || t.px != tilex || t.py != tiley || t.px2 != endx || t.py2 != endy) {
 					t.confirming = true;
@@ -236,7 +236,7 @@ public enum PlaceMode{
 		}
 		
 		public void draw(int tilex, int tiley, int endx, int endy){
-			if(android && !Gdx.input.isTouched(0) && !control.showCursor()){
+			if(mobile && !Gdx.input.isTouched(0) && !control.showCursor()){
 				return;
 			}
 
@@ -300,8 +300,8 @@ public enum PlaceMode{
 								Lines.stroke(2f);
 								Draw.color("placeInvalid");
 								Lines.crect(
-										px * t + (isX ? 0 : offset.x) + (ex < tx && isX ? t : 0) - (block.size == 3 && ex > tx && isX ? t : 0),
-										py * t + (isX ? offset.y : 0) + (ey < ty && !isX ? t : 0) - (block.size == 3 && ey > ty && !isX ? t : 0),
+										px * t + (isX ? 0 : offset.x) + (ex < tx && isX && block.size > 1 ? t : 0) - (block.size == 3 && ex > tx && isX ? t : 0),
+										py * t + (isX ? offset.y : 0) + (ey < ty && !isX && block.size > 1 ? t : 0) - (block.size == 3 && ey > ty && !isX ? t : 0),
 										t*(isX ? 1 : block.size),
 										t*(isX ? block.size : 1));
 								Draw.color("place");

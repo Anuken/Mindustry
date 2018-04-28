@@ -166,7 +166,7 @@ public class MapEditorDialog extends Dialog{
 			openImage.show();
 			menu.hide();
 		});
-		
+
 
 		/*
 		loadDialog = new MapLoadDialog(map -> {
@@ -365,13 +365,13 @@ public class MapEditorDialog extends Dialog{
 				
 			}}.left().growY().end();
 
-			
+
 			new table("button"){{
 				margin(5);
 				marginBottom(10);
 				add(view).grow();
 			}}.grow().end();
-			
+
 			new table(){{
 
 				row();
@@ -413,7 +413,7 @@ public class MapEditorDialog extends Dialog{
 			}
 		}
 	}
-	
+
 	private void addBlockSelection(Table table){
 		Table content = new Table();
 		pane = new ScrollPane(content, "volume");

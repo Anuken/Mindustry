@@ -26,7 +26,7 @@ public class TextFieldDialogListener extends ClickListener{
 	}
 
 	public static void add(TextField field){
-		add(field, 0, 15);
+		add(field, 0, 16);
 	}
 
 	//type - 0 is text, 1 is numbers, 2 is decimals

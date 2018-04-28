@@ -11,8 +11,6 @@ import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.scene.ui.layout.Table;
 
-import static io.anuke.mindustry.Vars.*;
-
 public class ToolFragment implements Fragment{
 	private Table tools;
 	public int px, py, px2, py2;
@@ -50,7 +48,7 @@ public class ToolFragment implements Fragment{
 		Core.scene.add(tools);
 		
 		tools.setVisible(() ->
-			!state.is(State.menu) && android && ((input.recipe != null && state.inventory.hasItems(input.recipe.requirements) &&
+			!state.is(State.menu) && mobile && ((input.recipe != null && state.inventory.hasItems(input.recipe.requirements) &&
 			input.placeMode == PlaceMode.cursor) || confirming)
 		);
 		

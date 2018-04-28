@@ -27,9 +27,12 @@ import java.util.Locale;
 
 public class Vars{
 
-	public static final boolean testAndroid = false;
+	public static final boolean testMobile = false;
 	//shorthand for whether or not this is running on android
-	public static final boolean android = (Gdx.app.getType() == ApplicationType.Android) || testAndroid;
+	public static final boolean mobile = (Gdx.app.getType() == ApplicationType.Android) ||
+											Gdx.app.getType() == ApplicationType.iOS || testMobile;
+	public static final boolean ios = Gdx.app.getType() == ApplicationType.iOS;
+	public static final boolean android = Gdx.app.getType() == ApplicationType.Android;
 	//shorthand for whether or not this is running on GWT
 	public static final boolean gwt = (Gdx.app.getType() == ApplicationType.WebGL);
 	//whether to send block state change events to players
@@ -39,7 +42,7 @@ public class Vars{
 	//respawn time in frames
 	public static final float respawnduration = 60*4;
 	//time between waves in frames (on normal mode)
-	public static final float wavespace = 60*60*(android ? 1 : 1);
+	public static final float wavespace = 60*60*(mobile ? 1 : 1);
 	//waves can last no longer than 3 minutes, otherwise the next one spawns
 	public static final float maxwavespace = 60*60*4f;
 	//advance time the pathfinding starts at

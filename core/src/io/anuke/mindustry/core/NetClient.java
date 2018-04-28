@@ -68,7 +68,7 @@ public class NetClient extends Module {
 
             ConnectPacket c = new ConnectPacket();
             c.name = player.name;
-            c.android = android;
+            c.android = mobile;
             c.color = Color.rgba8888(player.color);
             c.uuid = Platform.instance.getUUID();
 

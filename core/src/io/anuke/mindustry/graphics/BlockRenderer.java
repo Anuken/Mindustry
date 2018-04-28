@@ -28,7 +28,7 @@ public class BlockRenderer{
 	private int iterateidx = 0;
 
 	private float storeX, storeY;
-	
+
 	public BlockRenderer(){
 		floorRenderer = new FloorRenderer();
 
@@ -59,7 +59,7 @@ public class BlockRenderer{
 		
 		int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2)+2;
 		int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2)+2;
-			
+
 		int expandr = 4;
 		
 		Graphics.surface(renderer.shadowSurface);

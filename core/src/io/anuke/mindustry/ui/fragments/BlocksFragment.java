@@ -39,7 +39,7 @@ public class BlocksFragment implements Fragment{
 	private boolean shown = true;
 	private Recipe hoveredDescriptionRecipe;
 	private IntSet itemset = new IntSet();
-	
+
 	public void build(){
 		InputHandler input = control.input();
 

@@ -84,7 +84,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 		menu.addButton("$text.settings.graphics", () -> visible(1));
 		menu.row();
 		menu.addButton("$text.settings.sound", () -> visible(2));
-		if(!Vars.android) {
+		if(!Vars.mobile) {
 			menu.row();
 			menu.addButton("$text.settings.controls", ui.controls::show);
 		}
@@ -142,7 +142,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 			}
 		}
 
-		if(!android && !gwt) {
+		if(!mobile && !gwt) {
 			graphics.checkPref("vsync", true, b -> Gdx.graphics.setVSync(b));
 			graphics.checkPref("fullscreen", false, b -> {
 				if (b) {

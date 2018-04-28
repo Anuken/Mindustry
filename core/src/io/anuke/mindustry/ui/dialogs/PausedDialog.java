@@ -35,7 +35,7 @@ public class PausedDialog extends FloatingDialog{
 			if(!Net.active()) state.set(State.paused);
 		});
 		
-		if(!android){
+		if(!mobile){
 			content().defaults().width(220).height(50);
 
 			content().addButton("$text.back", () -> {

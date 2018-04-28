@@ -173,7 +173,7 @@ public class Renderer extends RendererModule{
 
 			float deltax = camera.position.x - prex, deltay = camera.position.y - prey;
 
-			if(android){
+			if(mobile){
 				player.x += camera.position.x - prevx;
 				player.y += camera.position.y - prevy;
 			}
@@ -405,7 +405,7 @@ public class Renderer extends RendererModule{
 		int tilex = control.input().getBlockX();
 		int tiley = control.input().getBlockY();
 		
-		if(android){
+		if(mobile){
 			Vector2 vec = Graphics.world(Gdx.input.getX(0), Gdx.input.getY(0));
 			tilex = Mathf.scl2(vec.x, tilesize);
 			tiley = Mathf.scl2(vec.y, tilesize);
@@ -414,7 +414,7 @@ public class Renderer extends RendererModule{
 		InputHandler input = control.input();
 
 		//draw placement box
-		if((input.recipe != null && state.inventory.hasItems(input.recipe.requirements) && (!ui.hasMouse() || android)
+		if((input.recipe != null && state.inventory.hasItems(input.recipe.requirements) && (!ui.hasMouse() || mobile)
 				&& control.input().drawPlace())){
 
 			input.placeMode.draw(control.input().getBlockX(), control.input().getBlockY(),
@@ -425,7 +425,7 @@ public class Renderer extends RendererModule{
 			
 		}else if(input.breakMode.delete && control.input().drawPlace()
 				&& (input.recipe == null || !state.inventory.hasItems(input.recipe.requirements))
-				&& (input.placeMode.delete || input.breakMode.both || !android)){
+				&& (input.placeMode.delete || input.breakMode.both || !mobile)){
 
             if(input.breakMode == PlaceMode.holdDelete)
                 input.breakMode.draw(tilex, tiley, 0, 0);

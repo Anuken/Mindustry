@@ -10,6 +10,7 @@ repositories {
 dependencies {
     implementation 'com.android.support:support-v4:22.1.1'
     implementation 'org.sufficientlysecure:donations:2.5'
+    implementation 'com.google.android.gms:play-services-auth:11.8.0'
 }
 
 task deploy(type: Copy){
@@ -22,7 +23,7 @@ task deploy(type: Copy){
 
 android {
     buildToolsVersion '26.0.2'
-    compileSdkVersion 27
+    compileSdkVersion 26
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -58,7 +59,7 @@ android {
         }
 
         applicationId "io.anuke.mindustry"
-        minSdkVersion 9
+        minSdkVersion 14
         targetSdkVersion 27
         versionCode code
         versionName versionNameResult
