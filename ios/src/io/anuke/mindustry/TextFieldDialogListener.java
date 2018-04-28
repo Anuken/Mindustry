@@ -83,6 +83,7 @@ public class TextFieldDialogListener {
         alertView.setAlertViewStyle(UIAlertViewStyle.PlainTextInput);
 
         UITextField uiTextField = alertView.getTextField(0);
+        uiTextField.setText(field.getText());
 
         uiTextField.setDelegate(new UITextFieldDelegateAdapter() {
             @Override
