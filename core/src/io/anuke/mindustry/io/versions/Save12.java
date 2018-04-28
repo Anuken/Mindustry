@@ -114,7 +114,7 @@ public class Save12 extends SaveFileVersion {
         state.wave = wave;
         state.wavetime = wavetime;
 
-        if(!android)
+        if(!mobile)
             Vars.player.add();
 
         //map

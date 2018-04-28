@@ -77,7 +77,7 @@ public class WorldGenerator {
 				}
 				
 				if(color == Hue.rgb(Color.PURPLE)){
-					if(!Vars.android) new Enemy(EnemyTypes.target).set(x * tilesize, y * tilesize).add();
+					if(!Vars.mobile) new Enemy(EnemyTypes.target).set(x * tilesize, y * tilesize).add();
 					floor = Blocks.stone;
 				}
 				

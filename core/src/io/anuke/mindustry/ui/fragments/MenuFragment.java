@@ -18,7 +18,7 @@ public class MenuFragment implements Fragment{
 		new table(){{
 			visible(() -> state.is(State.menu));
 
-			if(!android){
+			if(!mobile){
 				new table(){{
 
 					float w = 200f;

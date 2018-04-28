@@ -66,14 +66,14 @@ public class HudFragment implements Fragment{
 					}).get();
 
 					new imagebutton("icon-pause", isize, () -> {
-						if(android) DebugFragment.printDebugInfo();
-						if (Net.active() && android) {
+						if(mobile) DebugFragment.printDebugInfo();
+						if (Net.active() && mobile) {
 							ui.listfrag.visible = !ui.listfrag.visible;
 						} else {
 							state.set(state.is(State.paused) ? State.playing : State.paused);
 						}
 					}).update(i -> {
-						if (Net.active() && android) {
+						if (Net.active() && mobile) {
 							i.getStyle().imageUp = Core.skin.getDrawable("icon-players");
 						} else {
 							i.setDisabled(Net.active());
@@ -82,7 +82,7 @@ public class HudFragment implements Fragment{
 					}).get();
 
 					new imagebutton("icon-settings", isize, () -> {
-						if (Net.active() && android) {
+						if (Net.active() && mobile) {
 							if (ui.chatfrag.chatOpen()) {
 								ui.chatfrag.hide();
 							} else {
@@ -92,7 +92,7 @@ public class HudFragment implements Fragment{
 							ui.settings.show();
 						}
 					}).update(i -> {
-						if (Net.active() && android) {
+						if (Net.active() && mobile) {
 							i.getStyle().imageUp = Core.skin.getDrawable("icon-chat");
 						} else {
 							i.getStyle().imageUp = Core.skin.getDrawable("icon-settings");

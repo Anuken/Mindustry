@@ -105,7 +105,7 @@ public class Recipes {
 	
 	public static Array<Recipe> getBy(Section section, Array<Recipe> r){
 		for(Recipe recipe : list){
-			if(recipe.section == section && !(Vars.android && recipe.desktopOnly))
+			if(recipe.section == section && !(Vars.mobile && recipe.desktopOnly))
 				r.add(recipe);
 		}
 		

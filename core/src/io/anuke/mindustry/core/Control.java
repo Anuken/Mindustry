@@ -57,7 +57,7 @@ public class Control extends Module{
 
 		Gdx.input.setCatchBackKey(true);
 
-		if(android){
+		if(mobile){
 			input = new AndroidInput();
 		}else{
 			input = new DesktopInput();
@@ -115,7 +115,7 @@ public class Control extends Module{
 		Settings.defaultList(
 			"ip", "localhost",
 			"port", port+"",
-			"name", android || gwt ? "player" : UCore.getProperty("user.name"),
+			"name", mobile || gwt ? "player" : UCore.getProperty("user.name"),
 			"servers", "",
 			"color", Color.rgba8888(playerColors[8]),
 			"lastVersion", "3.2",
@@ -130,7 +130,7 @@ public class Control extends Module{
 
 		player = new Player();
 		player.name = Settings.getString("name");
-		player.isAndroid = android;
+		player.isAndroid = mobile;
 		player.color.set(Settings.getInt("color"));
 		player.isLocal = true;
 

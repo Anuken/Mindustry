@@ -44,6 +44,11 @@ public class ChangelogDialog extends FloatingDialog{
                 table.row();
                 table.add("$text.changelog.error.android").padTop(8);
             }
+
+            if(Vars.ios){
+                table.row();
+                table.add("$text.changelog.error.ios").padTop(8);
+            }
         }else{
             for(VersionInfo info : versions){
                 Table in = new Table("clear");

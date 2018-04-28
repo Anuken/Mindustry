@@ -186,7 +186,7 @@ public class BlocksFragment implements Fragment{
 
 				row();
 
-				if(!android) {
+				if(!mobile) {
 					weapons = new table("button").margin(0).fillX().end().get();
 				}
 
@@ -199,7 +199,7 @@ public class BlocksFragment implements Fragment{
 	}
 
 	public void updateWeapons(){
-		if(android) return;
+		if(mobile) return;
 
 		weapons.clearChildren();
 		weapons.left();

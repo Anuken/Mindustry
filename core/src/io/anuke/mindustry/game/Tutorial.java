@@ -1,7 +1,6 @@
 package io.anuke.mindustry.game;
 
 import com.badlogic.gdx.math.GridPoint2;
-import io.anuke.mindustry.core.GameState;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
@@ -102,7 +101,7 @@ public class Tutorial{
 				
 				if(current < 0 || current >= Stage.values().length){
 					break;
-				}else if(android == Stage.values()[current].androidOnly || android != Stage.values()[current].desktopOnly){
+				}else if(mobile == Stage.values()[current].androidOnly || mobile != Stage.values()[current].desktopOnly){
 					stage = Stage.values()[current];
 					stage.onSwitch();
 					break;
@@ -119,7 +118,7 @@ public class Tutorial{
 			
 			if(current < 0 || current >= Stage.values().length){
 				return false;
-			}else if(android == Stage.values()[current].androidOnly || android != Stage.values()[current].desktopOnly){
+			}else if(mobile == Stage.values()[current].androidOnly || mobile != Stage.values()[current].desktopOnly){
 				return true;
 			}
 		}

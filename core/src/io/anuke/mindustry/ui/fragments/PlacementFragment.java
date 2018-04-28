@@ -29,7 +29,7 @@ public class PlacementFragment implements Fragment{
 	Label modelabel;
 	
 	public void build(){
-		if(!android) return;
+		if(!mobile) return;
 
 		InputHandler input = control.input();
 

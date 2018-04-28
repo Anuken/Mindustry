@@ -85,7 +85,7 @@ public class MapEditorDialog extends Dialog{
 					Pixmaps.write(editor.pixmap(), result);
 				}catch (Exception e){
 					ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
-					if(!android) Log.err(e);
+					if(!mobile) Log.err(e);
 				}
 				ui.loadfrag.hide();
 			});
