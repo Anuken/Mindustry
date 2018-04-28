@@ -300,8 +300,8 @@ public enum PlaceMode{
 								Lines.stroke(2f);
 								Draw.color("placeInvalid");
 								Lines.crect(
-										px * t + (isX ? 0 : offset.x) + (ex < tx && isX ? t : 0) - (block.width == 3 && ex > tx && isX ? t : 0),
-										py * t + (isX ? offset.y : 0) + (ey < ty && !isX ? t : 0) - (block.height == 3 && ey > ty && !isX ? t : 0),
+										px * t + (isX ? 0 : offset.x) + (ex < tx && isX && block.width > 1 ? t : 0) - (block.width == 3 && ex > tx && isX ? t : 0),
+										py * t + (isX ? offset.y : 0) + (ey < ty && !isX && block.height > 1 ? t : 0) - (block.height == 3 && ey > ty && !isX ? t : 0),
 										t*(isX ? 1 : block.width),
 										t*(isX ? block.height : 1));
 								Draw.color("place");
