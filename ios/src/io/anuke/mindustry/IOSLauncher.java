@@ -9,6 +9,7 @@ import io.anuke.mindustry.core.ThreadHandler;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.scene.ui.TextField;
+import io.anuke.ucore.scene.ui.layout.Unit;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.uikit.UIApplication;
 
@@ -23,6 +24,8 @@ public class IOSLauncher extends IOSApplication.Delegate {
     protected IOSApplication createApplication() {
         Net.setClientProvider(new KryoClient());
         Net.setServerProvider(new KryoServer());
+
+        Unit.dp.addition -= 0.5f;
 
         Platform.instance = new Platform() {
             DateFormat format = SimpleDateFormat.getDateTimeInstance();
