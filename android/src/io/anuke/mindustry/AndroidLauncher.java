@@ -8,9 +8,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.utils.Base64Coder;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.security.ProviderInstaller;
 import io.anuke.kryonet.DefaultThreadImpl;
 import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
@@ -133,6 +138,15 @@ public class AndroidLauncher extends AndroidApplication{
 				}
 			}
 		};
+
+		try {
+			ProviderInstaller.installIfNeeded(this);
+		} catch (GooglePlayServicesRepairableException e) {
+			GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+			apiAvailability.getErrorDialog(this, e.getConnectionStatusCode(), 0).show();
+		} catch (GooglePlayServicesNotAvailableException e) {
+			Log.e("SecurityException", "Google Play Services not available.");
+		}
 
 		if(doubleScaleTablets && isTablet(this.getContext())){
 			Unit.dp.addition = 0.5f;
