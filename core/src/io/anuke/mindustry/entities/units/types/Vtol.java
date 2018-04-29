@@ -1,6 +1,5 @@
 package io.anuke.mindustry.entities.units.types;
 
-import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.AmmoTypes;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.units.BaseUnit;
@@ -8,7 +7,6 @@ import io.anuke.mindustry.entities.units.FlyingUnitType;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
@@ -26,33 +24,21 @@ public class Vtol extends FlyingUnitType {
         for(int i : Mathf.signs) {
 
             float rotation = unit.rotation - 90;
-            float dx = 5f * i, dx2 = 6f * i;
-            float dy = 4f, dy2 = -5f;
+            float scl = 0.7f + Mathf.absin(Timers.time(), 3f, 0.2f);
+            float dx = 5f * i*scl, dx2 = 6f * i*scl;
+            float dy = 4f*scl, dy2 = -5f*scl;
 
-            float rad = 1.5f + Mathf.absin(Timers.time(), 3f, 0.6f);
-            float ds = 1.2f;
+            Draw.color(Palette.lighterOrange, Palette.lightFlame, Mathf.absin(Timers.time(), 3f, 0.7f));
 
-            Draw.color(Palette.lightishOrange, Palette.lightFlame, Mathf.absin(Timers.time(), 3f, 0.3f));
-
-            Fill.circle(
+            Draw.rect("vtol-flame",
                     unit.x + Angles.trnsx(rotation, dx, dy),
-                    unit.y + Angles.trnsy(rotation, dx, dy), rad);
+                    unit.y + Angles.trnsy(rotation, dx, dy), Mathf.atan2(dx, dy));
 
-            Fill.circle(
+            Draw.rect("vtol-flame",
                     unit.x + Angles.trnsx(rotation, dx2, dy2),
-                    unit.y + Angles.trnsy(rotation, dx2, dy2), rad);
+                    unit.y + Angles.trnsy(rotation, dx2, dy2), Mathf.atan2(dx2, dy2));
 
-            Draw.color(Color.GRAY);
-
-            Fill.circle(
-                    unit.x + Angles.trnsx(rotation, dx, dy)/ds,
-                    unit.y + Angles.trnsy(rotation, dx, dy)/ds, 2f);
-
-            Fill.circle(
-                    unit.x + Angles.trnsx(rotation, dx2, dy2)/ds,
-                    unit.y + Angles.trnsy(rotation, dx2, dy2)/ds, 2f);
-
-            Draw.color(Color.WHITE);
+            Draw.color();
         }
 
 

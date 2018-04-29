@@ -20,6 +20,11 @@ public class BlockPart extends Block{
 	public void draw(Tile tile){
 		//do nothing
 	}
+
+	@Override
+	public void drawShadow(Tile tile){
+		//also do nothing
+	}
 	
 	@Override
 	public boolean isSolidFor(Tile tile){

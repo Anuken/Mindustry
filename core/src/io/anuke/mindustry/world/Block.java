@@ -69,8 +69,8 @@ public class Block extends BaseBlock {
 	public int health = 40;
 	/**base block explosiveness*/
 	public float baseExplosiveness = 0f;
-	/**the shadow drawn under the block*/
-	public String shadow = "shadow";
+	/**the shadow drawn under the block. use 'null' to indicate the default shadow for this block.*/
+	public String shadow = null;
 	/**whether to display a different shadow per variant*/
 	public boolean varyShadow = false;
 	/**edge fallback, used mainly for ores*/
@@ -344,10 +344,12 @@ public class Block extends BaseBlock {
 	
 	public void drawShadow(Tile tile){
 		
-		if(varyShadow && variants > 0){
+		if(varyShadow && variants > 0 && shadow != null) {
 			Draw.rect(shadow + (Mathf.randomSeed(tile.id(), 1, variants)), tile.worldx(), tile.worldy());
+		}else if(shadow != null){
+			Draw.rect(shadow, tile.drawx(), tile.drawy());
 		}else{
-			Draw.rect(shadow, tile.worldx(), tile.worldy());
+			Draw.rect("shadow-" + size, tile.drawx(), tile.drawy());
 		}
 	}
 	

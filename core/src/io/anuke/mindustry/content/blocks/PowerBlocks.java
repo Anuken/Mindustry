@@ -85,13 +85,16 @@ public class PowerBlocks {
         hasItems = false;
     }},
 
-    powernode = new PowerDistributor("powernode"),
+    powernode = new PowerDistributor("powernode"){{
+        shadow = "powernode-shadow";
+    }},
 
     powernodelarge = new PowerDistributor("powernodelarge"){{
         size = 2;
         powerSpeed = 1f;
         maxNodes = 5;
         laserRange = 7.5f;
+        shadow = "powernodelarge-shadow";
     }},
 
     teleporter = new Teleporter("teleporter");
