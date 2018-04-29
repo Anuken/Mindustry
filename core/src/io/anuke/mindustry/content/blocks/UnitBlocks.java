@@ -4,6 +4,7 @@ import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.blocks.types.units.ResupplyPoint;
 import io.anuke.mindustry.world.blocks.types.units.UnitFactory;
 
 public class UnitBlocks {
@@ -34,5 +35,10 @@ public class UnitBlocks {
         requirements = new ItemStack[]{
             new ItemStack(Items.stone, 1)
         };
+    }},
+
+    resupplyPoint = new ResupplyPoint("resupplypoint"){{
+        size = 2;
+        itemCapacity = 30;
     }};
 }

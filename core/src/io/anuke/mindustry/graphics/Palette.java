@@ -12,6 +12,7 @@ public class Palette {
     public static final Color turretHeat = Color.valueOf("ab3400");
 
     public static final Color lightOrange = Color.valueOf("f68021");
+    public static final Color lightishOrange = Color.valueOf("f8ad42");
     public static final Color lighterOrange = Color.valueOf("f6e096");
 
     public static final Color lightishGray = Color.valueOf("a2a2a2");

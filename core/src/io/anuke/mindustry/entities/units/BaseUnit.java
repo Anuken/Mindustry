@@ -7,7 +7,10 @@ import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.Entity;
+import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
 
@@ -38,6 +41,12 @@ public class BaseUnit extends Unit{
 
 	public void rotate(float angle){
 		rotation = Mathf.slerpDelta(rotation, angle, type.rotatespeed);
+	}
+
+	public void effectAt(Effect effect, float rotation, float dx, float dy){
+		Effects.effect(effect,
+				x + Angles.trnsx(rotation, dx, dy),
+				y + Angles.trnsy(rotation, dx, dy), Mathf.atan2(dx, dy));
 	}
 
 	@Override
@@ -80,6 +89,12 @@ public class BaseUnit extends Unit{
 	public void drawSmooth(){
 		type.draw(this);
 	}
+
+	@Override
+	public void drawUnder(){
+		type.drawUnder(this);
+	}
+
 
 	@Override
 	public float drawSize(){

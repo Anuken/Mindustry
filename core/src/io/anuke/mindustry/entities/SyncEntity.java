@@ -20,9 +20,9 @@ public abstract class SyncEntity extends DestructibleEntity{
     private Vector3 spos = new Vector3();
 
     /**rotation of the top, usually used as the 'shoot' direction.*/
-    public float rotation;
+    public float rotation = 90;
     /**rotation of the base, usually leg rotation for mechs.*/
-    public float baseRotation;
+    public float baseRotation = 90;
 
     /**Called when a death event is recieved remotely.*/
     public abstract void onRemoteDeath();

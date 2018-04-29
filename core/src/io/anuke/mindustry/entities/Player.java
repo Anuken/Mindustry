@@ -6,7 +6,6 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.content.fx.ExplosionFx;
-import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Palette;
@@ -271,10 +270,6 @@ public class Player extends Unit{
 			weapon.update(player, false);
 		}
 
-		if(dashing && timer.get(timerDash, 3) && movement.len() > 0){
-			Effects.effect(Fx.dash, x + Angles.trnsx(rotation + 180f, 3f), y + Angles.trnsy(rotation + 180f, 3f));
-		}
-
 		movement.limit(speed);
 
 		velocity.add(movement);
@@ -326,6 +321,11 @@ public class Player extends Unit{
 
 		if(isLocal){
 			super.writeSave(stream);
+
+			stream.writeByte(upgrades.size);
+			for(Upgrade u : upgrades){
+				stream.writeByte(u.id);
+			}
 		}
 	}
 
@@ -340,13 +340,18 @@ public class Player extends Unit{
 
 	private void readSaveSuper(DataInputStream stream) throws IOException {
 		super.readSave(stream);
+
+		byte uamount = stream.readByte();
+		for (int i = 0; i < uamount; i++) {
+			upgrades.add(Upgrade.getByID(stream.readByte()));
+		}
+
 		add();
 	}
 
 	@Override
 	public void writeSpawn(ByteBuffer buffer) {
-		buffer.put((byte)name.getBytes().length);
-		buffer.put(name.getBytes());
+		IOUtils.writeString(buffer, name);
 		buffer.put(weapon.id);
 		buffer.put(mech.id);
 		buffer.put(isAdmin ? 1 : (byte)0);
@@ -358,10 +363,7 @@ public class Player extends Unit{
 
 	@Override
 	public void readSpawn(ByteBuffer buffer) {
-		byte nlength = buffer.get();
-		byte[] n = new byte[nlength];
-		buffer.get(n);
-		name = new String(n);
+		name = IOUtils.readString(buffer);
 		weapon = Upgrade.getByID(buffer.get());
 		mech = Upgrade.getByID(buffer.get());
 		isAdmin = buffer.get() == 1;
@@ -410,14 +412,6 @@ public class Player extends Unit{
 
 		float tx = x + Angles.trnsx(rotation + 180f, 4f);
 		float ty = y + Angles.trnsy(rotation + 180f, 4f);
-
-		if(mech.flying && i.target.dst(i.last) > 2f && timer.get(timerDash, 1)){
-			Effects.effect(Fx.dash, tx, ty);
-		}
-
-		if(dashing && !dead && timer.get(timerDash, 3) && i.target.dst(i.last) > 1f){
-			Effects.effect(Fx.dash, tx, ty);
-		}
 	}
 
 	public Color getColor(){

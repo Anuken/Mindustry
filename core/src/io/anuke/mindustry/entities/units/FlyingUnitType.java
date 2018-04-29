@@ -2,20 +2,17 @@ package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectSet;
-import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.resource.AmmoType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Angles;
 
 import static io.anuke.mindustry.Vars.state;
 
 public class FlyingUnitType extends UnitType {
-    private static Vector2 vec = new Vector2();
+    protected static Vector2 vec = new Vector2();
 
     protected float boosterLength = 4.5f;
 
@@ -34,8 +31,8 @@ public class FlyingUnitType extends UnitType {
         unit.rotation = unit.velocity.angle();
 
         if(unit.velocity.len() > 0.2f && unit.timer.get(timerBoost, 2f)){
-            Effects.effect(Fx.dash, unit.x + Angles.trnsx(unit.rotation + 180f, boosterLength),
-                    unit.y + Angles.trnsy(unit.rotation + 180f, boosterLength));
+            //Effects.effect(UnitFx.vtolHover, unit.x + Angles.trnsx(unit.rotation + 180f, boosterLength),
+            //        unit.y + Angles.trnsy(unit.rotation + 180f, boosterLength));
         }
     }
 

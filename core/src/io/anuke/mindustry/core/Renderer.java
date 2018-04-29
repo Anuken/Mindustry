@@ -251,20 +251,19 @@ public class Renderer extends RendererModule{
 			if(group.count(p -> p.isFlying() == flying) +
 					playerGroup.count(p -> p.isFlying() == flying && p.team == team) == 0 && flying) continue;
 
+			Entities.drawWith(unitGroups[team.ordinal()], u -> u.isFlying() == flying, Unit::drawUnder);
+			Entities.drawWith(playerGroup, p -> p.isFlying() == flying && p.team == team, Unit::drawUnder);
+
 			Shaders.outline.color.set(team.color);
 
 			Graphics.beginShaders(Shaders.outline);
 			Graphics.shader(Shaders.hit, false);
-			drawTeam(team, flying);
+			Entities.draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying);
+			Entities.draw(playerGroup, p -> p.isFlying() == flying && p.team == team);
 			Graphics.shader();
 			blocks.drawTeamBlocks(Layer.turret, team);
 			Graphics.endShaders();
 		}
-	}
-
-	private void drawTeam(Team team, boolean flying){
-		Entities.draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying);
-		Entities.draw(playerGroup, p -> p.isFlying() == flying && p.team == team);
 	}
 
 	@Override
@@ -533,6 +532,8 @@ public class Renderer extends RendererModule{
 	}
 
 	void drawStats(Unit unit){
+		if(unit.isDead()) return;
+
 		float x = unit.getDrawPosition().x;
 		float y = unit.getDrawPosition().y;
 
@@ -541,8 +542,9 @@ public class Renderer extends RendererModule{
 			y = (int)y;
 		}
 
-		drawBar(Color.SCARLET, x, y - 7f, unit.health / unit.maxhealth);
-		drawBar(Color.valueOf("32cf6d"), x, y - 8f, unit.inventory.totalAmmo() / (float) unit.inventory.ammoCapacity());
+		drawEncloser(x, y - 8f, 2f);
+		drawBar(Color.SCARLET, x, y - 8f, unit.health / unit.maxhealth);
+		drawBar(Color.valueOf("32cf6d"), x, y - 9f, unit.inventory.totalAmmo() / (float) unit.inventory.ammoCapacity());
 	}
 	
 	//TODO optimize!
@@ -557,18 +559,25 @@ public class Renderer extends RendererModule{
 
 		x -= 0.5f;
 		y += 0.5f;
-		/*
-		Lines.stroke(3f);
-		Draw.color(Color.SLATE);
-		Lines.line(x - len + 1, y, x + len + 1.5f, y);
-
-		Lines.stroke(1f);*/
 
 		Draw.color(Color.BLACK);
 		Lines.line(x - len + 1, y, x + len + 0.5f, y);
 		Draw.color(color);
 		if(w >= 1)
 			Lines.line(x - len + 1, y, x - len + w, y);
+		Draw.reset();
+	}
+
+	public void drawEncloser(float x, float y, float height){
+		x -= 0.5f;
+		y += 0.5f - (height-1f)/2f;
+
+		float len = 3;
+
+		Lines.stroke(2f + height);
+		Draw.color(Color.SLATE);
+		Lines.line(x - len - 0.5f, y, x + len + 1.5f, y, CapStyle.none);
+
 		Draw.reset();
 	}
 

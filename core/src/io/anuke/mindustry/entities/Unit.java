@@ -26,7 +26,7 @@ public abstract class Unit extends SyncEntity implements SerializableEntity {
     public UnitInventory inventory = new UnitInventory(100, 100);
     public Team team = Team.blue;
 
-    public Vector2 velocity = new Vector2();
+    public Vector2 velocity = new Vector2(0f, 0.0001f);
     public float hitTime;
     public float drownTime;
 
@@ -147,6 +147,8 @@ public abstract class Unit extends SyncEntity implements SerializableEntity {
             super.damage(amount);
         }
     }
+
+    public void drawUnder(){}
 
     public abstract boolean acceptsAmmo(Item item);
     public abstract void addAmmo(Item item);

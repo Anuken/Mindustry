@@ -59,6 +59,8 @@ public abstract class UnitType {
 
     public abstract void draw(BaseUnit unit);
 
+    public void drawUnder(BaseUnit unit){}
+
     public boolean isFlying(){
         return isFlying;
     }

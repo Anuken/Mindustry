@@ -2,6 +2,7 @@ package io.anuke.mindustry.content.fx;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
@@ -32,13 +33,6 @@ public class Fx{
 	smoke = new Effect(100, e -> {
 		Draw.color(Color.GRAY, new Color(0.3f, 0.3f, 0.3f, 1f), e.fin());
 		float size = 7f-e.fin()*7f;
-		Draw.rect("circle", e.x, e.y, size, size);
-		Draw.reset();
-	}),
-
-	dash = new Effect(30, e -> {
-		Draw.color(Color.CORAL, Color.GRAY, e.fin());
-		float size = e.fout()*4f;
 		Draw.rect("circle", e.x, e.y, size, size);
 		Draw.reset();
 	}),

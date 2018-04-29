@@ -38,7 +38,7 @@ public class UnitFactory extends Block {
     protected float produceTime = 1000f;
     protected float powerUse = 0.1f;
     protected float openDuration = 50f;
-    protected float launchVelocity = 4f;
+    protected float launchVelocity = 0f;
     protected String unitRegion;
 
     public UnitFactory(String name) {

@@ -33,7 +33,7 @@ import static io.anuke.mindustry.Vars.*;
 
 /**Control module.
  * Handles all input, saving, keybinds and keybinds.
- * Should <i>not</i> handle any game-critical state.
+ * Should <i>not</i> handle any logic-critical state.
  * This class is not created in the headless server.*/
 public class Control extends Module{
 	private Tutorial tutorial = new Tutorial();
