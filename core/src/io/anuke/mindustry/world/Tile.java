@@ -11,12 +11,13 @@ import io.anuke.mindustry.world.blocks.types.modules.LiquidModule;
 import io.anuke.mindustry.world.blocks.types.modules.PowerModule;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Bits;
+import io.anuke.ucore.util.Position;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
 
-public class Tile{
+public class Tile implements Position{
 	public static final Object tileSetLock = new Object();
 	
 	/**Block ID data.*/
@@ -300,6 +301,7 @@ public class Tile{
 	}
 	
 	public void changed(){
+
 		synchronized (tileSetLock) {
 			if (entity != null) {
 				entity.remove();
@@ -321,6 +323,16 @@ public class Tile{
 		}
 
 		world.notifyChanged(this);
+	}
+
+	@Override
+	public float getX() {
+		return drawx();
+	}
+
+	@Override
+	public float getY() {
+		return drawy();
 	}
 
 	@Override

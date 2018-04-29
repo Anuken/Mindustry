@@ -13,7 +13,7 @@ public class UnitFx {
     vtolHover = new Effect(40f, e -> {
         float len = e.finpow()*10f;
         float ang = e.rotation + Mathf.randomSeedRange(e.id, 30f);
-        Draw.color(Palette.lightFlame);
+        Draw.color(Palette.lightFlame, Palette.lightOrange, e.fin());
         Fill.circle(e.x + Angles.trnsx(ang, len), e.y + Angles.trnsy(ang, len), 2f * e.fout());
         Draw.reset();
     });

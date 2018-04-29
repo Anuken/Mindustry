@@ -22,6 +22,7 @@ import io.anuke.mindustry.entities.effect.GroundEffectEntity;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.graphics.BlockRenderer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.MinimapRenderer;
@@ -519,8 +520,8 @@ public class Renderer extends RendererModule{
 		}
 
 		if((!debug || showUI) && Settings.getBool("healthbars")){
-			for(EntityGroup<BaseUnit> group : unitGroups){
-				for(Unit e : group.all()){
+			for(TeamData ally : state.teams.getTeams(true)){
+				for(Unit e : unitGroups[ally.team.ordinal()].all()){
 					drawStats(e);
 				}
 			}

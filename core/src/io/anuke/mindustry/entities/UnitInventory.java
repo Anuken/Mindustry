@@ -1,7 +1,14 @@
 package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.resource.*;
+import io.anuke.mindustry.resource.AmmoEntry;
+import io.anuke.mindustry.resource.AmmoType;
+import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.resource.ItemStack;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class UnitInventory {
     private Array<AmmoEntry> ammos = new Array<>();
@@ -12,6 +19,33 @@ public class UnitInventory {
     public UnitInventory(int capacity, int ammoCapacity) {
         this.capacity = capacity;
         this.ammoCapacity = ammoCapacity;
+    }
+
+    public void write(DataOutputStream stream) throws IOException {
+        stream.writeInt(item == null ? 0 : item.amount);
+        stream.writeByte(item == null ? 0 : item.item.id);
+        stream.writeInt(totalAmmo);
+        stream.writeByte(ammos.size);
+        for(int i = 0; i < ammos.size; i ++){
+            stream.writeByte(ammos.get(i).type.id);
+            stream.writeInt(ammos.get(i).amount);
+        }
+    }
+
+    public void read(DataInputStream stream) throws IOException {
+        int iamount = stream.readInt();
+        byte iid = stream.readByte();
+        this.totalAmmo = stream.readInt();
+        byte ammoa = stream.readByte();
+        for(int i = 0; i < ammoa; i ++){
+            byte aid = stream.readByte();
+            int am = stream.readInt();
+            ammos.add(new AmmoEntry(AmmoType.getByID(aid), am));
+        }
+
+        if(iamount != 0){
+            item = new ItemStack(Item.getByID(iid), iamount);
+        }
     }
 
     public AmmoType getAmmo() {

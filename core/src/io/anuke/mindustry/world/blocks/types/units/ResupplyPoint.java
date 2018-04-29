@@ -6,6 +6,8 @@ import io.anuke.mindustry.entities.effect.ItemTransferEffect;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.flags.BlockFlag;
+import io.anuke.ucore.util.EnumSet;
 
 public class ResupplyPoint extends Block{
     private static Rectangle rect = new Rectangle();
@@ -19,6 +21,7 @@ public class ResupplyPoint extends Block{
         super(name);
         update = true;
         solid = true;
+        flags = EnumSet.of(BlockFlag.resupplyPoint);
     }
 
     @Override

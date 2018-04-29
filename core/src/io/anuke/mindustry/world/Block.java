@@ -20,12 +20,14 @@ import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
+import io.anuke.mindustry.world.flags.BlockFlag;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.EnumSet;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
@@ -105,6 +107,8 @@ public class Block extends BaseBlock {
 	public BlockBars bars = new BlockBars();
 	/**List of block stats.*/
 	public BlockStats stats = new BlockStats();
+	/**List of block flags. Used for AI indexing.*/
+	public EnumSet<BlockFlag> flags;
 	/**Whether to automatically set the entity to 'sleeping' when created.*/
 	public boolean autoSleep;
 

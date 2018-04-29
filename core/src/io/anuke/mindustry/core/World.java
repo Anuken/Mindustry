@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.ai.BlockIndexer;
 import io.anuke.mindustry.ai.Pathfinder;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
@@ -28,6 +29,7 @@ public class World extends Module{
 	private Map currentMap;
 	private Tile[][] tiles;
 	private Pathfinder pathfinder = new Pathfinder();
+	private BlockIndexer indexer = new BlockIndexer();
 	private Maps maps = new Maps();
 
 	private Array<Tile> tempTiles = new Array<>();
@@ -44,6 +46,10 @@ public class World extends Module{
 	
 	public Maps maps(){
 		return maps;
+	}
+
+	public BlockIndexer indexer() {
+		return indexer;
 	}
 
 	public Pathfinder pathfinder(){

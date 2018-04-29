@@ -53,6 +53,10 @@ public class AmmoType {
         this.quantityMultiplier = multiplier;
     }
 
+    public float getRange(){
+        return bullet.speed * bullet.lifetime;
+    }
+
     public static Array<AmmoType> getAllTypes() {
         return allTypes;
     }

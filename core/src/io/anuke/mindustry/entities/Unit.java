@@ -56,6 +56,7 @@ public abstract class Unit extends SyncEntity implements SerializableEntity {
         stream.writeShort((short)health);
         stream.writeByte(status.current().id);
         stream.writeFloat(status.getTime());
+        inventory.write(stream);
     }
 
     @Override
@@ -67,6 +68,7 @@ public abstract class Unit extends SyncEntity implements SerializableEntity {
         byte effect = stream.readByte();
         float etime = stream.readFloat();
 
+        this.inventory.read(stream);
         this.team = Team.values()[team];
         this.health = health;
         this.x = x;
@@ -125,7 +127,10 @@ public abstract class Unit extends SyncEntity implements SerializableEntity {
                 damage(health + 1, false);
             }
 
+            float px = x, py = y;
             move(velocity.x / getMass() * floor.speedMultiplier * Timers.delta(), velocity.y / getMass() * floor.speedMultiplier * Timers.delta());
+            if(Math.abs(px - x) <= 0.0001f) velocity.x = 0f;
+            if(Math.abs(py - y) <= 0.0001f) velocity.y = 0f;
         }
 
         velocity.scl(Mathf.clamp(1f-drag* floor.dragMultiplier* Timers.delta()));

@@ -5,7 +5,6 @@ import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.AmmoType;
@@ -59,6 +58,10 @@ public abstract class UnitType {
 
     public abstract void draw(BaseUnit unit);
 
+    public UnitState getStartState(){
+        return null;
+    }
+
     public void drawUnder(BaseUnit unit){}
 
     public boolean isFlying(){
@@ -93,10 +96,6 @@ public abstract class UnitType {
     public void updateTargeting(BaseUnit unit){
         if(unit.target == null || (unit.target instanceof Unit && ((Unit)unit.target).isDead())){
             unit.target = null;
-        }
-
-        if(unit.timer.get(timerTarget, 20)){
-            unit.target = Units.getClosestEnemy(unit.team, unit.x, unit.y, range, e -> true);
         }
     }
 

@@ -4,9 +4,11 @@ import io.anuke.mindustry.ai.OptimizedPathFinder;
 import io.anuke.mindustry.ai.SmoothGraphPath;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.world.flags.BlockFlag;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.Entity;
@@ -25,6 +27,7 @@ public class BaseUnit extends Unit{
 	public UnitType type;
 	public Timer timer = new Timer(5);
 	public float walkTime = 0f;
+	public StateMachine state = new StateMachine();
 	public Entity target;
 
 	protected OptimizedPathFinder finder;
@@ -46,7 +49,12 @@ public class BaseUnit extends Unit{
 	public void effectAt(Effect effect, float rotation, float dx, float dy){
 		Effects.effect(effect,
 				x + Angles.trnsx(rotation, dx, dy),
-				y + Angles.trnsy(rotation, dx, dy), Mathf.atan2(dx, dy));
+				y + Angles.trnsy(rotation, dx, dy), Mathf.atan2(dx, dy) + rotation);
+	}
+
+	public boolean targetHasFlag(BlockFlag flag){
+		return target instanceof TileEntity &&
+				((TileEntity)target).tile.block().flags.contains(flag);
 	}
 
 	@Override
@@ -129,6 +137,7 @@ public class BaseUnit extends Unit{
 		hitbox.solid = true;
 		hitbox.setSize(type.hitsize);
 		hitboxTile.setSize(type.hitsizeTile);
+		state.set(this, type.getStartState());
 
 		if(!isFlying()){
 			finder = new OptimizedPathFinder();
