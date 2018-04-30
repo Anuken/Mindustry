@@ -96,6 +96,29 @@ public class Units {
         return result[0];
     }
 
+    /**Returns the closest ally of this team. Filter by predicate.*/
+    public static Unit getClosest(Team team, float x, float y, float range, Predicate<Unit> predicate){
+        Unit[] result = {null};
+        float[] cdist = {0};
+
+        rect.setSize(range*2f).setCenter(x, y);
+
+        getNearby(team, rect, e -> {
+            if (!predicate.test(e))
+                return;
+
+            float dist = Vector2.dst(e.x, e.y, x, y);
+            if (dist < range) {
+                if (result[0] == null || dist < cdist[0]) {
+                    result[0] = e;
+                    cdist[0] = dist;
+                }
+            }
+        });
+
+        return result[0];
+    }
+
     /**Iterates over all units in a rectangle.*/
     public static void getNearby(Team team, Rectangle rect, Consumer<Unit> cons){
 
