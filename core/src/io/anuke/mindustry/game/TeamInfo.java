@@ -22,6 +22,10 @@ public class TeamInfo {
         return ally ? allyData : enemyData;
     }
 
+    public ObjectSet<TeamData> getTeams() {
+        return allTeamData;
+    }
+
     /**Register a team.
      * @param team The team type enum.
      * @param ally Whether this team is an ally with the player or an enemy with the player.

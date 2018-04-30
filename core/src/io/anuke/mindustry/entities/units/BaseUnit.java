@@ -57,6 +57,10 @@ public class BaseUnit extends Unit{
 				((TileEntity)target).tile.block().flags.contains(flag);
 	}
 
+	public void setState(UnitState state){
+		this.state.set(this, state);
+	}
+
 	@Override
 	public boolean acceptsAmmo(Item item) {
 		return type.ammo.containsKey(item) && inventory.canAcceptAmmo(type.ammo.get(item));

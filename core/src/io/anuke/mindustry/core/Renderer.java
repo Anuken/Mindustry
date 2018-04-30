@@ -520,7 +520,7 @@ public class Renderer extends RendererModule{
 		}
 
 		if((!debug || showUI) && Settings.getBool("healthbars")){
-			for(TeamData ally : state.teams.getTeams(true)){
+			for(TeamData ally : (debug ? state.teams.getTeams() : state.teams.getTeams(true))){
 				for(Unit e : unitGroups[ally.team.ordinal()].all()){
 					drawStats(e);
 				}

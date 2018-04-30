@@ -20,6 +20,7 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.world;
 
 public class Vtol extends FlyingUnitType {
+    private float retreatHealth = 10f;
 
     public Vtol(){
         super("vtol");
@@ -94,6 +95,15 @@ public class Vtol extends FlyingUnitType {
         }
     }
 
+    @Override
+    public void behavior(BaseUnit unit) {
+        if(unit.health <= retreatHealth &&
+                Geometry.findClosest(unit.x, unit.y, world.indexer().getAllied(unit.team, BlockFlag.repair)) != null){
+            unit.setState(retreat);
+        }
+    }
+
+    @Override
     public UnitState getStartState(){
         return resupply;
     }
@@ -119,7 +129,7 @@ public class Vtol extends FlyingUnitType {
         if(diff > 100f && vec.len() < circleLength){
             vec.setAngle(unit.velocity.angle());
         }else{
-            vec.setAngle(Mathf.slerpDelta(unit.velocity.angle(), vec.angle(),  0.4f));
+            vec.setAngle(Mathf.slerpDelta(unit.velocity.angle(), vec.angle(),  0.44f));
         }
 
         vec.setLength(speed*Timers.delta());
@@ -153,13 +163,12 @@ public class Vtol extends FlyingUnitType {
         }
 
         public void update(BaseUnit unit) {
-
             if(!unit.inventory.hasAmmo()) {
                 unit.state.set(unit, resupply);
             }else if (unit.target == null){
                 if(unit.timer.get(timerTarget, 20)) {
                     Unit closest = Units.getClosestEnemy(unit.team, unit.x, unit.y,
-                            unit.inventory.getAmmo().getRange(), other -> true);
+                            unit.inventory.getAmmo().getRange(), other -> other.distanceTo(unit) < 60f);
                     if(closest != null){
                         unit.target = closest;
                     }else {
@@ -170,13 +179,31 @@ public class Vtol extends FlyingUnitType {
             }else{
                 attack(unit, 150f);
 
-                if (unit.timer.get(timerReload, 7) && Mathf.angNear(unit.angleTo(unit.target), unit.rotation, 16f)
+                if (unit.timer.get(timerReload, 7) && Mathf.angNear(unit.angleTo(unit.target), unit.rotation, 13f)
                         && unit.distanceTo(unit.target) < unit.inventory.getAmmo().getRange()) {
                     AmmoType ammo = unit.inventory.getAmmo();
                     unit.inventory.useAmmo();
 
                     shoot(unit, ammo, unit.rotation, 4f);
                 }
+            }
+        }
+    },
+    retreat = new UnitState() {
+        public void entered(BaseUnit unit) {
+            unit.target = null;
+        }
+
+        public void update(BaseUnit unit) {
+            if(unit.health >= health){
+                unit.state.set(unit, attack);
+            }else if(!unit.targetHasFlag(BlockFlag.repair)){
+                if(unit.timer.get(timerTarget, 20)) {
+                    Tile target = Geometry.findClosest(unit.x, unit.y, world.indexer().getAllied(unit.team, BlockFlag.repair));
+                    if (target != null) unit.target = target.entity;
+                }
+            }else{
+                circle(unit, 20f);
             }
         }
     };
