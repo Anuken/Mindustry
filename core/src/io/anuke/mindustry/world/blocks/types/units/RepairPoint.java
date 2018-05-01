@@ -11,6 +11,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.flags.BlockFlag;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.EnumSet;
@@ -35,6 +36,13 @@ public class RepairPoint extends Block{
         hasItems = false;
         hasPower = true;
         powerCapacity = 20f;
+    }
+
+    @Override
+    public void drawSelect(Tile tile){
+        Draw.color("accent");
+        Lines.dashCircle(tile.drawx(), tile.drawy(), repairRadius);
+        Draw.color();
     }
 
     @Override

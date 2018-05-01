@@ -12,6 +12,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.flags.BlockFlag;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.EnumSet;
@@ -39,6 +40,13 @@ public class ResupplyPoint extends Block{
     }
 
     @Override
+    public void drawSelect(Tile tile){
+        Draw.color("accent");
+        Lines.dashCircle(tile.drawx(), tile.drawy(), supplyRadius);
+        Draw.color();
+    }
+
+    @Override
     public void drawLayer(Tile tile) {
         ResupplyPointEntity entity = tile.entity();
 
@@ -55,9 +63,9 @@ public class ResupplyPoint extends Block{
                     x1, y1, entity.lastx, entity.lasty, entity.strength);
 
             Draw.color("accent");
-            for(int i = 0; i < dstTo/space - 1; i ++){
-                float fract = (i * space) / dstTo + (Timers.time()/4f) % (1f/(dstTo/space));
-                Draw.alpha(fract);
+            for(int i = 0; i < dstTo/space; i ++){
+                float fract = (i * space) / dstTo;
+                Draw.alpha(Mathf.absin(Timers.time() - i*space, 3f, 1f));
                 Draw.rect("transfer-arrow", x1 + fract*xf, y1 + fract*yf,
                         8, 8*entity.strength, ang);
             }
@@ -93,11 +101,11 @@ public class ResupplyPoint extends Block{
 
         if(entity.target != null && entity.power.amount >= powerUse){
             entity.power.amount -= powerUse;
-            entity.lastx = entity.x;
-            entity.lasty = entity.y;
-            entity.strength = Mathf.lerpDelta(entity.strength, 1f, 0.07f * Timers.delta());
+            entity.lastx = entity.target.x;
+            entity.lasty = entity.target.y;
+            entity.strength = Mathf.lerpDelta(entity.strength, 1f, 0.08f * Timers.delta());
         }else{
-            entity.strength = Mathf.lerpDelta(entity.strength, 0f, 0.05f * Timers.delta());
+            entity.strength = Mathf.lerpDelta(entity.strength, 0f, 0.08f * Timers.delta());
         }
 
         if(entity.timer.get(timerTarget, 20)) {
