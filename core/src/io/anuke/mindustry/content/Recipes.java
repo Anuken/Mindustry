@@ -115,6 +115,7 @@ public class Recipes {
 		new Recipe(liquid, LiquidBlocks.fluxpump, stack(Items.steel, 10), stack(Items.densealloy, 5)),
 
 		new Recipe(units, UnitBlocks.repairPoint, stack(Items.steel, 10)),
+		new Recipe(units, UnitBlocks.resupplyPoint, stack(Items.steel, 10)),
 
 		//new Recipe(units, UnitBlocks.droneFactory, stack(Items.steel, 10)),
 		//new Recipe(units, UnitBlocks.vtolFactory, stack(Items.steel, 10)),

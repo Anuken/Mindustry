@@ -39,11 +39,12 @@ public class UnitBlocks {
     }},
 
     resupplyPoint = new ResupplyPoint("resupplypoint"){{
-        size = 2;
+        shadow = "shadow-round-1";
         itemCapacity = 30;
     }},
 
     repairPoint = new RepairPoint("repairpoint"){{
-        shadow = "repairpoint-shadow";
+        shadow = "shadow-round-1";
+        repairSpeed = 0.1f;
     }};
 }

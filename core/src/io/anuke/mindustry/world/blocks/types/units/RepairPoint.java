@@ -30,7 +30,8 @@ public class RepairPoint extends Block{
         update = true;
         solid = true;
         flags = EnumSet.of(BlockFlag.repair);
-        layer = Layer.laser;
+        layer = Layer.turret;
+        layer2 = Layer.laser;
         hasItems = false;
         hasPower = true;
         powerCapacity = 20f;
@@ -40,15 +41,22 @@ public class RepairPoint extends Block{
     public void drawLayer(Tile tile) {
         RepairPointEntity entity = tile.entity();
 
-        if(entity.target != null){
+        Draw.rect(name + "-turret", tile.drawx(), tile.drawy(), entity.rotation - 90);
+    }
+
+    @Override
+    public void drawLayer2(Tile tile) {
+        RepairPointEntity entity = tile.entity();
+
+        if(entity.target != null &&
+                Angles.angleDist(entity.angleTo(entity.target), entity.rotation) < 30f){
             float ang = entity.angleTo(entity.target);
-            float len = 2f;
+            float len = 5f;
 
             Draw.color(Color.valueOf("e8ffd7"));
-            Draw.alpha(entity.strength);
             Shapes.laser("laser", "laser-end",
                     tile.drawx() + Angles.trnsx(ang, len), tile.drawy() + Angles.trnsy(ang, len),
-                    entity.target.x, entity.target.y);
+                    entity.target.x, entity.target.y, entity.strength);
             Draw.color();
         }
     }
@@ -63,15 +71,16 @@ public class RepairPoint extends Block{
         }else if(entity.target != null){
             entity.target.health += repairSpeed * Timers.delta() * entity.strength;
             entity.target.clampHealth();
+            entity.rotation = Mathf.slerpDelta(entity.rotation, entity.angleTo(entity.target), 0.5f);
         }
 
         float powerUse = Math.min(Timers.delta() * powerUsage, powerCapacity);
 
         if(entity.target != null && entity.power.amount >= powerUse){
             entity.power.amount -= powerUse;
-            entity.strength = Mathf.lerpDelta(entity.strength, 1f, 0.07f * Timers.delta());
+            entity.strength = Mathf.lerpDelta(entity.strength, 1f, 0.08f * Timers.delta());
         }else{
-            entity.strength = Mathf.lerpDelta(entity.strength, 0f, 0.05f * Timers.delta());
+            entity.strength = Mathf.lerpDelta(entity.strength, 0f, 0.07f * Timers.delta());
         }
 
         if(entity.timer.get(timerTarget, 20)) {
@@ -88,6 +97,6 @@ public class RepairPoint extends Block{
 
     public class RepairPointEntity extends TileEntity{
         public Unit target;
-        public float strength;
+        public float strength, rotation = 90;
     }
 }

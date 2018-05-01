@@ -319,9 +319,9 @@ public class ServerControl extends Module {
             if(target != null){
                 String ip = Net.getConnection(target.clientid).address;
                 netServer.admins.banPlayerIP(ip);
-                netServer.admins.banPlayerID(netServer.admins.getTrace(ip).uuid);
+                netServer.admins.banPlayerID(target.uuid);
                 netServer.kick(target.clientid, KickReason.banned);
-                info("Banned player by IP and ID: {0} / {1}", ip, netServer.admins.getTrace(ip).uuid);
+                info("Banned player by IP and ID: {0} / {1}", ip, target.uuid);
             }else{
                 info("Nobody with that name could be found.");
             }
@@ -378,7 +378,7 @@ public class ServerControl extends Module {
                 info("Banned player by ID: {0}.", arg[0]);
 
                 for(Player player : playerGroup.all()){
-                    if(netServer.admins.getTrace(Net.getConnection(player.clientid).address).uuid.equals(arg[0])){
+                    if(player.uuid.equals(arg[0])){
                         netServer.kick(player.clientid, KickReason.banned);
                         break;
                     }
@@ -420,10 +420,9 @@ public class ServerControl extends Module {
             }
 
             if(target != null){
-                String id = netServer.admins.getTrace(Net.getConnection(target.clientid).address).uuid;
-                netServer.admins.adminPlayer(id, Net.getConnection(target.clientid).address);
+                netServer.admins.adminPlayer(target.uuid, Net.getConnection(target.clientid).address);
                 NetEvents.handleAdminSet(target, true);
-                info("Admin-ed player by ID: {0} / {1}", id, arg[0]);
+                info("Admin-ed player by ID: {0} / {1}", target.uuid, arg[0]);
             }else{
                 info("Nobody with that name could be found.");
             }
@@ -445,10 +444,9 @@ public class ServerControl extends Module {
             }
 
             if(target != null){
-                String id = netServer.admins.getTrace(Net.getConnection(target.clientid).address).uuid;
-                netServer.admins.unAdminPlayer(id);
+                netServer.admins.unAdminPlayer(target.uuid);
                 NetEvents.handleAdminSet(target, false);
-                info("Un-admin-ed player by ID: {0} / {1}", id, arg[0]);
+                info("Un-admin-ed player by ID: {0} / {1}", target.uuid, arg[0]);
             }else{
                 info("Nobody with that name could be found.");
             }
@@ -530,7 +528,7 @@ public class ServerControl extends Module {
                 boolean found = false;
 
                 for (Player player : playerGroup.all()) {
-                    TraceInfo info = netServer.admins.getTrace(Net.getConnection(player.clientid).address);
+                    TraceInfo info = netServer.admins.getTraceByID(player.uuid);
                     if(info.totalBlocksBroken >= minbreak && info.totalBlocksBroken / Math.max(info.totalBlocksPlaced, 1f) >= ratio){
                         info("&ly - Player '{0}' / UUID &lm{1}&ly found: &lc{2}&ly broken and &lc{3}&ly placed.",
                                 player.name, info.uuid, info.totalBlocksBroken, info.totalBlocksPlaced);
@@ -677,7 +675,7 @@ public class ServerControl extends Module {
             }
 
             if(target != null){
-                TraceInfo info = netServer.admins.getTrace(Net.getConnection(target.clientid).address);
+                TraceInfo info = netServer.admins.getTraceByID(target.uuid);
                 Log.info("&lcTrace info for player '{0}':", target.name);
                 Log.info("  &lyEntity ID: {0}", info. playerid);
                 Log.info("  &lyIP: {0}", info.ip);

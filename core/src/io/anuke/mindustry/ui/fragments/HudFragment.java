@@ -137,7 +137,7 @@ public class HudFragment implements Fragment{
 		}}.end();
 
 		new table(){{
-			visible(() -> state.is(State.playing));
+			visible(() -> !state.is(State.menu));
 			atop();
 			aright();
 

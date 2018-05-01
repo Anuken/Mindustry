@@ -86,7 +86,7 @@ public class PowerBlocks {
     }},
 
     powernode = new PowerDistributor("powernode"){{
-        shadow = "powernode-shadow";
+        shadow = "shadow-round-1";
     }},
 
     powernodelarge = new PowerDistributor("powernodelarge"){{
