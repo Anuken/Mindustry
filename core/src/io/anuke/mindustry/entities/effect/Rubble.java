@@ -14,7 +14,7 @@ public class Rubble extends TimedEntity implements BelowLiquidEffect{
     public static void create(float x, float y, int size){
         Rubble rubble = new Rubble();
         rubble.size = size;
-        rubble.set(x + Mathf.range(1), y + Mathf.range(1)).add();
+        rubble.set(x, y).add();
     }
 
     private Rubble(){

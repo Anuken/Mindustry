@@ -58,7 +58,8 @@ public class BlockIndexer {
     }
 
     private void process(Tile tile){
-        if(tile.block().flags != null){
+        if(tile.block().flags != null &&
+                tile.getTeam() != Team.none){
             ObjectMap<BlockFlag, ObjectSet<Tile>> map = getMap(tile.getTeam());
 
             for(BlockFlag flag : tile.block().flags){

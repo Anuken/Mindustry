@@ -30,7 +30,7 @@ public abstract class UnitType {
     public final String name;
     public final byte id;
 
-    protected int health = 60;
+    protected float health = 60;
     protected float hitsize = 5f;
     protected float hitsizeTile = 4f;
     protected float speed = 0.4f;
@@ -94,7 +94,7 @@ public abstract class UnitType {
     public abstract void behavior(BaseUnit unit);
 
     public void updateTargeting(BaseUnit unit){
-        if(unit.target == null || (unit.target instanceof Unit && ((Unit)unit.target).isDead())){
+        if(unit.target == null || (unit.target instanceof Unit && (((Unit)unit.target).isDead() || ((Unit)unit.target).team == unit.team))){
             unit.target = null;
         }
     }

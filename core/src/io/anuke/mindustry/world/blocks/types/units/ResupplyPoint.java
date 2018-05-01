@@ -63,9 +63,9 @@ public class ResupplyPoint extends Block{
                     x1, y1, entity.lastx, entity.lasty, entity.strength);
 
             Draw.color("accent");
-            for(int i = 0; i < dstTo/space; i ++){
-                float fract = (i * space) / dstTo;
-                Draw.alpha(Mathf.absin(Timers.time() - i*space, 3f, 1f));
+            for(int i = 0; i < dstTo/space-1; i ++){
+                float fract = (i * space) / dstTo + ((Timers.time()/90f) % (space/dstTo));
+                Draw.alpha(Mathf.clamp(fract*1.5f));
                 Draw.rect("transfer-arrow", x1 + fract*xf, y1 + fract*yf,
                         8, 8*entity.strength, ang);
             }
