@@ -94,9 +94,14 @@ public class Weapon extends Upgrade{
 
 	void shootInternal(Player p, float x, float y, float rotation, boolean left){
 		Angles.shotgun(shots, spacing, rotation, f -> bullet(p, x, y, f + Mathf.range(inaccuracy)));
-		tr.trns(rotation, 3f);
 
 		AmmoType type = p.inventory.getAmmo();
+
+		tr.trns(rotation + 180f, type.recoil);
+
+		p.velocity.add(tr);
+
+		tr.trns(rotation, 3f);
 
 		Effects.shake(shake, shake, x, y);
 		Effects.effect(ejectEffect, x, y, rotation * -Mathf.sign(left));

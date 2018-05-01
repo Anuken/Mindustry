@@ -21,6 +21,8 @@ public class AmmoType {
     public final float quantityMultiplier;
     /**Reload speed multiplier.*/
     public float speedMultiplier = 1f;
+    /**Bullet recoil strength.*/
+    public float recoil = 0f;
     /**Effect created when shooting.*/
     public Effect shootEffect = Fx.none;
     /**Extra smoke effect created when shooting.*/

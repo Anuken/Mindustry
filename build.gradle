@@ -27,7 +27,7 @@ allprojects {
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'
         aiVersion = '1.8.1'
-        uCoreVersion = 'dd5eb72'
+        uCoreVersion = '88326fc'
 
         getVersionString = {
             String buildVersion = getBuildVersion()

@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.units;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
@@ -10,6 +11,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.flags.BlockFlag;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.EnumSet;
@@ -40,13 +42,28 @@ public class ResupplyPoint extends Block{
     public void drawLayer(Tile tile) {
         ResupplyPointEntity entity = tile.entity();
 
-        if(entity.target != null){
-            float ang = entity.angleTo(entity.target);
+        if(entity.strength > 0f){
+            float ang = entity.angleTo(entity.lastx, entity.lasty);
             float len = 5f;
+            float x1 = tile.drawx() + Angles.trnsx(ang, len), y1 = tile.drawy() + Angles.trnsy(ang, len);
+            float dstTo = Vector2.dst(x1, y1, entity.lastx, entity.lasty);
+            float space = 4f;
+
+            float xf = entity.lastx - x1, yf = entity.lasty - y1;
 
             Shapes.laser("transfer", "transfer-end",
-                    tile.drawx() + Angles.trnsx(ang, len), tile.drawy() + Angles.trnsy(ang, len),
-                    entity.target.x, entity.target.y, entity.strength);
+                    x1, y1, entity.lastx, entity.lasty, entity.strength);
+
+            Draw.color("accent");
+            for(int i = 0; i < dstTo/space - 1; i ++){
+                float fract = (i * space) / dstTo + (Timers.time()/4f) % (1f/(dstTo/space));
+                Draw.alpha(fract);
+                Draw.rect("transfer-arrow", x1 + fract*xf, y1 + fract*yf,
+                        8, 8*entity.strength, ang);
+            }
+
+            Draw.color();
+
         }
     }
 
@@ -76,6 +93,8 @@ public class ResupplyPoint extends Block{
 
         if(entity.target != null && entity.power.amount >= powerUse){
             entity.power.amount -= powerUse;
+            entity.lastx = entity.x;
+            entity.lasty = entity.y;
             entity.strength = Mathf.lerpDelta(entity.strength, 1f, 0.07f * Timers.delta());
         }else{
             entity.strength = Mathf.lerpDelta(entity.strength, 0f, 0.05f * Timers.delta());
@@ -113,6 +132,6 @@ public class ResupplyPoint extends Block{
 
     public class ResupplyPointEntity extends TileEntity{
         public Unit target;
-        public float strength, rotation = 90;
+        public float strength, rotation = 90, lastx, lasty;
     }
 }
