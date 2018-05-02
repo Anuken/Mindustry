@@ -20,13 +20,22 @@ import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
 public class Pathfinder {
-    private long maxUpdate = TimeUtils.millisToNanos(5);
+    private long maxUpdate = TimeUtils.millisToNanos(4);
     private PathData[] paths;
     private IntArray blocked = new IntArray();
 
     public Pathfinder(){
         Events.on(WorldLoadEvent.class, this::clear);
-        Events.on(TileChangeEvent.class, this::update);
+        Events.on(TileChangeEvent.class, tile -> {
+
+            for(TeamData data : state.teams.getTeams()){
+                if(data.team != tile.getTeam() && paths[data.team.ordinal()].weights[tile.x][tile.y] >= Float.MAX_VALUE){
+                    update(tile, data.team);
+                }
+            }
+
+            update(tile, tile.getTeam());
+        });
     }
 
     public void update(){
@@ -68,21 +77,21 @@ public class Pathfinder {
 
     private boolean passable(Tile tile, Team team){
         return (tile.getWallID() == 0 && !(tile.floor().liquid && (tile.floor().damageTaken > 0 || tile.floor().drownTime > 0))) || (tile.breakable()
-        && tile.getTeam() != team);
+        && (tile.getTeam() != team || !tile.solid()));
     }
 
-    private void update(Tile tile){
-        if(paths[tile.getTeam().ordinal()] != null) {
-            PathData path = paths[tile.getTeam().ordinal()];
+    private void update(Tile tile, Team team){
+        if(paths[team.ordinal()] != null) {
+            PathData path = paths[team.ordinal()];
 
-            if(!passable(tile, tile.getTeam())){
+            if(!passable(tile, team)){
                 path.weights[tile.x][tile.y] = Float.MAX_VALUE;
             }
 
             path.search ++;
             path.frontier.clear();
 
-            ObjectSet<Tile> set = world.indexer().getEnemy(tile.getTeam(), BlockFlag.target);
+            ObjectSet<Tile> set = world.indexer().getEnemy(team, BlockFlag.target);
             for(Tile other : set){
                 path.weights[other.x][other.y] = 0;
                 path.searches[other.x][other.y] = path.search;

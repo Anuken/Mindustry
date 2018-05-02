@@ -30,6 +30,10 @@ public class EventType {
         void handle(Tile tile);
     }
 
+    public interface TileRemoveEvent extends Event{
+        void handle(Tile tile, Team oldTeam);
+    }
+
     public interface StateChangeEvent extends Event{
         void handle(State from, State to);
     }
