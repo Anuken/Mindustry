@@ -3,12 +3,11 @@ package io.anuke.mindustry.editor;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.IndexedRenderer;
 
@@ -73,8 +72,6 @@ public class MapRenderer {
         }
 
         Graphics.begin();
-
-        long i = Timers.elapsed();
     }
 
     public void updatePoint(int x, int y){

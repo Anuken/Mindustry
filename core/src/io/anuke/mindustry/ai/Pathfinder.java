@@ -70,7 +70,7 @@ public class Pathfinder {
     }
 
     private void clear(){
-        Timers.markNs();
+        Timers.mark();
 
         weights = new float[Team.values().length][0][0];
         blocked.clear();
@@ -119,6 +119,6 @@ public class Pathfinder {
             }
         }
 
-        Log.info("Elapsed calculation time: {0}", Timers.elapsedNs());
+        Log.info("Elapsed calculation time: {0}", Timers.elapsed());
     }
 }

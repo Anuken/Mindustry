@@ -1,11 +1,10 @@
 package io.anuke.mindustry.graphics;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
@@ -13,13 +12,16 @@ import com.badlogic.gdx.utils.async.AsyncExecutor;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.CacheBatch;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
+
+import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
@@ -29,8 +31,8 @@ public class FloorRenderer {
     private final static int chunksize = 32;
 
     private AsyncExecutor executor = new AsyncExecutor(8);
-    private ShaderProgram program = createDefaultShader();
     private Chunk[][] cache;
+    private CacheBatch cbatch;
     private IntSet drawnLayerSet = new IntSet();
     private IntArray drawnLayers = new IntArray();
 
@@ -39,12 +41,6 @@ public class FloorRenderer {
     }
 
     public void drawFloor(){
-
-        int chunksx = world.width() / chunksize, chunksy = world.height() / chunksize;
-
-        if(cache == null || cache.length != chunksx || cache[0].length != chunksy){
-            cache = new Chunk[chunksx][chunksy];
-        }
 
         OrthographicCamera camera = Core.camera;
 
@@ -77,21 +73,11 @@ public class FloorRenderer {
                 if (!Mathf.inBounds(worldx, worldy, cache))
                     continue;
 
-                if (cache[worldx][worldy] == null) {
-                    cache[worldx][worldy] = new Chunk();
-                    executor.submit(() -> cacheChunk(worldx, worldy));
-                    continue;
-                }
-
                 Chunk chunk = cache[worldx][worldy];
-
-                if (!chunk.rendered) {
-                    continue;
-                }
 
                 //loop through all layers, and add layer index if it exists
                 for(int i = 0; i < layers - 1; i ++){
-                    if(chunk.lengths[i] > 0){
+                    if(chunk.caches[i] != -1){
                         drawnLayerSet.add(i);
                     }
                 }
@@ -119,16 +105,14 @@ public class FloorRenderer {
     }
 
     public void beginDraw(){
-        Core.atlas.getTextures().first().bind();
-        Gdx.gl.glEnable(GL20.GL_BLEND);
+        cbatch.setProjectionMatrix(Core.camera.combined);
+        cbatch.beginDraw();
 
-        program.begin();
-        program.setUniformMatrix("u_projTrans", Core.camera.combined);
-        program.setUniformi("u_texture", 0);
+        Gdx.gl.glEnable(GL20.GL_BLEND);
     }
 
     public void endDraw(){
-        program.end();
+        cbatch.endDraw();
     }
 
     public void drawLayer(DrawLayer layer){
@@ -144,15 +128,12 @@ public class FloorRenderer {
                 int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
                 int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
 
-                if(!Mathf.inBounds(worldx, worldy, cache) || cache[worldx][worldy] == null || !cache[worldx][worldy].rendered){
+                if(!Mathf.inBounds(worldx, worldy, cache)){
                     continue;
                 }
 
                 Chunk chunk = cache[worldx][worldy];
-
-                chunk.mesh.render(program, GL20.GL_TRIANGLES,
-                        chunk.offsets[layer.ordinal()] / vsize,
-                        chunk.lengths[layer.ordinal()] / vsize);
+                cbatch.drawCache(chunk.caches[layer.ordinal()]);
             }
         }
 
@@ -165,34 +146,18 @@ public class FloorRenderer {
         Draw.color();
     }
 
-    private Chunk cacheChunk(int cx, int cy){
+    private void cacheChunk(int cx, int cy){
         Chunk chunk = cache[cx][cy];
-
-        chunk.vertices =  new float[DrawLayer.values().length*chunksize*chunksize*vsize*4*6];
 
         for(DrawLayer layer : DrawLayer.values()){
             cacheChunkLayer(cx, cy, chunk, layer);
         }
-
-        Timers.run(0f, () -> {
-            chunk.mesh = new Mesh(true, chunk.vertices.length, 0,
-                    new VertexAttribute(Usage.Position, 2, "a_position"),
-                    new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0"));
-
-            chunk.mesh.setVertices(chunk.vertices, 0, chunk.idx);
-
-            chunk.rendered = true;
-        });
-        return chunk;
     }
 
     private void cacheChunkLayer(int cx, int cy, Chunk chunk, DrawLayer layer){
-        float[] vertices = chunk.vertices;
-        chunk.offsets[layer.ordinal()] = chunk.idx;
 
-        int idx = chunk.idx;
-        TextureRegion region = new TextureRegion(Core.atlas.getTextures().first());
-        IntArray edges = new IntArray();
+        Graphics.useBatch(cbatch);
+        cbatch.begin();
 
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
@@ -200,136 +165,48 @@ public class FloorRenderer {
                 if(tile == null) continue;
 
                 if(tile.floor().drawLayer == layer && tile.block().drawLayer != DrawLayer.walls){
-                    idx = drawFloor(tile, idx, region, vertices, false, edges);
+                    tile.floor().draw(tile);
                 }else if(tile.floor().drawLayer.ordinal() < layer.ordinal() && tile.block().drawLayer != DrawLayer.walls && layer != DrawLayer.walls){
-                    idx = drawFloor(tile, idx, region, vertices, true, edges);
+                    tile.floor().drawNonLayer(tile);
                 }
 
                 if(tile.block().drawLayer == layer && layer == DrawLayer.walls){
                     Block block = tile.block();
-                    idx = draw(vertices,
-                            idx,
-                            Draw.region(block.variants > 0 ? (block.name() + MathUtils.random(1, block.variants)) : block.name()),
-                            tile.worldx(),
-                            tile.worldy());
+                    block.draw(tile);
                 }
             }
         }
 
-        chunk.lengths[layer.ordinal()] = idx - chunk.offsets[layer.ordinal()];
-        chunk.idx = idx;
-    }
-
-    private int drawFloor(Tile tile, int idx, TextureRegion region, float[] vertices, boolean edgesOnly, IntArray edges){
-        MathUtils.random.setSeed(tile.id());
-        Block block = tile.floor();
-
-        if(!edgesOnly) {
-            TextureRegion base = Draw.region(block.variants > 0 ? (block.name() + MathUtils.random(1, block.variants)) : block.name());
-            idx = draw(vertices, idx, base, tile.worldx(), tile.worldy());
-        }
-
-        for(int dx = -1; dx <= 1; dx ++){
-            for(int dy = -1; dy <= 1; dy ++){
-
-                if(dx == 0 && dy == 0) continue;
-
-                Tile other = world.tile(tile.x+dx, tile.y+dy);
-
-                if(other == null) continue;
-
-                Block floor = other.floor();
-
-                if(floor.id <= block.id || !((Floor)block).blends.test(floor) || (floor.drawLayer.ordinal() > block.drawLayer.ordinal() && !edgesOnly) ||
-                        (edgesOnly && floor.drawLayer == block.drawLayer)) continue;
-
-                TextureRegion result = Draw.hasRegion(floor.name() + "edge") ? Draw.region(floor.name() + "edge") :
-                        Draw.region(floor.edge + "edge");
-
-                int sx = -dx*8+2, sy = -dy*8+2;
-                int x = Mathf.clamp(sx, 0, 12);
-                int y = Mathf.clamp(sy, 0, 12);
-                int w = Mathf.clamp(sx+8, 0, 12) - x, h = Mathf.clamp(sy+8, 0, 12) - y;
-
-                float rx = Mathf.clamp(dx*8, 0, 8-w);
-                float ry = Mathf.clamp(dy*8, 0, 8-h);
-
-                region.setTexture(result.getTexture());
-                region.setRegion(result.getRegionX()+x, result.getRegionY()+y+h, w, -h);
-
-                idx = drawc(vertices, idx, region, tile.worldx()-4 + rx, tile.worldy()-4 + ry, w, h);
-            }
-        }
-        return idx;
-    }
-
-    private int draw(float[] vertices, int idx, TextureRegion region, float x, float y){
-        return drawc(vertices, idx, region, x - tilesize/2f, y - tilesize/2f, tilesize, tilesize);
-    }
-
-    private int drawc(float[] vertices, int idx, TextureRegion region, float x, float y, float width, float height){
-
-        final float fx2 = x + width;
-        final float fy2 = y + height;
-        final float u = region.getU();
-        final float v = region.getV2();
-        final float u2 = region.getU2();
-        final float v2 = region.getV();
-
-        vertices[idx ++] = x;
-        vertices[idx ++] = y;
-        vertices[idx ++] = u;
-        vertices[idx ++] = v;
-
-        vertices[idx ++] = x;
-        vertices[idx ++] = fy2;
-        vertices[idx ++] = u;
-        vertices[idx ++] = v2;
-
-        vertices[idx ++] = fx2;
-        vertices[idx ++] = fy2;
-        vertices[idx ++] = u2;
-        vertices[idx ++] = v2;
-
-        vertices[idx ++] = x;
-        vertices[idx ++] = y;
-        vertices[idx ++] = u;
-        vertices[idx ++] = v;
-
-        vertices[idx ++] = fx2;
-        vertices[idx ++] = y;
-        vertices[idx ++] = u2;
-        vertices[idx ++] = v;
-
-        vertices[idx ++] = fx2;
-        vertices[idx ++] = fy2;
-        vertices[idx ++] = u2;
-        vertices[idx ++] = v2;
-
-        return idx;
+        cbatch.end();
+        Graphics.popBatch();
+        chunk.caches[layer.ordinal()] = cbatch.getLastCache();
     }
 
     private class Chunk{
-        float[] vertices;
-        int[] offsets = new int[DrawLayer.values().length];
-        int[] lengths = new int[DrawLayer.values().length];
-        int idx = 0;
-        boolean rendered;
-        Mesh mesh;
+        int[] caches = new int[DrawLayer.values().length];
     }
 
     public void clearTiles(){
-        if(cache != null){
-            for(int x = 0; x < cache.length; x ++){
-                for(int y = 0; y < cache[0].length; y ++){
-                    if(cache[x][y] != null && cache[x][y].mesh != null){
-                        cache[x][y].mesh.dispose();
-                        cache[x][y] = null;
-                    }
-                }
+        if(cbatch != null) cbatch.dispose();
+
+        Timers.mark();
+
+        int chunksx = world.width() / chunksize, chunksy = world.height() / chunksize;
+        cache = new Chunk[chunksx][chunksy];
+        cbatch = new CacheBatch(world.width()*world.height()*4*4);
+
+        Log.info("Time to create: {0}", Timers.elapsed());
+
+        for (int x = 0; x < chunksx; x++) {
+            for (int y = 0; y < chunksy; y++) {
+                cache[x][y] = new Chunk();
+                Arrays.fill(cache[x][y].caches, -1);
+
+                cacheChunk(x, y);
             }
         }
-        cache = null;
+
+        Log.info("Time to cache: {0}", Timers.elapsed());
     }
 
     static ShaderProgram createDefaultShader () {
