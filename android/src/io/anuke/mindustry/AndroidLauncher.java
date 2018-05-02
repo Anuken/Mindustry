@@ -104,7 +104,7 @@ public class AndroidLauncher extends AndroidApplication{
 
 			@Override
 			public boolean isDebug() {
-				return false;
+				return true;
 			}
 
 			@Override

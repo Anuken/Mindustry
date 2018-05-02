@@ -173,7 +173,7 @@ public abstract class InputHandler extends InputAdapter{
 	
 	public void placeBlock(int x, int y, Block result, int rotation, boolean effects, boolean sound){
 		if(!Net.client()){ //is server or singleplayer
-			Placement.placeBlock(player.team, x, y, result, rotation, effects, sound);
+			threads.run(() -> Placement.placeBlock(player.team, x, y, result, rotation, effects, sound));
 		}
 
 		if(Net.active()){
@@ -182,13 +182,14 @@ public abstract class InputHandler extends InputAdapter{
 
 		if(!Net.client()){
 			Tile tile = world.tile(x, y);
-			if(tile != null) result.placed(tile);
+			if(tile != null) threads.run(() -> result.placed(tile));
 		}
 	}
 
 	public void breakBlock(int x, int y, boolean sound){
-		if(!Net.client())
-			Placement.breakBlock(player.team, x, y, true, sound);
+		if(!Net.client()){
+			threads.run(() -> Placement.breakBlock(player.team, x, y, true, sound));
+		}
 
 		if(Net.active()){
 			NetEvents.handleBreak(x, y);

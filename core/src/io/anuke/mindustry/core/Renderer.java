@@ -241,7 +241,7 @@ public class Renderer extends RendererModule{
 		if(pixelate)
 			Graphics.flushSurface();
 
-		//drawDebug();
+		drawDebug();
 		drawPlayerNames();
 		
 		batch.end();
@@ -308,7 +308,7 @@ public class Renderer extends RendererModule{
 	}
 
 	void drawDebug(){
-		int rangex = 50, rangey = 50;
+		int rangex = (int)(Core.camera.viewportWidth/tilesize/2), rangey = (int)(Core.camera.viewportHeight/tilesize/2);
 		Draw.tscl(0.125f);
 
 		for(int x = -rangex; x <= rangex; x++) {

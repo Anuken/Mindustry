@@ -142,6 +142,8 @@ public class Logic extends Module {
                 }
 
                 Entities.collideGroups(bulletGroup, playerGroup);
+
+                world.pathfinder().update();
             }
         }
     }

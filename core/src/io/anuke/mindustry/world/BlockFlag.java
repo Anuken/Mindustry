@@ -1,7 +1,8 @@
 package io.anuke.mindustry.world;
 
 public enum BlockFlag {
-    resupplyPoint(0),
+    target(0),
+    resupplyPoint(Float.MAX_VALUE),
     producer(Float.MAX_VALUE),
     repair(Float.MAX_VALUE);
 

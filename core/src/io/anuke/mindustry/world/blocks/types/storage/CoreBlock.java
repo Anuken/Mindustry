@@ -29,7 +29,7 @@ public class CoreBlock extends StorageBlock {
         size = 3;
         hasItems = true;
         itemCapacity = 2000;
-        flags = EnumSet.of(BlockFlag.resupplyPoint);
+        flags = EnumSet.of(BlockFlag.resupplyPoint, BlockFlag.target);
     }
 
     @Override
