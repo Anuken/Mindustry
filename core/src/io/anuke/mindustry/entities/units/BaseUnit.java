@@ -132,7 +132,7 @@ public class BaseUnit extends Unit{
 	public void added(){
 		maxhealth = type.health;
 
-		hitbox.solid = true;
+		hitbox.solid = !isFlying();
 		hitbox.setSize(type.hitsize);
 		hitboxTile.setSize(type.hitsizeTile);
 		state.set(this, type.getStartState());

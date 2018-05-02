@@ -319,15 +319,13 @@ public class Renderer extends RendererModule{
 				if(world.tile(worldx, worldy) == null) continue;
 
 				float value = world.pathfinder().getDebugValue(worldx, worldy);
-				if(value == Float.MAX_VALUE){
-					Draw.text("R", worldx*tilesize, worldy*tilesize);
-				}else{
-					Draw.text(value + "", worldx*tilesize, worldy*tilesize);
-				}
+				Draw.color(Color.PURPLE);
+				Draw.alpha((value % 10f) / 10f);
+				Lines.square(worldx * tilesize, worldy*tilesize, 4f);
 			}
 		}
 
-		Draw.tscl(0.5f);
+		Draw.color();
 	}
 
 	void drawPlayerNames(){

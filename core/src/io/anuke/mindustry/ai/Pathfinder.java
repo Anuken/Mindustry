@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
-import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
@@ -14,15 +14,12 @@ import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
 public class Pathfinder {
-    private static final float SQRT2 = Mathf.sqrt(2f);
     private static final float unitBlockCost = 4f;
-    private static boolean avoid = false;
 
     private AsyncExecutor executor = new AsyncExecutor(8);
     private float[][][] weights;
@@ -30,30 +27,10 @@ public class Pathfinder {
 
     public Pathfinder(){
         Events.on(WorldLoadEvent.class, this::clear);
-    }
 
-    public void update(){
-        if(avoid) {
+        Events.on(TileChangeEvent.class, tile -> {
 
-            for (TeamData data : state.teams.getTeams()) {
-                for (int i = 0; i < blocked.size; i++) {
-                    int c = blocked.get(i);
-                    weights[data.team.ordinal()][c % world.width()][c / world.width()] -= unitBlockCost;
-                }
-            }
-
-            blocked.clear();
-
-            Units.getAllUnits(unit -> {
-                if (unit.isFlying()) return;
-                int cx = world.toTile(unit.x), cy = world.toTile(unit.y);
-                for (TeamData data : state.teams.getTeams()) {
-                    if (weights[data.team.ordinal()][cx][cy] < Float.MAX_VALUE)
-                        weights[data.team.ordinal()][cx][cy] += unitBlockCost;
-                }
-                blocked.add(cx + cy * world.width());
-            });
-        }
+        });
     }
 
     public Tile getTargetTile(Team team, Tile tile){
@@ -68,10 +45,12 @@ public class Pathfinder {
         for(GridPoint2 point : Geometry.d8) {
             int dx = tile.x + point.x, dy = tile.y + point.y;
 
-            if(!Mathf.inBounds(dx, dy, world.width(), world.height())) continue;
+            Tile other = world.tile(dx, dy);
+            if(other == null) continue;
 
-            if(values[dx][dy] < value && (target == null || values[dx][dy] < tl)){
-                target = world.tile(dx, dy);
+            if(values[dx][dy] < value && (target == null || values[dx][dy] < tl) &&
+                    (other.getWallID() == 0 || state.teams.areEnemies(team, other.getTeam()))){
+                target = other;
                 tl = values[dx][dy];
             }
         }
@@ -83,7 +62,7 @@ public class Pathfinder {
     }
 
     public float getDebugValue(int x, int y){
-        return weights[Team.blue.ordinal()][x][y];
+        return weights[Team.red.ordinal()][x][y];
     }
 
     private boolean passable(Tile tile){
@@ -138,7 +117,6 @@ public class Pathfinder {
                     }
                 }
             }
-
         }
 
         Log.info("Elapsed calculation time: {0}", Timers.elapsedNs());

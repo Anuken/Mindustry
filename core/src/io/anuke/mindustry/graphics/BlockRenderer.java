@@ -177,10 +177,6 @@ public class BlockRenderer{
 		}
 	}
 
-	public void clearTiles(){
-		floorRenderer.clearTiles();
-	}
-
 	public void beginFloor(){
 		floorRenderer.beginDraw();
 	}

@@ -117,8 +117,6 @@ public class Logic extends Module {
                     runWave();
                 }
 
-                world.pathfinder().update();
-
                 if(!Entities.defaultGroup().isEmpty()) throw new RuntimeException("Do not add anything to the default group!");
 
                 Entities.update(bulletGroup);
