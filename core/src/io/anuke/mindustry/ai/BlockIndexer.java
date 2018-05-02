@@ -7,7 +7,7 @@ import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.flags.BlockFlag;
+import io.anuke.mindustry.world.BlockFlag;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.util.EnumSet;
 

@@ -3,6 +3,7 @@ package io.anuke.mindustry.entities.units;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
@@ -18,9 +19,6 @@ import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
 public abstract class GroundUnitType extends UnitType{
-    private static final int nodeStateNone = -2;
-    private static final int nodeStateCalculating = -1;
-
     //only use for drawing!
     protected Translator tr1 = new Translator();
     //only use for updating!
@@ -33,6 +31,7 @@ public abstract class GroundUnitType extends UnitType{
         maxVelocity = 1.1f;
         speed = 0.1f;
         drag = 0.4f;
+        range = 40f;
     }
 
     @Override
@@ -106,32 +105,20 @@ public abstract class GroundUnitType extends UnitType{
 
     @Override
     public void behavior(BaseUnit unit) {
-        //TODO actually pathfind
-        if(unit.node == nodeStateNone){
-            world.pathfinder().findPath(world.tileWorld(unit.x, unit.y), world.tileWorld(unit.target.x, unit.target.y), unit.path, unit.finder, () -> {
-                unit.node = 0;
-            });
 
-            unit.node = nodeStateCalculating;
+        if(unit.target instanceof TileEntity && unit.distanceTo(unit.target) < range) {
+            if(unit.timer.get(timerReload, reload)){
+                //shoot(unit, BulletType.shot, tr2.angle(), 4f);
+            }
+        }else{
+            Tile targetTile = world.pathfinder().getTargetTile(unit.team, world.tileWorld(unit.x, unit.y));
+
+            tr2.trns(unit.baseRotation, speed);
+
+            unit.baseRotation = Mathf.slerpDelta(unit.baseRotation, unit.angleTo(targetTile), 0.05f);
+            unit.walkTime += Timers.delta();
+            unit.velocity.add(tr2);
         }
 
-        if(!(unit.node >= 0 && unit.node < unit.path.nodes.size)) return;
-
-        Tile nodeTarget = unit.path.get(unit.node);
-
-        tr2.set(nodeTarget.worldx(), nodeTarget.worldy()).sub(unit.x, unit.y);
-
-        if(tr2.len() < jumpDistance){
-            unit.node ++;
-        }
-
-        tr2.limit(speed);
-        unit.walkTime += Timers.delta();
-        unit.velocity.add(tr2);
-
-
-        if(unit.timer.get(timerReload, reload)){
-            //shoot(unit, BulletType.shot, tr2.angle(), 4f);
-        }
     }
 }

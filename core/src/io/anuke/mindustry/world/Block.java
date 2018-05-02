@@ -20,7 +20,6 @@ import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Liquid;
-import io.anuke.mindustry.world.flags.BlockFlag;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;

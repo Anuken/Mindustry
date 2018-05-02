@@ -6,7 +6,7 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.resource.AmmoType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.flags.BlockFlag;
+import io.anuke.mindustry.world.BlockFlag;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Angles;

@@ -13,8 +13,6 @@ import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.tilesize;
-
 /**An IndexedAStarPathfinder that uses an OptimizedGraph, and therefore has less allocations.*/
 public class OptimizedPathFinder {
     IntMap<NodeRecord> records = new IntMap<>();
@@ -303,8 +301,8 @@ public class OptimizedPathFinder {
     }
 
     protected float estimate(Tile tile, Tile other){
-        return Math.abs(tile.worldx() - other.worldx()) + Math.abs(tile.worldy() - other.worldy()) +
-                (tile.occluded ? tilesize : 0) + (other.occluded ? tilesize : 0);
+        return Math.abs(tile.worldx() - other.worldx()) + Math.abs(tile.worldy() - other.worldy()) +0;
+               // (tile.occluded ? tilesize : 0) + (other.occluded ? tilesize : 0);
     }
 
     protected int relDirection(Tile from, Tile current){

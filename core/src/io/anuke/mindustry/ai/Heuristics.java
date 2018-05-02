@@ -28,7 +28,7 @@ public class Heuristics {
             if(other.breakable() && other.block().solid) cost += tilesize* solidMultiplier + other.block().health;
 
             //if this block has solid blocks near it, increase the cost, as we don't want enemies hugging walls
-            if(node.occluded) cost += tilesize*occludedMultiplier;
+            //if(node.occluded) cost += tilesize*occludedMultiplier;
 
             return cost;
         }
@@ -55,7 +55,7 @@ public class Heuristics {
             if(other.breakable() && other.block().solid) cost += tilesize* solidMultiplier + other.block().health;
 
             //if this block has solid blocks near it, increase the cost, as we don't want enemies hugging walls
-            if(node.occluded) cost += tilesize*occludedMultiplier;
+            //if(node.occluded) cost += tilesize*occludedMultiplier;
 
             if(other.getLinked() != null) other = other.getLinked();
             if(node.getLinked() != null) node = node.getLinked();

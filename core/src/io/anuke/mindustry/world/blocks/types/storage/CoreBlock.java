@@ -5,7 +5,7 @@ import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.flags.BlockFlag;
+import io.anuke.mindustry.world.BlockFlag;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.EnumSet;

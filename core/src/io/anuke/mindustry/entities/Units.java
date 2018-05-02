@@ -166,5 +166,21 @@ public class Units {
         });
     }
 
+    /**Iterates over all units.*/
+    public static void getAllUnits(Consumer<Unit> cons){
+
+        for(Team team : Team.values()){
+            EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
+            for(Unit unit : group.all()){
+                cons.accept(unit);
+            }
+        }
+
+        //now check all enemy players
+        for(Unit unit : playerGroup.all()){
+            cons.accept(unit);
+        }
+    }
+
 
 }

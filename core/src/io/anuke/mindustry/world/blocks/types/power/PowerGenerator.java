@@ -5,7 +5,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
-import io.anuke.mindustry.world.flags.BlockFlag;
+import io.anuke.mindustry.world.BlockFlag;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.EnumSet;
 

@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.mindustry.world.blocks.types.modules.InventoryModule;
 import io.anuke.mindustry.world.blocks.types.modules.LiquidModule;
 import io.anuke.mindustry.world.blocks.types.modules.PowerModule;
@@ -29,8 +30,8 @@ public class Tile implements Position{
 	 * This is relative to the block it is linked to; negate coords to find the link.*/
 	public byte link = 0;
 	public short x, y;
-	/**Whether this tile has any solid blocks near it.*/
-	public boolean occluded = false;
+	/**Tile traversal cost*/
+	public float cost = 1f;
 	public TileEntity entity;
 
 	public float pathDistance = -1;
@@ -118,8 +119,8 @@ public class Tile implements Position{
 		return block().getPlaceOffset().y + worldy();
 	}
 	
-	public Block floor(){
-		return Block.getByID(getFloorID());
+	public Floor floor(){
+		return (Floor)Block.getByID(getFloorID());
 	}
 	
 	public Block block(){
@@ -288,15 +289,20 @@ public class Tile implements Position{
 	}
 
 	public void updateOcclusion(){
-		occluded = false;
+		cost = 0.5f;
+		boolean occluded = false;
+		outer:
 		for(int dx = -1; dx <= 1; dx ++){
 			for(int dy = -1; dy <= 1; dy ++){
 				Tile tile = world.tile(x + dx, y + dy);
 				if(tile != null && tile.solid()){
 					occluded = true;
-					break;
+					break outer;
 				}
 			}
+		}
+		if(occluded){
+			cost += 0.5f;
 		}
 	}
 	

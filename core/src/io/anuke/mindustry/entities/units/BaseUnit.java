@@ -1,14 +1,12 @@
 package io.anuke.mindustry.entities.units;
 
-import io.anuke.mindustry.ai.OptimizedPathFinder;
-import io.anuke.mindustry.ai.SmoothGraphPath;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.world.flags.BlockFlag;
+import io.anuke.mindustry.world.BlockFlag;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.Entity;
@@ -29,10 +27,6 @@ public class BaseUnit extends Unit{
 	public float walkTime = 0f;
 	public StateMachine state = new StateMachine();
 	public Entity target;
-
-	protected OptimizedPathFinder finder;
-	protected SmoothGraphPath path;
-	protected int node = -2;
 
 	public BaseUnit(UnitType type, Team team){
 		this.type = type;
@@ -142,11 +136,6 @@ public class BaseUnit extends Unit{
 		hitbox.setSize(type.hitsize);
 		hitboxTile.setSize(type.hitsizeTile);
 		state.set(this, type.getStartState());
-
-		if(!isFlying()){
-			finder = new OptimizedPathFinder();
-			path = new SmoothGraphPath();
-		}
 
 		heal();
 	}

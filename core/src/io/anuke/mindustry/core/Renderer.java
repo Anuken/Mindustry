@@ -241,6 +241,7 @@ public class Renderer extends RendererModule{
 		if(pixelate)
 			Graphics.flushSurface();
 
+		//drawDebug();
 		drawPlayerNames();
 		
 		batch.end();
@@ -304,6 +305,29 @@ public class Renderer extends RendererModule{
 					0, 0,
 					-((cw - vw) / 2 / tilesize), -ch / tilesize + 1);
 		}
+	}
+
+	void drawDebug(){
+		int rangex = 50, rangey = 50;
+		Draw.tscl(0.125f);
+
+		for(int x = -rangex; x <= rangex; x++) {
+			for (int y = -rangey; y <= rangey; y++) {
+				int worldx = Mathf.scl(camera.position.x, tilesize) + x;
+				int worldy = Mathf.scl(camera.position.y, tilesize) + y;
+
+				if(world.tile(worldx, worldy) == null) continue;
+
+				float value = world.pathfinder().getDebugValue(worldx, worldy);
+				if(value == Float.MAX_VALUE){
+					Draw.text("R", worldx*tilesize, worldy*tilesize);
+				}else{
+					Draw.text(value + "", worldx*tilesize, worldy*tilesize);
+				}
+			}
+		}
+
+		Draw.tscl(0.5f);
 	}
 
 	void drawPlayerNames(){
