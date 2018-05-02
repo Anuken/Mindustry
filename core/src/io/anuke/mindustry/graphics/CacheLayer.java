@@ -8,7 +8,7 @@ import io.anuke.ucore.graphics.Shader;
 
 import static io.anuke.mindustry.Vars.renderer;
 
-public enum DrawLayer {
+public enum CacheLayer {
     water{
         @Override
         public void begin(){

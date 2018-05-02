@@ -12,7 +12,7 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.effect.Rubble;
-import io.anuke.mindustry.graphics.DrawLayer;
+import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
@@ -90,8 +90,8 @@ public class Block extends BaseBlock {
 	public boolean expanded = false;
 	/**Max of timers used.*/
 	public int timers = 0;
-	/**Draw layer. Only used for 'cached' rendering.*/
-	public DrawLayer drawLayer = DrawLayer.normal;
+	/**Cache layer. Only used for 'cached' rendering.*/
+	public CacheLayer cacheLayer = CacheLayer.normal;
 	/**Layer to draw extra stuff on.*/
 	public Layer layer = null;
 	/**Extra layer to draw extra extra stuff on.*/

@@ -107,7 +107,7 @@ public class BlockRenderer{
 
 		Graphics.end();
 		floorRenderer.beginDraw();
-		floorRenderer.drawLayer(DrawLayer.walls);
+		floorRenderer.drawLayer(CacheLayer.walls);
 		floorRenderer.endDraw();
 		Graphics.begin();
 		

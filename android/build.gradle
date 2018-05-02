@@ -22,8 +22,8 @@ task deploy(type: Copy){
 }
 
 android {
-    buildToolsVersion '26.0.2'
-    compileSdkVersion 26
+    buildToolsVersion '27.0.3'
+    compileSdkVersion 27
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'

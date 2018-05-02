@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.graphics.DrawLayer;
+import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -28,7 +28,7 @@ public class Blocks {
 
     space = new Floor("space") {{
         variants = 0;
-        drawLayer = DrawLayer.space;
+        cacheLayer = CacheLayer.space;
         solid = true;
     }},
 
@@ -46,7 +46,7 @@ public class Blocks {
         status = StatusEffects.wet;
         statusIntensity = 1f;
         drownTime = 140f;
-        drawLayer = DrawLayer.water;
+        cacheLayer = CacheLayer.water;
     }},
 
     water = new Floor("water") {{
@@ -57,7 +57,7 @@ public class Blocks {
         statusIntensity = 0.9f;
         liquidDrop = Liquids.water;
         liquid = true;
-        drawLayer = DrawLayer.water;
+        cacheLayer = CacheLayer.water;
     }},
 
     lava = new Floor("lava") {{
@@ -69,7 +69,7 @@ public class Blocks {
         variants = 0;
         liquidDrop = Liquids.lava;
         liquid = true;
-        drawLayer = DrawLayer.lava;
+        cacheLayer = CacheLayer.lava;
     }},
 
     oil = new Floor("oil") {{
@@ -80,7 +80,7 @@ public class Blocks {
         variants = 0;
         liquidDrop = Liquids.oil;
         liquid = true;
-        drawLayer = DrawLayer.oil;
+        cacheLayer = CacheLayer.oil;
     }},
 
     stone = new Floor("stone") {{

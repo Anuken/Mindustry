@@ -25,7 +25,6 @@ public class MapRenderer {
     }
 
     public void resize(int width, int height){
-        //TODO just freezes on tablets
         if(chunks != null){
             for(int x = 0; x < chunks.length; x ++){
                 for(int y = 0; y < chunks[0].length; y ++){

@@ -33,9 +33,6 @@ public class Tile implements Position{
 	/**Tile traversal cost*/
 	public float cost = 1f;
 	public TileEntity entity;
-
-	public float pathDistance = -1;
-	public float vecx, vecy;
 	
 	public Tile(int x, int y){
 		this.x = (short)x;
