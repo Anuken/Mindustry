@@ -1,8 +1,7 @@
 apply plugin: "java"
-//apply plugin: 'org.akhikhl.gretty'
 
 gwt {
-    gwtVersion='2.8.0' // Should match the gwt version used for building the gwt backend
+    gwtVersion='2.8.2' // Should match the gwt version used for building the gwt backend
     maxHeapSize="2G" // Default 256m is not enough for gwt compiler. GWT is HUNGRY
     minHeapSize="1G"
 
@@ -39,13 +38,6 @@ task distZip(type: Zip, dependsOn: dist){
 	from "build/dist"
     archiveName appName + "-html5.zip"
     destinationDir(file("build/dist-zipped"))
-}
-
-
-eclipseWtpFacet.doLast{
-	delete{
-		delete '.settings/org.eclipse.wst.common.project.facet.core.xml'
-	}
 }
 
 draftWar {
