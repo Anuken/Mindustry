@@ -1,5 +1,7 @@
 package io.anuke.mindustry.entities.effect;
 
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -22,6 +24,10 @@ public class GroundEffectEntity extends EffectEntity {
             if (!once && time >= lifetime) {
                 once = true;
                 time = 0f;
+                Tile tile = Vars.world.tileWorld(x, y);
+                if(tile != null && tile.floor().liquid){
+                    remove();
+                }
             } else if (once && time >= effect.staticLife) {
                 remove();
             }
@@ -36,8 +42,14 @@ public class GroundEffectEntity extends EffectEntity {
 
         if(once && effect.isStatic)
             Effects.renderEffect(id, effect, color, lifetime, rotation, x, y, data);
-        else if(!effect.isStatic)
+        else
             Effects.renderEffect(id, effect, color, time, rotation, x, y, data);
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        once = false;
     }
 
     public static class GroundEffect extends Effect{

@@ -74,15 +74,14 @@ public class Renderer extends RendererModule{
 				Rectangle pos = rect2.setSize(effect.size).setCenter(x, y);
 
 				if(view.overlaps(pos)){
-					int id = 0;
 
-					if(!(effect instanceof GroundEffect) || ((GroundEffect)effect).isStatic) {
+					if(!(effect instanceof GroundEffect)) {
 						EffectEntity entity = Pools.obtain(EffectEntity.class);
 						entity.effect = effect;
 						entity.color = color;
 						entity.rotation = rotation;
 						entity.lifetime = effect.lifetime;
-						id = entity.set(x, y).add(effectGroup).id;
+						entity.set(x, y).add(effectGroup);
 
 						if(data instanceof Entity){
 							entity.setParent((Entity)data);
@@ -96,10 +95,6 @@ public class Renderer extends RendererModule{
 						entity.rotation = rotation;
 						entity.lifetime = effect.lifetime;
 						entity.set(x, y).add(groundEffectGroup);
-
-						if(((GroundEffect)effect).isStatic){
-							entity.id = id;
-						}
 					}
 				}
 			}
@@ -241,7 +236,7 @@ public class Renderer extends RendererModule{
 		if(pixelate)
 			Graphics.flushSurface();
 
-		drawDebug();
+		if(showPaths) drawDebug();
 		drawPlayerNames();
 		
 		batch.end();
