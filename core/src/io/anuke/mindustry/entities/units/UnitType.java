@@ -42,6 +42,7 @@ public abstract class UnitType {
     protected float drag = 0.1f;
     protected float maxVelocity = 5f;
     protected float reload = 40f;
+    protected float retreatPercent = 20f;
     protected ObjectMap<Item, AmmoType> ammo = new ObjectMap<>();
 
     public UnitType(String name){

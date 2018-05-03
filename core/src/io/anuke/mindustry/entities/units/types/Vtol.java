@@ -7,14 +7,10 @@ import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.FlyingUnitType;
 import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.world.BlockFlag;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
-
-import static io.anuke.mindustry.Vars.world;
 
 public class Vtol extends FlyingUnitType {
 
@@ -23,6 +19,7 @@ public class Vtol extends FlyingUnitType {
         setAmmo(AmmoTypes.basicIron);
         speed = 0.3f;
         maxVelocity = 2f;
+        reload = 7;
     }
 
     @Override
@@ -66,14 +63,6 @@ public class Vtol extends FlyingUnitType {
 
         if(unit.timer.get(timerBoost, 2)){
             unit.effectAt(UnitFx.vtolHover, unit.rotation + 180f, 4f, 0);
-        }
-    }
-
-    @Override
-    public void behavior(BaseUnit unit) {
-        if(unit.health <= retreatHealth &&
-                Geometry.findClosest(unit.x, unit.y, world.indexer().getAllied(unit.team, BlockFlag.repair)) != null){
-            unit.setState(retreat);
         }
     }
 

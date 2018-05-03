@@ -1,25 +1,23 @@
 package io.anuke.mindustry.entities.units;
 
-import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.resource.AmmoType;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.BlockFlag;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Translator;
 
 import static io.anuke.mindustry.Vars.world;
 
 public class FlyingUnitType extends UnitType {
-    protected static Vector2 vec = new Vector2();
+    protected static Translator vec = new Translator();
 
-    protected float boosterLength = 4.5f;
-    protected float retreatHealth = 10f;
     protected float maxAim = 30f;
 
     public FlyingUnitType(String name) {
@@ -49,7 +47,10 @@ public class FlyingUnitType extends UnitType {
 
     @Override
     public void behavior(BaseUnit unit) {
-
+        if(unit.health <= health * retreatPercent &&
+                Geometry.findClosest(unit.x, unit.y, world.indexer().getAllied(unit.team, BlockFlag.repair)) != null){
+            unit.setState(retreat);
+        }
     }
 
     protected void circle(BaseUnit unit, float circleLength){
@@ -128,7 +129,7 @@ public class FlyingUnitType extends UnitType {
             }else{
                 attack(unit, 150f);
 
-                if (unit.timer.get(timerReload, 7) && Mathf.angNear(unit.angleTo(unit.target), unit.rotation, 13f)
+                if (unit.timer.get(timerReload, reload) && Mathf.angNear(unit.angleTo(unit.target), unit.rotation, 13f)
                         && unit.distanceTo(unit.target) < unit.inventory.getAmmo().getRange()) {
                     AmmoType ammo = unit.inventory.getAmmo();
                     unit.inventory.useAmmo();

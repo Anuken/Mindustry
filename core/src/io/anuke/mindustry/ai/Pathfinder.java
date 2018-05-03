@@ -89,7 +89,12 @@ public class Pathfinder {
             }
 
             path.search ++;
-            path.frontier.clear();
+
+            if(path.lastSearchTime + 1000/60*3 > TimeUtils.millis()){
+                path.frontier.clear();
+            }
+
+            path.lastSearchTime = TimeUtils.millis();
 
             ObjectSet<Tile> set = world.indexer().getEnemy(team, BlockFlag.target);
             for(Tile other : set){
@@ -171,6 +176,7 @@ public class Pathfinder {
         float[][] weights;
         int[][] searches;
         int search = 0;
+        long lastSearchTime;
         Queue<Tile> frontier = new Queue<>();
 
         PathData(){
