@@ -33,7 +33,6 @@ public class FlyingUnitType extends UnitType {
         super.update(unit);
 
         unit.rotation = unit.velocity.angle();
-        unit.state.update(unit);
     }
 
     @Override

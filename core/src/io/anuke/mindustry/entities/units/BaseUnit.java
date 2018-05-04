@@ -101,6 +101,10 @@ public class BaseUnit extends Unit{
 		type.drawUnder(this);
 	}
 
+	@Override
+	public void drawOver(){
+		type.drawOver(this);
+	}
 
 	@Override
 	public float drawSize(){

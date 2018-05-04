@@ -86,9 +86,7 @@ public class Renderer extends RendererModule{
 						if(data instanceof Entity){
 							entity.setParent((Entity)data);
 						}
-					}
-
-					if(effect instanceof GroundEffect){
+					}else{
 						GroundEffectEntity entity = Pools.obtain(GroundEffectEntity.class);
 						entity.effect = effect;
 						entity.color = color;
@@ -260,6 +258,9 @@ public class Renderer extends RendererModule{
 			Graphics.shader();
 			blocks.drawTeamBlocks(Layer.turret, team);
 			Graphics.endShaders();
+
+			Entities.drawWith(unitGroups[team.ordinal()], u -> u.isFlying() == flying, Unit::drawOver);
+			Entities.drawWith(playerGroup, p -> p.isFlying() == flying && p.team == team, Unit::drawOver);
 		}
 	}
 
@@ -564,8 +565,7 @@ public class Renderer extends RendererModule{
 		drawBar(Color.SCARLET, x, y - 8f, unit.health / unit.maxhealth);
 		drawBar(Color.valueOf("32cf6d"), x, y - 9f, unit.inventory.totalAmmo() / (float) unit.inventory.ammoCapacity());
 	}
-	
-	//TODO optimize!
+
 	public void drawBar(Color color, float x, float y, float finion){
 		finion = Mathf.clamp(finion);
 

@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.entities.Bullet;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
@@ -42,7 +43,7 @@ public abstract class UnitType {
     protected float drag = 0.1f;
     protected float maxVelocity = 5f;
     protected float reload = 40f;
-    protected float retreatPercent = 20f;
+    protected float retreatPercent = 0.2f;
     protected ObjectMap<Item, AmmoType> ammo = new ObjectMap<>();
 
     public UnitType(String name){
@@ -59,11 +60,13 @@ public abstract class UnitType {
 
     public abstract void draw(BaseUnit unit);
 
+    public void drawUnder(BaseUnit unit){}
+
+    public void drawOver(BaseUnit unit){}
+
     public UnitState getStartState(){
         return null;
     }
-
-    public void drawUnder(BaseUnit unit){}
 
     public boolean isFlying(){
         return isFlying;
@@ -83,6 +86,7 @@ public abstract class UnitType {
 
         updateTargeting(unit);
 
+        unit.state.update(unit);
         unit.updateVelocityStatus(drag, maxVelocity);
 
         if(unit.target != null) behavior(unit);
@@ -95,7 +99,8 @@ public abstract class UnitType {
     public abstract void behavior(BaseUnit unit);
 
     public void updateTargeting(BaseUnit unit){
-        if(unit.target == null || (unit.target instanceof Unit && (((Unit)unit.target).isDead() || ((Unit)unit.target).team == unit.team))){
+        if(unit.target == null || (unit.target instanceof Unit && (((Unit)unit.target).isDead() || ((Unit)unit.target).team == unit.team))
+                || (unit.target instanceof TileEntity && ((TileEntity) unit.target).tile.entity == null)){
             unit.target = null;
         }
     }

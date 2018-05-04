@@ -51,7 +51,6 @@ public class ChatFragment extends Table implements Fragment{
 
         setVisible(() -> !state.is(State.menu) && Net.active());
 
-        //TODO put it in input?
         update(() -> {
             if(!Net.active() && chatOpen){
                 hide();

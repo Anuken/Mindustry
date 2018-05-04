@@ -241,7 +241,7 @@ public class Administration {
         public String validAdminIP;
         public Array<String> ips = new Array<>();
         public Array<String> names = new Array<>();
-        public int timesKicked; //TODO not implemented!
+        public int timesKicked;
         public int timesJoined;
         public int totalBlockPlaced;
         public int totalBlocksBroken;

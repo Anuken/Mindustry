@@ -59,9 +59,6 @@ public class ProductionBlocks {
 
     plasmadrill = new Drill("plasmadrill") {{
         heatColor = Color.valueOf("ff461b");
-        //TODO
-        //inputLiquid = Liquids.plasma;
-        //liquidRequired = true;
         drillTime = 110;
         size = 4;
         powerUse = 0.7f;

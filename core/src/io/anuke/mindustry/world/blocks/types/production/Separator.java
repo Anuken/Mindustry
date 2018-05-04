@@ -53,8 +53,6 @@ public class Separator extends Block {
         Draw.reset();
     }
 
-    //TODO draw with effects such as spinning
-
     @Override
     public void update(Tile tile) {
         GenericCrafterEntity entity = tile.entity();

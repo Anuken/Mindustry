@@ -3,12 +3,9 @@ package io.anuke.mindustry.ui.dialogs;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.ui.PressGroup;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.builders.imagebutton;
-import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
@@ -78,8 +75,6 @@ public class PausedDialog extends FloatingDialog{
 		}else{
 			build.begin(content());
 			
-			PressGroup group = new PressGroup();
-			
 			content().defaults().size(120f).pad(5);
 			float isize = 14f*4;
 			
@@ -113,12 +108,6 @@ public class PausedDialog extends FloatingDialog{
 					hide();
 				});
 			}).text("Quit").padTop(4f);
-			
-			for(Element e : content().getChildren()){
-				if(e instanceof ImageButton){
-					group.add((ImageButton)e);
-				}
-			}
 			
 			build.end();
 		}

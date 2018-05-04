@@ -67,9 +67,9 @@ public class DebugFragment implements Fragment {
                row();
                new button("death", () -> player.damage(99999, false));
                row();
-               new button("spawn1", () -> new BaseUnit(UnitTypes.vtol, Team.red).set(player.x, player.y).add());
+               new button("spawnf", () -> new BaseUnit(UnitTypes.drone, player.team).set(player.x, player.y).add());
                row();
-               new button("spawn2", () -> new BaseUnit(UnitTypes.scout, Team.red).set(player.x, player.y).add());
+               new button("spawng", () -> new BaseUnit(UnitTypes.scout, player.team).set(player.x, player.y).add());
                row();
            }}.end();
 

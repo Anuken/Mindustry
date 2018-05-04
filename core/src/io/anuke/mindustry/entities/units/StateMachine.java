@@ -13,4 +13,8 @@ public class StateMachine {
         this.state = next;
         if(next != null) next.entered(unit);
     }
+
+    public boolean is(UnitState state){
+        return this.state == state;
+    }
 }
