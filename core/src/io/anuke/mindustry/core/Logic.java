@@ -137,7 +137,7 @@ public class Logic extends Module {
                             world.pathfinder().resetPaths();
                             state.lastUpdated = state.wave + 1;
                         }
-                    }else{
+                    }else if(!world.getMap().name.equals("tutorial")){
                         state.extrawavetime -= delta();
                     }
                 }
