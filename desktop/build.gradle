@@ -84,7 +84,7 @@ task packrCmd() {
 
         exec {
 
-            commandLine "java", "-jar", PACKR_DIR + "packr.jar",
+            commandLine("java", "-jar", PACKR_DIR + "packr.jar",
                     "--verbose",
                     "--bundle", getPackage(),
                     "--platform", getPlatform(),
@@ -93,7 +93,8 @@ task packrCmd() {
                     "--mainclass", project.ext.mainClassName,
                     "--jdk", PACKR_DIR + "jdk-" + getPlatform() + ".zip",
                     "--icon", ICON_DIR.getAbsolutePath(),
-                    "--classpath", "--", PACKR_DIR + "config.json"
+                    "--vmargs", (getPlatform().equals("mac") ? "XstartOnFirstThread" : "Xms256m"),
+                    "--classpath", "--", PACKR_DIR + "config.json")
         }
     }
 }
