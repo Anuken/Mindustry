@@ -9,7 +9,7 @@ public class Items {
     stone = new Item("stone", Color.valueOf("777777")) {
         {
             material = false;
-            hardness = 2;
+            hardness = 3;
         }
     },
     iron = new Item("iron", Color.valueOf("bc8271")){
@@ -62,6 +62,13 @@ public class Items {
         {
             material = false;
             fluxiness = 0.5f;
+        }
+    },
+    rdx = new Item("rdx", Color.valueOf("e3d39e")){
+        {
+            material = false;
+            flammability = 0.2f;
+            explosiveness = 0.6f;
         }
     };
 }
