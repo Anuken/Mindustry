@@ -267,15 +267,15 @@ public class Renderer extends RendererModule{
 	       if(!player.isLocal && !player.isDead()){
 	        	layout.setText(Core.font, player.name);
 				Draw.color(0f, 0f, 0f, 0.3f);
-				Draw.rect("blank", player.x, player.y + 8 - layout.height/2, layout.width + 2, layout.height + 2);
+				Draw.rect("blank", player.getDrawPosition().x, player.getDrawPosition().y + 8 - layout.height/2, layout.width + 2, layout.height + 2);
 				Draw.color();
 				Draw.tcolor(player.getColor());
-	            Draw.text(player.name, player.x, player.y + 8);
+	            Draw.text(player.name, player.getDrawPosition().x, player.getDrawPosition().y + 8);
 
 	            if(player.isAdmin){
 	            	Draw.color(player.getColor());
 	            	float s = 3f;
-					Draw.rect("icon-admin-small", player.x + layout.width/2f + 2 + 1, player.y + 7f, s, s);
+					Draw.rect("icon-admin-small", player.getDrawPosition().x + layout.width/2f + 2 + 1, player.getDrawPosition().y + 7f, s, s);
 				}
 				Draw.reset();
            }

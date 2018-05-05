@@ -122,6 +122,8 @@ public abstract class SyncEntity extends DestructibleEntity{
 
             time += 1f / spacing * Math.min(Timers.delta(), 1f);
 
+            time = Mathf.clamp(time, 0, 2f);
+
             Mathf.lerp2(pos.set(last), target, time);
 
             angle = Mathf.slerpDelta(angle, targetrot, 0.6f);

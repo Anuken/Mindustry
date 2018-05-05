@@ -3,7 +3,6 @@ package io.anuke.mindustry.world.blocks.types.distribution;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidBlock;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 
 public class LiquidJunction extends Conduit{
@@ -26,10 +25,8 @@ public class LiquidJunction extends Conduit{
 		dir = (dir+4)%4;
 		Tile to = tile.getNearby(dir);
 
-		Timers.run(20f, () -> {
-			if(to.block() instanceof LiquidBlock && ((LiquidBlock)to.block()).acceptLiquid(to, tile, liquid, amount))
-				((LiquidBlock)to.block()).handleLiquid(to, tile, liquid, amount);
-		});
+		if(to.block() instanceof LiquidBlock && ((LiquidBlock)to.block()).acceptLiquid(to, tile, liquid, amount))
+			((LiquidBlock)to.block()).handleLiquid(to, tile, liquid, amount);
 	}
 
 	@Override
