@@ -48,7 +48,7 @@ public class HudFragment implements Fragment{
 					flip = new imagebutton("icon-arrow-up", isize, () -> toggleMenus()).get();
 
 					update(t -> {
-						if(Inputs.keyTap("toggle_menus")){
+						if(Inputs.keyTap("toggle_menus") && !ui.chatfrag.chatOpen()){
 							toggleMenus();
 						}
 					});
