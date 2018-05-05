@@ -177,8 +177,8 @@ public class NetServer extends Module{
             if(!Timers.get("fastshoot-" + id + "-" + weapon.id, wtrc)){
                 info.fastShots.getAndIncrement(weapon.id, 0, 1);
 
-                if(info.fastShots.get(weapon.id, 0) > (int)(wtrc / (weapon.getReload() / 2f)) + 8){
-                    kick(id, KickReason.kick);
+                if(info.fastShots.get(weapon.id, 0) > (int)(wtrc / (weapon.getReload() / 2f)) + 30){
+                    kick(id, KickReason.fastShoot);
                 }
             }else{
                 info.fastShots.put(weapon.id, 0);
@@ -279,6 +279,7 @@ public class NetServer extends Module{
         });
 
         Net.handleServer(EntityRequestPacket.class, (cid, packet) -> {
+
             int id = packet.id;
             int dest = cid;
             EntityGroup group = Entities.getGroup(packet.group);
