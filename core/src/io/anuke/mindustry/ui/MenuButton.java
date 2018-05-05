@@ -1,6 +1,7 @@
 package io.anuke.mindustry.ui;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Align;
 import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.scene.ui.TextButton;
 
@@ -27,7 +28,7 @@ public class MenuButton extends TextButton{
 
 
 		table(t -> {
-			t.add(text);
+			t.add(text).wrap().growX().get().setAlignment(Align.center, Align.left);
 			if(description != null){
 				t.row();
 				t.add(description).color(Color.LIGHT_GRAY);
