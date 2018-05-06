@@ -158,7 +158,7 @@ public class Packets {
         }
     }
 
-    public static class EntityShootPacket implements Packet{
+    public static class EntityShootPacket implements Packet, UnimportantPacket{
         public float x, y, rotation;
         public short bulletid;
         public byte groupid;
@@ -350,7 +350,7 @@ public class Packets {
     }
 
     public enum KickReason{
-        kick, invalidPassword, clientOutdated, serverOutdated, banned, gameover(true), recentKick, nameInUse, idInUse;
+        kick, invalidPassword, clientOutdated, serverOutdated, banned, gameover(true), recentKick, nameInUse, idInUse, fastShoot;
         public final boolean quiet;
 
         KickReason(){ quiet = false; }

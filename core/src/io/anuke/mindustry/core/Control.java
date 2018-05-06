@@ -103,7 +103,7 @@ public class Control extends Module{
 
 		Sounds.setFalloff(9000f);
 
-		Musics.load("1.mp3", "2.mp3", "3.mp3", "4.mp3", "5.mp3", "6.mp3");
+		Musics.load("1.mp3", "2.mp3", "3.mp3", "4.mp3");
 
         DefaultKeybinds.load();
 
@@ -188,6 +188,11 @@ public class Control extends Module{
 		});
 	}
 
+	//FIXME figure out what's causing this problem in the first place
+	public void triggerInputUpdate(){
+		Gdx.input = proxy;
+	}
+
 	public void setError(Throwable error){
 		this.error = error;
 	}
@@ -266,9 +271,7 @@ public class Control extends Module{
 			throw new RuntimeException(error);
 		}
 
-        if(Gdx.input != proxy){
-            Gdx.input = proxy;
-        }
+		Gdx.input = proxy;
 
         if(Inputs.keyTap("console")){
 			console = !console;
@@ -292,16 +295,21 @@ public class Control extends Module{
                 controly -= ya*baseControllerSpeed*scl;
                 controlling = true;
 
+                Gdx.input.setCursorCatched(true);
+
 				Inputs.getProcessor().touchDragged(Gdx.input.getX(), Gdx.input.getY(), 0);
             }
 
             controlx = Mathf.clamp(controlx, 0, Gdx.graphics.getWidth());
             controly = Mathf.clamp(controly, 0, Gdx.graphics.getHeight());
 
-            if(Gdx.input.getDeltaX() > 1 || Gdx.input.getDeltaY() > 1)
-                controlling = false;
+            if(Gdx.input.getDeltaX() > 1 || Gdx.input.getDeltaY() > 1) {
+				controlling = false;
+				Gdx.input.setCursorCatched(false);
+			}
         }else{
             controlling = false;
+			Gdx.input.setCursorCatched(false);
         }
 
         if(!controlling){

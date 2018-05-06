@@ -181,6 +181,11 @@ public class Tile implements Position{
 		Block floor = floor();
 		return isLinked() || !((floor.solid && (block == Blocks.air || block.solidifes)) || (block.solid && (!block.destructible && !block.update)));
 	}
+
+	public boolean synthetic(){
+		Block block = block();
+		return block.update || block.destructible;
+	}
 	
 	public boolean solid(){
 		Block block = block();

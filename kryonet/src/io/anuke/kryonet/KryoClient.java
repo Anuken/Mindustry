@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.esotericsoftware.kryonet.*;
 import com.esotericsoftware.kryonet.Listener.LagListener;
+import com.esotericsoftware.minlog.Log;
 import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.ClientProvider;
@@ -70,6 +71,7 @@ public class KryoClient implements ClientProvider{
                 Disconnect c = new Disconnect();
 
                 Gdx.app.postRunnable(() -> Net.handleClientReceived(c));
+                if(connection.getLastProtocolError() != null) Log.error("\n\n\n\nProtocol error: " + connection.getLastProtocolError() + "\n\n\n\n");
             }
 
             @Override
@@ -80,6 +82,7 @@ public class KryoClient implements ClientProvider{
                     try{
                         Net.handleClientReceived(object);
                     }catch (Exception e){
+                        e.printStackTrace();
                         if(e instanceof KryoNetException && e.getMessage() != null && e.getMessage().toLowerCase().contains("incorrect")) {
                             Net.showError("$text.server.mismatch");
                             netClient.disconnectQuietly();
@@ -159,11 +162,7 @@ public class KryoClient implements ClientProvider{
                 ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
                 Host host = NetworkIO.readServerData(packet.getAddress().getHostAddress(), buffer);
 
-                if (host != null) {
-                    Gdx.app.postRunnable(() -> valid.accept(host));
-                } else {
-                    Gdx.app.postRunnable(() -> invalid.accept(new IOException("Outdated server.")));
-                }
+                Gdx.app.postRunnable(() -> valid.accept(host));
             } catch (Exception e) {
                 Gdx.app.postRunnable(() -> invalid.accept(e));
             }

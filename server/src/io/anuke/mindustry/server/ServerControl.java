@@ -11,13 +11,10 @@ import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.Version;
+import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.NetConnection;
-import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.net.Packets.ChatPacket;
 import io.anuke.mindustry.net.Packets.KickReason;
-import io.anuke.mindustry.net.TraceInfo;
 import io.anuke.mindustry.ui.fragments.DebugFragment;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
@@ -251,7 +248,7 @@ public class ServerControl extends Module {
             }
         });
 
-        handler.register("friendlyfire", "<on/off>", "Enable or disable friendly fire", arg -> {
+        handler.register("friendlyfire", "<on/off>", "Enable or disable friendly fire.", arg -> {
             String s = arg[0];
             if(s.equalsIgnoreCase("on")){
                 NetEvents.handleFriendlyFireChange(true);
@@ -263,6 +260,35 @@ public class ServerControl extends Module {
                 info("Friendly fire disabled.");
             }else{
                 err("Incorrect command usage.");
+            }
+        });
+
+        handler.register("antigrief", "[on/off] [max-break] [cooldown-in-ms]", "Enable or disable anti-grief.", arg -> {
+            if(arg.length == 0){
+                info("Anti-grief is currently &lc{0}.", netServer.admins.isAntiGrief() ? "on" : "off");
+                return;
+            }
+
+            String s = arg[0];
+            if(s.equalsIgnoreCase("on")){
+                netServer.admins.setAntiGrief(true);
+                info("Anti-grief enabled.");
+            }else if(s.equalsIgnoreCase("off")){
+                netServer.admins.setAntiGrief(false);
+                info("Anti-grief disabled.");
+            }else{
+                err("Incorrect command usage.");
+            }
+
+            if(arg.length >= 2) {
+                try {
+                    int maxbreak = Integer.parseInt(arg[1]);
+                    int cooldown = (arg.length >= 3 ? Integer.parseInt(arg[2]) : Administration.defaultBreakCooldown);
+                    netServer.admins.setAntiGriefParams(maxbreak, cooldown);
+                    info("Anti-grief parameters set.");
+                } catch (NumberFormatException e) {
+                    err("Invalid number format.");
+                }
             }
         });
 

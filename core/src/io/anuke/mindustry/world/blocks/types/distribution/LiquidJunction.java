@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.LiquidBlock;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 
 public class LiquidJunction extends LiquidBlock{
@@ -30,10 +29,8 @@ public class LiquidJunction extends LiquidBlock{
 		dir = (dir+4)%4;
 		Tile to = tile.getNearby(dir);
 
-		Timers.run(20f, () -> {
-			if(to.block().hasLiquids && to.block().acceptLiquid(to, tile, liquid, amount))
-				to.block().handleLiquid(to, tile, liquid, amount);
-		});
+        if(to.block().hasLiquids && to.block().acceptLiquid(to, tile, liquid, amount))
+            to.block().handleLiquid(to, tile, liquid, amount);
 	}
 
 	@Override

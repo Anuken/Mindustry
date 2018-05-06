@@ -64,7 +64,9 @@ public class PlayerListFragment implements Fragment{
 
             update(t -> {
                 if(!mobile){
-                    visible = Inputs.keyDown("player_list");
+                    if(Inputs.keyTap("player_list")){
+                        visible = !visible;
+                    }
                 }
                 if(!(Net.active() && !state.is(State.menu))){
                     visible = false;

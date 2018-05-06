@@ -24,13 +24,14 @@ public class DefaultKeybinds {
             "dash", Input.SHIFT_LEFT,
             "rotate_alt", new Axis(Input.R, Input.E),
             "rotate", new Axis(Input.SCROLL),
+            "toggle_menus", Input.C,
             "block_info", Input.CONTROL_LEFT,
             "player_list", Input.TAB,
+            "item_withdraw", Input.SHIFT_LEFT,
             "chat", Input.ENTER,
             "chat_history_prev", Input.UP,
             "chat_history_next", Input.DOWN,
             "chat_scroll", new Axis(Input.SCROLL),
-            "item_withdraw", Input.SHIFT_LEFT,
             "console", Input.GRAVE,
             "weapon_1", Input.NUM_1,
             "weapon_2", Input.NUM_2,
@@ -41,7 +42,7 @@ public class DefaultKeybinds {
         );
 
         KeyBinds.defaults(
-            DeviceType.controller,
+                DeviceType.controller,
             "move_x", new Axis(Input.CONTROLLER_L_STICK_HORIZONTAL_AXIS),
             "move_y", new Axis(Input.CONTROLLER_L_STICK_VERTICAL_AXIS),
             "cursor_x", new Axis(Input.CONTROLLER_R_STICK_HORIZONTAL_AXIS),

@@ -35,6 +35,7 @@ import static io.anuke.mindustry.Vars.*;
 public class NetClient extends Module {
     private final static float dataTimeout = 60*18;
     private final static float playerSyncTime = 2;
+    private final static int maxRequests = 50;
 
     private Timer timer = new Timer(5);
     /**Whether the client is currently conencting.*/
@@ -47,6 +48,7 @@ public class NetClient extends Module {
     private IntMap<SyncEntity> recent = new IntMap<>();
     /**Counter for data timeout.*/
     private float timeoutTime = 0f;
+    private int requests = 0;
 
     public NetClient(){
 
@@ -125,11 +127,12 @@ public class NetClient extends Module {
                 if(entity instanceof BaseUnit) enemies ++;
 
                 if (entity == null || id == player.id) {
-                    if (id != player.id) {
+                    if (id != player.id && requests < maxRequests) {
                         EntityRequestPacket req = new EntityRequestPacket();
                         req.id = id;
                         req.group = groupid;
                         Net.send(req, SendMode.udp);
+                        requests ++;
                     }
                     data.position(data.position() + writesize);
                 } else {
@@ -322,6 +325,7 @@ public class NetClient extends Module {
     }
 
     void sync(){
+        requests = 0;
 
         if(timer.get(0, playerSyncTime)){
             PositionPacket packet = new PositionPacket();
