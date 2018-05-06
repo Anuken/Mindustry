@@ -14,6 +14,7 @@ import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Placement;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
@@ -199,6 +200,14 @@ public class NetServer extends Module{
 
             if(recipe == null) return;
 
+            Tile tile = world.tile(packet.x, packet.y);
+            if(tile.synthetic() && !admins.validateBreak(admins.getTrace(Net.getConnection(id).address).uuid, Net.getConnection(id).address)){
+                if(Timers.get("break-message-" + id, 120)){
+                    sendMessageTo(id, "[scarlet]Anti-grief: you are replacing blocks too quickly. wait until replacing again.");
+                }
+                return;
+            }
+
             state.inventory.removeItems(recipe.requirements);
 
             Placement.placeBlock(packet.x, packet.y, block, packet.rotation, true, false);
@@ -214,6 +223,15 @@ public class NetServer extends Module{
             packet.playerid = connections.get(id).id;
 
             if(!Placement.validBreak(packet.x, packet.y)) return;
+
+            Tile tile = world.tile(packet.x, packet.y);
+
+            if(tile.synthetic() && !admins.validateBreak(admins.getTrace(Net.getConnection(id).address).uuid, Net.getConnection(id).address)){
+                if(Timers.get("break-message-" + id, 120)){
+                    sendMessageTo(id, "[scarlet]Anti-grief: you are breaking blocks too quickly. wait until breaking again.");
+                }
+                return;
+            }
 
             Block block = Placement.breakBlock(packet.x, packet.y, true, false);
 
@@ -374,6 +392,12 @@ public class NetServer extends Module{
         Timers.runTask(2f, con::close);
 
         admins.save();
+    }
+
+    void sendMessageTo(int id, String message){
+        ChatPacket packet = new ChatPacket();
+        packet.text = message;
+        Net.sendTo(id, packet, SendMode.tcp);
     }
 
     void sync(){

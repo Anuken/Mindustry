@@ -3,9 +3,13 @@ package io.anuke.mindustry.net;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.ucore.core.Settings;
 
 public class Administration {
+    public static final int defaultMaxBrokenBlocks = 15;
+    public static final int defaultBreakCooldown = 1000*15;
+
     private Json json = new Json();
     /**All player info. Maps UUIDs to info. This persists throughout restarts.*/
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
@@ -14,10 +18,66 @@ public class Administration {
     private Array<String> bannedIPs = new Array<>();
 
     public Administration(){
-        Settings.defaults("playerInfo", "{}");
-        Settings.defaults("bannedIPs", "{}");
+        Settings.defaultList(
+            "playerInfo", "{}",
+            "bannedIPs", "{}",
+            "antigrief", false,
+            "antigrief-max", defaultMaxBrokenBlocks,
+            "antigrief-cooldown", defaultBreakCooldown
+        );
 
         load();
+    }
+
+    public boolean isAntiGrief(){
+        return Settings.getBool("antigrief");
+    }
+
+    public void setAntiGrief(boolean antiGrief){
+        Settings.putBool("antigrief", antiGrief);
+        Settings.save();
+    }
+
+    public void setAntiGriefParams(int maxBreak, int cooldown){
+        Settings.putInt("antigrief-max", maxBreak);
+        Settings.putInt("antigrief-cooldown", cooldown);
+        Settings.save();
+    }
+
+    public boolean validateBreak(String id, String ip){
+        if(!isAntiGrief() || isAdmin(id, ip)) return true;
+
+        PlayerInfo info = getCreateInfo(id);
+
+        if(info.lastBroken == null || info.lastBroken.length != Settings.getInt("antigrief-max")){
+            info.lastBroken = new long[Settings.getInt("antigrief-max")];
+        }
+
+        long[] breaks = info.lastBroken;
+
+        int shiftBy = 0;
+        for(int i = 0; i < breaks.length && breaks[i] != 0; i ++){
+            if(TimeUtils.timeSinceMillis(breaks[i]) >= Settings.getInt("antigrief-cooldown")){
+                shiftBy = i;
+            }
+        }
+
+        for (int i = 0; i < breaks.length; i++) {
+            breaks[i] = (i + shiftBy >= breaks.length) ? 0 : breaks[i + shiftBy];
+        }
+
+        int remaining = 0;
+        for(int i = 0; i < breaks.length; i ++){
+            if(breaks[i] == 0){
+                remaining = breaks.length - i;
+                break;
+            }
+        }
+
+        if(remaining == 0) return false;
+
+        breaks[breaks.length - remaining] = TimeUtils.millis();
+        return true;
     }
 
     /**Call when a player joins to update their information here.*/
@@ -247,6 +307,8 @@ public class Administration {
         public int totalBlocksBroken;
         public boolean banned, admin;
         public long lastKicked; //last kicked timestamp
+
+        public long[] lastBroken;
 
         PlayerInfo(String id){
             this.id = id;
