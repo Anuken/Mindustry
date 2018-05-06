@@ -33,6 +33,10 @@ public class Administration {
         return Settings.getBool("antigrief");
     }
 
+    public boolean isValidateReplace(){
+        return false;
+    }
+
     public void setAntiGrief(boolean antiGrief){
         Settings.putBool("antigrief", antiGrief);
         Settings.save();

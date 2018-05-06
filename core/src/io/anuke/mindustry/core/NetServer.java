@@ -201,7 +201,7 @@ public class NetServer extends Module{
             if(recipe == null) return;
 
             Tile tile = world.tile(packet.x, packet.y);
-            if(tile.synthetic() && !admins.validateBreak(admins.getTrace(Net.getConnection(id).address).uuid, Net.getConnection(id).address)){
+            if(tile.synthetic() && admins.isValidateReplace() && !admins.validateBreak(admins.getTrace(Net.getConnection(id).address).uuid, Net.getConnection(id).address)){
                 if(Timers.get("break-message-" + id, 120)){
                     sendMessageTo(id, "[scarlet]Anti-grief: you are replacing blocks too quickly. wait until replacing again.");
                 }
