@@ -18,10 +18,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.BiConsumer;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
-import io.anuke.ucore.util.Translator;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -151,14 +148,14 @@ public abstract class Turret extends Block{
 			    float speed = type.bullet.speed;
 			    if(speed < 0.1f) speed = 9999999f;
 				
-				float targetRot = Angles.predictAngle(tile.worldx(), tile.worldy(), 
-						entity.target.x, entity.target.y, entity.target.velocity.x, entity.target.velocity.y, speed);
+				float targetRot = Predict.intercept(tile.drawx(), tile.drawy(),
+						entity.target.x, entity.target.y, entity.target.velocity.x, entity.target.velocity.y, speed)
+						.sub(tile.drawx(), tile.drawy()).angle();
 				
 				if(Float.isNaN(entity.rotation)){
 					entity.rotation = 0;
 				}
-				entity.rotation = Mathf.slerpDelta(entity.rotation, targetRot,
-						rotatespeed);
+				entity.rotation = Angles.moveToward(entity.rotation, targetRot, 5f * Timers.delta());
 
 				if(Angles.angleDist(entity.rotation, targetRot) < shootCone){
 					updateShooting(tile);

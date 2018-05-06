@@ -21,6 +21,7 @@ import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Placement;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BaseBulletType;
 import io.anuke.ucore.entities.Entities;
@@ -203,7 +204,7 @@ public class NetServer extends Module{
             if(recipe == null || recipe.debugOnly != debug) return;
 
             Tile tile = world.tile(packet.x, packet.y);
-            if(tile.synthetic() && admins.isValidateReplace() && !admins.validateBreak(admins.getTrace(Net.getConnection(id).address).uuid, Net.getConnection(id).address)){
+            if(tile.synthetic() && admins.isValidateReplace() && !admins.validateBreak(placer.uuid, Net.getConnection(id).address)){
                 if(Timers.get("break-message-" + id, 120)){
                     sendMessageTo(id, "[scarlet]Anti-grief: you are replacing blocks too quickly. wait until replacing again.");
                 }
@@ -231,7 +232,7 @@ public class NetServer extends Module{
 
             Tile tile = world.tile(packet.x, packet.y);
 
-            if(tile.synthetic() && !admins.validateBreak(admins.getTrace(Net.getConnection(id).address).uuid, Net.getConnection(id).address)){
+            if(tile.synthetic() && !admins.validateBreak(placer.uuid, Net.getConnection(id).address)){
                 if(Timers.get("break-message-" + id, 120)){
                     sendMessageTo(id, "[scarlet]Anti-grief: you are breaking blocks too quickly. wait until breaking again.");
                 }
