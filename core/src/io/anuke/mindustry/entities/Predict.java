@@ -7,6 +7,8 @@ public class Predict {
     private static Vector2 vec = new Vector2();
     private static Vector2 vresult = new Vector2();
 
+    /**Returns resulting predicted vector.
+     * Don't call from multiple threads, ever.*/
     public static Vector2 intercept(float srcx, float srcy, float dstx, float dsty, float dstvx, float dstvy, float v) {
         float tx = dstx - srcx,
                 ty = dsty - srcy,
@@ -19,7 +21,7 @@ public class Predict {
         float c = tx*tx + ty*ty;
 
         // Solve quadratic
-        Vector2 ts = quad(a, b, c); // See quad(), below
+        Vector2 ts = quad(a, b, c);
 
         // Find smallest positive solution
         Vector2 sol = vresult.set(0, 0);
@@ -36,10 +38,7 @@ public class Predict {
     }
 
 
-    /**
-     * Return solutions for quadratic
-     */
-    public static Vector2 quad(float a, float b, float c) {
+    private static Vector2 quad(float a, float b, float c) {
         Vector2 sol = null;
         if (Math.abs(a) < 1e-6) {
             if (Math.abs(b) < 1e-6) {
