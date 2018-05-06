@@ -9,6 +9,7 @@ import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.scene.event.ClickListener;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.Touchable;
@@ -85,6 +86,7 @@ public class LevelDialog extends FloatingDialog{
 		sdif.addImageButton("icon-arrow-right", 10*3, () -> {
 			state.difficulty = (ds[Mathf.mod(state.difficulty.ordinal() + 1, ds.length)]);
 		}).width(s);
+		sdif.addButton("?", this::displayDifficultyHelp).size(50f, 54f).padLeft(18f);
 
 		content().add(sdif);
 		content().row();
@@ -168,18 +170,34 @@ public class LevelDialog extends FloatingDialog{
 	}
 
 	private void displayGameModeHelp() {
-		FloatingDialog d = new FloatingDialog(Bundles.get("mode.text.help.title"));
+		displayHelp("mode.text.help.title", this::displayGameModeHelpValues);
+	}
+
+	private void displayGameModeHelpValues(Table table) {
+		for(GameMode mode : GameMode.values()){
+			table.labelWrap("[accent]" + mode.toString() + ":[] [lightgray]" + mode.description()).width(600f);
+			table.row();
+		}
+	}
+
+	private void displayDifficultyHelp() {
+		displayHelp("setting.difficulty.text.help.title", this::displayDifficultyHelpValue);
+	}
+
+	private void displayDifficultyHelpValue(Table table) {
+		table.labelWrap(Bundles.get("setting.difficulty.text.help.description")).width(600f);
+	}
+
+	private void displayHelp(String title, Consumer<Table> cons) {
+		FloatingDialog d = new FloatingDialog(Bundles.get(title));
 		d.setFillParent(false);
 		Table table = new Table();
 		table.defaults().pad(1f);
 		ScrollPane pane = new ScrollPane(table, "clear");
 		pane.setFadeScrollBars(false);
 		table.row();
-		for(GameMode mode : GameMode.values()){
-			table.labelWrap("[accent]" + mode.toString() + ":[] [lightgray]" + mode.description()).width(600f);
-			table.row();
-		}
-
+		cons.accept(table);
+		table.row();
 		d.content().add(pane);
 		d.buttons().addButton("$text.ok", d::hide).size(110, 50).pad(10f);
 		d.show();
