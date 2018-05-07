@@ -29,8 +29,7 @@ public class TeamInfo {
     /**Register a team.
      * @param team The team type enum.
      * @param ally Whether this team is an ally with the player or an enemy with the player.
-     *             In PvP situations with dedicated servers, the sides can be arbitrary.
-     */
+     *             In PvP situations with dedicated servers, the sides can be arbitrary.*/
     public void add(Team team, boolean ally){
         if(has(team)) throw new RuntimeException("Can't define team information twice!");
 
