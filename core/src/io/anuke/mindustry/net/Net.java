@@ -8,6 +8,7 @@ import com.badlogic.gdx.net.HttpRequestBuilder;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
@@ -55,6 +56,7 @@ public class Net{
 			for(int i = 0; i < packetQueue.size; i ++){
                 Log.info("Processing {0} packet post-load.", ClassReflection.getSimpleName(packetQueue.get(i).getClass()));
 				handleClientReceived(packetQueue.get(i));
+				Pools.free(packetQueue.get(i));
 			}
 		}
 		//clear inbound packet queue
@@ -182,9 +184,12 @@ public class Net{
 			if(clientLoaded || object instanceof ImportantPacket){
 				if(clientListeners.get(object.getClass()) != null) clientListeners.get(object.getClass()).accept(object);
 				if(listeners.get(object.getClass()) != null) listeners.get(object.getClass()).accept(object);
+				Pools.free(object);
 			}else if(!(object instanceof UnimportantPacket)){
 				packetQueue.add(object);
 				Log.info("Queuing packet {0}.", ClassReflection.getSimpleName(object.getClass()));
+			}else{
+				Pools.free(object);
 			}
 		}else{
 			Log.err("Unhandled packet type: '{0}'!", ClassReflection.getSimpleName(object.getClass()));
@@ -198,6 +203,7 @@ public class Net{
 		if(serverListeners.get(object.getClass()) != null || listeners.get(object.getClass()) != null){
 			if(serverListeners.get(object.getClass()) != null) serverListeners.get(object.getClass()).accept(connection, object);
 			if(listeners.get(object.getClass()) != null) listeners.get(object.getClass()).accept(object);
+			Pools.free(object);
 		}else{
 			Log.err("Unhandled packet type: '{0}'!", ClassReflection.getSimpleName(object.getClass()));
 		}

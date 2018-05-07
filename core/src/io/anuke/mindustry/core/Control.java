@@ -113,7 +113,6 @@ public class Control extends Module{
 			"name", mobile || gwt ? "player" : UCore.getProperty("user.name"),
 			"servers", "",
 			"color", Color.rgba8888(playerColors[8]),
-			"lastVersion", "3.2",
 			"lastBuild", 0
 		);
 

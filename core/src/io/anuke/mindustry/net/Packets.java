@@ -328,6 +328,8 @@ public class Packets {
                 byte[] n = new byte[nlength];
                 buffer.get(n);
                 name = new String(n);
+            }else{
+                name = null;
             }
 
             text = IOUtils.readString(buffer);
@@ -531,8 +533,7 @@ public class Packets {
         @Override
         public void write(ByteBuffer buffer) {
             buffer.putInt(info.playerid);
-            buffer.putShort((short)info.ip.getBytes().length);
-            buffer.put(info.ip.getBytes());
+            IOUtils.writeString(buffer, info.ip);
             buffer.put(info.modclient ? (byte)1 : 0);
             buffer.put(info.android ? (byte)1 : 0);
 
@@ -548,11 +549,9 @@ public class Packets {
         @Override
         public void read(ByteBuffer buffer) {
             int id = buffer.getInt();
-            short iplen = buffer.getShort();
-            byte[] ipb = new byte[iplen];
-            buffer.get(ipb);
+            String ip = IOUtils.readString(buffer);
 
-            info = new TraceInfo(new String(ipb));
+            info = new TraceInfo(ip);
 
             info.playerid = id;
             info.modclient = buffer.get() == 1;
