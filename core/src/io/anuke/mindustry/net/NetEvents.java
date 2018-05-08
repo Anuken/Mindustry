@@ -1,5 +1,6 @@
 package io.anuke.mindustry.net;
 
+import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
@@ -16,7 +17,7 @@ import static io.anuke.mindustry.Vars.*;
 public class NetEvents {
 
     public static void handleFriendlyFireChange(boolean enabled){
-        FriendlyFireChangePacket packet = new FriendlyFireChangePacket();
+        FriendlyFireChangePacket packet = Pools.obtain(FriendlyFireChangePacket.class);
         packet.enabled = enabled;
 
         netCommon.sendMessage(enabled ? "[accent]Friendly fire enabled." : "[accent]Friendly fire disabled.");
@@ -25,57 +26,57 @@ public class NetEvents {
     }
 
     public static void handleGameOver(){
-        Net.send(new GameOverPacket(), SendMode.tcp);
+        Net.send(Pools.obtain(GameOverPacket.class), SendMode.tcp);
     }
 
     public static void handleUnitDeath(Unit entity){
-        EntityDeathPacket packet = new EntityDeathPacket();
+        EntityDeathPacket packet = Pools.obtain(EntityDeathPacket.class);
         packet.id = entity.id;
         packet.group = (byte)entity.getGroup().getID();
         Net.send(packet, SendMode.tcp);
     }
 
     public static void handleBlockDestroyed(TileEntity entity){
-        BlockDestroyPacket packet = new BlockDestroyPacket();
+        BlockDestroyPacket packet = Pools.obtain(BlockDestroyPacket.class);
         packet.position = entity.tile.packedPosition();
         Net.send(packet, SendMode.tcp);
     }
 
     public static void handleBlockDamaged(TileEntity entity){
-        BlockUpdatePacket packet = new BlockUpdatePacket();
+        BlockUpdatePacket packet = Pools.obtain(BlockUpdatePacket.class);
         packet.health = (int)entity.health;
         packet.position = entity.tile.packedPosition();
         Net.send(packet, SendMode.udp);
     }
 
     public static void handleBlockConfig(Tile tile, byte data){
-        BlockConfigPacket packet = new BlockConfigPacket();
+        BlockConfigPacket packet = Pools.obtain(BlockConfigPacket.class);
         packet.data = data;
         packet.position = tile.packedPosition();
         Net.send(packet, SendMode.tcp);
     }
 
     public static void handleBlockTap(Tile tile){
-        BlockTapPacket packet = new BlockTapPacket();
+        BlockTapPacket packet = Pools.obtain(BlockTapPacket.class);
         packet.position = tile.packedPosition();
         Net.send(packet, SendMode.tcp);
     }
 
     public static void handleWeaponSwitch(){
-        WeaponSwitchPacket packet = new WeaponSwitchPacket();
+        WeaponSwitchPacket packet = Pools.obtain(WeaponSwitchPacket.class);
         packet.weapon = Vars.player.weapon.id;
         packet.playerid = Vars.player.id;
         Net.send(packet, SendMode.tcp);
     }
 
     public static void handleUpgrade(Weapon weapon){
-        UpgradePacket packet = new UpgradePacket();
+        UpgradePacket packet = Pools.obtain(UpgradePacket.class);
         packet.id = weapon.id;
         Net.send(packet, SendMode.tcp);
     }
 
     public static void handleSendMessage(String message){
-        ChatPacket packet = new ChatPacket();
+        ChatPacket packet = Pools.obtain(ChatPacket.class);
         packet.text = message;
         packet.name = player.name;
         packet.id = player.id;
@@ -87,7 +88,7 @@ public class NetEvents {
     }
 
     public static void handleShoot(SyncEntity entity, float x, float y, float angle, short data){
-        EntityShootPacket packet = new EntityShootPacket();
+        EntityShootPacket packet = Pools.obtain(EntityShootPacket.class);
         packet.groupid = (byte)entity.getGroup().getID();
         packet.x = x;
         packet.y = y;
@@ -98,7 +99,7 @@ public class NetEvents {
     }
 
     public static void handlePlace(int x, int y, Block block, int rotation){
-        PlacePacket packet = new PlacePacket();
+        PlacePacket packet = Pools.obtain(PlacePacket.class);
         packet.x = (short)x;
         packet.y = (short)y;
         packet.rotation = (byte)rotation;
@@ -108,14 +109,14 @@ public class NetEvents {
     }
 
     public static void handleBreak(int x, int y){
-        BreakPacket packet = new BreakPacket();
+        BreakPacket packet = Pools.obtain(BreakPacket.class);
         packet.x = (short)x;
         packet.y = (short)y;
         Net.send(packet, SendMode.tcp);
     }
 
     public static void handleAdminSet(Player player, boolean admin){
-        PlayerAdminPacket packet = new PlayerAdminPacket();
+        PlayerAdminPacket packet = Pools.obtain(PlayerAdminPacket.class);
         packet.admin = admin;
         packet.id = player.id;
         player.isAdmin = admin;
@@ -123,7 +124,7 @@ public class NetEvents {
     }
 
     public static void handleAdministerRequest(Player target, AdminAction action){
-        AdministerRequestPacket packet = new AdministerRequestPacket();
+        AdministerRequestPacket packet = Pools.obtain(AdministerRequestPacket.class);
         packet.id = target.id;
         packet.action = action;
         Net.send(packet, SendMode.tcp);

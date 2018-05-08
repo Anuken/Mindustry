@@ -64,7 +64,7 @@ public class Items {
             fluxiness = 0.5f;
         }
     },
-    rdx = new Item("rdx", Color.valueOf("e3d39e")){
+    rdx = new Item("rdx", Color.valueOf("ff795e")){
         {
             material = false;
             flammability = 0.2f;

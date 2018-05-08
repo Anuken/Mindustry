@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.Pools;
 import com.esotericsoftware.kryonet.*;
 import com.esotericsoftware.kryonet.Listener.LagListener;
 import com.esotericsoftware.minlog.Log;
@@ -132,6 +133,7 @@ public class KryoClient implements ClientProvider{
         }else{
             client.sendUDP(object);
         }
+        Pools.free(object);
     }
 
     @Override

@@ -3,6 +3,7 @@ package io.anuke.kryonet;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Base64Coder;
+import com.badlogic.gdx.utils.Pools;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.FrameworkMessage;
 import com.esotericsoftware.kryonet.Listener;
@@ -361,6 +362,7 @@ public class KryoServer implements ServerProvider {
                     Log.info("Connection removed {0}", k);
                 }
             }
+            Pools.free(object);
         }
 
         @Override
