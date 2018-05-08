@@ -40,6 +40,7 @@ public class Registrator {
         PlayerAdminPacket.class,
         AdministerRequestPacket.class,
         TracePacket.class,
+        InvokePacket.class,
     };
     private static ObjectIntMap<Class<?>> ids = new ObjectIntMap<>();
 

@@ -3,7 +3,9 @@ package io.anuke.mindustry.net;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.sun.tools.internal.ws.wsdl.document.Import;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
@@ -29,6 +31,33 @@ public class Packets {
     public static class Disconnect implements ImportantPacket{
         public int id;
         public String addressTCP;
+    }
+
+    public static class InvokePacket implements Packet{
+        public Object[] args;
+        public Method method;
+        public Class type;
+
+        @Override
+        public void read(ByteBuffer buffer) {
+            IOUtils.writeString(buffer, method.getName());
+            IOUtils.writeString(buffer, type.getName());
+            Invoke.writeObjects(buffer, args);
+        }
+
+        @Override
+        public void write(ByteBuffer buffer) {
+            String methodname = IOUtils.readString(buffer);
+            String typename = IOUtils.readString(buffer);
+
+            try {
+                type = Invoke.findClass(typename);
+                method = Invoke.getMethod(type, methodname);
+                args = Invoke.readObjects(buffer, method.getParameterTypes());
+            }catch (ReflectionException e){
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public static class WorldData extends Streamable{
