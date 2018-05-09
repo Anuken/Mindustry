@@ -24,6 +24,7 @@ import static io.anuke.mindustry.Vars.playerGroup;
 public class Invoke {
     private static ObjectMap<Class, ObjectMap<String, Method>> methods = new ObjectMap<>();
     private static ObjectMap<String, Class> classes = new ObjectMap<>();
+    private static ObjectMap<Method, Boolean> methodLocal = new ObjectMap<>();
 
     /**
      * Invokes a method remotely (on all clients) and locally.
@@ -34,7 +35,9 @@ public class Invoke {
     public static void on(Class<?> type, String methodName, Object... args){
         try {
             Method method = getMethod(type, methodName);
-            method.invoke(null, args);
+            if(methodLocal.get(method)){
+                method.invoke(null, args);
+            }
             InvokePacket packet = new InvokePacket();
             packet.args = args;
             packet.type = type;
@@ -52,10 +55,6 @@ public class Invoke {
      * @param args the method arguments
      */
     public static void event(String methodName, Object... args){
-        on(NetEvents.class, methodName, args);
-    }
-
-    public static void eventRemote(String methodName, Object... args){
         on(NetEvents.class, methodName, args);
     }
 
@@ -162,6 +161,7 @@ public class Invoke {
             if(method.getDeclaredAnnotation(Remote.class) == null){
                 throw new RuntimeException("Attempt to invoke method '" + methodname + "', which is not Invokable!");
             }
+            methodLocal.put(method, method.getDeclaredAnnotation(Local.class) != null);
             map.put(methodname, method);
 
         }
@@ -170,9 +170,12 @@ public class Invoke {
 
     }
 
+    /**Marks a method as invokable remotely with {@link Invoke#on(Class, String, Object...)}*/
     @Retention(RetentionPolicy.RUNTIME)
-    @interface Remote{
+    @interface Remote{}
 
-    }
+    /**Marks a method to be locally invoked as well as remotely invoked.*/
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Local{}
 
 }

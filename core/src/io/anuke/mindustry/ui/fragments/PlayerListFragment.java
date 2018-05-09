@@ -1,5 +1,6 @@
 package io.anuke.mindustry.ui.fragments;
 
+import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -28,7 +29,7 @@ import static io.anuke.mindustry.Vars.*;
 public class PlayerListFragment implements Fragment{
     public boolean visible = false;
     Table content = new Table();
-    int last = 0;
+    ObjectMap<Player, Boolean> checkmap = new ObjectMap<>();
 
     @Override
     public void build(){
@@ -72,10 +73,14 @@ public class PlayerListFragment implements Fragment{
                 if(!(Net.active() && !state.is(State.menu))){
                     visible = false;
                 }
-                if(playerGroup.size() != last){
-                    rebuild();
-                    last = playerGroup.size();
+                boolean rebuild = false;
+                for(Player player : playerGroup.all()){
+                    if(!checkmap.containsKey(player) || checkmap.get(player, false) != player.isAdmin){
+                        rebuild = true;
+                    }
+                    checkmap.put(player, player.isAdmin);
                 }
+                if(rebuild) rebuild();
             });
 
             visible(() -> visible);

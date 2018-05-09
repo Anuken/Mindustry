@@ -8,6 +8,8 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.net.Invoke.Local;
+import io.anuke.mindustry.net.Invoke.Remote;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.resource.Weapon;
@@ -114,12 +116,10 @@ public class NetEvents {
         Net.send(packet, SendMode.tcp);
     }
 
+    @Remote
+    @Local
     public static void adminSet(Player player, boolean admin){
         player.isAdmin = admin;
-
-        if(Net.client()){
-            ui.listfrag.rebuild();
-        }
     }
 
     public static void handleAdministerRequest(Player target, AdminAction action){
