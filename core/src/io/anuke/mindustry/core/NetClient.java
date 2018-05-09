@@ -3,6 +3,7 @@ package io.anuke.mindustry.core;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
+import com.badlogic.gdx.utils.reflect.ReflectionException;
 import io.anuke.mindustry.content.UpgradeRecipes;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.BulletType;
@@ -142,6 +143,14 @@ public class NetClient extends Module {
 
             if(debugNet){
                 clientDebug.setSyncDebug(players, enemies);
+            }
+        });
+
+        Net.handleClient(InvokePacket.class, packet -> {
+            try{
+                packet.method.invoke(null, packet.args);
+            }catch (ReflectionException e){
+                throw new RuntimeException(e);
             }
         });
 

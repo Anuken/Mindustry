@@ -86,7 +86,7 @@ public class Bullet extends BulletEntity<BulletType>{
 	public void update(){
 		super.update();
 
-		if (collidesTiles()) {
+		if (type.hitTiles && collidesTiles()) {
 			world.raycastEach(world.toTile(lastX), world.toTile(lastY), world.toTile(x), world.toTile(y), (x, y) -> {
 
 				Tile tile = world.tile(x, y);

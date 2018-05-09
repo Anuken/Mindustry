@@ -4,8 +4,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
@@ -34,10 +36,8 @@ public class DamageArea{
 		}
 
 		for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i ++){
-			Timers.run(i/2, () -> {
-				Fireball f = new Fireball(x, y, color, Mathf.random(360f));
-				f.add();
-			});
+			Timers.run(i/2, () ->
+				Bullet.create(TurretBullets.fireball, null, Team.none, x, y, Mathf.random(360f)));
 		}
 
 		float e = explosiveness;

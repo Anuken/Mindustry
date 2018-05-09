@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BulletFx;
+import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.BulletType;
@@ -14,7 +15,9 @@ import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.resource.Liquid;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
@@ -28,6 +31,45 @@ import static io.anuke.mindustry.Vars.world;
 public class TurretBullets {
 
     public static final BulletType
+
+    fireball = new BulletType(1f, 1) {
+        {
+            pierce = true;
+            hitTiles = false;
+            drag = 0.3f;
+        }
+
+        @Override
+        public void init(Bullet b) {
+            b.velocity.setLength(0.6f + Mathf.random(2f));
+        }
+
+        @Override
+        public void draw(Bullet b) {
+            //TODO add color to the bullet
+            Draw.color(Palette.lightFlame, Palette.darkFlame, Color.GRAY, b.fin());
+            Fill.circle(b.x, b.y, 3f * b.fout());
+            Draw.reset();
+        }
+
+        @Override
+        public void update(Bullet b) {
+            if(Mathf.chance(0.04 * Timers.delta())){
+                Tile tile = world.tileWorld(b.x, b.y);
+                if(tile != null){
+                    Fire.create(tile);
+                }
+            }
+
+            if(Mathf.chance(0.1 * Timers.delta())){
+                Effects.effect(EnvironmentFx.fireballsmoke, b.x, b.y);
+            }
+
+            if(Mathf.chance(0.1 * Timers.delta())){
+                Effects.effect(EnvironmentFx.ballfire, b.x, b.y);
+            }
+        }
+    },
 
     basicIron = new BulletType(3f, 5) {
         @Override

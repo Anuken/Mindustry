@@ -78,7 +78,7 @@ public abstract class Unit extends SyncEntity implements SerializableEntity {
 
     public Floor getFloorOn(){
         Tile tile = world.tileWorld(x, y);
-        return (Floor)(tile == null || (!(tile.floor() instanceof Floor)) ? Blocks.defaultFloor : tile.floor());
+        return (Floor)(tile == null || (tile.floor() == null) ? Blocks.defaultFloor : tile.floor());
     }
 
     public void updateVelocityStatus(float drag, float maxVelocity){

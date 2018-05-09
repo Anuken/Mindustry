@@ -8,10 +8,13 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
+import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.SerializableEntity;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.resource.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -105,7 +108,7 @@ public class Puddle extends Entity implements SerializableEntity, Poolable{
                 (liquid.flammability > 0.3f && dest.temperature > 0.7f)){ //flammable liquid + hot liquid
             Fire.create(tile);
             if(Mathf.chance(0.006 * amount)){
-                new Fireball(x, y, dest.flameColor, Mathf.random(360f)).add();
+                Bullet.create(TurretBullets.fireball, tile.entity, Team.none, x, y, Mathf.random(360f));
             }
         }else if(dest.temperature > 0.7f && liquid.temperature < 0.55f){ //cold liquid poured onto hot puddle
             if(Mathf.chance(0.5f * amount)){

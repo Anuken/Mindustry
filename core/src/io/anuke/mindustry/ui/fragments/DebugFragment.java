@@ -3,9 +3,10 @@ package io.anuke.mindustry.ui.fragments;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import io.anuke.mindustry.content.UnitTypes;
+import io.anuke.mindustry.content.bullets.TurretBullets;
+import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.effect.Fireball;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Palette;
@@ -59,7 +60,7 @@ public class DebugFragment implements Fragment {
                row();
                new button("effect", () -> {
                    for(int i = 0; i < 20; i ++){
-                        new Fireball(player.x, player.y, Palette.darkFlame, Mathf.random(360f)).add();
+                       Bullet.create(TurretBullets.fireball, player, player.team, player.x, player.y, Mathf.random(360f));
                    }
                });
                row();

@@ -7,9 +7,11 @@ import io.anuke.ucore.entities.BaseBulletType;
 
 public abstract class BulletType extends BaseBulletType<Bullet>{
 	public float knockback;
+	public boolean hitTiles = true;
 	public StatusEffect status = StatusEffects.none;
 	public float statusIntensity = 0.5f;
 
+	//TODO use float damage
 	public BulletType(float speed, int damage){
 		this.speed = speed;
 		this.damage = damage;
