@@ -106,22 +106,22 @@ public class Vars{
 			new Locale("de"), new Locale("pt", "BR"), new Locale("ko"), new Locale("in", "ID"), new Locale("ita"), new Locale("es")};
 
 	public static final Color[] playerColors = {
-			Color.valueOf("82759a"),
-			Color.valueOf("c0c1c5"),
-			Color.valueOf("fff0e7"),
-			Color.valueOf("7d2953"),
-			Color.valueOf("ff074e"),
-			Color.valueOf("ff072a"),
-			Color.valueOf("ff76a6"),
-			Color.valueOf("a95238"),
-			Color.valueOf("ffa108"),
-			Color.valueOf("feeb2c"),
-			Color.valueOf("ffcaa8"),
-			Color.valueOf("008551"),
-			Color.valueOf("00e339"),
-			Color.valueOf("423c7b"),
-			Color.valueOf("4b5ef1"),
-			Color.valueOf("2cabfe"),
+		Color.valueOf("82759a"),
+		Color.valueOf("c0c1c5"),
+		Color.valueOf("fff0e7"),
+		Color.valueOf("7d2953"),
+		Color.valueOf("ff074e"),
+		Color.valueOf("ff072a"),
+		Color.valueOf("ff76a6"),
+		Color.valueOf("a95238"),
+		Color.valueOf("ffa108"),
+		Color.valueOf("feeb2c"),
+		Color.valueOf("ffcaa8"),
+		Color.valueOf("008551"),
+		Color.valueOf("00e339"),
+		Color.valueOf("423c7b"),
+		Color.valueOf("4b5ef1"),
+		Color.valueOf("2cabfe"),
 	};
 
 	//server port

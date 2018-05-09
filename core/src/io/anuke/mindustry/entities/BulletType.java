@@ -11,8 +11,7 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 	public StatusEffect status = StatusEffects.none;
 	public float statusIntensity = 0.5f;
 
-	//TODO use float damage
-	public BulletType(float speed, int damage){
+	public BulletType(float speed, float damage){
 		this.speed = speed;
 		this.damage = damage;
 		lifetime = 40f;

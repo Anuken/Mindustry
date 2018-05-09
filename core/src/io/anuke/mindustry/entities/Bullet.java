@@ -107,7 +107,7 @@ public class Bullet extends BulletEntity<BulletType>{
 	}
 
 	@Override
-	public int getDamage(){
+	public float getDamage(){
 		return damage == -1 ? type.damage : damage;
 	}
 

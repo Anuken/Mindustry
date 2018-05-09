@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.InvokePacket;
@@ -16,6 +17,8 @@ import io.anuke.ucore.util.IOUtils;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
+
+import static io.anuke.mindustry.Vars.playerGroup;
 
 /**Class for invoking static methods of other classes remotely.*/
 public class Invoke {
@@ -52,6 +55,10 @@ public class Invoke {
         on(NetEvents.class, methodName, args);
     }
 
+    public static void eventRemote(String methodName, Object... args){
+        on(NetEvents.class, methodName, args);
+    }
+
     //TODO refactor to serializer map!
     static void writeObjects(ByteBuffer buffer, Object[] objects){
         for(Object o : objects){
@@ -76,6 +83,8 @@ public class Invoke {
             }else if(type == Entity.class){
                 buffer.put((byte)((Entity)o).getGroup().getID());
                 buffer.putInt(((Entity)o).id);
+            }else if(type == Player.class){
+                buffer.putInt(((Player)o).id);
             }else if(type == Team.class){
                 buffer.put((byte)((Team)o).ordinal());
             }else if(type == String.class){
@@ -110,6 +119,9 @@ public class Invoke {
                 byte group = buffer.get();
                 int id = buffer.getInt();
                 obj = Entities.getGroup(group).getByID(id);
+            }else if(type == Player.class){
+                int id = buffer.getInt();
+                obj = playerGroup.getByID(id);
             }else if(type == Team.class){
                 obj = Team.values()[buffer.get()];
             }else if(type == String.class){

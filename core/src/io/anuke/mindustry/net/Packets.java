@@ -477,24 +477,6 @@ public class Packets {
         public void read(ByteBuffer buffer) { }
     }
 
-    public static class FriendlyFireChangePacket implements Packet{
-        public boolean enabled;
-
-        @Override
-        public void write(ByteBuffer buffer) {
-            buffer.put(enabled ? 1 : (byte)0);
-        }
-
-        @Override
-        public void read(ByteBuffer buffer) {
-            enabled = buffer.get() == 1;
-        }
-    }
-
-    public static class CustomMapPacket extends Streamable{
-
-    }
-
     public static class MapAckPacket implements Packet{
         @Override
         public void write(ByteBuffer buffer) { }
@@ -514,23 +496,6 @@ public class Packets {
         @Override
         public void read(ByteBuffer buffer) {
             message = IOUtils.readString(buffer);
-        }
-    }
-
-    public static class PlayerAdminPacket implements Packet{
-        public boolean admin;
-        public int id;
-
-        @Override
-        public void write(ByteBuffer buffer) {
-            buffer.put(admin ? (byte)1 : 0);
-            buffer.putInt(id);
-        }
-
-        @Override
-        public void read(ByteBuffer buffer) {
-            admin = buffer.get() == 1;
-            id = buffer.getInt();
         }
     }
 

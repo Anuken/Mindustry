@@ -142,18 +142,13 @@ project(":ios") {
         compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
     }
-
-    robovm {
-        iosSignIdentity = "a"
-        iosProvisioningProfile = ""
-    }
 }
 
 project(":core") {
     apply plugin: "java"
 
     dependencies {
-        boolean comp = System.properties["release"] == null || System.properties["release"] == "false"
+        boolean comp = true//System.properties["release"] == null || System.properties["release"] == "false"
 
         if(!comp){
             println("NOTICE: Compiling release build.")
@@ -161,7 +156,7 @@ project(":core") {
             println("Compiling DEBUG build.")
         }
 
-        if(new File('../uCore').exists() && comp){
+        if(new File(projectDir.parent, '../uCore').exists() && comp){
             compile project(":uCore")
         }else{
             compile "com.github.anuken:ucore:$uCoreVersion"

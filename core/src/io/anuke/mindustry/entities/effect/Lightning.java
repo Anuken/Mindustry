@@ -31,7 +31,7 @@ public class Lightning extends TimedEntity implements Poolable{
 
     public Color color = Palette.lancerLaser;
 
-    public static void create(Team team, Effect effect, Color color, int damage, float x, float y, float targetAngle, int length){
+    public static void create(Team team, Effect effect, Color color, float damage, float x, float y, float targetAngle, int length){
         Lightning l = Pools.obtain(Lightning.class);
 
         l.x = x;
@@ -68,10 +68,10 @@ public class Lightning extends TimedEntity implements Poolable{
                 Rectangle hitbox = entity.hitbox.getRect(entity.x, entity.y, range);
 
                 if(hitbox.contains(x2, y2) || hitbox.contains(fx, fy)){
-                    int result = damage;
+                    float result = damage;
 
                     if(entity.status.current() == StatusEffects.wet)
-                        result = (int)(result * wetDamageMultiplier);
+                        result = (result * wetDamageMultiplier);
 
                     entity.damage(result);
                     Effects.effect(effect, x2, y2, fangle);

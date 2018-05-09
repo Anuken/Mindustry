@@ -258,17 +258,9 @@ public class NetClient extends Module {
             ui.restart.show();
         });
 
-        Net.handleClient(FriendlyFireChangePacket.class, packet -> state.friendlyFire = packet.enabled);
-
         Net.handleClient(NetErrorPacket.class, packet -> {
             ui.showError(packet.message);
             disconnectQuietly();
-        });
-
-        Net.handleClient(PlayerAdminPacket.class, packet -> {
-            Player player = playerGroup.getByID(packet.id);
-            player.isAdmin = packet.admin;
-            ui.listfrag.rebuild();
         });
 
         Net.handleClient(TracePacket.class, packet -> {

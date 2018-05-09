@@ -3,6 +3,7 @@ package io.anuke.mindustry.ui.fragments;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.net.Invoke;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.NetEvents;
@@ -48,7 +49,7 @@ public class PlayerListFragment implements Fragment{
 
                     get().addCheck("$text.server.friendlyfire", b -> {
                         state.friendlyFire = b;
-                        NetEvents.handleFriendlyFireChange(b);
+                        Invoke.event("friendlyFireChange", b);
                     }).growX().update(i -> i.setChecked(state.friendlyFire)).disabled(b -> Net.client()).padRight(5);
 
                     new button("$text.server.bans", () -> {
@@ -155,12 +156,12 @@ public class PlayerListFragment implements Fragment{
                         if(netServer.admins.isAdmin(id, connection.address)){
                             ui.showConfirm("$text.confirm", "$text.confirmunadmin", () -> {
                                 netServer.admins.unAdminPlayer(id);
-                                NetEvents.handleAdminSet(player, false);
+                                Invoke.event("adminSet", player, false);
                             });
                         }else{
                             ui.showConfirm("$text.confirm", "$text.confirmadmin", () -> {
                                 netServer.admins.adminPlayer(id, connection.address);
-                                NetEvents.handleAdminSet(player, true);
+                                Invoke.event("adminSet", player, true);
                             });
                         }
                     }).update(b ->{

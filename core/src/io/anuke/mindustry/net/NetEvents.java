@@ -18,13 +18,10 @@ import static io.anuke.mindustry.Vars.*;
 
 public class NetEvents {
 
-    public static void handleFriendlyFireChange(boolean enabled){
-        FriendlyFireChangePacket packet = Pools.obtain(FriendlyFireChangePacket.class);
-        packet.enabled = enabled;
+    public static void friendlyFireChange(boolean enabled){
+        state.friendlyFire = enabled;
 
-        netCommon.sendMessage(enabled ? "[accent]Friendly fire enabled." : "[accent]Friendly fire disabled.");
-
-        Net.send(packet, SendMode.tcp);
+        if(Net.server()) netCommon.sendMessage(enabled ? "[accent]Friendly fire enabled." : "[accent]Friendly fire disabled.");
     }
 
     public static void handleGameOver(){
@@ -117,12 +114,12 @@ public class NetEvents {
         Net.send(packet, SendMode.tcp);
     }
 
-    public static void handleAdminSet(Player player, boolean admin){
-        PlayerAdminPacket packet = Pools.obtain(PlayerAdminPacket.class);
-        packet.admin = admin;
-        packet.id = player.id;
+    public static void adminSet(Player player, boolean admin){
         player.isAdmin = admin;
-        Net.send(packet, SendMode.tcp);
+
+        if(Net.client()){
+            ui.listfrag.rebuild();
+        }
     }
 
     public static void handleAdministerRequest(Player target, AdminAction action){
