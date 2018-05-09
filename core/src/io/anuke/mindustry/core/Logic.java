@@ -131,14 +131,14 @@ public class Logic extends Module {
                 if(!state.mode.disableWaveTimer){
 
                     if(state.enemies <= 0){
-                        if(!world.getMap().name.equals("tutorial")) state.wavetime -= delta();
+                        if(!world.getMap().name.equals("tutorial")) state.wavetime -= Timers.delta();
 
                         if(state.lastUpdated < state.wave + 1 && state.wavetime < aheadPathfinding){ //start updating beforehand
                             world.pathfinder().resetPaths();
                             state.lastUpdated = state.wave + 1;
                         }
                     }else if(!world.getMap().name.equals("tutorial")){
-                        state.extrawavetime -= delta();
+                        state.extrawavetime -= Timers.delta();
                     }
                 }
 
