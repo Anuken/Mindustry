@@ -17,6 +17,8 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
 
+import java.sql.Time;
+
 import static io.anuke.mindustry.Vars.*;
 
 /**Logic module.
@@ -27,6 +29,7 @@ import static io.anuke.mindustry.Vars.*;
  * This class should <i>not</i> call any outside methods to change state of modules, but instead fire events.
  */
 public class Logic extends Module {
+    public boolean doUpdate = true;
 
     public Logic(){
         state = new GameState();
@@ -80,6 +83,7 @@ public class Logic extends Module {
 
     @Override
     public void update(){
+        if(!doUpdate) return;
 
         if(!state.is(State.menu)){
 
@@ -109,9 +113,9 @@ public class Logic extends Module {
                 if(!state.mode.disableWaveTimer){
 
                     if(state.enemies <= 0){
-                        if(!world.getMap().name.equals("tutorial")) state.wavetime -= delta();
+                        if(!world.getMap().name.equals("tutorial")) state.wavetime -= Timers.delta();
                     }else{
-                        state.extrawavetime -= delta();
+                        state.extrawavetime -= Timers.delta();
                     }
                 }
 

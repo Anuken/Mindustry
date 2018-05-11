@@ -345,7 +345,7 @@ public class Control extends Module{
 
 				if(respawntime > 0){
 
-					respawntime -= delta();
+					respawntime -= Timers.delta();
 
 					if(respawntime <= 0){
 						player.set(world.getSpawnX(), world.getSpawnY());
