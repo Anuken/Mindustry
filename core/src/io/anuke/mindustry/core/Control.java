@@ -26,6 +26,7 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Atlas;
+import io.anuke.ucore.util.Input;
 import io.anuke.ucore.util.InputProxy;
 import io.anuke.ucore.util.Mathf;
 
@@ -43,8 +44,7 @@ public class Control extends Module{
 
 	private Saves saves;
 
-	private float respawntime;
-	private InputHandler input;
+	private InputHandler[] inputs;
 
     private InputProxy proxy;
     private float controlx, controly;
@@ -57,12 +57,6 @@ public class Control extends Module{
 		Inputs.useControllers(!gwt);
 
 		Gdx.input.setCatchBackKey(true);
-
-		if(mobile){
-			input = new AndroidInput();
-		}else{
-			input = new DesktopInput();
-		}
 
         proxy = new InputProxy(Gdx.input){
             @Override
@@ -86,8 +80,6 @@ public class Control extends Module{
 			}
         };
 
-		Inputs.addProcessor(input);
-
 		Effects.setShakeFalloff(10000f);
 
 		Core.atlas = new Atlas("sprites.atlas");
@@ -110,7 +102,6 @@ public class Control extends Module{
 		Settings.defaultList(
 			"ip", "localhost",
 			"port", port+"",
-			"name", mobile || gwt ? "player" : UCore.getProperty("user.name"),
 			"servers", "",
 			"color", Color.rgba8888(playerColors[8]),
 			"lastBuild", 0
@@ -118,11 +109,7 @@ public class Control extends Module{
 
 		KeyBinds.load();
 
-		player = new Player();
-		player.name = Settings.getString("name");
-        player.mech = mobile ? Mechs.standardShip : Mechs.standard;
-		player.color.set(Settings.getInt("color"));
-		player.isLocal = true;
+		addPlayer(0);
 
 		saves.load();
 
@@ -133,23 +120,20 @@ public class Control extends Module{
 		});
 
 		Events.on(PlayEvent.class, () -> {
-			player.set(world.getSpawnX(), world.getSpawnY());
+		    for(Player player : players){
+                player.set(world.getSpawnX(), world.getSpawnY());
+            }
 
-			Core.camera.position.set(player.x, player.y, 0);
+			Core.camera.position.set(world.getSpawnX(), world.getSpawnY(), 0);
 
 			state.set(State.playing);
 		});
 
 		Events.on(ResetEvent.class, () -> {
-			player.weapon = Weapons.blaster;
-			player.team = Team.blue;
-			player.inventory.clear();
-			player.upgrades.clear();
+		    for(Player player : players){
+		        player.reset();
+            }
 
-			player.add();
-			player.heal();
-
-			respawntime = -1;
 			hiscore = false;
 
 			ui.hudfrag.fadeRespawn(false);
@@ -173,19 +157,34 @@ public class Control extends Module{
 			Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
 
 
-			//TODO effects???
-            //Sounds.play("corexplode");
-			/*
-			for(int i = 0; i < 16; i ++){
-				Timers.run(i*2, ()-> Effects.effect(Fx.explosion, world.getCore().worldx()+Mathf.range(40), world.getCore().worldy()+Mathf.range(40)));
-			}
-			Effects.effect(Fx.coreexplosion, world.getCore().worldx(), world.getCore().worldy());*/
-
+			//TODO game over effect
 			ui.restart.show();
 
 			Timers.runTask(30f, () -> state.set(State.menu));
 		});
 	}
+
+	//TODO drop player method
+	public void addPlayer(int index){
+        Player player = new Player();
+        player.name = Settings.getString("name-" + index, "player");
+        player.mech = mobile ? Mechs.standardShip : Mechs.standard;
+        player.color.set(Settings.getInt("color"));
+        player.isLocal = true;
+        player.playerIndex = index;
+        players[index] = player;
+
+        InputHandler input;
+
+        if(mobile){
+            input = new AndroidInput(player);
+        }else{
+            input = new DesktopInput(player);
+        }
+
+        inputs[index] = input;
+        Inputs.addProcessor(input);
+    }
 
 	//FIXME figure out what's causing this problem in the first place
 	public void triggerInputUpdate(){
@@ -204,8 +203,8 @@ public class Control extends Module{
 		return controlling;
 	}
 
-	public InputHandler input(){
-		return input;
+	public InputHandler input(int index){
+		return inputs[index];
 	}
 
 	public void playMap(Map map){
@@ -223,14 +222,6 @@ public class Control extends Module{
 
 	public boolean isHighScore(){
 		return hiscore;
-	}
-
-	public float getRespawnTime(){
-		return respawntime;
-	}
-
-	public void setRespawnTime(float respawntime){
-		this.respawntime = respawntime;
 	}
 
 	public Tutorial tutorial(){
@@ -319,7 +310,9 @@ public class Control extends Module{
         saves.update();
 
 		if(!state.is(State.menu)){
-			input.update();
+		    for(InputHandler input : inputs){
+		        input.update();
+            }
 
 			if(Inputs.keyTap("pause") && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
                 state.set(state.is(State.playing) ? State.paused : State.playing);
@@ -342,19 +335,6 @@ public class Control extends Module{
 			if(!state.is(State.paused) || Net.active()){
 				Entities.update(effectGroup);
 				Entities.update(groundEffectGroup);
-
-				if(respawntime > 0){
-
-					respawntime -= Timers.delta();
-
-					if(respawntime <= 0){
-						player.set(world.getSpawnX(), world.getSpawnY());
-						player.heal();
-						player.add();
-						Effects.sound("respawn");
-						ui.hudfrag.fadeRespawn(false);
-					}
-				}
 
 				if(tutorial.active()){
 					tutorial.update();

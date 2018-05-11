@@ -49,9 +49,11 @@ public class Player extends Unit{
 	public boolean dashing = false;
 
 	public int clientid = -1;
+	public int playerIndex = 0;
 	public boolean isLocal = false;
 	public Timer timer = new Timer(4);
 	public float walktime;
+	public float respawntime;
 
 	private Vector2 movement = new Vector2();
 	
@@ -66,7 +68,7 @@ public class Player extends Unit{
 	@Override
 	public void onRemoteShoot(BulletType type, float x, float y, float rotation, short data) {
 		Weapon weapon = Upgrade.getByID(Bits.getLeftByte(data));
-		weapon.shoot(player, x, y, rotation, Bits.getRightByte(data) == 1);
+		weapon.shoot(this, x, y, rotation, Bits.getRightByte(data) == 1);
 	}
 
 	@Override
@@ -114,8 +116,7 @@ public class Player extends Unit{
 		DamageArea.dynamicExplosion(x, y, flammability, explosiveness, 0f, getSize()/2f, Palette.darkFlame);
 		Effects.sound("die", this);
 
-		control.setRespawnTime(respawnduration);
-		ui.hudfrag.fadeRespawn(true);
+		respawntime = respawnduration;
 		super.onDeath();
 	}
 
@@ -217,6 +218,18 @@ public class Player extends Unit{
 			return;
 		}
 
+        if(respawntime > 0){
+
+            respawntime -= Timers.delta();
+
+            if(respawntime <= 0){
+                set(world.getSpawnX(), world.getSpawnY());
+                heal();
+                add();
+                Effects.sound("respawn");
+            }
+        }
+
 		if(isDead()) return;
 
 		if(mech.flying){
@@ -227,6 +240,17 @@ public class Player extends Unit{
 
 		x = Mathf.clamp(x, 0, world.width() * tilesize);
 		y = Mathf.clamp(y, 0, world.height() * tilesize);
+	}
+
+	public void reset(){
+		weapon = Weapons.blaster;
+		team = Team.blue;
+		respawntime = -1;
+		inventory.clear();
+		upgrades.clear();
+
+		add();
+		heal();
 	}
 
 	protected void updateMech(){
@@ -266,8 +290,8 @@ public class Player extends Unit{
 		boolean shooting = control.input().canShoot() && control.input().isShooting() && inventory.hasAmmo();
 
 		if(shooting){
-			weapon.update(player, true);
-			weapon.update(player, false);
+			weapon.update(this, true);
+			weapon.update(this, false);
 		}
 
 		movement.limit(speed);
@@ -320,6 +344,7 @@ public class Player extends Unit{
 		stream.writeBoolean(isLocal);
 
 		if(isLocal){
+			stream.writeInt(playerIndex);
 			super.writeSave(stream);
 
 			stream.writeByte(upgrades.size);
@@ -334,7 +359,8 @@ public class Player extends Unit{
 		boolean local = stream.readBoolean();
 
 		if(local){
-			player.readSaveSuper(stream);
+			int index = stream.readInt();
+			players[index].readSaveSuper(stream);
 		}
 	}
 

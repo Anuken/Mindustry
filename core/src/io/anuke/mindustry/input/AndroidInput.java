@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.ItemStack;
@@ -26,7 +27,8 @@ public class AndroidInput extends InputHandler{
 	private float warmup;
 	private float warmupDelay = 20;
 	
-	public AndroidInput(){
+	public AndroidInput(Player player){
+	    super(player);
 		Inputs.addProcessor(new GestureDetector(20, 0.5f, 2, 0.15f, new GestureHandler(this)));
 	}
 	

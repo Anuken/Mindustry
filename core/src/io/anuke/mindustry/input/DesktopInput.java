@@ -3,6 +3,7 @@ package io.anuke.mindustry.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.Weapon;
@@ -23,7 +24,10 @@ public class DesktopInput extends InputHandler{
 	float endx, endy;
 	private boolean enableHold = false;
 	private boolean beganBreak;
-	private boolean rotated = false, rotatedAlt, zoomed;
+
+	public DesktopInput(Player player){
+	    super(player);
+    }
 	
 	@Override public float getCursorEndX(){ return endx; }
 	@Override public float getCursorEndY(){ return endy; }
@@ -75,27 +79,13 @@ public class DesktopInput extends InputHandler{
 		
 		if(Inputs.getAxisActive("zoom") && (Inputs.keyDown("zoom_hold") || controller)
 				&& !state.is(State.menu) && !ui.hasDialog()){
-			if((!zoomed || !controller)) {
-				renderer.scaleCamera((int) Inputs.getAxis("zoom"));
-			}
-			zoomed = true;
-		}else{
-			zoomed = false;
+		    renderer.scaleCamera((int) Inputs.getAxisTapped("zoom"));
 		}
 
 		renderer.minimap().zoomBy(-(int)Inputs.getAxisTapped("zoom_minimap"));
 
-		if(!rotated) {
-			rotation += Inputs.getAxis("rotate_alt");
-			rotated = true;
-		}
-		if(!Inputs.getAxisActive("rotate_alt")) rotated = false;
-
-		if(!rotatedAlt) {
-			rotation += Inputs.getAxis("rotate");
-			rotatedAlt = true;
-		}
-		if(!Inputs.getAxisActive("rotate")) rotatedAlt = false;
+		rotation += Inputs.getAxisTapped("rotate_alt");
+		rotation += Inputs.getAxis("rotate");
 
 		rotation = Mathf.mod(rotation, 4);
 		
@@ -192,7 +182,7 @@ public class DesktopInput extends InputHandler{
 		}
 
 		if(recipe != null){
-			showCursor = validPlace(tilex(), tiley(), control.input().recipe.result) && control.input().cursorNear();
+			showCursor = validPlace(tilex(), tiley(), recipe.result) && cursorNear();
 		}
 
 		if(canBeginShoot){

@@ -168,9 +168,12 @@ public class NetClient extends Module {
 
             Placement.placeBlock(placer.team, packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, Timers.get("placeblocksound", 10));
 
-            if(packet.playerid == player.id){
-                Tile tile = world.tile(packet.x, packet.y);
-                if(tile != null) Block.getByID(packet.block).placed(tile);
+            for(Player player : players) {
+                if (packet.playerid == player.id) {
+                    Tile tile = world.tile(packet.x, packet.y);
+                    if (tile != null) Block.getByID(packet.block).placed(tile);
+                    break;
+                }
             }
         });
 
@@ -272,7 +275,9 @@ public class NetClient extends Module {
             Weapon weapon = Upgrade.getByID(packet.id);
 
             state.inventory.removeItems(UpgradeRecipes.get(weapon));
-            player.upgrades.add(weapon);
+            for(Player player : players) {
+                player.upgrades.add(weapon);
+            }
             Effects.sound("purchase");
         });
     }
@@ -329,9 +334,11 @@ public class NetClient extends Module {
         requests = 0;
 
         if(timer.get(0, playerSyncTime)){
-            PositionPacket packet = new PositionPacket();
-            packet.player = player;
-            Net.send(packet, SendMode.udp);
+            for(Player player : players) {
+                PositionPacket packet = new PositionPacket();
+                packet.player = player;
+                Net.send(packet, SendMode.udp);
+            }
         }
 
         if(timer.get(1, 60)){

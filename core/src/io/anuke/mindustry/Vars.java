@@ -143,7 +143,7 @@ public class Vars{
 	public static NetServer netServer;
 	public static NetClient netClient;
 	
-	public static Player player;
+	public static Player[] players;
 
 	public static final EntityGroup<Player> playerGroup = Entities.addGroup(Player.class).enableMapping();
 	public static final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);

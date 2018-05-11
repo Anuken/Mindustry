@@ -5,6 +5,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.entities.ItemAnimationEffect;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.ItemStack;
@@ -25,6 +26,7 @@ public abstract class InputHandler extends InputAdapter{
 	public float breaktime = 0;
 	public Recipe recipe;
 	public int rotation;
+	public Player player;
 	public PlaceMode placeMode = mobile ? PlaceMode.cursor : PlaceMode.hold;
 	public PlaceMode breakMode = mobile ? PlaceMode.none : PlaceMode.holdDelete;
 	public PlaceMode lastPlaceMode = placeMode;
@@ -34,6 +36,10 @@ public abstract class InputHandler extends InputAdapter{
 	public float playerSelectRange = Unit.dp.scl(60f);
 
 	private Translator stackTrns = new Translator();
+
+	public InputHandler(Player player){
+	    this.player = player;
+    }
 
 	public abstract void update();
 	public abstract float getCursorX();

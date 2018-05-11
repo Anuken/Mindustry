@@ -23,10 +23,7 @@ import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
-import io.anuke.mindustry.graphics.BlockRenderer;
-import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.MinimapRenderer;
-import io.anuke.mindustry.graphics.Shaders;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.mindustry.ui.fragments.ToolFragment;
@@ -59,8 +56,10 @@ public class Renderer extends RendererModule{
 	private FloatArray shieldHits = new FloatArray();
 	private Array<Callable> shieldDraws = new Array<>();
 	private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
+	private Vector2 avgPosition = new Vector2();
 	private BlockRenderer blocks = new BlockRenderer();
 	private MinimapRenderer minimap = new MinimapRenderer();
+	private OverlayRenderer overlays = new OverlayRenderer();
 
 	public Renderer() {
 		Lines.setCircleVertices(14);
@@ -139,7 +138,9 @@ public class Renderer extends RendererModule{
 			if(Mathf.in(camera.zoom, targetzoom, 0.005f)){
 				camera.zoom = 1f;
 				Graphics.setCameraScale(targetscale);
-				control.input().resetCursor();
+				for(Player player : players) {
+                    control.input(player.playerIndex).resetCursor();
+                }
 			}
 		}else{
 			camera.zoom = Mathf.lerpDelta(camera.zoom, 1f, 0.2f);
@@ -150,15 +151,17 @@ public class Renderer extends RendererModule{
 		}else{
 			boolean smoothcam = Settings.getBool("smoothcam");
 
+            Vector2 position = averagePosition();
 
 			if(!smoothcam){
-				setCamera(player.x, player.y);
+				setCamera(position.x, position.y);
 			}else{
-				smoothCamera(player.x, player.y, mobile ? 0.3f : 0.14f);
+				smoothCamera(position.x, position.y, mobile ? 0.3f : 0.14f);
 			}
 
-			if(Settings.getBool("pixelate"))
-				limitCamera(4f, player.x, player.y);
+			if(Settings.getBool("pixelate") && players.length == 1) {
+                limitCamera(4f, position.x, position.y);
+            }
 
 			float prex = camera.position.x, prey = camera.position.y;
 			updateShake(0.75f);
@@ -166,11 +169,6 @@ public class Renderer extends RendererModule{
 			clampCamera(-tilesize / 2f, -tilesize / 2f + 1, world.width() * tilesize - tilesize / 2f, world.height() * tilesize - tilesize / 2f);
 
 			float deltax = camera.position.x - prex, deltay = camera.position.y - prey;
-
-			if(mobile){
-				player.x += camera.position.x - prevx;
-				player.y += camera.position.y - prevy;
-			}
 
 			float lastx = camera.position.x, lasty = camera.position.y;
 			
@@ -229,7 +227,7 @@ public class Renderer extends RendererModule{
 
 		//drawShield();
 
-		drawOverlay();
+		overlays.draw();
 
 		if(pixelate)
 			Graphics.flushSurface();
@@ -267,14 +265,24 @@ public class Renderer extends RendererModule{
 	@Override
 	public void resize(int width, int height){
 		super.resize(width, height);
-		control.input().resetCursor();
-		camera.position.set(player.x, player.y, 0);
+		for(Player player : players) {
+            control.input(player.playerIndex).resetCursor();
+        }
+		camera.position.set(players[0].x, players[0].y, 0);
 	}
 
 	@Override
 	public void dispose() {
 		background.dispose();
 	}
+
+	public Vector2 averagePosition(){
+	    avgPosition.setZero();
+	    for(Player player : players){
+	        avgPosition.add(player.x, player.y);
+        }
+        return avgPosition;
+    }
 
 	public MinimapRenderer minimap() {
 		return minimap;
@@ -410,193 +418,6 @@ public class Renderer extends RendererModule{
 
 	public void addShield(Callable call){
 		shieldDraws.add(call);
-	}
-
-	void drawOverlay(){
-
-		//draw config selected block
-		if(ui.configfrag.isShown()){
-			Tile tile = ui.configfrag.getSelectedTile();
-			tile.block().drawConfigure(tile);
-		}
-		
-		int tilex = control.input().getBlockX();
-		int tiley = control.input().getBlockY();
-		
-		if(mobile){
-			Vector2 vec = Graphics.world(Gdx.input.getX(0), Gdx.input.getY(0));
-			tilex = Mathf.scl2(vec.x, tilesize);
-			tiley = Mathf.scl2(vec.y, tilesize);
-		}
-
-		InputHandler input = control.input();
-
-		//draw placement box
-		if((input.recipe != null && state.inventory.hasItems(input.recipe.requirements) && (!ui.hasMouse() || mobile)
-				&& control.input().drawPlace())){
-
-			input.placeMode.draw(control.input().getBlockX(), control.input().getBlockY(),
-					control.input().getBlockEndX(), control.input().getBlockEndY());
-			
-			if(input.breakMode == PlaceMode.holdDelete)
-				input.breakMode.draw(tilex, tiley, 0, 0);
-			
-		}else if(input.breakMode.delete && control.input().drawPlace()
-				&& (input.recipe == null || !state.inventory.hasItems(input.recipe.requirements))
-				&& (input.placeMode.delete || input.breakMode.both || !mobile)){
-
-            if(input.breakMode == PlaceMode.holdDelete)
-                input.breakMode.draw(tilex, tiley, 0, 0);
-            else
-				input.breakMode.draw(control.input().getBlockX(), control.input().getBlockY(),
-						control.input().getBlockEndX(), control.input().getBlockEndY());
-		}
-
-		if(ui.toolfrag.confirming){
-			ToolFragment t = ui.toolfrag;
-			PlaceMode.areaDelete.draw(t.px, t.py, t.px2, t.py2);
-		}
-		
-		Draw.reset();
-
-		//draw selected block bars and info
-		if(input.recipe == null && !ui.hasMouse() && !ui.configfrag.isShown()){
-			Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y);
-
-			if(tile != null && tile.block() != Blocks.air){
-				Tile target = tile;
-				if(tile.isLinked())
-					target = tile.getLinked();
-
-				if(showBlockDebug && target.entity != null){
-					Draw.color(Color.RED);
-					Lines.crect(target.drawx(), target.drawy(), target.block().size * tilesize, target.block().size * tilesize);
-					Vector2 v = new Vector2();
-
-					Draw.tcolor(Color.YELLOW);
-					Draw.tscl(0.25f);
-					Array<Object> arr = target.block().getDebugInfo(target);
-					StringBuilder result = new StringBuilder();
-					for(int i = 0; i < arr.size/2; i ++){
-						result.append(arr.get(i*2));
-						result.append(": ");
-						result.append(arr.get(i*2 + 1));
-						result.append("\n");
-					}
-					Draw.textc(result.toString(), target.drawx(), target.drawy(), v);
-					Draw.color(0f, 0f, 0f, 0.5f);
-					Fill.rect(target.drawx(), target.drawy(), v.x, v.y);
-					Draw.textc(result.toString(), target.drawx(), target.drawy(), v);
-					Draw.tscl(fontscale);
-					Draw.reset();
-				}
-
-				if(Inputs.keyDown("block_info") && target.block().isAccessible()){
-					Draw.color(Colors.get("accent"));
-					Lines.crect(target.drawx(), target.drawy(), target.block().size * tilesize, target.block().size * tilesize);
-					Draw.color();
-				}
-
-				if(target.entity != null) {
-					int bot = 0, top = 0;
-					for (BlockBar bar : target.block().bars.list()) {
-						float offset = Mathf.sign(bar.top) * (target.block().size / 2f * tilesize + 3f + 4f * ((bar.top ? top : bot))) +
-								(bar.top ? -1f : 0f);
-
-						float value = bar.value.get(target);
-
-						if(MathUtils.isEqual(value, -1f)) continue;
-
-						drawBar(bar.type.color, target.drawx(), target.drawy() + offset, value);
-
-						if (bar.top)
-							top++;
-						else
-							bot++;
-					}
-				}
-
-				target.block().drawSelect(target);
-			}
-		}
-
-		if(control.input().isDroppingItem()){
-			Vector2 v = Graphics.mouseWorld();
-			float size = 8;
-			Draw.rect(player.inventory.getItem().item.region, v.x, v.y, size, size);
-			Draw.color("accent");
-			Lines.circle(v.x, v.y, 6 + Mathf.absin(Timers.time(), 5f, 1f));
-			Draw.reset();
-
-			Tile tile = world.tileWorld(v.x, v.y);
-			if(tile != null) tile = tile.target();
-			if(tile != null && tile.block().acceptStack(player.inventory.getItem().item, player.inventory.getItem().amount, tile, player) > 0){
-				Draw.color("place");
-				Lines.square(tile.drawx(), tile.drawy(), tile.block().size*tilesize/2f + 1 + Mathf.absin(Timers.time(), 5f, 1f));
-				Draw.color();
-			}
-		}
-
-		if((!debug || showUI) && Settings.getBool("healthbars")){
-			for(TeamData ally : (debug ? state.teams.getTeams() : state.teams.getTeams(true))){
-				for(Unit e : unitGroups[ally.team.ordinal()].all()){
-					drawStats(e);
-				}
-			}
-
-			for(Unit e : playerGroup.all()){
-				drawStats(e);
-			}
-		}
-	}
-
-	void drawStats(Unit unit){
-		if(unit.isDead()) return;
-
-		float x = unit.getDrawPosition().x;
-		float y = unit.getDrawPosition().y;
-
-		if(unit == player && snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate")) {
-			x = (int)x;
-			y = (int)y;
-		}
-
-		drawEncloser(x, y - 8f, 2f);
-		drawBar(Color.SCARLET, x, y - 8f, unit.health / unit.maxhealth);
-		drawBar(Color.valueOf("32cf6d"), x, y - 9f, unit.inventory.totalAmmo() / (float) unit.inventory.ammoCapacity());
-	}
-
-	public void drawBar(Color color, float x, float y, float finion){
-		finion = Mathf.clamp(finion);
-
-		if(finion > 0) finion = Mathf.clamp(finion + 0.2f, 0.24f, 1f);
-
-		float len = 3;
-
-		float w = (int) (len * 2 * finion) + 0.5f;
-
-		x -= 0.5f;
-		y += 0.5f;
-
-		Draw.color(Color.BLACK);
-		Lines.line(x - len + 1, y, x + len + 0.5f, y);
-		Draw.color(color);
-		if(w >= 1)
-			Lines.line(x - len + 1, y, x - len + w, y);
-		Draw.reset();
-	}
-
-	public void drawEncloser(float x, float y, float height){
-		x -= 0.5f;
-		y += 0.5f - (height-1f)/2f;
-
-		float len = 3;
-
-		Lines.stroke(2f + height);
-		Draw.color(Color.SLATE);
-		Lines.line(x - len - 0.5f, y, x + len + 1.5f, y, CapStyle.none);
-
-		Draw.reset();
 	}
 
 	public void setCameraScale(int amount){

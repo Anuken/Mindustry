@@ -176,7 +176,7 @@ public class NetworkIO {
     public static ByteBuffer writeServerData(){
         int maxlen = 32;
 
-        String host = (headless ? "Server" : player.name);
+        String host = (headless ? "Server" : players[0].name);
         String map = world.getMap().name;
 
         host = host.substring(0, Math.min(host.length(), maxlen));

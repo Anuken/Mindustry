@@ -85,9 +85,10 @@ public class Packets {
 
     public static class ConnectPacket implements Packet{
         public int version;
-        public String name;
+        public int players;
+        public String[] names;
         public boolean android;
-        public int color;
+        public int[] colors;
         public byte[] uuid;
 
         @Override
