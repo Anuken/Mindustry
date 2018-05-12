@@ -489,6 +489,12 @@ public class Renderer extends RendererModule{
 					Lines.crect(target.drawx(), target.drawy(), target.block().width * tilesize, target.block().height * tilesize);
 					Draw.color();
 				}
+				
+				if(Inputs.keyDown("block_logs")){
+					Draw.color(Colors.get("accent"));
+					Lines.crect(target.drawx(), target.drawy(), target.block().width * tilesize, target.block().height * tilesize);
+					Draw.color();
+				}
 
 				if(target.entity != null) {
 					int bot = 0, top = 0;

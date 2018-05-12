@@ -26,7 +26,6 @@ import io.anuke.ucore.util.Timer;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
-
 import static io.anuke.mindustry.Vars.*;
 
 public class NetServer extends Module{
@@ -34,6 +33,7 @@ public class NetServer extends Module{
 
     private final static int timerEntitySync = 0;
     private final static int timerStateSync = 1;
+    private final static int timerBlockLogSync = 2;
 
     public final Administration admins = new Administration();
 
@@ -212,6 +212,7 @@ public class NetServer extends Module{
 
             Placement.placeBlock(packet.x, packet.y, block, packet.rotation, true, false);
 
+            admins.logEdit(packet.x, packet.y, connections.get(id), block, packet.rotation, EditLog.EditAction.PLACE);
             admins.getTrace(Net.getConnection(id).address).lastBlockPlaced = block;
             admins.getTrace(Net.getConnection(id).address).totalBlocksPlaced ++;
             admins.getInfo(admins.getTrace(Net.getConnection(id).address).uuid).totalBlockPlaced ++;
@@ -236,6 +237,7 @@ public class NetServer extends Module{
             Block block = Placement.breakBlock(packet.x, packet.y, true, false);
 
             if(block != null) {
+                admins.logEdit(packet.x, packet.y, connections.get(id), block, tile.getRotation(), EditLog.EditAction.BREAK);
                 admins.getTrace(Net.getConnection(id).address).lastBlockBroken = block;
                 admins.getTrace(Net.getConnection(id).address).totalBlocksBroken++;
                 admins.getInfo(admins.getTrace(Net.getConnection(id).address).uuid).totalBlocksBroken ++;
@@ -313,7 +315,7 @@ public class NetServer extends Module{
             packet.id = connections.get(id).id;
             Net.sendExcept(id, packet, SendMode.tcp);
         });
-
+        
         Net.handleServer(AdministerRequestPacket.class, (id, packet) -> {
             Player player = connections.get(id);
 
@@ -475,7 +477,14 @@ public class NetServer extends Module{
             packet.wave = state.wave;
             packet.time = Timers.time();
             packet.timestamp = TimeUtils.millis();
-
+           
+            Net.send(packet, SendMode.udp);
+        }
+        
+        if(timer.get(timerBlockLogSync, serverSyncTime)) {
+            BlockLogSyncPacket packet = new BlockLogSyncPacket();
+            packet.editlogs = admins.getEditLogs();
+            
             Net.send(packet, SendMode.udp);
         }
     }

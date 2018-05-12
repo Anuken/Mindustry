@@ -1,10 +1,19 @@
 package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.blocks.types.BlockPart;
+import io.anuke.mindustry.world.blocks.types.Floor;
+import io.anuke.mindustry.world.blocks.types.Rock;
+import io.anuke.mindustry.world.blocks.types.StaticBlock;
 import io.anuke.ucore.core.Settings;
+import java.util.ArrayList;
+import static io.anuke.mindustry.Vars.world;
 
 public class Administration {
     public static final int defaultMaxBrokenBlocks = 15;
@@ -15,6 +24,9 @@ public class Administration {
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
     /**Maps UUIDs to trace infos. This is wiped when a player logs off.*/
     private ObjectMap<String, TraceInfo> traceInfo = new ObjectMap<>();
+    /**Maps packed coordinates to logs for that coordinate */
+    private IntMap<ArrayList<EditLog>> editLogs = new IntMap<>();
+    
     private Array<String> bannedIPs = new Array<>();
 
     public Administration(){
@@ -48,6 +60,22 @@ public class Administration {
         Settings.save();
     }
 
+    public IntMap<ArrayList<EditLog>> getEditLogs() {
+        return editLogs;
+    }
+    
+    public void logEdit(int x, int y, Player player, Block block, int rotation, EditLog.EditAction action) {
+    	if(block instanceof BlockPart || block instanceof Rock || block instanceof Floor || block instanceof StaticBlock) return;
+    	if(editLogs.containsKey(x + y * world.width())) {
+			editLogs.get(x + y * world.width()).add(new EditLog(player, block, rotation, action));
+		}
+		else {
+			ArrayList<EditLog> logs = new ArrayList<>();
+			logs.add(new EditLog(player, block, rotation, action));
+			editLogs.put(x + y * world.width(), logs);
+		}
+    }
+    
     public boolean validateBreak(String id, String ip){
         if(!isAntiGrief() || isAdmin(id, ip)) return true;
 

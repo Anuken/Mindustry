@@ -25,6 +25,7 @@ public class DefaultKeybinds {
             "rotate", new Axis(Input.SCROLL),
             "toggle_menus", Input.C,
             "block_info", Input.CONTROL_LEFT,
+            "block_logs", Input.I,
             "player_list", Input.TAB,
             "chat", Input.ENTER,
             "chat_history_prev", Input.UP,

@@ -3,6 +3,7 @@ package io.anuke.mindustry.server;
 import com.badlogic.gdx.ApplicationLogger;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Difficulty;
@@ -15,7 +16,9 @@ import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Packets.ChatPacket;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.ui.fragments.DebugFragment;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Map;
+import io.anuke.mindustry.world.Placement;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.modules.Module;
@@ -27,6 +30,8 @@ import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 import static io.anuke.mindustry.Vars.*;
@@ -723,6 +728,69 @@ public class ServerControl extends Module {
                 info("Nobody with that name could be found.");
             }
         });
+	
+		handler.register("rollback", "<amount>", "Rollback the block edits in the world", arg -> {
+			if(!state.is(State.playing)) {
+				err("Open the server first.");
+				return;
+			}
+			if(arg[0] == null) {
+				err("Please specify the amount of block edit cycles to rollback");
+				return;
+			}
+			
+			int rollbackTimes = Integer.valueOf(arg[0]);
+			IntMap<ArrayList<EditLog>> editLogs = netServer.admins.getEditLogs();
+			if(editLogs.size == 0){
+				err("Nothing to rollback!");
+				return;
+			}
+			
+			for(IntMap.Entry<ArrayList<EditLog>> editLog : editLogs.entries()) {
+				int coords = editLog.key;
+				ArrayList<EditLog> logs = editLog.value;
+				
+				for(int i = 0; i < rollbackTimes; i++) {
+					
+					EditLog log = logs.get(logs.size() - 1);
+					
+					int x = coords % world.width();
+					int y = coords / world.width();
+					Block result = log.block;
+					int rotation = log.rotation;
+					
+					if(log.action == EditLog.EditAction.PLACE) {
+						Placement.breakBlock(x, y, false, false);
+						
+						Packets.BreakPacket packet = new Packets.BreakPacket();
+						packet.x = (short) x;
+						packet.y = (short) y;
+						packet.playerid = 0;
+						
+						Net.send(packet, Net.SendMode.tcp);
+					}
+					else if(log.action == EditLog.EditAction.BREAK) {
+						Placement.placeBlock(x, y, result, rotation, false, false);
+						
+						Packets.PlacePacket packet = new Packets.PlacePacket();
+						packet.x = (short) x;
+						packet.y = (short) y;
+						packet.rotation = (byte) rotation;
+						packet.playerid = 0;
+						packet.block = result.id;
+						
+						Net.send(packet, Net.SendMode.tcp);
+					}
+					
+					logs.remove(logs.size() - 1);
+					if(logs.isEmpty()) {
+						editLogs.remove(coords);
+						break;
+					}
+				}
+			}
+			info("Rollback done!");
+		});
     }
 
     private void readCommands(){
