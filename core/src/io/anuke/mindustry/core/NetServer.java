@@ -3,6 +3,7 @@ package io.anuke.mindustry.core;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Recipes;
 import io.anuke.mindustry.content.UpgradeRecipes;
@@ -67,7 +68,7 @@ public class NetServer extends Module{
             TraceInfo trace = admins.getTraceByID(uuid);
             PlayerInfo info = admins.getInfo(uuid);
             trace.uuid = uuid;
-            trace.android = packet.android;
+            trace.android = packet.mobile;
 
             if(admins.isIDBanned(uuid)){
                 kick(id, KickReason.banned);
@@ -106,7 +107,7 @@ public class NetServer extends Module{
             player.clientid = id;
             player.name = packet.name;
             player.uuid = uuid;
-            player.mech = packet.android ? Mechs.standardShip : Mechs.standard;
+            player.mech = packet.mobile ? Mechs.standardShip : Mechs.standard;
             player.set(world.getSpawnX(), world.getSpawnY());
             player.setNet(player.x, player.y);
             player.setNet(player.x, player.y);
@@ -261,6 +262,12 @@ public class NetServer extends Module{
                 Net.sendTo(id, warn, SendMode.tcp);
                 return;
             }
+            if(packet.text.length() > Vars.maxTextLength){
+                ChatPacket warn = new ChatPacket();
+                warn.text = "[scarlet]That message is too long.";
+                Net.sendTo(id, warn, SendMode.tcp);
+                return;
+            }
             Player player = connections.get(id);
             packet.name = player.name;
             packet.id = player.id;
@@ -270,7 +277,7 @@ public class NetServer extends Module{
         Net.handleServer(UpgradePacket.class, (id, packet) -> {
             Player player = connections.get(id);
 
-            Weapon weapon = Upgrade.getByID(packet.id);
+            Weapon weapon = Upgrade.getByID(packet.upgradeid);
 
             if(!state.inventory.hasItems(UpgradeRecipes.get(weapon))){
                 return;
@@ -283,7 +290,7 @@ public class NetServer extends Module{
             }
 
             state.inventory.removeItems(UpgradeRecipes.get(weapon));
-            Net.sendTo(id, packet, SendMode.tcp);
+            Net.send(packet, SendMode.tcp);
         });
 
         Net.handleServer(WeaponSwitchPacket.class, (id, packet) -> {

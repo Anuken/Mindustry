@@ -86,16 +86,16 @@ public class Packets {
     public static class ConnectPacket implements Packet{
         public int version;
         public int players;
-        public String[] names;
-        public boolean android;
-        public int[] colors;
+        public String name;
+        public boolean mobile;
+        public int color;
         public byte[] uuid;
 
         @Override
         public void write(ByteBuffer buffer) {
             buffer.putInt(Version.build);
             IOUtils.writeString(buffer, name);
-            buffer.put(android ? (byte)1 : 0);
+            buffer.put(mobile ? (byte)1 : 0);
             buffer.putInt(color);
             buffer.put(uuid);
         }
@@ -104,7 +104,7 @@ public class Packets {
         public void read(ByteBuffer buffer) {
             version = buffer.getInt();
             name = IOUtils.readString(buffer);
-            android = buffer.get() == 1;
+            mobile = buffer.get() == 1;
             color = buffer.getInt();
             uuid = new byte[8];
             buffer.get(uuid);
@@ -392,16 +392,19 @@ public class Packets {
     }
 
     public static class UpgradePacket implements Packet{
-        public byte id; //weapon ID only, currently
+        public byte upgradeid; //weapon ID only, currently
+        public int playerid;
 
         @Override
         public void write(ByteBuffer buffer) {
-            buffer.put(id);
+            buffer.put(upgradeid);
+            buffer.putInt(playerid);
         }
 
         @Override
         public void read(ByteBuffer buffer) {
-            id = buffer.get();
+            upgradeid = buffer.get();
+            playerid = buffer.getInt();
         }
     }
 

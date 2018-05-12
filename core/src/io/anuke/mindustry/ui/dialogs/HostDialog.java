@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
@@ -11,7 +12,7 @@ import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.player;
+import static io.anuke.mindustry.Vars.players;
 import static io.anuke.mindustry.Vars.ui;
 
 public class HostDialog extends FloatingDialog{
@@ -20,13 +21,15 @@ public class HostDialog extends FloatingDialog{
     public HostDialog(){
         super("$text.hostserver");
 
+        Player player = players[0];
+
         addCloseButton();
 
         content().table(t -> {
             t.add("$text.name").padRight(10);
             t.addField(Settings.getString("name"), text -> {
                 if(text.isEmpty()) return;
-                Vars.player.name = text;
+                player.name = text;
                 Settings.put("name", text);
                 Settings.save();
                 ui.listfrag.rebuild();

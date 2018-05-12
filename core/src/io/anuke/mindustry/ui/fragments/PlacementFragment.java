@@ -8,6 +8,7 @@ import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.ucore.core.Core;
+import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.label;
@@ -28,10 +29,10 @@ public class PlacementFragment implements Fragment{
 	Table breaktable, next, container;
 	Label modelabel;
 	
-	public void build(){
+	public void build(Group parent){
 		if(!mobile) return;
 
-		InputHandler input = control.input();
+		InputHandler input = control.input(0);
 
 		float s = 50f;
 		float translation = Unit.dp.scl(58f);
@@ -130,7 +131,7 @@ public class PlacementFragment implements Fragment{
 							defaults().padBottom(-5.5f);
 
 							ImageButton button = new imagebutton("icon-" + mode.name(), "toggle", 10 * 3, () -> {
-								control.input().resetCursor();
+								input.resetCursor();
 								input.breakMode = mode;
 								input.lastBreakMode = mode;
 								if (!mode.both){
@@ -183,7 +184,7 @@ public class PlacementFragment implements Fragment{
 							if (!mode.shown || mode.delete) continue;
 
 							new imagebutton("icon-" + mode.name(), "toggle", 10 * 3, () -> {
-								control.input().resetCursor();
+								input.resetCursor();
 								input.placeMode = mode;
 								input.lastPlaceMode = mode;
 								modeText(Bundles.format("text.mode.place", mode.toString()));
@@ -215,6 +216,8 @@ public class PlacementFragment implements Fragment{
 	}
 
 	private void toggle(boolean show){
+	    InputHandler input = control.input(0);
+
 		float dur = 0.3f;
 		Interpolation in = Interpolation.pow3Out;
 
@@ -223,8 +226,8 @@ public class PlacementFragment implements Fragment{
 		breaktable.getParent().swapActor(breaktable, next);
 
 		if(!show){
-			control.input().breakMode = PlaceMode.none;
-			if(control.input().placeMode.delete) control.input().placeMode = PlaceMode.none;
+			input.breakMode = PlaceMode.none;
+			if(input.placeMode.delete) input.placeMode = PlaceMode.none;
 			breaktable.actions(Actions.translateBy(-breaktable.getWidth() - 5, 0, dur, in), Actions.call(() -> shown = false));
 		}else{
 			shown = true;

@@ -46,9 +46,9 @@ public class AndroidInput extends InputHandler{
 		}
 		
 		if(placing && pointer == 0 && !placeMode.pan && !breaking()){
-			placeMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
+			placeMode.released(this, getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
 		}else if(pointer == 0 && !breakMode.pan && breaking() && drawPlace()){
-			breakMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
+			breakMode.released(this, getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
 		}
 
 		placing = false;
@@ -79,9 +79,9 @@ public class AndroidInput extends InputHandler{
 			if(cursor != null && !ui.hasMouse(screenX, screenY)){
 				Tile linked = cursor.isLinked() ? cursor.getLinked() : cursor;
 				if(linked != null && linked.block().isConfigurable(linked)){
-					ui.configfrag.showConfig(linked);
-				}else if(!ui.configfrag.hasConfigMouse()){
-					ui.configfrag.hideConfig();
+					frag.config.showConfig(linked);
+				}else if(!frag.config.hasConfigMouse()){
+					frag.config.hideConfig();
 				}
 
 				if(linked != null) {

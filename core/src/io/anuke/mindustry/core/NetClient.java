@@ -54,6 +54,8 @@ public class NetClient extends Module {
     public NetClient(){
 
         Net.handleClient(Connect.class, packet -> {
+            Player player = players[0];
+
             player.isAdmin = false;
 
             Net.setClientLoaded(false);
@@ -71,7 +73,7 @@ public class NetClient extends Module {
 
             ConnectPacket c = new ConnectPacket();
             c.name = player.name;
-            c.android = mobile;
+            c.mobile = mobile;
             c.color = Color.rgba8888(player.color);
             c.uuid = Platform.instance.getUUID();
 
@@ -101,13 +103,14 @@ public class NetClient extends Module {
         Net.handleClient(WorldData.class, data -> {
             Log.info("Recieved world data: {0} bytes.", data.stream.available());
             NetworkIO.loadWorld(data.stream);
-            player.set(world.getSpawnX(), world.getSpawnY());
 
             finishConnecting();
         });
 
         Net.handleClient(SyncPacket.class, packet -> {
-            if (connecting) return;
+
+            Player player = players[0];
+
             int players = 0;
             int enemies = 0;
 
@@ -256,7 +259,6 @@ public class NetClient extends Module {
         });
 
         Net.handleClient(GameOverPacket.class, packet -> {
-            //TODO core death effects
             quiet = true;
             ui.restart.show();
         });
@@ -272,7 +274,7 @@ public class NetClient extends Module {
         });
 
         Net.handleClient(UpgradePacket.class, packet -> {
-            Weapon weapon = Upgrade.getByID(packet.id);
+            Weapon weapon = Upgrade.getByID(packet.upgradeid);
 
             state.inventory.removeItems(UpgradeRecipes.get(weapon));
             for(Player player : players) {
@@ -326,19 +328,15 @@ public class NetClient extends Module {
         Net.disconnect();
     }
 
-    public void clearRecieved(){
-        recieved.clear();
-    }
-
     void sync(){
         requests = 0;
 
         if(timer.get(0, playerSyncTime)){
-            for(Player player : players) {
-                PositionPacket packet = new PositionPacket();
-                packet.player = player;
-                Net.send(packet, SendMode.udp);
-            }
+            Player player = players[0];
+
+            PositionPacket packet = new PositionPacket();
+            packet.player = player;
+            Net.send(packet, SendMode.udp);
         }
 
         if(timer.get(1, 60)){

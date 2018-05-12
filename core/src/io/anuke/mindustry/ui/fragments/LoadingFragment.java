@@ -1,6 +1,7 @@
 package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.graphics.Colors;
+import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
@@ -11,7 +12,7 @@ public class LoadingFragment implements Fragment {
     private Table table;
 
     @Override
-    public void build() {
+    public void build(Group parent) {
 
        table = new table("loadDim"){{
             touchable(Touchable.enabled);

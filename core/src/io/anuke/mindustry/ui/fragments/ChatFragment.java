@@ -14,6 +14,7 @@ import io.anuke.mindustry.net.NetEvents;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.Label.LabelStyle;
 import io.anuke.ucore.scene.ui.TextField;
@@ -21,13 +22,13 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 
+import static io.anuke.mindustry.Vars.players;
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.ucore.core.Core.scene;
 import static io.anuke.ucore.core.Core.skin;
 
 public class ChatFragment extends Table implements Fragment{
     private final static int messagesShown = 10;
-    private final static int maxLength = 150;
     private Array<ChatMessage> messages = new Array<>();
     private float fadetime;
     private boolean chatOpen = false;
@@ -79,7 +80,7 @@ public class ChatFragment extends Table implements Fragment{
     }
 
     @Override
-    public void build() {
+    public void build(Group parent) {
         scene.add(this);
     }
 
@@ -95,12 +96,12 @@ public class ChatFragment extends Table implements Fragment{
         fieldlabel.setStyle(fieldlabel.getStyle());
 
         chatfield = new TextField("", new TextField.TextFieldStyle(skin.get(TextField.TextFieldStyle.class)));
-        chatfield.setTextFieldFilter((field, c) -> field.getText().length() < maxLength);
+        chatfield.setTextFieldFilter((field, c) -> field.getText().length() < Vars.maxTextLength);
         chatfield.getStyle().background = null;
         chatfield.getStyle().fontColor = Color.WHITE;
         chatfield.getStyle().font = skin.getFont("default-font-chat");
         chatfield.setStyle(chatfield.getStyle());
-        Platform.instance.addDialog(chatfield, maxLength);
+        Platform.instance.addDialog(chatfield, Vars.maxTextLength);
 
         bottom().left().marginBottom(offsety).marginLeft(offsetx*2).add(fieldlabel).padBottom(4f);
 
@@ -167,7 +168,7 @@ public class ChatFragment extends Table implements Fragment{
         if(message.replaceAll(" ", "").isEmpty()) return;
 
         history.insert(1, message);
-        NetEvents.handleSendMessage(message);
+        NetEvents.handleSendMessage(players[0], message);
     }
 
     public void toggle(){

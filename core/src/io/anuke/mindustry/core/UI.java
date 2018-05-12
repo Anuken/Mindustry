@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.editor.MapEditorDialog;
+import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
@@ -19,6 +20,7 @@ import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.modules.SceneModule;
+import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.Skin;
 import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.ui.Dialog;
@@ -52,16 +54,13 @@ public class UI extends SceneModule{
 	public ChangelogDialog changelog;
 
 	public final MenuFragment menufrag = new MenuFragment();
-    public final ToolFragment toolfrag = new ToolFragment();
     public final HudFragment hudfrag = new HudFragment();
     public final PlacementFragment placefrag = new PlacementFragment();
     public final ChatFragment chatfrag = new ChatFragment();
     public final PlayerListFragment listfrag = new PlayerListFragment();
     public final BackgroundFragment backfrag = new BackgroundFragment();
     public final LoadingFragment loadfrag = new LoadingFragment();
-    public final BlockConfigFragment configfrag = new BlockConfigFragment();
     public final DebugFragment debugfrag = new DebugFragment();
-    public final BlockInventoryFragment blockinvfrag = new BlockInventoryFragment();
 	public final PlayerMenuFragment playermenufrag = new PlayerMenuFragment();
 
     private Locale lastLocale;
@@ -134,18 +133,23 @@ public class UI extends SceneModule{
 		
 		act();
 
-		if(debug && !ui.chatfrag.chatOpen())
-			renderer.record(); //this only does something if GdxGifRecorder is on the class path, which it usually isn't
+		if(debug && !ui.chatfrag.chatOpen()) {
+            renderer.record(); //this only does something if GdxGifRecorder is on the class path, which it usually isn't
+        }
 
-		if(control.showCursor()) {
-			Draw.color();
+        for(int i = 0; i < players.length; i ++){
+		    InputHandler input = control.input(i);
 
-			float scl = Unit.dp.scl(3f);
+            if(input.isCursorVisible()) {
+                Draw.color();
 
-			Graphics.begin();
-			Draw.rect("controller-cursor", Graphics.mouse().x, Graphics.mouse().y, 16*scl, 16*scl);
-			Graphics.end();
-		}
+                float scl = Unit.dp.scl(3f);
+
+                Graphics.begin();
+                Draw.rect("controller-cursor", input.getMouseX(), Gdx.graphics.getHeight() - input.getMouseY(), 16*scl, 16*scl);
+                Graphics.end();
+            }
+        }
 	}
 
 	@Override
@@ -169,19 +173,18 @@ public class UI extends SceneModule{
 		traces = new TraceDialog();
 		
 		build.begin(scene);
+		
+		Group group = Core.scene.getRoot();
 
-		backfrag.build();
-		hudfrag.build();
-		configfrag.build();
-		menufrag.build();
-		placefrag.build();
-		toolfrag.build();
-		chatfrag.build();
-		listfrag.build();
-		debugfrag.build();
-		blockinvfrag.build();
-		playermenufrag.build();
-		loadfrag.build();
+		backfrag.build(group);
+		hudfrag.build(group);
+		menufrag.build(group);
+		placefrag.build(group);
+		chatfrag.build(group);
+		listfrag.build(group);
+		debugfrag.build(group);
+		playermenufrag.build(group);
+		loadfrag.build(group);
 
 		build.end();
 	}

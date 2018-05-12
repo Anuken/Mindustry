@@ -9,9 +9,9 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.builders.button;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
@@ -41,7 +41,10 @@ public class DebugFragment implements Fragment {
     }
 
     @Override
-    public void build(){
+    public void build(Group parent){
+
+        Player player = players[0];
+
         new table(){{
            visible(() -> debug);
 

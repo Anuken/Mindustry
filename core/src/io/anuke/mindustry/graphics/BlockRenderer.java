@@ -27,8 +27,6 @@ public class BlockRenderer{
 	private int requestidx = 0;
 	private int iterateidx = 0;
 
-	private float storeX, storeY;
-
 	public BlockRenderer(){
 		floorRenderer = new FloorRenderer();
 
@@ -205,40 +203,4 @@ public class BlockRenderer{
 		r.layer = layer;
 		requestidx ++;
 	}
-
-    public void drawPreview(Block block, float drawx, float drawy, float rotation, float opacity) {
-        Draw.alpha(opacity);
-        Draw.rect(block.name(), drawx, drawy, rotation);
-    }
-
-    public void handlePreview(Block block, float rotation, float drawx, float drawy, int tilex, int tiley) {
-
-        if(control.input().recipe != null && state.inventory.hasItems(control.input().recipe.requirements)
-                && control.input().validPlace(tilex, tiley, block) && (mobile || control.input().cursorNear())) {
-
-            if(block.isMultiblock()) {
-                float halfBlockWidth = (block.size * tilesize) / 2;
-                float halfBlockHeight = (block.size * tilesize) / 2;
-                if((storeX == 0 && storeY == 0)) {
-                    storeX = drawx;
-                    storeY = drawy;
-                }
-                if((storeX == drawx - halfBlockWidth || storeX == drawx + halfBlockWidth || storeY == drawy - halfBlockHeight || storeY == drawy + halfBlockHeight) &&
-                        ((tiley - control.input().getBlockY()) % block.size != 0 || (tilex - control.input().getBlockX()) % block.size != 0)) {
-                    return;
-                }else{
-                    storeX = drawx;
-                    storeY = drawy;
-                }
-            }
-
-            float opacity = (float) Settings.getInt("previewopacity") / 100f;
-            Draw.color(Color.WHITE);
-            Draw.alpha(opacity);
-
-            drawPreview(block, drawx, drawy, rotation, opacity);
-
-            Draw.reset();
-        }
-    }
 }

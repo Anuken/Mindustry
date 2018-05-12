@@ -1,11 +1,12 @@
 package io.anuke.mindustry.ui.fragments;
 
+import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.util.Strings;
 
 public class PlayerMenuFragment implements Fragment {
 
     @Override
-    public void build() {
+    public void build(Group parent) {
         /*
         new table(){{
             new table("clear"){{

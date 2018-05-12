@@ -1,6 +1,7 @@
 package io.anuke.mindustry.input;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -8,13 +9,10 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.core.Inputs.DeviceType;
-import io.anuke.ucore.core.KeyBinds;
-import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
-import io.anuke.ucore.util.Input;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
@@ -22,8 +20,10 @@ import static io.anuke.mindustry.Vars.*;
 public class DesktopInput extends InputHandler{
 	float mousex, mousey;
 	float endx, endy;
+	private float controlx, controly;
 	private boolean enableHold = false;
 	private boolean beganBreak;
+	private boolean controlling;
 
 	public DesktopInput(Player player){
 	    super(player);
@@ -37,14 +37,17 @@ public class DesktopInput extends InputHandler{
 
 	@Override
 	public void update(){
+
+        updateController();
+
 		if(player.isDead()) return;
 
 		if(Inputs.keyRelease("select")){
-			placeMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
+			placeMode.released(this, getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
 		}
 
 		if(Inputs.keyRelease("break") && !beganBreak){
-			breakMode.released(getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
+			breakMode.released(this, getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
 		}
 
 		if(!Inputs.keyDown("select")){
@@ -104,7 +107,7 @@ public class DesktopInput extends InputHandler{
 
 			if(Inputs.keyTap("weapon_" + keyIndex)){
 				player.weapon = (Weapon) player.upgrades.get(i);
-                if(Net.active()) NetEvents.handleWeaponSwitch();
+                if(Net.active()) NetEvents.handleWeaponSwitch(player);
 			}
 
 			keyIndex ++;
@@ -126,13 +129,13 @@ public class DesktopInput extends InputHandler{
 			showCursor = true;
 			if(Inputs.keyTap("select")){
 				canBeginShoot = false;
-				ui.blockinvfrag.showFor(target);
+				frag.inv.showFor(target);
                 Cursors.restoreCursor();
             }
 		}
 
 		if(!ui.hasMouse() && (target == null || !target.block().isAccessible()) && Inputs.keyTap("select")){
-			ui.blockinvfrag.hide();
+			frag.inv.hide();
 		}
 
         if(target != null && target.block().isConfigurable(target)){
@@ -141,14 +144,14 @@ public class DesktopInput extends InputHandler{
 		
 		if(target != null && Inputs.keyTap("select") && !ui.hasMouse()){
 			if(target.block().isConfigurable(target)){
-				if((!ui.configfrag.isShown()
-						|| ui.configfrag.getSelectedTile().block().onConfigureTileTapped(ui.configfrag.getSelectedTile(), cursor))) {
-					ui.configfrag.showConfig(target);
+				if((!frag.config.isShown()
+						|| frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), cursor))) {
+					frag.config.showConfig(target);
 					canBeginShoot = false;
 				}
-			}else if(!ui.configfrag.hasConfigMouse()){
-				if(ui.configfrag.isShown() && ui.configfrag.getSelectedTile().block().onConfigureTileTapped(ui.configfrag.getSelectedTile(), cursor)) {
-					ui.configfrag.hideConfig();
+			}else if(!frag.config.hasConfigMouse()){
+				if(frag.config.isShown() && frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), cursor)) {
+					frag.config.hideConfig();
 					canBeginShoot = false;
 				}
 			}
@@ -158,7 +161,7 @@ public class DesktopInput extends InputHandler{
 		}
 		
 		if(Inputs.keyTap("break")){
-			ui.configfrag.hideConfig();
+			frag.config.hideConfig();
 		}
 		
 		if(Inputs.keyRelease("break")){
@@ -196,7 +199,62 @@ public class DesktopInput extends InputHandler{
 				Cursors.restoreCursor();
 		}
 
+
 	}
+
+    @Override
+    public float getMouseX() {
+        return controlx;
+    }
+
+    @Override
+    public float getMouseY() {
+        return controly;
+    }
+
+    @Override
+    public boolean isCursorVisible() {
+        return controlling;
+    }
+
+    void updateController(){
+	    boolean mousemove = Gdx.input.getDeltaX() > 1 || Gdx.input.getDeltaY() > 1;
+
+        if(KeyBinds.getSection("default").device.type == DeviceType.controller && !mousemove){
+            if(Inputs.keyTap("select")){
+                Inputs.getProcessor().touchDown(Gdx.input.getX(), Gdx.input.getY(), player.playerIndex, Buttons.LEFT);
+            }
+
+            if(Inputs.keyRelease("select")){
+                Inputs.getProcessor().touchUp(Gdx.input.getX(), Gdx.input.getY(), player.playerIndex, Buttons.LEFT);
+            }
+
+            float xa = Inputs.getAxis("cursor_x");
+            float ya = Inputs.getAxis("cursor_y");
+
+            if(Math.abs(xa) > controllerMin || Math.abs(ya) > controllerMin) {
+                float scl = Settings.getInt("sensitivity")/100f * Unit.dp.scl(1f);
+                controlx += xa*baseControllerSpeed*scl;
+                controly -= ya*baseControllerSpeed*scl;
+                controlling = true;
+
+                Gdx.input.setCursorCatched(true);
+
+                Inputs.getProcessor().touchDragged(Gdx.input.getX(), Gdx.input.getY(), player.playerIndex);
+            }
+
+            controlx = Mathf.clamp(controlx, 0, Gdx.graphics.getWidth());
+            controly = Mathf.clamp(controly, 0, Gdx.graphics.getHeight());
+        }else{
+            controlling = false;
+            Gdx.input.setCursorCatched(false);
+        }
+
+        if(!controlling){
+            controlx = control.gdxInput().getX();
+            controly = control.gdxInput().getY();
+        }
+    }
 
 	public int tilex(){
 		return (recipe != null && recipe.result.isMultiblock() &&

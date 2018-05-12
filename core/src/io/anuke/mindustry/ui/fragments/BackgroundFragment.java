@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 import static io.anuke.mindustry.Vars.state;
@@ -12,7 +13,7 @@ import static io.anuke.mindustry.Vars.state;
 public class BackgroundFragment implements Fragment {
 
     @Override
-    public void build() {
+    public void build(Group parent) {
 
         Core.scene.table().addRect((a, b, w, h) -> {
             Draw.color();

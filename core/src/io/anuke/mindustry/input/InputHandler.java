@@ -10,10 +10,13 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
+import io.anuke.mindustry.ui.fragments.OverlayFragment;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Placement;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Angles;
@@ -23,6 +26,9 @@ import io.anuke.ucore.util.Translator;
 import static io.anuke.mindustry.Vars.*;
 
 public abstract class InputHandler extends InputAdapter{
+    public final static float playerSelectRange = Unit.dp.scl(60f);
+    private final static Translator stackTrns = new Translator();
+
 	public float breaktime = 0;
 	public Recipe recipe;
 	public int rotation;
@@ -33,12 +39,11 @@ public abstract class InputHandler extends InputAdapter{
 	public PlaceMode lastBreakMode = breakMode;
 	public boolean droppingItem, transferring;
 	public boolean shooting;
-	public float playerSelectRange = Unit.dp.scl(60f);
-
-	private Translator stackTrns = new Translator();
+	public OverlayFragment frag = new OverlayFragment(this);
 
 	public InputHandler(Player player){
 	    this.player = player;
+	    Timers.run(1f, () -> frag.build(Core.scene.getRoot()));
     }
 
 	public abstract void update();
@@ -46,11 +51,19 @@ public abstract class InputHandler extends InputAdapter{
 	public abstract float getCursorY();
 	public abstract float getCursorEndX();
 	public abstract float getCursorEndY();
-	public int getBlockX(){ return Mathf.sclb(Graphics.world(getCursorX(), getCursorY()).x, tilesize, round2()); }
+	public float getMouseX(){ return Gdx.input.getX(); };
+    public float getMouseY(){ return Gdx.input.getY(); };
+    public int getBlockX(){ return Mathf.sclb(Graphics.world(getCursorX(), getCursorY()).x, tilesize, round2()); }
 	public int getBlockY(){ return Mathf.sclb(Graphics.world(getCursorX(), getCursorY()).y, tilesize, round2()); }
 	public int getBlockEndX(){ return Mathf.sclb(Graphics.world(getCursorEndX(), getCursorEndY()).x, tilesize, round2()); }
 	public int getBlockEndY(){ return Mathf.sclb(Graphics.world(getCursorEndX(), getCursorEndY()).y, tilesize, round2()); }
 	public void resetCursor(){}
+	public boolean isCursorVisible(){ return false; }
+
+	public void remove(){
+	    Inputs.removeProcessor(this);
+	    frag.remove();
+    }
 
 	public boolean canShoot(){
 		return recipe == null && !ui.hasMouse() && !onConfigurable() && !isDroppingItem();
@@ -183,7 +196,7 @@ public abstract class InputHandler extends InputAdapter{
 		}
 
 		if(Net.active()){
-			NetEvents.handlePlace(x, y, result, rotation);
+			NetEvents.handlePlace(player, x, y, result, rotation);
 		}
 
 		if(!Net.client()){

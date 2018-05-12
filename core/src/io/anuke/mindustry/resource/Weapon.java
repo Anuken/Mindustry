@@ -75,8 +75,8 @@ public class Weapon extends Upgrade{
 	public void shoot(Player p, float x, float y, float angle, boolean left){
 		shootInternal(p, x, y, angle, left);
 
-		if(Net.active() && p == Vars.player){
-			NetEvents.handleShoot(Vars.player, x, y, angle, Bits.packShort(id, (byte)(left ? 1 : 0)));
+		if(Net.active() && p.isLocal){
+			NetEvents.handleShoot(p, x, y, angle, Bits.packShort(id, (byte)(left ? 1 : 0)));
 		}
 
 		p.inventory.useAmmo();

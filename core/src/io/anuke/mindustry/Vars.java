@@ -87,6 +87,8 @@ public class Vars{
     //whether to show block debug
     public static boolean showBlockDebug = false;
 
+    public static final int maxTextLength = 150;
+
 	public static boolean headless = false;
 
 	public static float controllerMin = 0.25f;
@@ -143,7 +145,7 @@ public class Vars{
 	public static NetServer netServer;
 	public static NetClient netClient;
 	
-	public static Player[] players;
+	public static Player[] players = {};
 
 	public static final EntityGroup<Player> playerGroup = Entities.addGroup(Player.class).enableMapping();
 	public static final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);

@@ -3,7 +3,9 @@ package io.anuke.mindustry.ui.dialogs;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Host;
@@ -21,7 +23,7 @@ import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
-import static io.anuke.mindustry.Vars.player;
+import static io.anuke.mindustry.Vars.players;
 import static io.anuke.mindustry.Vars.ui;
 
 public class JoinDialog extends FloatingDialog {
@@ -31,6 +33,7 @@ public class JoinDialog extends FloatingDialog {
     Table local = new Table();
     Table remote = new Table();
     Table hosts = new Table();
+    Json json = new Json();
     float w = 500;
 
     public JoinDialog(){
@@ -187,6 +190,8 @@ public class JoinDialog extends FloatingDialog {
     }
 
     void setup(){
+        Player player = players[0];
+
         hosts.clear();
 
         hosts.add(remote).growX();
@@ -205,7 +210,7 @@ public class JoinDialog extends FloatingDialog {
             t.add("$text.name").padRight(10);
             t.addField(Settings.getString("name"), text -> {
                 if(text.isEmpty()) return;
-                Vars.player.name = text;
+                player.name = text;
                 Settings.put("name", text);
                 Settings.save();
             }).grow().pad(8).get().setMaxLength(40);
@@ -304,39 +309,27 @@ public class JoinDialog extends FloatingDialog {
     }
 
     private void loadServers(){
-        String h = Settings.getString("servers");
-        String[] list = h.split("\\|\\|\\|");
-        for(String fname : list){
-            if(fname.isEmpty()) continue;
-            String[] split = fname.split(":");
-            String host = split[0];
-            int port = Strings.parseInt(split[1]);
-
-            if(port != Integer.MIN_VALUE) servers.add(new Server(host, port));
-        }
+        String h = Settings.getString("serverlist","{}");
+        servers = json.fromJson(Array.class, h);
     }
 
     private void saveServers(){
-        StringBuilder out = new StringBuilder();
-        for(Server server : servers){
-            out.append(server.ip);
-            out.append(":");
-            out.append(server.port);
-            out.append("|||");
-        }
-        Settings.putString("servers", out.toString());
+        Settings.putString("serverlist", json.toJson(servers));
         Settings.save();
     }
 
-    private class Server{
-        public String ip;
-        public int port;
-        public Host host;
-        public Table content;
+    static class Server{
+        String ip;
+        int port;
 
-        public Server(String ip, int port){
+        transient Host host;
+        transient Table content;
+
+        Server(String ip, int port){
             this.ip = ip;
             this.port = port;
         }
+
+        Server(){}
     }
 }

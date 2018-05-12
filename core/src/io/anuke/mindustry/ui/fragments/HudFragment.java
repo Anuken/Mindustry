@@ -11,6 +11,7 @@ import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.label;
@@ -36,7 +37,7 @@ public class HudFragment implements Fragment{
 	private float dsize = 58;
 	private float isize = 40;
 
-	public void build(){
+	public void build(Group parent){
 
 		//menu at top left
 		new table(){{
@@ -116,13 +117,6 @@ public class HudFragment implements Fragment{
 
 		}}.end();
 
-		//tutorial ui table
-		new table(){{
-			control.tutorial().buildUI(this);
-
-			visible(() -> control.tutorial().active());
-		}}.end();
-
 		new table(){{
 			visible(() -> !state.is(State.menu));
 			atop();
@@ -174,17 +168,6 @@ public class HudFragment implements Fragment{
 			});
 		}}.end();
 
-		//respawn table
-		new table(){{
-			new table("pane"){{
-
-				new label(()->"[orange]"+Bundles.get("text.respawn")+" " + (int)(control.getRespawnTime()/60)).scale(0.75f).pad(10);
-
-				visible(()->false);
-
-			}}.end();
-		}}.end();
-
 		new table(){{
 			abottom();
 			visible(() -> !state.is(State.menu) && control.getSaves().isSaving());
@@ -193,7 +176,7 @@ public class HudFragment implements Fragment{
 
 		}}.end();
 
-		blockfrag.build();
+		blockfrag.build(Core.scene.getRoot());
 	}
 
 	private void toggleMenus(){
@@ -236,7 +219,7 @@ public class HudFragment implements Fragment{
 
 				new label(()-> state.enemies > 0 ?
 					getEnemiesRemaining() :
-						(control.tutorial().active() || state.mode.disableWaveTimer) ? "$text.waiting"
+						(state.mode.disableWaveTimer) ? "$text.waiting"
 								: Bundles.format("text.wave.waiting", (int) (state.wavetime / 60f)))
 				.minWidth(126).padLeft(-6).left();
 

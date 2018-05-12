@@ -19,6 +19,7 @@ import io.anuke.mindustry.world.BlockStats;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.scene.Element;
+import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.ClickListener;
@@ -40,8 +41,8 @@ public class BlocksFragment implements Fragment{
 	private Recipe hoveredDescriptionRecipe;
 	private IntSet itemset = new IntSet();
 
-	public void build(){
-		InputHandler input = control.input();
+	public void build(Group parent){
+		InputHandler input = control.input(0);
 
 		new table(){{
 			abottom();
@@ -180,10 +181,9 @@ public class BlocksFragment implements Fragment{
 							table.add(image).size(size + 8);
 
 							image.update(() -> {
-								boolean canPlace = !control.tutorial().active() || control.tutorial().canPlace();
-								boolean has = (state.inventory.hasItems(r.requirements)) && canPlace;
+								boolean has = (state.inventory.hasItems(r.requirements));
 								image.setChecked(input.recipe == r);
-								image.setTouchable(canPlace ? Touchable.enabled : Touchable.disabled);
+								image.setTouchable(Touchable.enabled);
 								for(Element e : istack.getChildren()) e.setColor(has ? Color.WHITE : Hue.lightness(0.33f));
 							});
 

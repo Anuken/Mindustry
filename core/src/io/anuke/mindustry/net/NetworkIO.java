@@ -85,6 +85,8 @@ public class NetworkIO {
     /**Return whether a custom map is expected, and thus whether the client should wait for additional data.*/
     public static void loadWorld(InputStream is){
 
+        Player player = players[0];
+
         //TODO !! use map name as the network map in Maps, so getMap() isn't null.
 
         try(DataInputStream stream = new DataInputStream(is)){

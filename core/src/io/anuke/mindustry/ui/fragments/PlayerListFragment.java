@@ -14,6 +14,7 @@ import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.Element;
+import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.builders.button;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
@@ -32,7 +33,7 @@ public class PlayerListFragment implements Fragment{
     ObjectMap<Player, Boolean> checkmap = new ObjectMap<>();
 
     @Override
-    public void build(){
+    public void build(Group parent){
         new table(){{
             new table("pane"){{
                 margin(14f);
@@ -124,7 +125,7 @@ public class PlayerListFragment implements Fragment{
 
             button.addImage("icon-admin").size(14*2).visible(() -> player.isAdmin && !(!player.isLocal && Net.server())).padRight(5);
 
-            if((Net.server() || Vars.player.isAdmin) && !player.isLocal && (!player.isAdmin || Net.server())){
+            if((Net.server() || players[0].isAdmin) && !player.isLocal && (!player.isAdmin || Net.server())){
                 button.add().growY();
 
                 float bs = (h + 14)/2f;

@@ -9,16 +9,22 @@ import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.PlaceMode;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.ui.layout.Table;
 
 public class ToolFragment implements Fragment{
 	private Table tools;
+	private InputHandler input;
+
 	public int px, py, px2, py2;
 	public boolean confirming;
-	
-	public void build(){
-		InputHandler input = control.input();
-		
+
+	public ToolFragment(InputHandler input){
+	    this.input = input;
+    }
+
+	@Override
+	public void build(Group parent){
 		float isize = 14*3;
 		
 		tools = new Table();
@@ -38,14 +44,12 @@ public class ToolFragment implements Fragment{
 		
 		tools.addImageButton("icon-check", isize, () -> {
 			if(input.placeMode == PlaceMode.areaDelete && confirming){
-				input.placeMode.released(px, py, px2, py2);
+				input.placeMode.released(input, px, py, px2, py2);
 				confirming = false;
 			}else{
-				input.placeMode.tapped(control.input().getBlockX(), control.input().getBlockY());
+				input.placeMode.tapped(input, input.getBlockX(), input.getBlockY());
 			}
 		});
-		
-		Core.scene.add(tools);
 		
 		tools.setVisible(() ->
 			!state.is(State.menu) && mobile && ((input.recipe != null && state.inventory.hasItems(input.recipe.requirements) &&
@@ -58,13 +62,16 @@ public class ToolFragment implements Fragment{
 				tools.setPosition(v.x, v.y, Align.top);
 
 			}else{
-				tools.setPosition(control.input().getCursorX(),
-						Gdx.graphics.getHeight() - control.input().getCursorY() - 15*Core.cameraScale, Align.top);
+				tools.setPosition(input.getCursorX(),
+						Gdx.graphics.getHeight() - input.getCursorY() - 15*Core.cameraScale, Align.top);
 			}
 
 			if(input.placeMode != PlaceMode.areaDelete){
 				confirming = false;
 			}
 		});
+
+
+        parent.addChild(tools);
 	}
 }

@@ -1,6 +1,7 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.Mechs;
@@ -25,10 +26,7 @@ import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Atlas;
-import io.anuke.ucore.util.Input;
-import io.anuke.ucore.util.InputProxy;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -37,19 +35,14 @@ import static io.anuke.mindustry.Vars.*;
  * Should <i>not</i> handle any logic-critical state.
  * This class is not created in the headless server.*/
 public class Control extends Module{
-	private Tutorial tutorial = new Tutorial();
 	private boolean hiscore = false;
-
 	private boolean wasPaused = false;
-
 	private Saves saves;
+	private InputHandler[] inputs = {};
 
-	private InputHandler[] inputs;
-
-    private InputProxy proxy;
-    private float controlx, controly;
-    private boolean controlling;
     private Throwable error;
+    private InputProxy proxy;
+    private Input gdxInput;
 
 	public Control(){
 		saves = new Saves();
@@ -58,28 +51,6 @@ public class Control extends Module{
 
 		Gdx.input.setCatchBackKey(true);
 
-        proxy = new InputProxy(Gdx.input){
-            @Override
-            public int getY() {
-                return controlling ? (int)controly : input.getY();
-            }
-
-            @Override
-            public int getX() {
-                return controlling ? (int)controlx : input.getX();
-            }
-
-			@Override
-			public int getY(int pointer) {
-				return pointer == 0 ? getY() : super.getY(pointer);
-			}
-
-			@Override
-			public int getX(int pointer) {
-				return pointer == 0 ? getX() : super.getX(pointer);
-			}
-        };
-
 		Effects.setShakeFalloff(10000f);
 
 		Core.atlas = new Atlas("sprites.atlas");
@@ -87,6 +58,32 @@ public class Control extends Module{
 		for(Item item : Item.getAllItems()){
 			item.init();
 		}
+
+		gdxInput = Gdx.input;
+
+		proxy = new InputProxy(Gdx.input){
+            @Override
+            public int getX(int pointer) {
+                return pointer >= inputs.length ? super.getX(pointer) : (int)inputs[pointer].getMouseX();
+            }
+
+            @Override
+            public int getY(int pointer) {
+                return pointer >= inputs.length ? super.getY(pointer) : (int)inputs[pointer].getMouseY();
+            }
+
+            @Override
+            public int getX() {
+                return (int)inputs[0].getMouseX();
+            }
+
+            @Override
+            public int getY() {
+                return (int)inputs[0].getMouseY();
+            }
+        };
+
+		Gdx.input = proxy;
 
 		Sounds.load("shoot.mp3", "place.mp3", "explosion.mp3", "enemyshoot.mp3",
 				"corexplode.mp3", "break.mp3", "spawn.mp3", "flame.mp3", "die.mp3",
@@ -102,8 +99,11 @@ public class Control extends Module{
 		Settings.defaultList(
 			"ip", "localhost",
 			"port", port+"",
-			"servers", "",
-			"color", Color.rgba8888(playerColors[8]),
+			"color-0", Color.rgba8888(playerColors[8]),
+            "color-1", Color.rgba8888(playerColors[11]),
+            "color-2", Color.rgba8888(playerColors[13]),
+            "color-3", Color.rgba8888(playerColors[9]),
+			"name", "player",
 			"lastBuild", 0
 		);
 
@@ -156,7 +156,6 @@ public class Control extends Module{
 		Events.on(GameOverEvent.class, () -> {
 			Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
 
-
 			//TODO game over effect
 			ui.restart.show();
 
@@ -166,10 +165,20 @@ public class Control extends Module{
 
 	//TODO drop player method
 	public void addPlayer(int index){
+	    if(players.length < index + 1){
+	        Player[] old = players;
+	        players = new Player[index + 1];
+            System.arraycopy(old, 0, players, 0, old.length);
+
+            InputHandler[] oldi = inputs;
+            inputs = new InputHandler[index + 1];
+            System.arraycopy(old, 0, inputs, 0, oldi.length);
+        }
+
         Player player = new Player();
-        player.name = Settings.getString("name-" + index, "player");
+        player.name = Settings.getString("name");
         player.mech = mobile ? Mechs.standardShip : Mechs.standard;
-        player.color.set(Settings.getInt("color"));
+        player.color.set(Settings.getInt("color-" + index));
         player.isLocal = true;
         player.playerIndex = index;
         players[index] = player;
@@ -186,10 +195,9 @@ public class Control extends Module{
         Inputs.addProcessor(input);
     }
 
-	//FIXME figure out what's causing this problem in the first place
-	public void triggerInputUpdate(){
-		Gdx.input = proxy;
-	}
+    public Input gdxInput(){
+	    return gdxInput;
+    }
 
 	public void setError(Throwable error){
 		this.error = error;
@@ -199,13 +207,13 @@ public class Control extends Module{
 		return saves;
 	}
 
-	public boolean showCursor(){
-		return controlling;
-	}
-
 	public InputHandler input(int index){
 		return inputs[index];
 	}
+
+	public void triggerUpdateInput(){
+	    Gdx.input = proxy;
+    }
 
 	public void playMap(Map map){
 		ui.loadfrag.show();
@@ -222,10 +230,6 @@ public class Control extends Module{
 
 	public boolean isHighScore(){
 		return hiscore;
-	}
-
-	public Tutorial tutorial(){
-		return tutorial;
 	}
 
 	@Override
@@ -261,51 +265,9 @@ public class Control extends Module{
 			throw new RuntimeException(error);
 		}
 
-		Gdx.input = proxy;
-
         if(Inputs.keyTap("console")){
 			console = !console;
 		}
-
-        if(KeyBinds.getSection("default").device.type == DeviceType.controller){
-            if(Inputs.keyTap("select")){
-                Inputs.getProcessor().touchDown(Gdx.input.getX(), Gdx.input.getY(), 0, Buttons.LEFT);
-            }
-
-            if(Inputs.keyRelease("select")){
-				Inputs.getProcessor().touchUp(Gdx.input.getX(), Gdx.input.getY(), 0, Buttons.LEFT);
-            }
-
-            float xa = Inputs.getAxis("cursor_x");
-            float ya = Inputs.getAxis("cursor_y");
-
-            if(Math.abs(xa) > controllerMin || Math.abs(ya) > controllerMin) {
-            	float scl = Settings.getInt("sensitivity")/100f * Unit.dp.scl(1f);
-                controlx += xa*baseControllerSpeed*scl;
-                controly -= ya*baseControllerSpeed*scl;
-                controlling = true;
-
-                Gdx.input.setCursorCatched(true);
-
-				Inputs.getProcessor().touchDragged(Gdx.input.getX(), Gdx.input.getY(), 0);
-            }
-
-            controlx = Mathf.clamp(controlx, 0, Gdx.graphics.getWidth());
-            controly = Mathf.clamp(controly, 0, Gdx.graphics.getHeight());
-
-            if(Gdx.input.getDeltaX() > 1 || Gdx.input.getDeltaY() > 1) {
-				controlling = false;
-				Gdx.input.setCursorCatched(false);
-			}
-        }else{
-            controlling = false;
-			Gdx.input.setCursorCatched(false);
-        }
-
-        if(!controlling){
-            controlx = Gdx.input.getX();
-            controly = Gdx.input.getY();
-        }
 
         saves.update();
 
@@ -335,10 +297,6 @@ public class Control extends Module{
 			if(!state.is(State.paused) || Net.active()){
 				Entities.update(effectGroup);
 				Entities.update(groundEffectGroup);
-
-				if(tutorial.active()){
-					tutorial.update();
-				}
 			}
 		}else{
 			if(!state.is(State.paused) || Net.active()){

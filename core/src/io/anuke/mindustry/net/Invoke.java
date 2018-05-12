@@ -172,10 +172,10 @@ public class Invoke {
 
     /**Marks a method as invokable remotely with {@link Invoke#on(Class, String, Object...)}*/
     @Retention(RetentionPolicy.RUNTIME)
-    @interface Remote{}
+    public @interface Remote{}
 
     /**Marks a method to be locally invoked as well as remotely invoked.*/
     @Retention(RetentionPolicy.RUNTIME)
-    @interface Local{}
+    public @interface Local{}
 
 }

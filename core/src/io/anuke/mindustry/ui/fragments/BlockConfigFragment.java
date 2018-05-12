@@ -9,6 +9,7 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.scene.Element;
+import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.ui.layout.Table;
 
@@ -17,9 +18,9 @@ public class BlockConfigFragment implements  Fragment {
     private Tile configTile;
 
     @Override
-    public void build() {
+    public void build(Group parent) {
         table = new Table();
-        Core.scene.add(table);
+        parent.addChild(table);
     }
 
     public boolean isShown(){
@@ -41,7 +42,7 @@ public class BlockConfigFragment implements  Fragment {
         table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
                 Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
 
-        table.update(()->{
+        table.update(() -> {
             table.setOrigin(Align.center);
             Vector2 pos = Graphics.screen(tile.drawx(), tile.drawy());
             table.setPosition(pos.x, pos.y, Align.center);

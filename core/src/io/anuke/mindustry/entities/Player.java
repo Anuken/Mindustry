@@ -287,7 +287,7 @@ public class Player extends Unit{
 		movement.y += ya*speed;
 		movement.x += xa*speed;
 
-		boolean shooting = control.input().canShoot() && control.input().isShooting() && inventory.hasAmmo();
+		boolean shooting = control.input(playerIndex).canShoot() && control.input(playerIndex).isShooting() && inventory.hasAmmo();
 
 		if(shooting){
 			weapon.update(this, true);

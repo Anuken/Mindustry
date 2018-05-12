@@ -12,6 +12,7 @@ import io.anuke.mindustry.net.Invoke.Local;
 import io.anuke.mindustry.net.Invoke.Remote;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
+import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -63,20 +64,21 @@ public class NetEvents {
         Net.send(packet, SendMode.tcp);
     }
 
-    public static void handleWeaponSwitch(){
+    public static void handleWeaponSwitch(Player player){
         WeaponSwitchPacket packet = Pools.obtain(WeaponSwitchPacket.class);
-        packet.weapon = Vars.player.weapon.id;
-        packet.playerid = Vars.player.id;
+        packet.weapon = player.weapon.id;
+        packet.playerid = player.id;
         Net.send(packet, SendMode.tcp);
     }
 
-    public static void handleUpgrade(Weapon weapon){
+    public static void handleUpgrade(Player player, Upgrade weapon){
         UpgradePacket packet = Pools.obtain(UpgradePacket.class);
-        packet.id = weapon.id;
+        packet.upgradeid = weapon.id;
+        packet.playerid = player.id;
         Net.send(packet, SendMode.tcp);
     }
 
-    public static void handleSendMessage(String message){
+    public static void handleSendMessage(Player player, String message){
         ChatPacket packet = Pools.obtain(ChatPacket.class);
         packet.text = message;
         packet.name = player.name;
@@ -99,12 +101,12 @@ public class NetEvents {
         Net.send(packet, SendMode.udp);
     }
 
-    public static void handlePlace(int x, int y, Block block, int rotation){
+    public static void handlePlace(Player player, int x, int y, Block block, int rotation){
         PlacePacket packet = Pools.obtain(PlacePacket.class);
         packet.x = (short)x;
         packet.y = (short)y;
         packet.rotation = (byte)rotation;
-        packet.playerid = Vars.player.id;
+        packet.playerid = player.id;
         packet.block = block.id;
         Net.send(packet, SendMode.tcp);
     }

@@ -148,6 +148,8 @@ project(":core") {
     apply plugin: "java"
 
     dependencies {
+        compile project(":annotations")
+
         boolean comp = System.properties["release"] == null || System.properties["release"] == "false"
 
         if(!comp){
@@ -165,10 +167,16 @@ project(":core") {
         if(new File('../GDXGifRecorder').exists() && comp) {
             compile project(":GDXGifRecorder")
         }
+
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
     }
+
+    compileJava.options.compilerArgs = [
+            "-proc:only",
+            "-processor", "io.anuke.annotations.AnnotationProcessor"
+    ]
 }
 
 project(":server") {
@@ -180,6 +188,12 @@ project(":server") {
         compile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     }
+}
+
+project(":annotations") {
+    apply plugin: "java"
+
+    dependencies {}
 }
 
 project(":kryonet") {

@@ -30,30 +30,30 @@ public class GestureHandler extends GestureAdapter{
 	public boolean tap (float x, float y, int count, int button) {
 		if(ui.hasMouse() || input.brokeBlock) return false;
 		
-		if(!control.input().placeMode.pan || control.input().recipe == null){
+		if(!input.placeMode.pan || input.recipe == null){
 			input.mousex = x;
 			input.mousey = y;
 			
-			if(control.input().recipe == null)
-				control.input().breakMode.tapped(input.getBlockX(), input.getBlockY());
+			if(input.recipe == null)
+				input.breakMode.tapped(input, input.getBlockX(), input.getBlockY());
 			else
-				control.input().placeMode.tapped(input.getBlockX(), input.getBlockY());
+				input.placeMode.tapped(input, input.getBlockX(), input.getBlockY());
 		}
 		return false;
 	}
 	
 	@Override
 	public boolean pan(float x, float y, float deltaX, float deltaY){
-		if(control.showCursor() && !Inputs.keyDown("select")) return false;
+		if(input.isCursorVisible() && !Inputs.keyDown("select")) return false;
 
-		if(!control.showCursor() && !(control.input().recipe != null
-				&& control.input().placeMode.lockCamera && state.inventory.hasItems(control.input().recipe.requirements)) &&
-				!(control.input().recipe == null && control.input().breakMode.lockCamera)){
+		if(!input.isCursorVisible() && !(input.recipe != null
+				&& input.placeMode.lockCamera && state.inventory.hasItems(input.recipe.requirements)) &&
+				!(input.recipe == null && input.breakMode.lockCamera)){
 			float dx = deltaX*Core.camera.zoom/Core.cameraScale, dy = deltaY*Core.camera.zoom/Core.cameraScale;
-			player.x -= dx;
-			player.y += dy;
-			player.targetAngle = Mathf.atan2(dx, -dy) + 180f;
-		}else if(control.input().placeMode.lockCamera && (control.input().placeMode.pan && control.input().recipe != null)){
+			input.player.x -= dx;
+            input.player.y += dy;
+            input.player.targetAngle = Mathf.atan2(dx, -dy) + 180f;
+		}else if(input.placeMode.lockCamera && (input.placeMode.pan && input.recipe != null)){
 			input.mousex += deltaX;
 			input.mousey += deltaY;
 		}
@@ -63,7 +63,7 @@ public class GestureHandler extends GestureAdapter{
 	
 	@Override
 	public boolean pinch (Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
-		if(control.input().recipe == null && !control.input().breakMode.lockCamera)
+		if(input.recipe == null && !input.breakMode.lockCamera)
 			return false;
 		
 		if(pinch1.x < 0){
@@ -72,9 +72,9 @@ public class GestureHandler extends GestureAdapter{
 		}
 		
 		Vector2 vec = (vector.set(pointer1).add(pointer2).scl(0.5f)).sub(pinch1.add(pinch2).scl(0.5f));
-		
-		player.x -= vec.x*Core.camera.zoom/Core.cameraScale;
-		player.y += vec.y*Core.camera.zoom/Core.cameraScale;
+
+        input.player.x -= vec.x*Core.camera.zoom/Core.cameraScale;
+        input.player.y += vec.y*Core.camera.zoom/Core.cameraScale;
 		
 		pinch1.set(pointer1);
 		pinch2.set(pointer2);

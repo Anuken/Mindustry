@@ -244,7 +244,6 @@ public class Tutorial{
 			}
 			
 			void onSwitch(){
-				control.input().recipe = null;
 			}
 		},
 		drillInfo{
@@ -320,7 +319,6 @@ public class Tutorial{
 					//world.tile(world.getCore().x + 2, world.getCore().y - 2 + i).setBlock(DistributionBlocks.conveyor, 1);
 				}
 
-				control.input().recipe = null;
 			}
 		},
 		turretExplanation{

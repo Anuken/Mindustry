@@ -7,6 +7,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.world.Tile;
@@ -16,6 +18,7 @@ import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.BooleanProvider;
 import io.anuke.ucore.function.Callable;
+import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.event.HandCursorListener;
 import io.anuke.ucore.scene.event.Touchable;
@@ -29,12 +32,20 @@ import static io.anuke.mindustry.Vars.*;
 
 public class BlockInventoryFragment implements Fragment {
     private Table table;
+    private boolean shown;
     private Tile tile;
+    private InputHandler input;
+
+    public BlockInventoryFragment(InputHandler input){
+        this.input = input;
+    }
+
 
     @Override
-    public void build() {
+    public void build(Group parent) {
         table = new Table();
-        table.setVisible(() -> !state.is(State.menu));
+        table.setVisible(() -> !state.is(State.menu) && shown);
+        parent.addChild(table);
     }
 
     public void showFor(Tile t){
@@ -44,18 +55,20 @@ public class BlockInventoryFragment implements Fragment {
     }
 
     public void hide(){
+        shown = false;
         table.clear();
-        table.remove();
         table.setTouchable(Touchable.disabled);
         table.update(() -> {});
         tile = null;
     }
 
     private void rebuild(){
+        Player player = input.player;
+
+        shown = true;
         IntSet container = new IntSet();
 
         table.clear();
-        if(table.getParent() == null) Core.scene.add(table);
         table.background("clear");
         table.setTouchable(Touchable.enabled);
         table.update(() -> {
@@ -137,6 +150,8 @@ public class BlockInventoryFragment implements Fragment {
     }
 
     private void move(TextureRegion region, Vector2 v, Callable c, Color color){
+        Player player = input.player;
+
         Vector2 tv = Graphics.screen(player.x + Angles.trnsx(player.rotation + 180f, 5f), player.y + Angles.trnsy(player.rotation + 180f, 5f));
         float tx = tv.x, ty = tv.y;
         float dur = 40f / 60f;

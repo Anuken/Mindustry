@@ -6,6 +6,7 @@ import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.ui.MenuButton;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
+import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
@@ -14,7 +15,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class MenuFragment implements Fragment{
 	
-	public void build(){
+	public void build(Group parent){
 		new table(){{
 			visible(() -> state.is(State.menu));
 

@@ -281,6 +281,7 @@ public class Renderer extends RendererModule{
 	    for(Player player : players){
 	        avgPosition.add(player.x, player.y);
         }
+        avgPosition.scl(1f / players.length);
         return avgPosition;
     }
 
