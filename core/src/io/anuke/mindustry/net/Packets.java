@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
+import io.anuke.mindustry.gen.CallEvent;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packet.UnimportantPacket;
@@ -33,28 +34,28 @@ public class Packets {
     }
 
     public static class InvokePacket implements Packet{
-        public Object[] args;
-        public Method method;
-        public Class type;
+        public byte type;
+
+        public ByteBuffer writeBuffer;
+        public int writeLength;
 
         @Override
         public void read(ByteBuffer buffer) {
-            IOUtils.writeString(buffer, method.getName());
-            IOUtils.writeString(buffer, type.getName());
-            Invoke.writeObjects(buffer, args);
+            type = buffer.get();
+
+            if(Net.client()){
+                CallEvent.readPacket(buffer, type);
+            }else{
+                buffer.position(buffer.position() + writeLength);
+            }
         }
 
         @Override
         public void write(ByteBuffer buffer) {
-            String methodname = IOUtils.readString(buffer);
-            String typename = IOUtils.readString(buffer);
-
-            try {
-                type = Invoke.findClass(typename);
-                method = Invoke.getMethod(type, methodname);
-                args = Invoke.readObjects(buffer, method.getParameterTypes());
-            }catch (ReflectionException e){
-                throw new RuntimeException(e);
+            buffer.put(type);
+            writeBuffer.position(0);
+            for(int i = 0; i < writeLength; i ++){
+                buffer.put(writeBuffer.get());
             }
         }
     }

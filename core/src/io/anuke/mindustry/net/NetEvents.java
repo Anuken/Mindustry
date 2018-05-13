@@ -1,26 +1,27 @@
 package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.utils.Pools;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.Method;
-import io.anuke.mindustry.Vars;
+import io.anuke.annotations.Annotations.Local;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.net.Invoke.Local;
-import io.anuke.mindustry.net.Invoke.Remote;
+import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.gen.CallEvent;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.resource.Upgrade;
-import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.entities.Entity;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class NetEvents {
 
+    @Remote
+    @Local
     public static void friendlyFireChange(boolean enabled){
         state.friendlyFire = enabled;
 

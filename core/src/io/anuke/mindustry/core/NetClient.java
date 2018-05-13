@@ -150,15 +150,10 @@ public class NetClient extends Module {
         });
 
         Net.handleClient(InvokePacket.class, packet -> {
-            try{
-                packet.method.invoke(null, packet.args);
-            }catch (ReflectionException e){
-                throw new RuntimeException(e);
-            }
+            //TODO invoke it
         });
 
         Net.handleClient(StateSyncPacket.class, packet -> {
-
             System.arraycopy(packet.items, 0, state.inventory.writeItems(), 0, packet.items.length);
 
             state.enemies = packet.enemies;

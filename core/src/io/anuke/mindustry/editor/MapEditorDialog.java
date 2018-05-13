@@ -28,7 +28,7 @@ import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Input;
+import io.anuke.ucore.input.Input;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 

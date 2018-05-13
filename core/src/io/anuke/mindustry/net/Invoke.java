@@ -4,6 +4,8 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import io.anuke.annotations.Annotations.Local;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Team;
@@ -39,10 +41,7 @@ public class Invoke {
                 method.invoke(null, args);
             }
             InvokePacket packet = new InvokePacket();
-            packet.args = args;
-            packet.type = type;
-            packet.method = method;
-            packet.args = args;
+
             Net.send(packet, SendMode.tcp);
         }catch (ReflectionException e){
             throw new RuntimeException(e);
@@ -170,12 +169,5 @@ public class Invoke {
 
     }
 
-    /**Marks a method as invokable remotely with {@link Invoke#on(Class, String, Object...)}*/
-    @Retention(RetentionPolicy.RUNTIME)
-    public @interface Remote{}
-
-    /**Marks a method to be locally invoked as well as remotely invoked.*/
-    @Retention(RetentionPolicy.RUNTIME)
-    public @interface Local{}
 
 }

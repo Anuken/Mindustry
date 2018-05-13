@@ -2,15 +2,11 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.Mechs;
-import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.Tutorial;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.input.DesktopInput;
@@ -20,12 +16,10 @@ import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.io.Saves;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Item;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.*;
-import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.input.InputProxy;
 import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -270,6 +264,8 @@ public class Control extends Module{
 		}
 
         saves.update();
+
+		triggerUpdateInput();
 
 		if(!state.is(State.menu)){
 		    for(InputHandler input : inputs){

@@ -24,9 +24,13 @@ public class DesktopInput extends InputHandler{
 	private boolean enableHold = false;
 	private boolean beganBreak;
 	private boolean controlling;
+	private final int index;
+	private final String section;
 
 	public DesktopInput(Player player){
 	    super(player);
+	    this.index = player.playerIndex;
+	    this.section = "player_" + (player.playerIndex + 1);
     }
 	
 	@Override public float getCursorEndX(){ return endx; }
@@ -42,21 +46,21 @@ public class DesktopInput extends InputHandler{
 
 		if(player.isDead()) return;
 
-		if(Inputs.keyRelease("select")){
+		if(Inputs.keyRelease(section, "select")){
 			placeMode.released(this, getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
 		}
 
-		if(Inputs.keyRelease("break") && !beganBreak){
+		if(Inputs.keyRelease(section, "break") && !beganBreak){
 			breakMode.released(this, getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
 		}
 
-		if(!Inputs.keyDown("select")){
+		if(!Inputs.keyDown(section, "select")){
 			shooting = false;
 		}
 
-		boolean canBeginShoot = Inputs.keyTap("select") && canShoot();
+		boolean canBeginShoot = Inputs.keyTap(section, "select") && canShoot();
 
-		if(Inputs.keyTap("select") && recipe == null && player.inventory.hasItem()){
+		if(Inputs.keyTap(section, "select") && recipe == null && player.inventory.hasItem()){
 			Vector2 vec = Graphics.screen(player.x, player.y);
 			if(vec.dst(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY()) <= playerSelectRange){
 				canBeginShoot = false;
@@ -64,13 +68,13 @@ public class DesktopInput extends InputHandler{
 			}
 		}
 
-		if((Inputs.keyTap("select") && recipe != null) || Inputs.keyTap("break")){
+		if((Inputs.keyTap(section, "select") && recipe != null) || Inputs.keyTap(section, "break")){
 			Vector2 vec = Graphics.world(Gdx.input.getX(), Gdx.input.getY());
 			mousex = vec.x;
 			mousey = vec.y;
 		}
 
-		if(!Inputs.keyDown("select") && !Inputs.keyDown("break")){
+		if(!Inputs.keyDown(section, "select") && !Inputs.keyDown(section, "break")){
 			mousex = Graphics.mouseWorld().x;
 			mousey = Graphics.mouseWorld().y;
 		}
@@ -78,21 +82,21 @@ public class DesktopInput extends InputHandler{
 		endx = Gdx.input.getX();
 		endy = Gdx.input.getY();
 
-		boolean controller = KeyBinds.getSection("default").device.type == DeviceType.controller;
+		boolean controller = KeyBinds.getSection(section).device.type == DeviceType.controller;
 		
-		if(Inputs.getAxisActive("zoom") && (Inputs.keyDown("zoom_hold") || controller)
+		if(Inputs.getAxisActive("zoom") && (Inputs.keyDown(section,"zoom_hold") || controller)
 				&& !state.is(State.menu) && !ui.hasDialog()){
-		    renderer.scaleCamera((int) Inputs.getAxisTapped("zoom"));
+		    renderer.scaleCamera((int) Inputs.getAxisTapped(section, "zoom"));
 		}
 
-		renderer.minimap().zoomBy(-(int)Inputs.getAxisTapped("zoom_minimap"));
+		renderer.minimap().zoomBy(-(int)Inputs.getAxisTapped(section,"zoom_minimap"));
 
-		rotation += Inputs.getAxisTapped("rotate_alt");
-		rotation += Inputs.getAxis("rotate");
+		rotation += Inputs.getAxisTapped(section,"rotate_alt");
+		rotation += Inputs.getAxis(section,"rotate");
 
 		rotation = Mathf.mod(rotation, 4);
 		
-		if(Inputs.keyDown("break")){
+		if(Inputs.keyDown(section,"break")){
 			breakMode = PlaceMode.areaDelete;
 		}else{
 			breakMode = PlaceMode.hold;
@@ -117,24 +121,24 @@ public class DesktopInput extends InputHandler{
 		Tile target = cursor == null ? null : cursor.target();
 		boolean showCursor = false;
 
-		if(droppingItem && Inputs.keyRelease("select") && !player.inventory.isEmpty() && target != null){
+		if(droppingItem && Inputs.keyRelease(section,"select") && !player.inventory.isEmpty() && target != null){
 			dropItem(target, player.inventory.getItem());
 		}
 
-		if(droppingItem && (!Inputs.keyDown("select") || player.inventory.isEmpty())){
+		if(droppingItem && (!Inputs.keyDown(section,"select") || player.inventory.isEmpty())){
 			droppingItem = false;
 		}
 
-		if(recipe == null && target != null && !ui.hasMouse() && Inputs.keyDown("block_info") && target.block().isAccessible()){
+		if(recipe == null && target != null && !ui.hasMouse() && Inputs.keyDown(section,"block_info") && target.block().isAccessible()){
 			showCursor = true;
-			if(Inputs.keyTap("select")){
+			if(Inputs.keyTap(section,"select")){
 				canBeginShoot = false;
 				frag.inv.showFor(target);
                 Cursors.restoreCursor();
             }
 		}
 
-		if(!ui.hasMouse() && (target == null || !target.block().isAccessible()) && Inputs.keyTap("select")){
+		if(!ui.hasMouse() && (target == null || !target.block().isAccessible()) && Inputs.keyTap(section,"select")){
 			frag.inv.hide();
 		}
 
@@ -142,7 +146,7 @@ public class DesktopInput extends InputHandler{
 		    showCursor = true;
         }
 		
-		if(target != null && Inputs.keyTap("select") && !ui.hasMouse()){
+		if(target != null && Inputs.keyTap(section,"select") && !ui.hasMouse()){
 			if(target.block().isConfigurable(target)){
 				if((!frag.config.isShown()
 						|| frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), cursor))) {
@@ -160,21 +164,21 @@ public class DesktopInput extends InputHandler{
 			if(Net.active()) NetEvents.handleBlockTap(target);
 		}
 		
-		if(Inputs.keyTap("break")){
+		if(Inputs.keyTap(section,"break")){
 			frag.config.hideConfig();
 		}
 		
-		if(Inputs.keyRelease("break")){
+		if(Inputs.keyRelease(section,"break")){
 			beganBreak = false;
 		}
 
-		if(recipe != null && Inputs.keyTap("break")){
+		if(recipe != null && Inputs.keyTap(section,"break")){
 			beganBreak = true;
 			recipe = null;
 		}
 
 		//block breaking
-		if(enableHold && Inputs.keyDown("break") && cursor != null && validBreak(tilex(), tiley())){
+		if(enableHold && Inputs.keyDown(section,"break") && cursor != null && validBreak(tilex(), tiley())){
 			breaktime += Timers.delta();
 			if(breaktime >= cursor.getBreakTime()){
 				breakBlock(cursor.x, cursor.y, true);
@@ -199,7 +203,6 @@ public class DesktopInput extends InputHandler{
 				Cursors.restoreCursor();
 		}
 
-
 	}
 
     @Override
@@ -220,17 +223,21 @@ public class DesktopInput extends InputHandler{
     void updateController(){
 	    boolean mousemove = Gdx.input.getDeltaX() > 1 || Gdx.input.getDeltaY() > 1;
 
-        if(KeyBinds.getSection("default").device.type == DeviceType.controller && !mousemove){
-            if(Inputs.keyTap("select")){
+        if(KeyBinds.getSection(section).device.type == DeviceType.controller && (!mousemove || player.playerIndex > 0)){
+            if(player.playerIndex > 0){
+                controlling = true;
+            }
+
+            if(Inputs.keyTap(section,"select")){
                 Inputs.getProcessor().touchDown(Gdx.input.getX(), Gdx.input.getY(), player.playerIndex, Buttons.LEFT);
             }
 
-            if(Inputs.keyRelease("select")){
+            if(Inputs.keyRelease(section,"select")){
                 Inputs.getProcessor().touchUp(Gdx.input.getX(), Gdx.input.getY(), player.playerIndex, Buttons.LEFT);
             }
 
-            float xa = Inputs.getAxis("cursor_x");
-            float ya = Inputs.getAxis("cursor_y");
+            float xa = Inputs.getAxis(section, "cursor_x");
+            float ya = Inputs.getAxis(section, "cursor_y");
 
             if(Math.abs(xa) > controllerMin || Math.abs(ya) > controllerMin) {
                 float scl = Settings.getInt("sensitivity")/100f * Unit.dp.scl(1f);

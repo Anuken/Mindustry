@@ -85,7 +85,8 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
-        compile 'com.github.MinnDevelopment:java-discord-rpc:v1.3.2'
+        //todo uncomment
+        //compile 'com.github.MinnDevelopment:java-discord-rpc:v1.3.2'
     }
 }
 
@@ -174,8 +175,7 @@ project(":core") {
     }
 
     compileJava.options.compilerArgs = [
-            "-proc:only",
-            "-processor", "io.anuke.annotations.AnnotationProcessor"
+        "-processor", "io.anuke.annotations.AnnotationProcessor"
     ]
 }
 
@@ -193,7 +193,9 @@ project(":server") {
 project(":annotations") {
     apply plugin: "java"
 
-    dependencies {}
+    dependencies {
+        compile 'com.squareup:javapoet:1.11.0'
+    }
 }
 
 project(":kryonet") {

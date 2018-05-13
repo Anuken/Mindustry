@@ -1,8 +1,8 @@
 package io.anuke.mindustry.desktop;
 
-import club.minnced.discord.rpc.DiscordEventHandlers;
-import club.minnced.discord.rpc.DiscordRPC;
-import club.minnced.discord.rpc.DiscordRichPresence;
+//import club.minnced.discord.rpc.DiscordEventHandlers;
+//import club.minnced.discord.rpc.DiscordRPC;
+//import club.minnced.discord.rpc.DiscordRichPresence;
 import com.badlogic.gdx.utils.Base64Coder;
 import io.anuke.kryonet.DefaultThreadImpl;
 import io.anuke.mindustry.core.GameState.State;
@@ -24,7 +24,7 @@ import java.util.Locale;
 import java.util.Random;
 
 import static io.anuke.mindustry.Vars.*;
-
+//TODO uncomment discord related stuff
 public class DesktopPlatform extends Platform {
     final static boolean useDiscord = UCore.getPropertyNotNull("sun.arch.data.model").equals("64");
     final static String applicationId = "398246104468291591";
@@ -35,8 +35,8 @@ public class DesktopPlatform extends Platform {
         this.args = args;
 
         if(useDiscord) {
-            DiscordEventHandlers handlers = new DiscordEventHandlers();
-            DiscordRPC.INSTANCE.Discord_Initialize(applicationId, handlers, true, "");
+         //   DiscordEventHandlers handlers = new DiscordEventHandlers();
+        //    DiscordRPC.INSTANCE.Discord_Initialize(applicationId, handlers, true, "");
         }
     }
 
@@ -62,6 +62,7 @@ public class DesktopPlatform extends Platform {
 
     @Override
     public void updateRPC() {
+        /*
         if(!useDiscord) return;
 
         DiscordRichPresence presence = new DiscordRichPresence();
@@ -86,12 +87,12 @@ public class DesktopPlatform extends Platform {
 
         presence.largeImageKey = "logo";
 
-        DiscordRPC.INSTANCE.Discord_UpdatePresence(presence);
+        DiscordRPC.INSTANCE.Discord_UpdatePresence(presence);*/
     }
 
     @Override
     public void onGameExit() {
-        if(useDiscord) DiscordRPC.INSTANCE.Discord_Shutdown();
+        //if(useDiscord) DiscordRPC.INSTANCE.Discord_Shutdown();
     }
 
     @Override

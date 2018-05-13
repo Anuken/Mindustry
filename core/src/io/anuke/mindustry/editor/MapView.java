@@ -24,7 +24,7 @@ import io.anuke.ucore.scene.event.InputListener;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Input;
+import io.anuke.ucore.input.Input;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
