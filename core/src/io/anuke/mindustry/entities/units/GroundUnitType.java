@@ -14,10 +14,7 @@ import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
+import io.anuke.ucore.util.*;
 
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
@@ -44,7 +41,10 @@ public abstract class GroundUnitType extends UnitType{
     public void update(BaseUnit unit) {
         super.update(unit);
 
-        unit.rotation = unit.velocity.angle();
+        if(!unit.velocity.isZero(0.0001f) && (unit.target == null
+                || (unit.inventory.hasAmmo() && unit.distanceTo(unit.target) > unit.inventory.getAmmo().getRange()))){
+            unit.rotation = unit.velocity.angle();
+        }
     }
 
     @Override
@@ -82,39 +82,19 @@ public abstract class GroundUnitType extends UnitType{
     }
 
     @Override
-    public void updateTargeting(BaseUnit unit) {
-        if(!unit.timer.get(timerTarget, 20)) return;
-
-        unit.target = Units.findEnemyTile(unit.team, unit.x, unit.y, range, t -> true);
-
-        if(unit.target != null) return;
-
-        ObjectSet<TeamData> teams = state.teams.enemyDataOf(unit.team);
-
-        Tile closest = null;
-        float cdist = 0f;
-
-        for(TeamData data : teams){
-            for(Tile tile : data.cores){
-                float dist = Vector2.dst(unit.x, unit.y, tile.drawx(), tile.drawy());
-                if(closest == null || dist < cdist){
-                    closest = tile;
-                    cdist = dist;
-                }
-            }
-        }
-
-        if(closest != null){
-            unit.target = closest.entity;
-        }else{
-            unit.target = null;
+    public void behavior(BaseUnit unit) {
+        if(unit.health <= health * retreatPercent){
+            unit.setState(retreat);
         }
     }
 
     @Override
-    public void behavior(BaseUnit unit) {
-        if(unit.health <= health * retreatPercent){
-            unit.setState(retreat);
+    public void updateTargeting(BaseUnit unit) {
+        super.updateTargeting(unit);
+
+        if(unit.target != null && unit.inventory.hasAmmo() &&
+                !(unit.target instanceof TileEntity) && unit.target.distanceTo(unit) > unit.inventory.getAmmo().getRange()){
+            unit.target = null;
         }
     }
 
@@ -174,7 +154,7 @@ public abstract class GroundUnitType extends UnitType{
             }else if (unit.target == null){
                 if(unit.timer.get(timerTarget, 20)) {
                     Unit closest = Units.getClosestEnemy(unit.team, unit.x, unit.y,
-                            unit.inventory.getAmmo().getRange(), other -> other.distanceTo(unit) < 60f);
+                            unit.inventory.getAmmo().getRange(), other -> true);
                     if(closest != null){
                         unit.target = closest;
                     }else {
@@ -183,7 +163,12 @@ public abstract class GroundUnitType extends UnitType{
                     }
                 }
             }else{
-                moveToCore(unit);
+                if(unit.distanceTo(unit.target) > unit.inventory.getAmmo().getRange()){
+                    moveToCore(unit);
+                }else{
+                    unit.rotate(unit.angleTo(unit.target));
+                }
+
 
                 if (unit.timer.get(timerReload, reload) && Mathf.angNear(unit.angleTo(unit.target), unit.rotation, 13f)
                         && unit.distanceTo(unit.target) < unit.inventory.getAmmo().getRange()) {
