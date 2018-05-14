@@ -12,7 +12,6 @@ import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.mindustry.world.blocks.types.Rock;
 import io.anuke.mindustry.world.blocks.types.StaticBlock;
 import io.anuke.ucore.core.Settings;
-import java.util.ArrayList;
 import static io.anuke.mindustry.Vars.world;
 
 public class Administration {
@@ -25,7 +24,7 @@ public class Administration {
     /**Maps UUIDs to trace infos. This is wiped when a player logs off.*/
     private ObjectMap<String, TraceInfo> traceInfo = new ObjectMap<>();
     /**Maps packed coordinates to logs for that coordinate */
-    private IntMap<ArrayList<EditLog>> editLogs = new IntMap<>();
+    private IntMap<Array<EditLog>> editLogs = new IntMap<>();
     
     private Array<String> bannedIPs = new Array<>();
 
@@ -60,8 +59,12 @@ public class Administration {
         Settings.save();
     }
 
-    public IntMap<ArrayList<EditLog>> getEditLogs() {
+    public IntMap<Array<EditLog>> getEditLogs() {
         return editLogs;
+    }
+    
+    public void setEditLogs(IntMap<Array<EditLog>> editLogs) {
+        this.editLogs = editLogs;
     }
     
     public void logEdit(int x, int y, Player player, Block block, int rotation, EditLog.EditAction action) {
@@ -70,7 +73,7 @@ public class Administration {
 			editLogs.get(x + y * world.width()).add(new EditLog(player, block, rotation, action));
 		}
 		else {
-			ArrayList<EditLog> logs = new ArrayList<>();
+			Array<EditLog> logs = new Array<>();
 			logs.add(new EditLog(player, block, rotation, action));
 			editLogs.put(x + y * world.width(), logs);
 		}

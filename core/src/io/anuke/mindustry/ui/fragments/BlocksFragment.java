@@ -9,6 +9,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.net.EditLog;
+import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
@@ -26,7 +27,6 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
-import java.util.ArrayList;
 import static io.anuke.mindustry.Vars.*;
 
 public class BlocksFragment implements Fragment{
@@ -364,13 +364,13 @@ public class BlocksFragment implements Fragment{
 		
 		d.content().add(pane).grow();
 		
-		ArrayList<EditLog> logs = Vars.editLogs.get(x + y * world.width());
-		if(logs == null || logs.isEmpty()) {
+		Array<EditLog> logs = Vars.currentEditLogs;
+		if(logs == null || logs.size == 0) {
 			table.add("$text.block.editlogsnotfound").left();
 			table.row();
 		}
 		else {
-			for(int i = 0; i < logs.size(); i++) {
+			for(int i = 0; i < logs.size; i++) {
 				EditLog log = logs.get(i);
 				table.add("[gold]" + (i + 1) + ". [white]" + log.info()).left();
 				table.row();

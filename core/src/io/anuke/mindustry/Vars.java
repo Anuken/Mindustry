@@ -4,6 +4,7 @@ import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.Bullet;
@@ -20,7 +21,6 @@ import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import java.util.ArrayList;
 import java.util.Locale;
 
 public class Vars{
@@ -81,8 +81,6 @@ public class Vars{
 	public static boolean showUI = true;
     //whether to show block debug
     public static boolean showBlockDebug = false;
-	
-	public static IntMap<ArrayList<EditLog>> editLogs = new IntMap<>();
 
 	public static boolean headless = false;
 
@@ -93,6 +91,8 @@ public class Vars{
 	public static final int saveSlots = 64;
 	//amount of drops that are left when breaking a block
 	public static final float breakDropAmount = 0.5f;
+	
+	public static Array<EditLog> currentEditLogs = new Array<>();
 	
 	//only if smoothCamera
 	public static boolean snapCamera = true;

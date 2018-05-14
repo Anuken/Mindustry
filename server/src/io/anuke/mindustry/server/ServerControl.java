@@ -30,14 +30,10 @@ import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Scanner;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.util.Log.*;
-
-;
 
 public class ServerControl extends Module {
     private final CommandHandler handler = new CommandHandler("");
@@ -734,25 +730,26 @@ public class ServerControl extends Module {
 				err("Open the server first.");
 				return;
 			}
-			if(arg[0] == null) {
-				err("Please specify the amount of block edit cycles to rollback");
+			
+			if(!Strings.canParsePostiveInt(arg[0])) {
+				err("Please input a valid, positive, number of times to rollback");
 				return;
 			}
 			
 			int rollbackTimes = Integer.valueOf(arg[0]);
-			IntMap<ArrayList<EditLog>> editLogs = netServer.admins.getEditLogs();
+			IntMap<Array<EditLog>> editLogs = netServer.admins.getEditLogs();
 			if(editLogs.size == 0){
 				err("Nothing to rollback!");
 				return;
 			}
 			
-			for(IntMap.Entry<ArrayList<EditLog>> editLog : editLogs.entries()) {
+			for(IntMap.Entry<Array<EditLog>> editLog : editLogs.entries()) {
 				int coords = editLog.key;
-				ArrayList<EditLog> logs = editLog.value;
+				Array<EditLog> logs = editLog.value;
 				
 				for(int i = 0; i < rollbackTimes; i++) {
 					
-					EditLog log = logs.get(logs.size() - 1);
+					EditLog log = logs.get(logs.size - 1);
 					
 					int x = coords % world.width();
 					int y = coords / world.width();
@@ -782,8 +779,8 @@ public class ServerControl extends Module {
 						Net.send(packet, Net.SendMode.tcp);
 					}
 					
-					logs.remove(logs.size() - 1);
-					if(logs.isEmpty()) {
+					logs.removeIndex(logs.size - 1);
+					if(logs.size == 0) {
 						editLogs.remove(coords);
 						break;
 					}

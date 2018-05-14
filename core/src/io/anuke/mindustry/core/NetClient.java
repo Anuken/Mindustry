@@ -169,9 +169,9 @@ public class NetClient extends Module {
             ui.hudfrag.updateItems();
         });
     
-        Net.handleClient(BlockLogSyncPacket.class, packet -> {
-			Vars.editLogs = packet.editlogs;
-        });
+        Net.handleClient(BlockLogRequestPacket.class, packet -> {
+			currentEditLogs = packet.editlogs;
+		});
 
         Net.handleClient(PlacePacket.class, (packet) -> {
             Placement.placeBlock(packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, Timers.get("placeblocksound", 10));
@@ -256,6 +256,7 @@ public class NetClient extends Module {
                     world.getCore().entity != null){
                 world.getCore().entity.onDeath(true);
             }
+            netServer.admins.getEditLogs().clear();
             kicked = true;
             ui.restart.show();
         });

@@ -33,7 +33,6 @@ public class NetServer extends Module{
 
     private final static int timerEntitySync = 0;
     private final static int timerStateSync = 1;
-    private final static int timerBlockLogSync = 2;
 
     public final Administration admins = new Administration();
 
@@ -348,6 +347,11 @@ public class NetServer extends Module{
                 Log.info("&lc{0} has requested trace info of {1}.", player.name, other.name);
             }
         });
+    
+        Net.handleServer(BlockLogRequestPacket.class, (id, packet) -> {
+            packet.editlogs = EditLog.logsFromTile(packet.x, packet.y);
+            Net.sendTo(id, packet, SendMode.udp);
+        });
     }
 
     public void update(){
@@ -478,13 +482,6 @@ public class NetServer extends Module{
             packet.time = Timers.time();
             packet.timestamp = TimeUtils.millis();
            
-            Net.send(packet, SendMode.udp);
-        }
-        
-        if(timer.get(timerBlockLogSync, serverSyncTime)) {
-            BlockLogSyncPacket packet = new BlockLogSyncPacket();
-            packet.editlogs = admins.getEditLogs();
-            
             Net.send(packet, SendMode.udp);
         }
     }

@@ -1,8 +1,12 @@
 package io.anuke.mindustry.net;
 
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.world.Block;
+import static io.anuke.mindustry.Vars.netServer;
 import static io.anuke.mindustry.Vars.playerGroup;
+import static io.anuke.mindustry.Vars.world;
 
 public class EditLog {
 	
@@ -28,6 +32,15 @@ public class EditLog {
 						   Block.getByID(Integer.valueOf(parts[1])),
 						   Integer.valueOf(parts[2]),
 						   EditAction.valueOf(parts[3]));
+	}
+	
+	public static Array<EditLog> logsFromTile(int x, int y) {
+		for(IntMap.Entry<Array<EditLog>> editLog : netServer.admins.getEditLogs().entries()) {
+			if(editLog.key == (x + y * world.width())) {
+				return editLog.value;
+			}
+		}
+		return new Array<>();
 	}
 	
 	public String toString() {

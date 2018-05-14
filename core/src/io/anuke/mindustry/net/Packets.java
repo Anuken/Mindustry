@@ -1,5 +1,6 @@
 package io.anuke.mindustry.net;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -14,7 +15,6 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 
 /**Class for storing all packets.*/
 public class Packets {
@@ -140,51 +140,36 @@ public class Packets {
             timestamp = buffer.getLong();
         }
     }
-
-    public static class BlockLogSyncPacket implements Packet {
-		public IntMap<ArrayList<EditLog>> editlogs;
 	
+	public static class BlockLogRequestPacket implements Packet {
+		public int x;
+		public int y;
+		public Array<EditLog> editlogs;
+		
 		@Override
 		public void write(ByteBuffer buffer) {
-			int size = editlogs.size;
-			buffer.putInt(size);
-			for(IntMap.Entry<ArrayList<EditLog>> editlog :editlogs.entries()) {
+			buffer.putInt(x);
+			buffer.putInt(y);
+			buffer.putInt(editlogs.size);
+			for(EditLog value : editlogs) {
 				
-				String key = String.valueOf(editlog.key);
-				buffer.put((byte) key.getBytes().length);
-				buffer.put(key.getBytes());
-				
-				ArrayList<EditLog> values = editlog.value;
-				buffer.putInt(values.size());
-				for(EditLog value : values) {
-				 
-					String rawValue = value.toString();
-					buffer.put((byte) rawValue.getBytes().length);
-					buffer.put(rawValue.getBytes());
-				}
+				String rawValue = value.toString();
+				buffer.put((byte) rawValue.getBytes().length);
+				buffer.put(rawValue.getBytes());
 			}
 		}
-	
+		
 		@Override
 		public void read(ByteBuffer buffer) {
-			editlogs = new IntMap<>();
-			int logssize = buffer.getInt();
-			for(int i = 0; i < logssize; i ++){
-				
-				byte length = buffer.get();
-				byte[] bytes = new byte[length];
-				buffer.get(bytes);
-				Integer key = Integer.valueOf(new String(bytes));
-				
-				ArrayList<EditLog> list = new ArrayList<>();
-				int arraySize = buffer.getInt();
-				for(int a = 0; a < arraySize; a ++) {
+			x = buffer.getInt();
+			y = buffer.getInt();
+			editlogs = new Array<>();
+			int arraySize = buffer.getInt();
+			for(int a = 0; a < arraySize; a ++) {
 					
-					byte[] arraybytes = new byte[buffer.get()];
-					buffer.get(arraybytes);
-					list.add(EditLog.valueOf(new String(arraybytes)));
-				}
-				editlogs.put(key, list);
+				byte[] arraybytes = new byte[buffer.get()];
+				buffer.get(arraybytes);
+				editlogs.add(EditLog.valueOf(new String(arraybytes)));
 			}
 		}
 	}
