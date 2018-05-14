@@ -54,10 +54,12 @@ public class PausedDialog extends FloatingDialog{
 				load.show();
 			}).disabled(b -> Net.active());
 
+			//Local multiplayer is currently functional, but disabled.
+			/*
             content().row();
             content().addButton("$text.addplayers", () -> {
                 ui.localplayers.show();
-            }).disabled(b -> Net.active());
+            }).disabled(b -> Net.active());*/
 
 			content().row();
 
