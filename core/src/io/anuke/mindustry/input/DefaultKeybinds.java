@@ -11,7 +11,7 @@ import io.anuke.ucore.input.Input;
 public class DefaultKeybinds {
 
     public static void load(){
-        String[] sections = {"player_1", "player_2", "player_3", "player_4"};
+        String[] sections = {"player_1"};
 
         for(String section : sections) {
 
