@@ -74,7 +74,8 @@ public class OverlayRenderer {
 
             //draw selected block bars and info
             if (input.recipe == null && !ui.hasMouse() && !input.frag.config.isShown()) {
-                Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y);
+                Vector2 vec = Graphics.world(input.getMouseX(), input.getMouseY());
+                Tile tile = world.tileWorld(vec.x, vec.y);
 
                 if (tile != null && tile.block() != Blocks.air) {
                     Tile target = tile;
@@ -134,7 +135,7 @@ public class OverlayRenderer {
             }
 
             if (input.isDroppingItem()) {
-                Vector2 v = Graphics.mouseWorld();
+                Vector2 v = Graphics.world(input.getMouseX(), input.getMouseY());
                 float size = 8;
                 Draw.rect(player.inventory.getItem().item.region, v.x, v.y, size, size);
                 Draw.color("accent");

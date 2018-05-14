@@ -60,6 +60,10 @@ public abstract class InputHandler extends InputAdapter{
 	public void resetCursor(){}
 	public boolean isCursorVisible(){ return false; }
 
+	public float mouseAngle(float x, float y){
+        return Graphics.world(getMouseX(), getMouseY()).sub(x, y).angle();
+    }
+
 	public void remove(){
 	    Inputs.removeProcessor(this);
 	    frag.remove();

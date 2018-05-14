@@ -279,8 +279,10 @@ public class Player extends Unit{
 
 		movement.set(0, 0);
 
-		float xa = Inputs.getAxis("move_x");
-		float ya = Inputs.getAxis("move_y");
+		String section = "player_"+(playerIndex + 1);
+
+		float xa = Inputs.getAxis(section, "move_x");
+		float ya = Inputs.getAxis(section, "move_y");
 		if(Math.abs(xa) < 0.3) xa = 0;
 		if(Math.abs(ya) < 0.3) ya = 0;
 
@@ -310,7 +312,7 @@ public class Player extends Unit{
 				rotation = Mathf.slerpDelta(rotation, movement.angle(), 0.13f);
 			}
 		}else{
-			float angle = Angles.mouseAngle(x, y);
+			float angle = control.input(playerIndex).mouseAngle(x, y);
 			this.rotation = Mathf.slerpDelta(this.rotation, angle, 0.1f);
 		}
 	}

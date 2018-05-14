@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.content.Recipes;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.resource.ItemStack;
@@ -161,30 +162,44 @@ public class BlocksFragment implements Fragment{
 								}
 							});
 
-							image.clicked(() -> {
-								// note: input.recipe only gets set here during a click.
-								// during a hover only the visual description will be updated.
-								boolean nothingSelectedYet = input.recipe == null;
-								boolean selectedSomethingElse = !nothingSelectedYet && input.recipe != r;
-								boolean shouldMakeSelection = nothingSelectedYet || selectedSomethingElse;
-								if (shouldMakeSelection) {
-									input.recipe = r;
-									hoveredDescriptionRecipe = r;
-									updateRecipe(r);
-								} else {
-									input.recipe = null;
-									hoveredDescriptionRecipe = null;
-									updateRecipe(null);
-								}
-							});
+							image.addListener(new ClickListener(){
+                                @Override
+                                public void clicked(InputEvent event, float x, float y){
+                                    // note: input.recipe only gets set here during a click.
+                                    // during a hover only the visual description will be updated.
+                                    InputHandler handler = mobile ? input : control.input(event.getPointer());
+
+                                    boolean nothingSelectedYet = handler.recipe == null;
+                                    boolean selectedSomethingElse = !nothingSelectedYet && handler.recipe != r;
+                                    boolean shouldMakeSelection = nothingSelectedYet || selectedSomethingElse;
+                                    if (shouldMakeSelection) {
+                                        handler.recipe = r;
+                                        hoveredDescriptionRecipe = r;
+                                        updateRecipe(r);
+                                    } else {
+                                        handler.recipe = null;
+                                        hoveredDescriptionRecipe = null;
+                                        updateRecipe(null);
+                                    }
+                                }
+                            });
 
 							table.add(image).size(size + 8);
 
 							image.update(() -> {
 								boolean has = (state.inventory.hasItems(r.requirements));
-								image.setChecked(input.recipe == r);
 								image.setTouchable(Touchable.enabled);
-								for(Element e : istack.getChildren()) e.setColor(has ? Color.WHITE : Hue.lightness(0.33f));
+								for(Element e : istack.getChildren()){
+								    e.setColor(has ? Color.WHITE : Hue.lightness(0.33f));
+                                }
+
+                                for(Player player : players){
+								    if(control.input(player.playerIndex).recipe == r){
+                                        image.setChecked(true);
+                                        return;
+                                    }
+                                }
+                                image.setChecked(false);
 							});
 
 							if (i % rows == rows - 1)

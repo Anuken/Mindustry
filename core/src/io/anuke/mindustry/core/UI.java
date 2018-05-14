@@ -52,6 +52,7 @@ public class UI extends SceneModule{
 	public AdminsDialog admins;
 	public TraceDialog traces;
 	public ChangelogDialog changelog;
+	public LocalPlayerDialog localplayers;
 
 	public final MenuFragment menufrag = new MenuFragment();
     public final HudFragment hudfrag = new HudFragment();
@@ -171,6 +172,7 @@ public class UI extends SceneModule{
 		bans = new BansDialog();
 		admins = new AdminsDialog();
 		traces = new TraceDialog();
+		localplayers = new LocalPlayerDialog();
 		
 		build.begin(scene);
 		

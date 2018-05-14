@@ -54,6 +54,11 @@ public class PausedDialog extends FloatingDialog{
 				load.show();
 			}).disabled(b -> Net.active());
 
+            content().row();
+            content().addButton("$text.addplayers", () -> {
+                ui.localplayers.show();
+            }).disabled(b -> Net.active());
+
 			content().row();
 
 			if(!gwt) {

@@ -16,7 +16,7 @@ public class DefaultKeybinds {
         for(String section : sections) {
 
             KeyBinds.defaultSection(section, DeviceType.keyboard,
-                new Category("General"),
+         new Category("General"),
                 "move_x", new Axis(Input.A, Input.D),
                 "move_y", new Axis(Input.S, Input.W),
                 "select", Input.MOUSE_LEFT,
@@ -44,6 +44,7 @@ public class DefaultKeybinds {
             );
 
             KeyBinds.defaultSection(section, DeviceType.controller,
+         new Category("General"),
                 "move_x", new Axis(Input.CONTROLLER_L_STICK_HORIZONTAL_AXIS),
                 "move_y", new Axis(Input.CONTROLLER_L_STICK_VERTICAL_AXIS),
                 "cursor_x", new Axis(Input.CONTROLLER_R_STICK_HORIZONTAL_AXIS),
@@ -51,13 +52,15 @@ public class DefaultKeybinds {
                 "select", Input.CONTROLLER_R_BUMPER,
                 "break", Input.CONTROLLER_L_BUMPER,
                 "shoot", Input.CONTROLLER_R_TRIGGER,
+                "dash", Input.CONTROLLER_Y,
+                "rotate_alt", new Axis(Input.CONTROLLER_DPAD_RIGHT, Input.CONTROLLER_DPAD_LEFT),
+                "rotate", new Axis(Input.CONTROLLER_A, Input.CONTROLLER_B),
+                new Category("View"),
                 "zoom_hold", Input.ANY_KEY,
                 "zoom", new Axis(Input.CONTROLLER_DPAD_DOWN, Input.CONTROLLER_DPAD_UP),
                 "menu", Input.CONTROLLER_X,
                 "pause", Input.CONTROLLER_L_TRIGGER,
-                "dash", Input.CONTROLLER_Y,
-                "rotate_alt", new Axis(Input.CONTROLLER_DPAD_RIGHT, Input.CONTROLLER_DPAD_LEFT),
-                "rotate", new Axis(Input.CONTROLLER_A, Input.CONTROLLER_B),
+                new Category("Multiplayer"),
                 "player_list", Input.CONTROLLER_START
             );
 

@@ -52,7 +52,8 @@ public class Weapon extends Upgrade{
 				p.timer.reset(t2, reload/2f);
 			}
 
-			tr.set(Graphics.mouseWorld()).sub(p.x, p.y);
+			tr.set(Graphics.world(Vars.control.input(p.playerIndex).getMouseX(),
+                    Vars.control.input(p.playerIndex).getMouseY())).sub(p.x, p.y);
 			if(tr.len() < minPlayerDist) tr.setLength(minPlayerDist);
 
 			float cx = tr.x + p.x, cy = tr.y + p.y;

@@ -62,25 +62,26 @@ public class DesktopInput extends InputHandler{
 
 		if(Inputs.keyTap(section, "select") && recipe == null && player.inventory.hasItem()){
 			Vector2 vec = Graphics.screen(player.x, player.y);
-			if(vec.dst(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY()) <= playerSelectRange){
+			if(vec.dst(getMouseX(), Gdx.graphics.getHeight() - getMouseY()) <= playerSelectRange){
 				canBeginShoot = false;
 				droppingItem = true;
 			}
 		}
 
 		if((Inputs.keyTap(section, "select") && recipe != null) || Inputs.keyTap(section, "break")){
-			Vector2 vec = Graphics.world(Gdx.input.getX(), Gdx.input.getY());
+			Vector2 vec = Graphics.world(getMouseX(), getMouseY());
 			mousex = vec.x;
 			mousey = vec.y;
 		}
 
 		if(!Inputs.keyDown(section, "select") && !Inputs.keyDown(section, "break")){
-			mousex = Graphics.mouseWorld().x;
-			mousey = Graphics.mouseWorld().y;
+            Vector2 vec = Graphics.world(getMouseX(), getMouseY());
+            mousex = vec.x;
+            mousey = vec.y;
 		}
 		
-		endx = Gdx.input.getX();
-		endy = Gdx.input.getY();
+		endx = getMouseX();
+		endy = getMouseY();
 
 		boolean controller = KeyBinds.getSection(section).device.type == DeviceType.controller;
 		
@@ -229,11 +230,11 @@ public class DesktopInput extends InputHandler{
             }
 
             if(Inputs.keyTap(section,"select")){
-                Inputs.getProcessor().touchDown(Gdx.input.getX(), Gdx.input.getY(), player.playerIndex, Buttons.LEFT);
+                Inputs.getProcessor().touchDown((int)getMouseX(), (int)getMouseY(), player.playerIndex, Buttons.LEFT);
             }
 
             if(Inputs.keyRelease(section,"select")){
-                Inputs.getProcessor().touchUp(Gdx.input.getX(), Gdx.input.getY(), player.playerIndex, Buttons.LEFT);
+                Inputs.getProcessor().touchUp((int)getMouseX(), (int)getMouseY(), player.playerIndex, Buttons.LEFT);
             }
 
             float xa = Inputs.getAxis(section, "cursor_x");
@@ -245,9 +246,11 @@ public class DesktopInput extends InputHandler{
                 controly -= ya*baseControllerSpeed*scl;
                 controlling = true;
 
-                Gdx.input.setCursorCatched(true);
+                if(index == 0){
+                    Gdx.input.setCursorCatched(true);
+                }
 
-                Inputs.getProcessor().touchDragged(Gdx.input.getX(), Gdx.input.getY(), player.playerIndex);
+                Inputs.getProcessor().touchDragged((int)getMouseX(), (int)getMouseY(), player.playerIndex);
             }
 
             controlx = Mathf.clamp(controlx, 0, Gdx.graphics.getWidth());
@@ -266,17 +269,12 @@ public class DesktopInput extends InputHandler{
 	public int tilex(){
 		return (recipe != null && recipe.result.isMultiblock() &&
 				recipe.result.size % 2 == 0) ?
-				Mathf.scl(Graphics.mouseWorld().x, tilesize) : Mathf.scl2(Graphics.mouseWorld().x, tilesize);
+				Mathf.scl(Graphics.world(getMouseX(), getMouseY()).x, tilesize) : Mathf.scl2(Graphics.world(getMouseX(), getMouseY()).x, tilesize);
 	}
 
 	public int tiley(){
 		return (recipe != null && recipe.result.isMultiblock() &&
 				recipe.result.size % 2 == 0) ?
-				Mathf.scl(Graphics.mouseWorld().y, tilesize) : Mathf.scl2(Graphics.mouseWorld().y, tilesize);
-	}
-
-	@Override
-	public boolean keyDown(int keycode) {
-		return super.keyDown(keycode);
+				Mathf.scl(Graphics.world(getMouseX(), getMouseY()).y, tilesize) : Mathf.scl2(Graphics.world(getMouseX(), getMouseY()).y, tilesize);
 	}
 }

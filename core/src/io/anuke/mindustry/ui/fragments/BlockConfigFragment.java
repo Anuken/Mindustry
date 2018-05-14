@@ -14,12 +14,11 @@ import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.ui.layout.Table;
 
 public class BlockConfigFragment implements  Fragment {
-    private Table table;
+    private Table table = new Table();
     private Tile configTile;
 
     @Override
     public void build(Group parent) {
-        table = new Table();
         parent.addChild(table);
     }
 

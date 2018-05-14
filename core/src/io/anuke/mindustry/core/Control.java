@@ -166,8 +166,10 @@ public class Control extends Module{
 
             InputHandler[] oldi = inputs;
             inputs = new InputHandler[index + 1];
-            System.arraycopy(old, 0, inputs, 0, oldi.length);
+            System.arraycopy(oldi, 0, inputs, 0, oldi.length);
         }
+
+        Player setTo = (index == 0 ? null : players[0]);
 
         Player player = new Player();
         player.name = Settings.getString("name");
@@ -176,6 +178,14 @@ public class Control extends Module{
         player.isLocal = true;
         player.playerIndex = index;
         players[index] = player;
+
+        if(setTo != null){
+            player.set(setTo.x, setTo.y);
+        }
+
+        if(!state.is(State.menu)){
+            player.add();
+        }
 
         InputHandler input;
 
@@ -187,6 +197,19 @@ public class Control extends Module{
 
         inputs[index] = input;
         Inputs.addProcessor(input);
+    }
+
+    public void removePlayer(){
+	    players[players.length-1].remove();
+	    inputs[inputs.length-1].remove();
+
+        Player[] old = players;
+        players = new Player[players.length - 1];
+        System.arraycopy(old, 0, players, 0, players.length);
+
+        InputHandler[] oldi = inputs;
+        inputs = new InputHandler[inputs.length - 1];
+        System.arraycopy(oldi, 0, inputs, 0, inputs.length);
     }
 
     public Input gdxInput(){
