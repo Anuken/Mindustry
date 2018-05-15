@@ -256,7 +256,6 @@ public class NetClient extends Module {
                     world.getCore().entity != null){
                 world.getCore().entity.onDeath(true);
             }
-            netServer.admins.getEditLogs().clear();
             kicked = true;
             ui.restart.show();
         });

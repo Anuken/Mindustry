@@ -63,10 +63,6 @@ public class Administration {
         return editLogs;
     }
     
-    public void setEditLogs(IntMap<Array<EditLog>> editLogs) {
-        this.editLogs = editLogs;
-    }
-    
     public void logEdit(int x, int y, Player player, Block block, int rotation, EditLog.EditAction action) {
     	if(block instanceof BlockPart || block instanceof Rock || block instanceof Floor || block instanceof StaticBlock) return;
     	if(editLogs.containsKey(x + y * world.width())) {

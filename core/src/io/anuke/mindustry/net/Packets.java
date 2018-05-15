@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.io.Version;
@@ -148,28 +149,30 @@ public class Packets {
 		
 		@Override
 		public void write(ByteBuffer buffer) {
-			buffer.putInt(x);
-			buffer.putInt(y);
+			buffer.putShort((short)x);
+			buffer.putShort((short)y);
 			buffer.putInt(editlogs.size);
 			for(EditLog value : editlogs) {
-				
-				String rawValue = value.toString();
-				buffer.put((byte) rawValue.getBytes().length);
-				buffer.put(rawValue.getBytes());
+				buffer.putInt(value.player.id);
+				buffer.putInt(value.block.id);
+				buffer.put((byte) value.rotation);
+				buffer.put((byte) value.action.ordinal());
 			}
 		}
 		
 		@Override
 		public void read(ByteBuffer buffer) {
-			x = buffer.getInt();
-			y = buffer.getInt();
+			x = buffer.getShort();
+			y = buffer.getShort();
 			editlogs = new Array<>();
 			int arraySize = buffer.getInt();
 			for(int a = 0; a < arraySize; a ++) {
-					
-				byte[] arraybytes = new byte[buffer.get()];
-				buffer.get(arraybytes);
-				editlogs.add(EditLog.valueOf(new String(arraybytes)));
+				int playerid = buffer.getInt();
+				int blockid = buffer.getInt();
+				int rotation = buffer.get();
+				int ordinal = buffer.get();
+				
+				editlogs.add(new EditLog(Vars.playerGroup.getByID(playerid), Block.getByID(blockid), rotation, EditLog.EditAction.values()[ordinal]));
 			}
 		}
 	}

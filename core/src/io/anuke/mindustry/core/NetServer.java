@@ -44,7 +44,10 @@ public class NetServer extends Module{
 
     public NetServer(){
 
-        Events.on(GameOverEvent.class, () -> weapons.clear());
+        Events.on(GameOverEvent.class, () -> {
+			weapons.clear();
+			admins.getEditLogs().clear();
+		});
 
         Net.handleServer(Connect.class, (id, connect) -> {
             if(admins.isIPBanned(connect.addressTCP)){
@@ -349,7 +352,7 @@ public class NetServer extends Module{
         });
     
         Net.handleServer(BlockLogRequestPacket.class, (id, packet) -> {
-            packet.editlogs = EditLog.logsFromTile(packet.x, packet.y);
+            packet.editlogs = admins.getEditLogs().get(packet.x + packet.y * world.width(), new Array<>());
             Net.sendTo(id, packet, SendMode.udp);
         });
     }
