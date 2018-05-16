@@ -49,6 +49,8 @@ public class Vars{
 	public static final float aheadPathfinding = 60*15;
 	//how far away from spawn points the player can't place blocks
 	public static final float enemyspawnspace = 65;
+
+	public static final float coreBuildRange = 1000f;
 	//discord group URL
 	public static final String discordURL = "https://discord.gg/BKADYds";
 

@@ -162,7 +162,7 @@ public abstract class InputHandler extends InputAdapter{
 				validPlace(x, y, recipe.result) && !ui.hasMouse() && cursorNear() &&
 				state.inventory.hasItems(recipe.requirements)){
 			
-			placeBlock(x, y, recipe.result, rotation, true, sound);
+			placeBlock(x, y, recipe, rotation, true, sound);
 			
 			for(ItemStack stack : recipe.requirements){
 				state.inventory.removeItem(stack);
@@ -186,20 +186,27 @@ public abstract class InputHandler extends InputAdapter{
 	}
 	
 	public boolean validPlace(int x, int y, Block type){
-		return Placement.validPlace(player.team, x, y, type, rotation);
+        for(Tile tile : state.teams.get(player.team).cores){
+            if(tile.distanceTo(x * tilesize, y * tilesize) < coreBuildRange){
+                return Placement.validPlace(player.team, x, y, type, rotation) &&
+                        Vector2.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
+            }
+        }
+
+        return false;
 	}
 	
 	public boolean validBreak(int x, int y){
 		return Placement.validBreak(player.team, x, y);
 	}
 	
-	public void placeBlock(int x, int y, Block result, int rotation, boolean effects, boolean sound){
+	public void placeBlock(int x, int y, Recipe recipe, int rotation, boolean effects, boolean sound){
 		if(!Net.client()){ //is server or singleplayer
-			threads.run(() -> Placement.placeBlock(player, x, y, result, rotation, effects, sound));
+			threads.run(() -> Placement.placeBlock(player, x, y, recipe, rotation, effects, sound));
 		}
 
 		if(Net.active()){
-			NetEvents.handlePlace(player, x, y, result, rotation);
+			NetEvents.handlePlace(player, x, y, recipe, rotation);
 		}
 
 		//todo fix this, call placed()

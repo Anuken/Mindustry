@@ -5,7 +5,6 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
-import io.anuke.mindustry.content.Recipes;
 import io.anuke.mindustry.content.UpgradeRecipes;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.BulletType;
@@ -196,11 +195,10 @@ public class NetServer extends Module{
             Player placer = connections.get(id);
             packet.playerid = placer.id;
 
-            Block block = Block.getByID(packet.block);
+            Recipe recipe = Recipe.getByID(packet.recipe);
+            Block block = recipe.result;
 
             if(!Placement.validPlace(placer.team, packet.x, packet.y, block, packet.rotation)) return;
-
-            Recipe recipe = Recipes.getByResult(block);
 
             if(recipe == null || recipe.debugOnly != debug) return;
 
@@ -214,7 +212,7 @@ public class NetServer extends Module{
 
             state.inventory.removeItems(recipe.requirements);
 
-            Placement.placeBlock(placer, packet.x, packet.y, block, packet.rotation, true, false);
+            Placement.placeBlock(placer, packet.x, packet.y, recipe, packet.rotation, true, false);
 
             TraceInfo trace = admins.getTraceByID(getUUID(id));
 

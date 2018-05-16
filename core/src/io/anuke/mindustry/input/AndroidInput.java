@@ -176,7 +176,7 @@ public class AndroidInput extends InputHandler{
 				validPlace(x, y, recipe.result) && cursorNear() &&
 				state.inventory.hasItems(recipe.requirements)){
 			
-			placeBlock(x, y, recipe.result, rotation, true, sound);
+			placeBlock(x, y, recipe, rotation, true, sound);
 			
 			for(ItemStack stack : recipe.requirements){
 				state.inventory.removeItem(stack);

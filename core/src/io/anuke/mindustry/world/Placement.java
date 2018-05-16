@@ -3,7 +3,6 @@ package io.anuke.mindustry.world;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.content.Recipes;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.BlockPlacer;
@@ -28,7 +27,7 @@ public class Placement {
         if(tile == null) return null;
 
         Block block = tile.isLinked() ? tile.getLinked().block() : tile.block();
-        Recipe result = Recipes.getByResult(block);
+        Recipe result = Recipe.getByResult(block);
 
         if(result != null){
             for(ItemStack stack : result.requirements){
@@ -58,9 +57,10 @@ public class Placement {
         return block;
     }
 
-    public static void placeBlock(BlockPlacer placer, int x, int y, Block result, int rotation, boolean effects, boolean sound){
+    public static void placeBlock(BlockPlacer placer, int x, int y, Recipe recipe, int rotation, boolean effects, boolean sound){
         Tile tile = world.tile(x, y);
         Team team = placer.getTeam();
+        Block result = recipe.result;
 
         //just in case
         if(tile == null) return;
@@ -98,7 +98,7 @@ public class Placement {
     }
 
     public static boolean validPlace(Team team, int x, int y, Block type, int rotation){
-        Recipe recipe = Recipes.getByResult(type);
+        Recipe recipe = Recipe.getByResult(type);
 
         if(recipe == null || !state.inventory.hasItems(recipe.requirements)){
             return false;

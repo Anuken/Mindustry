@@ -38,8 +38,8 @@ import static io.anuke.mindustry.Vars.*;
 public class Player extends Unit implements BlockPlacer{
 	static final float speed = 1.1f;
 	static final float dashSpeed = 1.8f;
-	static final float placeDistance = 80f;
-	static final int maxPlacing = 5;
+	public static final float placeDistance = 80f;
+	public static final int maxPlacing = 5;
 
 	static final int timerDash = 0;
 	static final int timerRegen = 3;

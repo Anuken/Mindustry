@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntSet;
-import io.anuke.mindustry.content.Recipes;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.input.InputHandler;
@@ -98,7 +97,7 @@ public class BlocksFragment implements Fragment{
 
 					for (Section sec : Section.values()) {
 						recipes.clear();
-						io.anuke.mindustry.content.Recipes.getBy(sec, recipes);
+						Recipe.getBySection(sec, recipes);
 						maxcol = Math.max((int) ((float) recipes.size / rows + 1), maxcol);
 					}
 
@@ -106,7 +105,7 @@ public class BlocksFragment implements Fragment{
 						int secrows = 4;
 
 						recipes.clear();
-						Recipes.getBy(sec, recipes);
+						Recipe.getBySection(sec, recipes);
 
 						Table table = new Table();
 

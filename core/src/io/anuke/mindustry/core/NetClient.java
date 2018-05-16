@@ -3,7 +3,6 @@ package io.anuke.mindustry.core;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
 import io.anuke.mindustry.content.UpgradeRecipes;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.BulletType;
@@ -15,9 +14,9 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
+import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Placement;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -164,12 +163,12 @@ public class NetClient extends Module {
         Net.handleClient(PlacePacket.class, (packet) -> {
             Player placer = playerGroup.getByID(packet.playerid);
 
-            Placement.placeBlock(placer, packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, Timers.get("placeblocksound", 10));
+            Placement.placeBlock(placer, packet.x, packet.y, Recipe.getByID(packet.recipe), packet.rotation, true, Timers.get("placeblocksound", 10));
 
             for(Player player : players) {
                 if (packet.playerid == player.id) {
                     Tile tile = world.tile(packet.x, packet.y);
-                    if (tile != null) Block.getByID(packet.block).placed(tile);
+                    if (tile != null) Recipe.getByID(packet.recipe).result.placed(tile);
                     break;
                 }
             }

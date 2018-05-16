@@ -2,19 +2,20 @@ package io.anuke.mindustry.world.blocks.types;
 
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.effect.Rubble;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Shaders;
-import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.world.BarType;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
-import io.anuke.mindustry.content.fx.*;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.mindustry.entities.effect.*;
 
 public class BuildBlock extends Block {
     private static final float decaySpeedScl = 4f;
@@ -89,6 +90,7 @@ public class BuildBlock extends Block {
 
     public class BuildEntity extends TileEntity{
         public Block result;
+        public Recipe recipe;
         public float progress = 0.05f;
     }
 }

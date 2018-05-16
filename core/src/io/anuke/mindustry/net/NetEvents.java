@@ -7,14 +7,11 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.gen.CallEvent;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
+import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Upgrade;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.entities.Entity;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -102,13 +99,13 @@ public class NetEvents {
         Net.send(packet, SendMode.udp);
     }
 
-    public static void handlePlace(Player player, int x, int y, Block block, int rotation){
+    public static void handlePlace(Player player, int x, int y, Recipe recipe, int rotation){
         PlacePacket packet = Pools.obtain(PlacePacket.class);
         packet.x = (short)x;
         packet.y = (short)y;
         packet.rotation = (byte)rotation;
         packet.playerid = player.id;
-        packet.block = block.id;
+        packet.recipe = (byte)recipe.id;
         Net.send(packet, SendMode.tcp);
     }
 

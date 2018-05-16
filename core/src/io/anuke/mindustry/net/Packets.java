@@ -3,7 +3,6 @@ package io.anuke.mindustry.net;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
@@ -220,7 +219,7 @@ public class Packets {
         public int playerid;
         public byte rotation;
         public short x, y;
-        public int block;
+        public byte recipe;
 
         @Override
         public void write(ByteBuffer buffer) {
@@ -228,7 +227,7 @@ public class Packets {
             buffer.put(rotation);
             buffer.putShort(x);
             buffer.putShort(y);
-            buffer.putInt(block);
+            buffer.put(recipe);
         }
 
         @Override
@@ -237,7 +236,7 @@ public class Packets {
             rotation = buffer.get();
             x = buffer.getShort();
             y = buffer.getShort();
-            block = buffer.getInt();
+            recipe = buffer.get();
         }
     }
 
