@@ -144,8 +144,7 @@ project(":ios") {
     }
 
     robovm {
-        iosSignIdentity = "a"
-        iosProvisioningProfile = ""
+
     }
 }
 
