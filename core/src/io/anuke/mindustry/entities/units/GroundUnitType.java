@@ -132,7 +132,7 @@ public abstract class GroundUnitType extends UnitType{
         }
 
         public void update(BaseUnit unit) {
-            //TODO move toward resupply point?
+            //TODO move toward resupply point
             if(unit.inventory.totalAmmo() + 10 >= unit.inventory.ammoCapacity()){
                 unit.state.set(unit, attack);
             }
@@ -158,7 +158,7 @@ public abstract class GroundUnitType extends UnitType{
                     if(closest != null){
                         unit.target = closest;
                     }else {
-                        Tile target = Geometry.findClosest(unit.x, unit.y, world.indexer().getEnemy(unit.team, BlockFlag.resupplyPoint));
+                        Tile target = Geometry.findClosest(unit.x, unit.y, world.indexer().getEnemy(unit.team, BlockFlag.target));
                         if (target != null) unit.target = target.entity;
                     }
                 }

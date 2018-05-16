@@ -203,9 +203,10 @@ public abstract class InputHandler extends InputAdapter{
 			NetEvents.handlePlace(player, x, y, result, rotation);
 		}
 
+		//todo fix this, call placed()
 		if(!Net.client()){
-			Tile tile = world.tile(x, y);
-			if(tile != null) threads.run(() -> result.placed(tile));
+			//Tile tile = world.tile(x, y);
+			//if(tile != null) threads.run(() -> result.placed(tile));
 		}
 	}
 

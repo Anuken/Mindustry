@@ -2,17 +2,14 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Pools;
-import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -22,21 +19,18 @@ import io.anuke.mindustry.entities.effect.GroundEffectEntity;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.input.InputHandler;
-import io.anuke.mindustry.input.PlaceMode;
-import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.BlockBar;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.function.Callable;
-import io.anuke.ucore.graphics.*;
+import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Hue;
+import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.graphics.Surface;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
@@ -49,7 +43,7 @@ import static io.anuke.ucore.core.Core.camera;
 public class Renderer extends RendererModule{
 	private final static float shieldHitDuration = 18f;
 	
-	public Surface shadowSurface, shieldSurface, waterSurface;
+	public Surface effectSurface;
 	
 	private int targetscale = baseCameraScale;
 	private Texture background = new Texture("sprites/background.png");
@@ -117,11 +111,9 @@ public class Renderer extends RendererModule{
 	public void init(){
 		pixelate = Settings.getBool("pixelate");
 		int scale = Settings.getBool("pixelate") ? Core.cameraScale : 1;
-		
-		shadowSurface = Graphics.createSurface(scale);
-		shieldSurface = Graphics.createSurface(scale);
+
+        effectSurface = Graphics.createSurface(scale);
 		pixelSurface = Graphics.createSurface(scale);
-		waterSurface = Graphics.createSurface(scale);
 	}
 
 	public void setPixelate(boolean pixelate){
@@ -165,7 +157,6 @@ public class Renderer extends RendererModule{
 
 			float prex = camera.position.x, prey = camera.position.y;
 			updateShake(0.75f);
-			float prevx = camera.position.x, prevy = camera.position.y;
 			clampCamera(-tilesize / 2f, -tilesize / 2f + 1, world.width() * tilesize - tilesize / 2f, world.height() * tilesize - tilesize / 2f);
 
 			float deltax = camera.position.x - prex, deltay = camera.position.y - prey;
@@ -212,9 +203,17 @@ public class Renderer extends RendererModule{
 		Entities.draw(groundEffectGroup, e -> !(e instanceof BelowLiquidEffect));
 
 		blocks.processBlocks();
-		blocks.drawBlocks(Layer.overlay);
+		blocks.drawBlocks(Layer.block);
 
-		drawAllTeams(false);
+		Graphics.surface(effectSurface, true);
+		Graphics.shader(Shaders.inline, false);
+        blocks.drawBlocks(Layer.placement);
+        Graphics.shader();
+        Graphics.flushSurface();
+
+        blocks.drawBlocks(Layer.overlay);
+
+        drawAllTeams(false);
 
 		blocks.skipLayer(Layer.turret);
 		blocks.drawBlocks(Layer.laser);
@@ -361,7 +360,7 @@ public class Renderer extends RendererModule{
 	void drawShield(){
 		if(shieldGroup.size() == 0 && shieldDraws.size == 0) return;
 		
-		Graphics.surface(renderer.shieldSurface, false);
+		Graphics.surface(renderer.effectSurface, false);
 		Draw.color(Color.ROYAL);
 		Entities.draw(shieldGroup);
 		for(Callable c : shieldDraws){
@@ -382,7 +381,7 @@ public class Renderer extends RendererModule{
 			}
 		}
 
-		Texture texture = shieldSurface.texture();
+		Texture texture = effectSurface.texture();
 		Shaders.shield.color.set(Color.SKY);
 
 		Tmp.tr2.setRegion(texture);

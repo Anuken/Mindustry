@@ -23,6 +23,18 @@ public class Blocks {
 
     blockpart = new BlockPart(),
 
+    build1 = new BuildBlock("build1"),
+
+    build2 = new BuildBlock("build2"),
+
+    build3 = new BuildBlock("build3"),
+
+    build4 = new BuildBlock("build4"),
+
+    build5 = new BuildBlock("build5"),
+
+    build6 = new BuildBlock("build6"),
+
     defaultFloor = new Floor("defaultfloor") {{
     }},
 

@@ -10,6 +10,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
+import io.anuke.mindustry.world.blocks.types.BuildBlock.BuildEntity;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.Entities;
 
@@ -62,7 +63,10 @@ public class Placement {
         //just in case
         if(tile == null) return;
 
-        tile.setBlock(result, rotation);
+        Block sub = Block.getByName("build" + result.size);
+
+        tile.setBlock(sub, rotation);
+        tile.<BuildEntity>entity().result = result;
         tile.setTeam(team);
 
         if(result.isMultiblock()){

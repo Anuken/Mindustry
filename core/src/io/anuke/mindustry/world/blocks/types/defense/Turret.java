@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.*;
@@ -18,7 +19,10 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.BiConsumer;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Strings;
+import io.anuke.ucore.util.Translator;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -111,6 +115,11 @@ public abstract class Turret extends Block{
 
 		Draw.color();
 	}
+
+	@Override
+    public TextureRegion[] getBlockIcon(){
+        return new TextureRegion[]{Draw.region("block-" + size), Draw.region(name)};
+    }
 	
 	@Override
 	public void drawSelect(Tile tile){

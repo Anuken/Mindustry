@@ -66,20 +66,20 @@ public enum CacheLayer {
 
     protected void beginShader(){
         //renderer.getBlocks().endFloor();
-        renderer.waterSurface.getBuffer().begin();
+        renderer.effectSurface.getBuffer().begin();
         Graphics.clear(Color.CLEAR);
         //renderer.getBlocks().beginFloor();
     }
 
     public void endShader(Shader shader){
         renderer.getBlocks().endFloor();
-        renderer.waterSurface.getBuffer().end();
+        renderer.effectSurface.getBuffer().end();
 
         renderer.pixelSurface.getBuffer().begin();
 
         Graphics.shader(shader);
         Graphics.begin();
-        Draw.rect(renderer.waterSurface.texture(), Core.camera.position.x, Core.camera.position.y,
+        Draw.rect(renderer.effectSurface.texture(), Core.camera.position.x, Core.camera.position.y,
                 Core.camera.viewportWidth * Core.camera.zoom, -Core.camera.viewportHeight * Core.camera.zoom);
         Graphics.end();
         Graphics.shader();

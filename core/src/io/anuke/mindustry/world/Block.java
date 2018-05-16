@@ -304,6 +304,10 @@ public class Block extends BaseBlock {
 		}
 	}
 
+	public TextureRegion[] getBlockIcon(){
+	    return getIcon();
+    }
+
 	public TextureRegion[] getCompactIcon(){
 		TextureRegion[] out = getIcon();
 		for(int i = 0; i < out.length; i ++){

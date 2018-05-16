@@ -1,6 +1,5 @@
 package io.anuke.mindustry.graphics;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.Team;
@@ -8,7 +7,6 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.StaticBlock;
 import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
@@ -60,7 +58,7 @@ public class BlockRenderer{
 
 		int expandr = 4;
 		
-		Graphics.surface(renderer.shadowSurface);
+		Graphics.surface(renderer.effectSurface);
 
 		for(int x = -rangex - expandr; x <= rangex + expandr; x++){
 			for(int y = -rangey - expandr; y <= rangey + expandr; y++){
