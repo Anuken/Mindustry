@@ -205,11 +205,11 @@ public class Renderer extends RendererModule{
 		blocks.processBlocks();
 		blocks.drawBlocks(Layer.block);
 
-		Graphics.surface(effectSurface, true);
+		//Graphics.surface(effectSurface, true);
 		Graphics.shader(Shaders.inline, false);
         blocks.drawBlocks(Layer.placement);
         Graphics.shader();
-        Graphics.flushSurface();
+        //Graphics.flushSurface();
 
         blocks.drawBlocks(Layer.overlay);
 
