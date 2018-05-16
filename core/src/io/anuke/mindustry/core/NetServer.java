@@ -214,7 +214,7 @@ public class NetServer extends Module{
 
             state.inventory.removeItems(recipe.requirements);
 
-            Placement.placeBlock(placer.team, packet.x, packet.y, block, packet.rotation, true, false);
+            Placement.placeBlock(placer, packet.x, packet.y, block, packet.rotation, true, false);
 
             TraceInfo trace = admins.getTraceByID(getUUID(id));
 

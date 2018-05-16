@@ -164,7 +164,7 @@ public class NetClient extends Module {
         Net.handleClient(PlacePacket.class, (packet) -> {
             Player placer = playerGroup.getByID(packet.playerid);
 
-            Placement.placeBlock(placer.team, packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, Timers.get("placeblocksound", 10));
+            Placement.placeBlock(placer, packet.x, packet.y, Block.getByID(packet.block), packet.rotation, true, Timers.get("placeblocksound", 10));
 
             for(Player player : players) {
                 if (packet.playerid == player.id) {

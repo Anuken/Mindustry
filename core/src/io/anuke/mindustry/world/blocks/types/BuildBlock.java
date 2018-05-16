@@ -7,12 +7,17 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.BarType;
+import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Effects;
+import io.anuke.mindustry.content.fx.*;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.mindustry.entities.effect.*;
 
 public class BuildBlock extends Block {
-    private static final float buildTime = 120f;
+    private static final float decaySpeedScl = 4f;
 
     public BuildBlock(String name) {
         super(name);
@@ -21,6 +26,20 @@ public class BuildBlock extends Block {
         size = Integer.parseInt(name.charAt(name.length()-1) + "");
         health = 1;
         layer = Layer.placement;
+    }
+
+    @Override
+    public void setBars(){
+        bars.replace(new BlockBar(BarType.health, true, tile -> tile.<BuildEntity>entity().progress));
+    }
+
+    @Override
+    public void onDestroyed(Tile tile){
+        Effects.effect(ExplosionFx.blockExplosionSmoke, tile);
+
+        if(!tile.floor().solid && !tile.floor().liquid){
+            Rubble.create(tile.drawx(), tile.drawy(), size);
+        }
     }
 
     @Override
@@ -53,11 +72,13 @@ public class BuildBlock extends Block {
     @Override
     public void update(Tile tile) {
         BuildEntity entity = tile.entity();
-        entity.progress += 1f/buildTime;
+        entity.progress -= 1f/entity.result.health/decaySpeedScl;
         if(entity.progress > 1f){
             Team team = tile.getTeam();
             tile.setBlock(entity.result);
             tile.setTeam(team);
+        }else if(entity.progress < 0f){
+            entity.damage(entity.health + 1);
         }
     }
 
@@ -68,6 +89,6 @@ public class BuildBlock extends Block {
 
     public class BuildEntity extends TileEntity{
         public Block result;
-        public float progress;
+        public float progress = 0.05f;
     }
 }

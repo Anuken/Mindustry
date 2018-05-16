@@ -5,9 +5,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Recipes;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.entities.BlockPlacer;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.world.blocks.types.BuildBlock.BuildEntity;
@@ -57,8 +58,9 @@ public class Placement {
         return block;
     }
 
-    public static void placeBlock(Team team, int x, int y, Block result, int rotation, boolean effects, boolean sound){
+    public static void placeBlock(BlockPlacer placer, int x, int y, Block result, int rotation, boolean effects, boolean sound){
         Tile tile = world.tile(x, y);
+        Team team = placer.getTeam();
 
         //just in case
         if(tile == null) return;
@@ -91,6 +93,8 @@ public class Placement {
         }else if(effects) Effects.effect(Fx.place, x * tilesize, y * tilesize);
 
         if(effects && sound) threads.run(() -> Effects.sound("place", x * tilesize, y * tilesize));
+
+        placer.addPlaceBlock(tile);
     }
 
     public static boolean validPlace(Team team, int x, int y, Block type, int rotation){

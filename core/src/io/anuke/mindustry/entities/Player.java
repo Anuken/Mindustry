@@ -3,6 +3,7 @@ package io.anuke.mindustry.entities;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.content.fx.ExplosionFx;
@@ -13,6 +14,8 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.*;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.BuildBlock;
+import io.anuke.mindustry.world.blocks.types.BuildBlock.BuildEntity;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Inputs;
@@ -20,21 +23,27 @@ import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Fill;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Player extends Unit{
+public class Player extends Unit implements BlockPlacer{
 	static final float speed = 1.1f;
 	static final float dashSpeed = 1.8f;
+	static final float placeDistance = 80f;
+	static final int maxPlacing = 5;
 
 	static final int timerDash = 0;
 	static final int timerRegen = 3;
+	static final Translator[] tmptr = {new Translator(), new Translator(), new Translator(), new Translator()};
 
 	public String name = "name";
 	public String uuid;
@@ -55,6 +64,7 @@ public class Player extends Unit{
 	public float walktime;
 	public float respawntime;
 
+	private Array<Tile> placeBlocks = new Array<>();
 	private Vector2 movement = new Vector2();
 	
 	public Player(){
@@ -98,6 +108,13 @@ public class Player extends Unit{
 			}
 		}
 	}
+
+	@Override
+    public void addPlaceBlock(Tile tile){
+	    if(placeBlocks.size < maxPlacing) {
+            placeBlocks.add(tile);
+        }
+    }
 
 	@Override
 	public boolean collides(SolidEntity other){
@@ -208,6 +225,47 @@ public class Player extends Unit{
 		x = px;
 		y = py;
 	}
+
+	@Override
+	public void drawOver(){
+	    if(!isShooting()) {
+	        Draw.color("accent");
+	        float focusLen = 3.8f + Mathf.absin(Timers.time(), 1.1f, 0.6f);
+	        float px = x + Angles.trnsx(rotation, focusLen);
+            float py = y + Angles.trnsy(rotation, focusLen);
+
+            for (Tile tile : placeBlocks) {
+                float sz = Vars.tilesize*tile.block().size/2f;
+                float ang = angleTo(tile);
+
+                tmptr[0].set(tile.drawx() - sz, tile.drawy() - sz);
+                tmptr[1].set(tile.drawx() + sz, tile.drawy() - sz);
+                tmptr[2].set(tile.drawx() - sz, tile.drawy() + sz);
+                tmptr[3].set(tile.drawx() + sz, tile.drawy() + sz);
+
+                Arrays.sort(tmptr, (a, b) -> -Float.compare(Angles.angleDist(Angles.angle(x, y, a.x, a.y), ang),
+                        Angles.angleDist(Angles.angle(x, y, b.x, b.y), ang)));
+
+                float x1 = tmptr[0].x, y1 = tmptr[0].y,
+                        x3 = tmptr[1].x, y3 = tmptr[1].y;
+                Translator close = Geometry.findClosest(x, y, tmptr);
+                float x2 = close.x, y2 = close.y;
+
+                Draw.alpha(0.3f + Mathf.absin(Timers.time(), 0.9f, 0.2f));
+
+                Fill.tri(px, py, x2, y2, x1, y1);
+                Fill.tri(px, py, x2, y2, x3, y3);
+
+                Draw.alpha(1f);
+
+                Lines.line(px, py, x1, y1);
+                Lines.line(px, py, x3, y3);
+
+                Fill.circle(px, py, 1.5f + Mathf.absin(Timers.time(), 1f, 1.8f));
+            }
+            Draw.color();
+        }
+    }
 	
 	@Override
 	public void update(){
@@ -253,6 +311,10 @@ public class Player extends Unit{
 		heal();
 	}
 
+	public boolean isShooting(){
+	    return control.input(playerIndex).canShoot() && control.input(playerIndex).isShooting() && inventory.hasAmmo();
+    }
+
 	protected void updateMech(){
 
 		Tile tile = world.tileWorld(x, y);
@@ -261,6 +323,18 @@ public class Player extends Unit{
 		if(tile != null && tile.solid()) {
 			damage(health + 1); //die instantly
 		}
+
+		if(!isShooting()) {
+            for (Tile check : placeBlocks) {
+                if (!(check.block() instanceof BuildBlock) || distanceTo(check) > placeDistance) {
+                    placeBlocks.removeValue(check, true);
+                    break;
+                }
+                BuildEntity entity = check.entity();
+                entity.progress += 1f / entity.result.health;
+                rotation = Mathf.slerpDelta(rotation, angleTo(entity), 0.4f);
+            }
+        }
 
 		if(ui.chatfrag.chatOpen()) return;
 
@@ -289,7 +363,7 @@ public class Player extends Unit{
 		movement.y += ya*speed;
 		movement.x += xa*speed;
 
-		boolean shooting = control.input(playerIndex).canShoot() && control.input(playerIndex).isShooting() && inventory.hasAmmo();
+		boolean shooting = isShooting();
 
 		if(shooting){
 			weapon.update(this, true);

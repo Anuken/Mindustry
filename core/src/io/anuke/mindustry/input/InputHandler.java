@@ -154,8 +154,7 @@ public abstract class InputHandler extends InputAdapter{
 	}
 
 	public boolean cursorNear(){
-		return Vector2.dst(player.x, player.y, getBlockX() * tilesize, getBlockY() * tilesize) <= placerange ||
-				state.mode.infiniteResources || debug;
+		return true;
 	}
 	
 	public boolean tryPlaceBlock(int x, int y, boolean sound){
@@ -196,7 +195,7 @@ public abstract class InputHandler extends InputAdapter{
 	
 	public void placeBlock(int x, int y, Block result, int rotation, boolean effects, boolean sound){
 		if(!Net.client()){ //is server or singleplayer
-			threads.run(() -> Placement.placeBlock(player.team, x, y, result, rotation, effects, sound));
+			threads.run(() -> Placement.placeBlock(player, x, y, result, rotation, effects, sound));
 		}
 
 		if(Net.active()){
