@@ -12,12 +12,16 @@
     <string>${app.id}</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
+    <key>MinimumOSVersion</key>
+    <string>10.0.0</string>
     <key>CFBundleName</key>
     <string>${app.name}</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
     <string>${app.version}</string>
+    <key>CFBundleIconName</key>
+    <string>AppIcon</string>
     <key>CFBundleSignature</key>
     <string>????</string>
     <key>CFBundleVersion</key>
@@ -45,7 +49,7 @@
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
-    <key>CFBundleIcons</key>
+    <!--<key>CFBundleIcons</key>
     <dict>
         <key>CFBundlePrimaryIcon</key>
         <dict>
@@ -53,8 +57,10 @@
             <array>
                 <string>icon</string>
                 <string>icon-72</string>
+                <string>icon-120</string>
+                <string>icon-152</string>
             </array>
         </dict>
-    </dict>
+    </dict>-->
 </dict>
 </plist>
