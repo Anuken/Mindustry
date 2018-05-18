@@ -23,8 +23,15 @@ public class Rubble extends TimedEntity implements BelowLiquidEffect{
 
     @Override
     public void draw(){
+        String region = "rubble-" + size + "-" + Mathf.randomSeed(id, 0, 1);
+
+        if(!Draw.hasRegion(region)){
+            remove();
+            return;
+        }
+
         Draw.color(color.r, color.g, color.b, 1f-Mathf.curve(fin(), 0.98f));
-        Draw.rect("rubble-" + size + "-" + Mathf.randomSeed(id, 0, 1), x, y, Mathf.randomSeed(id, 0, 4) * 90);
+        Draw.rect(region, x, y, Mathf.randomSeed(id, 0, 4) * 90);
         Draw.color();
     }
 

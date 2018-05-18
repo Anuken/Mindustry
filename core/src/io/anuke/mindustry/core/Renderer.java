@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.BlockPlacer.PlaceRequest;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.BelowLiquidEffect;
@@ -21,16 +22,14 @@ import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Placement;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.function.Callable;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Hue;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.graphics.Surface;
+import io.anuke.ucore.graphics.*;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
@@ -74,6 +73,7 @@ public class Renderer extends RendererModule{
 						entity.color = color;
 						entity.rotation = rotation;
 						entity.lifetime = effect.lifetime;
+						entity.data = data;
 						entity.set(x, y).add(effectGroup);
 
 						if(data instanceof Entity){
@@ -85,6 +85,7 @@ public class Renderer extends RendererModule{
 						entity.color = color;
 						entity.rotation = rotation;
 						entity.lifetime = effect.lifetime;
+						entity.data = data;
 						entity.set(x, y).add(groundEffectGroup);
 					}
 				}
@@ -206,10 +207,12 @@ public class Renderer extends RendererModule{
 		blocks.drawBlocks(Layer.block);
 
 		//Graphics.surface(effectSurface, true);
-		Graphics.shader(Shaders.inline, false);
+		Graphics.shader(Shaders.blockbuild, false);
         blocks.drawBlocks(Layer.placement);
         Graphics.shader();
         //Graphics.flushSurface();
+
+        drawPlaceRequests();
 
         blocks.drawBlocks(Layer.overlay);
 
@@ -236,6 +239,22 @@ public class Renderer extends RendererModule{
 		
 		batch.end();
 	}
+
+	private void drawPlaceRequests(){
+	    Draw.color("accent");
+
+	    for(Player player : playerGroup.all()) {
+            for (PlaceRequest request : player.getPlaceQueue()) {
+                if(Placement.validPlace(player.team, request.x, request.y, request.recipe.result, request.rotation)){
+                    Lines.poly(request.x * tilesize + request.recipe.result.getPlaceOffset().x,
+                            request.y * tilesize + request.recipe.result.getPlaceOffset().y,
+                            4, request.recipe.result.size * tilesize /2f + Mathf.absin(Timers.time(), 3f, 1f));
+                }
+            }
+        }
+
+        Draw.color();
+    }
 
 	private void drawAllTeams(boolean flying){
 		for(Team team : Team.values()){

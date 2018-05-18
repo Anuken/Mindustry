@@ -2,10 +2,7 @@ package io.anuke.mindustry.resource;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Block;
-
-import static io.anuke.mindustry.Vars.debug;
 
 public class Recipe {
     private static int lastid;
@@ -41,7 +38,7 @@ public class Recipe {
 
     public static Array<Recipe> getBySection(Section section, Array<Recipe> r){
         for(Recipe recipe : allRecipes){
-            if(recipe.section == section && !(Vars.mobile && recipe.desktopOnly) && !(!debug && recipe.debugOnly)) {
+            if(recipe.section == section ) {
                 r.add(recipe);
             }
         }

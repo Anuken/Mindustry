@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
+import io.anuke.mindustry.entities.BlockPlacer.PlaceRequest;
 import io.anuke.mindustry.entities.ItemAnimationEffect;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
@@ -201,8 +202,11 @@ public abstract class InputHandler extends InputAdapter{
 	}
 	
 	public void placeBlock(int x, int y, Recipe recipe, int rotation, boolean effects, boolean sound){
+        //todo multiplayer support
+        player.addPlaceBlock(new PlaceRequest(x, y, rotation, recipe));
+        /*
 		if(!Net.client()){ //is server or singleplayer
-			threads.run(() -> Placement.placeBlock(player, x, y, recipe, rotation, effects, sound));
+			threads.run(() -> Placement.placeBlock(player.team, x, y, recipe, rotation, effects, sound));
 		}
 
 		if(Net.active()){
@@ -213,7 +217,7 @@ public abstract class InputHandler extends InputAdapter{
 		if(!Net.client()){
 			//Tile tile = world.tile(x, y);
 			//if(tile != null) threads.run(() -> result.placed(tile));
-		}
+		}*/
 	}
 
 	public void breakBlock(int x, int y, boolean sound){

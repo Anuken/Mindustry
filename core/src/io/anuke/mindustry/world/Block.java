@@ -40,6 +40,10 @@ public class Block extends BaseBlock {
 	protected Vector2 tempVector = new Vector2();
 	protected Color tempColor = new Color();
 
+	protected TextureRegion[] blockIcon;
+	protected TextureRegion[] icon;
+	protected TextureRegion[] compactIcon;
+
 	/**internal name*/
 	public final String name;
 	/**internal ID*/
@@ -295,13 +299,17 @@ public class Block extends BaseBlock {
 	}
 
 	public TextureRegion[] getIcon(){
-		if(Draw.hasRegion(name + "-icon")){
-			return new TextureRegion[]{Draw.region(name + "-icon")};
-		}else if(Draw.hasRegion(name + "1")){
-			return new TextureRegion[]{Draw.region(name+ "1")};
-		}else{
-			return new TextureRegion[]{Draw.region(name)};
-		}
+	    if(icon == null) {
+            if (Draw.hasRegion(name + "-icon")) {
+                icon = new TextureRegion[]{Draw.region(name + "-icon")};
+            } else if (Draw.hasRegion(name + "1")) {
+                icon = new TextureRegion[]{Draw.region(name + "1")};
+            } else {
+                icon = new TextureRegion[]{Draw.region(name)};
+            }
+        }
+
+		return icon;
 	}
 
 	public TextureRegion[] getBlockIcon(){
@@ -309,11 +317,13 @@ public class Block extends BaseBlock {
     }
 
 	public TextureRegion[] getCompactIcon(){
-		TextureRegion[] out = getIcon();
-		for(int i = 0; i < out.length; i ++){
-			out[i] = iconRegion(out[i]);
-		}
-		return out;
+	    if(compactIcon == null) {
+            compactIcon = new TextureRegion[getIcon().length];
+            for (int i = 0; i < compactIcon.length; i++) {
+                compactIcon[i] = iconRegion(getIcon()[i]);
+            }
+        }
+		return compactIcon;
 	}
 
 	protected TextureRegion iconRegion(TextureRegion src){

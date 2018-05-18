@@ -15,7 +15,8 @@ import static io.anuke.mindustry.Vars.world;
 
 public class Shaders{
 	public static final Outline outline = new Outline();
-    public static final Inline inline = new Inline();
+    public static final BlockBuild blockbuild = new BlockBuild();
+    public static final BlockPreview blockpreview = new BlockPreview();
 	public static final Shield shield = new Shield();
 	public static final SurfaceShader water = new SurfaceShader("water");
 	public static final SurfaceShader lava = new SurfaceShader("lava");
@@ -73,12 +74,12 @@ public class Shaders{
 		}
 	}
 
-    public static class Inline extends Shader{
+    public static class BlockBuild extends Shader{
         public Color color = new Color();
         public float progress;
 
-        public Inline(){
-            super("inline-lines", "default");
+        public BlockBuild(){
+            super("blockbuild", "default");
         }
 
         @Override
@@ -88,7 +89,25 @@ public class Shaders{
             shader.setUniformf("u_uv", region.getU(), region.getV());
             shader.setUniformf("u_uv2", region.getU2(), region.getV2());
             shader.setUniformf("u_time", Timers.time());
-            shader.setUniformf("u_texsize", vec.set(region.getTexture().getWidth(), region.getTexture().getHeight()));
+            shader.setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
+        }
+    }
+
+    public static class BlockPreview extends Shader{
+        public Color color = new Color();
+
+        public BlockPreview(){
+            super("blockpreview", "default");
+        }
+
+        @Override
+        public void apply(){
+           // shader.setUniformf("u_progress", progress);
+            shader.setUniformf("u_color", color);
+            shader.setUniformf("u_uv", region.getU(), region.getV());
+            shader.setUniformf("u_uv2", region.getU2(), region.getV2());
+            //shader.setUniformf("u_time", Timers.time());
+            shader.setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
         }
     }
 	

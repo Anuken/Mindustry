@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
-import io.anuke.mindustry.entities.BlockPlacer;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.resource.ItemStack;
@@ -57,9 +56,8 @@ public class Placement {
         return block;
     }
 
-    public static void placeBlock(BlockPlacer placer, int x, int y, Recipe recipe, int rotation, boolean effects, boolean sound){
+    public static void placeBlock(Team team, int x, int y, Recipe recipe, int rotation, boolean effects, boolean sound){
         Tile tile = world.tile(x, y);
-        Team team = placer.getTeam();
         Block result = recipe.result;
 
         //just in case
@@ -87,14 +85,12 @@ public class Placement {
                         }
                     }
 
-                    if(effects) Effects.effect(Fx.place, worldx * tilesize, worldy * tilesize);
+                    if(effects) Effects.effect(Fx.none, worldx * tilesize, worldy * tilesize);
                 }
             }
-        }else if(effects) Effects.effect(Fx.place, x * tilesize, y * tilesize);
+        }else if(effects) Effects.effect(Fx.none, x * tilesize, y * tilesize);
 
         if(effects && sound) threads.run(() -> Effects.sound("place", x * tilesize, y * tilesize));
-
-        placer.addPlaceBlock(tile);
     }
 
     public static boolean validPlace(Team team, int x, int y, Block type, int rotation){

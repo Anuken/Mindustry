@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.blocks.types;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.fx.ExplosionFx;
+import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Rubble;
 import io.anuke.mindustry.game.Team;
@@ -52,13 +53,15 @@ public class BuildBlock extends Block {
     public void drawLayer(Tile tile) {
         BuildEntity entity = tile.entity();
 
-        Shaders.inline.color = Colors.get("accent");
+        Shaders.blockbuild.color = Colors.get("accent");
 
         for(TextureRegion region : entity.result.getBlockIcon()){
-            Shaders.inline.region = region;
-            Shaders.inline.progress = entity.progress;
-            Shaders.inline.apply();
-            Draw.rect(region, tile.drawx(), tile.drawy());
+            Shaders.blockbuild.region = region;
+            Shaders.blockbuild.progress = entity.progress;
+            Shaders.blockbuild.apply();
+
+            Draw.rect(region, tile.drawx(), tile.drawy(), entity.result.rotate ? tile.getRotation() * 90 : 0);
+
             Graphics.flush();
         }
     }
@@ -78,6 +81,7 @@ public class BuildBlock extends Block {
             Team team = tile.getTeam();
             tile.setBlock(entity.result);
             tile.setTeam(team);
+            Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), 0f, (float)size);
         }else if(entity.progress < 0f){
             entity.damage(entity.health + 1);
         }

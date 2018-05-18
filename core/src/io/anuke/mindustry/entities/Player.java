@@ -3,6 +3,7 @@ package io.anuke.mindustry.entities;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Weapons;
@@ -13,6 +14,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.*;
+import io.anuke.mindustry.world.Placement;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.BuildBlock;
 import io.anuke.mindustry.world.blocks.types.BuildBlock.BuildEntity;
@@ -39,7 +41,6 @@ public class Player extends Unit implements BlockPlacer{
 	static final float speed = 1.1f;
 	static final float dashSpeed = 1.8f;
 	public static final float placeDistance = 80f;
-	public static final int maxPlacing = 5;
 
 	static final int timerDash = 0;
 	static final int timerRegen = 3;
@@ -64,7 +65,8 @@ public class Player extends Unit implements BlockPlacer{
 	public float walktime;
 	public float respawntime;
 
-	private Array<Tile> placeBlocks = new Array<>();
+	private Queue<PlaceRequest> placeQueue = new Queue<>();
+	private Tile currentPlace;
 	private Vector2 movement = new Vector2();
 	
 	public Player(){
@@ -110,10 +112,8 @@ public class Player extends Unit implements BlockPlacer{
 	}
 
 	@Override
-    public void addPlaceBlock(Tile tile){
-	    if(placeBlocks.size < maxPlacing) {
-            placeBlocks.add(tile);
-        }
+    public void addPlaceBlock(PlaceRequest req){
+	    placeQueue.addFirst(req);
     }
 
 	@Override
@@ -228,41 +228,42 @@ public class Player extends Unit implements BlockPlacer{
 
 	@Override
 	public void drawOver(){
-	    if(!isShooting()) {
+	    if(!isShooting() && currentPlace != null) {
 	        Draw.color("accent");
 	        float focusLen = 3.8f + Mathf.absin(Timers.time(), 1.1f, 0.6f);
 	        float px = x + Angles.trnsx(rotation, focusLen);
             float py = y + Angles.trnsy(rotation, focusLen);
 
-            for (Tile tile : placeBlocks) {
-                float sz = Vars.tilesize*tile.block().size/2f;
-                float ang = angleTo(tile);
+            Tile tile = currentPlace;
 
-                tmptr[0].set(tile.drawx() - sz, tile.drawy() - sz);
-                tmptr[1].set(tile.drawx() + sz, tile.drawy() - sz);
-                tmptr[2].set(tile.drawx() - sz, tile.drawy() + sz);
-                tmptr[3].set(tile.drawx() + sz, tile.drawy() + sz);
+            float sz = Vars.tilesize*tile.block().size/2f;
+            float ang = angleTo(tile);
 
-                Arrays.sort(tmptr, (a, b) -> -Float.compare(Angles.angleDist(Angles.angle(x, y, a.x, a.y), ang),
-                        Angles.angleDist(Angles.angle(x, y, b.x, b.y), ang)));
+            tmptr[0].set(tile.drawx() - sz, tile.drawy() - sz);
+            tmptr[1].set(tile.drawx() + sz, tile.drawy() - sz);
+            tmptr[2].set(tile.drawx() - sz, tile.drawy() + sz);
+            tmptr[3].set(tile.drawx() + sz, tile.drawy() + sz);
 
-                float x1 = tmptr[0].x, y1 = tmptr[0].y,
-                        x3 = tmptr[1].x, y3 = tmptr[1].y;
-                Translator close = Geometry.findClosest(x, y, tmptr);
-                float x2 = close.x, y2 = close.y;
+            Arrays.sort(tmptr, (a, b) -> -Float.compare(Angles.angleDist(Angles.angle(x, y, a.x, a.y), ang),
+                    Angles.angleDist(Angles.angle(x, y, b.x, b.y), ang)));
 
-                Draw.alpha(0.3f + Mathf.absin(Timers.time(), 0.9f, 0.2f));
+            float x1 = tmptr[0].x, y1 = tmptr[0].y,
+                    x3 = tmptr[1].x, y3 = tmptr[1].y;
+            Translator close = Geometry.findClosest(x, y, tmptr);
+            float x2 = close.x, y2 = close.y;
 
-                Fill.tri(px, py, x2, y2, x1, y1);
-                Fill.tri(px, py, x2, y2, x3, y3);
+            Draw.alpha(0.3f + Mathf.absin(Timers.time(), 0.9f, 0.2f));
 
-                Draw.alpha(1f);
+            Fill.tri(px, py, x2, y2, x1, y1);
+            Fill.tri(px, py, x2, y2, x3, y3);
 
-                Lines.line(px, py, x1, y1);
-                Lines.line(px, py, x3, y3);
+            Draw.alpha(1f);
 
-                Fill.circle(px, py, 1.5f + Mathf.absin(Timers.time(), 1f, 1.8f));
-            }
+            Lines.line(px, py, x1, y1);
+            Lines.line(px, py, x3, y3);
+
+            Fill.circle(px, py, 1.5f + Mathf.absin(Timers.time(), 1f, 1.8f));
+
             Draw.color();
         }
     }
@@ -315,6 +316,14 @@ public class Player extends Unit implements BlockPlacer{
 	    return control.input(playerIndex).canShoot() && control.input(playerIndex).isShooting() && inventory.hasAmmo();
     }
 
+    public Iterable<PlaceRequest> getPlaceQueue(){
+	    return placeQueue;
+    }
+
+    private boolean invalidPlaceBlock(Tile check){
+        return (!(check.block() instanceof BuildBlock) || distanceTo(check) > placeDistance);
+    }
+
 	protected void updateMech(){
 
 		Tile tile = world.tileWorld(x, y);
@@ -325,14 +334,24 @@ public class Player extends Unit implements BlockPlacer{
 		}
 
 		if(!isShooting()) {
-            for (Tile check : placeBlocks) {
-                if (!(check.block() instanceof BuildBlock) || distanceTo(check) > placeDistance) {
-                    placeBlocks.removeValue(check, true);
-                    break;
+
+		    if(currentPlace != null) {
+		        Tile check = currentPlace;
+
+                if (invalidPlaceBlock(currentPlace)) {
+                    currentPlace = null;
+                }else {
+                    BuildEntity entity = check.entity();
+                    entity.progress += 1f / entity.result.health;
+                    rotation = Mathf.slerpDelta(rotation, angleTo(entity), 0.4f);
                 }
-                BuildEntity entity = check.entity();
-                entity.progress += 1f / entity.result.health;
-                rotation = Mathf.slerpDelta(rotation, angleTo(entity), 0.4f);
+
+            }else if(placeQueue.size > 0){
+                PlaceRequest check = placeQueue.removeLast();
+                if(Placement.validPlace(team, check.x, check.y, check.recipe.result, check.rotation)){
+                    Placement.placeBlock(team, check.x, check.y, check.recipe, check.rotation, true, true);
+                    currentPlace = world.tile(check.x, check.y);
+                }
             }
         }
 
@@ -353,7 +372,7 @@ public class Player extends Unit implements BlockPlacer{
 
 		movement.set(0, 0);
 
-		String section = "player_"+(playerIndex + 1);
+		String section = "player_" + (playerIndex + 1);
 
 		float xa = Inputs.getAxis(section, "move_x");
 		float ya = Inputs.getAxis(section, "move_y");

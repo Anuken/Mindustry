@@ -46,7 +46,7 @@ public class DesktopInput extends InputHandler{
 
 		if(player.isDead()) return;
 
-		if(Inputs.keyRelease(section, "select")){
+		if(Inputs.keyRelease(section, "select") && recipe != null){
 			placeMode.released(this, getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
 		}
 

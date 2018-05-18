@@ -2,13 +2,18 @@ package io.anuke.mindustry.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Colors;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Placement;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
@@ -219,11 +224,10 @@ public enum PlaceMode{
 		}
 	},
 	hold{
-		int maxlen = 20;
-		int tilex;
-		int tiley;
-		int endx;
-		int endy;
+		int rtilex;
+		int rtiley;
+		int rendx;
+		int rendy;
 		int rotation;
 		
 		{
@@ -243,22 +247,19 @@ public enum PlaceMode{
 			Vector2 offset = block.getPlaceOffset();
 			
 			process(input, tilex, tiley, endx, endy);
-			int tx = tilex, ty = tiley, ex = endx, ey = endy;
-			tilex = this.tilex; tiley = this.tiley;
-			endx = this.endx; endy = this.endy;
-			float x = this.tilex * t, y = this.tiley * t,
-					x2 = this.endx * t, y2 = this.endy * t;
-			
+			float x = rtilex * t, y = rtiley * t,
+					x2 = rendx * t, y2 = rendy * t;
+
 			if(x2 >= x){
 				x -= block.size * t/2;
 				x2 += block.size * t/2;
 			}
-			
+
 			if(y2 >= y){
 				y -= block.size * t/2;
 				y2 += block.size * t/2;
 			}
-			
+
 			x += offset.x;
 			y += offset.y;
 			x2 += offset.x;
@@ -267,61 +268,47 @@ public enum PlaceMode{
 			if(tilex == endx && tiley == endy){
 				cursor.draw(input, tilex, tiley, endx, endy);
 			}else{
-				Lines.stroke(2f);
-				Draw.color(input.cursorNear() ? "place" : "placeInvalid");
+			    Draw.color("place");
+				Lines.stroke(1f);
 				Lines.rect(x, y, x2 - x, y2 - y);
 				Draw.alpha(0.3f);
-				Draw.crect("blank", x, y, x2 - x, y2 - y);
+				Fill.crect(x, y, x2 - x, y2 - y);
+				Draw.alpha(0f);
 
-				int amount = 1;
-				boolean isX = Math.abs(endx - tilex) >= Math.abs(endy - tiley);
+                Graphics.shader(Shaders.blockpreview, false);
 
-				for(int cx = 0; cx <= Math.abs(endx - tilex); cx += (isX ? 0 : 1)){
-					for(int cy = 0; cy <= Math.abs(endy - tiley); cy += (isX ? 1 : 0)){
+                for(int py = 0; py <= Math.abs(this.rendy - this.rtiley); py += block.size){
+                    for(int px = 0; px <= Math.abs(this.rendx - this.rtilex); px += block.size){
 
-						int px = tx + cx * Mathf.sign(ex - tx),
-								py = ty + cy * Mathf.sign(ey - ty);
+                        int wx = tilex + px * Mathf.sign(endx - tilex),
+                                wy = tiley + py * Mathf.sign(endy - tiley);
+                        if(!Placement.validPlace(input.player.team, wx, wy, block, rotation)){
+                            Draw.color("placeInvalid");
+                        }else{
+                            Draw.color("accent");
+                        }
 
-						//step by the block size if it's valid
-						if(input.validPlace(px, py, input.recipe.result) && state.inventory.hasItems(input.recipe.requirements, amount)){
+                        drawPreview(block, wx * t + offset.x, wy * t + offset.y);
+                    }
+                }
 
-							if(isX){
-								cx += block.size;
-							}else{
-								cy += block.size;
-							}
-							amount ++;
-						}else{ //otherwise, step by 1 until it is valid
-							if(input.cursorNear()){
-								Lines.stroke(2f);
-								Draw.color("placeInvalid");
-								Lines.crect(
-										px * t + (isX ? 0 : offset.x) + (ex < tx && isX && block.size > 1 ? t : 0) - (block.size == 3 && ex > tx && isX ? t : 0),
-										py * t + (isX ? offset.y : 0) + (ey < ty && !isX && block.size > 1 ? t : 0) - (block.size == 3 && ey > ty && !isX ? t : 0),
-										t*(isX ? 1 : block.size),
-										t*(isX ? block.size : 1));
-								Draw.color("place");
-							}
-
-							if(isX){
-								cx += 1;
-							}else{
-								cy += 1;
-							}
-						}
-					}
-				}
-
-				if(input.recipe.result.rotate){
-					float cx = tx * t, cy = ty * t;
-					Lines.stroke(2f);
-					Draw.color(Colors.get("placeRotate"));
-					tr.trns(rotation * 90, 7, 0);
-					Lines.line(cx, cy, cx + tr.x, cy + tr.y);
-				}
+                Graphics.shader();
 				Draw.reset();
 			}
 		}
+
+		public void drawPreview(Block block, float x, float y){
+		    for(TextureRegion region : block.getBlockIcon()){
+                Shaders.blockpreview.region = region;
+                Shaders.blockpreview.color.set(Colors.get("accent"));
+                Shaders.blockpreview.apply();
+
+		        Draw.rect(region, x, y);
+
+		        Graphics.flush();
+            }
+            //Lines.crect(x, y, block.size * tilesize, block.size * tilesize);
+        }
 		
 		public void released(InputHandler input, int tilex, int tiley, int endx, int endy){
 			process(input, tilex, tiley, endx, endy);
@@ -329,8 +316,8 @@ public enum PlaceMode{
 			input.rotation = this.rotation;
 			
 			boolean first = true;
-			for(int x = 0; x <= Math.abs(this.endx - this.tilex); x ++){
-				for(int y = 0; y <= Math.abs(this.endy - this.tiley); y ++){
+			for(int x = 0; x <= Math.abs(this.rendx - this.rtilex); x += input.recipe.result.size){
+				for(int y = 0; y <= Math.abs(this.rendy - this.rtiley); y += input.recipe.result.size){
 					if(input.tryPlaceBlock(
 							tilex + x * Mathf.sign(endx - tilex),
 							tiley + y * Mathf.sign(endy - tiley), first)){
@@ -342,19 +329,20 @@ public enum PlaceMode{
 		}
 		
 		void process(InputHandler input, int tilex, int tiley, int endx, int endy){
+		    /*
 			if(Math.abs(tilex - endx) > Math.abs(tiley - endy)){
 				endy = tiley;
 			}else{
 				endx = tilex;
 			}
-			
+
 			if(Math.abs(endx - tilex) > maxlen){
 				endx = Mathf.sign(endx - tilex) * maxlen + tilex;
 			}
-			
+
 			if(Math.abs(endy - tiley) > maxlen){
 				endy = Mathf.sign(endy - tiley) * maxlen + tiley;
-			}
+			}*/
 			
 			if(endx > tilex)
 				rotation = 0;
@@ -378,10 +366,10 @@ public enum PlaceMode{
 				tiley = t;
 			}
 			
-			this.endx = endx;
-			this.endy = endy;
-			this.tilex = tilex;
-			this.tiley = tiley;
+			this.rendx = endx;
+			this.rendy = endy;
+			this.rtilex = tilex;
+			this.rtiley = tiley;
 		}
 	};
 	public boolean lockCamera;

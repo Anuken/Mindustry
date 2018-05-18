@@ -118,7 +118,10 @@ public abstract class Turret extends Block{
 
 	@Override
     public TextureRegion[] getBlockIcon(){
-        return new TextureRegion[]{Draw.region("block-" + size), Draw.region(name)};
+	    if(blockIcon == null){
+	        blockIcon = new TextureRegion[]{Draw.region("block-" + size), Draw.region(name)};
+        }
+        return blockIcon;
     }
 	
 	@Override

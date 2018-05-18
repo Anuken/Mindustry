@@ -2,7 +2,6 @@ package io.anuke.mindustry.content.fx;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
-import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
@@ -17,9 +16,9 @@ public class Fx{
 
 	none = new Effect(0, 0f, e->{}),
 
-	place = new Effect(16, e -> {
+	placeBlock = new Effect(16, e -> {
 		Lines.stroke(3f - e.fin() * 2f);
-		Lines.square(e.x, e.y, tilesize / 2f + e.fin() * 3f);
+		Lines.square(e.x, e.y, tilesize / 2f * (float)(e.data) + e.fin() * 3f);
 		Draw.reset();
 	}),
 
