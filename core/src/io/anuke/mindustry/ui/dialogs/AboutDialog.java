@@ -9,6 +9,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Table;
 
+import static io.anuke.mindustry.Vars.ios;
 import static io.anuke.mindustry.Vars.ui;
 
 public class AboutDialog extends FloatingDialog {
@@ -59,7 +60,10 @@ public class AboutDialog extends FloatingDialog {
         content().add(pane).growX();
 
         buttons().addButton("$text.credits", this::showCredits).size(200f, 64f);
-        buttons().addButton("$text.changelog.title", ui.changelog::show).size(200f, 64f);
+        if(!ios){
+            buttons().addButton("$text.changelog.title", ui.changelog::show).size(200f, 64f);
+        }
+
     }
 
     private void showCredits(){

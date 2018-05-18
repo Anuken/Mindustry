@@ -57,7 +57,8 @@ public class MenuFragment implements Fragment{
 
 			}else {
 				new table() {{
-					defaults().size(120f).pad(5);
+				    float size = 120f;
+					defaults().size(size).pad(5);
 					float isize = 14f * 4;
 
 					new imagebutton("icon-play-2", isize, ui.levels::show).text("$text.play").padTop(4f);
@@ -70,13 +71,21 @@ public class MenuFragment implements Fragment{
 
 					row();
 
-					new imagebutton("icon-editor", isize, ui.editor::show).text("$text.editor").padTop(4f);
+					new table(){{
 
-					new imagebutton("icon-tools", isize, ui.settings::show).text("$text.settings").padTop(4f);
+                        defaults().size(size).pad(5);
 
-					new imagebutton("icon-info", isize, ui.about::show).text("$text.about.button").padTop(4f);
+                        new imagebutton("icon-editor", isize, ui.editor::show).text("$text.editor").padTop(4f);
 
-					new imagebutton("icon-donate", isize, Platform.instance::openDonations).text("$text.donate").padTop(4f);
+                        new imagebutton("icon-tools", isize, ui.settings::show).text("$text.settings").padTop(4f);
+
+                        new imagebutton("icon-info", isize, ui.about::show).text("$text.about.button").padTop(4f);
+
+                        if (!ios) {
+                            new imagebutton("icon-donate", isize, Platform.instance::openDonations).text("$text.donate").padTop(4f);
+                        }
+
+                    }}.colspan(4).end();
 				}}.end();
 			}
 		}}.end();

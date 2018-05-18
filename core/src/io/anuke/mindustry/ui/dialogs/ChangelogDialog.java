@@ -11,6 +11,8 @@ import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Log;
 
+import static io.anuke.mindustry.Vars.ios;
+
 public class ChangelogDialog extends FloatingDialog{
     private final float vw = 600;
     private Array<VersionInfo> versions;
@@ -22,13 +24,16 @@ public class ChangelogDialog extends FloatingDialog{
 
         content().add("$text.changelog.loading");
 
-        Changelogs.getChangelog(result -> {
-            versions = result;
-            Gdx.app.postRunnable(this::setup);
-        }, t -> {
-            Log.err(t);
-            Gdx.app.postRunnable(this::setup);
-        });
+        if(!ios) {
+
+            Changelogs.getChangelog(result -> {
+                versions = result;
+                Gdx.app.postRunnable(this::setup);
+            }, t -> {
+                Log.err(t);
+                Gdx.app.postRunnable(this::setup);
+            });
+        }
     }
 
     void setup(){
@@ -45,7 +50,7 @@ public class ChangelogDialog extends FloatingDialog{
                 table.add("$text.changelog.error.android").padTop(8);
             }
 
-            if(Vars.ios){
+            if(ios){
                 table.row();
                 table.add("$text.changelog.error.ios").padTop(8);
             }
