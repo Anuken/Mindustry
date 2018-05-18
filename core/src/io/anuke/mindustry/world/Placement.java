@@ -67,6 +67,7 @@ public class Placement {
 
         tile.setBlock(sub, rotation);
         tile.<BuildEntity>entity().result = result;
+        tile.<BuildEntity>entity().stacks = recipe.requirements;
         tile.setTeam(team);
 
         if(result.isMultiblock()){
@@ -88,9 +89,13 @@ public class Placement {
                     if(effects) Effects.effect(Fx.none, worldx * tilesize, worldy * tilesize);
                 }
             }
-        }else if(effects) Effects.effect(Fx.none, x * tilesize, y * tilesize);
+        }else if(effects){
+            Effects.effect(Fx.none, x * tilesize, y * tilesize);
+        }
 
-        if(effects && sound) threads.run(() -> Effects.sound("place", x * tilesize, y * tilesize));
+        if(effects && sound){
+            threads.run(() -> Effects.sound("place", x * tilesize, y * tilesize));
+        }
     }
 
     public static boolean validPlace(Team team, int x, int y, Block type, int rotation){

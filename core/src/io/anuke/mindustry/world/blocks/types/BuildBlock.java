@@ -9,6 +9,7 @@ import io.anuke.mindustry.entities.effect.Rubble;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Shaders;
+import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
@@ -96,5 +97,6 @@ public class BuildBlock extends Block {
         public Block result;
         public Recipe recipe;
         public float progress = 0.05f;
+        public ItemStack[] stacks;
     }
 }

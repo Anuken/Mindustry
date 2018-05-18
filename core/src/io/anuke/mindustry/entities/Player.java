@@ -42,7 +42,6 @@ public class Player extends Unit implements BlockPlacer{
 	static final float dashSpeed = 1.8f;
 	public static final float placeDistance = 80f;
 
-	static final int timerDash = 0;
 	static final int timerRegen = 3;
 	static final Translator[] tmptr = {new Translator(), new Translator(), new Translator(), new Translator()};
 
@@ -229,7 +228,7 @@ public class Player extends Unit implements BlockPlacer{
 	@Override
 	public void drawOver(){
 	    if(!isShooting() && currentPlace != null) {
-	        Draw.color("accent");
+	        Draw.color(distanceTo(currentPlace) > placeDistance ? "placeInvalid" : "accent");
 	        float focusLen = 3.8f + Mathf.absin(Timers.time(), 1.1f, 0.6f);
 	        float px = x + Angles.trnsx(rotation, focusLen);
             float py = y + Angles.trnsy(rotation, focusLen);
@@ -320,10 +319,6 @@ public class Player extends Unit implements BlockPlacer{
 	    return placeQueue;
     }
 
-    private boolean invalidPlaceBlock(Tile check){
-        return (!(check.block() instanceof BuildBlock) || distanceTo(check) > placeDistance);
-    }
-
 	protected void updateMech(){
 
 		Tile tile = world.tileWorld(x, y);
@@ -334,21 +329,24 @@ public class Player extends Unit implements BlockPlacer{
 		}
 
 		if(!isShooting()) {
+		    //update placing queue
 
 		    if(currentPlace != null) {
 		        Tile check = currentPlace;
 
-                if (invalidPlaceBlock(currentPlace)) {
+                if (!(check.block() instanceof BuildBlock)) {
                     currentPlace = null;
-                }else {
+                }else if(distanceTo(check) <= placeDistance){
                     BuildEntity entity = check.entity();
                     entity.progress += 1f / entity.result.health;
                     rotation = Mathf.slerpDelta(rotation, angleTo(entity), 0.4f);
                 }
 
             }else if(placeQueue.size > 0){
-                PlaceRequest check = placeQueue.removeLast();
-                if(Placement.validPlace(team, check.x, check.y, check.recipe.result, check.rotation)){
+                PlaceRequest check = placeQueue.last();
+                if(distanceTo(world.tile(check.x, check.y)) <= placeDistance &&
+                        Placement.validPlace(team, check.x, check.y, check.recipe.result, check.rotation)){
+                    placeQueue.removeLast();
                     Placement.placeBlock(team, check.x, check.y, check.recipe, check.rotation, true, true);
                     currentPlace = world.tile(check.x, check.y);
                 }
