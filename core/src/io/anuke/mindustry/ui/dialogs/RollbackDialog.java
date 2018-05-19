@@ -25,12 +25,11 @@ public class RollbackDialog extends FloatingDialog {
 		content().row();
 		content().add("$text.server.rollback.numberfield");
 		
-		TextField field = content().addField("", t->{}).get();
+		TextField field = content().addField("", t->{}).size(60f, 48f).get();
 		field.setTextFieldFilter((f, c) -> field.getText().length() < 4);
-		content().add(field).size(220f, 48f);
 		
 		content().row();
-		buttons().defaults().size(50f, 50f).left().pad(2f);
+		buttons().defaults().size(200f, 50f).left().pad(2f);
 		buttons().addButton("$text.cancel", this::hide);
 		
 		buttons().addButton("$text.ok", () -> {
