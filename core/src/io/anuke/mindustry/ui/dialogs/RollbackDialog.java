@@ -25,7 +25,7 @@ public class RollbackDialog extends FloatingDialog {
 		content().row();
 		content().add("$text.server.rollback.numberfield");
 		
-		TextField field = content().addField("", t->{}).size(60f, 48f).get();
+		TextField field = content().addField("", t->{}).size(200f, 48f).get();
 		field.setTextFieldFilter((f, c) -> field.getText().length() < 4);
 		
 		content().row();
