@@ -3,7 +3,10 @@ package io.anuke.mindustry;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.PixmapIO;
+import com.esotericsoftware.minlog.Log;
 import io.anuke.kryonet.DefaultThreadImpl;
 import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
@@ -15,6 +18,7 @@ import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.foundation.NSURL;
+import org.robovm.apple.uikit.UIActivityViewController;
 import org.robovm.apple.uikit.UIApplication;
 import org.robovm.apple.uikit.UIApplicationLaunchOptions;
 import org.robovm.apple.uikit.UIApplicationOpenURLOptions;
@@ -22,6 +26,7 @@ import org.robovm.apple.uikit.UIApplicationOpenURLOptions;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 
@@ -70,8 +75,13 @@ public class IOSLauncher extends IOSApplication.Delegate {
 
             @Override
             public void shareImage(Pixmap image){
-                //todo share it
+                FileHandle file = Gdx.files.local("tmp-img.pmh");
+                NSURL url = new NSURL(file.file());
+                PixmapIO.writePNG(file, image);
+                UIActivityViewController p = new UIActivityViewController(Collections.singletonList(url), null);
 
+                UIApplication.getSharedApplication().getKeyWindow().getRootViewController()
+                        .presentViewController(p, true, () -> Log.info("Success! Presented someting."));
             }
         };
 

@@ -234,9 +234,9 @@ public class MapEditorDialog extends Dialog{
 				new imagebutton("icon-save-image", isize, () -> {
 				    //iOS doesn't really support saving raw files. Sharing is used instead.
                     if(!ios){
-                        saveFile.show()
+                        saveFile.show();
                     }else {
-                        Platforms.instance.shareImage(editor.pixmap());
+                        Platform.instance.shareImage(editor.pixmap());
                     }
                 }).text("$text.editor.saveimage");
 				
