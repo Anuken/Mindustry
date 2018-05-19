@@ -20,12 +20,17 @@ public class GridImage extends Element{
 		float xspace = (getWidth() / imageWidth);
 		float yspace = (getHeight() / imageHeight);
 		float s = 1f;
+
+		int minspace = 10;
+
+		int jumpx = (int)(Math.max(minspace, xspace) / xspace);
+        int jumpy = (int)(Math.max(minspace, yspace)/ yspace);
 		
-		for(int x = 0; x <= imageWidth; x ++){
+		for(int x = 0; x <= imageWidth; x += jumpx){
 			batch.draw(blank, (int)(getX() + xspace * x - s), getY() - s, 2, getHeight()+ (x == imageWidth ? 1: 0));
 		}
 		
-		for(int y = 0; y <= imageHeight; y ++){
+		for(int y = 0; y <= imageHeight; y += jumpy){
 			batch.draw(blank, getX() - s, (int)(getY() + y * yspace - s), getWidth(), 2);
 		}
 	}
