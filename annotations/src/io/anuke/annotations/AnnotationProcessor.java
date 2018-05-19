@@ -2,15 +2,17 @@ package io.anuke.annotations;
 
 import com.squareup.javapoet.*;
 import io.anuke.annotations.Annotations.Local;
-import io.anuke.annotations.Annotations.Remote;
+import io.anuke.annotations.Annotations.RemoteClient;
+import io.anuke.annotations.Annotations.RemoteServer;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
-import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic.Kind;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,14 +20,16 @@ import java.util.Set;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes({
-    "io.anuke.annotations.Annotations.Remote",
+    "io.anuke.annotations.Annotations.RemoteClient",
+    "io.anuke.annotations.Annotations.RemoteServer",
     "io.anuke.annotations.Annotations.Local"
 })
 public class AnnotationProcessor extends AbstractProcessor {
     private static final int maxPacketSize = 128;
-    private static final String fullClassName = "io.anuke.mindustry.gen.CallEvent";
-    private static final String className = fullClassName.substring(1 + fullClassName.lastIndexOf('.'));
-    private static final String packageName = fullClassName.substring(0, fullClassName.lastIndexOf('.'));
+
+    private static final String clientFullClassName = "io.anuke.mindustry.gen.CallClient";
+    private static final String serverFullClassName = "io.anuke.mindustry.gen.CallServer";
+
     private static final HashMap<String, String[][]> writeMap = new HashMap<String, String[][]>(){{
         put("Player", new String[][]{
             {
@@ -57,22 +61,24 @@ public class AnnotationProcessor extends AbstractProcessor {
         if(done) return false;
         done = true;
 
-        ArrayList<Element> elements = new ArrayList<>();
+        writeElements(roundEnv, clientFullClassName, RemoteClient.class);
+        writeElements(roundEnv, serverFullClassName, RemoteServer.class);
 
-        for (Element element : roundEnv.getElementsAnnotatedWith(Remote.class)) {
-            if(!element.getModifiers().contains(Modifier.STATIC)) {
-                messager.printMessage(Kind.ERROR, "All local/remote methods must be static: ", element);
-            }else if(element.getKind() != ElementKind.METHOD){
-                    messager.printMessage(Kind.ERROR, "All local/remote annotations must be on methods: ", element);
-            }else{
-                elements.add(element);
-            }
-        }
+        return true;
+    }
 
+    private void writeElements(RoundEnvironment env, String fullClassName, Class<? extends Annotation> annotation){
         try {
+            boolean client = annotation == RemoteServer.class;
+            String className = fullClassName.substring(1 + fullClassName.lastIndexOf('.'));
+            String packageName = fullClassName.substring(0, fullClassName.lastIndexOf('.'));
 
-            TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className)
-                    .addModifiers(Modifier.PUBLIC);
+            Constructor<TypeName> cons = TypeName.class.getDeclaredConstructor(String.class);
+            cons.setAccessible(true);
+
+            TypeName playerType = cons.newInstance("io.anuke.mindustry.entities.Player");
+
+            TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
 
             int id = 0;
 
@@ -85,12 +91,23 @@ public class AnnotationProcessor extends AbstractProcessor {
                     .addParameter(int.class, "id")
                     .returns(void.class);
 
+            if(client){
+                readMethod.addParameter(playerType, "player");
+            }
+
             CodeBlock.Builder writeSwitch = CodeBlock.builder();
             boolean started = false;
 
             readMethod.addJavadoc("This method reads and executes a method by ID. For internal use only!");
 
-            for (Element e : elements) {
+            for (Element e : env.getElementsAnnotatedWith(annotation)) {
+                if(!e.getModifiers().contains(Modifier.STATIC)) {
+                    messager.printMessage(Kind.ERROR, "All local/remote methods must be static: ", e);
+                }else if(e.getKind() != ElementKind.METHOD){
+                    messager.printMessage(Kind.ERROR, "All local/remote annotations must be on methods: ", e);
+                }
+
+                if(e.getAnnotation(annotation) == null) continue;
                 boolean local = e.getAnnotation(Local.class) != null;
 
                 ExecutableElement exec = (ExecutableElement)e;
@@ -99,12 +116,24 @@ public class AnnotationProcessor extends AbstractProcessor {
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .returns(void.class);
 
+                if(client){
+                    if(exec.getParameters().isEmpty()){
+                        messager.printMessage(Kind.ERROR, "Client invoke methods must have a first parameter of type Player.", e);
+                        return;
+                    }
+
+                    VariableElement var = exec.getParameters().get(0);
+
+                    if(!var.asType().toString().equals("io.anuke.mindustry.entities.Player")){
+                        messager.printMessage(Kind.ERROR, "Client invoke methods should have a first parameter of type Player.", e);
+                    }
+                }
+
                 for(VariableElement var : exec.getParameters()){
                     method.addParameter(TypeName.get(var.asType()), var.getSimpleName().toString());
                 }
 
                 if(local){
-                    //todo
                     int index = 0;
                     StringBuilder results = new StringBuilder();
                     for(VariableElement var : exec.getParameters()){
@@ -124,11 +153,17 @@ public class AnnotationProcessor extends AbstractProcessor {
                 }
                 started = true;
 
-                method.addStatement("$1N packet = new $1N()", "io.anuke.mindustry.net.Packets.InvokePacket");
+                method.addStatement("$1N packet = $2N.obtain($1N.class)", "io.anuke.mindustry.net.Packets.InvokePacket",
+                        "com.badlogic.gdx.utils.Pools");
                 method.addStatement("packet.writeBuffer = TEMP_BUFFER");
                 method.addStatement("TEMP_BUFFER.position(0)");
 
-                for(VariableElement var : exec.getParameters()){
+                ArrayList<VariableElement> parameters = new ArrayList<>(exec.getParameters());
+                if(client){
+                    parameters.remove(0);
+                }
+
+                for(VariableElement var : parameters){
                     String varName = var.getSimpleName().toString();
                     String typeName = var.asType().toString();
                     String bufferName = "TEMP_BUFFER";
@@ -148,7 +183,7 @@ public class AnnotationProcessor extends AbstractProcessor {
                         String[] values = writeMap.get(simpleTypeName)[0];
                         for(String str : values){
                             method.addStatement(str.replaceAll("rbuffer", bufferName)
-                            .replaceAll("rvalue", varName));
+                                    .replaceAll("rvalue", varName));
                         }
                     }else{
                         messager.printMessage(Kind.ERROR, "No method for writing type: " + typeName, var);
@@ -178,13 +213,9 @@ public class AnnotationProcessor extends AbstractProcessor {
 
                 classBuilder.addMethod(method.build());
 
-                FieldSpec var = FieldSpec.builder(TypeName.INT, "ID_METHOD_" + exec.getSimpleName().toString().toUpperCase())
-                        .initializer("$1L", id).addModifiers(Modifier.FINAL, Modifier.PRIVATE, Modifier.STATIC).build();
-
-                classBuilder.addField(var);
-
                 int index = 0;
                 StringBuilder results = new StringBuilder();
+
                 for(VariableElement writevar : exec.getParameters()){
                     results.append(writevar.getSimpleName());
                     if(index != exec.getParameters().size() - 1) results.append(", ");
@@ -195,8 +226,6 @@ public class AnnotationProcessor extends AbstractProcessor {
                         ((TypeElement)e.getEnclosingElement()).getQualifiedName().toString());
 
                 id ++;
-
-                //TODO add params from the method and invoke it
             }
 
             if(started){
@@ -209,13 +238,10 @@ public class AnnotationProcessor extends AbstractProcessor {
             TypeSpec spec = classBuilder.build();
 
             JavaFile.builder(packageName, spec).build().writeTo(filer);
-
-
         }catch (Exception e){
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
-
-        return true;
     }
 
     private boolean isPrimitive(String type){

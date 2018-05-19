@@ -13,6 +13,7 @@ public class Recipe {
     public final Block result;
     public final ItemStack[] requirements;
     public final Section section;
+    public final float cost;
 
     public boolean desktopOnly = false, debugOnly = false;
 
@@ -21,6 +22,13 @@ public class Recipe {
         this.result = result;
         this.requirements = requirements;
         this.section = section;
+
+        float timeToPlace = 0f;
+        for(ItemStack stack : requirements){
+            timeToPlace += stack.amount * stack.item.cost;
+        }
+
+        this.cost = timeToPlace;
 
         allRecipes.add(this);
         recipeMap.put(result, this);

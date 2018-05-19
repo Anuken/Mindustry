@@ -27,6 +27,7 @@ import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.scene.utils.UIUtils;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.input.Input;
 import io.anuke.ucore.util.Log;
@@ -387,15 +388,14 @@ public class MapEditorDialog extends Dialog{
 	private void doInput(){
 		//tool select
 		for(int i = 0; i < EditorTool.values().length; i ++){
-			int code = i == 0 ? 5 : i;
-			if(Inputs.keyTap("weapon_" + code)){
+			if(Inputs.keyTap(Input.valueOf("NUM_" + (i+1)))){
 				view.setTool(EditorTool.values()[i]);
 				break;
 			}
 		}
 
 		//ctrl keys (undo, redo, save)
-		if(Inputs.keyDown(Input.CONTROL_LEFT)){
+		if(UIUtils.ctrl()){
 			if(Inputs.keyTap(Input.Z)){
 				view.undo();
 			}

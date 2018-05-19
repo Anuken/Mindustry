@@ -3,7 +3,7 @@ package io.anuke.mindustry.ui.fragments;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.gen.CallEvent;
+import io.anuke.mindustry.gen.CallClient;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.NetEvents;
@@ -49,7 +49,7 @@ public class PlayerListFragment implements Fragment{
                     margin(12f);
 
                     get().addCheck("$text.server.friendlyfire", b -> {
-                        CallEvent.friendlyFireChange(b);
+//                        CallClient.friendlyFireChange(b);
                     }).growX().update(i -> i.setChecked(state.friendlyFire)).disabled(b -> Net.client()).padRight(5);
 
                     new button("$text.server.bans", () -> {
@@ -160,12 +160,12 @@ public class PlayerListFragment implements Fragment{
                         if(netServer.admins.isAdmin(id, connection.address)){
                             ui.showConfirm("$text.confirm", "$text.confirmunadmin", () -> {
                                 netServer.admins.unAdminPlayer(id);
-                                CallEvent.adminSet(player, false);
+                                CallClient.adminSet(player, false);
                             });
                         }else{
                             ui.showConfirm("$text.confirm", "$text.confirmadmin", () -> {
                                 netServer.admins.adminPlayer(id, connection.address);
-                                CallEvent.adminSet(player,  true);
+                                CallClient.adminSet(player,  true);
                             });
                         }
                     }).update(b ->{

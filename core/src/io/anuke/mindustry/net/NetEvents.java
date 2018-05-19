@@ -2,7 +2,8 @@ package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.utils.Pools;
 import io.anuke.annotations.Annotations.Local;
-import io.anuke.annotations.Annotations.Remote;
+import io.anuke.annotations.Annotations.RemoteClient;
+import io.anuke.annotations.Annotations.RemoteServer;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.entities.TileEntity;
@@ -17,12 +18,23 @@ import static io.anuke.mindustry.Vars.*;
 
 public class NetEvents {
 
-    @Remote
+    @RemoteClient
     @Local
     public static void friendlyFireChange(boolean enabled){
         state.friendlyFire = enabled;
 
         if(Net.server()) netCommon.sendMessage(enabled ? "[accent]Friendly fire enabled." : "[accent]Friendly fire disabled.");
+    }
+
+    @RemoteServer
+    public static void notifySomethingFromClient(Player player, int x, float y){
+        
+    }
+
+    @RemoteClient
+    @Local
+    public static void notifySomethingFromServerLocal(int y, float x, boolean w){
+
     }
 
     public static void handleGameOver(){
@@ -116,7 +128,7 @@ public class NetEvents {
         Net.send(packet, SendMode.tcp);
     }
 
-    @Remote
+    @RemoteClient
     @Local
     public static void adminSet(Player player, boolean admin){
         player.isAdmin = admin;

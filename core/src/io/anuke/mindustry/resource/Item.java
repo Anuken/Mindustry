@@ -28,6 +28,9 @@ public class Item implements Comparable<Item>{
 	public int hardness = 0;
 	/**the burning color of this item*/
 	public Color flameColor = Palette.darkFlame.cpy();
+	/**base material cost of this item, used for calculating place times
+     * 1 cost = 1 tick added to build time*/
+	public float cost = 1f;
 
 	public Item(String name, Color color) {
 		this.id = items.size;

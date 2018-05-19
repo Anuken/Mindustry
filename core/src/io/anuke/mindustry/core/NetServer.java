@@ -10,6 +10,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
+import io.anuke.mindustry.gen.CallServer;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.*;
@@ -160,6 +161,10 @@ public class NetServer extends Module{
 
         Net.handleServer(PositionPacket.class, (id, packet) -> {
             //...don't do anything here as it's already handled by the packet itself
+        });
+
+        Net.handleServer(InvokePacket.class, (id, packet) -> {
+            CallServer.readPacket(packet.writeBuffer, packet.type, connections.get(id));
         });
 
         Net.handleServer(EntityShootPacket.class, (id, packet) -> {
