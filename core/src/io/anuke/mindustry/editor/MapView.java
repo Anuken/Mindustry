@@ -1,5 +1,6 @@
 package io.anuke.mindustry.editor;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -24,10 +25,11 @@ import io.anuke.ucore.scene.event.InputListener;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.input.Input;
+import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
+import static io.anuke.mindustry.Vars.mobile;
 import static io.anuke.mindustry.Vars.ui;
 
 public class MapView extends Element implements GestureListener{
@@ -43,10 +45,12 @@ public class MapView extends Element implements GestureListener{
 	private GridImage image = new GridImage(0, 0);
 	private Vector2 vec = new Vector2();
 	private Rectangle rect = new Rectangle();
+	private Vector2[][] brushPolygons = new Vector2[MapEditor.brushSizes.length][0];
 
 	private boolean drawing;
 	private int lastx, lasty;
 	private int startx, starty;
+	private float mousex, mousey;
 
 	public void setTool(EditorTool tool){
 		this.tool = tool;
@@ -87,11 +91,24 @@ public class MapView extends Element implements GestureListener{
 
 	public MapView(MapEditor editor){
 		this.editor = editor;
+
+        for(int i = 0; i < MapEditor.brushSizes.length; i ++){
+            float size = MapEditor.brushSizes[i];
+            brushPolygons[i] = Geometry.pixelCircle(size, (index, x, y) -> Vector2.dst(x, y, index, index) <= index - 0.5f);
+        }
 		
 		Inputs.addProcessor(0, new GestureDetector(20, 0.5f, 2, 0.15f, this));
 		setTouchable(Touchable.enabled);
 		
 		addListener(new InputListener(){
+
+		    @Override
+            public boolean mouseMoved (InputEvent event, float x, float y) {
+		        mousex = x;
+		        mousey = y;
+
+		        return false;
+            }
 			
 			@Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
@@ -135,6 +152,9 @@ public class MapView extends Element implements GestureListener{
 			
 			@Override
 			public void touchDragged (InputEvent event, float x, float y, int pointer) {
+		        mousex = x;
+		        mousey = y;
+
 				GridPoint2 p = project(x, y);
 				
 				if(drawing && tool == EditorTool.pencil){
@@ -156,7 +176,7 @@ public class MapView extends Element implements GestureListener{
 		super.act(delta);
 
 		if(Core.scene.getKeyboardFocus() == null || !(Core.scene.getKeyboardFocus() instanceof TextField) &&
-				!Inputs.keyDown(Input.CONTROL_LEFT)) {
+				!Inputs.keyDown(io.anuke.ucore.input.Input.CONTROL_LEFT)) {
 			float ax = Inputs.getAxis("move_x");
 			float ay = Inputs.getAxis("move_y");
 			offsetx -= ax * 15f / zoom;
@@ -223,19 +243,32 @@ public class MapView extends Element implements GestureListener{
 			Draw.color();
 		}
 
+        int index = 0;
+        for(int i = 0; i < MapEditor.brushSizes.length; i ++){
+            if(editor.getBrushSize() == MapEditor.brushSizes[i]){
+                index = i;
+                break;
+            }
+        }
+
 		if(tool == EditorTool.line && drawing){
 			Vector2 v1 = unproject(startx, starty).add(x, y);
 			float sx = v1.x, sy = v1.y;
 			Vector2 v2 = unproject(lastx, lasty).add(x, y);
 
-			Draw.color(Tmp.c1.set(ColorMapper.getColor(editor.getDrawBlock())));
-			Lines.stroke(Unit.dp.scl(3f * zoom));
-			Lines.line(sx, sy, v2.x, v2.y);
-
-			Lines.poly(sx, sy, 40, editor.getBrushSize() * zoom * 3);
-
-            Lines.poly(v2.x, v2.y, 40, editor.getBrushSize() * zoom * 3);
+            Draw.color("accent");
+			Lines.stroke(Unit.dp.scl(1f * zoom));
+            Lines.poly(brushPolygons[index], sx, sy, 3f*zoom);
+            Lines.poly(brushPolygons[index], v2.x, v2.y, 3f*zoom);
 		}
+
+		if(tool.edit && (!mobile || drawing)){
+            GridPoint2 p = project(mousex, mousey);
+            Vector2 v = unproject(p.x, p.y).add(x, y);
+            Draw.color("accent");
+            Lines.stroke(Unit.dp.scl(1f * zoom));
+            Lines.poly(brushPolygons[index], v.x, v.y, 3f*zoom);
+        }
 
 		batch.flush();
 		

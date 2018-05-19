@@ -316,7 +316,7 @@ public class Player extends Unit implements BlockPlacer{
 	    return control.input(playerIndex).canShoot() && control.input(playerIndex).isShooting() && inventory.hasAmmo();
     }
 
-    public Iterable<PlaceRequest> getPlaceQueue(){
+    public Queue<PlaceRequest> getPlaceQueue(){
 	    return placeQueue;
     }
 

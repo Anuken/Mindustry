@@ -74,9 +74,9 @@ public class MapEditor{
 			writer.team = (byte)drawTeam.ordinal();
 		}
 
-		for(int rx = -brushSize + 1; rx <= brushSize - 1; rx ++){
-			for(int ry = -brushSize + 1; ry <= brushSize - 1; ry ++){
-				if(Mathf.dst(rx, ry) <= brushSize){
+		for(int rx = -brushSize; rx <= brushSize; rx ++){
+			for(int ry = -brushSize; ry <= brushSize; ry ++){
+				if(Mathf.dst(rx, ry) <= brushSize - 0.5f){
 					if(dx + rx < 0 || dy + ry < 0 || dx + rx >= map.width() || dy + ry >= map.height()){
 						continue;
 					}
