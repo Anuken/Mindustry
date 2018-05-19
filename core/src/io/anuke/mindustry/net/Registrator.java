@@ -18,6 +18,7 @@ public class Registrator {
             BreakPacket.class,
             StateSyncPacket.class,
             BlockLogRequestPacket.class,
+            RollbackRequestPacket.class,
             BlockSyncPacket.class,
             BulletPacket.class,
             EnemyDeathPacket.class,

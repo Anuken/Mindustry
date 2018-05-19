@@ -153,7 +153,8 @@ public class Packets {
 			buffer.putShort((short)y);
 			buffer.putInt(editlogs.size);
 			for(EditLog value : editlogs) {
-				buffer.putInt(value.player.id);
+				buffer.put((byte)value.playername.getBytes().length);
+				buffer.put(value.playername.getBytes());
 				buffer.putInt(value.block.id);
 				buffer.put((byte) value.rotation);
 				buffer.put((byte) value.action.ordinal());
@@ -167,15 +168,33 @@ public class Packets {
 			editlogs = new Array<>();
 			int arraySize = buffer.getInt();
 			for(int a = 0; a < arraySize; a ++) {
-				int playerid = buffer.getInt();
+				byte length = buffer.get();
+				byte[] bytes = new byte[length];
+				buffer.get(bytes);
+				String name = new String(bytes);
+				
 				int blockid = buffer.getInt();
 				int rotation = buffer.get();
 				int ordinal = buffer.get();
 				
-				editlogs.add(new EditLog(Vars.playerGroup.getByID(playerid), Block.getByID(blockid), rotation, EditLog.EditAction.values()[ordinal]));
+				editlogs.add(new EditLog(name, Block.getByID(blockid), rotation, EditLog.EditAction.values()[ordinal]));
 			}
 		}
 	}
+    
+    public static class RollbackRequestPacket implements Packet {
+        public int rollbackTimes;
+        
+        @Override
+        public void write(ByteBuffer buffer) {
+            buffer.putInt(rollbackTimes);
+        }
+        
+        @Override
+        public void read(ByteBuffer buffer) {
+            rollbackTimes = buffer.getInt();
+        }
+    }
     
     public static class PositionPacket implements Packet{
         public byte[] data;

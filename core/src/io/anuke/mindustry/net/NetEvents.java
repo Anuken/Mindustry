@@ -186,4 +186,11 @@ public class NetEvents {
         
         Net.send(packet, SendMode.udp);
     }
+    
+    public static void handleRollbackRequest(int rollbackTimes) {
+        RollbackRequestPacket packet = new RollbackRequestPacket();
+        packet.rollbackTimes = rollbackTimes;
+    
+        Net.send(packet, SendMode.udp);
+    }
 }

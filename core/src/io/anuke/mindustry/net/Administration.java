@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Placement;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.mindustry.world.blocks.types.Rock;
@@ -66,13 +67,59 @@ public class Administration {
     public void logEdit(int x, int y, Player player, Block block, int rotation, EditLog.EditAction action) {
     	if(block instanceof BlockPart || block instanceof Rock || block instanceof Floor || block instanceof StaticBlock) return;
     	if(editLogs.containsKey(x + y * world.width())) {
-			editLogs.get(x + y * world.width()).add(new EditLog(player, block, rotation, action));
+			editLogs.get(x + y * world.width()).add(new EditLog(player.name, block, rotation, action));
 		}
 		else {
 			Array<EditLog> logs = new Array<>();
-			logs.add(new EditLog(player, block, rotation, action));
+			logs.add(new EditLog(player.name, block, rotation, action));
 			editLogs.put(x + y * world.width(), logs);
 		}
+    }
+    
+    public void rollbackWorld(int rollbackTimes) {
+        for(IntMap.Entry<Array<EditLog>> editLog : editLogs.entries()) {
+            int coords = editLog.key;
+            Array<EditLog> logs = editLog.value;
+        
+            for(int i = 0; i < rollbackTimes; i++) {
+            
+                EditLog log = logs.get(logs.size - 1);
+            
+                int x = coords % world.width();
+                int y = coords / world.width();
+                Block result = log.block;
+                int rotation = log.rotation;
+            
+                if(log.action == EditLog.EditAction.PLACE) {
+                    Placement.breakBlock(x, y, false, false);
+                
+                    Packets.BreakPacket packet = new Packets.BreakPacket();
+                    packet.x = (short) x;
+                    packet.y = (short) y;
+                    packet.playerid = 0;
+                
+                    Net.send(packet, Net.SendMode.tcp);
+                }
+                else if(log.action == EditLog.EditAction.BREAK) {
+                    Placement.placeBlock(x, y, result, rotation, false, false);
+                
+                    Packets.PlacePacket packet = new Packets.PlacePacket();
+                    packet.x = (short) x;
+                    packet.y = (short) y;
+                    packet.rotation = (byte) rotation;
+                    packet.playerid = 0;
+                    packet.block = result.id;
+                
+                    Net.send(packet, Net.SendMode.tcp);
+                }
+            
+                logs.removeIndex(logs.size - 1);
+                if(logs.size == 0) {
+                    editLogs.remove(coords);
+                    break;
+                }
+            }
+        }
     }
     
     public boolean validateBreak(String id, String ip){

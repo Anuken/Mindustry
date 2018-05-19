@@ -58,6 +58,10 @@ public class PlayerListFragment implements Fragment{
                     new button("$text.server.admins", () -> {
                         ui.admins.show();
                     }).padTop(-12).padBottom(-12).padRight(-12).fillY().cell.disabled(b -> Net.client());
+    
+                    new button("$text.server.rollback", () -> {
+                        ui.rollback.show();
+                    }).padTop(-12).padBottom(-12).padRight(-12).fillY().cell.disabled(b -> !player.isAdmin);
 
                 }}.pad(10f).growX().end();
             }}.end();

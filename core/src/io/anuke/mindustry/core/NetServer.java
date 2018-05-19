@@ -355,6 +355,19 @@ public class NetServer extends Module{
             packet.editlogs = admins.getEditLogs().get(packet.x + packet.y * world.width(), new Array<>());
             Net.sendTo(id, packet, SendMode.udp);
         });
+    
+        Net.handleServer(RollbackRequestPacket.class, (id, packet) -> {
+            Player player = connections.get(id);
+    
+            if(!player.isAdmin){
+                Log.err("ACCESS DENIED: Player {0} / {1} attempted to perform a rollback without proper security access.",
+                        player.name, Net.getConnection(player.clientid).address);
+                return;
+            }
+            
+            admins.rollbackWorld(packet.rollbackTimes);
+            Log.info("&lc{0} has rolled back the world {1} times.", player.name, packet.rollbackTimes);
+        });
     }
 
     public void update(){
