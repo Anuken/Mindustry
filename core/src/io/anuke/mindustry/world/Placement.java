@@ -67,6 +67,7 @@ public class Placement {
 
         tile.setBlock(sub, rotation);
         tile.<BuildEntity>entity().result = result;
+        tile.<BuildEntity>entity().recipe = recipe;
         tile.<BuildEntity>entity().stacks = recipe.requirements;
         tile.setTeam(team);
 
