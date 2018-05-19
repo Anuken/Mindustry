@@ -1,6 +1,6 @@
 package io.anuke.mindustry.mapeditor;
 
-import io.anuke.mindustry.io.Platform;
+import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Map;
 import io.anuke.ucore.function.Consumer;

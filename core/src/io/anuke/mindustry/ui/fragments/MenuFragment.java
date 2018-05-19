@@ -2,7 +2,7 @@ package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.Gdx;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.io.Platform;
+import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.ui.MenuButton;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;

@@ -3,7 +3,7 @@ package io.anuke.mindustry;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.io.BlockLoader;
 import io.anuke.mindustry.io.BundleLoader;
-import io.anuke.mindustry.io.Platform;
+import io.anuke.mindustry.core.Platform;
 import io.anuke.ucore.modules.ModuleCore;
 import io.anuke.ucore.util.Log;
 

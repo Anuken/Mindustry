@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.mapeditor.MapEditorDialog;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
