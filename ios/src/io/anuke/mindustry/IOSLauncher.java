@@ -85,6 +85,7 @@ public class IOSLauncher extends IOSApplication.Delegate {
 
                 NSURL url = new NSURL(to.file());
                 UIActivityViewController p = new UIActivityViewController(Collections.singletonList(url), null);
+                p.getPopoverPresentationController().setSourceView(UIApplication.getSharedApplication().getKeyWindow().getRootViewController().getView());
 
                 UIApplication.getSharedApplication().getKeyWindow().getRootViewController()
                         .presentViewController(p, true, () -> io.anuke.ucore.util.Log.info("Success! Presented {0}", to));
