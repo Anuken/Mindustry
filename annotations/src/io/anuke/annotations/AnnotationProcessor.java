@@ -36,7 +36,7 @@ public class AnnotationProcessor extends AbstractProcessor {
                 "rbuffer.putInt(rvalue.id)"
             },
             {
-                "rtype rvalue = io.anuke.mindustry.Vars.playerGroup.getByID(buffer.getInt())"
+                "rtype rvalue = io.anuke.mindustry.Vars.playerGroup.getByID(rbuffer.getInt())"
             }
         });
     }};
@@ -189,18 +189,20 @@ public class AnnotationProcessor extends AbstractProcessor {
                         messager.printMessage(Kind.ERROR, "No method for writing type: " + typeName, var);
                     }
 
+                    String writeBufferName = "buffer";
+
                     if(typeUtils.isAssignable(var.asType(), elementUtils.getTypeElement("java.lang.Enum").asType())) {
-                        writeSwitch.addStatement(typeName + " " + varName + " = " + typeName + ".values()["+bufferName +".getInt()]");
+                        writeSwitch.addStatement(typeName + " " + varName + " = " + typeName + ".values()["+writeBufferName +".getInt()]");
                     }else if(isPrimitive(typeName)) {
                         if(simpleTypeName.equals("boolean")){
-                            writeSwitch.addStatement("boolean " + varName + " = " + bufferName + ".get() == 1");
+                            writeSwitch.addStatement("boolean " + varName + " = " + writeBufferName + ".get() == 1");
                         }else{
-                            writeSwitch.addStatement(typeName + " " + varName + " = " + bufferName + ".get" + capName + "()");
+                            writeSwitch.addStatement(typeName + " " + varName + " = " + writeBufferName + ".get" + capName + "()");
                         }
                     }else if(writeMap.get(simpleTypeName) != null){
                         String[] values = writeMap.get(simpleTypeName)[1];
                         for(String str : values){
-                            writeSwitch.addStatement(str.replaceAll("rbuffer", bufferName)
+                            writeSwitch.addStatement(str.replaceAll("rbuffer", writeBufferName)
                                     .replaceAll("rvalue", varName)
                                     .replaceAll("rtype", simpleTypeName));
                         }

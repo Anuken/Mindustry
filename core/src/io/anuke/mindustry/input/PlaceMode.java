@@ -114,11 +114,10 @@ public enum PlaceMode{
 		}
 	},
 	areaDelete{
-		int maxlen = debug ? 999999: 20;
-		int tilex;
-		int tiley;
-		int endx;
-		int endy;
+		int rtilex;
+		int rtiley;
+		int rendx;
+		int rendy;
 		
 		{
 			shown = true;
@@ -131,10 +130,10 @@ public enum PlaceMode{
 			
 			process(tilex, tiley, endx, endy);
 			
-			tilex = this.tilex; tiley = this.tiley;
-			endx = this.endx; endy = this.endy;
-			float x = this.tilex * t, y = this.tiley * t,
-					x2 = this.endx * t, y2 = this.endy * t;
+			tilex = this.rtilex; tiley = this.rtiley;
+			endx = this.rendx; endy = this.rendy;
+			float x = this.rtilex * t, y = this.rtiley * t,
+					x2 = this.rendx * t, y2 = this.rendy * t;
 			
 			if(x2 >= x){
 				x -= t/2;
@@ -170,8 +169,10 @@ public enum PlaceMode{
 		
 		public void released(InputHandler input, int tilex, int tiley, int endx, int endy){
 			process(tilex, tiley, endx, endy);
-			tilex = this.tilex; tiley = this.tiley;
-			endx = this.endx; endy = this.endy;
+			tilex = this.rtilex; tiley = this.rtiley;
+			endx = this.rendx; endy = this.rendy;
+
+			input.player.getPlaceQueue().clear();
 			
 			if(mobile){
 				ToolFragment t = input.frag.tool;
@@ -197,14 +198,14 @@ public enum PlaceMode{
 		}
 		
 		void process(int tilex, int tiley, int endx, int endy){
-			
+			/*
 			if(Math.abs(endx - tilex) > maxlen){
 				endx = Mathf.sign(endx - tilex) * maxlen + tilex;
 			}
 			
 			if(Math.abs(endy - tiley) > maxlen){
 				endy = Mathf.sign(endy - tiley) * maxlen + tiley;
-			}
+			}*/
 			
 			if(endx < tilex){
 				int t = endx;
@@ -217,10 +218,10 @@ public enum PlaceMode{
 				tiley = t;
 			}
 			
-			this.endx = endx;
-			this.endy = endy;
-			this.tilex = tilex;
-			this.tiley = tiley;
+			this.rendx = endx;
+			this.rendy = endy;
+			this.rtilex = tilex;
+			this.rtiley = tiley;
 		}
 	},
 	hold{
@@ -314,6 +315,7 @@ public enum PlaceMode{
 			process(input, tilex, tiley, endx, endy);
 			
 			input.rotation = this.rotation;
+			input.player.getPlaceQueue().clear();
 			
 			boolean first = true;
 			for(int x = 0; x <= Math.abs(this.rendx - this.rtilex); x += input.recipe.result.size){

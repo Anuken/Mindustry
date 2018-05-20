@@ -10,7 +10,6 @@ import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.gen.CallClient;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
@@ -307,6 +306,7 @@ public class Player extends Unit implements BlockPlacer{
 		respawntime = -1;
 		inventory.clear();
 		upgrades.clear();
+		placeQueue.clear();
 
 		add();
 		heal();
