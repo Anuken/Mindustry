@@ -33,6 +33,7 @@ import java.util.Locale;
 
 import static io.anuke.mindustry.Vars.control;
 import static io.anuke.mindustry.Vars.ui;
+import static org.robovm.apple.foundation.NSPathUtilities.getDocumentsDirectory;
 
 public class IOSLauncher extends IOSApplication.Delegate {
     @Override
@@ -77,11 +78,14 @@ public class IOSLauncher extends IOSApplication.Delegate {
 
             @Override
             public void shareFile(FileHandle file){
-                NSURL url = new NSURL(file.file());
+                FileHandle to = Gdx.files.absolute(getDocumentsDirectory()).child(file.name());
+                file.copyTo(to);
+
+                NSURL url = new NSURL(to.file());
                 UIActivityViewController p = new UIActivityViewController(Collections.singletonList(url), null);
 
                 UIApplication.getSharedApplication().getKeyWindow().getRootViewController()
-                        .presentViewController(p, true, () -> io.anuke.ucore.util.Log.info("Success! Presented {0}", file));
+                        .presentViewController(p, true, () -> io.anuke.ucore.util.Log.info("Success! Presented {0}", to));
             }
         };
 
@@ -109,11 +113,13 @@ public class IOSLauncher extends IOSApplication.Delegate {
     }
 
     void openURL(NSURL url){
-        String str = url.getAbsoluteString().toLowerCase();
+        String str = url.getAbsoluteURL().getAbsoluteString().toLowerCase();
+        System.err.println("STR: " + str);
 
-        if(str.endsWith("mins")){ //open save
-            Timers.runTask(30f, () -> {
-                FileHandle file = Gdx.files.absolute(url.getAbsoluteString());
+        Timers.runTask(30f, () -> {
+            FileHandle file = Gdx.files.absolute(url.getAbsoluteString());
+
+            if(str.endsWith("mins")){ //open save
 
                 if(SaveIO.isSaveValid(file)){
                     try{
@@ -124,15 +130,14 @@ public class IOSLauncher extends IOSApplication.Delegate {
                 }else{
                     ui.showError("$text.save.import.invalid");
                 }
-            });
-        }else if(str.endsWith("png")){ //open map
-            Timers.runTask(30f, () -> {
+
+            }else if(str.endsWith("png")){ //open map
                 if(!ui.editor.isShown()){
                     ui.editor.show();
                 }
-                ui.editor.tryLoadMap(Gdx.files.absolute(url.getAbsoluteString()));
-            });
-        }
+                ui.editor.tryLoadMap(file);
+            }
+        });
     }
 
     public static void main(String[] argv) {
