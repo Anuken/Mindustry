@@ -19,10 +19,7 @@ import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Strings;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.foundation.NSURL;
-import org.robovm.apple.uikit.UIActivityViewController;
-import org.robovm.apple.uikit.UIApplication;
-import org.robovm.apple.uikit.UIApplicationLaunchOptions;
-import org.robovm.apple.uikit.UIApplicationOpenURLOptions;
+import org.robovm.apple.uikit.*;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -43,6 +40,10 @@ public class IOSLauncher extends IOSApplication.Delegate {
         Net.setServerProvider(new KryoServer());
 
         Unit.dp.addition -= 0.2f;
+
+        if(UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad){
+            Unit.dp.addition = 0.5f;
+        }
 
         Platform.instance = new Platform() {
             DateFormat format = SimpleDateFormat.getDateTimeInstance();
