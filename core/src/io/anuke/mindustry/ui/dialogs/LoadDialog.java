@@ -165,26 +165,30 @@ public class LoadDialog extends FloatingDialog{
 		}).fillX().margin(10f).minWidth(300f).height(70f).pad(4f).padRight(-4);
 	}
 
+	public void runLoadSave(SaveSlot slot){
+        ui.loadfrag.show();
+
+        Timers.runTask(3f, () -> {
+            ui.loadfrag.hide();
+            hide();
+            try{
+                slot.load();
+                state.set(State.playing);
+                ui.paused.hide();
+            }catch(Exception e){
+                Log.err(e);
+                ui.paused.hide();
+                state.set(State.menu);
+                logic.reset();
+                ui.showError("$text.save.corrupted");
+            }
+        });
+    }
+
 	public void modifyButton(TextButton button, SaveSlot slot){
 		button.clicked(() -> {
 			if(!button.childrenPressed()){
-				ui.loadfrag.show();
-
-				Timers.runTask(3f, () -> {
-					ui.loadfrag.hide();
-					hide();
-					try{
-						slot.load();
-						state.set(State.playing);
-						ui.paused.hide();
-					}catch(Exception e){
-						Log.err(e);
-						ui.paused.hide();
-						state.set(State.menu);
-						logic.reset();
-						ui.showError("$text.save.corrupted");
-					}
-				});
+				runLoadSave(slot);
 			}
 		});
 	}

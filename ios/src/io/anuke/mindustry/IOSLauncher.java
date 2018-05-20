@@ -10,6 +10,7 @@ import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.core.ThreadHandler;
 import io.anuke.mindustry.io.SaveIO;
+import io.anuke.mindustry.io.Saves.SaveSlot;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.TextField;
@@ -95,7 +96,7 @@ public class IOSLauncher extends IOSApplication.Delegate {
 
     @Override
     public boolean openURL(UIApplication app, NSURL url, UIApplicationOpenURLOptions options) {
-        System.out.println("Opened URL: " + url.getAbsoluteString());
+        System.out.println("Opened URL: " + url.getPath());
         openURL(url);
         return false;
     }
@@ -105,7 +106,7 @@ public class IOSLauncher extends IOSApplication.Delegate {
         boolean b = super.didFinishLaunching(application, options);
 
         if(options != null && options.has(UIApplicationLaunchOptions.Keys.URL())){
-            System.out.println("Opened URL at launch: " + ((NSURL)options.get(UIApplicationLaunchOptions.Keys.URL())).getAbsoluteString());
+            System.out.println("Opened URL at launch: " + ((NSURL)options.get(UIApplicationLaunchOptions.Keys.URL())).getPath());
             openURL(((NSURL)options.get(UIApplicationLaunchOptions.Keys.URL())));
         }
 
@@ -113,17 +114,17 @@ public class IOSLauncher extends IOSApplication.Delegate {
     }
 
     void openURL(NSURL url){
-        String str = url.getAbsoluteURL().getAbsoluteString().toLowerCase();
-        System.err.println("STR: " + str);
+        String str = url.getPath().toLowerCase();
 
         Timers.runTask(30f, () -> {
-            FileHandle file = Gdx.files.absolute(url.getAbsoluteString());
+            FileHandle file = Gdx.files.absolute(url.getPath());
 
             if(str.endsWith("mins")){ //open save
 
                 if(SaveIO.isSaveValid(file)){
                     try{
-                        control.getSaves().importSave(file);
+                        SaveSlot slot = control.getSaves().importSave(file);
+                        ui.load.runLoadSave(slot);
                     }catch (IOException e){
                         ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e, false)));
                     }
