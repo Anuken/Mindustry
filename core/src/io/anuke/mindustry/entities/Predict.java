@@ -3,12 +3,13 @@ package io.anuke.mindustry.entities;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.ucore.util.Mathf;
 
+/**Class for predicting shoot angles based on velocities of targets.*/
 public class Predict {
     private static Vector2 vec = new Vector2();
     private static Vector2 vresult = new Vector2();
 
     /**Returns resulting predicted vector.
-     * Don't call from multiple threads, ever.*/
+     * Don't call from multiple threads.*/
     public static Vector2 intercept(float srcx, float srcy, float dstx, float dsty, float dstvx, float dstvy, float v) {
         float tx = dstx - srcx,
                 ty = dsty - srcy,
@@ -36,7 +37,6 @@ public class Predict {
 
         return sol;
     }
-
 
     private static Vector2 quad(float a, float b, float c) {
         Vector2 sol = null;

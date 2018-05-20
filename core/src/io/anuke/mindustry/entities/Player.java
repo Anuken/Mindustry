@@ -1,10 +1,11 @@
 package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Queue;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.content.fx.ExplosionFx;
@@ -14,18 +15,11 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.resource.*;
-import io.anuke.mindustry.world.Placement;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.BuildBlock;
-import io.anuke.mindustry.world.blocks.types.BuildBlock.BuildEntity;
 import io.anuke.mindustry.world.blocks.types.Floor;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.*;
 
@@ -33,17 +27,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Player extends Unit implements BlockPlacer{
-	static final float speed = 1.1f;
-	static final float dashSpeed = 1.8f;
-	public static final float placeDistance = 80f;
-
-	static final int timerRegen = 3;
-	static final Translator[] tmptr = {new Translator(), new Translator(), new Translator(), new Translator()};
+public class Player extends Unit implements BlockBuilder {
+	private static final float speed = 1.1f;
+	private static final float dashSpeed = 1.8f;
+	private static final Vector2 movement = new Vector2();
 
 	public String name = "name";
 	public String uuid;
@@ -61,12 +51,10 @@ public class Player extends Unit implements BlockPlacer{
 	public int playerIndex = 0;
 	public boolean isLocal = false;
 	public Timer timer = new Timer(4);
-	public float walktime;
-	public float respawntime;
 
-	private Queue<PlaceRequest> placeQueue = new Queue<>();
-	private Tile currentPlace;
-	private Vector2 movement = new Vector2();
+	private float walktime;
+	private float respawntime;
+	private Queue<BuildRequest> placeQueue = new Queue<>();
 	
 	public Player(){
 		hitbox.setSize(5);
@@ -109,11 +97,6 @@ public class Player extends Unit implements BlockPlacer{
 			}
 		}
 	}
-
-	@Override
-    public void addPlaceBlock(PlaceRequest req){
-	    placeQueue.addFirst(req);
-    }
 
 	@Override
 	public boolean collides(SolidEntity other){
@@ -227,45 +210,49 @@ public class Player extends Unit implements BlockPlacer{
 
 	@Override
 	public void drawOver(){
-	    if(!isShooting() && currentPlace != null) {
-	        Draw.color(distanceTo(currentPlace) > placeDistance ? "placeInvalid" : "accent");
-	        float focusLen = 3.8f + Mathf.absin(Timers.time(), 1.1f, 0.6f);
-	        float px = x + Angles.trnsx(rotation, focusLen);
-            float py = y + Angles.trnsy(rotation, focusLen);
-
-            Tile tile = currentPlace;
-
-            float sz = Vars.tilesize*tile.block().size/2f;
-            float ang = angleTo(tile);
-
-            tmptr[0].set(tile.drawx() - sz, tile.drawy() - sz);
-            tmptr[1].set(tile.drawx() + sz, tile.drawy() - sz);
-            tmptr[2].set(tile.drawx() - sz, tile.drawy() + sz);
-            tmptr[3].set(tile.drawx() + sz, tile.drawy() + sz);
-
-            Arrays.sort(tmptr, (a, b) -> -Float.compare(Angles.angleDist(Angles.angle(x, y, a.x, a.y), ang),
-                    Angles.angleDist(Angles.angle(x, y, b.x, b.y), ang)));
-
-            float x1 = tmptr[0].x, y1 = tmptr[0].y,
-                    x3 = tmptr[1].x, y3 = tmptr[1].y;
-            Translator close = Geometry.findClosest(x, y, tmptr);
-            float x2 = close.x, y2 = close.y;
-
-            Draw.alpha(0.3f + Mathf.absin(Timers.time(), 0.9f, 0.2f));
-
-            Fill.tri(px, py, x2, y2, x1, y1);
-            Fill.tri(px, py, x2, y2, x3, y3);
-
-            Draw.alpha(1f);
-
-            Lines.line(px, py, x1, y1);
-            Lines.line(px, py, x3, y3);
-
-            Fill.circle(px, py, 1.5f + Mathf.absin(Timers.time(), 1f, 1.8f));
-
-            Draw.color();
+	    if(!isShooting() && getCurrentRequest() != null) {
+	        drawBuilding(this);
         }
     }
+
+    public void drawName(){
+		GlyphLayout layout = Pools.obtain(GlyphLayout.class);
+
+		Draw.tscl(0.25f/2);
+		layout.setText(Core.font, name);
+		Draw.color(0f, 0f, 0f, 0.3f);
+		Draw.rect("blank", getDrawPosition().x, getDrawPosition().y + 8 - layout.height/2, layout.width + 2, layout.height + 2);
+		Draw.color();
+		Draw.tcolor(color);
+		Draw.text(name, getDrawPosition().x, getDrawPosition().y + 8);
+
+		if(isAdmin){
+			Draw.color(color);
+			float s = 3f;
+			Draw.rect("icon-admin-small", getDrawPosition().x + layout.width/2f + 2 + 1, getDrawPosition().y + 7f, s, s);
+		}
+
+		Draw.reset();
+		Pools.free(layout);
+		Draw.tscl(fontscale);
+	}
+
+	public void drawBuildRequests(){
+		for (BuildRequest request : getPlaceQueue()) {
+			if(request.remove){
+				Draw.color("placeInvalid");
+				Tile tile = world.tile(request.x, request.y);
+
+				Lines.poly(tile.drawx(), tile.drawy(),
+						4, tile.block().size * tilesize /2f + Mathf.absin(Timers.time(), 3f, 1f));
+			}else{
+				Draw.color("accent");
+				Lines.poly(request.x * tilesize + request.recipe.result.getPlaceOffset().x,
+						request.y * tilesize + request.recipe.result.getPlaceOffset().y,
+						4, request.recipe.result.size * tilesize /2f + Mathf.absin(Timers.time(), 3f, 1f));
+			}
+		}
+	}
 	
 	@Override
 	public void update(){
@@ -300,6 +287,7 @@ public class Player extends Unit implements BlockPlacer{
 		y = Mathf.clamp(y, 0, world.height() * tilesize);
 	}
 
+	/**Resets all values of the player.*/
 	public void reset(){
 		weapon = Weapons.blaster;
 		team = Team.blue;
@@ -316,12 +304,11 @@ public class Player extends Unit implements BlockPlacer{
 	    return control.input(playerIndex).canShoot() && control.input(playerIndex).isShooting() && inventory.hasAmmo();
     }
 
-    public Queue<PlaceRequest> getPlaceQueue(){
+    public Queue<BuildRequest> getPlaceQueue(){
 	    return placeQueue;
     }
 
 	protected void updateMech(){
-
 		Tile tile = world.tileWorld(x, y);
 
 		//if player is in solid block
@@ -330,29 +317,7 @@ public class Player extends Unit implements BlockPlacer{
 		}
 
 		if(!isShooting()) {
-		    //update placing queue
-
-		    if(currentPlace != null) {
-		        Tile check = currentPlace;
-
-                if (!(check.block() instanceof BuildBlock)) {
-                    currentPlace = null;
-                }else if(distanceTo(check) <= placeDistance){
-                    BuildEntity entity = check.entity();
-
-                    entity.progress += 1f / entity.recipe.cost;
-                    rotation = Mathf.slerpDelta(rotation, angleTo(entity), 0.4f);
-                }
-
-            }else if(placeQueue.size > 0){
-                PlaceRequest check = placeQueue.last();
-                if(distanceTo(world.tile(check.x, check.y)) <= placeDistance &&
-                        Placement.validPlace(team, check.x, check.y, check.recipe.result, check.rotation)){
-                    placeQueue.removeLast();
-                    Placement.placeBlock(team, check.x, check.y, check.recipe, check.rotation, true, true);
-                    currentPlace = world.tile(check.x, check.y);
-                }
-            }
+		    updateBuilding(this);
         }
 
 		if(ui.chatfrag.chatOpen()) return;
@@ -364,11 +329,6 @@ public class Player extends Unit implements BlockPlacer{
 		float carrySlowdown = 0.3f;
 
 		speed *= ((1f-carrySlowdown) +  (inventory.hasItem() ? (float)inventory.getItem().amount/inventory.capacity(): 1f) * carrySlowdown);
-
-		if(health < maxhealth && timer.get(timerRegen, 20))
-			health ++;
-
-		health = Mathf.clamp(health, -1, maxhealth);
 
 		movement.set(0, 0);
 
@@ -523,19 +483,5 @@ public class Player extends Unit implements BlockPlacer{
 		this.dashing = dashing == 1;
 
 		interpolator.read(this.x, this.y, x, y, rot, baseRot, time);
-	}
-
-	@Override
-	public void interpolate() {
-		super.interpolate();
-
-		Interpolator i = interpolator;
-
-		float tx = x + Angles.trnsx(rotation + 180f, 4f);
-		float ty = y + Angles.trnsy(rotation + 180f, 4f);
-	}
-
-	public Color getColor(){
-		return color;
 	}
 }

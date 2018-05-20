@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -12,7 +11,6 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.BlockPlacer.PlaceRequest;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.BelowLiquidEffect;
@@ -22,14 +20,16 @@ import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Placement;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.function.Callable;
-import io.anuke.ucore.graphics.*;
+import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Hue;
+import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.graphics.Surface;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
@@ -206,13 +206,11 @@ public class Renderer extends RendererModule{
 		blocks.processBlocks();
 		blocks.drawBlocks(Layer.block);
 
-		//Graphics.surface(effectSurface, true);
 		Graphics.shader(Shaders.blockbuild, false);
         blocks.drawBlocks(Layer.placement);
         Graphics.shader();
-        //Graphics.flushSurface();
 
-        drawPlaceRequests();
+		Entities.drawWith(playerGroup, p -> true, Player::drawBuildRequests);
 
         blocks.drawBlocks(Layer.overlay);
 
@@ -227,34 +225,17 @@ public class Renderer extends RendererModule{
 		Entities.draw(airItemGroup);
         Entities.draw(effectGroup);
 
-		//drawShield();
-
 		overlays.draw();
 
 		if(pixelate)
 			Graphics.flushSurface();
 
 		if(showPaths) drawDebug();
-		drawPlayerNames();
+
+		Entities.drawWith(playerGroup, p -> !p.isLocal && !p.isDead(), Player::drawName);
 		
 		batch.end();
 	}
-
-	private void drawPlaceRequests(){
-	    Draw.color("accent");
-
-	    for(Player player : playerGroup.all()) {
-            for (PlaceRequest request : player.getPlaceQueue()) {
-                if(Placement.validPlace(player.team, request.x, request.y, request.recipe.result, request.rotation)){
-                    Lines.poly(request.x * tilesize + request.recipe.result.getPlaceOffset().x,
-                            request.y * tilesize + request.recipe.result.getPlaceOffset().y,
-                            4, request.recipe.result.size * tilesize /2f + Mathf.absin(Timers.time(), 3f, 1f));
-                }
-            }
-        }
-
-        Draw.color();
-    }
 
 	private void drawAllTeams(boolean flying){
 		for(Team team : Team.values()){
@@ -350,31 +331,6 @@ public class Renderer extends RendererModule{
 
 		Draw.color();
 	}
-
-	void drawPlayerNames(){
-		GlyphLayout layout = Pools.obtain(GlyphLayout.class);
-
-        Draw.tscl(0.25f/2);
-	    for(Player player : playerGroup.all()){
-	       if(!player.isLocal && !player.isDead()){
-	        	layout.setText(Core.font, player.name);
-				Draw.color(0f, 0f, 0f, 0.3f);
-				Draw.rect("blank", player.getDrawPosition().x, player.getDrawPosition().y + 8 - layout.height/2, layout.width + 2, layout.height + 2);
-				Draw.color();
-				Draw.tcolor(player.getColor());
-	            Draw.text(player.name, player.getDrawPosition().x, player.getDrawPosition().y + 8);
-
-	            if(player.isAdmin){
-	            	Draw.color(player.getColor());
-	            	float s = 3f;
-					Draw.rect("icon-admin-small", player.getDrawPosition().x + layout.width/2f + 2 + 1, player.getDrawPosition().y + 7f, s, s);
-				}
-				Draw.reset();
-           }
-        }
-		Pools.free(layout);
-        Draw.tscl(fontscale);
-    }
 
 	void drawShield(){
 		if(shieldGroup.size() == 0 && shieldDraws.size == 0) return;

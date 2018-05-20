@@ -1,6 +1,6 @@
 package io.anuke.mindustry.resource;
 
-public class ItemStack implements CarryItem{
+public class ItemStack{
 	public Item item;
 	public int amount;
 	

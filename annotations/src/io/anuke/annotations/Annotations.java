@@ -14,7 +14,8 @@ import java.lang.annotation.Target;
  * {@link RemoteServer}: Marks a method as able to be invoked remotely on a server from a client.<br>
  * {@link Local}: Makes this method get invoked locally as well as remotely.<br>
  *<br>
- * All RemoteClient methods are put in the class CallClient, and all RemoteServer methods are put in the class CallServer.<br>
+ * All RemoteClient methods are put in the class io.anuke.mindustry.gen.CallClient.<br>
+ * All RemoteServer methods are put in the class io.anuke.mindustry.gen.CallServer.<br>
  */
 public class Annotations {
 
@@ -35,4 +36,10 @@ public class Annotations {
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.CLASS)
     public @interface Local{}
+
+    /**Marks a method to be invoked unreliably, e.g. with UDP instead of TCP.
+     * This is faster, but is prone to packet loss and duplication.*/
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.CLASS)
+    public @interface Unreliable{}
 }

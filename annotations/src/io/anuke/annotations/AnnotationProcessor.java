@@ -4,6 +4,7 @@ import com.squareup.javapoet.*;
 import io.anuke.annotations.Annotations.Local;
 import io.anuke.annotations.Annotations.RemoteClient;
 import io.anuke.annotations.Annotations.RemoteServer;
+import io.anuke.annotations.Annotations.Unreliable;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -22,7 +23,8 @@ import java.util.Set;
 @SupportedAnnotationTypes({
     "io.anuke.annotations.Annotations.RemoteClient",
     "io.anuke.annotations.Annotations.RemoteServer",
-    "io.anuke.annotations.Annotations.Local"
+    "io.anuke.annotations.Annotations.Local",
+    "io.anuke.annotations.Annotations.Unreliable"
 })
 public class AnnotationProcessor extends AbstractProcessor {
     private static final int maxPacketSize = 128;
@@ -38,6 +40,19 @@ public class AnnotationProcessor extends AbstractProcessor {
             {
                 "rtype rvalue = io.anuke.mindustry.Vars.playerGroup.getByID(rbuffer.getInt())"
             }
+        });
+
+        put("String", new String[][]{
+                {
+                    "rbuffer.putShort((short)rvalue.getBytes().length)",
+                    "rbuffer.put(rvalue.getBytes())"
+                },
+                {
+                    "short __rvalue_length = rbuffer.getShort()",
+                    "byte[] __rvalue_bytes = new byte[__rvalue_length]",
+                    "rbuffer.get(__rvalue_bytes)",
+                    "rtype rvalue = new rtype(__rvalue_bytes)"
+                }
         });
     }};
 
@@ -109,6 +124,7 @@ public class AnnotationProcessor extends AbstractProcessor {
 
                 if(e.getAnnotation(annotation) == null) continue;
                 boolean local = e.getAnnotation(Local.class) != null;
+                boolean unreliable = e.getAnnotation(Unreliable.class) != null;
 
                 ExecutableElement exec = (ExecutableElement)e;
 
@@ -211,7 +227,8 @@ public class AnnotationProcessor extends AbstractProcessor {
                     }
                 }
                 method.addStatement("packet.writeLength = TEMP_BUFFER.position()");
-                method.addStatement("io.anuke.mindustry.net.Net.send(packet, io.anuke.mindustry.net.Net.SendMode.tcp)");
+                method.addStatement("io.anuke.mindustry.net.Net.send(packet, "+
+                        (unreliable ? "io.anuke.mindustry.net.Net.SendMode.udp" : "io.anuke.mindustry.net.Net.SendMode.tcp")+")");
 
                 classBuilder.addMethod(method.build());
 

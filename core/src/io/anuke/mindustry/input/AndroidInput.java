@@ -7,7 +7,6 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
-import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
@@ -98,26 +97,10 @@ public class AndroidInput extends InputHandler{
 		mousex = Gdx.graphics.getWidth()/2;
 		mousey = Gdx.graphics.getHeight()/2;
 	}
-	
-	@Override
-	public boolean cursorNear(){
-		return true;
-	}
 
 	public Tile selected(){
 		Vector2 vec = Graphics.world(mousex, mousey);
 		return world.tile(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize));
-	}
-
-	public void breakBlock(){
-		Tile tile = selected();
-		breaktime += Timers.delta();
-
-		if(breaktime >= tile.block().breaktime){
-			brokeBlock = true;
-			breakBlock(tile.x, tile.y, true);
-			breaktime = 0f;
-		}
 	}
 
 	@Override
@@ -150,15 +133,6 @@ public class AndroidInput extends InputHandler{
 			if(sel == null)
 				return;
 
-			if(warmup > warmupDelay && validBreak(sel.x, sel.y)){
-				breaktime += Timers.delta();
-
-				if(breaktime > selected().block().breaktime){
-					breakBlock();
-					breaktime = 0;
-				}
-			}
-
 			mousex = lx;
 			mousey = ly;
 		}else{
@@ -168,23 +142,6 @@ public class AndroidInput extends InputHandler{
 			mousex = Mathf.clamp(mousex, 0, Gdx.graphics.getWidth());
 			mousey = Mathf.clamp(mousey, 0, Gdx.graphics.getHeight());
 		}
-	}
-	
-	@Override
-	public boolean tryPlaceBlock(int x, int y, boolean sound){
-		if(recipe != null && 
-				validPlace(x, y, recipe.result) && cursorNear() &&
-				state.inventory.hasItems(recipe.requirements)){
-			
-			placeBlock(x, y, recipe, rotation, true, sound);
-			
-			for(ItemStack stack : recipe.requirements){
-				state.inventory.removeItem(stack);
-			}
-
-			return true;
-		}
-		return false;
 	}
 
 	public boolean breaking(){

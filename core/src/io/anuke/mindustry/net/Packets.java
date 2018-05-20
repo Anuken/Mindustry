@@ -11,7 +11,6 @@ import io.anuke.mindustry.gen.CallClient;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packet.UnimportantPacket;
-import io.anuke.mindustry.resource.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
@@ -136,17 +135,13 @@ public class Packets {
     }
 
     public static class StateSyncPacket implements Packet, UnimportantPacket{
-        public int[] items;
+        //todo fix item syncing
         public float countdown, time;
         public int enemies, wave;
         public long timestamp;
 
         @Override
         public void write(ByteBuffer buffer) {
-            for(int i = 0; i < items.length; i ++){
-                buffer.putInt(items[i]);
-            }
-
             buffer.putFloat(countdown);
             buffer.putFloat(time);
             buffer.putShort((short)enemies);
@@ -156,12 +151,6 @@ public class Packets {
 
         @Override
         public void read(ByteBuffer buffer) {
-            items = new int[Item.getAllItems().size];
-
-            for(int i = 0; i < items.length; i ++){
-                items[i] = buffer.getInt();
-            }
-
             countdown = buffer.getFloat();
             time = buffer.getFloat();
             enemies = buffer.getShort();

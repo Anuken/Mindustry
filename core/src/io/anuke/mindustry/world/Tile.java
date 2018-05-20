@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.mindustry.world.blocks.types.modules.InventoryModule;
 import io.anuke.mindustry.world.blocks.types.modules.LiquidModule;
@@ -132,10 +133,14 @@ public class Tile implements Position{
 		this.team = (byte)team.ordinal();
 	}
 	
-	/**Returns the breaktime of the block, <i>or</i> the breaktime of the linked block, if this tile is linked.*/
+	/**Returns the break time of the block, <i>or</i> the breaktime of the linked block, if this tile is linked.*/
 	public float getBreakTime(){
-		Block block = block();
-		return link == 0 ? block.breaktime : getLinked().block().breaktime;
+		Block block = target().block();
+		if(Recipe.getByResult(block) != null){
+			return Recipe.getByResult(block).cost;
+		}else{
+			return 15f;
+		}
 	}
 	
 	public void setBlock(Block type, int rotation){

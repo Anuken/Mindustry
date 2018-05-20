@@ -3,7 +3,6 @@ package io.anuke.mindustry.ui.fragments;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
-import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.PlaceMode;
@@ -11,6 +10,8 @@ import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.ui.layout.Table;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class ToolFragment implements Fragment{
 	private Table tools;
@@ -52,7 +53,7 @@ public class ToolFragment implements Fragment{
 		});
 		
 		tools.setVisible(() ->
-			!state.is(State.menu) && mobile && ((input.recipe != null && state.inventory.hasItems(input.recipe.requirements) &&
+			!state.is(State.menu) && mobile && ((input.recipe != null &&
 			input.placeMode == PlaceMode.cursor) || confirming)
 		);
 		

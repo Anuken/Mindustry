@@ -54,7 +54,7 @@ public class Recipe {
         return r;
     }
 
-    public static Array<Recipe> all(){
+    public static Array<Recipe> getAllRecipes(){
         return allRecipes;
     }
 

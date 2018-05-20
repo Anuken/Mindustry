@@ -68,8 +68,6 @@ public class Block extends BaseBlock {
 	public boolean liquid;
 	/**whether this floor can be placed on.*/
 	public boolean placeableOn = true;
-	/**time it takes to break*/
-	public float breaktime = 18;
 	/**tile entity health*/
 	public int health = 40;
 	/**base block explosiveness*/

@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Placement;
+import io.anuke.mindustry.world.Build;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
@@ -55,7 +55,7 @@ public enum PlaceMode{
 		}
 		
 		public void tapped(InputHandler input, int tilex, int tiley){
-			input.tryPlaceBlock(tilex, tiley, true);
+			input.tryPlaceBlock(tilex, tiley);
 		}
 	},
 	touch{
@@ -67,7 +67,7 @@ public enum PlaceMode{
 		}
 		
 		public void tapped(InputHandler input, int x, int y){
-			input.tryPlaceBlock(x, y, true);
+			input.tryPlaceBlock(x, y);
 		}
 	},
 	none{
@@ -110,7 +110,7 @@ public enum PlaceMode{
 		}
 		
 		public void tapped(InputHandler input, int x, int y){
-			input.tryDeleteBlock(x, y, true);
+			input.tryDeleteBlock(x, y);
 		}
 	},
 	areaDelete{
@@ -172,7 +172,7 @@ public enum PlaceMode{
 			tilex = this.rtilex; tiley = this.rtiley;
 			endx = this.rendx; endy = this.rendy;
 
-			input.player.getPlaceQueue().clear();
+			input.player.clearBuilding();
 			
 			if(mobile){
 				ToolFragment t = input.frag.tool;
@@ -186,13 +186,10 @@ public enum PlaceMode{
 				}
 			}
 			
-			boolean first = true;
-			
 			for(int cx = tilex; cx <= endx; cx ++){
 				for(int cy = tiley; cy <= endy; cy ++){
-					if(input.tryDeleteBlock(cx, cy, first)){
-						first = false;
-					}
+					input.tryDeleteBlock(cx, cy);
+
 				}
 			}
 		}
@@ -283,7 +280,7 @@ public enum PlaceMode{
 
                         int wx = tilex + px * Mathf.sign(endx - tilex),
                                 wy = tiley + py * Mathf.sign(endy - tiley);
-                        if(!Placement.validPlace(input.player.team, wx, wy, block, rotation)){
+                        if(!Build.validPlace(input.player.team, wx, wy, block, rotation)){
                             Draw.color("placeInvalid");
                         }else{
                             Draw.color("accent");
@@ -315,22 +312,21 @@ public enum PlaceMode{
 			process(input, tilex, tiley, endx, endy);
 			
 			input.rotation = this.rotation;
-			input.player.getPlaceQueue().clear();
+			input.player.clearBuilding();
 			
 			boolean first = true;
 			for(int x = 0; x <= Math.abs(this.rendx - this.rtilex); x += input.recipe.result.size){
 				for(int y = 0; y <= Math.abs(this.rendy - this.rtiley); y += input.recipe.result.size){
-					if(input.tryPlaceBlock(
+					input.tryPlaceBlock(
 							tilex + x * Mathf.sign(endx - tilex),
-							tiley + y * Mathf.sign(endy - tiley), first)){
-						first = false;
-					}
-					
+							tiley + y * Mathf.sign(endy - tiley));
 				}
 			}
 		}
 		
 		void process(InputHandler input, int tilex, int tiley, int endx, int endy){
+
+			//todo hold shift to snap
 		    /*
 			if(Math.abs(tilex - endx) > Math.abs(tiley - endy)){
 				endy = tiley;

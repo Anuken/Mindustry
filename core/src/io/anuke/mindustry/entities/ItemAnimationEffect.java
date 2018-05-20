@@ -10,6 +10,8 @@ import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
+/**This class should not be used anymore, as the animation does not fit the style well.*/
+@Deprecated
 public class ItemAnimationEffect extends TimedEntity {
     private static final float size = 5f;
 

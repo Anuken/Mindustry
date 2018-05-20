@@ -5,7 +5,6 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
-import io.anuke.mindustry.content.UpgradeRecipes;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
@@ -21,7 +20,7 @@ import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Placement;
+import io.anuke.mindustry.world.Build;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.BaseBulletType;
@@ -203,7 +202,7 @@ public class NetServer extends Module{
             Recipe recipe = Recipe.getByID(packet.recipe);
             Block block = recipe.result;
 
-            if(!Placement.validPlace(placer.team, packet.x, packet.y, block, packet.rotation)) return;
+            if(!Build.validPlace(placer.team, packet.x, packet.y, block, packet.rotation)) return;
 
             if(recipe == null || recipe.debugOnly != debug) return;
 
@@ -214,8 +213,6 @@ public class NetServer extends Module{
                 }
                 return;
             }
-
-            state.inventory.removeItems(recipe.requirements);
 
             //todo implement placing
             //Placement.placeBlock(placer, packet.x, packet.y, recipe, packet.rotation, true, false);
@@ -233,7 +230,7 @@ public class NetServer extends Module{
             Player placer = connections.get(id);
             packet.playerid = placer.id;
 
-            if(!Placement.validBreak(placer.team, packet.x, packet.y)) return;
+            if(!Build.validBreak(placer.team, packet.x, packet.y)) return;
 
             Tile tile = world.tile(packet.x, packet.y);
 
@@ -244,7 +241,7 @@ public class NetServer extends Module{
                 return;
             }
 
-            Block block = Placement.breakBlock(placer.team, packet.x, packet.y, true, false);
+            Block block = Build.breakBlock(placer.team, packet.x, packet.y, true, false);
 
             if(block != null) {
                 TraceInfo trace = admins.getTraceByID(getUUID(id));
@@ -283,9 +280,7 @@ public class NetServer extends Module{
 
             Weapon weapon = Upgrade.getByID(packet.upgradeid);
 
-            if(!state.inventory.hasItems(UpgradeRecipes.get(weapon))){
-                return;
-            }
+            //todo verify upgrades with item requirements
 
             if (!player.upgrades.contains(weapon, true)){
                 player.upgrades.add(weapon);
@@ -293,7 +288,6 @@ public class NetServer extends Module{
                 return;
             }
 
-            state.inventory.removeItems(UpgradeRecipes.get(weapon));
             Net.send(packet, SendMode.tcp);
         });
 
@@ -493,7 +487,6 @@ public class NetServer extends Module{
 
         if(timer.get(timerStateSync, itemSyncTime)){
             StateSyncPacket packet = new StateSyncPacket();
-            packet.items = state.inventory.readItems();
             packet.countdown = state.wavetime;
             packet.enemies = state.enemies;
             packet.wave = state.wave;

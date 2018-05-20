@@ -3,6 +3,7 @@ package io.anuke.mindustry.entities;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.ucore.core.Timers;
 
+/**Class for controlling status effects on an entity.*/
 public class StatusController {
     private static final TransitionResult globalResult = new TransitionResult();
 

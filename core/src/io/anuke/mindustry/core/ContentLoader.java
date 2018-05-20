@@ -60,7 +60,7 @@ public class ContentLoader {
         Log.info("--- CONTENT INFO ---");
         Log.info("Blocks loaded: {0}\nItems loaded: {1}\nLiquids loaded: {2}\nUpgrades loaded: {3}\nUnits loaded: {4}\nAmmo types loaded: {5}\nStatus effects loaded: {6}\nRecipes loaded: {7}\nTotal content classes: {8}",
                 Block.getAllBlocks().size, Item.getAllItems().size, Liquid.getAllLiquids().size,
-                Mech.getAllUpgrades().size, UnitType.getAllTypes().size, AmmoType.getAllTypes().size, StatusEffect.getAllEffects().size, Recipe.all().size, content.length);
+                Mech.getAllUpgrades().size, UnitType.getAllTypes().size, AmmoType.getAllTypes().size, StatusEffect.getAllEffects().size, Recipe.getAllRecipes().size, content.length);
 
         Log.info("-------------------");
     }

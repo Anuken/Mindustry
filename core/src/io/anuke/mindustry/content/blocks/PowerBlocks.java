@@ -46,13 +46,11 @@ public class PowerBlocks {
     nuclearReactor = new NuclearReactor("nuclearreactor") {{
         size = 3;
         health = 600;
-        breaktime *= 2.3f;
     }},
 
     fusionReactor = new FusionReactor("fusionreactor") {{
         size = 4;
         health = 600;
-        breaktime *= 4f;
     }},
 
     repairturret = new RepairTurret("repairturret") {{

@@ -27,7 +27,7 @@ public class NetEvents {
     }
 
     @RemoteServer
-    public static void notifySomethingFromClient(Player player, int x, float y){
+    public static void notifySomethingFromClient(Player player, int x, float y, String asdsad, long l){
         
     }
 

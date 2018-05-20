@@ -3,7 +3,6 @@ package io.anuke.mindustry.core;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
-import io.anuke.mindustry.content.UpgradeRecipes;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.Player;
@@ -17,7 +16,7 @@ import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.resource.Upgrade;
 import io.anuke.mindustry.resource.Weapon;
-import io.anuke.mindustry.world.Placement;
+import io.anuke.mindustry.world.Build;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
@@ -153,8 +152,6 @@ public class NetClient extends Module {
         });
 
         Net.handleClient(StateSyncPacket.class, packet -> {
-            System.arraycopy(packet.items, 0, state.inventory.writeItems(), 0, packet.items.length);
-
             state.enemies = packet.enemies;
             state.wavetime = packet.countdown;
             state.wave = packet.wave;
@@ -178,7 +175,7 @@ public class NetClient extends Module {
         Net.handleClient(BreakPacket.class, (packet) -> {
             Player placer = playerGroup.getByID(packet.playerid);
 
-            Placement.breakBlock(placer.team, packet.x, packet.y, true, Timers.get("breakblocksound", 10));
+            Build.breakBlock(placer.team, packet.x, packet.y, true, Timers.get("breakblocksound", 10));
         });
 
         Net.handleClient(EntitySpawnPacket.class, packet -> {
@@ -271,7 +268,6 @@ public class NetClient extends Module {
         Net.handleClient(UpgradePacket.class, packet -> {
             Weapon weapon = Upgrade.getByID(packet.upgradeid);
 
-            state.inventory.removeItems(UpgradeRecipes.get(weapon));
             for(Player player : players) {
                 player.upgrades.add(weapon);
             }

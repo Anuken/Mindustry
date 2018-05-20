@@ -222,7 +222,7 @@ public class JoinDialog extends FloatingDialog {
                     Settings.save();
                 });
             }).size(50f, 54f).get();
-            button.update(() -> button.getStyle().imageUpColor = player.getColor());
+            button.update(() -> button.getStyle().imageUpColor = player.color);
         }).width(w).height(70f).pad(4);
         content().row();
         content().add(pane).width(w + 34).pad(0);

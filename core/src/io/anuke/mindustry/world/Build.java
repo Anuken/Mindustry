@@ -7,15 +7,15 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.resource.ItemStack;
 import io.anuke.mindustry.resource.Recipe;
 import io.anuke.mindustry.world.blocks.types.BuildBlock.BuildEntity;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.Entities;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
-public class Placement {
+public class Build {
     private static final Rectangle rect = new Rectangle();
     private static Array<Tile> tempTiles = new Array<>();
 
@@ -28,17 +28,9 @@ public class Placement {
         Block block = tile.isLinked() ? tile.getLinked().block() : tile.block();
         Recipe result = Recipe.getByResult(block);
 
-        if(result != null){
-            for(ItemStack stack : result.requirements){
-                state.inventory.addItem(stack.item, (int)(stack.amount * breakDropAmount));
-            }
-        }
+        //todo add break results to core inventory
 
-        if(tile.block().drops != null){
-            state.inventory.addItem(tile.block().drops.item, tile.block().drops.amount);
-        }
-
-        if(sound) threads.run(() -> Effects.sound("break", x * tilesize, y * tilesize));
+        if(sound) Effects.sound("break", x * tilesize, y * tilesize);
 
         if(!tile.block().isMultiblock() && !tile.isLinked()){
             tile.setBlock(Blocks.air);
@@ -56,7 +48,8 @@ public class Placement {
         return block;
     }
 
-    public static void placeBlock(Team team, int x, int y, Recipe recipe, int rotation, boolean effects, boolean sound){
+    /**Places a BuildBlock at this location. Call validPlace first.*/
+    public static void placeBlock(Team team, int x, int y, Recipe recipe, int rotation){
         Tile tile = world.tile(x, y);
         Block result = recipe.result;
 
@@ -86,23 +79,16 @@ public class Placement {
                             toplace.setTeam(team);
                         }
                     }
-
-                    if(effects) Effects.effect(Fx.none, worldx * tilesize, worldy * tilesize);
                 }
             }
-        }else if(effects){
-            Effects.effect(Fx.none, x * tilesize, y * tilesize);
-        }
-
-        if(effects && sound){
-            threads.run(() -> Effects.sound("place", x * tilesize, y * tilesize));
         }
     }
 
+    /**Returns whether a tile can be placed at this location by this team.*/
     public static boolean validPlace(Team team, int x, int y, Block type, int rotation){
         Recipe recipe = Recipe.getByResult(type);
 
-        if(recipe == null || !state.inventory.hasItems(recipe.requirements)){
+        if(recipe == null){
             return false;
         }
 
@@ -121,7 +107,7 @@ public class Placement {
                     if (e == null) return; //not sure why this happens?
                     Rectangle rect = e.hitbox.getRect(e.x, e.y);
 
-                    if (Placement.rect.overlaps(rect) && !e.isFlying()) {
+                    if (Build.rect.overlaps(rect) && !e.isFlying()) {
                         result[0] = true;
                     }
                 });
@@ -160,13 +146,12 @@ public class Placement {
         return false;
     }
 
+    /**Returns whether the tile at this position is breakable by this team*/
     public static boolean validBreak(Team team, int x, int y) {
         Tile tile = world.tile(x, y);
 
-        if (tile == null || tile.block().unbreakable) return false;
-
-        return (!tile.isLinked() || !tile.getLinked().block().unbreakable) && tile.breakable()
-                && (tile.getTeam() == Team.none || tile.getTeam() == team);
+        return tile != null && !tile.block().unbreakable
+                && (!tile.isLinked() || !tile.getLinked().block().unbreakable) && tile.breakable() && (tile.getTeam() == Team.none || tile.getTeam() == team);
 
     }
 }

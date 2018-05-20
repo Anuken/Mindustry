@@ -21,7 +21,6 @@ public class DesktopInput extends InputHandler{
 	float mousex, mousey;
 	float endx, endy;
 	private float controlx, controly;
-	private boolean enableHold = false;
 	private boolean beganBreak;
 	private boolean controlling;
 	private final int index;
@@ -176,17 +175,6 @@ public class DesktopInput extends InputHandler{
 		if(recipe != null && Inputs.keyTap(section,"break")){
 			beganBreak = true;
 			recipe = null;
-		}
-
-		//block breaking
-		if(enableHold && Inputs.keyDown(section,"break") && cursor != null && validBreak(tilex(), tiley())){
-			breaktime += Timers.delta();
-			if(breaktime >= cursor.getBreakTime()){
-				breakBlock(cursor.x, cursor.y, true);
-				breaktime = 0f;
-			}
-		}else{
-			breaktime = 0f;
 		}
 
 		if(recipe != null){

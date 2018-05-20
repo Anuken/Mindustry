@@ -17,8 +17,6 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
 
-import java.sql.Time;
-
 import static io.anuke.mindustry.Vars.*;
 
 /**Logic module.
@@ -43,12 +41,6 @@ public class Logic extends Module {
 
     public void play(){
         state.wavetime = wavespace * state.difficulty.timeScaling * 2;
-
-        if(state.mode.infiniteResources){
-            state.inventory.fill();
-        }else{
-            state.inventory.clearItems();
-        }
 
         Events.fire(PlayEvent.class);
     }

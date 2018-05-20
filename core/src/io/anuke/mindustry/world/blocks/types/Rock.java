@@ -8,7 +8,6 @@ public class Rock extends Block {
         super(name);
         shadow = name+"shadow";
         breakable = true;
-        breaktime = 10;
         alwaysReplace = true;
     }
 }

@@ -17,7 +17,6 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockStats;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
@@ -40,6 +39,16 @@ public class BlocksFragment implements Fragment{
 	private boolean shown = true;
 	private Recipe hoveredDescriptionRecipe;
 	private IntSet itemset = new IntSet();
+	private int[] tmpItems;
+
+	{
+		int size = 0;
+		for(Item ignored : Item.getAllItems()){
+			size ++;
+		}
+
+		tmpItems = new int[size];
+	}
 
 	public void build(Group parent){
 		InputHandler input = control.input(0);
@@ -55,7 +64,7 @@ public class BlocksFragment implements Fragment{
 				itemtable = new Table("button");
 				itemtable.setVisible(() -> input.recipe == null && !state.mode.infiniteResources);
 				itemtable.update(() -> {
-					int[] items = state.inventory.readItems();
+					int[] items = tmpItems;
 					for(int i = 0; i < items.length; i ++){
 						if(itemset.contains(items[i]) != (items[i] > 0)){
 							updateItems();
@@ -186,10 +195,9 @@ public class BlocksFragment implements Fragment{
 							table.add(image).size(size + 8);
 
 							image.update(() -> {
-								boolean has = (state.inventory.hasItems(r.requirements));
 								image.setTouchable(Touchable.enabled);
 								for(Element e : istack.getChildren()){
-								    e.setColor(has ? Color.WHITE : Hue.lightness(0.33f));
+								    e.setColor(Color.WHITE);
                                 }
 
                                 for(Player player : players){
@@ -287,7 +295,7 @@ public class BlocksFragment implements Fragment{
 			Label reqlabel = new Label("");
 			
 			reqlabel.update(()->{
-				int current = state.inventory.getAmount(stack.item);
+				int current = stack.amount;
 				String text = Mathf.clamp(current, 0, stack.amount) + "/" + stack.amount;
 				
 				reqlabel.setColor(current < stack.amount ? Colors.get("missingitems") : Color.WHITE);
@@ -364,7 +372,7 @@ public class BlocksFragment implements Fragment{
 		};
 
 		int index = 0;
-		int[] items = state.inventory.readItems();
+		int[] items = tmpItems;
 
 		for(int i = 0; i < items.length; i ++){
 			int amount = items[i];

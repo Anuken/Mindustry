@@ -45,7 +45,7 @@ public class OverlayRenderer {
             int tiley = input.getBlockY();
 
             //draw placement box
-            if ((input.recipe != null && state.inventory.hasItems(input.recipe.requirements) && (!ui.hasMouse() || mobile)
+            if ((input.recipe != null && (!ui.hasMouse() || mobile)
                     && input.drawPlace())) {
 
                 input.placeMode.draw(input, input.getBlockX(),
@@ -55,7 +55,7 @@ public class OverlayRenderer {
                     input.breakMode.draw(input, tilex, tiley, 0, 0);
 
             } else if (input.breakMode.delete && input.drawPlace()
-                    && (input.recipe == null || !state.inventory.hasItems(input.recipe.requirements))
+                    && (input.recipe == null)
                     && (input.placeMode.delete || input.breakMode.both || !mobile)) {
 
                 if (input.breakMode == PlaceMode.holdDelete)

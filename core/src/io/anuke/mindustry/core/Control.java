@@ -2,7 +2,10 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -20,7 +23,7 @@ import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.input.InputProxy;
 import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Atlas;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -29,10 +32,14 @@ import static io.anuke.mindustry.Vars.*;
  * Should <i>not</i> handle any logic-critical state.
  * This class is not created in the headless server.*/
 public class Control extends Module{
+	/**Minimum period of time between the same sound being played.*/
+	private static final long minSoundPeriod = 30;
+
 	private boolean hiscore = false;
 	private boolean wasPaused = false;
 	private Saves saves;
 	private InputHandler[] inputs = {};
+	private ObjectMap<Sound, Long> soundMap = new ObjectMap<>();
 
     private Throwable error;
     private InputProxy proxy;
@@ -85,6 +92,15 @@ public class Control extends Module{
 				"ping.mp3", "tesla.mp3", "waveend.mp3", "railgun.mp3", "blast.mp3", "bang2.mp3");
 
 		Sounds.setFalloff(9000f);
+		Sounds.setPlayer(((sound, volume) -> {
+			long time = TimeUtils.millis();
+			long value = soundMap.get(sound, 0L);
+
+			if(TimeUtils.timeSinceMillis(value) >= minSoundPeriod){
+				threads.run(() -> sound.play(volume));
+				soundMap.put(sound, time);
+			}
+		}));
 
 		Musics.load("1.mp3", "2.mp3", "3.mp3", "4.mp3");
 

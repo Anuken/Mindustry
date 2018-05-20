@@ -29,7 +29,7 @@ public class ColorPickDialog extends Dialog{
                 cons.accept(color);
                 hide();
             }).size(44, 48).pad(0).padBottom(-5.1f).get();
-            button.setChecked(players[0].getColor().equals(color));
+            button.setChecked(players[0].color.equals(color));
             button.getStyle().imageUpColor = color;
 
             if(i%4 == 3){
