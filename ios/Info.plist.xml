@@ -57,6 +57,8 @@
             <array>
                 <string>icon-72.png</string>
             </array>
+            <key>CFBundleTypeName</key>
+            <string>Mindustry Map File</string>
             <key>CFBundleTypeRole</key>
             <string>Editor</string>
             <key>LSHandlerRank</key>
