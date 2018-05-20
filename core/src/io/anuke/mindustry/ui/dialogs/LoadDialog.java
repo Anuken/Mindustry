@@ -1,7 +1,10 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.Saves.SaveSlot;
 import io.anuke.ucore.core.Core;
@@ -83,14 +86,24 @@ public class LoadDialog extends FloatingDialog{
 
 				if(!gwt) {
 					t.addImageButton("icon-save", "empty", 14 * 3, () -> {
-						new FileChooser("$text.save.export", false, file -> {
-							try {
-								slot.exportFile(file);
-								setup();
-							} catch (IOException e) {
-								ui.showError(Bundles.format("text.save.export.fail", Strings.parseException(e, false)));
-							}
-						}).show();
+					    if(!ios) {
+                            new FileChooser("$text.save.export", false, file -> {
+                                try {
+                                    slot.exportFile(file);
+                                    setup();
+                                } catch (IOException e) {
+                                    ui.showError(Bundles.format("text.save.export.fail", Strings.parseException(e, false)));
+                                }
+                            }).show();
+                        }else{
+					        try {
+                                FileHandle file = Gdx.files.local("save-" + slot.getName() + ".mins");
+                                slot.exportFile(file);
+                                Platform.instance.shareFile(file);
+                            }catch (Exception e){
+                                ui.showError(Bundles.format("text.save.export.fail", Strings.parseException(e, false)));
+                            }
+                        }
 					}).size(14 * 3).right();
 				}
 
@@ -134,7 +147,7 @@ public class LoadDialog extends FloatingDialog{
 
 		slots.row();
 
-		if(gwt) return;
+		if(gwt || ios) return;
 
 		slots.addImageTextButton("$text.save.import", "icon-add", "clear", 14*3, () -> {
 			new FileChooser("$text.save.import", f -> f.extension().equals("mins"), true, file -> {

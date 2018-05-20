@@ -67,6 +67,27 @@
             </array>
         </dict>
     </array>
+
+    <key>UTExportedTypeDeclarations</key>
+    <array>
+        <dict>
+            <key>UTTypeConformsTo</key>
+            <array>
+                <string>public.data</string>
+            </array>
+            <key>UTTypeDescription</key>
+            <string>Mindustry Save File</string>
+            <key>UTTypeIdentifier</key>
+            <string>io.anuke.mindustry.savefile</string>
+            <key>UTTypeTagSpecification</key>
+            <dict>
+                <key>public.filename-extension</key>
+                <string>mins</string>
+                <key>public.mime-type</key>
+                <string>mindustry/mins</string>
+            </dict>
+        </dict>
+    </array>
     <!--<key>CFBundleIcons</key>
     <dict>
         <key>CFBundlePrimaryIcon</key>

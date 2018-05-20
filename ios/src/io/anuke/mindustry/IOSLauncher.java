@@ -4,18 +4,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.PixmapIO;
-import com.esotericsoftware.minlog.Log;
 import io.anuke.kryonet.DefaultThreadImpl;
 import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.core.ThreadHandler;
+import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Strings;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.foundation.NSURL;
 import org.robovm.apple.uikit.UIActivityViewController;
@@ -23,6 +23,7 @@ import org.robovm.apple.uikit.UIApplication;
 import org.robovm.apple.uikit.UIApplicationLaunchOptions;
 import org.robovm.apple.uikit.UIApplicationOpenURLOptions;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -30,6 +31,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 
+import static io.anuke.mindustry.Vars.control;
 import static io.anuke.mindustry.Vars.ui;
 
 public class IOSLauncher extends IOSApplication.Delegate {
@@ -74,14 +76,12 @@ public class IOSLauncher extends IOSApplication.Delegate {
             }
 
             @Override
-            public void shareImage(Pixmap image){
-                FileHandle file = Gdx.files.local("tmp-img.pmh");
+            public void shareFile(FileHandle file){
                 NSURL url = new NSURL(file.file());
-                PixmapIO.writePNG(file, image);
                 UIActivityViewController p = new UIActivityViewController(Collections.singletonList(url), null);
 
                 UIApplication.getSharedApplication().getKeyWindow().getRootViewController()
-                        .presentViewController(p, true, () -> Log.info("Success! Presented someting."));
+                        .presentViewController(p, true, () -> io.anuke.ucore.util.Log.info("Success! Presented {0}", file));
             }
         };
 
@@ -109,12 +109,30 @@ public class IOSLauncher extends IOSApplication.Delegate {
     }
 
     void openURL(NSURL url){
-        Timers.runTask(30f, () -> {
-            if(!ui.editor.isShown()){
-                ui.editor.show();
-            }
-            ui.editor.tryLoadMap(Gdx.files.absolute(url.getAbsoluteString()));
-        });
+        String str = url.getAbsoluteString().toLowerCase();
+
+        if(str.endsWith("mins")){ //open save
+            Timers.runTask(30f, () -> {
+                FileHandle file = Gdx.files.absolute(url.getAbsoluteString());
+
+                if(SaveIO.isSaveValid(file)){
+                    try{
+                        control.getSaves().importSave(file);
+                    }catch (IOException e){
+                        ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e, false)));
+                    }
+                }else{
+                    ui.showError("$text.save.import.invalid");
+                }
+            });
+        }else if(str.endsWith("png")){ //open map
+            Timers.runTask(30f, () -> {
+                if(!ui.editor.isShown()){
+                    ui.editor.show();
+                }
+                ui.editor.tryLoadMap(Gdx.files.absolute(url.getAbsoluteString()));
+            });
+        }
     }
 
     public static void main(String[] argv) {

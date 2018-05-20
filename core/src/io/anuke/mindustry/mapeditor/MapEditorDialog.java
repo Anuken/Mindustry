@@ -1,5 +1,6 @@
 package io.anuke.mindustry.mapeditor;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -235,8 +236,14 @@ public class MapEditorDialog extends Dialog{
 				    //iOS doesn't really support saving raw files. Sharing is used instead.
                     if(!ios){
                         saveFile.show();
-                    }else {
-                        Platform.instance.shareImage(editor.pixmap());
+                    }else{
+                        try{
+                            FileHandle file = Gdx.files.local(("map-" + ((editor.getMap().name == null) ? "unknown" : editor.getMap().name) + ".png"));
+                            Pixmaps.write(editor.pixmap(), file);
+                            Platform.instance.shareFile(file);
+                        }catch (Exception e){
+                            ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
+                        }
                     }
                 }).text("$text.editor.saveimage");
 				
