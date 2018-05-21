@@ -160,7 +160,7 @@ public class DesktopInput extends InputHandler{
 				}
 			}
 
-			target.block().tapped(target);
+			target.block().tapped(target, player);
 			if(Net.active()) NetEvents.handleBlockTap(target);
 		}
 		

@@ -31,8 +31,10 @@ public class NetCommon extends Module {
         });
 
         Net.handle(BlockTapPacket.class, (packet) -> {
+            Player player = playerGroup.getByID(packet.player);
+
             Tile tile = world.tile(packet.position);
-            threads.run(() -> tile.block().tapped(tile));
+            threads.run(() -> tile.block().tapped(tile, player));
         });
 
         Net.handle(BlockConfigPacket.class, (packet) -> {

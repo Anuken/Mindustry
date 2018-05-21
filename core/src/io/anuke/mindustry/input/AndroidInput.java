@@ -84,7 +84,7 @@ public class AndroidInput extends InputHandler{
 				}
 
 				if(linked != null) {
-					linked.block().tapped(linked);
+					linked.block().tapped(linked, player);
 					if(Net.active()) NetEvents.handleBlockTap(linked);
 				}
 			}

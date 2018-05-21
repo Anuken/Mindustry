@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.math.Rectangle;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.content.fx.BlockFx;
@@ -47,7 +48,7 @@ public class Door extends Wall{
 	}
 
 	@Override
-	public void tapped(Tile tile){
+	public void tapped(Tile tile, Player player){
 		DoorEntity entity = tile.entity();
 		
 		if(anyEntities(tile) && entity.open){

@@ -36,6 +36,11 @@ public interface BlockBuilder {
 
     /**Add another build requests to the tail of the queue.*/
     default void addBuildRequest(BuildRequest place){
+        for(BuildRequest request : getPlaceQueue()){
+            if(request.x == place.x && request.y == place.y){
+                return;
+            }
+        }
         getPlaceQueue().addLast(place);
     }
 
@@ -76,9 +81,10 @@ public interface BlockBuilder {
                     }
                 }
 
-                current.removeProgress += progress;
+                current.progress += progress;
+                unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(tile.drawx(), tile.drawy()), 0.4f);
 
-                if(current.removeProgress >= 1f){
+                if(current.progress >= 1f){
                     Build.breakBlock(unit.team, current.x, current.y, true, true);
                 }
             }else{
@@ -107,6 +113,7 @@ public interface BlockBuilder {
 
                 entity.addProgress(core.items, 1f / entity.recipe.cost);
                 unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(entity), 0.4f);
+                getCurrentRequest().progress = entity.progress();
             }
         }
     }
@@ -115,7 +122,7 @@ public interface BlockBuilder {
     default void drawBuilding(Unit unit){
         Tile tile = world.tile(getCurrentRequest().x, getCurrentRequest().y);
 
-        Draw.color(unit.distanceTo(tile) > placeDistance ? "placeInvalid" : "accent");
+        Draw.color(unit.distanceTo(tile) > placeDistance || getCurrentRequest().remove ? "break" : "accent");
         float focusLen = 3.8f + Mathf.absin(Timers.time(), 1.1f, 0.6f);
         float px = unit.x + Angles.trnsx(unit.rotation, focusLen);
         float py = unit.y + Angles.trnsy(unit.rotation, focusLen);
@@ -146,7 +153,7 @@ public interface BlockBuilder {
         Lines.line(px, py, x1, y1);
         Lines.line(px, py, x3, y3);
 
-        Fill.circle(px, py, 1.5f + Mathf.absin(Timers.time(), 1f, 1.8f));
+        Fill.circle(px, py, 1.6f + Mathf.absin(Timers.time(), 0.8f, 1.5f));
 
         Draw.color();
     }
@@ -157,7 +164,7 @@ public interface BlockBuilder {
         public final Recipe recipe;
         public final boolean remove;
 
-        float removeProgress;
+        float progress;
         float[] removeAccumulator;
 
         /**This creates a build request.*/

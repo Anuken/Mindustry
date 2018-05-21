@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.DamageArea;
@@ -148,7 +149,7 @@ public class Block extends BaseBlock {
 
 	}
 
-	public void tapped(Tile tile){}
+	public void tapped(Tile tile, Player player){}
 	public void buildTable(Tile tile, Table table) {}
 	public void configure(Tile tile, byte data){}
 

@@ -1,7 +1,6 @@
 package io.anuke.mindustry.content.fx;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Colors;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
@@ -17,15 +16,16 @@ public class Fx{
 	none = new Effect(0, 0f, e->{}),
 
 	placeBlock = new Effect(16, e -> {
+		Draw.color("accent");
 		Lines.stroke(3f - e.fin() * 2f);
 		Lines.square(e.x, e.y, tilesize / 2f * (float)(e.data) + e.fin() * 3f);
 		Draw.reset();
 	}),
 
 	breakBlock = new Effect(12, e -> {
-		Lines.stroke(2f);
-		Draw.color(Color.WHITE, Colors.get("break"), e.fin());
-		Lines.spikes(e.x, e.y, e.fin() * 6f, 2, 5, 90);
+		Draw.color("break");
+		Lines.stroke(3f - e.fin() * 2f);
+		Lines.square(e.x, e.y, tilesize / 2f * (float)(e.data) + e.fin() * 3f);
 		Draw.reset();
 	}),
 

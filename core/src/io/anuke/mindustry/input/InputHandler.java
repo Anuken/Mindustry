@@ -198,7 +198,9 @@ public abstract class InputHandler extends InputAdapter{
 	}
 
 	public void breakBlock(int x, int y){
+
 		//todo multiplayer support
-		player.addBuildRequest(new BuildRequest(x, y));
+    	Tile tile = world.tile(x, y).target();
+		player.addBuildRequest(new BuildRequest(tile.x, tile.y));
 	}
 }

@@ -417,7 +417,8 @@ public class Packets {
     }
 
     public static class BlockTapPacket implements Packet{
-        public int position;
+        public int position, player;
+        //todo implement
 
         @Override
         public void write(ByteBuffer buffer) {

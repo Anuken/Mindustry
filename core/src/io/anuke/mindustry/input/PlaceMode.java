@@ -39,7 +39,7 @@ public enum PlaceMode{
 
 			float si = MathUtils.sin(Timers.time() / 6f) + 1.5f;
 
-			Draw.color(valid ? Colors.get("place") : Colors.get("placeInvalid"));
+			Draw.color(valid ? Colors.get("place") : Colors.get("break"));
 			Lines.stroke(2f);
 			Lines.crect(x + offset.x, y + offset.y, tilesize * input.recipe.result.size + si,
 					tilesize * input.recipe.result.size + si);
@@ -189,7 +189,6 @@ public enum PlaceMode{
 			for(int cx = tilex; cx <= endx; cx ++){
 				for(int cy = tiley; cy <= endy; cy ++){
 					input.tryDeleteBlock(cx, cy);
-
 				}
 			}
 		}
@@ -281,7 +280,7 @@ public enum PlaceMode{
                         int wx = tilex + px * Mathf.sign(endx - tilex),
                                 wy = tiley + py * Mathf.sign(endy - tiley);
                         if(!Build.validPlace(input.player.team, wx, wy, block, rotation)){
-                            Draw.color("placeInvalid");
+                            Draw.color("break");
                         }else{
                             Draw.color("accent");
                         }

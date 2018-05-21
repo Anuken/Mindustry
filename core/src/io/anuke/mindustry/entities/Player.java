@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
@@ -23,6 +24,7 @@ import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.*;
 
@@ -243,18 +245,37 @@ public class Player extends Unit implements BlockBuilder {
 	public void drawBuildRequests(){
 		for (BuildRequest request : getPlaceQueue()) {
 			if(request.remove){
-				Draw.color("placeInvalid");
+				Draw.color("break");
+				Draw.alpha(0.4f);
+				Lines.stroke(1f);
+
+				float progress = request.progress;
 				Tile tile = world.tile(request.x, request.y);
+				float size = tile.block().size * tilesize/2f;
+				float ss = -(progress*2f-1f);
+
+				for(int i = 0; i < 4; i ++){
+					GridPoint2 p = Geometry.d8edge(i);
+
+					Fill.tri(tile.drawx() + size*p.x, tile.drawy() + size * p.y,
+							tile.drawx() + size*p.x*ss, tile.drawy() + size * p.y,
+							tile.drawx() + size*p.x, tile.drawy() + size * p.y*ss);
+				}
+
+				Draw.alpha(1f);
 
 				Lines.poly(tile.drawx(), tile.drawy(),
-						4, tile.block().size * tilesize /2f + Mathf.absin(Timers.time(), 3f, 1f));
+						4, tile.block().size * tilesize /2f * (1f-progress) + Mathf.absin(Timers.time(), 3f, 1f));
 			}else{
 				Draw.color("accent");
+				Lines.stroke((1f-request.progress));
 				Lines.poly(request.x * tilesize + request.recipe.result.getPlaceOffset().x,
 						request.y * tilesize + request.recipe.result.getPlaceOffset().y,
 						4, request.recipe.result.size * tilesize /2f + Mathf.absin(Timers.time(), 3f, 1f));
 			}
 		}
+
+		Draw.reset();
 	}
 	
 	@Override

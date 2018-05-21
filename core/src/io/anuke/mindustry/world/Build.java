@@ -30,17 +30,16 @@ public class Build {
         //todo add break results to core inventory
 
         if(sound) Effects.sound("break", x * tilesize, y * tilesize);
+        if(effect) Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), 0f, (float)block.size);
 
         if(!tile.block().isMultiblock() && !tile.isLinked()){
             tile.setBlock(Blocks.air);
-            if(effect) Effects.effect(Fx.breakBlock, tile.worldx(), tile.worldy());
         }else{
             Tile target = tile.isLinked() ? tile.getLinked() : tile;
             Array<Tile> removals = target.getLinkedTiles(tempTiles);
             for(Tile toremove : removals){
                 //note that setting a new block automatically unlinks it
                 toremove.setBlock(Blocks.air);
-                if(effect) Effects.effect(Fx.breakBlock, toremove.worldx(), toremove.worldy());
             }
         }
 

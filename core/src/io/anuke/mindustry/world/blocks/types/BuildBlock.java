@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.entities.BlockBuilder.BuildRequest;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Rubble;
 import io.anuke.mindustry.game.Team;
@@ -29,6 +31,14 @@ public class BuildBlock extends Block {
         size = Integer.parseInt(name.charAt(name.length()-1) + "");
         health = 1;
         layer = Layer.placement;
+    }
+
+    @Override
+    public void tapped(Tile tile, Player player) {
+        BuildEntity entity = tile.entity();
+
+        player.clearBuilding();
+        player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.getRotation(), entity.recipe));
     }
 
     @Override
@@ -131,6 +141,10 @@ public class BuildBlock extends Block {
 
             progress += maxProgress;
             updated = true;
+        }
+
+        public float progress(){
+            return (float)progress;
         }
 
         public void set(Recipe recipe){

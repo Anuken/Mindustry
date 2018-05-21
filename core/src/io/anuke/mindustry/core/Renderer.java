@@ -210,14 +210,14 @@ public class Renderer extends RendererModule{
         blocks.drawBlocks(Layer.placement);
         Graphics.shader();
 
-		Entities.drawWith(playerGroup, p -> true, Player::drawBuildRequests);
-
         blocks.drawBlocks(Layer.overlay);
 
         drawAllTeams(false);
 
 		blocks.skipLayer(Layer.turret);
 		blocks.drawBlocks(Layer.laser);
+
+		Entities.drawWith(playerGroup, p -> true, Player::drawBuildRequests);
 
 		drawAllTeams(true);
 
