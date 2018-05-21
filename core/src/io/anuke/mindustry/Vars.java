@@ -16,12 +16,12 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.ClientDebug;
 import io.anuke.mindustry.net.ServerDebug;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.OS;
 
 import java.util.Locale;
 
@@ -56,12 +56,9 @@ public class Vars{
 
 	public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
 	//directory for user-created map data
-	public static final FileHandle customMapDirectory = gwt ? null : UCore.isAssets() ?
-			Gdx.files.local("../../desktop/mindustry-maps") : Gdx.files.local("mindustry-maps/");
+	public static final FileHandle customMapDirectory = OS.getAppDataDirectory("Mindustry").child("maps/");
 	//save file directory
-	public static final FileHandle saveDirectory = gwt ? null : UCore.isAssets() ?
-			Gdx.files.local("../../desktop/mindustry-saves") : Gdx.files.local("mindustry-saves/");
-
+	public static final FileHandle saveDirectory = OS.getAppDataDirectory("Mindustry").child("saves/");
 	public static final String mapExtension = "mmap";
 	public static final String saveExtension = "msav";
 	//scale of the font

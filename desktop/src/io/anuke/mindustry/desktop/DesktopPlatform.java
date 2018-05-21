@@ -9,8 +9,8 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.util.OS;
 import io.anuke.ucore.util.Strings;
 
 import javax.swing.*;
@@ -26,7 +26,7 @@ import java.util.Random;
 import static io.anuke.mindustry.Vars.*;
 
 public class DesktopPlatform extends Platform {
-    final static boolean useDiscord = UCore.getPropertyNotNull("sun.arch.data.model").equals("64");
+    final static boolean useDiscord = OS.getPropertyNotNull("sun.arch.data.model").equals("64");
     final static String applicationId = "398246104468291591";
     final static DateFormat format = SimpleDateFormat.getDateTimeInstance();
     String[] args;
