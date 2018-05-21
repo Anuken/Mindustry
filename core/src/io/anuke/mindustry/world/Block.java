@@ -214,6 +214,10 @@ public class Block extends BaseBlock {
 	public boolean isAccessible(){
 		return (hasItems && itemCapacity > 0);
 	}
+
+	public void afterDestroyed(Tile tile, TileEntity entity){
+
+	}
 	
 	public void onDestroyed(Tile tile){
 		float x = tile.worldx(), y = tile.worldy();

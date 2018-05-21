@@ -50,6 +50,7 @@ public class Build {
     public static void placeBlock(Team team, int x, int y, Recipe recipe, int rotation){
         Tile tile = world.tile(x, y);
         Block result = recipe.result;
+        Block previous = tile.block();
 
         //just in case
         if(tile == null) return;
@@ -57,7 +58,7 @@ public class Build {
         Block sub = Block.getByName("build" + result.size);
 
         tile.setBlock(sub, rotation);
-        tile.<BuildEntity>entity().set(recipe);
+        tile.<BuildEntity>entity().set(previous, recipe);
         tile.setTeam(team);
 
         if(result.isMultiblock()){
@@ -119,6 +120,10 @@ public class Build {
         if(tile == null || (isSpawnPoint(tile) && (type.solidifes || type.solid))) return false;
 
         if(type.isMultiblock()){
+            if(type.canReplace(tile.block()) && tile.block().size == type.size){
+                return true;
+            }
+
             int offsetx = -(type.size-1)/2;
             int offsety = -(type.size-1)/2;
             for(int dx = 0; dx < type.size; dx ++){

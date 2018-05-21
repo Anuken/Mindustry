@@ -101,8 +101,8 @@ public class TileEntity extends Entity{
 				Block block = tile.block();
 
 				block.onDestroyed(tile);
-
 				world.removeBlock(tile);
+				block.afterDestroyed(tile, this);
 				remove();
 			}
 		}

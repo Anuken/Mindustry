@@ -12,10 +12,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.Recipe;
-import io.anuke.mindustry.world.BarType;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.BlockBar;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.types.modules.InventoryModule;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
@@ -56,8 +53,23 @@ public class BuildBlock extends Block {
     }
 
     @Override
-    public void draw(Tile tile){
+    public void afterDestroyed(Tile tile, TileEntity e){
+        BuildEntity entity = (BuildEntity)e;
 
+        if(entity.previous.update || entity.previous.solid){
+            tile.setBlock(entity.previous);
+        }
+    }
+
+    @Override
+    public void draw(Tile tile){
+        BuildEntity entity = tile.entity();
+
+        if(entity.previous.update || entity.previous.solid) {
+            for (TextureRegion region : entity.previous.getBlockIcon()) {
+                Draw.rect(region, tile.drawx(), tile.drawy(), entity.recipe.result.rotate ? tile.getRotation() * 90 : 0);
+            }
+        }
     }
 
     @Override
@@ -115,6 +127,7 @@ public class BuildBlock extends Block {
         private double progress = 0;
         private double[] accumulator;
         private boolean updated;
+        private Block previous;
 
         public void addProgress(InventoryModule inventory, double amount){
             double maxProgress = amount;
@@ -147,9 +160,10 @@ public class BuildBlock extends Block {
             return (float)progress;
         }
 
-        public void set(Recipe recipe){
+        public void set(Block previous, Recipe recipe){
             updated = true;
             this.recipe = recipe;
+            this.previous = previous;
             this.accumulator = new double[recipe.requirements.length];
         }
     }
