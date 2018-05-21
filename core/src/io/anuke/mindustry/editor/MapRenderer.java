@@ -1,8 +1,11 @@
 package io.anuke.mindustry.editor;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
+import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.core.Core;
@@ -36,7 +39,7 @@ public class MapRenderer {
 
         for(int x = 0; x < chunks.length; x ++){
             for(int y = 0; y < chunks[0].length; y ++){
-                chunks[x][y] = new IndexedRenderer(chunksize*chunksize*2);
+                chunks[x][y] = new IndexedRenderer(chunksize*chunksize*3);
             }
         }
         this.width = width;
@@ -98,14 +101,26 @@ public class MapRenderer {
         String fregion = Draw.hasRegion(floor.name) ? floor.name : (Draw.hasRegion(floor.name + "1") ? (floor.name + "1") : "clear");
 
         TextureRegion region = Draw.region(fregion);
-        mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize, region, wx * tilesize, wy * tilesize, -1f, 8, 8);
+        mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize, region, wx * tilesize, wy * tilesize, 8, 8);
 
-        String wregion = Draw.hasRegion(wall.name) ? wall.name : (Draw.hasRegion(wall.name + "1") ? (wall.name + "1") : "clear");
+        TextureRegion wregion = (wall == Blocks.air || wall == Blocks.blockpart) ? Draw.region("clear"): wall.getBlockIcon()[wall.getBlockIcon().length-1];
 
-        region = Draw.region(wregion);
+        region = wregion;
         mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize + chunksize*chunksize, region,
-                wx * tilesize + offsetx*tilesize, wy * tilesize  + offsety * tilesize, 0f,
+                wx * tilesize + offsetx*tilesize, wy * tilesize  + offsety * tilesize,
                 region.getRegionWidth(), region.getRegionHeight());
+
+        if(wall.update || wall.destructible) {
+            mesh.setColor(Team.values()[data.team].color);
+            region = Draw.region("block-border");
+        }else{
+            region = Draw.region("clear");
+        }
+
+        mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize + chunksize*chunksize*2, region,
+                wx * tilesize + offsetx*tilesize, wy * tilesize  + offsety * tilesize,
+                region.getRegionWidth(), region.getRegionHeight());
+        mesh.setColor(Color.WHITE);
 
     }
 }
