@@ -108,7 +108,7 @@ public abstract class InputHandler extends InputAdapter{
 
 					ItemTransfer.create(stack.item,
 							player.x + Angles.trnsx(rotation + 180f, backTrns), player.y + Angles.trnsy(rotation + 180f, backTrns),
-							tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y, () -> {
+							new Translator(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
 
 						tile.block().handleStack(stack.item, removed, tile, player);
 						remaining[1] -= removed;

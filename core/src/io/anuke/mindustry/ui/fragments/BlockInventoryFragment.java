@@ -146,7 +146,7 @@ public class BlockInventoryFragment implements Fragment {
     }
 
     private void move(Item item, Tile tile, Callable c){
-        ItemTransfer.create(item, tile.drawx(), tile.drawy(), input.player.x, input.player.y, c);
+        ItemTransfer.create(item, tile.drawx(), tile.drawy(), input.player, c);
     }
 
     private String round(float f){
