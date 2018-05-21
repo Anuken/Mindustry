@@ -5,7 +5,6 @@ import io.anuke.mindustry.content.fx.UnitFx;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.FlyingUnitType;
-import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -64,11 +63,6 @@ public class Vtol extends FlyingUnitType {
         if(unit.timer.get(timerBoost, 2)){
             unit.effectAt(UnitFx.vtolHover, unit.rotation + 180f, 4f, 0);
         }
-    }
-
-    @Override
-    public UnitState getStartState(){
-        return resupply;
     }
 
 }

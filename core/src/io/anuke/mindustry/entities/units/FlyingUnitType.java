@@ -52,6 +52,12 @@ public class FlyingUnitType extends UnitType {
         }
     }
 
+
+    @Override
+    public UnitState getStartState(){
+        return attack;
+    }
+
     protected void circle(BaseUnit unit, float circleLength){
         vec.set(unit.target.x - unit.x, unit.target.y - unit.y);
 

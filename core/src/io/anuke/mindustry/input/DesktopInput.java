@@ -20,6 +20,7 @@ import static io.anuke.mindustry.Vars.*;
 public class DesktopInput extends InputHandler{
 	float mousex, mousey;
 	float endx, endy;
+	float prmousex, prmousey;
 	private float controlx, controly;
 	private boolean beganBreak;
 	private boolean controlling;
@@ -34,8 +35,8 @@ public class DesktopInput extends InputHandler{
 	
 	@Override public float getCursorEndX(){ return endx; }
 	@Override public float getCursorEndY(){ return endy; }
-	@Override public float getCursorX(){ return Graphics.screen(mousex, mousey).x; }
-	@Override public float getCursorY(){ return Gdx.graphics.getHeight() - 1 - Graphics.screen(mousex, mousey).y; }
+	@Override public float getCursorX(){ return prmousex; }
+	@Override public float getCursorY(){ return prmousey; }
 	@Override public boolean drawPlace(){ return !beganBreak; }
 
 	@Override
@@ -81,6 +82,9 @@ public class DesktopInput extends InputHandler{
 		
 		endx = getMouseX();
 		endy = getMouseY();
+
+		prmousex = Graphics.screen(mousex, mousey).x;
+		prmousey = Gdx.graphics.getHeight() - 1 - Graphics.screen(mousex, mousey).y;
 
 		boolean controller = KeyBinds.getSection(section).device.type == DeviceType.controller;
 		

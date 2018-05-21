@@ -6,6 +6,7 @@ import io.anuke.ucore.function.BiConsumer;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.util.Mathf;
 
 public class MapResizeDialog extends FloatingDialog{
 	int[] validMapSizes = {200, 300, 400, 500};
@@ -21,14 +22,14 @@ public class MapResizeDialog extends FloatingDialog{
 			
 			Table table = new Table();
 			
-			for(int d = 0; d < 2; d ++){
-				boolean w = d == 0;
-				int curr = d == 0 ? data.width() : data.height();
+			for(boolean w : Mathf.booleans){
+				int curr = w ? data.width() : data.height();
 				int idx = 0;
-				for(int i = 0; i < validMapSizes.length; i ++)
-					if(validMapSizes[i] == curr) idx = i;
+				for(int i = 0; i < validMapSizes.length; i ++) {
+					if (validMapSizes[i] == curr) idx = i;
+				}
 				
-				table.add(d == 0 ? "$text.width": "$text.height").padRight(8f);
+				table.add(w ? "$text.width": "$text.height").padRight(8f);
 				ButtonGroup<TextButton> group = new ButtonGroup<>();
 				for(int i = 0; i < validMapSizes.length; i ++){
 					int size = validMapSizes[i];

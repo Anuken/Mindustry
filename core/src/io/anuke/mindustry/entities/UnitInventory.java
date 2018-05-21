@@ -15,10 +15,15 @@ public class UnitInventory {
     private int totalAmmo;
     private ItemStack item;
     private int capacity, ammoCapacity;
+    private boolean infiniteAmmo;
 
     public UnitInventory(int capacity, int ammoCapacity) {
         this.capacity = capacity;
         this.ammoCapacity = ammoCapacity;
+    }
+
+    public void setInfiniteAmmo(boolean infinite){
+        infiniteAmmo = infinite;
     }
 
     public void write(DataOutputStream stream) throws IOException {
@@ -57,6 +62,7 @@ public class UnitInventory {
     }
 
     public void useAmmo(){
+        if(infiniteAmmo) return;
         AmmoEntry entry = ammos.peek();
         entry.amount --;
         if(entry.amount == 0) ammos.pop();

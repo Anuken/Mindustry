@@ -92,7 +92,6 @@ public class Player extends Unit implements BlockBuilder {
 
 	@Override
 	public void damage(float amount){
-		//if(debug || mech.flying) return;
 		hitTime = hitDuration;
 		if(!debug) {
 			health -= amount;
@@ -111,6 +110,7 @@ public class Player extends Unit implements BlockBuilder {
 	@Override
 	public void onDeath(){
 		dead = true;
+		placeQueue.clear();
 		if(Net.active()){
 			NetEvents.handleUnitDeath(this);
 		}
@@ -215,7 +215,7 @@ public class Player extends Unit implements BlockBuilder {
 
 	@Override
 	public void drawOver(){
-	    if(!isShooting() && getCurrentRequest() != null) {
+	    if(!isShooting() && getCurrentRequest() != null && !dead) {
 	        drawBuilding(this);
         }
     }

@@ -1,8 +1,11 @@
 package io.anuke.mindustry.core;
 
+import com.badlogic.gdx.math.Vector2;
+import io.anuke.mindustry.content.AmmoTypes;
+import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.game.EventType.GameOverEvent;
+import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.EventType.PlayEvent;
 import io.anuke.mindustry.game.EventType.ResetEvent;
 import io.anuke.mindustry.game.EventType.WaveEvent;
@@ -10,7 +13,6 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.TeamInfo;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Events;
@@ -75,6 +77,13 @@ public class Logic extends Module {
     public void runWave(){
 
         //TODO spawn enemies
+        for(int i = 0; i < 10; i ++){
+            BaseUnit unit = new BaseUnit(UnitTypes.vtol, Team.red);
+            Vector2 offset = new Vector2().setToRandomDirection().scl(world.width()/2f*tilesize).add(world.width()/2f*tilesize, world.height()/2f*tilesize);
+            unit.inventory.addAmmo(AmmoTypes.basicIron);
+            unit.inventory.setInfiniteAmmo(true);
+            unit.set(offset.x, offset.y).add();
+        }
 
         state.wave ++;
         state.wavetime = wavespace * state.difficulty.timeScaling;
@@ -104,11 +113,11 @@ public class Logic extends Module {
                 }
             }
 
-            if(gameOver && !state.gameOver){ //TODO better gameover state, victory state?
+           /* if(gameOver && !state.gameOver){ //TODO better gameover state, victory state?
                 state.gameOver = true;
                 if(Net.server()) NetEvents.handleGameOver();
                 Events.fire(GameOverEvent.class);
-            }
+            }*/
 
             if(!state.is(State.paused) || Net.active()){
 
