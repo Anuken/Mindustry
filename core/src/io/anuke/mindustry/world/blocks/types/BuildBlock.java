@@ -56,12 +56,12 @@ public class BuildBlock extends Block {
 
         Shaders.blockbuild.color = Colors.get("accent");
 
-        for(TextureRegion region : entity.result.getBlockIcon()){
+        for(TextureRegion region : entity.recipe.result.getBlockIcon()){
             Shaders.blockbuild.region = region;
             Shaders.blockbuild.progress = (float)entity.progress;
             Shaders.blockbuild.apply();
 
-            Draw.rect(region, tile.drawx(), tile.drawy(), entity.result.rotate ? tile.getRotation() * 90 : 0);
+            Draw.rect(region, tile.drawx(), tile.drawy(), entity.recipe.result.rotate ? tile.getRotation() * 90 : 0);
 
             Graphics.flush();
         }
@@ -71,7 +71,7 @@ public class BuildBlock extends Block {
     public void drawShadow(Tile tile) {
         BuildEntity entity = tile.entity();
 
-        entity.result.drawShadow(tile);
+        entity.recipe.result.drawShadow(tile);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class BuildBlock extends Block {
 
         if(entity.progress >= 1f){
             Team team = tile.getTeam();
-            tile.setBlock(entity.result);
+            tile.setBlock(entity.recipe.result);
             tile.setTeam(team);
             Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), 0f, (float)size);
         }else if(entity.progress < 0f){
@@ -88,7 +88,7 @@ public class BuildBlock extends Block {
         }
 
         if(!entity.updated){
-            entity.progress -= 1f/entity.result.health/decaySpeedScl;
+            entity.progress -= 1f/entity.recipe.cost/decaySpeedScl;
         }
 
         entity.updated = false;
@@ -104,7 +104,6 @@ public class BuildBlock extends Block {
 
         private double progress = 0;
         private double[] accumulator;
-        private Block result;
         private boolean updated;
 
         public void addProgress(InventoryModule inventory, double amount){
@@ -136,7 +135,6 @@ public class BuildBlock extends Block {
 
         public void set(Recipe recipe){
             updated = true;
-            this.result = recipe.result;
             this.recipe = recipe;
             this.accumulator = new double[recipe.requirements.length];
         }
