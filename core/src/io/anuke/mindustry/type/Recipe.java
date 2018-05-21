@@ -1,4 +1,4 @@
-package io.anuke.mindustry.resource;
+package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -11,20 +11,20 @@ public class Recipe {
 
     public final int id;
     public final Block result;
-    public final ItemStack[] requirements;
-    public final Section section;
+    public final io.anuke.mindustry.type.ItemStack[] requirements;
+    public final io.anuke.mindustry.type.Section section;
     public final float cost;
 
     public boolean desktopOnly = false, debugOnly = false;
 
-    public Recipe(Section section, Block result, ItemStack... requirements){
+    public Recipe(io.anuke.mindustry.type.Section section, Block result, io.anuke.mindustry.type.ItemStack... requirements){
         this.id = lastid ++;
         this.result = result;
         this.requirements = requirements;
         this.section = section;
 
         float timeToPlace = 0f;
-        for(ItemStack stack : requirements){
+        for(io.anuke.mindustry.type.ItemStack stack : requirements){
             timeToPlace += stack.amount * stack.item.cost;
         }
 
@@ -44,7 +44,7 @@ public class Recipe {
         return this;
     }
 
-    public static Array<Recipe> getBySection(Section section, Array<Recipe> r){
+    public static Array<Recipe> getBySection(io.anuke.mindustry.type.Section section, Array<Recipe> r){
         for(Recipe recipe : allRecipes){
             if(recipe.section == section ) {
                 r.add(recipe);

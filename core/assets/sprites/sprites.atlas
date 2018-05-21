@@ -340,13 +340,6 @@ vault
   orig: 24, 24
   offset: 0, 0
   index: -1
-vault-icon
-  rotate: false
-  xy: 335, 45
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
 weaponfactory
   rotate: false
   xy: 537, 155
@@ -944,7 +937,7 @@ titanium3
   index: -1
 water
   rotate: false
-  xy: 325, 25
+  xy: 315, 15
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -1062,6 +1055,13 @@ rubble-2-1
   offset: 0, 0
   index: -1
 rubble-3-0
+  rotate: false
+  xy: 397, 143
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+rubble-3-1
   rotate: false
   xy: 397, 143
   size: 24, 24
@@ -3498,14 +3498,14 @@ triblaster-equip
   index: -1
 vulcan
   rotate: false
-  xy: 305, 5
+  xy: 335, 45
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 vulcan-equip
   rotate: false
-  xy: 315, 15
+  xy: 305, 5
   size: 8, 8
   orig: 8, 8
   offset: 0, 0

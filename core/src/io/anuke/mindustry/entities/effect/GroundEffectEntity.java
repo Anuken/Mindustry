@@ -9,6 +9,7 @@ import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.function.EffectRenderer;
 import io.anuke.ucore.util.Mathf;
 
+/**A ground effect contains an effect that is rendered on the ground layer as opposed to the top layer.*/
 public class GroundEffectEntity extends EffectEntity {
     private boolean once;
 
@@ -52,8 +53,12 @@ public class GroundEffectEntity extends EffectEntity {
         once = false;
     }
 
+    /**An effect that is rendered on the ground layer as opposed to the top layer.*/
     public static class GroundEffect extends Effect{
+        /**How long this effect stays on the ground when static.*/
         public final float staticLife;
+        /**If true, this effect will stop and lie on the ground for a specific duration,
+         * after its initial lifetime is over.*/
         public final boolean isStatic;
 
         public GroundEffect(float life, float staticLife, EffectRenderer draw) {

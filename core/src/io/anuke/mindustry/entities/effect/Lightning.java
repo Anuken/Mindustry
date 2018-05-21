@@ -31,6 +31,7 @@ public class Lightning extends TimedEntity implements Poolable{
 
     public Color color = Palette.lancerLaser;
 
+    /**Create a lighting branch at a location. Use Team.none to damage everyone.*/
     public static void create(Team team, Effect effect, Color color, float damage, float x, float y, float targetAngle, int length){
         Lightning l = Pools.obtain(Lightning.class);
 

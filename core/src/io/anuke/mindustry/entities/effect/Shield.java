@@ -14,6 +14,7 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.bulletGroup;
 import static io.anuke.mindustry.Vars.shieldGroup;
 
+//todo re-implement
 public class Shield extends Entity{
 	public boolean active;
 	public boolean hitPlayers = false;

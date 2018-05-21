@@ -7,7 +7,7 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.resource.Recipe;
+import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.blocks.types.BuildBlock.BuildEntity;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.Entities;
@@ -26,7 +26,6 @@ public class Build {
         if(tile == null) return null;
 
         Block block = tile.isLinked() ? tile.getLinked().block() : tile.block();
-        Recipe result = Recipe.getByResult(block);
 
         //todo add break results to core inventory
 
@@ -59,9 +58,7 @@ public class Build {
         Block sub = Block.getByName("build" + result.size);
 
         tile.setBlock(sub, rotation);
-        tile.<BuildEntity>entity().result = result;
-        tile.<BuildEntity>entity().recipe = recipe;
-        tile.<BuildEntity>entity().stacks = recipe.requirements;
+        tile.<BuildEntity>entity().set(recipe);
         tile.setTeam(team);
 
         if(result.isMultiblock()){

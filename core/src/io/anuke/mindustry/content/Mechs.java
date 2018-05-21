@@ -1,6 +1,6 @@
 package io.anuke.mindustry.content;
 
-import io.anuke.mindustry.resource.Mech;
+import io.anuke.mindustry.type.Mech;
 
 public class Mechs {
     public static final Mech

@@ -11,6 +11,8 @@ import io.anuke.mindustry.game.TeamInfo;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
@@ -41,6 +43,14 @@ public class Logic extends Module {
 
     public void play(){
         state.wavetime = wavespace * state.difficulty.timeScaling * 2;
+
+        for(Tile tile : state.teams.get(players[0].team).cores){
+            for(Item item : Item.getAllItems()){
+                if(item.material){
+                    tile.entity.items.addItem(item, 1000);
+                }
+            }
+        }
 
         Events.fire(PlayEvent.class);
     }

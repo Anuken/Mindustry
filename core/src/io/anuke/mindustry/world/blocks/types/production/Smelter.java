@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.types.production;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockBar;

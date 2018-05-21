@@ -19,14 +19,17 @@ import static io.anuke.mindustry.Vars.*;
 public class Units {
     private static Rectangle rect = new Rectangle();
 
+    /**Returns the neareset ally tile in a range.*/
     public static TileEntity findAllyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
         return findTile(x, y, range, tile -> !state.teams.areEnemies(team, tile.getTeam()) && pred.test(tile));
     }
 
+    /**Returns the neareset enemy tile in a range.*/
     public static TileEntity findEnemyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
         return findTile(x, y, range, tile -> state.teams.areEnemies(team, tile.getTeam()) && pred.test(tile));
     }
 
+    /**Returns the neareset tile entity in a range.*/
     public static TileEntity findTile(float x, float y, float range, Predicate<Tile> pred){
         Entity closest = null;
         float dst = 0;

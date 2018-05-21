@@ -8,10 +8,13 @@ public class StatusEffect{
 	private static final Array<StatusEffect> array = new Array<>();
 	private static int lastid;
 
+	/**Duration of this status effect in ticks at maximum power.*/
 	public final float baseDuration;
 	public final int id;
 
+	/**Set of 'opposite' effects, which will decrease the duration of this effect when applied.*/
 	protected ObjectSet<StatusEffect> opposites = new ObjectSet<>();
+	/**The strength of time decrease when met with an opposite effect, as a fraction of the other's duration.*/
 	protected float oppositeScale = 0.5f;
 
 	public StatusEffect(float baseDuration){

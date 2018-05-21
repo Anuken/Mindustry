@@ -1,7 +1,7 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.mindustry.content.fx.ShootFx;
-import io.anuke.mindustry.resource.Weapon;
+import io.anuke.mindustry.type.Weapon;
 
 public class Weapons {
     public static final Weapon

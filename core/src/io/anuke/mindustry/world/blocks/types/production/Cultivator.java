@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.content.fx.Fx;
-import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;

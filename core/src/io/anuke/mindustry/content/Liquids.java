@@ -1,7 +1,7 @@
 package io.anuke.mindustry.content;
 
 import com.badlogic.gdx.graphics.Color;
-import io.anuke.mindustry.resource.Liquid;
+import io.anuke.mindustry.type.Liquid;
 
 public class Liquids {
 

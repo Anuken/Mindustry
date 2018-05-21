@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.types.power;
 
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.resource.Liquid;
+import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.power.BurnerGenerator.BurnerEntity;
 import io.anuke.ucore.core.Effects;

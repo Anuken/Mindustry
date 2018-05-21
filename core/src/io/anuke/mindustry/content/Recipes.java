@@ -1,9 +1,9 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.mindustry.content.blocks.*;
-import io.anuke.mindustry.resource.ItemStack;
-import io.anuke.mindustry.resource.Recipe;
-import static io.anuke.mindustry.resource.Section.*;
+import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.Recipe;
+import static io.anuke.mindustry.type.Section.*;
 
 public class Recipes {
 	static {

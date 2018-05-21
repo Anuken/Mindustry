@@ -2,7 +2,7 @@ package io.anuke.mindustry.content;
 
 import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.content.fx.ShootFx;
-import io.anuke.mindustry.resource.AmmoType;
+import io.anuke.mindustry.type.AmmoType;
 
 public class AmmoTypes {
     public static final AmmoType

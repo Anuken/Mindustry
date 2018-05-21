@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.storage;
 
-import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockGroup;
 import io.anuke.mindustry.world.Tile;

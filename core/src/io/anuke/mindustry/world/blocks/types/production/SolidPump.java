@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.content.fx.Fx;
-import io.anuke.mindustry.resource.Liquid;
+import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;

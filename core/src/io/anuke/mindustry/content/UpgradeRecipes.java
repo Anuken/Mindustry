@@ -2,9 +2,9 @@ package io.anuke.mindustry.content;
 
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Entries;
-import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.resource.ItemStack;
-import io.anuke.mindustry.resource.Upgrade;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.Upgrade;
 import io.anuke.ucore.util.Mathf;
 
 public class UpgradeRecipes {

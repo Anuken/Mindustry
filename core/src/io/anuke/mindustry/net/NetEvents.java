@@ -10,8 +10,8 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.resource.Recipe;
-import io.anuke.mindustry.resource.Upgrade;
+import io.anuke.mindustry.type.Recipe;
+import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.*;

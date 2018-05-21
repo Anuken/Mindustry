@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.power;
 
-import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.type.Item;
 
 public class DecayGenerator extends BurnerGenerator {
 

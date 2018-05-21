@@ -1,10 +1,10 @@
 package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.resource.AmmoEntry;
-import io.anuke.mindustry.resource.AmmoType;
-import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.resource.ItemStack;
+import io.anuke.mindustry.type.AmmoEntry;
+import io.anuke.mindustry.type.AmmoType;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

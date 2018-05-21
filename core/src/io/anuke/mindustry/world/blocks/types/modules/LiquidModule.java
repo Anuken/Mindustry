@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.modules;
 
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.resource.Liquid;
+import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.blocks.types.BlockModule;
 
 import java.io.DataInputStream;

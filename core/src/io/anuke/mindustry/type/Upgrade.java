@@ -1,4 +1,4 @@
-package io.anuke.mindustry.resource;
+package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.ucore.util.Bundles;

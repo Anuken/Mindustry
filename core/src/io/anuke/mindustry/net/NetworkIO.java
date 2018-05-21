@@ -7,7 +7,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.Version;
-import io.anuke.mindustry.resource.Upgrade;
+import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.ucore.core.Timers;

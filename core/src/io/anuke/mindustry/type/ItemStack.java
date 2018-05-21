@@ -1,10 +1,10 @@
-package io.anuke.mindustry.resource;
+package io.anuke.mindustry.type;
 
 public class ItemStack{
-	public Item item;
+	public io.anuke.mindustry.type.Item item;
 	public int amount;
 	
-	public ItemStack(Item item, int amount){
+	public ItemStack(io.anuke.mindustry.type.Item item, int amount){
 		this.item = item;
 		this.amount = amount;
 	}

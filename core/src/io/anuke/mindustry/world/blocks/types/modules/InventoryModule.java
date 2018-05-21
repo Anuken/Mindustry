@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.modules;
 
-import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.resource.ItemStack;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.blocks.types.BlockModule;
 
 import java.io.DataInputStream;

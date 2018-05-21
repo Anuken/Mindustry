@@ -18,10 +18,12 @@ public class TeamInfo {
     private ObjectSet<TeamData> allTeamData = new ObjectSet<>();
     private ObjectSet<Team> allTeams = new ObjectSet<>();
 
+    /**Returns all teams on a side.*/
     public ObjectSet<TeamData> getTeams(boolean ally) {
         return ally ? allyData : enemyData;
     }
 
+    /**Returns all team data.*/
     public ObjectSet<TeamData> getTeams() {
         return allTeamData;
     }

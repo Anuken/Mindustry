@@ -9,10 +9,10 @@ import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.input.InputHandler;
-import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.resource.ItemStack;
-import io.anuke.mindustry.resource.Recipe;
-import io.anuke.mindustry.resource.Section;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.Recipe;
+import io.anuke.mindustry.type.Section;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockStats;
@@ -62,7 +62,7 @@ public class BlocksFragment implements Fragment{
 			blocks = new table(){{
 
 				itemtable = new Table("button");
-				itemtable.setVisible(() -> input.recipe == null && !state.mode.infiniteResources);
+				itemtable.setVisible(() -> false);
 				itemtable.update(() -> {
 					int[] items = tmpItems;
 					for(int i = 0; i < items.length; i ++){

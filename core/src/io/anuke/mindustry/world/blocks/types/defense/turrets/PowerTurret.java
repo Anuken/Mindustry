@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.defense.turrets;
 
-import io.anuke.mindustry.resource.AmmoType;
+import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.defense.Turret;
 import io.anuke.ucore.util.Strings;

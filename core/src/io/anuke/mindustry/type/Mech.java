@@ -1,6 +1,6 @@
-package io.anuke.mindustry.resource;
+package io.anuke.mindustry.type;
 
-public class Mech extends Upgrade{
+public class Mech extends io.anuke.mindustry.type.Upgrade {
 	public boolean flying;
 	public float mass = 1f;
 

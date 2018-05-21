@@ -1,13 +1,10 @@
 package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.game.TeamInfo.TeamData;
-import io.anuke.mindustry.resource.AmmoType;
+import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.BlockFlag;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Floor;

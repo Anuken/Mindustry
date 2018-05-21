@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;

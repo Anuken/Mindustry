@@ -1,4 +1,4 @@
-package io.anuke.mindustry.resource;
+package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.Vars;
@@ -16,11 +16,11 @@ import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
 
-public class Weapon extends Upgrade{
+public class Weapon extends io.anuke.mindustry.type.Upgrade {
 	/**minimum cursor distance from player, fixes 'cross-eyed' shooting.*/
 	protected static float minPlayerDist = 20f;
 	/**ammo type map. set with setAmmo()*/
-	protected ObjectMap<Item, AmmoType> ammoMap = new ObjectMap<>();
+	protected ObjectMap<io.anuke.mindustry.type.Item, io.anuke.mindustry.type.AmmoType> ammoMap = new ObjectMap<>();
 	/**shell ejection effect*/
 	protected Effect ejectEffect = Fx.none;
 	/**weapon reload in frames*/
@@ -83,12 +83,12 @@ public class Weapon extends Upgrade{
 		p.inventory.useAmmo();
 	}
 
-	public AmmoType getAmmoType(Item item){
+	public io.anuke.mindustry.type.AmmoType getAmmoType(io.anuke.mindustry.type.Item item){
 		return ammoMap.get(item);
 	}
 
-	protected void setAmmo(AmmoType... types){
-		for(AmmoType type : types){
+	protected void setAmmo(io.anuke.mindustry.type.AmmoType... types){
+		for(io.anuke.mindustry.type.AmmoType type : types){
 			ammoMap.put(type.item, type);
 		}
 	}
@@ -96,7 +96,7 @@ public class Weapon extends Upgrade{
 	void shootInternal(Player p, float x, float y, float rotation, boolean left){
 		Angles.shotgun(shots, spacing, rotation, f -> bullet(p, x, y, f + Mathf.range(inaccuracy)));
 
-		AmmoType type = p.inventory.getAmmo();
+		io.anuke.mindustry.type.AmmoType type = p.inventory.getAmmo();
 
 		tr.trns(rotation + 180f, type.recoil);
 

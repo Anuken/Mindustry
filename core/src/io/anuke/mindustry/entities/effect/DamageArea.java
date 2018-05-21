@@ -23,10 +23,12 @@ import io.anuke.ucore.util.Translator;
 
 import static io.anuke.mindustry.Vars.*;
 
+/**Utility class for damaging in an area.*/
 public class DamageArea{
 	private static Rectangle rect = new Rectangle();
 	private static Translator tr = new Translator();
 
+	/**Creates a dynamic explosion based on specified parameters.*/
 	public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color){
 		for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i ++){
 			int branches = 5 + Mathf.clamp((int)(power/30), 1, 20);

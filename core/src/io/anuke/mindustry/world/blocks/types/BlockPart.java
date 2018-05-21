@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.blocks.types;
 
-import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.resource.Liquid;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 

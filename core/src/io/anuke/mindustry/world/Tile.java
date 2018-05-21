@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.resource.Recipe;
+import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.mindustry.world.blocks.types.modules.InventoryModule;
 import io.anuke.mindustry.world.blocks.types.modules.LiquidModule;

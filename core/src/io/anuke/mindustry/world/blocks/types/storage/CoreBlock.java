@@ -1,9 +1,10 @@
 package io.anuke.mindustry.world.blocks.types.storage;
 
 import com.badlogic.gdx.math.Rectangle;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.BlockFlag;
 import io.anuke.ucore.graphics.Draw;
@@ -28,13 +29,22 @@ public class CoreBlock extends StorageBlock {
         unbreakable = true;
         size = 3;
         hasItems = true;
-        itemCapacity = 2000;
+        itemCapacity = 1000;
         flags = EnumSet.of(BlockFlag.resupplyPoint, BlockFlag.target);
     }
 
     @Override
+    public int acceptStack(Item item, int amount, Tile tile, Unit source){
+        if(acceptItem(item, tile, tile) && hasItems && source.team == tile.getTeam()){
+            return Math.min(itemCapacity - tile.entity.items.getItem(item), amount);
+        }else{
+            return 0;
+        }
+    }
+
+    @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return tile.entity.items.totalItems() < itemCapacity;
+        return tile.entity.items.items[item.id]< itemCapacity && item.material;
     }
 
     @Override

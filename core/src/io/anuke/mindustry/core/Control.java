@@ -18,7 +18,7 @@ import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.io.Saves;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.type.Item;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.input.InputProxy;

@@ -3,7 +3,7 @@ package io.anuke.mindustry.entities.units;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.resource.AmmoType;
+import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.BlockFlag;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;

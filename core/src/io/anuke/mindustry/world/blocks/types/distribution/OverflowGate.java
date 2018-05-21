@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.distribution;
 
-import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.util.Mathf;
 

@@ -1,4 +1,4 @@
-package io.anuke.mindustry.resource;
+package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.Fx;
@@ -13,7 +13,7 @@ public class AmmoType {
     /**The item used. Always null if liquid isn't.*/
     public final Item item;
     /**The liquid used. Always null if item isn't.*/
-    public final Liquid liquid;
+    public final io.anuke.mindustry.type.Liquid liquid;
     /**The resulting bullet.*/
     public final BulletType bullet;
     /**For item ammo, this is amount given per ammo item.
@@ -48,7 +48,7 @@ public class AmmoType {
         this.quantityMultiplier = multiplier;
     }
 
-    public AmmoType(Liquid liquid, BulletType result, float multiplier){
+    public AmmoType(io.anuke.mindustry.type.Liquid liquid, BulletType result, float multiplier){
         this.item = null;
         this.liquid = liquid;
         this.bullet = result;

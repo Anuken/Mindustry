@@ -10,7 +10,7 @@
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.core.GameState" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.game.EventType" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.io.SaveFileVersion" />
-	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.resource.Recipe" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.type.Recipe" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.net.Packets" />
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.net.Packet" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.net.Streamable" />

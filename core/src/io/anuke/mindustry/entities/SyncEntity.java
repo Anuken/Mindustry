@@ -115,7 +115,6 @@ public abstract class SyncEntity extends DestructibleEntity{
         }
 
         public void update(){
-            //TODO prevent rubberbanding from getting too bad, clamp values?
 
             time += 1f / spacing * Math.min(Timers.delta(), 1f);
 

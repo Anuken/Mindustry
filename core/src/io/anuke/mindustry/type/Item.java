@@ -1,4 +1,4 @@
-package io.anuke.mindustry.resource;
+package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;

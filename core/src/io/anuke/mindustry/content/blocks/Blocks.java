@@ -5,7 +5,7 @@ import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.graphics.CacheLayer;
-import io.anuke.mindustry.resource.ItemStack;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.*;

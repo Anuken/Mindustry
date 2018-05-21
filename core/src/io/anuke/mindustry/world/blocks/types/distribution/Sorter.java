@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockGroup;
 import io.anuke.mindustry.world.Tile;

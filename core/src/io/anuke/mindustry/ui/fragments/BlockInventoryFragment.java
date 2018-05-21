@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.input.InputHandler;
-import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Core;

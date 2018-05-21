@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.types.distribution;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.NumberUtils;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockGroup;
 import io.anuke.mindustry.world.Tile;

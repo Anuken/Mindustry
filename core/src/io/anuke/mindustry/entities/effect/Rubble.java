@@ -7,10 +7,12 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.groundEffectGroup;
 
+/**Class for creating block rubble on the ground.*/
 public class Rubble extends TimedEntity implements BelowLiquidEffect{
     private static final Color color = Color.valueOf("52504e");
     private int size;
 
+    /**Creates a rubble effect at a position. Provide a block size to use.*/
     public static void create(float x, float y, int size){
         Rubble rubble = new Rubble();
         rubble.size = size;

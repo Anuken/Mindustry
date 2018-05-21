@@ -7,7 +7,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
-import io.anuke.mindustry.resource.Weapon;
+import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.core.Inputs.DeviceType;
@@ -129,7 +129,7 @@ public class DesktopInput extends InputHandler{
 			droppingItem = false;
 		}
 
-		if(recipe == null && target != null && !ui.hasMouse() && Inputs.keyDown(section,"block_info") && target.block().isAccessible()){
+		if(recipe == null && target != null && !ui.hasMouse() && target.block().isAccessible()){
 			showCursor = true;
 			if(Inputs.keyTap(section,"select")){
 				canBeginShoot = false;

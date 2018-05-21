@@ -15,7 +15,7 @@ import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.SerializableEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.resource.Liquid;
+import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;

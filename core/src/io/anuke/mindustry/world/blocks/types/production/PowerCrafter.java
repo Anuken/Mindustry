@@ -1,9 +1,9 @@
 package io.anuke.mindustry.world.blocks.types.production;
 
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.resource.ItemStack;
-import io.anuke.mindustry.resource.Liquid;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.production.GenericCrafter.GenericCrafterEntity;

@@ -3,7 +3,7 @@ package io.anuke.mindustry.content.blocks;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.AmmoTypes;
 import io.anuke.mindustry.content.fx.ShootFx;
-import io.anuke.mindustry.resource.AmmoType;
+import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.defense.Turret;
 import io.anuke.mindustry.world.blocks.types.defense.turrets.*;

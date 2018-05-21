@@ -3,12 +3,14 @@ package io.anuke.mindustry.entities;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.game.TeamInfo.TeamData;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.SolidEntity;
+import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInputStream;
@@ -74,6 +76,21 @@ public abstract class Unit extends SyncEntity implements SerializableEntity {
         this.x = x;
         this.y = y;
         this.status.set(StatusEffect.getByID(effect), etime);
+    }
+
+    public TileEntity getClosestCore(){
+        if(state.teams.has(team)){
+            TeamData data = state.teams.get(team);
+
+            Tile tile =  Geometry.findClosest(x, y, data.cores);
+            if(tile == null){
+                return null;
+            }else{
+                return tile.entity;
+            }
+        }else{
+            return null;
+        }
     }
 
     public Floor getFloorOn(){

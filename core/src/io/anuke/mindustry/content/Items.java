@@ -1,7 +1,7 @@
 package io.anuke.mindustry.content;
 
 import com.badlogic.gdx.graphics.Color;
-import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.type.Item;
 
 public class Items {
     public static final Item

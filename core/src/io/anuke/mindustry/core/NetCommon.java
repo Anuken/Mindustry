@@ -7,7 +7,7 @@ import io.anuke.mindustry.net.Packets.BlockConfigPacket;
 import io.anuke.mindustry.net.Packets.BlockTapPacket;
 import io.anuke.mindustry.net.Packets.ChatPacket;
 import io.anuke.mindustry.net.Packets.WeaponSwitchPacket;
-import io.anuke.mindustry.resource.Upgrade;
+import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.modules.Module;
 

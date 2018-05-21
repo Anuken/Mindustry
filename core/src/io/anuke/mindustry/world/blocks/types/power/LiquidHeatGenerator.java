@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks.types.power;
 
-import io.anuke.mindustry.resource.Liquid;
+import io.anuke.mindustry.type.Liquid;
 
 public class LiquidHeatGenerator extends LiquidBurnerGenerator {
 

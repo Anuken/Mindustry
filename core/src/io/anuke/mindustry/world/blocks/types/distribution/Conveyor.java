@@ -5,7 +5,7 @@ import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockGroup;
 import io.anuke.mindustry.world.Tile;

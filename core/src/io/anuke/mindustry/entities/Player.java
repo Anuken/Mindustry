@@ -14,7 +14,10 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
-import io.anuke.mindustry.resource.*;
+import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.Mech;
+import io.anuke.mindustry.type.Upgrade;
+import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.*;
@@ -375,12 +378,12 @@ public class Player extends Unit implements BlockBuilder {
 	}
 
 	@Override
-	public boolean acceptsAmmo(Item item) {
+	public boolean acceptsAmmo(io.anuke.mindustry.type.Item item) {
 		return weapon.getAmmoType(item) != null && inventory.canAcceptAmmo(weapon.getAmmoType(item));
 	}
 
 	@Override
-	public void addAmmo(Item item) {
+	public void addAmmo(io.anuke.mindustry.type.Item item) {
 		inventory.addAmmo(weapon.getAmmoType(item));
 	}
 

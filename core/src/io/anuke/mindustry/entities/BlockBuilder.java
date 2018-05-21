@@ -2,7 +2,7 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.resource.Recipe;
+import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Build;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.BuildBlock;
@@ -76,10 +76,17 @@ public interface BlockBuilder {
                     getPlaceQueue().removeFirst();
                 }
             }else{
+                TileEntity core = unit.getClosestCore();
+
+                //if there is no core to build with, stop building!
+                if(core == null){
+                    return;
+                }
+
                 //otherwise, update it.
                 BuildEntity entity = tile.entity();
 
-                entity.progress += 1f / entity.recipe.cost;
+                entity.addProgress(core.items, 1f / entity.recipe.cost);
                 unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(entity), 0.4f);
             }
         }

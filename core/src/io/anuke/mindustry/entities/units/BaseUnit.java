@@ -5,7 +5,7 @@ import io.anuke.mindustry.entities.BulletType;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.resource.Item;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.BlockFlag;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;

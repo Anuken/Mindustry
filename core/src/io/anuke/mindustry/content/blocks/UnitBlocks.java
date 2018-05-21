@@ -2,7 +2,7 @@ package io.anuke.mindustry.content.blocks;
 
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.UnitTypes;
-import io.anuke.mindustry.resource.ItemStack;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.units.RepairPoint;
 import io.anuke.mindustry.world.blocks.types.units.ResupplyPoint;

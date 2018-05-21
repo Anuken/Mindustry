@@ -14,7 +14,7 @@ import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.resource.Liquid;
+import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;

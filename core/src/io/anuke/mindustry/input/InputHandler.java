@@ -2,13 +2,12 @@ package io.anuke.mindustry.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.entities.BlockBuilder.BuildRequest;
-import io.anuke.mindustry.entities.ItemAnimationEffect;
+import io.anuke.mindustry.entities.ItemTransfer;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.resource.ItemStack;
-import io.anuke.mindustry.resource.Recipe;
+import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.fragments.OverlayFragment;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Build;
@@ -107,7 +106,7 @@ public abstract class InputHandler extends InputAdapter{
 				Timers.run(i * 3, () -> {
 					tile.block().getStackOffset(stack.item, tile, stackTrns);
 
-					new ItemAnimationEffect(stack.item,
+					ItemTransfer.create(stack.item,
 							player.x + Angles.trnsx(rotation + 180f, backTrns), player.y + Angles.trnsy(rotation + 180f, backTrns),
 							tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y, () -> {
 
@@ -117,7 +116,7 @@ public abstract class InputHandler extends InputAdapter{
 						if(end && remaining[1] > 0) {
 							tile.block().handleStack(stack.item, remaining[1], tile, player);
 						}
-					}).add();
+					});
 
 					stack.amount -= removed;
 					remaining[0] -= removed;
@@ -130,6 +129,8 @@ public abstract class InputHandler extends InputAdapter{
 				});
 			}
 		}else{
+			//TODO create drop on the ground
+			/*
 			Vector2 vec = Graphics.screen(player.x, player.y);
 
 			if(vec.dst(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY()) > playerSelectRange) {
@@ -140,15 +141,12 @@ public abstract class InputHandler extends InputAdapter{
 						float x = player.x + Angles.trnsx(rotation + 180f, backTrns),
 								y = player.y + Angles.trnsy(rotation + 180f, backTrns);
 
-						ItemAnimationEffect e = new ItemAnimationEffect(stack.item,
-								x, y, x + Mathf.range(20f), y + Mathf.range(20f), () -> {}).add();
-						e.interp = Interpolation.pow3Out;
-						e.endSize = 0.5f;
-						e.lifetime = 20;
+						ItemTransfer.create(stack.item,
+								x, y, x + Mathf.range(20f), y + Mathf.range(20f), () -> {});
 					});
 				}
 				player.inventory.clear();
-			}
+			}*/
 		}
 	}
 
