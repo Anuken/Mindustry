@@ -116,12 +116,12 @@ public class IOSLauncher extends IOSApplication.Delegate {
     }
 
     void openURL(NSURL url){
-        String str = url.getPath().toLowerCase();
+        FileHandle file = Gdx.files.absolute(getDocumentsDirectory()).child(url.getLastPathComponent());
+        Gdx.files.absolute(url.getPath()).copyTo(file);
 
         Timers.runTask(30f, () -> {
-            FileHandle file = Gdx.files.absolute(url.getPath());
 
-            if(str.endsWith("mins")){ //open save
+            if(file.extension().equalsIgnoreCase("mins")){ //open save
 
                 if(SaveIO.isSaveValid(file)){
                     try{
@@ -134,7 +134,7 @@ public class IOSLauncher extends IOSApplication.Delegate {
                     ui.showError("$text.save.import.invalid");
                 }
 
-            }else if(str.endsWith("png")){ //open map
+            }else if(file.extension().equalsIgnoreCase("png")){ //open map
                 if(!ui.editor.isShown()){
                     ui.editor.show();
                 }
