@@ -2223,6 +2223,13 @@ casing
   orig: 2, 4
   offset: 0, 0
   index: -1
+clear
+  rotate: false
+  xy: 769, 490
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
 enemyarrow
   rotate: false
   xy: 707, 310
@@ -3249,7 +3256,7 @@ scroll-knob-vertical-black
   index: -1
 selection
   rotate: false
-  xy: 769, 490
+  xy: 566, 287
   size: 1, 1
   orig: 1, 1
   offset: 0, 0

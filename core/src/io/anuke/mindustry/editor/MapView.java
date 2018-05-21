@@ -198,7 +198,12 @@ public class MapView extends Element implements GestureListener{
 		float sclheight = size * zoom * ratio;
 		x = (x - getWidth()/2 + sclwidth/2 - offsetx*zoom) / sclwidth * editor.getMap().width();
 		y = (y - getHeight()/2 + sclheight/2 - offsety*zoom) / sclheight * editor.getMap().height();
-		return Tmp.g1.set((int)x, (int)y);
+
+		if(editor.getDrawBlock().size % 2 == 0){
+			return Tmp.g1.set((int)(x - 0.5f), (int)(y - 0.5f));
+		}else{
+			return Tmp.g1.set((int)x, (int)y);
+		}
 	}
 
 	private Vector2 unproject(int x, int y){
@@ -250,24 +255,35 @@ public class MapView extends Element implements GestureListener{
         //todo is it really math.max?
         float scaling = zoom * Math.min(width, height) / Math.max(editor.getMap().width(), editor.getMap().height());
 
-		if(tool == EditorTool.line && drawing){
-			Vector2 v1 = unproject(startx, starty).add(x, y);
-			float sx = v1.x, sy = v1.y;
-			Vector2 v2 = unproject(lastx, lasty).add(x, y);
+		Draw.color(Palette.accent);
+		Lines.stroke(Unit.dp.scl(1f * zoom));
 
-            Draw.color(Palette.accent);
-			Lines.stroke(Unit.dp.scl(1f * zoom));
-            Lines.poly(brushPolygons[index], sx, sy, scaling);
-            Lines.poly(brushPolygons[index], v2.x, v2.y, scaling);
+        if(!editor.getDrawBlock().isMultiblock()) {
+			if (tool == EditorTool.line && drawing) {
+				Vector2 v1 = unproject(startx, starty).add(x, y);
+				float sx = v1.x, sy = v1.y;
+				Vector2 v2 = unproject(lastx, lasty).add(x, y);
+
+				Lines.poly(brushPolygons[index], sx, sy, scaling);
+				Lines.poly(brushPolygons[index], v2.x, v2.y, scaling);
+			}
+
+			if (tool.edit && (!mobile || drawing)) {
+				GridPoint2 p = project(mousex, mousey);
+				Vector2 v = unproject(p.x, p.y).add(x, y);
+				Lines.poly(brushPolygons[index], v.x, v.y, scaling);
+			}
+		}else{
+        	if((tool.edit || tool == EditorTool.line) && (!mobile || drawing)){
+				GridPoint2 p = project(mousex, mousey);
+				Vector2 v = unproject(p.x, p.y).add(x, y);
+				float offset = (editor.getDrawBlock().size % 2 == 0 ? scaling/2f : 0f);
+        		Lines.square(
+        				v.x + scaling/2f + offset,
+						v.y + scaling/2f + offset,
+						scaling * editor.getDrawBlock().size /2f);
+			}
 		}
-
-		if(tool.edit && (!mobile || drawing)){
-            GridPoint2 p = project(mousex, mousey);
-            Vector2 v = unproject(p.x, p.y).add(x, y);
-            Draw.color(Palette.accent);
-            Lines.stroke(Unit.dp.scl(1f * zoom));
-            Lines.poly(brushPolygons[index], v.x, v.y, scaling);
-        }
 
 		batch.flush();
 		

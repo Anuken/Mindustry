@@ -30,7 +30,7 @@ public class WorldGenerator {
 		for(int y = 0; y < data.height(); y ++){
 			for(int x = 0; x < data.width(); x ++){
 				TileDataMarker tile = data.read();
-				tiles[x][y] = new Tile(x, y, tile.floor, tile.wall, tile.rotation, tile.team);
+				tiles[x][y] = new Tile(x, y, tile.floor, tile.wall == Blocks.blockpart.id ? 0 : tile.wall, tile.rotation, tile.team);
 
 				Team team = Team.values()[tile.team];
 

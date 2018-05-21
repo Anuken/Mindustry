@@ -81,10 +81,6 @@ public enum EditorTool{
 		int asInt(int x, int y, int width){
 			return x+y*width;
 		}
-		
-		boolean colorEquals(int a, int b){
-			return a == b;
-		}
 	},
 	zoom;
 	boolean edit;

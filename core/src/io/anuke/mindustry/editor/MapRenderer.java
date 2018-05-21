@@ -3,7 +3,6 @@ package io.anuke.mindustry.editor;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
-import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.core.Core;
@@ -93,20 +92,20 @@ public class MapRenderer {
         Block floor = Block.getByID(data.floor);
         Block wall = Block.getByID(data.wall);
 
-        String fregion = Draw.hasRegion(floor.name) ? floor.name : floor.name + "1";
+        int offsetx = -(wall.size-1)/2;
+        int offsety = -(wall.size-1)/2;
 
-        if (floor != Blocks.air && Draw.hasRegion(fregion)) {
-            TextureRegion region = Draw.region(fregion);
-            mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize, region, wx * tilesize, wy * tilesize, -1f, 8, 8);
-        }
+        String fregion = Draw.hasRegion(floor.name) ? floor.name : (Draw.hasRegion(floor.name + "1") ? (floor.name + "1") : "clear");
 
-        String wregion = Draw.hasRegion(wall.name) ? wall.name : wall.name + "1";
+        TextureRegion region = Draw.region(fregion);
+        mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize, region, wx * tilesize, wy * tilesize, -1f, 8, 8);
 
-        if (wall != Blocks.air && Draw.hasRegion(wregion)) {
-            TextureRegion region = Draw.region(wregion);
-            mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize + chunksize*chunksize, region,
-                    wx * tilesize - Math.max(region.getRegionWidth()-16f, 0), wy * tilesize - Math.max(region.getRegionHeight()-16f, 0), 0f,
-                    region.getRegionWidth(), region.getRegionHeight());
-        }
+        String wregion = Draw.hasRegion(wall.name) ? wall.name : (Draw.hasRegion(wall.name + "1") ? (wall.name + "1") : "clear");
+
+        region = Draw.region(wregion);
+        mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize + chunksize*chunksize, region,
+                wx * tilesize + offsetx*tilesize, wy * tilesize  + offsety * tilesize, 0f,
+                region.getRegionWidth(), region.getRegionHeight());
+
     }
 }

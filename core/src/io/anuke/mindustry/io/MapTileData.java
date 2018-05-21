@@ -6,11 +6,12 @@ import io.anuke.ucore.util.Bits;
 import java.nio.ByteBuffer;
 
 public class MapTileData {
-    /**Tile size: 3 bytes.
-     * 0: ground tile
-     * 1: wall tile
-     * 2: rotation + team*/
-    private final static int TILE_SIZE = 3;
+    /**Tile size: 3 bytes. <br>
+     * 0: ground tile <br>
+     * 1: wall tile <br>
+     * 2: rotation + team <br>
+     * 3: link (x/y) <br>*/
+    private final static int TILE_SIZE = 4;
 
     private final ByteBuffer buffer;
     private final TileDataMarker tile = new TileDataMarker();
@@ -92,12 +93,14 @@ public class MapTileData {
 
     public class TileDataMarker {
         public byte floor, wall;
+        public byte link;
         public byte rotation;
         public byte team;
 
         public void read(ByteBuffer buffer){
             floor = buffer.get();
             wall = buffer.get();
+            link = buffer.get();
             byte rt = buffer.get();
             rotation = Bits.getLeftByte(rt);
             team = Bits.getRightByte(rt);
@@ -112,8 +115,14 @@ public class MapTileData {
             if(readOnly) throw new IllegalArgumentException("This data is read-only.");
             buffer.put(floor);
             buffer.put(wall);
-            byte rt = Bits.packByte(rotation, team);
-            buffer.put(rt);
+            buffer.put(link);
+            buffer.put(Bits.packByte(rotation, team));
+        }
+
+        public void writeWallLink(){
+            buffer.position(buffer.position() + 1);
+            buffer.put(wall);
+            buffer.put(link);
         }
     }
 }
