@@ -1,34 +1,30 @@
 package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.ItemTransfer;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.BooleanProvider;
 import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.event.HandCursorListener;
 import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class BlockInventoryFragment implements Fragment {
     private Table table;
@@ -129,10 +125,10 @@ public class BlockInventoryFragment implements Fragment {
                         Vector2 v = image.localToStageCoordinates(new Vector2(image.getWidth() / 2f, image.getHeight() / 2f));
                         for(int j = 0; j < sent; j ++){
                             boolean all = j == sent-1;
-                            Timers.run(j*5, () -> move(item.region, v, () -> {
+                            Timers.run(j*5, () -> move(item, tile, () -> {
                                 player.inventory.addItem(item, all ? soFar[0] : per);
                                 soFar[0] -= per;
-                            }, Color.WHITE));
+                            }));
                         }
                     }
                 });
@@ -149,30 +145,8 @@ public class BlockInventoryFragment implements Fragment {
         updateTablePosition();
     }
 
-    private void move(TextureRegion region, Vector2 v, Callable c, Color color){
-        Player player = input.player;
-
-        Vector2 tv = Graphics.screen(player.x + Angles.trnsx(player.rotation + 180f, 5f), player.y + Angles.trnsy(player.rotation + 180f, 5f));
-        float tx = tv.x, ty = tv.y;
-        float dur = 40f / 60f;
-
-        Image mover = new Image(region);
-        mover.setColor(color);
-        mover.setSize(32f, 32f);
-        mover.setOrigin(Align.center);
-        mover.setPosition(v.x, v.y, Align.center);
-        mover.setTouchable(Touchable.disabled);
-        mover.actions(
-            Actions.parallel(
-                Actions.moveToAligned(tx, ty, Align.center, dur, Interpolation.fade),
-                Actions.scaleTo(0.7f, 0.7f, dur, Interpolation.fade),
-                Actions.rotateTo(player.rotation, dur, Interpolation.fade)
-            ),
-            Actions.call(c),
-            Actions.removeActor()
-        );
-
-        Core.scene.add(mover);
+    private void move(Item item, Tile tile, Callable c){
+        ItemTransfer.create(item, tile.drawx(), tile.drawy(), input.player.x, input.player.y, c);
     }
 
     private String round(float f){
