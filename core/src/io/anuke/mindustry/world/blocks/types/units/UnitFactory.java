@@ -4,11 +4,12 @@ import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
@@ -79,7 +80,7 @@ public class UnitFactory extends Block {
 
         Shaders.build.region = region;
         Shaders.build.progress = entity.buildTime/produceTime;
-        Shaders.build.color.set(Colors.get("accent"));
+        Shaders.build.color.set(Palette.accent);
         Shaders.build.color.a = entity.speedScl;
         Shaders.build.time = -entity.time / 10f;
 
@@ -88,7 +89,7 @@ public class UnitFactory extends Block {
         Draw.rect(region, tile.drawx(), tile.drawy());
         Graphics.shader();
 
-        Draw.color("accent");
+        Draw.color(Palette.accent);
         Draw.alpha(entity.speedScl);
 
         Lines.lineAngleCenter(

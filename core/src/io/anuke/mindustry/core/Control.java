@@ -33,7 +33,7 @@ import static io.anuke.mindustry.Vars.*;
  * This class is not created in the headless server.*/
 public class Control extends Module{
 	/**Minimum period of time between the same sound being played.*/
-	private static final long minSoundPeriod = 30;
+	private static final long minSoundPeriod = 100;
 
 	private boolean hiscore = false;
 	private boolean wasPaused = false;

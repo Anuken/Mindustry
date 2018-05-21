@@ -1,10 +1,10 @@
 package io.anuke.mindustry.input;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.Block;
@@ -39,7 +39,7 @@ public enum PlaceMode{
 
 			float si = MathUtils.sin(Timers.time() / 6f) + 1.5f;
 
-			Draw.color(valid ? Colors.get("place") : Colors.get("break"));
+			Draw.color(valid ? Palette.place : Palette.remove);
 			Lines.stroke(2f);
 			Lines.crect(x + offset.x, y + offset.y, tilesize * input.recipe.result.size + si,
 					tilesize * input.recipe.result.size + si);
@@ -48,7 +48,7 @@ public enum PlaceMode{
 
 			if(input.recipe.result.rotate){
 
-				Draw.color(Colors.get("placeRotate"));
+				Draw.color(Palette.placeRotate);
 				tr.trns(input.rotation * 90, 7, 0);
 				Lines.line(x, y, x + tr.x, y + tr.y);
 			}
@@ -93,7 +93,7 @@ public enum PlaceMode{
 				float fin = input.breaktime / tile.getBreakTime();
 				
 				if(mobile && input.breaktime > 0){
-					Draw.color(Colors.get("breakStart"), Colors.get("break"), fin);
+					Draw.color(Palette.place, Palette.remove, fin);
 					Lines.poly(tile.drawx(), tile.drawy(), 25, 4 + (1f - fin) * 26);
 				}
 				Draw.reset();
@@ -145,7 +145,7 @@ public enum PlaceMode{
 				y2 += t/2;
 			}
 			
-			Draw.color(Colors.get("break"));
+			Draw.color(Palette.remove);
 			Lines.stroke(1f);
 			for(int cx = tilex; cx <= endx; cx ++){
 				for(int cy = tiley; cy <= endy; cy ++){
@@ -160,7 +160,7 @@ public enum PlaceMode{
 			}
 			
 			Lines.stroke(2f);
-			Draw.color(input.cursorNear() ? Colors.get("break") : Colors.get("breakInvalid"));
+			Draw.color(Palette.remove);
 			Lines.rect(x, y, x2 - x, y2 - y);
 			Draw.alpha(0.3f);
 			Draw.crect("blank", x, y, x2 - x, y2 - y);
@@ -265,7 +265,7 @@ public enum PlaceMode{
 			if(tilex == endx && tiley == endy){
 				cursor.draw(input, tilex, tiley, endx, endy);
 			}else{
-			    Draw.color("place");
+			    Draw.color(Palette.place);
 				Lines.stroke(1f);
 				Lines.rect(x, y, x2 - x, y2 - y);
 				Draw.alpha(0.3f);
@@ -280,9 +280,9 @@ public enum PlaceMode{
                         int wx = tilex + px * Mathf.sign(endx - tilex),
                                 wy = tiley + py * Mathf.sign(endy - tiley);
                         if(!Build.validPlace(input.player.team, wx, wy, block, rotation)){
-                            Draw.color("break");
+                            Draw.color(Palette.remove);
                         }else{
-                            Draw.color("accent");
+                            Draw.color(Palette.accent);
                         }
 
                         drawPreview(block, wx * t + offset.x, wy * t + offset.y);
@@ -297,7 +297,7 @@ public enum PlaceMode{
 		public void drawPreview(Block block, float x, float y){
 		    for(TextureRegion region : block.getBlockIcon()){
                 Shaders.blockpreview.region = region;
-                Shaders.blockpreview.color.set(Colors.get("accent"));
+                Shaders.blockpreview.color.set(Palette.accent);
                 Shaders.blockpreview.apply();
 
 		        Draw.rect(region, x, y);
@@ -340,17 +340,24 @@ public enum PlaceMode{
 			if(Math.abs(endy - tiley) > maxlen){
 				endy = Mathf.sign(endy - tiley) * maxlen + tiley;
 			}*/
-			
-			if(endx > tilex)
-				rotation = 0;
-			else if(endx < tilex)
-				rotation = 2;
-			else if(endy > tiley)
-				rotation = 1;
-			else if(endy < tiley)
-				rotation = 3;
-			else
+
+		    int dx = endx - tilex, dy = endy - tiley;
+
+		    if(Math.abs(dx) > Math.abs(dy)){
+				if(dx >= 0){
+					rotation = 0;
+				}else{
+					rotation = 2;
+				}
+			}else if(Math.abs(dx) < Math.abs(dy)){
+				if(dy >= 0){
+					rotation = 1;
+				}else{
+					rotation = 3;
+				}
+			}else{
 				rotation = input.rotation;
+			}
 			
 			if(endx < tilex){
 				int t = endx;

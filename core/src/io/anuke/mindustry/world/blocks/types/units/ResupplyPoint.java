@@ -6,10 +6,11 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.graphics.Layer;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.BlockFlag;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
@@ -41,7 +42,7 @@ public class ResupplyPoint extends Block{
 
     @Override
     public void drawSelect(Tile tile){
-        Draw.color("accent");
+        Draw.color(Palette.accent);
         Lines.dashCircle(tile.drawx(), tile.drawy(), supplyRadius);
         Draw.color();
     }
@@ -62,7 +63,7 @@ public class ResupplyPoint extends Block{
             Shapes.laser("transfer", "transfer-end",
                     x1, y1, entity.lastx, entity.lasty, entity.strength);
 
-            Draw.color("accent");
+            Draw.color(Palette.accent);
             for(int i = 0; i < dstTo/space-1; i ++){
                 float fract = (i * space) / dstTo + ((Timers.time()/90f) % (space/dstTo));
                 Draw.alpha(Mathf.clamp(fract*1.5f));

@@ -6,9 +6,10 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.graphics.Layer;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.BlockFlag;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
@@ -40,7 +41,7 @@ public class RepairPoint extends Block{
 
     @Override
     public void drawSelect(Tile tile){
-        Draw.color("accent");
+        Draw.color(Palette.accent);
         Lines.dashCircle(tile.drawx(), tile.drawy(), repairRadius);
         Draw.color();
     }

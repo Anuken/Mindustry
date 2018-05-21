@@ -1,7 +1,6 @@
 package io.anuke.mindustry.content.fx;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Colors;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.core.Effects.Effect;
@@ -111,7 +110,7 @@ public class BlockFx {
     }),
     producesmoke = new Effect(12, e -> {
         Angles.randLenVectors(e.id, 8, 4f + e.fin()*18f, (x, y)->{
-            Draw.color(Color.WHITE, Colors.get("accent"), e.fin());
+            Draw.color(Color.WHITE, Palette.accent, e.fin());
             Fill.poly(e.x + x, e.y + y, 4, 1f+e.fout()*3f, 45);
             Draw.reset();
         });

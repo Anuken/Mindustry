@@ -245,7 +245,7 @@ public class Player extends Unit implements BlockBuilder {
 	public void drawBuildRequests(){
 		for (BuildRequest request : getPlaceQueue()) {
 			if(request.remove){
-				Draw.color("break");
+				Draw.color(Palette.remove);
 				Draw.alpha(0.4f);
 				Lines.stroke(1f);
 
@@ -267,7 +267,7 @@ public class Player extends Unit implements BlockBuilder {
 				Lines.poly(tile.drawx(), tile.drawy(),
 						4, tile.block().size * tilesize /2f * (1f-progress) + Mathf.absin(Timers.time(), 3f, 1f));
 			}else{
-				Draw.color("accent");
+				Draw.color(Palette.accent);
 				Lines.stroke((1f-request.progress));
 				Lines.poly(request.x * tilesize + request.recipe.result.getPlaceOffset().x,
 						request.y * tilesize + request.recipe.result.getPlaceOffset().y,

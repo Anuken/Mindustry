@@ -74,6 +74,7 @@ public class Renderer extends RendererModule{
 						entity.rotation = rotation;
 						entity.lifetime = effect.lifetime;
 						entity.data = data;
+						entity.id ++;
 						entity.set(x, y).add(effectGroup);
 
 						if(data instanceof Entity){
@@ -85,6 +86,7 @@ public class Renderer extends RendererModule{
 						entity.color = color;
 						entity.rotation = rotation;
 						entity.lifetime = effect.lifetime;
+						entity.id ++;
 						entity.data = data;
 						entity.set(x, y).add(groundEffectGroup);
 					}

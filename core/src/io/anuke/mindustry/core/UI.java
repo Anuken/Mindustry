@@ -2,12 +2,12 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.editor.MapEditorDialog;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.ui.dialogs.*;
@@ -94,24 +94,22 @@ public class UI extends SceneModule{
 		Dialog.closePadR = -1;
 		Dialog.closePadT = 5;
 		
-		Colors.put("description", Color.WHITE);
-		Colors.put("turretinfo", Color.ORANGE);
-		Colors.put("iteminfo", Color.LIGHT_GRAY);
-		Colors.put("powerinfo", Color.YELLOW);
-		Colors.put("liquidinfo", Color.ROYAL);
-		Colors.put("craftinfo", Color.LIGHT_GRAY);
-		Colors.put("missingitems", Color.SCARLET);
-		Colors.put("health", Color.YELLOW);
-		Colors.put("healthstats", Color.SCARLET);
-		Colors.put("interact", Color.ORANGE);
-		Colors.put("accent", Color.valueOf("f4ba6e"));
-		Colors.put("place", Color.valueOf("6335f8"));
-		Colors.put("break", Color.valueOf("e55454"));
-		Colors.put("placeRotate", Color.ORANGE);
-		Colors.put("breakStart", Color.YELLOW);
-		Colors.put("breakInvalid", Color.SCARLET);
-		Colors.put("range", Colors.get("accent"));
-		Colors.put("power", Color.valueOf("fbd367"));
+		Colors.put("description", Palette.description);
+		Colors.put("turretinfo", Palette.turretinfo);
+		Colors.put("iteminfo", Palette.iteminfo);
+		Colors.put("powerinfo", Palette.powerinfo);
+		Colors.put("liquidinfo", Palette.liquidinfo);
+		Colors.put("craftinfo", Palette.craftinfo);
+		Colors.put("missingitems", Palette.missingitems);
+		Colors.put("health", Palette.health);
+		Colors.put("healthstats", Palette.healthstats);
+		Colors.put("interact", Palette.interact);
+		Colors.put("accent", Palette.accent);
+		Colors.put("place", Palette.place);
+		Colors.put("remove", Palette.remove);
+		Colors.put("placeRotate", Palette.placeRotate);
+		Colors.put("range", Palette.range);
+		Colors.put("power", Palette.power);
 	}
 
 	@Override

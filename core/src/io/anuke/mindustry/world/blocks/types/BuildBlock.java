@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world.blocks.types;
 
-import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.content.fx.Fx;
@@ -10,16 +9,20 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Rubble;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Layer;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.Recipe;
-import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.BarType;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.BlockBar;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.modules.InventoryModule;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
 
 public class BuildBlock extends Block {
-    private static final float decaySpeedScl = 4f;
+    private static final float decaySpeedScl = 6f;
 
     public BuildBlock(String name) {
         super(name);
@@ -56,7 +59,7 @@ public class BuildBlock extends Block {
     public void afterDestroyed(Tile tile, TileEntity e){
         BuildEntity entity = (BuildEntity)e;
 
-        if(entity.previous.update || entity.previous.solid){
+        if(entity.previous.synthetic()){
             tile.setBlock(entity.previous);
         }
     }
@@ -65,7 +68,7 @@ public class BuildBlock extends Block {
     public void draw(Tile tile){
         BuildEntity entity = tile.entity();
 
-        if(entity.previous.update || entity.previous.solid) {
+        if(entity.previous.synthetic()) {
             for (TextureRegion region : entity.previous.getBlockIcon()) {
                 Draw.rect(region, tile.drawx(), tile.drawy(), entity.recipe.result.rotate ? tile.getRotation() * 90 : 0);
             }
@@ -76,7 +79,7 @@ public class BuildBlock extends Block {
     public void drawLayer(Tile tile) {
         BuildEntity entity = tile.entity();
 
-        Shaders.blockbuild.color = Colors.get("accent");
+        Shaders.blockbuild.color = Palette.accent;
 
         for(TextureRegion region : entity.recipe.result.getBlockIcon()){
             Shaders.blockbuild.region = region;

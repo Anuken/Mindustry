@@ -1,8 +1,8 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.utils.Align;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.scene.ui.Dialog;
 
 public class FloatingDialog extends Dialog{
@@ -12,7 +12,7 @@ public class FloatingDialog extends Dialog{
 		setFillParent(true);
 		title().setAlignment(Align.center);
 		getTitleTable().row();
-		getTitleTable().addImage("white", Colors.get("accent"))
+		getTitleTable().addImage("white", Palette.accent)
 		.growX().height(3f).pad(4f);
 	}
 	

@@ -2,10 +2,10 @@ package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
@@ -57,7 +57,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 		title().setAlignment(Align.center);
 		getTitleTable().row();
 		getTitleTable().add(new Image("white"))
-		.growX().height(3f).pad(4f).get().setColor(Colors.get("accent"));
+		.growX().height(3f).pad(4f).get().setColor(Palette.accent);
 
 		content().clearChildren();
 		content().remove();

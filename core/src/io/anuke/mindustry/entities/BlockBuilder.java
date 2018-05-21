@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Build;
 import io.anuke.mindustry.world.Tile;
@@ -122,7 +123,7 @@ public interface BlockBuilder {
     default void drawBuilding(Unit unit){
         Tile tile = world.tile(getCurrentRequest().x, getCurrentRequest().y);
 
-        Draw.color(unit.distanceTo(tile) > placeDistance || getCurrentRequest().remove ? "break" : "accent");
+        Draw.color(unit.distanceTo(tile) > placeDistance || getCurrentRequest().remove ? Palette.remove : Palette.accent);
         float focusLen = 3.8f + Mathf.absin(Timers.time(), 1.1f, 0.6f);
         float px = unit.x + Angles.trnsx(unit.rotation, focusLen);
         float py = unit.y + Angles.trnsy(unit.rotation, focusLen);

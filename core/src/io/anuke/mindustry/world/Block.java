@@ -30,7 +30,9 @@ import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.EnumSet;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class Block extends BaseBlock {
 	private static int lastid;
@@ -165,8 +167,12 @@ public class Block extends BaseBlock {
 		return true;
 	}
 
+	public boolean synthetic(){
+		return update || destructible || solid;
+	}
+
 	public void drawConfigure(Tile tile){
-		Draw.color("accent");
+		Draw.color(Palette.accent);
 		Lines.stroke(1f);
 		Lines.square(tile.drawx(), tile.drawy(),
 				tile.block().size * tilesize / 2f + 1f);
@@ -215,10 +221,12 @@ public class Block extends BaseBlock {
 		return (hasItems && itemCapacity > 0);
 	}
 
+	/**Called after the block is destroyed and removed.*/
 	public void afterDestroyed(Tile tile, TileEntity entity){
 
 	}
-	
+
+	/**Called when the block is destroyed.*/
 	public void onDestroyed(Tile tile){
 		float x = tile.worldx(), y = tile.worldy();
 		float explosiveness = baseExplosiveness;
@@ -301,6 +309,7 @@ public class Block extends BaseBlock {
 		}
 	}
 
+	/**Returns the icon used for displaying this block in the place menu*/
 	public TextureRegion[] getIcon(){
 	    if(icon == null) {
             if (Draw.hasRegion(name + "-icon")) {
@@ -315,10 +324,12 @@ public class Block extends BaseBlock {
 		return icon;
 	}
 
+	/**Returns a list of regions that represent this block in the world*/
 	public TextureRegion[] getBlockIcon(){
 	    return getIcon();
     }
 
+    /**Returns a list of icon regions that have been cropped to 8x8*/
 	public TextureRegion[] getCompactIcon(){
 	    if(compactIcon == null) {
             compactIcon = new TextureRegion[getIcon().length];
@@ -329,6 +340,7 @@ public class Block extends BaseBlock {
 		return compactIcon;
 	}
 
+	/**Crops a regionto 8x8*/
 	protected TextureRegion iconRegion(TextureRegion src){
         TextureRegion region = new TextureRegion(src);
         region.setRegionWidth(8);
@@ -391,7 +403,7 @@ public class Block extends BaseBlock {
 	}
 	
 	public static Block getByID(int id){
-	    if(id < 0){
+	    if(id < 0){ //offset negative values by 256, as they are a product of byte overflow
 	        id += 256;
         }
         if(id >= blocks.size || id < 0){

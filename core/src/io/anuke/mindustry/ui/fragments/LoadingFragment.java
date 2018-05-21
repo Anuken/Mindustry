@@ -1,6 +1,6 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.graphics.Colors;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
@@ -17,14 +17,14 @@ public class LoadingFragment implements Fragment {
        table = new table("loadDim"){{
             touchable(Touchable.enabled);
             get().addImage("white").growX()
-                    .height(3f).pad(4f).growX().get().setColor(Colors.get("accent"));
+                    .height(3f).pad(4f).growX().get().setColor(Palette.accent);
             row();
             new label("$text.loading"){{
                 get().setName("namelabel");
             }}.pad(10);
             row();
             get().addImage("white").growX()
-                    .height(3f).pad(4f).growX().get().setColor(Colors.get("accent"));
+                    .height(3f).pad(4f).growX().get().setColor(Palette.accent);
         }}.end().get();
 
         table.setVisible(false);

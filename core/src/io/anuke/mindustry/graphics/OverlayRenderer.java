@@ -106,7 +106,7 @@ public class OverlayRenderer {
                     }
 
                     if (Inputs.keyDown("block_info") && target.block().isAccessible()) {
-                        Draw.color(Colors.get("accent"));
+                        Draw.color(Palette.accent);
                         Lines.crect(target.drawx(), target.drawy(), target.block().size * tilesize, target.block().size * tilesize);
                         Draw.color();
                     }
@@ -138,14 +138,14 @@ public class OverlayRenderer {
                 Vector2 v = Graphics.world(input.getMouseX(), input.getMouseY());
                 float size = 8;
                 Draw.rect(player.inventory.getItem().item.region, v.x, v.y, size, size);
-                Draw.color("accent");
+                Draw.color(Palette.accent);
                 Lines.circle(v.x, v.y, 6 + Mathf.absin(Timers.time(), 5f, 1f));
                 Draw.reset();
 
                 Tile tile = world.tileWorld(v.x, v.y);
                 if (tile != null) tile = tile.target();
                 if (tile != null && tile.block().acceptStack(player.inventory.getItem().item, player.inventory.getItem().amount, tile, player) > 0) {
-                    Draw.color("place");
+                    Draw.color(Palette.place);
                     Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 1 + Mathf.absin(Timers.time(), 5f, 1f));
                     Draw.color();
                 }

@@ -1,9 +1,8 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.utils.Align;
-
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.KeybindDialog;
 
@@ -16,7 +15,7 @@ public class ControlsDialog extends KeybindDialog{
 		title().setAlignment(Align.center);
 		getTitleTable().row();
 		getTitleTable().add(new Image("white"))
-		.growX().height(3f).pad(4f).get().setColor(Colors.get("accent"));
+		.growX().height(3f).pad(4f).get().setColor(Palette.accent);
 	}
 	
 	@Override

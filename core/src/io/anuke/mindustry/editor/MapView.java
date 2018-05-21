@@ -1,6 +1,5 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -12,8 +11,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.ui.GridImage;
-import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
@@ -256,7 +255,7 @@ public class MapView extends Element implements GestureListener{
 			float sx = v1.x, sy = v1.y;
 			Vector2 v2 = unproject(lastx, lasty).add(x, y);
 
-            Draw.color("accent");
+            Draw.color(Palette.accent);
 			Lines.stroke(Unit.dp.scl(1f * zoom));
             Lines.poly(brushPolygons[index], sx, sy, 3f*zoom);
             Lines.poly(brushPolygons[index], v2.x, v2.y, 3f*zoom);
@@ -265,7 +264,7 @@ public class MapView extends Element implements GestureListener{
 		if(tool.edit && (!mobile || drawing)){
             GridPoint2 p = project(mousex, mousey);
             Vector2 v = unproject(p.x, p.y).add(x, y);
-            Draw.color("accent");
+            Draw.color(Palette.accent);
             Lines.stroke(Unit.dp.scl(1f * zoom));
             Lines.poly(brushPolygons[index], v.x, v.y, 3f*zoom);
         }
@@ -274,7 +273,7 @@ public class MapView extends Element implements GestureListener{
 		
 		if(pop) ScissorStack.popScissors();
 		
-		Draw.color(Colors.get("accent"));
+		Draw.color(Palette.accent);
 		Lines.stroke(Unit.dp.scl(3f));
 		Lines.rect(x, y, width, height);
 		Draw.reset();

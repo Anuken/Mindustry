@@ -4,10 +4,11 @@ import com.badlogic.gdx.math.Rectangle;
 import io.anuke.mindustry.entities.ItemTransfer;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.BlockFlag;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.EnumSet;
@@ -50,7 +51,7 @@ public class CoreBlock extends StorageBlock {
 
     @Override
     public void drawSelect(Tile tile){
-        Draw.color("accent");
+        Draw.color(Palette.accent);
         Lines.dashCircle(tile.drawx(), tile.drawy(), supplyRadius);
         Draw.color();
     }

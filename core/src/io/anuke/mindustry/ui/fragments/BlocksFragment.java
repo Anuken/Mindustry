@@ -1,13 +1,13 @@
 package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
@@ -298,7 +298,7 @@ public class BlocksFragment implements Fragment{
 				int current = stack.amount;
 				String text = Mathf.clamp(current, 0, stack.amount) + "/" + stack.amount;
 				
-				reqlabel.setColor(current < stack.amount ? Colors.get("missingitems") : Color.WHITE);
+				reqlabel.setColor(current < stack.amount ? Palette.missingitems : Color.WHITE);
 				
 				reqlabel.setText(text);
 			});

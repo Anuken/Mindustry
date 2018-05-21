@@ -1,7 +1,6 @@
 package io.anuke.mindustry.entities.effect;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.bullets.TurretBullets;
@@ -11,6 +10,7 @@ import io.anuke.mindustry.entities.Bullet;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
@@ -33,7 +33,7 @@ public class DamageArea{
 		for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i ++){
 			int branches = 5 + Mathf.clamp((int)(power/30), 1, 20);
 			Timers.run(i*2f + Mathf.random(4f), () -> {
-				Lightning.create(Team.none, Fx.none, Colors.get("power"), 3, x, y, Mathf.random(360f), branches + Mathf.range(2));
+				Lightning.create(Team.none, Fx.none, Palette.power, 3, x, y, Mathf.random(360f), branches + Mathf.range(2));
 			});
 		}
 

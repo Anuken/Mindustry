@@ -1,11 +1,11 @@
 package io.anuke.mindustry.world.blocks.types.power;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntArray;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.graphics.Layer;
+import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Settings;
@@ -13,21 +13,20 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Shapes;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Strings;
+import io.anuke.ucore.util.Translator;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.threads;
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class PowerDistributor extends PowerBlock{
 	public static final float thicknessScl = 0.7f;
     public static final float flashScl = 0.12f;
-	public static final Color laserFrom = Color.valueOf("e3e3e3");
-	public static final Color laserTo = Color.valueOf("ffe7a8");
 
 	//last distribution block placed
 	private static int lastPlaced = -1;
@@ -98,7 +97,7 @@ public class PowerDistributor extends PowerBlock{
 	public void drawSelect(Tile tile){
 		super.drawSelect(tile);
 
-        Draw.color("power");
+        Draw.color(Palette.power);
         Lines.stroke(1f);
 
         Lines.poly(Edges.getPixelPolygon(laserRange), tile.worldx() - tilesize/2, tile.worldy() - tilesize/2, tilesize);
@@ -110,7 +109,7 @@ public class PowerDistributor extends PowerBlock{
 	public void drawConfigure(Tile tile){
 		DistributorEntity entity = tile.entity();
 
-		Draw.color("accent");
+		Draw.color(Palette.accent);
 
 		Lines.stroke(1f);
 		Lines.square(tile.drawx(), tile.drawy(),
@@ -120,7 +119,7 @@ public class PowerDistributor extends PowerBlock{
 
 		Lines.poly(Edges.getPixelPolygon(laserRange), tile.worldx() - tilesize/2, tile.worldy() - tilesize/2, tilesize);
 
-		Draw.color("power");
+		Draw.color(Palette.power);
 
 		for(int x = (int)(tile.x - laserRange); x <= tile.x + laserRange; x ++){
 			for(int y = (int)(tile.y - laserRange); y <= tile.y + laserRange; y ++){
@@ -129,7 +128,7 @@ public class PowerDistributor extends PowerBlock{
 
 				if(link != tile && linkValid(tile, link)){
 					boolean linked = linked(tile, link);
-					Draw.color(linked ? "place" : "breakInvalid");
+					Draw.color(linked ? Palette.place : Palette.breakInvalid);
 
 					Lines.square(link.drawx(), link.drawy(),
 							link.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Timers.time(), 4f, 1f)));
@@ -147,7 +146,7 @@ public class PowerDistributor extends PowerBlock{
 
 	@Override
 	public void drawPlace(int x, int y, int rotation, boolean valid){
-        Draw.color("place");
+        Draw.color(Palette.place);
         Lines.stroke(1f);
 
         Lines.poly(Edges.getPixelPolygon(laserRange), x * tilesize - tilesize/2, y * tilesize - tilesize/2, tilesize);
@@ -163,7 +162,7 @@ public class PowerDistributor extends PowerBlock{
 
 		entity.laserColor = Mathf.lerpDelta(entity.laserColor, Mathf.clamp(entity.powerRecieved/(powerSpeed)), 0.08f);
 
-		Draw.color(laserFrom, laserTo, entity.laserColor * (1f-flashScl) + Mathf.sin(Timers.time(), 1.7f, flashScl));
+		Draw.color(Palette.powerLaserFrom, Palette.powerLaserTo, entity.laserColor * (1f-flashScl) + Mathf.sin(Timers.time(), 1.7f, flashScl));
 
 		for(int i = 0; i < entity.links.size; i ++){
 			Tile link = world.tile(entity.links.get(i));

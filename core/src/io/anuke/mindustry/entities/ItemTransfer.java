@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.TimedEntity;
@@ -65,7 +66,7 @@ public class ItemTransfer extends TimedEntity{
     public void draw() {
         float length = fslope()*6f;
         float angle = current.set(x, y).sub(from).angle();
-        Draw.color("accent");
+        Draw.color(Palette.accent);
         Lines.stroke(fslope()*2f);
 
         Lines.circle(x, y, fslope()*2f);
