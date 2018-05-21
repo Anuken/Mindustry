@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.storage;
 
 import com.badlogic.gdx.math.Rectangle;
+import io.anuke.mindustry.entities.ItemTransfer;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.net.Net;
@@ -83,7 +84,7 @@ public class CoreBlock extends StorageBlock {
                     if(tile.entity.items.items[i] > 0 && unit.acceptsAmmo(item)){
                         tile.entity.items.items[i] --;
                         unit.addAmmo(item);
-                        //new ItemTransferEffect(item, tile.drawx(), tile.drawy(), unit).add();
+                        ItemTransfer.create(item, tile.drawx(), tile.drawy(), unit, () -> {});
                         return;
                     }
                 }

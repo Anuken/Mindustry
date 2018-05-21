@@ -15,7 +15,6 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.BooleanProvider;
-import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.event.HandCursorListener;
 import io.anuke.ucore.scene.event.Touchable;
@@ -24,7 +23,6 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.tilesize;
 
 public class BlockInventoryFragment implements Fragment {
     private Table table;
@@ -122,10 +120,9 @@ public class BlockInventoryFragment implements Fragment {
                         int sent = Mathf.clamp(amount/3, 1, 8);
                         int per = Math.min(amount/sent, 5);
                         int[] soFar = {amount};
-                        Vector2 v = image.localToStageCoordinates(new Vector2(image.getWidth() / 2f, image.getHeight() / 2f));
                         for(int j = 0; j < sent; j ++){
                             boolean all = j == sent-1;
-                            Timers.run(j*5, () -> move(item, tile, () -> {
+                            Timers.run(j*5, () -> ItemTransfer.create(item, tile.drawx(), tile.drawy(), player, () -> {
                                 player.inventory.addItem(item, all ? soFar[0] : per);
                                 soFar[0] -= per;
                             }));
@@ -139,14 +136,10 @@ public class BlockInventoryFragment implements Fragment {
         }
 
         if(row == 0){
-            table.add("[LIGHT_GRAY]<empty>");
+            table.addImage("icon-items-none").color(Color.LIGHT_GRAY);
         }
 
         updateTablePosition();
-    }
-
-    private void move(Item item, Tile tile, Callable c){
-        ItemTransfer.create(item, tile.drawx(), tile.drawy(), input.player, c);
     }
 
     private String round(float f){
@@ -159,9 +152,9 @@ public class BlockInventoryFragment implements Fragment {
     }
 
     private void updateTablePosition(){
-        Vector2 v =  Graphics.screen(tile.drawx() + tile.block().size*tilesize/2f, tile.drawy() + tile.block().size*tilesize/2f);
+        Vector2 v =  Graphics.screen(tile.drawx(), tile.drawy());
         table.pack();
-        table.setPosition(v.x, v.y, Align.topLeft);
+        table.setPosition(v.x, v.y, Align.center);
     }
 
 }
