@@ -1,7 +1,6 @@
 package io.anuke.mindustry.editor;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
@@ -208,7 +207,7 @@ public class MapView extends Element implements GestureListener{
 		float sclwidth = size * zoom;
 		float sclheight = size * zoom * ratio;
 		float px = ((float)x / editor.getMap().width()) * sclwidth + offsetx*zoom - sclwidth/2 + getWidth()/2;
-		float py = (float)((float)(y) / editor.getMap().height()) * sclheight
+		float py = ((float)(y) / editor.getMap().height()) * sclheight
 				+ offsety*zoom - sclheight/2 + getHeight()/2;
 		return vec.set(px, py);
 	}
@@ -226,9 +225,7 @@ public class MapView extends Element implements GestureListener{
 		
 		batch.flush();
 		boolean pop = ScissorStack.pushScissors(rect.set(x, y, width, height));
-		
-		//batch.draw(editor.texture(), centerx - sclwidth/2, centery - sclheight/2, sclwidth, sclheight);
-		//TODO actually render the map here?
+
 		Draw.color(Color.LIGHT_GRAY);
 		Lines.stroke(-2f);
 		Lines.rect(centerx - sclwidth/2 - 1, centery - sclheight/2 - 1, sclwidth + 2, sclheight + 2);
@@ -250,6 +247,9 @@ public class MapView extends Element implements GestureListener{
             }
         }
 
+        //todo is it really math.max?
+        float scaling = zoom * Math.min(width, height) / Math.max(editor.getMap().width(), editor.getMap().height());
+
 		if(tool == EditorTool.line && drawing){
 			Vector2 v1 = unproject(startx, starty).add(x, y);
 			float sx = v1.x, sy = v1.y;
@@ -257,8 +257,8 @@ public class MapView extends Element implements GestureListener{
 
             Draw.color(Palette.accent);
 			Lines.stroke(Unit.dp.scl(1f * zoom));
-            Lines.poly(brushPolygons[index], sx, sy, 3f*zoom);
-            Lines.poly(brushPolygons[index], v2.x, v2.y, 3f*zoom);
+            Lines.poly(brushPolygons[index], sx, sy, scaling);
+            Lines.poly(brushPolygons[index], v2.x, v2.y, scaling);
 		}
 
 		if(tool.edit && (!mobile || drawing)){
@@ -266,7 +266,7 @@ public class MapView extends Element implements GestureListener{
             Vector2 v = unproject(p.x, p.y).add(x, y);
             Draw.color(Palette.accent);
             Lines.stroke(Unit.dp.scl(1f * zoom));
-            Lines.poly(brushPolygons[index], v.x, v.y, 3f*zoom);
+            Lines.poly(brushPolygons[index], v.x, v.y, scaling);
         }
 
 		batch.flush();

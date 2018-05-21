@@ -20,16 +20,17 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Pixmaps;
+import io.anuke.ucore.input.Input;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.build;
+import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.utils.UIUtils;
 import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.input.Input;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
@@ -137,6 +138,13 @@ public class MapEditorDialog extends Dialog{
 			}else{
 				hide();
 			}
+			menu.hide();
+		});
+
+		menu.content().row();
+
+		menu.content().addImageTextButton("$text.editor.resize", "icon-resize", isize, () -> {
+			resizeDialog.show();
 			menu.hide();
 		});
 
@@ -298,6 +306,7 @@ public class MapEditorDialog extends Dialog{
 				margin(0);
 				Table tools = new Table();
 				tools.top();
+				atop();
 
 				ButtonGroup<ImageButton> group = new ButtonGroup<>();
 				int i = 1;
@@ -352,17 +361,18 @@ public class MapEditorDialog extends Dialog{
 					if(i++ % 2 == 1) tools.row();
 				}
 
-				add(tools).growY().top().padBottom(-6);
+				add(tools).top().padBottom(-6);
 
 				row();
 
-				new table(){{
-					Slider slider = new Slider(0, MapEditor.brushSizes.length-1, 1, true);
+				new table("button"){{
+					Slider slider = new Slider(0, MapEditor.brushSizes.length-1, 1, false);
 					slider.moved(f -> editor.setBrushSize(MapEditor.brushSizes[(int)(float)f]));
+					new label("brush");
 					//new label(() -> Bundles.format("text.editor.brushsize", MapEditor.brushSizes[(int)slider.getValue()])).left();
 					row();
-					add(slider).growX().padTop(4f);
-				}}.growX().padBottom(10).end();
+					add(slider).width(100f).padTop(4f);
+				}}.padBottom(10).padTop(5).top().end();
 				
 			}}.left().growY().end();
 

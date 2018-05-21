@@ -1,6 +1,5 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.io.MapTileData;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.function.BiConsumer;
@@ -9,7 +8,7 @@ import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 
 public class MapResizeDialog extends FloatingDialog{
-	int[] validMapSizes = {128, 256, 512};
+	int[] validMapSizes = {200, 300, 400, 500};
 	int width, height;
 	
 	public MapResizeDialog(MapEditor editor, BiConsumer<Integer, Integer> cons){
@@ -47,10 +46,6 @@ public class MapResizeDialog extends FloatingDialog{
 				
 				table.row();
 			}
-			
-			content().label(() -> 
-				width + height > 512 ? "$text.editor.resizebig" : ""
-			).get().setAlignment(Align.center, Align.center);
 			content().row();
 			content().add(table);
 			

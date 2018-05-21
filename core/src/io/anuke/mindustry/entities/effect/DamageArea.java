@@ -42,13 +42,12 @@ public class DamageArea{
 				Bullet.create(TurretBullets.fireball, null, Team.none, x, y, Mathf.random(360f)));
 		}
 
-		float e = explosiveness;
 		int waves = Mathf.clamp((int)(explosiveness / 4), 0, 30);
 
 		for(int i = 0; i < waves; i ++){
 			int f = i;
 			Timers.run(i*2f, () -> {
-				DamageArea.damage(x, y, Mathf.clamp(radius + e, 0, 50f) * ((f + 1f)/waves), e/2f);
+				DamageArea.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f)/waves), explosiveness/2f);
 				Effects.effect(ExplosionFx.blockExplosionSmoke, x + Mathf.range(radius), y + Mathf.range(radius));
 			});
 		}
