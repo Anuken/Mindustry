@@ -81,6 +81,19 @@ public class MapTileData {
         return tile;
     }
 
+    /**Reads and returns the next tile data.*/
+    public TileDataMarker readAt(int x, int y, TileDataMarker marker){
+        position(x, y);
+        marker.read(buffer);
+        return marker;
+    }
+
+    /**Reads and returns a specific byte position.*/
+    public byte readAt(int x, int y, int offset){
+        buffer.position((x + width * y) * TILE_SIZE + offset);
+        return buffer.get();
+    }
+
     /**Writes and returns the next tile data.*/
     public void write(){
         tile.write(buffer);

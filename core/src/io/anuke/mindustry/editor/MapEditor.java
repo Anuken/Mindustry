@@ -16,6 +16,7 @@ public class MapEditor{
 	public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15};
 	
 	private MapTileData map;
+	private TileDataMarker multiWriter;
 	private MapRenderer renderer = new MapRenderer(this);
 
 	private int brushSize = 1;
@@ -35,6 +36,7 @@ public class MapEditor{
 		drawBlock = Blocks.stone;
 		this.map = map;
 		this.brushSize = 1;
+		multiWriter = map.new TileDataMarker();
 		renderer.resize(map.width(), map.height());
 	}
 
@@ -76,7 +78,8 @@ public class MapEditor{
 		}
 
 		TileDataMarker writer = map.readAt(x, y);
-		if(drawBlock instanceof Floor){
+		boolean isfloor = drawBlock instanceof Floor;
+		if(isfloor){
 			writer.floor = (byte)drawBlock.id;
 		}else{
 			writer.wall = (byte)drawBlock.id;
@@ -142,6 +145,15 @@ public class MapEditor{
 						if (x + rx < 0 || y + ry < 0 || x + rx >= map.width() || y + ry >= map.height()) {
 							continue;
 						}
+
+						if(!isfloor) {
+							byte link = map.readAt(x + rx, y + ry, 2);
+
+							if (link != 0) {
+								removeLinked(x + rx - (Bits.getLeftByte(link) - 8), y + ry - (Bits.getRightByte(link) - 8));
+							}
+						}
+
 						write(x + rx, y + ry, writer, true);
 						renderer.updatePoint(x + rx, y + ry);
 					}
@@ -151,7 +163,7 @@ public class MapEditor{
 	}
 
 	private void removeLinked(int x, int y){
-		TileDataMarker marker = map.readAt(x, y);
+		TileDataMarker marker = map.readAt(x, y, multiWriter);
 		Block block = Block.getByID(marker.wall);
 
 		int offsetx = -(block.size-1)/2;
@@ -160,7 +172,7 @@ public class MapEditor{
 			for(int dy = 0; dy < block.size; dy ++){
 				int worldx = x + dx + offsetx, worldy = y + dy + offsety;
 				if(Mathf.inBounds(worldx, worldy, map.width(), map.height())){
-					map.readAt(worldx, worldy);
+					map.readAt(worldx, worldy, marker);
 					marker.link = 0;
 					marker.wall = 0;
 					marker.rotation = 0;
