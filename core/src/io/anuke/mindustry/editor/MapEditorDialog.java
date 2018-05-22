@@ -8,10 +8,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.io.MapIO;
-import io.anuke.mindustry.io.MapMeta;
-import io.anuke.mindustry.io.MapTileData;
-import io.anuke.mindustry.io.Platform;
+import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
@@ -38,6 +35,7 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 import java.io.DataInputStream;
+import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -68,8 +66,7 @@ public class MapEditorDialog extends Dialog{
 		saveFile = new FileChooser("$text.saveimage", false, file -> {
 			file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
 			FileHandle result = file;
-			ui.loadfrag.show();
-			Timers.run(3f, () -> {
+			ui.loadAnd(() -> {
 
 				try{
 					if(!editor.getTags().containsKey("name")){
@@ -80,13 +77,11 @@ public class MapEditorDialog extends Dialog{
 					ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
 					Log.err(e);
 				}
-				ui.loadfrag.hide();
 			});
 		});
 
 		openFile = new FileChooser("$text.loadimage", FileChooser.mapFilter, true, file -> {
-			ui.loadfrag.show();
-			Timers.run(3f, () -> {
+			ui.loadAnd(() -> {
 				try{
 					DataInputStream stream = new DataInputStream(file.read());
 
@@ -99,28 +94,24 @@ public class MapEditorDialog extends Dialog{
 					ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
 					Log.err(e);
 				}
-				ui.loadfrag.hide();
 			});
 		});
 
 		saveImage = new FileChooser("$text.saveimage", false, file -> {
 			file = file.parent().child(file.nameWithoutExtension() + ".png");
 			FileHandle result = file;
-			ui.loadfrag.show();
-			Timers.run(3f, () -> {
+			ui.loadAnd(() -> {
 				try{
 					Pixmaps.write(MapIO.generatePixmap(editor.getMap()), result);
 				}catch (Exception e){
 					ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
 					Log.err(e);
 				}
-				ui.loadfrag.hide();
 			});
 		});
 
 		openImage = new FileChooser("$text.loadimage", FileChooser.pngFilter, true, file -> {
-			ui.loadfrag.show();
-			Timers.run(3f, () -> {
+			ui.loadAnd(() -> {
 				try{
 					MapTileData data = MapIO.readPixmap(new Pixmap(file));
 
@@ -130,7 +121,6 @@ public class MapEditorDialog extends Dialog{
 					ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
 					Log.err(e);
 				}
-				ui.loadfrag.hide();
 			});
 		});
 
@@ -155,11 +145,23 @@ public class MapEditorDialog extends Dialog{
 			t.row();
 
 			t.addImageTextButton("$text.editor.savemap", "icon-save-map", isize, () -> {
-				saveFile.show();
+				saveDialog.show();
 				menu.hide();
 			});
 
 			t.addImageTextButton("$text.editor.loadmap", "icon-load-map", isize, () -> {
+				loadDialog.show();
+				menu.hide();
+			});
+
+			t.row();
+
+			t.addImageTextButton("$text.editor.importmap", "icon-save-map", isize, () -> {
+				saveFile.show();
+				menu.hide();
+			});
+
+			t.addImageTextButton("$text.editor.exportmap", "icon-load-map", isize, () -> {
 				openFile.show();
 				menu.hide();
 			});
@@ -189,65 +191,41 @@ public class MapEditorDialog extends Dialog{
 			}
 			menu.hide();
 		}).size(470f, 60f);
-
-
-		/*
-		loadDialog = new MapLoadDialog(map -> {
-			saveDialog.setFieldText(map.name);
-			ui.loadfrag.show();
-			
-			Timers.run(3f, () -> {
-				Map copy = new Map();
-				copy.name = map.name;
-				copy.id = -1;
-				copy.pixmap = Pixmaps.copy(map.pixmap);
-				copy.texture = new Texture(copy.pixmap);
-				copy.oreGen = map.oreGen;
-				editor.beginEdit(copy);
-				ui.loadfrag.hide();
-				view.clearStack();
-			});
-		});*/
 		
 		resizeDialog = new MapResizeDialog(editor, (x, y) -> {
 			if(!(editor.getMap().width() == x && editor.getMap().height() == y)){
-				ui.loadfrag.show();
-				Timers.run(10f, () -> {
+				ui.loadAnd(() -> {
 					editor.resize(x, y);
 					view.clearStack();
-					ui.loadfrag.hide();
 				});
 			}
 		});
 
-		/*
-		saveDialog = new MapSaveDialog(name -> {
-			ui.loadfrag.show();
-			if(verifyMap()){
-				saved = true;
-				String before = editor.getMap().name;
-				editor.getMap().name = name;
-				Timers.run(10f, () -> {
-					world.maps().saveAndReload(editor.getMap(), editor.pixmap());
-					loadDialog.rebuild();
-					ui.loadfrag.hide();
+		loadDialog = new MapLoadDialog(map -> {
+			saveDialog.setFieldText(map.name);
+
+			ui.loadAnd(() -> {
+				try (DataInputStream stream = new DataInputStream(map.stream.get())){
+					MapMeta meta = MapIO.readMapMeta(stream);
+					MapTileData data = MapIO.readTileData(stream, meta, false);
+
+					editor.beginEdit(data, meta.tags);
 					view.clearStack();
+				}catch (IOException e){
+					ui.showError(Bundles.format("text.editor.errormapload", Strings.parseException(e, false)));
+					Log.err(e);
+				}
+			});
+		});
 
-					if(!name.equals(before)) {
-						Map map = new Map();
-						map.name = editor.getMap().name;
-						map.oreGen = editor.getMap().oreGen;
-						map.pixmap = Pixmaps.copy(editor.getMap().pixmap);
-						map.texture = new Texture(map.pixmap);
-						map.custom = true;
-						editor.beginEdit(map);
-					}
-				});
 
-			}else{
-				ui.loadfrag.hide();
-			}
-		});*/
+		saveDialog = new MapSaveDialog(name -> {
+			ui.loadAnd(() -> {
+				saved = true;
+				world.maps().saveAndReload(editor.getTags().get("name", name), editor.getMap(), editor.getTags());
+				loadDialog.rebuild();
+			});
+		});
 		
 		setFillParent(true);
 		

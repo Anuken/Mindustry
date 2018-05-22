@@ -51,7 +51,7 @@ public class DebugFragment implements Fragment {
            abottom().aleft();
 
            new table("pane"){{
-               defaults().fillX();
+               defaults().fillX().width(100f);
 
                new label("Debug");
                row();

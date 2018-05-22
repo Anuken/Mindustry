@@ -16,6 +16,7 @@ import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.graphics.Draw;
@@ -209,6 +210,14 @@ public class UI extends SceneModule{
 
 			return lastLocale;
 		}
+	}
+
+	public void loadAnd(Callable call){
+		loadfrag.show();
+		Timers.run(6f, () -> {
+			call.run();
+			loadfrag.hide();
+		});
 	}
 
 	public void showTextInput(String title, String text, String def, TextFieldFilter filter, Consumer<String> confirmed){
