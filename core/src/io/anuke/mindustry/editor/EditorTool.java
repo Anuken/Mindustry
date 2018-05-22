@@ -39,7 +39,6 @@ public enum EditorTool{
 		}
 		
 		public void touched(MapEditor editor, int x, int y){
-			//TODO select floor/block properly instead of using this method!
 			boolean floor = editor.getDrawBlock() instanceof Floor;
 
 			TileDataMarker writer = editor.getMap().readAt(x, y);
