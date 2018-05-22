@@ -67,7 +67,7 @@ public enum EditorTool{
 					else
 						writer.wall = (byte)editor.getDrawBlock().id;
 
-					editor.getMap().write(px, py, writer);
+					editor.write(px, py, writer, false);
 					editor.renderer().updatePoint(px, py);
 
 					if(px > 0 && !set.contains(asInt(px - 1, py, width))) points.add(asInt(px - 1, py, width));

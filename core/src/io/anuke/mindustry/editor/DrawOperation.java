@@ -1,38 +1,68 @@
 package io.anuke.mindustry.editor;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.io.MapTileData;
-
-import java.nio.ByteBuffer;
+import io.anuke.mindustry.io.MapTileData.TileDataMarker;
+import io.anuke.ucore.util.Bits;
 
 public class DrawOperation implements Disposable{
 	/**Data to apply operation to.*/
-	MapTileData data;
-	/**Format:
-	 *  position (int)
-	 *  packed data FROM (use TileDataMarker's read/write methods)
-	 *  packed data TO (use TileDataMarker's read/write methods)
-	 */
-	ByteBuffer operation;
-	//TileDataMarker writer = new TileDataMarker();
+	private MapTileData data;
+	/**List of per-tile operations that occurred.*/
+	private Array<TileOperation> operations = new Array<>();
+	/**Checks for duplicate operations, useful for brushes.*/
+	private IntSet checks = new IntSet();
 
 	public DrawOperation(MapTileData data){
 		this.data = data;
 	}
 
-	public void set(ByteBuffer operation) {
-		this.operation = operation;
+	public boolean isEmpty(){
+		return operations.size == 0;
 	}
 
-	public void undo() {
-		//TODO implement
+	public boolean checkDuplicate(short x, short y){
+		int i = Bits.packInt(x, y);
+		if(checks.contains(i)) return true;
+
+		checks.add(i);
+		return false;
 	}
 
-	public void redo() {
-		//TODO implement
+	public void addOperation(TileOperation op){
+		operations.add(op);
+	}
+
+	public void undo(MapEditor editor) {
+		for(int i = operations.size - 1; i >= 0; i --){
+			TileOperation op = operations.get(i);
+			data.write(op.x, op.y, op.from);
+			editor.renderer().updatePoint(op.x, op.y);
+		}
+	}
+
+	public void redo(MapEditor editor) {
+		for(TileOperation op : operations){
+			data.write(op.x, op.y, op.to);
+			editor.renderer().updatePoint(op.x, op.y);
+		}
 	}
 
 	@Override
 	public void dispose() {}
 
+	public static class TileOperation{
+		public short x, y;
+		public TileDataMarker from;
+		public TileDataMarker to;
+
+		public TileOperation(short x, short y, TileDataMarker from, TileDataMarker to) {
+			this.x = x;
+			this.y = y;
+			this.from = from;
+			this.to = to;
+		}
+	}
 }

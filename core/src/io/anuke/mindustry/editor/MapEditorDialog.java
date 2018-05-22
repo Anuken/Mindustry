@@ -420,6 +420,14 @@ public class MapEditorDialog extends Dialog{
 			}
 		}
 
+		if(Inputs.keyTap(Input.R)){
+			editor.setDrawRotation((editor.getDrawRotation() + 1)%4);
+		}
+
+		if(Inputs.keyTap(Input.E)){
+			editor.setDrawRotation(Mathf.mod((editor.getDrawRotation() + 1), 4));
+		}
+
 		//ctrl keys (undo, redo, save)
 		if(UIUtils.ctrl()){
 			if(Inputs.keyTap(Input.Z)){
@@ -432,14 +440,6 @@ public class MapEditorDialog extends Dialog{
 
 			if(Inputs.keyTap(Input.S)){
 				saveDialog.save();
-			}
-
-			if(Inputs.keyTap(Input.R)){
-				editor.setDrawRotation((editor.getDrawRotation() + 1)%4);
-			}
-
-			if(Inputs.keyTap(Input.E)){
-				editor.setDrawRotation(Mathf.mod((editor.getDrawRotation() + 1), 4));
 			}
 
 			if(Inputs.keyTap(Input.G)){

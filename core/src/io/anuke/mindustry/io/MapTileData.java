@@ -69,6 +69,12 @@ public class MapTileData {
     }
 
     /**Reads and returns the next tile data.*/
+    public TileDataMarker read(TileDataMarker marker){
+        marker.read(buffer);
+        return marker;
+    }
+
+    /**Reads and returns the next tile data.*/
     public TileDataMarker readAt(int x, int y){
         position(x, y);
         tile.read(buffer);

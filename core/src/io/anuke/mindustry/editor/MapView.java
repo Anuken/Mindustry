@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.editor.DrawOperation.TileOperation;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.ui.GridImage;
 import io.anuke.ucore.core.Core;
@@ -77,14 +78,22 @@ public class MapView extends Element implements GestureListener{
 
 	public void undo(){
 		if(stack.canUndo()){
-			stack.undo();
+			stack.undo(editor);
 		}
 	}
 
 	public void redo(){
 		if(stack.canRedo()){
-			stack.redo();
+			stack.redo(editor);
 		}
+	}
+
+	public void addTileOp(TileOperation t){
+		op.addOperation(t);
+	}
+
+	public boolean checkForDuplicates(short x, short y){
+		return op.checkDuplicate(x, y);
 	}
 
 	public MapView(MapEditor editor){
@@ -113,6 +122,8 @@ public class MapView extends Element implements GestureListener{
 				if(pointer != 0){
 					return false;
 				}
+
+				op = new DrawOperation(editor.getMap());
 
 				updated = false;
 
@@ -146,6 +157,14 @@ public class MapView extends Element implements GestureListener{
 					}
 					updated = true;
 				}
+
+				if(op != null && updated){
+					if(!op.isEmpty()){
+						stack.add(op);
+					}
+					op = null;
+				}
+
 			}
 			
 			@Override

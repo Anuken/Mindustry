@@ -1,6 +1,8 @@
 package io.anuke.mindustry.editor;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.editor.DrawOperation.TileOperation;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapTileData;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
@@ -111,7 +113,7 @@ public class MapEditor{
 							writer.team = (byte)drawTeam.ordinal();
 							writer.floor = floor;
 							writer.link = Bits.packByte((byte) (dx + offsetx + 8), (byte) (dy + offsety + 8));
-							map.write(worldx, worldy, writer);
+							write(worldx, worldy, writer, false);
 
 							renderer.updatePoint(worldx, worldy);
 						}
@@ -129,7 +131,7 @@ public class MapEditor{
 			writer.team = (byte)drawTeam.ordinal();
 			writer.rotation = 0;
 			writer.link = 0;
-			map.write(x, y, writer);
+			write(x, y, writer, false);
 
 			renderer.updatePoint(x, y);
 		}else{
@@ -140,7 +142,7 @@ public class MapEditor{
 						if (x + rx < 0 || y + ry < 0 || x + rx >= map.width() || y + ry >= map.height()) {
 							continue;
 						}
-						map.write(x + rx, y + ry, writer);
+						write(x + rx, y + ry, writer, true);
 						renderer.updatePoint(x + rx, y + ry);
 					}
 				}
@@ -163,13 +165,34 @@ public class MapEditor{
 					marker.wall = 0;
 					marker.rotation = 0;
 					marker.team = 0;
-					map.write(worldx, worldy, marker);
+					write(worldx, worldy, marker, false);
 
 					if(worldx == x && worldy == y){
 						renderer.updatePoint(worldx, worldy);
 					}
 				}
 			}
+		}
+	}
+
+	public void write(int x, int y, TileDataMarker writer, boolean checkDupes){
+		boolean dupe = checkDupes && Vars.ui.editor.getView().checkForDuplicates((short) x, (short) y);
+		TileDataMarker prev = null;
+
+		if(!dupe) {
+			prev = map.new TileDataMarker();
+			map.position(x, y);
+			map.read(prev);
+		}
+
+		map.write(x, y, writer);
+
+		if(!dupe) {
+			TileDataMarker current = map.new TileDataMarker();
+			map.position(x, y);
+			map.read(current);
+
+			Vars.ui.editor.getView().addTileOp(new TileOperation((short) x, (short) y, prev, current));
 		}
 	}
 
