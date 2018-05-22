@@ -12,7 +12,6 @@ import io.anuke.mindustry.core.ThreadHandler;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.Saves.SaveSlot;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Bundles;
@@ -116,10 +115,10 @@ public class IOSLauncher extends IOSApplication.Delegate {
     }
 
     void openURL(NSURL url){
-        FileHandle file = Gdx.files.absolute(getDocumentsDirectory()).child(url.getLastPathComponent());
-        Gdx.files.absolute(url.getPath()).copyTo(file);
 
-        Timers.runTask(30f, () -> {
+        Gdx.app.postRunnable(() -> {
+            FileHandle file = Gdx.files.absolute(getDocumentsDirectory()).child(url.getLastPathComponent());
+            Gdx.files.absolute(url.getPath()).copyTo(file);
 
             if(file.extension().equalsIgnoreCase("mins")){ //open save
 
