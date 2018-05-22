@@ -1,13 +1,12 @@
 package io.anuke.mindustry.editor;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.io.MapTileData;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.ucore.util.Bits;
 
-public class DrawOperation implements Disposable{
+public class DrawOperation{
 	/**Data to apply operation to.*/
 	private MapTileData data;
 	/**List of per-tile operations that occurred.*/
@@ -49,9 +48,6 @@ public class DrawOperation implements Disposable{
 			editor.renderer().updatePoint(op.x, op.y);
 		}
 	}
-
-	@Override
-	public void dispose() {}
 
 	public static class TileOperation{
 		public short x, y;

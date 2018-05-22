@@ -12,9 +12,6 @@ public class OperationStack{
 	}
 	
 	public void clear(){
-		for(DrawOperation op : stack){
-			op.dispose();
-		}
 		stack.clear();
 		index = 0;
 	}
