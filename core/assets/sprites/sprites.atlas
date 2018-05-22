@@ -2477,6 +2477,14 @@ button
   orig: 24, 40
   offset: 0, 0
   index: -1
+textarea
+  rotate: false
+  xy: 207, 130
+  size: 24, 40
+  split: 10, 10, 9, 14
+  orig: 24, 40
+  offset: 0, 0
+  index: -1
 button-down
   rotate: false
   xy: 721, 448

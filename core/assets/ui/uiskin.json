@@ -94,7 +94,9 @@ io.anuke.ucore.scene.ui.Label$LabelStyle: {
 },
 io.anuke.ucore.scene.ui.TextField$TextFieldStyle: {
 	default: {font: default-font-chat, fontColor: white, disabledFontColor: grey, selection: selection, background: button, cursor: cursor, messageFont: default-font, messageFontColor: grey }
+	textarea: {font: default-font-chat, fontColor: white, disabledFontColor: grey, selection: selection, background: textarea, cursor: cursor, messageFont: default-font, messageFontColor: grey }
 }
+
 io.anuke.ucore.scene.ui.CheckBox$CheckBoxStyle: {
 	default: {checkboxOn: check-on, checkboxOff: check-off, checkboxOnOver: check-on-over, checkboxOver: check-over, font: default-font, fontColor: white, disabledFontColor: grey }
 }

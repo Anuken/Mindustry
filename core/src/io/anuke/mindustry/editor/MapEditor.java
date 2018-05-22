@@ -1,5 +1,6 @@
 package io.anuke.mindustry.editor;
 
+import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.editor.DrawOperation.TileOperation;
@@ -16,6 +17,7 @@ public class MapEditor{
 	public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15};
 	
 	private MapTileData map;
+	private ObjectMap<String, String> tags = new ObjectMap<>();
 	private TileDataMarker multiWriter;
 	private MapRenderer renderer = new MapRenderer(this);
 
@@ -31,11 +33,17 @@ public class MapEditor{
 	public MapTileData getMap(){
 		return map;
 	}
-	
-	public void beginEdit(MapTileData map){
-		drawBlock = Blocks.stone;
+
+	public ObjectMap<String, String> getTags() {
+		return tags;
+	}
+
+	public void beginEdit(MapTileData map, ObjectMap<String, String> tags){
 		this.map = map;
 		this.brushSize = 1;
+		this.tags = tags;
+
+		drawBlock = Blocks.stone;
 		multiWriter = map.new TileDataMarker();
 		renderer.resize(map.width(), map.height());
 	}
