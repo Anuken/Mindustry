@@ -17,6 +17,7 @@ public class MapEditor{
 	private MapRenderer renderer = new MapRenderer(this);
 
 	private int brushSize = 1;
+	private int rotation;
 	private Block drawBlock = Blocks.stone;
 	private Team drawTeam = Team.none;
 	
@@ -33,6 +34,14 @@ public class MapEditor{
 		this.map = map;
 		this.brushSize = 1;
 		renderer.resize(map.width(), map.height());
+	}
+
+	public int getDrawRotation(){
+		return rotation;
+	}
+
+	public void setDrawRotation(int rotation){
+		this.rotation = rotation;
 	}
 
 	public void setDrawTeam(Team team){
@@ -73,6 +82,10 @@ public class MapEditor{
 
 		if(drawBlock.hasEntity()){
 			writer.team = (byte)drawTeam.ordinal();
+		}
+
+		if(drawBlock.rotate){
+			writer.rotation = (byte)rotation;
 		}
 
 		if(drawBlock.isMultiblock()){

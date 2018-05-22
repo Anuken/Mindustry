@@ -4,6 +4,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.Team;
@@ -32,6 +33,7 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.utils.UIUtils;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 import java.io.DataInputStream;
@@ -313,9 +315,11 @@ public class MapEditorDialog extends Dialog{
 
 				tools.defaults().size(60f, 64f).padBottom(-5.1f);
 
-				tools.addImageButton("icon-back", 16*2, () -> hide());
+				//tools.addImageButton("icon-back", 16*2, () -> hide());
 
 				tools.addImageButton("icon-menu-large", 16*2f, menu::show);
+
+				ImageButton grid = tools.addImageButton("icon-grid", "toggle", 16*2f, () -> view.setGrid(!view.isGrid())).get();
 
 				tools.row();
 
@@ -323,8 +327,6 @@ public class MapEditorDialog extends Dialog{
 				ImageButton redo = tools.addImageButton("icon-redo", 16*2f, () -> view.redo()).get();
 
 				tools.row();
-
-				ImageButton grid = tools.addImageButton("icon-grid", "toggle", 16*2f, () -> view.setGrid(!view.isGrid())).get();
 
 				undo.setDisabled(() -> !view.getStack().canUndo());
 				redo.setDisabled(() -> !view.getStack().canRedo());
@@ -343,8 +345,22 @@ public class MapEditorDialog extends Dialog{
 						button.setChecked(true);
 
 					tools.add(button).padBottom(-5.1f);
-					if(i++ % 2 == 1) tools.row();
+					if(i++ % 2 == 0) tools.row();
 				}
+
+				ImageButton rotate = tools.addImageButton("icon-arrow-16", 16*2f, () -> editor.setDrawRotation((editor.getDrawRotation() + 1)%4)).get();
+				rotate.getImage().update(() ->{
+					rotate.getImage().setRotation(editor.getDrawRotation() * 90);
+					rotate.getImage().setOrigin(Align.center);
+				});
+
+				tools.row();
+
+				tools.table("button", t -> {
+					t.add("$text.editor.teams");
+				}).colspan(2).height(40).width(120f);
+
+				tools.row();
 
 				ButtonGroup<ImageButton> teamgroup = new ButtonGroup<>();
 
@@ -418,6 +434,14 @@ public class MapEditorDialog extends Dialog{
 				saveDialog.save();
 			}
 
+			if(Inputs.keyTap(Input.R)){
+				editor.setDrawRotation((editor.getDrawRotation() + 1)%4);
+			}
+
+			if(Inputs.keyTap(Input.E)){
+				editor.setDrawRotation(Mathf.mod((editor.getDrawRotation() + 1), 4));
+			}
+
 			if(Inputs.keyTap(Input.G)){
 				view.setGrid(!view.isGrid());
 			}
@@ -454,6 +478,7 @@ public class MapEditorDialog extends Dialog{
 			button.getImageCell().setActor(stack);
 			button.addChild(stack);
 			button.getImage().remove();
+			button.update(() -> button.setChecked(editor.getDrawBlock() == block));
 			group.add(button);
 			content.add(button).pad(4f).size(53f, 58f);
 			

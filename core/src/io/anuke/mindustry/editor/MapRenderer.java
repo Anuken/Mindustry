@@ -106,9 +106,16 @@ public class MapRenderer {
         TextureRegion wregion = (wall == Blocks.air || wall == Blocks.blockpart) ? Draw.region("clear"): wall.getBlockIcon()[wall.getBlockIcon().length-1];
 
         region = wregion;
-        mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize + chunksize*chunksize, region,
-                wx * tilesize + offsetx*tilesize, wy * tilesize  + offsety * tilesize,
-                region.getRegionWidth(), region.getRegionHeight());
+
+        if(wall.rotate){
+            mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize + chunksize*chunksize, region,
+                    wx * tilesize + offsetx*tilesize, wy * tilesize  + offsety * tilesize,
+                    region.getRegionWidth(), region.getRegionHeight(), data.rotation*90 - 90);
+        }else{
+            mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize + chunksize*chunksize, region,
+                    wx * tilesize + offsetx*tilesize, wy * tilesize  + offsety * tilesize,
+                    region.getRegionWidth(), region.getRegionHeight());
+        }
 
         if(wall.update || wall.destructible) {
             mesh.setColor(Team.values()[data.team].color);
