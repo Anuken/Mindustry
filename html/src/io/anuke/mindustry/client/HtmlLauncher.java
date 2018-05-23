@@ -16,7 +16,7 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.shared.DateTimeFormat;
 import com.google.gwt.user.client.ui.*;
 import io.anuke.mindustry.Mindustry;
-import io.anuke.mindustry.io.Platform;
+import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Settings;
 

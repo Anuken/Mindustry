@@ -35,6 +35,7 @@ public class PlayerListFragment implements Fragment{
     public void build(Group parent){
         new table(){{
             new table("pane"){{
+                touchable(Touchable.enabled);
                 margin(14f);
                 new label(() -> Bundles.format(playerGroup.size() == 1 ? "text.players.single" :
                         "text.players", playerGroup.size()));

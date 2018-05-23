@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.Base64Coder;
 import io.anuke.kryonet.DefaultThreadImpl;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
-import io.anuke.mindustry.io.Platform;
+import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.util.OS;

@@ -9,7 +9,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.editor.MapEditorDialog;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.InputHandler;
-import io.anuke.mindustry.io.Platform;
+import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.ucore.core.Core;
@@ -173,9 +173,9 @@ public class UI extends SceneModule{
 		admins = new AdminsDialog();
 		traces = new TraceDialog();
 		localplayers = new LocalPlayerDialog();
-		
+
 		build.begin(scene);
-		
+
 		Group group = Core.scene.getRoot();
 
 		backfrag.build(group);

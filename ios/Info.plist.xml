@@ -12,12 +12,16 @@
     <string>${app.id}</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
+    <key>MinimumOSVersion</key>
+    <string>9.0.0</string>
     <key>CFBundleName</key>
     <string>${app.name}</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
     <string>${app.version}</string>
+    <key>CFBundleIconName</key>
+    <string>AppIcon</string>
     <key>CFBundleSignature</key>
     <string>????</string>
     <key>CFBundleVersion</key>
@@ -28,6 +32,10 @@
     <false/>
     <key>UIStatusBarHidden</key>
     <true/>
+    <key>UIRequiresFullScreen</key>
+    <true/>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Mindustry</string>
     <key>UIDeviceFamily</key>
     <array>
         <integer>1</integer>
@@ -43,16 +51,60 @@
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
-    <key>CFBundleIcons</key>
+
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeIconFiles</key>
+            <array>
+                <string>icon-72.png</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>Mindustry Map File</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSHandlerRank</key>
+            <string>Owner</string>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>public.png</string>
+                <string>io.anuke.mindustry.savefile</string>
+            </array>
+        </dict>
+    </array>
+
+    <key>UTExportedTypeDeclarations</key>
+    <array>
+        <dict>
+            <key>UTTypeConformsTo</key>
+            <array>
+                <string>public.data</string>
+            </array>
+            <key>UTTypeDescription</key>
+            <string>Mindustry Save File</string>
+            <key>UTTypeIdentifier</key>
+            <string>io.anuke.mindustry.savefile</string>
+            <key>UTTypeTagSpecification</key>
+            <dict>
+                <key>public.filename-extension</key>
+                <string>mins</string>
+                <key>public.mime-type</key>
+                <string>mindustry/mins</string>
+            </dict>
+        </dict>
+    </array>
+    <!--<key>CFBundleIcons</key>
     <dict>
         <key>CFBundlePrimaryIcon</key>
         <dict>
             <key>CFBundleIconFiles</key>
             <array>
-                <string>Icon</string>
-                <string>Icon-72</string>
+                <string>icon</string>
+                <string>icon-72</string>
+                <string>icon-120</string>
+                <string>icon-152</string>
             </array>
         </dict>
-    </dict>
+    </dict>-->
 </dict>
 </plist>
