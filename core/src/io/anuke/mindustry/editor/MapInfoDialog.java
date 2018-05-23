@@ -47,7 +47,7 @@ public class MapInfoDialog extends FloatingDialog{
 
         description = content().addArea(tags.get("description", ""), "textarea", text -> {
             tags.put("description", text);
-        }).size(400f, 130f).get();
+        }).size(400f, 140f).get();
 
         content().row();
 
