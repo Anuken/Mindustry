@@ -15,7 +15,6 @@ import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.io.Map;
-import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.io.Saves;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;

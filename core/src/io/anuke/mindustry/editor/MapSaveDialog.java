@@ -1,7 +1,7 @@
 package io.anuke.mindustry.editor;
 
 import io.anuke.mindustry.io.Map;
-import io.anuke.mindustry.io.Platform;
+import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.scene.ui.TextButton;
