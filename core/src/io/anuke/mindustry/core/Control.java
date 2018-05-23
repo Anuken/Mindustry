@@ -269,6 +269,7 @@ public class Control extends Module{
 	public void dispose(){
 		Platform.instance.onGameExit();
 		Net.dispose();
+		ui.editor.dispose();
 	}
 
 	@Override

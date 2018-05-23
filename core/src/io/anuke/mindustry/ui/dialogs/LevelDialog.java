@@ -5,9 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.io.Map;
-import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
@@ -26,15 +24,12 @@ public class LevelDialog extends FloatingDialog{
 		getTitleTable().getCell(title()).growX().center();
 		getTitleTable().center();
 		addCloseButton();
-		setup();
-	}
-	
-	public void reload(){
-		content().clear();
-		setup();
+		shown(this::setup);
 	}
 	
 	void setup(){
+		content().clear();
+
 		Table maps = new Table();
 		pane = new ScrollPane(maps);
 		pane.setFadeScrollBars(false);
@@ -126,13 +121,6 @@ public class LevelDialog extends FloatingDialog{
 		}
 		
 		content().add(pane).uniformX();
-		
-		shown(()->{
-			//this is necessary for some reason?
-			Timers.run(2f, ()->{
-				Core.scene.setScrollFocus(pane);
-			});
-		});
 	}
 
 	private void displayGameModeHelp() {

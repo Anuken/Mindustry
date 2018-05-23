@@ -3,18 +3,12 @@ package io.anuke.mindustry.io;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.*;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.function.Supplier;
 import io.anuke.ucore.util.Log;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -32,6 +26,8 @@ public class Maps implements Disposable{
 	private Array<Map> returnArray = new Array<>();
 	/**Used for writing a list of custom map names on GWT.*/
 	private Json json = new Json();
+	/**Used for storing a list of custom map names for GWT.*/
+	private Array<String> customMapNames;
 
 	public Maps(){
 
@@ -80,7 +76,33 @@ public class Maps implements Disposable{
 	}
 
 	public void saveAndReload(String name, MapTileData data, ObjectMap<String, String> tags){
-	    FileHandle file = customMapDirectory.child(name + "." + mapExtension);
+		try {
+			if (!gwt) {
+				FileHandle file = customMapDirectory.child(name + "." + mapExtension);
+				MapIO.writeMap(file.write(false), tags, data);
+			} else {
+				ByteArrayOutputStream stream = new ByteArrayOutputStream();
+				MapIO.writeMap(stream, tags, data);
+				Settings.putString("map-data-" + name, new String(Base64Coder.encode(stream.toByteArray())));
+				if(!customMapNames.contains(name, false)){
+					customMapNames.add(name);
+					Settings.putString("custom-maps", json.toJson(customMapNames));
+				}
+				Settings.save();
+			}
+
+			if(maps.containsKey(name)){
+				maps.get(name).texture.dispose();
+			}
+
+			Map map = new Map(name, new MapMeta(version, tags, data.width(), data.height(), null), true, getStreamFor(name));
+			if (!headless){
+				map.texture = new Texture(MapIO.generatePixmap(data));
+			}
+			maps.put(name, map);
+		}catch (IOException e){
+			throw new RuntimeException(e);
+		}
 	    //todo implement
 	}
 
@@ -88,7 +110,9 @@ public class Maps implements Disposable{
 	    try(DataInputStream ds = new DataInputStream(supplier.get())) {
             MapMeta meta = MapIO.readMapMeta(ds);
             Map map = new Map(name, meta, custom, supplier);
-            if (!headless) map.texture = new Texture(MapIO.generatePixmap(MapIO.readTileData(ds, meta, true)));
+            if (!headless){
+            	map.texture = new Texture(MapIO.generatePixmap(MapIO.readTileData(ds, meta, true)));
+			}
 
             maps.put(map.name, map);
             allMaps.add(map);
@@ -109,12 +133,12 @@ public class Maps implements Disposable{
             }
 
         }else{
-            Array<String> maps = json.fromJson(Array.class, Settings.getString("custom-maps", "{}"));
+            customMapNames = json.fromJson(Array.class, Settings.getString("custom-maps", "{}"));
 
-            for(String name : maps){
+            for(String name : customMapNames){
                 try{
                     String data = Settings.getString("map-data-" + name);
-                    byte[] bytes = data.getBytes();
+                    byte[] bytes = Base64Coder.decode(data);
                     loadMap(name, () -> new ByteArrayInputStream(bytes), true);
                 }catch (Exception e){
                     Log.err("Failed to load custom map '{0}'!", name);
@@ -123,6 +147,17 @@ public class Maps implements Disposable{
             }
         }
     }
+
+    /**Returns an input stream supplier for a given map name.*/
+    private Supplier<InputStream> getStreamFor(String name){
+		if(!gwt){
+			return customMapDirectory.child(name + "." + mapExtension)::read;
+		}else{
+			String data = Settings.getString("map-data-" + name);
+			byte[] bytes = Base64Coder.decode(data);
+			return () -> new ByteArrayInputStream(bytes);
+		}
+	}
 
 	@Override
 	public void dispose() {

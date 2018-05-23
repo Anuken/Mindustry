@@ -1,7 +1,6 @@
 package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -15,10 +14,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.ColorMapper.BlockPair;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.customMapDirectory;
 import static io.anuke.mindustry.Vars.mapExtension;
@@ -80,10 +76,10 @@ public class MapIO {
         return data;
     }
 
-    public static void writeMap(FileHandle file, ObjectMap<String, String> tags, MapTileData data) throws IOException{
+    public static void writeMap(OutputStream stream, ObjectMap<String, String> tags, MapTileData data) throws IOException{
         MapMeta meta = new MapMeta(version, tags, data.width(), data.height(), defaultBlockMap);
 
-        DataOutputStream ds = new DataOutputStream(file.write(false));
+        DataOutputStream ds = new DataOutputStream(stream);
 
         writeMapMeta(ds, meta);
         ds.write(data.toArray());

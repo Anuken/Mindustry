@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.Team;
@@ -18,6 +19,7 @@ import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.graphics.Pixmaps;
 import io.anuke.ucore.input.Input;
 import io.anuke.ucore.scene.Element;
@@ -39,7 +41,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class MapEditorDialog extends Dialog{
+public class MapEditorDialog extends Dialog implements Disposable{
 	private MapEditor editor;
 	private MapView view;
 	private MapInfoDialog infoDialog;
@@ -72,7 +74,7 @@ public class MapEditorDialog extends Dialog{
 					if(!editor.getTags().containsKey("name")){
 						tags.put("name", result.nameWithoutExtension());
 					}
-					MapIO.writeMap(result, editor.getTags(), editor.getMap());
+					MapIO.writeMap(result.write(false), editor.getTags(), editor.getMap());
 				}catch (Exception e){
 					ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
 					Log.err(e);
@@ -128,9 +130,30 @@ public class MapEditorDialog extends Dialog{
 		menu.addCloseButton();
 
 		float isize = 16*2f;
+		float swidth = 180f;
 
 		menu.content().table(t -> {
-			t.defaults().size(230f, 60f).padBottom(5).padRight(5).padLeft(5);
+			t.defaults().size(swidth, 60f).padBottom(5).padRight(5).padLeft(5);
+
+			t.addImageTextButton("$text.editor.savemap", "icon-floppy-16", isize, () -> {
+				String name = editor.getTags().get("name", "");
+
+				if(name.isEmpty()){
+					ui.showError("$text.editor.save.noname");
+				}else{
+					Map map = world.maps().getByName(name);
+					if(map != null && !map.custom){
+						ui.showError("$text.editor.save.overwrite");
+					}else{
+						world.maps().saveAndReload(name, editor.getMap(), editor.getTags());
+						ui.showInfoFade("$text.editor.saved");
+					}
+				}
+
+				menu.hide();
+			}).size(swidth*2f + 10, 60f).colspan(2);
+
+			t.row();
 
 			t.addImageTextButton("$text.editor.mapinfo", "icon-pencil", isize, () -> {
 				infoDialog.show();
@@ -144,39 +167,17 @@ public class MapEditorDialog extends Dialog{
 
 			t.row();
 
-			t.addImageTextButton("$text.editor.savemap", "icon-save-map", isize, () -> {
-				saveDialog.show();
-				menu.hide();
-			});
+			t.addImageTextButton("$text.editor.import", "icon-load-map", isize, () ->
+				createDialog("$text.editor.import",
+						"$text.editor.importmap", "$text.editor.importmap.description", "icon-load-map", (Listenable)loadDialog::show,
+						"$text.editor.importfile", "$text.editor.importfile.description", "icon-file", (Listenable)openFile::show,
+						"$text.editor.importimage", "$text.editor.importimage.description", "icon-file-image", (Listenable)openImage::show));
 
-			t.addImageTextButton("$text.editor.loadmap", "icon-load-map", isize, () -> {
-				loadDialog.show();
-				menu.hide();
-			});
-
-			t.row();
-
-			t.addImageTextButton("$text.editor.importmap", "icon-save-map", isize, () -> {
-				saveFile.show();
-				menu.hide();
-			});
-
-			t.addImageTextButton("$text.editor.exportmap", "icon-load-map", isize, () -> {
-				openFile.show();
-				menu.hide();
-			});
+			t.addImageTextButton("$text.editor.export", "icon-save-map", isize, () -> createDialog("$text.editor.export",
+					"$text.editor.exportfile", "$text.editor.exportfile.description", "icon-file", (Listenable)saveFile::show,
+					"$text.editor.exportimage", "$text.editor.exportimage.description", "icon-file-image", (Listenable)saveImage::show));
 
 			t.row();
-
-			t.addImageTextButton("$text.editor.saveimage", "icon-save-map", isize, () -> {
-				saveImage.show();
-				menu.hide();
-			});
-
-			t.addImageTextButton("$text.editor.loadimage", "icon-load-map", isize, () -> {
-				openImage.show();
-				menu.hide();
-			});
 
 			t.row();
 		});
@@ -190,7 +191,7 @@ public class MapEditorDialog extends Dialog{
 				hide();
 			}
 			menu.hide();
-		}).size(470f, 60f);
+		}).padTop(-5).size(swidth*2f + 10, 60f);
 		
 		resizeDialog = new MapResizeDialog(editor, (x, y) -> {
 			if(!(editor.getMap().width() == x && editor.getMap().height() == y)){
@@ -259,10 +260,61 @@ public class MapEditorDialog extends Dialog{
 		hidden(() -> Platform.instance.updateRPC());
 	}
 
+	/**Argument format:
+	 * 0) button name
+	 * 1) description
+	 * 2) icon name
+	 * 3) listener
+	 */
+	private FloatingDialog createDialog(String title, Object... arguments){
+		FloatingDialog dialog = new FloatingDialog(title);
+
+		float h = 90f;
+
+		dialog.content().defaults().size(360f, h).padBottom(5).padRight(5).padLeft(5);
+
+		for(int i = 0; i < arguments.length; i += 4){
+			String name = (String)arguments[i];
+			String description = (String)arguments[i + 1];
+			String iconname = (String)arguments[i + 2];
+			Listenable listenable = (Listenable)arguments[i + 3];
+
+			TextButton button = dialog.content().addButton(name, () -> {
+				listenable.listen();
+				dialog.hide();
+				menu.hide();
+			}).left().get();
+
+			button.clearChildren();
+			button.table("button", t -> {
+				t.addImage(iconname).size(16*3);
+				t.update(() -> t.background(button.getClickListener().isOver() ? "button-over" : "button"));
+			}).padLeft(-10).padBottom(-3).size(h);
+			button.table(t -> {
+				t.add(name).growX().wrap();
+				t.row();
+				t.add(description).color(Color.GRAY).growX().wrap();
+			}).growX().padLeft(8);
+
+			button.row();
+
+			dialog.content().row();
+		}
+
+		dialog.addCloseButton();
+		dialog.show();
+
+		return dialog;
+	}
 
 	@Override
 	public Dialog show(){
 		return super.show(Core.scene, Actions.sequence(Actions.alpha(0f), Actions.scaleTo(1f, 1f),  Actions.fadeIn(0.3f)));
+	}
+
+	@Override
+	public void dispose(){
+		editor.renderer().dispose();
 	}
 
 	public MapView getView() {
@@ -449,12 +501,9 @@ public class MapEditorDialog extends Dialog{
 		int i = 0;
 		
 		for(Block block : Block.getAllBlocks()){
-			TextureRegion[] regions;
-			try {
-				regions = block.getCompactIcon();
-			}catch (Exception e){
-				continue;
-			}
+			TextureRegion[] regions = block.getCompactIcon();
+
+			if(regions.length == 0) continue;
 
 			Stack stack = new Stack();
 

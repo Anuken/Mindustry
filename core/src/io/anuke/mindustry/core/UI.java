@@ -23,11 +23,13 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.Skin;
+import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.TextField.TextFieldFilter;
 import io.anuke.ucore.scene.ui.TooltipManager;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 
@@ -237,6 +239,14 @@ public class UI extends SceneModule{
 
 	public void showTextInput(String title, String text, String def, Consumer<String> confirmed){
 		showTextInput(title, text, def, (field, c) -> true, confirmed);
+	}
+
+	public void showInfoFade(String info){
+		Table table = new Table();
+		table.setFillParent(true);
+		table.actions(Actions.fadeOut(7f, Interpolation.fade), Actions.removeActor());
+		table.top().add(info).padTop(8);
+		Core.scene.add(table);
 	}
 
 	public void showInfo(String info){

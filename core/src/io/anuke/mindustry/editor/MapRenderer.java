@@ -1,29 +1,99 @@
 package io.anuke.mindustry.editor;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.PixmapPacker;
+import com.badlogic.gdx.graphics.g2d.PixmapPacker.Page;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
-import io.anuke.mindustry.content.blocks.Blocks;
+import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.IndexedRenderer;
+import io.anuke.ucore.util.Log;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class MapRenderer {
+public class MapRenderer implements Disposable{
     private static final int chunksize = 64;
     private IndexedRenderer[][] chunks;
     private IntSet updates = new IntSet();
     private MapEditor editor;
     private int width, height;
 
+    private ObjectMap<Block, TextureRegion> blockIcons = new ObjectMap<>();
+    private ObjectMap<String, TextureRegion> regions = new ObjectMap<>();
+    private Texture blockTexture;
+
     public MapRenderer(MapEditor editor){
         this.editor = editor;
+        createTexture();
+    }
+
+
+    private void createTexture(){
+        Timers.mark();
+
+        PixmapPacker packer = new PixmapPacker(512, 512, Format.RGBA8888, 2, true);
+        Pixmap pixmap = Core.atlas.getPixmapOf("blank");
+
+        for(Block block : Block.getAllBlocks()){
+            TextureRegion[] regions = block.getBlockIcon();
+            if(regions.length > 0){
+                Pixmap result = new Pixmap(regions[0].getRegionWidth(), regions[0].getRegionHeight(), Format.RGBA8888);
+                for(TextureRegion region : regions){
+                    result.drawPixmap(pixmap, 0, 0, region.getRegionX(), region.getRegionY(), region.getRegionWidth(), region.getRegionHeight());
+                }
+
+                packer.pack(block.name, result);
+                result.dispose();
+            }
+        }
+
+        add("clear", packer);
+        add("block-border", packer);
+
+        if(packer.getPages().size > 1){
+            throw new IllegalArgumentException("Pixmap packer may not have more than 1 page!");
+        }
+
+        Page page = packer.getPages().first();
+        page.updateTexture(TextureFilter.Nearest, TextureFilter.Nearest, false);
+        blockTexture = page.getTexture();
+        for(String str : page.getRects().keys()){
+            if(Block.getByName(str) == null) continue;
+            Rectangle rect = page.getRects().get(str);
+            blockIcons.put(Block.getByName(str),
+                    new TextureRegion(blockTexture,
+                            (int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height));
+        }
+
+        packer.dispose();
+
+        Core.atlas.disposePixmaps();
+
+        Log.info("Packing elapsed: {0}", Timers.elapsed());
+    }
+
+    private void add(String name, PixmapPacker packer){
+        TextureRegion region = Draw.region(name);
+        Pixmap result = new Pixmap(region.getRegionWidth(), region.getRegionHeight(), Format.RGBA8888);
+        result.drawPixmap(Core.atlas.getPixmapOf(region), 0, 0, region.getRegionX(), region.getRegionY(), region.getRegionWidth(), region.getRegionHeight());
+        Rectangle rect = packer.pack(name, result);
+        result.dispose();
+        Gdx.app.postRunnable(() -> regions.put(name, new TextureRegion(packer.getPages().first().getTexture(), (int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height)));
     }
 
     public void resize(int width, int height){
@@ -68,7 +138,7 @@ public class MapRenderer {
                         th / (height * tilesize), 1f);
                 mesh.setProjectionMatrix(Core.batch.getProjectionMatrix());
 
-                mesh.render(Core.atlas.getTextures().first());
+                mesh.render(blockTexture);
             }
         }
 
@@ -98,14 +168,10 @@ public class MapRenderer {
         int offsetx = -(wall.size-1)/2;
         int offsety = -(wall.size-1)/2;
 
-        String fregion = Draw.hasRegion(floor.name) ? floor.name : (Draw.hasRegion(floor.name + "1") ? (floor.name + "1") : "clear");
-
-        TextureRegion region = Draw.region(fregion);
+        TextureRegion region = blockIcons.get(floor, regions.get("clear"));
         mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize, region, wx * tilesize, wy * tilesize, 8, 8);
 
-        TextureRegion wregion = (wall == Blocks.air || wall == Blocks.blockpart) ? Draw.region("clear"): wall.getBlockIcon()[wall.getBlockIcon().length-1];
-
-        region = wregion;
+        region = blockIcons.get(wall, regions.get("clear"));
 
         if(wall.rotate){
             mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize + chunksize*chunksize, region,
@@ -119,15 +185,25 @@ public class MapRenderer {
 
         if(wall.update || wall.destructible) {
             mesh.setColor(Team.values()[data.team].color);
-            region = Draw.region("block-border");
+            region = regions.get("block-border");
         }else{
-            region = Draw.region("clear");
+            region = regions.get("clear");
         }
 
         mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize + chunksize*chunksize*2, region,
                 wx * tilesize + offsetx*tilesize, wy * tilesize  + offsety * tilesize,
                 region.getRegionWidth(), region.getRegionHeight());
         mesh.setColor(Color.WHITE);
+    }
 
+    @Override
+    public void dispose() {
+        for(int x = 0; x < chunks.length; x ++){
+            for(int y = 0; y < chunks[0].length; y ++){
+                if(chunks[x][y] != null){
+                    chunks[x][y].dispose();
+                }
+            }
+        }
     }
 }

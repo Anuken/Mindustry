@@ -316,9 +316,11 @@ public class Block extends BaseBlock {
                 icon = new TextureRegion[]{Draw.region(name + "-icon")};
             } else if (Draw.hasRegion(name + "1")) {
                 icon = new TextureRegion[]{Draw.region(name + "1")};
-            } else {
+            } else if (Draw.hasRegion(name)){
                 icon = new TextureRegion[]{Draw.region(name)};
-            }
+            }else{
+            	icon = new TextureRegion[]{};
+			}
         }
 
 		return icon;
