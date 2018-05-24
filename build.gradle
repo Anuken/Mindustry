@@ -27,7 +27,7 @@ allprojects {
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'
         aiVersion = '1.8.1'
-        uCoreVersion = '55f0d90'
+        uCoreVersion = 'd5af97f93813d8767423521b1fcc5a5e0f7241d9'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -152,7 +152,7 @@ project(":core") {
     apply plugin: "java"
 
     dependencies {
-        boolean comp = false//System.properties["release"] == null || System.properties["release"] == "false"
+        boolean comp = System.properties["release"] == null || System.properties["release"] == "false"
 
         if(!comp){
             println("NOTICE: Compiling release build.")
