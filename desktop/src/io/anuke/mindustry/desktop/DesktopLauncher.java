@@ -1,5 +1,6 @@
 package io.anuke.mindustry.desktop;
 
+import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import io.anuke.kryonet.KryoClient;
@@ -7,6 +8,7 @@ import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.net.Net;
+import io.anuke.ucore.util.OS;
 
 public class DesktopLauncher {
 	
@@ -17,6 +19,9 @@ public class DesktopLauncher {
 		config.setMaximized(true);
 		config.setWindowedMode(960, 540);
 		config.setWindowIcon("sprites/icon.png");
+		if(OS.isMac) {
+            config.setPreferencesConfig(System.getProperty("DocumentsDirectory"), FileType.Absolute);
+        }
 
         Platform.instance = new DesktopPlatform(arg);
 
