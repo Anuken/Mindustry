@@ -91,7 +91,7 @@ public class Control extends Module{
 				"ping.mp3", "tesla.mp3", "waveend.mp3", "railgun.mp3", "blast.mp3", "bang2.mp3");
 
 		Sounds.setFalloff(9000f);
-		Sounds.setPlayer(((sound, volume) -> {
+		Sounds.setPlayer((sound, volume) -> {
 			long time = TimeUtils.millis();
 			long value = soundMap.get(sound, 0L);
 
@@ -99,7 +99,7 @@ public class Control extends Module{
 				threads.run(() -> sound.play(volume));
 				soundMap.put(sound, time);
 			}
-		}));
+		});
 
         Musics.load("1.mp3", "2.mp3", "3.mp3", "4.mp3", "5.mp3", "6.mp3");
 
