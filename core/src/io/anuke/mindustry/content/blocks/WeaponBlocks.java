@@ -5,7 +5,6 @@ import io.anuke.mindustry.content.AmmoTypes;
 import io.anuke.mindustry.content.fx.ShootFx;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.defense.Turret;
 import io.anuke.mindustry.world.blocks.types.defense.turrets.*;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Angles;
@@ -15,14 +14,14 @@ import io.anuke.ucore.util.Strings;
 public class WeaponBlocks{
 	public static Block
 	
-	doubleturret = new DoubleTurret("doubleturret"){{
+	duo = new DoubleTurret("duo"){{
 		ammoTypes = new AmmoType[]{AmmoTypes.basicIron};
 		reload = 25f;
 		restitution = 0.03f;
 		ammoUseEffect = ShootFx.shellEjectSmall;
 	}},
 	
-	gatlingturret = new BurstTurret("gatlingturret") {{
+	scatter = new BurstTurret("scatter") {{
 		ammoTypes = new AmmoType[]{AmmoTypes.basicIron};
 		ammoPerShot = 1;
 		shots = 3;
@@ -33,7 +32,7 @@ public class WeaponBlocks{
 		ammoUseEffect = ShootFx.shellEjectSmall;
 	}},
 	
-	flameturret = new LiquidTurret("flameturret"){{
+	scorch = new LiquidTurret("scorch"){{
 		ammoTypes = new AmmoType[]{AmmoTypes.basicFlame};
 		recoil = 0f;
 		reload = 5f;
@@ -44,19 +43,28 @@ public class WeaponBlocks{
 			Draw.rect(entity.target != null ? name + "-shoot" : name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
 		};
 	}},
-	
-	railgunturret = new ItemTurret("railgunturret"){{
-		range = 100f;
-		ammoTypes = new AmmoType[]{AmmoTypes.basicSteel};
-		reload = 100f;
-		restitution = 0.03f;
-		ammoEjectBack = 2f;
-		recoil = 3f;
-		shootShake = 2f;
-		ammoUseEffect = ShootFx.shellEjectMedium;
+
+	wave = new LiquidTurret("wave") {{
+		ammoTypes = new AmmoType[]{AmmoTypes.water, AmmoTypes.lava, AmmoTypes.cryofluid, AmmoTypes.oil};
+		size = 2;
+		recoil = 0f;
+		reload = 4f;
+		inaccuracy = 5f;
+		shootCone = 50f;
+		shootEffect = ShootFx.shootLiquid;
+		range = 70f;
+
+		drawer = (tile, entity) -> {
+			Draw.rect(name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+
+			Draw.color(entity.liquids.liquid.color);
+			Draw.alpha(entity.liquids.amount/liquidCapacity);
+			Draw.rect(name + "-liquid", tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+			Draw.color();
+		};
 	}},
 	
-	flakturret = new ItemTurret("flakturret"){{
+	crux = new ItemTurret("crux"){{
 		size = 2;
 		range = 100f;
 		ammoTypes = new AmmoType[]{AmmoTypes.basicLeadFrag};
@@ -82,7 +90,7 @@ public class WeaponBlocks{
 		};
 	}},
 	
-	laserturret = new LaserTurret("laserturret"){{
+	lancer = new LaserTurret("lancer"){{
 		range = 70f;
 		chargeTime = 70f;
 		chargeMaxDelay = 30f;
@@ -98,7 +106,7 @@ public class WeaponBlocks{
 		heatColor = Color.RED;
 	}},
 	
-	teslaturret = new LaserTurret("teslaturret"){{
+	arc = new LaserTurret("arc"){{
 		shootType = AmmoTypes.lightning;
 		reload = 100f;
 		chargeTime = 70f;
@@ -110,41 +118,22 @@ public class WeaponBlocks{
 		chargeBeginEffect = ShootFx.lancerLaserChargeBegin;
 		heatColor = Color.RED;
 		recoil = 3f;
-	}},
-
-	liquidturret = new LiquidTurret("liquidturret") {{
-		ammoTypes = new AmmoType[]{AmmoTypes.water, AmmoTypes.lava, AmmoTypes.cryofluid, AmmoTypes.oil};
 		size = 2;
-		recoil = 0f;
-		reload = 4f;
-		inaccuracy = 5f;
-		shootCone = 50f;
-		shootEffect = ShootFx.shootLiquid;
-		range = 70f;
-
-		drawer = (tile, entity) -> {
-			Draw.rect(name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-
-			Draw.color(entity.liquids.liquid.color);
-			Draw.alpha(entity.liquids.amount/liquidCapacity);
-			Draw.rect(name + "-liquid", tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-			Draw.color();
-		};
-	}},
-	
-	chainturret = new Turret("chainturret"){{
-
-	}},
-	
-	titanturret = new Turret("titancannon"){{
-
 	}},
 
-	fornaxcannon = new PowerTurret("fornaxcannon") {
+	swarmer = new PowerTurret("missileturret") {{
+		size = 2;
+	}},
 
-	},
+	fuse = new PowerTurret("fornaxcannon") {{
+		size = 3;
+	}},
 
-	missileturret = new PowerTurret("missileturret") {
+	spectre = new PowerTurret("spectre") {{
+		size = 3;
+	}},
 
-	};
+	meltdown = new PowerTurret("meltdown") {{
+		size = 3;
+	}};
 }

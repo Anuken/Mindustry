@@ -188,8 +188,6 @@ public class NetClient extends Module {
             recent.put(packet.entity.id, packet.entity);
 
             packet.entity.add();
-
-            Log.info("Recieved entity {0}", packet.entity.id);
         });
 
         Net.handleClient(EntityDeathPacket.class, packet -> {
