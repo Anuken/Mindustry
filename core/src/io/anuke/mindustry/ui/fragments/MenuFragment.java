@@ -31,21 +31,15 @@ public class MenuFragment implements Fragment{
 
 					row();
 
-					add(new MenuButton("icon-editor", "$text.editor", () -> {
-						if(gwt){
-							ui.showInfo("$text.editor.web");
-						}else{
-							ui.editor.show();
-						}
-					}));
-					
-					add(new MenuButton("icon-tools", "$text.settings", ui.settings::show));
+					add(new MenuButton("icon-editor", "$text.editor", ui.editor::show));
+
+					add(new MenuButton("icon-menu", "$text.maps", ui.maps::show));
 
 					row();
 
 					add(new MenuButton("icon-info", "$text.about.button", ui.about::show));
 
-					add(new MenuButton("icon-menu", "$text.changelog.title", ui.changelog::show));
+					add(new MenuButton("icon-tools", "$text.settings", ui.settings::show));
 
 					row();
 					

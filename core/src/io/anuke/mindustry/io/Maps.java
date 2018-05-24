@@ -75,7 +75,8 @@ public class Maps implements Disposable{
 		loadCustomMaps();
 	}
 
-	public void saveAndReload(String name, MapTileData data, ObjectMap<String, String> tags){
+	/**Save a map. This updates all values and stored data necessary.*/
+	public void saveMap(String name, MapTileData data, ObjectMap<String, String> tags){
 		try {
 			if (!gwt) {
 				FileHandle file = customMapDirectory.child(name + "." + mapExtension);
@@ -92,18 +93,43 @@ public class Maps implements Disposable{
 			}
 
 			if(maps.containsKey(name)){
-				maps.get(name).texture.dispose();
+				if(maps.get(name).texture != null) {
+					maps.get(name).texture.dispose();
+					maps.get(name).texture = null;
+				}
+				allMaps.removeValue(maps.get(name), true);
 			}
 
 			Map map = new Map(name, new MapMeta(version, tags, data.width(), data.height(), null), true, getStreamFor(name));
 			if (!headless){
 				map.texture = new Texture(MapIO.generatePixmap(data));
 			}
+			allMaps.add(map);
+
 			maps.put(name, map);
 		}catch (IOException e){
 			throw new RuntimeException(e);
 		}
-	    //todo implement
+	}
+
+	/**Removes a map completely.*/
+	public void removeMap(Map map){
+		if(map.texture != null){
+			map.texture.dispose();
+			map.texture = null;
+		}
+
+		maps.remove(map.name);
+		allMaps.removeValue(map, true);
+
+		if (!gwt) {
+			customMapDirectory.child(map.name + "." + mapExtension).delete();
+		} else {
+			customMapNames.removeValue(map.name, false);
+			Settings.putString("map-data-" + map.name, "");
+			Settings.putString("custom-maps", json.toJson(customMapNames));
+			Settings.save();
+		}
 	}
 
 	private void loadMap(String name, Supplier<InputStream> supplier, boolean custom) throws IOException{

@@ -67,6 +67,10 @@ public class MapInfoDialog extends FloatingDialog{
             tags.put("oregen", enabled ? "1" : "0");
         }).left();
 
+        name.change();
+        description.change();
+        author.change();
+
         Platform.instance.addDialog(name, 50);
         Platform.instance.addDialog(author, 50);
         Platform.instance.addDialog(description, 1000);

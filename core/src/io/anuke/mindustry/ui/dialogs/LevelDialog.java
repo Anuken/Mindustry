@@ -17,12 +17,9 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.*;
 
 public class LevelDialog extends FloatingDialog{
-	private ScrollPane pane;
 	
 	public LevelDialog(){
 		super("$text.level.select");
-		getTitleTable().getCell(title()).growX().center();
-		getTitleTable().center();
 		addCloseButton();
 		shown(this::setup);
 	}
@@ -31,7 +28,7 @@ public class LevelDialog extends FloatingDialog{
 		content().clear();
 
 		Table maps = new Table();
-		pane = new ScrollPane(maps);
+		ScrollPane pane = new ScrollPane(maps);
 		pane.setFadeScrollBars(false);
 		
 		int maxwidth = 4;

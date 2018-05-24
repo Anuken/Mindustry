@@ -23,4 +23,8 @@ public class Map {
         this.meta = meta;
         this.stream = streamSupplier;
     }
+
+    public String getDisplayName(){
+        return meta.tags.get("name", name);
+    }
 }

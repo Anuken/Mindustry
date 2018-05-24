@@ -36,6 +36,7 @@ public class MapLoadDialog extends FloatingDialog{
 
 	public void rebuild(){
 		content().clear();
+		selected = world.maps().all().first();
 
 		ButtonGroup<TextButton> group = new ButtonGroup<>();
 
@@ -52,7 +53,7 @@ public class MapLoadDialog extends FloatingDialog{
 
 		for (Map map : world.maps().all()) {
 
-			TextButton button = new TextButton(map.meta.name(), "toggle");
+			TextButton button = new TextButton(map.getDisplayName(), "toggle");
 			button.add(new BorderImage(map.texture, 2f)).size(16 * 4f);
 			button.getCells().reverse();
 			button.clicked(() -> selected = map);

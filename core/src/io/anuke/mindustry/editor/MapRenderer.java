@@ -198,6 +198,9 @@ public class MapRenderer implements Disposable{
 
     @Override
     public void dispose() {
+        if(chunks == null){
+            return;
+        }
         for(int x = 0; x < chunks.length; x ++){
             for(int y = 0; y < chunks[0].length; y ++){
                 if(chunks[x][y] != null){

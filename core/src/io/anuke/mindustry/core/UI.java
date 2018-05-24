@@ -9,7 +9,6 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.editor.MapEditorDialog;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.InputHandler;
-import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.ucore.core.Core;
@@ -42,6 +41,7 @@ public class UI extends SceneModule{
 	public AboutDialog about;
 	public RestartDialog restart;
 	public LevelDialog levels;
+	public MapsDialog maps;
 	public LoadDialog load;
 	public DiscordDialog discord;
 	public JoinDialog join;
@@ -172,6 +172,7 @@ public class UI extends SceneModule{
 		bans = new BansDialog();
 		admins = new AdminsDialog();
 		traces = new TraceDialog();
+		maps = new MapsDialog();
 		localplayers = new LocalPlayerDialog();
 
 		build.begin(scene);
@@ -251,21 +252,22 @@ public class UI extends SceneModule{
 
 	public void showInfo(String info){
 		new Dialog("$text.info.title", "dialog"){{
-			content().margin(15).add(info).width(600f).get().setWrap(true);
+			getCell(content()).growX();
+			content().margin(15).add(info).width(400f).wrap();
 			buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);
 		}}.show();
 	}
 
 	public void showError(String text){
 		new Dialog("$text.error.title", "dialog"){{
-			content().margin(15).add(text);
+			content().margin(15).add(text).width(400f).wrap();
 			buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);
 		}}.show();
 	}
 
 	public void showConfirm(String title, String text, Listenable confirmed){
 		FloatingDialog dialog = new FloatingDialog(title);
-		dialog.content().add(text).pad(4f);
+		dialog.content().add(text).width(400f).wrap().pad(4f);
 		dialog.buttons().defaults().size(200f, 54f).pad(2f);
 		dialog.buttons().addButton("$text.cancel", dialog::hide);
 		dialog.buttons().addButton("$text.ok", () -> {

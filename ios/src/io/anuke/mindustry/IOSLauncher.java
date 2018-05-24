@@ -137,7 +137,8 @@ public class IOSLauncher extends IOSApplication.Delegate {
                 if(!ui.editor.isShown()){
                     ui.editor.show();
                 }
-                ui.editor.tryLoadMap(file);
+
+                ui.editor.beginEditMap(file.read());
             }
         });
     }
