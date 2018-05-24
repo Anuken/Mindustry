@@ -42,8 +42,6 @@ public class DesktopInput extends InputHandler{
 	@Override
 	public void update(){
 
-        updateController();
-
 		if(player.isDead()) return;
 
 		if(Inputs.keyRelease(section, "select") && recipe != null){
@@ -213,7 +211,8 @@ public class DesktopInput extends InputHandler{
         return controlling;
     }
 
-    void updateController(){
+    @Override
+    public void updateController(){
 	    boolean mousemove = Gdx.input.getDeltaX() > 1 || Gdx.input.getDeltaY() > 1;
 
         if(KeyBinds.getSection(section).device.type == DeviceType.controller && (!mousemove || player.playerIndex > 0)){

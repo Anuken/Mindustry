@@ -306,6 +306,10 @@ public class Control extends Module{
 
 		triggerUpdateInput();
 
+		for(InputHandler inputHandler : inputs){
+			inputHandler.updateController();
+		}
+
 		if(!state.is(State.menu)){
 		    for(InputHandler input : inputs){
 		        input.update();

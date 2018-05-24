@@ -4,13 +4,17 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.io.Map;
+import io.anuke.mindustry.io.MapIO;
+import io.anuke.mindustry.io.MapMeta;
+import io.anuke.mindustry.io.MapTileData;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
@@ -23,7 +27,6 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.graphics.Pixmaps;
 import io.anuke.ucore.input.Input;
-import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.builders.label;
@@ -223,11 +226,18 @@ public class MapEditorDialog extends Dialog implements Disposable{
 		build.end();
 
 		tapped(() -> {
-			Element e = Core.scene.hit(Graphics.mouse().x, Graphics.mouse().y, true);
-			if(e == null || !e.isDescendantOf(pane)) Core.scene.setScrollFocus(null);
+
 		});
 
 		update(() -> {
+			Vector2 v = pane.stageToLocalCoordinates(Graphics.mouse());
+
+			if(v.x >= 0 && v.y >= 0 && v.x <= pane.getWidth() && v.y <= pane.getHeight()){
+				Core.scene.setScrollFocus(pane);
+			}else{
+				Core.scene.setScrollFocus(null);
+			}
+
 			if(Core.scene != null && Core.scene.getKeyboardFocus() == this){
 				doInput();
 			}
@@ -360,7 +370,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 	}
 
 	public boolean hasPane(){
-		return Core.scene.getScrollFocus() == pane;
+		return Core.scene.getScrollFocus() == pane || Core.scene.getKeyboardFocus() != this;
 	}
 	
 	public void build(){

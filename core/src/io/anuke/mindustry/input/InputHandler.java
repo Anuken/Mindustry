@@ -57,6 +57,7 @@ public abstract class InputHandler extends InputAdapter{
 	public int getBlockEndY(){ return Mathf.sclb(Graphics.world(getCursorEndX(), getCursorEndY()).y, tilesize, round2()); }
 	public void resetCursor(){}
 	public boolean isCursorVisible(){ return false; }
+	public void updateController(){}
 
 	public float mouseAngle(float x, float y){
         return Graphics.world(getMouseX(), getMouseY()).sub(x, y).angle();
