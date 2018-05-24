@@ -24,7 +24,9 @@ import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Atlas;
+import io.anuke.ucore.util.InputProxy;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -384,7 +386,7 @@ public class Control extends Module{
 
 				if(respawntime > 0){
 
-					respawntime -= delta();
+					respawntime -= Timers.delta();
 
 					if(respawntime <= 0){
 						player.set(world.getSpawnX(), world.getSpawnY());

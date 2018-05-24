@@ -18,6 +18,7 @@ import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.OS;
 
 import java.util.Locale;
 
@@ -51,10 +52,14 @@ public class Vars{
 	public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
 	//directory for user-created map data
 	public static final FileHandle customMapDirectory = gwt ? null : UCore.isAssets() ?
-			Gdx.files.local("../../desktop/mindustry-maps") : Gdx.files.local("mindustry-maps/");
+			Gdx.files.local("../../desktop/mindustry-maps") :
+			OS.isMac ? (Gdx.files.absolute(UCore.getProperty("user.home") + "/Library/Application Support/").child("Mindustry/maps/")) :
+					Gdx.files.local("mindustry-maps/");
 	//save file directory
 	public static final FileHandle saveDirectory = gwt ? null : UCore.isAssets() ?
-			Gdx.files.local("../../desktop/mindustry-saves") : Gdx.files.local("mindustry-saves/");
+			Gdx.files.local("../../desktop/mindustry-saves") :
+			OS.isMac ? (Gdx.files.absolute(UCore.getProperty("user.home") + "/Library/Application Support/").child("Mindustry/saves/")) :
+			Gdx.files.local("mindustry-saves/");
 	//scale of the font
 	public static float fontscale = Math.max(Unit.dp.scl(1f)/2f, 0.5f);
 	//camera zoom displayed on startup
