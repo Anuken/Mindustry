@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.core.Platform;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Consumer;
@@ -15,12 +16,14 @@ import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.OS;
 
 import java.util.Arrays;
 
 public class FileChooser extends FloatingDialog {
 	private Table files;
-	private FileHandle homeDirectory = Gdx.files.absolute(Gdx.files.getExternalStoragePath());
+	private FileHandle homeDirectory = Gdx.files.absolute(OS.isMac ? UCore.getProperty("user.home") + "/Downloads/" :
+            Gdx.files.getExternalStoragePath());
 	private FileHandle directory = homeDirectory;
 	private ScrollPane pane;
 	private TextField navigation, filefield;
