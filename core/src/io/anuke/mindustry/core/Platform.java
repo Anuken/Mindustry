@@ -64,7 +64,15 @@ public abstract class Platform {
 	}
 	/**Only used for iOS or android: open the share menu for a map or save.*/
 	public void shareFile(FileHandle file){}
-	/**Show a file chooser. Desktop only.*/
+
+    /**Show a file chooser. Desktop only.
+     *
+     * @param text File chooser title text
+     * @param content Type of files to be loaded
+     * @param cons Selection listener
+     * @param open Whether to open or save files.
+     * @param filetypes List of file extensions to filter.
+     */
 	public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String... filetypes){}
 	/**Use the default thread provider from the kryonet module for this.*/
 	public ThreadProvider getThreadProvider(){

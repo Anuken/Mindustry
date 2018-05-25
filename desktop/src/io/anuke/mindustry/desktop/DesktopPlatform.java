@@ -55,6 +55,7 @@ public class DesktopPlatform extends Platform {
             FxApp.cons = cons;
             FxApp.filter = filter;
             FxApp.open = open;
+            FxApp.content = content;
             FxApp.open();
         }){{
             setDaemon(true);
@@ -208,7 +209,7 @@ public class DesktopPlatform extends Platform {
                 file = chooser.showSaveDialog(null);
             }
             if (file != null) {
-                cons.accept(Gdx.files.absolute(file.getAbsolutePath()));
+                Gdx.app.postRunnable(() -> cons.accept(Gdx.files.absolute(file.getAbsolutePath())));
             }
         }
     }

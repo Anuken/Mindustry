@@ -20,8 +20,9 @@ public class DesktopLauncher {
 		config.setMaximized(true);
 		config.setWindowedMode(960, 540);
 		config.setWindowIcon("sprites/icon.png");
+
 		if(OS.isMac) {
-            config.setPreferencesConfig(UCore.getProperty("user.home") + "/Library/Application Support/", FileType.Absolute);
+            config.setPreferencesConfig(UCore.getProperty("user.home") + "/Library/Application Support/Mindustry", FileType.Absolute);
         }
 
         Platform.instance = new DesktopPlatform(arg);
