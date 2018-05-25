@@ -8,6 +8,7 @@ import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.net.Net;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.util.OS;
 
 public class DesktopLauncher {
@@ -20,7 +21,7 @@ public class DesktopLauncher {
 		config.setWindowedMode(960, 540);
 		config.setWindowIcon("sprites/icon.png");
 		if(OS.isMac) {
-            config.setPreferencesConfig(System.getProperty("DocumentsDirectory"), FileType.Absolute);
+            config.setPreferencesConfig(UCore.getProperty("user.home") + "/Library/Application Support/", FileType.Absolute);
         }
 
         Platform.instance = new DesktopPlatform(arg);

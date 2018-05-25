@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.ColorMapper.BlockPair;
@@ -43,7 +42,6 @@ public class MapEditorDialog extends Dialog{
 	private MapSaveDialog saveDialog;
 	private MapResizeDialog resizeDialog;
 	private ScrollPane pane;
-	private FileChooser openFile, saveFile;
 	private boolean saved = false;
 	
 	private ButtonGroup<ImageButton> blockgroup;
@@ -55,25 +53,6 @@ public class MapEditorDialog extends Dialog{
 		editor = new MapEditor();
 		dialog = new MapGenerateDialog(editor);
 		view = new MapView(editor);
-		
-		openFile = new FileChooser("$text.loadimage", FileChooser.pngFilter, true, this::tryLoadMap);
-		
-		saveFile = new FileChooser("$saveimage", false, file -> {
-			if(!file.extension().toLowerCase().equals(".png")){
-				file = file.parent().child(file.nameWithoutExtension() + ".png");
-			}
-			FileHandle result = file;
-			ui.loadfrag.show();
-			Timers.run(3f, () -> {
-				try{
-					Pixmaps.write(editor.pixmap(), result);
-				}catch (Exception e){
-					ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
-					if(!mobile) Log.err(e);
-				}
-				ui.loadfrag.hide();
-			});
-		});
 		
 		loadDialog = new MapLoadDialog(map -> {
 			saveDialog.setFieldText(map.name);
@@ -225,9 +204,9 @@ public class MapEditorDialog extends Dialog{
 				//iOS does not support loading raw files.
 				if(!ios) {
 
-                    new imagebutton("icon-load-image", isize, () ->
-                            openFile.show()
-                    ).text("$text.editor.loadimage");
+                    new imagebutton("icon-load-image", isize, () -> {
+                    	Platform.instance.showFileChooser(Bundles.get("text.loadimage"), "Image Files", MapEditorDialog.this::tryLoadMap, true, "png");
+					}).text("$text.editor.loadimage");
 
                     row();
                 }
@@ -235,7 +214,22 @@ public class MapEditorDialog extends Dialog{
 				new imagebutton("icon-save-image", isize, () -> {
 				    //iOS doesn't really support saving raw files. Sharing is used instead.
                     if(!ios){
-                        saveFile.show();
+                    	Platform.instance.showFileChooser(Bundles.get("text.saveimage"), "Image Files", file -> {
+							if(!file.extension().toLowerCase().equals(".png")){
+								file = file.parent().child(file.nameWithoutExtension() + ".png");
+							}
+							FileHandle result = file;
+							ui.loadfrag.show();
+							Timers.run(3f, () -> {
+								try{
+									Pixmaps.write(editor.pixmap(), result);
+								}catch (Exception e){
+									ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
+									if(!mobile) Log.err(e);
+								}
+								ui.loadfrag.hide();
+							});
+						}, false, "png");
                     }else{
                         try{
                             FileHandle file = Gdx.files.local(("map-" + ((editor.getMap().name == null) ? "unknown" : editor.getMap().name) + ".png"));

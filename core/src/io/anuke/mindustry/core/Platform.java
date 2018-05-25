@@ -6,6 +6,7 @@ import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.scene.ui.TextField;
 
 import java.util.Date;
@@ -63,6 +64,8 @@ public abstract class Platform {
 	}
 	/**Only used for iOS or android: open the share menu for a map or save.*/
 	public void shareFile(FileHandle file){}
+	/**Show a file chooser. Desktop only.*/
+	public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String... filetypes){}
 	/**Use the default thread provider from the kryonet module for this.*/
 	public ThreadProvider getThreadProvider(){
 		return new ThreadProvider() {
