@@ -50,15 +50,16 @@ public class Vars{
 	public static final String discordURL = "https://discord.gg/BKADYds";
 
 	public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
+	public static final String macAppDir = UCore.getProperty("user.home") + "/Library/Application Support/";
 	//directory for user-created map data
 	public static final FileHandle customMapDirectory = gwt ? null : UCore.isAssets() ?
 			Gdx.files.local("../../desktop/mindustry-maps") :
-			OS.isMac ? (Gdx.files.absolute(UCore.getProperty("user.home") + "/Library/Application Support/").child("Mindustry/maps/")) :
+			OS.isMac ? (Gdx.files.absolute(macAppDir).child("maps/")) :
 					Gdx.files.local("mindustry-maps/");
 	//save file directory
 	public static final FileHandle saveDirectory = gwt ? null : UCore.isAssets() ?
 			Gdx.files.local("../../desktop/mindustry-saves") :
-			OS.isMac ? (Gdx.files.absolute(UCore.getProperty("user.home") + "/Library/Application Support/").child("Mindustry/saves/")) :
+			OS.isMac ? (Gdx.files.absolute(macAppDir).child("saves/")) :
 			Gdx.files.local("mindustry-saves/");
 	//scale of the font
 	public static float fontscale = Math.max(Unit.dp.scl(1f)/2f, 0.5f);
