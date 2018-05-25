@@ -3,7 +3,6 @@ package io.anuke.mindustry.desktop;
 import club.minnced.discord.rpc.DiscordEventHandlers;
 import club.minnced.discord.rpc.DiscordRPC;
 import club.minnced.discord.rpc.DiscordRichPresence;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Base64Coder;
 import io.anuke.kryonet.DefaultThreadImpl;
@@ -11,17 +10,13 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Strings;
-import javafx.application.Application;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Stage;
 
 import javax.swing.*;
-import java.io.File;
 import java.net.NetworkInterface;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -49,17 +44,8 @@ public class DesktopPlatform extends Platform {
     }
 
     @Override
-    public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String... filter) {
-        new Thread(() -> {
-            FxApp.text = text;
-            FxApp.cons = cons;
-            FxApp.filter = filter;
-            FxApp.open = open;
-            FxApp.content = content;
-            FxApp.open();
-        }){{
-            setDaemon(true);
-        }}.start();
+    public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filter) {
+        new FileChooser(text, file -> file.extension().equalsIgnoreCase(filter), open, cons).show();
     }
 
     @Override
@@ -160,57 +146,5 @@ public class DesktopPlatform extends Platform {
         byte[] result = new byte[8];
         System.arraycopy(bytes, 0, result, 0, bytes.length);
         return !new String(Base64Coder.encode(result)).equals("AAAAAAAAAOA=");
-    }
-
-    public static class FxApp extends Application{
-        static String text;
-        static Consumer<FileHandle> cons;
-        static String[] filter;
-        static String content;
-        static boolean open;
-
-        private static FxApp instance;
-
-        static void open(){
-            if(instance == null){
-                launch();
-            }
-            ss();
-        }
-
-        static void ss(){
-            javafx.application.Platform.runLater(() -> instance.show());
-        }
-
-        public FxApp(){
-            instance = this;
-            ss();
-        }
-
-        @Override
-        public void start(Stage stage){
-
-        }
-
-        public void show(){
-            for(int i = 0; i < filter.length; i ++){
-                filter[i] = "*." + filter[i];
-            }
-
-            FileChooser chooser = new FileChooser();
-            chooser.setTitle(text);
-            chooser.getExtensionFilters().add(new ExtensionFilter(content, filter));
-            chooser.setInitialDirectory(new File(System.getProperty("user.home")));
-
-            File file;
-            if (open) {
-                file = chooser.showOpenDialog(null);
-            } else {
-                file = chooser.showSaveDialog(null);
-            }
-            if (file != null) {
-                Gdx.app.postRunnable(() -> cons.accept(Gdx.files.absolute(file.getAbsolutePath())));
-            }
-        }
     }
 }
