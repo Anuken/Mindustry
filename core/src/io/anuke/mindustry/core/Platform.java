@@ -71,9 +71,9 @@ public abstract class Platform {
      * @param content Type of files to be loaded
      * @param cons Selection listener
      * @param open Whether to open or save files.
-     * @param filetypes List of file extensions to filter.
+     * @param filetype File extensions to filter.
      */
-	public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String... filetypes){}
+	public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filetype){}
 	/**Use the default thread provider from the kryonet module for this.*/
 	public ThreadProvider getThreadProvider(){
 		return new ThreadProvider() {
