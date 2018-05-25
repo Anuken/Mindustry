@@ -5,6 +5,7 @@ import io.anuke.mindustry.content.fx.ShootFx;
 import io.anuke.mindustry.type.AmmoType;
 
 public class AmmoTypes {
+    //TODO add definitions for all ammo types
     public static final AmmoType
 
     basicIron = new AmmoType(Items.iron, TurretBullets.basicIron, 5){{
@@ -12,7 +13,27 @@ public class AmmoTypes {
         smokeEffect = ShootFx.shootSmallSmoke;
     }},
 
-    basicSteel = new AmmoType(Items.steel, TurretBullets.basicSteel, 5){{
+    basicLead = new AmmoType(Items.iron, TurretBullets.basicIron, 5){{
+        shootEffect = ShootFx.shootSmall;
+        smokeEffect = ShootFx.shootSmallSmoke;
+    }},
+
+    standardLead = new AmmoType(Items.iron, TurretBullets.basicIron, 5){{
+        shootEffect = ShootFx.shootSmall;
+        smokeEffect = ShootFx.shootSmallSmoke;
+    }},
+
+    standardArmorPiercing = new AmmoType(Items.steel, TurretBullets.basicSteel, 5){{
+        shootEffect = ShootFx.shootBig;
+        smokeEffect = ShootFx.shootBigSmoke;
+    }},
+
+    homing = new AmmoType(Items.steel, TurretBullets.basicSteel, 5){{
+        shootEffect = ShootFx.shootBig;
+        smokeEffect = ShootFx.shootBigSmoke;
+    }},
+
+    tracer = new AmmoType(Items.steel, TurretBullets.basicSteel, 5){{
         shootEffect = ShootFx.shootBig;
         smokeEffect = ShootFx.shootBigSmoke;
     }},
@@ -21,7 +42,42 @@ public class AmmoTypes {
         shootEffect = ShootFx.shootSmallFlame;
     }},
 
-    basicLeadFrag = new AmmoType(Items.lead, TurretBullets.basicLeadFragShell, 1){{
+    basicLeadShell = new AmmoType(Items.lead, TurretBullets.basicLeadFragShell, 1){{
+        shootEffect = ShootFx.shootBig2;
+        smokeEffect = ShootFx.shootBigSmoke2;
+    }},
+
+    explosiveFragShell = new AmmoType(Items.lead, TurretBullets.basicLeadFragShell, 1){{
+        shootEffect = ShootFx.shootBig2;
+        smokeEffect = ShootFx.shootBigSmoke2;
+    }},
+
+    fragShell = new AmmoType(Items.lead, TurretBullets.basicLeadFragShell, 1){{
+        shootEffect = ShootFx.shootBig2;
+        smokeEffect = ShootFx.shootBigSmoke2;
+    }},
+
+    standardThoriumShell = new AmmoType(Items.lead, TurretBullets.basicLeadFragShell, 1){{
+        shootEffect = ShootFx.shootBig2;
+        smokeEffect = ShootFx.shootBigSmoke2;
+    }},
+
+    swarmMissile = new AmmoType(Items.lead, TurretBullets.basicLeadFragShell, 1){{
+        shootEffect = ShootFx.shootBig2;
+        smokeEffect = ShootFx.shootBigSmoke2;
+    }},
+
+    scytheMissile = new AmmoType(Items.lead, TurretBullets.basicLeadFragShell, 1){{
+        shootEffect = ShootFx.shootBig2;
+        smokeEffect = ShootFx.shootBigSmoke2;
+    }},
+
+    incendiaryMortar = new AmmoType(Items.lead, TurretBullets.basicLeadFragShell, 1){{
+        shootEffect = ShootFx.shootBig2;
+        smokeEffect = ShootFx.shootBigSmoke2;
+    }},
+
+    surgeMortar = new AmmoType(Items.lead, TurretBullets.basicLeadFragShell, 1){{
         shootEffect = ShootFx.shootBig2;
         smokeEffect = ShootFx.shootBigSmoke2;
     }},

@@ -67,7 +67,7 @@ public class WeaponBlocks{
 	crux = new ItemTurret("crux"){{
 		size = 2;
 		range = 100f;
-		ammoTypes = new AmmoType[]{AmmoTypes.basicLeadFrag};
+		ammoTypes = new AmmoType[]{AmmoTypes.basicLeadShell};
 		reload = 70f;
 		restitution = 0.03f;
 		ammoEjectBack = 3f;

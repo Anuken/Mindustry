@@ -7,6 +7,7 @@ import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.world.BlockFlag;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.graphics.Draw;
@@ -46,7 +47,7 @@ public class CoreBlock extends StorageBlock {
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return tile.entity.items.items[item.id]< itemCapacity && item.material;
+        return tile.entity.items.items[item.id]< itemCapacity && item.type == ItemType.material;
     }
 
     @Override

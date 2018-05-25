@@ -15,15 +15,16 @@ public class Item implements Comparable<Item>{
 	public final Color color;
 	public TextureRegion region;
 
+	/**type of the item; used for tabs and core acceptance. default value is {@link ItemType#resource}.*/
+	public ItemType type = ItemType.resource;
+	/**how explosive this item is.*/
 	public float explosiveness = 0f;
 	/**flammability above 0.3 makes this eleigible for item burners.*/
 	public float flammability = 0f;
-	/**how radioactive this item is. 0=none, 1=ridiculous*/
+	/**how radioactive this item is. 0=none, 1=chernobyl ground zero*/
 	public float radioactivity;
 	/**how effective this item is as flux for smelting. 0 = not a flux, 0.5 = normal flux, 1 = very good*/
 	public float fluxiness = 0f;
-	/**whether this material goes in the core*/
-	public boolean material = true;
 	/**drill hardness of the item*/
 	public int hardness = 0;
 	/**the burning color of this item*/
