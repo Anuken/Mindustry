@@ -182,6 +182,10 @@ public class Renderer extends RendererModule{
 
 			camera.position.set(lastx - deltax, lasty - deltay, 0);
 		}
+
+		if(debug && !ui.chatfrag.chatOpen()) {
+			renderer.record(); //this only does something if GdxGifRecorder is on the class path, which it usually isn't
+		}
 	}
 
 	@Override

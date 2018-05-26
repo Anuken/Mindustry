@@ -134,10 +134,6 @@ public class UI extends SceneModule{
 		
 		act();
 
-		if(debug && !ui.chatfrag.chatOpen()) {
-            renderer.record(); //this only does something if GdxGifRecorder is on the class path, which it usually isn't
-        }
-
         for(int i = 0; i < players.length; i ++){
 		    InputHandler input = control.input(i);
 

@@ -36,7 +36,7 @@ public class Items {
         hardness = 3;
     }},
 
-    thorium = new Item("thorium", Color.valueOf("bb80bd")) {{
+    thorium = new Item("thorium", Color.valueOf("f9a3c7")) {{
         explosiveness = 0.1f;
         hardness = 4;
     }},
