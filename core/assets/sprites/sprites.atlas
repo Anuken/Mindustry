@@ -237,7 +237,7 @@ liquidtank-top
   index: -1
 multiplexer
   rotate: false
-  xy: 228, 32
+  xy: 209, 14
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -1042,28 +1042,28 @@ ripples
   index: -1
 rubble-1-0
   rotate: false
-  xy: 466, 184
+  xy: 463, 166
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 rubble-1-1
   rotate: false
-  xy: 463, 166
+  xy: 263, 109
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 rubble-2-0
   rotate: false
-  xy: 263, 109
+  xy: 281, 109
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 rubble-2-1
   rotate: false
-  xy: 281, 109
+  xy: 299, 109
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -1259,7 +1259,7 @@ powernode
   index: -1
 powernodelarge
   rotate: false
-  xy: 790, 381
+  xy: 790, 363
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -1301,7 +1301,7 @@ shieldgenerator
   index: -1
 shieldprojector
   rotate: false
-  xy: 299, 109
+  xy: 317, 109
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -1399,42 +1399,42 @@ centrifuge-liquid
   index: -1
 cryofluidmixer-bottom
   rotate: false
-  xy: 736, 396
+  xy: 718, 378
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cryofluidmixer-liquid
   rotate: false
-  xy: 718, 378
+  xy: 754, 396
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cryofluidmixer-top
   rotate: false
-  xy: 754, 396
+  xy: 736, 378
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cultivator
   rotate: false
-  xy: 736, 378
+  xy: 754, 378
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cultivator-middle
   rotate: false
-  xy: 754, 378
+  xy: 682, 353
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cultivator-top
   rotate: false
-  xy: 682, 353
+  xy: 700, 355
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -1504,21 +1504,21 @@ itemvoid
   index: -1
 laserdrill
   rotate: false
-  xy: 192, 34
+  xy: 155, 16
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 laserdrill-rotator
   rotate: false
-  xy: 155, 16
+  xy: 173, 16
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 laserdrill-top
   rotate: false
-  xy: 173, 16
+  xy: 191, 16
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -1637,49 +1637,49 @@ plasmadrill-top
   index: -1
 plasticformer
   rotate: false
-  xy: 209, 14
+  xy: 227, 14
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 plasticformer-top
   rotate: false
-  xy: 227, 14
+  xy: 772, 372
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 poweralloysmelter
   rotate: false
-  xy: 772, 372
+  xy: 772, 354
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 poweralloysmelter-top
   rotate: false
-  xy: 772, 354
+  xy: 790, 381
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 powersmelter
   rotate: false
-  xy: 790, 363
+  xy: 790, 345
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 powersmelter-top
   rotate: false
-  xy: 790, 345
+  xy: 466, 184
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 siliconsmelter-top
   rotate: false
-  xy: 790, 345
+  xy: 466, 184
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -1749,7 +1749,7 @@ siliconextractor
   index: -1
 siliconsmelter
   rotate: false
-  xy: 317, 109
+  xy: 335, 109
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -1908,23 +1908,30 @@ teslaturret-heat
   orig: 10, 10
   offset: 0, 0
   index: -1
-crux-heat
+crux
   rotate: false
   xy: 700, 391
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-crux-panel-left
+crux-heat
   rotate: false
   xy: 700, 373
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-crux-panel-right
+crux-panel-left
   rotate: false
   xy: 718, 396
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+crux-panel-right
+  rotate: false
+  xy: 736, 396
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -1978,13 +1985,6 @@ scorch-shoot
   orig: 10, 10
   offset: 0, 0
   index: -1
-vrux
-  rotate: false
-  xy: 371, 109
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
 wave
   rotate: false
   xy: 467, 148
@@ -2022,21 +2022,21 @@ fuse
   index: -1
 megarepairturret
   rotate: false
-  xy: 191, 16
+  xy: 210, 32
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 missileturret
   rotate: false
-  xy: 210, 32
+  xy: 228, 32
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 swarmer
   rotate: false
-  xy: 210, 32
+  xy: 228, 32
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2071,42 +2071,42 @@ titancannon
   index: -1
 flierfactory
   rotate: false
-  xy: 754, 360
+  xy: 677, 335
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 walkerfactory
   rotate: false
-  xy: 754, 360
+  xy: 677, 335
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 flierfactory-top
   rotate: false
-  xy: 677, 335
+  xy: 677, 317
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 walkerfactory-top
   rotate: false
-  xy: 677, 335
+  xy: 677, 317
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 flierfactory-top-open
   rotate: false
-  xy: 677, 317
+  xy: 799, 467
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 walkerfactory-top-open
   rotate: false
-  xy: 677, 317
+  xy: 799, 467
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2148,14 +2148,14 @@ door
   index: -1
 door-large
   rotate: false
-  xy: 700, 355
+  xy: 718, 360
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 door-large-open
   rotate: false
-  xy: 718, 360
+  xy: 736, 360
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2176,7 +2176,7 @@ duriumwall
   index: -1
 duriumwall-large
   rotate: false
-  xy: 736, 360
+  xy: 754, 360
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2197,7 +2197,7 @@ steelwall
   index: -1
 steelwall-large
   rotate: false
-  xy: 335, 109
+  xy: 353, 109
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2225,7 +2225,7 @@ titaniumwall
   index: -1
 titaniumwall-large
   rotate: false
-  xy: 353, 109
+  xy: 371, 109
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2675,7 +2675,7 @@ icon-arrow
   index: -1
 icon-arrow-16
   rotate: false
-  xy: 799, 467
+  xy: 817, 469
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2710,7 +2710,7 @@ icon-arrow-up
   index: -1
 icon-back
   rotate: false
-  xy: 817, 469
+  xy: 835, 469
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2822,14 +2822,14 @@ icon-exit
   index: -1
 icon-file
   rotate: false
-  xy: 835, 469
+  xy: 853, 469
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 icon-file-image
   rotate: false
-  xy: 853, 469
+  xy: 871, 469
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2843,7 +2843,7 @@ icon-file-text
   index: -1
 icon-fill
   rotate: false
-  xy: 871, 469
+  xy: 889, 469
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2857,7 +2857,7 @@ icon-floppy
   index: -1
 icon-floppy-16
   rotate: false
-  xy: 889, 469
+  xy: 907, 469
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2892,7 +2892,7 @@ icon-google-play
   index: -1
 icon-grid
   rotate: false
-  xy: 907, 469
+  xy: 925, 469
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2948,7 +2948,7 @@ icon-items-none
   index: -1
 icon-line
   rotate: false
-  xy: 925, 469
+  xy: 943, 469
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2976,21 +2976,21 @@ icon-load
   index: -1
 icon-load-image
   rotate: false
-  xy: 943, 469
+  xy: 961, 469
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 icon-load-map
   rotate: false
-  xy: 961, 469
+  xy: 979, 469
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 icon-loading
   rotate: false
-  xy: 979, 469
+  xy: 997, 469
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -3011,7 +3011,7 @@ icon-menu
   index: -1
 icon-menu-large
   rotate: false
-  xy: 997, 469
+  xy: 630, 266
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -3032,7 +3032,7 @@ icon-pause
   index: -1
 icon-pencil
   rotate: false
-  xy: 630, 266
+  xy: 635, 234
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -3046,7 +3046,7 @@ icon-pencil-small
   index: -1
 icon-pick
   rotate: false
-  xy: 635, 234
+  xy: 635, 216
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -3095,7 +3095,7 @@ icon-quit
   index: -1
 icon-redo
   rotate: false
-  xy: 635, 216
+  xy: 635, 198
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -3116,7 +3116,7 @@ icon-rename
   index: -1
 icon-resize
   rotate: false
-  xy: 635, 198
+  xy: 119, 25
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -3158,14 +3158,14 @@ icon-save
   index: -1
 icon-save-image
   rotate: false
-  xy: 119, 25
+  xy: 138, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 icon-save-map
   rotate: false
-  xy: 138, 38
+  xy: 137, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -3179,7 +3179,7 @@ icon-settings
   index: -1
 icon-terrain
   rotate: false
-  xy: 137, 20
+  xy: 131, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -3214,7 +3214,7 @@ icon-trash
   index: -1
 icon-trash-16
   rotate: false
-  xy: 131, 2
+  xy: 156, 34
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -3235,7 +3235,7 @@ icon-tutorial
   index: -1
 icon-undo
   rotate: false
-  xy: 156, 34
+  xy: 174, 34
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -3263,7 +3263,7 @@ icon-wiki
   index: -1
 icon-zoom
   rotate: false
-  xy: 174, 34
+  xy: 192, 34
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

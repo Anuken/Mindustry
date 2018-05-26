@@ -85,8 +85,8 @@ public class Conveyor extends Block{
 				tr2.trns(rotation * 90, -tilesize / 2, pos.x * tilesize / 2);
 
 				Draw.rect(pos.item.region,
-						tile.x * tilesize + tr1.x * pos.y + tr2.x,
-						tile.y * tilesize + tr1.y * pos.y + tr2.y, itemSize, itemSize);
+						(int)(tile.x * tilesize + tr1.x * pos.y + tr2.x),
+						(int)(tile.y * tilesize + tr1.y * pos.y + tr2.y), itemSize, itemSize);
 			}
 
 		}catch (IndexOutOfBoundsException e){

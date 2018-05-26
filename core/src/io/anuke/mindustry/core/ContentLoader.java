@@ -30,6 +30,7 @@ public class ContentLoader {
 
             //items
             new Items(),
+            new AmmoItems(),
 
             //liquids
             new Liquids(),

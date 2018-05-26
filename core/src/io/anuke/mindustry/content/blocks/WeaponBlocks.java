@@ -15,14 +15,14 @@ public class WeaponBlocks{
 	public static Block
 	
 	duo = new DoubleTurret("duo"){{
-		ammoTypes = new AmmoType[]{AmmoTypes.basicIron};
+		ammoTypes = new AmmoType[]{AmmoTypes.basicIron, AmmoTypes.basicLead, AmmoTypes.standardLead, AmmoTypes.tracer};
 		reload = 25f;
 		restitution = 0.03f;
 		ammoUseEffect = ShootFx.shellEjectSmall;
 	}},
 	
 	scatter = new BurstTurret("scatter") {{
-		ammoTypes = new AmmoType[]{AmmoTypes.basicIron};
+		ammoTypes = new AmmoType[]{AmmoTypes.basicLeadFlak, AmmoTypes.standardLeadFlak, AmmoTypes.compositeFlak};
 		ammoPerShot = 1;
 		shots = 3;
 		reload = 60f;
@@ -67,7 +67,7 @@ public class WeaponBlocks{
 	crux = new ItemTurret("crux"){{
 		size = 2;
 		range = 100f;
-		ammoTypes = new AmmoType[]{AmmoTypes.basicLeadShell};
+		ammoTypes = new AmmoType[]{AmmoTypes.basicLeadShell, AmmoTypes.explosiveFragShell, AmmoTypes.fragShell, AmmoTypes.standardThoriumShell};
 		reload = 70f;
 		restitution = 0.03f;
 		ammoEjectBack = 3f;
@@ -104,6 +104,7 @@ public class WeaponBlocks{
 		chargeEffect = ShootFx.lancerLaserCharge;
 		chargeBeginEffect = ShootFx.lancerLaserChargeBegin;
 		heatColor = Color.RED;
+		size = 2;
 	}},
 	
 	arc = new LaserTurret("arc"){{
@@ -121,11 +122,13 @@ public class WeaponBlocks{
 		size = 2;
 	}},
 
-	swarmer = new PowerTurret("missileturret") {{
+	swarmer = new ItemTurret("missileturret") {{
+		ammoTypes = new AmmoType[]{AmmoTypes.basicLeadShell, AmmoTypes.explosiveFragShell, AmmoTypes.fragShell, AmmoTypes.standardThoriumShell};
 		size = 2;
 	}},
 
-	fuse = new PowerTurret("fornaxcannon") {{
+	fuse = new ItemTurret("fuse") {{
+		ammoTypes = new AmmoType[]{AmmoTypes.basicLeadShell, AmmoTypes.explosiveFragShell, AmmoTypes.fragShell, AmmoTypes.standardThoriumShell};
 		size = 3;
 	}},
 
