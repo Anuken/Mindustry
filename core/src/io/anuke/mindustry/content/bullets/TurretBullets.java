@@ -7,6 +7,7 @@ import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.entities.bullet.BasicBulletType;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.effect.DamageArea;
@@ -21,7 +22,6 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
@@ -71,72 +71,46 @@ public class TurretBullets {
         }
     },
 
-    basicIron = new BulletType(3f, 5) {
-        @Override
-        public void draw(Bullet b) {
-            drawBullet(Palette.bulletYellow, Palette.bulletYellowBack,
-                    "bullet", b.x, b.y, 9f, 5f + b.fout()*7f, b.angle() - 90);
+    basicIron = new BasicBulletType(3f, 5) {
+        {
+            bulletWidth = 7f;
+            bulletHeight = 9f;
         }
     },
 
-    basicSteel = new BulletType(6f, 0) {
+    basicSteel = new BasicBulletType(6f, 0) {
         {
             hiteffect = BulletFx.hitBulletBig;
             knockback = 0.5f;
-        }
-
-        @Override
-        public void draw(Bullet b) {
-            drawBullet(Palette.bulletYellow, Palette.bulletYellowBack,
-                    "bullet", b.x, b.y, 11f, 9f + b.fout()*8f, b.angle() - 90);
+            bulletWidth = 9f;
+            bulletHeight = 11f;
         }
     },
 
-    basicLeadFragShell = new BulletType(3f, 0) {
+    basicLeadFragShell = new BasicBulletType(3f, 0) {
         {
             hiteffect = BulletFx.flakExplosion;
             knockback = 0.8f;
             lifetime = 90f;
             drag = 0.01f;
-        }
-
-        @Override
-        public void draw(Bullet b) {
-            drawBullet(Palette.bulletYellow, Palette.bulletYellowBack,
-                    "shell", b.x, b.y, 9f, 9f, b.angle() - 90);
-        }
-
-        @Override
-        public void hit(Bullet b, float x, float y) {
-            super.hit(b, x, y);
-            for(int i = 0; i < 9; i ++){
-                float len = Mathf.random(1f, 7f);
-                float a = Mathf.random(360f);
-                Bullet bullet = Bullet.create(TurretBullets.basicLeadFrag, b,
-                        x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a);
-                bullet.velocity.scl(Mathf.random(0.2f, 1f));
-            }
-        }
-
-        @Override
-        public void despawned(Bullet b) {
-            hit(b);
+            bulletWidth = bulletHeight = 9f;
+            fragBullet = basicLeadFrag;
+            bulletSprite = "frag";
+            bulletShrink = 0.1f;
         }
     },
 
-    basicLeadFrag = new BulletType(3f, 0) {
+    basicLeadFrag = new BasicBulletType(3f, 0) {
         {
             drag = 0.1f;
             hiteffect = Fx.none;
             despawneffect = Fx.none;
             hitsize = 4;
             lifetime = 20f;
-        }
-
-        @Override
-        public void draw(Bullet b) {
-            drawBullet(Palette.bulletYellow, Palette.bulletYellowBack,
-                    "bullet", b.x, b.y, 7f + b.fout()*3f, 1f + b.fout()*11f, b.angle() - 90);
+            bulletWidth = 9f;
+            bulletHeight = 11f;
+            bulletShrink = 1f;
+            //todo scaling
         }
     },
 
@@ -238,14 +212,6 @@ public class TurretBullets {
             Lightning.create(b.team, hiteffect, Palette.lancerLaser, damage, b.x, b.y, b.angle(), 30);
         }
     };
-
-    private static void drawBullet(Color first, Color second, String name, float x, float y, float w, float h, float rot){
-        Draw.color(second);
-        Draw.rect(name + "-back", x, y, w, h, rot);
-        Draw.color(first);
-        Draw.rect(name, x, y, w, h, rot);
-        Draw.color();
-    }
 
     private abstract static class LiquidShot extends BulletType{
         Liquid liquid;
