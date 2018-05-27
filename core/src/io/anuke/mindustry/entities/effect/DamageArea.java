@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.content.fx.Fx;
-import io.anuke.mindustry.entities.Bullet;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;

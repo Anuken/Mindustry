@@ -1,7 +1,8 @@
-package io.anuke.mindustry.entities;
+package io.anuke.mindustry.entities.bullet;
 
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BulletFx;
+import io.anuke.mindustry.entities.StatusEffect;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.BaseBulletType;
 

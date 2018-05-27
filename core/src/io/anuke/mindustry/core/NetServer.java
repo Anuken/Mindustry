@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.gen.CallServer;

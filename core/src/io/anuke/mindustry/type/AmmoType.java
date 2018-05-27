@@ -2,7 +2,7 @@ package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.Fx;
-import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.ucore.core.Effects.Effect;
 
 public class AmmoType {

@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.type.Item;
@@ -40,7 +41,7 @@ public abstract class Unit extends SyncEntity implements SerializableEntity {
 
     @Override
     public boolean collides(SolidEntity other){
-        return other instanceof Bullet && state.teams.areEnemies((((Bullet) other).team), team);
+        return other instanceof io.anuke.mindustry.entities.bullet.Bullet && state.teams.areEnemies((((Bullet) other).team), team);
     }
 
     @Override

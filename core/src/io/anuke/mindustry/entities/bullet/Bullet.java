@@ -1,7 +1,9 @@
-package io.anuke.mindustry.entities;
+package io.anuke.mindustry.entities.bullet;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pools;
+import io.anuke.mindustry.entities.SyncEntity;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.BulletEntity;

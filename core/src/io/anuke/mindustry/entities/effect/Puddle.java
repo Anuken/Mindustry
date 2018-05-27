@@ -11,7 +11,7 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
-import io.anuke.mindustry.entities.Bullet;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.SerializableEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;

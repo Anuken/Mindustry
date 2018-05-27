@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities.units;
 
-import io.anuke.mindustry.entities.Bullet;
-import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.Team;

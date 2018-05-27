@@ -1,6 +1,7 @@
 package io.anuke.mindustry.entities;
 
 import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.world.Block;
@@ -108,7 +109,7 @@ public class TileEntity extends Entity{
 		}
 	}
 
-	public boolean collide(Bullet other){
+	public boolean collide(io.anuke.mindustry.entities.bullet.Bullet other){
 		return true;
 	}
 	

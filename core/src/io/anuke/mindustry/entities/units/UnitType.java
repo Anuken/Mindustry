@@ -3,7 +3,7 @@ package io.anuke.mindustry.entities.units;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.content.fx.ExplosionFx;
-import io.anuke.mindustry.entities.Bullet;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.net.Net;

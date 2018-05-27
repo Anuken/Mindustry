@@ -3,7 +3,7 @@ package io.anuke.mindustry.type;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.Fx;
-import io.anuke.mindustry.entities.Bullet;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.net.Net;

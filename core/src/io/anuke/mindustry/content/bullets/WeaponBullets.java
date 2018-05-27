@@ -1,7 +1,7 @@
 package io.anuke.mindustry.content.bullets;
 
-import io.anuke.mindustry.entities.Bullet;
-import io.anuke.mindustry.entities.BulletType;
+import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.bullet.BulletType;
 
 public class WeaponBullets {
     public static final BulletType

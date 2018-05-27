@@ -11,7 +11,6 @@ import io.anuke.mindustry.game.EventType.ResetEvent;
 import io.anuke.mindustry.game.EventType.WaveEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.TeamInfo;
-import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
@@ -106,6 +105,7 @@ public class Logic extends Module {
                 Timers.update();
             }
 
+            /*
             boolean gameOver = true;
 
             for(TeamData data : state.teams.getTeams(true)){
@@ -115,7 +115,7 @@ public class Logic extends Module {
                 }
             }
 
-           /* if(gameOver && !state.gameOver){ //TODO better gameover state, victory state?
+            if(gameOver && !state.gameOver){ //TODO better gameover state, victory state?
                 state.gameOver = true;
                 if(Net.server()) NetEvents.handleGameOver();
                 Events.fire(GameOverEvent.class);

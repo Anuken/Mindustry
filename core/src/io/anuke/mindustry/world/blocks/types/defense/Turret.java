@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.AmmoEntry;
@@ -229,7 +230,7 @@ public abstract class Turret extends Block{
 	}
 	
 	protected void bullet(Tile tile, BulletType type, float angle){
-		Bullet.create(type, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
+		io.anuke.mindustry.entities.bullet.Bullet.create(type, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
 	}
 
 	protected void effects(Tile tile){
