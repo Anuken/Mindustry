@@ -71,6 +71,11 @@ public class Player extends Unit implements BlockBuilder {
 	}
 
 	@Override
+	public float getArmor() {
+		return 0f;
+	}
+
+	@Override
 	public void onRemoteShoot(BulletType type, float x, float y, float rotation, short data) {
 		Weapon weapon = Upgrade.getByID(Bits.getLeftByte(data));
 		weapon.shoot(this, x, y, rotation, Bits.getRightByte(data) == 1);

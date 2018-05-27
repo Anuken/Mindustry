@@ -56,6 +56,11 @@ public class BaseUnit extends Unit{
 	}
 
 	@Override
+	public float getArmor() {
+		return type.armor;
+	}
+
+	@Override
 	public boolean acceptsAmmo(Item item) {
 		return type.ammo.containsKey(item) && inventory.canAcceptAmmo(type.ammo.get(item));
 	}

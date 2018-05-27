@@ -178,6 +178,7 @@ public abstract class Unit extends SyncEntity implements SerializableEntity {
     public void drawUnder(){}
     public void drawOver(){}
 
+    public abstract float getArmor();
     public abstract boolean acceptsAmmo(Item item);
     public abstract void addAmmo(Item item);
     public abstract float getMass();

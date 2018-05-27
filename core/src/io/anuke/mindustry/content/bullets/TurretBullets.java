@@ -1,31 +1,26 @@
 package io.anuke.mindustry.content.bullets;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.content.fx.Fx;
-import io.anuke.mindustry.entities.bullet.BasicBulletType;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
+import io.anuke.mindustry.entities.bullet.LiquidBulletType;
 import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
-import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
 public class TurretBullets {
@@ -68,49 +63,6 @@ public class TurretBullets {
             if(Mathf.chance(0.1 * Timers.delta())){
                 Effects.effect(EnvironmentFx.ballfire, b.x, b.y);
             }
-        }
-    },
-
-    basicIron = new BasicBulletType(3f, 5) {
-        {
-            bulletWidth = 7f;
-            bulletHeight = 9f;
-        }
-    },
-
-    basicSteel = new BasicBulletType(6f, 0) {
-        {
-            hiteffect = BulletFx.hitBulletBig;
-            knockback = 0.5f;
-            bulletWidth = 9f;
-            bulletHeight = 11f;
-        }
-    },
-
-    basicLeadFragShell = new BasicBulletType(3f, 0) {
-        {
-            hiteffect = BulletFx.flakExplosion;
-            knockback = 0.8f;
-            lifetime = 90f;
-            drag = 0.01f;
-            bulletWidth = bulletHeight = 9f;
-            fragBullet = basicLeadFrag;
-            bulletSprite = "frag";
-            bulletShrink = 0.1f;
-        }
-    },
-
-    basicLeadFrag = new BasicBulletType(3f, 0) {
-        {
-            drag = 0.1f;
-            hiteffect = Fx.none;
-            despawneffect = Fx.none;
-            hitsize = 4;
-            lifetime = 20f;
-            bulletWidth = 9f;
-            bulletHeight = 11f;
-            bulletShrink = 1f;
-            //todo scaling
         }
     },
 
@@ -165,20 +117,20 @@ public class TurretBullets {
         }
     },
 
-    waterShot = new LiquidShot(Liquids.water) {
+    waterShot = new LiquidBulletType(Liquids.water) {
         {
             status = StatusEffects.wet;
             statusIntensity = 0.5f;
             knockback = 0.65f;
         }
     },
-    cryoShot = new LiquidShot(Liquids.cryofluid) {
+    cryoShot = new LiquidBulletType(Liquids.cryofluid) {
         {
             status = StatusEffects.freezing;
             statusIntensity = 0.5f;
         }
     },
-    lavaShot = new LiquidShot(Liquids.lava) {
+    lavaShot = new LiquidBulletType(Liquids.lava) {
         {
             damage = 4;
             speed = 1.9f;
@@ -187,7 +139,7 @@ public class TurretBullets {
             statusIntensity = 0.5f;
         }
     },
-    oilShot = new LiquidShot(Liquids.oil) {
+    oilShot = new LiquidBulletType(Liquids.oil) {
         {
             speed = 2f;
             drag = 0.03f;
@@ -203,49 +155,11 @@ public class TurretBullets {
         }
 
         @Override
-        public void draw(Bullet b) {
-
-        }
+        public void draw(Bullet b) {}
 
         @Override
         public void init(Bullet b) {
             Lightning.create(b.team, hiteffect, Palette.lancerLaser, damage, b.x, b.y, b.angle(), 30);
         }
     };
-
-    private abstract static class LiquidShot extends BulletType{
-        Liquid liquid;
-
-        public LiquidShot(Liquid liquid) {
-            super(2.5f, 0);
-            this.liquid = liquid;
-
-            lifetime = 70f;
-            despawneffect = Fx.none;
-            hiteffect = BulletFx.hitLiquid;
-            drag = 0.01f;
-            knockback = 0.5f;
-        }
-
-        @Override
-        public void draw(Bullet b) {
-            Draw.color(liquid.color, Color.WHITE, b.fout() / 100f + Mathf.randomSeedRange(b.id, 0.1f));
-
-            Fill.circle(b.x, b.y, 0.5f + b.fout()*2.5f);
-        }
-
-        @Override
-        public void hit(Bullet b, float hitx, float hity) {
-            Effects.effect(hiteffect, liquid.color, hitx, hity);
-            Puddle.deposit(world.tileWorld(hitx, hity), liquid, 5f);
-
-            if(liquid.temperature <= 0.5f && liquid.flammability < 0.3f){
-                float intensity = 400f;
-                Fire.extinguish(world.tileWorld(hitx, hity), intensity);
-                for(GridPoint2 p : Geometry.d4){
-                    Fire.extinguish(world.tileWorld(hitx + p.x*tilesize, hity + p.y*tilesize), intensity);
-                }
-            }
-        }
-    }
 }

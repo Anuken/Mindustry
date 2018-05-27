@@ -7,10 +7,16 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.BaseBulletType;
 
 public abstract class BulletType extends BaseBulletType<Bullet>{
+	/**Knockback in velocity.*/
 	public float knockback;
+	/**Whether this bullet hits tiles.*/
 	public boolean hitTiles = true;
+	/**Status effect applied on hit.*/
 	public StatusEffect status = StatusEffects.none;
+	/**Intensity of applied status effect in terms of duration.*/
 	public float statusIntensity = 0.5f;
+	/**What fraction of armor is pierced, 0-1*/
+	public float armorPierce = 0f;
 
 	public BulletType(float speed, float damage){
 		this.speed = speed;

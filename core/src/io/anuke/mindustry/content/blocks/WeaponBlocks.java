@@ -15,7 +15,7 @@ public class WeaponBlocks{
 	public static Block
 	
 	duo = new DoubleTurret("duo"){{
-		ammoTypes = new AmmoType[]{AmmoTypes.basicIron, AmmoTypes.basicLead, AmmoTypes.standardLead, AmmoTypes.tracer};
+		ammoTypes = new AmmoType[]{AmmoTypes.basicIron, AmmoTypes.basicLead, AmmoTypes.standardLead, AmmoTypes.standardTracer};
 		reload = 25f;
 		restitution = 0.03f;
 		ammoUseEffect = ShootFx.shellEjectSmall;
