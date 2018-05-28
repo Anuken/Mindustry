@@ -41,7 +41,7 @@ public class TurretBullets {
 
         @Override
         public void draw(Bullet b) {
-            //TODO add color to the bullet
+            //TODO add color to the bullet depending on the color of the flame it came from
             Draw.color(Palette.lightFlame, Palette.darkFlame, Color.GRAY, b.fin());
             Fill.circle(b.x, b.y, 3f * b.fout());
             Draw.reset();
@@ -115,6 +115,10 @@ public class TurretBullets {
             }
             Draw.reset();
         }
+    },
+
+    fuseShot = new BulletType(0.01f, 100) {
+        //TODO
     },
 
     waterShot = new LiquidBulletType(Liquids.water) {

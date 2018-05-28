@@ -3,15 +3,8 @@ package io.anuke.mindustry.content.bullets;
 import io.anuke.mindustry.entities.bullet.BasicBulletType;
 import io.anuke.mindustry.entities.bullet.BulletType;
 
-public class StandardBullets {
+public class FlakBullets {
     public static final BulletType
-
-    iron = new BasicBulletType(3f, 5) {
-        {
-            bulletWidth = 7f;
-            bulletHeight = 9f;
-        }
-    },
 
     lead = new BasicBulletType(3f, 5) {
         {
@@ -20,28 +13,21 @@ public class StandardBullets {
         }
     },
 
-    steel = new BasicBulletType(3f, 5) {
+    plastic = new BasicBulletType(3f, 5) {
         {
             bulletWidth = 7f;
             bulletHeight = 9f;
         }
     },
 
-    thorium = new BasicBulletType(3f, 5) {
+    explosive = new BasicBulletType(3f, 5) {
         {
             bulletWidth = 7f;
             bulletHeight = 9f;
         }
     },
 
-    homing = new BasicBulletType(3f, 5) {
-        {
-            bulletWidth = 7f;
-            bulletHeight = 9f;
-        }
-    },
-
-    tracer = new BasicBulletType(3f, 5) {
+    surge = new BasicBulletType(3f, 5) {
         {
             bulletWidth = 7f;
             bulletHeight = 9f;

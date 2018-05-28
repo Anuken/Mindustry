@@ -137,8 +137,8 @@ public class Build {
             return true;
         }else {
             return (tile.getTeam() == Team.none || tile.getTeam() == team) && tile.floor().placeableOn
-                    && ((type.canReplace(tile.block()) && !(type == tile.block() && rotation == tile.getRotation() && type.rotate)) || tile.block().alwaysReplace)
-                    && tile.block().isMultiblock() == type.isMultiblock() || tile.block() == Blocks.air;
+                    && ((type.canReplace(tile.block()) && !(type == tile.block() && rotation == tile.getRotation() && type.rotate)) || tile.block().alwaysReplace  || tile.block() == Blocks.air)
+                    && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile);
         }
     }
 

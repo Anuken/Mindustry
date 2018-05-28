@@ -15,14 +15,14 @@ public class WeaponBlocks{
 	public static Block
 	
 	duo = new DoubleTurret("duo"){{
-		ammoTypes = new AmmoType[]{AmmoTypes.basicIron, AmmoTypes.basicLead, AmmoTypes.standardLead, AmmoTypes.standardTracer};
+		ammoTypes = new AmmoType[]{AmmoTypes.bulletIron, AmmoTypes.bulletLead, AmmoTypes.bulletSteel, AmmoTypes.bulletThermite};
 		reload = 25f;
 		restitution = 0.03f;
 		ammoUseEffect = ShootFx.shellEjectSmall;
 	}},
 	
 	scatter = new BurstTurret("scatter") {{
-		ammoTypes = new AmmoType[]{AmmoTypes.basicLeadFlak, AmmoTypes.standardLeadFlak, AmmoTypes.compositeFlak};
+		ammoTypes = new AmmoType[]{AmmoTypes.flakLead, AmmoTypes.flakExplosive, AmmoTypes.flakPlastic};
 		ammoPerShot = 1;
 		shots = 3;
 		reload = 60f;
@@ -39,9 +39,11 @@ public class WeaponBlocks{
 		shootCone = 50f;
 		ammoUseEffect = ShootFx.shellEjectSmall;
 
-		drawer = (tile, entity) -> {
-			Draw.rect(entity.target != null ? name + "-shoot" : name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-		};
+		drawer = (tile, entity) -> Draw.rect(entity.target != null ? name + "-shoot" : name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+	}},
+
+	hail = new ItemTurret("hail") {{
+		ammoTypes = new AmmoType[]{AmmoTypes.artilleryLead, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary};
 	}},
 
 	wave = new LiquidTurret("wave") {{
@@ -67,7 +69,7 @@ public class WeaponBlocks{
 	crux = new ItemTurret("crux"){{
 		size = 2;
 		range = 100f;
-		ammoTypes = new AmmoType[]{AmmoTypes.basicLeadShell, AmmoTypes.explosiveFragShell, AmmoTypes.fragShell, AmmoTypes.standardThoriumShell};
+		ammoTypes = new AmmoType[]{AmmoTypes.shellExplosive, AmmoTypes.shellLead, AmmoTypes.shellPlastic, AmmoTypes.shellThorium};
 		reload = 70f;
 		restitution = 0.03f;
 		ammoEjectBack = 3f;
@@ -122,21 +124,54 @@ public class WeaponBlocks{
 		size = 2;
 	}},
 
-	swarmer = new ItemTurret("missileturret") {{
-		ammoTypes = new AmmoType[]{AmmoTypes.basicLeadShell, AmmoTypes.explosiveFragShell, AmmoTypes.fragShell, AmmoTypes.standardThoriumShell};
+	swarmer = new ItemTurret("swarmer") {{
+		ammoTypes = new AmmoType[]{AmmoTypes.missileExplosive, AmmoTypes.missileIncindiary, AmmoTypes.missileSurge};
 		size = 2;
 	}},
 
-	fuse = new ItemTurret("fuse") {{
-		ammoTypes = new AmmoType[]{AmmoTypes.basicLeadShell, AmmoTypes.explosiveFragShell, AmmoTypes.fragShell, AmmoTypes.standardThoriumShell};
+	ripple = new ItemTurret("ripple") {{
+		ammoTypes = new AmmoType[]{AmmoTypes.artilleryLead, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary, AmmoTypes.artilleryPlastic, AmmoTypes.artilleryThorium};
 		size = 3;
 	}},
 
-	spectre = new PowerTurret("spectre") {{
+	cyclone = new ItemTurret("cyclone") {{
+		ammoTypes = new AmmoType[]{AmmoTypes.flakLead, AmmoTypes.flakExplosive, AmmoTypes.flakPlastic, AmmoTypes.flakSurge};
 		size = 3;
+	}},
+
+	fuse = new ItemTurret("fuse") {{
+		//TODO make it use power
+		ammoTypes = new AmmoType[]{AmmoTypes.fuseShotgun};
+		size = 3;
+	}},
+
+	spectre = new LaserTurret("spectre") {{
+		range = 70f;
+		chargeTime = 70f;
+		chargeMaxDelay = 30f;
+		chargeEffects = 7;
+		shootType = AmmoTypes.spectreLaser;
+		recoil = 2f;
+		reload = 130f;
+		cooldown = 0.03f;
+		shootEffect = ShootFx.lancerLaserShoot;
+		smokeEffect = ShootFx.lancerLaserShootSmoke;
+		chargeEffect = ShootFx.lancerLaserCharge;
+		chargeBeginEffect = ShootFx.lancerLaserChargeBegin;
+		heatColor = Color.RED;
+		size = 3;
+	}},
+
+	eraser = new ItemTurret("eraser"){{
+		ammoTypes = new AmmoType[]{AmmoTypes.bulletIron, AmmoTypes.bulletLead, AmmoTypes.bulletSteel, AmmoTypes.bulletThermite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
+		reload = 25f;
+		restitution = 0.03f;
+		ammoUseEffect = ShootFx.shellEjectSmall;
+		size = 4;
 	}},
 
 	meltdown = new PowerTurret("meltdown") {{
-		size = 3;
+		shootType = AmmoTypes.meltdownLaser;
+		size = 4;
 	}};
 }

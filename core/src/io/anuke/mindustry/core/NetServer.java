@@ -168,7 +168,7 @@ public class NetServer extends Module{
         Net.handleServer(EntityShootPacket.class, (id, packet) -> {
             Player player = connections.get(id);
 
-            BulletType type = BaseBulletType.getByID(packet.bulletid);
+            BulletType type = BulletType.getByID(packet.bulletid);
             Weapon weapon = Upgrade.getByID((byte)packet.data);
 
             if(!player.upgrades.contains(weapon, true)){

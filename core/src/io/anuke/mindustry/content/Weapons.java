@@ -11,6 +11,6 @@ public class Weapons {
         reload = 15f;
         roundrobin = true;
         ejectEffect = ShootFx.shellEjectSmall;
-        setAmmo(AmmoTypes.basicIron);
+        setAmmo(AmmoTypes.bulletIron);
     }};
 }

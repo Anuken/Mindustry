@@ -7,6 +7,6 @@ public class Scout extends GroundUnitType {
 
     public Scout(){
         super("scout");
-        setAmmo(AmmoTypes.basicIron);
+        setAmmo(AmmoTypes.bulletIron);
     }
 }

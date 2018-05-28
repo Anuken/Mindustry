@@ -39,6 +39,7 @@ public class Blocks {
     }},
 
     space = new Floor("space") {{
+        placeableOn = false;
         variants = 0;
         cacheLayer = CacheLayer.space;
         solid = true;
@@ -62,6 +63,7 @@ public class Blocks {
     }},
 
     water = new Floor("water") {{
+        placeableOn = false;
         liquidColor = Color.valueOf("546bb3");
         speedMultiplier = 0.5f;
         variants = 0;
@@ -73,6 +75,7 @@ public class Blocks {
     }},
 
     lava = new Floor("lava") {{
+        placeableOn = false;
         liquidColor = Color.valueOf("ed5334");
         speedMultiplier = 0.2f;
         damageTaken = 0.1f;
@@ -85,6 +88,7 @@ public class Blocks {
     }},
 
     oil = new Floor("oil") {{
+        placeableOn = false;
         liquidColor = Color.valueOf("292929");
         status = StatusEffects.oiled;
         statusIntensity = 1f;

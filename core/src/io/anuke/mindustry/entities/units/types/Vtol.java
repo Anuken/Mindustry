@@ -15,7 +15,7 @@ public class Vtol extends FlyingUnitType {
 
     public Vtol(){
         super("vtol");
-        setAmmo(AmmoTypes.basicIron);
+        setAmmo(AmmoTypes.bulletIron);
         speed = 0.3f;
         maxVelocity = 2f;
         reload = 7;

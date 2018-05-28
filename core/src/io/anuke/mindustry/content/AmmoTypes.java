@@ -1,8 +1,6 @@
 package io.anuke.mindustry.content;
 
-import io.anuke.mindustry.content.bullets.ShellBullets;
-import io.anuke.mindustry.content.bullets.StandardBullets;
-import io.anuke.mindustry.content.bullets.TurretBullets;
+import io.anuke.mindustry.content.bullets.*;
 import io.anuke.mindustry.content.fx.ShootFx;
 import io.anuke.mindustry.type.AmmoType;
 
@@ -10,98 +8,145 @@ public class AmmoTypes {
     //TODO add definitions for all ammo types
     public static final AmmoType
 
-    basicIron = new AmmoType(Items.iron, StandardBullets.basicIron, 5){{
+    //bullets
+
+    bulletIron = new AmmoType(Items.iron, StandardBullets.iron, 5){{
         shootEffect = ShootFx.shootSmall;
         smokeEffect = ShootFx.shootSmallSmoke;
     }},
 
-    basicLead = new AmmoType(Items.lead, StandardBullets.basicLead, 5){{
+    bulletLead = new AmmoType(Items.lead, StandardBullets.lead, 5){{
         shootEffect = ShootFx.shootSmall;
         smokeEffect = ShootFx.shootSmallSmoke;
     }},
 
-    standardLead = new AmmoType(AmmoItems.leadBullet, StandardBullets.standardLead, 5){{
+    bulletSteel = new AmmoType(Items.steel, StandardBullets.steel, 5){{
         shootEffect = ShootFx.shootSmall;
         smokeEffect = ShootFx.shootSmallSmoke;
     }},
 
-    standardArmorPiercing = new AmmoType(AmmoItems.armorPiercingBullet, StandardBullets.standardArmorPiercing, 5){{
-        shootEffect = ShootFx.shootBig;
-        smokeEffect = ShootFx.shootBigSmoke;
-    }},
-
-    standardHoming = new AmmoType(AmmoItems.homingBullet, StandardBullets.standardHoming, 5){{
-        shootEffect = ShootFx.shootBig;
-        smokeEffect = ShootFx.shootBigSmoke;
-    }},
-
-    standardTracer = new AmmoType(AmmoItems.tracerBullet, StandardBullets.standardTracer, 5){{
-        shootEffect = ShootFx.shootBig;
-        smokeEffect = ShootFx.shootBigSmoke;
-    }},
-
-    basicLeadFlak = new AmmoType(Items.lead, StandardBullets.basicLeadFlak, 5){{
+    bulletThorium = new AmmoType(Items.thorium, StandardBullets.thorium, 5){{
         shootEffect = ShootFx.shootSmall;
         smokeEffect = ShootFx.shootSmallSmoke;
     }},
 
-    standardLeadFlak = new AmmoType(AmmoItems.leadBullet, StandardBullets.standardLeadFlak, 5){{
+    bulletSilicon = new AmmoType(Items.silicon, StandardBullets.homing, 5){{
         shootEffect = ShootFx.shootSmall;
         smokeEffect = ShootFx.shootSmallSmoke;
     }},
 
-    compositeFlak = new AmmoType(AmmoItems.compositeFlak, StandardBullets.compositeFlak, 5){{
+    bulletThermite = new AmmoType(Items.thermite, StandardBullets.tracer, 5){{
         shootEffect = ShootFx.shootSmall;
         smokeEffect = ShootFx.shootSmallSmoke;
     }},
+
+    //flak
+
+    flakLead = new AmmoType(Items.lead, FlakBullets.lead, 5){{
+        shootEffect = ShootFx.shootSmall;
+        smokeEffect = ShootFx.shootSmallSmoke;
+    }},
+
+    flakExplosive = new AmmoType(Items.rdx, FlakBullets.explosive, 5){{
+        shootEffect = ShootFx.shootSmall;
+        smokeEffect = ShootFx.shootSmallSmoke;
+    }},
+
+    flakPlastic = new AmmoType(Items.plastic, FlakBullets.plastic, 5){{
+        shootEffect = ShootFx.shootSmall;
+        smokeEffect = ShootFx.shootSmallSmoke;
+    }},
+
+    flakSurge = new AmmoType(Items.densealloy, FlakBullets.surge, 5){{
+        shootEffect = ShootFx.shootSmall;
+        smokeEffect = ShootFx.shootSmallSmoke;
+    }},
+
+    //shells
+
+    shellLead = new AmmoType(Items.lead, ShellBullets.lead, 1){{
+        shootEffect = ShootFx.shootBig2;
+        smokeEffect = ShootFx.shootBigSmoke2;
+    }},
+
+    shellExplosive = new AmmoType(Items.rdx, ShellBullets.explosive, 1){{
+        shootEffect = ShootFx.shootBig2;
+        smokeEffect = ShootFx.shootBigSmoke2;
+    }},
+
+    shellPlastic = new AmmoType(Items.plastic, ShellBullets.plastic, 1){{
+        shootEffect = ShootFx.shootBig2;
+        smokeEffect = ShootFx.shootBigSmoke2;
+    }},
+
+    shellThorium = new AmmoType(Items.thorium, ShellBullets.thorium, 1){{
+        shootEffect = ShootFx.shootBig2;
+        smokeEffect = ShootFx.shootBigSmoke2;
+    }},
+
+    //missiles
+
+    missileExplosive = new AmmoType(Items.rdx, MissileBullets.explosive, 1){{
+        shootEffect = ShootFx.shootBig2;
+        smokeEffect = ShootFx.shootBigSmoke2;
+    }},
+
+    missileIncindiary = new AmmoType(Items.thermite, MissileBullets.incindiary, 1){{
+        shootEffect = ShootFx.shootBig2;
+        smokeEffect = ShootFx.shootBigSmoke2;
+    }},
+
+    missileSurge = new AmmoType(Items.densealloy, MissileBullets.surge, 1){{
+        shootEffect = ShootFx.shootBig2;
+        smokeEffect = ShootFx.shootBigSmoke2;
+    }},
+
+    //artillery
+
+    artilleryLead = new AmmoType(Items.lead, ArtilleryBullets.lead, 1){{
+        shootEffect = ShootFx.shootBig2;
+        smokeEffect = ShootFx.shootBigSmoke2;
+    }},
+
+    artilleryThorium = new AmmoType(Items.thorium, ArtilleryBullets.thorium, 1){{
+        shootEffect = ShootFx.shootBig2;
+        smokeEffect = ShootFx.shootBigSmoke2;
+    }},
+
+    artilleryPlastic = new AmmoType(Items.plastic, ArtilleryBullets.plastic, 1){{
+        shootEffect = ShootFx.shootBig2;
+        smokeEffect = ShootFx.shootBigSmoke2;
+    }},
+
+    artilleryHoming = new AmmoType(Items.silicon, ArtilleryBullets.homing, 1){{
+        shootEffect = ShootFx.shootBig2;
+        smokeEffect = ShootFx.shootBigSmoke2;
+    }},
+
+    artilleryIncindiary = new AmmoType(Items.thermite, ArtilleryBullets.incindiary, 1){{
+        shootEffect = ShootFx.shootBig2;
+        smokeEffect = ShootFx.shootBigSmoke2;
+    }},
+
+    //flame
 
     basicFlame = new AmmoType(Liquids.oil, TurretBullets.basicFlame, 0.3f){{
         shootEffect = ShootFx.shootSmallFlame;
     }},
 
-    basicLeadShell = new AmmoType(Items.lead, ShellBullets.basicLeadShell, 1){{
-        shootEffect = ShootFx.shootBig2;
-        smokeEffect = ShootFx.shootBigSmoke2;
-    }},
-
-    explosiveFragShell = new AmmoType(AmmoItems.explosiveShell, ShellBullets.explosiveShell, 1){{
-        shootEffect = ShootFx.shootBig2;
-        smokeEffect = ShootFx.shootBigSmoke2;
-    }},
-
-    fragShell = new AmmoType(AmmoItems.fragShell, ShellBullets.fragShell, 1){{
-        shootEffect = ShootFx.shootBig2;
-        smokeEffect = ShootFx.shootBigSmoke2;
-    }},
-
-    standardThoriumShell = new AmmoType(AmmoItems.thoriumShell, ShellBullets.thoriumShell, 1){{
-        shootEffect = ShootFx.shootBig2;
-        smokeEffect = ShootFx.shootBigSmoke2;
-    }},
-
-    swarmMissile = new AmmoType(AmmoItems.swarmMissile, ShellBullets.swarmMissile, 1){{
-        shootEffect = ShootFx.shootBig2;
-        smokeEffect = ShootFx.shootBigSmoke2;
-    }},
-
-    scytheMissile = new AmmoType(AmmoItems.scytheMissile, ShellBullets.scytheMissile, 1){{
-        shootEffect = ShootFx.shootBig2;
-        smokeEffect = ShootFx.shootBigSmoke2;
-    }},
-
-    incendiaryMortar = new AmmoType(AmmoItems.incendiaryMortarShell, ShellBullets.incendiaryMortar, 1){{
-        shootEffect = ShootFx.shootBig2;
-        smokeEffect = ShootFx.shootBigSmoke2;
-    }},
-
-    surgeMortar = new AmmoType(AmmoItems.surgeMortarShell, ShellBullets.surgeMortar, 1){{
-        shootEffect = ShootFx.shootBig2;
-        smokeEffect = ShootFx.shootBigSmoke2;
-    }},
+    //power
 
     lancerLaser = new AmmoType(TurretBullets.lancerLaser),
 
     lightning = new AmmoType(TurretBullets.lightning),
+
+    spectreLaser = new AmmoType(TurretBullets.lancerLaser),
+
+    meltdownLaser = new AmmoType(TurretBullets.lancerLaser),
+
+    fuseShotgun = new AmmoType(Items.iron, TurretBullets.fuseShot, 0.1f),
+
+    //liquid
 
     oil = new AmmoType(Liquids.oil, TurretBullets.oilShot, 0.3f),
 

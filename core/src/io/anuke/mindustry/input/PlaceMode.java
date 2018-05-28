@@ -304,7 +304,6 @@ public enum PlaceMode{
 
 		        Graphics.flush();
             }
-            //Lines.crect(x, y, block.size * tilesize, block.size * tilesize);
         }
 		
 		public void released(InputHandler input, int tilex, int tiley, int endx, int endy){

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities.bullet;
 
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.entities.StatusEffect;
@@ -7,6 +8,10 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.BaseBulletType;
 
 public abstract class BulletType extends BaseBulletType<Bullet>{
+	private static int lastid = 0;
+	private static Array<BulletType> types = new Array<>();
+
+	public final int id;
 	/**Knockback in velocity.*/
 	public float knockback;
 	/**Whether this bullet hits tiles.*/
@@ -19,11 +24,14 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 	public float armorPierce = 0f;
 
 	public BulletType(float speed, float damage){
+		this.id = lastid ++;
 		this.speed = speed;
 		this.damage = damage;
 		lifetime = 40f;
 		hiteffect = BulletFx.hitBulletSmall;
 		despawneffect = BulletFx.despawn;
+
+		types.add(this);
 	}
 	
 	@Override
@@ -34,5 +42,13 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 	@Override
 	public void despawned(Bullet b){
 		Effects.effect(despawneffect, b.x, b.y, b.angle());
+	}
+
+	public static BulletType getByID(int id){
+		return types.get(id);
+	}
+
+	public static Array<BulletType> all(){
+		return types;
 	}
 }

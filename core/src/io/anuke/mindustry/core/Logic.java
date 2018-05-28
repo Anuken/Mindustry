@@ -81,7 +81,7 @@ public class Logic extends Module {
         for(int i = 0; i < 10; i ++){
             BaseUnit unit = new BaseUnit(UnitTypes.vtol, Team.red);
             Vector2 offset = new Vector2().setToRandomDirection().scl(world.width()/2f*tilesize).add(world.width()/2f*tilesize, world.height()/2f*tilesize);
-            unit.inventory.addAmmo(AmmoTypes.basicIron);
+            unit.inventory.addAmmo(AmmoTypes.bulletIron);
             unit.inventory.setInfiniteAmmo(true);
             unit.set(offset.x, offset.y).add();
         }

@@ -4,9 +4,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
+import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
@@ -19,7 +19,6 @@ import io.anuke.mindustry.world.Build;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.BaseBulletType;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
@@ -208,7 +207,7 @@ public class NetClient extends Module {
         });
 
         Net.handleClient(EntityShootPacket.class, packet -> {
-            BulletType type = BaseBulletType.getByID(packet.bulletid);
+            BulletType type = BulletType.getByID(packet.bulletid);
             EntityGroup group = Entities.getGroup(packet.groupid);
             SyncEntity owner = (SyncEntity) group.getByID(packet.entityid);
 

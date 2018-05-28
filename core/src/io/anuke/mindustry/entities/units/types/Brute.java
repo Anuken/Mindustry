@@ -7,7 +7,7 @@ public class Brute extends GroundUnitType {
 
     public Brute(String name) {
         super(name);
-        setAmmo(AmmoTypes.basicIron);
+        setAmmo(AmmoTypes.bulletIron);
     }
 
 }

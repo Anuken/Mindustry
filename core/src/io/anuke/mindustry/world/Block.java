@@ -30,9 +30,7 @@ import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.EnumSet;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Block extends BaseBlock {
 	private static int lastid;
@@ -135,10 +133,21 @@ public class Block extends BaseBlock {
 	public boolean isLayer2(Tile tile){return true;}
 	public void drawLayer(Tile tile){}
 	public void drawLayer2(Tile tile){}
+
+	/**Draw the block overlay that is shown when a cursor is over the block.*/
 	public void drawSelect(Tile tile){}
+
+	/**Drawn when you are placing a block.*/
 	public void drawPlace(int x, int y, int rotation, boolean valid){}
+
+	/**Called after the block is placed.*/
 	public void placed(Tile tile){}
+
+	/**Called every frame a unit is on this tile.*/
 	public void unitOn(Tile tile, Unit unit){}
+
+	/**Returns whether ot not this block can be place on the specified tile.*/
+	public boolean canPlaceOn(Tile tile){ return true; }
 
 	/**Called after all blocks are created.*/
 	public void init(){
@@ -147,14 +156,25 @@ public class Block extends BaseBlock {
 	}
 
 	/**Called after texture atlas is loaded.*/
-	public void load(){
+	public void load(){}
 
+	/**Called when the block is tapped.*/
+	public void tapped(Tile tile, Player player){}
+
+	/**Called when this block is tapped to build a UI on the table.
+	 * {@link #isConfigurable(Tile)} able} must return true for this to be called.*/
+	public void buildTable(Tile tile, Table table) {}
+
+	//TODO make it a boolean?
+	/**Returns whether this tile can be configured.*/
+	public boolean isConfigurable(Tile tile){
+		return false;
 	}
 
-	public void tapped(Tile tile, Player player){}
-	public void buildTable(Tile tile, Table table) {}
+	//TODO remove this
 	public void configure(Tile tile, byte data){}
 
+	//TODO remove this
 	public void setConfigure(Tile tile, byte data){
 		configure(tile, data);
 		if(Net.active()) NetEvents.handleBlockConfig(tile, data);
@@ -177,10 +197,6 @@ public class Block extends BaseBlock {
 		Lines.square(tile.drawx(), tile.drawy(),
 				tile.block().size * tilesize / 2f + 1f);
 		Draw.reset();
-	}
-
-	public boolean isConfigurable(Tile tile){
-		return false;
 	}
 	
 	public void setStats(){

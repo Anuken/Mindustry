@@ -16,7 +16,7 @@ public class Cruiser extends FlyingUnitType {
 
     public Cruiser(){
         super("vtol");
-        setAmmo(AmmoTypes.basicIron);
+        setAmmo(AmmoTypes.bulletIron);
         speed = 0.2f;
         maxVelocity = 1.4f;
         health = 300f;

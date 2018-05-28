@@ -42,6 +42,7 @@ public class Recipes {
         new Recipe(weapon, WeaponBlocks.crux, new ItemStack(Items.steel, 25), new ItemStack(Items.titanium, 15));
         new Recipe(weapon, WeaponBlocks.arc, new ItemStack(Items.steel, 20), new ItemStack(Items.titanium, 25), new ItemStack(Items.densealloy, 15));
         new Recipe(weapon, WeaponBlocks.swarmer, new ItemStack(Items.steel, 80), new ItemStack(Items.titanium, 70), new ItemStack(Items.densealloy, 60));
+        new Recipe(weapon, WeaponBlocks.ripple, new ItemStack(Items.steel, 80), new ItemStack(Items.titanium, 70), new ItemStack(Items.densealloy, 60));
         new Recipe(weapon, WeaponBlocks.fuse, new ItemStack(Items.steel, 70), new ItemStack(Items.titanium, 50), new ItemStack(Items.densealloy, 55));
         new Recipe(weapon, WeaponBlocks.spectre, new ItemStack(Items.steel, 70), new ItemStack(Items.titanium, 50), new ItemStack(Items.densealloy, 55));
         new Recipe(weapon, WeaponBlocks.meltdown, new ItemStack(Items.steel, 70), new ItemStack(Items.titanium, 50), new ItemStack(Items.densealloy, 55));

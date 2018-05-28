@@ -33,6 +33,7 @@ public class Items {
     }},
 
     titanium = new Item("titanium", Color.valueOf("8da1e3")){{
+        type = ItemType.material;
         hardness = 3;
     }},
 
@@ -62,12 +63,16 @@ public class Items {
     }},
 
     sand = new Item("sand", Color.valueOf("e3d39e")){{
-
         fluxiness = 0.5f;
     }},
 
     rdx = new Item("rdx", Color.valueOf("ff795e")){{
         flammability = 0.2f;
         explosiveness = 0.6f;
+    }},
+
+    thermite = new Item("thermite", Color.valueOf("ff795e")){{
+        flammability = 0.7f;
+        explosiveness = 0.2f;
     }};
 }
