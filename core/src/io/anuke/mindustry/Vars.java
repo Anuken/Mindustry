@@ -50,7 +50,7 @@ public class Vars{
 	//how far away from spawn points the player can't place blocks
 	public static final float enemyspawnspace = 65;
 
-	public static final float coreBuildRange = 1000f;
+	public static final float coreBuildRange = 400f;
 	//discord group URL
 	public static final String discordURL = "https://discord.gg/BKADYds";
 

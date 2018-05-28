@@ -13,6 +13,7 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.effect.Rubble;
+import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
@@ -32,7 +33,7 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Block extends BaseBlock {
+public class Block extends BaseBlock implements Content{
 	private static int lastid;
 	private static Array<Block> blocks = new Array<>();
 	private static ObjectMap<String, Block> map = new ObjectMap<>();
@@ -442,6 +443,16 @@ public class Block extends BaseBlock {
 				"entity.id", tile.entity.id,
 				"entity.items.total", hasItems ? tile.entity.items.totalItems() : null
 		);
+	}
+
+	@Override
+	public String getContentName() {
+		return name;
+	}
+
+	@Override
+	public String getContentTypeName() {
+		return "block";
 	}
 
 	@Override

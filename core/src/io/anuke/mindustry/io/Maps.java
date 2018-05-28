@@ -24,8 +24,6 @@ public class Maps implements Disposable{
 	private Array<Map> allMaps = new Array<>();
 	/**Temporary array used for returning things.*/
 	private Array<Map> returnArray = new Array<>();
-	/**Used for writing a list of custom map names on GWT.*/
-	private Json json = new Json();
 	/**Used for storing a list of custom map names for GWT.*/
 	private Array<String> customMapNames;
 
@@ -87,7 +85,7 @@ public class Maps implements Disposable{
 				Settings.putString("map-data-" + name, new String(Base64Coder.encode(stream.toByteArray())));
 				if(!customMapNames.contains(name, false)){
 					customMapNames.add(name);
-					Settings.putString("custom-maps", json.toJson(customMapNames));
+					Settings.putJson("custom-maps", customMapNames);
 				}
 				Settings.save();
 			}
@@ -127,7 +125,7 @@ public class Maps implements Disposable{
 		} else {
 			customMapNames.removeValue(map.name, false);
 			Settings.putString("map-data-" + map.name, "");
-			Settings.putString("custom-maps", json.toJson(customMapNames));
+			Settings.putJson("custom-maps", customMapNames);
 			Settings.save();
 		}
 	}
@@ -159,7 +157,7 @@ public class Maps implements Disposable{
             }
 
         }else{
-            customMapNames = json.fromJson(Array.class, Settings.getString("custom-maps", "{}"));
+            customMapNames = Settings.getJson("custom-maps", Array.class);
 
             for(String name : customMapNames){
                 try{

@@ -47,7 +47,7 @@ public class AmmoTypes {
         smokeEffect = ShootFx.shootSmallSmoke;
     }},
 
-    flakExplosive = new AmmoType(Items.rdx, FlakBullets.explosive, 5){{
+    flakExplosive = new AmmoType(Items.blastCompound, FlakBullets.explosive, 5){{
         shootEffect = ShootFx.shootSmall;
         smokeEffect = ShootFx.shootSmallSmoke;
     }},
@@ -69,7 +69,7 @@ public class AmmoTypes {
         smokeEffect = ShootFx.shootBigSmoke2;
     }},
 
-    shellExplosive = new AmmoType(Items.rdx, ShellBullets.explosive, 1){{
+    shellExplosive = new AmmoType(Items.blastCompound, ShellBullets.explosive, 1){{
         shootEffect = ShootFx.shootBig2;
         smokeEffect = ShootFx.shootBigSmoke2;
     }},
@@ -86,7 +86,7 @@ public class AmmoTypes {
 
     //missiles
 
-    missileExplosive = new AmmoType(Items.rdx, MissileBullets.explosive, 1){{
+    missileExplosive = new AmmoType(Items.blastCompound, MissileBullets.explosive, 1){{
         shootEffect = ShootFx.shootBig2;
         smokeEffect = ShootFx.shootBigSmoke2;
     }},

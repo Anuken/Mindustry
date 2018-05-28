@@ -188,12 +188,12 @@ public class HudFragment implements Fragment{
 		flip.getStyle().imageUp = Core.skin.getDrawable(shown ? "icon-arrow-down" : "icon-arrow-up");
 
 		if (shown) {
-			blockfrag.toggle(false, dur, in);
+			//blockfrag.toggle(false, dur, in);
 			wavetable.actions(Actions.translateBy(0, wavetable.getHeight() + dsize, dur, in), Actions.call(() -> shown = false));
 			infolabel.actions(Actions.translateBy(0, wavetable.getHeight(), dur, in), Actions.call(() -> shown = false));
 		} else {
 			shown = true;
-			blockfrag.toggle(true, dur, in);
+			//blockfrag.toggle(true, dur, in);
 			wavetable.actions(Actions.translateBy(0, -wavetable.getTranslation().y, dur, in));
 			infolabel.actions(Actions.translateBy(0, -infolabel.getTranslation().y, dur, in));
 		}

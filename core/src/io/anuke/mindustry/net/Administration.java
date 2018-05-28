@@ -1,7 +1,6 @@
 package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.ucore.core.Settings;
@@ -10,7 +9,6 @@ public class Administration {
     public static final int defaultMaxBrokenBlocks = 15;
     public static final int defaultBreakCooldown = 1000*15;
 
-    private Json json = new Json();
     /**All player info. Maps UUIDs to info. This persists throughout restarts.*/
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
     /**Maps UUIDs to trace infos. This is wiped when a player logs off.*/
@@ -19,8 +17,6 @@ public class Administration {
 
     public Administration(){
         Settings.defaultList(
-            "playerInfo", "{}",
-            "bannedIPs", "{}",
             "antigrief", false,
             "antigrief-max", defaultMaxBrokenBlocks,
             "antigrief-cooldown", defaultBreakCooldown
@@ -289,14 +285,14 @@ public class Administration {
     }
 
     public void save(){
-        Settings.putString("playerInfo", json.toJson(playerInfo));
-        Settings.putString("bannedIPs", json.toJson(bannedIPs));
+        Settings.putJson("player-info", playerInfo);
+        Settings.putJson("banned-ips", bannedIPs);
         Settings.save();
     }
 
     private void load(){
-        playerInfo = json.fromJson(ObjectMap.class, Settings.getString("playerInfo"));
-        bannedIPs = json.fromJson(Array.class, Settings.getString("bannedIPs"));
+        playerInfo = Settings.getJson("player-info", ObjectMap.class);
+        bannedIPs = Settings.getJson("banned-ips", Array.class);
     }
 
     public static class PlayerInfo{

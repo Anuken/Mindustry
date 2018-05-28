@@ -2323,7 +2323,7 @@ item-armor-piercing-bullet
   index: -1
 item-composite-flak
   rotate: false
-  xy: 644, 160
+  xy: 624, 130
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -2365,7 +2365,7 @@ item-lead-bullet
   index: -1
 item-scythe-missile
   rotate: false
-  xy: 654, 145
+  xy: 664, 165
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -2405,16 +2405,16 @@ item-biomatter
   orig: 8, 8
   offset: 0, 0
   index: -1
-item-coal
+item-blast-compound
   rotate: false
   xy: 634, 150
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-item-densealloy
+item-coal
   rotate: false
-  xy: 624, 130
+  xy: 644, 160
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -2440,35 +2440,35 @@ item-plastic
   orig: 8, 8
   offset: 0, 0
   index: -1
-item-rdx
+item-sand
   rotate: false
   xy: 654, 155
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
-item-sand
-  rotate: false
-  xy: 664, 165
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
 item-silicon
   rotate: false
-  xy: 664, 155
+  xy: 654, 145
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 item-steel
   rotate: false
-  xy: 654, 135
+  xy: 664, 155
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 item-stone
+  rotate: false
+  xy: 654, 135
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+item-surge-alloy
   rotate: false
   xy: 664, 145
   size: 8, 8

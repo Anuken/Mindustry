@@ -38,6 +38,7 @@ public class Items {
     }},
 
     thorium = new Item("thorium", Color.valueOf("f9a3c7")) {{
+        type = ItemType.material;
         explosiveness = 0.1f;
         hardness = 4;
     }},
@@ -52,12 +53,11 @@ public class Items {
         explosiveness = 0.1f;
     }},
 
-    surgealloy = new Item("surgealloy", Color.valueOf("b4d5c7")){{
+    surgealloy = new Item("surge-alloy", Color.valueOf("b4d5c7")){{
         type = ItemType.material;
     }},
 
     biomatter = new Item("biomatter", Color.valueOf("648b55")) {{
-        type = ItemType.material;
         flammability = 0.4f;
         fluxiness = 0.2f;
     }},
@@ -66,7 +66,7 @@ public class Items {
         fluxiness = 0.5f;
     }},
 
-    rdx = new Item("rdx", Color.valueOf("ff795e")){{
+    blastCompound = new Item("blast-compound", Color.valueOf("ff795e")){{
         flammability = 0.2f;
         explosiveness = 0.6f;
     }},
