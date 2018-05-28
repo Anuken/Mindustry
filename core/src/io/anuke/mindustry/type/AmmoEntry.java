@@ -1,10 +1,11 @@
 package io.anuke.mindustry.type;
 
+/**Used to store ammo amounts in units and turrets.*/
 public class AmmoEntry{
-    public io.anuke.mindustry.type.AmmoType type;
+    public AmmoType type;
     public int amount;
 
-    public AmmoEntry(io.anuke.mindustry.type.AmmoType type, int amount) {
+    public AmmoEntry(AmmoType type, int amount) {
         this.type = type;
         this.amount = amount;
     }

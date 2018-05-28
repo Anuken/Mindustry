@@ -110,7 +110,7 @@ public class Sorter extends Block{
 	public void buildTable(Tile tile, Table table){
 		SorterEntity entity = tile.entity();
 
-		Array<Item> items = Item.getAllItems();
+		Array<Item> items = Item.all();
 
 		ButtonGroup<ImageButton> group = new ButtonGroup<>();
 		Table cont = new Table();
@@ -151,7 +151,7 @@ public class Sorter extends Block{
 		
 		@Override
 		public void read(DataInputStream stream) throws IOException{
-			sortItem = Item.getAllItems().get(stream.readByte());
+			sortItem = Item.all().get(stream.readByte());
 		}
 	}
 }

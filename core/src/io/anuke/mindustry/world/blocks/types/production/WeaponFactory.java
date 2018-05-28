@@ -45,7 +45,7 @@ public class WeaponFactory extends Block{
         Table content = new Table();
 
         /*
-        for(Upgrade upgrade : Upgrade.getAllUpgrades()){
+        for(Upgrade upgrade : Upgrade.all()){
             if(!(upgrade instanceof Weapon)) continue;
             Weapon weapon = (Weapon)upgrade;
 

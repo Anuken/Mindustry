@@ -48,7 +48,7 @@ public class Logic extends Module {
 
         //fill inventory with items for debugging
         for(Tile tile : state.teams.get(players[0].team).cores){
-            for(Item item : Item.getAllItems()){
+            for(Item item : Item.all()){
                 if(item.type == ItemType.material){
                     tile.entity.items.addItem(item, 1000);
                 }

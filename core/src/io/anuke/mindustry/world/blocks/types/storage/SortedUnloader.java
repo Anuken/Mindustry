@@ -69,7 +69,7 @@ public class SortedUnloader extends Unloader {
     public void buildTable(Tile tile, Table table){
         SortedUnloaderEntity entity = tile.entity();
 
-        Array<Item> items = Item.getAllItems();
+        Array<Item> items = Item.all();
 
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
         Table cont = new Table();
@@ -111,7 +111,7 @@ public class SortedUnloader extends Unloader {
 
         @Override
         public void read(DataInputStream stream) throws IOException{
-            sortItem = Item.getAllItems().get(stream.readByte());
+            sortItem = Item.all().get(stream.readByte());
         }
     }
 }

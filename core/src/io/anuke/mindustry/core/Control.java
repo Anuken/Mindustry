@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.game.ContentDatabase;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.DefaultKeybinds;
@@ -37,6 +38,7 @@ public class Control extends Module{
 	private boolean hiscore = false;
 	private boolean wasPaused = false;
 	private Saves saves;
+	private ContentDatabase db;
 	private InputHandler[] inputs = {};
 	private ObjectMap<Sound, Long> soundMap = new ObjectMap<>();
 
@@ -46,6 +48,7 @@ public class Control extends Module{
 
 	public Control(){
 		saves = new Saves();
+		db = new ContentDatabase();
 
 		Inputs.useControllers(!gwt);
 
@@ -55,7 +58,7 @@ public class Control extends Module{
 
 		Core.atlas = new Atlas("sprites.atlas");
 
-		for(Item item : Item.getAllItems()){
+		for(Item item : Item.all()){
 			item.init();
 		}
 
@@ -227,7 +230,11 @@ public class Control extends Module{
         System.arraycopy(oldi, 0, inputs, 0, inputs.length);
     }
 
-    public Input gdxInput(){
+	public ContentDatabase database() {
+		return db;
+	}
+
+	public Input gdxInput(){
 	    return gdxInput;
     }
 

@@ -253,7 +253,7 @@ public class Block extends BaseBlock {
 		tempColor.set(Palette.darkFlame);
 
 		if(hasItems){
-			for(Item item : Item.getAllItems()){
+			for(Item item : Item.all()){
 				int amount = tile.entity.items.getItem(item);
 				explosiveness += item.explosiveness*amount;
 				flammability += item.flammability*amount;
@@ -314,7 +314,7 @@ public class Block extends BaseBlock {
 			return 0;
 		}else{
 			float result = 0f;
-			for(Item item : Item.getAllItems()){
+			for(Item item : Item.all()){
 				int amount = tile.entity.items.getItem(item);
 				result += item.flammability*amount;
 			}

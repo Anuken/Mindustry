@@ -70,8 +70,8 @@ public class ContentLoader {
 
         Log.info("--- CONTENT INFO ---");
         Log.info("Blocks loaded: {0}\nItems loaded: {1}\nLiquids loaded: {2}\nUpgrades loaded: {3}\nUnits loaded: {4}\nAmmo types loaded: {5}\nBullet types loaded: {6}\nStatus effects loaded: {7}\nRecipes loaded: {8}\nTotal content classes: {9}",
-                Block.getAllBlocks().size, io.anuke.mindustry.type.Item.getAllItems().size, Liquid.getAllLiquids().size,
-                io.anuke.mindustry.type.Mech.getAllUpgrades().size, UnitType.getAllTypes().size, io.anuke.mindustry.type.AmmoType.getAllTypes().size, BulletType.all().size, StatusEffect.getAllEffects().size, io.anuke.mindustry.type.Recipe.getAllRecipes().size, content.length);
+                Block.getAllBlocks().size, io.anuke.mindustry.type.Item.all().size, Liquid.all().size,
+                io.anuke.mindustry.type.Mech.all().size, UnitType.getAllTypes().size, io.anuke.mindustry.type.AmmoType.all().size, BulletType.all().size, StatusEffect.getAllEffects().size, io.anuke.mindustry.type.Recipe.all().size, content.length);
 
         Log.info("-------------------");
     }

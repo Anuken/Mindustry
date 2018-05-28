@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class InventoryModule extends BlockModule{
-    public int[] items = new int[Item.getAllItems().size];
+    public int[] items = new int[Item.all().size];
 
     //TODO optimize!
     public int totalItems(){

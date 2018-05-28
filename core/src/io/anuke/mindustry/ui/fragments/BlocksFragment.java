@@ -43,7 +43,7 @@ public class BlocksFragment implements Fragment{
 
 	{
 		int size = 0;
-		for(Item ignored : Item.getAllItems()){
+		for(Item ignored : Item.all()){
 			size ++;
 		}
 

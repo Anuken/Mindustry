@@ -92,7 +92,7 @@ public class DebugBlocks {
         public void buildTable(Tile tile, Table table){
             LiquidSourceEntity entity = tile.entity();
 
-            Array<Liquid> items = Liquid.getAllLiquids();
+            Array<Liquid> items = Liquid.all();
 
             ButtonGroup<ImageButton> group = new ButtonGroup<>();
             Table cont = new Table();

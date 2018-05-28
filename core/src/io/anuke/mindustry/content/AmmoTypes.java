@@ -57,7 +57,7 @@ public class AmmoTypes {
         smokeEffect = ShootFx.shootSmallSmoke;
     }},
 
-    flakSurge = new AmmoType(Items.densealloy, FlakBullets.surge, 5){{
+    flakSurge = new AmmoType(Items.surgealloy, FlakBullets.surge, 5){{
         shootEffect = ShootFx.shootSmall;
         smokeEffect = ShootFx.shootSmallSmoke;
     }},
@@ -96,7 +96,7 @@ public class AmmoTypes {
         smokeEffect = ShootFx.shootBigSmoke2;
     }},
 
-    missileSurge = new AmmoType(Items.densealloy, MissileBullets.surge, 1){{
+    missileSurge = new AmmoType(Items.surgealloy, MissileBullets.surge, 1){{
         shootEffect = ShootFx.shootBig2;
         smokeEffect = ShootFx.shootBigSmoke2;
     }},

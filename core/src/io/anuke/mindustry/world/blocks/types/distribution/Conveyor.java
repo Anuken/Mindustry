@@ -322,10 +322,10 @@ public class Conveyor extends Block{
 		ItemPos set(long lvalue, short[] values){
 			Bits.getShorts(lvalue, values);
 
-			if(values[0] >= Item.getAllItems().size || values[0] < 0)
+			if(values[0] >= Item.all().size || values[0] < 0)
 				item = null;
 			else
-				item = Item.getAllItems().get(values[0]);
+				item = Item.all().get(values[0]);
 
 			x = values[1] / (float)Short.MAX_VALUE;
 			y = ((float)values[2]) / Short.MAX_VALUE + 1f;

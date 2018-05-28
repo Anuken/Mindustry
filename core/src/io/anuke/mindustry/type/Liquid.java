@@ -4,10 +4,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.entities.StatusEffect;
+import io.anuke.mindustry.game.Content;
 import io.anuke.ucore.util.Bundles;
 
-public class Liquid {
-
+public class Liquid implements Content{
 	private static final Array<Liquid> liquids = new Array<>();
 
 	public final Color color;
@@ -47,7 +47,17 @@ public class Liquid {
 		return localizedName();
 	}
 
-	public static Array<Liquid> getAllLiquids() {
+	@Override
+	public String getContentName() {
+		return name;
+	}
+
+	@Override
+	public String getContentTypeName() {
+		return "liquid";
+	}
+
+	public static Array<Liquid> all() {
 		return Liquid.liquids;
 	}
 

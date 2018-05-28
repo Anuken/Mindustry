@@ -2,29 +2,30 @@ package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.world.Block;
 
-public class Recipe {
+public class Recipe implements Content{
     private static int lastid;
     private static Array<Recipe> allRecipes = new Array<>();
     private static ObjectMap<Block, Recipe> recipeMap = new ObjectMap<>();
 
     public final int id;
     public final Block result;
-    public final io.anuke.mindustry.type.ItemStack[] requirements;
-    public final io.anuke.mindustry.type.Section section;
+    public final ItemStack[] requirements;
+    public final Section section;
     public final float cost;
 
     public boolean desktopOnly = false, debugOnly = false;
 
-    public Recipe(io.anuke.mindustry.type.Section section, Block result, io.anuke.mindustry.type.ItemStack... requirements){
+    public Recipe(Section section, Block result, ItemStack... requirements){
         this.id = lastid ++;
         this.result = result;
         this.requirements = requirements;
         this.section = section;
 
         float timeToPlace = 0f;
-        for(io.anuke.mindustry.type.ItemStack stack : requirements){
+        for(ItemStack stack : requirements){
             timeToPlace += stack.amount * stack.item.cost;
         }
 
@@ -44,7 +45,17 @@ public class Recipe {
         return this;
     }
 
-    public static Array<Recipe> getBySection(io.anuke.mindustry.type.Section section, Array<Recipe> r){
+    @Override
+    public String getContentName() {
+        return result.name;
+    }
+
+    @Override
+    public String getContentTypeName() {
+        return "recipe";
+    }
+
+    public static Array<Recipe> getBySection(Section section, Array<Recipe> r){
         for(Recipe recipe : allRecipes){
             if(recipe.section == section ) {
                 r.add(recipe);
@@ -54,7 +65,7 @@ public class Recipe {
         return r;
     }
 
-    public static Array<Recipe> getAllRecipes(){
+    public static Array<Recipe> all(){
         return allRecipes;
     }
 

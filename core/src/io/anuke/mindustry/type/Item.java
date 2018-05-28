@@ -3,11 +3,12 @@ package io.anuke.mindustry.type;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Bundles;
 
-public class Item implements Comparable<Item>{
+public class Item implements Comparable<Item>, Content{
 	private static final Array<Item> items = new Array<>();
 
 	public final int id;
@@ -59,7 +60,17 @@ public class Item implements Comparable<Item>{
 		return Integer.compare(id, item.id);
 	}
 
-	public static Array<Item> getAllItems() {
+	@Override
+	public String getContentName() {
+		return name;
+	}
+
+	@Override
+	public String getContentTypeName() {
+		return "item";
+	}
+
+	public static Array<Item> all() {
 		return Item.items;
 	}
 

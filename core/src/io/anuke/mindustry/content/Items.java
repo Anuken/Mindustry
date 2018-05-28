@@ -52,7 +52,7 @@ public class Items {
         explosiveness = 0.1f;
     }},
 
-    densealloy = new Item("densealloy", Color.valueOf("b4d5c7")){{
+    surgealloy = new Item("surgealloy", Color.valueOf("b4d5c7")){{
         type = ItemType.material;
     }},
 

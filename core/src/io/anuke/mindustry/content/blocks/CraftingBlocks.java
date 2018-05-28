@@ -24,7 +24,7 @@ public class CraftingBlocks {
         health = 90;
         inputs = new Item[]{Items.titanium, Items.steel};
         fuel = Items.coal;
-        result = Items.densealloy;
+        result = Items.surgealloy;
         burnDuration = 45f;
         craftTime = 25f;
         flameColor = Color.valueOf("fd896e");
@@ -46,7 +46,7 @@ public class CraftingBlocks {
         health = 90;
         craftEffect = BlockFx.smeltsmoke;
         inputs = new ItemStack[]{new ItemStack(Items.titanium, 4), new ItemStack(Items.thorium, 4)};
-        result = Items.densealloy;
+        result = Items.surgealloy;
         powerUse = 0.3f;
         craftTime = 25f;
         size = 2;
