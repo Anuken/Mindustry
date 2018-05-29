@@ -2,7 +2,6 @@ package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -39,7 +38,6 @@ public class Block extends BaseBlock implements Content{
 	private static ObjectMap<String, Block> map = new ObjectMap<>();
 
 	protected Array<Tile> tempTiles = new Array<>();
-	protected Vector2 tempVector = new Vector2();
 	protected Color tempColor = new Color();
 
 	protected TextureRegion[] blockIcon;
@@ -405,8 +403,8 @@ public class Block extends BaseBlock implements Content{
 	}
 	
 	/**Offset for placing and drawing multiblocks.*/
-	public Vector2 getPlaceOffset(){
-		return tempVector.set(((size + 1) % 2) * tilesize/2, ((size + 1) % 2) * tilesize/2);
+	public float offset(){
+		return ((size + 1) % 2) * tilesize/2;
 	}
 	
 	public boolean isMultiblock(){

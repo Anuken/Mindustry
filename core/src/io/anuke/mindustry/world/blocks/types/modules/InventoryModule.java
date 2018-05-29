@@ -10,7 +10,23 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class InventoryModule extends BlockModule{
+    //TODO make private!
     public int[] items = new int[Item.all().size];
+
+    public boolean hasItems(ItemStack[] stacks){
+        for(ItemStack stack : stacks){
+            if(!hasItem(stack.item, stack.amount)) return false;
+        }
+        return true;
+    }
+
+    /**Returns true if this entity has at least one of each item in each stack.*/
+    public boolean hasAtLeastOneOfItems(ItemStack[] stacks){
+        for(ItemStack stack : stacks){
+            if(!hasItem(stack.item, 1)) return false;
+        }
+        return true;
+    }
 
     //TODO optimize!
     public int totalItems(){

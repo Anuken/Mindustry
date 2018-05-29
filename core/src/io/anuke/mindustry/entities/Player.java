@@ -16,10 +16,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.Mech;
-import io.anuke.mindustry.type.Upgrade;
-import io.anuke.mindustry.type.Weapon;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.*;
@@ -275,8 +272,8 @@ public class Player extends Unit implements BlockBuilder {
 			}else{
 				Draw.color(Palette.accent);
 				Lines.stroke((1f-request.progress));
-				Lines.poly(request.x * tilesize + request.recipe.result.getPlaceOffset().x,
-						request.y * tilesize + request.recipe.result.getPlaceOffset().y,
+				Lines.poly(request.x * tilesize + request.recipe.result.offset(),
+						request.y * tilesize + request.recipe.result.offset(),
 						4, request.recipe.result.size * tilesize /2f + Mathf.absin(Timers.time(), 3f, 1f));
 			}
 		}
@@ -313,6 +310,10 @@ public class Player extends Unit implements BlockBuilder {
 			updateMech();
 		}
 
+		if(!isShooting()) {
+			updateBuilding(this);
+		}
+
 		x = Mathf.clamp(x, 0, world.width() * tilesize);
 		y = Mathf.clamp(y, 0, world.height() * tilesize);
 	}
@@ -345,10 +346,6 @@ public class Player extends Unit implements BlockBuilder {
 		if(tile != null && tile.solid()) {
 			damage(health + 1); //die instantly
 		}
-
-		if(!isShooting()) {
-		    updateBuilding(this);
-        }
 
 		if(ui.chatfrag.chatOpen()) return;
 
@@ -401,16 +398,16 @@ public class Player extends Unit implements BlockBuilder {
 	}
 
 	protected void updateFlying(){
-		rotation = Mathf.slerpDelta(rotation, targetAngle, 0.2f);
+		rotation = Mathf.slerpDelta(rotation, targetAngle, 0.1f);
 	}
 
 	@Override
-	public boolean acceptsAmmo(io.anuke.mindustry.type.Item item) {
+	public boolean acceptsAmmo(Item item) {
 		return weapon.getAmmoType(item) != null && inventory.canAcceptAmmo(weapon.getAmmoType(item));
 	}
 
 	@Override
-	public void addAmmo(io.anuke.mindustry.type.Item item) {
+	public void addAmmo(Item item) {
 		inventory.addAmmo(weapon.getAmmoType(item));
 	}
 

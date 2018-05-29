@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
@@ -90,14 +89,13 @@ public class Build {
         }
 
         rect.setSize(type.size * tilesize, type.size * tilesize);
-        Vector2 offset = type.getPlaceOffset();
-        rect.setCenter(offset.x + x * tilesize, offset.y + y * tilesize);
+        rect.setCenter(type.offset() + x * tilesize, type.offset() + y * tilesize);
 
         if(type.solid || type.solidifes)
         synchronized (Entities.entityLock) {
             try {
 
-                rect.setSize(tilesize * type.size).setCenter(x * tilesize + type.getPlaceOffset().x, y * tilesize + type.getPlaceOffset().y);
+                rect.setSize(tilesize * type.size).setCenter(x * tilesize + type.offset(), y * tilesize + type.offset());
                 boolean[] result = {false};
 
                 Units.getNearby(rect, e -> {

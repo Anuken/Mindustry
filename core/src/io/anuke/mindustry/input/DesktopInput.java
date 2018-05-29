@@ -32,25 +32,11 @@ public class DesktopInput extends InputHandler{
 	    this.index = player.playerIndex;
 	    this.section = "player_" + (player.playerIndex + 1);
     }
-	
-	@Override public float getCursorEndX(){ return endx; }
-	@Override public float getCursorEndY(){ return endy; }
-	@Override public float getCursorX(){ return prmousex; }
-	@Override public float getCursorY(){ return prmousey; }
-	@Override public boolean drawPlace(){ return !beganBreak; }
 
 	@Override
 	public void update(){
 
 		if(player.isDead()) return;
-
-		if(Inputs.keyRelease(section, "select") && recipe != null){
-			placeMode.released(this, getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
-		}
-
-		if(Inputs.keyRelease(section, "break") && !beganBreak){
-			breakMode.released(this, getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
-		}
 
 		if(!Inputs.keyDown(section, "select")){
 			shooting = false;
@@ -97,12 +83,6 @@ public class DesktopInput extends InputHandler{
 		rotation += Inputs.getAxis(section,"rotate");
 
 		rotation = Mathf.mod(rotation, 4);
-		
-		if(Inputs.keyDown(section,"break")){
-			breakMode = PlaceMode.areaDelete;
-		}else{
-			breakMode = PlaceMode.hold;
-		}
 
 		int keyIndex = 1;
 		

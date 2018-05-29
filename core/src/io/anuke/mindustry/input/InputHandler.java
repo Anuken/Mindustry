@@ -16,6 +16,7 @@ import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
@@ -27,37 +28,61 @@ public abstract class InputHandler extends InputAdapter{
     public final static float playerSelectRange = Unit.dp.scl(60f);
     private final static Translator stackTrns = new Translator();
 
-	public float breaktime = 0;
+    private float mx, my;
+
+	public final Player player;
+	public final OverlayFragment frag = new OverlayFragment(this);
+
 	public Recipe recipe;
 	public int rotation;
-	public Player player;
-	public PlaceMode placeMode = mobile ? PlaceMode.cursor : PlaceMode.hold;
-	public PlaceMode breakMode = mobile ? PlaceMode.none : PlaceMode.holdDelete;
-	public PlaceMode lastPlaceMode = placeMode;
-	public PlaceMode lastBreakMode = breakMode;
 	public boolean droppingItem, transferring;
 	public boolean shooting;
-	public OverlayFragment frag = new OverlayFragment(this);
 
 	public InputHandler(Player player){
 	    this.player = player;
 	    Timers.run(1f, () -> frag.build(Core.scene.getRoot()));
     }
 
-	public abstract void update();
-	public abstract float getCursorX();
-	public abstract float getCursorY();
-	public abstract float getCursorEndX();
-	public abstract float getCursorEndY();
-	public float getMouseX(){ return Gdx.input.getX(); };
-    public float getMouseY(){ return Gdx.input.getY(); };
-    public int getBlockX(){ return Mathf.sclb(Graphics.world(getCursorX(), getCursorY()).x, tilesize, round2()); }
-	public int getBlockY(){ return Mathf.sclb(Graphics.world(getCursorX(), getCursorY()).y, tilesize, round2()); }
-	public int getBlockEndX(){ return Mathf.sclb(Graphics.world(getCursorEndX(), getCursorEndY()).x, tilesize, round2()); }
-	public int getBlockEndY(){ return Mathf.sclb(Graphics.world(getCursorEndX(), getCursorEndY()).y, tilesize, round2()); }
-	public void resetCursor(){}
-	public boolean isCursorVisible(){ return false; }
-	public void updateController(){}
+    //methods to override
+
+	public void update(){
+
+	}
+
+	public float getMouseX(){
+		return mx;
+	}
+
+    public float getMouseY(){
+    	return my;
+    }
+
+	public void resetCursor(){
+
+	}
+
+	public boolean isCursorVisible(){
+		return false;
+	}
+
+	public void updateController(){
+		mx = Gdx.input.getX();
+		my = Gdx.input.getY();
+	}
+
+	public void buildUI(Group group){
+
+	}
+
+	public void draw(){
+
+	}
+
+	//utility methods
+
+	public boolean isPlacing(){
+		return recipe != null;
+	}
 
 	public float mouseAngle(float x, float y){
         return Graphics.world(getMouseX(), getMouseY()).sub(x, y).angle();
@@ -75,12 +100,9 @@ public abstract class InputHandler extends InputAdapter{
 	public boolean isShooting(){
 		return shooting;
 	}
-
-	public boolean drawPlace(){ return true; }
 	
 	public boolean onConfigurable(){
-		Tile tile = world.tile(getBlockX(), getBlockY());
-		return tile != null && (tile.block().isConfigurable(tile) || (tile.isLinked() && tile.getLinked().block().isConfigurable(tile)));
+		return false;
 	}
 
 	public boolean isDroppingItem(){
@@ -129,26 +151,8 @@ public abstract class InputHandler extends InputAdapter{
 					}
 				});
 			}
-		}else{
-			//TODO create drop on the ground
-			/*
-			Vector2 vec = Graphics.screen(player.x, player.y);
-
-			if(vec.dst(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY()) > playerSelectRange) {
-				int sent = Mathf.clamp(stack.amount / 4, 1, 8);
-				float backTrns = 3f;
-				for (int i = 0; i < sent; i++) {
-					Timers.run(i, () -> {
-						float x = player.x + Angles.trnsx(rotation + 180f, backTrns),
-								y = player.y + Angles.trnsy(rotation + 180f, backTrns);
-
-						ItemTransfer.create(stack.item,
-								x, y, x + Mathf.range(20f), y + Mathf.range(20f), () -> {});
-					});
-				}
-				player.inventory.clear();
-			}*/
 		}
+		//TODO create drop on the ground otherwise
 	}
 
 	public boolean cursorNear(){
@@ -156,8 +160,7 @@ public abstract class InputHandler extends InputAdapter{
 	}
 	
 	public boolean tryPlaceBlock(int x, int y){
-		if(recipe != null && 
-				validPlace(x, y, recipe.result) && !ui.hasMouse() && cursorNear()){
+		if(recipe != null && validPlace(x, y, recipe.result) && cursorNear()){
 			
 			placeBlock(x, y, recipe, rotation);
 
@@ -172,10 +175,6 @@ public abstract class InputHandler extends InputAdapter{
 			return true;
 		}
 		return false;
-	}
-	
-	public boolean round2(){
-		return !(recipe != null && recipe.result.isMultiblock() && recipe.result.size % 2 == 0);
 	}
 	
 	public boolean validPlace(int x, int y, Block type){

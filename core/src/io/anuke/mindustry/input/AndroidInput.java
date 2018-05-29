@@ -1,150 +1,237 @@
 package io.anuke.mindustry.input;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.NetEvents;
+import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.scene.Group;
+import io.anuke.ucore.scene.builders.imagebutton;
+import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class AndroidInput extends InputHandler{
-	public float lmousex, lmousey;
-	public float mousex, mousey;
-	public boolean brokeBlock = false;
-	public boolean placing = false;
-	
-	private boolean enableHold = false;
-	private float warmup;
-	private float warmupDelay = 20;
+public class AndroidInput extends InputHandler implements GestureListener{
+    //gesture data
+    private Vector2 pinch1 = new Vector2(-1, -1), pinch2 = pinch1.cpy();
+    private Vector2 vector = new Vector2();
+    private float initzoom = -1;
+    private boolean zoomed = false;
+
+    /**List of currently selected tiles to place.*/
+    private Array<PlaceRequest> placement = new Array<>();
+    /**Whether or not the player is currently shifting all placed tiles.*/
+    private boolean selecting;
 	
 	public AndroidInput(Player player){
 	    super(player);
-		Inputs.addProcessor(new GestureDetector(20, 0.5f, 2, 0.15f, new GestureHandler(this)));
+		Inputs.addProcessor(new GestureDetector(20, 0.5f, 2, 0.15f, this));
 	}
-	
-	@Override public float getCursorEndX(){ return Gdx.input.getX(0); }
-	@Override public float getCursorEndY(){ return Gdx.input.getY(0); }
-	@Override public float getCursorX(){ return mousex; }
-	@Override public float getCursorY(){ return mousey; }
-	@Override public boolean drawPlace(){ return (placing && !brokeBlock) || (placeMode.pan && recipe != null); }
 
-	@Override
-	public boolean touchUp(int screenX, int screenY, int pointer, int button){
-		if(brokeBlock){
-			brokeBlock = false;
-			return false;
-		}
-		
-		if(placing && pointer == 0 && !placeMode.pan && !breaking()){
-			placeMode.released(this, getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
-		}else if(pointer == 0 && !breakMode.pan && breaking() && drawPlace()){
-			breakMode.released(this, getBlockX(), getBlockY(), getBlockEndX(), getBlockEndY());
-		}
+	boolean hasRequest(Tile tile){
+        for(PlaceRequest req : placement){
+            if(req.tile() == tile) return true;
+        }
+	    return false;
+    }
 
-		placing = false;
-		return false;
-	}
+    @Override
+    public void buildUI(Group group) {
+
+	    //Create confirm/cancel table
+        new table(){{
+            abottom().aleft();
+            defaults().size(60f);
+
+            //Add a cancel button, which clears the selection.
+            new imagebutton("icon-cancel", 14*2f, () -> {
+                placement.clear();
+                selecting = false;
+            });
+
+            //Add an accept button, which places everything.
+            new imagebutton("icon-check", 14*2f, () -> {
+                for(PlaceRequest request : placement){
+                    Tile tile = request.tile();
+
+                    if(tile != null){
+                        rotation = request.rotation;
+                        recipe = request.recipe;
+                        tryPlaceBlock(tile.x, tile.y);
+                    }
+                }
+
+                placement.clear();
+                selecting = false;
+            });
+        }}.visible(this::isPlacing).end();
+    }
+
+    @Override
+	public void draw(){
+        Draw.color(Palette.accent);
+
+        //Draw all placement requests as squares
+        for(PlaceRequest request : placement){
+            Tile tile = request.tile();
+            if(tile == null) continue;
+            Lines.square(tile.worldx() + request.recipe.result.offset(), tile.worldy() + request.recipe.result.offset(),
+                    request.recipe.result.size * tilesize/2f);
+        }
+
+        Draw.color();
+    }
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button){
-		if(ui.hasMouse()){
-			brokeBlock = true;
-			return false;
-		}
+		if(state.is(State.menu)) return false;
 
-		lmousex = screenX;
-		lmousey = screenY;
-		
-		if((!placeMode.pan || breaking()) && pointer == 0){
-			mousex = screenX;
-			mousey = screenY;
-		}
+        //get tile on cursor
+        Tile cursor = world.tile(Mathf.scl2(Graphics.mouseWorld().x, tilesize), Mathf.scl2(Graphics.mouseWorld().y, tilesize));
 
-		placing = pointer == 0;
-		
-		warmup = 0;
+        //ignore off-screen taps
+        if(cursor == null || ui.hasMouse(screenX, screenY)) return false;
 
-		if(!state.is(State.menu)){
-			Tile cursor = world.tile(Mathf.scl2(Graphics.mouseWorld().x, tilesize), Mathf.scl2(Graphics.mouseWorld().y, tilesize));
-			if(cursor != null && !ui.hasMouse(screenX, screenY)){
-				Tile linked = cursor.isLinked() ? cursor.getLinked() : cursor;
-				if(linked != null && linked.block().isConfigurable(linked)){
-					frag.config.showConfig(linked);
-				}else if(!frag.config.hasConfigMouse()){
-					frag.config.hideConfig();
-				}
+        //only begin selecting if the tapped block is a request
+        selecting = hasRequest(cursor);
 
-				if(linked != null) {
-					linked.block().tapped(linked, player);
-					if(Net.active()) NetEvents.handleBlockTap(linked);
-				}
-			}
-		}
+        Tile linked = cursor.target();
+
+        //show-hide configuration fragment for blocks
+        if(linked.block().isConfigurable(linked)){
+            frag.config.showConfig(linked);
+        }else if(!frag.config.hasConfigMouse()){
+            frag.config.hideConfig();
+        }
+
+        //call tapped() event
+        //TODO net event for block tapped
+        linked.block().tapped(linked, player);
+
 		return false;
 	}
-	
-	@Override
-	public void resetCursor(){
-		mousex = Gdx.graphics.getWidth()/2;
-		mousey = Gdx.graphics.getHeight()/2;
-	}
 
-	public Tile selected(){
-		Vector2 vec = Graphics.world(mousex, mousey);
-		return world.tile(Mathf.scl2(vec.x, tilesize), Mathf.scl2(vec.y, tilesize));
-	}
+    @Override
+    public boolean tap(float x, float y, int count, int button) {
+        if(state.is(State.menu)) return false;
+
+        //get tile on cursor
+        Tile cursor = world.tile(Mathf.scl2(Graphics.mouseWorld().x, tilesize), Mathf.scl2(Graphics.mouseWorld().y, tilesize));
+
+        //ignore off-screen taps
+        if(cursor == null || ui.hasMouse(x, y)) return false;
+
+        //add to placement queue if it's a valid place position
+        if(isPlacing() && validPlace(cursor.x, cursor.y, recipe.result)){
+            placement.add(new PlaceRequest(cursor.worldx(), cursor.worldy(), recipe, rotation));
+        }
+
+        return false;
+    }
 
 	@Override
 	public void update(){
-		enableHold = breakMode == PlaceMode.holdDelete;
 
-		float xa = Inputs.getAxis("move_x");
-		float ya = Inputs.getAxis("move_y");
-		if(Math.abs(xa) < controllerMin) xa = 0;
-		if(Math.abs(ya) < controllerMin) ya = 0;
-
-		player.x += xa * 4f;
-		player.y += ya * 4f;
-
-		rotation += Inputs.getAxis("rotate_alt");
-		rotation += Inputs.getAxis("rotate");
-		rotation = Mathf.mod(rotation, 4);
-
-		if(enableHold && Gdx.input.isTouched(0) && Mathf.near2d(lmousex, lmousey, Gdx.input.getX(0), Gdx.input.getY(0), Unit.dp.scl(50))
-				&& !ui.hasMouse()){
-			warmup += Timers.delta();
-
-			float lx = mousex, ly = mousey;
-
-			mousex = Gdx.input.getX(0);
-			mousey = Gdx.input.getY(0);
-
-			Tile sel = selected();
-
-			if(sel == null)
-				return;
-
-			mousex = lx;
-			mousey = ly;
-		}else{
-			warmup = 0;
-			breaktime = 0;
-
-			mousex = Mathf.clamp(mousex, 0, Gdx.graphics.getWidth());
-			mousey = Mathf.clamp(mousey, 0, Gdx.graphics.getHeight());
-		}
+	    if(!isPlacing()){
+	        selecting = false;
+	        placement.clear();
+        }
 	}
 
-	public boolean breaking(){
-		return recipe == null;
-	}
+    @Override
+    public boolean pan(float x, float y, float deltaX, float deltaY){
+        float dx = deltaX * Core.camera.zoom / Core.cameraScale, dy = deltaY * Core.camera.zoom / Core.cameraScale;
+
+	    if(selecting){
+            for(PlaceRequest req : placement){
+                req.x += dx;
+                req.y -= dy;
+            }
+        }else{
+            player.x -= dx;
+            player.y += dy;
+            player.targetAngle = Mathf.atan2(dx, -dy) + 180f;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean panStop(float x, float y, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean pinch (Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
+        if(pinch1.x < 0){
+            pinch1.set(initialPointer1);
+            pinch2.set(initialPointer2);
+        }
+
+        Vector2 vec = (vector.set(pointer1).add(pointer2).scl(0.5f)).sub(pinch1.add(pinch2).scl(0.5f));
+
+        player.x -= vec.x*Core.camera.zoom/Core.cameraScale;
+        player.y += vec.y*Core.camera.zoom/Core.cameraScale;
+
+        pinch1.set(pointer1);
+        pinch2.set(pointer2);
+
+        return false;
+    }
+
+    @Override
+    public boolean zoom(float initialDistance, float distance){
+        if(initzoom < 0){
+            initzoom = initialDistance;
+        }
+
+        if(Math.abs(distance - initzoom) > Unit.dp.scl(100f) && !zoomed){
+            int amount = (distance > initzoom ? 1 : -1);
+            renderer.scaleCamera(Math.round(Unit.dp.scl(amount)));
+            initzoom = distance;
+            zoomed = true;
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void pinchStop () {
+        initzoom = -1;
+        pinch2.set(pinch1.set(-1, -1));
+        zoomed = false;
+    }
+
+    @Override public boolean touchDown(float x, float y, int pointer, int button) { return false; }
+    @Override public boolean longPress(float x, float y) { return false; }
+    @Override public boolean fling(float velocityX, float velocityY, int button) { return false; }
+
+    class PlaceRequest{
+	    float x, y;
+	    Recipe recipe;
+	    int rotation;
+
+	    PlaceRequest(float x, float y, Recipe recipe, int rotation) {
+            this.x = x;
+            this.y = y;
+            this.recipe = recipe;
+            this.rotation = rotation;
+        }
+
+        Tile tile(){
+	        return world.tileWorld(x - recipe.result.offset(), y - recipe.result.offset());
+        }
+    }
 }

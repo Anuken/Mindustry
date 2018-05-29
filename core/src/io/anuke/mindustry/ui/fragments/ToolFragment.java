@@ -1,24 +1,10 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Align;
-import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.InputHandler;
-import io.anuke.mindustry.input.PlaceMode;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.ui.layout.Table;
-
-import static io.anuke.mindustry.Vars.*;
 
 public class ToolFragment implements Fragment{
-	private Table tools;
-	private InputHandler input;
-
-	public int px, py, px2, py2;
-	public boolean confirming;
+	private final InputHandler input;
 
 	public ToolFragment(InputHandler input){
 	    this.input = input;
@@ -26,53 +12,6 @@ public class ToolFragment implements Fragment{
 
 	@Override
 	public void build(Group parent){
-		float isize = 14*3;
-		
-		tools = new Table();
-		
-		tools.addImageButton("icon-cancel", isize, () -> {
-			if(input.placeMode == PlaceMode.areaDelete && confirming){
-				confirming = false;
-			}else{
-				input.recipe = null;
-			}
-		});
-		
-		tools.addImageButton("icon-rotate", isize, () -> {
-			input.rotation++;
-			input.rotation %= 4;
-		});
-		
-		tools.addImageButton("icon-check", isize, () -> {
-			if(input.placeMode == PlaceMode.areaDelete && confirming){
-				input.placeMode.released(input, px, py, px2, py2);
-				confirming = false;
-			}else{
-				input.placeMode.tapped(input, input.getBlockX(), input.getBlockY());
-			}
-		});
-		
-		tools.setVisible(() ->
-			!state.is(State.menu) && mobile && ((input.recipe != null &&
-			input.placeMode == PlaceMode.cursor) || confirming)
-		);
-		
-		tools.update(() -> {
-			if(confirming){
-				Vector2 v = Graphics.screen((px + px2)/2f * tilesize, Math.min(py, py2) * tilesize - tilesize*1.5f);
-				tools.setPosition(v.x, v.y, Align.top);
 
-			}else{
-				tools.setPosition(input.getCursorX(),
-						Gdx.graphics.getHeight() - input.getCursorY() - 15*Core.cameraScale, Align.top);
-			}
-
-			if(input.placeMode != PlaceMode.areaDelete){
-				confirming = false;
-			}
-		});
-
-
-        parent.addChild(tools);
 	}
 }

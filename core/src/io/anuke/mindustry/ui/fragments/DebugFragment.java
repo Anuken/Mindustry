@@ -48,7 +48,7 @@ public class DebugFragment implements Fragment {
         new table(){{
            visible(() -> debug);
 
-           abottom().aleft();
+           atop().aright();
 
            new table("pane"){{
                defaults().fillX().width(100f);

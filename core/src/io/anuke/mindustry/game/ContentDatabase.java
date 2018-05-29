@@ -11,6 +11,7 @@ import static io.anuke.mindustry.Vars.debug;
 public class ContentDatabase {
     private ObjectMap<String, ObjectSet<String>> unlocked = new ObjectMap<>();
 
+    /**Returns whether or not this piece of content is unlocked yet.*/
     public boolean isUnlocked(Content content){
         if(debug){
             return true;
@@ -23,6 +24,17 @@ public class ContentDatabase {
         ObjectSet<String> set = unlocked.get(content.getContentTypeName());
 
         return set.contains(content.getContentName());
+    }
+
+    /**Makes this piece of content 'unlocked'.
+     * If this piece of content is already unlocked, nothing changes.
+     * Results are not saved until you call {@link #save()}.*/
+    public void unlockContent(Content content){
+        if(!unlocked.containsKey(content.getContentTypeName())){
+            unlocked.put(content.getContentTypeName(), new ObjectSet<>());
+        }
+
+        unlocked.get(content.getContentTypeName()).add(content.getContentName());
     }
 
     private void load(){

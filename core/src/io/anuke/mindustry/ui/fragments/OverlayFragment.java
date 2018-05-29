@@ -9,8 +9,11 @@ public class OverlayFragment implements Fragment{
     public final BlockConfigFragment config;
 
     private Group group = new Group();
+    private InputHandler input;
 
     public OverlayFragment(InputHandler input){
+        this.input = input;
+
         tool = new ToolFragment(input);
         inv = new BlockInventoryFragment(input);
         config = new BlockConfigFragment();
@@ -24,6 +27,8 @@ public class OverlayFragment implements Fragment{
         inv.build(group);
         tool.build(group);
         config.build(group);
+
+        input.buildUI(group);
     }
 
     public void remove(){

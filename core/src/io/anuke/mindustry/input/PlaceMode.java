@@ -3,10 +3,8 @@ package io.anuke.mindustry.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
-import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Build;
 import io.anuke.mindustry.world.Tile;
@@ -34,14 +32,14 @@ public enum PlaceMode{
 			float y = tiley * tilesize;
 			
 			boolean valid = input.validPlace(tilex, tiley, input.recipe.result) && (mobile || input.cursorNear());
-			
-			Vector2 offset = input.recipe.result.getPlaceOffset();
+
+			float offset = input.recipe.result.offset();
 
 			float si = MathUtils.sin(Timers.time() / 6f) + 1.5f;
 
 			Draw.color(valid ? Palette.place : Palette.remove);
 			Lines.stroke(2f);
-			Lines.crect(x + offset.x, y + offset.y, tilesize * input.recipe.result.size + si,
+			Lines.crect(x + offset, y + offset, tilesize * input.recipe.result.size + si,
 					tilesize * input.recipe.result.size + si);
 
 			input.recipe.result.drawPlace(tilex, tiley, input.rotation, valid);
@@ -75,29 +73,6 @@ public enum PlaceMode{
 			delete = true;
 			shown = true;
 			both = true;
-		}
-	},
-	holdDelete{
-		{
-			delete = true;
-			shown = true;
-			both = true;
-		}
-		
-		public void draw(InputHandler input, int tilex, int tiley, int endx, int endy){
-			Tile tile = world.tile(tilex, tiley);
-			
-			if(tile != null && input.validBreak(tilex, tiley)){
-				if(tile.isLinked())
-					tile = tile.getLinked();
-				float fin = input.breaktime / tile.getBreakTime();
-				
-				if(mobile && input.breaktime > 0){
-					Draw.color(Palette.place, Palette.remove, fin);
-					Lines.poly(tile.drawx(), tile.drawy(), 25, 4 + (1f - fin) * 26);
-				}
-				Draw.reset();
-			}
 		}
 	},
 	touchDelete{
@@ -174,18 +149,6 @@ public enum PlaceMode{
 
 			input.player.clearBuilding();
 			
-			if(mobile){
-				ToolFragment t = input.frag.tool;
-				if(!t.confirming || t.px != tilex || t.py != tiley || t.px2 != endx || t.py2 != endy) {
-					t.confirming = true;
-					t.px = tilex;
-					t.py = tiley;
-					t.px2 = endx;
-					t.py2 = endy;
-					return;
-				}
-			}
-			
 			for(int cx = tilex; cx <= endx; cx ++){
 				for(int cy = tiley; cy <= endy; cy ++){
 					input.tryDeleteBlock(cx, cy);
@@ -241,7 +204,7 @@ public enum PlaceMode{
 
 			float t = tilesize;
 			Block block = input.recipe.result;
-			Vector2 offset = block.getPlaceOffset();
+			float offset = block.offset();
 			
 			process(input, tilex, tiley, endx, endy);
 			float x = rtilex * t, y = rtiley * t,
@@ -257,10 +220,10 @@ public enum PlaceMode{
 				y2 += block.size * t/2;
 			}
 
-			x += offset.x;
-			y += offset.y;
-			x2 += offset.x;
-			y2 += offset.y;
+			x += offset;
+			y += offset;
+			x2 += offset;
+			y2 += offset;
 			
 			if(tilex == endx && tiley == endy){
 				cursor.draw(input, tilex, tiley, endx, endy);
@@ -285,7 +248,7 @@ public enum PlaceMode{
                             Draw.color(Palette.accent);
                         }
 
-                        drawPreview(block, wx * t + offset.x, wy * t + offset.y);
+                        drawPreview(block, wx * t + offset, wy * t + offset);
                     }
                 }
 

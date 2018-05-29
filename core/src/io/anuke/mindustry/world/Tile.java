@@ -110,11 +110,11 @@ public class Tile implements Position{
 	}
 
 	public float drawx(){
-		return block().getPlaceOffset().x + worldx();
+		return block().offset() + worldx();
 	}
 
 	public float drawy(){
-		return block().getPlaceOffset().y + worldy();
+		return block().offset() + worldy();
 	}
 	
 	public Floor floor(){

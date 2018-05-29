@@ -1,7 +1,6 @@
 package io.anuke.mindustry.graphics;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -10,8 +9,6 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.input.InputHandler;
-import io.anuke.mindustry.input.PlaceMode;
-import io.anuke.mindustry.ui.fragments.ToolFragment;
 import io.anuke.mindustry.world.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Graphics;
@@ -25,7 +22,6 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.mindustry.Vars.playerGroup;
 
 public class OverlayRenderer {
 
@@ -41,34 +37,7 @@ public class OverlayRenderer {
                 tile.block().drawConfigure(tile);
             }
 
-            int tilex = input.getBlockX();
-            int tiley = input.getBlockY();
-
-            //draw placement box
-            if ((input.recipe != null && (!ui.hasMouse() || mobile)
-                    && input.drawPlace())) {
-
-                input.placeMode.draw(input, input.getBlockX(),
-                        input.getBlockY(), input.getBlockEndX(), input.getBlockEndY());
-
-                if (input.breakMode == PlaceMode.holdDelete)
-                    input.breakMode.draw(input, tilex, tiley, 0, 0);
-
-            } else if (input.breakMode.delete && input.drawPlace()
-                    && (input.recipe == null)
-                    && (input.placeMode.delete || input.breakMode.both || !mobile)) {
-
-                if (input.breakMode == PlaceMode.holdDelete)
-                    input.breakMode.draw(input, tilex, tiley, 0, 0);
-                else
-                    input.breakMode.draw(input, input.getBlockX(),
-                            input.getBlockY(), input.getBlockEndX(), input.getBlockEndY());
-            }
-
-            if (input.frag.tool.confirming) {
-                ToolFragment t = input.frag.tool;
-                PlaceMode.areaDelete.draw(input, t.px, t.py, t.px2, t.py2);
-            }
+            input.draw();
 
             Draw.reset();
 
@@ -182,7 +151,7 @@ public class OverlayRenderer {
         drawBar(Color.valueOf("32cf6d"), x, y - 9f, unit.inventory.totalAmmo() / (float) unit.inventory.ammoCapacity());
     }
 
-    public void drawBar(Color color, float x, float y, float finion){
+    void drawBar(Color color, float x, float y, float finion){
         finion = Mathf.clamp(finion);
 
         if(finion > 0) finion = Mathf.clamp(finion + 0.2f, 0.24f, 1f);
@@ -202,7 +171,7 @@ public class OverlayRenderer {
         Draw.reset();
     }
 
-    public void drawEncloser(float x, float y, float height){
+    void drawEncloser(float x, float y, float height){
         x -= 0.5f;
         y += 0.5f - (height-1f)/2f;
 
