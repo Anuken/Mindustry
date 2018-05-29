@@ -16,51 +16,48 @@ public class ColorMapper{
 
 	private static ObjectIntMap<Block> reverseColors = new ObjectIntMap<>();
 	private static Array<BlockPair> pairs = new Array<>();
-	private static IntMap<BlockPair> colors = map(
-		"323232", pair(Blocks.stone),
-		"646464", pair(Blocks.stone, Blocks.stoneblock),
-		"50965a", pair(Blocks.grass),
-		"5ab464", pair(Blocks.grass, Blocks.grassblock),
-		"506eb4", pair(Blocks.water),
-		"465a96", pair(Blocks.deepwater),
-		"252525", pair(Blocks.blackstone),
-		"575757", pair(Blocks.blackstone, Blocks.blackstoneblock),
-		"988a67", pair(Blocks.sand),
-		"e5d8bb", pair(Blocks.sand, Blocks.sandblock),
-		"c2d1d2", pair(Blocks.snow),
-		"c4e3e7", pair(Blocks.ice),
-		"f7feff", pair(Blocks.snow, Blocks.snowblock),
-		"6e501e", pair(Blocks.dirt),
-		"ed5334", pair(Blocks.lava),
-		"292929", pair(Blocks.oil),
-		"c3a490", pair(Blocks.iron),
-		"161616", pair(Blocks.coal),
-		"6277bc", pair(Blocks.titanium),
-		"83bc58", pair(Blocks.thorium),
-		"000000", pair(Blocks.space)
-	);
+	private static IntMap<BlockPair> colors;
+
+	private static void init(){
+		if(colors != null) return;
+
+		colors = map(
+			"323232", pair(Blocks.stone),
+			"646464", pair(Blocks.stone, Blocks.stoneblock),
+			"50965a", pair(Blocks.grass),
+			"5ab464", pair(Blocks.grass, Blocks.grassblock),
+			"506eb4", pair(Blocks.water),
+			"465a96", pair(Blocks.deepwater),
+			"252525", pair(Blocks.blackstone),
+			"575757", pair(Blocks.blackstone, Blocks.blackstoneblock),
+			"988a67", pair(Blocks.sand),
+			"e5d8bb", pair(Blocks.sand, Blocks.sandblock),
+			"c2d1d2", pair(Blocks.snow),
+			"c4e3e7", pair(Blocks.ice),
+			"f7feff", pair(Blocks.snow, Blocks.snowblock),
+			"6e501e", pair(Blocks.dirt),
+			"ed5334", pair(Blocks.lava),
+			"292929", pair(Blocks.oil),
+			"c3a490", pair(Blocks.iron),
+			"161616", pair(Blocks.coal),
+			"6277bc", pair(Blocks.titanium),
+			"83bc58", pair(Blocks.thorium),
+			"000000", pair(Blocks.space)
+		);
+	}
 	
 	public static BlockPair get(int color){
+		init();
 		return colors.get(color);
-	}
-
-	public static int getColorByID(byte id){
-		return colorIDS[id];
-	}
-
-	public static byte getColorID(int color){
-		return (byte)reverseIDs.get(color, -1);
-	}
-	
-	public static IntMap<BlockPair> getColors(){
-		return colors;
 	}
 	
 	public static Array<BlockPair> getPairs(){
+		init();
 		return pairs;
 	}
 	
 	public static int getColor(Block block){
+		init();
 		return reverseColors.get(block, 0);
 	}
 	

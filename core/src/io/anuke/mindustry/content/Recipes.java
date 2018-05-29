@@ -1,12 +1,15 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.mindustry.content.blocks.*;
+import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import static io.anuke.mindustry.type.Section.*;
 
-public class Recipes {
-	static {
+public class Recipes implements ContentList{
+
+    @Override
+	public void load (){
         new Recipe(defense, DefenseBlocks.ironwall, new ItemStack(Items.iron, 12));
         new Recipe(defense, DefenseBlocks.steelwall, new ItemStack(Items.steel, 12));
         new Recipe(defense, DefenseBlocks.titaniumwall, new ItemStack(Items.titanium, 12));

@@ -141,8 +141,7 @@ public class DebugFragment implements Fragment {
                 "tiles.sleeping: " + TileEntity.sleepingEntities,
                 "time: " + Timers.time(),
                 "state.gameover: " + state.gameOver,
-                "state: " + state.getState(),
-                !Net.server() ? clientDebug.getOut() : serverDebug.getOut()
+                "state: " + state.getState()
         );
 
         result.append("players: ");

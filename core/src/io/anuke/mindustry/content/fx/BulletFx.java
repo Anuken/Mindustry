@@ -2,6 +2,7 @@ package io.anuke.mindustry.content.fx;
 
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.type.ContentList;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
@@ -9,101 +10,105 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
-public class BulletFx {
-    public static final Effect
+public class BulletFx implements ContentList {
+    public static Effect hitBulletSmall, hitBulletBig, hitFlameSmall, hitLiquid, hitLancer, despawn, flakExplosion;
 
-    hitBulletSmall = new Effect(14, e -> {
-        Draw.color(Color.WHITE, Palette.lightOrange, e.fin());
-        Lines.stroke(0.5f + e.fout());
+    @Override
+    public void load() {
 
-        Angles.randLenVectors(e.id, 5, e.fin()*15f, e.rotation, 50f, (x, y) -> {
-            float ang = Mathf.atan2(x, y);
-            Lines.lineAngle(e.x + x, e.y + y, ang, e.fout()*3 + 1f);
+        hitBulletSmall = new Effect(14, e -> {
+            Draw.color(Color.WHITE, Palette.lightOrange, e.fin());
+            Lines.stroke(0.5f + e.fout());
+
+            Angles.randLenVectors(e.id, 5, e.fin() * 15f, e.rotation, 50f, (x, y) -> {
+                float ang = Mathf.atan2(x, y);
+                Lines.lineAngle(e.x + x, e.y + y, ang, e.fout() * 3 + 1f);
+            });
+
+            Draw.reset();
         });
 
-        Draw.reset();
-    }),
+        hitBulletBig = new Effect(13, e -> {
+            Draw.color(Color.WHITE, Palette.lightOrange, e.fin());
+            Lines.stroke(0.5f + e.fout() * 1.5f);
 
-    hitBulletBig = new Effect(13, e -> {
-        Draw.color(Color.WHITE, Palette.lightOrange, e.fin());
-        Lines.stroke(0.5f + e.fout()*1.5f);
+            Angles.randLenVectors(e.id, 8, e.finpow() * 30f, e.rotation, 50f, (x, y) -> {
+                float ang = Mathf.atan2(x, y);
+                Lines.lineAngle(e.x + x, e.y + y, ang, e.fout() * 4 + 1.5f);
+            });
 
-        Angles.randLenVectors(e.id, 8, e.finpow()*30f, e.rotation, 50f, (x, y) -> {
-            float ang = Mathf.atan2(x, y);
-            Lines.lineAngle(e.x + x, e.y + y, ang, e.fout()*4 + 1.5f);
+            Draw.reset();
         });
 
-        Draw.reset();
-    }),
+        hitFlameSmall = new Effect(14, e -> {
+            Draw.color(Palette.lightFlame, Palette.darkFlame, e.fin());
+            Lines.stroke(0.5f + e.fout());
 
-    hitFlameSmall = new Effect(14, e -> {
-        Draw.color(Palette.lightFlame, Palette.darkFlame, e.fin());
-        Lines.stroke(0.5f + e.fout());
+            Angles.randLenVectors(e.id, 5, e.fin() * 15f, e.rotation, 50f, (x, y) -> {
+                float ang = Mathf.atan2(x, y);
+                Lines.lineAngle(e.x + x, e.y + y, ang, e.fout() * 3 + 1f);
+            });
 
-        Angles.randLenVectors(e.id, 5, e.fin()*15f, e.rotation, 50f, (x, y) -> {
-            float ang = Mathf.atan2(x, y);
-            Lines.lineAngle(e.x + x, e.y + y, ang, e.fout()*3 + 1f);
+            Draw.reset();
         });
 
-        Draw.reset();
-    }),
+        hitLiquid = new Effect(16, e -> {
+            Draw.color(e.color);
 
-    hitLiquid = new Effect(16, e -> {
-        Draw.color(e.color);
+            Angles.randLenVectors(e.id, 5, e.fin() * 15f, e.rotation + 180f, 60f, (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, e.fout() * 2f);
+            });
 
-        Angles.randLenVectors(e.id, 5, e.fin()*15f, e.rotation + 180f, 60f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, e.fout() * 2f);
+            Draw.reset();
         });
 
-        Draw.reset();
-    }),
+        hitLancer = new Effect(12, e -> {
+            Draw.color(Color.WHITE);
+            Lines.stroke(e.fout() * 1.5f);
 
-    hitLancer = new Effect(12, e -> {
-        Draw.color(Color.WHITE);
-        Lines.stroke(e.fout()*1.5f);
+            Angles.randLenVectors(e.id, 8, e.finpow() * 17f, e.rotation, 360f, (x, y) -> {
+                float ang = Mathf.atan2(x, y);
+                Lines.lineAngle(e.x + x, e.y + y, ang, e.fout() * 4 + 1f);
+            });
 
-        Angles.randLenVectors(e.id, 8, e.finpow()*17f, e.rotation, 360f, (x, y) -> {
-            float ang = Mathf.atan2(x, y);
-            Lines.lineAngle(e.x + x, e.y + y, ang, e.fout()*4 + 1f);
+            Draw.reset();
         });
 
-        Draw.reset();
-    }),
+        despawn = new Effect(12, e -> {
+            Draw.color(Palette.lighterOrange, Color.GRAY, e.fin());
+            Lines.stroke(e.fout());
 
-    despawn = new Effect(12, e -> {
-        Draw.color(Palette.lighterOrange, Color.GRAY, e.fin());
-        Lines.stroke(e.fout());
+            Angles.randLenVectors(e.id, 7, e.fin() * 7f, e.rotation, 40f, (x, y) -> {
+                float ang = Mathf.atan2(x, y);
+                Lines.lineAngle(e.x + x, e.y + y, ang, e.fout() * 2 + 1f);
+            });
 
-        Angles.randLenVectors(e.id, 7, e.fin()*7f, e.rotation, 40f, (x, y) -> {
-            float ang = Mathf.atan2(x, y);
-            Lines.lineAngle(e.x + x, e.y + y, ang, e.fout()*2 + 1f);
+            Draw.reset();
         });
 
-        Draw.reset();
-    }),
+        flakExplosion = new Effect(20, e -> {
 
-    flakExplosion = new Effect(20, e -> {
+            Draw.color(Palette.bulletYellow);
+            e.scaled(6, i -> {
+                Lines.stroke(3f * i.fout());
+                Lines.circle(e.x, e.y, 3f + i.fin() * 10f);
+            });
 
-        Draw.color(Palette.bulletYellow);
-        e.scaled(6, i -> {
-            Lines.stroke(3f * i.fout());
-            Lines.circle(e.x, e.y, 3f + i.fin()*10f);
+            Draw.color(Color.GRAY);
+
+            Angles.randLenVectors(e.id, 5, 2f + 23f * e.finpow(), (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, e.fout() * 3f + 0.5f);
+            });
+
+            Draw.color(Palette.lighterOrange);
+            Lines.stroke(1f * e.fout());
+
+            Angles.randLenVectors(e.id + 1, 4, 1f + 23f * e.finpow(), (x, y) -> {
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), 1f + e.fout() * 3f);
+            });
+
+            Draw.reset();
         });
-
-        Draw.color(Color.GRAY);
-
-        Angles.randLenVectors(e.id, 5, 2f + 23f * e.finpow(), (x, y) ->{
-            Fill.circle(e.x + x, e.y + y, e.fout()*3f + 0.5f);
-        });
-
-        Draw.color(Palette.lighterOrange);
-        Lines.stroke(1f * e.fout());
-
-        Angles.randLenVectors(e.id + 1, 4, 1f + 23f * e.finpow(), (x, y) -> {
-            Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), 1f + e.fout()*3f);
-        });
-
-        Draw.reset();
-    });
+    }
 
 }

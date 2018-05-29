@@ -3,8 +3,6 @@ package io.anuke.mindustry.desktop;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.util.Strings;
 
-import javax.swing.*;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -42,9 +40,9 @@ public class CrashHandler {
         }
 
         try{
-            JOptionPane.showMessageDialog(null, "An error has occured: \n" + result + "\n\n" +
-                (!failed ? "A crash report has been written to " + new File(filename).getAbsolutePath() + ".\nPlease send this file to the developer!"
-                        : "Failed to generate crash report.\nPlease send an image of this crash log to the developer!"));
+            //JOptionPane.showMessageDialog(null, "An error has occured: \n" + result + "\n\n" +
+           //     (!failed ? "A crash report has been written to " + new File(filename).getAbsolutePath() + ".\nPlease send this file to the developer!"
+           //             : "Failed to generate crash report.\nPlease send an image of this crash log to the developer!"));
         }catch (Throwable i){
             i.printStackTrace();
             //what now?

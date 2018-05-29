@@ -139,10 +139,6 @@ public class NetClient extends Module {
                     entity.read(data, time);
                 }
             }
-
-            if(debugNet){
-                clientDebug.setSyncDebug(players, enemies);
-            }
         });
 
         Net.handleClient(InvokePacket.class, packet -> {

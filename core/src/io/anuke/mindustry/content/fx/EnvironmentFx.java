@@ -3,113 +3,117 @@ package io.anuke.mindustry.content.fx;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.type.ContentList;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
-public class EnvironmentFx {
+public class EnvironmentFx implements ContentList {
+    public static Effect burning, fire, smoke, steam, fireballsmoke, ballfire, freezing, melting, wet, oily;
 
-    public static final Effect
+    @Override
+    public void load() {
 
-    burning = new Effect(35f, e -> {
-        Draw.color(Palette.lightFlame, Palette.darkFlame, e.fin());
+        burning = new Effect(35f, e -> {
+            Draw.color(Palette.lightFlame, Palette.darkFlame, e.fin());
 
-        Angles.randLenVectors(e.id, 3, 2f + e.fin()*7f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, 0.1f + e.fout() * 1.4f);
+            Angles.randLenVectors(e.id, 3, 2f + e.fin() * 7f, (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, 0.1f + e.fout() * 1.4f);
+            });
+
+            Draw.color();
         });
 
-        Draw.color();
-    }),
+        fire = new Effect(35f, e -> {
+            Draw.color(Palette.lightFlame, Palette.darkFlame, e.fin());
 
-    fire = new Effect(35f, e -> {
-        Draw.color(Palette.lightFlame, Palette.darkFlame, e.fin());
+            Angles.randLenVectors(e.id, 2, 2f + e.fin() * 7f, (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, 0.2f + e.fslope() * 1.5f);
+            });
 
-        Angles.randLenVectors(e.id, 2, 2f + e.fin()*7f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, 0.2f + e.fslope() * 1.5f);
+            Draw.color();
         });
 
-        Draw.color();
-    }),
+        smoke = new Effect(35f, e -> {
+            Draw.color(Color.GRAY);
 
-    smoke = new Effect(35f, e -> {
-        Draw.color(Color.GRAY);
+            Angles.randLenVectors(e.id, 1, 2f + e.fin() * 7f, (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, 0.2f + e.fslope() * 1.5f);
+            });
 
-        Angles.randLenVectors(e.id, 1, 2f + e.fin()*7f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, 0.2f + e.fslope() * 1.5f);
+            Draw.color();
         });
 
-        Draw.color();
-    }),
+        steam = new Effect(35f, e -> {
+            Draw.color(Color.LIGHT_GRAY);
 
-    steam = new Effect(35f, e -> {
-        Draw.color(Color.LIGHT_GRAY);
+            Angles.randLenVectors(e.id, 2, 2f + e.fin() * 7f, (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, 0.2f + e.fslope() * 1.5f);
+            });
 
-        Angles.randLenVectors(e.id, 2, 2f + e.fin()*7f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, 0.2f + e.fslope() * 1.5f);
+            Draw.color();
         });
 
-        Draw.color();
-    }),
+        fireballsmoke = new Effect(25f, e -> {
+            Draw.color(Color.GRAY);
 
-    fireballsmoke = new Effect(25f, e -> {
-        Draw.color(Color.GRAY);
+            Angles.randLenVectors(e.id, 1, 2f + e.fin() * 7f, (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, 0.2f + e.fout() * 1.5f);
+            });
 
-        Angles.randLenVectors(e.id, 1, 2f + e.fin()*7f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, 0.2f + e.fout() * 1.5f);
+            Draw.color();
         });
 
-        Draw.color();
-    }),
+        ballfire = new Effect(25f, e -> {
+            Draw.color(Palette.lightFlame, Palette.darkFlame, e.fin());
 
-    ballfire = new Effect(25f, e -> {
-        Draw.color(Palette.lightFlame, Palette.darkFlame, e.fin());
+            Angles.randLenVectors(e.id, 2, 2f + e.fin() * 7f, (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, 0.2f + e.fout() * 1.5f);
+            });
 
-        Angles.randLenVectors(e.id, 2, 2f + e.fin()*7f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, 0.2f + e.fout() * 1.5f);
+            Draw.color();
         });
 
-        Draw.color();
-    }),
+        freezing = new Effect(40f, e -> {
+            Draw.color(Liquids.cryofluid.color);
 
-    freezing = new Effect(40f, e -> {
-        Draw.color(Liquids.cryofluid.color);
+            Angles.randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, e.fout() * 1.2f);
+            });
 
-        Angles.randLenVectors(e.id, 2, 1f + e.fin()*2f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, e.fout() * 1.2f);
+            Draw.color();
         });
 
-        Draw.color();
-    }),
+        melting = new Effect(40f, e -> {
+            Draw.color(Liquids.lava.color, Color.WHITE, e.fout() / 5f + Mathf.randomSeedRange(e.id, 0.12f));
 
-    melting = new Effect(40f, e -> {
-        Draw.color(Liquids.lava.color, Color.WHITE,  e.fout()/5f + Mathf.randomSeedRange(e.id, 0.12f));
+            Angles.randLenVectors(e.id, 2, 1f + e.fin() * 3f, (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, .2f + e.fout() * 1.2f);
+            });
 
-        Angles.randLenVectors(e.id, 2, 1f + e.fin()*3f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, .2f + e.fout() * 1.2f);
+            Draw.color();
         });
 
-        Draw.color();
-    }),
+        wet = new Effect(40f, e -> {
+            Draw.color(Liquids.water.color);
 
-    wet = new Effect(40f, e -> {
-        Draw.color(Liquids.water.color);
+            Angles.randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, e.fout() * 1f);
+            });
 
-        Angles.randLenVectors(e.id, 2, 1f + e.fin()*2f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, e.fout() * 1f);
+            Draw.color();
         });
 
-        Draw.color();
-    }),
+        oily = new Effect(42f, e -> {
+            Draw.color(Liquids.oil.color);
 
-    oily = new Effect(42f, e -> {
-        Draw.color(Liquids.oil.color);
+            Angles.randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, e.fout() * 1f);
+            });
 
-        Angles.randLenVectors(e.id, 2, 1f + e.fin()*2f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, e.fout() * 1f);
+            Draw.color();
         });
-
-        Draw.color();
-    });
+    }
 }

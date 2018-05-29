@@ -3,20 +3,60 @@ package io.anuke.mindustry.core;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.content.bullets.*;
+import io.anuke.mindustry.content.fx.*;
 import io.anuke.mindustry.entities.StatusEffect;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.units.UnitType;
+import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.util.Log;
 
-/**Loads all game content by creating class instances.
+/**Loads all game content.
  * Call load() before doing anything with content.*/
 public class ContentLoader {
 
     public static void load(){
 
-        Object[] content = {
+        ContentList[] content = {
+            //items
+            new Items(),
+
+            //liquids
+            new Liquids(),
+
+            //ammotypes
+            new AmmoTypes(),
+
+            //mechs
+            new Mechs(),
+
+            //bullets
+            new ArtilleryBullets(),
+            new FlakBullets(),
+            new MissileBullets(),
+            new ShellBullets(),
+            new StandardBullets(),
+            new TurretBullets(),
+
+            //units
+            new UnitTypes(),
+
+            //weapons
+            new Weapons(),
+
+            //status effects
+            new StatusEffects(),
+
+            //effects
+            new BlockFx(),
+            new BulletFx(),
+            new EnvironmentFx(),
+            new ExplosionFx(),
+            new Fx(),
+            new ShootFx(),
+            new UnitFx(),
+
             //blocks
             new Blocks(),
             new DefenseBlocks(),
@@ -30,39 +70,13 @@ public class ContentLoader {
             new PowerBlocks(),
             new CraftingBlocks(),
 
-            //items
-            new Items(),
-
-            //liquids
-            new Liquids(),
-
-            //mechs
-            new Mechs(),
-
-            //weapons
-            new Weapons(),
-
-            //units
-            new UnitTypes(),
-
-
-            //bullets
-            new ArtilleryBullets(),
-            new FlakBullets(),
-            new MissileBullets(),
-            new ShellBullets(),
-            new StandardBullets(),
-            new TurretBullets(),
-
-            //ammotypes
-            new AmmoTypes(),
-
-            //status effects
-            new StatusEffects(),
-
             //recipes
             new Recipes(),
         };
+
+        for (ContentList list : content){
+            list.load();
+        }
 
         for(Block block : Block.getAllBlocks()){
             block.init();

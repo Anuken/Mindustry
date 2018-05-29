@@ -3,7 +3,6 @@ package io.anuke.mindustry.graphics;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.FloatArray;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Timers;
@@ -14,18 +13,29 @@ import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
 public class Shaders{
-	public static final Outline outline = new Outline();
-    public static final BlockBuild blockbuild = new BlockBuild();
-    public static final BlockPreview blockpreview = new BlockPreview();
-	public static final Shield shield = new Shield();
-	public static final SurfaceShader water = new SurfaceShader("water");
-	public static final SurfaceShader lava = new SurfaceShader("lava");
-	public static final SurfaceShader oil = new SurfaceShader("oil");
-	public static final Space space = new Space();
-	public static final UnitBuild build = new UnitBuild();
-	public static final Shader hit = new Shader("hit", "default");
+	public static Outline outline;
+    public static BlockBuild blockbuild;
+    public static BlockPreview blockpreview;
+	public static Shield shield;
+	public static SurfaceShader water;
+	public static SurfaceShader lava;
+	public static SurfaceShader oil;
+	public static Space space;
+	public static UnitBuild build;
+	public static Shader hit;
 
-	private static final Vector2 vec = new Vector2();
+	public static void init(){
+		outline = new Outline();
+		blockbuild = new BlockBuild();
+		blockpreview = new BlockPreview();
+		shield = new Shield();
+		water = new SurfaceShader("water");
+		lava = new SurfaceShader("lava");
+		oil = new SurfaceShader("oil");
+		space = new Space();
+		build = new UnitBuild();
+		hit = new Shader("hit", "default");
+	}
 
 	public static class Space extends SurfaceShader{
 
@@ -70,7 +80,7 @@ public class Shaders{
 		@Override
 		public void apply(){
 			shader.setUniformf("u_color", color);
-			shader.setUniformf("u_texsize", vec.set(region.getTexture().getWidth(), region.getTexture().getHeight()));
+			shader.setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
 		}
 	}
 

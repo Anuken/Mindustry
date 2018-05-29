@@ -1,10 +1,15 @@
 package io.anuke.mindustry.content;
 
+import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.Mech;
 
-public class Mechs {
-    public static final Mech
+public class Mechs implements ContentList {
+    public static Mech standard, standardShip;
 
-    standard = new Mech("standard-mech", false),
-    standardShip = new Mech("standard-ship", true);
+    @Override
+    public void load() {
+
+        standard = new Mech("standard-mech", false);
+        standardShip = new Mech("standard-ship", true);
+    }
 }

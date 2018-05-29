@@ -58,7 +58,7 @@ public class MenuFragment implements Fragment{
 
 					new imagebutton("icon-play-2", isize, ui.levels::show).text("$text.play").padTop(4f);
 
-					new imagebutton("icon-tutorial", isize, () -> control.playMap(world.maps().getByName("tutorial"))).text("$text.tutorial").padTop(4f);
+					new imagebutton("icon-tutorial", isize, () -> {}).text("$text.tutorial").padTop(4f);
 
 					new imagebutton("icon-load", isize, ui.load::show).text("$text.load").padTop(4f);
 
@@ -123,10 +123,7 @@ public class MenuFragment implements Fragment{
 				ui.showInfo("$text.multiplayer.web");
 			}
 		}));
-		dialog.content().add(new MenuButton("icon-tutorial", "$text.tutorial", ()-> {
-			control.playMap(world.maps().getByName("tutorial"));
-			dialog.hide();
-		}));
+		dialog.content().add(new MenuButton("icon-tutorial", "$text.tutorial", ()-> {}));
 
 		dialog.content().row();
 

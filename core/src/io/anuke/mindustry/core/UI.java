@@ -120,7 +120,7 @@ public class UI extends SceneModule{
 		skin = new Skin(Gdx.files.internal("ui/uiskin.json"), Core.atlas);
 		Mathf.each(font -> {
 			font.setUseIntegerPositions(false);
-			font.getData().setScale(Vars.fontscale);
+			font.getData().setScale(Vars.fontScale);
 			font.getData().down += Unit.dp.scl(4f);
 			font.getData().lineHeight -= Unit.dp.scl(2f);
 		}, skin.font(), skin.getFont("default-font-chat"), skin.getFont("korean"));

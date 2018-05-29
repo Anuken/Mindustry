@@ -25,8 +25,8 @@ import io.anuke.ucore.util.Translator;
 import static io.anuke.mindustry.Vars.*;
 
 public abstract class InputHandler extends InputAdapter{
-    public final static float playerSelectRange = Unit.dp.scl(60f);
-    private final static Translator stackTrns = new Translator();
+    float playerSelectRange = Unit.dp.scl(60f);
+    Translator stackTrns = new Translator();
 
     private float mx, my;
 

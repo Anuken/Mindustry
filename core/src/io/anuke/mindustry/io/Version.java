@@ -9,13 +9,13 @@ import io.anuke.ucore.util.Strings;
 import java.io.IOException;
 
 public class Version {
-    public static final String name;
-    public static final String type;
-    public static final String code;
-    public static final int build;
-    public static final String buildName;
+    public static String name;
+    public static String type;
+    public static String code;
+    public static int build;
+    public static String buildName;
 
-    static{
+    public static void init(){
         try {
             FileHandle file = Gdx.files.internal("version.properties");
 

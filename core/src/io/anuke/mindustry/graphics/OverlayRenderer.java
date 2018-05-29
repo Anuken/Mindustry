@@ -70,7 +70,7 @@ public class OverlayRenderer {
                         Draw.color(0f, 0f, 0f, 0.5f);
                         Fill.rect(target.drawx(), target.drawy(), v.x, v.y);
                         Draw.textc(result.toString(), target.drawx(), target.drawy(), v);
-                        Draw.tscl(fontscale);
+                        Draw.tscl(fontScale);
                         Draw.reset();
                     }
 

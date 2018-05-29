@@ -5,17 +5,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.core.*;
-import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.effect.Shield;
-import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.net.ClientDebug;
-import io.anuke.mindustry.net.ServerDebug;
+import io.anuke.mindustry.io.Version;
 import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
@@ -29,52 +27,43 @@ public class Vars{
 
 	public static final boolean testMobile = true;
 	//shorthand for whether or not this is running on android or ios
-	public static final boolean mobile = (Gdx.app.getType() == ApplicationType.Android) ||
-											Gdx.app.getType() == ApplicationType.iOS || testMobile;
-	public static final boolean ios = Gdx.app.getType() == ApplicationType.iOS;
-	public static final boolean android = Gdx.app.getType() == ApplicationType.Android;
+	public static boolean mobile;
+	public static boolean ios;
+	public static boolean android;
 	//shorthand for whether or not this is running on GWT
-	public static final boolean gwt = (Gdx.app.getType() == ApplicationType.WebGL);
-	//whether to send block state change events to players
-	public static final boolean syncBlockState = false;
-	//how far away from the player blocks can be placed
-	public static final float placerange = 66;
+	public static boolean gwt;
+
 	//respawn time in frames
 	public static final float respawnduration = 60*4;
 	//time between waves in frames (on normal mode)
-	public static final float wavespace = 60*60*(mobile ? 1 : 1);
+	public static final float wavespace = 60*60;
 	//waves can last no longer than 3 minutes, otherwise the next one spawns
 	public static final float maxwavespace = 60*60*4f;
-	//advance time the pathfinding starts at
-	public static final float aheadPathfinding = 60*15;
-	//how far away from spawn points the player can't place blocks
-	public static final float enemyspawnspace = 65;
 
 	public static final float coreBuildRange = 400f;
 	//discord group URL
 	public static final String discordURL = "https://discord.gg/BKADYds";
 
 	public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
+
 	//directory for user-created map data
-	public static final FileHandle customMapDirectory = OS.getAppDataDirectory("Mindustry").child("maps/");
+	public static FileHandle customMapDirectory;
 	//save file directory
-	public static final FileHandle saveDirectory = OS.getAppDataDirectory("Mindustry").child("saves/");
-	public static final String mapExtension = "mmap";
-	public static final String saveExtension = "msav";
+	public static FileHandle saveDirectory;
+	public static String mapExtension = "mmap";
+	public static String saveExtension = "msav";
 	//scale of the font
-	public static float fontscale = Math.max(Unit.dp.scl(1f)/2f, 0.5f);
+	public static float fontScale;
 	//camera zoom displayed on startup
-	public static final int baseCameraScale = Math.round(Unit.dp.scl(4));
+	public static int baseCameraScale;
 	//how much the zoom changes every zoom button press (unused?)
-	public static final int zoomScale = Math.round(Unit.dp.scl(1));
+	public static int zoomScale;
 	//if true, player speed will be increased, massive amounts of resources will be given on start, and other debug options will be available
 	public static boolean debug = false;
 	public static boolean debugNet = true;
 	public static boolean console = false;
 	//whether the player can clip through walls
 	public static boolean noclip = false;
-	//whether to draw chunk borders
-	public static boolean debugChunks = false;
 	//whether turrets have infinite ammo (only with debug)
 	public static boolean infiniteAmmo = true;
 	//whether to show paths of enemies
@@ -130,10 +119,7 @@ public class Vars{
 	public static final int webPort = 6568;
 
 	public static GameState state;
-	public static final ThreadHandler threads = new ThreadHandler(Platform.instance.getThreadProvider());
-
-	public static final ServerDebug serverDebug = new ServerDebug();
-	public static final ClientDebug clientDebug = new ClientDebug();
+	public static ThreadHandler threads;
 
 	public static Control control;
 	public static Logic logic;
@@ -146,19 +132,46 @@ public class Vars{
 	
 	public static Player[] players = {};
 
-	public static final EntityGroup<Player> playerGroup = Entities.addGroup(Player.class).enableMapping();
-	public static final EntityGroup<TileEntity> tileGroup = Entities.addGroup(TileEntity.class, false);
-	public static final EntityGroup<Bullet> bulletGroup = Entities.addGroup(Bullet.class);
-	public static final EntityGroup<Shield> shieldGroup = Entities.addGroup(Shield.class, false);
-	public static final EntityGroup<EffectEntity> effectGroup = Entities.addGroup(EffectEntity.class, false);
-	public static final EntityGroup<Entity> groundEffectGroup = Entities.addGroup(Entity.class, false);
-	public static final EntityGroup<Puddle> puddleGroup = Entities.addGroup(Puddle.class, false);
-	public static final EntityGroup<Fire> airItemGroup = Entities.addGroup(Fire.class, false);
-	public static final EntityGroup<BaseUnit>[] unitGroups = new EntityGroup[Team.values().length];
+	public static EntityGroup<Player> playerGroup;
+	public static EntityGroup<TileEntity> tileGroup;
+	public static EntityGroup<Bullet> bulletGroup;
+	public static EntityGroup<Shield> shieldGroup;
+	public static EntityGroup<EffectEntity> effectGroup;
+	public static EntityGroup<Entity> groundEffectGroup;
+	public static EntityGroup<Puddle> puddleGroup;
+	public static EntityGroup<Fire> airItemGroup;
+	public static EntityGroup<BaseUnit>[] unitGroups;
 
-	static{
+	public static void init(){
+		Version.init();
+
+		playerGroup = Entities.addGroup(Player.class).enableMapping();
+		tileGroup = Entities.addGroup(TileEntity.class, false);
+		bulletGroup = Entities.addGroup(Bullet.class);
+		shieldGroup = Entities.addGroup(Shield.class, false);
+		effectGroup = Entities.addGroup(EffectEntity.class, false);
+		groundEffectGroup = Entities.addGroup(Entity.class, false);
+		puddleGroup = Entities.addGroup(Puddle.class, false);
+		airItemGroup = Entities.addGroup(Fire.class, false);
+		unitGroups = new EntityGroup[Team.values().length];
+
+		threads = new ThreadHandler(Platform.instance.getThreadProvider());
+
 		for(Team team : Team.values()){
 			unitGroups[team.ordinal()] = Entities.addGroup(BaseUnit.class).enableMapping();
 		}
+
+		mobile = (Gdx.app.getType() == ApplicationType.Android) ||
+				Gdx.app.getType() == ApplicationType.iOS || testMobile;
+		ios = Gdx.app.getType() == ApplicationType.iOS;
+		android = Gdx.app.getType() == ApplicationType.Android;
+		gwt = Gdx.app.getType() == ApplicationType.WebGL;
+
+		customMapDirectory = OS.getAppDataDirectory("Mindustry").child("maps/");
+		saveDirectory = OS.getAppDataDirectory("Mindustry").child("saves/");
+
+		fontScale = Math.max(Unit.dp.scl(1f)/2f, 0.5f);
+		baseCameraScale = Math.round(Unit.dp.scl(4));
+		zoomScale = Math.round(Unit.dp.scl(1));
 	}
 }

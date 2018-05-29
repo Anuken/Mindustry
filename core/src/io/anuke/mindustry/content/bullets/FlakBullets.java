@@ -2,35 +2,40 @@ package io.anuke.mindustry.content.bullets;
 
 import io.anuke.mindustry.entities.bullet.BasicBulletType;
 import io.anuke.mindustry.entities.bullet.BulletType;
+import io.anuke.mindustry.type.ContentList;
 
-public class FlakBullets {
-    public static final BulletType
+public class FlakBullets implements ContentList {
+    public static BulletType lead, plastic, explosive, surge;
 
-    lead = new BasicBulletType(3f, 5) {
-        {
-            bulletWidth = 7f;
-            bulletHeight = 9f;
-        }
-    },
+    @Override
+    public void load() {
 
-    plastic = new BasicBulletType(3f, 5) {
-        {
-            bulletWidth = 7f;
-            bulletHeight = 9f;
-        }
-    },
+        lead = new BasicBulletType(3f, 5) {
+            {
+                bulletWidth = 7f;
+                bulletHeight = 9f;
+            }
+        };
 
-    explosive = new BasicBulletType(3f, 5) {
-        {
-            bulletWidth = 7f;
-            bulletHeight = 9f;
-        }
-    },
+        plastic = new BasicBulletType(3f, 5) {
+            {
+                bulletWidth = 7f;
+                bulletHeight = 9f;
+            }
+        };
 
-    surge = new BasicBulletType(3f, 5) {
-        {
-            bulletWidth = 7f;
-            bulletHeight = 9f;
-        }
-    };
+        explosive = new BasicBulletType(3f, 5) {
+            {
+                bulletWidth = 7f;
+                bulletHeight = 9f;
+            }
+        };
+
+        surge = new BasicBulletType(3f, 5) {
+            {
+                bulletWidth = 7f;
+                bulletHeight = 9f;
+            }
+        };
+    }
 }

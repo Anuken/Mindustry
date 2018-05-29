@@ -157,7 +157,6 @@ public class KryoServer implements ServerProvider {
 
     @Override
     public void close() {
-        UCore.setPrivate(server, "shutdown", true);
         connections.clear();
         lastconnection = 0;
 

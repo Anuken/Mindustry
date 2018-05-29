@@ -213,7 +213,7 @@ public class HudFragment implements Fragment{
 			new table(){{
 				aleft();
 
-				new label(() -> Bundles.format("text.wave", state.wave)).scale(fontscale*1.5f).left().padLeft(-6);
+				new label(() -> Bundles.format("text.wave", state.wave)).scale(fontScale *1.5f).left().padLeft(-6);
 
 				row();
 

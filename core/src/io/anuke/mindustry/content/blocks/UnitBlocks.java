@@ -1,46 +1,33 @@
 package io.anuke.mindustry.content.blocks;
 
+import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.units.RepairPoint;
 import io.anuke.mindustry.world.blocks.types.units.ResupplyPoint;
 
-public class UnitBlocks {
-    public static final Block
-/*
-    droneFactory = new UnitFactory("dronefactory"){{
-        type = UnitTypes.drone;
-        produceTime = 200;
-        size = 2;
-        requirements = new ItemStack[]{
-            new ItemStack(Items.stone, 5)
-        };
-    }},
+public class UnitBlocks implements ContentList {
+    public static Block resupplyPoint, repairPoint, droneFactory;
 
-    vtolFactory = new UnitFactory("vtolfactory"){{
-        type = UnitTypes.vtol;
-        produceTime = 200;
-        size = 2;
-        requirements = new ItemStack[]{
-            new ItemStack(Items.stone, 5)
-        };
-    }},
+    @Override
+    public void load() {
+        /*
+        droneFactory = new UnitFactory("dronefactory") {{
+            type = UnitTypes.drone;
+            produceTime = 200;
+            size = 2;
+            requirements = new ItemStack[]{
+                    new ItemStack(Items.stone, 5)
+            };
+        }};*/
 
-    walkerFactory = new UnitFactory("walkerfactory"){{
-        type = UnitTypes.scout;
-        produceTime = 20;
-        size = 2;
-        requirements = new ItemStack[]{
-            new ItemStack(Items.stone, 1)
-        };
-    }},*/
+        resupplyPoint = new ResupplyPoint("resupplypoint") {{
+            shadow = "shadow-round-1";
+            itemCapacity = 30;
+        }};
 
-    resupplyPoint = new ResupplyPoint("resupplypoint"){{
-        shadow = "shadow-round-1";
-        itemCapacity = 30;
-    }},
-
-    repairPoint = new RepairPoint("repairpoint"){{
-        shadow = "shadow-round-1";
-        repairSpeed = 0.1f;
-    }};
+        repairPoint = new RepairPoint("repairpoint") {{
+            shadow = "shadow-round-1";
+            repairSpeed = 0.1f;
+        }};
+    }
 }

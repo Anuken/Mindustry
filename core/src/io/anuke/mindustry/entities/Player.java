@@ -242,7 +242,7 @@ public class Player extends Unit implements BlockBuilder {
 
 		Draw.reset();
 		Pools.free(layout);
-		Draw.tscl(fontscale);
+		Draw.tscl(fontScale);
 	}
 
 	public void drawBuildRequests(){

@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
@@ -14,12 +13,6 @@ import static io.anuke.mindustry.Vars.world;
 
 
 public class WorldGenerator {
-	public static final ObjectMap<Block, Block> rocks = new ObjectMap<Block, Block>(){{
-		put(Blocks.stone, Blocks.rock);
-		put(Blocks.snow, Blocks.icerock);
-		put(Blocks.grass, Blocks.shrub);
-		put(Blocks.blackstone, Blocks.blackrock);
-	}};
 	
 	/**Should fill spawns with the correct spawnpoints.*/
 	public static void generate(Tile[][] tiles, MapTileData data){

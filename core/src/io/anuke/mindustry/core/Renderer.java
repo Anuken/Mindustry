@@ -57,6 +57,8 @@ public class Renderer extends RendererModule{
 	public Renderer() {
 		Lines.setCircleVertices(14);
 
+		Shaders.init();
+
 		Core.cameraScale = baseCameraScale;
 		Effects.setEffectProvider((effect, color, x, y, rotation, data) -> {
 			if(effect == Fx.none) return;

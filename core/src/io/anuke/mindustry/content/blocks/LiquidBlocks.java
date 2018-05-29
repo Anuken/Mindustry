@@ -1,48 +1,53 @@
 package io.anuke.mindustry.content.blocks;
 
+import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.distribution.*;
 import io.anuke.mindustry.world.blocks.types.production.Pump;
 
-public class LiquidBlocks {
-    public static final Block
+public class LiquidBlocks implements ContentList{
+    public static Block pump, fluxpump, conduit, pulseconduit, liquidrouter, liquidtank, liquidjunction, bridgeconduit, laserconduit;
 
-    pump = new Pump("pump") {{
-        pumpAmount = 0.1f;
-    }},
+    @Override
+    public void load() {
 
-    fluxpump = new Pump("fluxpump") {{
-        pumpAmount = 0.2f;
-    }},
+        pump = new Pump("pump") {{
+            pumpAmount = 0.1f;
+        }};
 
-    conduit = new Conduit("conduit") {{
-        health = 45;
-    }},
+        fluxpump = new Pump("fluxpump") {{
+            pumpAmount = 0.2f;
+        }};
 
-    pulseconduit = new Conduit("pulseconduit") {{
-        liquidCapacity = 16f;
-        liquidFlowFactor = 4.9f;
-        health = 65;
-    }},
+        conduit = new Conduit("conduit") {{
+            health = 45;
+        }};
 
-    liquidrouter = new LiquidRouter("liquidrouter") {{
-        liquidCapacity = 40f;
-    }},
+        pulseconduit = new Conduit("pulseconduit") {{
+            liquidCapacity = 16f;
+            liquidFlowFactor = 4.9f;
+            health = 65;
+        }};
 
-    liquidtank = new LiquidRouter("liquidtank") {{
-        size = 3;
-        liquidCapacity = 1500f;
-        health = 500;
-    }},
+        liquidrouter = new LiquidRouter("liquidrouter") {{
+            liquidCapacity = 40f;
+        }};
 
-    liquidjunction = new LiquidJunction("liquidjunction"),
+        liquidtank = new LiquidRouter("liquidtank") {{
+            size = 3;
+            liquidCapacity = 1500f;
+            health = 500;
+        }};
 
-    bridgeconduit = new LiquidExtendingBridge("bridgeconduit"){{
-        range = 3;
-        hasPower = false;
-    }},
+        liquidjunction = new LiquidJunction("liquidjunction");
 
-    laserconduit = new LiquidBridge("laserconduit"){{
-        range = 7;
-    }};
+        bridgeconduit = new LiquidExtendingBridge("bridgeconduit") {{
+            range = 3;
+            hasPower = false;
+        }};
+
+        laserconduit = new LiquidBridge("laserconduit") {{
+            range = 7;
+        }};
+    }
 }

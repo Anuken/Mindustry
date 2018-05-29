@@ -6,14 +6,12 @@ import club.minnced.discord.rpc.DiscordRichPresence;
 import com.badlogic.gdx.utils.Base64Coder;
 import io.anuke.kryonet.DefaultThreadImpl;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.mindustry.core.Platform;
+import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.util.OS;
 import io.anuke.ucore.util.Strings;
 
-import javax.swing.*;
 import java.net.NetworkInterface;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -26,7 +24,7 @@ import java.util.Random;
 import static io.anuke.mindustry.Vars.*;
 
 public class DesktopPlatform extends Platform {
-    final static boolean useDiscord = OS.getPropertyNotNull("sun.arch.data.model").equals("64");
+    final static boolean useDiscord = false;//OS.getPropertyNotNull("sun.arch.data.model").equals("64");
     final static String applicationId = "398246104468291591";
     final static DateFormat format = SimpleDateFormat.getDateTimeInstance();
     String[] args;
@@ -52,7 +50,7 @@ public class DesktopPlatform extends Platform {
 
     @Override
     public void showError(String text){
-        JOptionPane.showMessageDialog(null, text);
+        //JOptionPane.showMessageDialog(null, text);
     }
 
     @Override
