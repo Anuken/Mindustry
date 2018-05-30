@@ -3,9 +3,11 @@ package io.anuke.mindustry.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -20,6 +22,7 @@ import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.input.DesktopInput.PlaceMode.*;
 
 public class DesktopInput extends InputHandler{
 	//controller info
@@ -30,8 +33,8 @@ public class DesktopInput extends InputHandler{
 
     /**Position where the player started dragging a line.*/
     private int selectX, selectY;
-    /**Wehther selecting mode is active.*/
-    private boolean selecting;
+    /**Whether selecting mode is active.*/
+    private PlaceMode mode;
     /**Animation scale for line.*/
     private float selectScale;
 
@@ -85,14 +88,14 @@ public class DesktopInput extends InputHandler{
         if(cursor == null) return;
 
 	    //draw selection
-	    if(selecting){
+	    if(mode == placing) {
             NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursor.x, cursor.y, rotation, true, maxLength);
 
-            for(int i = 0; i <= result.getLength(); i += recipe.result.size){
+            for (int i = 0; i <= result.getLength(); i += recipe.result.size) {
                 int x = selectX + i * Mathf.sign(cursor.x - selectX) * Mathf.bool(result.isX());
                 int y = selectY + i * Mathf.sign(cursor.y - selectY) * Mathf.bool(!result.isX());
 
-                if(i + recipe.result.size > result.getLength() && recipe.result.rotate){
+                if (i + recipe.result.size > result.getLength() && recipe.result.rotate) {
                     Draw.color(!validPlace(x, y, recipe.result, result.rotation) ? Palette.remove : Palette.placeRotate);
                     Draw.grect("place-arrow", x * tilesize + recipe.result.offset(),
                             y * tilesize + recipe.result.offset(), result.rotation * 90 - 90);
@@ -102,7 +105,28 @@ public class DesktopInput extends InputHandler{
             }
 
             Draw.reset();
-	    }else if(isPlacing()){
+        }else if(mode == breaking){
+            NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, selectX, selectY, cursor.x, cursor.y, false, maxLength, 1f);
+            NormalizeResult dresult = PlaceUtils.normalizeArea(selectX, selectY, cursor.x, cursor.y, rotation, false, maxLength);
+
+            Draw.color(Palette.remove);
+
+            Draw.alpha(0.6f);
+            //Fill.crect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+            Draw.alpha(1f);
+
+            for(int x = dresult.x; x <= dresult.x2; x ++){
+                for(int y = dresult.y; y <= dresult.y2; y ++){
+                    Tile tile = world.tile(x, y);
+                    if(tile == null || !validBreak(tile.x, tile.y)) continue;
+                    tile = tile.target();
+
+                    Lines.poly(tile.drawx(), tile.drawy(), 4, tile.block().size * tilesize/2f, 45 + 15);
+                }
+            }
+
+            Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+        }else if(isPlacing()){
 	        if(recipe.result.rotate){
 	            Draw.color(!validPlace(cursor.x, cursor.y, recipe.result, rotation) ? Palette.remove : Palette.placeRotate);
 	            Draw.grect("place-arrow", cursor.worldx() + recipe.result.offset(),
@@ -119,8 +143,8 @@ public class DesktopInput extends InputHandler{
 		if(player.isDead() || state.is(State.menu) || ui.hasDialog()) return;
 
 		//deslect if not placing
-		if(!isPlacing()){
-		    selecting = false;
+		if(!isPlacing() && mode == placing){
+		    mode = none;
         }
 
         if(isPlacing()){
@@ -165,12 +189,22 @@ public class DesktopInput extends InputHandler{
 
         if(cursor == null) return false;
 
-        if(isPlacing()) {
+        //if left, begin placing or tap a tile
+        if(button == Buttons.LEFT) {
+            if (isPlacing()) {
+                selectX = cursor.x;
+                selectY = cursor.y;
+                mode = placing;
+            } else {
+                tileTapped(cursor);
+            }
+        }else if(button == Buttons.RIGHT){
             selectX = cursor.x;
             selectY = cursor.y;
-            selecting = true;
-        }else {
-            tileTapped(cursor);
+            mode = breaking;
+        }else if(button == Buttons.MIDDLE){
+            recipe = null;
+            mode = none;
         }
 
         return false;
@@ -183,11 +217,11 @@ public class DesktopInput extends InputHandler{
         Tile cursor = tileAt(screenX, screenY);
 
         if(cursor == null){
-            selecting = false;
+            mode = none;
             return false;
         }
 
-        if(selecting){
+        if(mode == placing){
             NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursor.x, cursor.y, rotation, true, maxLength);
 
             for(int i = 0; i <= result.getLength(); i += recipe.result.size){
@@ -198,9 +232,20 @@ public class DesktopInput extends InputHandler{
 
                 tryPlaceBlock(x, y);
             }
+        }else if(mode == breaking){
+            NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursor.x, cursor.y, rotation, false, maxLength);
+
+            for(int x = 0; x <= Math.abs(result.x2 - result.x); x ++ ){
+                for(int y = 0; y <= Math.abs(result.y2 - result.y); y ++){
+                    int wx = selectX + x * Mathf.sign(cursor.x - selectX);
+                    int wy = selectY + y * Mathf.sign(cursor.y - selectY);
+
+                    tryBreakBlock(wx, wy);
+                }
+            }
         }
 
-        selecting = false;
+        mode = none;
 
         return false;
     }
@@ -264,5 +309,9 @@ public class DesktopInput extends InputHandler{
             controlx = control.gdxInput().getX();
             controly = control.gdxInput().getY();
         }
+    }
+
+    enum PlaceMode{
+	    none, breaking, placing;
     }
 }

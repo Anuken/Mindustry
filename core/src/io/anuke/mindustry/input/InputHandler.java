@@ -168,22 +168,17 @@ public abstract class InputHandler extends InputAdapter{
 		return true;
 	}
 	
-	public boolean tryPlaceBlock(int x, int y){
+	public void tryPlaceBlock(int x, int y){
 		if(recipe != null && validPlace(x, y, recipe.result, rotation) && cursorNear()){
 			
 			placeBlock(x, y, recipe, rotation);
-
-			return true;
 		}
-		return false;
 	}
 	
-	public boolean tryDeleteBlock(int x, int y){
+	public void tryBreakBlock(int x, int y){
 		if(cursorNear() && validBreak(x, y)){
 			breakBlock(x, y);
-			return true;
 		}
-		return false;
 	}
 	
 	public boolean validPlace(int x, int y, Block type, int rotation){
