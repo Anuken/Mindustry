@@ -24,7 +24,8 @@ import io.anuke.ucore.util.Translator;
 import static io.anuke.mindustry.Vars.*;
 
 public abstract class InputHandler extends InputAdapter{
-    float playerSelectRange = Unit.dp.scl(80f);
+	/**Used for dropping items.*/
+    float playerSelectRange = Unit.dp.scl(40f);
     Translator stackTrns = new Translator();
 
 	public final Player player;

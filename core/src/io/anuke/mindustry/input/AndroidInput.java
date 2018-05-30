@@ -7,6 +7,7 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
@@ -147,27 +148,38 @@ public class AndroidInput extends InputHandler implements GestureListener{
 	    //Create confirm/cancel table
         new table(){{
             abottom().aleft();
-            defaults().size(60f);
 
-            //Add a cancel button, which clears the selection.
-            new imagebutton("icon-cancel", 14*2f, () -> recipe = null);
+            new table("pane"){{
+                margin(5);
+                defaults().size(60f);
 
-            //Add an accept button, which places everything.
-            new imagebutton("icon-check", 14*2f, () -> {
-                for(PlaceRequest request : placement){
-                    Tile tile = request.tile();
+                //Add a cancel button, which clears the selection.
+                new imagebutton("icon-cancel", 16 * 2f, () -> recipe = null);
 
-                    if(tile != null){
-                        rotation = request.rotation;
-                        recipe = request.recipe;
-                        tryPlaceBlock(tile.x, tile.y);
+                //Add an accept button, which places everything.
+                new imagebutton("icon-check", 16 * 2f, () -> {
+                    for (PlaceRequest request : placement) {
+                        Tile tile = request.tile();
+
+                        if (tile != null) {
+                            rotation = request.rotation;
+                            recipe = request.recipe;
+                            tryPlaceBlock(tile.x, tile.y);
+                        }
                     }
-                }
 
-                removals.addAll(placement);
-                placement.clear();
-                selecting = false;
-            });
+                    removals.addAll(placement);
+                    placement.clear();
+                    selecting = false;
+                });
+
+                //Add a rotate button
+                new imagebutton("icon-arrow", 16 * 2f, () -> rotation = Mathf.mod(rotation + 1, 4))
+                        .update(i -> {
+                            i.getImage().setRotation(rotation * 90);
+                            i.getImage().setOrigin(Align.center);
+                        }).cell.disabled(i -> recipe == null || !recipe.result.rotate);
+            }}.end();
         }}.visible(() -> isPlacing() && placement.size > 0).end();
     }
 
@@ -233,7 +245,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
 
                         for(TextureRegion region : regions){
                             Draw.rect(region, x *tilesize + recipe.result.offset(), y * tilesize + recipe.result.offset(),
-                                    region.getRegionWidth() * lineScale, region.getRegionHeight() * lineScale, recipe.result.rotate ? rotation * 90 : 0);
+                                    region.getRegionWidth() * lineScale, region.getRegionHeight() * lineScale, recipe.result.rotate ? result.rotation * 90 : 0);
                         }
                     }else{
                         Draw.color(Palette.breakInvalid);
@@ -315,7 +327,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean longPress(float x, float y) {
-        if(state.is(State.menu)) return false;
+        if(state.is(State.menu) || !isPlacing()) return false;
 
         //get tile on cursor
         Tile cursor = tileAt(x, y);

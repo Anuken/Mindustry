@@ -44,7 +44,6 @@ public class DebugFragment implements Fragment {
     public void build(Group parent){
 
         Player player = players[0];
-
         new table(){{
            visible(() -> debug);
 

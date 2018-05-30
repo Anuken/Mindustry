@@ -19,11 +19,23 @@ public class ContentLoader {
     public static void load(){
 
         ContentList[] content = {
+            //effects
+            new BlockFx(),
+            new BulletFx(),
+            new EnvironmentFx(),
+            new ExplosionFx(),
+            new Fx(),
+            new ShootFx(),
+            new UnitFx(),
+
             //items
             new Items(),
 
             //liquids
             new Liquids(),
+
+            //status effects
+            new StatusEffects(),
 
             //bullets
             new ArtilleryBullets(),
@@ -39,23 +51,8 @@ public class ContentLoader {
             //mechs
             new Mechs(),
 
-            //units
-            new UnitTypes(),
-
             //weapons
             new Weapons(),
-
-            //status effects
-            new StatusEffects(),
-
-            //effects
-            new BlockFx(),
-            new BulletFx(),
-            new EnvironmentFx(),
-            new ExplosionFx(),
-            new Fx(),
-            new ShootFx(),
-            new UnitFx(),
 
             //blocks
             new Blocks(),
@@ -72,6 +69,9 @@ public class ContentLoader {
 
             //recipes
             new Recipes(),
+
+            //units
+            new UnitTypes(),
         };
 
         for (ContentList list : content){

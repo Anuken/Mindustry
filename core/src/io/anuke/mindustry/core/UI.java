@@ -134,6 +134,8 @@ public class UI extends SceneModule{
 		
 		act();
 
+		Graphics.begin();
+
         for(int i = 0; i < players.length; i ++){
 		    InputHandler input = control.input(i);
 
@@ -142,11 +144,12 @@ public class UI extends SceneModule{
 
                 float scl = Unit.dp.scl(3f);
 
-                Graphics.begin();
                 Draw.rect("controller-cursor", input.getMouseX(), Gdx.graphics.getHeight() - input.getMouseY(), 16*scl, 16*scl);
-                Graphics.end();
             }
         }
+
+		Graphics.end();
+
 	}
 
 	@Override
@@ -181,7 +184,7 @@ public class UI extends SceneModule{
 		placefrag.build(group);
 		chatfrag.build(group);
 		listfrag.build(group);
-		debugfrag.build(group);
+		//debugfrag.build(group);
 		playermenufrag.build(group);
 		loadfrag.build(group);
 

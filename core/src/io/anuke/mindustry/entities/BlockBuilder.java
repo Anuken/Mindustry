@@ -25,7 +25,7 @@ import static io.anuke.mindustry.Vars.world;
 public interface BlockBuilder {
     //temporary static final values
     Translator[] tmptr = {new Translator(), new Translator(), new Translator(), new Translator()};
-    float placeDistance = 80f;
+    float placeDistance = 200f;
 
     /**Returns the queue for storing build requests.*/
     Queue<BuildRequest> getPlaceQueue();
