@@ -81,68 +81,63 @@ public class Build {
     }
 
     /**Returns whether a tile can be placed at this location by this team.*/
-    public static boolean validPlace(Team team, int x, int y, Block type, int rotation){
+    public static boolean validPlace(Team team, int x, int y, Block type, int rotation) {
         Recipe recipe = Recipe.getByResult(type);
 
-        if(recipe == null){
+        if (recipe == null) {
             return false;
         }
 
         rect.setSize(type.size * tilesize, type.size * tilesize);
         rect.setCenter(type.offset() + x * tilesize, type.offset() + y * tilesize);
 
-        if(type.solid || type.solidifes)
-        synchronized (Entities.entityLock) {
-            try {
+        if (type.solid || type.solidifes)
+            synchronized (Entities.entityLock) {
+                try {
 
-                rect.setSize(tilesize * type.size).setCenter(x * tilesize + type.offset(), y * tilesize + type.offset());
-                boolean[] result = {false};
+                    rect.setSize(tilesize * type.size).setCenter(x * tilesize + type.offset(), y * tilesize + type.offset());
+                    boolean[] result = {false};
 
-                Units.getNearby(rect, e -> {
-                    if (e == null) return; //not sure why this happens?
-                    Rectangle rect = e.hitbox.getRect(e.x, e.y);
+                    Units.getNearby(rect, e -> {
+                        if (e == null) return; //not sure why this happens?
+                        Rectangle rect = e.hitbox.getRect(e.x, e.y);
 
-                    if (Build.rect.overlaps(rect) && !e.isFlying()) {
-                        result[0] = true;
-                    }
-                });
+                        if (Build.rect.overlaps(rect) && !e.isFlying()) {
+                            result[0] = true;
+                        }
+                    });
 
-                if (result[0]) return false;
-            }catch (Exception e){
-                return false;
+                    if (result[0]) return false;
+                } catch (Exception e) {
+                    return false;
+                }
             }
-        }
 
         Tile tile = world.tile(x, y);
 
-        if(tile == null || (isSpawnPoint(tile) && (type.solidifes || type.solid))) return false;
+        if (tile == null) return false;
 
-        if(type.isMultiblock()){
-            if(type.canReplace(tile.block()) && tile.block().size == type.size){
+        if (type.isMultiblock()) {
+            if (type.canReplace(tile.block()) && tile.block().size == type.size) {
                 return true;
             }
 
-            int offsetx = -(type.size-1)/2;
-            int offsety = -(type.size-1)/2;
-            for(int dx = 0; dx < type.size; dx ++){
-                for(int dy = 0; dy < type.size; dy ++){
+            int offsetx = -(type.size - 1) / 2;
+            int offsety = -(type.size - 1) / 2;
+            for (int dx = 0; dx < type.size; dx++) {
+                for (int dy = 0; dy < type.size; dy++) {
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-                    if(other == null || (other.block() != Blocks.air && !other.block().alwaysReplace) || isSpawnPoint(other) || !other.floor().placeableOn){
+                    if (other == null || (other.block() != Blocks.air && !other.block().alwaysReplace)  || !other.floor().placeableOn) {
                         return false;
                     }
                 }
             }
             return true;
-        }else {
+        } else {
             return (tile.getTeam() == Team.none || tile.getTeam() == team) && tile.floor().placeableOn
-                    && ((type.canReplace(tile.block()) && !(type == tile.block() && rotation == tile.getRotation() && type.rotate)) || tile.block().alwaysReplace  || tile.block() == Blocks.air)
+                    && ((type.canReplace(tile.block()) && !(type == tile.block() && rotation == tile.getRotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
                     && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile);
         }
-    }
-
-    //TODO make this work!
-    public static boolean isSpawnPoint(Tile tile){
-        return false;
     }
 
     /**Returns whether the tile at this position is breakable by this team*/

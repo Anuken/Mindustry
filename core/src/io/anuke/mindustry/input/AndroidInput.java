@@ -34,6 +34,7 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.input.PlaceMode.none;
 
 public class AndroidInput extends InputHandler implements GestureListener{
     private static Rectangle r1 = new Rectangle(), r2 = new Rectangle();
@@ -63,6 +64,8 @@ public class AndroidInput extends InputHandler implements GestureListener{
     private boolean selecting;
     /**Whether the player is currently in line-place mode.*/
     private boolean lineMode;
+    /**Current place mode.*/
+    private PlaceMode mode = none;
 	
 	public AndroidInput(Player player){
 	    super(player);
@@ -164,7 +167,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
                     removals.addAll(placement);
                     placement.clear();
                     selecting = false;
-                });
+                }).cell.disabled(i -> placement.size == 0);
 
                 //Add a rotate button
                 new imagebutton("icon-arrow", 16 * 2f, () -> rotation = Mathf.mod(rotation + 1, 4))
@@ -173,7 +176,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
                             i.getImage().setOrigin(Align.center);
                         }).cell.disabled(i -> recipe == null || !recipe.result.rotate);
             }}.end();
-        }}.visible(() -> isPlacing() && placement.size > 0).end();
+        }}.visible(this::isPlacing).end();
     }
 
     @Override
@@ -266,23 +269,13 @@ public class AndroidInput extends InputHandler implements GestureListener{
 
         Tile linked = cursor.target();
 
-        //show-hide configuration fragment for blocks
-        if(linked.block().isConfigurable(linked)){
-            frag.config.showConfig(linked);
-        }else if(!frag.config.hasConfigMouse()){
-            frag.config.hideConfig();
-        }
-
         //when tapping a build block, select it
         if(linked.block() instanceof BuildBlock){
             BuildEntity entity = linked.entity();
-
             player.replaceBuilding(linked.x, linked.y, linked.getRotation(), entity.recipe);
+        }else if(pointer == 0 && !selecting){
+            tileTapped(cursor);
         }
-
-        //call tapped() event
-        //TODO net event for block tapped
-        linked.block().tapped(linked, player);
 
 		return false;
 	}

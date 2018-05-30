@@ -24,7 +24,6 @@ import io.anuke.ucore.util.OS;
 import java.util.Locale;
 
 public class Vars{
-
 	public static final boolean testMobile = false;
 	//shorthand for whether or not this is running on android or ios
 	public static boolean mobile;

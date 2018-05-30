@@ -22,7 +22,7 @@ import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.mindustry.input.DesktopInput.PlaceMode.*;
+import static io.anuke.mindustry.input.PlaceMode.*;
 
 public class DesktopInput extends InputHandler{
 	//controller info
@@ -43,28 +43,7 @@ public class DesktopInput extends InputHandler{
 	    this.section = "player_" + (player.playerIndex + 1);
     }
 
-    void tileTapped(Tile tile){
-
-		//check if tapped block is configurable
-		if(tile.block().isConfigurable(tile)){
-			if((!frag.config.isShown() //if the config fragment is hidden, show
-					//alternatively, the current selected block can 'agree' to switch config tiles
-					|| frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile))) {
-				frag.config.showConfig(tile);
-			}
-			//otherwise...
-		}else if(!frag.config.hasConfigMouse()){ //make sure a configuration fragment isn't on the cursor
-			//then, if it's shown and the current block 'agrees' to hide, hide it.
-			if(frag.config.isShown() && frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile)) {
-				frag.config.hideConfig();
-			}
-		}
-
-		//TODO network event!
-		//call tapped event
-		tile.block().tapped(tile, player);
-	}
-
+    /**Draws a placement icon for a specific block.*/
 	void drawPlace(int x, int y, Block block, int rotation){
         if(validPlace(x, y, block, rotation)){
             Draw.color();
@@ -87,7 +66,7 @@ public class DesktopInput extends InputHandler{
 
         if(cursor == null) return;
 
-	    //draw selection
+	    //draw selection(s)
 	    if(mode == placing) {
             NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursor.x, cursor.y, rotation, true, maxLength);
 
@@ -189,8 +168,7 @@ public class DesktopInput extends InputHandler{
 
         if(cursor == null) return false;
 
-        //if left, begin placing or tap a tile
-        if(button == Buttons.LEFT) {
+        if(button == Buttons.LEFT) { //left = begin placing
             if (isPlacing()) {
                 selectX = cursor.x;
                 selectY = cursor.y;
@@ -198,11 +176,11 @@ public class DesktopInput extends InputHandler{
             } else {
                 tileTapped(cursor);
             }
-        }else if(button == Buttons.RIGHT){
+        }else if(button == Buttons.RIGHT){ //right = begin breaking
             selectX = cursor.x;
             selectY = cursor.y;
             mode = breaking;
-        }else if(button == Buttons.MIDDLE){
+        }else if(button == Buttons.MIDDLE){ //middle button = cancel placing
             recipe = null;
             mode = none;
         }
@@ -221,7 +199,8 @@ public class DesktopInput extends InputHandler{
             return false;
         }
 
-        if(mode == placing){
+
+        if(mode == placing){ //touch up while placing, place everything in selection
             NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursor.x, cursor.y, rotation, true, maxLength);
 
             for(int i = 0; i <= result.getLength(); i += recipe.result.size){
@@ -232,7 +211,7 @@ public class DesktopInput extends InputHandler{
 
                 tryPlaceBlock(x, y);
             }
-        }else if(mode == breaking){
+        }else if(mode == breaking){ //touch up while breaking, break everything in selection
             NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursor.x, cursor.y, rotation, false, maxLength);
 
             for(int x = 0; x <= Math.abs(result.x2 - result.x); x ++ ){
@@ -309,9 +288,5 @@ public class DesktopInput extends InputHandler{
             controlx = control.gdxInput().getX();
             controly = control.gdxInput().getY();
         }
-    }
-
-    enum PlaceMode{
-	    none, breaking, placing;
     }
 }

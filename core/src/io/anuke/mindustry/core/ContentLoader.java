@@ -10,6 +10,7 @@ import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
+import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.util.Log;
 
 /**Loads all game content.
@@ -83,9 +84,9 @@ public class ContentLoader {
         }
 
         Log.info("--- CONTENT INFO ---");
-        Log.info("Blocks loaded: {0}\nItems loaded: {1}\nLiquids loaded: {2}\nUpgrades loaded: {3}\nUnits loaded: {4}\nAmmo types loaded: {5}\nBullet types loaded: {6}\nStatus effects loaded: {7}\nRecipes loaded: {8}\nTotal content classes: {9}",
+        Log.info("Blocks loaded: {0}\nItems loaded: {1}\nLiquids loaded: {2}\nUpgrades loaded: {3}\nUnits loaded: {4}\nAmmo types loaded: {5}\nBullet types loaded: {6}\nStatus effects loaded: {7}\nRecipes loaded: {8}\nEffects loaded: {9}\nTotal content classes: {10}",
                 Block.getAllBlocks().size, io.anuke.mindustry.type.Item.all().size, Liquid.all().size,
-                io.anuke.mindustry.type.Mech.all().size, UnitType.getAllTypes().size, io.anuke.mindustry.type.AmmoType.all().size, BulletType.all().size, StatusEffect.getAllEffects().size, io.anuke.mindustry.type.Recipe.all().size, content.length);
+                io.anuke.mindustry.type.Mech.all().size, UnitType.getAllTypes().size, io.anuke.mindustry.type.AmmoType.all().size, BulletType.all().size, StatusEffect.getAllEffects().size, io.anuke.mindustry.type.Recipe.all().size, Effects.all().size, content.length);
 
         Log.info("-------------------");
     }

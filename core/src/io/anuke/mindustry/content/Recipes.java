@@ -4,7 +4,7 @@ import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
-import static io.anuke.mindustry.type.Section.*;
+import static io.anuke.mindustry.type.Category.*;
 
 public class Recipes implements ContentList{
 

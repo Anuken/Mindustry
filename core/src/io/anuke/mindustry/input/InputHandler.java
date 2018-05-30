@@ -81,6 +81,29 @@ public abstract class InputHandler extends InputAdapter{
 
 	}
 
+	/**Handles tile tap events that are not platform specific.*/
+	public void tileTapped(Tile tile){
+
+		//check if tapped block is configurable
+		if(tile.block().isConfigurable(tile)){
+			if((!frag.config.isShown() //if the config fragment is hidden, show
+					//alternatively, the current selected block can 'agree' to switch config tiles
+					|| frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile))) {
+				frag.config.showConfig(tile);
+			}
+			//otherwise...
+		}else if(!frag.config.hasConfigMouse()){ //make sure a configuration fragment isn't on the cursor
+			//then, if it's shown and the current block 'agrees' to hide, hide it.
+			if(frag.config.isShown() && frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile)) {
+				frag.config.hideConfig();
+			}
+		}
+
+		//TODO network event!
+		//call tapped event
+		tile.block().tapped(tile, player);
+	}
+
 	//utility methods
 
 	/**Returns the tile at the specified MOUSE coordinates.*/
@@ -170,7 +193,6 @@ public abstract class InputHandler extends InputAdapter{
 	
 	public void tryPlaceBlock(int x, int y){
 		if(recipe != null && validPlace(x, y, recipe.result, rotation) && cursorNear()){
-			
 			placeBlock(x, y, recipe, rotation);
 		}
 	}

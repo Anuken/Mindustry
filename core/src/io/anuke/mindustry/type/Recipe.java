@@ -2,8 +2,11 @@ package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.world.Block;
+
+import static io.anuke.mindustry.Vars.headless;
 
 public class Recipe implements Content{
     private static int lastid;
@@ -13,16 +16,16 @@ public class Recipe implements Content{
     public final int id;
     public final Block result;
     public final ItemStack[] requirements;
-    public final Section section;
+    public final Category category;
     public final float cost;
 
     public boolean desktopOnly = false, debugOnly = false;
 
-    public Recipe(Section section, Block result, ItemStack... requirements){
+    public Recipe(Category category, Block result, ItemStack... requirements){
         this.id = lastid ++;
         this.result = result;
         this.requirements = requirements;
-        this.section = section;
+        this.category = category;
 
         float timeToPlace = 0f;
         for(ItemStack stack : requirements){
@@ -55,14 +58,29 @@ public class Recipe implements Content{
         return "recipe";
     }
 
-    public static Array<Recipe> getBySection(Section section, Array<Recipe> r){
+    /**Returns unlocked recipes in a category.
+     * Do not call on the server backend, as unlocking does not exist!*/
+    public static void getUnlockedByCategory(Category category, Array<Recipe> r){
+        if(headless){
+            throw new RuntimeException("Not enabled on the headless backend!");
+        }
+
+        r.clear();
         for(Recipe recipe : allRecipes){
-            if(recipe.section == section ) {
+            if(recipe.category == category && Vars.control.database().isUnlocked(recipe)) {
                 r.add(recipe);
             }
         }
+    }
 
-        return r;
+    /**Returns all recipes in a category.*/
+    public static void getByCategory(Category category, Array<Recipe> r){
+        r.clear();
+        for(Recipe recipe : allRecipes){
+            if(recipe.category == category) {
+                r.add(recipe);
+            }
+        }
     }
 
     public static Array<Recipe> all(){

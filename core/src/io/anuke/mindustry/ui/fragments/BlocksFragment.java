@@ -1,6 +1,5 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
@@ -8,9 +7,11 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.input.InputHandler;
+import io.anuke.mindustry.type.Category;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
-import io.anuke.mindustry.type.Section;
+import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
@@ -18,40 +19,56 @@ import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.ClickListener;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.ButtonGroup;
-import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.ImageButton;
-import io.anuke.ucore.scene.ui.Label;
+import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class BlocksFragment implements Fragment{
-	private Table desctable, blocks;
-	private Stack stack = new Stack();
+	/**Table containing description that is shown on top.*/
+	private Table desctable;
+	/**Main table containing the whole menu.*/
+	private Table blocks;
+	/**Whether the whole thing is shown or hidden by the popup button.*/
 	private boolean shown = true;
-	private Recipe hoveredDescriptionRecipe;
+	/**Recipe currently hovering over.*/
+	private Recipe hoverRecipe;
+	/**Temporary recipe array for storage*/
+	private Array<Recipe> recipes = new Array<>();
+
+	//number of block icon rows
+	private static final int rows = 4;
+	//number of category button rows
+	private static final int secrows = 4;
+	//size of each block icon
+	private static final float size = 48;
+	//maximum recipe rows
+	private static final int maxrow = 3;
 
 	public void build(Group parent){
 		InputHandler input = control.input(0);
 
+		//create container table
 		new table(){{
 			abottom();
 			aright();
 
+			//make it only be shown when needed.
 			visible(() -> !state.is(State.menu) && shown);
 
+			//create the main blocks table
 			blocks = new table(){{
+
+				//add top description table
 				desctable = new Table("button");
-				desctable.setVisible(() -> hoveredDescriptionRecipe != null || input.recipe != null);
+				desctable.setVisible(() -> hoverRecipe != null || input.recipe != null); //make sure it's visible when necessary
 				desctable.update(() -> {
 					// note: This is required because there is no direct connection between
 					// input.recipe and the description ui. If input.recipe gets set to null
 					// a proper cleanup of the ui elements is required.
-					boolean anyRecipeShown = input.recipe != null || hoveredDescriptionRecipe != null;
+					boolean anyRecipeShown = input.recipe != null || hoverRecipe != null;
 					boolean descriptionTableClean = desctable.getChildren().size == 0;
 					boolean cleanupRequired = !anyRecipeShown && !descriptionTableClean;
 					if(cleanupRequired){
@@ -59,57 +76,60 @@ public class BlocksFragment implements Fragment{
 					}
 				});
 
-				stack.add(desctable);
-
-				add(stack).fillX().uniformX();
+				add(desctable).fillX().uniformX();
 
 				row();
 
+				//now add the block selection menu
 				new table("pane") {{
 					touchable(Touchable.enabled);
-					int rows = 4;
-					int maxcol = 0;
-					float size = 48;
+					get().setRound(true);
 
 					Stack stack = new Stack();
 					ButtonGroup<ImageButton> group = new ButtonGroup<>();
-					Array<Recipe> recipes = new Array<>();
 
-					for (Section sec : Section.values()) {
-						recipes.clear();
-						Recipe.getBySection(sec, recipes);
-						maxcol = Math.max((int) ((float) recipes.size / rows + 1), maxcol);
-					}
+					//add categories
+					for (Category cat : Category.values()) {
+						//get recipes out by category
+						Recipe.getUnlockedByCategory(cat, recipes);
 
-					for (Section sec : Section.values()) {
-						int secrows = 4;
+						//empty section, nothing to see here
+						if(recipes.size == 0){
+							continue;
+						}
 
-						recipes.clear();
-						Recipe.getBySection(sec, recipes);
+						//table where actual recipes go
+						Table recipeTable = new Table();
+						recipeTable.margin(4).top().left().marginRight(15);
 
-						Table table = new Table();
-
-						ImageButton button = new ImageButton("icon-" + sec.name(), "toggle");
-						button.clicked(() -> {
-							if (!table.isVisible() && input.recipe != null) {
+						//add category button
+						ImageButton catb = get().addImageButton( "icon-" + cat.name(), "toggle", 40, () -> {
+							if (!recipeTable.isVisible() && input.recipe != null) {
 								input.recipe = null;
 							}
+						}).growX().height(54).padTop(cat.ordinal() <= secrows-1 ? -10 : -5).group(group)
+								.name("sectionbutton" + cat.name()).get();
+
+						//scrollpane for recipes
+						ScrollPane pane = new ScrollPane(recipeTable, "clear-black");
+						pane.setOverscroll(false, false);
+						pane.setVisible(catb::isChecked);
+						pane.update(() -> {
+							Element e = Core.scene.hit(Graphics.mouse().x, Graphics.mouse().y, true);
+							if(e != null && e.isDescendantOf(pane)){
+								Core.scene.setScrollFocus(pane);
+							}
 						});
+						stack.add(pane);
 
-						button.setName("sectionbutton" + sec.name());
-						add(button).growX().height(54).padLeft(-1).padTop(sec.ordinal() <= secrows-1 ? -10 : -5);
-						button.getImageCell().size(40).padBottom(4).padTop(2);
-						group.add(button);
-
-						if (sec.ordinal() % secrows == secrows-1) {
+						//add a new row here when needed
+						if (cat.ordinal() % secrows == secrows-1) {
 							row();
 						}
 
-						table.margin(4);
-						table.top().left();
-
 						int i = 0;
 
+						//add actual recipes
 						for (Recipe r : recipes) {
 							ImageButton image = new ImageButton(new TextureRegion(), "select");
 
@@ -121,14 +141,15 @@ public class BlocksFragment implements Fragment{
 
 							image.getImageCell().setActor(istack).size(size);
 							image.addChild(istack);
+							image.setTouchable(Touchable.enabled);
 							image.getImage().remove();
 
 							image.addListener(new ClickListener(){
 								@Override
 								public void enter(InputEvent event, float x, float y, int pointer, Element fromActor) {
 									super.enter(event, x, y, pointer, fromActor);
-									if (hoveredDescriptionRecipe != r) {
-										hoveredDescriptionRecipe = r;
+									if (hoverRecipe != r) {
+										hoverRecipe = r;
 										updateRecipe(r);
 									}
 								}
@@ -136,41 +157,33 @@ public class BlocksFragment implements Fragment{
 								@Override
 								public void exit(InputEvent event, float x, float y, int pointer, Element toActor) {
 									super.exit(event, x, y, pointer, toActor);
-									hoveredDescriptionRecipe = null;
+									hoverRecipe = null;
 									updateRecipe(input.recipe);
 								}
 							});
 
-							image.addListener(new ClickListener(){
-								@Override
-								public void clicked(InputEvent event, float x, float y){
-									// note: input.recipe only gets set here during a click.
-									// during a hover only the visual description will be updated.
-									InputHandler handler = mobile ? input : control.input(event.getPointer());
+							image.clicked(() -> {
+								// note: input.recipe only gets set here during a click.
+								// during a hover only the visual description will be updated.
+								InputHandler handler = mobile ? input : control.input(0);
 
-									boolean nothingSelectedYet = handler.recipe == null;
-									boolean selectedSomethingElse = !nothingSelectedYet && handler.recipe != r;
-									boolean shouldMakeSelection = nothingSelectedYet || selectedSomethingElse;
-									if (shouldMakeSelection) {
-										handler.recipe = r;
-										hoveredDescriptionRecipe = r;
-										updateRecipe(r);
-									} else {
-										handler.recipe = null;
-										hoveredDescriptionRecipe = null;
-										updateRecipe(null);
-									}
+								boolean nothingSelectedYet = handler.recipe == null;
+								boolean selectedSomethingElse = !nothingSelectedYet && handler.recipe != r;
+								boolean shouldMakeSelection = nothingSelectedYet || selectedSomethingElse;
+								if (shouldMakeSelection) {
+									handler.recipe = r;
+									hoverRecipe = r;
+									updateRecipe(r);
+								} else {
+									handler.recipe = null;
+									hoverRecipe = null;
+									updateRecipe(null);
 								}
 							});
 
-							table.add(image).size(size + 8);
+							recipeTable.add(image).size(size + 8);
 
 							image.update(() -> {
-								image.setTouchable(Touchable.enabled);
-								for(Element e : istack.getChildren()){
-									e.setColor(Color.WHITE);
-								}
-
 								for(Player player : players){
 									if(control.input(player.playerIndex).recipe == r){
 										image.setChecked(true);
@@ -181,26 +194,22 @@ public class BlocksFragment implements Fragment{
 							});
 
 							if (i % rows == rows - 1) {
-								table.row();
+								recipeTable.row();
 							}
 
 							i++;
 						}
-
-						table.setVisible(button::isChecked);
-
-						stack.add(table);
 					}
 
 					row();
-					add(stack).colspan(Section.values().length);
+					add(stack).colspan(Category.values().length).padBottom(-5).height((size + 12)*maxrow);
 					margin(10f);
 
-					marginLeft(1f);
-					marginRight(1f);
+					marginLeft(0f);
+					marginRight(0f);
 
 					end();
-				}}.right().bottom().uniformX();
+				}}.right().bottom();
 
 				visible(() -> !state.is(State.menu) && shown);
 
@@ -210,7 +219,7 @@ public class BlocksFragment implements Fragment{
 
 	public void toggle(boolean show, float t, Interpolation ip){
 		if(!show){
-			blocks.actions(Actions.translateBy(0, -blocks.getHeight() - stack.getHeight(), t, ip), Actions.call(() -> shown = false));
+			blocks.actions(Actions.translateBy(0, -blocks.getHeight() - desctable.getHeight(), t, ip), Actions.call(() -> shown = false));
 		}else{
 			shown = true;
 			blocks.actions(Actions.translateBy(0, -blocks.getTranslation().y, t, ip));
@@ -272,10 +281,6 @@ public class BlocksFragment implements Fragment{
 		}
 
 		desctable.row();
-
-		Label label = new Label("[health]"+ Bundles.get("text.health")+": " + recipe.result.health);
-		label.setWrap(true);
-		desctable.add(label).width(200).padTop(4).padBottom(2);
 	}
 
 	private void checkUnlockableBlocks(){
