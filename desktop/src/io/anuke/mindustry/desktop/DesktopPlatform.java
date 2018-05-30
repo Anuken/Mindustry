@@ -10,6 +10,7 @@ import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.util.OS;
 import io.anuke.ucore.util.Strings;
 
 import java.net.NetworkInterface;
@@ -24,13 +25,15 @@ import java.util.Random;
 import static io.anuke.mindustry.Vars.*;
 
 public class DesktopPlatform extends Platform {
-    final static boolean useDiscord = false;//OS.getPropertyNotNull("sun.arch.data.model").equals("64");
+    final static boolean useDiscord = !OS.is64Bit;
     final static String applicationId = "398246104468291591";
     final static DateFormat format = SimpleDateFormat.getDateTimeInstance();
     String[] args;
 
     public DesktopPlatform(String[] args){
         this.args = args;
+
+
 
         if(useDiscord) {
             DiscordEventHandlers handlers = new DiscordEventHandlers();

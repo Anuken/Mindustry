@@ -161,14 +161,15 @@ public class Vars{
 			unitGroups[team.ordinal()] = Entities.addGroup(BaseUnit.class).enableMapping();
 		}
 
-		mobile = (Gdx.app.getType() == ApplicationType.Android) ||
-				Gdx.app.getType() == ApplicationType.iOS || testMobile;
+		mobile = Gdx.app.getType() == ApplicationType.Android || Gdx.app.getType() == ApplicationType.iOS || testMobile;
 		ios = Gdx.app.getType() == ApplicationType.iOS;
 		android = Gdx.app.getType() == ApplicationType.Android;
 		gwt = Gdx.app.getType() == ApplicationType.WebGL;
 
-		customMapDirectory = OS.getAppDataDirectory("Mindustry").child("maps/");
-		saveDirectory = OS.getAppDataDirectory("Mindustry").child("saves/");
+		if(!gwt) {
+			customMapDirectory = OS.getAppDataDirectory("Mindustry").child("maps/");
+			saveDirectory = OS.getAppDataDirectory("Mindustry").child("saves/");
+		}
 
 		fontScale = Math.max(Unit.dp.scl(1f)/2f, 0.5f);
 		baseCameraScale = Math.round(Unit.dp.scl(4));

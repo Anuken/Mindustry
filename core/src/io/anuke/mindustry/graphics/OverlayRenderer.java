@@ -15,17 +15,27 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.CapStyle;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.graphics.*;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class OverlayRenderer {
 
-    public void draw(){
+    public void drawBottom(){
+        for(Player player : players) {
+            InputHandler input = control.input(player.playerIndex);
+
+            Shaders.outline.color.set(Palette.accent);
+            Graphics.beginShaders(Shaders.outline);
+
+            input.drawBottom();
+
+            Graphics.endShaders();
+        }
+    }
+
+    public void drawTop(){
 
         for(Player player : players) {
 
@@ -37,7 +47,7 @@ public class OverlayRenderer {
                 tile.block().drawConfigure(tile);
             }
 
-            input.draw();
+            input.drawTop();
 
             Draw.reset();
 

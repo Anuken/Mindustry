@@ -12,7 +12,7 @@ import io.anuke.ucore.util.Angles;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class Fx implements ContentList {
-	public static Effect none, placeBlock, breakBlock, smoke, spawn;
+	public static Effect none, placeBlock, breakBlock, smoke, spawn, tapBlock;
 
 	@Override
 	public void load() {
@@ -23,19 +23,24 @@ public class Fx implements ContentList {
 		placeBlock = new Effect(16, e -> {
 			Draw.color(Palette.accent);
 			Lines.stroke(3f - e.fin() * 2f);
-			Lines.square(e.x, e.y, tilesize / 2f * (float) (e.data) + e.fin() * 3f);
+			Lines.square(e.x, e.y, tilesize / 2f * e.rotation + e.fin() * 3f);
+			Draw.reset();
+		});
+
+		tapBlock = new Effect(12, e -> {
+			Draw.color(Palette.accent);
+			Lines.stroke(3f - e.fin() * 2f);
+			Lines.circle(e.x, e.y, 4f + (tilesize/1.5f * e.rotation) * e.fin());
 			Draw.reset();
 		});
 
 		breakBlock = new Effect(12, e -> {
-			float data = (float) (e.data);
-
 			Draw.color(Palette.remove);
 			Lines.stroke(3f - e.fin() * 2f);
-			Lines.square(e.x, e.y, tilesize / 2f * data + e.fin() * 3f);
+			Lines.square(e.x, e.y, tilesize / 2f * e.rotation + e.fin() * 3f);
 
-			Angles.randLenVectors(e.id, 3 + (int) (data * 3), data * 2f + (tilesize * data) * e.finpow(), (x, y) -> {
-				Fill.square(e.x + x, e.y + y, 1f + e.fout() * (3f + data));
+			Angles.randLenVectors(e.id, 3 + (int) (e.rotation * 3), e.rotation * 2f + (tilesize * e.rotation) * e.finpow(), (x, y) -> {
+				Fill.square(e.x + x, e.y + y, 1f + e.fout() * (3f + e.rotation));
 			});
 			Draw.reset();
 		});

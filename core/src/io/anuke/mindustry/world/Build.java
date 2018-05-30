@@ -29,7 +29,7 @@ public class Build {
         //todo add break results to core inventory
 
         if(sound) Effects.sound("break", x * tilesize, y * tilesize);
-        if(effect) Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), 0f, (float)block.size);
+        if(effect) Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), block.size);
 
         if(!tile.block().isMultiblock() && !tile.isLinked()){
             tile.setBlock(Blocks.air);

@@ -107,7 +107,7 @@ public class BuildBlock extends Block {
             Team team = tile.getTeam();
             tile.setBlock(entity.recipe.result);
             tile.setTeam(team);
-            Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), 0f, (float)size);
+            Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), size);
         }else if(entity.progress < 0f){
             entity.damage(entity.health + 1);
         }

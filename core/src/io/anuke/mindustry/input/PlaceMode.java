@@ -158,12 +158,12 @@ public enum PlaceMode{
 		
 		void process(int tilex, int tiley, int endx, int endy){
 			/*
-			if(Math.abs(endx - tilex) > maxlen){
-				endx = Mathf.sign(endx - tilex) * maxlen + tilex;
+			if(Math.abs(x2 - tilex) > maxlen){
+				x2 = Mathf.sign(x2 - tilex) * maxlen + tilex;
 			}
 			
-			if(Math.abs(endy - tiley) > maxlen){
-				endy = Mathf.sign(endy - tiley) * maxlen + tiley;
+			if(Math.abs(y2 - tiley) > maxlen){
+				y2 = Mathf.sign(y2 - tiley) * maxlen + tiley;
 			}*/
 			
 			if(endx < tilex){
@@ -289,18 +289,18 @@ public enum PlaceMode{
 
 			//todo hold shift to snap
 		    /*
-			if(Math.abs(tilex - endx) > Math.abs(tiley - endy)){
-				endy = tiley;
+			if(Math.abs(tilex - x2) > Math.abs(tiley - y2)){
+				y2 = tiley;
 			}else{
-				endx = tilex;
+				x2 = tilex;
 			}
 
-			if(Math.abs(endx - tilex) > maxlen){
-				endx = Mathf.sign(endx - tilex) * maxlen + tilex;
+			if(Math.abs(x2 - tilex) > maxlen){
+				x2 = Mathf.sign(x2 - tilex) * maxlen + tilex;
 			}
 
-			if(Math.abs(endy - tiley) > maxlen){
-				endy = Mathf.sign(endy - tiley) * maxlen + tiley;
+			if(Math.abs(y2 - tiley) > maxlen){
+				y2 = Mathf.sign(y2 - tiley) * maxlen + tiley;
 			}*/
 
 		    int dx = endx - tilex, dy = endy - tiley;

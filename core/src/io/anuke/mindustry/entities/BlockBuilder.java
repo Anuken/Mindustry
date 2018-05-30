@@ -30,6 +30,20 @@ public interface BlockBuilder {
     /**Returns the queue for storing build requests.*/
     Queue<BuildRequest> getPlaceQueue();
 
+    /**If a place request matching this signature is present, it is removed.
+     * Otherwise, a new place request is added to the queue.*/
+    default void replaceBuilding(int x, int y, int rotation, Recipe recipe){
+        for(BuildRequest request : getPlaceQueue()){
+            if(request.x == x && request.y == y){
+                clearBuilding();
+                addBuildRequest(request);
+                return;
+            }
+        }
+
+        addBuildRequest(new BuildRequest(x, y, rotation, recipe));
+    }
+
     /**Clears the placement queue.*/
     default void clearBuilding(){
         getPlaceQueue().clear();

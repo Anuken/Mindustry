@@ -25,12 +25,6 @@ public class ContentLoader {
             //liquids
             new Liquids(),
 
-            //ammotypes
-            new AmmoTypes(),
-
-            //mechs
-            new Mechs(),
-
             //bullets
             new ArtilleryBullets(),
             new FlakBullets(),
@@ -38,6 +32,12 @@ public class ContentLoader {
             new ShellBullets(),
             new StandardBullets(),
             new TurretBullets(),
+
+            //ammotypes
+            new AmmoTypes(),
+
+            //mechs
+            new Mechs(),
 
             //units
             new UnitTypes(),

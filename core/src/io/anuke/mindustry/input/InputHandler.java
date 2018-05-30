@@ -1,6 +1,5 @@
 package io.anuke.mindustry.input;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.entities.BlockBuilder.BuildRequest;
@@ -25,10 +24,8 @@ import io.anuke.ucore.util.Translator;
 import static io.anuke.mindustry.Vars.*;
 
 public abstract class InputHandler extends InputAdapter{
-    float playerSelectRange = Unit.dp.scl(60f);
+    float playerSelectRange = Unit.dp.scl(80f);
     Translator stackTrns = new Translator();
-
-    private float mx, my;
 
 	public final Player player;
 	public final OverlayFragment frag = new OverlayFragment(this);
@@ -50,11 +47,11 @@ public abstract class InputHandler extends InputAdapter{
 	}
 
 	public float getMouseX(){
-		return mx;
+		return control.gdxInput().getX();
 	}
 
     public float getMouseY(){
-    	return my;
+    	return control.gdxInput().getY();
     }
 
 	public void resetCursor(){
@@ -65,16 +62,19 @@ public abstract class InputHandler extends InputAdapter{
 		return false;
 	}
 
-	public void updateController(){
-		mx = Gdx.input.getX();
-		my = Gdx.input.getY();
-	}
-
 	public void buildUI(Group group){
 
 	}
 
-	public void draw(){
+	public void updateController(){
+
+	}
+
+	public void drawBottom(){
+
+	}
+
+	public void drawTop(){
 
 	}
 

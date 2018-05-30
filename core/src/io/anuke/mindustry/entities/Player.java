@@ -245,9 +245,12 @@ public class Player extends Unit implements BlockBuilder {
 		Draw.tscl(fontScale);
 	}
 
+	/**Draw all current build requests. Does not draw the beam effect, only the positions.*/
 	public void drawBuildRequests(){
 		for (BuildRequest request : getPlaceQueue()) {
+
 			if(request.remove){
+				//draw removal request
 				Draw.color(Palette.remove);
 				Draw.alpha(0.4f);
 				Lines.stroke(1f);
@@ -270,11 +273,17 @@ public class Player extends Unit implements BlockBuilder {
 				Lines.poly(tile.drawx(), tile.drawy(),
 						4, tile.block().size * tilesize /2f * (1f-progress) + Mathf.absin(Timers.time(), 3f, 1f));
 			}else{
+				//draw place request
 				Draw.color(Palette.accent);
 				Lines.stroke((1f-request.progress));
+
 				Lines.poly(request.x * tilesize + request.recipe.result.offset(),
 						request.y * tilesize + request.recipe.result.offset(),
 						4, request.recipe.result.size * tilesize /2f + Mathf.absin(Timers.time(), 3f, 1f));
+
+				Lines.poly(request.x * tilesize + request.recipe.result.offset(),
+						request.y * tilesize + request.recipe.result.offset(),
+						4, request.recipe.result.size * tilesize /2f + 2f, 45 + 15);
 			}
 		}
 

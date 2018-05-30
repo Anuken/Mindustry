@@ -225,6 +225,8 @@ public class Renderer extends RendererModule{
 		blocks.skipLayer(Layer.turret);
 		blocks.drawBlocks(Layer.laser);
 
+		overlays.drawBottom();
+
 		Entities.drawWith(playerGroup, p -> true, Player::drawBuildRequests);
 
 		drawAllTeams(true);
@@ -233,7 +235,7 @@ public class Renderer extends RendererModule{
 		Entities.draw(airItemGroup);
         Entities.draw(effectGroup);
 
-		overlays.draw();
+		overlays.drawTop();
 
 		if(pixelate)
 			Graphics.flushSurface();
@@ -257,7 +259,7 @@ public class Renderer extends RendererModule{
 			Shaders.outline.color.set(team.color);
 
 			Graphics.beginShaders(Shaders.outline);
-			Graphics.shader(Shaders.hit, false);
+			Graphics.shader(Shaders.mix, false);
 			Entities.draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying);
 			Entities.draw(playerGroup, p -> p.isFlying() == flying && p.team == team);
 			Graphics.shader();

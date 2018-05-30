@@ -22,7 +22,8 @@ public class Shaders{
 	public static SurfaceShader oil;
 	public static Space space;
 	public static UnitBuild build;
-	public static Shader hit;
+	public static MixShader mix;
+	public static Shader fullMix;
 
 	public static void init(){
 		outline = new Outline();
@@ -34,7 +35,22 @@ public class Shaders{
 		oil = new SurfaceShader("oil");
 		space = new Space();
 		build = new UnitBuild();
-		hit = new Shader("hit", "default");
+		mix = new MixShader();
+		fullMix = new Shader("fullmix", "default");
+	}
+
+	public static class MixShader extends Shader{
+		public Color color = new Color(Color.WHITE);
+
+		public MixShader(){
+			super("mix", "default");
+		}
+
+		@Override
+		public void apply() {
+			super.apply();
+			shader.setUniformf("u_color", color);
+		}
 	}
 
 	public static class Space extends SurfaceShader{
