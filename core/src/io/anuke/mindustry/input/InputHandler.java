@@ -169,7 +169,7 @@ public abstract class InputHandler extends InputAdapter{
 	}
 	
 	public boolean tryPlaceBlock(int x, int y){
-		if(recipe != null && validPlace(x, y, recipe.result) && cursorNear()){
+		if(recipe != null && validPlace(x, y, recipe.result, rotation) && cursorNear()){
 			
 			placeBlock(x, y, recipe, rotation);
 
@@ -186,7 +186,7 @@ public abstract class InputHandler extends InputAdapter{
 		return false;
 	}
 	
-	public boolean validPlace(int x, int y, Block type){
+	public boolean validPlace(int x, int y, Block type, int rotation){
         for(Tile tile : state.teams.get(player.team).cores){
             if(tile.distanceTo(x * tilesize, y * tilesize) < coreBuildRange){
                 return Build.validPlace(player.team, x, y, type, rotation) &&

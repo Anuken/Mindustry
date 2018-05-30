@@ -200,7 +200,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
 
             if(tile == null) continue;
 
-            if(validPlace(tile.x, tile.y, request.recipe.result)){
+            if(validPlace(tile.x, tile.y, request.recipe.result, request.rotation)){
                 request.scale = Mathf.lerpDelta(request.scale, 1f, 0.2f);
                 request.redness = Mathf.lerpDelta(request.redness, 0f, 0.2f);
             }else{
@@ -231,7 +231,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
                     int x = lineStartX + i * Mathf.sign(tile.x - lineStartX) * Mathf.bool(result.isX());
                     int y = lineStartY + i * Mathf.sign(tile.y - lineStartY) * Mathf.bool(!result.isX());
 
-                    if(!checkOverlapPlacement(x, y, recipe.result) && validPlace(x, y, recipe.result)){
+                    if(!checkOverlapPlacement(x, y, recipe.result) && validPlace(x, y, recipe.result, result.rotation)){
                         Draw.color();
 
                         TextureRegion[] regions = recipe.result.getBlockIcon();
@@ -306,7 +306,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
                 int x = lineStartX + i * Mathf.sign(tile.x - lineStartX) * Mathf.bool(result.isX());
                 int y = lineStartY + i * Mathf.sign(tile.y - lineStartY) * Mathf.bool(!result.isX());
 
-                if(!checkOverlapPlacement(x, y, recipe.result) && validPlace(x, y, recipe.result)){
+                if(!checkOverlapPlacement(x, y, recipe.result) && validPlace(x, y, recipe.result, result.rotation)){
                     PlaceRequest request = new PlaceRequest(x * tilesize, y * tilesize, recipe, result.rotation);
                     request.scale = 1f;
                     placement.add(request);
@@ -352,7 +352,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
         //remove if request present
         if(hasRequest(cursor)) {
             removeRequest(getRequest(cursor));
-        }else if(isPlacing() && validPlace(cursor.x, cursor.y, recipe.result) && !checkOverlapPlacement(cursor.x, cursor.y, recipe.result)){
+        }else if(isPlacing() && validPlace(cursor.x, cursor.y, recipe.result, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, recipe.result)){
             //add to placement queue if it's a valid place position
             placement.add(new PlaceRequest(cursor.worldx(), cursor.worldy(), recipe, rotation));
         }

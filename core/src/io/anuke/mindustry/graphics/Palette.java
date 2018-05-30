@@ -42,7 +42,7 @@ public class Palette {
     public static final Color accent = Color.valueOf("f4ba6e");
     public static final Color place = Color.valueOf("6335f8");
     public static final Color remove = Color.valueOf("e55454");
-    public static final Color placeRotate = Color.ORANGE;
+    public static final Color placeRotate = accent;
     public static final Color breakInvalid = Color.valueOf("d44b3d");
     public static final Color range = Color.valueOf("f4ba6e");
     public static final Color power = Color.valueOf("fbd367");

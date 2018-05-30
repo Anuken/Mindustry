@@ -2,14 +2,19 @@ package io.anuke.mindustry.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
+import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.core.KeyBinds;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
@@ -20,7 +25,7 @@ public class DesktopInput extends InputHandler{
 	//controller info
 	private float controlx, controly;
 	private boolean controlling;
-    private boolean showCursor = false;
+    private boolean handCursor;
     private final String section;
 
     /**Position where the player started dragging a line.*/
@@ -57,6 +62,22 @@ public class DesktopInput extends InputHandler{
 		tile.block().tapped(tile, player);
 	}
 
+	void drawPlace(int x, int y, Block block, int rotation){
+        if(validPlace(x, y, block, rotation)){
+            Draw.color();
+
+            TextureRegion[] regions = block.getBlockIcon();
+
+            for(TextureRegion region : regions){
+                Draw.rect(region, x *tilesize + block.offset(), y * tilesize + block.offset(),
+                        region.getRegionWidth() * selectScale, region.getRegionHeight() * selectScale, block.rotate ? rotation * 90 : 0);
+            }
+        }else{
+            Draw.color(Palette.remove);
+            Lines.square(x*tilesize + block.offset(), y*tilesize + block.offset(), block.size * tilesize/2f);
+        }
+    }
+
     @Override
     public void drawBottom(){
         Tile cursor = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
@@ -65,10 +86,32 @@ public class DesktopInput extends InputHandler{
 
 	    //draw selection
 	    if(selecting){
-            NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(recipe.result, selectX, selectY, cursor.x, cursor.y, true, maxLength, selectScale);
+            NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursor.x, cursor.y, rotation, true, maxLength);
 
+            for(int i = 0; i <= result.getLength(); i += recipe.result.size){
+                int x = selectX + i * Mathf.sign(cursor.x - selectX) * Mathf.bool(result.isX());
+                int y = selectY + i * Mathf.sign(cursor.y - selectY) * Mathf.bool(!result.isX());
 
-	    }
+                if(i + recipe.result.size > result.getLength() && recipe.result.rotate){
+                    Draw.color(!validPlace(x, y, recipe.result, result.rotation) ? Palette.remove : Palette.placeRotate);
+                    Draw.grect("place-arrow", x * tilesize + recipe.result.offset(),
+                            y * tilesize + recipe.result.offset(), result.rotation * 90 - 90);
+                }
+
+                drawPlace(x, y, recipe.result, result.rotation);
+            }
+
+            Draw.reset();
+	    }else if(isPlacing()){
+	        if(recipe.result.rotate){
+	            Draw.color(!validPlace(cursor.x, cursor.y, recipe.result, rotation) ? Palette.remove : Palette.placeRotate);
+	            Draw.grect("place-arrow", cursor.worldx() + recipe.result.offset(),
+                        cursor.worldy() + recipe.result.offset(), rotation * 90 - 90);
+            }
+            drawPlace(cursor.x, cursor.y, recipe.result, rotation);
+        }
+
+        Draw.reset();
     }
 
 	@Override
@@ -80,8 +123,8 @@ public class DesktopInput extends InputHandler{
 		    selecting = false;
         }
 
-        //update select animation
-        if(selecting){
+        if(isPlacing()){
+            handCursor = true;
             selectScale = Mathf.lerpDelta(selectScale, 1f, 0.2f);
         }else{
 		    selectScale = 0f;
@@ -100,18 +143,18 @@ public class DesktopInput extends InputHandler{
 		Tile cursor = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
 
 		if(cursor != null && cursor.block().isConfigurable(cursor)){
-            showCursor = true;
+            handCursor = true;
         }
 
 		if(!ui.hasMouse()) {
-			if (showCursor) {
+			if (handCursor) {
 				Cursors.setHand();
 			}else {
 				Cursors.restoreCursor();
 			}
 		}
 
-        showCursor = false;
+        handCursor = false;
 	}
 
 	@Override
@@ -136,6 +179,26 @@ public class DesktopInput extends InputHandler{
     @Override
     public boolean touchUp (int screenX, int screenY, int pointer, int button) {
         if(player.isDead() || state.is(State.menu) || ui.hasDialog()) return false;
+
+        Tile cursor = tileAt(screenX, screenY);
+
+        if(cursor == null){
+            selecting = false;
+            return false;
+        }
+
+        if(selecting){
+            NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursor.x, cursor.y, rotation, true, maxLength);
+
+            for(int i = 0; i <= result.getLength(); i += recipe.result.size){
+                int x = selectX + i * Mathf.sign(cursor.x - selectX) * Mathf.bool(result.isX());
+                int y = selectY + i * Mathf.sign(cursor.y - selectY) * Mathf.bool(!result.isX());
+
+                rotation = result.rotation;
+
+                tryPlaceBlock(x, y);
+            }
+        }
 
         selecting = false;
 
