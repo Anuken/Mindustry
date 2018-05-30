@@ -59,13 +59,11 @@ public class UI extends SceneModule{
 
 	public final MenuFragment menufrag = new MenuFragment();
     public final HudFragment hudfrag = new HudFragment();
-    public final PlacementFragment placefrag = new PlacementFragment();
     public final ChatFragment chatfrag = new ChatFragment();
     public final PlayerListFragment listfrag = new PlayerListFragment();
     public final BackgroundFragment backfrag = new BackgroundFragment();
     public final LoadingFragment loadfrag = new LoadingFragment();
     public final DebugFragment debugfrag = new DebugFragment();
-	public final PlayerMenuFragment playermenufrag = new PlayerMenuFragment();
 
     private Locale lastLocale;
 	
@@ -181,11 +179,9 @@ public class UI extends SceneModule{
 		backfrag.build(group);
 		hudfrag.build(group);
 		menufrag.build(group);
-		placefrag.build(group);
 		chatfrag.build(group);
 		listfrag.build(group);
-		//debugfrag.build(group);
-		playermenufrag.build(group);
+		debugfrag.build(group);
 		loadfrag.build(group);
 
 		build.end();

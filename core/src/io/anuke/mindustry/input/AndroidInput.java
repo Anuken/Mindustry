@@ -38,8 +38,6 @@ import static io.anuke.mindustry.Vars.*;
 public class AndroidInput extends InputHandler implements GestureListener{
     private static Rectangle r1 = new Rectangle(), r2 = new Rectangle();
 
-    /**Maximum line length.*/
-    private static final int maxLength = 100;
     /**Maximum speed the player can pan.*/
     private static final float maxPanSpeed = 1.3f;
     /**Distance to edge of screen to start panning.*/
@@ -114,11 +112,6 @@ public class AndroidInput extends InputHandler implements GestureListener{
             }
         }
         return null;
-    }
-
-    Tile tileAt(float x, float y){
-        Vector2 vec = Graphics.world(x, y);
-        return world.tileWorld(vec.x, vec.y);
     }
 
     void removeRequest(PlaceRequest request){

@@ -2,15 +2,14 @@ package io.anuke.mindustry.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
-import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.NetEvents;
-import io.anuke.mindustry.type.Weapon;
+import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.*;
+import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Inputs.DeviceType;
+import io.anuke.ucore.core.KeyBinds;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
@@ -18,172 +17,139 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.*;
 
 public class DesktopInput extends InputHandler{
-	float mousex, mousey;
-	float endx, endy;
-	float prmousex, prmousey;
+	//controller info
 	private float controlx, controly;
-	private boolean beganBreak;
 	private boolean controlling;
-	private final int index;
-	private final String section;
+    private boolean showCursor = false;
+    private final String section;
+
+    /**Position where the player started dragging a line.*/
+    private int selectX, selectY;
+    /**Wehther selecting mode is active.*/
+    private boolean selecting;
+    /**Animation scale for line.*/
+    private float selectScale;
 
 	public DesktopInput(Player player){
 	    super(player);
-	    this.index = player.playerIndex;
 	    this.section = "player_" + (player.playerIndex + 1);
+    }
+
+    void tileTapped(Tile tile){
+
+		//check if tapped block is configurable
+		if(tile.block().isConfigurable(tile)){
+			if((!frag.config.isShown() //if the config fragment is hidden, show
+					//alternatively, the current selected block can 'agree' to switch config tiles
+					|| frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile))) {
+				frag.config.showConfig(tile);
+			}
+			//otherwise...
+		}else if(!frag.config.hasConfigMouse()){ //make sure a configuration fragment isn't on the cursor
+			//then, if it's shown and the current block 'agrees' to hide, hide it.
+			if(frag.config.isShown() && frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile)) {
+				frag.config.hideConfig();
+			}
+		}
+
+		//TODO network event!
+		//call tapped event
+		tile.block().tapped(tile, player);
+	}
+
+    @Override
+    public void drawBottom(){
+        Tile cursor = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
+
+        if(cursor == null) return;
+
+	    //draw selection
+	    if(selecting){
+            NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(recipe.result, selectX, selectY, cursor.x, cursor.y, true, maxLength, selectScale);
+
+
+	    }
     }
 
 	@Override
 	public void update(){
+		if(player.isDead() || state.is(State.menu) || ui.hasDialog()) return;
 
-		if(player.isDead()) return;
+		//deslect if not placing
+		if(!isPlacing()){
+		    selecting = false;
+        }
 
-		if(!Inputs.keyDown(section, "select")){
-			shooting = false;
-		}
-
-		boolean canBeginShoot = Inputs.keyTap(section, "select") && canShoot();
-
-		if(Inputs.keyTap(section, "select") && recipe == null && player.inventory.hasItem()){
-			Vector2 vec = Graphics.screen(player.x, player.y);
-			if(vec.dst(getMouseX(), Gdx.graphics.getHeight() - getMouseY()) <= playerSelectRange){
-				canBeginShoot = false;
-				droppingItem = true;
-			}
-		}
-
-		if((Inputs.keyTap(section, "select") && recipe != null) || Inputs.keyTap(section, "break")){
-			Vector2 vec = Graphics.world(getMouseX(), getMouseY());
-			mousex = vec.x;
-			mousey = vec.y;
-		}
-
-		if(!Inputs.keyDown(section, "select") && !Inputs.keyDown(section, "break")){
-            Vector2 vec = Graphics.world(getMouseX(), getMouseY());
-            mousex = vec.x;
-            mousey = vec.y;
-		}
-		
-		endx = getMouseX();
-		endy = getMouseY();
-
-		prmousex = Graphics.screen(mousex, mousey).x;
-		prmousey = Gdx.graphics.getHeight() - 1 - Graphics.screen(mousex, mousey).y;
+        //update select animation
+        if(selecting){
+            selectScale = Mathf.lerpDelta(selectScale, 1f, 0.2f);
+        }else{
+		    selectScale = 0f;
+        }
 
 		boolean controller = KeyBinds.getSection(section).device.type == DeviceType.controller;
-		
-		if(Inputs.getAxisActive("zoom") && (Inputs.keyDown(section,"zoom_hold") || controller)
-				&& !state.is(State.menu) && !ui.hasDialog()){
+
+		//zoom and rotate things
+		if(Inputs.getAxisActive("zoom") && (Inputs.keyDown(section,"zoom_hold") || controller)){
 		    renderer.scaleCamera((int) Inputs.getAxisTapped(section, "zoom"));
 		}
 
 		renderer.minimap().zoomBy(-(int)Inputs.getAxisTapped(section,"zoom_minimap"));
-
-		rotation += Inputs.getAxisTapped(section,"rotate_alt");
-		rotation += Inputs.getAxis(section,"rotate");
-
-		rotation = Mathf.mod(rotation, 4);
-
-		int keyIndex = 1;
+		rotation = Mathf.mod(rotation + (int)Inputs.getAxisTapped(section,"rotate"), 4);
 		
-		for(int i = 0; i < 6 && i < player.upgrades.size; i ++){
-			if(!(player.upgrades.get(i) instanceof Weapon)){
-				continue;
-			}
+		Tile cursor = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
 
-			if(Inputs.keyTap("weapon_" + keyIndex)){
-				player.weapon = (Weapon) player.upgrades.get(i);
-                if(Net.active()) NetEvents.handleWeaponSwitch(player);
-			}
-
-			keyIndex ++;
-		}
-		
-		Tile cursor = world.tile(tilex(), tiley());
-		Tile target = cursor == null ? null : cursor.target();
-		boolean showCursor = false;
-
-		if(droppingItem && Inputs.keyRelease(section,"select") && !player.inventory.isEmpty() && target != null){
-			dropItem(target, player.inventory.getItem());
-		}
-
-		if(droppingItem && (!Inputs.keyDown(section,"select") || player.inventory.isEmpty())){
-			droppingItem = false;
-		}
-
-		if(recipe == null && target != null && !ui.hasMouse() && target.block().isAccessible()){
-			showCursor = true;
-			if(Inputs.keyTap(section,"select")){
-				canBeginShoot = false;
-				frag.inv.showFor(target);
-                Cursors.restoreCursor();
-            }
-		}
-
-		if(!ui.hasMouse() && (target == null || !target.block().isAccessible()) && Inputs.keyTap(section,"select")){
-			frag.inv.hide();
-		}
-
-        if(target != null && target.block().isConfigurable(target)){
-		    showCursor = true;
+		if(cursor != null && cursor.block().isConfigurable(cursor)){
+            showCursor = true;
         }
-		
-		if(target != null && Inputs.keyTap(section,"select") && !ui.hasMouse()){
-			if(target.block().isConfigurable(target)){
-				if((!frag.config.isShown()
-						|| frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), cursor))) {
-					frag.config.showConfig(target);
-					canBeginShoot = false;
-				}
-			}else if(!frag.config.hasConfigMouse()){
-				if(frag.config.isShown() && frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), cursor)) {
-					frag.config.hideConfig();
-					canBeginShoot = false;
-				}
-			}
-
-			target.block().tapped(target, player);
-			if(Net.active()) NetEvents.handleBlockTap(target);
-		}
-		
-		if(Inputs.keyTap(section,"break")){
-			frag.config.hideConfig();
-		}
-		
-		if(Inputs.keyRelease(section,"break")){
-			beganBreak = false;
-		}
-
-		if(recipe != null && Inputs.keyTap(section,"break")){
-			beganBreak = true;
-			recipe = null;
-		}
-
-		if(recipe != null){
-			showCursor = validPlace(tilex(), tiley(), recipe.result) && cursorNear();
-		}
-
-		if(canBeginShoot){
-			shooting = true;
-		}
 
 		if(!ui.hasMouse()) {
-			if (showCursor)
+			if (showCursor) {
 				Cursors.setHand();
-			else
+			}else {
 				Cursors.restoreCursor();
+			}
 		}
 
+        showCursor = false;
 	}
+
+	@Override
+    public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+        if(player.isDead() || state.is(State.menu) || ui.hasDialog()) return false;
+
+        Tile cursor = tileAt(screenX, screenY);
+
+        if(cursor == null) return false;
+
+        if(isPlacing()) {
+            selectX = cursor.x;
+            selectY = cursor.y;
+            selecting = true;
+        }else {
+            tileTapped(cursor);
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean touchUp (int screenX, int screenY, int pointer, int button) {
+        if(player.isDead() || state.is(State.menu) || ui.hasDialog()) return false;
+
+        selecting = false;
+
+        return false;
+    }
 
     @Override
     public float getMouseX() {
-        return controlx;
+        return !controlling ? control.gdxInput().getX() : controlx;
     }
 
     @Override
     public float getMouseY() {
-        return controly;
+        return !controlling ? control.gdxInput().getY() : controly;
     }
 
     @Override
@@ -217,7 +183,7 @@ public class DesktopInput extends InputHandler{
                 controly -= ya*baseControllerSpeed*scl;
                 controlling = true;
 
-                if(index == 0){
+                if(player.playerIndex == 0){
                     Gdx.input.setCursorCatched(true);
                 }
 
@@ -236,16 +202,4 @@ public class DesktopInput extends InputHandler{
             controly = control.gdxInput().getY();
         }
     }
-
-	public int tilex(){
-		return (recipe != null && recipe.result.isMultiblock() &&
-				recipe.result.size % 2 == 0) ?
-				Mathf.scl(Graphics.world(getMouseX(), getMouseY()).x, tilesize) : Mathf.scl2(Graphics.world(getMouseX(), getMouseY()).x, tilesize);
-	}
-
-	public int tiley(){
-		return (recipe != null && recipe.result.isMultiblock() &&
-				recipe.result.size % 2 == 0) ?
-				Mathf.scl(Graphics.world(getMouseX(), getMouseY()).y, tilesize) : Mathf.scl2(Graphics.world(getMouseX(), getMouseY()).y, tilesize);
-	}
 }

@@ -5,7 +5,6 @@ import io.anuke.ucore.scene.Group;
 
 public class OverlayFragment implements Fragment{
     public final BlockInventoryFragment inv;
-    public final ToolFragment tool;
     public final BlockConfigFragment config;
 
     private Group group = new Group();
@@ -14,7 +13,6 @@ public class OverlayFragment implements Fragment{
     public OverlayFragment(InputHandler input){
         this.input = input;
 
-        tool = new ToolFragment(input);
         inv = new BlockInventoryFragment(input);
         config = new BlockConfigFragment();
     }
@@ -25,7 +23,6 @@ public class OverlayFragment implements Fragment{
         parent.addChild(group);
 
         inv.build(group);
-        tool.build(group);
         config.build(group);
 
         input.buildUI(group);

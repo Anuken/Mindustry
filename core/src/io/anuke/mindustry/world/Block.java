@@ -183,7 +183,7 @@ public class Block extends BaseBlock implements Content{
 	/**Called when another tile is tapped while this block is selected.
 	 * Returns whether or not this block should be deselected.*/
 	public boolean onConfigureTileTapped(Tile tile, Tile other){
-		return true;
+		return tile != other;
 	}
 
 	public boolean synthetic(){

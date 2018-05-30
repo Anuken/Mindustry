@@ -25,8 +25,10 @@ import static io.anuke.mindustry.Vars.*;
 
 public abstract class InputHandler extends InputAdapter{
 	/**Used for dropping items.*/
-    float playerSelectRange = Unit.dp.scl(40f);
-    Translator stackTrns = new Translator();
+    final float playerSelectRange = Unit.dp.scl(40f);
+	/**Maximum line length.*/
+	final int maxLength = 100;
+    final Translator stackTrns = new Translator();
 
 	public final Player player;
 	public final OverlayFragment frag = new OverlayFragment(this);
@@ -80,6 +82,12 @@ public abstract class InputHandler extends InputAdapter{
 	}
 
 	//utility methods
+
+	/**Returns the tile at the specified MOUSE coordinates.*/
+	Tile tileAt(float x, float y){
+		Vector2 vec = Graphics.world(x, y);
+		return world.tileWorld(vec.x, vec.y);
+	}
 
 	public boolean isPlacing(){
 		return recipe != null;

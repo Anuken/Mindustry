@@ -281,9 +281,11 @@ public class Player extends Unit implements BlockBuilder {
 						request.y * tilesize + request.recipe.result.offset(),
 						4, request.recipe.result.size * tilesize /2f + Mathf.absin(Timers.time(), 3f, 1f));
 
+				Lines.stroke((1f-request.progress)*2f);
+
 				Lines.poly(request.x * tilesize + request.recipe.result.offset(),
 						request.y * tilesize + request.recipe.result.offset(),
-						4, request.recipe.result.size * tilesize /2f + 2f, 45 + 15);
+						4, request.recipe.result.size * tilesize /2f + 3f, 45 + 15);
 			}
 		}
 
