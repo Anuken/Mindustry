@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.ContentDatabase;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.input.AndroidInput;
@@ -19,6 +20,7 @@ import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.Saves;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Recipe;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.input.InputProxy;
@@ -271,6 +273,22 @@ public class Control extends Module{
 		return hiscore;
 	}
 
+
+	private void checkUnlockableBlocks(){
+		TileEntity entity = players[0].getClosestCore();
+
+		if(entity == null) return;
+
+		for(int i = 0 ; i < Recipe.all().size; i ++){
+			Recipe recipe = Recipe.all().get(i);
+			if(entity.items.hasItems(recipe.requirements)){
+				if(control.database().unlockContent(recipe)){
+					ui.hudfrag.showUnlock(recipe);
+				}
+			}
+		}
+	}
+
 	@Override
 	public void dispose(){
 		Platform.instance.onGameExit();
@@ -321,6 +339,10 @@ public class Control extends Module{
 		    for(InputHandler input : inputs){
 		        input.update();
             }
+
+			if(Timers.get("timerCheckUnlock", 60)){
+				checkUnlockableBlocks();
+			}
 
 			if(Inputs.keyTap("pause") && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
                 state.set(state.is(State.playing) ? State.paused : State.playing);

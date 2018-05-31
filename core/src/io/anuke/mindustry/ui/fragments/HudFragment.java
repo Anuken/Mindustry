@@ -5,12 +5,16 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Scaling;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.type.Recipe;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.imagebutton;
@@ -21,6 +25,7 @@ import io.anuke.ucore.scene.style.TextureRegionDrawable;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.Label;
+import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
@@ -33,6 +38,8 @@ public class HudFragment implements Fragment{
 	private Table respawntable;
 	private Table wavetable;
 	private Label infolabel;
+	private Table lastUnlockTable;
+	private Table lastUnlockLayout;
 	private boolean shown = true;
 	private float dsize = 58;
 	private float isize = 40;
@@ -177,6 +184,96 @@ public class HudFragment implements Fragment{
 		}}.end();
 
 		blockfrag.build(Core.scene.getRoot());
+	}
+
+	/**Show unlock notification for a new recipe.*/
+	public void showUnlock(Recipe recipe){
+		blockfrag.rebuild();
+
+		//if there's currently no unlock notification...
+		if(lastUnlockTable == null) {
+			Table table = new Table("button");
+			table.margin(12);
+
+			Table in = new Table();
+
+			//create texture stack for displaying
+			Stack stack = new Stack();
+			for (TextureRegion region : recipe.result.getCompactIcon()) {
+				Image image = new Image(region);
+				image.setScaling(Scaling.fit);
+				stack.add(image);
+			}
+
+			in.add(stack).size(48f).pad(2);
+
+			//add to table
+			table.add(in).padRight(8);
+			table.add("$text.unlocked");
+			table.pack();
+
+			//create container table which will align and move
+			Table container = Core.scene.table();
+			container.top().add(table);
+			container.setTranslation(0, table.getPrefHeight());
+			container.actions(Actions.translateBy(0, -table.getPrefHeight(), 1f, Interpolation.fade), Actions.delay(4f),
+					//nesting actions() calls is necessary so the right prefHeight() is used
+					Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.run(() ->{
+						lastUnlockTable = null;
+						lastUnlockLayout = null;
+					}), Actions.removeActor())));
+
+			lastUnlockTable = container;
+			lastUnlockLayout = in;
+		}else{
+			//max column size
+			int col = 3;
+			//max amount of elements minus extra 'plus'
+			int cap = col*col-1;
+
+			//get old elements
+			Array<Element> elements = new Array<>(lastUnlockLayout.getChildren());
+			int esize = elements.size;
+
+			//...if it's already reached the cap, ignore everything
+			if(esize > cap) return;
+
+			//get size of each element
+			float size = 48f / Math.min(elements.size + 1, col);
+
+			//correct plurals if needed
+			if(esize == 1){
+				((Label)lastUnlockLayout.getParent().find(e -> e instanceof Label)).setText("$text.unlocked.plural");
+			}
+
+			lastUnlockLayout.clearChildren();
+			lastUnlockLayout.defaults().size(size).pad(2);
+
+			for(int i = 0; i < esize && i <= cap; i ++){
+				lastUnlockLayout.add(elements.get(i));
+
+				if(i % col == col - 1){
+					lastUnlockLayout.row();
+				}
+			}
+
+			//if there's space, add it
+			if(esize < cap) {
+
+				Stack stack = new Stack();
+				for (TextureRegion region : recipe.result.getCompactIcon()) {
+					Image image = new Image(region);
+					image.setScaling(Scaling.fit);
+					stack.add(image);
+				}
+
+				lastUnlockLayout.add(stack);
+			}else{ //else, add a specific icon to denote no more space
+				lastUnlockLayout.addImage("icon-add");
+			}
+
+			lastUnlockLayout.pack();
+		}
 	}
 
 	private void toggleMenus(){

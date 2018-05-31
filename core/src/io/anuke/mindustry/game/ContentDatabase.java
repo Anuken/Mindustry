@@ -6,17 +6,11 @@ import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.ucore.core.Settings;
 
-import static io.anuke.mindustry.Vars.debug;
-
 public class ContentDatabase {
     private ObjectMap<String, ObjectSet<String>> unlocked = new ObjectMap<>();
 
     /**Returns whether or not this piece of content is unlocked yet.*/
     public boolean isUnlocked(Content content){
-        if(debug){
-            return true;
-        }
-
         if(!unlocked.containsKey(content.getContentTypeName())){
             unlocked.put(content.getContentTypeName(), new ObjectSet<>());
         }
@@ -28,13 +22,14 @@ public class ContentDatabase {
 
     /**Makes this piece of content 'unlocked'.
      * If this piece of content is already unlocked, nothing changes.
-     * Results are not saved until you call {@link #save()}.*/
-    public void unlockContent(Content content){
+     * Results are not saved until you call {@link #save()}.
+     * @return whether or not this content was newly unlocked.*/
+    public boolean unlockContent(Content content){
         if(!unlocked.containsKey(content.getContentTypeName())){
             unlocked.put(content.getContentTypeName(), new ObjectSet<>());
         }
 
-        unlocked.get(content.getContentTypeName()).add(content.getContentName());
+        return unlocked.get(content.getContentTypeName()).add(content.getContentName());
     }
 
     private void load(){

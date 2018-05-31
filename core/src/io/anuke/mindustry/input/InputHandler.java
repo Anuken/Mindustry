@@ -229,4 +229,5 @@ public abstract class InputHandler extends InputAdapter{
     	Tile tile = world.tile(x, y).target();
 		player.addBuildRequest(new BuildRequest(tile.x, tile.y));
 	}
+
 }
