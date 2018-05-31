@@ -8,7 +8,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Consumer;
@@ -25,7 +24,7 @@ import static io.anuke.mindustry.Vars.gwt;
 
 public class FileChooser extends FloatingDialog {
 	private Table files;
-	private FileHandle homeDirectory = gwt? Gdx.files.internal("") : Gdx.files.absolute(OS.isMac ? UCore.getProperty("user.home") + "/Downloads/" :
+	private FileHandle homeDirectory = gwt ? Gdx.files.internal("") : Gdx.files.absolute(OS.isMac ? OS.getProperty("user.home") + "/Downloads/" :
             Gdx.files.getExternalStoragePath());
 	private FileHandle directory = homeDirectory;
 	private ScrollPane pane;
