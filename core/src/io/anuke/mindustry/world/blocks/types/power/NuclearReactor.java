@@ -32,9 +32,9 @@ public class NuclearReactor extends LiquidBurnerGenerator {
 	protected Item generateItem;
 	protected Color coolColor = new Color(1, 1, 1, 0f);
 	protected Color hotColor = Color.valueOf("ff9575a3");
-	protected int fuelUseTime = 130; //time to consume 1 fuel
+	protected int fuelUseTime = 120; //time to consume 1 fuel
 	protected float powerMultiplier = 0.45f; //power per frame, depends on full capacity
-	protected float heating = 0.007f; //heating per frame
+	protected float heating = 0.009f; //heating per frame
 	protected float coolantPower = 0.015f; //how much heat decreases per coolant unit
 	protected float smokeThreshold = 0.3f; //threshold at which block starts smoking
 	protected int explosionRadius = 19;
@@ -83,16 +83,17 @@ public class NuclearReactor extends LiquidBurnerGenerator {
 		}
 		
 		if(entity.liquids.amount > 0){
-			//TODO steam when cooling large amounts?
-			float liquidPower = 1f;
 
-			if(liquidPower > 0){ //is coolant
-				float pow = coolantPower * entity.liquids.liquid.heatCapacity;
-				float maxCool = Math.min(entity.liquids.amount, entity.heat / pow); //max that can be cooled in terms of liquid
-				entity.heat -= maxCool * pow;
-				entity.liquids.amount -= maxCool;
+			if(entity.liquids.liquid.temperature <= 0.5f){ //is coolant
+				float pow = coolantPower * entity.liquids.liquid.heatCapacity; //heat depleted per unit of liquid
+				float maxUsed = Math.min(entity.liquids.amount, entity.heat / pow); //max that can be cooled in terms of liquid
+				entity.heat -= maxUsed * pow;
+				entity.liquids.amount -= maxUsed;
 			}else{ //is heater
-				//TODO
+				float heat = coolantPower * entity.liquids.liquid.heatCapacity / 4f; //heat created per unit of liquid
+				float maxUsed = Math.min(entity.liquids.amount, (1f - entity.heat) / heat); //max liquid used
+				entity.heat += maxUsed * heat;
+				entity.liquids.amount -= maxUsed;
 			}
 		}
 		

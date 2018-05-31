@@ -32,11 +32,11 @@ public class ContentLoader {
             //items
             new Items(),
 
-            //liquids
-            new Liquids(),
-
             //status effects
             new StatusEffects(),
+
+            //liquids
+            new Liquids(),
 
             //bullets
             new ArtilleryBullets(),
