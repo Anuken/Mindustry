@@ -145,7 +145,7 @@ public class DesktopInput extends InputHandler{
 		
 		Tile cursor = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
 
-		if(cursor != null && cursor.block().isConfigurable(cursor)){
+		if(cursor != null && cursor.target().block().isCursor(cursor.target())){
             handCursor = true;
         }
 
@@ -165,7 +165,6 @@ public class DesktopInput extends InputHandler{
         if(player.isDead() || state.is(State.menu) || ui.hasDialog()) return false;
 
         Tile cursor = tileAt(screenX, screenY);
-
         if(cursor == null) return false;
 
         if(button == Buttons.LEFT) { //left = begin placing
@@ -174,7 +173,10 @@ public class DesktopInput extends InputHandler{
                 selectY = cursor.y;
                 mode = placing;
             } else {
-                tileTapped(cursor);
+                //only begin shooting if there's no cursor event
+                if(!tileTapped(cursor) && player.getPlaceQueue().size == 0){
+                    shooting = true;
+                }
             }
         }else if(button == Buttons.RIGHT){ //right = begin breaking
             selectX = cursor.x;
@@ -190,6 +192,10 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public boolean touchUp (int screenX, int screenY, int pointer, int button) {
+        if(button == Buttons.LEFT){
+            shooting = false;
+        }
+
         if(player.isDead() || state.is(State.menu) || ui.hasDialog()) return false;
 
         Tile cursor = tileAt(screenX, screenY);
@@ -198,7 +204,6 @@ public class DesktopInput extends InputHandler{
             mode = none;
             return false;
         }
-
 
         if(mode == placing){ //touch up while placing, place everything in selection
             NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursor.x, cursor.y, rotation, true, maxLength);

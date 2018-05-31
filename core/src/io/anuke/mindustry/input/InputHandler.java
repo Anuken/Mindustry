@@ -82,10 +82,14 @@ public abstract class InputHandler extends InputAdapter{
 	}
 
 	/**Handles tile tap events that are not platform specific.*/
-	public void tileTapped(Tile tile){
+	public boolean tileTapped(Tile tile){
+		tile = tile.target();
+
+		boolean consumed = false;
 
 		//check if tapped block is configurable
 		if(tile.block().isConfigurable(tile)){
+			consumed = true;
 			if((!frag.config.isShown() //if the config fragment is hidden, show
 					//alternatively, the current selected block can 'agree' to switch config tiles
 					|| frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile))) {
@@ -95,13 +99,18 @@ public abstract class InputHandler extends InputAdapter{
 		}else if(!frag.config.hasConfigMouse()){ //make sure a configuration fragment isn't on the cursor
 			//then, if it's shown and the current block 'agrees' to hide, hide it.
 			if(frag.config.isShown() && frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile)) {
+				consumed = true;
 				frag.config.hideConfig();
 			}
 		}
 
 		//TODO network event!
 		//call tapped event
-		tile.block().tapped(tile, player);
+		if(tile.block().tapped(tile, player)){
+			consumed = true;
+		}
+
+		return consumed;
 	}
 
 	//utility methods

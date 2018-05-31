@@ -19,8 +19,6 @@ import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.BuildBlock;
-import io.anuke.mindustry.world.blocks.types.BuildBlock.BuildEntity;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
@@ -267,14 +265,9 @@ public class AndroidInput extends InputHandler implements GestureListener{
         //only begin selecting if the tapped block is a request
         selecting = hasRequest(cursor) && isPlacing();
 
-        Tile linked = cursor.target();
-
-        //when tapping a build block, select it
-        if(linked.block() instanceof BuildBlock){
-            BuildEntity entity = linked.entity();
-            player.replaceBuilding(linked.x, linked.y, linked.getRotation(), entity.recipe);
-        }else if(pointer == 0 && !selecting){
-            tileTapped(cursor);
+        //call tap events
+        if(pointer == 0 && !selecting){
+            tileTapped(cursor.target());
         }
 
 		return false;

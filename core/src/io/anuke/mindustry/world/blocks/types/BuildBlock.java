@@ -34,11 +34,18 @@ public class BuildBlock extends Block {
     }
 
     @Override
-    public void tapped(Tile tile, Player player) {
+    public boolean tapped(Tile tile, Player player) {
         BuildEntity entity = tile.entity();
 
         player.clearBuilding();
         player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.getRotation(), entity.recipe));
+
+        return true;
+    }
+
+    @Override
+    public boolean isCursor(Tile tile) {
+        return true;
     }
 
     @Override

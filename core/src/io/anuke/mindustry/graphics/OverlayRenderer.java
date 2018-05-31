@@ -151,7 +151,7 @@ public class OverlayRenderer {
         float x = unit.getDrawPosition().x;
         float y = unit.getDrawPosition().y;
 
-        if(unit == players[0] && players.length == 1 && snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate")) {
+        if(unit == players[0] && players.length == 1 && snapCamera) {
             x = (int)x;
             y = (int)y;
         }

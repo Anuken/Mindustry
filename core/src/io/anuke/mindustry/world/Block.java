@@ -158,7 +158,14 @@ public class Block extends BaseBlock implements Content{
 	public void load(){}
 
 	/**Called when the block is tapped.*/
-	public void tapped(Tile tile, Player player){}
+	public boolean tapped(Tile tile, Player player){
+		return false;
+	}
+
+	/**Returns whether or not a hand cursor should be shown over this block.*/
+	public boolean isCursor(Tile tile){
+		return isConfigurable(tile);
+	}
 
 	/**Called when this block is tapped to build a UI on the table.
 	 * {@link #isConfigurable(Tile)} able} must return true for this to be called.*/

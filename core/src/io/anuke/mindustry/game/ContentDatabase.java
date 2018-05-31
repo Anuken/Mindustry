@@ -4,6 +4,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.mindustry.game.EventType.UnlockEvent;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Settings;
 
 public class ContentDatabase {
@@ -29,8 +31,17 @@ public class ContentDatabase {
             unlocked.put(content.getContentTypeName(), new ObjectSet<>());
         }
 
-        return unlocked.get(content.getContentTypeName()).add(content.getContentName());
+        boolean ret = unlocked.get(content.getContentTypeName()).add(content.getContentName());
+
+        //fire unlock event so other classes can use it
+        if(ret){
+            Events.fire(UnlockEvent.class, content);
+        }
+
+        return ret;
     }
+
+    //saving/loading currently disabled for testing.
 
     private void load(){
         ObjectMap<String, Array<String>> result = Settings.getJson("content-database", ObjectMap.class);

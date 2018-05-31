@@ -145,7 +145,7 @@ public class Player extends Unit implements BlockBuilder {
 	public void drawSmooth(){
 		if((debug && (!showPlayer || !showUI)) || dead) return;
 
-        boolean snap = snapCamera && Settings.getBool("smoothcam") && Settings.getBool("pixelate") && isLocal;
+        boolean snap = snapCamera && isLocal;
 
         String mname = mech.name;
 
@@ -405,6 +405,16 @@ public class Player extends Unit implements BlockBuilder {
 
 	protected void updateFlying(){
 		rotation = Mathf.slerpDelta(rotation, targetAngle, 0.1f);
+	}
+
+	@Override
+	public Player set(float x, float y){
+		this.x = x;
+		this.y = y;
+		if(mobile && !isLocal){
+			Core.camera.position.set(x, y, 0f);
+		}
+		return this;
 	}
 
 	@Override

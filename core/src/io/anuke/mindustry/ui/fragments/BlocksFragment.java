@@ -102,6 +102,7 @@ public class BlocksFragment implements Fragment{
 		}}.end();
 	}
 
+	/**Rebuilds the whole placement menu, attempting to preserve previous state.*/
 	void rebuild(){
 		selectTable.clear();
 

@@ -37,4 +37,9 @@ public class EventType {
     public interface StateChangeEvent extends Event{
         void handle(State from, State to);
     }
+
+    public interface UnlockEvent extends Event{
+        void handle(Content content);
+    }
 }
+

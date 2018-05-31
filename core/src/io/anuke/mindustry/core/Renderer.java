@@ -146,19 +146,9 @@ public class Renderer extends RendererModule{
 		if(state.is(State.menu)){
 			Graphics.clear(Color.BLACK);
 		}else{
-			boolean smoothcam = Settings.getBool("smoothcam");
-
             Vector2 position = averagePosition();
 
-			if(!smoothcam){
-				setCamera(position.x, position.y);
-			}else{
-				smoothCamera(position.x, position.y, mobile ? 0.3f : 0.14f);
-			}
-
-			if(Settings.getBool("pixelate") && players.length == 1) {
-                limitCamera(4f, position.x, position.y);
-            }
+            setCamera(position.x, position.y);
 
 			float prex = camera.position.x, prey = camera.position.y;
 			updateShake(0.75f);
@@ -168,7 +158,7 @@ public class Renderer extends RendererModule{
 
 			float lastx = camera.position.x, lasty = camera.position.y;
 			
-			if(snapCamera && smoothcam && Settings.getBool("pixelate")){
+			if(snapCamera){
 				camera.position.set((int) camera.position.x, (int) camera.position.y, 0);
 			}
 			
@@ -259,7 +249,7 @@ public class Renderer extends RendererModule{
 			Shaders.outline.color.set(team.color);
 
 			Graphics.beginShaders(Shaders.outline);
-			Graphics.shader(Shaders.mix, false);
+			Graphics.shader(Shaders.mix, true);
 			Entities.draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying);
 			Entities.draw(playerGroup, p -> p.isFlying() == flying && p.team == team);
 			Graphics.shader();

@@ -40,6 +40,11 @@ public class Door extends Wall{
 			Draw.rect(name + "-open", tile.drawx(), tile.drawy());
 		}
 	}
+
+	@Override
+	public boolean isCursor(Tile tile){
+		return true;
+	}
 	
 	@Override
 	public boolean isSolidFor(Tile tile){
@@ -48,11 +53,11 @@ public class Door extends Wall{
 	}
 
 	@Override
-	public void tapped(Tile tile, Player player){
+	public boolean tapped(Tile tile, Player player){
 		DoorEntity entity = tile.entity();
 		
 		if(anyEntities(tile) && entity.open){
-			return;
+			return true;
 		}
 		
 		entity.open = !entity.open;
@@ -61,6 +66,8 @@ public class Door extends Wall{
 		}else{
 			Effects.effect(openfx, tile.drawx(), tile.drawy());
 		}
+
+		return true;
 	}
 	
 	boolean anyEntities(Tile tile){
