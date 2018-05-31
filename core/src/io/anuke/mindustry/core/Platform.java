@@ -69,6 +69,16 @@ public abstract class Platform {
 	public void downloadFile(String name, byte[] bytes){}
 	/**Open a file chooser. Only used on GWT backend.*/
 	public void openFile(Consumer<InputStream> cons){}
+
+    /**Show a file chooser. Desktop only.
+     *
+     * @param text File chooser title text
+     * @param content Type of files to be loaded
+     * @param cons Selection listener
+     * @param open Whether to open or save files.
+     * @param filetype File extensions to filter.
+     */
+	public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filetype){}
 	/**Use the default thread provider from the kryonet module for this.*/
 	public ThreadProvider getThreadProvider(){
 		return new ThreadProvider() {

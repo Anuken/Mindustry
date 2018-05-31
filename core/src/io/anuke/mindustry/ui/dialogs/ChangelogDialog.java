@@ -10,6 +10,7 @@ import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.OS;
 
 import static io.anuke.mindustry.Vars.ios;
 
@@ -24,7 +25,7 @@ public class ChangelogDialog extends FloatingDialog{
 
         content().add("$text.changelog.loading");
 
-        if(!ios) {
+        if(!ios && !OS.isMac) {
             Changelogs.getChangelog(result -> {
                 versions = result;
                 Gdx.app.postRunnable(this::setup);
@@ -55,6 +56,10 @@ public class ChangelogDialog extends FloatingDialog{
             }
         }else{
             for(VersionInfo info : versions){
+                String desc = info.description;
+
+                desc = desc.replace("Android", "Mobile");
+
                 Table in = new Table("clear");
                 in.top().left().margin(10);
 
@@ -67,7 +72,7 @@ public class ChangelogDialog extends FloatingDialog{
                     in.add("$text.changelog.latest");
                 }
                 in.row();
-                in.labelWrap("[lightgray]" + info.description).width(vw - 20).padTop(12);
+                in.labelWrap("[lightgray]" + desc).width(vw - 20).padTop(12);
 
                 table.add(in).width(vw).pad(8).row();
             }

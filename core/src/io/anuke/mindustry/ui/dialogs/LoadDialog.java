@@ -87,14 +87,14 @@ public class LoadDialog extends FloatingDialog{
 				if(!gwt) {
 					t.addImageButton("icon-save", "empty", 14 * 3, () -> {
 					    if(!ios) {
-                            new FileChooser("$text.save.export", false, file -> {
-                                try {
-                                    slot.exportFile(file);
-                                    setup();
-                                } catch (IOException e) {
-                                    ui.showError(Bundles.format("text.save.export.fail", Strings.parseException(e, false)));
-                                }
-                            }).show();
+					    	Platform.instance.showFileChooser(Bundles.get("text.save.export"), "Mindustry Save", file -> {
+								try {
+									slot.exportFile(file);
+									setup();
+								} catch (IOException e) {
+									ui.showError(Bundles.format("text.save.export.fail", Strings.parseException(e, false)));
+								}
+							}, false, "mins");
                         }else{
 					        try {
                                 FileHandle file = Gdx.files.local("save-" + slot.getName() + ".mins");
@@ -150,7 +150,7 @@ public class LoadDialog extends FloatingDialog{
 		if(gwt || ios) return;
 
 		slots.addImageTextButton("$text.save.import", "icon-add", "clear", 14*3, () -> {
-			new FileChooser("$text.save.import", f -> f.extension().equals("mins"), true, file -> {
+			Platform.instance.showFileChooser(Bundles.get("text.save.import"), "Mindustry Save", file -> {
 				if(SaveIO.isSaveValid(file)){
 					try{
 						control.getSaves().importSave(file);
@@ -161,7 +161,7 @@ public class LoadDialog extends FloatingDialog{
 				}else{
 					ui.showError("$text.save.import.invalid");
 				}
-			}).show();
+			}, true, "mins");
 		}).fillX().margin(10f).minWidth(300f).height(70f).pad(4f).padRight(-4);
 	}
 

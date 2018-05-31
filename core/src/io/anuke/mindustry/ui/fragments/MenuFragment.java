@@ -10,6 +10,7 @@ import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
+import io.anuke.ucore.util.OS;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -39,7 +40,13 @@ public class MenuFragment implements Fragment{
 
 					add(new MenuButton("icon-info", "$text.about.button", ui.about::show));
 
-					add(new MenuButton("icon-tools", "$text.settings", ui.settings::show));
+					add(new MenuButton("icon-menu", OS.isMac ? "$text.credits" : "$text.changelog.title", () -> {
+						if(OS.isMac){
+							ui.about.showCredits();
+						}else {
+							ui.changelog.show();
+						}
+					}));
 
 					row();
 					
