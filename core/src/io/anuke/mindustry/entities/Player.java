@@ -19,7 +19,11 @@ import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Floor;
-import io.anuke.ucore.core.*;
+import io.anuke.mindustry.world.blocks.types.storage.CoreBlock.CoreEntity;
+import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
@@ -55,8 +59,8 @@ public class Player extends Unit implements BlockBuilder {
 	public boolean isLocal = false;
 	public Timer timer = new Timer(4);
 
+	private boolean respawning;
 	private float walktime;
-	private float respawntime;
 	private Queue<BuildRequest> placeQueue = new Queue<>();
 	
 	public Player(){
@@ -113,6 +117,7 @@ public class Player extends Unit implements BlockBuilder {
 	@Override
 	public void onDeath(){
 		dead = true;
+		respawning = false;
 		placeQueue.clear();
 		if(Net.active()){
 			NetEvents.handleUnitDeath(this);
@@ -122,14 +127,13 @@ public class Player extends Unit implements BlockBuilder {
 		float flammability = (inventory.hasItem() ? inventory.getItem().item.flammability * inventory.getItem().amount : 0f);
 		DamageArea.dynamicExplosion(x, y, flammability, explosiveness, 0f, getSize()/2f, Palette.darkFlame);
 		Effects.sound("die", this);
-
-		respawntime = respawnduration;
 		super.onDeath();
 	}
 
 	@Override
 	public void onRemoteDeath(){
 		dead = true;
+		respawning = true;
 		Effects.effect(ExplosionFx.explosion, this);
 		Effects.shake(4f, 5f, this);
 		Effects.sound("die", this);
@@ -296,19 +300,14 @@ public class Player extends Unit implements BlockBuilder {
 			return;
 		}
 
-        if(respawntime > 0){
+		if(isDead()){
+			CoreEntity entity = (CoreEntity)getClosestCore();
 
-            respawntime -= Timers.delta();
-
-            if(respawntime <= 0){
-                set(world.getSpawnX(), world.getSpawnY());
-                heal();
-                add();
-                Effects.sound("respawn");
-            }
-        }
-
-		if(isDead()) return;
+			if(!respawning && entity != null && entity.trySetPlayer(this)){
+				respawning = true;
+			}
+			return;
+		}
 
 		if(mech.flying){
 			updateFlying();
@@ -328,7 +327,6 @@ public class Player extends Unit implements BlockBuilder {
 	public void reset(){
 		weapon = Weapons.blaster;
 		team = Team.blue;
-		respawntime = -1;
 		inventory.clear();
 		upgrades.clear();
 		placeQueue.clear();

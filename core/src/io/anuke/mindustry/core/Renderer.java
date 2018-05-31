@@ -55,6 +55,7 @@ public class Renderer extends RendererModule{
 	private OverlayRenderer overlays = new OverlayRenderer();
 
 	public Renderer() {
+		pixelate = true;
 		Lines.setCircleVertices(14);
 
 		Shaders.init();
@@ -114,15 +115,10 @@ public class Renderer extends RendererModule{
 
 	@Override
 	public void init(){
-		pixelate = Settings.getBool("pixelate");
-		int scale = Settings.getBool("pixelate") ? Core.cameraScale : 1;
+		int scale = Core.cameraScale;
 
         effectSurface = Graphics.createSurface(scale);
 		pixelSurface = Graphics.createSurface(scale);
-	}
-
-	public void setPixelate(boolean pixelate){
-		this.pixelate = pixelate;
 	}
 
 	@Override
@@ -399,10 +395,8 @@ public class Renderer extends RendererModule{
 		targetscale = amount;
 		clampScale();
 		//scale up all surfaces in preparation for the zoom
-		if(Settings.getBool("pixelate")){
-			for(Surface surface : Graphics.getSurfaces()){
-				surface.setScale(targetscale);
-			}
+		for(Surface surface : Graphics.getSurfaces()){
+			surface.setScale(targetscale);
 		}
 	}
 

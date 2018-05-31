@@ -53,9 +53,9 @@ public class Fx implements ContentList {
 		});
 
 		spawn = new Effect(23, e -> {
-			Lines.stroke(2f);
-			Draw.color(Color.DARK_GRAY, Color.SCARLET, e.fin());
-			Lines.circle(e.x, e.y, 7f - e.fin() * 6f);
+			Lines.stroke(2f * e.fout());
+			Draw.color(Palette.accent);
+			Lines.poly(e.x, e.y, 4, 3f + e.fin() * 8f);
 			Draw.reset();
 		});
 	}

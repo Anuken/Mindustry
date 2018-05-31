@@ -163,19 +163,6 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.sliderPref("previewopacity", 50, 0, 100, i -> i + "%");
 		graphics.checkPref("indicators", true);
 		graphics.checkPref("healthbars", true);
-		graphics.checkPref("pixelate", true, b -> {
-			if(b){
-				renderer.pixelSurface.setScale(Core.cameraScale);
-				renderer.effectSurface.setScale(Core.cameraScale);
-				//Graphics.getEffects1().setScale(Core.cameraScale);
-				//Graphics.getEffects2().setScale(Core.cameraScale);
-			}else{
-				renderer.effectSurface.setScale(1);
-				//Graphics.getEffects1().setScale(1);
-				//Graphics.getEffects2().setScale(1);
-			}
-			renderer.setPixelate(b);
-		});
 	}
 
 	private void back(){

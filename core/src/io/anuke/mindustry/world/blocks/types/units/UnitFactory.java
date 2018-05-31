@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world.blocks.types.units;
 
-import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import io.anuke.mindustry.Vars;
@@ -148,8 +147,6 @@ public class UnitFactory extends Block {
             });
 
             entity.openCountdown = openDuration;
-
-            //Timers.run(openDuration, () -> entity.open = false);
 
             for(ItemStack stack : requirements){
                 entity.items.removeItem(stack.item, stack.amount);

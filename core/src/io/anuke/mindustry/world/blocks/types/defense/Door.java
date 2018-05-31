@@ -1,11 +1,10 @@
 package io.anuke.mindustry.world.blocks.types.defense;
 
 import com.badlogic.gdx.math.Rectangle;
+import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Wall;
 import io.anuke.ucore.core.Effects;
@@ -15,8 +14,6 @@ import io.anuke.ucore.graphics.Draw;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-
-import static io.anuke.mindustry.Vars.tilesize;
 
 public class Door extends Wall{
 	protected final Rectangle rect = new Rectangle();
@@ -56,7 +53,7 @@ public class Door extends Wall{
 	public boolean tapped(Tile tile, Player player){
 		DoorEntity entity = tile.entity();
 		
-		if(anyEntities(tile) && entity.open){
+		if(Units.anyEntities(tile) && entity.open){
 			return true;
 		}
 		
@@ -68,23 +65,6 @@ public class Door extends Wall{
 		}
 
 		return true;
-	}
-	
-	boolean anyEntities(Tile tile){
-		Block type = tile.block();
-		rect.setSize(type.size * tilesize, type.size * tilesize);
-		rect.setCenter(tile.drawx(), tile.drawy());
-
-		boolean[] value = new boolean[1];
-
-		Units.getNearby(rect, unit -> {
-			if(value[0]) return;
-			if(unit.hitbox.getRect(unit.x, unit.y).overlaps(rect)){
-				value[0] = true;
-			}
-		});
-		
-		return value[0];
 	}
 	
 	@Override

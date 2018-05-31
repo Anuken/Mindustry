@@ -177,7 +177,6 @@ public class Control extends Module{
 		});
 	}
 
-	//TODO drop player method
 	public void addPlayer(int index){
 	    if(players.length < index + 1){
 	        Player[] old = players;

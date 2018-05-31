@@ -1,18 +1,24 @@
 package io.anuke.mindustry.world.blocks.types.storage;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import io.anuke.mindustry.entities.ItemTransfer;
-import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.world.BlockFlag;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.EnumSet;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.state;
 
@@ -27,13 +33,60 @@ public class CoreBlock extends StorageBlock {
     public CoreBlock(String name) {
         super(name);
 
-        solid = true;
+        solid = false;
+        solidifes = true;
         update = true;
         unbreakable = true;
         size = 3;
         hasItems = true;
         itemCapacity = 1000;
         flags = EnumSet.of(BlockFlag.resupplyPoint, BlockFlag.target);
+    }
+
+    @Override
+    public void draw(Tile tile) {
+        CoreEntity entity = tile.entity();
+
+        Draw.rect(entity.solid ? name : name + "-open", tile.drawx(), tile.drawy());
+
+        Draw.alpha(entity.heat);
+        Draw.rect(name + "-top", tile.drawx(), tile.drawy());
+        Draw.color();
+
+        if(entity.currentPlayer != null) {
+            Player player = entity.currentPlayer;
+
+            TextureRegion region = Draw.region(player.mech.name);
+
+            Shaders.build.region = region;
+            Shaders.build.progress = entity.progress;
+            Shaders.build.color.set(Palette.accent);
+            Shaders.build.time = -entity.time / 10f;
+
+            Graphics.shader(Shaders.build, false);
+            Shaders.build.apply();
+            Draw.rect(region, tile.drawx(), tile.drawy());
+            Graphics.shader();
+
+            Draw.color(Palette.accent);
+
+            Lines.lineAngleCenter(
+                    tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),
+                    tile.drawy(),
+                    90,
+                    size * Vars.tilesize /2f);
+
+            Draw.reset();
+
+            //Draw.rect(name + (!entity.solid ? "-top-open" : "-top"), tile.drawx(), tile.drawy());
+        }
+    }
+
+    @Override
+    public boolean isSolidFor(Tile tile) {
+        CoreEntity entity = tile.entity();
+
+        return entity.solid;
     }
 
     @Override
@@ -74,12 +127,36 @@ public class CoreBlock extends StorageBlock {
 
     @Override
     public void update(Tile tile) {
+        CoreEntity entity = tile.entity();
 
-        if(tile.entity.timer.get(timerSupply, supplyInterval)){
+        if(!entity.solid && !Units.anyEntities(tile)){
+            entity.solid = true;
+        }
+
+        if(entity.currentPlayer != null){
+            entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
+            entity.time += Timers.delta();
+            entity.progress += 1f / Vars.respawnduration;
+
+            if(entity.progress >= 1f){
+                Effects.effect(Fx.spawn, entity);
+                entity.progress = 0;
+                entity.solid = false;
+                entity.currentPlayer.heal();
+                entity.currentPlayer.rotation = 90f;
+                entity.currentPlayer.baseRotation = 90f;
+                entity.currentPlayer.set(tile.drawx(), tile.drawy()).add();
+                entity.currentPlayer = null;
+            }
+        }else{
+            entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.1f);
+        }
+
+        if(entity.solid && tile.entity.timer.get(timerSupply, supplyInterval)){
             rect.setSize(supplyRadius*2).setCenter(tile.drawx(), tile.drawy());
 
             Units.getNearby(tile.getTeam(), rect, unit -> {
-                if(unit.distanceTo(tile.drawx(), tile.drawy()) > supplyRadius) return;
+                if(unit.isDead() || unit.distanceTo(tile.drawx(), tile.drawy()) > supplyRadius) return;
 
                 for(int i = 0; i < tile.entity.items.items.length; i ++){
                     Item item = Item.getByID(i);
@@ -91,6 +168,27 @@ public class CoreBlock extends StorageBlock {
                     }
                 }
             });
+        }
+    }
+
+    @Override
+    public TileEntity getEntity() {
+        return new CoreEntity();
+    }
+
+    public class CoreEntity extends TileEntity{
+        Player currentPlayer;
+        boolean solid = true;
+        float progress;
+        float time;
+        float heat;
+
+        public boolean trySetPlayer(Player player){
+            if(currentPlayer != null) return false;
+            player.set(tile.drawx(), tile.drawy());
+            currentPlayer = player;
+            progress = 0f;
+            return true;
         }
     }
 }

@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
@@ -18,6 +19,24 @@ import static io.anuke.mindustry.Vars.*;
 /**Utility class for unit and team interactions.*/
 public class Units {
     private static Rectangle rect = new Rectangle();
+
+    /**Returns whether there are any entities on this tile.*/
+    public static boolean anyEntities(Tile tile){
+        Block type = tile.block();
+        rect.setSize(type.size * tilesize, type.size * tilesize);
+        rect.setCenter(tile.drawx(), tile.drawy());
+
+        boolean[] value = new boolean[1];
+
+        Units.getNearby(rect, unit -> {
+            if(value[0]) return;
+            if(unit.hitbox.getRect(unit.x, unit.y).overlaps(rect)){
+                value[0] = true;
+            }
+        });
+
+        return value[0];
+    }
 
     /**Returns the neareset ally tile in a range.*/
     public static TileEntity findAllyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
@@ -130,7 +149,7 @@ public class Units {
             Entities.getNearby(group, rect, entity -> cons.accept((Unit)entity));
         }
 
-        //now check all enemy players
+        //now check all ally players
         Entities.getNearby(playerGroup, rect, player -> {
             if(((Unit)player).team == team) cons.accept((Unit)player);
         });
