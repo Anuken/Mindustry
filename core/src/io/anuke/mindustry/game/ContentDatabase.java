@@ -9,7 +9,10 @@ import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Settings;
 
 public class ContentDatabase {
+    /**Maps unlockable type names to a set of unlocked content.*/
     private ObjectMap<String, ObjectSet<String>> unlocked = new ObjectMap<>();
+    /**Whether unlockables have changed since the last save.*/
+    private boolean dirty;
 
     /**Returns whether or not this piece of content is unlocked yet.*/
     public boolean isUnlocked(Content content){
@@ -36,14 +39,24 @@ public class ContentDatabase {
         //fire unlock event so other classes can use it
         if(ret){
             Events.fire(UnlockEvent.class, content);
+            dirty = true;
         }
 
         return ret;
     }
 
-    //saving/loading currently disabled for testing.
+    /**Returns whether unlockables have changed since the last save.*/
+    public boolean isDirty(){
+        return dirty;
+    }
 
-    private void load(){
+    /**Clears all unlocked content.*/
+    public void reset(){
+        unlocked.clear();
+        dirty = true;
+    }
+
+    public void load(){
         ObjectMap<String, Array<String>> result = Settings.getJson("content-database", ObjectMap.class);
 
         for(Entry<String, Array<String>> entry : result.entries()){
@@ -51,9 +64,12 @@ public class ContentDatabase {
             set.addAll(entry.value);
             unlocked.put(entry.key, set);
         }
+
+        dirty = false;
     }
 
-    private void save(){
+    public void save(){
+
         ObjectMap<String, Array<String>> write = new ObjectMap<>();
 
         for(Entry<String, ObjectSet<String>> entry : unlocked.entries()){
@@ -61,6 +77,8 @@ public class ContentDatabase {
         }
 
         Settings.putJson("content-database", write);
+        Settings.save();
+        dirty = false;
     }
 
 }

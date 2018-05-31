@@ -42,7 +42,7 @@ public class Item implements Comparable<Item>, Content{
 		items.add(this);
 	}
 
-	public void init(){
+	public void load(){
 		this.region = Draw.region("item-" + name);
 	}
 

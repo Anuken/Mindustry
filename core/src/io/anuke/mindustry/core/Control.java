@@ -61,8 +61,10 @@ public class Control extends Module{
 		Core.atlas = new Atlas("sprites.atlas");
 
 		for(Item item : Item.all()){
-			item.init();
+			item.load();
 		}
+
+		db.load();
 
 		gdxInput = Gdx.input;
 
@@ -337,8 +339,14 @@ public class Control extends Module{
 		        input.update();
             }
 
-			if(Timers.get("timerCheckUnlock", 60)){
+            //check unlocks every 2 seconds
+			if(Timers.get("timerCheckUnlock", 120)){
 				checkUnlockableBlocks();
+
+				//save if the db changed
+				if(db.isDirty()){
+					db.save();
+				}
 			}
 
 			if(Inputs.keyTap("pause") && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){

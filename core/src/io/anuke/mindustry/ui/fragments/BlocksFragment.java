@@ -99,7 +99,10 @@ public class BlocksFragment implements Fragment{
 				visible(() -> !state.is(State.menu) && shown);
 
 			}}.end().get();
+
 		}}.end();
+
+		rebuild();
 	}
 
 	/**Rebuilds the whole placement menu, attempting to preserve previous state.*/

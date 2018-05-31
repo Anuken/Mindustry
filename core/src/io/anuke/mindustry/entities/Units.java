@@ -30,7 +30,7 @@ public class Units {
 
         Units.getNearby(rect, unit -> {
             if(value[0]) return;
-            if(unit.hitbox.getRect(unit.x, unit.y).overlaps(rect)){
+            if(!unit.isFlying() && unit.hitbox.getRect(unit.x, unit.y).overlaps(rect)){
                 value[0] = true;
             }
         });
