@@ -135,10 +135,8 @@ public class Control extends Module{
 
 		Events.on(PlayEvent.class, () -> {
 		    for(Player player : players){
-                player.set(world.getSpawnX(), world.getSpawnY());
+                player.dead = true;
             }
-
-			Core.camera.position.set(world.getSpawnX(), world.getSpawnY(), 0);
 
 			state.set(State.playing);
 		});

@@ -166,7 +166,7 @@ public class NetworkIO {
                 }
             }
 
-            player.set(world.getSpawnX(), world.getSpawnY());
+            player.dead = true;
 
             world.endMapLoad();
 

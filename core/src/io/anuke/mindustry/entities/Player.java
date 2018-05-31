@@ -133,16 +133,10 @@ public class Player extends Unit implements BlockBuilder {
 	@Override
 	public void onRemoteDeath(){
 		dead = true;
-		respawning = true;
+		respawning = false;
 		Effects.effect(ExplosionFx.explosion, this);
 		Effects.shake(4f, 5f, this);
 		Effects.sound("die", this);
-
-		Timers.run(respawnduration + 5f, () -> {
-			heal();
-			set(world.getSpawnX(), world.getSpawnY());
-			interpolator.target.set(x, y);
-		});
 	}
 	
 	@Override

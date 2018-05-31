@@ -55,15 +55,6 @@ public class World extends Module{
 	public Pathfinder pathfinder(){
 		return pathfinder;
 	}
-
-    //TODO proper spawnpoints!
-	public float getSpawnX(){
-		return width() * tilesize/2f;
-	}
-
-	public float getSpawnY(){
-		return height() * tilesize/2f;
-	}
 	
 	public boolean solid(int x, int y){
 		Tile tile = tile(x, y);

@@ -20,6 +20,7 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.EnumSet;
 import io.anuke.ucore.util.Mathf;
 
+import static io.anuke.mindustry.Vars.debug;
 import static io.anuke.mindustry.Vars.state;
 
 public class CoreBlock extends StorageBlock {
@@ -77,8 +78,6 @@ public class CoreBlock extends StorageBlock {
                     size * Vars.tilesize /2f);
 
             Draw.reset();
-
-            //Draw.rect(name + (!entity.solid ? "-top-open" : "-top"), tile.drawx(), tile.drawy());
         }
     }
 
@@ -137,6 +136,11 @@ public class CoreBlock extends StorageBlock {
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
             entity.time += Timers.delta();
             entity.progress += 1f / Vars.respawnduration;
+
+            //instant build for fast testing.
+            if(debug){
+                entity.progress = 1f;
+            }
 
             if(entity.progress >= 1f){
                 Effects.effect(Fx.spawn, entity);
