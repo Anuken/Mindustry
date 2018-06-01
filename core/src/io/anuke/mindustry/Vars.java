@@ -12,7 +12,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Shield;
 import io.anuke.mindustry.entities.enemies.Enemy;
-import io.anuke.mindustry.io.Platform;
+import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.net.EditLog;
 import io.anuke.mindustry.net.ClientDebug;
 import io.anuke.mindustry.net.ServerDebug;
@@ -21,6 +21,7 @@ import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.OS;
 import java.util.Locale;
 
 public class Vars{
@@ -51,12 +52,17 @@ public class Vars{
 	public static final String discordURL = "https://discord.gg/BKADYds";
 
 	public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
+	public static final String macAppDir = UCore.getProperty("user.home") + "/Library/Application Support/";
 	//directory for user-created map data
 	public static final FileHandle customMapDirectory = gwt ? null : UCore.isAssets() ?
-			Gdx.files.local("../../desktop/mindustry-maps") : Gdx.files.local("mindustry-maps/");
+			Gdx.files.local("../../desktop/mindustry-maps") :
+			OS.isMac ? (Gdx.files.absolute(macAppDir).child("maps/")) :
+					Gdx.files.local("mindustry-maps/");
 	//save file directory
 	public static final FileHandle saveDirectory = gwt ? null : UCore.isAssets() ?
-			Gdx.files.local("../../desktop/mindustry-saves") : Gdx.files.local("mindustry-saves/");
+			Gdx.files.local("../../desktop/mindustry-saves") :
+			OS.isMac ? (Gdx.files.absolute(macAppDir).child("saves/")) :
+			Gdx.files.local("mindustry-saves/");
 	//scale of the font
 	public static float fontscale = Math.max(Unit.dp.scl(1f)/2f, 0.5f);
 	//camera zoom displayed on startup
@@ -99,7 +105,7 @@ public class Vars{
 	
 	public static final int tilesize = 8;
 
-	public static final Locale[] locales = {new Locale("en"), new Locale("fr"), new Locale("ru"), new Locale("uk", "UA"), new Locale("pl", "PL"),
+	public static final Locale[] locales = {new Locale("en"), new Locale("fr"), new Locale("ru"), new Locale("uk", "UA"), new Locale("pl"),
 			new Locale("de"), new Locale("pt", "BR"), new Locale("ko"), new Locale("in", "ID"), new Locale("ita"), new Locale("es")};
 
 	public static final Color[] playerColors = {

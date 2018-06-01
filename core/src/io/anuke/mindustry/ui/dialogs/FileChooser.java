@@ -6,7 +6,8 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
-import io.anuke.mindustry.io.Platform;
+import io.anuke.mindustry.core.Platform;
+import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Consumer;
@@ -15,12 +16,14 @@ import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.OS;
 
 import java.util.Arrays;
 
 public class FileChooser extends FloatingDialog {
 	private Table files;
-	private FileHandle homeDirectory = Gdx.files.absolute(Gdx.files.getExternalStoragePath());
+	private FileHandle homeDirectory = Gdx.files.absolute(OS.isMac ? UCore.getProperty("user.home") + "/Downloads/" :
+            Gdx.files.getExternalStoragePath());
 	private FileHandle directory = homeDirectory;
 	private ScrollPane pane;
 	private TextField navigation, filefield;
@@ -96,6 +99,11 @@ public class FileChooser extends FloatingDialog {
 			updateFiles(true);
 		});
 
+		//Macs are confined to the Downloads/ directory
+		if(OS.isMac){
+			up.setDisabled(true);
+		}
+
 		ImageButton back = new ImageButton("icon-arrow-left");
 		back.resizeImage(isize);
 		
@@ -166,7 +174,8 @@ public class FileChooser extends FloatingDialog {
 
 	private void updateFiles(boolean push){
 		if(push) stack.push(directory);
-		navigation.setText(directory.toString());
+		//if is mac, don't display extra info since you can only ever go to downloads
+		navigation.setText(OS.isMac ? directory.name() : directory.toString());
 		
 		GlyphLayout layout = Pools.obtain(GlyphLayout.class);
 		
@@ -181,23 +190,25 @@ public class FileChooser extends FloatingDialog {
 		Pools.free(layout);
 
 		files.clearChildren();
+		files.top().left();
 		FileHandle[] names = getFileNames();
 
-		Image upimage = new Image("icon-folder-parent");
+		//macs are confined to the Downloads/ directory
+		if(!OS.isMac) {
+			Image upimage = new Image("icon-folder-parent");
+			TextButton upbutton = new TextButton(".." + directory.toString());
+			upbutton.clicked(() -> {
+				directory = directory.parent();
+				updateFiles(true);
+			});
 
-		TextButton upbutton = new TextButton(".." + directory.toString());
-		upbutton.clicked(()->{
-			directory = directory.parent();
-			updateFiles(true);
-		});
-		
-		upbutton.left().add(upimage).padRight(4f).size(14*2);
-		upbutton.getCells().reverse();
-		
-		files.top().left().add(upbutton).align(Align.topLeft).fillX().expandX().height(50).pad(2).colspan(2);
-		upbutton.getLabel().setAlignment(Align.left);
+			upbutton.left().add(upimage).padRight(4f).size(14 * 2);
+			upbutton.getLabel().setAlignment(Align.left);
+			upbutton.getCells().reverse();
 
-		files.row();
+			files.add(upbutton).align(Align.topLeft).fillX().expandX().height(50).pad(2).colspan(2);
+			files.row();
+		}
 		
 		ButtonGroup<TextButton> group = new ButtonGroup<TextButton>();
 		group.setMinCheckCount(0);

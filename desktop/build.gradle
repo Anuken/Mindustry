@@ -86,7 +86,7 @@ task packrCmd() {
 
             commandLine("java", "-jar", PACKR_DIR + "packr.jar",
                     "--verbose",
-                    "--bundle", getPackage(),
+                    "--bundle", getPackage() + ".mac",
                     "--platform", getPlatform(),
                     "--executable", appName,
                     "--output", "packr-out/",

@@ -3,14 +3,17 @@ package io.anuke.mindustry.desktop;
 import club.minnced.discord.rpc.DiscordEventHandlers;
 import club.minnced.discord.rpc.DiscordRPC;
 import club.minnced.discord.rpc.DiscordRichPresence;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Base64Coder;
 import io.anuke.kryonet.DefaultThreadImpl;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
-import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Strings;
 
 import javax.swing.*;
@@ -38,6 +41,11 @@ public class DesktopPlatform extends Platform {
             DiscordEventHandlers handlers = new DiscordEventHandlers();
             DiscordRPC.INSTANCE.Discord_Initialize(applicationId, handlers, true, "");
         }
+    }
+
+    @Override
+    public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filter) {
+        new FileChooser(text, file -> file.extension().equalsIgnoreCase(filter), open, cons).show();
     }
 
     @Override

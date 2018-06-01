@@ -2,13 +2,14 @@ package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.Gdx;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.io.Platform;
+import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.ui.MenuButton;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
+import io.anuke.ucore.util.OS;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -44,7 +45,13 @@ public class MenuFragment implements Fragment{
 
 					add(new MenuButton("icon-info", "$text.about.button", ui.about::show));
 
-					add(new MenuButton("icon-menu", "$text.changelog.title", ui.changelog::show));
+					add(new MenuButton("icon-menu", OS.isMac ? "$text.credits" : "$text.changelog.title", () -> {
+						if(OS.isMac){
+							ui.about.showCredits();
+						}else {
+							ui.changelog.show();
+						}
+					}));
 
 					row();
 					
@@ -57,7 +64,8 @@ public class MenuFragment implements Fragment{
 
 			}else {
 				new table() {{
-					defaults().size(120f).pad(5);
+				    float size = 120f;
+					defaults().size(size).pad(5);
 					float isize = 14f * 4;
 
 					new imagebutton("icon-play-2", isize, ui.levels::show).text("$text.play").padTop(4f);
@@ -70,13 +78,21 @@ public class MenuFragment implements Fragment{
 
 					row();
 
-					new imagebutton("icon-editor", isize, ui.editor::show).text("$text.editor").padTop(4f);
+					new table(){{
 
-					new imagebutton("icon-tools", isize, ui.settings::show).text("$text.settings").padTop(4f);
+                        defaults().size(size).pad(5);
 
-					new imagebutton("icon-info", isize, ui.about::show).text("$text.about.button").padTop(4f);
+                        new imagebutton("icon-editor", isize, ui.editor::show).text("$text.editor").padTop(4f);
 
-					new imagebutton("icon-donate", isize, Platform.instance::openDonations).text("$text.donate").padTop(4f);
+                        new imagebutton("icon-tools", isize, ui.settings::show).text("$text.settings").padTop(4f);
+
+                        new imagebutton("icon-info", isize, ui.about::show).text("$text.about.button").padTop(4f);
+
+                        if (!ios) {
+                            new imagebutton("icon-donate", isize, Platform.instance::openDonations).text("$text.donate").padTop(4f);
+                        }
+
+                    }}.colspan(4).end();
 				}}.end();
 			}
 		}}.end();
