@@ -125,7 +125,7 @@ public class Puddle extends Entity implements SerializableEntity, Poolable{
     }
 
     /**Deserialization use only!*/
-    private Puddle(){}
+    public Puddle(){}
 
     public float getFlammability(){
         return liquid.flammability * amount;

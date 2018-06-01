@@ -54,7 +54,7 @@ public class Fire extends TimedEntity implements SerializableEntity, Poolable{
     }
 
     /**Deserialization use only!*/
-    private Fire(){}
+    public Fire(){}
 
     @Override
     public void update() {

@@ -1,4 +1,4 @@
-package io.anuke.mindustry.entities;
+package io.anuke.mindustry.entities.effect;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
@@ -35,7 +35,7 @@ public class ItemTransfer extends TimedEntity{
         tr.add();
     }
 
-    private ItemTransfer(){}
+    public ItemTransfer(){}
 
     @Override
     public void reset() {

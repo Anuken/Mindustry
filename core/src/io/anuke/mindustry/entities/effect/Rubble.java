@@ -19,7 +19,7 @@ public class Rubble extends TimedEntity implements BelowLiquidEffect{
         rubble.set(x, y).add();
     }
 
-    private Rubble(){
+    public Rubble(){
         lifetime = 7000f;
     }
 

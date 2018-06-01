@@ -3,7 +3,7 @@ package io.anuke.mindustry.input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.entities.BlockBuilder.BuildRequest;
-import io.anuke.mindustry.entities.ItemTransfer;
+import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;

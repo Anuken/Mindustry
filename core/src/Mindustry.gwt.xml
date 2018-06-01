@@ -11,8 +11,12 @@
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.game.EventType" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.io.SaveFileVersion" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.type.Recipe" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.ucore.entities.EffectEntity" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.net.Packets" />
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.net.Packet" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.effect" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.Bullet" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.type.Recipe" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.net.Streamable" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.BlockBar" />
 	<extend-configuration-property name="gdx.reflect.include" value="com.badlogic.gdx.utils.Predicate" />

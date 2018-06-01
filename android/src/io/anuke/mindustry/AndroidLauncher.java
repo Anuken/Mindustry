@@ -4,11 +4,13 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
@@ -22,13 +24,21 @@ import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
+import io.anuke.mindustry.io.SaveIO;
+import io.anuke.mindustry.io.Saves.SaveSlot;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Strings;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -36,6 +46,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class AndroidLauncher extends AndroidApplication{
 	public static final int PERMISSION_REQUEST_CODE = 1;
@@ -172,6 +184,8 @@ public class AndroidLauncher extends AndroidApplication{
         Net.setServerProvider(new KryoServer());
 
         initialize(new Mindustry(), config);
+
+		checkFiles(getIntent());
 	}
 
 	@Override
@@ -184,6 +198,63 @@ public class AndroidLauncher extends AndroidApplication{
 			if(chooser != null){
 				chooser.show();
 			}
+		}
+	}
+
+	private void checkFiles(Intent intent){
+		try {
+			Uri uri = intent.getData();
+			if (uri != null) {
+				File myFile = null;
+				String scheme = uri.getScheme();
+				if (scheme.equals("file")) {
+					String fileName = uri.getEncodedPath();
+					myFile = new File(fileName);
+				} else if (!scheme.equals("content")) {
+					//error
+					return;
+				}
+
+				boolean save = uri.getPath().endsWith(saveExtension);
+				boolean map = uri.getPath().endsWith(mapExtension);
+
+				InputStream inStream;
+				if (myFile != null) inStream = new FileInputStream(myFile);
+				else inStream = getContentResolver().openInputStream(uri);
+
+				Gdx.app.postRunnable(() -> {
+
+					if(save){ //open save
+						System.out.println("Opening save.");
+						FileHandle file = Gdx.files.local("temp-save." + saveExtension);
+						file.write(inStream, false);
+
+						if(SaveIO.isSaveValid(file)){
+							try{
+								SaveSlot slot = control.getSaves().importSave(file);
+								ui.load.runLoadSave(slot);
+							}catch (IOException e){
+								ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e, false)));
+							}
+						}else{
+							ui.showError("$text.save.import.invalid");
+						}
+
+					}else if(map){ //open map
+						Gdx.app.postRunnable(() -> {
+							System.out.println("Opening map.");
+							if (!ui.editor.isShown()) {
+								ui.editor.show();
+							}
+
+							ui.editor.beginEditMap(inStream);
+						});
+					}
+				});
+			}
+
+		}catch (IOException e){
+			e.printStackTrace();
 		}
 	}
 	

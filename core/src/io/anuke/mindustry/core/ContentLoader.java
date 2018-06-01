@@ -16,64 +16,69 @@ import io.anuke.ucore.util.Log;
 /**Loads all game content.
  * Call load() before doing anything with content.*/
 public class ContentLoader {
+    private static boolean loaded = false;
+    private static ContentList[] content = {
+        //effects
+        new BlockFx(),
+        new BulletFx(),
+        new EnvironmentFx(),
+        new ExplosionFx(),
+        new Fx(),
+        new ShootFx(),
+        new UnitFx(),
+
+        //items
+        new Items(),
+
+        //status effects
+        new StatusEffects(),
+
+        //liquids
+        new Liquids(),
+
+        //bullets
+        new ArtilleryBullets(),
+        new FlakBullets(),
+        new MissileBullets(),
+        new ShellBullets(),
+        new StandardBullets(),
+        new TurretBullets(),
+
+        //ammotypes
+        new AmmoTypes(),
+
+        //mechs
+        new Mechs(),
+
+        //weapons
+        new Weapons(),
+
+        //blocks
+        new Blocks(),
+        new DefenseBlocks(),
+        new DistributionBlocks(),
+        new ProductionBlocks(),
+        new WeaponBlocks(),
+        new DebugBlocks(),
+        new LiquidBlocks(),
+        new StorageBlocks(),
+        new UnitBlocks(),
+        new PowerBlocks(),
+        new CraftingBlocks(),
+
+        //recipes
+        new Recipes(),
+
+        //units
+        new UnitTypes(),
+    };
+
 
     public static void load(){
-
-        ContentList[] content = {
-            //effects
-            new BlockFx(),
-            new BulletFx(),
-            new EnvironmentFx(),
-            new ExplosionFx(),
-            new Fx(),
-            new ShootFx(),
-            new UnitFx(),
-
-            //items
-            new Items(),
-
-            //status effects
-            new StatusEffects(),
-
-            //liquids
-            new Liquids(),
-
-            //bullets
-            new ArtilleryBullets(),
-            new FlakBullets(),
-            new MissileBullets(),
-            new ShellBullets(),
-            new StandardBullets(),
-            new TurretBullets(),
-
-            //ammotypes
-            new AmmoTypes(),
-
-            //mechs
-            new Mechs(),
-
-            //weapons
-            new Weapons(),
-
-            //blocks
-            new Blocks(),
-            new DefenseBlocks(),
-            new DistributionBlocks(),
-            new ProductionBlocks(),
-            new WeaponBlocks(),
-            new DebugBlocks(),
-            new LiquidBlocks(),
-            new StorageBlocks(),
-            new UnitBlocks(),
-            new PowerBlocks(),
-            new CraftingBlocks(),
-
-            //recipes
-            new Recipes(),
-
-            //units
-            new UnitTypes(),
-        };
+        if(loaded){
+            Log.info("Content already loaded, skipping.");
+            return;
+        }
 
         for (ContentList list : content){
             list.load();
@@ -89,5 +94,11 @@ public class ContentLoader {
                 io.anuke.mindustry.type.Mech.all().size, UnitType.getAllTypes().size, io.anuke.mindustry.type.AmmoType.all().size, BulletType.all().size, StatusEffect.getAllEffects().size, io.anuke.mindustry.type.Recipe.all().size, Effects.all().size, content.length);
 
         Log.info("-------------------");
+
+        loaded = true;
+    }
+
+    public static void dispose(){
+        //TODO clear all content.
     }
 }

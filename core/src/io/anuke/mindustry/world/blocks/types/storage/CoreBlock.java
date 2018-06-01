@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Rectangle;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
