@@ -62,7 +62,7 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public boolean isDrawing(){
-        return mode != none;
+        return mode != none || recipe != null;
     }
 
     @Override
@@ -167,7 +167,7 @@ public class DesktopInput extends InputHandler{
 
 	@Override
     public boolean touchDown (int screenX, int screenY, int pointer, int button) {
-        if(player.isDead() || state.is(State.menu) || ui.hasDialog()) return false;
+        if(player.isDead() || state.is(State.menu) || ui.hasDialog() || ui.hasMouse()) return false;
 
         Tile cursor = tileAt(screenX, screenY);
         if(cursor == null) return false;

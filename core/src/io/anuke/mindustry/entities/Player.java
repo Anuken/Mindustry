@@ -255,7 +255,9 @@ public class Player extends Unit implements BlockBuilder {
 	        drawBuilding(this);
         }
 
-		trail.draw(Palette.lighterOrange, Palette.lightishOrange, 5f);
+		if(isFlying()){
+	    	trail.draw(Palette.lighterOrange, Palette.lightishOrange, 5f);
+		}
     }
 
     public void drawName(){
