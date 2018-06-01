@@ -33,42 +33,42 @@ public class DesktopLauncher {
 		config.setWindowedMode(960, 540);
 		config.setWindowIcon("sprites/icon.png");
 
-		Application.getApplication().setOpenFileHandler(e -> {
-			List<File> list = e.getFiles();
-
-			File target = list.get(0);
-
-			Gdx.app.postRunnable(() -> {
-				FileHandle file = OS.getAppDataDirectory("Mindustry").child("tmp").child(target.getName());
-
-				Gdx.files.absolute(target.getAbsolutePath()).copyTo(file);
-
-				if(file.extension().equalsIgnoreCase(saveExtension)){ //open save
-
-					if(SaveIO.isSaveValid(file)){
-						try{
-							SaveSlot slot = control.getSaves().importSave(file);
-							ui.load.runLoadSave(slot);
-						}catch (IOException e2){
-							ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e2, false)));
-						}
-					}else{
-						ui.showError("$text.save.import.invalid");
-					}
-
-				}else if(file.extension().equalsIgnoreCase(mapExtension)){ //open map
-					Gdx.app.postRunnable(() -> {
-						if (!ui.editor.isShown()) {
-							ui.editor.show();
-						}
-
-						ui.editor.beginEditMap(file.read());
-					});
-				}
-			});
-		});
-
 		if(OS.isMac) {
+            Application.getApplication().setOpenFileHandler(e -> {
+                List<File> list = e.getFiles();
+
+                File target = list.get(0);
+
+                Gdx.app.postRunnable(() -> {
+                    FileHandle file = OS.getAppDataDirectory("Mindustry").child("tmp").child(target.getName());
+
+                    Gdx.files.absolute(target.getAbsolutePath()).copyTo(file);
+
+                    if(file.extension().equalsIgnoreCase(saveExtension)){ //open save
+
+                        if(SaveIO.isSaveValid(file)){
+                            try{
+                                SaveSlot slot = control.getSaves().importSave(file);
+                                ui.load.runLoadSave(slot);
+                            }catch (IOException e2){
+                                ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e2, false)));
+                            }
+                        }else{
+                            ui.showError("$text.save.import.invalid");
+                        }
+
+                    }else if(file.extension().equalsIgnoreCase(mapExtension)){ //open map
+                        Gdx.app.postRunnable(() -> {
+                            if (!ui.editor.isShown()) {
+                                ui.editor.show();
+                            }
+
+                            ui.editor.beginEditMap(file.read());
+                        });
+                    }
+                });
+            });
+
             config.setPreferencesConfig(OS.getAppDataDirectoryString("Mindustry"), FileType.Absolute);
         }
 

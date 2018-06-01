@@ -5,11 +5,8 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.world.Tile;
 
-/**Wrapper around an ObjectMap for team data.*/
+/**Class for various team-based utilities.*/
 public class TeamInfo {
-    private final static ObjectSet<Team> empty = new ObjectSet<>();
-    private final static ObjectSet<TeamData> emptyData = new ObjectSet<>();
-
     private ObjectMap<Team, TeamData> map = new ObjectMap<>();
     private ObjectSet<Team> allies = new ObjectSet<>(),
             enemies = new ObjectSet<>();

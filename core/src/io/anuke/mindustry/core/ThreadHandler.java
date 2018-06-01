@@ -105,7 +105,9 @@ public class ThreadHandler {
                     toRun.clear();
                 }
 
+                logic.doUpdate = true;
                 logic.update();
+                logic.doUpdate = false;
 
                 long elapsed = TimeUtils.timeSinceMillis(time);
                 long target = (long) (1000 / 60f);
