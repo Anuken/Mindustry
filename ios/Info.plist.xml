@@ -67,7 +67,7 @@
             <string>Owner</string>
             <key>LSItemContentTypes</key>
             <array>
-                <string>public.png</string>
+                <string>io.anuke.mindustry.mapfile</string>
                 <string>io.anuke.mindustry.savefile</string>
             </array>
         </dict>
@@ -87,24 +87,32 @@
             <key>UTTypeTagSpecification</key>
             <dict>
                 <key>public.filename-extension</key>
-                <string>mins</string>
+                <string>msav</string>
                 <key>public.mime-type</key>
-                <string>mindustry/mins</string>
+                <string>mindustry/msav</string>
             </dict>
         </dict>
     </array>
-    <!--<key>CFBundleIcons</key>
-    <dict>
-        <key>CFBundlePrimaryIcon</key>
+
+    <key>UTExportedTypeDeclarations</key>
+    <array>
         <dict>
-            <key>CFBundleIconFiles</key>
+            <key>UTTypeConformsTo</key>
             <array>
-                <string>icon</string>
-                <string>icon-72</string>
-                <string>icon-120</string>
-                <string>icon-152</string>
+                <string>public.data</string>
             </array>
+            <key>UTTypeDescription</key>
+            <string>Mindustry Map File</string>
+            <key>UTTypeIdentifier</key>
+            <string>io.anuke.mindustry.mapfile</string>
+            <key>UTTypeTagSpecification</key>
+            <dict>
+                <key>public.filename-extension</key>
+                <string>mmap</string>
+                <key>public.mime-type</key>
+                <string>mindustry/mmap</string>
+            </dict>
         </dict>
-    </dict>-->
+    </array>
 </dict>
 </plist>
