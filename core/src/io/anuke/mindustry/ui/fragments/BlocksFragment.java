@@ -245,7 +245,9 @@ public class BlocksFragment implements Fragment{
 			cati ++;
 		}
 
-		group.getButtons().get(checkedi).setChecked(true);
+		if(group.getButtons().size > 0){
+			group.getButtons().get(checkedi).setChecked(true);
+		}
 
 		selectTable.row();
 		selectTable.add(stack).colspan(Category.values().length).padBottom(-5).height((size + 12)*maxrow);

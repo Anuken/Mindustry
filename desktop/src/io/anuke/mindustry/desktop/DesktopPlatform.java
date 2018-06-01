@@ -12,6 +12,7 @@ import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.OS;
 import io.anuke.ucore.util.Strings;
 
@@ -34,8 +35,6 @@ public class DesktopPlatform extends Platform {
 
     public DesktopPlatform(String[] args){
         this.args = args;
-
-
 
         if(useDiscord) {
             DiscordEventHandlers handlers = new DiscordEventHandlers();
@@ -60,7 +59,7 @@ public class DesktopPlatform extends Platform {
 
     @Override
     public void showError(String text){
-        //JOptionPane.showMessageDialog(null, text);
+
     }
 
     @Override

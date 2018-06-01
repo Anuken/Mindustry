@@ -11,6 +11,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -19,23 +20,28 @@ import com.google.android.gms.security.ProviderInstaller;
 import io.anuke.kryonet.DefaultThreadImpl;
 import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
-import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.mindustry.core.Platform;
+import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
 
 public class AndroidLauncher extends AndroidApplication{
+	public static final int PERMISSION_REQUEST_CODE = 1;
+
 	boolean doubleScaleTablets = true;
-	int WRITE_REQUEST_CODE = 1;
+	FileChooser chooser;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -79,22 +85,7 @@ public class AndroidLauncher extends AndroidApplication{
 
 			@Override
 			public void requestWritePerms() {
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
-							checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-						requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
-								Manifest.permission.READ_EXTERNAL_STORAGE}, WRITE_REQUEST_CODE);
-					}else{
 
-						if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-							requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_REQUEST_CODE);
-						}
-
-						if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-							requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, WRITE_REQUEST_CODE);
-						}
-					}
-				}
 			}
 
 			@Override
@@ -137,6 +128,34 @@ public class AndroidLauncher extends AndroidApplication{
                     return Base64Coder.decode(uuid);
 				}
 			}
+
+			@Override
+			public void shareFile(FileHandle file){
+
+			}
+
+			@Override
+			public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filetype) {
+				chooser = new FileChooser(text, file -> file.extension().equalsIgnoreCase(filetype), open, cons);
+
+				if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+						checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
+					chooser.show();
+					chooser = null;
+				}else {
+					ArrayList<String> perms = new ArrayList<>();
+
+					if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+						perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+					}
+
+					if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+						perms.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+					}
+
+					requestPermissions(perms.toArray(new String[perms.size()]), PERMISSION_REQUEST_CODE);
+				}
+			}
 		};
 
 		try {
@@ -158,6 +177,19 @@ public class AndroidLauncher extends AndroidApplication{
         Net.setServerProvider(new KryoServer());
 
         initialize(new Mindustry(), config);
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+		if(requestCode == PERMISSION_REQUEST_CODE){
+			for(int i : grantResults){
+				if(i != PackageManager.PERMISSION_GRANTED) return;
+			}
+
+			if(chooser != null){
+				chooser.show();
+			}
+		}
 	}
 	
 	private boolean isPackageInstalled(String packagename) {

@@ -518,6 +518,8 @@ public class AndroidInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY){
+        if(ui.hasMouse()) return false;
+
         //can't pan in line mode with one finger!
         if(lineMode && !Gdx.input.isTouched(1)){
             return false;

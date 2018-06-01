@@ -25,7 +25,20 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.EDIT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="file"  android:host="*" android:pathPattern=".*\\.msav" android:mimeType="application/io.anuke.mindustry.save"  />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.EDIT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="file"  android:host="*" android:pathPattern=".*\\.mmap" android:mimeType="application/io.anuke.mindustry.map"  />
+            </intent-filter>
         </activity>
+
 
         <activity android:name=".DonationsActivity"
             android:theme="@style/GdxTheme" />

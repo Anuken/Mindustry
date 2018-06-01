@@ -15,7 +15,6 @@ import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.io.MapMeta;
 import io.anuke.mindustry.io.MapTileData;
-import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
@@ -54,7 +53,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
 	private MapResizeDialog resizeDialog;
 	private ScrollPane pane;
 	private FloatingDialog menu;
-	private FileChooser openFile, saveFile, openImage, saveImage;
 	private boolean saved = false;
 	private boolean shownWithMap = false;
 	
@@ -67,67 +65,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
 		view = new MapView(editor);
 
 		infoDialog = new MapInfoDialog(editor);
-
-		saveFile = new FileChooser("$text.saveimage", false, file -> {
-			file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
-			FileHandle result = file;
-			ui.loadAnd(() -> {
-
-				try{
-					if(!editor.getTags().containsKey("name")){
-						editor.getTags().put("name", result.nameWithoutExtension());
-					}
-					MapIO.writeMap(result.write(false), editor.getTags(), editor.getMap());
-				}catch (Exception e){
-					ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
-					Log.err(e);
-				}
-			});
-		});
-
-		openFile = new FileChooser("$text.loadimage", FileChooser.mapFilter, true, file -> {
-			ui.loadAnd(() -> {
-				try{
-					DataInputStream stream = new DataInputStream(file.read());
-
-					MapMeta meta = MapIO.readMapMeta(stream);
-					MapTileData data = MapIO.readTileData(stream, meta, false);
-
-					editor.beginEdit(data, meta.tags);
-					view.clearStack();
-				}catch (Exception e){
-					ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
-					Log.err(e);
-				}
-			});
-		});
-
-		saveImage = new FileChooser("$text.saveimage", false, file -> {
-			file = file.parent().child(file.nameWithoutExtension() + ".png");
-			FileHandle result = file;
-			ui.loadAnd(() -> {
-				try{
-					Pixmaps.write(MapIO.generatePixmap(editor.getMap()), result);
-				}catch (Exception e){
-					ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
-					Log.err(e);
-				}
-			});
-		});
-
-		openImage = new FileChooser("$text.loadimage", FileChooser.pngFilter, true, file -> {
-			ui.loadAnd(() -> {
-				try{
-					MapTileData data = MapIO.readPixmap(new Pixmap(file));
-
-					editor.beginEdit(data, editor.getTags());
-					view.clearStack();
-				}catch (Exception e){
-					ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
-					Log.err(e);
-				}
-			});
-		});
 
 		menu = new FloatingDialog("$text.menu");
 		menu.addCloseButton();
@@ -157,22 +94,79 @@ public class MapEditorDialog extends Dialog implements Disposable{
 			t.addImageTextButton("$text.editor.import", "icon-load-map", isize, () ->
 				createDialog("$text.editor.import",
 						"$text.editor.importmap", "$text.editor.importmap.description", "icon-load-map", (Listenable)loadDialog::show,
-						"$text.editor.importfile", "$text.editor.importfile.description", "icon-file", (Listenable)openFile::show,
+						"$text.editor.importfile", "$text.editor.importfile.description", "icon-file", (Listenable)() -> {
+							Platform.instance.showFileChooser("$text.loadimage", "Map Files", file -> {
+								ui.loadAnd(() -> {
+									try{
+										DataInputStream stream = new DataInputStream(file.read());
+
+										MapMeta meta = MapIO.readMapMeta(stream);
+										MapTileData data = MapIO.readTileData(stream, meta, false);
+
+										editor.beginEdit(data, meta.tags);
+										view.clearStack();
+									}catch (Exception e){
+										ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
+										Log.err(e);
+									}
+								});
+							}, true, mapExtension);
+						},
 						"$text.editor.importimage", "$text.editor.importimage.description", "icon-file-image", (Listenable)() -> {
 							if(gwt){
 								ui.showError("text.web.unsupported");
 							}else {
-								openImage.show();
+								Platform.instance.showFileChooser("$text.loadimage", "Image Files", file -> {
+									ui.loadAnd(() -> {
+										try{
+											MapTileData data = MapIO.readPixmap(new Pixmap(file));
+
+											editor.beginEdit(data, editor.getTags());
+											view.clearStack();
+										}catch (Exception e){
+											ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
+											Log.err(e);
+										}
+									});
+								}, true, "png");
 							}
 						}));
 
 			t.addImageTextButton("$text.editor.export", "icon-save-map", isize, () -> createDialog("$text.editor.export",
-					"$text.editor.exportfile", "$text.editor.exportfile.description", "icon-file", (Listenable)saveFile::show,
+					"$text.editor.exportfile", "$text.editor.exportfile.description", "icon-file", (Listenable)() -> {
+						Platform.instance.showFileChooser("$text.saveimage", "Map Files", file -> {
+							file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
+							FileHandle result = file;
+							ui.loadAnd(() -> {
+
+								try{
+									if(!editor.getTags().containsKey("name")){
+										editor.getTags().put("name", result.nameWithoutExtension());
+									}
+									MapIO.writeMap(result.write(false), editor.getTags(), editor.getMap());
+								}catch (Exception e){
+									ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
+									Log.err(e);
+								}
+							});
+						}, false, mapExtension);
+					},
 					"$text.editor.exportimage", "$text.editor.exportimage.description", "icon-file-image", (Listenable)() -> {
 						if(gwt){
 							ui.showError("text.web.unsupported");
 						}else {
-							saveImage.show();
+							Platform.instance.showFileChooser("$text.saveimage", "Image Files", file -> {
+								file = file.parent().child(file.nameWithoutExtension() + ".png");
+								FileHandle result = file;
+								ui.loadAnd(() -> {
+									try{
+										Pixmaps.write(MapIO.generatePixmap(editor.getMap()), result);
+									}catch (Exception e){
+										ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
+										Log.err(e);
+									}
+								});
+							}, false, "png");
 						}
 					}));
 
@@ -374,6 +368,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 	}
 	
 	public void build(){
+		float size = 60;
 		
 		new table(){{
 			aleft();
@@ -387,7 +382,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 				ButtonGroup<ImageButton> group = new ButtonGroup<>();
 				int i = 1;
 
-				tools.defaults().size(60f, 64f).padBottom(-5.1f);
+				tools.defaults().size(size, size + 4f).padBottom(-5.1f);
 
 				//tools.addImageButton("icon-back", 16*2, () -> hide());
 
@@ -432,7 +427,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
 				tools.table("button", t -> {
 					t.add("$text.editor.teams");
-				}).colspan(2).height(40).width(120f);
+				}).colspan(2).height(40).width(size*2f);
 
 				tools.row();
 
@@ -456,13 +451,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
 				row();
 
 				new table("button"){{
+					atop();
 					Slider slider = new Slider(0, MapEditor.brushSizes.length-1, 1, false);
 					slider.moved(f -> editor.setBrushSize(MapEditor.brushSizes[(int)(float)f]));
 					new label("brush");
 					//new label(() -> Bundles.format("text.editor.brushsize", MapEditor.brushSizes[(int)slider.getValue()])).left();
 					row();
-					add(slider).width(100f).padTop(4f);
-				}}.padBottom(10).padTop(5).top().end();
+					add(slider).width(size*2f-20).padTop(4f);
+				}}.padTop(5).growY().top().end();
 				
 			}}.left().growY().end();
 

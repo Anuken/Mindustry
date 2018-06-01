@@ -9,7 +9,6 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.scene.ui.TextField;
 
-import java.io.InputStream;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
@@ -67,16 +66,14 @@ public abstract class Platform {
 	public void shareFile(FileHandle file){}
 	/**Download a file. Only used on GWT backend.*/
 	public void downloadFile(String name, byte[] bytes){}
-	/**Open a file chooser. Only used on GWT backend.*/
-	public void openFile(Consumer<InputStream> cons){}
 
     /**Show a file chooser. Desktop only.
      *
      * @param text File chooser title text
-     * @param content Type of files to be loaded
+     * @param content Description of the type of files to be loaded
      * @param cons Selection listener
-     * @param open Whether to open or save files.
-     * @param filetype File extensions to filter.
+     * @param open Whether to open or save files
+     * @param filetype File extension to filter
      */
 	public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filetype){}
 	/**Use the default thread provider from the kryonet module for this.*/
