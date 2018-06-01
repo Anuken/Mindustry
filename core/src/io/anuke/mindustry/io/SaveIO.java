@@ -4,6 +4,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.IntMap;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.versions.Save16;
 import io.anuke.ucore.core.Settings;
 
@@ -103,7 +104,7 @@ public class SaveIO{
 	}
 	
 	public static FileHandle fileFor(int slot){
-		return saveDirectory.child(slot  + ".mins");
+		return saveDirectory.child(slot  + "." + Vars.saveExtension);
 	}
 
 	public static void write(FileHandle file){

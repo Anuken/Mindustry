@@ -264,7 +264,6 @@ public class FileChooser extends FloatingDialog {
 
 	@Override
 	public Dialog show(){
-		Platform.instance.requestWritePerms();
 		Timers.runTask(2f, () -> {
 			content().clear();
 			setupWidgets();

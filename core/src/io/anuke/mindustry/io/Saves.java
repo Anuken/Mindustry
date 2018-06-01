@@ -3,6 +3,7 @@ package io.anuke.mindustry.io;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
@@ -11,9 +12,7 @@ import io.anuke.ucore.core.Timers;
 
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.gwt;
-import static io.anuke.mindustry.Vars.saveSlots;
-import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.*;
 
 public class Saves {
     private int nextSlot;
@@ -170,7 +169,7 @@ public class Saves {
         public void exportFile(FileHandle file) throws IOException{
             try{
                 if(!file.extension().equals("mins")){
-                    file = file.parent().child(file.nameWithoutExtension() + ".mins");
+                    file = file.parent().child(file.nameWithoutExtension() + "." + Vars.saveExtension);
                 }
                 SaveIO.fileFor(index).copyTo(file);
             }catch (Exception e){

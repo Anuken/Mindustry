@@ -84,11 +84,6 @@ public class AndroidLauncher extends AndroidApplication{
 			}
 
 			@Override
-			public void requestWritePerms() {
-
-			}
-
-			@Override
 			public ThreadProvider getThreadProvider() {
 				return new DefaultThreadImpl();
 			}

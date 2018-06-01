@@ -3,6 +3,7 @@ package io.anuke.mindustry.ui.dialogs;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.io.SaveIO;
@@ -97,7 +98,7 @@ public class LoadDialog extends FloatingDialog{
 							}, false, "mins");
                         }else{
 					        try {
-                                FileHandle file = Gdx.files.local("save-" + slot.getName() + ".mins");
+                                FileHandle file = Gdx.files.local("save-" + slot.getName() + "." + Vars.saveExtension);
                                 slot.exportFile(file);
                                 Platform.instance.shareFile(file);
                             }catch (Exception e){

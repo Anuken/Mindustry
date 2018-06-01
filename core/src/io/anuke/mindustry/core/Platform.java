@@ -37,8 +37,6 @@ public abstract class Platform {
 	public void openDonations(){}
 	/**Whether discord RPC is supported.*/
 	public boolean hasDiscord(){return true;}
-	/**Request Android permissions for writing files.*/
-	public void requestWritePerms(){}
 	/**Return the localized name for the locale. This is basically a workaround for GWT not supporting getName().*/
 	public String getLocaleName(Locale locale){
 		return locale.toString();
