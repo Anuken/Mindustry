@@ -25,7 +25,6 @@ import io.anuke.ucore.util.Timer;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
-
 import static io.anuke.mindustry.Vars.*;
 
 public class NetServer extends Module{
@@ -44,7 +43,10 @@ public class NetServer extends Module{
 
     public NetServer(){
 
-        Events.on(GameOverEvent.class, () -> weapons.clear());
+        Events.on(GameOverEvent.class, () -> {
+			weapons.clear();
+			admins.getEditLogs().clear();
+		});
 
         Net.handleServer(Connect.class, (id, connect) -> {
             if(admins.isIPBanned(connect.addressTCP)){
@@ -211,6 +213,7 @@ public class NetServer extends Module{
 
             Placement.placeBlock(packet.x, packet.y, block, packet.rotation, true, false);
 
+            admins.logEdit(packet.x, packet.y, connections.get(id), block, packet.rotation, EditLog.EditAction.PLACE);
             admins.getTrace(Net.getConnection(id).address).lastBlockPlaced = block;
             admins.getTrace(Net.getConnection(id).address).totalBlocksPlaced ++;
             admins.getInfo(admins.getTrace(Net.getConnection(id).address).uuid).totalBlockPlaced ++;
@@ -235,6 +238,7 @@ public class NetServer extends Module{
             Block block = Placement.breakBlock(packet.x, packet.y, true, false);
 
             if(block != null) {
+                admins.logEdit(packet.x, packet.y, connections.get(id), block, tile.getRotation(), EditLog.EditAction.BREAK);
                 admins.getTrace(Net.getConnection(id).address).lastBlockBroken = block;
                 admins.getTrace(Net.getConnection(id).address).totalBlocksBroken++;
                 admins.getInfo(admins.getTrace(Net.getConnection(id).address).uuid).totalBlocksBroken ++;
@@ -312,7 +316,7 @@ public class NetServer extends Module{
             packet.id = connections.get(id).id;
             Net.sendExcept(id, packet, SendMode.tcp);
         });
-
+        
         Net.handleServer(AdministerRequestPacket.class, (id, packet) -> {
             Player player = connections.get(id);
 
@@ -344,6 +348,24 @@ public class NetServer extends Module{
                 Net.sendTo(id, trace, SendMode.tcp);
                 Log.info("&lc{0} has requested trace info of {1}.", player.name, other.name);
             }
+        });
+    
+        Net.handleServer(BlockLogRequestPacket.class, (id, packet) -> {
+            packet.editlogs = admins.getEditLogs().get(packet.x + packet.y * world.width(), new Array<>());
+            Net.sendTo(id, packet, SendMode.udp);
+        });
+    
+        Net.handleServer(RollbackRequestPacket.class, (id, packet) -> {
+            Player player = connections.get(id);
+    
+            if(!player.isAdmin){
+                Log.err("ACCESS DENIED: Player {0} / {1} attempted to perform a rollback without proper security access.",
+                        player.name, Net.getConnection(player.clientid).address);
+                return;
+            }
+            
+            admins.rollbackWorld(packet.rollbackTimes);
+            Log.info("&lc{0} has rolled back the world {1} times.", player.name, packet.rollbackTimes);
         });
     }
 
@@ -474,7 +496,7 @@ public class NetServer extends Module{
             packet.wave = state.wave;
             packet.time = Timers.time();
             packet.timestamp = TimeUtils.millis();
-
+           
             Net.send(packet, SendMode.udp);
         }
     }

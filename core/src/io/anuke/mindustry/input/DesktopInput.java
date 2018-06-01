@@ -107,6 +107,17 @@ public class DesktopInput extends InputHandler{
                 Cursors.restoreCursor();
             }
 		}
+		
+		if(recipe == null && !ui.hasMouse() && Inputs.keyDown("block_logs")) {
+			showCursor = true;
+			if(Inputs.keyTap("select")){
+				NetEvents.handleBlockLogRequest(getBlockX(), getBlockY());
+				Timers.runTask(20f, () -> {
+					ui.hudfrag.blockfrag.showBlockLogs(getBlockX(), getBlockY());
+					Cursors.restoreCursor();
+				});
+			}
+		}
 
         if(target != null && target.block().isConfigurable(target)){
 		    showCursor = true;
