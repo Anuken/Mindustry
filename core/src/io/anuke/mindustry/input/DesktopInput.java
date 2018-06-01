@@ -61,6 +61,11 @@ public class DesktopInput extends InputHandler{
     }
 
     @Override
+    public boolean isDrawing(){
+        return mode != none;
+    }
+
+    @Override
     public void drawBottom(){
         Tile cursor = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
 

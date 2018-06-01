@@ -14,6 +14,8 @@ public class CrashHandler {
         //TODO send full error report to server via HTTP
         e.printStackTrace();
 
+
+
         //attempt to close connections, if applicable
         try{
             Net.dispose();

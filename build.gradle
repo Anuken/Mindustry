@@ -86,7 +86,7 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
         compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.0'
-        //compile 'com.yuvimasory:orange-extensions:1.3.0'
+        compile 'com.yuvimasory:orange-extensions:1.3.0'
     }
 }
 

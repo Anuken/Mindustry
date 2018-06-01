@@ -81,6 +81,10 @@ public abstract class InputHandler extends InputAdapter{
 
 	}
 
+	public boolean isDrawing(){
+		return false;
+	}
+
 	/**Handles tile tap events that are not platform specific.*/
 	public boolean tileTapped(Tile tile){
 		tile = tile.target();

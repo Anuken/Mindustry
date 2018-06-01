@@ -26,6 +26,8 @@ public class OverlayRenderer {
         for(Player player : players) {
             InputHandler input = control.input(player.playerIndex);
 
+            if(!input.isDrawing()) continue;
+
             Shaders.outline.color.set(Palette.accent);
             Graphics.beginShaders(Shaders.outline);
 

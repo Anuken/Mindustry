@@ -216,6 +216,11 @@ public class AndroidInput extends InputHandler implements GestureListener{
     }
 
     @Override
+    public boolean isDrawing(){
+        return selection.size > 0 || removals.size > 0;
+    }
+
+    @Override
 	public void drawBottom(){
 
         Shaders.mix.color.set(Palette.accent);
