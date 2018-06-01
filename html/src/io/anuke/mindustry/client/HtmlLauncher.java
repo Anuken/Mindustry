@@ -5,6 +5,7 @@ import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
 import com.badlogic.gdx.backends.gwt.preloader.Preloader.PreloaderCallback;
 import com.badlogic.gdx.backends.gwt.preloader.Preloader.PreloaderState;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
@@ -19,7 +20,10 @@ import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.function.Consumer;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.Random;
 
@@ -27,7 +31,7 @@ public class HtmlLauncher extends GwtApplication {
     static final int WIDTH = 800;
     static final int HEIGHT = 600;
     static HtmlLauncher instance;
-    boolean canJoin = true;
+    static Consumer<FileHandle> fileCons;
     
     @Override
     public PreloaderCallback getPreloaderCallback () {
@@ -46,7 +50,6 @@ public class HtmlLauncher extends GwtApplication {
 		preloaderPanel.add(meterPanel);
 		getRootPanel().add(preloaderPanel);
 		return new PreloaderCallback() {
-
 			@Override
 			public void error (String file) {
 				System.out.println("error: " + file);
@@ -55,8 +58,7 @@ public class HtmlLauncher extends GwtApplication {
 			@Override
 			public void update (PreloaderState state) {
 				meterStyle.setWidth(100f * state.getProgress(), Unit.PCT);
-			}			
-			
+			}
 		};
 	}
 
@@ -99,8 +101,16 @@ public class HtmlLauncher extends GwtApplication {
         
         Platform.instance = new Platform(){
         	DateTimeFormat format = DateTimeFormat.getFormat("EEE, dd MMM yyyy HH:mm:ss");
-			
-			@Override
+
+            @Override
+            public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filetype) {
+                if(!open) return; //can't save files on gwt
+
+                fileCons = cons;
+                createFileChooser();
+            }
+
+            @Override
 			public String format(Date date){
 				return format.format(date);
 			}
@@ -130,6 +140,11 @@ public class HtmlLauncher extends GwtApplication {
                     return result;
                 }
                 return Base64Coder.decode(uuid);
+            }
+
+            @Override
+            public void downloadFile(String name, byte[] bytes) {
+                downloadBytes(name, new String(Base64Coder.encode(bytes)));
             }
         };
         
@@ -165,6 +180,38 @@ public class HtmlLauncher extends GwtApplication {
         }
     }
 
+    native void createFileChooser() /*-{
+        function getBase64(file, callback) {
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(){ callback(reader.result); }
+            reader.onerror = function(error){ console.log(error); }
+        }
+
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.onchange = function() {
+           getBase64(input.files[0], function(data){ @io.anuke.mindustry.client.HtmlLauncher::handleFileSelect(Ljava/lang/String;)(data); });
+        };
+        input.click();
+    }-*/;
+
+    native void downloadBytes(String name, String base64) /*-{
+        var binaryString = window.atob(base64);
+        var binaryLen = binaryString.length;
+        var bytes = new Uint8Array(binaryLen);
+        for (var i = 0; i < binaryLen; i++) {
+           var ascii = binaryString.charCodeAt(i);
+           bytes[i] = ascii;
+        }
+
+        var blob = new Blob([bytes]);
+        var link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = name;
+        link.click();
+    }-*/;
+
     native int getWindowInnerWidth() /*-{
         return $wnd.innerWidth;
     }-*/;
@@ -180,5 +227,15 @@ public class HtmlLauncher extends GwtApplication {
 
     public static void handleResize() {
         instance.scaleCanvas();
+    }
+
+    public static void handleFileSelect(String base64){
+        ByteArrayInputStream stream = new ByteArrayInputStream(Base64Coder.decode(base64.substring("data:;base64,".length())));
+        fileCons.accept(new FileHandle(){
+            @Override
+            public InputStream read() {
+                return stream;
+            }
+        });
     }
 }

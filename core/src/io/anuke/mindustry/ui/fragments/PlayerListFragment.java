@@ -3,7 +3,6 @@ package io.anuke.mindustry.ui.fragments;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.gen.CallClient;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.NetEvents;
@@ -161,12 +160,12 @@ public class PlayerListFragment implements Fragment{
                         if(netServer.admins.isAdmin(id, connection.address)){
                             ui.showConfirm("$text.confirm", "$text.confirmunadmin", () -> {
                                 netServer.admins.unAdminPlayer(id);
-                                CallClient.adminSet(player, false);
+                                //CallClient.adminSet(player, false);
                             });
                         }else{
                             ui.showConfirm("$text.confirm", "$text.confirmadmin", () -> {
                                 netServer.admins.adminPlayer(id, connection.address);
-                                CallClient.adminSet(player,  true);
+                                //CallClient.adminSet(player,  true);
                             });
                         }
                     }).update(b ->{

@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
-import io.anuke.mindustry.gen.CallClient;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packet.UnimportantPacket;
@@ -42,7 +41,8 @@ public class Packets {
             type = buffer.get();
 
             if(Net.client()){
-                CallClient.readPacket(buffer, type);
+                //TODO implement
+                //CallClient.readPacket(buffer, type);
             }else{
                 byte[] bytes = new byte[writeLength];
                 buffer.get(bytes);

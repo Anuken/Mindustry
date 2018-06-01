@@ -1,7 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.gen.CallClient;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
@@ -49,7 +48,7 @@ public class AdminsDialog extends FloatingDialog {
                     for(Player player : playerGroup.all()){
                         NetConnection c = Net.getConnection(player.clientid);
                         if(c != null){
-                            CallClient.adminSet(player, false);
+                            //CallClient.adminSet(player, false);
                             break;
                         }
                     }

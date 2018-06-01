@@ -39,9 +39,7 @@ import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -134,22 +132,33 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
 			t.addImageTextButton("$text.editor.export", "icon-save-map", isize, () -> createDialog("$text.editor.export",
 					"$text.editor.exportfile", "$text.editor.exportfile.description", "icon-file", (Listenable)() -> {
-						Platform.instance.showFileChooser("$text.saveimage", "Map Files", file -> {
-							file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
-							FileHandle result = file;
-							ui.loadAnd(() -> {
+						if(!gwt) {
+							Platform.instance.showFileChooser("$text.saveimage", "Map Files", file -> {
+								file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
+								FileHandle result = file;
+								ui.loadAnd(() -> {
 
-								try{
-									if(!editor.getTags().containsKey("name")){
-										editor.getTags().put("name", result.nameWithoutExtension());
+									try {
+										if (!editor.getTags().containsKey("name")) {
+											editor.getTags().put("name", result.nameWithoutExtension());
+										}
+										MapIO.writeMap(result.write(false), editor.getTags(), editor.getMap());
+									} catch (Exception e) {
+										ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
+										Log.err(e);
 									}
-									MapIO.writeMap(result.write(false), editor.getTags(), editor.getMap());
-								}catch (Exception e){
-									ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
-									Log.err(e);
-								}
-							});
-						}, false, mapExtension);
+								});
+							}, false, mapExtension);
+						}else{
+							try {
+								ByteArrayOutputStream ba = new ByteArrayOutputStream();
+								MapIO.writeMap(ba, editor.getTags(), editor.getMap());
+								Platform.instance.downloadFile(editor.getTags().get("name", "unknown") + "." + mapExtension, ba.toByteArray());
+							}catch (IOException e){
+								ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
+								Log.err(e);
+							}
+						}
 					},
 					"$text.editor.exportimage", "$text.editor.exportimage.description", "icon-file-image", (Listenable)() -> {
 						if(gwt){
