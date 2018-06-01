@@ -89,8 +89,7 @@ public abstract class GroundUnitType extends UnitType{
     public void updateTargeting(BaseUnit unit) {
         super.updateTargeting(unit);
 
-        if(unit.target != null && unit.inventory.hasAmmo() &&
-                !(unit.target instanceof TileEntity) && unit.target.distanceTo(unit) > unit.inventory.getAmmo().getRange()){
+        if(Units.invalidateTarget(unit.target, unit)){
             unit.target = null;
         }
     }

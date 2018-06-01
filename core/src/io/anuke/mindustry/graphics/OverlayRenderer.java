@@ -31,7 +31,7 @@ public class OverlayRenderer {
             Shaders.outline.color.set(Palette.accent);
             Graphics.beginShaders(Shaders.outline);
 
-            input.drawBottom();
+            input.drawOutlined();
 
             Graphics.endShaders();
         }

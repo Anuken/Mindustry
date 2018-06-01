@@ -20,7 +20,10 @@ import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.Block;
-import io.anuke.ucore.core.*;
+import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
@@ -33,15 +36,12 @@ import io.anuke.ucore.graphics.Surface;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.core.Core.batch;
 import static io.anuke.ucore.core.Core.camera;
 
 public class Renderer extends RendererModule{
-	private final static float shieldHitDuration = 18f;
-	
 	public Surface effectSurface;
 	
 	private int targetscale = baseCameraScale;
@@ -143,15 +143,18 @@ public class Renderer extends RendererModule{
 			Graphics.clear(Color.BLACK);
 		}else{
             Vector2 position = averagePosition();
+            boolean flying = players[0].isFlying();
 
-            setCamera(position.x, position.y);
+            if(!flying){
+            	setCamera(position.x, position.y);
+			}
+
+			clampCamera(-tilesize / 2f, -tilesize / 2f + 1, world.width() * tilesize - tilesize / 2f, world.height() * tilesize - tilesize / 2f);
 
 			float prex = camera.position.x, prey = camera.position.y;
 			updateShake(0.75f);
-			clampCamera(-tilesize / 2f, -tilesize / 2f + 1, world.width() * tilesize - tilesize / 2f, world.height() * tilesize - tilesize / 2f);
 
 			float deltax = camera.position.x - prex, deltay = camera.position.y - prey;
-
 			float lastx = camera.position.x, lasty = camera.position.y;
 			
 			if(snapCamera){
@@ -243,6 +246,7 @@ public class Renderer extends RendererModule{
 			Entities.drawWith(playerGroup, p -> p.isFlying() == flying && p.team == team, Unit::drawUnder);
 
 			Shaders.outline.color.set(team.color);
+			Shaders.mix.color.set(Color.WHITE);
 
 			Graphics.beginShaders(Shaders.outline);
 			Graphics.shader(Shaders.mix, true);
@@ -326,57 +330,6 @@ public class Renderer extends RendererModule{
 		}
 
 		Draw.color();
-	}
-
-	void drawShield(){
-		if(shieldGroup.size() == 0 && shieldDraws.size == 0) return;
-		
-		Graphics.surface(renderer.effectSurface, false);
-		Draw.color(Color.ROYAL);
-		Entities.draw(shieldGroup);
-		for(Callable c : shieldDraws){
-			c.run();
-		}
-		Draw.reset();
-		Graphics.surface();
-		
-		for(int i = 0; i < shieldHits.size / 3; i++){
-			float time = shieldHits.get(i * 3 + 2);
-
-			time += Timers.delta() / shieldHitDuration;
-			shieldHits.set(i * 3 + 2, time);
-
-			if(time >= 1f){
-				shieldHits.removeRange(i * 3, i * 3 + 2);
-				i--;
-			}
-		}
-
-		Texture texture = effectSurface.texture();
-		Shaders.shield.color.set(Color.SKY);
-
-		Tmp.tr2.setRegion(texture);
-		Shaders.shield.region = Tmp.tr2;
-		Shaders.shield.hits = shieldHits;
-		
-		if(Shaders.shield.isFallback){
-			Draw.color(1f, 1f, 1f, 0.3f);
-			Shaders.outline.color = Color.SKY;
-			Shaders.outline.region = Tmp.tr2;
-		}
-
-		Graphics.end();
-		Graphics.shader(Shaders.shield.isFallback ? Shaders.outline : Shaders.shield);
-		Graphics.setScreen();
-
-		Core.batch.draw(texture, 0, Gdx.graphics.getHeight(), Gdx.graphics.getWidth(), -Gdx.graphics.getHeight());
-
-		Graphics.shader();
-		Graphics.end();
-		Graphics.beginCam();
-		
-		Draw.color();
-		shieldDraws.clear();
 	}
 
 	public BlockRenderer getBlocks() {

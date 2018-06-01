@@ -30,6 +30,11 @@ public interface BlockBuilder {
     /**Returns the queue for storing build requests.*/
     Queue<BuildRequest> getPlaceQueue();
 
+    /**Return whether this builder's place queue contains items.*/
+    default boolean isBuilding(){
+        return getPlaceQueue().size != 0;
+    }
+
     /**If a place request matching this signature is present, it is removed.
      * Otherwise, a new place request is added to the queue.*/
     default void replaceBuilding(int x, int y, int rotation, Recipe recipe){

@@ -1,6 +1,5 @@
 package io.anuke.mindustry.entities.units;
 
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.type.AmmoType;
@@ -59,7 +58,7 @@ public class FlyingUnitType extends UnitType {
     }
 
     protected void circle(BaseUnit unit, float circleLength){
-        vec.set(unit.target.x - unit.x, unit.target.y - unit.y);
+        vec.set(unit.target.getX() - unit.x, unit.target.getY() - unit.y);
 
         if(vec.len() < circleLength){
             vec.rotate((circleLength-vec.len())/circleLength * 180f);
@@ -71,7 +70,7 @@ public class FlyingUnitType extends UnitType {
     }
 
     protected void attack(BaseUnit unit, float circleLength){
-        vec.set(unit.target.x - unit.x, unit.target.y - unit.y);
+        vec.set(unit.target.getX() - unit.x, unit.target.getY() - unit.y);
 
         float ang = unit.angleTo(unit.target);
         float diff = Angles.angleDist(ang, unit.rotation);
@@ -113,8 +112,7 @@ public class FlyingUnitType extends UnitType {
         }
 
         public void update(BaseUnit unit) {
-            if(unit.target != null && (unit.target instanceof TileEntity &&
-                    (((TileEntity)unit.target).tile.getTeam() == unit.team || !((TileEntity)unit.target).tile.breakable()))){
+            if(Units.invalidateTarget(unit.target, unit.team, unit.x, unit.y)){
                 unit.target = null;
             }
 

@@ -69,7 +69,7 @@ public class Drone extends FlyingUnitType {
             Shapes.laser("beam", "beam-end",
                     unit.x + Angles.trnsx(unit.rotation, len),
                     unit.y + Angles.trnsy(unit.rotation, len),
-                    unit.target.x, unit.target.y);
+                    unit.target.getX(), unit.target.getY());
             Draw.color();
         }
     }

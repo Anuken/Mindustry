@@ -21,7 +21,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
-public abstract class Unit extends SyncEntity implements SerializableEntity {
+public abstract class Unit extends SyncEntity implements SerializableEntity, Targetable {
     /**total duration of hit flash effect*/
     public static final float hitDuration = 9f;
 
@@ -173,6 +173,11 @@ public abstract class Unit extends SyncEntity implements SerializableEntity {
         }else{
             super.damage(amount);
         }
+    }
+
+    @Override
+    public Vector2 getVelocity() {
+        return velocity;
     }
 
     public void drawUnder(){}

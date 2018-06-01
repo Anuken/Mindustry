@@ -53,6 +53,11 @@ public class UnitInventory {
         }
     }
 
+    /**Returns ammo range, or MAX_VALUE if this inventory has no ammo.*/
+    public float getAmmoRange(){
+        return hasAmmo() ? getAmmo().getRange() : Float.MAX_VALUE;
+    }
+
     public AmmoType getAmmo() {
         return ammos.size == 0 ? null : ammos.peek().type;
     }

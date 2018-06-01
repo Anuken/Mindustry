@@ -1,7 +1,9 @@
 package io.anuke.mindustry.entities;
 
+import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.world.Block;
@@ -23,19 +25,19 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.tileGroup;
 import static io.anuke.mindustry.Vars.world;
 
-public class TileEntity extends Entity{
+public class TileEntity extends Entity implements Targetable{
 	public static final float timeToSleep = 60f*4; //4 seconds to fall asleep
 	public static int sleepingEntities = 0;
 
 	public Tile tile;
 	public Timer timer;
 	public float health;
-	public boolean dead = false;
 
 	public PowerModule power;
 	public InventoryModule items;
 	public LiquidModule liquids;
 
+	private boolean dead = false;
 	private boolean sleeping;
 	private float sleepTime;
 	
@@ -82,7 +84,11 @@ public class TileEntity extends Entity{
 			sleepingEntities --;
 		}
 	}
-	
+
+	public boolean isDead() {
+		return dead;
+	}
+
 	public void write(DataOutputStream stream) throws IOException{}
 	public void read(DataInputStream stream) throws IOException{}
 	
@@ -128,7 +134,17 @@ public class TileEntity extends Entity{
 			NetEvents.handleBlockDamaged(this);
 		}
 	}
-	
+
+	@Override
+	public Team getTeam() {
+		return tile.getTeam();
+	}
+
+	@Override
+	public Vector2 getVelocity() {
+		return Vector2.Zero;
+	}
+
 	@Override
 	public void update(){
 		synchronized (Tile.tileSetLock) {

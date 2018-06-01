@@ -73,7 +73,7 @@ public abstract class InputHandler extends InputAdapter{
 
 	}
 
-	public void drawBottom(){
+	public void drawOutlined(){
 
 	}
 

@@ -1,15 +1,15 @@
 package io.anuke.mindustry.entities.units;
 
-import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.bullet.BulletType;
+import io.anuke.mindustry.entities.Targetable;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.BlockFlag;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
@@ -26,7 +26,7 @@ public class BaseUnit extends Unit{
 	public Timer timer = new Timer(5);
 	public float walkTime = 0f;
 	public StateMachine state = new StateMachine();
-	public Entity target;
+	public Targetable target;
 
 	public BaseUnit(UnitType type, Team team){
 		this.type = type;

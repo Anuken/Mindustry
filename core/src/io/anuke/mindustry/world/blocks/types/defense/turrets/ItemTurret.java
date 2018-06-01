@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.types.defense.turrets;
 
 import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.type.AmmoEntry;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
@@ -10,7 +11,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.defense.Turret;
 
 public class ItemTurret extends Turret {
-    protected int maxammo = 100;
+    protected int maxAmmo = 100;
     //TODO implement this!
     /**A value of 'null' means this turret does not need ammo.*/
     protected AmmoType[] ammoTypes;
@@ -18,6 +19,24 @@ public class ItemTurret extends Turret {
 
     public ItemTurret(String name) {
         super(name);
+        hasItems = true;
+    }
+
+    @Override
+    public int acceptStack(Item item, int amount, Tile tile, Unit source) {
+        TurretEntity entity = tile.entity();
+
+        AmmoType type = ammoMap.get(item);
+
+        if(type == null) return 0;
+
+        return Math.min((int)((maxAmmo - entity.totalAmmo) / ammoMap.get(item).quantityMultiplier), amount);
+    }
+
+    //currently can't remove items from turrets.
+    @Override
+    public int removeStack(Tile tile, Item item, int amount) {
+        return 0;
     }
 
     @Override
@@ -26,6 +45,7 @@ public class ItemTurret extends Turret {
 
         AmmoType type = ammoMap.get(item);
         entity.totalAmmo += type.quantityMultiplier;
+        entity.items.addItem(item, 1);
 
         //find ammo entry by type
         for(int i = 0; i < entity.ammo.size; i ++){
@@ -48,12 +68,12 @@ public class ItemTurret extends Turret {
     public boolean acceptItem(Item item, Tile tile, Tile source){
         TurretEntity entity = tile.entity();
 
-        return ammoMap != null && ammoMap.get(item) != null && entity.totalAmmo + ammoMap.get(item).quantityMultiplier <= maxammo;
+        return ammoMap != null && ammoMap.get(item) != null && entity.totalAmmo + ammoMap.get(item).quantityMultiplier <= maxAmmo;
     }
 
     @Override
     public void setBars(){
-        bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.<TurretEntity>entity().totalAmmo / maxammo));
+        bars.replace(new BlockBar(BarType.inventory, true, tile -> (float)tile.<TurretEntity>entity().totalAmmo / maxAmmo));
     }
 
     @Override

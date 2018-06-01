@@ -20,6 +20,36 @@ import static io.anuke.mindustry.Vars.*;
 public class Units {
     private static Rectangle rect = new Rectangle();
 
+    /**Validates a target.
+     * @param target The target to validate
+     * @param team The team of the thing doing tha targeting
+     * @param x The X position of the thing doign the targeting
+     * @param y The Y position of the thing doign the targeting
+     * @param range The maximum distance from the target X/Y the targeter can be for it to be valid
+     * @return whether the target is invalid
+     */
+    public static boolean invalidateTarget(Targetable target, Team team, float x, float y, float range){
+        if(target == null){
+            return false;
+        }
+
+        if(range != Float.MAX_VALUE && target.distanceTo(x, y) > range){
+            return false;
+        }
+
+        return target.getTeam() == team || !target.isValid();
+    }
+
+    /**See {@link #invalidateTarget(Targetable, Team, float, float, float)}*/
+    public static boolean invalidateTarget(Targetable target, Team team, float x, float y){
+        return invalidateTarget(target, team, x, y, Float.MAX_VALUE);
+    }
+
+    /**See {@link #invalidateTarget(Targetable, Team, float, float, float)}*/
+    public static boolean invalidateTarget(Targetable target, Unit targeter){
+        return invalidateTarget(target, targeter.team, targeter.x, targeter.y, targeter.inventory.getAmmoRange());
+    }
+
     /**Returns whether there are any entities on this tile.*/
     public static boolean anyEntities(Tile tile){
         Block type = tile.block();
@@ -95,6 +125,16 @@ public class Units {
         }
     }
 
+    /**Returns the closest target enemy. First, units are checked, then tile entities.*/
+    public static Targetable getClosestTarget(Team team, float x, float y, float range){
+        Unit unit = getClosestEnemy(team, x, y, range, u -> true);
+        if(unit != null){
+            return unit;
+        }else{
+            return findEnemyTile(team, x, y, range, tile -> true);
+        }
+    }
+
     /**Returns the closest enemy of this team. Filter by predicate.*/
     public static Unit getClosestEnemy(Team team, float x, float y, float range, Predicate<Unit> predicate){
         Unit[] result = {null};
@@ -103,7 +143,7 @@ public class Units {
         rect.setSize(range*2f).setCenter(x, y);
 
         getNearbyEnemies(team, rect, e -> {
-            if (!predicate.test(e))
+            if (e.isDead() || !predicate.test(e))
                 return;
 
             float dist = Vector2.dst(e.x, e.y, x, y);

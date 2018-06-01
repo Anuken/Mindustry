@@ -8,8 +8,15 @@ public class Predict {
     private static Vector2 vec = new Vector2();
     private static Vector2 vresult = new Vector2();
 
-    /**Returns resulting predicted vector.
-     * Don't call from multiple threads.*/
+    /**Calculates of intercept of a stationary and moving target. Do not call from multiple threads!
+     * @param srcx X of shooter
+     * @param srcy Y of shooter
+     * @param dstx X of target
+     * @param dsty Y of target
+     * @param dstvx X velocity of target (subtract shooter X velocity if needed)
+     * @param dstvy Y velocity of target (subtract shooter Y velocity if needed)
+     * @param v speed of bullet
+     * @return the intercept location*/
     public static Vector2 intercept(float srcx, float srcy, float dstx, float dsty, float dstvx, float dstvy, float v) {
         float tx = dstx - srcx,
                 ty = dsty - srcy,

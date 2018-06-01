@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
@@ -13,6 +14,9 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.Targetable;
+import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
@@ -20,16 +24,12 @@ import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.table;
-import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
@@ -41,7 +41,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
     /**Maximum speed the player can pan.*/
     private static final float maxPanSpeed = 1.3f;
     /**Distance to edge of screen to start panning.*/
-    private final float edgePan = Unit.dp.scl(60f);
+    private final float edgePan = io.anuke.ucore.scene.ui.layout.Unit.dp.scl(60f);
 
     //gesture data
     private Vector2 pinch1 = new Vector2(-1, -1), pinch2 = pinch1.cpy();
@@ -54,6 +54,9 @@ public class AndroidInput extends InputHandler implements GestureListener{
 
     /**Animation scale for line.*/
     private float lineScale;
+    /**Animation data for crosshair.*/
+    private float crosshairScale;
+    private Targetable lastTarget;
 
     /**List of currently selected tiles to place.*/
     private Array<PlaceRequest> selection = new Array<>();
@@ -72,6 +75,24 @@ public class AndroidInput extends InputHandler implements GestureListener{
 	    super(player);
 		Inputs.addProcessor(new GestureDetector(20, 0.5f, 0.4f, 0.15f, this));
 	}
+
+	//region utility methods
+
+    /**Check and assign targets for a specific position.*/
+    void checkTargets(float x, float y){
+	    Unit unit = Units.getClosestEnemy(player.team, x, y, 20f, u -> true);
+
+	    if(unit != null){
+            player.target = unit;
+        }else{
+            Tile tile = world.tileWorld(x, y);
+            if(tile != null) tile = tile.target();
+
+            if(tile != null && state.teams.areEnemies(player.team, tile.getTeam())){
+                player.target = tile.entity;
+            }
+        }
+    }
 
 	/**Returns whether this tile is in the list of requests, or at least colliding with one.*/
 	boolean hasRequest(Tile tile){
@@ -156,6 +177,10 @@ public class AndroidInput extends InputHandler implements GestureListener{
         }
     }
 
+    //endregion
+
+    //region UI and drawing
+
     @Override
     public void buildUI(Group group) {
 
@@ -217,11 +242,11 @@ public class AndroidInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean isDrawing(){
-        return selection.size > 0 || removals.size > 0;
+        return selection.size > 0 || removals.size > 0 || lineMode || player.target != null;
     }
 
     @Override
-	public void drawBottom(){
+	public void drawOutlined(){
 
         Shaders.mix.color.set(Palette.accent);
         Graphics.shader(Shaders.mix);
@@ -321,8 +346,30 @@ public class AndroidInput extends InputHandler implements GestureListener{
             }
         }
 
-        Draw.color();
+        //draw targeting crosshair
+        if(player.target != null){
+            if(player.target != lastTarget){
+                crosshairScale = 0f;
+                lastTarget = player.target;
+            }
+
+            crosshairScale = Mathf.lerpDelta(crosshairScale, 1f, 0.2f);
+
+            Draw.color(Palette.remove);
+            Lines.stroke(1f);
+
+            float radius = Interpolation.swingIn.apply(crosshairScale);
+
+            Lines.poly(player.target.getX(), player.target.getY(), 4, 7f * radius, Timers.time()*1.5f);
+            Lines.spikes(player.target.getX(), player.target.getY(), 3f * radius, 6f * radius, 4, Timers.time()*1.5f);
+        }
+
+        Draw.reset();
     }
+
+    //endregion
+
+    //region input events
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button){
@@ -432,6 +479,8 @@ public class AndroidInput extends InputHandler implements GestureListener{
     public boolean tap(float x, float y, int count, int button) {
         if(state.is(State.menu) || lineMode) return false;
 
+        checkTargets(Graphics.world(x, y).x, Graphics.world(x, y).y);
+
         //get tile on cursor
         Tile cursor = tileAt(x, y);
 
@@ -502,9 +551,9 @@ public class AndroidInput extends InputHandler implements GestureListener{
                 vector.set(panX, panY).scl((Core.camera.viewportWidth * Core.camera.zoom) / Gdx.graphics.getWidth());
                 vector.limit(maxPanSpeed);
 
-                player.x += vector.x;
-                player.y += vector.y;
-                player.targetAngle = vector.angle();
+                //pan view
+                Core.camera.position.x += vector.x;
+                Core.camera.position.y += vector.y;
             }
         }else{
 	        lineScale = 0f;
@@ -540,9 +589,8 @@ public class AndroidInput extends InputHandler implements GestureListener{
             }
         }else{
 	        //pan player
-            player.x -= dx;
-            player.y += dy;
-            player.targetAngle = Mathf.atan2(dx, -dy) + 180f;
+            Core.camera.position.x -= dx;
+            Core.camera.position.y += dy;
         }
 
         return false;
@@ -577,9 +625,9 @@ public class AndroidInput extends InputHandler implements GestureListener{
             initzoom = initialDistance;
         }
 
-        if(Math.abs(distance - initzoom) > Unit.dp.scl(100f) && !zoomed){
+        if(Math.abs(distance - initzoom) > io.anuke.ucore.scene.ui.layout.Unit.dp.scl(100f) && !zoomed){
             int amount = (distance > initzoom ? 1 : -1);
-            renderer.scaleCamera(Math.round(Unit.dp.scl(amount)));
+            renderer.scaleCamera(Math.round(io.anuke.ucore.scene.ui.layout.Unit.dp.scl(amount)));
             initzoom = distance;
             zoomed = true;
             return true;
@@ -597,6 +645,8 @@ public class AndroidInput extends InputHandler implements GestureListener{
 
     @Override public boolean touchDown(float x, float y, int pointer, int button) { return false; }
     @Override public boolean fling(float velocityX, float velocityY, int button) { return false; }
+
+    //endregion
 
     class PlaceRequest{
 	    float x, y;

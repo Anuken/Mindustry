@@ -1,16 +1,14 @@
 package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.utils.ObjectMap;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.Fx;
-import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Mathf;
@@ -44,7 +42,7 @@ public class Weapon extends Upgrade {
 		super(name);
 	}
 
-	public void update(Player p, boolean left){
+	public void update(Player p, boolean left, float pointerX, float pointerY){
 		int t = left ? 1 : 2;
 		int t2 = !left ? 1 : 2;
 		if(p.inventory.hasAmmo() && p.timer.get(t, reload)){
@@ -52,8 +50,7 @@ public class Weapon extends Upgrade {
 				p.timer.reset(t2, reload/2f);
 			}
 
-			tr.set(Graphics.world(Vars.control.input(p.playerIndex).getMouseX(),
-                    Vars.control.input(p.playerIndex).getMouseY())).sub(p.x, p.y);
+			tr.set(pointerX, pointerY).sub(p.x, p.y);
 			if(tr.len() < minPlayerDist) tr.setLength(minPlayerDist);
 
 			float cx = tr.x + p.x, cy = tr.y + p.y;

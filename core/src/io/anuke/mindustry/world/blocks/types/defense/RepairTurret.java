@@ -38,7 +38,7 @@ public class RepairTurret extends PowerTurret {
 			return;
 		}
 		
-		if(entity.blockTarget != null && entity.blockTarget.dead){
+		if(entity.blockTarget != null && entity.blockTarget.isDead()){
 			entity.blockTarget = null;
 		}
 		

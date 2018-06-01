@@ -79,7 +79,7 @@ public abstract class Turret extends Block{
 		super.setStats();
 		/*
 		if(ammo != null) stats.add("ammo", ammo);
-		if(ammo != null) stats.add("ammocapacity", maxammo);
+		if(ammo != null) stats.add("ammocapacity", maxAmmo);
 		if(ammo != null) stats.add("ammoitem", ammoMultiplier);*/
 		stats.add("range", (int)range);
 		stats.add("inaccuracy", (int)inaccuracy);

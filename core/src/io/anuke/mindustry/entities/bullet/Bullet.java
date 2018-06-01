@@ -95,7 +95,7 @@ public class Bullet extends BulletEntity<BulletType>{
 				if (tile == null) return false;
 				tile = tile.target();
 
-				if (tile.entity != null && tile.entity.collide(this) && !tile.entity.dead && tile.entity.tile.getTeam() != team) {
+				if (tile.entity != null && tile.entity.collide(this) && !tile.entity.isDead() && tile.entity.tile.getTeam() != team) {
 					tile.entity.collision(this);
 					remove();
 					type.hit(this);

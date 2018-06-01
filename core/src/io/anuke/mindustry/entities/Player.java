@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Queue;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.content.fx.ExplosionFx;
@@ -14,16 +15,14 @@ import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Trail;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.mindustry.world.blocks.types.storage.CoreBlock.CoreEntity;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.SolidEntity;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
@@ -38,9 +37,13 @@ import java.nio.ByteBuffer;
 import static io.anuke.mindustry.Vars.*;
 
 public class Player extends Unit implements BlockBuilder {
-	private static final float speed = 1.1f;
+	private static final float walkSpeed = 1.1f;
+	private static final float flySpeed = 0.4f;
+	private static final float flyMaxSpeed = 3f;
 	private static final float dashSpeed = 1.8f;
 	private static final Vector2 movement = new Vector2();
+
+	//region instance variables, constructor
 
 	public String name = "name";
 	public String uuid;
@@ -51,17 +54,16 @@ public class Player extends Unit implements BlockBuilder {
 	public Weapon weapon = Weapons.blaster;
 	public Mech mech = Mechs.standard;
 
-	public float targetAngle = 0f;
-	public boolean dashing = false;
-
 	public int clientid = -1;
 	public int playerIndex = 0;
 	public boolean isLocal = false;
 	public Timer timer = new Timer(4);
+	public Targetable target;
 
 	private boolean respawning;
 	private float walktime;
 	private Queue<BuildRequest> placeQueue = new Queue<>();
+	private Trail trail = new Trail(16);
 	
 	public Player(){
 		hitbox.setSize(5);
@@ -71,9 +73,23 @@ public class Player extends Unit implements BlockBuilder {
 		heal();
 	}
 
+	//endregion
+
+	//region unit and event overrides, utility methods
+
 	@Override
 	public float getArmor() {
 		return 0f;
+	}
+
+	@Override
+	public boolean acceptsAmmo(Item item) {
+		return weapon.getAmmoType(item) != null && inventory.canAcceptAmmo(weapon.getAmmoType(item));
+	}
+
+	@Override
+	public void addAmmo(Item item) {
+		inventory.addAmmo(weapon.getAmmoType(item));
 	}
 
 	@Override
@@ -131,14 +147,33 @@ public class Player extends Unit implements BlockBuilder {
 	}
 
 	@Override
-	public void onRemoteDeath(){
+	public void onRemoteDeath() {
 		dead = true;
 		respawning = false;
 		Effects.effect(ExplosionFx.explosion, this);
 		Effects.shake(4f, 5f, this);
 		Effects.sound("die", this);
 	}
-	
+
+	@Override
+	public Player set(float x, float y){
+		this.x = x;
+		this.y = y;
+		if(isFlying() && isLocal){
+			Core.camera.position.set(x, y, 0f);
+		}
+		return this;
+	}
+
+	@Override
+	public Player add(){
+		return add(playerGroup);
+	}
+
+	//endregion
+
+	//region draw methods
+
 	@Override
 	public void drawSmooth(){
 		if((debug && (!showPlayer || !showUI)) || dead) return;
@@ -219,6 +254,8 @@ public class Player extends Unit implements BlockBuilder {
 	    if(!isShooting() && getCurrentRequest() != null && !dead) {
 	        drawBuilding(this);
         }
+
+		trail.draw(Palette.lighterOrange, Palette.lightishOrange, 5f);
     }
 
     public void drawName(){
@@ -284,7 +321,11 @@ public class Player extends Unit implements BlockBuilder {
 
 		Draw.reset();
 	}
-	
+
+	//endregion
+
+	//region update methods
+
 	@Override
 	public void update(){
 		hitTime = Math.max(0f, hitTime - Timers.delta());
@@ -309,6 +350,11 @@ public class Player extends Unit implements BlockBuilder {
 			updateMech();
 		}
 
+		float wobblyness = 0.6f;
+
+		trail.update(x + Angles.trnsx(rotation + 180f, 6f) + Mathf.range(wobblyness),
+				y + Angles.trnsy(rotation + 180f, 6f) + Mathf.range(wobblyness));
+
 		if(!isShooting()) {
 			updateBuilding(this);
 		}
@@ -316,26 +362,6 @@ public class Player extends Unit implements BlockBuilder {
 		x = Mathf.clamp(x, 0, world.width() * tilesize);
 		y = Mathf.clamp(y, 0, world.height() * tilesize);
 	}
-
-	/**Resets all values of the player.*/
-	public void reset(){
-		weapon = Weapons.blaster;
-		team = Team.blue;
-		inventory.clear();
-		upgrades.clear();
-		placeQueue.clear();
-
-		add();
-		heal();
-	}
-
-	public boolean isShooting(){
-	    return control.input(playerIndex).canShoot() && control.input(playerIndex).isShooting() && inventory.hasAmmo();
-    }
-
-    public Queue<BuildRequest> getPlaceQueue(){
-	    return placeQueue;
-    }
 
 	protected void updateMech(){
 		Tile tile = world.tileWorld(x, y);
@@ -347,9 +373,7 @@ public class Player extends Unit implements BlockBuilder {
 
 		if(ui.chatfrag.chatOpen()) return;
 
-		dashing = Inputs.keyDown("dash");
-
-		float speed = dashing ? (debug ? Player.dashSpeed * 5f : Player.dashSpeed) : Player.speed ;
+		float speed = Inputs.keyDown("dash") ? (debug ? Player.dashSpeed * 5f : Player.dashSpeed) : Player.walkSpeed;
 
 		float carrySlowdown = 0.3f;
 
@@ -370,8 +394,12 @@ public class Player extends Unit implements BlockBuilder {
 		boolean shooting = isShooting();
 
 		if(shooting){
-			weapon.update(this, true);
-			weapon.update(this, false);
+			Vector2 vec = Graphics.world(Vars.control.input(playerIndex).getMouseX(),
+					Vars.control.input(playerIndex).getMouseY());
+			float vx = vec.x, vy = vec.y;
+
+			weapon.update(this, true, vx, vy);
+			weapon.update(this, false, vx, vy);
 		}
 
 		movement.limit(speed);
@@ -396,38 +424,93 @@ public class Player extends Unit implements BlockBuilder {
 	}
 
 	protected void updateFlying(){
-		rotation = Mathf.slerpDelta(rotation, targetAngle, 0.1f);
-	}
-
-	@Override
-	public Player set(float x, float y){
-		this.x = x;
-		this.y = y;
-		if(mobile && !isLocal){
-			Core.camera.position.set(x, y, 0f);
+		if(Units.invalidateTarget(target, this)){
+			target = null;
 		}
-		return this;
+
+		float targetX = Core.camera.position.x, targetY = Core.camera.position.y;
+		float attractDst = 15f;
+
+		movement.set(targetX - x, targetY - y).limit(flySpeed);
+		movement.setAngle(Mathf.slerpDelta(movement.angle(), velocity.angle(), 0.05f));
+
+		if(distanceTo(targetX, targetY) < attractDst){
+			movement.setZero();
+		}
+
+		velocity.add(movement);
+		updateVelocityStatus(0.1f, flyMaxSpeed);
+
+		//hovering effect
+		x += Mathf.sin(Timers.time() + id * 999, 25f, 0.08f);
+		y += Mathf.cos(Timers.time() + id * 999, 25f, 0.08f);
+
+		if(velocity.len() <= 0.2f){
+			rotation += Mathf.sin(Timers.time() + id * 99, 10f, 1f);
+		}else{
+			rotation = Mathf.slerpDelta(rotation, velocity.angle(), velocity.len()/10f);
+		}
+
+		//update shooting if not building and there's ammo left
+		if(!isBuilding() && inventory.hasAmmo()){
+
+			//autofire: mobile only!
+			if(mobile) {
+				if (target == null) {
+					target = Units.getClosestTarget(team, x, y, inventory.getAmmoRange());
+				} else {
+					//rotate toward and shoot the target
+					rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
+
+					Vector2 intercept =
+							Predict.intercept(x, y, target.getX(), target.getY(), target.getVelocity().x - velocity.x, target.getVelocity().y - velocity.y, inventory.getAmmo().bullet.speed);
+
+					weapon.update(this, true, intercept.x, intercept.y);
+					weapon.update(this, false, intercept.x, intercept.y);
+				}
+			}else if(isShooting()){ //desktop shooting, TODO
+				Vector2 vec = Graphics.world(Vars.control.input(playerIndex).getMouseX(),
+						Vars.control.input(playerIndex).getMouseY());
+				float vx = vec.x, vy = vec.y;
+
+				weapon.update(this, true, vx, vy);
+				weapon.update(this, false, vx, vy);
+			}
+		}
 	}
 
-	@Override
-	public boolean acceptsAmmo(Item item) {
-		return weapon.getAmmoType(item) != null && inventory.canAcceptAmmo(weapon.getAmmoType(item));
+	//endregion
+
+	//region utility methods
+
+	/**Resets all values of the player.*/
+	public void reset(){
+		weapon = Weapons.blaster;
+		team = Team.blue;
+		inventory.clear();
+		upgrades.clear();
+		placeQueue.clear();
+
+		add();
+		heal();
 	}
 
-	@Override
-	public void addAmmo(Item item) {
-		inventory.addAmmo(weapon.getAmmoType(item));
+	public boolean isShooting(){
+		return control.input(playerIndex).canShoot() && control.input(playerIndex).isShooting() && inventory.hasAmmo();
 	}
 
-	@Override
-	public Player add(){
-		return add(playerGroup);
+	public Queue<BuildRequest> getPlaceQueue(){
+		return placeQueue;
 	}
 
     @Override
     public String toString() {
         return "Player{" + id + ", mech=" + mech.name + ", local=" + isLocal + ", " + x + ", " + y + "}\n";
     }
+
+    //endregion
+
+    //region read and write methods
 
 	@Override
 	public void writeSave(DataOutputStream stream) throws IOException {
@@ -502,7 +585,6 @@ public class Player extends Unit implements BlockBuilder {
 		data.putFloat(rotation);
 		data.putFloat(baseRotation);
 		data.putShort((short)health);
-		data.put((byte)(dashing ? 1 : 0));
 	}
 
 	@Override
@@ -515,8 +597,9 @@ public class Player extends Unit implements BlockBuilder {
 		byte dashing = data.get();
 
 		this.health = health;
-		this.dashing = dashing == 1;
 
 		interpolator.read(this.x, this.y, x, y, rot, baseRot, time);
 	}
+
+	//endregion
 }
