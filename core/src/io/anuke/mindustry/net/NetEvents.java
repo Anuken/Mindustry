@@ -177,4 +177,20 @@ public class NetEvents {
             ui.traces.show(target, netServer.admins.getTrace(Net.getConnection(target.clientid).address));
         }
     }
+    
+    public static void handleBlockLogRequest(int x, int y) {
+        BlockLogRequestPacket packet = new BlockLogRequestPacket();
+        packet.x = x;
+        packet.y = y;
+        packet.editlogs = Vars.currentEditLogs;
+        
+        Net.send(packet, SendMode.udp);
+    }
+    
+    public static void handleRollbackRequest(int rollbackTimes) {
+        RollbackRequestPacket packet = new RollbackRequestPacket();
+        packet.rollbackTimes = rollbackTimes;
+    
+        Net.send(packet, SendMode.udp);
+    }
 }

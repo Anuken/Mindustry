@@ -17,6 +17,8 @@ public class Registrator {
             PlacePacket.class,
             BreakPacket.class,
             StateSyncPacket.class,
+            BlockLogRequestPacket.class,
+            RollbackRequestPacket.class,
             BlockSyncPacket.class,
             BulletPacket.class,
             EnemyDeathPacket.class,
@@ -44,7 +46,7 @@ public class Registrator {
             NetErrorPacket.class,
             PlayerAdminPacket.class,
             AdministerRequestPacket.class,
-            TracePacket.class,
+            TracePacket.class
     };
     private static ObjectIntMap<Class<?>> ids = new ObjectIntMap<>();
 
