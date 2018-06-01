@@ -251,11 +251,9 @@ public class ServerControl extends Module {
         handler.register("friendlyfire", "<on/off>", "Enable or disable friendly fire.", arg -> {
             String s = arg[0];
             if(s.equalsIgnoreCase("on")){
-                NetEvents.handleFriendlyFireChange(true);
                 state.friendlyFire = true;
                 info("Friendly fire enabled.");
             }else if(s.equalsIgnoreCase("off")){
-                NetEvents.handleFriendlyFireChange(false);
                 state.friendlyFire = false;
                 info("Friendly fire disabled.");
             }else{
@@ -447,7 +445,6 @@ public class ServerControl extends Module {
 
             if(target != null){
                 netServer.admins.adminPlayer(target.uuid, Net.getConnection(target.clientid).address);
-                NetEvents.handleAdminSet(target, true);
                 info("Admin-ed player by ID: {0} / {1}", target.uuid, arg[0]);
             }else{
                 info("Nobody with that name could be found.");
@@ -471,7 +468,6 @@ public class ServerControl extends Module {
 
             if(target != null){
                 netServer.admins.unAdminPlayer(target.uuid);
-                NetEvents.handleAdminSet(target, false);
                 info("Un-admin-ed player by ID: {0} / {1}", target.uuid, arg[0]);
             }else{
                 info("Nobody with that name could be found.");

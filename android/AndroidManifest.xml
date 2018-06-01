@@ -34,7 +34,9 @@
                 <data android:mimeType="application/octet-stream"/>
             </intent-filter>
 
-            <intent-filter>
+            <intent-filter android:icon="@mipmap/ic_launcher"
+                           android:label="Mindustry Map"
+                           android:priority="1">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:scheme="file"   android:host="*" android:pathPattern=".*\\.mmap"  android:mimeType="*/*"  />
