@@ -3,7 +3,11 @@ package io.anuke.mindustry.ui.dialogs;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Scaling;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.io.Map;
+import io.anuke.mindustry.io.MapIO;
+import io.anuke.mindustry.io.MapMeta;
+import io.anuke.mindustry.io.MapTileData;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.Image;
@@ -11,15 +15,48 @@ import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Strings;
 
-import static io.anuke.mindustry.Vars.ui;
-import static io.anuke.mindustry.Vars.world;
+import java.io.DataInputStream;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class MapsDialog extends FloatingDialog {
 
     public MapsDialog() {
         super("$text.maps");
+
         addCloseButton();
+        buttons().addImageTextButton("$text.editor.importmap", "icon-add", 14*2, () -> {
+            Platform.instance.showFileChooser("$text.editor.importmap", "Map File", file -> {
+                try{
+                    DataInputStream stream = new DataInputStream(file.read());
+                    MapMeta meta = MapIO.readMapMeta(stream);
+                    MapTileData data = MapIO.readTileData(stream, meta, true);
+                    stream.close();
+
+                    String name = meta.tags.get("name", file.nameWithoutExtension());
+
+                    if(world.maps().getByName(name) != null && !world.maps().getByName(name).custom){
+                        ui.showError(Bundles.format("text.editor.import.exists", name));
+                    }else if(world.maps().getByName(name) != null){
+                        ui.showConfirm("$text.confirm", "$text.editor.overwrite.confirm", () -> {
+                            world.maps().saveMap(name, data, meta.tags);
+                            setup();
+                        });
+                    }else{
+                        world.maps().saveMap(name, data, meta.tags);
+                        setup();
+                    }
+
+                }catch (Exception e){
+                    ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
+                    Log.err(e);
+                }
+            }, true, mapExtension);
+        }).size(230f, 64f);
+
         shown(this::setup);
     }
 
@@ -71,6 +108,7 @@ public class MapsDialog extends FloatingDialog {
         table.table("clear", desc -> {
             desc.top();
             Table t = new Table();
+            t.margin(6);
 
             ScrollPane pane = new ScrollPane(t, "clear-black");
             desc.add(pane).grow();
@@ -93,7 +131,7 @@ public class MapsDialog extends FloatingDialog {
             t.add("$text.editor.oregen.info").padRight(10).color(Color.GRAY);
             t.row();
             t.add(map.meta.hasOreGen() ? "$text.on" : "$text.off").padTop(2);
-        }).height(mapsize).width(mapsize).margin(6);
+        }).height(mapsize).width(mapsize);
 
         table.row();
 

@@ -31,7 +31,7 @@ public class MenuFragment implements Fragment{
 
 					row();
 
-					add(new MenuButton("icon-editor", "$text.editor", ui.editor::show));
+					add(new MenuButton("icon-editor", "$text.editor", () -> ui.loadAnd(ui.editor::show)));
 
 					add(new MenuButton("icon-menu", "$text.maps", ui.maps::show));
 
@@ -70,7 +70,7 @@ public class MenuFragment implements Fragment{
 
                         defaults().size(size).pad(5);
 
-                        new imagebutton("icon-editor", isize, ui.editor::show).text("$text.editor").padTop(4f);
+                        new imagebutton("icon-editor", isize, () -> ui.loadAnd(ui.editor::show)).text("$text.editor").padTop(4f);
 
                         new imagebutton("icon-tools", isize, ui.settings::show).text("$text.settings").padTop(4f);
 
