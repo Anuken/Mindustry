@@ -16,13 +16,10 @@ public class Blocks implements ContentList{
 
     @Override
     public void load() {
-        air = new Block("air") {
+        air = new Floor("air") {
             //don't draw
             public void draw(Tile tile) {}
         };
-
-        //player/enemy spawnpoint?
-        spawn = new Block("spawn");
 
         blockpart = new BlockPart();
 

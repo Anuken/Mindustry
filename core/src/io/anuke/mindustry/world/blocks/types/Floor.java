@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.StatusEffect;
+import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects.Effect;
@@ -24,15 +25,26 @@ public class Floor extends Block{
 	protected Predicate<Block> blends = block -> block != this;
 	protected boolean blend = true;
 
+	/**Multiplies unit velocity by this when walked on.*/
 	public float speedMultiplier = 1f;
+	/**Multiplies unit drag by this when walked on.*/
 	public float dragMultiplier = 1f;
+	/**Damage taken per tick on this tile.*/
 	public float damageTaken = 0f;
+	/**How many ticks it takes to drown on this.*/
 	public float drownTime = 0f;
+	/**Effect when walking on this floor.*/
 	public Effect walkEffect = BlockFx.ripple;
+	/**Effect displayed when drowning on this floor.*/
     public Effect drownUpdateEffect = BlockFx.bubble;
+    /**Status effect applied when walking on.*/
 	public StatusEffect status = StatusEffects.none;
+	/**Intensity of applied status effect.*/
 	public float statusIntensity = 0.6f;
+	/**Color of this floor's liquid. Used for tinting sprites.*/
 	public Color liquidColor;
+	/**liquids that drop from this block, used for pumps*/
+	public Liquid liquidDrop = null;
 	
 	public Floor(String name) {
 		super(name);

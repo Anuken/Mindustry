@@ -1,6 +1,5 @@
 package io.anuke.mindustry.io;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -14,10 +13,10 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.ColorMapper.BlockPair;
 
-import java.io.*;
-
-import static io.anuke.mindustry.Vars.customMapDirectory;
-import static io.anuke.mindustry.Vars.mapExtension;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**Reads and writes map files.*/
 //TODO GWT support
@@ -47,6 +46,8 @@ public class MapIO {
                 pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, wallc == 0 ? ColorMapper.getColor(floor) : wallc);
             }
         }
+
+        data.position(0, 0);
 
         return pixmap;
     }
@@ -93,28 +94,18 @@ public class MapIO {
         return readTileData(stream, meta, readOnly);
     }
 
+
     /**Does not skip meta. Call after reading meta.*/
     public static MapTileData readTileData(DataInputStream stream, MapMeta meta, boolean readOnly) throws IOException {
         byte[] bytes = new byte[stream.available()];
-        stream.read(bytes);
+        stream.readFully(bytes);
         return new MapTileData(bytes, meta.width, meta.height, meta.blockMap, readOnly);
     }
 
     /**Reads tile data, skipping meta tags.*/
     public static MapTileData readTileData(Map map, boolean readOnly){
-        try {
-            InputStream stream;
-
-            if (!map.custom) {
-                stream = Gdx.files.internal("maps/" + map.name + "." + mapExtension).read();
-            } else {
-                stream = customMapDirectory.child(map.name + "." + mapExtension).read();
-            }
-
-            DataInputStream ds = new DataInputStream(stream);
-            MapTileData data = MapIO.readTileData(ds, readOnly);
-            ds.close();
-            return data;
+        try (DataInputStream ds = new DataInputStream(map.stream.get())){
+            return MapIO.readTileData(ds, readOnly);
         }catch (IOException e){
             throw new RuntimeException(e);
         }

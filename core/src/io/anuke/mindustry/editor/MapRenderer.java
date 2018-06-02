@@ -169,6 +169,11 @@ public class MapRenderer implements Disposable{
         int offsety = -(wall.size-1)/2;
 
         TextureRegion region = blockIcons.get(floor, regions.get("clear"));
+
+        if(data.link != 0 || wall.solid){
+            region = regions.get("clear");
+        }
+
         mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize, region, wx * tilesize, wy * tilesize, 8, 8);
 
         region = blockIcons.get(wall, regions.get("clear"));

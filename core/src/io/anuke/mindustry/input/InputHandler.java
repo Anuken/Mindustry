@@ -2,9 +2,10 @@ package io.anuke.mindustry.input;
 
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector2;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.BlockBuilder.BuildRequest;
-import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.fragments.OverlayFragment;
@@ -118,6 +119,16 @@ public abstract class InputHandler extends InputAdapter{
 	}
 
 	//utility methods
+
+	/**Tries to begin mining a tile, returns true if successful.*/
+	boolean tryBeginMine(Tile tile){
+		if(tile.floor().drops != null && tile.floor().drops.item.hardness <= player.mech.drillPower
+				&& tile.block() == Blocks.air){
+			player.setMineTile(tile);
+			return true;
+		}
+		return false;
+	}
 
 	/**Returns the tile at the specified MOUSE coordinates.*/
 	Tile tileAt(float x, float y){

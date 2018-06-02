@@ -154,6 +154,10 @@ public class MapEditor{
 							continue;
 						}
 
+						byte b1 = map.readAt(x + rx, y + ry, 1);
+						byte b2 = map.readAt(x + rx, y + ry, 2);
+						byte b3 = map.readAt(x + rx, y + ry, 3);
+
 						if(!isfloor) {
 							byte link = map.readAt(x + rx, y + ry, 2);
 
@@ -161,6 +165,11 @@ public class MapEditor{
 								removeLinked(x + rx - (Bits.getLeftByte(link) - 8), y + ry - (Bits.getRightByte(link) - 8));
 							}
 						}
+
+						writer.wall = b1;
+						writer.link = b2;
+						writer.rotation = Bits.getLeftByte(b3);
+						writer.team = Bits.getRightByte(b3);
 
 						write(x + rx, y + ry, writer, true);
 						renderer.updatePoint(x + rx, y + ry);

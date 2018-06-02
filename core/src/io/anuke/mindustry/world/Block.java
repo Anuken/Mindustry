@@ -82,8 +82,6 @@ public class Block extends BaseBlock implements Content{
 	public int variants = 0;
 	/**stuff that drops when broken*/
 	public ItemStack drops = null;
-	/**liquids that drop from this block, used for pumps*/
-	public Liquid liquidDrop = null;
 	/**multiblock size*/
 	public int size = 1;
 	/**Detailed description of the block. Can be as long as necesary.*/

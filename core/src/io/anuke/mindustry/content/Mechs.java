@@ -9,7 +9,12 @@ public class Mechs implements ContentList {
     @Override
     public void load() {
 
-        standard = new Mech("standard-mech", false);
-        standardShip = new Mech("standard-ship", true);
+        standard = new Mech("standard-mech", false){{
+            drillPower = 1;
+        }};
+
+        standardShip = new Mech("standard-ship", true){{
+
+        }};
     }
 }

@@ -134,6 +134,7 @@ public class Maps implements Disposable{
 	    try(DataInputStream ds = new DataInputStream(supplier.get())) {
             MapMeta meta = MapIO.readMapMeta(ds);
             Map map = new Map(name, meta, custom, supplier);
+
             if (!headless){
             	map.texture = new Texture(MapIO.generatePixmap(MapIO.readTileData(ds, meta, true)));
 			}

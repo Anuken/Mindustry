@@ -102,6 +102,7 @@ public class Renderer extends RendererModule{
 		Cursors.arrow = Cursors.loadCursor("cursor");
 		Cursors.hand = Cursors.loadCursor("hand");
 		Cursors.ibeam = Cursors.loadCursor("ibar");
+		Cursors.tool1 = Cursors.loadCursor("drill");
 
 		clearColor = Hue.lightness(0.4f);
 		clearColor.a = 1f;

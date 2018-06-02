@@ -228,11 +228,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
 		build();
 		build.end();
 
-		tapped(() -> {
-
-		});
-
 		update(() -> {
+			if(Core.scene.getKeyboardFocus() instanceof Dialog && Core.scene.getKeyboardFocus() != this) {
+				return;
+			}
+
 			Vector2 v = pane.stageToLocalCoordinates(Graphics.mouse());
 
 			if(v.x >= 0 && v.y >= 0 && v.x <= pane.getWidth() && v.y <= pane.getHeight()){

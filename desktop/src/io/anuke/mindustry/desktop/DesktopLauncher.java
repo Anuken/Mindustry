@@ -35,9 +35,9 @@ public class DesktopLauncher {
 
 		if(OS.isMac) {
             Application.getApplication().setOpenFileHandler(e -> {
-                List<File> list = e.getFiles();
+                List list = e.getFiles();
 
-                File target = list.get(0);
+                File target = (File)list.get(0);
 
                 Gdx.app.postRunnable(() -> {
                     FileHandle file = OS.getAppDataDirectory("Mindustry").child("tmp").child(target.getName());
@@ -68,9 +68,9 @@ public class DesktopLauncher {
                     }
                 });
             });
-
-            config.setPreferencesConfig(OS.getAppDataDirectoryString("Mindustry"), FileType.Absolute);
         }
+
+        config.setPreferencesConfig(OS.getAppDataDirectoryString("Mindustry"), FileType.Absolute);
 
         Platform.instance = new DesktopPlatform(arg);
 

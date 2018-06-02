@@ -21,7 +21,7 @@ import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.world;
 
-/**Interface for units that build thing.*/
+/**Interface for units that build, break or mine things.*/
 public interface BlockBuilder {
     //temporary static final values
     Translator[] tmptr = {new Translator(), new Translator(), new Translator(), new Translator()};
@@ -29,6 +29,12 @@ public interface BlockBuilder {
 
     /**Returns the queue for storing build requests.*/
     Queue<BuildRequest> getPlaceQueue();
+
+    /**Returns the tile this builder is currently mining.*/
+    Tile getMineTile();
+
+    /**Sets the tile this builder is currently mining.*/
+    void setMineTile(Tile tile);
 
     /**Return whether this builder's place queue contains items.*/
     default boolean isBuilding(){
@@ -70,11 +76,18 @@ public interface BlockBuilder {
         return getPlaceQueue().size == 0 ? null : getPlaceQueue().first();
     }
 
-    /**Update building mechanism for this unit.*/
+    /**Update building mechanism for this unit.
+     * This includes mining.*/
     default void updateBuilding(Unit unit){
         BuildRequest current = getCurrentRequest();
 
-        if(current == null) return; //nothing to do here
+        //update mining here
+        if(current == null){
+            if(getMineTile() != null){
+                updateMining(unit);
+            }
+            return;
+        }
 
         Tile tile = world.tile(current.x, current.y);
 
@@ -136,6 +149,11 @@ public interface BlockBuilder {
                 getCurrentRequest().progress = entity.progress();
             }
         }
+    }
+
+    /**Do not call directly.*/
+    default void updateMining(Unit unit){
+
     }
 
     /**Draw placement effects for an entity.*/

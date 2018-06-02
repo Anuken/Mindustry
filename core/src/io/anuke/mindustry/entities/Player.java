@@ -63,6 +63,7 @@ public class Player extends Unit implements BlockBuilder {
 	private boolean respawning;
 	private float walktime;
 	private Queue<BuildRequest> placeQueue = new Queue<>();
+	private Tile mining;
 	private Trail trail = new Trail(16);
 	
 	public Player(){
@@ -76,6 +77,17 @@ public class Player extends Unit implements BlockBuilder {
 	//endregion
 
 	//region unit and event overrides, utility methods
+
+
+	@Override
+	public Tile getMineTile() {
+		return mining;
+	}
+
+	@Override
+	public void setMineTile(Tile tile) {
+		this.mining = tile;
+	}
 
 	@Override
 	public float getArmor() {

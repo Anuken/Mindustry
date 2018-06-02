@@ -2,6 +2,7 @@ package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.utils.IntIntMap;
 import io.anuke.ucore.util.Bits;
+import io.anuke.ucore.util.Log;
 
 import java.nio.ByteBuffer;
 
@@ -44,6 +45,8 @@ public class MapTileData {
             buffer.position(0);
             this.map = null;
         }
+
+        read();
     }
 
     public byte[] toArray(){

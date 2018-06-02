@@ -15,6 +15,7 @@ import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.core.KeyBinds;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.ui.layout.Unit;
@@ -22,14 +23,17 @@ import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.input.DesktopInput.CursorType.drill;
+import static io.anuke.mindustry.input.DesktopInput.CursorType.hand;
+import static io.anuke.mindustry.input.DesktopInput.CursorType.normal;
 import static io.anuke.mindustry.input.PlaceMode.*;
 
 public class DesktopInput extends InputHandler{
 	//controller info
 	private float controlx, controly;
 	private boolean controlling;
-    private boolean handCursor;
     private final String section;
+    private CursorType cursorType = normal;
 
     /**Position where the player started dragging a line.*/
     private int selectX, selectY;
@@ -132,7 +136,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(isPlacing()){
-            handCursor = true;
+            cursorType = hand;
             selectScale = Mathf.lerpDelta(selectScale, 1f, 0.2f);
         }else{
 		    selectScale = 0f;
@@ -150,19 +154,24 @@ public class DesktopInput extends InputHandler{
 		
 		Tile cursor = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
 
-		if(cursor != null && cursor.target().block().isCursor(cursor.target())){
-            handCursor = true;
+		if(cursor != null){
+		    cursor = cursor.target();
+
+		    if(cursor.block().isCursor(cursor)) {
+                cursorType = hand;
+            }
+
+            if(cursor.floor().drops != null && cursor.floor().drops.item.hardness <= player.mech.drillPower
+                    && cursor.block() == Blocks.air){
+                cursorType = drill;
+            }
         }
 
 		if(!ui.hasMouse()) {
-			if (handCursor) {
-				Cursors.setHand();
-			}else {
-				Cursors.restoreCursor();
-			}
+			cursorType.set();
 		}
 
-        handCursor = false;
+        cursorType = normal;
 	}
 
 	@Override
@@ -179,7 +188,7 @@ public class DesktopInput extends InputHandler{
                 mode = placing;
             } else {
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(cursor) && player.getPlaceQueue().size == 0){
+                if(!tileTapped(cursor) && player.getPlaceQueue().size == 0 && !tryBeginMine(cursor)){
                     shooting = true;
                 }
             }
@@ -297,6 +306,22 @@ public class DesktopInput extends InputHandler{
         if(!controlling){
             controlx = control.gdxInput().getX();
             controly = control.gdxInput().getY();
+        }
+    }
+
+    enum CursorType{
+	    normal(Cursors::restoreCursor),
+        hand(Cursors::setHand),
+        drill(Cursors::setTool1);
+
+	    private final Callable call;
+
+	    CursorType(Callable call){
+	        this.call = call;
+        }
+
+        void set(){
+	        call.run();
         }
     }
 }
