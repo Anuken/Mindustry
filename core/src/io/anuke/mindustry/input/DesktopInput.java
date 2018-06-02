@@ -151,7 +151,7 @@ public class DesktopInput extends InputHandler{
 
 		renderer.minimap().zoomBy(-(int)Inputs.getAxisTapped(section,"zoom_minimap"));
 		rotation = Mathf.mod(rotation + (int)Inputs.getAxisTapped(section,"rotate"), 4);
-		
+
 		Tile cursor = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
 
 		if(cursor != null){
@@ -164,6 +164,16 @@ public class DesktopInput extends InputHandler{
             if(cursor.floor().drops != null && cursor.floor().drops.item.hardness <= player.mech.drillPower
                     && cursor.block() == Blocks.air){
                 cursorType = drill;
+            }
+
+            if(recipe == null && !ui.hasMouse() && Inputs.keyDown("block_info")
+                    && cursor.block().fullDescription != null){
+                cursorType = hand;
+                if(Inputs.keyTap("select")){
+                    ui.hudfrag.blockfrag.showBlockInfo(cursor.block());
+                    Cursors.restoreCursor();
+                    cursorType = normal;
+                }
             }
         }
 

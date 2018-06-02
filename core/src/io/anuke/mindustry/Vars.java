@@ -4,6 +4,7 @@ import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -14,13 +15,14 @@ import io.anuke.mindustry.entities.effect.Shield;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.Version;
+import io.anuke.mindustry.core.Platform;
+import io.anuke.mindustry.net.EditLog;
 import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.OS;
-
 import java.util.Locale;
 
 public class Vars{
@@ -86,6 +88,8 @@ public class Vars{
 	//amount of drops that are left when breaking a block
 	public static final float breakDropAmount = 0.5f;
 	
+	public static Array<EditLog> currentEditLogs = new Array<>();
+
 	//only if smoothCamera
 	public static boolean snapCamera = true;
 	

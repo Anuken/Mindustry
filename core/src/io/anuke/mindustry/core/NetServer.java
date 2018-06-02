@@ -30,7 +30,6 @@ import io.anuke.ucore.util.Timer;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
-
 import static io.anuke.mindustry.Vars.*;
 
 public class NetServer extends Module{
@@ -217,6 +216,7 @@ public class NetServer extends Module{
 
             TraceInfo trace = admins.getTraceByID(getUUID(id));
 
+            admins.logEdit(packet.x, packet.y, connections.get(id), block, packet.rotation, EditLog.EditAction.PLACE);
             trace.lastBlockPlaced = block;
             trace.totalBlocksPlaced ++;
             admins.getInfo(getUUID(id)).totalBlockPlaced ++;
@@ -244,6 +244,7 @@ public class NetServer extends Module{
             if(block != null) {
                 TraceInfo trace = admins.getTraceByID(getUUID(id));
 
+                admins.logEdit(packet.x, packet.y, connections.get(id), block, tile.getRotation(), EditLog.EditAction.BREAK);
                 trace.lastBlockBroken = block;
                 trace.totalBlocksBroken++;
                 admins.getInfo(getUUID(id)).totalBlocksBroken ++;
@@ -352,6 +353,24 @@ public class NetServer extends Module{
                 Net.sendTo(id, trace, SendMode.tcp);
                 Log.info("&lc{0} has requested trace info of {1}.", player.name, other.name);
             }
+        });
+
+        Net.handleServer(BlockLogRequestPacket.class, (id, packet) -> {
+            packet.editlogs = admins.getEditLogs().get(packet.x + packet.y * world.width(), new Array<>());
+            Net.sendTo(id, packet, SendMode.udp);
+        });
+
+        Net.handleServer(RollbackRequestPacket.class, (id, packet) -> {
+            Player player = connections.get(id);
+
+            if(!player.isAdmin){
+                Log.err("ACCESS DENIED: Player {0} / {1} attempted to perform a rollback without proper security access.",
+                        player.name, Net.getConnection(player.clientid).address);
+                return;
+            }
+
+            admins.rollbackWorld(packet.rollbackTimes);
+            Log.info("&lc{0} has rolled back the world {1} times.", player.name, packet.rollbackTimes);
         });
     }
 

@@ -38,6 +38,8 @@ public class Registrator {
         AdministerRequestPacket.class,
         TracePacket.class,
         InvokePacket.class,
+        BlockLogRequestPacket.class,
+        RollbackRequestPacket.class
     };
     private static ObjectIntMap<Class<?>> ids = new ObjectIntMap<>();
 
