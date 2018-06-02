@@ -263,7 +263,7 @@ public class Player extends Unit implements BlockBuilder {
 
 	@Override
 	public void drawOver(){
-	    if(!isShooting() && getCurrentRequest() != null && !dead) {
+	    if(!isShooting() && !dead) {
 	        drawBuilding(this);
         }
 

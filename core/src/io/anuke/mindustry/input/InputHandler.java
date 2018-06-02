@@ -123,8 +123,9 @@ public abstract class InputHandler extends InputAdapter{
 	/**Tries to begin mining a tile, returns true if successful.*/
 	boolean tryBeginMine(Tile tile){
 		if(tile.floor().drops != null && tile.floor().drops.item.hardness <= player.mech.drillPower
-				&& tile.block() == Blocks.air){
-			player.setMineTile(tile);
+				&& tile.block() == Blocks.air && player.distanceTo(tile.worldx(), tile.worldy()) <= Player.mineDistance){
+			//if a block is clicked twice, reset it
+			player.setMineTile(player.getMineTile() == tile ? null : tile);
 			return true;
 		}
 		return false;

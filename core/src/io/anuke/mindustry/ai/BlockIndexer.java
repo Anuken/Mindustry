@@ -21,6 +21,8 @@ public class BlockIndexer {
     private ObjectMap<BlockFlag, ObjectSet<Tile>> enemyMap = new ObjectMap<>();
     /**Maps teams to a map of flagged tiles by type.*/
     private ObjectMap<BlockFlag, ObjectSet<Tile>> allyMap = new ObjectMap<>();
+    /**Empty map for invalid teams.*/
+    private ObjectMap<BlockFlag, ObjectSet<Tile>> emptyMap = new ObjectMap<>();
     /**Maps tile positions to their last known tile index data.*/
     private IntMap<TileIndex> typeMap = new IntMap<>();
     /**Empty array used for returning.*/
@@ -79,6 +81,7 @@ public class BlockIndexer {
     }
 
     private ObjectMap<BlockFlag, ObjectSet<Tile>> getMap(Team team){
+        if(!state.teams.has(team)) return emptyMap;
         return state.teams.get(team).ally ? allyMap : enemyMap;
     }
 

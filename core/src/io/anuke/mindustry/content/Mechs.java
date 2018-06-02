@@ -14,7 +14,7 @@ public class Mechs implements ContentList {
         }};
 
         standardShip = new Mech("standard-ship", true){{
-
+            drillPower = 1;
         }};
     }
 }

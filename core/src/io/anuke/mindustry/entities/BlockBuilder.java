@@ -1,17 +1,24 @@
 package io.anuke.mindustry.entities;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Build;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.BuildBlock;
 import io.anuke.mindustry.world.blocks.types.BuildBlock.BuildEntity;
+import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
@@ -19,13 +26,15 @@ import io.anuke.ucore.util.Translator;
 
 import java.util.Arrays;
 
+import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
 /**Interface for units that build, break or mine things.*/
 public interface BlockBuilder {
-    //temporary static final values
+    //these are not instance variables!
     Translator[] tmptr = {new Translator(), new Translator(), new Translator(), new Translator()};
     float placeDistance = 200f;
+    float mineDistance = 70f;
 
     /**Returns the queue for storing build requests.*/
     Queue<BuildRequest> getPlaceQueue();
@@ -87,6 +96,8 @@ public interface BlockBuilder {
                 updateMining(unit);
             }
             return;
+        }else{
+            setMineTile(null);
         }
 
         Tile tile = world.tile(current.x, current.y);
@@ -153,11 +164,39 @@ public interface BlockBuilder {
 
     /**Do not call directly.*/
     default void updateMining(Unit unit){
+        Tile tile = getMineTile();
 
+        if(tile.block() != Blocks.air || unit.distanceTo(tile.worldx(), tile.worldy()) > mineDistance || !unit.inventory.canAcceptItem(tile.floor().drops.item)){
+            setMineTile(null);
+        }else{
+            Item item = tile.floor().drops.item;
+            unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(tile.worldx(), tile.worldy()), 0.4f);
+
+            if(unit.inventory.canAcceptItem(item) &&
+                    Mathf.chance(Timers.delta() * 0.05 / item.hardness)){
+                ItemTransfer.create(item,
+                        tile.worldx() + Mathf.range(tilesize/2f),
+                        tile.worldy() + Mathf.range(tilesize/2f),
+                        unit, () -> unit.inventory.addItem(item, 1));
+            }
+
+            if(Mathf.chance(0.06 * Timers.delta())){
+                Effects.effect(BlockFx.pulverizeSmall,
+                        tile.worldx() + Mathf.range(tilesize/2f),
+                        tile.worldy() + Mathf.range(tilesize/2f), 0f, item.color);
+            }
+        }
     }
 
     /**Draw placement effects for an entity.*/
     default void drawBuilding(Unit unit){
+        if(!isBuilding()){
+            if(getMineTile() != null){
+                drawMining(unit);
+            }
+            return;
+        }
+
         Tile tile = world.tile(getCurrentRequest().x, getCurrentRequest().y);
 
         Draw.color(unit.distanceTo(tile) > placeDistance || getCurrentRequest().remove ? Palette.remove : Palette.accent);
@@ -193,6 +232,28 @@ public interface BlockBuilder {
 
         Fill.circle(px, py, 1.6f + Mathf.absin(Timers.time(), 0.8f, 1.5f));
 
+        Draw.color();
+    }
+
+    /**Internal use only.*/
+    default void drawMining(Unit unit){
+        Tile tile = getMineTile();
+
+        float focusLen = 4f + Mathf.absin(Timers.time(), 1.1f, 0.5f);
+        float swingScl = 12f, swingMag = tilesize/8f;
+        float flashScl = 0.3f;
+
+        float px = unit.x + Angles.trnsx(unit.rotation, focusLen);
+        float py = unit.y + Angles.trnsy(unit.rotation, focusLen);
+
+        float ex = tile.worldx() + Mathf.sin(Timers.time() + 48, swingScl, swingMag);
+        float ey = tile.worldy() + Mathf.sin(Timers.time() + 48, swingScl + 2f, swingMag);
+
+        Draw.color(Color.LIGHT_GRAY, Color.WHITE, 1f-flashScl + Mathf.absin(Timers.time(), 0.5f, flashScl));
+        Shapes.laser("minelaser", "minelaser-end", px, py, ex, ey);
+
+        Draw.color(Palette.accent);
+        Lines.poly(tile.worldx(), tile.worldy(), 4, tilesize/2f * Mathf.sqrt2, Timers.time());
         Draw.color();
     }
 

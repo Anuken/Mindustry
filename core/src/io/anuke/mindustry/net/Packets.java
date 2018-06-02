@@ -169,14 +169,19 @@ public class Packets {
 		public void write(ByteBuffer buffer) {
 			buffer.putShort((short)x);
 			buffer.putShort((short)y);
-			buffer.putInt(editlogs.size);
-			for(EditLog value : editlogs) {
-				buffer.put((byte)value.playername.getBytes().length);
-				buffer.put(value.playername.getBytes());
-				buffer.putInt(value.block.id);
-				buffer.put((byte) value.rotation);
-				buffer.put((byte) value.action.ordinal());
-			}
+
+			if(editlogs != null) {
+                buffer.putInt(editlogs.size);
+                for (EditLog value : editlogs) {
+                    buffer.put((byte) value.playername.getBytes().length);
+                    buffer.put(value.playername.getBytes());
+                    buffer.putInt(value.block.id);
+                    buffer.put((byte) value.rotation);
+                    buffer.put((byte) value.action.ordinal());
+                }
+            }else{
+			    buffer.putInt(0);
+            }
 		}
 
 		@Override

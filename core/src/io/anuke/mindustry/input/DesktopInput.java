@@ -161,7 +161,8 @@ public class DesktopInput extends InputHandler{
             }
 
             if(cursor.floor().drops != null && cursor.floor().drops.item.hardness <= player.mech.drillPower
-                    && cursor.block() == Blocks.air){
+                    && cursor.block() == Blocks.air && player.distanceTo(cursor.worldx(), cursor.worldy()) <= Player.mineDistance &&
+                    player.inventory.canAcceptItem(cursor.floor().drops.item)){
                 cursorType = drill;
             }
 
