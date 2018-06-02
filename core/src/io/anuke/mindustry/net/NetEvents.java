@@ -125,7 +125,6 @@ public class NetEvents {
         BlockLogRequestPacket packet = new BlockLogRequestPacket();
         packet.x = x;
         packet.y = y;
-        packet.editlogs = Vars.currentEditLogs;
         
         Net.send(packet, SendMode.udp);
     }

@@ -3,8 +3,6 @@ package io.anuke.mindustry.core;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.TimeUtils;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.SyncEntity;
@@ -154,7 +152,7 @@ public class NetClient extends Module {
         });
 
         Net.handleClient(BlockLogRequestPacket.class, packet -> {
-			currentEditLogs = packet.editlogs;
+            ui.listfrag.showBlockLogs(packet.editlogs, packet.x, packet.y);
 		});
 
         Net.handleClient(PlacePacket.class, (packet) -> {

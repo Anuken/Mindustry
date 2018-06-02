@@ -9,6 +9,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
+import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Inputs;
@@ -23,9 +24,7 @@ import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.mindustry.input.DesktopInput.CursorType.drill;
-import static io.anuke.mindustry.input.DesktopInput.CursorType.hand;
-import static io.anuke.mindustry.input.DesktopInput.CursorType.normal;
+import static io.anuke.mindustry.input.DesktopInput.CursorType.*;
 import static io.anuke.mindustry.input.PlaceMode.*;
 
 public class DesktopInput extends InputHandler{
@@ -166,13 +165,11 @@ public class DesktopInput extends InputHandler{
                 cursorType = drill;
             }
 
-            if(recipe == null && !ui.hasMouse() && Inputs.keyDown("block_info")
-                    && cursor.block().fullDescription != null){
+            if(recipe == null && !ui.hasMouse() && Inputs.keyDown("block_logs")) {
                 cursorType = hand;
                 if(Inputs.keyTap("select")){
-                    ui.hudfrag.blockfrag.showBlockInfo(cursor.block());
+                    NetEvents.handleBlockLogRequest(cursor.x, cursor.y);
                     Cursors.restoreCursor();
-                    cursorType = normal;
                 }
             }
         }

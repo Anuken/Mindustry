@@ -1,14 +1,17 @@
 package io.anuke.mindustry.ui.fragments;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.net.EditLog;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.ui.BorderImage;
+import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.Element;
@@ -62,7 +65,7 @@ public class PlayerListFragment implements Fragment{
     
                     new button("$text.server.rollback", () -> {
                         ui.rollback.show();
-                    }).padTop(-12).padBottom(-12).padRight(-12).fillY().cell.disabled(b -> !player.isAdmin);
+                    }).padTop(-12).padBottom(-12).padRight(-12).fillY().cell.disabled(b -> !players[0].isAdmin);
 
                 }}.pad(10f).growX().end();
             }}.end();
@@ -189,6 +192,45 @@ public class PlayerListFragment implements Fragment{
         }
 
         content.marginBottom(5);
+    }
+
+    public void showBlockLogs(Array<EditLog> currentEditLogs, int x, int y){
+        boolean wasPaused = state.is(State.paused);
+        state.set(State.paused);
+
+        FloatingDialog d = new FloatingDialog("$text.blocks.editlogs");
+        Table table = new Table();
+        table.defaults().pad(1f);
+        ScrollPane pane = new ScrollPane(table, "clear");
+        pane.setFadeScrollBars(false);
+        Table top = new Table();
+        top.left();
+        top.add("[accent]Edit logs for: "+ x + ", " + y);
+        table.add(top).fill().left();
+        table.row();
+
+        d.content().add(pane).grow();
+
+        if(currentEditLogs == null || currentEditLogs.size == 0) {
+            table.add("$text.block.editlogsnotfound").left();
+            table.row();
+        }
+
+        else {
+            for(int i = 0; i < currentEditLogs.size; i++) {
+                EditLog log = currentEditLogs.get(i);
+                table.add("[gold]" + (i + 1) + ". [white]" + log.info()).left();
+                table.row();
+            }
+        }
+
+        d.buttons().addButton("$text.ok", () -> {
+            if(!wasPaused)
+                state.set(State.playing);
+            d.hide();
+        }).size(110, 50).pad(10f);
+
+        d.show();
     }
 
 }

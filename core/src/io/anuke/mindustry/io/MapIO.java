@@ -25,6 +25,7 @@ public class MapIO {
     private static final int version = 0;
     private static final IntIntMap defaultBlockMap = new IntIntMap();
 
+    //TODO static initializers are evil, remove
     static{
 
         for(Block block : Block.getAllBlocks()){

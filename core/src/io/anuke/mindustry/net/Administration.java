@@ -2,17 +2,16 @@ package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Placement;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.mindustry.world.blocks.types.Rock;
 import io.anuke.mindustry.world.blocks.types.StaticBlock;
 import io.anuke.ucore.core.Settings;
+
 import static io.anuke.mindustry.Vars.world;
 
 public class Administration {
@@ -87,8 +86,10 @@ public class Administration {
                 Block result = log.block;
                 int rotation = log.rotation;
 
+                //TODO fix this mess, broken with 4.0
+
                 if(log.action == EditLog.EditAction.PLACE) {
-                    Placement.breakBlock(x, y, false, false);
+                   // Build.breakBlock(x, y, false, false);
 
                     Packets.BreakPacket packet = new Packets.BreakPacket();
                     packet.x = (short) x;
@@ -98,14 +99,14 @@ public class Administration {
                     Net.send(packet, Net.SendMode.tcp);
                 }
                 else if(log.action == EditLog.EditAction.BREAK) {
-                    Placement.placeBlock(x, y, result, rotation, false, false);
+                    //Build.placeBlock(x, y, result, rotation, false, false);
 
                     Packets.PlacePacket packet = new Packets.PlacePacket();
                     packet.x = (short) x;
                     packet.y = (short) y;
                     packet.rotation = (byte) rotation;
                     packet.playerid = 0;
-                    packet.block = result.id;
+                    //packet.block = result.id;
 
                     Net.send(packet, Net.SendMode.tcp);
                 }
