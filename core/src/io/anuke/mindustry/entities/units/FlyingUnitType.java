@@ -97,10 +97,7 @@ public class FlyingUnitType extends UnitType {
             if(unit.inventory.totalAmmo() + 10 >= unit.inventory.ammoCapacity()){
                 unit.state.set(unit, attack);
             }else if(!unit.targetHasFlag(BlockFlag.resupplyPoint)){
-                if(unit.timer.get(timerTarget, 20)) {
-                    Tile target = Geometry.findClosest(unit.x, unit.y, world.indexer().getAllied(unit.team, BlockFlag.resupplyPoint));
-                    if (target != null) unit.target = target.entity;
-                }
+                unit.retarget(() -> targetClosestAllyFlag(unit, BlockFlag.resupplyPoint));
             }else{
                 circle(unit, 20f);
             }
@@ -125,7 +122,7 @@ public class FlyingUnitType extends UnitType {
                     if(closest != null){
                         unit.target = closest;
                     }else {
-                        Tile target = Geometry.findClosest(unit.x, unit.y, world.indexer().getEnemy(unit.team, BlockFlag.resupplyPoint));
+                        Tile target = Geometry.findClosest(unit.x, unit.y, world.indexer().getEnemy(unit.team, BlockFlag.target));
                         if (target != null) unit.target = target.entity;
                     }
                 }

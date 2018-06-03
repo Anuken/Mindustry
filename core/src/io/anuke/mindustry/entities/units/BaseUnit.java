@@ -55,6 +55,12 @@ public class BaseUnit extends Unit{
 		this.state.set(this, state);
 	}
 
+	public void retarget(Runnable run){
+		if(timer.get(UnitType.timerTarget, 20)){
+			run.run();
+		}
+	}
+
 	@Override
 	public float getArmor() {
 		return type.armor;

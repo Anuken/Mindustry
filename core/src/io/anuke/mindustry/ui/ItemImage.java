@@ -14,6 +14,8 @@ public class ItemImage extends Stack {
     public ItemImage(TextureRegion region, Supplier<String> text, Color color) {
         Table t = new Table().left().bottom();
 
+        t.label(text).get().setFontScale(0.5f);
+
         image = new Image(region);
         image.setColor(color);
 

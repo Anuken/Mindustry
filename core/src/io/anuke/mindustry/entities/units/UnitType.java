@@ -3,16 +3,19 @@ package io.anuke.mindustry.entities.units;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.content.fx.ExplosionFx;
-import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.world.BlockFlag;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
@@ -114,6 +117,11 @@ public abstract class UnitType {
                 unit.y + Angles.trnsy(rotation, translation), rotation, unit);
         Effects.effect(type.smokeEffect, unit.x + Angles.trnsx(rotation, translation),
                 unit.y + Angles.trnsy(rotation, translation), rotation, unit);
+    }
+
+    public void targetClosestAllyFlag(BaseUnit unit, BlockFlag flag){
+        Tile target = Geometry.findClosest(unit.x, unit.y, world.indexer().getAllied(unit.team, flag));
+        if (target != null) unit.target = target.entity;
     }
 
     public void onDeath(BaseUnit unit){

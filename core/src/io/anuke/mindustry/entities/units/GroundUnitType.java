@@ -1,7 +1,6 @@
 package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.graphics.Color;
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.type.AmmoType;
@@ -11,7 +10,10 @@ import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Geometry;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Translator;
 
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
@@ -128,6 +130,12 @@ public abstract class GroundUnitType extends UnitType{
         }
 
         public void update(BaseUnit unit) {
+            Tile tile = Geometry.findClosest(unit.x, unit.y, world.indexer().getAllied(unit.team, BlockFlag.resupplyPoint));
+
+            if (tile != null && unit.distanceTo(tile) > 40) {
+                moveAwayFromCore(unit);
+            }
+
             //TODO move toward resupply point
             if(unit.inventory.totalAmmo() + 10 >= unit.inventory.ammoCapacity()){
                 unit.state.set(unit, attack);
@@ -140,31 +148,24 @@ public abstract class GroundUnitType extends UnitType{
         }
 
         public void update(BaseUnit unit) {
-            if(unit.target != null && (unit.target instanceof TileEntity &&
-                    (((TileEntity)unit.target).tile.getTeam() == unit.team || !((TileEntity)unit.target).tile.breakable()))){
-                unit.target = null;
-            }
+            unit.retarget(() -> {
+                Unit closest = Units.getClosestEnemy(unit.team, unit.x, unit.y, unit.inventory.getAmmo().getRange(), other -> true);
+                if(closest != null){
+                    unit.target = closest;
+                }else {
+                    Tile target = Geometry.findClosest(unit.x, unit.y, world.indexer().getEnemy(unit.team, BlockFlag.target));
+                    if (target != null) unit.target = target.entity;
+                }
+            });
 
             if(!unit.inventory.hasAmmo()) {
                 unit.state.set(unit, resupply);
-            }else if (unit.target == null){
-                if(unit.timer.get(timerTarget, 20)) {
-                    Unit closest = Units.getClosestEnemy(unit.team, unit.x, unit.y,
-                            unit.inventory.getAmmo().getRange(), other -> true);
-                    if(closest != null){
-                        unit.target = closest;
-                    }else {
-                        Tile target = Geometry.findClosest(unit.x, unit.y, world.indexer().getEnemy(unit.team, BlockFlag.target));
-                        if (target != null) unit.target = target.entity;
-                    }
-                }
             }else{
-                if(unit.distanceTo(unit.target) > unit.inventory.getAmmo().getRange()){
+                if(unit.distanceTo(unit.target) > unit.inventory.getAmmo().getRange() * 0.7f){
                     moveToCore(unit);
                 }else{
                     unit.rotate(unit.angleTo(unit.target));
                 }
-
 
                 if (unit.timer.get(timerReload, reload) && Mathf.angNear(unit.angleTo(unit.target), unit.rotation, 13f)
                         && unit.distanceTo(unit.target) < unit.inventory.getAmmo().getRange()) {

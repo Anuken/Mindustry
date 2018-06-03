@@ -63,7 +63,7 @@ public class Pathfinder {
             if(other == null) continue;
 
             if(values[dx][dy] < value && (target == null || values[dx][dy] < tl) &&
-                    (other.getWallID() == 0 || state.teams.areEnemies(team, other.getTeam()))){
+                    (!other.solid() || state.teams.areEnemies(team, other.getTeam()))){
                 target = other;
                 tl = values[dx][dy];
             }
@@ -79,8 +79,8 @@ public class Pathfinder {
     }
 
     private boolean passable(Tile tile, Team team){
-        return (tile.getWallID() == 0 && !(tile.floor().liquid && (tile.floor().damageTaken > 0 || tile.floor().drownTime > 0))) || (tile.breakable()
-        && (tile.getTeam() != team || !tile.solid()));
+        return (tile.getWallID() == 0 && !(tile.floor().liquid && (tile.floor().damageTaken > 0 || tile.floor().drownTime > 0)))
+                || (tile.breakable() && (tile.getTeam() != team)) || !tile.solid();
     }
 
     private void update(Tile tile, Team team){
