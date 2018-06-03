@@ -91,7 +91,7 @@ public class Build {
         rect.setSize(type.size * tilesize, type.size * tilesize);
         rect.setCenter(type.offset() + x * tilesize, type.offset() + y * tilesize);
 
-        if (type.solid || type.solidifes)
+        if (type.solid || type.solidifes) {
             synchronized (Entities.entityLock) {
                 try {
 
@@ -112,6 +112,7 @@ public class Build {
                     return false;
                 }
             }
+        }
 
         Tile tile = world.tile(x, y);
 

@@ -176,7 +176,7 @@ public class Control extends Module{
 			Timers.runTask(30f, () -> state.set(State.menu));
 		});
 
-		Events.on(WorldLoadEvent.class, () -> Gdx.app.postRunnable(() -> Events.fire(WorldLoadGraphicsEvent.class)));
+		Events.on(WorldLoadEvent.class, () -> threads.runGraphics(() -> Events.fire(WorldLoadGraphicsEvent.class)));
 	}
 
 	public void addPlayer(int index){
@@ -261,12 +261,14 @@ public class Control extends Module{
 		ui.loadfrag.show();
 		saves.resetSave();
 
-		threads.run(() -> {
-			logic.reset();
-			world.loadMap(map);
-			logic.play();
+		Timers.run(5f, () -> {
+			threads.run(() -> {
+				logic.reset();
+				world.loadMap(map);
+				logic.play();
 
-			Gdx.app.postRunnable(ui.loadfrag::hide);
+				Gdx.app.postRunnable(ui.loadfrag::hide);
+			});
 		});
 	}
 

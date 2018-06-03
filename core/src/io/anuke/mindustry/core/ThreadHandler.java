@@ -43,6 +43,14 @@ public class ThreadHandler {
         }
     }
 
+    public void runGraphics(Runnable r){
+        if(enabled) {
+            Gdx.app.postRunnable(r);
+        }else{
+            r.run();
+        }
+    }
+
     public void runDelay(Runnable r){
         if(enabled) {
             synchronized (toRun) {
