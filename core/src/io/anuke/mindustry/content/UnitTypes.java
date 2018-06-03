@@ -11,8 +11,29 @@ public class UnitTypes implements ContentList {
 
     @Override
     public void load() {
-        drone = new Drone();
-        scout = new Scout();
-        vtol = new Vtol();
+        drone = new UnitType("drone", team -> new Drone(drone, team)){{
+            isFlying = true;
+            drag = 0.01f;
+            speed = 0.2f;
+            maxVelocity = 0.8f;
+            range = 50f;
+        }};
+
+        scout = new UnitType("scout", team -> new Scout(scout, team)){{
+            maxVelocity = 1.1f;
+            speed = 0.1f;
+            drag = 0.4f;
+            range = 40f;
+            setAmmo(AmmoTypes.bulletIron);
+        }};
+
+        vtol = new UnitType("vtol", team -> new Vtol(vtol, team)){{
+            speed = 0.3f;
+            maxVelocity = 2f;
+            drag = 0.01f;
+            isFlying = true;
+            reload = 7;
+            setAmmo(AmmoTypes.bulletIron);
+        }};
     }
 }

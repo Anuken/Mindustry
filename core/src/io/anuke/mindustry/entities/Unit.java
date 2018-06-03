@@ -41,7 +41,7 @@ public abstract class Unit extends SyncEntity implements SerializableEntity, Tar
 
     @Override
     public boolean collides(SolidEntity other){
-        return other instanceof io.anuke.mindustry.entities.bullet.Bullet && state.teams.areEnemies((((Bullet) other).team), team);
+        return other instanceof Bullet && state.teams.areEnemies((((Bullet) other).team), team);
     }
 
     @Override

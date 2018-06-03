@@ -1,58 +1,117 @@
 package io.anuke.mindustry.entities.units.types;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Queue;
+import io.anuke.mindustry.entities.BlockBuilder;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.units.BaseUnit;
-import io.anuke.mindustry.entities.units.FlyingUnitType;
+import io.anuke.mindustry.entities.units.FlyingUnit;
 import io.anuke.mindustry.entities.units.UnitState;
+import io.anuke.mindustry.entities.units.UnitType;
+import io.anuke.mindustry.game.EventType.BlockBuildEvent;
+import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.BlockFlag;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.types.BuildBlock;
+import io.anuke.mindustry.world.blocks.types.BuildBlock.BuildEntity;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
+import static io.anuke.mindustry.Vars.unitGroups;
 import static io.anuke.mindustry.Vars.world;
 
-public class Drone extends FlyingUnitType {
-    protected float healSpeed = 0.1f;
-    protected float discoverRange = 120f;
+public class Drone extends FlyingUnit implements BlockBuilder{
+    protected static float healSpeed = 0.1f;
+    protected static float discoverRange = 120f;
+    protected static boolean initialized;
 
-    public Drone() {
-        super("drone");
-        speed = 0.2f;
-        maxVelocity = 0.8f;
-        range = 50f;
+    protected Tile mineTile;
+    protected Queue<BuildRequest> placeQueue = new Queue<>();
+
+    private static void initEvents(){
+        Events.on(BlockBuildEvent.class, (team, tile) -> {
+            EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
+
+            if(!(tile.entity instanceof BuildEntity)) return;
+            BuildEntity entity = tile.entity();
+
+            for(BaseUnit unit : group.all()){
+                if(unit instanceof Drone){
+                    ((Drone) unit).notifyPlaced(entity);
+                }
+            }
+        });
+    }
+
+    public Drone(UnitType type, Team team) {
+        super(type, team);
+
+        if(!initialized){
+            initEvents();
+            initialized = true;
+        }
+    }
+
+    private void notifyPlaced(BuildEntity entity){
+        float timeToBuild = entity.recipe.cost;
+        float dist = Math.min(entity.distanceTo(x, y) - placeDistance, 0);
+
+        if(dist / type.maxVelocity < timeToBuild * 0.9f){
+            target = entity;
+            setState(build);
+        }
     }
 
     @Override
-    public void update(BaseUnit unit) {
-        float rot = unit.rotation;
-        super.update(unit);
-        unit.rotation = rot;
+    public Queue<BuildRequest> getPlaceQueue() {
+        return placeQueue;
+    }
 
-        if(unit.target != null && unit.state.is(repair)){
-            unit.rotation = Mathf.slerpDelta(rot, unit.angleTo(unit.target), 0.3f);
+    @Override
+    public Tile getMineTile() {
+        return mineTile;
+    }
+
+    @Override
+    public void setMineTile(Tile tile) {
+        this.mineTile = tile;
+    }
+
+    @Override
+    public void update() {
+        float rot = rotation;
+        super.update();
+        rotation = rot;
+
+        if(target != null && state.is(repair)){
+            rotation = Mathf.slerpDelta(rot, angleTo(target), 0.3f);
         }else{
-            unit.rotation = Mathf.slerpDelta(rot, unit.velocity.angle(), 0.3f);
+            rotation = Mathf.slerpDelta(rot, velocity.angle(), 0.3f);
         }
 
-        unit.x += Mathf.sin(Timers.time() + unit.id * 999, 25f, 0.07f);
-        unit.y += Mathf.cos(Timers.time() + unit.id * 999, 25f, 0.07f);
+        x += Mathf.sin(Timers.time() + id * 999, 25f, 0.07f);
+        y += Mathf.cos(Timers.time() + id * 999, 25f, 0.07f);
 
-        if(unit.velocity.len() <= 0.2f && !(unit.state.is(repair) && unit.target != null)){
-            unit.rotation += Mathf.sin(Timers.time() + unit.id * 99, 10f, 5f);
+        if(velocity.len() <= 0.2f && !(state.is(repair) && target != null)){
+            rotation += Mathf.sin(Timers.time() + id * 99, 10f, 5f);
         }
+
+        updateBuilding(this);
     }
 
     @Override
-    public void behavior(BaseUnit unit) {
-        if(unit.health <= health * retreatPercent &&
-                Geometry.findClosest(unit.x, unit.y, world.indexer().getAllied(unit.team, BlockFlag.repair)) != null){
-            unit.setState(retreat);
+    public void behavior() {
+        if(health <= health * type.retreatPercent &&
+                Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair)) != null){
+            setState(retreat);
         }
     }
 
@@ -62,60 +121,86 @@ public class Drone extends FlyingUnitType {
     }
 
     @Override
-    public void drawOver(BaseUnit unit) {
-        if(unit.target instanceof TileEntity && unit.state.is(repair)){
+    public void drawOver() {
+        trail.draw(Palette.lighterOrange, Palette.lightishOrange, 3f);
+
+        if(target instanceof TileEntity && state.is(repair)){
             float len = 5f;
             Draw.color(Color.BLACK, Color.WHITE, 0.95f + Mathf.absin(Timers.time(), 0.8f, 0.05f));
             Shapes.laser("beam", "beam-end",
-                    unit.x + Angles.trnsx(unit.rotation, len),
-                    unit.y + Angles.trnsy(unit.rotation, len),
-                    unit.target.getX(), unit.target.getY());
+                    x + Angles.trnsx(rotation, len),
+                    y + Angles.trnsy(rotation, len),
+                    target.getX(), target.getY());
             Draw.color();
         }
+
+        drawBuilding(this);
+    }
+
+    @Override
+    public float drawSize() {
+        return isBuilding() ? placeDistance*2f : 30f;
     }
 
     public final UnitState
 
+    build = new UnitState(){
+
+        public void update() {
+            BuildEntity entity = (BuildEntity)target;
+
+            if(entity.progress() < 1f && entity.tile.block() instanceof BuildBlock){ //building is valid
+                if(!isBuilding() && distanceTo(target) < placeDistance * 0.9f){ //within distance, begin placing
+                    getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y, entity.tile.getRotation(), entity.recipe));
+                }
+
+                circle(placeDistance * 0.7f);
+            }else{ //building isn't valid
+                setState(repair);
+            }
+        }
+    },
+
     repair = new UnitState(){
-        public void entered(BaseUnit unit) {
-            unit.target = null;
+        public void entered() {
+            target = null;
         }
 
-        public void update(BaseUnit unit) {
-            if(unit.target != null && (((TileEntity)unit.target).health >= ((TileEntity)unit.target).tile.block().health
-                    || unit.target.distanceTo(unit) > discoverRange)){
-                unit.target = null;
+        public void update() {
+            if(target != null && (((TileEntity)target).health >= ((TileEntity)target).tile.block().health
+                    || target.distanceTo(Drone.this) > discoverRange)){
+                target = null;
             }
 
-            if (unit.target == null) {
-                if (unit.timer.get(timerTarget, 20)) {
-                    unit.target = Units.findAllyTile(unit.team, unit.x, unit.y, discoverRange,
-                           tile -> tile.entity != null && tile.entity.health + 0.0001f < tile.block().health);
-                }
-            }else if(unit.target.distanceTo(unit) > range){
-                circle(unit, range);
+            if (target == null) {
+                retarget(() -> {
+                    target = Units.findAllyTile(team, x, y, discoverRange,
+                            tile -> tile.entity != null && tile.entity.health + 0.0001f < tile.block().health);
+                });
+            }else if(target.distanceTo(Drone.this) > type.range){
+                circle(type.range);
             }else{
-                TileEntity entity = (TileEntity) unit.target;
+                TileEntity entity = (TileEntity) target;
                 entity.health += healSpeed * Timers.delta();
                 entity.health = Mathf.clamp(entity.health, 0, entity.tile.block().health);
             }
         }
     },
     retreat = new UnitState() {
-        public void entered(BaseUnit unit) {
-            unit.target = null;
+        public void entered() {
+            target = null;
         }
 
-        public void update(BaseUnit unit) {
-            if(unit.health >= health){
-                unit.state.set(unit, attack);
-            }else if(!unit.targetHasFlag(BlockFlag.repair)){
-                if(unit.timer.get(timerTarget, 20)) {
-                    Tile target = Geometry.findClosest(unit.x, unit.y, world.indexer().getAllied(unit.team, BlockFlag.repair));
-                    if (target != null) unit.target = target.entity;
+        public void update() {
+            if(health >= health){
+                state.set(attack);
+            }else if(!targetHasFlag(BlockFlag.repair)){
+                if(timer.get(timerTarget, 20)) {
+                    Tile target = Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair));
+                    if (target != null) Drone.this.target = target.entity;
                 }
             }else{
-                circle(unit, 40f);
+                circle(40f);
             }
         }
     };

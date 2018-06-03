@@ -47,6 +47,7 @@ public class NuclearReactor extends LiquidBurnerGenerator {
 		itemCapacity = 30;
 		liquidCapacity = 50;
 		powerCapacity = 80f;
+		hasItems = true;
 	}
 
 	@Override

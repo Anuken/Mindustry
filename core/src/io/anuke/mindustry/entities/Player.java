@@ -69,8 +69,7 @@ public class Player extends Unit implements BlockBuilder {
 	public Player(){
 		hitbox.setSize(5);
 		hitboxTile.setSize(4f);
-		
-		maxhealth = 200;
+
 		heal();
 	}
 
@@ -78,6 +77,10 @@ public class Player extends Unit implements BlockBuilder {
 
 	//region unit and event overrides, utility methods
 
+	@Override
+	public float getMaxHealth() {
+		return 200;
+	}
 
 	@Override
 	public Tile getMineTile() {

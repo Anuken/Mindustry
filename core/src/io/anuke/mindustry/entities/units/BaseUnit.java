@@ -1,16 +1,22 @@
 package io.anuke.mindustry.entities.units;
 
+import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.entities.Targetable;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.BlockFlag;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
 
@@ -19,14 +25,19 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import static io.anuke.mindustry.Vars.unitGroups;
+import static io.anuke.mindustry.Vars.*;
 
-public class BaseUnit extends Unit{
-	public UnitType type;
-	public Timer timer = new Timer(5);
-	public float walkTime = 0f;
-	public StateMachine state = new StateMachine();
-	public Targetable target;
+public abstract class BaseUnit extends Unit{
+	private static int timerIndex = 0;
+
+	protected static final int timerTarget = timerIndex++;
+	protected static final int timerBoost = timerIndex++;
+	protected static final int timerReload = timerIndex++;
+
+	protected UnitType type;
+	protected Timer timer = new Timer(5);
+	protected StateMachine state = new StateMachine();
+	protected Targetable target;
 
 	public BaseUnit(UnitType type, Team team){
 		this.type = type;
@@ -52,13 +63,49 @@ public class BaseUnit extends Unit{
 	}
 
 	public void setState(UnitState state){
-		this.state.set(this, state);
+		this.state.set(state);
 	}
 
 	public void retarget(Runnable run){
-		if(timer.get(UnitType.timerTarget, 20)){
+		if(timer.get(timerTarget, 20)){
 			run.run();
 		}
+	}
+
+	/**Only runs when the unit has a target.*/
+	public void behavior(){
+
+	}
+
+	public void updateTargeting(){
+		if(target == null || (target instanceof Unit && (target.isDead() || ((Unit)target).team == team))
+				|| (target instanceof TileEntity && ((TileEntity) target).tile.entity == null)){
+			target = null;
+		}
+	}
+
+	public void shoot(AmmoType type, float rotation, float translation){
+		Bullet.create(type.bullet, this,
+				x + Angles.trnsx(rotation, translation),
+				y + Angles.trnsy(rotation, translation), rotation);
+		Effects.effect(type.shootEffect, x + Angles.trnsx(rotation, translation),
+				y + Angles.trnsy(rotation, translation), rotation, this);
+		Effects.effect(type.smokeEffect, x + Angles.trnsx(rotation, translation),
+				y + Angles.trnsy(rotation, translation), rotation, this);
+	}
+
+	public void targetClosestAllyFlag(BlockFlag flag){
+		Tile target = Geometry.findClosest(x, y, world.indexer().getAllied(team, flag));
+		if (target != null) this.target = target.entity;
+	}
+
+	public UnitState getStartState(){
+		return null;
+	}
+
+	@Override
+	public float getMaxHealth() {
+		return type.health;
 	}
 
 	@Override
@@ -99,22 +146,41 @@ public class BaseUnit extends Unit{
 
 	@Override
 	public void update(){
-		type.update(this);
+		if(hitTime > 0){
+			hitTime -= Timers.delta();
+		}
+
+		if(hitTime < 0) hitTime = 0;
+
+		if(Net.client()){
+			interpolate();
+			return;
+		}
+
+		updateTargeting();
+
+		state.update();
+		updateVelocityStatus(type.drag, type.maxVelocity);
+
+		if(target != null) behavior();
+
+		x = Mathf.clamp(x, 0, world.width() * tilesize);
+		y = Mathf.clamp(y, 0, world.height() * tilesize);
 	}
 
 	@Override
 	public void drawSmooth(){
-		type.draw(this);
+
 	}
 
 	@Override
 	public void drawUnder(){
-		type.drawUnder(this);
+
 	}
 
 	@Override
 	public void drawOver(){
-		type.drawOver(this);
+
 	}
 
 	@Override
@@ -130,27 +196,29 @@ public class BaseUnit extends Unit{
 	@Override
 	public void onDeath(){
 		super.onDeath();
-		type.onDeath(this);
+
+		Effects.effect(ExplosionFx.explosion, this);
+		Effects.shake(2f, 2f, this);
+
+		remove();
 	}
 
 	@Override
 	public void onRemoteDeath(){
-		type.onRemoteDeath(this);
+		onDeath();
 	}
 
 	@Override
 	public void removed(){
-		type.removed(this);
+
 	}
 
 	@Override
 	public void added(){
-		maxhealth = type.health;
-
 		hitbox.solid = !isFlying();
 		hitbox.setSize(type.hitsize);
 		hitboxTile.setSize(type.hitsizeTile);
-		state.set(this, type.getStartState());
+		state.set(getStartState());
 
 		heal();
 	}

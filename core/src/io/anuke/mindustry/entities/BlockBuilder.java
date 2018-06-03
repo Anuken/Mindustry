@@ -6,6 +6,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.effect.ItemTransfer;
+import io.anuke.mindustry.game.EventType.BlockBuildEvent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Recipe;
@@ -14,6 +15,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.BuildBlock;
 import io.anuke.mindustry.world.blocks.types.BuildBlock.BuildEntity;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
@@ -26,8 +28,7 @@ import io.anuke.ucore.util.Translator;
 
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 /**Interface for units that build, break or mine things.*/
 public interface BlockBuilder {
@@ -140,6 +141,9 @@ public interface BlockBuilder {
                 if(Build.validPlace(unit.team, current.x, current.y, current.recipe.result, current.rotation)){
                     //if it's valid, place it
                     Build.placeBlock(unit.team, current.x, current.y, current.recipe, current.rotation);
+
+                    //fire place event.
+                    threads.run(() -> Events.fire(BlockBuildEvent.class, unit.team, world.tile(current.x, current.y)));
                 }else{
                     //otherwise, skip it
                     getPlaceQueue().removeFirst();

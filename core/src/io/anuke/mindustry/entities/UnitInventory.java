@@ -22,6 +22,10 @@ public class UnitInventory {
         this.ammoCapacity = ammoCapacity;
     }
 
+    public boolean isInfiniteAmmo() {
+        return infiniteAmmo;
+    }
+
     public void setInfiniteAmmo(boolean infinite){
         infiniteAmmo = infinite;
     }
@@ -29,6 +33,7 @@ public class UnitInventory {
     public void write(DataOutputStream stream) throws IOException {
         stream.writeInt(item == null ? 0 : item.amount);
         stream.writeByte(item == null ? 0 : item.item.id);
+        stream.writeBoolean(infiniteAmmo);
         stream.writeInt(totalAmmo);
         stream.writeByte(ammos.size);
         for(int i = 0; i < ammos.size; i ++){
@@ -40,6 +45,7 @@ public class UnitInventory {
     public void read(DataInputStream stream) throws IOException {
         int iamount = stream.readInt();
         byte iid = stream.readByte();
+        infiniteAmmo = stream.readBoolean();
         this.totalAmmo = stream.readInt();
         byte ammoa = stream.readByte();
         for(int i = 0; i < ammoa; i ++){

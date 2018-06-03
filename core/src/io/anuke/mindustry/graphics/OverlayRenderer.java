@@ -189,7 +189,7 @@ public class OverlayRenderer {
         }
 
         drawEncloser(x, y - 8f, 2f);
-        drawBar(Color.SCARLET, x, y - 8f, unit.health / unit.maxhealth);
+        drawBar(Color.SCARLET, x, y - 8f, unit.healthfrac());
         drawBar(Color.valueOf("32cf6d"), x, y - 9f, unit.inventory.totalAmmo() / (float) unit.inventory.ammoCapacity());
     }
 

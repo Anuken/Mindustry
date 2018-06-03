@@ -4,10 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.content.bullets.TurretBullets;
-import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Timers;
@@ -70,9 +69,9 @@ public class DebugFragment implements Fragment {
                row();
                new button("death", () -> player.damage(99999, false));
                row();
-               new button("spawnf", () -> new BaseUnit(UnitTypes.drone, player.team).set(player.x, player.y).add());
+               new button("spawnf", () -> UnitTypes.drone.create(player.team).set(player.x, player.y).add());
                row();
-               new button("spawng", () -> new BaseUnit(UnitTypes.scout, player.team).set(player.x, player.y).add());
+               new button("spawng", () -> UnitTypes.scout.create(player.team).set(player.x, player.y).add());
                row();
            }}.end();
 

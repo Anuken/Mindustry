@@ -1,8 +1,10 @@
 package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.graphics.Color;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.BlockFlag;
 import io.anuke.mindustry.world.Tile;
@@ -15,20 +17,16 @@ import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
 
-import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
-public abstract class GroundUnitType extends UnitType{
+public abstract class GroundUnitType extends BaseUnit {
     protected static Translator vec = new Translator();
+    protected static float maxAim = 30f;
 
-    protected float maxAim = 30f;
+    protected float walkTime;
 
-    public GroundUnitType(String name) {
-        super(name);
-        maxVelocity = 1.1f;
-        speed = 0.1f;
-        drag = 0.4f;
-        range = 40f;
+    public GroundUnitType(UnitType type, Team team) {
+        super(type, team);
     }
 
     @Override
@@ -37,158 +35,158 @@ public abstract class GroundUnitType extends UnitType{
     }
 
     @Override
-    public void update(BaseUnit unit) {
-        super.update(unit);
+    public void update() {
+        super.update();
 
-        if(!unit.velocity.isZero(0.0001f) && (unit.target == null
-                || (unit.inventory.hasAmmo() && unit.distanceTo(unit.target) > unit.inventory.getAmmo().getRange()))){
-            unit.rotation = unit.velocity.angle();
+        if(!velocity.isZero(0.0001f) && (target == null
+                || (inventory.hasAmmo() && distanceTo(target) > inventory.getAmmo().getRange()))){
+            rotation = velocity.angle();
         }
     }
 
     @Override
-    public void draw(BaseUnit unit) {
-        Draw.alpha(unit.hitTime / Unit.hitDuration);
+    public void drawSmooth() {
+        Draw.alpha(hitTime / hitDuration);
 
-        float walktime = unit.walkTime;
+        float walktime = walkTime;
 
         float ft = Mathf.sin(walktime, 6f, 2f);
 
-        Floor floor = unit.getFloorOn();
+        Floor floor = getFloorOn();
 
         if(floor.liquid){
             Draw.tint(Hue.mix(Color.WHITE, floor.liquidColor, 0.5f));
         }
 
         for (int i : Mathf.signs) {
-            Draw.rect(name + "-leg",
-                    unit.x + Angles.trnsx(unit.baseRotation, ft * i),
-                    unit.y + Angles.trnsy(unit.baseRotation, ft * i),
-                    12f * i, 12f - Mathf.clamp(ft * i, 0, 2), unit.baseRotation - 90);
+            Draw.rect(type.name + "-leg",
+                    x + Angles.trnsx(baseRotation, ft * i),
+                    y + Angles.trnsy(baseRotation, ft * i),
+                    12f * i, 12f - Mathf.clamp(ft * i, 0, 2), baseRotation - 90);
         }
 
         if(floor.liquid) {
-            Draw.tint(Color.WHITE, floor.liquidColor, unit.drownTime * 0.4f);
+            Draw.tint(Color.WHITE, floor.liquidColor, drownTime * 0.4f);
         }else {
             Draw.tint(Color.WHITE);
         }
 
-        Draw.rect(name + "-base", unit.x, unit.y, unit.baseRotation- 90);
+        Draw.rect(type.name + "-base", x, y, baseRotation- 90);
 
-        Draw.rect(name, unit.x, unit.y, unit.rotation -90);
+        Draw.rect(type.name, x, y, rotation -90);
 
         Draw.alpha(1f);
     }
 
     @Override
-    public void behavior(BaseUnit unit) {
-        if(unit.health <= health * retreatPercent){
-            unit.setState(retreat);
+    public void behavior() {
+        if(health <= health * type.retreatPercent && !inventory.isInfiniteAmmo()){
+            setState(retreat);
         }
     }
 
     @Override
-    public void updateTargeting(BaseUnit unit) {
-        super.updateTargeting(unit);
+    public void updateTargeting() {
+        super.updateTargeting();
 
-        if(Units.invalidateTarget(unit.target, unit)){
-            unit.target = null;
+        if(Units.invalidateTarget(target, this)){
+            target = null;
         }
     }
 
-    protected void moveToCore(BaseUnit unit){
-        Tile tile = world.tileWorld(unit.x, unit.y);
-        Tile targetTile = world.pathfinder().getTargetTile(unit.team, tile);
+    protected void moveToCore(){
+        Tile tile = world.tileWorld(x, y);
+        Tile targetTile = world.pathfinder().getTargetTile(team, tile);
 
         if(tile == targetTile) return;
 
-        vec.trns(unit.baseRotation, speed);
+        vec.trns(baseRotation, type.speed);
 
-        unit.baseRotation = Mathf.slerpDelta(unit.baseRotation, unit.angleTo(targetTile), 0.05f);
-        unit.walkTime += Timers.delta();
-        unit.velocity.add(vec);
+        baseRotation = Mathf.slerpDelta(baseRotation, angleTo(targetTile), 0.05f);
+        walkTime += Timers.delta();
+        velocity.add(vec);
     }
 
-    protected void moveAwayFromCore(BaseUnit unit){
-        Tile tile = world.tileWorld(unit.x, unit.y);
-        Tile targetTile = world.pathfinder().getTargetTile(state.teams.enemiesOf(unit.team).first(), tile);
+    protected void moveAwayFromCore(){
+        Tile tile = world.tileWorld(x, y);
+        Tile targetTile = world.pathfinder().getTargetTile(Vars.state.teams.enemiesOf(team).first(), tile);
 
         if(tile == targetTile) return;
 
-        vec.trns(unit.baseRotation, speed);
+        vec.trns(baseRotation, type.speed);
 
-        unit.baseRotation = Mathf.slerpDelta(unit.baseRotation, unit.angleTo(targetTile), 0.05f);
-        unit.walkTime += Timers.delta();
-        unit.velocity.add(vec);
+        baseRotation = Mathf.slerpDelta(baseRotation, angleTo(targetTile), 0.05f);
+        walkTime += Timers.delta();
+        velocity.add(vec);
     }
 
     public final UnitState
 
     resupply = new UnitState(){
-        public void entered(BaseUnit unit) {
-            unit.target = null;
+        public void entered() {
+            target = null;
         }
 
-        public void update(BaseUnit unit) {
-            Tile tile = Geometry.findClosest(unit.x, unit.y, world.indexer().getAllied(unit.team, BlockFlag.resupplyPoint));
+        public void update() {
+            Tile tile = Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.resupplyPoint));
 
-            if (tile != null && unit.distanceTo(tile) > 40) {
-                moveAwayFromCore(unit);
+            if (tile != null && distanceTo(tile) > 40) {
+                moveAwayFromCore();
             }
 
             //TODO move toward resupply point
-            if(unit.inventory.totalAmmo() + 10 >= unit.inventory.ammoCapacity()){
-                unit.state.set(unit, attack);
+            if(inventory.totalAmmo() + 10 >= inventory.ammoCapacity()){
+                state.set(attack);
             }
         }
     },
     attack = new UnitState(){
-        public void entered(BaseUnit unit) {
-            unit.target = null;
+        public void entered() {
+            target = null;
         }
 
-        public void update(BaseUnit unit) {
-            unit.retarget(() -> {
-                Unit closest = Units.getClosestEnemy(unit.team, unit.x, unit.y, unit.inventory.getAmmo().getRange(), other -> true);
+        public void update() {
+            retarget(() -> {
+                Unit closest = Units.getClosestEnemy(team, x, y, inventory.getAmmo().getRange(), other -> true);
                 if(closest != null){
-                    unit.target = closest;
+                    target = closest;
                 }else {
-                    Tile target = Geometry.findClosest(unit.x, unit.y, world.indexer().getEnemy(unit.team, BlockFlag.target));
-                    if (target != null) unit.target = target.entity;
+                    Tile target = Geometry.findClosest(x, y, world.indexer().getEnemy(team, BlockFlag.target));
+                    if (target != null) GroundUnitType.this.target = target.entity;
                 }
             });
 
-            if(!unit.inventory.hasAmmo()) {
-                unit.state.set(unit, resupply);
+            if(!inventory.hasAmmo()) {
+                state.set(resupply);
             }else{
-                if(unit.distanceTo(unit.target) > unit.inventory.getAmmo().getRange() * 0.7f){
-                    moveToCore(unit);
+                if(distanceTo(target) > inventory.getAmmo().getRange() * 0.7f){
+                    moveToCore();
                 }else{
-                    unit.rotate(unit.angleTo(unit.target));
+                    rotate(angleTo(target));
                 }
 
-                if (unit.timer.get(timerReload, reload) && Mathf.angNear(unit.angleTo(unit.target), unit.rotation, 13f)
-                        && unit.distanceTo(unit.target) < unit.inventory.getAmmo().getRange()) {
-                    AmmoType ammo = unit.inventory.getAmmo();
-                    unit.inventory.useAmmo();
-                    unit.rotate(unit.angleTo(unit.target));
+                if (timer.get(timerReload, type.reload) && Mathf.angNear(angleTo(target), rotation, 13f)
+                        && distanceTo(target) < inventory.getAmmo().getRange()) {
+                    AmmoType ammo = inventory.getAmmo();
+                    inventory.useAmmo();
+                    rotate(angleTo(target));
 
-                    shoot(unit, ammo, Angles.moveToward(unit.rotation, unit.angleTo(unit.target), maxAim), 4f);
+                    shoot(ammo, Angles.moveToward(rotation, angleTo(target), maxAim), 4f);
                 }
             }
         }
     },
     retreat = new UnitState() {
-        public void entered(BaseUnit unit) {
-            unit.target = null;
+        public void entered() {
+            target = null;
         }
 
-        public void update(BaseUnit unit) {
-            if(unit.health >= health){
-                unit.state.set(unit, attack);
+        public void update() {
+            if(health >= health){
+                state.set(attack);
             }
 
-            moveAwayFromCore(unit);
+            moveAwayFromCore();
         }
     };
 }

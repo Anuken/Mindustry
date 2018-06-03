@@ -51,7 +51,7 @@ public class UnitFactory extends Block {
     @Override
     public boolean isSolidFor(Tile tile) {
         UnitFactoryEntity entity = tile.entity();
-        return type.isFlying() || !entity.open;
+        return type.isFlying || !entity.open;
     }
 
     @Override
@@ -114,7 +114,7 @@ public class UnitFactory extends Block {
             if(entity.openCountdown > Timers.delta()){
                 entity.openCountdown -= Timers.delta();
             }else{
-                if(type.isFlying() || !anyEntities(tile)) {
+                if(type.isFlying || !anyEntities(tile)) {
                     entity.open = false;
                     entity.openCountdown = -1;
                 }else{
@@ -141,7 +141,7 @@ public class UnitFactory extends Block {
                 Effects.shake(2f, 3f, entity);
                 Effects.effect(BlockFx.producesmoke, tile.drawx(), tile.drawy());
 
-                BaseUnit unit = new BaseUnit(type, tile.getTeam());
+                BaseUnit unit = type.create(tile.getTeam());
                 unit.set(tile.drawx(), tile.drawy()).add();
                 unit.velocity.y = launchVelocity;
             });

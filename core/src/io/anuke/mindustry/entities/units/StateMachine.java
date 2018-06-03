@@ -3,15 +3,15 @@ package io.anuke.mindustry.entities.units;
 public class StateMachine {
     private UnitState state;
 
-    public void update(BaseUnit unit){
-        if(state != null) state.update(unit);
+    public void update(){
+        if(state != null) state.update();
     }
 
-    public void set(BaseUnit unit, UnitState next){
+    public void set( UnitState next){
         if(next == state) return;
-        if(state != null) state.exited(unit);
+        if(state != null) state.exited();
         this.state = next;
-        if(next != null) next.entered(unit);
+        if(next != null) next.entered();
     }
 
     public boolean is(UnitState state){

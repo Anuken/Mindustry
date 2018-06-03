@@ -50,5 +50,9 @@ public class EventType {
     public interface UnlockEvent extends Event{
         void handle(Content content);
     }
+
+    public interface BlockBuildEvent extends Event{
+        void handle(Team team, Tile tile);
+    }
 }
 
