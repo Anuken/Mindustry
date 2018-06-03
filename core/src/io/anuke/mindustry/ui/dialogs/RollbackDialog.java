@@ -1,9 +1,7 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.mindustry.net.NetEvents;
-import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.TextField;
-import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Strings;
 import static io.anuke.mindustry.Vars.*;
 

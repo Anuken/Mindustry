@@ -2,7 +2,6 @@ package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.utils.IntIntMap;
 import io.anuke.ucore.util.Bits;
-import io.anuke.ucore.util.Log;
 
 import java.nio.ByteBuffer;
 
@@ -15,7 +14,6 @@ public class MapTileData {
     private final static int TILE_SIZE = 4;
 
     private final ByteBuffer buffer;
-    private final TileDataMarker tile = new TileDataMarker();
     private final int width, height;
     private final boolean readOnly;
 
@@ -38,15 +36,14 @@ public class MapTileData {
 
         if(mapping != null && !readOnly){
             for(int i = 0; i < width * height; i ++){
-                read();
+                TileDataMarker marker = new TileDataMarker();
+                read(marker);
                 buffer.position(i * TILE_SIZE);
-                write();
+                write(marker);
             }
             buffer.position(0);
             this.map = null;
         }
-
-        read();
     }
 
     public byte[] toArray(){
@@ -61,14 +58,16 @@ public class MapTileData {
         return height;
     }
 
-    public TileDataMarker getMarker() {
-        return tile;
+    /**Write a byte to a specific position.*/
+    public void write(int x, int y, DataPosition position, byte data){
+        buffer.position((x + width * y) * TILE_SIZE + position.ordinal());
+        buffer.put(data);
     }
 
-    /**Reads and returns the next tile data.*/
-    public TileDataMarker read(){
-        tile.read(buffer);
-        return tile;
+    /**Gets a byte at a specific position.*/
+    public byte read(int x, int y, DataPosition position){
+        buffer.position((x + width * y) * TILE_SIZE + position.ordinal());
+        return buffer.get();
     }
 
     /**Reads and returns the next tile data.*/
@@ -77,40 +76,22 @@ public class MapTileData {
         return marker;
     }
 
-    /**Reads and returns the next tile data.*/
-    public TileDataMarker readAt(int x, int y){
-        position(x, y);
-        tile.read(buffer);
-        return tile;
-    }
-
-    /**Reads and returns the next tile data.*/
-    public TileDataMarker readAt(int x, int y, TileDataMarker marker){
-        position(x, y);
-        marker.read(buffer);
-        return marker;
-    }
-
-    /**Reads and returns a specific byte position.*/
-    public byte readAt(int x, int y, int offset){
-        buffer.position((x + width * y) * TILE_SIZE + offset);
-        return buffer.get();
-    }
-
-    /**Writes and returns the next tile data.*/
-    public void write(){
-        tile.write(buffer);
-    }
-
-    /**Writes tile data at a specified position.*/
-    public void write(int x, int y, TileDataMarker writer){
-        position(x, y);
-        writer.write(buffer);
+    /**Writes this tile data marker.*/
+    public void write(TileDataMarker marker){
+        marker.write(buffer);
     }
 
     /**Sets read position to the specified coordinates*/
     public void position(int x, int y){
         buffer.position((x + width * y) * TILE_SIZE);
+    }
+
+    public TileDataMarker newDataMarker(){
+        return new TileDataMarker();
+    }
+
+    public enum DataPosition{
+        floor, wall, link, rotationTeam
     }
 
     public class TileDataMarker {
@@ -139,12 +120,6 @@ public class MapTileData {
             buffer.put(wall);
             buffer.put(link);
             buffer.put(Bits.packByte(rotation, team));
-        }
-
-        public void writeWallLink(){
-            buffer.position(buffer.position() + 1);
-            buffer.put(wall);
-            buffer.put(link);
         }
     }
 }

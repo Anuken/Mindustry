@@ -132,6 +132,10 @@ public class UnitInventory {
         totalAmmo = 0;
     }
 
+    public void clearItem(){
+        item = null;
+    }
+
     public boolean hasItem(){
         return item != null;
     }

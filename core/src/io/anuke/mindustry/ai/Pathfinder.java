@@ -3,6 +3,7 @@ package io.anuke.mindustry.ai;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.ObjectSet.ObjectSetIterator;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
@@ -39,7 +40,9 @@ public class Pathfinder {
     }
 
     public void update(){
-        for(TeamData team : state.teams.getTeams()){
+        ObjectSetIterator<TeamData> iterator = new ObjectSetIterator<>(state.teams.getTeams());
+
+        for(TeamData team : iterator){
             updateFrontier(team.team, maxUpdate);
         }
     }

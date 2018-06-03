@@ -35,15 +35,11 @@ public class Vault extends StorageBlock {
     }
 
     @Override
-    public boolean canDump(Tile tile, Tile to, Item item){
+    public boolean canDump(Tile tile, Tile to, Item item) {
         to = to.target();
-        if(!(to.block() instanceof StorageBlock)) return false;
+        if (!(to.block() instanceof StorageBlock)) return false;
 
-        if(to.block() instanceof Vault){
-            return (float)to.entity.items.totalItems() / to.block().itemCapacity <
-                    (float)tile.entity.items.totalItems() / itemCapacity;
-        }
+        return !(to.block() instanceof Vault) || (float) to.entity.items.totalItems() / to.block().itemCapacity < (float) tile.entity.items.totalItems() / itemCapacity;
 
-        return true;
     }
 }

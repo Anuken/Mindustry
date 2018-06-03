@@ -55,11 +55,8 @@ public class Vars{
 	public static float fontScale;
 	//camera zoom displayed on startup
 	public static int baseCameraScale;
-	//how much the zoom changes every zoom button press (unused?)
-	public static int zoomScale;
 	//if true, player speed will be increased, massive amounts of resources will be given on start, and other debug options will be available
 	public static boolean debug = false;
-	public static boolean debugNet = true;
 	public static boolean console = false;
 	//whether the player can clip through walls
 	public static boolean noclip = false;
@@ -83,8 +80,6 @@ public class Vars{
 	public static float baseControllerSpeed = 11f;
 
 	public static final int saveSlots = 64;
-	//amount of drops that are left when breaking a block
-	public static final float breakDropAmount = 0.5f;
 
 	//only if smoothCamera
 	public static boolean snapCamera = true;
@@ -172,6 +167,5 @@ public class Vars{
 
 		fontScale = Math.max(Unit.dp.scl(1f)/2f, 0.5f);
 		baseCameraScale = Math.round(Unit.dp.scl(4));
-		zoomScale = Math.round(Unit.dp.scl(1));
 	}
 }

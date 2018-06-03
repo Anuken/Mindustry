@@ -100,7 +100,7 @@ public abstract class UnitType {
     public abstract void behavior(BaseUnit unit);
 
     public void updateTargeting(BaseUnit unit){
-        if(unit.target == null || (unit.target instanceof Unit && (((Unit)unit.target).isDead() || ((Unit)unit.target).team == unit.team))
+        if(unit.target == null || (unit.target instanceof Unit && (unit.target.isDead() || ((Unit)unit.target).team == unit.team))
                 || (unit.target instanceof TileEntity && ((TileEntity) unit.target).tile.entity == null)){
             unit.target = null;
         }

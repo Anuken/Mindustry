@@ -12,12 +12,9 @@ public class ItemImage extends Stack {
     private Image image;
 
     public ItemImage(TextureRegion region, Supplier<String> text, Color color) {
-        Table t = new Table();
-        t.left().bottom();
+        Table t = new Table().left().bottom();
 
-        t.label(text).color(Color.DARK_GRAY);
-        t.row();
-        t.label(text).padTop(-22);
+        t.label(text).get().setFontScale(0.5f);
 
         image = new Image(region);
         image.setColor(color);

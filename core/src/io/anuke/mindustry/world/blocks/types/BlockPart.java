@@ -67,14 +67,10 @@ public class BlockPart extends Block{
 	}
 	
 	@Override
-	public boolean acceptPower(Tile tile, Tile from, float amount){
-		Block block = linked(tile);
-		if(block.hasPower){
-			return block.acceptPower(tile.getLinked(), from, amount);
-		}else{
-			return false;
-		}
-	}
+	public boolean acceptPower(Tile tile, Tile from, float amount) {
+        Block block = linked(tile);
+        return block.hasPower && block.acceptPower(tile.getLinked(), from, amount);
+    }
 	
 	private Block linked(Tile tile){
 		return tile.getLinked().block();

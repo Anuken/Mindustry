@@ -221,7 +221,7 @@ public class MapFilter{
 		OrderedMap<String, GenPref> prefs = new OrderedMap<>();
 		
 		for(int i = 0; i < objects.length; i ++){
-			GenPref pref = (GenPref)objects[i];
+			GenPref pref = objects[i];
 			prefs.put(pref.name, pref);
 		}
 		return prefs;

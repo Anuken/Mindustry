@@ -123,6 +123,9 @@ public class MapView extends Element implements GestureListener{
 					return false;
 				}
 
+				mousex = x;
+				mousey = y;
+
 				op = new DrawOperation(editor.getMap());
 
 				updated = false;

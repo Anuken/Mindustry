@@ -15,13 +15,14 @@ import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.io.MapTileData.TileDataMarker;
+import io.anuke.mindustry.io.MapTileData.DataPosition;
 import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.IndexedRenderer;
+import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Log;
 
 import static io.anuke.mindustry.Vars.tilesize;
@@ -109,7 +110,7 @@ public class MapRenderer implements Disposable{
 
         for(int x = 0; x < chunks.length; x ++){
             for(int y = 0; y < chunks[0].length; y ++){
-                chunks[x][y] = new IndexedRenderer(chunksize*chunksize*3);
+                chunks[x][y] = new IndexedRenderer(chunksize*chunksize*2);
             }
         }
         this.width = width;
@@ -161,41 +162,47 @@ public class MapRenderer implements Disposable{
     private void render(int wx, int wy){
         int x = wx/chunksize, y = wy/chunksize;
         IndexedRenderer mesh = chunks[x][y];
-        TileDataMarker data = editor.getMap().readAt(wx, wy);
-        Block floor = Block.getByID(data.floor);
-        Block wall = Block.getByID(data.wall);
+        //TileDataMarker data = editor.getMap().readAt(wx, wy);
+        byte bf = editor.getMap().read(wx, wy, DataPosition.floor);
+        byte bw = editor.getMap().read(wx, wy, DataPosition.wall);
+        byte btr = editor.getMap().read(wx, wy, DataPosition.rotationTeam);
+        byte rotation = Bits.getLeftByte(btr);
+        Team team = Team.values()[Bits.getRightByte(btr)];
+
+        Block floor = Block.getByID(bf);
+        Block wall = Block.getByID(bw);
 
         int offsetx = -(wall.size-1)/2;
         int offsety = -(wall.size-1)/2;
 
-        TextureRegion region = blockIcons.get(floor, regions.get("clear"));
+        TextureRegion region;
 
-        if(data.link != 0 || wall.solid){
-            region = regions.get("clear");
-        }
+        if(bw != 0) {
+            region = blockIcons.get(wall, regions.get("clear"));
 
-        mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize, region, wx * tilesize, wy * tilesize, 8, 8);
-
-        region = blockIcons.get(wall, regions.get("clear"));
-
-        if(wall.rotate){
-            mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize + chunksize*chunksize, region,
-                    wx * tilesize + offsetx*tilesize, wy * tilesize  + offsety * tilesize,
-                    region.getRegionWidth(), region.getRegionHeight(), data.rotation*90 - 90);
+            if (wall.rotate) {
+                mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
+                        wx * tilesize + offsetx * tilesize, wy * tilesize + offsety * tilesize,
+                        region.getRegionWidth(), region.getRegionHeight(), rotation * 90 - 90);
+            } else {
+                mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
+                        wx * tilesize + offsetx * tilesize, wy * tilesize + offsety * tilesize,
+                        region.getRegionWidth(), region.getRegionHeight());
+            }
         }else{
-            mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize + chunksize*chunksize, region,
-                    wx * tilesize + offsetx*tilesize, wy * tilesize  + offsety * tilesize,
-                    region.getRegionWidth(), region.getRegionHeight());
+            region = blockIcons.get(floor, regions.get("clear"));
+
+            mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize, region, wx * tilesize, wy * tilesize, 8, 8);
         }
 
         if(wall.update || wall.destructible) {
-            mesh.setColor(Team.values()[data.team].color);
+            mesh.setColor(team.color);
             region = regions.get("block-border");
         }else{
             region = regions.get("clear");
         }
 
-        mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize + chunksize*chunksize*2, region,
+        mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize + chunksize*chunksize, region,
                 wx * tilesize + offsetx*tilesize, wy * tilesize  + offsety * tilesize,
                 region.getRegionWidth(), region.getRegionHeight());
         mesh.setColor(Color.WHITE);

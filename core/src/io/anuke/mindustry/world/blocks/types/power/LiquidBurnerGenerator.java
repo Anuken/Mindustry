@@ -23,6 +23,7 @@ public class LiquidBurnerGenerator extends PowerGenerator {
 		super(name);
 		liquidCapacity = 30f;
 		hasLiquids = true;
+		hasItems = false;
 	}
 	
 	@Override

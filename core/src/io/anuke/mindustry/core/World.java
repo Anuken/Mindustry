@@ -1,6 +1,5 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
@@ -21,6 +20,7 @@ import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
 
+import static io.anuke.mindustry.Vars.threads;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class World extends Module{
@@ -192,7 +192,7 @@ public class World extends Module{
 
 	public void notifyChanged(Tile tile){
     	if(!generating){
-    		Gdx.app.postRunnable(() -> Events.fire(TileChangeEvent.class, tile));
+    		threads.runDelay(() -> Events.fire(TileChangeEvent.class, tile));
 		}
 	}
 

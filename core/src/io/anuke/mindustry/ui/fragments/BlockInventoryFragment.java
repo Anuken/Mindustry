@@ -85,7 +85,7 @@ public class BlockInventoryFragment implements Fragment {
         int row = 0;
 
         table.margin(3f);
-        table.defaults().size(16 * 2).space(6f);
+        table.defaults().size(16*2).space(6f);
 
         if(tile.block().hasItems) {
             int[] items = tile.entity.items.items;
@@ -96,13 +96,6 @@ public class BlockInventoryFragment implements Fragment {
                 Item item = Item.getByID(i);
 
                 container.add(i);
-
-                Table t = new Table();
-                t.left().bottom();
-
-                t.label(() -> round(items[f])).color(Color.DARK_GRAY);
-                t.row();
-                t.label(() -> round(items[f])).padTop(-22);
 
                 BooleanProvider canPick = () -> player.inventory.canAcceptItem(item);
 

@@ -40,7 +40,7 @@ public class ChatFragment extends Table implements Fragment{
     private float textWidth = Unit.dp.scl(600);
     private Color shadowColor = new Color(0, 0, 0, 0.4f);
     private float textspacing = Unit.dp.scl(10);
-    private Array<String> history = new Array<String>();
+    private Array<String> history = new Array<>();
     private int historyPos = 0;
     private int scrollPos = 0;
 

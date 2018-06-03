@@ -1,6 +1,5 @@
 package io.anuke.mindustry.net;
 
-import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.world.Block;
 
 public class EditLog {
@@ -21,6 +20,6 @@ public class EditLog {
 	}
 	
 	public enum EditAction {
-		PLACE, BREAK;
-	}
+		PLACE, BREAK
+    }
 }

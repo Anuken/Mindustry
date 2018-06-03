@@ -37,14 +37,16 @@ public class DrawOperation{
 	public void undo(MapEditor editor) {
 		for(int i = operations.size - 1; i >= 0; i --){
 			TileOperation op = operations.get(i);
-			data.write(op.x, op.y, op.from);
+			data.position(op.x, op.y);
+			data.write(op.from);
 			editor.renderer().updatePoint(op.x, op.y);
 		}
 	}
 
 	public void redo(MapEditor editor) {
 		for(TileOperation op : operations){
-			data.write(op.x, op.y, op.to);
+			data.position(op.x, op.y);
+			data.write(op.to);
 			editor.renderer().updatePoint(op.x, op.y);
 		}
 	}

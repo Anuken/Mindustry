@@ -212,7 +212,7 @@ public class FileChooser extends FloatingDialog {
 			files.row();
 		}
 		
-		ButtonGroup<TextButton> group = new ButtonGroup<TextButton>();
+		ButtonGroup<TextButton> group = new ButtonGroup<>();
 		group.setMinCheckCount(0);
 
 		for(FileHandle file : names){
@@ -278,7 +278,7 @@ public class FileChooser extends FloatingDialog {
 	}
 
 	public class FileHistory{
-		private Array<FileHandle> history = new Array<FileHandle>();
+		private Array<FileHandle> history = new Array<>();
 		private int index;
 
 		public FileHistory(){

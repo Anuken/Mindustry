@@ -28,16 +28,13 @@ public class Units {
      * @param range The maximum distance from the target X/Y the targeter can be for it to be valid
      * @return whether the target is invalid
      */
-    public static boolean invalidateTarget(Targetable target, Team team, float x, float y, float range){
-        if(target == null){
+    public static boolean invalidateTarget(Targetable target, Team team, float x, float y, float range) {
+        if (target == null) {
             return false;
         }
 
-        if(range != Float.MAX_VALUE && target.distanceTo(x, y) > range){
-            return false;
-        }
+        return (!(range != Float.MAX_VALUE) || !(target.distanceTo(x, y) > range)) && (target.getTeam() == team || !target.isValid());
 
-        return target.getTeam() == team || !target.isValid();
     }
 
     /**See {@link #invalidateTarget(Targetable, Team, float, float, float)}*/

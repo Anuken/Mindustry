@@ -21,10 +21,11 @@ public class WorldGenerator {
 		IntArray multiblocks = new IntArray();
 
 		data.position(0, 0);
+		TileDataMarker marker = data.newDataMarker();
 
 		for(int y = 0; y < data.height(); y ++){
 			for(int x = 0; x < data.width(); x ++){
-				TileDataMarker tile = data.read();
+				TileDataMarker tile = data.read(marker);
 				tiles[x][y] = new Tile(x, y, tile.floor, tile.wall == Blocks.blockpart.id ? 0 : tile.wall, tile.rotation, tile.team);
 
 				Team team = Team.values()[tile.team];

@@ -6,6 +6,7 @@ public class LiquidHeatGenerator extends LiquidBurnerGenerator {
 
     public LiquidHeatGenerator(String name) {
         super(name);
+        hasItems = false;
     }
 
     @Override

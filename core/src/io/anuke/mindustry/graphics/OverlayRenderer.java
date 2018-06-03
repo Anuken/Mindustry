@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet.ObjectSetIterator;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
@@ -15,7 +16,11 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.*;
+import io.anuke.ucore.function.Callable;
+import io.anuke.ucore.graphics.CapStyle;
+import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Fill;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
@@ -93,22 +98,45 @@ public class OverlayRenderer {
                     }
 
                     if (target.entity != null) {
-                        int bot = 0, top = 0;
-                        for (BlockBar bar : target.block().bars.list()) {
-                            float offset = Mathf.sign(bar.top) * (target.block().size / 2f * tilesize + 3f + 4f * ((bar.top ? top : bot))) +
-                                    (bar.top ? -1f : 0f);
+                        int[] values = {0, 0};
+                        Tile t = target;
+                        boolean[] doDraw = {false};
 
-                            float value = bar.value.get(target);
+                        Callable drawbars = () -> {
+                            for (BlockBar bar : t.block().bars.list()) {
+                                //TODO fix.
+                                float offset = Mathf.sign(bar.top) * (t.block().size / 2f * tilesize + 2f + (bar.top ? values[0] : values[1]));
 
-                            if (MathUtils.isEqual(value, -1f)) continue;
+                                float value = bar.value.get(t);
 
-                            drawBar(bar.type.color, target.drawx(), target.drawy() + offset, value);
+                                if (MathUtils.isEqual(value, -1f)) continue;
 
-                            if (bar.top)
-                                top++;
-                            else
-                                bot++;
+                                if(doDraw[0]){
+                                    drawBar(bar.type.color, t.drawx(), t.drawy() + offset, value);
+                                }
+
+                                if (bar.top)
+                                    values[0]++;
+                                else
+                                    values[1]++;
+                            }
+                        };
+
+                        drawbars.run();
+
+                        if(values[0] > 0){
+                            drawEncloser(target.drawx(), target.drawy() + target.block().size * tilesize/2f + 2f + values[0]/2f + (values[0] > 2 ? 1 : 0), values[0]);
                         }
+
+                        if(values[1] > 0){
+                            drawEncloser(target.drawx(), target.drawy() - target.block().size * tilesize/2f - 2f - values[1]/2f, values[1]);
+                        }
+
+                        doDraw[0] = true;
+                        values[0] = 0;
+                        values[1] = 1;
+
+                        drawbars.run();
                     }
 
                     target.block().drawSelect(target);
@@ -135,7 +163,9 @@ public class OverlayRenderer {
         }
 
         if((!debug || showUI) && Settings.getBool("healthbars")){
-            for(TeamData ally : (debug ? state.teams.getTeams() : state.teams.getTeams(true))){
+            ObjectSetIterator<TeamData> iterator = new ObjectSetIterator<>((debug ? state.teams.getTeams() : state.teams.getTeams(true)));
+
+            for(TeamData ally : iterator){
                 for(Unit e : unitGroups[ally.team.ordinal()].all()){
                     drawStats(e);
                 }

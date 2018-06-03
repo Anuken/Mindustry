@@ -19,13 +19,11 @@ public class Predict {
      * @return the intercept location*/
     public static Vector2 intercept(float srcx, float srcy, float dstx, float dsty, float dstvx, float dstvy, float v) {
         float tx = dstx - srcx,
-                ty = dsty - srcy,
-                tvx = dstvx,
-                tvy = dstvy;
+                ty = dsty - srcy;
 
         // Get quadratic equation components
-        float a = tvx*tvx + tvy*tvy - v*v;
-        float b = 2 * (tvx * tx + tvy * ty);
+        float a = dstvx * dstvx + dstvy * dstvy - v*v;
+        float b = 2 * (dstvx * tx + dstvy * ty);
         float c = tx*tx + ty*ty;
 
         // Solve quadratic

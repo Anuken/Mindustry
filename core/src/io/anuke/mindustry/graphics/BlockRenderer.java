@@ -20,7 +20,7 @@ public class BlockRenderer{
 
 	private FloorRenderer floorRenderer;
 	
-	private Array<BlockRequest> requests = new Array<BlockRequest>(initialRequests);
+	private Array<BlockRequest> requests = new Array<>(initialRequests);
 	private Layer lastLayer;
 	private int requestidx = 0;
 	private int iterateidx = 0;

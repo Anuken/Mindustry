@@ -17,7 +17,6 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
@@ -26,7 +25,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public abstract class InputHandler extends InputAdapter{
 	/**Used for dropping items.*/
-    final float playerSelectRange = Unit.dp.scl(40f);
+    final float playerSelectRange = 16f;
 	/**Maximum line length.*/
 	final int maxLength = 100;
     final Translator stackTrns = new Translator();
@@ -87,13 +86,14 @@ public abstract class InputHandler extends InputAdapter{
 	}
 
 	/**Handles tile tap events that are not platform specific.*/
-	public boolean tileTapped(Tile tile){
+	boolean tileTapped(Tile tile){
 		tile = tile.target();
 
 		boolean consumed = false;
+		boolean showedInventory = false;
 
 		//check if tapped block is configurable
-		if(tile.block().isConfigurable(tile)){
+		if(tile.block().isConfigurable(tile) && tile.getTeam() == player.team){
 			consumed = true;
 			if((!frag.config.isShown() //if the config fragment is hidden, show
 					//alternatively, the current selected block can 'agree' to switch config tiles
@@ -111,24 +111,47 @@ public abstract class InputHandler extends InputAdapter{
 
 		//TODO network event!
 		//call tapped event
-		if(tile.block().tapped(tile, player)){
+		if(tile.getTeam() == player.team && tile.block().tapped(tile, player)){
 			consumed = true;
+		}else if(tile.getTeam() == player.team && tile.block().synthetic() && tile.block().hasItems){
+			frag.inv.showFor(tile);
+			consumed = true;
+			showedInventory = true;
+		}
+
+		if(!showedInventory){
+			frag.inv.hide();
 		}
 
 		return consumed;
 	}
 
-	//utility methods
+	/**Tries to select the player to drop off items, returns true if successful.*/
+	boolean tryTapPlayer(float x, float y){
+		if(canTapPlayer(x, y)){
+			droppingItem = true;
+			return true;
+		}
+		return false;
+	}
+
+	boolean canTapPlayer(float x, float y){
+		return Vector2.dst(x, y, player.x, player.y) <= playerSelectRange && player.inventory.hasItem();
+	}
 
 	/**Tries to begin mining a tile, returns true if successful.*/
 	boolean tryBeginMine(Tile tile){
-		if(tile.floor().drops != null && tile.floor().drops.item.hardness <= player.mech.drillPower
-				&& tile.block() == Blocks.air && player.distanceTo(tile.worldx(), tile.worldy()) <= Player.mineDistance){
+		if(canMine(tile)){
 			//if a block is clicked twice, reset it
 			player.setMineTile(player.getMineTile() == tile ? null : tile);
 			return true;
 		}
 		return false;
+	}
+
+	boolean canMine(Tile tile){
+		return tile.floor().drops != null && tile.floor().drops.item.hardness <= player.mech.drillPower
+				&& tile.block() == Blocks.air && player.distanceTo(tile.worldx(), tile.worldy()) <= Player.mineDistance;
 	}
 
 	/**Returns the tile at the specified MOUSE coordinates.*/
@@ -166,7 +189,16 @@ public abstract class InputHandler extends InputAdapter{
 		return droppingItem;
 	}
 
-	public void dropItem(Tile tile, ItemStack stack){
+	public void tryDropItems(Tile tile){
+		if(!droppingItem || !player.inventory.hasItem() || !tile.block().hasItems){
+			droppingItem = false;
+			return;
+		}
+
+		droppingItem = false;
+
+		ItemStack stack = player.inventory.getItem();
+
 		int accepted = tile.block().acceptStack(stack.item, stack.amount, tile, player);
 
 		if(accepted > 0){
@@ -203,7 +235,7 @@ public abstract class InputHandler extends InputAdapter{
 
 					if(end){
 						stack.amount -= remaining[0];
-						if(clear) player.inventory.clear();
+						if(clear) player.inventory.clearItem();
 						transferring = false;
 					}
 				});

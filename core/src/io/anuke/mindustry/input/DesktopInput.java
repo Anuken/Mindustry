@@ -12,6 +12,7 @@ import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
 import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.core.KeyBinds;
@@ -32,6 +33,8 @@ public class DesktopInput extends InputHandler{
 	private float controlx, controly;
 	private boolean controlling;
     private final String section;
+
+    /**Current cursor type.*/
     private CursorType cursorType = normal;
 
     /**Position where the player started dragging a line.*/
@@ -98,10 +101,6 @@ public class DesktopInput extends InputHandler{
 
             Draw.color(Palette.remove);
 
-            Draw.alpha(0.6f);
-            //Fill.crect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
-            Draw.alpha(1f);
-
             for(int x = dresult.x; x <= dresult.x2; x ++){
                 for(int y = dresult.y; y <= dresult.y2; y ++){
                     Tile tile = world.tile(x, y);
@@ -160,9 +159,11 @@ public class DesktopInput extends InputHandler{
                 cursorType = hand;
             }
 
-            if(cursor.floor().drops != null && cursor.floor().drops.item.hardness <= player.mech.drillPower
-                    && cursor.block() == Blocks.air && player.distanceTo(cursor.worldx(), cursor.worldy()) <= Player.mineDistance &&
-                    player.inventory.canAcceptItem(cursor.floor().drops.item)){
+            if(canMine(cursor)){
+                cursorType = drill;
+            }
+
+            if(canTapPlayer(Graphics.mouseWorld().x, Graphics.mouseWorld().y)){
                 cursorType = drill;
             }
 
@@ -189,6 +190,8 @@ public class DesktopInput extends InputHandler{
         Tile cursor = tileAt(screenX, screenY);
         if(cursor == null) return false;
 
+        float worldx = Graphics.world(screenX, screenY).x, worldy = Graphics.world(screenX, screenY).y;
+
         if(button == Buttons.LEFT) { //left = begin placing
             if (isPlacing()) {
                 selectX = cursor.x;
@@ -196,7 +199,8 @@ public class DesktopInput extends InputHandler{
                 mode = placing;
             } else {
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(cursor) && player.getPlaceQueue().size == 0 && !tryBeginMine(cursor)){
+                if(!tileTapped(cursor) && player.getPlaceQueue().size == 0 && !tryBeginMine(cursor)
+                        && player.getMineTile() == null && !tryTapPlayer(worldx, worldy) && !droppingItem){
                     shooting = true;
                 }
             }
@@ -250,6 +254,8 @@ public class DesktopInput extends InputHandler{
                 }
             }
         }
+
+        tryDropItems(cursor.target());
 
         mode = none;
 
@@ -320,7 +326,8 @@ public class DesktopInput extends InputHandler{
     enum CursorType{
 	    normal(Cursors::restoreCursor),
         hand(Cursors::setHand),
-        drill(Cursors::setTool1);
+        drill(() -> Cursors.set("drill")),
+        unload(() -> Cursors.set("unload"));
 
 	    private final Callable call;
 

@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.io.MapTileData.DataPosition;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
@@ -37,9 +38,11 @@ public class MapIO {
         Pixmap pixmap = new Pixmap(data.width(), data.height(), Format.RGBA8888);
         data.position(0, 0);
 
+        TileDataMarker marker = data.newDataMarker();
+
         for(int y = 0; y < data.height(); y ++){
             for(int x = 0; x < data.width(); x ++){
-                TileDataMarker marker = data.read();
+                data.read(marker);
                 Block floor = Block.getByID(marker.floor);
                 Block wall = Block.getByID(marker.wall);
                 int wallc = ColorMapper.getColor(wall);
@@ -56,22 +59,17 @@ public class MapIO {
     public static MapTileData readPixmap(Pixmap pixmap){
         MapTileData data = new MapTileData(pixmap.getWidth(), pixmap.getHeight());
 
-        data.position(0, 0);
-        TileDataMarker marker = data.getMarker();
-
         for(int x = 0; x < data.width(); x ++){
             for(int y = 0; y < data.height(); y ++){
                 BlockPair pair = ColorMapper.get(pixmap.getPixel(y, pixmap.getWidth() - 1 - x));
 
                 if(pair == null){
-                    marker.floor = (byte)Blocks.stone.id;
-                    marker.wall = (byte)Blocks.air.id;
+                    data.write(x, y, DataPosition.floor, (byte)Blocks.stone.id);
+                    data.write(x, y, DataPosition.wall, (byte)Blocks.air.id);
                 }else{
-                    marker.floor = (byte)pair.floor.id;
-                    marker.wall = (byte)pair.wall.id;
+                    data.write(x, y, DataPosition.floor, (byte)pair.floor.id);
+                    data.write(x, y, DataPosition.wall, (byte)pair.wall.id);
                 }
-
-                data.write();
             }
         }
 

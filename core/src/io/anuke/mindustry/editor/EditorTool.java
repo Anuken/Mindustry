@@ -2,17 +2,29 @@ package io.anuke.mindustry.editor;
 
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
+import io.anuke.mindustry.io.MapTileData.DataPosition;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.Floor;
+import io.anuke.ucore.util.Bits;
 
 import static io.anuke.mindustry.Vars.ui;
 
 public enum EditorTool{
 	pick{
 		public void touched(MapEditor editor, int x, int y){
-			TileDataMarker writer = editor.getMap().readAt(x, y);
-			Block block = Block.getByID(writer.wall == 0 ? writer.floor : writer.wall);
+			byte bf = editor.getMap().read(x, y, DataPosition.floor);
+			byte bw = editor.getMap().read(x, y, DataPosition.wall);
+			byte link = editor.getMap().read(x, y, DataPosition.link);
+
+			if(link != 0){
+				x -= (Bits.getLeftByte(link) - 8);
+				y -= (Bits.getRightByte(link) - 8);
+				bf = editor.getMap().read(x, y, DataPosition.floor);
+				bw = editor.getMap().read(x, y, DataPosition.wall);
+			}
+
+			Block block = Block.getByID(bw == 0 ? bf : bw);
 			editor.setDrawBlock(block);
 			ui.editor.updateSelectedBlock();
 		}
@@ -31,7 +43,6 @@ public enum EditorTool{
 		{
 
 		}
-
 	},
 	fill{
 		{
@@ -39,11 +50,21 @@ public enum EditorTool{
 		}
 		
 		public void touched(MapEditor editor, int x, int y){
+			if(editor.getDrawBlock().isMultiblock()){
+				//don't fill multiblocks, thanks
+				pencil.touched(editor, x, y);
+				return;
+			}
+
 			boolean floor = editor.getDrawBlock() instanceof Floor;
 
-			TileDataMarker writer = editor.getMap().readAt(x, y);
+			byte bf = editor.getMap().read(x, y, DataPosition.floor);
+			byte bw = editor.getMap().read(x, y, DataPosition.wall);
+			boolean synth = editor.getDrawBlock().synthetic();
+			byte brt = Bits.packByte((byte)editor.getDrawRotation(), (byte)editor.getDrawTeam().ordinal());
 
-			byte dest = floor ? writer.floor : writer.wall;
+			byte dest = floor ? bf: bw;
+			byte draw = (byte)editor.getDrawBlock().id;
 
 			int width = editor.getMap().width();
 			int height = editor.getMap().height();
@@ -58,21 +79,28 @@ public enum EditorTool{
 				int py = pos / width;
 				set.add(pos);
 
-				writer = editor.getMap().readAt(px, py);
+				byte nbf = editor.getMap().read(px, py, DataPosition.floor);
+				byte nbw = editor.getMap().read(px, py, DataPosition.wall);
 
-				if((floor ? writer.floor : writer.wall) == dest){
-					if(floor)
-						writer.floor = (byte)editor.getDrawBlock().id;
-					else
-						writer.wall = (byte)editor.getDrawBlock().id;
+				if((floor ? nbf : nbw) == dest){
+					TileDataMarker prev = editor.getPrev(px, py, false);
 
-					editor.write(px, py, writer, false);
-					editor.renderer().updatePoint(px, py);
+					if(floor) {
+						editor.getMap().write(px, py, DataPosition.floor, draw);
+					}else {
+						editor.getMap().write(px, py, DataPosition.wall, draw);
+					}
+
+					if(synth){
+						editor.getMap().write(px, py, DataPosition.rotationTeam, brt);
+					}
 
 					if(px > 0 && !set.contains(asInt(px - 1, py, width))) points.add(asInt(px - 1, py, width));
 					if(py > 0 && !set.contains(asInt(px, py - 1, width))) points.add(asInt(px, py - 1, width));
 					if(px < width - 1 && !set.contains(asInt(px + 1, py, width))) points.add(asInt(px + 1, py, width));
 					if(py < height - 1 && !set.contains(asInt(px, py + 1, width))) points.add(asInt(px, py + 1, width));
+
+					editor.onWrite(px, py, prev);
 				}
 			}
 		}

@@ -30,7 +30,6 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.table;
-import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;

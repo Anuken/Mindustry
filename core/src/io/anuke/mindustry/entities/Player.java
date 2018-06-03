@@ -465,8 +465,8 @@ public class Player extends Unit implements BlockBuilder {
 			rotation = Mathf.slerpDelta(rotation, velocity.angle(), velocity.len()/10f);
 		}
 
-		//update shooting if not building and there's ammo left
-		if(!isBuilding() && inventory.hasAmmo()){
+		//update shooting if not building, not mining and there's ammo left
+		if(!isBuilding() && inventory.hasAmmo() && getMineTile() == null){
 
 			//autofire: mobile only!
 			if(mobile) {

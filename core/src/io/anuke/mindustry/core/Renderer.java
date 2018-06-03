@@ -99,10 +99,12 @@ public class Renderer extends RendererModule{
 
 		Cursors.cursorScaling = 3;
 		Cursors.outlineColor = Color.valueOf("444444");
+
 		Cursors.arrow = Cursors.loadCursor("cursor");
 		Cursors.hand = Cursors.loadCursor("hand");
 		Cursors.ibeam = Cursors.loadCursor("ibar");
-		Cursors.tool1 = Cursors.loadCursor("drill");
+		Cursors.loadCustom("drill");
+		Cursors.loadCustom("unload");
 
 		clearColor = Hue.lightness(0.4f);
 		clearColor.a = 1f;

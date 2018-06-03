@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
 import com.badlogic.gdx.utils.ObjectSet;
-import io.anuke.mindustry.game.EventType.WorldLoadEvent;
+import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Core;
@@ -35,7 +35,7 @@ public class FloorRenderer {
     private IntArray drawnLayers = new IntArray();
 
     public FloorRenderer(){
-        Events.on(WorldLoadEvent.class, this::clearTiles);
+        Events.on(WorldLoadGraphicsEvent.class, this::clearTiles);
     }
 
     public void drawFloor(){

@@ -43,6 +43,16 @@ public class ThreadHandler {
         }
     }
 
+    public void runDelay(Runnable r){
+        if(enabled) {
+            synchronized (toRun) {
+                toRun.add(r);
+            }
+        }else{
+            Gdx.app.postRunnable(r);
+        }
+    }
+
     public int getFPS(){
         return (int)(60/delta);
     }

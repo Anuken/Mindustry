@@ -1,5 +1,6 @@
 package io.anuke.mindustry.graphics;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
@@ -8,7 +9,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Disposable;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
-import io.anuke.mindustry.game.EventType.WorldLoadEvent;
+import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Core;
@@ -17,7 +18,8 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Pixmaps;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class MinimapRenderer implements Disposable{
     private static final int baseSize = 16;
@@ -28,12 +30,13 @@ public class MinimapRenderer implements Disposable{
     private int zoom = 4;
 
     public MinimapRenderer(){
-        Events.on(WorldLoadEvent.class, () -> {
+        Events.on(WorldLoadGraphicsEvent.class, () -> {
             reset();
             updateAll();
         });
 
-        Events.on(TileChangeEvent.class, this::update);
+        //make sure to call on the graphics thread
+        Events.on(TileChangeEvent.class, tile -> Gdx.app.postRunnable(() -> update(tile)));
     }
 
     public Texture getTexture(){

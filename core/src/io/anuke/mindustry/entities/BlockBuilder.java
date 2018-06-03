@@ -173,7 +173,7 @@ public interface BlockBuilder {
             unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(tile.worldx(), tile.worldy()), 0.4f);
 
             if(unit.inventory.canAcceptItem(item) &&
-                    Mathf.chance(Timers.delta() * 0.05 / item.hardness)){
+                    Mathf.chance(Timers.delta() * (0.06 - item.hardness * 0.01))){
                 ItemTransfer.create(item,
                         tile.worldx() + Mathf.range(tilesize/2f),
                         tile.worldy() + Mathf.range(tilesize/2f),
