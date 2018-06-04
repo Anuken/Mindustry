@@ -14,7 +14,6 @@ import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
-import io.anuke.mindustry.net.Packets.ChatPacket;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.ui.fragments.DebugFragment;
 import io.anuke.mindustry.world.Tile;
@@ -49,11 +48,6 @@ public class ServerControl extends Module {
         Effects.setScreenShakeProvider((a, b) -> {});
         Effects.setEffectProvider((a, b, c, d, e, f) -> {});
         Sounds.setHeadless(true);
-
-        //override default handling of chat packets
-        Net.handle(ChatPacket.class, (packet) -> {
-            info("&y" + (packet.name == null ? "" : packet.name) +  ": &lb{0}", packet.text);
-        });
 
         //don't do anything at all for GDX logging: don't want controller info and such
         Gdx.app.setApplicationLogger(new ApplicationLogger() {
@@ -735,7 +729,7 @@ public class ServerControl extends Module {
 				return;
 			}
 
-			netServer.admins.rollbackWorld(rollbackTimes);
+			//netServer.admins.rollbackWorld(rollbackTimes);
 			info("Rollback done!");
 		});
     }

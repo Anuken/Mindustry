@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.entities.component.DrawTrait;
 import io.anuke.ucore.entities.impl.TimedEntity;
 import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.graphics.Draw;
@@ -16,7 +17,7 @@ import io.anuke.ucore.util.Position;
 
 import static io.anuke.mindustry.Vars.effectGroup;
 
-public class ItemTransfer extends TimedEntity{
+public class ItemTransfer extends TimedEntity implements DrawTrait{
     private Vector2 from = new Vector2();
     private Vector2 current = new Vector2();
     private Vector2 tovec = new Vector2();

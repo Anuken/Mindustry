@@ -14,7 +14,7 @@ import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.entities.effect.BelowLiquidEffect;
+import io.anuke.mindustry.entities.traits.BelowLiquidTrait;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
 import io.anuke.mindustry.entities.units.BaseUnit;
@@ -204,9 +204,9 @@ public class Renderer extends RendererModule{
 		
 		blocks.drawFloor();
 
-		EntityDraw.draw(groundEffectGroup, e -> e instanceof BelowLiquidEffect);
+		EntityDraw.draw(groundEffectGroup, e -> e instanceof BelowLiquidTrait);
 		EntityDraw.draw(puddleGroup);
-		EntityDraw.draw(groundEffectGroup, e -> !(e instanceof BelowLiquidEffect));
+		EntityDraw.draw(groundEffectGroup, e -> !(e instanceof BelowLiquidTrait));
 
 		blocks.processBlocks();
 		blocks.drawBlocks(Layer.block);

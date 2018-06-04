@@ -166,6 +166,7 @@ public class Player extends Unit implements BuilderTrait {
 	public void set(float x, float y){
 		this.x = x;
 		this.y = y;
+
 		if(isFlying() && isLocal){
 			Core.camera.position.set(x, y, 0f);
 		}
