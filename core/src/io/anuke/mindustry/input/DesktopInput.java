@@ -190,8 +190,8 @@ public class DesktopInput extends InputHandler{
                 mode = placing;
             } else {
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(cursor) && player.getPlaceQueue().size == 0 && !tryBeginMine(cursor)
-                        && player.getMineTile() == null && !tryTapPlayer(worldx, worldy) && !droppingItem){
+                if(!tileTapped(cursor) && player.getPlaceQueue().size == 0 && !tryTapPlayer(worldx, worldy) && !droppingItem &&
+                        !tryBeginMine(cursor) && player.getMineTile() == null){
                     shooting = true;
                 }
             }

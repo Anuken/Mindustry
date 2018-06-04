@@ -26,7 +26,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public abstract class InputHandler extends InputAdapter{
 	/**Used for dropping items.*/
-    final float playerSelectRange = 16f;
+    final float playerSelectRange = mobile ? 17f : 11f;
 	/**Maximum line length.*/
 	final int maxLength = 100;
     final Translator stackTrns = new Translator();
@@ -152,6 +152,7 @@ public abstract class InputHandler extends InputAdapter{
 
 	boolean canMine(Tile tile){
 		return tile.floor().drops != null && tile.floor().drops.item.hardness <= player.mech.drillPower
+				&& player.inventory.canAcceptItem(tile.floor().drops.item)
 				&& tile.block() == Blocks.air && player.distanceTo(tile.worldx(), tile.worldy()) <= Player.mineDistance;
 	}
 
@@ -191,7 +192,7 @@ public abstract class InputHandler extends InputAdapter{
 	}
 
 	public void tryDropItems(Tile tile, float x, float y){
-		if(!droppingItem || !player.inventory.hasItem() || !tile.block().hasItems){
+		if(!droppingItem || !player.inventory.hasItem() || !tile.block().hasItems || canTapPlayer(x, y)){
 			droppingItem = false;
 			return;
 		}

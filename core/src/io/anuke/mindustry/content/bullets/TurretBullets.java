@@ -101,7 +101,7 @@ public class TurretBullets implements ContentList {
 
             @Override
             public void init(Bullet b) {
-                DamageArea.collideLine(b, b.team, hiteffect, b.x, b.y, b.angle(), length);
+                DamageArea.collideLine(b, b.getTeam(), hiteffect, b.x, b.y, b.angle(), length);
             }
 
             @Override
@@ -168,7 +168,7 @@ public class TurretBullets implements ContentList {
 
             @Override
             public void init(Bullet b) {
-                Lightning.create(b.team, hiteffect, Palette.lancerLaser, damage, b.x, b.y, b.angle(), 30);
+                Lightning.create(b.getTeam(), hiteffect, Palette.lancerLaser, damage, b.x, b.y, b.angle(), 30);
             }
         };
     }

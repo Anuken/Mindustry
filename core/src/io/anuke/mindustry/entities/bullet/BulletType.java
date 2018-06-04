@@ -22,6 +22,8 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 	public float statusIntensity = 0.5f;
 	/**What fraction of armor is pierced, 0-1*/
 	public float armorPierce = 0f;
+	/**Whether to sync this bullet to clients.*/
+	public boolean syncable;
 
 	public BulletType(float speed, float damage){
 		this.id = lastid ++;

@@ -3,24 +3,30 @@ package io.anuke.mindustry.entities.bullet;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TeamTrait;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.net.Interpolator;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.entities.impl.BulletEntity;
 import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.entities.trait.VelocityTrait;
-import io.anuke.ucore.entities.impl.BulletEntity;
 import io.anuke.ucore.util.Timer;
+
+import java.nio.ByteBuffer;
 
 import static io.anuke.mindustry.Vars.bulletGroup;
 import static io.anuke.mindustry.Vars.world;
 
-public class Bullet extends BulletEntity<BulletType> implements TeamTrait{
+public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncTrait{
 	private static Vector2 vector = new Vector2();
 
+	private Interpolator interpolator = new Interpolator();
+	private Team team;
+
 	public Timer timer = new Timer(3);
-	public Team team;
 
 	public static Bullet create(BulletType type, TeamTrait owner, float x, float y, float angle){
 		return create(type, owner, owner.getTeam(), x, y, angle);
@@ -46,10 +52,37 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait{
 		return create(type, parent.owner, parent.team, x, y, angle);
 	}
 
-	private Bullet(){}
+	/**Internal use only!*/
+	public Bullet(){}
 
 	public boolean collidesTiles(){
 		return true; //TODO make artillery and such not do this
+	}
+
+	@Override
+	public boolean doSync(){
+		return type.syncable;
+	}
+
+	@Override
+	public Interpolator getInterpolator() {
+		return interpolator;
+	}
+
+	@Override
+	public void write(ByteBuffer data) {
+		data.putFloat(x);
+		data.putFloat(y);
+		data.put((byte)team.ordinal());
+		data.put((byte)type.id);
+	}
+
+	@Override
+	public void read(ByteBuffer data, long time) {
+		x = data.getFloat();
+		y = data.getFloat();
+		team = Team.values()[data.get()];
+		type = BulletType.getByID(data.get());
 	}
 
 	@Override

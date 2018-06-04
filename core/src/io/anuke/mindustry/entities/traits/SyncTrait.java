@@ -14,6 +14,10 @@ public interface SyncTrait extends Entity {
         return threads.isEnabled() && threads.getFPS() <= Gdx.graphics.getFramesPerSecond() / 2f;
     }
 
+    default boolean doSync(){
+        return true;
+    }
+
     default void setNet(float x, float y){
         set(x, y);
         getInterpolator().target.set(x, y);

@@ -158,11 +158,13 @@ public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, Veloc
     public void write(ByteBuffer data) {
         data.putFloat(x);
         data.putFloat(y);
+        data.put((byte)item.id);
     }
 
     @Override
     public void read(ByteBuffer data, long time) {
         x = data.getFloat();
         y = data.getFloat();
+        item = Item.getByID(data.get());
     }
 }
