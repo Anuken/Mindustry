@@ -75,7 +75,7 @@ public class RepairPoint extends Block{
         RepairPointEntity entity = tile.entity();
 
         if(entity.target != null && (entity.target.isDead() || entity.target.distanceTo(tile) > repairRadius ||
-            entity.target.health >= entity.target.getMaxHealth())){
+            entity.target.health >= entity.target.maxHealth())){
             entity.target = null;
         }else if(entity.target != null){
             entity.target.health += repairSpeed * Timers.delta() * entity.strength;
@@ -95,7 +95,7 @@ public class RepairPoint extends Block{
         if(entity.timer.get(timerTarget, 20)) {
             rect.setSize(repairRadius * 2).setCenter(tile.drawx(), tile.drawy());
             entity.target = Units.getClosest(tile.getTeam(), tile.drawx(), tile.drawy(), repairRadius,
-                    unit -> unit.health < unit.getMaxHealth());
+                    unit -> unit.health < unit.maxHealth());
         }
     }
 

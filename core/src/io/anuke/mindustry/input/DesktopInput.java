@@ -9,7 +9,6 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
-import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Graphics;
@@ -165,14 +164,6 @@ public class DesktopInput extends InputHandler{
 
             if(canTapPlayer(Graphics.mouseWorld().x, Graphics.mouseWorld().y)){
                 cursorType = drill;
-            }
-
-            if(recipe == null && !ui.hasMouse() && Inputs.keyDown("block_logs")) {
-                cursorType = hand;
-                if(Inputs.keyTap("select")){
-                    NetEvents.handleBlockLogRequest(cursor.x, cursor.y);
-                    Cursors.restoreCursor();
-                }
             }
         }
 

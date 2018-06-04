@@ -1,9 +1,9 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.mindustry.net.NetEvents;
 import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.util.Strings;
-import static io.anuke.mindustry.Vars.*;
+
+import static io.anuke.mindustry.Vars.gwt;
 
 public class RollbackDialog extends FloatingDialog {
 	
@@ -31,7 +31,7 @@ public class RollbackDialog extends FloatingDialog {
 		buttons().addButton("$text.cancel", this::hide);
 		
 		buttons().addButton("$text.ok", () -> {
-			NetEvents.handleRollbackRequest(Integer.valueOf(field.getText()));
+			//NetEvents.handleRollbackRequest(Integer.valueOf(field.getText()));
 			hide();
 		}).disabled(b -> field.getText().isEmpty() || !Strings.canParsePostiveInt(field.getText()));
 	}

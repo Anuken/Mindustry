@@ -7,7 +7,7 @@ import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.Group;
@@ -55,13 +55,13 @@ public class DebugFragment implements Fragment {
                row();
                new button("noclip", "toggle", () -> noclip = !noclip);
                row();
-               new button("team", "toggle", () -> player.team = (player.team == Team.blue ? Team.red : Team.blue));
+               new button("team", "toggle", () -> player.toggleTeam());
                row();
                new button("blocks", "toggle", () -> showBlockDebug = !showBlockDebug);
                row();
                new button("effect", () -> {
                    for(int i = 0; i < 20; i ++){
-                       Bullet.create(TurretBullets.fireball, player, player.team, player.x, player.y, Mathf.random(360f));
+                       Bullet.create(TurretBullets.fireball, player, player.getTeam(), player.x, player.y, Mathf.random(360f));
                    }
                });
                row();
@@ -69,9 +69,17 @@ public class DebugFragment implements Fragment {
                row();
                new button("death", () -> player.damage(99999, false));
                row();
-               new button("spawnf", () -> UnitTypes.vtol.create(player.team).set(player.x, player.y).add());
+               new button("spawnf", () -> {
+                   BaseUnit unit = UnitTypes.vtol.create(player.getTeam());
+                   unit.set(player.x, player.y);
+                   unit.add();
+               });
                row();
-               new button("spawng", () -> UnitTypes.scout.create(player.team).set(player.x, player.y).add());
+               new button("spawng", () ->{
+                   BaseUnit unit = UnitTypes.scout.create(player.getTeam());
+                   unit.set(player.x, player.y);
+                   unit.add();
+               });
                row();
            }}.end();
 

@@ -6,24 +6,26 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.badlogic.gdx.utils.Pools;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.entities.Entity;
-import io.anuke.ucore.entities.SolidEntity;
-import io.anuke.ucore.entities.TimedEntity;
+import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.entities.component.SolidTrait;
+import io.anuke.ucore.entities.impl.TimedEntity;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
+import static io.anuke.mindustry.Vars.bulletGroup;
+
 public class Lightning extends TimedEntity implements Poolable{
-    private static Array<SolidEntity> entities = new Array<>();
+    private static Array<SolidTrait> entities = new Array<>();
     private static Rectangle rect = new Rectangle();
+    private static Rectangle hitrect = new Rectangle();
     private static float angle;
     private static float wetDamageMultiplier = 2;
 
@@ -66,12 +68,16 @@ public class Lightning extends TimedEntity implements Poolable{
                     angle = Mathf.slerp(angle, Angles.angle(x2, y2, entity.x, entity.y), (attractRange - dst) / attractRange / 4f);
                 }
 
-                Rectangle hitbox = entity.hitbox.getRect(entity.x, entity.y, range);
+                entity.getHitbox(hitrect);
+                hitrect.x -= range/2f;
+                hitrect.y -= range/2f;
+                hitrect.width += range/2f;
+                hitrect.height += range/2f;
 
-                if(hitbox.contains(x2, y2) || hitbox.contains(fx, fy)){
+                if(hitrect.contains(x2, y2) || hitrect.contains(fx, fy)){
                     float result = damage;
 
-                    if(entity.status.current() == StatusEffects.wet)
+                    if(entity.getStatus() == StatusEffects.wet)
                         result = (result * wetDamageMultiplier);
 
                     entity.damage(result);
@@ -115,7 +121,7 @@ public class Lightning extends TimedEntity implements Poolable{
     }
 
     @Override
-    public <T extends Entity> T add() {
-        return super.add(Vars.bulletGroup);
+    public EntityGroup targetGroup() {
+        return bulletGroup;
     }
 }

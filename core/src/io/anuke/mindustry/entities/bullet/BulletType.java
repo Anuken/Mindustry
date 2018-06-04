@@ -5,7 +5,7 @@ import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.entities.StatusEffect;
 import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.entities.BaseBulletType;
+import io.anuke.ucore.entities.impl.BaseBulletType;
 
 public abstract class BulletType extends BaseBulletType<Bullet>{
 	private static int lastid = 0;

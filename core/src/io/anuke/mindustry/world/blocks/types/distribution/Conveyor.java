@@ -115,7 +115,7 @@ public class Conveyor extends Block{
 		entity.carrying += unit.getMass();
 
 		if(entity.convey.size * itemSpace < 0.9f){
-			unit.velocity.add(tx * speed * Timers.delta(), ty * speed * Timers.delta());
+			unit.getVelocity().add(tx * speed * Timers.delta(), ty * speed * Timers.delta());
 		}
 	}
 

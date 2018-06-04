@@ -1,31 +1,19 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.SyncEntity;
-import io.anuke.mindustry.entities.bullet.BulletType;
-import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.type.Recipe;
-import io.anuke.mindustry.type.Upgrade;
-import io.anuke.mindustry.type.Weapon;
-import io.anuke.mindustry.world.Build;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Timer;
-
-import java.nio.ByteBuffer;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -42,7 +30,7 @@ public class NetClient extends Module {
     /**List of all recieved entitity IDs, to prevent duplicates.*/
     private IntSet recieved = new IntSet();
     /**List of recently recieved entities that have not been added to the queue yet.*/
-    private IntMap<SyncEntity> recent = new IntMap<>();
+    private IntMap<SyncTrait> recent = new IntMap<>();
     /**Counter for data timeout.*/
     private float timeoutTime = 0f;
     private int requests = 0;
@@ -67,20 +55,7 @@ public class NetClient extends Module {
 
             Entities.clear();
 
-            ConnectPacket c = new ConnectPacket();
-            c.name = player.name;
-            c.mobile = mobile;
-            c.color = Color.rgba8888(player.color);
-            c.uuid = Platform.instance.getUUID();
-
-            if(c.uuid == null){
-                ui.showError("$text.invalidid");
-                ui.loadfrag.hide();
-                disconnectQuietly();
-                return;
-            }
-
-            Net.send(c, SendMode.tcp);
+            //TODO send connect packet here
         });
 
         Net.handleClient(Disconnect.class, packet -> {
@@ -96,178 +71,15 @@ public class NetClient extends Module {
             Platform.instance.updateRPC();
         });
 
-        Net.handleClient(WorldData.class, data -> {
+        Net.handleClient(WorldStream.class, data -> {
             Log.info("Recieved world data: {0} bytes.", data.stream.available());
             NetworkIO.loadWorld(data.stream);
 
             finishConnecting();
         });
 
-        Net.handleClient(SyncPacket.class, packet -> {
-
-            Player player = players[0];
-
-            int players = 0;
-            int enemies = 0;
-
-            ByteBuffer data = ByteBuffer.wrap(packet.data);
-            long time = data.getLong();
-
-            byte groupid = data.get();
-            byte writesize = data.get();
-
-            EntityGroup<?> group = Entities.getGroup(groupid);
-
-            while (data.position() < data.capacity()) {
-                int id = data.getInt();
-
-                SyncEntity entity = (SyncEntity) group.getByID(id);
-
-                if(entity instanceof Player) players ++;
-                if(entity instanceof BaseUnit) enemies ++;
-
-                if (entity == null || id == player.id) {
-                    if (id != player.id && requests < maxRequests) {
-                        EntityRequestPacket req = new EntityRequestPacket();
-                        req.id = id;
-                        req.group = groupid;
-                        Net.send(req, SendMode.udp);
-                        requests ++;
-                    }
-                    data.position(data.position() + writesize);
-                } else {
-                    entity.read(data, time);
-                }
-            }
-        });
-
         Net.handleClient(InvokePacket.class, packet -> {
             //TODO invoke it
-        });
-
-        Net.handleClient(StateSyncPacket.class, packet -> {
-            state.enemies = packet.enemies;
-            state.wavetime = packet.countdown;
-            state.wave = packet.wave;
-        });
-
-        Net.handleClient(BlockLogRequestPacket.class, packet -> {
-            ui.listfrag.showBlockLogs(packet.editlogs, packet.x, packet.y);
-		});
-
-        Net.handleClient(PlacePacket.class, (packet) -> {
-            Player placer = playerGroup.getByID(packet.playerid);
-
-            //todo make it work
-//            Placement.placeBlock(placer, packet.x, packet.y, Recipe.getByID(packet.recipe), packet.rotation, true, Timers.get("placeblocksound", 10));
-
-            for(Player player : players) {
-                if (packet.playerid == player.id) {
-                    Tile tile = world.tile(packet.x, packet.y);
-                    if (tile != null) Recipe.getByID(packet.recipe).result.placed(tile);
-                    break;
-                }
-            }
-        });
-
-        Net.handleClient(BreakPacket.class, (packet) -> {
-            Player placer = playerGroup.getByID(packet.playerid);
-
-            Build.breakBlock(placer.team, packet.x, packet.y, true, Timers.get("breakblocksound", 10));
-        });
-
-        Net.handleClient(EntitySpawnPacket.class, packet -> {
-            EntityGroup group = packet.group;
-
-            //duplicates.
-            if (group.getByID(packet.entity.id) != null ||
-                    recieved.contains(packet.entity.id)) return;
-
-            recieved.add(packet.entity.id);
-            recent.put(packet.entity.id, packet.entity);
-
-            packet.entity.add();
-        });
-
-        Net.handleClient(EntityDeathPacket.class, packet -> {
-            EntityGroup group = Entities.getGroup(packet.group);
-            SyncEntity entity = (SyncEntity) group.getByID(packet.id);
-
-            recieved.add(packet.id);
-
-            if(entity != null) {
-                entity.onRemoteDeath();
-            }else{
-                if(recent.get(packet.id) != null){
-                    recent.get(packet.id).onRemoteDeath();
-                }else{
-                    Log.err("Got remove for null entity! {0} / group type {1}", packet.id, group.getType());
-                }
-            }
-        });
-
-        Net.handleClient(EntityShootPacket.class, packet -> {
-            BulletType type = BulletType.getByID(packet.bulletid);
-            EntityGroup group = Entities.getGroup(packet.groupid);
-            SyncEntity owner = (SyncEntity) group.getByID(packet.entityid);
-
-            owner.onRemoteShoot(type, packet.x, packet.y, packet.rotation, packet.data);
-        });
-
-        Net.handleClient(BlockDestroyPacket.class, packet -> {
-            Tile tile = world.tile(packet.position % world.width(), packet.position / world.width());
-            if (tile != null && tile.entity != null) {
-                tile.entity.onDeath(true);
-            }
-        });
-
-        Net.handleClient(BlockUpdatePacket.class, packet -> {
-            Tile tile = world.tile(packet.position % world.width(), packet.position / world.width());
-            if (tile != null && tile.entity != null) {
-                tile.entity.health = packet.health;
-            }
-        });
-
-        Net.handleClient(DisconnectPacket.class, packet -> {
-            Player player = playerGroup.getByID(packet.playerid);
-
-            if (player != null) {
-                player.remove();
-            }
-
-            Platform.instance.updateRPC();
-        });
-
-        Net.handleClient(KickPacket.class, packet -> {
-            quiet = true;
-            Net.disconnect();
-            state.set(State.menu);
-            if(!packet.reason.quiet) ui.showError("$text.server.kicked." + packet.reason.name());
-            ui.loadfrag.hide();
-        });
-
-        Net.handleClient(GameOverPacket.class, packet -> {
-            quiet = true;
-            ui.restart.show();
-        });
-
-        Net.handleClient(NetErrorPacket.class, packet -> {
-            ui.showError(packet.message);
-            disconnectQuietly();
-        });
-
-        Net.handleClient(TracePacket.class, packet -> {
-            Player player = playerGroup.getByID(packet.info.playerid);
-            ui.traces.show(player, packet.info);
-        });
-
-        Net.handleClient(UpgradePacket.class, packet -> {
-            Weapon weapon = Upgrade.getByID(packet.upgradeid);
-
-            for(Player player : players) {
-                player.upgrades.add(weapon);
-            }
-            Effects.sound("purchase");
         });
     }
 
@@ -302,7 +114,8 @@ public class NetClient extends Module {
         ui.loadfrag.hide();
         ui.join.hide();
         Net.setClientLoaded(true);
-        Timers.runTask(1f, () -> Net.send(new ConnectConfirmPacket(), SendMode.tcp));
+        //send connect ACK packet
+        //Timers.runTask(1f, () -> Net.send(new ConnectConfirmPacket(), SendMode.tcp));
         Timers.runTask(40f, Platform.instance::updateRPC);
     }
 
@@ -321,7 +134,7 @@ public class NetClient extends Module {
         if(timer.get(0, playerSyncTime)){
             Player player = players[0];
 
-            PositionPacket packet = new PositionPacket();
+            ClientSnapshotPacket packet = new ClientSnapshotPacket();
             packet.player = player;
             Net.send(packet, SendMode.udp);
         }

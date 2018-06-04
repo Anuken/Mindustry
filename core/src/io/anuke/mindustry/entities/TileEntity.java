@@ -3,9 +3,8 @@ package io.anuke.mindustry.entities;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Wall;
@@ -14,7 +13,8 @@ import io.anuke.mindustry.world.blocks.types.modules.LiquidModule;
 import io.anuke.mindustry.world.blocks.types.modules.PowerModule;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.Entity;
+import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.entities.impl.BaseEntity;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
 
@@ -25,7 +25,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.tileGroup;
 import static io.anuke.mindustry.Vars.world;
 
-public class TileEntity extends Entity implements Targetable{
+public class TileEntity extends BaseEntity implements TargetTrait {
 	public static final float timeToSleep = 60f*4; //4 seconds to fall asleep
 	public static int sleepingEntities = 0;
 
@@ -79,7 +79,7 @@ public class TileEntity extends Entity implements Targetable{
 	public void wakeUp(){
 		sleepTime = 0f;
 		if(sleeping){
-			add(tileGroup);
+			add();
 			sleeping = false;
 			sleepingEntities --;
 		}
@@ -91,31 +91,21 @@ public class TileEntity extends Entity implements Targetable{
 
 	public void write(DataOutputStream stream) throws IOException{}
 	public void read(DataInputStream stream) throws IOException{}
-	
+
 	public void onDeath(){
-		onDeath(false);
-	}
+		if(!dead) {
+			dead = true;
+			Block block = tile.block();
 
-	public void onDeath(boolean force){
-		if(Net.server()){
-			NetEvents.handleBlockDestroyed(this);
+			block.onDestroyed(tile);
+			world.removeBlock(tile);
+			block.afterDestroyed(tile, this);
+			remove();
 		}
 
-		if(!Net.active() || Net.server() || force){
-
-			if(!dead) {
-				dead = true;
-				Block block = tile.block();
-
-				block.onDestroyed(tile);
-				world.removeBlock(tile);
-				block.afterDestroyed(tile, this);
-				remove();
-			}
-		}
 	}
 
-	public boolean collide(io.anuke.mindustry.entities.bullet.Bullet other){
+	public boolean collide(Bullet other){
 		return true;
 	}
 	
@@ -129,10 +119,6 @@ public class TileEntity extends Entity implements Targetable{
 		float amount = tile.block().handleDamage(tile, damage);
 		health -= amount;
 		if(health <= 0) onDeath();
-
-		if(Net.server()){
-			NetEvents.handleBlockDamaged(this);
-		}
 	}
 
 	@Override
@@ -162,9 +148,9 @@ public class TileEntity extends Entity implements Targetable{
 			tile.block().update(tile);
 		}
 	}
-	
+
 	@Override
-	public TileEntity add(){
-		return add(tileGroup);
+	public EntityGroup targetGroup() {
+		return tileGroup;
 	}
 }

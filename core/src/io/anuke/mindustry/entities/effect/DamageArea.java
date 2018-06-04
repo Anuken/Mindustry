@@ -15,7 +15,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.SolidEntity;
+import io.anuke.ucore.entities.impl.SolidEntity;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Physics;
@@ -26,6 +26,7 @@ import static io.anuke.mindustry.Vars.*;
 /**Utility class for damaging in an area.*/
 public class DamageArea{
 	private static Rectangle rect = new Rectangle();
+	private static Rectangle hitrect = new Rectangle();
 	private static Translator tr = new Translator();
 
 	/**Creates a dynamic explosion based on specified parameters.*/
@@ -90,7 +91,8 @@ public class DamageArea{
 		rect.height += expand*2;
 
         Consumer<Unit> cons = e -> {
-            Rectangle other = e.hitbox.getRect(e.x, e.y);
+			e.getHitbox(hitrect);
+            Rectangle other = hitrect;
             other.y -= expand;
             other.x -= expand;
             other.width += expand * 2;
@@ -111,7 +113,8 @@ public class DamageArea{
 	/**Damages all entities and blocks in a radius that are enemies of the team.*/
 	public static void damageUnits(Team team, float x, float y, float size, float damage, Consumer<Unit> acceptor) {
 		Consumer<Unit> cons = entity -> {
-			if (!entity.hitbox.getRect(entity.x, entity.y).overlaps(rect)) {
+			entity.getHitbox(hitrect);
+			if (!hitrect.overlaps(rect)) {
 				return;
 			}
 			entity.damage(damage);
@@ -140,7 +143,7 @@ public class DamageArea{
 			float amount = calculateDamage(x, y, entity.x, entity.y, radius, damage);
 			entity.damage(amount);
 			//TODO better velocity displacement
-			entity.velocity.add(tr.set(entity.x - x, entity.y - y).setLength(damage*2f));
+			entity.getVelocity().add(tr.set(entity.x - x, entity.y - y).setLength(damage*2f));
 		};
 
 		rect.setSize(radius *2).setCenter(x, y);

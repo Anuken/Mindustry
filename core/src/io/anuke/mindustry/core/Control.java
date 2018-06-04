@@ -23,6 +23,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.entities.EntityPhysics;
 import io.anuke.ucore.input.InputProxy;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Atlas;
@@ -314,7 +315,7 @@ public class Control extends Module{
 
 	@Override
 	public void init(){
-		Entities.initPhysics();
+		EntityPhysics.initPhysics();
 
 		Platform.instance.updateRPC();
 	}

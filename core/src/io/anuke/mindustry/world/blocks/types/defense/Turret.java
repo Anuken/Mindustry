@@ -161,8 +161,7 @@ public abstract class Turret extends Block{
 			    float speed = type.bullet.speed;
 			    if(speed < 0.1f) speed = 9999999f;
 				
-				float targetRot = Predict.intercept(tile.drawx(), tile.drawy(),
-						entity.target.x, entity.target.y, entity.target.velocity.x, entity.target.velocity.y, speed)
+				float targetRot = Predict.intercept(entity, entity.target, speed)
 						.sub(tile.drawx(), tile.drawy()).angle();
 				
 				if(Float.isNaN(entity.rotation)){

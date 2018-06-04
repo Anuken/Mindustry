@@ -5,9 +5,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.EntityGroup.ArrayContainer;
+import io.anuke.ucore.entities.component.Entity;
 import io.anuke.ucore.util.Log;
 
 import static io.anuke.mindustry.Vars.control;

@@ -1,10 +1,12 @@
-package io.anuke.mindustry.entities;
+package io.anuke.mindustry.entities.traits;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.game.EventType.BlockBuildEvent;
 import io.anuke.mindustry.graphics.Palette;
@@ -31,7 +33,7 @@ import java.util.Arrays;
 import static io.anuke.mindustry.Vars.*;
 
 /**Interface for units that build, break or mine things.*/
-public interface BlockBuilder {
+public interface BuilderTrait {
     //these are not instance variables!
     Translator[] tmptr = {new Translator(), new Translator(), new Translator(), new Translator()};
     float placeDistance = 200f;
@@ -109,7 +111,7 @@ public interface BlockBuilder {
         if(unit.distanceTo(tile) > placeDistance) { //out of range, skip it.
             getPlaceQueue().removeFirst();
         }else if(current.remove){
-            if(Build.validBreak(unit.team, current.x, current.y) && current.recipe == Recipe.getByResult(tile.block())){ //if it's valid, break it
+            if(Build.validBreak(unit.getTeam(), current.x, current.y) && current.recipe == Recipe.getByResult(tile.block())){ //if it's valid, break it
 
                 float progress = 1f / tile.getBreakTime();
                 TileEntity core = unit.getClosestCore();
@@ -133,7 +135,7 @@ public interface BlockBuilder {
                 unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(tile.drawx(), tile.drawy()), 0.4f);
 
                 if(current.progress >= 1f){
-                    Build.breakBlock(unit.team, current.x, current.y, true, true);
+                    Build.breakBlock(unit.getTeam(), current.x, current.y, true, true);
                 }
             }else{
                 //otherwise, skip it
@@ -141,12 +143,12 @@ public interface BlockBuilder {
             }
         }else{
             if (!(tile.block() instanceof BuildBlock)) { //check if haven't started placing
-                if(Build.validPlace(unit.team, current.x, current.y, current.recipe.result, current.rotation)){
+                if(Build.validPlace(unit.getTeam(), current.x, current.y, current.recipe.result, current.rotation)){
                     //if it's valid, place it
-                    Build.placeBlock(unit.team, current.x, current.y, current.recipe, current.rotation);
+                    Build.placeBlock(unit.getTeam(), current.x, current.y, current.recipe, current.rotation);
 
                     //fire place event.
-                    threads.run(() -> Events.fire(BlockBuildEvent.class, unit.team, world.tile(current.x, current.y)));
+                    threads.run(() -> Events.fire(BlockBuildEvent.class, unit.getTeam(), world.tile(current.x, current.y)));
                 }else{
                     //otherwise, skip it
                     getPlaceQueue().removeFirst();
@@ -270,8 +272,9 @@ public interface BlockBuilder {
         public final Recipe recipe;
         public final boolean remove;
 
-        float progress;
-        float[] removeAccumulator;
+        public float progress;
+
+        private float[] removeAccumulator;
 
         /**This creates a build request.*/
         public BuildRequest(int x, int y, int rotation, Recipe recipe) {

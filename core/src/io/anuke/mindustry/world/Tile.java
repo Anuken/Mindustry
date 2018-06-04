@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.entities.Targetable;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.Recipe;
@@ -21,7 +21,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
 
-public class Tile implements Position, Targetable{
+public class Tile implements Position, TargetTrait {
 	public static final Object tileSetLock = new Object();
 	
 	/**Block ID data.*/

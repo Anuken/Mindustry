@@ -16,6 +16,7 @@ import static io.anuke.mindustry.Vars.world;
 
 public class Build {
     private static final Rectangle rect = new Rectangle();
+    private static final Rectangle hitrect = new Rectangle();
     private static Array<Tile> tempTiles = new Array<>();
 
     /**Returns block type that was broken, or null if unsuccesful.*/
@@ -100,9 +101,9 @@ public class Build {
 
                     Units.getNearby(rect, e -> {
                         if (e == null) return; //not sure why this happens?
-                        Rectangle rect = e.hitbox.getRect(e.x, e.y);
+                        e.getHitbox(hitrect);
 
-                        if (Build.rect.overlaps(rect) && !e.isFlying()) {
+                        if (rect.overlaps(hitrect) && !e.isFlying()) {
                             result[0] = true;
                         }
                     });

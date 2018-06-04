@@ -42,7 +42,7 @@ public class BasicBulletType extends BulletType {
                 float a = Mathf.random(360f);
                 Bullet bullet = Bullet.create(fragBullet, b,
                         x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a);
-                bullet.velocity.scl(Mathf.random(fragVelocityMin, fragVelocityMax));
+                bullet.getVelocity().scl(Mathf.random(fragVelocityMin, fragVelocityMax));
             }
         }
     }

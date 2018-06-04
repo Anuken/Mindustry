@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
-import io.anuke.mindustry.entities.SerializableEntity;
+import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
@@ -13,8 +13,9 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.entities.EntityPhysics;
+import io.anuke.ucore.entities.component.Entity;
 import io.anuke.ucore.util.Bits;
 
 import java.io.DataInputStream;
@@ -72,7 +73,7 @@ public class Save16 extends SaveFileVersion {
             EntityGroup<?> group = Entities.getGroup(gid);
             for (int j = 0; j < amount; j++) {
                 Entity entity = construct(group.getType());
-                ((SerializableEntity)entity).readSave(stream);
+                ((SaveTrait)entity).readSave(stream);
             }
         }
 
@@ -81,7 +82,7 @@ public class Save16 extends SaveFileVersion {
         short width = stream.readShort();
         short height = stream.readShort();
 
-        Entities.resizeTree(0, 0, width * tilesize, height * tilesize);
+        EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
         world.beginMapLoad();
 
@@ -161,7 +162,7 @@ public class Save16 extends SaveFileVersion {
         int groups = 0;
 
         for(EntityGroup<?> group : Entities.getAllGroups()){
-            if(!group.isEmpty() && group.all().get(0) instanceof SerializableEntity){
+            if(!group.isEmpty() && group.all().get(0) instanceof SaveTrait){
                 groups ++;
             }
         }
@@ -169,11 +170,11 @@ public class Save16 extends SaveFileVersion {
         stream.writeByte(groups);
 
         for(EntityGroup<?> group : Entities.getAllGroups()){
-            if(!group.isEmpty() && group.all().get(0) instanceof SerializableEntity){
+            if(!group.isEmpty() && group.all().get(0) instanceof SaveTrait){
                 stream.writeInt(group.size());
                 stream.writeByte(group.getID());
                 for(Entity entity : group.all()){
-                    ((SerializableEntity)entity).writeSave(stream);
+                    ((SaveTrait)entity).writeSave(stream);
                 }
             }
         }

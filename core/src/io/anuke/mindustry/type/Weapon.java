@@ -5,12 +5,9 @@ import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.NetEvents;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
 
@@ -73,14 +70,10 @@ public class Weapon extends Upgrade {
 	public void shoot(Player p, float x, float y, float angle, boolean left){
 		shootInternal(p, x, y, angle, left);
 
-		if(Net.active() && p.isLocal){
-			NetEvents.handleShoot(p, x, y, angle, Bits.packShort(id, (byte)(left ? 1 : 0)));
-		}
-
 		p.inventory.useAmmo();
 	}
 
-	public AmmoType getAmmoType(io.anuke.mindustry.type.Item item){
+	public AmmoType getAmmoType(Item item){
 		return ammoMap.get(item);
 	}
 
@@ -97,7 +90,7 @@ public class Weapon extends Upgrade {
 
 		tr.trns(rotation + 180f, type.recoil);
 
-		p.velocity.add(tr);
+		p.getVelocity().add(tr);
 
 		tr.trns(rotation, 3f);
 

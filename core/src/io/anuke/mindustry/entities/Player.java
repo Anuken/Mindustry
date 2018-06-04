@@ -10,24 +10,26 @@ import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Weapons;
-import io.anuke.mindustry.content.fx.ExplosionFx;
-import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.effect.DamageArea;
+import io.anuke.mindustry.entities.traits.BuilderTrait;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.mindustry.world.blocks.types.storage.CoreBlock.CoreEntity;
 import io.anuke.ucore.core.*;
-import io.anuke.ucore.entities.SolidEntity;
+import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.entities.component.SolidTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Geometry;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Timer;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -36,7 +38,7 @@ import java.nio.ByteBuffer;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Player extends Unit implements BlockBuilder {
+public class Player extends Unit implements BuilderTrait {
 	private static final float walkSpeed = 1.1f;
 	private static final float flySpeed = 0.4f;
 	private static final float flyMaxSpeed = 3f;
@@ -44,6 +46,8 @@ public class Player extends Unit implements BlockBuilder {
 	private static final Vector2 movement = new Vector2();
 
 	//region instance variables, constructor
+
+	public float baseRotation;
 
 	public String name = "name";
 	public String uuid;
@@ -58,7 +62,7 @@ public class Player extends Unit implements BlockBuilder {
 	public int playerIndex = 0;
 	public boolean isLocal = false;
 	public Timer timer = new Timer(4);
-	public Targetable target;
+	public TargetTrait target;
 
 	private boolean respawning;
 	private float walktime;
@@ -84,7 +88,7 @@ public class Player extends Unit implements BlockBuilder {
 	}
 
 	@Override
-	public float getMaxHealth() {
+	public float maxHealth() {
 		return 200;
 	}
 
@@ -111,12 +115,6 @@ public class Player extends Unit implements BlockBuilder {
 	@Override
 	public void addAmmo(Item item) {
 		inventory.addAmmo(weapon.getAmmoType(item));
-	}
-
-	@Override
-	public void onRemoteShoot(BulletType type, float x, float y, float rotation, short data) {
-		Weapon weapon = Upgrade.getByID(Bits.getLeftByte(data));
-		weapon.shoot(this, x, y, rotation, Bits.getRightByte(data) == 1);
 	}
 
 	@Override
@@ -147,7 +145,7 @@ public class Player extends Unit implements BlockBuilder {
 	}
 
 	@Override
-	public boolean collides(SolidEntity other){
+	public boolean collides(SolidTrait other){
 		return !isDead() && super.collides(other) && !mech.flying;
 	}
 	
@@ -156,9 +154,6 @@ public class Player extends Unit implements BlockBuilder {
 		dead = true;
 		respawning = false;
 		placeQueue.clear();
-		if(Net.active()){
-			NetEvents.handleUnitDeath(this);
-		}
 
 		float explosiveness = 2f + (inventory.hasItem() ? inventory.getItem().item.explosiveness * inventory.getItem().amount : 0f);
 		float flammability = (inventory.hasItem() ? inventory.getItem().item.flammability * inventory.getItem().amount : 0f);
@@ -168,35 +163,35 @@ public class Player extends Unit implements BlockBuilder {
 	}
 
 	@Override
-	public void onRemoteDeath() {
-		dead = true;
-		respawning = false;
-		Effects.effect(ExplosionFx.explosion, this);
-		Effects.shake(4f, 5f, this);
-		Effects.sound("die", this);
-	}
-
-	@Override
-	public Player set(float x, float y){
+	public void set(float x, float y){
 		this.x = x;
 		this.y = y;
 		if(isFlying() && isLocal){
 			Core.camera.position.set(x, y, 0f);
 		}
-		return this;
 	}
 
 	@Override
-	public Player add(){
-		return add(playerGroup);
+	public EntityGroup targetGroup() {
+		return playerGroup;
+	}
+
+	public void toggleTeam(){
+		team = (team == Team.blue ? Team.red : Team.blue);
 	}
 
 	//endregion
 
 	//region draw methods
 
+
 	@Override
-	public void drawSmooth(){
+	public float drawSize() {
+		return 40;
+	}
+
+	@Override
+	public void draw(){
 		if((debug && (!showPlayer || !showUI)) || dead) return;
 
         boolean snap = snapCamera && isLocal;
@@ -287,15 +282,15 @@ public class Player extends Unit implements BlockBuilder {
 		Draw.tscl(0.25f/2);
 		layout.setText(Core.font, name);
 		Draw.color(0f, 0f, 0f, 0.3f);
-		Draw.rect("blank", getDrawPosition().x, getDrawPosition().y + 8 - layout.height/2, layout.width + 2, layout.height + 2);
+		Draw.rect("blank", x, y + 8 - layout.height/2, layout.width + 2, layout.height + 2);
 		Draw.color();
 		Draw.tcolor(color);
-		Draw.text(name, getDrawPosition().x, getDrawPosition().y + 8);
+		Draw.text(name, x, y + 8);
 
 		if(isAdmin){
 			Draw.color(color);
 			float s = 3f;
-			Draw.rect("icon-admin-small", getDrawPosition().x + layout.width/2f + 2 + 1, getDrawPosition().y + 7f, s, s);
+			Draw.rect("icon-admin-small", x + layout.width/2f + 2 + 1, y + 7f, s, s);
 		}
 
 		Draw.reset();
@@ -574,56 +569,13 @@ public class Player extends Unit implements BlockBuilder {
 	}
 
 	@Override
-	public void writeSpawn(ByteBuffer buffer) {
-		IOUtils.writeString(buffer, name);
-		buffer.put(weapon.id);
-		buffer.put(mech.id);
-		buffer.put(isAdmin ? 1 : (byte)0);
-		buffer.putInt(Color.rgba8888(color));
-		buffer.putFloat(x);
-		buffer.putFloat(y);
-		buffer.put((byte)team.ordinal());
+	public void write(ByteBuffer buffer) {
+		//todo
 	}
 
 	@Override
-	public void readSpawn(ByteBuffer buffer) {
-		name = IOUtils.readString(buffer);
-		weapon = Upgrade.getByID(buffer.get());
-		mech = Upgrade.getByID(buffer.get());
-		isAdmin = buffer.get() == 1;
-		color.set(buffer.getInt());
-		x = buffer.getFloat();
-		y = buffer.getFloat();
-		team = Team.values()[buffer.get()];
-		setNet(x, y);
-	}
-
-	@Override
-	public void write(ByteBuffer data) {
-		if(Net.client() || isLocal) {
-			data.putFloat(x);
-			data.putFloat(y);
-		}else{
-			data.putFloat(interpolator.target.x);
-			data.putFloat(interpolator.target.y);
-		}
-		data.putFloat(rotation);
-		data.putFloat(baseRotation);
-		data.putShort((short)health);
-	}
-
-	@Override
-	public void read(ByteBuffer data, long time) {
-		float x = data.getFloat();
-		float y = data.getFloat();
-		float rot = data.getFloat();
-		float baseRot = data.getFloat();
-		short health = data.getShort();
-		byte dashing = data.get();
-
-		this.health = health;
-
-		interpolator.read(this.x, this.y, x, y, rot, baseRot, time);
+	public void read(ByteBuffer buffer, long time) {
+		//todo
 	}
 
 	//endregion

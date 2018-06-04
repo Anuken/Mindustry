@@ -6,7 +6,7 @@ import io.anuke.mindustry.entities.effect.Shield;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.PowerBlock;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.BulletEntity;
+import io.anuke.ucore.entities.impl.BulletEntity;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 

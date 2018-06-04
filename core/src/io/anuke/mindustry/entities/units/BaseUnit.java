@@ -1,12 +1,11 @@
 package io.anuke.mindustry.entities.units;
 
 import io.anuke.mindustry.content.fx.ExplosionFx;
-import io.anuke.mindustry.entities.Targetable;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.AmmoType;
@@ -16,6 +15,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
@@ -32,13 +32,13 @@ public abstract class BaseUnit extends Unit{
 	private static int timerIndex = 0;
 
 	protected static final int timerTarget = timerIndex++;
-	protected static final int timerBoost = timerIndex++;
 	protected static final int timerReload = timerIndex++;
 
 	protected UnitType type;
 	protected Timer timer = new Timer(5);
 	protected StateMachine state = new StateMachine();
-	protected Targetable target;
+	protected boolean isWave;
+	protected TargetTrait target;
 
 	public BaseUnit(UnitType type, Team team){
 		this.type = type;
@@ -47,6 +47,12 @@ public abstract class BaseUnit extends Unit{
 
 	/**internal constructor used for deserialization, DO NOT USE*/
 	public BaseUnit(){}
+
+	/**Sets this to a 'wave' unit, which means it has slightly different AI and will not run out of ammo.*/
+	public void setWave(){
+		isWave = true;
+		inventory.setInfiniteAmmo(true);
+	}
 
 	public void rotate(float angle){
 		rotation = Mathf.slerpDelta(rotation, angle, type.rotatespeed);
@@ -79,7 +85,7 @@ public abstract class BaseUnit extends Unit{
 	}
 
 	public void updateTargeting(){
-		if(target == null || (target instanceof Unit && (target.isDead() || ((Unit)target).team == team))
+		if(target == null || (target instanceof Unit && (target.isDead() || ((Unit)target).getTeam() == team))
 				|| (target instanceof TileEntity && ((TileEntity) target).tile.entity == null)){
 			target = null;
 		}
@@ -120,7 +126,7 @@ public abstract class BaseUnit extends Unit{
 	}
 
 	@Override
-	public float getMaxHealth() {
+	public float maxHealth() {
 		return type.health;
 	}
 
@@ -142,12 +148,6 @@ public abstract class BaseUnit extends Unit{
 	@Override
 	public float getSize() {
 		return 8;
-	}
-
-	@Override
-	public void move(float x, float y){
-		baseRotation = Mathf.slerpDelta(baseRotation, Mathf.atan2(x, y), type.baseRotateSpeed);
-		super.move(x, y);
 	}
 
 	@Override
@@ -180,12 +180,14 @@ public abstract class BaseUnit extends Unit{
 
 		if(target != null) behavior();
 
-		x = Mathf.clamp(x, 0, world.width() * tilesize);
-		y = Mathf.clamp(y, 0, world.height() * tilesize);
+		if(!isWave) {
+			x = Mathf.clamp(x, 0, world.width() * tilesize);
+			y = Mathf.clamp(y, 0, world.height() * tilesize);
+		}
 	}
 
 	@Override
-	public void drawSmooth(){
+	public void draw(){
 
 	}
 
@@ -205,11 +207,6 @@ public abstract class BaseUnit extends Unit{
 	}
 
 	@Override
-	public void onRemoteShoot(BulletType type, float x, float y, float rotation, short data) {
-		Bullet.create(type, this, x, y, rotation).damage = data;
-	}
-
-	@Override
 	public void onDeath(){
 		super.onDeath();
 
@@ -220,8 +217,8 @@ public abstract class BaseUnit extends Unit{
 	}
 
 	@Override
-	public void onRemoteDeath(){
-		onDeath();
+	public boolean collidesOthers() {
+		return !isFlying();
 	}
 
 	@Override
@@ -231,17 +228,16 @@ public abstract class BaseUnit extends Unit{
 
 	@Override
 	public void added(){
-		hitbox.solid = !isFlying();
 		hitbox.setSize(type.hitsize);
 		hitboxTile.setSize(type.hitsizeTile);
 		state.set(getStartState());
 
 		heal();
 	}
-	
+
 	@Override
-	public BaseUnit add(){
-		return add(unitGroups[team.ordinal()]);
+	public EntityGroup targetGroup() {
+		return unitGroups[team.ordinal()];
 	}
 
 	@Override
@@ -256,46 +252,16 @@ public abstract class BaseUnit extends Unit{
 		byte type = stream.readByte();
 
 		this.type = UnitType.getByID(type);
-		add(unitGroups[team.ordinal()]);
-	}
-
-	@Override
-	public void writeSpawn(ByteBuffer buffer) {
-		buffer.put(type.id);
-		buffer.put((byte)team.ordinal());
-		buffer.putFloat(x);
-		buffer.putFloat(y);
-		buffer.putShort((short)health);
-	}
-
-	@Override
-	public void readSpawn(ByteBuffer buffer) {
-		type = UnitType.getByID(buffer.get());
-		team = Team.values()[buffer.get()];
-		x = buffer.getFloat();
-		y = buffer.getFloat();
-		health = buffer.getShort();
-		setNet(x, y);
+		add();
 	}
 
 	@Override
 	public void write(ByteBuffer data) {
-		data.putFloat(x);
-		data.putFloat(y);
-		data.putShort((short)(rotation *2));
-		data.putShort((short)(baseRotation *2));
-		data.putShort((short)health);
+		//todo
 	}
 
 	@Override
 	public void read(ByteBuffer data, long time) {
-		float x = data.getFloat();
-		float y = data.getFloat();
-		short rotation = data.getShort();
-		short baserotation = data.getShort();
-		short health = data.getShort();
-
-		interpolator.read(this.x, this.y, x, y, rotation/2f, baserotation/2f, time);
-		this.health = health;
+		//todo
 	}
 }

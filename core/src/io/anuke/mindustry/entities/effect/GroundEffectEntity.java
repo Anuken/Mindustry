@@ -5,7 +5,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EffectEntity;
+import io.anuke.ucore.entities.impl.EffectEntity;
 import io.anuke.ucore.function.EffectRenderer;
 import io.anuke.ucore.util.Mathf;
 

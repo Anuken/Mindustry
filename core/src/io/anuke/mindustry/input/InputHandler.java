@@ -3,7 +3,7 @@ package io.anuke.mindustry.input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.entities.BlockBuilder.BuildRequest;
+import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.type.ItemStack;
@@ -93,7 +93,7 @@ public abstract class InputHandler extends InputAdapter{
 		boolean showedInventory = false;
 
 		//check if tapped block is configurable
-		if(tile.block().isConfigurable(tile) && tile.getTeam() == player.team){
+		if(tile.block().isConfigurable(tile) && tile.getTeam() == player.getTeam()){
 			consumed = true;
 			if((!frag.config.isShown() //if the config fragment is hidden, show
 					//alternatively, the current selected block can 'agree' to switch config tiles
@@ -111,9 +111,9 @@ public abstract class InputHandler extends InputAdapter{
 
 		//TODO network event!
 		//call tapped event
-		if(tile.getTeam() == player.team && tile.block().tapped(tile, player)){
+		if(tile.getTeam() == player.getTeam() && tile.block().tapped(tile, player)){
 			consumed = true;
-		}else if(tile.getTeam() == player.team && tile.block().synthetic() && tile.block().hasItems){
+		}else if(tile.getTeam() == player.getTeam() && tile.block().synthetic() && tile.block().hasItems){
 			frag.inv.showFor(tile);
 			consumed = true;
 			showedInventory = true;
@@ -261,9 +261,9 @@ public abstract class InputHandler extends InputAdapter{
 	}
 	
 	public boolean validPlace(int x, int y, Block type, int rotation){
-        for(Tile tile : state.teams.get(player.team).cores){
+        for(Tile tile : state.teams.get(player.getTeam()).cores){
             if(tile.distanceTo(x * tilesize, y * tilesize) < coreBuildRange){
-                return Build.validPlace(player.team, x, y, type, rotation) &&
+                return Build.validPlace(player.getTeam(), x, y, type, rotation) &&
                         Vector2.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
             }
         }
@@ -272,7 +272,7 @@ public abstract class InputHandler extends InputAdapter{
 	}
 	
 	public boolean validBreak(int x, int y){
-		return Build.validBreak(player.team, x, y);
+		return Build.validBreak(player.getTeam(), x, y);
 	}
 	
 	public void placeBlock(int x, int y, Recipe recipe, int rotation){

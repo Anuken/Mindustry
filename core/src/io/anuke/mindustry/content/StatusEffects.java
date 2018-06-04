@@ -51,7 +51,7 @@ public class StatusEffects implements ContentList {
 
             @Override
             public void update(Unit unit, float time) {
-                unit.velocity.scl(0.7f);
+                unit.getVelocity().scl(0.7f);
 
                 if (Mathf.chance(Timers.delta() * 0.15f)) {
                     Effects.effect(EnvironmentFx.freezing, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
@@ -70,7 +70,7 @@ public class StatusEffects implements ContentList {
                     Effects.effect(EnvironmentFx.wet, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                 }
 
-                unit.velocity.scl(0.999f);
+                unit.getVelocity().scl(0.999f);
             }
         };
 
@@ -90,7 +90,7 @@ public class StatusEffects implements ContentList {
 
             @Override
             public void update(Unit unit, float time) {
-                unit.velocity.scl(0.8f);
+                unit.getVelocity().scl(0.8f);
                 unit.damagePeriodic(0.1f);
 
                 if (Mathf.chance(Timers.delta() * 0.2f)) {
@@ -106,7 +106,7 @@ public class StatusEffects implements ContentList {
                     Effects.effect(EnvironmentFx.oily, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                 }
 
-                unit.velocity.scl(0.6f);
+                unit.getVelocity().scl(0.6f);
             }
 
             @Override

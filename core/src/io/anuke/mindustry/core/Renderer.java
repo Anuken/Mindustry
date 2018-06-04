@@ -27,10 +27,10 @@ import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.entities.EffectEntity;
-import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.Entity;
+import io.anuke.ucore.entities.EntityDraw;
 import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.entities.impl.EffectEntity;
+import io.anuke.ucore.entities.impl.BaseEntity;
 import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
@@ -81,10 +81,11 @@ public class Renderer extends RendererModule{
 						entity.lifetime = effect.lifetime;
 						entity.data = data;
 						entity.id ++;
-						entity.set(x, y).add(effectGroup);
+						entity.set(x, y);
+						effectGroup.add(entity);
 
-						if(data instanceof Entity){
-							entity.setParent((Entity)data);
+						if(data instanceof BaseEntity){
+							entity.setParent((BaseEntity)data);
 						}
 					}else{
 						GroundEffectEntity entity = Pools.obtain(GroundEffectEntity.class);
@@ -94,7 +95,8 @@ public class Renderer extends RendererModule{
 						entity.lifetime = effect.lifetime;
 						entity.id ++;
 						entity.data = data;
-						entity.set(x, y).add(groundEffectGroup);
+						entity.set(x, y);
+						groundEffectGroup.add(entity);
 					}
 				}
 			}
@@ -202,9 +204,9 @@ public class Renderer extends RendererModule{
 		
 		blocks.drawFloor();
 
-		Entities.draw(groundEffectGroup, e -> e instanceof BelowLiquidEffect);
-		Entities.draw(puddleGroup);
-		Entities.draw(groundEffectGroup, e -> !(e instanceof BelowLiquidEffect));
+		EntityDraw.draw(groundEffectGroup, e -> e instanceof BelowLiquidEffect);
+		EntityDraw.draw(puddleGroup);
+		EntityDraw.draw(groundEffectGroup, e -> !(e instanceof BelowLiquidEffect));
 
 		blocks.processBlocks();
 		blocks.drawBlocks(Layer.block);
@@ -222,13 +224,13 @@ public class Renderer extends RendererModule{
 
 		overlays.drawBottom();
 
-		Entities.drawWith(playerGroup, p -> true, Player::drawBuildRequests);
+		EntityDraw.drawWith(playerGroup, p -> true, Player::drawBuildRequests);
 
 		drawAllTeams(true);
 
-		Entities.draw(bulletGroup);
-		Entities.draw(airItemGroup);
-        Entities.draw(effectGroup);
+		EntityDraw.draw(bulletGroup);
+		EntityDraw.draw(airItemGroup);
+		EntityDraw.draw(effectGroup);
 
 		overlays.drawTop();
 
@@ -237,7 +239,7 @@ public class Renderer extends RendererModule{
 
 		if(showPaths && debug) drawDebug();
 
-		Entities.drawWith(playerGroup, p -> !p.isLocal && !p.isDead(), Player::drawName);
+		EntityDraw.drawWith(playerGroup, p -> !p.isLocal && !p.isDead(), Player::drawName);
 		
 		batch.end();
 	}
@@ -246,24 +248,24 @@ public class Renderer extends RendererModule{
 		for(Team team : Team.values()){
 			EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
 			if(group.count(p -> p.isFlying() == flying) +
-					playerGroup.count(p -> p.isFlying() == flying && p.team == team) == 0 && flying) continue;
+					playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
 
-			Entities.drawWith(unitGroups[team.ordinal()], u -> u.isFlying() == flying, Unit::drawUnder);
-			Entities.drawWith(playerGroup, p -> p.isFlying() == flying && p.team == team, Unit::drawUnder);
+			EntityDraw.drawWith(unitGroups[team.ordinal()], u -> u.isFlying() == flying, Unit::drawUnder);
+			EntityDraw.drawWith(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawUnder);
 
 			Shaders.outline.color.set(team.color);
 			Shaders.mix.color.set(Color.WHITE);
 
 			Graphics.beginShaders(Shaders.outline);
 			Graphics.shader(Shaders.mix, true);
-			Entities.draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying);
-			Entities.draw(playerGroup, p -> p.isFlying() == flying && p.team == team);
+			EntityDraw.draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying);
+			EntityDraw.draw(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team);
 			Graphics.shader();
 			blocks.drawTeamBlocks(Layer.turret, team);
 			Graphics.endShaders();
 
-			Entities.drawWith(unitGroups[team.ordinal()], u -> u.isFlying() == flying, Unit::drawOver);
-			Entities.drawWith(playerGroup, p -> p.isFlying() == flying && p.team == team, Unit::drawOver);
+			EntityDraw.drawWith(unitGroups[team.ordinal()], u -> u.isFlying() == flying, Unit::drawOver);
+			EntityDraw.drawWith(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);
 		}
 	}
 

@@ -16,8 +16,6 @@ import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
@@ -169,7 +167,7 @@ public class Block extends BaseBlock implements Content{
 	 * {@link #isConfigurable(Tile)} able} must return true for this to be called.*/
 	public void buildTable(Tile tile, Table table) {}
 
-	//TODO make it a boolean?
+	//TODO why make it a method?
 	/**Returns whether this tile can be configured.*/
 	public boolean isConfigurable(Tile tile){
 		return false;
@@ -180,8 +178,6 @@ public class Block extends BaseBlock implements Content{
 
 	//TODO remove this
 	public void setConfigure(Tile tile, byte data){
-		configure(tile, data);
-		if(Net.active()) NetEvents.handleBlockConfig(tile, data);
 		configure(tile, data);
 	}
 

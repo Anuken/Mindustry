@@ -3,7 +3,7 @@ package io.anuke.mindustry.entities.units.types;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.entities.BlockBuilder;
+import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.units.BaseUnit;
@@ -29,7 +29,7 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.unitGroups;
 import static io.anuke.mindustry.Vars.world;
 
-public class Drone extends FlyingUnit implements BlockBuilder{
+public class Drone extends FlyingUnit implements BuilderTrait {
     protected static float healSpeed = 0.1f;
     protected static float discoverRange = 120f;
     protected static boolean initialized;

@@ -28,8 +28,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.tilesize;
-
 public class UnitFactory extends Block {
     private final Rectangle rect = new Rectangle();
 
@@ -114,7 +112,7 @@ public class UnitFactory extends Block {
             if(entity.openCountdown > Timers.delta()){
                 entity.openCountdown -= Timers.delta();
             }else{
-                if(type.isFlying || !anyEntities(tile)) {
+                if(type.isFlying || !Units.anyEntities(tile)) {
                     entity.open = false;
                     entity.openCountdown = -1;
                 }else{
@@ -142,8 +140,9 @@ public class UnitFactory extends Block {
                 Effects.effect(BlockFx.producesmoke, tile.drawx(), tile.drawy());
 
                 BaseUnit unit = type.create(tile.getTeam());
-                unit.set(tile.drawx(), tile.drawy()).add();
-                unit.velocity.y = launchVelocity;
+                unit.set(tile.drawx(), tile.drawy());
+                unit.add();
+                unit.getVelocity().y = launchVelocity;
             });
 
             entity.openCountdown = openDuration;
@@ -167,23 +166,6 @@ public class UnitFactory extends Block {
     @Override
     public TileEntity getEntity() {
         return new UnitFactoryEntity();
-    }
-
-    boolean anyEntities(Tile tile){
-        Block type = tile.block();
-        rect.setSize(type.size * tilesize, type.size * tilesize);
-        rect.setCenter(tile.drawx(), tile.drawy());
-
-        boolean[] value = new boolean[1];
-
-        Units.getNearby(rect, unit -> {
-            if(value[0]) return;
-            if(unit.hitbox.getRect(unit.x, unit.y).overlaps(rect)){
-                value[0] = true;
-            }
-        });
-
-        return value[0];
     }
 
     protected boolean hasRequirements(InventoryModule inv, float fraction){

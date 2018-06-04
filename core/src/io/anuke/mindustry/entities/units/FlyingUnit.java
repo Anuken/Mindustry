@@ -37,7 +37,7 @@ public class FlyingUnit extends BaseUnit {
     }
 
     @Override
-    public void drawSmooth() {
+    public void draw() {
         Draw.alpha(hitTime / hitDuration);
 
         Draw.rect(type.name, x, y, rotation - 90);
@@ -52,7 +52,7 @@ public class FlyingUnit extends BaseUnit {
 
     @Override
     public void behavior() {
-        if(health <= health * type.retreatPercent &&
+        if(health <= health * type.retreatPercent && !isWave &&
                 Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair)) != null){
             setState(retreat);
         }
@@ -174,7 +174,7 @@ public class FlyingUnit extends BaseUnit {
         }
 
         public void update() {
-            if(health >= getMaxHealth()){
+            if(health >= maxHealth()){
                 state.set(attack);
             }else if(!targetHasFlag(BlockFlag.repair)){
                 retarget(() -> {

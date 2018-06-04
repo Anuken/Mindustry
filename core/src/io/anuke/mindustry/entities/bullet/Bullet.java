@@ -2,16 +2,19 @@ package io.anuke.mindustry.entities.bullet;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pools;
-import io.anuke.mindustry.entities.SyncEntity;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.traits.TeamTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.entities.BulletEntity;
-import io.anuke.ucore.entities.Entity;
-import io.anuke.ucore.entities.SolidEntity;
+import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.entities.component.Entity;
+import io.anuke.ucore.entities.component.SolidTrait;
+import io.anuke.ucore.entities.component.VelocityTrait;
+import io.anuke.ucore.entities.impl.BulletEntity;
 import io.anuke.ucore.util.Timer;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.bulletGroup;
+import static io.anuke.mindustry.Vars.world;
 
 public class Bullet extends BulletEntity<BulletType>{
 	private static Vector2 vector = new Vector2();
@@ -19,8 +22,8 @@ public class Bullet extends BulletEntity<BulletType>{
 	public Timer timer = new Timer(3);
 	public Team team;
 
-	public static Bullet create(BulletType type, Unit owner, float x, float y, float angle){
-		return create(type, owner, owner.team, x, y, angle);
+	public static Bullet create(BulletType type, TeamTrait owner, float x, float y, float angle){
+		return create(type, owner, owner.getTeam(), x, y, angle);
 	}
 
 	public static Bullet create (BulletType type, Entity owner, Team team, float x, float y, float angle){
@@ -29,13 +32,14 @@ public class Bullet extends BulletEntity<BulletType>{
 		bullet.owner = owner;
 
 		bullet.velocity.set(0, type.speed).setAngle(angle);
-		bullet.velocity.add(owner instanceof Unit ? ((Unit)owner).velocity : Vector2.Zero);
+		bullet.velocity.add(owner instanceof VelocityTrait ? ((VelocityTrait)owner).getVelocity() : Vector2.Zero);
 		bullet.hitbox.setSize(type.hitsize);
 
 		bullet.team = team;
 		bullet.type = type;
 		bullet.set(x, y);
-		return bullet.add();
+		bullet.add();
+		return bullet;
 	}
 
 	public static Bullet create(BulletType type, Bullet parent, float x, float y, float angle){
@@ -43,20 +47,14 @@ public class Bullet extends BulletEntity<BulletType>{
 	}
 
 	private Bullet(){}
-	
+
+	public boolean collidesTiles(){
+		return true; //TODO make artillery and such not do this
+	}
+
+	@Override
 	public void draw(){
-		//interpolate position linearly at low tick speeds
-		if(SyncEntity.isSmoothing()){
-			x += threads.getFramesSinceUpdate() * velocity.x;
-			y += threads.getFramesSinceUpdate() * velocity.y;
-
-			type.draw(this);
-
-			x -= threads.getFramesSinceUpdate() * velocity.x;
-			y -= threads.getFramesSinceUpdate() * velocity.y;
-		}else{
-			type.draw(this);
-		}
+		type.draw(this);
 	}
 
 	@Override
@@ -64,22 +62,18 @@ public class Bullet extends BulletEntity<BulletType>{
 		return 8;
 	}
 
-	public boolean collidesTiles(){
-		return true;
-	}
-
 	@Override
-	public boolean collides(SolidEntity other){
+	public boolean collides(SolidTrait other){
 		return super.collides(other);
 	}
 
 	@Override
-	public void collision(SolidEntity other, float x, float y){
+	public void collision(SolidTrait other, float x, float y){
 		super.collision(other, x, y);
 
 		if(other instanceof Unit){
 			Unit unit = (Unit)other;
-			unit.velocity.add(vector.set(other.x, other.y).sub(x, y).setLength(type.knockback / unit.getMass()));
+			unit.getVelocity().add(vector.set(other.getX(), other.getY()).sub(x, y).setLength(type.knockback / unit.getMass()));
 			unit.applyEffect(type.status, type.statusIntensity);
 		}
 	}
@@ -89,7 +83,7 @@ public class Bullet extends BulletEntity<BulletType>{
 		super.update();
 
 		if (type.hitTiles && collidesTiles()) {
-			world.raycastEach(world.toTile(lastX), world.toTile(lastY), world.toTile(x), world.toTile(y), (x, y) -> {
+			world.raycastEach(world.toTile(lastPosition().x), world.toTile(lastPosition().y), world.toTile(x), world.toTile(y), (x, y) -> {
 
 				Tile tile = world.tile(x, y);
 				if (tile == null) return false;
@@ -109,11 +103,6 @@ public class Bullet extends BulletEntity<BulletType>{
 	}
 
 	@Override
-	public float getDamage(){
-		return damage == -1 ? type.damage : damage;
-	}
-
-	@Override
 	public void reset() {
 		super.reset();
 		timer.clear();
@@ -126,7 +115,7 @@ public class Bullet extends BulletEntity<BulletType>{
 	}
 
 	@Override
-	public Bullet add(){
-		return super.add(bulletGroup);
+	public EntityGroup targetGroup() {
+		return bulletGroup;
 	}
 }

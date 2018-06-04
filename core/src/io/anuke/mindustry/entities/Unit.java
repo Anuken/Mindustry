@@ -3,14 +3,21 @@ package io.anuke.mindustry.entities;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.traits.SaveTrait;
+import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.entities.traits.TargetTrait;
+import io.anuke.mindustry.entities.traits.TeamTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
+import io.anuke.mindustry.net.Interpolator;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.SolidEntity;
+import io.anuke.ucore.entities.component.DrawTrait;
+import io.anuke.ucore.entities.component.SolidTrait;
+import io.anuke.ucore.entities.impl.DestructibleEntity;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
@@ -21,17 +28,39 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
-public abstract class Unit extends SyncEntity implements SerializableEntity, Targetable {
+public abstract class Unit extends DestructibleEntity implements SaveTrait, TargetTrait, SyncTrait, DrawTrait, TeamTrait {
     /**total duration of hit flash effect*/
     public static final float hitDuration = 9f;
 
-    public StatusController status = new StatusController();
     public UnitInventory inventory = new UnitInventory(100, 100);
-    public Team team = Team.blue;
+    public float rotation;
 
-    public Vector2 velocity = new Vector2(0f, 0.0001f);
-    public float hitTime;
-    public float drownTime;
+    protected Interpolator interpolator = new Interpolator();
+    protected StatusController status = new StatusController();
+    protected Team team = Team.blue;
+
+    protected Vector2 velocity = new Vector2(0f, 0.0001f);
+    protected float hitTime;
+    protected float drownTime;
+
+    @Override
+    public Team getTeam(){
+        return team;
+    }
+
+    @Override
+    public void interpolate() {
+        interpolator.update();
+
+        x = interpolator.pos.x;
+        y = interpolator.pos.y;
+        rotation = interpolator.values[0];
+    }
+
+    @Override
+    public Interpolator getInterpolator() {
+        return interpolator;
+    }
 
     @Override
     public void damage(float amount){
@@ -40,7 +69,7 @@ public abstract class Unit extends SyncEntity implements SerializableEntity, Tar
     }
 
     @Override
-    public boolean collides(SolidEntity other){
+    public boolean collides(SolidTrait other){
         return other instanceof Bullet && state.teams.areEnemies((((Bullet) other).team), team);
     }
 
@@ -49,6 +78,11 @@ public abstract class Unit extends SyncEntity implements SerializableEntity, Tar
         inventory.clear();
         drownTime = 0f;
         status.clear();
+    }
+
+    @Override
+    public Vector2 getVelocity() {
+        return velocity;
     }
 
     @Override
@@ -79,6 +113,10 @@ public abstract class Unit extends SyncEntity implements SerializableEntity, Tar
         this.status.set(StatusEffect.getByID(effect), etime);
     }
 
+    public StatusEffect getStatus(){
+        return status.current();
+    }
+
     public TileEntity getClosestCore(){
         if(state.teams.has(team)){
             TeamData data = state.teams.get(team);
@@ -97,10 +135,6 @@ public abstract class Unit extends SyncEntity implements SerializableEntity, Tar
     public Floor getFloorOn(){
         Tile tile = world.tileWorld(x, y);
         return (Floor)(tile == null || (tile.floor() == null) ? Blocks.defaultFloor : tile.floor());
-    }
-
-    public Team getTeam(){
-        return team;
     }
 
     public void updateVelocityStatus(float drag, float maxVelocity){
@@ -173,11 +207,6 @@ public abstract class Unit extends SyncEntity implements SerializableEntity, Tar
         }else{
             super.damage(amount);
         }
-    }
-
-    @Override
-    public Vector2 getVelocity() {
-        return velocity;
     }
 
     public void drawUnder(){}

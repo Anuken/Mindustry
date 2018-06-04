@@ -180,8 +180,8 @@ public class OverlayRenderer {
     void drawStats(Unit unit){
         if(unit.isDead()) return;
 
-        float x = unit.getDrawPosition().x;
-        float y = unit.getDrawPosition().y;
+        float x = unit.x;
+        float y = unit.y;
 
         if(unit == players[0] && players.length == 1 && snapCamera) {
             x = (int)x;
@@ -189,7 +189,7 @@ public class OverlayRenderer {
         }
 
         drawEncloser(x, y - 8f, 2f);
-        drawBar(Color.SCARLET, x, y - 8f, unit.healthfrac());
+        drawBar(Color.SCARLET, x, y - 8f, unit.healthf());
         drawBar(Color.valueOf("32cf6d"), x, y - 9f, unit.inventory.totalAmmo() / (float) unit.inventory.ammoCapacity());
     }
 

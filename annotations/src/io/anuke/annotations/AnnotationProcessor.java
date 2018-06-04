@@ -19,6 +19,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+//TODO document
+//TODO split up into more classes
+//TODO somehow use annotations to generate serializers for each type?
+//TODO documentation
+//TODO custom hash to verify server/client compatibility, just in case!
+//TODO specify creation class for putting each method
+//TODO unified Call.functionName() class for more unified usage
+//TODO error reporting for invalid usage, e.g. method IDs
+//TODO automatically disable calling on server/client when it's not necessary
+//TODO autogenerate methods for calling functions for specific clients
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes({
     "io.anuke.annotations.Annotations.RemoteClient",
@@ -42,17 +52,26 @@ public class AnnotationProcessor extends AbstractProcessor {
             }
         });
 
+        put("Tile", new String[][]{
+            {
+                "rbuffer.putInt(rvalue.packedPosition())"
+            },
+            {
+                "rtype rvalue = io.anuke.mindustry.Vars.world.tile(rbuffer.getInt())"
+            }
+        });
+
         put("String", new String[][]{
-                {
-                    "rbuffer.putShort((short)rvalue.getBytes().length)",
-                    "rbuffer.put(rvalue.getBytes())"
-                },
-                {
-                    "short __rvalue_length = rbuffer.getShort()",
-                    "byte[] __rvalue_bytes = new byte[__rvalue_length]",
-                    "rbuffer.get(__rvalue_bytes)",
-                    "rtype rvalue = new rtype(__rvalue_bytes)"
-                }
+            {
+                "rbuffer.putShort((short)rvalue.getBytes().length)",
+                "rbuffer.put(rvalue.getBytes())"
+            },
+            {
+                "short __rvalue_length = rbuffer.getShort()",
+                "byte[] __rvalue_bytes = new byte[__rvalue_length]",
+                "rbuffer.get(__rvalue_bytes)",
+                "rtype rvalue = new rtype(__rvalue_bytes)"
+            }
         });
     }};
 
@@ -186,8 +205,11 @@ public class AnnotationProcessor extends AbstractProcessor {
                     String simpleTypeName = typeName.contains(".") ? typeName.substring(1 + typeName.lastIndexOf('.')) : typeName;
                     String capName = simpleTypeName.equals("byte") ? "" : Character.toUpperCase(simpleTypeName.charAt(0)) + simpleTypeName.substring(1);
 
-                    if(typeUtils.isAssignable(var.asType(), elementUtils.getTypeElement("java.lang.Enum").asType())) {
-                        method.addStatement(bufferName + ".put(" + varName + ".ordinal())");
+                    boolean isEnum = typeUtils.directSupertypes(var.asType()).size() > 0
+                            && typeUtils.asElement(typeUtils.directSupertypes(var.asType()).get(0)).getSimpleName().equals("java.lang.Enum");
+
+                    if(isEnum) {
+                        method.addStatement(bufferName + ".putShort((short)" + varName + ".ordinal())");
                     }else if(isPrimitive(typeName)) {
                         if(simpleTypeName.equals("boolean")){
                             method.addStatement(bufferName + ".put(" + varName + " ? (byte)1 : 0)");
@@ -207,8 +229,8 @@ public class AnnotationProcessor extends AbstractProcessor {
 
                     String writeBufferName = "buffer";
 
-                    if(typeUtils.isAssignable(var.asType(), elementUtils.getTypeElement("java.lang.Enum").asType())) {
-                        writeSwitch.addStatement(typeName + " " + varName + " = " + typeName + ".values()["+writeBufferName +".getInt()]");
+                    if(isEnum) {
+                        writeSwitch.addStatement(typeName + " " + varName + " = " + typeName + ".values()["+writeBufferName +".getShort()]");
                     }else if(isPrimitive(typeName)) {
                         if(simpleTypeName.equals("boolean")){
                             writeSwitch.addStatement("boolean " + varName + " = " + writeBufferName + ".get() == 1");
@@ -266,7 +288,6 @@ public class AnnotationProcessor extends AbstractProcessor {
     private boolean isPrimitive(String type){
         return type.equals("boolean") || type.equals("byte") || type.equals("short") || type.equals("int")
                 || type.equals("long") || type.equals("float") || type.equals("double") || type.equals("char");
-
     }
 
 }

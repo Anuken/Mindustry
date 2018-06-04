@@ -23,7 +23,7 @@ public abstract class BaseBlock {
 
     /**Returns the amount of items this block can accept.*/
     public int acceptStack(Item item, int amount, Tile tile, Unit source){
-        if(acceptItem(item, tile, tile) && hasItems && source.team == tile.getTeam()){
+        if(acceptItem(item, tile, tile) && hasItems && source.getTeam() == tile.getTeam()){
             return Math.min(itemCapacity - tile.entity.items.totalItems(), amount);
         }else{
             return 0;

@@ -20,9 +20,26 @@ public abstract class GroundUnit extends BaseUnit {
     protected static float maxAim = 30f;
 
     protected float walkTime;
+    protected float baseRotation;
 
     public GroundUnit(UnitType type, Team team) {
         super(type, team);
+    }
+
+    @Override
+    public void interpolate() {
+        interpolator.update();
+
+        x = interpolator.pos.x;
+        y = interpolator.pos.y;
+        rotation = interpolator.values[0];
+        baseRotation = interpolator.values[1];
+    }
+
+    @Override
+    public void move(float x, float y){
+        baseRotation = Mathf.slerpDelta(baseRotation, Mathf.atan2(x, y), type.baseRotateSpeed);
+        super.move(x, y);
     }
 
     @Override
@@ -40,7 +57,7 @@ public abstract class GroundUnit extends BaseUnit {
     }
 
     @Override
-    public void drawSmooth() {
+    public void draw() {
         Draw.alpha(hitTime / hitDuration);
 
         float walktime = walkTime;
@@ -75,7 +92,7 @@ public abstract class GroundUnit extends BaseUnit {
 
     @Override
     public void behavior() {
-        if(health <= health * type.retreatPercent && !inventory.isInfiniteAmmo()){
+        if(health <= health * type.retreatPercent && !isWave){
             setState(retreat);
         }
     }

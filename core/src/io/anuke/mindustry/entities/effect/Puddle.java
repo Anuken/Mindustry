@@ -12,14 +12,16 @@ import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.SerializableEntity;
+import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.Entity;
+import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.entities.component.DrawTrait;
+import io.anuke.ucore.entities.impl.BaseEntity;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Hue;
@@ -34,12 +36,13 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.puddleGroup;
 import static io.anuke.mindustry.Vars.world;
 
-public class Puddle extends Entity implements SerializableEntity, Poolable{
+public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait {
     private static final IntMap<Puddle> map = new IntMap<>();
     private static final float maxLiquid = 70f;
     private static final int maxGeneration = 2;
     private static final Color tmp = new Color();
     private static final Rectangle rect = new Rectangle();
+    private static final Rectangle rect2 = new Rectangle();
     private static int seeds;
 
     private int loadedPosition = -1;
@@ -83,7 +86,8 @@ public class Puddle extends Entity implements SerializableEntity, Poolable{
             puddle.liquid = liquid;
             puddle.amount = amount;
             puddle.generation = generation;
-            puddle.set((tile.worldx() + source.worldx())/2f, (tile.worldy() + source.worldy())/2f).add();
+            puddle.set((tile.worldx() + source.worldx())/2f, (tile.worldy() + source.worldy())/2f);
+            puddle.add();
             map.put(tile.packedPosition(), puddle);
         }else if(p.liquid == liquid){
             p.accepting = Math.max(amount, p.accepting);
@@ -153,11 +157,11 @@ public class Puddle extends Entity implements SerializableEntity, Poolable{
 
         if(amount >= maxLiquid/2f && Timers.get(this, "update", 20)){
             Units.getNearby(rect.setSize(Mathf.clamp(amount/(maxLiquid/1.5f))*10f).setCenter(tile.worldx(), tile.worldy()), unit -> {
-                Rectangle o = unit.hitbox.getRect(unit.x, unit.y);
-                if(!rect.overlaps(o)) return;
+                unit.getHitbox(rect2);
+                if(!rect.overlaps(rect2)) return;
 
                 unit.applyEffect(liquid.effect, 0.5f);
-                if(unit.velocity.len() > 0.4) {
+                if(unit.getVelocity().len() > 0.4) {
                     Effects.effect(BlockFx.ripple, liquid.color, unit.x, unit.y);
                 }
             });
@@ -190,6 +194,11 @@ public class Puddle extends Entity implements SerializableEntity, Poolable{
             seeds ++;
         });
         Draw.color();
+    }
+
+    @Override
+    public float drawSize() {
+        return 20;
     }
 
     @Override
@@ -238,7 +247,7 @@ public class Puddle extends Entity implements SerializableEntity, Poolable{
     }
 
     @Override
-    public Puddle add() {
-        return add(puddleGroup);
+    public EntityGroup targetGroup() {
+        return puddleGroup;
     }
 }

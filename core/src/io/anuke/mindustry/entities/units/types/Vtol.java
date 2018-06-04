@@ -31,7 +31,7 @@ public class Vtol extends FlyingUnit {
     }
 
     @Override
-    public void drawSmooth() {
+    public void draw() {
         Draw.alpha(hitTime / hitDuration);
 
         Draw.rect(type.name, x, y, rotation - 90);

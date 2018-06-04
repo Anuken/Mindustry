@@ -11,16 +11,19 @@ import com.esotericsoftware.kryonet.Listener.LagListener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.util.InputStreamSender;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Net.ServerProvider;
-import io.anuke.mindustry.net.Packets.*;
+import io.anuke.mindustry.net.NetConnection;
+import io.anuke.mindustry.net.NetworkIO;
+import io.anuke.mindustry.net.Packets.Connect;
+import io.anuke.mindustry.net.Packets.Disconnect;
+import io.anuke.mindustry.net.Streamable;
 import io.anuke.mindustry.net.Streamable.StreamBegin;
 import io.anuke.mindustry.net.Streamable.StreamChunk;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Strings;
 import org.java_websocket.WebSocket;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.handshake.ClientHandshake;
@@ -346,10 +349,13 @@ public class KryoServer implements ServerProvider {
                 }catch (Exception e){
                     Log.err(e);
                     Log.info("Disconnecting invalid client!");
+
                     try{
+                        //send error packet here
+                        /*
                         NetErrorPacket packet = new NetErrorPacket();
                         packet.message = Strings.parseException(e, true);
-                        Timers.runTask(5f, connection::close);
+                        Timers.runTask(5f, connection::close);*/
                     }catch (Exception e2){
                         Log.err(e2);
                         connection.close();

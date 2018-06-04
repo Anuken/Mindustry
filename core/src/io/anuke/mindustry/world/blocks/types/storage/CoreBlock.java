@@ -91,7 +91,7 @@ public class CoreBlock extends StorageBlock {
 
     @Override
     public int acceptStack(Item item, int amount, Tile tile, Unit source){
-        if(acceptItem(item, tile, tile) && hasItems && source.team == tile.getTeam()){
+        if(acceptItem(item, tile, tile) && hasItems && source.getTeam() == tile.getTeam()){
             return Math.min(itemCapacity - tile.entity.items.getItem(item), amount);
         }else{
             return 0;
@@ -150,7 +150,8 @@ public class CoreBlock extends StorageBlock {
                 entity.currentPlayer.heal();
                 entity.currentPlayer.rotation = 90f;
                 entity.currentPlayer.baseRotation = 90f;
-                entity.currentPlayer.set(tile.drawx(), tile.drawy()).add();
+                entity.currentPlayer.set(tile.drawx(), tile.drawy());
+                entity.currentPlayer.add();
                 entity.currentPlayer = null;
             }
         }else{

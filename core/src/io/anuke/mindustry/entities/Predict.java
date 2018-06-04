@@ -1,6 +1,7 @@
 package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.math.Vector2;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.ucore.util.Mathf;
 
 /**Class for predicting shoot angles based on velocities of targets.*/
@@ -41,6 +42,11 @@ public class Predict {
         }
 
         return sol;
+    }
+
+    /**See {@link #intercept(float, float, float, float, float, float, float)}.*/
+    public static Vector2 intercept(TargetTrait src, TargetTrait dst, float v) {
+        return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), dst.getVelocity().x - src.getVelocity().x, dst.getVelocity().x - src.getVelocity().y, v);
     }
 
     private static Vector2 quad(float a, float b, float c) {

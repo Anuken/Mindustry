@@ -72,6 +72,7 @@ public class Administration {
 		}
     }
 
+    /*
     public void rollbackWorld(int rollbackTimes) {
         for(IntMap.Entry<Array<EditLog>> editLog : editLogs.entries()) {
             int coords = editLog.key;
@@ -118,7 +119,7 @@ public class Administration {
                 }
             }
         }
-    }
+    }*/
 
     public boolean validateBreak(String id, String ip){
         if(!isAntiGrief() || isAdmin(id, ip)) return true;

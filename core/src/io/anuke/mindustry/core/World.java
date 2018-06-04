@@ -15,7 +15,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.WorldGenerator;
 import io.anuke.ucore.core.Events;
-import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.entities.EntityPhysics;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Tmp;
@@ -179,7 +179,7 @@ public class World extends Module{
 
 		createTiles(width, height);
 		
-		Entities.resizeTree(0, 0, width * tilesize, height * tilesize);
+		EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
 		WorldGenerator.generate(tiles, MapIO.readTileData(map, true));
 

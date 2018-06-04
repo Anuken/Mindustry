@@ -39,7 +39,7 @@ public class TurretBullets implements ContentList {
 
             @Override
             public void init(Bullet b) {
-                b.velocity.setLength(0.6f + Mathf.random(2f));
+                b.getVelocity().setLength(0.6f + Mathf.random(2f));
             }
 
             @Override

@@ -14,7 +14,7 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.Targetable;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.graphics.Palette;
@@ -56,7 +56,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
     private float lineScale;
     /**Animation data for crosshair.*/
     private float crosshairScale;
-    private Targetable lastTarget;
+    private TargetTrait lastTarget;
 
     /**List of currently selected tiles to place.*/
     private Array<PlaceRequest> selection = new Array<>();
@@ -80,7 +80,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
 
     /**Check and assign targets for a specific position.*/
     void checkTargets(float x, float y){
-	    Unit unit = Units.getClosestEnemy(player.team, x, y, 20f, u -> true);
+	    Unit unit = Units.getClosestEnemy(player.getTeam(), x, y, 20f, u -> true);
 
 	    if(unit != null){
             player.target = unit;
@@ -88,7 +88,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
             Tile tile = world.tileWorld(x, y);
             if(tile != null) tile = tile.target();
 
-            if(tile != null && state.teams.areEnemies(player.team, tile.getTeam())){
+            if(tile != null && state.teams.areEnemies(player.getTeam(), tile.getTeam())){
                 player.target = tile.entity;
             }
         }

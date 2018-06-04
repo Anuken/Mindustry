@@ -14,10 +14,10 @@ import io.anuke.mindustry.entities.effect.Shield;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.Version;
-import io.anuke.ucore.entities.EffectEntity;
 import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.Entity;
 import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.entities.component.DrawTrait;
+import io.anuke.ucore.entities.impl.EffectEntity;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.OS;
 
@@ -131,7 +131,7 @@ public class Vars{
 	public static EntityGroup<Bullet> bulletGroup;
 	public static EntityGroup<Shield> shieldGroup;
 	public static EntityGroup<EffectEntity> effectGroup;
-	public static EntityGroup<Entity> groundEffectGroup;
+	public static EntityGroup<DrawTrait> groundEffectGroup;
 	public static EntityGroup<Puddle> puddleGroup;
 	public static EntityGroup<Fire> airItemGroup;
 	public static EntityGroup<BaseUnit>[] unitGroups;
@@ -144,7 +144,7 @@ public class Vars{
 		bulletGroup = Entities.addGroup(Bullet.class);
 		shieldGroup = Entities.addGroup(Shield.class, false);
 		effectGroup = Entities.addGroup(EffectEntity.class, false);
-		groundEffectGroup = Entities.addGroup(Entity.class, false);
+		groundEffectGroup = Entities.addGroup(DrawTrait.class, false);
 		puddleGroup = Entities.addGroup(Puddle.class, false);
 		airItemGroup = Entities.addGroup(Fire.class, false);
 		unitGroups = new EntityGroup[Team.values().length];

@@ -7,8 +7,6 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.EditLog;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
-import io.anuke.mindustry.net.NetEvents;
-import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
@@ -137,6 +135,7 @@ public class PlayerListFragment implements Fragment{
 
                 button.table(t -> {
                     t.defaults().size(bs - 1, bs + 3);
+                    //TODO requests.
 
                     t.addImageButton("icon-ban", 14*2, () -> {
                         ui.showConfirm("$text.confirm", "$text.confirmban", () -> {
@@ -144,7 +143,7 @@ public class PlayerListFragment implements Fragment{
                                 netServer.admins.banPlayerIP(connection.address);
                                 netServer.kick(player.clientid, KickReason.banned);
                             }else{
-                                NetEvents.handleAdministerRequest(player, AdminAction.ban);
+                                //NetEvents.handleAdministerRequest(player, AdminAction.ban);
                             }
                         });
                     }).padBottom(-5.1f);
@@ -153,7 +152,7 @@ public class PlayerListFragment implements Fragment{
                         if(Net.server()) {
                             netServer.kick(player.clientid, KickReason.kick);
                         }else{
-                            NetEvents.handleAdministerRequest(player, AdminAction.kick);
+                            //NetEvents.handleAdministerRequest(player, AdminAction.kick);
                         }
                     }).padBottom(-5.1f);
 
@@ -180,7 +179,7 @@ public class PlayerListFragment implements Fragment{
                         b.setDisabled(Net.client());
                     }).get().setTouchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled);
 
-                    t.addImageButton("icon-zoom-small", 14*2, () -> NetEvents.handleTraceRequest(player));
+                    t.addImageButton("icon-zoom-small", 14*2, () -> {}/*NetEvents.handleTraceRequest(player)*/);
 
                 }).padRight(12).padTop(-5).padLeft(0).padBottom(-10).size(bs + 10f, bs);
 

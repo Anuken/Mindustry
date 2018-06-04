@@ -10,7 +10,6 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.NetEvents;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
@@ -22,7 +21,6 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.players;
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.ucore.core.Core.scene;
 import static io.anuke.ucore.core.Core.skin;
@@ -168,7 +166,7 @@ public class ChatFragment extends Table implements Fragment{
         if(message.replaceAll(" ", "").isEmpty()) return;
 
         history.insert(1, message);
-        NetEvents.handleSendMessage(players[0], message);
+        //TODO send the message
     }
 
     public void toggle(){

@@ -3,17 +3,18 @@ package io.anuke.mindustry.entities.effect;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pools;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
-import io.anuke.ucore.entities.Entity;
-import io.anuke.ucore.entities.TimedEntity;
+import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.entities.impl.TimedEntity;
 import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Position;
+
+import static io.anuke.mindustry.Vars.effectGroup;
 
 public class ItemTransfer extends TimedEntity{
     private Vector2 from = new Vector2();
@@ -80,7 +81,7 @@ public class ItemTransfer extends TimedEntity{
     }
 
     @Override
-    public <T extends Entity> T add() {
-        return super.add(Vars.effectGroup);
+    public EntityGroup targetGroup() {
+        return effectGroup;
     }
 }

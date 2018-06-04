@@ -20,6 +20,7 @@ import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.entities.EntityPhysics;
 import io.anuke.ucore.modules.Module;
 
 import static io.anuke.mindustry.Vars.*;
@@ -40,8 +41,8 @@ public class Logic extends Module {
 
     @Override
     public void init(){
-        Entities.initPhysics();
-        Entities.collisions().setCollider(tilesize, world::solid);
+        EntityPhysics.initPhysics();
+        EntityPhysics.collisions().setCollider(tilesize, world::solid);
     }
 
     public void play(){
@@ -85,8 +86,9 @@ public class Logic extends Module {
             BaseUnit unit = UnitTypes.vtol.create(Team.red);
             Vector2 offset = new Vector2().setToRandomDirection().scl(world.width()/2f*tilesize).add(world.width()/2f*tilesize, world.height()/2f*tilesize);
             unit.inventory.addAmmo(AmmoTypes.bulletIron);
-            unit.inventory.setInfiniteAmmo(true);
-            unit.set(offset.x, offset.y).add();
+            unit.setWave();
+            unit.set(offset.x, offset.y);
+            unit.add();
         }
 
         state.wave ++;
@@ -153,17 +155,17 @@ public class Logic extends Module {
 
                 for(EntityGroup group : unitGroups){
                     if(!group.isEmpty()){
-                        Entities.collideGroups(bulletGroup, group);
+                        EntityPhysics.collideGroups(bulletGroup, group);
 
                         for(EntityGroup other : unitGroups){
                             if(!other.isEmpty()){
-                                Entities.collideGroups(group, other);
+                                EntityPhysics.collideGroups(group, other);
                             }
                         }
                     }
                 }
 
-                Entities.collideGroups(bulletGroup, playerGroup);
+                EntityPhysics.collideGroups(bulletGroup, playerGroup);
 
                 world.pathfinder().update();
             }
