@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.entities.StatusEffect;
+import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;

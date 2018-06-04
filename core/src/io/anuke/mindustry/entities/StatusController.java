@@ -1,16 +1,17 @@
 package io.anuke.mindustry.entities;
 
 import io.anuke.mindustry.content.StatusEffects;
+import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.ucore.core.Timers;
 
 /**Class for controlling status effects on an entity.*/
 public class StatusController {
     private static final TransitionResult globalResult = new TransitionResult();
 
-    private StatusEffect current = StatusEffects.none;
+    private io.anuke.mindustry.type.StatusEffect current = StatusEffects.none;
     private float time;
 
-    public void handleApply(Unit unit, StatusEffect effect, float intensity){
+    public void handleApply(Unit unit, io.anuke.mindustry.type.StatusEffect effect, float intensity){
         if(effect == StatusEffects.none) return; //don't apply empty effects
 
         float newTime = effect.baseDuration*intensity;
@@ -44,12 +45,12 @@ public class StatusController {
         }
     }
 
-    public void set(StatusEffect current, float time){
+    public void set(io.anuke.mindustry.type.StatusEffect current, float time){
         this.current = current;
         this.time = time;
     }
 
-    public StatusEffect current() {
+    public io.anuke.mindustry.type.StatusEffect current() {
         return current;
     }
 
@@ -58,7 +59,7 @@ public class StatusController {
     }
 
     public static class TransitionResult{
-        public StatusEffect result;
+        public io.anuke.mindustry.type.StatusEffect result;
         public float time;
 
         public TransitionResult set(StatusEffect effect, float time){

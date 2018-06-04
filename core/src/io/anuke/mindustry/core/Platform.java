@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.Base64Coder;
 import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.component.Entity;
+import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.scene.ui.TextField;
 

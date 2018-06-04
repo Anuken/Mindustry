@@ -2,7 +2,7 @@ package io.anuke.mindustry.content;
 
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.StatusController.TransitionResult;
-import io.anuke.mindustry.entities.StatusEffect;
+import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.ucore.core.Effects;

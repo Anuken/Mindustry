@@ -1,11 +1,11 @@
 package io.anuke.mindustry.entities.traits;
 
 import io.anuke.mindustry.game.Team;
-import io.anuke.ucore.entities.component.VelocityTrait;
-import io.anuke.ucore.util.Position;
+import io.anuke.ucore.entities.trait.VelocityTrait;
+import io.anuke.ucore.entities.trait.PosTrait;
 
 /**Base interface for targetable entities.*/
-public interface TargetTrait extends Position, VelocityTrait {
+public interface TargetTrait extends PosTrait, VelocityTrait {
 
     boolean isDead();
     Team getTeam();

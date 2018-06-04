@@ -7,16 +7,16 @@ import io.anuke.mindustry.entities.traits.TeamTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.component.Entity;
-import io.anuke.ucore.entities.component.SolidTrait;
-import io.anuke.ucore.entities.component.VelocityTrait;
+import io.anuke.ucore.entities.trait.Entity;
+import io.anuke.ucore.entities.trait.SolidTrait;
+import io.anuke.ucore.entities.trait.VelocityTrait;
 import io.anuke.ucore.entities.impl.BulletEntity;
 import io.anuke.ucore.util.Timer;
 
 import static io.anuke.mindustry.Vars.bulletGroup;
 import static io.anuke.mindustry.Vars.world;
 
-public class Bullet extends BulletEntity<BulletType>{
+public class Bullet extends BulletEntity<BulletType> implements TeamTrait{
 	private static Vector2 vector = new Vector2();
 
 	public Timer timer = new Timer(3);
@@ -50,6 +50,11 @@ public class Bullet extends BulletEntity<BulletType>{
 
 	public boolean collidesTiles(){
 		return true; //TODO make artillery and such not do this
+	}
+
+	@Override
+	public Team getTeam() {
+		return team;
 	}
 
 	@Override

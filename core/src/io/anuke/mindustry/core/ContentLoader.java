@@ -4,7 +4,7 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.content.bullets.*;
 import io.anuke.mindustry.content.fx.*;
-import io.anuke.mindustry.entities.StatusEffect;
+import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.type.ContentList;

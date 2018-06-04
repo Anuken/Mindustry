@@ -3,7 +3,7 @@ package io.anuke.kryonet;
 import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.EntityGroup.EntityContainer;
-import io.anuke.ucore.entities.component.Entity;
+import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.util.Log;
 
 import java.util.Iterator;

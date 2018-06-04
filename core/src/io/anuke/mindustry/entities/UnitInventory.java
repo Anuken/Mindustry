@@ -27,10 +27,6 @@ public class UnitInventory {
         return item != null && item.amount >= capacity;
     }
 
-    public boolean isInfiniteAmmo() {
-        return infiniteAmmo;
-    }
-
     public void setInfiniteAmmo(boolean infinite){
         infiniteAmmo = infinite;
     }
@@ -135,6 +131,10 @@ public class UnitInventory {
 
     public boolean canAcceptItem(Item type){
         return !hasItem() || (item.item == type && capacity - item.amount > 0);
+    }
+
+    public boolean canAcceptItem(Item type, int amount){
+        return !hasItem() || (item.item == type && item.amount + amount <= capacity);
     }
 
     public void clear(){

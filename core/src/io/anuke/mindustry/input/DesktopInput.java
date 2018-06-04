@@ -163,7 +163,7 @@ public class DesktopInput extends InputHandler{
             }
 
             if(canTapPlayer(Graphics.mouseWorld().x, Graphics.mouseWorld().y)){
-                cursorType = drill;
+                cursorType = unload;
             }
         }
 
@@ -246,7 +246,7 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        tryDropItems(cursor.target());
+        tryDropItems(cursor.target(), Graphics.world(screenX, screenY).x, Graphics.world(screenX, screenY).y);
 
         mode = none;
 

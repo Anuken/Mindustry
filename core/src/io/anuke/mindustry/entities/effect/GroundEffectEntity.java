@@ -22,7 +22,7 @@ public class GroundEffectEntity extends EffectEntity {
 
             time = Mathf.clamp(time, 0, effect.staticLife);
 
-            if (!once && time >= lifetime) {
+            if (!once && time >= lifetime()) {
                 once = true;
                 time = 0f;
                 Tile tile = Vars.world.tileWorld(x, y);
@@ -42,7 +42,7 @@ public class GroundEffectEntity extends EffectEntity {
         GroundEffect effect = (GroundEffect)this.effect;
 
         if(once && effect.isStatic)
-            Effects.renderEffect(id, effect, color, lifetime, rotation, x, y, data);
+            Effects.renderEffect(id, effect, color, lifetime(), rotation, x, y, data);
         else
             Effects.renderEffect(id, effect, color, time, rotation, x, y, data);
     }

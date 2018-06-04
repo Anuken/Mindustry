@@ -11,6 +11,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.entities.effect.DamageArea;
+import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
@@ -22,7 +23,7 @@ import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.mindustry.world.blocks.types.storage.CoreBlock.CoreEntity;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.component.SolidTrait;
+import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
@@ -145,10 +146,10 @@ public class Player extends Unit implements BuilderTrait {
 	}
 
 	@Override
-	public boolean collides(SolidTrait other){
-		return !isDead() && super.collides(other) && !mech.flying;
+	public boolean collides(SolidTrait other) {
+		return super.collides(other) || other instanceof ItemDrop;
 	}
-	
+
 	@Override
 	public void onDeath(){
 		dead = true;

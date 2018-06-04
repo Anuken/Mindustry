@@ -15,13 +15,13 @@ import io.anuke.mindustry.world.blocks.types.modules.LiquidModule;
 import io.anuke.mindustry.world.blocks.types.modules.PowerModule;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Bits;
-import io.anuke.ucore.util.Position;
+import io.anuke.ucore.entities.trait.PosTrait;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
 
-public class Tile implements Position, TargetTrait {
+public class Tile implements PosTrait, TargetTrait {
 	public static final Object tileSetLock = new Object();
 	
 	/**Block ID data.*/
@@ -359,6 +359,12 @@ public class Tile implements Position, TargetTrait {
 	public float getY() {
 		return drawy();
 	}
+
+	@Override
+	public void setX(float x) {}
+
+	@Override
+	public void setY(float y) {}
 
 	@Override
 	public String toString(){

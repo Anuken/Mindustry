@@ -20,7 +20,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.component.DrawTrait;
+import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.entities.impl.BaseEntity;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;

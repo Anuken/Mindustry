@@ -3,6 +3,7 @@ package io.anuke.mindustry.input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.effect.ItemTransfer;
@@ -189,7 +190,7 @@ public abstract class InputHandler extends InputAdapter{
 		return droppingItem;
 	}
 
-	public void tryDropItems(Tile tile){
+	public void tryDropItems(Tile tile, float x, float y){
 		if(!droppingItem || !player.inventory.hasItem() || !tile.block().hasItems){
 			droppingItem = false;
 			return;
@@ -240,6 +241,9 @@ public abstract class InputHandler extends InputAdapter{
 					}
 				});
 			}
+		}else{
+			ItemDrop.create(stack.item, stack.amount, player.x, player.y, player.angleTo(x, y));
+			player.inventory.clearItem();
 		}
 		//TODO create drop on the ground otherwise
 	}

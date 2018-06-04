@@ -78,7 +78,6 @@ public class Renderer extends RendererModule{
 						entity.effect = effect;
 						entity.color = color;
 						entity.rotation = rotation;
-						entity.lifetime = effect.lifetime;
 						entity.data = data;
 						entity.id ++;
 						entity.set(x, y);
@@ -92,7 +91,6 @@ public class Renderer extends RendererModule{
 						entity.effect = effect;
 						entity.color = color;
 						entity.rotation = rotation;
-						entity.lifetime = effect.lifetime;
 						entity.id ++;
 						entity.data = data;
 						entity.set(x, y);
@@ -207,6 +205,7 @@ public class Renderer extends RendererModule{
 		EntityDraw.draw(groundEffectGroup, e -> e instanceof BelowLiquidTrait);
 		EntityDraw.draw(puddleGroup);
 		EntityDraw.draw(groundEffectGroup, e -> !(e instanceof BelowLiquidTrait));
+		EntityDraw.draw(itemGroup);
 
 		blocks.processBlocks();
 		blocks.drawBlocks(Layer.block);
@@ -229,7 +228,7 @@ public class Renderer extends RendererModule{
 		drawAllTeams(true);
 
 		EntityDraw.draw(bulletGroup);
-		EntityDraw.draw(airItemGroup);
+		EntityDraw.draw(fireGroup);
 		EntityDraw.draw(effectGroup);
 
 		overlays.drawTop();

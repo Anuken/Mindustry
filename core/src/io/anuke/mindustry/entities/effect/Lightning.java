@@ -13,7 +13,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.component.SolidTrait;
+import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.entities.impl.TimedEntity;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
@@ -39,7 +39,6 @@ public class Lightning extends TimedEntity implements Poolable{
 
         l.x = x;
         l.y = y;
-        l.lifetime = 10f;
         l.color = color;
 
         float step = 3f;
@@ -99,6 +98,11 @@ public class Lightning extends TimedEntity implements Poolable{
 
     /**For pooling use only. Do not call directly!*/
     public Lightning(){}
+
+    @Override
+    public float lifetime() {
+        return 10;
+    }
 
     @Override
     public void reset() {

@@ -1,8 +1,9 @@
-package io.anuke.mindustry.entities;
+package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.StatusController.TransitionResult;
+import io.anuke.mindustry.entities.Unit;
 
 public class StatusEffect{
 	private static final Array<StatusEffect> array = new Array<>();

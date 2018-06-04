@@ -13,7 +13,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.component.DrawTrait;
+import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.entities.impl.TimedEntity;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
@@ -32,6 +32,7 @@ public class Fire extends TimedEntity implements SaveTrait, Poolable, DrawTrait 
     private Tile tile;
     private Block block;
     private float baseFlammability = -1, puddleFlammability;
+    private float lifetime;
 
     /**Start a fire on the tile. If there already is a file there, refreshes its lifetime..*/
     public static void create(Tile tile){
@@ -58,6 +59,11 @@ public class Fire extends TimedEntity implements SaveTrait, Poolable, DrawTrait 
 
     /**Deserialization use only!*/
     public Fire(){}
+
+    @Override
+    public float lifetime() {
+        return lifetime;
+    }
 
     @Override
     public void update() {
@@ -153,6 +159,6 @@ public class Fire extends TimedEntity implements SaveTrait, Poolable, DrawTrait 
 
     @Override
     public EntityGroup targetGroup() {
-        return airItemGroup;
+        return fireGroup;
     }
 }

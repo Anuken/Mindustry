@@ -22,8 +22,9 @@ public class Rubble extends TimedEntity implements BelowLiquidTrait {
         rubble.add();
     }
 
-    public Rubble(){
-        lifetime = 7000f;
+    @Override
+    public float lifetime() {
+        return 7000f;
     }
 
     @Override

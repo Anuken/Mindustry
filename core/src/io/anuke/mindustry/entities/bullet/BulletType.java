@@ -3,7 +3,7 @@ package io.anuke.mindustry.entities.bullet;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BulletFx;
-import io.anuke.mindustry.entities.StatusEffect;
+import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.impl.BaseBulletType;
 

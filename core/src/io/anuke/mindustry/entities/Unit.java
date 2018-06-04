@@ -2,7 +2,6 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
@@ -11,12 +10,14 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.net.Interpolator;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.component.DrawTrait;
-import io.anuke.ucore.entities.component.SolidTrait;
+import io.anuke.ucore.entities.trait.DamageTrait;
+import io.anuke.ucore.entities.trait.DrawTrait;
+import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.entities.impl.DestructibleEntity;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
@@ -70,7 +71,8 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     @Override
     public boolean collides(SolidTrait other){
-        return other instanceof Bullet && state.teams.areEnemies((((Bullet) other).team), team);
+        return other instanceof DamageTrait && other
+                instanceof TeamTrait && state.teams.areEnemies((((TeamTrait) other).getTeam()), team) && !isDead();
     }
 
     @Override
@@ -110,10 +112,10 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         this.health = health;
         this.x = x;
         this.y = y;
-        this.status.set(StatusEffect.getByID(effect), etime);
+        this.status.set(io.anuke.mindustry.type.StatusEffect.getByID(effect), etime);
     }
 
-    public StatusEffect getStatus(){
+    public io.anuke.mindustry.type.StatusEffect getStatus(){
         return status.current();
     }
 

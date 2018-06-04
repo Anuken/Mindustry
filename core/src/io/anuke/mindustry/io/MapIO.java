@@ -20,15 +20,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**Reads and writes map files.*/
-//TODO GWT support
-//TODO map header that maps block names to IDs for backwards compatibility
 public class MapIO {
     private static final int version = 0;
-    private static final IntIntMap defaultBlockMap = new IntIntMap();
+    private static IntIntMap defaultBlockMap = new IntIntMap();
 
-    //TODO static initializers are evil, remove
-    static{
-
+    private static void loadDefaultBlocks(){
         for(Block block : Block.getAllBlocks()){
             defaultBlockMap.put(block.id, block.id);
         }
@@ -77,6 +73,10 @@ public class MapIO {
     }
 
     public static void writeMap(OutputStream stream, ObjectMap<String, String> tags, MapTileData data) throws IOException{
+        if(defaultBlockMap == null){
+            loadDefaultBlocks();
+        }
+
         MapMeta meta = new MapMeta(version, tags, data.width(), data.height(), defaultBlockMap);
 
         DataOutputStream ds = new DataOutputStream(stream);

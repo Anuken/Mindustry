@@ -3,7 +3,6 @@ package io.anuke.mindustry.type;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.entities.StatusEffect;
 import io.anuke.mindustry.game.Content;
 import io.anuke.ucore.util.Bundles;
 

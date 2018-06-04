@@ -149,9 +149,10 @@ public class Logic extends Module {
                 }
                 Entities.update(puddleGroup);
                 Entities.update(tileGroup);
-                Entities.update(airItemGroup);
+                Entities.update(fireGroup);
                 Entities.update(shieldGroup);
                 Entities.update(playerGroup);
+                Entities.update(itemGroup);
 
                 for(EntityGroup group : unitGroups){
                     if(!group.isEmpty()){
@@ -166,6 +167,7 @@ public class Logic extends Module {
                 }
 
                 EntityPhysics.collideGroups(bulletGroup, playerGroup);
+                EntityPhysics.collideGroups(itemGroup, playerGroup);
 
                 world.pathfinder().update();
             }

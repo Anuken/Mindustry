@@ -9,6 +9,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Fire;
+import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.effect.Shield;
 import io.anuke.mindustry.entities.units.BaseUnit;
@@ -16,7 +17,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.Version;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.component.DrawTrait;
+import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.entities.impl.EffectEntity;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.OS;
@@ -63,7 +64,7 @@ public class Vars{
 	//whether turrets have infinite ammo (only with debug)
 	public static boolean infiniteAmmo = true;
 	//whether to show paths of enemies
-	public static boolean showPaths = true;
+	public static boolean showPaths = false;
 	//if false, player is always hidden
 	public static boolean showPlayer = true;
 	//whether to hide ui, only on debug
@@ -80,6 +81,8 @@ public class Vars{
 	public static float baseControllerSpeed = 11f;
 
 	public static final int saveSlots = 64;
+
+	public static final float itemSize = 5f;
 
 	//only if smoothCamera
 	public static boolean snapCamera = true;
@@ -132,8 +135,10 @@ public class Vars{
 	public static EntityGroup<Shield> shieldGroup;
 	public static EntityGroup<EffectEntity> effectGroup;
 	public static EntityGroup<DrawTrait> groundEffectGroup;
+	public static EntityGroup<ItemDrop> itemGroup;
+
 	public static EntityGroup<Puddle> puddleGroup;
-	public static EntityGroup<Fire> airItemGroup;
+	public static EntityGroup<Fire> fireGroup;
 	public static EntityGroup<BaseUnit>[] unitGroups;
 
 	public static void init(){
@@ -146,7 +151,8 @@ public class Vars{
 		effectGroup = Entities.addGroup(EffectEntity.class, false);
 		groundEffectGroup = Entities.addGroup(DrawTrait.class, false);
 		puddleGroup = Entities.addGroup(Puddle.class, false);
-		airItemGroup = Entities.addGroup(Fire.class, false);
+		itemGroup = Entities.addGroup(ItemDrop.class);
+		fireGroup = Entities.addGroup(Fire.class, false);
 		unitGroups = new EntityGroup[Team.values().length];
 
 		threads = new ThreadHandler(Platform.instance.getThreadProvider());

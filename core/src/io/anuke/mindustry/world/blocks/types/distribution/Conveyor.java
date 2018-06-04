@@ -17,6 +17,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.itemSize;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class Conveyor extends Block{
@@ -27,7 +28,6 @@ public class Conveyor extends Block{
 	private static final float itemSpace = 0.135f * 2.2f;
 	private static final float offsetScl = 128f*3f;
 	private static final float minmove = 1f / (Short.MAX_VALUE - 2);
-	private static final float itemSize = 5f;
 
 	private final Translator tr1 = new Translator();
 	private final Translator tr2 = new Translator();

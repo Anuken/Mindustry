@@ -15,7 +15,7 @@ import io.anuke.mindustry.world.blocks.types.BlockPart;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.EntityPhysics;
-import io.anuke.ucore.entities.component.Entity;
+import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.util.Bits;
 
 import java.io.DataInputStream;

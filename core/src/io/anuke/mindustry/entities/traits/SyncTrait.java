@@ -2,7 +2,7 @@ package io.anuke.mindustry.entities.traits;
 
 import com.badlogic.gdx.Gdx;
 import io.anuke.mindustry.net.Interpolator;
-import io.anuke.ucore.entities.component.Entity;
+import io.anuke.ucore.entities.trait.Entity;
 
 import java.nio.ByteBuffer;
 

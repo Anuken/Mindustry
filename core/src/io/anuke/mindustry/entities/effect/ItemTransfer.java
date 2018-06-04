@@ -6,14 +6,14 @@ import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.component.DrawTrait;
+import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.entities.impl.TimedEntity;
 import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Position;
+import io.anuke.ucore.entities.trait.PosTrait;
 
 import static io.anuke.mindustry.Vars.effectGroup;
 
@@ -23,21 +23,25 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
     private Vector2 tovec = new Vector2();
     private Item item;
     private float seed;
-    private Position to;
+    private PosTrait to;
     private Callable done;
 
-    public static void create(Item item, float fromx, float fromy, Position to, Callable done){
+    public static void create(Item item, float fromx, float fromy, PosTrait to, Callable done){
         ItemTransfer tr = Pools.obtain(ItemTransfer.class);
         tr.item = item;
         tr.from.set(fromx, fromy);
         tr.to = to;
         tr.done = done;
-        tr.lifetime = 60f;
         tr.seed = Mathf.range(1f);
         tr.add();
     }
 
     public ItemTransfer(){}
+
+    @Override
+    public float lifetime() {
+        return 60;
+    }
 
     @Override
     public void reset() {
