@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities.units.types;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Queue;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.BlockBuilder;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
@@ -36,6 +37,8 @@ public class Drone extends FlyingUnit implements BlockBuilder{
     protected Tile mineTile;
     protected Queue<BuildRequest> placeQueue = new Queue<>();
 
+    /**Initialize placement event notifier system.
+     * Static initialization is to be avoided, thus, this is done lazily.*/
     private static void initEvents(){
         Events.on(BlockBuildEvent.class, (team, tile) -> {
             EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
@@ -68,6 +71,11 @@ public class Drone extends FlyingUnit implements BlockBuilder{
             target = entity;
             setState(build);
         }
+    }
+
+    @Override
+    public float getBuildPower(Tile tile) {
+        return 0.3f;
     }
 
     @Override
@@ -176,6 +184,10 @@ public class Drone extends FlyingUnit implements BlockBuilder{
                 retarget(() -> {
                     target = Units.findAllyTile(team, x, y, discoverRange,
                             tile -> tile.entity != null && tile.entity.health + 0.0001f < tile.block().health);
+
+                    if(target == null){
+                        setState(mine);
+                    }
                 });
             }else if(target.distanceTo(Drone.this) > type.range){
                 circle(type.range);
@@ -184,6 +196,22 @@ public class Drone extends FlyingUnit implements BlockBuilder{
                 entity.health += healSpeed * Timers.delta();
                 entity.health = Mathf.clamp(entity.health, 0, entity.tile.block().health);
             }
+        }
+    },
+    mine = new UnitState() {
+        public void update() {
+            //if inventory is full, drop it off.
+            if(inventory.isFull()){
+                setState(drop);
+            }else{
+                //only mines iron for now
+                retarget(() -> target = Geometry.findClosest(x, y, world.indexer().getOrePositions(Items.iron)));
+            }
+        }
+    },
+    drop = new UnitState() {
+        public void update() {
+
         }
     },
     retreat = new UnitState() {

@@ -29,11 +29,7 @@ public class Units {
      * @return whether the target is invalid
      */
     public static boolean invalidateTarget(Targetable target, Team team, float x, float y, float range) {
-        if (target == null) {
-            return false;
-        }
-
-        return (!(range != Float.MAX_VALUE) || !(target.distanceTo(x, y) > range)) && (target.getTeam() == team || !target.isValid());
+        return target == null || (range != Float.MAX_VALUE && target.distanceTo(x, y) > range) || target.getTeam() == team || !target.isValid();
 
     }
 

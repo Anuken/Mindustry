@@ -53,6 +53,9 @@ public class ContentLoader {
         //weapons
         new Weapons(),
 
+        //units
+        new UnitTypes(),
+
         //blocks
         new Blocks(),
         new DefenseBlocks(),
@@ -68,9 +71,6 @@ public class ContentLoader {
 
         //recipes
         new Recipes(),
-
-        //units
-        new UnitTypes(),
     };
 
 

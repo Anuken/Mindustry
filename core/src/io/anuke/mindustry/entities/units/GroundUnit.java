@@ -2,7 +2,6 @@ package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.AmmoType;
@@ -12,20 +11,17 @@ import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
+import io.anuke.ucore.util.*;
 
 import static io.anuke.mindustry.Vars.world;
 
-public abstract class GroundUnitType extends BaseUnit {
+public abstract class GroundUnit extends BaseUnit {
     protected static Translator vec = new Translator();
     protected static float maxAim = 30f;
 
     protected float walkTime;
 
-    public GroundUnitType(UnitType type, Team team) {
+    public GroundUnit(UnitType type, Team team) {
         super(type, team);
     }
 
@@ -38,9 +34,8 @@ public abstract class GroundUnitType extends BaseUnit {
     public void update() {
         super.update();
 
-        if(!velocity.isZero(0.0001f) && (target == null
-                || (inventory.hasAmmo() && distanceTo(target) > inventory.getAmmo().getRange()))){
-            rotation = velocity.angle();
+        if(target == null){
+            rotation = Mathf.lerpDelta(rotation, velocity.angle(), 0.2f);
         }
     }
 
@@ -89,7 +84,8 @@ public abstract class GroundUnitType extends BaseUnit {
     public void updateTargeting() {
         super.updateTargeting();
 
-        if(Units.invalidateTarget(target, this)){
+        if(Units.invalidateTarget(target, team,  x, y, Float.MAX_VALUE)){
+            if(target != null) Log.info("Invalidating target {0}", target);
             target = null;
         }
     }
@@ -146,19 +142,11 @@ public abstract class GroundUnitType extends BaseUnit {
         }
 
         public void update() {
-            retarget(() -> {
-                Unit closest = Units.getClosestEnemy(team, x, y, inventory.getAmmo().getRange(), other -> true);
-                if(closest != null){
-                    target = closest;
-                }else {
-                    Tile target = Geometry.findClosest(x, y, world.indexer().getEnemy(team, BlockFlag.target));
-                    if (target != null) GroundUnitType.this.target = target.entity;
-                }
-            });
+            retarget(() -> targetClosest());
 
             if(!inventory.hasAmmo()) {
                 state.set(resupply);
-            }else{
+            }else if(target != null){
                 if(distanceTo(target) > inventory.getAmmo().getRange() * 0.7f){
                     moveToCore();
                 }else{
@@ -173,6 +161,8 @@ public abstract class GroundUnitType extends BaseUnit {
 
                     shoot(ammo, Angles.moveToward(rotation, angleTo(target), maxAim), 4f);
                 }
+            }else{
+                moveToCore();
             }
         }
     },

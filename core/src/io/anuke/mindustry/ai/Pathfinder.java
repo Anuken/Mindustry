@@ -63,7 +63,8 @@ public class Pathfinder {
             if(other == null) continue;
 
             if(values[dx][dy] < value && (target == null || values[dx][dy] < tl) &&
-                    (!other.solid() || state.teams.areEnemies(team, other.getTeam()))){
+                    !other.solid() &&
+                    !(point.x != 0 && point.y != 0 && (world.solid(tile.x + point.x, tile.y) || world.solid(tile.x, tile.y + point.y)))){ //diagonal corner trap
                 target = other;
                 tl = values[dx][dy];
             }

@@ -1,6 +1,5 @@
 package io.anuke.mindustry.entities.units.types;
 
-import io.anuke.mindustry.content.fx.UnitFx;
 import io.anuke.mindustry.entities.units.FlyingUnit;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.game.Team;
@@ -53,10 +52,6 @@ public class Vtol extends FlyingUnit {
 
         if(velocity.len() <= 0.2f){
             rotation += Mathf.sin(Timers.time() + id * 99, 10f, 8f);
-        }
-
-        if(timer.get(timerBoost, 2)){
-            effectAt(UnitFx.vtolHover, rotation + 180f, 4f, 0);
         }
     }
 

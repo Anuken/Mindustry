@@ -77,6 +77,12 @@ public class Player extends Unit implements BlockBuilder {
 
 	//region unit and event overrides, utility methods
 
+
+	@Override
+	public float getBuildPower(Tile tile) {
+		return 1f;
+	}
+
 	@Override
 	public float getMaxHealth() {
 		return 200;
@@ -507,6 +513,8 @@ public class Player extends Unit implements BlockBuilder {
 		inventory.clear();
 		upgrades.clear();
 		placeQueue.clear();
+		dead = true;
+		respawning = false;
 
 		add();
 		heal();

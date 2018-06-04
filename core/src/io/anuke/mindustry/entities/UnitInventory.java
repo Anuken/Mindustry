@@ -14,12 +14,17 @@ public class UnitInventory {
     private Array<AmmoEntry> ammos = new Array<>();
     private int totalAmmo;
     private ItemStack item;
+    //TODO move these somewhere else so they're not variables?
     private int capacity, ammoCapacity;
     private boolean infiniteAmmo;
 
     public UnitInventory(int capacity, int ammoCapacity) {
         this.capacity = capacity;
         this.ammoCapacity = ammoCapacity;
+    }
+
+    public boolean isFull(){
+        return item != null && item.amount >= capacity;
     }
 
     public boolean isInfiniteAmmo() {

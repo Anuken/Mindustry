@@ -46,6 +46,9 @@ public interface BlockBuilder {
     /**Sets the tile this builder is currently mining.*/
     void setMineTile(Tile tile);
 
+    /**Build power, can be any float. 1 = builds recipes in normal time, 0 = doesn't build at all.*/
+    float getBuildPower(Tile tile);
+
     /**Return whether this builder's place queue contains items.*/
     default boolean isBuilding(){
         return getPlaceQueue().size != 0;

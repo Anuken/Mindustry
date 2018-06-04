@@ -110,9 +110,12 @@ public class Recipes implements ContentList{
         new Recipe(liquid, LiquidBlocks.fluxpump, new ItemStack(Items.steel, 10), new ItemStack(Items.surgealloy, 5));
 
         new Recipe(units, UnitBlocks.repairPoint, new ItemStack(Items.steel, 10));
+        new Recipe(units, UnitBlocks.dropPoint, new ItemStack(Items.steel, 10));
         new Recipe(units, UnitBlocks.resupplyPoint, new ItemStack(Items.steel, 10));
 
-        //new Recipe(units, UnitBlocks.droneFactory, new ItemStack(Items.steel, 10));
+        new Recipe(units, UnitBlocks.droneFactory, new ItemStack(Items.iron, 50));
+
+
         //new Recipe(units, UnitBlocks.vtolFactory, new ItemStack(Items.steel, 10));
         //new Recipe(units, UnitBlocks.droneFactory, new ItemStack(Items.steel, 10));
         //new Recipe(units, UnitBlocks.droneFactory, new ItemStack(Items.steel, 10));

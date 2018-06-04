@@ -1,6 +1,5 @@
 package io.anuke.mindustry.entities.units;
 
-import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Palette;
@@ -48,7 +47,7 @@ public class FlyingUnit extends BaseUnit {
 
     @Override
     public void drawOver() {
-        trail.draw(Palette.lighterOrange, Palette.lightishOrange, 5f);
+        trail.draw(Palette.lightFlame, Palette.lightOrange, 5f);
     }
 
     @Override
@@ -63,6 +62,11 @@ public class FlyingUnit extends BaseUnit {
     @Override
     public UnitState getStartState(){
         return attack;
+    }
+
+    @Override
+    public float drawSize() {
+        return 60;
     }
 
     protected void circle(float circleLength){
@@ -111,6 +115,24 @@ public class FlyingUnit extends BaseUnit {
             }
         }
     },
+    idle = new UnitState() {
+        public void update() {
+            retarget(() -> {
+                targetClosest();
+                targetClosestEnemyFlag(BlockFlag.target);
+
+                if(target != null){
+                    setState(attack);
+                }
+            });
+
+            target = getClosestCore();
+            if(target != null){
+                circle(50f);
+            }
+            velocity.scl(0.8f);
+        }
+    },
     attack = new UnitState(){
         public void entered() {
             target = null;
@@ -124,16 +146,15 @@ public class FlyingUnit extends BaseUnit {
             if(!inventory.hasAmmo()) {
                 state.set(resupply);
             }else if (target == null){
-                if(timer.get(timerTarget, 20)) {
-                    Unit closest = Units.getClosestEnemy(team, x, y,
-                            inventory.getAmmo().getRange(), other -> distanceTo(other) < 60f);
-                    if(closest != null){
-                        target = closest;
-                    }else {
-                        Tile target = Geometry.findClosest(x, y, world.indexer().getEnemy(team, BlockFlag.target));
-                        if (target != null) FlyingUnit.this.target = target.entity;
+                retarget(() -> {
+                    targetClosest();
+                    targetClosestEnemyFlag(BlockFlag.target);
+                    targetClosestEnemyFlag(BlockFlag.producer);
+
+                    if(target == null){
+                        setState(idle);
                     }
-                }
+                });
             }else{
                 attack(150f);
 
@@ -153,7 +174,7 @@ public class FlyingUnit extends BaseUnit {
         }
 
         public void update() {
-            if(health >= health){
+            if(health >= getMaxHealth()){
                 state.set(attack);
             }else if(!targetHasFlag(BlockFlag.repair)){
                 retarget(() -> {

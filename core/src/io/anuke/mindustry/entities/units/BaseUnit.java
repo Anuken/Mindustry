@@ -4,6 +4,7 @@ import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.entities.Targetable;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.game.Team;
@@ -95,8 +96,23 @@ public abstract class BaseUnit extends Unit{
 	}
 
 	public void targetClosestAllyFlag(BlockFlag flag){
+		if(target != null) return;
+
 		Tile target = Geometry.findClosest(x, y, world.indexer().getAllied(team, flag));
 		if (target != null) this.target = target.entity;
+	}
+
+	public void targetClosestEnemyFlag(BlockFlag flag){
+		if(target != null) return;
+
+		Tile target = Geometry.findClosest(x, y, world.indexer().getEnemy(team, flag));
+		if (target != null) this.target = target.entity;
+	}
+
+	public void targetClosest(){
+		if(target != null) return;
+
+		target = Units.getClosestTarget(team, x, y, inventory.getAmmoRange());
 	}
 
 	public UnitState getStartState(){
