@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
+import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Block;
@@ -106,7 +107,7 @@ public class Fire extends TimedEntity implements SaveTrait, Poolable, DrawTrait 
             if(damage){
                 entity.damage(0.4f);
             }
-            DamageArea.damageUnits(null, tile.worldx(), tile.worldy(), tilesize, 3f, unit -> unit.applyEffect(StatusEffects.burning, 0.8f));
+            Damage.damageUnits(null, tile.worldx(), tile.worldy(), tilesize, 3f, unit -> unit.applyEffect(StatusEffects.burning, 0.8f));
         }
 
         if(Mathf.chance(0.05 * Timers.delta())){

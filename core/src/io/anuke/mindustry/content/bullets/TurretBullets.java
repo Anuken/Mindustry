@@ -9,7 +9,7 @@ import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.bullet.LiquidBulletType;
-import io.anuke.mindustry.entities.effect.DamageArea;
+import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.graphics.Palette;
@@ -101,7 +101,7 @@ public class TurretBullets implements ContentList {
 
             @Override
             public void init(Bullet b) {
-                DamageArea.collideLine(b, b.getTeam(), hiteffect, b.x, b.y, b.angle(), length);
+                Damage.collideLine(b, b.getTeam(), hiteffect, b.x, b.y, b.angle(), length);
             }
 
             @Override

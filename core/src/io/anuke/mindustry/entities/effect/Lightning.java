@@ -13,6 +13,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.entities.impl.TimedEntity;
 import io.anuke.ucore.graphics.Draw;
@@ -22,7 +23,7 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.bulletGroup;
 
-public class Lightning extends TimedEntity implements Poolable{
+public class Lightning extends TimedEntity implements Poolable, DrawTrait{
     private static Array<SolidTrait> entities = new Array<>();
     private static Rectangle rect = new Rectangle();
     private static Rectangle hitrect = new Rectangle();

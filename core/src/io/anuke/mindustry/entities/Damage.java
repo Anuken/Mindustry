@@ -1,4 +1,4 @@
-package io.anuke.mindustry.entities.effect;
+package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Rectangle;
@@ -7,8 +7,7 @@ import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Tile;
@@ -24,7 +23,7 @@ import io.anuke.ucore.util.Translator;
 import static io.anuke.mindustry.Vars.*;
 
 /**Utility class for damaging in an area.*/
-public class DamageArea{
+public class Damage {
 	private static Rectangle rect = new Rectangle();
 	private static Rectangle hitrect = new Rectangle();
 	private static Translator tr = new Translator();
@@ -33,14 +32,12 @@ public class DamageArea{
 	public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color){
 		for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i ++){
 			int branches = 5 + Mathf.clamp((int)(power/30), 1, 20);
-			Timers.run(i*2f + Mathf.random(4f), () -> {
-				Lightning.create(Team.none, Fx.none, Palette.power, 3, x, y, Mathf.random(360f), branches + Mathf.range(2));
-			});
+			Timers.run(i*2f + Mathf.random(4f), () -> Lightning.create(Team.none, Fx.none, Palette.power, 3,
+					x, y, Mathf.random(360f), branches + Mathf.range(2)));
 		}
 
 		for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i ++){
-			Timers.run(i/2, () ->
-				Bullet.create(TurretBullets.fireball, null, Team.none, x, y, Mathf.random(360f)));
+			Timers.run(i/2, () -> Bullet.create(TurretBullets.fireball, null, Team.none, x, y, Mathf.random(360f)));
 		}
 
 		int waves = Mathf.clamp((int)(explosiveness / 4), 0, 30);
@@ -48,7 +45,7 @@ public class DamageArea{
 		for(int i = 0; i < waves; i ++){
 			int f = i;
 			Timers.run(i*2f, () -> {
-				DamageArea.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f)/waves), explosiveness/2f);
+				Damage.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f)/waves), explosiveness/2f);
 				Effects.effect(ExplosionFx.blockExplosionSmoke, x + Mathf.range(radius), y + Mathf.range(radius));
 			});
 		}

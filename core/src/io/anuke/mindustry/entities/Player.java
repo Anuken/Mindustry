@@ -10,9 +10,10 @@ import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Weapons;
-import io.anuke.mindustry.entities.effect.DamageArea;
 import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
+import io.anuke.mindustry.entities.traits.CarriableTrait;
+import io.anuke.mindustry.entities.traits.CarryTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Palette;
@@ -39,7 +40,7 @@ import java.nio.ByteBuffer;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Player extends Unit implements BuilderTrait {
+public class Player extends Unit implements BuilderTrait, CarryTrait {
 	private static final float walkSpeed = 1.1f;
 	private static final float flySpeed = 0.4f;
 	private static final float flyMaxSpeed = 3f;
@@ -69,6 +70,7 @@ public class Player extends Unit implements BuilderTrait {
 	private float walktime;
 	private Queue<BuildRequest> placeQueue = new Queue<>();
 	private Tile mining;
+	private CarriableTrait carrying;
 	private Trail trail = new Trail(16);
 	
 	public Player(){
@@ -82,6 +84,20 @@ public class Player extends Unit implements BuilderTrait {
 
 	//region unit and event overrides, utility methods
 
+	@Override
+	public CarriableTrait getCarry() {
+		return carrying;
+	}
+
+	@Override
+	public void setCarry(CarriableTrait unit) {
+		this.carrying = unit;
+	}
+
+	@Override
+	public float getCarryWeight() {
+		return mech.carryWeight;
+	}
 
 	@Override
 	public float getBuildPower(Tile tile) {
@@ -156,9 +172,14 @@ public class Player extends Unit implements BuilderTrait {
 		respawning = false;
 		placeQueue.clear();
 
+		if(carrying != null){
+			carrying.setCarrier(null);
+			carrying = null;
+		}
+
 		float explosiveness = 2f + (inventory.hasItem() ? inventory.getItem().item.explosiveness * inventory.getItem().amount : 0f);
 		float flammability = (inventory.hasItem() ? inventory.getItem().item.flammability * inventory.getItem().amount : 0f);
-		DamageArea.dynamicExplosion(x, y, flammability, explosiveness, 0f, getSize()/2f, Palette.darkFlame);
+		Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, getSize()/2f, Palette.darkFlame);
 		Effects.sound("die", this);
 		super.onDeath();
 	}
@@ -174,6 +195,14 @@ public class Player extends Unit implements BuilderTrait {
 	}
 
 	@Override
+	public void removed() {
+		if(carrying != null){
+			carrying.setCarrier(null);
+			carrying = null;
+		}
+	}
+
+	@Override
 	public EntityGroup targetGroup() {
 		return playerGroup;
 	}
@@ -185,7 +214,6 @@ public class Player extends Unit implements BuilderTrait {
 	//endregion
 
 	//region draw methods
-
 
 	@Override
 	public float drawSize() {
@@ -512,6 +540,11 @@ public class Player extends Unit implements BuilderTrait {
 		placeQueue.clear();
 		dead = true;
 		respawning = false;
+
+		if(carrying != null){
+			carrying.setCarrier(null);
+			carrying = null;
+		}
 
 		add();
 		heal();

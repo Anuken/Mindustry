@@ -51,6 +51,7 @@ public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, Veloc
     /**Internal use only!*/
     public ItemDrop(){
         hitbox.setSize(5f);
+        hitboxTile.setSize(5f);
     }
 
     @Override
@@ -99,8 +100,8 @@ public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, Veloc
         int stored = Mathf.clamp(amount / 6, 1, 8);
 
         for(int i = 0; i < stored; i ++) {
-            float px = Mathf.randomSeedRange(i + 1, 4f);
-            float py = Mathf.randomSeedRange(i + 2, 4f);
+            float px = stored == 1 ? 0 : Mathf.randomSeedRange(i + 1, 4f);
+            float py = stored == 1 ? 0 : Mathf.randomSeedRange(i + 2, 4f);
             Draw.rect(item.region, x + px, y + py, size, size);
         }
 

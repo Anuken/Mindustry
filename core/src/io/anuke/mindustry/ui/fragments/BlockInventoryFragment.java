@@ -34,7 +34,6 @@ public class BlockInventoryFragment implements Fragment {
         this.input = input;
     }
 
-
     @Override
     public void build(Group parent) {
         table = new Table();
@@ -105,22 +104,15 @@ public class BlockInventoryFragment implements Fragment {
                 ItemImage image = new ItemImage(item.region, () -> round(items[f]), Color.WHITE);
                 image.addListener(l);
                 image.tapped(() -> {
-                    if(!canPick.get()) return;
-                    if (items[f] > 0) {
-                        int amount = Math.min(Inputs.keyDown("item_withdraw") ? items[f] : 1, player.inventory.itemCapacityUsed(item));
-                        tile.block().removeStack(tile, item, amount);
+                    if(!canPick.get() || items[f] == 0) return;
+                    int amount = Math.min(Inputs.keyDown("item_withdraw") ? items[f] : 1, player.inventory.itemCapacityUsed(item));
+                    tile.block().removeStack(tile, item, amount);
 
-                        int sent = Mathf.clamp(amount/3, 1, 8);
-                        int per = Math.min(amount/sent, 5);
-                        int[] soFar = {amount};
-                        for(int j = 0; j < sent; j ++){
-                            boolean all = j == sent-1;
-                            Timers.run(j*5, () -> ItemTransfer.create(item, tile.drawx(), tile.drawy(), player, () -> {
-                                player.inventory.addItem(item, all ? soFar[0] : per);
-                                soFar[0] -= per;
-                            }));
-                        }
+                    player.inventory.addItem(item, amount);
+                    for(int j = 0; j < Mathf.clamp(amount/3, 1, 8); j ++){
+                        Timers.run(j*3f, () -> ItemTransfer.create(item, tile.drawx(), tile.drawy(), player, () -> {}));
                     }
+
                 });
                 table.add(image);
 

@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.types.power;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.effect.DamageArea;
+import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.type.Item;
@@ -138,7 +138,7 @@ public class NuclearReactor extends LiquidBurnerGenerator {
 			});
 		}
 		
-		DamageArea.damage(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);
+		Damage.damage(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);
 		
 		
 		for(int i = 0; i < 20; i ++){

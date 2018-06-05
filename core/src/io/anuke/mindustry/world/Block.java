@@ -9,7 +9,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.entities.effect.DamageArea;
+import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.effect.Rubble;
 import io.anuke.mindustry.game.Content;
@@ -298,7 +298,7 @@ public class Block extends BaseBlock implements Content{
 			}
 		}
 
-		DamageArea.dynamicExplosion(x, y, flammability, explosiveness, power, tilesize * size/2f, tempColor);
+		Damage.dynamicExplosion(x, y, flammability, explosiveness, power, tilesize * size/2f, tempColor);
 		if(!tile.floor().solid && !tile.floor().liquid){
 			Rubble.create(tile.drawx(), tile.drawy(), size);
 		}

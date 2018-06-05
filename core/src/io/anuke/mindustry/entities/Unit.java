@@ -2,10 +2,7 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.entities.traits.SaveTrait;
-import io.anuke.mindustry.entities.traits.SyncTrait;
-import io.anuke.mindustry.entities.traits.TargetTrait;
-import io.anuke.mindustry.entities.traits.TeamTrait;
+import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.net.Interpolator;
@@ -29,7 +26,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
-public abstract class Unit extends DestructibleEntity implements SaveTrait, TargetTrait, SyncTrait, DrawTrait, TeamTrait {
+public abstract class Unit extends DestructibleEntity implements SaveTrait, TargetTrait, SyncTrait, DrawTrait, TeamTrait, CarriableTrait {
     /**total duration of hit flash effect*/
     public static final float hitDuration = 9f;
 
@@ -40,9 +37,20 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     protected StatusController status = new StatusController();
     protected Team team = Team.blue;
 
+    protected CarryTrait carrier;
     protected Vector2 velocity = new Vector2(0f, 0.0001f);
     protected float hitTime;
     protected float drownTime;
+
+    @Override
+    public void setCarrier(CarryTrait carrier) {
+        this.carrier = carrier;
+    }
+
+    @Override
+    public CarryTrait getCarrier() {
+        return carrier;
+    }
 
     @Override
     public Team getTeam(){
@@ -65,7 +73,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     @Override
     public void damage(float amount){
-        super.damage(amount);
+        super.damage(amount * Mathf.clamp(1f-getArmor()/100f));
         hitTime = hitDuration;
     }
 
@@ -112,10 +120,10 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         this.health = health;
         this.x = x;
         this.y = y;
-        this.status.set(io.anuke.mindustry.type.StatusEffect.getByID(effect), etime);
+        this.status.set(StatusEffect.getByID(effect), etime);
     }
 
-    public io.anuke.mindustry.type.StatusEffect getStatus(){
+    public StatusEffect getStatus(){
         return status.current();
     }
 
