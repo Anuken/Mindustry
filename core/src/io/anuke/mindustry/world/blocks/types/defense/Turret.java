@@ -4,7 +4,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.Fx;
-import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.Predict;
+import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
@@ -20,10 +23,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.BiConsumer;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
-import io.anuke.ucore.util.Translator;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -267,7 +267,7 @@ public abstract class Turret extends Block{
 	
 	public static class TurretEntity extends TileEntity{
 		public TileEntity blockTarget;
-		public Array<AmmoEntry> ammo = new Array<>();
+		public Array<AmmoEntry> ammo = new ThreadArray<>();
 		public int totalAmmo;
 		public float reload;
 		public float rotation = 90;

@@ -64,15 +64,14 @@ public class AmmoType implements Content{
         return bullet.speed * bullet.lifetime;
     }
 
-    //TODO implement content name?
-    @Override
-    public String getContentName() {
-        return "???";
-    }
-
     @Override
     public String getContentTypeName() {
         return "ammotype";
+    }
+
+    @Override
+    public Array<? extends Content> getAll() {
+        return allTypes;
     }
 
     public static Array<AmmoType> all() {

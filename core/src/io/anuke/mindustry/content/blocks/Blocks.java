@@ -11,7 +11,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.*;
 
-public class Blocks implements ContentList{
+public class Blocks extends BlockList implements ContentList{
     public static Block air, spawn, blockpart, build1, build2, build3, build4, build5, build6, defaultFloor, space, metalfloor, deepwater, water, lava, oil, stone, blackstone, iron, lead, coal, titanium, thorium, dirt, sand, ice, snow, grass, sandblock, snowblock, stoneblock, blackstoneblock, grassblock, mossblock, shrub, rock, icerock, blackrock, dirtblock;
 
     @Override

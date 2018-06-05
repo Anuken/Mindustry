@@ -11,7 +11,7 @@ import io.anuke.mindustry.world.blocks.types.production.Drill;
 import io.anuke.mindustry.world.blocks.types.production.Fracker;
 import io.anuke.mindustry.world.blocks.types.production.SolidPump;
 
-public class ProductionBlocks implements ContentList {
+public class ProductionBlocks extends BlockList implements ContentList {
     public static Block ironDrill, reinforcedDrill, steelDrill, titaniumDrill, laserdrill, nucleardrill, plasmadrill, waterextractor, oilextractor, cultivator;
 
     @Override

@@ -1,14 +1,22 @@
 package io.anuke.mindustry.game;
 
+import com.badlogic.gdx.utils.Array;
+
 /**Base interface for an unlockable content type.*/
 public interface Content {
-    /**Returns the unqiue name of this piece of content.
-     * The name only needs to be unique for all content of this type.
-     * Do not use IDs for names! Make sure this string stays constant with each update unless removed.
-     * (e.g. having a recipe and a block, both with name "wall" is fine, as they are different types).*/
-    String getContentName();
 
     /**Returns the type name of this piece of content.
      * This should return the same value for all instances of this content type.*/
     String getContentTypeName();
+
+    /**Returns a list of all instances of this content.*/
+    Array<? extends Content> getAll();
+
+    /**Called after all content is created. Use for loading texture regions and other data.
+     * Do not use to load regions!*/
+    default void init(){}
+
+    /**Called after all content is created, only on non-headless versions.
+     * Use for loading regions or other image data.*/
+    default void load(){}
 }

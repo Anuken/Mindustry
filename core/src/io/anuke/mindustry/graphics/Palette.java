@@ -16,6 +16,7 @@ public class Palette {
     public static final Color lighterOrange = Color.valueOf("f6e096");
 
     public static final Color lightishGray = Color.valueOf("a2a2a2");
+    public static final Color darkishGray = new Color(0.3f, 0.3f, 0.3f, 1f);
 
     public static final Color lancerLaser = Color.valueOf("a9d8ff");
 
@@ -37,7 +38,9 @@ public class Palette {
 
     public static final Color missingitems = Color.SCARLET;
     public static final Color health = Color.YELLOW;
+    public static final Color ammo = Color.valueOf("32cf6d");
     public static final Color healthstats = Color.SCARLET;
+    public static final Color bar = Color.SLATE;
     public static final Color interact = Color.ORANGE;
     public static final Color accent = Color.valueOf("f4ba6e");
     public static final Color place = Color.valueOf("6335f8");
@@ -46,4 +49,13 @@ public class Palette {
     public static final Color breakInvalid = Color.valueOf("d44b3d");
     public static final Color range = Color.valueOf("f4ba6e");
     public static final Color power = Color.valueOf("fbd367");
+
+    public static final Color redSpark = Color.valueOf("fbb97f");
+    public static final Color orangeSpark = Color.valueOf("d2b29c");
+
+    public static final Color redDust = Color.valueOf("ffa480");
+    public static final Color redderDust = Color.valueOf("ff7b69");
+
+    public static final Color plasticSmoke = Color.valueOf("f1e479");
+    public static final Color plasticBurn = Color.valueOf("e9ead3");
 }

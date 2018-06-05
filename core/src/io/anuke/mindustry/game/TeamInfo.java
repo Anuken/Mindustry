@@ -1,19 +1,20 @@
 package io.anuke.mindustry.game;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.util.ThreadArray;
+import io.anuke.ucore.util.ThreadSet;
 
 /**Class for various team-based utilities.*/
 public class TeamInfo {
     private ObjectMap<Team, TeamData> map = new ObjectMap<>();
-    private ObjectSet<Team> allies = new ObjectSet<>(),
-            enemies = new ObjectSet<>();
-    private ObjectSet<TeamData> allyData = new ObjectSet<>(),
-            enemyData = new ObjectSet<>();
-    private ObjectSet<TeamData> allTeamData = new ObjectSet<>();
-    private ObjectSet<Team> allTeams = new ObjectSet<>();
+    private ThreadSet<Team> allies = new ThreadSet<>(),
+            enemies = new ThreadSet<>();
+    private ThreadSet<TeamData> allyData = new ThreadSet<>(),
+            enemyData = new ThreadSet<>();
+    private ThreadSet<TeamData> allTeamData = new ThreadSet<>();
+    private ThreadSet<Team> allTeams = new ThreadSet<>();
 
     /**Returns all teams on a side.*/
     public ObjectSet<TeamData> getTeams(boolean ally) {
@@ -93,7 +94,7 @@ public class TeamInfo {
     }
 
     public class TeamData {
-        public final Array<Tile> cores = new Array<>();
+        public final ThreadArray<Tile> cores = new ThreadArray<>();
         public final Team team;
         public final boolean ally;
 

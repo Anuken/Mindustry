@@ -4,11 +4,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Bundles;
 
-public class Item implements Comparable<Item>, Content{
+public class Item implements Comparable<Item>, UnlockableContent{
 	private static final Array<Item> items = new Array<>();
 
 	public final int id;
@@ -68,6 +69,11 @@ public class Item implements Comparable<Item>, Content{
 	@Override
 	public String getContentTypeName() {
 		return "item";
+	}
+
+	@Override
+	public Array<? extends Content> getAll() {
+		return all();
 	}
 
 	public static Array<Item> all() {

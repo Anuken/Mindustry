@@ -7,7 +7,7 @@ import io.anuke.mindustry.world.blocks.types.Wall;
 import io.anuke.mindustry.world.blocks.types.defense.Door;
 import io.anuke.mindustry.world.blocks.types.defense.ShieldedWallBlock;
 
-public class DefenseBlocks implements ContentList {
+public class DefenseBlocks extends BlockList implements ContentList {
     public static Block stonewall, ironwall, steelwall, titaniumwall, diriumwall, compositewall, steelwalllarge, titaniumwalllarge, diriumwalllarge, titaniumshieldwall, door, largedoor;
 
     @Override

@@ -76,7 +76,6 @@ public class FlyingUnit extends BaseUnit implements CarryTrait{
         }
     }
 
-
     @Override
     public UnitState getStartState(){
         return attack;

@@ -2,9 +2,10 @@ package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.ucore.util.Bundles;
 
-public abstract class Upgrade implements Content{
+public abstract class Upgrade implements UnlockableContent{
     private static Array<Upgrade> upgrades = new Array<>();
     private static byte lastid;
 
@@ -37,6 +38,11 @@ public abstract class Upgrade implements Content{
     @Override
     public String getContentTypeName() {
         return "upgrade";
+    }
+
+    @Override
+    public Array<? extends Content> getAll() {
+        return all();
     }
 
     public static Array<Upgrade> all() {

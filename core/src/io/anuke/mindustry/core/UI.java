@@ -190,7 +190,7 @@ public class UI extends SceneModule{
 	}
 
 	@Override
-	public synchronized boolean hasMouse() {
+	public boolean hasMouse() {
 		return super.hasMouse();
 	}
 

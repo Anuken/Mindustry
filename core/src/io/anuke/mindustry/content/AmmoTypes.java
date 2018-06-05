@@ -1,7 +1,9 @@
 package io.anuke.mindustry.content;
 
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.bullets.*;
 import io.anuke.mindustry.content.fx.ShootFx;
+import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.ContentList;
 
@@ -159,5 +161,10 @@ public class AmmoTypes implements ContentList {
 
         cryofluid = new AmmoType(Liquids.cryofluid, TurretBullets.cryoShot, 0.3f);
 
+    }
+
+    @Override
+    public Array<? extends Content> getAll() {
+        return AmmoType.all();
     }
 }

@@ -20,7 +20,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class DebugBlocks implements ContentList{
+public class DebugBlocks extends BlockList implements ContentList{
     public static Block powerVoid, powerInfinite, itemSource, liquidSource, itemVoid;
 
     @Override

@@ -25,7 +25,7 @@ public class MapIO {
     private static IntIntMap defaultBlockMap = new IntIntMap();
 
     private static void loadDefaultBlocks(){
-        for(Block block : Block.getAllBlocks()){
+        for(Block block : Block.all()){
             defaultBlockMap.put(block.id, block.id);
         }
     }
@@ -151,8 +151,8 @@ public class MapIO {
             stream.writeUTF(entry.value);
         }
 
-        stream.writeShort(Block.getAllBlocks().size);
-        for(Block block : Block.getAllBlocks()){
+        stream.writeShort(Block.all().size);
+        for(Block block : Block.all()){
             stream.writeShort(block.id);
             stream.writeUTF(block.name);
         }

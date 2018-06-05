@@ -1,6 +1,8 @@
 package io.anuke.mindustry.content;
 
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.blocks.*;
+import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
@@ -126,5 +128,10 @@ public class Recipes implements ContentList{
         new Recipe(units, DebugBlocks.liquidSource, new ItemStack(Items.steel, 10)).setDebug();
         new Recipe(units, DebugBlocks.powerVoid, new ItemStack(Items.steel, 10)).setDebug();
         new Recipe(units, DebugBlocks.powerInfinite, new ItemStack(Items.steel, 10), new ItemStack(Items.surgealloy, 5)).setDebug();
+    }
+
+    @Override
+    public Array<? extends Content> getAll() {
+        return Recipe.all();
     }
 }

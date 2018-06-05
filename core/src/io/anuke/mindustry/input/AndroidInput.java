@@ -25,6 +25,7 @@ import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
+import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.Group;
@@ -80,16 +81,18 @@ public class AndroidInput extends InputHandler implements GestureListener{
 
     /**Check and assign targets for a specific position.*/
     void checkTargets(float x, float y){
-	    Unit unit = Units.getClosestEnemy(player.getTeam(), x, y, 20f, u -> true);
+        synchronized (Entities.entityLock) {
+            Unit unit = Units.getClosestEnemy(player.getTeam(), x, y, 20f, u -> true);
 
-	    if(unit != null){
-            player.target = unit;
-        }else{
-            Tile tile = world.tileWorld(x, y);
-            if(tile != null) tile = tile.target();
+            if (unit != null) {
+                player.target = unit;
+            } else {
+                Tile tile = world.tileWorld(x, y);
+                if (tile != null) tile = tile.target();
 
-            if(tile != null && state.teams.areEnemies(player.getTeam(), tile.getTeam())){
-                player.target = tile.entity;
+                if (tile != null && state.teams.areEnemies(player.getTeam(), tile.getTeam())) {
+                    player.target = tile.entity;
+                }
             }
         }
     }

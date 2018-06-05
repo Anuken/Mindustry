@@ -4,27 +4,27 @@ import io.anuke.mindustry.entities.bullet.BasicBulletType;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.type.ContentList;
 
-public class MissileBullets implements ContentList {
+public class MissileBullets extends BulletList implements ContentList {
     public static BulletType explosive, incindiary, surge;
 
     @Override
     public void load() {
 
-        explosive = new BasicBulletType(3f, 5) {
+        explosive = new BasicBulletType(3f, 5, "bullet") {
             {
                 bulletWidth = 7f;
                 bulletHeight = 9f;
             }
         };
 
-        incindiary = new BasicBulletType(3f, 5) {
+        incindiary = new BasicBulletType(3f, 5, "bullet") {
             {
                 bulletWidth = 7f;
                 bulletHeight = 9f;
             }
         };
 
-        surge = new BasicBulletType(3f, 5) {
+        surge = new BasicBulletType(3f, 5, "bullet") {
             {
                 bulletWidth = 7f;
                 bulletHeight = 9f;

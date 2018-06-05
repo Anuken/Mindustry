@@ -4,11 +4,12 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.world.Block;
 
 import static io.anuke.mindustry.Vars.headless;
 
-public class Recipe implements Content{
+public class Recipe implements UnlockableContent{
     private static int lastid;
     private static Array<Recipe> allRecipes = new Array<>();
     private static ObjectMap<Block, Recipe> recipeMap = new ObjectMap<>();
@@ -56,6 +57,11 @@ public class Recipe implements Content{
     @Override
     public String getContentTypeName() {
         return "recipe";
+    }
+
+    @Override
+    public Array<? extends Content> getAll() {
+        return allRecipes;
     }
 
     /**Returns unlocked recipes in a category.

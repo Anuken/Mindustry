@@ -10,14 +10,13 @@ import io.anuke.ucore.util.Mathf;
 /**Class that renders a trail.*/
 public class Trail {
     private final int length;
-
-    private FloatArray points = new FloatArray();
+    private final FloatArray points = new FloatArray();
 
     public Trail(int length){
         this.length = length;
     }
 
-    public void update(float curx, float cury){
+    public synchronized void update(float curx, float cury){
         points.add(curx, cury);
 
         if(points.size > length*2) {
@@ -27,7 +26,11 @@ public class Trail {
         }
     }
 
-    public void draw(Color start, Color end, float stroke){
+    public synchronized void clear(){
+        points.clear();
+    }
+
+    public synchronized void draw(Color start, Color end, float stroke){
 
         for(int i = 0; i < points.size - 2; i += 2){
             float x = points.get(i);

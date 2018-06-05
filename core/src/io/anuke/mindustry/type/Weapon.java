@@ -1,5 +1,6 @@
 package io.anuke.mindustry.type;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
@@ -7,6 +8,7 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
@@ -35,8 +37,16 @@ public class Weapon extends Upgrade {
 	/**translator for vector calulations*/
 	protected Translator tr = new Translator();
 
+	public TextureRegion equipRegion, region;
+
 	protected Weapon(String name){
 		super(name);
+	}
+
+	@Override
+	public void load() {
+		equipRegion = Draw.region(name + "-equip");
+		region = Draw.region(name);
 	}
 
 	public void update(Player p, boolean left, float pointerX, float pointerY){
@@ -78,7 +88,7 @@ public class Weapon extends Upgrade {
 	}
 
 	protected void setAmmo(AmmoType... types){
-		for(io.anuke.mindustry.type.AmmoType type : types){
+		for(AmmoType type : types){
 			ammoMap.put(type.item, type);
 		}
 	}

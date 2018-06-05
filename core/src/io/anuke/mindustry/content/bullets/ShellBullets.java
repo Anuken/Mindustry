@@ -6,13 +6,13 @@ import io.anuke.mindustry.entities.bullet.BasicBulletType;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.type.ContentList;
 
-public class ShellBullets implements ContentList {
+public class ShellBullets extends BulletList implements ContentList {
     public static BulletType lead, leadShard, thorium, thoriumShard, plastic, plasticShard, explosive, explosiveShard, incindiary;
 
     @Override
     public void load() {
 
-        lead = new BasicBulletType(3f, 0) {
+        lead = new BasicBulletType(3f, 0, "shell") {
             {
                 hiteffect = BulletFx.flakExplosion;
                 knockback = 0.8f;
@@ -20,12 +20,11 @@ public class ShellBullets implements ContentList {
                 drag = 0.01f;
                 bulletWidth = bulletHeight = 9f;
                 fragBullet = leadShard;
-                bulletSprite = "frag";
                 bulletShrink = 0.1f;
             }
         };
 
-        leadShard = new BasicBulletType(3f, 0) {
+        leadShard = new BasicBulletType(3f, 0, "shell") {
             {
                 drag = 0.1f;
                 hiteffect = Fx.none;
@@ -38,7 +37,7 @@ public class ShellBullets implements ContentList {
             }
         };
 
-        thorium = new BasicBulletType(3f, 0) {
+        thorium = new BasicBulletType(3f, 0, "shell") {
             {
                 hiteffect = BulletFx.flakExplosion;
                 knockback = 0.8f;
@@ -46,12 +45,11 @@ public class ShellBullets implements ContentList {
                 drag = 0.01f;
                 bulletWidth = bulletHeight = 9f;
                 fragBullet = leadShard;
-                bulletSprite = "frag";
                 bulletShrink = 0.1f;
             }
         };
 
-        thoriumShard = new BasicBulletType(3f, 0) {
+        thoriumShard = new BasicBulletType(3f, 0, "shell") {
             {
                 drag = 0.1f;
                 hiteffect = Fx.none;
@@ -64,7 +62,7 @@ public class ShellBullets implements ContentList {
             }
         };
 
-        plastic = new BasicBulletType(3f, 0) {
+        plastic = new BasicBulletType(3f, 0, "shell") {
             {
                 hiteffect = BulletFx.flakExplosion;
                 knockback = 0.8f;
@@ -72,12 +70,11 @@ public class ShellBullets implements ContentList {
                 drag = 0.01f;
                 bulletWidth = bulletHeight = 9f;
                 fragBullet = leadShard;
-                bulletSprite = "frag";
                 bulletShrink = 0.1f;
             }
         };
 
-        plasticShard = new BasicBulletType(3f, 0) {
+        plasticShard = new BasicBulletType(3f, 0, "shell") {
             {
                 drag = 0.1f;
                 hiteffect = Fx.none;
@@ -90,7 +87,7 @@ public class ShellBullets implements ContentList {
             }
         };
 
-        explosive = new BasicBulletType(3f, 0) {
+        explosive = new BasicBulletType(3f, 0, "shell") {
             {
                 hiteffect = BulletFx.flakExplosion;
                 knockback = 0.8f;
@@ -98,12 +95,11 @@ public class ShellBullets implements ContentList {
                 drag = 0.01f;
                 bulletWidth = bulletHeight = 9f;
                 fragBullet = leadShard;
-                bulletSprite = "frag";
                 bulletShrink = 0.1f;
             }
         };
 
-        explosiveShard = new BasicBulletType(3f, 0) {
+        explosiveShard = new BasicBulletType(3f, 0, "shell") {
             {
                 drag = 0.1f;
                 hiteffect = Fx.none;
@@ -116,7 +112,7 @@ public class ShellBullets implements ContentList {
             }
         };
 
-        incindiary = new BasicBulletType(3f, 0) {
+        incindiary = new BasicBulletType(3f, 0, "shell") {
             {
                 hiteffect = BulletFx.flakExplosion;
                 knockback = 0.8f;
@@ -124,7 +120,6 @@ public class ShellBullets implements ContentList {
                 drag = 0.01f;
                 bulletWidth = bulletHeight = 9f;
                 fragBullet = leadShard;
-                bulletSprite = "frag";
                 bulletShrink = 0.1f;
             }
         };

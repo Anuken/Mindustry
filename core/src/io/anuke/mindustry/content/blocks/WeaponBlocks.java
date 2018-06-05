@@ -12,7 +12,7 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
-public class WeaponBlocks implements ContentList {
+public class WeaponBlocks extends BlockList implements ContentList {
 	public static Block duo, scatter, scorch, hail, wave, crux, lancer, arc, swarmer, ripple, cyclone, fuse, spectre, eraser, meltdown;
 
 	@Override

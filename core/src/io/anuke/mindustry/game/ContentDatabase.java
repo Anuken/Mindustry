@@ -15,7 +15,7 @@ public class ContentDatabase {
     private boolean dirty;
 
     /**Returns whether or not this piece of content is unlocked yet.*/
-    public boolean isUnlocked(Content content){
+    public boolean isUnlocked(UnlockableContent content){
         if(!unlocked.containsKey(content.getContentTypeName())){
             unlocked.put(content.getContentTypeName(), new ObjectSet<>());
         }
@@ -29,7 +29,7 @@ public class ContentDatabase {
      * If this piece of content is already unlocked, nothing changes.
      * Results are not saved until you call {@link #save()}.
      * @return whether or not this content was newly unlocked.*/
-    public boolean unlockContent(Content content){
+    public boolean unlockContent(UnlockableContent content){
         if(!unlocked.containsKey(content.getContentTypeName())){
             unlocked.put(content.getContentTypeName(), new ObjectSet<>());
         }

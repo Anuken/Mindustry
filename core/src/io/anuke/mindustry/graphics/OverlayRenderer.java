@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectSet.ObjectSetIterator;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
@@ -163,9 +162,8 @@ public class OverlayRenderer {
         }
 
         if((!debug || showUI) && Settings.getBool("healthbars")){
-            ObjectSetIterator<TeamData> iterator = new ObjectSetIterator<>((debug ? state.teams.getTeams() : state.teams.getTeams(true)));
 
-            for(TeamData ally : iterator){
+            for(TeamData ally : (debug ? state.teams.getTeams() : state.teams.getTeams(true))){
                 for(Unit e : unitGroups[ally.team.ordinal()].all()){
                     drawStats(e);
                 }
@@ -189,8 +187,8 @@ public class OverlayRenderer {
         }
 
         drawEncloser(x, y - 8f, 2f);
-        drawBar(Color.SCARLET, x, y - 8f, unit.healthf());
-        drawBar(Color.valueOf("32cf6d"), x, y - 9f, unit.inventory.totalAmmo() / (float) unit.inventory.ammoCapacity());
+        drawBar(Palette.healthstats, x, y - 8f, unit.healthf());
+        drawBar(Palette.ammo, x, y - 9f, unit.inventory.totalAmmo() / (float) unit.inventory.ammoCapacity());
     }
 
     void drawBar(Color color, float x, float y, float finion){
@@ -220,7 +218,7 @@ public class OverlayRenderer {
         float len = 3;
 
         Lines.stroke(2f + height);
-        Draw.color(Color.SLATE);
+        Draw.color(Palette.bar);
         Lines.line(x - len - 0.5f, y, x + len + 1.5f, y, CapStyle.none);
 
         Draw.reset();

@@ -11,7 +11,7 @@ import io.anuke.ucore.util.Angles;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class Fx implements ContentList {
+public class Fx extends FxList implements ContentList {
 	public static Effect none, placeBlock, breakBlock, smoke, spawn, tapBlock, select;
 
 	@Override
@@ -53,7 +53,7 @@ public class Fx implements ContentList {
 		});
 
 		smoke = new Effect(100, e -> {
-			Draw.color(Color.GRAY, new Color(0.3f, 0.3f, 0.3f, 1f), e.fin());
+			Draw.color(Color.GRAY, Palette.darkishGray, e.fin());
 			float size = 7f - e.fin() * 7f;
 			Draw.rect("circle", e.x, e.y, size, size);
 			Draw.reset();

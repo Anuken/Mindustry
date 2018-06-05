@@ -28,10 +28,7 @@ import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Timer;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -69,7 +66,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	private boolean respawning;
 	private float walktime;
-	private Queue<BuildRequest> placeQueue = new Queue<>();
+	private Queue<BuildRequest> placeQueue = new ThreadQueue<>();
 	private Tile mining;
 	private CarriableTrait carrying;
 	private Trail trail = new Trail(16);
@@ -239,13 +236,13 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 			}
 
 			for (int i : Mathf.signs) {
-				Draw.rect(mname + "-leg",
+				Draw.rect(mech.legRegion,
 						x + Angles.trnsx(baseRotation, ft * i),
 						y + Angles.trnsy(baseRotation, ft * i),
 						12f * i, 12f - Mathf.clamp(ft * i, 0, 2), baseRotation - 90);
 			}
 
-			Draw.rect(mname + "-base", x, y,baseRotation- 90);
+			Draw.rect(mech.baseRegion, x, y, baseRotation- 90);
 		}
 
 		if(floor.liquid) {
@@ -254,13 +251,13 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 			Draw.tint(Color.WHITE);
 		}
 
-		Draw.rect(mname, x, y, rotation -90);
+		Draw.rect(mech.region, x, y, rotation -90);
 
 		for (int i : Mathf.signs) {
 			float tra = rotation - 90,
 					trX = 4*i, trY = 3 - weapon.getRecoil(this, i > 0)*1.5f;
 			float w = i > 0 ? -8 : 8;
-			Draw.rect(weapon.name + "-equip",
+			Draw.rect(weapon.equipRegion,
 					x + Angles.trnsx(tra, trX, trY),
 					y + Angles.trnsy(tra, trX, trY), w, 8, rotation - 90);
 		}
@@ -413,10 +410,14 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		if(ui.chatfrag.chatOpen()) return;
 
 		float speed = Inputs.keyDown("dash") ? (debug ? Player.dashSpeed * 5f : Player.dashSpeed) : Player.walkSpeed;
-
 		float carrySlowdown = 0.3f;
 
 		speed *= ((1f-carrySlowdown) +  (inventory.hasItem() ? (float)inventory.getItem().amount/inventory.capacity(): 1f) * carrySlowdown);
+
+		//drop from carrier on key press
+		if(Inputs.keyTap("drop_unit") && getCarrier() != null){
+			getCarrier().dropCarry();
+		}
 
 		movement.set(0, 0);
 
@@ -549,6 +550,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		placeQueue.clear();
 		dead = true;
 		respawning = false;
+		trail.clear();
 
 		add();
 		heal();

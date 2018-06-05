@@ -4,9 +4,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.ucore.util.Bundles;
 
-public class Liquid implements Content{
+public class Liquid implements UnlockableContent{
 	private static final Array<Liquid> liquids = new Array<>();
 
 	public final Color color;
@@ -54,6 +55,11 @@ public class Liquid implements Content{
 	@Override
 	public String getContentTypeName() {
 		return "liquid";
+	}
+
+	@Override
+	public Array<? extends Content> getAll() {
+		return all();
 	}
 
 	public static Array<Liquid> all() {

@@ -15,7 +15,7 @@ import io.anuke.ucore.util.Tmp;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class BlockFx implements ContentList{
+public class BlockFx extends FxList implements ContentList{
     public static Effect reactorsmoke, nuclearsmoke, nuclearcloud, redgeneratespark, generatespark, fuelburn, plasticburn, pulverize, pulverizeRed, pulverizeRedder, pulverizeSmall, pulverizeMedium, producesmoke, smeltsmoke, formsmoke, blastsmoke, lava, dooropen, doorclose, dooropenlarge, doorcloselarge, purify, purifyoil, purifystone, generate, mine, mineBig, mineHuge, smelt, teleportActivate, teleport, teleportOut, ripple, bubble;
 
     @Override
@@ -48,7 +48,7 @@ public class BlockFx implements ContentList{
         redgeneratespark = new Effect(18, e -> {
             Angles.randLenVectors(e.id, 5, e.fin() * 8f, (x, y) -> {
                 float len = e.fout() * 4f;
-                Draw.color(Color.valueOf("fbb97f"), Color.GRAY, e.fin());
+                Draw.color(Palette.redSpark, Color.GRAY, e.fin());
                 //Draw.alpha(e.fout());
                 Draw.rect("circle", e.x + x, e.y + y, len, len);
                 Draw.reset();
@@ -57,7 +57,7 @@ public class BlockFx implements ContentList{
         generatespark = new Effect(18, e -> {
             Angles.randLenVectors(e.id, 5, e.fin() * 8f, (x, y) -> {
                 float len = e.fout() * 4f;
-                Draw.color(Color.valueOf("d2b29c"), Color.GRAY, e.fin());
+                Draw.color(Palette.orangeSpark, Color.GRAY, e.fin());
                 Draw.rect("circle", e.x + x, e.y + y, len, len);
                 Draw.reset();
             });
@@ -86,14 +86,14 @@ public class BlockFx implements ContentList{
         });
         pulverizeRed = new Effect(40, e -> {
             Angles.randLenVectors(e.id, 5, 3f + e.fin() * 8f, (x, y) -> {
-                Draw.color(Color.valueOf("ffa480"), Palette.stoneGray, e.fin());
+                Draw.color(Palette.redDust, Palette.stoneGray, e.fin());
                 Fill.poly(e.x + x, e.y + y, 4, e.fout() * 2f + 0.5f, 45);
                 Draw.reset();
             });
         });
         pulverizeRedder = new Effect(40, e -> {
             Angles.randLenVectors(e.id, 5, 3f + e.fin() * 9f, (x, y) -> {
-                Draw.color(Color.valueOf("ff7b69"), Palette.stoneGray, e.fin());
+                Draw.color(Palette.redderDust, Palette.stoneGray, e.fin());
                 Fill.poly(e.x + x, e.y + y, 4, e.fout() * 2.5f + 0.5f, 45);
                 Draw.reset();
             });
@@ -128,7 +128,7 @@ public class BlockFx implements ContentList{
         });
         formsmoke = new Effect(40, e -> {
             Angles.randLenVectors(e.id, 6, 5f + e.fin() * 8f, (x, y) -> {
-                Draw.color(Color.valueOf("f1e479"), Color.LIGHT_GRAY, e.fin());
+                Draw.color(Palette.plasticSmoke, Color.LIGHT_GRAY, e.fin());
                 Fill.poly(e.x + x, e.y + y, 4, 0.2f + e.fout() * 2f, 45);
                 Draw.reset();
             });

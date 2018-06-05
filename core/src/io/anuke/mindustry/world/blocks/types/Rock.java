@@ -6,7 +6,7 @@ public class Rock extends Block {
 
     public Rock(String name) {
         super(name);
-        shadow = name+"shadow";
+        varyShadow = true;
         breakable = true;
         alwaysReplace = true;
     }

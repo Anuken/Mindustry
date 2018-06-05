@@ -10,7 +10,7 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
-public class UnitFx implements ContentList {
+public class UnitFx extends FxList implements ContentList {
     public static Effect vtolHover, unitDrop, unitPickup;
 
     @Override

@@ -14,13 +14,12 @@ import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.entities.traits.BelowLiquidTrait;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
+import io.anuke.mindustry.entities.traits.BelowLiquidTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.BlockFlag;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Core;
@@ -29,8 +28,8 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.entities.EntityDraw;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.impl.EffectEntity;
 import io.anuke.ucore.entities.impl.BaseEntity;
+import io.anuke.ucore.entities.impl.EffectEntity;
 import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
@@ -113,10 +112,6 @@ public class Renderer extends RendererModule{
 		clearColor.a = 1f;
 
 		background.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-
-		for(Block block : Block.getAllBlocks()){
-			block.load();
-		}
 	}
 
 	@Override

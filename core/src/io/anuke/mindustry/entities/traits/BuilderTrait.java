@@ -113,7 +113,7 @@ public interface BuilderTrait {
         }else if(current.remove){
             if(Build.validBreak(unit.getTeam(), current.x, current.y) && current.recipe == Recipe.getByResult(tile.block())){ //if it's valid, break it
 
-                float progress = 1f / tile.getBreakTime();
+                float progress = 1f / tile.getBreakTime() * Timers.delta() * getBuildPower(tile);
                 TileEntity core = unit.getClosestCore();
 
                 //update accumulation of resources to add
@@ -164,7 +164,7 @@ public interface BuilderTrait {
                 //otherwise, update it.
                 BuildEntity entity = tile.entity();
 
-                entity.addProgress(core.items, 1f / entity.recipe.cost);
+                entity.addProgress(core.items, 1f / entity.recipe.cost * Timers.delta() * getBuildPower(tile));
                 unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(entity), 0.4f);
                 getCurrentRequest().progress = entity.progress();
             }

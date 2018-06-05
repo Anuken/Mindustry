@@ -7,7 +7,7 @@ import io.anuke.mindustry.world.blocks.types.storage.SortedUnloader;
 import io.anuke.mindustry.world.blocks.types.storage.Unloader;
 import io.anuke.mindustry.world.blocks.types.storage.Vault;
 
-public class StorageBlocks implements ContentList {
+public class StorageBlocks extends BlockList implements ContentList {
     public static Block core, vault, unloader, sortedunloader;
 
     @Override

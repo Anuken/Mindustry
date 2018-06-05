@@ -3,11 +3,12 @@ package io.anuke.mindustry.entities.bullet;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BulletFx;
+import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.impl.BaseBulletType;
 
-public abstract class BulletType extends BaseBulletType<Bullet>{
+public abstract class BulletType extends BaseBulletType<Bullet> implements Content{
 	private static int lastid = 0;
 	private static Array<BulletType> types = new Array<>();
 
@@ -44,6 +45,16 @@ public abstract class BulletType extends BaseBulletType<Bullet>{
 	@Override
 	public void despawned(Bullet b){
 		Effects.effect(despawneffect, b.x, b.y, b.angle());
+	}
+
+	@Override
+	public String getContentTypeName() {
+		return "bullettype";
+	}
+
+	@Override
+	public Array<? extends Content> getAll() {
+		return types;
 	}
 
 	public static BulletType getByID(int id){

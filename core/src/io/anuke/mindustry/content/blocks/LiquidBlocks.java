@@ -5,7 +5,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.distribution.*;
 import io.anuke.mindustry.world.blocks.types.production.Pump;
 
-public class LiquidBlocks implements ContentList{
+public class LiquidBlocks extends BlockList implements ContentList{
     public static Block pump, fluxpump, conduit, pulseconduit, liquidrouter, liquidtank, liquidjunction, bridgeconduit, laserconduit;
 
     @Override

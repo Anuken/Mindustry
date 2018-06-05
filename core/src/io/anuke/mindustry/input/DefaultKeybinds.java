@@ -16,7 +16,7 @@ public class DefaultKeybinds {
         for(String section : sections) {
 
             KeyBinds.defaultSection(section, DeviceType.keyboard,
-         new Category("General"),
+                new Category("General"),
                 "move_x", new Axis(Input.A, Input.D),
                 "move_y", new Axis(Input.S, Input.W),
                 "select", Input.MOUSE_LEFT,
@@ -25,6 +25,7 @@ public class DefaultKeybinds {
                 "rotate_alt", new Axis(Input.R, Input.E),
                 "rotate", new Axis(Input.SCROLL),
                 "dash", Input.SHIFT_LEFT,
+                "drop_unit", Input.SHIFT_LEFT,
                 new Category("View"),
                 "zoom_hold", Input.CONTROL_LEFT,
                 "zoom", new Axis(Input.SCROLL),
@@ -45,7 +46,7 @@ public class DefaultKeybinds {
             );
 
             KeyBinds.defaultSection(section, DeviceType.controller,
-         new Category("General"),
+                new Category("General"),
                 "move_x", new Axis(Input.CONTROLLER_L_STICK_HORIZONTAL_AXIS),
                 "move_y", new Axis(Input.CONTROLLER_L_STICK_VERTICAL_AXIS),
                 "cursor_x", new Axis(Input.CONTROLLER_R_STICK_HORIZONTAL_AXIS),

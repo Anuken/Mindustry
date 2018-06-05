@@ -3,10 +3,14 @@ package io.anuke.mindustry.io;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Base64Coder;
+import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.function.Supplier;
 import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.ThreadArray;
 
 import java.io.*;
 
@@ -21,9 +25,9 @@ public class Maps implements Disposable{
 	/**Maps map names to the real maps.*/
 	private ObjectMap<String, Map> maps = new ObjectMap<>();
 	/**All maps stored in an ordered array.*/
-	private Array<Map> allMaps = new Array<>();
+	private Array<Map> allMaps = new ThreadArray<>();
 	/**Temporary array used for returning things.*/
-	private Array<Map> returnArray = new Array<>();
+	private Array<Map> returnArray = new ThreadArray<>();
 	/**Used for storing a list of custom map names for GWT.*/
 	private Array<String> customMapNames;
 

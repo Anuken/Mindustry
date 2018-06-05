@@ -8,7 +8,7 @@ import io.anuke.mindustry.world.blocks.types.defense.ShieldBlock;
 import io.anuke.mindustry.world.blocks.types.distribution.Teleporter;
 import io.anuke.mindustry.world.blocks.types.power.*;
 
-public class PowerBlocks implements ContentList {
+public class PowerBlocks extends BlockList implements ContentList {
     public static Block combustiongenerator, thermalgenerator, liquidcombustiongenerator, rtgenerator, solarpanel, largesolarpanel, nuclearReactor, fusionReactor, repairturret, megarepairturret, shieldgenerator, battery, batteryLarge, powernode, powernodelarge, teleporter;
 
     @Override
@@ -95,7 +95,7 @@ public class PowerBlocks implements ContentList {
             powerSpeed = 1f;
             maxNodes = 5;
             laserRange = 7.5f;
-            shadow = "powernodelarge-shadow";
+            shadow = "shadow-round-2";
         }};
 
         teleporter = new Teleporter("teleporter");

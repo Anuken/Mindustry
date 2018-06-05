@@ -18,6 +18,7 @@ import io.anuke.ucore.core.Events;
 import io.anuke.ucore.entities.EntityPhysics;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.ThreadArray;
 import io.anuke.ucore.util.Tmp;
 
 import static io.anuke.mindustry.Vars.threads;
@@ -32,7 +33,7 @@ public class World extends Module{
 	private BlockIndexer indexer = new BlockIndexer();
 	private Maps maps = new Maps();
 
-	private Array<Tile> tempTiles = new Array<>();
+	private Array<Tile> tempTiles = new ThreadArray<>();
 	private boolean generating;
 	
 	public World(){

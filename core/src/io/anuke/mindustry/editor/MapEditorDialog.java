@@ -1,5 +1,6 @@
 package io.anuke.mindustry.editor;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -33,13 +34,17 @@ import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.UIUtils;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -377,7 +382,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 	}
 	
 	public void build(){
-		float size = 60;
+		float size = mobile ? (int)(Gdx.graphics.getHeight() / 9.5f / Unit.dp.scl(1f)) : 60;
 		
 		new table(){{
 			aleft();
@@ -537,7 +542,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 		
 		int i = 0;
 		
-		for(Block block : Block.getAllBlocks()){
+		for(Block block : Block.all()){
 			TextureRegion[] regions = block.getCompactIcon();
 
 			if(regions.length == 0) continue;

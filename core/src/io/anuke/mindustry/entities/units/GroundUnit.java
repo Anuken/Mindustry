@@ -10,7 +10,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.util.*;
 
 import static io.anuke.mindustry.Vars.world;
@@ -67,7 +66,7 @@ public abstract class GroundUnit extends BaseUnit {
         Floor floor = getFloorOn();
 
         if(floor.liquid){
-            Draw.tint(Hue.mix(Color.WHITE, floor.liquidColor, 0.5f));
+            Draw.tint(Color.WHITE, floor.liquidColor, 0.5f);
         }
 
         for (int i : Mathf.signs) {

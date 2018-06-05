@@ -1,7 +1,9 @@
 package io.anuke.mindustry.content;
 
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.StatusController.TransitionResult;
+import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.type.ContentList;
@@ -123,5 +125,10 @@ public class StatusEffects implements ContentList {
         wet.setOpposites(burning);
         freezing.setOpposites(burning, melting);
         burning.setOpposites(wet, freezing);
+    }
+
+    @Override
+    public Array<? extends Content> getAll() {
+        return StatusEffect.all();
     }
 }

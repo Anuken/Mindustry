@@ -3,9 +3,9 @@ package io.anuke.mindustry.entities.units.types;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.FlyingUnit;
 import io.anuke.mindustry.entities.units.UnitState;
@@ -25,6 +25,7 @@ import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.ThreadQueue;
 
 import static io.anuke.mindustry.Vars.unitGroups;
 import static io.anuke.mindustry.Vars.world;
@@ -35,7 +36,7 @@ public class Drone extends FlyingUnit implements BuilderTrait {
     protected static boolean initialized;
 
     protected Tile mineTile;
-    protected Queue<BuildRequest> placeQueue = new Queue<>();
+    protected Queue<BuildRequest> placeQueue = new ThreadQueue<>();
 
     /**Initialize placement event notifier system.
      * Static initialization is to be avoided, thus, this is done lazily.*/

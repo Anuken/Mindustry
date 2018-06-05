@@ -10,6 +10,7 @@ import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.ContentDatabase;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.input.AndroidInput;
@@ -19,7 +20,6 @@ import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.Saves;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
@@ -59,11 +59,11 @@ public class Control extends Module{
 
 		Effects.setShakeFalloff(10000f);
 
+		ContentLoader.initialize(Content::init);
+
 		Core.atlas = new Atlas("sprites.atlas");
 
-		for(Item item : Item.all()){
-			item.load();
-		}
+		ContentLoader.initialize(Content::load);
 
 		db.load();
 
@@ -91,7 +91,7 @@ public class Control extends Module{
             }
         };
 
-		Gdx.input = proxy;
+		//Gdx.input = proxy;
 
 		Sounds.load("shoot.mp3", "place.mp3", "explosion.mp3", "enemyshoot.mp3",
 				"corexplode.mp3", "break.mp3", "spawn.mp3", "flame.mp3", "die.mp3",
@@ -255,7 +255,7 @@ public class Control extends Module{
 	}
 
 	public void triggerUpdateInput(){
-	    Gdx.input = proxy;
+	    //Gdx.input = proxy;
     }
 
 	public void playMap(Map map){

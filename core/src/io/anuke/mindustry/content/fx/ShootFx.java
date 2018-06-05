@@ -12,7 +12,7 @@ import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
-public class ShootFx implements ContentList {
+public class ShootFx extends FxList implements ContentList {
     public static Effect shootSmall, shootSmallSmoke, shootBig, shootBig2, shootBigSmoke, shootBigSmoke2, shootSmallFlame, shootLiquid, shellEjectSmall, shellEjectMedium, shellEjectBig, lancerLaserShoot, lancerLaserShootSmoke, lancerLaserCharge, lancerLaserChargeBegin, lightningCharge, lightningShoot;
 
     @Override

@@ -1,10 +1,13 @@
 package io.anuke.mindustry.content;
 
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.entities.units.types.Drone;
 import io.anuke.mindustry.entities.units.types.Scout;
 import io.anuke.mindustry.entities.units.types.Vtol;
+import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.type.StatusEffect;
 
 public class UnitTypes implements ContentList {
     public static UnitType drone, scout, vtol;
@@ -35,5 +38,10 @@ public class UnitTypes implements ContentList {
             reload = 7;
             setAmmo(AmmoTypes.bulletIron);
         }};
+    }
+
+    @Override
+    public Array<? extends Content> getAll() {
+        return StatusEffect.all();
     }
 }

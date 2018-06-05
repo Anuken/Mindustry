@@ -10,7 +10,7 @@ import io.anuke.mindustry.world.blocks.types.units.RepairPoint;
 import io.anuke.mindustry.world.blocks.types.units.ResupplyPoint;
 import io.anuke.mindustry.world.blocks.types.units.UnitFactory;
 
-public class UnitBlocks implements ContentList {
+public class UnitBlocks extends BlockList implements ContentList {
     public static Block resupplyPoint, repairPoint, droneFactory, dropPoint;
 
     @Override

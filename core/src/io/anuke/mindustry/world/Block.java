@@ -6,13 +6,14 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.effect.Rubble;
 import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
@@ -30,7 +31,7 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Block extends BaseBlock implements Content{
+public class Block extends BaseBlock implements UnlockableContent{
 	private static int lastid;
 	private static Array<Block> blocks = new Array<>();
 	private static ObjectMap<String, Block> map = new ObjectMap<>();
@@ -70,8 +71,6 @@ public class Block extends BaseBlock implements Content{
 	public int health = 40;
 	/**base block explosiveness*/
 	public float baseExplosiveness = 0f;
-	/**the shadow drawn under the block. use 'null' to indicate the default shadow for this block.*/
-	public String shadow = null;
 	/**whether to display a different shadow per variant*/
 	public boolean varyShadow = false;
 	/**edge fallback, used mainly for ores*/
@@ -108,6 +107,12 @@ public class Block extends BaseBlock implements Content{
 	public EnumSet<BlockFlag> flags;
 	/**Whether to automatically set the entity to 'sleeping' when created.*/
 	public boolean autoSleep;
+	/**Name of shadow region to load. Null to indicate normal shadow.*/
+	public String shadow = null;
+	/**Region used for drawing shadows.*/
+	public TextureRegion shadowRegion;
+	/**Texture region array for drawing multiple shadows.*/
+	public TextureRegion[] shadowRegions;
 
 	public Block(String name) {
 		this.name = name;
@@ -145,13 +150,23 @@ public class Block extends BaseBlock implements Content{
 	public boolean canPlaceOn(Tile tile){ return true; }
 
 	/**Called after all blocks are created.*/
+	@Override
 	public void init(){
 		setStats();
 		setBars();
 	}
 
-	/**Called after texture atlas is loaded.*/
-	public void load(){}
+	@Override
+	public void load() {
+		shadowRegion = Draw.region(shadow == null ? "shadow-" + size : shadow);
+
+		if(varyShadow && variants > 0) {
+			shadowRegions = new TextureRegion[variants];
+			for(int i = 0; i < variants; i ++){
+				shadowRegions[i] = Draw.region(name + "shadow" + (i + 1));
+			}
+		}
+	}
 
 	/**Called when the block is tapped.*/
 	public boolean tapped(Tile tile, Player player){
@@ -394,12 +409,10 @@ public class Block extends BaseBlock implements Content{
 	
 	public void drawShadow(Tile tile){
 		
-		if(varyShadow && variants > 0 && shadow != null) {
-			Draw.rect(shadow + (Mathf.randomSeed(tile.id(), 1, variants)), tile.worldx(), tile.worldy());
-		}else if(shadow != null){
-			Draw.rect(shadow, tile.drawx(), tile.drawy());
+		if(shadowRegions != null) {
+			Draw.rect(shadowRegions[(Mathf.randomSeed(tile.id(), 0, variants - 1))], tile.worldx(), tile.worldy());
 		}else{
-			Draw.rect("shadow-" + size, tile.drawx(), tile.drawy());
+			Draw.rect(shadowRegion, tile.drawx(), tile.drawy());
 		}
 	}
 	
@@ -410,24 +423,6 @@ public class Block extends BaseBlock implements Content{
 	
 	public boolean isMultiblock(){
 		return size > 1;
-	}
-	
-	public static Array<Block> getAllBlocks(){
-		return blocks;
-	}
-
-	public static Block getByName(String name){
-		return map.get(name);
-	}
-	
-	public static Block getByID(int id){
-	    if(id < 0){ //offset negative values by 256, as they are a product of byte overflow
-	        id += 256;
-        }
-        if(id >= blocks.size || id < 0){
-	    	throw new RuntimeException("No block with ID '" + id + "' found!");
-		}
-		return blocks.get(id);
 	}
 
 	public Array<Object> getDebugInfo(Tile tile){
@@ -455,7 +450,30 @@ public class Block extends BaseBlock implements Content{
 	}
 
 	@Override
+	public Array<? extends Content> getAll() {
+		return all();
+	}
+
+	@Override
 	public String toString(){
 		return name;
+	}
+
+	public static Array<Block> all(){
+		return blocks;
+	}
+
+	public static Block getByName(String name){
+		return map.get(name);
+	}
+
+	public static Block getByID(int id){
+		if(id < 0){ //offset negative values by 256, as they are a product of byte overflow
+			id += 256;
+		}
+		if(id >= blocks.size || id < 0){
+			throw new RuntimeException("No block with ID '" + id + "' found!");
+		}
+		return blocks.get(id);
 	}
 }

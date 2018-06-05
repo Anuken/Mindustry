@@ -148,10 +148,10 @@ public class Save16 extends SaveFileVersion {
 
         //--BLOCK HEADER--
 
-        stream.writeInt(Block.getAllBlocks().size);
+        stream.writeInt(Block.all().size);
 
-        for(int i = 0; i < Block.getAllBlocks().size; i ++){
-            Block block = Block.getAllBlocks().get(i);
+        for(int i = 0; i < Block.all().size; i ++){
+            Block block = Block.all().get(i);
             stream.writeUTF(block.name);
             stream.writeShort(block.id);
         }

@@ -20,6 +20,9 @@ public class FusionReactor extends PowerGenerator {
     protected Liquid inputLiquid = Liquids.water;
     protected float warmupSpeed = 0.001f;
 
+    protected Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
+    protected Color ind1 = Color.valueOf("858585"), ind2 = Color.valueOf("fea080");
+
     public FusionReactor(String name) {
         super(name);
         hasPower = true;
@@ -62,7 +65,7 @@ public class FusionReactor extends PowerGenerator {
         for(int i = 0; i < plasmas; i ++){
             float r = 29f + Mathf.absin(Timers.time(), 2f + i*1f, 5f - i*0.5f);
 
-            Draw.color(Color.valueOf("ffd06b"), Color.valueOf("ff361b"), (float)i/plasmas);
+            Draw.color(plasma1, plasma2, (float)i/plasmas);
             Draw.alpha((0.3f + Mathf.absin(Timers.time(), 2f+i*2f, 0.3f+i*0.05f)) * entity.warmup);
             Draw.rect(name + "-plasma-" + i, tile.drawx(), tile.drawy(), r, r, Timers.time()*(12+i*6f) * entity.warmup);
         }
@@ -75,7 +78,7 @@ public class FusionReactor extends PowerGenerator {
 
         Draw.rect(name + "-top", tile.drawx(), tile.drawy());
 
-        Draw.color(Color.valueOf("858585"), Color.valueOf("fea080"), entity.warmup + Mathf.absin(entity.totalProgress, 3f, entity.warmup*0.5f));
+        Draw.color(ind1, ind2, entity.warmup + Mathf.absin(entity.totalProgress, 3f, entity.warmup*0.5f));
         Draw.rect(name + "-light", tile.drawx(), tile.drawy());
 
         Draw.color();

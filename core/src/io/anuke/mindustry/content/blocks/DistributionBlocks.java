@@ -4,7 +4,7 @@ import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.types.distribution.*;
 
-public class DistributionBlocks implements ContentList{
+public class DistributionBlocks extends BlockList implements ContentList{
 	public static Block conveyor, steelconveyor, pulseconveyor, router, multiplexer, junction, bridgeconveyor, laserconveyor, sorter, splitter, overflowgate;
 
 	@Override

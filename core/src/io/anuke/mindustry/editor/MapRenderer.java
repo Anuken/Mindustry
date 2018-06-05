@@ -50,7 +50,7 @@ public class MapRenderer implements Disposable{
         PixmapPacker packer = new PixmapPacker(512, 512, Format.RGBA8888, 2, true);
         Pixmap pixmap = Core.atlas.getPixmapOf("blank");
 
-        for(Block block : Block.getAllBlocks()){
+        for(Block block : Block.all()){
             TextureRegion[] regions = block.getBlockIcon();
             if(regions.length > 0){
                 Pixmap result = new Pixmap(regions[0].getRegionWidth(), regions[0].getRegionHeight(), Format.RGBA8888);

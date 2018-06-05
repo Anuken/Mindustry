@@ -4,8 +4,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.StatusController.TransitionResult;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.game.Content;
 
-public class StatusEffect{
+public class StatusEffect implements Content{
 	private static final Array<StatusEffect> array = new Array<>();
 	private static int lastid;
 
@@ -52,11 +53,21 @@ public class StatusEffect{
 		}
 	}
 
+	@Override
+	public String getContentTypeName() {
+		return "statuseffect";
+	}
+
+	@Override
+	public Array<? extends Content> getAll() {
+		return null;
+	}
+
 	public static StatusEffect getByID(int id){
 		return array.get(id);
 	}
 
-	public static Array<StatusEffect> getAllEffects(){
+	public static Array<StatusEffect> all(){
 		return array;
 	}
 }

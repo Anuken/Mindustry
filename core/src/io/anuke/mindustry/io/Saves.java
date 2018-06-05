@@ -9,6 +9,7 @@ import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.ThreadArray;
 
 import java.io.IOException;
 
@@ -16,7 +17,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Saves {
     private int nextSlot;
-    private Array<SaveSlot> saves = new Array<>();
+    private Array<SaveSlot> saves = new ThreadArray<>();
     private SaveSlot current;
     private boolean saving;
     private float time;

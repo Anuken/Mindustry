@@ -10,7 +10,7 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
-public class BulletFx implements ContentList {
+public class BulletFx extends FxList implements ContentList {
     public static Effect hitBulletSmall, hitBulletBig, hitFlameSmall, hitLiquid, hitLancer, despawn, flakExplosion;
 
     @Override

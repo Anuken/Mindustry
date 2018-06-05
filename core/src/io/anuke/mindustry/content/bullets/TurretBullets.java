@@ -24,7 +24,7 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.world;
 
-public class TurretBullets implements ContentList {
+public class TurretBullets extends BulletList implements ContentList {
     public static BulletType fireball, basicFlame, lancerLaser, fuseShot, waterShot, cryoShot, lavaShot, oilShot, lightning;
 
     @Override
