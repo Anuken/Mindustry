@@ -14,9 +14,9 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
@@ -203,9 +203,11 @@ public class AndroidInput extends InputHandler implements GestureListener{
                 margin(5);
                 defaults().size(60f);
 
-                //Add a cancel button, which clears the selection.
-                new imagebutton("icon-cancel", 16 * 2f, () -> selection.clear())
-                        .cell.disabled(i -> selection.size == 0);
+                //Add a cancel button
+                new imagebutton("icon-cancel", 16 * 2f, () -> {
+                    mode = none;
+                    recipe = null;
+                });
 
                 //Add an accept button, which places everything.
                 new imagebutton("icon-check", 16 * 2f, () -> {
@@ -481,7 +483,9 @@ public class AndroidInput extends InputHandler implements GestureListener{
     public boolean tap(float x, float y, int count, int button) {
         if(state.is(State.menu) || lineMode) return false;
 
-        checkTargets(Graphics.world(x, y).x, Graphics.world(x, y).y);
+        float worldx = Graphics.world(x, y).x, worldy = Graphics.world(x, y).y;
+
+        checkTargets(worldx, worldy);
 
         //get tile on cursor
         Tile cursor = tileAt(x, y);
@@ -498,6 +502,17 @@ public class AndroidInput extends InputHandler implements GestureListener{
         }else if(mode == breaking && validBreak(cursor.x, cursor.y) && !hasRequest(cursor)){
             //add to selection queue if it's a valid BREAK position
             selection.add(new PlaceRequest(cursor.worldx(), cursor.worldy()));
+        }else{ //else, try and carry units
+            if(player.getCarry() != null){
+                player.dropCarry(); //drop off unit
+            }else{
+                Unit unit = Units.getClosest(player.getTeam(), Graphics.world(x, y).x, Graphics.world(x, y).y, 4f, u -> !u.isFlying());
+
+                if(unit != null){
+                    player.pickupTarget = unit;
+                    Effects.effect(Fx.select, unit.getX(), unit.getY());
+                }
+            }
         }
 
         return false;

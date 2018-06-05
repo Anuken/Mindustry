@@ -228,7 +228,6 @@ public class Renderer extends RendererModule{
 		drawAllTeams(true);
 
 		EntityDraw.draw(bulletGroup);
-		EntityDraw.draw(fireGroup);
 		EntityDraw.draw(effectGroup);
 
 		overlays.drawTop();

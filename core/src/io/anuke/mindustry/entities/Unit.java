@@ -12,10 +12,10 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.types.Floor;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.entities.impl.DestructibleEntity;
 import io.anuke.ucore.entities.trait.DamageTrait;
 import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.entities.trait.SolidTrait;
-import io.anuke.ucore.entities.impl.DestructibleEntity;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
@@ -148,6 +148,12 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void updateVelocityStatus(float drag, float maxVelocity){
+        if(isCarried()){ //carried units do not take into account velocity normally
+            set(carrier.getX(), carrier.getY());
+            velocity.set(carrier.getVelocity());
+            return;
+        }
+
         Floor floor = getFloorOn();
         Tile tile = world.tileWorld(x, y);
 

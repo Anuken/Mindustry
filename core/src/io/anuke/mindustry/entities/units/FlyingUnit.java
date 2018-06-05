@@ -1,6 +1,8 @@
 package io.anuke.mindustry.entities.units;
 
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.traits.CarriableTrait;
+import io.anuke.mindustry.entities.traits.CarryTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
@@ -16,15 +18,31 @@ import io.anuke.ucore.util.Translator;
 
 import static io.anuke.mindustry.Vars.world;
 
-public class FlyingUnit extends BaseUnit {
+public class FlyingUnit extends BaseUnit implements CarryTrait{
     protected static Translator vec = new Translator();
     protected static float maxAim = 30f;
     protected static float wobblyness = 0.6f;
 
     protected Trail trail = new Trail(16);
+    protected CarriableTrait carrying;
 
     public FlyingUnit(UnitType type, Team team) {
         super(type, team);
+    }
+
+    @Override
+    public CarriableTrait getCarry() {
+        return carrying;
+    }
+
+    @Override
+    public void setCarry(CarriableTrait unit) {
+        this.carrying = unit;
+    }
+
+    @Override
+    public float getCarryWeight() {
+        return type.carryWeight;
     }
 
     @Override
@@ -67,6 +85,17 @@ public class FlyingUnit extends BaseUnit {
     @Override
     public float drawSize() {
         return 60;
+    }
+
+    @Override
+    public void removed() {
+        dropCarry();
+    }
+
+    @Override
+    public void onDeath() {
+        super.onDeath();
+        dropCarry();
     }
 
     protected void circle(float circleLength){

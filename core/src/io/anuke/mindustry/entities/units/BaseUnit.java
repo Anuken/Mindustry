@@ -222,11 +222,6 @@ public abstract class BaseUnit extends Unit{
 	}
 
 	@Override
-	public void removed(){
-
-	}
-
-	@Override
 	public void added(){
 		hitbox.setSize(type.hitsize);
 		hitboxTile.setSize(type.hitsizeTile);

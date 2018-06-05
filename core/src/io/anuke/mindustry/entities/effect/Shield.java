@@ -6,13 +6,14 @@ import io.anuke.mindustry.world.blocks.types.defense.ShieldBlock;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.BaseEntity;
+import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.shieldGroup;
 
 //todo re-implement
-public class Shield extends BaseEntity {
+public class Shield extends BaseEntity implements DrawTrait {
 	public boolean active;
 	public boolean hitPlayers = false;
 	public float radius = 0f;

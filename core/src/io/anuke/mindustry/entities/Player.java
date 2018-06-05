@@ -65,6 +65,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	public boolean isLocal = false;
 	public Timer timer = new Timer(4);
 	public TargetTrait target;
+	public CarriableTrait pickupTarget;
 
 	private boolean respawning;
 	private float walktime;
@@ -141,7 +142,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
     @Override
 	public boolean isFlying(){
-		return mech.flying || noclip;
+		return mech.flying || noclip || isCarried();
 	}
 
 	@Override
@@ -172,10 +173,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		respawning = false;
 		placeQueue.clear();
 
-		if(carrying != null){
-			carrying.setCarrier(null);
-			carrying = null;
-		}
+        dropCarry();
 
 		float explosiveness = 2f + (inventory.hasItem() ? inventory.getItem().item.explosiveness * inventory.getItem().amount : 0f);
 		float flammability = (inventory.hasItem() ? inventory.getItem().item.flammability * inventory.getItem().amount : 0f);
@@ -196,19 +194,12 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	@Override
 	public void removed() {
-		if(carrying != null){
-			carrying.setCarrier(null);
-			carrying = null;
-		}
+        dropCarry();
 	}
 
 	@Override
 	public EntityGroup targetGroup() {
 		return playerGroup;
-	}
-
-	public void toggleTeam(){
-		team = (team == Team.blue ? Team.red : Team.blue);
 	}
 
 	//endregion
@@ -301,7 +292,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	        drawBuilding(this);
         }
 
-		if(isFlying()){
+		if(mech.flying){
 	    	trail.draw(Palette.lighterOrange, Palette.lightishOrange, 5f);
 		}
     }
@@ -479,6 +470,20 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		float targetX = Core.camera.position.x, targetY = Core.camera.position.y;
 		float attractDst = 15f;
 
+		if(pickupTarget != null && !pickupTarget.isDead()){
+			targetX = pickupTarget.getX();
+			targetY = pickupTarget.getY();
+			attractDst = 0f;
+
+			if(distanceTo(pickupTarget) < 2f){
+				carry(pickupTarget);
+
+				pickupTarget = null;
+			}
+		}else{
+			pickupTarget = null;
+		}
+
 		movement.set(targetX - x, targetY - y).limit(flySpeed);
 		movement.setAngle(Mathf.slerpDelta(movement.angle(), velocity.angle(), 0.05f));
 
@@ -531,6 +536,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	//region utility methods
 
+	public void toggleTeam(){
+		team = (team == Team.blue ? Team.red : Team.blue);
+	}
+
 	/**Resets all values of the player.*/
 	public void reset(){
 		weapon = Weapons.blaster;
@@ -540,11 +549,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		placeQueue.clear();
 		dead = true;
 		respawning = false;
-
-		if(carrying != null){
-			carrying.setCarrier(null);
-			carrying = null;
-		}
 
 		add();
 		heal();

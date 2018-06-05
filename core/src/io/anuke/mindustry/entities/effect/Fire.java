@@ -7,14 +7,13 @@ import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.entities.impl.TimedEntity;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
@@ -25,7 +24,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Fire extends TimedEntity implements SaveTrait, Poolable, DrawTrait {
+public class Fire extends TimedEntity implements SaveTrait, Poolable {
     private static final IntMap<Fire> map = new IntMap<>();
     private static final float baseLifetime = 1000f;
 
@@ -113,11 +112,6 @@ public class Fire extends TimedEntity implements SaveTrait, Poolable, DrawTrait 
         if(Mathf.chance(0.05 * Timers.delta())){
             Effects.effect(EnvironmentFx.smoke, tile.worldx() + Mathf.range(4f), tile.worldy() + Mathf.range(4f));
         }
-    }
-
-    @Override
-    public float drawSize() {
-        return 10;
     }
 
     @Override

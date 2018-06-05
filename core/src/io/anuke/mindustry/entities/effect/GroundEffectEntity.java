@@ -72,5 +72,11 @@ public class GroundEffectEntity extends EffectEntity {
             this.staticLife = 0f;
             this.isStatic = isStatic;
         }
+
+        public GroundEffect(float life, EffectRenderer draw) {
+            super(life, draw);
+            this.staticLife = 0f;
+            this.isStatic = false;
+        }
     }
 }

@@ -12,7 +12,7 @@ import io.anuke.ucore.util.Angles;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class Fx implements ContentList {
-	public static Effect none, placeBlock, breakBlock, smoke, spawn, tapBlock;
+	public static Effect none, placeBlock, breakBlock, smoke, spawn, tapBlock, select;
 
 	@Override
 	public void load() {
@@ -42,6 +42,13 @@ public class Fx implements ContentList {
 			Angles.randLenVectors(e.id, 3 + (int) (e.rotation * 3), e.rotation * 2f + (tilesize * e.rotation) * e.finpow(), (x, y) -> {
 				Fill.square(e.x + x, e.y + y, 1f + e.fout() * (3f + e.rotation));
 			});
+			Draw.reset();
+		});
+
+		select = new Effect(23, e -> {
+			Draw.color(Palette.accent);
+			Lines.stroke(e.fout() * 3f);
+			Lines.circle(e.x, e.y, 3f + e.fin() * 14f);
 			Draw.reset();
 		});
 

@@ -1,9 +1,39 @@
 package io.anuke.mindustry.entities.traits;
 
+import io.anuke.mindustry.content.fx.UnitFx;
+import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.trait.SolidTrait;
 
 public interface CarryTrait extends TeamTrait, SolidTrait, TargetTrait{
+    /**Returns the thing this carrier is carrying.*/
     CarriableTrait getCarry();
+    /**Sets the carrying unit. Internal use only! Use {@link #carry(CarriableTrait)} to set state.*/
     void setCarry(CarriableTrait unit);
+    /**Returns maximum mass this carrier can carry.*/
     float getCarryWeight();
+
+    /**Drops the unit that is being carried, if applicable.*/
+    default void dropCarry(){
+        carry(null);
+    }
+
+    /**Do not override unless absolutely necessary.
+     * Carries a unit. To drop a unit, call with {@code null}.*/
+    default void carry(CarriableTrait unit){
+        if(getCarry() != null){ //already carrying something, drop it
+            //drop current
+            Effects.effect(UnitFx.unitDrop, getCarry());
+            getCarry().setCarrier(null);
+            setCarry(null);
+
+            if(unit != null){
+                carry(unit); //now carry this new thing
+            }
+        }else if(unit != null){ //not currently carrying anything, make sure it's not null
+            setCarry(unit);
+            unit.setCarrier(this);
+
+            Effects.effect(UnitFx.unitPickup, this);
+        }
+    }
 }
