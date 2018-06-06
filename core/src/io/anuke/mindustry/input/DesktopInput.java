@@ -16,15 +16,13 @@ import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.core.KeyBinds;
 import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.mindustry.input.DesktopInput.CursorType.*;
+import static io.anuke.mindustry.input.CursorType.*;
 import static io.anuke.mindustry.input.PlaceMode.*;
 
 public class DesktopInput extends InputHandler{
@@ -154,9 +152,7 @@ public class DesktopInput extends InputHandler{
 		if(cursor != null){
 		    cursor = cursor.target();
 
-		    if(cursor.block().isCursor(cursor)) {
-                cursorType = hand;
-            }
+            cursorType = cursor.block().getCursor(cursor);
 
             if(canMine(cursor)){
                 cursorType = drill;
@@ -314,20 +310,4 @@ public class DesktopInput extends InputHandler{
         }
     }
 
-    enum CursorType{
-	    normal(Cursors::restoreCursor),
-        hand(Cursors::setHand),
-        drill(() -> Cursors.set("drill")),
-        unload(() -> Cursors.set("unload"));
-
-	    private final Callable call;
-
-	    CursorType(Callable call){
-	        this.call = call;
-        }
-
-        void set(){
-	        call.run();
-        }
-    }
 }

@@ -94,7 +94,7 @@ public abstract class InputHandler extends InputAdapter{
 		boolean showedInventory = false;
 
 		//check if tapped block is configurable
-		if(tile.block().isConfigurable(tile) && tile.getTeam() == player.getTeam()){
+		if(tile.block().configurable && tile.getTeam() == player.getTeam()){
 			consumed = true;
 			if((!frag.config.isShown() //if the config fragment is hidden, show
 					//alternatively, the current selected block can 'agree' to switch config tiles

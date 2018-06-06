@@ -149,7 +149,7 @@ project(":core") {
     apply plugin: "java"
 
     dependencies {
-        //compileOnly project(":annotations")
+        compileOnly project(":annotations")
 
         boolean comp = System.properties["release"] == null || System.properties["release"] == "false"
 
@@ -174,9 +174,9 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
     }
 
-    //compileJava.options.compilerArgs = [
-    //    "-processor", "io.anuke.annotations.AnnotationProcessor"
-    //]
+    compileJava.options.compilerArgs = [
+        "-processor", "io.anuke.annotations.RemoteMethodAnnotationProcessor"
+    ]
 }
 
 project(":server") {

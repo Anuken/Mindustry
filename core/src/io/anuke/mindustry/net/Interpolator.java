@@ -18,8 +18,6 @@ public class Interpolator {
     public Vector2 pos = new Vector2();
     public float[] values = {};
 
-    public Vector2 smoothPos = new Vector2();
-
     public void read(float cx, float cy, float x, float y, long sent, float... target1ds){
         targets = target1ds;
         time = 0f;

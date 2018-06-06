@@ -11,7 +11,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.SaveFileVersion;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.BlockPart;
+import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.EntityPhysics;

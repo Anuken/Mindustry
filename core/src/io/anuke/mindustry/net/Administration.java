@@ -6,10 +6,10 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.BlockPart;
-import io.anuke.mindustry.world.blocks.types.Floor;
-import io.anuke.mindustry.world.blocks.types.Rock;
-import io.anuke.mindustry.world.blocks.types.StaticBlock;
+import io.anuke.mindustry.world.blocks.BlockPart;
+import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.world.blocks.Rock;
+import io.anuke.mindustry.world.blocks.StaticBlock;
 import io.anuke.ucore.core.Settings;
 
 import static io.anuke.mindustry.Vars.world;

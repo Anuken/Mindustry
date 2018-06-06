@@ -81,8 +81,8 @@ public class Logic extends Module {
 
     public void runWave(){
 
-        //TODO spawn enemies
-        for(int i = 0; i < 100; i ++){
+        //TODO spawn enemies properly
+        for(int i = 0; i < 10; i ++){
             BaseUnit unit = UnitTypes.vtol.create(Team.red);
             Vector2 offset = new Vector2().setToRandomDirection().scl(world.width()/2f*tilesize).add(world.width()/2f*tilesize, world.height()/2f*tilesize);
             unit.inventory.addAmmo(AmmoTypes.bulletIron);

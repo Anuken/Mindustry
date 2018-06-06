@@ -6,7 +6,7 @@ import io.anuke.mindustry.content.fx.ShootFx;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.defense.turrets.*;
+import io.anuke.mindustry.world.blocks.defense.turrets.*;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;

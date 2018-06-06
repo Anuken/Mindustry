@@ -7,7 +7,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
 import io.anuke.mindustry.type.AmmoType;
-import io.anuke.mindustry.world.BlockFlag;
+import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;

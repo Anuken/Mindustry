@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.io.MapTileData.DataPosition;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.Floor;
+import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.ucore.util.Bits;
 
 import static io.anuke.mindustry.Vars.ui;

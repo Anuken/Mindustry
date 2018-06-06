@@ -17,9 +17,15 @@ import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.input.CursorType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.world.meta.BlockBar;
+import io.anuke.mindustry.world.meta.BlockBars;
+import io.anuke.mindustry.world.meta.BlockFlag;
+import io.anuke.mindustry.world.meta.BlockGroup;
+import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
@@ -98,11 +104,11 @@ public class Block extends BaseBlock implements UnlockableContent{
 	/**whether this block has instant transfer checking. used for calculations to prevent infinite loops.*/
 	public boolean instantTransfer = false;
 	/**The block group. Unless {@link #canReplace} is overriden, blocks in the same group can replace each other.*/
-	public BlockGroup group = BlockGroup.none;
+	public io.anuke.mindustry.world.meta.BlockGroup group = io.anuke.mindustry.world.meta.BlockGroup.none;
 	/**list of displayed block status bars. Defaults to health bar.*/
-	public BlockBars bars = new BlockBars();
+	public io.anuke.mindustry.world.meta.BlockBars bars = new BlockBars();
 	/**List of block stats.*/
-	public BlockStats stats = new BlockStats();
+	public io.anuke.mindustry.world.meta.BlockStats stats = new BlockStats();
 	/**List of block flags. Used for AI indexing.*/
 	public EnumSet<BlockFlag> flags;
 	/**Whether to automatically set the entity to 'sleeping' when created.*/
@@ -113,6 +119,8 @@ public class Block extends BaseBlock implements UnlockableContent{
 	public TextureRegion shadowRegion;
 	/**Texture region array for drawing multiple shadows.*/
 	public TextureRegion[] shadowRegions;
+	/**Whether the block can be tapped and selected to configure.*/
+	public boolean configurable;
 
 	public Block(String name) {
 		this.name = name;
@@ -174,27 +182,13 @@ public class Block extends BaseBlock implements UnlockableContent{
 	}
 
 	/**Returns whether or not a hand cursor should be shown over this block.*/
-	public boolean isCursor(Tile tile){
-		return isConfigurable(tile);
+	public CursorType getCursor(Tile tile){
+		return configurable ? CursorType.normal : CursorType.hand;
 	}
 
 	/**Called when this block is tapped to build a UI on the table.
-	 * {@link #isConfigurable(Tile)} able} must return true for this to be called.*/
+	 * {@link #configurable} able} must return true for this to be called.*/
 	public void buildTable(Tile tile, Table table) {}
-
-	//TODO why make it a method?
-	/**Returns whether this tile can be configured.*/
-	public boolean isConfigurable(Tile tile){
-		return false;
-	}
-
-	//TODO remove this
-	public void configure(Tile tile, byte data){}
-
-	//TODO remove this
-	public void setConfigure(Tile tile, byte data){
-		configure(tile, data);
-	}
 
 	/**Called when another tile is tapped while this block is selected.
 	 * Returns whether or not this block should be deselected.*/
@@ -225,8 +219,8 @@ public class Block extends BaseBlock implements UnlockableContent{
 
 	//TODO make this easier to config.
 	public void setBars(){
-		if(hasPower) bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.amount / powerCapacity));
-		if(hasLiquids) bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.amount / liquidCapacity));
+		if(hasPower) bars.add(new io.anuke.mindustry.world.meta.BlockBar(BarType.power, true, tile -> tile.entity.power.amount / powerCapacity));
+		if(hasLiquids) bars.add(new io.anuke.mindustry.world.meta.BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.amount / liquidCapacity));
 		if(hasItems) bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.totalItems() / itemCapacity));
 	}
 	

@@ -9,7 +9,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.BlockPart;
+import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.util.Bits;

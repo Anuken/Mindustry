@@ -109,27 +109,6 @@ conveyortunnel
   orig: 8, 8
   offset: 0, 0
   index: -1
-core
-  rotate: false
-  xy: 627, 301
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
-core-open
-  rotate: false
-  xy: 653, 305
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
-core-top
-  rotate: false
-  xy: 586, 284
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
 junction
   rotate: false
   xy: 221, 24
@@ -298,13 +277,6 @@ router
   orig: 8, 8
   offset: 0, 0
   index: -1
-sortedunloader
-  rotate: false
-  xy: 435, 95
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
 sorter
   rotate: false
   xy: 445, 96
@@ -338,27 +310,6 @@ teleporter-top
   xy: 411, 135
   size: 24, 24
   orig: 24, 24
-  offset: 0, 0
-  index: -1
-unloader
-  rotate: false
-  xy: 911, 377
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-vault
-  rotate: false
-  xy: 587, 232
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
-weaponfactory
-  rotate: false
-  xy: 165, 82
-  size: 16, 16
-  orig: 16, 16
   offset: 0, 0
   index: -1
 blackrock1
@@ -1864,6 +1815,55 @@ waterextractor-top
   xy: 625, 114
   size: 16, 16
   orig: 16, 16
+  offset: 0, 0
+  index: -1
+weaponfactory
+  rotate: false
+  xy: 165, 82
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+core
+  rotate: false
+  xy: 627, 301
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+core-open
+  rotate: false
+  xy: 653, 305
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+core-top
+  rotate: false
+  xy: 586, 284
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+sortedunloader
+  rotate: false
+  xy: 435, 95
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+unloader
+  rotate: false
+  xy: 911, 377
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+vault
+  rotate: false
+  xy: 587, 232
+  size: 24, 24
+  orig: 24, 24
   offset: 0, 0
   index: -1
 block-1

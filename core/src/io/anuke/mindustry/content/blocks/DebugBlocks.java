@@ -8,9 +8,9 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.PowerBlock;
-import io.anuke.mindustry.world.blocks.types.distribution.Sorter;
-import io.anuke.mindustry.world.blocks.types.power.PowerDistributor;
+import io.anuke.mindustry.world.blocks.PowerBlock;
+import io.anuke.mindustry.world.blocks.distribution.Sorter;
+import io.anuke.mindustry.world.blocks.power.PowerDistributor;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
@@ -64,11 +64,7 @@ public class DebugBlocks extends BlockList implements ContentList{
                 solid = true;
                 hasLiquids = true;
                 liquidCapacity = 100f;
-            }
-
-            @Override
-            public boolean isConfigurable(Tile tile) {
-                return true;
+                configurable = true;
             }
 
             @Override

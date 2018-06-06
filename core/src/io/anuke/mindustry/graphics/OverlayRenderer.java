@@ -9,7 +9,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.input.InputHandler;
-import io.anuke.mindustry.world.BlockBar;
+import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;

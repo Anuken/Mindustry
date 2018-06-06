@@ -8,7 +8,7 @@ import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.production.*;
+import io.anuke.mindustry.world.blocks.production.*;
 
 public class CraftingBlocks extends BlockList implements ContentList {
     public static Block smelter, alloysmelter, siliconsmelter, poweralloysmelter, powersmelter, cryofluidmixer, melter, separator, centrifuge, plasticFormer, biomatterCompressor, pulverizer, oilRefinery, stoneFormer, weaponFactory, incinerator;

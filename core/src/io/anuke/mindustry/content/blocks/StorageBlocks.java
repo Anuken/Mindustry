@@ -2,10 +2,10 @@ package io.anuke.mindustry.content.blocks;
 
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.storage.CoreBlock;
-import io.anuke.mindustry.world.blocks.types.storage.SortedUnloader;
-import io.anuke.mindustry.world.blocks.types.storage.Unloader;
-import io.anuke.mindustry.world.blocks.types.storage.Vault;
+import io.anuke.mindustry.world.blocks.storage.CoreBlock;
+import io.anuke.mindustry.world.blocks.storage.SortedUnloader;
+import io.anuke.mindustry.world.blocks.storage.Unloader;
+import io.anuke.mindustry.world.blocks.storage.Vault;
 
 public class StorageBlocks extends BlockList implements ContentList {
     public static Block core, vault, unloader, sortedunloader;

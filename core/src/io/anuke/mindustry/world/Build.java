@@ -7,7 +7,7 @@ import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.Recipe;
-import io.anuke.mindustry.world.blocks.types.BuildBlock.BuildEntity;
+import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.Entities;
 

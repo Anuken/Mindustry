@@ -6,10 +6,10 @@ import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.production.Cultivator;
-import io.anuke.mindustry.world.blocks.types.production.Drill;
-import io.anuke.mindustry.world.blocks.types.production.Fracker;
-import io.anuke.mindustry.world.blocks.types.production.SolidPump;
+import io.anuke.mindustry.world.blocks.production.Cultivator;
+import io.anuke.mindustry.world.blocks.production.Drill;
+import io.anuke.mindustry.world.blocks.production.Fracker;
+import io.anuke.mindustry.world.blocks.production.SolidPump;
 
 public class ProductionBlocks extends BlockList implements ContentList {
     public static Block ironDrill, reinforcedDrill, steelDrill, titaniumDrill, laserdrill, nucleardrill, plasmadrill, waterextractor, oilextractor, cultivator;

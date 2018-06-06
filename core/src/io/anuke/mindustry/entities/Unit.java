@@ -9,7 +9,7 @@ import io.anuke.mindustry.net.Interpolator;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.Floor;
+import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.impl.DestructibleEntity;

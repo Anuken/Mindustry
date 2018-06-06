@@ -5,10 +5,10 @@ import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.units.DropPoint;
-import io.anuke.mindustry.world.blocks.types.units.RepairPoint;
-import io.anuke.mindustry.world.blocks.types.units.ResupplyPoint;
-import io.anuke.mindustry.world.blocks.types.units.UnitFactory;
+import io.anuke.mindustry.world.blocks.units.DropPoint;
+import io.anuke.mindustry.world.blocks.units.RepairPoint;
+import io.anuke.mindustry.world.blocks.units.ResupplyPoint;
+import io.anuke.mindustry.world.blocks.units.UnitFactory;
 
 public class UnitBlocks extends BlockList implements ContentList {
     public static Block resupplyPoint, repairPoint, droneFactory, dropPoint;

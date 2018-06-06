@@ -3,10 +3,10 @@ package io.anuke.mindustry.content.blocks;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.defense.RepairTurret;
-import io.anuke.mindustry.world.blocks.types.defense.ShieldBlock;
-import io.anuke.mindustry.world.blocks.types.distribution.Teleporter;
-import io.anuke.mindustry.world.blocks.types.power.*;
+import io.anuke.mindustry.world.blocks.defense.RepairTurret;
+import io.anuke.mindustry.world.blocks.defense.ShieldBlock;
+import io.anuke.mindustry.world.blocks.distribution.Teleporter;
+import io.anuke.mindustry.world.blocks.power.*;
 
 public class PowerBlocks extends BlockList implements ContentList {
     public static Block combustiongenerator, thermalgenerator, liquidcombustiongenerator, rtgenerator, solarpanel, largesolarpanel, nuclearReactor, fusionReactor, repairturret, megarepairturret, shieldgenerator, battery, batteryLarge, powernode, powernodelarge, teleporter;

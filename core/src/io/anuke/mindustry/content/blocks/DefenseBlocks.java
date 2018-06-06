@@ -3,9 +3,9 @@ package io.anuke.mindustry.content.blocks;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.types.Wall;
-import io.anuke.mindustry.world.blocks.types.defense.Door;
-import io.anuke.mindustry.world.blocks.types.defense.ShieldedWallBlock;
+import io.anuke.mindustry.world.blocks.Wall;
+import io.anuke.mindustry.world.blocks.defense.Door;
+import io.anuke.mindustry.world.blocks.defense.ShieldedWallBlock;
 
 public class DefenseBlocks extends BlockList implements ContentList {
     public static Block stonewall, ironwall, steelwall, titaniumwall, diriumwall, compositewall, steelwalllarge, titaniumwalllarge, diriumwalllarge, titaniumshieldwall, door, largedoor;

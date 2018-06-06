@@ -5,7 +5,7 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.types.StaticBlock;
+import io.anuke.mindustry.world.blocks.StaticBlock;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
