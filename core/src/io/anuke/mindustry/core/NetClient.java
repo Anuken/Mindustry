@@ -80,6 +80,7 @@ public class NetClient extends Module {
 
         Net.handleClient(InvokePacket.class, packet -> {
             //TODO invoke it
+
         });
     }
 

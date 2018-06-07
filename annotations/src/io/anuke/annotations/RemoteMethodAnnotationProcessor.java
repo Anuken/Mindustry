@@ -19,23 +19,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-//TODO document
-//TODO split up into more classes
-//TODO somehow use annotations to generate serializers for each type?
-//TODO documentation
-//TODO custom hash to verify server/client compatibility, just in case!
-//TODO specify creation class for putting each method
-//TODO unified Call.functionName() class for more unified usage
-//TODO error reporting for invalid usage, e.g. method IDs
-//TODO automatically disable calling on server/client when it's not necessary
-//TODO autogenerate methods for calling functions for specific clients
+
+/**The annotation processor for generating remote method call code.*/
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes({
-    "io.anuke.annotations.Annotations.RemoteClient",
-    "io.anuke.annotations.Annotations.RemoteServer",
-    "io.anuke.annotations.Annotations.Local",
-    "io.anuke.annotations.Annotations.Unreliable",
-    "io.anuke.annotations.Annotations.In",
+    "io.anuke.annotations.Annotations.Remote",
     "io.anuke.annotations.Annotations.WriteClass",
     "io.anuke.annotations.Annotations.ReadClass",
 })
@@ -125,10 +113,10 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
             RemoteReadGenerator readgen = new RemoteReadGenerator(serializers);
             RemoteWriteGenerator writegen = new RemoteWriteGenerator(serializers);
 
-            //generate client readers
-            readgen.generateFor(methods.stream().filter(method -> method.client).collect(Collectors.toList()), readClientName, packageName, false);
             //generate server readers
-            readgen.generateFor(methods.stream().filter(method -> method.server).collect(Collectors.toList()), readServerName, packageName, true);
+            readgen.generateFor(methods.stream().filter(method -> method.client).collect(Collectors.toList()), readServerName, packageName, true);
+            //generate client readers
+            readgen.generateFor(methods.stream().filter(method -> method.server).collect(Collectors.toList()), readClientName, packageName, false);
 
             //generate the methods to invoke (write)
             writegen.generateFor(classes, packageName);
@@ -136,7 +124,7 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
             //create class for storing unique method hash
             TypeSpec.Builder hashBuilder = TypeSpec.classBuilder("MethodHash").addModifiers(Modifier.PUBLIC);
             hashBuilder.addField(FieldSpec.builder(int.class, "HASH", Modifier.STATIC, Modifier.PUBLIC, Modifier.FINAL)
-                    .initializer("$1L)", Objects.hash(methods)).build());
+                    .initializer("$1L", Objects.hash(methods)).build());
 
             //build and write resulting hash class
             TypeSpec spec = hashBuilder.build();
@@ -145,6 +133,7 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
             return true;
 
         }catch (Exception e){
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }

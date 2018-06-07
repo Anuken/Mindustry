@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.gen.RemoteReadServer;
 import io.anuke.mindustry.net.Administration;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Net;
@@ -49,7 +50,7 @@ public class NetServer extends Module{
 
         Net.handleServer(InvokePacket.class, (id, packet) -> {
             //TODO implement
-            //CallServer.readPacket(packet.writeBuffer, packet.type, connections.get(id));
+            RemoteReadServer.readPacket(packet.writeBuffer, packet.type, connections.get(id));
         });
     }
 

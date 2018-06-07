@@ -113,7 +113,7 @@ public class RemoteReadGenerator {
         //end control flow if necessary
         if(started){
             readBlock.nextControlFlow("else");
-            readBlock.addStatement("throw new $1N(\"Invalid read method ID: \" + id + \"\")"); //handle invalid method IDs
+            readBlock.addStatement("throw new $1N(\"Invalid read method ID: \" + id + \"\")", RuntimeException.class.getName()); //handle invalid method IDs
             readBlock.endControlFlow();
         }
 

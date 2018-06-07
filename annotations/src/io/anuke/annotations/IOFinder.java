@@ -5,10 +5,10 @@ import io.anuke.annotations.Annotations.WriteClass;
 
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.type.MirroredTypeException;
 import javax.tools.Diagnostic.Kind;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.stream.Stream;
 
 /**This class finds reader and writer methods annotated by the {@link io.anuke.annotations.Annotations.WriteClass}
  * and {@link io.anuke.annotations.Annotations.ReadClass} annotations.*/
@@ -26,28 +26,46 @@ public class IOFinder {
         //look for writers first
         for(Element writer : writers){
             WriteClass writean = writer.getAnnotation(WriteClass.class);
-            Class<?> type = writean.value();
+            String typeName = getValue(writean);
 
             //make sure there's only one read method
-            if(readers.stream().filter(elem -> elem.getAnnotation(ReadClass.class).value() == type).count() > 1){
+            if(readers.stream().filter(elem -> getValue(elem.getAnnotation(ReadClass.class)).equals(typeName)).count() > 1){
                 Utils.messager.printMessage(Kind.ERROR, "Multiple writer methods for type: ", writer);
             }
 
             //make sure there's only one write method
-            Stream<? extends Element> stream = readers.stream().filter(elem -> elem.getAnnotation(ReadClass.class).value() == type);
-            if(stream.count() == 0){
+            long count = readers.stream().filter(elem -> getValue(elem.getAnnotation(ReadClass.class)).equals(typeName)).count();
+            if(count == 0){
                 Utils.messager.printMessage(Kind.ERROR, "Writer method does not have an accompanying reader: ", writer);
-            }else if(stream.count() > 1){
+            }else if(count > 1){
                 Utils.messager.printMessage(Kind.ERROR, "Writer method has multiple reader for type: ", writer);
             }
 
-            Element reader = stream.findFirst().get();
+            Element reader = readers.stream().filter(elem -> getValue(elem.getAnnotation(ReadClass.class)).equals(typeName)).findFirst().get();
 
             //add to result list
-            result.put(type.getName(), new ClassSerializer(Utils.getMethodName(reader), Utils.getMethodName(writer), type.getName()));
+            result.put(typeName, new ClassSerializer(Utils.getMethodName(reader), Utils.getMethodName(writer), typeName));
         }
 
         return result;
+    }
+
+    private String getValue(WriteClass write){
+        try {
+            Class<?> type = write.value();
+            return type.getName();
+        }catch (MirroredTypeException e){
+            return e.getTypeMirror().toString();
+        }
+    }
+
+    private String getValue(ReadClass read){
+        try {
+            Class<?> type = read.value();
+            return type.getName();
+        }catch (MirroredTypeException e){
+            return e.getTypeMirror().toString();
+        }
     }
 
     /**Information about read/write methods for a specific class type.*/

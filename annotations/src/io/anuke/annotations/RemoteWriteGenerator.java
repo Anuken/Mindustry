@@ -42,7 +42,7 @@ public class RemoteWriteGenerator {
 
                 //write the 'send even to one player' variant, which is only applicable on the server
                 if(methodEntry.server && methodEntry.oneVariant){
-                    writeMethodVariant(classBuilder, methodEntry, true);
+                    writeMethodVariant(classBuilder, methodEntry, false);
                 }
             }
 
@@ -52,6 +52,7 @@ public class RemoteWriteGenerator {
         }
     }
 
+    /**Creates a specific variant for a method entry.*/
     private void writeMethodVariant(TypeSpec.Builder classBuilder, MethodEntry methodEntry, boolean toAll){
         ExecutableElement elem = methodEntry.element;
 
@@ -134,7 +135,7 @@ public class RemoteWriteGenerator {
                 }
 
                 //add statement for writing it
-                method.addStatement(ser.writeMethod + "(buffer, " + varName +")");
+                method.addStatement(ser.writeMethod + "(TEMP_BUFFER, " + varName +")");
             }
         }
 

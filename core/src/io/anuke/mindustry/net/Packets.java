@@ -3,6 +3,7 @@ package io.anuke.mindustry.net;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.gen.RemoteReadClient;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packet.UnimportantPacket;
 
@@ -38,6 +39,7 @@ public class Packets {
             if(Net.client()){
                 //TODO implement
                 //CallClient.readPacket(buffer, type);
+                RemoteReadClient.readPacket(buffer, type);
             }else{
                 byte[] bytes = new byte[writeLength];
                 buffer.get(bytes);
