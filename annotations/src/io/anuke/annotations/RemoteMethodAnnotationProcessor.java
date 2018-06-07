@@ -96,13 +96,8 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
                     return false;
                 }
 
-                if (annotation.server() && annotation.client()) {
-                    Utils.messager.printMessage(Kind.ERROR, "A method cannot be client and server simulatenously!", element);
-                    return false;
-                }
-
                 //create and add entry
-                MethodEntry method = new MethodEntry(entry.name, Utils.getMethodName(element), annotation.client(), annotation.server(),
+                MethodEntry method = new MethodEntry(entry.name, Utils.getMethodName(element), annotation.server(),
                         annotation.all(), annotation.one(), annotation.local(), annotation.unreliable(), lastMethodID ++, (ExecutableElement)element);
 
                 entry.methods.add(method);
@@ -114,7 +109,7 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
             RemoteWriteGenerator writegen = new RemoteWriteGenerator(serializers);
 
             //generate server readers
-            readgen.generateFor(methods.stream().filter(method -> method.client).collect(Collectors.toList()), readServerName, packageName, true);
+            readgen.generateFor(methods.stream().filter(method -> !method.server).collect(Collectors.toList()), readServerName, packageName, true);
             //generate client readers
             readgen.generateFor(methods.stream().filter(method -> method.server).collect(Collectors.toList()), readClientName, packageName, false);
 

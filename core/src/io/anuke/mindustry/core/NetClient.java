@@ -1,10 +1,9 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.IntSet;
+import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
@@ -27,13 +26,8 @@ public class NetClient extends Module {
     private boolean connecting = false;
     /**If true, no message will be shown on disconnect.*/
     private boolean quiet = false;
-    /**List of all recieved entitity IDs, to prevent duplicates.*/
-    private IntSet recieved = new IntSet();
-    /**List of recently recieved entities that have not been added to the queue yet.*/
-    private IntMap<SyncTrait> recent = new IntMap<>();
     /**Counter for data timeout.*/
     private float timeoutTime = 0f;
-    private int requests = 0;
 
     public NetClient(){
 
@@ -43,8 +37,6 @@ public class NetClient extends Module {
             player.isAdmin = false;
 
             Net.setClientLoaded(false);
-            recieved.clear();
-            recent.clear();
             timeoutTime = 0f;
             connecting = true;
             quiet = false;
@@ -55,7 +47,20 @@ public class NetClient extends Module {
 
             Entities.clear();
 
-            //TODO send connect packet here
+            ConnectPacket c = new ConnectPacket();
+            c.name = player.name;
+            c.mobile = mobile;
+            c.color = Color.rgba8888(player.color);
+            c.uuid = Platform.instance.getUUID();
+
+            if(c.uuid == null){
+                ui.showError("$text.invalidid");
+                ui.loadfrag.hide();
+                disconnectQuietly();
+                return;
+            }
+
+            Net.send(c, SendMode.tcp);
         });
 
         Net.handleClient(Disconnect.class, packet -> {
@@ -78,10 +83,7 @@ public class NetClient extends Module {
             finishConnecting();
         });
 
-        Net.handleClient(InvokePacket.class, packet -> {
-            //TODO invoke it
-
-        });
+        Net.handleClient(InvokePacket.class, packet -> {});
     }
 
     @Override
@@ -115,8 +117,7 @@ public class NetClient extends Module {
         ui.loadfrag.hide();
         ui.join.hide();
         Net.setClientLoaded(true);
-        //send connect ACK packet
-        //Timers.runTask(1f, () -> Net.send(new ConnectConfirmPacket(), SendMode.tcp));
+        Call.connectConfirm();
         Timers.runTask(40f, Platform.instance::updateRPC);
     }
 
@@ -130,7 +131,6 @@ public class NetClient extends Module {
     }
 
     void sync(){
-        requests = 0;
 
         if(timer.get(0, playerSyncTime)){
             Player player = players[0];

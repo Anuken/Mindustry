@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import static io.anuke.mindustry.Vars.playerGroup;
 import static io.anuke.mindustry.Vars.world;
 
+/**Class for specifying read/write methods for code generation.*/
 public class TypeIO {
 
     @WriteClass(Player.class)
@@ -46,5 +47,19 @@ public class TypeIO {
         byte[] bytes = new byte[length];
         buffer.get(bytes);
         return new String(bytes);
+    }
+
+    @WriteClass(byte[].class)
+    public static void writeBytes(ByteBuffer buffer, byte[] bytes){
+        buffer.putShort((short)bytes.length);
+        buffer.put(bytes);
+    }
+
+    @ReadClass(byte[].class)
+    public static byte[] readBytes(ByteBuffer buffer){
+        short length = buffer.getShort();
+        byte[] bytes = new byte[length];
+        buffer.get(bytes);
+        return bytes;
     }
 }

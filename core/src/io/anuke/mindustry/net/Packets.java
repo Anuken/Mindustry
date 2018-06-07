@@ -4,8 +4,10 @@ import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.gen.RemoteReadClient;
+import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packet.UnimportantPacket;
+import io.anuke.ucore.util.IOUtils;
 
 import java.nio.ByteBuffer;
 
@@ -19,11 +21,38 @@ public class Packets {
 
     public static class Disconnect implements ImportantPacket{
         public int id;
-        public String addressTCP;
     }
 
     public static class WorldStream extends Streamable{
 
+    }
+
+    public static class ConnectPacket implements Packet{
+        public int version;
+        public int players;
+        public String name;
+        public boolean mobile;
+        public int color;
+        public byte[] uuid;
+
+        @Override
+        public void write(ByteBuffer buffer) {
+            buffer.putInt(Version.build);
+            IOUtils.writeString(buffer, name);
+            buffer.put(mobile ? (byte)1 : 0);
+            buffer.putInt(color);
+            buffer.put(uuid);
+        }
+
+        @Override
+        public void read(ByteBuffer buffer) {
+            version = buffer.getInt();
+            name = IOUtils.readString(buffer);
+            mobile = buffer.get() == 1;
+            color = buffer.getInt();
+            uuid = new byte[8];
+            buffer.get(uuid);
+        }
     }
 
     public static class InvokePacket implements Packet{
@@ -37,8 +66,6 @@ public class Packets {
             type = buffer.get();
 
             if(Net.client()){
-                //TODO implement
-                //CallClient.readPacket(buffer, type);
                 RemoteReadClient.readPacket(buffer, type);
             }else{
                 byte[] bytes = new byte[writeLength];

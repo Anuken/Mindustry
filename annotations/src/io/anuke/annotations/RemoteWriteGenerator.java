@@ -62,7 +62,7 @@ public class RemoteWriteGenerator {
                 .returns(void.class);
 
         //validate client methods to make sure
-        if(methodEntry.client){
+        if(!methodEntry.server){
             if(elem.getParameters().isEmpty()){
                 Utils.messager.printMessage(Kind.ERROR, "Client invoke methods must have a first parameter of type Player.", elem);
                 return;
@@ -79,13 +79,8 @@ public class RemoteWriteGenerator {
             method.addParameter(int.class, "playerClientID");
         }
 
-        //add all other parameters to method
-        for(VariableElement var : elem.getParameters()){
-            method.addParameter(TypeName.get(var.asType()), var.getSimpleName().toString());
-        }
-
         //call local method if applicable
-        if(methodEntry.local){
+        if(methodEntry.local && methodEntry.server){
             //concatenate parameters
             int index = 0;
             StringBuilder results = new StringBuilder();
@@ -101,7 +96,7 @@ public class RemoteWriteGenerator {
         }
 
         //start control flow to check if it's actually client/server so no netcode is called
-        method.beginControlFlow("if(io.anuke.mindustry.net.Net." + (methodEntry.client ? "client" : "server")+"())");
+        method.beginControlFlow("if(io.anuke.mindustry.net.Net." + (!methodEntry.server ? "client" : "server")+"())");
 
         //add statement to create packet from pool
         method.addStatement("$1N packet = $2N.obtain($1N.class)", "io.anuke.mindustry.net.Packets.InvokePacket", "com.badlogic.gdx.utils.Pools");
@@ -110,7 +105,17 @@ public class RemoteWriteGenerator {
         //rewind buffer
         method.addStatement("TEMP_BUFFER.position(0)");
 
-        for(VariableElement var : elem.getParameters()){
+        for(int i = 0; i < elem.getParameters().size(); i ++){
+            //first argument is skipped as it is always the player caller
+            if(!methodEntry.server && i == 0){
+                continue;
+            }
+
+            VariableElement var = elem.getParameters().get(i);
+
+            //add parameter to method
+            method.addParameter(TypeName.get(var.asType()), var.getSimpleName().toString());
+
             //name of parameter
             String varName = var.getSimpleName().toString();
             //name of parameter type

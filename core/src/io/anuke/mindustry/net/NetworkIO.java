@@ -1,11 +1,14 @@
 package io.anuke.mindustry.net;
 
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.io.Map;
+import io.anuke.mindustry.io.MapMeta;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.world.Tile;
@@ -30,7 +33,7 @@ public class NetworkIO {
 
             //--GENERAL STATE--
             stream.writeByte(state.mode.ordinal()); //gamemode
-            stream.writeUTF(world.getMap().name); //map ID
+            stream.writeUTF(world.getMap().name); //map name
 
             stream.writeInt(state.wave); //wave
             stream.writeFloat(state.wavetime); //wave countdown
@@ -133,10 +136,15 @@ public class NetworkIO {
             int width = stream.readShort();
             int height = stream.readShort();
 
+            //TODO send advanced map meta such as author, etc
+            //TODO scan for cores
+            Map currentMap = new Map(map, new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
+            world.setMap(currentMap);
+
             Tile[][] tiles = world.createTiles(width, height);
 
-            for(int x = 0; x < world.width(); x ++){
-                for(int y = 0; y < world.height(); y ++){
+            for(int x = 0; x < width; x ++){
+                for(int y = 0; y < height; y ++){
                     byte floorid = stream.readByte();
                     byte blockid = stream.readByte();
 

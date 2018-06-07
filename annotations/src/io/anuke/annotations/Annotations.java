@@ -15,9 +15,8 @@ public class Annotations {
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.CLASS)
     public @interface Remote {
-        /**Whether this method can be invoked from remote clients.*/
-        boolean client() default false;
-        /**Whether this method can be invoked from the remote server.*/
+        /**If true, this method can only be invoked on clients from the server.
+         * If false, this method can only be invoked on servers from a client.*/
         boolean server() default true;
         /**Whether a client-specific method is generated that accepts a connecton ID and sends to only one player. Default is false.
          * Only affects client methods.*/

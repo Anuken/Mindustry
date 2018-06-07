@@ -70,7 +70,7 @@ public class RemoteReadGenerator {
             for(int i = 0; i < entry.element.getParameters().size(); i ++){
                 VariableElement var = entry.element.getParameters().get(i);
 
-                if(!(entry.client && i == 0)) { //if client, skip first parameter since it's always of type player and doesn't need to be read
+                if(entry.server || i != 0) { //if client, skip first parameter since it's always of type player and doesn't need to be read
                     //full type name of parameter
                     //TODO check if the result is correct
                     String typeName = var.asType().toString();

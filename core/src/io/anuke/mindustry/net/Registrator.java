@@ -11,6 +11,7 @@ public class Registrator {
         StreamBegin.class,
         StreamChunk.class,
         WorldStream.class,
+        ConnectPacket.class,
         ClientSnapshotPacket.class,
         SnapshotPacket.class,
         InvokePacket.class

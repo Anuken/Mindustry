@@ -1,24 +1,24 @@
 package io.anuke.mindustry.core;
 
+import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.annotations.Annotations.Remote;
+import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.gen.RemoteReadServer;
-import io.anuke.mindustry.net.Administration;
+import io.anuke.mindustry.io.Version;
+import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.NetConnection;
-import io.anuke.mindustry.net.Packets.ClientSnapshotPacket;
-import io.anuke.mindustry.net.Packets.Connect;
-import io.anuke.mindustry.net.Packets.InvokePacket;
-import io.anuke.mindustry.net.Packets.KickReason;
+import io.anuke.mindustry.net.Packets.*;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Timer;
 
-import java.nio.ByteBuffer;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -34,7 +34,6 @@ public class NetServer extends Module{
     private IntMap<Player> connections = new IntMap<>();
     private boolean closing = false;
     private Timer timer = new Timer(5);
-    private ByteBuffer writeBuffer = ByteBuffer.allocate(32);
 
     public NetServer(){
 
@@ -44,14 +43,81 @@ public class NetServer extends Module{
             }
         });
 
-        Net.handleServer(ClientSnapshotPacket.class, (id, packet) -> {
-            //...don't do anything here as it's already handled by the packet itself
+        Net.handleServer(Disconnect.class, (id, packet) -> {});
+
+        Net.handleServer(ConnectPacket.class, (id, packet) -> {
+            String uuid = new String(Base64Coder.encode(packet.uuid));
+
+            if(Net.getConnection(id) == null ||
+                    admins.isIPBanned(Net.getConnection(id).address)) return;
+
+            TraceInfo trace = admins.getTraceByID(uuid);
+            PlayerInfo info = admins.getInfo(uuid);
+            trace.uuid = uuid;
+            trace.android = packet.mobile;
+
+            if(admins.isIDBanned(uuid)){
+                kick(id, KickReason.banned);
+                return;
+            }
+
+            if(TimeUtils.millis() - info.lastKicked < kickDuration){
+                kick(id, KickReason.recentKick);
+                return;
+            }
+
+            for(Player player : playerGroup.all()){
+                if(player.name.equalsIgnoreCase(packet.name)){
+                    kick(id, KickReason.nameInUse);
+                    return;
+                }
+            }
+
+            Log.info("Recieved connect packet for player '{0}' / UUID {1} / IP {2}", packet.name, uuid, trace.ip);
+
+            String ip = Net.getConnection(id).address;
+
+            admins.updatePlayerJoined(uuid, ip, packet.name);
+
+            if(packet.version != Version.build && Version.build != -1 && packet.version != -1){
+                kick(id, packet.version > Version.build ? KickReason.serverOutdated : KickReason.clientOutdated);
+                return;
+            }
+
+            if(packet.version == -1){
+                trace.modclient = true;
+            }
+
+            Player player = new Player();
+            player.isAdmin = admins.isAdmin(uuid, ip);
+            player.clientid = id;
+            player.name = packet.name;
+            player.uuid = uuid;
+            player.mech = packet.mobile ? Mechs.standardShip : Mechs.standard;
+            player.dead = true;
+            player.setNet(player.x, player.y);
+            player.setNet(player.x, player.y);
+            player.color.set(packet.color);
+            connections.put(id, player);
+
+            trace.playerid = player.id;
+
+            //TODO try DeflaterOutputStream
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            NetworkIO.writeWorld(player, stream);
+            WorldStream data = new WorldStream();
+            data.stream = new ByteArrayInputStream(stream.toByteArray());
+            Net.sendStream(id, data);
+
+            Log.info("Packed {0} uncompressed bytes of WORLD data.", stream.size());
+
+            Platform.instance.updateRPC();
         });
 
-        Net.handleServer(InvokePacket.class, (id, packet) -> {
-            //TODO implement
-            RemoteReadServer.readPacket(packet.writeBuffer, packet.type, connections.get(id));
-        });
+
+        Net.handleServer(ClientSnapshotPacket.class, (id, packet) -> {});
+
+        Net.handleServer(InvokePacket.class, (id, packet) -> RemoteReadServer.readPacket(packet.writeBuffer, packet.type, connections.get(id)));
     }
 
     public void update(){
@@ -101,11 +167,14 @@ public class NetServer extends Module{
         return connections.get(connectionID).uuid;
     }
 
-    void sendMessageTo(int id, String message){
-        //TODO implement
-    }
-
     void sync(){
         //TODO implement snapshot packets w/ delta compression
+    }
+
+    @Remote(server = false)
+    public static void connectConfirm(Player player){
+        player.add();
+        Log.info("&y{0} has connected.", player.name);
+        netCommon.sendMessage("[accent]" + player.name + " has connected.");
     }
 }
