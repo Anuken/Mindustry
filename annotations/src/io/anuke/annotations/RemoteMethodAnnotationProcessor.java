@@ -1,24 +1,23 @@
 package io.anuke.annotations;
 
-import com.squareup.javapoet.*;
-import io.anuke.annotations.Annotations.Local;
-import io.anuke.annotations.Annotations.RemoteClient;
-import io.anuke.annotations.Annotations.RemoteServer;
-import io.anuke.annotations.Annotations.Unreliable;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.TypeSpec;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.annotations.IOFinder.ClassSerializer;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.*;
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic.Kind;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 //TODO document
 //TODO split up into more classes
@@ -42,12 +41,15 @@ import java.util.Set;
 })
 public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
     /**Maximum size of each event packet.*/
-    private static final int maxPacketSize = 512;
+    public static final int maxPacketSize = 512;
     /**Name of the base package to put all the generated classes.*/
-    private static final String packageClassName = "io.anuke.mindustry.gen";
+    private static final String packageName = "io.anuke.mindustry.gen";
 
-    /**Maps fully qualified class names to serializers.*/
-    private HashMap<String, ClassSerializer> serializers;
+    /**Name of class that handles reading and invoking packets on the server.*/
+    private static final String readServerName = "RemoteReadServer";
+    /**Name of class that handles reading and invoking packets on the client.*/
+    private static final String readClientName = "RemoteReadClient";
+
     /**Whether the initial round is done.*/
     private boolean done;
 
@@ -63,203 +65,87 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        if(done) return false;
+        if(done) return false; //only process 1 round
         done = true;
 
-        serializers = new IOFinder().findSerializers(roundEnv);
-
-        writeElements(roundEnv, clientFullClassName, RemoteClient.class);
-        writeElements(roundEnv, serverFullClassName, RemoteServer.class);
-
-        return true;
-    }
-
-    private void writeElements(RoundEnvironment env){
         try {
-            boolean client = annotation == RemoteServer.class;
-            String className = fullClassName.substring(1 + fullClassName.lastIndexOf('.'));
-            String packageName = fullClassName.substring(0, fullClassName.lastIndexOf('.'));
 
-            Constructor<TypeName> cons = TypeName.class.getDeclaredConstructor(String.class);
-            cons.setAccessible(true);
+            //get serializers
+            HashMap<String, ClassSerializer> serializers = new IOFinder().findSerializers(roundEnv);
 
-            TypeName playerType = cons.newInstance("io.anuke.mindustry.entities.Player");
+            //last method ID used
+            int lastMethodID = 0;
+            //find all elements with the Remote annotation
+            Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(Remote.class);
+            //map of all classes to generate by name
+            HashMap<String, ClassEntry> classMap = new HashMap<>();
+            //list of all method entries
+            ArrayList<MethodEntry> methods = new ArrayList<>();
+            //list of all method entries
+            ArrayList<ClassEntry> classes = new ArrayList<>();
 
-            TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
+            //create methods
+            for (Element element : elements) {
+                Remote annotation = element.getAnnotation(Remote.class);
 
-            int id = 0;
+                //check for static
+                if(!element.getModifiers().contains(Modifier.STATIC)) {
+                    Utils.messager.printMessage(Kind.ERROR, "All Remote methods must be static: ", element);
+                }
 
-            classBuilder.addField(FieldSpec.builder(ByteBuffer.class, "TEMP_BUFFER", Modifier.STATIC, Modifier.PRIVATE, Modifier.FINAL)
-                    .initializer("ByteBuffer.allocate($1L)", maxPacketSize).build());
+                //get and create class entry if needed
+                if (!classMap.containsKey(annotation.target())) {
+                    ClassEntry clas = new ClassEntry(annotation.target());
+                    classMap.put(annotation.target(), clas);
+                    classes.add(clas);
+                }
 
-            MethodSpec.Builder readMethod = MethodSpec.methodBuilder("readPacket")
-                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .addParameter(ByteBuffer.class, "buffer")
-                    .addParameter(int.class, "id")
-                    .returns(void.class);
+                ClassEntry entry = classMap.get(annotation.target());
 
-            if(client){
-                readMethod.addParameter(playerType, "player");
+                //make sure that each server annotation has at least one method to generate, otherwise throw an error
+                if (annotation.server() && !annotation.all() && !annotation.one()) {
+                    Utils.messager.printMessage(Kind.ERROR, "A client method must not have all() and one() both be false!", element);
+                    return false;
+                }
+
+                if (annotation.server() && annotation.client()) {
+                    Utils.messager.printMessage(Kind.ERROR, "A method cannot be client and server simulatenously!", element);
+                    return false;
+                }
+
+                //create and add entry
+                MethodEntry method = new MethodEntry(entry.name, Utils.getMethodName(element), annotation.client(), annotation.server(),
+                        annotation.all(), annotation.one(), annotation.local(), annotation.unreliable(), lastMethodID ++, (ExecutableElement)element);
+
+                entry.methods.add(method);
+                methods.add(method);
             }
 
-            CodeBlock.Builder writeSwitch = CodeBlock.builder();
-            boolean started = false;
+            //create read/write generators
+            RemoteReadGenerator readgen = new RemoteReadGenerator(serializers);
+            RemoteWriteGenerator writegen = new RemoteWriteGenerator(serializers);
 
-            readMethod.addJavadoc("This method reads and executes a method by ID. For internal use only!");
+            //generate client readers
+            readgen.generateFor(methods.stream().filter(method -> method.client).collect(Collectors.toList()), readClientName, packageName, false);
+            //generate server readers
+            readgen.generateFor(methods.stream().filter(method -> method.server).collect(Collectors.toList()), readServerName, packageName, true);
 
-            for (Element e : env.getElementsAnnotatedWith(annotation)) {
-                if(!e.getModifiers().contains(Modifier.STATIC)) {
-                    messager.printMessage(Kind.ERROR, "All local/remote methods must be static: ", e);
-                }else if(e.getKind() != ElementKind.METHOD){
-                    messager.printMessage(Kind.ERROR, "All local/remote annotations must be on methods: ", e);
-                }
+            //generate the methods to invoke (write)
+            writegen.generateFor(classes, packageName);
 
-                if(e.getAnnotation(annotation) == null) continue;
-                boolean local = e.getAnnotation(Local.class) != null;
-                boolean unreliable = e.getAnnotation(Unreliable.class) != null;
+            //create class for storing unique method hash
+            TypeSpec.Builder hashBuilder = TypeSpec.classBuilder("MethodHash").addModifiers(Modifier.PUBLIC);
+            hashBuilder.addField(FieldSpec.builder(int.class, "HASH", Modifier.STATIC, Modifier.PUBLIC, Modifier.FINAL)
+                    .initializer("$1L)", Objects.hash(methods)).build());
 
-                ExecutableElement exec = (ExecutableElement)e;
+            //build and write resulting hash class
+            TypeSpec spec = hashBuilder.build();
+            JavaFile.builder(packageName, spec).build().writeTo(Utils.filer);
 
-                MethodSpec.Builder method = MethodSpec.methodBuilder(e.getSimpleName().toString())
-                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .returns(void.class);
-
-                if(client){
-                    if(exec.getParameters().isEmpty()){
-                        messager.printMessage(Kind.ERROR, "Client invoke methods must have a first parameter of type Player.", e);
-                        return;
-                    }
-
-                    VariableElement var = exec.getParameters().get(0);
-
-                    if(!var.asType().toString().equals("io.anuke.mindustry.entities.Player")){
-                        messager.printMessage(Kind.ERROR, "Client invoke methods should have a first parameter of type Player.", e);
-                    }
-                }
-
-                for(VariableElement var : exec.getParameters()){
-                    method.addParameter(TypeName.get(var.asType()), var.getSimpleName().toString());
-                }
-
-                if(local){
-                    int index = 0;
-                    StringBuilder results = new StringBuilder();
-                    for(VariableElement var : exec.getParameters()){
-                        results.append(var.getSimpleName());
-                        if(index != exec.getParameters().size() - 1) results.append(", ");
-                        index ++;
-                    }
-
-                    method.addStatement("$N." + exec.getSimpleName() + "(" + results.toString() + ")",
-                            ((TypeElement)e.getEnclosingElement()).getQualifiedName().toString());
-                }
-
-                if(!started){
-                    writeSwitch.beginControlFlow("if(id == "+id+")");
-                }else{
-                    writeSwitch.nextControlFlow("else if(id == "+id+")");
-                }
-                started = true;
-
-                method.addStatement("$1N packet = $2N.obtain($1N.class)", "io.anuke.mindustry.net.Packets.InvokePacket",
-                        "com.badlogic.gdx.utils.Pools");
-                method.addStatement("packet.writeBuffer = TEMP_BUFFER");
-                method.addStatement("TEMP_BUFFER.position(0)");
-
-                ArrayList<VariableElement> parameters = new ArrayList<>(exec.getParameters());
-                if(client){
-                    parameters.remove(0);
-                }
-
-                for(VariableElement var : parameters){
-                    String varName = var.getSimpleName().toString();
-                    String typeName = var.asType().toString();
-                    String bufferName = "TEMP_BUFFER";
-                    String simpleTypeName = typeName.contains(".") ? typeName.substring(1 + typeName.lastIndexOf('.')) : typeName;
-                    String capName = simpleTypeName.equals("byte") ? "" : Character.toUpperCase(simpleTypeName.charAt(0)) + simpleTypeName.substring(1);
-
-                    boolean isEnum = typeUtils.directSupertypes(var.asType()).size() > 0
-                            && typeUtils.asElement(typeUtils.directSupertypes(var.asType()).get(0)).getSimpleName().equals("java.lang.Enum");
-
-                    if(isEnum) {
-                        method.addStatement(bufferName + ".putShort((short)" + varName + ".ordinal())");
-                    }else if(isPrimitive(typeName)) {
-                        if(simpleTypeName.equals("boolean")){
-                            method.addStatement(bufferName + ".put(" + varName + " ? (byte)1 : 0)");
-                        }else{
-                            method.addStatement(bufferName + ".put" +
-                                    capName + "(" + varName + ")");
-                        }
-                    }else if(writeMap.get(simpleTypeName) != null){
-                        String[] values = writeMap.get(simpleTypeName)[0];
-                        for(String str : values){
-                            method.addStatement(str.replaceAll("rbuffer", bufferName)
-                                    .replaceAll("rvalue", varName));
-                        }
-                    }else{
-                        messager.printMessage(Kind.ERROR, "No method for writing type: " + typeName, var);
-                    }
-
-                    String writeBufferName = "buffer";
-
-                    if(isEnum) {
-                        writeSwitch.addStatement(typeName + " " + varName + " = " + typeName + ".values()["+writeBufferName +".getShort()]");
-                    }else if(isPrimitive(typeName)) {
-                        if(simpleTypeName.equals("boolean")){
-                            writeSwitch.addStatement("boolean " + varName + " = " + writeBufferName + ".get() == 1");
-                        }else{
-                            writeSwitch.addStatement(typeName + " " + varName + " = " + writeBufferName + ".get" + capName + "()");
-                        }
-                    }else if(writeMap.get(simpleTypeName) != null){
-                        String[] values = writeMap.get(simpleTypeName)[1];
-                        for(String str : values){
-                            writeSwitch.addStatement(str.replaceAll("rbuffer", writeBufferName)
-                                    .replaceAll("rvalue", varName)
-                                    .replaceAll("rtype", simpleTypeName));
-                        }
-                    }else{
-                        messager.printMessage(Kind.ERROR, "No method for writing type: " + typeName, var);
-                    }
-                }
-                method.addStatement("packet.writeLength = TEMP_BUFFER.position()");
-                method.addStatement("io.anuke.mindustry.net.Net.send(packet, "+
-                        (unreliable ? "io.anuke.mindustry.net.Net.SendMode.udp" : "io.anuke.mindustry.net.Net.SendMode.tcp")+")");
-
-                classBuilder.addMethod(method.build());
-
-                int index = 0;
-                StringBuilder results = new StringBuilder();
-
-                for(VariableElement writevar : exec.getParameters()){
-                    results.append(writevar.getSimpleName());
-                    if(index != exec.getParameters().size() - 1) results.append(", ");
-                    index ++;
-                }
-
-                writeSwitch.addStatement("com.badlogic.gdx.Gdx.app.postRunnable(() -> $N." + exec.getSimpleName() + "(" + results.toString() + "))",
-                        ((TypeElement)e.getEnclosingElement()).getQualifiedName().toString());
-
-                id ++;
-            }
-
-            if(started){
-                writeSwitch.endControlFlow();
-            }
-
-            readMethod.addCode(writeSwitch.build());
-            classBuilder.addMethod(readMethod.build());
-
-            TypeSpec spec = classBuilder.build();
-
-            JavaFile.builder(packageName, spec).build().writeTo(filer);
-
+            return true;
 
         }catch (Exception e){
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
-
-
-
 }

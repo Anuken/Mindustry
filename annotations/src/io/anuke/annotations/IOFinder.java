@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 public class IOFinder {
 
     /**Finds all class serializers for all types and returns them. Logs errors when necessary.
-     * Maps full class names to their serializers.*/
+     * Maps fully qualified class names to their serializers.*/
     public HashMap<String, ClassSerializer> findSerializers(RoundEnvironment env){
         HashMap<String, ClassSerializer> result = new HashMap<>();
 
@@ -44,14 +44,10 @@ public class IOFinder {
             Element reader = stream.findFirst().get();
 
             //add to result list
-            result.put(type.getName(), new ClassSerializer(getFullMethod(reader), getFullMethod(writer), type.getName()));
+            result.put(type.getName(), new ClassSerializer(Utils.getMethodName(reader), Utils.getMethodName(writer), type.getName()));
         }
 
         return result;
-    }
-
-    private String getFullMethod(Element element){
-        return element.getEnclosingElement().asType().toString() + "." + element.getSimpleName();
     }
 
     /**Information about read/write methods for a specific class type.*/
