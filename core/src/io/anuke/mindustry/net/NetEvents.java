@@ -6,7 +6,7 @@ import io.anuke.mindustry.world.Tile;
 
 public class NetEvents {
 
-    @Remote(unreliable = true, one = true)
+    @Remote(unreliable = true, one = true, all = false)
     public static void callClientMethod(int something, Player player, String str, boolean bool){
         System.out.println("Called " + something + " ? " + bool);
     }
