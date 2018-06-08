@@ -9,7 +9,7 @@ import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packet.UnimportantPacket;
 import io.anuke.ucore.io.ByteBufferOutput;
 import io.anuke.ucore.io.IOUtils;
-import io.anuke.ucore.io.delta.ByteBufferInput;
+import io.anuke.ucore.io.ByteBufferInput;
 
 import java.nio.ByteBuffer;
 

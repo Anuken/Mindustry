@@ -7,6 +7,8 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.gen.RemoteReadServer;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.*;
@@ -15,12 +17,18 @@ import io.anuke.mindustry.net.Packets.*;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.entities.trait.Entity;
+import io.anuke.ucore.io.delta.ByteDeltaEncoder;
+import io.anuke.ucore.io.delta.ByteMatcherHash;
+import io.anuke.ucore.io.delta.DEZEncoder;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Timer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -36,6 +44,13 @@ public class NetServer extends Module{
     private IntMap<Player> connections = new IntMap<>();
     private boolean closing = false;
     private Timer timer = new Timer(5);
+
+    /**Stream for writing player sync data to.*/
+    private ByteArrayOutputStream syncStream = new ByteArrayOutputStream();
+    /**Data stream for writing player sync data to.*/
+    private DataOutputStream dataStream = new DataOutputStream(syncStream);
+    /**Encoder for computing snapshot deltas.*/
+    private DEZEncoder encoder = new DEZEncoder();
 
     public NetServer(){
 
@@ -170,19 +185,56 @@ public class NetServer extends Module{
     }
 
     void sync(){
-        //TODO implement snapshot packets w/ delta compression
+        try {
+            //TODO implement snapshot packets w/ delta compression
 
+            //iterate through each player
+            for (Player player : connections.values()) {
+                //reset stream to begin writing
+                syncStream.reset();
 
+                int totalGroups = 0;
 
-        //iterate through each player
-        for(Player player : connections.values()){
+                for (EntityGroup<?> group : Entities.getAllGroups()) {
+                    if (!group.isEmpty() && (group.all().get(0) instanceof SyncTrait)) totalGroups ++;
+                }
 
-            //check for syncable groups.
-            for(EntityGroup<?> group : Entities.getAllGroups()){
-                if(group.isEmpty()) continue;
+                //write total amount of serializable groups
+                dataStream.writeByte(totalGroups);
+
+                //check for syncable groups
+                for (EntityGroup<?> group : Entities.getAllGroups()) {
+                    //TODO range-check sync positions?
+                    if (group.isEmpty() || !(group.all().get(0) instanceof SyncTrait)) continue;
+
+                    //write group ID + group size
+                    dataStream.writeByte(group.getID());
+                    dataStream.writeShort(group.size());
+
+                    for(Entity entity : group.all()){
+                        //write all entities now
+                        ((SyncTrait)entity).write(dataStream);
+                    }
+                }
+
+                NetConnection connection = Net.getConnection(player.clientid);
+
+                byte[] bytes = syncStream.toByteArray();
+                if(connection.lastSnapshot == null){
+                    //no snapshot to diff, send it all
+                    Call.onSnapshot(connection.id, bytes, -1);
+                }else{
+                    //send diff otherwise
+                    byte[] diff = ByteDeltaEncoder.toDiff(new ByteMatcherHash(connection.lastSnapshot, bytes), encoder);
+                    Call.onSnapshot(connection.id, diff, connection.lastSnapshotID);
+
+                    connection.lastSentSnapshot = bytes;
+                }
             }
-        }
 
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
     @Remote(server = false)
