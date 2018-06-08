@@ -13,6 +13,8 @@ import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Timer;
@@ -169,6 +171,18 @@ public class NetServer extends Module{
 
     void sync(){
         //TODO implement snapshot packets w/ delta compression
+
+
+
+        //iterate through each player
+        for(Player player : connections.values()){
+
+            //check for syncable groups.
+            for(EntityGroup<?> group : Entities.getAllGroups()){
+                if(group.isEmpty()) continue;
+            }
+        }
+
     }
 
     @Remote(server = false)

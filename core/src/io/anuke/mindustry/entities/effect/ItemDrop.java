@@ -20,7 +20,9 @@ import io.anuke.ucore.entities.trait.VelocityTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
-import java.nio.ByteBuffer;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.itemGroup;
 import static io.anuke.mindustry.Vars.itemSize;
@@ -156,16 +158,16 @@ public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, Veloc
     }
 
     @Override
-    public void write(ByteBuffer data) {
-        data.putFloat(x);
-        data.putFloat(y);
-        data.put((byte)item.id);
+    public void write(DataOutput data) throws IOException{
+        data.writeFloat(x);
+        data.writeFloat(y);
+        data.writeByte(item.id);
     }
 
     @Override
-    public void read(ByteBuffer data, long time) {
-        x = data.getFloat();
-        y = data.getFloat();
-        item = Item.getByID(data.get());
+    public void read(DataInput data, long time) throws IOException{
+        x = data.readFloat();
+        y = data.readFloat();
+        item = Item.getByID(data.readByte());
     }
 }

@@ -7,7 +7,9 @@ import io.anuke.mindustry.gen.RemoteReadClient;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packet.UnimportantPacket;
-import io.anuke.ucore.util.IOUtils;
+import io.anuke.ucore.io.ByteBufferOutput;
+import io.anuke.ucore.io.IOUtils;
+import io.anuke.ucore.io.delta.ByteBufferInput;
 
 import java.nio.ByteBuffer;
 
@@ -101,17 +103,21 @@ public class Packets {
 
         @Override
         public void write(ByteBuffer buffer) {
+            ByteBufferOutput out = new ByteBufferOutput(buffer);
+
             buffer.putInt(player.id);
             buffer.putLong(TimeUtils.millis());
-            player.write(buffer);
+            player.write(out);
         }
 
         @Override
         public void read(ByteBuffer buffer) {
+            ByteBufferInput in = new ByteBufferInput(buffer);
+
             int id = buffer.getInt();
             long time = buffer.getLong();
             player = Vars.playerGroup.getByID(id);
-            player.read(buffer, time);
+            player.read(in, time);
         }
     }
 

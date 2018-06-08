@@ -6,9 +6,7 @@ import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 public class UnitInventory {
     private Array<AmmoEntry> ammos = new Array<>();
@@ -31,7 +29,7 @@ public class UnitInventory {
         infiniteAmmo = infinite;
     }
 
-    public void write(DataOutputStream stream) throws IOException {
+    public void write(DataOutput stream) throws IOException {
         stream.writeInt(item == null ? 0 : item.amount);
         stream.writeByte(item == null ? 0 : item.item.id);
         stream.writeBoolean(infiniteAmmo);
@@ -43,7 +41,7 @@ public class UnitInventory {
         }
     }
 
-    public void read(DataInputStream stream) throws IOException {
+    public void read(DataInput stream) throws IOException {
         int iamount = stream.readInt();
         byte iid = stream.readByte();
         infiniteAmmo = stream.readBoolean();

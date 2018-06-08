@@ -29,8 +29,8 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.puddleGroup;
@@ -202,7 +202,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
     }
 
     @Override
-    public void writeSave(DataOutputStream stream) throws IOException {
+    public void writeSave(DataOutput stream) throws IOException {
         stream.writeInt(tile.packedPosition());
         stream.writeFloat(x);
         stream.writeFloat(y);
@@ -212,7 +212,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
     }
 
     @Override
-    public void readSave(DataInputStream stream) throws IOException {
+    public void readSave(DataInput stream) throws IOException {
         this.loadedPosition = stream.readInt();
         this.x = stream.readFloat();
         this.y = stream.readFloat();

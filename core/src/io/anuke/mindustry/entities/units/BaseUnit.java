@@ -21,10 +21,7 @@ import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -236,13 +233,13 @@ public abstract class BaseUnit extends Unit{
 	}
 
 	@Override
-	public void writeSave(DataOutputStream stream) throws IOException {
+	public void writeSave(DataOutput stream) throws IOException {
 		super.writeSave(stream);
 		stream.writeByte(type.id);
 	}
 
 	@Override
-	public void readSave(DataInputStream stream) throws IOException {
+	public void readSave(DataInput stream) throws IOException {
 		super.readSave(stream);
 		byte type = stream.readByte();
 
@@ -251,12 +248,12 @@ public abstract class BaseUnit extends Unit{
 	}
 
 	@Override
-	public void write(ByteBuffer data) {
+	public void write(DataOutput data) {
 		//todo
 	}
 
 	@Override
-	public void read(ByteBuffer data, long time) {
+	public void read(DataInput data, long time) {
 		//todo
 	}
 }

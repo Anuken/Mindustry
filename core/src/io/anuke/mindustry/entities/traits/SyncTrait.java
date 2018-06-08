@@ -4,7 +4,9 @@ import com.badlogic.gdx.Gdx;
 import io.anuke.mindustry.net.Interpolator;
 import io.anuke.ucore.entities.trait.Entity;
 
-import java.nio.ByteBuffer;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.threads;
 
@@ -36,6 +38,6 @@ public interface SyncTrait extends Entity {
     Interpolator getInterpolator();
 
     //Read and write sync data, usually position
-    void write(ByteBuffer data);
-    void read(ByteBuffer data, long time);
+    void write(DataOutput data) throws IOException;
+    void read(DataInput data, long time) throws IOException;
 }

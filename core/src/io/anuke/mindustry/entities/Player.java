@@ -30,10 +30,7 @@ import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.*;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -574,7 +571,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
     //region read and write methods
 
 	@Override
-	public void writeSave(DataOutputStream stream) throws IOException {
+	public void writeSave(DataOutput stream) throws IOException {
 		stream.writeBoolean(isLocal);
 
 		if(isLocal){
@@ -589,7 +586,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	}
 
 	@Override
-	public void readSave(DataInputStream stream) throws IOException {
+	public void readSave(DataInput stream) throws IOException {
 		boolean local = stream.readBoolean();
 
 		if(local){
@@ -598,7 +595,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		}
 	}
 
-	private void readSaveSuper(DataInputStream stream) throws IOException {
+	private void readSaveSuper(DataInput stream) throws IOException {
 		super.readSave(stream);
 
 		byte uamount = stream.readByte();
@@ -610,12 +607,12 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	}
 
 	@Override
-	public void write(ByteBuffer buffer) {
+	public void write(DataOutput buffer) {
 		//todo
 	}
 
 	@Override
-	public void read(ByteBuffer buffer, long time) {
+	public void read(DataInput buffer, long time) {
 		//todo
 	}
 

@@ -15,7 +15,9 @@ import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.entities.trait.VelocityTrait;
 import io.anuke.ucore.util.Timer;
 
-import java.nio.ByteBuffer;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.bulletGroup;
 import static io.anuke.mindustry.Vars.world;
@@ -70,19 +72,19 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 	}
 
 	@Override
-	public void write(ByteBuffer data) {
-		data.putFloat(x);
-		data.putFloat(y);
-		data.put((byte)team.ordinal());
-		data.put((byte)type.id);
+	public void write(DataOutput data) throws IOException{
+		data.writeFloat(x);
+		data.writeFloat(y);
+		data.writeByte(team.ordinal());
+		data.writeByte(type.id);
 	}
 
 	@Override
-	public void read(ByteBuffer data, long time) {
-		x = data.getFloat();
-		y = data.getFloat();
-		team = Team.values()[data.get()];
-		type = BulletType.getByID(data.get());
+	public void read(DataInput data, long time) throws IOException{
+		x = data.readFloat();
+		y = data.readFloat();
+		team = Team.values()[data.readByte()];
+		type = BulletType.getByID(data.readByte());
 	}
 
 	@Override

@@ -19,7 +19,6 @@ import static io.anuke.mindustry.Vars.*;
 public class NetClient extends Module {
     private final static float dataTimeout = 60*18;
     private final static float playerSyncTime = 2;
-    private final static int maxRequests = 50;
 
     private Timer timer = new Timer(5);
     /**Whether the client is currently conencting.*/

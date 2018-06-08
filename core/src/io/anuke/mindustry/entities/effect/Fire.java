@@ -18,8 +18,8 @@ import io.anuke.ucore.entities.impl.TimedEntity;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
@@ -115,14 +115,14 @@ public class Fire extends TimedEntity implements SaveTrait, Poolable {
     }
 
     @Override
-    public void writeSave(DataOutputStream stream) throws IOException {
+    public void writeSave(DataOutput stream) throws IOException {
         stream.writeInt(tile.packedPosition());
         stream.writeFloat(lifetime);
         stream.writeFloat(time);
     }
 
     @Override
-    public void readSave(DataInputStream stream) throws IOException {
+    public void readSave(DataInput stream) throws IOException {
         this.loadedPosition = stream.readInt();
         this.lifetime = stream.readFloat();
         this.time = stream.readFloat();
