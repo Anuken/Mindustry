@@ -100,11 +100,13 @@ public class Packets {
 
     public static class ClientSnapshotPacket implements Packet{
         public Player player;
+        public int lastSnapshot;
 
         @Override
         public void write(ByteBuffer buffer) {
             ByteBufferOutput out = new ByteBufferOutput(buffer);
 
+            buffer.putInt(lastSnapshot);
             buffer.putInt(player.id);
             buffer.putLong(TimeUtils.millis());
             player.write(out);
@@ -114,6 +116,7 @@ public class Packets {
         public void read(ByteBuffer buffer) {
             ByteBufferInput in = new ByteBufferInput(buffer);
 
+            lastSnapshot = buffer.getInt();
             int id = buffer.getInt();
             long time = buffer.getLong();
             player = Vars.playerGroup.getByID(id);

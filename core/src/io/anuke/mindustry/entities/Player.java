@@ -41,6 +41,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	private static final float dashSpeed = 1.8f;
 	private static final Vector2 movement = new Vector2();
 
+	public static final int timerShootLeft = 0;
+	public static final int timerShootRight = 1;
+	public static final int timeSync = 2;
+
 	//region instance variables, constructor
 
 	public float baseRotation;

@@ -50,8 +50,8 @@ public class Weapon extends Upgrade {
 	}
 
 	public void update(Player p, boolean left, float pointerX, float pointerY){
-		int t = left ? 1 : 2;
-		int t2 = !left ? 1 : 2;
+		int t = left ? Player.timerShootLeft : Player.timerShootRight;
+		int t2 = !left ? Player.timerShootRight : Player.timerShootLeft;
 		if(p.inventory.hasAmmo() && p.timer.get(t, reload)){
 			if(roundrobin){
 				p.timer.reset(t2, reload/2f);
@@ -70,7 +70,7 @@ public class Weapon extends Upgrade {
 	}
 
 	public float getRecoil(Player player, boolean left){
-		return 1f-Mathf.clamp(player.timer.getTime(left ? 1 : 2)/reload);
+		return 1f-Mathf.clamp(player.timer.getTime(left ? Player.timerShootLeft : Player.timerShootRight)/reload);
 	}
 
 	public float getReload(){

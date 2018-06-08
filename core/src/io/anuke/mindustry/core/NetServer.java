@@ -23,7 +23,6 @@ import io.anuke.ucore.io.delta.ByteMatcherHash;
 import io.anuke.ucore.io.delta.DEZEncoder;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Timer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -43,7 +42,6 @@ public class NetServer extends Module{
     /**Maps connection IDs to players.*/
     private IntMap<Player> connections = new IntMap<>();
     private boolean closing = false;
-    private Timer timer = new Timer(5);
 
     /**Stream for writing player sync data to.*/
     private ByteArrayOutputStream syncStream = new ByteArrayOutputStream();
@@ -131,8 +129,8 @@ public class NetServer extends Module{
             Platform.instance.updateRPC();
         });
 
-
-        Net.handleServer(ClientSnapshotPacket.class, (id, packet) -> {});
+        //update last recieved snapshot based on client snapshot
+        Net.handleServer(ClientSnapshotPacket.class, (id, packet) -> Net.getConnection(id).lastSnapshotID = packet.lastSnapshot);
 
         Net.handleServer(InvokePacket.class, (id, packet) -> RemoteReadServer.readPacket(packet.writeBuffer, packet.type, connections.get(id)));
     }
@@ -190,6 +188,19 @@ public class NetServer extends Module{
 
             //iterate through each player
             for (Player player : connections.values()) {
+                NetConnection connection = Net.getConnection(player.clientid);
+
+                if(!player.timer.get(Player.timeSync, serverSyncTime)) continue;
+
+                //if the player hasn't acknolwedged that it has recieved the packet, send the same thing again
+                if(connection.lastSentSnapshotID > connection.lastSnapshotID){
+                    Call.onSnapshot(connection.id, connection.lastSentSnapshot, connection.lastSentSnapshotID);
+                    return;
+                }else{
+                    //set up last confirmed snapshot to the last one that was sent, otherwise
+                    connection.lastSnapshot = connection.lastSentSnapshot;
+                }
+
                 //reset stream to begin writing
                 syncStream.reset();
 
@@ -207,24 +218,32 @@ public class NetServer extends Module{
                     //TODO range-check sync positions?
                     if (group.isEmpty() || !(group.all().get(0) instanceof SyncTrait)) continue;
 
+                    //make sure mapping is enabled for this group
+                    if(!group.mappingEnabled()){
+                        throw new RuntimeException("Entity group '" + group.getType() + "' contains SyncTrait entities, yet mapping is not enabled. In order for syncing to work, you must enable mapping for this group.");
+                    }
+
                     //write group ID + group size
                     dataStream.writeByte(group.getID());
                     dataStream.writeShort(group.size());
+                    //write timestamp
+                    dataStream.writeLong(TimeUtils.millis());
 
                     for(Entity entity : group.all()){
                         //write all entities now
+                        dataStream.writeInt(entity.getID());
                         ((SyncTrait)entity).write(dataStream);
                     }
                 }
-
-                NetConnection connection = Net.getConnection(player.clientid);
 
                 byte[] bytes = syncStream.toByteArray();
                 if(connection.lastSnapshot == null){
                     //no snapshot to diff, send it all
                     Call.onSnapshot(connection.id, bytes, -1);
                 }else{
-                    //send diff otherwise
+                    //increment snapshot ID
+                    connection.lastSnapshotID ++;
+                    //send diff, otherwise
                     byte[] diff = ByteDeltaEncoder.toDiff(new ByteMatcherHash(connection.lastSnapshot, bytes), encoder);
                     Call.onSnapshot(connection.id, diff, connection.lastSnapshotID);
 
@@ -240,7 +259,7 @@ public class NetServer extends Module{
     @Remote(server = false)
     public static void connectConfirm(Player player){
         player.add();
-        Log.info("&y{0} has connected.", player.name);
         netCommon.sendMessage("[accent]" + player.name + " has connected.");
+        Log.info("&y{0} has connected.", player.name);
     }
 }

@@ -1,8 +1,12 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.ReflectionException;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
@@ -10,9 +14,16 @@ import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.io.ReusableByteArrayInputStream;
+import io.anuke.ucore.io.delta.DEZDecoder;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Timer;
+
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -27,6 +38,15 @@ public class NetClient extends Module {
     private boolean quiet = false;
     /**Counter for data timeout.*/
     private float timeoutTime = 0f;
+    /**Last snapshot recieved.*/
+    private byte[] lastSnapshot;
+    /**Last snapshot ID recieved.*/
+    private int lastSnapshotID = -1;
+    /**Decoder for uncompressing snapshots.*/
+    private DEZDecoder decoder = new DEZDecoder();
+    /**Byte stream for reading in snapshots.*/
+    private ReusableByteArrayInputStream byteStream = new ReusableByteArrayInputStream();
+    private DataInputStream dataStream = new DataInputStream(byteStream);
 
     public NetClient(){
 
@@ -135,12 +155,82 @@ public class NetClient extends Module {
             Player player = players[0];
 
             ClientSnapshotPacket packet = new ClientSnapshotPacket();
+            packet.lastSnapshot = lastSnapshotID;
             packet.player = player;
             Net.send(packet, SendMode.udp);
         }
 
         if(timer.get(1, 60)){
             Net.updatePing();
+        }
+    }
+
+    @Remote(one = true, all = false, unreliable = true)
+    public static void onSnapshot(byte[] snapshot, int snapshotID){
+
+        //skip snapshot IDs that have already been recieved
+        if(snapshotID == netClient.lastSnapshotID){
+            return;
+        }
+
+        try {
+
+            byte[] result;
+            int length;
+            if (snapshotID == -1) { //-1 = fresh snapshot
+                result = snapshot;
+                length = snapshot.length;
+                netClient.lastSnapshot = snapshot;
+            } else { //otherwise, last snapshot must not be null, decode it
+                netClient.decoder.init(netClient.lastSnapshot, snapshot);
+                result = netClient.decoder.decode();
+                length = netClient.decoder.getDecodedLength();
+                //set last snapshot to a copy to prevent issues
+                netClient.lastSnapshot = Arrays.copyOf(result, length);
+            }
+
+            //set stream bytes to begin write
+            netClient.byteStream.setBytes(result, 0, length);
+
+            //get data input for reading from the stream
+            DataInputStream input = netClient.dataStream;
+
+            byte totalGroups = input.readByte();
+            //for each group...
+            for (int i = 0; i < totalGroups; i++) {
+                //read group info
+                byte groupID = input.readByte();
+                short amount = input.readShort();
+                long timestamp = input.readLong();
+
+                EntityGroup<?> group = Entities.getGroup(groupID);
+
+                //go through each entity
+                for (int j = 0; j < amount; j++) {
+                    int id = input.readInt();
+
+                    SyncTrait entity = (SyncTrait) group.getByID(id);
+
+                    //entity must not be added yet, so create it
+                    if(entity == null){
+                        entity = (SyncTrait) ClassReflection.newInstance(group.getType()); //TODO solution without reflection?
+                        entity.add();
+                    }
+
+                    //read the entity
+                    entity.read(input, timestamp);
+                }
+            }
+
+            //confirm that snapshot 0 has been recieved if this is the initial snapshot
+            if(snapshotID == -1){
+                netClient.lastSnapshotID = 0;
+            }else{ //confirm that the snapshot has been recieved
+                netClient.lastSnapshotID = snapshotID;
+            }
+
+        }catch (IOException | ReflectionException e){
+            throw new RuntimeException(e);
         }
     }
 }
