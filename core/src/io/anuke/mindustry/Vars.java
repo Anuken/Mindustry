@@ -106,7 +106,7 @@ public class Vars{
 	public static final int tilesize = 8;
 
 	public static final Locale[] locales = {new Locale("en"), new Locale("fr"), new Locale("ru"), new Locale("uk", "UA"), new Locale("pl"),
-			new Locale("de"), new Locale("pt", "BR"), new Locale("ko"), new Locale("in", "ID"), new Locale("ita"), new Locale("es")};
+			new Locale("de"), new Locale("pt", "BR"), new Locale("ko"), new Locale("in", "ID"), new Locale("ita"), new Locale("es") , new Locale("zh","TW")};
 
 	public static final Color[] playerColors = {
 			Color.valueOf("82759a"),
