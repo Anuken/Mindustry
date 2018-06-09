@@ -15,6 +15,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.entities.EntityPhysics;
 import io.anuke.ucore.util.Bits;
 
 import java.io.*;
@@ -168,6 +169,8 @@ public class NetworkIO {
                     tiles[x][y] = tile;
                 }
             }
+
+            EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
             player.reset();
             state.teams = new TeamInfo();

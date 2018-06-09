@@ -11,7 +11,6 @@ import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 
-
 import java.nio.ByteBuffer;
 
 import static io.anuke.mindustry.Vars.playerGroup;

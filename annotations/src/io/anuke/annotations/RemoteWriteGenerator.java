@@ -150,6 +150,13 @@ public class RemoteWriteGenerator {
             String typeName = var.asType().toString();
             //captialized version of type name for writing primitives
             String capName = typeName.equals("byte") ? "" : Character.toUpperCase(typeName.charAt(0)) + typeName.substring(1);
+            //special case: method can be called from anywhere to anywhere
+            //thus, only write the player when the SERVER is writing data, since the client is the only one who reads that
+            boolean writePlayerSkipCheck = methodEntry.where == Loc.both && methodEntry.local == Loc.both && i == 0;
+
+            if(writePlayerSkipCheck){ //write begin check
+                method.beginControlFlow("if(io.anuke.mindustry.net.Net.server())");
+            }
 
             if(Utils.isPrimitive(typeName)) { //check if it's a primitive, and if so write it
                 if(typeName.equals("boolean")){ //booleans are special
@@ -169,6 +176,10 @@ public class RemoteWriteGenerator {
 
                 //add statement for writing it
                 method.addStatement(ser.writeMethod + "(TEMP_BUFFER, " + varName +")");
+            }
+
+            if(writePlayerSkipCheck){ //write end check
+                method.endControlFlow();
             }
         }
 
