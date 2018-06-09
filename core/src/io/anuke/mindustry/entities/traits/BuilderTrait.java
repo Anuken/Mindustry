@@ -5,10 +5,12 @@ import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.game.EventType.BlockBuildEvent;
+import io.anuke.mindustry.gen.CallBlocks;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Recipe;
@@ -135,7 +137,8 @@ public interface BuilderTrait {
                 unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(tile.drawx(), tile.drawy()), 0.4f);
 
                 if(current.progress >= 1f){
-                    Build.breakBlock(unit.getTeam(), current.x, current.y, true, true);
+                    //FIXME a player instace is required here, but the the builder may not be a player
+                    CallBlocks.breakBlock(unit instanceof Player ? (Player)unit : null, unit.getTeam(), current.x, current.y, true, true);
                 }
             }else{
                 //otherwise, skip it
@@ -145,9 +148,10 @@ public interface BuilderTrait {
             if (!(tile.block() instanceof BuildBlock)) { //check if haven't started placing
                 if(Build.validPlace(unit.getTeam(), current.x, current.y, current.recipe.result, current.rotation)){
                     //if it's valid, place it
-                    Build.placeBlock(unit.getTeam(), current.x, current.y, current.recipe, current.rotation);
+                    //FIXME a player instace is required here, but the the builder may not be a player
+                    CallBlocks.placeBlock(unit instanceof Player ? (Player)unit : null, unit.getTeam(), current.x, current.y, current.recipe, current.rotation);
 
-                    //fire place event.
+                    //fire build event
                     threads.run(() -> Events.fire(BlockBuildEvent.class, unit.getTeam(), world.tile(current.x, current.y)));
                 }else{
                     //otherwise, skip it

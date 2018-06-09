@@ -65,8 +65,13 @@ public class RemoteWriteGenerator {
 
         //create builder
         MethodSpec.Builder method = MethodSpec.methodBuilder(elem.getSimpleName().toString() + (forwarded ? "__forward" : "")) //add except suffix when forwarding
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.SYNCHRONIZED)
+                .addModifiers(Modifier.STATIC, Modifier.SYNCHRONIZED)
                 .returns(void.class);
+
+        //forwarded methods aren't intended for use, and are not public
+        if(!forwarded){
+            method.addModifiers(Modifier.PUBLIC);
+        }
 
         //validate client methods to make sure
         if(methodEntry.where.isClient){
@@ -173,7 +178,11 @@ public class RemoteWriteGenerator {
         String sendString;
 
         if(forwarded){ //forward packet
-            sendString = "sendExcept(exceptSenderID, ";
+            if(!methodEntry.local.isClient){ //if the client doesn't get it called locally, forward it back after validation
+                sendString = "send(";
+            }else {
+                sendString = "sendExcept(exceptSenderID, ";
+            }
         }else if(toAll){ //send to all players / to server
             sendString = "send(";
         }else{ //send to specific client from server

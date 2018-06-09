@@ -3,7 +3,10 @@ package io.anuke.mindustry.io;
 import io.anuke.annotations.Annotations.ReadClass;
 import io.anuke.annotations.Annotations.WriteClass;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Packets.KickReason;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
@@ -47,6 +50,16 @@ public class TypeIO {
         return KickReason.values()[buffer.get()];
     }
 
+    @WriteClass(Team.class)
+    public static void writeTeam(ByteBuffer buffer, Team reason){
+        buffer.put((byte)reason.ordinal());
+    }
+
+    @ReadClass(Team.class)
+    public static Team readTeam(ByteBuffer buffer){
+        return Team.values()[buffer.get()];
+    }
+
     @WriteClass(Weapon.class)
     public static void writeWeapon(ByteBuffer buffer, Weapon weapon){
         buffer.put(weapon.id);
@@ -55,6 +68,26 @@ public class TypeIO {
     @ReadClass(Weapon.class)
     public static Weapon readWeapon(ByteBuffer buffer){
         return Upgrade.getByID(buffer.get());
+    }
+
+    @WriteClass(Item.class)
+    public static void writeItem(ByteBuffer buffer, Item item){
+        buffer.put((byte)item.id);
+    }
+
+    @ReadClass(Item.class)
+    public static Item readItem(ByteBuffer buffer){
+        return Item.getByID(buffer.get());
+    }
+
+    @WriteClass(Recipe.class)
+    public static void writeRecipe(ByteBuffer buffer, Recipe recipe){
+        buffer.put((byte)recipe.id);
+    }
+
+    @ReadClass(Recipe.class)
+    public static Recipe readRecipe(ByteBuffer buffer){
+        return Recipe.getByID(buffer.get());
     }
 
     @WriteClass(String.class)

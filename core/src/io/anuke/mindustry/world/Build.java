@@ -2,10 +2,16 @@ package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.ValidateException;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.ucore.core.Effects;
@@ -20,7 +26,13 @@ public class Build {
     private static Array<Tile> tempTiles = new Array<>();
 
     /**Returns block type that was broken, or null if unsuccesful.*/
-    public static Block breakBlock(Team team, int x, int y, boolean effect, boolean sound){
+    @Remote(targets = Loc.both, forward = true, called = Loc.server, in = In.blocks)
+    public static Block breakBlock(Player player, Team team, int x, int y, boolean effect, boolean sound){
+
+        if(Net.server() && !validBreak(team, x, y)){
+            throw new ValidateException(player, "An invalid block has been broken.");
+        }
+
         Tile tile = world.tile(x, y);
 
         if(tile == null) return null;
@@ -47,7 +59,13 @@ public class Build {
     }
 
     /**Places a BuildBlock at this location. Call validPlace first.*/
-    public static void placeBlock(Team team, int x, int y, Recipe recipe, int rotation){
+    @Remote(targets = Loc.both, forward = true, called = Loc.server, in = In.blocks)
+    public static void placeBlock(Player player, Team team, int x, int y, Recipe recipe, int rotation){
+
+        if(Net.server() && !validPlace(team, x, y, recipe.result, rotation)){
+            throw new ValidateException(player, "An invalid block has been placed.");
+        }
+
         Tile tile = world.tile(x, y);
         Block result = recipe.result;
         Block previous = tile.block();
@@ -148,6 +166,5 @@ public class Build {
 
         return tile != null && !tile.block().unbreakable
                 && (!tile.isLinked() || !tile.getLinked().block().unbreakable) && tile.breakable() && (tile.getTeam() == Team.none || tile.getTeam() == team);
-
     }
 }

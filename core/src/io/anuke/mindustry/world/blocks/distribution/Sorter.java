@@ -1,7 +1,12 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.gen.CallBlocks;
+import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -95,12 +100,18 @@ public class Sorter extends Block implements SelectionTrait{
 	@Override
 	public void buildTable(Tile tile, Table table){
 		SorterEntity entity = tile.entity();
-		buildItemTable(table, () -> entity.sortItem, item -> entity.sortItem = item);
+		buildItemTable(table, () -> entity.sortItem, item -> CallBlocks.setSorterItem(null, tile, item));
 	}
 	
 	@Override
 	public TileEntity getEntity(){
 		return new SorterEntity();
+	}
+
+	@Remote(targets = Loc.both, called = Loc.both, in = In.blocks, forward = true)
+	public static void setSorterItem(Player player, Tile tile, Item item){
+		SorterEntity entity = tile.entity();
+		entity.sortItem = item;
 	}
 
 	public static class SorterEntity extends TileEntity{

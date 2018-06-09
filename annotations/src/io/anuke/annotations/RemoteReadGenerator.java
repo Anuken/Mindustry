@@ -107,31 +107,17 @@ public class RemoteReadGenerator {
                 }
             }
 
+            //execute the relevant method before the forward
+            //if it throws a ValidateException, the method won't be forwarded
+            readBlock.addStatement("$N." + entry.element.getSimpleName() + "(" + varResult.toString() + ")", ((TypeElement) entry.element.getEnclosingElement()).getQualifiedName().toString());
 
-
-            //begin lambda control flow
-            readBlock.beginControlFlow("com.badlogic.gdx.Gdx.app.postRunnable(() -> ");
-
-            //call forwarded method before the method, so if it throws a ValidateException, the method won't be forwarded
-            if(entry.forward && entry.where.isServer){
-                //try block to catch validate exception
-                readBlock.beginControlFlow("try");
-
+            //call forwarded method, don't forward on the client reader
+            if(entry.forward && entry.where.isServer && needsPlayer){
                 //call forwarded method
                 readBlock.addStatement(packageName + "." + entry.className + "." + entry.element.getSimpleName() +
                         "__forward(player.clientid" + (varResult.length() == 0 ? "" : ", ") + varResult.toString() + ")");
-
-                //when a ValidateException is caught, print the error and return
-                readBlock.nextControlFlow("catch (io.anuke.mindustry.net.ValidateException e)");
-                readBlock.addStatement("e.printStackTrace()");
-                readBlock.addStatement("return");
-                readBlock.endControlFlow();
             }
 
-            //execute the relevant method
-            readBlock.addStatement("$N." + entry.element.getSimpleName() + "(" + varResult.toString() + ")", ((TypeElement) entry.element.getEnclosingElement()).getQualifiedName().toString());
-            //end lambda
-            readBlock.endControlFlow(")");
         }
 
         //end control flow if necessary
