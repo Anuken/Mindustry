@@ -119,6 +119,6 @@ public class Weapon extends Upgrade {
 		Effects.effect(type.smokeEffect, x + weapon.tr.x, y + weapon.tr.y, rotation, player);
 
 		//reset timer for remote players
-		player.timer.getTime(left ? Player.timerShootLeft : Player.timerShootRight);
+		player.timer.reset(left ? Player.timerShootLeft : Player.timerShootRight, weapon.reload);
 	}
 }

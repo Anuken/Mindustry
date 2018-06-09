@@ -118,7 +118,6 @@ public class NetServer extends Module{
             player.mech = packet.mobile ? Mechs.standardShip : Mechs.standard;
             player.dead = true;
             player.setNet(player.x, player.y);
-            player.setNet(player.x, player.y);
             player.color.set(packet.color);
             connections.put(id, player);
 
@@ -198,7 +197,7 @@ public class NetServer extends Module{
                 NetConnection connection = Net.getConnection(player.clientid);
 
                 if(connection == null){
-                    Log.err("Player {0} failed to connect.", player.name);
+                    //player disconnected
                     connections.remove(player.clientid);
                     player.remove();
                     return;

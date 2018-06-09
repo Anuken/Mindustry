@@ -15,13 +15,13 @@ public class Annotations {
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.CLASS)
     public @interface Remote {
-        /**Specifies the locations where this method can be invoked.*/
+        /**Specifies the locations from which this method can be invoked.*/
         Loc targets() default Loc.server;
-        /**Specifies which methods are generated. Only affects client methods.*/
+        /**Specifies which methods are generated. Only affects server-to-client methods.*/
         Variant variants() default Variant.all;
         /**The local locations where this method is called.*/
         Loc called() default Loc.none;
-        /**Whether to forward this packet to all other clients.*/
+        /**Whether to forward this packet to all other clients upon recieval. Server only.*/
         boolean forward() default false;
         /**Whether the packet for this method is sent with UDP instead of TCP.
          * UDP is faster, but is prone to packet loss and duplication.*/

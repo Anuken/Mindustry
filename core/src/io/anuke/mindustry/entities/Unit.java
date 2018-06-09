@@ -63,6 +63,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
         x = interpolator.pos.x;
         y = interpolator.pos.y;
+
         if(interpolator.values.length > 0){
             rotation = interpolator.values[0];
         }

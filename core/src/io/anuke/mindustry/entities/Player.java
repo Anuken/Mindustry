@@ -7,6 +7,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Queue;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Weapons;
@@ -16,8 +18,10 @@ import io.anuke.mindustry.entities.traits.CarriableTrait;
 import io.anuke.mindustry.entities.traits.CarryTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
+import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
@@ -152,13 +156,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	@Override
 	public void damage(float amount){
-		hitTime = hitDuration;
-		if(!debug) {
-			health -= amount;
-			if(health <= 0 && !dead && isLocal){ //remote players don't die normally
-				onDeath();
-				dead = true;
-			}
+		CallEntity.onPlayerDamage(this, amount);
+
+		if(health <= 0 && !dead && isLocal){
+			CallEntity.onPlayerDeath(this);
 		}
 	}
 
@@ -167,19 +168,25 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		return super.collides(other) || other instanceof ItemDrop;
 	}
 
-	@Override
-	public void onDeath(){
-		dead = true;
-		respawning = false;
-		placeQueue.clear();
+	@Remote(in = In.entities, targets = Loc.server, called = Loc.server)
+	public static void onPlayerDamage(Player player, float amount){
+		player.hitTime = hitDuration;
+		player.health -= amount;
+	}
 
-        dropCarry();
+	@Remote(in = In.entities, targets = Loc.server, called = Loc.server)
+	public static void onPlayerDeath(Player player){
+		player.dead = true;
+		player.respawning = false;
+		player.placeQueue.clear();
 
-		float explosiveness = 2f + (inventory.hasItem() ? inventory.getItem().item.explosiveness * inventory.getItem().amount : 0f);
-		float flammability = (inventory.hasItem() ? inventory.getItem().item.flammability * inventory.getItem().amount : 0f);
-		Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, getSize()/2f, Palette.darkFlame);
-		Effects.sound("die", this);
-		super.onDeath();
+		player.dropCarry();
+
+		float explosiveness = 2f + (player.inventory.hasItem() ? player.inventory.getItem().item.explosiveness * player.inventory.getItem().amount : 0f);
+		float flammability = (player.inventory.hasItem() ? player.inventory.getItem().item.flammability * player.inventory.getItem().amount : 0f);
+		Damage.dynamicExplosion(player.x, player.y, flammability, explosiveness, 0f, player.getSize()/2f, Palette.darkFlame);
+		Effects.sound("die", player);
+		player.onDeath();
 	}
 
 	@Override
@@ -194,7 +201,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	@Override
 	public void removed() {
-		Log.info("\n\nPLAYER REMOVED\n\n");
         dropCarry();
 	}
 
@@ -217,8 +223,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		if((debug && (!showPlayer || !showUI)) || dead) return;
 
         boolean snap = snapCamera && isLocal;
-
-        String mname = mech.name;
 
 		float px = x, py =y;
 
@@ -370,17 +374,17 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	public void update(){
 		hitTime = Math.max(0f, hitTime - Timers.delta());
 
-		if(!isLocal){
-			//interpolate();
-			return;
-		}
-
 		if(isDead()){
 			CoreEntity entity = (CoreEntity)getClosestCore();
 
 			if(!respawning && entity != null && entity.trySetPlayer(this)){
 				respawning = true;
 			}
+			return;
+		}
+
+		if(!isLocal){
+			interpolate();
 			return;
 		}
 
@@ -624,12 +628,15 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	@Override
 	public void read(DataInput buffer, long time) throws IOException {
+		float lastx = x, lasty = y, lastrot = rotation;
 		super.readSave(buffer);
 		name = buffer.readUTF();
 		color.set(buffer.readInt());
 		dead = buffer.readBoolean();
 		weapon = Upgrade.getByID(buffer.readByte());
 		mech = Upgrade.getByID(buffer.readByte());
+		interpolator.read(lastx, lasty, x, y, time, rotation);
+		rotation = lastrot;
 	}
 
 	//endregion

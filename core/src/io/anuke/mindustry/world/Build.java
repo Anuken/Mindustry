@@ -8,6 +8,7 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
@@ -72,6 +73,11 @@ public class Build {
 
         //just in case
         if(tile == null) return;
+
+        //remote players only (?)
+        if(player.getPlaceQueue().size == 0){
+            player.getPlaceQueue().addFirst(new BuildRequest(x, y, rotation, recipe));
+        }
 
         Block sub = Block.getByName("build" + result.size);
 
