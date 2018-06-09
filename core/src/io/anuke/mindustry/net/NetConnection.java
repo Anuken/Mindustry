@@ -16,6 +16,9 @@ public abstract class NetConnection {
     /**Byte array of last sent snapshot.*/
     public byte[] lastSentSnapshot;
 
+    /**ID of last recieved client snapshot.*/
+    public int lastRecievedSnapshot = -1;
+
     public NetConnection(int id, String address){
         this.id = id;
         this.address = address;

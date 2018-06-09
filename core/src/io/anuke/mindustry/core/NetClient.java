@@ -1,6 +1,7 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import io.anuke.annotations.Annotations.Remote;
@@ -40,6 +41,8 @@ public class NetClient extends Module {
     private boolean quiet = false;
     /**Counter for data timeout.*/
     private float timeoutTime = 0f;
+    /**Last sent client snapshot ID.*/
+    private int lastSent;
     /**Last snapshot recieved.*/
     private byte[] lastSnapshot;
     /**Last snapshot ID recieved.*/
@@ -159,8 +162,9 @@ public class NetClient extends Module {
         if(timer.get(0, playerSyncTime)){
             Player player = players[0];
 
-            ClientSnapshotPacket packet = new ClientSnapshotPacket();
+            ClientSnapshotPacket packet = Pools.obtain(ClientSnapshotPacket.class);
             packet.lastSnapshot = lastSnapshotID;
+            packet.snapid = lastSent++;
             packet.player = player;
             Net.send(packet, SendMode.udp);
         }

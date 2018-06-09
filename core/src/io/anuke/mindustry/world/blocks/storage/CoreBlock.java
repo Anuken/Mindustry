@@ -151,7 +151,7 @@ public class CoreBlock extends StorageBlock {
 
             //instant build for fast testing.
             if(debug){
-                entity.progress = 1f;
+           //     entity.progress = 1f;
             }
 
             if(entity.progress >= 1f){

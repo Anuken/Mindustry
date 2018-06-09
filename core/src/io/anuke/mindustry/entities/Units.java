@@ -188,7 +188,7 @@ public class Units {
             EntityPhysics.getNearby(group, rect, entity -> cons.accept((Unit)entity));
         }
 
-        //now check all ally players
+        //now check all players
         EntityPhysics.getNearby(playerGroup, rect, player -> {
             if(((Unit)player).team == team) cons.accept((Unit)player);
         });

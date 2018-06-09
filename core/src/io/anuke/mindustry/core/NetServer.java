@@ -136,7 +136,19 @@ public class NetServer extends Module{
         });
 
         //update last recieved snapshot based on client snapshot
-        Net.handleServer(ClientSnapshotPacket.class, (id, packet) -> Net.getConnection(id).lastSnapshotID = packet.lastSnapshot);
+        Net.handleServer(ClientSnapshotPacket.class, (id, packet) ->{
+            Player player = connections.get(id);
+            NetConnection connection = Net.getConnection(id);
+            if(player == null || connection == null || packet.snapid < connection.lastRecievedSnapshot) return;
+
+            try {
+                player.read(packet.in, packet.timeSent);
+                connection.lastSnapshotID = packet.lastSnapshot;
+                connection.lastRecievedSnapshot = packet.snapid;
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        });
 
         Net.handleServer(InvokePacket.class, (id, packet) -> RemoteReadServer.readPacket(packet.writeBuffer, packet.type, connections.get(id)));
     }

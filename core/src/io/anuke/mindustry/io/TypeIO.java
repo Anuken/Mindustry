@@ -22,12 +22,17 @@ public class TypeIO {
 
     @WriteClass(Player.class)
     public static void writePlayer(ByteBuffer buffer, Player player){
-        buffer.putInt(player.id);
+        if(player == null){
+            buffer.putInt(-1);
+        }else {
+            buffer.putInt(player.id);
+        }
     }
 
     @ReadClass(Player.class)
     public static Player readPlayer(ByteBuffer buffer){
-        return playerGroup.getByID(buffer.getInt());
+        int id = buffer.getInt();
+        return id == -1 ? null : playerGroup.getByID(id);
     }
 
     @WriteClass(Tile.class)

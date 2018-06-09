@@ -1,7 +1,6 @@
 package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.utils.TimeUtils;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
@@ -97,17 +96,32 @@ public class Packets {
     }
 
     public static class ClientSnapshotPacket implements Packet{
+        /**For writing only.*/
         public Player player;
+
         public int lastSnapshot;
+        public int snapid;
+        public int length;
+        public long timeSent;
+
+        public byte[] bytes;
+        public ByteBuffer result;
+        public ByteBufferInput in;
 
         @Override
         public void write(ByteBuffer buffer) {
             ByteBufferOutput out = new ByteBufferOutput(buffer);
 
             buffer.putInt(lastSnapshot);
-            buffer.putInt(player.id);
+            buffer.putInt(snapid);
             buffer.putLong(TimeUtils.millis());
+
+            int position = buffer.position();
             try {
+                player.write(out);
+                length = buffer.position() - position;
+                buffer.position(position);
+                buffer.putInt(length);
                 player.write(out);
             }catch (IOException e){
                 e.printStackTrace();
@@ -116,17 +130,20 @@ public class Packets {
 
         @Override
         public void read(ByteBuffer buffer) {
-            ByteBufferInput in = new ByteBufferInput(buffer);
 
             lastSnapshot = buffer.getInt();
-            int id = buffer.getInt();
-            long time = buffer.getLong();
-            player = Vars.playerGroup.getByID(id);
-            try {
-                player.read(in, time);
-            }catch (IOException e){
-                e.printStackTrace();
+            snapid = buffer.getInt();
+            timeSent = buffer.getLong();
+            length = buffer.getInt();
+
+            if(bytes == null || bytes.length != length){
+                bytes = new byte[length];
+                result = ByteBuffer.wrap(bytes);
+                in = new ByteBufferInput(result);
             }
+
+            buffer.get(bytes);
+            result.position(0);
         }
     }
 

@@ -101,7 +101,7 @@ public class Weapon extends Upgrade {
 		Bullet.create(owner.inventory.getAmmo().bullet, owner, x + tr.x, y + tr.y, angle);
 	}
 
-	@Remote(targets = Loc.both, called = Loc.both, in = In.entities, forward = true)
+	@Remote(targets = Loc.both, called = Loc.both, in = In.entities, unreliable = true, forward = true)
 	public static void onShootWeapon(Player player, Weapon weapon, float x, float y, float rotation, boolean left){
 		Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> weapon.bullet(player, x, y, f + Mathf.range(weapon.inaccuracy)));
 
@@ -119,6 +119,6 @@ public class Weapon extends Upgrade {
 		Effects.effect(type.smokeEffect, x + weapon.tr.x, y + weapon.tr.y, rotation, player);
 
 		//reset timer for remote players
-		player.timer.reset(left ? Player.timerShootLeft : Player.timerShootRight, weapon.reload);
+		player.timer.get(left ? Player.timerShootLeft : Player.timerShootRight, weapon.reload);
 	}
 }
