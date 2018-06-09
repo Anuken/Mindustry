@@ -141,13 +141,9 @@ public class NetServer extends Module{
             NetConnection connection = Net.getConnection(id);
             if(player == null || connection == null || packet.snapid < connection.lastRecievedSnapshot) return;
 
-            try {
-                player.read(packet.in, packet.timeSent);
-                connection.lastSnapshotID = packet.lastSnapshot;
-                connection.lastRecievedSnapshot = packet.snapid;
-            }catch (IOException e){
-                e.printStackTrace();
-            }
+            player.getInterpolator().read(player.x, player.y, packet.x, packet.y, packet.timeSent, packet.rotation, packet.baseRotation);
+            connection.lastSnapshotID = packet.lastSnapshot;
+            connection.lastRecievedSnapshot = packet.snapid;
         });
 
         Net.handleServer(InvokePacket.class, (id, packet) -> RemoteReadServer.readPacket(packet.writeBuffer, packet.type, connections.get(id)));

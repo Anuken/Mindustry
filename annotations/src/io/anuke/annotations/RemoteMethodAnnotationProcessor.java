@@ -98,7 +98,7 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
 
                     //can't generate none methods
                     if (annotation.targets() == Loc.none) {
-                        Utils.messager.printMessage(Kind.ERROR, "A @Remote method's where() cannot be equal to 'none':", element);
+                        Utils.messager.printMessage(Kind.ERROR, "A @Remote method's targets() cannot be equal to 'none':", element);
                     }
 
                     //get and create class entry if needed
@@ -106,6 +106,8 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
                         ClassEntry clas = new ClassEntry(annotation.in());
                         classMap.put(annotation.in(), clas);
                         classes.add(clas);
+
+                        Utils.messager.printMessage(Kind.NOTE, "Generating class '" + clas.name + "'.");
                     }
 
                     ClassEntry entry = classMap.get(annotation.in());

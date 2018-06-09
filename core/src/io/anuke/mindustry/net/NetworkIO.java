@@ -1,6 +1,7 @@
 package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
@@ -35,6 +36,14 @@ public class NetworkIO {
             //--GENERAL STATE--
             stream.writeByte(state.mode.ordinal()); //gamemode
             stream.writeUTF(world.getMap().name); //map name
+
+            //write tags
+            ObjectMap<String, String> tags = world.getMap().meta.tags;
+            stream.writeByte(tags.size);
+            for(Entry<String, String> entry : tags.entries()){
+                stream.writeUTF(entry.key);
+                stream.writeUTF(entry.value);
+            }
 
             stream.writeInt(state.wave); //wave
             stream.writeFloat(state.wavetime); //wave countdown
@@ -109,6 +118,14 @@ public class NetworkIO {
             //general state
             byte mode = stream.readByte();
             String map = stream.readUTF();
+            ObjectMap<String, String> tags = new ObjectMap<>();
+
+            byte tagSize = stream.readByte();
+            for (int i = 0; i < tagSize; i++) {
+                String key = stream.readUTF();
+                String value = stream.readUTF();
+                tags.put(key, value);
+            }
 
             int wave = stream.readInt();
             float wavetime = stream.readFloat();
@@ -135,6 +152,8 @@ public class NetworkIO {
             //TODO send advanced map meta such as author, etc
             //TODO scan for cores
             Map currentMap = new Map(map, new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
+            currentMap.meta.tags.clear();
+            currentMap.meta.tags.putAll(tags);
             world.setMap(currentMap);
 
             Tile[][] tiles = world.createTiles(width, height);

@@ -3,17 +3,21 @@ package io.anuke.mindustry.entities.effect;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pools;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.type.Item;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.entities.impl.TimedEntity;
+import io.anuke.ucore.entities.trait.DrawTrait;
+import io.anuke.ucore.entities.trait.PosTrait;
 import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.entities.trait.PosTrait;
 
 import static io.anuke.mindustry.Vars.effectGroup;
 
@@ -25,6 +29,17 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
     private float seed;
     private PosTrait to;
     private Callable done;
+
+    @Remote(in = In.entities, called = Loc.server, unreliable = true)
+    public static void transferAmmo(Item item, float x, float y, Unit to){
+        to.addAmmo(item);
+        create(item, x, y, to, () -> {});
+    }
+
+    @Remote(in = In.entities, called = Loc.server, unreliable = true)
+    public static void transferItemEffect(Item item, float x, float y, Unit to){
+        create(item, x, y, to, () -> {});
+    }
 
     public static void create(Item item, float fromx, float fromy, PosTrait to, Callable done){
         ItemTransfer tr = Pools.obtain(ItemTransfer.class);

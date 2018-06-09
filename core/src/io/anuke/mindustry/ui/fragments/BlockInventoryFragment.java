@@ -4,10 +4,14 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.IntSet;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.effect.ItemTransfer;
+import io.anuke.mindustry.gen.CallBlocks;
+import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.input.InputHandler;
+import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.world.Tile;
@@ -106,12 +110,14 @@ public class BlockInventoryFragment implements Fragment {
                 image.tapped(() -> {
                     if(!canPick.get() || items[f] == 0) return;
                     int amount = Math.min(Inputs.keyDown("item_withdraw") ? items[f] : 1, player.inventory.itemCapacityUsed(item));
-                    tile.block().removeStack(tile, item, amount);
+
+                   /* tile.block().removeStack(tile, item, amount);
 
                     player.inventory.addItem(item, amount);
                     for(int j = 0; j < Mathf.clamp(amount/3, 1, 8); j ++){
                         Timers.run(j*3f, () -> ItemTransfer.create(item, tile.drawx(), tile.drawy(), player, () -> {}));
-                    }
+                    }*/
+                    CallBlocks.requestItem(tile, item, amount);
 
                 });
                 table.add(image);
@@ -142,4 +148,13 @@ public class BlockInventoryFragment implements Fragment {
         table.setPosition(v.x, v.y, Align.center);
     }
 
+    @Remote(called = Loc.server, targets = Loc.client, in = In.blocks)
+    public static void requestItem(Player player, Tile tile, Item item, int amount){
+        int removed = tile.block().removeStack(tile, item, amount);
+
+        player.inventory.addItem(item, removed);
+        for(int j = 0; j < Mathf.clamp(removed/3, 1, 8); j ++){
+            Timers.run(j*3f, () -> CallEntity.transferItemEffect(item, tile.drawx(), tile.drawy(), player));
+        }
+    }
 }

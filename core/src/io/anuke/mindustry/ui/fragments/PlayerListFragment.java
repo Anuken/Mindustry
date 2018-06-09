@@ -218,7 +218,8 @@ public class PlayerListFragment implements Fragment{
         else {
             for(int i = 0; i < currentEditLogs.size; i++) {
                 EditLog log = currentEditLogs.get(i);
-                table.add("[gold]" + (i + 1) + ". [white]" + log.info()).left();
+                //TODO display log info.
+                table.add("[gold]" + (i + 1) + ". [white]INVALID").left();
                 table.row();
             }
         }

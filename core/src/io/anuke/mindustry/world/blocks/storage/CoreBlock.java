@@ -10,8 +10,8 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.gen.CallBlocks;
+import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.In;
@@ -180,7 +180,7 @@ public class CoreBlock extends StorageBlock {
                     if(tile.entity.items.items[i] > 0 && unit.acceptsAmmo(item)){
                         tile.entity.items.items[i] --;
                         unit.addAmmo(item);
-                        ItemTransfer.create(item, tile.drawx(), tile.drawy(), unit, () -> {});
+                        CallEntity.transferAmmo(item, tile.drawx(), tile.drawy(), unit);
                         return;
                     }
                 }

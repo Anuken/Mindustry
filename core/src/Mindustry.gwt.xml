@@ -2,6 +2,7 @@
 <module>
 	<source path="io/anuke/mindustry" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.Tile" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.game.Content" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.io.Maps" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.Player" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.units.BaseUnit" />
@@ -15,7 +16,7 @@
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.net.Packets" />
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.net.Packet" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.effect" />
-	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.Bullet" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.bullet.Bullet" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.type.Recipe" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.net.Streamable" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.meta.BlockBar" />

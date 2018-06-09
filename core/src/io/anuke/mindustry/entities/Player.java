@@ -89,6 +89,19 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	//region unit and event overrides, utility methods
 
+    @Override
+    public void interpolate() {
+        super.interpolate();
+
+        if(interpolator.values.length > 1){
+            baseRotation = interpolator.values[1];
+        }
+
+        if(interpolator.target.dst(interpolator.last) > 1f){
+            walktime += Timers.delta();
+        }
+    }
+
 	@Override
 	public CarriableTrait getCarry() {
 		return carrying;
@@ -568,6 +581,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		return control.input(playerIndex).canShoot() && control.input(playerIndex).isShooting() && inventory.hasAmmo();
 	}
 
+	@Override
 	public Queue<BuildRequest> getPlaceQueue(){
 		return placeQueue;
 	}

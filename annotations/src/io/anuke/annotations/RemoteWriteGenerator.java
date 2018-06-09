@@ -28,7 +28,6 @@ public class RemoteWriteGenerator {
 
         for(ClassEntry entry : entries){
             //create builder
-            System.out.println("Generating class! " + entry.name);
             TypeSpec.Builder classBuilder = TypeSpec.classBuilder(entry.name).addModifiers(Modifier.PUBLIC);
 
             //add temporary write buffer
@@ -107,7 +106,12 @@ public class RemoteWriteGenerator {
             int index = 0;
             StringBuilder results = new StringBuilder();
             for(VariableElement var : elem.getParameters()){
-                results.append(var.getSimpleName());
+                //special case: calling local-only methods uses the local player
+                if(index == 0 && methodEntry.where == Loc.client){
+                    results.append("io.anuke.mindustry.Vars.players[0]");
+                }else {
+                    results.append(var.getSimpleName());
+                }
                 if(index != elem.getParameters().size() - 1) results.append(", ");
                 index ++;
             }
@@ -151,7 +155,7 @@ public class RemoteWriteGenerator {
             //captialized version of type name for writing primitives
             String capName = typeName.equals("byte") ? "" : Character.toUpperCase(typeName.charAt(0)) + typeName.substring(1);
             //special case: method can be called from anywhere to anywhere
-            //thus, only write the player when the SERVER is writing data, since the client is the only one who reads that
+            //thus, only write the player when the SERVER is writing data, since the client is the only one who reads it
             boolean writePlayerSkipCheck = methodEntry.where == Loc.both && methodEntry.local == Loc.both && i == 0;
 
             if(writePlayerSkipCheck){ //write begin check

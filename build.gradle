@@ -27,7 +27,7 @@ allprojects {
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'
         aiVersion = '1.8.1'
-        uCoreVersion = 'a91031d'
+        uCoreVersion = 'f0adaff'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -97,6 +97,8 @@ project(":html") {
 
     dependencies {
         compile project(":core")
+        compileOnly project(":annotations")
+
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
@@ -108,6 +110,10 @@ project(":html") {
         compile "com.sksamuel.gwt:gwt-websockets:1.0.4"
         compile "com.sksamuel.gwt:gwt-websockets:1.0.4:sources"
     }
+
+    compileJava.options.compilerArgs = [
+        "-processor", "io.anuke.annotations.RemoteMethodAnnotationProcessor"
+    ]
 }
 
 project(":android") {

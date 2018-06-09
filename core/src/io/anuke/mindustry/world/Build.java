@@ -75,7 +75,8 @@ public class Build {
         if(tile == null) return;
 
         //remote players only (?)
-        if(player.getPlaceQueue().size == 0){
+        if(false){
+            player.getPlaceQueue().clear();
             player.getPlaceQueue().addFirst(new BuildRequest(x, y, rotation, recipe));
         }
 

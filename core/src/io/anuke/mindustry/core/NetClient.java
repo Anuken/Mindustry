@@ -165,7 +165,6 @@ public class NetClient extends Module {
             ClientSnapshotPacket packet = Pools.obtain(ClientSnapshotPacket.class);
             packet.lastSnapshot = lastSnapshotID;
             packet.snapid = lastSent++;
-            packet.player = player;
             Net.send(packet, SendMode.udp);
         }
 

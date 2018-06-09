@@ -1,15 +1,13 @@
 package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packet.UnimportantPacket;
-import io.anuke.ucore.io.ByteBufferInput;
-import io.anuke.ucore.io.ByteBufferOutput;
 import io.anuke.ucore.io.IOUtils;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**Class for storing all packets.*/
@@ -96,54 +94,38 @@ public class Packets {
     }
 
     public static class ClientSnapshotPacket implements Packet{
-        /**For writing only.*/
-        public Player player;
-
+        //snapshot meta
         public int lastSnapshot;
         public int snapid;
-        public int length;
         public long timeSent;
-
-        public byte[] bytes;
-        public ByteBuffer result;
-        public ByteBufferInput in;
+        //player snapshot data
+        public float x, y, rotation, baseRotation;
 
         @Override
         public void write(ByteBuffer buffer) {
-            ByteBufferOutput out = new ByteBufferOutput(buffer);
+            Player player = Vars.players[0];
 
             buffer.putInt(lastSnapshot);
             buffer.putInt(snapid);
             buffer.putLong(TimeUtils.millis());
 
-            int position = buffer.position();
-            try {
-                player.write(out);
-                length = buffer.position() - position;
-                buffer.position(position);
-                buffer.putInt(length);
-                player.write(out);
-            }catch (IOException e){
-                e.printStackTrace();
-            }
+            buffer.putFloat(player.x);
+            buffer.putFloat(player.y);
+            //saving 4 bytes, yay?
+            buffer.putShort((short)(player.rotation*2));
+            buffer.putShort((short)(player.baseRotation*2));
         }
 
         @Override
         public void read(ByteBuffer buffer) {
-
             lastSnapshot = buffer.getInt();
             snapid = buffer.getInt();
             timeSent = buffer.getLong();
-            length = buffer.getInt();
 
-            if(bytes == null || bytes.length != length){
-                bytes = new byte[length];
-                result = ByteBuffer.wrap(bytes);
-                in = new ByteBufferInput(result);
-            }
-
-            buffer.get(bytes);
-            result.position(0);
+            x = buffer.getFloat();
+            y = buffer.getFloat();
+            rotation = buffer.getShort()/2f;
+            baseRotation = buffer.getShort()/2f;
         }
     }
 
