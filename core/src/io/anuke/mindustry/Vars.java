@@ -123,7 +123,6 @@ public class Vars{
 	public static Renderer renderer;
 	public static UI ui;
 	public static World world;
-	public static NetCommon netCommon;
 	public static NetServer netServer;
 	public static NetClient netClient;
 	

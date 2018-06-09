@@ -1,6 +1,7 @@
 package io.anuke.annotations;
 
 import com.squareup.javapoet.*;
+import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.IOFinder.ClassSerializer;
 
 import javax.lang.model.element.ExecutableElement;
@@ -27,6 +28,7 @@ public class RemoteWriteGenerator {
 
         for(ClassEntry entry : entries){
             //create builder
+            System.out.println("Generating class! " + entry.name);
             TypeSpec.Builder classBuilder = TypeSpec.classBuilder(entry.name).addModifiers(Modifier.PUBLIC);
 
             //add temporary write buffer
@@ -36,13 +38,18 @@ public class RemoteWriteGenerator {
             //go through each method entry in this class
             for(MethodEntry methodEntry : entry.methods){
                 //write the 'send event to all players' variant: always happens for clients, but only happens if 'all' is enabled on the server method
-                if(!methodEntry.server || methodEntry.allVariant){
-                    writeMethodVariant(classBuilder, methodEntry, true);
+                if(methodEntry.where.isClient || methodEntry.target.isAll){
+                    writeMethodVariant(classBuilder, methodEntry, true, false);
                 }
 
-                //write the 'send even to one player' variant, which is only applicable on the server
-                if(methodEntry.server && methodEntry.oneVariant){
-                    writeMethodVariant(classBuilder, methodEntry, false);
+                //write the 'send event to one player' variant, which is only applicable on the server
+                if(methodEntry.where.isServer && methodEntry.target.isOne){
+                    writeMethodVariant(classBuilder, methodEntry, false, false);
+                }
+
+                //write the forwarded method version
+                if(methodEntry.where.isServer && methodEntry.forward){
+                    writeMethodVariant(classBuilder, methodEntry, true, true);
                 }
             }
 
@@ -53,16 +60,16 @@ public class RemoteWriteGenerator {
     }
 
     /**Creates a specific variant for a method entry.*/
-    private void writeMethodVariant(TypeSpec.Builder classBuilder, MethodEntry methodEntry, boolean toAll){
+    private void writeMethodVariant(TypeSpec.Builder classBuilder, MethodEntry methodEntry, boolean toAll, boolean forwarded){
         ExecutableElement elem = methodEntry.element;
 
         //create builder
-        MethodSpec.Builder method = MethodSpec.methodBuilder(elem.getSimpleName().toString())
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        MethodSpec.Builder method = MethodSpec.methodBuilder(elem.getSimpleName().toString() + (forwarded ? "__forward" : "")) //add except suffix when forwarding
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.SYNCHRONIZED)
                 .returns(void.class);
 
         //validate client methods to make sure
-        if(!methodEntry.server){
+        if(methodEntry.where.isClient){
             if(elem.getParameters().isEmpty()){
                 Utils.messager.printMessage(Kind.ERROR, "Client invoke methods must have a first parameter of type Player.", elem);
                 return;
@@ -79,8 +86,18 @@ public class RemoteWriteGenerator {
             method.addParameter(int.class, "playerClientID");
         }
 
-        //call local method if applicable
-        if(methodEntry.local && methodEntry.server){
+        //add sender to ignore
+        if(forwarded){
+            method.addParameter(int.class, "exceptSenderID");
+        }
+
+        //call local method if applicable, shouldn't happen when forwarding method as that already happens by default
+        if(!forwarded && methodEntry.local != Loc.none){
+            //add in local checks
+            if(methodEntry.local != Loc.both){
+                method.beginControlFlow("if("+getCheckString(methodEntry.local) + " || !io.anuke.mindustry.net.Net.active())");
+            }
+
             //concatenate parameters
             int index = 0;
             StringBuilder results = new StringBuilder();
@@ -93,21 +110,27 @@ public class RemoteWriteGenerator {
             //add the statement to call it
             method.addStatement("$N." + elem.getSimpleName() + "(" + results.toString() + ")",
                     ((TypeElement)elem.getEnclosingElement()).getQualifiedName().toString());
+
+            if(methodEntry.local != Loc.both){
+                method.endControlFlow();
+            }
         }
 
         //start control flow to check if it's actually client/server so no netcode is called
-        method.beginControlFlow("if(io.anuke.mindustry.net.Net." + (!methodEntry.server ? "client" : "server")+"())");
+        method.beginControlFlow("if("+getCheckString(methodEntry.where)+")");
 
         //add statement to create packet from pool
         method.addStatement("$1N packet = $2N.obtain($1N.class)", "io.anuke.mindustry.net.Packets.InvokePacket", "com.badlogic.gdx.utils.Pools");
         //assign buffer
         method.addStatement("packet.writeBuffer = TEMP_BUFFER");
+        //assign method ID
+        method.addStatement("packet.type = (byte)" + methodEntry.id);
         //rewind buffer
         method.addStatement("TEMP_BUFFER.position(0)");
 
         for(int i = 0; i < elem.getParameters().size(); i ++){
             //first argument is skipped as it is always the player caller
-            if(!methodEntry.server && i == 0){
+            if((!methodEntry.where.isServer/* || methodEntry.mode == Loc.both*/) && i == 0){
                 continue;
             }
 
@@ -147,21 +170,31 @@ public class RemoteWriteGenerator {
         //assign packet length
         method.addStatement("packet.writeLength = TEMP_BUFFER.position()");
 
-        //send the actual packet
-        if(toAll){
-            //send to all players / to server
-            method.addStatement("io.anuke.mindustry.net.Net.send(packet, "+
-                    (methodEntry.unreliable ? "io.anuke.mindustry.net.Net.SendMode.udp" : "io.anuke.mindustry.net.Net.SendMode.tcp")+")");
-        }else{
-            //send to specific client from server
-            method.addStatement("io.anuke.mindustry.net.Net.sendTo(playerClientID, packet, "+
-                    (methodEntry.unreliable ? "io.anuke.mindustry.net.Net.SendMode.udp" : "io.anuke.mindustry.net.Net.SendMode.tcp")+")");
+        String sendString;
+
+        if(forwarded){ //forward packet
+            sendString = "sendExcept(exceptSenderID, ";
+        }else if(toAll){ //send to all players / to server
+            sendString = "send(";
+        }else{ //send to specific client from server
+            sendString = "sendTo(playerClientID, ";
         }
+
+        //send the actual packet
+        method.addStatement("io.anuke.mindustry.net.Net." + sendString + "packet, "+
+                (methodEntry.unreliable ? "io.anuke.mindustry.net.Net.SendMode.udp" : "io.anuke.mindustry.net.Net.SendMode.tcp")+")");
+
 
         //end check for server/client
         method.endControlFlow();
 
         //add method to class, finally
         classBuilder.addMethod(method.build());
+    }
+
+    private String getCheckString(Loc loc){
+        return loc.isClient && loc.isServer ? "io.anuke.mindustry.net.Net.server() || io.anuke.mindustry.net.Net.client()" :
+               loc.isClient ? "io.anuke.mindustry.net.Net.client()" :
+               loc.isServer ? "io.anuke.mindustry.net.Net.server()" : "false";
     }
 }

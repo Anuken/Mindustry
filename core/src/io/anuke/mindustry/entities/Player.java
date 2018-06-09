@@ -30,7 +30,9 @@ import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.*;
 
-import java.io.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -192,6 +194,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	@Override
 	public void removed() {
+		Log.info("\n\nPLAYER REMOVED\n\n");
         dropCarry();
 	}
 
@@ -368,7 +371,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		hitTime = Math.max(0f, hitTime - Timers.delta());
 
 		if(!isLocal){
-			interpolate();
+			//interpolate();
 			return;
 		}
 
@@ -552,9 +555,9 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		dead = true;
 		respawning = false;
 		trail.clear();
+		health = maxHealth();
 
 		add();
-		heal();
 	}
 
 	public boolean isShooting(){
@@ -601,7 +604,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	private void readSaveSuper(DataInput stream) throws IOException {
 		super.readSave(stream);
-
 		byte uamount = stream.readByte();
 		for (int i = 0; i < uamount; i++) {
 			upgrades.add(Upgrade.getByID(stream.readByte()));
@@ -611,13 +613,23 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	}
 
 	@Override
-	public void write(DataOutput buffer) {
-		//todo
+	public void write(DataOutput buffer) throws IOException {
+		super.writeSave(buffer);
+		buffer.writeUTF(name);
+		buffer.writeInt(Color.rgba8888(color));
+		buffer.writeBoolean(dead);
+		buffer.writeByte(weapon.id);
+		buffer.writeByte(mech.id);
 	}
 
 	@Override
-	public void read(DataInput buffer, long time) {
-		//todo
+	public void read(DataInput buffer, long time) throws IOException {
+		super.readSave(buffer);
+		name = buffer.readUTF();
+		color.set(buffer.readInt());
+		dead = buffer.readBoolean();
+		weapon = Upgrade.getByID(buffer.readByte());
+		mech = Upgrade.getByID(buffer.readByte());
 	}
 
 	//endregion

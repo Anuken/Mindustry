@@ -229,7 +229,7 @@ public class ServerControl extends Module {
                 return;
             }
 
-            netCommon.sendMessage("[GRAY][[Server]:[] " + arg[0]);
+            //netCommon.sendMessage("[GRAY][[Server]:[] " + arg[0]);
             info("&lyServer: &lb{0}", arg[0]);
         });
 

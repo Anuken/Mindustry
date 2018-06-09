@@ -3,6 +3,7 @@ package io.anuke.mindustry.core;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
@@ -32,10 +33,8 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class NetServer extends Module{
-    private final static float serverSyncTime = 4, itemSyncTime = 10, kickDuration = 30 * 1000;
-
-    private final static int timerEntitySync = 0;
-    private final static int timerStateSync = 1;
+    private final static float serverSyncTime = 4, kickDuration = 30 * 1000;
+    private final static boolean preventDuplicatNames = false;
 
     public final Administration admins = new Administration();
 
@@ -58,7 +57,13 @@ public class NetServer extends Module{
             }
         });
 
-        Net.handleServer(Disconnect.class, (id, packet) -> {});
+        Net.handleServer(Disconnect.class, (id, packet) -> {
+            Player player = connections.get(id);
+            if(player != null){
+                Call.sendMessage("[accent]" + player.name + " has disconnected.");
+                player.remove();
+            }
+        });
 
         Net.handleServer(ConnectPacket.class, (id, packet) -> {
             String uuid = new String(Base64Coder.encode(packet.uuid));
@@ -81,10 +86,12 @@ public class NetServer extends Module{
                 return;
             }
 
-            for(Player player : playerGroup.all()){
-                if(player.name.equalsIgnoreCase(packet.name)){
-                    kick(id, KickReason.nameInUse);
-                    return;
+            if(preventDuplicatNames) {
+                for (Player player : playerGroup.all()) {
+                    if (player.name.equalsIgnoreCase(packet.name)) {
+                        kick(id, KickReason.nameInUse);
+                        return;
+                    }
                 }
             }
 
@@ -172,6 +179,7 @@ public class NetServer extends Module{
         }
 
         //TODO kick player, send kick packet
+        Call.onKick(connection, reason);
 
         Timers.runTask(2f, con::close);
 
@@ -184,15 +192,21 @@ public class NetServer extends Module{
 
     void sync(){
         try {
-            //TODO implement snapshot packets w/ delta compression
 
             //iterate through each player
             for (Player player : connections.values()) {
                 NetConnection connection = Net.getConnection(player.clientid);
 
+                if(connection == null){
+                    Log.err("Player {0} failed to connect.", player.name);
+                    connections.remove(player.clientid);
+                    player.remove();
+                    return;
+                }
+
                 if(!player.timer.get(Player.timeSync, serverSyncTime)) continue;
 
-                //if the player hasn't acknolwedged that it has recieved the packet, send the same thing again
+                //if the player hasn't acknowledged that it has recieved the packet, send the same thing again
                 if(connection.lastSentSnapshotID > connection.lastSnapshotID){
                     Call.onSnapshot(connection.id, connection.lastSentSnapshot, connection.lastSentSnapshotID);
                     return;
@@ -215,7 +229,7 @@ public class NetServer extends Module{
 
                 //check for syncable groups
                 for (EntityGroup<?> group : Entities.getAllGroups()) {
-                    //TODO range-check sync positions?
+                    //TODO range-check sync positions to optimize?
                     if (group.isEmpty() || !(group.all().get(0) instanceof SyncTrait)) continue;
 
                     //make sure mapping is enabled for this group
@@ -223,13 +237,20 @@ public class NetServer extends Module{
                         throw new RuntimeException("Entity group '" + group.getType() + "' contains SyncTrait entities, yet mapping is not enabled. In order for syncing to work, you must enable mapping for this group.");
                     }
 
+                    int size = group.size();
+
+                    if(group.getType() == Player.class){
+                        size --;
+                    }
+
                     //write group ID + group size
                     dataStream.writeByte(group.getID());
-                    dataStream.writeShort(group.size());
+                    dataStream.writeShort(size);
                     //write timestamp
                     dataStream.writeLong(TimeUtils.millis());
 
                     for(Entity entity : group.all()){
+                        if(entity == player) continue;
                         //write all entities now
                         dataStream.writeInt(entity.getID());
                         ((SyncTrait)entity).write(dataStream);
@@ -237,17 +258,17 @@ public class NetServer extends Module{
                 }
 
                 byte[] bytes = syncStream.toByteArray();
-                if(connection.lastSnapshot == null){
+                connection.lastSentSnapshot = bytes;
+                if(connection.lastSnapshotID == -1){
                     //no snapshot to diff, send it all
-                    Call.onSnapshot(connection.id, bytes, -1);
+                    Call.onSnapshot(connection.id, bytes, 0);
+                    connection.lastSnapshotID = 0;
                 }else{
-                    //increment snapshot ID
-                    connection.lastSnapshotID ++;
                     //send diff, otherwise
                     byte[] diff = ByteDeltaEncoder.toDiff(new ByteMatcherHash(connection.lastSnapshot, bytes), encoder);
-                    Call.onSnapshot(connection.id, diff, connection.lastSnapshotID);
-
-                    connection.lastSentSnapshot = bytes;
+                    Call.onSnapshot(connection.id, diff, connection.lastSnapshotID + 1);
+                    //increment snapshot ID
+                    connection.lastSentSnapshotID ++;
                 }
             }
 
@@ -256,10 +277,10 @@ public class NetServer extends Module{
         }
     }
 
-    @Remote(server = false)
+    @Remote(targets = Loc.client)
     public static void connectConfirm(Player player){
         player.add();
-        netCommon.sendMessage("[accent]" + player.name + " has connected.");
+        Call.sendMessage("[accent]" + player.name + " has connected.");
         Log.info("&y{0} has connected.", player.name);
     }
 }

@@ -3,14 +3,14 @@ package io.anuke.mindustry.net;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.gen.RemoteReadClient;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packet.UnimportantPacket;
+import io.anuke.ucore.io.ByteBufferInput;
 import io.anuke.ucore.io.ByteBufferOutput;
 import io.anuke.ucore.io.IOUtils;
-import io.anuke.ucore.io.ByteBufferInput;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**Class for storing all packets.*/
@@ -66,19 +66,17 @@ public class Packets {
         @Override
         public void read(ByteBuffer buffer) {
             type = buffer.get();
-
-            if(Net.client()){
-                RemoteReadClient.readPacket(buffer, type);
-            }else{
-                byte[] bytes = new byte[writeLength];
-                buffer.get(bytes);
-                writeBuffer = ByteBuffer.wrap(bytes);
-            }
+            writeLength = buffer.getShort();
+            byte[] bytes = new byte[writeLength];
+            buffer.get(bytes);
+            writeBuffer = ByteBuffer.wrap(bytes);
         }
 
         @Override
         public void write(ByteBuffer buffer) {
             buffer.put(type);
+            buffer.putShort((short)writeLength);
+
             writeBuffer.position(0);
             for(int i = 0; i < writeLength; i ++){
                 buffer.put(writeBuffer.get());
@@ -109,7 +107,11 @@ public class Packets {
             buffer.putInt(lastSnapshot);
             buffer.putInt(player.id);
             buffer.putLong(TimeUtils.millis());
-            player.write(out);
+            try {
+                player.write(out);
+            }catch (IOException e){
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -120,7 +122,11 @@ public class Packets {
             int id = buffer.getInt();
             long time = buffer.getLong();
             player = Vars.playerGroup.getByID(id);
-            player.read(in, time);
+            try {
+                player.read(in, time);
+            }catch (IOException e){
+                e.printStackTrace();
+            }
         }
     }
 

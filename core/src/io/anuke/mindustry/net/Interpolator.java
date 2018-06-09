@@ -10,7 +10,7 @@ public class Interpolator {
     //used for movement
     public Vector2 target = new Vector2();
     public Vector2 last = new Vector2();
-    public float[] targets;
+    public float[] targets = {};
     public float spacing = 1f;
     public float time;
 

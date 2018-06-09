@@ -2,17 +2,24 @@ package io.anuke.mindustry.world.blocks.storage;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.Fx;
-import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.ItemTransfer;
+import io.anuke.mindustry.gen.CallBlocks;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
+import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
-import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
@@ -20,6 +27,10 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.EnumSet;
 import io.anuke.ucore.util.Mathf;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.debug;
 import static io.anuke.mindustry.Vars.state;
@@ -130,7 +141,7 @@ public class CoreBlock extends StorageBlock {
         CoreEntity entity = tile.entity();
 
         if(!entity.solid && !Units.anyEntities(tile)){
-            entity.solid = true;
+            CallBlocks.setCoreSolid(tile, true);
         }
 
         if(entity.currentPlayer != null){
@@ -145,8 +156,8 @@ public class CoreBlock extends StorageBlock {
 
             if(entity.progress >= 1f){
                 Effects.effect(Fx.spawn, entity);
+                CallBlocks.setCoreSolid(tile, false);
                 entity.progress = 0;
-                entity.solid = false;
                 entity.currentPlayer.heal();
                 entity.currentPlayer.rotation = 90f;
                 entity.currentPlayer.baseRotation = 90f;
@@ -182,6 +193,12 @@ public class CoreBlock extends StorageBlock {
         return new CoreEntity();
     }
 
+    @Remote(called = Loc.server, in = In.blocks)
+    public static void setCoreSolid(Tile tile, boolean solid){
+        CoreEntity entity = tile.entity();
+        entity.solid = solid;
+    }
+
     public class CoreEntity extends TileEntity{
         Player currentPlayer;
         boolean solid = true;
@@ -195,6 +212,16 @@ public class CoreBlock extends StorageBlock {
             currentPlayer = player;
             progress = 0f;
             return true;
+        }
+
+        @Override
+        public void write(DataOutputStream stream) throws IOException {
+            stream.writeBoolean(solid);
+        }
+
+        @Override
+        public void read(DataInputStream stream) throws IOException {
+            solid = stream.readBoolean();
         }
     }
 }

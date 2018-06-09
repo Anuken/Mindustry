@@ -2,10 +2,14 @@ package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.annotations.Annotations.Remote;
+import io.anuke.annotations.Annotations.Loc;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.net.In;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
@@ -51,7 +55,7 @@ public class Weapon extends Upgrade {
 
 	public void update(Player p, boolean left, float pointerX, float pointerY){
 		int t = left ? Player.timerShootLeft : Player.timerShootRight;
-		int t2 = !left ? Player.timerShootRight : Player.timerShootLeft;
+		int t2 = !left ? Player.timerShootLeft : Player.timerShootRight;
 		if(p.inventory.hasAmmo() && p.timer.get(t, reload)){
 			if(roundrobin){
 				p.timer.reset(t2, reload/2f);
@@ -78,8 +82,7 @@ public class Weapon extends Upgrade {
 	}
 
 	public void shoot(Player p, float x, float y, float angle, boolean left){
-		shootInternal(p, x, y, angle, left);
-
+		CallEntity.onShootWeapon(p, this, x, y, angle, left);
 		p.inventory.useAmmo();
 	}
 
@@ -92,26 +95,30 @@ public class Weapon extends Upgrade {
 			ammoMap.put(type.item, type);
 		}
 	}
-
-	void shootInternal(Player p, float x, float y, float rotation, boolean left){
-		Angles.shotgun(shots, spacing, rotation, f -> bullet(p, x, y, f + Mathf.range(inaccuracy)));
-
-		AmmoType type = p.inventory.getAmmo();
-
-		tr.trns(rotation + 180f, type.recoil);
-
-		p.getVelocity().add(tr);
-
-		tr.trns(rotation, 3f);
-
-		Effects.shake(shake, shake, x, y);
-		Effects.effect(ejectEffect, x, y, rotation * -Mathf.sign(left));
-		Effects.effect(type.shootEffect, x + tr.x, y + tr.y, rotation, p);
-		Effects.effect(type.smokeEffect, x + tr.x, y + tr.y, rotation, p);
-	}
 	
 	void bullet(Unit owner, float x, float y, float angle){
 		tr.trns(angle, 3f);
 		Bullet.create(owner.inventory.getAmmo().bullet, owner, x + tr.x, y + tr.y, angle);
+	}
+
+	@Remote(targets = Loc.both, called = Loc.both, in = In.entities, forward = true)
+	public static void onShootWeapon(Player player, Weapon weapon, float x, float y, float rotation, boolean left){
+		Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> weapon.bullet(player, x, y, f + Mathf.range(weapon.inaccuracy)));
+
+		AmmoType type = player.inventory.getAmmo();
+
+		weapon.tr.trns(rotation + 180f, type.recoil);
+
+		player.getVelocity().add(weapon.tr);
+
+		weapon.tr.trns(rotation, 3f);
+
+		Effects.shake(weapon.shake, weapon.shake, x, y);
+		Effects.effect(weapon.ejectEffect, x, y, rotation * -Mathf.sign(left));
+		Effects.effect(type.shootEffect, x + weapon.tr.x, y + weapon.tr.y, rotation, player);
+		Effects.effect(type.smokeEffect, x + weapon.tr.x, y + weapon.tr.y, rotation, player);
+
+		//reset timer for remote players
+		player.timer.getTime(left ? Player.timerShootLeft : Player.timerShootRight);
 	}
 }

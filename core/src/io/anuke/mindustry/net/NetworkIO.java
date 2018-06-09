@@ -2,15 +2,15 @@ package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
-import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.TeamInfo;
+import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.MapMeta;
 import io.anuke.mindustry.io.Version;
-import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.ucore.core.Timers;
@@ -37,16 +37,11 @@ public class NetworkIO {
 
             stream.writeInt(state.wave); //wave
             stream.writeFloat(state.wavetime); //wave countdown
-            stream.writeInt(state.enemies); //enemy amount
 
             stream.writeBoolean(state.friendlyFire); //friendly fire state
-            stream.writeInt(player.id); //player remap ID
-            stream.writeBoolean(player.isAdmin);
 
-            stream.writeByte(player.upgrades.size);
-            for(Upgrade u : player.upgrades){
-                stream.writeByte(u.id);
-            }
+            stream.writeInt(player.id);
+            player.write(stream);
 
             //--MAP DATA--
 
@@ -80,6 +75,17 @@ public class NetworkIO {
                 }
             }
 
+            //write team data
+            stream.writeByte(state.teams.getTeams().size);
+            for(TeamData data : state.teams.getTeams()){
+                stream.writeByte(data.team.ordinal());
+                stream.writeBoolean(data.ally);
+                stream.writeShort(data.cores.size);
+                for(Tile tile : data.cores){
+                    stream.writeInt(tile.packedPosition());
+                }
+            }
+
         }catch (IOException e){
             throw new RuntimeException(e);
         }
@@ -105,29 +111,18 @@ public class NetworkIO {
 
             int wave = stream.readInt();
             float wavetime = stream.readFloat();
-            int enemies = stream.readInt();
+
             boolean friendlyfire = stream.readBoolean();
 
-            state.enemies = enemies;
             state.wave = wave;
             state.wavetime = wavetime;
             state.mode = GameMode.values()[mode];
             state.friendlyFire = friendlyfire;
 
-            int pid = stream.readInt();
-            boolean admin = stream.readBoolean();
-
-            byte weapons = stream.readByte();
-
-            for(int i = 0; i < weapons; i ++){
-                player.upgrades.add(Upgrade.getByID(stream.readByte()));
-            }
-
-            player.weapon = Weapons.blaster;
-
             Entities.clear();
-            player.id = pid;
-            player.isAdmin = admin;
+            int id = stream.readInt();
+            player.read(stream, TimeUtils.millis());
+            player.resetID(id);
             player.add();
 
             world.beginMapLoad();
@@ -174,7 +169,20 @@ public class NetworkIO {
                 }
             }
 
-            player.dead = true;
+            player.reset();
+            state.teams = new TeamInfo();
+
+            byte teams = stream.readByte();
+            for (int i = 0; i < teams; i++) {
+                Team team = Team.values()[stream.readByte()];
+                boolean ally = stream.readBoolean();
+                short cores = stream.readShort();
+                state.teams.add(team, ally);
+
+                for (int j = 0; j < cores; j++) {
+                    state.teams.get(team).cores.add(world.tile(stream.readInt()));
+                }
+            }
 
             world.endMapLoad();
 

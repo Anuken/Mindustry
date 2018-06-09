@@ -3,10 +3,8 @@ package io.anuke.mindustry.entities.bullet;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TeamTrait;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.net.Interpolator;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.BulletEntity;
@@ -15,31 +13,31 @@ import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.entities.trait.VelocityTrait;
 import io.anuke.ucore.util.Timer;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import static io.anuke.mindustry.Vars.bulletGroup;
 import static io.anuke.mindustry.Vars.world;
 
-public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncTrait{
+public class Bullet extends BulletEntity<BulletType> implements TeamTrait{
 	private static Vector2 vector = new Vector2();
 
-	private Interpolator interpolator = new Interpolator();
+	//private Interpolator interpolator = new Interpolator();
 	private Team team;
 
 	public Timer timer = new Timer(3);
 
-	public static Bullet create(BulletType type, TeamTrait owner, float x, float y, float angle){
-		return create(type, owner, owner.getTeam(), x, y, angle);
+	public static void create (BulletType type, TeamTrait owner, float x, float y, float angle){
+		create(type, owner, owner.getTeam(), x, y, angle);
 	}
 
-	public static Bullet create (BulletType type, Entity owner, Team team, float x, float y, float angle){
+	public static void create (BulletType type, Entity owner, Team team, float x, float y, float angle){
+		create(type, owner, team, x, y, angle, 1f);
+	}
+
+	public static void create (BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl){
 		Bullet bullet = Pools.obtain(Bullet.class);
 		bullet.type = type;
 		bullet.owner = owner;
 
-		bullet.velocity.set(0, type.speed).setAngle(angle);
+		bullet.velocity.set(0, type.speed).setAngle(angle).scl(velocityScl);
 		bullet.velocity.add(owner instanceof VelocityTrait ? ((VelocityTrait)owner).getVelocity() : Vector2.Zero);
 		bullet.hitbox.setSize(type.hitsize);
 
@@ -47,11 +45,14 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 		bullet.type = type;
 		bullet.set(x, y);
 		bullet.add();
-		return bullet;
 	}
 
-	public static Bullet create(BulletType type, Bullet parent, float x, float y, float angle){
-		return create(type, parent.owner, parent.team, x, y, angle);
+	public static void create(BulletType type, Bullet parent, float x, float y, float angle){
+		create(type, parent.owner, parent.team, x, y, angle);
+	}
+
+	public static void create(BulletType type, Bullet parent, float x, float y, float angle, float velocityScl){
+		create(type, parent.owner, parent.team, x, y, angle, velocityScl);
 	}
 
 	/**Internal use only!*/
@@ -60,7 +61,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 	public boolean collidesTiles(){
 		return true; //TODO make artillery and such not do this
 	}
-
+/*
 	@Override
 	public boolean doSync(){
 		return type.syncable;
@@ -85,7 +86,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 		y = data.readFloat();
 		team = Team.values()[data.readByte()];
 		type = BulletType.getByID(data.readByte());
-	}
+	}*/
 
 	@Override
 	public Team getTeam() {

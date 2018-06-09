@@ -39,7 +39,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Block extends BaseBlock implements UnlockableContent{
 	private static int lastid;
-	private static Array<Block> blocks = new Array<>();
+	private static Array<Block> blocks = new Array<>(140);
 	private static ObjectMap<String, Block> map = new ObjectMap<>();
 
 	protected Array<Tile> tempTiles = new Array<>();

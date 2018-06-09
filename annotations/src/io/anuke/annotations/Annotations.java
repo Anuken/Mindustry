@@ -15,22 +15,19 @@ public class Annotations {
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.CLASS)
     public @interface Remote {
-        /**If true, this method can only be invoked on clients from the server.
-         * If false, this method can only be invoked on servers from a client.*/
-        boolean server() default true;
-        /**Whether a client-specific method is generated that accepts a connecton ID and sends to only one player. Default is false.
-         * Only affects client methods.*/
-        boolean one() default false;
-        /**Whether a 'global' method is generated that sends the event to all players. Default is true.
-         * Only affects client methods.*/
-        boolean all() default true;
-        /**Whether this method is invoked locally as well as remotely.*/
-        boolean local() default true;
+        /**Specifies the locations where this method can be invoked.*/
+        Loc targets() default Loc.server;
+        /**Specifies which methods are generated. Only affects client methods.*/
+        Variant variants() default Variant.all;
+        /**The local locations where this method is called.*/
+        Loc called() default Loc.none;
+        /**Whether to forward this packet to all other clients.*/
+        boolean forward() default false;
         /**Whether the packet for this method is sent with UDP instead of TCP.
          * UDP is faster, but is prone to packet loss and duplication.*/
         boolean unreliable() default false;
         /**The simple class name where this method is placed.*/
-        String target() default "Call";
+        String in() default "Call";
     }
 
     /**Specifies that this method will be used to write classes of the type returned by {@link #value()}.<br>
@@ -49,5 +46,43 @@ public class Annotations {
     @Retention(RetentionPolicy.CLASS)
     public @interface ReadClass {
         Class<?> value();
+    }
+
+    /**A set of two booleans, one specifying server and one specifying client.*/
+    public enum Loc {
+        /**Method can only be invoked on the client from the server.*/
+        server(true, false),
+        /**Method can only be invoked on the server from the client.*/
+        client(false, true),
+        /**Method can be invoked from anywhere*/
+        both(true, true),
+        /**Neither server no client.*/
+        none(false, false);
+
+        /**If true, this method can be invoked ON clients FROM servers.*/
+        public final boolean isServer;
+        /**If true, this method can be invoked ON servers FROM clients.*/
+        public final boolean isClient;
+
+        Loc(boolean server, boolean client){
+            this.isServer = server;
+            this.isClient = client;
+        }
+    }
+
+    public enum Variant {
+        /**Method can only be invoked targeting one player.*/
+        one(true, false),
+        /**Method can only be invoked targeting all players.*/
+        all(false, true),
+        /**Method targets both one player and all players.*/
+        both(true, true);
+
+        public final boolean isOne, isAll;
+
+        Variant(boolean isOne, boolean isAll){
+            this.isOne = isOne;
+            this.isAll = isAll;
+        }
     }
 }

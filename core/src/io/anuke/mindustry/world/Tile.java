@@ -189,6 +189,7 @@ public class Tile implements PosTrait, TargetTrait {
 		return isLinked() || !((floor.solid && (block == Blocks.air || block.solidifes)) || (block.solid && (!block.destructible && !block.update)));
 	}
 
+	/**Whether this block was placed by a player/unit.*/
 	public boolean synthetic(){
 		Block block = block();
 		return block.update || block.destructible;
@@ -197,7 +198,8 @@ public class Tile implements PosTrait, TargetTrait {
 	public boolean solid(){
 		Block block = block();
 		Block floor = floor();
-		return block.solid || (floor.solid && (block == Blocks.air || block.solidifes)) || block.isSolidFor(this);
+		return block.solid || (floor.solid && (block == Blocks.air || block.solidifes)) || block.isSolidFor(this)
+				|| (isLinked() && getLinked().block().isSolidFor(getLinked()));
 	}
 	
 	public boolean breakable(){

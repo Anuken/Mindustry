@@ -4,10 +4,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.annotations.Annotations.Variant;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.gen.RemoteReadClient;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
@@ -102,7 +104,10 @@ public class NetClient extends Module {
             finishConnecting();
         });
 
-        Net.handleClient(InvokePacket.class, packet -> {});
+        Net.handleClient(InvokePacket.class, packet -> {
+            packet.writeBuffer.position(0);
+            RemoteReadClient.readPacket(packet.writeBuffer, packet.type);
+        });
     }
 
     @Override
@@ -165,9 +170,16 @@ public class NetClient extends Module {
         }
     }
 
-    @Remote(one = true, all = false, unreliable = true)
-    public static void onSnapshot(byte[] snapshot, int snapshotID){
+    @Remote(variants = Variant.one)
+    public static void onKick(KickReason reason){
+        netClient.disconnectQuietly();
+        state.set(State.menu);
+        if(!reason.quiet) ui.showError("$text.server.kicked." + reason.name());
+        ui.loadfrag.hide();
+    }
 
+    @Remote(variants = Variant.one, unreliable = true)
+    public static void onSnapshot(byte[] snapshot, int snapshotID){
         //skip snapshot IDs that have already been recieved
         if(snapshotID == netClient.lastSnapshotID){
             return;
@@ -177,7 +189,7 @@ public class NetClient extends Module {
 
             byte[] result;
             int length;
-            if (snapshotID == -1) { //-1 = fresh snapshot
+            if (snapshotID == 0) { //fresh snapshot
                 result = snapshot;
                 length = snapshot.length;
                 netClient.lastSnapshot = snapshot;
@@ -188,6 +200,8 @@ public class NetClient extends Module {
                 //set last snapshot to a copy to prevent issues
                 netClient.lastSnapshot = Arrays.copyOf(result, length);
             }
+
+            netClient.lastSnapshotID = snapshotID;
 
             //set stream bytes to begin write
             netClient.byteStream.setBytes(result, 0, length);
@@ -214,6 +228,7 @@ public class NetClient extends Module {
                     //entity must not be added yet, so create it
                     if(entity == null){
                         entity = (SyncTrait) ClassReflection.newInstance(group.getType()); //TODO solution without reflection?
+                        entity.resetID(id);
                         entity.add();
                     }
 
@@ -222,15 +237,11 @@ public class NetClient extends Module {
                 }
             }
 
-            //confirm that snapshot 0 has been recieved if this is the initial snapshot
-            if(snapshotID == -1){
-                netClient.lastSnapshotID = 0;
-            }else{ //confirm that the snapshot has been recieved
-                netClient.lastSnapshotID = snapshotID;
-            }
+            //confirm that snapshot has been recieved
+            netClient.lastSnapshotID = snapshotID;
 
         }catch (IOException | ReflectionException e){
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 }

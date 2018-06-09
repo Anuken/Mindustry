@@ -1,5 +1,8 @@
 package io.anuke.annotations;
 
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Variant;
+
 import javax.lang.model.element.ExecutableElement;
 
 /**Class that repesents a remote method to be constructed and put into a class.*/
@@ -9,26 +12,28 @@ public class MethodEntry {
     /**Fully qualified target method to call.*/
     public final String targetMethod;
     /**Whether this method can be called on a client/server.*/
-    public final boolean server;
+    public final Loc where;
     /**Whether an additional 'one' and 'all' method variant is generated. At least one of these must be true.
      * Only applicable to client (server-invoked) methods.*/
-    public final boolean allVariant, oneVariant;
+    public final Variant target;
     /**Whether this method is called locally as well as remotely.*/
-    public final boolean local;
+    public final Loc local;
     /**Whether this method is unreliable and uses UDP.*/
     public final boolean unreliable;
+    /**Whether to forward this method call to all other clients when a client invokes it. Server only.*/
+    public final boolean forward;
     /**Unique method ID.*/
     public final int id;
     /**The element method associated with this entry.*/
     public final ExecutableElement element;
 
-    public MethodEntry(String className, String targetMethod, boolean server,
-                       boolean allVariant, boolean oneVariant, boolean local, boolean unreliable, int id, ExecutableElement element) {
+    public MethodEntry(String className, String targetMethod, Loc where, Variant target,
+                       Loc local, boolean unreliable, boolean forward, int id, ExecutableElement element) {
         this.className = className;
+        this.forward = forward;
         this.targetMethod = targetMethod;
-        this.server = server;
-        this.allVariant = allVariant;
-        this.oneVariant = oneVariant;
+        this.where = where;
+        this.target = target;
         this.local = local;
         this.id = id;
         this.element = element;

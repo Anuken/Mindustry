@@ -31,7 +31,6 @@ public class Mindustry extends ModuleCore {
 		module(ui = new UI());
 		module(netServer = new NetServer());
 		module(netClient = new NetClient());
-		module(netCommon = new NetCommon());
 	}
 
 	@Override

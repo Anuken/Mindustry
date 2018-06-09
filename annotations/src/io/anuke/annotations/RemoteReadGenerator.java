@@ -70,9 +70,8 @@ public class RemoteReadGenerator {
             for(int i = 0; i < entry.element.getParameters().size(); i ++){
                 VariableElement var = entry.element.getParameters().get(i);
 
-                if(entry.server || i != 0) { //if client, skip first parameter since it's always of type player and doesn't need to be read
+                if(!needsPlayer || i != 0) { //if client, skip first parameter since it's always of type player and doesn't need to be read
                     //full type name of parameter
-                    //TODO check if the result is correct
                     String typeName = var.asType().toString();
                     //name of parameter
                     String varName = var.getSimpleName().toString();
@@ -98,16 +97,41 @@ public class RemoteReadGenerator {
                         //add statement for reading it
                         readBlock.addStatement(typeName + " " + varName + " = " + ser.readMethod + "(buffer)");
                     }
-                }
 
-                //append variable name to string builder
-                varResult.append(var.getSimpleName());
-                if(i != entry.element.getParameters().size() - 1) varResult.append(", ");
+                    //append variable name to string builder
+                    varResult.append(var.getSimpleName());
+                    if(i != entry.element.getParameters().size() - 1) varResult.append(", ");
+                }else{
+                    varResult.append("player");
+                    if(i != entry.element.getParameters().size() - 1) varResult.append(", ");
+                }
             }
 
-            //now execute it
-            readBlock.addStatement("com.badlogic.gdx.Gdx.app.postRunnable(() -> $N." + entry.element.getSimpleName() + "(" + varResult.toString() + "))",
-                    ((TypeElement)entry.element.getEnclosingElement()).getQualifiedName().toString());
+
+
+            //begin lambda control flow
+            readBlock.beginControlFlow("com.badlogic.gdx.Gdx.app.postRunnable(() -> ");
+
+            //call forwarded method before the method, so if it throws a ValidateException, the method won't be forwarded
+            if(entry.forward && entry.where.isServer){
+                //try block to catch validate exception
+                readBlock.beginControlFlow("try");
+
+                //call forwarded method
+                readBlock.addStatement(packageName + "." + entry.className + "." + entry.element.getSimpleName() +
+                        "__forward(player.clientid" + (varResult.length() == 0 ? "" : ", ") + varResult.toString() + ")");
+
+                //when a ValidateException is caught, print the error and return
+                readBlock.nextControlFlow("catch (io.anuke.mindustry.net.ValidateException e)");
+                readBlock.addStatement("e.printStackTrace()");
+                readBlock.addStatement("return");
+                readBlock.endControlFlow();
+            }
+
+            //execute the relevant method
+            readBlock.addStatement("$N." + entry.element.getSimpleName() + "(" + varResult.toString() + ")", ((TypeElement) entry.element.getEnclosingElement()).getQualifiedName().toString());
+            //end lambda
+            readBlock.endControlFlow(")");
         }
 
         //end control flow if necessary

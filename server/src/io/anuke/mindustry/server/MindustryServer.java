@@ -28,7 +28,6 @@ public class MindustryServer extends ModuleCore {
         module(logic = new Logic());
         module(world = new World());
         module(netServer = new NetServer());
-        module(netCommon = new NetCommon());
         module(new ServerControl(args));
     }
 }

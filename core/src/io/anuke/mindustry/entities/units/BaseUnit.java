@@ -1,19 +1,18 @@
 package io.anuke.mindustry.entities.units;
 
 import io.anuke.mindustry.content.fx.ExplosionFx;
-import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.util.Angles;
@@ -21,7 +20,9 @@ import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
 
-import java.io.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -53,12 +54,6 @@ public abstract class BaseUnit extends Unit{
 
 	public void rotate(float angle){
 		rotation = Mathf.slerpDelta(rotation, angle, type.rotatespeed);
-	}
-
-	public void effectAt(Effect effect, float rotation, float dx, float dy){
-		Effects.effect(effect,
-				x + Angles.trnsx(rotation, dx, dy),
-				y + Angles.trnsy(rotation, dx, dy), Mathf.atan2(dx, dy) + rotation);
 	}
 
 	public boolean targetHasFlag(BlockFlag flag){
@@ -248,12 +243,13 @@ public abstract class BaseUnit extends Unit{
 	}
 
 	@Override
-	public void write(DataOutput data) {
-		//todo
+	public void write(DataOutput data) throws IOException{
+		writeSave(data);
 	}
 
 	@Override
-	public void read(DataInput data, long time) {
-		//todo
+	public void read(DataInput data, long time) throws IOException{
+		super.readSave(data);
+		this.type = UnitType.getByID(data.readByte());
 	}
 }

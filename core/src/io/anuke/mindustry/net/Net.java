@@ -56,7 +56,6 @@ public class Net{
 			for(int i = 0; i < packetQueue.size; i ++){
                 Log.info("Processing {0} packet post-load.", ClassReflection.getSimpleName(packetQueue.get(i).getClass()));
 				handleClientReceived(packetQueue.get(i));
-				Pools.free(packetQueue.get(i));
 			}
 		}
 		//clear inbound packet queue
@@ -180,6 +179,7 @@ public class Net{
 			}
 		}else if(clientListeners.get(object.getClass()) != null ||
 					listeners.get(object.getClass()) != null){
+
 			if(clientLoaded || object instanceof ImportantPacket){
 				if(clientListeners.get(object.getClass()) != null) clientListeners.get(object.getClass()).accept(object);
 				if(listeners.get(object.getClass()) != null) listeners.get(object.getClass()).accept(object);

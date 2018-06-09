@@ -138,7 +138,7 @@ public class Control extends Module{
 
 		Events.on(PlayEvent.class, () -> {
 		    for(Player player : players){
-                player.dead = true;
+                player.add();
             }
 
 			state.set(State.playing);

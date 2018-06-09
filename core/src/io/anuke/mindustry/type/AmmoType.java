@@ -8,7 +8,7 @@ import io.anuke.ucore.core.Effects.Effect;
 
 public class AmmoType implements Content{
     private static int lastID = 0;
-    private static Array<AmmoType> allTypes = new Array<>();
+    private static Array<AmmoType> allTypes = new Array<>(32);
 
     public final byte id;
     /**The item used. Always null if liquid isn't.*/

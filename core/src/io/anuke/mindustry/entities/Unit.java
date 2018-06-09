@@ -63,7 +63,9 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
         x = interpolator.pos.x;
         y = interpolator.pos.y;
-        rotation = interpolator.values[0];
+        if(interpolator.values.length > 0){
+            rotation = interpolator.values[0];
+        }
     }
 
     @Override
@@ -100,6 +102,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         stream.writeByte(team.ordinal());
         stream.writeFloat(x);
         stream.writeFloat(y);
+        stream.writeFloat(rotation);
         stream.writeShort((short)health);
         stream.writeByte(status.current().id);
         stream.writeFloat(status.getTime());
@@ -111,6 +114,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         byte team = stream.readByte();
         float x = stream.readFloat();
         float y = stream.readFloat();
+        float rotation = stream.readFloat();
         int health = stream.readShort();
         byte effect = stream.readByte();
         float etime = stream.readFloat();
@@ -120,6 +124,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         this.health = health;
         this.x = x;
         this.y = y;
+        this.rotation = rotation;
         this.status.set(StatusEffect.getByID(effect), etime);
     }
 

@@ -3,6 +3,7 @@ package io.anuke.annotations;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
+import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.annotations.IOFinder.ClassSerializer;
 
@@ -38,8 +39,19 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
     /**Name of class that handles reading and invoking packets on the client.*/
     private static final String readClientName = "RemoteReadClient";
 
-    /**Whether the initial round is done.*/
-    private boolean done;
+    /**Processing round number.*/
+    private int round;
+
+    //class serializers
+    private HashMap<String, ClassSerializer> serializers;
+    //all elements with the Remote annotation
+    private Set<? extends Element> elements;
+    //map of all classes to generate by name
+    private HashMap<String, ClassEntry> classMap;
+    //list of all method entries
+    private ArrayList<MethodEntry> methods;
+    //list of all method entries
+    private ArrayList<ClassEntry> classes;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -53,83 +65,91 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        if(done) return false; //only process 1 round
-        done = true;
+        if(round > 1) return false; //only process 2 rounds
+
+        round ++;
 
         try {
 
-            //get serializers
-            HashMap<String, ClassSerializer> serializers = new IOFinder().findSerializers(roundEnv);
+            //round 1: find all annotations, generate *writers*
+            if(round == 1) {
+                //get serializers
+                serializers = new IOFinder().findSerializers(roundEnv);
 
-            //last method ID used
-            int lastMethodID = 0;
-            //find all elements with the Remote annotation
-            Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(Remote.class);
-            //map of all classes to generate by name
-            HashMap<String, ClassEntry> classMap = new HashMap<>();
-            //list of all method entries
-            ArrayList<MethodEntry> methods = new ArrayList<>();
-            //list of all method entries
-            ArrayList<ClassEntry> classes = new ArrayList<>();
+                //last method ID used
+                int lastMethodID = 0;
+                //find all elements with the Remote annotation
+                elements = roundEnv.getElementsAnnotatedWith(Remote.class);
+                //map of all classes to generate by name
+                classMap = new HashMap<>();
+                //list of all method entries
+                methods = new ArrayList<>();
+                //list of all method entries
+                classes = new ArrayList<>();
 
-            //create methods
-            for (Element element : elements) {
-                Remote annotation = element.getAnnotation(Remote.class);
+                //create methods
+                for (Element element : elements) {
+                    Remote annotation = element.getAnnotation(Remote.class);
 
-                //check for static
-                if(!element.getModifiers().contains(Modifier.STATIC)) {
-                    Utils.messager.printMessage(Kind.ERROR, "All Remote methods must be static: ", element);
+                    //check for static
+                    if (!element.getModifiers().contains(Modifier.STATIC) || !element.getModifiers().contains(Modifier.PUBLIC)) {
+                        Utils.messager.printMessage(Kind.ERROR, "All @Remote methods must be public and static: ", element);
+                    }
+
+                    //can't generate none methods
+                    if (annotation.targets() == Loc.none) {
+                        Utils.messager.printMessage(Kind.ERROR, "A @Remote method's where() cannot be equal to 'none':", element);
+                    }
+
+                    //get and create class entry if needed
+                    if (!classMap.containsKey(annotation.in())) {
+                        ClassEntry clas = new ClassEntry(annotation.in());
+                        classMap.put(annotation.in(), clas);
+                        classes.add(clas);
+                    }
+
+                    ClassEntry entry = classMap.get(annotation.in());
+
+                    //create and add entry
+                    MethodEntry method = new MethodEntry(entry.name, Utils.getMethodName(element), annotation.targets(), annotation.variants(),
+                            annotation.called(), annotation.unreliable(), annotation.forward(), lastMethodID++, (ExecutableElement) element);
+
+                    entry.methods.add(method);
+                    methods.add(method);
                 }
 
-                //get and create class entry if needed
-                if (!classMap.containsKey(annotation.target())) {
-                    ClassEntry clas = new ClassEntry(annotation.target());
-                    classMap.put(annotation.target(), clas);
-                    classes.add(clas);
-                }
+                //create read/write generators
+                RemoteWriteGenerator writegen = new RemoteWriteGenerator(serializers);
 
-                ClassEntry entry = classMap.get(annotation.target());
+                //generate the methods to invoke (write)
+                writegen.generateFor(classes, packageName);
 
-                //make sure that each server annotation has at least one method to generate, otherwise throw an error
-                if (annotation.server() && !annotation.all() && !annotation.one()) {
-                    Utils.messager.printMessage(Kind.ERROR, "A client method must not have all() and one() both be false!", element);
-                    return false;
-                }
+                return true;
+            }else if(round == 2) { //round 2: generate all *readers*
+                RemoteReadGenerator readgen = new RemoteReadGenerator(serializers);
 
-                //create and add entry
-                MethodEntry method = new MethodEntry(entry.name, Utils.getMethodName(element), annotation.server(),
-                        annotation.all(), annotation.one(), annotation.local(), annotation.unreliable(), lastMethodID ++, (ExecutableElement)element);
+                //generate server readers
+                readgen.generateFor(methods.stream().filter(method -> method.where.isClient).collect(Collectors.toList()), readServerName, packageName, true);
+                //generate client readers
+                readgen.generateFor(methods.stream().filter(method -> method.where.isServer).collect(Collectors.toList()), readClientName, packageName, false);
 
-                entry.methods.add(method);
-                methods.add(method);
+                //create class for storing unique method hash
+                TypeSpec.Builder hashBuilder = TypeSpec.classBuilder("MethodHash").addModifiers(Modifier.PUBLIC);
+                hashBuilder.addField(FieldSpec.builder(int.class, "HASH", Modifier.STATIC, Modifier.PUBLIC, Modifier.FINAL)
+                        .initializer("$1L", Objects.hash(methods)).build());
+
+                //build and write resulting hash class
+                TypeSpec spec = hashBuilder.build();
+                JavaFile.builder(packageName, spec).build().writeTo(Utils.filer);
+
+                return true;
             }
-
-            //create read/write generators
-            RemoteReadGenerator readgen = new RemoteReadGenerator(serializers);
-            RemoteWriteGenerator writegen = new RemoteWriteGenerator(serializers);
-
-            //generate server readers
-            readgen.generateFor(methods.stream().filter(method -> !method.server).collect(Collectors.toList()), readServerName, packageName, true);
-            //generate client readers
-            readgen.generateFor(methods.stream().filter(method -> method.server).collect(Collectors.toList()), readClientName, packageName, false);
-
-            //generate the methods to invoke (write)
-            writegen.generateFor(classes, packageName);
-
-            //create class for storing unique method hash
-            TypeSpec.Builder hashBuilder = TypeSpec.classBuilder("MethodHash").addModifiers(Modifier.PUBLIC);
-            hashBuilder.addField(FieldSpec.builder(int.class, "HASH", Modifier.STATIC, Modifier.PUBLIC, Modifier.FINAL)
-                    .initializer("$1L", Objects.hash(methods)).build());
-
-            //build and write resulting hash class
-            TypeSpec spec = hashBuilder.build();
-            JavaFile.builder(packageName, spec).build().writeTo(Utils.filer);
-
-            return true;
 
         }catch (Exception e){
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+
+        return false;
     }
 }
