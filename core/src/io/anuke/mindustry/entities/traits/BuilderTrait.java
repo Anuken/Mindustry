@@ -197,6 +197,7 @@ public interface BuilderTrait {
                 BuildEntity entity = tile.entity();
 
                 entity.addProgress(core.items, 1f / entity.recipe.cost * Timers.delta() * getBuildPower(tile));
+                entity.lastBuilder = (Player)unit;
                 unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(entity), 0.4f);
                 getCurrentRequest().progress = entity.progress();
             }

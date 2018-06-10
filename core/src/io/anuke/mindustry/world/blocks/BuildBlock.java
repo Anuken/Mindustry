@@ -25,6 +25,8 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
 
+import static io.anuke.mindustry.Vars.threads;
+
 public class BuildBlock extends Block {
     private static final float decaySpeedScl = 6f;
 
@@ -110,7 +112,7 @@ public class BuildBlock extends Block {
         BuildEntity entity = tile.entity();
 
         if(entity.progress >= 1f){
-            CallBlocks.onBuildFinish(tile);
+            CallBlocks.onBuildFinish(tile, entity.lastBuilder);
         }else if(entity.progress < 0f){
             CallBlocks.onBuildDeath(tile);
         }
@@ -133,13 +135,20 @@ public class BuildBlock extends Block {
     }
 
     @Remote(called = Loc.server, in = In.blocks)
-    public static void onBuildFinish(Tile tile){
+    public static void onBuildFinish(Tile tile, Player lastBuilder){
         BuildEntity entity = tile.entity();
 
         Team team = tile.getTeam();
         tile.setBlock(entity.recipe.result);
         tile.setTeam(team);
         Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), entity.recipe.result.size);
+
+        //last builder was this local client player, call placed()
+        if(lastBuilder != null && lastBuilder.isLocal){
+            //this is run delayed, since if this is called on the server, all clients need to recieve the onBuildFinish()
+            //event first before they can recieve the placed() event modification results
+            threads.runDelay(() -> tile.block().placed(tile));
+        }
     }
 
     public class BuildEntity extends TileEntity{
@@ -147,6 +156,7 @@ public class BuildBlock extends Block {
 
         public double progress = 0;
         public Block previous;
+        public Player lastBuilder;
 
         private double[] accumulator;
         private boolean updated;
