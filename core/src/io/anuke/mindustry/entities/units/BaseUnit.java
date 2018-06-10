@@ -87,8 +87,8 @@ public abstract class BaseUnit extends Unit{
 		}
 	}
 
-	public void shoot(AmmoType type, float rotation, float translation){
-
+	public void shoot(AmmoType type, float rotation){
+		CallEntity.onUnitShoot(this, type, rotation);
 	}
 
 	public void targetClosestAllyFlag(BlockFlag flag){

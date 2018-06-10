@@ -178,7 +178,7 @@ public abstract class GroundUnit extends BaseUnit {
                     inventory.useAmmo();
                     rotate(angleTo(target));
 
-                    shoot(ammo, Angles.moveToward(rotation, angleTo(target), maxAim), 4f);
+                    shoot(ammo, Angles.moveToward(rotation, angleTo(target), maxAim));
                 }
             }else{
                 moveToCore();

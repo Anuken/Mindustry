@@ -196,7 +196,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
                     AmmoType ammo = inventory.getAmmo();
                     inventory.useAmmo();
 
-                    shoot(ammo, Angles.moveToward(rotation, angleTo(target), maxAim), 4f);
+                    shoot(ammo, Angles.moveToward(rotation, angleTo(target), maxAim));
                 }
             }
         }
