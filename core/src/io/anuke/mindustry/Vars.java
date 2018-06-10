@@ -150,7 +150,7 @@ public class Vars{
 		effectGroup = Entities.addGroup(EffectEntity.class, false);
 		groundEffectGroup = Entities.addGroup(DrawTrait.class, false);
 		puddleGroup = Entities.addGroup(Puddle.class, false);
-		itemGroup = Entities.addGroup(ItemDrop.class);
+		itemGroup = Entities.addGroup(ItemDrop.class).enableMapping();
 		fireGroup = Entities.addGroup(Fire.class, false);
 		unitGroups = new EntityGroup[Team.values().length];
 

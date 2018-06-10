@@ -4,9 +4,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.blocks.BlockModule;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 
 public class InventoryModule extends BlockModule{
@@ -76,7 +74,7 @@ public class InventoryModule extends BlockModule{
     }
 
     @Override
-    public void write(DataOutputStream stream) throws IOException {
+    public void write(DataOutput stream) throws IOException {
         byte amount = 0;
         for(int i = 0; i < items.length; i ++){
             if(items[i] > 0) amount ++;
@@ -93,7 +91,7 @@ public class InventoryModule extends BlockModule{
     }
 
     @Override
-    public void read(DataInputStream stream) throws IOException {
+    public void read(DataInput stream) throws IOException {
         byte count = stream.readByte();
 
         for(int j = 0; j < count; j ++){

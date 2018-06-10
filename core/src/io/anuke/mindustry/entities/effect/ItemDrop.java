@@ -4,8 +4,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.badlogic.gdx.utils.Pools;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Interpolator;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
@@ -24,9 +28,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.itemGroup;
-import static io.anuke.mindustry.Vars.itemSize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, VelocityTrait, TimeTrait, Poolable {
     private static final float sinkLifetime = 80f;
@@ -48,6 +50,11 @@ public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, Veloc
         drop.add();
 
         return drop;
+    }
+
+    @Remote(called = Loc.server, in = In.entities)
+    public static void onPickup(int itemid){
+        itemGroup.removeByID(itemid);
     }
 
     /**Internal use only!*/
@@ -86,7 +93,7 @@ public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, Veloc
         Player player = (Player)other;
         if(player.inventory.canAcceptItem(item, amount)){
             player.inventory.addItem(item, amount);
-            remove();
+            CallEntity.onPickup(getID());
         }
     }
 

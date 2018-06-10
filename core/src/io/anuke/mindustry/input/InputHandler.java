@@ -2,11 +2,18 @@ package io.anuke.mindustry.input;
 
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector2;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.entities.effect.ItemDrop;
-import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.ItemTransfer;
+import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
+import io.anuke.mindustry.gen.CallBlocks;
+import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.ValidateException;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.fragments.OverlayFragment;
@@ -26,17 +33,19 @@ import static io.anuke.mindustry.Vars.*;
 
 public abstract class InputHandler extends InputAdapter{
 	/**Used for dropping items.*/
-    final float playerSelectRange = mobile ? 17f : 11f;
+    final static float playerSelectRange = mobile ? 17f : 11f;
 	/**Maximum line length.*/
-	final int maxLength = 100;
-    final Translator stackTrns = new Translator();
+	final static int maxLength = 100;
+    final static Translator stackTrns = new Translator();
+    /**Distance on the back from where items originate.*/
+	final static float backTrns = 3f;
 
 	public final Player player;
 	public final OverlayFragment frag = new OverlayFragment(this);
 
 	public Recipe recipe;
 	public int rotation;
-	public boolean droppingItem, transferring;
+	public boolean droppingItem;
 	public boolean shooting;
 
 	public InputHandler(Player player){
@@ -110,9 +119,11 @@ public abstract class InputHandler extends InputAdapter{
 			}
 		}
 
-		//TODO network event!
 		//call tapped event
-		if(tile.getTeam() == player.getTeam() && tile.block().tapped(tile, player)){
+		CallBlocks.onTileTapped(player, tile);
+
+		//consume tap event if necessary
+		if(tile.getTeam() == player.getTeam() && tile.block().consumesTap){
 			consumed = true;
 		}else if(tile.getTeam() == player.getTeam() && tile.block().synthetic() && tile.block().hasItems){
 			frag.inv.showFor(tile);
@@ -201,52 +212,11 @@ public abstract class InputHandler extends InputAdapter{
 
 		ItemStack stack = player.inventory.getItem();
 
-		int accepted = tile.block().acceptStack(stack.item, stack.amount, tile, player);
-
-		if(accepted > 0){
-			if(transferring) return;
-
-			transferring = true;
-			boolean clear = stack.amount == accepted;
-
-			float backTrns = 3f;
-
-			int sent = Mathf.clamp(accepted/4, 1, 8);
-			int removed = accepted/sent;
-			int[] remaining = {accepted, accepted};
-
-			for(int i = 0; i < sent; i ++){
-				boolean end = i == sent-1;
-				Timers.run(i * 3, () -> {
-					tile.block().getStackOffset(stack.item, tile, stackTrns);
-
-					ItemTransfer.create(stack.item,
-							player.x + Angles.trnsx(rotation + 180f, backTrns), player.y + Angles.trnsy(rotation + 180f, backTrns),
-							new Translator(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
-
-						tile.block().handleStack(stack.item, removed, tile, player);
-						remaining[1] -= removed;
-
-						if(end && remaining[1] > 0) {
-							tile.block().handleStack(stack.item, remaining[1], tile, player);
-						}
-					});
-
-					stack.amount -= removed;
-					remaining[0] -= removed;
-
-					if(end){
-						stack.amount -= remaining[0];
-						if(clear) player.inventory.clearItem();
-						transferring = false;
-					}
-				});
-			}
+		if(tile.block().acceptStack(stack.item, stack.amount, tile, player) > 0){
+			CallBlocks.transferInventory(player, tile);
 		}else{
-			ItemDrop.create(stack.item, stack.amount, player.x, player.y, player.angleTo(x, y));
-			player.inventory.clearItem();
+			CallEntity.dropItem(player, player.angleTo(x, y));
 		}
-		//TODO create drop on the ground otherwise
 	}
 
 	public boolean cursorNear(){
@@ -290,6 +260,71 @@ public abstract class InputHandler extends InputAdapter{
 		//todo multiplayer support
     	Tile tile = world.tile(x, y).target();
 		player.addBuildRequest(new BuildRequest(tile.x, tile.y));
+	}
+
+	@Remote(targets = Loc.both, called = Loc.server, in = In.entities)
+	public static void dropItem(Player player, float angle){
+		if(Net.server() && !player.inventory.hasItem()){
+			throw new ValidateException(player, "Player cannot drop an item.");
+		}
+
+		ItemDrop.create(player.inventory.getItem().item, player.inventory.getItem().amount, player.x, player.y, angle);
+		player.inventory.clearItem();
+	}
+
+	@Remote(targets = Loc.both, forward = true, called = Loc.server, in = In.blocks)
+	public static void transferInventory(Player player, Tile tile){
+		if(Net.server() && (!player.inventory.hasItem() || player.isTransferring)){
+			throw new ValidateException(player, "Player cannot transfer an item.");
+		}
+
+		player.isTransferring = true;
+
+		ItemStack stack = player.inventory.getItem();
+		int accepted = tile.block().acceptStack(stack.item, stack.amount, tile, player);
+
+		boolean clear = stack.amount == accepted;
+		int sent = Mathf.clamp(accepted/4, 1, 8);
+		int removed = accepted/sent;
+		int[] remaining = {accepted, accepted};
+
+		for(int i = 0; i < sent; i ++){
+			boolean end = i == sent-1;
+			Timers.run(i * 3, () -> {
+				tile.block().getStackOffset(stack.item, tile, stackTrns);
+
+				ItemTransfer.create(stack.item,
+						player.x + Angles.trnsx(player.rotation + 180f, backTrns), player.y + Angles.trnsy(player.rotation + 180f, backTrns),
+						new Translator(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
+
+							tile.block().handleStack(stack.item, removed, tile, player);
+							remaining[1] -= removed;
+
+							if(end && remaining[1] > 0) {
+								tile.block().handleStack(stack.item, remaining[1], tile, player);
+							}
+						});
+
+				stack.amount -= removed;
+				remaining[0] -= removed;
+
+				if(end){
+					stack.amount -= remaining[0];
+					if(clear){
+						player.inventory.clearItem();
+					}
+					player.isTransferring = false;
+				}
+			});
+		}
+
+		//ItemDrop.create(player.inventory.getItem().item, player.inventory.getItem().amount, player.x, player.y, angle);
+		//player.inventory.clearItem();
+	}
+
+	@Remote(targets = Loc.both, called = Loc.server, forward = true, in = In.blocks)
+	public static void onTileTapped(Player player, Tile tile){
+		tile.block().tapped(tile, player);
 	}
 
 }

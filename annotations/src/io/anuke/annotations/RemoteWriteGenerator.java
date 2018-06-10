@@ -156,7 +156,7 @@ public class RemoteWriteGenerator {
             String capName = typeName.equals("byte") ? "" : Character.toUpperCase(typeName.charAt(0)) + typeName.substring(1);
             //special case: method can be called from anywhere to anywhere
             //thus, only write the player when the SERVER is writing data, since the client is the only one who reads it
-            boolean writePlayerSkipCheck = methodEntry.where == Loc.both && methodEntry.local == Loc.both && i == 0;
+            boolean writePlayerSkipCheck = methodEntry.where == Loc.both && i == 0;
 
             if(writePlayerSkipCheck){ //write begin check
                 method.beginControlFlow("if(io.anuke.mindustry.net.Net.server())");

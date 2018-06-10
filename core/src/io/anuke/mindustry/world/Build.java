@@ -1,21 +1,20 @@
 package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.ValidateException;
 import io.anuke.mindustry.type.Recipe;
+import io.anuke.mindustry.world.blocks.BreakBlock;
+import io.anuke.mindustry.world.blocks.BreakBlock.BreakEntity;
+import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
-import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.Entities;
 
 import static io.anuke.mindustry.Vars.tilesize;
@@ -24,81 +23,119 @@ import static io.anuke.mindustry.Vars.world;
 public class Build {
     private static final Rectangle rect = new Rectangle();
     private static final Rectangle hitrect = new Rectangle();
-    private static Array<Tile> tempTiles = new Array<>();
 
     /**Returns block type that was broken, or null if unsuccesful.*/
     @Remote(targets = Loc.both, forward = true, called = Loc.server, in = In.blocks)
-    public static Block breakBlock(Player player, Team team, int x, int y, boolean effect, boolean sound){
-
+    public static void breakBlock(Player player, Team team, int x, int y){
         if(Net.server() && !validBreak(team, x, y)){
-            throw new ValidateException(player, "An invalid block has been broken.");
+            return;
+            //throw new ValidateException(player, "An invalid block has been broken.");
         }
 
         Tile tile = world.tile(x, y);
 
-        if(tile == null) return null;
+        //just in case
+        if(tile == null) return;
 
-        Block block = tile.isLinked() ? tile.getLinked().block() : tile.block();
+        tile = tile.target();
 
-        //todo add break results to core inventory
+        Block previous = tile.block();
 
-        if(sound) Effects.sound("break", x * tilesize, y * tilesize);
-        if(effect) Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), block.size);
-
-        if(!tile.block().isMultiblock() && !tile.isLinked()){
-            tile.setBlock(Blocks.air);
-        }else{
-            Tile target = tile.isLinked() ? tile.getLinked() : tile;
-            Array<Tile> removals = target.getLinkedTiles(tempTiles);
-            for(Tile toremove : removals){
-                //note that setting a new block automatically unlinks it
-                toremove.setBlock(Blocks.air);
-            }
+        //remote players only
+        if(!player.isLocal){
+            player.getPlaceQueue().clear();
+            player.getPlaceQueue().addFirst(new BuildRequest(x, y));
         }
 
-        return block;
+        Block sub = Block.getByName("break" + previous.size);
+
+        if(previous instanceof BuildBlock){
+            BuildEntity build = tile.entity();
+
+            tile.setBlock(sub);
+            tile.setTeam(team);
+
+            BreakEntity breake = tile.entity();
+            breake.set(build.recipe.result);
+            breake.progress = 1.0 - build.progress;
+        }else {
+            tile.setBlock(sub);
+            tile.<BreakEntity>entity().set(previous);
+            tile.setTeam(team);
+
+            if (previous.isMultiblock()) {
+                int offsetx = -(previous.size - 1) / 2;
+                int offsety = -(previous.size - 1) / 2;
+
+                for (int dx = 0; dx < previous.size; dx++) {
+                    for (int dy = 0; dy < previous.size; dy++) {
+                        int worldx = dx + offsetx + x;
+                        int worldy = dy + offsety + y;
+                        if (!(worldx == x && worldy == y)) {
+                            Tile toplace = world.tile(worldx, worldy);
+                            if (toplace != null) {
+                                toplace.setLinked((byte) (dx + offsetx), (byte) (dy + offsety));
+                                toplace.setTeam(team);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**Places a BuildBlock at this location. Call validPlace first.*/
     @Remote(targets = Loc.both, forward = true, called = Loc.server, in = In.blocks)
     public static void placeBlock(Player player, Team team, int x, int y, Recipe recipe, int rotation){
-
         if(Net.server() && !validPlace(team, x, y, recipe.result, rotation)){
-            throw new ValidateException(player, "An invalid block has been placed.");
+            return;
+            //throw new ValidateException(player, "An invalid block has been placed.");
         }
 
         Tile tile = world.tile(x, y);
-        Block result = recipe.result;
-        Block previous = tile.block();
 
         //just in case
         if(tile == null) return;
 
-        //remote players only (?)
-        if(false){
+        Block result = recipe.result;
+        Block previous = tile.block();
+
+        //remote players only
+        if(!player.isLocal){
             player.getPlaceQueue().clear();
             player.getPlaceQueue().addFirst(new BuildRequest(x, y, rotation, recipe));
         }
 
         Block sub = Block.getByName("build" + result.size);
 
-        tile.setBlock(sub, rotation);
-        tile.<BuildEntity>entity().set(previous, recipe);
-        tile.setTeam(team);
+        if(previous instanceof BreakBlock){
+            BreakEntity breake = tile.entity();
 
-        if(result.isMultiblock()){
-            int offsetx = -(result.size-1)/2;
-            int offsety = -(result.size-1)/2;
+            tile.setBlock(sub);
+            tile.setTeam(team);
 
-            for(int dx = 0; dx < result.size; dx ++){
-                for(int dy = 0; dy < result.size; dy ++){
-                    int worldx = dx + offsetx + x;
-                    int worldy = dy + offsety + y;
-                    if(!(worldx == x && worldy == y)){
-                        Tile toplace = world.tile(worldx, worldy);
-                        if(toplace != null) {
-                            toplace.setLinked((byte) (dx + offsetx), (byte) (dy + offsety));
-                            toplace.setTeam(team);
+            BuildEntity build = tile.entity();
+            build.set(breake.previous, recipe);
+            build.progress = 1.0 - breake.progress;
+        }else{
+            tile.setBlock(sub, rotation);
+            tile.<BuildEntity>entity().set(previous, recipe);
+            tile.setTeam(team);
+
+            if (result.isMultiblock()) {
+                int offsetx = -(result.size - 1) / 2;
+                int offsety = -(result.size - 1) / 2;
+
+                for (int dx = 0; dx < result.size; dx++) {
+                    for (int dy = 0; dy < result.size; dy++) {
+                        int worldx = dx + offsetx + x;
+                        int worldy = dy + offsety + y;
+                        if (!(worldx == x && worldy == y)) {
+                            Tile toplace = world.tile(worldx, worldy);
+                            if (toplace != null) {
+                                toplace.setLinked((byte) (dx + offsetx), (byte) (dy + offsety));
+                                toplace.setTeam(team);
+                            }
                         }
                     }
                 }
@@ -171,7 +208,7 @@ public class Build {
     public static boolean validBreak(Team team, int x, int y) {
         Tile tile = world.tile(x, y);
 
-        return tile != null && !tile.block().unbreakable
+        return tile != null && !tile.block().unbreakable && !(tile.target().block() instanceof BreakBlock)
                 && (!tile.isLinked() || !tile.getLinked().block().unbreakable) && tile.breakable() && (tile.getTeam() == Team.none || tile.getTeam() == team);
     }
 }

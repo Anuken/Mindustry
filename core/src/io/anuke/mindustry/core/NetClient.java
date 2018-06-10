@@ -160,7 +160,6 @@ public class NetClient extends Module {
     void sync(){
 
         if(timer.get(0, playerSyncTime)){
-            Player player = players[0];
 
             ClientSnapshotPacket packet = Pools.obtain(ClientSnapshotPacket.class);
             packet.lastSnapshot = lastSnapshotID;
@@ -211,6 +210,12 @@ public class NetClient extends Module {
 
             //get data input for reading from the stream
             DataInputStream input = netClient.dataStream;
+            
+            byte cores = input.readByte();
+            for (int i = 0; i < cores; i++) {
+                int pos = input.readInt();
+                world.tile(pos).entity.items.read(input);
+            }
 
             byte totalGroups = input.readByte();
             //for each group...

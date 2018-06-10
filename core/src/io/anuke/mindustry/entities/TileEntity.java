@@ -1,10 +1,14 @@
 package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.math.Vector2;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.gen.CallBlocks;
+import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Wall;
@@ -92,7 +96,7 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 	public void write(DataOutputStream stream) throws IOException{}
 	public void read(DataInputStream stream) throws IOException{}
 
-	public void onDeath(){
+	private void onDeath(){
 		if(!dead) {
 			dead = true;
 			Block block = tile.block();
@@ -102,7 +106,6 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 			block.afterDestroyed(tile, this);
 			remove();
 		}
-
 	}
 
 	public boolean collide(Bullet other){
@@ -115,10 +118,12 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 	
 	public void damage(float damage){
 		if(dead) return;
-		
-		float amount = tile.block().handleDamage(tile, damage);
-		health -= amount;
-		if(health <= 0) onDeath();
+
+		CallBlocks.onTileDamage(tile, health - tile.block().handleDamage(tile, damage));
+
+		if(health <= 0){
+			CallBlocks.onTileDestroyed(tile);
+		}
 	}
 
 	@Override
@@ -152,5 +157,15 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 	@Override
 	public EntityGroup targetGroup() {
 		return tileGroup;
+	}
+
+	@Remote(called = Loc.server, in = In.blocks)
+	public static void onTileDamage(Tile tile, float health){
+		tile.entity.health = health;
+	}
+
+	@Remote(called = Loc.server, in = In.blocks)
+	public static void onTileDestroyed(Tile tile){
+		tile.entity.onDeath();
 	}
 }

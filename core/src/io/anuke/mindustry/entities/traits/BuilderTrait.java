@@ -16,6 +16,8 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Build;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.BreakBlock;
+import io.anuke.mindustry.world.blocks.BreakBlock.BreakEntity;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.ucore.core.Effects;
@@ -113,6 +115,7 @@ public interface BuilderTrait {
         if(unit.distanceTo(tile) > placeDistance) { //out of range, skip it.
             getPlaceQueue().removeFirst();
         }else if(current.remove){
+            /*
             if(Build.validBreak(unit.getTeam(), current.x, current.y) && current.recipe == Recipe.getByResult(tile.block())){ //if it's valid, break it
 
                 float progress = 1f / tile.getBreakTime() * Timers.delta() * getBuildPower(tile);
@@ -138,18 +141,43 @@ public interface BuilderTrait {
 
                 if(current.progress >= 1f){
                     //FIXME a player instace is required here, but the the builder may not be a player
-                    CallBlocks.breakBlock(unit instanceof Player ? (Player)unit : null, unit.getTeam(), current.x, current.y, true, true);
+                    CallBlocks.breakBlock((Player)unit, unit.getTeam(), current.x, current.y, true, true);
                 }
             }else{
                 //otherwise, skip it
                 getPlaceQueue().removeFirst();
+            }*/
+
+            if (!(tile.block() instanceof BreakBlock)) { //check if haven't started placing
+                if(Build.validBreak(unit.getTeam(), current.x, current.y)){
+                    //if it's valid, place it
+                    //FIXME a player instance is required here, but the the builder may not be a player
+                    CallBlocks.breakBlock((Player)unit, unit.getTeam(), current.x, current.y);
+                }else{
+                    //otherwise, skip it
+                    getPlaceQueue().removeFirst();
+                }
+            }else{
+                TileEntity core = unit.getClosestCore();
+
+                //if there is no core to build with, stop building!
+                if(core == null){
+                    return;
+                }
+
+                //otherwise, update it.
+                BreakEntity entity = tile.entity();
+
+                entity.addProgress(core, unit, 1f / entity.breakTime * Timers.delta() * getBuildPower(tile));
+                unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(entity), 0.4f);
+                getCurrentRequest().progress = entity.progress();
             }
         }else{
             if (!(tile.block() instanceof BuildBlock)) { //check if haven't started placing
                 if(Build.validPlace(unit.getTeam(), current.x, current.y, current.recipe.result, current.rotation)){
                     //if it's valid, place it
-                    //FIXME a player instace is required here, but the the builder may not be a player
-                    CallBlocks.placeBlock(unit instanceof Player ? (Player)unit : null, unit.getTeam(), current.x, current.y, current.recipe, current.rotation);
+                    //FIXME a player instance is required here, but the the builder may not be a player
+                    CallBlocks.placeBlock((Player)unit, unit.getTeam(), current.x, current.y, current.recipe, current.rotation);
 
                     //fire build event
                     threads.run(() -> Events.fire(BlockBuildEvent.class, unit.getTeam(), world.tile(current.x, current.y)));
@@ -278,8 +306,6 @@ public interface BuilderTrait {
 
         public float progress;
 
-        private float[] removeAccumulator;
-
         /**This creates a build request.*/
         public BuildRequest(int x, int y, int rotation, Recipe recipe) {
             this.x = x;
@@ -296,10 +322,6 @@ public interface BuilderTrait {
             this.rotation = -1;
             this.recipe = Recipe.getByResult(world.tile(x, y).block());
             this.remove = true;
-
-            if(this.recipe != null){
-                this.removeAccumulator = new float[recipe.requirements.length];
-            }
         }
     }
 }

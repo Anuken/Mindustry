@@ -121,6 +121,8 @@ public class Block extends BaseBlock implements UnlockableContent{
 	public TextureRegion[] shadowRegions;
 	/**Whether the block can be tapped and selected to configure.*/
 	public boolean configurable;
+	/**Whether this block consumes touchDown events when tapped.*/
+	public boolean consumesTap;
 
 	public Block(String name) {
 		this.name = name;
@@ -177,8 +179,8 @@ public class Block extends BaseBlock implements UnlockableContent{
 	}
 
 	/**Called when the block is tapped.*/
-	public boolean tapped(Tile tile, Player player){
-		return false;
+	public void tapped(Tile tile, Player player){
+
 	}
 
 	/**Returns whether or not a hand cursor should be shown over this block.*/

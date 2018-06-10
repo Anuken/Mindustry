@@ -1,22 +1,26 @@
 package io.anuke.mindustry.world.blocks;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.content.fx.Fx;
-import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Rubble;
+import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.gen.CallBlocks;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
+import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.modules.InventoryModule;
+import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
@@ -32,16 +36,15 @@ public class BuildBlock extends Block {
         health = 1;
         layer = Layer.placement;
         configurable = true;
+        consumesTap = true;
     }
 
     @Override
-    public boolean tapped(Tile tile, Player player) {
+    public void tapped(Tile tile, Player player) {
         BuildEntity entity = tile.entity();
 
         player.clearBuilding();
         player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.getRotation(), entity.recipe));
-
-        return true;
     }
 
     @Override
@@ -107,12 +110,9 @@ public class BuildBlock extends Block {
         BuildEntity entity = tile.entity();
 
         if(entity.progress >= 1f){
-            Team team = tile.getTeam();
-            tile.setBlock(entity.recipe.result);
-            tile.setTeam(team);
-            Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), size);
+            CallBlocks.onBuildFinish(tile);
         }else if(entity.progress < 0f){
-            entity.damage(entity.health + 1);
+            CallBlocks.onBuildDeath(tile);
         }
 
         if(!entity.updated){
@@ -127,13 +127,29 @@ public class BuildBlock extends Block {
         return new BuildEntity();
     }
 
+    @Remote(called = Loc.server, in = In.blocks)
+    public static void onBuildDeath(Tile tile){
+        tile.entity.damage(tile.entity.health + 1);
+    }
+
+    @Remote(called = Loc.server, in = In.blocks)
+    public static void onBuildFinish(Tile tile){
+        BuildEntity entity = tile.entity();
+
+        Team team = tile.getTeam();
+        tile.setBlock(entity.recipe.result);
+        tile.setTeam(team);
+        Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), entity.recipe.result.size);
+    }
+
     public class BuildEntity extends TileEntity{
         public Recipe recipe;
 
-        private double progress = 0;
+        public double progress = 0;
+        public Block previous;
+
         private double[] accumulator;
         private boolean updated;
-        private Block previous;
 
         public void addProgress(InventoryModule inventory, double amount){
             double maxProgress = amount;

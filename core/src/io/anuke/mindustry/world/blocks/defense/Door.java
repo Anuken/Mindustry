@@ -26,6 +26,7 @@ public class Door extends Wall{
 		super(name);
 		solid = false;
 		solidifes = true;
+		consumesTap = true;
 	}
 	
 	@Override
@@ -51,11 +52,11 @@ public class Door extends Wall{
 	}
 
 	@Override
-	public boolean tapped(Tile tile, Player player){
+	public void tapped(Tile tile, Player player){
 		DoorEntity entity = tile.entity();
 		
 		if(Units.anyEntities(tile) && entity.open){
-			return true;
+			return;
 		}
 		
 		entity.open = !entity.open;
@@ -64,8 +65,6 @@ public class Door extends Wall{
 		}else{
 			Effects.effect(openfx, tile.drawx(), tile.drawy());
 		}
-
-		return true;
 	}
 	
 	@Override

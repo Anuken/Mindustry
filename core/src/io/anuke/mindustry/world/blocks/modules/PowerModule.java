@@ -2,8 +2,8 @@ package io.anuke.mindustry.world.blocks.modules;
 
 import io.anuke.mindustry.world.blocks.BlockModule;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 public class PowerModule extends BlockModule{
@@ -28,12 +28,12 @@ public class PowerModule extends BlockModule{
     }
 
     @Override
-    public void write(DataOutputStream stream) throws IOException {
+    public void write(DataOutput stream) throws IOException {
         stream.writeFloat(amount);
     }
 
     @Override
-    public void read(DataInputStream stream) throws IOException{
+    public void read(DataInput stream) throws IOException{
         amount = stream.readFloat();
     }
 }

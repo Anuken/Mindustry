@@ -1,6 +1,7 @@
 package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.type.AmmoEntry;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
@@ -11,7 +12,7 @@ import java.io.*;
 public class UnitInventory {
     private Array<AmmoEntry> ammos = new Array<>();
     private int totalAmmo;
-    private ItemStack item;
+    private ItemStack item = new ItemStack(Items.stone, 0);
     //TODO move these somewhere else so they're not variables?
     private int capacity, ammoCapacity;
     private boolean infiniteAmmo;
@@ -30,32 +31,31 @@ public class UnitInventory {
     }
 
     public void write(DataOutput stream) throws IOException {
-        stream.writeInt(item == null ? 0 : item.amount);
-        stream.writeByte(item == null ? 0 : item.item.id);
+        stream.writeShort(item.amount);
+        stream.writeByte(item.item.id);
         stream.writeBoolean(infiniteAmmo);
-        stream.writeInt(totalAmmo);
+        stream.writeShort(totalAmmo);
         stream.writeByte(ammos.size);
         for(int i = 0; i < ammos.size; i ++){
             stream.writeByte(ammos.get(i).type.id);
-            stream.writeInt(ammos.get(i).amount);
+            stream.writeShort(ammos.get(i).amount);
         }
     }
 
     public void read(DataInput stream) throws IOException {
-        int iamount = stream.readInt();
+        short iamount = stream.readShort();
         byte iid = stream.readByte();
         infiniteAmmo = stream.readBoolean();
-        this.totalAmmo = stream.readInt();
+        this.totalAmmo = stream.readShort();
         byte ammoa = stream.readByte();
         for(int i = 0; i < ammoa; i ++){
             byte aid = stream.readByte();
-            int am = stream.readInt();
+            int am = stream.readShort();
             ammos.add(new AmmoEntry(AmmoType.getByID(aid), am));
         }
 
-        if(iamount != 0){
-            item = new ItemStack(Item.getByID(iid), iamount);
-        }
+        item.item = Item.getByID(iid);
+        item.amount = iamount;
     }
 
     /**Returns ammo range, or MAX_VALUE if this inventory has no ammo.*/
@@ -116,7 +116,7 @@ public class UnitInventory {
     }
 
     public boolean isEmpty(){
-        return item == null;
+        return item.amount == 0;
     }
 
     public int itemCapacityUsed(Item type){
@@ -136,30 +136,29 @@ public class UnitInventory {
     }
 
     public void clear(){
-        item = null;
+        item.amount = 0;
         ammos.clear();
         totalAmmo = 0;
     }
 
     public void clearItem(){
-        item = null;
+        item.amount = 0;
     }
 
     public boolean hasItem(){
-        return item != null;
+        return item.amount > 0;
+    }
+
+    public boolean hasItem(Item i, int amount){
+        return item.item == i && item.amount >= amount;
     }
 
     public void addItem(Item item, int amount){
-        if(hasItem()){
-            getItem().amount = getItem().item == item ? getItem().amount + amount : amount;
-            getItem().item = item;
-        }else{
-            this.item = new ItemStack(item, amount);
-        }
+        getItem().amount = getItem().item == item ? getItem().amount + amount : amount;
+        getItem().item = item;
     }
 
     public ItemStack getItem(){
-        if(!hasItem()) throw new RuntimeException("This inventory has no item! Check hasItem() first.");
         return item;
     }
 }

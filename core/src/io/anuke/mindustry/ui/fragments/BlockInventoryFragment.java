@@ -117,7 +117,7 @@ public class BlockInventoryFragment implements Fragment {
                     for(int j = 0; j < Mathf.clamp(amount/3, 1, 8); j ++){
                         Timers.run(j*3f, () -> ItemTransfer.create(item, tile.drawx(), tile.drawy(), player, () -> {}));
                     }*/
-                    CallBlocks.requestItem(tile, item, amount);
+                    CallBlocks.requestItem(player, tile, item, amount);
 
                 });
                 table.add(image);
@@ -148,7 +148,7 @@ public class BlockInventoryFragment implements Fragment {
         table.setPosition(v.x, v.y, Align.center);
     }
 
-    @Remote(called = Loc.server, targets = Loc.client, in = In.blocks)
+    @Remote(called = Loc.server, targets = Loc.both, in = In.blocks)
     public static void requestItem(Player player, Tile tile, Item item, int amount){
         int removed = tile.block().removeStack(tile, item, amount);
 

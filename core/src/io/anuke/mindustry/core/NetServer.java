@@ -1,5 +1,6 @@
 package io.anuke.mindustry.core;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -15,6 +16,7 @@ import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Packets.*;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
@@ -136,7 +138,7 @@ public class NetServer extends Module{
         });
 
         //update last recieved snapshot based on client snapshot
-        Net.handleServer(ClientSnapshotPacket.class, (id, packet) ->{
+        Net.handleServer(ClientSnapshotPacket.class, (id, packet) -> {
             Player player = connections.get(id);
             NetConnection connection = Net.getConnection(id);
             if(player == null || connection == null || packet.snapid < connection.lastRecievedSnapshot) return;
@@ -231,6 +233,16 @@ public class NetServer extends Module{
                     if (!group.isEmpty() && (group.all().get(0) instanceof SyncTrait)) totalGroups ++;
                 }
 
+                Array<Tile> cores = state.teams.get(player.getTeam()).cores;
+
+                dataStream.writeByte(cores.size);
+
+                //write all core inventory data
+                for(Tile tile : cores){
+                    dataStream.writeInt(tile.packedPosition());
+                    tile.entity.items.write(dataStream);
+                }
+
                 //write total amount of serializable groups
                 dataStream.writeByte(totalGroups);
 
@@ -244,20 +256,13 @@ public class NetServer extends Module{
                         throw new RuntimeException("Entity group '" + group.getType() + "' contains SyncTrait entities, yet mapping is not enabled. In order for syncing to work, you must enable mapping for this group.");
                     }
 
-                    int size = group.size();
-
-                    if(group.getType() == Player.class){
-                        size --;
-                    }
-
                     //write group ID + group size
                     dataStream.writeByte(group.getID());
-                    dataStream.writeShort(size);
+                    dataStream.writeShort(group.size());
                     //write timestamp
                     dataStream.writeLong(TimeUtils.millis());
 
                     for(Entity entity : group.all()){
-                        if(entity == player) continue;
                         //write all entities now
                         dataStream.writeInt(entity.getID());
                         ((SyncTrait)entity).write(dataStream);

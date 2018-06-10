@@ -12,7 +12,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.*;
 
 public class Blocks extends BlockList implements ContentList{
-    public static Block air, spawn, blockpart, build1, build2, build3, build4, build5, build6, defaultFloor, space, metalfloor, deepwater, water, lava, oil, stone, blackstone, iron, lead, coal, titanium, thorium, dirt, sand, ice, snow, grass, sandblock, snowblock, stoneblock, blackstoneblock, grassblock, mossblock, shrub, rock, icerock, blackrock, dirtblock;
+    public static Block air, spawn, blockpart, defaultFloor, space, metalfloor, deepwater, water, lava, oil, stone, blackstone, iron, lead, coal, titanium, thorium, dirt, sand, ice, snow, grass, sandblock, snowblock, stoneblock, blackstoneblock, grassblock, mossblock, shrub, rock, icerock, blackrock, dirtblock;
 
     @Override
     public void load() {
@@ -23,17 +23,10 @@ public class Blocks extends BlockList implements ContentList{
 
         blockpart = new BlockPart();
 
-        build1 = new BuildBlock("build1");
-
-        build2 = new BuildBlock("build2");
-
-        build3 = new BuildBlock("build3");
-
-        build4 = new BuildBlock("build4");
-
-        build5 = new BuildBlock("build5");
-
-        build6 = new BuildBlock("build6");
+        for(int i = 1; i <= 6; i ++){
+            new BuildBlock("build" + i);
+            new BreakBlock("break" + i);
+        }
 
         defaultFloor = new Floor("defaultfloor");
 

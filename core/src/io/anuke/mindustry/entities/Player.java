@@ -2,7 +2,6 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
@@ -23,6 +22,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock.CoreEntity;
@@ -30,9 +30,11 @@ import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.ThreadQueue;
+import io.anuke.ucore.util.Timer;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -57,7 +59,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	public String name = "name";
 	public String uuid;
-	public boolean isAdmin;
+	public boolean isAdmin, isTransferring;
 	public Color color = new Color();
 
 	public Array<Upgrade> upgrades = new Array<>();
@@ -342,28 +344,16 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		for (BuildRequest request : getPlaceQueue()) {
 
 			if(request.remove){
+                Block block = world.tile(request.x, request.y).target().block();
+
 				//draw removal request
-				Draw.color(Palette.remove);
-				Draw.alpha(0.4f);
-				Lines.stroke(1f);
+                Draw.color(Palette.remove);
 
-				float progress = request.progress;
-				Tile tile = world.tile(request.x, request.y);
-				float size = tile.block().size * tilesize/2f;
-				float ss = -(progress*2f-1f);
+                Lines.stroke((1f-request.progress));
 
-				for(int i = 0; i < 4; i ++){
-					GridPoint2 p = Geometry.d8edge(i);
-
-					Fill.tri(tile.drawx() + size*p.x, tile.drawy() + size * p.y,
-							tile.drawx() + size*p.x*ss, tile.drawy() + size * p.y,
-							tile.drawx() + size*p.x, tile.drawy() + size * p.y*ss);
-				}
-
-				Draw.alpha(1f);
-
-				Lines.poly(tile.drawx(), tile.drawy(),
-						4, tile.block().size * tilesize /2f * (1f-progress) + Mathf.absin(Timers.time(), 3f, 1f));
+                Lines.poly(request.x * tilesize + block.offset(),
+                        request.y * tilesize + block.offset(),
+                        4, block.size * tilesize /2f, 45 + 15);
 			}else{
 				//draw place request
 				Draw.color(Palette.accent);
@@ -398,6 +388,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 		if(!isLocal){
 			interpolate();
+			updateBuilding(this); //building happens even with non-locals
 			return;
 		}
 
@@ -651,6 +642,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		mech = Upgrade.getByID(buffer.readByte());
 		interpolator.read(lastx, lasty, x, y, time, rotation);
 		rotation = lastrot;
+
+		if(isLocal){
+			x = lastx;
+			y = lasty;
+		}
 	}
 
 	//endregion
