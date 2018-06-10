@@ -13,10 +13,10 @@ import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.game.EventType.BlockBuildEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
+import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
@@ -31,6 +31,8 @@ import static io.anuke.mindustry.Vars.unitGroups;
 import static io.anuke.mindustry.Vars.world;
 
 public class Drone extends FlyingUnit implements BuilderTrait {
+    public static int typeID = -1;
+
     protected static float healSpeed = 0.1f;
     protected static float discoverRange = 120f;
     protected static boolean initialized;
@@ -64,6 +66,10 @@ public class Drone extends FlyingUnit implements BuilderTrait {
         }
     }
 
+    public Drone(){
+
+    }
+
     private void notifyPlaced(BuildEntity entity){
         float timeToBuild = entity.recipe.cost;
         float dist = Math.min(entity.distanceTo(x, y) - placeDistance, 0);
@@ -72,6 +78,11 @@ public class Drone extends FlyingUnit implements BuilderTrait {
             target = entity;
             setState(build);
         }
+    }
+
+    @Override
+    public int getTypeID() {
+        return typeID;
     }
 
     @Override

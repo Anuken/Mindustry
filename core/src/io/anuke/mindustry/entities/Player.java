@@ -12,10 +12,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.entities.effect.ItemDrop;
-import io.anuke.mindustry.entities.traits.BuilderTrait;
-import io.anuke.mindustry.entities.traits.CarriableTrait;
-import io.anuke.mindustry.entities.traits.CarryTrait;
-import io.anuke.mindustry.entities.traits.TargetTrait;
+import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
@@ -48,6 +45,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	private static final float flyMaxSpeed = 3f;
 	private static final float dashSpeed = 1.8f;
 	private static final Vector2 movement = new Vector2();
+
+	public static int typeID = -1;
 
 	public static final int timerShootLeft = 0;
 	public static final int timerShootRight = 1;
@@ -103,6 +102,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
             walktime += Timers.delta();
         }
     }
+
+	@Override
+	public int getTypeID() {
+		return typeID;
+	}
 
 	@Override
 	public CarriableTrait getCarry() {

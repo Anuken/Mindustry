@@ -32,6 +32,8 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, VelocityTrait, TimeTrait, Poolable {
+    public static int typeID = -1;
+
     private static final float sinkLifetime = 80f;
 
     private Interpolator interpolator = new Interpolator();
@@ -62,6 +64,11 @@ public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, Veloc
     public ItemDrop(){
         hitbox.setSize(5f);
         hitboxTile.setSize(5f);
+    }
+
+    @Override
+    public int getTypeID() {
+        return typeID;
     }
 
     @Override

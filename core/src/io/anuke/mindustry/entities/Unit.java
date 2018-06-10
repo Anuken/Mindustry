@@ -29,6 +29,10 @@ import static io.anuke.mindustry.Vars.world;
 public abstract class Unit extends DestructibleEntity implements SaveTrait, TargetTrait, SyncTrait, DrawTrait, TeamTrait, CarriableTrait {
     /**total duration of hit flash effect*/
     public static final float hitDuration = 9f;
+    /**Percision divisor of velocity, used when writing. For example a value of '2' would mean the percision is 1/2 = 0.5-size chunks.*/
+    public static final float velocityPercision = 8f;
+    /**Maximum absolute value of a velocity vector component.*/
+    public static final float maxAbsVelocity = 127f/velocityPercision;
 
     public UnitInventory inventory = new UnitInventory(100, 100);
     public float rotation;
@@ -103,10 +107,12 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         stream.writeByte(team.ordinal());
         stream.writeFloat(x);
         stream.writeFloat(y);
-        stream.writeFloat(rotation);
+        stream.writeByte((byte)(Mathf.clamp(velocity.x, -maxAbsVelocity, maxAbsVelocity) * velocityPercision));
+        stream.writeByte((byte)(Mathf.clamp(velocity.y, -maxAbsVelocity, maxAbsVelocity) * velocityPercision));
+        stream.writeShort((short)(rotation*2));
         stream.writeShort((short)health);
         stream.writeByte(status.current().id);
-        stream.writeFloat(status.getTime());
+        stream.writeShort((short)(status.getTime()*2));
         inventory.write(stream);
     }
 
@@ -115,16 +121,19 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         byte team = stream.readByte();
         float x = stream.readFloat();
         float y = stream.readFloat();
-        float rotation = stream.readFloat();
+        byte xv = stream.readByte();
+        byte yv = stream.readByte();
+        float rotation = stream.readShort()/2f;
         int health = stream.readShort();
         byte effect = stream.readByte();
-        float etime = stream.readFloat();
+        float etime = stream.readShort()/2f;
 
         this.inventory.read(stream);
         this.team = Team.values()[team];
         this.health = health;
         this.x = x;
         this.y = y;
+        this.velocity.set(xv / velocityPercision, yv / velocityPercision);
         this.rotation = rotation;
         this.status.set(StatusEffect.getByID(effect), etime);
     }

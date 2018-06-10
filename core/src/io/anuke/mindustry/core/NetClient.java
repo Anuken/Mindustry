@@ -2,8 +2,6 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Pools;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.annotations.Annotations.Variant;
 import io.anuke.mindustry.core.GameState.State;
@@ -217,38 +215,45 @@ public class NetClient extends Module {
                 world.tile(pos).entity.items.read(input);
             }
 
+            long timestamp = input.readLong();
+
             byte totalGroups = input.readByte();
             //for each group...
             for (int i = 0; i < totalGroups; i++) {
                 //read group info
                 byte groupID = input.readByte();
                 short amount = input.readShort();
-                long timestamp = input.readLong();
 
-                EntityGroup<?> group = Entities.getGroup(groupID);
+                EntityGroup group = Entities.getGroup(groupID);
 
                 //go through each entity
                 for (int j = 0; j < amount; j++) {
                     int id = input.readInt();
+                    byte typeID = input.readByte();
 
                     SyncTrait entity = (SyncTrait) group.getByID(id);
+                    boolean add = false;
 
                     //entity must not be added yet, so create it
                     if(entity == null){
-                        entity = (SyncTrait) ClassReflection.newInstance(group.getType()); //TODO solution without reflection?
+                        entity = SyncTrait.getTypeByID(typeID).get(); //create entity from supplier
                         entity.resetID(id);
-                        entity.add();
+                        add = true;
                     }
 
                     //read the entity
                     entity.read(input, timestamp);
+
+                    if(add){
+                        entity.add();
+                    }
                 }
             }
 
             //confirm that snapshot has been recieved
             netClient.lastSnapshotID = snapshotID;
 
-        }catch (IOException | ReflectionException e){
+        }catch (IOException e){
             e.printStackTrace();
         }
     }

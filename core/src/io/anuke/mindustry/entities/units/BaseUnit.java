@@ -1,5 +1,7 @@
 package io.anuke.mindustry.entities.units;
 
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
@@ -7,6 +9,8 @@ import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
@@ -84,13 +88,7 @@ public abstract class BaseUnit extends Unit{
 	}
 
 	public void shoot(AmmoType type, float rotation, float translation){
-		Bullet.create(type.bullet, this,
-				x + Angles.trnsx(rotation, translation),
-				y + Angles.trnsy(rotation, translation), rotation);
-		Effects.effect(type.shootEffect, x + Angles.trnsx(rotation, translation),
-				y + Angles.trnsy(rotation, translation), rotation, this);
-		Effects.effect(type.smokeEffect, x + Angles.trnsx(rotation, translation),
-				y + Angles.trnsy(rotation, translation), rotation, this);
+
 	}
 
 	public void targetClosestAllyFlag(BlockFlag flag){
@@ -115,6 +113,15 @@ public abstract class BaseUnit extends Unit{
 
 	public UnitState getStartState(){
 		return null;
+	}
+
+	@Override
+	public void interpolate() {
+		super.interpolate();
+
+		if(interpolator.values.length > 0){
+			rotation = interpolator.values[0];
+		}
 	}
 
 	@Override
@@ -200,12 +207,7 @@ public abstract class BaseUnit extends Unit{
 
 	@Override
 	public void onDeath(){
-		super.onDeath();
-
-		Effects.effect(ExplosionFx.explosion, this);
-		Effects.shake(2f, 2f, this);
-
-		remove();
+		CallEntity.onUnitDeath(this);
 	}
 
 	@Override
@@ -244,12 +246,42 @@ public abstract class BaseUnit extends Unit{
 
 	@Override
 	public void write(DataOutput data) throws IOException{
-		writeSave(data);
+		super.writeSave(data);
+		data.writeByte(type.id);
 	}
 
 	@Override
 	public void read(DataInput data, long time) throws IOException{
+		float lastx = x, lasty = y, lastrot = rotation;
 		super.readSave(data);
 		this.type = UnitType.getByID(data.readByte());
+
+		interpolator.read(lastx, lasty, x, y, time, rotation);
+		rotation = lastrot;
+	}
+
+	public void onSuperDeath(){
+		super.onDeath();
+	}
+
+	@Remote(called = Loc.server, in = In.entities)
+	public static void onUnitShoot(BaseUnit unit, AmmoType type, float rotation){
+		Bullet.create(type.bullet, unit,
+				unit.x + Angles.trnsx(rotation, unit.type.shootTranslation),
+				unit.y + Angles.trnsy(rotation, unit.type.shootTranslation), rotation);
+		Effects.effect(type.shootEffect, unit.x + Angles.trnsx(rotation, unit.type.shootTranslation),
+				unit.y + Angles.trnsy(rotation, unit.type.shootTranslation), rotation, unit);
+		Effects.effect(type.smokeEffect, unit.x + Angles.trnsx(rotation, unit.type.shootTranslation),
+				unit.y + Angles.trnsy(rotation, unit.type.shootTranslation), rotation, unit);
+	}
+
+	@Remote(called = Loc.server, in = In.entities)
+	public static void onUnitDeath(BaseUnit unit){
+		unit.onSuperDeath();
+
+		Effects.effect(ExplosionFx.explosion, unit);
+		Effects.shake(2f, 2f, unit);
+
+		unit.remove();
 	}
 }

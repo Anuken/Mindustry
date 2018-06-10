@@ -34,7 +34,7 @@ public class Fire extends TimedEntity implements SaveTrait, Poolable {
     private float baseFlammability = -1, puddleFlammability;
     private float lifetime;
 
-    /**Start a fire on the tile. If there already is a file there, refreshes its lifetime..*/
+    /**Start a fire on the tile. If there already is a file there, refreshes its lifetime.*/
     public static void create(Tile tile){
         Fire fire = map.get(tile.packedPosition());
 
@@ -67,7 +67,11 @@ public class Fire extends TimedEntity implements SaveTrait, Poolable {
 
     @Override
     public void update() {
-        super.update();
+        time = Mathf.clamp(time + Timers.delta(), 0, lifetime());
+
+        if(time >= lifetime()){
+            remove();
+        }
 
         TileEntity entity = tile.target().entity;
         boolean damage = entity != null;

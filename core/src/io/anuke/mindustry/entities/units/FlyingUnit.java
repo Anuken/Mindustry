@@ -7,8 +7,8 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
 import io.anuke.mindustry.type.AmmoType;
-import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Angles;
@@ -18,7 +18,7 @@ import io.anuke.ucore.util.Translator;
 
 import static io.anuke.mindustry.Vars.world;
 
-public class FlyingUnit extends BaseUnit implements CarryTrait{
+public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     protected static Translator vec = new Translator();
     protected static float maxAim = 30f;
     protected static float wobblyness = 0.6f;
@@ -28,6 +28,11 @@ public class FlyingUnit extends BaseUnit implements CarryTrait{
 
     public FlyingUnit(UnitType type, Team team) {
         super(type, team);
+    }
+
+    //instantiation only
+    public FlyingUnit(){
+
     }
 
     @Override

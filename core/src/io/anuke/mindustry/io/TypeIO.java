@@ -4,12 +4,10 @@ import io.anuke.annotations.Annotations.ReadClass;
 import io.anuke.annotations.Annotations.WriteClass;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Packets.KickReason;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Recipe;
-import io.anuke.mindustry.type.Upgrade;
-import io.anuke.mindustry.type.Weapon;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.Entities;
 
@@ -47,6 +45,19 @@ public class TypeIO {
         byte gid = buffer.get();
         int id = buffer.getInt();
         return (Unit)Entities.getGroup(gid).getByID(id);
+    }
+
+    @WriteClass(BaseUnit.class)
+    public static void writeBaseUnit(ByteBuffer buffer, BaseUnit unit){
+        buffer.put((byte)unit.getGroup().getID());
+        buffer.putInt(unit.getID());
+    }
+
+    @ReadClass(BaseUnit.class)
+    public static BaseUnit writeBaseUnit(ByteBuffer buffer){
+        byte gid = buffer.get();
+        int id = buffer.getInt();
+        return (BaseUnit)Entities.getGroup(gid).getByID(id);
     }
 
     @WriteClass(Tile.class)
@@ -87,6 +98,16 @@ public class TypeIO {
     @ReadClass(Weapon.class)
     public static Weapon readWeapon(ByteBuffer buffer){
         return Upgrade.getByID(buffer.get());
+    }
+
+    @WriteClass(AmmoType.class)
+    public static void writeAmmo(ByteBuffer buffer, AmmoType type){
+        buffer.put(type.id);
+    }
+
+    @ReadClass(AmmoType.class)
+    public static AmmoType readAmmo(ByteBuffer buffer){
+        return AmmoType.getByID(buffer.get());
     }
 
     @WriteClass(Item.class)

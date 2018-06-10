@@ -7,8 +7,14 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.content.bullets.*;
 import io.anuke.mindustry.content.fx.*;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.bullet.BulletType;
+import io.anuke.mindustry.entities.effect.ItemDrop;
+import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.units.UnitType;
+import io.anuke.mindustry.entities.units.types.Drone;
+import io.anuke.mindustry.entities.units.types.Scout;
+import io.anuke.mindustry.entities.units.types.Vtol;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.Liquid;
@@ -86,6 +92,8 @@ public class ContentLoader {
             return;
         }
 
+        registerTypes();
+
         for (ContentList list : content){
             list.load();
         }
@@ -116,5 +124,14 @@ public class ContentLoader {
 
     public static void dispose(){
         //TODO clear all content.
+    }
+
+    /**Registers sync IDs for all types of sync entities.*/
+    private static void registerTypes(){
+        Player.typeID = SyncTrait.registerType(Player::new);
+        Drone.typeID = SyncTrait.registerType(Drone::new);
+        Vtol.typeID = SyncTrait.registerType(Vtol::new);
+        Scout.typeID = SyncTrait.registerType(Scout::new);
+        ItemDrop.typeID = SyncTrait.registerType(ItemDrop::new);
     }
 }

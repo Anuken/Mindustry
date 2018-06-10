@@ -243,6 +243,9 @@ public class NetServer extends Module{
                     tile.entity.items.write(dataStream);
                 }
 
+                //write timestamp
+                dataStream.writeLong(TimeUtils.millis());
+
                 //write total amount of serializable groups
                 dataStream.writeByte(totalGroups);
 
@@ -259,13 +262,12 @@ public class NetServer extends Module{
                     //write group ID + group size
                     dataStream.writeByte(group.getID());
                     dataStream.writeShort(group.size());
-                    //write timestamp
-                    dataStream.writeLong(TimeUtils.millis());
 
                     for(Entity entity : group.all()){
                         //write all entities now
-                        dataStream.writeInt(entity.getID());
-                        ((SyncTrait)entity).write(dataStream);
+                        dataStream.writeInt(entity.getID()); //write id
+                        dataStream.writeByte(((SyncTrait)entity).getTypeID()); //write type ID
+                        ((SyncTrait)entity).write(dataStream); //write entity
                     }
                 }
 

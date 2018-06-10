@@ -21,6 +21,7 @@ public class UnitType {
     public float speed = 0.4f;
     public float range = 160;
     public float rotatespeed = 0.1f;
+    public float shootTranslation = 4f;
     public float baseRotateSpeed = 0.1f;
     public float mass = 1f;
     public boolean isFlying;

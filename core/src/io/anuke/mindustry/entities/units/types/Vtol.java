@@ -3,14 +3,25 @@ package io.anuke.mindustry.entities.units.types;
 import io.anuke.mindustry.entities.units.FlyingUnit;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
 public class Vtol extends FlyingUnit {
+    public static int typeID = -1;
 
     public Vtol(UnitType type, Team team) {
         super(type, team);
+    }
+
+    public Vtol(){
+
+    }
+
+    @Override
+    public int getTypeID() {
+        return typeID;
     }
 
     @Override
@@ -31,10 +42,12 @@ public class Vtol extends FlyingUnit {
     public void update() {
         super.update();
 
+        if(Net.client()) return;
+
         x += Mathf.sin(Timers.time() + id * 999, 25f, 0.07f);
         y += Mathf.cos(Timers.time() + id * 999, 25f, 0.07f);
 
-        if(velocity.len() <= 0.2f){
+        if (velocity.len() <= 0.2f) {
             rotation += Mathf.sin(Timers.time() + id * 99, 10f, 8f);
         }
     }

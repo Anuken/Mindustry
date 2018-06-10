@@ -5,9 +5,9 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.AmmoType;
-import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.*;
@@ -25,14 +25,17 @@ public abstract class GroundUnit extends BaseUnit {
         super(type, team);
     }
 
+    public GroundUnit(){
+
+    }
+
     @Override
     public void interpolate() {
-        interpolator.update();
+        super.interpolate();
 
-        x = interpolator.pos.x;
-        y = interpolator.pos.y;
-        rotation = interpolator.values[0];
-        baseRotation = interpolator.values[1];
+        if(interpolator.values.length > 1) {
+            baseRotation = interpolator.values[1];
+        }
     }
 
     @Override
