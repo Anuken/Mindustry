@@ -2,9 +2,14 @@ package io.anuke.mindustry.world.blocks.power;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntArray;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.gen.CallBlocks;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
@@ -54,7 +59,7 @@ public class PowerDistributor extends PowerBlock{
 	public void placed(Tile tile) {
 		Tile before = world.tile(lastPlaced);
 		if(linkValid(tile, before) && before.block() instanceof PowerDistributor){
-			link(tile, before);
+			CallBlocks.linkPowerDistributors(null, tile, before);
 		}
 
 		lastPlaced = tile.packedPosition();
@@ -80,9 +85,9 @@ public class PowerDistributor extends PowerBlock{
 
 		if(linkValid(tile, other)){
 			if(linked(tile, other)){
-				unlink(tile, other);
+				CallBlocks.unlinkPowerDistributors(null, tile, other);
 			}else if(entity.links.size < maxNodes){
-				link(tile, other);
+				CallBlocks.linkPowerDistributors(null, tile, other);
 			}
 			return false;
 		}
@@ -215,7 +220,7 @@ public class PowerDistributor extends PowerBlock{
 			}
 		}
 	}
-
+/*
 	protected void link(Tile tile, Tile other){
 		DistributorEntity entity = tile.entity();
 
@@ -242,7 +247,7 @@ public class PowerDistributor extends PowerBlock{
 
 			oe.links.removeValue(tile.packedPosition());
 		}
-	}
+	}*/
 
 	protected boolean linked(Tile tile, Tile other){
 		return tile.<DistributorEntity>entity().links.contains(other.packedPosition());
@@ -282,6 +287,36 @@ public class PowerDistributor extends PowerBlock{
     public TileEntity getEntity() {
         return new DistributorEntity();
     }
+
+    @Remote(targets = Loc.both, called = Loc.both, in = In.blocks, forward = true)
+    public static void linkPowerDistributors(Player player, Tile tile, Tile other){
+		DistributorEntity entity = tile.entity();
+
+		if(!entity.links.contains(other.packedPosition())){
+			entity.links.add(other.packedPosition());
+		}
+
+		if(other.block() instanceof PowerDistributor){
+			DistributorEntity oe = other.entity();
+
+			if(!oe.links.contains(tile.packedPosition()) ){
+				oe.links.add(tile.packedPosition());
+			}
+		}
+	}
+
+	@Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
+	public static void unlinkPowerDistributors(Player player, Tile tile, Tile other){
+		DistributorEntity entity = tile.entity();
+
+		entity.links.removeValue(other.packedPosition());
+
+		if(other.block() instanceof PowerDistributor){
+			DistributorEntity oe = other.entity();
+
+			oe.links.removeValue(tile.packedPosition());
+		}
+	}
 
     public static class DistributorEntity extends TileEntity{
         public float laserColor = 0f;

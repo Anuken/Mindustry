@@ -125,7 +125,7 @@ public abstract class InputHandler extends InputAdapter{
 		//consume tap event if necessary
 		if(tile.getTeam() == player.getTeam() && tile.block().consumesTap){
 			consumed = true;
-		}else if(tile.getTeam() == player.getTeam() && tile.block().synthetic() && tile.block().hasItems){
+		}else if(tile.getTeam() == player.getTeam() && tile.block().synthetic() && tile.block().hasItems && !consumed){
 			frag.inv.showFor(tile);
 			consumed = true;
 			showedInventory = true;

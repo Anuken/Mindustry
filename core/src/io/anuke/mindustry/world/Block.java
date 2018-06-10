@@ -185,7 +185,7 @@ public class Block extends BaseBlock implements UnlockableContent{
 
 	/**Returns whether or not a hand cursor should be shown over this block.*/
 	public CursorType getCursor(Tile tile){
-		return configurable ? CursorType.normal : CursorType.hand;
+		return configurable ? CursorType.hand : CursorType.normal;
 	}
 
 	/**Called when this block is tapped to build a UI on the table.

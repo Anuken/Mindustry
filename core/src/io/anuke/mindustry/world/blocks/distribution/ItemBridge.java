@@ -4,9 +4,14 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.gen.CallBlocks;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -50,7 +55,7 @@ public class ItemBridge extends Block {
         if(linkValid(tile, last)){
             ItemBridgeEntity entity = last.entity();
             if(!linkValid(last, world.tile(entity.link))){
-                link(last, tile);
+                CallBlocks.linkItemBridge(null, last, tile);
             }
         }
         lastPlaced = tile.packedPosition();
@@ -103,9 +108,9 @@ public class ItemBridge extends Block {
 
         if(linkValid(tile, other)){
             if(entity.link == other.packedPosition()){
-                unlink(tile, other);
+                CallBlocks.unlinkItemBridge(null, tile, other);
             }else{
-                link(tile, other);
+                CallBlocks.linkItemBridge(null, tile, other);
             }
             return false;
         }
@@ -243,22 +248,6 @@ public class ItemBridge extends Block {
         return new ItemBridgeEntity();
     }
 
-    public void link(Tile tile, Tile other){
-        ItemBridgeEntity entity = tile.entity();
-        ItemBridgeEntity oe = other.entity();
-        entity.link = other.packedPosition();
-        oe.incoming.add(tile.packedPosition());
-    }
-
-    public void unlink(Tile tile, Tile other){
-        ItemBridgeEntity entity = tile.entity();
-        entity.link = -1;
-        if(other != null) {
-            ItemBridgeEntity oe = other.entity();
-            oe.incoming.remove(tile.packedPosition());
-        }
-    }
-
     public boolean linkValid(Tile tile, Tile other){
         return linkValid(tile, other, true);
     }
@@ -274,6 +263,24 @@ public class ItemBridge extends Block {
         }
 
         return other.block() == this && (!checkDouble || other.<ItemBridgeEntity>entity().link != tile.packedPosition());
+    }
+
+    @Remote(targets = Loc.both, called = Loc.both, in = In.blocks, forward = true)
+    public static void linkItemBridge(Player player, Tile tile, Tile other){
+        ItemBridgeEntity entity = tile.entity();
+        ItemBridgeEntity oe = other.entity();
+        entity.link = other.packedPosition();
+        oe.incoming.add(tile.packedPosition());
+    }
+
+    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
+    public static void unlinkItemBridge(Player player, Tile tile, Tile other){
+        ItemBridgeEntity entity = tile.entity();
+        entity.link = -1;
+        if(other != null) {
+            ItemBridgeEntity oe = other.entity();
+            oe.incoming.remove(tile.packedPosition());
+        }
     }
 
     public static class ItemBridgeEntity extends TileEntity{

@@ -3,9 +3,14 @@ package io.anuke.mindustry.world.blocks.distribution;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.gen.CallBlocks;
+import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
@@ -75,8 +80,7 @@ public class Teleporter extends PowerBlock{
 
 	@Override
 	public void placed(Tile tile){
-		tile.<TeleporterEntity>entity().color = lastColor;
-		tile.<TeleporterEntity>entity().color = lastColor;
+		CallBlocks.setTeleporterColor(null, tile, lastColor);
 	}
 	
 	@Override
@@ -222,6 +226,7 @@ public class Teleporter extends PowerBlock{
 			final int f = i;
 			ImageButton button = cont.addImageButton("white", "toggle", 24, () -> {
 				lastColor = (byte)f;
+				CallBlocks.setTeleporterColor(null, tile, (byte)f);
 			}).size(34, 38).padBottom(-5.1f).group(group).get();
 			button.getStyle().imageUpColor = colorArray[f];
 			button.setChecked(entity.color == f);
@@ -290,6 +295,12 @@ public class Teleporter extends PowerBlock{
 			teleporters[entity.color].remove(remove);
 		
 		return returns;
+	}
+
+	@Remote(targets = Loc.both, called = Loc.both, in = In.blocks, forward = true)
+	public static void setTeleporterColor(Player player, Tile tile, byte color){
+		TeleporterEntity entity = tile.entity();
+		entity.color = color;
 	}
 
 	public static class TeleporterEntity extends TileEntity{
