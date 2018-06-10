@@ -6,20 +6,25 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.badlogic.gdx.utils.Pools;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.net.In;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.entities.impl.TimedEntity;
 import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.entities.trait.SolidTrait;
-import io.anuke.ucore.entities.impl.TimedEntity;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.SeedRandom;
 
 import static io.anuke.mindustry.Vars.bulletGroup;
 
@@ -27,19 +32,26 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait{
     private static Array<SolidTrait> entities = new Array<>();
     private static Rectangle rect = new Rectangle();
     private static Rectangle hitrect = new Rectangle();
+    private static int lastSeed = 0;
     private static float angle;
     private static float wetDamageMultiplier = 2;
 
     private Array<Vector2> lines = new Array<>();
-
-    public Color color = Palette.lancerLaser;
+    private Color color = Palette.lancerLaser;
+    private SeedRandom random = new SeedRandom();
 
     /**Create a lighting branch at a location. Use Team.none to damage everyone.*/
     public static void create(Team team, Effect effect, Color color, float damage, float x, float y, float targetAngle, int length){
+        CallEntity.createLighting(lastSeed++, team, effect, color, damage, x, y, targetAngle, length);
+    }
+
+    @Remote(called = Loc.server, in = In.entities)
+    public static void createLighting(int seed, Team team, Effect effect, Color color, float damage, float x, float y, float targetAngle, int length){
         Lightning l = Pools.obtain(Lightning.class);
 
         l.x = x;
         l.y = y;
+        l.random.setSeed(seed);
         l.color = color;
 
         float step = 3f;
@@ -85,8 +97,8 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait{
                 }
             });
 
-            if(Mathf.chance(0.1)){
-                Lightning.create(team, effect, color, damage, x2, y2, angle + Mathf.range(100f), length/3);
+            if(l.random.chance(0.1f)){
+                createLighting(l.random.nextInt(), team, effect, color, damage, x2, y2, angle + l.random.range(100f), length/3);
             }
 
             x = x2;
@@ -109,6 +121,11 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait{
     public void reset() {
         color = Palette.lancerLaser;
         lines.clear();
+    }
+
+    @Override
+    public void removed() {
+        Pools.free(this);
     }
 
     @Override

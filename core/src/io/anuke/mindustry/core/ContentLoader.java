@@ -9,6 +9,7 @@ import io.anuke.mindustry.content.bullets.*;
 import io.anuke.mindustry.content.fx.*;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.bullet.BulletType;
+import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.units.UnitType;
@@ -133,5 +134,6 @@ public class ContentLoader {
         Vtol.typeID = SyncTrait.registerType(Vtol::new);
         Scout.typeID = SyncTrait.registerType(Scout::new);
         ItemDrop.typeID = SyncTrait.registerType(ItemDrop::new);
+        Fire.typeID = SyncTrait.registerType(Fire::new);
     }
 }

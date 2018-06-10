@@ -6,9 +6,9 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.content.fx.Fx;
-import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -37,7 +37,7 @@ public class Damage {
 		}
 
 		for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i ++){
-			Timers.run(i/2, () -> Bullet.create(TurretBullets.fireball, null, Team.none, x, y, Mathf.random(360f)));
+			Timers.run(i/2, () -> CallEntity.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f)));
 		}
 
 		int waves = Mathf.clamp((int)(explosiveness / 4), 0, 30);

@@ -2,9 +2,12 @@ package io.anuke.mindustry.entities.bullet;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pools;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.traits.TeamTrait;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.BulletEntity;
@@ -53,6 +56,11 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait{
 
 	public static void create(BulletType type, Bullet parent, float x, float y, float angle, float velocityScl){
 		create(type, parent.owner, parent.team, x, y, angle, velocityScl);
+	}
+
+	@Remote(called = Loc.server, in = In.entities)
+	public static void createBullet(BulletType type, float x, float y, float angle){
+		create(type, null, Team.none, x, y, angle);
 	}
 
 	/**Internal use only!*/

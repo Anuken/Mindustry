@@ -4,11 +4,17 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.badlogic.gdx.utils.Pools;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.traits.SaveTrait;
+import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -24,9 +30,11 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Fire extends TimedEntity implements SaveTrait, Poolable {
+public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable {
     private static final IntMap<Fire> map = new IntMap<>();
     private static final float baseLifetime = 1000f;
+
+    public static int typeID = -1;
 
     private int loadedPosition = -1;
     private Tile tile;
@@ -61,15 +69,33 @@ public class Fire extends TimedEntity implements SaveTrait, Poolable {
     public Fire(){}
 
     @Override
+    public int getTypeID() {
+        return 0;
+    }
+
+    @Override
     public float lifetime() {
         return lifetime;
     }
 
     @Override
     public void update() {
+        if(Mathf.chance(0.1 * Timers.delta())) {
+            Effects.effect(EnvironmentFx.fire, tile.worldx() + Mathf.range(4f), tile.worldy() + Mathf.range(4f));
+        }
+
+        if(Mathf.chance(0.05 * Timers.delta())){
+            Effects.effect(EnvironmentFx.smoke, tile.worldx() + Mathf.range(4f), tile.worldy() + Mathf.range(4f));
+        }
+
+        if(Net.client()){
+            return;
+        }
+
         time = Mathf.clamp(time + Timers.delta(), 0, lifetime());
 
         if(time >= lifetime()){
+            CallEntity.onFireRemoved(getID());
             remove();
         }
 
@@ -98,8 +124,6 @@ public class Fire extends TimedEntity implements SaveTrait, Poolable {
         }
 
         if(Mathf.chance(0.1 * Timers.delta())){
-            Effects.effect(EnvironmentFx.fire, tile.worldx() + Mathf.range(4f), tile.worldy() + Mathf.range(4f));
-
             Puddle p = Puddle.getPuddle(tile);
             if(p != null){
                 puddleFlammability = p.getFlammability()/3f;
@@ -111,10 +135,6 @@ public class Fire extends TimedEntity implements SaveTrait, Poolable {
                 entity.damage(0.4f);
             }
             Damage.damageUnits(null, tile.worldx(), tile.worldy(), tilesize, 3f, unit -> unit.applyEffect(StatusEffects.burning, 0.8f));
-        }
-
-        if(Mathf.chance(0.05 * Timers.delta())){
-            Effects.effect(EnvironmentFx.smoke, tile.worldx() + Mathf.range(4f), tile.worldy() + Mathf.range(4f));
         }
     }
 
@@ -131,6 +151,18 @@ public class Fire extends TimedEntity implements SaveTrait, Poolable {
         this.lifetime = stream.readFloat();
         this.time = stream.readFloat();
         add();
+    }
+
+    @Override
+    public void write(DataOutput data) throws IOException {
+        data.writeFloat(x);
+        data.writeFloat(y);
+    }
+
+    @Override
+    public void read(DataInput data, long time) throws IOException {
+        x = data.readFloat();
+        y = data.readFloat();
     }
 
     @Override
@@ -159,5 +191,10 @@ public class Fire extends TimedEntity implements SaveTrait, Poolable {
     @Override
     public EntityGroup targetGroup() {
         return fireGroup;
+    }
+
+    @Remote(called = Loc.server, in = In.entities)
+    public static void onFireRemoved(int fireid){
+        fireGroup.removeByID(fireid);
     }
 }

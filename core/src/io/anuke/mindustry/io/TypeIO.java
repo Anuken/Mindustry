@@ -1,14 +1,18 @@
 package io.anuke.mindustry.io;
 
+import com.badlogic.gdx.graphics.Color;
 import io.anuke.annotations.Annotations.ReadClass;
 import io.anuke.annotations.Annotations.WriteClass;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.Entities;
 
 import java.nio.ByteBuffer;
@@ -90,6 +94,26 @@ public class TypeIO {
         return Team.values()[buffer.get()];
     }
 
+    @WriteClass(Effect.class)
+    public static void writeEffect(ByteBuffer buffer, Effect effect){
+        buffer.putShort((short)effect.id);
+    }
+
+    @ReadClass(Effect.class)
+    public static Effect readEffect(ByteBuffer buffer){
+        return Effects.getEffect(buffer.getShort());
+    }
+
+    @WriteClass(Color.class)
+    public static void writeColor(ByteBuffer buffer, Color color){
+        buffer.putInt(Color.rgba8888(color));
+    }
+
+    @ReadClass(Color.class)
+    public static Color readColor(ByteBuffer buffer){
+        return new Color(buffer.getInt());
+    }
+
     @WriteClass(Weapon.class)
     public static void writeWeapon(ByteBuffer buffer, Weapon weapon){
         buffer.put(weapon.id);
@@ -108,6 +132,16 @@ public class TypeIO {
     @ReadClass(AmmoType.class)
     public static AmmoType readAmmo(ByteBuffer buffer){
         return AmmoType.getByID(buffer.get());
+    }
+
+    @WriteClass(BulletType.class)
+    public static void writeBulletType(ByteBuffer buffer, BulletType type){
+        buffer.put((byte)type.id);
+    }
+
+    @ReadClass(BulletType.class)
+    public static BulletType readBulletType(ByteBuffer buffer){
+        return BulletType.getByID(buffer.get());
     }
 
     @WriteClass(Item.class)

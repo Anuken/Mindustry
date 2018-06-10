@@ -11,17 +11,16 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
-import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.entities.traits.SaveTrait;
+import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.entities.impl.BaseEntity;
+import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Hue;
@@ -112,7 +111,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
                 (liquid.flammability > 0.3f && dest.temperature > 0.7f)){ //flammable liquid + hot liquid
             Fire.create(tile);
             if(Mathf.chance(0.006 * amount)){
-                Bullet.create(TurretBullets.fireball, tile.entity, Team.none, x, y, Mathf.random(360f));
+                CallEntity.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f));
             }
         }else if(dest.temperature > 0.7f && liquid.temperature < 0.55f){ //cold liquid poured onto hot puddle
             if(Mathf.chance(0.5f * amount)){
