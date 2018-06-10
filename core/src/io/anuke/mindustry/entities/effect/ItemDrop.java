@@ -11,6 +11,7 @@ import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Interpolator;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -119,8 +120,12 @@ public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, Veloc
 
     @Override
     public void update() {
-        updateVelocity(0.2f);
-        updateTime();
+        if(Net.client()) {
+            interpolate();
+        }else{
+            updateVelocity(0.2f);
+            updateTime();
+        }
 
         Tile tile = world.tileWorld(x, y);
 
@@ -132,7 +137,7 @@ public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, Veloc
             }
 
             if(sinktime >= sinkLifetime){
-                remove();
+                CallEntity.onPickup(getID());
             }
         }else{
             sinktime = 0f;
@@ -147,6 +152,7 @@ public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, Veloc
     @Override
     public void reset() {
         time = 0f;
+        interpolator.reset();
     }
 
     @Override
@@ -169,12 +175,13 @@ public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, Veloc
         data.writeFloat(x);
         data.writeFloat(y);
         data.writeByte(item.id);
+        data.writeShort(amount);
     }
 
     @Override
     public void read(DataInput data, long time) throws IOException{
-        x = data.readFloat();
-        y = data.readFloat();
+        interpolator.read(x, y, data.readFloat(), data.readFloat(), time);
         item = Item.getByID(data.readByte());
+        amount = data.readShort();
     }
 }

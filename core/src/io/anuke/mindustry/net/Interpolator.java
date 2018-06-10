@@ -26,6 +26,16 @@ public class Interpolator {
         spacing = Math.min(Math.max(((TimeUtils.timeSinceMillis(sent) / 1000f) * 60f), 4f), 10);
     }
 
+    public void reset(){
+        values = new float[0];
+        targets = new float[0];
+        target.setZero();
+        last.setZero();
+        spacing = 1f;
+        time = 0f;
+        pos.setZero();
+    }
+
     public void update(){
 
         time += 1f / spacing * Math.min(Timers.delta(), 1f);
