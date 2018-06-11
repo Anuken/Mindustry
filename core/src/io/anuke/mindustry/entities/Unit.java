@@ -6,6 +6,7 @@ import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.net.Interpolator;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Tile;
@@ -224,7 +225,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void applyEffect(StatusEffect effect, float intensity){
-        if(dead) return;
+        if(dead || Net.client()) return; //effects are synced and thus not applied through clients
         status.handleApply(this, effect, intensity);
     }
 

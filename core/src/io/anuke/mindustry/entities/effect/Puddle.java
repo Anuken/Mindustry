@@ -6,6 +6,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.badlogic.gdx.utils.Pools;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.bullets.TurretBullets;
@@ -14,6 +16,8 @@ import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -32,8 +36,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.puddleGroup;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait {
     private static final IntMap<Puddle> map = new IntMap<>();
@@ -45,10 +48,11 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
     private static int seeds;
 
     private int loadedPosition = -1;
+
     private Tile tile;
     private Liquid liquid;
     private float amount;
-    private int generation;
+    private byte generation;
     private float accepting;
 
     /**Deposists a puddle between tile and source.*/
@@ -80,11 +84,13 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
 
         Puddle p = map.get(tile.packedPosition());
         if(p == null){
+            if(Net.client()) return; //not clientside.
+
             Puddle puddle = Pools.obtain(Puddle.class);
             puddle.tile = tile;
             puddle.liquid = liquid;
             puddle.amount = amount;
-            puddle.generation = generation;
+            puddle.generation = (byte)generation;
             puddle.set((tile.worldx() + source.worldx())/2f, (tile.worldy() + source.worldy())/2f);
             puddle.add();
             map.put(tile.packedPosition(), puddle);
@@ -136,6 +142,26 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
 
     @Override
     public void update() {
+        if(amount >= maxLiquid/2f && Timers.get(this, "update", 20)){
+            Units.getNearby(rect.setSize(Mathf.clamp(amount/(maxLiquid/1.5f))*10f).setCenter(tile.worldx(), tile.worldy()), unit -> {
+                unit.getHitbox(rect2);
+                if(!rect.overlaps(rect2)) return;
+
+                unit.applyEffect(liquid.effect, 0.5f);
+
+                if(unit.getVelocity().len() > 0.4) {
+                    Effects.effect(BlockFx.ripple, liquid.color, unit.x, unit.y);
+                }
+            });
+
+            if(liquid.temperature > 0.7f && tile.entity != null && Mathf.chance(0.3 * Timers.delta())){
+                Fire.create(tile);
+            }
+        }
+
+        //no updating happens clientside
+        if(Net.client()) return;
+
         float addSpeed = accepting > 0 ? 3f : 0f;
 
         amount -= Timers.delta() * (1f - liquid.viscosity) /(5f+addSpeed);
@@ -154,26 +180,10 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
             }
         }
 
-        if(amount >= maxLiquid/2f && Timers.get(this, "update", 20)){
-            Units.getNearby(rect.setSize(Mathf.clamp(amount/(maxLiquid/1.5f))*10f).setCenter(tile.worldx(), tile.worldy()), unit -> {
-                unit.getHitbox(rect2);
-                if(!rect.overlaps(rect2)) return;
-
-                unit.applyEffect(liquid.effect, 0.5f);
-                if(unit.getVelocity().len() > 0.4) {
-                    Effects.effect(BlockFx.ripple, liquid.color, unit.x, unit.y);
-                }
-            });
-
-            if(liquid.temperature > 0.7f && tile.entity != null && Mathf.chance(0.3 * Timers.delta())){
-                Fire.create(tile);
-            }
-        }
-
         amount = Mathf.clamp(amount, 0, maxLiquid);
 
         if(amount <= 0f){
-            remove();
+            CallEntity.onPuddleRemoved(getID());
         }
     }
 
@@ -248,5 +258,10 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
     @Override
     public EntityGroup targetGroup() {
         return puddleGroup;
+    }
+
+    @Remote(called = Loc.server, in = In.entities)
+    public static void onPuddleRemoved(int puddleid){
+        puddleGroup.removeByID(puddleid);
     }
 }

@@ -149,9 +149,9 @@ public class Vars{
 		shieldGroup = Entities.addGroup(Shield.class, false);
 		effectGroup = Entities.addGroup(EffectEntity.class, false);
 		groundEffectGroup = Entities.addGroup(DrawTrait.class, false);
-		puddleGroup = Entities.addGroup(Puddle.class, false);
+		puddleGroup = Entities.addGroup(Puddle.class, false).enableMapping();
 		itemGroup = Entities.addGroup(ItemDrop.class).enableMapping();
-		fireGroup = Entities.addGroup(Fire.class, false);
+		fireGroup = Entities.addGroup(Fire.class, false).enableMapping();
 		unitGroups = new EntityGroup[Team.values().length];
 
 		threads = new ThreadHandler(Platform.instance.getThreadProvider());
