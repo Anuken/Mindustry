@@ -189,12 +189,16 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	@Remote(in = In.entities, targets = Loc.server, called = Loc.server)
 	public static void onPlayerDamage(Player player, float amount){
+		if(player == null) return;
+
 		player.hitTime = hitDuration;
 		player.health -= amount;
 	}
 
 	@Remote(in = In.entities, targets = Loc.server, called = Loc.server)
 	public static void onPlayerDeath(Player player){
+		if(player == null) return;
+
 		player.dead = true;
 		player.respawning = false;
 		player.placeQueue.clear();
@@ -393,6 +397,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		if(!isLocal){
 			interpolate();
 			updateBuilding(this); //building happens even with non-locals
+			status.update(this); //status effect updating also happens with non locals for effect purposes
 			return;
 		}
 

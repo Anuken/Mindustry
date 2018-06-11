@@ -1,8 +1,13 @@
 package io.anuke.mindustry.content.blocks;
 
 import com.badlogic.gdx.utils.Array;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.Liquids;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.gen.CallBlocks;
+import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
@@ -105,7 +110,7 @@ public class DebugBlocks extends BlockList implements ContentList{
                     if (i == 0) continue;
                     final int f = i;
                     ImageButton button = cont.addImageButton("white", "toggle", 24, () -> {
-                        entity.source = items.get(f);
+                        CallBlocks.setLiquidSourceLiquid(null, tile, items.get(f));
                     }).size(38, 42).padBottom(-5.1f).group(group).get();
                     button.getStyle().imageUpColor = items.get(i).color;
                     button.setChecked(entity.source.id == f);
@@ -121,20 +126,6 @@ public class DebugBlocks extends BlockList implements ContentList{
             @Override
             public TileEntity getEntity() {
                 return new LiquidSourceEntity();
-            }
-
-            class LiquidSourceEntity extends TileEntity {
-                public Liquid source = Liquids.water;
-
-                @Override
-                public void write(DataOutputStream stream) throws IOException {
-                    stream.writeByte(source.id);
-                }
-
-                @Override
-                public void read(DataInputStream stream) throws IOException {
-                    source = Liquid.getByID(stream.readByte());
-                }
             }
         };
 
@@ -152,5 +143,25 @@ public class DebugBlocks extends BlockList implements ContentList{
                 return true;
             }
         };
+    }
+
+    @Remote(targets = Loc.both, called = Loc.both, in = In.blocks, forward = true)
+    public static void setLiquidSourceLiquid(Player player, Tile tile, Liquid liquid){
+        LiquidSourceEntity entity = tile.entity();
+        entity.source = liquid;
+    }
+
+    class LiquidSourceEntity extends TileEntity {
+        public Liquid source = Liquids.water;
+
+        @Override
+        public void write(DataOutputStream stream) throws IOException {
+            stream.writeByte(source.id);
+        }
+
+        @Override
+        public void read(DataInputStream stream) throws IOException {
+            source = Liquid.getByID(stream.readByte());
+        }
     }
 }

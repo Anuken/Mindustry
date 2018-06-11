@@ -12,7 +12,7 @@ import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.Puddle;
-import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.entities.units.types.Drone;
 import io.anuke.mindustry.entities.units.types.Scout;
@@ -130,12 +130,12 @@ public class ContentLoader {
 
     /**Registers sync IDs for all types of sync entities.*/
     private static void registerTypes(){
-        Player.typeID = SyncTrait.registerType(Player::new);
-        Drone.typeID = SyncTrait.registerType(Drone::new);
-        Vtol.typeID = SyncTrait.registerType(Vtol::new);
-        Scout.typeID = SyncTrait.registerType(Scout::new);
-        ItemDrop.typeID = SyncTrait.registerType(ItemDrop::new);
-        Fire.typeID = SyncTrait.registerType(Fire::new);
-        Puddle.typeID = SyncTrait.registerType(Puddle::new);
+        Player.typeID = TypeTrait.registerType(Player::new);
+        Drone.typeID = TypeTrait.registerType(Drone::new);
+        Vtol.typeID = TypeTrait.registerType(Vtol::new);
+        Scout.typeID = TypeTrait.registerType(Scout::new);
+        ItemDrop.typeID = TypeTrait.registerType(ItemDrop::new);
+        Fire.typeID = TypeTrait.registerType(Fire::new);
+        Puddle.typeID = TypeTrait.registerType(Puddle::new);
     }
 }

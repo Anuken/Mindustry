@@ -52,6 +52,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable 
             fire = Pools.obtain(Fire.class);
             fire.tile = tile;
             fire.lifetime = baseLifetime;
+            fire.set(tile.worldx(), tile.worldy());
             fire.add();
             map.put(tile.packedPosition(), fire);
         }else{
@@ -72,7 +73,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable 
 
     @Override
     public int getTypeID() {
-        return 0;
+        return typeID;
     }
 
     @Override
@@ -83,11 +84,11 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable 
     @Override
     public void update() {
         if(Mathf.chance(0.1 * Timers.delta())) {
-            Effects.effect(EnvironmentFx.fire, tile.worldx() + Mathf.range(4f), tile.worldy() + Mathf.range(4f));
+            Effects.effect(EnvironmentFx.fire, x + Mathf.range(4f), y + Mathf.range(4f));
         }
 
         if(Mathf.chance(0.05 * Timers.delta())){
-            Effects.effect(EnvironmentFx.smoke, tile.worldx() + Mathf.range(4f), tile.worldy() + Mathf.range(4f));
+            Effects.effect(EnvironmentFx.smoke, x + Mathf.range(4f), y + Mathf.range(4f));
         }
 
         if(Net.client()){
@@ -136,7 +137,11 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable 
             if(damage){
                 entity.damage(0.4f);
             }
-            Damage.damageUnits(null, tile.worldx(), tile.worldy(), tilesize, 3f, unit -> unit.applyEffect(StatusEffects.burning, 0.8f));
+            Damage.damageUnits(null, tile.worldx(), tile.worldy(), tilesize, 3f, unit -> {
+                if(!unit.isFlying()) {
+                    unit.applyEffect(StatusEffects.burning, 0.8f);
+                }
+            });
         }
     }
 
@@ -186,7 +191,9 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable 
 
     @Override
     public void removed() {
-        map.remove(tile.packedPosition());
+        if(tile != null){
+            map.remove(tile.packedPosition());
+        }
         reset();
     }
 

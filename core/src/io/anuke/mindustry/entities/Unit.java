@@ -163,6 +163,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         return (Floor)(tile == null || (tile.floor() == null) ? Blocks.defaultFloor : tile.floor());
     }
 
+    /**Updates velocity and status effects.*/
     public void updateVelocityStatus(float drag, float maxVelocity){
         if(isCarried()){ //carried units do not take into account velocity normally
             set(carrier.getX(), carrier.getY());

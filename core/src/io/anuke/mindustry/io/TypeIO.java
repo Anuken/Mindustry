@@ -124,6 +124,16 @@ public class TypeIO {
         return Upgrade.getByID(buffer.get());
     }
 
+    @WriteClass(Liquid.class)
+    public static void writeLiquid(ByteBuffer buffer, Liquid liquid){
+        buffer.put((byte)liquid.id);
+    }
+
+    @ReadClass(Liquid.class)
+    public static Liquid readLiquid(ByteBuffer buffer){
+        return Liquid.getByID(buffer.get());
+    }
+
     @WriteClass(AmmoType.class)
     public static void writeAmmo(ByteBuffer buffer, AmmoType type){
         buffer.put(type.id);

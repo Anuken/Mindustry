@@ -7,6 +7,7 @@ import io.anuke.annotations.Annotations.Variant;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.gen.RemoteReadClient;
 import io.anuke.mindustry.net.Net;
@@ -23,7 +24,6 @@ import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Timer;
 
 import java.io.DataInputStream;
-import java.io.IOException;
 import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.*;
@@ -228,6 +228,7 @@ public class NetClient extends Module {
 
                 //go through each entity
                 for (int j = 0; j < amount; j++) {
+                    int position = netClient.byteStream.position(); //save position to check read/write correctness
                     int id = input.readInt();
                     byte typeID = input.readByte();
 
@@ -236,13 +237,18 @@ public class NetClient extends Module {
 
                     //entity must not be added yet, so create it
                     if(entity == null){
-                        entity = SyncTrait.getTypeByID(typeID).get(); //create entity from supplier
+                        entity = (SyncTrait) TypeTrait.getTypeByID(typeID).get(); //create entity from supplier
                         entity.resetID(id);
                         add = true;
                     }
 
                     //read the entity
                     entity.read(input, timestamp);
+
+                    byte readLength = input.readByte();
+                    if(netClient.byteStream.position() - position - 1 != readLength){
+                        throw new RuntimeException("Error reading entity of type '"+ group.getType() + "': Read length mismatch [write=" + readLength + ", read=" + (netClient.byteStream.position() - position - 1)+ "]");
+                    }
 
                     if(add){
                         entity.add();
@@ -253,8 +259,8 @@ public class NetClient extends Module {
             //confirm that snapshot has been recieved
             netClient.lastSnapshotID = snapshotID;
 
-        }catch (IOException e){
-            e.printStackTrace();
+        }catch (Exception e){
+            throw new RuntimeException(e);
         }
     }
 }

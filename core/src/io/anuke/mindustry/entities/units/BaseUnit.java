@@ -266,6 +266,8 @@ public abstract class BaseUnit extends Unit{
 
 	@Remote(called = Loc.server, in = In.entities)
 	public static void onUnitShoot(BaseUnit unit, AmmoType type, float rotation){
+		if(unit == null) return;
+
 		Bullet.create(type.bullet, unit,
 				unit.x + Angles.trnsx(rotation, unit.type.shootTranslation),
 				unit.y + Angles.trnsy(rotation, unit.type.shootTranslation), rotation);
@@ -277,11 +279,14 @@ public abstract class BaseUnit extends Unit{
 
 	@Remote(called = Loc.server, in = In.entities)
 	public static void onUnitDeath(BaseUnit unit){
+		if(unit == null) return;
+
 		unit.onSuperDeath();
 
 		Effects.effect(ExplosionFx.explosion, unit);
 		Effects.shake(2f, 2f, unit);
 
-		unit.remove();
+		//must run afterwards so the unit's group is not null
+		threads.runDelay(unit::remove);
 	}
 }

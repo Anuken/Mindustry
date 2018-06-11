@@ -1,10 +1,8 @@
 package io.anuke.mindustry.entities.traits;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.net.Interpolator;
 import io.anuke.ucore.entities.trait.Entity;
-import io.anuke.ucore.function.Supplier;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -12,25 +10,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.threads;
 
-public interface SyncTrait extends Entity {
-    int[] lastRegisteredID = {0};
-    Array<Supplier<? extends SyncTrait>> registeredTypes = new Array<>();
-
-    /**Register and return a type ID. The supplier should return a fresh instace of that type.*/
-    static int registerType(Supplier<? extends SyncTrait> supplier){
-        registeredTypes.add(supplier);
-        int result = lastRegisteredID[0];
-        lastRegisteredID[0] ++;
-        return result;
-    }
-
-    /**Registers a syncable type by ID.*/
-    static Supplier<? extends SyncTrait> getTypeByID(int id){
-        if(id == -1){
-            throw new IllegalArgumentException("Attempt to retrieve invalid entity type ID! Did you forget to set it in ContentLoader.registerTypes()?");
-        }
-        return registeredTypes.get(id);
-    }
+public interface SyncTrait extends Entity, TypeTrait {
 
     /**Whether smoothing of entities is enabled; not yet implemented.*/
     static boolean isSmoothing(){
@@ -63,9 +43,6 @@ public interface SyncTrait extends Entity {
     default Interpolator getInterpolator(){
         return null;
     }
-
-    /**Returns the type ID of this entity used for intstantiation. Should be < BYTE_MAX.*/
-    int getTypeID();
 
     //Read and write sync data, usually position
     void write(DataOutput data) throws IOException;

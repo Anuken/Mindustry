@@ -30,7 +30,7 @@ public class OverlayRenderer {
         for(Player player : players) {
             InputHandler input = control.input(player.playerIndex);
 
-            if(!input.isDrawing()) continue;
+            if(!input.isDrawing() || player.isDead()) continue;
 
             Shaders.outline.color.set(Palette.accent);
             Graphics.beginShaders(Shaders.outline);
@@ -44,6 +44,7 @@ public class OverlayRenderer {
     public void drawTop(){
 
         for(Player player : players) {
+            if(player.isDead()) continue; //dead player don't draw
 
             InputHandler input = control.input(player.playerIndex);
 

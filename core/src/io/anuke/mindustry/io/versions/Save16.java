@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.entities.traits.SaveTrait;
+import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
@@ -69,11 +70,10 @@ public class Save16 extends SaveFileVersion {
 
         for (int i = 0; i < groups; i++) {
             int amount = stream.readInt();
-            byte gid = stream.readByte();
-            EntityGroup<?> group = Entities.getGroup(gid);
             for (int j = 0; j < amount; j++) {
-                Entity entity = construct(group.getType());
-                ((SaveTrait)entity).readSave(stream);
+                byte typeid = stream.readByte();
+                SaveTrait trait = (SaveTrait) TypeTrait.getTypeByID(typeid).get();
+                trait.readSave(stream);
             }
         }
 
@@ -172,8 +172,8 @@ public class Save16 extends SaveFileVersion {
         for(EntityGroup<?> group : Entities.getAllGroups()){
             if(!group.isEmpty() && group.all().get(0) instanceof SaveTrait){
                 stream.writeInt(group.size());
-                stream.writeByte(group.getID());
                 for(Entity entity : group.all()){
+                    stream.writeByte(((SaveTrait)entity).getTypeID());
                     ((SaveTrait)entity).writeSave(stream);
                 }
             }

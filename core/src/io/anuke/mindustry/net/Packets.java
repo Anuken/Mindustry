@@ -3,10 +3,12 @@ package io.anuke.mindustry.net;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packet.UnimportantPacket;
 import io.anuke.ucore.io.IOUtils;
+import io.anuke.ucore.util.Mathf;
 
 import java.nio.ByteBuffer;
 
@@ -99,7 +101,7 @@ public class Packets {
         public int snapid;
         public long timeSent;
         //player snapshot data
-        public float x, y, rotation, baseRotation;
+        public float x, y, rotation, baseRotation, xv, yv;
 
         @Override
         public void write(ByteBuffer buffer) {
@@ -111,6 +113,9 @@ public class Packets {
 
             buffer.putFloat(player.x);
             buffer.putFloat(player.y);
+
+            buffer.put((byte)(Mathf.clamp(player.getVelocity().x, -Unit.maxAbsVelocity, Unit.maxAbsVelocity) * Unit.velocityPercision));
+            buffer.put((byte)(Mathf.clamp(player.getVelocity().y, -Unit.maxAbsVelocity, Unit.maxAbsVelocity) * Unit.velocityPercision));
             //saving 4 bytes, yay?
             buffer.putShort((short)(player.rotation*2));
             buffer.putShort((short)(player.baseRotation*2));
@@ -124,6 +129,8 @@ public class Packets {
 
             x = buffer.getFloat();
             y = buffer.getFloat();
+            xv = buffer.get() / Unit.velocityPercision;
+            yv = buffer.get() / Unit.velocityPercision;
             rotation = buffer.getShort()/2f;
             baseRotation = buffer.getShort()/2f;
         }

@@ -37,7 +37,8 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.puddleGroup;
+import static io.anuke.mindustry.Vars.world;
 
 public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait, SyncTrait {
     private static final IntMap<Puddle> map = new IntMap<>();
@@ -52,6 +53,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
 
     private int loadedPosition = -1;
 
+    private float updateTime;
     private Tile tile;
     private Liquid liquid;
     private float amount, targetAmount;
@@ -145,14 +147,46 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
 
     @Override
     public void update() {
-        if(amount >= maxLiquid/2f && Timers.get(this, "update", 20)){
+
+        //no updating happens clientside
+        if(Net.client()){
+            amount = Mathf.lerpDelta(amount, targetAmount, 0.15f);
+        }else{
+            //update code
+            float addSpeed = accepting > 0 ? 3f : 0f;
+
+            amount -= Timers.delta() * (1f - liquid.viscosity) / (5f + addSpeed);
+
+            amount += accepting;
+            accepting = 0f;
+
+            if (amount >= maxLiquid / 1.5f && generation < maxGeneration) {
+                float deposited = Math.min((amount - maxLiquid / 1.5f) / 4f, 0.3f) * Timers.delta();
+                for (GridPoint2 point : Geometry.d4) {
+                    Tile other = world.tile(tile.x + point.x, tile.y + point.y);
+                    if (other.block() == Blocks.air) {
+                        deposit(other, tile, liquid, deposited, generation + 1);
+                        amount -= deposited / 4f;
+                    }
+                }
+            }
+
+            amount = Mathf.clamp(amount, 0, maxLiquid);
+
+            if (amount <= 0f) {
+                CallEntity.onPuddleRemoved(getID());
+            }
+        }
+
+        //effects-only code
+        if(amount >= maxLiquid/2f && updateTime <= 0f){
             Units.getNearby(rect.setSize(Mathf.clamp(amount/(maxLiquid/1.5f))*10f).setCenter(x, y), unit -> {
                 unit.getHitbox(rect2);
                 if(!rect.overlaps(rect2)) return;
 
                 unit.applyEffect(liquid.effect, 0.5f);
 
-                if(unit.getVelocity().len() > 0.4) {
+                if(unit.getVelocity().len() > 0.1) {
                     Effects.effect(BlockFx.ripple, liquid.color, unit.x, unit.y);
                 }
             });
@@ -160,37 +194,11 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
             if(liquid.temperature > 0.7f && tile.entity != null && Mathf.chance(0.3 * Timers.delta())){
                 Fire.create(tile);
             }
+
+            updateTime = 20f;
         }
 
-        //no updating happens clientside
-        if(Net.client()){
-            amount = Mathf.lerpDelta(amount, targetAmount, 0.15f);
-            return;
-        }
-
-        float addSpeed = accepting > 0 ? 3f : 0f;
-
-        amount -= Timers.delta() * (1f - liquid.viscosity) /(5f+addSpeed);
-
-        amount += accepting;
-        accepting = 0f;
-
-        if(amount >= maxLiquid/1.5f && generation < maxGeneration){
-            float deposited = Math.min((amount - maxLiquid/1.5f)/4f, 0.3f) * Timers.delta();
-            for(GridPoint2 point : Geometry.d4){
-                Tile other = world.tile(tile.x + point.x, tile.y + point.y);
-                if(other.block() == Blocks.air){
-                    deposit(other, tile, liquid, deposited, generation + 1);
-                    amount -= deposited/4f;
-                }
-            }
-        }
-
-        amount = Mathf.clamp(amount, 0, maxLiquid);
-
-        if(amount <= 0f){
-            CallEntity.onPuddleRemoved(getID());
-        }
+        updateTime -= Timers.delta();
     }
 
     @Override
@@ -282,6 +290,8 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
         liquid = Liquid.getByID(data.readByte());
         targetAmount = data.readShort()/4f;
         tile = world.tile(data.readInt());
+
+        map.put(tile.packedPosition(), this);
     }
 
     @Override

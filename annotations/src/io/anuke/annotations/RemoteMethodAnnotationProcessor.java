@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 })
 public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
     /**Maximum size of each event packet.*/
-    public static final int maxPacketSize = 1024;
+    public static final int maxPacketSize = 4096;
     /**Name of the base package to put all the generated classes.*/
     private static final String packageName = "io.anuke.mindustry.gen";
 

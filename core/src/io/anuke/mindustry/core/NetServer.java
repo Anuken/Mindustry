@@ -21,6 +21,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.trait.Entity;
+import io.anuke.ucore.io.CountableByteArrayOutputStream;
 import io.anuke.ucore.io.delta.ByteDeltaEncoder;
 import io.anuke.ucore.io.delta.ByteMatcherHash;
 import io.anuke.ucore.io.delta.DEZEncoder;
@@ -45,7 +46,7 @@ public class NetServer extends Module{
     private boolean closing = false;
 
     /**Stream for writing player sync data to.*/
-    private ByteArrayOutputStream syncStream = new ByteArrayOutputStream();
+    private CountableByteArrayOutputStream syncStream = new CountableByteArrayOutputStream();
     /**Data stream for writing player sync data to.*/
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
     /**Encoder for computing snapshot deltas.*/
@@ -144,6 +145,7 @@ public class NetServer extends Module{
             if(player == null || connection == null || packet.snapid < connection.lastRecievedSnapshot) return;
 
             player.getInterpolator().read(player.x, player.y, packet.x, packet.y, packet.timeSent, packet.rotation, packet.baseRotation);
+            player.getVelocity().set(packet.xv, packet.yv); //only for visual calculation purposes, doesn't actually update the player
             connection.lastSnapshotID = packet.lastSnapshot;
             connection.lastRecievedSnapshot = packet.snapid;
         });
@@ -264,10 +266,14 @@ public class NetServer extends Module{
                     dataStream.writeShort(group.size());
 
                     for(Entity entity : group.all()){
+                        int position = syncStream.position();
                         //write all entities now
                         dataStream.writeInt(entity.getID()); //write id
                         dataStream.writeByte(((SyncTrait)entity).getTypeID()); //write type ID
                         ((SyncTrait)entity).write(dataStream); //write entity
+                        int length = syncStream.position() - position; //length must always be less than 127 bytes
+                        if(length > 127) throw new RuntimeException("Write size for entity of type " + group.getType() + " must not exceed 127!");
+                        dataStream.writeByte(length);
                     }
                 }
 

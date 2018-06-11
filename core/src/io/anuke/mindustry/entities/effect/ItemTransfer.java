@@ -32,6 +32,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
 
     @Remote(in = In.entities, called = Loc.server, unreliable = true)
     public static void transferAmmo(Item item, float x, float y, Unit to){
+        if(to == null) return;
         to.addAmmo(item);
         create(item, x, y, to, () -> {});
     }
