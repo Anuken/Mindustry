@@ -15,6 +15,7 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.SaveTrait;
+import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
@@ -38,7 +39,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait {
+public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait, SyncTrait {
     private static final IntMap<Puddle> map = new IntMap<>();
     private static final float maxLiquid = 70f;
     private static final int maxGeneration = 2;
@@ -47,13 +48,15 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
     private static final Rectangle rect2 = new Rectangle();
     private static int seeds;
 
+    public static int typeID = -1;
+
     private int loadedPosition = -1;
 
     private Tile tile;
     private Liquid liquid;
-    private float amount;
-    private byte generation;
+    private float amount, targetAmount;
     private float accepting;
+    private byte generation;
 
     /**Deposists a puddle between tile and source.*/
     public static void deposit(Tile tile, Tile source, Liquid liquid, float amount){
@@ -143,7 +146,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
     @Override
     public void update() {
         if(amount >= maxLiquid/2f && Timers.get(this, "update", 20)){
-            Units.getNearby(rect.setSize(Mathf.clamp(amount/(maxLiquid/1.5f))*10f).setCenter(tile.worldx(), tile.worldy()), unit -> {
+            Units.getNearby(rect.setSize(Mathf.clamp(amount/(maxLiquid/1.5f))*10f).setCenter(x, y), unit -> {
                 unit.getHitbox(rect2);
                 if(!rect.overlaps(rect2)) return;
 
@@ -160,7 +163,10 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
         }
 
         //no updating happens clientside
-        if(Net.client()) return;
+        if(Net.client()){
+            amount = Mathf.lerpDelta(amount, targetAmount, 0.15f);
+            return;
+        }
 
         float addSpeed = accepting > 0 ? 3f : 0f;
 
@@ -253,6 +259,29 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
     public void removed() {
         map.remove(tile.packedPosition());
         reset();
+    }
+
+    @Override
+    public int getTypeID() {
+        return typeID;
+    }
+
+    @Override
+    public void write(DataOutput data) throws IOException {
+        data.writeFloat(x);
+        data.writeFloat(y);
+        data.writeByte(liquid.id);
+        data.writeShort((short)(amount * 4));
+        data.writeInt(tile.packedPosition());
+    }
+
+    @Override
+    public void read(DataInput data, long time) throws IOException {
+        x = data.readFloat();
+        y = data.readFloat();
+        liquid = Liquid.getByID(data.readByte());
+        targetAmount = data.readShort()/4f;
+        tile = world.tile(data.readInt());
     }
 
     @Override

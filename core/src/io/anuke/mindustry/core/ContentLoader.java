@@ -11,6 +11,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.ItemDrop;
+import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.entities.units.types.Drone;
@@ -135,5 +136,6 @@ public class ContentLoader {
         Scout.typeID = SyncTrait.registerType(Scout::new);
         ItemDrop.typeID = SyncTrait.registerType(ItemDrop::new);
         Fire.typeID = SyncTrait.registerType(Fire::new);
+        Puddle.typeID = SyncTrait.registerType(Puddle::new);
     }
 }
