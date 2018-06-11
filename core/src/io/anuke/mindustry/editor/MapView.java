@@ -1,5 +1,6 @@
 package io.anuke.mindustry.editor;
 
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.input.GestureDetector;
@@ -50,6 +51,7 @@ public class MapView extends Element implements GestureListener{
 	private int lastx, lasty;
 	private int startx, starty;
 	private float mousex, mousey;
+	private EditorTool lastTool;
 
 	public void setTool(EditorTool tool){
 		this.tool = tool;
@@ -123,6 +125,15 @@ public class MapView extends Element implements GestureListener{
 					return false;
 				}
 
+				if(!mobile && button != Buttons.LEFT && button != Buttons.MIDDLE){
+					return true;
+				}
+
+				if(button == Buttons.MIDDLE){
+					lastTool = tool;
+					tool = EditorTool.zoom;
+				}
+
 				mousex = x;
 				mousey = y;
 
@@ -148,6 +159,10 @@ public class MapView extends Element implements GestureListener{
 			
 			@Override
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+				if(!mobile && button != Buttons.LEFT && button != Buttons.MIDDLE){
+					return;
+				}
+
 				drawing = false;
 
 				GridPoint2 p = project(x, y);
@@ -168,6 +183,11 @@ public class MapView extends Element implements GestureListener{
 					op = null;
 				}
 
+				if(lastTool != null){
+					tool = lastTool;
+					lastTool = null;
+				}
+
 			}
 			
 			@Override
@@ -177,11 +197,11 @@ public class MapView extends Element implements GestureListener{
 
 				GridPoint2 p = project(x, y);
 				
-				if(drawing && tool == EditorTool.pencil){
+				if(drawing && tool.draggable){
 					ui.editor.resetSaved();
 					Array<GridPoint2> points = br.line(lastx, lasty, p.x, p.y);
 					for(GridPoint2 point : points){
-						editor.draw(point.x, point.y);
+						tool.touched(editor, point.x, point.y);
 					}
 					updated = true;
 				}
@@ -221,7 +241,7 @@ public class MapView extends Element implements GestureListener{
 		x = (x - getWidth()/2 + sclwidth/2 - offsetx*zoom) / sclwidth * editor.getMap().width();
 		y = (y - getHeight()/2 + sclheight/2 - offsety*zoom) / sclheight * editor.getMap().height();
 
-		if(editor.getDrawBlock().size % 2 == 0){
+		if(editor.getDrawBlock().size % 2 == 0 && tool != EditorTool.eraser){
 			return Tmp.g1.set((int)(x - 0.5f), (int)(y - 0.5f));
 		}else{
 			return Tmp.g1.set((int)x, (int)y);
@@ -280,7 +300,7 @@ public class MapView extends Element implements GestureListener{
 		Draw.color(Palette.accent);
 		Lines.stroke(Unit.dp.scl(1f * zoom));
 
-        if(!editor.getDrawBlock().isMultiblock()) {
+        if(!editor.getDrawBlock().isMultiblock() || tool == EditorTool.eraser) {
 			if (tool == EditorTool.line && drawing) {
 				Vector2 v1 = unproject(startx, starty).add(x, y);
 				float sx = v1.x, sy = v1.y;

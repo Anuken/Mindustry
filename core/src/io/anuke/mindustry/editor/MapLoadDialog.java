@@ -36,7 +36,9 @@ public class MapLoadDialog extends FloatingDialog{
 
 	public void rebuild(){
 		content().clear();
-		selected = world.maps().all().first();
+		if(world.maps().all().size > 0){
+			selected = world.maps().all().first();
+		}
 
 		ButtonGroup<TextButton> group = new ButtonGroup<>();
 

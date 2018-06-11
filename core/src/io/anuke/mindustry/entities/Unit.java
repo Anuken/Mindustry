@@ -160,7 +160,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     public Floor getFloorOn(){
         Tile tile = world.tileWorld(x, y);
-        return (Floor)(tile == null || (tile.floor() == null) ? Blocks.defaultFloor : tile.floor());
+        return tile == null ? (Floor) Blocks.air : tile.floor();
     }
 
     /**Updates velocity and status effects.*/

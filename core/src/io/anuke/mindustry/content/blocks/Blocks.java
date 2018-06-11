@@ -12,13 +12,18 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.*;
 
 public class Blocks extends BlockList implements ContentList{
-    public static Block air, spawn, blockpart, defaultFloor, space, metalfloor, deepwater, water, lava, oil, stone, blackstone, iron, lead, coal, titanium, thorium, dirt, sand, ice, snow, grass, sandblock, snowblock, stoneblock, blackstoneblock, grassblock, mossblock, shrub, rock, icerock, blackrock, dirtblock;
+    public static Block air, spawn, blockpart, space, metalfloor, deepwater, water, lava, oil, stone, blackstone, iron, lead, coal, titanium, thorium, dirt, sand, ice, snow, grass, sandblock, snowblock, stoneblock, blackstoneblock, grassblock, mossblock, shrub, rock, icerock, blackrock, dirtblock;
 
     @Override
     public void load() {
         air = new Floor("air") {
+            {
+                blend = false;
+            }
             //don't draw
             public void draw(Tile tile) {}
+            public void load() {}
+            public void init() {}
         };
 
         blockpart = new BlockPart();
@@ -28,13 +33,12 @@ public class Blocks extends BlockList implements ContentList{
             new BreakBlock("break" + i);
         }
 
-        defaultFloor = new Floor("defaultfloor");
-
         space = new Floor("space") {{
             placeableOn = false;
             variants = 0;
             cacheLayer = CacheLayer.space;
             solid = true;
+            blend = false;
         }};
 
         metalfloor = new Floor("metalfloor") {{

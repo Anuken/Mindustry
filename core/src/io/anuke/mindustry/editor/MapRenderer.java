@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.graphics.g2d.PixmapPacker.Page;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntSet;
@@ -23,7 +24,9 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.IndexedRenderer;
 import io.anuke.ucore.util.Bits;
+import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -31,8 +34,10 @@ public class MapRenderer implements Disposable{
     private static final int chunksize = 64;
     private IndexedRenderer[][] chunks;
     private IntSet updates = new IntSet();
+    private IntSet delayedUpdates = new IntSet();
     private MapEditor editor;
     private int width, height;
+    private Color tmpColor = Color.WHITE.cpy();
 
     private ObjectMap<Block, TextureRegion> blockIcons = new ObjectMap<>();
     private ObjectMap<String, TextureRegion> regions = new ObjectMap<>();
@@ -65,6 +70,7 @@ public class MapRenderer implements Disposable{
 
         add("clear", packer);
         add("block-border", packer);
+        add("block-elevation", packer);
 
         if(packer.getPages().size > 1){
             throw new IllegalArgumentException("Pixmap packer may not have more than 1 page!");
@@ -131,6 +137,9 @@ public class MapRenderer implements Disposable{
         }
         updates.clear();
 
+        updates.addAll(delayedUpdates);
+        delayedUpdates.clear();
+
         for(int x = 0; x < chunks.length; x ++){
             for(int y = 0; y < chunks[0].length; y ++){
                 IndexedRenderer mesh = chunks[x][y];
@@ -166,6 +175,7 @@ public class MapRenderer implements Disposable{
         byte bf = editor.getMap().read(wx, wy, DataPosition.floor);
         byte bw = editor.getMap().read(wx, wy, DataPosition.wall);
         byte btr = editor.getMap().read(wx, wy, DataPosition.rotationTeam);
+        byte elev = editor.getMap().read(wx, wy, DataPosition.elevation);
         byte rotation = Bits.getLeftByte(btr);
         Team team = Team.values()[Bits.getRightByte(btr)];
 
@@ -198,6 +208,9 @@ public class MapRenderer implements Disposable{
         if(wall.update || wall.destructible) {
             mesh.setColor(team.color);
             region = regions.get("block-border");
+        }else if(elev > 0 && checkElevation(elev, wx, wy)){
+            mesh.setColor(tmpColor.fromHsv((360f * elev/127f * 4f) % 360f, 0.5f + (elev / 4f) % 0.5f, 1f));
+            region = regions.get("block-elevation");
         }else{
             region = regions.get("clear");
         }
@@ -206,6 +219,23 @@ public class MapRenderer implements Disposable{
                 wx * tilesize + offsetx*tilesize, wy * tilesize  + offsety * tilesize,
                 region.getRegionWidth(), region.getRegionHeight());
         mesh.setColor(Color.WHITE);
+    }
+
+    private boolean checkElevation(byte elev, int x, int y){
+        for(GridPoint2 p : Geometry.d4){
+            int wx = x + p.x, wy = y + p.y;
+            if(!Mathf.inBounds(wx, wy, editor.getMap().width(), editor.getMap().height())){
+                return true;
+            }
+            byte value = editor.getMap().read(wx, wy, DataPosition.elevation);
+
+            if(value < elev){
+                return true;
+            }else if(value > elev){
+                delayedUpdates.add(wx + wy*width);
+            }
+        }
+        return false;
     }
 
     @Override

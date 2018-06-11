@@ -6,8 +6,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects.Effect;
@@ -25,6 +25,8 @@ public class Floor extends Block{
 	protected Predicate<Block> blends = block -> block != this;
 	protected boolean blend = true;
 
+    /**edge fallback, used mainly for ores*/
+    public String edge = "stone";
 	/**Multiplies unit velocity by this when walked on.*/
 	public float speedMultiplier = 1f;
 	/**Multiplies unit drag by this when walked on.*/

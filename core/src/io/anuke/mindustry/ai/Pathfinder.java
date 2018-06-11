@@ -152,7 +152,7 @@ public class Pathfinder {
                     if (other != null && (path.weights[dx][dy] > cost + 1 || path.searches[dx][dy] < path.search)
                             && passable(other, team)){
                         path.frontier.addFirst(world.tile(dx, dy));
-                        path.weights[dx][dy] = cost + other.cost;
+                        path.weights[dx][dy] = cost + other.cost/2f;
                         path.searches[dx][dy] = path.search;
                     }
                 }

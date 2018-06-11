@@ -50,6 +50,7 @@ public class Control extends Module{
     private Input gdxInput;
 
 	public Control(){
+
 		saves = new Saves();
 		db = new ContentDatabase();
 
@@ -60,9 +61,7 @@ public class Control extends Module{
 		Effects.setShakeFalloff(10000f);
 
 		ContentLoader.initialize(Content::init);
-
 		Core.atlas = new Atlas("sprites.atlas");
-
 		ContentLoader.initialize(Content::load);
 
 		db.load();

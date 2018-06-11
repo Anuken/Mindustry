@@ -6,7 +6,9 @@ public enum Team {
     none(Color.DARK_GRAY),
     blue(Color.ROYAL),
     red(Color.valueOf("e84737")),
-    green(Color.valueOf("1dc645"));
+    green(Color.valueOf("1dc645")),
+    purple(Color.valueOf("ba5bd9")),
+    orange(Color.valueOf("e8c66a"));
 
     public final Color color;
     public final int intColor;

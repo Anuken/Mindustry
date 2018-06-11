@@ -116,7 +116,6 @@ public class ContentLoader {
 
     /**Initializes all content with the specified function.*/
     public static void initialize(Consumer<Content> callable){
-
         for(Array<? extends Content> arr : contentSet){
             for(Content content : arr){
                 callable.accept(content);

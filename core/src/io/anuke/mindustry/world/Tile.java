@@ -16,6 +16,7 @@ import io.anuke.mindustry.world.blocks.modules.PowerModule;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.entities.trait.PosTrait;
+import io.anuke.ucore.util.Geometry;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
@@ -26,15 +27,21 @@ public class Tile implements PosTrait, TargetTrait {
 	
 	/**Block ID data.*/
 	private byte floor, wall;
+	/**Rotation, 0-3. Also used to store offload location.*/
 	private byte rotation;
-	private byte dump;
+	/**Team ordinal.*/
 	private byte team;
 	/**The coordinates of the core tile this is linked to, in the form of two bytes packed into one.
 	 * This is relative to the block it is linked to; negate coords to find the link.*/
 	public byte link = 0;
 	public short x, y;
-	/**Tile traversal cost*/
-	public float cost = 1f;
+	/**Tile traversal cost.*/
+	public byte cost = 1;
+	/**Elevation of tile.*/
+	public byte elevation;
+	/**Position of cliffs around the tile, packed into bits 0-8.*/
+	public byte cliffs;
+	/**Tile entity, usually null.*/
 	public TileEntity entity;
 	
 	public Tile(int x, int y){
@@ -49,11 +56,12 @@ public class Tile implements PosTrait, TargetTrait {
 		changed();
 	}
 	
-	public Tile(int x, int y, byte floor, byte wall, byte rotation, byte team){
+	public Tile(int x, int y, byte floor, byte wall, byte rotation, byte team, byte elevation){
 		this(x, y);
 		this.floor = floor;
 		this.wall = wall;
 		this.rotation = rotation;
+		this.elevation = elevation;
 		changed();
 		this.team = team;
 	}
@@ -172,7 +180,7 @@ public class Tile implements PosTrait, TargetTrait {
 	}
 	
 	public void setDump(byte dump){
-		this.dump = dump;
+		this.rotation = dump;
 	}
 	
 	public byte getRotation(){
@@ -180,7 +188,7 @@ public class Tile implements PosTrait, TargetTrait {
 	}
 	
 	public byte getDump(){
-		return dump;
+		return rotation;
 	}
 
 	public boolean passable(){
@@ -198,7 +206,7 @@ public class Tile implements PosTrait, TargetTrait {
 	public boolean solid(){
 		Block block = block();
 		Block floor = floor();
-		return block.solid || (floor.solid && (block == Blocks.air || block.solidifes)) || block.isSolidFor(this)
+		return block.solid || cliffs != 0 || (floor.solid && (block == Blocks.air || block.solidifes)) || block.isSolidFor(this)
 				|| (isLinked() && getLinked().block().isSolidFor(getLinked()));
 	}
 	
@@ -300,20 +308,23 @@ public class Tile implements PosTrait, TargetTrait {
 	}
 
 	public void updateOcclusion(){
-		cost = 0.5f;
+		cost = 1;
+		cliffs = 0;
 		boolean occluded = false;
-		outer:
-		for(int dx = -1; dx <= 1; dx ++){
-			for(int dy = -1; dy <= 1; dy ++){
-				Tile tile = world.tile(x + dx, y + dy);
-				if(tile != null && tile.solid()){
+		for(int i = 0; i < 8; i ++){
+			GridPoint2 point = Geometry.d8[i];
+			Tile tile = world.tile(x + point.x, y + point.y);
+			if(tile != null){
+				if(tile.solid()){
 					occluded = true;
-					break outer;
+				}
+				if(tile.elevation < elevation){
+					cliffs |= (0x1 << i);
 				}
 			}
 		}
 		if(occluded){
-			cost += 0.5f;
+			cost += 1;
 		}
 	}
 	

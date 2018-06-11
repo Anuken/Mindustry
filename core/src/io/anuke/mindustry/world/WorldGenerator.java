@@ -25,19 +25,22 @@ public class WorldGenerator {
 
 		for(int y = 0; y < data.height(); y ++){
 			for(int x = 0; x < data.width(); x ++){
-				TileDataMarker tile = data.read(marker);
-				tiles[x][y] = new Tile(x, y, tile.floor, tile.wall == Blocks.blockpart.id ? 0 : tile.wall, tile.rotation, tile.team);
+				data.read(marker);
 
-				Team team = Team.values()[tile.team];
+				Tile tile = new Tile(x, y, marker.floor, marker.wall == Blocks.blockpart.id ? 0 : marker.wall, marker.rotation, marker.team, marker.elevation);
 
-				if(tiles[x][y].block().isMultiblock()){
-					multiblocks.add(tiles[x][y].packedPosition());
+				Team team = Team.values()[marker.team];
+
+				if(tile.block().isMultiblock()){
+					multiblocks.add(tile.packedPosition());
 				}
 
-				if(tiles[x][y].block() == StorageBlocks.core &&
+				if(tile.block() == StorageBlocks.core &&
 						state.teams.has(team)){
-					state.teams.get(team).cores.add(tiles[x][y]);
+					state.teams.get(team).cores.add(tile);
 				}
+
+				tiles[x][y] = tile;
 
 				//TODO ores, plants, extra decoration?
 			}

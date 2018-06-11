@@ -18,7 +18,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Maps implements Disposable{
 	/**List of all built-in maps.*/
-	private static final String[] defaultMapNames = {"test"};
+	private static final String[] defaultMapNames = {};
 	/**Tile format version.*/
 	private static final int version = 0;
 

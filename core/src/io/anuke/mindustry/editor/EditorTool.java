@@ -2,6 +2,7 @@ package io.anuke.mindustry.editor;
 
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.io.MapTileData.DataPosition;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
@@ -32,11 +33,23 @@ public enum EditorTool{
 	pencil{
 		{
 			edit = true;
+			draggable = true;
 		}
 
 		@Override
 		public void touched(MapEditor editor, int x, int y){
 			editor.draw(x, y);
+		}
+	},
+	eraser{
+		{
+			edit = true;
+			draggable = true;
+		}
+
+		@Override
+		public void touched(MapEditor editor, int x, int y){
+			editor.draw(x, y, Blocks.air);
 		}
 	},
 	line{
@@ -110,7 +123,8 @@ public enum EditorTool{
 		}
 	},
 	zoom;
-	boolean edit;
+
+	boolean edit, draggable;
 	
 	public void touched(MapEditor editor, int x, int y){
 		

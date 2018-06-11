@@ -250,21 +250,21 @@ public class UI extends SceneModule{
 	public void showInfo(String info){
 		new Dialog("$text.info.title", "dialog"){{
 			getCell(content()).growX();
-			content().margin(15).add(info).width(400f).wrap();
+			content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
 			buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);
 		}}.show();
 	}
 
 	public void showError(String text){
 		new Dialog("$text.error.title", "dialog"){{
-			content().margin(15).add(text).width(400f).wrap();
+			content().margin(15).add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
 			buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);
 		}}.show();
 	}
 
 	public void showConfirm(String title, String text, Listenable confirmed){
 		FloatingDialog dialog = new FloatingDialog(title);
-		dialog.content().add(text).width(400f).wrap().pad(4f);
+		dialog.content().add(text).width(400f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
 		dialog.buttons().defaults().size(200f, 54f).pad(2f);
 		dialog.buttons().addButton("$text.cancel", dialog::hide);
 		dialog.buttons().addButton("$text.ok", () -> {

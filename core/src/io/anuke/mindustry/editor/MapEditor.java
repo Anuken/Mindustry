@@ -22,6 +22,7 @@ public class MapEditor{
 	private MapRenderer renderer = new MapRenderer(this);
 
 	private int brushSize = 1;
+	private byte elevation;
 	private int rotation;
 	private Block drawBlock = Blocks.stone;
 	private Team drawTeam = Team.none;
@@ -45,6 +46,14 @@ public class MapEditor{
 
 		drawBlock = Blocks.stone;
 		renderer.resize(map.width(), map.height());
+	}
+
+	public void setDrawElevation(int elevation){
+		this.elevation = (byte)elevation;
+	}
+
+	public byte getDrawElevation(){
+		return elevation;
 	}
 
 	public int getDrawRotation(){
@@ -80,6 +89,10 @@ public class MapEditor{
 	}
 
 	public void draw(int x, int y){
+		draw(x, y, drawBlock);
+	}
+
+	public void draw(int x, int y, Block drawBlock){
 		if(x < 0 || y < 0 || x >= map.width() || y >= map.height()){
 			return;
 		}
@@ -88,7 +101,7 @@ public class MapEditor{
 		byte partID = (byte)Blocks.blockpart.id;
 		byte rotationTeam = Bits.packByte(drawBlock.rotate ? (byte)rotation : 0, drawBlock.synthetic() ? (byte)drawTeam.ordinal() : 0);
 
-		boolean isfloor = drawBlock instanceof Floor;
+		boolean isfloor = drawBlock instanceof Floor && drawBlock != Blocks.air;
 
 		if(drawBlock.isMultiblock()) {
 
@@ -155,6 +168,7 @@ public class MapEditor{
 
 						if(isfloor){
 							map.write(wx, wy, DataPosition.floor, writeID);
+							map.write(wx, wy, DataPosition.elevation, elevation);
 						}else{
 							map.write(wx, wy, DataPosition.wall, writeID);
 							map.write(wx, wy, DataPosition.link, (byte)0);
