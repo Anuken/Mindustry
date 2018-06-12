@@ -205,10 +205,12 @@ public class MapRenderer implements Disposable{
             mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize, region, wx * tilesize, wy * tilesize, 8, 8);
         }
 
+        boolean check = checkElevation(elev, wx, wy);
+
         if(wall.update || wall.destructible) {
             mesh.setColor(team.color);
             region = regions.get("block-border");
-        }else if(elev > 0 && checkElevation(elev, wx, wy)){
+        }else if(elev > 0 && check){
             mesh.setColor(tmpColor.fromHsv((360f * elev/127f * 4f) % 360f, 0.5f + (elev / 4f) % 0.5f, 1f));
             region = regions.get("block-elevation");
         }else{
