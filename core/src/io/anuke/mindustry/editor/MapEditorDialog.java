@@ -442,7 +442,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
 				addTool.accept(EditorTool.fill);
 				addTool.accept(EditorTool.elevation);
 
-
 				ImageButton rotate = tools.addImageButton("icon-arrow-16", 16*2f, () -> editor.setDrawRotation((editor.getDrawRotation() + 1)%4)).get();
 				rotate.getImage().update(() ->{
 					rotate.getImage().setRotation(editor.getDrawRotation() * 90);
