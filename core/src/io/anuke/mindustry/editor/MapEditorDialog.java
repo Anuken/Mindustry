@@ -496,15 +496,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
 				get().table("button", t -> {
 					t.margin(0);
-					t.addImageButton("icon-arrow-left", 16*2f, () -> {
-						editor.setDrawElevation(editor.getDrawElevation() - 1);
-					}).disabled(b -> editor.getDrawElevation() <= 0).size(size);
+					t.addImageButton("icon-arrow-left", 16*2f, () -> editor.setDrawElevation(editor.getDrawElevation() - 1))
+							.disabled(b -> editor.getDrawElevation() <= -1).size(size);
 
-					t.label(() -> editor.getDrawElevation() + "").size(size).get().setAlignment(Align.center, Align.center);
+					t.label(() -> editor.getDrawElevation() == -1 ? "$text.editor.slope" : (editor.getDrawElevation() + ""))
+							.size(size).get().setAlignment(Align.center, Align.center);
 
-					t.addImageButton("icon-arrow-right", 16*2f, () -> {
-						editor.setDrawElevation(editor.getDrawElevation() + 1);
-					}).disabled(b -> editor.getDrawElevation() >= 127).size(size);
+					t.addImageButton("icon-arrow-right", 16*2f, () -> editor.setDrawElevation(editor.getDrawElevation() + 1))
+							.disabled(b -> editor.getDrawElevation() >= 127).size(size);
 				}).colspan(3).height(size).padTop(-5).width(size*3f);
 				
 			}}.left().growY().end();

@@ -71,6 +71,7 @@ public class MapRenderer implements Disposable{
         add("clear", packer);
         add("block-border", packer);
         add("block-elevation", packer);
+        add("block-slope", packer);
 
         if(packer.getPages().size > 1){
             throw new IllegalArgumentException("Pixmap packer may not have more than 1 page!");
@@ -213,6 +214,8 @@ public class MapRenderer implements Disposable{
         }else if(elev > 0 && check){
             mesh.setColor(tmpColor.fromHsv((360f * elev/127f * 4f) % 360f, 0.5f + (elev / 4f) % 0.5f, 1f));
             region = regions.get("block-elevation");
+        }else if(elev == -1){
+            region = regions.get("block-slope");
         }else{
             region = regions.get("clear");
         }

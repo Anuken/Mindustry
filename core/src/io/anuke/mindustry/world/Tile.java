@@ -5,18 +5,19 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.modules.InventoryModule;
 import io.anuke.mindustry.world.blocks.modules.LiquidModule;
 import io.anuke.mindustry.world.blocks.modules.PowerModule;
+import io.anuke.ucore.entities.trait.PosTrait;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Bits;
-import io.anuke.ucore.entities.trait.PosTrait;
 import io.anuke.ucore.util.Geometry;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
@@ -325,21 +326,29 @@ public class Tile implements PosTrait, TargetTrait {
 		//check for bitmasking cliffs
 		for(int i = 0; i < 4; i ++){
 			GridPoint2 pc = Geometry.d4[i];
+			GridPoint2 pcprev = Geometry.d4[Mathf.mod(i - 1, 4)];
+			GridPoint2 pcnext = Geometry.d4[(i + 1) % 4];
 			GridPoint2 pe = Geometry.d8edge[i];
 
 			Tile tc = world.tile(x + pc.x, y + pc.y);
+			Tile tprev = world.tile(x + pcprev.x, y + pcprev.y);
+			Tile tnext = world.tile(x + pcnext.x, y + pcnext.y);
 			Tile te = world.tile(x + pe.x, y + pe.y);
 			Tile tex = world.tile(x, y + pe.y);
 			Tile tey = world.tile(x + pe.x, y);
 
 			//check for cardinal direction elevation changes and bitmask that
-			if(tc != null && tc.elevation < elevation){
+			if(tc != null && tprev != null && tnext != null && ((tc.elevation < elevation && tc.elevation != -1))){
 				cliffs |= (1 << (i*2));
 			}
 
-			//check for corner bitmasking
-			if(te != null && tex != null && tey != null && te.elevation < elevation && tex.elevation < elevation && tey.elevation < elevation){
-				cliffs |= (1 << (i*2 + 1));
+			//00S
+            //0X0
+            //010
+
+			//check for corner bitmasking: doesn't even get checked so it doesn't matter
+			if(te != null && tex != null && tey != null && te.elevation == -1 && elevation > 0){
+				cliffs |= (1 << (((i+1)%4)*2));
 			}
 		}
 		if(occluded){
