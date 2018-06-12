@@ -48,7 +48,7 @@ float snoise(vec2 v){
 void main() {
 
 	vec2 c = v_texCoord.xy;
-	vec4 color = texture2D(u_texture, c);
+	vec4 color = texture2D(u_texture, c) * v_color;
 
 	vec2 v = vec2(1.0/screensize.x, 1.0/screensize.y);
 	ivec2 icoords = ivec2(int(c.x / v.x + camerapos.x), int(c.y / v.y + camerapos.y));

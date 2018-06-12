@@ -311,16 +311,35 @@ public class Tile implements PosTrait, TargetTrait {
 		cost = 1;
 		cliffs = 0;
 		boolean occluded = false;
+
+		//check for occlusion
 		for(int i = 0; i < 8; i ++){
 			GridPoint2 point = Geometry.d8[i];
 			Tile tile = world.tile(x + point.x, y + point.y);
-			if(tile != null){
-				if(tile.solid()){
-					occluded = true;
-				}
-				if(tile.elevation < elevation){
-					cliffs |= (0x1 << i);
-				}
+			if(tile != null && tile.solid()){
+				occluded = true;
+				break;
+			}
+		}
+
+		//check for bitmasking cliffs
+		for(int i = 0; i < 4; i ++){
+			GridPoint2 pc = Geometry.d4[i];
+			GridPoint2 pe = Geometry.d8edge[i];
+
+			Tile tc = world.tile(x + pc.x, y + pc.y);
+			Tile te = world.tile(x + pe.x, y + pe.y);
+			Tile tex = world.tile(x, y + pe.y);
+			Tile tey = world.tile(x + pe.x, y);
+
+			//check for cardinal direction elevation changes and bitmask that
+			if(tc != null && tc.elevation < elevation){
+				cliffs |= (1 << (i*2));
+			}
+
+			//check for corner bitmasking
+			if(te != null && tex != null && tey != null && te.elevation < elevation && tex.elevation < elevation && tey.elevation < elevation){
+				cliffs |= (1 << (i*2 + 1));
 			}
 		}
 		if(occluded){
