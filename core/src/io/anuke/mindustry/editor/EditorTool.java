@@ -52,6 +52,17 @@ public enum EditorTool{
 			editor.draw(x, y, Blocks.air);
 		}
 	},
+	elevation{
+		{
+			edit = true;
+			draggable = true;
+		}
+
+		@Override
+		public void touched(MapEditor editor, int x, int y){
+			editor.elevate(x, y);
+		}
+	},
 	line{
 		{
 

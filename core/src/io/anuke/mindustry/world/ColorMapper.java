@@ -23,18 +23,13 @@ public class ColorMapper{
 
 		colors = map(
 			"323232", pair(Blocks.stone),
-			"646464", pair(Blocks.stone, Blocks.stoneblock),
 			"50965a", pair(Blocks.grass),
-			"5ab464", pair(Blocks.grass, Blocks.grassblock),
 			"506eb4", pair(Blocks.water),
 			"465a96", pair(Blocks.deepwater),
 			"252525", pair(Blocks.blackstone),
-			"575757", pair(Blocks.blackstone, Blocks.blackstoneblock),
 			"988a67", pair(Blocks.sand),
-			"e5d8bb", pair(Blocks.sand, Blocks.sandblock),
 			"c2d1d2", pair(Blocks.snow),
 			"c4e3e7", pair(Blocks.ice),
-			"f7feff", pair(Blocks.snow, Blocks.snowblock),
 			"6e501e", pair(Blocks.dirt),
 			"ed5334", pair(Blocks.lava),
 			"292929", pair(Blocks.oil),

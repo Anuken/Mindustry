@@ -12,7 +12,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.*;
 
 public class Blocks extends BlockList implements ContentList{
-    public static Block air, spawn, blockpart, space, metalfloor, deepwater, water, lava, oil, stone, blackstone, iron, lead, coal, titanium, thorium, dirt, sand, ice, snow, grass, sandblock, snowblock, stoneblock, blackstoneblock, grassblock, mossblock, shrub, rock, icerock, blackrock, dirtblock;
+    public static Block air, spawn, blockpart, space, metalfloor, deepwater, water, lava, oil, stone, blackstone, iron, lead, coal, titanium, thorium, dirt, sand, ice, snow, grass, shrub, rock, icerock, blackrock;
 
     @Override
     public void load() {
@@ -138,35 +138,6 @@ public class Blocks extends BlockList implements ContentList{
 
         grass = new Floor("grass");
 
-        sandblock = new StaticBlock("sandblock") {{
-            solid = true;
-            variants = 3;
-        }};
-
-        snowblock = new StaticBlock("snowblock") {{
-            solid = true;
-            variants = 3;
-        }};
-
-        stoneblock = new StaticBlock("stoneblock") {{
-            solid = true;
-            variants = 3;
-        }};
-
-        blackstoneblock = new StaticBlock("blackstoneblock") {{
-            solid = true;
-            variants = 3;
-        }};
-
-        grassblock = new StaticBlock("grassblock") {{
-            solid = true;
-            variants = 2;
-        }};
-
-        mossblock = new StaticBlock("mossblock") {{
-            solid = true;
-        }};
-
         shrub = new Rock("shrub");
 
         rock = new Rock("rock") {{
@@ -182,10 +153,6 @@ public class Blocks extends BlockList implements ContentList{
         blackrock = new Rock("blackrock") {{
             variants = 1;
             varyShadow = true;
-        }};
-
-        dirtblock = new StaticBlock("dirtblock") {{
-            solid = true;
         }};
     }
 }

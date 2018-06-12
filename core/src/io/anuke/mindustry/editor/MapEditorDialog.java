@@ -409,11 +409,13 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
 				tools.defaults().size(size, size + 4f).padBottom(-5.1f);
 
-				tools.addImageButton("icon-back", 16*2, () -> tryExit());
+				//tools.addImageButton("icon-back", 16*2, () -> tryExit());
 
 				tools.addImageButton("icon-menu-large", 16*2f, menu::show);
 
 				ImageButton grid = tools.addImageButton("icon-grid", "toggle", 16*2f, () -> view.setGrid(!view.isGrid())).get();
+
+				addTool.accept(EditorTool.zoom);
 
 				tools.row();
 
@@ -438,7 +440,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
 				tools.row();
 
 				addTool.accept(EditorTool.fill);
-				addTool.accept(EditorTool.zoom);
+				addTool.accept(EditorTool.elevation);
+
 
 				ImageButton rotate = tools.addImageButton("icon-arrow-16", 16*2f, () -> editor.setDrawRotation((editor.getDrawRotation() + 1)%4)).get();
 				rotate.getImage().update(() ->{

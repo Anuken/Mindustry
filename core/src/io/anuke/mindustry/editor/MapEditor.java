@@ -182,6 +182,30 @@ public class MapEditor{
 		}
 	}
 
+	public void elevate(int x, int y){
+		if(x < 0 || y < 0 || x >= map.width() || y >= map.height()){
+			return;
+		}
+
+		for (int rx = -brushSize; rx <= brushSize; rx++) {
+			for (int ry = -brushSize; ry <= brushSize; ry++) {
+				if (Mathf.dst(rx, ry) <= brushSize - 0.5f) {
+					int wx = x + rx, wy = y + ry;
+
+					if (wx < 0 || wy < 0 || wx >= map.width() || wy >= map.height()) {
+						continue;
+					}
+
+					TileDataMarker prev = getPrev(wx, wy, true);
+
+					map.write(wx, wy, DataPosition.elevation, elevation);
+
+					onWrite(x + rx, y + ry, prev);
+				}
+			}
+		}
+	}
+
 	private void removeLinked(int x, int y){
 		Block block = Block.getByID(map.read(x, y, DataPosition.wall));
 

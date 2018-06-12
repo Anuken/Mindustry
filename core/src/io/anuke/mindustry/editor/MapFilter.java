@@ -70,7 +70,7 @@ public class MapFilter{
 						noise += 2 * (dist - 0.8);
 					}
 
-					Block block = noise > 0.6 ? Blocks.stoneblock : Blocks.stone;
+					Block block = Blocks.stone;
 
 					pixmap.drawPixel(x, y, ColorMapper.getColor(block));
 				}
@@ -109,32 +109,6 @@ public class MapFilter{
 				noise += nwater / 5.0;
 
 				double noil = sim.octaveNoise2D(1, 1.0, 1 / 150.0, x + 9999, y) + sim.octaveNoise2D(1, 1.0, 1 / 2.0, x, y) / 290.0;
-
-				if(!floor || prefs.get("replace").enabled){
-					
-					if(prefs.get("allgrass").enabled){
-						block = floor ? Blocks.grass : Blocks.grassblock;
-					}else if(prefs.get("allsnow").enabled){
-						block = floor ? Blocks.snow : Blocks.snowblock;
-					}else if(prefs.get("allsand").enabled){
-						block = floor ? Blocks.sand : Blocks.sandblock;
-					}else if(prefs.get("replace").enabled){
-						block = floor ? Blocks.stone : Blocks.stoneblock;
-					}
-						
-					if(noise > 0.7 && prefs.get("grass").enabled){
-						block = floor ? Blocks.grass : Blocks.grassblock;
-					}
-					if(noise > 0.7 && prefs.get("blackstone").enabled){
-						block = floor ? Blocks.blackstone : Blocks.blackstoneblock;
-					}
-					if(noise > 0.7 && prefs.get("sand").enabled){
-						block = floor ? Blocks.sand : Blocks.sandblock;
-					}
-					if(noise > 0.8 && prefs.get("stone").enabled){
-						block = floor ? Blocks.stone : Blocks.stoneblock;
-					}
-				}
 
 				if(floor){
 					if(nwater > 0.93 && prefs.get("water").enabled){
