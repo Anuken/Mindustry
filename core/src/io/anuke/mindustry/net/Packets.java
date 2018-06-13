@@ -101,7 +101,7 @@ public class Packets {
         public int snapid;
         public long timeSent;
         //player snapshot data
-        public float x, y, rotation, baseRotation, xv, yv;
+        public float x, y, pointerX, pointerY, rotation, baseRotation, xv, yv;
 
         @Override
         public void write(ByteBuffer buffer) {
@@ -113,6 +113,8 @@ public class Packets {
 
             buffer.putFloat(player.x);
             buffer.putFloat(player.y);
+            buffer.putFloat(player.pointerX);
+            buffer.putFloat(player.pointerY);
 
             buffer.put((byte)(Mathf.clamp(player.getVelocity().x, -Unit.maxAbsVelocity, Unit.maxAbsVelocity) * Unit.velocityPercision));
             buffer.put((byte)(Mathf.clamp(player.getVelocity().y, -Unit.maxAbsVelocity, Unit.maxAbsVelocity) * Unit.velocityPercision));
@@ -129,6 +131,8 @@ public class Packets {
 
             x = buffer.getFloat();
             y = buffer.getFloat();
+            pointerX = buffer.getFloat();
+            pointerY = buffer.getFloat();
             xv = buffer.get() / Unit.velocityPercision;
             yv = buffer.get() / Unit.velocityPercision;
             rotation = buffer.getShort()/2f;

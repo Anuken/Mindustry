@@ -2,14 +2,16 @@ package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ObjectMap;
-import io.anuke.annotations.Annotations.Remote;
 import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
@@ -82,7 +84,13 @@ public class Weapon extends Upgrade {
 	}
 
 	public void shoot(Player p, float x, float y, float angle, boolean left){
-		CallEntity.onShootWeapon(p, this, x, y, angle, left);
+		if(Net.client()){
+			//call it directly, don't invoke on server
+			shootDirect(p, this, x, y, angle, left);
+		}else{
+			CallEntity.onShootWeapon(p, this, x, y, angle, left);
+		}
+
 		p.inventory.useAmmo();
 	}
 
@@ -101,8 +109,18 @@ public class Weapon extends Upgrade {
 		Bullet.create(owner.inventory.getAmmo().bullet, owner, x + tr.x, y + tr.y, angle);
 	}
 
-	@Remote(targets = Loc.both, called = Loc.both, in = In.entities, unreliable = true, forward = true)
+	@Remote(targets = Loc.server, called = Loc.both, in = In.entities, unreliable = true)
 	public static void onShootWeapon(Player player, Weapon weapon, float x, float y, float rotation, boolean left){
+		//clients do not see their own shoot events: they are simulated completely clientside to prevent laggy visuals
+		//messing with the firerate or any other stats does not affect the server (take that, script kiddies!)
+		if(Net.client() && player == Vars.players[0]){
+			return;
+		}
+
+		shootDirect(player, weapon, x, y, rotation, left);
+	}
+
+	public static void shootDirect(Player player, Weapon weapon, float x, float y, float rotation, boolean left){
 		Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> weapon.bullet(player, x, y, f + Mathf.range(weapon.inaccuracy)));
 
 		AmmoType type = player.inventory.getAmmo();

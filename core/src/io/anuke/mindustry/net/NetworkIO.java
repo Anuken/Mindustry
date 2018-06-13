@@ -63,9 +63,9 @@ public class NetworkIO {
                 for(int y = 0; y < world.height(); y ++){
                     Tile tile = world.tile(x, y);
 
-                    //TODO will break if block number gets over BYTE_MAX
                     stream.writeByte(tile.floor().id); //floor ID
                     stream.writeByte(tile.block().id); //block ID
+                    stream.writeByte(tile.elevation);
 
                     if(tile.block() instanceof BlockPart){
                         stream.writeByte(tile.link);
@@ -162,8 +162,11 @@ public class NetworkIO {
                 for(int y = 0; y < height; y ++){
                     byte floorid = stream.readByte();
                     byte blockid = stream.readByte();
+                    byte elevation = stream.readByte();
 
                     Tile tile = new Tile(x, y, floorid, blockid);
+
+                    tile.elevation = elevation;
 
                     if(tile.block() == Blocks.blockpart){
                         tile.link = stream.readByte();
@@ -188,8 +191,6 @@ public class NetworkIO {
                     tiles[x][y] = tile;
                 }
             }
-
-            EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
             player.reset();
             state.teams = new TeamInfo();

@@ -156,9 +156,17 @@ public class World extends Module{
     	generating = true;
 	}
 
-	/**Call to signify the end of map loading.
+	/**Call to signify the end of map loading. Updates tile occlusions and sets up physics for the world.
 	 * A WorldLoadEvent will be fire.*/
 	public void endMapLoad(){
+		for(int x = 0; x < tiles.length; x ++) {
+			for (int y = 0; y < tiles[0].length; y++) {
+				tiles[x][y].updateOcclusion();
+			}
+		}
+
+		EntityPhysics.resizeTree(0, 0, tiles.length * tilesize, tiles[0].length * tilesize);
+
     	generating = false;
 		Events.fire(WorldLoadEvent.class);
 	}

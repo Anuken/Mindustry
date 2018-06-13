@@ -18,6 +18,8 @@ public abstract class NetConnection {
 
     /**ID of last recieved client snapshot.*/
     public int lastRecievedSnapshot = -1;
+    /**Timestamp of last recieved snapshot.*/
+    public long lastRecievedTime;
 
     public NetConnection(int id, String address){
         this.id = id;

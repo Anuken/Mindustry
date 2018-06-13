@@ -105,16 +105,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     @Override
     public void writeSave(DataOutput stream) throws IOException {
-        stream.writeByte(team.ordinal());
-        stream.writeFloat(x);
-        stream.writeFloat(y);
-        stream.writeByte((byte)(Mathf.clamp(velocity.x, -maxAbsVelocity, maxAbsVelocity) * velocityPercision));
-        stream.writeByte((byte)(Mathf.clamp(velocity.y, -maxAbsVelocity, maxAbsVelocity) * velocityPercision));
-        stream.writeShort((short)(rotation*2));
-        stream.writeShort((short)health);
-        stream.writeByte(status.current().id);
-        stream.writeShort((short)(status.getTime()*2));
-        inventory.write(stream);
+        writeSave(stream, false);
     }
 
     @Override
@@ -137,6 +128,19 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         this.velocity.set(xv / velocityPercision, yv / velocityPercision);
         this.rotation = rotation;
         this.status.set(StatusEffect.getByID(effect), etime);
+    }
+
+    public void writeSave(DataOutput stream, boolean net) throws IOException {
+        stream.writeByte(team.ordinal());
+        stream.writeFloat(net ? interpolator.target.x : x);
+        stream.writeFloat(net ? interpolator.target.y : y);
+        stream.writeByte((byte)(Mathf.clamp(velocity.x, -maxAbsVelocity, maxAbsVelocity) * velocityPercision));
+        stream.writeByte((byte)(Mathf.clamp(velocity.y, -maxAbsVelocity, maxAbsVelocity) * velocityPercision));
+        stream.writeShort((short)(rotation*2));
+        stream.writeShort((short)health);
+        stream.writeByte(status.current().id);
+        stream.writeShort((short)(status.getTime()*2));
+        inventory.write(stream);
     }
 
     public StatusEffect getStatus(){

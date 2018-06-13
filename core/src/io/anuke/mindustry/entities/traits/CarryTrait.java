@@ -1,6 +1,11 @@
 package io.anuke.mindustry.entities.traits;
 
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.fx.UnitFx;
+import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.net.In;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.trait.SolidTrait;
 
@@ -17,23 +22,36 @@ public interface CarryTrait extends TeamTrait, SolidTrait, TargetTrait{
         carry(null);
     }
 
+    default void dropCarryLocal(){
+        setCarryOf(null, this, null);
+    }
+
     /**Do not override unless absolutely necessary.
      * Carries a unit. To drop a unit, call with {@code null}.*/
     default void carry(CarriableTrait unit){
-        if(getCarry() != null){ //already carrying something, drop it
+        CallEntity.setCarryOf(this instanceof Player ? (Player)this : null, this, unit);
+    }
+
+    @Remote(called = Loc.server, targets = Loc.both, forward = true, in = In.entities)
+    static void setCarryOf(Player player, CarryTrait trait, CarriableTrait unit){
+        if(player != null){ //when a server recieves this called from a player, set the carrier to the player.
+            trait = player;
+        }
+
+        if(trait.getCarry() != null){ //already carrying something, drop it
             //drop current
-            Effects.effect(UnitFx.unitDrop, getCarry());
-            getCarry().setCarrier(null);
-            setCarry(null);
+            Effects.effect(UnitFx.unitDrop, trait.getCarry());
+            trait.getCarry().setCarrier(null);
+            trait.setCarry(null);
 
             if(unit != null){
-                carry(unit); //now carry this new thing
+                trait.carry(unit); //now carry this new thing
             }
         }else if(unit != null){ //not currently carrying anything, make sure it's not null
-            setCarry(unit);
-            unit.setCarrier(this);
+            trait.setCarry(unit);
+            unit.setCarrier(trait);
 
-            Effects.effect(UnitFx.unitPickup, this);
+            Effects.effect(UnitFx.unitPickup, trait);
         }
     }
 }

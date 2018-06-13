@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
@@ -130,6 +131,10 @@ public class DesktopInput extends InputHandler{
 		    mode = none;
         }
 
+        if(player.isShooting && !canShoot()){
+		    CallEntity.setShooting(false);
+        }
+
         if(isPlacing()){
             cursorType = hand;
             selectScale = Mathf.lerpDelta(selectScale, 1f, 0.2f);
@@ -188,7 +193,7 @@ public class DesktopInput extends InputHandler{
                 //only begin shooting if there's no cursor event
                 if(!tileTapped(cursor) && player.getPlaceQueue().size == 0 && !tryTapPlayer(worldx, worldy) && !droppingItem &&
                         !tryBeginMine(cursor) && player.getMineTile() == null){
-                    shooting = true;
+                    CallEntity.setShooting(true);
                 }
             }
         }else if(button == Buttons.RIGHT){ //right = begin breaking
@@ -206,7 +211,7 @@ public class DesktopInput extends InputHandler{
     @Override
     public boolean touchUp (int screenX, int screenY, int pointer, int button) {
         if(button == Buttons.LEFT){
-            shooting = false;
+            CallEntity.setShooting(false);
         }
 
         if(player.isDead() || state.is(State.menu) || ui.hasDialog()) return false;

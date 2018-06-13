@@ -2,6 +2,7 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.IntMap;
@@ -40,6 +41,9 @@ import static io.anuke.mindustry.Vars.*;
 public class NetServer extends Module{
     private final static float serverSyncTime = 4, kickDuration = 30 * 1000;
     private final static boolean preventDuplicatNames = false;
+    private final static Vector2 vector = new Vector2();
+    /**If a play goes away of their server-side coordinates by this distance, they get teleported back.*/
+    private final static float correctDist = 16f;
 
     public final Administration admins = new Administration();
 
@@ -153,10 +157,46 @@ public class NetServer extends Module{
             NetConnection connection = Net.getConnection(id);
             if(player == null || connection == null || packet.snapid < connection.lastRecievedSnapshot) return;
 
-            player.getInterpolator().read(player.x, player.y, packet.x, packet.y, packet.timeSent, packet.rotation, packet.baseRotation);
+            boolean verifyPosition = !player.isDead() && !debug && !headless;
+
+            if(connection.lastRecievedTime == 0) connection.lastRecievedTime = TimeUtils.millis() - 16;
+
+            long elapsed = TimeUtils.timeSinceMillis(connection.lastRecievedTime);
+
+            //extra 1.1x multiplicaton is added just in case
+            float maxMove = elapsed / 1000f * 60f * player.mech.maxSpeed * 1.1f;
+
+            player.pointerX = packet.pointerX;
+            player.pointerY = packet.pointerY;
+
+            vector.set(packet.x - player.getInterpolator().target.x, packet.y - player.getInterpolator().target.y);
+
+            vector.limit(maxMove);
+
+            float prevx = player.x, prevy = player.y;
+            player.set(player.getInterpolator().target.x, player.getInterpolator().target.y);
+            player.move(vector.x, vector.y);
+            float newx = player.x, newy = player.y;
+
+            if(!verifyPosition){
+                player.x = prevx;
+                player.y = prevy;
+                newx = packet.x;
+                newy = packet.y;
+            }else if(Vector2.dst(packet.x, packet.y, newx, newy) > correctDist){
+                Call.onPositionSet(id, newx, newy); //teleport and correct position when necessary
+            }
+            //reset player to previous synced position so it gets interpolated
+            player.x = prevx;
+            player.y = prevy;
+
+            //set interpolator target to *new* position so it moves toward it
+            player.getInterpolator().read(player.x, player.y, newx, newy, packet.timeSent, packet.rotation, packet.baseRotation);
             player.getVelocity().set(packet.xv, packet.yv); //only for visual calculation purposes, doesn't actually update the player
+
             connection.lastSnapshotID = packet.lastSnapshot;
             connection.lastRecievedSnapshot = packet.snapid;
+            connection.lastRecievedTime = TimeUtils.millis();
         });
 
         Net.handleServer(InvokePacket.class, (id, packet) -> RemoteReadServer.readPacket(packet.writeBuffer, packet.type, connections.get(id)));

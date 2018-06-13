@@ -18,6 +18,7 @@ import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
 import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -28,10 +29,7 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.ThreadQueue;
-import io.anuke.ucore.util.Timer;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -40,10 +38,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class Player extends Unit implements BuilderTrait, CarryTrait {
-	private static final float walkSpeed = 1.1f;
-	private static final float flySpeed = 0.4f;
-	private static final float flyMaxSpeed = 3f;
-	private static final float dashSpeed = 1.8f;
+	private static final float debugSpeed = 1.8f;
 	private static final Vector2 movement = new Vector2();
 
 	public static int typeID = -1;
@@ -56,9 +51,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	public float baseRotation;
 
+	public float pointerX, pointerY;
 	public String name = "name";
 	public String uuid;
-	public boolean isAdmin, isTransferring;
+	public boolean isAdmin, isTransferring, isShooting;
 	public Color color = new Color();
 
 	public Array<Upgrade> upgrades = new Array<>();
@@ -224,7 +220,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	@Override
 	public void removed() {
-        dropCarry();
+        dropCarryLocal();
 	}
 
 	@Override
@@ -388,8 +384,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		if(isDead()){
 			CoreEntity entity = (CoreEntity)getClosestCore();
 
-			if(!respawning && entity != null && entity.trySetPlayer(this)){
-				respawning = true;
+			if (!respawning && entity != null) {
+				entity.trySetPlayer(this);
 			}
 			return;
 		}
@@ -398,6 +394,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 			interpolate();
 			updateBuilding(this); //building happens even with non-locals
 			status.update(this); //status effect updating also happens with non locals for effect purposes
+
+			if(Net.server()){
+				updateShooting(); //server simulates player shooting
+			}
 			return;
 		}
 
@@ -424,13 +424,13 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		Tile tile = world.tileWorld(x, y);
 
 		//if player is in solid block
-		if(tile != null && tile.solid()) {
+		if(tile != null && tile.solid() && !noclip) {
 			damage(health + 1); //die instantly
 		}
 
 		if(ui.chatfrag.chatOpen()) return;
 
-		float speed = Inputs.keyDown("dash") ? (debug ? Player.dashSpeed * 5f : Player.dashSpeed) : Player.walkSpeed;
+		float speed = Inputs.keyDown("dash") && debug ? 5f : mech.speed;
 		float carrySlowdown = 0.3f;
 
 		speed *= ((1f-carrySlowdown) +  (inventory.hasItem() ? (float)inventory.getItem().amount/inventory.capacity(): 1f) * carrySlowdown);
@@ -452,16 +452,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		movement.y += ya*speed;
 		movement.x += xa*speed;
 
-		boolean shooting = isShooting();
-
-		if(shooting){
-			Vector2 vec = Graphics.world(Vars.control.input(playerIndex).getMouseX(),
-					Vars.control.input(playerIndex).getMouseY());
-			float vx = vec.x, vy = vec.y;
-
-			weapon.update(this, true, vx, vy);
-			weapon.update(this, false, vx, vy);
-		}
+		Vector2 vec = Graphics.world(Vars.control.input(playerIndex).getMouseX(),
+				Vars.control.input(playerIndex).getMouseY());
+		pointerX = vec.x;
+		pointerY = vec.y;
+		updateShooting();
 
 		movement.limit(speed);
 
@@ -474,13 +469,20 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 			baseRotation = Mathf.slerpDelta(baseRotation, movement.angle(), 0.13f);
 		}
 
-		if(!shooting){
+		if(!isShooting()){
 			if(!movement.isZero()) {
 				rotation = Mathf.slerpDelta(rotation, movement.angle(), 0.13f);
 			}
 		}else{
 			float angle = control.input(playerIndex).mouseAngle(x, y);
 			this.rotation = Mathf.slerpDelta(this.rotation, angle, 0.1f);
+		}
+	}
+
+	protected void updateShooting(){
+		if(isShooting()){
+			weapon.update(this, true, pointerX, pointerY);
+			weapon.update(this, false, pointerX, pointerY);
 		}
 	}
 
@@ -506,7 +508,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 			pickupTarget = null;
 		}
 
-		movement.set(targetX - x, targetY - y).limit(flySpeed);
+		movement.set(targetX - x, targetY - y).limit(mech.speed);
 		movement.setAngle(Mathf.slerpDelta(movement.angle(), velocity.angle(), 0.05f));
 
 		if(distanceTo(targetX, targetY) < attractDst){
@@ -514,7 +516,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		}
 
 		velocity.add(movement);
-		updateVelocityStatus(0.1f, flyMaxSpeed);
+		updateVelocityStatus(0.1f, mech.maxSpeed);
 
 		//hovering effect
 		x += Mathf.sin(Timers.time() + id * 999, 25f, 0.08f);
@@ -531,7 +533,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 			//autofire: mobile only!
 			if(mobile) {
+				boolean lastShooting = isShooting;
+
 				if (target == null) {
+					isShooting = false;
 					target = Units.getClosestTarget(team, x, y, inventory.getAmmoRange());
 				} else {
 					//rotate toward and shoot the target
@@ -540,16 +545,24 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 					Vector2 intercept =
 							Predict.intercept(x, y, target.getX(), target.getY(), target.getVelocity().x - velocity.x, target.getVelocity().y - velocity.y, inventory.getAmmo().bullet.speed);
 
-					weapon.update(this, true, intercept.x, intercept.y);
-					weapon.update(this, false, intercept.x, intercept.y);
+					pointerX = intercept.x;
+					pointerY = intercept.y;
+
+					updateShooting();
+					isShooting = true;
+				}
+
+				//update status of shooting to server
+				if(lastShooting != isShooting){
+					CallEntity.setShooting(isShooting);
 				}
 			}else if(isShooting()){ //desktop shooting, TODO
 				Vector2 vec = Graphics.world(Vars.control.input(playerIndex).getMouseX(),
 						Vars.control.input(playerIndex).getMouseY());
-				float vx = vec.x, vy = vec.y;
+				pointerX = vec.x;
+				pointerY = vec.y;
 
-				weapon.update(this, true, vx, vy);
-				weapon.update(this, false, vx, vy);
+				updateShooting();
 			}
 		}
 	}
@@ -578,7 +591,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	}
 
 	public boolean isShooting(){
-		return control.input(playerIndex).canShoot() && control.input(playerIndex).isShooting() && inventory.hasAmmo();
+		return isShooting && inventory.hasAmmo();
+	}
+
+	public void setRespawning(){
+		respawning = true;
 	}
 
 	@Override
@@ -601,7 +618,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 		if(isLocal){
 			stream.writeInt(playerIndex);
-			super.writeSave(stream);
+			super.writeSave(stream, false);
 
 			stream.writeByte(upgrades.size);
 			for(Upgrade u : upgrades){
@@ -632,7 +649,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	@Override
 	public void write(DataOutput buffer) throws IOException {
-		super.writeSave(buffer);
+		super.writeSave(buffer, !isLocal);
 		buffer.writeUTF(name);
 		buffer.writeInt(Color.rgba8888(color));
 		buffer.writeBoolean(dead);

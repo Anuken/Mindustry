@@ -6,6 +6,8 @@ import io.anuke.annotations.Annotations.WriteClass;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.bullet.BulletType;
+import io.anuke.mindustry.entities.traits.CarriableTrait;
+import io.anuke.mindustry.entities.traits.CarryTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Packets.KickReason;
@@ -49,6 +51,39 @@ public class TypeIO {
         byte gid = buffer.get();
         int id = buffer.getInt();
         return (Unit)Entities.getGroup(gid).getByID(id);
+    }
+
+    @WriteClass(CarriableTrait.class)
+    public static void writeCarriable(ByteBuffer buffer, CarriableTrait unit){
+        if(unit == null){
+            buffer.put((byte)-1);
+            return;
+        }
+        buffer.put((byte)unit.getGroup().getID());
+        buffer.putInt(unit.getID());
+    }
+
+    @ReadClass(CarriableTrait.class)
+    public static CarriableTrait readCarriable(ByteBuffer buffer){
+        byte gid = buffer.get();
+        if(gid == -1){
+            return null;
+        }
+        int id = buffer.getInt();
+        return (CarriableTrait)Entities.getGroup(gid).getByID(id);
+    }
+
+    @WriteClass(CarryTrait.class)
+    public static void writeCarry(ByteBuffer buffer, CarryTrait unit){
+        buffer.put((byte)unit.getGroup().getID());
+        buffer.putInt(unit.getID());
+    }
+
+    @ReadClass(CarryTrait.class)
+    public static CarryTrait readCarry(ByteBuffer buffer){
+        byte gid = buffer.get();
+        int id = buffer.getInt();
+        return (CarryTrait)Entities.getGroup(gid).getByID(id);
     }
 
     @WriteClass(BaseUnit.class)

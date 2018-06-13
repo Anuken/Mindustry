@@ -14,10 +14,14 @@ public class Mechs implements ContentList {
 
         standard = new Mech("standard-mech", false){{
             drillPower = 1;
+            speed = 1.1f;
+            maxSpeed = 1.1f;
         }};
 
         standardShip = new Mech("standard-ship", true){{
             drillPower = 1;
+            speed = 0.4f;
+            maxSpeed = 3f;
         }};
     }
 

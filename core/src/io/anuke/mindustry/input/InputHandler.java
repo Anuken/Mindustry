@@ -46,7 +46,6 @@ public abstract class InputHandler extends InputAdapter{
 	public Recipe recipe;
 	public int rotation;
 	public boolean droppingItem;
-	public boolean shooting;
 
 	public InputHandler(Player player){
 	    this.player = player;
@@ -189,10 +188,6 @@ public abstract class InputHandler extends InputAdapter{
 	public boolean canShoot(){
 		return recipe == null && !ui.hasMouse() && !onConfigurable() && !isDroppingItem();
 	}
-
-	public boolean isShooting(){
-		return shooting;
-	}
 	
 	public boolean onConfigurable(){
 		return false;
@@ -260,6 +255,11 @@ public abstract class InputHandler extends InputAdapter{
 		//todo multiplayer support
     	Tile tile = world.tile(x, y).target();
 		player.addBuildRequest(new BuildRequest(tile.x, tile.y));
+	}
+
+	@Remote(targets = Loc.client, called = Loc.both, in = In.entities)
+	public static void setShooting(Player player, boolean on){
+		player.isShooting = on;
 	}
 
 	@Remote(targets = Loc.both, called = Loc.server, in = In.entities)

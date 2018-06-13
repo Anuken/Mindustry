@@ -92,9 +92,11 @@ public class Save16 extends SaveFileVersion {
             for(int y = 0; y < height; y ++) {
                 byte floorid = stream.readByte();
                 byte wallid = stream.readByte();
+                byte elevation = stream.readByte();
 
                 Tile tile = new Tile(x, y, floorid, wallid);
 
+                tile.elevation = elevation;
 
                 if (wallid == Blocks.blockpart.id) {
                     tile.link = stream.readByte();
@@ -190,8 +192,9 @@ public class Save16 extends SaveFileVersion {
             for(int y = 0; y < world.height(); y ++){
                 Tile tile = world.tile(x, y);
 
-                stream.writeByte(tile.floor().id); //floor ID
-                stream.writeByte(tile.block().id); //wall ID
+                stream.writeByte(tile.floor().id);
+                stream.writeByte(tile.block().id);
+                stream.writeByte(tile.elevation);
 
                 if(tile.block() instanceof BlockPart){
                     stream.writeByte(tile.link);

@@ -155,15 +155,7 @@ public class CoreBlock extends StorageBlock {
             }
 
             if(entity.progress >= 1f){
-                Effects.effect(Fx.spawn, entity);
-                CallBlocks.setCoreSolid(tile, false);
-                entity.progress = 0;
-                entity.currentPlayer.heal();
-                entity.currentPlayer.rotation = 90f;
-                entity.currentPlayer.baseRotation = 90f;
-                entity.currentPlayer.set(tile.drawx(), tile.drawy());
-                entity.currentPlayer.add();
-                entity.currentPlayer = null;
+                CallBlocks.onPlayerRespawn(tile, entity.currentPlayer);
             }
         }else{
             entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.1f);
@@ -194,6 +186,30 @@ public class CoreBlock extends StorageBlock {
     }
 
     @Remote(called = Loc.server, in = In.blocks)
+    public static void onPlayerRespawn(Tile tile, Player player){
+        CoreEntity entity = tile.entity();
+        Effects.effect(Fx.spawn, entity);
+        entity.solid = false;
+        entity.progress = 0;
+        entity.currentPlayer = player;
+        entity.currentPlayer.heal();
+        entity.currentPlayer.rotation = 90f;
+        entity.currentPlayer.baseRotation = 90f;
+        entity.currentPlayer.setNet(tile.drawx(), tile.drawy());
+        entity.currentPlayer.add();
+        entity.currentPlayer = null;
+    }
+
+    @Remote(called = Loc.server, in = In.blocks)
+    public static void onCorePlayerSet(Tile tile, Player player){
+        CoreEntity entity = tile.entity();
+        entity.currentPlayer = player;
+        entity.progress = 0f;
+        player.set(tile.drawx(), tile.drawy());
+        player.setRespawning();
+    }
+
+    @Remote(called = Loc.server, in = In.blocks)
     public static void setCoreSolid(Tile tile, boolean solid){
         CoreEntity entity = tile.entity();
         entity.solid = solid;
@@ -206,12 +222,10 @@ public class CoreBlock extends StorageBlock {
         float time;
         float heat;
 
-        public boolean trySetPlayer(Player player){
-            if(currentPlayer != null) return false;
-            player.set(tile.drawx(), tile.drawy());
-            currentPlayer = player;
-            progress = 0f;
-            return true;
+        public void trySetPlayer(Player player){
+            if(currentPlayer == null){
+                CallBlocks.onCorePlayerSet(tile, player);
+            }
         }
 
         @Override

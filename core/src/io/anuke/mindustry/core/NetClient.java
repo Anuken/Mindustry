@@ -33,7 +33,7 @@ public class NetClient extends Module {
     private final static float playerSyncTime = 2;
 
     private Timer timer = new Timer(5);
-    /**Whether the client is currently conencting.*/
+    /**Whether the client is currently connecting.*/
     private boolean connecting = false;
     /**If true, no message will be shown on disconnect.*/
     private boolean quiet = false;
@@ -176,6 +176,12 @@ public class NetClient extends Module {
         state.set(State.menu);
         if(!reason.quiet) ui.showError("$text.server.kicked." + reason.name());
         ui.loadfrag.hide();
+    }
+
+    @Remote(variants = Variant.one)
+    public static void onPositionSet(float x, float y){
+        players[0].x = x;
+        players[0].y = y;
     }
 
     @Remote(variants = Variant.one, unreliable = true)
