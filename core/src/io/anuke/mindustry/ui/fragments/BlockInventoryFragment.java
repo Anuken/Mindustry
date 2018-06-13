@@ -27,6 +27,7 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class BlockInventoryFragment implements Fragment {
     private Table table;
@@ -127,7 +128,7 @@ public class BlockInventoryFragment implements Fragment {
         }
 
         if(row == 0){
-            table.addImage("icon-items-none").color(Color.LIGHT_GRAY);
+            table.setSize(0f, 0f);
         }
 
         updateTablePosition();
@@ -143,9 +144,9 @@ public class BlockInventoryFragment implements Fragment {
     }
 
     private void updateTablePosition(){
-        Vector2 v =  Graphics.screen(tile.drawx(), tile.drawy());
+        Vector2 v =  Graphics.screen(tile.drawx() + tile.block().size * tilesize/2f, tile.drawy() + tile.block().size * tilesize/2f);
         table.pack();
-        table.setPosition(v.x, v.y, Align.center);
+        table.setPosition(v.x, v.y, Align.topLeft);
     }
 
     @Remote(called = Loc.server, targets = Loc.both, in = In.blocks)

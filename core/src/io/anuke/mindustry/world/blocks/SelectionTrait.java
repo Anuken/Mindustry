@@ -18,11 +18,6 @@ public interface SelectionTrait {
 
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
         Table cont = new Table();
-        cont.margin(4);
-        cont.marginBottom(5);
-
-        cont.add().colspan(4).height(50f * (int)(items.size/4f + 1f));
-        cont.row();
 
         for(int i = 0; i < items.size; i ++){
 

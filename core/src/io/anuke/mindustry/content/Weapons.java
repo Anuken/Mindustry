@@ -8,7 +8,7 @@ import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.type.Weapon;
 
 public class Weapons implements ContentList {
-    public static Weapon blaster;
+    public static Weapon blaster, blaster2, blaster3, blaster4;
 
     @Override
     public void load() {
@@ -19,6 +19,30 @@ public class Weapons implements ContentList {
             roundrobin = true;
             ejectEffect = ShootFx.shellEjectSmall;
             setAmmo(AmmoTypes.bulletIron);
+        }};
+
+        blaster2 = new Weapon("clustergun") {{
+            length = 1.5f;
+            reload = 13f;
+            roundrobin = true;
+            ejectEffect = ShootFx.shellEjectSmall;
+            setAmmo(AmmoTypes.bulletLead);
+        }};
+
+        blaster3 = new Weapon("shockgun") {{
+            length = 1.5f;
+            reload = 12f;
+            roundrobin = true;
+            ejectEffect = ShootFx.shellEjectSmall;
+            setAmmo(AmmoTypes.bulletSteel);
+        }};
+
+        blaster4 = new Weapon("vulcan") {{
+            length = 1.5f;
+            reload = 10f;
+            roundrobin = true;
+            ejectEffect = ShootFx.shellEjectSmall;
+            setAmmo(AmmoTypes.bulletThermite);
         }};
     }
 

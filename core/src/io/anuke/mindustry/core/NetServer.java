@@ -209,7 +209,7 @@ public class NetServer extends Module{
                 NetConnection connection = Net.getConnection(player.clientid);
 
                 if(connection == null){
-                    //player disconnected
+                    //player disconnected, ignore them
                     connections.remove(player.clientid);
                     player.remove();
                     return;

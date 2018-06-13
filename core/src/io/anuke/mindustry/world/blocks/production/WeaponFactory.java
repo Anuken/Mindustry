@@ -1,11 +1,18 @@
 package io.anuke.mindustry.world.blocks.production;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.gen.CallBlocks;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
+import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -14,8 +21,15 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.scene.style.TextureRegionDrawable;
+import io.anuke.ucore.scene.ui.ButtonGroup;
+import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class WeaponFactory extends Block{
 
@@ -33,17 +47,13 @@ public class WeaponFactory extends Block{
 
         Draw.rect(name, tile.drawx(), tile.drawy());
 
-        Draw.alpha(entity.heat);
-        Draw.rect(name + "-top", tile.drawx(), tile.drawy());
-        Draw.color();
-
         if(entity.current != null) {
-            TextureRegion region = Draw.region(entity.current.name);
+            TextureRegion region = entity.current.equipRegion;
 
             Shaders.build.region = region;
             Shaders.build.progress = entity.progress;
-            Shaders.build.color.set(Palette.accent);
             Shaders.build.time = -entity.time / 10f;
+            Shaders.build.color.set(Palette.accent);
 
             Graphics.shader(Shaders.build, false);
             Shaders.build.apply();
@@ -56,7 +66,7 @@ public class WeaponFactory extends Block{
                     tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),
                     tile.drawy(),
                     90,
-                    size * Vars.tilesize /2f);
+                    size * Vars.tilesize / 2f);
 
             Draw.reset();
         }
@@ -72,10 +82,7 @@ public class WeaponFactory extends Block{
             entity.progress += 1f / Vars.respawnduration;
 
             if(entity.progress >= 1f){
-                Effects.effect(Fx.spawn, entity);
-                entity.progress = 0;
-
-                //TODO what now?
+                CallBlocks.onWeaponFactoryDone(tile, entity.current);
             }
         }else{
             entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.1f);
@@ -84,82 +91,74 @@ public class WeaponFactory extends Block{
 
     @Override
     public void buildTable(Tile tile, Table table) {
+        WeaponFactoryEntity entity = tile.entity();
 
-        Table content = new Table();
+        Table cont = new Table();
 
-        /*
-        for(Upgrade upgrade : Upgrade.all()){
-            if(!(upgrade instanceof Weapon)) continue;
-            Weapon weapon = (Weapon)upgrade;
+        //no result to show, build weapon selection menu
+        if(entity.result == null) {
+            //show weapon to select and build
+            showSelect(tile, cont);
+        }else{
+            //show weapon to withdraw
+            showResult(tile, cont);
+        }
 
-            ItemStack[] requirements = UpgradeRecipes.get(weapon);
+        table.add(cont);
+    }
 
-            Table tiptable = new Table();
+    protected void showSelect(Tile tile, Table cont){
+        WeaponFactoryEntity entity = tile.entity();
 
-            Listenable run = ()->{
-                tiptable.clearChildren();
+        Array<Upgrade> items = Upgrade.all();
 
-                String description = weapon.description;
+        ButtonGroup<ImageButton> group = new ButtonGroup<>();
+        group.setMinCheckCount(0);
 
-                tiptable.background("pane");
-                tiptable.add("[orange]" + weapon.localized(), 0.5f).left().padBottom(2f);
+        int i = 0;
 
-                Table reqtable = new Table();
+        for (Upgrade upgrade : items) {
+            if (!(upgrade instanceof Weapon)) continue;
+            Weapon weapon = (Weapon) upgrade;
 
-                tiptable.row();
-                tiptable.add(reqtable).left();
+            ImageButton button = cont.addImageButton("white", "toggle", 24, () -> CallBlocks.setWeaponFactoryWeapon(null, tile, weapon))
+                    .size(38, 42).padBottom(-5.1f).group(group).get();
+            button.getStyle().imageUp = new TextureRegionDrawable(new TextureRegion(weapon.region));
+            button.setChecked(entity.current == weapon);
 
-                if(!control.upgrades().hasWeapon(weapon)){
-                    for(ItemStack s : requirements){
-
-                        int amount = Math.min(state.inventory.getAmount(s.item), s.amount);
-                        reqtable.addImage(s.item.region).padRight(3).size(8*2);
-                        reqtable.add(
-                                (amount >= s.amount ? "" : "[RED]")
-                                        + amount + " / " +s.amount, 0.5f).left();
-                        reqtable.row();
-                    }
-                }
-
-                tiptable.row();
-                tiptable.add().size(4);
-                tiptable.row();
-                tiptable.add("[gray]" + description).left();
-                tiptable.row();
-                if(control.upgrades().hasWeapon(weapon)){
-                    tiptable.add("$text.purchased").padTop(4).left();
-                }
-                tiptable.margin(8f);
-            };
-
-            run.listen();
-
-            Tooltip<Table> tip = new Tooltip<>(tiptable, run);
-
-            tip.setInstant(true);
-
-            ImageButton button = content.addImageButton("white", 8*4, () -> {
-
-                if(Net.client()){
-                    NetEvents.handleUpgrade(weapon);
-                }else{
-                    state.inventory.removeItems(requirements);
-                    control.upgrades().addWeapon(weapon);
-                    run.listen();
-                    Effects.sound("purchase");
-                }
-            }).size(49f, 54f).padBottom(-5).get();
-
-            button.setDisabled(() -> control.upgrades().hasWeapon(weapon) || !state.inventory.hasItems(requirements));
-            button.getStyle().imageUp = new TextureRegionDrawable(Draw.region(weapon.name));
-            button.addListener(tip);
-
-            if(++i % 3 == 0){
-                content.row();
+            if (i++ % 4 == 3) {
+                cont.row();
             }
-        }*/
+        }
 
-        table.add(content).padTop(140f);
+        cont.update(() -> {
+            //show result when done
+            if(entity.result != null){
+                cont.clear();
+                cont.update(null);
+                showResult(tile, cont);
+            }
+        });
+    }
+
+    protected void showResult(Tile tile, Table cont){
+        WeaponFactoryEntity entity = tile.entity();
+
+        Weapon weapon = entity.result;
+
+        ImageButton button = cont.addImageButton("white", "toggle", 24, () -> CallBlocks.setWeaponFactoryWeapon(null, tile, weapon))
+                .size(38, 42).padBottom(-5.1f).get();
+        button.getStyle().imageUp = new TextureRegionDrawable(new TextureRegion(weapon.region));
+        button.setChecked(entity.current == weapon);
+
+        cont.update(() -> {
+            //show selection menu when result disappears
+            if(entity.result == null){
+                cont.clear();
+                cont.update(null);
+                showSelect(tile, cont);
+            }
+        });
     }
 
     @Override
@@ -167,10 +166,65 @@ public class WeaponFactory extends Block{
         return new WeaponFactoryEntity();
     }
 
+    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
+    public static void pickupWeaponFactoryWeapon(Player player, Tile tile){
+        WeaponFactoryEntity entity = tile.entity();
+
+        if(entity.current != null){
+            player.upgrades.add(entity.current);
+            entity.current = null;
+            entity.progress = 0;
+            entity.result = null;
+        }
+    }
+
+    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
+    public static void setWeaponFactoryWeapon(Player player, Tile tile, Weapon weapon){
+        WeaponFactoryEntity entity = tile.entity();
+        entity.current = weapon;
+        entity.progress = 0f;
+        entity.heat = 0f;
+    }
+
+    @Remote(called = Loc.server, in = In.blocks)
+    public static void onWeaponFactoryDone(Tile tile, Weapon result){
+        WeaponFactoryEntity entity = tile.entity();
+        Effects.effect(Fx.spawn, entity);
+        entity.current = null;
+        entity.progress = 0;
+        entity.result = result;
+    }
+
     public class WeaponFactoryEntity extends TileEntity{
         public Weapon current;
         public float progress;
         public float time;
         public float heat;
+        public Weapon result;
+
+        @Override
+        public void write(DataOutputStream stream) throws IOException {
+            stream.writeByte(current == null ? -1 : current.id);
+            stream.writeByte(result == null ? -1 : result.id);
+            stream.writeFloat(progress);
+            stream.writeFloat(time);
+            stream.writeFloat(heat);
+        }
+
+        @Override
+        public void read(DataInputStream stream) throws IOException {
+            byte id = stream.readByte(), rid = stream.readByte();
+            progress = stream.readFloat();
+            time = stream.readFloat();
+            heat = stream.readFloat();
+
+            if(id != -1){
+                current = Upgrade.getByID(id);
+            }
+
+            if(rid != -1){
+                result = Upgrade.getByID(rid);
+            }
+        }
     }
 }

@@ -13,6 +13,8 @@ import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.ui.layout.Table;
 
+import static io.anuke.mindustry.Vars.tilesize;
+
 public class BlockConfigFragment implements  Fragment {
     private Table table = new Table();
     private Tile configTile;
@@ -43,8 +45,8 @@ public class BlockConfigFragment implements  Fragment {
 
         table.update(() -> {
             table.setOrigin(Align.center);
-            Vector2 pos = Graphics.screen(tile.drawx(), tile.drawy());
-            table.setPosition(pos.x, pos.y, Align.center);
+            Vector2 pos = Graphics.screen(tile.drawx(), tile.drawy() - tile.block().size * tilesize/2f - 1);
+            table.setPosition(pos.x, pos.y, Align.top);
             if(configTile == null || configTile.block() == Blocks.air){
                 hideConfig();
             }
