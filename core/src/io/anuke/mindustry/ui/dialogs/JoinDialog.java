@@ -22,6 +22,7 @@ import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
+import static io.anuke.mindustry.Vars.maxNameLength;
 import static io.anuke.mindustry.Vars.players;
 import static io.anuke.mindustry.Vars.ui;
 
@@ -211,7 +212,7 @@ public class JoinDialog extends FloatingDialog {
                 player.name = text;
                 Settings.put("name", text);
                 Settings.save();
-            }).grow().pad(8).get().setMaxLength(40);
+            }).grow().pad(8).get().setMaxLength(maxNameLength);
 
             ImageButton button = t.addImageButton("white", 40, () -> {
                 new ColorPickDialog().show(color -> {

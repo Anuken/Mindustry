@@ -19,7 +19,7 @@ public class Annotations {
         Loc targets() default Loc.server;
         /**Specifies which methods are generated. Only affects server-to-client methods.*/
         Variant variants() default Variant.all;
-        /**The local locations where this method is called.*/
+        /**The local locations where this method is called locally, when invoked.*/
         Loc called() default Loc.none;
         /**Whether to forward this packet to all other clients upon recieval. Server only.*/
         boolean forward() default false;

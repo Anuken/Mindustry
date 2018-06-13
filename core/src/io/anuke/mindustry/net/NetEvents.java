@@ -6,18 +6,23 @@ import io.anuke.annotations.Annotations.Variant;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 
+import static io.anuke.mindustry.Vars.maxTextLength;
 import static io.anuke.mindustry.Vars.playerGroup;
 
 public class NetEvents {
 
-    @Remote(called = Loc.both, targets = Loc.both)
+    @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void sendMessage(Player player, String message){
+        if(message.length() > maxTextLength){
+            throw new ValidateException(player, "Player has sent a message above the text limit.");
+        }
+
         if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message, player == null ? null : colorizeName(player.id, player.name));
         }
     }
 
-    @Remote(called = Loc.both, variants = Variant.both)
+    @Remote(called = Loc.server, variants = Variant.both, forward = true)
     public static void sendMessage(String message){
         if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message, null);

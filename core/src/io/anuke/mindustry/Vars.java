@@ -73,6 +73,8 @@ public class Vars{
     public static boolean showBlockDebug = false;
 
     public static final int maxTextLength = 150;
+    public static final int maxNameLength = 40;
+    public static final int maxCharNameLength = 20;
 
 	public static boolean headless = false;
 

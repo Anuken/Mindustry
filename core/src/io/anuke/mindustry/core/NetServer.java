@@ -1,5 +1,7 @@
 package io.anuke.mindustry.core;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.IntMap;
@@ -96,6 +98,13 @@ public class NetServer extends Module{
                         return;
                     }
                 }
+            }
+
+            packet.name = fixName(packet.name);
+
+            if(packet.name.trim().length() <= 0){
+                kick(id, KickReason.nameEmpty);
+                return;
             }
 
             Log.info("Recieved connect packet for player '{0}' / UUID {1} / IP {2}", packet.name, uuid, trace.ip);
@@ -199,6 +208,47 @@ public class NetServer extends Module{
 
     String getUUID(int connectionID){
         return connections.get(connectionID).uuid;
+    }
+
+    String fixName(String name){
+
+        for(int i = 0; i < name.length(); i ++){
+            if(name.charAt(i) == '[' && i != name.length() - 1 && name.charAt(i + 1) != '[' && (i == 0 || name.charAt(i - 1) != '[')){
+                String prev = name.substring(0, i);
+                String next = name.substring(i);
+                String result = checkColor(next);
+
+                name = prev + result;
+            }
+        }
+
+        return name.substring(0, Math.min(name.length(), maxNameLength));
+    }
+
+    String checkColor(String str){
+
+        for(int i = 1; i < str.length(); i ++){
+            if(str.charAt(i) == ']'){
+                String color = str.substring(1, i);
+
+                if(Colors.get(color.toUpperCase()) != null || Colors.get(color.toLowerCase()) != null){
+                    Color result = (Colors.get(color.toLowerCase()) == null ? Colors.get(color.toUpperCase()) : Colors.get(color.toLowerCase()));
+                    if(result.a <= 0.8f){
+                        return str.substring(i + 1);
+                    }
+                }else{
+                    try{
+                        Color result = Color.valueOf(color);
+                        if(result.a <= 0.8f){
+                            return str.substring(i + 1);
+                        }
+                    }catch (Exception e){
+                        return str;
+                    }
+                }
+            }
+        }
+        return str;
     }
 
     void sync(){

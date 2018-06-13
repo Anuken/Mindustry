@@ -137,7 +137,7 @@ public class Packets {
     }
 
     public enum KickReason{
-        kick, invalidPassword, clientOutdated, serverOutdated, banned, gameover(true), recentKick, nameInUse, idInUse, fastShoot;
+        kick, invalidPassword, clientOutdated, serverOutdated, banned, gameover(true), recentKick, nameInUse, idInUse, fastShoot, nameEmpty;
         public final boolean quiet;
 
         KickReason(){ quiet = false; }
