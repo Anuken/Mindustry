@@ -4,10 +4,11 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.EditLog;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
-import io.anuke.mindustry.net.Packets.KickReason;
+import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.Inputs;
@@ -138,23 +139,10 @@ public class PlayerListFragment implements Fragment{
                     //TODO requests.
 
                     t.addImageButton("icon-ban", 14*2, () -> {
-                        ui.showConfirm("$text.confirm", "$text.confirmban", () -> {
-                            if(Net.server()) {
-                                netServer.admins.banPlayerIP(connection.address);
-                                netServer.kick(player.clientid, KickReason.banned);
-                            }else{
-                                //NetEvents.handleAdministerRequest(player, AdminAction.ban);
-                            }
-                        });
+                        ui.showConfirm("$text.confirm", "$text.confirmban", () -> Call.onAdminRequest(player, AdminAction.ban));
                     }).padBottom(-5.1f);
 
-                    t.addImageButton("icon-cancel", 14*2, () -> {
-                        if(Net.server()) {
-                            netServer.kick(player.clientid, KickReason.kick);
-                        }else{
-                            //NetEvents.handleAdministerRequest(player, AdminAction.kick);
-                        }
-                    }).padBottom(-5.1f);
+                    t.addImageButton("icon-cancel", 14*2, () -> Call.onAdminRequest(player, AdminAction.kick)).padBottom(-5.1f);
 
                     t.row();
 
@@ -166,12 +154,10 @@ public class PlayerListFragment implements Fragment{
                         if(netServer.admins.isAdmin(id, connection.address)){
                             ui.showConfirm("$text.confirm", "$text.confirmunadmin", () -> {
                                 netServer.admins.unAdminPlayer(id);
-                                //CallClient.adminSet(player, false);
                             });
                         }else{
                             ui.showConfirm("$text.confirm", "$text.confirmadmin", () -> {
-                                netServer.admins.adminPlayer(id, connection.address);
-                                //CallClient.adminSet(player,  true);
+                                netServer.admins.adminPlayer(id, player.usid);
                             });
                         }
                     }).update(b ->{
@@ -179,7 +165,7 @@ public class PlayerListFragment implements Fragment{
                         b.setDisabled(Net.client());
                     }).get().setTouchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled);
 
-                    t.addImageButton("icon-zoom-small", 14*2, () -> {}/*NetEvents.handleTraceRequest(player)*/);
+                    t.addImageButton("icon-zoom-small", 14*2, () -> Call.onAdminRequest(player, AdminAction.trace));
 
                 }).padRight(12).padTop(-5).padLeft(0).padBottom(-10).size(bs + 10f, bs);
 

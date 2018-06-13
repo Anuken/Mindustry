@@ -53,7 +53,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	public float pointerX, pointerY;
 	public String name = "name";
-	public String uuid;
+	public String uuid, usid;
 	public boolean isAdmin, isTransferring, isShooting;
 	public Color color = new Color();
 
@@ -651,6 +651,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	public void write(DataOutput buffer) throws IOException {
 		super.writeSave(buffer, !isLocal);
 		buffer.writeUTF(name);
+		buffer.writeBoolean(isAdmin);
 		buffer.writeInt(Color.rgba8888(color));
 		buffer.writeBoolean(dead);
 		buffer.writeByte(weapon.id);
@@ -662,6 +663,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		float lastx = x, lasty = y, lastrot = rotation;
 		super.readSave(buffer);
 		name = buffer.readUTF();
+		isAdmin = buffer.readBoolean();
 		color.set(buffer.readInt());
 		dead = buffer.readBoolean();
 		weapon = Upgrade.getByID(buffer.readByte());

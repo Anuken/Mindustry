@@ -1,6 +1,7 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.Pools;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.annotations.Annotations.Variant;
@@ -14,6 +15,8 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
+import io.anuke.mindustry.net.TraceInfo;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
@@ -25,6 +28,7 @@ import io.anuke.ucore.util.Timer;
 
 import java.io.DataInputStream;
 import java.util.Arrays;
+import java.util.Random;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -73,6 +77,7 @@ public class NetClient extends Module {
             c.name = player.name;
             c.mobile = mobile;
             c.color = Color.rgba8888(player.color);
+            c.usid = getUsid(packet.addressTCP);
             c.uuid = Platform.instance.getUUID();
 
             if(c.uuid == null){
@@ -170,6 +175,18 @@ public class NetClient extends Module {
         }
     }
 
+    String getUsid(String ip){
+        if(Settings.getString("usid-" + ip, null) != null){
+            return Settings.getString("usid-" + ip);
+        }else{
+            byte[] bytes = new byte[8];
+            new Random().nextBytes(bytes);
+            String result = new String(Base64Coder.encode(bytes));
+            Settings.putString("usid-" + ip, result);
+            return result;
+        }
+    }
+
     @Remote(variants = Variant.one)
     public static void onKick(KickReason reason){
         netClient.disconnectQuietly();
@@ -182,6 +199,12 @@ public class NetClient extends Module {
     public static void onPositionSet(float x, float y){
         players[0].x = x;
         players[0].y = y;
+    }
+
+    @Remote(variants = Variant.one)
+    public static void onTraceInfo(TraceInfo info){
+        Player player = playerGroup.getByID(info.playerid);
+        ui.traces.show(player, info);
     }
 
     @Remote(variants = Variant.one, unreliable = true)

@@ -439,7 +439,7 @@ public class ServerControl extends Module {
             }
 
             if(target != null){
-                netServer.admins.adminPlayer(target.uuid, Net.getConnection(target.clientid).address);
+                netServer.admins.adminPlayer(target.uuid, target.usid);
                 info("Admin-ed player by ID: {0} / {1}", target.uuid, arg[0]);
             }else{
                 info("Nobody with that name could be found.");

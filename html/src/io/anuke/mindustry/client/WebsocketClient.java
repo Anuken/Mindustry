@@ -57,6 +57,7 @@ public class WebsocketClient implements ClientProvider {
             @Override
             public void onOpen() {
                 Connect connect = new Connect();
+                connect.addressTCP = ip;
                 Net.handleClientReceived(connect);
             }
         });

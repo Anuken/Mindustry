@@ -1,6 +1,7 @@
 package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Base64Coder;
 import io.anuke.annotations.Annotations.ReadClass;
 import io.anuke.annotations.Annotations.WriteClass;
 import io.anuke.mindustry.entities.Player;
@@ -10,8 +11,11 @@ import io.anuke.mindustry.entities.traits.CarriableTrait;
 import io.anuke.mindustry.entities.traits.CarryTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.net.Packets.KickReason;
+import io.anuke.mindustry.net.TraceInfo;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
@@ -129,6 +133,16 @@ public class TypeIO {
         return Team.values()[buffer.get()];
     }
 
+    @WriteClass(AdminAction.class)
+    public static void writeAction(ByteBuffer buffer, AdminAction reason){
+        buffer.put((byte)reason.ordinal());
+    }
+
+    @ReadClass(AdminAction.class)
+    public static AdminAction readAction(ByteBuffer buffer){
+        return AdminAction.values()[buffer.get()];
+    }
+
     @WriteClass(Effect.class)
     public static void writeEffect(ByteBuffer buffer, Effect effect){
         buffer.putShort((short)effect.id);
@@ -244,5 +258,46 @@ public class TypeIO {
         byte[] bytes = new byte[length];
         buffer.get(bytes);
         return bytes;
+    }
+
+    @WriteClass(TraceInfo.class)
+    public static void writeTrace(ByteBuffer buffer, TraceInfo info){
+        buffer.putInt(info.playerid);
+        buffer.putShort((short)info.ip.getBytes().length);
+        buffer.put(info.ip.getBytes());
+        buffer.put(info.modclient ? (byte)1 : 0);
+        buffer.put(info.android ? (byte)1 : 0);
+
+        buffer.putInt(info.totalBlocksBroken);
+        buffer.putInt(info.structureBlocksBroken);
+        buffer.putInt(info.lastBlockBroken.id);
+
+        buffer.putInt(info.totalBlocksPlaced);
+        buffer.putInt(info.lastBlockPlaced.id);
+        buffer.put(Base64Coder.decode(info.uuid));
+    }
+
+    @ReadClass(TraceInfo.class)
+    public static TraceInfo readTrace(ByteBuffer buffer){
+        int id = buffer.getInt();
+        short iplen = buffer.getShort();
+        byte[] ipb = new byte[iplen];
+        buffer.get(ipb);
+
+        TraceInfo info = new TraceInfo(new String(ipb));
+
+        info.playerid = id;
+        info.modclient = buffer.get() == 1;
+        info.android = buffer.get() == 1;
+        info.totalBlocksBroken = buffer.getInt();
+        info.structureBlocksBroken = buffer.getInt();
+        info.lastBlockBroken = Block.getByID(buffer.getInt());
+        info.totalBlocksPlaced = buffer.getInt();
+        info.lastBlockPlaced = Block.getByID(buffer.getInt());
+        byte[] uuid = new byte[8];
+        buffer.get(uuid);
+
+        info.uuid = new String(Base64Coder.encode(uuid));
+        return info;
     }
 }

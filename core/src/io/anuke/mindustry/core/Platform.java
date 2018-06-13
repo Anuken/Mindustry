@@ -47,8 +47,8 @@ public abstract class Platform {
 	}
 	/**Whether debug mode is enabled.*/
 	public boolean isDebug(){return false;}
-	/**Must be 8 bytes in length.*/
-	public byte[] getUUID(){
+	/**Must be a base64 string 8 bytes in length.*/
+	public String getUUID(){
 		String uuid = Settings.getString("uuid", "");
 		if(uuid.isEmpty()){
 			byte[] result = new byte[8];
@@ -56,9 +56,9 @@ public abstract class Platform {
 			uuid = new String(Base64Coder.encode(result));
 			Settings.putString("uuid", uuid);
 			Settings.save();
-			return result;
+			return uuid;
 		}
-		return Base64Coder.decode(uuid);
+		return uuid;
 	}
 	/**Only used for iOS or android: open the share menu for a map or save.*/
 	public void shareFile(FileHandle file){}

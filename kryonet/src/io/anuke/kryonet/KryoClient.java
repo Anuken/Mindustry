@@ -60,6 +60,7 @@ public class KryoClient implements ClientProvider{
             @Override
             public void connected (Connection connection) {
                 Connect c = new Connect();
+                c.addressTCP = connection.getRemoteAddressTCP().getAddress().getHostAddress();
                 c.id = connection.getID();
                 if(connection.getRemoteAddressTCP() != null) c.addressTCP = connection.getRemoteAddressTCP().toString();
 

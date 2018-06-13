@@ -28,7 +28,6 @@ import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.Saves.SaveSlot;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
-import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Unit;
@@ -45,7 +44,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Random;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -106,7 +104,7 @@ public class AndroidLauncher extends AndroidApplication{
 			}
 
 			@Override
-			public byte[] getUUID() {
+			public String getUUID() {
 				try {
 					String s = Secure.getString(getContext().getContentResolver(),
 							Secure.ANDROID_ID);
@@ -118,21 +116,13 @@ public class AndroidLauncher extends AndroidApplication{
 								+ Character.digit(s.charAt(i + 1), 16));
 					}
 
-					if(new String(Base64Coder.encode(data)).equals("AAAAAAAAAOA=")) throw new RuntimeException("Bad UUID.");
+					String result = new String(Base64Coder.encode(data));
 
-					return data;
+					if(result.equals("AAAAAAAAAOA=")) throw new RuntimeException("Bad UUID.");
+
+					return result;
 				}catch (Exception e){
-
-                    String uuid = Settings.getString("uuid", "");
-                    if(uuid.isEmpty()){
-                        byte[] result = new byte[8];
-                        new Random().nextBytes(result);
-                        uuid = new String(Base64Coder.encode(result));
-                        Settings.putString("uuid", uuid);
-                        Settings.save();
-                        return result;
-                    }
-                    return Base64Coder.decode(uuid);
+					return super.getUUID();
 				}
 			}
 

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.net;
 
+import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
@@ -30,29 +31,30 @@ public class Packets {
 
     public static class ConnectPacket implements Packet{
         public int version;
-        public int players;
-        public String name;
+        public String name, uuid, usid;
         public boolean mobile;
         public int color;
-        public byte[] uuid;
 
         @Override
         public void write(ByteBuffer buffer) {
             buffer.putInt(Version.build);
             IOUtils.writeString(buffer, name);
+            IOUtils.writeString(buffer, usid);
             buffer.put(mobile ? (byte)1 : 0);
             buffer.putInt(color);
-            buffer.put(uuid);
+            buffer.put(Base64Coder.decode(uuid));
         }
 
         @Override
         public void read(ByteBuffer buffer) {
             version = buffer.getInt();
             name = IOUtils.readString(buffer);
+            usid = IOUtils.readString(buffer);
             mobile = buffer.get() == 1;
             color = buffer.getInt();
-            uuid = new byte[8];
-            buffer.get(uuid);
+            byte[] idbytes = new byte[8];
+            buffer.get(idbytes);
+            uuid = new String(Base64Coder.encode(idbytes));
         }
     }
 

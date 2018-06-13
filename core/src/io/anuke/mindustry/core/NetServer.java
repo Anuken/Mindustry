@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.annotations.Annotations.Loc;
@@ -75,7 +74,7 @@ public class NetServer extends Module{
         });
 
         Net.handleServer(ConnectPacket.class, (id, packet) -> {
-            String uuid = new String(Base64Coder.encode(packet.uuid));
+            String uuid = packet.uuid;
 
             if(Net.getConnection(id) == null ||
                     admins.isIPBanned(Net.getConnection(id).address)) return;
@@ -127,8 +126,9 @@ public class NetServer extends Module{
             }
 
             Player player = new Player();
-            player.isAdmin = admins.isAdmin(uuid, ip);
+            player.isAdmin = admins.isAdmin(uuid, packet.usid);
             player.clientid = id;
+            player.usid = packet.usid;
             player.name = packet.name;
             player.uuid = uuid;
             player.mech = packet.mobile ? Mechs.standardShip : Mechs.standard;
@@ -384,6 +384,39 @@ public class NetServer extends Module{
 
         }catch (IOException e){
             e.printStackTrace();
+        }
+    }
+
+    @Remote(targets = Loc.client, called = Loc.server)
+    public static void onAdminRequest(Player player, Player other, AdminAction action){
+
+        if(!player.isAdmin){
+            Log.err("ACCESS DENIED: Player {0} / {1} attempted to perform admin action without proper security access.",
+                    player.name, Net.getConnection(player.clientid).address);
+            return;
+        }
+
+        if(other == null || other.isAdmin){
+            Log.err("{0} attempted to perform admin action on nonexistant or admin player.", player.name);
+            return;
+        }
+
+        String ip = Net.getConnection(other.clientid).address;
+
+        if(action == AdminAction.ban){
+            netServer.admins.banPlayerIP(ip);
+            netServer.kick(other.clientid, KickReason.banned);
+            Log.info("&lc{0} has banned {1}.", player.name, other.name);
+        }else if(action == AdminAction.kick){
+            netServer.kick(other.clientid, KickReason.kick);
+            Log.info("&lc{0} has kicked {1}.", player.name, other.name);
+        }else if(action == AdminAction.trace){
+            if(player.clientid != -1) {
+                Call.onTraceInfo(player.clientid, netServer.admins.getTraceByID(other.uuid));
+            }else{
+                NetClient.onTraceInfo(netServer.admins.getTraceByID(other.uuid));
+            }
+            Log.info("&lc{0} has requested trace info of {1}.", player.name, other.name);
         }
     }
 
