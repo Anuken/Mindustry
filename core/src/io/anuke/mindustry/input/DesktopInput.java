@@ -159,7 +159,11 @@ public class DesktopInput extends InputHandler{
 
             cursorType = cursor.block().getCursor(cursor);
 
-            if(canMine(cursor)){
+            if(isPlacing()){
+                cursorType = hand;
+            }
+
+            if(!isPlacing() && canMine(cursor)){
                 cursorType = drill;
             }
 

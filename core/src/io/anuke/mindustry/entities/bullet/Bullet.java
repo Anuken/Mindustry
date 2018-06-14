@@ -29,7 +29,6 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 
 	private static Vector2 vector = new Vector2();
 
-	//private Interpolator interpolator = new Interpolator();
 	private Team team;
 
 	public Timer timer = new Timer(3);

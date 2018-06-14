@@ -1,17 +1,19 @@
 package io.anuke.mindustry.world.blocks.production;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.meta.BlockGroup;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.graphics.Layer;
+import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
+import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 public class Pump extends LiquidBlock{
+	protected final Array<Tile> drawTiles = new Array<>();
+
 	protected float pumpAmount = 1f;
 
 	public Pump(String name) {
@@ -49,15 +51,17 @@ public class Pump extends LiquidBlock{
 	}
 
 	@Override
-	public boolean isLayer(Tile tile) {
-		return tile.floor().liquidDrop == null;
-	}
-	
-	@Override
-	public void drawLayer(Tile tile){
-		Draw.colorl(0.85f + Mathf.absin(Timers.time(), 6f, 0.15f));
-		Draw.rect("cross-"+size, tile.drawx(), tile.drawy());
-		Draw.color();
+	public boolean canPlaceOn(Tile tile) {
+		if(isMultiblock()){
+			for(Tile other : tile.getLinkedTiles(drawTiles)){
+				if(isValid(other)){
+					return true;
+				}
+			}
+			return false;
+		}else{
+			return isValid(tile);
+		}
 	}
 	
 	@Override
@@ -70,6 +74,10 @@ public class Pump extends LiquidBlock{
 		}
 
 		tryDumpLiquid(tile);
+	}
+
+	protected boolean isValid(Tile tile){
+		return tile.floor().liquidDrop != null;
 	}
 
 }

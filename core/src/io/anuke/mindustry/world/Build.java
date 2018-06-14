@@ -191,7 +191,7 @@ public class Build {
             for (int dx = 0; dx < type.size; dx++) {
                 for (int dy = 0; dy < type.size; dy++) {
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-                    if (other == null || (other.block() != Blocks.air && !other.block().alwaysReplace) || other.cliffs != 0  || !other.floor().placeableOn) {
+                    if (other == null || (other.block() != Blocks.air && !other.block().alwaysReplace) || !type.canPlaceOn(other) || other.cliffs != 0  || !other.floor().placeableOn) {
                         return false;
                     }
                 }

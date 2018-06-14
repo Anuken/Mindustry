@@ -39,6 +39,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import static io.anuke.mindustry.Vars.headless;
 
 public class KryoServer implements ServerProvider {
+    final boolean tcpOnly = System.getProperty("java.version") == null;
     final Server server;
     final ByteSerializer serializer = new ByteSerializer();
     final ByteBuffer buffer = ByteBuffer.allocate(4096);
@@ -142,7 +143,11 @@ public class KryoServer implements ServerProvider {
         lastconnection = 0;
         connections.clear();
         missing.clear();
-        server.bind(port, port);
+        if(tcpOnly){
+            server.bind(port);
+        }else{
+            server.bind(port, port);
+        }
         webServer = new SocketServer(Vars.webPort);
         webServer.start();
 

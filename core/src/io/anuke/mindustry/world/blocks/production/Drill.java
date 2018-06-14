@@ -174,24 +174,17 @@ public class Drill extends Block{
 	}
 
 	@Override
-	public boolean isLayer(Tile tile){
+	public boolean canPlaceOn(Tile tile) {
 		if(isMultiblock()){
 			for(Tile other : tile.getLinkedTiles(drawTiles)){
 				if(isValid(other)){
-					return false;
+					return true;
 				}
 			}
-			return true;
+			return false;
 		}else{
-			return !isValid(tile);
+			return isValid(tile);
 		}
-	}
-	
-	@Override
-	public void drawLayer(Tile tile){
-		Draw.colorl(0.85f + Mathf.absin(Timers.time(), 6f, 0.15f));
-		Draw.rect("cross-" + size, tile.drawx(), tile.drawy());
-		Draw.color();
 	}
 
 	@Override
@@ -204,15 +197,15 @@ public class Drill extends Block{
 		return new DrillEntity();
 	}
 
+	protected boolean isValid(Tile tile){
+		return tile.floor().drops != null && tile.floor().drops.item.hardness <= tier;
+	}
+
 	public static class DrillEntity extends TileEntity{
 		public float progress;
 		public int index;
 		public float warmup;
 		public float drillTime;
-	}
-
-	protected boolean isValid(Tile tile){
-		return tile.floor().drops != null && tile.floor().drops.item.hardness <= tier;
 	}
 
 }
