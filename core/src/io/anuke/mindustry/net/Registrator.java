@@ -3,8 +3,8 @@ package io.anuke.mindustry.net;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.net.Streamable.StreamBegin;
-import io.anuke.mindustry.net.Streamable.StreamChunk;
+import io.anuke.mindustry.net.Packets.StreamBegin;
+import io.anuke.mindustry.net.Packets.StreamChunk;
 
 public class Registrator {
     private static Class<?>[] classes = {

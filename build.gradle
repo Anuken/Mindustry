@@ -189,6 +189,8 @@ project(":server") {
     apply plugin: "java"
 
     dependencies {
+        compileOnly project(":annotations")
+
         compile project(":core")
         compile project(":kryonet")
         compile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"

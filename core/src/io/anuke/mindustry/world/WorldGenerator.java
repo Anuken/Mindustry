@@ -114,7 +114,6 @@ public class WorldGenerator {
 				}
 			}
 		}
-
 	}
 
 	static class OreEntry{

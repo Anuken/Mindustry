@@ -135,6 +135,7 @@ public class NetServer extends Module{
             player.dead = true;
             player.setNet(player.x, player.y);
             player.color.set(packet.color);
+            player.color.a = 1f;
             connections.put(id, player);
 
             trace.playerid = player.id;

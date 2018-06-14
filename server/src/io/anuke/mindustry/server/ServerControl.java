@@ -1,6 +1,5 @@
 package io.anuke.mindustry.server;
 
-import com.badlogic.gdx.ApplicationLogger;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
@@ -48,16 +47,6 @@ public class ServerControl extends Module {
         Effects.setScreenShakeProvider((a, b) -> {});
         Effects.setEffectProvider((a, b, c, d, e, f) -> {});
         Sounds.setHeadless(true);
-
-        //don't do anything at all for GDX logging: don't want controller info and such
-        Gdx.app.setApplicationLogger(new ApplicationLogger() {
-            @Override public void log(String tag, String message) { }
-            @Override public void log(String tag, String message, Throwable exception) { }
-            @Override public void error(String tag, String message) { }
-            @Override public void error(String tag, String message, Throwable exception) { }
-            @Override public void debug(String tag, String message) { }
-            @Override public void debug(String tag, String message, Throwable exception) { }
-        });
 
         String[] commands = {};
 
@@ -137,6 +126,11 @@ public class ServerControl extends Module {
         handler.register("host", "[mapname] [mode]", "Open the server with a specific map.", arg -> {
             if(state.is(State.playing)){
                 err("Already hosting. Type 'stop' to stop hosting first.");
+                return;
+            }
+
+            if(world.maps().all().size == 0){
+                err("No maps found to host with!");
                 return;
             }
 
@@ -230,6 +224,7 @@ public class ServerControl extends Module {
             }
 
             //netCommon.sendMessage("[GRAY][[Server]:[] " + arg[0]);
+
             info("&lyServer: &lb{0}", arg[0]);
         });
 
@@ -743,7 +738,23 @@ public class ServerControl extends Module {
                 Response response = handler.handleMessage(line);
 
                 if (response.type == ResponseType.unknownCommand) {
-                    err("Invalid command. Type 'help' for help.");
+
+                    int minDst = 0;
+                    Command closest = null;
+
+                    for(Command command : handler.getCommandList()){
+                        int dst = Strings.levenshtein(command.text, response.runCommand);
+                        if(dst < 3 && (closest == null || dst < minDst)){
+                            minDst = dst;
+                            closest = command;
+                        }
+                    }
+
+                    if(closest != null){
+                        err("Command not found. Did you mean \"" + closest.text + "\"?");
+                    }else {
+                        err("Invalid command. Type 'help' for help.");
+                    }
                 }else if (response.type == ResponseType.fewArguments) {
                     err("Too few command arguments. Usage: " + response.command.text + " " + response.command.paramText);
                 }else if (response.type == ResponseType.manyArguments) {
