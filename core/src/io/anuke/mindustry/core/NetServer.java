@@ -359,12 +359,12 @@ public class NetServer extends Module{
                         }
                     }
 
-                    //write group ID + group sizeif(((SyncTrait)entity).isSyncing())
+                    //write group ID + group size
                     dataStream.writeByte(group.getID());
                     dataStream.writeShort(amount);
 
                     for(Entity entity : group.all()){
-                        if(!((SyncTrait)entity).isSyncing()) continue;;
+                        if(!((SyncTrait)entity).isSyncing()) continue;
 
                         int position = syncStream.position();
                         //write all entities now

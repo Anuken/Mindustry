@@ -74,7 +74,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 	public Bullet(){}
 
 	public boolean collidesTiles(){
-		return true; //TODO make artillery and such not do this
+		return type.collidesTiles; //TODO make artillery and such not do this
 	}
 
 	@Override

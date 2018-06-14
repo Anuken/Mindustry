@@ -12,7 +12,7 @@ import static io.anuke.mindustry.Vars.threads;
 
 public interface SyncTrait extends Entity, TypeTrait {
 
-    /**Whether smoothing of entities is enabled; not yet implemented.*/
+    /**Whether smoothing of entities is enabled when using multithreading; not yet implemented.*/
     static boolean isSmoothing(){
         return threads.isEnabled() && threads.getFPS() <= Gdx.graphics.getFramesPerSecond() / 2f;
     }

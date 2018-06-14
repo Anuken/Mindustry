@@ -650,7 +650,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	@Override
 	public void write(DataOutput buffer) throws IOException {
 		super.writeSave(buffer, !isLocal);
-		buffer.writeUTF(name);
+		buffer.writeUTF(name); //TODO writing strings is very inefficient
 		buffer.writeBoolean(isAdmin);
 		buffer.writeInt(Color.rgba8888(color));
 		buffer.writeBoolean(dead);
