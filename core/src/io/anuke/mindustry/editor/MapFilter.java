@@ -38,9 +38,9 @@ public class MapFilter{
 	);
 	
 	private Simplex sim = new Simplex();
-	private RidgedPerlin rid = new RidgedPerlin(1, 10, 20f);
-	private RidgedPerlin rid2 = new RidgedPerlin(1, 6, 1f);
-	private RidgedPerlin rid3 = new RidgedPerlin(1, 6, 1f);
+	private RidgedPerlin rid = new RidgedPerlin(1, 10);
+	private RidgedPerlin rid2 = new RidgedPerlin(1, 6);
+	private RidgedPerlin rid3 = new RidgedPerlin(1, 6);
 	
 	public MapFilter(){
 		prefs.get("replace").enabled = true;

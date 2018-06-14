@@ -57,6 +57,8 @@ public class Floor extends Block{
 	public Color liquidColor;
 	/**liquids that drop from this block, used for pumps*/
 	public Liquid liquidDrop = null;
+	/**Whether ores generate on this block.*/
+	public boolean hasOres = true;
 	
 	public Floor(String name) {
 		super(name);

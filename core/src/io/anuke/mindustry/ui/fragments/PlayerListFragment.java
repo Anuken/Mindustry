@@ -160,7 +160,7 @@ public class PlayerListFragment implements Fragment{
                                 netServer.admins.adminPlayer(id, player.usid);
                             });
                         }
-                    }).update(b ->{
+                    }).update(b -> {
                         b.setChecked(player.isAdmin);
                         b.setDisabled(Net.client());
                     }).get().setTouchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled);

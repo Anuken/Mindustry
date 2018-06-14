@@ -30,6 +30,6 @@ public class MapMeta {
     }
 
     public boolean hasOreGen(){
-        return tags.get("oregen", "1").equals("1");
+        return !tags.get("oregen", "0").equals("0");
     }
 }

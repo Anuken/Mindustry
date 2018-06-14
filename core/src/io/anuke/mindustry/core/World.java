@@ -190,7 +190,7 @@ public class World extends Module{
 		
 		EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
-		WorldGenerator.generate(tiles, MapIO.readTileData(map, true));
+		WorldGenerator.generate(tiles, MapIO.readTileData(map, true), map.meta.hasOreGen(), seed);
 
 		endMapLoad();
 	}
