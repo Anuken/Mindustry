@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Pools;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TeamTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.In;
@@ -16,10 +17,16 @@ import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.entities.trait.VelocityTrait;
 import io.anuke.ucore.util.Timer;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 import static io.anuke.mindustry.Vars.bulletGroup;
 import static io.anuke.mindustry.Vars.world;
 
-public class Bullet extends BulletEntity<BulletType> implements TeamTrait{
+public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncTrait{
+	public static int typeID = -1;
+
 	private static Vector2 vector = new Vector2();
 
 	//private Interpolator interpolator = new Interpolator();
@@ -69,21 +76,23 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait{
 	public boolean collidesTiles(){
 		return true; //TODO make artillery and such not do this
 	}
-/*
+
 	@Override
-	public boolean doSync(){
+	public int getTypeID() {
+		return typeID;
+	}
+
+	@Override
+	public boolean isSyncing(){
 		return type.syncable;
 	}
 
 	@Override
-	public Interpolator getInterpolator() {
-		return interpolator;
-	}
-
-	@Override
-	public void write(DataOutput data) throws IOException{
+	public void write(DataOutput data) throws IOException {
 		data.writeFloat(x);
 		data.writeFloat(y);
+		data.writeFloat(velocity.x);
+		data.writeFloat(velocity.y);
 		data.writeByte(team.ordinal());
 		data.writeByte(type.id);
 	}
@@ -92,9 +101,11 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait{
 	public void read(DataInput data, long time) throws IOException{
 		x = data.readFloat();
 		y = data.readFloat();
+		velocity.x = data.readFloat();
+		velocity.y = data.readFloat();
 		team = Team.values()[data.readByte()];
 		type = BulletType.getByID(data.readByte());
-	}*/
+	}
 
 	@Override
 	public Team getTeam() {

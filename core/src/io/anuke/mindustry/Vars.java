@@ -147,7 +147,7 @@ public class Vars{
 
 		playerGroup = Entities.addGroup(Player.class).enableMapping();
 		tileGroup = Entities.addGroup(TileEntity.class, false);
-		bulletGroup = Entities.addGroup(Bullet.class);
+		bulletGroup = Entities.addGroup(Bullet.class).enableMapping();
 		shieldGroup = Entities.addGroup(Shield.class, false);
 		effectGroup = Entities.addGroup(EffectEntity.class, false);
 		groundEffectGroup = Entities.addGroup(DrawTrait.class, false);

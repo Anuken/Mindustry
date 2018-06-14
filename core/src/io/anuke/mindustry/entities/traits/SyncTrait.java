@@ -44,6 +44,11 @@ public interface SyncTrait extends Entity, TypeTrait {
         return null;
     }
 
+    /**Whether syncing is enabled for this entity; true by default.*/
+    default boolean isSyncing(){
+        return true;
+    }
+
     //Read and write sync data, usually position
     void write(DataOutput data) throws IOException;
     void read(DataInput data, long time) throws IOException;

@@ -200,7 +200,6 @@ public class Renderer extends RendererModule{
 		EntityDraw.draw(groundEffectGroup, e -> e instanceof BelowLiquidTrait);
 		EntityDraw.draw(puddleGroup);
 		EntityDraw.draw(groundEffectGroup, e -> !(e instanceof BelowLiquidTrait));
-		EntityDraw.draw(itemGroup);
 
 		blocks.processBlocks();
 		blocks.drawBlocks(Layer.block);
@@ -210,6 +209,14 @@ public class Renderer extends RendererModule{
         Graphics.shader();
 
         blocks.drawBlocks(Layer.overlay);
+
+        if(itemGroup.size() > 0){
+			Shaders.outline.color.set(Team.none.color);
+
+			Graphics.beginShaders(Shaders.outline);
+			EntityDraw.draw(itemGroup);
+			Graphics.endShaders();
+		}
 
         drawAllTeams(false);
 
@@ -240,6 +247,7 @@ public class Renderer extends RendererModule{
 	private void drawAllTeams(boolean flying){
 		for(Team team : Team.values()){
 			EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
+
 			if(group.count(p -> p.isFlying() == flying) +
 					playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
 

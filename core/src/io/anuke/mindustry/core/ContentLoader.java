@@ -8,6 +8,7 @@ import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.content.bullets.*;
 import io.anuke.mindustry.content.fx.*;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.ItemDrop;
@@ -136,5 +137,6 @@ public class ContentLoader {
         ItemDrop.typeID = TypeTrait.registerType(ItemDrop::new);
         Fire.typeID = TypeTrait.registerType(Fire::new);
         Puddle.typeID = TypeTrait.registerType(Puddle::new);
+        Bullet.typeID = TypeTrait.registerType(Bullet::new);
     }
 }

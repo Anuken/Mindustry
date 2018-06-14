@@ -124,8 +124,6 @@ public class WorldGenerator {
 		final RidgedPerlin ridge;
 		final int index;
 
-		int used;
-
 		OreEntry(Block block, float frequency, int seed) {
 			this.frequency = frequency;
 			this.block = block;

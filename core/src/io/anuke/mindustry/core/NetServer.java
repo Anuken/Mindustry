@@ -351,11 +351,21 @@ public class NetServer extends Module{
                         throw new RuntimeException("Entity group '" + group.getType() + "' contains SyncTrait entities, yet mapping is not enabled. In order for syncing to work, you must enable mapping for this group.");
                     }
 
-                    //write group ID + group size
-                    dataStream.writeByte(group.getID());
-                    dataStream.writeShort(group.size());
+                    int amount = 0;
 
                     for(Entity entity : group.all()){
+                        if(((SyncTrait)entity).isSyncing()){
+                            amount ++;
+                        }
+                    }
+
+                    //write group ID + group sizeif(((SyncTrait)entity).isSyncing())
+                    dataStream.writeByte(group.getID());
+                    dataStream.writeShort(amount);
+
+                    for(Entity entity : group.all()){
+                        if(!((SyncTrait)entity).isSyncing()) continue;;
+
                         int position = syncStream.position();
                         //write all entities now
                         dataStream.writeInt(entity.getID()); //write id
