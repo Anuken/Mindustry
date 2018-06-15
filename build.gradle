@@ -198,6 +198,14 @@ project(":server") {
     }
 }
 
+project(":packer") {
+    apply plugin: "java"
+
+    dependencies {
+        compile project(":core")
+    }
+}
+
 project(":annotations") {
     apply plugin: "java"
 

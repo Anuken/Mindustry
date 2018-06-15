@@ -16,7 +16,7 @@ public abstract class Upgrade implements UnlockableContent{
     public Upgrade(String name){
         this.id = lastid ++;
         this.name = name;
-        this.description = Bundles.getNotNull("upgrade."+name+".description");
+        this.description = Bundles.get("upgrade."+name+".description");
 
         upgrades.add(this);
     }

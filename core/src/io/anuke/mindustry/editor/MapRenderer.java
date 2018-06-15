@@ -1,31 +1,20 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.PixmapPacker;
-import com.badlogic.gdx.graphics.g2d.PixmapPacker.Page;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
-import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapTileData.DataPosition;
 import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.IndexedRenderer;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
@@ -39,69 +28,8 @@ public class MapRenderer implements Disposable{
     private int width, height;
     private Color tmpColor = Color.WHITE.cpy();
 
-    private ObjectMap<Block, TextureRegion> blockIcons = new ObjectMap<>();
-    private ObjectMap<String, TextureRegion> regions = new ObjectMap<>();
-    private Texture blockTexture;
-
     public MapRenderer(MapEditor editor){
         this.editor = editor;
-        createTexture();
-    }
-
-
-    private void createTexture(){
-        Timers.mark();
-
-        PixmapPacker packer = new PixmapPacker(512, 512, Format.RGBA8888, 2, true);
-        Pixmap pixmap = Core.atlas.getPixmapOf("blank");
-
-        for(Block block : Block.all()){
-            TextureRegion[] regions = block.getBlockIcon();
-            if(regions.length > 0){
-                Pixmap result = new Pixmap(regions[0].getRegionWidth(), regions[0].getRegionHeight(), Format.RGBA8888);
-                for(TextureRegion region : regions){
-                    result.drawPixmap(pixmap, 0, 0, region.getRegionX(), region.getRegionY(), region.getRegionWidth(), region.getRegionHeight());
-                }
-
-                packer.pack(block.name, result);
-                result.dispose();
-            }
-        }
-
-        add("clear", packer);
-        add("block-border", packer);
-        add("block-elevation", packer);
-        add("block-slope", packer);
-
-        if(packer.getPages().size > 1){
-            throw new IllegalArgumentException("Pixmap packer may not have more than 1 page!");
-        }
-
-        Page page = packer.getPages().first();
-        page.updateTexture(TextureFilter.Nearest, TextureFilter.Nearest, false);
-        blockTexture = page.getTexture();
-        for(String str : page.getRects().keys()){
-            if(Block.getByName(str) == null) continue;
-            Rectangle rect = page.getRects().get(str);
-            blockIcons.put(Block.getByName(str),
-                    new TextureRegion(blockTexture,
-                            (int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height));
-        }
-
-        packer.dispose();
-
-        Core.atlas.disposePixmaps();
-
-        Log.info("Packing elapsed: {0}", Timers.elapsed());
-    }
-
-    private void add(String name, PixmapPacker packer){
-        TextureRegion region = Draw.region(name);
-        Pixmap result = new Pixmap(region.getRegionWidth(), region.getRegionHeight(), Format.RGBA8888);
-        result.drawPixmap(Core.atlas.getPixmapOf(region), 0, 0, region.getRegionX(), region.getRegionY(), region.getRegionWidth(), region.getRegionHeight());
-        Rectangle rect = packer.pack(name, result);
-        result.dispose();
-        Gdx.app.postRunnable(() -> regions.put(name, new TextureRegion(packer.getPages().first().getTexture(), (int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height)));
     }
 
     public void resize(int width, int height){
@@ -149,7 +77,7 @@ public class MapRenderer implements Disposable{
                         th / (height * tilesize), 1f);
                 mesh.setProjectionMatrix(Core.batch.getProjectionMatrix());
 
-                mesh.render(blockTexture);
+                mesh.render(Core.atlas.getTextures().first());
             }
         }
 
@@ -189,7 +117,7 @@ public class MapRenderer implements Disposable{
         TextureRegion region;
 
         if(bw != 0) {
-            region = blockIcons.get(wall, regions.get("clear"));
+            region = Draw.region("block-icon-" + wall.name, Draw.region("clear"));
 
             if (wall.rotate) {
                 mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
@@ -201,7 +129,7 @@ public class MapRenderer implements Disposable{
                         region.getRegionWidth(), region.getRegionHeight());
             }
         }else{
-            region = blockIcons.get(floor, regions.get("clear"));
+            region = Draw.region("block-icon-" + floor.name, Draw.region("clear"));
 
             mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize, region, wx * tilesize, wy * tilesize, 8, 8);
         }
@@ -210,14 +138,14 @@ public class MapRenderer implements Disposable{
 
         if(wall.update || wall.destructible) {
             mesh.setColor(team.color);
-            region = regions.get("block-border");
+            region = Draw.region("block-border");
         }else if(elev > 0 && check){
             mesh.setColor(tmpColor.fromHsv((360f * elev/127f * 4f) % 360f, 0.5f + (elev / 4f) % 0.5f, 1f));
-            region = regions.get("block-elevation");
+            region = Draw.region("block-elevation");
         }else if(elev == -1){
-            region = regions.get("block-slope");
+            region = Draw.region("block-slope");
         }else{
-            region = regions.get("clear");
+            region = Draw.region("clear");
         }
 
         mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize + chunksize*chunksize, region,
