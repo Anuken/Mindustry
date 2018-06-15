@@ -74,12 +74,15 @@ public class TextureGenerator {
             }
         };
 
+        Core.atlas.setErrorRegion("error");
+
         image = ImageIO.read(new File(spritesFolder + "/sprites.png"));
         graphics = image.createGraphics();
 
         generateBlocks();
     }
 
+    /**Generates full block icons for use in the editor.*/
     static void generateBlocks() throws IOException {
 
         for(Block block : Block.all()){
@@ -87,6 +90,11 @@ public class TextureGenerator {
 
             if(regions.length == 0){
                 continue;
+            }
+
+            if(regions[0] == null){
+                System.err.println("Error in block \"" + block.name + "\": null region!");
+                System.exit(-1);
             }
 
             BufferedImage target = new BufferedImage(regions[0].getRegionWidth(), regions[0].getRegionHeight(), BufferedImage.TYPE_INT_ARGB);

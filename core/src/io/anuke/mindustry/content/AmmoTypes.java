@@ -57,7 +57,7 @@ public class AmmoTypes implements ContentList {
             smokeEffect = ShootFx.shootSmallSmoke;
         }};
 
-        flakPlastic = new AmmoType(Items.plastic, FlakBullets.plastic, 5) {{
+        flakPlastic = new AmmoType(Items.plasteel, FlakBullets.plastic, 5) {{
             shootEffect = ShootFx.shootSmall;
             smokeEffect = ShootFx.shootSmallSmoke;
         }};
@@ -79,7 +79,7 @@ public class AmmoTypes implements ContentList {
             smokeEffect = ShootFx.shootBigSmoke2;
         }};
 
-        shellPlastic = new AmmoType(Items.plastic, ShellBullets.plastic, 1) {{
+        shellPlastic = new AmmoType(Items.plasteel, ShellBullets.plastic, 1) {{
             shootEffect = ShootFx.shootBig2;
             smokeEffect = ShootFx.shootBigSmoke2;
         }};
@@ -118,7 +118,7 @@ public class AmmoTypes implements ContentList {
             smokeEffect = ShootFx.shootBigSmoke2;
         }};
 
-        artilleryPlastic = new AmmoType(Items.plastic, ArtilleryBullets.plastic, 1) {{
+        artilleryPlastic = new AmmoType(Items.plasteel, ArtilleryBullets.plastic, 1) {{
             shootEffect = ShootFx.shootBig2;
             smokeEffect = ShootFx.shootBigSmoke2;
         }};

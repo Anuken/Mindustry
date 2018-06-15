@@ -53,15 +53,18 @@ public class Recipes implements ContentList{
         new Recipe(weapon, WeaponBlocks.meltdown, new ItemStack(Items.steel, 70), new ItemStack(Items.titanium, 50), new ItemStack(Items.surgealloy, 55));
 
         new Recipe(crafting, CraftingBlocks.smelter, new ItemStack(Items.iron, 40));
+        new Recipe(crafting, CraftingBlocks.arcsmelter, new ItemStack(Items.iron, 40));
+
         new Recipe(crafting, CraftingBlocks.alloysmelter, new ItemStack(Items.titanium, 50), new ItemStack(Items.steel, 50));
-        new Recipe(crafting, CraftingBlocks.powersmelter, new ItemStack(Items.steel, 30), new ItemStack(Items.iron, 30));
-        new Recipe(crafting, CraftingBlocks.poweralloysmelter, new ItemStack(Items.steel, 30), new ItemStack(Items.iron, 30));
+        new Recipe(crafting, CraftingBlocks.alloyfuser, new ItemStack(Items.steel, 30), new ItemStack(Items.iron, 30));
+
+        new Recipe(crafting, CraftingBlocks.phaseweaver, new ItemStack(Items.steel, 30), new ItemStack(Items.iron, 30));
         new Recipe(crafting, CraftingBlocks.separator, new ItemStack(Items.steel, 30), new ItemStack(Items.iron, 30));
         new Recipe(crafting, CraftingBlocks.centrifuge, new ItemStack(Items.steel, 30), new ItemStack(Items.iron, 30));
         new Recipe(crafting, CraftingBlocks.siliconsmelter, new ItemStack(Items.steel, 30), new ItemStack(Items.iron, 30));
         new Recipe(crafting, CraftingBlocks.oilRefinery, new ItemStack(Items.steel, 15), new ItemStack(Items.iron, 15));
         new Recipe(crafting, CraftingBlocks.biomatterCompressor, new ItemStack(Items.steel, 15), new ItemStack(Items.iron, 15));
-        new Recipe(crafting, CraftingBlocks.plasticFormer, new ItemStack(Items.steel, 30), new ItemStack(Items.titanium, 15));
+        new Recipe(crafting, CraftingBlocks.plasteelcompressor, new ItemStack(Items.steel, 30), new ItemStack(Items.titanium, 15));
         new Recipe(crafting, CraftingBlocks.cryofluidmixer, new ItemStack(Items.steel, 30), new ItemStack(Items.titanium, 15));
         new Recipe(crafting, CraftingBlocks.pulverizer, new ItemStack(Items.steel, 10), new ItemStack(Items.iron, 10));
         new Recipe(crafting, CraftingBlocks.stoneFormer, new ItemStack(Items.steel, 10), new ItemStack(Items.iron, 10));

@@ -11,7 +11,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.production.*;
 
 public class CraftingBlocks extends BlockList implements ContentList {
-    public static Block smelter, alloysmelter, siliconsmelter, poweralloysmelter, powersmelter, cryofluidmixer, melter, separator, centrifuge, plasticFormer, biomatterCompressor, pulverizer, oilRefinery, stoneFormer, weaponFactory, incinerator;
+    public static Block smelter, arcsmelter, siliconsmelter, plasteelcompressor, phaseweaver, alloysmelter, alloyfuser, cryofluidmixer, melter, separator, centrifuge, biomatterCompressor, pulverizer, oilRefinery, stoneFormer, weaponFactory, incinerator;
 
     @Override
     public void load() {
@@ -20,42 +20,10 @@ public class CraftingBlocks extends BlockList implements ContentList {
             inputs = new Item[]{Items.iron};
             fuel = Items.coal;
             result = Items.steel;
-            craftTime = 25f;
-        }};
-
-        alloysmelter = new Smelter("alloysmelter") {{
-            health = 90;
-            inputs = new Item[]{Items.titanium, Items.steel};
-            fuel = Items.coal;
-            result = Items.surgealloy;
-            burnDuration = 45f;
-            craftTime = 25f;
-            flameColor = Color.valueOf("fd896e");
-        }};
-
-        siliconsmelter = new PowerSmelter("siliconsmelter") {{
-            health = 90;
-            craftEffect = BlockFx.smeltsmoke;
-            inputs = new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.sand, 2)};
-            result = Items.silicon;
-            powerUse = 0.05f;
             craftTime = 35f;
-            size = 2;
-            hasLiquids = false;
-            flameColor = Color.valueOf("ffef99");
         }};
 
-        poweralloysmelter = new PowerSmelter("poweralloysmelter") {{
-            health = 90;
-            craftEffect = BlockFx.smeltsmoke;
-            inputs = new ItemStack[]{new ItemStack(Items.titanium, 4), new ItemStack(Items.thorium, 4)};
-            result = Items.surgealloy;
-            powerUse = 0.3f;
-            craftTime = 25f;
-            size = 2;
-        }};
-
-        powersmelter = new PowerSmelter("powersmelter") {{
+        arcsmelter = new PowerSmelter("arc-smelter") {{
             health = 90;
             craftEffect = BlockFx.smeltsmoke;
             inputs = new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.iron, 1)};
@@ -63,6 +31,64 @@ public class CraftingBlocks extends BlockList implements ContentList {
             powerUse = 0.1f;
             craftTime = 25f;
             size = 2;
+        }};
+
+        siliconsmelter = new PowerSmelter("silicon-smelter") {{
+            health = 90;
+            craftEffect = BlockFx.smeltsmoke;
+            inputs = new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.sand, 2)};
+            result = Items.silicon;
+            powerUse = 0.05f;
+            craftTime = 40f;
+            size = 2;
+            hasLiquids = false;
+            flameColor = Color.valueOf("ffef99");
+        }};
+
+        plasteelcompressor = new PlasteelCompressor("plasteel-compressor") {{
+            inputLiquid = Liquids.oil;
+            inputItem = new ItemStack(Items.steel, 1);
+            liquidUse = 0.3f;
+            liquidCapacity = 60f;
+            powerUse = 0.5f;
+            craftTime = 80f;
+            output = Items.plasteel;
+            itemCapacity = 30;
+            size = 2;
+            health = 320;
+            hasPower = hasLiquids = true;
+            craftEffect = BlockFx.formsmoke;
+            updateEffect = BlockFx.plasticburn;
+        }};
+
+        phaseweaver = new PowerSmelter("phase-weaver") {{
+            health = 90;
+            craftEffect = BlockFx.smeltsmoke;
+            inputs = new ItemStack[]{new ItemStack(Items.thorium, 2), new ItemStack(Items.sand, 6)};
+            result = Items.phasematter;
+            powerUse = 0.4f;
+            craftTime = 100f;
+            size = 3;
+        }};
+
+        alloysmelter = new PowerSmelter("alloy-smelter") {{
+            health = 90;
+            craftEffect = BlockFx.smeltsmoke;
+            inputs = new ItemStack[]{new ItemStack(Items.titanium, 2), new ItemStack(Items.lead, 4), new ItemStack(Items.silicon, 3), new ItemStack(Items.plasteel, 2)};
+            result = Items.surgealloy;
+            powerUse = 0.3f;
+            craftTime = 50f;
+            size = 2;
+        }};
+
+        alloyfuser = new PowerSmelter("alloy-fuser") {{
+            health = 90;
+            craftEffect = BlockFx.smeltsmoke;
+            inputs = new ItemStack[]{new ItemStack(Items.titanium, 3), new ItemStack(Items.lead, 4), new ItemStack(Items.silicon, 3), new ItemStack(Items.plasteel, 2)};
+            result = Items.surgealloy;
+            powerUse = 0.4f;
+            craftTime = 30f;
+            size = 3;
         }};
 
         cryofluidmixer = new LiquidMixer("cryofluidmixer") {{
@@ -130,21 +156,6 @@ public class CraftingBlocks extends BlockList implements ContentList {
             spinnerThickness = 1.5f;
             spinnerSpeed = 3f;
             size = 2;
-        }};
-
-        plasticFormer = new PlasticFormer("plasticformer") {{
-            inputLiquid = Liquids.oil;
-            liquidUse = 0.3f;
-            liquidCapacity = 60f;
-            powerUse = 0.5f;
-            craftTime = 80f;
-            output = Items.plastic;
-            itemCapacity = 30;
-            size = 2;
-            health = 320;
-            hasPower = hasLiquids = true;
-            craftEffect = BlockFx.formsmoke;
-            updateEffect = BlockFx.plasticburn;
         }};
 
         biomatterCompressor = new Compressor("biomattercompressor") {{

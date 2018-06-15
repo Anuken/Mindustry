@@ -8,7 +8,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 
 public class Items implements ContentList{
-    public static Item stone, iron, lead, coal, steel, titanium, thorium, silicon, plastic, surgealloy, biomatter, sand, blastCompound, thermite;
+    public static Item stone, iron, lead, coal, steel, titanium, thorium, silicon, plasteel, phasematter, surgealloy, biomatter, sand, blastCompound, thermite;
 
     @Override
     public void load() {
@@ -53,10 +53,14 @@ public class Items implements ContentList{
             type = ItemType.material;
         }};
 
-        plastic = new Item("plastic", Color.valueOf("e9ead3")) {{
+        plasteel = new Item("plasteel", Color.valueOf("e9ead3")) {{
             type = ItemType.material;
             flammability = 0.2f;
             explosiveness = 0.1f;
+        }};
+
+        phasematter = new Item("phase-matter", Color.valueOf("f4ba6e")) {{
+            type = ItemType.material;
         }};
 
         surgealloy = new Item("surge-alloy", Color.valueOf("b4d5c7")) {{

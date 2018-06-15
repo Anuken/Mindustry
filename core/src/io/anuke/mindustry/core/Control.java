@@ -62,6 +62,7 @@ public class Control extends Module{
 
 		ContentLoader.initialize(Content::init);
 		Core.atlas = new Atlas("sprites.atlas");
+		Core.atlas.setErrorRegion("error");
 		ContentLoader.initialize(Content::load);
 
 		db.load();
