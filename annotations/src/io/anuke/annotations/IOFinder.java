@@ -30,7 +30,7 @@ public class IOFinder {
 
             //make sure there's only one read method
             if(readers.stream().filter(elem -> getValue(elem.getAnnotation(ReadClass.class)).equals(typeName)).count() > 1){
-                Utils.messager.printMessage(Kind.ERROR, "Multiple writer methods for type: ", writer);
+                Utils.messager.printMessage(Kind.ERROR, "Multiple writer methods for type '" + typeName + "'", writer);
             }
 
             //make sure there's only one write method

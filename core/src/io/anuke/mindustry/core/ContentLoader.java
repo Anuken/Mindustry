@@ -62,11 +62,11 @@ public class ContentLoader {
         //ammotypes
         new AmmoTypes(),
 
-        //mechs
-        new Mechs(),
-
         //weapons
         new Weapons(),
+
+        //mechs
+        new Mechs(),
 
         //units
         new UnitTypes(),

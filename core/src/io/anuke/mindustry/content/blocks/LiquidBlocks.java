@@ -6,17 +6,30 @@ import io.anuke.mindustry.world.blocks.distribution.*;
 import io.anuke.mindustry.world.blocks.production.Pump;
 
 public class LiquidBlocks extends BlockList implements ContentList{
-    public static Block pump, fluxpump, conduit, pulseconduit, liquidrouter, liquidtank, liquidjunction, bridgeconduit, laserconduit;
+    public static Block mechanicalPump, rotaryPump, thermalPump, conduit, pulseconduit, liquidrouter, liquidtank, liquidjunction, bridgeconduit, laserconduit;
 
     @Override
     public void load() {
 
-        pump = new Pump("pump") {{
+        mechanicalPump = new Pump("mechanical-pump") {{
             pumpAmount = 0.1f;
+            tier = 0;
         }};
 
-        fluxpump = new Pump("fluxpump") {{
+        rotaryPump = new Pump("rotary-pump") {{
             pumpAmount = 0.2f;
+            powerUse = 0.015f;
+            liquidCapacity = 30f;
+            size = 2;
+            tier = 1;
+        }};
+
+        thermalPump = new Pump("thermal-pump") {{
+            pumpAmount = 0.3f;
+            powerUse = 0.02f;
+            liquidCapacity = 40f;
+            size = 2;
+            tier = 2;
         }};
 
         conduit = new Conduit("conduit") {{

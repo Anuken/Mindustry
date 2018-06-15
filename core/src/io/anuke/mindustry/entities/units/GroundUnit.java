@@ -68,7 +68,7 @@ public abstract class GroundUnit extends BaseUnit {
 
         Floor floor = getFloorOn();
 
-        if(floor.liquid){
+        if(floor.isLiquid){
             Draw.tint(Color.WHITE, floor.liquidColor, 0.5f);
         }
 
@@ -79,7 +79,7 @@ public abstract class GroundUnit extends BaseUnit {
                     12f * i, 12f - Mathf.clamp(ft * i, 0, 2), baseRotation - 90);
         }
 
-        if(floor.liquid) {
+        if(floor.isLiquid) {
             Draw.tint(Color.WHITE, floor.liquidColor, drownTime * 0.4f);
         }else {
             Draw.tint(Color.WHITE);

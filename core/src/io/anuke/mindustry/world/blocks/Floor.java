@@ -59,6 +59,8 @@ public class Floor extends Block{
 	public Liquid liquidDrop = null;
 	/**Whether ores generate on this block.*/
 	public boolean hasOres = true;
+	/**whether this block can be drowned in*/
+	public boolean isLiquid;
 	
 	public Floor(String name) {
 		super(name);
@@ -113,7 +115,7 @@ public class Floor extends Block{
 	public void init(){
 		super.init();
 
-		if(liquid && liquidColor == null){
+		if(isLiquid && liquidColor == null){
 			throw new RuntimeException("All liquids must define a liquidColor! Problematic block: " + name);
 		}
 	}

@@ -58,7 +58,7 @@ public class BuildBlock extends Block {
     public void onDestroyed(Tile tile){
         Effects.effect(ExplosionFx.blockExplosionSmoke, tile);
 
-        if(!tile.floor().solid && !tile.floor().liquid){
+        if(!tile.floor().solid && !tile.floor().isLiquid){
             Rubble.create(tile.drawx(), tile.drawy(), size);
         }
     }

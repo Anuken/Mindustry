@@ -51,7 +51,7 @@ public class Blocks extends BlockList implements ContentList{
             speedMultiplier = 0.2f;
             variants = 0;
             liquidDrop = Liquids.water;
-            liquid = true;
+            isLiquid = true;
             status = StatusEffects.wet;
             statusIntensity = 1f;
             drownTime = 140f;
@@ -66,7 +66,7 @@ public class Blocks extends BlockList implements ContentList{
             status = StatusEffects.wet;
             statusIntensity = 0.9f;
             liquidDrop = Liquids.water;
-            liquid = true;
+            isLiquid = true;
             cacheLayer = CacheLayer.water;
         }};
 
@@ -79,7 +79,7 @@ public class Blocks extends BlockList implements ContentList{
             statusIntensity = 0.8f;
             variants = 0;
             liquidDrop = Liquids.lava;
-            liquid = true;
+            isLiquid = true;
             cacheLayer = CacheLayer.lava;
         }};
 
@@ -91,7 +91,7 @@ public class Blocks extends BlockList implements ContentList{
             speedMultiplier = 0.2f;
             variants = 0;
             liquidDrop = Liquids.oil;
-            liquid = true;
+            isLiquid = true;
             cacheLayer = CacheLayer.oil;
         }};
 

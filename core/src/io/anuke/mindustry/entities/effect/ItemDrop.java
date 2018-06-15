@@ -111,7 +111,7 @@ public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, Veloc
 
         Tile tile = world.tileWorld(x, y);
 
-        Draw.color(Color.WHITE, tile == null || !tile.floor().liquid ? Color.WHITE : tile.floor().liquidColor, sinktime/sinkLifetime);
+        Draw.color(Color.WHITE, tile == null || !tile.floor().isLiquid ? Color.WHITE : tile.floor().liquidColor, sinktime/sinkLifetime);
         Draw.rect(item.region, x, y, size, size);
 
         int stored = Mathf.clamp(amount / 6, 1, 8);
@@ -136,7 +136,7 @@ public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, Veloc
 
         Tile tile = world.tileWorld(x, y);
 
-        if(tile.floor().liquid){
+        if(tile.floor().isLiquid){
             sinktime += Timers.delta();
 
             if(Mathf.chance(0.04 * Timers.delta())){

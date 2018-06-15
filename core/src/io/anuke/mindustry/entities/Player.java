@@ -3,23 +3,27 @@ package io.anuke.mindustry.entities;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
-import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.entities.effect.ItemDrop;
-import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.entities.traits.BuilderTrait;
+import io.anuke.mindustry.entities.traits.CarriableTrait;
+import io.anuke.mindustry.entities.traits.CarryTrait;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.Mech;
+import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
@@ -29,7 +33,10 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.ThreadQueue;
+import io.anuke.ucore.util.Timer;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -38,14 +45,13 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class Player extends Unit implements BuilderTrait, CarryTrait {
-	private static final float debugSpeed = 1.8f;
 	private static final Vector2 movement = new Vector2();
 
 	public static int typeID = -1;
 
 	public static final int timerShootLeft = 0;
 	public static final int timerShootRight = 1;
-	public static final int timeSync = 2;
+	public static final int timerSync = 2;
 
 	//region instance variables, constructor
 
@@ -56,9 +62,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	public String uuid, usid;
 	public boolean isAdmin, isTransferring, isShooting;
 	public Color color = new Color();
-
-	public Array<Upgrade> upgrades = new Array<>();
-	public Weapon weapon = Weapons.blaster;
 	public Mech mech = Mechs.standard;
 
 	public int clientid = -1;
@@ -78,8 +81,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	public Player(){
 		hitbox.setSize(5);
 		hitboxTile.setSize(4f);
-
-		heal();
 	}
 
 	//endregion
@@ -146,12 +147,12 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	@Override
 	public boolean acceptsAmmo(Item item) {
-		return weapon.getAmmoType(item) != null && inventory.canAcceptAmmo(weapon.getAmmoType(item));
+		return mech.weapon.getAmmoType(item) != null && inventory.canAcceptAmmo(mech.weapon.getAmmoType(item));
 	}
 
 	@Override
 	public void addAmmo(Item item) {
-		inventory.addAmmo(weapon.getAmmoType(item));
+		inventory.addAmmo(mech.weapon.getAmmoType(item));
 	}
 
 	@Override
@@ -258,7 +259,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		Draw.alpha(hitTime / hitDuration);
 
 		if(!mech.flying) {
-			if(floor.liquid){
+			if(floor.isLiquid){
 				Draw.tint(Color.WHITE, floor.liquidColor, 0.5f);
 			}
 
@@ -272,7 +273,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 			Draw.rect(mech.baseRegion, x, y, baseRotation- 90);
 		}
 
-		if(floor.liquid) {
+		if(floor.isLiquid) {
 			Draw.tint(Color.WHITE, floor.liquidColor, drownTime * 0.4f);
 		}else {
 			Draw.tint(Color.WHITE);
@@ -282,9 +283,9 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 		for (int i : Mathf.signs) {
 			float tra = rotation - 90,
-					trX = 4*i, trY = 3 - weapon.getRecoil(this, i > 0)*1.5f;
+					trX = 4*i, trY = 3 - mech.weapon.getRecoil(this, i > 0)*1.5f;
 			float w = i > 0 ? -8 : 8;
-			Draw.rect(weapon.equipRegion,
+			Draw.rect(mech.weapon.equipRegion,
 					x + Angles.trnsx(tra, trX, trY),
 					y + Angles.trnsy(tra, trX, trY), w, 8, rotation - 90);
 		}
@@ -481,8 +482,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	protected void updateShooting(){
 		if(isShooting()){
-			weapon.update(this, true, pointerX, pointerY);
-			weapon.update(this, false, pointerX, pointerY);
+			mech.weapon.update(this, true, pointerX, pointerY);
+			mech.weapon.update(this, false, pointerX, pointerY);
 		}
 	}
 
@@ -577,10 +578,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	/**Resets all values of the player.*/
 	public void reset(){
-		weapon = Weapons.blaster;
 		team = Team.blue;
 		inventory.clear();
-		upgrades.clear();
 		placeQueue.clear();
 		dead = true;
 		respawning = false;
@@ -617,13 +616,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		stream.writeBoolean(isLocal);
 
 		if(isLocal){
-			stream.writeInt(playerIndex);
+			stream.writeByte(playerIndex);
 			super.writeSave(stream, false);
-
-			stream.writeByte(upgrades.size);
-			for(Upgrade u : upgrades){
-				stream.writeByte(u.id);
-			}
 		}
 	}
 
@@ -632,17 +626,13 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		boolean local = stream.readBoolean();
 
 		if(local){
-			int index = stream.readInt();
+			int index = stream.readByte();
 			players[index].readSaveSuper(stream);
 		}
 	}
 
 	private void readSaveSuper(DataInput stream) throws IOException {
 		super.readSave(stream);
-		byte uamount = stream.readByte();
-		for (int i = 0; i < uamount; i++) {
-			upgrades.add(Upgrade.getByID(stream.readByte()));
-		}
 
 		add();
 	}
@@ -654,7 +644,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		buffer.writeBoolean(isAdmin);
 		buffer.writeInt(Color.rgba8888(color));
 		buffer.writeBoolean(dead);
-		buffer.writeByte(weapon.id);
 		buffer.writeByte(mech.id);
 	}
 
@@ -666,7 +655,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		isAdmin = buffer.readBoolean();
 		color.set(buffer.readInt());
 		dead = buffer.readBoolean();
-		weapon = Upgrade.getByID(buffer.readByte());
 		mech = Upgrade.getByID(buffer.readByte());
 		interpolator.read(lastx, lasty, x, y, time, rotation);
 		rotation = lastrot;

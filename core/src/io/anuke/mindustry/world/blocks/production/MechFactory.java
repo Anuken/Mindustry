@@ -12,8 +12,8 @@ import io.anuke.mindustry.gen.CallBlocks;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.type.Upgrade;
-import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -31,9 +31,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class WeaponFactory extends Block{
+public class MechFactory extends Block{
 
-    public WeaponFactory(String name){
+    public MechFactory(String name){
         super(name);
         solid = true;
         destructible = true;
@@ -43,12 +43,12 @@ public class WeaponFactory extends Block{
 
     @Override
     public void draw(Tile tile) {
-        WeaponFactoryEntity entity = tile.entity();
+        MechFactoryEntity entity = tile.entity();
 
         Draw.rect(name, tile.drawx(), tile.drawy());
 
         if(entity.current != null) {
-            TextureRegion region = entity.current.equipRegion;
+            TextureRegion region = entity.current.region;
 
             Shaders.build.region = region;
             Shaders.build.progress = entity.progress;
@@ -74,7 +74,7 @@ public class WeaponFactory extends Block{
 
     @Override
     public void update(Tile tile) {
-        WeaponFactoryEntity entity = tile.entity();
+        MechFactoryEntity entity = tile.entity();
 
         if(entity.current != null){
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
@@ -82,7 +82,7 @@ public class WeaponFactory extends Block{
             entity.progress += 1f / Vars.respawnduration;
 
             if(entity.progress >= 1f){
-                CallBlocks.onWeaponFactoryDone(tile, entity.current);
+                CallBlocks.onMechFactoryDone(tile, entity.current);
             }
         }else{
             entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.1f);
@@ -91,7 +91,7 @@ public class WeaponFactory extends Block{
 
     @Override
     public void buildTable(Tile tile, Table table) {
-        WeaponFactoryEntity entity = tile.entity();
+        MechFactoryEntity entity = tile.entity();
 
         Table cont = new Table();
 
@@ -108,7 +108,7 @@ public class WeaponFactory extends Block{
     }
 
     protected void showSelect(Tile tile, Table cont){
-        WeaponFactoryEntity entity = tile.entity();
+        MechFactoryEntity entity = tile.entity();
 
         Array<Upgrade> items = Upgrade.all();
 
@@ -118,13 +118,13 @@ public class WeaponFactory extends Block{
         int i = 0;
 
         for (Upgrade upgrade : items) {
-            if (!(upgrade instanceof Weapon)) continue;
-            Weapon weapon = (Weapon) upgrade;
+            if (!(upgrade instanceof Mech)) continue;
+            Mech mech = (Mech) upgrade;
 
-            ImageButton button = cont.addImageButton("white", "toggle", 24, () -> CallBlocks.setWeaponFactoryWeapon(null, tile, weapon))
+            ImageButton button = cont.addImageButton("white", "toggle", 24, () -> CallBlocks.setMechFactory(null, tile, mech))
                     .size(38, 42).padBottom(-5.1f).group(group).get();
-            button.getStyle().imageUp = new TextureRegionDrawable(new TextureRegion(weapon.region));
-            button.setChecked(entity.current == weapon);
+            button.getStyle().imageUp = new TextureRegionDrawable(new TextureRegion(mech.region));
+            button.setChecked(entity.current == mech);
 
             if (i++ % 4 == 3) {
                 cont.row();
@@ -142,14 +142,14 @@ public class WeaponFactory extends Block{
     }
 
     protected void showResult(Tile tile, Table cont){
-        WeaponFactoryEntity entity = tile.entity();
+        MechFactoryEntity entity = tile.entity();
 
-        Weapon weapon = entity.result;
+        Mech mech = entity.result;
 
-        ImageButton button = cont.addImageButton("white", "toggle", 24, () -> CallBlocks.setWeaponFactoryWeapon(null, tile, weapon))
+        ImageButton button = cont.addImageButton("white", "toggle", 24, () -> CallBlocks.pickupMechFactory(null, tile))
                 .size(38, 42).padBottom(-5.1f).get();
-        button.getStyle().imageUp = new TextureRegionDrawable(new TextureRegion(weapon.region));
-        button.setChecked(entity.current == weapon);
+        button.getStyle().imageUp = new TextureRegionDrawable(new TextureRegion(mech.region));
+        button.setChecked(entity.current == mech);
 
         cont.update(() -> {
             //show selection menu when result disappears
@@ -163,15 +163,15 @@ public class WeaponFactory extends Block{
 
     @Override
     public TileEntity getEntity() {
-        return new WeaponFactoryEntity();
+        return new MechFactoryEntity();
     }
 
     @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
-    public static void pickupWeaponFactoryWeapon(Player player, Tile tile){
-        WeaponFactoryEntity entity = tile.entity();
+    public static void pickupMechFactory(Player player, Tile tile){
+        MechFactoryEntity entity = tile.entity();
 
         if(entity.current != null){
-            player.upgrades.add(entity.current);
+            player.mech = entity.current;
             entity.current = null;
             entity.progress = 0;
             entity.result = null;
@@ -179,28 +179,28 @@ public class WeaponFactory extends Block{
     }
 
     @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
-    public static void setWeaponFactoryWeapon(Player player, Tile tile, Weapon weapon){
-        WeaponFactoryEntity entity = tile.entity();
+    public static void setMechFactory(Player player, Tile tile, Mech weapon){
+        MechFactoryEntity entity = tile.entity();
         entity.current = weapon;
         entity.progress = 0f;
         entity.heat = 0f;
     }
 
     @Remote(called = Loc.server, in = In.blocks)
-    public static void onWeaponFactoryDone(Tile tile, Weapon result){
-        WeaponFactoryEntity entity = tile.entity();
+    public static void onMechFactoryDone(Tile tile, Mech result){
+        MechFactoryEntity entity = tile.entity();
         Effects.effect(Fx.spawn, entity);
         entity.current = null;
         entity.progress = 0;
         entity.result = result;
     }
 
-    public class WeaponFactoryEntity extends TileEntity{
-        public Weapon current;
+    public class MechFactoryEntity extends TileEntity{
+        public Mech current;
+        public Mech result;
         public float progress;
         public float time;
         public float heat;
-        public Weapon result;
 
         @Override
         public void write(DataOutputStream stream) throws IOException {

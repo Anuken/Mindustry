@@ -90,7 +90,7 @@ public class RemoteReadGenerator {
                         ClassSerializer ser = serializers.get(typeName);
 
                         if (ser == null) { //make sure a serializer exists!
-                            Utils.messager.printMessage(Kind.ERROR, "No @ReadClass method to read class type: ", var);
+                            Utils.messager.printMessage(Kind.ERROR, "No @ReadClass method to read class type: '" + typeName + "'", var);
                             return;
                         }
 

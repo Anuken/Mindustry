@@ -1,6 +1,7 @@
 package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.mindustry.content.Weapons;
 import io.anuke.ucore.graphics.Draw;
 
 public class Mech extends Upgrade {
@@ -10,6 +11,7 @@ public class Mech extends Upgrade {
 	public float mass = 1f;
 	public int drillPower = -1;
 	public float carryWeight = 1f;
+	public Weapon weapon = Weapons.blaster;
 
 	public TextureRegion baseRegion, legRegion, region;
 

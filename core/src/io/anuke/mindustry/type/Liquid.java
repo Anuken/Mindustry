@@ -28,6 +28,8 @@ public class Liquid implements UnlockableContent{
 	public Color flameColor = Color.valueOf("ffb763");
 	/**The associated status effect.*/
 	public StatusEffect effect = StatusEffects.none;
+	/**Pump tier. Controls which pumps can use this liquid.*/
+	public int tier;
 	
 	public Liquid(String name, Color color) {
 		this.name = name;

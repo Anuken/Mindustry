@@ -9,12 +9,19 @@ import io.anuke.mindustry.world.blocks.LiquidBlock;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 public class Pump extends LiquidBlock{
 	protected final Array<Tile> drawTiles = new Array<>();
+	protected final Array<Tile> updateTiles = new Array<>();
 
+	/**Pump amount per tile this block is on.*/
 	protected float pumpAmount = 1f;
+	/**Power used per frame per tile this block is on.*/
+	protected float powerUse = 0f;
+	/**Maximum liquid tier this pump can use.*/
+	protected int tier = 0;
 
 	public Pump(String name) {
 		super(name);
@@ -53,12 +60,18 @@ public class Pump extends LiquidBlock{
 	@Override
 	public boolean canPlaceOn(Tile tile) {
 		if(isMultiblock()){
+			Liquid last = null;
 			for(Tile other : tile.getLinkedTiles(drawTiles)){
+				//can't place pump on block with multiple liquids
+				if(last != null && other.floor().liquidDrop != last){
+					return false;
+				}
+
 				if(isValid(other)){
-					return true;
+					last = other.floor().liquidDrop;
 				}
 			}
-			return false;
+			return last != null;
 		}else{
 			return isValid(tile);
 		}
@@ -66,10 +79,34 @@ public class Pump extends LiquidBlock{
 	
 	@Override
 	public void update(Tile tile){
-		
-		if(tile.floor().liquidDrop != null){
-			float maxPump = Math.min(liquidCapacity - tile.entity.liquids.amount, pumpAmount * Timers.delta());
-			tile.entity.liquids.liquid = tile.floor().liquidDrop;
+		float tiles = 0f;
+		Liquid liquidDrop = null;
+
+		if(isMultiblock()){
+			for(Tile other : tile.getLinkedTiles(updateTiles)){
+				if(isValid(other)){
+					liquidDrop = other.floor().liquidDrop;
+					tiles ++;
+				}
+			}
+		}else{
+			tiles = 1f;
+			liquidDrop = tile.floor().liquidDrop;
+		}
+
+		if(hasPower){
+			float used = Math.min(powerCapacity, tiles * powerUse * Timers.delta());
+
+			//multiply liquid obtained by the fraction of power this pump has to pump it
+			//e.g. only has 50% power required = only pumps 50% of liquid that it can
+			tiles *= Mathf.clamp(tile.entity.power.amount / used);
+
+			tile.entity.power.amount -= Math.min(tile.entity.power.amount, used);
+		}
+
+		if(liquidDrop != null){
+			float maxPump = Math.min(liquidCapacity - tile.entity.liquids.amount, tiles * pumpAmount * Timers.delta());
+			tile.entity.liquids.liquid = liquidDrop;
 			tile.entity.liquids.amount += maxPump;
 		}
 
@@ -77,7 +114,7 @@ public class Pump extends LiquidBlock{
 	}
 
 	protected boolean isValid(Tile tile){
-		return tile.floor().liquidDrop != null;
+		return tile.floor().liquidDrop != null && tier >= tile.floor().liquidDrop.tier;
 	}
 
 }

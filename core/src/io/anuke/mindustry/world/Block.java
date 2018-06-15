@@ -69,8 +69,6 @@ public class Block extends BaseBlock implements UnlockableContent{
 	public boolean rotate;
 	/**whether you can break this with rightclick*/
 	public boolean breakable;
-	/**whether this block can be drowned in*/
-	public boolean liquid;
 	/**whether this floor can be placed on.*/
 	public boolean placeableOn = true;
 	/**tile entity health*/
@@ -308,7 +306,7 @@ public class Block extends BaseBlock implements UnlockableContent{
 		}
 
 		Damage.dynamicExplosion(x, y, flammability, explosiveness, power, tilesize * size/2f, tempColor);
-		if(!tile.floor().solid && !tile.floor().liquid){
+		if(!tile.floor().solid && !tile.floor().isLiquid){
 			Rubble.create(tile.drawx(), tile.drawy(), size);
 		}
 	}
@@ -317,7 +315,7 @@ public class Block extends BaseBlock implements UnlockableContent{
 	 * Takes flammability of floor liquid into account.*/
 	public float getFlammability(Tile tile){
 		if(!hasItems || tile.entity == null){
-			if(tile.floor().liquid && !solid){
+			if(tile.floor().isLiquid && !solid){
 				return tile.floor().liquidDrop.flammability;
 			}
 			return 0;

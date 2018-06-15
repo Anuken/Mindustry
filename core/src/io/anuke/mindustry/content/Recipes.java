@@ -108,8 +108,9 @@ public class Recipes implements ContentList{
         new Recipe(liquid, LiquidBlocks.bridgeconduit, new ItemStack(Items.titanium, 2), new ItemStack(Items.steel, 2));
         new Recipe(liquid, LiquidBlocks.laserconduit, new ItemStack(Items.titanium, 2), new ItemStack(Items.steel, 2));
 
-        new Recipe(liquid, LiquidBlocks.pump, new ItemStack(Items.steel, 10));
-        new Recipe(liquid, LiquidBlocks.fluxpump, new ItemStack(Items.steel, 10), new ItemStack(Items.surgealloy, 5));
+        new Recipe(liquid, LiquidBlocks.mechanicalPump, new ItemStack(Items.steel, 10));
+        new Recipe(liquid, LiquidBlocks.rotaryPump, new ItemStack(Items.steel, 10), new ItemStack(Items.surgealloy, 5));
+        new Recipe(liquid, LiquidBlocks.thermalPump, new ItemStack(Items.steel, 10), new ItemStack(Items.surgealloy, 5));
 
         new Recipe(units, UnitBlocks.repairPoint, new ItemStack(Items.steel, 10));
         new Recipe(units, UnitBlocks.dropPoint, new ItemStack(Items.steel, 10));

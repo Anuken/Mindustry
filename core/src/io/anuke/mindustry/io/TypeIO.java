@@ -173,6 +173,16 @@ public class TypeIO {
         return Upgrade.getByID(buffer.get());
     }
 
+    @WriteClass(Mech.class)
+    public static void writeMech(ByteBuffer buffer, Mech mech){
+        buffer.put(mech.id);
+    }
+
+    @ReadClass(Mech.class)
+    public static Mech readMech(ByteBuffer buffer){
+        return Upgrade.getByID(buffer.get());
+    }
+
     @WriteClass(Liquid.class)
     public static void writeLiquid(ByteBuffer buffer, Liquid liquid){
         buffer.put((byte)liquid.id);

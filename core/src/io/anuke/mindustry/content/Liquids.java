@@ -17,6 +17,7 @@ public class Liquids implements ContentList {
         water = new Liquid("water", Color.valueOf("486acd")) {
             {
                 heatCapacity = 0.4f;
+                tier = 0;
                 effect = StatusEffects.wet;
             }
         };
@@ -25,6 +26,7 @@ public class Liquids implements ContentList {
             {
                 temperature = 0.8f;
                 viscosity = 0.8f;
+                tier = 2;
                 effect = StatusEffects.melting;
             }
         };
@@ -34,6 +36,7 @@ public class Liquids implements ContentList {
                 viscosity = 0.7f;
                 flammability = 0.6f;
                 explosiveness = 0.6f;
+                tier = 1;
                 effect = StatusEffects.oiled;
             }
         };
@@ -42,6 +45,7 @@ public class Liquids implements ContentList {
             {
                 heatCapacity = 0.75f;
                 temperature = 0.5f;
+                tier = 1;
                 effect = StatusEffects.freezing;
             }
         };

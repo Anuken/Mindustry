@@ -76,7 +76,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
     }
 
     private static void deposit(Tile tile, Tile source, Liquid liquid, float amount, int generation){
-        if(tile.floor().liquid && !canStayOn(liquid, tile.floor().liquidDrop)){
+        if(tile.floor().isLiquid && !canStayOn(liquid, tile.floor().liquidDrop)){
             reactPuddle(tile.floor().liquidDrop, liquid, amount, tile,
                     (tile.worldx() + source.worldx())/2f, (tile.worldy() + source.worldy())/2f);
 
@@ -204,7 +204,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
     @Override
     public void draw() {
         seeds = id;
-        boolean onLiquid = tile.floor().liquid;
+        boolean onLiquid = tile.floor().isLiquid;
         float f = Mathf.clamp(amount/(maxLiquid/1.5f));
         float smag = onLiquid ? 0.8f : 0f;
         float sscl = 20f;

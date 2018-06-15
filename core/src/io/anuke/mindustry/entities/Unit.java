@@ -186,7 +186,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
             x += velocity.x / getMass() * Timers.delta();
             y += velocity.y / getMass() * Timers.delta();
         }else{
-            boolean onLiquid = floor.liquid;
+            boolean onLiquid = floor.isLiquid;
 
             if(tile != null){
                 tile.block().unitOn(tile, this);

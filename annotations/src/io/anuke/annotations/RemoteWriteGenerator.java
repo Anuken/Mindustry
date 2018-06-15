@@ -174,7 +174,7 @@ public class RemoteWriteGenerator {
                 ClassSerializer ser = serializers.get(typeName);
 
                 if(ser == null){ //make sure a serializer exists!
-                    Utils.messager.printMessage(Kind.ERROR, "No @WriteClass method to write class type: ", var);
+                    Utils.messager.printMessage(Kind.ERROR, "No @WriteClass method to write class type: '" + typeName + "'", var);
                     return;
                 }
 

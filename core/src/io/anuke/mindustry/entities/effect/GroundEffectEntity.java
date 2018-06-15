@@ -26,7 +26,7 @@ public class GroundEffectEntity extends EffectEntity {
                 once = true;
                 time = 0f;
                 Tile tile = Vars.world.tileWorld(x, y);
-                if(tile != null && tile.floor().liquid){
+                if(tile != null && tile.floor().isLiquid){
                     remove();
                 }
             } else if (once && time >= effect.staticLife) {

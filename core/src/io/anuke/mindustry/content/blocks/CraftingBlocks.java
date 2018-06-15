@@ -194,7 +194,7 @@ public class CraftingBlocks extends BlockList implements ContentList {
             hasLiquids = hasItems = true;
         }};
 
-        weaponFactory = new WeaponFactory("weaponfactory") {{
+        weaponFactory = new MechFactory("weaponfactory") {{
             size = 2;
             health = 250;
         }};
