@@ -39,6 +39,20 @@ laserconveyor-end
   orig: 8, 8
   offset: 0, 0
   index: -1
+mass-driver-turret
+  rotate: false
+  xy: 281, 135
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+ripple
+  rotate: false
+  xy: 281, 135
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
 poweredconveyormove
   rotate: false
   xy: 709, 199
@@ -111,56 +125,56 @@ laserdrill-top
   index: -1
 nucleardrill
   rotate: false
-  xy: 281, 135
+  xy: 307, 135
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 nucleardrill-rim
   rotate: false
-  xy: 307, 135
+  xy: 333, 135
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 nucleardrill-rotator
   rotate: false
-  xy: 333, 135
+  xy: 359, 135
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 nucleardrill-top
   rotate: false
-  xy: 359, 135
+  xy: 385, 135
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 oilextractor
   rotate: false
-  xy: 437, 136
+  xy: 587, 232
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 oilextractor-liquid
   rotate: false
-  xy: 587, 232
+  xy: 613, 232
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 oilextractor-rotator
   rotate: false
-  xy: 613, 232
+  xy: 607, 206
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 oilextractor-top
   rotate: false
-  xy: 607, 206
+  xy: 597, 180
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -1252,14 +1266,14 @@ fusionreactor-top
   index: -1
 nuclearreactor-center
   rotate: false
-  xy: 385, 135
+  xy: 411, 135
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 nuclearreactor-lights
   rotate: false
-  xy: 411, 135
+  xy: 437, 136
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -1504,13 +1518,6 @@ siliconextractor
   index: -1
 core-open
   rotate: false
-  xy: 545, 157
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
-core-top
-  rotate: false
   xy: 571, 157
   size: 24, 24
   orig: 24, 24
@@ -1647,13 +1654,6 @@ meltdown
   xy: 805, 479
   size: 32, 32
   orig: 32, 32
-  offset: 0, 0
-  index: -1
-ripple
-  rotate: false
-  xy: 597, 180
-  size: 24, 24
-  orig: 24, 24
   offset: 0, 0
   index: -1
 scatter
@@ -2496,6 +2496,27 @@ block-icon-liquidtank
   orig: 24, 24
   offset: 0, 0
   index: -1
+block-icon-mass-driver
+  rotate: false
+  xy: 493, 183
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+mass-driver
+  rotate: false
+  xy: 493, 183
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+core-top
+  rotate: false
+  xy: 493, 183
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
 block-icon-mechanical-pump
   rotate: false
   xy: 903, 427
@@ -2561,21 +2582,21 @@ multiplexer
   index: -1
 block-icon-nucleardrill
   rotate: false
-  xy: 493, 183
+  xy: 519, 183
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 block-icon-nuclearreactor
   rotate: false
-  xy: 519, 183
+  xy: 545, 183
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 nuclearreactor
   rotate: false
-  xy: 519, 183
+  xy: 545, 183
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -2596,7 +2617,7 @@ oil
   index: -1
 block-icon-oilextractor
   rotate: false
-  xy: 545, 183
+  xy: 571, 183
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -2771,7 +2792,7 @@ resupplypoint
   index: -1
 block-icon-ripple
   rotate: false
-  xy: 571, 183
+  xy: 467, 150
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -3114,14 +3135,14 @@ block-icon-swarmer
   index: -1
 block-icon-teleporter
   rotate: false
-  xy: 467, 150
+  xy: 493, 157
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 teleporter
   rotate: false
-  xy: 467, 150
+  xy: 493, 157
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -3233,14 +3254,14 @@ unloader
   index: -1
 block-icon-vault
   rotate: false
-  xy: 493, 157
+  xy: 519, 157
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 vault
   rotate: false
-  xy: 493, 157
+  xy: 519, 157
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -3598,7 +3619,7 @@ button-map-over
   index: -1
 button-select
   rotate: false
-  xy: 519, 157
+  xy: 545, 157
   size: 24, 24
   split: 4, 4, 4, 4
   orig: 24, 24

@@ -3,29 +3,34 @@ package io.anuke.mindustry.content.bullets;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.StatusEffects;
+import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.bullet.LiquidBulletType;
-import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
+import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.distribution.MassDriver.DriverBulletData;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.world;
 
 public class TurretBullets extends BulletList implements ContentList {
-    public static BulletType fireball, basicFlame, lancerLaser, fuseShot, waterShot, cryoShot, lavaShot, oilShot, lightning;
+    public static BulletType fireball, basicFlame, lancerLaser, fuseShot, waterShot, cryoShot, lavaShot, oilShot, lightning, driverBolt;
 
     @Override
     public void load() {
@@ -169,6 +174,97 @@ public class TurretBullets extends BulletList implements ContentList {
             @Override
             public void init(Bullet b) {
                 Lightning.create(b.getTeam(), hiteffect, Palette.lancerLaser, damage, b.x, b.y, b.angle(), 30);
+            }
+        };
+
+        driverBolt = new BulletType(5f, 20) {
+            {
+                collidesTiles = false;
+                lifetime = 200f;
+                despawneffect = BlockFx.smeltsmoke;
+                hiteffect = BulletFx.hitBulletBig;
+                drag = 0.02f;
+            }
+
+            @Override
+            public void draw(Bullet b) {
+                Draw.color(Color.LIGHT_GRAY);
+                Fill.square(b.x, b.y, 3f, b.angle());
+
+                Draw.color(Palette.lighterOrange);
+                Fill.square(b.x, b.y, 2f, b.angle());
+                Draw.reset();
+            }
+
+            @Override
+            public void update(Bullet b) {
+                //data MUST be an instance of DriverBulletData
+                if(!(b.getData() instanceof DriverBulletData)){
+                    hit(b);
+                    return;
+                }
+
+                float hitDst = 7f;
+
+                DriverBulletData data = (DriverBulletData)b.getData();
+
+                //if the target is dead, just keep flying until the bullet explodes
+                if(data.to.isDead()){
+                    return;
+                }
+
+                float baseDst = data.from.distanceTo(data.to);
+                float dst1 = b.distanceTo(data.from);
+                float dst2 = b.distanceTo(data.to);
+
+                boolean intersect = false;
+
+                //bullet has gone past the destination point: but did it intersect it?
+                if(dst1 > baseDst){
+                    float angleTo = b.angleTo(data.to);
+                    float baseAngle = data.to.angleTo(data.from);
+
+                    //if angles are nearby, then yes, it did
+                    if(Mathf.angNear(angleTo, baseAngle, 2f)){
+                        intersect = true;
+                        //snap bullet position back; this is used for low-FPS situations
+                        b.set(data.to.x + Angles.trnsx(baseAngle, hitDst), data.to.y + Angles.trnsy(baseAngle, hitDst));
+                    }
+                }
+
+                //if on course and it's in range of the target
+                if(Math.abs(dst1 + dst2 - baseDst) < 4f && dst2 <= hitDst){
+                    intersect = true;
+                } //else, bullet has gone off course, does not get recieved.
+
+                if(intersect){
+                    data.to.handlePayload(b, data);
+                }
+            }
+
+            @Override
+            public void despawned(Bullet b) {
+                super.despawned(b);
+
+                if(!(b.getData() instanceof DriverBulletData)) return;
+
+                DriverBulletData data = (DriverBulletData)b.getData();
+                data.to.isRecieving = false;
+
+                for(int i = 0; i < data.items.length; i ++){
+                    int amountDropped = Mathf.random(0, data.items[i]);
+                    if(amountDropped > 0){
+                        float angle = b.angle() + Mathf.range(100f);
+                        float vs = Mathf.random(0f, 4f);
+                        CallEntity.createItemDrop(Item.getByID(i), amountDropped, b.x, b.y, Angles.trnsx(angle, vs), Angles.trnsy(angle, vs));
+                    }
+                }
+            }
+
+            @Override
+            public void hit(Bullet b, float hitx, float hity) {
+                super.hit(b, hitx, hity);
+                despawned(b);
             }
         };
     }

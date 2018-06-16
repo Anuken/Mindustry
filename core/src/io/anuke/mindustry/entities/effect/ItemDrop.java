@@ -56,6 +56,11 @@ public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, Veloc
     }
 
     @Remote(called = Loc.server, in = In.entities)
+    public static void createItemDrop(Item item, int amount, float x, float y, float velocityX, float velocityY){
+        create(item, amount, x, y, 0).getVelocity().set(velocityX, velocityY);
+    }
+
+    @Remote(called = Loc.server, in = In.entities)
     public static void onPickup(int itemid){
         itemGroup.removeByID(itemid);
     }

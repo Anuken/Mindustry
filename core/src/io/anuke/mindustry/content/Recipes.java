@@ -39,6 +39,7 @@ public class Recipes implements ContentList{
         new Recipe(distribution, StorageBlocks.sortedunloader, new ItemStack(Items.steel, 5));
         new Recipe(distribution, DistributionBlocks.bridgeconveyor, new ItemStack(Items.steel, 5));
         new Recipe(distribution, DistributionBlocks.laserconveyor, new ItemStack(Items.steel, 5));
+        new Recipe(distribution, DistributionBlocks.massdriver, new ItemStack(Items.steel, 1));
 
         new Recipe(weapon, WeaponBlocks.duo, new ItemStack(Items.iron, 7));
         new Recipe(weapon, WeaponBlocks.scatter, new ItemStack(Items.iron, 8));

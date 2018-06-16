@@ -30,6 +30,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 	private static Vector2 vector = new Vector2();
 
 	private Team team;
+	private Object data;
 	private boolean supressCollision;
 
 	public Timer timer = new Timer(3);
@@ -43,9 +44,14 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 	}
 
 	public static void create (BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl){
+		create(type, owner, team, x, y, angle, velocityScl, null);
+	}
+
+	public static void create (BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl, Object data){
 		Bullet bullet = Pools.obtain(Bullet.class);
 		bullet.type = type;
 		bullet.owner = owner;
+		bullet.data = data;
 
 		bullet.velocity.set(0, type.speed).setAngle(angle).scl(velocityScl);
 		bullet.velocity.add(owner instanceof VelocityTrait ? ((VelocityTrait)owner).getVelocity() : Vector2.Zero);
@@ -88,6 +94,10 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 
 	public void scaleTime(float add){
 		time += add;
+	}
+
+	public Object getData() {
+		return data;
 	}
 
 	@Override
@@ -185,6 +195,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 		super.reset();
 		timer.clear();
 		team = null;
+		data = null;
 	}
 
 	@Override

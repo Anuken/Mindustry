@@ -25,7 +25,6 @@ public class DeflectorWall extends Wall {
 
     public DeflectorWall(String name) {
         super(name);
-        update = false;
     }
 
     @Override

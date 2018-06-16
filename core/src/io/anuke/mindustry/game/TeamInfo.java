@@ -77,8 +77,7 @@ public class TeamInfo {
     }
 
     /**Returns a set of all teams that are enemies of this team.
-     * For teams not active, an empty set is returned.
-     */
+     * For teams not active, an empty set is returned.*/
     public ObjectSet<TeamData> enemyDataOf(Team team) {
         boolean ally = allies.contains(team);
         boolean enemy = enemies.contains(team);
