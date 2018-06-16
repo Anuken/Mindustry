@@ -15,6 +15,8 @@ public class TeamInfo {
             enemyData = new ThreadSet<>();
     private ThreadSet<TeamData> allTeamData = new ThreadSet<>();
     private ThreadSet<Team> allTeams = new ThreadSet<>();
+    private int allyBits = 0;
+    private int enemyBits = 0;
 
     /**Returns all teams on a side.*/
     public ObjectSet<TeamData> getTeams(boolean ally) {
@@ -38,9 +40,11 @@ public class TeamInfo {
         if(ally) {
             allies.add(team);
             allyData.add(data);
+            allyBits |= (1 << team.ordinal());
         }else {
             enemies.add(team);
             enemyData.add(data);
+            enemyBits |= (1 << team.ordinal());
         }
 
         allTeamData.add(data);
@@ -88,9 +92,9 @@ public class TeamInfo {
     /**Returns whether or not these two teams are enemies.*/
     public boolean areEnemies(Team team, Team other){
         if(team == other) return false; //fast fail to be more efficient
-        boolean ally = allies.contains(team);
-        boolean ally2 = enemies.contains(other);
-        return (ally == ally2) || !allTeams.contains(team); //if it's not in the game, target everything.
+        boolean ally = (allyBits & (1 << team.ordinal())) != 0;
+        boolean ally2 = (enemyBits & (1 << other.ordinal())) != 0;
+        return (ally == ally2) || !ally; //if it's not in the game, target everything.
     }
 
     public class TeamData {

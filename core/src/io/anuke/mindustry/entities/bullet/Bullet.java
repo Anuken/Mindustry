@@ -81,6 +81,15 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 		supressCollision = true;
 	}
 
+	public void resetOwner(Entity entity, Team team){
+		this.owner = entity;
+		this.team = team;
+	}
+
+	public void scaleTime(float add){
+		time += add;
+	}
+
 	@Override
 	public int getTypeID() {
 		return typeID;
