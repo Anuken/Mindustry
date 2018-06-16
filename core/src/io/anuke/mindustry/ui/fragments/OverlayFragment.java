@@ -15,7 +15,7 @@ public class OverlayFragment implements Fragment{
         this.input = input;
 
         inv = new BlockInventoryFragment(input);
-        config = new BlockConfigFragment();
+        config = new BlockConfigFragment(input);
     }
 
     @Override

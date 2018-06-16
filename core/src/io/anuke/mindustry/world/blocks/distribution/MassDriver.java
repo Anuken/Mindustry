@@ -37,7 +37,6 @@ public class MassDriver extends Block {
     protected float range;
     protected float rotateSpeed = 0.04f;
     protected float translation = 7f;
-    //minimum amount of items needed to begin firing
     protected int minDistribute = 10;
     protected float knockback = 4f;
     protected float reloadTime = 80f;
@@ -134,6 +133,8 @@ public class MassDriver extends Block {
 
     @Override
     public boolean onConfigureTileTapped(Tile tile, Tile other){
+        if(tile == other) return false;
+
         MassDriverEntity entity = tile.entity();
 
         if(entity.link == other.packedPosition()) {

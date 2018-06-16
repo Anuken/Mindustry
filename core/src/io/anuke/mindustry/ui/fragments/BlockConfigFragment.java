@@ -4,8 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.input.InputHandler;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.scene.Element;
@@ -13,11 +15,17 @@ import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.ui.layout.Table;
 
+import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class BlockConfigFragment implements  Fragment {
+public class BlockConfigFragment implements Fragment {
     private Table table = new Table();
+    private InputHandler input;
     private Tile configTile;
+
+    public BlockConfigFragment(InputHandler input){
+        this.input = input;
+    }
 
     @Override
     public void build(Group parent) {
@@ -44,6 +52,16 @@ public class BlockConfigFragment implements  Fragment {
                 Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
 
         table.update(() -> {
+            if(state.is(State.menu)){
+                hideConfig();
+                return;
+            }
+
+            if(configTile != null && configTile.block().shouldHideConfigure(configTile, input.player)){
+                hideConfig();
+                return;
+            }
+
             table.setOrigin(Align.center);
             Vector2 pos = Graphics.screen(tile.drawx(), tile.drawy() - tile.block().size * tilesize/2f - 1);
             table.setPosition(pos.x, pos.y, Align.top);
@@ -59,6 +77,7 @@ public class BlockConfigFragment implements  Fragment {
     }
 
     public void hideConfig(){
+        configTile = null;
         table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interpolation.pow3Out), Actions.visible(false));
     }
 }

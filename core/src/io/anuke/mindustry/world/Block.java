@@ -195,6 +195,16 @@ public class Block extends BaseBlock implements UnlockableContent{
 		return tile != other;
 	}
 
+	/**Returns whether this config menu should show when the specified player taps it.*/
+	public boolean shouldShowConfigure(Tile tile, Player player){
+		return true;
+	}
+
+	/**Whether this configuration should be hidden now. Called every frame the config is open.*/
+	public boolean shouldHideConfigure(Tile tile, Player player){
+		return false;
+	}
+
 	public boolean synthetic(){
 		return update || destructible || solid;
 	}

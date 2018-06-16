@@ -5,13 +5,10 @@ import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.units.DropPoint;
-import io.anuke.mindustry.world.blocks.units.RepairPoint;
-import io.anuke.mindustry.world.blocks.units.ResupplyPoint;
-import io.anuke.mindustry.world.blocks.units.UnitFactory;
+import io.anuke.mindustry.world.blocks.units.*;
 
 public class UnitBlocks extends BlockList implements ContentList {
-    public static Block resupplyPoint, repairPoint, droneFactory, dropPoint;
+    public static Block resupplyPoint, repairPoint, droneFactory, dropPoint, reconstructor;
 
     @Override
     public void load() {
@@ -37,6 +34,10 @@ public class UnitBlocks extends BlockList implements ContentList {
         repairPoint = new RepairPoint("repairpoint") {{
             shadow = "shadow-round-1";
             repairSpeed = 0.1f;
+        }};
+
+        reconstructor = new Reconstructor("reconstructor") {{
+            size = 2;
         }};
     }
 }

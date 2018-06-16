@@ -67,6 +67,28 @@ public class Units {
         return value[0];
     }
 
+    /**Returns whether there are any entities on this tile, with the hitbox expanded.*/
+    public static boolean anyEntities(Tile tile, float expansion, Predicate<Unit> pred){
+        Block type = tile.block();
+        rect.setSize(type.size * tilesize + expansion, type.size * tilesize + expansion);
+        rect.setCenter(tile.drawx(), tile.drawy());
+
+        boolean[] value = new boolean[1];
+
+        Units.getNearby(rect, unit -> {
+            if(value[0] || !pred.test(unit)) return;
+            if(!unit.isFlying()){
+                unit.getHitbox(hitrect);
+
+                if(hitrect.overlaps(rect)) {
+                    value[0] = true;
+                }
+            }
+        });
+
+        return value[0];
+    }
+
     /**Returns the neareset ally tile in a range.*/
     public static TileEntity findAllyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
         return findTile(x, y, range, tile -> !state.teams.areEnemies(team, tile.getTeam()) && pred.test(tile));

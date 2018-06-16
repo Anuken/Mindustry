@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  */
 public class Annotations {
 
-    /**Marks a method as invokable remotely from a server on a client.*/
+    /**Marks a method as invokable remotely across a server/client connection.*/
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.CLASS)
     public @interface Remote {

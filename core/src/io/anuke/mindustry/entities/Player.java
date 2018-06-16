@@ -597,6 +597,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		respawning = true;
 	}
 
+	public void setRespawning(boolean respawning){
+		this.respawning = respawning;
+	}
+
 	@Override
 	public Queue<BuildRequest> getPlaceQueue(){
 		return placeQueue;
