@@ -113,7 +113,7 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 	}
 	
 	public void collision(Bullet other){
-		damage(other.getDamage());
+		tile.block().handleBulletHit(this, other);
 	}
 	
 	public void damage(float damage){

@@ -6,6 +6,7 @@ import io.anuke.annotations.Annotations.ReadClass;
 import io.anuke.annotations.Annotations.WriteClass;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.traits.CarriableTrait;
 import io.anuke.mindustry.entities.traits.CarryTrait;
@@ -23,6 +24,7 @@ import io.anuke.ucore.entities.Entities;
 
 import java.nio.ByteBuffer;
 
+import static io.anuke.mindustry.Vars.bulletGroup;
 import static io.anuke.mindustry.Vars.playerGroup;
 import static io.anuke.mindustry.Vars.world;
 
@@ -51,10 +53,21 @@ public class TypeIO {
     }
 
     @ReadClass(Unit.class)
-    public static Unit writeUnit(ByteBuffer buffer){
+    public static Unit readUnit(ByteBuffer buffer){
         byte gid = buffer.get();
         int id = buffer.getInt();
         return (Unit)Entities.getGroup(gid).getByID(id);
+    }
+
+    @WriteClass(Bullet.class)
+    public static void writeBullet(ByteBuffer buffer, Bullet bullet){
+        buffer.putInt(bullet.getID());
+    }
+
+    @ReadClass(Bullet.class)
+    public static Bullet readBullet(ByteBuffer buffer){
+        int id = buffer.getInt();
+        return (Bullet)bulletGroup.getByID(id);
     }
 
     @WriteClass(CarriableTrait.class)

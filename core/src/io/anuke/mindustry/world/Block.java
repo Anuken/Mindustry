@@ -10,6 +10,7 @@ import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.effect.Rubble;
 import io.anuke.mindustry.game.Content;
@@ -236,6 +237,10 @@ public class Block extends BaseBlock implements UnlockableContent{
 	
 	public float handleDamage(Tile tile, float amount){
 		return amount;
+	}
+
+	public void handleBulletHit(TileEntity entity, Bullet bullet){
+		entity.damage(bullet.getDamage());
 	}
 	
 	public void update(Tile tile){}

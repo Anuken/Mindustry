@@ -30,6 +30,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 	private static Vector2 vector = new Vector2();
 
 	private Team team;
+	private boolean supressCollision;
 
 	public Timer timer = new Timer(3);
 
@@ -73,7 +74,11 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 	public Bullet(){}
 
 	public boolean collidesTiles(){
-		return type.collidesTiles; //TODO make artillery and such not do this
+		return type.collidesTiles;
+	}
+
+	public void supressCollision(){
+		supressCollision = true;
 	}
 
 	@Override
@@ -141,7 +146,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 	public void update(){
 		super.update();
 
-		if (type.hitTiles && collidesTiles()) {
+		if (type.hitTiles && collidesTiles() && !supressCollision) {
 			world.raycastEach(world.toTile(lastPosition().x), world.toTile(lastPosition().y), world.toTile(x), world.toTile(y), (x, y) -> {
 
 				Tile tile = world.tile(x, y);
@@ -150,8 +155,11 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 
 				if (tile.entity != null && tile.entity.collide(this) && !tile.entity.isDead() && tile.entity.tile.getTeam() != team) {
 					tile.entity.collision(this);
-					remove();
-					type.hit(this);
+
+					if(!supressCollision){
+						type.hit(this);
+						remove();
+					}
 
 					return true;
 				}
@@ -159,6 +167,8 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 				return false;
 			});
 		}
+
+		supressCollision = false;
 	}
 
 	@Override

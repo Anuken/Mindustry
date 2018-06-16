@@ -4,11 +4,11 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Wall;
+import io.anuke.mindustry.world.blocks.defense.DeflectorWall;
 import io.anuke.mindustry.world.blocks.defense.Door;
-import io.anuke.mindustry.world.blocks.defense.ShieldedWallBlock;
 
 public class DefenseBlocks extends BlockList implements ContentList {
-    public static Block stonewall, ironwall, steelwall, titaniumwall, diriumwall, compositewall, steelwalllarge, titaniumwalllarge, diriumwalllarge, titaniumshieldwall, door, largedoor;
+    public static Block stonewall, ironwall, steelwall, titaniumwall, diriumwall, steelwalllarge, titaniumwalllarge, diriumwalllarge, door, largedoor, deflectorwall, deflectorwalllarge;
 
     @Override
     public void load() {
@@ -34,10 +34,6 @@ public class DefenseBlocks extends BlockList implements ContentList {
             health = 190 * wallHealthMultiplier;
         }};
 
-        compositewall = new Wall("compositewall") {{
-            health = 270 * wallHealthMultiplier;
-        }};
-
         steelwalllarge = new Wall("steelwall-large") {{
             health = 110 * 4 * wallHealthMultiplier;
             size = 2;
@@ -53,8 +49,13 @@ public class DefenseBlocks extends BlockList implements ContentList {
             size = 2;
         }};
 
-        titaniumshieldwall = new ShieldedWallBlock("titaniumshieldwall") {{
+        deflectorwall = new DeflectorWall("deflector-wall") {{
             health = 150 * wallHealthMultiplier;
+        }};
+
+        deflectorwalllarge = new DeflectorWall("deflector-wall-large") {{
+            health = 150 * 4 * wallHealthMultiplier;
+            size = 2;
         }};
 
         door = new Door("door") {{

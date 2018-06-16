@@ -21,7 +21,8 @@ public class Recipes implements ContentList{
         new Recipe(defense, DefenseBlocks.diriumwall, new ItemStack(Items.surgealloy, 12 * 4));
         new Recipe(defense, DefenseBlocks.door, new ItemStack(Items.steel, 3), new ItemStack(Items.iron, 3 * 4));
         new Recipe(defense, DefenseBlocks.largedoor, new ItemStack(Items.steel, 3 * 4), new ItemStack(Items.iron, 3 * 4 * 4));
-        new Recipe(defense, DefenseBlocks.titaniumshieldwall, new ItemStack(Items.titanium, 16));
+        new Recipe(defense, DefenseBlocks.deflectorwall, new ItemStack(Items.titanium, 1));
+        new Recipe(defense, DefenseBlocks.deflectorwalllarge, new ItemStack(Items.titanium, 1));
 
         new Recipe(distribution, DistributionBlocks.conveyor, new ItemStack(Items.iron, 1));
         new Recipe(distribution, DistributionBlocks.steelconveyor, new ItemStack(Items.steel, 1));
