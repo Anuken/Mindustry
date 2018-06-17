@@ -1,20 +1,20 @@
 package io.anuke.mindustry.world.blocks.production;
 
 import com.badlogic.gdx.graphics.Color;
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockBar;
+import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
 
 import java.util.Arrays;
 
@@ -49,13 +49,14 @@ public class Smelter extends Block{
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add("input", Arrays.toString(inputs));
-		stats.add("fuel", fuel);
-		stats.add("output", result);
-		stats.add("fuelduration", Strings.toFixed(burnDuration/60f, 1));
-		stats.add("maxoutputsecond", Strings.toFixed(60f/craftTime, 1));
-		stats.add("inputcapacity", capacity);
-		stats.add("outputcapacity", capacity);
+
+		stats.add(BlockStat.inputFuel, fuel.toString());
+		stats.add(BlockStat.fuelBurnTime, burnDuration/60f);
+		stats.add(BlockStat.inputItems, Arrays.toString(inputs));
+		stats.add(BlockStat.outputItem, result.toString());
+		stats.add(BlockStat.craftSpeed, 60f/craftTime);
+		stats.add(BlockStat.inputItemCapacity, capacity);
+		stats.add(BlockStat.outputItemCapacity, capacity);
 	}
 	
 	@Override

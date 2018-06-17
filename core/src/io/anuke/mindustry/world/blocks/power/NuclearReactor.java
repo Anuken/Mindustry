@@ -2,20 +2,20 @@ package io.anuke.mindustry.world.blocks.power;
 
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.ExplosionFx;
+import io.anuke.mindustry.entities.Damage;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.BarType;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockBar;
+import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
 import io.anuke.ucore.util.Translator;
 
 import java.io.DataInputStream;
@@ -60,11 +60,8 @@ public class NuclearReactor extends LiquidBurnerGenerator {
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add("inputitem", generateItem);
-		stats.add("maxpowergenerationsecond", Strings.toFixed(powerMultiplier*60f, 2));
-
-		stats.remove("powerliquid");
-		stats.remove("maxliquidsecond");
+		stats.add(BlockStat.inputItem, generateItem.toString());
+		stats.add(BlockStat.maxPowerGeneration, powerMultiplier*60f);
 	}
 	
 	@Override

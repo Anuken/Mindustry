@@ -1,25 +1,26 @@
 package io.anuke.mindustry.world.blocks.production;
 
 import com.badlogic.gdx.graphics.Color;
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.BarType;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
+import io.anuke.mindustry.world.meta.BlockBar;
+import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class PowerSmelter extends PowerBlock {
     protected final int timerDump = timers++;
@@ -63,12 +64,13 @@ public class PowerSmelter extends PowerBlock {
     public void setStats(){
         super.setStats();
         //TODO input/outputs
-       // stats.add("input", Arrays.toString(inputs));
-        stats.add("powersecond", Strings.toFixed(powerUse *60f, 2));
-        //stats.add("output", result);
-        stats.add("maxoutputsecond", Strings.toFixed(60f/craftTime, 1));
-        stats.add("inputcapacity", capacity);
-        stats.add("outputcapacity", capacity);
+
+        stats.add(BlockStat.inputItems, Arrays.toString(inputs));
+        stats.add(BlockStat.powerUse, powerUse * 60f);
+        stats.add(BlockStat.outputItem, result.toString());
+        stats.add(BlockStat.craftSpeed, 60f/craftTime);
+        stats.add(BlockStat.inputItemCapacity, capacity);
+        stats.add(BlockStat.outputItemCapacity, capacity);
     }
 
     @Override

@@ -7,8 +7,9 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockGroup;
+import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.*;
@@ -43,6 +44,7 @@ public class Conveyor extends Block{
 		group = BlockGroup.transportation;
 		hasItems = true;
 		autoSleep = true;
+		itemCapacity = Math.round(tilesize/ itemSpace);
 	}
 
 	@Override
@@ -51,7 +53,7 @@ public class Conveyor extends Block{
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add("itemspeedsecond", Strings.toFixed(speed * 60, 1));
+		stats.add(BlockStat.itemSpeed, speed * 60);
 	}
 
 	@Override

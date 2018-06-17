@@ -1,18 +1,17 @@
 package io.anuke.mindustry.world.blocks.power;
 
 import com.badlogic.gdx.graphics.Color;
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.BarType;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -39,8 +38,9 @@ public class BurnerGenerator extends PowerGenerator {
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add("powergenerationsecond", Strings.toFixed(powerOutput*60f, 2));
-		stats.add("generationsecondsitem", Strings.toFixed(itemDuration/60f, 2));
+		//TODO both of these depend on the item type, implement later
+		//stats.add("powergenerationsecond", Strings.toFixed(powerOutput*60f, 2));
+		//stats.add("generationsecondsitem", Strings.toFixed(itemDuration/60f, 2));
 	}
 	
 	@Override

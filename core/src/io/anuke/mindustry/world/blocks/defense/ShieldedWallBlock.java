@@ -6,11 +6,11 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Strings;
 
 import static io.anuke.mindustry.Vars.renderer;
 import static io.anuke.mindustry.Vars.tilesize;
 
+//TODO remove
 public class ShieldedWallBlock extends PowerBlock{
 	static final float hitTime = 18f;
 	static final Color hitColor = Color.SKY.cpy().mul(1.2f);
@@ -44,7 +44,7 @@ public class ShieldedWallBlock extends PowerBlock{
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add("powerdraindamage", Strings.toFixed(powerPerDamage, 2));
+		//stats.add("powerdraindamage", Strings.toFixed(powerPerDamage, 2));
 	}
 	
 	@Override

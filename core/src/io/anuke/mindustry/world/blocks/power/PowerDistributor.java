@@ -13,6 +13,7 @@ import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
+import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -20,7 +21,6 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
 import io.anuke.ucore.util.Translator;
 
 import java.io.DataInputStream;
@@ -69,8 +69,8 @@ public class PowerDistributor extends PowerBlock{
 	public void setStats(){
 		super.setStats();
 
-		stats.add("lasertilerange", laserRange);
-		stats.add("maxpowertransfersecond", Strings.toFixed(powerSpeed * 60, 2));
+		stats.add(BlockStat.powerRange, laserRange);
+		stats.add(BlockStat.powerTransferSpeed, powerSpeed * 60);
 	}
 
 	@Override

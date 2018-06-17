@@ -7,10 +7,10 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
 import io.anuke.mindustry.world.meta.BlockGroup;
+import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
 
 public class Pump extends LiquidBlock{
 	protected final Array<Tile> drawTiles = new Array<>();
@@ -34,7 +34,7 @@ public class Pump extends LiquidBlock{
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add("liquidsecond", Strings.toFixed(60f*pumpAmount, 1));
+		stats.add(BlockStat.liquidOutput, 60f*pumpAmount);
 	}
 	
 	@Override

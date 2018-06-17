@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.blocks.power;
 
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.power.BurnerGenerator.BurnerEntity;
@@ -10,8 +10,8 @@ import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
 
+//TODO remove this class
 public class LiquidBurnerGenerator extends PowerGenerator {
 	protected float minEfficiency = 0.2f;
 	protected float powerPerLiquid = 0.13f;
@@ -29,8 +29,8 @@ public class LiquidBurnerGenerator extends PowerGenerator {
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add("powerliquid", Strings.toFixed(powerPerLiquid, 2) + " power/liquid");
-		stats.add("maxliquidsecond", Strings.toFixed(maxLiquidGenerate*60f, 2) + " liquid/s");
+		//stats.add("powerliquid", Strings.toFixed(powerPerLiquid, 2) + " power/liquid");
+		//stats.add("maxliquidsecond", Strings.toFixed(maxLiquidGenerate*60f, 2) + " liquid/s");
 	}
 	
 	@Override

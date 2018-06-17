@@ -22,11 +22,7 @@ import io.anuke.mindustry.input.CursorType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.meta.BlockBar;
-import io.anuke.mindustry.world.meta.BlockBars;
-import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.mindustry.world.meta.BlockStats;
+import io.anuke.mindustry.world.meta.*;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
@@ -101,11 +97,11 @@ public class Block extends BaseBlock implements UnlockableContent{
 	/**whether this block has instant transfer checking. used for calculations to prevent infinite loops.*/
 	public boolean instantTransfer = false;
 	/**The block group. Unless {@link #canReplace} is overriden, blocks in the same group can replace each other.*/
-	public io.anuke.mindustry.world.meta.BlockGroup group = io.anuke.mindustry.world.meta.BlockGroup.none;
+	public BlockGroup group = BlockGroup.none;
 	/**list of displayed block status bars. Defaults to health bar.*/
-	public io.anuke.mindustry.world.meta.BlockBars bars = new BlockBars();
+	public BlockBars bars = new BlockBars();
 	/**List of block stats.*/
-	public io.anuke.mindustry.world.meta.BlockStats stats = new BlockStats();
+	public BlockStats stats = new BlockStats();
 	/**List of block flags. Used for AI indexing.*/
 	public EnumSet<BlockFlag> flags;
 	/**Whether to automatically set the entity to 'sleeping' when created.*/
@@ -218,12 +214,12 @@ public class Block extends BaseBlock implements UnlockableContent{
 	}
 	
 	public void setStats(){
-		stats.add("size", size);
-		stats.add("health", health);
+		stats.add(BlockStat.size, "{0}x{0}", size);
+		stats.add(BlockStat.health, health);
 
-		if(hasPower) stats.add("powercapacity", powerCapacity);
-		if(hasLiquids) stats.add("liquidcapacity", liquidCapacity);
-		if(hasItems) stats.add("capacity", itemCapacity);
+		if(hasPower) stats.add(BlockStat.powerCapacity, powerCapacity);
+		if(hasLiquids) stats.add(BlockStat.liquidCapacity, liquidCapacity);
+		if(hasItems) stats.add(BlockStat.itemCapacity, itemCapacity);
 	}
 
 	//TODO make this easier to config.

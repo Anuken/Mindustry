@@ -12,8 +12,8 @@ import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
 
+//TODO remove
 public class RepairTurret extends PowerTurret {
 	protected float repairFrac = 1f / 135f;
 
@@ -27,7 +27,7 @@ public class RepairTurret extends PowerTurret {
 	public void setStats(){
 		super.setStats();
 
-		stats.add("repairssecond", Strings.toFixed(60f/reload * repairFrac * 100, 1) + "%");
+		//stats.add("repairssecond", Strings.toFixed(60f/reload * repairFrac * 100, 1) + "%");
 	}
 	
 	@Override

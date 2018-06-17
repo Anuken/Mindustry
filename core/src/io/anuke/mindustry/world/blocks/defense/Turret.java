@@ -16,6 +16,7 @@ import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Graphics;
@@ -81,11 +82,10 @@ public abstract class Turret extends Block{
 		if(ammo != null) stats.add("ammo", ammo);
 		if(ammo != null) stats.add("ammocapacity", maxAmmo);
 		if(ammo != null) stats.add("ammoitem", ammoMultiplier);*/
-		stats.add("range", (int)range);
-		stats.add("inaccuracy", (int)inaccuracy);
-		//stats.add("damageshot", bullet.damage);
-		stats.add("shotssecond", Strings.toFixed(60f/reload, 1));
-		stats.add("shots", shots);
+		stats.add(BlockStat.shootRange, (int)range);
+		stats.add(BlockStat.inaccuracy, (int)inaccuracy);
+		stats.add(BlockStat.reload, Strings.toFixed(60f/reload, 1));
+		stats.add(BlockStat.shots, shots);
 	}
 	
 	@Override

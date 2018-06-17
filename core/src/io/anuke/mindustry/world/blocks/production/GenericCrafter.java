@@ -1,22 +1,22 @@
 package io.anuke.mindustry.world.blocks.production;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockBar;
+import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -56,10 +56,11 @@ public class GenericCrafter extends Block{
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add("maxitemssecond", Strings.toFixed(60f/craftTime, 1));
-		if(inputLiquid != null) stats.add("inputliquid", inputLiquid + " x " + (int)(liquidUse * craftTime));
-		if(inputItem != null) stats.add("inputitem", inputItem + " x " + inputItem.amount);
-		stats.add("output", output);
+		stats.add(BlockStat.craftSpeed, 60f/craftTime);
+		stats.add(BlockStat.outputItem, output.toString());
+
+		if(inputLiquid != null) stats.add(BlockStat.inputLiquid, "{0} x {1}", inputLiquid, (int)(liquidUse * craftTime));
+		if(inputItem != null) stats.add(BlockStat.inputItem, "{0} x {1}", inputItem, inputItem.amount);
 	}
 	
 	@Override

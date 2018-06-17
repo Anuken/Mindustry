@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.defense.turrets;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.defense.Turret;
-import io.anuke.ucore.util.Strings;
+import io.anuke.mindustry.world.meta.BlockStat;
 
 public abstract class PowerTurret extends Turret {
 	protected float powerUsed = 0.5f;
@@ -17,7 +17,8 @@ public abstract class PowerTurret extends Turret {
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add("powershot", Strings.toFixed(powerUsed, 1));
+
+		stats.add(BlockStat.powerShot, powerUsed);
 	}
 	
 	@Override

@@ -8,11 +8,11 @@ import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.impl.BulletEntity;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
 
 import static io.anuke.mindustry.Vars.headless;
 import static io.anuke.mindustry.Vars.renderer;
 
+//TODO remove
 public class ShieldBlock extends PowerBlock{
 	public float shieldRadius = 40f;
 	public float powerDrain = 0.005f;
@@ -29,9 +29,9 @@ public class ShieldBlock extends PowerBlock{
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add("powersecond", Strings.toFixed(powerDrain*60, 2));
-		stats.add("powerdraindamage", Strings.toFixed(powerPerDamage, 2));
-		stats.add("shieldradius", (int)shieldRadius);
+		//stats.add("powersecond", Strings.toFixed(powerDrain*60, 2));
+		//stats.add("powerdraindamage", Strings.toFixed(powerPerDamage, 2));
+		//stats.add("shieldradius", (int)shieldRadius);
 	}
 
 	@Override

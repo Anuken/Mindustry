@@ -4,21 +4,20 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
 
 public class Drill extends Block{
 	protected final static float hardnessDrillMultiplier = 50f;
@@ -105,8 +104,7 @@ public class Drill extends Block{
 	@Override
 	public void setStats(){
 		super.setStats();
-		//TODO this is misleading, change it
-		stats.add("secondsitem", Strings.toFixed(drillTime/60, 1));
+		//TODO add drill speed stats
 	}
 	
 	@Override
