@@ -26,7 +26,7 @@ public class BlockStats {
 
     /**Adds a formatted string with this stat.*/
     public void add(BlockStat stat, String format, Object... arguments){
-        if(!Bundles.has("text.blocks." + stat.name())){
+        if(!Bundles.has("text.blocks." + stat.name().toLowerCase())){
             if(!errorWhenMissing){
                 Log.err("Warning: No bundle entry for stat type \"" + stat + "\"!");
             }else{
