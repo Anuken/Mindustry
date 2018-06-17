@@ -53,7 +53,7 @@ public class WarpGate extends PowerBlock{
 
 	protected float warmupTime = 60f;
 	//time between teleports
-	protected float teleportMax = 1000f;
+	protected float teleportMax = 400f;
 	protected float teleportLiquidUse = 0.3f;
 	protected float liquidUse = 0.1f;
 	protected float powerUse = 0.3f;
@@ -212,7 +212,7 @@ public class WarpGate extends PowerBlock{
 
 			entity.time += Timers.delta() * entity.speedScl;
 
-			if (!entity.teleporting && entity.items.totalItems() >= itemCapacity && entity.power.amount >= powerCapacity - 0.01f &&
+			if (!entity.teleporting && entity.items.totalItems() >= itemCapacity && entity.power.amount >= powerCapacity - 0.01f - powerUse &&
 					entity.timer.get(timerTeleport, teleportMax)) {
 				Array<Tile> testLinks = findLinks(tile);
 
