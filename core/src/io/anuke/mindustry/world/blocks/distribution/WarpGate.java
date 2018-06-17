@@ -7,6 +7,8 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.fx.ExplosionFx;
+import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.gen.CallBlocks;
@@ -17,6 +19,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
@@ -26,12 +29,15 @@ import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Translator;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class Teleporter extends PowerBlock{
+import static io.anuke.mindustry.Vars.tilesize;
+
+public class WarpGate extends PowerBlock{
 	public static final Color[] colorArray = {Color.ROYAL, Color.ORANGE, Color.SCARLET, Color.LIME,
 			Color.PURPLE, Color.GOLD, Color.PINK, Color.LIGHT_GRAY};
 	public static final int colors = colorArray.length;
@@ -46,8 +52,10 @@ public class Teleporter extends PowerBlock{
 	private Array<Tile> returns = new Array<>();
 
 	protected float warmupTime = 60f;
-	protected float teleportMax = 400f;
-	protected float liquidUse = 0.3f;
+	//time between teleports
+	protected float teleportMax = 1000f;
+	protected float teleportLiquidUse = 0.3f;
+	protected float liquidUse = 0.1f;
 	protected float powerUse = 0.3f;
 	protected Liquid inputLiquid = Liquids.cryofluid;
 	protected Effect activateEffect = BlockFx.teleportActivate;
@@ -60,7 +68,7 @@ public class Teleporter extends PowerBlock{
 		}
 	}
 	
-	public Teleporter(String name) {
+	public WarpGate(String name) {
 		super(name);
 		update = true;
 		solid = true;
@@ -91,8 +99,15 @@ public class Teleporter extends PowerBlock{
 		float time = entity.time;
 		float rad = entity.activeScl;
 
+		if(entity.liquidLackScl > 0.01f){
+			Graphics.setAdditiveBlending();
+			Draw.color(1f, 0.3f, 0.3f, 0.4f * entity.liquidLackScl);
+			Fill.square(tile.drawx(), tile.drawy(), size * tilesize);
+			Graphics.setNormalBlending();
+		}
+
 		Draw.color(getColor(tile, 0));
-		Draw.rect("teleporter-top", tile.drawx(), tile.drawy());
+		Draw.rect(name+"-top", tile.drawx(), tile.drawy());
 		Draw.reset();
 
 		if(rad <= 0.0001f) return;
@@ -142,9 +157,12 @@ public class Teleporter extends PowerBlock{
 			entity.activeScl = Mathf.lerpDelta(entity.activeScl, 0f, 0.01f);
 
 			if(entity.power.amount >= powerCapacity){
+				Color resultColor = new Color();
+				resultColor.set(getColor(tile, 0));
+
 				entity.active = true;
 				entity.power.amount = 0f;
-				Effects.effect(activateEffect, getColor(tile, 0), tile.drawx(), tile.drawy());
+				Effects.effect(activateEffect, resultColor, tile.drawx(), tile.drawy());
 			}
 		}else {
 			entity.activeScl = Mathf.lerpDelta(entity.activeScl, 1f, 0.015f);
@@ -153,12 +171,27 @@ public class Teleporter extends PowerBlock{
 
 			if (entity.power.amount >= powerUsed) {
 				entity.power.amount -= powerUsed;
-				entity.powerLackScl = Mathf.lerpDelta(entity.powerLackScl, 0f, 0.01f);
+				entity.powerLackScl = Mathf.lerpDelta(entity.powerLackScl, 0f, 0.1f);
 			}else{
-				entity.powerLackScl = Mathf.lerpDelta(entity.powerLackScl, 1f, 0.01f);
+				entity.power.amount = 0f;
+				entity.powerLackScl = Mathf.lerpDelta(entity.powerLackScl, 1f, 0.1f);
 			}
 
 			if(entity.powerLackScl >= 0.999f){
+				catastrophicFailure(tile);
+			}
+
+			float liquidUsed = Math.min(liquidCapacity, liquidUse * Timers.delta());
+
+			if (entity.liquids.amount >= liquidUsed) {
+				entity.liquids.amount -= liquidUsed;
+				entity.liquidLackScl = Mathf.lerpDelta(entity.liquidLackScl, 0f, 0.1f);
+			}else{
+				entity.liquids.amount = 0f;
+				entity.liquidLackScl = Mathf.lerpDelta(entity.liquidLackScl, 1f, 0.1f);
+			}
+
+			if(entity.liquidLackScl >= 0.999f){
 				catastrophicFailure(tile);
 			}
 
@@ -166,7 +199,7 @@ public class Teleporter extends PowerBlock{
 
 			if (entity.teleporting) {
 				entity.speedScl = Mathf.lerpDelta(entity.speedScl, 2f, 0.01f);
-				float liquidUsed = Math.min(liquidCapacity, liquidUse * Timers.delta());
+				liquidUsed = Math.min(liquidCapacity, teleportLiquidUse * Timers.delta());
 
 				if (entity.liquids.amount >= liquidUsed) {
 					entity.liquids.amount -= liquidUsed;
@@ -179,15 +212,18 @@ public class Teleporter extends PowerBlock{
 
 			entity.time += Timers.delta() * entity.speedScl;
 
-			if (entity.items.totalItems() == itemCapacity && entity.power.amount >= powerCapacity &&
+			if (!entity.teleporting && entity.items.totalItems() >= itemCapacity && entity.power.amount >= powerCapacity - 0.01f &&
 					entity.timer.get(timerTeleport, teleportMax)) {
 				Array<Tile> testLinks = findLinks(tile);
 
 				if (testLinks.size == 0) return;
 
+				Color resultColor = new Color();
+				resultColor.set(getColor(tile, 0));
+
 				entity.teleporting = true;
 
-				Effects.effect(teleportEffect, getColor(tile, 0), tile.drawx(), tile.drawy());
+				Effects.effect(teleportEffect, resultColor, tile.drawx(), tile.drawy());
 				Timers.run(warmupTime, () -> {
 					Array<Tile> links = findLinks(tile);
 
@@ -195,12 +231,12 @@ public class Teleporter extends PowerBlock{
 						int canAccept = itemCapacity - other.entity.items.totalItems();
 						int total = entity.items.totalItems();
 						if (total == 0) break;
-						Effects.effect(teleportOutEffect, getColor(tile, 0), other.drawx(), other.drawy());
+						Effects.effect(teleportOutEffect, resultColor, other.drawx(), other.drawy());
 						for (int i = 0; i < canAccept && i < total; i++) {
 							other.entity.items.addItem(entity.items.takeItem(), 1);
 						}
 					}
-					Effects.effect(teleportOutEffect, getColor(tile, 0), tile.drawx(), tile.drawy());
+					Effects.effect(teleportOutEffect, resultColor, tile.drawx(), tile.drawy());
 					entity.power.amount = 0f;
 					entity.teleporting = false;
 				});
@@ -216,11 +252,6 @@ public class Teleporter extends PowerBlock{
 
 		ButtonGroup<ImageButton> group = new ButtonGroup<>();
 		Table cont = new Table();
-		cont.margin(4);
-		cont.marginBottom(5);
-
-		cont.add().colspan(4).height(145f);
-		cont.row();
 
 		for(int i = 0; i < colors; i ++){
 			final int f = i;
@@ -255,7 +286,46 @@ public class Teleporter extends PowerBlock{
 		return super.acceptLiquid(tile, source, liquid, amount) && liquid == inputLiquid;
 	}
 
+	@Override
+	public void onDestroyed(Tile tile) {
+		super.onDestroyed(tile);
+
+		TeleporterEntity entity = tile.entity();
+
+		if(entity.activeScl < 0.5f) return;
+
+		float explosionRadius = 50f;
+		float explosionDamage = 20f;
+
+		Translator tr = new Translator();
+
+		Effects.shake(6f, 16f, tile.worldx(), tile.worldy());
+		Effects.effect(ExplosionFx.nuclearShockwave, tile.worldx(), tile.worldy());
+		for(int i = 0; i < 6; i ++){
+			Timers.run(Mathf.random(40), () -> {
+				Effects.effect(BlockFx.nuclearcloud, tile.worldx(), tile.worldy());
+			});
+		}
+
+		Damage.damage(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);
+
+		for(int i = 0; i < 20; i ++){
+			Timers.run(Mathf.random(50), ()->{
+				tr.rnd(Mathf.random(40f));
+				Effects.effect(ExplosionFx.explosion, tr.x + tile.worldx(), tr.y + tile.worldy());
+			});
+		}
+
+		for(int i = 0; i < 70; i ++){
+			Timers.run(Mathf.random(80), ()->{
+				tr.rnd(Mathf.random(120f));
+				Effects.effect(BlockFx.nuclearsmoke, tr.x + tile.worldx(), tr.y + tile.worldy());
+			});
+		}
+	}
+
 	private void catastrophicFailure(Tile tile){
+		tile.entity.damage(tile.entity.health + 1);
 		//TODO fail gloriously
 	}
 
@@ -277,7 +347,7 @@ public class Teleporter extends PowerBlock{
 		
 		for(Tile other : teleporters[entity.color]){
 			if(other != tile){
-				if(other.block() instanceof Teleporter){
+				if(other.block() instanceof WarpGate){
 					TeleporterEntity oe = other.entity();
 					if(!oe.active) continue;
 					if(oe.color != entity.color){
@@ -291,8 +361,9 @@ public class Teleporter extends PowerBlock{
 			}
 		}
 
-		for(Tile remove : removal)
+		for(Tile remove : removal) {
 			teleporters[entity.color].remove(remove);
+		}
 		
 		return returns;
 	}
@@ -309,17 +380,25 @@ public class Teleporter extends PowerBlock{
 		public boolean active;
 		public float activeScl = 0f;
 		public float speedScl = 1f;
-		public float powerLackScl;
+		public float powerLackScl, liquidLackScl;
 		public float time;
 		
 		@Override
 		public void write(DataOutputStream stream) throws IOException{
 			stream.writeByte(color);
+			stream.writeBoolean(active);
+			stream.writeFloat(activeScl);
+			stream.writeFloat(speedScl);
+			stream.writeFloat(powerLackScl);
 		}
 		
 		@Override
 		public void read(DataInputStream stream) throws IOException{
 			color = stream.readByte();
+			active = stream.readBoolean();
+			activeScl = stream.readFloat();
+			speedScl = stream.readFloat();
+			powerLackScl = stream.readFloat();
 		}
 	}
 

@@ -100,7 +100,7 @@ public class Recipes implements ContentList{
 
         new Recipe(power, PowerBlocks.shieldgenerator, new ItemStack(Items.titanium, 30), new ItemStack(Items.surgealloy, 30));
 
-        new Recipe(distribution, PowerBlocks.teleporter, new ItemStack(Items.steel, 30), new ItemStack(Items.surgealloy, 40));
+        new Recipe(distribution, PowerBlocks.warpgate, new ItemStack(Items.steel, 1));
 
         new Recipe(power, PowerBlocks.repairturret, new ItemStack(Items.iron, 30));
         new Recipe(power, PowerBlocks.megarepairturret, new ItemStack(Items.iron, 20), new ItemStack(Items.steel, 30));

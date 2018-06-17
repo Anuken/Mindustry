@@ -29,8 +29,8 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class Reconstructor extends Block{
-    protected float departTime = 20f;
-    protected float arriveTime = 30f;
+    protected float departTime = 30f;
+    protected float arriveTime = 40f;
     protected float powerPerTeleport = 5f;
     protected Effect arriveEffect = Fx.spawn;
 
@@ -158,7 +158,13 @@ public class Reconstructor extends Block{
 
                 entity.updateTime -= Timers.delta()/departTime;
                 if(entity.updateTime <= 0f){
-                    //TODO veryify power per teleport!
+                    //no power? death.
+                    if(other.power.amount < powerPerTeleport){
+                        entity.current.setDead(true);
+                        entity.current.setRespawning(false);
+                        entity.current = null;
+                        return;
+                    }
                     other.power.amount -= powerPerTeleport;
                     other.current = entity.current;
                     other.departing = false;
@@ -239,13 +245,14 @@ public class Reconstructor extends Block{
     public static void reconstructPlayer(Player player, Tile tile){
         ReconstructorEntity entity = tile.entity();
 
-        if(!checkValidTap(tile, entity, player)) return;
+        if(!checkValidTap(tile, entity, player) || entity.power.amount < ((Reconstructor)tile.block()).powerPerTeleport) return;
 
         entity.departing = true;
         entity.current = player;
         entity.solid = false;
-        entity.set(tile.drawx(), tile.drawy());
+        entity.power.amount -= ((Reconstructor)tile.block()).powerPerTeleport;
         entity.updateTime = 1f;
+        entity.set(tile.drawx(), tile.drawy());
         player.setDead(true);
         player.setRespawning(true);
         player.setRespawning();

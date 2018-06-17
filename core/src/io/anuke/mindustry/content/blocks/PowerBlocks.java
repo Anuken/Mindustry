@@ -5,11 +5,12 @@ import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.defense.RepairTurret;
 import io.anuke.mindustry.world.blocks.defense.ShieldBlock;
-import io.anuke.mindustry.world.blocks.distribution.Teleporter;
+import io.anuke.mindustry.world.blocks.distribution.WarpGate;
 import io.anuke.mindustry.world.blocks.power.*;
 
 public class PowerBlocks extends BlockList implements ContentList {
-    public static Block combustiongenerator, thermalgenerator, liquidcombustiongenerator, rtgenerator, solarpanel, largesolarpanel, nuclearReactor, fusionReactor, repairturret, megarepairturret, shieldgenerator, battery, batteryLarge, powernode, powernodelarge, teleporter;
+    public static Block combustiongenerator, thermalgenerator, liquidcombustiongenerator, rtgenerator, solarpanel, largesolarpanel,
+            nuclearReactor, fusionReactor, repairturret, megarepairturret, shieldgenerator, battery, batteryLarge, powernode, powernodelarge, warpgate;
 
     @Override
     public void load() {
@@ -98,7 +99,7 @@ public class PowerBlocks extends BlockList implements ContentList {
             shadow = "shadow-round-2";
         }};
 
-        teleporter = new Teleporter("teleporter");
+        warpgate = new WarpGate("warpgate");
 
     }
 }
