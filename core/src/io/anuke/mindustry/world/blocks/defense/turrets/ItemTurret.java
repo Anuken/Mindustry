@@ -6,11 +6,10 @@ import io.anuke.mindustry.type.AmmoEntry;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.BarType;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.defense.Turret;
+import io.anuke.mindustry.world.meta.BlockBar;
 
-public class ItemTurret extends Turret {
+public class ItemTurret extends CooledTurret {
     protected int maxAmmo = 100;
     //TODO implement this!
     /**A value of 'null' means this turret does not need ammo.*/
@@ -73,6 +72,7 @@ public class ItemTurret extends Turret {
 
     @Override
     public void setBars(){
+        super.setBars();
         bars.replace(new BlockBar(BarType.inventory, true, tile -> (float)tile.<TurretEntity>entity().totalAmmo / maxAmmo));
     }
 

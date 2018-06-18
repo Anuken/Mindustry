@@ -7,8 +7,6 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.content.fx.ExplosionFx;
-import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.gen.CallBlocks;
@@ -29,7 +27,6 @@ import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -295,34 +292,7 @@ public class WarpGate extends PowerBlock{
 
 		if(entity.activeScl < 0.5f) return;
 
-		float explosionRadius = 50f;
-		float explosionDamage = 20f;
-
-		Translator tr = new Translator();
-
-		Effects.shake(6f, 16f, tile.worldx(), tile.worldy());
-		Effects.effect(ExplosionFx.nuclearShockwave, tile.worldx(), tile.worldy());
-		for(int i = 0; i < 6; i ++){
-			Timers.run(Mathf.random(40), () -> {
-				Effects.effect(BlockFx.nuclearcloud, tile.worldx(), tile.worldy());
-			});
-		}
-
-		Damage.damage(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);
-
-		for(int i = 0; i < 20; i ++){
-			Timers.run(Mathf.random(50), ()->{
-				tr.rnd(Mathf.random(40f));
-				Effects.effect(ExplosionFx.explosion, tr.x + tile.worldx(), tr.y + tile.worldy());
-			});
-		}
-
-		for(int i = 0; i < 70; i ++){
-			Timers.run(Mathf.random(80), ()->{
-				tr.rnd(Mathf.random(120f));
-				Effects.effect(BlockFx.nuclearsmoke, tr.x + tile.worldx(), tr.y + tile.worldy());
-			});
-		}
+		//TODO catastrophic failure
 	}
 
 	private void catastrophicFailure(Tile tile){

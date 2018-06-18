@@ -198,7 +198,7 @@ public abstract class InputHandler extends InputAdapter{
 	}
 
 	public void tryDropItems(Tile tile, float x, float y){
-		if(!droppingItem || !player.inventory.hasItem() || !tile.block().hasItems || canTapPlayer(x, y)){
+		if(!droppingItem || !player.inventory.hasItem() || canTapPlayer(x, y)){
 			droppingItem = false;
 			return;
 		}
@@ -207,7 +207,7 @@ public abstract class InputHandler extends InputAdapter{
 
 		ItemStack stack = player.inventory.getItem();
 
-		if(tile.block().acceptStack(stack.item, stack.amount, tile, player) > 0){
+		if(tile.block().acceptStack(stack.item, stack.amount, tile, player) > 0 && tile.block().hasItems){
 			CallBlocks.transferInventory(player, tile);
 		}else{
 			CallEntity.dropItem(player, player.angleTo(x, y));

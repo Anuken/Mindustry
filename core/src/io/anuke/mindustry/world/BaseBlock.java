@@ -122,7 +122,7 @@ public abstract class BaseBlock {
         next = next.target();
 
         if(next.block().hasLiquids && tile.entity.liquids.amount > 0f){
-            if(next.entity.liquids.liquid == tile.entity.liquids.liquid) {
+            if(next.entity.liquids.liquid == tile.entity.liquids.liquid || next.entity.liquids.amount <= 0.01f) {
                 float ofract = next.entity.liquids.amount / next.block().liquidCapacity;
                 float fract = tile.entity.liquids.amount / liquidCapacity;
                 float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (liquidCapacity), tile.entity.liquids.amount);
