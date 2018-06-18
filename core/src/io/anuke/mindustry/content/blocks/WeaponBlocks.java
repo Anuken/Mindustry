@@ -13,7 +13,7 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 public class WeaponBlocks extends BlockList implements ContentList {
-	public static Block duo, scatter, scorch, hail, wave, crux, lancer, arc, swarmer, ripple, cyclone, fuse, spectre, eraser, meltdown;
+	public static Block duo, scatter, scorch, hail, wave, lancer, arc, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown;
 
 	@Override
 	public void load() {
@@ -69,32 +69,6 @@ public class WeaponBlocks extends BlockList implements ContentList {
 			};
 		}};
 
-		crux = new ItemTurret("crux") {{
-			size = 2;
-			range = 100f;
-			ammoTypes = new AmmoType[]{AmmoTypes.shellExplosive, AmmoTypes.shellLead, AmmoTypes.shellPlastic, AmmoTypes.shellThorium};
-			reload = 70f;
-			restitution = 0.03f;
-			ammoEjectBack = 3f;
-			cooldown = 0.03f;
-			recoil = 3f;
-			shootShake = 2f;
-			ammoUseEffect = ShootFx.shellEjectBig;
-
-			drawer = (tile, entity) -> {
-				Draw.rect(name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-				float offsetx = (int) (Mathf.abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 3f);
-				float offsety = -(int) (Mathf.abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 2f);
-
-				for (int i : Mathf.signs) {
-					float rot = entity.rotation + 90 * i;
-					Draw.rect(name + "-panel-" + Strings.dir(i),
-							tile.drawx() + tr2.x + Angles.trnsx(rot, offsetx, offsety),
-							tile.drawy() + tr2.y + Angles.trnsy(rot, -offsetx, offsety), entity.rotation - 90);
-				}
-			};
-		}};
-
 		lancer = new LaserTurret("lancer") {{
 			range = 70f;
 			chargeTime = 70f;
@@ -132,6 +106,32 @@ public class WeaponBlocks extends BlockList implements ContentList {
 			size = 2;
 		}};
 
+		salvo = new ItemTurret("salvo") {{
+			size = 2;
+			range = 100f;
+			ammoTypes = new AmmoType[]{AmmoTypes.shellExplosive, AmmoTypes.shellLead, AmmoTypes.shellPlastic, AmmoTypes.shellThorium};
+			reload = 70f;
+			restitution = 0.03f;
+			ammoEjectBack = 3f;
+			cooldown = 0.03f;
+			recoil = 3f;
+			shootShake = 2f;
+			ammoUseEffect = ShootFx.shellEjectBig;
+
+			drawer = (tile, entity) -> {
+				Draw.rect(name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+				float offsetx = (int) (Mathf.abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 3f);
+				float offsety = -(int) (Mathf.abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 2f);
+
+				for (int i : Mathf.signs) {
+					float rot = entity.rotation + 90 * i;
+					Draw.rect(name + "-panel-" + Strings.dir(i),
+							tile.drawx() + tr2.x + Angles.trnsx(rot, offsetx, offsety),
+							tile.drawy() + tr2.y + Angles.trnsy(rot, -offsetx, offsety), entity.rotation - 90);
+				}
+			};
+		}};
+
 		ripple = new ItemTurret("ripple") {{
 			ammoTypes = new AmmoType[]{AmmoTypes.artilleryLead, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary, AmmoTypes.artilleryPlastic, AmmoTypes.artilleryThorium};
 			size = 3;
@@ -148,24 +148,7 @@ public class WeaponBlocks extends BlockList implements ContentList {
 			size = 3;
 		}};
 
-		spectre = new LaserTurret("spectre") {{
-			range = 70f;
-			chargeTime = 70f;
-			chargeMaxDelay = 30f;
-			chargeEffects = 7;
-			shootType = AmmoTypes.spectreLaser;
-			recoil = 2f;
-			reload = 130f;
-			cooldown = 0.03f;
-			shootEffect = ShootFx.lancerLaserShoot;
-			smokeEffect = ShootFx.lancerLaserShootSmoke;
-			chargeEffect = ShootFx.lancerLaserCharge;
-			chargeBeginEffect = ShootFx.lancerLaserChargeBegin;
-			heatColor = Color.RED;
-			size = 3;
-		}};
-
-		eraser = new ItemTurret("eraser") {{
+		spectre = new ItemTurret("eraser") {{
 			ammoTypes = new AmmoType[]{AmmoTypes.bulletIron, AmmoTypes.bulletLead, AmmoTypes.bulletSteel, AmmoTypes.bulletThermite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
 			reload = 25f;
 			restitution = 0.03f;

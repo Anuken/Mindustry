@@ -44,18 +44,20 @@ public class Recipes implements ContentList{
         new Recipe(distribution, DistributionBlocks.laserconveyor, new ItemStack(Items.steel, 5));
         new Recipe(distribution, DistributionBlocks.massdriver, new ItemStack(Items.steel, 1));
 
-        new Recipe(weapon, WeaponBlocks.duo, new ItemStack(Items.iron, 7));
-        new Recipe(weapon, WeaponBlocks.scatter, new ItemStack(Items.iron, 8));
-        new Recipe(weapon, WeaponBlocks.scorch, new ItemStack(Items.iron, 12), new ItemStack(Items.steel, 9));
-        new Recipe(weapon, WeaponBlocks.wave, new ItemStack(Items.iron, 15), new ItemStack(Items.steel, 10));
-        new Recipe(weapon, WeaponBlocks.lancer, new ItemStack(Items.steel, 12), new ItemStack(Items.titanium, 12));
-        new Recipe(weapon, WeaponBlocks.crux, new ItemStack(Items.steel, 25), new ItemStack(Items.titanium, 15));
-        new Recipe(weapon, WeaponBlocks.arc, new ItemStack(Items.steel, 20), new ItemStack(Items.titanium, 25), new ItemStack(Items.surgealloy, 15));
-        new Recipe(weapon, WeaponBlocks.swarmer, new ItemStack(Items.steel, 80), new ItemStack(Items.titanium, 70), new ItemStack(Items.surgealloy, 60));
-        new Recipe(weapon, WeaponBlocks.ripple, new ItemStack(Items.steel, 80), new ItemStack(Items.titanium, 70), new ItemStack(Items.surgealloy, 60));
-        new Recipe(weapon, WeaponBlocks.fuse, new ItemStack(Items.steel, 70), new ItemStack(Items.titanium, 50), new ItemStack(Items.surgealloy, 55));
-        new Recipe(weapon, WeaponBlocks.spectre, new ItemStack(Items.steel, 70), new ItemStack(Items.titanium, 50), new ItemStack(Items.surgealloy, 55));
-        new Recipe(weapon, WeaponBlocks.meltdown, new ItemStack(Items.steel, 70), new ItemStack(Items.titanium, 50), new ItemStack(Items.surgealloy, 55));
+        new Recipe(weapon, WeaponBlocks.duo, new ItemStack(Items.iron, 1));
+        new Recipe(weapon, WeaponBlocks.scatter, new ItemStack(Items.iron, 1));
+        new Recipe(weapon, WeaponBlocks.scorch, new ItemStack(Items.iron, 1));
+        new Recipe(weapon, WeaponBlocks.hail, new ItemStack(Items.iron, 1));
+        new Recipe(weapon, WeaponBlocks.wave, new ItemStack(Items.iron, 1));
+        new Recipe(weapon, WeaponBlocks.lancer, new ItemStack(Items.iron, 1));
+        new Recipe(weapon, WeaponBlocks.arc, new ItemStack(Items.iron, 1));
+        new Recipe(weapon, WeaponBlocks.swarmer, new ItemStack(Items.iron, 1));
+        new Recipe(weapon, WeaponBlocks.ripple, new ItemStack(Items.iron, 1));
+        new Recipe(weapon, WeaponBlocks.fuse, new ItemStack(Items.iron, 1));
+        new Recipe(weapon, WeaponBlocks.ripple, new ItemStack(Items.iron, 1));
+        new Recipe(weapon, WeaponBlocks.cyclone, new ItemStack(Items.iron, 1));
+        new Recipe(weapon, WeaponBlocks.spectre, new ItemStack(Items.iron, 1));
+        new Recipe(weapon, WeaponBlocks.meltdown, new ItemStack(Items.iron, 1));
 
         new Recipe(crafting, CraftingBlocks.smelter, new ItemStack(Items.iron, 40));
         new Recipe(crafting, CraftingBlocks.arcsmelter, new ItemStack(Items.iron, 40));
