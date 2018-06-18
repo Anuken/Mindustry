@@ -47,6 +47,7 @@ public class Items implements ContentList{
             type = ItemType.material;
             explosiveness = 0.1f;
             hardness = 4;
+            radioactivity = 0.5f;
         }};
 
         silicon = new Item("silicon", Color.valueOf("53565c")) {{

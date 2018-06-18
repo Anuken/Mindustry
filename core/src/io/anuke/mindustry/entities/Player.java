@@ -142,7 +142,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	@Override
 	public float getArmor() {
-		return 0f;
+		return mech.armor;
 	}
 
 	@Override
@@ -172,7 +172,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	@Override
 	public void damage(float amount){
-		CallEntity.onPlayerDamage(this, amount);
+		CallEntity.onPlayerDamage(this, calculateDamage(amount));
 
 		if(health <= 0 && !dead && isLocal){
 			CallEntity.onPlayerDeath(this);

@@ -34,26 +34,29 @@ public class LiquidMixer extends LiquidBlock{
     }
 
     @Override
-    public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
-        LiquidMixerEntity entity = tile.entity();
-        entity.accumulator += amount;
-        int items = (int)(entity.accumulator / liquidPerItem);
-        entity.items.removeItem(inputItem, items);
-        entity.accumulator %= liquidPerItem;
-        entity.liquids.liquid = outputLiquid;
-        entity.liquids.amount += amount;
-    }
-
-    @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
         return item == inputItem && tile.entity.items.getItem(item) < itemCapacity;
     }
 
     @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
-        return liquid == inputLiquid && tile.entity.liquids.amount + amount <= liquidCapacity &&
-                tile.entity.items.hasItem(inputItem, (int)((tile.<LiquidMixerEntity>entity().accumulator + amount)/amount)) &&
-                tile.entity.power.amount >= powerUse;
+    public float handleAuxLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
+        LiquidMixerEntity entity = tile.entity();
+
+        if(liquid == inputLiquid && tile.entity.items.hasItem(inputItem, (int)((entity.accumulator + amount)/amount)) &&
+                tile.entity.power.amount >= powerUse){
+
+            amount = Math.min(liquidCapacity - tile.entity.liquids.amount, amount);
+
+            entity.accumulator += amount;
+            int items = (int)(entity.accumulator / liquidPerItem);
+            entity.items.removeItem(inputItem, items);
+            entity.accumulator %= liquidPerItem;
+            entity.liquids.liquid = outputLiquid;
+            entity.liquids.amount += amount;
+            return amount;
+        }else{
+            return 0;
+        }
     }
 
     @Override

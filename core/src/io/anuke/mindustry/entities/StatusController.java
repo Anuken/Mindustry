@@ -1,69 +1,136 @@
 package io.anuke.mindustry.entities;
 
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.content.StatusEffects;
+import io.anuke.mindustry.entities.traits.Saveable;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.ucore.core.Timers;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 /**Class for controlling status effects on an entity.*/
-public class StatusController {
-    private static final TransitionResult globalResult = new TransitionResult();
+public class StatusController implements Saveable{
+    private static final StatusEntry globalResult = new StatusEntry();
+    private static final Array<StatusEntry> removals = new Array<>();
 
-    private io.anuke.mindustry.type.StatusEffect current = StatusEffects.none;
-    private float time;
+    private Array<StatusEntry> statuses = new Array<>();
 
-    public void handleApply(Unit unit, io.anuke.mindustry.type.StatusEffect effect, float intensity){
+    private float speedMultiplier;
+    private float damageMultiplier;
+    private float armorMultiplier;
+
+    public void handleApply(Unit unit, StatusEffect effect, float intensity){
         if(effect == StatusEffects.none) return; //don't apply empty effects
 
         float newTime = effect.baseDuration*intensity;
 
-        if(effect == current){
-            time = Math.max(time, newTime);
-        }else {
+        if(statuses.size > 0){
+            //check for opposite effects
+            for(StatusEntry entry : statuses){
+                //extend effect
+                if(entry.effect == effect) {
+                    entry.time = Math.max(entry.time, newTime);
+                    return;
+                }else if(entry.effect.isOpposite(effect)){ //find opposite
+                    entry.effect.getTransition(unit, effect, entry.time, newTime, globalResult);
+                    entry.time = globalResult.time;
 
-            current.getTransition(unit, effect, time, newTime, globalResult);
-            time = globalResult.time;
+                    if (globalResult.effect != entry.effect) {
+                        entry.effect.onTransition(unit, globalResult.effect);
+                        entry.effect = globalResult.effect;
+                    }
 
-            if (globalResult.result != current) {
-                current.onTransition(unit, globalResult.result);
-                current = globalResult.result;
+                    //stop looking when one is found
+                    return;
+                }
             }
         }
+
+        //otherwise, no opposites found, add direct effect
+        StatusEntry entry = Pools.obtain(StatusEntry.class);
+        entry.set(effect, newTime);
+        statuses.add(entry);
     }
 
     public void clear(){
-        current = StatusEffects.none;
-        time = 0f;
+        statuses.clear();
     }
 
     public void update(Unit unit){
-        time = Math.max(time - Timers.delta(), 0);
+        speedMultiplier = damageMultiplier = armorMultiplier = 1f;
 
-        if(time <= 0){
-            current = StatusEffects.none;
-        }else{
-            current.update(unit, time);
+        if(statuses.size == 0) return;
+
+        removals.clear();
+
+        for(StatusEntry entry : statuses){
+            entry.time = Math.max(entry.time - Timers.delta(), 0);
+
+            if(entry.time <= 0){
+                Pools.free(entry);
+                removals.add(entry);
+            }else{
+                speedMultiplier *= entry.effect.speedMultiplier;
+                armorMultiplier *= entry.effect.armorMultiplier;
+                damageMultiplier *= entry.effect.damageMultiplier;
+                entry.effect.update(unit, entry.time);
+            }
+        }
+
+        if(removals.size > 0){
+            statuses.removeAll(removals, true);
         }
     }
 
-    public void set(io.anuke.mindustry.type.StatusEffect current, float time){
-        this.current = current;
-        this.time = time;
+    public float getSpeedMultiplier(){
+        return speedMultiplier;
     }
 
-    public io.anuke.mindustry.type.StatusEffect current() {
-        return current;
+    public float getDamageMultiplier(){
+        return damageMultiplier;
     }
 
-    public float getTime() {
-        return time;
+    public float getArmorMultiplier() {
+        return armorMultiplier;
     }
 
-    public static class TransitionResult{
-        public io.anuke.mindustry.type.StatusEffect result;
+    public boolean hasEffect(StatusEffect effect){
+        for(StatusEntry entry : statuses){
+            if(entry.effect == effect) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void writeSave(DataOutput stream) throws IOException {
+        stream.writeByte(statuses.size);
+        for(StatusEntry entry : statuses){
+            stream.writeByte(entry.effect.id);
+            stream.writeShort((short)(entry.time * 2));
+        }
+    }
+
+    @Override
+    public void readSave(DataInput stream) throws IOException {
+        byte amount = stream.readByte();
+        for (int i = 0; i < amount; i++) {
+            byte id = stream.readByte();
+            float time = stream.readShort() / 2f;
+            StatusEntry entry = Pools.obtain(StatusEntry.class);
+            entry.set(StatusEffect.getByID(id), time);
+            statuses.add(entry);
+        }
+    }
+
+    public static class StatusEntry {
+        public StatusEffect effect;
         public float time;
 
-        public TransitionResult set(StatusEffect effect, float time){
-            this.result = effect;
+        public StatusEntry set(StatusEffect effect, float time){
+            this.effect = effect;
             this.time = time;
             return this;
         }

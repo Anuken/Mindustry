@@ -2,7 +2,7 @@ package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
-import io.anuke.mindustry.entities.StatusController.TransitionResult;
+import io.anuke.mindustry.entities.StatusController.StatusEntry;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.Content;
 
@@ -13,6 +13,10 @@ public class StatusEffect implements Content{
 	/**Duration of this status effect in ticks at maximum power.*/
 	public final float baseDuration;
 	public final int id;
+
+	public float damageMultiplier; //damage dealt
+	public float armorMultiplier; //armor points
+	public float speedMultiplier; //speed
 
 	/**Set of 'opposite' effects, which will decrease the duration of this effect when applied.*/
 	protected ObjectSet<StatusEffect> opposites = new ObjectSet<>();
@@ -33,7 +37,7 @@ public class StatusEffect implements Content{
 	 * @param to The state to transition to
 	 * @param time The current status effect time
 	 * @param newTime The time that the new status effect will last*/
-	public TransitionResult getTransition(Unit unit, StatusEffect to, float time, float newTime, TransitionResult result){
+	public StatusEntry getTransition(Unit unit, StatusEffect to, float time, float newTime, StatusEntry result){
 		if(opposites.contains(to)){
 			time -= newTime*oppositeScale;
 			if(time > 0) {
@@ -46,6 +50,10 @@ public class StatusEffect implements Content{
 
 	/**Called when this effect transitions to a new status effect.*/
 	public void onTransition(Unit unit, StatusEffect to){}
+
+	public boolean isOpposite(StatusEffect other){
+		return opposites.size > 0 && opposites.contains(other);
+	}
 
 	public void setOpposites(StatusEffect... effects){
 		for(StatusEffect e : effects){

@@ -101,6 +101,15 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 	}
 
 	@Override
+	public float getDamage(){
+		if(owner instanceof Unit){
+			return super.getDamage() * ((Unit) owner).getDamageMultipler();
+		}
+
+		return super.getDamage();
+	}
+
+	@Override
 	public int getTypeID() {
 		return typeID;
 	}

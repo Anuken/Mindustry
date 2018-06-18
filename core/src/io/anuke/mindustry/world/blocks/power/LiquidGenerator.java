@@ -4,32 +4,24 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.power.BurnerGenerator.BurnerEntity;
+import io.anuke.mindustry.world.blocks.power.ItemGenerator.ItemGeneratorEntity;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
-//TODO remove this class
-public class LiquidBurnerGenerator extends PowerGenerator {
+public abstract class LiquidGenerator extends PowerGenerator {
 	protected float minEfficiency = 0.2f;
 	protected float powerPerLiquid = 0.13f;
 	/**Maximum liquid used per frame.*/
 	protected float maxLiquidGenerate = 0.4f;
 	protected Effect generateEffect = BlockFx.generatespark;
 
-	public LiquidBurnerGenerator(String name) {
+	public LiquidGenerator(String name) {
 		super(name);
 		liquidCapacity = 30f;
 		hasLiquids = true;
-	}
-	
-	@Override
-	public void setStats(){
-		super.setStats();
-		//stats.add("powerliquid", Strings.toFixed(powerPerLiquid, 2) + " power/liquid");
-		//stats.add("maxliquidsecond", Strings.toFixed(maxLiquidGenerate*60f, 2) + " liquid/s");
 	}
 	
 	@Override
@@ -75,10 +67,11 @@ public class LiquidBurnerGenerator extends PowerGenerator {
 
 	@Override
 	public TileEntity getEntity() {
-		return new BurnerEntity();
+		return new ItemGeneratorEntity();
 	}
 
-	protected float getEfficiency(Liquid liquid){
-		return liquid.flammability;
-	}
+	/**Returns an efficiency value for the specified liquid.
+	 * Greater efficiency means more power generation.
+	 * If a liquid's efficiency is below {@link #minEfficiency}, it is not accepted.*/
+	protected abstract float getEfficiency(Liquid liquid);
 }

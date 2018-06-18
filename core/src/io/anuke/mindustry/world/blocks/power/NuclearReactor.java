@@ -24,7 +24,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class NuclearReactor extends LiquidBurnerGenerator {
+public class NuclearReactor extends PowerGenerator {
 	protected final int timerFuel = timers++;
 
 	protected final Translator tr = new Translator();
@@ -110,11 +110,6 @@ public class NuclearReactor extends LiquidBurnerGenerator {
 		}else{
 			distributePower(tile);
 		}
-	}
-	
-	@Override
-	public void drawLiquidCenter(Tile tile){
-		Draw.rect(name + "-center", tile.drawx(), tile.drawy());
 	}
 	
 	@Override

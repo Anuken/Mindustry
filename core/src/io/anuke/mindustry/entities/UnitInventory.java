@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.entities.traits.Saveable;
 import io.anuke.mindustry.type.AmmoEntry;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
@@ -9,7 +10,7 @@ import io.anuke.mindustry.type.ItemStack;
 
 import java.io.*;
 
-public class UnitInventory {
+public class UnitInventory implements Saveable{
     private Array<AmmoEntry> ammos = new Array<>();
     private int totalAmmo;
     private ItemStack item = new ItemStack(Items.stone, 0);
@@ -30,7 +31,8 @@ public class UnitInventory {
         infiniteAmmo = infinite;
     }
 
-    public void write(DataOutput stream) throws IOException {
+    @Override
+    public void writeSave(DataOutput stream) throws IOException {
         stream.writeShort(item.amount);
         stream.writeByte(item.item.id);
         stream.writeBoolean(infiniteAmmo);
@@ -42,7 +44,8 @@ public class UnitInventory {
         }
     }
 
-    public void read(DataInput stream) throws IOException {
+    @Override
+    public void readSave(DataInput stream) throws IOException {
         short iamount = stream.readShort();
         byte iid = stream.readByte();
         infiniteAmmo = stream.readBoolean();

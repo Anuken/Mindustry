@@ -37,7 +37,7 @@ public class Liquids implements ContentList {
                 flammability = 0.6f;
                 explosiveness = 0.6f;
                 tier = 1;
-                effect = StatusEffects.oiled;
+                effect = StatusEffects.tarred;
             }
         };
 

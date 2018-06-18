@@ -59,6 +59,10 @@ public abstract class BaseBlock {
                 && (tile.entity.liquids.liquid == liquid || tile.entity.liquids.amount <= 0.1f);
     }
 
+    public float handleAuxLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+        return 0f;
+    }
+
     public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         tile.entity.liquids.liquid = liquid;
         tile.entity.liquids.amount += amount;
@@ -118,31 +122,36 @@ public abstract class BaseBlock {
         next = next.target();
 
         if(next.block().hasLiquids && tile.entity.liquids.amount > 0f){
-            float ofract = next.entity.liquids.amount / next.block().liquidCapacity;
-            float fract = tile.entity.liquids.amount / liquidCapacity;
-            float flow = Math.min(Mathf.clamp((fract - ofract)*(1f)) * (liquidCapacity), tile.entity.liquids.amount);
-            flow = Math.min(flow, next.block().liquidCapacity - next.entity.liquids.amount - 0.001f);
+            if(next.entity.liquids.liquid == tile.entity.liquids.liquid) {
+                float ofract = next.entity.liquids.amount / next.block().liquidCapacity;
+                float fract = tile.entity.liquids.amount / liquidCapacity;
+                float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (liquidCapacity), tile.entity.liquids.amount);
+                flow = Math.min(flow, next.block().liquidCapacity - next.entity.liquids.amount - 0.001f);
 
-            if(flow > 0f && ofract <= fract && next.block().acceptLiquid(next, tile, tile.entity.liquids.liquid, flow)){
-                next.block().handleLiquid(next, tile, tile.entity.liquids.liquid, flow);
-                tile.entity.liquids.amount -= flow;
-                return flow;
-            }else if(ofract > 0.1f && fract > 0.1f){
-                Liquid liquid = tile.entity.liquids.liquid, other = next.entity.liquids.liquid;
-                if((other.flammability > 0.3f && liquid.temperature > 0.7f) ||
-                    (liquid.flammability > 0.3f && other.temperature > 0.7f)){
-                    tile.entity.damage(1 * Timers.delta());
-                    next.entity.damage(1 * Timers.delta());
-                    if(Mathf.chance(0.1 * Timers.delta())){
-                        Effects.effect(EnvironmentFx.fire, (tile.worldx() + next.worldx())/2f, (tile.worldy() + next.worldy())/2f);
-                    }
-                }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) ||
-                        (other.temperature > 0.7f && liquid.temperature < 0.55f)){
-                    tile.entity.liquids.amount -= Math.min(tile.entity.liquids.amount, 0.7f * Timers.delta());
-                    if(Mathf.chance(0.2f * Timers.delta())){
-                        Effects.effect(EnvironmentFx.steam, (tile.worldx() + next.worldx())/2f, (tile.worldy() + next.worldy())/2f);
+                if (flow > 0f && ofract <= fract && next.block().acceptLiquid(next, tile, tile.entity.liquids.liquid, flow)) {
+                    next.block().handleLiquid(next, tile, tile.entity.liquids.liquid, flow);
+                    tile.entity.liquids.amount -= flow;
+                    return flow;
+                } else if (ofract > 0.1f && fract > 0.1f) {
+                    Liquid liquid = tile.entity.liquids.liquid, other = next.entity.liquids.liquid;
+                    if ((other.flammability > 0.3f && liquid.temperature > 0.7f) ||
+                            (liquid.flammability > 0.3f && other.temperature > 0.7f)) {
+                        tile.entity.damage(1 * Timers.delta());
+                        next.entity.damage(1 * Timers.delta());
+                        if (Mathf.chance(0.1 * Timers.delta())) {
+                            Effects.effect(EnvironmentFx.fire, (tile.worldx() + next.worldx()) / 2f, (tile.worldy() + next.worldy()) / 2f);
+                        }
+                    } else if ((liquid.temperature > 0.7f && other.temperature < 0.55f) ||
+                            (other.temperature > 0.7f && liquid.temperature < 0.55f)) {
+                        tile.entity.liquids.amount -= Math.min(tile.entity.liquids.amount, 0.7f * Timers.delta());
+                        if (Mathf.chance(0.2f * Timers.delta())) {
+                            Effects.effect(EnvironmentFx.steam, (tile.worldx() + next.worldx()) / 2f, (tile.worldy() + next.worldy()) / 2f);
+                        }
                     }
                 }
+            }else{
+                float accepted = next.block().handleAuxLiquid(next, tile, tile.entity.liquids.liquid, tile.entity.liquids.amount);
+                tile.entity.liquids.amount -= accepted;
             }
         }else if(leak && !next.block().solid && !next.block().hasLiquids){
             float leakAmount = Math.min(tile.entity.liquids.amount, tile.entity.liquids.amount/1.5f);

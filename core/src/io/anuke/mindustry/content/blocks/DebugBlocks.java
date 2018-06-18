@@ -50,6 +50,9 @@ public class DebugBlocks extends BlockList implements ContentList{
         };
 
         itemSource = new Sorter("itemsource") {
+            {
+                hasItems = true;
+            }
             @Override
             public void update(Tile tile) {
                 SorterEntity entity = tile.entity();

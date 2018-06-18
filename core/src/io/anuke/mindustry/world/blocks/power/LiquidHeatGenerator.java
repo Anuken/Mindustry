@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.mindustry.type.Liquid;
 
-public class LiquidHeatGenerator extends LiquidBurnerGenerator {
+public class LiquidHeatGenerator extends LiquidGenerator {
 
     public LiquidHeatGenerator(String name) {
         super(name);
@@ -10,6 +10,6 @@ public class LiquidHeatGenerator extends LiquidBurnerGenerator {
 
     @Override
     protected float getEfficiency(Liquid liquid){
-        return liquid.flammability;
+        return liquid.temperature-0.5f;
     }
 }

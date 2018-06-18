@@ -3,93 +3,73 @@ package io.anuke.mindustry.content.blocks;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.defense.RepairTurret;
-import io.anuke.mindustry.world.blocks.defense.ShieldBlock;
 import io.anuke.mindustry.world.blocks.distribution.WarpGate;
 import io.anuke.mindustry.world.blocks.power.*;
 
 public class PowerBlocks extends BlockList implements ContentList {
-    public static Block combustiongenerator, thermalgenerator, liquidcombustiongenerator, rtgenerator, solarpanel, largesolarpanel,
-            nuclearReactor, fusionReactor, repairturret, megarepairturret, shieldgenerator, battery, batteryLarge, powernode, powernodelarge, warpgate;
+    public static Block combustiongenerator, thermalgenerator, turbinegenerator, rtgenerator, solarpanel, largesolarpanel,
+            nuclearReactor, fusionReactor, battery, batteryLarge, powernode, powernodelarge, warpgate;
 
     @Override
     public void load() {
-        combustiongenerator = new BurnerGenerator("combustiongenerator") {{
+        combustiongenerator = new BurnerGenerator("combustion-generator") {{
             powerOutput = 0.04f;
             powerCapacity = 40f;
         }};
 
-        thermalgenerator = new LiquidHeatGenerator("thermalgenerator") {{
+        thermalgenerator = new LiquidHeatGenerator("thermal-generator") {{
             maxLiquidGenerate = 0.5f;
             powerPerLiquid = 0.08f;
             powerCapacity = 40f;
             generateEffect = BlockFx.redgeneratespark;
+            size = 2;
         }};
 
-        liquidcombustiongenerator = new LiquidBurnerGenerator("liquidcombustiongenerator") {{
-            maxLiquidGenerate = 0.4f;
-            powerPerLiquid = 0.12f;
+        turbinegenerator = new TurbineGenerator("turbine-generator") {{
+            powerOutput = 0.04f;
             powerCapacity = 40f;
+            size = 2;
         }};
 
-        rtgenerator = new DecayGenerator("rtgenerator") {{
+        rtgenerator = new DecayGenerator("rtg-generator") {{
             powerCapacity = 40f;
             powerOutput = 0.02f;
             itemDuration = 500f;
         }};
 
-        solarpanel = new SolarGenerator("solarpanel") {{
+        solarpanel = new SolarGenerator("solar-panel") {{
             generation = 0.003f;
         }};
 
-        largesolarpanel = new SolarGenerator("largesolarpanel") {{
+        largesolarpanel = new SolarGenerator("large-solar-panel") {{
             size = 3;
             generation = 0.012f;
         }};
 
-        nuclearReactor = new NuclearReactor("nuclearreactor") {{
+        nuclearReactor = new NuclearReactor("nuclear-reactor") {{
             size = 3;
             health = 600;
         }};
 
-        fusionReactor = new FusionReactor("fusionreactor") {{
+        fusionReactor = new FusionReactor("fusion-reactor") {{
             size = 4;
             health = 600;
-        }};
-
-        repairturret = new RepairTurret("repairturret") {{
-            range = 30;
-            reload = 20f;
-            health = 60;
-            powerUsed = 0.08f;
-        }};
-
-        megarepairturret = new RepairTurret("megarepairturret") {{
-            range = 44;
-            reload = 12f;
-            health = 90;
-            powerUsed = 0.13f;
-            size = 2;
-        }};
-
-        shieldgenerator = new ShieldBlock("shieldgenerator") {{
-            health = 400;
         }};
 
         battery = new PowerGenerator("battery") {{
             powerCapacity = 320f;
         }};
 
-        batteryLarge = new PowerGenerator("batterylarge") {{
+        batteryLarge = new PowerGenerator("battery-large") {{
             size = 3;
             powerCapacity = 2000f;
         }};
 
-        powernode = new PowerDistributor("powernode") {{
+        powernode = new PowerDistributor("power-node") {{
             shadow = "shadow-round-1";
         }};
 
-        powernodelarge = new PowerDistributor("powernodelarge") {{
+        powernodelarge = new PowerDistributor("power-node-large") {{
             size = 2;
             powerSpeed = 1f;
             maxNodes = 5;

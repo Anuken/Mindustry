@@ -86,7 +86,7 @@ public class Blocks extends BlockList implements ContentList{
         oil = new Floor("oil") {{
             placeableOn = false;
             liquidColor = Color.valueOf("292929");
-            status = StatusEffects.oiled;
+            status = StatusEffects.tarred;
             statusIntensity = 1f;
             speedMultiplier = 0.2f;
             variants = 0;

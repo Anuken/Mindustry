@@ -81,7 +81,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     @Override
     public void damage(float amount){
-        super.damage(amount * Mathf.clamp(1f-getArmor()/100f));
+        super.damage(calculateDamage(amount));
         hitTime = hitDuration;
     }
 
@@ -117,17 +117,15 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         byte yv = stream.readByte();
         float rotation = stream.readShort()/2f;
         int health = stream.readShort();
-        byte effect = stream.readByte();
-        float etime = stream.readShort()/2f;
 
-        this.inventory.read(stream);
+        this.status.readSave(stream);
+        this.inventory.readSave(stream);
         this.team = Team.values()[team];
         this.health = health;
         this.x = x;
         this.y = y;
         this.velocity.set(xv / velocityPercision, yv / velocityPercision);
         this.rotation = rotation;
-        this.status.set(StatusEffect.getByID(effect), etime);
     }
 
     public void writeSave(DataOutput stream, boolean net) throws IOException {
@@ -138,13 +136,20 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         stream.writeByte((byte)(Mathf.clamp(velocity.y, -maxAbsVelocity, maxAbsVelocity) * velocityPercision));
         stream.writeShort((short)(rotation*2));
         stream.writeShort((short)health);
-        stream.writeByte(status.current().id);
-        stream.writeShort((short)(status.getTime()*2));
-        inventory.write(stream);
+        status.writeSave(stream);
+        inventory.writeSave(stream);
     }
 
-    public StatusEffect getStatus(){
-        return status.current();
+    public float calculateDamage(float amount){
+        return amount * Mathf.clamp(1f-getArmor()/100f*status.getArmorMultiplier());
+    }
+
+    public float getDamageMultipler(){
+        return status.getDamageMultiplier();
+    }
+
+    public boolean hasEffect(StatusEffect effect){
+        return status.hasEffect(effect);
     }
 
     public TileEntity getClosestCore(){
@@ -178,9 +183,9 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         Floor floor = getFloorOn();
         Tile tile = world.tileWorld(x, y);
 
-        velocity.limit(maxVelocity);
-
         status.update(this);
+
+        velocity.limit(maxVelocity).scl(status.getSpeedMultiplier());
 
         if(isFlying()) {
             x += velocity.x / getMass() * Timers.delta();

@@ -156,7 +156,7 @@ public class TurretBullets extends BulletList implements ContentList {
             {
                 speed = 2f;
                 drag = 0.03f;
-                status = StatusEffects.oiled;
+                status = StatusEffects.tarred;
                 statusIntensity = 0.5f;
             }
         };

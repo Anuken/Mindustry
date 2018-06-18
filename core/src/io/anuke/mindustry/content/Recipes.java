@@ -89,21 +89,16 @@ public class Recipes implements ContentList{
         new Recipe(power, PowerBlocks.powernodelarge, new ItemStack(Items.steel, 3), new ItemStack(Items.iron, 3));
         new Recipe(power, PowerBlocks.battery, new ItemStack(Items.steel, 5), new ItemStack(Items.iron, 5));
         new Recipe(power, PowerBlocks.batteryLarge, new ItemStack(Items.steel, 5), new ItemStack(Items.iron, 5));
-        new Recipe(power, PowerBlocks.combustiongenerator, new ItemStack(Items.iron, 30));
-        new Recipe(power, PowerBlocks.liquidcombustiongenerator, new ItemStack(Items.iron, 30));
-        new Recipe(power, PowerBlocks.thermalgenerator, new ItemStack(Items.steel, 30));
-        new Recipe(power, PowerBlocks.rtgenerator, new ItemStack(Items.titanium, 20), new ItemStack(Items.steel, 20));
+        new Recipe(power, PowerBlocks.combustiongenerator, new ItemStack(Items.iron, 1));
+        new Recipe(power, PowerBlocks.turbinegenerator, new ItemStack(Items.iron, 1));
+        new Recipe(power, PowerBlocks.thermalgenerator, new ItemStack(Items.steel, 1));
+        new Recipe(power, PowerBlocks.rtgenerator, new ItemStack(Items.titanium, 1), new ItemStack(Items.steel, 1));
         new Recipe(power, PowerBlocks.solarpanel, new ItemStack(Items.iron, 30), new ItemStack(Items.silicon, 20));
         new Recipe(power, PowerBlocks.largesolarpanel, new ItemStack(Items.iron, 30), new ItemStack(Items.silicon, 20));
         new Recipe(power, PowerBlocks.nuclearReactor, new ItemStack(Items.titanium, 40), new ItemStack(Items.surgealloy, 40), new ItemStack(Items.steel, 50));
         new Recipe(power, PowerBlocks.fusionReactor, new ItemStack(Items.titanium, 40), new ItemStack(Items.surgealloy, 40), new ItemStack(Items.steel, 50));
 
-        new Recipe(power, PowerBlocks.shieldgenerator, new ItemStack(Items.titanium, 30), new ItemStack(Items.surgealloy, 30));
-
         new Recipe(distribution, PowerBlocks.warpgate, new ItemStack(Items.steel, 1));
-
-        new Recipe(power, PowerBlocks.repairturret, new ItemStack(Items.iron, 30));
-        new Recipe(power, PowerBlocks.megarepairturret, new ItemStack(Items.iron, 20), new ItemStack(Items.steel, 30));
 
         new Recipe(liquid, LiquidBlocks.conduit, new ItemStack(Items.steel, 1));
         new Recipe(liquid, LiquidBlocks.pulseconduit, new ItemStack(Items.titanium, 1), new ItemStack(Items.steel, 1));
@@ -123,6 +118,9 @@ public class Recipes implements ContentList{
 
         new Recipe(units, UnitBlocks.droneFactory, new ItemStack(Items.iron, 50));
         new Recipe(units, UnitBlocks.reconstructor, new ItemStack(Items.iron, 1));
+
+        new Recipe(units, UnitBlocks.overdriveProjector, new ItemStack(Items.iron, 1));
+        new Recipe(units, UnitBlocks.shieldProjector, new ItemStack(Items.iron, 1));
 
 
         //new Recipe(units, UnitBlocks.vtolFactory, new ItemStack(Items.steel, 10));

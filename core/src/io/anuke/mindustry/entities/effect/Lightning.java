@@ -89,7 +89,7 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait{
                 if(hitrect.contains(x2, y2) || hitrect.contains(fx, fy)){
                     float result = damage;
 
-                    if(entity.getStatus() == StatusEffects.wet)
+                    if(entity.hasEffect(StatusEffects.wet))
                         result = (result * wetDamageMultiplier);
 
                     entity.damage(result);
