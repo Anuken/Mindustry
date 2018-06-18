@@ -33,6 +33,11 @@ public class PowerSmelter extends PowerBlock {
     protected Item result;
     protected float powerUse;
 
+    protected float minFlux = 0.2f;
+    protected int fluxNeeded = 1;
+    protected float baseFluxChance = 0.15f;
+    protected boolean useFlux = false;
+
     protected float heatUpTime = 80f;
     protected float minHeat = 0.5f;
 
@@ -42,13 +47,12 @@ public class PowerSmelter extends PowerBlock {
             burnEffect = BlockFx.fuelburn;
     protected Color flameColor = Color.valueOf("ffc999");
 
-    protected int capacity = 20;
-
     public PowerSmelter(String name) {
         super(name);
         hasItems = true;
         update = true;
         solid = true;
+        itemCapacity = 20;
     }
 
     @Override
@@ -57,7 +61,7 @@ public class PowerSmelter extends PowerBlock {
         bars.remove(BarType.inventory);
 
         for(ItemStack item : inputs){
-            bars.add(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.items.getItem(item.item) / capacity));
+            bars.add(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.items.getItem(item.item) / itemCapacity));
         }
     }
 
@@ -70,8 +74,8 @@ public class PowerSmelter extends PowerBlock {
         stats.add(BlockStat.powerUse, powerUse * 60f);
         stats.add(BlockStat.outputItem, result.toString());
         stats.add(BlockStat.craftSpeed, 60f/craftTime);
-        stats.add(BlockStat.inputItemCapacity, capacity);
-        stats.add(BlockStat.outputItemCapacity, capacity);
+        stats.add(BlockStat.inputItemCapacity, itemCapacity);
+        stats.add(BlockStat.outputItemCapacity, itemCapacity);
     }
 
     @Override
@@ -104,14 +108,31 @@ public class PowerSmelter extends PowerBlock {
             }
         }
 
-        if(entity.items.getItem(result) >= capacity //output full
+        if(entity.items.getItem(result) >= itemCapacity //output full
                 || entity.heat <= minHeat //not burning
                 || !entity.timer.get(timerCraft, craftTime)){ //not yet time
             return;
         }
 
-        for(ItemStack item : inputs){
-            entity.items.removeItem(item.item, item.amount);
+        boolean consumeInputs = false;
+
+        if(useFlux){
+            //remove flux materials if present
+            for(Item item : Item.all()){
+                if(item.fluxiness >= minFlux && tile.entity.items.getItem(item) >= fluxNeeded){
+                    tile.entity.items.removeItem(item, fluxNeeded);
+
+                    //chance of not consuming inputs if flux material present
+                    consumeInputs = !Mathf.chance(item.fluxiness * baseFluxChance);
+                    break;
+                }
+            }
+        }
+
+        if(consumeInputs) {
+            for (ItemStack item : inputs) {
+                entity.items.removeItem(item.item, item.amount);
+            }
         }
 
         offloadNear(tile, result);
@@ -123,11 +144,20 @@ public class PowerSmelter extends PowerBlock {
 
         for(ItemStack stack : inputs){
             if(stack.item == item){
-                return tile.entity.items.getItem(item) < capacity;
+                return tile.entity.items.getItem(item) < itemCapacity;
             }
         }
 
+        if(useFlux && item.fluxiness >= minFlux){
+            return tile.entity.items.getItem(item) < itemCapacity;
+        }
+
         return false;
+    }
+
+    @Override
+    public int getMaximumAccepted(Tile tile, Item item) {
+        return itemCapacity - tile.entity.items.getItem(item);
     }
 
     @Override

@@ -109,7 +109,7 @@ public class WeaponBlocks extends BlockList implements ContentList {
 		salvo = new ItemTurret("salvo") {{
 			size = 2;
 			range = 100f;
-			ammoTypes = new AmmoType[]{AmmoTypes.shellExplosive, AmmoTypes.shellLead, AmmoTypes.shellPlastic, AmmoTypes.shellThorium};
+			ammoTypes = new AmmoType[]{AmmoTypes.bulletIron, AmmoTypes.bulletLead, AmmoTypes.bulletSteel, AmmoTypes.bulletThermite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
 			reload = 70f;
 			restitution = 0.03f;
 			ammoEjectBack = 3f;

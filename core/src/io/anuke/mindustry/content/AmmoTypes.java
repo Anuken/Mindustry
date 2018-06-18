@@ -8,7 +8,7 @@ import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.ContentList;
 
 public class AmmoTypes implements ContentList {
-    public static AmmoType bulletIron, bulletLead, bulletSteel, bulletThorium, bulletSilicon, bulletThermite, flakLead, flakExplosive, flakPlastic, flakSurge, shellLead, shellExplosive, shellPlastic, shellThorium, missileExplosive, missileIncindiary, missileSurge, artilleryLead, artilleryThorium, artilleryPlastic, artilleryHoming, artilleryIncindiary, basicFlame, lancerLaser, lightning, spectreLaser, meltdownLaser, fuseShotgun, oil, water, lava, cryofluid;
+    public static AmmoType bulletIron, bulletLead, bulletSteel, bulletThorium, bulletSilicon, bulletThermite, flakLead, flakExplosive, flakPlastic, flakSurge, missileExplosive, missileIncindiary, missileSurge, artilleryLead, artilleryThorium, artilleryPlastic, artilleryHoming, artilleryIncindiary, basicFlame, lancerLaser, lightning, spectreLaser, meltdownLaser, fuseShotgun, oil, water, lava, cryofluid;
 
     @Override
     public void load() {
@@ -65,28 +65,6 @@ public class AmmoTypes implements ContentList {
         flakSurge = new AmmoType(Items.surgealloy, FlakBullets.surge, 5) {{
             shootEffect = ShootFx.shootSmall;
             smokeEffect = ShootFx.shootSmallSmoke;
-        }};
-
-        //shells
-
-        shellLead = new AmmoType(Items.lead, ShellBullets.lead, 1) {{
-            shootEffect = ShootFx.shootBig2;
-            smokeEffect = ShootFx.shootBigSmoke2;
-        }};
-
-        shellExplosive = new AmmoType(Items.blastCompound, ShellBullets.explosive, 1) {{
-            shootEffect = ShootFx.shootBig2;
-            smokeEffect = ShootFx.shootBigSmoke2;
-        }};
-
-        shellPlastic = new AmmoType(Items.plasteel, ShellBullets.plastic, 1) {{
-            shootEffect = ShootFx.shootBig2;
-            smokeEffect = ShootFx.shootBigSmoke2;
-        }};
-
-        shellThorium = new AmmoType(Items.thorium, ShellBullets.thorium, 1) {{
-            shootEffect = ShootFx.shootBig2;
-            smokeEffect = ShootFx.shootBigSmoke2;
         }};
 
         //missiles

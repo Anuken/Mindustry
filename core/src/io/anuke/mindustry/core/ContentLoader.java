@@ -55,7 +55,6 @@ public class ContentLoader {
         new ArtilleryBullets(),
         new FlakBullets(),
         new MissileBullets(),
-        new ShellBullets(),
         new StandardBullets(),
         new TurretBullets(),
 

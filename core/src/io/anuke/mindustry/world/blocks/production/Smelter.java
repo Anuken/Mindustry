@@ -26,24 +26,27 @@ public class Smelter extends Block{
 	protected Item fuel;
 	protected Item result;
 
-	protected float craftTime = 20f; //time to craft one item, so max 3 items per second by default
-	protected float burnDuration = 50f; //by default, the fuel will burn 45 frames, so that's 2.5 items/fuel at most
+	protected float minFlux = 0.2f;
+	protected float baseFluxChance = 0.15f;
+	protected boolean useFlux = false;
+
+	protected float craftTime = 20f;
+	protected float burnDuration = 50f;
 	protected Effect craftEffect = BlockFx.smelt, burnEffect = BlockFx.fuelburn;
 	protected Color flameColor = Color.valueOf("ffb879");
-
-	protected int capacity = 20;
 
 	public Smelter(String name) {
 		super(name);
 		update = true;
 		hasItems = true;
 		solid = true;
+		itemCapacity = 20;
 	}
 
 	@Override
 	public void setBars(){
 		for(Item item : inputs){
-			bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.getItem(item)/capacity));
+			bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.getItem(item)/itemCapacity));
 		}
 	}
 	
@@ -56,10 +59,21 @@ public class Smelter extends Block{
 		stats.add(BlockStat.inputItems, Arrays.toString(inputs));
 		stats.add(BlockStat.outputItem, result.toString());
 		stats.add(BlockStat.craftSpeed, 60f/craftTime);
-		stats.add(BlockStat.inputItemCapacity, capacity);
-		stats.add(BlockStat.outputItemCapacity, capacity);
+		stats.add(BlockStat.inputItemCapacity, itemCapacity);
+		stats.add(BlockStat.outputItemCapacity, itemCapacity);
 	}
-	
+
+	@Override
+	public void init() {
+		super.init();
+
+		for(Item item : inputs){
+			if(item.fluxiness >= minFlux && useFlux){
+				throw new IllegalArgumentException("'" + name + "' has input item '" + item.name + "', which is a flux, when useFlux is enabled. To prevent ambiguous item use, either remove this flux item from the inputs, or set useFlux to false.");
+			}
+		}
+	}
+
 	@Override
 	public void update(Tile tile){
 		SmelterEntity entity = tile.entity();
@@ -90,18 +104,40 @@ public class Smelter extends Block{
 			}
 		}
 
-		if(entity.items.getItem(result) >= capacity //output full
+		if(entity.items.getItem(result) >= itemCapacity //output full
 				|| entity.burnTime <= 0 //not burning
 				|| !entity.timer.get(timerCraft, craftTime)){ //not yet time
 			return;
 		}
 
-		for(Item item : inputs){
-			entity.items.removeItem(item, 1);
+		boolean consumeInputs = false;
+
+		if(useFlux){
+			//remove flux materials if present
+			for(Item item : Item.all()){
+				if(item.fluxiness >= minFlux && tile.entity.items.getItem(item) > 0){
+					tile.entity.items.removeItem(item, 1);
+
+					//chance of not consuming inputs if flux material present
+					consumeInputs = !Mathf.chance(item.fluxiness * baseFluxChance);
+					break;
+				}
+			}
+		}
+
+		if(consumeInputs) {
+			for (Item item : inputs) {
+				entity.items.removeItem(item, 1);
+			}
 		}
 		
 		offloadNear(tile, result);
 		Effects.effect(craftEffect, flameColor, tile.drawx(), tile.drawy());
+	}
+
+	@Override
+	public int getMaximumAccepted(Tile tile, Item item) {
+		return itemCapacity - tile.entity.items.getItem(item);
 	}
 
 	@Override
@@ -115,7 +151,8 @@ public class Smelter extends Block{
 			}
 		}
 
-		return (isInput && tile.entity.items.getItem(item) < capacity) || (item == fuel && tile.entity.items.getItem(fuel) < capacity);
+		return (isInput && tile.entity.items.getItem(item) < itemCapacity) || (item == fuel && tile.entity.items.getItem(fuel) < itemCapacity) ||
+				(useFlux && item.fluxiness >= minFlux && tile.entity.items.getItem(item) < itemCapacity);
 	}
 
 	@Override

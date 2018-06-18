@@ -21,6 +21,7 @@ public class CraftingBlocks extends BlockList implements ContentList {
             fuel = Items.coal;
             result = Items.steel;
             craftTime = 35f;
+            useFlux = true;
         }};
 
         arcsmelter = new PowerSmelter("arc-smelter") {{
@@ -31,6 +32,9 @@ public class CraftingBlocks extends BlockList implements ContentList {
             powerUse = 0.1f;
             craftTime = 25f;
             size = 2;
+
+            useFlux = true;
+            fluxNeeded = 2;
         }};
 
         siliconsmelter = new PowerSmelter("silicon-smelter") {{
@@ -79,6 +83,9 @@ public class CraftingBlocks extends BlockList implements ContentList {
             powerUse = 0.3f;
             craftTime = 50f;
             size = 2;
+
+            useFlux = true;
+            fluxNeeded = 4;
         }};
 
         alloyfuser = new PowerSmelter("alloy-fuser") {{
@@ -89,6 +96,9 @@ public class CraftingBlocks extends BlockList implements ContentList {
             powerUse = 0.4f;
             craftTime = 30f;
             size = 3;
+
+            useFlux = true;
+            fluxNeeded = 4;
         }};
 
         cryofluidmixer = new LiquidMixer("cryofluidmixer") {{

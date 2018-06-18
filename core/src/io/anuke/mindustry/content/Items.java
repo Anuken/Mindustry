@@ -30,7 +30,6 @@ public class Items implements ContentList{
         coal = new Item("coal", Color.valueOf("272727")) {{
             explosiveness = 0.2f;
             flammability = 0.5f;
-            fluxiness = 0.3f;
             hardness = 2;
         }};
 

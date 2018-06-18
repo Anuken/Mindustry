@@ -24,10 +24,14 @@ public abstract class BaseBlock {
     /**Returns the amount of items this block can accept.*/
     public int acceptStack(Item item, int amount, Tile tile, Unit source){
         if(acceptItem(item, tile, tile) && hasItems && source.getTeam() == tile.getTeam()){
-            return Math.min(itemCapacity - tile.entity.items.totalItems(), amount);
+            return Math.min(getMaximumAccepted(tile, item), amount);
         }else{
             return 0;
         }
+    }
+
+    public int getMaximumAccepted(Tile tile, Item item){
+        return itemCapacity - tile.entity.items.totalItems();
     }
 
     /**Remove a stack from this inventory, and return the amount removed.*/
