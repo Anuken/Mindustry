@@ -13,6 +13,7 @@ public class Recipes implements ContentList{
     @Override
 	public void load (){
         new Recipe(defense, DefenseBlocks.ironwall, new ItemStack(Items.iron, 12));
+        new Recipe(defense, DefenseBlocks.ironwalllarge, new ItemStack(Items.iron, 12));
         new Recipe(defense, DefenseBlocks.steelwall, new ItemStack(Items.steel, 12));
         new Recipe(defense, DefenseBlocks.titaniumwall, new ItemStack(Items.titanium, 12));
         new Recipe(defense, DefenseBlocks.diriumwall, new ItemStack(Items.surgealloy, 12));
@@ -23,6 +24,8 @@ public class Recipes implements ContentList{
         new Recipe(defense, DefenseBlocks.largedoor, new ItemStack(Items.steel, 3 * 4), new ItemStack(Items.iron, 3 * 4 * 4));
         new Recipe(defense, DefenseBlocks.deflectorwall, new ItemStack(Items.titanium, 1));
         new Recipe(defense, DefenseBlocks.deflectorwalllarge, new ItemStack(Items.titanium, 1));
+        new Recipe(defense, DefenseBlocks.phasewall, new ItemStack(Items.titanium, 1));
+        new Recipe(defense, DefenseBlocks.phasewalllarge, new ItemStack(Items.titanium, 1));
 
         new Recipe(distribution, DistributionBlocks.conveyor, new ItemStack(Items.iron, 1));
         new Recipe(distribution, DistributionBlocks.steelconveyor, new ItemStack(Items.steel, 1));
