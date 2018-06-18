@@ -21,7 +21,6 @@ public class Junction extends Block{
 		solid = true;
 		instantTransfer = true;
 		group = BlockGroup.transportation;
-		hasItems = false;
 	}
 
 	@Override

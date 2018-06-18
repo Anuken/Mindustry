@@ -12,7 +12,7 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
 
 public abstract class BaseBlock {
-    public boolean hasItems = true;
+    public boolean hasItems;
     public boolean hasLiquids;
     public boolean hasPower;
 

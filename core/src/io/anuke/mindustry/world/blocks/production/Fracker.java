@@ -13,6 +13,7 @@ public class Fracker extends SolidPump {
 
     public Fracker(String name) {
         super(name);
+        hasItems = true;
     }
 
     @Override

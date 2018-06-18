@@ -8,6 +8,7 @@ public class Pulverizer extends GenericCrafter {
 
     public Pulverizer(String name) {
         super(name);
+        hasItems = true;
     }
 
     @Override

@@ -77,6 +77,7 @@ public class WarpGate extends PowerBlock{
 		size = 3;
 		itemCapacity = 100;
 		hasLiquids = true;
+		hasItems = true;
 		liquidCapacity = 100f;
 		configurable = true;
 	}

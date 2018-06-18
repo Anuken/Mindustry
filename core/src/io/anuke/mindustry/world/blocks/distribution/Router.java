@@ -13,6 +13,7 @@ public class Router extends Block{
 		update = true;
 		solid = true;
 		itemCapacity = 20;
+		hasItems = true;
 		group = BlockGroup.transportation;
 		autoSleep = true;
 	}

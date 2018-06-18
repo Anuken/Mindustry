@@ -36,6 +36,7 @@ public class Smelter extends Block{
 	public Smelter(String name) {
 		super(name);
 		update = true;
+		hasItems = true;
 		solid = true;
 	}
 

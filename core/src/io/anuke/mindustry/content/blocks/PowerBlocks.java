@@ -78,13 +78,11 @@ public class PowerBlocks extends BlockList implements ContentList {
 
         battery = new PowerGenerator("battery") {{
             powerCapacity = 320f;
-            hasItems = false;
         }};
 
         batteryLarge = new PowerGenerator("batterylarge") {{
             size = 3;
             powerCapacity = 2000f;
-            hasItems = false;
         }};
 
         powernode = new PowerDistributor("powernode") {{

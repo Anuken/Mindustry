@@ -9,6 +9,7 @@ public abstract class StorageBlock extends Block {
 
     public StorageBlock(String name){
         super(name);
+        hasItems = true;
     }
 
     /**Removes an item and returns it. If item is not null, it should return the item.

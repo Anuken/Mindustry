@@ -8,7 +8,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.units.*;
 
 public class UnitBlocks extends BlockList implements ContentList {
-    public static Block resupplyPoint, repairPoint, droneFactory, dropPoint, reconstructor;
+    public static Block resupplyPoint, repairPoint, droneFactory, dropPoint, reconstructor, overdriveProjector, shieldProjector;
 
     @Override
     public void load() {
@@ -37,6 +37,14 @@ public class UnitBlocks extends BlockList implements ContentList {
         }};
 
         reconstructor = new Reconstructor("reconstructor") {{
+            size = 2;
+        }};
+
+        overdriveProjector = new OverdriveProjector("overdriveprojector") {{
+            size = 2;
+        }};
+
+        shieldProjector = new ShieldProjector("shieldprojector") {{
             size = 2;
         }};
     }

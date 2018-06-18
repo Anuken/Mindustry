@@ -65,6 +65,7 @@ public class Drill extends Block{
 		group = BlockGroup.drills;
 		hasLiquids = true;
 		liquidCapacity = 5f;
+		hasItems = true;
 	}
 
 	@Override

@@ -47,6 +47,7 @@ public class ItemBridge extends Block {
         expanded = true;
         itemCapacity = 30;
         configurable = true;
+        hasItems = true;
     }
 
     @Override

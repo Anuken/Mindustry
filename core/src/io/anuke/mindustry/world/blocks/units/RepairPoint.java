@@ -34,7 +34,6 @@ public class RepairPoint extends Block{
         flags = EnumSet.of(BlockFlag.repair);
         layer = Layer.turret;
         layer2 = Layer.laser;
-        hasItems = false;
         hasPower = true;
         powerCapacity = 20f;
     }

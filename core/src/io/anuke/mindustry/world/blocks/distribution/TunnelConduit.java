@@ -16,6 +16,7 @@ public class TunnelConduit extends LiquidBlock {
         rotate = true;
         solid = true;
         health = 70;
+        hasItems = true;
         instantTransfer = true;
     }
 

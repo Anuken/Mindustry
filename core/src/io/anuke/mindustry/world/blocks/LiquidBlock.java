@@ -15,7 +15,6 @@ public class LiquidBlock extends Block{
 		update = true;
 		solid = true;
 		hasLiquids = true;
-		hasItems = false;
 		group = BlockGroup.liquids;
 	}
 

@@ -39,7 +39,6 @@ import static io.anuke.mindustry.Vars.*;
 
 public class NetServer extends Module{
     private final static float serverSyncTime = 4, kickDuration = 30 * 1000;
-    private final static boolean preventDuplicatNames = false;
     private final static Vector2 vector = new Vector2();
     /**If a play goes away of their server-side coordinates by this distance, they get teleported back.*/
     private final static float correctDist = 16f;
@@ -94,10 +93,17 @@ public class NetServer extends Module{
                 return;
             }
 
-            if(preventDuplicatNames) {
+            boolean preventDuplicates = headless;
+
+            if(preventDuplicates) {
                 for (Player player : playerGroup.all()) {
                     if (player.name.equalsIgnoreCase(packet.name)) {
                         kick(id, KickReason.nameInUse);
+                        return;
+                    }
+
+                    if (player.uuid.equals(packet.uuid)) {
+                        kick(id, KickReason.idInUse);
                         return;
                     }
                 }

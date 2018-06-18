@@ -63,11 +63,14 @@ public class PausedDialog extends FloatingDialog{
 
 			content().row();
 
-			if(!gwt) {
-				content().addButton("$text.hostserver", () -> {
+			content().addButton("$text.hostserver", () -> {
+				if(!gwt){
 					ui.host.show();
-				}).disabled(b -> Net.active());
-			}
+				}else{
+					ui.showInfo("$text.host.web");
+				}
+			}).disabled(b -> Net.active());
+
 
             content().row();
 

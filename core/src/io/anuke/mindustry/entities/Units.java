@@ -216,6 +216,27 @@ public class Units {
         });
     }
 
+    /**Iterates over all units in a circle around this position.*/
+    public static void getNearby(Team team, float x, float y, float radius, Consumer<Unit> cons){
+        rect.setSize(radius * 2).setCenter(x, y);
+
+        EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
+        if(!group.isEmpty()){
+            EntityPhysics.getNearby(group, rect, entity -> {
+                if(entity.distanceTo(x, y) <= radius) {
+                    cons.accept((Unit) entity);
+                }
+            });
+        }
+
+        //now check all players
+        EntityPhysics.getNearby(playerGroup, rect, player -> {
+            if(((Unit)player).team == team && player.distanceTo(x, y) <= radius){
+                cons.accept((Unit)player);
+            }
+        });
+    }
+
     /**Iterates over all units in a rectangle.*/
     public static void getNearby(Rectangle rect, Consumer<Unit> cons){
 

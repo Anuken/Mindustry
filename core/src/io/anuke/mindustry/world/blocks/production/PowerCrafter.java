@@ -28,6 +28,7 @@ public class PowerCrafter extends Block{
         solid = true;
         update = true;
         hasPower = true;
+        hasItems = true;
     }
 
     @Override

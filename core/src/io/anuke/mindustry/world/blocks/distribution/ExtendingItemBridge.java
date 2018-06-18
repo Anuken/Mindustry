@@ -14,6 +14,7 @@ public class ExtendingItemBridge extends ItemBridge {
 
     public ExtendingItemBridge(String name) {
         super(name);
+        hasItems = true;
     }
 
     @Override

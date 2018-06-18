@@ -36,6 +36,7 @@ public class MechFactory extends Block{
     public MechFactory(String name){
         super(name);
         solid = true;
+        hasItems = true;
         destructible = true;
         configurable = true;
         update = true;

@@ -46,6 +46,7 @@ public class PowerSmelter extends PowerBlock {
 
     public PowerSmelter(String name) {
         super(name);
+        hasItems = true;
         update = true;
         solid = true;
     }

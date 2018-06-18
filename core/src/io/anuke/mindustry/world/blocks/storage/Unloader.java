@@ -15,6 +15,7 @@ public class Unloader extends Block {
         solid = true;
         health = 70;
         group = BlockGroup.transportation;
+        hasItems = true;
     }
 
     @Override

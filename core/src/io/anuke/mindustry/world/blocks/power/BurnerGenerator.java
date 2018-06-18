@@ -27,6 +27,7 @@ public class BurnerGenerator extends PowerGenerator {
 	public BurnerGenerator(String name) {
 		super(name);
 		itemCapacity = 20;
+		hasItems = true;
 	}
 
 	@Override

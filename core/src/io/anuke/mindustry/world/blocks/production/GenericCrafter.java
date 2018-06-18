@@ -25,7 +25,7 @@ import java.io.IOException;
 public class GenericCrafter extends Block{
 	protected final int timerDump = timers++;
 	
-	/**Can be null. If you use this, make sure to set hasInvetory to true!*/
+	/**Can be null. If you use this, make sure to set hasItems to true!*/
 	protected ItemStack inputItem;
 	/**Can be null. If you use this, make sure to set hasLiquids to true!*/
 	protected Liquid inputLiquid;

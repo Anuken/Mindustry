@@ -19,6 +19,7 @@ public class BufferedItemBridge extends ExtendingItemBridge {
     public BufferedItemBridge(String name) {
         super(name);
         hasPower = false;
+        hasItems = true;
     }
 
     @Override

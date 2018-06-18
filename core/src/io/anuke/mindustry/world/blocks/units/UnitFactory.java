@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.units;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
@@ -14,9 +13,9 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.modules.InventoryModule;
+import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
@@ -29,8 +28,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class UnitFactory extends Block {
-    private final Rectangle rect = new Rectangle();
-
     protected UnitType type;
     protected ItemStack[] requirements;
     protected float produceTime = 1000f;
@@ -43,6 +40,7 @@ public class UnitFactory extends Block {
         super(name);
         update = true;
         hasPower = true;
+        hasItems = true;
         solidifes = true;
     }
 

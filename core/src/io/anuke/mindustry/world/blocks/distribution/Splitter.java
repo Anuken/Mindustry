@@ -13,7 +13,6 @@ public class Splitter extends Block{
         solid = true;
         instantTransfer = true;
         destructible = true;
-        hasItems = false;
         group = BlockGroup.transportation;
     }
 

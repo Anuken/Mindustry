@@ -6,6 +6,7 @@ public class DecayGenerator extends BurnerGenerator {
 
     public DecayGenerator(String name) {
         super(name);
+        hasItems = true;
     }
 
     @Override

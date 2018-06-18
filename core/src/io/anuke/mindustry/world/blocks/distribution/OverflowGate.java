@@ -8,6 +8,7 @@ public class OverflowGate extends Splitter {
 
     public OverflowGate(String name) {
         super(name);
+        hasItems = true;
     }
 
     @Override
