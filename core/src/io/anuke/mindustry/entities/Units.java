@@ -76,7 +76,7 @@ public class Units {
         boolean[] value = new boolean[1];
 
         Units.getNearby(rect, unit -> {
-            if(value[0] || !pred.test(unit)) return;
+            if(value[0] || !pred.test(unit) || unit.isDead()) return;
             if(!unit.isFlying()){
                 unit.getHitbox(hitrect);
 

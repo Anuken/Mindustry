@@ -53,7 +53,6 @@ public abstract class BaseUnit extends Unit{
 	/**Sets this to a 'wave' unit, which means it has slightly different AI and will not run out of ammo.*/
 	public void setWave(){
 		isWave = true;
-		inventory.setInfiniteAmmo(true);
 	}
 
 	public void rotate(float angle){
@@ -113,6 +112,21 @@ public abstract class BaseUnit extends Unit{
 
 	public UnitState getStartState(){
 		return null;
+	}
+
+	@Override
+	public int getItemCapacity() {
+		return type.itemCapacity;
+	}
+
+	@Override
+	public int getAmmoCapacity() {
+		return type.ammoCapacity;
+	}
+
+	@Override
+	public boolean isInfiniteAmmo() {
+		return isWave;
 	}
 
 	@Override

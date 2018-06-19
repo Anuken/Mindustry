@@ -14,28 +14,21 @@ public class UnitInventory implements Saveable{
     private Array<AmmoEntry> ammos = new Array<>();
     private int totalAmmo;
     private ItemStack item = new ItemStack(Items.stone, 0);
-    //TODO move these somewhere else so they're not variables?
-    private int capacity, ammoCapacity;
-    private boolean infiniteAmmo;
 
-    public UnitInventory(int capacity, int ammoCapacity) {
-        this.capacity = capacity;
-        this.ammoCapacity = ammoCapacity;
+    private final Unit unit;
+
+    public UnitInventory(Unit unit) {
+        this.unit = unit;
     }
 
     public boolean isFull(){
-        return item != null && item.amount >= capacity;
-    }
-
-    public void setInfiniteAmmo(boolean infinite){
-        infiniteAmmo = infinite;
+        return item != null && item.amount >= unit.getItemCapacity();
     }
 
     @Override
     public void writeSave(DataOutput stream) throws IOException {
         stream.writeShort(item.amount);
         stream.writeByte(item.item.id);
-        stream.writeBoolean(infiniteAmmo);
         stream.writeShort(totalAmmo);
         stream.writeByte(ammos.size);
         for(int i = 0; i < ammos.size; i ++){
@@ -48,7 +41,6 @@ public class UnitInventory implements Saveable{
     public void readSave(DataInput stream) throws IOException {
         short iamount = stream.readShort();
         byte iid = stream.readByte();
-        infiniteAmmo = stream.readBoolean();
         this.totalAmmo = stream.readShort();
         byte ammoa = stream.readByte();
         for(int i = 0; i < ammoa; i ++){
@@ -75,7 +67,7 @@ public class UnitInventory implements Saveable{
     }
 
     public void useAmmo(){
-        if(infiniteAmmo) return;
+        if(unit.isInfiniteAmmo()) return;
         AmmoEntry entry = ammos.peek();
         entry.amount --;
         if(entry.amount == 0) ammos.pop();
@@ -87,11 +79,11 @@ public class UnitInventory implements Saveable{
     }
 
     public int ammoCapacity(){
-        return ammoCapacity;
+        return unit.getAmmoCapacity();
     }
 
     public boolean canAcceptAmmo(AmmoType type){
-        return totalAmmo + type.quantityMultiplier <= ammoCapacity;
+        return totalAmmo + type.quantityMultiplier <= unit.getAmmoCapacity();
     }
 
     public void addAmmo(AmmoType type){
@@ -115,7 +107,7 @@ public class UnitInventory implements Saveable{
     }
 
     public int capacity(){
-        return capacity;
+        return unit.getItemCapacity();
     }
 
     public boolean isEmpty(){
@@ -124,18 +116,18 @@ public class UnitInventory implements Saveable{
 
     public int itemCapacityUsed(Item type){
         if(canAcceptItem(type)){
-            return !hasItem() ? capacity : (capacity - item.amount);
+            return !hasItem() ? unit.getItemCapacity() : (unit.getItemCapacity() - item.amount);
         }else{
-            return capacity;
+            return unit.getItemCapacity();
         }
     }
 
     public boolean canAcceptItem(Item type){
-        return !hasItem() || (item.item == type && capacity - item.amount > 0);
+        return !hasItem() || (item.item == type && unit.getItemCapacity() - item.amount > 0);
     }
 
     public boolean canAcceptItem(Item type, int amount){
-        return !hasItem() || (item.item == type && item.amount + amount <= capacity);
+        return !hasItem() || (item.item == type && item.amount + amount <= unit.getItemCapacity());
     }
 
     public void clear(){

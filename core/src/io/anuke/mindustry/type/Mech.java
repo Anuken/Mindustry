@@ -6,13 +6,21 @@ import io.anuke.ucore.graphics.Draw;
 
 public class Mech extends Upgrade {
 	public boolean flying;
+
 	public float speed = 1.1f;
 	public float maxSpeed = 1.1f;
 	public float mass = 1f;
+	public float armor = 1f;
+
 	public int drillPower = -1;
 	public float carryWeight = 1f;
-	public float armor = 1f;
+	public float buildPower = 1f;
+	public boolean canRepair = false;
+
 	public Weapon weapon = Weapons.blaster;
+
+	public int itemCapacity = 30;
+	public int ammoCapacity = 100;
 
 	public TextureRegion baseRegion, legRegion, region, iconRegion;
 

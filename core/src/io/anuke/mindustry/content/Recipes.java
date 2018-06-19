@@ -6,6 +6,7 @@ import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
+
 import static io.anuke.mindustry.type.Category.*;
 
 public class Recipes implements ContentList{
@@ -126,11 +127,9 @@ public class Recipes implements ContentList{
         new Recipe(units, UnitBlocks.overdriveProjector, new ItemStack(Items.iron, 1));
         new Recipe(units, UnitBlocks.shieldProjector, new ItemStack(Items.iron, 1));
 
-
-        //new Recipe(units, UnitBlocks.vtolFactory, new ItemStack(Items.steel, 10));
-        //new Recipe(units, UnitBlocks.droneFactory, new ItemStack(Items.steel, 10));
-        //new Recipe(units, UnitBlocks.droneFactory, new ItemStack(Items.steel, 10));
-        //new Recipe(units, UnitBlocks.walkerFactory, new ItemStack(Items.steel, 10));
+        new Recipe(units, UpgradeBlocks.omegaFactory, new ItemStack(Items.iron, 1));
+        new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.iron, 1));
+        new Recipe(units, UpgradeBlocks.tauFactory, new ItemStack(Items.iron, 1));
 
         new Recipe(units, DebugBlocks.itemSource, new ItemStack(Items.steel, 10)).setDebug();
         new Recipe(units, DebugBlocks.itemVoid, new ItemStack(Items.steel, 10)).setDebug();

@@ -31,6 +31,8 @@ public class UnitType {
     public float retreatPercent = 0.2f;
     public float armor = 0f;
     public float carryWeight = 1f;
+    public int ammoCapacity = 100;
+    public int itemCapacity = 100;
     public ObjectMap<Item, AmmoType> ammo = new ObjectMap<>();
 
     public UnitType(String name, UnitCreator creator){

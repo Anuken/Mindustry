@@ -35,7 +35,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     /**Maximum absolute value of a velocity vector component.*/
     public static final float maxAbsVelocity = 127f/velocityPercision;
 
-    public UnitInventory inventory = new UnitInventory(100, 100);
+    public UnitInventory inventory = new UnitInventory(this);
     public float rotation;
 
     protected Interpolator interpolator = new Interpolator();
@@ -259,6 +259,12 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public void drawUnder(){}
     public void drawOver(){}
 
+    public boolean isInfiniteAmmo(){
+        return false;
+    }
+
+    public abstract int getItemCapacity();
+    public abstract int getAmmoCapacity();
     public abstract float getArmor();
     public abstract boolean acceptsAmmo(Item item);
     public abstract void addAmmo(Item item);

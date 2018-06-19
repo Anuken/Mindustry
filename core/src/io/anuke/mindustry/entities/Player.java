@@ -8,7 +8,6 @@ import com.badlogic.gdx.utils.Queue;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.traits.CarriableTrait;
@@ -62,7 +61,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	public String uuid, usid;
 	public boolean isAdmin, isTransferring, isShooting;
 	public Color color = new Color();
-	public Mech mech = Mechs.standard;
+	public Mech mech;
 
 	public int clientid = -1;
 	public int playerIndex = 0;
@@ -87,7 +86,18 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	//region unit and event overrides, utility methods
 
-    @Override
+
+	@Override
+	public int getItemCapacity() {
+		return mech.itemCapacity;
+	}
+
+	@Override
+	public int getAmmoCapacity() {
+		return mech.ammoCapacity;
+	}
+
+	@Override
     public void interpolate() {
         super.interpolate();
 
@@ -122,7 +132,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	@Override
 	public float getBuildPower(Tile tile) {
-		return 1f;
+		return mech.buildPower;
 	}
 
 	@Override

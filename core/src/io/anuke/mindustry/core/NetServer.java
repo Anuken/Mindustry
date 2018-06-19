@@ -137,7 +137,7 @@ public class NetServer extends Module{
             player.usid = packet.usid;
             player.name = packet.name;
             player.uuid = uuid;
-            player.mech = packet.mobile ? Mechs.standardShip : Mechs.standard;
+            player.mech = packet.mobile ? Mechs.starterMobile : Mechs.starterDesktop;
             player.dead = true;
             player.setNet(player.x, player.y);
             player.color.set(packet.color);

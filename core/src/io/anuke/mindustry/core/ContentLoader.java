@@ -82,6 +82,7 @@ public class ContentLoader {
         new UnitBlocks(),
         new PowerBlocks(),
         new CraftingBlocks(),
+        new UpgradeBlocks(),
 
         //recipes
         new Recipes(),

@@ -195,7 +195,7 @@ public class Control extends Module{
 
         Player player = new Player();
         player.name = Settings.getString("name");
-        player.mech = mobile ? Mechs.standardShip : Mechs.standard;
+        player.mech = mobile ? Mechs.starterMobile : Mechs.starterDesktop;
         player.color.set(Settings.getInt("color-" + index));
         player.isLocal = true;
         player.playerIndex = index;

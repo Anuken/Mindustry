@@ -3,6 +3,8 @@ package io.anuke.mindustry.type;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.ucore.function.Consumer;
+import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.util.Bundles;
 
 public abstract class Upgrade implements UnlockableContent{
@@ -43,6 +45,14 @@ public abstract class Upgrade implements UnlockableContent{
     @Override
     public Array<? extends Content> getAll() {
         return all();
+    }
+
+    public static <T extends Upgrade> void forEach(Consumer<T> type, Predicate<Upgrade> pred){
+        for(Upgrade u : upgrades){
+            if(pred.test(u)){
+                type.accept((T)u);
+            }
+        }
     }
 
     public static Array<Upgrade> all() {
