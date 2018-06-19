@@ -32,10 +32,7 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.ThreadQueue;
-import io.anuke.ucore.util.Timer;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -448,13 +445,26 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		if(mech.flying){
 			//prevent strafing backwards, have a penalty for doing so
 			float angDist = Angles.angleDist(rotation, velocity.angle()) / 180f;
-			float penalty = 0.2f;
+			float penalty = 0.2f; //when going 180 degrees backwards, reduce speed to 0.2x
 			speed *= Mathf.lerp(1f, penalty, angDist);
 		}
 
 		//drop from carrier on key press
-		if(Inputs.keyTap("drop_unit") && getCarrier() != null){
-			getCarrier().dropCarry();
+		if(Inputs.keyTap("drop_unit")){
+			if(!mech.flying) {
+				if (getCarrier() != null) {
+					CallEntity.dropSelf(this);
+				}
+			}else if(getCarry() != null){
+				dropCarry();
+			}else{
+				Unit unit = Units.getClosest(team, x, y, 8f,
+						u -> !u.isFlying() && u.getMass() <= mech.carryWeight);
+
+				if(unit != null){
+					carry(unit);
+				}
+			}
 		}
 
 		movement.set(0, 0);

@@ -509,7 +509,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
             if(player.getCarry() != null){
                 player.dropCarry(); //drop off unit
             }else{
-                Unit unit = Units.getClosest(player.getTeam(), Graphics.world(x, y).x, Graphics.world(x, y).y, 4f, u -> !u.isFlying());
+                Unit unit = Units.getClosest(player.getTeam(), Graphics.world(x, y).x, Graphics.world(x, y).y, 4f, u -> !u.isFlying() && u.getMass() <= player.mech.carryWeight);
 
                 if(unit != null){
                     player.pickupTarget = unit;

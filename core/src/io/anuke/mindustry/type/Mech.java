@@ -14,7 +14,7 @@ public class Mech extends Upgrade {
 	public float armor = 1f;
 
 	public int drillPower = -1;
-	public float carryWeight = 1f;
+	public float carryWeight = 10f;
 	public float buildPower = 1f;
 	public boolean canRepair = false;
 
