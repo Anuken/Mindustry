@@ -38,7 +38,7 @@ task cleanup(){
 task generateSprites(dependsOn: classes, type: JavaExec) {
     file(textureFolder).mkdirs()
 
-    main = "io.anuke.mindustry.TextureGenerator"
+    main = "io.anuke.mindustry.PackerLauncher"
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = textureFolder

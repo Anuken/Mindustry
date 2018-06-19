@@ -14,7 +14,7 @@ public class Mech extends Upgrade {
 	public float armor = 1f;
 	public Weapon weapon = Weapons.blaster;
 
-	public TextureRegion baseRegion, legRegion, region;
+	public TextureRegion baseRegion, legRegion, region, iconRegion;
 
 	public Mech(String name, boolean flying){
 		super(name);
@@ -29,5 +29,6 @@ public class Mech extends Upgrade {
 		}
 
 		region = Draw.region(name);
+		iconRegion = Draw.optional("mech-icon-"+ name);
 	}
 }

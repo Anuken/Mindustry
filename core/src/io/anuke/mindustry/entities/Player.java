@@ -282,12 +282,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		Draw.rect(mech.region, x, y, rotation -90);
 
 		for (int i : Mathf.signs) {
-			float tra = rotation - 90,
-					trX = 4*i, trY = 3 - mech.weapon.getRecoil(this, i > 0)*1.5f;
-			float w = i > 0 ? -8 : 8;
+			float tra = rotation - 90, trY = - mech.weapon.getRecoil(this, i > 0)*1.5f;
+			float w = i > 0 ? -12 : 12;
 			Draw.rect(mech.weapon.equipRegion,
-					x + Angles.trnsx(tra, trX, trY),
-					y + Angles.trnsy(tra, trX, trY), w, 8, rotation - 90);
+					x + Angles.trnsx(tra, 0, trY),
+					y + Angles.trnsy(tra, 0, trY), w, 12, rotation - 90);
 		}
 
 		float backTrns = 4f, itemSize = 5f;

@@ -6,30 +6,27 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData.Region;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.core.ContentLoader;
-import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Atlas;
 import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Log.LogHandler;
 import io.anuke.ucore.util.Log.NoopLogHandler;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-/**Used for generating extra textures before packing.*/
-public class TextureGenerator {
-    static BufferedImage image;
-    static Graphics2D graphics;
+public class ImageContext {
+    private BufferedImage image;
 
-    public static void main(String[] args) throws Exception{
+    public void load() throws IOException{
         Log.setLogger(new NoopLogHandler());
-
         ContentLoader.load();
+        Log.setLogger(new LogHandler());
 
         String spritesFolder = new File("../../../assets/sprites").getAbsolutePath();
-
         TextureAtlasData data = new TextureAtlasData(new FileHandle(spritesFolder + "/sprites.atlas"),
                 new FileHandle(spritesFolder), false);
 
@@ -77,45 +74,24 @@ public class TextureGenerator {
         Core.atlas.setErrorRegion("error");
 
         image = ImageIO.read(new File(spritesFolder + "/sprites.png"));
-        graphics = image.createGraphics();
-
-        generateBlocks();
     }
 
-    /**Generates full block icons for use in the editor.*/
-    static void generateBlocks() throws IOException {
+    public void generate(String name, Runnable run){
+        Timers.mark();
+        run.run();
+        Log.info("&ly[Generator]&lc Time to generate &lm{0}&lc: &lg{1}&lcms", name, Timers.elapsed());
+    }
 
-        for(Block block : Block.all()){
-            TextureRegion[] regions = block.getBlockIcon();
+    public Image get(String name){
+        return get(Core.atlas.getRegion(name));
+    }
 
-            if(regions.length == 0){
-                continue;
-            }
+    public Image get(TextureRegion region){
+        return new Image(image, region);
+    }
 
-            if(regions[0] == null){
-                System.err.println("Error in block \"" + block.name + "\": null region!");
-                System.exit(-1);
-            }
-
-            BufferedImage target = new BufferedImage(regions[0].getRegionWidth(), regions[0].getRegionHeight(), BufferedImage.TYPE_INT_ARGB);
-            Graphics2D tg = target.createGraphics();
-
-            for(TextureRegion region : regions){
-
-                tg.drawImage(image,
-                        0, 0,
-                        region.getRegionWidth(),
-                        region.getRegionHeight(),
-                        region.getRegionX(),
-                        region.getRegionY(),
-                        region.getRegionX() + region.getRegionWidth(),
-                        region.getRegionY() + region.getRegionHeight(),
-                        null);
-            }
-
-            tg.dispose();
-
-            ImageIO.write(target, "png", new File("block-icon-" + block.name + ".png"));
-        }
+    public void err(String message, Object... args){
+        Log.err(message, args);
+        System.exit(-1);
     }
 }

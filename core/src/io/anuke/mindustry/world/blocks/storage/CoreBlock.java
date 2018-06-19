@@ -69,7 +69,7 @@ public class CoreBlock extends StorageBlock {
         if(entity.currentPlayer != null) {
             Player player = entity.currentPlayer;
 
-            TextureRegion region = Draw.region(player.mech.name);
+            TextureRegion region = player.mech.iconRegion;
 
             Shaders.build.region = region;
             Shaders.build.progress = entity.progress;

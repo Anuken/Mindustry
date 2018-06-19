@@ -11,7 +11,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.production.*;
 
 public class CraftingBlocks extends BlockList implements ContentList {
-    public static Block smelter, arcsmelter, siliconsmelter, plasteelcompressor, phaseweaver, alloysmelter, alloyfuser, cryofluidmixer, melter, separator, centrifuge, biomatterCompressor, pulverizer, oilRefinery, stoneFormer, weaponFactory, incinerator;
+    public static Block smelter, arcsmelter, siliconsmelter, plasteelcompressor, phaseweaver, alloysmelter, alloyfuser, cryofluidmixer, melter, separator, centrifuge, biomatterCompressor, pulverizer, oilRefinery, stoneFormer, incinerator;
 
     @Override
     public void load() {
@@ -213,11 +213,6 @@ public class CraftingBlocks extends BlockList implements ContentList {
             health = 80;
             craftEffect = BlockFx.purifystone;
             hasLiquids = hasItems = true;
-        }};
-
-        weaponFactory = new MechFactory("weaponfactory") {{
-            size = 2;
-            health = 250;
         }};
 
         incinerator = new Incinerator("incinerator") {{

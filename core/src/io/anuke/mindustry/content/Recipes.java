@@ -77,7 +77,6 @@ public class Recipes implements ContentList{
         new Recipe(crafting, CraftingBlocks.stoneFormer, new ItemStack(Items.steel, 10), new ItemStack(Items.iron, 10));
         new Recipe(crafting, CraftingBlocks.melter, new ItemStack(Items.steel, 30), new ItemStack(Items.titanium, 15));
         new Recipe(crafting, CraftingBlocks.incinerator, new ItemStack(Items.steel, 60), new ItemStack(Items.iron, 60));
-        new Recipe(crafting, CraftingBlocks.weaponFactory, new ItemStack(Items.steel, 1), new ItemStack(Items.iron, 1)).setDesktop();
 
         new Recipe(production, ProductionBlocks.ironDrill, new ItemStack(Items.iron, 25));
         new Recipe(production, ProductionBlocks.reinforcedDrill, new ItemStack(Items.iron, 25));

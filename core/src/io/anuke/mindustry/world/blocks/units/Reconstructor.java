@@ -112,7 +112,7 @@ public class Reconstructor extends Block{
 
             Player player = entity.current;
 
-            TextureRegion region = Draw.region(player.mech.name);
+            TextureRegion region = player.mech.iconRegion;
 
             Shaders.build.region = region;
             Shaders.build.progress = progress;
@@ -253,6 +253,8 @@ public class Reconstructor extends Block{
         entity.power.amount -= ((Reconstructor)tile.block()).powerPerTeleport;
         entity.updateTime = 1f;
         entity.set(tile.drawx(), tile.drawy());
+        player.rotation = 90f;
+        player.baseRotation = 90f;
         player.setDead(true);
         player.setRespawning(true);
         player.setRespawning();
