@@ -7,7 +7,7 @@ import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.type.Upgrade;
 
 public class Mechs implements ContentList {
-    public static Mech alpha, delta, tau, omega, standardShip;
+    public static Mech alpha, delta, tau, omega, dart, trident, javelin, halberd;
 
     /**These are not new mechs, just re-assignments for convenience.*/
     public static Mech starterDesktop, starterMobile;
@@ -39,14 +39,36 @@ public class Mechs implements ContentList {
             maxSpeed = 1.0f;
         }};
 
-        standardShip = new Mech("standard-ship", true){{
+        dart = new Mech("dart-ship", true){{
+            drillPower = -1;
+            speed = 0.4f;
+            maxSpeed = 3f;
+            drag = 0.1f;
+        }};
+
+        trident = new Mech("trident-ship", true){{
             drillPower = 1;
             speed = 0.4f;
             maxSpeed = 3f;
+            drag = 0.1f;
+        }};
+
+        javelin = new Mech("javelin-ship", true){{
+            drillPower = -1;
+            speed = 0.4f;
+            maxSpeed = 3f;
+            drag = 0.1f;
+        }};
+
+        halberd = new Mech("halberd-ship", true){{
+            drillPower = 2;
+            speed = 0.4f;
+            maxSpeed = 3f;
+            drag = 0.1f;
         }};
 
         starterDesktop = alpha;
-        starterMobile = standardShip;
+        starterMobile = dart;
     }
 
     @Override

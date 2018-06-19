@@ -41,14 +41,14 @@ laserconveyor-end
   index: -1
 mass-driver-turret
   rotate: false
-  xy: 307, 135
+  xy: 281, 135
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 ripple
   rotate: false
-  xy: 307, 135
+  xy: 281, 135
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -398,7 +398,7 @@ dirt3
   index: -1
 dirtedge
   rotate: false
-  xy: 197, 2
+  xy: 991, 433
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -433,7 +433,7 @@ grassblock2
   index: -1
 grassedge
   rotate: false
-  xy: 253, 41
+  xy: 251, 27
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -454,7 +454,7 @@ ice3
   index: -1
 iceedge
   rotate: false
-  xy: 251, 27
+  xy: 251, 13
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -510,7 +510,7 @@ iron3
   index: -1
 lavaedge
   rotate: false
-  xy: 251, 13
+  xy: 991, 419
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -566,7 +566,7 @@ metalfloor6
   index: -1
 metalflooredge
   rotate: false
-  xy: 607, 106
+  xy: 621, 106
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -580,7 +580,7 @@ mossblock
   index: -1
 oiledge
   rotate: false
-  xy: 621, 106
+  xy: 635, 106
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -629,7 +629,7 @@ sandblock3
   index: -1
 sandedge
   rotate: false
-  xy: 635, 106
+  xy: 649, 106
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -678,14 +678,14 @@ snowblock3
   index: -1
 snowedge
   rotate: false
-  xy: 641, 200
+  xy: 641, 186
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 spaceedge
   rotate: false
-  xy: 641, 186
+  xy: 641, 172
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -895,7 +895,7 @@ cross-2
   index: -1
 cross-3
   rotate: false
-  xy: 572, 258
+  xy: 229, 143
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -1147,21 +1147,21 @@ liquidrouter-top
   index: -1
 liquidtank-bottom
   rotate: false
-  xy: 229, 117
+  xy: 598, 258
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 liquidtank-liquid
   rotate: false
-  xy: 255, 127
+  xy: 229, 117
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 liquidtank-top
   rotate: false
-  xy: 281, 135
+  xy: 255, 127
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -1504,7 +1504,7 @@ siliconextractor
   index: -1
 core-open
   rotate: false
-  xy: 229, 143
+  xy: 571, 157
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -1609,14 +1609,14 @@ duo
   index: -1
 fuse
   rotate: false
-  xy: 598, 258
+  xy: 572, 258
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 spectre
   rotate: false
-  xy: 598, 258
+  xy: 572, 258
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -1719,6 +1719,20 @@ walkerfactory-top-open
   orig: 16, 16
   offset: 0, 0
   index: -1
+mech-factory
+  rotate: false
+  xy: 307, 135
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+ship-factory
+  rotate: false
+  xy: 307, 135
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
 reconstructor-open
   rotate: false
   xy: 387, 81
@@ -1819,7 +1833,7 @@ enemyarrow
   index: -1
 error
   rotate: false
-  xy: 1005, 433
+  xy: 773, 340
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -2510,34 +2524,6 @@ core-top
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-icon-mech-factory
-  rotate: false
-  xy: 519, 183
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
-mech-factory
-  rotate: false
-  xy: 519, 183
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
-ship-factory
-  rotate: false
-  xy: 519, 183
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
-block-icon-ship-factory
-  rotate: false
-  xy: 519, 183
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
 block-icon-mechanical-pump
   rotate: false
   xy: 415, 43
@@ -2603,21 +2589,21 @@ multiplexer
   index: -1
 block-icon-nuclear-reactor
   rotate: false
-  xy: 545, 183
+  xy: 519, 183
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 nuclear-reactor
   rotate: false
-  xy: 545, 183
+  xy: 519, 183
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 block-icon-nucleardrill
   rotate: false
-  xy: 571, 183
+  xy: 545, 183
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -2638,7 +2624,7 @@ oil
   index: -1
 block-icon-oilextractor
   rotate: false
-  xy: 467, 150
+  xy: 571, 183
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -2841,7 +2827,7 @@ resupplypoint
   index: -1
 block-icon-ripple
   rotate: false
-  xy: 493, 157
+  xy: 467, 150
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -3275,28 +3261,28 @@ unloader
   index: -1
 block-icon-vault
   rotate: false
-  xy: 519, 157
+  xy: 493, 157
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 vault
   rotate: false
-  xy: 519, 157
+  xy: 493, 157
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 block-icon-warpgate
   rotate: false
-  xy: 545, 157
+  xy: 519, 157
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 warpgate
   rotate: false
-  xy: 545, 157
+  xy: 519, 157
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -3331,35 +3317,56 @@ block-icon-wave
   index: -1
 mech-icon-alpha-mech
   rotate: false
-  xy: 991, 419
+  xy: 1005, 419
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 mech-icon-delta-mech
   rotate: false
-  xy: 991, 419
+  xy: 1005, 419
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 mech-icon-omega-mech
   rotate: false
-  xy: 991, 419
+  xy: 1005, 419
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 mech-icon-tau-mech
   rotate: false
-  xy: 991, 419
+  xy: 1005, 419
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
-mech-icon-standard-ship
+mech-icon-dart-ship
   rotate: false
-  xy: 1005, 419
+  xy: 607, 106
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+mech-icon-halberd-ship
+  rotate: false
+  xy: 607, 106
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+mech-icon-javelin-ship
+  rotate: false
+  xy: 607, 106
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+mech-icon-trident-ship
+  rotate: false
+  xy: 607, 106
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -3651,9 +3658,30 @@ scout-leg
   orig: 12, 12
   offset: 0, 0
   index: -1
-standard-ship
+dart-ship
   rotate: false
-  xy: 641, 172
+  xy: 197, 2
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+halberd-ship
+  rotate: false
+  xy: 197, 2
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+javelin-ship
+  rotate: false
+  xy: 197, 2
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+trident-ship
+  rotate: false
+  xy: 197, 2
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -3766,7 +3794,7 @@ button-map-over
   index: -1
 button-select
   rotate: false
-  xy: 571, 157
+  xy: 545, 157
   size: 24, 24
   split: 4, 4, 4, 4
   orig: 24, 24
@@ -4668,14 +4696,14 @@ window-empty
   index: -1
 drone
   rotate: false
-  xy: 991, 433
+  xy: 1005, 433
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 scout
   rotate: false
-  xy: 649, 106
+  xy: 641, 200
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -4745,7 +4773,7 @@ clustergun-equip
   index: -1
 generic-weapon
   rotate: false
-  xy: 773, 340
+  xy: 253, 41
   size: 12, 12
   orig: 12, 12
   offset: 0, 0

@@ -144,9 +144,8 @@ public class Renderer extends RendererModule{
 			Graphics.clear(Color.BLACK);
 		}else{
             Vector2 position = averagePosition();
-            boolean flying = players[0].isFlying();
 
-            if(!flying){
+            if(!mobile){
             	setCamera(position.x, position.y);
 			}
 

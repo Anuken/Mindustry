@@ -17,7 +17,6 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
@@ -29,13 +28,10 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class MechFactory extends Block{
-    protected float powerUse = 0.1f;
     protected Mech mech;
 
     public MechFactory(String name){
         super(name);
-        hasItems = true;
-        hasPower = true;
         update = true;
         consumesTap = true;
         solidifes = true;
@@ -90,8 +86,6 @@ public class MechFactory extends Block{
     public void update(Tile tile) {
         MechFactoryEntity entity = tile.entity();
 
-        float used = Math.min(powerCapacity, Timers.delta() * powerUse);
-
         if(entity.open){
             if(!Units.anyEntities(tile)){
                 entity.open = false;
@@ -101,13 +95,9 @@ public class MechFactory extends Block{
         }
 
         if(entity.player != null){
-            if(entity.power.amount >= used || true) {
-                entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
-                entity.progress += 1f / Vars.respawnduration;
-                entity.power.amount -= used;
-            }else{
-                entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.05f);
-            }
+            entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
+            entity.progress += 1f / Vars.respawnduration;
+
 
             entity.time += entity.heat;
 

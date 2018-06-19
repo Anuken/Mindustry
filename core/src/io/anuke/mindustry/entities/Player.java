@@ -411,7 +411,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 			return;
 		}
 
-		if(mech.flying){
+		if(mobile){
 			updateFlying();
 		}else{
 			updateMech();
@@ -434,7 +434,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		Tile tile = world.tileWorld(x, y);
 
 		//if player is in solid block
-		if(tile != null && tile.solid() && !noclip) {
+		if(!mech.flying && tile != null && tile.solid() && !noclip) {
 			damage(health + 1); //die instantly
 		}
 
@@ -444,6 +444,13 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		float carrySlowdown = 0.3f;
 
 		speed *= ((1f-carrySlowdown) +  (inventory.hasItem() ? (float)inventory.getItem().amount/inventory.capacity(): 1f) * carrySlowdown);
+
+		if(mech.flying){
+			//prevent strafing backwards, have a penalty for doing so
+			float angDist = Angles.angleDist(rotation, velocity.angle()) / 180f;
+			float penalty = 0.2f;
+			speed *= Mathf.lerp(1f, penalty, angDist);
+		}
 
 		//drop from carrier on key press
 		if(Inputs.keyTap("drop_unit") && getCarrier() != null){
@@ -472,7 +479,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 		velocity.add(movement);
 
-		updateVelocityStatus(0.4f, speed);
+		updateVelocityStatus(mech.drag, mech.maxSpeed);
 
 		if(!movement.isZero()){
 			walktime += Timers.delta() * velocity.len()*(1f/0.5f)/speed * getFloorOn().speedMultiplier;
@@ -526,7 +533,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		}
 
 		velocity.add(movement);
-		updateVelocityStatus(0.1f, mech.maxSpeed);
+		updateVelocityStatus(mech.drag, mech.maxSpeed);
 
 		//hovering effect
 		x += Mathf.sin(Timers.time() + id * 999, 25f, 0.08f);
