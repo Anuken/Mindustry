@@ -1,5 +1,6 @@
 package io.anuke.mindustry.core;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
@@ -103,6 +104,10 @@ public class Logic extends Module {
     @Override
     public void update(){
         if(threads.isEnabled() && !threads.isOnThread()) return;
+
+        if(Vars.control != null){
+            control.runUpdateLogic();
+        }
 
         if(!state.is(State.menu)){
 

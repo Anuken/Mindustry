@@ -6,7 +6,9 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
@@ -14,19 +16,24 @@ import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Events;
+import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Pixmaps;
+import io.anuke.ucore.scene.utils.ScissorStack;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.ThreadArray;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
 public class MinimapRenderer implements Disposable{
     private static final int baseSize = 16;
+    private final Array<Unit> units = new ThreadArray<>();
     private Pixmap pixmap;
     private Texture texture;
     private TextureRegion region;
     private Rectangle rect = new Rectangle();
+    private Rectangle clipRect = new Rectangle();
     private int zoom = 4;
 
     public MinimapRenderer(){
@@ -65,15 +72,23 @@ public class MinimapRenderer implements Disposable{
         dx = Mathf.clamp(dx, sz, world.width()-sz);
         dy = Mathf.clamp(dy, sz, world.height()-sz);
 
-        rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
-        Units.getNearby(rect, unit -> {
-            if(!rect.contains(unit.x, unit.y)) return;
+        synchronized (units){
+            rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
+            Graphics.flush();
 
-            float rx = (unit.x - rect.x) / rect.width * w, ry = (unit.y - rect.y)/ rect.width * h;
-            Draw.color(unit.getTeam().color);
-            Draw.rect("white", x + rx, y + ry, w/(sz*2), h/(sz*2));
-        });
-        Draw.color();
+            boolean clip = ScissorStack.pushScissors(clipRect.set(x, y, w, h));
+
+            for(Unit unit : units){
+                float rx = (unit.x - rect.x) / rect.width * w, ry = (unit.y - rect.y) / rect.width * h;
+                Draw.color(unit.getTeam().color);
+                Draw.rect("white", x + rx, y + ry, w / (sz * 2), h / (sz * 2));
+            }
+
+            Draw.color();
+
+            Graphics.flush();
+            if(clip) ScissorStack.popScissors();
+        }
     }
 
     public TextureRegion getRegion() {
@@ -104,6 +119,20 @@ public class MinimapRenderer implements Disposable{
 
         texture.bind();
         Pixmaps.drawPixel(texture, tile.x, pixmap.getHeight() - 1 - tile.y, color);
+    }
+
+    public void updateUnitArray(){
+        int sz = baseSize * zoom;
+        float dx = (Core.camera.position.x / tilesize);
+        float dy = (Core.camera.position.y / tilesize);
+        dx = Mathf.clamp(dx, sz, world.width()-sz);
+        dy = Mathf.clamp(dy, sz, world.height()-sz);
+
+        synchronized (units) {
+            rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
+            units.clear();
+            Units.getNearby(rect, units::add);
+        }
     }
 
     private int colorFor(Tile tile){

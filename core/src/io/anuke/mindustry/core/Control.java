@@ -320,6 +320,13 @@ public class Control extends Module{
 		Platform.instance.updateRPC();
 	}
 
+	/**Called from main logic thread.*/
+	public void runUpdateLogic(){
+		if(!state.is(State.menu)) {
+			renderer.minimap().updateUnitArray();
+		}
+	}
+
 	@Override
 	public void update(){
 
