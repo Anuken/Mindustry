@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities.bullet;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pools;
+import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.entities.Unit;
@@ -10,6 +11,7 @@ import io.anuke.mindustry.entities.traits.TeamTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.BulletEntity;
 import io.anuke.ucore.entities.trait.Entity;
@@ -59,7 +61,15 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 
 		bullet.team = team;
 		bullet.type = type;
-		bullet.set(x, y);
+
+		//translate bullets backwards, purely for visual reasons
+		float backDelta = Timers.delta();
+
+		bullet.lastPosition().set(x-bullet.velocity.x * backDelta, y-bullet.velocity.y * backDelta, bullet.angle());
+		bullet.setLastUpdated(TimeUtils.millis());
+		bullet.setUpdateSpacing((long)((Timers.delta() / 60f) * 1000));
+		bullet.set(x-bullet.velocity.x * backDelta, y-bullet.velocity.y * backDelta);
+
 		bullet.add();
 	}
 

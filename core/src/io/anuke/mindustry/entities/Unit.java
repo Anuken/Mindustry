@@ -52,6 +52,16 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     protected float drownTime;
 
     @Override
+    public float getRotation() {
+        return rotation;
+    }
+
+    @Override
+    public void setRotation(float rotation) {
+        this.rotation = rotation;
+    }
+
+    @Override
     public void setCarrier(CarryTrait carrier) {
         this.carrier = carrier;
     }

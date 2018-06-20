@@ -111,6 +111,10 @@ public class ThreadHandler {
         return enabled;
     }
 
+    public boolean doInterpolate(){
+        return enabled && Math.abs(Gdx.graphics.getFramesPerSecond() - getFPS()) > 15;
+    }
+
     public boolean isOnThread(){
         return impl.isOnThread();
     }
@@ -118,7 +122,7 @@ public class ThreadHandler {
     private void runLogic(){
         try {
             while (true) {
-                long time = TimeUtils.millis();
+                long time = TimeUtils.nanoTime();
 
                 synchronized (toRun) {
                     for(Runnable r : toRun){
@@ -131,8 +135,8 @@ public class ThreadHandler {
                 logic.update();
                 logic.doUpdate = false;
 
-                long elapsed = TimeUtils.timeSinceMillis(time);
-                long target = (long) (1000 / 60f);
+                long elapsed = TimeUtils.nanosToMillis(TimeUtils.timeSinceNanos(time));
+                long target = (long) ((1000) / 60f);
 
                 delta = Math.max(elapsed, target) / 1000f * 60f;
 

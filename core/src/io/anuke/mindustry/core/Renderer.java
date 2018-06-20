@@ -6,10 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.FloatArray;
-import com.badlogic.gdx.utils.ObjectIntMap;
-import com.badlogic.gdx.utils.Pools;
+import com.badlogic.gdx.utils.*;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -20,8 +17,8 @@ import io.anuke.mindustry.entities.traits.BelowLiquidTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
@@ -30,7 +27,11 @@ import io.anuke.ucore.entities.EntityDraw;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.BaseEntity;
 import io.anuke.ucore.entities.impl.EffectEntity;
+import io.anuke.ucore.entities.trait.DrawTrait;
+import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.function.Callable;
+import io.anuke.ucore.function.Consumer;
+import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
@@ -38,6 +39,7 @@ import io.anuke.ucore.graphics.Surface;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Translator;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.core.Core.batch;
@@ -51,7 +53,9 @@ public class Renderer extends RendererModule{
 	private FloatArray shieldHits = new FloatArray();
 	private Array<Callable> shieldDraws = new Array<>();
 	private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
-	private Vector2 avgPosition = new Vector2();
+	private Vector2 avgPosition = new Translator();
+	private Vector2 tmpVector1 = new Translator();
+	private Vector2 tmpVector2 = new Translator();
 	private BlockRenderer blocks = new BlockRenderer();
 	private MinimapRenderer minimap = new MinimapRenderer();
 	private OverlayRenderer overlays = new OverlayRenderer();
@@ -196,9 +200,9 @@ public class Renderer extends RendererModule{
 		
 		blocks.drawFloor();
 
-		EntityDraw.draw(groundEffectGroup, e -> e instanceof BelowLiquidTrait);
-		EntityDraw.draw(puddleGroup);
-		EntityDraw.draw(groundEffectGroup, e -> !(e instanceof BelowLiquidTrait));
+		drawAndInterpolate(groundEffectGroup, e -> e instanceof BelowLiquidTrait);
+		drawAndInterpolate(puddleGroup);
+		drawAndInterpolate(groundEffectGroup, e -> !(e instanceof BelowLiquidTrait));
 
 		blocks.processBlocks();
 		blocks.drawBlocks(Layer.block);
@@ -213,7 +217,7 @@ public class Renderer extends RendererModule{
 			Shaders.outline.color.set(Team.none.color);
 
 			Graphics.beginShaders(Shaders.outline);
-			EntityDraw.draw(itemGroup);
+			drawAndInterpolate(itemGroup);
 			Graphics.endShaders();
 		}
 
@@ -224,12 +228,12 @@ public class Renderer extends RendererModule{
 
 		overlays.drawBottom();
 
-		EntityDraw.drawWith(playerGroup, p -> true, Player::drawBuildRequests);
+		drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
 
 		drawAllTeams(true);
 
-		EntityDraw.draw(bulletGroup);
-		EntityDraw.draw(effectGroup);
+		drawAndInterpolate(bulletGroup);
+		drawAndInterpolate(effectGroup);
 
 		overlays.drawTop();
 
@@ -238,7 +242,7 @@ public class Renderer extends RendererModule{
 
 		if(showPaths && debug) drawDebug();
 
-		EntityDraw.drawWith(playerGroup, p -> !p.isLocal && !p.isDead(), Player::drawName);
+		drawAndInterpolate(playerGroup, p -> !p.isLocal && !p.isDead(), Player::drawName);
 		
 		batch.end();
 	}
@@ -250,23 +254,64 @@ public class Renderer extends RendererModule{
 			if(group.count(p -> p.isFlying() == flying) +
 					playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
 
-			EntityDraw.drawWith(unitGroups[team.ordinal()], u -> u.isFlying() == flying, Unit::drawUnder);
-			EntityDraw.drawWith(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawUnder);
+			drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying, Unit::drawUnder);
+			drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawUnder);
 
 			Shaders.outline.color.set(team.color);
 			Shaders.mix.color.set(Color.WHITE);
 
 			Graphics.beginShaders(Shaders.outline);
 			Graphics.shader(Shaders.mix, true);
-			EntityDraw.draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying);
-			EntityDraw.draw(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team);
+			drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying);
+			drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team);
 			Graphics.shader();
 			blocks.drawTeamBlocks(Layer.turret, team);
 			Graphics.endShaders();
 
-			EntityDraw.drawWith(unitGroups[team.ordinal()], u -> u.isFlying() == flying, Unit::drawOver);
-			EntityDraw.drawWith(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);
+			drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying, Unit::drawOver);
+			drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);
 		}
+	}
+
+	private <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group){
+		drawAndInterpolate(group, t -> true, DrawTrait::draw);
+	}
+
+	private <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group, Predicate<T> toDraw){
+		drawAndInterpolate(group, toDraw, DrawTrait::draw);
+	}
+
+	private <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group, Predicate<T> toDraw, Consumer<T> drawer){
+		EntityDraw.drawWith(group, toDraw, t -> {
+			float lastx = t.getX(), lasty = t.getY(), lastrot = 0f;
+
+			if(threads.doInterpolate() && threads.isEnabled() && t instanceof SolidTrait){
+				SolidTrait s = (SolidTrait)t;
+
+				lastrot = s.getRotation();
+
+				if(s.lastUpdated() != 0){
+					float timeSinceUpdate = TimeUtils.timeSinceMillis(s.lastUpdated());
+					float alpha = Math.min(timeSinceUpdate / s.updateSpacing(), 1f);
+
+					tmpVector1.set(s.lastPosition().x, s.lastPosition().y)
+							.lerp(tmpVector2.set(lastx, lasty), alpha);
+					s.setRotation(Mathf.slerp(s.lastPosition().z, lastrot, alpha));
+
+					s.set(tmpVector1.x, tmpVector1.y);
+				}
+			}
+
+			drawer.accept(t);
+
+			if(threads.doInterpolate() && threads.isEnabled()) {
+				t.set(lastx, lasty);
+
+				if (t instanceof SolidTrait) {
+					((SolidTrait) t).setRotation(lastrot);
+				}
+			}
+		});
 	}
 
 	@Override
@@ -284,10 +329,12 @@ public class Renderer extends RendererModule{
 	}
 
 	public Vector2 averagePosition(){
-	    avgPosition.setZero();
-	    for(Player player : players){
-	        avgPosition.add(player.x, player.y);
-        }
+		avgPosition.setZero();
+
+		drawAndInterpolate(playerGroup, p -> p.isLocal, p -> {
+			avgPosition.add(p.x, p.y);
+		});
+
         avgPosition.scl(1f / players.length);
         return avgPosition;
     }

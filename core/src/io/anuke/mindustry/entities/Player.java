@@ -41,8 +41,6 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class Player extends Unit implements BuilderTrait, CarryTrait {
-	private static final Vector2 movement = new Vector2();
-
 	public static int typeID = -1;
 
 	public static final int timerShootLeft = 0;
@@ -73,6 +71,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	private Tile mining;
 	private CarriableTrait carrying;
 	private Trail trail = new Trail(16);
+	private Vector2 movement = new Vector2();
+	private boolean moved;
 	
 	public Player(){
 		hitbox.setSize(5);
@@ -242,12 +242,17 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	@Override
 	public float drawSize() {
-		return 40;
+		return isLocal ? Float.MAX_VALUE : 40;
 	}
 
 	@Override
 	public void draw(){
 		if((debug && (!showPlayer || !showUI)) || dead) return;
+
+		if(!movement.isZero() && moved){
+			walktime += Timers.delta() * movement.len()/1.6f * getFloorOn().speedMultiplier;
+			baseRotation = Mathf.slerpDelta(baseRotation, movement.angle(), 0.13f);
+		}
 
         boolean snap = snapCamera && isLocal;
 
@@ -491,12 +496,9 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 		velocity.add(movement);
 
+		float prex = x, prey = y;
 		updateVelocityStatus(mech.drag, debug ? speed : mech.maxSpeed);
-
-		if(!movement.isZero()){
-			walktime += Timers.delta() * velocity.len()*(1f/0.5f)/speed * getFloorOn().speedMultiplier;
-			baseRotation = Mathf.slerpDelta(baseRotation, movement.angle(), 0.13f);
-		}
+		moved = distanceTo(prex, prey) > 0.01f;
 
 		if(!isShooting()){
 			if(!movement.isZero()) {

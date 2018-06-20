@@ -1,12 +1,10 @@
 package io.anuke.mindustry.entities.units;
 
-import com.badlogic.gdx.math.Vector2;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
@@ -20,7 +18,10 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Geometry;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Timer;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -30,7 +31,6 @@ import static io.anuke.mindustry.Vars.*;
 
 public abstract class BaseUnit extends Unit{
 	private static int timerIndex = 0;
-	private static Vector2 moveVector = new Translator();
 
 	protected static final int timerTarget = timerIndex++;
 	protected static final int timerReload = timerIndex++;
@@ -113,7 +113,7 @@ public abstract class BaseUnit extends Unit{
 	public void targetClosest(){
 		if(target != null) return;
 
-		target = Units.getClosestTarget(team, x, y, inventory.getAmmoRange());
+		//target = Units.getClosestTarget(team, x, y, inventory.getAmmoRange());
 	}
 
 	public UnitState getStartState(){
@@ -234,11 +234,6 @@ public abstract class BaseUnit extends Unit{
 	@Override
 	public void onDeath(){
 		CallEntity.onUnitDeath(this);
-	}
-
-	@Override
-	public boolean collidesOthers() {
-		return !isFlying();
 	}
 
 	@Override
