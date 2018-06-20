@@ -31,7 +31,8 @@ public class WeaponBlocks extends BlockList implements ContentList {
 			reload = 60f;
 			restitution = 0.03f;
 			recoil = 1.5f;
-			burstSpacing = 6f;
+			burstSpacing = 1f;
+			inaccuracy = 7f;
 			ammoUseEffect = ShootFx.shellEjectSmall;
 		}};
 
@@ -47,6 +48,7 @@ public class WeaponBlocks extends BlockList implements ContentList {
 
 		hail = new ItemTurret("hail") {{
 			ammoTypes = new AmmoType[]{AmmoTypes.artilleryLead, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary};
+			reload = 40f;
 		}};
 
 		wave = new LiquidTurret("wave") {{

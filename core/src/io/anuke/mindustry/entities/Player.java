@@ -414,6 +414,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 			updateMech();
 		}
 
+		avoidOthers(8f);
+
 		float wobblyness = 0.6f;
 
 		trail.update(x + Angles.trnsx(rotation + 180f, 6f) + Mathf.range(wobblyness),
@@ -489,7 +491,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 		velocity.add(movement);
 
-		updateVelocityStatus(mech.drag, mech.maxSpeed);
+		updateVelocityStatus(mech.drag, debug ? speed : mech.maxSpeed);
 
 		if(!movement.isZero()){
 			walktime += Timers.delta() * velocity.len()*(1f/0.5f)/speed * getFloorOn().speedMultiplier;

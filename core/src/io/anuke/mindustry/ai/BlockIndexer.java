@@ -1,5 +1,6 @@
 package io.anuke.mindustry.ai;
 
+import com.badlogic.gdx.utils.Bits;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
@@ -7,9 +8,10 @@ import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.util.EnumSet;
 import io.anuke.ucore.util.Mathf;
@@ -18,15 +20,21 @@ import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
 //TODO consider using quadtrees for finding specific types of blocks within an area
-/**Class used for indexing special target blocks for AI.
- * TODO maybe use Arrays instead of ObjectSets?*/
+//TODO maybe use Arrays instead of ObjectSets?
+/**Class used for indexing special target blocks for AI.*/
 public class BlockIndexer {
     /**Size of one ore quadrant.*/
-    private final static int quadrantSize = 12;
+    private final static int oreQuadrantSize = 12;
+    /**Size of one structure quadrant.*/
+    private final static int structQuadrantSize = 12;
+
     /**Set of all ores that are being scanned.*/
     private final ObjectSet<Item> scanOres = ObjectSet.with(Items.iron, Items.coal, Items.lead, Items.thorium, Items.titanium);
     /**Stores all ore quadtrants on the map.*/
     private ObjectMap<Item, ObjectSet<Tile>> ores = new ObjectMap<>();
+
+    /**Tags all quadrants.*/
+    private Bits[] structQuadrants;
 
     /**Maps teams to a map of flagged tiles by type.*/
     private ObjectMap<BlockFlag, ObjectSet<Tile>> enemyMap = new ObjectMap<>();
@@ -48,6 +56,7 @@ public class BlockIndexer {
                 }
             }
             process(tile);
+            updateQuadrant(tile);
         });
 
         Events.on(WorldLoadEvent.class, () -> {
@@ -55,6 +64,13 @@ public class BlockIndexer {
             allyMap.clear();
             typeMap.clear();
             ores.clear();
+
+            //create bitset for each team type that contains each quadrant
+            structQuadrants = new Bits[Team.values().length];
+            for(int i = 0; i < Team.values().length; i ++){
+                structQuadrants[i] = new Bits(Mathf.ceil(world.width() / (float)structQuadrantSize) * Mathf.ceil(world.height() / (float)structQuadrantSize));
+            }
+
             for(int x = 0; x < world.width(); x ++){
                 for (int y = 0; y < world.height(); y++) {
                     process(world.tile(x, y));
@@ -77,7 +93,7 @@ public class BlockIndexer {
 
     /**Returns a set of tiles that have ores of the specified type nearby.
      * While each tile in the set is not guaranteed to have an ore directly on it,
-     * each tile will at least have an ore within {@link #quadrantSize} / 2 blocks of it.
+     * each tile will at least have an ore within {@link #oreQuadrantSize} / 2 blocks of it.
      * Only specific ore types are scanned. See {@link #scanOres}.*/
     public ObjectSet<Tile> getOrePositions(Item item){
         return ores.get(item, emptyArray);
@@ -104,6 +120,36 @@ public class BlockIndexer {
         }
     }
 
+    private void updateQuadrant(Tile tile){
+        //this quadrant is now 'dirty', re-scan the whole thing
+        int quadrantX = tile.x / structQuadrantSize;
+        int quadrantY = tile.y / structQuadrantSize;
+        int index = quadrantX * Mathf.ceil(world.width() / (float)structQuadrantSize) + quadrantY;
+
+        for(TeamData data : state.teams.getTeams()) {
+
+            //fast-set this quadrant to 'occupied' if the tile just placed is already of this team
+            if(tile.getTeam() == data.team && tile.entity != null){
+                structQuadrants[data.team.ordinal()].set(index);
+                continue; //no need to process futher
+            }
+
+            structQuadrants[data.team.ordinal()].clear(index);
+
+            outer:
+            for (int x = quadrantX * structQuadrantSize; x < world.width() && x < (quadrantX + 1) * structQuadrantSize; x++) {
+                for (int y = quadrantY * structQuadrantSize; y < world.height() && y < (quadrantY + 1) * structQuadrantSize; y++) {
+                    Tile result = world.tile(x, y);
+                    //when a targetable block is found, mark this quadrant as occupied and stop searching
+                    if(result.entity != null && result.getTeam() == data.team){
+                        structQuadrants[data.team.ordinal()].set(index);
+                        break outer;
+                    }
+                }
+            }
+        }
+    }
+
     private ObjectMap<BlockFlag, ObjectSet<Tile>> getMap(Team team){
         if(!state.teams.has(team)) return emptyMap;
         return state.teams.get(team).ally ? allyMap : enemyMap;
@@ -117,8 +163,8 @@ public class BlockIndexer {
 
         for(int x = 0; x < world.width(); x ++){
             for (int y = 0; y < world.height(); y++) {
-                int qx = (x/quadrantSize);
-                int qy = (y/quadrantSize);
+                int qx = (x/ oreQuadrantSize);
+                int qy = (y/ oreQuadrantSize);
 
                 Tile tile = world.tile(x, y);
 
@@ -126,8 +172,8 @@ public class BlockIndexer {
                 if(tile.floor().drops != null && scanOres.contains(tile.floor().drops.item)){
                     ores.get(tile.floor().drops.item).add(world.tile(
                             //make sure to clamp quadrant middle position, since it might go off bounds
-                            Mathf.clamp(qx * quadrantSize + quadrantSize/2, 0, world.width() - 1),
-                            Mathf.clamp(qy * quadrantSize + quadrantSize/2, 0, world.height() - 1)));
+                            Mathf.clamp(qx * oreQuadrantSize + oreQuadrantSize /2, 0, world.width() - 1),
+                            Mathf.clamp(qy * oreQuadrantSize + oreQuadrantSize /2, 0, world.height() - 1)));
                 }
             }
         }

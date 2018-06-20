@@ -1,11 +1,8 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.math.Vector2;
-import io.anuke.mindustry.content.AmmoTypes;
-import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.game.EventType.PlayEvent;
 import io.anuke.mindustry.game.EventType.ResetEvent;
 import io.anuke.mindustry.game.EventType.WaveEvent;
@@ -30,8 +27,7 @@ import static io.anuke.mindustry.Vars.*;
  * Handles game state events.
  * Does not store any game state itself.
  *
- * This class should <i>not</i> call any outside methods to change state of modules, but instead fire events.
- */
+ * This class should <i>not</i> call any outside methods to change state of modules, but instead fire events.*/
 public class Logic extends Module {
     public boolean doUpdate = true;
 
@@ -80,22 +76,28 @@ public class Logic extends Module {
     }
 
     public void runWave(){
-
-        //TODO spawn enemies properly
-        for(int i = 0; i < 10; i ++){
-            BaseUnit unit = UnitTypes.vtol.create(Team.red);
-            Vector2 offset = new Vector2().setToRandomDirection().scl(world.width()/2f*tilesize).add(world.width()/2f*tilesize, world.height()/2f*tilesize);
-            unit.inventory.addAmmo(AmmoTypes.bulletIron);
-            unit.setWave();
-            unit.set(offset.x, offset.y);
-            unit.add();
-        }
-
+        state.spawner.spawnEnemies();
         state.wave ++;
         state.wavetime = wavespace * state.difficulty.timeScaling;
         state.extrawavetime = maxwavespace * state.difficulty.maxTimeScaling;
 
         Events.fire(WaveEvent.class);
+    }
+
+    private void checkGameOver(){
+        boolean gameOver = true;
+
+        for(TeamData data : state.teams.getTeams(true)){
+            if(data.cores.size > 0){
+                gameOver = false;
+                break;
+            }
+        }
+
+        if(gameOver && !state.gameOver){
+            state.gameOver = true;
+            Events.fire(GameOverEvent.class);
+        }
     }
 
     @Override
@@ -110,21 +112,9 @@ public class Logic extends Module {
                 Timers.update();
             }
 
-            /*
-            boolean gameOver = true;
-
-            for(TeamData data : state.teams.getTeams(true)){
-                if(data.cores.size > 0){
-                    gameOver = false;
-                    break;
-                }
+            if(!debug){
+                checkGameOver();
             }
-
-            if(gameOver && !state.gameOver){ //TODO better gameover state, victory state?
-                state.gameOver = true;
-                if(Net.server()) NetEvents.handleGameOver();
-                Events.fire(GameOverEvent.class);
-            }*/
 
             if(!state.is(State.paused) || Net.active()){
 
@@ -158,11 +148,12 @@ public class Logic extends Module {
                     if(!group.isEmpty()){
                         EntityPhysics.collideGroups(bulletGroup, group);
 
+                        /*
                         for(EntityGroup other : unitGroups){
                             if(!other.isEmpty()){
                                 EntityPhysics.collideGroups(group, other);
                             }
-                        }
+                        }*/
                     }
                 }
 

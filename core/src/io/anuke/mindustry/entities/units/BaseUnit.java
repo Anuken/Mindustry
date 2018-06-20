@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities.units;
 
+import com.badlogic.gdx.math.Vector2;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.fx.ExplosionFx;
@@ -19,10 +20,7 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Timer;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -32,6 +30,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public abstract class BaseUnit extends Unit{
 	private static int timerIndex = 0;
+	private static Vector2 moveVector = new Translator();
 
 	protected static final int timerTarget = timerIndex++;
 	protected static final int timerReload = timerIndex++;
@@ -39,8 +38,10 @@ public abstract class BaseUnit extends Unit{
 	protected UnitType type;
 	protected Timer timer = new Timer(5);
 	protected StateMachine state = new StateMachine();
-	protected boolean isWave;
 	protected TargetTrait target;
+
+	protected boolean isWave;
+	protected Squad squad;
 
 	public BaseUnit(UnitType type, Team team){
 		this.type = type;
@@ -53,6 +54,11 @@ public abstract class BaseUnit extends Unit{
 	/**Sets this to a 'wave' unit, which means it has slightly different AI and will not run out of ammo.*/
 	public void setWave(){
 		isWave = true;
+	}
+
+	public void setSquad(Squad squad) {
+		this.squad = squad;
+		squad.units ++;
 	}
 
 	public void rotate(float angle){
@@ -184,6 +190,12 @@ public abstract class BaseUnit extends Unit{
 		if(Net.client()){
 			interpolate();
 			return;
+		}
+
+		avoidOthers(8f);
+
+		if(squad != null){
+			squad.update();
 		}
 
 		updateTargeting();

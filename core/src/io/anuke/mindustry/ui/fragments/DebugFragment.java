@@ -10,6 +10,7 @@ import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.builders.button;
 import io.anuke.ucore.scene.builders.label;
@@ -46,7 +47,7 @@ public class DebugFragment implements Fragment {
         new table(){{
            visible(() -> debug);
 
-           atop().aright();
+           abottom().aleft();
 
            new table("pane"){{
                defaults().fillX().width(100f);
@@ -133,11 +134,20 @@ public class DebugFragment implements Fragment {
     }
 
     public static String debugInfo(){
+        int totalUnits = 0;
+        for(EntityGroup<?> group : unitGroups){
+            totalUnits += group.size();
+        }
+
+        totalUnits += playerGroup.size();
+
         StringBuilder result = join(
                 "net.active: " + Net.active(),
                 "net.server: " + Net.server(),
                 "net.client: " + Net.client(),
                 "state: " + state.getState(),
+                "units: " + totalUnits,
+                "bullets: " + bulletGroup.size(),
                 Net.client() ?
                 "chat.open: " + ui.chatfrag.chatOpen() + "\n" +
                 "chat.messages: " + ui.chatfrag.getMessagesSize() + "\n" +

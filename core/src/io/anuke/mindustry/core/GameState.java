@@ -1,5 +1,6 @@
 package io.anuke.mindustry.core;
 
+import io.anuke.mindustry.ai.WaveSpawner;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.GameMode;
@@ -17,6 +18,7 @@ public class GameState{
 	public GameMode mode = GameMode.waves;
 	public Difficulty difficulty = Difficulty.normal;
 	public boolean friendlyFire;
+	public WaveSpawner spawner = new WaveSpawner();
 	public TeamInfo teams = new TeamInfo();
 	
 	public void set(State astate){

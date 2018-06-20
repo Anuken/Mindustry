@@ -92,8 +92,8 @@ public class TeamInfo {
     public boolean areEnemies(Team team, Team other){
         if(team == other) return false; //fast fail to be more efficient
         boolean ally = (allyBits & (1 << team.ordinal())) != 0;
-        boolean ally2 = (enemyBits & (1 << other.ordinal())) != 0;
-        return (ally == ally2) || !ally; //if it's not in the game, target everything.
+        boolean enemy = (enemyBits & (1 << other.ordinal())) != 0;
+        return (ally == enemy) || !ally; //if it's not in the game, target everything.
     }
 
     public class TeamData {

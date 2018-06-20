@@ -10,7 +10,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.EntityPhysics;
-import io.anuke.ucore.entities.impl.BaseEntity;
+import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.util.Mathf;
@@ -99,9 +99,10 @@ public class Units {
         return findTile(x, y, range, tile -> state.teams.areEnemies(team, tile.getTeam()) && pred.test(tile));
     }
 
+    //TODO optimize, spatial caching of tiles
     /**Returns the neareset tile entity in a range.*/
     public static TileEntity findTile(float x, float y, float range, Predicate<Tile> pred){
-        BaseEntity closest = null;
+        Entity closest = null;
         float dst = 0;
 
         int rad = (int)(range/tilesize)+1;

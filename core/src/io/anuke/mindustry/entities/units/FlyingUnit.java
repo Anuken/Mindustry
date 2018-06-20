@@ -23,7 +23,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     protected static float maxAim = 30f;
     protected static float wobblyness = 0.6f;
 
-    protected Trail trail = new Trail(16);
+    protected Trail trail = new Trail(8);
     protected CarriableTrait carrying;
 
     public FlyingUnit(UnitType type, Team team) {
@@ -78,6 +78,11 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
         if(health <= health * type.retreatPercent && !isWave &&
                 Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair)) != null){
             setState(retreat);
+        }
+
+        if(squad != null){
+            squad.direction.add(velocity.x / squad.units, velocity.y / squad.units);
+            velocity.setAngle(Mathf.slerpDelta(velocity.angle(), squad.direction.angle(), 0.3f));
         }
     }
 
