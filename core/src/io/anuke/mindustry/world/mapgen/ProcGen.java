@@ -12,11 +12,13 @@ import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Mathf;
 
 public class ProcGen {
-    public RidgedPerlin rid = new RidgedPerlin(1, 1);
-    public Simplex sim = new Simplex();
+    private RidgedPerlin rid = new RidgedPerlin(1, 1);
+    private Simplex sim = new Simplex();
+    private Simplex sim2 = new Simplex();
 
     public MapTileData generate(GenProperties props){
         sim.setSeed(Mathf.random(9999));
+        sim2.setSeed(Mathf.random(9999));
         rid = new RidgedPerlin(Mathf.random(9999), 1);
 
         MapTileData data = new MapTileData(300, 300);
@@ -25,14 +27,21 @@ public class ProcGen {
             for (int y = 0; y < data.height(); y++) {
                 marker.floor = (byte)Blocks.stone.id;
 
-                double r = rid.getValue(x, y, 1/70f);
-                double elevation = sim.octaveNoise2D(3, 0.6, 1f/50, x, y) * 3 - 1 - r*2;
+                double r = sim2.octaveNoise2D(1, 0.6, 1f/70, x, y);
+                double elevation = sim.octaveNoise2D(3, 0.5, 1f/70, x, y) * 4 - 1.2;
+                double edgeDist = Math.max(data.width()/2, data.height()/2) - Math.max(Math.abs(x - data.width()/2), Math.abs(y - data.height()/2));
 
-                if(r > 0.0){
+                double border = 10;
+
+                if(edgeDist < border){
+                    elevation += (border - edgeDist)/4.0;
+                }
+
+                if(r > 0.9){
                     marker.floor = (byte)Blocks.water.id;
                     elevation = 0;
 
-                    if(r > 0.055){
+                    if(r > 0.94){
                         marker.floor = (byte)Blocks.deepwater.id;
                     }
                 }
