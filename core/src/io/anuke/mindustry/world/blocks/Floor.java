@@ -58,7 +58,7 @@ public class Floor extends Block{
 	/**liquids that drop from this block, used for pumps*/
 	public Liquid liquidDrop = null;
 	/**Whether ores generate on this block.*/
-	public boolean hasOres = true;
+	public boolean hasOres = false;
 	/**whether this block can be drowned in*/
 	public boolean isLiquid;
 	

@@ -35,6 +35,7 @@ public class MapIO {
         data.position(0, 0);
 
         TileDataMarker marker = data.newDataMarker();
+        Color color = new Color();
 
         for(int y = 0; y < data.height(); y ++){
             for(int x = 0; x < data.width(); x ++){
@@ -43,7 +44,14 @@ public class MapIO {
                 Block wall = Block.getByID(marker.wall);
                 int wallc = ColorMapper.getColor(wall);
                 if(wallc == 0 && (wall.update || wall.solid || wall.breakable)) wallc = Color.rgba8888(Team.values()[marker.team].color);
-                pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, wallc == 0 ? ColorMapper.getColor(floor) : wallc);
+                wallc = wallc == 0 ? ColorMapper.getColor(floor) : wallc;
+                if(marker.elevation > 0){
+                    float scaling = 1f + marker.elevation/8f;
+                    color.set(wallc);
+                    color.mul(scaling, scaling, scaling, 1f);
+                    wallc = Color.rgba8888(color);
+                }
+                pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, wallc);
             }
         }
 

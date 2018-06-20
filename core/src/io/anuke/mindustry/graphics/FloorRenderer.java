@@ -220,7 +220,7 @@ public class FloorRenderer {
 
         Timers.mark();
 
-        int chunksx = world.width() / chunksize, chunksy = world.height() / chunksize;
+        int chunksx = Mathf.ceil((float)world.width() / chunksize), chunksy = Mathf.ceil((float)world.height() / chunksize);
         cache = new Chunk[chunksx][chunksy];
         cbatch = new CacheBatch(world.width()*world.height()*4*4);
 

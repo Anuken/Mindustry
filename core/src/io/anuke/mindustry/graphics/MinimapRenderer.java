@@ -1,6 +1,7 @@
 package io.anuke.mindustry.graphics;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
@@ -34,6 +35,7 @@ public class MinimapRenderer implements Disposable{
     private TextureRegion region;
     private Rectangle rect = new Rectangle();
     private Rectangle clipRect = new Rectangle();
+    private Color tmpColor = new Color();
     private int zoom = 4;
 
     public MinimapRenderer(){
@@ -138,6 +140,11 @@ public class MinimapRenderer implements Disposable{
     private int colorFor(Tile tile){
         int color = tile.breakable() ? tile.target().getTeam().intColor : ColorMapper.getColor(tile.block());
         if(color == 0) color = ColorMapper.getColor(tile.floor());
+        if(tile.cliffs != 0){
+            tmpColor.set(color);
+            tmpColor.mul(1.5f, 1.5f, 1.5f, 1f);
+            color = Color.rgba8888(tmpColor);
+        }
         return color;
     }
 

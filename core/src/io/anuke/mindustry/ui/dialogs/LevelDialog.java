@@ -1,11 +1,20 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.io.Map;
+import io.anuke.mindustry.io.MapMeta;
+import io.anuke.mindustry.io.MapTileData;
+import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.WorldGenerator;
+import io.anuke.mindustry.world.mapgen.ProcGen;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.entities.EntityPhysics;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
@@ -99,7 +108,6 @@ public class LevelDialog extends FloatingDialog{
 			ImageButton image = new ImageButton(new TextureRegion(map.texture), "togglemap");
 			image.row();
 			image.add(inset).width(images+6);
-			//TODO custom map delete button
 
 			image.clicked(() -> {
 				hide();
@@ -112,10 +120,41 @@ public class LevelDialog extends FloatingDialog{
 			
 			maps.add(stack).width(170).top().pad(4f);
 			
-			maps.marginRight(26);
-			
 			i ++;
 		}
+
+		maps.addImageButton("icon-editor", 16*4, () -> {
+			hide();
+
+			ProcGen gen = new ProcGen();
+			MapTileData data = gen.generate(null);
+			Map map = new Map("generated-map", new MapMeta(0, new ObjectMap<>(), data.width(), data.height(), null), true, () -> null);
+
+			ui.loadfrag.show();
+
+			Timers.run(5f, () -> {
+				threads.run(() -> {
+					logic.reset();
+
+					world.beginMapLoad();
+					world.setMap(map);
+
+					int width = map.meta.width, height = map.meta.height;
+
+					Tile[][] tiles = world.createTiles(data.width(), data.height());
+
+					EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
+
+					WorldGenerator.generate(tiles, data, true, 0);
+
+					world.endMapLoad();
+
+					logic.play();
+
+					Gdx.app.postRunnable(ui.loadfrag::hide);
+				});
+			});
+		}).size(170, 154f + 73).pad(4f);
 		
 		content().add(pane).uniformX();
 	}

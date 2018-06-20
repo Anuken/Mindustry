@@ -151,7 +151,7 @@ public class Control extends Module{
 
 			hiscore = false;
 
-			ui.hudfrag.fadeRespawn(false);
+			saves.resetSave();
 		});
 
 		Events.on(WaveEvent.class, () -> {
@@ -260,7 +260,6 @@ public class Control extends Module{
 
 	public void playMap(Map map){
 		ui.loadfrag.show();
-		saves.resetSave();
 
 		Timers.run(5f, () -> {
 			threads.run(() -> {

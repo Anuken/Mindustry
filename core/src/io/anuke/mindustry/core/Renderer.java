@@ -298,14 +298,16 @@ public class Renderer extends RendererModule{
 							.lerp(tmpVector2.set(lastx, lasty), alpha);
 					s.setRotation(Mathf.slerp(s.lastPosition().z, lastrot, alpha));
 
-					s.set(tmpVector1.x, tmpVector1.y);
+					s.setX(tmpVector1.x);
+					s.setY(tmpVector1.y);
 				}
 			}
 
 			drawer.accept(t);
 
 			if(threads.doInterpolate() && threads.isEnabled()) {
-				t.set(lastx, lasty);
+				t.setX(lastx);
+				t.setY(lasty);
 
 				if (t instanceof SolidTrait) {
 					((SolidTrait) t).setRotation(lastrot);
