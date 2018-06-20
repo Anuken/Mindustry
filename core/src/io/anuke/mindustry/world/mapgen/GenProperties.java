@@ -1,8 +1,7 @@
-package io.anuke.mindustry.server.mapgen;
+package io.anuke.mindustry.world.mapgen;
 
 public class GenProperties {
     public long seed;
-    public SpawnStyle spawns;
     public MapStyle maps;
     public OreStyle ores;
     public RiverType riverType;
@@ -10,15 +9,6 @@ public class GenProperties {
     public TerrainStyle terrains;
     public FoliageStyle foliage;
     public EnvironmentStyle environment;
-
-    enum SpawnStyle{
-        /**spawn in a wide arc with branching paths*/
-        arc,
-        /**spawn in one big group*/
-        grouped,
-        /**surround player spawn*/
-        surround
-    }
 
     enum MapStyle{
         /**256x512*/

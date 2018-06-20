@@ -102,7 +102,7 @@ public class Logic extends Module {
 
     @Override
     public void update(){
-        if(!doUpdate) return;
+        if(threads.isEnabled() && !threads.isOnThread()) return;
 
         if(!state.is(State.menu)){
 

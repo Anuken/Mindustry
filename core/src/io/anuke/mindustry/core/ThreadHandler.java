@@ -111,6 +111,10 @@ public class ThreadHandler {
         return enabled;
     }
 
+    public boolean isOnThread(){
+        return impl.isOnThread();
+    }
+
     private void runLogic(){
         try {
             while (true) {

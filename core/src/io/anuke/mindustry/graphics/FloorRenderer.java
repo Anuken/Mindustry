@@ -39,6 +39,9 @@ public class FloorRenderer {
     }
 
     public void drawFloor(){
+        if(cache == null){
+            return;
+        }
 
         OrthographicCamera camera = Core.camera;
 
@@ -103,6 +106,10 @@ public class FloorRenderer {
     }
 
     public void beginDraw(){
+        if(cache == null){
+            return;
+        }
+
         cbatch.setProjectionMatrix(Core.camera.combined);
         cbatch.beginDraw();
 
@@ -110,10 +117,18 @@ public class FloorRenderer {
     }
 
     public void endDraw(){
+        if(cache == null){
+            return;
+        }
+
         cbatch.endDraw();
     }
 
     public void drawLayer(CacheLayer layer){
+        if(cache == null){
+            return;
+        }
+
         OrthographicCamera camera = Core.camera;
 
         int crangex = (int)(camera.viewportWidth * camera.zoom / (chunksize * tilesize))+1;
