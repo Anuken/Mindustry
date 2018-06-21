@@ -21,7 +21,8 @@ public class DefenseBlocks extends BlockList implements ContentList {
         }};
 
         ironwalllarge = new Wall("ironwall-large") {{
-            health = 80 * wallHealthMultiplier;
+            health = 80 * 4 * wallHealthMultiplier;
+            size = 2;
         }};
 
         steelwall = new Wall("steelwall") {{

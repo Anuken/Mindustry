@@ -32,7 +32,10 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.ThreadQueue;
+import io.anuke.ucore.util.Timer;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -54,7 +57,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	public float pointerX, pointerY;
 	public String name = "name";
 	public String uuid, usid;
-	public boolean isAdmin, isTransferring, isShooting;
+	public boolean isAdmin, isTransferring, isShooting, isBoosting;
+	public float boostHeat;
 	public Color color = new Color();
 	public Mech mech;
 
@@ -82,7 +86,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	//endregion
 
 	//region unit and event overrides, utility methods
-
 
 	@Override
 	public int getItemCapacity() {
@@ -250,9 +253,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		if((debug && (!showPlayer || !showUI)) || dead) return;
 
 		if(!movement.isZero() && moved){
-			walktime += Timers.delta() * movement.len()/1.6f * getFloorOn().speedMultiplier;
+			walktime += Timers.delta() * movement.len()/0.7f * getFloorOn().speedMultiplier;
 			baseRotation = Mathf.slerpDelta(baseRotation, movement.angle(), 0.13f);
 		}
+
+		boostHeat = Mathf.lerpDelta(boostHeat, isBoosting ? 1f : 0f, 0.08f);
 
         boolean snap = snapCamera && isLocal;
 
@@ -263,7 +268,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 			y = (int)y;
 		}
 
-		float ft = Mathf.sin(walktime, 6f, 2f);
+		float ft = Mathf.sin(walktime, 6f, 2f) * (1f-boostHeat);
 
 		Floor floor = getFloorOn();
 
@@ -275,11 +280,15 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 				Draw.tint(Color.WHITE, floor.liquidColor, 0.5f);
 			}
 
+			float boostTrnsY = -boostHeat * 3f;
+			float boostTrnsX = boostHeat * 3f;
+			float boostAng = boostHeat*40f;
+
 			for (int i : Mathf.signs) {
 				Draw.rect(mech.legRegion,
-						x + Angles.trnsx(baseRotation, ft * i),
-						y + Angles.trnsy(baseRotation, ft * i),
-						12f * i, 12f - Mathf.clamp(ft * i, 0, 2), baseRotation - 90);
+						x + Angles.trnsx(baseRotation, ft * i + boostTrnsY, -boostTrnsX*i),
+						y + Angles.trnsy(baseRotation, ft * i + boostTrnsY, -boostTrnsX*i),
+						12f * i, 12f - Mathf.clamp(ft * i, 0, 2), baseRotation - 90 + boostAng*i);
 			}
 
 			Draw.rect(mech.baseRegion, x, y, baseRotation- 90);
@@ -328,8 +337,13 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	        drawBuilding(this);
         }
 
-		if(mech.flying){
-	    	trail.draw(Palette.lighterOrange, Palette.lightishOrange, 5f);
+		if(mech.flying || boostHeat > 0.001f){
+			float wobblyness = 0.6f;
+			trail.update(x + Angles.trnsx(rotation + 180f, 5f) + Mathf.range(wobblyness),
+					y + Angles.trnsy(rotation + 180f, 5f) + Mathf.range(wobblyness));
+	    	trail.draw(Palette.lighterOrange, Palette.lightishOrange, 5f * (isFlying() ? 1f : boostHeat));
+		}else{
+	    	trail.clear();
 		}
     }
 
@@ -421,11 +435,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 		avoidOthers(8f);
 
-		float wobblyness = 0.6f;
-
-		trail.update(x + Angles.trnsx(rotation + 180f, 6f) + Mathf.range(wobblyness),
-				y + Angles.trnsy(rotation + 180f, 6f) + Mathf.range(wobblyness));
-
 		if(!isShooting()) {
 			updateBuilding(this);
 		}
@@ -444,7 +453,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 		if(ui.chatfrag.chatOpen()) return;
 
-		float speed = Inputs.keyDown("dash") && debug ? 5f : mech.speed;
+		float speed = isBoosting ? mech.boostSpeed : mech.speed;
 		float carrySlowdown = 0.3f;
 
 		speed *= ((1f-carrySlowdown) +  (inventory.hasItem() ? (float)inventory.getItem().amount/inventory.capacity(): 1f) * carrySlowdown);
@@ -474,14 +483,12 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 			}
 		}
 
-		movement.set(0, 0);
+		movement.setZero();
 
 		String section = "player_" + (playerIndex + 1);
 
 		float xa = Inputs.getAxis(section, "move_x");
 		float ya = Inputs.getAxis(section, "move_y");
-		if(Math.abs(xa) < 0.3) xa = 0;
-		if(Math.abs(ya) < 0.3) ya = 0;
 
 		movement.y += ya*speed;
 		movement.x += xa*speed;
@@ -497,7 +504,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		velocity.add(movement);
 
 		float prex = x, prey = y;
-		updateVelocityStatus(mech.drag, debug ? speed : mech.maxSpeed);
+		updateVelocityStatus(mech.drag, 10f);
 		moved = distanceTo(prex, prey) > 0.01f;
 
 		if(!isShooting()){
@@ -620,7 +627,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	}
 
 	public boolean isShooting(){
-		return isShooting && inventory.hasAmmo();
+		return isShooting && inventory.hasAmmo() && !isBoosting;
 	}
 
 	public void setRespawning(){
@@ -680,6 +687,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		buffer.writeInt(Color.rgba8888(color));
 		buffer.writeBoolean(dead);
 		buffer.writeByte(mech.id);
+		buffer.writeBoolean(isBoosting);
 	}
 
 	@Override
@@ -691,12 +699,15 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		color.set(buffer.readInt());
 		dead = buffer.readBoolean();
 		mech = Upgrade.getByID(buffer.readByte());
+		boolean dashing = buffer.readBoolean();
 		interpolator.read(lastx, lasty, x, y, time, rotation);
 		rotation = lastrot;
 
 		if(isLocal){
 			x = lastx;
 			y = lasty;
+		}else{
+			isBoosting = dashing;
 		}
 	}
 

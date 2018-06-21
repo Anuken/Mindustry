@@ -40,7 +40,7 @@ public class Vars{
 	//waves can last no longer than 3 minutes, otherwise the next one spawns
 	public static final float maxwavespace = 60*60*4f;
 
-	public static final float coreBuildRange = 400f;
+	public static final float coreBuildRange = 800f;
 	//discord group URL
 	public static final String discordURL = "https://discord.gg/BKADYds";
 

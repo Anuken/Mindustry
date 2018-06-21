@@ -170,8 +170,10 @@ public class NetServer extends Module{
 
             long elapsed = TimeUtils.timeSinceMillis(connection.lastRecievedTime);
 
+            float maxSpeed = packet.boosting ? player.mech.boostSpeed : player.mech.speed;
+
             //extra 1.1x multiplicaton is added just in case
-            float maxMove = elapsed / 1000f * 60f * player.mech.maxSpeed * 1.1f;
+            float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.1f;
 
             player.pointerX = packet.pointerX;
             player.pointerY = packet.pointerY;

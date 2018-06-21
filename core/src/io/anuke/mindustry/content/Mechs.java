@@ -17,26 +17,22 @@ public class Mechs implements ContentList {
 
         alpha = new Mech("alpha-mech", false){{
             drillPower = 2;
-            speed = 1.1f;
-            maxSpeed = 1.1f;
+            speed = 0.5f;
         }};
 
         delta = new Mech("delta-mech", false){{
             drillPower = -1;
-            speed = 1.5f;
-            maxSpeed = 1.5f;
+            speed = 0.6f;
         }};
 
         tau = new Mech("tau-mech", false){{
             drillPower = 2;
-            speed = 1.1f;
-            maxSpeed = 1.1f;
+            speed = 0.5f;
         }};
 
         omega = new Mech("omega-mech", false){{
             drillPower = 1;
-            speed = 1.0f;
-            maxSpeed = 1.0f;
+            speed = 0.4f;
         }};
 
         dart = new Mech("dart-ship", true){{

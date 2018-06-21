@@ -306,6 +306,7 @@ public abstract class BaseUnit extends Unit{
 		if(unit == null) return;
 
 		unit.onSuperDeath();
+		UnitDrops.dropItems(unit);
 
 		Effects.effect(ExplosionFx.explosion, unit);
 		Effects.shake(2f, 2f, unit);

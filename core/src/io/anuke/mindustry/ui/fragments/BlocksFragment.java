@@ -1,10 +1,12 @@
 package io.anuke.mindustry.ui.fragments;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.type.Category;
 import io.anuke.mindustry.type.ItemStack;
@@ -116,6 +118,7 @@ public class BlocksFragment implements Fragment{
 
 		int cati = 0;
 		int checkedi = 0;
+		int rowsUsed = 0;
 
 		//add categories
 		for (Category cat : Category.values()) {
@@ -184,6 +187,8 @@ public class BlocksFragment implements Fragment{
 				}
 
 				image.getImageCell().setActor(istack).size(size);
+				image.getStyle().imageUpColor = Color.WHITE;
+				image.getStyle().imageDisabledColor = Color.GRAY;
 				image.addChild(istack);
 				image.setTouchable(Touchable.enabled);
 				image.getImage().remove();
@@ -225,9 +230,23 @@ public class BlocksFragment implements Fragment{
 					}
 				});
 
+				image.setDisabled(() -> {
+					TileEntity entity = players[0].getClosestCore();
+
+					if(entity == null) return true;
+
+					for(ItemStack s : r.requirements){
+						if(!entity.items.hasItem(s.item, Mathf.ceil(s.amount/2f))){
+							return true;
+						}
+					}
+					return false;
+				});
+
 				recipeTable.add(image).size(size + 8);
 
 				image.update(() -> {
+					image.getImage().setColor(image.isDisabled() ? Color.GRAY : Color.WHITE);
 					for(Player player : players){
 						if(control.input(player.playerIndex).recipe == r){
 							image.setChecked(true);
@@ -238,6 +257,7 @@ public class BlocksFragment implements Fragment{
 				});
 
 				if (i % rows == rows - 1) {
+					rowsUsed = Math.max((i+1)/rows, rowsUsed);
 					recipeTable.row();
 				}
 
@@ -252,7 +272,7 @@ public class BlocksFragment implements Fragment{
 		}
 
 		selectTable.row();
-		selectTable.add(stack).growX().left().top().colspan(Category.values().length).padBottom(-5).height((size + 12)*maxrow);
+		selectTable.add(stack).growX().left().top().colspan(Category.values().length).padBottom(-5).height((size + 12)*rowsUsed);
 	}
 
 	void toggle(boolean show, float t, Interpolation ip){
@@ -305,14 +325,7 @@ public class BlocksFragment implements Fragment{
 
 		for(ItemStack stack : recipe.requirements){
 			requirements.addImage(stack.item.region).size(8*3);
-			Label reqlabel = new Label("");
-
-			reqlabel.update(() -> {
-				int current = stack.amount;
-				String text = Mathf.clamp(current, 0, stack.amount) + "/" + stack.amount;
-
-				reqlabel.setText(text);
-			});
+			Label reqlabel = new Label(() -> Mathf.clamp(stack.amount, 0, stack.amount) + "/" + stack.amount);
 
 			requirements.add(reqlabel).left();
 			requirements.row();

@@ -40,6 +40,7 @@ public class Recipes implements ContentList{
         new Recipe(power, PowerBlocks.battery, new ItemStack(Items.iron, 8), new ItemStack(Items.lead, 30));
         //new Recipe(power, PowerBlocks.batteryLarge, new ItemStack(Items.steel, 5), new ItemStack(Items.iron, 5));
         new Recipe(power, PowerBlocks.combustiongenerator, new ItemStack(Items.iron, 30), new ItemStack(Items.lead, 30));
+
         //new Recipe(distribution, StorageBlocks.vault, new ItemStack(Items.steel, 50));
         //new Recipe(distribution, StorageBlocks.core, new ItemStack(Items.steel, 50));
         //new Recipe(distribution, StorageBlocks.unloader, new ItemStack(Items.steel, 5));
@@ -49,6 +50,10 @@ public class Recipes implements ContentList{
         new Recipe(production, ProductionBlocks.reinforcedDrill, new ItemStack(Items.iron, 20), new ItemStack(Items.lead, 20));
         new Recipe(production, ProductionBlocks.steelDrill, new ItemStack(Items.iron, 40), new ItemStack(Items.lead, 25), new ItemStack(Items.steel, 25));
         new Recipe(production, ProductionBlocks.titaniumDrill, new ItemStack(Items.iron, 40), new ItemStack(Items.titanium, 40), new ItemStack(Items.steel, 40));
+
+        new Recipe(units, UnitBlocks.droneFactory, new ItemStack(Items.iron, 50), new ItemStack(Items.lead, 50));
+        new Recipe(units, UnitBlocks.repairPoint, new ItemStack(Items.lead, 20), new ItemStack(Items.steel, 10));
+
         /*
         new Recipe(production, ProductionBlocks.laserdrill, new ItemStack(Items.titanium, 40), new ItemStack(Items.surgealloy, 40));
         new Recipe(production, ProductionBlocks.nucleardrill, new ItemStack(Items.titanium, 40), new ItemStack(Items.surgealloy, 40));

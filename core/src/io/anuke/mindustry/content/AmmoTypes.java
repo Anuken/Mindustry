@@ -15,32 +15,32 @@ public class AmmoTypes implements ContentList {
 
         //bullets
 
-        bulletIron = new AmmoType(Items.iron, StandardBullets.iron, 5) {{
+        bulletIron = new AmmoType(Items.iron, StandardBullets.iron, 3) {{
             shootEffect = ShootFx.shootSmall;
             smokeEffect = ShootFx.shootSmallSmoke;
         }};
 
-        bulletLead = new AmmoType(Items.lead, StandardBullets.lead, 5) {{
+        bulletLead = new AmmoType(Items.lead, StandardBullets.lead, 3) {{
             shootEffect = ShootFx.shootSmall;
             smokeEffect = ShootFx.shootSmallSmoke;
         }};
 
-        bulletSteel = new AmmoType(Items.steel, StandardBullets.steel, 5) {{
+        bulletSteel = new AmmoType(Items.steel, StandardBullets.steel, 3) {{
             shootEffect = ShootFx.shootSmall;
             smokeEffect = ShootFx.shootSmallSmoke;
         }};
 
-        bulletThorium = new AmmoType(Items.thorium, StandardBullets.thorium, 5) {{
+        bulletThorium = new AmmoType(Items.thorium, StandardBullets.thorium, 3) {{
             shootEffect = ShootFx.shootSmall;
             smokeEffect = ShootFx.shootSmallSmoke;
         }};
 
-        bulletSilicon = new AmmoType(Items.silicon, StandardBullets.homing, 5) {{
+        bulletSilicon = new AmmoType(Items.silicon, StandardBullets.homing, 3) {{
             shootEffect = ShootFx.shootSmall;
             smokeEffect = ShootFx.shootSmallSmoke;
         }};
 
-        bulletThermite = new AmmoType(Items.thermite, StandardBullets.tracer, 5) {{
+        bulletThermite = new AmmoType(Items.thermite, StandardBullets.tracer, 3) {{
             shootEffect = ShootFx.shootSmall;
             smokeEffect = ShootFx.shootSmallSmoke;
         }};

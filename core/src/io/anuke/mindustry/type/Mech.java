@@ -9,6 +9,7 @@ public class Mech extends Upgrade {
 
 	public float speed = 1.1f;
 	public float maxSpeed = 1.1f;
+	public float boostSpeed = 0.75f;
 	public float drag = 0.4f;
 	public float mass = 1f;
 	public float armor = 1f;

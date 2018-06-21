@@ -126,6 +126,8 @@ public class DesktopInput extends InputHandler{
 	public void update(){
 		if(player.isDead() || state.is(State.menu) || ui.hasDialog()) return;
 
+		player.isBoosting = Inputs.keyDown("dash");
+
 		//deslect if not placing
 		if(!isPlacing() && mode == placing){
 		    mode = none;

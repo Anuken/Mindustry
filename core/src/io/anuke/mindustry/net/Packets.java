@@ -104,6 +104,7 @@ public class Packets {
         public long timeSent;
         //player snapshot data
         public float x, y, pointerX, pointerY, rotation, baseRotation, xv, yv;
+        public boolean boosting;
 
         @Override
         public void write(ByteBuffer buffer) {
@@ -117,6 +118,7 @@ public class Packets {
             buffer.putFloat(player.y);
             buffer.putFloat(player.pointerX);
             buffer.putFloat(player.pointerY);
+            buffer.put(player.isBoosting ? (byte)1 : 0);
 
             buffer.put((byte)(Mathf.clamp(player.getVelocity().x, -Unit.maxAbsVelocity, Unit.maxAbsVelocity) * Unit.velocityPercision));
             buffer.put((byte)(Mathf.clamp(player.getVelocity().y, -Unit.maxAbsVelocity, Unit.maxAbsVelocity) * Unit.velocityPercision));
@@ -135,6 +137,7 @@ public class Packets {
             y = buffer.getFloat();
             pointerX = buffer.getFloat();
             pointerY = buffer.getFloat();
+            boosting = buffer.get() == 1;
             xv = buffer.get() / Unit.velocityPercision;
             yv = buffer.get() / Unit.velocityPercision;
             rotation = buffer.getShort()/2f;
