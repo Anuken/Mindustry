@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.mapgen;
 
+import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
@@ -30,11 +31,16 @@ public class ProcGen {
                 double r = sim2.octaveNoise2D(1, 0.6, 1f/70, x, y);
                 double elevation = sim.octaveNoise2D(3, 0.5, 1f/70, x, y) * 4 - 1.2;
                 double edgeDist = Math.max(data.width()/2, data.height()/2) - Math.max(Math.abs(x - data.width()/2), Math.abs(y - data.height()/2));
+                double dst = Vector2.dst(data.width()/2, data.height()/2, x, y);
 
-                double border = 10;
+                double border = 14;
 
                 if(edgeDist < border){
-                    elevation += (border - edgeDist)/4.0;
+                    elevation += (border - edgeDist)/6.0;
+                }
+
+                if(dst < 20){
+                    elevation = 0;
                 }
 
                 if(r > 0.9){

@@ -24,7 +24,7 @@ public class UnitTypes implements ContentList {
 
         scout = new UnitType("scout", team -> new Scout(scout, team)){{
             maxVelocity = 1.1f;
-            speed = 0.1f;
+            speed = 0.2f;
             drag = 0.4f;
             range = 40f;
             setAmmo(AmmoTypes.bulletIron);

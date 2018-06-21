@@ -111,6 +111,7 @@ public abstract class GroundUnit extends BaseUnit {
 
     protected void moveToCore(){
         Tile tile = world.tileWorld(x, y);
+        if(tile == null) return;
         Tile targetTile = world.pathfinder().getTargetTile(team, tile);
 
         if(tile == targetTile) return;
@@ -150,7 +151,7 @@ public abstract class GroundUnit extends BaseUnit {
             }
 
             //TODO move toward resupply point
-            if(inventory.totalAmmo() + 10 >= inventory.ammoCapacity()){
+            if(isWave || inventory.totalAmmo() + 10 >= inventory.ammoCapacity()){
                 state.set(attack);
             }
         }

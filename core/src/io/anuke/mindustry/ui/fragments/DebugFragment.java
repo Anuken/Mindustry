@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import io.anuke.mindustry.content.AmmoTypes;
 import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.entities.Player;
@@ -79,6 +80,8 @@ public class DebugFragment implements Fragment {
                new button("spawng", () ->{
                    BaseUnit unit = UnitTypes.scout.create(player.getTeam());
                    unit.set(player.x, player.y);
+                   unit.inventory.addAmmo(AmmoTypes.bulletIron);
+                   unit.setWave();
                    unit.add();
                });
                row();

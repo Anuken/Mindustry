@@ -79,8 +79,12 @@ public class Pathfinder {
         return paths[Team.red.ordinal()].weights[x][y];
     }
 
+    public float getValueforTeam(Team team, int x, int y){
+        return paths == null ? 0 : paths[team.ordinal()].weights[x][y];
+    }
+
     private boolean passable(Tile tile, Team team){
-        return (tile.getWallID() == 0 && !(tile.floor().isLiquid && (tile.floor().damageTaken > 0 || tile.floor().drownTime > 0)))
+        return (tile.getWallID() == 0 && tile.cliffs == 0 && !(tile.floor().isLiquid && (tile.floor().damageTaken > 0 || tile.floor().drownTime > 0)))
                 || (tile.breakable() && (tile.getTeam() != team)) || !tile.solid();
     }
 
@@ -172,6 +176,8 @@ public class Pathfinder {
 
             createFor(data.team);
         }
+
+        state.spawner.checkAllQuadrants();
 
         Log.info("Elapsed calculation time: {0}", Timers.elapsed());
     }
