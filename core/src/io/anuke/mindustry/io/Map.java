@@ -1,6 +1,7 @@
 package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.ucore.function.Supplier;
 
 import java.io.InputStream;
@@ -22,6 +23,10 @@ public class Map {
         this.custom = custom;
         this.meta = meta;
         this.stream = streamSupplier;
+    }
+
+    public Map(String unknownName, int width, int height){
+        this(unknownName, new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
     }
 
     public String getDisplayName(){

@@ -41,9 +41,7 @@ public class ProcGen {
 
                 if(dst < 20){
                     elevation = 0;
-                }
-
-                if(r > 0.9){
+                }else if(r > 0.9){
                     marker.floor = (byte)Blocks.water.id;
                     elevation = 0;
 

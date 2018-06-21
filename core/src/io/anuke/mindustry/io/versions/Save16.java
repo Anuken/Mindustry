@@ -9,13 +9,13 @@ import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.SaveFileVersion;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.EntityPhysics;
 import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.util.Bits;
 
@@ -23,7 +23,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.world;
 
 public class Save16 extends SaveFileVersion {
 
@@ -39,7 +40,8 @@ public class Save16 extends SaveFileVersion {
         //general state
         byte mode = stream.readByte();
         String mapname = stream.readUTF();
-        world.setMap(world.maps().getByName(mapname));
+        Map map = world.maps().getByName(mapname);
+        world.setMap(map);
 
         int wave = stream.readInt();
         byte difficulty = stream.readByte();
@@ -55,13 +57,13 @@ public class Save16 extends SaveFileVersion {
 
         int blocksize = stream.readInt();
 
-        IntMap<Block> map = new IntMap<>();
+        IntMap<Block> blockMap = new IntMap<>();
 
         for(int i = 0; i < blocksize; i ++){
             String name = stream.readUTF();
             int id = stream.readShort();
 
-            map.put(id, Block.getByName(name));
+            blockMap.put(id, Block.getByName(name));
         }
 
         //entities
@@ -82,7 +84,9 @@ public class Save16 extends SaveFileVersion {
         short width = stream.readShort();
         short height = stream.readShort();
 
-        EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
+        if(map == null){
+            world.setMap(new Map("unknown", width, height));
+        }
 
         world.beginMapLoad();
 

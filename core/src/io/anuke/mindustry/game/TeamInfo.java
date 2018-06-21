@@ -76,6 +76,18 @@ public class TeamInfo {
         return ally ? enemies : allies;
     }
 
+    /**Returns a set of all teams that are allies of this team.
+     * For teams not active, an empty set is returned.*/
+    public ObjectSet<Team> alliesOf(Team team) {
+        boolean ally = allies.contains(team);
+        boolean enemy = enemies.contains(team);
+
+        //this team isn't even in the game, so target everything!
+        if(!ally && !enemy) return allTeams;
+
+        return !ally ? enemies : allies;
+    }
+
     /**Returns a set of all teams that are enemies of this team.
      * For teams not active, an empty set is returned.*/
     public ObjectSet<TeamData> enemyDataOf(Team team) {

@@ -53,7 +53,7 @@ public abstract class GroundUnit extends BaseUnit {
     public void update() {
         super.update();
 
-        if(target == null){
+        if(!velocity.isZero(0.001f) && (target == null || (inventory.hasAmmo() && distanceTo(target) <= inventory.getAmmoRange()))){
             rotation = Mathf.lerpDelta(rotation, velocity.angle(), 0.2f);
         }
     }
@@ -104,7 +104,6 @@ public abstract class GroundUnit extends BaseUnit {
         super.updateTargeting();
 
         if(Units.invalidateTarget(target, team,  x, y, Float.MAX_VALUE)){
-            if(target != null) Log.info("Invalidating target {0}", target);
             target = null;
         }
     }

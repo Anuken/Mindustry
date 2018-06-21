@@ -1,10 +1,12 @@
 package io.anuke.mindustry.ai;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Bits;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
@@ -13,11 +15,12 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Events;
+import io.anuke.ucore.entities.trait.Entity;
+import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.util.EnumSet;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 //TODO consider using quadtrees for finding specific types of blocks within an area
 //TODO maybe use Arrays instead of ObjectSets?
@@ -77,6 +80,12 @@ public class BlockIndexer {
                 }
             }
 
+            for (int x = 0; x < quadWidth(); x++) {
+                for (int y = 0; y < quadHeight(); y++) {
+                    updateQuadrant(world.tile(x * structQuadrantSize, y * structQuadrantSize));
+                }
+            }
+
             scanOres();
         });
     }
@@ -89,6 +98,36 @@ public class BlockIndexer {
     /**Get all enemy blocks with a flag.*/
     public ObjectSet<Tile> getEnemy(Team team, BlockFlag type){
         return (!state.teams.get(team).ally ? allyMap : enemyMap).get(type, emptyArray);
+    }
+
+    public TileEntity findTile(Team team, float x, float y, float range, Predicate<Tile> pred){
+        Entity closest = null;
+        float dst = 0;
+
+        for(int rx = Math.max((int)((x-range)/tilesize/structQuadrantSize), 0); rx <= (int)((x+range)/tilesize/structQuadrantSize) && rx < quadWidth(); rx ++){
+            for(int ry = Math.max((int)((y-range)/tilesize/structQuadrantSize), 0); ry <= (int)((y+range)/tilesize/structQuadrantSize) && ry < quadHeight(); ry ++){
+
+                if(!getQuad(team, rx, ry)) continue;
+
+                for(int tx = rx * structQuadrantSize; tx < (rx + 1) * structQuadrantSize && tx < world.width(); tx ++){
+                    for(int ty = ry * structQuadrantSize; ty < (ry + 1) * structQuadrantSize && ty < world.height(); ty ++ ){
+                        Tile other = world.tile(tx, ty);
+
+                        if(other == null || other.entity == null || !pred.test(other)) continue;
+
+                        TileEntity e = other.entity;
+
+                        float ndst = Vector2.dst(x, y, e.x, e.y);
+                        if(ndst < range && (closest == null || ndst < dst)){
+                            dst = ndst;
+                            closest = e;
+                        }
+                    }
+                }
+            }
+        }
+
+        return (TileEntity) closest;
     }
 
     /**Returns a set of tiles that have ores of the specified type nearby.
@@ -124,7 +163,8 @@ public class BlockIndexer {
         //this quadrant is now 'dirty', re-scan the whole thing
         int quadrantX = tile.x / structQuadrantSize;
         int quadrantY = tile.y / structQuadrantSize;
-        int index = quadrantX * Mathf.ceil(world.width() / (float)structQuadrantSize) + quadrantY;
+        int index = quadrantX + quadrantY * quadWidth();
+        //Log.info("Updating quadrant: {0} {1}", quadrantX, quadrantY);
 
         for(TeamData data : state.teams.getTeams()) {
 
@@ -148,6 +188,19 @@ public class BlockIndexer {
                 }
             }
         }
+    }
+
+    private boolean getQuad(Team team, int quadrantX, int quadrantY){
+        int index = quadrantX + quadrantY * Mathf.ceil(world.width() / (float)structQuadrantSize);
+        return structQuadrants[team.ordinal()].get(index);
+    }
+
+    private int quadWidth(){
+        return Mathf.ceil(world.width() / (float)structQuadrantSize);
+    }
+
+    private int quadHeight(){
+        return Mathf.ceil(world.height() / (float)structQuadrantSize);
     }
 
     private ObjectMap<BlockFlag, ObjectSet<Tile>> getMap(Team team){

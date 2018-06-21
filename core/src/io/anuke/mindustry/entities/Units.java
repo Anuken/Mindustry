@@ -10,10 +10,8 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.EntityPhysics;
-import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Predicate;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -91,43 +89,24 @@ public class Units {
 
     /**Returns the neareset ally tile in a range.*/
     public static TileEntity findAllyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
-        return findTile(x, y, range, tile -> !state.teams.areEnemies(team, tile.getTeam()) && pred.test(tile));
+        for(Team enemy : state.teams.alliesOf(team)){
+            TileEntity entity = world.indexer().findTile(enemy, x, y, range, pred);
+            if(entity != null){
+                return entity;
+            }
+        }
+        return null;
     }
 
     /**Returns the neareset enemy tile in a range.*/
     public static TileEntity findEnemyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
-        return findTile(x, y, range, tile -> state.teams.areEnemies(team, tile.getTeam()) && pred.test(tile));
-    }
-
-    //TODO optimize, spatial caching of tiles
-    /**Returns the neareset tile entity in a range.*/
-    public static TileEntity findTile(float x, float y, float range, Predicate<Tile> pred){
-        Entity closest = null;
-        float dst = 0;
-
-        int rad = (int)(range/tilesize)+1;
-        int tilex = Mathf.scl2(x, tilesize);
-        int tiley = Mathf.scl2(y, tilesize);
-
-        for(int rx = -rad; rx <= rad; rx ++){
-            for(int ry = -rad; ry <= rad; ry ++){
-                Tile other = world.tile(rx+tilex, ry+tiley);
-
-                if(other != null) other = other.target();
-
-                if(other == null || other.entity == null || !pred.test(other)) continue;
-
-                TileEntity e = other.entity;
-
-                float ndst = Vector2.dst(x, y, e.x, e.y);
-                if(ndst < range && (closest == null || ndst < dst)){
-                    dst = ndst;
-                    closest = e;
-                }
+        for(Team enemy : state.teams.enemiesOf(team)){
+            TileEntity entity = world.indexer().findTile(enemy, x, y, range, pred);
+            if(entity != null){
+                return entity;
             }
         }
-
-        return (TileEntity) closest;
+        return null;
     }
 
     /**Iterates over all units on all teams, including players.*/

@@ -5,6 +5,7 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
@@ -113,7 +114,7 @@ public abstract class BaseUnit extends Unit{
 	public void targetClosest(){
 		if(target != null) return;
 
-		//target = Units.getClosestTarget(team, x, y, inventory.getAmmoRange());
+		target = Units.getClosestTarget(team, x, y, inventory.getAmmoRange());
 	}
 
 	public UnitState getStartState(){
@@ -254,12 +255,14 @@ public abstract class BaseUnit extends Unit{
 	public void writeSave(DataOutput stream) throws IOException {
 		super.writeSave(stream);
 		stream.writeByte(type.id);
+		stream.writeBoolean(isWave);
 	}
 
 	@Override
 	public void readSave(DataInput stream) throws IOException {
 		super.readSave(stream);
 		byte type = stream.readByte();
+		this.isWave = stream.readBoolean();
 
 		this.type = UnitType.getByID(type);
 		add();

@@ -93,11 +93,11 @@ public class World extends Module{
 	}
 	
 	public int width(){
-		return currentMap.meta.width;
+		return tiles.length;
 	}
 	
 	public int height(){
-		return currentMap.meta.height;
+		return tiles[0].length;
 	}
 
 	public Tile tile(int packed){

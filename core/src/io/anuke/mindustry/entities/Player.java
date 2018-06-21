@@ -662,7 +662,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		if(local){
 			int index = stream.readByte();
 			players[index].readSaveSuper(stream);
-			dead = false;
+			players[index].dead = false;
 		}
 	}
 
