@@ -252,7 +252,7 @@ public class BlocksFragment implements Fragment{
 		}
 
 		selectTable.row();
-		selectTable.add(stack).colspan(Category.values().length).padBottom(-5).height((size + 12)*maxrow);
+		selectTable.add(stack).growX().left().top().colspan(Category.values().length).padBottom(-5).height((size + 12)*maxrow);
 	}
 
 	void toggle(boolean show, float t, Interpolation ip){

@@ -57,7 +57,7 @@ public class Logic extends Module {
                         }
                     }
                 }else{
-                    tile.entity.items.addItem(Items.iron, 50);
+                    tile.entity.items.addItem(Items.iron, 100);
                 }
             }
         }

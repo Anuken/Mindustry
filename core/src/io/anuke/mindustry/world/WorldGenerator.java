@@ -23,7 +23,7 @@ public class WorldGenerator {
 
 		Array<OreEntry> ores = Array.with(
 				new OreEntry(Blocks.iron, 0.3f, seed),
-				new OreEntry(Blocks.coal, 0.27f, seed),
+				new OreEntry(Blocks.coal, 0.284f, seed),
 				new OreEntry(Blocks.lead, 0.28f, seed),
 				new OreEntry(Blocks.titanium, 0.27f, seed),
 				new OreEntry(Blocks.thorium, 0.26f, seed)

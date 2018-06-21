@@ -18,26 +18,26 @@ public class ProductionBlocks extends BlockList implements ContentList {
     public void load() {
         ironDrill = new Drill("irondrill") {{
             tier = 1;
-            drillTime = 400;
+            drillTime = 360;
         }};
 
         reinforcedDrill = new Drill("reinforceddrill") {{
             tier = 2;
-            drillTime = 360;
+            drillTime = 320;
         }};
 
         steelDrill = new Drill("steeldrill") {{
             tier = 3;
-            drillTime = 320;
+            drillTime = 280;
         }};
 
         titaniumDrill = new Drill("titaniumdrill") {{
             tier = 4;
-            drillTime = 280;
+            drillTime = 240;
         }};
 
         laserdrill = new Drill("laserdrill") {{
-            drillTime = 220;
+            drillTime = 180;
             size = 2;
             powerUse = 0.2f;
             hasPower = true;
@@ -47,7 +47,7 @@ public class ProductionBlocks extends BlockList implements ContentList {
         }};
 
         nucleardrill = new Drill("nucleardrill") {{
-            drillTime = 160;
+            drillTime = 120;
             size = 3;
             powerUse = 0.5f;
             drawRim = true;
@@ -62,7 +62,7 @@ public class ProductionBlocks extends BlockList implements ContentList {
 
         plasmadrill = new Drill("plasmadrill") {{
             heatColor = Color.valueOf("ff461b");
-            drillTime = 110;
+            drillTime = 90;
             size = 4;
             powerUse = 0.7f;
             hasLiquids = true;

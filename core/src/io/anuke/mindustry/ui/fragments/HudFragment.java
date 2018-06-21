@@ -211,6 +211,13 @@ public class HudFragment implements Fragment{
 		//if there's currently no unlock notification...
 		if(lastUnlockTable == null) {
 			Table table = new Table("button");
+			table.update(() -> {
+				if(state.is(State.menu)){
+					table.remove();
+					lastUnlockLayout = null;
+					lastUnlockTable = null;
+				}
+			});
 			table.margin(12);
 
 			Table in = new Table();

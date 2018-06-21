@@ -26,6 +26,10 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import static io.anuke.mindustry.Vars.threads;
 
 public class BuildBlock extends Block {
@@ -179,6 +183,8 @@ public class BuildBlock extends Block {
                     //get this as a fraction
                     double fraction = maxUse / (double)required;
 
+                    accumulator[i] -= recipe.requirements[i].amount*amount*(1-fraction);
+
                     //move max progress down if this fraction is less than 1
                     maxProgress = Math.min(maxProgress, maxProgress*fraction);
 
@@ -202,6 +208,40 @@ public class BuildBlock extends Block {
             this.recipe = recipe;
             this.previous = previous;
             this.accumulator = new double[recipe.requirements.length];
+        }
+
+        @Override
+        public void write(DataOutputStream stream) throws IOException {
+            stream.writeFloat((float)progress);
+            stream.writeShort(previous == null ? -1 : previous.id);
+            stream.writeShort(recipe == null ? -1 : recipe.result.id);
+
+            if(accumulator == null){
+                stream.writeByte(-1);
+            }else{
+                stream.writeByte(accumulator.length);
+                for(double d : accumulator){
+                    stream.writeFloat((float)d);
+                }
+            }
+        }
+
+        @Override
+        public void read(DataInputStream stream) throws IOException {
+            progress = stream.readFloat();
+            short pid = stream.readShort();
+            short rid = stream.readShort();
+            byte acsize = stream.readByte();
+            
+            if(acsize != -1){
+                accumulator = new double[acsize];
+                for (int i = 0; i < acsize; i++) {
+                    accumulator[i] = stream.readFloat();
+                }
+            }
+
+            if(pid != -1) previous = Block.getByID(pid);
+            if(rid != -1) recipe = Recipe.getByResult(Block.getByID(rid));
         }
     }
 }

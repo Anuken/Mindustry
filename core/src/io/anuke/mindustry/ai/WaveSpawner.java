@@ -31,7 +31,7 @@ public class WaveSpawner {
     public void spawnEnemies(){
         int spawned = Math.min(state.wave, 6);
         int groundGroups = 1 + state.wave / 20;
-        int flyGroups = 1 + state.wave / 20;
+        int flyGroups = state.wave / 20;
 
         //add extra groups if necessary
         for (int i = 0; i < groundGroups - groundSpawns.size; i++) {

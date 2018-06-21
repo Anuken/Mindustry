@@ -1,9 +1,7 @@
 package io.anuke.mindustry.content;
 
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.content.blocks.DefenseBlocks;
-import io.anuke.mindustry.content.blocks.DistributionBlocks;
-import io.anuke.mindustry.content.blocks.WeaponBlocks;
+import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.ItemStack;
@@ -31,13 +29,35 @@ public class Recipes implements ContentList{
         new Recipe(distribution, DistributionBlocks.sorter, new ItemStack(Items.iron, 4), new ItemStack(Items.lead, 4));
         new Recipe(distribution, DistributionBlocks.splitter, new ItemStack(Items.iron, 2), new ItemStack(Items.lead, 4));
         new Recipe(distribution, DistributionBlocks.overflowgate, new ItemStack(Items.steel, 4));
+        new Recipe(distribution, DistributionBlocks.bridgeconveyor, new ItemStack(Items.steel, 8), new ItemStack(Items.iron, 8));
 
+        new Recipe(crafting, CraftingBlocks.smelter, new ItemStack(Items.iron, 40), new ItemStack(Items.lead, 30));
+        new Recipe(crafting, CraftingBlocks.siliconsmelter, new ItemStack(Items.iron, 60), new ItemStack(Items.steel, 60), new ItemStack(Items.lead, 50));
+        new Recipe(crafting, CraftingBlocks.arcsmelter, new ItemStack(Items.iron, 60), new ItemStack(Items.steel, 60), new ItemStack(Items.lead, 50));
+
+        new Recipe(power, PowerBlocks.powernode, new ItemStack(Items.iron, 2), new ItemStack(Items.lead, 6));
+        //new Recipe(power, PowerBlocks.powernodelarge, new ItemStack(Items.steel, 3), new ItemStack(Items.iron, 3));
+        new Recipe(power, PowerBlocks.battery, new ItemStack(Items.iron, 8), new ItemStack(Items.lead, 30));
+        //new Recipe(power, PowerBlocks.batteryLarge, new ItemStack(Items.steel, 5), new ItemStack(Items.iron, 5));
+        new Recipe(power, PowerBlocks.combustiongenerator, new ItemStack(Items.iron, 30), new ItemStack(Items.lead, 30));
         //new Recipe(distribution, StorageBlocks.vault, new ItemStack(Items.steel, 50));
         //new Recipe(distribution, StorageBlocks.core, new ItemStack(Items.steel, 50));
         //new Recipe(distribution, StorageBlocks.unloader, new ItemStack(Items.steel, 5));
         //new Recipe(distribution, StorageBlocks.sortedunloader, new ItemStack(Items.steel, 5));
 
-        new Recipe(distribution, DistributionBlocks.bridgeconveyor, new ItemStack(Items.steel, 8), new ItemStack(Items.iron, 8));
+        new Recipe(production, ProductionBlocks.ironDrill, new ItemStack(Items.iron, 15));
+        new Recipe(production, ProductionBlocks.reinforcedDrill, new ItemStack(Items.iron, 20), new ItemStack(Items.lead, 20));
+        new Recipe(production, ProductionBlocks.steelDrill, new ItemStack(Items.iron, 40), new ItemStack(Items.lead, 25), new ItemStack(Items.steel, 25));
+        new Recipe(production, ProductionBlocks.titaniumDrill, new ItemStack(Items.iron, 40), new ItemStack(Items.titanium, 40), new ItemStack(Items.steel, 40));
+        /*
+        new Recipe(production, ProductionBlocks.laserdrill, new ItemStack(Items.titanium, 40), new ItemStack(Items.surgealloy, 40));
+        new Recipe(production, ProductionBlocks.nucleardrill, new ItemStack(Items.titanium, 40), new ItemStack(Items.surgealloy, 40));
+        new Recipe(production, ProductionBlocks.plasmadrill, new ItemStack(Items.titanium, 40), new ItemStack(Items.surgealloy, 40));
+        new Recipe(production, ProductionBlocks.cultivator, new ItemStack(Items.titanium, 40), new ItemStack(Items.surgealloy, 40));
+        new Recipe(production, ProductionBlocks.waterextractor, new ItemStack(Items.titanium, 40), new ItemStack(Items.surgealloy, 40));
+        new Recipe(production, ProductionBlocks.oilextractor, new ItemStack(Items.titanium, 40), new ItemStack(Items.surgealloy, 40));*/
+
+
 
         //new Recipe(distribution, DistributionBlocks.laserconveyor, new ItemStack(Items.steel, 5));
         //new Recipe(distribution, DistributionBlocks.massdriver, new ItemStack(Items.steel, 1));
@@ -59,8 +79,6 @@ public class Recipes implements ContentList{
         new Recipe(defense, DefenseBlocks.phasewalllarge, new ItemStack(Items.titanium, 1));
 
 
-
-
         new Recipe(weapon, WeaponBlocks.wave, new ItemStack(Items.iron, 1));
         new Recipe(weapon, WeaponBlocks.lancer, new ItemStack(Items.iron, 1));
         new Recipe(weapon, WeaponBlocks.arc, new ItemStack(Items.iron, 1));
@@ -71,9 +89,6 @@ public class Recipes implements ContentList{
         new Recipe(weapon, WeaponBlocks.cyclone, new ItemStack(Items.iron, 1));
         new Recipe(weapon, WeaponBlocks.spectre, new ItemStack(Items.iron, 1));
         new Recipe(weapon, WeaponBlocks.meltdown, new ItemStack(Items.iron, 1));
-
-        new Recipe(crafting, CraftingBlocks.smelter, new ItemStack(Items.iron, 40));
-        new Recipe(crafting, CraftingBlocks.arcsmelter, new ItemStack(Items.iron, 40));
 
         new Recipe(crafting, CraftingBlocks.alloysmelter, new ItemStack(Items.titanium, 50), new ItemStack(Items.steel, 50));
         new Recipe(crafting, CraftingBlocks.alloyfuser, new ItemStack(Items.steel, 30), new ItemStack(Items.iron, 30));
