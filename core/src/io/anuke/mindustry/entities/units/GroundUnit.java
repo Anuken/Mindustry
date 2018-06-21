@@ -54,7 +54,7 @@ public abstract class GroundUnit extends BaseUnit {
         super.update();
 
         if(!velocity.isZero(0.001f) && (target == null || (inventory.hasAmmo() && distanceTo(target) <= inventory.getAmmoRange()))){
-            rotation = Mathf.lerpDelta(rotation, velocity.angle(), 0.2f);
+            rotation = Mathf.slerpDelta(rotation, velocity.angle(), 0.2f);
         }
     }
 
