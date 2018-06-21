@@ -5,25 +5,20 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.distribution.*;
 
 public class DistributionBlocks extends BlockList implements ContentList{
-	public static Block conveyor, steelconveyor, pulseconveyor, router, multiplexer, junction,
+	public static Block conveyor, titaniumconveyor, router, multiplexer, junction,
 			bridgeconveyor, laserconveyor, sorter, splitter, overflowgate, massdriver;
 
 	@Override
 	public void load() {
 
 		conveyor = new Conveyor("conveyor") {{
-			health = 40;
-			speed = 0.02f;
+			health = 45;
+			speed = 0.03f;
 		}};
 
-		steelconveyor = new Conveyor("steelconveyor") {{
-			health = 55;
-			speed = 0.04f;
-		}};
-
-		pulseconveyor = new Conveyor("poweredconveyor") {{
-			health = 75;
-			speed = 0.09f;
+		titaniumconveyor = new Conveyor("titanium-conveyor") {{
+			health = 65;
+			speed = 0.07f;
 		}};
 
 		router = new Router("router");

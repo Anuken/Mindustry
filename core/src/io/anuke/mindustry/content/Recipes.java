@@ -1,7 +1,9 @@
 package io.anuke.mindustry.content;
 
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.content.blocks.*;
+import io.anuke.mindustry.content.blocks.DefenseBlocks;
+import io.anuke.mindustry.content.blocks.DistributionBlocks;
+import io.anuke.mindustry.content.blocks.WeaponBlocks;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.ItemStack;
@@ -14,7 +16,35 @@ public class Recipes implements ContentList{
     @Override
 	public void load (){
         new Recipe(defense, DefenseBlocks.ironwall, new ItemStack(Items.iron, 12));
-        new Recipe(defense, DefenseBlocks.ironwalllarge, new ItemStack(Items.iron, 12));
+        new Recipe(defense, DefenseBlocks.ironwalllarge, new ItemStack(Items.iron, 12*4));
+
+        new Recipe(weapon, WeaponBlocks.duo, new ItemStack(Items.iron, 12));
+        new Recipe(weapon, WeaponBlocks.scatter, new ItemStack(Items.iron, 8), new ItemStack(Items.lead, 6));
+        new Recipe(weapon, WeaponBlocks.scorch, new ItemStack(Items.iron, 12), new ItemStack(Items.lead, 8));
+        new Recipe(weapon, WeaponBlocks.hail, new ItemStack(Items.iron, 12), new ItemStack(Items.lead, 12), new ItemStack(Items.steel, 6));
+
+        new Recipe(distribution, DistributionBlocks.conveyor, new ItemStack(Items.iron, 1));
+        new Recipe(distribution, DistributionBlocks.titaniumconveyor, new ItemStack(Items.iron, 2), new ItemStack(Items.titanium, 1));
+        new Recipe(distribution, DistributionBlocks.router, new ItemStack(Items.iron, 2), new ItemStack(Items.lead, 4));
+        new Recipe(distribution, DistributionBlocks.multiplexer, new ItemStack(Items.iron, 8), new ItemStack(Items.lead, 8));
+        new Recipe(distribution, DistributionBlocks.junction, new ItemStack(Items.iron, 2));
+        new Recipe(distribution, DistributionBlocks.sorter, new ItemStack(Items.iron, 4), new ItemStack(Items.lead, 4));
+        new Recipe(distribution, DistributionBlocks.splitter, new ItemStack(Items.iron, 2), new ItemStack(Items.lead, 4));
+        new Recipe(distribution, DistributionBlocks.overflowgate, new ItemStack(Items.steel, 4));
+
+        //new Recipe(distribution, StorageBlocks.vault, new ItemStack(Items.steel, 50));
+        //new Recipe(distribution, StorageBlocks.core, new ItemStack(Items.steel, 50));
+        //new Recipe(distribution, StorageBlocks.unloader, new ItemStack(Items.steel, 5));
+        //new Recipe(distribution, StorageBlocks.sortedunloader, new ItemStack(Items.steel, 5));
+
+        new Recipe(distribution, DistributionBlocks.bridgeconveyor, new ItemStack(Items.steel, 8), new ItemStack(Items.iron, 8));
+
+        //new Recipe(distribution, DistributionBlocks.laserconveyor, new ItemStack(Items.steel, 5));
+        //new Recipe(distribution, DistributionBlocks.massdriver, new ItemStack(Items.steel, 1));
+
+
+        /*
+
         new Recipe(defense, DefenseBlocks.steelwall, new ItemStack(Items.steel, 12));
         new Recipe(defense, DefenseBlocks.titaniumwall, new ItemStack(Items.titanium, 12));
         new Recipe(defense, DefenseBlocks.diriumwall, new ItemStack(Items.surgealloy, 12));
@@ -28,27 +58,9 @@ public class Recipes implements ContentList{
         new Recipe(defense, DefenseBlocks.phasewall, new ItemStack(Items.titanium, 1));
         new Recipe(defense, DefenseBlocks.phasewalllarge, new ItemStack(Items.titanium, 1));
 
-        new Recipe(distribution, DistributionBlocks.conveyor, new ItemStack(Items.iron, 1));
-        new Recipe(distribution, DistributionBlocks.steelconveyor, new ItemStack(Items.steel, 1));
-        new Recipe(distribution, DistributionBlocks.pulseconveyor, new ItemStack(Items.surgealloy, 1));
-        new Recipe(distribution, DistributionBlocks.router, new ItemStack(Items.iron, 2));
-        new Recipe(distribution, DistributionBlocks.multiplexer, new ItemStack(Items.iron, 8));
-        new Recipe(distribution, DistributionBlocks.junction, new ItemStack(Items.iron, 2));
-        new Recipe(distribution, DistributionBlocks.sorter, new ItemStack(Items.steel, 2));
-        new Recipe(distribution, DistributionBlocks.splitter, new ItemStack(Items.steel, 1));
-        new Recipe(distribution, DistributionBlocks.overflowgate, new ItemStack(Items.steel, 1));
-        new Recipe(distribution, StorageBlocks.vault, new ItemStack(Items.steel, 50));
-        new Recipe(distribution, StorageBlocks.core, new ItemStack(Items.steel, 50));
-        new Recipe(distribution, StorageBlocks.unloader, new ItemStack(Items.steel, 5));
-        new Recipe(distribution, StorageBlocks.sortedunloader, new ItemStack(Items.steel, 5));
-        new Recipe(distribution, DistributionBlocks.bridgeconveyor, new ItemStack(Items.steel, 5));
-        new Recipe(distribution, DistributionBlocks.laserconveyor, new ItemStack(Items.steel, 5));
-        new Recipe(distribution, DistributionBlocks.massdriver, new ItemStack(Items.steel, 1));
 
-        new Recipe(weapon, WeaponBlocks.duo, new ItemStack(Items.iron, 1));
-        new Recipe(weapon, WeaponBlocks.scatter, new ItemStack(Items.iron, 1));
-        new Recipe(weapon, WeaponBlocks.scorch, new ItemStack(Items.iron, 1));
-        new Recipe(weapon, WeaponBlocks.hail, new ItemStack(Items.iron, 1));
+
+
         new Recipe(weapon, WeaponBlocks.wave, new ItemStack(Items.iron, 1));
         new Recipe(weapon, WeaponBlocks.lancer, new ItemStack(Items.iron, 1));
         new Recipe(weapon, WeaponBlocks.arc, new ItemStack(Items.iron, 1));
@@ -139,7 +151,7 @@ public class Recipes implements ContentList{
         new Recipe(units, DebugBlocks.itemVoid, new ItemStack(Items.steel, 10)).setDebug();
         new Recipe(units, DebugBlocks.liquidSource, new ItemStack(Items.steel, 10)).setDebug();
         new Recipe(units, DebugBlocks.powerVoid, new ItemStack(Items.steel, 10)).setDebug();
-        new Recipe(units, DebugBlocks.powerInfinite, new ItemStack(Items.steel, 10), new ItemStack(Items.surgealloy, 5)).setDebug();
+        new Recipe(units, DebugBlocks.powerInfinite, new ItemStack(Items.steel, 10), new ItemStack(Items.surgealloy, 5)).setDebug();*/
     }
 
     @Override

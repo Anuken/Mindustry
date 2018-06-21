@@ -1,6 +1,7 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
@@ -46,15 +47,21 @@ public class Logic extends Module {
         state.wavetime = wavespace * state.difficulty.timeScaling * 2;
 
         //fill inventory with items for debugging
-        for(TeamData team : state.teams.getTeams()) {
+
+        for (TeamData team : state.teams.getTeams()) {
             for (Tile tile : team.cores) {
-                for (Item item : Item.all()) {
-                    if (item.type == ItemType.material) {
-                        tile.entity.items.addItem(item, 1000);
+                if(debug) {
+                    for (Item item : Item.all()) {
+                        if (item.type == ItemType.material) {
+                            tile.entity.items.addItem(item, 1000);
+                        }
                     }
+                }else{
+                    tile.entity.items.addItem(Items.iron, 50);
                 }
             }
         }
+
 
         Events.fire(PlayEvent.class);
     }

@@ -48,7 +48,7 @@ public class BlockInventoryFragment implements Fragment {
 
     public void showFor(Tile t){
         this.tile = t.target();
-        if(tile == null || tile.entity == null || !tile.block().isAccessible()) return;
+        if(tile == null || tile.entity == null || !tile.block().isAccessible() || tile.entity.items.totalItems() == 0) return;
         rebuild();
     }
 

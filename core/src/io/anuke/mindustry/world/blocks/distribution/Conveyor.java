@@ -1,5 +1,7 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.LongArray;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.TileEntity;
@@ -32,6 +34,8 @@ public class Conveyor extends Block{
 
 	private final Translator tr1 = new Translator();
 	private final Translator tr2 = new Translator();
+	private final TextureRegion region1 = new TextureRegion();
+	private final TextureRegion region2 = new TextureRegion();
 
 	protected float speed = 0f;
 	protected float carryCapacity = 8f;
@@ -60,9 +64,27 @@ public class Conveyor extends Block{
 	public void draw(Tile tile){
 		byte rotation = tile.getRotation();
 
-		Draw.rect(name() +
-						(Timers.time() % ((20 / 100f) / speed) < (10 / 100f) / speed && acceptItem(Items.stone, tile, null) ? "" : "move"),
-				tile.worldx(), tile.worldy(), rotation * 90);
+		GridPoint2 point = Geometry.d4[rotation];
+
+		int offset = acceptItem(Items.stone, tile, null) ? (int)((Timers.time()/4f)%8) : 0;
+		TextureRegion region = Draw.region(name);
+
+		region1.setRegion(region, 0, 0, region.getRegionWidth() - offset, region.getRegionHeight());
+		region2.setRegion(region, region.getRegionWidth() - offset, 0, offset, region.getRegionHeight());
+
+		float x = tile.drawx(), y = tile.drawy();
+
+		if(offset % 2 == 1){
+			if(point.x < 0) x += 0.5f;
+			if(point.y < 0) y += 0.5f;
+		}
+
+		Draw.rect(region1,
+				x + (point.x * (tilesize/2f - region1.getRegionWidth()/2f)),
+				y + (point.y * (tilesize/2f - region1.getRegionWidth()/2f)), rotation * 90);
+		Draw.rect(region2,
+				x - (point.x * (tilesize/2f - region2.getRegionWidth()/2f)),
+				y - (point.y * (tilesize/2f - region2.getRegionWidth()/2f)), rotation * 90);
 	}
 
 	@Override

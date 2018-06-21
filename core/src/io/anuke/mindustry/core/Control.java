@@ -65,7 +65,9 @@ public class Control extends Module{
 		Core.atlas.setErrorRegion("error");
 		ContentLoader.initialize(Content::load);
 
-		db.load();
+		//TODO load database
+		//not loaded currently for testing
+		//db.load();
 
 		gdxInput = Gdx.input;
 
