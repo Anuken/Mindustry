@@ -161,6 +161,8 @@ public class BlocksFragment implements Fragment{
 				Element e = Core.scene.hit(Graphics.mouse().x, Graphics.mouse().y, true);
 				if(e != null && e.isDescendantOf(pane)){
 					Core.scene.setScrollFocus(pane);
+				}else if(Core.scene.getScrollFocus() == pane){
+					Core.scene.setScrollFocus(null);
 				}
 
 				if(lastCategory == cat){

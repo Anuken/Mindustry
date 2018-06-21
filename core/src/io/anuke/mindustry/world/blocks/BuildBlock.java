@@ -14,6 +14,7 @@ import io.anuke.mindustry.gen.CallBlocks;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
+import io.anuke.mindustry.input.CursorType;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.BarType;
@@ -37,8 +38,12 @@ public class BuildBlock extends Block {
         size = Integer.parseInt(name.charAt(name.length()-1) + "");
         health = 1;
         layer = Layer.placement;
-        configurable = true;
         consumesTap = true;
+    }
+
+    @Override
+    public CursorType getCursor(Tile tile) {
+        return CursorType.hand;
     }
 
     @Override

@@ -11,6 +11,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.graphics.Draw;
@@ -20,6 +21,8 @@ import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
+import io.anuke.ucore.scene.event.InputEvent;
+import io.anuke.ucore.scene.event.InputListener;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.style.TextureRegionDrawable;
 import io.anuke.ucore.scene.ui.Image;
@@ -130,6 +133,7 @@ public class HudFragment implements Fragment{
 			aright();
 
 			new table("button"){{
+				Table table = get();
 				margin(5);
 				marginBottom(10);
 				TextureRegionDrawable draw = new TextureRegionDrawable(new TextureRegion());
@@ -143,7 +147,21 @@ public class HudFragment implements Fragment{
 					}
 				};
 				image.setDrawable(draw);
+				table.addListener(new InputListener(){
+					public boolean scrolled (InputEvent event, float x, float y, int amount) {
+						renderer.minimap().zoomBy(amount);
+						return true;
+					}
+				});
 				image.update(() -> {
+
+					Element e = Core.scene.hit(Graphics.mouse().x, Graphics.mouse().y, true);
+					if(e != null && e.isDescendantOf(table)){
+						Core.scene.setScrollFocus(table);
+					}else if(Core.scene.getScrollFocus() == table){
+						Core.scene.setScrollFocus(null);
+					}
+
 					if (renderer.minimap().getTexture() == null) {
 						draw.getRegion().setRegion(Draw.region("white"));
 					} else {

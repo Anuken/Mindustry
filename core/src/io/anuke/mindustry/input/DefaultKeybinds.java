@@ -33,7 +33,6 @@ public class DefaultKeybinds {
                 "menu", Gdx.app.getType() == ApplicationType.Android ? Input.BACK : Input.ESCAPE,
                 "pause", Input.SPACE,
                 "toggle_menus", Input.C,
-                "block_info", Input.CONTROL_LEFT,
                 "item_withdraw", Input.SHIFT_LEFT,
                 new Category("Multiplayer"),
                 "player_list", Input.TAB,

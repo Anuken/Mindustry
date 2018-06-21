@@ -46,7 +46,6 @@ public class Blocks extends BlockList implements ContentList{
         }};
 
         deepwater = new Floor("deepwater") {{
-            placeableOn = false;
             liquidColor = Color.valueOf("546bb3");
             speedMultiplier = 0.2f;
             variants = 0;
@@ -59,7 +58,6 @@ public class Blocks extends BlockList implements ContentList{
         }};
 
         water = new Floor("water") {{
-            placeableOn = false;
             liquidColor = Color.valueOf("546bb3");
             speedMultiplier = 0.5f;
             variants = 0;
@@ -71,7 +69,6 @@ public class Blocks extends BlockList implements ContentList{
         }};
 
         lava = new Floor("lava") {{
-            placeableOn = false;
             liquidColor = Color.valueOf("ed5334");
             speedMultiplier = 0.2f;
             damageTaken = 0.1f;
@@ -84,7 +81,6 @@ public class Blocks extends BlockList implements ContentList{
         }};
 
         oil = new Floor("oil") {{
-            placeableOn = false;
             liquidColor = Color.valueOf("292929");
             status = StatusEffects.tarred;
             statusIntensity = 1f;

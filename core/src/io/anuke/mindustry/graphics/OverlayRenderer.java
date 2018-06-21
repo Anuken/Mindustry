@@ -9,10 +9,9 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.input.InputHandler;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Callable;
@@ -89,12 +88,6 @@ public class OverlayRenderer {
                         Draw.textc(result.toString(), target.drawx(), target.drawy(), v);
                         Draw.tscl(fontScale);
                         Draw.reset();
-                    }
-
-                    if (Inputs.keyDown("block_info") && target.block().isAccessible()) {
-                        Draw.color(Palette.accent);
-                        Lines.crect(target.drawx(), target.drawy(), target.block().size * tilesize, target.block().size * tilesize);
-                        Draw.color();
                     }
 
                     if (target.entity != null) {

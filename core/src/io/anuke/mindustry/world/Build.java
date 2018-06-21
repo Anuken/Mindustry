@@ -191,15 +191,20 @@ public class Build {
             for (int dx = 0; dx < type.size; dx++) {
                 for (int dy = 0; dy < type.size; dy++) {
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-                    if (other == null || (other.block() != Blocks.air && !other.block().alwaysReplace) || !type.canPlaceOn(other) || other.cliffs != 0  || !other.floor().placeableOn) {
+                    if (other == null || (other.block() != Blocks.air && !other.block().alwaysReplace)
+                            || !type.canPlaceOn(other) || other.cliffs != 0  || !other.floor().placeableOn ||
+                            (tile.floor().liquidDrop != null && !type.floating)) {
                         return false;
                     }
                 }
             }
             return true;
         } else {
-            return (tile.getTeam() == Team.none || tile.getTeam() == team) && tile.floor().placeableOn && tile.cliffs == 0
-                    && ((type.canReplace(tile.block()) && !(type == tile.block() && rotation == tile.getRotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
+            return (tile.getTeam() == Team.none || tile.getTeam() == team)
+                    && (tile.floor().liquidDrop == null || type.floating)
+                    && tile.floor().placeableOn && tile.cliffs == 0
+                    && ((type.canReplace(tile.block())
+                    && !(type == tile.block() && rotation == tile.getRotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
                     && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile);
         }
     }

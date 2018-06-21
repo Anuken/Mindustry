@@ -29,6 +29,7 @@ public class Pump extends LiquidBlock{
 		liquidFlowFactor = 3f;
 		group = BlockGroup.liquids;
 		liquidRegion = "pump-liquid";
+		floating = true;
 	}
 
 	@Override

@@ -205,6 +205,10 @@ public class DesktopInput extends InputHandler{
             selectY = cursor.y;
             mode = breaking;
         }else if(button == Buttons.MIDDLE){ //middle button = cancel placing
+            if(recipe == null){
+                player.clearBuilding();
+            }
+
             recipe = null;
             mode = none;
         }

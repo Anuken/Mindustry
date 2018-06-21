@@ -44,7 +44,7 @@ public class Junction extends Block{
 					Tile dest = tile.getNearby(direction);
 
 					if(dest == null || !dest.block().acceptItem(item, dest, tile)){
-						if(buffer.index > 1){
+						if(buffer.index > 1 && Bits.getRightShort(Bits.getRightInt(buffer.items[1])) != direction){
 							System.arraycopy(buffer.items, 1, buffer.items, 0, buffer.index - 1);
 							buffer.index --;
 						}

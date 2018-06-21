@@ -74,6 +74,8 @@ public class Block extends BaseBlock implements UnlockableContent{
 	public float baseExplosiveness = 0f;
 	/**whether to display a different shadow per variant*/
 	public boolean varyShadow = false;
+	/**whether this block can be placed on liquids.*/
+	public boolean floating = true;
 	/**number of block variants, 0 to disable*/
 	public int variants = 0;
 	/**stuff that drops when broken*/
