@@ -111,13 +111,6 @@ public class BlockInventoryFragment implements Fragment {
                 image.tapped(() -> {
                     if(!canPick.get() || items[f] == 0) return;
                     int amount = Math.min(Inputs.keyDown("item_withdraw") ? items[f] : 1, player.inventory.itemCapacityUsed(item));
-
-                   /* tile.block().removeStack(tile, item, amount);
-
-                    player.inventory.addItem(item, amount);
-                    for(int j = 0; j < Mathf.clamp(amount/3, 1, 8); j ++){
-                        Timers.run(j*3f, () -> ItemTransfer.create(item, tile.drawx(), tile.drawy(), player, () -> {}));
-                    }*/
                     CallBlocks.requestItem(player, tile, item, amount);
 
                 });

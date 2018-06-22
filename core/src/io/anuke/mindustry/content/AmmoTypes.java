@@ -8,14 +8,17 @@ import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.ContentList;
 
 public class AmmoTypes implements ContentList {
-    public static AmmoType bulletIron, bulletLead, bulletSteel, bulletThorium, bulletSilicon, bulletThermite, flakLead, flakExplosive, flakPlastic, flakSurge, missileExplosive, missileIncindiary, missileSurge, artilleryLead, artilleryThorium, artilleryPlastic, artilleryHoming, artilleryIncindiary, basicFlame, lancerLaser, lightning, spectreLaser, meltdownLaser, fuseShotgun, oil, water, lava, cryofluid;
+    public static AmmoType bulletIron, bulletLead, bulletSteel, bulletThorium, bulletSilicon, bulletThermite,
+            flakLead, flakExplosive, flakPlastic, flakSurge, missileExplosive, missileIncindiary, missileSurge,
+            artilleryLead, artilleryThorium, artilleryPlastic, artilleryHoming, artilleryIncindiary,
+            basicFlame, lancerLaser, lightning, spectreLaser, meltdownLaser, fuseShotgun, oil, water, lava, cryofluid;
 
     @Override
     public void load() {
 
         //bullets
 
-        bulletIron = new AmmoType(Items.iron, StandardBullets.iron, 3) {{
+        bulletIron = new AmmoType(Items.tungsten, StandardBullets.iron, 3) {{
             shootEffect = ShootFx.shootSmall;
             smokeEffect = ShootFx.shootSmallSmoke;
         }};
@@ -25,7 +28,7 @@ public class AmmoTypes implements ContentList {
             smokeEffect = ShootFx.shootSmallSmoke;
         }};
 
-        bulletSteel = new AmmoType(Items.steel, StandardBullets.steel, 3) {{
+        bulletSteel = new AmmoType(Items.carbide, StandardBullets.steel, 3) {{
             shootEffect = ShootFx.shootSmall;
             smokeEffect = ShootFx.shootSmallSmoke;
         }};
@@ -127,7 +130,7 @@ public class AmmoTypes implements ContentList {
 
         meltdownLaser = new AmmoType(TurretBullets.lancerLaser);
 
-        fuseShotgun = new AmmoType(Items.iron, TurretBullets.fuseShot, 0.1f);
+        fuseShotgun = new AmmoType(Items.tungsten, TurretBullets.fuseShot, 0.1f);
 
         //liquid
 

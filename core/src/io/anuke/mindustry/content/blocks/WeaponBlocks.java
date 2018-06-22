@@ -13,7 +13,7 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 public class WeaponBlocks extends BlockList implements ContentList {
-	public static Block duo, scatter, scorch, hail, wave, lancer, arc, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown;
+	public static Block duo, /*scatter,*/ scorch, hail, wave, lancer, arc, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown;
 
 	@Override
 	public void load() {
@@ -23,7 +23,7 @@ public class WeaponBlocks extends BlockList implements ContentList {
 			restitution = 0.03f;
 			ammoUseEffect = ShootFx.shellEjectSmall;
 		}};
-
+/*
 		scatter = new BurstTurret("scatter") {{
 			ammoTypes = new AmmoType[]{AmmoTypes.flakLead, AmmoTypes.flakExplosive, AmmoTypes.flakPlastic};
 			ammoPerShot = 1;
@@ -34,22 +34,22 @@ public class WeaponBlocks extends BlockList implements ContentList {
 			burstSpacing = 1f;
 			inaccuracy = 7f;
 			ammoUseEffect = ShootFx.shellEjectSmall;
-		}};
-
-		scorch = new LiquidTurret("scorch") {{
-			ammoTypes = new AmmoType[]{AmmoTypes.basicFlame};
-			recoil = 0f;
-			reload = 5f;
-			shootCone = 50f;
-			ammoUseEffect = ShootFx.shellEjectSmall;
-
-			drawer = (tile, entity) -> Draw.rect(entity.target != null ? name + "-shoot" : name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-		}};
+		}};*/
 
 		hail = new ItemTurret("hail") {{
 			ammoTypes = new AmmoType[]{AmmoTypes.artilleryLead, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary};
 			reload = 40f;
 		}};
+
+        scorch = new LiquidTurret("scorch") {{
+            ammoTypes = new AmmoType[]{AmmoTypes.basicFlame};
+            recoil = 0f;
+            reload = 5f;
+            shootCone = 50f;
+            ammoUseEffect = ShootFx.shellEjectSmall;
+
+            drawer = (tile, entity) -> Draw.rect(entity.target != null ? name + "-shoot" : name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+        }};
 
 		wave = new LiquidTurret("wave") {{
 			ammoTypes = new AmmoType[]{AmmoTypes.water, AmmoTypes.lava, AmmoTypes.cryofluid, AmmoTypes.oil};

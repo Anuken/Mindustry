@@ -353,7 +353,7 @@ public class Control extends Module{
             }
 
             //check unlocks every 2 seconds
-			if(Timers.get("timerCheckUnlock", 120)){
+			if(!state.mode.infiniteResources && !state.mode.disableWaveTimer && Timers.get("timerCheckUnlock", 120)){
 				checkUnlockableBlocks();
 
 				//save if the db changed

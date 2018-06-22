@@ -197,7 +197,9 @@ public interface BuilderTrait {
                 BuildEntity entity = tile.entity();
 
                 entity.addProgress(core.items, 1f / entity.recipe.cost * Timers.delta() * getBuildPower(tile));
-                entity.lastBuilder = (Player)unit;
+                if(unit instanceof Player){
+                    entity.lastBuilder = (Player)unit;
+                }
                 unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(entity), 0.4f);
                 getCurrentRequest().progress = entity.progress();
             }
@@ -230,7 +232,7 @@ public interface BuilderTrait {
         }
     }
 
-    /**Draw placement effects for an entity.*/
+    /**Draw placement effects for an entity. This includes mining*/
     default void drawBuilding(Unit unit){
         if(!isBuilding()){
             if(getMineTile() != null){
@@ -294,8 +296,11 @@ public interface BuilderTrait {
         Draw.color(Color.LIGHT_GRAY, Color.WHITE, 1f-flashScl + Mathf.absin(Timers.time(), 0.5f, flashScl));
         Shapes.laser("minelaser", "minelaser-end", px, py, ex, ey);
 
-        Draw.color(Palette.accent);
-        Lines.poly(tile.worldx(), tile.worldy(), 4, tilesize/2f * Mathf.sqrt2, Timers.time());
+        if(unit instanceof Player && ((Player) unit).isLocal) {
+            Draw.color(Palette.accent);
+            Lines.poly(tile.worldx(), tile.worldy(), 4, tilesize / 2f * Mathf.sqrt2, Timers.time());
+        }
+
         Draw.color();
     }
 

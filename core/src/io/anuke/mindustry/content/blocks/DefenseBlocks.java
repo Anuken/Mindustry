@@ -9,46 +9,37 @@ import io.anuke.mindustry.world.blocks.defense.Door;
 import io.anuke.mindustry.world.blocks.defense.PhaseWall;
 
 public class DefenseBlocks extends BlockList implements ContentList {
-    public static Block ironwall, ironwalllarge, steelwall, titaniumwall, diriumwall, steelwalllarge, titaniumwalllarge, diriumwalllarge, door, largedoor, deflectorwall, deflectorwalllarge,
+    public static Block tungstenWall, tungstenWallLarge, carbideWall, carbideWallLarge, thoriumWall, thoriumWallLarge, door, largedoor, deflectorwall, deflectorwalllarge,
         phasewall, phasewalllarge;
 
     @Override
     public void load() {
         int wallHealthMultiplier = 4;
 
-        ironwall = new Wall("ironwall") {{
+        tungstenWall = new Wall("tungsten-wall") {{
             health = 80 * wallHealthMultiplier;
         }};
 
-        ironwalllarge = new Wall("ironwall-large") {{
+        tungstenWallLarge = new Wall("tungsten-wall-large") {{
             health = 80 * 4 * wallHealthMultiplier;
             size = 2;
         }};
 
-        steelwall = new Wall("steelwall") {{
+        carbideWall = new Wall("carbide-wall") {{
             health = 110 * wallHealthMultiplier;
         }};
 
-        titaniumwall = new Wall("titaniumwall") {{
-            health = 150 * wallHealthMultiplier;
-        }};
-
-        diriumwall = new Wall("duriumwall") {{
-            health = 190 * wallHealthMultiplier;
-        }};
-
-        steelwalllarge = new Wall("steelwall-large") {{
-            health = 110 * 4 * wallHealthMultiplier;
+        carbideWallLarge = new Wall("carbide-wall-large") {{
+            health = 110 * wallHealthMultiplier*4;
             size = 2;
         }};
 
-        titaniumwalllarge = new Wall("titaniumwall-large") {{
-            health = 150 * 4 * wallHealthMultiplier;
-            size = 2;
+        thoriumWall = new Wall("thorium-wall") {{
+            health = 110 * wallHealthMultiplier;
         }};
 
-        diriumwalllarge = new Wall("duriumwall-large") {{
-            health = 190 * 4 * wallHealthMultiplier;
+        thoriumWallLarge = new Wall("thorium-wall-large") {{
+            health = 110 * wallHealthMultiplier*4;
             size = 2;
         }};
 

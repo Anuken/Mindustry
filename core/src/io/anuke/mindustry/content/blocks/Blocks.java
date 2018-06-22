@@ -101,8 +101,8 @@ public class Blocks extends BlockList implements ContentList{
             drops = new ItemStack(Items.stone, 1);
         }};
 
-        iron = new Ore("iron") {{
-            drops = new ItemStack(Items.iron, 1);
+        iron = new Ore("tungsten") {{
+            drops = new ItemStack(Items.tungsten, 1);
         }};
 
         lead = new Ore("lead") {{

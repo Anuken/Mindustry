@@ -13,7 +13,7 @@ import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.io.Maps;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.WorldGenerator;
+import io.anuke.mindustry.world.mapgen.WorldGenerator;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.entities.EntityPhysics;
 import io.anuke.ucore.modules.Module;

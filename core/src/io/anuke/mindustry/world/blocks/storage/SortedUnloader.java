@@ -73,7 +73,7 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
     }
 
     public static class SortedUnloaderEntity extends TileEntity{
-        public Item sortItem = Items.iron;
+        public Item sortItem = Items.tungsten;
 
         @Override
         public void write(DataOutputStream stream) throws IOException {

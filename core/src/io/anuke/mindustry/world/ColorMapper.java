@@ -33,7 +33,7 @@ public class ColorMapper{
 			"6e501e", pair(Blocks.dirt),
 			"ed5334", pair(Blocks.lava),
 			"292929", pair(Blocks.oil),
-			"c3a490", pair(Blocks.iron),
+			"a0b0c8", pair(Blocks.iron),
 			"161616", pair(Blocks.coal),
 			"6277bc", pair(Blocks.titanium),
 			"c594dc", pair(Blocks.thorium),

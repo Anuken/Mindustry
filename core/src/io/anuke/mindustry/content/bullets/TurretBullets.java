@@ -74,7 +74,7 @@ public class TurretBullets extends BulletList implements ContentList {
             }
         };
 
-        basicFlame = new BulletType(2f, 0) {
+        basicFlame = new BulletType(2f, 5) {
             {
                 hitsize = 7f;
                 lifetime = 30f;

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities.units;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.fx.ExplosionFx;
@@ -19,6 +20,7 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
@@ -47,6 +49,10 @@ public abstract class BaseUnit extends Unit{
 	public BaseUnit(UnitType type, Team team){
 		this.type = type;
 		this.team = team;
+	}
+
+	public UnitType getType() {
+		return type;
 	}
 
 	/**internal constructor used for deserialization, DO NOT USE*/
@@ -119,6 +125,11 @@ public abstract class BaseUnit extends Unit{
 
 	public UnitState getStartState(){
 		return null;
+	}
+
+	@Override
+	public TextureRegion getIconRegion() {
+		return Draw.region(type.name);
 	}
 
 	@Override

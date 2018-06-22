@@ -9,6 +9,8 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.TimedEntity;
 import io.anuke.ucore.entities.trait.DrawTrait;
@@ -40,6 +42,14 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
     @Remote(in = In.entities, called = Loc.server, unreliable = true)
     public static void transferItemEffect(Item item, float x, float y, Unit to){
         create(item, x, y, to, () -> {});
+    }
+
+    @Remote(in = In.entities, called = Loc.server)
+    public static void transferItemTo(Item item, int amount, float x, float y, Tile tile){
+        for (int i = 0; i < Mathf.clamp(amount/3, 1, 8); i++) {
+            Timers.run(i*3, () -> create(item, x, y, tile, () -> {}));
+        }
+        tile.entity.items.addItem(item, amount);
     }
 
     public static void create(Item item, float fromx, float fromy, PosTrait to, Callable done){

@@ -5,11 +5,14 @@ import com.badlogic.gdx.math.Rectangle;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.gen.CallBlocks;
 import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
@@ -32,8 +35,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.debug;
-import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock {
     private static Rectangle rect = new Rectangle();
@@ -42,6 +44,7 @@ public class CoreBlock extends StorageBlock {
 
     protected float supplyRadius = 50f;
     protected float supplyInterval = 5f;
+    protected UnitType droneType = UnitTypes.drone;
 
     public CoreBlock(String name) {
         super(name);
@@ -71,10 +74,10 @@ public class CoreBlock extends StorageBlock {
         Draw.rect(name + "-top", tile.drawx(), tile.drawy());
         Draw.color();
 
-        if(entity.currentPlayer != null) {
-            Player player = entity.currentPlayer;
+        if(entity.currentUnit != null) {
+            Unit player = entity.currentUnit;
 
-            TextureRegion region = player.mech.iconRegion;
+            TextureRegion region = player.getIconRegion();
 
             Shaders.build.region = region;
             Shaders.build.progress = entity.progress;
@@ -149,7 +152,7 @@ public class CoreBlock extends StorageBlock {
             CallBlocks.setCoreSolid(tile, true);
         }
 
-        if(entity.currentPlayer != null){
+        if(entity.currentUnit != null){
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
             entity.time += Timers.delta();
             entity.progress += 1f / Vars.respawnduration;
@@ -160,9 +163,31 @@ public class CoreBlock extends StorageBlock {
             }
 
             if(entity.progress >= 1f){
-                CallBlocks.onPlayerRespawn(tile, entity.currentPlayer);
+                CallBlocks.onUnitRespawn(tile, entity.currentUnit);
             }
         }else{
+            entity.warmup += Timers.delta();
+
+            if(entity.solid && entity.warmup > 10f && unitGroups[tile.getTeamID()].getByID(entity.droneID) == null && !Net.client()){
+
+                boolean found = false;
+                for(BaseUnit unit : unitGroups[tile.getTeamID()].all()){
+                    if(unit.getType().id == droneType.id){
+                        entity.droneID = unit.id;
+                        found = true;
+                        break;
+                    }
+                }
+
+                if(!found) {
+
+                    BaseUnit unit = droneType.create(tile.getTeam());
+                    entity.droneID = unit.id;
+                    unit.setDead(true);
+                    CallBlocks.onCoreUnitSet(tile, unit);
+                }
+            }
+
             entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.1f);
         }
 
@@ -191,27 +216,34 @@ public class CoreBlock extends StorageBlock {
     }
 
     @Remote(called = Loc.server, in = In.blocks)
-    public static void onPlayerRespawn(Tile tile, Player player){
+    public static void onUnitRespawn(Tile tile, Unit player){
         CoreEntity entity = tile.entity();
         Effects.effect(Fx.spawn, entity);
         entity.solid = false;
         entity.progress = 0;
-        entity.currentPlayer = player;
-        entity.currentPlayer.heal();
-        entity.currentPlayer.rotation = 90f;
-        entity.currentPlayer.baseRotation = 90f;
-        entity.currentPlayer.setNet(tile.drawx(), tile.drawy());
-        entity.currentPlayer.add();
-        entity.currentPlayer = null;
+        entity.currentUnit = player;
+        entity.currentUnit.heal();
+        entity.currentUnit.rotation = 90f;
+        entity.currentUnit.setNet(tile.drawx(), tile.drawy());
+        entity.currentUnit.add();
+
+        if(entity.currentUnit instanceof Player){
+            ((Player) entity.currentUnit).baseRotation = 90f;
+        }
+
+        entity.currentUnit = null;
     }
 
     @Remote(called = Loc.server, in = In.blocks)
-    public static void onCorePlayerSet(Tile tile, Player player){
+    public static void onCoreUnitSet(Tile tile, Unit player){
         CoreEntity entity = tile.entity();
-        entity.currentPlayer = player;
+        entity.currentUnit = player;
         entity.progress = 0f;
         player.set(tile.drawx(), tile.drawy());
-        player.setRespawning();
+
+        if(player instanceof Player){
+            ((Player) player).setRespawning(true);
+        }
     }
 
     @Remote(called = Loc.server, in = In.blocks)
@@ -221,26 +253,30 @@ public class CoreBlock extends StorageBlock {
     }
 
     public class CoreEntity extends TileEntity{
-        Player currentPlayer;
+        Unit currentUnit;
+        int droneID = -1;
         boolean solid = true;
+        float warmup;
         float progress;
         float time;
         float heat;
 
         public void trySetPlayer(Player player){
-            if(currentPlayer == null){
-                CallBlocks.onCorePlayerSet(tile, player);
+            if(currentUnit == null){
+                CallBlocks.onCoreUnitSet(tile, player);
             }
         }
 
         @Override
         public void write(DataOutputStream stream) throws IOException {
             stream.writeBoolean(solid);
+            stream.writeInt(droneID);
         }
 
         @Override
         public void read(DataInputStream stream) throws IOException {
             solid = stream.readBoolean();
+            droneID = stream.readInt();
         }
     }
 }

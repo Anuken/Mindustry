@@ -12,41 +12,31 @@ import io.anuke.mindustry.world.blocks.production.Fracker;
 import io.anuke.mindustry.world.blocks.production.SolidPump;
 
 public class ProductionBlocks extends BlockList implements ContentList {
-    public static Block ironDrill, reinforcedDrill, steelDrill, titaniumDrill, laserdrill, nucleardrill, plasmadrill, waterextractor, oilextractor, cultivator;
+    public static Block tungstenDrill, carbideDrill, laserdrill, blastdrill, plasmadrill, waterextractor, oilextractor, cultivator;
 
     @Override
     public void load() {
-        ironDrill = new Drill("irondrill") {{
-            tier = 1;
+        tungstenDrill = new Drill("tungsten-drill") {{
+            tier = 2;
             drillTime = 360;
         }};
 
-        reinforcedDrill = new Drill("reinforceddrill") {{
-            tier = 2;
-            drillTime = 320;
-        }};
-
-        steelDrill = new Drill("steeldrill") {{
+        carbideDrill = new Drill("carbide-drill") {{
             tier = 3;
             drillTime = 280;
         }};
 
-        titaniumDrill = new Drill("titaniumdrill") {{
-            tier = 4;
-            drillTime = 240;
-        }};
-
-        laserdrill = new Drill("laserdrill") {{
+        laserdrill = new Drill("laser-drill") {{
             drillTime = 180;
             size = 2;
             powerUse = 0.2f;
             hasPower = true;
-            tier = 5;
+            tier = 4;
             updateEffect = BlockFx.pulverizeMedium;
             drillEffect = BlockFx.mineBig;
         }};
 
-        nucleardrill = new Drill("nucleardrill") {{
+        blastdrill = new Drill("blast-drill") {{
             drillTime = 120;
             size = 3;
             powerUse = 0.5f;
@@ -60,7 +50,7 @@ public class ProductionBlocks extends BlockList implements ContentList {
             warmupSpeed = 0.01f;
         }};
 
-        plasmadrill = new Drill("plasmadrill") {{
+        plasmadrill = new Drill("plasma-drill") {{
             heatColor = Color.valueOf("ff461b");
             drillTime = 90;
             size = 4;
@@ -76,7 +66,7 @@ public class ProductionBlocks extends BlockList implements ContentList {
             warmupSpeed = 0.005f;
         }};
 
-        waterextractor = new SolidPump("waterextractor") {{
+        waterextractor = new SolidPump("water-extractor") {{
             result = Liquids.water;
             powerUse = 0.2f;
             pumpAmount = 0.1f;
@@ -85,7 +75,7 @@ public class ProductionBlocks extends BlockList implements ContentList {
             rotateSpeed = 1.4f;
         }};
 
-        oilextractor = new Fracker("oilextractor") {{
+        oilextractor = new Fracker("oil-extractor") {{
             result = Liquids.oil;
             inputLiquid = Liquids.water;
             updateEffect = BlockFx.pulverize;

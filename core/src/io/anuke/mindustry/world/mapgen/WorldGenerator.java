@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world;
+package io.anuke.mindustry.world.mapgen;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
@@ -7,6 +7,8 @@ import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapTileData;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.noise.RidgedPerlin;
 import io.anuke.ucore.noise.Simplex;
 
@@ -22,11 +24,11 @@ public class WorldGenerator {
 		oreIndex = 0;
 
 		Array<OreEntry> ores = Array.with(
-				new OreEntry(Blocks.iron, 0.3f, seed),
-				new OreEntry(Blocks.coal, 0.284f, seed),
-				new OreEntry(Blocks.lead, 0.28f, seed),
-				new OreEntry(Blocks.titanium, 0.27f, seed),
-				new OreEntry(Blocks.thorium, 0.26f, seed)
+			new OreEntry(Blocks.iron, 0.3f, seed),
+			new OreEntry(Blocks.coal, 0.284f, seed),
+			new OreEntry(Blocks.lead, 0.28f, seed),
+			new OreEntry(Blocks.titanium, 0.27f, seed),
+			new OreEntry(Blocks.thorium, 0.26f, seed)
 		);
 
 		IntArray multiblocks = new IntArray();

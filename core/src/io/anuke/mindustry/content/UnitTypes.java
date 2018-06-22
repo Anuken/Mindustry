@@ -19,6 +19,7 @@ public class UnitTypes implements ContentList {
             drag = 0.01f;
             speed = 0.2f;
             maxVelocity = 0.8f;
+            ammoCapacity = 0;
             range = 50f;
         }};
 

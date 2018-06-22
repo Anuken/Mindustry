@@ -7,14 +7,12 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
 import io.anuke.mindustry.type.AmmoType;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
+import io.anuke.ucore.util.*;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -54,7 +52,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     public void update() {
         super.update();
 
-        rotation = velocity.angle();
+        updateRotation();
         trail.update(x + Angles.trnsx(rotation + 180f, 6f) + Mathf.range(wobblyness),
                 y + Angles.trnsy(rotation + 180f, 6f) + Mathf.range(wobblyness));
     }
@@ -64,6 +62,21 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
         Draw.alpha(hitTime / hitDuration);
 
         Draw.rect(type.name, x, y, rotation - 90);
+
+        float backTrns = 4f, itemSize = 5f;
+        if(inventory.hasItem()){
+            ItemStack stack = inventory.getItem();
+            int stored = Mathf.clamp(stack.amount / 6, 1, 8);
+
+            for(int i = 0; i < stored; i ++) {
+                float angT = i == 0 ? 0 : Mathf.randomSeedRange(i + 2, 60f);
+                float lenT = i == 0 ? 0 : Mathf.randomSeedRange(i + 3, 1f) - 1f;
+                Draw.rect(stack.item.region,
+                        x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
+                        y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
+                        itemSize, itemSize, rotation);
+            }
+        }
 
         Draw.alpha(1f);
     }
@@ -107,14 +120,37 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
         dropCarry();
     }
 
+    protected void updateRotation(){
+        rotation = velocity.angle();
+    }
+
     protected void circle(float circleLength){
+        circle(circleLength, type.speed);
+    }
+
+    protected void circle(float circleLength, float speed){
+        if(target == null) return;
+
         vec.set(target.getX() - x, target.getY() - y);
 
         if(vec.len() < circleLength){
             vec.rotate((circleLength-vec.len())/circleLength * 180f);
         }
 
-        vec.setLength(type.speed * Timers.delta());
+        vec.setLength(speed * Timers.delta());
+
+        velocity.add(vec);
+    }
+
+    protected void moveTo(float circleLength){
+        if(target == null) return;
+
+        vec.set(target.getX() - x, target.getY() - y);
+
+        float length = Mathf.clamp((distanceTo(target) - circleLength)/100f, -1f, 1f);
+
+        vec.setLength(type.speed * Timers.delta() * length);
+        if(length < 0) vec.rotate(180f);
 
         velocity.add(vec);
     }

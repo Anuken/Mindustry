@@ -115,7 +115,7 @@ public class Sorter extends Block implements SelectionTrait{
 	}
 
 	public static class SorterEntity extends TileEntity{
-		public Item sortItem = Items.iron;
+		public Item sortItem = Items.tungsten;
 		
 		@Override
 		public void write(DataOutputStream stream) throws IOException{

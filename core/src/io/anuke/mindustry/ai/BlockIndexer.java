@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
@@ -18,6 +19,7 @@ import io.anuke.ucore.core.Events;
 import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.util.EnumSet;
+import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
@@ -27,12 +29,12 @@ import static io.anuke.mindustry.Vars.*;
 /**Class used for indexing special target blocks for AI.*/
 public class BlockIndexer {
     /**Size of one ore quadrant.*/
-    private final static int oreQuadrantSize = 12;
+    private final static int oreQuadrantSize = 20;
     /**Size of one structure quadrant.*/
     private final static int structQuadrantSize = 12;
 
     /**Set of all ores that are being scanned.*/
-    private final ObjectSet<Item> scanOres = ObjectSet.with(Items.iron, Items.coal, Items.lead, Items.thorium, Items.titanium);
+    private final ObjectSet<Item> scanOres = ObjectSet.with(Items.tungsten, Items.coal, Items.lead, Items.thorium, Items.titanium);
     /**Stores all ore quadtrants on the map.*/
     private ObjectMap<Item, ObjectSet<Tile>> ores = new ObjectMap<>();
 
@@ -138,6 +140,24 @@ public class BlockIndexer {
         return ores.get(item, emptyArray);
     }
 
+    /**Find the closest ore block relative to a position.*/
+    public Tile findClosestOre(float xp, float yp, Item item){
+        Tile tile  = Geometry.findClosest(xp, yp, world.indexer().getOrePositions(item));
+
+        if(tile == null) return null;
+
+        for (int x = Math.max(0, tile.x - oreQuadrantSize/2); x < tile.x + oreQuadrantSize/2 && x < world.width(); x++) {
+            for (int y = Math.max(0, tile.y - oreQuadrantSize/2); y < tile.y + oreQuadrantSize/2 && y < world.height(); y++) {
+                Tile res = world.tile(x, y);
+                if(res.block() == Blocks.air && res.floor().drops != null && res.floor().drops.item == item){
+                    return res;
+                }
+            }
+        }
+
+        return null;
+    }
+
     private void process(Tile tile){
         if(tile.block().flags != null &&
                 tile.getTeam() != Team.none){
@@ -222,7 +242,7 @@ public class BlockIndexer {
                 Tile tile = world.tile(x, y);
 
                 //add position of quadrant to list when an ore is found
-                if(tile.floor().drops != null && scanOres.contains(tile.floor().drops.item)){
+                if(tile.floor().drops != null && scanOres.contains(tile.floor().drops.item) && tile.block() == Blocks.air){
                     ores.get(tile.floor().drops.item).add(world.tile(
                             //make sure to clamp quadrant middle position, since it might go off bounds
                             Mathf.clamp(qx * oreQuadrantSize + oreQuadrantSize /2, 0, world.width() - 1),

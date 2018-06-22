@@ -7,20 +7,17 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapTileData;
 import io.anuke.mindustry.io.MapTileData.DataPosition;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
-import io.anuke.ucore.noise.RidgedPerlin;
 import io.anuke.ucore.noise.Simplex;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Mathf;
 
 public class ProcGen {
-    private RidgedPerlin rid = new RidgedPerlin(1, 1);
     private Simplex sim = new Simplex();
     private Simplex sim2 = new Simplex();
 
     public MapTileData generate(GenProperties props){
-        sim.setSeed(Mathf.random(9999));
-        sim2.setSeed(Mathf.random(9999));
-        rid = new RidgedPerlin(Mathf.random(9999), 1);
+        sim.setSeed(Mathf.random(99999));
+        sim2.setSeed(Mathf.random(99999));
 
         MapTileData data = new MapTileData(300, 300);
         TileDataMarker marker = data.newDataMarker();

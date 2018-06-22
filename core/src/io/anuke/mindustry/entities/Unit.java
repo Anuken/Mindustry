@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.traits.*;
@@ -287,6 +288,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         return false;
     }
 
+    public abstract TextureRegion getIconRegion();
     public abstract int getItemCapacity();
     public abstract int getAmmoCapacity();
     public abstract float getArmor();

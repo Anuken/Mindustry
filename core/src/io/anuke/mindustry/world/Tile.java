@@ -140,6 +140,10 @@ public class Tile implements PosTrait, TargetTrait {
 		return Team.values()[team];
 	}
 
+	public byte getTeamID(){
+		return team;
+	}
+
 	public void setTeam(Team team){
 		this.team = (byte)team.ordinal();
 	}

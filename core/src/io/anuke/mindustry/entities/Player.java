@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Queue;
@@ -86,6 +87,12 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 	//endregion
 
 	//region unit and event overrides, utility methods
+
+
+	@Override
+	public TextureRegion getIconRegion() {
+		return mech.iconRegion;
+	}
 
 	@Override
 	public int getItemCapacity() {

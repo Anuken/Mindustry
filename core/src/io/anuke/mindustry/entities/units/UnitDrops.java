@@ -10,7 +10,7 @@ public class UnitDrops {
 
     public static void dropItems(BaseUnit unit){
         if(dropTable == null){
-            dropTable = new Item[]{Items.iron, Items.lead, Items.steel};
+            dropTable = new Item[]{Items.tungsten, Items.lead, Items.carbide};
         }
 
         for(Item item : dropTable){

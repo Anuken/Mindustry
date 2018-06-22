@@ -17,9 +17,9 @@ public class CraftingBlocks extends BlockList implements ContentList {
     public void load() {
         smelter = new Smelter("smelter") {{
             health = 70;
-            inputs = new Item[]{Items.iron};
+            inputs = new Item[]{Items.tungsten};
             fuel = Items.coal;
-            result = Items.steel;
+            result = Items.carbide;
             craftTime = 35f;
             useFlux = true;
         }};
@@ -27,8 +27,8 @@ public class CraftingBlocks extends BlockList implements ContentList {
         arcsmelter = new PowerSmelter("arc-smelter") {{
             health = 90;
             craftEffect = BlockFx.smeltsmoke;
-            inputs = new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.iron, 1)};
-            result = Items.steel;
+            inputs = new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.tungsten, 1)};
+            result = Items.carbide;
             powerUse = 0.1f;
             craftTime = 25f;
             size = 2;
@@ -51,7 +51,7 @@ public class CraftingBlocks extends BlockList implements ContentList {
 
         plasteelcompressor = new PlasteelCompressor("plasteel-compressor") {{
             inputLiquid = Liquids.oil;
-            inputItem = new ItemStack(Items.steel, 1);
+            inputItem = new ItemStack(Items.carbide, 1);
             liquidUse = 0.3f;
             liquidCapacity = 60f;
             powerUse = 0.5f;
@@ -130,7 +130,7 @@ public class CraftingBlocks extends BlockList implements ContentList {
                     null, null, null, null, null, null, null, null, null, null,
                     Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand,
                     Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone,
-                    Items.iron, Items.iron, Items.iron, Items.iron,
+                    Items.tungsten, Items.tungsten, Items.tungsten, Items.tungsten,
                     Items.lead, Items.lead,
                     Items.coal, Items.coal,
                     Items.titanium
@@ -148,7 +148,7 @@ public class CraftingBlocks extends BlockList implements ContentList {
                     null, null, null, null, null, null, null, null, null, null, null, null, null,
                     Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand,
                     Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone,
-                    Items.iron, Items.iron, Items.iron, Items.iron, Items.iron,
+                    Items.tungsten, Items.tungsten, Items.tungsten, Items.tungsten, Items.tungsten,
                     Items.lead, Items.lead, Items.lead,
                     Items.coal, Items.coal, Items.coal,
                     Items.titanium, Items.titanium,

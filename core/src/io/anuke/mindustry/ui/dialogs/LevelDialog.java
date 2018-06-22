@@ -10,7 +10,7 @@ import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.MapMeta;
 import io.anuke.mindustry.io.MapTileData;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.WorldGenerator;
+import io.anuke.mindustry.world.mapgen.WorldGenerator;
 import io.anuke.mindustry.world.mapgen.ProcGen;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
@@ -145,7 +145,7 @@ public class LevelDialog extends FloatingDialog{
 
 					EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
-					WorldGenerator.generate(tiles, data, true, 0);
+					WorldGenerator.generate(tiles, data, true, Mathf.random(9999999));
 
 					world.endMapLoad();
 
