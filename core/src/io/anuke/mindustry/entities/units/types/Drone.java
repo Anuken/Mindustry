@@ -1,6 +1,7 @@
 package io.anuke.mindustry.entities.units.types;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.TileEntity;
@@ -15,6 +16,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
@@ -32,7 +34,7 @@ import static io.anuke.mindustry.Vars.world;
 public class Drone extends FlyingUnit implements BuilderTrait {
     public static int typeID = -1;
 
-    protected static Item[] toMine;
+    protected static ObjectSet<Item> toMine;
     protected static float healSpeed = 0.1f;
     protected static float discoverRange = 120f;
     protected static boolean initialized;
@@ -46,7 +48,7 @@ public class Drone extends FlyingUnit implements BuilderTrait {
     private static void initEvents(){
         if(initialized) return;
 
-        toMine = new Item[]{Items.lead, Items.tungsten};
+        toMine = ObjectSet.with(Items.lead, Items.tungsten);
 
         Events.on(BlockBuildEvent.class, (team, tile) -> {
             EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
@@ -180,10 +182,23 @@ public class Drone extends FlyingUnit implements BuilderTrait {
 
         public void update() {
             BuildEntity entity = (BuildEntity)target;
+            TileEntity core = getClosestCore();
+
+            if(core == null) return;
 
             if(entity.progress() < 1f && entity.tile.block() instanceof BuildBlock){ //building is valid
                 if(!isBuilding() && distanceTo(target) < placeDistance * 0.9f){ //within distance, begin placing
                     getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y, entity.tile.getRotation(), entity.recipe));
+                }
+
+                //if it's missing requirements, try and mine them
+                for(ItemStack stack : entity.recipe.requirements){
+                    if(!core.items.hasItem(stack.item, stack.amount) && toMine.contains(stack.item)){
+                        targetItem = stack.item;
+                        getPlaceQueue().clear();
+                        setState(mine);
+                        return;
+                    }
                 }
 
                 circle(placeDistance * 0.7f);
@@ -223,9 +238,6 @@ public class Drone extends FlyingUnit implements BuilderTrait {
         }
     },
     mine = new UnitState() {
-        public void entered() {
-            setMineTile(null);
-        }
 
         public void update() {
             if(targetItem == null) {
