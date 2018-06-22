@@ -133,7 +133,9 @@ public class Blocks extends BlockList implements ContentList{
 
         snow = new Floor("snow");
 
-        grass = new Floor("grass");
+        grass = new Floor("grass"){{
+            hasOres = true;
+        }};
 
         shrub = new Rock("shrub");
 

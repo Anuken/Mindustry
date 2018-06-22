@@ -28,7 +28,7 @@ public class UnitTypes implements ContentList {
             speed = 0.2f;
             drag = 0.4f;
             range = 40f;
-            setAmmo(AmmoTypes.bulletIron);
+            setAmmo(AmmoTypes.bulletLead);
         }};
 
         vtol = new UnitType("vtol", team -> new Vtol(vtol, team)){{
@@ -37,7 +37,7 @@ public class UnitTypes implements ContentList {
             drag = 0.01f;
             isFlying = true;
             reload = 7;
-            setAmmo(AmmoTypes.bulletIron);
+            setAmmo(AmmoTypes.bulletLead);
         }};
     }
 

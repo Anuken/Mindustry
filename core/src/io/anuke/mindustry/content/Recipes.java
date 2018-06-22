@@ -17,13 +17,16 @@ public class Recipes implements ContentList{
         new Recipe(defense, DefenseBlocks.tungstenWall, new ItemStack(Items.tungsten, 12));
         new Recipe(defense, DefenseBlocks.tungstenWallLarge, new ItemStack(Items.tungsten, 12*4));
 
-        //TURRETS
-        new Recipe(weapon, WeaponBlocks.duo, new ItemStack(Items.tungsten, 20));
-        new Recipe(weapon, WeaponBlocks.scorch, new ItemStack(Items.tungsten, 25), new ItemStack(Items.carbide, 20));
-        new Recipe(weapon, WeaponBlocks.hail, new ItemStack(Items.tungsten, 25), new ItemStack(Items.carbide, 25));
+        new Recipe(defense, DefenseBlocks.carbideWall, new ItemStack(Items.carbide, 12));
+        new Recipe(defense, DefenseBlocks.carbideWallLarge, new ItemStack(Items.carbide, 12*4));
 
-        new Recipe(weapon, WeaponBlocks.lancer, new ItemStack(Items.tungsten, 25), new ItemStack(Items.lead, 25), new ItemStack(Items.silicon, 25));
-        new Recipe(weapon, WeaponBlocks.arc, new ItemStack(Items.tungsten, 25), new ItemStack(Items.lead, 30), new ItemStack(Items.silicon, 30));
+        //TURRETS
+        new Recipe(weapon, TurretBlocks.duo, new ItemStack(Items.tungsten, 20));
+        new Recipe(weapon, TurretBlocks.scorch, new ItemStack(Items.tungsten, 25), new ItemStack(Items.carbide, 20));
+        new Recipe(weapon, TurretBlocks.hail, new ItemStack(Items.tungsten, 25), new ItemStack(Items.carbide, 25));
+
+        new Recipe(weapon, TurretBlocks.lancer, new ItemStack(Items.tungsten, 25), new ItemStack(Items.lead, 25), new ItemStack(Items.silicon, 25));
+        new Recipe(weapon, TurretBlocks.arc, new ItemStack(Items.tungsten, 25), new ItemStack(Items.lead, 30), new ItemStack(Items.silicon, 30));
 
         //DISTRIBUTION
         new Recipe(distribution, DistributionBlocks.conveyor, new ItemStack(Items.lead, 1));
@@ -42,11 +45,20 @@ public class Recipes implements ContentList{
         new Recipe(distribution, DistributionBlocks.bridgeconveyor, new ItemStack(Items.carbide, 8), new ItemStack(Items.tungsten, 8));
 
         //CRAFTING
-        new Recipe(crafting, CraftingBlocks.smelter, new ItemStack(Items.tungsten, 40));
-        new Recipe(crafting, CraftingBlocks.siliconsmelter, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 50));
-        new Recipe(crafting, CraftingBlocks.arcsmelter, new ItemStack(Items.tungsten, 60), new ItemStack(Items.carbide, 60), new ItemStack(Items.lead, 50));
 
-        new Recipe(crafting, CraftingBlocks.pulverizer, new ItemStack(Items.tungsten, 50), new ItemStack(Items.lead, 50));
+        //smelting
+        new Recipe(crafting, CraftingBlocks.smelter, new ItemStack(Items.tungsten, 40));
+        new Recipe(crafting, CraftingBlocks.arcsmelter, new ItemStack(Items.tungsten, 60), new ItemStack(Items.carbide, 60), new ItemStack(Items.lead, 50));
+        new Recipe(crafting, CraftingBlocks.siliconsmelter, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 50));
+
+        //misc
+        new Recipe(crafting, CraftingBlocks.pulverizer, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 50));
+        new Recipe(crafting, CraftingBlocks.thermiteMixer, new ItemStack(Items.tungsten, 100), new ItemStack(Items.lead, 50));
+        new Recipe(crafting, CraftingBlocks.blastMixer, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 60), new ItemStack(Items.carbide, 40));
+
+        //processing
+        new Recipe(crafting, CraftingBlocks.separator, new ItemStack(Items.tungsten, 60), new ItemStack(Items.carbide, 50));
+        new Recipe(crafting, CraftingBlocks.centrifuge, new ItemStack(Items.tungsten, 130), new ItemStack(Items.carbide, 130), new ItemStack(Items.silicon, 30), new ItemStack(Items.titanium, 40));
 
         //POWER
         new Recipe(power, PowerBlocks.powernode, new ItemStack(Items.tungsten, 2), new ItemStack(Items.lead, 6));
@@ -65,6 +77,7 @@ public class Recipes implements ContentList{
         new Recipe(production, ProductionBlocks.carbideDrill, new ItemStack(Items.tungsten, 40), new ItemStack(Items.carbide, 40));
 
         new Recipe(production, ProductionBlocks.waterextractor, new ItemStack(Items.tungsten, 50), new ItemStack(Items.carbide, 50), new ItemStack(Items.lead, 40));
+        new Recipe(production, ProductionBlocks.cultivator, new ItemStack(Items.tungsten, 20), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 20));
 
         //UNITS
         new Recipe(units, UnitBlocks.droneFactory, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 30));
@@ -81,7 +94,7 @@ public class Recipes implements ContentList{
         new Recipe(liquid, LiquidBlocks.bridgeconduit, new ItemStack(Items.carbide, 8), new ItemStack(Items.lead, 8));
         //new Recipe(liquid, LiquidBlocks.laserconduit, new ItemStack(Items.titanium, 2), new ItemStack(Items.lead, 2), new ItemStack(Items.phasematter, 10));
 
-        new Recipe(liquid, LiquidBlocks.mechanicalPump, new ItemStack(Items.tungsten, 10), new ItemStack(Items.lead, 10), new ItemStack(Items.silicon, 10));
+        new Recipe(liquid, LiquidBlocks.mechanicalPump, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 20));
         //new Recipe(liquid, LiquidBlocks.rotaryPump, new ItemStack(Items.carbide, 10), new ItemStack(Items.surgealloy, 5));
         //new Recipe(liquid, LiquidBlocks.thermalPump, new ItemStack(Items.carbide, 10), new ItemStack(Items.surgealloy, 5));
 
@@ -114,16 +127,16 @@ public class Recipes implements ContentList{
         new Recipe(defense, DefenseBlocks.phasewall, new ItemStack(Items.titanium, 1));
         new Recipe(defense, DefenseBlocks.phasewalllarge, new ItemStack(Items.titanium, 1));
 
-        new Recipe(weapon, WeaponBlocks.wave, new ItemStack(Items.tungsten, 1));
-        new Recipe(weapon, WeaponBlocks.lancer, new ItemStack(Items.tungsten, 1));
-        new Recipe(weapon, WeaponBlocks.arc, new ItemStack(Items.tungsten, 1));
-        new Recipe(weapon, WeaponBlocks.swarmer, new ItemStack(Items.tungsten, 1));
-        new Recipe(weapon, WeaponBlocks.ripple, new ItemStack(Items.tungsten, 1));
-        new Recipe(weapon, WeaponBlocks.fuse, new ItemStack(Items.tungsten, 1));
-        new Recipe(weapon, WeaponBlocks.ripple, new ItemStack(Items.tungsten, 1));
-        new Recipe(weapon, WeaponBlocks.cyclone, new ItemStack(Items.tungsten, 1));
-        new Recipe(weapon, WeaponBlocks.spectre, new ItemStack(Items.tungsten, 1));
-        new Recipe(weapon, WeaponBlocks.meltdown, new ItemStack(Items.tungsten, 1));
+        new Recipe(weapon, TurretBlocks.wave, new ItemStack(Items.tungsten, 1));
+        new Recipe(weapon, TurretBlocks.lancer, new ItemStack(Items.tungsten, 1));
+        new Recipe(weapon, TurretBlocks.arc, new ItemStack(Items.tungsten, 1));
+        new Recipe(weapon, TurretBlocks.swarmer, new ItemStack(Items.tungsten, 1));
+        new Recipe(weapon, TurretBlocks.ripple, new ItemStack(Items.tungsten, 1));
+        new Recipe(weapon, TurretBlocks.fuse, new ItemStack(Items.tungsten, 1));
+        new Recipe(weapon, TurretBlocks.ripple, new ItemStack(Items.tungsten, 1));
+        new Recipe(weapon, TurretBlocks.cyclone, new ItemStack(Items.tungsten, 1));
+        new Recipe(weapon, TurretBlocks.spectre, new ItemStack(Items.tungsten, 1));
+        new Recipe(weapon, TurretBlocks.meltdown, new ItemStack(Items.tungsten, 1));
 
         new Recipe(crafting, CraftingBlocks.alloysmelter, new ItemStack(Items.titanium, 50), new ItemStack(Items.carbide, 50));
         new Recipe(crafting, CraftingBlocks.alloyfuser, new ItemStack(Items.carbide, 30), new ItemStack(Items.tungsten, 30));

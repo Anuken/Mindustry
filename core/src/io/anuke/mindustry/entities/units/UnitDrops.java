@@ -13,11 +13,13 @@ public class UnitDrops {
             dropTable = new Item[]{Items.tungsten, Items.lead, Items.carbide};
         }
 
-        for(Item item : dropTable){
-            if(Mathf.chance(0.2)){
-                int amount = Mathf.random(1, 30);
-                CallEntity.createItemDrop(item, amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f),
-                        unit.getVelocity().x + Mathf.range(0.5f), unit.getVelocity().y + Mathf.range(0.5f));
+        for (int i = 0; i < 3; i++) {
+            for(Item item : dropTable){
+                if(Mathf.chance(0.2)){
+                    int amount = Mathf.random(1, 5);
+                    CallEntity.createItemDrop(item, amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f),
+                            unit.getVelocity().x + Mathf.range(3f), unit.getVelocity().y + Mathf.range(3f));
+                }
             }
         }
     }

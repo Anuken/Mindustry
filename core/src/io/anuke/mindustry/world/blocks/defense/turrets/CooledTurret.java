@@ -4,7 +4,6 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.defense.Turret;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -21,6 +20,7 @@ public class CooledTurret extends Turret {
     public CooledTurret(String name) {
         super(name);
         hasLiquids = true;
+        liquidCapacity = 20f;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class CooledTurret extends Turret {
 
         TurretEntity entity = tile.entity();
 
-        float used = Math.min(Math.min(entity.liquids.amount, maxUsed * Timers.delta()), ((reload - entity.reload) / coolantMultiplier) / entity.liquids.liquid.heatCapacity);
+        float used = Math.min(Math.min(entity.liquids.amount, maxUsed * Timers.delta()), Math.max(0, ((reload - entity.reload) / coolantMultiplier) / entity.liquids.liquid.heatCapacity));
         entity.reload += (used * entity.liquids.liquid.heatCapacity) / entity.liquids.liquid.heatCapacity;
         entity.liquids.amount -= used;
 

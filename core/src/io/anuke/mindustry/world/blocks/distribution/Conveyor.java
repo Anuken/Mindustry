@@ -3,7 +3,6 @@ package io.anuke.mindustry.world.blocks.distribution;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.LongArray;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.graphics.Layer;
@@ -62,11 +61,12 @@ public class Conveyor extends Block{
 
 	@Override
 	public void draw(Tile tile){
+		ConveyorEntity entity = tile.entity();
 		byte rotation = tile.getRotation();
 
 		GridPoint2 point = Geometry.d4[rotation];
 
-		int offset = acceptItem(Items.stone, tile, null) ? (int)((Timers.time()/4f)%8) : 0;
+		int offset = entity.clogHeat <= 0.5f ? (int)((Timers.time()/4f)%8) : 0;
 		TextureRegion region = Draw.region(name);
 
 		region1.setRegion(region, 0, 0, region.getRegionWidth() - offset, region.getRegionHeight());
@@ -192,6 +192,12 @@ public class Conveyor extends Block{
 			}
 		}
 
+		if(entity.minitem <= 0.0001f){
+			entity.clogHeat = Mathf.lerpDelta(entity.clogHeat, 1f, 0.05f);
+		}else{
+			entity.clogHeat = Mathf.lerpDelta(entity.clogHeat, 0f, 1f);
+		}
+
 		entity.carrying = 0f;
 		entity.minCarry = 2f;
 
@@ -300,6 +306,8 @@ public class Conveyor extends Block{
 		float minitem = 1;
 		float carrying;
 		float minCarry = 2f;
+
+		float clogHeat = 0f;
 
 		@Override
 		public void write(DataOutputStream stream) throws IOException{

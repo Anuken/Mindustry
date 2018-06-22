@@ -6,7 +6,9 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 import com.badlogic.gdx.utils.Pools;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.mindustry.content.fx.UnitFx;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.net.In;
@@ -31,7 +33,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, VelocityTrait, TimeTrait, Poolable {
+public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawTrait, VelocityTrait, TimeTrait, Poolable {
     public static int typeID = -1;
 
     private static final float sinkLifetime = 80f;
@@ -62,6 +64,10 @@ public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, Veloc
 
     @Remote(called = Loc.server, in = In.entities)
     public static void onPickup(int itemid){
+        ItemDrop drop = itemGroup.getByID(itemid);
+        if(drop != null){
+            Effects.effect(UnitFx.pickup, drop);
+        }
         itemGroup.removeByID(itemid);
     }
 
@@ -104,9 +110,14 @@ public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, Veloc
     @Override
     public void collision(SolidTrait other, float x, float y) {
         Player player = (Player)other;
-        if(player.inventory.canAcceptItem(item, amount)){
-            player.inventory.addItem(item, amount);
-            CallEntity.onPickup(getID());
+        if(player.inventory.canAcceptItem(item, 1)){
+            int used = Math.min(amount, player.inventory.capacity() - player.inventory.getItem().amount);
+            player.inventory.addItem(item, used);
+            amount -= used;
+
+            if(amount <= 0) {
+                CallEntity.onPickup(getID());
+            }
         }
     }
 
@@ -180,6 +191,22 @@ public class ItemDrop extends SolidEntity implements SyncTrait, DrawTrait, Veloc
     @Override
     public EntityGroup targetGroup() {
         return itemGroup;
+    }
+
+    @Override
+    public void writeSave(DataOutput data) throws IOException {
+        data.writeFloat(x);
+        data.writeFloat(y);
+        data.writeByte(item.id);
+        data.writeShort(amount);
+    }
+
+    @Override
+    public void readSave(DataInput data) throws IOException {
+        x = data.readFloat();
+        y = data.readFloat();
+        item = Item.getByID(data.readByte());
+        amount = data.readShort();
     }
 
     @Override

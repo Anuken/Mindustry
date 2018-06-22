@@ -24,7 +24,7 @@ public class DoubleTurret extends ItemTurret {
         tr.trns(entity.rotation - 90, shotWidth * i, size * tilesize / 2);
         bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy));
 
-        useAmmo(tile);
         effects(tile);
+        useAmmo(tile);
     }
 }

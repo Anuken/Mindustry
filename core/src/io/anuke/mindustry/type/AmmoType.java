@@ -21,9 +21,11 @@ public class AmmoType implements Content{
      * For liquid ammo, this is amount used per shot.*/
     public final float quantityMultiplier;
     /**Reload speed multiplier.*/
-    public float speedMultiplier = 1f;
+    public float reloadMultiplier = 1f;
     /**Bullet recoil strength.*/
     public float recoil = 0f;
+    /**Additional inaccuracy in degrees.*/
+    public float inaccuracy;
     /**Effect created when shooting.*/
     public Effect shootEffect = Fx.none;
     /**Extra smoke effect created when shooting.*/
@@ -40,7 +42,7 @@ public class AmmoType implements Content{
         this.liquid = null;
         this.bullet = result;
         this.quantityMultiplier = 1f;
-        this.speedMultiplier = 1f;
+        this.reloadMultiplier = 1f;
     }
 
     /**Creates an AmmoType with an item.*/

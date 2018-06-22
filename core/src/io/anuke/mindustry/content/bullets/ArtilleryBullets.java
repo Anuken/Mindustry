@@ -6,12 +6,12 @@ import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.type.ContentList;
 
 public class ArtilleryBullets extends BulletList implements ContentList{
-    public static BulletType lead, thorium, plastic, homing, incindiary, surge;
+    public static BulletType carbide, thorium, plastic, homing, incindiary, surge;
 
     @Override
     public void load() {
 
-        lead = new BasicBulletType(3f, 0, "shell") {
+        carbide = new BasicBulletType(3f, 0, "shell") {
             {
                 hiteffect = BulletFx.flakExplosion;
                 knockback = 0.8f;

@@ -61,7 +61,7 @@ public class WaveSpawner {
 
             for(int i = 0; i < spawned; i ++){
                 BaseUnit unit = UnitTypes.scout.create(Team.red);
-                unit.inventory.addAmmo(AmmoTypes.bulletIron);
+                unit.inventory.addAmmo(AmmoTypes.bulletLead);
                 unit.setWave();
                 unit.setSquad(squad);
                 unit.set(spawn.x * quadsize * tilesize + quadsize * tilesize/2f + Mathf.range(quadsize*tilesize/3f),
@@ -80,7 +80,7 @@ public class WaveSpawner {
 
             for(int i = 0; i < spawned; i ++){
                 BaseUnit unit = UnitTypes.vtol.create(Team.red);
-                unit.inventory.addAmmo(AmmoTypes.bulletIron);
+                unit.inventory.addAmmo(AmmoTypes.bulletLead);
                 unit.setWave();
                 unit.setSquad(squad);
                 unit.set(baseX + Mathf.range(spread), baseY + Mathf.range(spread));

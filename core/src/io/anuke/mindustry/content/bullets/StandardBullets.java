@@ -5,36 +5,38 @@ import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.type.ContentList;
 
 public class StandardBullets extends BulletList implements ContentList {
-    public static BulletType iron, lead, steel, thorium, homing, tracer;
+    public static BulletType tungsten, lead, carbide, thorium, homing, tracer;
 
     @Override
     public void load() {
 
-        iron = new BasicBulletType(3f, 5, "bullet") {
+        tungsten = new BasicBulletType(3.2f, 10, "bullet") {
+            {
+                bulletWidth = 9f;
+                bulletHeight = 11f;
+            }
+        };
+
+        lead = new BasicBulletType(2.5f, 5, "bullet") {
             {
                 bulletWidth = 7f;
                 bulletHeight = 9f;
             }
         };
 
-        lead = new BasicBulletType(3f, 5, "bullet") {
+        carbide = new BasicBulletType(3.5f, 18, "bullet") {
             {
-                bulletWidth = 7f;
-                bulletHeight = 9f;
+                bulletWidth = 9f;
+                bulletHeight = 12f;
+                armorPierce = 0.2f;
             }
         };
 
-        steel = new BasicBulletType(3f, 5, "bullet") {
+        thorium = new BasicBulletType(4f, 25, "bullet") {
             {
-                bulletWidth = 7f;
-                bulletHeight = 9f;
-            }
-        };
-
-        thorium = new BasicBulletType(3f, 5, "bullet") {
-            {
-                bulletWidth = 7f;
-                bulletHeight = 9f;
+                bulletWidth = 10f;
+                bulletHeight = 13f;
+                armorPierce = 0.5f;
             }
         };
 

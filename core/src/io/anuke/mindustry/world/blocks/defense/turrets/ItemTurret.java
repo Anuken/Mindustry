@@ -11,8 +11,6 @@ import io.anuke.mindustry.world.meta.BlockBar;
 
 public class ItemTurret extends CooledTurret {
     protected int maxAmmo = 100;
-    //TODO implement this!
-    /**A value of 'null' means this turret does not need ammo.*/
     protected AmmoType[] ammoTypes;
     protected ObjectMap<Item, AmmoType> ammoMap = new ObjectMap<>();
 

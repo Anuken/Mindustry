@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks.defense;
+package io.anuke.mindustry.world.blocks.defense.turrets;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -8,14 +8,15 @@ import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.AmmoEntry;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
@@ -166,6 +167,7 @@ public abstract class Turret extends Block{
 				if(Float.isNaN(entity.rotation)){
 					entity.rotation = 0;
 				}
+
 				entity.rotation = Angles.moveToward(entity.rotation, targetRot, 5f * Timers.delta());
 
 				if(Angles.angleDist(entity.rotation, targetRot) < shootCone){
@@ -208,7 +210,7 @@ public abstract class Turret extends Block{
 
             entity.reload = 0f;
         }else{
-			entity.reload += Timers.delta() * peekAmmo(tile).speedMultiplier;
+			entity.reload += Timers.delta() * peekAmmo(tile).reloadMultiplier;
 		}
 	}
 
@@ -218,17 +220,18 @@ public abstract class Turret extends Block{
 		entity.recoil = recoil;
 		entity.heat = 1f;
 
+		AmmoType type = peekAmmo(tile);
 		useAmmo(tile);
 
 		tr.trns(entity.rotation, size * tilesize / 2);
 
-		bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy));
+		bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy + type.inaccuracy));
 
 		effects(tile);
 	}
 	
 	protected void bullet(Tile tile, BulletType type, float angle){
-		io.anuke.mindustry.entities.bullet.Bullet.create(type, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
+		Bullet.create(type, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
 	}
 
 	protected void effects(Tile tile){

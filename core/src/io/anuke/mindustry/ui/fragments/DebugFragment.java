@@ -80,7 +80,7 @@ public class DebugFragment implements Fragment {
                new button("spawng", () ->{
                    BaseUnit unit = UnitTypes.scout.create(player.getTeam());
                    unit.set(player.x, player.y);
-                   unit.inventory.addAmmo(AmmoTypes.bulletIron);
+                   unit.inventory.addAmmo(AmmoTypes.bulletLead);
                    unit.setWave();
                    unit.add();
                });

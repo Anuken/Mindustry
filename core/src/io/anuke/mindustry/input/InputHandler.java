@@ -169,6 +169,9 @@ public abstract class InputHandler extends InputAdapter{
 	/**Returns the tile at the specified MOUSE coordinates.*/
 	Tile tileAt(float x, float y){
 		Vector2 vec = Graphics.world(x, y);
+		if(isPlacing()){
+			vec.sub(recipe.result.offset(), recipe.result.offset());
+		}
 		return world.tileWorld(vec.x, vec.y);
 	}
 

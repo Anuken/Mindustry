@@ -36,12 +36,14 @@ public abstract class BaseBlock {
 
     /**Remove a stack from this inventory, and return the amount removed.*/
     public int removeStack(Tile tile, Item item, int amount){
+        tile.entity.wakeUp();
         tile.entity.items.removeItem(item, amount);
         return amount;
     }
 
     /**Handle a stack input.*/
     public void handleStack(Item item, int amount, Tile tile, Unit source){
+        tile.entity.wakeUp();
         tile.entity.items.addItem(item, amount);
     }
 

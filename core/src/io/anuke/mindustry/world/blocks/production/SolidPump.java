@@ -1,10 +1,9 @@
 package io.anuke.mindustry.world.blocks.production;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -21,8 +20,6 @@ public class SolidPump extends Pump {
     protected Effect updateEffect = Fx.none;
     protected float updateEffectChance = 0.02f;
     protected float rotateSpeed = 1f;
-
-    protected final Array<Tile> drawTiles = new Array<>();
 
     public SolidPump(String name){
         super(name);
@@ -84,19 +81,20 @@ public class SolidPump extends Pump {
     }
 
     @Override
-    public boolean isLayer(Tile tile) {
+    public boolean canPlaceOn(Tile tile) {
         if(isMultiblock()){
             for(Tile other : tile.getLinkedTiles(drawTiles)){
                 if(isValid(other)){
-                    return false;
+                    return true;
                 }
             }
-            return true;
+            return false;
         }else{
-            return !isValid(tile);
+            return isValid(tile);
         }
     }
 
+    @Override
     protected boolean isValid(Tile tile){
         return !tile.floor().isLiquid;
     }

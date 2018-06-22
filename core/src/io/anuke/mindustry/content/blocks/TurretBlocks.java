@@ -12,15 +12,16 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
-public class WeaponBlocks extends BlockList implements ContentList {
+public class TurretBlocks extends BlockList implements ContentList {
 	public static Block duo, /*scatter,*/ scorch, hail, wave, lancer, arc, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown;
 
 	@Override
 	public void load() {
 		duo = new DoubleTurret("duo") {{
-			ammoTypes = new AmmoType[]{AmmoTypes.bulletIron, AmmoTypes.bulletLead, AmmoTypes.bulletSteel, AmmoTypes.bulletThermite};
+			ammoTypes = new AmmoType[]{AmmoTypes.bulletTungsten, AmmoTypes.bulletLead, AmmoTypes.bulletCarbide, AmmoTypes.bulletThermite};
 			reload = 25f;
 			restitution = 0.03f;
+			range = 80f;
 			ammoUseEffect = ShootFx.shellEjectSmall;
 		}};
 /*
@@ -37,8 +38,9 @@ public class WeaponBlocks extends BlockList implements ContentList {
 		}};*/
 
 		hail = new ItemTurret("hail") {{
-			ammoTypes = new AmmoType[]{AmmoTypes.artilleryLead, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary};
+			ammoTypes = new AmmoType[]{AmmoTypes.artilleryCarbide, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary};
 			reload = 40f;
+			range = 200f;
 		}};
 
         scorch = new LiquidTurret("scorch") {{
@@ -111,7 +113,7 @@ public class WeaponBlocks extends BlockList implements ContentList {
 		salvo = new ItemTurret("salvo") {{
 			size = 2;
 			range = 100f;
-			ammoTypes = new AmmoType[]{AmmoTypes.bulletIron, AmmoTypes.bulletLead, AmmoTypes.bulletSteel, AmmoTypes.bulletThermite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
+			ammoTypes = new AmmoType[]{AmmoTypes.bulletTungsten, AmmoTypes.bulletLead, AmmoTypes.bulletCarbide, AmmoTypes.bulletThermite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
 			reload = 70f;
 			restitution = 0.03f;
 			ammoEjectBack = 3f;
@@ -135,7 +137,7 @@ public class WeaponBlocks extends BlockList implements ContentList {
 		}};
 
 		ripple = new ItemTurret("ripple") {{
-			ammoTypes = new AmmoType[]{AmmoTypes.artilleryLead, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary, AmmoTypes.artilleryPlastic, AmmoTypes.artilleryThorium};
+			ammoTypes = new AmmoType[]{AmmoTypes.artilleryCarbide, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary, AmmoTypes.artilleryPlastic, AmmoTypes.artilleryThorium};
 			size = 3;
 		}};
 
@@ -151,7 +153,7 @@ public class WeaponBlocks extends BlockList implements ContentList {
 		}};
 
 		spectre = new ItemTurret("eraser") {{
-			ammoTypes = new AmmoType[]{AmmoTypes.bulletIron, AmmoTypes.bulletLead, AmmoTypes.bulletSteel, AmmoTypes.bulletThermite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
+			ammoTypes = new AmmoType[]{AmmoTypes.bulletTungsten, AmmoTypes.bulletLead, AmmoTypes.bulletCarbide, AmmoTypes.bulletThermite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
 			reload = 25f;
 			restitution = 0.03f;
 			ammoUseEffect = ShootFx.shellEjectSmall;

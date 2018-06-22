@@ -14,10 +14,12 @@ import io.anuke.ucore.util.Mathf;
 public class ProcGen {
     private Simplex sim = new Simplex();
     private Simplex sim2 = new Simplex();
+    private Simplex sim3 = new Simplex();
 
     public MapTileData generate(GenProperties props){
         sim.setSeed(Mathf.random(99999));
         sim2.setSeed(Mathf.random(99999));
+        sim3.setSeed(Mathf.random(99999));
 
         MapTileData data = new MapTileData(300, 300);
         TileDataMarker marker = data.newDataMarker();
@@ -45,6 +47,10 @@ public class ProcGen {
                     if(r > 0.94){
                         marker.floor = (byte)Blocks.deepwater.id;
                     }
+                }
+
+                if(sim3.octaveNoise2D(4, 0.5, 1f/120f, x, y) > 0.5){
+                    marker.floor = (byte)Blocks.grass.id;
                 }
 
                 marker.elevation = (byte)Math.max(elevation, 0);

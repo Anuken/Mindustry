@@ -184,10 +184,18 @@ public class Drone extends FlyingUnit implements BuilderTrait {
     public final UnitState
 
     build = new UnitState(){
+        public void entered() {
+            target = null;
+        }
 
         public void update() {
             BuildEntity entity = (BuildEntity)target;
             TileEntity core = getClosestCore();
+
+            if(entity == null){
+                setState(repair);
+                return;
+            }
 
             if(core == null) return;
 
@@ -243,6 +251,9 @@ public class Drone extends FlyingUnit implements BuilderTrait {
         }
     },
     mine = new UnitState() {
+        public void entered() {
+            target = null;
+        }
 
         public void update() {
             if(targetItem == null) {
@@ -253,7 +264,11 @@ public class Drone extends FlyingUnit implements BuilderTrait {
             if(inventory.isFull()){
                 setState(drop);
             }else{
-                //only mines tungsten for now
+                if(targetItem != null && !inventory.canAcceptItem(targetItem)){
+                    setState(drop);
+                    return;
+                }
+
                 retarget(() -> {
                     if(getMineTile() == null){
                         findItem();
@@ -279,6 +294,9 @@ public class Drone extends FlyingUnit implements BuilderTrait {
         }
     },
     drop = new UnitState() {
+        public void entered() {
+            target = null;
+        }
 
         public void update() {
             if(inventory.isEmpty()){

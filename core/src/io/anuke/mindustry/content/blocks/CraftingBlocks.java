@@ -11,7 +11,9 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.production.*;
 
 public class CraftingBlocks extends BlockList implements ContentList {
-    public static Block smelter, arcsmelter, siliconsmelter, plasteelcompressor, phaseweaver, alloysmelter, alloyfuser, cryofluidmixer, melter, separator, centrifuge, biomatterCompressor, pulverizer, oilRefinery, stoneFormer, incinerator;
+    public static Block smelter, arcsmelter, siliconsmelter, plasteelcompressor, phaseweaver, alloysmelter, alloyfuser,
+            thermiteMixer, blastMixer,
+            cryofluidmixer, melter, separator, centrifuge, biomatterCompressor, pulverizer, oilRefinery, stoneFormer, incinerator;
 
     @Override
     public void load() {
@@ -109,6 +111,30 @@ public class CraftingBlocks extends BlockList implements ContentList {
             liquidPerItem = 50f;
             itemCapacity = 50;
             powerUse = 0.1f;
+            size = 2;
+        }};
+
+        blastMixer = new GenericCrafter("blast-mixer") {{
+            itemCapacity = 20;
+            hasItems = true;
+            hasPower = true;
+            inputLiquid = Liquids.oil;
+            liquidUse = 0.05f;
+            inputItem = new ItemStack(Items.thermite, 1);
+            output = Items.blastCompound;
+            powerUse = 0.04f;
+
+            size = 2;
+        }};
+
+        thermiteMixer = new PowerSmelter("thermite-mixer") {{
+            itemCapacity = 20;
+            hasItems = true;
+            hasPower = true;
+            inputs = new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.lead, 2), new ItemStack(Items.sand, 2)};
+            result = Items.thermite;
+            powerUse = 0.02f;
+
             size = 2;
         }};
 

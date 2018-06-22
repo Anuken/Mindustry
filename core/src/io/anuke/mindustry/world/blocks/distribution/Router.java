@@ -2,8 +2,8 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.ucore.core.Timers;
 
 public class Router extends Block{
@@ -21,7 +21,7 @@ public class Router extends Block{
 	@Override
 	public void update(Tile tile){
 		int iterations = Math.max(1, (int) (Timers.delta() + 0.4f));
-		boolean moved = false;
+		boolean moved = tile.entity.items.totalItems() > 0;
 
 		for(int i = 0; i < iterations; i ++) {
 			if (tile.entity.items.totalItems() > 0) {

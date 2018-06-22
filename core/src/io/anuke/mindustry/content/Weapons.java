@@ -18,7 +18,7 @@ public class Weapons implements ContentList {
             reload = 15f;
             roundrobin = true;
             ejectEffect = ShootFx.shellEjectSmall;
-            setAmmo(AmmoTypes.bulletIron);
+            setAmmo(AmmoTypes.bulletLead);
         }};
 
         blaster2 = new Weapon("clustergun") {{
@@ -34,7 +34,7 @@ public class Weapons implements ContentList {
             reload = 12f;
             roundrobin = true;
             ejectEffect = ShootFx.shellEjectSmall;
-            setAmmo(AmmoTypes.bulletSteel);
+            setAmmo(AmmoTypes.bulletCarbide);
         }};
 
         blaster4 = new Weapon("vulcan") {{

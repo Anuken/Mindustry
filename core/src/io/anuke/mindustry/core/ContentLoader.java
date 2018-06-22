@@ -75,7 +75,7 @@ public class ContentLoader {
         new DefenseBlocks(),
         new DistributionBlocks(),
         new ProductionBlocks(),
-        new WeaponBlocks(),
+        new TurretBlocks(),
         new DebugBlocks(),
         new LiquidBlocks(),
         new StorageBlocks(),
