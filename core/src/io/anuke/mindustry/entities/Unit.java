@@ -281,6 +281,10 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         }
     }
 
+    public float getAmmoFraction(){
+        return inventory.totalAmmo() / (float)inventory.ammoCapacity();
+    }
+
     public void drawUnder(){}
     public void drawOver(){}
 

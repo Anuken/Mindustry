@@ -44,6 +44,7 @@ public class CoreBlock extends StorageBlock {
 
     protected float supplyRadius = 50f;
     protected float supplyInterval = 5f;
+    protected float droneRespawnDuration = 60*6;
     protected UnitType droneType = UnitTypes.drone;
 
     public CoreBlock(String name) {
@@ -155,7 +156,7 @@ public class CoreBlock extends StorageBlock {
         if(entity.currentUnit != null){
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
             entity.time += Timers.delta();
-            entity.progress += 1f / Vars.respawnduration;
+            entity.progress += 1f / (entity.currentUnit instanceof Player ? respawnduration : droneRespawnDuration);
 
             //instant build for fast testing.
             if(debug){

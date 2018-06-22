@@ -273,15 +273,15 @@ public class Renderer extends RendererModule{
 		}
 	}
 
-	private <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group){
+	public <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group){
 		drawAndInterpolate(group, t -> true, DrawTrait::draw);
 	}
 
-	private <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group, Predicate<T> toDraw){
+	public <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group, Predicate<T> toDraw){
 		drawAndInterpolate(group, toDraw, DrawTrait::draw);
 	}
 
-	private <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group, Predicate<T> toDraw, Consumer<T> drawer){
+	public <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group, Predicate<T> toDraw, Consumer<T> drawer){
 		EntityDraw.drawWith(group, toDraw, t -> {
 			float lastx = t.getX(), lasty = t.getY(), lastrot = 0f;
 

@@ -156,16 +156,11 @@ public class OverlayRenderer {
         }
 
         if((!debug || showUI) && Settings.getBool("healthbars")){
-
             for(TeamData ally : (debug ? state.teams.getTeams() : state.teams.getTeams(true))){
-                for(Unit e : unitGroups[ally.team.ordinal()].all()){
-                    drawStats(e);
-                }
+                renderer.drawAndInterpolate(unitGroups[ally.team.ordinal()], u -> !u.isDead(), this::drawStats);
             }
 
-            for(Unit e : playerGroup.all()){
-                drawStats(e);
-            }
+            renderer.drawAndInterpolate(playerGroup, u -> !u.isDead(), this::drawStats);
         }
     }
 
@@ -182,7 +177,7 @@ public class OverlayRenderer {
 
         drawEncloser(x, y - 8f, 2f);
         drawBar(Palette.healthstats, x, y - 8f, unit.healthf());
-        drawBar(Palette.ammo, x, y - 9f, unit.inventory.totalAmmo() / (float) unit.inventory.ammoCapacity());
+        drawBar(Palette.ammo, x, y - 9f, unit.getAmmoFraction());
     }
 
     void drawBar(Color color, float x, float y, float finion){
