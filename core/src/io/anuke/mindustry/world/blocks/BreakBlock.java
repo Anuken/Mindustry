@@ -8,7 +8,7 @@ import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.entities.effect.Rubble;
+import io.anuke.mindustry.entities.effect.RubbleDecal;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.CallBlocks;
@@ -69,7 +69,7 @@ public class BreakBlock extends Block {
         Effects.effect(ExplosionFx.blockExplosionSmoke, tile);
 
         if(!tile.floor().solid && !tile.floor().isLiquid){
-            Rubble.create(tile.drawx(), tile.drawy(), size);
+            RubbleDecal.create(tile.drawx(), tile.drawy(), size);
         }
     }
 

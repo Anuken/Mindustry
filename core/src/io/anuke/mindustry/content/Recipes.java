@@ -62,7 +62,7 @@ public class Recipes implements ContentList{
 
         //POWER
         new Recipe(power, PowerBlocks.powernode, new ItemStack(Items.tungsten, 2), new ItemStack(Items.lead, 6));
-        new Recipe(power, PowerBlocks.powernodelarge, new ItemStack(Items.carbide, 5), new ItemStack(Items.lead, 20), new ItemStack(Items.silicon, 6));
+        new Recipe(power, PowerBlocks.powernodelarge, new ItemStack(Items.carbide, 10), new ItemStack(Items.lead, 20), new ItemStack(Items.silicon, 6));
         new Recipe(power, PowerBlocks.battery, new ItemStack(Items.tungsten, 8), new ItemStack(Items.lead, 30), new ItemStack(Items.silicon, 4));
         new Recipe(power, PowerBlocks.batteryLarge, new ItemStack(Items.carbide, 16), new ItemStack(Items.tungsten, 16), new ItemStack(Items.lead, 80), new ItemStack(Items.silicon, 20));
         new Recipe(power, PowerBlocks.combustiongenerator, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 30));

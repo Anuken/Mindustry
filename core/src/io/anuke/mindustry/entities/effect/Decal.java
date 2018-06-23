@@ -11,17 +11,8 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.groundEffectGroup;
 
 /**Class for creating block rubble on the ground.*/
-public class Rubble extends TimedEntity implements BelowLiquidTrait, DrawTrait {
+public abstract class Decal extends TimedEntity implements BelowLiquidTrait, DrawTrait {
     private static final Color color = Color.valueOf("52504e");
-    private int size;
-
-    /**Creates a rubble effect at a position. Provide a block size to use.*/
-    public static void create(float x, float y, int size){
-        Rubble rubble = new Rubble();
-        rubble.size = size;
-        rubble.set(x, y);
-        rubble.add();
-    }
 
     @Override
     public float lifetime() {
@@ -30,15 +21,8 @@ public class Rubble extends TimedEntity implements BelowLiquidTrait, DrawTrait {
 
     @Override
     public void draw(){
-        String region = "rubble-" + size + "-" + Mathf.randomSeed(id, 0, 1);
-
-        if(!Draw.hasRegion(region)){
-            remove();
-            return;
-        }
-
         Draw.color(color.r, color.g, color.b, 1f-Mathf.curve(fin(), 0.98f));
-        Draw.rect(region, x, y, Mathf.randomSeed(id, 0, 4) * 90);
+        drawDecal();
         Draw.color();
     }
 
@@ -46,4 +30,6 @@ public class Rubble extends TimedEntity implements BelowLiquidTrait, DrawTrait {
     public EntityGroup targetGroup() {
         return groundEffectGroup;
     }
+
+    abstract void drawDecal();
 }

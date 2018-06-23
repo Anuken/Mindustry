@@ -11,8 +11,9 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.effect.Decal;
 import io.anuke.mindustry.entities.effect.Puddle;
-import io.anuke.mindustry.entities.effect.Rubble;
+import io.anuke.mindustry.entities.effect.RubbleDecal;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.CacheLayer;
@@ -322,7 +323,7 @@ public class Block extends BaseBlock implements UnlockableContent{
 
 		Damage.dynamicExplosion(x, y, flammability, explosiveness, power, tilesize * size/2f, tempColor);
 		if(!tile.floor().solid && !tile.floor().isLiquid){
-			Rubble.create(tile.drawx(), tile.drawy(), size);
+			RubbleDecal.create(tile.drawx(), tile.drawy(), size);
 		}
 	}
 

@@ -123,7 +123,7 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
 
     @Override
     public void draw() {
-        float size = itemSize * (1f - sinktime/sinkLifetime);
+        float size = itemSize * (1f - sinktime/sinkLifetime) * (1f-Mathf.curve(fin(), 0.98f));
 
         Tile tile = world.tileWorld(x, y);
 

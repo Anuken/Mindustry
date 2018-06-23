@@ -8,6 +8,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.effect.ScorchDecal;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.CallEntity;
@@ -319,6 +320,7 @@ public abstract class BaseUnit extends Unit{
 		unit.onSuperDeath();
 		UnitDrops.dropItems(unit);
 
+		ScorchDecal.create(unit.x, unit.y);
 		Effects.effect(ExplosionFx.explosion, unit);
 		Effects.shake(2f, 2f, unit);
 

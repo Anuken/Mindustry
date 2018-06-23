@@ -10,6 +10,7 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.effect.ItemDrop;
+import io.anuke.mindustry.entities.effect.ScorchDecal;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.traits.CarriableTrait;
 import io.anuke.mindustry.entities.traits.CarryTrait;
@@ -222,6 +223,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		float explosiveness = 2f + (player.inventory.hasItem() ? player.inventory.getItem().item.explosiveness * player.inventory.getItem().amount : 0f);
 		float flammability = (player.inventory.hasItem() ? player.inventory.getItem().item.flammability * player.inventory.getItem().amount : 0f);
 		Damage.dynamicExplosion(player.x, player.y, flammability, explosiveness, 0f, player.getSize()/2f, Palette.darkFlame);
+		ScorchDecal.create(player.x, player.y);
 		Effects.sound("die", player);
 		player.onDeath();
 	}
