@@ -1,19 +1,25 @@
 package io.anuke.mindustry.world.mapgen;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.OreBlocks;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapTileData;
+import io.anuke.mindustry.io.MapTileData.DataPosition;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.noise.RidgedPerlin;
 import io.anuke.ucore.noise.Simplex;
+import io.anuke.ucore.util.Bits;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.SeedRandom;
 
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
@@ -94,6 +100,11 @@ public class WorldGenerator {
 		for(int x = 0; x < data.width(); x ++){
 			for(int y = 0; y < data.height(); y ++) {
 				tiles[x][y].updateOcclusion();
+
+				//fix things on cliffs that shouldn't be
+				if(tiles[x][y].block() != Blocks.air && tiles[x][y].cliffs != 0){
+					tiles[x][y].setBlock(Blocks.air);
+				}
 			}
 		}
 
@@ -120,6 +131,67 @@ public class WorldGenerator {
 				}
 			}
 		}
+	}
+
+	public static MapTileData generate(){
+		Simplex sim = new Simplex(Mathf.random(99999));
+		Simplex sim2 = new Simplex(Mathf.random(99999));
+		Simplex sim3 = new Simplex(Mathf.random(99999));
+
+		SeedRandom random = new SeedRandom(Mathf.random(99999));
+
+		MapTileData data = new MapTileData(300, 300);
+		TileDataMarker marker = data.newDataMarker();
+
+		ObjectMap<Block, Block> decoration = new ObjectMap<>();
+
+		decoration.put(Blocks.grass, Blocks.shrub);
+		decoration.put(Blocks.stone, Blocks.rock);
+
+		for (int x = 0; x < data.width(); x++) {
+			for (int y = 0; y < data.height(); y++) {
+				marker.floor = (byte)Blocks.stone.id;
+
+				double r = sim2.octaveNoise2D(1, 0.6, 1f/70, x, y);
+				double elevation = sim.octaveNoise2D(3, 0.5, 1f/70, x, y) * 4 - 1.2;
+				double edgeDist = Math.max(data.width()/2, data.height()/2) - Math.max(Math.abs(x - data.width()/2), Math.abs(y - data.height()/2));
+				double dst = Vector2.dst(data.width()/2, data.height()/2, x, y);
+
+				double border = 14;
+
+				if(edgeDist < border){
+					elevation += (border - edgeDist)/6.0;
+				}
+
+				if(sim3.octaveNoise2D(6, 0.5, 1f/120f, x, y) > 0.5){
+					marker.floor = (byte)Blocks.grass.id;
+				}
+
+				if(dst < 20){
+					elevation = 0;
+				}else if(r > 0.9){
+					marker.floor = (byte)Blocks.water.id;
+					elevation = 0;
+
+					if(r > 0.94){
+						marker.floor = (byte)Blocks.deepwater.id;
+					}
+				}
+
+				marker.elevation = (byte)Math.max(elevation, 0);
+
+				if(marker.wall == 0 && decoration.containsKey(Block.getByID(marker.floor)) && random.chance(0.03)){
+					marker.wall = (byte)decoration.get(Block.getByID(marker.floor)).id;
+				}
+
+				data.write(marker);
+
+				marker.wall = 0;
+			}
+		}
+		data.write(data.width()/2, data.height()/2, DataPosition.wall, (byte)StorageBlocks.core.id);
+		data.write(data.width()/2, data.height()/2, DataPosition.rotationTeam, Bits.packByte((byte)0, (byte)Team.blue.ordinal()));
+		return data;
 	}
 
 	static class OreEntry{

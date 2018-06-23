@@ -11,7 +11,6 @@ import io.anuke.mindustry.io.MapMeta;
 import io.anuke.mindustry.io.MapTileData;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.mapgen.WorldGenerator;
-import io.anuke.mindustry.world.mapgen.ProcGen;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityPhysics;
@@ -126,8 +125,7 @@ public class LevelDialog extends FloatingDialog{
 		maps.addImageButton("icon-editor", 16*4, () -> {
 			hide();
 
-			ProcGen gen = new ProcGen();
-			MapTileData data = gen.generate(null);
+			MapTileData data = WorldGenerator.generate();
 			Map map = new Map("generated-map", new MapMeta(0, new ObjectMap<>(), data.width(), data.height(), null), true, () -> null);
 
 			ui.loadfrag.show();
