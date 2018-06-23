@@ -117,15 +117,19 @@ public class Blocks extends BlockList implements ContentList{
         sand = new Floor("sand") {{
             drops = new ItemStack(Items.sand, 1);
             minimapColor = Color.valueOf("988a67");
+            hasOres = true;
         }};
 
         ice = new Floor("ice") {{
-            dragMultiplier = 0.2f;
+            dragMultiplier = 0.3f;
+            speedMultiplier = 0.4f;
             minimapColor = Color.valueOf("c4e3e7");
+            hasOres = true;
         }};
 
         snow = new Floor("snow"){{
             minimapColor = Color.valueOf("c2d1d2");
+            hasOres = true;
         }};
 
         grass = new Floor("grass"){{

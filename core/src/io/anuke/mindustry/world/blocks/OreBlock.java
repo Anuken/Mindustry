@@ -17,7 +17,7 @@ public class OreBlock extends Floor {
         this.base = base;
         this.variants = 3;
         this.minimapColor = ore.color;
-        this.blends = block -> false;
+        this.blends = block -> block instanceof OreBlock && ((OreBlock) block).base != base;
         this.edge = base.name;
     }
 
@@ -32,6 +32,8 @@ public class OreBlock extends Floor {
         Draw.rect(variants > 0 ? (drops.item.name + rand)  : name, tile.worldx(), tile.worldy() - 1);
         Draw.color();
         Draw.rect(variants > 0 ? (drops.item.name + rand)  : name, tile.worldx(), tile.worldy());
+
+        drawEdges(tile, false);
     }
 
     @Override
@@ -47,11 +49,6 @@ public class OreBlock extends Floor {
         MathUtils.random.setSeed(tile.id());
 
         base.drawEdges(tile, true);
-    }
-
-    @Override
-    protected void drawEdges(Tile tile, boolean sameLayer){
-        base.drawEdges(tile, sameLayer);
     }
 
     @Override

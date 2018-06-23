@@ -110,6 +110,10 @@ public class ContentLoader {
             contentSet.add(list.getAll());
         }
 
+        if(Block.all().size >= 256){
+            throw new IllegalArgumentException("THE TIME HAS COME. More than 256 blocks have been created..");
+        }
+
         Log.info("--- CONTENT INFO ---");
         Log.info("Blocks loaded: {0}\nItems loaded: {1}\nLiquids loaded: {2}\nUpgrades loaded: {3}\nUnits loaded: {4}\nAmmo types loaded: {5}\nBullet types loaded: {6}\nStatus effects loaded: {7}\nRecipes loaded: {8}\nEffects loaded: {9}\nTotal content classes: {10}",
                 Block.all().size, io.anuke.mindustry.type.Item.all().size, Liquid.all().size,

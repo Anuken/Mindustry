@@ -125,13 +125,13 @@ public class LevelDialog extends FloatingDialog{
 		maps.addImageButton("icon-editor", 16*4, () -> {
 			hide();
 
-			MapTileData data = WorldGenerator.generate();
-			Map map = new Map("generated-map", new MapMeta(0, new ObjectMap<>(), data.width(), data.height(), null), true, () -> null);
-
 			ui.loadfrag.show();
 
 			Timers.run(5f, () -> {
 				threads.run(() -> {
+					MapTileData data = WorldGenerator.generate();
+					Map map = new Map("generated-map", new MapMeta(0, new ObjectMap<>(), data.width(), data.height(), null), true, () -> null);
+
 					logic.reset();
 
 					world.beginMapLoad();

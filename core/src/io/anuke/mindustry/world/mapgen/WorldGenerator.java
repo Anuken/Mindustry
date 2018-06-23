@@ -140,22 +140,30 @@ public class WorldGenerator {
 
 		SeedRandom random = new SeedRandom(Mathf.random(99999));
 
-		MapTileData data = new MapTileData(300, 300);
+		MapTileData data = new MapTileData(400, 400);
 		TileDataMarker marker = data.newDataMarker();
 
 		ObjectMap<Block, Block> decoration = new ObjectMap<>();
 
 		decoration.put(Blocks.grass, Blocks.shrub);
 		decoration.put(Blocks.stone, Blocks.rock);
+		decoration.put(Blocks.ice, Blocks.icerock);
+		decoration.put(Blocks.snow, Blocks.icerock);
+		decoration.put(Blocks.blackstone, Blocks.blackrock);
+
+		//TODO implement improved, more interesting generation
 
 		for (int x = 0; x < data.width(); x++) {
 			for (int y = 0; y < data.height(); y++) {
 				marker.floor = (byte)Blocks.stone.id;
 
+				double elevation = sim.octaveNoise2D(3, 0.5, 1f/100, x, y) * 4.1 - 1;
+				double temp = sim3.octaveNoise2D(7, 0.53, 1f/320f, x, y);
+
 				double r = sim2.octaveNoise2D(1, 0.6, 1f/70, x, y);
-				double elevation = sim.octaveNoise2D(3, 0.5, 1f/70, x, y) * 4 - 1.2;
 				double edgeDist = Math.max(data.width()/2, data.height()/2) - Math.max(Math.abs(x - data.width()/2), Math.abs(y - data.height()/2));
 				double dst = Vector2.dst(data.width()/2, data.height()/2, x, y);
+				double elevDip = 20;
 
 				double border = 14;
 
@@ -163,12 +171,23 @@ public class WorldGenerator {
 					elevation += (border - edgeDist)/6.0;
 				}
 
-				if(sim3.octaveNoise2D(6, 0.5, 1f/120f, x, y) > 0.5){
+				if(temp < 0.35){
+					marker.floor = (byte)Blocks.snow.id;
+				}else if(temp < 0.45){
+					marker.floor = (byte)Blocks.stone.id;
+				}else if(temp < 0.7){
 					marker.floor = (byte)Blocks.grass.id;
+				}else if(temp < 0.8){
+					marker.floor = (byte)Blocks.sand.id;
+				}else if(temp < 0.9){
+					marker.floor = (byte)Blocks.blackstone.id;
+					elevation = 0f;
+				}else{
+					marker.floor = (byte)Blocks.lava.id;
 				}
 
-				if(dst < 20){
-					elevation = 0;
+				if(dst < elevDip){
+					elevation -= (elevDip - dst)/elevDip * 4.0;
 				}else if(r > 0.9){
 					marker.floor = (byte)Blocks.water.id;
 					elevation = 0;
