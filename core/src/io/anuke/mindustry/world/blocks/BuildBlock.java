@@ -37,12 +37,18 @@ public class BuildBlock extends Block {
 
     public BuildBlock(String name) {
         super(name);
-        solid = true;
         update = true;
         size = Integer.parseInt(name.charAt(name.length()-1) + "");
         health = 1;
         layer = Layer.placement;
         consumesTap = true;
+        solidifes = true;
+    }
+
+    @Override
+    public boolean isSolidFor(Tile tile) {
+        BuildEntity entity = tile.entity();
+        return entity.recipe.result.solid || entity.previous.solid;
     }
 
     @Override

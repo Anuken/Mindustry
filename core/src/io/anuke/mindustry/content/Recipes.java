@@ -95,6 +95,14 @@ public class Recipes implements ContentList{
         //new Recipe(liquid, LiquidBlocks.laserconduit, new ItemStack(Items.titanium, 2), new ItemStack(Items.lead, 2), new ItemStack(Items.phasematter, 10));
 
         new Recipe(liquid, LiquidBlocks.mechanicalPump, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 20));
+
+        //DEBUG
+        new Recipe(units, DebugBlocks.itemSource, new ItemStack(Items.carbide, 10)).setDebug();
+        new Recipe(units, DebugBlocks.itemVoid, new ItemStack(Items.carbide, 10)).setDebug();
+        new Recipe(units, DebugBlocks.liquidSource, new ItemStack(Items.carbide, 10)).setDebug();
+        new Recipe(units, DebugBlocks.powerVoid, new ItemStack(Items.carbide, 10)).setDebug();
+        new Recipe(units, DebugBlocks.powerInfinite, new ItemStack(Items.carbide, 10), new ItemStack(Items.surgealloy, 5)).setDebug();
+
         //new Recipe(liquid, LiquidBlocks.rotaryPump, new ItemStack(Items.carbide, 10), new ItemStack(Items.surgealloy, 5));
         //new Recipe(liquid, LiquidBlocks.thermalPump, new ItemStack(Items.carbide, 10), new ItemStack(Items.surgealloy, 5));
 

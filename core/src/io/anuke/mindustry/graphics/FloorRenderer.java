@@ -226,6 +226,8 @@ public class FloorRenderer {
 
         Log.info("Time to create: {0}", Timers.elapsed());
 
+        Timers.mark();
+
         for (int x = 0; x < chunksx; x++) {
             for (int y = 0; y < chunksy; y++) {
                 cache[x][y] = new Chunk();

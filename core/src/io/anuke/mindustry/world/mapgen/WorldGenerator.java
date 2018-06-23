@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.mapgen;
 
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
@@ -18,6 +19,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.noise.RidgedPerlin;
 import io.anuke.ucore.noise.Simplex;
 import io.anuke.ucore.util.Bits;
+import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.SeedRandom;
 
@@ -99,11 +101,13 @@ public class WorldGenerator {
 		//update cliffs, occlusion data
 		for(int x = 0; x < data.width(); x ++){
 			for(int y = 0; y < data.height(); y ++) {
-				tiles[x][y].updateOcclusion();
+				Tile tile = tiles[x][y];
+
+				tile.updateOcclusion();
 
 				//fix things on cliffs that shouldn't be
-				if(tiles[x][y].block() != Blocks.air && tiles[x][y].cliffs != 0){
-					tiles[x][y].setBlock(Blocks.air);
+				if(tile.block() != Blocks.air && tile.cliffs != 0){
+					tile.setBlock(Blocks.air);
 				}
 			}
 		}
@@ -151,8 +155,6 @@ public class WorldGenerator {
 		decoration.put(Blocks.snow, Blocks.icerock);
 		decoration.put(Blocks.blackstone, Blocks.blackrock);
 
-		//TODO implement improved, more interesting generation
-
 		for (int x = 0; x < data.width(); x++) {
 			for (int y = 0; y < data.height(); y++) {
 				marker.floor = (byte)Blocks.stone.id;
@@ -163,7 +165,7 @@ public class WorldGenerator {
 				double r = sim2.octaveNoise2D(1, 0.6, 1f/70, x, y);
 				double edgeDist = Math.max(data.width()/2, data.height()/2) - Math.max(Math.abs(x - data.width()/2), Math.abs(y - data.height()/2));
 				double dst = Vector2.dst(data.width()/2, data.height()/2, x, y);
-				double elevDip = 20;
+				double elevDip = 30;
 
 				double border = 14;
 
@@ -175,7 +177,7 @@ public class WorldGenerator {
 					marker.floor = (byte)Blocks.snow.id;
 				}else if(temp < 0.45){
 					marker.floor = (byte)Blocks.stone.id;
-				}else if(temp < 0.7){
+				}else if(temp < 0.65){
 					marker.floor = (byte)Blocks.grass.id;
 				}else if(temp < 0.8){
 					marker.floor = (byte)Blocks.sand.id;
@@ -187,7 +189,7 @@ public class WorldGenerator {
 				}
 
 				if(dst < elevDip){
-					elevation -= (elevDip - dst)/elevDip * 4.0;
+					elevation -= (elevDip - dst)/elevDip * 3.0;
 				}else if(r > 0.9){
 					marker.floor = (byte)Blocks.water.id;
 					elevation = 0;
@@ -208,6 +210,24 @@ public class WorldGenerator {
 				marker.wall = 0;
 			}
 		}
+
+		for (int x = 0; x < data.width(); x++) {
+			for (int y = 0; y < data.height(); y++) {
+				byte elevation = data.read(x, y, DataPosition.elevation);
+
+				for(GridPoint2 point : Geometry.d4){
+					if(!Mathf.inBounds(x + point.x, y + point.y, data.width(), data.height())) continue;
+					if(data.read(x + point.x, y + point.y, DataPosition.elevation) < elevation){
+
+						if(Mathf.chance(0.05)){
+							data.write(x, y, DataPosition.elevation, (byte)-1);
+						}
+						break;
+					}
+				}
+			}
+		}
+
 		data.write(data.width()/2, data.height()/2, DataPosition.wall, (byte)StorageBlocks.core.id);
 		data.write(data.width()/2, data.height()/2, DataPosition.rotationTeam, Bits.packByte((byte)0, (byte)Team.blue.ordinal()));
 		return data;

@@ -24,6 +24,7 @@ import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Strings;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -183,12 +184,12 @@ public class BlocksFragment implements Fragment{
 				TextureRegion[] regions = r.result.getCompactIcon();
 				Stack istack = new Stack();
 				for(TextureRegion region : regions){
-					istack.add(new Image(region));
+					Image u = new Image(region);
+					u.update(() -> u.setColor(image.isDisabled() ? Color.GRAY : Color.WHITE));
+					istack.add(u);
 				}
 
 				image.getImageCell().setActor(istack).size(size);
-				image.getStyle().imageUpColor = Color.WHITE;
-				image.getStyle().imageDisabledColor = Color.GRAY;
 				image.addChild(istack);
 				image.setTouchable(Touchable.enabled);
 				image.getImage().remove();
@@ -246,7 +247,6 @@ public class BlocksFragment implements Fragment{
 				recipeTable.add(image).size(size + 8);
 
 				image.update(() -> {
-					image.getImage().setColor(image.isDisabled() ? Color.GRAY : Color.WHITE);
 					for(Player player : players){
 						if(control.input(player.playerIndex).recipe == r){
 							image.setChecked(true);
@@ -325,12 +325,32 @@ public class BlocksFragment implements Fragment{
 
 		for(ItemStack stack : recipe.requirements){
 			requirements.addImage(stack.item.region).size(8*3);
-			Label reqlabel = new Label(() -> Mathf.clamp(stack.amount, 0, stack.amount) + "/" + stack.amount);
+			Label reqlabel = new Label(() ->{
+				TileEntity core = players[0].getClosestCore();
+				if(core == null) return "*/*";
+
+				int amount = core.items.getItem(stack.item);
+				String color = (amount < stack.amount/2f ? "[red]" : amount < stack.amount ? "[orange]" : "[white]");
+
+				return color + format(amount) + "[white]/" + stack.amount;
+			});
 
 			requirements.add(reqlabel).left();
 			requirements.row();
 		}
 
 		descTable.row();
+	}
+
+	String format(int number){
+		if(number > 1000000) {
+			return Strings.toFixed(number/1000000f, 1) + "[gray]mil[]";
+		}else if(number > 10000){
+			return number/1000 + "[gray]k[]";
+		}else if(number > 1000){
+			return Strings.toFixed(number/1000f, 1) + "[gray]k[]";
+		}else{
+			return number + "";
+		}
 	}
 }

@@ -61,6 +61,8 @@ public class Floor extends Block{
 	public boolean hasOres = false;
 	/**whether this block can be drowned in*/
 	public boolean isLiquid;
+	/**if true, this block cannot be mined by players. useful for annoying things like stone.*/
+	public boolean playerUnmineable = false;
 	
 	public Floor(String name) {
 		super(name);

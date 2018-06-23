@@ -207,6 +207,7 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
         y = data.readFloat();
         item = Item.getByID(data.readByte());
         amount = data.readShort();
+        add();
     }
 
     @Override

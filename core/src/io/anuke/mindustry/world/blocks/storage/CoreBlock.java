@@ -169,7 +169,7 @@ public class CoreBlock extends StorageBlock {
         }else{
             entity.warmup += Timers.delta();
 
-            if(entity.solid && entity.warmup > 10f && unitGroups[tile.getTeamID()].getByID(entity.droneID) == null && !Net.client()){
+            if(entity.solid && entity.warmup > 60f && unitGroups[tile.getTeamID()].getByID(entity.droneID) == null && !Net.client()){
 
                 boolean found = false;
                 for(BaseUnit unit : unitGroups[tile.getTeamID()].all()){

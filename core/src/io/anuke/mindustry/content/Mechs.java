@@ -16,7 +16,7 @@ public class Mechs implements ContentList {
     public void load() {
 
         alpha = new Mech("alpha-mech", false){{
-            drillPower = 2;
+            drillPower = 1;
             speed = 0.5f;
         }};
 

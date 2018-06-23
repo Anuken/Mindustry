@@ -162,6 +162,7 @@ public abstract class InputHandler extends InputAdapter{
 
 	boolean canMine(Tile tile){
 		return tile.floor().drops != null && tile.floor().drops.item.hardness <= player.mech.drillPower
+				&& !tile.floor().playerUnmineable
 				&& player.inventory.canAcceptItem(tile.floor().drops.item)
 				&& tile.block() == Blocks.air && player.distanceTo(tile.worldx(), tile.worldy()) <= Player.mineDistance;
 	}

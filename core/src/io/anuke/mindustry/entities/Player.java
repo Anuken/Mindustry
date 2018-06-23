@@ -264,7 +264,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 			baseRotation = Mathf.slerpDelta(baseRotation, movement.angle(), 0.13f);
 		}
 
-		boostHeat = Mathf.lerpDelta(boostHeat, isBoosting ? 1f : 0f, 0.08f);
+		boostHeat = Mathf.lerpDelta(boostHeat, isBoosting && !movement.isZero() && moved ? 1f : 0f, 0.08f);
 
         boolean snap = snapCamera && isLocal;
 
@@ -415,6 +415,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		hitTime = Math.max(0f, hitTime - Timers.delta());
 
 		if(isDead()){
+			isBoosting = false;
 			CoreEntity entity = (CoreEntity)getClosestCore();
 
 			if (!respawning && entity != null) {

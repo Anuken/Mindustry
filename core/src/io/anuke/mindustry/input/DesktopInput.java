@@ -156,7 +156,9 @@ public class DesktopInput extends InputHandler{
 
 		Tile cursor = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
 
-		if(cursor != null){
+		if(player.isDead()){
+            cursorType = normal;
+        }else if(cursor != null){
 		    cursor = cursor.target();
 
             cursorType = cursor.block().getCursor(cursor);
@@ -197,7 +199,7 @@ public class DesktopInput extends InputHandler{
                 mode = placing;
             } else {
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(cursor) && player.getPlaceQueue().size == 0 && !tryTapPlayer(worldx, worldy) && !droppingItem &&
+                if(!tileTapped(cursor) && !tryTapPlayer(worldx, worldy) && player.getPlaceQueue().size == 0 && !droppingItem &&
                         !tryBeginMine(cursor) && player.getMineTile() == null){
                     CallEntity.setShooting(true);
                 }

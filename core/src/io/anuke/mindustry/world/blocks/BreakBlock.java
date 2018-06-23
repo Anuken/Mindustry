@@ -34,12 +34,18 @@ public class BreakBlock extends Block {
 
     public BreakBlock(String name) {
         super(name);
-        solid = true;
+        solidifes = true;
         update = true;
         size = Integer.parseInt(name.charAt(name.length()-1) + "");
         health = 1;
         layer = Layer.placement;
         consumesTap = true;
+    }
+
+    @Override
+    public boolean isSolidFor(Tile tile) {
+        BreakEntity entity = tile.entity();
+        return entity.previous.solid;
     }
 
     @Override

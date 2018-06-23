@@ -351,9 +351,9 @@ public class Tile implements PosTrait, TargetTrait {
             //010
 
 			//check for corner bitmasking: doesn't even get checked so it doesn't matter
-			if(te != null && tex != null && tey != null && te.elevation == -1 && elevation > 0){
+			/*if(te != null && tex != null && tey != null && te.elevation == -1 && elevation > 0){
 				cliffs |= (1 << (((i+1)%4)*2));
-			}
+			}*/
 		}
 		if(occluded){
 			cost += 1;
