@@ -138,8 +138,8 @@ public class MinimapRenderer implements Disposable{
     }
 
     private int colorFor(Tile tile){
-        int color = tile.breakable() ? tile.target().getTeam().intColor : ColorMapper.getColor(tile.block());
-        if(color == 0) color = ColorMapper.getColor(tile.floor());
+        int color = tile.breakable() ? tile.target().getTeam().intColor : ColorMapper.getBlockColor(tile.block());
+        if(color == 0) color = ColorMapper.getBlockColor(tile.floor());
         if(tile.cliffs != 0){
             tmpColor.set(color);
             tmpColor.mul(1.5f, 1.5f, 1.5f, 1f);

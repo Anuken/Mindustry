@@ -12,7 +12,6 @@ import io.anuke.mindustry.io.MapTileData.DataPosition;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
-import io.anuke.mindustry.world.ColorMapper.BlockPair;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -42,9 +41,9 @@ public class MapIO {
                 data.read(marker);
                 Block floor = Block.getByID(marker.floor);
                 Block wall = Block.getByID(marker.wall);
-                int wallc = ColorMapper.getColor(wall);
-                if(wallc == 0 && (wall.update || wall.solid || wall.breakable)) wallc = Color.rgba8888(Team.values()[marker.team].color);
-                wallc = wallc == 0 ? ColorMapper.getColor(floor) : wallc;
+                int wallc = ColorMapper.getBlockColor(wall);
+                if(wallc == 0 && (wall.update || wall.solid || wall.breakable)) wallc = Team.values()[marker.team].intColor;
+                wallc = wallc == 0 ? ColorMapper.getBlockColor(floor) : wallc;
                 if(marker.elevation > 0){
                     float scaling = 1f + marker.elevation/8f;
                     color.set(wallc);
@@ -65,15 +64,15 @@ public class MapIO {
 
         for(int x = 0; x < data.width(); x ++){
             for(int y = 0; y < data.height(); y ++){
-                BlockPair pair = ColorMapper.get(pixmap.getPixel(y, pixmap.getWidth() - 1 - x));
+                Block block = ColorMapper.getByColor(pixmap.getPixel(y, pixmap.getWidth() - 1 - x));
 
-                if(pair == null){
+                if(block == null){
                     data.write(x, y, DataPosition.floor, (byte)Blocks.stone.id);
-                    data.write(x, y, DataPosition.wall, (byte)Blocks.air.id);
                 }else{
-                    data.write(x, y, DataPosition.floor, (byte)pair.floor.id);
-                    data.write(x, y, DataPosition.wall, (byte)pair.wall.id);
+                    data.write(x, y, DataPosition.floor, (byte)block.id);
                 }
+
+                data.write(x, y, DataPosition.wall, (byte)Blocks.air.id);
             }
         }
 

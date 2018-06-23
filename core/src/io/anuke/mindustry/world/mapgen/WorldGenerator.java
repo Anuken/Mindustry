@@ -2,11 +2,14 @@ package io.anuke.mindustry.world.mapgen;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.blocks.OreBlocks;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapTileData;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.noise.RidgedPerlin;
@@ -24,11 +27,11 @@ public class WorldGenerator {
 		oreIndex = 0;
 
 		Array<OreEntry> ores = Array.with(
-			new OreEntry(Blocks.iron, 0.3f, seed),
-			new OreEntry(Blocks.coal, 0.284f, seed),
-			new OreEntry(Blocks.lead, 0.28f, seed),
-			new OreEntry(Blocks.titanium, 0.27f, seed),
-			new OreEntry(Blocks.thorium, 0.26f, seed)
+			new OreEntry(Items.tungsten, 0.3f, seed),
+			new OreEntry(Items.coal, 0.284f, seed),
+			new OreEntry(Items.lead, 0.28f, seed),
+			new OreEntry(Items.titanium, 0.27f, seed),
+			new OreEntry(Items.thorium, 0.26f, seed)
 		);
 
 		IntArray multiblocks = new IntArray();
@@ -110,7 +113,8 @@ public class WorldGenerator {
 						if(entry.noise.octaveNoise2D(2, 0.7, 1f / (2 + i*2), x, y)/2f +
 								entry.ridge.getValue(x, y, 1f / (28 + i*4)) >= 2.0f - entry.frequency*4.0f
 								&& entry.ridge.getValue(x+9999, y+9999, 1f/100f) > 0.4){
-							tile.setFloor(entry.block);
+							tile.setFloor(OreBlocks.get(tile.floor(), entry.item));
+							break;
 						}
 					}
 				}
@@ -120,14 +124,14 @@ public class WorldGenerator {
 
 	static class OreEntry{
 		final float frequency;
-		final Block block;
+		final Item item;
 		final Simplex noise;
 		final RidgedPerlin ridge;
 		final int index;
 
-		OreEntry(Block block, float frequency, int seed) {
+		OreEntry(Item item, float frequency, int seed) {
 			this.frequency = frequency;
-			this.block = block;
+			this.item = item;
 			this.noise = new Simplex(seed + oreIndex);
 			this.ridge = new RidgedPerlin(seed + oreIndex, 2);
 			this.index = oreIndex ++;

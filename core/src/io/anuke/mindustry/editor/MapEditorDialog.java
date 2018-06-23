@@ -9,7 +9,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
-import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.Map;
@@ -18,8 +17,6 @@ import io.anuke.mindustry.io.MapMeta;
 import io.anuke.mindustry.io.MapTileData;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.ColorMapper;
-import io.anuke.mindustry.world.ColorMapper.BlockPair;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
@@ -365,8 +362,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
 	public void updateSelectedBlock(){
 		Block block = editor.getDrawBlock();
 		int i = 0;
-		for(BlockPair pair : ColorMapper.getPairs()){
-			if(pair.wall == block || (pair.wall == Blocks.air && pair.floor == block)){
+		for(Block test : Block.all()){
+			if(block == test){
 				blockgroup.getButtons().get(i).setChecked(true);
 				break;
 			}

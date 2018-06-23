@@ -12,7 +12,9 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.*;
 
 public class Blocks extends BlockList implements ContentList{
-    public static Block air, spawn, blockpart, space, metalfloor, deepwater, water, lava, oil, stone, blackstone, iron, lead, coal, titanium, thorium, dirt, sand, ice, snow, grass, shrub, rock, icerock, blackrock;
+    public static Block air, spawn, blockpart, space, metalfloor, deepwater, water, lava, oil, stone, blackstone, dirt, sand, ice, snow, grass, shrub, rock, icerock, blackrock;
+
+
 
     @Override
     public void load() {
@@ -39,6 +41,7 @@ public class Blocks extends BlockList implements ContentList{
             cacheLayer = CacheLayer.space;
             solid = true;
             blend = false;
+            minimapColor = Color.valueOf("000001");
         }};
 
         metalfloor = new Floor("metalfloor") {{
@@ -55,6 +58,7 @@ public class Blocks extends BlockList implements ContentList{
             statusIntensity = 1f;
             drownTime = 140f;
             cacheLayer = CacheLayer.water;
+            minimapColor = Color.valueOf("465a96");
         }};
 
         water = new Floor("water") {{
@@ -66,6 +70,7 @@ public class Blocks extends BlockList implements ContentList{
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
+            minimapColor = Color.valueOf("506eb4");
         }};
 
         lava = new Floor("lava") {{
@@ -78,6 +83,7 @@ public class Blocks extends BlockList implements ContentList{
             liquidDrop = Liquids.lava;
             isLiquid = true;
             cacheLayer = CacheLayer.lava;
+            minimapColor = Color.valueOf("ed5334");
         }};
 
         oil = new Floor("oil") {{
@@ -89,52 +95,42 @@ public class Blocks extends BlockList implements ContentList{
             liquidDrop = Liquids.oil;
             isLiquid = true;
             cacheLayer = CacheLayer.oil;
+            minimapColor = Color.valueOf("292929");
         }};
 
         stone = new Floor("stone") {{
             hasOres = true;
             drops = new ItemStack(Items.stone, 1);
             blends = block -> block != this && !(block instanceof Ore);
+            minimapColor = Color.valueOf("323232");
         }};
 
         blackstone = new Floor("blackstone") {{
             drops = new ItemStack(Items.stone, 1);
+            minimapColor = Color.valueOf("252525");
         }};
 
-        iron = new Ore("tungsten") {{
-            drops = new ItemStack(Items.tungsten, 1);
+        dirt = new Floor("dirt"){{
+            minimapColor = Color.valueOf("6e501e");
         }};
-
-        lead = new Ore("lead") {{
-            drops = new ItemStack(Items.lead, 1);
-        }};
-
-        coal = new Ore("coal") {{
-            drops = new ItemStack(Items.coal, 1);
-        }};
-
-        titanium = new Ore("titanium") {{
-            drops = new ItemStack(Items.titanium, 1);
-        }};
-
-        thorium = new Ore("thorium") {{
-            drops = new ItemStack(Items.thorium, 1);
-        }};
-
-        dirt = new Floor("dirt");
 
         sand = new Floor("sand") {{
             drops = new ItemStack(Items.sand, 1);
+            minimapColor = Color.valueOf("988a67");
         }};
 
         ice = new Floor("ice") {{
             dragMultiplier = 0.2f;
+            minimapColor = Color.valueOf("c4e3e7");
         }};
 
-        snow = new Floor("snow");
+        snow = new Floor("snow"){{
+            minimapColor = Color.valueOf("c2d1d2");
+        }};
 
         grass = new Floor("grass"){{
             hasOres = true;
+            minimapColor = Color.valueOf("549d5b");
         }};
 
         shrub = new Rock("shrub");

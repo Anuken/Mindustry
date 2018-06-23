@@ -23,6 +23,7 @@ import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Log;
@@ -83,6 +84,10 @@ public class ContentLoader {
         new PowerBlocks(),
         new CraftingBlocks(),
         new UpgradeBlocks(),
+        new OreBlocks(),
+
+        //not really a content class, but this makes initialization easier
+        new ColorMapper(),
 
         //recipes
         new Recipes(),

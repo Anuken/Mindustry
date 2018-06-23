@@ -118,6 +118,8 @@ public class Block extends BaseBlock implements UnlockableContent{
 	public boolean configurable;
 	/**Whether this block consumes touchDown events when tapped.*/
 	public boolean consumesTap;
+	/**The color of this block when displayed on the minimap or map preview.*/
+	public Color minimapColor = Color.CLEAR;
 
 	public Block(String name) {
 		this.name = name;

@@ -32,7 +32,7 @@ public class Floor extends Block{
 	protected TextureRegion[] edgeRegions;
 	protected TextureRegion[] cliffRegions;
 	protected Vector2[] offsets;
-	protected Predicate<Block> blends = block -> block != this;
+	protected Predicate<Floor> blends = block -> block != this && !block.blendOverride(this);
 	protected boolean blend = true;
 
     /**edge fallback, used mainly for ores*/
@@ -157,7 +157,11 @@ public class Floor extends Block{
 		drawEdges(tile, false);
 	}
 
-	private void drawEdges(Tile tile, boolean sameLayer){
+	public boolean blendOverride(Block block){
+		return false;
+	}
+
+	protected void drawEdges(Tile tile, boolean sameLayer){
 		if(!blend || tile.cliffs > 0) return;
 
 		for(int i = 0; i < 8; i ++){
