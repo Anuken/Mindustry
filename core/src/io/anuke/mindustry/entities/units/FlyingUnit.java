@@ -1,5 +1,7 @@
 package io.anuke.mindustry.entities.units;
 
+import com.badlogic.gdx.math.Vector2;
+import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.CarriableTrait;
 import io.anuke.mindustry.entities.traits.CarryTrait;
@@ -12,7 +14,10 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Geometry;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Translator;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -237,7 +242,9 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
                     AmmoType ammo = inventory.getAmmo();
                     inventory.useAmmo();
 
-                    shoot(ammo, Angles.moveToward(rotation, angleTo(target), maxAim));
+                    Vector2 to = Predict.intercept(FlyingUnit.this, target, ammo.bullet.speed);
+
+                    shoot(ammo, Angles.moveToward(rotation, angleTo(to.x, to.y), maxAim));
                 }
             }
         }

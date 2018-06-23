@@ -10,7 +10,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockBar;
 
 public class ItemTurret extends CooledTurret {
-    protected int maxAmmo = 100;
+    protected int maxAmmo = 50;
     protected AmmoType[] ammoTypes;
     protected ObjectMap<Item, AmmoType> ammoMap = new ObjectMap<>();
 

@@ -1,7 +1,10 @@
 package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.Predict;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.AmmoType;
@@ -10,7 +13,10 @@ import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Geometry;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Translator;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -53,7 +59,7 @@ public abstract class GroundUnit extends BaseUnit {
     public void update() {
         super.update();
 
-        if(!velocity.isZero(0.001f) && (target == null || (inventory.hasAmmo() && distanceTo(target) <= inventory.getAmmoRange()))){
+        if(!velocity.isZero(0.001f) && (target == null || !inventory.hasAmmo() || (inventory.hasAmmo() && distanceTo(target) > inventory.getAmmoRange()))){
             rotation = Mathf.slerpDelta(rotation, velocity.angle(), 0.2f);
         }
     }
@@ -161,14 +167,27 @@ public abstract class GroundUnit extends BaseUnit {
         }
 
         public void update() {
-            retarget(() -> targetClosest());
+            TileEntity core = getClosestEnemyCore();
+            float dst = core == null ? 0 :distanceTo(core);
+
+            if(core != null && dst < inventory.getAmmo().getRange()){
+                target = core;
+            }else {
+                retarget(() -> targetClosest());
+            }
 
             if(!inventory.hasAmmo()) {
                 state.set(resupply);
             }else if(target != null){
-                if(distanceTo(target) > inventory.getAmmo().getRange() * 0.7f){
-                    moveToCore();
+                if(core != null){
+                    if(dst > inventory.getAmmo().getRange() * 0.7f){
+                        moveToCore();
+                    }
+
+                    rotate(angleTo(target));
+
                 }else{
+                    moveToCore();
                     rotate(angleTo(target));
                 }
 
@@ -178,7 +197,9 @@ public abstract class GroundUnit extends BaseUnit {
                     inventory.useAmmo();
                     rotate(angleTo(target));
 
-                    shoot(ammo, Angles.moveToward(rotation, angleTo(target), maxAim));
+                    Vector2 to = Predict.intercept(GroundUnit.this, target, ammo.bullet.speed);
+
+                    shoot(ammo, Angles.moveToward(rotation, angleTo(to.x, to.y), maxAim));
                 }
             }else{
                 moveToCore();

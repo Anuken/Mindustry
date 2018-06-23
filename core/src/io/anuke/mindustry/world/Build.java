@@ -17,6 +17,7 @@ import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.ucore.entities.Entities;
 
+import static io.anuke.mindustry.Vars.debug;
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
@@ -147,7 +148,7 @@ public class Build {
     public static boolean validPlace(Team team, int x, int y, Block type, int rotation) {
         Recipe recipe = Recipe.getByResult(type);
 
-        if (recipe == null) {
+        if (recipe == null || (recipe.debugOnly && !debug)) {
             return false;
         }
 

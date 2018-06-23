@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.production;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.content.fx.Fx;
@@ -82,6 +83,11 @@ public class Cultivator extends Drill {
     @Override
     public boolean isValid(Tile tile){
         return tile.floor() == Blocks.grass;
+    }
+
+    @Override
+    public Item getDrop(Tile tile) {
+        return Items.biomatter;
     }
 
     public static class CultivatorEntity extends DrillEntity{

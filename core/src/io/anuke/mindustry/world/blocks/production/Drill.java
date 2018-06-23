@@ -119,8 +119,9 @@ public class Drill extends Block{
 
 		for(Tile other : tile.getLinkedTiles(tempTiles)){
 			if(isValid(other)){
-				toAdd.add(other.floor().drops.item);
-				totalHardness += other.floor().drops.item.hardness;
+				Item drop = getDrop(other);
+				toAdd.add(drop);
+				totalHardness += drop.hardness;
 				multiplier += 1f;
 			}
 		}
@@ -194,6 +195,10 @@ public class Drill extends Block{
 	@Override
 	public TileEntity getEntity() {
 		return new DrillEntity();
+	}
+
+	public Item getDrop(Tile tile){
+		return tile.floor().drops.item;
 	}
 
 	protected boolean isValid(Tile tile){

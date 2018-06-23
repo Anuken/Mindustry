@@ -179,6 +179,8 @@ public class BlocksFragment implements Fragment{
 
 			//add actual recipes
 			for (Recipe r : recipes) {
+				if(r.debugOnly && !debug) continue;
+
 				ImageButton image = new ImageButton(new TextureRegion(), "select");
 
 				TextureRegion[] regions = r.result.getCompactIcon();
@@ -343,11 +345,11 @@ public class BlocksFragment implements Fragment{
 	}
 
 	String format(int number){
-		if(number > 1000000) {
+		if(number >= 1000000) {
 			return Strings.toFixed(number/1000000f, 1) + "[gray]mil[]";
-		}else if(number > 10000){
+		}else if(number >= 10000){
 			return number/1000 + "[gray]k[]";
-		}else if(number > 1000){
+		}else if(number >= 1000){
 			return Strings.toFixed(number/1000f, 1) + "[gray]k[]";
 		}else{
 			return number + "";

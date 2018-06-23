@@ -192,8 +192,8 @@ public class Conveyor extends Block{
 			}
 		}
 
-		if(entity.minitem <= 0.0001f){
-			entity.clogHeat = Mathf.lerpDelta(entity.clogHeat, 1f, 0.05f);
+		if(entity.minitem < itemSpace){
+			entity.clogHeat = Mathf.lerpDelta(entity.clogHeat, 1f, 0.02f);
 		}else{
 			entity.clogHeat = Mathf.lerpDelta(entity.clogHeat, 0f, 1f);
 		}

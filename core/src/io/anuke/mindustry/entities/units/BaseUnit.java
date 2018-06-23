@@ -1,8 +1,11 @@
 package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
@@ -11,6 +14,7 @@ import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.ScorchDecal;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
@@ -38,6 +42,8 @@ public abstract class BaseUnit extends Unit{
 
 	protected static final int timerTarget = timerIndex++;
 	protected static final int timerReload = timerIndex++;
+
+	protected static final Array<Tile> nearbyCores = new Array<>();
 
 	protected UnitType type;
 	protected Timer timer = new Timer(5);
@@ -94,7 +100,7 @@ public abstract class BaseUnit extends Unit{
 	}
 
 	public void updateTargeting(){
-		if(target == null || (target instanceof Unit && (target.isDead() || ((Unit)target).getTeam() == team))
+		if(target == null || (target instanceof Unit && (target.isDead() || target.getTeam() == team))
 				|| (target instanceof TileEntity && ((TileEntity) target).tile.entity == null)){
 			target = null;
 		}
@@ -122,6 +128,20 @@ public abstract class BaseUnit extends Unit{
 		if(target != null) return;
 
 		target = Units.getClosestTarget(team, x, y, inventory.getAmmoRange());
+	}
+
+	public TileEntity getClosestEnemyCore(){
+		if(Vars.state.teams.has(team)){
+			ObjectSet<TeamData> datas = Vars.state.teams.enemyDataOf(team);
+
+			for(TeamData data : datas){
+				Tile tile = Geometry.findClosest(x, y, data.cores);
+				if(tile != null){
+					return tile.entity;
+				}
+			}
+		}
+		return null;
 	}
 
 	public UnitState getStartState(){

@@ -464,9 +464,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		if(ui.chatfrag.chatOpen()) return;
 
 		float speed = isBoosting ? mech.boostSpeed : mech.speed;
-		float carrySlowdown = 0.3f;
+		//fraction of speed when at max load
+		float carrySlowdown = 0.7f;
 
-		speed *= ((1f-carrySlowdown) +  (inventory.hasItem() ? (float)inventory.getItem().amount/inventory.capacity(): 1f) * carrySlowdown);
+		speed *= ((inventory.hasItem() ? Mathf.lerp(1f, carrySlowdown, (float)inventory.getItem().amount/inventory.capacity()) : 1f));
 
 		if(mech.flying){
 			//prevent strafing backwards, have a penalty for doing so

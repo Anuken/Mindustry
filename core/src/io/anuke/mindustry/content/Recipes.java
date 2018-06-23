@@ -47,8 +47,8 @@ public class Recipes implements ContentList{
         //CRAFTING
 
         //smelting
-        new Recipe(crafting, CraftingBlocks.smelter, new ItemStack(Items.tungsten, 40));
-        new Recipe(crafting, CraftingBlocks.arcsmelter, new ItemStack(Items.tungsten, 60), new ItemStack(Items.carbide, 60), new ItemStack(Items.lead, 50));
+        new Recipe(crafting, CraftingBlocks.smelter, new ItemStack(Items.tungsten, 60));
+        new Recipe(crafting, CraftingBlocks.arcsmelter, new ItemStack(Items.tungsten, 90), new ItemStack(Items.carbide, 60), new ItemStack(Items.lead, 50));
         new Recipe(crafting, CraftingBlocks.siliconsmelter, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 50));
 
         //misc
@@ -57,6 +57,7 @@ public class Recipes implements ContentList{
         new Recipe(crafting, CraftingBlocks.blastMixer, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 60), new ItemStack(Items.carbide, 40));
 
         //processing
+        new Recipe(crafting, CraftingBlocks.biomatterCompressor, new ItemStack(Items.lead, 70), new ItemStack(Items.silicon, 60));
         new Recipe(crafting, CraftingBlocks.separator, new ItemStack(Items.tungsten, 60), new ItemStack(Items.carbide, 50));
         new Recipe(crafting, CraftingBlocks.centrifuge, new ItemStack(Items.tungsten, 130), new ItemStack(Items.carbide, 130), new ItemStack(Items.silicon, 30), new ItemStack(Items.titanium, 40));
 
