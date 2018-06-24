@@ -15,5 +15,8 @@ void main() {
 	color.a = 1.0 - color.r;
 	color.rgb = vec3(0.0);
 	color.a = float(int(color.a / round)) * round;
+	if(color.a >= 1.0 - round){
+	    color.a = 1.0;
+	}
 	gl_FragColor = color * v_color;
 }

@@ -11,7 +11,6 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.effect.Decal;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.effect.RubbleDecal;
 import io.anuke.mindustry.game.Content;
@@ -121,6 +120,8 @@ public class Block extends BaseBlock implements UnlockableContent{
 	public boolean consumesTap;
 	/**The color of this block when displayed on the minimap or map preview.*/
 	public Color minimapColor = Color.CLEAR;
+	/**View range of this block type. Use a value < 0 to disable.*/
+	public float viewRange = -1;
 
 	public Block(String name) {
 		this.name = name;

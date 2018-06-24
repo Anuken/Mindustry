@@ -298,7 +298,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public float getViewDistance(){
-        return 60f;
+        return 130f;
     }
 
     public abstract TextureRegion getIconRegion();

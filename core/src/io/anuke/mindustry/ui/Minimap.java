@@ -33,8 +33,6 @@ public class Minimap extends Table {
                     renderer.minimap().drawEntities(x, y, width, height);
                 }
 
-
-
                 renderer.fog().getTexture().setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 
                 //draw.getRegion().setV(draw.getRegion().getV2());

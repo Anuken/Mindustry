@@ -74,7 +74,12 @@ public abstract class Turret extends Block{
 		layer = Layer.turret;
 		group = BlockGroup.turrets;
 	}
-	
+
+	@Override
+	public void init() {
+		viewRange = range;
+	}
+
 	@Override
 	public void setStats(){
 		super.setStats();

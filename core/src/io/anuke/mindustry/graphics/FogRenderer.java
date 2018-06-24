@@ -5,15 +5,21 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.entities.EntityDraw;
 import io.anuke.ucore.graphics.ClipSpriteBatch;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Fill;
+
+import java.nio.ByteBuffer;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -21,6 +27,8 @@ import static io.anuke.mindustry.Vars.*;
 public class FogRenderer implements Disposable{
     private TextureRegion region = new TextureRegion();
     private FrameBuffer buffer;
+    private ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(4);
+    private Array<Tile> changeQueue = new Array<>();
 
     public FogRenderer(){
         Events.on(WorldLoadGraphicsEvent.class, () -> {
@@ -29,9 +37,25 @@ public class FogRenderer implements Disposable{
 
             //clear buffer to black
             buffer.begin();
-            Graphics.clear(Color.BLACK);
+            Graphics.clear(0, 0, 0, 1f);
             buffer.end();
+
+            for (int x = 0; x < world.width(); x++) {
+                for (int y = 0; y < world.height(); y++) {
+                    Tile tile = world.tile(x, y);
+
+                    if(tile.getTeam() == players[0].getTeam() && tile.block().viewRange > 0){
+                        changeQueue.add(tile);
+                    }
+                }
+            }
         });
+
+        Events.on(TileChangeEvent.class, tile -> threads.runGraphics(() -> {
+            if(tile.getTeam() == players[0].getTeam() && tile.block().viewRange > 0){
+                changeQueue.add(tile);
+            }
+        }));
     }
 
     public void draw(){
@@ -58,11 +82,24 @@ public class FogRenderer implements Disposable{
         Draw.color(Color.WHITE);
 
         buffer.begin();
+
+        //TODO use this for per-tile visibility to show/hide units
+        //pixelBuffer.position(0);
+        //Gdx.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1);
+        //Gdx.gl.glReadPixels(world.width()/2, world.height()/2 + 20, 1, 1, GL20.GL_RGB, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
+        //Log.info(pixelBuffer.get(0));
+
         Graphics.begin();
         EntityDraw.setClip(false);
 
         renderer.drawAndInterpolate(playerGroup, player -> player.getTeam() == players[0].getTeam(), Unit::drawView);
         renderer.drawAndInterpolate(unitGroups[players[0].getTeam().ordinal()], unit -> true, Unit::drawView);
+
+        for(Tile tile : changeQueue){
+            float viewRange = tile.block().viewRange;
+            if(viewRange < 0) continue;
+            Fill.circle(tile.drawx(), tile.drawy(), tile.block().viewRange);
+        }
 
         EntityDraw.setClip(true);
         Graphics.end();

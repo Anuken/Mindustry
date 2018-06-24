@@ -57,6 +57,7 @@ public class CoreBlock extends StorageBlock {
         size = 3;
         hasItems = true;
         itemCapacity = 1000;
+        viewRange = 200f;
         flags = EnumSet.of(BlockFlag.resupplyPoint, BlockFlag.target);
     }
 

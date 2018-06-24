@@ -61,14 +61,12 @@ public class MapTileData {
 
     /**Write a byte to a specific position.*/
     public void write(int x, int y, DataPosition position, byte data){
-        buffer.position((x + width * y) * TILE_SIZE + position.ordinal());
-        buffer.put(data);
+        buffer.put((x + width * y) * TILE_SIZE + position.ordinal(), data);
     }
 
     /**Gets a byte at a specific position.*/
     public byte read(int x, int y, DataPosition position){
-        buffer.position((x + width * y) * TILE_SIZE + position.ordinal());
-        return buffer.get();
+        return buffer.get((x + width * y) * TILE_SIZE + position.ordinal());
     }
 
     /**Reads and returns the next tile data.*/
