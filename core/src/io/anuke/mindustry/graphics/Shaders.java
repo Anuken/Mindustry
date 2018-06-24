@@ -24,6 +24,7 @@ public class Shaders{
 	public static UnitBuild build;
 	public static MixShader mix;
 	public static Shader fullMix;
+	public static FogShader fog;
 
 	public static void init(){
 		outline = new Outline();
@@ -36,7 +37,14 @@ public class Shaders{
 		space = new Space();
 		build = new UnitBuild();
 		mix = new MixShader();
+		fog = new FogShader();
 		fullMix = new Shader("fullmix", "default");
+	}
+
+	public static class FogShader extends Shader{
+		public FogShader(){
+			super("fog", "default");
+		}
 	}
 
 	public static class MixShader extends Shader{

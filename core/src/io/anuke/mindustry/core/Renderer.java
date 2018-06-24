@@ -6,7 +6,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.ObjectIntMap;
+import com.badlogic.gdx.utils.Pools;
+import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -29,7 +31,6 @@ import io.anuke.ucore.entities.impl.BaseEntity;
 import io.anuke.ucore.entities.impl.EffectEntity;
 import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.entities.trait.SolidTrait;
-import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.graphics.Draw;
@@ -50,15 +51,16 @@ public class Renderer extends RendererModule{
 	
 	private int targetscale = baseCameraScale;
 	private Texture background = new Texture("sprites/background.png");
-	private FloatArray shieldHits = new FloatArray();
-	private Array<Callable> shieldDraws = new Array<>();
+
 	private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
 	private Vector2 avgPosition = new Translator();
 	private Vector2 tmpVector1 = new Translator();
 	private Vector2 tmpVector2 = new Translator();
+
 	private BlockRenderer blocks = new BlockRenderer();
 	private MinimapRenderer minimap = new MinimapRenderer();
 	private OverlayRenderer overlays = new OverlayRenderer();
+	private FogRenderer fog = new FogRenderer();
 
 	public Renderer() {
 		pixelate = true;
@@ -243,8 +245,10 @@ public class Renderer extends RendererModule{
 		if(showPaths && debug) drawDebug();
 
 		drawAndInterpolate(playerGroup, p -> !p.isLocal && !p.isDead(), Player::drawName);
-		
+
 		batch.end();
+
+		fog.draw();
 	}
 
 	private void drawAllTeams(boolean flying){
@@ -328,6 +332,7 @@ public class Renderer extends RendererModule{
 	@Override
 	public void dispose() {
 		background.dispose();
+		fog.dispose();
 	}
 
 	public Vector2 averagePosition(){
@@ -406,14 +411,6 @@ public class Renderer extends RendererModule{
 
 	public BlockRenderer getBlocks() {
 		return blocks;
-	}
-
-	public void addShieldHit(float x, float y){
-		shieldHits.addAll(x, y, 0f);
-	}
-
-	public void addShield(Callable call){
-		shieldDraws.add(call);
 	}
 
 	public void setCameraScale(int amount){

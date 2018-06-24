@@ -14,6 +14,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 public class CooledTurret extends Turret {
     /**How much reload is lowered by for each unit of liquid of heat capacity 1.*/
     protected float coolantMultiplier = 1f;
+    /**Max coolant used per tick.*/
     protected float maxUsed = 1f;
     protected Effect coolEffect = BlockFx.fuelburn;
 

@@ -7,7 +7,6 @@ import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 
-import static io.anuke.mindustry.Vars.renderer;
 import static io.anuke.mindustry.Vars.tilesize;
 
 //TODO remove
@@ -54,7 +53,7 @@ public class ShieldedWallBlock extends PowerBlock{
 		ShieldedWallEntity entity = tile.entity();
 		
 		if(entity.power.amount > powerPerDamage){
-			renderer.addShield(() -> Draw.rect("blank", tile.worldx(), tile.worldy(), tilesize, tilesize));
+			//renderer.addShield(() -> Draw.rect("blank", tile.worldx(), tile.worldy(), tilesize, tilesize));
 		}
 		
 		Draw.color(hitColor);

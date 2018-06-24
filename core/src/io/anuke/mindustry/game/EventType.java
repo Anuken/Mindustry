@@ -34,11 +34,12 @@ public class EventType {
         void handle();
     }
 
-    /**Called from the logic thread. Do not call graphics here!*/
+    /**Called from the logic thread. Do not access graphics here!*/
     public interface TileChangeEvent extends Event{
         void handle(Tile tile);
     }
 
+    //TODO unimplemented; remove?
     public interface TileRemoveEvent extends Event{
         void handle(Tile tile, Team oldTeam);
     }

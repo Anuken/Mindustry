@@ -9,9 +9,6 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.impl.BulletEntity;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.headless;
-import static io.anuke.mindustry.Vars.renderer;
-
 //TODO remove
 public class ShieldBlock extends PowerBlock{
 	public float shieldRadius = 40f;
@@ -73,7 +70,7 @@ public class ShieldBlock extends PowerBlock{
 		
 		bullet.remove();
 		//Effects.effect(bullet.damage > 5 ? BulletFx.shieldhit : BulletFx.laserhit, bullet);
-		if(!headless) renderer.addShieldHit(bullet.x, bullet.y);
+		//if(!headless) renderer.addShieldHit(bullet.x, bullet.y);
 		
 		entity.power.amount -= bullet.getDamage() * powerPerDamage;
 	}

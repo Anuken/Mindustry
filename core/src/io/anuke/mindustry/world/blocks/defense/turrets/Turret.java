@@ -52,8 +52,8 @@ public abstract class Turret extends Block{
 	protected float recoil = 1f;
 	protected float restitution = 0.02f;
 	protected float cooldown = 0.02f;
-	protected float rotatespeed = 0.2f;
-	protected float shootCone = 5f;
+	protected float rotatespeed = 5f; //in degrees per tick
+	protected float shootCone = 8f;
 	protected float shootShake = 0f;
 	protected Translator tr = new Translator();
 	protected Translator tr2 = new Translator();
@@ -168,7 +168,7 @@ public abstract class Turret extends Block{
 					entity.rotation = 0;
 				}
 
-				entity.rotation = Angles.moveToward(entity.rotation, targetRot, 5f * Timers.delta());
+				entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * Timers.delta());
 
 				if(Angles.angleDist(entity.rotation, targetRot) < shootCone){
 					updateShooting(tile);
