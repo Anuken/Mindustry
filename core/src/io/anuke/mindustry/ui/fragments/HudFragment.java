@@ -2,7 +2,6 @@ package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
@@ -10,21 +9,17 @@ import com.badlogic.gdx.utils.Scaling;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Recipe;
+import io.anuke.mindustry.ui.Minimap;
 import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
-import io.anuke.ucore.scene.event.InputEvent;
-import io.anuke.ucore.scene.event.InputListener;
 import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.style.TextureRegionDrawable;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.Label;
@@ -132,44 +127,9 @@ public class HudFragment implements Fragment{
 			atop();
 			aright();
 
-			new table("button"){{
-				Table table = get();
-				margin(5);
-				marginBottom(10);
-				TextureRegionDrawable draw = new TextureRegionDrawable(new TextureRegion());
-				Image image = new Image(){
-					@Override
-					public void draw(Batch batch, float parentAlpha) {
-						super.draw(batch, parentAlpha);
-						if(renderer.minimap().getTexture() != null){
-							renderer.minimap().drawEntities(x, y, width, height);
-						}
-					}
-				};
-				image.setDrawable(draw);
-				table.addListener(new InputListener(){
-					public boolean scrolled (InputEvent event, float x, float y, int amount) {
-						renderer.minimap().zoomBy(amount);
-						return true;
-					}
-				});
-				image.update(() -> {
+			Minimap minimap = new Minimap();
 
-					Element e = Core.scene.hit(Graphics.mouse().x, Graphics.mouse().y, true);
-					if(e != null && e.isDescendantOf(table)){
-						Core.scene.setScrollFocus(table);
-					}else if(Core.scene.getScrollFocus() == table){
-						Core.scene.setScrollFocus(null);
-					}
-
-					if (renderer.minimap().getTexture() == null) {
-						draw.getRegion().setRegion(Draw.region("white"));
-					} else {
-						draw.getRegion().setRegion(renderer.minimap().getRegion());
-					}
-				});
-				add(image).size(140f, 140f);
-			}}.end();
+			add(minimap);
 		}}.end();
 
 		//paused table

@@ -2,16 +2,18 @@ package io.anuke.mindustry.graphics;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Disposable;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.entities.EntityDraw;
+import io.anuke.ucore.graphics.ClipSpriteBatch;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -47,15 +49,22 @@ public class FogRenderer implements Disposable{
         float u2 = (px + vw)/ tilesize / world.width();
         float v2 = (py + vh)/ tilesize / world.height();
 
+        if(Core.batch instanceof ClipSpriteBatch){
+            ((ClipSpriteBatch) Core.batch).enableClip(false);
+        }
+
         Core.batch.getProjectionMatrix().setToOrtho2D(0, 0, world.width() * tilesize, world.height() * tilesize);
 
         Draw.color(Color.WHITE);
 
         buffer.begin();
         Graphics.begin();
-        for(Player player : playerGroup.all()){
-            Fill.circle(player.x, player.y, 60f);
-        }
+        EntityDraw.setClip(false);
+
+        renderer.drawAndInterpolate(playerGroup, player -> player.getTeam() == players[0].getTeam(), Unit::drawView);
+        renderer.drawAndInterpolate(unitGroups[players[0].getTeam().ordinal()], unit -> true, Unit::drawView);
+
+        EntityDraw.setClip(true);
         Graphics.end();
         buffer.end();
 
@@ -65,13 +74,29 @@ public class FogRenderer implements Disposable{
 
         Core.batch.setProjectionMatrix(Core.camera.combined);
         Graphics.shader(Shaders.fog);
+        renderer.pixelSurface.getBuffer().begin();
         Graphics.begin();
 
        // Core.batch.draw(buffer.getColorBufferTexture(), px + 50, py, 200, 200 * world.height()/(float)world.width());
         Core.batch.draw(region, px, py, vw, vh);
 
         Graphics.end();
+        renderer.pixelSurface.getBuffer().end();
         Graphics.shader();
+
+        Graphics.begin();
+
+        Core.batch.draw(renderer.pixelSurface.texture(), px, py + vh, vw, -vh);
+        Graphics.end();
+
+        if(Core.batch instanceof ClipSpriteBatch){
+            ((ClipSpriteBatch) Core.batch).enableClip(true);
+        }
+
+    }
+
+    public Texture getTexture(){
+        return buffer.getColorBufferTexture();
     }
 
     @Override

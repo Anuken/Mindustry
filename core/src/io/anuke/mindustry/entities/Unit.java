@@ -19,6 +19,7 @@ import io.anuke.ucore.entities.impl.DestructibleEntity;
 import io.anuke.ucore.entities.trait.DamageTrait;
 import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.entities.trait.SolidTrait;
+import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
@@ -288,8 +289,16 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public void drawUnder(){}
     public void drawOver(){}
 
+    public void drawView(){
+        Fill.circle(x, y, getViewDistance());
+    }
+
     public boolean isInfiniteAmmo(){
         return false;
+    }
+
+    public float getViewDistance(){
+        return 60f;
     }
 
     public abstract TextureRegion getIconRegion();

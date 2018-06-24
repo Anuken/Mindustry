@@ -346,6 +346,10 @@ public class Renderer extends RendererModule{
         return avgPosition;
     }
 
+	public FogRenderer fog() {
+		return fog;
+	}
+
 	public MinimapRenderer minimap() {
 		return minimap;
 	}
