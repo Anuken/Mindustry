@@ -70,7 +70,7 @@ public class Recipes implements ContentList{
 
         //generators
         new Recipe(power, PowerBlocks.combustiongenerator, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 30));
-        //new Recipe(power, PowerBlocks.turbinegenerator, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 30));
+        new Recipe(power, PowerBlocks.turbinegenerator, new ItemStack(Items.tungsten, 70), new ItemStack(Items.carbide, 50), new ItemStack(Items.lead, 80), new ItemStack(Items.silicon, 60));
 
 
         //new Recipe(distribution, StorageBlocks.vault, new ItemStack(Items.carbide, 50));
