@@ -92,8 +92,8 @@ public class FogRenderer implements Disposable{
         Graphics.begin();
         EntityDraw.setClip(false);
 
-        renderer.drawAndInterpolate(playerGroup, player -> player.getTeam() == players[0].getTeam(), Unit::drawView);
-        renderer.drawAndInterpolate(unitGroups[players[0].getTeam().ordinal()], unit -> true, Unit::drawView);
+        renderer.drawAndInterpolate(playerGroup, player -> !player.isDead() && player.getTeam() == players[0].getTeam(), Unit::drawView);
+        renderer.drawAndInterpolate(unitGroups[players[0].getTeam().ordinal()], unit -> !unit.isDead(), Unit::drawView);
 
         for(Tile tile : changeQueue){
             float viewRange = tile.block().viewRange;

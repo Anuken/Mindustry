@@ -38,7 +38,7 @@ public class HudFragment implements Fragment{
 	private Label infolabel;
 	private Table lastUnlockTable;
 	private Table lastUnlockLayout;
-	private boolean shown = true;
+	private boolean shown = true, done = true;
 	private float dsize = 58;
 	private float isize = 40;
 
@@ -103,7 +103,6 @@ public class HudFragment implements Fragment{
 
 				new table() {{
 					touchable(Touchable.enabled);
-					visible(() -> shown);
 					addWaveTable();
 				}}.fillX().end();
 
@@ -262,7 +261,8 @@ public class HudFragment implements Fragment{
 	}
 
 	private void toggleMenus(){
-		if (wavetable.getActions().size != 0) return;
+		wavetable.clearActions();
+		infolabel.clearActions();
 
 		float dur = 0.3f;
 		Interpolation in = Interpolation.pow3Out;
@@ -270,9 +270,10 @@ public class HudFragment implements Fragment{
 		flip.getStyle().imageUp = Core.skin.getDrawable(shown ? "icon-arrow-down" : "icon-arrow-up");
 
 		if (shown) {
+			shown = false;
 			blockfrag.toggle(false, dur, in);
-			wavetable.actions(Actions.translateBy(0, wavetable.getHeight() + dsize, dur, in), Actions.call(() -> shown = false));
-			infolabel.actions(Actions.translateBy(0, wavetable.getHeight(), dur, in), Actions.call(() -> shown = false));
+			wavetable.actions(Actions.translateBy(0, (wavetable.getHeight() + dsize) - wavetable.getTranslation().y, dur, in));
+			infolabel.actions(Actions.translateBy(0, (wavetable.getHeight()) - wavetable.getTranslation().y, dur, in));
 		} else {
 			shown = true;
 			blockfrag.toggle(true, dur, in);

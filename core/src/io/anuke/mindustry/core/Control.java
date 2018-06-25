@@ -155,7 +155,6 @@ public class Control extends Module{
 		});
 
 		Events.on(WaveEvent.class, () -> {
-			Sounds.play("spawn");
 
 			int last = Settings.getInt("hiscore" + world.getMap().name, 0);
 

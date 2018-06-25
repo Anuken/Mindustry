@@ -2,7 +2,6 @@ package io.anuke.mindustry.ai;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Bits;
-import com.badlogic.gdx.utils.IntArray;
 import io.anuke.mindustry.content.AmmoTypes;
 import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.entities.units.BaseUnit;
@@ -13,19 +12,53 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.util.Mathf;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 import static io.anuke.mindustry.Vars.*;
 
 public class WaveSpawner {
     private static final int quadsize = 4;
 
     private Bits quadrants;
-    private IntArray tmpArray = new IntArray();
 
     private Array<FlyerSpawn> flySpawns = new Array<>();
     private Array<GroundSpawn> groundSpawns = new Array<>();
 
     public WaveSpawner(){
         Events.on(WorldLoadEvent.class, this::reset);
+    }
+
+    public void write(DataOutput output) throws IOException{
+        output.writeShort(flySpawns.size);
+        for (FlyerSpawn spawn : flySpawns){
+            output.writeFloat(spawn.angle);
+        }
+
+        output.writeShort(groundSpawns.size);
+        for (GroundSpawn spawn : groundSpawns){
+            output.writeShort((short)spawn.x);
+            output.writeShort((short)spawn.y);
+        }
+    }
+
+    public void read(DataInput input) throws IOException{
+        short flya = input.readShort();
+        
+        for (int i = 0; i < flya; i++) {
+            FlyerSpawn spawn = new FlyerSpawn();
+            spawn.angle = input.readFloat();
+            flySpawns.add(spawn);
+        }
+        
+        short grounda = input.readShort();
+        for (int i = 0; i < grounda; i++) {
+            GroundSpawn spawn = new GroundSpawn();
+            spawn.x = input.readShort();
+            spawn.y = input.readShort();
+            groundSpawns.add(spawn);
+        }
     }
 
     public void spawnEnemies(){

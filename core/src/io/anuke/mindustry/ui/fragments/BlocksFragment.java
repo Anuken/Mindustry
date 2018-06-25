@@ -64,7 +64,7 @@ public class BlocksFragment implements Fragment{
 			aright();
 
 			//make it only be shown when needed.
-			visible(() -> !state.is(State.menu) && shown);
+			visible(() -> !state.is(State.menu));
 
 			//create the main blocks table
 			mainTable = new table(){{
@@ -99,7 +99,7 @@ public class BlocksFragment implements Fragment{
 
 				}}.right().bottom().end().get();
 
-				visible(() -> !state.is(State.menu) && shown);
+				visible(() -> !state.is(State.menu));
 
 			}}.end().get();
 
@@ -278,8 +278,9 @@ public class BlocksFragment implements Fragment{
 	}
 
 	void toggle(boolean show, float t, Interpolation ip){
-		if(!show){
-			mainTable.actions(Actions.translateBy(0, -mainTable.getHeight() - descTable.getHeight(), t, ip), Actions.call(() -> shown = false));
+		if(shown){
+			shown = false;
+			mainTable.actions(Actions.translateBy(0, mainTable.getTranslation().y + (-mainTable.getHeight() - descTable.getHeight()), t, ip));
 		}else{
 			shown = true;
 			mainTable.actions(Actions.translateBy(0, -mainTable.getTranslation().y, t, ip));

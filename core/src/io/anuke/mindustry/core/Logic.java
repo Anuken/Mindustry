@@ -44,6 +44,7 @@ public class Logic extends Module {
     }
 
     public void play(){
+        state.set(State.playing);
         state.wavetime = wavespace * state.difficulty.timeScaling * 2;
 
         //fill inventory with items for debugging
@@ -156,6 +157,11 @@ public class Logic extends Module {
                 Entities.update(shieldGroup);
                 Entities.update(playerGroup);
                 Entities.update(itemGroup);
+
+                //effect group only contains item drops in the headless version, update it!
+                if(headless){
+                    Entities.update(effectGroup);
+                }
 
                 for(EntityGroup group : unitGroups){
                     if(!group.isEmpty()){

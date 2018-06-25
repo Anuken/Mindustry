@@ -78,17 +78,24 @@ public class ServerControl extends Module {
             }
 
             if (mode != ShuffleMode.off) {
-                Array<Map> maps = mode == ShuffleMode.both ? world.maps().all() :
-                        mode == ShuffleMode.normal ? world.maps().defaultMaps() : world.maps().customMaps();
+                if(world.maps().all().size > 0) {
+                    Array<Map> maps = mode == ShuffleMode.both ? world.maps().all() :
+                            mode == ShuffleMode.normal ? world.maps().defaultMaps() : world.maps().customMaps();
 
-                Map previous = world.getMap();
-                Map map = previous;
-                while (map == previous) map = maps.random();
+                    Map previous = world.getMap();
+                    Map map = previous;
+                    while (map == previous) map = maps.random();
 
-                info("Selected next map to be {0}.", map.name);
-                state.set(State.playing);
-                logic.reset();
-                world.loadMap(map);
+                    info("Selected next map to be {0}.", map.name);
+                    state.set(State.playing);
+
+                    logic.reset();
+                    world.loadMap(map);
+                }else{
+                    info("Selected a procedural map.");
+                    world.loadProceduralMap();
+                    logic.play();
+                }
             }else{
                 state.set(State.menu);
                 Net.closeServer();
@@ -129,11 +136,6 @@ public class ServerControl extends Module {
                 return;
             }
 
-            if(world.maps().all().size == 0){
-                err("No maps found to host with!");
-                return;
-            }
-
             Map result = null;
 
             if(arg.length > 0) {
@@ -147,25 +149,27 @@ public class ServerControl extends Module {
                     err("No map with name &y'{0}'&lr found.", search);
                     return;
                 }
+
+                GameMode mode;
+                try{
+                    mode = arg.length < 2 ? GameMode.waves : GameMode.valueOf(arg[1]);
+                }catch (IllegalArgumentException e){
+                    err("No gamemode '{0}' found.", arg[1]);
+                    return;
+                }
+
+                info("Loading map...");
+                state.mode = mode;
+
+                logic.reset();
+                world.loadMap(result);
+
             }else{
-                result = world.maps().all().random();
-                Log.info("&ly&fiNo map specified, so &lb{0}&ly was chosen randomly.", result.name);
+                world.loadProceduralMap();
+                Log.info("&ly&fiNo map specified, so a procedural one was generated.");
             }
 
-            GameMode mode;
-            try{
-                mode = arg.length < 2 ? GameMode.waves : GameMode.valueOf(arg[1]);
-            }catch (IllegalArgumentException e){
-                err("No gamemode '{0}' found.", arg[1]);
-                return;
-            }
-
-            info("Loading map...");
-            state.mode = mode;
-
-            logic.reset();
-            world.loadMap(result);
-            state.set(State.playing);
+            logic.play();
             info("Map loaded.");
 
             host();

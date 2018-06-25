@@ -177,7 +177,7 @@ public class NetClient extends Module {
 
     String getUsid(String ip){
         if(Settings.getString("usid-" + ip, null) != null){
-            return Settings.getString("usid-" + ip);
+            return Settings.getString("usid-" + ip, null);
         }else{
             byte[] bytes = new byte[8];
             new Random().nextBytes(bytes);

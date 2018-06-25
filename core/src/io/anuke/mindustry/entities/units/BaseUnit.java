@@ -53,7 +53,7 @@ public abstract class BaseUnit extends Unit{
 
 	protected boolean isWave;
 	protected Squad squad;
-	protected UnitFactoryEntity spawner;
+	protected int spawner = -1;
 
 	public BaseUnit(UnitType type, Team team){
 		this.type = type;
@@ -61,7 +61,7 @@ public abstract class BaseUnit extends Unit{
 	}
 
 	public void setSpawner(UnitFactoryEntity spawner) {
-		this.spawner = spawner;
+		this.spawner = spawner.tile.packedPosition();
 	}
 
 	public UnitType getType() {
@@ -267,10 +267,14 @@ public abstract class BaseUnit extends Unit{
 
 	@Override
 	public void removed() {
-		if(spawner != null){
-			spawner.hasSpawned = false;
-			spawner = null;
+		Tile tile = world.tile(spawner);
+
+		if(tile != null && tile.entity instanceof UnitFactoryEntity){
+			UnitFactoryEntity factory = (UnitFactoryEntity)tile.entity;
+			factory.hasSpawned = false;
 		}
+
+		spawner = -1;
 	}
 
 	@Override
@@ -302,6 +306,7 @@ public abstract class BaseUnit extends Unit{
 		super.writeSave(stream);
 		stream.writeByte(type.id);
 		stream.writeBoolean(isWave);
+		stream.writeInt(spawner);
 	}
 
 	@Override
@@ -309,6 +314,7 @@ public abstract class BaseUnit extends Unit{
 		super.readSave(stream);
 		byte type = stream.readByte();
 		this.isWave = stream.readBoolean();
+		this.spawner = stream.readInt();
 
 		this.type = UnitType.getByID(type);
 		add();

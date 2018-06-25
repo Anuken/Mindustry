@@ -8,10 +8,13 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packet.UnimportantPacket;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.io.IOUtils;
 import io.anuke.ucore.util.Mathf;
 
 import java.nio.ByteBuffer;
+
+import static io.anuke.mindustry.Vars.world;
 
 /**Class for storing all packets.*/
 public class Packets {
@@ -104,6 +107,7 @@ public class Packets {
         public long timeSent;
         //player snapshot data
         public float x, y, pointerX, pointerY, rotation, baseRotation, xv, yv;
+        public Tile mining;
         public boolean boosting;
 
         @Override
@@ -125,6 +129,8 @@ public class Packets {
             //saving 4 bytes, yay?
             buffer.putShort((short)(player.rotation*2));
             buffer.putShort((short)(player.baseRotation*2));
+
+            buffer.putInt(player.getMineTile() == null ? -1 : player.getMineTile().packedPosition());
         }
 
         @Override
@@ -142,6 +148,7 @@ public class Packets {
             yv = buffer.get() / Unit.velocityPercision;
             rotation = buffer.getShort()/2f;
             baseRotation = buffer.getShort()/2f;
+            mining = world.tile(buffer.getInt());
         }
     }
 

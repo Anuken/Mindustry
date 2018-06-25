@@ -14,9 +14,9 @@ import io.anuke.mindustry.io.MapMeta;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
+import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.EntityPhysics;
 import io.anuke.ucore.util.Bits;
 
 import java.io.*;
@@ -204,6 +204,10 @@ public class NetworkIO {
 
                 for (int j = 0; j < cores; j++) {
                     state.teams.get(team).cores.add(world.tile(stream.readInt()));
+                }
+
+                if(team == players[0].getTeam() && cores > 0){
+                    Core.camera.position.set(state.teams.get(team).cores.first().drawx(), state.teams.get(team).cores.first().drawy(), 0);
                 }
             }
 

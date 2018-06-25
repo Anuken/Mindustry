@@ -53,6 +53,8 @@ public class Save16 extends SaveFileVersion {
         state.wave = wave;
         state.wavetime = wavetime;
 
+        state.spawner.read(stream);
+
         //block header
 
         int blocksize = stream.readInt();
@@ -151,6 +153,8 @@ public class Save16 extends SaveFileVersion {
         stream.writeInt(state.wave); //wave
         stream.writeByte(state.difficulty.ordinal()); //difficulty ordinal
         stream.writeFloat(state.wavetime); //wave countdown
+
+        state.spawner.write(stream);
 
         //--BLOCK HEADER--
 

@@ -3,26 +3,26 @@ package io.anuke.mindustry.core;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.ai.BlockIndexer;
 import io.anuke.mindustry.ai.Pathfinder;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
-import io.anuke.mindustry.io.Map;
-import io.anuke.mindustry.io.MapIO;
-import io.anuke.mindustry.io.Maps;
+import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.mapgen.WorldGenerator;
 import io.anuke.ucore.core.Events;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityPhysics;
 import io.anuke.ucore.modules.Module;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.ThreadArray;
 import io.anuke.ucore.util.Tmp;
 
-import static io.anuke.mindustry.Vars.threads;
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.*;
 
 public class World extends Module{
 	private int seed;
@@ -101,7 +101,7 @@ public class World extends Module{
 	}
 
 	public Tile tile(int packed){
-		return tile(packed % width(), packed / width());
+		return tiles == null ? null : tile(packed % width(), packed / width());
 	}
 	
 	public Tile tile(int x, int y){
@@ -169,6 +169,30 @@ public class World extends Module{
 
     	generating = false;
 		Events.fire(WorldLoadEvent.class);
+	}
+
+	/**Loads up a procedural map. This does not call play(), but calls reset().*/
+	public void loadProceduralMap(){
+		Timers.mark();
+		MapTileData data = WorldGenerator.generate();
+		Map map = new Map("generated-map", new MapMeta(0, new ObjectMap<>(), data.width(), data.height(), null), true, () -> null);
+
+		logic.reset();
+
+		beginMapLoad();
+		setMap(map);
+
+		int width = map.meta.width, height = map.meta.height;
+
+		Tile[][] tiles = createTiles(data.width(), data.height());
+
+		EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
+
+		WorldGenerator.generate(tiles, data, true, Mathf.random(9999999));
+
+		endMapLoad();
+
+		Log.info("Time to generate: {0}", Timers.elapsed());
 	}
 
     public void setMap(Map map){

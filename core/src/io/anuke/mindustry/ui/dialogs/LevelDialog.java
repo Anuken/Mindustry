@@ -3,17 +3,11 @@ package io.anuke.mindustry.ui.dialogs;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.io.Map;
-import io.anuke.mindustry.io.MapMeta;
-import io.anuke.mindustry.io.MapTileData;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.mapgen.WorldGenerator;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityPhysics;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
@@ -21,7 +15,6 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.scene.utils.Elements;
 import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
@@ -133,29 +126,8 @@ public class LevelDialog extends FloatingDialog{
 			Timers.run(5f, () -> {
 				Cursors.restoreCursor();
 				threads.run(() -> {
-					Timers.mark();
-					MapTileData data = WorldGenerator.generate();
-					Map map = new Map("generated-map", new MapMeta(0, new ObjectMap<>(), data.width(), data.height(), null), true, () -> null);
-
-					logic.reset();
-
-					world.beginMapLoad();
-					world.setMap(map);
-
-					int width = map.meta.width, height = map.meta.height;
-
-					Tile[][] tiles = world.createTiles(data.width(), data.height());
-
-					EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
-
-					WorldGenerator.generate(tiles, data, true, Mathf.random(9999999));
-
-					world.endMapLoad();
-
-					Log.info("Time to generate: {0}", Timers.elapsed());
-
+					world.loadProceduralMap();
 					logic.play();
-
 					Gdx.app.postRunnable(ui.loadfrag::hide);
 				});
 			});

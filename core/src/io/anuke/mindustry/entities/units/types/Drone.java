@@ -34,6 +34,10 @@ import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.ThreadQueue;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 import static io.anuke.mindustry.Vars.*;
 
 public class Drone extends FlyingUnit implements BuilderTrait {
@@ -117,7 +121,7 @@ public class Drone extends FlyingUnit implements BuilderTrait {
 
     @Override
     public void setMineTile(Tile tile) {
-        this.mineTile = tile;
+        mineTile = tile;
     }
 
     @Override
@@ -206,6 +210,21 @@ public class Drone extends FlyingUnit implements BuilderTrait {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void write(DataOutput data) throws IOException {
+        super.write(data);
+        data.writeInt(mineTile == null ? -1 : mineTile.packedPosition());
+    }
+
+    @Override
+    public void read(DataInput data, long time) throws IOException {
+        super.read(data, time);
+        int mined = data.readInt();
+        if(mined != -1){
+            mineTile = world.tile(mined);
+        }
     }
 
     public final UnitState
@@ -317,7 +336,7 @@ public class Drone extends FlyingUnit implements BuilderTrait {
                 if(target instanceof Tile) {
                     moveTo(type.range/1.5f);
 
-                    if (distanceTo(target) < type.range) {
+                    if (distanceTo(target) < type.range && mineTile != target) {
                         setMineTile((Tile)target);
                     }
 

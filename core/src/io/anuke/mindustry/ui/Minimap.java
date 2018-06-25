@@ -26,6 +26,8 @@ public class Minimap extends Table {
         Image image = new Image(new TextureRegionDrawable(new TextureRegion())){
             @Override
             public void draw(Batch batch, float parentAlpha) {
+                if(renderer.minimap().getRegion() == null) return;
+
                 TextureRegionDrawable draw = (TextureRegionDrawable)getDrawable();
                 draw.getRegion().setRegion(renderer.minimap().getRegion());
                 super.draw(batch, parentAlpha);

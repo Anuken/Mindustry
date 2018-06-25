@@ -186,7 +186,9 @@ public class CoreBlock extends StorageBlock {
                     BaseUnit unit = droneType.create(tile.getTeam());
                     entity.droneID = unit.id;
                     unit.setDead(true);
+                    unit.setGroup(unitGroups[unit.getTeam().ordinal()]);
                     CallBlocks.onCoreUnitSet(tile, unit);
+                    unit.setGroup(null);
                 }
             }
 
@@ -219,6 +221,8 @@ public class CoreBlock extends StorageBlock {
 
     @Remote(called = Loc.server, in = In.blocks)
     public static void onUnitRespawn(Tile tile, Unit player){
+        if(player == null) return;
+
         CoreEntity entity = tile.entity();
         Effects.effect(Fx.spawn, entity);
         entity.solid = false;
@@ -238,6 +242,8 @@ public class CoreBlock extends StorageBlock {
 
     @Remote(called = Loc.server, in = In.blocks)
     public static void onCoreUnitSet(Tile tile, Unit player){
+        if(player == null) return;
+
         CoreEntity entity = tile.entity();
         entity.currentUnit = player;
         entity.progress = 0f;

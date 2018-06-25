@@ -26,7 +26,7 @@ import java.util.Locale;
 import static io.anuke.mindustry.Vars.*;
 
 public class DesktopPlatform extends Platform {
-    final static boolean useDiscord = !OS.is64Bit;
+    final static boolean useDiscord = OS.is64Bit;
     final static String applicationId = "398246104468291591";
     final static DateFormat format = SimpleDateFormat.getDateTimeInstance();
     String[] args;

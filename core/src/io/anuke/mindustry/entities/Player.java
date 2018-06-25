@@ -705,6 +705,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		buffer.writeBoolean(dead);
 		buffer.writeByte(mech.id);
 		buffer.writeBoolean(isBoosting);
+		buffer.writeInt(mining == null ? -1 : mining.packedPosition());
 	}
 
 	@Override
@@ -717,6 +718,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		dead = buffer.readBoolean();
 		mech = Upgrade.getByID(buffer.readByte());
 		boolean dashing = buffer.readBoolean();
+		int mine = buffer.readInt();
 		interpolator.read(lastx, lasty, x, y, time, rotation);
 		rotation = lastrot;
 
@@ -724,6 +726,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 			x = lastx;
 			y = lasty;
 		}else{
+			mining = world.tile(mine);
 			isBoosting = dashing;
 		}
 	}

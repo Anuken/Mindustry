@@ -8,9 +8,9 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.game.EventType.BlockBuildEvent;
 import io.anuke.mindustry.gen.CallBlocks;
+import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Recipe;
@@ -27,10 +27,7 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Shapes;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
+import io.anuke.ucore.util.*;
 
 import java.util.Arrays;
 
@@ -189,10 +186,10 @@ public interface BuilderTrait {
 
             if(unit.inventory.canAcceptItem(item) &&
                     Mathf.chance(Timers.delta() * (0.06 - item.hardness * 0.01) * getMinePower())){
-                ItemTransfer.create(item,
+                CallEntity.transferItemToUnit(item,
                         tile.worldx() + Mathf.range(tilesize/2f),
                         tile.worldy() + Mathf.range(tilesize/2f),
-                        unit, () -> unit.inventory.addItem(item, 1));
+                        unit);
             }
 
             if(Mathf.chance(0.06 * Timers.delta())){
