@@ -9,7 +9,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.graphics.Draw;
 
 public class OreBlock extends Floor {
-    protected Floor base;
+    public Floor base;
 
     public OreBlock(Item ore, Floor base){
         super("ore-" + ore.name + "-" + base.name);

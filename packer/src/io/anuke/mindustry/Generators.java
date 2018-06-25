@@ -1,9 +1,11 @@
 package io.anuke.mindustry;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.blocks.OreBlock;
 
 public class Generators {
 
@@ -54,6 +56,19 @@ public class Generators {
 
 
                 image.save("mech-icon-" + mech.name);
+            }
+        });
+
+        context.generate("ore-icons", () -> {
+            for(Block block : Block.all()){
+                if(!(block instanceof OreBlock)) continue;
+
+                OreBlock ore = (OreBlock)block;
+                Item item = ore.drops.item;
+                Block base = ore.base;
+
+                //get base image to draw on
+                Image image = context.get(base.name);
             }
         });
     }

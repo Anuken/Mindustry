@@ -95,7 +95,7 @@ public class LoadDialog extends FloatingDialog{
 								} catch (IOException e) {
 									ui.showError(Bundles.format("text.save.export.fail", Strings.parseException(e, false)));
 								}
-							}, false, "mins");
+							}, false, saveExtension);
                         }else{
 					        try {
                                 FileHandle file = Gdx.files.local("save-" + slot.getName() + "." + Vars.saveExtension);
@@ -162,7 +162,7 @@ public class LoadDialog extends FloatingDialog{
 				}else{
 					ui.showError("$text.save.import.invalid");
 				}
-			}, true, "mins");
+			}, true, saveExtension);
 		}).fillX().margin(10f).minWidth(300f).height(70f).pad(4f).padRight(-4);
 	}
 

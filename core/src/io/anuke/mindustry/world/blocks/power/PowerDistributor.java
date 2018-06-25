@@ -253,7 +253,8 @@ public class PowerDistributor extends PowerBlock{
 	}
 
 	protected boolean linkValid(Tile tile, Tile link){
-		if(!(tile != link && link != null && link.block().hasPower)) return false;
+		if(!(tile != link && link != null && link.block().hasPower)
+				|| link.block() instanceof PowerGenerator) return false;
 
 		if(link.block() instanceof PowerDistributor){
 			DistributorEntity oe = link.entity();

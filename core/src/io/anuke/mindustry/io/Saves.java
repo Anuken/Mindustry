@@ -3,7 +3,6 @@ package io.anuke.mindustry.io;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
@@ -169,8 +168,8 @@ public class Saves {
 
         public void exportFile(FileHandle file) throws IOException{
             try{
-                if(!file.extension().equals("mins")){
-                    file = file.parent().child(file.nameWithoutExtension() + "." + Vars.saveExtension);
+                if(!file.extension().equals(saveExtension)){
+                    file = file.parent().child(file.nameWithoutExtension() + "." + saveExtension);
                 }
                 SaveIO.fileFor(index).copyTo(file);
             }catch (Exception e){

@@ -88,6 +88,11 @@ public class Recipes implements ContentList{
         new Recipe(production, ProductionBlocks.oilextractor, new ItemStack(Items.tungsten, 90), new ItemStack(Items.carbide, 150), new ItemStack(Items.lead, 100), new ItemStack(Items.silicon, 100));
 
         //UNITS
+
+        //bodies
+        //new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 30));
+
+        //actual unit related stuff
         new Recipe(units, UnitBlocks.droneFactory, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 30));
         new Recipe(units, UnitBlocks.repairPoint, new ItemStack(Items.lead, 30), new ItemStack(Items.tungsten, 30), new ItemStack(Items.silicon, 20));
 
