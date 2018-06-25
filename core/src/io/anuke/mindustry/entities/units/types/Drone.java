@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.ItemDrop;
@@ -313,6 +314,10 @@ public class Drone extends FlyingUnit implements BuilderTrait {
 
                     if (distanceTo(target) < type.range) {
                         setMineTile((Tile)target);
+                    }
+
+                    if(((Tile)target).block() != Blocks.air){
+                        setState(drop);
                     }
                 }
             }
