@@ -112,7 +112,6 @@ public class BlockInventoryFragment implements Fragment {
                     if(!canPick.get() || items[f] == 0) return;
                     int amount = Math.min(Inputs.keyDown("item_withdraw") ? items[f] : 1, player.inventory.itemCapacityUsed(item));
                     CallBlocks.requestItem(player, tile, item, amount);
-
                 });
                 table.add(image);
 
