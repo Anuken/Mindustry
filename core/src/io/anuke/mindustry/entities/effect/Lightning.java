@@ -28,6 +28,7 @@ import io.anuke.ucore.util.SeedRandom;
 
 import static io.anuke.mindustry.Vars.bulletGroup;
 
+//TODO utterly broken
 public class Lightning extends TimedEntity implements Poolable, DrawTrait{
     private static Array<SolidTrait> entities = new Array<>();
     private static Rectangle rect = new Rectangle();

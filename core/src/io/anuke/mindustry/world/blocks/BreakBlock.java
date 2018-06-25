@@ -45,7 +45,7 @@ public class BreakBlock extends Block {
     @Override
     public boolean isSolidFor(Tile tile) {
         BreakEntity entity = tile.entity();
-        return entity.previous.solid;
+        return entity.previous == null || entity.previous.solid;
     }
 
     @Override

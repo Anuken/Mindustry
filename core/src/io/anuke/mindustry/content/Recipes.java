@@ -26,7 +26,8 @@ public class Recipes implements ContentList{
         new Recipe(weapon, TurretBlocks.hail, new ItemStack(Items.tungsten, 25), new ItemStack(Items.carbide, 25));
 
         new Recipe(weapon, TurretBlocks.lancer, new ItemStack(Items.tungsten, 25), new ItemStack(Items.lead, 25), new ItemStack(Items.silicon, 25));
-        new Recipe(weapon, TurretBlocks.arc, new ItemStack(Items.tungsten, 25), new ItemStack(Items.lead, 30), new ItemStack(Items.silicon, 30));
+        //TODO arc turret broken
+        //new Recipe(weapon, TurretBlocks.arc, new ItemStack(Items.tungsten, 25), new ItemStack(Items.lead, 30), new ItemStack(Items.silicon, 30));
 
         //DISTRIBUTION
         new Recipe(distribution, DistributionBlocks.conveyor, new ItemStack(Items.lead, 1));

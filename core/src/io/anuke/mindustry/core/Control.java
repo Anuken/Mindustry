@@ -65,9 +65,7 @@ public class Control extends Module{
 		Core.atlas.setErrorRegion("error");
 		ContentLoader.initialize(Content::load);
 
-		//TODO load database
-		//not loaded currently for testing
-		//db.load();
+		db.load();
 
 		gdxInput = Gdx.input;
 
@@ -356,8 +354,8 @@ public class Control extends Module{
 			if(!state.mode.infiniteResources && !state.mode.disableWaveTimer && Timers.get("timerCheckUnlock", 120)){
 				checkUnlockableBlocks();
 
-				//save if the db changed
-				if(db.isDirty()){
+				//save if the db changed, but don't save unlocks
+				if(db.isDirty() && !debug){
 					db.save();
 				}
 			}

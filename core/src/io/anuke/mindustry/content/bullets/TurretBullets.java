@@ -35,7 +35,7 @@ public class TurretBullets extends BulletList implements ContentList {
     @Override
     public void load() {
 
-        fireball = new BulletType(1f, 1) {
+        fireball = new BulletType(1f, 4) {
             {
                 pierce = true;
                 hitTiles = false;
@@ -90,7 +90,7 @@ public class TurretBullets extends BulletList implements ContentList {
             }
         };
 
-        lancerLaser = new BulletType(0.001f, 1) {
+        lancerLaser = new BulletType(0.001f, 110) {
             Color[] colors = {Palette.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Palette.lancerLaser, Color.WHITE};
             float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
             float[] lenscales = {1f, 1.1f, 1.13f, 1.14f};
@@ -160,7 +160,7 @@ public class TurretBullets extends BulletList implements ContentList {
                 statusIntensity = 0.5f;
             }
         };
-        lightning = new BulletType(0.001f, 5) {
+        lightning = new BulletType(0.001f, 10) {
             {
                 lifetime = 1;
                 despawneffect = Fx.none;
