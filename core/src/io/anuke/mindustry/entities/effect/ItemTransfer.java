@@ -93,6 +93,11 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
 
     @Override
     public void update() {
+        if(to == null){
+            remove();
+            return;
+        }
+
         super.update();
         current.set(from).interpolate(tovec.set(to.getX(), to.getY()), fin(), Interpolation.pow3);
         current.add(tovec.set(to.getX(), to.getY()).sub(from).nor().rotate90(1).scl(seed * fslope() * 10f));

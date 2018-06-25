@@ -27,6 +27,7 @@ import java.util.List;
 
 import static io.anuke.mindustry.Vars.netClient;
 import static io.anuke.mindustry.Vars.port;
+import static io.anuke.mindustry.Vars.threads;
 
 public class KryoClient implements ClientProvider{
     Client client;
@@ -64,14 +65,14 @@ public class KryoClient implements ClientProvider{
                 c.id = connection.getID();
                 if(connection.getRemoteAddressTCP() != null) c.addressTCP = connection.getRemoteAddressTCP().toString();
 
-                Gdx.app.postRunnable(() -> Net.handleClientReceived(c));
+                threads.runDelay(() -> Net.handleClientReceived(c));
             }
 
             @Override
             public void disconnected (Connection connection) {
                 Disconnect c = new Disconnect();
 
-                Gdx.app.postRunnable(() -> Net.handleClientReceived(c));
+                threads.runDelay(() -> Net.handleClientReceived(c));
                 if(connection.getLastProtocolError() != null) Log.error("\n\n\n\nProtocol error: " + connection.getLastProtocolError() + "\n\n\n\n");
             }
 

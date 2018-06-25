@@ -14,10 +14,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic.Kind;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -86,6 +83,9 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
                 methods = new ArrayList<>();
                 //list of all method entries
                 classes = new ArrayList<>();
+
+                List<Element> orderedElements = new ArrayList<>(elements);
+                orderedElements.sort(Comparator.comparing(Object::toString));
 
                 //create methods
                 for (Element element : elements) {
