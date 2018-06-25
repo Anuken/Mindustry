@@ -418,6 +418,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 		if(isDead()){
 			isBoosting = false;
+			boostHeat = 0f;
 			CoreEntity entity = (CoreEntity)getClosestCore();
 
 			if (!respawning && entity != null) {

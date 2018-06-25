@@ -18,10 +18,11 @@ public class TurretBlocks extends BlockList implements ContentList {
 	@Override
 	public void load() {
 		duo = new DoubleTurret("duo") {{
-			ammoTypes = new AmmoType[]{AmmoTypes.bulletTungsten, AmmoTypes.bulletLead, AmmoTypes.bulletCarbide, AmmoTypes.bulletThermite};
+			ammoTypes = new AmmoType[]{AmmoTypes.bulletTungsten, AmmoTypes.bulletLead, AmmoTypes.bulletCarbide, AmmoTypes.bulletThermite, AmmoTypes.bulletSilicon};
 			reload = 25f;
 			restitution = 0.03f;
 			range = 80f;
+			shootCone = 15f;
 			ammoUseEffect = ShootFx.shellEjectSmall;
 		}};
 /*

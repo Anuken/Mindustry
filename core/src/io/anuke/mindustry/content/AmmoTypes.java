@@ -42,9 +42,10 @@ public class AmmoTypes implements ContentList {
             smokeEffect = ShootFx.shootSmallSmoke;
         }};
 
-        bulletSilicon = new AmmoType(Items.silicon, StandardBullets.homing, 4) {{
+        bulletSilicon = new AmmoType(Items.silicon, StandardBullets.homing, 5) {{
             shootEffect = ShootFx.shootSmall;
             smokeEffect = ShootFx.shootSmallSmoke;
+            reloadMultiplier = 1.4f;
         }};
 
         bulletThermite = new AmmoType(Items.thermite, StandardBullets.tracer, 3) {{
