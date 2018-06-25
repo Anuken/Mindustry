@@ -66,7 +66,7 @@ public class HudFragment implements Fragment{
 
 					new imagebutton("icon-pause", isize, () -> {
 						if (Net.active()) {
-							ui.listfrag.visible = !ui.listfrag.visible;
+							ui.listfrag.toggle();
 						} else {
 							state.set(state.is(State.paused) ? State.playing : State.paused);
 						}

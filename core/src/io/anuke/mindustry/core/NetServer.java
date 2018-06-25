@@ -178,6 +178,7 @@ public class NetServer extends Module{
             player.pointerX = packet.pointerX;
             player.pointerY = packet.pointerY;
             player.setMineTile(packet.mining);
+            player.isBoosting = packet.boosting;
 
             vector.set(packet.x - player.getInterpolator().target.x, packet.y - player.getInterpolator().target.y);
 

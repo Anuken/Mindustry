@@ -10,6 +10,7 @@ import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Graphics;
@@ -124,6 +125,10 @@ public class DesktopInput extends InputHandler{
 
 	@Override
 	public void update(){
+        if(Net.active() && Inputs.keyTap("player_list")){
+            ui.listfrag.toggle();
+        }
+
 		if(player.isDead() || state.is(State.menu) || ui.hasDialog()) return;
 
 		player.isBoosting = Inputs.keyDown("dash");

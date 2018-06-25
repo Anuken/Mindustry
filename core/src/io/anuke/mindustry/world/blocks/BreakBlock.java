@@ -107,6 +107,10 @@ public class BreakBlock extends Block {
     public void drawShadow(Tile tile) {
         BreakEntity entity = tile.entity();
 
+        if(entity.previous instanceof BreakBlock){
+            return;
+        }
+
         entity.previous.drawShadow(tile);
     }
 

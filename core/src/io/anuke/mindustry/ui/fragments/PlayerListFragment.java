@@ -1,36 +1,31 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.net.EditLog;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.ui.BorderImage;
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.builders.button;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
+import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class PlayerListFragment implements Fragment{
-    public boolean visible = false;
-    Table content = new Table();
-    ObjectMap<Player, Boolean> checkmap = new ObjectMap<>();
+    private boolean visible = false;
+    private Table content = new Table();
+    private ObjectMap<Player, Boolean> checkmap = new ObjectMap<>();
 
     @Override
     public void build(Group parent){
@@ -48,33 +43,25 @@ public class PlayerListFragment implements Fragment{
                 add(pane).grow();
                 row();
                 new table("pane"){{
-                    margin(12f);
+                    margin(0f);
+                    defaults().growX().height(50f).fillY();
 
-                    get().addCheck("$text.server.friendlyfire", b -> {
+                    //get().addCheck("$text.server.friendlyfire", b -> {
 //                        CallClient.friendlyFireChange(b);
-                    }).growX().update(i -> i.setChecked(state.friendlyFire)).disabled(b -> Net.client()).padRight(5);
+                    //}).left().padLeft(-12).pad(0).update(i -> i.setChecked(state.friendlyFire)).disabled(b -> Net.client()).padRight(5);
 
                     new button("$text.server.bans", () -> {
                         ui.bans.show();
-                    }).padTop(-12).padBottom(-12).fillY().cell.disabled(b -> Net.client());
+                    }).cell.disabled(b -> Net.client());
 
                     new button("$text.server.admins", () -> {
                         ui.admins.show();
-                    }).padTop(-12).padBottom(-12).padRight(-12).fillY().cell.disabled(b -> Net.client());
-    
-                    new button("$text.server.rollback", () -> {
-                        ui.rollback.show();
-                    }).padTop(-12).padBottom(-12).padRight(-12).fillY().cell.disabled(b -> !players[0].isAdmin);
+                    }).cell.disabled(b -> Net.client());
 
                 }}.pad(10f).growX().end();
             }}.end();
 
             update(t -> {
-                if(!mobile){
-                    if(Inputs.keyTap("player_list")){
-                        visible = !visible;
-                    }
-                }
                 if(!(Net.active() && !state.is(State.menu))){
                     visible = false;
                 }
@@ -113,15 +100,7 @@ public class PlayerListFragment implements Fragment{
 
             stack.add(image);
 
-            stack.add(new Element(){
-                public void draw(){
-                    float s = getWidth() / 12f;
-                    for(int i : Mathf.signs){
-                        Draw.rect((player.mech.weapon.name)
-                                + "-equip", x + s * 6 + i * 3*s, y + s*6 + 2*s, -8*s*i, 8*s);
-                    }
-                }
-            });
+            stack.add(new Image(player.mech.iconRegion));
 
             button.add(stack).size(h);
             button.labelWrap("[#" + player.color.toString().toUpperCase() + "]" + player.name).width(170f).pad(10);
@@ -179,44 +158,8 @@ public class PlayerListFragment implements Fragment{
         content.marginBottom(5);
     }
 
-    public void showBlockLogs(Array<EditLog> currentEditLogs, int x, int y){
-        boolean wasPaused = state.is(State.paused);
-        state.set(State.paused);
-
-        FloatingDialog d = new FloatingDialog("$text.blocks.editlogs");
-        Table table = new Table();
-        table.defaults().pad(1f);
-        ScrollPane pane = new ScrollPane(table, "clear");
-        pane.setFadeScrollBars(false);
-        Table top = new Table();
-        top.left();
-        top.add("[accent]Edit logs for: "+ x + ", " + y);
-        table.add(top).fill().left();
-        table.row();
-
-        d.content().add(pane).grow();
-
-        if(currentEditLogs == null || currentEditLogs.size == 0) {
-            table.add("$text.block.editlogsnotfound").left();
-            table.row();
-        }
-
-        else {
-            for(int i = 0; i < currentEditLogs.size; i++) {
-                EditLog log = currentEditLogs.get(i);
-                //TODO display log info.
-                table.add("[gold]" + (i + 1) + ". [white]INVALID").left();
-                table.row();
-            }
-        }
-
-        d.buttons().addButton("$text.ok", () -> {
-            if(!wasPaused)
-                state.set(State.playing);
-            d.hide();
-        }).size(110, 50).pad(10f);
-
-        d.show();
+    public void toggle(){
+        visible = !visible;
     }
 
 }
