@@ -17,7 +17,7 @@ public class UnitBlocks extends BlockList implements ContentList {
             produceTime = 300;
             size = 2;
             requirements = new ItemStack[]{
-                new ItemStack(Items.tungsten, 20)
+                new ItemStack(Items.silicon, 20), new ItemStack(Items.lead, 20)
             };
         }};
 

@@ -1,14 +1,19 @@
 package io.anuke.mindustry.world.blocks.units;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
+import io.anuke.mindustry.gen.CallBlocks;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
+import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.BarType;
@@ -119,7 +124,7 @@ public class UnitFactory extends Block {
             }
         }
 
-        if(hasRequirements(entity.items, entity.buildTime/produceTime) &&
+        if(!entity.hasSpawned && hasRequirements(entity.items, entity.buildTime/produceTime) &&
                 entity.power.amount >= used && !entity.open){
 
             entity.buildTime += Timers.delta();
@@ -132,16 +137,7 @@ public class UnitFactory extends Block {
         if(entity.buildTime >= produceTime && !entity.open){
             entity.open = true;
 
-            Timers.run(openDuration/1.5f, () -> {
-                entity.buildTime = 0f;
-                Effects.shake(2f, 3f, entity);
-                Effects.effect(BlockFx.producesmoke, tile.drawx(), tile.drawy());
-
-                BaseUnit unit = type.create(tile.getTeam());
-                unit.set(tile.drawx(), tile.drawy());
-                unit.add();
-                unit.getVelocity().y = launchVelocity;
-            });
+            Timers.run(openDuration / 1.5f, () -> CallBlocks.onUnitFactorySpawn(tile));
 
             entity.openCountdown = openDuration;
 
@@ -175,12 +171,33 @@ public class UnitFactory extends Block {
         return true;
     }
 
+    @Remote(called = Loc.server, in = In.blocks)
+    public static void onUnitFactorySpawn(Tile tile){
+        UnitFactoryEntity entity = tile.entity();
+        UnitFactory factory = (UnitFactory)tile.block();
+
+        entity.buildTime = 0f;
+        entity.hasSpawned = true;
+
+        Effects.shake(2f, 3f, entity);
+        Effects.effect(BlockFx.producesmoke, tile.drawx(), tile.drawy());
+
+        if(!Net.client()) {
+            BaseUnit unit = factory.type.create(tile.getTeam());
+            unit.setSpawner(entity);
+            unit.set(tile.drawx(), tile.drawy());
+            unit.add();
+            unit.getVelocity().y = factory.launchVelocity;
+        }
+    }
+
     public static class UnitFactoryEntity extends TileEntity{
         public float buildTime;
         public boolean open;
         public float openCountdown;
         public float time;
         public float speedScl;
+        public boolean hasSpawned;
 
         @Override
         public void write(DataOutputStream stream) throws IOException {

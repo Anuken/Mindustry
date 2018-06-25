@@ -111,7 +111,7 @@ public class Smelter extends Block{
 			return;
 		}
 
-		boolean consumeInputs = false;
+		boolean consumeInputs = true;
 
 		if(useFlux){
 			//remove flux materials if present

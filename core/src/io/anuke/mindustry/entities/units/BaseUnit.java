@@ -21,6 +21,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.units.UnitFactory.UnitFactoryEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
@@ -52,10 +53,15 @@ public abstract class BaseUnit extends Unit{
 
 	protected boolean isWave;
 	protected Squad squad;
+	protected UnitFactoryEntity spawner;
 
 	public BaseUnit(UnitType type, Team team){
 		this.type = type;
 		this.team = team;
+	}
+
+	public void setSpawner(UnitFactoryEntity spawner) {
+		this.spawner = spawner;
 	}
 
 	public UnitType getType() {
@@ -257,6 +263,14 @@ public abstract class BaseUnit extends Unit{
 	@Override
 	public void drawOver(){
 
+	}
+
+	@Override
+	public void removed() {
+		if(spawner != null){
+			spawner.hasSpawned = false;
+			spawner = null;
+		}
 	}
 
 	@Override
