@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -22,7 +23,7 @@ public class Smelter extends Block{
 	protected final int timerDump = timers++;
 	protected final int timerCraft = timers++;
 	
-	protected Item[] inputs;
+	protected ItemStack[] inputs;
 	protected Item fuel;
 	protected Item result;
 
@@ -45,8 +46,8 @@ public class Smelter extends Block{
 
 	@Override
 	public void setBars(){
-		for(Item item : inputs){
-			bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.getItem(item)/itemCapacity));
+		for(ItemStack item : inputs){
+			bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.getItem(item.item)/itemCapacity));
 		}
 	}
 	
@@ -67,9 +68,9 @@ public class Smelter extends Block{
 	public void init() {
 		super.init();
 
-		for(Item item : inputs){
-			if(item.fluxiness >= minFlux && useFlux){
-				throw new IllegalArgumentException("'" + name + "' has input item '" + item.name + "', which is a flux, when useFlux is enabled. To prevent ambiguous item use, either remove this flux item from the inputs, or set useFlux to false.");
+		for(ItemStack item : inputs){
+			if(item.item.fluxiness >= minFlux && useFlux){
+				throw new IllegalArgumentException("'" + name + "' has input item '" + item.item.name + "', which is a flux, when useFlux is enabled. To prevent ambiguous item use, either remove this flux item from the inputs, or set useFlux to false.");
 			}
 		}
 	}
@@ -98,8 +99,8 @@ public class Smelter extends Block{
 		}
 
 		//make sure it has all the items
-		for(Item item : inputs){
-			if(!entity.items.hasItem(item)){
+		for(ItemStack item : inputs){
+			if(!entity.items.hasItem(item.item, item.amount)){
 				return;
 			}
 		}
@@ -126,8 +127,8 @@ public class Smelter extends Block{
 		}
 
 		if(consumeInputs) {
-			for (Item item : inputs) {
-				entity.items.removeItem(item, 1);
+			for (ItemStack item : inputs) {
+				entity.items.removeItem(item.item, item.amount);
 			}
 		}
 		
@@ -144,8 +145,8 @@ public class Smelter extends Block{
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		boolean isInput = false;
 
-		for(Item req : inputs){
-			if(req == item){
+		for(ItemStack req : inputs){
+			if(req.item == item){
 				isInput = true;
 				break;
 			}

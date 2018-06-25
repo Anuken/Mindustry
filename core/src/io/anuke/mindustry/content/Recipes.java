@@ -67,7 +67,11 @@ public class Recipes implements ContentList{
         new Recipe(power, PowerBlocks.powernodelarge, new ItemStack(Items.carbide, 10), new ItemStack(Items.lead, 20), new ItemStack(Items.silicon, 6));
         new Recipe(power, PowerBlocks.battery, new ItemStack(Items.tungsten, 8), new ItemStack(Items.lead, 30), new ItemStack(Items.silicon, 4));
         new Recipe(power, PowerBlocks.batteryLarge, new ItemStack(Items.carbide, 16), new ItemStack(Items.tungsten, 16), new ItemStack(Items.lead, 80), new ItemStack(Items.silicon, 20));
+
+        //generators
         new Recipe(power, PowerBlocks.combustiongenerator, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 30));
+        //new Recipe(power, PowerBlocks.turbinegenerator, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 30));
+
 
         //new Recipe(distribution, StorageBlocks.vault, new ItemStack(Items.carbide, 50));
         //new Recipe(distribution, StorageBlocks.core, new ItemStack(Items.carbide, 50));
@@ -77,9 +81,11 @@ public class Recipes implements ContentList{
         //DRILLS, PRODUCERS
         new Recipe(production, ProductionBlocks.tungstenDrill, new ItemStack(Items.tungsten, 30));
         new Recipe(production, ProductionBlocks.carbideDrill, new ItemStack(Items.tungsten, 40), new ItemStack(Items.carbide, 40));
+        new Recipe(production, ProductionBlocks.laserdrill, new ItemStack(Items.tungsten, 60), new ItemStack(Items.carbide, 70), new ItemStack(Items.silicon, 60), new ItemStack(Items.carbide, 60));
 
         new Recipe(production, ProductionBlocks.waterextractor, new ItemStack(Items.tungsten, 50), new ItemStack(Items.carbide, 50), new ItemStack(Items.lead, 40));
         new Recipe(production, ProductionBlocks.cultivator, new ItemStack(Items.tungsten, 20), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 20));
+        new Recipe(production, ProductionBlocks.oilextractor, new ItemStack(Items.tungsten, 90), new ItemStack(Items.carbide, 150), new ItemStack(Items.lead, 100), new ItemStack(Items.silicon, 100));
 
         //UNITS
         new Recipe(units, UnitBlocks.droneFactory, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 30));

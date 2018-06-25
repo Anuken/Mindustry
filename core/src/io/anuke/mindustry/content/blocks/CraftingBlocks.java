@@ -19,17 +19,17 @@ public class CraftingBlocks extends BlockList implements ContentList {
     public void load() {
         smelter = new Smelter("smelter") {{
             health = 70;
-            inputs = new Item[]{Items.tungsten};
+            inputs = new ItemStack[]{new ItemStack(Items.tungsten, 3)};
             fuel = Items.coal;
             result = Items.carbide;
-            craftTime = 35f;
+            craftTime = 40f;
             useFlux = true;
         }};
 
         arcsmelter = new PowerSmelter("arc-smelter") {{
             health = 90;
             craftEffect = BlockFx.smeltsmoke;
-            inputs = new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.tungsten, 1)};
+            inputs = new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.tungsten, 2)};
             result = Items.carbide;
             powerUse = 0.1f;
             craftTime = 25f;
