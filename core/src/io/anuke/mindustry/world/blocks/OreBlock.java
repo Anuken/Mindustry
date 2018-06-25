@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world.blocks;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
@@ -24,24 +23,16 @@ public class OreBlock extends Floor {
     @Override
     public void draw(Tile tile){
 
-        Draw.rect(base.variants > 0 ? (base.name + MathUtils.random(1, base.variants))  : base.name, tile.worldx(), tile.worldy());
+        //Draw.rect(base.variants > 0 ? (base.name + MathUtils.random(1, base.variants))  : base.name, tile.worldx(), tile.worldy());
 
         int rand = variants > 0 ? MathUtils.random(1, variants) : 0;
 
-        Draw.color(0f, 0f, 0f, 0.2f);
-        Draw.rect(variants > 0 ? (drops.item.name + rand)  : name, tile.worldx(), tile.worldy() - 1);
-        Draw.color();
-        Draw.rect(variants > 0 ? (drops.item.name + rand)  : name, tile.worldx(), tile.worldy());
+       // Draw.color(0f, 0f, 0f, 0.2f);
+        //Draw.rect(variants > 0 ? (drops.item.name + rand)  : name, tile.worldx(), tile.worldy() - 1);
+        //Draw.color();
+        Draw.rect(name + rand, tile.worldx(), tile.worldy());
 
         drawEdges(tile, false);
-    }
-
-    @Override
-    public TextureRegion[] getIcon() {
-        if(icon == null){
-            icon = new TextureRegion[]{Draw.region(drops.item.name + "1")};
-        }
-        return icon;
     }
 
     @Override

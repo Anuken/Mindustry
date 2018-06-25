@@ -1,5 +1,6 @@
 package io.anuke.mindustry;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import javax.imageio.ImageIO;
@@ -16,6 +17,7 @@ public class Image {
 
     private BufferedImage image;
     private Graphics2D graphics;
+    private Color color = new Color();
 
     public Image(BufferedImage atlas, TextureRegion region){
         this.atlas = atlas;
@@ -26,6 +28,25 @@ public class Image {
         draw(region);
 
         toDispose.add(this);
+    }
+
+    public int width(){
+        return image.getWidth();
+    }
+
+    public int height(){
+        return image.getHeight();
+    }
+
+    public Color getColor(int x, int y){
+        int i = image.getRGB(x, y);
+        Color.argb8888ToColor(color, i);
+        return color;
+    }
+
+    public void draw(int x, int y, Color color){
+        graphics.setColor(new java.awt.Color(color.r, color.g, color.b, color.a));
+        graphics.fillRect(x, y, 1, 1);
     }
 
     /**Draws a region at the top left corner.*/

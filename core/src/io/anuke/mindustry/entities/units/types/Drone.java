@@ -101,6 +101,11 @@ public class Drone extends FlyingUnit implements BuilderTrait {
     }
 
     @Override
+    public float getMinePower() {
+        return 0.7f;
+    }
+
+    @Override
     public Queue<BuildRequest> getPlaceQueue() {
         return placeQueue;
     }

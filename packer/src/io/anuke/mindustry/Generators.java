@@ -1,5 +1,6 @@
 package io.anuke.mindustry;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Mech;
@@ -67,8 +68,27 @@ public class Generators {
                 Item item = ore.drops.item;
                 Block base = ore.base;
 
-                //get base image to draw on
-                Image image = context.get(base.name);
+                for (int i = 0; i < 3; i++) {
+                    //get base image to draw on
+                    Image image = context.get(base.name + (i+1));
+                    Image shadow = context.get(item.name + (i+1));
+
+                    for (int x = 0; x < image.width(); x++) {
+                        for (int y = 1; y < image.height(); y++) {
+                            Color color = shadow.getColor(x, y - 1);
+
+                            //draw semi transparent background
+                            if(color.a > 0.001f){
+                                color.set(0, 0, 0, 0.3f);
+                                image.draw(x, y, color);
+                            }
+                        }
+                    }
+
+                    image.draw(context.get(item.name + (i+1)));
+                    image.save("ore-" + item.name + "-" + base.name + (i+1));
+                }
+
             }
         });
     }

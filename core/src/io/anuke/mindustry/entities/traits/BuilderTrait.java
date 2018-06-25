@@ -52,6 +52,9 @@ public interface BuilderTrait {
     /**Sets the tile this builder is currently mining.*/
     void setMineTile(Tile tile);
 
+    /**Returns the minining speed of this miner. 1 = standard, 0.5 = half speed, 2 = double speed, etc.*/
+    float getMinePower();
+
     /**Build power, can be any float. 1 = builds recipes in normal time, 0 = doesn't build at all.*/
     float getBuildPower(Tile tile);
 
@@ -115,38 +118,6 @@ public interface BuilderTrait {
         if(unit.distanceTo(tile) > placeDistance) { //out of range, skip it.
             getPlaceQueue().removeFirst();
         }else if(current.remove){
-            /*
-            if(Build.validBreak(unit.getTeam(), current.x, current.y) && current.recipe == Recipe.getByResult(tile.block())){ //if it's valid, break it
-
-                float progress = 1f / tile.getBreakTime() * Timers.delta() * getBuildPower(tile);
-                TileEntity core = unit.getClosestCore();
-
-                //update accumulation of resources to add
-                if(current.recipe != null && core != null){
-                    for(int i = 0; i < current.recipe.requirements.length; i ++){
-                        current.removeAccumulator[i] += current.recipe.requirements[i].amount*progress / 2f; //add scaled amount progressed to the accumulator
-                        int amount = (int)(current.removeAccumulator[i]); //get amount
-
-                        if(amount > 0){ //if it's positive, add it to the core
-                            int accepting = core.tile.block().acceptStack(getCurrentRequest().recipe.requirements[i].item, amount, core.tile, unit);
-                            core.tile.block().handleStack(getCurrentRequest().recipe.requirements[i].item, amount, core.tile, unit);
-
-                            current.removeAccumulator[i] -= accepting;
-                        }
-                    }
-                }
-
-                current.progress += progress;
-                unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(tile.drawx(), tile.drawy()), 0.4f);
-
-                if(current.progress >= 1f){
-                    //FIXME a player instace is required here, but the the builder may not be a player
-                    CallBlocks.breakBlock((Player)unit, unit.getTeam(), current.x, current.y, true, true);
-                }
-            }else{
-                //otherwise, skip it
-                getPlaceQueue().removeFirst();
-            }*/
 
             if (!(tile.block() instanceof BreakBlock)) { //check if haven't started placing
                 if(Build.validBreak(unit.getTeam(), current.x, current.y)){
@@ -217,7 +188,7 @@ public interface BuilderTrait {
             unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(tile.worldx(), tile.worldy()), 0.4f);
 
             if(unit.inventory.canAcceptItem(item) &&
-                    Mathf.chance(Timers.delta() * (0.06 - item.hardness * 0.01))){
+                    Mathf.chance(Timers.delta() * (0.06 - item.hardness * 0.01) * getMinePower())){
                 ItemTransfer.create(item,
                         tile.worldx() + Mathf.range(tilesize/2f),
                         tile.worldy() + Mathf.range(tilesize/2f),

@@ -91,6 +91,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 
 	@Override
+	public float getMinePower() {
+		return mech.mineSpeed;
+	}
+
+	@Override
 	public TextureRegion getIconRegion() {
 		return mech.iconRegion;
 	}
