@@ -284,7 +284,7 @@ public class Control extends Module{
 
 		for(int i = 0 ; i < Recipe.all().size; i ++){
 			Recipe recipe = Recipe.all().get(i);
-			if(entity.items.hasItems(recipe.requirements)){
+			if(!recipe.debugOnly && entity.items.hasItems(recipe.requirements)){
 				if(control.database().unlockContent(recipe)){
 					ui.hudfrag.showUnlock(recipe);
 				}

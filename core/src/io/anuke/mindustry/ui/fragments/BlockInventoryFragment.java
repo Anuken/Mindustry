@@ -70,7 +70,7 @@ public class BlockInventoryFragment implements Fragment {
         table.background("clear");
         table.setTouchable(Touchable.enabled);
         table.update(() -> {
-            if(tile == null || tile.entity == null || !tile.block().isAccessible()){
+            if(tile == null || tile.entity == null || !tile.block().isAccessible() || tile.entity.items.totalItems() == 0){
                 hide();
             }else {
                 updateTablePosition();
