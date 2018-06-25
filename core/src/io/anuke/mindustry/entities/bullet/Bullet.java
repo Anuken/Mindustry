@@ -166,7 +166,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 
 	@Override
 	public boolean collides(SolidTrait other){
-		return super.collides(other);
+		return type.collides && super.collides(other);
 	}
 
 	@Override

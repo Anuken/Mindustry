@@ -77,6 +77,7 @@ public abstract class Turret extends Block{
 
 	@Override
 	public void init() {
+		super.init();
 		viewRange = range;
 	}
 

@@ -27,6 +27,8 @@ public abstract class BulletType extends BaseBulletType<Bullet> implements Conte
 	public boolean syncable;
 	/**Whether this bullet type collides with tiles.*/
 	public boolean collidesTiles = true;
+	/**Whether this bullet types collides with anything at all.*/
+	public boolean collides = true;
 
 	public BulletType(float speed, float damage){
 		this.id = lastid ++;

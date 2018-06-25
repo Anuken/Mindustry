@@ -37,10 +37,12 @@ public class TurretBlocks extends BlockList implements ContentList {
 			ammoUseEffect = ShootFx.shellEjectSmall;
 		}};*/
 
-		hail = new ItemTurret("hail") {{
+		hail = new ArtilleryTurret("hail") {{
 			ammoTypes = new AmmoType[]{AmmoTypes.artilleryCarbide, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary};
-			reload = 40f;
+			reload = 100f;
+			recoil = 2f;
 			range = 200f;
+			inaccuracy = 5f;
 		}};
 
         scorch = new LiquidTurret("scorch") {{
@@ -136,7 +138,7 @@ public class TurretBlocks extends BlockList implements ContentList {
 			};
 		}};
 
-		ripple = new ItemTurret("ripple") {{
+		ripple = new ArtilleryTurret("ripple") {{
 			ammoTypes = new AmmoType[]{AmmoTypes.artilleryCarbide, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary, AmmoTypes.artilleryPlastic, AmmoTypes.artilleryThorium};
 			size = 3;
 		}};

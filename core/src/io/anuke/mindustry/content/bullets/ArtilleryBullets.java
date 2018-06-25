@@ -1,6 +1,7 @@
 package io.anuke.mindustry.content.bullets;
 
 import io.anuke.mindustry.content.fx.BulletFx;
+import io.anuke.mindustry.entities.bullet.ArtilleryBulletType;
 import io.anuke.mindustry.entities.bullet.BasicBulletType;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.type.ContentList;
@@ -11,14 +12,15 @@ public class ArtilleryBullets extends BulletList implements ContentList{
     @Override
     public void load() {
 
-        carbide = new BasicBulletType(3f, 0, "shell") {
+        carbide = new ArtilleryBulletType(3f, 4, "shell") {
             {
                 hiteffect = BulletFx.flakExplosion;
                 knockback = 0.8f;
-                lifetime = 90f;
-                drag = 0.01f;
-                bulletWidth = bulletHeight = 9f;
-                bulletShrink = 0.1f;
+                lifetime = 50f;
+                bulletWidth = bulletHeight = 11f;
+                collidesTiles = false;
+                splashDamageRadius = 25f;
+                splashDamage = 33f;
             }
         };
 
