@@ -207,6 +207,11 @@ public class NetClient extends Module {
         ui.traces.show(player, info);
     }
 
+    @Remote
+    public static void onPlayerDisconnect(int playerid){
+        playerGroup.removeByID(playerid);
+    }
+
     @Remote(variants = Variant.one, unreliable = true)
     public static void onSnapshot(byte[] snapshot, int snapshotID){
         //skip snapshot IDs that have already been recieved
@@ -215,7 +220,6 @@ public class NetClient extends Module {
         }
 
         try {
-
             byte[] result;
             int length;
             if (snapshotID == 0) { //fresh snapshot

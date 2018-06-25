@@ -67,8 +67,7 @@ public class NetServer extends Module{
         Net.handleServer(Disconnect.class, (id, packet) -> {
             Player player = connections.get(id);
             if(player != null){
-                Call.sendMessage("[accent]" + player.name + " has disconnected.");
-                player.remove();
+                onDisconnect(player);
             }
         });
 
@@ -311,8 +310,7 @@ public class NetServer extends Module{
 
                 if(connection == null){
                     //player disconnected, ignore them
-                    connections.remove(player.clientid);
-                    player.remove();
+                    onDisconnect(player);
                     return;
                 }
 
@@ -406,6 +404,13 @@ public class NetServer extends Module{
         }catch (IOException e){
             e.printStackTrace();
         }
+    }
+
+    private static void onDisconnect(Player player){
+        Call.sendMessage("[accent]" + player.name + " has disconnected.");
+        Call.onPlayerDisconnect(player.id);
+        player.remove();
+        netServer.connections.remove(player.clientid);
     }
 
     @Remote(targets = Loc.client, called = Loc.server)
