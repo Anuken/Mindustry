@@ -88,7 +88,7 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
                 orderedElements.sort(Comparator.comparing(Object::toString));
 
                 //create methods
-                for (Element element : elements) {
+                for (Element element : orderedElements) {
                     Remote annotation = element.getAnnotation(Remote.class);
 
                     //check for static
