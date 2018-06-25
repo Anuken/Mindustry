@@ -24,9 +24,7 @@ import io.anuke.ucore.entities.Entities;
 
 import java.nio.ByteBuffer;
 
-import static io.anuke.mindustry.Vars.bulletGroup;
-import static io.anuke.mindustry.Vars.playerGroup;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 /**Class for specifying read/write methods for code generation.*/
 public class TypeIO {
@@ -67,7 +65,7 @@ public class TypeIO {
     @ReadClass(Bullet.class)
     public static Bullet readBullet(ByteBuffer buffer){
         int id = buffer.getInt();
-        return (Bullet)bulletGroup.getByID(id);
+        return bulletGroup.getByID(id);
     }
 
     @WriteClass(CarriableTrait.class)

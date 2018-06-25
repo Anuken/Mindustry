@@ -164,7 +164,7 @@ public class NetServer extends Module{
             NetConnection connection = Net.getConnection(id);
             if(player == null || connection == null || packet.snapid < connection.lastRecievedSnapshot) return;
 
-            boolean verifyPosition = !player.isDead() && !debug && !headless;
+            boolean verifyPosition = !player.isDead() && !debug && headless;
 
             if(connection.lastRecievedTime == 0) connection.lastRecievedTime = TimeUtils.millis() - 16;
 

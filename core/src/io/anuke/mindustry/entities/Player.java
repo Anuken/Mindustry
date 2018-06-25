@@ -271,7 +271,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 			baseRotation = Mathf.slerpDelta(baseRotation, movement.angle(), 0.13f);
 		}
 
-		boostHeat = Mathf.lerpDelta(boostHeat, isBoosting && !movement.isZero() && moved ? 1f : 0f, 0.08f);
+		boostHeat = Mathf.lerpDelta(boostHeat, isBoosting && ((!movement.isZero() && moved) || !isLocal) ? 1f : 0f, 0.08f);
 
         boolean snap = snapCamera && isLocal;
 
@@ -717,7 +717,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		color.set(buffer.readInt());
 		dead = buffer.readBoolean();
 		mech = Upgrade.getByID(buffer.readByte());
-		boolean dashing = buffer.readBoolean();
+		boolean boosting = buffer.readBoolean();
 		int mine = buffer.readInt();
 		interpolator.read(lastx, lasty, x, y, time, rotation);
 		rotation = lastrot;
@@ -727,7 +727,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 			y = lasty;
 		}else{
 			mining = world.tile(mine);
-			isBoosting = dashing;
+			isBoosting = boosting;
 		}
 	}
 
