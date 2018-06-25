@@ -121,7 +121,7 @@ public class Block extends BaseBlock implements UnlockableContent{
 	/**The color of this block when displayed on the minimap or map preview.*/
 	public Color minimapColor = Color.CLEAR;
 	/**View range of this block type. Use a value < 0 to disable.*/
-	public float viewRange = -1;
+	public float viewRange = 10;
 
 	public Block(String name) {
 		this.name = name;
@@ -354,10 +354,10 @@ public class Block extends BaseBlock implements UnlockableContent{
 	    if(icon == null) {
             if (Draw.hasRegion(name + "-icon")) {
                 icon = new TextureRegion[]{Draw.region(name + "-icon")};
+			} else if (Draw.hasRegion(name)){
+				icon = new TextureRegion[]{Draw.region(name)};
             } else if (Draw.hasRegion(name + "1")) {
-                icon = new TextureRegion[]{Draw.region(name + "1")};
-            } else if (Draw.hasRegion(name)){
-                icon = new TextureRegion[]{Draw.region(name)};
+				icon = new TextureRegion[]{Draw.region(name + "1")};
             }else{
             	icon = new TextureRegion[]{};
 			}

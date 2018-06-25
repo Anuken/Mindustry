@@ -127,7 +127,7 @@ public class UnitInventory implements Saveable{
     }
 
     public boolean canAcceptItem(Item type, int amount){
-        return !hasItem() || (item.item == type && item.amount + amount <= unit.getItemCapacity());
+        return (!hasItem() && amount <= unit.getItemCapacity()) || (item.item == type && item.amount + amount <= unit.getItemCapacity());
     }
 
     public void clear(){

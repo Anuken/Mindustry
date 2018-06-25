@@ -44,7 +44,7 @@ public class FogRenderer implements Disposable{
                 for (int y = 0; y < world.height(); y++) {
                     Tile tile = world.tile(x, y);
 
-                    if(tile.getTeam() == players[0].getTeam() && tile.block().viewRange > 0){
+                    if(tile.getTeam() == players[0].getTeam() && tile.block().synthetic() && tile.block().viewRange > 0){
                         changeQueue.add(tile);
                     }
                 }
@@ -52,7 +52,7 @@ public class FogRenderer implements Disposable{
         });
 
         Events.on(TileChangeEvent.class, tile -> threads.runGraphics(() -> {
-            if(tile.getTeam() == players[0].getTeam() && tile.block().viewRange > 0){
+            if(tile.getTeam() == players[0].getTeam() && tile.block().synthetic() && tile.block().viewRange > 0){
                 changeQueue.add(tile);
             }
         }));
@@ -106,7 +106,6 @@ public class FogRenderer implements Disposable{
         buffer.end();
 
         region.setTexture(buffer.getColorBufferTexture());
-        //region.setRegion(0, 0, 1, 1);
         region.setRegion(u, v2, u2, v);
 
         Core.batch.setProjectionMatrix(Core.camera.combined);
@@ -114,7 +113,6 @@ public class FogRenderer implements Disposable{
         renderer.pixelSurface.getBuffer().begin();
         Graphics.begin();
 
-       // Core.batch.draw(buffer.getColorBufferTexture(), px + 50, py, 200, 200 * world.height()/(float)world.width());
         Core.batch.draw(region, px, py, vw, vh);
 
         Graphics.end();

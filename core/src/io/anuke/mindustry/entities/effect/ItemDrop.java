@@ -8,8 +8,11 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.fx.UnitFx;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.entities.traits.TargetTrait;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Interpolator;
@@ -33,7 +36,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawTrait, VelocityTrait, TimeTrait, Poolable {
+public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawTrait, VelocityTrait, TimeTrait, TargetTrait, Poolable {
     public static int typeID = -1;
 
     private static final float sinkLifetime = 80f;
@@ -77,6 +80,24 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
         hitboxTile.setSize(5f);
     }
 
+    public Item getItem() {
+        return item;
+    }
+
+    public int getAmount(){
+        return amount;
+    }
+
+    @Override
+    public boolean isDead() {
+        return !isAdded();
+    }
+
+    @Override
+    public Team getTeam() {
+        return Team.none;
+    }
+
     @Override
     public int getTypeID() {
         return typeID;
@@ -109,7 +130,7 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
 
     @Override
     public void collision(SolidTrait other, float x, float y) {
-        Player player = (Player)other;
+        Unit player = (Unit)other;
         if(player.inventory.canAcceptItem(item, 1)){
             int used = Math.min(amount, player.inventory.capacity() - player.inventory.getItem().amount);
             player.inventory.addItem(item, used);

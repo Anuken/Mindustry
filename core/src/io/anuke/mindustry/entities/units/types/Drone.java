@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.FlyingUnit;
@@ -24,12 +25,15 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.entities.EntityPhysics;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Shapes;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Geometry;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.ThreadQueue;
 
-import static io.anuke.mindustry.Vars.unitGroups;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Drone extends FlyingUnit implements BuilderTrait {
     public static int typeID = -1;
@@ -181,6 +185,23 @@ public class Drone extends FlyingUnit implements BuilderTrait {
         targetItem = Mathf.findMin(toMine, (a, b) -> -Integer.compare(entity.items.getItem(a), entity.items.getItem(b)));
     }
 
+    protected boolean findItemDrop(){
+        TileEntity core = getClosestCore();
+
+        if(core == null) return false;
+
+        //find nearby dropped items to pick up if applicable
+        ItemDrop drop = EntityPhysics.getClosest(itemGroup, x, y, 60f,
+                item -> core.tile.block().acceptStack(item.getItem(), item.getAmount(), core.tile, Drone.this) == item.getAmount() &&
+                        inventory.canAcceptItem(item.getItem(), 1));
+        if(drop != null){
+            setState(pickup);
+            target = drop;
+            return true;
+        }
+        return false;
+    }
+
     public final UnitState
 
     build = new UnitState(){
@@ -256,6 +277,10 @@ public class Drone extends FlyingUnit implements BuilderTrait {
         }
 
         public void update() {
+            TileEntity entity = getClosestCore();
+
+            if(entity == null) return;
+
             if(targetItem == null) {
                 findItem();
             }
@@ -270,6 +295,10 @@ public class Drone extends FlyingUnit implements BuilderTrait {
                 }
 
                 retarget(() -> {
+                    if(findItemDrop()){
+                        return;
+                    }
+
                     if(getMineTile() == null){
                         findItem();
                     }
@@ -279,7 +308,7 @@ public class Drone extends FlyingUnit implements BuilderTrait {
                     target = world.indexer().findClosestOre(x, y, targetItem);
                 });
 
-                if(target != null) {
+                if(target instanceof Tile) {
                     moveTo(type.range/1.5f);
 
                     if (distanceTo(target) < type.range) {
@@ -291,6 +320,33 @@ public class Drone extends FlyingUnit implements BuilderTrait {
 
         public void exited() {
             setMineTile(null);
+        }
+    },
+    pickup = new UnitState() {
+        public void entered() {
+            target = null;
+        }
+
+        public void update() {
+            ItemDrop item = (ItemDrop)target;
+
+            if(inventory.isFull() || !inventory.canAcceptItem(item.getItem(), 1)){
+                setState(drop);
+                return;
+            }
+
+            if(distanceTo(item) < 4){
+                item.collision(Drone.this, x, y);
+            }
+
+            //item has been picked up
+            if(item.getAmount() == 0){
+                if(!findItemDrop()){
+                    setState(drop);
+                }
+            }
+
+            moveTo(0f);
         }
     },
     drop = new UnitState() {
