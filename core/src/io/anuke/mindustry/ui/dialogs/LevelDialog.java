@@ -18,6 +18,7 @@ import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.scene.utils.Elements;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
@@ -50,6 +51,7 @@ public class LevelDialog extends FloatingDialog{
 			TextButton[] b = {null};
 			b[0] = Elements.newButton("$mode." + mode.name() + ".name", "toggle", () -> state.mode = mode);
 			b[0].update(() -> b[0].setChecked(state.mode == mode));
+			b[0].setDisabled(true);
 			group.add(b[0]);
 			selmode.add(b[0]).size(130f, 54f);
 		}
@@ -129,6 +131,7 @@ public class LevelDialog extends FloatingDialog{
 			ui.loadfrag.show();
 
 			Timers.run(5f, () -> {
+				Cursors.restoreCursor();
 				threads.run(() -> {
 					Timers.mark();
 					MapTileData data = WorldGenerator.generate();
