@@ -111,7 +111,7 @@ public class ContentLoader {
         }
 
         if(Block.all().size >= 256){
-            throw new IllegalArgumentException("THE TIME HAS COME. More than 256 blocks have been created..");
+            throw new IllegalArgumentException("THE TIME HAS COME. More than 256 blocks have been created.");
         }
 
         Log.info("--- CONTENT INFO ---");

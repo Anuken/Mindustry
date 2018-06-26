@@ -100,6 +100,7 @@ public class PowerSmelter extends PowerBlock {
         }
 
         entity.heat = Mathf.clamp(entity.heat);
+        entity.time += entity.heat * Timers.delta();
 
         //make sure it has all the items
         for(ItemStack item : inputs){
@@ -191,6 +192,7 @@ public class PowerSmelter extends PowerBlock {
 
     class PowerSmelterEntity extends TileEntity{
         public float heat;
+        public float time;
 
         @Override
         public void write(DataOutputStream stream) throws IOException {

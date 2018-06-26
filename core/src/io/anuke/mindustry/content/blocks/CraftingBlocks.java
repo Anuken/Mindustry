@@ -68,14 +68,14 @@ public class CraftingBlocks extends BlockList implements ContentList {
             updateEffect = BlockFx.plasticburn;
         }};
 
-        phaseweaver = new PowerSmelter("phase-weaver") {{
+        phaseweaver = new PhaseWeaver("phase-weaver") {{
             health = 90;
             craftEffect = BlockFx.smeltsmoke;
-            inputs = new ItemStack[]{new ItemStack(Items.thorium, 2), new ItemStack(Items.sand, 6)};
+            inputs = new ItemStack[]{new ItemStack(Items.thorium, 4), new ItemStack(Items.sand, 10)};
             result = Items.phasematter;
             powerUse = 0.4f;
-            craftTime = 100f;
-            size = 3;
+            craftTime = 120f;
+            size = 2;
         }};
 
         alloysmelter = new PowerSmelter("alloy-smelter") {{

@@ -59,7 +59,6 @@ public class Recipes implements ContentList{
         new Recipe(crafting, CraftingBlocks.siliconsmelter, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 50));
 
         //other crafting
-        //TODO phaseweaver sprites
         new Recipe(crafting, CraftingBlocks.phaseweaver, new ItemStack(Items.silicon, 160), new ItemStack(Items.lead, 160), new ItemStack(Items.thorium, 150));
         //TODO implement alloy smelter
         // new Recipe(crafting, CraftingBlocks.alloySmelter, new ItemStack(Items.silicon, 160), new ItemStack(Items.lead, 160), new ItemStack(Items.thorium, 140));
