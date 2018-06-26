@@ -1,9 +1,10 @@
-package io.anuke.mindustry.world.blocks.production;
+package io.anuke.mindustry.world.blocks.units;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -29,6 +30,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 
 public class MechFactory extends Block{
     protected Mech mech;
+    protected float buildTime = 60*5;
 
     protected TextureRegion openRegion;
 
@@ -68,9 +70,13 @@ public class MechFactory extends Block{
         if(entity.player != null) {
             TextureRegion region = mech.iconRegion;
 
+            if(entity.player.mech == mech){
+                region = (entity.player.isMobile ? Mechs.starterMobile : Mechs.starterDesktop).iconRegion;
+            }
+
             Shaders.build.region = region;
             Shaders.build.progress = entity.progress;
-            Shaders.build.time = -entity.time / 10f;
+            Shaders.build.time = -entity.time / 4f;
             Shaders.build.color.set(Palette.accent);
 
             Graphics.shader(Shaders.build, false);
@@ -84,7 +90,7 @@ public class MechFactory extends Block{
                     tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),
                     tile.drawy(),
                     90,
-                    size * Vars.tilesize / 2f);
+                    size * Vars.tilesize / 2f + 1f);
 
             Draw.reset();
         }
@@ -104,8 +110,7 @@ public class MechFactory extends Block{
 
         if(entity.player != null){
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
-            entity.progress += 1f / Vars.respawnduration;
-
+            entity.progress += 1f / buildTime;
 
             entity.time += entity.heat;
 
@@ -146,10 +151,17 @@ public class MechFactory extends Block{
         MechFactoryEntity entity = tile.entity();
 
         Effects.effect(Fx.spawn, entity);
+        Mech result = ((MechFactory)tile.block()).mech;
 
-        entity.player.mech = ((MechFactory)tile.block()).mech;
+        if(entity.player.mech == result){
+            entity.player.mech = (entity.player.isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
+        }else{
+            entity.player.mech = result;
+        }
+
         entity.progress = 0;
         entity.player.heal();
+        entity.open = true;
         entity.player.setDead(false);
         entity.player = null;
     }

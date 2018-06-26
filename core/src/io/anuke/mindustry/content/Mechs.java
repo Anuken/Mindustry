@@ -40,6 +40,8 @@ public class Mechs implements ContentList {
             speed = 0.4f;
             maxSpeed = 3f;
             drag = 0.1f;
+            weaponOffsetX = -1;
+            weaponOffsetY = -1;
         }};
 
         trident = new Mech("trident-ship", true){{

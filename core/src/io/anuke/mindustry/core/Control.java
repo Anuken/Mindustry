@@ -198,6 +198,7 @@ public class Control extends Module{
         player.color.set(Settings.getInt("color-" + index));
         player.isLocal = true;
         player.playerIndex = index;
+        player.isMobile = mobile;
         players[index] = player;
 
         if(setTo != null){

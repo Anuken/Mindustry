@@ -136,6 +136,7 @@ public class NetServer extends Module{
             player.usid = packet.usid;
             player.name = packet.name;
             player.uuid = uuid;
+            player.isMobile = packet.mobile;
             player.mech = packet.mobile ? Mechs.starterMobile : Mechs.starterDesktop;
             player.dead = true;
             player.setNet(player.x, player.y);
@@ -169,7 +170,7 @@ public class NetServer extends Module{
 
             long elapsed = TimeUtils.timeSinceMillis(connection.lastRecievedTime);
 
-            float maxSpeed = packet.boosting ? player.mech.boostSpeed : player.mech.speed;
+            float maxSpeed = packet.boosting && !player.mech.flying ? player.mech.boostSpeed : player.mech.speed;
 
             //extra 1.1x multiplicaton is added just in case
             float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.1f;

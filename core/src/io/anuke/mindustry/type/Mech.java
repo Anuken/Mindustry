@@ -20,6 +20,8 @@ public class Mech extends Upgrade {
 	public float buildPower = 1f;
 	public boolean canRepair = false;
 
+	public float weaponOffsetX, weaponOffsetY;
+
 	public Weapon weapon = Weapons.blaster;
 
 	public int itemCapacity = 30;

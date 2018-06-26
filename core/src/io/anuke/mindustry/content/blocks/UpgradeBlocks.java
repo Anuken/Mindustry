@@ -2,7 +2,7 @@ package io.anuke.mindustry.content.blocks;
 
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.production.MechFactory;
+import io.anuke.mindustry.world.blocks.units.MechFactory;
 
 public class UpgradeBlocks extends BlockList {
     public static Block deltaFactory, tauFactory, omegaFactory, dartFactory, tridentFactory, javelinFactory, halberdFactory;
