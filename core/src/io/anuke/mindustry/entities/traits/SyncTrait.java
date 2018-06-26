@@ -1,7 +1,6 @@
 package io.anuke.mindustry.entities.traits;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.net.Interpolator;
 import io.anuke.ucore.entities.trait.Entity;
 
@@ -25,8 +24,9 @@ public interface SyncTrait extends Entity, TypeTrait {
         if(getInterpolator() != null) {
             getInterpolator().target.set(x, y);
             getInterpolator().last.set(x, y);
+            getInterpolator().pos.set(0, 0);
             getInterpolator().updateSpacing = 16;
-            getInterpolator().lastUpdated = TimeUtils.millis();
+            getInterpolator().lastUpdated = 0;
         }
     }
 

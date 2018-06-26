@@ -1691,34 +1691,6 @@ wave-liquid
   orig: 16, 16
   offset: 0, 0
   index: -1
-dronefactory-top
-  rotate: false
-  xy: 737, 426
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-walkerfactory-top
-  rotate: false
-  xy: 737, 426
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-dronefactory-top-open
-  rotate: false
-  xy: 755, 430
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-walkerfactory-top-open
-  rotate: false
-  xy: 755, 430
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
 mech-factory
   rotate: false
   xy: 411, 135
@@ -1731,6 +1703,34 @@ ship-factory
   xy: 411, 135
   size: 24, 24
   orig: 24, 24
+  offset: 0, 0
+  index: -1
+dart-ship-factory-top
+  rotate: false
+  xy: 643, 124
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+dronefactory-top
+  rotate: false
+  xy: 643, 124
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+dart-ship-factory-top-open
+  rotate: false
+  xy: 737, 426
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+dronefactory-top-open
+  rotate: false
+  xy: 737, 426
+  size: 16, 16
+  orig: 16, 16
   offset: 0, 0
   index: -1
 reconstructor-open
@@ -1749,7 +1749,7 @@ repairpoint-turret
   index: -1
 door-large-open
   rotate: false
-  xy: 643, 124
+  xy: 755, 430
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2097,6 +2097,41 @@ block-icon-cultivator
   orig: 16, 16
   offset: 0, 0
   index: -1
+block-icon-dart-ship-factory
+  rotate: false
+  xy: 273, 109
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+dronefactory
+  rotate: false
+  xy: 273, 109
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+dart-ship-factory
+  rotate: false
+  xy: 273, 109
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+reconstructor
+  rotate: false
+  xy: 273, 109
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+block-icon-reconstructor
+  rotate: false
+  xy: 273, 109
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 block-icon-deepwater
   rotate: false
   xy: 593, 98
@@ -2141,28 +2176,28 @@ block-icon-phase-wall
   index: -1
 block-icon-deflector-wall-large
   rotate: false
-  xy: 273, 109
+  xy: 291, 117
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 deflector-wall-large
   rotate: false
-  xy: 273, 109
+  xy: 291, 117
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 phase-wall-large
   rotate: false
-  xy: 273, 109
+  xy: 291, 117
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 block-icon-phase-wall-large
   rotate: false
-  xy: 273, 109
+  xy: 291, 117
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2197,21 +2232,21 @@ door
   index: -1
 block-icon-door-large
   rotate: false
-  xy: 291, 117
+  xy: 309, 117
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 door-large
   rotate: false
-  xy: 291, 117
+  xy: 309, 117
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 block-icon-dronefactory
   rotate: false
-  xy: 309, 117
+  xy: 327, 117
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2358,7 +2393,7 @@ junction
   index: -1
 block-icon-lancer
   rotate: false
-  xy: 327, 117
+  xy: 345, 117
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2379,7 +2414,7 @@ large-solar-panel
   index: -1
 block-icon-laser-drill
   rotate: false
-  xy: 345, 117
+  xy: 363, 117
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2540,14 +2575,14 @@ metalfloor1
   index: -1
 block-icon-multiplexer
   rotate: false
-  xy: 363, 117
+  xy: 381, 117
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 multiplexer
   rotate: false
-  xy: 363, 117
+  xy: 381, 117
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2624,14 +2659,14 @@ block-icon-plasma-drill
   index: -1
 block-icon-plasteel-compressor
   rotate: false
-  xy: 381, 117
+  xy: 399, 117
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 plasteel-compressor
   rotate: false
-  xy: 381, 117
+  xy: 399, 117
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2652,14 +2687,14 @@ power-node
   index: -1
 block-icon-power-node-large
   rotate: false
-  xy: 399, 117
+  xy: 417, 117
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 power-node-large
   rotate: false
-  xy: 399, 117
+  xy: 417, 117
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2704,34 +2739,6 @@ block-icon-pulverizer
   xy: 429, 37
   size: 8, 8
   orig: 8, 8
-  offset: 0, 0
-  index: -1
-block-icon-reconstructor
-  rotate: false
-  xy: 417, 117
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-dronefactory
-  rotate: false
-  xy: 417, 117
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-reconstructor
-  rotate: false
-  xy: 417, 117
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-walkerfactory
-  rotate: false
-  xy: 417, 117
-  size: 16, 16
-  orig: 16, 16
   offset: 0, 0
   index: -1
 block-icon-repairpoint

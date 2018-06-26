@@ -22,7 +22,8 @@ public class CraftingBlocks extends BlockList implements ContentList {
             inputs = new ItemStack[]{new ItemStack(Items.tungsten, 3)};
             fuel = Items.coal;
             result = Items.carbide;
-            craftTime = 40f;
+            craftTime = 45f;
+            burnDuration = 35f;
             useFlux = true;
         }};
 
@@ -32,7 +33,7 @@ public class CraftingBlocks extends BlockList implements ContentList {
             inputs = new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.tungsten, 2)};
             result = Items.carbide;
             powerUse = 0.1f;
-            craftTime = 25f;
+            craftTime = 30f;
             size = 2;
 
             useFlux = true;

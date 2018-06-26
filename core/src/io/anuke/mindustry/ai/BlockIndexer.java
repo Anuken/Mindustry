@@ -36,7 +36,9 @@ public class BlockIndexer {
     /**Set of all ores that are being scanned.*/
     private final ObjectSet<Item> scanOres = ObjectSet.with(Items.tungsten, Items.coal, Items.lead, Items.thorium, Items.titanium);
     /**Stores all ore quadtrants on the map.*/
-    private ObjectMap<Item, ObjectSet<Tile>> ores = new ObjectMap<>();
+    private ObjectMap<Item, ObjectSet<Tile>> ores;
+
+    private final ObjectSet<Item> itemSet = new ObjectSet<>();
 
     /**Tags all quadrants.*/
     private Bits[] structQuadrants;
@@ -68,7 +70,7 @@ public class BlockIndexer {
             enemyMap.clear();
             allyMap.clear();
             typeMap.clear();
-            ores.clear();
+            ores = null;
 
             //create bitset for each team type that contains each quadrant
             structQuadrants = new Bits[Team.values().length];
@@ -177,6 +179,37 @@ public class BlockIndexer {
             }
             typeMap.put(tile.packedPosition(), new TileIndex(tile.block().flags, tile.getTeam()));
         }
+
+        if(ores == null) return;
+
+        int quadrantX = tile.x / oreQuadrantSize;
+        int quadrantY = tile.y / oreQuadrantSize;
+        itemSet.clear();
+
+        Tile rounded = world.tile(Mathf.clamp(quadrantX * oreQuadrantSize + oreQuadrantSize /2, 0, world.width() - 1),
+                Mathf.clamp(quadrantY * oreQuadrantSize + oreQuadrantSize /2, 0, world.height() - 1));
+
+        //find all items that this quadrant contains
+        for (int x = quadrantX * structQuadrantSize; x < world.width() && x < (quadrantX + 1) * structQuadrantSize; x++) {
+            for (int y = quadrantY * structQuadrantSize; y < world.height() && y < (quadrantY + 1) * structQuadrantSize; y++) {
+                Tile result = world.tile(x, y);
+                if(result.block().drops == null || !scanOres.contains(result.block().drops.item)) continue;
+
+                itemSet.add(result.block().drops.item);
+            }
+        }
+
+        //update quadrant at this position
+        for (Item item : scanOres){
+            ObjectSet<Tile> set = ores.get(item);
+
+            //update quadrant status depending on whether the item is in it
+            if(!itemSet.contains(item)){
+                set.remove(rounded);
+            }else{
+                set.add(rounded);
+            }
+        }
     }
 
     private void updateQuadrant(Tile tile){
@@ -229,6 +262,8 @@ public class BlockIndexer {
     }
 
     private void scanOres(){
+        ores = new ObjectMap<>();
+
         //initialize ore map with empty sets
         for(Item item : scanOres){
             ores.put(item, new ObjectSet<>());

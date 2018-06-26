@@ -8,7 +8,6 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.game.EventType.BlockBuildEvent;
 import io.anuke.mindustry.gen.CallBlocks;
 import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
@@ -21,17 +20,20 @@ import io.anuke.mindustry.world.blocks.BreakBlock.BreakEntity;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Shapes;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Geometry;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Translator;
 
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 /**Interface for units that build, break or mine things.*/
 public interface BuilderTrait {
@@ -76,7 +78,11 @@ public interface BuilderTrait {
 
     /**Clears the placement queue.*/
     default void clearBuilding(){
-        getPlaceQueue().clear();
+        if(this instanceof Player) {
+            CallBlocks.onBuildDeselect((Player) this);
+        }else{
+            getPlaceQueue().clear();
+        }
     }
 
     /**Add another build requests to the tail of the queue.*/
@@ -145,10 +151,12 @@ public interface BuilderTrait {
                 if(Build.validPlace(unit.getTeam(), current.x, current.y, current.recipe.result, current.rotation)){
                     //if it's valid, place it
                     //FIXME a player instance is required here, but the the builder may not be a player
-                    CallBlocks.placeBlock((Player)unit, unit.getTeam(), current.x, current.y, current.recipe, current.rotation);
 
-                    //fire build event
-                    threads.run(() -> Events.fire(BlockBuildEvent.class, unit.getTeam(), world.tile(current.x, current.y)));
+                    if(!current.requested){
+                        CallBlocks.placeBlock((Player)unit, unit.getTeam(), current.x, current.y, current.recipe, current.rotation);
+                        current.requested = true;
+                    }
+
                 }else{
                     //otherwise, skip it
                     getPlaceQueue().removeFirst();
@@ -277,6 +285,7 @@ public interface BuilderTrait {
         public final int x, y, rotation;
         public final Recipe recipe;
         public final boolean remove;
+        public boolean requested;
 
         public float progress;
 

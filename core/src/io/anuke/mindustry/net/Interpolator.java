@@ -31,19 +31,18 @@ public class Interpolator {
         targets = new float[0];
         target.setZero();
         last.setZero();
-        lastUpdated = updateSpacing = 0;
+        lastUpdated = 0;
+        updateSpacing = 16; //1 frame
         pos.setZero();
     }
 
     public void update(){
 
-        if(lastUpdated != 0){
+        if(lastUpdated != 0 && updateSpacing != 0){
             float timeSinceUpdate = TimeUtils.timeSinceMillis(lastUpdated);
-            float alpha = Math.min(timeSinceUpdate / updateSpacing, 1f);
+            float alpha = Math.min(timeSinceUpdate / updateSpacing, 2f);
 
-            Mathf.lerp2(last, target, alpha);
-
-            pos.set(last).lerp(target, alpha);
+            Mathf.lerp2(pos.set(last), target, alpha);
 
             if(values.length != targets.length){
                 values = new float[targets.length];
@@ -52,34 +51,9 @@ public class Interpolator {
             for (int i = 0; i < values.length; i++) {
                 values[i] = Mathf.slerp(values[i], targets[i], alpha);
             }
-
-            if(target.dst(pos) > 128){
-                pos.set(target);
-                last.set(target);
-            }
         }else{
             pos.set(target);
         }
-        /*
-        time += 1f / spacing * Math.min(Timers.delta(), 1f);
-
-        time = Mathf.clamp(time, 0, 2f);
-
-        Mathf.lerp2(pos.set(last), target, time);
-
-        if(values.length != targets.length){
-            values = new float[targets.length];
-        }
-
-        for(int i = 0; i < values.length; i ++){
-            values[i] = Mathf.slerpDelta(values[i], targets[i], 0.6f);
-        }
-
-        if(target.dst(pos) > 128){
-            pos.set(target);
-            last.set(target);
-            time = 0f;
-        }*/
 
     }
 }

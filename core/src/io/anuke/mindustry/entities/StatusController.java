@@ -115,6 +115,12 @@ public class StatusController implements Saveable{
 
     @Override
     public void readSave(DataInput stream) throws IOException {
+        for (StatusEntry effect : statuses){
+            Pools.free(effect);
+        }
+
+        statuses.clear();
+
         byte amount = stream.readByte();
         for (int i = 0; i < amount; i++) {
             byte id = stream.readByte();

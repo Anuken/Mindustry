@@ -58,10 +58,7 @@ public class BuildBlock extends Block {
 
     @Override
     public void tapped(Tile tile, Player player) {
-        BuildEntity entity = tile.entity();
-
-        player.clearBuilding();
-        player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.getRotation(), entity.recipe));
+        CallBlocks.onBuildSelect(player, tile);
     }
 
     @Override
@@ -164,6 +161,21 @@ public class BuildBlock extends Block {
             //event first before they can recieve the placed() event modification results
             threads.runDelay(() -> tile.block().placed(tile));
         }
+    }
+
+    @Remote(called = Loc.server, targets = Loc.both, in = In.blocks, forward = true)
+    public static void onBuildSelect(Player player, Tile tile){
+        if(player == null || !(tile.entity instanceof BuildEntity)) return;
+
+        BuildEntity entity = tile.entity();
+
+        player.clearBuilding();
+        player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.getRotation(), entity.recipe));
+    }
+
+    @Remote(called = Loc.server, targets = Loc.both, in = In.blocks, forward = true)
+    public static void onBuildDeselect(Player player){
+        player.getPlaceQueue().clear();
     }
 
     public class BuildEntity extends TileEntity{

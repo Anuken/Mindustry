@@ -402,6 +402,8 @@ public class AndroidInput extends InputHandler implements GestureListener{
         //get tile on cursor
         Tile cursor = tileAt(screenX, screenY);
 
+        float worldx = Graphics.world(screenX, screenY).x, worldy = Graphics.world(screenX, screenY).y;
+
         //ignore off-screen taps
         if(cursor == null || ui.hasMouse(screenX, screenY)) return false;
 
@@ -410,7 +412,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
 
         //call tap events
         if(pointer == 0 && !selecting && mode == none){
-            if(!tileTapped(cursor.target())){
+            if(!tileTapped(cursor.target()) && !tryTapPlayer(worldx, worldy)){
                 tryBeginMine(cursor);
             }
         }
@@ -475,6 +477,12 @@ public class AndroidInput extends InputHandler implements GestureListener{
             }
 
             lineMode = false;
+        }else{
+            Tile tile = tileAt(screenX, screenY);
+
+            if (tile == null) return false;
+
+            tryDropItems(tile.target(), Graphics.world(screenX, screenY).x, Graphics.world(screenX, screenY).y);
         }
         return false;
     }
@@ -524,7 +532,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
         }else if(mode == placing && isPlacing() && validPlace(cursor.x, cursor.y, recipe.result, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, recipe.result)){
             //add to selection queue if it's a valid place position
             selection.add(lastPlaced = new PlaceRequest(cursor.worldx(), cursor.worldy(), recipe, rotation));
-        }else if(mode == breaking && validBreak(cursor.x, cursor.y) && !hasRequest(cursor)){
+        }else if(mode == breaking && validBreak(cursor.x, cursor.y) && !hasRequest(cursor)) {
             //add to selection queue if it's a valid BREAK position
             selection.add(new PlaceRequest(cursor.worldx(), cursor.worldy()));
         }else{ //else, try and carry units
@@ -616,8 +624,8 @@ public class AndroidInput extends InputHandler implements GestureListener{
     public boolean pan(float x, float y, float deltaX, float deltaY){
         if(ui.hasMouse()) return false;
 
-        //can't pan in line mode with one finger!
-        if(lineMode && !Gdx.input.isTouched(1)){
+        //can't pan in line mode with one finger or while dropping items!
+        if((lineMode && !Gdx.input.isTouched(1)) || droppingItem){
             return false;
         }
 

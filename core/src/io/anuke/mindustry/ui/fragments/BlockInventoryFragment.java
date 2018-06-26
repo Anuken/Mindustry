@@ -141,7 +141,7 @@ public class BlockInventoryFragment implements Fragment {
         table.setPosition(v.x, v.y, Align.topLeft);
     }
 
-    @Remote(called = Loc.server, targets = Loc.both, in = In.blocks)
+    @Remote(called = Loc.server, targets = Loc.both, in = In.blocks, forward = true)
     public static void requestItem(Player player, Tile tile, Item item, int amount){
         int removed = tile.block().removeStack(tile, item, amount);
 

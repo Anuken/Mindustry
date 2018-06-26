@@ -48,7 +48,7 @@ public class Recipes implements ContentList{
         //CRAFTING
 
         //smelting
-        new Recipe(crafting, CraftingBlocks.smelter, new ItemStack(Items.tungsten, 60));
+        new Recipe(crafting, CraftingBlocks.smelter, new ItemStack(Items.tungsten, 70));
         new Recipe(crafting, CraftingBlocks.arcsmelter, new ItemStack(Items.tungsten, 90), new ItemStack(Items.carbide, 60), new ItemStack(Items.lead, 50));
         new Recipe(crafting, CraftingBlocks.siliconsmelter, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 50));
 
@@ -91,8 +91,8 @@ public class Recipes implements ContentList{
 
         //bodies
 
-        new Recipe(units, UpgradeBlocks.tridentFactory, new ItemStack(Items.lead, 150), new ItemStack(Items.silicon, 200), new ItemStack(Items.titanium, 240))
-                .setDesktop(); //trident is desktop only, because it's the starter mobile ship
+        new Recipe(units, UpgradeBlocks.dartFactory, new ItemStack(Items.lead, 150), new ItemStack(Items.silicon, 200), new ItemStack(Items.titanium, 240))
+                .setDesktop(); //dart is desktop only, because it's the starter mobile ship
 
         //new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 30));
 

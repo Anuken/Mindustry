@@ -7,6 +7,7 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
+import io.anuke.mindustry.game.EventType.BlockBuildEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
@@ -15,11 +16,10 @@ import io.anuke.mindustry.world.blocks.BreakBlock;
 import io.anuke.mindustry.world.blocks.BreakBlock.BreakEntity;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.entities.Entities;
 
-import static io.anuke.mindustry.Vars.debug;
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Build {
     private static final Rectangle rect = new Rectangle();
@@ -97,6 +97,8 @@ public class Build {
 
         //just in case
         if(tile == null) return;
+
+        threads.run(() -> Events.fire(BlockBuildEvent.class, team, tile));
 
         Block result = recipe.result;
         Block previous = tile.block();
