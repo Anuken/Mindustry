@@ -17,6 +17,7 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
+import static io.anuke.mindustry.Vars.headless;
 import static io.anuke.mindustry.Vars.world;
 
 public class Floor extends Block{

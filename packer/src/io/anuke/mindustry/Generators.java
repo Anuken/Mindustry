@@ -27,6 +27,9 @@ public class Generators {
                 Image image = context.get(regions[0]);
 
                 for(TextureRegion region : regions){
+                    if(region == null){
+                        context.err("Error in block \"{0}\": null region!", block.name);
+                    }
                     image.draw(region);
                 }
 

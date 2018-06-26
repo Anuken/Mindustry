@@ -90,6 +90,10 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 		}
 	}
 
+	public boolean isSleeping(){
+		return sleeping;
+	}
+
 	public boolean isDead() {
 		return dead;
 	}

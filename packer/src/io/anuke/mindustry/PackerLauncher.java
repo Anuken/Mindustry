@@ -8,6 +8,7 @@ import java.io.IOException;
 public class PackerLauncher {
 
     public static void main(String[] args) throws IOException {
+        Vars.headless = true;
         ImageContext context = new ImageContext();
         context.load();
         Timers.mark();

@@ -7,6 +7,7 @@ import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.world.Block;
 
+import static io.anuke.mindustry.Vars.debug;
 import static io.anuke.mindustry.Vars.headless;
 
 public class Recipe implements UnlockableContent{
@@ -73,7 +74,7 @@ public class Recipe implements UnlockableContent{
 
         r.clear();
         for(Recipe recipe : allRecipes){
-            if(recipe.category == category && Vars.control.database().isUnlocked(recipe)) {
+            if(recipe.category == category && (Vars.control.database().isUnlocked(recipe) || (debug && recipe.debugOnly))) {
                 r.add(recipe);
             }
         }

@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.units;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
@@ -27,6 +28,8 @@ public class RepairPoint extends Block{
     protected float repairSpeed = 0.3f;
     protected float powerUsage = 0.2f;
 
+    protected TextureRegion topRegion;
+
     public RepairPoint(String name) {
         super(name);
         update = true;
@@ -36,6 +39,13 @@ public class RepairPoint extends Block{
         layer2 = Layer.laser;
         hasPower = true;
         powerCapacity = 20f;
+    }
+
+    @Override
+    public void load() {
+        super.load();
+
+        topRegion = Draw.region(name + "-turret");
     }
 
     @Override
@@ -49,7 +59,7 @@ public class RepairPoint extends Block{
     public void drawLayer(Tile tile) {
         RepairPointEntity entity = tile.entity();
 
-        Draw.rect(name + "-turret", tile.drawx(), tile.drawy(), entity.rotation - 90);
+        Draw.rect(topRegion, tile.drawx(), tile.drawy(), entity.rotation - 90);
     }
 
     @Override

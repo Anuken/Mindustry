@@ -20,6 +20,12 @@ public class Recipes implements ContentList{
         new Recipe(defense, DefenseBlocks.carbideWall, new ItemStack(Items.carbide, 12));
         new Recipe(defense, DefenseBlocks.carbideWallLarge, new ItemStack(Items.carbide, 12*4));
 
+        new Recipe(defense, DefenseBlocks.thoriumWall, new ItemStack(Items.thorium, 12));
+        new Recipe(defense, DefenseBlocks.thoriumWallLarge, new ItemStack(Items.thorium, 12*4));
+
+        new Recipe(defense, DefenseBlocks.door, new ItemStack(Items.carbide, 12), new ItemStack(Items.silicon, 8));
+        new Recipe(defense, DefenseBlocks.doorLarge, new ItemStack(Items.carbide, 12*4), new ItemStack(Items.silicon, 8*4));
+
         //TURRETS
         new Recipe(weapon, TurretBlocks.duo, new ItemStack(Items.tungsten, 20));
         new Recipe(weapon, TurretBlocks.scorch, new ItemStack(Items.tungsten, 25), new ItemStack(Items.carbide, 20));
@@ -52,6 +58,14 @@ public class Recipes implements ContentList{
         new Recipe(crafting, CraftingBlocks.arcsmelter, new ItemStack(Items.tungsten, 90), new ItemStack(Items.carbide, 60), new ItemStack(Items.lead, 50));
         new Recipe(crafting, CraftingBlocks.siliconsmelter, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 50));
 
+        //other crafting
+        //TODO phaseweaver sprites
+        new Recipe(crafting, CraftingBlocks.phaseweaver, new ItemStack(Items.silicon, 160), new ItemStack(Items.lead, 160), new ItemStack(Items.thorium, 150));
+        //TODO implement alloy smelter
+        // new Recipe(crafting, CraftingBlocks.alloySmelter, new ItemStack(Items.silicon, 160), new ItemStack(Items.lead, 160), new ItemStack(Items.thorium, 140));
+
+        new Recipe(crafting, CraftingBlocks.plasteelcompressor, new ItemStack(Items.silicon, 60), new ItemStack(Items.lead, 170), new ItemStack(Items.titanium, 170));
+
         //misc
         new Recipe(crafting, CraftingBlocks.pulverizer, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 50));
         new Recipe(crafting, CraftingBlocks.thermiteMixer, new ItemStack(Items.tungsten, 100), new ItemStack(Items.lead, 50));
@@ -81,7 +95,7 @@ public class Recipes implements ContentList{
         //DRILLS, PRODUCERS
         new Recipe(production, ProductionBlocks.tungstenDrill, new ItemStack(Items.tungsten, 30));
         new Recipe(production, ProductionBlocks.carbideDrill, new ItemStack(Items.tungsten, 60), new ItemStack(Items.carbide, 60));
-        new Recipe(production, ProductionBlocks.laserdrill, new ItemStack(Items.tungsten, 80), new ItemStack(Items.carbide, 90), new ItemStack(Items.silicon, 60), new ItemStack(Items.titanium, 80));
+        new Recipe(production, ProductionBlocks.laserdrill, new ItemStack(Items.tungsten, 90), new ItemStack(Items.carbide, 110), new ItemStack(Items.silicon, 70), new ItemStack(Items.titanium, 80));
 
         new Recipe(production, ProductionBlocks.waterextractor, new ItemStack(Items.tungsten, 50), new ItemStack(Items.carbide, 50), new ItemStack(Items.lead, 40));
         new Recipe(production, ProductionBlocks.cultivator, new ItemStack(Items.tungsten, 20), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 20));
@@ -99,6 +113,7 @@ public class Recipes implements ContentList{
         //actual unit related stuff
         new Recipe(units, UnitBlocks.droneFactory, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 80));
         new Recipe(units, UnitBlocks.repairPoint, new ItemStack(Items.lead, 30), new ItemStack(Items.tungsten, 30), new ItemStack(Items.silicon, 30));
+        new Recipe(units, UnitBlocks.resupplyPoint, new ItemStack(Items.lead, 30), new ItemStack(Items.tungsten, 30), new ItemStack(Items.silicon, 30));
 
         //LIQUIDS
         new Recipe(liquid, LiquidBlocks.conduit, new ItemStack(Items.lead, 1));

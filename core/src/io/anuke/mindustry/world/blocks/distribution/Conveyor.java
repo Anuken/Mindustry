@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongArray;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
@@ -122,6 +123,8 @@ public class Conveyor extends Block{
 	public void unitOn(Tile tile, Unit unit) {
 		ConveyorEntity entity = tile.entity();
 
+		entity.wakeUp();
+
 		float speed = this.speed * tilesize / 2.3f;
 		float tx = Geometry.d4[tile.getRotation()].x, ty = Geometry.d4[tile.getRotation()].y;
 
@@ -206,7 +209,6 @@ public class Conveyor extends Block{
 		}
 
 		if (minremove != Integer.MAX_VALUE) entity.convey.truncate(minremove);
-
 	}
 
 	@Override
@@ -293,6 +295,20 @@ public class Conveyor extends Block{
 		if(!inserted){
 			entity.convey.add(result);
 		}
+	}
+
+	@Override
+	public Array<Object> getDebugInfo(Tile tile) {
+		ConveyorEntity entity = tile.entity();
+		Array<Object> arr = super.getDebugInfo(tile);
+		arr.addAll(Array.with(
+			"mincarry", entity.minCarry,
+			"minitem", entity.minCarry,
+			"carrying", entity.carrying,
+			"clogHeat", entity.clogHeat,
+			"sleeping", entity.isSleeping()
+		));
+		return arr;
 	}
 
 	@Override

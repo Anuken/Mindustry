@@ -9,7 +9,7 @@ import io.anuke.mindustry.world.blocks.defense.Door;
 import io.anuke.mindustry.world.blocks.defense.PhaseWall;
 
 public class DefenseBlocks extends BlockList implements ContentList {
-    public static Block tungstenWall, tungstenWallLarge, carbideWall, carbideWallLarge, thoriumWall, thoriumWallLarge, door, largedoor, deflectorwall, deflectorwalllarge,
+    public static Block tungstenWall, tungstenWallLarge, carbideWall, carbideWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge, deflectorwall, deflectorwalllarge,
         phasewall, phasewalllarge;
 
     @Override
@@ -63,13 +63,13 @@ public class DefenseBlocks extends BlockList implements ContentList {
         }};
 
         door = new Door("door") {{
-            health = 90 * wallHealthMultiplier;
+            health = 100 * wallHealthMultiplier;
         }};
 
-        largedoor = new Door("door-large") {{
+        doorLarge = new Door("door-large") {{
             openfx = BlockFx.dooropenlarge;
             closefx = BlockFx.doorcloselarge;
-            health = 90 * 4 * wallHealthMultiplier;
+            health = 100 * 4 * wallHealthMultiplier;
             size = 2;
         }};
     }
