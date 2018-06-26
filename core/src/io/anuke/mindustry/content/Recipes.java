@@ -59,7 +59,7 @@ public class Recipes implements ContentList{
         new Recipe(crafting, CraftingBlocks.siliconsmelter, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 50));
 
         //other crafting
-        new Recipe(crafting, CraftingBlocks.phaseweaver, new ItemStack(Items.silicon, 160), new ItemStack(Items.lead, 160), new ItemStack(Items.thorium, 150));
+        new Recipe(crafting, CraftingBlocks.phaseweaver, new ItemStack(Items.silicon, 160), new ItemStack(Items.lead, 240), new ItemStack(Items.thorium, 150));
         //TODO implement alloy smelter
         // new Recipe(crafting, CraftingBlocks.alloySmelter, new ItemStack(Items.silicon, 160), new ItemStack(Items.lead, 160), new ItemStack(Items.thorium, 140));
 
@@ -69,6 +69,7 @@ public class Recipes implements ContentList{
         new Recipe(crafting, CraftingBlocks.pulverizer, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 50));
         new Recipe(crafting, CraftingBlocks.thermiteMixer, new ItemStack(Items.tungsten, 100), new ItemStack(Items.lead, 50));
         new Recipe(crafting, CraftingBlocks.blastMixer, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 60), new ItemStack(Items.carbide, 40));
+        new Recipe(crafting, CraftingBlocks.cryofluidmixer, new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 80), new ItemStack(Items.titanium, 90));
 
         //processing
         new Recipe(crafting, CraftingBlocks.biomatterCompressor, new ItemStack(Items.lead, 70), new ItemStack(Items.silicon, 60));
@@ -106,6 +107,8 @@ public class Recipes implements ContentList{
 
         new Recipe(units, UpgradeBlocks.dartFactory, new ItemStack(Items.lead, 150), new ItemStack(Items.silicon, 200), new ItemStack(Items.titanium, 240))
                 .setDesktop(); //dart is desktop only, because it's the starter mobile ship
+
+        new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.carbide, 160), new ItemStack(Items.silicon, 220), new ItemStack(Items.titanium, 250)).setDesktop();
 
         //new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 30));
 

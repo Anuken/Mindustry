@@ -163,6 +163,7 @@ public class MechFactory extends Block{
         entity.player.heal();
         entity.open = true;
         entity.player.setDead(false);
+        entity.player.inventory.clear();
         entity.player = null;
     }
 

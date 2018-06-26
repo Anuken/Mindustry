@@ -1,5 +1,6 @@
 package io.anuke.mindustry.type;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.ucore.graphics.Draw;
@@ -19,6 +20,7 @@ public class Mech extends Upgrade {
 	public float carryWeight = 10f;
 	public float buildPower = 1f;
 	public boolean canRepair = false;
+	public Color trailColor = Color.valueOf("ffd37f");
 
 	public float weaponOffsetX, weaponOffsetY;
 

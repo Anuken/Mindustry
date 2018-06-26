@@ -51,6 +51,8 @@ public class Palette {
     public static final Color power = Color.valueOf("fbd367");
     public static final Color placing = Color.valueOf("616161");
 
+    public static final Color lightTrail = Color.valueOf("ffe2a9");
+
     public static final Color redSpark = Color.valueOf("fbb97f");
     public static final Color orangeSpark = Color.valueOf("d2b29c");
 

@@ -36,8 +36,12 @@ public class Weapon extends Upgrade {
 	protected float inaccuracy = 0f;
 	/**intensity and duration of each shot's screen shake*/
 	protected float shake = 0f;
+	/**visual weapon knockback.*/
+	protected float recoil = 1.5f;
 	/**shoot barrel length*/
 	protected float length = 3f;
+	/**fraction of velocity that is random*/
+	protected float velocityRnd = 0f;
 	/**whether to shoot the weapons in different arms one after another, rather than all at once*/
 	protected boolean roundrobin = false;
 	/**translator for vector calulations*/
@@ -76,7 +80,7 @@ public class Weapon extends Upgrade {
 	}
 
 	public float getRecoil(Player player, boolean left){
-		return 1f-Mathf.clamp(player.timer.getTime(left ? Player.timerShootLeft : Player.timerShootRight)/reload);
+		return (1f-Mathf.clamp(player.timer.getTime(left ? Player.timerShootLeft : Player.timerShootRight)/reload))*recoil;
 	}
 
 	public float getReload(){
@@ -106,7 +110,7 @@ public class Weapon extends Upgrade {
 	
 	void bullet(Unit owner, float x, float y, float angle){
 		tr.trns(angle, 3f);
-		Bullet.create(owner.inventory.getAmmo().bullet, owner, x + tr.x, y + tr.y, angle);
+		Bullet.create(owner.inventory.getAmmo().bullet, owner, owner.getTeam(), x + tr.x, y + tr.y, angle, (1f-velocityRnd) + Mathf.random(velocityRnd));
 	}
 
 	@Remote(targets = Loc.server, called = Loc.both, in = In.entities, unreliable = true)

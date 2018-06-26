@@ -55,8 +55,8 @@ public class Generators {
                     image.draw(mech.region);
                 }
 
-                image.draw(mech.weapon.equipRegion, false, false);
-                image.draw(mech.weapon.equipRegion, true, false);
+                image.draw(mech.weapon.equipRegion, -(int)mech.weaponOffsetX, (int)mech.weaponOffsetY, false, false);
+                image.draw(mech.weapon.equipRegion, (int)mech.weaponOffsetX, (int)mech.weaponOffsetY, true, false);
 
 
                 image.save("mech-icon-" + mech.name);

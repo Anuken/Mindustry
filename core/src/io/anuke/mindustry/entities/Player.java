@@ -317,7 +317,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		Draw.rect(mech.region, x, y, rotation -90);
 
 		for (int i : Mathf.signs) {
-			float tra = rotation - 90, trY = - mech.weapon.getRecoil(this, i > 0)*1.5f + mech.weaponOffsetY;
+			float tra = rotation - 90, trY = - mech.weapon.getRecoil(this, i > 0) + mech.weaponOffsetY;
 			float w = i > 0 ? -12 : 12;
 			Draw.rect(mech.weapon.equipRegion,
 					x + Angles.trnsx(tra, mech.weaponOffsetX * i, trY),
@@ -357,7 +357,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 			float wobblyness = 0.6f;
 			trail.update(x + Angles.trnsx(rotation + 180f, 5f) + Mathf.range(wobblyness),
 					y + Angles.trnsy(rotation + 180f, 5f) + Mathf.range(wobblyness));
-	    	trail.draw(Palette.lighterOrange, Palette.lightishOrange, 5f * (isFlying() ? 1f : boostHeat));
+	    	trail.draw(mech.trailColor, mech.trailColor, 5f * (isFlying() ? 1f : boostHeat));
 		}else{
 	    	trail.clear();
 		}
@@ -676,6 +676,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		stream.writeBoolean(isLocal);
 
 		if(isLocal){
+			stream.writeByte(mech.id);
 			stream.writeByte(playerIndex);
 			super.writeSave(stream, false);
 		}
@@ -686,8 +687,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 		boolean local = stream.readBoolean();
 
 		if(local){
+			byte mechid = stream.readByte();
 			int index = stream.readByte();
 			players[index].readSaveSuper(stream);
+			players[index].mech = Upgrade.getByID(mechid);
 			players[index].dead = false;
 		}
 	}

@@ -1,7 +1,9 @@
 package io.anuke.mindustry.content;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.type.Upgrade;
@@ -18,11 +20,21 @@ public class Mechs implements ContentList {
         alpha = new Mech("alpha-mech", false){{
             drillPower = 1;
             speed = 0.5f;
+            weapon = Weapons.blaster;
+            trailColor = Palette.lightTrail;
         }};
 
         delta = new Mech("delta-mech", false){{
             drillPower = -1;
-            speed = 0.6f;
+            speed = 0.63f;
+            boostSpeed = 0.86f;
+            itemCapacity = 15;
+            armor = 30f;
+            weaponOffsetX = -1;
+            weaponOffsetY = -1;
+            weapon = Weapons.shockgun;
+            ammoCapacity = 50;
+            trailColor = Color.valueOf("d3ddff");
         }};
 
         tau = new Mech("tau-mech", false){{
@@ -42,6 +54,7 @@ public class Mechs implements ContentList {
             drag = 0.1f;
             weaponOffsetX = -1;
             weaponOffsetY = -1;
+            trailColor = Palette.lightTrail;
         }};
 
         trident = new Mech("trident-ship", true){{

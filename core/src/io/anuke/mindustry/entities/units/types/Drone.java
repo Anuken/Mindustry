@@ -162,7 +162,7 @@ public class Drone extends FlyingUnit implements BuilderTrait {
 
     @Override
     public void drawOver() {
-        trail.draw(Palette.lighterOrange, Palette.lightishOrange, 3f);
+        trail.draw(Palette.lightTrail, Palette.lightTrail, 3f);
 
         if(target instanceof TileEntity && state.is(repair)){
             float len = 5f;
