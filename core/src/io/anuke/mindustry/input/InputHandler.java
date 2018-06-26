@@ -6,6 +6,7 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
@@ -164,6 +165,7 @@ public abstract class InputHandler extends InputAdapter{
 		return tile.floor().drops != null && tile.floor().drops.item.hardness <= player.mech.drillPower
 				&& !tile.floor().playerUnmineable
 				&& player.inventory.canAcceptItem(tile.floor().drops.item)
+				&& Units.getClosestEnemy(player.getTeam(), tile.worldx(), tile.worldy(), 40f, e -> true) == null //don't being mining when an enemy is near
 				&& tile.block() == Blocks.air && player.distanceTo(tile.worldx(), tile.worldy()) <= Player.mineDistance;
 	}
 
