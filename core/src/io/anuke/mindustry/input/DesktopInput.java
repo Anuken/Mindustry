@@ -118,6 +118,7 @@ public class DesktopInput extends InputHandler{
                         cursor.worldy() + recipe.result.offset(), rotation * 90 - 90);
             }
             drawPlace(cursor.x, cursor.y, recipe.result, rotation);
+	        recipe.result.drawPlace(cursor.x, cursor.y, rotation, validPlace(cursor.x, cursor.y, recipe.result, rotation));
         }
 
         Draw.reset();

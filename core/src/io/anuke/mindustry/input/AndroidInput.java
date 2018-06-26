@@ -71,6 +71,8 @@ public class AndroidInput extends InputHandler implements GestureListener{
     private PlaceMode mode = none;
     /**Whether no recipe was available when switching to break mode.*/
     private Recipe lastRecipe;
+    /**Last placed request. Used for drawing block overlay.*/
+    private PlaceRequest lastPlaced;
 	
 	public AndroidInput(Player player){
 	    super(player);
@@ -195,6 +197,18 @@ public class AndroidInput extends InputHandler implements GestureListener{
                 margin(5);
                 defaults().size(60f);
 
+                //Add a 'cancel building' button.
+                new imagebutton("icon-cancel", "toggle", 16 * 2f, () -> player.clearBuilding());
+
+                visible(() -> player.getPlaceQueue().size > 0);
+            }}.left().colspan(2).end();
+
+            row();
+
+            new table("pane"){{
+                margin(5);
+                defaults().size(60f);
+
                 //Add a break button.
                 new imagebutton("icon-break", "toggle", 16 * 2f, () -> {
                     mode = mode == breaking ? recipe == null ? none : placing : breaking;
@@ -268,7 +282,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
             drawRequest(request);
         }
 
-        //draw normals
+        //draw list of requests
         for(PlaceRequest request : selection){
             Tile tile = request.tile();
 
@@ -285,6 +299,11 @@ public class AndroidInput extends InputHandler implements GestureListener{
 
 
             drawRequest(request);
+
+            //draw last placed request
+            if(!request.remove && request == lastPlaced){
+                recipe.result.drawPlace(tile.x, tile.y, rotation, validPlace(tile.x, tile.y, recipe.result, rotation));
+            }
         }
 
         Graphics.shader();
@@ -427,6 +446,9 @@ public class AndroidInput extends InputHandler implements GestureListener{
                     }
                 }
 
+                //reset last placed for convenience
+                lastPlaced = null;
+
             }else if(mode == breaking){
                 //normalize area
                 NormalizeResult result = PlaceUtils.normalizeArea(lineStartX, lineStartY, tile.x, tile.y, rotation, false, maxLength);
@@ -501,7 +523,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
             removeRequest(getRequest(cursor));
         }else if(mode == placing && isPlacing() && validPlace(cursor.x, cursor.y, recipe.result, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, recipe.result)){
             //add to selection queue if it's a valid place position
-            selection.add(new PlaceRequest(cursor.worldx(), cursor.worldy(), recipe, rotation));
+            selection.add(lastPlaced = new PlaceRequest(cursor.worldx(), cursor.worldy(), recipe, rotation));
         }else if(mode == breaking && validBreak(cursor.x, cursor.y) && !hasRequest(cursor)){
             //add to selection queue if it's a valid BREAK position
             selection.add(new PlaceRequest(cursor.worldx(), cursor.worldy()));

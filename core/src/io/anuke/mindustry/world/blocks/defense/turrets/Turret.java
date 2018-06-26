@@ -140,7 +140,7 @@ public abstract class Turret extends Block{
 	
 	@Override
 	public void drawPlace(int x, int y, int rotation, boolean valid){
-		Draw.color(Palette.place);
+		Draw.color(Palette.placing);
 		Lines.stroke(1f);
 		Lines.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range);
 	}

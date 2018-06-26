@@ -90,6 +90,10 @@ public class Recipes implements ContentList{
         //UNITS
 
         //bodies
+
+        new Recipe(units, UpgradeBlocks.tridentFactory, new ItemStack(Items.lead, 150), new ItemStack(Items.silicon, 200), new ItemStack(Items.titanium, 240))
+                .setDesktop(); //trident is desktop only, because it's the starter mobile ship
+
         //new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 30));
 
         //actual unit related stuff

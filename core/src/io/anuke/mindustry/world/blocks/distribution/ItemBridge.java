@@ -65,11 +65,11 @@ public class ItemBridge extends Block {
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid) {
         Lines.stroke(2f);
-        Draw.color(Palette.place);
+        Draw.color(Palette.placing);
         for(int i = 0; i < 4; i ++){
             Lines.dashLine(
-                    x * tilesize + Geometry.d4[i].x * tilesize/2f,
-                    y * tilesize + Geometry.d4[i].y * tilesize/2f,
+                    x * tilesize + Geometry.d4[i].x * (tilesize/2f + 2),
+                    y * tilesize + Geometry.d4[i].y * (tilesize/2f + 2),
                     x * tilesize + Geometry.d4[i].x * range * tilesize,
                     y * tilesize + Geometry.d4[i].y * range * tilesize,
                     range);

@@ -146,7 +146,7 @@ public class PowerDistributor extends PowerBlock{
 
 	@Override
 	public void drawPlace(int x, int y, int rotation, boolean valid){
-        Draw.color(Palette.place);
+        Draw.color(Palette.placing);
         Lines.stroke(1f);
 
         Lines.poly(Edges.getPixelPolygon(laserRange), x * tilesize - tilesize/2, y * tilesize - tilesize/2, tilesize);
