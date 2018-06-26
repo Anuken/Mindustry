@@ -13,6 +13,8 @@ public enum Team {
     public final Color color;
     public final int intColor;
 
+    public final static Team[] all = values();
+
     Team(Color color){
         this.color = color;
         intColor = Color.rgba8888(color);

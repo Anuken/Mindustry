@@ -39,7 +39,7 @@ import static io.anuke.mindustry.Vars.world;
 public interface BuilderTrait {
     //these are not instance variables!
     Translator[] tmptr = {new Translator(), new Translator(), new Translator(), new Translator()};
-    float placeDistance = 200f;
+    float placeDistance = 140f;
     float mineDistance = 70f;
 
     /**Returns the queue for storing build requests.*/
@@ -118,7 +118,8 @@ public interface BuilderTrait {
 
         Tile tile = world.tile(current.x, current.y);
 
-        if(unit.distanceTo(tile) > placeDistance) { //out of range, skip it.
+        if(unit.distanceTo(tile) > placeDistance || //out of range, skip it
+                (current.lastEntity != null && current.lastEntity.isDead())) { //build/destroy request has died, skip it
             getPlaceQueue().removeFirst();
         }else if(current.remove){
 
@@ -144,6 +145,7 @@ public interface BuilderTrait {
 
                 //otherwise, update it.
                 BreakEntity entity = tile.entity();
+                current.lastEntity = entity;
 
                 entity.addProgress(core, unit, 1f / entity.breakTime * Timers.delta() * getBuildPower(tile));
                 unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(entity), 0.4f);
@@ -174,6 +176,7 @@ public interface BuilderTrait {
 
                 //otherwise, update it.
                 BuildEntity entity = tile.entity();
+                current.lastEntity = entity;
 
                 entity.addProgress(core.items, 1f / entity.recipe.cost * Timers.delta() * getBuildPower(tile));
                 if(unit instanceof Player){
@@ -288,7 +291,9 @@ public interface BuilderTrait {
         public final int x, y, rotation;
         public final Recipe recipe;
         public final boolean remove;
+
         public boolean requested;
+        public TileEntity lastEntity;
 
         public float progress;
 

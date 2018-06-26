@@ -42,6 +42,7 @@ public abstract class InputHandler extends InputAdapter{
 	final static float backTrns = 3f;
 
 	public final Player player;
+	public final String section;
 	public final OverlayFragment frag = new OverlayFragment(this);
 
 	public Recipe recipe;
@@ -50,6 +51,7 @@ public abstract class InputHandler extends InputAdapter{
 
 	public InputHandler(Player player){
 	    this.player = player;
+	    this.section = "player_" + (player.playerIndex + 1);
 	    Timers.run(1f, () -> frag.build(Core.scene.getRoot()));
     }
 

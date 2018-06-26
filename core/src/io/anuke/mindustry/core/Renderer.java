@@ -252,7 +252,7 @@ public class Renderer extends RendererModule{
 	}
 
 	private void drawAllTeams(boolean flying){
-		for(Team team : Team.values()){
+		for(Team team : Team.all){
 			EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
 
 			if(group.count(p -> p.isFlying() == flying) +

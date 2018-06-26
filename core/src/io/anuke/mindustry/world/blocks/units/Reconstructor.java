@@ -33,6 +33,7 @@ public class Reconstructor extends Block{
     protected float arriveTime = 40f;
     protected float powerPerTeleport = 5f;
     protected Effect arriveEffect = Fx.spawn;
+    protected TextureRegion openRegion;
 
     public Reconstructor(String name) {
         super(name);
@@ -40,6 +41,12 @@ public class Reconstructor extends Block{
         solidifes = true;
         hasPower = true;
         configurable = true;
+    }
+
+    @Override
+    public void load() {
+        super.load();
+        openRegion = Draw.region(name + "-open");
     }
 
     @Override
@@ -104,7 +111,7 @@ public class Reconstructor extends Block{
         if(entity.solid){
             Draw.rect(name, tile.drawx(), tile.drawy());
         }else{
-            Draw.rect(name + "-open", tile.drawx(), tile.drawy());
+            Draw.rect(openRegion, tile.drawx(), tile.drawy());
         }
 
         if(entity.current != null){

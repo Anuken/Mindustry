@@ -30,6 +30,8 @@ import static io.anuke.mindustry.Vars.tilesize;
 public class MechFactory extends Block{
     protected Mech mech;
 
+    protected TextureRegion openRegion;
+
     public MechFactory(String name){
         super(name);
         update = true;
@@ -52,10 +54,16 @@ public class MechFactory extends Block{
     }
 
     @Override
+    public void load() {
+        super.load();
+        openRegion = Draw.region(name + "-open");
+    }
+
+    @Override
     public void draw(Tile tile) {
         MechFactoryEntity entity = tile.entity();
 
-        Draw.rect(entity.open ? name + "-open" : name, tile.drawx(), tile.drawy());
+        Draw.rect(entity.open ? openRegion : Draw.region(name), tile.drawx(), tile.drawy());
 
         if(entity.player != null) {
             TextureRegion region = mech.iconRegion;

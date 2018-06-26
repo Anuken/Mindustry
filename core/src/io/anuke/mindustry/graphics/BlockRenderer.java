@@ -1,6 +1,7 @@
 package io.anuke.mindustry.graphics;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Sort;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
@@ -9,8 +10,6 @@ import io.anuke.mindustry.world.blocks.StaticBlock;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
-
-import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.core.Core.camera;
@@ -106,8 +105,8 @@ public class BlockRenderer{
 		floorRenderer.drawLayer(CacheLayer.walls);
 		floorRenderer.endDraw();
 		Graphics.begin();
-		
-		Arrays.sort(requests.items, 0, requestidx);
+
+		Sort.instance().sort(requests.items, 0, requestidx);
 		iterateidx = 0;
 	}
 

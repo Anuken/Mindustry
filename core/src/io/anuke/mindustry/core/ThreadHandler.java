@@ -61,7 +61,7 @@ public class ThreadHandler {
         }
     }
 
-    public int getFPS(){
+    public int getTPS(){
         return (int)(60/delta);
     }
 
@@ -112,7 +112,7 @@ public class ThreadHandler {
     }
 
     public boolean doInterpolate(){
-        return enabled && Math.abs(Gdx.graphics.getFramesPerSecond() - getFPS()) > 15;
+        return enabled && Math.abs(Gdx.graphics.getFramesPerSecond() - getTPS()) > 15;
     }
 
     public boolean isOnThread(){

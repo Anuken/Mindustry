@@ -15,7 +15,7 @@ public class Items implements ContentList{
     public void load() {
 
         stone = new Item("stone", Color.valueOf("777777")) {{
-            hardness = 2;
+            hardness = 3;
         }};
 
         tungsten = new Item("tungsten", Color.valueOf("a0b0c8")) {{

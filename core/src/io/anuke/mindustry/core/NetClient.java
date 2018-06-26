@@ -241,6 +241,10 @@ public class NetClient extends Module {
 
             //get data input for reading from the stream
             DataInputStream input = netClient.dataStream;
+
+            //read wave info
+            state.wavetime = input.readFloat();
+            state.wave = input.readInt();
             
             byte cores = input.readByte();
             for (int i = 0; i < cores; i++) {

@@ -457,7 +457,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
 				int i = 0;
 
-				for(Team team : Team.values()){
+				for(Team team : Team.all){
 					ImageButton button = new ImageButton("white", "toggle");
 					button.margin(4f, 4f, 10f, 4f);
 					button.getImageCell().grow();

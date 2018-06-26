@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.defense;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.Player;
@@ -22,13 +23,21 @@ public class Door extends Wall{
 	protected Effect openfx = BlockFx.dooropen;
 	protected Effect closefx = BlockFx.doorclose;
 
+	protected TextureRegion openRegion;
+
 	public Door(String name) {
 		super(name);
 		solid = false;
 		solidifes = true;
 		consumesTap = true;
 	}
-	
+
+	@Override
+	public void load() {
+		super.load();
+		openRegion = Draw.region(name + "-open");
+	}
+
 	@Override
 	public void draw(Tile tile){
 		DoorEntity entity = tile.entity();
@@ -36,7 +45,7 @@ public class Door extends Wall{
 		if(!entity.open){
 			Draw.rect(name, tile.drawx(), tile.drawy());
 		}else{
-			Draw.rect(name + "-open", tile.drawx(), tile.drawy());
+			Draw.rect(openRegion, tile.drawx(), tile.drawy());
 		}
 	}
 

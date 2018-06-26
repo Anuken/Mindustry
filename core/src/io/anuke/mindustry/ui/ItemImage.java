@@ -11,7 +11,7 @@ import io.anuke.ucore.scene.ui.layout.Table;
 public class ItemImage extends Stack {
     private Image image;
 
-    public ItemImage(TextureRegion region, Supplier<String> text, Color color) {
+    public ItemImage(TextureRegion region, Supplier<CharSequence> text, Color color) {
         Table t = new Table().left().bottom();
 
         t.label(text).get().setFontScale(0.5f);

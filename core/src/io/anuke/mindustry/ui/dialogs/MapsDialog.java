@@ -93,6 +93,10 @@ public class MapsDialog extends FloatingDialog {
             i ++;
         }
 
+        if(world.maps().all().size == 0){
+            maps.add("$text.maps.none");
+        }
+
         content().add(pane).uniformX();
     }
 

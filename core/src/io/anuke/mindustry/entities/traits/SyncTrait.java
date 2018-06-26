@@ -14,7 +14,7 @@ public interface SyncTrait extends Entity, TypeTrait {
 
     /**Whether smoothing of entities is enabled when using multithreading; not yet implemented.*/
     static boolean isSmoothing(){
-        return threads.isEnabled() && threads.getFPS() <= Gdx.graphics.getFramesPerSecond() / 2f;
+        return threads.isEnabled() && threads.getTPS() <= Gdx.graphics.getFramesPerSecond() / 2f;
     }
 
     /**Sets the position of this entity and updated the interpolator.*/

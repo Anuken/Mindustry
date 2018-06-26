@@ -17,7 +17,6 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
 public class Floor extends Block{
@@ -31,6 +30,7 @@ public class Floor extends Block{
 	protected TextureRegion edgeRegion;
 	protected TextureRegion[] edgeRegions;
 	protected TextureRegion[] cliffRegions;
+	protected TextureRegion[] variantRegions;
 	protected Vector2[] offsets;
 	protected Predicate<Floor> blends = block -> block != this && !block.blendOverride(this);
 	protected boolean blend = true;
@@ -72,6 +72,7 @@ public class Floor extends Block{
 	@Override
 	public void load() {
 		super.load();
+
 		if(blend) {
 			edgeRegion = Draw.hasRegion(name + "edge") ? Draw.region(name + "edge") : Draw.region(edge + "edge");
 			edgeRegions = new TextureRegion[8];
@@ -97,19 +98,23 @@ public class Floor extends Block{
 				offsets[i] = new Vector2(-4 + rx, -4 + ry);
 			}
 
-			if(Draw.hasRegion(name + "-cliff")){
-				cliffRegions = new TextureRegion[8];
-				TextureRegion base = Draw.region(name + "-cliff");
+			cliffRegions = new TextureRegion[4];
+			cliffRegions[0] = Draw.region(name + "-cliff-edge-2");
+			cliffRegions[1] = Draw.region(name + "-cliff-edge");
+			cliffRegions[2] = Draw.region(name + "-cliff-edge-1");
+			cliffRegions[3] = Draw.region(name + "-cliff-side");
+		}
 
-				for(int i = 0; i < 8; i ++){
-					int dx = Geometry.d8[i].x, dy = Geometry.d8[i].y;
+		//load variant regions for drawing
+		if(variants > 0){
+			variantRegions = new TextureRegion[variants];
 
-					TextureRegion region = new TextureRegion();
-					region.setTexture(base.getTexture());
-					region.setRegion(base.getRegionX() + tilesize + tilesize*dx, base.getRegionY() + tilesize - tilesize*dy, tilesize, tilesize);
-					cliffRegions[i] = region;
-				}
+			for (int i = 0; i < variants; i++) {
+				variantRegions[i] = Draw.region(name + (i + 1));
 			}
+		}else{
+			variantRegions = new TextureRegion[1];
+			variantRegions[0] = Draw.region(name);
 		}
 	}
 
@@ -133,9 +138,9 @@ public class Floor extends Block{
 	public void draw(Tile tile){
 		MathUtils.random.setSeed(tile.id());
 
-		Draw.rect(variants > 0 ? (name() + MathUtils.random(1, variants))  : name(), tile.worldx(), tile.worldy());
+		Draw.rect(variantRegions[Mathf.randomSeed(tile.id(), 0, Math.max(0, variantRegions.length-1))], tile.worldx(), tile.worldy());
 
-		if(Draw.hasRegion(name + "-cliff-side") && tile.cliffs != 0){
+		if(tile.cliffs != 0){
 			for(int i = 0; i < 4; i ++){
 				if((tile.cliffs & (1 << i*2)) != 0) {
 					Draw.colorl(i > 1 ? 0.6f : 1f);
@@ -143,13 +148,13 @@ public class Floor extends Block{
 					boolean above = (tile.cliffs & (1 << ((i+1)%4)*2)) != 0, below = (tile.cliffs & (1 << (Mathf.mod(i-1, 4))*2)) != 0;
 
 					if(above && below){
-						Draw.rect(name + "-cliff-edge-2", tile.worldx(), tile.worldy(), i * 90);
+						Draw.rect(cliffRegions[0], tile.worldx(), tile.worldy(), i * 90);
 					}else if(above){
-						Draw.rect(name + "-cliff-edge", tile.worldx(), tile.worldy(), i * 90);
+						Draw.rect(cliffRegions[1], tile.worldx(), tile.worldy(), i * 90);
 					}else if(below){
-						Draw.rect(name + "-cliff-edge-1", tile.worldx(), tile.worldy(), i * 90);
+						Draw.rect(cliffRegions[2], tile.worldx(), tile.worldy(), i * 90);
 					}else{
-						Draw.rect(name + "-cliff-side", tile.worldx(), tile.worldy(), i * 90);
+						Draw.rect(cliffRegions[3], tile.worldx(), tile.worldy(), i * 90);
 					}
 				}
 			}

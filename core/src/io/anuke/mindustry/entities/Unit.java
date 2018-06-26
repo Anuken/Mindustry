@@ -136,7 +136,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
         this.status.readSave(stream);
         this.inventory.readSave(stream);
-        this.team = Team.values()[team];
+        this.team = Team.all[team];
         this.health = health;
         this.x = x;
         this.y = y;

@@ -141,7 +141,7 @@ public class TypeIO {
 
     @ReadClass(Team.class)
     public static Team readTeam(ByteBuffer buffer){
-        return Team.values()[buffer.get()];
+        return Team.all[buffer.get()];
     }
 
     @WriteClass(AdminAction.class)

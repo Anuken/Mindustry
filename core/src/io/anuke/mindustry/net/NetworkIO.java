@@ -176,7 +176,7 @@ public class NetworkIO {
                         byte tr = stream.readByte();
                         short health = stream.readShort();
 
-                        tile.setTeam(Team.values()[Bits.getLeftByte(tr)]);
+                        tile.setTeam(Team.all[Bits.getLeftByte(tr)]);
                         tile.setRotation(Bits.getRightByte(tr));
 
                         tile.entity.health = health;
@@ -197,7 +197,7 @@ public class NetworkIO {
 
             byte teams = stream.readByte();
             for (int i = 0; i < teams; i++) {
-                Team team = Team.values()[stream.readByte()];
+                Team team = Team.all[stream.readByte()];
                 boolean ally = stream.readBoolean();
                 short cores = stream.readShort();
                 state.teams.add(team, ally);

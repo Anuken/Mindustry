@@ -47,6 +47,9 @@ public class CoreBlock extends StorageBlock {
     protected float droneRespawnDuration = 60*6;
     protected UnitType droneType = UnitTypes.drone;
 
+    protected TextureRegion openRegion;
+    protected TextureRegion topRegion;
+
     public CoreBlock(String name) {
         super(name);
 
@@ -62,6 +65,14 @@ public class CoreBlock extends StorageBlock {
     }
 
     @Override
+    public void load() {
+        super.load();
+
+        openRegion = Draw.region(name + "-open");
+        topRegion = Draw.region(name + "-top");
+    }
+
+    @Override
     public float handleDamage(Tile tile, float amount) {
         return debug ? 0 : amount;
     }
@@ -70,10 +81,10 @@ public class CoreBlock extends StorageBlock {
     public void draw(Tile tile) {
         CoreEntity entity = tile.entity();
 
-        Draw.rect(entity.solid ? name : name + "-open", tile.drawx(), tile.drawy());
+        Draw.rect(entity.solid ? Draw.region(name) : openRegion, tile.drawx(), tile.drawy());
 
         Draw.alpha(entity.heat);
-        Draw.rect(name + "-top", tile.drawx(), tile.drawy());
+        Draw.rect(topRegion, tile.drawx(), tile.drawy());
         Draw.color();
 
         if(entity.currentUnit != null) {

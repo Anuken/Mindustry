@@ -6,6 +6,7 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.util.Mathf;
 
 public class OreBlock extends Floor {
     public Floor base;
@@ -22,15 +23,7 @@ public class OreBlock extends Floor {
 
     @Override
     public void draw(Tile tile){
-
-        //Draw.rect(base.variants > 0 ? (base.name + MathUtils.random(1, base.variants))  : base.name, tile.worldx(), tile.worldy());
-
-        int rand = variants > 0 ? MathUtils.random(1, variants) : 0;
-
-       // Draw.color(0f, 0f, 0f, 0.2f);
-        //Draw.rect(variants > 0 ? (drops.item.name + rand)  : name, tile.worldx(), tile.worldy() - 1);
-        //Draw.color();
-        Draw.rect(name + rand, tile.worldx(), tile.worldy());
+        Draw.rect(variantRegions[Mathf.randomSeed(tile.id(), 0, Math.max(0, variantRegions.length-1))], tile.worldx(), tile.worldy());
 
         drawEdges(tile, false);
     }

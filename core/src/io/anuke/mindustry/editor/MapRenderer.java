@@ -106,7 +106,7 @@ public class MapRenderer implements Disposable{
         byte btr = editor.getMap().read(wx, wy, DataPosition.rotationTeam);
         byte elev = editor.getMap().read(wx, wy, DataPosition.elevation);
         byte rotation = Bits.getLeftByte(btr);
-        Team team = Team.values()[Bits.getRightByte(btr)];
+        Team team = Team.all[Bits.getRightByte(btr)];
 
         Block floor = Block.getByID(bf);
         Block wall = Block.getByID(bw);

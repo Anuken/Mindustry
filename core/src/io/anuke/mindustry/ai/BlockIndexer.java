@@ -73,8 +73,8 @@ public class BlockIndexer {
             ores = null;
 
             //create bitset for each team type that contains each quadrant
-            structQuadrants = new Bits[Team.values().length];
-            for(int i = 0; i < Team.values().length; i ++){
+            structQuadrants = new Bits[Team.all.length];
+            for(int i = 0; i < Team.all.length; i ++){
                 structQuadrants[i] = new Bits(Mathf.ceil(world.width() / (float)structQuadrantSize) * Mathf.ceil(world.height() / (float)structQuadrantSize));
             }
 

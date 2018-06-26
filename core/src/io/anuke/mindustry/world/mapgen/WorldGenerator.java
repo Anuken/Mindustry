@@ -53,7 +53,7 @@ public class WorldGenerator {
 
 				Tile tile = new Tile(x, y, marker.floor, marker.wall == Blocks.blockpart.id ? 0 : marker.wall, marker.rotation, marker.team, marker.elevation);
 
-				Team team = Team.values()[marker.team];
+				Team team = Team.all[marker.team];
 
 				if(tile.block().isMultiblock()){
 					multiblocks.add(tile.packedPosition());

@@ -18,6 +18,8 @@ public enum Difficulty {
     /**Scaling of max time between waves. Default time is 4 minutes.*/
     public final float maxTimeScaling;
 
+    private String value;
+
     Difficulty(float enemyScaling, float timeScaling, float maxTimeScaling){
         this.enemyScaling = enemyScaling;
         this.timeScaling = timeScaling;
@@ -26,6 +28,9 @@ public enum Difficulty {
 
     @Override
     public String toString() {
-        return Bundles.get("setting.difficulty." + name());
+        if(value == null){
+            value = Bundles.get("setting.difficulty." + name());
+        }
+        return value;
     }
 }

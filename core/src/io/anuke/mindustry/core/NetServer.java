@@ -328,11 +328,9 @@ public class NetServer extends Module{
                 //reset stream to begin writing
                 syncStream.reset();
 
-                int totalGroups = 0;
-
-                for (EntityGroup<?> group : Entities.getAllGroups()) {
-                    if (!group.isEmpty() && (group.all().get(0) instanceof SyncTrait)) totalGroups ++;
-                }
+                //write wave data
+                dataStream.writeFloat(state.wavetime);
+                dataStream.writeInt(state.wave);
 
                 Array<Tile> cores = state.teams.get(player.getTeam()).cores;
 
@@ -346,6 +344,12 @@ public class NetServer extends Module{
 
                 //write timestamp
                 dataStream.writeLong(TimeUtils.millis());
+
+                int totalGroups = 0;
+
+                for (EntityGroup<?> group : Entities.getAllGroups()) {
+                    if (!group.isEmpty() && (group.all().get(0) instanceof SyncTrait)) totalGroups ++;
+                }
 
                 //write total amount of serializable groups
                 dataStream.writeByte(totalGroups);

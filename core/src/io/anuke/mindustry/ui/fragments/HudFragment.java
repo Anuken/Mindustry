@@ -9,10 +9,10 @@ import com.badlogic.gdx.utils.Scaling;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Recipe;
+import io.anuke.mindustry.ui.IntFormat;
 import io.anuke.mindustry.ui.Minimap;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
@@ -35,10 +35,10 @@ public class HudFragment implements Fragment{
 	private ImageButton menu, flip;
 	private Table respawntable;
 	private Table wavetable;
-	private Label infolabel;
+	private Table infolabel;
 	private Table lastUnlockTable;
 	private Table lastUnlockLayout;
-	private boolean shown = true, done = true;
+	private boolean shown = true;
 	private float dsize = 58;
 	private float isize = 40;
 
@@ -109,16 +109,20 @@ public class HudFragment implements Fragment{
 				row();
 
 				visible(() -> !state.is(State.menu));
-
-				infolabel = new Label(() -> (Settings.getBool("fps") ? (Gdx.graphics.getFramesPerSecond() + " FPS") +
-						(threads.isEnabled() ?  " / " + threads.getFPS() + " TPS" : "") + (Net.client() && !gwt ? "\nPing: " + Net.getPing() : "") : ""));
 				row();
-				add(infolabel).size(-1);
+				new table(){{
+					IntFormat fps = new IntFormat("text.fps");
+					IntFormat tps = new IntFormat("text.tps");
+					IntFormat ping = new IntFormat("text.ping");
+					new label(() -> fps.get(Gdx.graphics.getFramesPerSecond())).padRight(10);
+					new label(() -> tps.get(threads.getTPS())).visible(() -> threads.isEnabled());
+					row();
+					new label(() -> ping.get(Net.getPing())).visible(() -> Net.client() && !gwt).colspan(2);
+
+					infolabel = get();
+				}}.size(-1).end();
 
 			}}.end();
-
-
-
 		}}.end();
 
 		new table(){{
@@ -285,25 +289,30 @@ public class HudFragment implements Fragment{
 	private String getEnemiesRemaining() {
 		if(state.enemies == 1) {
 			return Bundles.format("text.enemies.single", state.enemies);
-		} else return Bundles.format("text.enemies", state.enemies);
+		} else {
+			return Bundles.format("text.enemies", state.enemies);
+		}
 	}
 
 	private void addWaveTable(){
 		float uheight = 66f;
+
+		IntFormat wavef = new IntFormat("text.wave");
+		IntFormat timef = new IntFormat("text.wave.waiting");
 
 		wavetable = new table("button"){{
 			aleft();
 			new table(){{
 				aleft();
 
-				new label(() -> Bundles.format("text.wave", state.wave)).scale(fontScale *1.5f).left().padLeft(-6);
+				new label(() -> wavef.get(state.wave)).scale(fontScale *1.5f).left().padLeft(-6);
 
 				row();
 
-				new label(()-> state.enemies > 0 ?
+				new label(() -> state.enemies > 0 ?
 					getEnemiesRemaining() :
 						(state.mode.disableWaveTimer) ? "$text.waiting"
-								: Bundles.format("text.wave.waiting", (int) (state.wavetime / 60f)))
+								: timef.get((int) (state.wavetime / 60f)))
 				.minWidth(126).padLeft(-6).left();
 
 				margin(10f);

@@ -116,7 +116,7 @@ public class Pathfinder {
     private void createFor(Team team){
         PathData path = new PathData();
         path.search ++;
-        path.frontier.ensureCapacity(world.width() * world.height() / 2);
+        path.frontier.ensureCapacity((world.width() + world.height()) * 3);
 
         paths[team.ordinal()] = path;
 
@@ -167,7 +167,7 @@ public class Pathfinder {
     private void clear(){
         Timers.mark();
 
-        paths = new PathData[Team.values().length];
+        paths = new PathData[Team.all.length];
         blocked.clear();
 
         for(TeamData data : state.teams.getTeams()){

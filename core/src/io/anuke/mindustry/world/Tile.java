@@ -137,7 +137,7 @@ public class Tile implements PosTrait, TargetTrait {
 	}
 
 	public Team getTeam(){
-		return Team.values()[team];
+		return Team.all[team];
 	}
 
 	public byte getTeamID(){

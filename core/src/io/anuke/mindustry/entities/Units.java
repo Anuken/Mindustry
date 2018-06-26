@@ -220,7 +220,7 @@ public class Units {
     /**Iterates over all units in a rectangle.*/
     public static void getNearby(Rectangle rect, Consumer<Unit> cons){
 
-        for(Team team : Team.values()){
+        for(Team team : Team.all){
             EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
             if(!group.isEmpty()){
                 EntityPhysics.getNearby(group, rect, entity -> cons.accept((Unit)entity));
@@ -253,7 +253,7 @@ public class Units {
     /**Iterates over all units.*/
     public static void getAllUnits(Consumer<Unit> cons){
 
-        for(Team team : Team.values()){
+        for(Team team : Team.all){
             EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
             for(Unit unit : group.all()){
                 cons.accept(unit);

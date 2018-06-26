@@ -42,7 +42,7 @@ public class MapIO {
                 Block floor = Block.getByID(marker.floor);
                 Block wall = Block.getByID(marker.wall);
                 int wallc = ColorMapper.getBlockColor(wall);
-                if(wallc == 0 && (wall.update || wall.solid || wall.breakable)) wallc = Team.values()[marker.team].intColor;
+                if(wallc == 0 && (wall.update || wall.solid || wall.breakable)) wallc = Team.all[marker.team].intColor;
                 wallc = wallc == 0 ? ColorMapper.getBlockColor(floor) : wallc;
                 if(marker.elevation > 0){
                     float scaling = 1f + marker.elevation/8f;

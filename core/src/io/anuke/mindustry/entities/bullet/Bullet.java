@@ -145,7 +145,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 		y = data.readFloat();
 		velocity.x = data.readFloat();
 		velocity.y = data.readFloat();
-		team = Team.values()[data.readByte()];
+		team = Team.all[data.readByte()];
 		type = BulletType.getByID(data.readByte());
 	}
 

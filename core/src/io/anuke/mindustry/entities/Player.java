@@ -502,7 +502,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 		movement.setZero();
 
-		String section = "player_" + (playerIndex + 1);
+		String section = control.input(playerIndex).section;
 
 		float xa = Inputs.getAxis(section, "move_x");
 		float ya = Inputs.getAxis(section, "move_y");

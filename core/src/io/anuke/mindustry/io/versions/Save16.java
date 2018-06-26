@@ -115,9 +115,9 @@ public class Save16 extends SaveFileVersion {
                     byte team = Bits.getLeftByte(tr);
                     byte rotation = Bits.getRightByte(tr);
 
-                    Team t = Team.values()[team];
+                    Team t = Team.all[team];
 
-                    tile.setTeam(Team.values()[team]);
+                    tile.setTeam(Team.all[team]);
                     tile.entity.health = health;
                     tile.setRotation(rotation);
 

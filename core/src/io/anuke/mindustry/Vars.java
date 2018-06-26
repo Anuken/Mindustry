@@ -154,11 +154,11 @@ public class Vars{
 		puddleGroup = Entities.addGroup(Puddle.class, false).enableMapping();
 		itemGroup = Entities.addGroup(ItemDrop.class).enableMapping();
 		fireGroup = Entities.addGroup(Fire.class, false).enableMapping();
-		unitGroups = new EntityGroup[Team.values().length];
+		unitGroups = new EntityGroup[Team.all.length];
 
 		threads = new ThreadHandler(Platform.instance.getThreadProvider());
 
-		for(Team team : Team.values()){
+		for(Team team : Team.all){
 			unitGroups[team.ordinal()] = Entities.addGroup(BaseUnit.class).enableMapping();
 		}
 
