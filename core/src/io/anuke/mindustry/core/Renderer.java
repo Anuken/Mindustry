@@ -86,11 +86,10 @@ public class Renderer extends RendererModule{
 						entity.data = data;
 						entity.id ++;
 						entity.set(x, y);
-						effectGroup.add(entity);
-
 						if(data instanceof BaseEntity){
 							entity.setParent((BaseEntity)data);
 						}
+						threads.runGraphics(() -> effectGroup.add(entity));
 					}else{
 						GroundEffectEntity entity = Pools.obtain(GroundEffectEntity.class);
 						entity.effect = effect;
@@ -99,7 +98,7 @@ public class Renderer extends RendererModule{
 						entity.id ++;
 						entity.data = data;
 						entity.set(x, y);
-						groundEffectGroup.add(entity);
+						threads.runGraphics(() -> groundEffectGroup.add(entity));
 					}
 				}
 			}

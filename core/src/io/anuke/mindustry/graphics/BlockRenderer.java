@@ -71,7 +71,9 @@ public class BlockRenderer{
 					Block block = tile.block();
 					
 					if(!expanded && block != Blocks.air && world.isAccessible(worldx, worldy)){
-						block.drawShadow(tile);
+						synchronized (Tile.tileSetLock) {
+							block.drawShadow(tile);
+						}
 					}
 					
 					if(!(block instanceof StaticBlock)){
@@ -130,12 +132,14 @@ public class BlockRenderer{
 				layerBegins(req.layer);
 			}
 
-			if(req.layer == Layer.block){
-				block.draw(req.tile);
-			}else if(req.layer == block.layer){
-				block.drawLayer(req.tile);
-			}else if(req.layer == block.layer2){
-				block.drawLayer2(req.tile);
+			synchronized (Tile.tileSetLock) {
+				if (req.layer == Layer.block) {
+					block.draw(req.tile);
+				} else if (req.layer == block.layer) {
+					block.drawLayer(req.tile);
+				} else if (req.layer == block.layer2) {
+					block.drawLayer2(req.tile);
+				}
 			}
 
 			lastLayer = req.layer;

@@ -94,6 +94,8 @@ public class MinimapRenderer implements Disposable{
     }
 
     public TextureRegion getRegion() {
+        if(texture == null) return null;
+
         int sz = Mathf.clamp(baseSize * zoom, baseSize, Math.min(world.width(), world.height()));
         float dx = (Core.camera.position.x / tilesize);
         float dy = (Core.camera.position.y / tilesize);

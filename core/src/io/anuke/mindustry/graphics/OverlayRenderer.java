@@ -50,7 +50,10 @@ public class OverlayRenderer {
             //draw config selected block
             if(input.frag.config.isShown()){
                 Tile tile = input.frag.config.getSelectedTile();
-                tile.block().drawConfigure(tile);
+
+                synchronized (Tile.tileSetLock) {
+                    tile.block().drawConfigure(tile);
+                }
             }
 
             input.drawTop();
@@ -132,7 +135,9 @@ public class OverlayRenderer {
                         drawbars.run();
                     }
 
-                    target.block().drawSelect(target);
+                    synchronized (Tile.tileSetLock) {
+                        target.block().drawSelect(target);
+                    }
                 }
             }
 

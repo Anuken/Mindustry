@@ -55,6 +55,9 @@ public class Drill extends Block{
 	protected boolean drawRim = false;
 
 	protected Color heatColor = Color.valueOf("ff5512");
+	protected TextureRegion rimRegion;
+	protected TextureRegion rotatorRegion;
+	protected TextureRegion topRegion;
 
 	public Drill(String name) {
 		super(name);
@@ -66,6 +69,14 @@ public class Drill extends Block{
 		hasLiquids = true;
 		liquidCapacity = 5f;
 		hasItems = true;
+	}
+
+	@Override
+	public void load() {
+		super.load();
+		rimRegion = Draw.region(name + "-rim");
+		rotatorRegion = Draw.region(name + "-rotator");
+		topRegion = Draw.region(name + "-top");
 	}
 
 	@Override
@@ -81,14 +92,14 @@ public class Drill extends Block{
 			Graphics.setAdditiveBlending();
 			Draw.color(heatColor);
 			Draw.alpha(entity.warmup * ts * (1f-s + Mathf.absin(Timers.time(), 3f, s)));
-			Draw.rect(name + "-rim", tile.drawx(), tile.drawy());
+			Draw.rect(rimRegion, tile.drawx(), tile.drawy());
 			Draw.color();
 			Graphics.setNormalBlending();
 		}
 
-		Draw.rect(name + "-rotator", tile.drawx(), tile.drawy(), entity.drillTime * rotateSpeed);
+		Draw.rect(rotatorRegion, tile.drawx(), tile.drawy(), entity.drillTime * rotateSpeed);
 
-		Draw.rect(name + "-top", tile.drawx(), tile.drawy());
+		Draw.rect(topRegion, tile.drawx(), tile.drawy());
 
 		if(!isMultiblock() && isValid(tile)) {
 			Draw.color(tile.floor().drops.item.color);
