@@ -126,7 +126,10 @@ public interface BuilderTrait {
                 if(Build.validBreak(unit.getTeam(), current.x, current.y)){
                     //if it's valid, place it
                     //FIXME a player instance is required here, but the the builder may not be a player
-                    CallBlocks.breakBlock((Player)unit, unit.getTeam(), current.x, current.y);
+                    if(!current.requested){
+                        CallBlocks.breakBlock((Player)unit, unit.getTeam(), current.x, current.y);
+                        current.requested = true;
+                    }
                 }else{
                     //otherwise, skip it
                     getPlaceQueue().removeFirst();
