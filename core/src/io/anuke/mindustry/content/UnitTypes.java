@@ -18,6 +18,7 @@ public class UnitTypes implements ContentList {
             maxVelocity = 0.8f;
             ammoCapacity = 0;
             range = 50f;
+            health = 45;
         }};
 
         scout = new UnitType("scout", Scout.class, Scout::new){{
@@ -25,7 +26,8 @@ public class UnitTypes implements ContentList {
             speed = 0.2f;
             drag = 0.4f;
             range = 40f;
-            weapon = Weapons.blaster;
+            weapon = Weapons.chainBlaster;
+            health = 70;
         }};
 
         titan = new UnitType("titan", Titan.class, Titan::new){{
@@ -33,7 +35,8 @@ public class UnitTypes implements ContentList {
             speed = 0.18f;
             drag = 0.4f;
             range = 10f;
-            weapon = Weapons.shockgun;
+            weapon = Weapons.chainBlaster;
+            health = 260;
         }};
 
         vtol = new UnitType("vtol", Vtol.class, Vtol::new){{
@@ -45,7 +48,7 @@ public class UnitTypes implements ContentList {
         }};
 
         monsoon = new UnitType("monsoon", Monsoon.class, Monsoon::new){{
-            health = 300;
+            health = 230;
             speed = 0.2f;
             maxVelocity = 1.5f;
             drag = 0.01f;

@@ -179,6 +179,8 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
         //effects-only code
         if(amount >= maxLiquid/2f && updateTime <= 0f){
             Units.getNearby(rect.setSize(Mathf.clamp(amount/(maxLiquid/1.5f))*10f).setCenter(x, y), unit -> {
+                if(unit.isFlying()) return;
+
                 unit.getHitbox(rect2);
                 if(!rect.overlaps(rect2)) return;
 

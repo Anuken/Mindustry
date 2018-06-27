@@ -8,8 +8,6 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.type.Weapon;
 
-import static io.anuke.mindustry.Vars.state;
-
 /**A spawn group defines spawn information for a specific type of unit, with optional extra information like
  * weapon equipped, ammo used, and status effects.
  * Each spawn group can have multiple sub-groups spawned in different areas of the map.*/
@@ -50,7 +48,7 @@ public class SpawnGroup {
 		if(wave < begin || wave > end || (wave - begin) % spacing != 0){
 			return 0;
 		}
-		float scaling = this.unitScaling * state.difficulty.enemyScaling;
+		float scaling = this.unitScaling;
 		
 		return Math.min(unitAmount-1 + Math.max((int)((wave / spacing) / scaling), 1), max);
 	}
@@ -75,7 +73,7 @@ public class SpawnGroup {
 		}
 
 		if(effect != null){
-			unit.applyEffect(effect, 1f);
+			unit.applyEffect(effect, 10000f);
 		}
 
 		if(items != null){

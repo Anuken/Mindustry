@@ -78,8 +78,14 @@ public class Generators {
                     image.draw(type.legRegion, true, false);
                     image.draw(type.region);
 
-                    image.draw(type.weapon.equipRegion, -(int)type.weaponOffsetX, (int)type.weaponOffsetY, false, false);
-                    image.draw(type.weapon.equipRegion, (int)type.weaponOffsetX, (int)type.weaponOffsetY, true, false);
+                    image.draw(type.weapon.equipRegion,
+                            -(int)type.weaponOffsetX + (image.width() - type.weapon.equipRegion.getRegionWidth())/2,
+                            (int)type.weaponOffsetY - (image.height() - type.weapon.equipRegion.getRegionHeight())/2,
+                            false, false);
+                    image.draw(type.weapon.equipRegion,
+                            (int)type.weaponOffsetX + (image.width() - type.weapon.equipRegion.getRegionWidth())/2,
+                            (int)type.weaponOffsetY - (image.height() - type.weapon.equipRegion.getRegionHeight())/2,
+                            true, false);
                 }
 
                 image.save("unit-icon-" + type.name);

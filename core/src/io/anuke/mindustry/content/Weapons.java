@@ -9,7 +9,7 @@ import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.type.Weapon;
 
 public class Weapons implements ContentList {
-    public static Weapon blaster, shockgun, sapper, swarmer, bomber;
+    public static Weapon blaster, chainBlaster, shockgun, sapper, swarmer, bomber, flakgun, flamethrower;
 
     @Override
     public void load() {
@@ -22,6 +22,14 @@ public class Weapons implements ContentList {
             setAmmo(AmmoTypes.bulletLead);
         }};
 
+        chainBlaster = new Weapon("chain-blaster") {{
+            length = 1.5f;
+            reload = 20f;
+            roundrobin = true;
+            ejectEffect = ShootFx.shellEjectSmall;
+            setAmmo(AmmoTypes.bulletLead, AmmoTypes.bulletCarbide, AmmoTypes.bulletTungsten, AmmoTypes.bulletSilicon, AmmoTypes.bulletThorium);
+        }};
+
         shockgun = new Weapon("shockgun") {{
             length = 1f;
             reload = 50f;
@@ -32,6 +40,27 @@ public class Weapons implements ContentList {
             velocityRnd = 0.7f;
             ejectEffect = ShootFx.shellEjectSmall;
             setAmmo(AmmoTypes.shotgunTungsten);
+        }};
+
+        flakgun = new Weapon("flakgun") {{
+            length = 1f;
+            reload = 70f;
+            roundrobin = true;
+            shots = 1;
+            inaccuracy = 3f;
+            recoil = 3f;
+            velocityRnd = 0.1f;
+            ejectEffect = ShootFx.shellEjectMedium;
+            setAmmo(AmmoTypes.shellCarbide);
+        }};
+
+        flamethrower = new Weapon("flamethrower") {{
+            length = 1f;
+            reload = 14f;
+            roundrobin = true;
+            recoil = 1f;
+            ejectEffect = Fx.none;
+            setAmmo(AmmoTypes.flamerThermite);
         }};
 
         sapper = new Weapon("sapper") {{
@@ -58,7 +87,7 @@ public class Weapons implements ContentList {
             ejectEffect = Fx.none;
             velocityRnd = 1f;
             inaccuracy = 40f;
-            setAmmo(AmmoTypes.bombExplosive, AmmoTypes.bombIncendiary);
+            setAmmo(AmmoTypes.bombExplosive, AmmoTypes.bombIncendiary, AmmoTypes.bombOil);
         }};
     }
 

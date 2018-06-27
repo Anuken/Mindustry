@@ -10,13 +10,45 @@ import io.anuke.mindustry.type.ContentList;
 
 public class AmmoTypes implements ContentList {
     public static AmmoType bulletTungsten, bulletLead, bulletCarbide, bulletThorium, bulletSilicon, bulletThermite,
-            shotgunTungsten, bombExplosive, bombIncendiary,
+            shotgunTungsten, bombExplosive, bombIncendiary, bombOil, shellCarbide, flamerThermite,
             flakLead, flakExplosive, flakPlastic, flakSurge, missileExplosive, missileIncindiary, missileSurge,
             artilleryCarbide, artilleryThorium, artilleryPlastic, artilleryHoming, artilleryIncindiary,
             basicFlame, lancerLaser, lightning, spectreLaser, meltdownLaser, fuseShotgun, oil, water, lava, cryofluid;
 
     @Override
     public void load() {
+
+        //weapon specific
+
+        shotgunTungsten = new AmmoType(Items.tungsten, WeaponBullets.tungstenShotgun, 2) {{
+            shootEffect = ShootFx.shootBig;
+            smokeEffect = ShootFx.shootBigSmoke;
+            recoil = 1f;
+        }};
+
+        shellCarbide = new AmmoType(Items.carbide, WeaponBullets.shellCarbide, 2) {{
+            shootEffect = ShootFx.shootBig;
+            smokeEffect = ShootFx.shootBigSmoke;
+        }};
+
+        bombExplosive = new AmmoType(Items.blastCompound, WeaponBullets.bombExplosive, 3) {{
+            shootEffect = Fx.none;
+            smokeEffect = Fx.none;
+        }};
+
+        bombIncendiary = new AmmoType(Items.thermite, WeaponBullets.bombIncendiary, 3) {{
+            shootEffect = Fx.none;
+            smokeEffect = Fx.none;
+        }};
+
+        bombOil = new AmmoType(Items.coal, WeaponBullets.bombOil, 3) {{
+            shootEffect = Fx.none;
+            smokeEffect = Fx.none;
+        }};
+
+        flamerThermite = new AmmoType(Items.thermite, TurretBullets.basicFlame, 3) {{
+            shootEffect = ShootFx.shootSmallFlame;
+        }};
 
         //bullets
 
@@ -54,24 +86,6 @@ public class AmmoTypes implements ContentList {
             shootEffect = ShootFx.shootSmall;
             smokeEffect = ShootFx.shootSmallSmoke;
             inaccuracy = 3f;
-        }};
-
-        //shotgun (delta mech)
-
-        shotgunTungsten = new AmmoType(Items.tungsten, WeaponBullets.tungstenShotgun, 2) {{
-            shootEffect = ShootFx.shootBig;
-            smokeEffect = ShootFx.shootBigSmoke;
-            recoil = 1f;
-        }};
-
-        bombExplosive = new AmmoType(Items.blastCompound, WeaponBullets.bombExplosive, 3) {{
-            shootEffect = Fx.none;
-            smokeEffect = Fx.none;
-        }};
-
-        bombIncendiary = new AmmoType(Items.thermite, WeaponBullets.bombIncendiary, 3) {{
-            shootEffect = Fx.none;
-            smokeEffect = Fx.none;
         }};
 
         //flak

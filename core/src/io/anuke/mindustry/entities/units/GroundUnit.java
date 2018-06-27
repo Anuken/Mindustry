@@ -155,7 +155,7 @@ public abstract class GroundUnit extends BaseUnit {
 
     @Override
     public void readSave(DataInput stream) throws IOException{
-        weapon = Upgrade.getByID(weapon.id);
+        weapon = Upgrade.getByID(stream.readByte());
         super.readSave(stream);
     }
 
@@ -229,7 +229,7 @@ public abstract class GroundUnit extends BaseUnit {
                 state.set(resupply);
             }else if(target != null){
                 if(core != null){
-                    if(dst > inventory.getAmmo().getRange() * 0.7f){
+                    if(dst > inventory.getAmmo().getRange() * 0.5f){
                         moveToCore();
                     }
 

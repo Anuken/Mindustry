@@ -30,6 +30,8 @@ public class WaveSpawner {
 
     public WaveSpawner(){
         Events.on(WorldLoadEvent.class, this::reset);
+
+        WaveCreator.testWaves(0, 200);
     }
 
     public void write(DataOutput output) throws IOException{
@@ -77,14 +79,16 @@ public class WaveSpawner {
             }
         }
 
+        int addGround = groundGroups - groundSpawns.size, addFly = flyGroups - flySpawns.size;
+
         //add extra groups if the total exceeds it
-        for (int i = 0; i < groundGroups - groundSpawns.size; i++) {
+        for (int i = 0; i < addGround; i++) {
             GroundSpawn spawn = new GroundSpawn();
             findLocation(spawn);
             groundSpawns.add(spawn);
         }
 
-        for (int i = 0; i < flyGroups - flySpawns.size; i++) {
+        for (int i = 0; i < addFly; i++) {
             FlyerSpawn spawn = new FlyerSpawn();
             findLocation(spawn);
             flySpawns.add(spawn);

@@ -71,6 +71,9 @@ public class Recipes implements ContentList{
         new Recipe(crafting, CraftingBlocks.blastMixer, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 60), new ItemStack(Items.carbide, 40));
         new Recipe(crafting, CraftingBlocks.cryofluidmixer, new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 80), new ItemStack(Items.titanium, 90));
 
+        new Recipe(crafting, CraftingBlocks.melter, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 70), new ItemStack(Items.carbide, 90));
+        new Recipe(crafting, CraftingBlocks.incinerator, new ItemStack(Items.carbide, 10), new ItemStack(Items.lead, 30));
+
         //processing
         new Recipe(crafting, CraftingBlocks.biomatterCompressor, new ItemStack(Items.lead, 70), new ItemStack(Items.silicon, 60));
         new Recipe(crafting, CraftingBlocks.separator, new ItemStack(Items.tungsten, 60), new ItemStack(Items.carbide, 50));
@@ -113,7 +116,7 @@ public class Recipes implements ContentList{
         //new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 30));
 
         //actual unit related stuff
-        new Recipe(units, UnitBlocks.droneFactory, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 80));
+        new Recipe(units, UnitBlocks.droneFactory, new ItemStack(Items.tungsten, 50), new ItemStack(Items.lead, 90), new ItemStack(Items.silicon, 130));
         new Recipe(units, UnitBlocks.repairPoint, new ItemStack(Items.lead, 30), new ItemStack(Items.tungsten, 30), new ItemStack(Items.silicon, 30));
         new Recipe(units, UnitBlocks.resupplyPoint, new ItemStack(Items.lead, 30), new ItemStack(Items.tungsten, 30), new ItemStack(Items.silicon, 30));
 
