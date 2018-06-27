@@ -143,11 +143,13 @@ public class BuildBlock extends Block {
 
     @Remote(called = Loc.server, in = In.blocks)
     public static void onBuildDeath(Tile tile){
+        if(tile.entity == null) return;
         tile.entity.damage(tile.entity.health + 1);
     }
 
     @Remote(called = Loc.server, in = In.blocks)
     public static void onBuildFinish(Tile tile, Player lastBuilder){
+        if(tile.entity == null) return;
         BuildEntity entity = tile.entity();
 
         Team team = tile.getTeam();
