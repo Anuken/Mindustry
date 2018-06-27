@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Wall;
@@ -69,7 +68,7 @@ public class DeflectorWall extends Wall {
             bullet.getVelocity().y *= -1;
         }
 
-        bullet.updateVelocity(BulletType.getByID(bullet.getTypeID()).drag);
+        bullet.updateVelocity(0f);
         bullet.resetOwner(entity, Team.none);
         bullet.scaleTime(1f);
         bullet.supressCollision();

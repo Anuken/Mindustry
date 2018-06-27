@@ -1,7 +1,6 @@
 package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
@@ -10,24 +9,22 @@ import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.ScorchDecal;
+import io.anuke.mindustry.entities.traits.ShooterTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.units.UnitFactory.UnitFactoryEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
@@ -38,13 +35,13 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
-public abstract class BaseUnit extends Unit{
-	private static int timerIndex = 0;
+public abstract class BaseUnit extends Unit implements ShooterTrait{
+	protected static int timerIndex = 0;
 
 	protected static final int timerTarget = timerIndex++;
-	protected static final int timerReload = timerIndex++;
 
-	protected static final Array<Tile> nearbyCores = new Array<>();
+	protected static final int timerShootLeft = timerIndex++;
+	protected static final int timerShootRight = timerIndex++;
 
 	protected UnitType type;
 	protected Timer timer = new Timer(5);
@@ -55,7 +52,10 @@ public abstract class BaseUnit extends Unit{
 	protected Squad squad;
 	protected int spawner = -1;
 
-	public BaseUnit(UnitType type, Team team){
+	/**Initialize the type and team of this unit. Only call once!*/
+	public void init(UnitType type, Team team){
+		if(this.type != null) throw new RuntimeException("This unit is already initialized!");
+
 		this.type = type;
 		this.team = team;
 	}
@@ -111,11 +111,6 @@ public abstract class BaseUnit extends Unit{
 			target = null;
 		}
 	}
-
-	public void shoot(AmmoType type, float rotation){
-		CallEntity.onUnitShoot(this, type, rotation);
-	}
-
 	public void targetClosestAllyFlag(BlockFlag flag){
 		if(target != null) return;
 
@@ -155,8 +150,23 @@ public abstract class BaseUnit extends Unit{
 	}
 
 	@Override
+	public Timer getTimer() {
+		return timer;
+	}
+
+	@Override
+	public int getShootTimer(boolean left) {
+		return left ? timerShootLeft : timerShootRight;
+	}
+
+	@Override
+	public Weapon getWeapon() {
+		return type.weapon;
+	}
+
+	@Override
 	public TextureRegion getIconRegion() {
-		return Draw.region(type.name);
+		return type.iconRegion;
 	}
 
 	@Override
@@ -195,12 +205,12 @@ public abstract class BaseUnit extends Unit{
 
 	@Override
 	public boolean acceptsAmmo(Item item) {
-		return type.ammo.containsKey(item) && inventory.canAcceptAmmo(type.ammo.get(item));
+		return getWeapon().getAmmoType(item) != null && inventory.canAcceptAmmo(getWeapon().getAmmoType(item));
 	}
 
 	@Override
 	public void addAmmo(Item item) {
-		inventory.addAmmo(type.ammo.get(item));
+		inventory.addAmmo(getWeapon().getAmmoType(item));
 	}
 
 	@Override
@@ -338,19 +348,6 @@ public abstract class BaseUnit extends Unit{
 
 	public void onSuperDeath(){
 		super.onDeath();
-	}
-
-	@Remote(called = Loc.server, in = In.entities)
-	public static void onUnitShoot(BaseUnit unit, AmmoType type, float rotation){
-		if(unit == null) return;
-
-		Bullet.create(type.bullet, unit,
-				unit.x + Angles.trnsx(rotation, unit.type.shootTranslation),
-				unit.y + Angles.trnsy(rotation, unit.type.shootTranslation), rotation);
-		Effects.effect(type.shootEffect, unit.x + Angles.trnsx(rotation, unit.type.shootTranslation),
-				unit.y + Angles.trnsy(rotation, unit.type.shootTranslation), rotation, unit);
-		Effects.effect(type.smokeEffect, unit.x + Angles.trnsx(rotation, unit.type.shootTranslation),
-				unit.y + Angles.trnsy(rotation, unit.type.shootTranslation), rotation, unit);
 	}
 
 	@Remote(called = Loc.server, in = In.entities)

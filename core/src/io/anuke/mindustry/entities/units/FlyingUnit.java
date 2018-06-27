@@ -5,9 +5,9 @@ import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.CarriableTrait;
 import io.anuke.mindustry.entities.traits.CarryTrait;
-import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Tile;
@@ -28,10 +28,6 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
 
     protected Trail trail = new Trail(8);
     protected CarriableTrait carrying;
-
-    public FlyingUnit(UnitType type, Team team) {
-        super(type, team);
-    }
 
     //instantiation only
     public FlyingUnit(){
@@ -60,6 +56,8 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
         updateRotation();
         trail.update(x + Angles.trnsx(rotation + 180f, 6f) + Mathf.range(wobblyness),
                 y + Angles.trnsy(rotation + 180f, 6f) + Mathf.range(wobblyness));
+
+        wobble();
     }
 
     @Override
@@ -114,15 +112,15 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
         return 60;
     }
 
-    @Override
-    public void removed() {
-        dropCarry();
-    }
+    protected void wobble(){
+        if(Net.client()) return;
 
-    @Override
-    public void onDeath() {
-        super.onDeath();
-        dropCarry();
+        x += Mathf.sin(Timers.time() + id * 999, 25f, 0.07f);
+        y += Mathf.cos(Timers.time() + id * 999, 25f, 0.07f);
+
+        if (velocity.len() <= 0.2f) {
+            rotation += Mathf.sin(Timers.time() + id * 99, 10f, 8f);
+        }
     }
 
     protected void updateRotation(){
@@ -237,14 +235,14 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
             }else{
                 attack(150f);
 
-                if (timer.get(timerReload, type.reload) && Mathf.angNear(angleTo(target), rotation, 13f)
+                if ((Mathf.angNear(angleTo(target), rotation, 15f) || !inventory.getAmmo().bullet.keepVelocity) //bombers don't care about rotation
                         && distanceTo(target) < inventory.getAmmo().getRange()) {
                     AmmoType ammo = inventory.getAmmo();
                     inventory.useAmmo();
 
                     Vector2 to = Predict.intercept(FlyingUnit.this, target, ammo.bullet.speed);
 
-                    shoot(ammo, Angles.moveToward(rotation, angleTo(to.x, to.y), maxAim));
+                    getWeapon().update(FlyingUnit.this, to.x, to.y);
                 }
             }
         }

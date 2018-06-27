@@ -8,6 +8,8 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.AmmoType;
+import io.anuke.mindustry.type.Upgrade;
+import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.meta.BlockFlag;
@@ -18,21 +20,26 @@ import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 import static io.anuke.mindustry.Vars.world;
 
 public abstract class GroundUnit extends BaseUnit {
     protected static Translator vec = new Translator();
     protected static float maxAim = 30f;
 
+    protected static final int timerReloadAlt = timerIndex++;
+
     protected float walkTime;
     protected float baseRotation;
+    protected Weapon weapon;
 
-    public GroundUnit(UnitType type, Team team) {
-        super(type, team);
-    }
-
-    public GroundUnit(){
-
+    @Override
+    public void init(UnitType type, Team team) {
+        super.init(type, team);
+        this.weapon = type.weapon;
     }
 
     @Override
@@ -65,6 +72,11 @@ public abstract class GroundUnit extends BaseUnit {
     }
 
     @Override
+    public Weapon getWeapon() {
+        return weapon;
+    }
+
+    @Override
     public void draw() {
         Draw.alpha(hitTime / hitDuration);
 
@@ -79,7 +91,7 @@ public abstract class GroundUnit extends BaseUnit {
         }
 
         for (int i : Mathf.signs) {
-            Draw.rect(type.name + "-leg",
+            Draw.rect(type.legRegion,
                     x + Angles.trnsx(baseRotation, ft * i),
                     y + Angles.trnsy(baseRotation, ft * i),
                     12f * i, 12f - Mathf.clamp(ft * i, 0, 2), baseRotation - 90);
@@ -91,9 +103,17 @@ public abstract class GroundUnit extends BaseUnit {
             Draw.tint(Color.WHITE);
         }
 
-        Draw.rect(type.name + "-base", x, y, baseRotation- 90);
+        Draw.rect(type.baseRegion, x, y, baseRotation- 90);
 
-        Draw.rect(type.name, x, y, rotation -90);
+        Draw.rect(type.region, x, y, rotation -90);
+
+        for (int i : Mathf.signs) {
+            float tra = rotation - 90, trY = - weapon.getRecoil(this, i > 0) + type.weaponOffsetY;
+            float w = i > 0 ? -12 : 12;
+            Draw.rect(weapon.equipRegion,
+                    x + Angles.trnsx(tra, type.weaponOffsetX * i, trY),
+                    y + Angles.trnsy(tra, type.weaponOffsetX * i, trY), w, 12, rotation - 90);
+        }
 
         Draw.alpha(1f);
     }
@@ -112,6 +132,34 @@ public abstract class GroundUnit extends BaseUnit {
         if(Units.invalidateTarget(target, team,  x, y, Float.MAX_VALUE)){
             target = null;
         }
+    }
+
+    @Override
+    public void write(DataOutput data) throws IOException {
+        super.write(data);
+        data.writeByte(weapon.id);
+    }
+
+    @Override
+    public void read(DataInput data, long time) throws IOException {
+        super.read(data, time);
+        weapon = Upgrade.getByID(data.readByte());
+    }
+
+    @Override
+    public void writeSave(DataOutput stream) throws IOException {
+        stream.writeByte(weapon.id);
+        super.writeSave(stream);
+    }
+
+    @Override
+    public void readSave(DataInput stream) throws IOException{
+        weapon = Upgrade.getByID(weapon.id);
+        super.readSave(stream);
+    }
+
+    public void setWeapon(Weapon weapon){
+        this.weapon = weapon;
     }
 
     protected void moveToCore(){
@@ -191,15 +239,13 @@ public abstract class GroundUnit extends BaseUnit {
                     rotate(angleTo(target));
                 }
 
-                if (timer.get(timerReload, type.reload) && Mathf.angNear(angleTo(target), rotation, 13f)
-                        && distanceTo(target) < inventory.getAmmo().getRange()) {
+                if (Mathf.angNear(angleTo(target), rotation, 13f) && distanceTo(target) < inventory.getAmmo().getRange()) {
                     AmmoType ammo = inventory.getAmmo();
-                    inventory.useAmmo();
                     rotate(angleTo(target));
 
                     Vector2 to = Predict.intercept(GroundUnit.this, target, ammo.bullet.speed);
 
-                    shoot(ammo, Angles.moveToward(rotation, angleTo(to.x, to.y), maxAim));
+                    getWeapon().update(GroundUnit.this, to.x, to.y);
                 }
             }else{
                 moveToCore();

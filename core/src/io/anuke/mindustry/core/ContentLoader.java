@@ -15,13 +15,8 @@ import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.entities.units.UnitType;
-import io.anuke.mindustry.entities.units.types.Drone;
-import io.anuke.mindustry.entities.units.types.Scout;
-import io.anuke.mindustry.entities.units.types.Vtol;
 import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.type.ContentList;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.type.StatusEffect;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.ucore.core.Effects;
@@ -59,6 +54,7 @@ public class ContentLoader {
         new StandardBullets(),
         new TurretBullets(),
         new WeaponBullets(),
+
 
         //ammotypes
         new AmmoTypes(),
@@ -117,8 +113,8 @@ public class ContentLoader {
 
         Log.info("--- CONTENT INFO ---");
         Log.info("Blocks loaded: {0}\nItems loaded: {1}\nLiquids loaded: {2}\nUpgrades loaded: {3}\nUnits loaded: {4}\nAmmo types loaded: {5}\nBullet types loaded: {6}\nStatus effects loaded: {7}\nRecipes loaded: {8}\nEffects loaded: {9}\nTotal content classes: {10}",
-                Block.all().size, io.anuke.mindustry.type.Item.all().size, Liquid.all().size,
-                io.anuke.mindustry.type.Mech.all().size, UnitType.getAllTypes().size, io.anuke.mindustry.type.AmmoType.all().size, BulletType.all().size, StatusEffect.all().size, io.anuke.mindustry.type.Recipe.all().size, Effects.all().size, content.length);
+                Block.all().size, Item.all().size, Liquid.all().size, Mech.all().size, UnitType.all().size,
+                AmmoType.all().size, BulletType.all().size, StatusEffect.all().size, Recipe.all().size, Effects.all().size, content.length);
 
         Log.info("-------------------");
 
@@ -138,15 +134,13 @@ public class ContentLoader {
         //TODO clear all content.
     }
 
-    /**Registers sync IDs for all types of sync entities.*/
+    /**Registers sync IDs for all types of sync entities.
+     * Do not register units here!*/
     private static void registerTypes(){
-        Player.typeID = TypeTrait.registerType(Player::new);
-        Drone.typeID = TypeTrait.registerType(Drone::new);
-        Vtol.typeID = TypeTrait.registerType(Vtol::new);
-        Scout.typeID = TypeTrait.registerType(Scout::new);
-        ItemDrop.typeID = TypeTrait.registerType(ItemDrop::new);
-        Fire.typeID = TypeTrait.registerType(Fire::new);
-        Puddle.typeID = TypeTrait.registerType(Puddle::new);
-        Bullet.typeID = TypeTrait.registerType(Bullet::new);
+        TypeTrait.registerType(Player.class, Player::new);
+        TypeTrait.registerType(ItemDrop.class, ItemDrop::new);
+        TypeTrait.registerType(Fire.class, Fire::new);
+        TypeTrait.registerType(Puddle.class, Puddle::new);
+        TypeTrait.registerType(Bullet.class, Bullet::new);
     }
 }

@@ -1,16 +1,22 @@
 package io.anuke.mindustry.entities.units;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.mindustry.content.Weapons;
+import io.anuke.mindustry.entities.traits.TypeTrait;
+import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.type.AmmoType;
-import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.type.Weapon;
+import io.anuke.ucore.function.Supplier;
+import io.anuke.ucore.graphics.Draw;
 
-public class UnitType {
+//TODO merge unit type with mech
+public class UnitType implements UnlockableContent{
     private static byte lastid = 0;
     private static Array<UnitType> types = new Array<>();
 
-    protected final UnitCreator creator;
+    protected final Supplier<? extends BaseUnit> constructor;
 
     public final String name;
     public final byte id;
@@ -21,7 +27,6 @@ public class UnitType {
     public float speed = 0.4f;
     public float range = 160;
     public float rotatespeed = 0.1f;
-    public float shootTranslation = 4f;
     public float baseRotateSpeed = 0.1f;
     public float mass = 1f;
     public boolean isFlying;
@@ -34,35 +39,58 @@ public class UnitType {
     public int ammoCapacity = 100;
     public int itemCapacity = 30;
     public int mineLevel = 2;
-    public ObjectMap<Item, AmmoType> ammo = new ObjectMap<>();
+    public Weapon weapon = Weapons.blaster;
+    public float weaponOffsetX, weaponOffsetY;
 
-    public UnitType(String name, UnitCreator creator){
+    public TextureRegion iconRegion, legRegion, baseRegion, region;
+
+    public <T extends BaseUnit> UnitType(String name, Class<T> type, Supplier<T> mainConstructor){
         this.id = lastid++;
         this.name = name;
-        this.creator = creator;
+        this.constructor = mainConstructor;
 
         types.add(this);
+
+        TypeTrait.registerType(type, mainConstructor);
     }
 
-    public BaseUnit create(Team team){
-        return creator.create(team);
-    }
+    @Override
+    public void load() {
+        iconRegion = Draw.region("unit-icon-" + name);
+        region = Draw.region(name);
 
-    protected void setAmmo(AmmoType... types){
-        for(AmmoType type : types){
-            ammo.put(type.item, type);
+        if(!isFlying) {
+            legRegion = Draw.region(name + "-leg");
+            baseRegion = Draw.region(name + "-base");
         }
     }
 
-    public interface UnitCreator{
-        BaseUnit create(Team team);
+    @Override
+    public String getContentTypeName() {
+        return "unit-type";
+    }
+
+    @Override
+    public String getContentName() {
+        return name;
+    }
+
+    @Override
+    public Array<? extends Content> getAll() {
+        return types;
+    }
+
+    public BaseUnit create(Team team){
+        BaseUnit unit = constructor.get();
+        unit.init(this, team);
+        return unit;
     }
 
     public static UnitType getByID(byte id){
         return types.get(id);
     }
 
-    public static Array<UnitType> getAllTypes(){
+    public static Array<UnitType> all(){
         return types;
     }
 }

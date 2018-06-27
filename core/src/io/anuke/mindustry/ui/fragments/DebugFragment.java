@@ -2,20 +2,21 @@ package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import io.anuke.mindustry.content.AmmoTypes;
-import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.builders.button;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
+import io.anuke.ucore.scene.style.TextureRegionDrawable;
 import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Table;
@@ -71,18 +72,21 @@ public class DebugFragment implements Fragment {
                row();
                new button("death", () -> player.damage(99999, false));
                row();
-               new button("spawnf", () -> {
-                   BaseUnit unit = UnitTypes.vtol.create(player.getTeam());
-                   unit.set(player.x, player.y);
-                   unit.add();
-               });
-               row();
-               new button("spawng", () ->{
-                   BaseUnit unit = UnitTypes.scout.create(player.getTeam());
-                   unit.set(player.x, player.y);
-                   unit.inventory.addAmmo(AmmoTypes.bulletLead);
-                   unit.setWave();
-                   unit.add();
+               new button("spawn", () -> {
+                   FloatingDialog dialog = new FloatingDialog("debug spawn");
+                   for(UnitType type : UnitType.all()){
+                       dialog.content().addImageButton("white", 40, () -> {
+                           dialog.hide();
+                           BaseUnit unit = type.create(player.getTeam());
+                           unit.inventory.addAmmo(type.weapon.getAmmoType(type.weapon.getAcceptedItems().iterator().next()));
+                           unit.setWave();
+                           unit.set(player.x, player.y);
+                           unit.add();
+                       }).get().getStyle().imageUp = new TextureRegionDrawable(type.iconRegion);
+                   }
+                   dialog.addCloseButton();
+                   dialog.setFillParent(false);
+                   dialog.show();
                });
                row();
            }}.end();

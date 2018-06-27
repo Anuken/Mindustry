@@ -98,8 +98,6 @@ public class Build {
         //just in case
         if(tile == null) return;
 
-        threads.run(() -> Events.fire(BlockBuildEvent.class, team, tile));
-
         Block result = recipe.result;
         Block previous = tile.block();
 
@@ -144,6 +142,8 @@ public class Build {
                 }
             }
         }
+
+        threads.runDelay(() -> Events.fire(BlockBuildEvent.class, team, tile));
     }
 
     /**Returns whether a tile can be placed at this location by this team.*/

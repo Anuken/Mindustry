@@ -12,9 +12,7 @@ import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.FlyingUnit;
 import io.anuke.mindustry.entities.units.UnitState;
-import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.game.EventType.BlockBuildEvent;
-import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
@@ -41,8 +39,6 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class Drone extends FlyingUnit implements BuilderTrait {
-    public static int typeID = -1;
-
     protected static ObjectSet<Item> toMine;
     protected static float healSpeed = 0.1f;
     protected static float discoverRange = 120f;
@@ -71,17 +67,12 @@ public class Drone extends FlyingUnit implements BuilderTrait {
                 }
             }
         });
+
+        initialized = true;
     }
 
     {
         initEvents();
-    }
-
-    public Drone(UnitType type, Team team) {
-        super(type, team);
-    }
-
-    public Drone(){
     }
 
     private void notifyPlaced(BuildEntity entity){
@@ -92,11 +83,6 @@ public class Drone extends FlyingUnit implements BuilderTrait {
             target = entity;
             setState(build);
         }
-    }
-
-    @Override
-    public int getTypeID() {
-        return typeID;
     }
 
     @Override
@@ -231,7 +217,9 @@ public class Drone extends FlyingUnit implements BuilderTrait {
 
     build = new UnitState(){
         public void entered() {
-            target = null;
+            if(!(target instanceof BuildEntity)){
+                target = null;
+            }
         }
 
         public void update() {
@@ -308,6 +296,12 @@ public class Drone extends FlyingUnit implements BuilderTrait {
 
             if(targetItem == null) {
                 findItem();
+            }
+
+            //core full
+            if(targetItem != null && entity.tile.block().acceptStack(targetItem, 1, entity.tile, Drone.this) == 0){
+                setState(repair);
+                return;
             }
 
             //if inventory is full, drop it off.
@@ -395,10 +389,12 @@ public class Drone extends FlyingUnit implements BuilderTrait {
 
             TileEntity tile = (TileEntity)target;
 
-            if(distanceTo(target) < type.range
-                    && tile.tile.block().acceptStack(inventory.getItem().item, inventory.getItem().amount, tile.tile, Drone.this) == inventory.getItem().amount){
-                CallEntity.transferItemTo(inventory.getItem().item, inventory.getItem().amount, x, y, tile.tile);
-                inventory.clearItem();
+            if(distanceTo(target) < type.range){
+                if(tile.tile.block().acceptStack(inventory.getItem().item, inventory.getItem().amount, tile.tile, Drone.this) == inventory.getItem().amount) {
+                    CallEntity.transferItemTo(inventory.getItem().item, inventory.getItem().amount, x, y, tile.tile);
+                    inventory.clearItem();
+                }
+
                 setState(repair);
             }
 

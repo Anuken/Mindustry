@@ -64,6 +64,8 @@ public class Image {
     }
 
     public void draw(TextureRegion region, int x, int y, boolean flipx, boolean flipy){
+        GenRegion.validate(region);
+
         int ofx = 0, ofy = 0;
 
         if(x < 0){

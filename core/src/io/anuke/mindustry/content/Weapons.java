@@ -1,6 +1,7 @@
 package io.anuke.mindustry.content;
 
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.content.fx.ShootFx;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.ContentList;
@@ -8,7 +9,7 @@ import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.type.Weapon;
 
 public class Weapons implements ContentList {
-    public static Weapon blaster, shockgun, sapper, swarmer;
+    public static Weapon blaster, shockgun, sapper, swarmer, bomber;
 
     @Override
     public void load() {
@@ -47,6 +48,17 @@ public class Weapons implements ContentList {
             roundrobin = true;
             ejectEffect = ShootFx.shellEjectSmall;
             setAmmo(AmmoTypes.bulletThermite);
+        }};
+
+        bomber = new Weapon("bomber") {{
+            length = 0f;
+            width = 2f;
+            reload = 5f;
+            roundrobin = true;
+            ejectEffect = Fx.none;
+            velocityRnd = 1f;
+            inaccuracy = 40f;
+            setAmmo(AmmoTypes.bombExplosive);
         }};
     }
 

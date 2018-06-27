@@ -16,6 +16,7 @@ import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.impl.SolidEntity;
 import io.anuke.ucore.function.Consumer;
+import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Physics;
 import io.anuke.ucore.util.Translator;
@@ -108,8 +109,10 @@ public class Damage {
 	}
 
 	/**Damages all entities and blocks in a radius that are enemies of the team.*/
-	public static void damageUnits(Team team, float x, float y, float size, float damage, Consumer<Unit> acceptor) {
+	public static void damageUnits(Team team, float x, float y, float size, float damage, Predicate<Unit> predicate, Consumer<Unit> acceptor) {
 		Consumer<Unit> cons = entity -> {
+			if(!predicate.test(entity)) return;
+
 			entity.getHitbox(hitrect);
 			if (!hitrect.overlaps(rect)) {
 				return;
@@ -134,13 +137,14 @@ public class Damage {
 	/**Damages all entities and blocks in a radius that are enemies of the team.*/
 	public static void damage(Team team, float x, float y, float radius, float damage){
 		Consumer<Unit> cons = entity -> {
-			if(entity.distanceTo(x, y) > radius){
+			if(entity.team == team || entity.distanceTo(x, y) > radius){
 				return;
 			}
 			float amount = calculateDamage(x, y, entity.x, entity.y, radius, damage);
 			entity.damage(amount);
 			//TODO better velocity displacement
-			entity.getVelocity().add(tr.set(entity.x - x, entity.y - y).setLength(damage*2f));
+			float dst = tr.set(entity.x - x, entity.y - y).len();
+			entity.getVelocity().add(tr.setLength((1f-dst/radius) * 2f));
 		};
 
 		rect.setSize(radius *2).setCenter(x, y);

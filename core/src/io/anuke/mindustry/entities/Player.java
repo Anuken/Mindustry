@@ -11,20 +11,14 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.ScorchDecal;
-import io.anuke.mindustry.entities.traits.BuilderTrait;
-import io.anuke.mindustry.entities.traits.CarriableTrait;
-import io.anuke.mindustry.entities.traits.CarryTrait;
-import io.anuke.mindustry.entities.traits.TargetTrait;
+import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.Mech;
-import io.anuke.mindustry.type.Upgrade;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
@@ -34,10 +28,7 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.ThreadQueue;
-import io.anuke.ucore.util.Timer;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -45,11 +36,10 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Player extends Unit implements BuilderTrait, CarryTrait {
-	public static int typeID = -1;
+public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTrait {
+	private static final int timerShootLeft = 0;
+	private static final int timerShootRight = 1;
 
-	public static final int timerShootLeft = 0;
-	public static final int timerShootRight = 1;
 	public static final int timerSync = 2;
 
 	//region instance variables, constructor
@@ -91,6 +81,21 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 
 	@Override
+	public Timer getTimer() {
+		return timer;
+	}
+
+	@Override
+	public int getShootTimer(boolean left) {
+		return left ? timerShootLeft : timerShootRight;
+	}
+
+	@Override
+	public Weapon getWeapon() {
+		return mech.weapon;
+	}
+
+	@Override
 	public float getMinePower() {
 		return mech.mineSpeed;
 	}
@@ -122,11 +127,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
             walktime += Timers.delta();
         }
     }
-
-	@Override
-	public int getTypeID() {
-		return typeID;
-	}
 
 	@Override
 	public CarriableTrait getCarry() {
@@ -538,8 +538,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait {
 
 	protected void updateShooting(){
 		if(isShooting()){
-			mech.weapon.update(this, true, pointerX, pointerY);
-			mech.weapon.update(this, false, pointerX, pointerY);
+			mech.weapon.update(this, pointerX, pointerY);
 		}
 	}
 

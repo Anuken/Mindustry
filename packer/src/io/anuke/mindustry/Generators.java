@@ -2,6 +2,7 @@ package io.anuke.mindustry;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.type.Upgrade;
@@ -60,6 +61,28 @@ public class Generators {
 
 
                 image.save("mech-icon-" + mech.name);
+            }
+        });
+
+        context.generate("unit-icons", () -> {
+            for(UnitType type : UnitType.all()){
+
+                type.load();
+                type.weapon.load();
+
+                Image image = context.get(type.region);
+
+                if(!type.isFlying){
+                    image.draw(type.baseRegion);
+                    image.draw(type.legRegion);
+                    image.draw(type.legRegion, true, false);
+                    image.draw(type.region);
+
+                    image.draw(type.weapon.equipRegion, -(int)type.weaponOffsetX, (int)type.weaponOffsetY, false, false);
+                    image.draw(type.weapon.equipRegion, (int)type.weaponOffsetX, (int)type.weaponOffsetY, true, false);
+                }
+
+                image.save("unit-icon-" + type.name);
             }
         });
 

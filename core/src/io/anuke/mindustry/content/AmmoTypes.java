@@ -2,6 +2,7 @@ package io.anuke.mindustry.content;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.bullets.*;
+import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.content.fx.ShootFx;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.AmmoType;
@@ -9,7 +10,7 @@ import io.anuke.mindustry.type.ContentList;
 
 public class AmmoTypes implements ContentList {
     public static AmmoType bulletTungsten, bulletLead, bulletCarbide, bulletThorium, bulletSilicon, bulletThermite,
-            shotgunTungsten,
+            shotgunTungsten, bombExplosive, bombIncendiary,
             flakLead, flakExplosive, flakPlastic, flakSurge, missileExplosive, missileIncindiary, missileSurge,
             artilleryCarbide, artilleryThorium, artilleryPlastic, artilleryHoming, artilleryIncindiary,
             basicFlame, lancerLaser, lightning, spectreLaser, meltdownLaser, fuseShotgun, oil, water, lava, cryofluid;
@@ -61,6 +62,16 @@ public class AmmoTypes implements ContentList {
             shootEffect = ShootFx.shootBig;
             smokeEffect = ShootFx.shootBigSmoke;
             recoil = 1f;
+        }};
+
+        bombExplosive = new AmmoType(Items.blastCompound, WeaponBullets.bombExplosive, 3) {{
+            shootEffect = Fx.none;
+            smokeEffect = Fx.none;
+        }};
+
+        bombIncendiary = new AmmoType(Items.thermite, WeaponBullets.bombIncendiary, 3) {{
+            shootEffect = Fx.none;
+            smokeEffect = Fx.none;
         }};
 
         //flak

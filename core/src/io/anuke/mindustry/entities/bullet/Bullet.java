@@ -27,8 +27,6 @@ import static io.anuke.mindustry.Vars.bulletGroup;
 import static io.anuke.mindustry.Vars.world;
 
 public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncTrait{
-	public static int typeID = -1;
-
 	private static Vector2 vector = new Vector2();
 
 	private Team team;
@@ -56,7 +54,9 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 		bullet.data = data;
 
 		bullet.velocity.set(0, type.speed).setAngle(angle).scl(velocityScl);
-		bullet.velocity.add(owner instanceof VelocityTrait ? ((VelocityTrait)owner).getVelocity() : Vector2.Zero);
+		if(type.keepVelocity){
+			bullet.velocity.add(owner instanceof VelocityTrait ? ((VelocityTrait)owner).getVelocity() : Vector2.Zero);
+		}
 		bullet.hitbox.setSize(type.hitsize);
 
 		bullet.team = team;
@@ -117,11 +117,6 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 		}
 
 		return super.getDamage();
-	}
-
-	@Override
-	public int getTypeID() {
-		return typeID;
 	}
 
 	@Override

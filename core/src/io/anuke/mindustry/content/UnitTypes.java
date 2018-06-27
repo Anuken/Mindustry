@@ -2,19 +2,16 @@ package io.anuke.mindustry.content;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.units.UnitType;
-import io.anuke.mindustry.entities.units.types.Drone;
-import io.anuke.mindustry.entities.units.types.Scout;
-import io.anuke.mindustry.entities.units.types.Vtol;
+import io.anuke.mindustry.entities.units.types.*;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.ContentList;
-import io.anuke.mindustry.type.StatusEffect;
 
 public class UnitTypes implements ContentList {
-    public static UnitType drone, scout, vtol;
+    public static UnitType drone, scout, vtol, monsoon, titan;
 
     @Override
     public void load() {
-        drone = new UnitType("drone", team -> new Drone(drone, team)){{
+        drone = new UnitType("drone", Drone.class, Drone::new){{
             isFlying = true;
             drag = 0.01f;
             speed = 0.2f;
@@ -23,26 +20,43 @@ public class UnitTypes implements ContentList {
             range = 50f;
         }};
 
-        scout = new UnitType("scout", team -> new Scout(scout, team)){{
+        scout = new UnitType("scout", Scout.class, Scout::new){{
             maxVelocity = 1.1f;
             speed = 0.2f;
             drag = 0.4f;
             range = 40f;
-            setAmmo(AmmoTypes.bulletLead);
+            weapon = Weapons.blaster;
         }};
 
-        vtol = new UnitType("vtol", team -> new Vtol(vtol, team)){{
+        titan = new UnitType("titan", Titan.class, Titan::new){{
+            maxVelocity = 0.8f;
+            speed = 0.18f;
+            drag = 0.4f;
+            range = 10f;
+            weapon = Weapons.shockgun;
+        }};
+
+        vtol = new UnitType("vtol", Vtol.class, Vtol::new){{
             speed = 0.3f;
-            maxVelocity = 2f;
+            maxVelocity = 2.1f;
             drag = 0.01f;
             isFlying = true;
             reload = 7;
-            setAmmo(AmmoTypes.bulletLead);
+        }};
+
+        monsoon = new UnitType("monsoon", Monsoon.class, Monsoon::new){{
+            health = 300;
+            speed = 0.2f;
+            maxVelocity = 1.5f;
+            drag = 0.01f;
+            isFlying = true;
+            reload = 7;
+            weapon = Weapons.bomber;
         }};
     }
 
     @Override
     public Array<? extends Content> getAll() {
-        return StatusEffect.all();
+        return UnitType.all();
     }
 }

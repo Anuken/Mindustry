@@ -49,8 +49,6 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
     private static final Rectangle rect2 = new Rectangle();
     private static int seeds;
 
-    public static int typeID = -1;
-
     private int loadedPosition = -1;
 
     private float updateTime;
@@ -267,11 +265,6 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
     public void removed() {
         map.remove(tile.packedPosition());
         reset();
-    }
-
-    @Override
-    public int getTypeID() {
-        return typeID;
     }
 
     @Override

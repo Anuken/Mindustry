@@ -35,7 +35,11 @@ public class ImageContext {
         for(Region region : data.getRegions()){
             int x = region.left, y = region.top, width = region.width, height = region.height;
 
-            regionCache.put(region.name, new TextureRegion(){
+            regionCache.put(region.name, new GenRegion(){
+                {
+                    name = region.name;
+                    context = ImageContext.this;
+                }
 
                 @Override
                 public int getRegionX(){
@@ -62,6 +66,13 @@ public class ImageContext {
         Core.atlas = new Atlas(){
             @Override
             public TextureRegion getRegion(String name){
+                if(!regionCache.containsKey(name)){
+                    GenRegion region = new GenRegion();
+                    region.name = name;
+                    region.context = ImageContext.this;
+                    region.invalid = true;
+                    return region;
+                }
                 return regionCache.get(name);
             }
 
@@ -87,6 +98,8 @@ public class ImageContext {
     }
 
     public Image get(TextureRegion region){
+        GenRegion.validate(region);
+
         return new Image(image, region);
     }
 

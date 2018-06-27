@@ -6,6 +6,8 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.world.Block;
+import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Log;
 
 import static io.anuke.mindustry.Vars.debug;
 import static io.anuke.mindustry.Vars.headless;
@@ -48,6 +50,15 @@ public class Recipe implements UnlockableContent{
     public Recipe setDebug(){
         debugOnly = true;
         return this;
+    }
+
+    @Override
+    public void init() {
+        if(!Bundles.has("block." + result.name + ".name")) {
+            Log.err("WARNING: Recipe block '{0}' does not have a formal name defined.", result.name);
+        }else if(result.fullDescription == null){
+            Log.err("WARNING: Recipe block '{0}' does not have a description defined.", result.name);
+        }
     }
 
     @Override

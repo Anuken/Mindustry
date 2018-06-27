@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.ucore.graphics.Draw;
 
+//TODO merge unit type with mech
 public class Mech extends Upgrade {
 	public boolean flying;
 
@@ -44,6 +45,6 @@ public class Mech extends Upgrade {
 		}
 
 		region = Draw.region(name);
-		iconRegion = Draw.optional("mech-icon-"+ name);
+		iconRegion = Draw.region("mech-icon-"+ name);
 	}
 }

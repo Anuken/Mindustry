@@ -34,8 +34,6 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable 
     private static final IntMap<Fire> map = new IntMap<>();
     private static final float baseLifetime = 1000f;
 
-    public static int typeID = -1;
-
     private int loadedPosition = -1;
     private Tile tile;
     private Block block;
@@ -70,11 +68,6 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable 
 
     /**Deserialization use only!*/
     public Fire(){}
-
-    @Override
-    public int getTypeID() {
-        return typeID;
-    }
 
     @Override
     public float lifetime() {
@@ -137,11 +130,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable 
             if(damage){
                 entity.damage(0.4f);
             }
-            Damage.damageUnits(null, tile.worldx(), tile.worldy(), tilesize, 3f, unit -> {
-                if(!unit.isFlying()) {
-                    unit.applyEffect(StatusEffects.burning, 0.8f);
-                }
-            });
+            Damage.damageUnits(null, tile.worldx(), tile.worldy(), tilesize, 3f, unit -> !unit.isFlying(), unit -> unit.applyEffect(StatusEffects.burning, 0.8f));
         }
     }
 

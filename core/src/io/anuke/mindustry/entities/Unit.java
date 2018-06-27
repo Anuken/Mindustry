@@ -31,7 +31,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
-public abstract class Unit extends DestructibleEntity implements SaveTrait, TargetTrait, SyncTrait, DrawTrait, TeamTrait, CarriableTrait {
+public abstract class Unit extends DestructibleEntity implements SaveTrait, TargetTrait, SyncTrait, DrawTrait, TeamTrait, CarriableTrait, InventoryTrait {
     /**total duration of hit flash effect*/
     public static final float hitDuration = 9f;
     /**Percision divisor of velocity, used when writing. For example a value of '2' would mean the percision is 1/2 = 0.5-size chunks.*/
@@ -52,6 +52,11 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     protected Vector2 velocity = new Translator(0f, 0.0001f);
     protected float hitTime;
     protected float drownTime;
+
+    @Override
+    public UnitInventory getInventory() {
+        return inventory;
+    }
 
     @Override
     public float getRotation() {
@@ -191,7 +196,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public void avoidOthers(float avoidRange){
 
         EntityPhysics.getNearby(getGroup(), x, y, avoidRange*2f, t -> {
-            if(t == this || (t instanceof Unit && ((Unit) t).isDead())) return;
+            if(t == this || (t instanceof Unit && (((Unit) t).isDead() || (((Unit) t).isFlying() != isFlying())))) return;
             float dst = distanceTo(t);
             if(dst > avoidRange) return;
             velocity.add(moveVector.set(x, y).sub(t.getX(), t.getY()).setLength(1f * (1f - (dst / avoidRange))));

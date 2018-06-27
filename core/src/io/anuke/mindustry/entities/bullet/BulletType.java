@@ -29,6 +29,8 @@ public abstract class BulletType extends BaseBulletType<Bullet> implements Conte
 	public boolean collidesTiles = true;
 	/**Whether this bullet types collides with anything at all.*/
 	public boolean collides = true;
+	/**Whether velocity is inherited from the shooter.*/
+	public boolean keepVelocity = true;
 
 	public BulletType(float speed, float damage){
 		this.id = lastid ++;
