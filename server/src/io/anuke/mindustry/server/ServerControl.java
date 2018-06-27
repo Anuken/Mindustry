@@ -86,11 +86,18 @@ public class ServerControl extends Module {
                     Map map = previous;
                     while (map == previous) map = maps.random();
 
-                    info("Selected next map to be {0}.", map.name);
-                    state.set(State.playing);
+                    if(map != null) {
 
-                    logic.reset();
-                    world.loadMap(map);
+                        info("Selected next map to be {0}.", map.name);
+                        state.set(State.playing);
+
+                        logic.reset();
+                        world.loadMap(map);
+                    }else{
+                        info("Selected a procedural map.");
+                        world.loadProceduralMap();
+                        logic.play();
+                    }
                 }else{
                     info("Selected a procedural map.");
                     world.loadProceduralMap();
