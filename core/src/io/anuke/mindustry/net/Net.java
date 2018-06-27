@@ -26,6 +26,8 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class Net{
+	public static final Object packetPoolLock = new Object();
+
 	private static boolean server;
 	private static boolean active;
 	private static boolean clientLoaded;
@@ -183,12 +185,16 @@ public class Net{
 			if(clientLoaded || object instanceof ImportantPacket){
 				if(clientListeners.get(object.getClass()) != null) clientListeners.get(object.getClass()).accept(object);
 				if(listeners.get(object.getClass()) != null) listeners.get(object.getClass()).accept(object);
-				Pools.free(object);
+				synchronized (packetPoolLock) {
+					Pools.free(object);
+				}
 			}else if(!(object instanceof UnimportantPacket)){
 				packetQueue.add(object);
 				Log.info("Queuing packet {0}.", ClassReflection.getSimpleName(object.getClass()));
 			}else{
-				Pools.free(object);
+				synchronized (packetPoolLock) {
+					Pools.free(object);
+				}
 			}
 		}else{
 			Log.err("Unhandled packet type: '{0}'!", ClassReflection.getSimpleName(object.getClass()));
@@ -201,7 +207,9 @@ public class Net{
 		if(serverListeners.get(object.getClass()) != null || listeners.get(object.getClass()) != null){
 			if(serverListeners.get(object.getClass()) != null) serverListeners.get(object.getClass()).accept(connection, object);
 			if(listeners.get(object.getClass()) != null) listeners.get(object.getClass()).accept(object);
-			Pools.free(object);
+			synchronized (packetPoolLock) {
+				Pools.free(object);
+			}
 		}else{
 			Log.err("Unhandled packet type: '{0}'!", ClassReflection.getSimpleName(object.getClass()));
 		}

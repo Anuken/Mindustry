@@ -9,6 +9,8 @@ import io.anuke.mindustry.net.Registrator;
 
 import java.nio.ByteBuffer;
 
+import static io.anuke.mindustry.net.Net.packetPoolLock;
+
 public class ByteSerializer implements Serialization {
 
     @Override
@@ -24,7 +26,9 @@ public class ByteSerializer implements Serialization {
                 throw new RuntimeException("Unregistered class: " + ClassReflection.getSimpleName(o.getClass()));
             byteBuffer.put(id);
             ((Packet) o).write(byteBuffer);
-            Pools.free(o);
+            synchronized (packetPoolLock) {
+                Pools.free(o);
+            }
         }
     }
 
@@ -35,9 +39,11 @@ public class ByteSerializer implements Serialization {
            return FrameworkSerializer.read(byteBuffer);
         }else{
             Class<?> type = Registrator.getByID(id);
-            Packet packet = (Packet)Pools.obtain(type);
-            packet.read(byteBuffer);
-            return packet;
+            synchronized (packetPoolLock) {
+                Packet packet = (Packet) Pools.obtain(type);
+                packet.read(byteBuffer);
+                return packet;
+            }
         }
     }
 
