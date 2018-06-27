@@ -21,6 +21,8 @@ public abstract class NetConnection {
     /**Timestamp of last recieved snapshot.*/
     public long lastRecievedTime;
 
+    public boolean hasConnected = false;
+
     public NetConnection(int id, String address){
         this.id = id;
         this.address = address;

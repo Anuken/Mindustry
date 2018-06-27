@@ -52,7 +52,7 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
         drop.item = item;
         drop.amount = amount;
         drop.velocity.set(4f, 0f).rotate(angle);
-        drop.set(x, y);
+        drop.setNet(x, y);
         drop.add();
 
         return drop;
@@ -162,6 +162,9 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
         }else{
             updateVelocity(0.2f);
             updateTime();
+            if(time >= lifetime()){
+                CallEntity.onPickup(getID());
+            }
         }
 
         Tile tile = world.tileWorld(x, y);

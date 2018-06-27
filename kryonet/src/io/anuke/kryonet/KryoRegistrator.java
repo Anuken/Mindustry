@@ -10,7 +10,7 @@ import java.io.StringWriter;
 import static io.anuke.mindustry.Vars.headless;
 
 public class KryoRegistrator {
-    public static boolean fakeLag = false;
+    public static boolean fakeLag = true;
     public static final int fakeLagMax = 1000;
     public static final int fakeLagMin = 0;
 

@@ -125,9 +125,9 @@ public interface BuilderTrait {
 
             if (!(tile.block() instanceof BreakBlock)) { //check if haven't started placing
                 if(Build.validBreak(unit.getTeam(), current.x, current.y)){
+
                     //if it's valid, place it
-                    //FIXME a player instance is required here, but the the builder may not be a player
-                    if(!current.requested){
+                    if(!current.requested && unit instanceof Player){
                         CallBlocks.breakBlock((Player)unit, unit.getTeam(), current.x, current.y);
                         current.requested = true;
                     }
@@ -154,10 +154,9 @@ public interface BuilderTrait {
         }else{
             if (!(tile.block() instanceof BuildBlock)) { //check if haven't started placing
                 if(Build.validPlace(unit.getTeam(), current.x, current.y, current.recipe.result, current.rotation)){
-                    //if it's valid, place it
-                    //FIXME a player instance is required here, but the the builder may not be a player
 
-                    if(!current.requested){
+                    //if it's valid, place it
+                    if(!current.requested && unit instanceof Player){
                         CallBlocks.placeBlock((Player)unit, unit.getTeam(), current.x, current.y, current.recipe, current.rotation);
                         current.requested = true;
                     }

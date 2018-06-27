@@ -315,7 +315,7 @@ public class NetServer extends Module{
                     return;
                 }
 
-                if(!player.timer.get(Player.timerSync, serverSyncTime)) continue;
+                if(!player.timer.get(Player.timerSync, serverSyncTime) || !connection.hasConnected) continue;
 
                 //if the player hasn't acknowledged that it has recieved the packet, send the same thing again
                 if(connection.lastSentSnapshotID > connection.lastSnapshotID){
@@ -454,6 +454,7 @@ public class NetServer extends Module{
     @Remote(targets = Loc.client)
     public static void connectConfirm(Player player){
         player.add();
+        Net.getConnection(player.clientid).hasConnected = true;
         Call.sendMessage("[accent]" + player.name + " has connected.");
         Log.info("&y{0} has connected.", player.name);
     }
