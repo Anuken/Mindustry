@@ -30,8 +30,6 @@ public class WaveSpawner {
 
     public WaveSpawner(){
         Events.on(WorldLoadEvent.class, this::reset);
-
-        WaveCreator.testWaves(0, 200);
     }
 
     public void write(DataOutput output) throws IOException{
