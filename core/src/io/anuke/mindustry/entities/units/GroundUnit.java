@@ -233,21 +233,22 @@ public abstract class GroundUnit extends BaseUnit {
                         moveToCore();
                     }
 
-                    rotate(angleTo(target));
-
                 }else{
                     moveToCore();
-                    rotate(angleTo(target));
                 }
 
-                if (Mathf.angNear(angleTo(target), rotation, 13f) && distanceTo(target) < inventory.getAmmo().getRange()) {
-                    AmmoType ammo = inventory.getAmmo();
+                if(distanceTo(target) < inventory.getAmmo().getRange()){
                     rotate(angleTo(target));
 
-                    Vector2 to = Predict.intercept(GroundUnit.this, target, ammo.bullet.speed);
+                    if (Mathf.angNear(angleTo(target), rotation, 13f)) {
+                        AmmoType ammo = inventory.getAmmo();
 
-                    getWeapon().update(GroundUnit.this, to.x, to.y);
+                        Vector2 to = Predict.intercept(GroundUnit.this, target, ammo.bullet.speed);
+
+                        getWeapon().update(GroundUnit.this, to.x, to.y);
+                    }
                 }
+
             }else{
                 moveToCore();
             }
