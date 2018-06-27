@@ -38,7 +38,7 @@ public class HostDialog extends FloatingDialog{
             ImageButton button = t.addImageButton("white", 40, () -> {
                 new ColorPickDialog().show(color -> {
                     player.color.set(color);
-                    Settings.putInt("color", Color.rgba8888(color));
+                    Settings.putInt("color-0", Color.rgba8888(color));
                     Settings.save();
                 });
             }).size(50f, 54f).get();
