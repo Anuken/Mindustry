@@ -7,6 +7,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.Timers;
@@ -68,6 +69,11 @@ public class DebugFragment implements Fragment {
                new button("blocks", "toggle", () -> showBlockDebug = !showBlockDebug);
                row();
                new button("fog", () -> showFog = !showFog);
+               row();
+               new button("gameover", () ->{
+                   state.teams.get(Team.blue).cores.get(0).entity.health = 0;
+                   state.teams.get(Team.blue).cores.get(0).entity.damage(1);
+               });
                row();
                new button("wave", () -> state.wavetime = 0f);
                row();

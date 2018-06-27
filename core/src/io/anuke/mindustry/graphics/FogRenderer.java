@@ -34,6 +34,7 @@ public class FogRenderer implements Disposable{
         Events.on(WorldLoadGraphicsEvent.class, () -> {
             dispose();
             buffer = new FrameBuffer(Format.RGBA8888, world.width(), world.height(), false);
+            changeQueue.clear();
 
             //clear buffer to black
             buffer.begin();
@@ -100,6 +101,8 @@ public class FogRenderer implements Disposable{
             if(viewRange < 0) continue;
             Fill.circle(tile.drawx(), tile.drawy(), tile.block().viewRange);
         }
+
+        changeQueue.clear();
 
         EntityDraw.setClip(true);
         Graphics.end();

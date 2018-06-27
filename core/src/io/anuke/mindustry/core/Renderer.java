@@ -151,7 +151,7 @@ public class Renderer extends RendererModule{
             Vector2 position = averagePosition();
 
             if(!mobile){
-            	setCamera(position.x, position.y);
+            	setCamera(position.x + 0.0001f, position.y + 0.0001f);
 			}
 
 			clampCamera(-tilesize / 2f, -tilesize / 2f + 1, world.width() * tilesize - tilesize / 2f, world.height() * tilesize - tilesize / 2f);

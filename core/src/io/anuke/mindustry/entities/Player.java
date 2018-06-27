@@ -279,8 +279,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		float px = x, py =y;
 
 		if(snap){
-			x = (int)x;
-			y = (int)y;
+			x = (int)(x + 0.0001f);
+			y = (int)(y + 0.0001f);
 		}
 
 		float ft = Mathf.sin(walktime, 6f, 2f) * (1f-boostHeat);

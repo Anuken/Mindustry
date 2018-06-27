@@ -17,6 +17,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.threads;
+
 public class Door extends Wall{
 	protected final Rectangle rect = new Rectangle();
 
@@ -63,17 +65,20 @@ public class Door extends Wall{
 	@Override
 	public void tapped(Tile tile, Player player){
 		DoorEntity entity = tile.entity();
-		
-		if(Units.anyEntities(tile) && entity.open){
-			return;
-		}
-		
-		entity.open = !entity.open;
-		if(!entity.open){
-			Effects.effect(closefx, tile.drawx(), tile.drawy());
-		}else{
-			Effects.effect(openfx, tile.drawx(), tile.drawy());
-		}
+
+		threads.run(() -> {
+
+			if(Units.anyEntities(tile) && entity.open){
+				return;
+			}
+
+			entity.open = !entity.open;
+			if(!entity.open){
+				Effects.effect(closefx, tile.drawx(), tile.drawy());
+			}else{
+				Effects.effect(openfx, tile.drawx(), tile.drawy());
+			}
+		});
 	}
 	
 	@Override

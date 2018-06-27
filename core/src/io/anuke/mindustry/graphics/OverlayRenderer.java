@@ -176,8 +176,8 @@ public class OverlayRenderer {
         float y = unit.y;
 
         if(unit == players[0] && players.length == 1 && snapCamera) {
-            x = (int)x;
-            y = (int)y;
+            x = (int)(x + 0.0001f);
+            y = (int)(y + 0.0001f);
         }
 
         drawEncloser(x, y - 8f, 2f);

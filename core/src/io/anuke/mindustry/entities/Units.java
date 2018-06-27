@@ -52,11 +52,11 @@ public class Units {
         boolean[] value = new boolean[1];
 
         Units.getNearby(rect, unit -> {
-            if(value[0]) return;
-            if(!unit.isFlying()){
+            if (value[0]) return;
+            if (!unit.isFlying()) {
                 unit.getHitbox(hitrect);
 
-                if(hitrect.overlaps(rect)) {
+                if (hitrect.overlaps(rect)) {
                     value[0] = true;
                 }
             }

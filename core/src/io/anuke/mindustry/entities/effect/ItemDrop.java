@@ -166,7 +166,11 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
 
         Tile tile = world.tileWorld(x, y);
 
-        if(tile.floor().isLiquid){
+        if(tile != null && tile.solid()){
+            CallEntity.onPickup(getID());
+        }
+
+        if(tile != null && tile.floor().isLiquid){
             sinktime += Timers.delta();
 
             if(Mathf.chance(0.04 * Timers.delta())){
