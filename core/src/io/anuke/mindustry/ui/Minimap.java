@@ -14,6 +14,7 @@ import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.renderer;
+import static io.anuke.mindustry.Vars.showFog;
 
 public class Minimap extends Table {
 
@@ -35,18 +36,19 @@ public class Minimap extends Table {
                     renderer.minimap().drawEntities(x, y, width, height);
                 }
 
-                renderer.fog().getTexture().setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+                if(showFog) {
+                    renderer.fog().getTexture().setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 
-                draw.getRegion().setTexture(renderer.fog().getTexture());
-                draw.getRegion().setV(1f - draw.getRegion().getV());
-                draw.getRegion().setV2(1f - draw.getRegion().getV2());
+                    draw.getRegion().setTexture(renderer.fog().getTexture());
+                    draw.getRegion().setV(1f - draw.getRegion().getV());
+                    draw.getRegion().setV2(1f - draw.getRegion().getV2());
 
+                    Graphics.shader(Shaders.fog);
+                    super.draw(batch, parentAlpha);
+                    Graphics.shader();
 
-                Graphics.shader(Shaders.fog);
-                super.draw(batch, parentAlpha);
-                Graphics.shader();
-
-                renderer.fog().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+                    renderer.fog().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+                }
             }
         };
 

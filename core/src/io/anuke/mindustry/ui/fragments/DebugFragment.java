@@ -2,10 +2,9 @@ package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.net.Net;
@@ -58,19 +57,21 @@ public class DebugFragment implements Fragment {
                row();
                new button("noclip", "toggle", () -> noclip = !noclip);
                row();
+               new button("fire", () -> {
+                   for (int i = 0; i < 10; i++) {
+                       Fire.create(world.tileWorld(player.x + Mathf.range(20), player.y + Mathf.range(20)));
+                   }
+               });
+               row();
                new button("team", "toggle", () -> player.toggleTeam());
                row();
                new button("blocks", "toggle", () -> showBlockDebug = !showBlockDebug);
                row();
-               new button("effect", () -> {
-                   for(int i = 0; i < 20; i ++){
-                       Bullet.create(TurretBullets.fireball, player, player.getTeam(), player.x, player.y, Mathf.random(360f));
-                   }
-               });
+               new button("fog", () -> showFog = !showFog);
                row();
                new button("wave", () -> state.wavetime = 0f);
                row();
-               new button("death", () -> player.damage(99999, false));
+               new button("death", () -> player.damage(99999, true));
                row();
                new button("spawn", () -> {
                    FloatingDialog dialog = new FloatingDialog("debug spawn");

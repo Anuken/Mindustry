@@ -9,7 +9,6 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.AmmoType;
-import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Timers;
@@ -66,20 +65,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
 
         Draw.rect(type.name, x, y, rotation - 90);
 
-        float backTrns = 4f, itemSize = 5f;
-        if(inventory.hasItem()){
-            ItemStack stack = inventory.getItem();
-            int stored = Mathf.clamp(stack.amount / 6, 1, 8);
-
-            for(int i = 0; i < stored; i ++) {
-                float angT = i == 0 ? 0 : Mathf.randomSeedRange(i + 2, 60f);
-                float lenT = i == 0 ? 0 : Mathf.randomSeedRange(i + 3, 1f) - 1f;
-                Draw.rect(stack.item.region,
-                        x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
-                        y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
-                        itemSize, itemSize, rotation);
-            }
-        }
+        drawItems();
 
         Draw.alpha(1f);
     }

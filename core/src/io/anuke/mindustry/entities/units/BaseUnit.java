@@ -6,6 +6,7 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.ExplosionFx;
+import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
@@ -15,9 +16,11 @@ import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.units.UnitFactory.UnitFactoryEntity;
@@ -25,9 +28,8 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Timer;
+import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -147,6 +149,23 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
 	public UnitState getStartState(){
 		return null;
+	}
+
+	protected void drawItems(){
+		float backTrns = 4f, itemSize = 5f;
+		if(inventory.hasItem()){
+			ItemStack stack = inventory.getItem();
+			int stored = Mathf.clamp(stack.amount / 6, 1, 8);
+
+			for(int i = 0; i < stored; i ++) {
+				float angT = i == 0 ? 0 : Mathf.randomSeedRange(i + 2, 60f);
+				float lenT = i == 0 ? 0 : Mathf.randomSeedRange(i + 3, 1f) - 1f;
+				Draw.rect(stack.item.region,
+						x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
+						y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
+						itemSize, itemSize, rotation);
+			}
+		}
 	}
 
 	@Override
@@ -354,8 +373,13 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 	public static void onUnitDeath(BaseUnit unit){
 		if(unit == null) return;
 
-		unit.onSuperDeath();
 		UnitDrops.dropItems(unit);
+
+		float explosiveness = 2f + (unit.inventory.hasItem() ? unit.inventory.getItem().item.explosiveness * unit.inventory.getItem().amount : 0f);
+		float flammability = (unit.inventory.hasItem() ? unit.inventory.getItem().item.flammability * unit.inventory.getItem().amount : 0f);
+		Damage.dynamicExplosion(unit.x, unit.y, flammability, explosiveness, 0f, unit.getSize()/2f, Palette.darkFlame);
+
+		unit.onSuperDeath();
 
 		ScorchDecal.create(unit.x, unit.y);
 		Effects.effect(ExplosionFx.explosion, unit);

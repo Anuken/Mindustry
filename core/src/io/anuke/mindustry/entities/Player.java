@@ -228,6 +228,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		float explosiveness = 2f + (player.inventory.hasItem() ? player.inventory.getItem().item.explosiveness * player.inventory.getItem().amount : 0f);
 		float flammability = (player.inventory.hasItem() ? player.inventory.getItem().item.flammability * player.inventory.getItem().amount : 0f);
 		Damage.dynamicExplosion(player.x, player.y, flammability, explosiveness, 0f, player.getSize()/2f, Palette.darkFlame);
+
 		ScorchDecal.create(player.x, player.y);
 		Effects.sound("die", player);
 		player.onDeath();
@@ -471,7 +472,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
 		if(ui.chatfrag.chatOpen()) return;
 
-		float speed = isBoosting && !mech.flying ? mech.boostSpeed : mech.speed;
+		float speed = isBoosting && !mech.flying ? debug ? 5f : mech.boostSpeed : mech.speed;
 		//fraction of speed when at max load
 		float carrySlowdown = 0.7f;
 

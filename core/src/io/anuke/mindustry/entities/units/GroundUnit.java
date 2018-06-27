@@ -28,9 +28,6 @@ import static io.anuke.mindustry.Vars.world;
 
 public abstract class GroundUnit extends BaseUnit {
     protected static Translator vec = new Translator();
-    protected static float maxAim = 30f;
-
-    protected static final int timerReloadAlt = timerIndex++;
 
     protected float walkTime;
     protected float baseRotation;
@@ -53,7 +50,9 @@ public abstract class GroundUnit extends BaseUnit {
 
     @Override
     public void move(float x, float y){
-        baseRotation = Mathf.slerpDelta(baseRotation, Mathf.atan2(x, y), type.baseRotateSpeed);
+        if(Mathf.dst(x, y) > 0.01f){
+            baseRotation = Mathf.slerpDelta(baseRotation, Mathf.atan2(x, y), type.baseRotateSpeed);
+        }
         super.move(x, y);
     }
 
@@ -66,7 +65,7 @@ public abstract class GroundUnit extends BaseUnit {
     public void update() {
         super.update();
 
-        if(!velocity.isZero(0.001f) && (target == null || !inventory.hasAmmo() || (inventory.hasAmmo() && distanceTo(target) > inventory.getAmmoRange()))){
+        if(!velocity.isZero(0.0001f) && (target == null || !inventory.hasAmmo() || (inventory.hasAmmo() && distanceTo(target) > inventory.getAmmoRange()))){
             rotation = Mathf.slerpDelta(rotation, velocity.angle(), 0.2f);
         }
     }
@@ -114,6 +113,8 @@ public abstract class GroundUnit extends BaseUnit {
                     x + Angles.trnsx(tra, type.weaponOffsetX * i, trY),
                     y + Angles.trnsy(tra, type.weaponOffsetX * i, trY), w, 12, rotation - 90);
         }
+
+        drawItems();
 
         Draw.alpha(1f);
     }

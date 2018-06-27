@@ -58,7 +58,7 @@ public class Weapons implements ContentList {
             ejectEffect = Fx.none;
             velocityRnd = 1f;
             inaccuracy = 40f;
-            setAmmo(AmmoTypes.bombExplosive);
+            setAmmo(AmmoTypes.bombExplosive, AmmoTypes.bombIncendiary);
         }};
     }
 

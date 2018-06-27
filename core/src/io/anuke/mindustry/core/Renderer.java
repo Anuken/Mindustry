@@ -247,7 +247,9 @@ public class Renderer extends RendererModule{
 
 		batch.end();
 
-		fog.draw();
+		if(showFog){
+			fog.draw();
+		}
 	}
 
 	private void drawAllTeams(boolean flying){

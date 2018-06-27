@@ -1,7 +1,7 @@
 package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.OrderedMap;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
@@ -23,7 +23,7 @@ public class Weapon extends Upgrade {
 	/**minimum cursor distance from player, fixes 'cross-eyed' shooting.*/
 	protected static float minPlayerDist = 20f;
 	/**ammo type map. set with setAmmo()*/
-	protected ObjectMap<Item, AmmoType> ammoMap = new ObjectMap<>();
+	protected OrderedMap<Item, AmmoType> ammoMap = new OrderedMap<>();
 	/**shell ejection effect*/
 	protected Effect ejectEffect = Fx.none;
 	/**weapon reload in frames*/
@@ -112,7 +112,7 @@ public class Weapon extends Upgrade {
 	}
 
 	public Iterable<Item> getAcceptedItems(){
-		return ammoMap.keys();
+		return ammoMap.orderedKeys();
 	}
 
 	public AmmoType getAmmoType(Item item){

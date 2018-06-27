@@ -14,9 +14,9 @@ public class StatusEffect implements Content{
 	public final float baseDuration;
 	public final int id;
 
-	public float damageMultiplier; //damage dealt
-	public float armorMultiplier; //armor points
-	public float speedMultiplier; //speed
+	public float damageMultiplier = 1f; //damage dealt
+	public float armorMultiplier = 1f; //armor points
+	public float speedMultiplier = 1f; //speed
 
 	/**Set of 'opposite' effects, which will decrease the duration of this effect when applied.*/
 	protected ObjectSet<StatusEffect> opposites = new ObjectSet<>();

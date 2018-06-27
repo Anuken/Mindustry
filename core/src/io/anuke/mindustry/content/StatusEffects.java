@@ -42,7 +42,6 @@ public class StatusEffects implements ContentList {
                 if (Mathf.chance(Timers.delta() * 0.2f)) {
                     Effects.effect(EnvironmentFx.burning, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                 }
-
             }
         };
 

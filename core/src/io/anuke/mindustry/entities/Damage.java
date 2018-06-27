@@ -169,7 +169,8 @@ public class Damage {
 	
 	private static float calculateDamage(float x, float y, float tx, float ty, float radius, float damage){
 		float dist = Vector2.dst(x, y, tx, ty);
-		float scaled = 1f - dist/radius;
+		float falloff = 0.4f;
+		float scaled = Mathf.lerp(1f - dist/radius, 1f, falloff);
 		return damage * scaled;
 	}
 }

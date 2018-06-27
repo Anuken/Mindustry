@@ -35,13 +35,13 @@ public class WeaponBullets extends BulletList {
             }
         };
 
-        bombIncendiary = new BombBulletType(20f, 20f, "shell"){
+        bombIncendiary = new BombBulletType(15f, 10f, "shell"){
             {
-                bulletWidth = 9f;
-                bulletHeight = 13f;
+                bulletWidth = 8f;
+                bulletHeight = 12f;
                 hiteffect = BulletFx.flakExplosion;
-                backColor = Palette.darkFlame;
-                frontColor = Palette.lightFlame;
+                backColor = Palette.lightOrange;
+                frontColor = Palette.lightishOrange;
             }
 
             @Override
