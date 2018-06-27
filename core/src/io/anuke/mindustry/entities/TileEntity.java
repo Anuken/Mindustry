@@ -171,6 +171,7 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 
 	@Remote(called = Loc.server, in = In.blocks)
 	public static void onTileDestroyed(Tile tile){
+		if(tile.entity == null) return;
 		tile.entity.onDeath();
 	}
 }

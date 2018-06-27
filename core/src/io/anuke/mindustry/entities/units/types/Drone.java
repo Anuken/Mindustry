@@ -3,9 +3,11 @@ package io.anuke.mindustry.entities.units.types;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Queue;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
@@ -15,8 +17,10 @@ import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.game.EventType.BlockBuildEvent;
 import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
@@ -80,6 +84,7 @@ public class Drone extends FlyingUnit implements BuilderTrait {
         float dist = Math.min(entity.distanceTo(x, y) - placeDistance, 0);
 
         if(dist / type.maxVelocity < timeToBuild * 0.9f){
+            CallEntity.onDroneBeginBuild(this, entity.tile, entity.recipe);
             target = entity;
             setState(build);
         }
@@ -211,6 +216,15 @@ public class Drone extends FlyingUnit implements BuilderTrait {
         if(mined != -1){
             mineTile = world.tile(mined);
         }
+    }
+
+    @Remote(in = In.entities)
+    public static void onDroneBeginBuild(Unit unit, Tile tile, Recipe recipe){
+        if(unit == null) return;
+
+        Drone drone = (Drone)unit;
+
+        drone.getPlaceQueue().addLast(new BuildRequest(tile.x, tile.y, tile.getRotation(), recipe));
     }
 
     public final UnitState
