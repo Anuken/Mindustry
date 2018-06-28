@@ -27,9 +27,9 @@ public class Recipes implements ContentList{
         new Recipe(defense, DefenseBlocks.doorLarge, new ItemStack(Items.carbide, 12*4), new ItemStack(Items.silicon, 8*4));
 
         //TURRETS
-        new Recipe(weapon, TurretBlocks.duo, new ItemStack(Items.tungsten, 20));
-        new Recipe(weapon, TurretBlocks.scorch, new ItemStack(Items.tungsten, 25), new ItemStack(Items.carbide, 20));
-        new Recipe(weapon, TurretBlocks.hail, new ItemStack(Items.tungsten, 25), new ItemStack(Items.carbide, 25));
+        new Recipe(weapon, TurretBlocks.duo, new ItemStack(Items.tungsten, 40));
+        new Recipe(weapon, TurretBlocks.scorch, new ItemStack(Items.tungsten, 50), new ItemStack(Items.carbide, 20));
+        new Recipe(weapon, TurretBlocks.hail, new ItemStack(Items.tungsten, 60), new ItemStack(Items.carbide, 35));
 
         new Recipe(weapon, TurretBlocks.lancer, new ItemStack(Items.tungsten, 25), new ItemStack(Items.lead, 25), new ItemStack(Items.silicon, 25));
         //TODO arc turret broken
@@ -90,10 +90,10 @@ public class Recipes implements ContentList{
         new Recipe(power, PowerBlocks.turbinegenerator, new ItemStack(Items.tungsten, 70), new ItemStack(Items.carbide, 50), new ItemStack(Items.lead, 80), new ItemStack(Items.silicon, 60));
 
 
-        //new Recipe(distribution, StorageBlocks.vault, new ItemStack(Items.carbide, 50));
         //new Recipe(distribution, StorageBlocks.core, new ItemStack(Items.carbide, 50));
-        //new Recipe(distribution, StorageBlocks.unloader, new ItemStack(Items.carbide, 5));
-        //new Recipe(distribution, StorageBlocks.sortedunloader, new ItemStack(Items.carbide, 5));
+        new Recipe(distribution, StorageBlocks.unloader, new ItemStack(Items.carbide, 40), new ItemStack(Items.silicon, 50));
+        new Recipe(distribution, StorageBlocks.sortedunloader, new ItemStack(Items.carbide, 40), new ItemStack(Items.silicon, 70));
+        new Recipe(distribution, StorageBlocks.vault, new ItemStack(Items.carbide, 300), new ItemStack(Items.thorium, 250));
 
         //DRILLS, PRODUCERS
         new Recipe(production, ProductionBlocks.tungstenDrill, new ItemStack(Items.tungsten, 30));

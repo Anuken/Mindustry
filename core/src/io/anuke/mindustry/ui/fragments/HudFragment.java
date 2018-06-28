@@ -330,7 +330,7 @@ public class HudFragment implements Fragment{
 		new imagebutton("icon-play", 30f, () -> {
 			state.wavetime = 0f;
 		}).height(uheight).fillX().right().padTop(-8f).padBottom(-12f).padLeft(-15).padRight(-10).width(40f).update(l->{
-			boolean vis = state.enemies <= 0 && (Net.server() || !Net.active());
+			boolean vis = state.mode.disableWaveTimer && (Net.server() || !Net.active());
 			boolean paused = state.is(State.paused) || !vis;
 			
 			l.setVisible(vis);
