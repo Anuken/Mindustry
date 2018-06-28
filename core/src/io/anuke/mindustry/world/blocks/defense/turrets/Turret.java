@@ -141,6 +141,14 @@ public abstract class Turret extends Block{
         return blockIcon;
     }
 
+    @Override
+	public TextureRegion[] getCompactIcon(){
+		if(compactIcon == null) {
+			compactIcon = new TextureRegion[]{iconRegion(Draw.region("block-icon-" + name))};
+		}
+		return compactIcon;
+	}
+
 	@Override
 	public void drawSelect(Tile tile){
 		Draw.color(tile.getTeam().color);

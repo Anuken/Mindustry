@@ -45,6 +45,7 @@ public class Block extends BaseBlock implements UnlockableContent{
 	protected TextureRegion[] blockIcon;
 	protected TextureRegion[] icon;
 	protected TextureRegion[] compactIcon;
+	protected TextureRegion editorIcon;
 
 	/**internal name*/
 	public final String name;
@@ -349,6 +350,13 @@ public class Block extends BaseBlock implements UnlockableContent{
 		}
 	}
 
+	public TextureRegion getEditorIcon(){
+		if(editorIcon == null){
+			editorIcon = Draw.region("block-icon-" + name, Draw.region("clear"));
+		}
+		return editorIcon;
+	}
+
 	/**Returns the icon used for displaying this block in the place menu*/
 	public TextureRegion[] getIcon(){
 	    if(icon == null) {
@@ -373,9 +381,12 @@ public class Block extends BaseBlock implements UnlockableContent{
 
     /**Returns a list of icon regions that have been cropped to 8x8*/
 	public TextureRegion[] getCompactIcon(){
-	    if(compactIcon == null) {
-            compactIcon = new TextureRegion[]{iconRegion(Draw.region("block-icon-" + name))};
-        }
+		if(compactIcon == null) {
+			compactIcon = new TextureRegion[getIcon().length];
+			for (int i = 0; i < compactIcon.length; i++) {
+				compactIcon[i] = iconRegion(getIcon()[i]);
+			}
+		}
 		return compactIcon;
 	}
 

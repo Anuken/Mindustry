@@ -213,7 +213,11 @@ public class UI extends SceneModule{
 	}
 
 	public void loadAnd(Callable call){
-		loadfrag.show();
+		loadAnd("$text.loading", call);
+	}
+
+	public void loadAnd(String text, Callable call){
+		loadfrag.show(text);
 		Timers.run(6f, () -> {
 			call.run();
 			loadfrag.hide();

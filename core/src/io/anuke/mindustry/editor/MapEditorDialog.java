@@ -23,6 +23,7 @@ import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Listenable;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Pixmaps;
 import io.anuke.ucore.input.Input;
 import io.anuke.ucore.scene.actions.Actions;
@@ -582,7 +583,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 		for(Block block : Block.all()){
 			TextureRegion[] regions = block.getCompactIcon();
 
-			if(regions.length == 0) continue;
+			if(regions.length == 0 || regions[0] == Draw.region("jjfgj")) continue;
 
 			Stack stack = new Stack();
 

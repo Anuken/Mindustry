@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
@@ -19,6 +20,14 @@ public class OreBlock extends Floor {
         this.minimapColor = ore.color;
         this.blends = block -> block instanceof OreBlock && ((OreBlock) block).base != base;
         this.edge = base.name;
+    }
+
+    @Override
+    public TextureRegion getEditorIcon(){
+        if(editorIcon == null){
+            editorIcon = variantRegions[0];
+        }
+        return editorIcon;
     }
 
     @Override

@@ -117,7 +117,7 @@ public class MapRenderer implements Disposable{
         TextureRegion region;
 
         if(bw != 0) {
-            region = Draw.region("block-icon-" + wall.name, Draw.region("clear"));
+            region = wall.getEditorIcon();
 
             if (wall.rotate) {
                 mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
@@ -129,7 +129,7 @@ public class MapRenderer implements Disposable{
                         region.getRegionWidth(), region.getRegionHeight());
             }
         }else{
-            region = Draw.region("block-icon-" + floor.name, Draw.region("clear"));
+            region = floor.getEditorIcon();
 
             mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize, region, wx * tilesize, wy * tilesize, 8, 8);
         }
