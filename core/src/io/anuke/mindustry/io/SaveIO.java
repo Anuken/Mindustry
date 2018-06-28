@@ -9,6 +9,8 @@ import io.anuke.mindustry.io.versions.Save16;
 import io.anuke.ucore.core.Settings;
 
 import java.io.*;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -59,7 +61,7 @@ public class SaveIO{
 			byte[] bytes = Base64Coder.decode(string);
 			return new DataInputStream(new ByteArrayInputStream(bytes));
 		}else{
-			return new DataInputStream(fileFor(slot).read());
+			return new DataInputStream(new InflaterInputStream(fileFor(slot).read()));
 		}
 	}
 	
@@ -112,11 +114,10 @@ public class SaveIO{
 	}
 
 	public static void write(OutputStream os){
-
 		DataOutputStream stream;
 		
 		try{
-			stream = new DataOutputStream(os);
+			stream = new DataOutputStream(new DeflaterOutputStream(os));
 			getVersion().write(stream);
 			stream.close();
 		}catch (Exception e){
@@ -142,7 +143,7 @@ public class SaveIO{
 		DataInputStream stream;
 		
 		try{
-			stream = new DataInputStream(is);
+			stream = new DataInputStream(new InflaterInputStream(is));
 			int version = stream.readInt();
 			SaveFileVersion ver = versions.get(version);
 

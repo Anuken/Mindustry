@@ -19,6 +19,7 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.util.Bits;
+import io.anuke.ucore.util.Log;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -240,32 +241,5 @@ public class Save16 extends SaveFileVersion {
                 i += consecutives;
             }
         }
-
-        /*
-        //now write all blocks
-        for(int x = 0; x < world.width(); x ++){
-            for(int y = 0; y < world.height(); y ++){
-                Tile tile = world.tile(x, y);
-
-                stream.writeByte(tile.floor().id);
-                stream.writeByte(tile.block().id);
-                stream.writeByte(tile.elevation);
-
-                if(tile.block() instanceof BlockPart){
-                    stream.writeByte(tile.link);
-                }
-
-                if(tile.entity != null){
-                    stream.writeByte(Bits.packByte((byte)tile.getTeam().ordinal(), tile.getRotation())); //team + rotation
-                    stream.writeShort((short)tile.entity.health); //health
-
-                    if(tile.entity.items != null) tile.entity.items.write(stream);
-                    if(tile.entity.power != null) tile.entity.power.write(stream);
-                    if(tile.entity.liquids != null) tile.entity.liquids.write(stream);
-
-                    tile.entity.write(stream);
-                }
-            }
-        }*/
     }
 }

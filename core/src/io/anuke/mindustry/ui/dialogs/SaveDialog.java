@@ -56,6 +56,7 @@ public class SaveDialog extends LoadDialog{
 			try{
 				slot.save();
 			}catch(Throwable e){
+				e.printStackTrace();
 				e = (e.getCause() == null ? e : e.getCause());
 
 				ui.showError("[orange]"+Bundles.get("text.savefail")+"\n[white]" + ClassReflection.getSimpleName(e.getClass()) + ": " + e.getMessage() + "\n" + "at " + e.getStackTrace()[0].getFileName() + ":" + e.getStackTrace()[0].getLineNumber());
