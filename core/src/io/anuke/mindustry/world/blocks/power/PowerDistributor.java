@@ -14,6 +14,7 @@ import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -68,8 +69,8 @@ public class PowerDistributor extends PowerBlock{
 	public void setStats(){
 		super.setStats();
 
-		stats.add(BlockStat.powerRange, laserRange);
-		stats.add(BlockStat.powerTransferSpeed, powerSpeed * 60);
+		stats.add(BlockStat.powerRange, laserRange, StatUnit.blocks);
+		stats.add(BlockStat.powerTransferSpeed, powerSpeed * 60, StatUnit.powerSecond);
 	}
 
 	@Override

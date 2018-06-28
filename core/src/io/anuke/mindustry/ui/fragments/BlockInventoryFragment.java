@@ -1,6 +1,5 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.IntSet;
@@ -106,7 +105,7 @@ public class BlockInventoryFragment implements Fragment {
                 HandCursorListener l = new HandCursorListener();
                 l.setEnabled(canPick);
 
-                ItemImage image = new ItemImage(item.region, () -> round(items[f]), Color.WHITE);
+                ItemImage image = new ItemImage(item.region, () -> round(items[f]));
                 image.addListener(l);
                 image.tapped(() -> {
                     if(!canPick.get() || items[f] == 0) return;

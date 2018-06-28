@@ -14,10 +14,10 @@ public class UnitBlocks extends BlockList implements ContentList {
     public void load() {
         droneFactory = new UnitFactory("dronefactory") {{
             type = UnitTypes.drone;
-            produceTime = 300;
+            produceTime = 800;
             size = 2;
             requirements = new ItemStack[]{
-                new ItemStack(Items.silicon, 20), new ItemStack(Items.lead, 20)
+                new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30)
             };
         }};
 

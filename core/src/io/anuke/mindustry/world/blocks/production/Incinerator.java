@@ -8,6 +8,8 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -32,6 +34,13 @@ public class Incinerator extends Block {
     public void setBars() {
         super.setBars();
         bars.remove(BarType.liquid);
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+
+        stats.add(BlockStat.powerUse, powerUse * 60f, StatUnit.powerSecond);
     }
 
     @Override

@@ -63,12 +63,12 @@ public class Recipes implements ContentList{
         //TODO implement alloy smelter
         // new Recipe(crafting, CraftingBlocks.alloySmelter, new ItemStack(Items.silicon, 160), new ItemStack(Items.lead, 160), new ItemStack(Items.thorium, 140));
 
-        new Recipe(crafting, CraftingBlocks.plasteelcompressor, new ItemStack(Items.silicon, 60), new ItemStack(Items.lead, 170), new ItemStack(Items.titanium, 170));
+       // new Recipe(crafting, CraftingBlocks.plasteelcompressor, new ItemStack(Items.silicon, 60), new ItemStack(Items.lead, 170), new ItemStack(Items.titanium, 170));
 
         //misc
         new Recipe(crafting, CraftingBlocks.pulverizer, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 50));
-        new Recipe(crafting, CraftingBlocks.thermiteMixer, new ItemStack(Items.tungsten, 100), new ItemStack(Items.lead, 50));
-        new Recipe(crafting, CraftingBlocks.blastMixer, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 60), new ItemStack(Items.carbide, 40));
+        //new Recipe(crafting, CraftingBlocks.thermiteMixer, new ItemStack(Items.tungsten, 100), new ItemStack(Items.lead, 50));
+        //new Recipe(crafting, CraftingBlocks.blastMixer, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 60), new ItemStack(Items.carbide, 40));
         new Recipe(crafting, CraftingBlocks.cryofluidmixer, new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 80), new ItemStack(Items.titanium, 90));
 
         new Recipe(crafting, CraftingBlocks.melter, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 70), new ItemStack(Items.carbide, 90));
@@ -102,7 +102,7 @@ public class Recipes implements ContentList{
 
         new Recipe(production, ProductionBlocks.waterextractor, new ItemStack(Items.tungsten, 50), new ItemStack(Items.carbide, 50), new ItemStack(Items.lead, 40));
         new Recipe(production, ProductionBlocks.cultivator, new ItemStack(Items.tungsten, 20), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 20));
-        new Recipe(production, ProductionBlocks.oilextractor, new ItemStack(Items.tungsten, 90), new ItemStack(Items.carbide, 150), new ItemStack(Items.lead, 100), new ItemStack(Items.silicon, 100));
+        //new Recipe(production, ProductionBlocks.oilextractor, new ItemStack(Items.tungsten, 90), new ItemStack(Items.carbide, 150), new ItemStack(Items.lead, 100), new ItemStack(Items.silicon, 100));
 
         //UNITS
 

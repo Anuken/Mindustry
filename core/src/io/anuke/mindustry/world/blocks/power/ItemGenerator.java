@@ -7,6 +7,8 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockBar;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.values.ItemFilterValue;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -28,6 +30,13 @@ public abstract class ItemGenerator extends PowerGenerator {
 		super(name);
 		itemCapacity = 20;
 		hasItems = true;
+	}
+
+	@Override
+	public void setStats() {
+		super.setStats();
+
+		stats.add(BlockStat.inputItems, new ItemFilterValue(item -> getItemEfficiency(item) >= minItemEfficiency));
 	}
 
 	@Override
@@ -86,7 +95,7 @@ public abstract class ItemGenerator extends PowerGenerator {
 		
 	}
 
-	 protected abstract float getItemEfficiency(Item item);
+	protected abstract float getItemEfficiency(Item item);
 
 	@Override
 	public TileEntity getEntity() {

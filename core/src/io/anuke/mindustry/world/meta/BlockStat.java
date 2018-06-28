@@ -1,5 +1,7 @@
 package io.anuke.mindustry.world.meta;
 
+import io.anuke.ucore.util.Bundles;
+
 /**Describes one type of stat for a block.*/
 public enum BlockStat {
     health(StatCategory.general),
@@ -20,12 +22,15 @@ public enum BlockStat {
     maxPowerGeneration(StatCategory.power),
 
     inputLiquid(StatCategory.crafting),
+    liquidUse(StatCategory.crafting),
     inputItem(StatCategory.crafting),
     inputItems(StatCategory.crafting),
     inputFuel(StatCategory.crafting),
     fuelBurnTime(StatCategory.crafting),
     craftSpeed(StatCategory.crafting),
     outputItem(StatCategory.crafting),
+    drillTier(StatCategory.crafting),
+    drillSpeed(StatCategory.crafting),
 
     shootRange(StatCategory.shooting),
     inaccuracy(StatCategory.shooting),
@@ -40,5 +45,9 @@ public enum BlockStat {
 
     BlockStat(StatCategory category) {
         this.category = category;
+    }
+
+    public String localized(){
+        return Bundles.get("text.blocks." + name().toLowerCase());
     }
 }

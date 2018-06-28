@@ -2,34 +2,37 @@ package io.anuke.mindustry.ui;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.ucore.function.Supplier;
-import io.anuke.ucore.scene.style.TextureRegionDrawable;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
 
 public class ItemImage extends Stack {
-    private Image image;
 
-    public ItemImage(TextureRegion region, Supplier<CharSequence> text, Color color) {
+    public ItemImage(TextureRegion region, Supplier<CharSequence> text) {
         Table t = new Table().left().bottom();
 
+        t.label(text).color(Color.DARK_GRAY).padBottom(-60).get().setFontScale(0.5f);
+        t.row();
         t.label(text).get().setFontScale(0.5f);
 
-        image = new Image(region);
-        image.setColor(color);
+        Image image = new Image(region);
 
         add(image);
         add(t);
     }
 
-    public ItemImage updateColor(Supplier<Color> c){
-        image.update(() -> image.setColor(c.get()));
-        return this;
-    }
+    public ItemImage(ItemStack stack) {
+        Table t = new Table().left().bottom();
 
-    public ItemImage updateRegion(Supplier<TextureRegion> c){
-        image.update(() -> image.setDrawable(new TextureRegionDrawable(c.get())));
-        return this;
+        t.add(stack.amount + "").color(Color.DARK_GRAY).padBottom(-22).get().setFontScale(0.5f);
+        t.row();
+        t.add(stack.amount + "").get().setFontScale(0.5f);
+
+        Image image = new Image(stack.item.region);
+
+        add(image);
+        add(t);
     }
 }

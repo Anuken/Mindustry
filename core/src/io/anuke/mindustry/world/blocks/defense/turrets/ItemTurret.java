@@ -8,6 +8,8 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockBar;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.values.ItemFilterValue;
 
 public class ItemTurret extends CooledTurret {
     protected int maxAmmo = 50;
@@ -17,6 +19,15 @@ public class ItemTurret extends CooledTurret {
     public ItemTurret(String name) {
         super(name);
         hasItems = true;
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+
+        stats.remove(BlockStat.itemCapacity);
+
+        stats.add(BlockStat.inputItems, new ItemFilterValue(item -> ammoMap.containsKey(item)));
     }
 
     @Override

@@ -12,6 +12,8 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Graphics;
@@ -117,6 +119,9 @@ public class Drill extends Block{
 	public void setStats(){
 		super.setStats();
 		//TODO add drill speed stats
+
+        stats.add(BlockStat.drillTier, tier, StatUnit.none);
+        stats.add(BlockStat.drillSpeed, 60f/drillTime, StatUnit.itemsSecond);
 	}
 	
 	@Override

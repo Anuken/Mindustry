@@ -5,8 +5,10 @@ import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.BarType;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockBar;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
 import io.anuke.ucore.core.Effects;
 
 public abstract class LiquidTurret extends Turret {
@@ -16,6 +18,13 @@ public abstract class LiquidTurret extends Turret {
     public LiquidTurret(String name) {
         super(name);
         hasLiquids = true;
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+
+        stats.add(BlockStat.inputItems, new LiquidFilterValue(item -> liquidAmmoMap.containsKey(item)));
     }
 
     @Override

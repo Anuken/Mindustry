@@ -7,6 +7,8 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 
@@ -29,6 +31,25 @@ public class PowerCrafter extends Block{
         update = true;
         hasPower = true;
         hasItems = true;
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+
+        stats.add(BlockStat.inputItem, input);
+
+        if(outputItem != null){
+            stats.add(BlockStat.outputItem, outputItem);
+        }
+
+        if(outputLiquid != null){
+            stats.add(BlockStat.liquidOutput, outputLiquid);
+        }
+
+        if(hasPower){
+            stats.add(BlockStat.powerUse, 60f * powerUse, StatUnit.powerSecond);
+        }
     }
 
     @Override

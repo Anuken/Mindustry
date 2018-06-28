@@ -126,7 +126,7 @@ public class Block extends BaseBlock implements UnlockableContent{
 	public Block(String name) {
 		this.name = name;
 		this.formalName = Bundles.get("block." + name + ".name", name);
-		this.fullDescription = Bundles.getOrNull("block." + name + ".fulldescription");
+		this.fullDescription = Bundles.getOrNull("block." + name + ".description");
 		this.solid = false;
 		this.id = lastid++;
 
@@ -221,11 +221,11 @@ public class Block extends BaseBlock implements UnlockableContent{
 	
 	public void setStats(){
 		stats.add(BlockStat.size, "{0}x{0}", size);
-		stats.add(BlockStat.health, health);
+		stats.add(BlockStat.health, health, StatUnit.none);
 
-		if(hasPower) stats.add(BlockStat.powerCapacity, powerCapacity);
-		if(hasLiquids) stats.add(BlockStat.liquidCapacity, liquidCapacity);
-		if(hasItems) stats.add(BlockStat.itemCapacity, itemCapacity);
+		if(hasPower) stats.add(BlockStat.powerCapacity, powerCapacity, StatUnit.powerUnits);
+		if(hasLiquids) stats.add(BlockStat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
+		if(hasItems) stats.add(BlockStat.itemCapacity, itemCapacity, StatUnit.items);
 	}
 
 	//TODO make this easier to config.

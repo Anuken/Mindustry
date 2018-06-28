@@ -10,14 +10,14 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.values.ItemListValue;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Mathf;
-
-import java.util.Arrays;
 
 public class Smelter extends Block{
 	protected final int timerDump = timers++;
@@ -55,13 +55,13 @@ public class Smelter extends Block{
 	public void setStats(){
 		super.setStats();
 
-		stats.add(BlockStat.inputFuel, fuel.toString());
-		stats.add(BlockStat.fuelBurnTime, burnDuration/60f);
-		stats.add(BlockStat.inputItems, Arrays.toString(inputs));
-		stats.add(BlockStat.outputItem, result.toString());
-		stats.add(BlockStat.craftSpeed, 60f/craftTime);
-		stats.add(BlockStat.inputItemCapacity, itemCapacity);
-		stats.add(BlockStat.outputItemCapacity, itemCapacity);
+		stats.add(BlockStat.inputFuel, fuel);
+		stats.add(BlockStat.fuelBurnTime, burnDuration/60f, StatUnit.seconds);
+		stats.add(BlockStat.inputItems, new ItemListValue(inputs));
+		stats.add(BlockStat.outputItem, result);
+		stats.add(BlockStat.craftSpeed, 60f/craftTime, StatUnit.itemsSecond);
+		stats.add(BlockStat.inputItemCapacity, itemCapacity, StatUnit.items);
+		stats.add(BlockStat.outputItemCapacity, itemCapacity, StatUnit.items);
 	}
 
 	@Override

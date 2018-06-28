@@ -1,6 +1,8 @@
 package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Timers;
 
 public class SolarGenerator extends PowerGenerator {
@@ -9,6 +11,13 @@ public class SolarGenerator extends PowerGenerator {
 
     public SolarGenerator(String name){
         super(name);
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+
+        stats.add(BlockStat.maxPowerGeneration, generation * 60f, StatUnit.powerSecond);
     }
 
     @Override

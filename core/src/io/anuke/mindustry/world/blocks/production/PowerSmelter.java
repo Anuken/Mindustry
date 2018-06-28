@@ -10,6 +10,8 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.values.ItemListValue;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -20,7 +22,6 @@ import io.anuke.ucore.util.Mathf;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 
 public class PowerSmelter extends PowerBlock {
     protected final int timerDump = timers++;
@@ -70,12 +71,12 @@ public class PowerSmelter extends PowerBlock {
         super.setStats();
         //TODO input/outputs
 
-        stats.add(BlockStat.inputItems, Arrays.toString(inputs));
-        stats.add(BlockStat.powerUse, powerUse * 60f);
-        stats.add(BlockStat.outputItem, result.toString());
-        stats.add(BlockStat.craftSpeed, 60f/craftTime);
-        stats.add(BlockStat.inputItemCapacity, itemCapacity);
-        stats.add(BlockStat.outputItemCapacity, itemCapacity);
+        stats.add(BlockStat.inputItems, new ItemListValue(inputs));
+        stats.add(BlockStat.powerUse, powerUse * 60f, StatUnit.powerSecond);
+        stats.add(BlockStat.outputItem, result);
+        stats.add(BlockStat.craftSpeed, 60f/craftTime, StatUnit.itemsSecond);
+        stats.add(BlockStat.inputItemCapacity, itemCapacity, StatUnit.items);
+        stats.add(BlockStat.outputItemCapacity, itemCapacity, StatUnit.items);
     }
 
     @Override

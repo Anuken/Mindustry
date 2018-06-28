@@ -4,6 +4,8 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -19,6 +21,13 @@ public abstract class ItemLiquidGenerator extends ItemGenerator {
         super(name);
         hasLiquids = true;
         liquidCapacity = 10f;
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+
+        stats.add(BlockStat.inputLiquid, new LiquidFilterValue(item -> getLiquidEfficiency(item) >= minLiquidEfficiency));
     }
 
     @Override

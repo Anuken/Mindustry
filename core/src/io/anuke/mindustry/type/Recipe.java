@@ -9,6 +9,8 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
 
+import java.util.Arrays;
+
 import static io.anuke.mindustry.Vars.debug;
 import static io.anuke.mindustry.Vars.headless;
 
@@ -30,6 +32,8 @@ public class Recipe implements UnlockableContent{
         this.result = result;
         this.requirements = requirements;
         this.category = category;
+
+        Arrays.sort(requirements, (a, b) -> Integer.compare(a.item.id, b.item.id));
 
         float timeToPlace = 0f;
         for(ItemStack stack : requirements){
@@ -56,9 +60,9 @@ public class Recipe implements UnlockableContent{
     public void init() {
         if(!Bundles.has("block." + result.name + ".name")) {
             Log.err("WARNING: Recipe block '{0}' does not have a formal name defined.", result.name);
-        }else if(result.fullDescription == null){
+        }/*else if(result.fullDescription == null){
             Log.err("WARNING: Recipe block '{0}' does not have a description defined.", result.name);
-        }
+        }*/
     }
 
     @Override

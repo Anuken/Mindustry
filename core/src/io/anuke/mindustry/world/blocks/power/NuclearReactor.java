@@ -12,6 +12,7 @@ import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -60,8 +61,8 @@ public class NuclearReactor extends PowerGenerator {
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add(BlockStat.inputItem, generateItem.toString());
-		stats.add(BlockStat.maxPowerGeneration, powerMultiplier*60f);
+		stats.add(BlockStat.inputItem, generateItem);
+		stats.add(BlockStat.maxPowerGeneration, powerMultiplier*60f, StatUnit.powerSecond);
 	}
 	
 	@Override

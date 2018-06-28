@@ -12,6 +12,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.*;
@@ -57,7 +58,7 @@ public class Conveyor extends Block{
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add(BlockStat.itemSpeed, speed * 60);
+		stats.add(BlockStat.itemSpeed, speed * 60, StatUnit.pixelsSecond);
 	}
 
 	@Override

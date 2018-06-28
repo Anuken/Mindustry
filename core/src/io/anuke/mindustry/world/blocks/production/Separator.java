@@ -7,6 +7,9 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.values.ItemFilterValue;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
@@ -35,6 +38,24 @@ public class Separator extends Block {
         solid = true;
         hasItems = true;
         hasLiquids = true;
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+
+        if(hasPower){
+            stats.add(BlockStat.powerUse, powerUse * 60f, StatUnit.powerSecond);
+        }
+
+        stats.add(BlockStat.liquidUse, liquidUse * 60f, StatUnit.liquidSecond);
+        stats.add(BlockStat.inputLiquid, liquid);
+        stats.add(BlockStat.outputItem, new ItemFilterValue(item -> {
+            for(Item i : results){
+                if(item == i) return true;
+            }
+            return false;
+        }));
     }
 
     @Override

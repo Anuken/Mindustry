@@ -56,7 +56,7 @@ public class Items implements ContentList{
 
         plasteel = new Item("plasteel", Color.valueOf("e9ead3")) {{
             type = ItemType.material;
-            flammability = 0.2f;
+            flammability = 0.1f;
             explosiveness = 0.1f;
         }};
 

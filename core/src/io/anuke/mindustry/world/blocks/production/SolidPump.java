@@ -6,6 +6,8 @@ import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -25,6 +27,16 @@ public class SolidPump extends Pump {
         super(name);
         hasPower = true;
         liquidRegion = name + "-liquid";
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+
+        stats.remove(BlockStat.liquidOutput);
+
+        stats.add(BlockStat.powerUse, powerUse * 60f, StatUnit.powerSecond);
+        stats.add(BlockStat.liquidOutput, result);
     }
 
     @Override

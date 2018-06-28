@@ -21,6 +21,9 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.modules.InventoryModule;
 import io.anuke.mindustry.world.meta.BlockBar;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.values.ItemListValue;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
@@ -47,6 +50,15 @@ public class UnitFactory extends Block {
         hasPower = true;
         hasItems = true;
         solidifes = true;
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+
+        stats.add(BlockStat.inputItems, new ItemListValue(requirements));
+        stats.add(BlockStat.powerUse, powerUse * 60f, StatUnit.powerSecond);
+        stats.add(BlockStat.craftSpeed, produceTime/60f, StatUnit.seconds);
     }
 
     @Override

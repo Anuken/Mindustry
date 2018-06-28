@@ -8,6 +8,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
@@ -35,7 +36,7 @@ public class Pump extends LiquidBlock{
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add(BlockStat.liquidOutput, 60f*pumpAmount);
+		stats.add(BlockStat.liquidOutput, 60f*pumpAmount, StatUnit.liquidSecond);
 	}
 	
 	@Override

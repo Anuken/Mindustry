@@ -12,6 +12,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -56,11 +57,13 @@ public class GenericCrafter extends Block{
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add(BlockStat.craftSpeed, 60f/craftTime);
-		stats.add(BlockStat.outputItem, output.toString());
+		stats.add(BlockStat.craftSpeed, 60f/craftTime, StatUnit.itemsSecond);
+		stats.add(BlockStat.outputItem, output);
 
-		if(inputLiquid != null) stats.add(BlockStat.inputLiquid, "{0} x {1}", inputLiquid, (int)(liquidUse * craftTime));
-		if(inputItem != null) stats.add(BlockStat.inputItem, "{0} x {1}", inputItem, inputItem.amount);
+		if(inputLiquid != null) stats.add(BlockStat.inputLiquid, inputLiquid);
+		if(inputLiquid != null) stats.add(BlockStat.liquidUse, (liquidUse * craftTime), StatUnit.liquidSecond);
+		if(inputItem != null) stats.add(BlockStat.inputItem, inputItem);
+		if(hasPower) stats.add(BlockStat.powerUse, powerUse * 60f, StatUnit.powerSecond);
 	}
 	
 	@Override
