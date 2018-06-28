@@ -11,14 +11,12 @@ import io.anuke.mindustry.content.blocks.OreBlocks;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapTileData;
-import io.anuke.mindustry.io.MapTileData.DataPosition;
 import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.noise.RidgedPerlin;
 import io.anuke.ucore.noise.Simplex;
-import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.SeedRandom;
@@ -31,42 +29,40 @@ public class WorldGenerator {
 	static int oreIndex = 0;
 	
 	/**Should fill spawns with the correct spawnpoints.*/
-	public static void generate(Tile[][] tiles, MapTileData data, boolean genOres, int seed){
-		oreIndex = 0;
-
-		Array<OreEntry> ores = Array.with(
-			new OreEntry(Items.tungsten, 0.3f, seed),
-			new OreEntry(Items.coal, 0.284f, seed),
-			new OreEntry(Items.lead, 0.28f, seed),
-			new OreEntry(Items.titanium, 0.27f, seed),
-			new OreEntry(Items.thorium, 0.26f, seed)
-		);
-
-		IntArray multiblocks = new IntArray();
-
+	public static void loadTileData(Tile[][] tiles, MapTileData data, boolean genOres, int seed){
 		data.position(0, 0);
 		TileDataMarker marker = data.newDataMarker();
 
 		for(int y = 0; y < data.height(); y ++){
 			for(int x = 0; x < data.width(); x ++){
 				data.read(marker);
+				
+				tiles[x][y] = new Tile(x, y, marker.floor, marker.wall == Blocks.blockpart.id ? 0 : marker.wall, marker.rotation, marker.team, marker.elevation);
+			}
+		}
 
-				Tile tile = new Tile(x, y, marker.floor, marker.wall == Blocks.blockpart.id ? 0 : marker.wall, marker.rotation, marker.team, marker.elevation);
+		prepareTiles(tiles, seed, genOres);
+	}
 
-				Team team = Team.all[marker.team];
+	public static void prepareTiles(Tile[][] tiles, int seed, boolean genOres){
+		
+		//find multiblocks
+		IntArray multiblocks = new IntArray();
 
-				if(tile.block().isMultiblock()){
-					multiblocks.add(tile.packedPosition());
-				}
+		for(int x = 0; x < tiles.length; x ++) {
+			for (int y = 0; y < tiles[0].length; y++) {
+				Tile tile = tiles[x][y];
+				
+				Team team = tile.getTeam();
 
 				if(tile.block() == StorageBlocks.core &&
 						state.teams.has(team)){
 					state.teams.get(team).cores.add(tile);
 				}
-
-				tiles[x][y] = tile;
-
-				//TODO ores, plants, extra decoration?
+				
+				if(tiles[x][y].block().isMultiblock()){
+					multiblocks.add(tiles[x][y].packedPosition());
+				}
 			}
 		}
 
@@ -99,8 +95,8 @@ public class WorldGenerator {
 		}
 
 		//update cliffs, occlusion data
-		for(int x = 0; x < data.width(); x ++){
-			for(int y = 0; y < data.height(); y ++) {
+		for(int x = 0; x < tiles.length; x ++){
+			for(int y = 0; y < tiles[0].length; y ++) {
 				Tile tile = tiles[x][y];
 
 				tile.updateOcclusion();
@@ -112,10 +108,19 @@ public class WorldGenerator {
 			}
 		}
 
-		if(genOres) {
+		oreIndex = 0;
 
-			for (int x = 0; x < data.width(); x++) {
-				for (int y = 0; y < data.height(); y++) {
+		if(genOres) {
+			Array<OreEntry> ores = Array.with(
+					new OreEntry(Items.tungsten, 0.3f, seed),
+					new OreEntry(Items.coal, 0.284f, seed),
+					new OreEntry(Items.lead, 0.28f, seed),
+					new OreEntry(Items.titanium, 0.27f, seed),
+					new OreEntry(Items.thorium, 0.26f, seed)
+			);
+
+			for (int x = 0; x < tiles.length; x++) {
+				for (int y = 0; y < tiles[0].length; y++) {
 
 					Tile tile = tiles[x][y];
 
@@ -137,15 +142,14 @@ public class WorldGenerator {
 		}
 	}
 
-	public static MapTileData generate(){
+	public static void generateMap(Tile[][] tiles, int seed){
 		Simplex sim = new Simplex(Mathf.random(99999));
 		Simplex sim2 = new Simplex(Mathf.random(99999));
 		Simplex sim3 = new Simplex(Mathf.random(99999));
 
 		SeedRandom random = new SeedRandom(Mathf.random(99999));
 
-		MapTileData data = new MapTileData(400, 400);
-		TileDataMarker marker = data.newDataMarker();
+		int width = tiles.length, height = tiles[0].length;
 
 		ObjectMap<Block, Block> decoration = new ObjectMap<>();
 
@@ -155,16 +159,17 @@ public class WorldGenerator {
 		decoration.put(Blocks.snow, Blocks.icerock);
 		decoration.put(Blocks.blackstone, Blocks.blackrock);
 
-		for (int x = 0; x < data.width(); x++) {
-			for (int y = 0; y < data.height(); y++) {
-				marker.floor = (byte)Blocks.stone.id;
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				Block floor = Blocks.stone;
+				Block wall = Blocks.air;
 
 				double elevation = sim.octaveNoise2D(3, 0.5, 1f/100, x, y) * 4.1 - 1;
 				double temp = sim3.octaveNoise2D(7, 0.53, 1f/320f, x, y);
 
 				double r = sim2.octaveNoise2D(1, 0.6, 1f/70, x, y);
-				double edgeDist = Math.max(data.width()/2, data.height()/2) - Math.max(Math.abs(x - data.width()/2), Math.abs(y - data.height()/2));
-				double dst = Vector2.dst(data.width()/2, data.height()/2, x, y);
+				double edgeDist = Math.max(width/2, height/2) - Math.max(Math.abs(x - width/2), Math.abs(y - height/2));
+				double dst = Vector2.dst(width/2, height/2, x, y);
 				double elevDip = 30;
 
 				double border = 14;
@@ -174,53 +179,53 @@ public class WorldGenerator {
 				}
 
 				if(temp < 0.35){
-					marker.floor = (byte)Blocks.snow.id;
+					floor = Blocks.snow;
 				}else if(temp < 0.45){
-					marker.floor = (byte)Blocks.stone.id;
+					floor = Blocks.stone;
 				}else if(temp < 0.65){
-					marker.floor = (byte)Blocks.grass.id;
+					floor = Blocks.grass;
 				}else if(temp < 0.8){
-					marker.floor = (byte)Blocks.sand.id;
+					floor = Blocks.sand;
 				}else if(temp < 0.9){
-					marker.floor = (byte)Blocks.blackstone.id;
+					floor = Blocks.blackstone;
 					elevation = 0f;
 				}else{
-					marker.floor = (byte)Blocks.lava.id;
+					floor = Blocks.lava;
 				}
 
 				if(dst < elevDip){
 					elevation -= (elevDip - dst)/elevDip * 3.0;
 				}else if(r > 0.9){
-					marker.floor = (byte)Blocks.water.id;
+					floor = Blocks.water;
 					elevation = 0;
 
 					if(r > 0.94){
-						marker.floor = (byte)Blocks.deepwater.id;
+						floor = Blocks.deepwater;
 					}
 				}
 
-				marker.elevation = (byte)Math.max(elevation, 0);
-
-				if(marker.wall == 0 && decoration.containsKey(Block.getByID(marker.floor)) && random.chance(0.03)){
-					marker.wall = (byte)decoration.get(Block.getByID(marker.floor)).id;
+				if(wall == Blocks.air && decoration.containsKey(floor) && random.chance(0.03)){
+					wall = decoration.get(floor);
 				}
 
-				data.write(marker);
-
-				marker.wall = 0;
+				Tile tile = new Tile(x, y, (byte)floor.id, (byte)wall.id);
+				tile.elevation = (byte)Math.max(elevation, 0);
+				tiles[x][y] = tile;
 			}
 		}
 
-		for (int x = 0; x < data.width(); x++) {
-			for (int y = 0; y < data.height(); y++) {
-				byte elevation = data.read(x, y, DataPosition.elevation);
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				Tile tile = tiles[x][y];
+
+				byte elevation = tile.elevation;
 
 				for(GridPoint2 point : Geometry.d4){
-					if(!Mathf.inBounds(x + point.x, y + point.y, data.width(), data.height())) continue;
-					if(data.read(x + point.x, y + point.y, DataPosition.elevation) < elevation){
+					if(!Mathf.inBounds(x + point.x, y + point.y, width, height)) continue;
+					if(tiles[x + point.x][y + point.y].elevation < elevation){
 
 						if(Mathf.chance(0.05)){
-							data.write(x, y, DataPosition.elevation, (byte)-1);
+							tile.elevation = -1;
 						}
 						break;
 					}
@@ -228,9 +233,10 @@ public class WorldGenerator {
 			}
 		}
 
-		data.write(data.width()/2, data.height()/2, DataPosition.wall, (byte)StorageBlocks.core.id);
-		data.write(data.width()/2, data.height()/2, DataPosition.rotationTeam, Bits.packByte((byte)0, (byte)Team.blue.ordinal()));
-		return data;
+		tiles[width/2][height/2].setBlock(StorageBlocks.core);
+		tiles[width/2][height/2].setTeam(Team.blue);
+		
+		prepareTiles(tiles, seed, true);
 	}
 
 	static class OreEntry{

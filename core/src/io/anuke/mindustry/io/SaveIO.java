@@ -127,12 +127,12 @@ public class SaveIO{
 
 	public static void load(FileHandle file){
 		try {
-			load(file.read());
+			load(new InflaterInputStream(file.read()));
 		}catch (RuntimeException e){
 			e.printStackTrace();
 			FileHandle backup = file.sibling(file.name() + "-backup." + file.extension());
 			if(backup.exists()){
-				load(backup.read());
+				load(new InflaterInputStream(backup.read()));
 			}
 		}
 	}
@@ -143,7 +143,7 @@ public class SaveIO{
 		DataInputStream stream;
 		
 		try{
-			stream = new DataInputStream(new InflaterInputStream(is));
+			stream = new DataInputStream(is);
 			int version = stream.readInt();
 			SaveFileVersion ver = versions.get(version);
 

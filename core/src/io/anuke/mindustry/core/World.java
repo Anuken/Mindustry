@@ -174,25 +174,30 @@ public class World extends Module{
 	/**Loads up a procedural map. This does not call play(), but calls reset().*/
 	public void loadProceduralMap(){
 		Timers.mark();
-		MapTileData data = WorldGenerator.generate();
-		Map map = new Map("generated-map", new MapMeta(0, new ObjectMap<>(), data.width(), data.height(), null), true, () -> null);
+		Timers.mark();
 
 		logic.reset();
 
 		beginMapLoad();
+
+		int width = 400, height = 400;
+
+		Tile[][] tiles = createTiles(width, height);
+
+		Map map = new Map("Generated Map", new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
 		setMap(map);
-
-		int width = map.meta.width, height = map.meta.height;
-
-		Tile[][] tiles = createTiles(data.width(), data.height());
 
 		EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
-		WorldGenerator.generate(tiles, data, true, Mathf.random(9999999));
+		Timers.mark();
+		WorldGenerator.generateMap(tiles, Mathf.random(9999999));
+		Log.info("Time to generate base map: {0}", Timers.elapsed());
+
+		Log.info("Time to generate fully without additional events: {0}", Timers.elapsed());
 
 		endMapLoad();
 
-		Log.info("Time to generate: {0}", Timers.elapsed());
+		Log.info("Full time to generate: {0}", Timers.elapsed());
 	}
 
     public void setMap(Map map){
@@ -214,7 +219,7 @@ public class World extends Module{
 		
 		EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
-		WorldGenerator.generate(tiles, MapIO.readTileData(map, true), map.meta.hasOreGen(), seed);
+		WorldGenerator.loadTileData(tiles, MapIO.readTileData(map, true), map.meta.hasOreGen(), seed);
 
 		endMapLoad();
 	}
