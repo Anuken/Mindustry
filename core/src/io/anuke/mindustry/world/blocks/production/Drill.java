@@ -120,8 +120,27 @@ public class Drill extends Block{
 		super.setStats();
 		//TODO add drill speed stats
 
-        stats.add(BlockStat.drillTier, tier, StatUnit.none);
+        stats.add(BlockStat.drillTier, table -> {
+			Array<Item> list = new Array<>();
+
+			for(Item item : Item.all()){
+				if(tier >= item.hardness && Draw.hasRegion(item.name + "1")){
+					list.add(item);
+				}
+			}
+
+			for (int i = 0; i < list.size; i++) {
+				Item item = list.get(i);
+				table.addImage(item.name + "1").size(8*3).padRight(2).padLeft(2);
+				if(i != list.size - 1){
+					table.add("/");
+				}
+			}
+		});
         stats.add(BlockStat.drillSpeed, 60f/drillTime, StatUnit.itemsSecond);
+		if(inputLiquid != null){
+			stats.add(BlockStat.inputLiquid, inputLiquid);
+		}
 	}
 	
 	@Override

@@ -4,10 +4,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
@@ -31,6 +32,16 @@ public class Cultivator extends Drill {
     public Cultivator(String name) {
         super(name);
         drillEffect = Fx.none;
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+
+        stats.remove(BlockStat.drillTier);
+        stats.add(BlockStat.drillTier, table -> {
+            table.addImage("grass1").size(8*3);
+        });
     }
 
     @Override
