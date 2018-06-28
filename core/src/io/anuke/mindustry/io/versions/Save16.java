@@ -14,6 +14,7 @@ import io.anuke.mindustry.io.SaveFileVersion;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.trait.Entity;
@@ -94,47 +95,54 @@ public class Save16 extends SaveFileVersion {
 
         Tile[][] tiles = world.createTiles(width, height);
 
-        for(int x = 0; x < width; x ++){
-            for(int y = 0; y < height; y ++) {
-                byte floorid = stream.readByte();
-                byte wallid = stream.readByte();
-                byte elevation = stream.readByte();
+        for (int i = 0; i < width * height; i++) {
+            int x = i % width, y = i /width;
+            byte floorid = stream.readByte();
+            byte wallid = stream.readByte();
+            byte elevation = stream.readByte();
 
-                Tile tile = new Tile(x, y, floorid, wallid);
+            Tile tile = new Tile(x, y, floorid, wallid);
+            tile.elevation = elevation;
 
-                tile.elevation = elevation;
+            if (wallid == Blocks.blockpart.id) {
+                tile.link = stream.readByte();
+            }else if (tile.entity != null) {
+                byte tr = stream.readByte();
+                short health = stream.readShort();
 
-                if (wallid == Blocks.blockpart.id) {
-                    tile.link = stream.readByte();
+                byte team = Bits.getLeftByte(tr);
+                byte rotation = Bits.getRightByte(tr);
+
+                Team t = Team.all[team];
+
+                tile.setTeam(Team.all[team]);
+                tile.entity.health = health;
+                tile.setRotation(rotation);
+
+                if (tile.entity.items != null) tile.entity.items.read(stream);
+                if (tile.entity.power != null) tile.entity.power.read(stream);
+                if (tile.entity.liquids != null) tile.entity.liquids.read(stream);
+
+                tile.entity.read(stream);
+
+                if(tile.block() == StorageBlocks.core &&
+                        state.teams.has(t)){
+                    state.teams.get(t).cores.add(tile);
+                }
+            }else if(wallid == 0){
+                int consecutives = stream.readUnsignedByte();
+
+                for (int j = i + 1; j < i + 1 + consecutives; j++) {
+                    int newx = j % width, newy = j / width;
+                    Tile newTile = new Tile(newx, newy, floorid, wallid);
+                    newTile.elevation = elevation;
+                    tiles[newx][newy] = newTile;
                 }
 
-                if (tile.entity != null) {
-                    byte tr = stream.readByte();
-                    short health = stream.readShort();
-
-                    byte team = Bits.getLeftByte(tr);
-                    byte rotation = Bits.getRightByte(tr);
-
-                    Team t = Team.all[team];
-
-                    tile.setTeam(Team.all[team]);
-                    tile.entity.health = health;
-                    tile.setRotation(rotation);
-
-                    if (tile.entity.items != null) tile.entity.items.read(stream);
-                    if (tile.entity.power != null) tile.entity.power.read(stream);
-                    if (tile.entity.liquids != null) tile.entity.liquids.read(stream);
-
-                    tile.entity.read(stream);
-
-                    if(tile.block() == StorageBlocks.core &&
-                            state.teams.has(t)){
-                        state.teams.get(t).cores.add(tile);
-                    }
-                }
-
-                tiles[x][y] = tile;
+                i += consecutives;
             }
+
+            tiles[x][y] = tile;
         }
 
         world.endMapLoad();
@@ -191,10 +199,49 @@ public class Save16 extends SaveFileVersion {
 
         //--MAP DATA--
 
+        Timers.mark();
+
         //write world size
         stream.writeShort(world.width());
         stream.writeShort(world.height());
 
+        for (int i = 0; i < world.width() * world.height(); i++) {
+            Tile tile = world.tile(i);
+
+            stream.writeByte(tile.getFloorID());
+            stream.writeByte(tile.getWallID());
+            stream.writeByte(tile.elevation);
+
+            if(tile.block() instanceof BlockPart){
+                stream.writeByte(tile.link);
+            }else if(tile.entity != null){
+                stream.writeByte(Bits.packByte(tile.getTeamID(), tile.getRotation())); //team + rotation
+                stream.writeShort((short)tile.entity.health); //health
+
+                if(tile.entity.items != null) tile.entity.items.write(stream);
+                if(tile.entity.power != null) tile.entity.power.write(stream);
+                if(tile.entity.liquids != null) tile.entity.liquids.write(stream);
+
+                tile.entity.write(stream);
+            }else if(tile.getWallID() == 0){
+                int consecutives = 0;
+
+                for (int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++) {
+                    Tile nextTile = world.tile(j);
+
+                    if(nextTile.getFloorID() != tile.getFloorID() || nextTile.getWallID() != 0 || nextTile.elevation != tile.elevation){
+                        break;
+                    }
+
+                    consecutives ++;
+                }
+
+                stream.writeByte(consecutives);
+                i += consecutives;
+            }
+        }
+
+        /*
         //now write all blocks
         for(int x = 0; x < world.width(); x ++){
             for(int y = 0; y < world.height(); y ++){
@@ -219,6 +266,6 @@ public class Save16 extends SaveFileVersion {
                     tile.entity.write(stream);
                 }
             }
-        }
+        }*/
     }
 }
