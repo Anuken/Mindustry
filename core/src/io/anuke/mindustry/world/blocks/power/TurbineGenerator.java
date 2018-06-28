@@ -4,6 +4,7 @@ import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.core.Timers;
 
 public class TurbineGenerator extends BurnerGenerator {
@@ -13,6 +14,13 @@ public class TurbineGenerator extends BurnerGenerator {
 
     public TurbineGenerator(String name) {
         super(name);
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+
+        stats.add(BlockStat.inputLiquidAux, auxLiquid);
     }
 
     @Override

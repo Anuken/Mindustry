@@ -21,10 +21,10 @@ import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.Saves;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Recipe;
+import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityPhysics;
-import io.anuke.ucore.input.InputProxy;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Atlas;
 
@@ -46,7 +46,6 @@ public class Control extends Module{
 	private ObjectMap<Sound, Long> soundMap = new ObjectMap<>();
 
     private Throwable error;
-    private InputProxy proxy;
     private Input gdxInput;
 
 	public Control(){
@@ -68,30 +67,6 @@ public class Control extends Module{
 		db.load();
 
 		gdxInput = Gdx.input;
-
-		proxy = new InputProxy(Gdx.input){
-            @Override
-            public int getX(int pointer) {
-                return pointer >= inputs.length ? super.getX(pointer) : (int)inputs[pointer].getMouseX();
-            }
-
-            @Override
-            public int getY(int pointer) {
-                return pointer >= inputs.length ? super.getY(pointer) : (int)inputs[pointer].getMouseY();
-            }
-
-            @Override
-            public int getX() {
-                return (int)inputs[0].getMouseX();
-            }
-
-            @Override
-            public int getY() {
-                return (int)inputs[0].getMouseY();
-            }
-        };
-
-		//Gdx.input = proxy;
 
 		Sounds.load("shoot.mp3", "place.mp3", "explosion.mp3", "enemyshoot.mp3",
 				"corexplode.mp3", "break.mp3", "spawn.mp3", "flame.mp3", "die.mp3",
@@ -261,15 +236,14 @@ public class Control extends Module{
 	public void playMap(Map map){
 		ui.loadfrag.show();
 
-		Timers.run(5f, () -> {
+		Timers.run(5f, () ->
 			threads.run(() -> {
 				logic.reset();
 				world.loadMap(map);
 				logic.play();
 
 				Gdx.app.postRunnable(ui.loadfrag::hide);
-			});
-		});
+			}));
 	}
 
 	public boolean isHighScore(){
@@ -317,6 +291,20 @@ public class Control extends Module{
 		EntityPhysics.initPhysics();
 
 		Platform.instance.updateRPC();
+
+		if(!Settings.has("4.0-warning")){
+			Settings.putBool("4.0-warning", true);
+
+			Timers.runTask(5f, () -> {
+				FloatingDialog dialog = new FloatingDialog("[orange]WARNING![]");
+				dialog.buttons().addButton("$text.ok", dialog::hide).size(100f, 60f);
+				dialog.content().add("The beta version you are about to play should be considered very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
+						"A large portion of content is still unimplemented. \nAll current art and UI is temporary, and will be re-drawn before release. " +
+						"\n\n[accent]Saves and maps may be corrupted without warning between updates.[] You have been warned!").wrap().width(500f);
+				dialog.show();
+
+			});
+		}
 	}
 
 	/**Called from main logic thread.*/

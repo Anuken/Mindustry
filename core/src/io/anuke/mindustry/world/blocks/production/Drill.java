@@ -118,7 +118,6 @@ public class Drill extends Block{
 	@Override
 	public void setStats(){
 		super.setStats();
-		//TODO add drill speed stats
 
         stats.add(BlockStat.drillTier, table -> {
 			Array<Item> list = new Array<>();
@@ -131,15 +130,21 @@ public class Drill extends Block{
 
 			for (int i = 0; i < list.size; i++) {
 				Item item = list.get(i);
-				table.addImage(item.name + "1").size(8*3).padRight(2).padLeft(2);
+				table.addImage(item.name + "1").size(8*3).padRight(2).padLeft(2).padTop(3).padBottom(3);
 				if(i != list.size - 1){
 					table.add("/");
 				}
 			}
 		});
+
         stats.add(BlockStat.drillSpeed, 60f/drillTime, StatUnit.itemsSecond);
+
 		if(inputLiquid != null){
 			stats.add(BlockStat.inputLiquid, inputLiquid);
+		}
+
+		if(hasPower){
+			stats.add(BlockStat.powerUse,  powerUse*60f, StatUnit.powerSecond);
 		}
 	}
 	
