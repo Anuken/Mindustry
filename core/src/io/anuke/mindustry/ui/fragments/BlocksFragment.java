@@ -15,6 +15,7 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.blocks.defense.turrets.Turret;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatCategory;
@@ -364,7 +365,13 @@ public class BlocksFragment implements Fragment{
 		ScrollPane pane = new ScrollPane(table, "clear");
 
 		table.table(title -> {
-			title.addImage(Draw.region("block-icon-" + block.name)).size(8 * 6);
+			int size = 8*6;
+
+			if(block instanceof Turret){
+				size = (8 * block.size + 2) * (7 - block.size*2);
+			}
+			
+			title.addImage(Draw.region("block-icon-" + block.name)).size(size);
 			title.add("[accent]" + block.formalName).padLeft(5);
 		});
 

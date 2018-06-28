@@ -2,6 +2,7 @@ package io.anuke.mindustry;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.ucore.util.Mathf;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -20,12 +21,16 @@ public class Image {
     private Color color = new Color();
 
     public Image(BufferedImage atlas, TextureRegion region){
-        this.atlas = atlas;
-
-        this.image = new BufferedImage(region.getRegionWidth(), region.getRegionHeight(), BufferedImage.TYPE_INT_ARGB);
-        this.graphics = image.createGraphics();
+        this(atlas, region.getRegionWidth(), region.getRegionHeight());
 
         draw(region);
+    }
+
+    public Image(BufferedImage atlas, int width, int height){
+        this.atlas = atlas;
+
+        this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        this.graphics = image.createGraphics();
 
         toDispose.add(this);
     }
@@ -36,6 +41,14 @@ public class Image {
 
     public int height(){
         return image.getHeight();
+    }
+
+    public boolean isEmpty(int x, int y){
+        if(!Mathf.inBounds(x, y, width(), height())){
+            return true;
+        }
+        Color color = getColor(x, y);
+        return color.a <= 0.001f;
     }
 
     public Color getColor(int x, int y){
@@ -56,7 +69,12 @@ public class Image {
 
     /**Draws an image at the top left corner.*/
     public void draw(Image image){
-        graphics.drawImage(image.image, 0, 0, null);
+        draw(image, 0, 0);
+    }
+
+    /**Draws an image at the coordinates specified.*/
+    public void draw(Image image, int x, int y){
+        graphics.drawImage(image.image, x, y, null);
     }
 
     public void draw(TextureRegion region, boolean flipx, boolean flipy){

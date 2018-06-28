@@ -56,15 +56,20 @@ public abstract class Turret extends Block{
 	protected float rotatespeed = 5f; //in degrees per tick
 	protected float shootCone = 8f;
 	protected float shootShake = 0f;
+
 	protected Translator tr = new Translator();
 	protected Translator tr2 = new Translator();
-	protected String base = null; //name of the region to draw under turret, usually null
+
+	protected TextureRegion baseRegion;
+	protected TextureRegion heatRegion;
+	protected TextureRegion baseTopRegion;
+
     protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) -> Draw.rect(name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
 	protected BiConsumer<Tile, TurretEntity> heatDrawer = (tile, entity) ->{
 		Graphics.setAdditiveBlending();
 		Draw.color(heatColor);
 		Draw.alpha(entity.heat);
-		Draw.rect(name + "-heat", tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+		Draw.rect(heatRegion, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
 		Graphics.setNormalBlending();
 	};
 
@@ -83,6 +88,15 @@ public abstract class Turret extends Block{
 	}
 
 	@Override
+	public void load() {
+		super.load();
+
+		baseRegion = Draw.region("block-" + size);
+		baseTopRegion = Draw.region("block-" +size + "-top");
+		heatRegion = Draw.region(name + "-heat");
+	}
+
+	@Override
 	public void setStats(){
 		super.setStats();
 		/*
@@ -98,16 +112,10 @@ public abstract class Turret extends Block{
 	
 	@Override
 	public void draw(Tile tile){
-		if(base == null) {
-			Draw.rect("block-" + size, tile.drawx(), tile.drawy());
-			if(Draw.hasRegion("block-" + size + "-top")) {
-				Draw.color(tile.getTeam().color, Color.WHITE, 0.45f);
-				Draw.rect("block-" + size + "-top", tile.drawx(), tile.drawy());
-				Draw.color();
-			}
-		}else{
-			Draw.rect(base, tile.drawx(), tile.drawy());
-		}
+		Draw.rect(baseRegion, tile.drawx(), tile.drawy());
+		Draw.color(tile.getTeam().color, Color.WHITE, 0.45f);
+		Draw.rect(baseTopRegion, tile.drawx(), tile.drawy());
+		Draw.color();
 	}
 	
 	@Override
@@ -128,11 +136,11 @@ public abstract class Turret extends Block{
 	@Override
     public TextureRegion[] getBlockIcon(){
 	    if(blockIcon == null){
-	        blockIcon = Draw.hasRegion(name) ? new TextureRegion[]{Draw.region("block-" + size), Draw.region(name)} : new TextureRegion[0];
+	        blockIcon = new TextureRegion[]{Draw.region("block-icon-" + name)};
         }
         return blockIcon;
     }
-	
+
 	@Override
 	public void drawSelect(Tile tile){
 		Draw.color(tile.getTeam().color);

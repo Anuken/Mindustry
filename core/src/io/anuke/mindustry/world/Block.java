@@ -374,10 +374,7 @@ public class Block extends BaseBlock implements UnlockableContent{
     /**Returns a list of icon regions that have been cropped to 8x8*/
 	public TextureRegion[] getCompactIcon(){
 	    if(compactIcon == null) {
-            compactIcon = new TextureRegion[getIcon().length];
-            for (int i = 0; i < compactIcon.length; i++) {
-                compactIcon[i] = iconRegion(getIcon()[i]);
-            }
+            compactIcon = new TextureRegion[]{iconRegion(Draw.region("block-icon-" + name))};
         }
 		return compactIcon;
 	}

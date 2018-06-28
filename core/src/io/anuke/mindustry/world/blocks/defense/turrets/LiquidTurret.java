@@ -24,7 +24,7 @@ public abstract class LiquidTurret extends Turret {
     public void setStats() {
         super.setStats();
 
-        stats.add(BlockStat.inputItems, new LiquidFilterValue(item -> liquidAmmoMap.containsKey(item)));
+        stats.add(BlockStat.inputLiquid, new LiquidFilterValue(item -> liquidAmmoMap.containsKey(item)));
     }
 
     @Override

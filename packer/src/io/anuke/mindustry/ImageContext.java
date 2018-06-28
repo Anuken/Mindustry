@@ -93,6 +93,10 @@ public class ImageContext {
         Log.info("&ly[Generator]&lc Time to generate &lm{0}&lc: &lg{1}&lcms", name, Timers.elapsed());
     }
 
+    public Image create(int width, int height){
+        return new Image(image, width, height);
+    }
+
     public Image get(String name){
         return get(Core.atlas.getRegion(name));
     }

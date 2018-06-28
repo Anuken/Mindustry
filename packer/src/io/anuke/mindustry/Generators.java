@@ -8,6 +8,8 @@ import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.OreBlock;
+import io.anuke.mindustry.world.blocks.defense.turrets.Turret;
+import io.anuke.ucore.graphics.Hue;
 
 public class Generators {
 
@@ -21,20 +23,56 @@ public class Generators {
                     continue;
                 }
 
-                if(regions[0] == null){
-                    context.err("Error in block \"{0}\": null region!", block.name);
-                }
+                if(block instanceof Turret){
+                    Color color = Color.ROYAL;
 
-                Image image = context.get(regions[0]);
-
-                for(TextureRegion region : regions){
-                    if(region == null){
-                        context.err("Error in block \"{0}\": null region!", block.name);
+                    Image image = context.get(block.name);
+                    if(image.width() != block.size*8 + 2){
+                        Image resized = context.create(block.size*8 + 2, block.size*8 + 2);
+                        resized.draw(image, (resized.width() - image.width())/2, (resized.height() - image.height())/2);
+                        image = resized;
                     }
-                    image.draw(region);
-                }
 
-                image.save("block-icon-" + block.name);
+                    Image read = context.create(image.width(), image.height());
+                    read.draw(image);
+
+                    for (int x = 0; x < image.width(); x++) {
+                        for (int y = 0; y < image.height(); y++) {
+                            if(read.isEmpty(x, y) &&
+                                    (!read.isEmpty(x, y + 1) || !read.isEmpty(x, y - 1) || !read.isEmpty(x + 1, y) || !read.isEmpty(x - 1, y))){
+                                image.draw(x, y, color);
+                            }
+                        }
+                    }
+
+                    Image base = context.get("block-" + block.size);
+                    Image top = context.get("block-" + block.size + "-top");
+
+                    for (int x = 0; x < base.width(); x++) {
+                        for (int y = 0; y < base.height(); y++) {
+                            Color result = top.getColor(x, y);
+                            if(result.a > 0.01f){
+                                Hue.mix(result, color, 0.45f, result);
+                                base.draw(x, y, result);
+                            }
+                        }
+                    }
+
+                    Image padded = context.create(base.width() + 2, base.height() + 2);
+                    padded.draw(base, 1, 1);
+                    padded.draw(image, 0, 0);
+
+                    padded.save("block-icon-" + block.name);
+                }else {
+
+                    Image image = context.get(regions[0]);
+
+                    for (TextureRegion region : regions) {
+                        image.draw(region);
+                    }
+
+                    image.save("block-icon-" + block.name);
+                }
             }
         });
 

@@ -157,7 +157,7 @@ public class TurretBlocks extends BlockList implements ContentList {
 			size = 3;
 		}};
 
-		spectre = new ItemTurret("eraser") {{
+		spectre = new ItemTurret("spectre") {{
 			ammoTypes = new AmmoType[]{AmmoTypes.bulletTungsten, AmmoTypes.bulletLead, AmmoTypes.bulletCarbide, AmmoTypes.bulletThermite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
 			reload = 25f;
 			restitution = 0.03f;
