@@ -2,10 +2,9 @@ package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.game.UnlockableContent;
 
 //TODO implement this class
-public class WeatherEvent implements UnlockableContent{
+public class WeatherEvent implements Content{
     private static final Array<WeatherEvent> all = new Array<>();
     private static int lastid;
 
@@ -17,11 +16,6 @@ public class WeatherEvent implements UnlockableContent{
         this.name = name;
 
         all.add(this);
-    }
-
-    @Override
-    public String getContentName() {
-        return name;
     }
 
     @Override

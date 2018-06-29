@@ -1,8 +1,6 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectSet;
-import com.badlogic.gdx.utils.OrderedSet;
+import com.badlogic.gdx.utils.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.content.bullets.*;
@@ -28,6 +26,7 @@ import io.anuke.ucore.util.Log;
 public class ContentLoader {
     private static boolean loaded = false;
     private static ObjectSet<Array<? extends Content>> contentSet = new OrderedSet<>();
+    private static OrderedMap<String, Array<Content>> contentMap = new OrderedMap<>();
     private static ContentList[] content = {
         //effects
         new BlockFx(),
@@ -104,6 +103,15 @@ public class ContentLoader {
         }
 
         for (ContentList list : content){
+            if(list.getAll().size != 0){
+                String type = list.getAll().first().getContentTypeName();
+
+                if(!contentMap.containsKey(type)){
+                    contentMap.put(type, new Array<>());
+                }
+
+                contentMap.get(type).addAll(list.getAll());
+            }
             contentSet.add(list.getAll());
         }
 
@@ -132,6 +140,10 @@ public class ContentLoader {
 
     public static void dispose(){
         //TODO clear all content.
+    }
+
+    public static OrderedMap<String, Array<Content>> getContentMap(){
+        return contentMap;
     }
 
     /**Registers sync IDs for all types of sync entities.

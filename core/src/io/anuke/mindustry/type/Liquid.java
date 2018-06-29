@@ -1,10 +1,14 @@
 package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.ui.ContentDisplay;
+import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
 public class Liquid implements UnlockableContent{
@@ -40,8 +44,19 @@ public class Liquid implements UnlockableContent{
 		Liquid.liquids.add(this);
 	}
 
+	@Override
+	public void displayInfo(Table table) {
+		ContentDisplay.displayLiquid(table, this);
+	}
+
+	@Override
 	public String localizedName(){
 		return Bundles.get("liquid."+ this.name + ".name");
+	}
+
+	@Override
+	public TextureRegion getContentIcon() {
+		return Draw.region("liquid-icon");
 	}
 
 	@Override

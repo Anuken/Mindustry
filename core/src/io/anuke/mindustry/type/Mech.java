@@ -3,10 +3,13 @@ package io.anuke.mindustry.type;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.Weapons;
+import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.scene.ui.layout.Table;
 
 //TODO merge unit type with mech
-public class Mech extends Upgrade {
+public class Mech extends Upgrade implements UnlockableContent{
 	public boolean flying;
 
 	public float speed = 1.1f;
@@ -36,6 +39,26 @@ public class Mech extends Upgrade {
 		super(name);
 		this.flying = flying;
 	}
+
+	@Override
+	public void displayInfo(Table table) {
+		ContentDisplay.displayMech(table, this);
+	}
+
+	@Override
+	public TextureRegion getContentIcon() {
+		return iconRegion;
+	}
+
+    @Override
+    public String getContentName() {
+        return name;
+    }
+
+    @Override
+    public String getContentTypeName() {
+        return "mech";
+    }
 
 	@Override
 	public void load() {

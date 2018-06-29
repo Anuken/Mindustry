@@ -4,25 +4,15 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.OrderedMap;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.type.Category;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.defense.turrets.Turret;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.BlockStats;
-import io.anuke.mindustry.world.meta.StatCategory;
-import io.anuke.mindustry.world.meta.StatValue;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
@@ -327,7 +317,7 @@ public class BlocksFragment implements Fragment{
 		nameLabel.setWrap(true);
 		header.add(nameLabel).padLeft(2).width(120f);
 
-		header.addButton("?", () -> showBlockInfo(recipe.result)).expandX().padLeft(3).top().right().size(40f, 44f).padTop(-2);
+		header.addButton("?", () -> ui.content.show(recipe)).expandX().padLeft(3).top().right().size(40f, 44f).padTop(-2);
 
 		descTable.add().pad(2);
 
@@ -355,62 +345,6 @@ public class BlocksFragment implements Fragment{
 		}
 
 		descTable.row();
-	}
-
-	private void showBlockInfo(Block block){
-		FloatingDialog dialog = new FloatingDialog("$text.blocks.blockinfo");
-		dialog.addCloseButton();
-
-		Table table = new Table();
-		ScrollPane pane = new ScrollPane(table, "clear");
-
-		table.table(title -> {
-			int size = 8*6;
-
-			if(block instanceof Turret){
-				size = (8 * block.size + 2) * (7 - block.size*2);
-			}
-			
-			title.addImage(Draw.region("block-icon-" + block.name)).size(size);
-			title.add("[accent]" + block.formalName).padLeft(5);
-		});
-
-		table.row();
-
-		table.addImage("white").height(3).color(Color.LIGHT_GRAY).pad(15).padLeft(0).padRight(0).fillX();
-
-		table.row();
-
-		if(block.fullDescription != null){
-			table.add(block.fullDescription).padLeft(5).padRight(5).width(400f).wrap().fillX();
-			table.row();
-
-			table.addImage("white").height(3).color(Color.LIGHT_GRAY).pad(15).padLeft(0).padRight(0).fillX();
-			table.row();
-		}
-
-		BlockStats stats = block.stats;
-
-		for(StatCategory cat : stats.toMap().keys()){
-			OrderedMap<BlockStat, StatValue> map = stats.toMap().get(cat);
-
-			if(map.size == 0) continue;
-
-			table.add("$text.category." + cat.name()).color(Palette.accent).fillX();
-			table.row();
-
-			for (BlockStat stat : map.keys()){
-				table.table(inset -> {
-					inset.left();
-					inset.add("[LIGHT_GRAY]" + stat.localized() + ":[] ");
-					map.get(stat).display(inset);
-				}).fillX().padLeft(10);
-				table.row();
-			}
-		}
-
-		dialog.content().add(pane).grow();
-		dialog.show();
 	}
 
 	String format(int number){

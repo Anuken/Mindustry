@@ -57,6 +57,8 @@ public class UI extends SceneModule{
 	public RollbackDialog rollback;
 	public ChangelogDialog changelog;
 	public LocalPlayerDialog localplayers;
+	public UnlocksDialog unlocks;
+	public ContentInfoDialog content;
 
 	public final MenuFragment menufrag = new MenuFragment();
     public final HudFragment hudfrag = new HudFragment();
@@ -72,10 +74,10 @@ public class UI extends SceneModule{
 		Dialog.setShowAction(()-> sequence(
 			alpha(0f),
 			originCenter(),
-			moveToAligned(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, Align.center), 
+			moveToAligned(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, Align.center),
 			scaleTo(0.0f, 1f),
 			parallel(
-				scaleTo(1f, 1f, 0.1f, Interpolation.fade), 
+				scaleTo(1f, 1f, 0.1f, Interpolation.fade),
 				fadeIn(0.1f, Interpolation.fade)
 			)
 		));
@@ -173,6 +175,8 @@ public class UI extends SceneModule{
 		rollback = new RollbackDialog();
 		maps = new MapsDialog();
 		localplayers = new LocalPlayerDialog();
+		unlocks = new UnlocksDialog();
+		content = new ContentInfoDialog();
 
 		build.begin(scene);
 

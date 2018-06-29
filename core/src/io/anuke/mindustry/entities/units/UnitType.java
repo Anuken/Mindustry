@@ -8,8 +8,11 @@ import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.type.Weapon;
+import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.ucore.function.Supplier;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.util.Bundles;
 
 //TODO merge unit type with mech
 public class UnitType implements UnlockableContent{
@@ -52,6 +55,21 @@ public class UnitType implements UnlockableContent{
         types.add(this);
 
         TypeTrait.registerType(type, mainConstructor);
+    }
+
+    @Override
+    public void displayInfo(Table table) {
+        ContentDisplay.displayUnit(table, this);
+    }
+
+    @Override
+    public String localizedName() {
+        return Bundles.get("unit." + name + ".name");
+    }
+
+    @Override
+    public TextureRegion getContentIcon() {
+        return iconRegion;
     }
 
     @Override

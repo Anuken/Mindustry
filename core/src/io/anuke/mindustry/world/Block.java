@@ -14,7 +14,6 @@ import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.effect.RubbleDecal;
 import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
@@ -34,7 +33,7 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Block extends BaseBlock implements UnlockableContent{
+public class Block extends BaseBlock implements Content{
 	private static int lastid;
 	private static Array<Block> blocks = new Array<>(140);
 	private static ObjectMap<String, Block> map = new ObjectMap<>();
@@ -454,11 +453,6 @@ public class Block extends BaseBlock implements UnlockableContent{
 				"entity.id", tile.entity.id,
 				"entity.items.total", hasItems ? tile.entity.items.totalItems() : null
 		);
-	}
-
-	@Override
-	public String getContentName() {
-		return name;
 	}
 
 	@Override

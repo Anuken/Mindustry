@@ -25,7 +25,7 @@ public class MenuFragment implements Fragment{
 					float w = 200f;
 					float bw = w * 2f + 10f;
 
-					defaults().size(w, 70f).padTop(5).padRight(5);
+					defaults().size(w, 66f).padTop(5).padRight(5);
 
 					add(new MenuButton("icon-play-2", "$text.play", MenuFragment.this::showPlaySelect)).width(bw).colspan(2);
 
@@ -40,6 +40,12 @@ public class MenuFragment implements Fragment{
 					add(new MenuButton("icon-info", "$text.about.button", ui.about::show));
 
 					add(new MenuButton("icon-tools", "$text.settings", ui.settings::show));
+
+					row();
+
+					add(new MenuButton("icon-menu", "$text.changelog.title", ui.changelog::show));
+
+					add(new MenuButton("icon-unlocks", "$text.unlocks", ui.unlocks::show));
 
 					row();
 					

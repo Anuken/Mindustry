@@ -14,7 +14,7 @@ public class CustomListeners {
     static public class LagListener extends QueuedListener {
         protected final ScheduledExecutorService threadPool;
         private final int lagMillisMin, lagMillisMax;
-        final LinkedList<Runnable> runnables = new LinkedList();
+        final LinkedList<Runnable> runnables = new LinkedList<>();
 
         public LagListener (int lagMillisMin, int lagMillisMax, Listener listener) {
             super(listener);

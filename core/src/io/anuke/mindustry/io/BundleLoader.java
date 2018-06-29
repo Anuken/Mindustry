@@ -17,7 +17,7 @@ public class BundleLoader {
 
     public static void load(){
         Settings.defaults("locale", "default");
-        Settings.load("io.anuke.mindustry");
+        Settings.load(headless ? "io.anuke.mindustry.server" : "io.anuke.mindustry");
         loadBundle();
     }
 

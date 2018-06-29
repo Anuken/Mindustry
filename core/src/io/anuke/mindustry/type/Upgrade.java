@@ -2,12 +2,11 @@ package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.util.Bundles;
 
-public abstract class Upgrade implements UnlockableContent{
+public abstract class Upgrade implements Content{
     private static Array<Upgrade> upgrades = new Array<>();
     private static byte lastid;
 
@@ -23,23 +22,13 @@ public abstract class Upgrade implements UnlockableContent{
         upgrades.add(this);
     }
 
-    public String localized(){
+    public String localizedName(){
         return Bundles.get("upgrade." + name + ".name");
     }
 
     @Override
     public String toString(){
-        return localized();
-    }
-
-    @Override
-    public String getContentName() {
-        return name;
-    }
-
-    @Override
-    public String getContentTypeName() {
-        return "upgrade";
+        return localizedName();
     }
 
     @Override

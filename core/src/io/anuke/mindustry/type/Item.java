@@ -6,7 +6,9 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
 public class Item implements Comparable<Item>, UnlockableContent{
@@ -47,8 +49,19 @@ public class Item implements Comparable<Item>, UnlockableContent{
 		this.region = Draw.region("item-" + name);
 	}
 
+	@Override
+	public void displayInfo(Table table) {
+		ContentDisplay.displayItem(table, this);
+	}
+
+	@Override
 	public String localizedName(){
 		return Bundles.get("item." + this.name + ".name");
+	}
+
+	@Override
+	public TextureRegion getContentIcon() {
+		return region;
 	}
 
 	@Override

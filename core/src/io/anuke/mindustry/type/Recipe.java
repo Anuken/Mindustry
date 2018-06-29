@@ -1,11 +1,14 @@
 package io.anuke.mindustry.type;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.mindustry.world.Block;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
@@ -55,6 +58,21 @@ public class Recipe implements UnlockableContent{
     public Recipe setDebug(){
         debugOnly = true;
         return this;
+    }
+
+    @Override
+    public void displayInfo(Table table) {
+        ContentDisplay.displayRecipe(table, this);
+    }
+
+    @Override
+    public String localizedName() {
+        return result.formalName;
+    }
+
+    @Override
+    public TextureRegion getContentIcon() {
+        return result.getEditorIcon();
     }
 
     @Override

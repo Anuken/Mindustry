@@ -61,7 +61,12 @@ public class Weapon extends Upgrade {
 		region = Draw.region(name);
 	}
 
-    public void update(ShooterTrait shooter, float pointerX, float pointerY){
+	@Override
+	public String getContentTypeName() {
+		return "weapon";
+	}
+
+	public void update(ShooterTrait shooter, float pointerX, float pointerY){
         update(shooter, true, pointerX, pointerY);
         update(shooter, false, pointerX, pointerY);
     }

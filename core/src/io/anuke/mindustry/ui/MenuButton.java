@@ -13,7 +13,7 @@ public class MenuButton extends TextButton{
 	
 	public MenuButton(String icon, String text, String description, Listenable clicked){
 		super("default");
-		float s = 70f;
+		float s = 66f;
 
 		clicked(clicked);
 
