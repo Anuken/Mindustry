@@ -56,7 +56,7 @@ public class NetClient extends Module {
     /**Counter of how many chunks have been recieved.*/
     private int recievedChunkCounter;
     /**ID of snapshot that is currently being constructed.*/
-    private int currentSnapshotID;
+    private int currentSnapshotID = -1;
     /**Last snapshot ID recieved.*/
     private int lastSnapshotID = -1;
     /**Decoder for uncompressing snapshots.*/
@@ -82,7 +82,7 @@ public class NetClient extends Module {
             lastSent = 0;
             lastSnapshot = null;
             currentSnapshot = null;
-            currentSnapshotID = 0;
+            currentSnapshotID = -1;
             lastSnapshotID = -1;
 
             ui.chatfrag.clearMessages();
@@ -285,7 +285,7 @@ public class NetClient extends Module {
             if (snapshotID == 0) { //fresh snapshot
                 result = snapshot;
                 length = snapshot.length;
-                netClient.lastSnapshot = snapshot;
+                netClient.lastSnapshot = Arrays.copyOf(snapshot, snapshot.length);
             } else { //otherwise, last snapshot must not be null, decode it
                 netClient.decoder.init(netClient.lastSnapshot, snapshot);
                 result = netClient.decoder.decode();

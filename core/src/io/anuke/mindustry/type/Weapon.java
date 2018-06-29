@@ -126,8 +126,11 @@ public class Weapon extends Upgrade {
 	}
 	
 	void bullet(ShooterTrait owner, float x, float y, float angle){
+		if(owner == null || !owner.getInventory().hasAmmo()) return;
+
 		tr.trns(angle, 3f);
-		Bullet.create(owner.getInventory().getAmmo().bullet, owner, owner.getTeam(), x + tr.x, y + tr.y, angle, (1f-velocityRnd) + Mathf.random(velocityRnd));
+		Bullet.create(owner.getInventory().getAmmo().bullet,
+				owner, owner.getTeam(), x + tr.x, y + tr.y, angle, (1f-velocityRnd) + Mathf.random(velocityRnd));
 	}
 
 	@Remote(targets = Loc.server, called = Loc.both, in = In.entities, unreliable = true)

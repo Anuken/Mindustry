@@ -41,6 +41,7 @@ import static io.anuke.mindustry.Vars.*;
 public class NetServer extends Module{
     public final static int maxSnapshotSize = 2047;
 
+    private final static byte[] reusableSnapArray = new byte[maxSnapshotSize];
     private final static boolean showSnapshotSize = false;
     private final static float serverSyncTime = 4, kickDuration = 30 * 1000;
     private final static Vector2 vector = new Vector2();
@@ -429,8 +430,13 @@ public class NetServer extends Module{
             int chunkid = 0;
             while(remaining > 0){
                 int used = Math.min(remaining, maxSnapshotSize);
-                //TODO optimize to *not* copy the bytes directly, but instead re-use all arrays that are of length = maxSnapshotSize
-                byte[] toSend = Arrays.copyOfRange(bytes, offset, Math.min(offset + maxSnapshotSize, bytes.length));
+                byte[] toSend;
+                if(used == maxSnapshotSize){
+                    toSend = reusableSnapArray;
+                    System.arraycopy(bytes, offset, toSend, 0, Math.min(offset + maxSnapshotSize, bytes.length) - offset);
+                }else {
+                    toSend = Arrays.copyOfRange(bytes, offset, Math.min(offset + maxSnapshotSize, bytes.length));
+                }
                 Call.onSnapshot(userid, toSend, snapshotID, (short)chunkid, (short)bytes.length);
 
                 remaining -= used;
