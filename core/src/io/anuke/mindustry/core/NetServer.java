@@ -34,10 +34,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class NetServer extends Module{
+    public final static int maxSnapshotSize = 2047;
+
+    private final static boolean showSnapshotSize = false;
     private final static float serverSyncTime = 4, kickDuration = 30 * 1000;
     private final static Vector2 vector = new Vector2();
     /**If a play goes away of their server-side coordinates by this distance, they get teleported back.*/
@@ -319,7 +323,7 @@ public class NetServer extends Module{
 
                 //if the player hasn't acknowledged that it has recieved the packet, send the same thing again
                 if(connection.lastSentSnapshotID > connection.lastSnapshotID){
-                    Call.onSnapshot(connection.id, connection.lastSentSnapshot, connection.lastSentSnapshotID);
+                    sendSplitSnapshot(connection.id, connection.lastSentSnapshot, connection.lastSentSnapshotID);
                     return;
                 }else{
                     //set up last confirmed snapshot to the last one that was sent, otherwise
@@ -394,13 +398,17 @@ public class NetServer extends Module{
                 byte[] bytes = syncStream.toByteArray();
                 connection.lastSentSnapshot = bytes;
                 if(connection.lastSnapshotID == -1){
+                    if(showSnapshotSize) Log.info("Sent raw snapshot: {0} bytes.", bytes.length);
                     //no snapshot to diff, send it all
-                    Call.onSnapshot(connection.id, bytes, 0);
+                    //Call.onSnapshot(connection.id, bytes, 0, 0);
+                    sendSplitSnapshot(connection.id, bytes, 0);
                     connection.lastSnapshotID = 0;
                 }else{
                     //send diff, otherwise
                     byte[] diff = ByteDeltaEncoder.toDiff(new ByteMatcherHash(connection.lastSnapshot, bytes), encoder);
-                    Call.onSnapshot(connection.id, diff, connection.lastSnapshotID + 1);
+                    if(showSnapshotSize) Log.info("Shrank snapshot: {0} -> {1}", bytes.length, diff.length);
+                    //Call.onSnapshot(connection.id, diff, connection.lastSnapshotID + 1, 0);
+                    sendSplitSnapshot(connection.id, diff, connection.lastSnapshotID + 1);
                     //increment snapshot ID
                     connection.lastSentSnapshotID ++;
                 }
@@ -408,6 +416,27 @@ public class NetServer extends Module{
 
         }catch (IOException e){
             e.printStackTrace();
+        }
+    }
+
+    /**Sends a raw byte[] snapshot to a client, splitting up into chunks when needed.*/
+    private static void sendSplitSnapshot(int userid, byte[] bytes, int snapshotID){
+        if(bytes.length < maxSnapshotSize){
+            Call.onSnapshot(userid, bytes, snapshotID, (short)0, (short)bytes.length);
+        }else{
+            int remaining = bytes.length;
+            int offset = 0;
+            int chunkid = 0;
+            while(remaining > 0){
+                int used = Math.min(remaining, maxSnapshotSize);
+                //TODO optimize to *not* copy the bytes directly, but instead re-use all arrays that are of length = maxSnapshotSize
+                byte[] toSend = Arrays.copyOfRange(bytes, offset, Math.min(offset + maxSnapshotSize, bytes.length));
+                Call.onSnapshot(userid, toSend, snapshotID, (short)chunkid, (short)bytes.length);
+
+                remaining -= used;
+                offset += used;
+                chunkid ++;
+            }
         }
     }
 

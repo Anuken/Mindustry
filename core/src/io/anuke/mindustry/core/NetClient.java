@@ -2,6 +2,7 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Base64Coder;
+import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.Pools;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.annotations.Annotations.Variant;
@@ -24,6 +25,7 @@ import io.anuke.ucore.io.ReusableByteArrayInputStream;
 import io.anuke.ucore.io.delta.DEZDecoder;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
 
 import java.io.DataInputStream;
@@ -47,10 +49,20 @@ public class NetClient extends Module {
     private int lastSent;
     /**Last snapshot recieved.*/
     private byte[] lastSnapshot;
+    /**Current snapshot that is being built from chinks.*/
+    private byte[] currentSnapshot;
+    /**Array of recieved chunk statuses.*/
+    private boolean[] recievedChunks;
+    /**Counter of how many chunks have been recieved.*/
+    private int recievedChunkCounter;
+    /**ID of snapshot that is currently being constructed.*/
+    private int currentSnapshotID;
     /**Last snapshot ID recieved.*/
     private int lastSnapshotID = -1;
     /**Decoder for uncompressing snapshots.*/
     private DEZDecoder decoder = new DEZDecoder();
+    /**List of entities that were removed, and need not be added while syncing.*/
+    private IntSet removed = new IntSet();
     /**Byte stream for reading in snapshots.*/
     private ReusableByteArrayInputStream byteStream = new ReusableByteArrayInputStream();
     private DataInputStream dataStream = new DataInputStream(byteStream);
@@ -63,9 +75,15 @@ public class NetClient extends Module {
             player.isAdmin = false;
 
             Net.setClientLoaded(false);
+            removed.clear();
             timeoutTime = 0f;
             connecting = true;
             quiet = false;
+            lastSent = 0;
+            lastSnapshot = null;
+            currentSnapshot = null;
+            currentSnapshotID = 0;
+            lastSnapshotID = -1;
 
             ui.chatfrag.clearMessages();
             ui.loadfrag.hide();
@@ -160,6 +178,14 @@ public class NetClient extends Module {
         Net.disconnect();
     }
 
+    public synchronized void addRemovedEntity(int id){
+        removed.add(id);
+    }
+
+    public synchronized boolean isEntityUsed(int id){
+        return removed.contains(id);
+    }
+
     void sync(){
 
         if(timer.get(0, playerSyncTime)){
@@ -213,13 +239,47 @@ public class NetClient extends Module {
     }
 
     @Remote(variants = Variant.one, unreliable = true)
-    public static void onSnapshot(byte[] snapshot, int snapshotID){
+    public static void onSnapshot(byte[] chunk, int snapshotID, short chunkID, short totalLength){
         //skip snapshot IDs that have already been recieved
         if(snapshotID == netClient.lastSnapshotID){
             return;
         }
 
         try {
+            byte[] snapshot;
+
+            //total length exceeds that needed to hold one snapshot, therefore, it is split into chunks
+            if(totalLength > NetServer.maxSnapshotSize) {
+                //total amount of chunks to recieve
+                int totalChunks = Mathf.ceil((float) totalLength / NetServer.maxSnapshotSize);
+
+                //reset status when a new snapshot sending begins
+                if (netClient.currentSnapshotID != snapshotID) {
+                    netClient.currentSnapshotID = snapshotID;
+                    netClient.currentSnapshot = new byte[totalLength];
+                    netClient.recievedChunkCounter = 0;
+                    netClient.recievedChunks = new boolean[totalChunks];
+                }
+
+                //if this chunk hasn't been recieved yet...
+                if (!netClient.recievedChunks[chunkID]) {
+                    netClient.recievedChunks[chunkID] = true;
+                    netClient.recievedChunkCounter ++; //update recieved status
+                    //copy the recieved bytes into the holding array
+                    System.arraycopy(chunk, 0, netClient.currentSnapshot, chunkID * NetServer.maxSnapshotSize,
+                            Math.min(NetServer.maxSnapshotSize, totalLength - chunkID * NetServer.maxSnapshotSize));
+                }
+
+                //when all chunks have been recieved, begin
+                if(netClient.recievedChunkCounter >= totalChunks){
+                    snapshot = netClient.currentSnapshot;
+                }else{
+                    return;
+                }
+            }else{
+                snapshot = chunk;
+            }
+
             byte[] result;
             int length;
             if (snapshotID == 0) { //fresh snapshot
@@ -236,7 +296,7 @@ public class NetClient extends Module {
 
             netClient.lastSnapshotID = snapshotID;
 
-            //set stream bytes to begin write
+            //set stream bytes to begin snapshot reaeding
             netClient.byteStream.setBytes(result, 0, length);
 
             //get data input for reading from the stream
@@ -287,8 +347,9 @@ public class NetClient extends Module {
                         throw new RuntimeException("Error reading entity of type '"+ group.getType() + "': Read length mismatch [write=" + readLength + ", read=" + (netClient.byteStream.position() - position - 1)+ "]");
                     }
 
-                    if(add){
+                    if(add && !netClient.isEntityUsed(entity.getID())){
                         entity.add();
+                        netClient.addRemovedEntity(entity.getID());
                     }
                 }
             }

@@ -132,6 +132,7 @@ public class Weapon extends Upgrade {
 
 	@Remote(targets = Loc.server, called = Loc.both, in = In.entities, unreliable = true)
 	public static void onPlayerShootWeapon(Player player, float x, float y, float rotation, boolean left){
+		if(player == null) return;
 		//clients do not see their own shoot events: they are simulated completely clientside to prevent laggy visuals
 		//messing with the firerate or any other stats does not affect the server (take that, script kiddies!)
 		if(Net.client() && player == Vars.players[0]){
@@ -143,6 +144,7 @@ public class Weapon extends Upgrade {
 
     @Remote(targets = Loc.server, called = Loc.both, in = In.entities, unreliable = true)
     public static void onGenericShootWeapon(ShooterTrait shooter, float x, float y, float rotation, boolean left){
+		if(shooter == null) return;
         shootDirect(shooter, x, y, rotation, left);
     }
 

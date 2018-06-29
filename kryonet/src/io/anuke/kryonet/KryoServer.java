@@ -52,7 +52,7 @@ public class KryoServer implements ServerProvider {
     int lastconnection = 0;
 
     public KryoServer(){
-        server = new Server(4096*2, 2048, connection -> new ByteSerializer());
+        server = new Server(4096*2, 4096, connection -> new ByteSerializer());
         server.setDiscoveryHandler((datagramChannel, fromAddress) -> {
             ByteBuffer buffer = NetworkIO.writeServerData();
             buffer.position(0);

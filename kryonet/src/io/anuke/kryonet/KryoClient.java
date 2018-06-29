@@ -54,7 +54,7 @@ public class KryoClient implements ClientProvider{
             }
         };
 
-        client = new Client(8192, 2048, connection -> new ByteSerializer());
+        client = new Client(8192, 4096, connection -> new ByteSerializer());
         client.setDiscoveryHandler(handler);
 
         Listener listener = new Listener(){

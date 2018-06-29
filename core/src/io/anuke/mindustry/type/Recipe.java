@@ -8,6 +8,7 @@ import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Strings;
 
 import java.util.Arrays;
 
@@ -59,7 +60,8 @@ public class Recipe implements UnlockableContent{
     @Override
     public void init() {
         if(!Bundles.has("block." + result.name + ".name")) {
-            Log.err("WARNING: Recipe block '{0}' does not have a formal name defined.", result.name);
+            Log.err("WARNING: Recipe block '{0}' does not have a formal name defined. Add the following to bundle.properties:", result.name);
+            Log.err("block.{0}.name={1}", result.name, Strings.capitalize(result.name.replace('-', '_')));
         }/*else if(result.fullDescription == null){
             Log.err("WARNING: Recipe block '{0}' does not have a description defined.", result.name);
         }*/

@@ -12,9 +12,11 @@ import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.effect.Shield;
+import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.Version;
+import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.trait.DrawTrait;
@@ -158,11 +160,19 @@ public class Vars{
 		fireGroup = Entities.addGroup(Fire.class, false).enableMapping();
 		unitGroups = new EntityGroup[Team.all.length];
 
-		threads = new ThreadHandler(Platform.instance.getThreadProvider());
-
 		for(Team team : Team.all){
 			unitGroups[team.ordinal()] = Entities.addGroup(BaseUnit.class).enableMapping();
 		}
+
+		for(EntityGroup<?> group : Entities.getAllGroups()){
+			group.setRemoveListener(entity -> {
+				if(entity instanceof SyncTrait && Net.client()){
+					netClient.addRemovedEntity(((SyncTrait) entity).getID());
+				}
+			});
+		}
+
+		threads = new ThreadHandler(Platform.instance.getThreadProvider());
 
 		mobile = Gdx.app.getType() == ApplicationType.Android || Gdx.app.getType() == ApplicationType.iOS || testMobile;
 		ios = Gdx.app.getType() == ApplicationType.iOS;
