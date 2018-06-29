@@ -102,7 +102,7 @@ public class Build {
         Block previous = tile.block();
 
         //remote players only
-        if(!player.isLocal){
+        if(player != null && !player.isLocal){
             player.getPlaceQueue().clear();
             player.getPlaceQueue().addFirst(new BuildRequest(x, y, rotation, recipe));
         }

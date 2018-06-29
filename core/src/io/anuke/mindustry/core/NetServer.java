@@ -431,6 +431,7 @@ public class NetServer extends Module{
             while(remaining > 0){
                 int used = Math.min(remaining, maxSnapshotSize);
                 byte[] toSend;
+                //re-use sent byte arrays when possible
                 if(used == maxSnapshotSize){
                     toSend = reusableSnapArray;
                     System.arraycopy(bytes, offset, toSend, 0, Math.min(offset + maxSnapshotSize, bytes.length) - offset);

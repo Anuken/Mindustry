@@ -55,8 +55,7 @@ public class BreakBlock extends Block {
 
     @Override
     public void tapped(Tile tile, Player player) {
-        player.clearBuilding();
-        player.addBuildRequest(new BuildRequest(tile.x, tile.y));
+        CallBlocks.onBreakSelect(player, tile);
     }
 
     @Override
@@ -145,6 +144,14 @@ public class BreakBlock extends Block {
 
         Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), entity.previous.size);
         world.removeBlock(tile);
+    }
+
+    @Remote(called = Loc.both, targets = Loc.both, in = In.blocks, forward = true)
+    public static void onBreakSelect(Player player, Tile tile){
+        if(player == null || !(tile.entity instanceof BreakEntity)) return;
+
+        player.getPlaceQueue().clear();
+        player.addBuildRequest(new BuildRequest(tile.x, tile.y));
     }
 
     public class BreakEntity extends TileEntity{

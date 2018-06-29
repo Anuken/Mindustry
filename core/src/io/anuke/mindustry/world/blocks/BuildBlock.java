@@ -165,13 +165,13 @@ public class BuildBlock extends Block {
         }
     }
 
-    @Remote(called = Loc.server, targets = Loc.both, in = In.blocks, forward = true)
+    @Remote(called = Loc.both, targets = Loc.both, in = In.blocks, forward = true)
     public static void onBuildSelect(Player player, Tile tile){
         if(player == null || !(tile.entity instanceof BuildEntity)) return;
 
         BuildEntity entity = tile.entity();
 
-        player.clearBuilding();
+        player.getPlaceQueue().clear();
         player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.getRotation(), entity.recipe));
     }
 

@@ -613,7 +613,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 				if(lastShooting != isShooting){
 					CallEntity.setShooting(isShooting);
 				}
-			}else if(isShooting()){ //desktop shooting, TODO
+			}else if(isShooting()){
 				Vector2 vec = Graphics.world(Vars.control.input(playerIndex).getMouseX(),
 						Vars.control.input(playerIndex).getMouseY());
 				pointerX = vec.x;
