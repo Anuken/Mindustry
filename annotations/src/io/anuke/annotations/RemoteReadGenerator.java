@@ -63,6 +63,8 @@ public class RemoteReadGenerator {
                 readBlock.nextControlFlow("else if(id == " + entry.id + ")");
             }
 
+            readBlock.beginControlFlow("try");
+
             //concatenated list of variable names for method invocation
             StringBuilder varResult = new StringBuilder();
 
@@ -118,6 +120,9 @@ public class RemoteReadGenerator {
                         "__forward(player.clientid" + (varResult.length() == 0 ? "" : ", ") + varResult.toString() + ")");
             }
 
+            readBlock.nextControlFlow("catch (java.lang.Exception e)");
+            readBlock.addStatement("throw new java.lang.RuntimeException(\"Failed to to read remote method '"+entry.element.getSimpleName() +"'!\", e)");
+            readBlock.endControlFlow();
         }
 
         //end control flow if necessary
