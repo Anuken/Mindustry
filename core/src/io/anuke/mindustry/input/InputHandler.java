@@ -265,11 +265,6 @@ public abstract class InputHandler extends InputAdapter{
 		player.addBuildRequest(new BuildRequest(tile.x, tile.y));
 	}
 
-	@Remote(targets = Loc.client, called = Loc.both, in = In.entities)
-	public static void setShooting(Player player, boolean on){
-		player.isShooting = on;
-	}
-
 	@Remote(targets = Loc.both, called = Loc.server, in = In.entities)
 	public static void dropItem(Player player, float angle){
 		if(Net.server() && !player.inventory.hasItem()){
@@ -332,6 +327,7 @@ public abstract class InputHandler extends InputAdapter{
 
 	@Remote(targets = Loc.both, called = Loc.server, forward = true, in = In.blocks)
 	public static void onTileTapped(Player player, Tile tile){
+		if(tile == null || player == null) return;
 		tile.block().tapped(tile, player);
 	}
 

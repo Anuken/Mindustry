@@ -135,7 +135,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 		game.sliderPref("saveinterval", 90, 10, 5*120, i -> Bundles.format("setting.seconds", i));
 
 		if(!gwt){
-			graphics.checkPref("multithread", false, threads::setEnabled);
+			graphics.checkPref("multithread", true, threads::setEnabled);
 
 			if(Settings.getBool("multithread")){
 				threads.setEnabled(true);

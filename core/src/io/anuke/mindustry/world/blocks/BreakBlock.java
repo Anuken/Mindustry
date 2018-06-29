@@ -140,9 +140,12 @@ public class BreakBlock extends Block {
 
     @Remote(called = Loc.server, in = In.blocks)
     public static void onBreakFinish(Tile tile){
-        BreakEntity entity = tile.entity();
 
-        Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), entity.previous.size);
+        if(tile.entity instanceof BreakEntity){
+            BreakEntity entity = tile.entity();
+            Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), entity.previous.size);
+        }
+
         world.removeBlock(tile);
     }
 

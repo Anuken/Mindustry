@@ -40,9 +40,9 @@ import static io.anuke.mindustry.Vars.*;
 
 public class NetServer extends Module{
     public final static int maxSnapshotSize = 2047;
+    public final static boolean showSnapshotSize = false;
 
     private final static byte[] reusableSnapArray = new byte[maxSnapshotSize];
-    private final static boolean showSnapshotSize = false;
     private final static float serverSyncTime = 4, kickDuration = 30 * 1000;
     private final static Vector2 vector = new Vector2();
     /**If a play goes away of their server-side coordinates by this distance, they get teleported back.*/
@@ -167,15 +167,15 @@ public class NetServer extends Module{
         Net.handleServer(ClientSnapshotPacket.class, (id, packet) -> {
             Player player = connections.get(id);
             NetConnection connection = Net.getConnection(id);
-            if(player == null || connection == null || packet.snapid < connection.lastRecievedSnapshot) return;
+            if(player == null || connection == null || packet.snapid < connection.lastRecievedClientSnapshot) return;
 
             boolean verifyPosition = !player.isDead() && !debug && headless;
 
-            if(connection.lastRecievedTime == 0) connection.lastRecievedTime = TimeUtils.millis() - 16;
+            if(connection.lastRecievedClientTime == 0) connection.lastRecievedClientTime = TimeUtils.millis() - 16;
 
-            long elapsed = TimeUtils.timeSinceMillis(connection.lastRecievedTime);
+            long elapsed = TimeUtils.timeSinceMillis(connection.lastRecievedClientTime);
 
-            float maxSpeed = packet.boosting && !player.mech.flying ? player.mech.boostSpeed*3f : player.mech.speed*3f;
+            float maxSpeed = (packet.boosting && !player.mech.flying ? player.mech.boostSpeed : player.mech.speed)*2.5f;
 
             //extra 1.1x multiplicaton is added just in case
             float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.1f;
@@ -184,6 +184,7 @@ public class NetServer extends Module{
             player.pointerY = packet.pointerY;
             player.setMineTile(packet.mining);
             player.isBoosting = packet.boosting;
+            player.isShooting = packet.shooting;
 
             vector.set(packet.x - player.getInterpolator().target.x, packet.y - player.getInterpolator().target.y);
 
@@ -210,12 +211,21 @@ public class NetServer extends Module{
             player.getInterpolator().read(player.x, player.y, newx, newy, packet.timeSent, packet.rotation, packet.baseRotation);
             player.getVelocity().set(packet.xv, packet.yv); //only for visual calculation purposes, doesn't actually update the player
 
-            connection.lastSnapshotID = packet.lastSnapshot;
-            connection.lastRecievedSnapshot = packet.snapid;
-            connection.lastRecievedTime = TimeUtils.millis();
+            //when the client confirms recieveing a snapshot, update base and clear map
+            if(packet.lastSnapshot > connection.currentBaseID){
+                connection.currentBaseID = packet.lastSnapshot;
+                connection.currentBaseSnapshot = connection.lastSentRawSnapshot;
+            }
+
+            connection.lastRecievedClientSnapshot = packet.snapid;
+            connection.lastRecievedClientTime = TimeUtils.millis();
         });
 
-        Net.handleServer(InvokePacket.class, (id, packet) -> RemoteReadServer.readPacket(packet.writeBuffer, packet.type, connections.get(id)));
+        Net.handleServer(InvokePacket.class, (id, packet) -> {
+            Player player = connections.get(id);
+            if(player == null) return;
+            RemoteReadServer.readPacket(packet.writeBuffer, packet.type, player);
+        });
     }
 
     public void update(){
@@ -314,7 +324,7 @@ public class NetServer extends Module{
             for (Player player : connections.values()) {
                 NetConnection connection = Net.getConnection(player.clientid);
 
-                if(connection == null){
+                if(connection == null || !connection.isConnected()){
                     //player disconnected, ignore them
                     onDisconnect(player);
                     return;
@@ -323,18 +333,16 @@ public class NetServer extends Module{
                 if(!player.timer.get(Player.timerSync, serverSyncTime) || !connection.hasConnected) continue;
 
                 //if the player hasn't acknowledged that it has recieved the packet, send the same thing again
-                if(connection.lastSentSnapshotID > connection.lastSnapshotID){
-                    sendSplitSnapshot(connection.id, connection.lastSentSnapshot, connection.lastSentSnapshotID);
+                if(connection.currentBaseID < connection.lastSentSnapshotID){
+                    if(showSnapshotSize) Log.info("Re-sending snapshot: {0} bytes, ID {1} base {2} baselength {3}", connection.lastSentSnapshot.length, connection.lastSentSnapshotID, connection.lastSentBase, connection.currentBaseSnapshot.length);
+                    sendSplitSnapshot(connection.id, connection.lastSentSnapshot, connection.lastSentSnapshotID, connection.lastSentBase);
                     return;
-                }else{
-                    //set up last confirmed snapshot to the last one that was sent, otherwise
-                    connection.lastSnapshot = connection.lastSentSnapshot;
                 }
 
                 //reset stream to begin writing
                 syncStream.reset();
 
-                //write wave data
+                //write wave datas
                 dataStream.writeFloat(state.wavetime);
                 dataStream.writeInt(state.wave);
 
@@ -397,21 +405,22 @@ public class NetServer extends Module{
                 }
 
                 byte[] bytes = syncStream.toByteArray();
-                connection.lastSentSnapshot = bytes;
-                if(connection.lastSnapshotID == -1){
+
+                connection.lastSentRawSnapshot = bytes;
+
+                if(connection.currentBaseID == -1){
                     if(showSnapshotSize) Log.info("Sent raw snapshot: {0} bytes.", bytes.length);
-                    //no snapshot to diff, send it all
-                    //Call.onSnapshot(connection.id, bytes, 0, 0);
-                    sendSplitSnapshot(connection.id, bytes, 0);
-                    connection.lastSnapshotID = 0;
+                    ///Nothing to diff off of in this case, send the whole thing, but increment the counter
+                    connection.lastSentSnapshot = bytes;
+                    sendSplitSnapshot(connection.id, bytes, 0, -1);
                 }else{
                     //send diff, otherwise
-                    byte[] diff = ByteDeltaEncoder.toDiff(new ByteMatcherHash(connection.lastSnapshot, bytes), encoder);
-                    if(showSnapshotSize) Log.info("Shrank snapshot: {0} -> {1}", bytes.length, diff.length);
-                    //Call.onSnapshot(connection.id, diff, connection.lastSnapshotID + 1, 0);
-                    sendSplitSnapshot(connection.id, diff, connection.lastSnapshotID + 1);
-                    //increment snapshot ID
-                    connection.lastSentSnapshotID ++;
+                    byte[] diff = ByteDeltaEncoder.toDiff(new ByteMatcherHash(connection.currentBaseSnapshot, bytes), encoder);
+                    if(showSnapshotSize) Log.info("Shrank snapshot: {0} -> {1}, Base {2} ID {3}", bytes.length, diff.length, connection.currentBaseID, connection.lastSentSnapshotID);
+                    sendSplitSnapshot(connection.id, diff, connection.lastSentSnapshotID + 1, connection.currentBaseID);
+                    connection.lastSentSnapshot = diff;
+                    connection.lastSentSnapshotID = connection.currentBaseID + 1;
+                    connection.lastSentBase = connection.currentBaseID;
                 }
             }
 
@@ -421,9 +430,10 @@ public class NetServer extends Module{
     }
 
     /**Sends a raw byte[] snapshot to a client, splitting up into chunks when needed.*/
-    private static void sendSplitSnapshot(int userid, byte[] bytes, int snapshotID){
+    private static void sendSplitSnapshot(int userid, byte[] bytes, int snapshotID, int base){
         if(bytes.length < maxSnapshotSize){
-            Call.onSnapshot(userid, bytes, snapshotID, (short)0, (short)bytes.length);
+            if(showSnapshotSize) Log.info("Raw send() snapshot call: {0} bytes, sID {1}", bytes.length, snapshotID);
+            Call.onSnapshot(userid, bytes, snapshotID, (short)0, (short)bytes.length, base);
         }else{
             int remaining = bytes.length;
             int offset = 0;
@@ -438,7 +448,7 @@ public class NetServer extends Module{
                 }else {
                     toSend = Arrays.copyOfRange(bytes, offset, Math.min(offset + maxSnapshotSize, bytes.length));
                 }
-                Call.onSnapshot(userid, toSend, snapshotID, (short)chunkid, (short)bytes.length);
+                Call.onSnapshot(userid, toSend, snapshotID, (short)chunkid, (short)bytes.length, base);
 
                 remaining -= used;
                 offset += used;

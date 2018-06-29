@@ -28,8 +28,12 @@ public class Build {
     /**Returns block type that was broken, or null if unsuccesful.*/
     @Remote(targets = Loc.both, forward = true, called = Loc.server, in = In.blocks)
     public static void breakBlock(Player player, Team team, int x, int y){
-        if(Net.server() && !validBreak(team, x, y)){
-            return;
+        if(Net.server()){
+            if(!validBreak(team, x, y)){
+                return;
+            }
+
+            team = player.getTeam();
             //throw new ValidateException(player, "An invalid block has been broken.");
         }
 
@@ -43,7 +47,7 @@ public class Build {
         Block previous = tile.block();
 
         //remote players only
-        if(!player.isLocal){
+        if(player != null && !player.isLocal){
             player.getPlaceQueue().clear();
             player.getPlaceQueue().addFirst(new BuildRequest(x, y));
         }
@@ -88,8 +92,12 @@ public class Build {
     /**Places a BuildBlock at this location. Call validPlace first.*/
     @Remote(targets = Loc.both, forward = true, called = Loc.server, in = In.blocks)
     public static void placeBlock(Player player, Team team, int x, int y, Recipe recipe, int rotation){
-        if(Net.server() && !validPlace(team, x, y, recipe.result, rotation)){
-            return;
+        if(Net.server()){
+            if(!validPlace(team, x, y, recipe.result, rotation)){
+                return;
+            }
+
+            team = player.getTeam();
             //throw new ValidateException(player, "An invalid block has been placed.");
         }
 
@@ -143,7 +151,9 @@ public class Build {
             }
         }
 
-        threads.runDelay(() -> Events.fire(BlockBuildEvent.class, team, tile));
+        Team fteam = team;
+
+        threads.runDelay(() -> Events.fire(BlockBuildEvent.class, fteam, tile));
     }
 
     /**Returns whether a tile can be placed at this location by this team.*/

@@ -22,9 +22,7 @@ import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
-import static io.anuke.mindustry.Vars.maxNameLength;
-import static io.anuke.mindustry.Vars.players;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 
 public class JoinDialog extends FloatingDialog {
     Array<Server> servers = new Array<>();
@@ -274,6 +272,11 @@ public class JoinDialog extends FloatingDialog {
 
     void connect(String ip, int port){
         ui.loadfrag.show("$text.connecting");
+
+        ui.loadfrag.setButton(() -> {
+            ui.loadfrag.hide();
+            netClient.disconnectQuietly();
+        });
 
         Timers.runTask(2f, () -> {
             try{

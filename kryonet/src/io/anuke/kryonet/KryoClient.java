@@ -5,8 +5,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.esotericsoftware.kryonet.*;
-import com.esotericsoftware.kryonet.Listener.LagListener;
 import com.esotericsoftware.minlog.Log;
+import io.anuke.kryonet.CustomListeners.UnreliableListener;
 import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.ClientProvider;
@@ -25,9 +25,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ClosedSelectorException;
 import java.util.List;
 
-import static io.anuke.mindustry.Vars.netClient;
-import static io.anuke.mindustry.Vars.port;
-import static io.anuke.mindustry.Vars.threads;
+import static io.anuke.mindustry.Vars.*;
 
 public class KryoClient implements ClientProvider{
     Client client;
@@ -35,6 +33,8 @@ public class KryoClient implements ClientProvider{
     ClientDiscoveryHandler handler;
 
     public KryoClient(){
+        KryoCore.init();
+
         handler = new ClientDiscoveryHandler() {
             @Override
             public DatagramPacket onRequestNewDatagramPacket() {
@@ -80,7 +80,7 @@ public class KryoClient implements ClientProvider{
             public void received (Connection connection, Object object) {
                 if(object instanceof FrameworkMessage) return;
 
-                Gdx.app.postRunnable(() -> {
+                threads.runDelay(() -> {
                     try{
                         Net.handleClientReceived(object);
                     }catch (Exception e){
@@ -97,8 +97,8 @@ public class KryoClient implements ClientProvider{
             }
         };
 
-        if(KryoRegistrator.fakeLag){
-            client.addListener(new LagListener(KryoRegistrator.fakeLagMin, KryoRegistrator.fakeLagMax, listener));
+        if(KryoCore.fakeLag){
+            client.addListener(new UnreliableListener(KryoCore.fakeLagMin, KryoCore.fakeLagMax, KryoCore.fakeLagDrop, KryoCore.fakeLagDuplicate, listener));
         }else{
             client.addListener(listener);
         }

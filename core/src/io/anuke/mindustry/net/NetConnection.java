@@ -6,26 +6,31 @@ public abstract class NetConnection {
     public final int id;
     public final String address;
 
-    /**ID of last snapshot this connection is guaranteed to have recieved.*/
-    public int lastSnapshotID = -1;
-    /**Byte array of last sent snapshot data that is confirmed to be recieved.*/
-    public byte[] lastSnapshot;
+    /**The current base snapshot that the client is absolutely confirmed to have recieved.
+     * All sent snapshots should be taking the diff from this base snapshot, if it isn't null.*/
+    public byte[] currentBaseSnapshot;
+    /**ID of the current base snapshot.*/
+    public int currentBaseID = -1;
 
-    /**ID of last sent snapshot.*/
-    public int lastSentSnapshotID = -1;
-    /**Byte array of last sent snapshot.*/
+    public int lastSentBase = -1;
     public byte[] lastSentSnapshot;
+    public byte[] lastSentRawSnapshot;
+    public int lastSentSnapshotID = -1;
 
     /**ID of last recieved client snapshot.*/
-    public int lastRecievedSnapshot = -1;
+    public int lastRecievedClientSnapshot = -1;
     /**Timestamp of last recieved snapshot.*/
-    public long lastRecievedTime;
+    public long lastRecievedClientTime;
 
     public boolean hasConnected = false;
 
     public NetConnection(int id, String address){
         this.id = id;
         this.address = address;
+    }
+
+    public boolean isConnected(){
+        return true;
     }
 
     public abstract void send(Object object, SendMode mode);

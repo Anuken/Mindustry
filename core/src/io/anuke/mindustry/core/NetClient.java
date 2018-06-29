@@ -47,8 +47,11 @@ public class NetClient extends Module {
     private float timeoutTime = 0f;
     /**Last sent client snapshot ID.*/
     private int lastSent;
+
+    /**Last snapshot ID recieved.*/
+    private int lastSnapshotBaseID = -1;
     /**Last snapshot recieved.*/
-    private byte[] lastSnapshot;
+    private byte[] lastSnapshotBase;
     /**Current snapshot that is being built from chinks.*/
     private byte[] currentSnapshot;
     /**Array of recieved chunk statuses.*/
@@ -57,8 +60,7 @@ public class NetClient extends Module {
     private int recievedChunkCounter;
     /**ID of snapshot that is currently being constructed.*/
     private int currentSnapshotID = -1;
-    /**Last snapshot ID recieved.*/
-    private int lastSnapshotID = -1;
+
     /**Decoder for uncompressing snapshots.*/
     private DEZDecoder decoder = new DEZDecoder();
     /**List of entities that were removed, and need not be added while syncing.*/
@@ -80,14 +82,21 @@ public class NetClient extends Module {
             connecting = true;
             quiet = false;
             lastSent = 0;
-            lastSnapshot = null;
+            lastSnapshotBase = null;
             currentSnapshot = null;
             currentSnapshotID = -1;
-            lastSnapshotID = -1;
+            lastSnapshotBaseID = -1;
 
             ui.chatfrag.clearMessages();
             ui.loadfrag.hide();
             ui.loadfrag.show("$text.connecting.data");
+
+            ui.loadfrag.setButton(() -> {
+                ui.loadfrag.hide();
+                connecting = false;
+                quiet = true;
+                Net.disconnect();
+            });
 
             Entities.clear();
 
@@ -191,7 +200,7 @@ public class NetClient extends Module {
         if(timer.get(0, playerSyncTime)){
 
             ClientSnapshotPacket packet = Pools.obtain(ClientSnapshotPacket.class);
-            packet.lastSnapshot = lastSnapshotID;
+            packet.lastSnapshot = lastSnapshotBaseID;
             packet.snapid = lastSent++;
             Net.send(packet, SendMode.udp);
         }
@@ -239,9 +248,12 @@ public class NetClient extends Module {
     }
 
     @Remote(variants = Variant.one, unreliable = true)
-    public static void onSnapshot(byte[] chunk, int snapshotID, short chunkID, short totalLength){
-        //skip snapshot IDs that have already been recieved
-        if(snapshotID == netClient.lastSnapshotID){
+    public static void onSnapshot(byte[] chunk, int snapshotID, short chunkID, short totalLength, int base){
+        if(NetServer.showSnapshotSize) Log.info("Recieved snapshot: len {0} ID {1} chunkID {2} totalLength {3} base {4} client-base {5}", chunk.length, snapshotID, chunkID, totalLength, base, netClient.lastSnapshotBaseID);
+
+        //skip snapshot IDs that have already been recieved OR snapshots that are too far in front
+        if(snapshotID < netClient.lastSnapshotBaseID || base != netClient.lastSnapshotBaseID){
+            if(NetServer.showSnapshotSize) Log.info("//SKIP SNAPSHOT");
             return;
         }
 
@@ -280,21 +292,24 @@ public class NetClient extends Module {
                 snapshot = chunk;
             }
 
+            if(NetServer.showSnapshotSize) Log.info("Finished recieving snapshot ID {0} length {1}", snapshotID, chunk.length);
+
             byte[] result;
             int length;
-            if (snapshotID == 0) { //fresh snapshot
+            if (base == -1) { //fresh snapshot
                 result = snapshot;
                 length = snapshot.length;
-                netClient.lastSnapshot = Arrays.copyOf(snapshot, snapshot.length);
+                netClient.lastSnapshotBase = Arrays.copyOf(snapshot, snapshot.length);
             } else { //otherwise, last snapshot must not be null, decode it
-                netClient.decoder.init(netClient.lastSnapshot, snapshot);
+                if(NetServer.showSnapshotSize) Log.info("Base size: {0} Path size: {1}", netClient.lastSnapshotBase.length, snapshot.length);
+                netClient.decoder.init(netClient.lastSnapshotBase, snapshot);
                 result = netClient.decoder.decode();
                 length = netClient.decoder.getDecodedLength();
                 //set last snapshot to a copy to prevent issues
-                netClient.lastSnapshot = Arrays.copyOf(result, length);
+                netClient.lastSnapshotBase = Arrays.copyOf(result, length);
             }
 
-            netClient.lastSnapshotID = snapshotID;
+            netClient.lastSnapshotBaseID = snapshotID;
 
             //set stream bytes to begin snapshot reaeding
             netClient.byteStream.setBytes(result, 0, length);
@@ -355,7 +370,7 @@ public class NetClient extends Module {
             }
 
             //confirm that snapshot has been recieved
-            netClient.lastSnapshotID = snapshotID;
+            netClient.lastSnapshotBaseID = snapshotID;
 
         }catch (Exception e){
             throw new RuntimeException(e);

@@ -6,9 +6,9 @@ import com.badlogic.gdx.utils.Base64Coder;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.FrameworkMessage;
 import com.esotericsoftware.kryonet.Listener;
-import com.esotericsoftware.kryonet.Listener.LagListener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.util.InputStreamSender;
+import io.anuke.kryonet.CustomListeners.UnreliableListener;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
@@ -17,9 +17,9 @@ import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
-import io.anuke.mindustry.net.Streamable;
 import io.anuke.mindustry.net.Packets.StreamBegin;
 import io.anuke.mindustry.net.Packets.StreamChunk;
+import io.anuke.mindustry.net.Streamable;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Log;
@@ -52,6 +52,8 @@ public class KryoServer implements ServerProvider {
     int lastconnection = 0;
 
     public KryoServer(){
+        KryoCore.init();
+
         server = new Server(4096*2, 4096, connection -> new ByteSerializer());
         server.setDiscoveryHandler((datagramChannel, fromAddress) -> {
             ByteBuffer buffer = NetworkIO.writeServerData();
@@ -110,8 +112,8 @@ public class KryoServer implements ServerProvider {
             }
         };
 
-        if(KryoRegistrator.fakeLag){
-            server.addListener(new LagListener(KryoRegistrator.fakeLagMin, KryoRegistrator.fakeLagMax, listener));
+        if(KryoCore.fakeLag){
+            server.addListener(new UnreliableListener(KryoCore.fakeLagMin, KryoCore.fakeLagMax, KryoCore.fakeLagDrop, KryoCore.fakeLagDuplicate, listener));
         }else{
             server.addListener(listener);
         }
@@ -321,6 +323,11 @@ public class KryoServer implements ServerProvider {
             super(id, address);
             this.socket = null;
             this.connection = connection;
+        }
+
+        @Override
+        public boolean isConnected(){
+            return connection == null ? !socket.isClosed() : connection.isConnected();
         }
 
         @Override

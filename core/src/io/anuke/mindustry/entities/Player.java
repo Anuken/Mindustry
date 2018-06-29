@@ -590,7 +590,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
 			//autofire: mobile only!
 			if(mobile) {
-				boolean lastShooting = isShooting;
 
 				if (target == null) {
 					isShooting = false;
@@ -609,10 +608,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 					isShooting = true;
 				}
 
-				//update status of shooting to server
-				if(lastShooting != isShooting){
-					CallEntity.setShooting(isShooting);
-				}
 			}else if(isShooting()){
 				Vector2 vec = Graphics.world(Vars.control.input(playerIndex).getMouseX(),
 						Vars.control.input(playerIndex).getMouseY());
