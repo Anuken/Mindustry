@@ -21,6 +21,9 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
+import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.headless;
+
 public class Drill extends Block{
 	protected final static float hardnessDrillMultiplier = 50f;
 	protected final int timerDump = timers++;
@@ -204,6 +207,11 @@ public class Drill extends Block{
 
 			int index = entity.index % toAdd.size;
 			offloadNear(tile, toAdd.get(index));
+
+			//unlock item content
+			if(!headless){
+				control.database().unlockContent(toAdd.get(index));
+			}
 
 			entity.index ++;
 			entity.progress = 0f;

@@ -8,7 +8,6 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.type.Recipe;
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.defense.turrets.Turret;
 import io.anuke.mindustry.world.meta.BlockStat;
@@ -17,14 +16,12 @@ import io.anuke.mindustry.world.meta.StatCategory;
 import io.anuke.mindustry.world.meta.StatValue;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.util.Bundles;
 
 public class ContentDisplay {
 
     public static void displayRecipe(Table table, Recipe recipe){
         Block block = recipe.result;
-
-        FloatingDialog dialog = new FloatingDialog("$text.blocks.blockinfo");
-        dialog.addCloseButton();
 
         table.table(title -> {
             int size = 8*6;
@@ -74,6 +71,37 @@ public class ContentDisplay {
 
     public static void displayItem(Table table, Item item){
 
+        table.table(title -> {
+            title.addImage(item.getContentIcon()).size(8 * 6);
+            title.add("[accent]" + item.localizedName()).padLeft(5);
+        });
+
+        table.row();
+
+        table.addImage("white").height(3).color(Color.LIGHT_GRAY).pad(15).padLeft(0).padRight(0).fillX();
+
+        table.row();
+
+        if(item.description != null){
+            table.add(item.description).padLeft(5).padRight(5).width(400f).wrap().fillX();
+            table.row();
+
+            table.addImage("white").height(3).color(Color.LIGHT_GRAY).pad(15).padLeft(0).padRight(0).fillX();
+            table.row();
+        }
+
+        table.left().defaults().fillX();
+
+        table.add(Bundles.format("text.item.explosiveness", (int)(item.explosiveness * 100)));
+        table.row();
+        table.add(Bundles.format("text.item.flammability", (int)(item.flammability * 100)));
+        table.row();
+        table.add(Bundles.format("text.item.radioactivity", (int)(item.radioactivity * 100)));
+        table.row();
+        table.add(Bundles.format("text.item.fluxiness", (int)(item.fluxiness * 100)));
+        table.row();
+        table.add(Bundles.format("text.item.hardness", item.hardness));
+        table.row();
     }
 
     public static void displayLiquid(Table table, Liquid liquid){

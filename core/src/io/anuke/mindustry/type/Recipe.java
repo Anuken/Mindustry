@@ -3,11 +3,15 @@ package io.anuke.mindustry.type;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.OrderedMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.ContentStatValue;
+import io.anuke.mindustry.world.meta.StatValue;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
@@ -15,6 +19,7 @@ import io.anuke.ucore.util.Strings;
 
 import java.util.Arrays;
 
+import static io.anuke.mindustry.Vars.control;
 import static io.anuke.mindustry.Vars.debug;
 import static io.anuke.mindustry.Vars.headless;
 
@@ -93,6 +98,21 @@ public class Recipe implements UnlockableContent{
     @Override
     public String getContentTypeName() {
         return "recipe";
+    }
+
+    @Override
+    public void onUnlock() {
+        for(OrderedMap<BlockStat, StatValue> map : result.stats.toMap().values()){
+            for(StatValue value : map.values()){
+                if(value instanceof ContentStatValue){
+                    ContentStatValue stat = (ContentStatValue)value;
+                    UnlockableContent[] content = stat.getValueContent();
+                    for(UnlockableContent c : content){
+                        control.database().unlockContent(c);
+                    }
+                }
+            }
+        }
     }
 
     @Override

@@ -13,7 +13,7 @@ public class ItemImage extends Stack {
     public ItemImage(TextureRegion region, Supplier<CharSequence> text) {
         Table t = new Table().left().bottom();
 
-        t.label(text).color(Color.DARK_GRAY).padBottom(-60).get().setFontScale(0.5f);
+        t.label(text).color(Color.DARK_GRAY).padBottom(-22).get().setFontScale(0.5f);
         t.row();
         t.label(text).get().setFontScale(0.5f);
 

@@ -20,6 +20,7 @@ import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.Saves;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.*;
@@ -250,11 +251,20 @@ public class Control extends Module{
 		return hiscore;
 	}
 
-
 	private void checkUnlockableBlocks(){
 		TileEntity entity = players[0].getClosestCore();
 
 		if(entity == null) return;
+
+		for (int i = 0; i < entity.items.items.length; i++) {
+			if(entity.items.items[i] <= 0) continue;
+			Item item = Item.getByID(i);
+			control.database().unlockContent(item);
+		}
+
+		if(players[0].inventory.hasItem()){
+			control.database().unlockContent(players[0].inventory.getItem().item);
+		}
 
 		for(int i = 0 ; i < Recipe.all().size; i ++){
 			Recipe recipe = Recipe.all().get(i);

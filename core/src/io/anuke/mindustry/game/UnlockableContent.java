@@ -19,4 +19,7 @@ public interface UnlockableContent extends Content{
 
     /**This should show all necessary info about this content in the specified table.*/
     void displayInfo(Table table);
+
+    /**Called when this content is unlocked. Use this to unlock other related content.*/
+    default void onUnlock(){}
 }

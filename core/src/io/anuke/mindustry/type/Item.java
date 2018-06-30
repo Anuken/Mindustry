@@ -10,12 +10,15 @@ import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Strings;
 
 public class Item implements Comparable<Item>, UnlockableContent{
 	private static final Array<Item> items = new Array<>();
 
 	public final int id;
 	public final String name;
+	public final String description;
 	public final Color color;
 	public TextureRegion region;
 
@@ -41,8 +44,14 @@ public class Item implements Comparable<Item>, UnlockableContent{
 		this.id = items.size;
 		this.name = name;
 		this.color = color;
+		this.description = Bundles.getOrNull("item." + this.name + ".description");
 
 		items.add(this);
+
+		if(!Bundles.has("item." + this.name + ".name")){
+            Log.err("Warning: item '" + name + "' is missing a localized name. Add the follow to bundle.properties:");
+            Log.err("item." + this.name + ".name=" + Strings.capitalize(name.replace('-', '_')));
+        }
 	}
 
 	public void load(){
