@@ -24,7 +24,6 @@ public class ArtilleryTurret extends ItemTurret {
         entity.heat = 1f;
 
         AmmoType type = peekAmmo(tile);
-        useAmmo(tile);
 
         tr.trns(entity.rotation, size * tilesize / 2);
 
@@ -37,5 +36,6 @@ public class ArtilleryTurret extends ItemTurret {
                 entity.rotation + Mathf.range(inaccuracy + type.inaccuracy), dst/maxTraveled);
 
         effects(tile);
+        useAmmo(tile);
     }
 }

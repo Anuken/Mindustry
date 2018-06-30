@@ -72,7 +72,7 @@ public class BlockRenderer{
 					
 					if(!expanded && block != Blocks.air && world.isAccessible(worldx, worldy)){
 						synchronized (Tile.tileSetLock) {
-							block.drawShadow(tile);
+							tile.block().drawShadow(tile);
 						}
 					}
 					
@@ -125,7 +125,6 @@ public class BlockRenderer{
 			}
 			
 			BlockRequest req = requests.get(iterateidx);
-			Block block = req.tile.block();
 
 			if(req.layer != lastLayer){
 				if(lastLayer != null) layerEnds(lastLayer);
@@ -133,6 +132,8 @@ public class BlockRenderer{
 			}
 
 			synchronized (Tile.tileSetLock) {
+				Block block = req.tile.block();
+
 				if (req.layer == Layer.block) {
 					block.draw(req.tile);
 				} else if (req.layer == block.layer) {
@@ -157,12 +158,15 @@ public class BlockRenderer{
 
 			BlockRequest req = requests.get(index);
 			if(req.tile.getTeam() != team) continue;
-			Block block = req.tile.block();
 
-			if(req.layer == block.layer){
-				block.drawLayer(req.tile);
-			}else if(req.layer == block.layer2){
-				block.drawLayer2(req.tile);
+			synchronized (Tile.tileSetLock) {
+				Block block = req.tile.block();
+
+				if (req.layer == block.layer) {
+					block.drawLayer(req.tile);
+				} else if (req.layer == block.layer2) {
+					block.drawLayer2(req.tile);
+				}
 			}
 		}
 	}

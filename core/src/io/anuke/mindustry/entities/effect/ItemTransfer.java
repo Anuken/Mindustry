@@ -15,13 +15,13 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.TimedEntity;
 import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.entities.trait.PosTrait;
-import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.effectGroup;
+import static io.anuke.mindustry.Vars.threads;
 
 public class ItemTransfer extends TimedEntity implements DrawTrait{
     private Vector2 from = new Vector2();
@@ -30,7 +30,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
     private Item item;
     private float seed;
     private PosTrait to;
-    private Callable done;
+    private Runnable done;
 
     @Remote(in = In.entities, called = Loc.server, unreliable = true)
     public static void transferAmmo(Item item, float x, float y, Unit to){
@@ -60,7 +60,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
         tile.entity.items.addItem(item, amount);
     }
 
-    public static void create(Item item, float fromx, float fromy, PosTrait to, Callable done){
+    public static void create(Item item, float fromx, float fromy, PosTrait to, Runnable done){
         ItemTransfer tr = Pools.obtain(ItemTransfer.class);
         tr.item = item;
         tr.from.set(fromx, fromy);
@@ -90,7 +90,9 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
 
     @Override
     public void removed() {
-        done.run();
+        if(done != null){
+            threads.run(done);
+        }
         Pools.free(this);
     }
 
