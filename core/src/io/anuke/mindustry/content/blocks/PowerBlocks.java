@@ -7,17 +7,18 @@ import io.anuke.mindustry.world.blocks.distribution.WarpGate;
 import io.anuke.mindustry.world.blocks.power.*;
 
 public class PowerBlocks extends BlockList implements ContentList {
-    public static Block combustiongenerator, thermalgenerator, turbinegenerator, rtgenerator, solarpanel, largesolarpanel,
-            nuclearReactor, fusionReactor, battery, batteryLarge, powernode, powernodelarge, warpgate;
+    public static Block combustionGenerator, thermalGenerator, turbineGenerator, rtgGenerator, solarPanel, largeSolarPanel,
+            nuclearReactor, fusionReactor, battery, batteryLarge, powerNode, powerNodeLarge, warpGate;
 
     @Override
     public void load() {
-        combustiongenerator = new BurnerGenerator("combustion-generator") {{
-            powerOutput = 0.04f;
+        combustionGenerator = new BurnerGenerator("combustion-generator") {{
+            powerOutput = 0.06f;
             powerCapacity = 40f;
+            itemDuration = 50f;
         }};
 
-        thermalgenerator = new LiquidHeatGenerator("thermal-generator") {{
+        thermalGenerator = new LiquidHeatGenerator("thermal-generator") {{
             maxLiquidGenerate = 0.5f;
             powerPerLiquid = 0.08f;
             powerCapacity = 40f;
@@ -25,25 +26,26 @@ public class PowerBlocks extends BlockList implements ContentList {
             size = 2;
         }};
 
-        turbinegenerator = new TurbineGenerator("turbine-generator") {{
-            powerOutput = 0.04f;
+        turbineGenerator = new TurbineGenerator("turbine-generator") {{
+            powerOutput = 0.15f;
             powerCapacity = 40f;
+            itemDuration = 40f;
             size = 2;
         }};
 
-        rtgenerator = new DecayGenerator("rtg-generator") {{
+        rtgGenerator = new DecayGenerator("rtg-generator") {{
             powerCapacity = 40f;
             powerOutput = 0.02f;
             itemDuration = 500f;
         }};
 
-        solarpanel = new SolarGenerator("solar-panel") {{
-            generation = 0.003f;
+        solarPanel = new SolarGenerator("solar-panel") {{
+            generation = 0.0045f;
         }};
 
-        largesolarpanel = new SolarGenerator("large-solar-panel") {{
+        largeSolarPanel = new SolarGenerator("solar-panel-large") {{
             size = 3;
-            generation = 0.012f;
+            generation = 0.055f;
         }};
 
         nuclearReactor = new NuclearReactor("nuclear-reactor") {{
@@ -65,11 +67,11 @@ public class PowerBlocks extends BlockList implements ContentList {
             powerCapacity = 2000f;
         }};
 
-        powernode = new PowerDistributor("power-node") {{
+        powerNode = new PowerDistributor("power-node") {{
             shadow = "shadow-round-1";
         }};
 
-        powernodelarge = new PowerDistributor("power-node-large") {{
+        powerNodeLarge = new PowerDistributor("power-node-large") {{
             size = 2;
             powerSpeed = 1f;
             maxNodes = 5;
@@ -77,7 +79,7 @@ public class PowerBlocks extends BlockList implements ContentList {
             shadow = "shadow-round-2";
         }};
 
-        warpgate = new WarpGate("warpgate");
+        warpGate = new WarpGate("warp-gate");
 
     }
 }

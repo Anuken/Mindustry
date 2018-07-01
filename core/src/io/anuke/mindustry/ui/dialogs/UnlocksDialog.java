@@ -32,8 +32,6 @@ public class UnlocksDialog extends FloatingDialog {
 
         OrderedMap<String, Array<Content>> allContent = ContentLoader.getContentMap();
 
-        //allContent.orderedKeys().reverse();
-
         for(String key : allContent.orderedKeys()){
             Array<Content> array = allContent.get(key);
             if(array.size == 0 || !(array.first() instanceof UnlockableContent)) continue;
@@ -48,8 +46,12 @@ public class UnlocksDialog extends FloatingDialog {
                 int maxWidth = 14;
                 int size = 8*6;
 
+                int count = 0;
+
                 for (int i = 0; i < array.size; i++) {
                     UnlockableContent unlock = (UnlockableContent)array.get(i);
+
+                    if(unlock.isHidden()) continue;
 
                     Image image = control.database().isUnlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-locked");
                     list.add(image).size(size).pad(3);
@@ -62,7 +64,7 @@ public class UnlocksDialog extends FloatingDialog {
                         }}));
                     }
 
-                    if((i+1) % maxWidth == 0){
+                    if((++count) % maxWidth == 0){
                         list.row();
                     }
                 }

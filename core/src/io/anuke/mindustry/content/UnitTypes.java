@@ -7,7 +7,7 @@ import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.ContentList;
 
 public class UnitTypes implements ContentList {
-    public static UnitType drone, scout, vtol, monsoon, titan;
+    public static UnitType drone, scout, vtol, monsoon, titan, fabricator;
 
     @Override
     public void load() {
@@ -44,7 +44,6 @@ public class UnitTypes implements ContentList {
             maxVelocity = 2.1f;
             drag = 0.01f;
             isFlying = true;
-            reload = 7;
         }};
 
         monsoon = new UnitType("monsoon", Monsoon.class, Monsoon::new){{
@@ -53,8 +52,22 @@ public class UnitTypes implements ContentList {
             maxVelocity = 1.5f;
             drag = 0.01f;
             isFlying = true;
-            reload = 7;
             weapon = Weapons.bomber;
+        }};
+
+        fabricator = new UnitType("fabricator", Fabricator.class, Fabricator::new){{
+            isFlying = true;
+            drag = 0.01f;
+            speed = 0.2f;
+            maxVelocity = 0.6f;
+            ammoCapacity = 0;
+            range = 70f;
+            itemCapacity = 70;
+            health = 120;
+            health = 45;
+            buildPower = 0.9f;
+            minePower = 1.1f;
+            healSpeed = 0.3f;
         }};
     }
 

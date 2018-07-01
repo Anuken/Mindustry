@@ -36,7 +36,7 @@ public class AmmoTypes implements ContentList {
             smokeEffect = Fx.none;
         }};
 
-        bombIncendiary = new AmmoType(Items.thermite, WeaponBullets.bombIncendiary, 3) {{
+        bombIncendiary = new AmmoType(Items.pyratite, WeaponBullets.bombIncendiary, 3) {{
             shootEffect = Fx.none;
             smokeEffect = Fx.none;
         }};
@@ -46,7 +46,7 @@ public class AmmoTypes implements ContentList {
             smokeEffect = Fx.none;
         }};
 
-        flamerThermite = new AmmoType(Items.thermite, TurretBullets.basicFlame, 3) {{
+        flamerThermite = new AmmoType(Items.pyratite, TurretBullets.basicFlame, 3) {{
             shootEffect = ShootFx.shootSmallFlame;
         }};
 
@@ -82,7 +82,7 @@ public class AmmoTypes implements ContentList {
             reloadMultiplier = 1.4f;
         }};
 
-        bulletThermite = new AmmoType(Items.thermite, StandardBullets.tracer, 3) {{
+        bulletThermite = new AmmoType(Items.pyratite, StandardBullets.tracer, 3) {{
             shootEffect = ShootFx.shootSmall;
             smokeEffect = ShootFx.shootSmallSmoke;
             inaccuracy = 3f;
@@ -100,7 +100,7 @@ public class AmmoTypes implements ContentList {
             smokeEffect = ShootFx.shootSmallSmoke;
         }};
 
-        flakPlastic = new AmmoType(Items.plasteel, FlakBullets.plastic, 5) {{
+        flakPlastic = new AmmoType(Items.plastanium, FlakBullets.plastic, 5) {{
             shootEffect = ShootFx.shootSmall;
             smokeEffect = ShootFx.shootSmallSmoke;
         }};
@@ -117,7 +117,7 @@ public class AmmoTypes implements ContentList {
             smokeEffect = ShootFx.shootBigSmoke2;
         }};
 
-        missileIncindiary = new AmmoType(Items.thermite, MissileBullets.incindiary, 1) {{
+        missileIncindiary = new AmmoType(Items.pyratite, MissileBullets.incindiary, 1) {{
             shootEffect = ShootFx.shootBig2;
             smokeEffect = ShootFx.shootBigSmoke2;
         }};
@@ -139,7 +139,7 @@ public class AmmoTypes implements ContentList {
             smokeEffect = ShootFx.shootBigSmoke2;
         }};
 
-        artilleryPlastic = new AmmoType(Items.plasteel, ArtilleryBullets.plastic, 1) {{
+        artilleryPlastic = new AmmoType(Items.plastanium, ArtilleryBullets.plastic, 1) {{
             shootEffect = ShootFx.shootBig2;
             smokeEffect = ShootFx.shootBigSmoke2;
         }};
@@ -149,7 +149,7 @@ public class AmmoTypes implements ContentList {
             smokeEffect = ShootFx.shootBigSmoke2;
         }};
 
-        artilleryIncindiary = new AmmoType(Items.thermite, ArtilleryBullets.incindiary, 1) {{
+        artilleryIncindiary = new AmmoType(Items.pyratite, ArtilleryBullets.incindiary, 1) {{
             shootEffect = ShootFx.shootBig2;
             smokeEffect = ShootFx.shootBigSmoke2;
         }};

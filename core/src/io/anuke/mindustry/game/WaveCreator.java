@@ -115,7 +115,7 @@ public class WaveCreator{
 					unitAmount = 4;
 					groupAmount = 2;
 					effect = StatusEffects.overdrive;
-					items = new ItemStack(Items.thermite, 100);
+					items = new ItemStack(Items.pyratite, 100);
 					end = 130;
 				}},
 
@@ -139,7 +139,7 @@ public class WaveCreator{
 
 				new SpawnGroup(UnitTypes.monsoon){{
 					begin = 53;
-					ammoItem = Items.thermite;
+					ammoItem = Items.pyratite;
 					unitAmount = 2;
 					unitScaling = 3;
 					spacing = 4;

@@ -41,7 +41,6 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Drone extends FlyingUnit implements BuilderTrait {
     protected static ObjectSet<Item> toMine;
-    protected static float healSpeed = 0.1f;
     protected static float discoverRange = 120f;
     protected static boolean initialized;
 
@@ -89,12 +88,12 @@ public class Drone extends FlyingUnit implements BuilderTrait {
 
     @Override
     public float getBuildPower(Tile tile) {
-        return 0.3f;
+        return type.buildPower;
     }
 
     @Override
     public float getMinePower() {
-        return 0.7f;
+        return type.minePower;
     }
 
     @Override
@@ -292,7 +291,7 @@ public class Drone extends FlyingUnit implements BuilderTrait {
                 circle(type.range);
             }else{
                 TileEntity entity = (TileEntity) target;
-                entity.health += healSpeed * Timers.delta();
+                entity.health += type.healSpeed * Timers.delta();
                 entity.health = Mathf.clamp(entity.health, 0, entity.tile.block().health);
             }
         }

@@ -6,7 +6,7 @@ import io.anuke.mindustry.world.blocks.distribution.*;
 
 public class DistributionBlocks extends BlockList implements ContentList{
 	public static Block conveyor, titaniumconveyor, router, multiplexer, junction,
-			bridgeconveyor, laserconveyor, sorter, splitter, overflowgate, massdriver;
+			bridgeConveyor, phaseConveyor, sorter, splitter, overflowGate, massDriver;
 
 	@Override
 	public void load() {
@@ -33,12 +33,12 @@ public class DistributionBlocks extends BlockList implements ContentList{
 			capacity = 32;
 		}};
 
-		bridgeconveyor = new BufferedItemBridge("bridgeconveyor") {{
+		bridgeConveyor = new BufferedItemBridge("bridge-conveyor") {{
 			range = 3;
 			hasPower = false;
 		}};
 
-		laserconveyor = new ItemBridge("laserconveyor") {{
+		phaseConveyor = new ItemBridge("phase-conveyor") {{
 			range = 7;
 		}};
 
@@ -46,9 +46,9 @@ public class DistributionBlocks extends BlockList implements ContentList{
 
 		splitter = new Splitter("splitter");
 
-		overflowgate = new OverflowGate("overflowgate");
+		overflowGate = new OverflowGate("overflow-gate");
 
-		massdriver = new MassDriver("mass-driver"){{
+		massDriver = new MassDriver("mass-driver"){{
 			size = 3;
 			itemCapacity = 80;
 			range = 300f;

@@ -1,19 +1,48 @@
 package io.anuke.mindustry.world.blocks.production;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 
 public class Fracker extends SolidPump {
     protected Liquid inputLiquid;
     protected float inputLiquidUse;
+    protected float inputCapacity = 20f;
+    protected Item inputItem = Items.sand;
+    protected float itemUseTime = 100f;
+
+    protected TextureRegion liquidRegion;
+    protected TextureRegion rotatorRegion;
+    protected TextureRegion topRegion;
 
     public Fracker(String name) {
         super(name);
         hasItems = true;
+    }
+
+    @Override
+    public void load() {
+        super.load();
+
+        liquidRegion = Draw.region(name + "-liquid");
+        rotatorRegion = Draw.region(name + "-rotator");
+        topRegion = Draw.region(name + "-top");
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+
+        stats.add(BlockStat.inputItem, inputItem);
+        stats.add(BlockStat.inputLiquid, inputLiquid);
+        stats.add(BlockStat.liquidUse, 60f *inputLiquidUse, StatUnit.liquidSecond);
     }
 
     @Override
@@ -24,11 +53,11 @@ public class Fracker extends SolidPump {
 
         Draw.color(tile.entity.liquids.liquid.color);
         Draw.alpha(tile.entity.liquids.amount/liquidCapacity);
-        Draw.rect(name + "-liquid", tile.drawx(), tile.drawy());
+        Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
         Draw.color();
 
-        Draw.rect(name + "-rotator", tile.drawx(), tile.drawy(), entity.pumpTime);
-        Draw.rect(name + "-top", tile.drawx(), tile.drawy());
+        Draw.rect(rotatorRegion, tile.drawx(), tile.drawy(), entity.pumpTime);
+        Draw.rect(topRegion, tile.drawx(), tile.drawy());
     }
 
     @Override
@@ -40,29 +69,30 @@ public class Fracker extends SolidPump {
     public void update(Tile tile) {
         FrackerEntity entity = tile.entity();
 
-        if(entity.input >= inputLiquidUse * Timers.delta()){
+        while(entity.accumulator > itemUseTime && entity.items.hasItem(inputItem, 1)){
+            entity.items.removeItem(inputItem, 1);
+            entity.accumulator -= itemUseTime;
+        }
+
+        if(entity.input >= inputLiquidUse * Timers.delta() && entity.accumulator < itemUseTime){
             super.update(tile);
             entity.input -= inputLiquidUse * Timers.delta();
+            entity.accumulator += Timers.delta();
         }else{
             tryDumpLiquid(tile);
         }
     }
 
     @Override
-    public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
+    public float handleAuxLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
         if(liquid != inputLiquid){
-            super.handleLiquid(tile, source, liquid, amount);
+            return 0f;
         }else{
             FrackerEntity entity = tile.entity();
-            entity.input += amount;
+            float accepted = Math.min(inputCapacity - entity.input, amount);
+            entity.input += accepted;
+            return accepted;
         }
-    }
-
-    @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
-        FrackerEntity entity = tile.entity();
-
-        return (liquid == inputLiquid && entity.input < inputLiquidUse) || super.acceptLiquid(tile, source, liquid, amount);
     }
 
     @Override
@@ -72,5 +102,6 @@ public class Fracker extends SolidPump {
 
     public static class FrackerEntity extends SolidPumpEntity{
         public float input;
+        public float accumulator;
     }
 }

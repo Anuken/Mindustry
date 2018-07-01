@@ -36,6 +36,9 @@ public class Recipe implements UnlockableContent{
 
     public boolean desktopOnly = false, debugOnly = false;
 
+    private Block[] dependencies;
+    private Recipe[] recipeDependencies;
+
     public Recipe(Category category, Block result, ItemStack... requirements){
         this.id = lastid ++;
         this.result = result;
@@ -53,6 +56,11 @@ public class Recipe implements UnlockableContent{
 
         allRecipes.add(this);
         recipeMap.put(result, this);
+    }
+
+    public Recipe setDependencies(Block... blocks){
+        this.dependencies = blocks;
+        return this;
     }
 
     public Recipe setDesktop(){
@@ -113,6 +121,19 @@ public class Recipe implements UnlockableContent{
                 }
             }
         }
+    }
+
+    @Override
+    public UnlockableContent[] getDependencies() {
+        if(dependencies == null){
+            return null;
+        }else if(recipeDependencies == null){
+            recipeDependencies = new Recipe[dependencies.length];
+            for (int i = 0; i < recipeDependencies.length; i++) {
+                recipeDependencies[i] = Recipe.getByResult(dependencies[i]);
+            }
+        }
+        return recipeDependencies;
     }
 
     @Override

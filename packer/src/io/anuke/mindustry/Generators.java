@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.world.Block;
@@ -127,6 +128,12 @@ public class Generators {
                 }
 
                 image.save("unit-icon-" + type.name);
+            }
+        });
+
+        context.generate("liquid-icons", () -> {
+            for(Liquid liquid : Liquid.all()){
+
             }
         });
 

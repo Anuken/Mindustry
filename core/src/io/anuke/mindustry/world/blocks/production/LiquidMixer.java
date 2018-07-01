@@ -6,6 +6,8 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Timers;
 
 public class LiquidMixer extends LiquidBlock{
@@ -22,6 +24,15 @@ public class LiquidMixer extends LiquidBlock{
         rotate = false;
         liquidRegion = name() + "-liquid";
         solid = true;
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+
+        stats.add(BlockStat.liquidOutput, outputLiquid);
+        stats.add(BlockStat.powerUse, powerUse * 60f, StatUnit.powerSecond);
+        stats.add(BlockStat.inputItem, inputItem);
     }
 
     @Override

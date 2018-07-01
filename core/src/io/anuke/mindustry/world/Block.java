@@ -69,7 +69,7 @@ public class Block extends BaseBlock implements Content{
 	/**whether this floor can be placed on.*/
 	public boolean placeableOn = true;
 	/**tile entity health*/
-	public int health = 40;
+	public int health = -1;
 	/**base block explosiveness*/
 	public float baseExplosiveness = 0f;
 	/**whether to display a different shadow per variant*/
@@ -161,6 +161,11 @@ public class Block extends BaseBlock implements Content{
 	/**Called after all blocks are created.*/
 	@Override
 	public void init(){
+		//initialize default health based on size
+		if(health == -1){
+			health = size*size*40;
+		}
+
 		setStats();
 		setBars();
 	}

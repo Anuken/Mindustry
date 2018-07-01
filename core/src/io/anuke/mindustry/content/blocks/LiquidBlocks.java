@@ -6,18 +6,20 @@ import io.anuke.mindustry.world.blocks.distribution.*;
 import io.anuke.mindustry.world.blocks.production.Pump;
 
 public class LiquidBlocks extends BlockList implements ContentList{
-    public static Block mechanicalPump, rotaryPump, thermalPump, conduit, pulseconduit, liquidrouter, liquidtank, liquidjunction, bridgeconduit, laserconduit;
+    public static Block mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, liquidRouter, liquidtank, liquidJunction, bridgeConduit, phaseConduit;
 
     @Override
     public void load() {
 
         mechanicalPump = new Pump("mechanical-pump") {{
+            shadow = "shadow-round-1";
             pumpAmount = 0.1f;
             tier = 0;
         }};
 
         rotaryPump = new Pump("rotary-pump") {{
-            pumpAmount = 0.2f;
+            shadow = "shadow-rounded-2";
+            pumpAmount = 0.25f;
             powerUse = 0.015f;
             liquidCapacity = 30f;
             size = 2;
@@ -36,30 +38,30 @@ public class LiquidBlocks extends BlockList implements ContentList{
             health = 45;
         }};
 
-        pulseconduit = new Conduit("pulseconduit") {{
+        pulseConduit = new Conduit("pulse-conduit") {{
             liquidCapacity = 16f;
             liquidFlowFactor = 4.9f;
-            health = 65;
+            health = 90;
         }};
 
-        liquidrouter = new LiquidRouter("liquidrouter") {{
+        liquidRouter = new LiquidRouter("liquid-router") {{
             liquidCapacity = 40f;
         }};
 
-        liquidtank = new LiquidRouter("liquidtank") {{
+        liquidtank = new LiquidRouter("liquid-tank") {{
             size = 3;
             liquidCapacity = 1500f;
             health = 500;
         }};
 
-        liquidjunction = new LiquidJunction("liquidjunction");
+        liquidJunction = new LiquidJunction("liquid-junction");
 
-        bridgeconduit = new LiquidExtendingBridge("bridgeconduit") {{
+        bridgeConduit = new LiquidExtendingBridge("bridge-conduit") {{
             range = 3;
             hasPower = false;
         }};
 
-        laserconduit = new LiquidBridge("laserconduit") {{
+        phaseConduit = new LiquidBridge("phase-conduit") {{
             range = 7;
         }};
     }

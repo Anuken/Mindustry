@@ -25,11 +25,13 @@ public class ContentDatabase {
         return set.contains(content.getContentName());
     }
 
-    /**Makes this piece of content 'unlocked'.
-     * If this piece of content is already unlocked, nothing changes.
+    /**Makes this piece of content 'unlocked', if possible.
+     * If this piece of content is already unlocked or cannot be unlocked due to dependencies, nothing changes.
      * Results are not saved until you call {@link #save()}.
      * @return whether or not this content was newly unlocked.*/
     public boolean unlockContent(UnlockableContent content){
+        if(!content.canBeUnlocked()) return false;
+
         if(!unlocked.containsKey(content.getContentTypeName())){
             unlocked.put(content.getContentTypeName(), new ObjectSet<>());
         }
@@ -38,6 +40,7 @@ public class ContentDatabase {
 
         //fire unlock event so other classes can use it
         if(ret){
+            content.onUnlock();
             Events.fire(UnlockEvent.class, content);
             dirty = true;
         }

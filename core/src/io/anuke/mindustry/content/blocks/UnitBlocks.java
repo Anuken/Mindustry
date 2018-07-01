@@ -8,11 +8,11 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.units.*;
 
 public class UnitBlocks extends BlockList implements ContentList {
-    public static Block resupplyPoint, repairPoint, droneFactory, dropPoint, reconstructor, overdriveProjector, shieldProjector;
+    public static Block resupplyPoint, repairPoint, droneFactory, fabricatorFactory, dropPoint, reconstructor, overdriveProjector, shieldProjector;
 
     @Override
     public void load() {
-        droneFactory = new UnitFactory("dronefactory") {{
+        droneFactory = new UnitFactory("drone-factory") {{
             type = UnitTypes.drone;
             produceTime = 800;
             size = 2;
@@ -21,17 +21,27 @@ public class UnitBlocks extends BlockList implements ContentList {
             };
         }};
 
-        resupplyPoint = new ResupplyPoint("resupplypoint") {{
+        fabricatorFactory = new UnitFactory("fabricator-factory") {{
+            type = UnitTypes.fabricator;
+            produceTime = 1600;
+            size = 2;
+            powerUse = 0.2f;
+            requirements = new ItemStack[]{
+                new ItemStack(Items.silicon, 70), new ItemStack(Items.lead, 80), new ItemStack(Items.titanium, 80)
+            };
+        }};
+
+        resupplyPoint = new ResupplyPoint("resupply-point") {{
             shadow = "shadow-round-1";
             itemCapacity = 30;
         }};
 
-        dropPoint = new DropPoint("droppoint") {{
+        dropPoint = new DropPoint("drop-point") {{
             shadow = "shadow-round-1";
             itemCapacity = 40;
         }};
 
-        repairPoint = new RepairPoint("repairpoint") {{
+        repairPoint = new RepairPoint("repair-point") {{
             shadow = "shadow-round-1";
             repairSpeed = 0.1f;
         }};
@@ -40,7 +50,7 @@ public class UnitBlocks extends BlockList implements ContentList {
             size = 2;
         }};
 
-        overdriveProjector = new OverdriveProjector("overdriveprojector") {{
+        overdriveProjector = new OverdriveProjector("overdrive-projector") {{
             size = 2;
         }};
 

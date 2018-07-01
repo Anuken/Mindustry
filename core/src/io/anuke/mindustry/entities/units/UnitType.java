@@ -35,13 +35,13 @@ public class UnitType implements UnlockableContent{
     public boolean isFlying;
     public float drag = 0.1f;
     public float maxVelocity = 5f;
-    public float reload = 40f;
     public float retreatPercent = 0.2f;
     public float armor = 0f;
     public float carryWeight = 1f;
     public int ammoCapacity = 100;
     public int itemCapacity = 30;
     public int mineLevel = 2;
+    public float buildPower = 0.3f, minePower = 0.7f, healSpeed = 0.1f;
     public Weapon weapon = Weapons.blaster;
     public float weaponOffsetX, weaponOffsetY;
 

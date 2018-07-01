@@ -24,6 +24,7 @@ public class TurretBlocks extends BlockList implements ContentList {
 			range = 80f;
 			shootCone = 15f;
 			ammoUseEffect = ShootFx.shellEjectSmall;
+			health = 80;
 		}};
 /*
 		scatter = new BurstTurret("scatter") {{
@@ -44,6 +45,7 @@ public class TurretBlocks extends BlockList implements ContentList {
 			recoil = 2f;
 			range = 200f;
 			inaccuracy = 5f;
+			health = 120;
 		}};
 
         scorch = new LiquidTurret("scorch") {{
@@ -52,6 +54,7 @@ public class TurretBlocks extends BlockList implements ContentList {
             reload = 5f;
             shootCone = 50f;
             ammoUseEffect = ShootFx.shellEjectSmall;
+			health = 140;
 
             drawer = (tile, entity) -> Draw.rect(entity.target != null ? name + "-shoot" : name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
         }};
@@ -65,6 +68,7 @@ public class TurretBlocks extends BlockList implements ContentList {
 			shootCone = 50f;
 			shootEffect = ShootFx.shootLiquid;
 			range = 70f;
+			health = 360;
 
 			drawer = (tile, entity) -> {
 				Draw.rect(name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
@@ -93,6 +97,7 @@ public class TurretBlocks extends BlockList implements ContentList {
 			chargeBeginEffect = ShootFx.lancerLaserChargeBegin;
 			heatColor = Color.RED;
 			size = 2;
+			health = 320;
 		}};
 
 		arc = new LaserTurret("arc") {{
@@ -113,6 +118,7 @@ public class TurretBlocks extends BlockList implements ContentList {
 		swarmer = new ItemTurret("swarmer") {{
 			ammoTypes = new AmmoType[]{AmmoTypes.missileExplosive, AmmoTypes.missileIncindiary, AmmoTypes.missileSurge};
 			size = 2;
+			health = 380;
 		}};
 
 		salvo = new ItemTurret("salvo") {{
@@ -139,11 +145,15 @@ public class TurretBlocks extends BlockList implements ContentList {
 							tile.drawy() + tr2.y + Angles.trnsy(rot, -offsetx, offsety), entity.rotation - 90);
 				}
 			};
+
+			health = 430;
 		}};
 
 		ripple = new ArtilleryTurret("ripple") {{
 			ammoTypes = new AmmoType[]{AmmoTypes.artilleryCarbide, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary, AmmoTypes.artilleryPlastic, AmmoTypes.artilleryThorium};
 			size = 3;
+
+			health = 550;
 		}};
 
 		cyclone = new ItemTurret("cyclone") {{

@@ -34,6 +34,8 @@ public class Liquid implements UnlockableContent{
 	public StatusEffect effect = StatusEffects.none;
 	/**Pump tier. Controls which pumps can use this liquid.*/
 	public int tier;
+	/**Displayed icon.*/
+	public TextureRegion iconRegion;
 	
 	public Liquid(String name, Color color) {
 		this.name = name;
@@ -42,6 +44,11 @@ public class Liquid implements UnlockableContent{
 		this.id = liquids.size;
 
 		Liquid.liquids.add(this);
+	}
+
+	@Override
+	public void load() {
+		iconRegion = Draw.region("icon-liquid-" + name);
 	}
 
 	@Override
@@ -56,7 +63,7 @@ public class Liquid implements UnlockableContent{
 
 	@Override
 	public TextureRegion getContentIcon() {
-		return Draw.region("liquid-icon");
+		return iconRegion;
 	}
 
 	@Override
