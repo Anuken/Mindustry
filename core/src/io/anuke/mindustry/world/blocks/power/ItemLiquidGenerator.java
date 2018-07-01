@@ -11,6 +11,8 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
+import static io.anuke.mindustry.Vars.tilesize;
+
 public abstract class ItemLiquidGenerator extends ItemGenerator {
     protected float minLiquidEfficiency = 0.2f;
     protected float powerPerLiquid = 0.13f;
@@ -55,6 +57,11 @@ public abstract class ItemLiquidGenerator extends ItemGenerator {
                 entity.generateTime -= 1f / itemDuration * mfract;
                 entity.power.amount += maxPower;
                 entity.generateTime = Mathf.clamp(entity.generateTime);
+
+                if(Mathf.chance(Timers.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.25f))){
+                    entity.damage(Mathf.random(8f));
+                    Effects.effect(explodeEffect, tile.worldx() + Mathf.range(size * tilesize/2f), tile.worldy() + Mathf.range(size * tilesize/2f));
+                }
             }
 
             if (entity.generateTime <= 0f && entity.items.totalItems() > 0) {
@@ -63,6 +70,7 @@ public abstract class ItemLiquidGenerator extends ItemGenerator {
                     if (entity.items.items[i] > 0) {
                         entity.items.items[i]--;
                         entity.efficiency = getItemEfficiency(Item.getByID(i));
+                        entity.explosiveness = Item.getByID(i).explosiveness;
                         break;
                     }
                 }

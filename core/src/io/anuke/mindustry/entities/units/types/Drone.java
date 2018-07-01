@@ -9,6 +9,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.FlyingUnit;
 import io.anuke.mindustry.entities.units.UnitState;
@@ -151,13 +152,15 @@ public class Drone extends FlyingUnit implements BuilderTrait {
     public void drawOver() {
         trail.draw(Palette.lightTrail, Palette.lightTrail, 3f);
 
-        if(target instanceof TileEntity && state.is(repair)){
+        TargetTrait entity = target;
+
+        if(entity instanceof TileEntity && state.is(repair)){
             float len = 5f;
             Draw.color(Color.BLACK, Color.WHITE, 0.95f + Mathf.absin(Timers.time(), 0.8f, 0.05f));
             Shapes.laser("beam", "beam-end",
                     x + Angles.trnsx(rotation, len),
                     y + Angles.trnsy(rotation, len),
-                    target.getX(), target.getY());
+                    entity.getX(), entity.getY());
             Draw.color();
         }
 

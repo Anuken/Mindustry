@@ -17,6 +17,12 @@ public class PowerDistributor extends PowerBlock {
         TileEntity entity = tile.entity;
         int sources = 0;
 
+        if(entity == null) return;
+
+        if(Float.isNaN(entity.power.amount)){
+            entity.power.amount = 0f;
+        }
+
         for(GridPoint2 point : Edges.getEdges(size)){
             Tile target = tile.getNearby(point);
             if(target != null && target.block().hasPower &&

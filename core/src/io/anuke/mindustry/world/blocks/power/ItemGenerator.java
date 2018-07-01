@@ -19,11 +19,14 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.tilesize;
+
 public abstract class ItemGenerator extends PowerGenerator {
 	protected float minItemEfficiency = 0.2f;
 	protected float powerOutput;
 	protected float itemDuration = 70f;
-	protected Effect generateEffect = BlockFx.generatespark;
+	protected Effect generateEffect = BlockFx.generatespark, explodeEffect =
+			BlockFx.generatespark;
 	protected Color heatColor = Color.valueOf("ff9b59");
 
 	public ItemGenerator(String name) {
@@ -77,14 +80,20 @@ public abstract class ItemGenerator extends PowerGenerator {
 			entity.generateTime -= 1f/itemDuration*mfract;
 			entity.power.amount += maxPower;
 			entity.generateTime = Mathf.clamp(entity.generateTime);
+
+			if(Mathf.chance(Timers.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.25f))){
+				entity.damage(Mathf.random(8f));
+				Effects.effect(explodeEffect, tile.worldx() + Mathf.range(size * tilesize/2f), tile.worldy() + Mathf.range(size * tilesize/2f));
+			}
 		}
 		
 		if(entity.generateTime <= 0f && entity.items.totalItems() > 0){
-			Effects.effect(generateEffect, tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
+			Effects.effect(generateEffect, tile.worldx() + Mathf.range(size * tilesize/2f), tile.worldy() + Mathf.range(size * tilesize/2f));
 			for(int i = 0; i < entity.items.items.length; i ++){
 				if(entity.items.items[i] > 0){
 					entity.items.items[i] --;
 					entity.efficiency = getItemEfficiency(Item.getByID(i));
+					entity.explosiveness = Item.getByID(i).explosiveness;
 					break;
 				}
 			}
@@ -104,6 +113,7 @@ public abstract class ItemGenerator extends PowerGenerator {
 
 	public static class ItemGeneratorEntity extends GeneratorEntity{
 		public float efficiency;
+		public float explosiveness;
 
 		@Override
 		public void write(DataOutputStream stream) throws IOException {

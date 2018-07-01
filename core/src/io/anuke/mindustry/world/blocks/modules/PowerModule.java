@@ -35,5 +35,8 @@ public class PowerModule extends BlockModule{
     @Override
     public void read(DataInput stream) throws IOException{
         amount = stream.readFloat();
+        if(Float.isNaN(amount)){
+            amount = 0f;
+        }
     }
 }

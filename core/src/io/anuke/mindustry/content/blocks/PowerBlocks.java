@@ -15,7 +15,7 @@ public class PowerBlocks extends BlockList implements ContentList {
         combustionGenerator = new BurnerGenerator("combustion-generator") {{
             powerOutput = 0.06f;
             powerCapacity = 40f;
-            itemDuration = 50f;
+            itemDuration = 40f;
         }};
 
         thermalGenerator = new LiquidHeatGenerator("thermal-generator") {{
@@ -29,7 +29,7 @@ public class PowerBlocks extends BlockList implements ContentList {
         turbineGenerator = new TurbineGenerator("turbine-generator") {{
             powerOutput = 0.15f;
             powerCapacity = 40f;
-            itemDuration = 40f;
+            itemDuration = 30f;
             size = 2;
         }};
 

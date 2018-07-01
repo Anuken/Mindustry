@@ -83,11 +83,13 @@ public class PowerNode extends PowerBlock{
 		DistributorEntity entity = tile.entity();
 		other = other.target();
 
+		Tile result = other;
+
 		if(linkValid(tile, other)){
 			if(linked(tile, other)){
-				CallBlocks.unlinkPowerDistributors(null, tile, other);
+				threads.run(() -> CallBlocks.unlinkPowerDistributors(null, tile, result));
 			}else if(entity.links.size < maxNodes){
-				CallBlocks.linkPowerDistributors(null, tile, other);
+				threads.run(() -> CallBlocks.linkPowerDistributors(null, tile, result));
 			}
 			return false;
 		}
@@ -188,12 +190,20 @@ public class PowerNode extends PowerBlock{
 	}
 
 	protected boolean shouldDistribute(Tile tile, Tile other) {
+		return other.entity.power.amount / other.block().powerCapacity <= tile.entity.power.amount / powerCapacity;
+	}
+
+	protected boolean shouldLeechPower(Tile tile, Tile other){
 		return !(other.block() instanceof PowerNode)
-				|| other.entity.power.amount / other.block().powerCapacity < tile.entity.power.amount / powerCapacity;
+				&& other.entity.power.amount / other.block().powerCapacity > tile.entity.power.amount / powerCapacity;
 	}
 
 	protected void distributeLaserPower(Tile tile){
 		DistributorEntity entity = tile.entity();
+
+		if(Float.isNaN(entity.power.amount)){
+			entity.power.amount = 0f;
+		}
 
 		int targets = 0;
 
@@ -203,8 +213,8 @@ public class PowerNode extends PowerBlock{
 			if(!linkValid(tile, target)) {
 				entity.links.removeIndex(i);
 				i --;
-			}else if(shouldDistribute(tile, target)){
-				targets ++;
+			}else if(shouldDistribute(tile, target)) {
+				targets++;
 			}
 		}
 
@@ -212,11 +222,17 @@ public class PowerNode extends PowerBlock{
 
 		for(int i = 0; i < entity.links.size; i ++){
 			Tile target = world.tile(entity.links.get(i));
-			if(!shouldDistribute(tile, target)) continue;
+			if(shouldDistribute(tile, target)) {
 
-			float transmit = Math.min(result * Timers.delta(), entity.power.amount);
-			if(target.block().acceptPower(target, tile, transmit)){
-				entity.power.amount -= target.block().addPower(target, transmit);
+				float transmit = Math.min(result * Timers.delta(), entity.power.amount);
+				if (target.block().acceptPower(target, tile, transmit)) {
+					entity.power.amount -= target.block().addPower(target, transmit);
+				}
+			}else if(shouldLeechPower(tile, target)){
+				float diff = (target.entity.power.amount / target.block().powerCapacity - tile.entity.power.amount / powerCapacity)/1.4f;
+				float transmit = Math.min(Math.min(target.block().powerCapacity * diff, target.entity.power.amount), powerCapacity - tile.entity.power.amount);
+				entity.power.amount += transmit;
+				target.entity.power.amount -= transmit;
 			}
 		}
 	}
@@ -226,8 +242,7 @@ public class PowerNode extends PowerBlock{
 	}
 
 	protected boolean linkValid(Tile tile, Tile link){
-		if(!(tile != link && link != null && link.block().hasPower)
-				|| link.block() instanceof PowerGenerator) return false;
+		if(!(tile != link && link != null && link.block().hasPower)) return false;
 
 		if(link.block() instanceof PowerNode){
 			DistributorEntity oe = link.entity();
