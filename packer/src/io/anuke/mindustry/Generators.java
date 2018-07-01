@@ -133,7 +133,16 @@ public class Generators {
 
         context.generate("liquid-icons", () -> {
             for(Liquid liquid : Liquid.all()){
+                Image image = context.get("liquid-icon");
+                for (int x = 0; x < image.width(); x++) {
+                    for (int y = 0; y < image.height(); y++) {
+                        Color color = image.getColor(x, y);
+                        color.mul(liquid.color);
+                        image.draw(x, y, color);
+                    }
+                }
 
+                image.save("liquid-icon-" + liquid.name);
             }
         });
 

@@ -26,6 +26,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.mobile;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class MechFactory extends Block{
@@ -52,6 +53,8 @@ public class MechFactory extends Block{
 
         if(checkValidTap(tile, player)){
             CallBlocks.onMechFactoryBegin(player, tile);
+        }else if(player.isLocal && mobile){
+            player.moveTarget = tile.entity;
         }
     }
 

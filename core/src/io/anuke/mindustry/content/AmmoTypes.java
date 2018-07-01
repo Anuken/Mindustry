@@ -2,6 +2,7 @@ package io.anuke.mindustry.content;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.bullets.*;
+import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.content.fx.ShootFx;
 import io.anuke.mindustry.game.Content;
@@ -10,7 +11,7 @@ import io.anuke.mindustry.type.ContentList;
 
 public class AmmoTypes implements ContentList {
     public static AmmoType bulletTungsten, bulletLead, bulletCarbide, bulletThorium, bulletSilicon, bulletPyratite,
-            shotgunTungsten, bombExplosive, bombIncendiary, bombOil, shellCarbide, flamerThermite,
+            shotgunTungsten, bombExplosive, bombIncendiary, bombOil, shellCarbide, flamerThermite, weaponMissile,
             flakLead, flakExplosive, flakPlastic, flakSurge, missileExplosive, missileIncindiary, missileSurge,
             artilleryCarbide, artilleryPlastic, artilleryHoming, artilleryIncindiary, artilleryExplosive,
             basicFlame, lancerLaser, lightning, spectreLaser, meltdownLaser, fuseShotgun, oil, water, lava, cryofluid;
@@ -48,6 +49,12 @@ public class AmmoTypes implements ContentList {
 
         flamerThermite = new AmmoType(Items.pyratite, TurretBullets.basicFlame, 3) {{
             shootEffect = ShootFx.shootSmallFlame;
+        }};
+
+        weaponMissile = new AmmoType(Items.carbide, MissileBullets.javelin, 2) {{
+            shootEffect = BulletFx.hitBulletSmall;
+            smokeEffect = Fx.none;
+            reloadMultiplier = 1.2f;
         }};
 
         //bullets

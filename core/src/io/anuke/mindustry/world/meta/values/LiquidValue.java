@@ -19,6 +19,6 @@ public class LiquidValue implements ContentStatValue {
 
     @Override
     public void display(Table table) {
-        table.addImage("liquid-icon").color(liquid.color).size(8*3);
+        table.addImage(liquid.getContentIcon()).size(8*3);
     }
 }

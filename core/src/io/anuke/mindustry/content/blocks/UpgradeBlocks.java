@@ -5,13 +5,13 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.units.MechFactory;
 
 public class UpgradeBlocks extends BlockList {
-    public static Block deltaFactory, tauFactory, omegaFactory, dartFactory, tridentFactory, javelinFactory, halberdFactory;
+    public static Block deltaFactory, tauFactory, omegaFactory, dartFactory, javelinFactory, tridentFactory, halberdFactory;
 
     @Override
     public void load() {
         deltaFactory = new MechFactory("delta-mech-factory"){{
             mech = Mechs.delta;
-           size = 2;
+            size = 2;
         }};
 
         tauFactory = new MechFactory("tau-mech-factory"){{
@@ -29,13 +29,13 @@ public class UpgradeBlocks extends BlockList {
             size = 2;
         }};
 
-        tridentFactory = new MechFactory("trident-ship-factory"){{
-            mech = Mechs.trident;
+        javelinFactory = new MechFactory("javelin-ship-factory"){{
+            mech = Mechs.javelin;
             size = 2;
         }};
 
-        javelinFactory = new MechFactory("javelin-ship-factory"){{
-            mech = Mechs.javelin;
+        tridentFactory = new MechFactory("trident-ship-factory"){{
+            mech = Mechs.trident;
             size = 2;
         }};
 

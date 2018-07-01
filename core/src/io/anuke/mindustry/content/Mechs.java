@@ -9,7 +9,7 @@ import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.type.Upgrade;
 
 public class Mechs implements ContentList {
-    public static Mech alpha, delta, tau, omega, dart, trident, javelin, halberd;
+    public static Mech alpha, delta, tau, omega, dart, javelin, trident, halberd;
 
     /**These are not new mechs, just re-assignments for convenience.*/
     public static Mech starterDesktop, starterMobile;
@@ -57,15 +57,17 @@ public class Mechs implements ContentList {
             trailColor = Palette.lightTrail;
         }};
 
-        trident = new Mech("trident-ship", true){{
-            drillPower = 1;
-            speed = 0.4f;
-            maxSpeed = 3f;
-            drag = 0.1f;
-        }};
-
         javelin = new Mech("javelin-ship", true){{
             drillPower = -1;
+            speed = 0.4f;
+            maxSpeed = 3.6f;
+            drag = 0.09f;
+            weapon = Weapons.missiles;
+            trailColor = Color.valueOf("d3ddff");
+        }};
+
+        trident = new Mech("trident-ship", true){{
+            drillPower = 1;
             speed = 0.4f;
             maxSpeed = 3f;
             drag = 0.1f;

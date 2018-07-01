@@ -23,12 +23,16 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock.CoreEntity;
+import io.anuke.mindustry.world.blocks.units.MechFactory;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.ThreadQueue;
+import io.anuke.ucore.util.Timer;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -59,7 +63,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 	public boolean isLocal = false;
 	public Timer timer = new Timer(4);
 	public TargetTrait target;
-	public CarriableTrait pickupTarget;
+	public TargetTrait moveTarget;
 
 	private boolean respawning;
 	private float walktime;
@@ -551,18 +555,23 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		float targetX = Core.camera.position.x, targetY = Core.camera.position.y;
 		float attractDst = 15f;
 
-		if(pickupTarget != null && !pickupTarget.isDead()){
-			targetX = pickupTarget.getX();
-			targetY = pickupTarget.getY();
+		if(moveTarget != null && !moveTarget.isDead()){
+			targetX = moveTarget.getX();
+			targetY = moveTarget.getY();
 			attractDst = 0f;
 
-			if(distanceTo(pickupTarget) < 2f){
-				carry(pickupTarget);
+			if(distanceTo(moveTarget) < 2f){
+				if(moveTarget instanceof CarriableTrait){
+					carry((CarriableTrait) moveTarget);
+				}else if(moveTarget instanceof TileEntity && ((TileEntity) moveTarget).tile.block() instanceof MechFactory){
+					Tile tile = ((TileEntity) moveTarget).tile;
+					tile.block().tapped(tile, this);
+				}
 
-				pickupTarget = null;
+				moveTarget = null;
 			}
 		}else{
-			pickupTarget = null;
+			moveTarget = null;
 		}
 
 		movement.set(targetX - x, targetY - y).limit(mech.speed);

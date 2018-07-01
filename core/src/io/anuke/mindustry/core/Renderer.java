@@ -227,15 +227,13 @@ public class Renderer extends RendererModule{
 		blocks.skipLayer(Layer.turret);
 		blocks.drawBlocks(Layer.laser);
 
-		overlays.drawBottom();
-
-		drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
-
 		drawAllTeams(true);
 
 		drawAndInterpolate(bulletGroup);
 		drawAndInterpolate(effectGroup);
 
+		overlays.drawBottom();
+		drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
 		overlays.drawTop();
 
 		if(pixelate)

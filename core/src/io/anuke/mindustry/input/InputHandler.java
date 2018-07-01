@@ -122,7 +122,9 @@ public abstract class InputHandler extends InputAdapter{
 		}
 
 		//call tapped event
-		CallBlocks.onTileTapped(player, tile);
+		if(tile.getTeam() == player.getTeam()){
+			CallBlocks.onTileTapped(player, tile);
+		}
 
 		//consume tap event if necessary
 		if(tile.getTeam() == player.getTeam() && tile.block().consumesTap){

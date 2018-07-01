@@ -48,7 +48,7 @@ public class Liquid implements UnlockableContent{
 
 	@Override
 	public void load() {
-		iconRegion = Draw.region("icon-liquid-" + name);
+		iconRegion = Draw.region("liquid-icon-" + name);
 	}
 
 	@Override

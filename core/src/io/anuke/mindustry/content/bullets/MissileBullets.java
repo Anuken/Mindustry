@@ -7,7 +7,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentList;
 
 public class MissileBullets extends BulletList implements ContentList {
-    public static BulletType explosive, incindiary, surge;
+    public static BulletType explosive, incindiary, surge, javelin;
 
     @Override
     public void load() {
@@ -48,6 +48,21 @@ public class MissileBullets extends BulletList implements ContentList {
             {
                 bulletWidth = 7f;
                 bulletHeight = 9f;
+            }
+        };
+
+        javelin = new MissileBulletType(2.5f, 10, "missile") {
+            {
+                bulletWidth = 8f;
+                bulletHeight = 8f;
+                bulletShrink = 0f;
+                drag = -0.02f;
+                keepVelocity = false;
+                splashDamageRadius = 25f;
+                splashDamage = 15f;
+                lifetime = 90f;
+                hiteffect = BulletFx.blastExplosion;
+                despawneffect = BulletFx.blastExplosion;
             }
         };
     }

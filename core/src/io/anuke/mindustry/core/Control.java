@@ -120,6 +120,12 @@ public class Control extends Module{
 			state.set(State.playing);
 		});
 
+		Events.on(WorldLoadGraphicsEvent.class, () -> {
+			if(mobile){
+				Core.camera.position.set(players[0].x, players[0].y, 0);
+			}
+		});
+
 		Events.on(ResetEvent.class, () -> {
 		    for(Player player : players){
 		        player.reset();

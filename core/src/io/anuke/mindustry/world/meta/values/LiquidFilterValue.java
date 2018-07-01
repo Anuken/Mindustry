@@ -23,7 +23,7 @@ public class LiquidFilterValue implements StatValue {
 
         for (int i = 0; i < list.size; i++) {
             Liquid item = list.get(i);
-            table.addImage("liquid-icon").color(item.color).size(8*3).padRight(2).padLeft(2).padTop(2).padBottom(2);
+            table.addImage(item.getContentIcon()).size(8*3).padRight(2).padLeft(2).padTop(2).padBottom(2);
             if(i != list.size - 1){
                 table.add("/");
             }
