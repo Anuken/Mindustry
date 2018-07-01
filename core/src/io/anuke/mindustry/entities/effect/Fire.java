@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Pools;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.StatusEffects;
+import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.TileEntity;
@@ -117,6 +118,10 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable 
             GridPoint2 p = Mathf.select(Geometry.d4);
             Tile other = world.tile(tile.x + p.x, tile.y + p.y);
             create(other);
+
+            if(Mathf.chance(0.05 * Timers.delta() * Mathf.clamp(flammability / 10.0))){
+                CallEntity.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f));
+            }
         }
 
         if(Mathf.chance(0.1 * Timers.delta())){

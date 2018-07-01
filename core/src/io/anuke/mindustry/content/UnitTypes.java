@@ -18,6 +18,7 @@ public class UnitTypes implements ContentList {
             maxVelocity = 0.8f;
             ammoCapacity = 0;
             range = 50f;
+            healSpeed = 0.05f;
             health = 45;
         }};
 
@@ -67,7 +68,7 @@ public class UnitTypes implements ContentList {
             health = 45;
             buildPower = 0.9f;
             minePower = 1.1f;
-            healSpeed = 0.3f;
+            healSpeed = 0.09f;
         }};
     }
 

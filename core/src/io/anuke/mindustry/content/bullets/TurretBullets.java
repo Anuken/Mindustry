@@ -39,7 +39,9 @@ public class TurretBullets extends BulletList implements ContentList {
             {
                 pierce = true;
                 hitTiles = false;
-                drag = 0.3f;
+                collides = false;
+                collidesTiles = false;
+                drag = 0.03f;
             }
 
             @Override

@@ -79,6 +79,7 @@ public class ProductionBlocks extends BlockList implements ContentList {
             result = Liquids.oil;
             inputLiquid = Liquids.water;
             updateEffect = BlockFx.pulverize;
+            liquidCapacity = 50f;
             updateEffectChance = 0.05f;
             inputLiquidUse = 0.3f;
             powerUse = 0.6f;

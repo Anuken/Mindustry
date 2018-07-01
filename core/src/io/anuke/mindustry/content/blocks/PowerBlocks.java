@@ -58,20 +58,20 @@ public class PowerBlocks extends BlockList implements ContentList {
             health = 600;
         }};
 
-        battery = new PowerGenerator("battery") {{
+        battery = new PowerDistributor("battery") {{
             powerCapacity = 320f;
         }};
 
-        batteryLarge = new PowerGenerator("battery-large") {{
+        batteryLarge = new PowerDistributor("battery-large") {{
             size = 3;
             powerCapacity = 2000f;
         }};
 
-        powerNode = new PowerDistributor("power-node") {{
+        powerNode = new PowerNode("power-node") {{
             shadow = "shadow-round-1";
         }};
 
-        powerNodeLarge = new PowerDistributor("power-node-large") {{
+        powerNodeLarge = new PowerNode("power-node-large") {{
             size = 2;
             powerSpeed = 1f;
             maxNodes = 5;

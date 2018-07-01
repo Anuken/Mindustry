@@ -15,7 +15,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.blocks.distribution.Sorter;
-import io.anuke.mindustry.world.blocks.power.PowerDistributor;
+import io.anuke.mindustry.world.blocks.power.PowerNode;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
@@ -36,7 +36,7 @@ public class DebugBlocks extends BlockList implements ContentList{
             }
         };
 
-        powerInfinite = new PowerDistributor("powerinfinite") {
+        powerInfinite = new PowerNode("powerinfinite") {
             {
                 powerCapacity = 10000f;
                 powerSpeed = 100f;

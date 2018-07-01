@@ -10,6 +10,7 @@ import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.util.Log;
 
 public class Fracker extends SolidPump {
     protected Liquid inputLiquid;
@@ -25,6 +26,7 @@ public class Fracker extends SolidPump {
     public Fracker(String name) {
         super(name);
         hasItems = true;
+        itemCapacity = 20;
     }
 
     @Override
@@ -74,13 +76,18 @@ public class Fracker extends SolidPump {
             entity.accumulator -= itemUseTime;
         }
 
-        if(entity.input >= inputLiquidUse * Timers.delta() && entity.accumulator < itemUseTime){
+        if(entity.input >= Math.min(inputLiquidUse * Timers.delta(), inputCapacity) && entity.accumulator < itemUseTime){
             super.update(tile);
             entity.input -= inputLiquidUse * Timers.delta();
             entity.accumulator += Timers.delta();
         }else{
             tryDumpLiquid(tile);
         }
+    }
+
+    @Override
+    public boolean acceptItem(Item item, Tile tile, Tile source) {
+        return item == inputItem && tile.entity.items.totalItems() < itemCapacity;
     }
 
     @Override
