@@ -33,7 +33,7 @@ public class MenuFragment implements Fragment{
 
 					add(new MenuButton("icon-editor", "$text.editor", () -> ui.loadAnd(ui.editor::show)));
 
-					add(new MenuButton("icon-menu", "$text.maps", ui.maps::show));
+					add(new MenuButton("icon-map", "$text.maps", ui.maps::show));
 
 					row();
 
@@ -64,8 +64,10 @@ public class MenuFragment implements Fragment{
 
 					new imagebutton("icon-play-2", isize, ui.levels::show).text("$text.play").padTop(4f);
 
-					new imagebutton("icon-tutorial", isize, () -> ui.showInfo("The tutorial is currently not yet implemented."))
-							.text("$text.tutorial").padTop(4f);
+					//new imagebutton("icon-tutorial", isize, () -> ui.showInfo("The tutorial is currently not yet implemented."))
+					//		.text("$text.tutorial").padTop(4f);
+
+					new imagebutton("icon-map", isize, ui.maps::show).text("$text.maps").padTop(4f);
 
 					new imagebutton("icon-load", isize, ui.load::show).text("$text.load").padTop(4f);
 

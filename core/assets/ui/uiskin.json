@@ -65,10 +65,11 @@ io.anuke.ucore.scene.ui.ImageButton$ImageButtonStyle: {
 	static-down: {up: button-down },
 	toggle: {checked: button-down, down: button-down, up: button, imageDisabledColor: lightgray, imageUpColor: white  },
 	togglemap: {down: button-map-down, up: button-map },
-	select: {checked: button-select, up: clear }
+	select: {checked: button-select, up: clear },
+	clear: {down: clear-down, up: clear, over: clear-over},
 },
 io.anuke.ucore.scene.ui.ScrollPane$ScrollPaneStyle: {
-	default: {background: border, vScroll: scroll, vScrollKnob: scroll-knob-vertical},
+	default: {background: border, vScroll: scroll, vScrollKnob: scroll-knob-vertical-black},
 	horizontal: {background: border, vScroll: scroll, vScrollKnob: scroll-knob-vertical, hScroll: scroll-horizontal, hScrollKnob: scroll-knob-horizontal},
 	volume: {background: button-map, vScroll: scroll, vScrollKnob: scroll-knob-vertical},
 	clear: {vScroll: scroll, vScrollKnob: scroll-knob-vertical},

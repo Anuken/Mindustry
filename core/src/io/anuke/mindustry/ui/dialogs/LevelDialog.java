@@ -1,16 +1,20 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.io.Map;
+import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.*;
-import io.anuke.ucore.scene.ui.layout.Stack;
+import io.anuke.ucore.scene.ui.ButtonGroup;
+import io.anuke.ucore.scene.ui.ImageButton;
+import io.anuke.ucore.scene.ui.ScrollPane;
+import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.scene.utils.Elements;
@@ -31,7 +35,8 @@ public class LevelDialog extends FloatingDialog{
 		content().clear();
 
 		Table maps = new Table();
-		ScrollPane pane = new ScrollPane(maps);
+		maps.marginRight(14);
+		ScrollPane pane = new ScrollPane(maps, "clear-black");
 		pane.setFadeScrollBars(false);
 		
 		int maxwidth = 4;
@@ -80,6 +85,8 @@ public class LevelDialog extends FloatingDialog{
 		content().add(sdif);
 		content().row();
 
+		float images = 146f;
+
 		int i = 0;
 		for(Map map : world.maps().all()){
 
@@ -87,38 +94,29 @@ public class LevelDialog extends FloatingDialog{
 				maps.row();
 			}
 			
-			Table inset = new Table("pane-button");
-			inset.add("[accent]" + Bundles.get("map."+map.name+".name", map.name)).pad(3f);
-			inset.row();
-			inset.label((() -> Bundles.format("text.level.highscore", Settings.getInt("hiscore" + map.name, 0)))).pad(3f);
-			inset.pack();
-			
-			float images = 154f;
-			
-			Stack stack = new Stack();
-			
-			Image back = new Image("white");
-			back.setColor(Color.valueOf("646464"));
-			
-			ImageButton image = new ImageButton(new TextureRegion(map.texture), "togglemap");
+			ImageButton image = new ImageButton(new TextureRegion(map.texture), "clear");
+			image.margin(5);
+			image.getImageCell().size(images);
+			image.top();
 			image.row();
-			image.add(inset).width(images+6);
+			image.add("[accent]" + Bundles.get("map."+map.name+".name", map.name)).pad(3f).growX().wrap().get().setAlignment(Align.center, Align.center);
+			image.row();
+			image.label((() -> Bundles.format("text.level.highscore", Settings.getInt("hiscore" + map.name, 0)))).pad(3f);
+
+			BorderImage border = new BorderImage(map.texture, 3f);
+			image.replaceImage(border);
 
 			image.clicked(() -> {
 				hide();
 				control.playMap(map);
 			});
-			image.getImageCell().size(images);
 			
-			stack.add(back);
-			stack.add(image);
-			
-			maps.add(stack).width(170).top().pad(4f);
+			maps.add(image).width(170).fillY().top().pad(4f);
 			
 			i ++;
 		}
 
-		maps.addImageButton("icon-editor", 16*4, () -> {
+		ImageButton genb = maps.addImageButton("icon-editor", "clear", 16*3, () -> {
 			hide();
 
 			ui.loadfrag.show();
@@ -131,7 +129,16 @@ public class LevelDialog extends FloatingDialog{
 					Gdx.app.postRunnable(ui.loadfrag::hide);
 				});
 			});
-		}).size(170, 154f + 73).pad(4f);
+		}).width(170).fillY().pad(4f).get();
+
+		genb.top();
+		genb.margin(5);
+		genb.clearChildren();
+		genb.add(new BorderImage(Draw.region("icon-generated"), 3f)).size(images);
+		genb.row();
+		genb.add("$text.map.random").growX().wrap().pad(3f).get().setAlignment(Align.center, Align.center);
+		genb.row();
+		genb.add("<generated>").pad(3f);
 		
 		content().add(pane).uniformX();
 	}
