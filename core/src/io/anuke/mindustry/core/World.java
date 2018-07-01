@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.ai.BlockIndexer;
 import io.anuke.mindustry.ai.Pathfinder;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.io.*;
@@ -34,7 +35,7 @@ public class World extends Module{
 	private Maps maps = new Maps();
 
 	private Array<Tile> tempTiles = new ThreadArray<>();
-	private boolean generating;
+	private boolean generating, invalidMap;
 	
 	public World(){
 		maps.load();
@@ -56,7 +57,11 @@ public class World extends Module{
 	public Pathfinder pathfinder(){
 		return pathfinder;
 	}
-	
+
+	public boolean isInvalidMap() {
+		return invalidMap;
+	}
+
 	public boolean solid(int x, int y){
 		Tile tile = tile(x, y);
 		
@@ -215,6 +220,14 @@ public class World extends Module{
 		EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
 		WorldGenerator.loadTileData(tiles, MapIO.readTileData(map, true), map.meta.hasOreGen(), seed);
+
+		if(!headless && state.teams.get(players[0].getTeam()).cores.size == 0){
+			ui.showError("$text.map.nospawn");
+			threads.runDelay(() -> state.set(State.menu));
+			invalidMap = true;
+		}else{
+			invalidMap = false;
+		}
 
 		endMapLoad();
 	}

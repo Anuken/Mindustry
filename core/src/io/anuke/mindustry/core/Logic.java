@@ -126,7 +126,9 @@ public class Logic extends Module {
                 Timers.update();
             }
 
-            checkGameOver();
+            if(!world.isInvalidMap()){
+                checkGameOver();
+            }
 
             if(!state.is(State.paused) || Net.active()){
 

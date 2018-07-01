@@ -116,7 +116,7 @@ public class MenuFragment implements Fragment{
 
 		FloatingDialog dialog = new FloatingDialog("$text.play");
 		dialog.addCloseButton();
-		dialog.content().defaults().height(70f).width(w).padRight(5f);
+		dialog.content().defaults().height(66f).width(w).padRight(5f);
 
 		dialog.content().add(new MenuButton("icon-play-2", "$text.newgame", () -> {
 			dialog.hide();
