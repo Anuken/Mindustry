@@ -11,7 +11,8 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
 public class BulletFx extends FxList implements ContentList {
-    public static Effect hitBulletSmall, hitBulletBig, hitFlameSmall, hitLiquid, hitLancer, despawn, flakExplosion, artilleryTrail;
+    public static Effect hitBulletSmall, hitBulletBig, hitFlameSmall, hitLiquid, hitLancer, despawn, flakExplosion, blastExplosion, plasticExplosion,
+            artilleryTrail, incendTrail, missileTrail;
 
     @Override
     public void load() {
@@ -110,8 +111,68 @@ public class BulletFx extends FxList implements ContentList {
             Draw.reset();
         });
 
+        plasticExplosion = new Effect(24, e -> {
+
+            Draw.color(Palette.plastaniumFront);
+            e.scaled(7, i -> {
+                Lines.stroke(3f * i.fout());
+                Lines.circle(e.x, e.y, 3f + i.fin() * 24f);
+            });
+
+            Draw.color(Color.GRAY);
+
+            Angles.randLenVectors(e.id, 7, 2f + 28f * e.finpow(), (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.5f);
+            });
+
+            Draw.color(Palette.plastaniumBack);
+            Lines.stroke(1f * e.fout());
+
+            Angles.randLenVectors(e.id + 1, 4, 1f + 25f * e.finpow(), (x, y) -> {
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), 1f + e.fout() * 3f);
+            });
+
+            Draw.reset();
+        });
+
+        blastExplosion = new Effect(22, e -> {
+
+            Draw.color(Palette.missileYellow);
+            e.scaled(6, i -> {
+                Lines.stroke(3f * i.fout());
+                Lines.circle(e.x, e.y, 3f + i.fin() * 15f);
+            });
+
+            Draw.color(Color.GRAY);
+
+            Angles.randLenVectors(e.id, 5, 2f + 23f * e.finpow(), (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.5f);
+            });
+
+            Draw.color(Palette.missileYellowBack);
+            Lines.stroke(1f * e.fout());
+
+            Angles.randLenVectors(e.id + 1, 4, 1f + 23f * e.finpow(), (x, y) -> {
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), 1f + e.fout() * 3f);
+            });
+
+            Draw.reset();
+        });
+
         artilleryTrail = new Effect(50, e -> {
-            Draw.color(Palette.bulletYellowBack);
+            Draw.color(e.color);
+            Fill.circle(e.x, e.y, e.rotation * e.fout());
+            Draw.reset();
+        });
+
+        incendTrail = new Effect(50, e -> {
+            Draw.color(Palette.lightOrange);
+            Fill.circle(e.x, e.y, e.rotation * e.fout());
+            Draw.reset();
+        });
+
+        missileTrail = new Effect(50, e -> {
+            Draw.color(Palette.missileYellowBack);
             Fill.circle(e.x, e.y, e.rotation * e.fout());
             Draw.reset();
         });

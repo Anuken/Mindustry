@@ -6,6 +6,12 @@ public class Palette {
     public static final Color bulletYellow = Color.valueOf("ffeec9");
     public static final Color bulletYellowBack = Color.valueOf("f9c87a");
 
+    public static final Color missileYellow = Color.valueOf("ffd2ae");
+    public static final Color missileYellowBack = Color.valueOf("e58956");
+
+    public static final Color plastaniumBack = Color.valueOf("d8d97f");
+    public static final Color plastaniumFront = Color.valueOf("fffac6");
+
     public static final Color lightFlame = Color.valueOf("ffdd55");
     public static final Color darkFlame = Color.valueOf("db401c");
 

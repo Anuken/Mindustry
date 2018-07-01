@@ -116,7 +116,9 @@ public class BuildBlock extends Block {
     public void drawShadow(Tile tile) {
         BuildEntity entity = tile.entity();
 
-        entity.recipe.result.drawShadow(tile);
+        if(entity.recipe != null && entity.recipe.result != null){
+            entity.recipe.result.drawShadow(tile);
+        }
     }
 
     @Override

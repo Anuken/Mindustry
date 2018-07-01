@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectIntMap;
-import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
@@ -40,6 +39,7 @@ import io.anuke.ucore.graphics.Surface;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Pooling;
 import io.anuke.ucore.util.Translator;
 
 import static io.anuke.mindustry.Vars.*;
@@ -79,7 +79,7 @@ public class Renderer extends RendererModule{
 				if(view.overlaps(pos)){
 
 					if(!(effect instanceof GroundEffect)) {
-						EffectEntity entity = Pools.obtain(EffectEntity.class);
+						EffectEntity entity = Pooling.obtain(EffectEntity.class);
 						entity.effect = effect;
 						entity.color = color;
 						entity.rotation = rotation;
@@ -91,7 +91,7 @@ public class Renderer extends RendererModule{
 						}
 						threads.runGraphics(() -> effectGroup.add(entity));
 					}else{
-						GroundEffectEntity entity = Pools.obtain(GroundEffectEntity.class);
+						GroundEffectEntity entity = Pooling.obtain(GroundEffectEntity.class);
 						entity.effect = effect;
 						entity.color = color;
 						entity.rotation = rotation;

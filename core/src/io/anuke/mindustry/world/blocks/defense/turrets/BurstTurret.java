@@ -9,6 +9,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 
 public class BurstTurret extends ItemTurret {
     protected float burstSpacing = 5;
+    protected float xRand = 0f;
 
     public BurstTurret(String name) {
         super(name);
@@ -27,7 +28,7 @@ public class BurstTurret extends ItemTurret {
 
                 entity.recoil = recoil;
 
-                tr.trns(entity.rotation, size * tilesize / 2);
+                tr.trns(entity.rotation, size * tilesize / 2, Mathf.range(xRand));
                 useAmmo(tile);
                 bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy));
                 effects(tile);

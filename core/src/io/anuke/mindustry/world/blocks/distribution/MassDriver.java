@@ -2,7 +2,6 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Pool.Poolable;
-import com.badlogic.gdx.utils.Pools;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.bullets.TurretBullets;
@@ -26,6 +25,7 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Pooling;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -186,7 +186,7 @@ public class MassDriver extends Block {
 
         entity.reload = 1f;
 
-        DriverBulletData data = Pools.obtain(DriverBulletData.class);
+        DriverBulletData data = Pooling.obtain(DriverBulletData.class);
         data.from = entity;
         data.to = other;
         System.arraycopy(entity.items.items, 0, data.items, 0, data.items.length);

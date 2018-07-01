@@ -2,21 +2,26 @@ package io.anuke.mindustry.entities.bullet;
 
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
 
 //TODO scale velocity depending on fslope()
 public class ArtilleryBulletType extends BasicBulletType {
+    protected Effect trailEffect = BulletFx.artilleryTrail;
 
     public ArtilleryBulletType(float speed, float damage, String bulletSprite) {
         super(speed, damage, bulletSprite);
         collidesTiles = false;
         collides = false;
+        hitShake = 1f;
     }
 
     @Override
     public void update(Bullet b) {
+        super.update(b);
+
         if(b.timer.get(0, 3 + b.fslope()*2f)){
-            Effects.effect(BulletFx.artilleryTrail, b.x, b.y, b.fslope() * 4f);
+            Effects.effect(trailEffect, backColor, b.x, b.y, b.fslope() * 4f);
         }
     }
 

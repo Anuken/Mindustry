@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Pool.Poolable;
-import com.badlogic.gdx.utils.Pools;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.Liquids;
@@ -32,6 +31,7 @@ import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Pooling;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -89,7 +89,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
         if(p == null){
             if(Net.client()) return; //not clientside.
 
-            Puddle puddle = Pools.obtain(Puddle.class);
+            Puddle puddle = Pooling.obtain(Puddle.class);
             puddle.tile = tile;
             puddle.liquid = liquid;
             puddle.amount = amount;

@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool.Poolable;
-import com.badlogic.gdx.utils.Pools;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.StatusEffects;
@@ -24,6 +23,7 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Pooling;
 import io.anuke.ucore.util.SeedRandom;
 
 import static io.anuke.mindustry.Vars.bulletGroup;
@@ -48,7 +48,7 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait{
 
     @Remote(called = Loc.server, in = In.entities)
     public static void createLighting(int seed, Team team, Effect effect, Color color, float damage, float x, float y, float targetAngle, int length){
-        Lightning l = Pools.obtain(Lightning.class);
+        Lightning l = Pooling.obtain(Lightning.class);
 
         l.x = x;
         l.y = y;
@@ -126,7 +126,7 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait{
 
     @Override
     public void removed() {
-        Pools.free(this);
+        Pooling.free(this);
     }
 
     @Override

@@ -18,13 +18,14 @@ public class TurretBlocks extends BlockList implements ContentList {
 	@Override
 	public void load() {
 		duo = new DoubleTurret("duo") {{
-			ammoTypes = new AmmoType[]{AmmoTypes.bulletTungsten, AmmoTypes.bulletLead, AmmoTypes.bulletCarbide, AmmoTypes.bulletThermite, AmmoTypes.bulletSilicon};
+			ammoTypes = new AmmoType[]{AmmoTypes.bulletTungsten, AmmoTypes.bulletLead, AmmoTypes.bulletCarbide, AmmoTypes.bulletPyratite, AmmoTypes.bulletSilicon};
 			reload = 25f;
 			restitution = 0.03f;
 			range = 80f;
 			shootCone = 15f;
 			ammoUseEffect = ShootFx.shellEjectSmall;
 			health = 80;
+			inaccuracy = 3f;
 		}};
 /*
 		scatter = new BurstTurret("scatter") {{
@@ -115,22 +116,30 @@ public class TurretBlocks extends BlockList implements ContentList {
 			size = 2;
 		}};
 
-		swarmer = new ItemTurret("swarmer") {{
-			ammoTypes = new AmmoType[]{AmmoTypes.missileExplosive, AmmoTypes.missileIncindiary, AmmoTypes.missileSurge};
+		swarmer = new BurstTurret("swarmer") {{
+			ammoTypes = new AmmoType[]{AmmoTypes.missileExplosive, AmmoTypes.missileIncindiary/*, AmmoTypes.missileSurge*/};
+			reload = 60f;
+			shots = 4;
+			burstSpacing = 5;
+			inaccuracy = 10f;
+			range = 140f;
+			xRand = 6f;
 			size = 2;
 			health = 380;
 		}};
 
-		salvo = new ItemTurret("salvo") {{
+		salvo = new BurstTurret("salvo") {{
 			size = 2;
-			range = 100f;
-			ammoTypes = new AmmoType[]{AmmoTypes.bulletTungsten, AmmoTypes.bulletLead, AmmoTypes.bulletCarbide, AmmoTypes.bulletThermite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
-			reload = 70f;
+			range = 110f;
+			ammoTypes = new AmmoType[]{AmmoTypes.bulletTungsten, AmmoTypes.bulletCarbide, AmmoTypes.bulletPyratite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
+			reload = 40f;
 			restitution = 0.03f;
 			ammoEjectBack = 3f;
 			cooldown = 0.03f;
 			recoil = 3f;
 			shootShake = 2f;
+			burstSpacing = 4;
+			shots = 3;
 			ammoUseEffect = ShootFx.shellEjectBig;
 
 			drawer = (tile, entity) -> {
@@ -146,12 +155,23 @@ public class TurretBlocks extends BlockList implements ContentList {
 				}
 			};
 
-			health = 430;
+			health = 360;
 		}};
 
 		ripple = new ArtilleryTurret("ripple") {{
-			ammoTypes = new AmmoType[]{AmmoTypes.artilleryCarbide, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary, AmmoTypes.artilleryPlastic, AmmoTypes.artilleryThorium};
+			ammoTypes = new AmmoType[]{AmmoTypes.artilleryCarbide, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary, AmmoTypes.artilleryExplosive, AmmoTypes.artilleryPlastic};
 			size = 3;
+			shots = 4;
+			inaccuracy = 12f;
+			reload = 60f;
+			ammoEjectBack = 5f;
+            ammoUseEffect = ShootFx.shellEjectBig;
+            cooldown = 0.03f;
+			velocityInaccuracy = 0.2f;
+            restitution = 0.02f;
+            recoil = 6f;
+            shootShake = 2f;
+            range = 300f;
 
 			health = 550;
 		}};
@@ -168,7 +188,7 @@ public class TurretBlocks extends BlockList implements ContentList {
 		}};
 
 		spectre = new ItemTurret("spectre") {{
-			ammoTypes = new AmmoType[]{AmmoTypes.bulletTungsten, AmmoTypes.bulletLead, AmmoTypes.bulletCarbide, AmmoTypes.bulletThermite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
+			ammoTypes = new AmmoType[]{AmmoTypes.bulletTungsten, AmmoTypes.bulletLead, AmmoTypes.bulletCarbide, AmmoTypes.bulletPyratite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
 			reload = 25f;
 			restitution = 0.03f;
 			ammoUseEffect = ShootFx.shellEjectSmall;

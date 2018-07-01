@@ -3,7 +3,6 @@ package io.anuke.mindustry.core;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.Pools;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.annotations.Annotations.Variant;
 import io.anuke.mindustry.core.GameState.State;
@@ -26,6 +25,7 @@ import io.anuke.ucore.io.delta.DEZDecoder;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Pooling;
 import io.anuke.ucore.util.Timer;
 
 import java.io.DataInputStream;
@@ -199,7 +199,7 @@ public class NetClient extends Module {
 
         if(timer.get(0, playerSyncTime)){
 
-            ClientSnapshotPacket packet = Pools.obtain(ClientSnapshotPacket.class);
+            ClientSnapshotPacket packet = Pooling.obtain(ClientSnapshotPacket.class);
             packet.lastSnapshot = lastSnapshotBaseID;
             packet.snapid = lastSent++;
             Net.send(packet, SendMode.udp);

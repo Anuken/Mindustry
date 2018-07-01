@@ -9,10 +9,10 @@ import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.ContentList;
 
 public class AmmoTypes implements ContentList {
-    public static AmmoType bulletTungsten, bulletLead, bulletCarbide, bulletThorium, bulletSilicon, bulletThermite,
+    public static AmmoType bulletTungsten, bulletLead, bulletCarbide, bulletThorium, bulletSilicon, bulletPyratite,
             shotgunTungsten, bombExplosive, bombIncendiary, bombOil, shellCarbide, flamerThermite,
             flakLead, flakExplosive, flakPlastic, flakSurge, missileExplosive, missileIncindiary, missileSurge,
-            artilleryCarbide, artilleryThorium, artilleryPlastic, artilleryHoming, artilleryIncindiary,
+            artilleryCarbide, artilleryPlastic, artilleryHoming, artilleryIncindiary, artilleryExplosive,
             basicFlame, lancerLaser, lightning, spectreLaser, meltdownLaser, fuseShotgun, oil, water, lava, cryofluid;
 
     @Override
@@ -72,8 +72,8 @@ public class AmmoTypes implements ContentList {
         }};
 
         bulletThorium = new AmmoType(Items.thorium, StandardBullets.thorium, 2) {{
-            shootEffect = ShootFx.shootSmall;
-            smokeEffect = ShootFx.shootSmallSmoke;
+            shootEffect = ShootFx.shootBig;
+            smokeEffect = ShootFx.shootBigSmoke;
         }};
 
         bulletSilicon = new AmmoType(Items.silicon, StandardBullets.homing, 5) {{
@@ -82,7 +82,7 @@ public class AmmoTypes implements ContentList {
             reloadMultiplier = 1.4f;
         }};
 
-        bulletThermite = new AmmoType(Items.pyratite, StandardBullets.tracer, 3) {{
+        bulletPyratite = new AmmoType(Items.pyratite, StandardBullets.tracer, 3) {{
             shootEffect = ShootFx.shootSmall;
             smokeEffect = ShootFx.shootSmallSmoke;
             inaccuracy = 3f;
@@ -115,11 +115,13 @@ public class AmmoTypes implements ContentList {
         missileExplosive = new AmmoType(Items.blastCompound, MissileBullets.explosive, 1) {{
             shootEffect = ShootFx.shootBig2;
             smokeEffect = ShootFx.shootBigSmoke2;
+            reloadMultiplier = 1.2f;
         }};
 
         missileIncindiary = new AmmoType(Items.pyratite, MissileBullets.incindiary, 1) {{
             shootEffect = ShootFx.shootBig2;
             smokeEffect = ShootFx.shootBigSmoke2;
+            reloadMultiplier = 1.0f;
         }};
 
         missileSurge = new AmmoType(Items.surgealloy, MissileBullets.surge, 1) {{
@@ -129,29 +131,33 @@ public class AmmoTypes implements ContentList {
 
         //artillery
 
-        artilleryCarbide = new AmmoType(Items.carbide, ArtilleryBullets.carbide, 1) {{
+        artilleryCarbide = new AmmoType(Items.carbide, ArtilleryBullets.carbide, 2) {{
             shootEffect = ShootFx.shootBig2;
             smokeEffect = ShootFx.shootBigSmoke2;
         }};
 
-        artilleryThorium = new AmmoType(Items.thorium, ArtilleryBullets.thorium, 1) {{
+        artilleryPlastic = new AmmoType(Items.plastanium, ArtilleryBullets.plastic, 2) {{
             shootEffect = ShootFx.shootBig2;
             smokeEffect = ShootFx.shootBigSmoke2;
-        }};
-
-        artilleryPlastic = new AmmoType(Items.plastanium, ArtilleryBullets.plastic, 1) {{
-            shootEffect = ShootFx.shootBig2;
-            smokeEffect = ShootFx.shootBigSmoke2;
+            reloadMultiplier = 1.4f;
         }};
 
         artilleryHoming = new AmmoType(Items.silicon, ArtilleryBullets.homing, 1) {{
             shootEffect = ShootFx.shootBig2;
             smokeEffect = ShootFx.shootBigSmoke2;
+            reloadMultiplier = 0.9f;
         }};
 
-        artilleryIncindiary = new AmmoType(Items.pyratite, ArtilleryBullets.incindiary, 1) {{
+        artilleryIncindiary = new AmmoType(Items.pyratite, ArtilleryBullets.incindiary, 2) {{
             shootEffect = ShootFx.shootBig2;
             smokeEffect = ShootFx.shootBigSmoke2;
+            reloadMultiplier = 1.2f;
+        }};
+
+        artilleryExplosive = new AmmoType(Items.blastCompound, ArtilleryBullets.explosive, 1) {{
+            shootEffect = ShootFx.shootBig2;
+            smokeEffect = ShootFx.shootBigSmoke2;
+            reloadMultiplier = 1.6f;
         }};
 
         //flame

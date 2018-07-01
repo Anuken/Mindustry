@@ -1,7 +1,6 @@
 package io.anuke.mindustry.entities.bullet;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
@@ -17,6 +16,7 @@ import io.anuke.ucore.entities.impl.BulletEntity;
 import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.entities.trait.VelocityTrait;
+import io.anuke.ucore.util.Pooling;
 import io.anuke.ucore.util.Timer;
 
 import java.io.DataInput;
@@ -48,7 +48,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 	}
 
 	public static void create (BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl, Object data){
-		Bullet bullet = Pools.obtain(Bullet.class);
+		Bullet bullet = Pooling.obtain(Bullet.class);
 		bullet.type = type;
 		bullet.owner = owner;
 		bullet.data = data;
@@ -214,7 +214,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 
 	@Override
 	public void removed() {
-		Pools.free(this);
+		Pooling.free(this);
 	}
 
 	@Override

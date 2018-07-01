@@ -76,7 +76,7 @@ public class Weapons implements ContentList {
             reload = 10f;
             roundrobin = true;
             ejectEffect = ShootFx.shellEjectSmall;
-            setAmmo(AmmoTypes.bulletThermite);
+            setAmmo(AmmoTypes.bulletPyratite);
         }};
 
         bomber = new Weapon("bomber") {{

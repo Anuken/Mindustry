@@ -18,12 +18,12 @@ public class LiquidFilterValue implements StatValue {
         Array<Liquid> list = new Array<>();
 
         for(Liquid item : Liquid.all()){
-            if(filter.test(item)) list.add(item);
+            if(!item.isHidden() && filter.test(item)) list.add(item);
         }
 
         for (int i = 0; i < list.size; i++) {
             Liquid item = list.get(i);
-            table.addImage("liquid-icon").color(item.color).size(8*3).padRight(2).padLeft(2);
+            table.addImage("liquid-icon").color(item.color).size(8*3).padRight(2).padLeft(2).padTop(2).padBottom(2);
             if(i != list.size - 1){
                 table.add("/");
             }

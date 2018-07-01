@@ -10,6 +10,8 @@ import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 
+import static io.anuke.mindustry.Vars.control;
+
 public interface SelectionTrait {
 
     default void buildItemTable(Table table, Supplier<Item> holder, Consumer<Item> consumer){
@@ -19,7 +21,10 @@ public interface SelectionTrait {
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
         Table cont = new Table();
 
-        for(int i = 0; i < items.size; i ++){
+        int i = 0;
+
+        for(Item item : items){
+            if(!control.database().isUnlocked(item)) continue;
 
             final int f = i;
             ImageButton button = cont.addImageButton("white", "toggle", 24, () -> consumer.accept(items.get(f)))
@@ -27,7 +32,7 @@ public interface SelectionTrait {
             button.getStyle().imageUp = new TextureRegionDrawable(new TextureRegion(items.get(i).region));
             button.setChecked(holder.get().id == f);
 
-            if(i%4 == 3){
+            if(i++%4 == 3){
                 cont.row();
             }
         }

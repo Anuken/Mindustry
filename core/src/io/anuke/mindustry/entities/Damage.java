@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.CallEntity;
@@ -62,6 +63,17 @@ public class Damage {
 		float shake = Math.min(explosiveness/4f + 3f, 9f);
 		Effects.shake(shake, shake, x, y);
 		Effects.effect(ExplosionFx.blockExplosion, x, y);
+	}
+
+	public static void createIncend(float x, float y, float range, int amount){
+		for (int i = 0; i < amount; i++) {
+			float cx = x + Mathf.range(range);
+			float cy = y + Mathf.range(range);
+			Tile tile = world.tileWorld(cx, cy);
+			if(tile != null){
+				Fire.create(tile);
+			}
+		}
 	}
 
 	/**Damages entities in a line.

@@ -1,11 +1,11 @@
 package io.anuke.kryonet;
 
-import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.esotericsoftware.kryonet.FrameworkMessage;
 import com.esotericsoftware.kryonet.serialization.Serialization;
 import io.anuke.mindustry.net.Packet;
 import io.anuke.mindustry.net.Registrator;
+import io.anuke.ucore.util.Pooling;
 
 import java.nio.ByteBuffer;
 
@@ -27,7 +27,7 @@ public class ByteSerializer implements Serialization {
             byteBuffer.put(id);
             ((Packet) o).write(byteBuffer);
             synchronized (packetPoolLock) {
-                Pools.free(o);
+                Pooling.free(o);
             }
         }
     }
@@ -40,7 +40,7 @@ public class ByteSerializer implements Serialization {
         }else{
             Class<?> type = Registrator.getByID(id);
             synchronized (packetPoolLock) {
-                Packet packet = (Packet) Pools.obtain(type);
+                Packet packet = (Packet) Pooling.obtain(type);
                 packet.read(byteBuffer);
                 return packet;
             }

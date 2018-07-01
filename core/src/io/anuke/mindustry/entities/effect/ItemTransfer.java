@@ -2,7 +2,6 @@ package io.anuke.mindustry.entities.effect;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Pools;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.entities.Unit;
@@ -19,6 +18,7 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Pooling;
 
 import static io.anuke.mindustry.Vars.effectGroup;
 import static io.anuke.mindustry.Vars.threads;
@@ -61,7 +61,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
     }
 
     public static void create(Item item, float fromx, float fromy, PosTrait to, Runnable done){
-        ItemTransfer tr = Pools.obtain(ItemTransfer.class);
+        ItemTransfer tr = Pooling.obtain(ItemTransfer.class);
         tr.item = item;
         tr.from.set(fromx, fromy);
         tr.to = to;
@@ -93,7 +93,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
         if(done != null){
             threads.run(done);
         }
-        Pools.free(this);
+        Pooling.free(this);
     }
 
     @Override

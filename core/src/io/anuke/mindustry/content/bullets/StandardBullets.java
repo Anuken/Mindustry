@@ -1,13 +1,9 @@
 package io.anuke.mindustry.content.bullets;
 
-import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.BasicBulletType;
-import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentList;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Angles;
 
 public class StandardBullets extends BulletList implements ContentList {
     public static BulletType tungsten, lead, carbide, thorium, homing, tracer;
@@ -46,25 +42,22 @@ public class StandardBullets extends BulletList implements ContentList {
         };
 
         homing = new BasicBulletType(3f, 9, "bullet") {
-            float homingPower = 5f;
             {
                 bulletWidth = 7f;
                 bulletHeight = 9f;
-            }
-
-            @Override
-            public void update(Bullet b) {
-                Unit target = Units.getClosestEnemy(b.getTeam(), b.x, b.y, 40f, unit -> true);
-                if(target != null){
-                    b.getVelocity().setAngle(Angles.moveToward(b.getVelocity().angle(), b.angleTo(target), homingPower * Timers.delta()));
-                }
+                homingPower = 5f;
             }
         };
 
-        tracer = new BasicBulletType(3f, 5, "bullet") {
+        tracer = new BasicBulletType(3.2f, 11, "bullet") {
             {
-                bulletWidth = 7f;
-                bulletHeight = 9f;
+                bulletWidth = 10f;
+                bulletHeight = 12f;
+                frontColor = Palette.lightishOrange;
+                backColor = Palette.lightOrange;
+                incendSpread = 3f;
+                incendAmount = 1;
+                incendChance = 0.3f;
             }
         };
     }

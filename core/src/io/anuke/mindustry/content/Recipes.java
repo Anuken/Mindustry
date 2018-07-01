@@ -33,9 +33,9 @@ public class Recipes implements ContentList{
 
         new Recipe(weapon, TurretBlocks.lancer, new ItemStack(Items.tungsten, 50), new ItemStack(Items.lead, 100), new ItemStack(Items.silicon, 90));
         new Recipe(weapon, TurretBlocks.wave, new ItemStack(Items.carbide, 60), new ItemStack(Items.titanium, 70), new ItemStack(Items.lead, 150));
-        new Recipe(weapon, TurretBlocks.swarmer, new ItemStack(Items.carbide, 70), new ItemStack(Items.titanium, 70), new ItemStack(Items.plastanium, 90), new ItemStack(Items.silicon, 60), new ItemStack(Items.phasematter, 60));
-        new Recipe(weapon, TurretBlocks.salvo, new ItemStack(Items.tungsten, 160), new ItemStack(Items.carbide, 190), new ItemStack(Items.thorium, 130));
-        new Recipe(weapon, TurretBlocks.ripple, new ItemStack(Items.tungsten, 170), new ItemStack(Items.carbide, 220), new ItemStack(Items.thorium, 120));
+        new Recipe(weapon, TurretBlocks.swarmer, new ItemStack(Items.carbide, 70), new ItemStack(Items.titanium, 70), new ItemStack(Items.plastanium, 90), new ItemStack(Items.silicon, 60));
+        new Recipe(weapon, TurretBlocks.salvo, new ItemStack(Items.tungsten, 210), new ItemStack(Items.carbide, 190), new ItemStack(Items.thorium, 130));
+        new Recipe(weapon, TurretBlocks.ripple, new ItemStack(Items.tungsten, 300), new ItemStack(Items.carbide, 220), new ItemStack(Items.thorium, 120));
 
         //DISTRIBUTION
         new Recipe(distribution, DistributionBlocks.conveyor, new ItemStack(Items.lead, 1));

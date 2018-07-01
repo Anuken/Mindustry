@@ -3,7 +3,6 @@ package io.anuke.mindustry.entities.effect;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Pool.Poolable;
-import com.badlogic.gdx.utils.Pools;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.StatusEffects;
@@ -24,6 +23,7 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.TimedEntity;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Pooling;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -48,7 +48,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable 
         Fire fire = map.get(tile.packedPosition());
 
         if(fire == null){
-            fire = Pools.obtain(Fire.class);
+            fire = Pooling.obtain(Fire.class);
             fire.tile = tile;
             fire.lifetime = baseLifetime;
             fire.set(tile.worldx(), tile.worldy());

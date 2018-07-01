@@ -8,22 +8,23 @@ import com.badlogic.gdx.net.HttpRequestBuilder;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packet.UnimportantPacket;
 import io.anuke.mindustry.net.Packets.StreamBegin;
-import io.anuke.mindustry.net.Streamable.StreamBuilder;
 import io.anuke.mindustry.net.Packets.StreamChunk;
+import io.anuke.mindustry.net.Streamable.StreamBuilder;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.BiConsumer;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Pooling;
 
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.headless;
+import static io.anuke.mindustry.Vars.ui;
 
 public class Net{
 	public static final Object packetPoolLock = new Object();
@@ -186,14 +187,14 @@ public class Net{
 				if(clientListeners.get(object.getClass()) != null) clientListeners.get(object.getClass()).accept(object);
 				if(listeners.get(object.getClass()) != null) listeners.get(object.getClass()).accept(object);
 				synchronized (packetPoolLock) {
-					Pools.free(object);
+					Pooling.free(object);
 				}
 			}else if(!(object instanceof UnimportantPacket)){
 				packetQueue.add(object);
 				Log.info("Queuing packet {0}.", ClassReflection.getSimpleName(object.getClass()));
 			}else{
 				synchronized (packetPoolLock) {
-					Pools.free(object);
+					Pooling.free(object);
 				}
 			}
 		}else{
@@ -208,7 +209,7 @@ public class Net{
 			if(serverListeners.get(object.getClass()) != null) serverListeners.get(object.getClass()).accept(connection, object);
 			if(listeners.get(object.getClass()) != null) listeners.get(object.getClass()).accept(object);
 			synchronized (packetPoolLock) {
-				Pools.free(object);
+				Pooling.free(object);
 			}
 		}else{
 			Log.err("Unhandled packet type: '{0}'!", ClassReflection.getSimpleName(object.getClass()));

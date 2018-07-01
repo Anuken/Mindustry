@@ -1,11 +1,11 @@
 package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.entities.traits.Saveable;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Pooling;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -50,7 +50,7 @@ public class StatusController implements Saveable{
         }
 
         //otherwise, no opposites found, add direct effect
-        StatusEntry entry = Pools.obtain(StatusEntry.class);
+        StatusEntry entry = Pooling.obtain(StatusEntry.class);
         entry.set(effect, newTime);
         statuses.add(entry);
     }
@@ -70,7 +70,7 @@ public class StatusController implements Saveable{
             entry.time = Math.max(entry.time - Timers.delta(), 0);
 
             if(entry.time <= 0){
-                Pools.free(entry);
+                Pooling.free(entry);
                 removals.add(entry);
             }else{
                 speedMultiplier *= entry.effect.speedMultiplier;
@@ -116,7 +116,7 @@ public class StatusController implements Saveable{
     @Override
     public void readSave(DataInput stream) throws IOException {
         for (StatusEntry effect : statuses){
-            Pools.free(effect);
+            Pooling.free(effect);
         }
 
         statuses.clear();
@@ -125,7 +125,7 @@ public class StatusController implements Saveable{
         for (int i = 0; i < amount; i++) {
             byte id = stream.readByte();
             float time = stream.readShort() / 2f;
-            StatusEntry entry = Pools.obtain(StatusEntry.class);
+            StatusEntry entry = Pooling.obtain(StatusEntry.class);
             entry.set(StatusEffect.getByID(id), time);
             statuses.add(entry);
         }

@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.defense.turrets;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Predict;
@@ -56,6 +57,7 @@ public abstract class Turret extends Block{
 	protected float rotatespeed = 5f; //in degrees per tick
 	protected float shootCone = 8f;
 	protected float shootShake = 0f;
+	protected boolean targetAir = true;
 
 	protected Translator tr = new Translator();
 	protected Translator tr2 = new Translator();
@@ -177,16 +179,20 @@ public abstract class Turret extends Block{
 			
 			if(entity.timer.get(timerTarget, targetInterval)){
 				entity.target = Units.getClosestEnemy(tile.getTeam(),
-						tile.drawx(), tile.drawy(), range, e -> !e.isDead());
+						tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir));
 			}
 			
 			if(entity.target != null){
 			    AmmoType type = peekAmmo(tile);
 			    float speed = type.bullet.speed;
 			    if(speed < 0.1f) speed = 9999999f;
+
+				Vector2 result = Predict.intercept(entity, entity.target, speed);
+				if(result.isZero()){
+					result.set(entity.target.getX(), entity.target.getY());
+				}
 				
-				float targetRot = Predict.intercept(entity, entity.target, speed)
-						.sub(tile.drawx(), tile.drawy()).angle();
+				float targetRot = result.sub(tile.drawx(), tile.drawy()).angle();
 				
 				if(Float.isNaN(entity.rotation)){
 					entity.rotation = 0;
