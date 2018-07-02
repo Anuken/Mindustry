@@ -288,7 +288,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean isDrawing(){
-        return selection.size > 0 || removals.size > 0 || lineMode || player.target != null;
+        return selection.size > 0 || removals.size > 0 || lineMode || player.target != null || mode != PlaceMode.none;
     }
 
     @Override
@@ -298,6 +298,10 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
 	public void drawOutlined(){
+
+        Draw.color(Palette.placing);
+        Lines.poly(player.x, player.y, 100, Player.placeDistance);
+        Draw.color();
 
         Shaders.mix.color.set(Palette.accent);
         Graphics.shader(Shaders.mix);
