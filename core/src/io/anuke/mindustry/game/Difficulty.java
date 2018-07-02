@@ -6,8 +6,9 @@ public enum Difficulty {
     easy(4f, 2f, 1f),
     normal(2f, 1f, 1f),
     hard(1.5f, 0.5f, 0.75f),
-    insane(0.5f, 0.25f, 0.5f),
-    purge(0.25f, 0.01f, 0.25f);
+    insane(0.5f, 0.25f, 0.5f);
+    //purge removed due to new wave system
+    /*purge(0.25f, 0.01f, 0.25f)*/;
 
     /**The scaling of how many waves it takes for one more enemy of a type to appear.
      * For example: with enemeyScaling = 2 and the default scaling being 2, it would take 4 waves for

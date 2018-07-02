@@ -18,6 +18,8 @@ public class LoadingFragment implements Fragment {
     public void build(Group parent) {
 
        table = new table("loadDim"){{
+            add().height(70f).row();
+
             touchable(Touchable.enabled);
             get().addImage("white").growX()
                     .height(3f).pad(4f).growX().get().setColor(Palette.accent);

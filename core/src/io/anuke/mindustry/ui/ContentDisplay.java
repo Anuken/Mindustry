@@ -106,6 +106,37 @@ public class ContentDisplay {
 
     public static void displayLiquid(Table table, Liquid liquid){
 
+        table.table(title -> {
+            title.addImage(liquid.getContentIcon()).size(8 * 6);
+            title.add("[accent]" + liquid.localizedName()).padLeft(5);
+        });
+
+        table.row();
+
+        table.addImage("white").height(3).color(Color.LIGHT_GRAY).pad(15).padLeft(0).padRight(0).fillX();
+
+        table.row();
+
+        if(liquid.description != null){
+            table.add(liquid.description).padLeft(5).padRight(5).width(400f).wrap().fillX();
+            table.row();
+
+            table.addImage("white").height(3).color(Color.LIGHT_GRAY).pad(15).padLeft(0).padRight(0).fillX();
+            table.row();
+        }
+
+        table.left().defaults().fillX();
+
+        table.add(Bundles.format("text.item.explosiveness", (int)(liquid.explosiveness * 100)));
+        table.row();
+        table.add(Bundles.format("text.item.flammability", (int)(liquid.flammability * 100)));
+        table.row();
+        table.add(Bundles.format("text.liquid.heatcapacity", (int)(liquid.heatCapacity * 100)));
+        table.row();
+        table.add(Bundles.format("text.liquid.temperature", (int)(liquid.temperature * 100)));
+        table.row();
+        table.add(Bundles.format("text.liquid.viscosity", (int)(liquid.viscosity * 100)));
+        table.row();
     }
 
     public static void displayMech(Table table, Mech mech){

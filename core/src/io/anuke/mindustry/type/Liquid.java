@@ -16,6 +16,7 @@ public class Liquid implements UnlockableContent{
 
 	public final Color color;
 	public final String name;
+	public final String description;
 	public final int id;
 
 	/**0-1, 0 is completely inflammable, anything above that may catch fire when exposed to heat, 0.5+ is very flammable.*/
@@ -42,6 +43,7 @@ public class Liquid implements UnlockableContent{
 		this.color = new Color(color);
 
 		this.id = liquids.size;
+		this.description = Bundles.getOrNull("liquid." + name + ".description");
 
 		Liquid.liquids.add(this);
 	}

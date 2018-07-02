@@ -49,7 +49,7 @@ public class Liquids implements ContentList {
         cryofluid = new Liquid("cryofluid", Color.SKY) {
             {
                 heatCapacity = 0.75f;
-                temperature = 0.5f;
+                temperature = 0.4f;
                 tier = 1;
                 effect = StatusEffects.freezing;
             }

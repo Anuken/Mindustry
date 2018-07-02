@@ -4,8 +4,10 @@ import club.minnced.discord.rpc.DiscordEventHandlers;
 import club.minnced.discord.rpc.DiscordRPC;
 import club.minnced.discord.rpc.DiscordRichPresence;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Base64Coder;
 import io.anuke.kryonet.DefaultThreadImpl;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
@@ -33,6 +35,8 @@ public class DesktopPlatform extends Platform {
 
     public DesktopPlatform(String[] args){
         this.args = args;
+
+        Vars.testMobile = Array.with(args).contains("-testMobile", false);
 
         if(useDiscord) {
             DiscordEventHandlers handlers = new DiscordEventHandlers();

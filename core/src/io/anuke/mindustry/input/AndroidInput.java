@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
@@ -22,6 +23,7 @@ import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
 import io.anuke.mindustry.type.Recipe;
+import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
@@ -49,6 +51,8 @@ public class AndroidInput extends InputHandler implements GestureListener{
     private Vector2 vector = new Vector2();
     private float initzoom = -1;
     private boolean zoomed = false;
+    /**Set of completed guides.*/
+    private ObjectSet<String> guides = new ObjectSet<>();
 
     /**Position where the player started dragging a line.*/
     private int lineStartX, lineStartY;
@@ -182,6 +186,22 @@ public class AndroidInput extends InputHandler implements GestureListener{
         }
     }
 
+    void showGuide(String type){
+        if(!guides.contains(type) && !Settings.getBool(type, false)){
+            FloatingDialog dialog = new FloatingDialog("$text." + type + ".title");
+            dialog.addCloseButton();
+            dialog.content().left();
+            dialog.content().add("$text." + type).growX().wrap();
+            dialog.content().row();
+            dialog.content().addCheck("$text.showagain", false, checked -> {
+                Settings.putBool(type, checked);
+                Settings.save();
+            }).growX().left();
+            dialog.show();
+            guides.add(type);
+        }
+    }
+
     //endregion
 
     //region UI and drawing
@@ -213,6 +233,9 @@ public class AndroidInput extends InputHandler implements GestureListener{
                 new imagebutton("icon-break", "toggle", 16 * 2f, () -> {
                     mode = mode == breaking ? recipe == null ? none : placing : breaking;
                     lastRecipe = recipe;
+                    if(mode == breaking){
+                        showGuide("deconstruction");
+                    }
                 }).update(l -> l.setChecked(mode == breaking));
             }}.end();
 
@@ -262,6 +285,11 @@ public class AndroidInput extends InputHandler implements GestureListener{
     @Override
     public boolean isDrawing(){
         return selection.size > 0 || removals.size > 0 || lineMode || player.target != null;
+    }
+
+    @Override
+    public boolean isPlacing() {
+        return super.isPlacing() && mode == placing;
     }
 
     @Override
@@ -565,6 +593,10 @@ public class AndroidInput extends InputHandler implements GestureListener{
         //if there is no mode and there's a recipe, switch to placing
         if(recipe != null && mode == none){
 	        mode = placing;
+        }
+
+        if(recipe != null){
+            showGuide("construction");
         }
 
         //automatically switch to placing after a new recipe is selected
