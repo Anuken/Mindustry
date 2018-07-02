@@ -121,7 +121,7 @@ public class HudFragment extends Fragment{
 					new label(() -> ping.get(Net.getPing())).visible(() -> Net.client() && !gwt).colspan(2);
 
 					infolabel = get();
-				}}.size(-1).end();
+				}}.size(-1).end().visible(() -> Settings.getBool("fps"));
 
 			}}.end();
 		}}.end();

@@ -163,7 +163,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.sliderPref("previewopacity", 50, 0, 100, i -> i + "%");
 		graphics.checkPref("indicators", true);
 		graphics.checkPref("healthbars", true);
-		graphics.checkPref("minimap", true);
+		graphics.checkPref("minimap", !mobile); //minimap is disabled by default on mobile devices
 	}
 
 	private void back(){
