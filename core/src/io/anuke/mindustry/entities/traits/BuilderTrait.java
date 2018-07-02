@@ -219,16 +219,22 @@ public interface BuilderTrait {
 
     /**Draw placement effects for an entity. This includes mining*/
     default void drawBuilding(Unit unit){
-        if(!isBuilding()){
-            if(getMineTile() != null){
-                drawMining(unit);
+        BuildRequest request;
+
+        synchronized (getPlaceQueue()) {
+            if (!isBuilding()) {
+                if (getMineTile() != null) {
+                    drawMining(unit);
+                }
+                return;
             }
-            return;
+
+            request = getCurrentRequest();
         }
 
-        Tile tile = world.tile(getCurrentRequest().x, getCurrentRequest().y);
+        Tile tile = world.tile(request.x, request.y);
 
-        Draw.color(unit.distanceTo(tile) > placeDistance || getCurrentRequest().remove ? Palette.remove : Palette.accent);
+        Draw.color(unit.distanceTo(tile) > placeDistance || request.remove ? Palette.remove : Palette.accent);
         float focusLen = 3.8f + Mathf.absin(Timers.time(), 1.1f, 0.6f);
         float px = unit.x + Angles.trnsx(unit.rotation, focusLen);
         float py = unit.y + Angles.trnsy(unit.rotation, focusLen);
@@ -267,6 +273,8 @@ public interface BuilderTrait {
     /**Internal use only.*/
     default void drawMining(Unit unit){
         Tile tile = getMineTile();
+
+        if(tile == null) return;
 
         float focusLen = 4f + Mathf.absin(Timers.time(), 1.1f, 0.5f);
         float swingScl = 12f, swingMag = tilesize/8f;
