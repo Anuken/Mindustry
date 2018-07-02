@@ -13,7 +13,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.ContentDatabase;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.input.AndroidInput;
+import io.anuke.mindustry.input.MobileInput;
 import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
@@ -194,7 +194,7 @@ public class Control extends Module{
         InputHandler input;
 
         if(mobile){
-            input = new AndroidInput(player);
+            input = new MobileInput(player);
         }else{
             input = new DesktopInput(player);
         }

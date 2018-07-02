@@ -38,7 +38,7 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.input.PlaceMode.*;
 
-public class AndroidInput extends InputHandler implements GestureListener{
+public class MobileInput extends InputHandler implements GestureListener{
     private static Rectangle r1 = new Rectangle(), r2 = new Rectangle();
 
     /**Maximum speed the player can pan.*/
@@ -78,7 +78,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
     /**Last placed request. Used for drawing block overlay.*/
     private PlaceRequest lastPlaced;
 	
-	public AndroidInput(Player player){
+	public MobileInput(Player player){
 	    super(player);
 		Inputs.addProcessor(new GestureDetector(20, 0.5f, 0.4f, 0.15f, this));
 	}
@@ -196,7 +196,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
             dialog.content().addCheck("$text.showagain", false, checked -> {
                 Settings.putBool(type, checked);
                 Settings.save();
-            }).growX().left();
+            }).growX().left().get().left();
             dialog.show();
             guides.add(type);
         }
@@ -217,37 +217,13 @@ public class AndroidInput extends InputHandler implements GestureListener{
                 margin(5);
                 defaults().size(60f);
 
-                //Add a 'cancel building' button.
-                new imagebutton("icon-cancel", 16 * 2f, player::clearBuilding);
-
-                visible(() -> player.getPlaceQueue().size > 0);
-            }}.left().colspan(2).end();
-
-            row();
-
-            new table("pane"){{
-                margin(5);
-                defaults().size(60f);
-
-                //Add a break button.
-                new imagebutton("icon-break", "toggle", 16 * 2f, () -> {
-                    mode = mode == breaking ? recipe == null ? none : placing : breaking;
-                    lastRecipe = recipe;
-                    if(mode == breaking){
-                        showGuide("deconstruction");
-                    }
-                }).update(l -> l.setChecked(mode == breaking));
-            }}.end();
-
-            new table("pane"){{
-                margin(5);
-                defaults().size(60f);
-
                 //Add a cancel button
                 new imagebutton("icon-cancel", 16 * 2f, () -> {
                     mode = none;
                     recipe = null;
                 });
+
+                row();
 
                 //Add an accept button, which places everything.
                 new imagebutton("icon-check", 16 * 2f, () -> {
@@ -272,6 +248,8 @@ public class AndroidInput extends InputHandler implements GestureListener{
                     selecting = false;
                 }).cell.disabled(i -> selection.size == 0);
 
+                row();
+
                 //Add a rotate button
                 new imagebutton("icon-arrow", 16 * 2f, () -> rotation = Mathf.mod(rotation + 1, 4))
                         .update(i -> {
@@ -279,6 +257,32 @@ public class AndroidInput extends InputHandler implements GestureListener{
                             i.getImage().setOrigin(Align.center);
                         }).cell.disabled(i -> recipe == null || !recipe.result.rotate);
             }}.visible(() -> mode != none).end();
+
+            row();
+
+            new table("pane"){{
+                margin(5);
+                defaults().size(60f);
+
+                //Add a break button.
+                new imagebutton("icon-break", "toggle", 16 * 2f, () -> {
+                    mode = mode == breaking ? recipe == null ? none : placing : breaking;
+                    lastRecipe = recipe;
+                    if(mode == breaking){
+                        showGuide("deconstruction");
+                    }
+                }).update(l -> l.setChecked(mode == breaking));
+            }}.end();
+
+            new table("pane"){{
+                margin(5);
+                defaults().size(60f);
+
+                //Add a 'cancel building' button.
+                new imagebutton("icon-cancel", 16 * 2f, player::clearBuilding);
+
+                visible(() -> player.getPlaceQueue().size > 0);
+            }}.left().colspan(2).end();
         }}.visible(() -> !state.is(State.menu)).end();
     }
 
