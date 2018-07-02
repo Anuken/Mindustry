@@ -198,7 +198,7 @@ public class AndroidInput extends InputHandler implements GestureListener{
                 defaults().size(60f);
 
                 //Add a 'cancel building' button.
-                new imagebutton("icon-cancel", "toggle", 16 * 2f, () -> player.clearBuilding());
+                new imagebutton("icon-cancel", 16 * 2f, player::clearBuilding);
 
                 visible(() -> player.getPlaceQueue().size > 0);
             }}.left().colspan(2).end();

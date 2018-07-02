@@ -25,7 +25,6 @@ public class AndroidTextFieldDialog{
 	public AndroidTextFieldDialog show() {
 
 		activity.runOnUiThread(() -> {
-            Gdx.app.error("Android Dialogs", AndroidTextFieldDialog.class.getSimpleName() + " now shown.");
             AlertDialog dialog = builder.create();
 
             dialog.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
@@ -48,7 +47,7 @@ public class AndroidTextFieldDialog{
 
             alertDialogBuilder.setView(promptsView);
 
-            userInput = (EditText) promptsView.findViewById(getResourceId("gdxDialogsEditTextInput", "id"));
+            userInput = promptsView.findViewById(getResourceId("gdxDialogsEditTextInput", "id"));
 
             alertDialogBuilder.setCancelable(false);
             builder = alertDialogBuilder;

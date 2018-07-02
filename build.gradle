@@ -9,7 +9,7 @@ buildscript {
     dependencies {
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.0'
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.1.0'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.8"
     }
 }
@@ -27,7 +27,7 @@ allprojects {
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'
         aiVersion = '1.8.1'
-        uCoreVersion = '6d1ef60c46'
+        uCoreVersion = 'd28a0e7969'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -114,25 +114,6 @@ project(":html") {
     compileJava.options.compilerArgs = [
         "-processor", "io.anuke.annotations.RemoteMethodAnnotationProcessor"
     ]
-}
-
-project(":android") {
-    apply plugin: "android"
-
-    configurations { natives }
-
-    dependencies {
-        implementation project(":core")
-        implementation project(":kryonet")
-        implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
-        implementation "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-        implementation "com.badlogicgames.gdx:gdx-controllers-android:$gdxVersion"
-    }
 }
 
 project(":ios") {

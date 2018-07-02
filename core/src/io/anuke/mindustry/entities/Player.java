@@ -392,32 +392,34 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
 	/**Draw all current build requests. Does not draw the beam effect, only the positions.*/
 	public void drawBuildRequests(){
-		for (BuildRequest request : getPlaceQueue()) {
+		synchronized (getPlaceQueue()) {
+			for (BuildRequest request : getPlaceQueue()) {
 
-			if(request.remove){
-                Block block = world.tile(request.x, request.y).target().block();
+				if (request.remove) {
+					Block block = world.tile(request.x, request.y).target().block();
 
-				//draw removal request
-                Draw.color(Palette.remove);
+					//draw removal request
+					Draw.color(Palette.remove);
 
-                Lines.stroke((1f-request.progress));
+					Lines.stroke((1f - request.progress));
 
-                Lines.poly(request.x * tilesize + block.offset(),
-                        request.y * tilesize + block.offset(),
-                        4, block.size * tilesize /2f, 45 + 15);
-			}else{
-				//draw place request
-				Draw.color(Palette.accent);
+					Lines.poly(request.x * tilesize + block.offset(),
+							request.y * tilesize + block.offset(),
+							4, block.size * tilesize / 2f, 45 + 15);
+				} else {
+					//draw place request
+					Draw.color(Palette.accent);
 
-				Lines.stroke((1f-request.progress));
+					Lines.stroke((1f - request.progress));
 
-				Lines.poly(request.x * tilesize + request.recipe.result.offset(),
-						request.y * tilesize + request.recipe.result.offset(),
-						4, request.recipe.result.size * tilesize /2f, 45 + 15);
+					Lines.poly(request.x * tilesize + request.recipe.result.offset(),
+							request.y * tilesize + request.recipe.result.offset(),
+							4, request.recipe.result.size * tilesize / 2f, 45 + 15);
+				}
 			}
-		}
 
-		Draw.reset();
+			Draw.reset();
+		}
 	}
 
 	//endregion

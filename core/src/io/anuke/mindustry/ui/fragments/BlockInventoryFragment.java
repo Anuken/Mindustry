@@ -1,5 +1,6 @@
 package io.anuke.mindustry.ui.fragments;
 
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.IntSet;
@@ -19,20 +20,28 @@ import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.BooleanProvider;
 import io.anuke.ucore.scene.Group;
+import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.event.HandCursorListener;
+import io.anuke.ucore.scene.event.InputEvent;
+import io.anuke.ucore.scene.event.InputListener;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
+import static io.anuke.mindustry.Vars.mobile;
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class BlockInventoryFragment implements Fragment {
+    private final static float holdWithdraw = 40f;
+
     private Table table;
-    private boolean shown;
     private Tile tile;
     private InputHandler input;
+    private float holdTime = 0f;
+    private boolean holding;
+    private Item lastItem;
 
     public BlockInventoryFragment(InputHandler input){
         this.input = input;
@@ -41,7 +50,9 @@ public class BlockInventoryFragment implements Fragment {
     @Override
     public void build(Group parent) {
         table = new Table();
-        table.setVisible(() -> !state.is(State.menu) && shown);
+        table.setVisible(() -> !state.is(State.menu));
+        table.setTransform(true);
+        parent.setTransform(true);
         parent.addChild(table);
     }
 
@@ -52,26 +63,37 @@ public class BlockInventoryFragment implements Fragment {
     }
 
     public void hide(){
-        shown = false;
-        table.clear();
+        table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interpolation.pow3Out), Actions.visible(false), Actions.run(() -> {
+            table.clear();
+            table.update(null);
+        }));
         table.setTouchable(Touchable.disabled);
-        table.update(() -> {});
         tile = null;
     }
 
     private void rebuild(){
         Player player = input.player;
 
-        shown = true;
         IntSet container = new IntSet();
 
         table.clear();
-        table.background("clear");
+        table.background("inventory");
         table.setTouchable(Touchable.enabled);
         table.update(() -> {
             if(tile == null || tile.entity == null || !tile.block().isAccessible() || tile.entity.items.totalItems() == 0){
                 hide();
-            }else {
+            }else{
+                if(holding && lastItem != null){
+                    holdTime += Timers.delta();
+
+                    if(holdTime >= holdWithdraw){
+                        int amount = Math.min(tile.entity.items.getItem(lastItem), player.inventory.itemCapacityUsed(lastItem));
+                        CallBlocks.requestItem(player, tile, lastItem, amount);
+                        holding = false;
+                        holdTime = 0f;
+                    }
+                }
+
                 updateTablePosition();
                 if(tile.block().hasItems) {
                     int[] items = tile.entity.items.items;
@@ -87,8 +109,8 @@ public class BlockInventoryFragment implements Fragment {
         int cols = 3;
         int row = 0;
 
-        table.margin(3f);
-        table.defaults().size(16*2).space(6f);
+        table.margin(6f);
+        table.defaults().size(mobile ? 16*3 : 16*2).space(6f);
 
         if(tile.block().hasItems) {
             int[] items = tile.entity.items.items;
@@ -107,10 +129,24 @@ public class BlockInventoryFragment implements Fragment {
 
                 ItemImage image = new ItemImage(item.region, () -> round(items[f]));
                 image.addListener(l);
-                image.tapped(() -> {
-                    if(!canPick.get() || items[f] == 0) return;
-                    int amount = Math.min(Inputs.keyDown("item_withdraw") ? items[f] : 1, player.inventory.itemCapacityUsed(item));
-                    CallBlocks.requestItem(player, tile, item, amount);
+
+                image.addListener(new InputListener(){
+                    @Override
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                        if(!canPick.get() || items[f] == 0) return false;
+                        int amount = Math.min(Inputs.keyDown("item_withdraw") ? items[f] : 1, player.inventory.itemCapacityUsed(item));
+                        CallBlocks.requestItem(player, tile, item, amount);
+                        lastItem = item;
+                        holding = true;
+                        holdTime = 0f;
+                        return true;
+                    }
+
+                    @Override
+                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                        holding = false;
+                        lastItem = null;
+                    }
                 });
                 table.add(image);
 
@@ -123,6 +159,9 @@ public class BlockInventoryFragment implements Fragment {
         }
 
         updateTablePosition();
+
+        table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
+                Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
     }
 
     private String round(float f){

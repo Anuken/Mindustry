@@ -71,7 +71,7 @@ io.anuke.ucore.scene.ui.ImageButton$ImageButtonStyle: {
 io.anuke.ucore.scene.ui.ScrollPane$ScrollPaneStyle: {
 	default: {background: border, vScroll: scroll, vScrollKnob: scroll-knob-vertical-black},
 	horizontal: {background: border, vScroll: scroll, vScrollKnob: scroll-knob-vertical, hScroll: scroll-horizontal, hScrollKnob: scroll-knob-horizontal},
-	volume: {background: button-map, vScroll: scroll, vScrollKnob: scroll-knob-vertical},
+	volume: {background: button-map, vScroll: scroll, vScrollKnob: scroll-knob-vertical-black},
 	clear: {vScroll: scroll, vScrollKnob: scroll-knob-vertical},
 	clear-black: {vScroll: scroll, vScrollKnob: scroll-knob-vertical-black}
 },

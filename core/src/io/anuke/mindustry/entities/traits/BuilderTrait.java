@@ -65,11 +65,13 @@ public interface BuilderTrait {
     /**If a place request matching this signature is present, it is removed.
      * Otherwise, a new place request is added to the queue.*/
     default void replaceBuilding(int x, int y, int rotation, Recipe recipe){
-        for(BuildRequest request : getPlaceQueue()){
-            if(request.x == x && request.y == y){
-                clearBuilding();
-                addBuildRequest(request);
-                return;
+        synchronized (getPlaceQueue()) {
+            for (BuildRequest request : getPlaceQueue()) {
+                if (request.x == x && request.y == y) {
+                    clearBuilding();
+                    addBuildRequest(request);
+                    return;
+                }
             }
         }
 
@@ -85,14 +87,16 @@ public interface BuilderTrait {
         }
     }
 
-    /**Add another build requests to the tail of the queue.*/
+    /**Add another build requests to the tail of the queue, if it doesn't exist there yet.*/
     default void addBuildRequest(BuildRequest place){
-        for(BuildRequest request : getPlaceQueue()){
-            if(request.x == place.x && request.y == place.y){
-                return;
+        synchronized (getPlaceQueue()) {
+            for (BuildRequest request : getPlaceQueue()) {
+                if (request.x == place.x && request.y == place.y) {
+                    return;
+                }
             }
+            getPlaceQueue().addLast(place);
         }
-        getPlaceQueue().addLast(place);
     }
 
     /**Return the build requests currently active, or the one at the top of the queue.

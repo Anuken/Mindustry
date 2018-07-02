@@ -9,14 +9,14 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:resizeableActivity="false"
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:isGame="true"
-        android:appCategory="game"
-        android:label="@string/app_name"
-        android:theme="@style/GdxTheme" >
+            android:resizeableActivity="false"
+            android:allowBackup="true"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:isGame="true"
+            android:appCategory="game"
+            android:label="@string/app_name"
+            android:theme="@style/GdxTheme" android:fullBackupContent="@xml/backup_rules">
         <activity
             android:name="io.anuke.mindustry.AndroidLauncher"
             android:label="@string/app_name"
@@ -33,7 +33,17 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:mimeType="application/octet-stream"/>
+                <data android:scheme="file" android:host="*" android:pathPattern=".*\\.mmap" />
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:mimeType="application/octet-stream"/>
+                <data android:scheme="file" android:host="*" android:pathPattern=".*\\.msav" />
+            </intent-filter>
+
 
             <intent-filter android:icon="@mipmap/ic_launcher"
                            android:label="Mindustry Map"
