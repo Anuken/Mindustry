@@ -33,7 +33,7 @@ import static io.anuke.mindustry.Vars.mobile;
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class BlockInventoryFragment implements Fragment {
+public class BlockInventoryFragment extends Fragment {
     private final static float holdWithdraw = 40f;
 
     private Table table;

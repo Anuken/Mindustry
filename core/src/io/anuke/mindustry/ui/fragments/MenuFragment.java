@@ -13,7 +13,7 @@ import io.anuke.ucore.scene.builders.table;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class MenuFragment implements Fragment{
+public class MenuFragment extends Fragment{
 	
 	public void build(Group parent){
 		new table(){{

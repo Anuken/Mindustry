@@ -10,7 +10,7 @@ import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 
-public class LoadingFragment implements Fragment {
+public class LoadingFragment extends Fragment {
     private Table table;
     private TextButton button;
 

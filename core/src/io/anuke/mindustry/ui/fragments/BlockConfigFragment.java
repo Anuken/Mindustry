@@ -18,7 +18,7 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class BlockConfigFragment implements Fragment {
+public class BlockConfigFragment extends Fragment {
     private Table table = new Table();
     private InputHandler input;
     private Tile configTile;

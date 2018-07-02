@@ -22,7 +22,7 @@ import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class PlayerListFragment implements Fragment{
+public class PlayerListFragment extends Fragment{
     private boolean visible = false;
     private Table content = new Table();
     private ObjectMap<Player, Boolean> checkmap = new ObjectMap<>();

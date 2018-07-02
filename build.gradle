@@ -22,7 +22,7 @@ allprojects {
 
     ext {
         versionNumber = '4.0'
-        versionType = 'pre-alpha'
+        versionType = 'alpha'
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'

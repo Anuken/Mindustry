@@ -86,4 +86,12 @@ public abstract class Platform {
 			@Override public <T extends Entity> void switchContainer(EntityGroup<T> group) {}
 		};
 	}
+
+	//TODO iOS implementation
+	/**Forces the app into landscape mode. Currently Android only.*/
+	public void beginForceLandscape(){}
+
+	//TODO iOS implementation
+	/**Stops forcing the app into landscape orientation. Currently Android only.*/
+	public void endForceLandscape(){}
 }

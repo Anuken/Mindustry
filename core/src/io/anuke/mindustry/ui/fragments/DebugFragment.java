@@ -27,7 +27,7 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class DebugFragment implements Fragment {
+public class DebugFragment extends Fragment {
     private static StringBuilder log = new StringBuilder();
 
     static{

@@ -3,6 +3,7 @@ package io.anuke.mindustry;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -152,6 +153,16 @@ public class AndroidLauncher extends AndroidApplication{
 
 					requestPermissions(perms.toArray(new String[perms.size()]), PERMISSION_REQUEST_CODE);
 				}
+			}
+
+			@Override
+			public void beginForceLandscape() {
+				setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+			}
+
+			@Override
+			public void endForceLandscape() {
+				setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 			}
 		};
 

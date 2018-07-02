@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.editor.MapEditorDialog;
 import io.anuke.mindustry.graphics.Palette;
@@ -34,7 +35,8 @@ import io.anuke.ucore.util.Mathf;
 
 import java.util.Locale;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.players;
 import static io.anuke.ucore.scene.actions.Actions.*;
 
 public class UI extends SceneModule{
@@ -69,6 +71,7 @@ public class UI extends SceneModule{
     public final DebugFragment debugfrag = new DebugFragment();
 
     private Locale lastLocale;
+    private Array<Fragment> fragments = new Array<>();
 	
 	public UI() {
 		Dialog.setShowAction(()-> sequence(
@@ -185,7 +188,7 @@ public class UI extends SceneModule{
 		backfrag.build(group);
 		hudfrag.build(group);
 		menufrag.build(group);
-		chatfrag.build(group);
+		chatfrag.container().build(group);
 		listfrag.build(group);
 		debugfrag.build(group);
 		loadfrag.build(group);
@@ -196,6 +199,10 @@ public class UI extends SceneModule{
 	@Override
 	public boolean hasMouse() {
 		return super.hasMouse();
+	}
+
+	public void addFragment(Fragment fragment){
+		fragments.add(fragment);
 	}
 
 	public Locale getLocale(){

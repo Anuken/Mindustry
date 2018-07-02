@@ -27,7 +27,7 @@ import static io.anuke.mindustry.Vars.state;
 import static io.anuke.ucore.core.Core.scene;
 import static io.anuke.ucore.core.Core.skin;
 
-public class ChatFragment extends Table implements Fragment{
+public class ChatFragment extends Table{
     private final static int messagesShown = 10;
     private Array<ChatMessage> messages = new Array<>();
     private float fadetime;
@@ -43,6 +43,12 @@ public class ChatFragment extends Table implements Fragment{
     private Array<String> history = new Array<>();
     private int historyPos = 0;
     private int scrollPos = 0;
+    private Fragment container = new Fragment() {
+        @Override
+        public void build(Group parent) {
+            scene.add(ChatFragment.this);
+        }
+    };
 
     public ChatFragment(){
         super();
@@ -79,9 +85,8 @@ public class ChatFragment extends Table implements Fragment{
         setup();
     }
 
-    @Override
-    public void build(Group parent) {
-        scene.add(this);
+    public Fragment container() {
+        return container;
     }
 
     public void clearMessages(){

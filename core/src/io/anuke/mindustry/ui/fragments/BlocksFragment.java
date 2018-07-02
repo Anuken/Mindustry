@@ -28,7 +28,7 @@ import io.anuke.ucore.util.Strings;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class BlocksFragment implements Fragment{
+public class BlocksFragment extends Fragment{
 	/**Table containing description that is shown on top.*/
 	private Table descTable;
 	/**Main table containing the whole menu.*/

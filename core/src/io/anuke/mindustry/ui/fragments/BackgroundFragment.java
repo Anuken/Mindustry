@@ -10,7 +10,7 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 
 import static io.anuke.mindustry.Vars.state;
 
-public class BackgroundFragment implements Fragment {
+public class BackgroundFragment extends Fragment {
 
     @Override
     public void build(Group parent) {
