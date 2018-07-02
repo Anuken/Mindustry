@@ -18,6 +18,7 @@ import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.scene.utils.UIUtils;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
@@ -31,7 +32,6 @@ public class JoinDialog extends FloatingDialog {
     Table local = new Table();
     Table remote = new Table();
     Table hosts = new Table();
-    float w = 500;
 
     public JoinDialog(){
         super("$text.joingame");
@@ -77,12 +77,13 @@ public class JoinDialog extends FloatingDialog {
             add.getTitleLabel().setText(renaming != null ? "$text.server.edit" : "$text.server.add");
         });
 
-        setup();
-
         shown(() -> {
+            setup();
             refreshLocal();
             refreshRemote();
         });
+
+        onResize(this::setup);
     }
 
     void setupRemote(){
@@ -93,7 +94,7 @@ public class JoinDialog extends FloatingDialog {
 
             TextButton button = buttons[0] = remote.addButton("[accent]"+server.ip, "clear", () -> {
                 if(!buttons[0].childrenPressed()) connect(server.ip, Vars.port);
-            }).width(w).height(150f).pad(4f).get();
+            }).width(targetWidth()).height(150f).pad(4f).get();
 
             button.getLabel().setWrap(true);
 
@@ -187,6 +188,8 @@ public class JoinDialog extends FloatingDialog {
     }
 
     void setup(){
+        float w = targetWidth();
+
         Player player = players[0];
 
         hosts.clear();
@@ -246,6 +249,8 @@ public class JoinDialog extends FloatingDialog {
     }
 
     void addLocalHosts(Array<Host> array){
+        float w = targetWidth();
+
         local.clear();
 
         if(array.size == 0){
@@ -308,6 +313,10 @@ public class JoinDialog extends FloatingDialog {
                 Log.err(e);
             }
         });
+    }
+
+    float targetWidth(){
+        return UIUtils.portrait() ? 350f : 500f;
     }
 
     private void loadServers(){

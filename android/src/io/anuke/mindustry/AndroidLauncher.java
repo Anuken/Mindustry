@@ -164,6 +164,11 @@ public class AndroidLauncher extends AndroidApplication{
 			public void endForceLandscape() {
 				setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 			}
+
+			@Override
+			public boolean canDonate(){
+				return true;
+			}
 		};
 
 		try {

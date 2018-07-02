@@ -55,5 +55,9 @@ public class EventType {
     public interface BlockBuildEvent extends Event{
         void handle(Team team, Tile tile);
     }
+
+    public interface ResizeEvent extends Event{
+        void handle();
+    }
 }
 

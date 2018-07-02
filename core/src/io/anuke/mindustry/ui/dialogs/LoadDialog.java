@@ -6,9 +6,11 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
+import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.Saves.SaveSlot;
 import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
@@ -124,8 +126,7 @@ public class LoadDialog extends FloatingDialog{
 			button.row();
 			button.label(() -> Bundles.format("text.save.autosave", color + Bundles.get(slot.isAutosave() ? "text.on" : "text.off")));
 			button.row();
-			button.add();
-			button.add(Bundles.format("text.save.date", color+slot.getDate()));
+			button.add(Bundles.format("text.save.date", color+slot.getDate())).colspan(2).padTop(5).right();
 			button.row();
 			modifyButton(button, slot);
 

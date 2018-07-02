@@ -11,6 +11,7 @@ import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.Tooltip;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.scene.utils.UIUtils;
 
 import static io.anuke.mindustry.Vars.control;
 
@@ -21,6 +22,7 @@ public class UnlocksDialog extends FloatingDialog {
 
         addCloseButton();
         shown(this::rebuild);
+        onResize(this::rebuild);
     }
 
     void rebuild(){
@@ -43,7 +45,7 @@ public class UnlocksDialog extends FloatingDialog {
             table.table(list -> {
                 list.left();
 
-                int maxWidth = 14;
+                int maxWidth = UIUtils.portrait() ? 6 : 14;
                 int size = 8*6;
 
                 int count = 0;

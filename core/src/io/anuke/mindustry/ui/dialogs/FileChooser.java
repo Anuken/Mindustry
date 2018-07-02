@@ -16,6 +16,7 @@ import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.scene.utils.UIUtils;
 import io.anuke.ucore.util.OS;
 
 import java.util.Arrays;
@@ -47,7 +48,7 @@ public class FileChooser extends FloatingDialog {
 	}
 
 	private void setupWidgets(){
-		getCell(content()).maxWidth(Gdx.graphics.getWidth()/Unit.dp.scl(2f));
+		//getCell(content()).maxWidth(UIUtils.portrait() ? Gdx.graphics.getWidth() : Gdx.graphics.getWidth()/Unit.dp.scl(2f));
 		content().margin(-10);
 		
 		Table content = new Table();
@@ -79,6 +80,8 @@ public class FileChooser extends FloatingDialog {
 		navigation.setTouchable(Touchable.disabled);
 
 		files = new Table();
+		files.marginRight(10);
+		files.marginLeft(3);
 
 		pane = new ScrollPane(files){
 			public float getPrefHeight(){
@@ -142,7 +145,7 @@ public class FileChooser extends FloatingDialog {
 		content.add(icontable).expandX().fillX();
 		content.row();
 
-		content.center().add(pane).width(Gdx.graphics.getWidth()/Unit.dp.scl(2)).colspan(3).grow();
+		content.center().add(pane).width(UIUtils.portrait() ?  Gdx.graphics.getWidth() : Gdx.graphics.getWidth()/Unit.dp.scl(2)).colspan(3).grow();
 		content.row();
 		
 		if(!open){

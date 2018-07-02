@@ -3,8 +3,10 @@ package io.anuke.mindustry.ui.dialogs;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.utils.Align;
+import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.ScrollPane;
 
@@ -29,6 +31,14 @@ public class FloatingDialog extends Dialog{
 						done[0] = true;
 					}
 				})));
+	}
+
+	protected void onResize(Runnable run){
+		Events.on(ResizeEvent.class, () -> {
+			if(isShown()){
+				run.run();
+			}
+		});
 	}
 	
 	@Override

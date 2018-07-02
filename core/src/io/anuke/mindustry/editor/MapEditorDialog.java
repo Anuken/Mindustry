@@ -383,7 +383,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 	public void build(){
 		float amount = 10f, baseSize = 60f;
 
-		float size = mobile ? (int)(Gdx.graphics.getHeight() / amount / Unit.dp.scl(1f)) :
+		float size = mobile ? (int)(Math.min(Gdx.graphics.getHeight(), Gdx.graphics.getWidth()) / amount / Unit.dp.scl(1f)) :
 				Math.min(Gdx.graphics.getDisplayMode().height / amount, baseSize);
 
 		new table(){{

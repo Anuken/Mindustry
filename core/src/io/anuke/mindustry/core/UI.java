@@ -5,17 +5,14 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.editor.MapEditorDialog;
+import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Listenable;
@@ -71,7 +68,6 @@ public class UI extends SceneModule{
     public final DebugFragment debugfrag = new DebugFragment();
 
     private Locale lastLocale;
-    private Array<Fragment> fragments = new Array<>();
 	
 	public UI() {
 		Dialog.setShowAction(()-> sequence(
@@ -158,7 +154,6 @@ public class UI extends SceneModule{
 
 	@Override
 	public void init(){
-
 		editor = new MapEditorDialog();
 		controls = new ControlsDialog();
 		restart = new RestartDialog();
@@ -201,8 +196,11 @@ public class UI extends SceneModule{
 		return super.hasMouse();
 	}
 
-	public void addFragment(Fragment fragment){
-		fragments.add(fragment);
+	@Override
+	public void resize(int width, int height) {
+		super.resize(width, height);
+
+		Events.fire(ResizeEvent.class);
 	}
 
 	public Locale getLocale(){

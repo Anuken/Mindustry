@@ -3,94 +3,34 @@ package io.anuke.mindustry.ui.fragments;
 import com.badlogic.gdx.Gdx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
+import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.ui.MenuButton;
+import io.anuke.mindustry.ui.MobileButton;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.builders.imagebutton;
+import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.builders.label;
 import io.anuke.ucore.scene.builders.table;
+import io.anuke.ucore.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class MenuFragment extends Fragment{
-	
+	private Table mobileContainer;
+
+	@Override
 	public void build(Group parent){
 		new table(){{
 			visible(() -> state.is(State.menu));
 
 			if(!mobile){
-				new table(){{
+				buildDesktop();
+			}else{
+				buildMobile();
 
-					float w = 200f;
-					float bw = w * 2f + 10f;
-
-					defaults().size(w, 66f).padTop(5).padRight(5);
-
-					add(new MenuButton("icon-play-2", "$text.play", MenuFragment.this::showPlaySelect)).width(bw).colspan(2);
-
-					row();
-
-					add(new MenuButton("icon-editor", "$text.editor", () -> ui.loadAnd(ui.editor::show)));
-
-					add(new MenuButton("icon-map", "$text.maps", ui.maps::show));
-
-					row();
-
-					add(new MenuButton("icon-info", "$text.about.button", ui.about::show));
-
-					add(new MenuButton("icon-tools", "$text.settings", ui.settings::show));
-
-					row();
-
-					add(new MenuButton("icon-menu", "$text.changelog.title", ui.changelog::show));
-
-					add(new MenuButton("icon-unlocks", "$text.unlocks", ui.unlocks::show));
-
-					row();
-					
-					if(!gwt){
-						add(new MenuButton("icon-exit", "$text.quit", Gdx.app::exit)).width(bw).colspan(2);
-					}
-
-					get().margin(16);
-				}}.end();
-
-			}else {
-				new table() {{
-				    float size = 120f;
-					defaults().size(size).pad(5);
-					float isize = 14f * 4;
-
-					new imagebutton("icon-play-2", isize, ui.levels::show).text("$text.play").padTop(4f);
-
-					//new imagebutton("icon-tutorial", isize, () -> ui.showInfo("The tutorial is currently not yet implemented."))
-					//		.text("$text.tutorial").padTop(4f);
-
-					new imagebutton("icon-map", isize, ui.maps::show).text("$text.maps").padTop(4f);
-
-					new imagebutton("icon-load", isize, ui.load::show).text("$text.load").padTop(4f);
-
-					new imagebutton("icon-add", isize, ui.join::show).text("$text.joingame").padTop(4f);
-
-					row();
-
-					new table(){{
-
-                        defaults().size(size).pad(5);
-
-                        new imagebutton("icon-editor", isize, () -> ui.loadAnd(ui.editor::show)).text("$text.editor").padTop(4f);
-
-                        new imagebutton("icon-tools", isize, ui.settings::show).text("$text.settings").padTop(4f);
-
-                        new imagebutton("icon-info", isize, ui.about::show).text("$text.about.button").padTop(4f);
-
-                        if (!ios) {
-                            new imagebutton("icon-donate", isize, Platform.instance::openDonations).text("$text.donate").padTop(4f);
-                        }
-
-                    }}.colspan(4).end();
-				}}.end();
+				Events.on(ResizeEvent.class, () -> buildMobile());
 			}
 		}}.end();
 
@@ -102,11 +42,116 @@ public class MenuFragment extends Fragment{
 			}}.end().visible(() -> state.is(State.menu));
 		}
 
+		//info icon
+		if(mobile) {
+			new table() {{
+				abottom().atop().aleft();
+				get().addButton("", "info", ui.about::show);
+			}}.end().visible(() -> state.is(State.menu));
+		}
+
 		//version info
 		new table(){{
 			visible(() -> state.is(State.menu));
 			abottom().aleft();
 			new label("Mindustry " + Version.code + " " + Version.type + " / " + Version.buildName);
+		}}.end();
+	}
+
+	private void buildMobile(){
+		if(mobileContainer == null){
+			mobileContainer = build.getTable();
+		}
+
+		mobileContainer.clear();
+		mobileContainer.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+		float size = 120f;
+		float isize = 14f * 4;
+		mobileContainer.defaults().size(size).pad(5).padTop(4f);
+
+		MobileButton
+				play = new MobileButton("icon-play-2", isize, "$text.play", ui.levels::show),
+				maps = new MobileButton("icon-map", isize, "$text.maps", ui.maps::show),
+				load = new MobileButton("icon-load", isize, "$text.load", ui.load::show),
+				join = new MobileButton("icon-add", isize, "$text.joingame", ui.join::show),
+				editor = new MobileButton("icon-editor", isize, "$text.editor", () -> ui.loadAnd(ui.editor::show)),
+				tools = new MobileButton("icon-tools", isize, "$text.settings", ui.settings::show),
+				unlocks = new MobileButton("icon-unlocks", isize, "$text.unlocks", ui.unlocks::show),
+				donate = new MobileButton("icon-donate", isize, "$text.donate", Platform.instance::openDonations);
+
+		if(Gdx.graphics.getWidth() > Gdx.graphics.getHeight()){
+			mobileContainer.add(play);
+			mobileContainer.add(join);
+			mobileContainer.add(load);
+			mobileContainer.add(maps);
+			mobileContainer.row();
+
+			mobileContainer.table(table -> {
+				table.defaults().set(mobileContainer.defaults());
+
+				table.add(editor);
+				table.add(tools);
+				table.add(unlocks);
+
+				if(Platform.instance.canDonate()) table.add(donate);
+			}).colspan(4);
+		}else{
+			mobileContainer.add(play);
+			mobileContainer.add(maps);
+			mobileContainer.row();
+			mobileContainer.add(load);
+			mobileContainer.add(join);
+			mobileContainer.row();
+			mobileContainer.add(editor);
+			mobileContainer.add(tools);
+			mobileContainer.row();
+
+			mobileContainer.table(table -> {
+				table.defaults().set(mobileContainer.defaults());
+
+				table.add(unlocks);
+
+				if(Platform.instance.canDonate()) table.add(donate);
+			}).colspan(2);
+		}
+	}
+
+	private void buildDesktop(){
+		new table(){{
+
+			float w = 200f;
+			float bw = w * 2f + 10f;
+
+			defaults().size(w, 66f).padTop(5).padRight(5);
+
+			add(new MenuButton("icon-play-2", "$text.play", MenuFragment.this::showPlaySelect)).width(bw).colspan(2);
+
+			row();
+
+			add(new MenuButton("icon-editor", "$text.editor", () -> ui.loadAnd(ui.editor::show)));
+
+			add(new MenuButton("icon-map", "$text.maps", ui.maps::show));
+
+			row();
+
+			add(new MenuButton("icon-info", "$text.about.button", ui.about::show));
+
+			add(new MenuButton("icon-tools", "$text.settings", ui.settings::show));
+
+			row();
+
+			add(new MenuButton("icon-menu", "$text.changelog.title", ui.changelog::show));
+
+			add(new MenuButton("icon-unlocks", "$text.unlocks", ui.unlocks::show));
+
+			row();
+
+			if(!gwt){
+				add(new MenuButton("icon-exit", "$text.quit", Gdx.app::exit)).width(bw).colspan(2);
+			}
+
+			get().margin(16);
 		}}.end();
 	}
 

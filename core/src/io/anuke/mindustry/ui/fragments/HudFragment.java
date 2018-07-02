@@ -13,6 +13,7 @@ import io.anuke.mindustry.ui.IntFormat;
 import io.anuke.mindustry.ui.Minimap;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
@@ -132,7 +133,7 @@ public class HudFragment extends Fragment{
 
 			Minimap minimap = new Minimap();
 
-			add(minimap);
+			add(minimap).visible(() -> Settings.getBool("minimap"));
 		}}.end();
 
 		//paused table

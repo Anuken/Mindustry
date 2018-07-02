@@ -163,6 +163,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.sliderPref("previewopacity", 50, 0, 100, i -> i + "%");
 		graphics.checkPref("indicators", true);
 		graphics.checkPref("healthbars", true);
+		graphics.checkPref("minimap", true);
 	}
 
 	private void back(){

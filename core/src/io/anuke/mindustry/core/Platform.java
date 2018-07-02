@@ -35,6 +35,10 @@ public abstract class Platform {
 	public void onGameExit(){}
 	/**Open donation dialog. Currently android only.*/
 	public void openDonations(){}
+	/**Whether donating is supported.*/
+	public boolean canDonate(){
+		return false;
+	}
 	/**Whether discord RPC is supported.*/
 	public boolean hasDiscord(){return true;}
 	/**Return the localized name for the locale. This is basically a workaround for GWT not supporting getName().*/

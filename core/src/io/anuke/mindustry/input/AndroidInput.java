@@ -690,11 +690,6 @@ public class AndroidInput extends InputHandler implements GestureListener{
             pinch2.set(initialPointer2);
         }
 
-        Vector2 vec = (vector.set(pointer1).add(pointer2).scl(0.5f)).sub(pinch1.add(pinch2).scl(0.5f));
-
-        player.x -= vec.x*Core.camera.zoom/Core.cameraScale;
-        player.y += vec.y*Core.camera.zoom/Core.cameraScale;
-
         pinch1.set(pointer1);
         pinch2.set(pointer2);
 
