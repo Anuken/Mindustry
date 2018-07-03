@@ -132,6 +132,8 @@ public class RemoteWriteGenerator {
         method.addStatement("$1N packet = $2N.obtain($1N.class)", "io.anuke.mindustry.net.Packets.InvokePacket", "com.badlogic.gdx.utils.Pools");
         //assign buffer
         method.addStatement("packet.writeBuffer = TEMP_BUFFER");
+        //assign priority
+        method.addStatement("packet.priority = (byte)" + methodEntry.priority.ordinal());
         //assign method ID
         method.addStatement("packet.type = (byte)" + methodEntry.id);
         //rewind buffer
