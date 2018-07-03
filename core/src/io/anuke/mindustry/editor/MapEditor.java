@@ -44,6 +44,12 @@ public class MapEditor{
 		this.brushSize = 1;
 		this.tags = tags;
 
+		for (int x = 0; x < map.width(); x++) {
+			for (int y = 0; y < map.height(); y++) {
+				map.write(x, y, DataPosition.floor, (byte)Blocks.stone.id);
+			}
+		}
+
 		drawBlock = Blocks.stone;
 		renderer.resize(map.width(), map.height());
 	}

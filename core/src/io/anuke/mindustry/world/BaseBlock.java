@@ -207,7 +207,8 @@ public abstract class BaseBlock {
             Tile other;
             Tile in;
 
-            for(Item item : Item.all()){
+            for(int ii = 0; ii < Item.all().size; ii ++){
+                Item item = Item.getByID(ii);
                 other = tile.getNearby(nearby[i]);
                 in = tile.getNearby(Edges.getInsideEdges(size)[i]);
 

@@ -12,9 +12,10 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
+import io.anuke.ucore.util.ThreadArray;
 
 public class Item implements Comparable<Item>, UnlockableContent{
-	private static final Array<Item> items = new Array<>();
+	private static final ThreadArray<Item> items = new ThreadArray<>();
 
 	public final int id;
 	public final String name;

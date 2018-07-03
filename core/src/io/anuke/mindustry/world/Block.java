@@ -343,9 +343,9 @@ public class Block extends BaseBlock implements Content{
 			return 0;
 		}else{
 			float result = 0f;
-			for(Item item : Item.all()){
-				int amount = tile.entity.items.getItem(item);
-				result += item.flammability*amount;
+			for (int i = 0; i < Item.all().size; i++) {
+				int amount = tile.entity.items.items[i];
+				result += Item.getByID(i).flammability*amount;
 			}
 			if(hasLiquids){
 				result += tile.entity.liquids.amount * tile.entity.liquids.liquid.flammability/3f;

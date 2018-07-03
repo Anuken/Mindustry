@@ -17,7 +17,6 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.headless;
 import static io.anuke.mindustry.Vars.world;
 
 public class Floor extends Block{
@@ -141,7 +140,7 @@ public class Floor extends Block{
 
 		Draw.rect(variantRegions[Mathf.randomSeed(tile.id(), 0, Math.max(0, variantRegions.length-1))], tile.worldx(), tile.worldy());
 
-		if(tile.cliffs != 0){
+		if(tile.cliffs != 0 && cliffRegions != null){
 			for(int i = 0; i < 4; i ++){
 				if((tile.cliffs & (1 << i*2)) != 0) {
 					Draw.colorl(i > 1 ? 0.6f : 1f);

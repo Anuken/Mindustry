@@ -15,6 +15,7 @@ import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.io.MapMeta;
 import io.anuke.mindustry.io.MapTileData;
+import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.core.Core;
@@ -586,6 +587,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 		
 		for(Block block : Block.all()){
 			TextureRegion[] regions = block.getCompactIcon();
+			if((block.synthetic() && (Recipe.getByResult(block) == null || !control.database().isUnlocked(Recipe.getByResult(block)))) && !debug) continue;
 
 			if(regions.length == 0 || regions[0] == Draw.region("jjfgj")) continue;
 
