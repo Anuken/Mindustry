@@ -131,6 +131,12 @@ public class DesktopInput extends InputHandler{
 
 		if(player.isDead() || state.is(State.menu) || ui.hasDialog()) return;
 
+        if(recipe != null && !Settings.getBool("desktop-place-help", false)){
+            ui.showInfo("Desktop controls have been changed.\nTo deselect a block or stop building, [accent]use the middle mouse button[].");
+            Settings.putBool("desktop-place-help", true);
+            Settings.save();
+        }
+
 		player.isBoosting = Inputs.keyDown("dash");
 
 		//deslect if not placing
