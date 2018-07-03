@@ -1,5 +1,6 @@
 package io.anuke.mindustry.ui.fragments;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
@@ -148,6 +149,7 @@ public class BlocksFragment extends Fragment{
 					input.recipe = null;
 				}
 				lastCategory = cat;
+				stack.act(Gdx.graphics.getDeltaTime());
 			}).growX().height(54).group(group)
 					.name("sectionbutton" + cat.name()).get();
 

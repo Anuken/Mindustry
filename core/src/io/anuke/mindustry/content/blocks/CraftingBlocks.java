@@ -129,6 +129,7 @@ public class CraftingBlocks extends BlockList implements ContentList {
         }};
 
         pyratiteMixer = new PowerSmelter("pyratite-mixer") {{
+            flameColor = Color.CLEAR;
             itemCapacity = 20;
             hasItems = true;
             hasPower = true;

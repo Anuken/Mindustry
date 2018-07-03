@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.production;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
@@ -48,12 +49,20 @@ public class PowerSmelter extends PowerBlock {
             burnEffect = BlockFx.fuelburn;
     protected Color flameColor = Color.valueOf("ffc999");
 
+    protected TextureRegion topRegion;
+
     public PowerSmelter(String name) {
         super(name);
         hasItems = true;
         update = true;
         solid = true;
         itemCapacity = 20;
+    }
+
+    @Override
+    public void load() {
+        super.load();
+        topRegion = Draw.region(name + "-top");
     }
 
     @Override
@@ -169,7 +178,7 @@ public class PowerSmelter extends PowerBlock {
         PowerSmelterEntity entity = tile.entity();
 
         //draw glowing center
-        if(entity.heat > 0f){
+        if(entity.heat > 0f && flameColor.a > 0.001f){
             float g = 0.3f;
             float r = 0.06f;
             float cr = Mathf.random(0.1f);
@@ -179,7 +188,7 @@ public class PowerSmelter extends PowerBlock {
             Draw.tint(flameColor);
             Fill.circle(tile.drawx(), tile.drawy(), 3f + Mathf.absin(Timers.time(), 5f, 2f) + cr);
             Draw.color(1f, 1f, 1f, entity.heat);
-            Draw.rect(name + "-top", tile.drawx(), tile.drawy());
+            Draw.rect(topRegion, tile.drawx(), tile.drawy());
             Fill.circle(tile.drawx(), tile.drawy(), 1.9f + Mathf.absin(Timers.time(), 5f, 1f) + cr);
 
             Draw.color();
