@@ -23,6 +23,7 @@ import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.entities.impl.EffectEntity;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.OS;
+import io.anuke.ucore.util.Translator;
 
 import java.util.Locale;
 
@@ -95,6 +96,8 @@ public class Vars{
 	public static boolean snapCamera = true;
 	
 	public static final int tilesize = 8;
+
+	public static final Translator[] tmptr = new Translator[]{new Translator(), new Translator(), new Translator(), new Translator()};
 
 	public static final Locale[] locales = {new Locale("en"), new Locale("fr"), new Locale("ru"), new Locale("uk", "UA"), new Locale("pl"),
 			new Locale("de"), new Locale("pt", "BR"), new Locale("ko"), new Locale("in", "ID"), new Locale("ita"), new Locale("es")};

@@ -30,12 +30,12 @@ import io.anuke.ucore.util.*;
 import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.tmptr;
 import static io.anuke.mindustry.Vars.world;
 
 /**Interface for units that build, break or mine things.*/
 public interface BuilderTrait {
     //these are not instance variables!
-    Translator[] tmptr = {new Translator(), new Translator(), new Translator(), new Translator()};
     float placeDistance = 140f;
     float mineDistance = 70f;
 
