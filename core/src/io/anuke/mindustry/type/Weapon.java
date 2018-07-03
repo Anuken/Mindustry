@@ -163,6 +163,8 @@ public class Weapon extends Upgrade {
 
 		AmmoType type = shooter.getInventory().getAmmo();
 
+		if(type == null) return;
+
 		weapon.tr.trns(rotation + 180f, type.recoil);
 
 		shooter.getVelocity().add(weapon.tr);

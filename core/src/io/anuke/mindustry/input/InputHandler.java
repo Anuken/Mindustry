@@ -279,9 +279,11 @@ public abstract class InputHandler extends InputAdapter{
 
 	@Remote(targets = Loc.both, forward = true, called = Loc.server, in = In.blocks)
 	public static void transferInventory(Player player, Tile tile){
-		if(Net.server() && (!player.inventory.hasItem() || player.isTransferring)){
+		if(Net.server() && (!player.inventory.hasItem() || player.isTransferring)) {
 			throw new ValidateException(player, "Player cannot transfer an item.");
 		}
+
+		if(player == null) return;
 
 		player.isTransferring = true;
 

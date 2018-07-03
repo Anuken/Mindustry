@@ -99,7 +99,9 @@ public interface BuilderTrait {
     /**Return the build requests currently active, or the one at the top of the queue.
      * May return null.*/
     default BuildRequest getCurrentRequest(){
-        return getPlaceQueue().size == 0 ? null : getPlaceQueue().first();
+        synchronized (getPlaceQueue()) {
+            return getPlaceQueue().size == 0 ? null : getPlaceQueue().first();
+        }
     }
 
     /**Update building mechanism for this unit.

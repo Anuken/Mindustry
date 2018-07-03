@@ -151,7 +151,7 @@ public class BuildBlock extends Block {
 
     @Remote(called = Loc.server, in = In.blocks)
     public static void onBuildFinish(Tile tile, Player lastBuilder){
-        if(tile.entity == null) return;
+        if(tile.entity == null || !(tile.entity instanceof BuildEntity)) return;
         BuildEntity entity = tile.entity();
 
         Team team = tile.getTeam();
@@ -179,6 +179,8 @@ public class BuildBlock extends Block {
 
     @Remote(called = Loc.server, targets = Loc.both, in = In.blocks, forward = true)
     public static void onBuildDeselect(Player player){
+        if(player == null) return;
+
         player.getPlaceQueue().clear();
     }
 
