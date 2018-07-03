@@ -74,6 +74,7 @@ public class NetServer extends Module{
             if(player != null){
                 onDisconnect(player);
             }
+            connections.remove(id);
         });
 
         Net.handleServer(ConnectPacket.class, (id, packet) -> {
@@ -406,18 +407,25 @@ public class NetServer extends Module{
 
                 byte[] bytes = syncStream.toByteArray();
 
-                connection.lastSentRawSnapshot = bytes;
-
                 if(connection.currentBaseID == -1){
+                    //assign to last sent snapshot so that there is only ever one unique snapshot with ID 0
+                    if(connection.lastSentSnapshot != null){
+                        bytes = connection.lastSentSnapshot;
+                    }else{
+                        connection.lastSentRawSnapshot = bytes;
+                        connection.lastSentSnapshot = bytes;
+                    }
+
                     if(showSnapshotSize) Log.info("Sent raw snapshot: {0} bytes.", bytes.length);
-                    ///Nothing to diff off of in this case, send the whole thing, but increment the counter
-                    connection.lastSentSnapshot = bytes;
+                    ///Nothing to diff off of in this case, send the whole thing
                     sendSplitSnapshot(connection.id, bytes, 0, -1);
                 }else{
+                    connection.lastSentRawSnapshot = bytes;
+
                     //send diff, otherwise
                     byte[] diff = ByteDeltaEncoder.toDiff(new ByteMatcherHash(connection.currentBaseSnapshot, bytes), encoder);
-                    if(showSnapshotSize) Log.info("Shrank snapshot: {0} -> {1}, Base {2} ID {3}", bytes.length, diff.length, connection.currentBaseID, connection.lastSentSnapshotID);
-                    sendSplitSnapshot(connection.id, diff, connection.lastSentSnapshotID + 1, connection.currentBaseID);
+                    if(showSnapshotSize) Log.info("Shrank snapshot: {0} -> {1}, Base {2} ID {3} base length = {4}", bytes.length, diff.length, connection.currentBaseID, connection.currentBaseID + 1, connection.currentBaseSnapshot.length);
+                    sendSplitSnapshot(connection.id, diff, connection.currentBaseID + 1, connection.currentBaseID);
                     connection.lastSentSnapshot = diff;
                     connection.lastSentSnapshotID = connection.currentBaseID + 1;
                     connection.lastSentBase = connection.currentBaseID;
@@ -432,7 +440,6 @@ public class NetServer extends Module{
     /**Sends a raw byte[] snapshot to a client, splitting up into chunks when needed.*/
     private static void sendSplitSnapshot(int userid, byte[] bytes, int snapshotID, int base){
         if(bytes.length < maxSnapshotSize){
-            if(showSnapshotSize) Log.info("Raw send() snapshot call: {0} bytes, sID {1}", bytes.length, snapshotID);
             Call.onSnapshot(userid, bytes, snapshotID, (short)0, (short)bytes.length, base);
         }else{
             int remaining = bytes.length;

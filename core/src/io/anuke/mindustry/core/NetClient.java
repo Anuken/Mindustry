@@ -301,7 +301,7 @@ public class NetClient extends Module {
                 length = snapshot.length;
                 netClient.lastSnapshotBase = Arrays.copyOf(snapshot, snapshot.length);
             } else { //otherwise, last snapshot must not be null, decode it
-                if(NetServer.showSnapshotSize) Log.info("Base size: {0} Path size: {1}", netClient.lastSnapshotBase.length, snapshot.length);
+                if(NetServer.showSnapshotSize) Log.info("Base size: {0} Patch size: {1}", netClient.lastSnapshotBase.length, snapshot.length);
                 netClient.decoder.init(netClient.lastSnapshotBase, snapshot);
                 result = netClient.decoder.decode();
                 length = netClient.decoder.getDecodedLength();

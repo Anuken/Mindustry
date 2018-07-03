@@ -18,7 +18,7 @@ public class ProductionBlocks extends BlockList implements ContentList {
     public void load() {
         tungstenDrill = new Drill("tungsten-drill") {{
             tier = 2;
-            drillTime = 360;
+            drillTime = 340;
         }};
 
         carbideDrill = new Drill("carbide-drill") {{

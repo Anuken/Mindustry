@@ -272,7 +272,7 @@ public class CoreBlock extends StorageBlock {
     }
 
     public class CoreEntity extends TileEntity{
-        Unit currentUnit;
+        public Unit currentUnit;
         int droneID = -1;
         boolean solid = true;
         float warmup;

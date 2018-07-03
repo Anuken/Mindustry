@@ -21,11 +21,12 @@ public class TurretBlocks extends BlockList implements ContentList {
 			ammoTypes = new AmmoType[]{AmmoTypes.bulletTungsten, AmmoTypes.bulletLead, AmmoTypes.bulletCarbide, AmmoTypes.bulletPyratite, AmmoTypes.bulletSilicon};
 			reload = 25f;
 			restitution = 0.03f;
-			range = 80f;
+			range = 90f;
 			shootCone = 15f;
 			ammoUseEffect = ShootFx.shellEjectSmall;
 			health = 80;
-			inaccuracy = 3f;
+			inaccuracy = 2f;
+			rotatespeed = 10f;
 		}};
 /*
 		scatter = new BurstTurret("scatter") {{
@@ -52,10 +53,10 @@ public class TurretBlocks extends BlockList implements ContentList {
         scorch = new LiquidTurret("scorch") {{
             ammoTypes = new AmmoType[]{AmmoTypes.basicFlame};
             recoil = 0f;
-            reload = 5f;
+            reload = 4f;
             shootCone = 50f;
             ammoUseEffect = ShootFx.shellEjectSmall;
-			health = 140;
+			health = 160;
 
             drawer = (tile, entity) -> Draw.rect(entity.target != null ? name + "-shoot" : name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
         }};

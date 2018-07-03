@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.core.NetServer;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
@@ -220,9 +221,8 @@ public class ServerControl extends Module {
                 if(playerGroup.size() > 0) {
                     info("&lyPlayers: {0}", playerGroup.size());
                     for (Player p : playerGroup.all()) {
-                        //TODO
                         if(Net.getConnection(p.clientid) == null){
-                            netServer.onDisconnect(p);
+                            NetServer.onDisconnect(p);
                             continue;
                         }
                         print("   &y{0} / Connection {1} / IP: {2}", p.name, p.clientid, Net.getConnection(p.clientid).address);

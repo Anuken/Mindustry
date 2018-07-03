@@ -28,7 +28,6 @@ import io.anuke.ucore.entities.trait.TimeTrait;
 import io.anuke.ucore.entities.trait.VelocityTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Pooling;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -48,7 +47,7 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
     private float sinktime;
 
     public static ItemDrop create(Item item, int amount, float x, float y, float angle){
-        ItemDrop drop = Pooling.obtain(ItemDrop.class);
+        ItemDrop drop = new ItemDrop();
         drop.item = item;
         drop.amount = amount;
         drop.velocity.set(4f, 0f).rotate(angle);
@@ -186,11 +185,6 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
         }else{
             sinktime = 0f;
         }
-    }
-
-    @Override
-    public void removed() {
-        Pooling.free(this);
     }
 
     @Override

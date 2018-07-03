@@ -250,6 +250,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 	@Override
 	public void removed() {
         dropCarryLocal();
+
+        TileEntity core = getClosestCore();
+        if(core != null && ((CoreEntity)core).currentUnit == this){
+			((CoreEntity)core).currentUnit = null;
+		}
 	}
 
 	@Override
