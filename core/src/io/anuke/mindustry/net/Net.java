@@ -10,8 +10,6 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.net.Packet.ImportantPacket;
-import io.anuke.mindustry.net.Packet.UnimportantPacket;
 import io.anuke.mindustry.net.Packets.StreamBegin;
 import io.anuke.mindustry.net.Packets.StreamChunk;
 import io.anuke.mindustry.net.Streamable.StreamBuilder;
@@ -183,13 +181,13 @@ public class Net{
 		}else if(clientListeners.get(object.getClass()) != null ||
 					listeners.get(object.getClass()) != null){
 
-			if(clientLoaded || object instanceof ImportantPacket){
+			if(clientLoaded || ((object instanceof Packet) && ((Packet) object).isImportant())){
 				if(clientListeners.get(object.getClass()) != null) clientListeners.get(object.getClass()).accept(object);
 				if(listeners.get(object.getClass()) != null) listeners.get(object.getClass()).accept(object);
 				synchronized (packetPoolLock) {
 					Pooling.free(object);
 				}
-			}else if(!(object instanceof UnimportantPacket)){
+			}else if(!((object instanceof Packet) && ((Packet) object).isUnimportant())){
 				packetQueue.add(object);
 				Log.info("Queuing packet {0}.", ClassReflection.getSimpleName(object.getClass()));
 			}else{

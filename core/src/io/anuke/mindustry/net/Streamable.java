@@ -2,14 +2,13 @@ package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import io.anuke.mindustry.net.Packet.ImportantPacket;
 import io.anuke.mindustry.net.Packets.StreamBegin;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-public class Streamable implements ImportantPacket{
+public class Streamable implements Packet{
     public transient ByteArrayInputStream stream;
 
     public static class StreamBuilder{
@@ -46,5 +45,10 @@ public class Streamable implements ImportantPacket{
         public boolean isDone(){
             return stream.size() >= total;
         }
+    }
+
+    @Override
+    public boolean isImportant() {
+        return true;
     }
 }

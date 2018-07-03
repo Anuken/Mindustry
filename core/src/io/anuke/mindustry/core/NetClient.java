@@ -3,6 +3,7 @@ package io.anuke.mindustry.core;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.IntSet;
+import io.anuke.annotations.Annotations.PacketPriority;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.annotations.Annotations.Variant;
 import io.anuke.mindustry.core.GameState.State;
@@ -222,7 +223,7 @@ public class NetClient extends Module {
         }
     }
 
-    @Remote(variants = Variant.one)
+    @Remote(variants = Variant.one, priority = PacketPriority.high)
     public static void onKick(KickReason reason){
         netClient.disconnectQuietly();
         state.set(State.menu);
@@ -247,7 +248,7 @@ public class NetClient extends Module {
         playerGroup.removeByID(playerid);
     }
 
-    @Remote(variants = Variant.one, unreliable = true)
+    @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
     public static void onSnapshot(byte[] chunk, int snapshotID, short chunkID, short totalLength, int base){
         if(NetServer.showSnapshotSize) Log.info("Recieved snapshot: len {0} ID {1} chunkID {2} totalLength {3} base {4} client-base {5}", chunk.length, snapshotID, chunkID, totalLength, base, netClient.lastSnapshotBaseID);
 

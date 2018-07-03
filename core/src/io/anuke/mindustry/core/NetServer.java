@@ -98,6 +98,11 @@ public class NetServer extends Module{
                 return;
             }
 
+            if(packet.version == -1 && Version.build != -1 && admins.allowsCustomClients()){
+                kick(id, KickReason.customClient);
+                return;
+            }
+
             boolean preventDuplicates = headless;
 
             if(preventDuplicates) {
@@ -138,7 +143,7 @@ public class NetServer extends Module{
 
             Player player = new Player();
             player.isAdmin = admins.isAdmin(uuid, packet.usid);
-            player.clientid = id;
+            player.con = Net.getConnection(id);
             player.usid = packet.usid;
             player.name = packet.name;
             player.uuid = uuid;
@@ -323,9 +328,9 @@ public class NetServer extends Module{
 
             //iterate through each player
             for (Player player : connections.values()) {
-                NetConnection connection = Net.getConnection(player.clientid);
+                NetConnection connection = player.con;
 
-                if(connection == null || !connection.isConnected()){
+                if(!connection.isConnected()){
                     //player disconnected, ignore them
                     onDisconnect(player);
                     return;
@@ -468,7 +473,7 @@ public class NetServer extends Module{
         Call.sendMessage("[accent]" + player.name + " has disconnected.");
         Call.onPlayerDisconnect(player.id);
         player.remove();
-        netServer.connections.remove(player.clientid);
+        netServer.connections.remove(player.con.id);
     }
 
     @Remote(targets = Loc.client, called = Loc.server)
@@ -476,7 +481,7 @@ public class NetServer extends Module{
 
         if(!player.isAdmin){
             Log.err("ACCESS DENIED: Player {0} / {1} attempted to perform admin action without proper security access.",
-                    player.name, Net.getConnection(player.clientid).address);
+                    player.name, player.con.address);
             return;
         }
 
@@ -485,18 +490,19 @@ public class NetServer extends Module{
             return;
         }
 
-        String ip = Net.getConnection(other.clientid).address;
+        String ip = player.con.address;
 
         if(action == AdminAction.ban){
             netServer.admins.banPlayerIP(ip);
-            netServer.kick(other.clientid, KickReason.banned);
+            netServer.kick(other.con.id, KickReason.banned);
             Log.info("&lc{0} has banned {1}.", player.name, other.name);
         }else if(action == AdminAction.kick){
-            netServer.kick(other.clientid, KickReason.kick);
+            netServer.kick(other.con.id, KickReason.kick);
             Log.info("&lc{0} has kicked {1}.", player.name, other.name);
         }else if(action == AdminAction.trace){
-            if(player.clientid != -1) {
-                Call.onTraceInfo(player.clientid, netServer.admins.getTraceByID(other.uuid));
+            //TODO
+            if(player.con != null) {
+                Call.onTraceInfo(player.con.id, netServer.admins.getTraceByID(other.uuid));
             }else{
                 NetClient.onTraceInfo(netServer.admins.getTraceByID(other.uuid));
             }
@@ -507,7 +513,7 @@ public class NetServer extends Module{
     @Remote(targets = Loc.client)
     public static void connectConfirm(Player player){
         player.add();
-        Net.getConnection(player.clientid).hasConnected = true;
+        player.con.hasConnected = true;
         Call.sendMessage("[accent]" + player.name + " has connected.");
         Log.info("&y{0} has connected.", player.name);
     }

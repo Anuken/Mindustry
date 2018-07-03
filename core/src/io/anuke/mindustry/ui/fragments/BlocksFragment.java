@@ -182,7 +182,7 @@ public class BlocksFragment extends Fragment{
 
 			//add actual recipes
 			for (Recipe r : recipes) {
-				if(r.debugOnly && !debug) continue;
+				if((r.debugOnly && !debug) || (r.desktopOnly && mobile)) continue;
 
 				ImageButton image = new ImageButton(new TextureRegion(), "select");
 

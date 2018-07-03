@@ -210,7 +210,7 @@ public class CoreBlock extends StorageBlock {
             rect.setSize(supplyRadius*2).setCenter(tile.drawx(), tile.drawy());
 
             Units.getNearby(tile.getTeam(), rect, unit -> {
-                if(unit.isDead() || unit.distanceTo(tile.drawx(), tile.drawy()) > supplyRadius) return;
+                if(unit.isDead() || unit.distanceTo(tile.drawx(), tile.drawy()) > supplyRadius || unit.getGroup() == null) return;
 
                 for(int i = 0; i < tile.entity.items.items.length; i ++){
                     Item item = Item.getByID(i);

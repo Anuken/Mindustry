@@ -18,6 +18,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -58,7 +59,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 	public Color color = new Color();
 	public Mech mech;
 
-	public int clientid = -1;
+	public NetConnection con;
 	public int playerIndex = 0;
 	public boolean isLocal = false;
 	public Timer timer = new Timer(4);

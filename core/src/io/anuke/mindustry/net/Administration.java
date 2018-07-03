@@ -12,6 +12,7 @@ import io.anuke.mindustry.world.blocks.Rock;
 import io.anuke.mindustry.world.blocks.StaticBlock;
 import io.anuke.ucore.core.Settings;
 
+import static io.anuke.mindustry.Vars.headless;
 import static io.anuke.mindustry.Vars.world;
 
 public class Administration {
@@ -39,6 +40,14 @@ public class Administration {
 
     public boolean isAntiGrief(){
         return Settings.getBool("antigrief");
+    }
+
+    public boolean allowsCustomClients(){
+        return Settings.getBool("kick-custom", headless);
+    }
+
+    public void setCustomClients(boolean allowed){
+        Settings.getBool("kick-custom", allowed);
     }
 
     public boolean isValidateReplace(){

@@ -13,7 +13,6 @@ public class Registrator {
         WorldStream.class,
         ConnectPacket.class,
         ClientSnapshotPacket.class,
-        SnapshotPacket.class,
         InvokePacket.class
     };
     private static ObjectIntMap<Class<?>> ids = new ObjectIntMap<>();
