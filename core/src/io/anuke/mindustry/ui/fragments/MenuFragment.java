@@ -38,7 +38,7 @@ public class MenuFragment extends Fragment{
 		if(Platform.instance.hasDiscord()) {
 			new table() {{
 				abottom().atop().aright();
-				get().addButton("", "discord", ui.discord::show);
+				get().addButton("", "discord", ui.discord::show).size(81, 42);
 			}}.end().visible(() -> state.is(State.menu));
 		}
 
@@ -46,7 +46,7 @@ public class MenuFragment extends Fragment{
 		if(mobile) {
 			new table() {{
 				abottom().atop().aleft();
-				get().addButton("", "info", ui.about::show);
+				get().addButton("", "info", ui.about::show).size(81, 42);
 			}}.end().visible(() -> state.is(State.menu));
 		}
 
