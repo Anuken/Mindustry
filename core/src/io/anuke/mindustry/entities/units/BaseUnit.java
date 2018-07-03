@@ -114,22 +114,16 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 		}
 	}
 	public void targetClosestAllyFlag(BlockFlag flag){
-		if(target != null) return;
-
 		Tile target = Geometry.findClosest(x, y, world.indexer().getAllied(team, flag));
 		if (target != null) this.target = target.entity;
 	}
 
 	public void targetClosestEnemyFlag(BlockFlag flag){
-		if(target != null) return;
-
 		Tile target = Geometry.findClosest(x, y, world.indexer().getEnemy(team, flag));
 		if (target != null) this.target = target.entity;
 	}
 
 	public void targetClosest(){
-		if(target != null) return;
-
 		target = Units.getClosestTarget(team, x, y, inventory.getAmmoRange());
 	}
 

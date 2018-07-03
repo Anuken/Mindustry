@@ -219,7 +219,7 @@ public abstract class GroundUnit extends BaseUnit {
             TileEntity core = getClosestEnemyCore();
             float dst = core == null ? 0 :distanceTo(core);
 
-            if(core != null && inventory.hasAmmo() && dst < inventory.getAmmo().getRange()){
+            if(core != null && inventory.hasAmmo() && dst < inventory.getAmmo().getRange()/1.1f){
                 target = core;
             }else {
                 retarget(() -> targetClosest());
