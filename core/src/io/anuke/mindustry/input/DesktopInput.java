@@ -313,7 +313,7 @@ public class DesktopInput extends InputHandler{
             float ya = Inputs.getAxis(section, "cursor_y");
 
             if(Math.abs(xa) > controllerMin || Math.abs(ya) > controllerMin) {
-                float scl = Settings.getInt("sensitivity")/100f * Unit.dp.scl(1f);
+                float scl = Settings.getInt("sensitivity", 100)/100f * Unit.dp.scl(1f);
                 controlx += xa*baseControllerSpeed*scl;
                 controly -= ya*baseControllerSpeed*scl;
                 controlling = true;

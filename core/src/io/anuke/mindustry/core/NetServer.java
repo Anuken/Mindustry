@@ -457,7 +457,7 @@ public class NetServer extends Module{
         }
     }
 
-    private static void onDisconnect(Player player){
+    public static void onDisconnect(Player player){
         Call.sendMessage("[accent]" + player.name + " has disconnected.");
         Call.onPlayerDisconnect(player.id);
         player.remove();

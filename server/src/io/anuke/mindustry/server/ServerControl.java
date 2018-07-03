@@ -220,6 +220,11 @@ public class ServerControl extends Module {
                 if(playerGroup.size() > 0) {
                     info("&lyPlayers: {0}", playerGroup.size());
                     for (Player p : playerGroup.all()) {
+                        //TODO
+                        if(Net.getConnection(p.clientid) == null){
+                            netServer.onDisconnect(p);
+                            continue;
+                        }
                         print("   &y{0} / Connection {1} / IP: {2}", p.name, p.clientid, Net.getConnection(p.clientid).address);
                     }
                 }else{

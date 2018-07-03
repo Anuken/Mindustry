@@ -322,7 +322,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         for(PlaceRequest request : selection){
             Tile tile = request.tile();
 
-            if(tile == null) continue;
+            if(tile == null || recipe == null) continue;
 
             if ((!request.remove && validPlace(tile.x, tile.y, request.recipe.result, request.rotation))
                     || (request.remove && validBreak(tile.x, tile.y))) {
