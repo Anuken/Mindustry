@@ -234,7 +234,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		Damage.dynamicExplosion(player.x, player.y, flammability, explosiveness, 0f, player.getSize()/2f, Palette.darkFlame);
 
 		ScorchDecal.create(player.x, player.y);
-		Effects.sound("die", player);
 		player.onDeath();
 	}
 
