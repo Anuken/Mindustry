@@ -6,9 +6,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.input.InputHandler;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.ucore.core.Graphics;
@@ -66,9 +68,7 @@ public class OverlayRenderer {
                 Tile tile = world.tileWorld(vec.x, vec.y);
 
                 if (tile != null && tile.block() != Blocks.air) {
-                    Tile target = tile;
-                    if (tile.isLinked())
-                        target = tile.getLinked();
+                    Tile target = tile.target();
 
                     if (showBlockDebug && target.entity != null) {
                         Draw.color(Color.RED);
@@ -93,49 +93,51 @@ public class OverlayRenderer {
                         Draw.reset();
                     }
 
-                    if (target.entity != null) {
-                        int[] values = {0, 0};
-                        Tile t = target;
-                        boolean[] doDraw = {false};
-
-                        Callable drawbars = () -> {
-                            for (BlockBar bar : t.block().bars.list()) {
-                                //TODO fix.
-                                float offset = Mathf.sign(bar.top) * (t.block().size / 2f * tilesize + 2f + (bar.top ? values[0] : values[1]));
-
-                                float value = bar.value.get(t);
-
-                                if (MathUtils.isEqual(value, -1f)) continue;
-
-                                if(doDraw[0]){
-                                    drawBar(bar.type.color, t.drawx(), t.drawy() + offset, value);
-                                }
-
-                                if (bar.top)
-                                    values[0]++;
-                                else
-                                    values[1]++;
-                            }
-                        };
-
-                        drawbars.run();
-
-                        if(values[0] > 0){
-                            drawEncloser(target.drawx(), target.drawy() + target.block().size * tilesize/2f + 2f + values[0]/2f - 0.5f + (values[0] > 2 ? 0.5f : 0), values[0]);
-                        }
-
-                        if(values[1] > 0){
-                            drawEncloser(target.drawx(), target.drawy() - target.block().size * tilesize/2f - 2f - values[1]/2f - 0.5f, values[1]);
-                        }
-
-                        doDraw[0] = true;
-                        values[0] = 0;
-                        values[1] = 1;
-
-                        drawbars.run();
-                    }
-
                     synchronized (Tile.tileSetLock) {
+                        Block block = target.block();
+                        TileEntity entity = target.entity;
+
+                        if (entity != null) {
+                            int[] values = {0, 0};
+                            boolean[] doDraw = {false};
+
+                            Callable drawbars = () -> {
+                                for (BlockBar bar : block.bars.list()) {
+                                    float offset = Mathf.sign(bar.top) * (block.size / 2f * tilesize + 2f + (bar.top ? values[0] : values[1]));
+
+                                    float value = bar.value.get(target);
+
+                                    if (MathUtils.isEqual(value, -1f)) continue;
+
+                                    if(doDraw[0]){
+                                        drawBar(bar.type.color, target.drawx(), target.drawy() + offset, value);
+                                    }
+
+                                    if (bar.top)
+                                        values[0]++;
+                                    else
+                                        values[1]++;
+                                }
+                            };
+
+                            drawbars.run();
+
+                            if(values[0] > 0){
+                                drawEncloser(target.drawx(), target.drawy() + block.size * tilesize/2f + 2f + values[0]/2f - 0.5f + (values[0] > 2 ? 0.5f : 0), values[0]);
+                            }
+
+                            if(values[1] > 0){
+                                drawEncloser(target.drawx(), target.drawy() - block.size * tilesize/2f - 2f - values[1]/2f - 0.5f, values[1]);
+                            }
+
+                            doDraw[0] = true;
+                            values[0] = 0;
+                            values[1] = 1;
+
+                            drawbars.run();
+                        }
+
+
                         target.block().drawSelect(target);
                     }
                 }

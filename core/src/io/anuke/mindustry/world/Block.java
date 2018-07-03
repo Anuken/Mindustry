@@ -235,8 +235,8 @@ public class Block extends BaseBlock implements Content{
 
 	//TODO make this easier to config.
 	public void setBars(){
-		if(hasPower) bars.add(new io.anuke.mindustry.world.meta.BlockBar(BarType.power, true, tile -> tile.entity.power.amount / powerCapacity));
-		if(hasLiquids) bars.add(new io.anuke.mindustry.world.meta.BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.amount / liquidCapacity));
+		if(hasPower) bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.amount / powerCapacity));
+		if(hasLiquids) bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.amount / liquidCapacity));
 		if(hasItems) bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.totalItems() / itemCapacity));
 	}
 	

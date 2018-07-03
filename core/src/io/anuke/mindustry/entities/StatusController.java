@@ -6,6 +6,7 @@ import io.anuke.mindustry.entities.traits.Saveable;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Pooling;
+import io.anuke.ucore.util.ThreadArray;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -14,9 +15,9 @@ import java.io.IOException;
 /**Class for controlling status effects on an entity.*/
 public class StatusController implements Saveable{
     private static final StatusEntry globalResult = new StatusEntry();
-    private static final Array<StatusEntry> removals = new Array<>();
+    private static final Array<StatusEntry> removals = new ThreadArray<>();
 
-    private Array<StatusEntry> statuses = new Array<>();
+    private Array<StatusEntry> statuses = new ThreadArray<>();
 
     private float speedMultiplier;
     private float damageMultiplier;
