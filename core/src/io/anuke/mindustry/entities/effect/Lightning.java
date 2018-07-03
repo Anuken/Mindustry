@@ -9,6 +9,7 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
@@ -26,10 +27,14 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Pooling;
 import io.anuke.ucore.util.SeedRandom;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 import static io.anuke.mindustry.Vars.bulletGroup;
 
 //TODO utterly broken
-public class Lightning extends TimedEntity implements Poolable, DrawTrait{
+public class Lightning extends TimedEntity implements Poolable, DrawTrait, SyncTrait{
     private static Array<SolidTrait> entities = new Array<>();
     private static Rectangle rect = new Rectangle();
     private static Rectangle hitrect = new Rectangle();
@@ -112,6 +117,21 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait{
 
     /**For pooling use only. Do not call directly!*/
     public Lightning(){}
+
+    @Override
+    public boolean isSyncing() {
+        return false;
+    }
+
+    @Override
+    public void write(DataOutput data) throws IOException {
+
+    }
+
+    @Override
+    public void read(DataInput data, long time) throws IOException {
+
+    }
 
     @Override
     public float lifetime() {

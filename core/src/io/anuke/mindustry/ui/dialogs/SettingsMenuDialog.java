@@ -129,9 +129,9 @@ public class SettingsMenuDialog extends SettingsDialog{
 		sound.volumePrefs();
 
 		game.screenshakePref();
-		game.checkPref("smoothcam", true);
+		//game.checkPref("smoothcam", true);
 		game.checkPref("effects", true);
-		game.sliderPref("sensitivity", 100, 10, 300, i -> i + "%");
+		//game.sliderPref("sensitivity", 100, 10, 300, i -> i + "%");
 		game.sliderPref("saveinterval", 90, 10, 5*120, i -> Bundles.format("setting.seconds", i));
 
 		if(!gwt){
@@ -160,8 +160,6 @@ public class SettingsMenuDialog extends SettingsDialog{
 
 		graphics.checkPref("fps", false);
 		graphics.checkPref("lasers", true);
-        graphics.sliderPref("previewopacity", 50, 0, 100, i -> i + "%");
-		graphics.checkPref("indicators", true);
 		graphics.checkPref("healthbars", true);
 		graphics.checkPref("minimap", !mobile); //minimap is disabled by default on mobile devices
 	}

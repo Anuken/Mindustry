@@ -280,10 +280,12 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void damage(float amount, boolean withEffect){
-        if(withEffect){
-            damage(amount);
-        }else{
-            super.damage(amount);
+        float pre = hitTime;
+
+        damage(amount);
+
+        if(!withEffect){
+            hitTime = pre;
         }
     }
 

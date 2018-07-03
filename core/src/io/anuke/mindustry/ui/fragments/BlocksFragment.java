@@ -150,6 +150,7 @@ public class BlocksFragment extends Fragment{
 				}
 				lastCategory = cat;
 				stack.act(Gdx.graphics.getDeltaTime());
+				stack.act(Gdx.graphics.getDeltaTime());
 			}).growX().height(54).group(group)
 					.name("sectionbutton" + cat.name()).get();
 
@@ -251,10 +252,12 @@ public class BlocksFragment extends Fragment{
 				recipeTable.add(image).size(size + 8);
 
 				image.update(() -> {
-					for(Player player : players){
-						if(control.input(player.playerIndex).recipe == r){
-							image.setChecked(true);
-							return;
+					if(!image.isDisabled()) {
+						for (Player player : players) {
+							if (control.input(player.playerIndex).recipe == r) {
+								image.setChecked(true);
+								return;
+							}
 						}
 					}
 					image.setChecked(false);

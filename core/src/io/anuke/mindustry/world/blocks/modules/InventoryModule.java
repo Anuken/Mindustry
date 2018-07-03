@@ -18,6 +18,13 @@ public class InventoryModule extends BlockModule{
         return true;
     }
 
+    public boolean hasItems(ItemStack[] stacks, float amountScaling){
+        for(ItemStack stack : stacks){
+            if(!hasItem(stack.item, (int)(stack.amount * amountScaling))) return false;
+        }
+        return true;
+    }
+
     /**Returns true if this entity has at least one of each item in each stack.*/
     public boolean hasAtLeastOneOfItems(ItemStack[] stacks){
         for(ItemStack stack : stacks){

@@ -92,7 +92,7 @@ public class StatusEffects implements ContentList {
 
             @Override
             public void update(Unit unit, float time) {
-                unit.damagePeriodic(0.1f);
+                unit.damagePeriodic(0.3f);
 
                 if (Mathf.chance(Timers.delta() * 0.2f)) {
                     Effects.effect(EnvironmentFx.melting, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));

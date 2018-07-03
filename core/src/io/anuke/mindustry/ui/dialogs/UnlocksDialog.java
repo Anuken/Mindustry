@@ -45,7 +45,7 @@ public class UnlocksDialog extends FloatingDialog {
             table.table(list -> {
                 list.left();
 
-                int maxWidth = UIUtils.portrait() ? 6 : 14;
+                int maxWidth = UIUtils.portrait() ? 7 : 14;
                 int size = 8*6;
 
                 int count = 0;

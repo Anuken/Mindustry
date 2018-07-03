@@ -76,7 +76,7 @@ public class Blocks extends BlockList implements ContentList{
         lava = new Floor("lava") {{
             liquidColor = Color.valueOf("ed5334");
             speedMultiplier = 0.2f;
-            damageTaken = 0.1f;
+            damageTaken = 0.5f;
             status = StatusEffects.melting;
             statusIntensity = 0.8f;
             variants = 0;
