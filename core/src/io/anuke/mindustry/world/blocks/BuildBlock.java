@@ -186,6 +186,7 @@ public class BuildBlock extends Block {
         public Recipe recipe;
 
         public double progress = 0;
+        public double lastProgress;
         public Block previous;
         public Player lastBuilder;
 
@@ -193,6 +194,21 @@ public class BuildBlock extends Block {
         private boolean updated;
 
         public void addProgress(InventoryModule inventory, double amount){
+            double maxProgress = checkRequired(inventory, amount);
+
+            for (int i = 0; i < recipe.requirements.length; i++) {
+                accumulator[i] += recipe.requirements[i].amount*maxProgress; //add min amount progressed to the accumulator
+            }
+
+            maxProgress = checkRequired(inventory, maxProgress);
+
+            progress += maxProgress;
+
+            lastProgress = maxProgress;
+            updated = true;
+        }
+
+        public double checkRequired(InventoryModule inventory, double amount){
             double maxProgress = amount;
 
             for(int i = 0; i < recipe.requirements.length; i ++){
@@ -204,8 +220,6 @@ public class BuildBlock extends Block {
                     //get this as a fraction
                     double fraction = maxUse / (double)required;
 
-                    //accumulator[i] -= recipe.requirements[i].amount*amount*(1-fraction);
-
                     //move max progress down if this fraction is less than 1
                     maxProgress = Math.min(maxProgress, maxProgress*fraction);
 
@@ -216,12 +230,7 @@ public class BuildBlock extends Block {
                 //else, no items are required yet, so just keep going
             }
 
-            for (int i = 0; i < recipe.requirements.length; i++) {
-                accumulator[i] += recipe.requirements[i].amount*maxProgress; //add min amount progressed to the accumulator
-            }
-
-            progress += maxProgress;
-            updated = true;
+            return maxProgress;
         }
 
         public float progress(){
