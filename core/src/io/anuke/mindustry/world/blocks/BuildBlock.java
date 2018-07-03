@@ -196,7 +196,6 @@ public class BuildBlock extends Block {
             double maxProgress = amount;
 
             for(int i = 0; i < recipe.requirements.length; i ++){
-                accumulator[i] += recipe.requirements[i].amount*amount; //add amount progressed to the accumulator
                 int required = (int)(accumulator[i]); //calculate items that are required now
 
                 if(required > 0){ //if this amount is positive...
@@ -205,7 +204,7 @@ public class BuildBlock extends Block {
                     //get this as a fraction
                     double fraction = maxUse / (double)required;
 
-                    accumulator[i] -= recipe.requirements[i].amount*amount*(1-fraction);
+                    //accumulator[i] -= recipe.requirements[i].amount*amount*(1-fraction);
 
                     //move max progress down if this fraction is less than 1
                     maxProgress = Math.min(maxProgress, maxProgress*fraction);
@@ -215,6 +214,10 @@ public class BuildBlock extends Block {
                     inventory.removeItem(recipe.requirements[i].item, maxUse);
                 }
                 //else, no items are required yet, so just keep going
+            }
+
+            for (int i = 0; i < recipe.requirements.length; i++) {
+                accumulator[i] += recipe.requirements[i].amount*maxProgress; //add min amount progressed to the accumulator
             }
 
             progress += maxProgress;

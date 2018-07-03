@@ -77,8 +77,11 @@ public class Conveyor extends Block{
 		float x = tile.drawx(), y = tile.drawy();
 
 		if(offset % 2 == 1){
-			if(point.x < 0) x += 0.5f;
-			if(point.y < 0) y += 0.5f;
+			if(point.x < 0) x += 0.75f;
+			if(point.y < 0)
+				y += 0.5f;
+			else if(point.y > 0)
+				y -= 0.5f;
 		}
 
 		Draw.rect(region1,

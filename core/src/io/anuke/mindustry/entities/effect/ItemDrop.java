@@ -181,7 +181,7 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
             }
 
             if(sinktime >= sinkLifetime){
-                CallEntity.onPickup(getID());
+                remove();
             }
         }else{
             sinktime = 0f;

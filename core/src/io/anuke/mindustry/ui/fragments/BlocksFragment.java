@@ -259,7 +259,11 @@ public class BlocksFragment extends Fragment{
 								return;
 							}
 						}
-					}
+					}/*else{
+						if(control.input(0).recipe == r){
+							control.input(0).recipe = null;
+						}
+					}*/
 					image.setChecked(false);
 				});
 

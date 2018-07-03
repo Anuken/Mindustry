@@ -251,6 +251,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
 		if(Net.client()){
 			interpolate();
+			status.update(this);
 			return;
 		}
 

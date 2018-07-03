@@ -121,11 +121,11 @@ public class OverlayRenderer {
                         drawbars.run();
 
                         if(values[0] > 0){
-                            drawEncloser(target.drawx(), target.drawy() + target.block().size * tilesize/2f + 2f + values[0]/2f + (values[0] > 2 ? 1 : 0), values[0]);
+                            drawEncloser(target.drawx(), target.drawy() + target.block().size * tilesize/2f + 2f + values[0]/2f - 0.5f + (values[0] > 2 ? 0.5f : 0), values[0]);
                         }
 
                         if(values[1] > 0){
-                            drawEncloser(target.drawx(), target.drawy() - target.block().size * tilesize/2f - 2f - values[1]/2f, values[1]);
+                            drawEncloser(target.drawx(), target.drawy() - target.block().size * tilesize/2f - 2f - values[1]/2f - 0.5f, values[1]);
                         }
 
                         doDraw[0] = true;
