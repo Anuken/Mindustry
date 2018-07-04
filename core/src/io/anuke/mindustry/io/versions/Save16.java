@@ -19,7 +19,6 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.util.Bits;
-import io.anuke.ucore.util.Log;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -51,7 +50,6 @@ public class Save16 extends SaveFileVersion {
 
         state.difficulty = Difficulty.values()[difficulty];
         state.mode = GameMode.values()[mode];
-        state.enemies = 0; //TODO display enemies correctly!
         state.wave = wave;
         state.wavetime = wavetime;
 

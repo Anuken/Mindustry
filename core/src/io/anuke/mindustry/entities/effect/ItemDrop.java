@@ -69,6 +69,7 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
             Effects.effect(UnitFx.pickup, drop);
         }
         itemGroup.removeByID(itemid);
+        netClient.addRemovedEntity(itemid);
     }
 
     /**Internal use only!*/

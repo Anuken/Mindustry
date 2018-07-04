@@ -48,7 +48,7 @@ public class BuildBlock extends Block {
     @Override
     public boolean isSolidFor(Tile tile) {
         BuildEntity entity = tile.entity();
-        return entity.recipe.result.solid || entity.previous.solid;
+        return entity == null || entity.recipe ==null || entity.recipe.result.solid || entity.previous.solid;
     }
 
     @Override
@@ -88,7 +88,7 @@ public class BuildBlock extends Block {
     public void draw(Tile tile){
         BuildEntity entity = tile.entity();
 
-        if(entity.previous.synthetic()) {
+        if(entity.previous != null && entity.previous.synthetic()) {
             for (TextureRegion region : entity.previous.getBlockIcon()) {
                 Draw.rect(region, tile.drawx(), tile.drawy(), entity.recipe.result.rotate ? tile.getRotation() * 90 : 0);
             }
@@ -131,7 +131,7 @@ public class BuildBlock extends Block {
             CallBlocks.onBuildDeath(tile);
         }
 
-        if(!entity.updated){
+        if(!entity.updated && entity.recipe != null){
             entity.progress -= 1f/entity.recipe.cost/decaySpeedScl;
         }
 
@@ -208,6 +208,10 @@ public class BuildBlock extends Block {
 
             lastProgress = maxProgress;
             updated = true;
+
+            if(progress > 1.0001f){
+                progress = 1.0001f;
+            }
         }
 
         public double checkRequired(InventoryModule inventory, double amount){

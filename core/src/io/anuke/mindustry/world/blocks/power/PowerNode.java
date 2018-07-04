@@ -129,14 +129,14 @@ public class PowerNode extends PowerBlock{
 				Tile link = world.tile(x, y);
 				if(link != null) link = link.target();
 
-				if(link != tile && linkValid(tile, link)){
+				if(link != tile && linkValid(tile, link, false)){
 					boolean linked = linked(tile, link);
 					Draw.color(linked ? Palette.place : Palette.breakInvalid);
 
 					Lines.square(link.drawx(), link.drawy(),
 							link.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Timers.time(), 4f, 1f)));
 
-					if(entity.links.size >= maxNodes && !linked){
+					if((entity.links.size >= maxNodes || (link.block() instanceof PowerNode && ((DistributorEntity)link.entity).links.size >= ((PowerNode)link.block()).maxNodes)) && !linked){
 						Draw.color();
 						Draw.rect("cross-" + link.block().size, link.drawx(), link.drawy());
 					}
@@ -190,11 +190,13 @@ public class PowerNode extends PowerBlock{
 	}
 
 	protected boolean shouldDistribute(Tile tile, Tile other) {
-		return other.entity.power.amount / other.block().powerCapacity <= tile.entity.power.amount / powerCapacity;
+		return other.entity.power.amount / other.block().powerCapacity <= tile.entity.power.amount / powerCapacity &&
+				!(other.block() instanceof PowerGenerator); //do not distribute to power generators
 	}
 
 	protected boolean shouldLeechPower(Tile tile, Tile other){
 		return !(other.block() instanceof PowerNode)
+				&& other.block() instanceof PowerDistributor //only suck power from batteries and power generators
 				&& other.entity.power.amount / other.block().powerCapacity > tile.entity.power.amount / powerCapacity;
 	}
 
@@ -242,6 +244,10 @@ public class PowerNode extends PowerBlock{
 	}
 
 	protected boolean linkValid(Tile tile, Tile link){
+		return linkValid(tile, link, true);
+	}
+
+	protected boolean linkValid(Tile tile, Tile link, boolean checkMaxNodes){
 		if(!(tile != link && link != null && link.block().hasPower)) return false;
 
 		if(link.block() instanceof PowerNode){
@@ -250,7 +256,7 @@ public class PowerNode extends PowerBlock{
 			return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy()) <= Math.max(laserRange * tilesize,
 					((PowerNode)link.block()).laserRange * tilesize) - tilesize/2f
 					+ (link.block().size-1)*tilesize/2f + (tile.block().size-1)*tilesize/2f &&
-					(oe.links.size < ((PowerNode)link.block()).maxNodes || oe.links.contains(tile.packedPosition()));
+					(!checkMaxNodes || (oe.links.size < ((PowerNode)link.block()).maxNodes || oe.links.contains(tile.packedPosition())));
 		}else{
 			return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy())
 					<= laserRange * tilesize - tilesize/2f + (link.block().size-1)*tilesize;
@@ -276,8 +282,9 @@ public class PowerNode extends PowerBlock{
         return new DistributorEntity();
     }
 
-    @Remote(targets = Loc.both, called = Loc.both, in = In.blocks, forward = true)
+    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
     public static void linkPowerDistributors(Player player, Tile tile, Tile other){
+
 		DistributorEntity entity = tile.entity();
 
 		if(!entity.links.contains(other.packedPosition())){

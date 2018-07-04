@@ -43,7 +43,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable 
 
     /**Start a fire on the tile. If there already is a file there, refreshes its lifetime.*/
     public static void create(Tile tile){
-        if(Net.client()) return; //not clientside.
+        if(Net.client() || tile == null) return; //not clientside.
 
         Fire fire = map.get(tile.packedPosition());
 
@@ -62,7 +62,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable 
 
     /**Attempts to extinguish a fire by shortening its life. If there is no fire here, does nothing.*/
     public static void extinguish(Tile tile, float intensity) {
-        if (map.containsKey(tile.packedPosition())) {
+        if (tile != null && map.containsKey(tile.packedPosition())) {
             map.get(tile.packedPosition()).time += intensity * Timers.delta();
         }
     }

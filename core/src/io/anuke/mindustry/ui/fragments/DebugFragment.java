@@ -185,7 +185,7 @@ public class DebugFragment extends Fragment {
             result.append(player.id);
             result.append("\n");
             result.append("   cid: ");
-            result.append(player.con.id);
+            result.append(player.con == null ? -1 : player.con.id);
             result.append("\n");
             result.append("   dead: ");
             result.append(player.isDead());

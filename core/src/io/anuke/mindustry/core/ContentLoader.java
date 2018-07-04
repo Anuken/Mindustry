@@ -1,6 +1,9 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.OrderedMap;
+import com.badlogic.gdx.utils.OrderedSet;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.content.bullets.*;
@@ -28,6 +31,7 @@ public class ContentLoader {
     private static boolean loaded = false;
     private static ObjectSet<Array<? extends Content>> contentSet = new OrderedSet<>();
     private static OrderedMap<String, Array<Content>> contentMap = new OrderedMap<>();
+    private static ObjectSet<Consumer<Content>> initialization = new ObjectSet<>();
     private static ContentList[] content = {
         //effects
         new BlockFx(),
@@ -132,11 +136,15 @@ public class ContentLoader {
 
     /**Initializes all content with the specified function.*/
     public static void initialize(Consumer<Content> callable){
+        if(initialization.contains(callable)) return;
+
         for(Array<? extends Content> arr : contentSet){
             for(Content content : arr){
                 callable.accept(content);
             }
         }
+
+        initialization.add(callable);
     }
 
     public static void dispose(){

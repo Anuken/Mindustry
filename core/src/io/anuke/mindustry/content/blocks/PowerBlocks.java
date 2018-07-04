@@ -13,7 +13,7 @@ public class PowerBlocks extends BlockList implements ContentList {
     @Override
     public void load() {
         combustionGenerator = new BurnerGenerator("combustion-generator") {{
-            powerOutput = 0.06f;
+            powerOutput = 0.09f;
             powerCapacity = 40f;
             itemDuration = 40f;
         }};
@@ -27,7 +27,7 @@ public class PowerBlocks extends BlockList implements ContentList {
         }};
 
         turbineGenerator = new TurbineGenerator("turbine-generator") {{
-            powerOutput = 0.15f;
+            powerOutput = 0.25f;
             powerCapacity = 40f;
             itemDuration = 30f;
             size = 2;

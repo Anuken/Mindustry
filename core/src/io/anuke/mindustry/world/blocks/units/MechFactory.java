@@ -154,6 +154,9 @@ public class MechFactory extends Block{
         MechFactoryEntity entity = tile.entity();
 
         Effects.effect(Fx.spawn, entity);
+
+        if(entity.player == null) return;
+
         Mech result = ((MechFactory)tile.block()).mech;
 
         if(entity.player.mech == result){

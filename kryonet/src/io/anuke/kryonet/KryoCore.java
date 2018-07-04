@@ -6,9 +6,7 @@ import io.anuke.ucore.util.ColorCodes;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static io.anuke.mindustry.Vars.headless;
 
@@ -64,26 +62,5 @@ public class KryoCore {
 
     private static int calculateLag() {
         return fakeLagMin + (int)(Math.random() * (fakeLagMax - fakeLagMin));
-    }
-
-    /**Executes something in a potentially unreliable way. Used to simulate lag and packet errors with UDP.*/
-    public static void recieveUnreliable(Runnable run){
-        if(fakeLag && threadPool == null){
-            threadPool = Executors.newScheduledThreadPool(1, r -> {
-                Thread t = Executors.defaultThreadFactory().newThread(r);
-                t.setDaemon(true);
-                return t;
-            });
-        }
-
-        if(fakeLag){
-            do {
-                if (Math.random() >= fakeLagDrop) {
-                    threadPool.schedule(run, calculateLag(), TimeUnit.MILLISECONDS);
-                }
-            } while (Math.random() < fakeLagDuplicate);
-        }else{
-            run.run();
-        }
     }
 }

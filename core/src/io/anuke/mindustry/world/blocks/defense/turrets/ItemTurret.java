@@ -40,6 +40,13 @@ public class ItemTurret extends CooledTurret {
 
         return Math.min((int)((maxAmmo - entity.totalAmmo) / ammoMap.get(item).quantityMultiplier), amount);
     }
+    
+    @Override
+    public void handleStack(Item item, int amount, Tile tile, Unit source){
+        for (int i = 0; i < amount; i++) {
+            handleItem(item, tile, null);
+        }
+    }
 
     //currently can't remove items from turrets.
     @Override

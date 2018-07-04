@@ -610,7 +610,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 				if (target == null) {
 					isShooting = false;
 					target = Units.getClosestTarget(team, x, y, inventory.getAmmoRange());
-				} else {
+				} else if(target.isValid()){
 					//rotate toward and shoot the target
 					rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
 
@@ -697,12 +697,18 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 	public void readSave(DataInput stream) throws IOException {
 		boolean local = stream.readBoolean();
 
-		if(local){
+		if(local && !headless){
 			byte mechid = stream.readByte();
 			int index = stream.readByte();
 			players[index].readSaveSuper(stream);
 			players[index].mech = Upgrade.getByID(mechid);
 			players[index].dead = false;
+		}else if(local){
+			byte mechid = stream.readByte();
+			stream.readByte();
+			readSaveSuper(stream);
+			mech = Upgrade.getByID(mechid);
+			dead = false;
 		}
 	}
 

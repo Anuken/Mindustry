@@ -51,7 +51,9 @@ public class PowerDistributor extends PowerBlock {
     }
 
     protected boolean shouldDistribute(Tile tile, Tile other) {
-        return !(other.block() instanceof PowerGenerator) || other.entity.power.amount / other.block().powerCapacity < tile.entity.power.amount / powerCapacity;
+        //only generators can distribute to other generators
+        return (!(other.block() instanceof PowerGenerator) || tile.block() instanceof PowerGenerator)
+                && other.entity.power.amount / other.block().powerCapacity < tile.entity.power.amount / powerCapacity;
     }
 
     @Override

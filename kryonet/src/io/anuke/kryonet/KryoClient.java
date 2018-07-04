@@ -15,6 +15,7 @@ import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
 import io.anuke.ucore.function.Consumer;
+import io.anuke.ucore.util.Pooling;
 import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ import java.nio.channels.ClosedSelectorException;
 import java.util.List;
 
 import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.net.Net.packetPoolLock;
 
 public class KryoClient implements ClientProvider{
     Client client;
@@ -133,6 +135,10 @@ public class KryoClient implements ClientProvider{
             client.sendTCP(object);
         }else{
             client.sendUDP(object);
+        }
+
+        synchronized (packetPoolLock) {
+            Pooling.free(object);
         }
     }
 

@@ -221,7 +221,7 @@ public class ServerControl extends Module {
                 if(playerGroup.size() > 0) {
                     info("&lyPlayers: {0}", playerGroup.size());
                     for (Player p : playerGroup.all()) {
-                        print("   &y{0} / Connection {1} / IP: {2}", p.name, p.con, p.con.address);
+                        print("   &y{0} / Connection {1} / IP: {2}", p.name, p.con.id, p.con.address);
                     }
                 }else{
                     info("&lyNo players connected.");

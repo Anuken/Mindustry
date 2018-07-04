@@ -369,8 +369,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
 	public void updateSelectedBlock(){
 		Block block = editor.getDrawBlock();
 		int i = 0;
-		for(Block test : Block.all()){
-			if(block == test){
+		for(int j = 0; j < Block.all().size; j ++){
+			if(block.id == j){
 				blockgroup.getButtons().get(i).setChecked(true);
 				break;
 			}

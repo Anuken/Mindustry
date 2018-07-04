@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.IntFormat;
@@ -288,10 +289,11 @@ public class HudFragment extends Fragment{
 	}
 
 	private String getEnemiesRemaining() {
-		if(state.enemies == 1) {
-			return Bundles.format("text.enemies.single", state.enemies);
+		int enemies = unitGroups[Team.red.ordinal()].size();
+		if(enemies == 1) {
+			return Bundles.format("text.enemies.single", enemies);
 		} else {
-			return Bundles.format("text.enemies", state.enemies);
+			return Bundles.format("text.enemies", enemies);
 		}
 	}
 
@@ -310,7 +312,7 @@ public class HudFragment extends Fragment{
 
 				row();
 
-				new label(() -> state.enemies > 0 ?
+				new label(() -> unitGroups[Team.red.ordinal()].size() > 0 && state.mode.disableWaveTimer ?
 					getEnemiesRemaining() :
 						(state.mode.disableWaveTimer) ? "$text.waiting"
 								: timef.get((int) (state.wavetime / 60f)))
@@ -333,10 +335,9 @@ public class HudFragment extends Fragment{
 		}).height(uheight).fillX().right().padTop(-8f).padBottom(-12f).padLeft(-15).padRight(-10).width(40f).update(l->{
 			boolean vis = state.mode.disableWaveTimer && (Net.server() || !Net.active());
 			boolean paused = state.is(State.paused) || !vis;
-			
-			l.setVisible(vis);
+
 			l.getStyle().imageUp = Core.skin.getDrawable(vis ? "icon-play" : "clear");
 			l.setTouchable(!paused ? Touchable.enabled : Touchable.disabled);
-		});
+		}).visible(() -> state.mode.disableWaveTimer && (Net.server() || !Net.active()) && unitGroups[Team.red.ordinal()].size() == 0);
 	}
 }

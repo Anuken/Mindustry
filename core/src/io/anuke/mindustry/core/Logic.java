@@ -70,9 +70,7 @@ public class Logic extends Module {
 
     public void reset(){
         state.wave = 1;
-        state.extrawavetime = maxwavespace * state.difficulty.maxTimeScaling;
         state.wavetime = wavespace * state.difficulty.timeScaling;
-        state.enemies = 0;
         state.gameOver = false;
         state.teams = new TeamInfo();
         state.teams.add(Team.blue, true);
@@ -89,7 +87,6 @@ public class Logic extends Module {
         state.spawner.spawnEnemies();
         state.wave ++;
         state.wavetime = wavespace * state.difficulty.timeScaling;
-        state.extrawavetime = maxwavespace * state.difficulty.maxTimeScaling;
 
         Events.fire(WaveEvent.class);
     }
@@ -133,15 +130,10 @@ public class Logic extends Module {
             if(!state.is(State.paused) || Net.active()){
 
                 if(!state.mode.disableWaveTimer){
-
-                    if(state.enemies <= 0){
-                        if(!world.getMap().name.equals("tutorial")) state.wavetime -= Timers.delta();
-                    }else{
-                        state.extrawavetime -= Timers.delta();
-                    }
+                    state.wavetime -= Timers.delta();
                 }
 
-                if(!Net.client() && (state.wavetime <= 0 || state.extrawavetime <= 0)){
+                if(!Net.client() && state.wavetime <= 0){
                     runWave();
                 }
 

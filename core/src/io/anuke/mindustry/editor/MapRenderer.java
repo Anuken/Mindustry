@@ -61,7 +61,7 @@ public class MapRenderer implements Disposable{
         while(it.hasNext){
             int i = it.next();
             int x = i % width;
-            int y = i / height;
+            int y = i / width;
             render(x, y);
         }
         updates.clear();

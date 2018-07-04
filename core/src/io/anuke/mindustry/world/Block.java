@@ -432,7 +432,7 @@ public class Block extends BaseBlock implements Content{
 		
 		if(shadowRegions != null) {
 			Draw.rect(shadowRegions[(Mathf.randomSeed(tile.id(), 0, variants - 1))], tile.worldx(), tile.worldy());
-		}else{
+		}else if(shadowRegion != null){
 			Draw.rect(shadowRegion, tile.drawx(), tile.drawy());
 		}
 	}

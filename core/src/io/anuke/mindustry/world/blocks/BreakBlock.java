@@ -76,7 +76,7 @@ public class BreakBlock extends Block {
     public void afterDestroyed(Tile tile, TileEntity e){
         BreakEntity entity = (BreakEntity)e;
 
-        if(entity.previous.synthetic()){
+        if(entity != null && entity.previous != null && entity.previous.synthetic()){
             tile.setBlock(entity.previous);
         }
     }
@@ -145,7 +145,9 @@ public class BreakBlock extends Block {
 
         if(tile.entity instanceof BreakEntity){
             BreakEntity entity = tile.entity();
-            Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), entity.previous.size);
+            if(entity.previous != null){
+                Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), entity.previous.size);
+            }
         }
 
         world.removeBlock(tile);
@@ -186,6 +188,10 @@ public class BreakBlock extends Block {
             }
 
             progress += add;
+
+            if(progress > 1.0001f){
+                progress = 1.0001f;
+            }
         }
 
         public float progress(){

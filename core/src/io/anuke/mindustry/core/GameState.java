@@ -12,8 +12,6 @@ public class GameState{
 
 	public int wave = 1;
 	public float wavetime;
-	public float extrawavetime;
-	public int enemies = 0;
 	public boolean gameOver = false;
 	public GameMode mode = GameMode.waves;
 	public Difficulty difficulty = Difficulty.normal;

@@ -4,12 +4,13 @@ import io.anuke.ucore.util.Bundles;
 
 public enum GameMode{
 	waves,
-	sandbox{
+	//disabled for technical reasons
+	/*sandbox{
 		{
 			infiniteResources = true;
 			disableWaveTimer = true;
 		}
-	},
+	},*/
     freebuild{
         {
             disableWaveTimer = true;

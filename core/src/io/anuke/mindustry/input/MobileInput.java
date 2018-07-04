@@ -353,7 +353,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             if(tile != null){
 
                 //draw placing
-                if(mode == placing) {
+                if(mode == placing && recipe != null) {
                     NormalizeDrawResult dresult = PlaceUtils.normalizeDrawArea(recipe.result, lineStartX, lineStartY, tile.x, tile.y, true, maxLength, lineScale);
 
                     Lines.rect(dresult.x, dresult.y, dresult.x2 - dresult.x, dresult.y2 - dresult.y);
@@ -465,7 +465,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             if (tile == null) return false;
 
-            if(mode == placing) {
+            if(mode == placing && recipe != null) {
 
                 //normalize area
                 NormalizeResult result = PlaceUtils.normalizeArea(lineStartX, lineStartY, tile.x, tile.y, rotation, true, 100);
@@ -597,6 +597,10 @@ public class MobileInput extends InputHandler implements GestureListener{
 	        lineMode = false;
 	        removals.addAll(selection);
 	        selection.clear();
+        }
+
+        if(lineMode && mode == placing && recipe == null){
+	        lineMode = false;
         }
 
         //if there is no mode and there's a recipe, switch to placing
