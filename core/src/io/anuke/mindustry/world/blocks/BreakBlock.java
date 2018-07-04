@@ -91,6 +91,8 @@ public class BreakBlock extends Block {
 
         Shaders.blockbuild.color = Palette.remove;
 
+        if(entity.previous == null) return;
+
         for(TextureRegion region : entity.previous.getBlockIcon()){
             Shaders.blockbuild.region = region;
             Shaders.blockbuild.progress = (float)(1f-entity.progress); //progress reversed

@@ -87,7 +87,7 @@ public class PlayerListFragment extends Fragment{
         float h = 74f;
 
         for(Player player : playerGroup.all()){
-            NetConnection connection = gwt ? null : Net.getConnection(player.clientid);
+            NetConnection connection = gwt ? null : player.con;
 
             if(connection == null && Net.server() && !player.isLocal) continue;
 

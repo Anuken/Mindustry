@@ -8,6 +8,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.game.GameMode;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.Version;
@@ -220,12 +221,7 @@ public class ServerControl extends Module {
                 if(playerGroup.size() > 0) {
                     info("&lyPlayers: {0}", playerGroup.size());
                     for (Player p : playerGroup.all()) {
-                        //TODO
-                        if(Net.getConnection(p.clientid) == null){
-                            netServer.onDisconnect(p);
-                            continue;
-                        }
-                        print("   &y{0} / Connection {1} / IP: {2}", p.name, p.clientid, Net.getConnection(p.clientid).address);
+                        print("   &y{0} / Connection {1} / IP: {2}", p.name, p.con, p.con.address);
                     }
                 }else{
                     info("&lyNo players connected.");
@@ -239,7 +235,7 @@ public class ServerControl extends Module {
                 return;
             }
 
-            //netCommon.sendMessage("[GRAY][[Server]:[] " + arg[0]);
+            Call.sendMessage("[GRAY][[Server]:[] " + arg[0]);
 
             info("&lyServer: &lb{0}", arg[0]);
         });
@@ -296,6 +292,24 @@ public class ServerControl extends Module {
             }
         });
 
+        handler.register("allow-custom-clients", "[on/off]", "Allow or disallow custom clients.", arg -> {
+            if(arg.length == 0){
+                info("Custom clients are currently &lc{0}.", netServer.admins.allowsCustomClients() ? "allowed" : "disallowed");
+                return;
+            }
+
+            String s = arg[0];
+            if(s.equalsIgnoreCase("on")){
+                netServer.admins.setCustomClients(true);
+                info("Custom clients enabled.");
+            }else if(s.equalsIgnoreCase("off")){
+                netServer.admins.setCustomClients(false);
+                info("Custom clients disabled.");
+            }else{
+                err("Incorrect command usage.");
+            }
+        });
+
         handler.register("shuffle", "<normal/custom/both/off>", "Set map shuffling.", arg -> {
 
             try{
@@ -324,7 +338,7 @@ public class ServerControl extends Module {
             }
 
             if(target != null){
-                netServer.kick(target.clientid, KickReason.kick);
+                netServer.kick(target.con.id, KickReason.kick);
                 info("It is done.");
             }else{
                 info("Nobody with that name could be found...");
@@ -347,10 +361,10 @@ public class ServerControl extends Module {
             }
 
             if(target != null){
-                String ip = Net.getConnection(target.clientid).address;
+                String ip = target.con.address;
                 netServer.admins.banPlayerIP(ip);
                 netServer.admins.banPlayerID(target.uuid);
-                netServer.kick(target.clientid, KickReason.banned);
+                netServer.kick(target.con.id, KickReason.banned);
                 info("Banned player by IP and ID: {0} / {1}", ip, target.uuid);
             }else{
                 info("Nobody with that name could be found.");
@@ -391,10 +405,9 @@ public class ServerControl extends Module {
                 info("Banned player by IP: {0}.", arg[0]);
 
                 for(Player player : playerGroup.all()){
-                    if(Net.getConnection(player.clientid) != null &&
-                            Net.getConnection(player.clientid).address != null &&
-                            Net.getConnection(player.clientid).address.equals(arg[0])){
-                        netServer.kick(player.clientid, KickReason.banned);
+                    if(player.con.address != null &&
+                            player.con.address.equals(arg[0])){
+                        netServer.kick(player.con.id, KickReason.banned);
                         break;
                     }
                 }
@@ -409,7 +422,7 @@ public class ServerControl extends Module {
 
                 for(Player player : playerGroup.all()){
                     if(player.uuid.equals(arg[0])){
-                        netServer.kick(player.clientid, KickReason.banned);
+                        netServer.kick(player.con.id, KickReason.banned);
                         break;
                     }
                 }

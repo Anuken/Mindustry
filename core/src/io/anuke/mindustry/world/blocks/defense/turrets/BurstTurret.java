@@ -29,9 +29,9 @@ public class BurstTurret extends ItemTurret {
                 entity.recoil = recoil;
 
                 tr.trns(entity.rotation, size * tilesize / 2, Mathf.range(xRand));
-                useAmmo(tile);
                 bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy));
                 effects(tile);
+                useAmmo(tile);
             });
         }
     }

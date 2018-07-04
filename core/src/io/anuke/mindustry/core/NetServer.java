@@ -74,6 +74,7 @@ public class NetServer extends Module{
             if(player != null){
                 onDisconnect(player);
             }
+            connections.remove(id);
         });
 
         Net.handleServer(ConnectPacket.class, (id, packet) -> {
@@ -94,6 +95,11 @@ public class NetServer extends Module{
 
             if(TimeUtils.millis() - info.lastKicked < kickDuration){
                 kick(id, KickReason.recentKick);
+                return;
+            }
+
+            if(packet.version == -1 && Version.build != -1 && !admins.allowsCustomClients()){
+                kick(id, KickReason.customClient);
                 return;
             }
 
@@ -137,7 +143,7 @@ public class NetServer extends Module{
 
             Player player = new Player();
             player.isAdmin = admins.isAdmin(uuid, packet.usid);
-            player.clientid = id;
+            player.con = Net.getConnection(id);
             player.usid = packet.usid;
             player.name = packet.name;
             player.uuid = uuid;
@@ -322,9 +328,9 @@ public class NetServer extends Module{
 
             //iterate through each player
             for (Player player : connections.values()) {
-                NetConnection connection = Net.getConnection(player.clientid);
+                NetConnection connection = player.con;
 
-                if(connection == null || !connection.isConnected()){
+                if(!connection.isConnected()){
                     //player disconnected, ignore them
                     onDisconnect(player);
                     return;
@@ -406,18 +412,25 @@ public class NetServer extends Module{
 
                 byte[] bytes = syncStream.toByteArray();
 
-                connection.lastSentRawSnapshot = bytes;
-
                 if(connection.currentBaseID == -1){
+                    //assign to last sent snapshot so that there is only ever one unique snapshot with ID 0
+                    if(connection.lastSentSnapshot != null){
+                        bytes = connection.lastSentSnapshot;
+                    }else{
+                        connection.lastSentRawSnapshot = bytes;
+                        connection.lastSentSnapshot = bytes;
+                    }
+
                     if(showSnapshotSize) Log.info("Sent raw snapshot: {0} bytes.", bytes.length);
-                    ///Nothing to diff off of in this case, send the whole thing, but increment the counter
-                    connection.lastSentSnapshot = bytes;
+                    ///Nothing to diff off of in this case, send the whole thing
                     sendSplitSnapshot(connection.id, bytes, 0, -1);
                 }else{
+                    connection.lastSentRawSnapshot = bytes;
+
                     //send diff, otherwise
                     byte[] diff = ByteDeltaEncoder.toDiff(new ByteMatcherHash(connection.currentBaseSnapshot, bytes), encoder);
-                    if(showSnapshotSize) Log.info("Shrank snapshot: {0} -> {1}, Base {2} ID {3}", bytes.length, diff.length, connection.currentBaseID, connection.lastSentSnapshotID);
-                    sendSplitSnapshot(connection.id, diff, connection.lastSentSnapshotID + 1, connection.currentBaseID);
+                    if(showSnapshotSize) Log.info("Shrank snapshot: {0} -> {1}, Base {2} ID {3} base length = {4}", bytes.length, diff.length, connection.currentBaseID, connection.currentBaseID + 1, connection.currentBaseSnapshot.length);
+                    sendSplitSnapshot(connection.id, diff, connection.currentBaseID + 1, connection.currentBaseID);
                     connection.lastSentSnapshot = diff;
                     connection.lastSentSnapshotID = connection.currentBaseID + 1;
                     connection.lastSentBase = connection.currentBaseID;
@@ -432,7 +445,6 @@ public class NetServer extends Module{
     /**Sends a raw byte[] snapshot to a client, splitting up into chunks when needed.*/
     private static void sendSplitSnapshot(int userid, byte[] bytes, int snapshotID, int base){
         if(bytes.length < maxSnapshotSize){
-            if(showSnapshotSize) Log.info("Raw send() snapshot call: {0} bytes, sID {1}", bytes.length, snapshotID);
             Call.onSnapshot(userid, bytes, snapshotID, (short)0, (short)bytes.length, base);
         }else{
             int remaining = bytes.length;
@@ -461,7 +473,7 @@ public class NetServer extends Module{
         Call.sendMessage("[accent]" + player.name + " has disconnected.");
         Call.onPlayerDisconnect(player.id);
         player.remove();
-        netServer.connections.remove(player.clientid);
+        netServer.connections.remove(player.con.id);
     }
 
     @Remote(targets = Loc.client, called = Loc.server)
@@ -469,7 +481,7 @@ public class NetServer extends Module{
 
         if(!player.isAdmin){
             Log.err("ACCESS DENIED: Player {0} / {1} attempted to perform admin action without proper security access.",
-                    player.name, Net.getConnection(player.clientid).address);
+                    player.name, player.con.address);
             return;
         }
 
@@ -478,18 +490,19 @@ public class NetServer extends Module{
             return;
         }
 
-        String ip = Net.getConnection(other.clientid).address;
+        String ip = player.con.address;
 
         if(action == AdminAction.ban){
             netServer.admins.banPlayerIP(ip);
-            netServer.kick(other.clientid, KickReason.banned);
+            netServer.kick(other.con.id, KickReason.banned);
             Log.info("&lc{0} has banned {1}.", player.name, other.name);
         }else if(action == AdminAction.kick){
-            netServer.kick(other.clientid, KickReason.kick);
+            netServer.kick(other.con.id, KickReason.kick);
             Log.info("&lc{0} has kicked {1}.", player.name, other.name);
         }else if(action == AdminAction.trace){
-            if(player.clientid != -1) {
-                Call.onTraceInfo(player.clientid, netServer.admins.getTraceByID(other.uuid));
+            //TODO
+            if(player.con != null) {
+                Call.onTraceInfo(player.con.id, netServer.admins.getTraceByID(other.uuid));
             }else{
                 NetClient.onTraceInfo(netServer.admins.getTraceByID(other.uuid));
             }
@@ -500,7 +513,7 @@ public class NetServer extends Module{
     @Remote(targets = Loc.client)
     public static void connectConfirm(Player player){
         player.add();
-        Net.getConnection(player.clientid).hasConnected = true;
+        player.con.hasConnected = true;
         Call.sendMessage("[accent]" + player.name + " has connected.");
         Log.info("&y{0} has connected.", player.name);
     }

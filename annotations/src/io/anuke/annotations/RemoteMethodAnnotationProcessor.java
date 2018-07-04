@@ -114,7 +114,7 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
 
                     //create and add entry
                     MethodEntry method = new MethodEntry(entry.name, Utils.getMethodName(element), annotation.targets(), annotation.variants(),
-                            annotation.called(), annotation.unreliable(), annotation.forward(), lastMethodID++, (ExecutableElement) element);
+                            annotation.called(), annotation.unreliable(), annotation.forward(), lastMethodID++, (ExecutableElement) element, annotation.priority());
 
                     entry.methods.add(method);
                     methods.add(method);

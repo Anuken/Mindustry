@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.Map;
@@ -587,7 +588,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 		
 		for(Block block : Block.all()){
 			TextureRegion[] regions = block.getCompactIcon();
-			if((block.synthetic() && (Recipe.getByResult(block) == null || !control.database().isUnlocked(Recipe.getByResult(block)))) && !debug) continue;
+			if((block.synthetic() && (Recipe.getByResult(block) == null || !control.database().isUnlocked(Recipe.getByResult(block)))) && !debug && block != StorageBlocks.core) continue;
 
 			if(regions.length == 0 || regions[0] == Draw.region("jjfgj")) continue;
 

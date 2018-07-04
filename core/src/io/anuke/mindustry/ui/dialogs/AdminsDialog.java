@@ -2,8 +2,6 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.NetConnection;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Table;
 
@@ -46,9 +44,8 @@ public class AdminsDialog extends FloatingDialog {
                 ui.showConfirm("$text.confirm", "$text.confirmunadmin", () -> {
                     netServer.admins.unAdminPlayer(info.id);
                     for(Player player : playerGroup.all()){
-                        NetConnection c = Net.getConnection(player.clientid);
-                        if(c != null){
-                            //CallClient.adminSet(player, false);
+                        if(player.con != null){
+                            player.isAdmin = false;
                             break;
                         }
                     }

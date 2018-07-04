@@ -28,6 +28,8 @@ public class Annotations {
         boolean unreliable() default false;
         /**The simple class name where this method is placed.*/
         String in() default "Call";
+        /**Priority of this event.*/
+        PacketPriority priority() default PacketPriority.normal;
     }
 
     /**Specifies that this method will be used to write classes of the type returned by {@link #value()}.<br>
@@ -46,6 +48,15 @@ public class Annotations {
     @Retention(RetentionPolicy.CLASS)
     public @interface ReadClass {
         Class<?> value();
+    }
+
+    public enum PacketPriority {
+        /**Gets put in a queue and processed if not connected.*/
+        normal,
+        /**Gets handled immediately, regardless of connection status.*/
+        high,
+        /**Does not get handled unless client is connected.*/
+        low
     }
 
     /**A set of two booleans, one specifying server and one specifying client.*/

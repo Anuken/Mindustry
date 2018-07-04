@@ -1,6 +1,7 @@
 package io.anuke.annotations;
 
 import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.PacketPriority;
 import io.anuke.annotations.Annotations.Variant;
 
 import javax.lang.model.element.ExecutableElement;
@@ -26,9 +27,11 @@ public class MethodEntry {
     public final int id;
     /**The element method associated with this entry.*/
     public final ExecutableElement element;
+    /**The assigned packet priority. Only used in clients.*/
+    public final PacketPriority priority;
 
     public MethodEntry(String className, String targetMethod, Loc where, Variant target,
-                       Loc local, boolean unreliable, boolean forward, int id, ExecutableElement element) {
+                       Loc local, boolean unreliable, boolean forward, int id, ExecutableElement element, PacketPriority priority) {
         this.className = className;
         this.forward = forward;
         this.targetMethod = targetMethod;
@@ -38,6 +41,7 @@ public class MethodEntry {
         this.id = id;
         this.element = element;
         this.unreliable = unreliable;
+        this.priority = priority;
     }
 
     @Override

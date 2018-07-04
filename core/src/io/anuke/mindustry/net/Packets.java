@@ -6,8 +6,6 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.io.Version;
-import io.anuke.mindustry.net.Packet.ImportantPacket;
-import io.anuke.mindustry.net.Packet.UnimportantPacket;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.io.IOUtils;
 import io.anuke.ucore.util.Mathf;
@@ -19,13 +17,23 @@ import static io.anuke.mindustry.Vars.world;
 /**Class for storing all packets.*/
 public class Packets {
 
-    public static class Connect implements ImportantPacket{
+    public static class Connect implements Packet{
         public int id;
         public String addressTCP;
+
+        @Override
+        public boolean isImportant() {
+            return true;
+        }
     }
 
-    public static class Disconnect implements ImportantPacket{
+    public static class Disconnect implements Packet{
         public int id;
+
+        @Override
+        public boolean isImportant() {
+            return true;
+        }
     }
 
     public static class WorldStream extends Streamable{
@@ -62,7 +70,7 @@ public class Packets {
     }
 
     public static class InvokePacket implements Packet{
-        public byte type;
+        public byte type, priority;
 
         public ByteBuffer writeBuffer;
         public int writeLength;
@@ -70,6 +78,7 @@ public class Packets {
         @Override
         public void read(ByteBuffer buffer) {
             type = buffer.get();
+            priority = buffer.get();
             writeLength = buffer.getShort();
             byte[] bytes = new byte[writeLength];
             buffer.get(bytes);
@@ -79,6 +88,7 @@ public class Packets {
         @Override
         public void write(ByteBuffer buffer) {
             buffer.put(type);
+            buffer.put(priority);
             buffer.putShort((short)writeLength);
 
             writeBuffer.position(0);
@@ -86,17 +96,20 @@ public class Packets {
                 buffer.put(writeBuffer.get());
             }
         }
-    }
 
-    public static class SnapshotPacket implements Packet, UnimportantPacket{
         @Override
-        public void read(ByteBuffer buffer) {
-
+        public void reset() {
+            priority = 0;
         }
 
         @Override
-        public void write(ByteBuffer buffer) {
+        public boolean isImportant() {
+            return priority == 1;
+        }
 
+        @Override
+        public boolean isUnimportant() {
+            return priority == 2;
         }
     }
 
@@ -155,7 +168,7 @@ public class Packets {
     }
 
     public enum KickReason{
-        kick, invalidPassword, clientOutdated, serverOutdated, banned, gameover(true), recentKick, nameInUse, idInUse, fastShoot, nameEmpty;
+        kick, invalidPassword, clientOutdated, serverOutdated, banned, gameover(true), recentKick, nameInUse, idInUse, fastShoot, nameEmpty, customClient;
         public final boolean quiet;
 
         KickReason(){ quiet = false; }
