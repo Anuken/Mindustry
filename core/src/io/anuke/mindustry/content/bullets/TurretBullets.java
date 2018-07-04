@@ -12,8 +12,8 @@ import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.bullet.LiquidBulletType;
 import io.anuke.mindustry.entities.effect.Fire;
+import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.Lightning;
-import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.Item;
@@ -258,7 +258,7 @@ public class TurretBullets extends BulletList implements ContentList {
                     if(amountDropped > 0){
                         float angle = b.angle() + Mathf.range(100f);
                         float vs = Mathf.random(0f, 4f);
-                        CallEntity.createItemDrop(Item.getByID(i), amountDropped, b.x, b.y, Angles.trnsx(angle, vs), Angles.trnsy(angle, vs));
+                        ItemDrop.create(Item.getByID(i), amountDropped, b.x, b.y, Angles.trnsx(angle, vs), Angles.trnsy(angle, vs));
                     }
                 }
             }

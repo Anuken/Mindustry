@@ -57,8 +57,7 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
         return drop;
     }
 
-    @Remote(called = Loc.server, in = In.entities)
-    public static void createItemDrop(Item item, int amount, float x, float y, float velocityX, float velocityY){
+    public static void create(Item item, int amount, float x, float y, float velocityX, float velocityY){
         create(item, amount, x, y, 0).getVelocity().set(velocityX, velocityY);
     }
 

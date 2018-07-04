@@ -199,7 +199,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 	public void damage(float amount){
 		CallEntity.onPlayerDamage(this, calculateDamage(amount));
 
-		if(health <= 0 && !dead && isLocal){
+		if(health <= 0 && !dead){
 			CallEntity.onPlayerDeath(this);
 		}
 	}

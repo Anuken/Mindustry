@@ -220,7 +220,7 @@ public abstract class InputHandler extends InputAdapter{
 		if(tile.block().acceptStack(stack.item, stack.amount, tile, player) > 0 && tile.block().hasItems){
 			CallBlocks.transferInventory(player, tile);
 		}else{
-			CallEntity.dropItem(player, player.angleTo(x, y));
+			CallEntity.dropItem(player.angleTo(x, y));
 		}
 	}
 
@@ -267,7 +267,7 @@ public abstract class InputHandler extends InputAdapter{
 		player.addBuildRequest(new BuildRequest(tile.x, tile.y));
 	}
 
-	@Remote(targets = Loc.both, called = Loc.server, in = In.entities)
+	@Remote(targets = Loc.client, called = Loc.server, in = In.entities)
 	public static void dropItem(Player player, float angle){
 		if(Net.server() && !player.inventory.hasItem()){
 			throw new ValidateException(player, "Player cannot drop an item.");

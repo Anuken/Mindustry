@@ -2,7 +2,7 @@ package io.anuke.mindustry.entities.units;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.type.Item;
 import io.anuke.ucore.util.Mathf;
 
@@ -23,7 +23,7 @@ public class UnitDrops {
             for(Item item : dropTable){
                 if(Mathf.chance(0.2)){
                     int amount = Mathf.random(1, 5);
-                    CallEntity.createItemDrop(item, amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f),
+                    ItemDrop.create(item, amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f),
                             unit.getVelocity().x + Mathf.range(3f), unit.getVelocity().y + Mathf.range(3f));
                 }
             }
