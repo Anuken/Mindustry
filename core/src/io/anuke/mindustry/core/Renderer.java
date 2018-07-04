@@ -191,11 +191,8 @@ public class Renderer extends RendererModule{
 		Graphics.clear(clearColor);
 		
 		batch.setProjectionMatrix(camera.combined);
-		
-		if(pixelate) 
-			Graphics.surface(pixelSurface, false);
-		else
-			batch.begin();
+
+		Graphics.surface(pixelSurface, false);
 
 		drawPadding();
 		
@@ -222,6 +219,7 @@ public class Renderer extends RendererModule{
 			Graphics.endShaders();
 		}
 
+
         drawAllTeams(false);
 
 		blocks.skipLayer(Layer.turret);
@@ -236,18 +234,19 @@ public class Renderer extends RendererModule{
 		drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
 		overlays.drawTop();
 
-		if(pixelate)
-			Graphics.flushSurface();
+		Graphics.flushSurface();
 
 		if(showPaths && debug) drawDebug();
-
-		drawAndInterpolate(playerGroup, p -> !p.isLocal && !p.isDead(), Player::drawName);
 
 		batch.end();
 
 		if(showFog){
 			fog.draw();
 		}
+
+		batch.begin();
+		drawAndInterpolate(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
+		batch.end();
 	}
 
 	private void drawAllTeams(boolean flying){

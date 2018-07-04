@@ -163,6 +163,11 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 	}
 
 	@Override
+	public boolean isValid() {
+		return super.isValid() && isAdded();
+	}
+
+	@Override
 	public Timer getTimer() {
 		return timer;
 	}
