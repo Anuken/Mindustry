@@ -8,6 +8,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.game.GameMode;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.SaveIO;
@@ -138,7 +139,7 @@ public class ServerControl extends Module {
             Log.info("Stopped server.");
         });
 
-        handler.register("host", "[mapname] [mode]", "Open the server with a specific map.", arg -> {
+        handler.register("host", "[mode] [mapname]", "Open the server with a specific map.", arg -> {
             if(state.is(State.playing)){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
@@ -147,34 +148,39 @@ public class ServerControl extends Module {
             Map result = null;
 
             if(arg.length > 0) {
-                String search = arg[0];
-                for (Map map : world.maps().all()) {
-                    if (map.name.equalsIgnoreCase(search))
-                        result = map;
-                }
-
-                if(result == null){
-                    err("No map with name &y'{0}'&lr found.", search);
-                    return;
-                }
-
                 GameMode mode;
                 try{
-                    mode = arg.length < 2 ? GameMode.waves : GameMode.valueOf(arg[1]);
+                    mode = GameMode.valueOf(arg[0]);
                 }catch (IllegalArgumentException e){
-                    err("No gamemode '{0}' found.", arg[1]);
+                    err("No gamemode '{0}' found.", arg[0]);
                     return;
                 }
 
                 info("Loading map...");
                 state.mode = mode;
 
-                logic.reset();
-                world.loadMap(result);
+                if(arg.length > 1) {
+                    String search = arg[1];
+                    for (Map map : world.maps().all()) {
+                        if (map.name.equalsIgnoreCase(search))
+                            result = map;
+                    }
+
+                    if (result == null) {
+                        err("No map with name &y'{0}'&lr found.", search);
+                        return;
+                    }
+
+                    logic.reset();
+                    world.loadMap(result);
+                }else{
+                    Log.info("&ly&fiNo map specified, so a procedural one was generated.");
+                    world.loadProceduralMap();
+                }
 
             }else{
-                world.loadProceduralMap();
                 Log.info("&ly&fiNo map specified, so a procedural one was generated.");
+                world.loadProceduralMap();
             }
 
             logic.play();
@@ -194,10 +200,10 @@ public class ServerControl extends Module {
             if(state.is(State.menu)){
                 info("&lyStatus: &rserver closed");
             }else{
-                info("&lyStatus: &lcPlaying on map &fi{0}&fb &lb/&lc Wave {1} &lb/&lc {2}",
-                        Strings.capitalize(world.getMap().name), state.wave, Strings.capitalize(state.difficulty.name()));
-                if(state.enemies > 0){
-                    info("&ly{0} enemies remaining.", state.enemies);
+                info("&lyStatus: &lcPlaying on map &fi{0}&fb &lb/&lc Wave {1} &lb/&lc {2} &lb/&lc {3}",
+                        Strings.capitalize(world.getMap().name), state.wave, Strings.capitalize(state.difficulty.name()), Strings.capitalize(state.mode.name()));
+                if(state.mode.disableWaveTimer){
+                    info("&ly{0} enemies.", unitGroups[Team.red.ordinal()].size());
                 }else{
                     info("&ly{0} seconds until next wave.", (int)(state.wavetime / 60));
                 }
@@ -464,6 +470,7 @@ public class ServerControl extends Module {
 
             if(target != null){
                 netServer.admins.adminPlayer(target.uuid, target.usid);
+                target.isAdmin = true;
                 info("Admin-ed player by ID: {0} / {1}", target.uuid, arg[0]);
             }else{
                 info("Nobody with that name could be found.");
@@ -487,6 +494,7 @@ public class ServerControl extends Module {
 
             if(target != null){
                 netServer.admins.unAdminPlayer(target.uuid);
+                target.isAdmin = false;
                 info("Un-admin-ed player by ID: {0} / {1}", target.uuid, arg[0]);
             }else{
                 info("Nobody with that name could be found.");
@@ -509,8 +517,6 @@ public class ServerControl extends Module {
         handler.register("runwave", "Trigger the next wave.", arg -> {
             if(!state.is(State.playing)) {
                 err("Not hosting. Host a game first.");
-            }else if(state.enemies > 0){
-                err("There are still {0} enemies remaining.", state.enemies);
             }else{
                 logic.runWave();
                 info("Wave spawned.");

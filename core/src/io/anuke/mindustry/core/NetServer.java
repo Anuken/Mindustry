@@ -485,14 +485,18 @@ public class NetServer extends Module{
             return;
         }
 
-        if(other == null || other.isAdmin){
+        if(other == null || (other.isAdmin && other != player)){ //fun fact: this means you can ban yourself
             Log.err("{0} attempted to perform admin action on nonexistant or admin player.", player.name);
             return;
         }
 
         String ip = player.con.address;
 
-        if(action == AdminAction.ban){
+        if(action == AdminAction.wave) {
+            //no verification is done, so admins can hypothetically spam waves
+            //not a real issue, because server owners may want to do just that
+            state.wavetime = 0f;
+        }else if(action == AdminAction.ban){
             netServer.admins.banPlayerIP(ip);
             netServer.kick(other.con.id, KickReason.banned);
             Log.info("&lc{0} has banned {1}.", player.name, other.name);

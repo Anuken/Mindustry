@@ -179,7 +179,7 @@ public class Packets {
     }
 
     public enum AdminAction{
-        kick, ban, trace
+        kick, ban, trace, wave
     }
 
     /**Marks the beginning of a stream.*/

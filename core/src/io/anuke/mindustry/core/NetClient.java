@@ -219,6 +219,7 @@ public class NetClient extends Module {
             new Random().nextBytes(bytes);
             String result = new String(Base64Coder.encode(bytes));
             Settings.putString("usid-" + ip, result);
+            Settings.save();
             return result;
         }
     }

@@ -8,7 +8,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.IntFormat;
 import io.anuke.mindustry.ui.Minimap;
@@ -331,13 +333,17 @@ public class HudFragment extends Fragment{
 
 	private void playButton(float uheight){
 		new imagebutton("icon-play", 30f, () -> {
-			state.wavetime = 0f;
+			if(Net.client() && players[0].isAdmin){
+				Call.onAdminRequest(players[0], AdminAction.wave);
+			}else {
+				state.wavetime = 0f;
+			}
 		}).height(uheight).fillX().right().padTop(-8f).padBottom(-12f).padLeft(-15).padRight(-10).width(40f).update(l->{
-			boolean vis = state.mode.disableWaveTimer && (Net.server() || !Net.active());
+			boolean vis = state.mode.disableWaveTimer && ((Net.server() || players[0].isAdmin) || !Net.active());
 			boolean paused = state.is(State.paused) || !vis;
 
 			l.getStyle().imageUp = Core.skin.getDrawable(vis ? "icon-play" : "clear");
 			l.setTouchable(!paused ? Touchable.enabled : Touchable.disabled);
-		}).visible(() -> state.mode.disableWaveTimer && (Net.server() || !Net.active()) && unitGroups[Team.red.ordinal()].size() == 0);
+		}).visible(() -> state.mode.disableWaveTimer && ((Net.server() || players[0].isAdmin) || !Net.active()) && unitGroups[Team.red.ordinal()].size() == 0);
 	}
 }
