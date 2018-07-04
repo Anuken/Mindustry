@@ -43,11 +43,12 @@ public class Administration {
     }
 
     public boolean allowsCustomClients(){
-        return Settings.getBool("kick-custom", headless);
+        return Settings.getBool("allow-custom", !headless);
     }
 
     public void setCustomClients(boolean allowed){
-        Settings.getBool("kick-custom", allowed);
+        Settings.putBool("allow-custom", allowed);
+        Settings.save();
     }
 
     public boolean isValidateReplace(){
