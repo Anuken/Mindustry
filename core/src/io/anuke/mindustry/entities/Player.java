@@ -30,10 +30,7 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.ThreadQueue;
-import io.anuke.ucore.util.Timer;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -451,6 +448,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 			updateBuilding(this); //building happens even with non-locals
 			status.update(this); //status effect updating also happens with non locals for effect purposes
 
+			if(getCarrier() != null){
+				x = getCarrier().getX();
+				y = getCarrier().getY();
+			}
+
 			if(Net.server()){
 				updateShooting(); //server simulates player shooting
 			}
@@ -532,11 +534,16 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
 		movement.limit(speed);
 
-		velocity.add(movement);
-
-		float prex = x, prey = y;
-		updateVelocityStatus(mech.drag, 10f);
-		moved = distanceTo(prex, prey) > 0.01f;
+		if(getCarrier() == null){
+			velocity.add(movement);
+			float prex = x, prey = y;
+			updateVelocityStatus(mech.drag, 10f);
+			moved = distanceTo(prex, prey) > 0.01f;
+		}else{
+			velocity.setZero();
+			x = Mathf.lerpDelta(x, getCarrier().getX(), 0.1f);
+			y = Mathf.lerpDelta(y, getCarrier().getY(), 0.1f);
+		}
 
 		if(!isShooting()){
 			if(!movement.isZero()) {

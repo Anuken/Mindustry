@@ -306,11 +306,18 @@ public class Renderer extends RendererModule{
 				}
 			}
 
+			//TODO extremely hacky
+			if(t instanceof Player && ((Player) t).getCarry() != null && ((Player) t).getCarry() instanceof Player && ((Player) ((Player) t).getCarry()).isLocal){
+				((Player) t).x = ((Player) t).getCarry().getX();
+				((Player) t).y = ((Player) t).getCarry().getY();
+			}
+
 			drawer.accept(t);
 
+			t.setX(lastx);
+			t.setY(lasty);
+
 			if(threads.doInterpolate() && threads.isEnabled()) {
-				t.setX(lastx);
-				t.setY(lasty);
 
 				if (t instanceof SolidTrait) {
 					((SolidTrait) t).setRotation(lastrot);
