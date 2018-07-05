@@ -49,11 +49,14 @@ public class Saves {
             if(time > Settings.getInt("saveinterval")*60) {
                 saving = true;
 
-                exec.submit(() -> {
-                    SaveIO.saveToSlot(current.index);
-                    current.meta = SaveIO.getData(current.index);
+                Timers.run(2f, () -> {
+                    try {
+                        SaveIO.saveToSlot(current.index);
+                        current.meta = SaveIO.getData(current.index);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                     saving = false;
-                    return true;
                 });
 
                 time = 0;
