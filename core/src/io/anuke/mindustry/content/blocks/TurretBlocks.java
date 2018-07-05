@@ -93,6 +93,7 @@ public class TurretBlocks extends BlockList implements ContentList {
 			cooldown = 0.03f;
 			powerUsed = 20f;
 			powerCapacity = 60f;
+			shootShake = 2f;
 			shootEffect = ShootFx.lancerLaserShoot;
 			smokeEffect = ShootFx.lancerLaserShootSmoke;
 			chargeEffect = ShootFx.lancerLaserCharge;
