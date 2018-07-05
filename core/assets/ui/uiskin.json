@@ -15,6 +15,11 @@ com.badlogic.gdx.graphics.g2d.BitmapFont: {
 		markupEnabled: true,
 		scale: 0.5
 	},
+	trad-chinese: {
+		file: trad_chinese.fnt,
+		markupEnabled: true,
+		scale: 0.5
+	},
 	title: {
 		file: title.fnt,
 		markupEnabled: true,
