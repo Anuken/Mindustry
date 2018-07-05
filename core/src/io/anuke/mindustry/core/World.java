@@ -100,6 +100,10 @@ public class World extends Module{
 		return tiles[0].length;
 	}
 
+	public int toPacked(int x, int y){
+		return x + y *width();
+	}
+
 	public Tile tile(int packed){
 		return tiles == null ? null : tile(packed % width(), packed / width());
 	}

@@ -8,32 +8,36 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.gen.CallBlocks;
 import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Build;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.BreakBlock;
-import io.anuke.mindustry.world.blocks.BreakBlock.BreakEntity;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Shapes;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Geometry;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Translator;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
 /**Interface for units that build, break or mine things.*/
-public interface BuilderTrait {
+public interface BuilderTrait extends Entity{
     //these are not instance variables!
     Translator[] tmptr = {new Translator(), new Translator(), new Translator(), new Translator()};
     float placeDistance = 140f;
@@ -53,6 +57,49 @@ public interface BuilderTrait {
 
     /**Build power, can be any float. 1 = builds recipes in normal time, 0 = doesn't build at all.*/
     float getBuildPower(Tile tile);
+
+    default void writeBuilding(DataOutput output) throws IOException{
+        BuildRequest request = getCurrentRequest();
+
+        if(request != null){
+            output.writeByte(request.remove ? 1 : 0);
+            output.writeInt(world.toPacked(request.x, request.y));
+            if(!request.remove){
+                output.writeByte(request.recipe.id);
+                output.writeByte(request.rotation);
+            }
+        }else{
+            output.writeByte(-1);
+        }
+    }
+
+    default void readBuilding(DataInput input) throws IOException{
+        readBuilding(input, true);
+    }
+
+    default void readBuilding(DataInput input, boolean applyChanges) throws IOException{
+        synchronized (getPlaceQueue()) {
+            if(applyChanges) getPlaceQueue().clear();
+
+            byte type = input.readByte();
+            if (type != -1) {
+                int position = input.readInt();
+                BuildRequest request;
+
+                if (type == 1) { //remove
+                    request = new BuildRequest(position % world.width(), position / world.width());
+                } else { //place
+                    byte recipe = input.readByte();
+                    byte rotation = input.readByte();
+                    request = new BuildRequest(position % world.width(), position / world.width(), rotation, Recipe.getByID(recipe));
+                }
+
+                if(applyChanges){
+                    getPlaceQueue().addLast(request);
+                }
+            }
+        }
+    }
 
     /**Return whether this builder's place queue contains items.*/
     default boolean isBuilding(){
@@ -77,11 +124,7 @@ public interface BuilderTrait {
 
     /**Clears the placement queue.*/
     default void clearBuilding(){
-        if(this instanceof Player) {
-            CallBlocks.onBuildDeselect((Player) this);
-        }else{
-            getPlaceQueue().clear();
-        }
+        getPlaceQueue().clear();
     }
 
     /**Add another build requests to the tail of the queue, if it doesn't exist there yet.*/
@@ -119,75 +162,38 @@ public interface BuilderTrait {
             setMineTile(null);
         }
 
+        TileEntity core = unit.getClosestCore();
+
+        //if there is no core to build with, stop building!
+        if(core == null){
+            return;
+        }
+
         Tile tile = world.tile(current.x, current.y);
 
-        if(unit.distanceTo(tile) > placeDistance || //out of range, skip it
-                (current.lastEntity != null && current.lastEntity.isDead())) { //build/destroy request has died, skip it
-            getPlaceQueue().removeFirst();
-        }else if(current.remove){
-
-            if (!(tile.block() instanceof BreakBlock)) { //check if haven't started placing
-                if(Build.validBreak(unit.getTeam(), current.x, current.y)){
-
-                    //if it's valid, place it
-                    if(!current.requested && unit instanceof Player){
-                        CallBlocks.breakBlock((Player)unit, unit.getTeam(), current.x, current.y);
-                        current.requested = true;
-                    }
-                }else{
-                    //otherwise, skip it
-                    getPlaceQueue().removeFirst();
-                }
+        if (!(tile.block() instanceof BuildBlock)) {
+            if(!current.remove && Build.validPlace(unit.getTeam(), current.x, current.y, current.recipe.result, current.rotation)) {
+                Build.beginPlace(unit.getTeam(), current.x, current.y, current.recipe, current.rotation);
+            }else if(current.remove && Build.validBreak(unit.getTeam(), current.x, current.y)){
+                Build.beginBreak(unit.getTeam(), current.x, current.y);
             }else{
-                TileEntity core = unit.getClosestCore();
-
-                //if there is no core to build with, stop building!
-                if(core == null){
-                    return;
-                }
-
-                //otherwise, update it.
-                BreakEntity entity = tile.entity();
-                current.lastEntity = entity;
-
-                entity.addProgress(core, unit, 1f / entity.breakTime * Timers.delta() * getBuildPower(tile));
-                unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(entity), 0.4f);
-                getCurrentRequest().progress = entity.progress();
-            }
-        }else{
-            if (!(tile.block() instanceof BuildBlock)) { //check if haven't started placing
-                if(Build.validPlace(unit.getTeam(), current.x, current.y, current.recipe.result, current.rotation)){
-
-                    //if it's valid, place it
-                    if(!current.requested && unit instanceof Player){
-                        CallBlocks.placeBlock((Player)unit, unit.getTeam(), current.x, current.y, current.recipe, current.rotation);
-                        current.requested = true;
-                    }
-
-                }else{
-                    //otherwise, skip it
-                    getPlaceQueue().removeFirst();
-                }
-            }else{
-                TileEntity core = unit.getClosestCore();
-
-                //if there is no core to build with, stop building!
-                if(core == null){
-                    return;
-                }
-
-                //otherwise, update it.
-                BuildEntity entity = tile.entity();
-                current.lastEntity = entity;
-
-                entity.addProgress(core.items, 1f / entity.recipe.cost * Timers.delta() * getBuildPower(tile));
-                if(unit instanceof Player){
-                    entity.lastBuilder = (Player)unit;
-                }
-                unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(entity), 0.4f);
-                getCurrentRequest().progress = entity.progress();
+                getPlaceQueue().removeFirst();
+                return;
             }
         }
+
+        //otherwise, update it.
+        BuildEntity entity = tile.entity();
+
+        //deconstructing is 2x as fast
+        if(current.remove){
+            entity.deconstruct(unit, core, 2f / entity.buildCost * Timers.delta() * getBuildPower(tile));
+        }else{
+            entity.construct(unit, core, 1f / entity.buildCost * Timers.delta() * getBuildPower(tile));
+        }
+
+        unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(entity), 0.4f);
+        current.progress = entity.progress();
     }
 
     /**Do not call directly.*/
@@ -301,9 +307,6 @@ public interface BuilderTrait {
         public final int x, y, rotation;
         public final Recipe recipe;
         public final boolean remove;
-
-        public boolean requested;
-        public TileEntity lastEntity;
 
         public float progress;
 

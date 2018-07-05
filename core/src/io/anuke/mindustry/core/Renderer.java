@@ -245,7 +245,9 @@ public class Renderer extends RendererModule{
 		}
 
 		batch.begin();
+		EntityDraw.setClip(false);
 		drawAndInterpolate(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
+		EntityDraw.setClip(true);
 		batch.end();
 	}
 

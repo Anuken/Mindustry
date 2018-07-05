@@ -191,6 +191,10 @@ public class NetServer extends Module{
             player.setMineTile(packet.mining);
             player.isBoosting = packet.boosting;
             player.isShooting = packet.shooting;
+            player.getPlaceQueue().clear();
+            if(packet.currentRequest != null){
+                player.getPlaceQueue().addLast(packet.currentRequest);
+            }
 
             vector.set(packet.x - player.getInterpolator().target.x, packet.y - player.getInterpolator().target.y);
 

@@ -27,9 +27,10 @@ public class PowerBlocks extends BlockList implements ContentList {
         }};
 
         turbineGenerator = new TurbineGenerator("turbine-generator") {{
-            powerOutput = 0.25f;
+            powerOutput = 0.28f;
             powerCapacity = 40f;
             itemDuration = 30f;
+            auxLiquidUse = 0.05f;
             size = 2;
         }};
 

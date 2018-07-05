@@ -5,7 +5,9 @@ import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.io.Version;
+import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.io.IOUtils;
 import io.anuke.ucore.util.Mathf;
@@ -122,6 +124,7 @@ public class Packets {
         public float x, y, pointerX, pointerY, rotation, baseRotation, xv, yv;
         public Tile mining;
         public boolean boosting, shooting;
+        public BuildRequest currentRequest;
 
         @Override
         public void write(ByteBuffer buffer) {
@@ -145,6 +148,19 @@ public class Packets {
             buffer.putShort((short)(player.baseRotation*2));
 
             buffer.putInt(player.getMineTile() == null ? -1 : player.getMineTile().packedPosition());
+
+            BuildRequest request = player.getCurrentRequest();
+
+            if(request != null){
+                buffer.put(request.remove ? (byte)1 : 0);
+                buffer.putInt(world.toPacked(request.x, request.y));
+                if(!request.remove){
+                    buffer.put((byte)request.recipe.id);
+                    buffer.put((byte)request.rotation);
+                }
+            }else{
+                buffer.put((byte)-1);
+            }
         }
 
         @Override
@@ -164,6 +180,21 @@ public class Packets {
             rotation = buffer.getShort()/2f;
             baseRotation = buffer.getShort()/2f;
             mining = world.tile(buffer.getInt());
+
+            byte type = buffer.get();
+            if (type != -1) {
+                int position = buffer.getInt();
+
+                if (type == 1) { //remove
+                    currentRequest = new BuildRequest(position % world.width(), position / world.width());
+                } else { //place
+                    byte recipe = buffer.get();
+                    byte rotation = buffer.get();
+                    currentRequest = new BuildRequest(position % world.width(), position / world.width(), rotation, Recipe.getByID(recipe));
+                }
+            }else{
+                currentRequest = null;
+            }
         }
     }
 

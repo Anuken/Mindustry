@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.power;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
@@ -29,11 +30,18 @@ public abstract class ItemGenerator extends PowerGenerator {
 	protected Effect generateEffect = BlockFx.generatespark, explodeEffect =
 			BlockFx.generatespark;
 	protected Color heatColor = Color.valueOf("ff9b59");
+	protected TextureRegion topRegion;
 
 	public ItemGenerator(String name) {
 		super(name);
 		itemCapacity = 20;
 		hasItems = true;
+	}
+
+	@Override
+	public void load() {
+		super.load();
+		topRegion = Draw.region(name + "-top");
 	}
 
 	@Override
@@ -61,7 +69,7 @@ public abstract class ItemGenerator extends PowerGenerator {
 			float alpha = (entity.items.totalItems() > 0 ? 1f : Mathf.clamp(entity.generateTime));
 			alpha = alpha * 0.7f + Mathf.absin(Timers.time(), 12f, 0.3f) * alpha;
 			Draw.alpha(alpha);
-			Draw.rect(name + "-top", tile.worldx(), tile.worldy());
+			Draw.rect(topRegion, tile.drawx(), tile.drawy());
 			Draw.reset();
 		}
 	}

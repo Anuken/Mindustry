@@ -7,6 +7,7 @@ import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.RubbleDecal;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.game.Team;
@@ -16,6 +17,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.CursorType;
 import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
@@ -25,16 +27,15 @@ import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.threads;
+import static io.anuke.mindustry.Vars.*;
 
 public class BuildBlock extends Block {
-    private static final float decaySpeedScl = 6f;
-
     public BuildBlock(String name) {
         super(name);
         update = true;
@@ -48,7 +49,7 @@ public class BuildBlock extends Block {
     @Override
     public boolean isSolidFor(Tile tile) {
         BuildEntity entity = tile.entity();
-        return entity == null || entity.recipe ==null || entity.recipe.result.solid || entity.previous.solid;
+        return entity == null || entity.recipe == null || entity.recipe.result.solid || entity.previous.solid;
     }
 
     @Override
@@ -58,7 +59,13 @@ public class BuildBlock extends Block {
 
     @Override
     public void tapped(Tile tile, Player player) {
-        CallBlocks.onBuildSelect(player, tile);
+        BuildEntity entity = tile.entity();
+
+        //if the target is constructible, begin constructing
+        if(entity.recipe != null){
+            player.clearBuilding();
+            player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.getRotation(), entity.recipe));
+        }
     }
 
     @Override
@@ -79,7 +86,7 @@ public class BuildBlock extends Block {
     public void afterDestroyed(Tile tile, TileEntity e){
         BuildEntity entity = (BuildEntity)e;
 
-        if(entity.previous.synthetic()){
+        if(entity.previous != null && entity.previous.synthetic()){
             tile.setBlock(entity.previous);
         }
     }
@@ -88,10 +95,13 @@ public class BuildBlock extends Block {
     public void draw(Tile tile){
         BuildEntity entity = tile.entity();
 
-        if(entity.previous != null && entity.previous.synthetic()) {
-            for (TextureRegion region : entity.previous.getBlockIcon()) {
-                Draw.rect(region, tile.drawx(), tile.drawy(), entity.recipe.result.rotate ? tile.getRotation() * 90 : 0);
-            }
+        //When breaking, don't draw the previous block... since it's the thing you were breaking
+        if(entity.recipe != null && entity.previous == entity.recipe.result){
+            return;
+        }
+
+        for (TextureRegion region : entity.previous.getBlockIcon()) {
+            Draw.rect(region, tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.getRotation() * 90 : 0);
         }
     }
 
@@ -101,12 +111,16 @@ public class BuildBlock extends Block {
 
         Shaders.blockbuild.color = Palette.accent;
 
-        for(TextureRegion region : entity.recipe.result.getBlockIcon()){
+        Block target = entity.recipe == null ? entity.previous : entity.recipe.result;
+
+        if(target == null) return;
+
+        for(TextureRegion region : target.getBlockIcon()){
             Shaders.blockbuild.region = region;
             Shaders.blockbuild.progress = (float)entity.progress;
             Shaders.blockbuild.apply();
 
-            Draw.rect(region, tile.drawx(), tile.drawy(), entity.recipe.result.rotate ? tile.getRotation() * 90 : 0);
+            Draw.rect(region, tile.drawx(), tile.drawy(), target.rotate ? tile.getRotation() * 90 : 0);
 
             Graphics.flush();
         }
@@ -116,26 +130,16 @@ public class BuildBlock extends Block {
     public void drawShadow(Tile tile) {
         BuildEntity entity = tile.entity();
 
-        if(entity.recipe != null && entity.recipe.result != null){
+        if(entity.recipe != null){
             entity.recipe.result.drawShadow(tile);
+        }else if(entity.previous != null){
+            entity.previous.drawShadow(tile);
         }
     }
 
     @Override
     public void update(Tile tile) {
-        BuildEntity entity = tile.entity();
 
-        if(entity.progress >= 1f){
-            CallBlocks.onBuildFinish(tile, entity.lastBuilder);
-        }else if(entity.progress < 0f){
-            CallBlocks.onBuildDeath(tile);
-        }
-
-        if(!entity.updated && entity.recipe != null){
-            entity.progress -= 1f/entity.recipe.cost/decaySpeedScl;
-        }
-
-        entity.updated = false;
     }
 
     @Override
@@ -144,77 +148,85 @@ public class BuildBlock extends Block {
     }
 
     @Remote(called = Loc.server, in = In.blocks)
-    public static void onBuildDeath(Tile tile){
-        if(tile.entity == null) return;
-        tile.entity.damage(tile.entity.health + 1);
+    public static void onDeconstructFinish(Tile tile, Block block){
+        Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), block.size);
+        world.removeBlock(tile);
     }
 
     @Remote(called = Loc.server, in = In.blocks)
-    public static void onBuildFinish(Tile tile, Player lastBuilder){
-        if(tile.entity == null || !(tile.entity instanceof BuildEntity)) return;
-        BuildEntity entity = tile.entity();
-
+    public static void onConstructFinish(Tile tile, Block block, int builderID){
         Team team = tile.getTeam();
-        tile.setBlock(entity.recipe.result);
+        tile.setBlock(block);
         tile.setTeam(team);
-        Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), entity.recipe.result.size);
+        Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
 
         //last builder was this local client player, call placed()
-        if(lastBuilder != null && lastBuilder.isLocal){
+        if(!headless && builderID == players[0].id){
             //this is run delayed, since if this is called on the server, all clients need to recieve the onBuildFinish()
             //event first before they can recieve the placed() event modification results
             threads.runDelay(() -> tile.block().placed(tile));
         }
     }
 
-    @Remote(called = Loc.both, targets = Loc.both, in = In.blocks, forward = true)
-    public static void onBuildSelect(Player player, Tile tile){
-        if(player == null || !(tile.entity instanceof BuildEntity)) return;
-
-        BuildEntity entity = tile.entity();
-
-        player.getPlaceQueue().clear();
-        player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.getRotation(), entity.recipe));
-    }
-
-    @Remote(called = Loc.server, targets = Loc.both, in = In.blocks, forward = true)
-    public static void onBuildDeselect(Player player){
-        if(player == null) return;
-
-        player.getPlaceQueue().clear();
-    }
-
     public class BuildEntity extends TileEntity{
+        /**The recipe of the block that is being constructed.
+         * If there is no recipe for this block, as is the case with rocks, 'previous' is used.*/
         public Recipe recipe;
 
         public double progress = 0;
         public double lastProgress;
+        public double buildCost;
+        /**The block that used to be here.
+         * If a non-recipe block is being deconstructed, this is the block that is being deconstructed.*/
         public Block previous;
-        public Player lastBuilder;
 
         private double[] accumulator;
-        private boolean updated;
 
-        public void addProgress(InventoryModule inventory, double amount){
-            double maxProgress = checkRequired(inventory, amount);
+        public void construct(Unit builder, TileEntity core, double amount){
+            double maxProgress = checkRequired(core.items, amount);
 
             for (int i = 0; i < recipe.requirements.length; i++) {
                 accumulator[i] += recipe.requirements[i].amount*maxProgress; //add min amount progressed to the accumulator
             }
 
-            maxProgress = checkRequired(inventory, maxProgress);
+            maxProgress = checkRequired(core.items, maxProgress);
 
-            progress += maxProgress;
+            progress = Mathf.clamp(progress + maxProgress);
 
             lastProgress = maxProgress;
-            updated = true;
 
-            if(progress > 1.0001f){
-                progress = 1.0001f;
+            if(progress >= 1f){
+                CallBlocks.onConstructFinish(tile, recipe.result, builder.getID());
             }
         }
 
-        public double checkRequired(InventoryModule inventory, double amount){
+        public void deconstruct(Unit builder, TileEntity core, double amount){
+            Recipe recipe = Recipe.getByResult(previous);
+
+            if(recipe != null) {
+                ItemStack[] requirements = recipe.requirements;
+
+                for (int i = 0; i < requirements.length; i++) {
+                    accumulator[i] += requirements[i].amount * amount / 2f; //add scaled amount progressed to the accumulator
+                    int accumulated = (int) (accumulator[i]); //get amount
+
+                    if (amount > 0) { //if it's positive, add it to the core
+                        int accepting = core.tile.block().acceptStack(requirements[i].item, accumulated, core.tile, builder);
+                        core.tile.block().handleStack(requirements[i].item, accumulated, core.tile, builder);
+
+                        accumulator[i] -= accepting;
+                    }
+                }
+            }
+
+            progress = Mathf.clamp(progress - amount);
+
+            if(progress <= 0){
+                CallBlocks.onDeconstructFinish(tile, recipe == null ? previous : recipe.result);
+            }
+        }
+
+        private double checkRequired(InventoryModule inventory, double amount){
             double maxProgress = amount;
 
             for(int i = 0; i < recipe.requirements.length; i ++){
@@ -243,11 +255,23 @@ public class BuildBlock extends Block {
             return (float)progress;
         }
 
-        public void set(Block previous, Recipe recipe){
-            updated = true;
+        public void setConstruct(Block previous, Recipe recipe){
             this.recipe = recipe;
             this.previous = previous;
             this.accumulator = new double[recipe.requirements.length];
+            this.buildCost = recipe.cost;
+        }
+
+        public void setDeconstruct(Block previous){
+            this.previous = previous;
+            this.progress = 1f;
+            if(Recipe.getByResult(previous) != null){
+                this.recipe = Recipe.getByResult(previous);
+                this.accumulator = new double[Recipe.getByResult(previous).requirements.length];
+                this.buildCost = Recipe.getByResult(previous).cost;
+            }else{
+                this.buildCost = 20f; //default no-recipe build cost is 20
+            }
         }
 
         @Override

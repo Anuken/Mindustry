@@ -735,6 +735,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		buffer.writeByte(mech.id);
 		buffer.writeBoolean(isBoosting);
 		buffer.writeInt(mining == null ? -1 : mining.packedPosition());
+
+		writeBuilding(buffer);
 	}
 
 	@Override
@@ -748,6 +750,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		mech = Upgrade.getByID(buffer.readByte());
 		boolean boosting = buffer.readBoolean();
 		int mine = buffer.readInt();
+		readBuilding(buffer, !isLocal);
+
 		interpolator.read(lastx, lasty, x, y, time, rotation);
 		rotation = lastrot;
 
