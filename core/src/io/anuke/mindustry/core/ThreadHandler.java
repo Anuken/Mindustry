@@ -17,7 +17,8 @@ public class ThreadHandler {
     private final Array<Runnable> toRun = new Array<>();
     private final ThreadProvider impl;
     private float delta = 1f;
-    private long frame = 0;
+    private float smoothDelta = 1f;
+    private long frame = 0, lastDeltaUpdate;
     private float framesSinceUpdate;
     private boolean enabled;
 
@@ -29,7 +30,7 @@ public class ThreadHandler {
 
         Timers.setDeltaProvider(() -> {
             float result = impl.isOnThread() ? delta : Gdx.graphics.getDeltaTime()*60f;
-            return Math.min(Float.isNaN(result) ? 1f : result, 12f);
+            return Math.min(Float.isNaN(result) ? 1f : result, 15f);
         });
     }
 
@@ -62,7 +63,7 @@ public class ThreadHandler {
     }
 
     public int getTPS(){
-        return (int)(60/delta);
+        return (int)(60/smoothDelta);
     }
 
     public long getFrameID(){
@@ -138,8 +139,6 @@ public class ThreadHandler {
                 long elapsed = TimeUtils.nanosToMillis(TimeUtils.timeSinceNanos(time));
                 long target = (long) ((1000) / 60f);
 
-                delta = Math.max(elapsed, target) / 1000f * 60f;
-
                 if (elapsed < target) {
                     impl.sleep(target - elapsed);
                 }
@@ -149,6 +148,14 @@ public class ThreadHandler {
                         impl.wait(updateLock);
                     }
                     rendered = false;
+                }
+
+                long actuallyElapsed = TimeUtils.nanosToMillis(TimeUtils.timeSinceNanos(time));
+                delta = Math.max(actuallyElapsed, target) / 1000f * 60f;
+
+                if(TimeUtils.timeSinceMillis(lastDeltaUpdate) > 1000){
+                    lastDeltaUpdate = TimeUtils.millis();
+                    smoothDelta = delta;
                 }
 
                 frame ++;
