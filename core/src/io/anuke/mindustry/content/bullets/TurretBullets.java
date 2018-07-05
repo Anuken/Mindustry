@@ -96,7 +96,7 @@ public class TurretBullets extends BulletList implements ContentList {
             Color[] colors = {Palette.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Palette.lancerLaser, Color.WHITE};
             float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
             float[] lenscales = {1f, 1.1f, 1.13f, 1.14f};
-            float length = 70f;
+            float length = 90f;
 
             {
                 hiteffect = BulletFx.hitLancer;

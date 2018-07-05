@@ -162,7 +162,7 @@ public class Control extends Module{
 	}
 
 	public void addPlayer(int index){
-	    if(players.length < index + 1){
+	    if(players.length != index + 1){
 	        Player[] old = players;
 	        players = new Player[index + 1];
             System.arraycopy(old, 0, players, 0, old.length);
@@ -288,6 +288,8 @@ public class Control extends Module{
 		ContentLoader.dispose();
 		Net.dispose();
 		ui.editor.dispose();
+		inputs = new InputHandler[]{};
+		players = new Player[]{};
 	}
 
 	@Override

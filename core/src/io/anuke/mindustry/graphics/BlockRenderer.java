@@ -64,31 +64,31 @@ public class BlockRenderer{
 				int worldx = Mathf.scl(camera.position.x, tilesize) + x;
 				int worldy = Mathf.scl(camera.position.y, tilesize) + y;
 				boolean expanded = (x < -rangex || x > rangex || y < -rangey || y > rangey);
-				
-				Tile tile = world.tile(worldx, worldy);
-				
-				if(tile != null){
-					Block block = tile.block();
-					
-					if(!expanded && block != Blocks.air && world.isAccessible(worldx, worldy)){
-						synchronized (Tile.tileSetLock) {
+
+				synchronized (Tile.tileSetLock) {
+					Tile tile = world.tile(worldx, worldy);
+
+					if (tile != null) {
+						Block block = tile.block();
+
+						if (!expanded && block != Blocks.air && world.isAccessible(worldx, worldy)) {
 							tile.block().drawShadow(tile);
 						}
-					}
-					
-					if(!(block instanceof StaticBlock)){
-						if(block != Blocks.air){
-							if(!expanded){
-								addRequest(tile, Layer.block);
-							}
 
-							if(block.expanded || !expanded){
-								if(block.layer != null && block.isLayer(tile)){
-									addRequest(tile, block.layer);
+						if (!(block instanceof StaticBlock)) {
+							if (block != Blocks.air) {
+								if (!expanded) {
+									addRequest(tile, Layer.block);
 								}
 
-								if(block.layer2 != null && block.isLayer2(tile)){
-									addRequest(tile, block.layer2);
+								if (block.expanded || !expanded) {
+									if (block.layer != null && block.isLayer(tile)) {
+										addRequest(tile, block.layer);
+									}
+
+									if (block.layer2 != null && block.isLayer2(tile)) {
+										addRequest(tile, block.layer2);
+									}
 								}
 							}
 						}

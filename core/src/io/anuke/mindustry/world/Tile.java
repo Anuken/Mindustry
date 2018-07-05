@@ -253,6 +253,25 @@ public class Tile implements PosTrait, TargetTrait {
 		}
 		return tmpArray;
 	}
+
+	/**Returns the list of all tiles linked to this multiblock if it were this block, or an empty array if it's not a multiblock.
+	 * This array contains all linked tiles, including this tile itself.*/
+	public synchronized Array<Tile> getLinkedTilesAs(Block block, Array<Tile> tmpArray){
+		tmpArray.clear();
+		if(block.isMultiblock()){
+			int offsetx = -(block.size-1)/2;
+			int offsety = -(block.size-1)/2;
+			for(int dx = 0; dx < block.size; dx ++){
+				for(int dy = 0; dy < block.size; dy ++){
+					Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
+					tmpArray.add(other);
+				}
+			}
+		}else{
+			tmpArray.add(this);
+		}
+		return tmpArray;
+	}
 	
 	/**Returns the block the multiblock is linked to, or null if it is not linked to any block.*/
 	public Tile getLinked(){

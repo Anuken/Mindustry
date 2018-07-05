@@ -19,9 +19,9 @@ public class DefaultKeybinds {
                 new Category("General"),
                 "move_x", new Axis(Input.A, Input.D),
                 "move_y", new Axis(Input.S, Input.W),
-                "select", Input.MOUSE_LEFT,
-                "break", Input.MOUSE_RIGHT,
-                "shoot", Input.MOUSE_LEFT,
+                //"select", Input.MOUSE_LEFT,
+                //"break", Input.MOUSE_RIGHT,
+                //"shoot", Input.MOUSE_LEFT,
                 "rotate", new Axis(Input.SCROLL),
                 "dash", Input.SHIFT_LEFT,
                 "drop_unit", Input.SHIFT_LEFT,
@@ -39,8 +39,7 @@ public class DefaultKeybinds {
                 "chat_history_prev", Input.UP,
                 "chat_history_next", Input.DOWN,
                 "chat_scroll", new Axis(Input.SCROLL),
-                "console", Input.GRAVE,
-                "block_logs", Input.I
+                "console", Input.GRAVE
             );
 
             KeyBinds.defaultSection(section, DeviceType.controller,
@@ -49,9 +48,9 @@ public class DefaultKeybinds {
                 "move_y", new Axis(Input.CONTROLLER_L_STICK_VERTICAL_AXIS),
                 "cursor_x", new Axis(Input.CONTROLLER_R_STICK_HORIZONTAL_AXIS),
                 "cursor_y", new Axis(Input.CONTROLLER_R_STICK_VERTICAL_AXIS),
-                "select", Input.CONTROLLER_R_BUMPER,
-                "break", Input.CONTROLLER_L_BUMPER,
-                "shoot", Input.CONTROLLER_R_TRIGGER,
+                //"select", Input.CONTROLLER_R_BUMPER,
+                //"break", Input.CONTROLLER_L_BUMPER,
+                //"shoot", Input.CONTROLLER_R_TRIGGER,
                 "dash", Input.CONTROLLER_Y,
                 "rotate_alt", new Axis(Input.CONTROLLER_DPAD_RIGHT, Input.CONTROLLER_DPAD_LEFT),
                 "rotate", new Axis(Input.CONTROLLER_A, Input.CONTROLLER_B),

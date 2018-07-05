@@ -131,6 +131,10 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 		}
 	}
 
+	public Tile getTile(){
+		return tile;
+	}
+
 	@Override
 	public Team getTeam() {
 		return tile.getTeam();

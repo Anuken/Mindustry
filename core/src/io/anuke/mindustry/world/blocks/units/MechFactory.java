@@ -8,7 +8,9 @@ import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.gen.CallBlocks;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
@@ -52,7 +54,7 @@ public class MechFactory extends Block{
     public void tapped(Tile tile, Player player) {
 
         if(checkValidTap(tile, player)){
-            CallBlocks.onMechFactoryBegin(player, tile);
+            CallBlocks.onMechFactoryTap(player, tile);
         }else if(player.isLocal && mobile){
             player.moveTarget = tile.entity;
         }
@@ -134,19 +136,12 @@ public class MechFactory extends Block{
         return new MechFactoryEntity();
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
-    public static void onMechFactoryBegin(Player player, Tile tile){
+    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks)
+    public static void onMechFactoryTap(Player player, Tile tile){
         if(!checkValidTap(tile, player)) return;
 
         MechFactoryEntity entity = tile.entity();
-        entity.progress = 0f;
-        entity.player = player;
-
-        player.rotation = 90f;
-        player.baseRotation = 90f;
-        player.set(entity.x, entity.y);
-        player.setDead(true);
-        player.setRespawning(true);
+        player.beginRespawning(entity);
     }
 
     @Remote(called = Loc.server, in = In.blocks)
@@ -179,12 +174,32 @@ public class MechFactory extends Block{
                 Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize / 2f && entity.player == null;
     }
 
-    public class MechFactoryEntity extends TileEntity{
-        public Player player;
-        public float progress;
-        public float time;
-        public float heat;
-        public boolean open;
+    public class MechFactoryEntity extends TileEntity implements SpawnerTrait{
+        Player player;
+        float progress;
+        float time;
+        float heat;
+        boolean open;
+
+        @Override
+        public void updateSpawning(Unit unit) {
+            if(!(unit instanceof Player)) throw new IllegalArgumentException("Mech factories only accept player respawners.");
+
+            if(player == null){
+                progress = 0f;
+                player = (Player)unit;
+
+                player.rotation = 90f;
+                player.baseRotation = 90f;
+                player.set(x, y);
+                player.beginRespawning(this);
+            }
+        }
+
+        @Override
+        public float getSpawnProgress() {
+            return progress;
+        }
 
         @Override
         public void write(DataOutputStream stream) throws IOException {

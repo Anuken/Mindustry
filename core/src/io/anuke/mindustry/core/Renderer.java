@@ -258,7 +258,7 @@ public class Renderer extends RendererModule{
 			if(group.count(p -> p.isFlying() == flying) +
 					playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
 
-			drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying, Unit::drawUnder);
+			drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
 			drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawUnder);
 
 			Shaders.outline.color.set(team.color);
@@ -266,13 +266,13 @@ public class Renderer extends RendererModule{
 
 			Graphics.beginShaders(Shaders.outline);
 			Graphics.shader(Shaders.mix, true);
-			drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying);
+			drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead());
 			drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team);
 			Graphics.shader();
 			blocks.drawTeamBlocks(Layer.turret, team);
 			Graphics.endShaders();
 
-			drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying, Unit::drawOver);
+			drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
 			drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);
 		}
 	}

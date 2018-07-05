@@ -12,6 +12,7 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.ScorchDecal;
 import io.anuke.mindustry.entities.traits.ShooterTrait;
+import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
@@ -52,7 +53,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
 	protected boolean isWave;
 	protected Squad squad;
-	protected int spawner = -1;
+	protected int spawner;
 
 	/**Initialize the type and team of this unit. Only call once!*/
 	public void init(UnitType type, Team team){
@@ -62,8 +63,8 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 		this.team = team;
 	}
 
-	public void setSpawner(UnitFactoryEntity spawner) {
-		this.spawner = spawner.tile.packedPosition();
+	public void setSpawner(Tile tile) {
+		this.spawner = tile.packedPosition();
 	}
 
 	public UnitType getType() {
@@ -90,6 +91,19 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 	public boolean targetHasFlag(BlockFlag flag){
 		return target instanceof TileEntity &&
 				((TileEntity)target).tile.block().flags.contains(flag);
+	}
+
+	public void updateRespawning(){
+		if(spawner == -1) return;
+
+		Tile tile = world.tile(spawner);
+		if(tile != null && tile.entity != null){
+			if(tile.entity instanceof SpawnerTrait){
+			    ((SpawnerTrait) tile.entity).updateSpawning(this);
+            }
+		}else{
+			spawner = -1;
+		}
 	}
 
 	public void setState(UnitState state){
@@ -254,6 +268,11 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
 		if(hitTime < 0) hitTime = 0;
 
+		if(isDead()){
+			updateRespawning();
+			return;
+		}
+
 		if(Net.client()){
 			interpolate();
 			status.update(this);
@@ -322,7 +341,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 		hitboxTile.setSize(type.hitsizeTile);
 		state.set(getStartState());
 
-		heal();
+		health(maxHealth());
 	}
 
 	@Override
@@ -353,6 +372,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 	public void write(DataOutput data) throws IOException{
 		super.writeSave(data);
 		data.writeByte(type.id);
+		data.writeInt(spawner);
 	}
 
 	@Override
@@ -360,6 +380,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 		float lastx = x, lasty = y, lastrot = rotation;
 		super.readSave(data);
 		this.type = UnitType.getByID(data.readByte());
+		this.spawner = data.readInt();
 
 		interpolator.read(lastx, lasty, x, y, time, rotation);
 		rotation = lastrot;

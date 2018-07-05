@@ -192,7 +192,9 @@ public interface BuilderTrait extends Entity{
             entity.construct(unit, core, 1f / entity.buildCost * Timers.delta() * getBuildPower(tile));
         }
 
-        unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(entity), 0.4f);
+        if(unit.distanceTo(tile) <= placeDistance){
+            unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(entity), 0.4f);
+        }
         current.progress = entity.progress();
     }
 
@@ -239,7 +241,11 @@ public interface BuilderTrait extends Entity{
 
         Tile tile = world.tile(request.x, request.y);
 
-        Draw.color(unit.distanceTo(tile) > placeDistance || request.remove ? Palette.remove : Palette.accent);
+        if(unit.distanceTo(tile) > placeDistance){
+            return;
+        }
+
+        Draw.color(Palette.accent);
         float focusLen = 3.8f + Mathf.absin(Timers.time(), 1.1f, 0.6f);
         float px = unit.x + Angles.trnsx(unit.rotation, focusLen);
         float py = unit.y + Angles.trnsy(unit.rotation, focusLen);

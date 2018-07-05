@@ -101,6 +101,8 @@ public class Recipes implements ContentList{
         new Recipe(power, PowerBlocks.solarPanel, new ItemStack(Items.lead, 20), new ItemStack(Items.silicon, 30));
         new Recipe(power, PowerBlocks.largeSolarPanel, new ItemStack(Items.lead, 200), new ItemStack(Items.silicon, 290), new ItemStack(Items.phasematter, 30));
 
+        //generators - other
+        new Recipe(power, PowerBlocks.nuclearReactor, new ItemStack(Items.lead, 600), new ItemStack(Items.silicon, 400), new ItemStack(Items.carbide, 300), new ItemStack(Items.thorium, 300));
 
         //new Recipe(distribution, StorageBlocks.core, new ItemStack(Items.carbide, 50));
         new Recipe(distribution, StorageBlocks.unloader, new ItemStack(Items.carbide, 40), new ItemStack(Items.silicon, 50));

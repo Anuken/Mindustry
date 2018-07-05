@@ -55,6 +55,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 	public float boostHeat;
 	public Color color = new Color();
 	public Mech mech;
+	public int spawner;
 
 	public NetConnection con;
 	public int playerIndex = 0;
@@ -63,7 +64,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 	public TargetTrait target;
 	public TargetTrait moveTarget;
 
-	private boolean respawning;
 	private float walktime;
 	private Queue<BuildRequest> placeQueue = new ThreadQueue<>();
 	private Tile mining;
@@ -176,6 +176,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 	}
 
 	@Override
+	public void added() {
+		baseRotation = 90f;
+	}
+
+	@Override
 	public void addAmmo(Item item) {
 		inventory.addAmmo(mech.weapon.getAmmoType(item));
 	}
@@ -222,7 +227,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		if(player == null) return;
 
 		player.dead = true;
-		player.respawning = false;
 		player.placeQueue.clear();
 
 		player.dropCarry();
@@ -435,11 +439,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		if(isDead()){
 			isBoosting = false;
 			boostHeat = 0f;
-			CoreEntity entity = (CoreEntity)getClosestCore();
-
-			if (!respawning && entity != null) {
-				entity.trySetPlayer(this);
-			}
+			updateRespawning();
 			return;
 		}
 
@@ -656,7 +656,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		inventory.clear();
 		placeQueue.clear();
 		dead = true;
-		respawning = false;
 		trail.clear();
 		health = maxHealth();
 
@@ -667,12 +666,18 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		return isShooting && inventory.hasAmmo() && (!isBoosting || mech.flying);
 	}
 
-	public void setRespawning(){
-		respawning = true;
+	public void updateRespawning(){
+		CoreEntity entity = (CoreEntity)getClosestCore();
+
+		if (entity != null) {
+			this.spawner = entity.tile.id();
+			entity.updateSpawning(this);
+		}
 	}
 
-	public void setRespawning(boolean respawning){
-		this.respawning = respawning;
+	public void beginRespawning(SpawnerTrait spawner){
+		this.spawner = spawner.getTile().packedPosition();
+		this.dead = true;
 	}
 
 	@Override
@@ -735,6 +740,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		buffer.writeByte(mech.id);
 		buffer.writeBoolean(isBoosting);
 		buffer.writeInt(mining == null ? -1 : mining.packedPosition());
+		buffer.writeInt(spawner);
 
 		writeBuilding(buffer);
 	}
@@ -750,6 +756,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		mech = Upgrade.getByID(buffer.readByte());
 		boolean boosting = buffer.readBoolean();
 		int mine = buffer.readInt();
+		spawner = buffer.readInt();
+
 		readBuilding(buffer, !isLocal);
 
 		interpolator.read(lastx, lasty, x, y, time, rotation);

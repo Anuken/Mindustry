@@ -22,6 +22,7 @@ public class PowerBlocks extends BlockList implements ContentList {
             maxLiquidGenerate = 0.5f;
             powerPerLiquid = 0.08f;
             powerCapacity = 40f;
+            powerPerLiquid = 0.25f;
             generateEffect = BlockFx.redgeneratespark;
             size = 2;
         }};
@@ -30,6 +31,7 @@ public class PowerBlocks extends BlockList implements ContentList {
             powerOutput = 0.28f;
             powerCapacity = 40f;
             itemDuration = 30f;
+            powerPerLiquid = 0.7f;
             auxLiquidUse = 0.05f;
             size = 2;
         }};
@@ -51,7 +53,8 @@ public class PowerBlocks extends BlockList implements ContentList {
 
         nuclearReactor = new NuclearReactor("nuclear-reactor") {{
             size = 3;
-            health = 600;
+            health = 700;
+            powerMultiplier = 0.8f;
         }};
 
         fusionReactor = new FusionReactor("fusion-reactor") {{

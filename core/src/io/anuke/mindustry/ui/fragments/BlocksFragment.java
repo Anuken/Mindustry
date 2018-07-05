@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.type.Category;
@@ -190,7 +189,7 @@ public class BlocksFragment extends Fragment{
 				Stack istack = new Stack();
 				for(TextureRegion region : regions){
 					Image u = new Image(region);
-					u.update(() -> u.setColor(image.isDisabled() ? Color.GRAY : Color.WHITE));
+					u.update(() -> u.setColor(istack.getColor()));
 					istack.add(u);
 				}
 
@@ -236,35 +235,21 @@ public class BlocksFragment extends Fragment{
 					}
 				});
 
-				image.setDisabled(() -> {
-					TileEntity entity = players[0].getClosestCore();
-
-					if(entity == null) return true;
-
-					for(ItemStack s : r.requirements){
-						if(!entity.items.hasItem(s.item, Mathf.ceil(s.amount/2f))){
-							return true;
-						}
-					}
-					return false;
-				});
-
 				recipeTable.add(image).size(size + 8);
 
 				image.update(() -> {
-					if(!image.isDisabled()) {
-						for (Player player : players) {
-							if (control.input(player.playerIndex).recipe == r) {
-								image.setChecked(true);
-								return;
-							}
+					image.setChecked(r == control.input(0).recipe);
+					TileEntity entity = players[0].getClosestCore();
+
+					if(entity == null) return;
+
+					for(ItemStack s : r.requirements){
+						if(!entity.items.hasItem(s.item, Mathf.ceil(s.amount))){
+							istack.setColor(Color.GRAY);
+							return;
 						}
-					}/*else{
-						if(control.input(0).recipe == r){
-							control.input(0).recipe = null;
-						}
-					}*/
-					image.setChecked(false);
+					}
+					istack.setColor(Color.WHITE);
 				});
 
 				if (i % rows == rows - 1) {

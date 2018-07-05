@@ -95,7 +95,7 @@ public class SolidPump extends Pump {
     @Override
     public boolean canPlaceOn(Tile tile) {
         if(isMultiblock()){
-            for(Tile other : tile.getLinkedTiles(drawTiles)){
+            for(Tile other : tile.getLinkedTilesAs(this, drawTiles)){
                 if(isValid(other)){
                     return true;
                 }

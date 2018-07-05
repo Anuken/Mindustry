@@ -43,8 +43,8 @@ public class Drill extends Block{
 	protected Liquid inputLiquid = Liquids.water;
 	/**Whether the liquid is required to drill. If false, then it will be used as a speed booster.*/
 	protected boolean liquidRequired = false;
-	/**How many times faster the drill will progress when booster by liquid.*/
-	protected float liquidBoostIntensity = 1.3f;
+	/**How many times faster the drill will progress when boosted by liquid.*/
+	protected float liquidBoostIntensity = 1.6f;
 	/**Speed at which the drill speeds up.*/
 	protected float warmupSpeed = 0.02f;
 
@@ -224,7 +224,7 @@ public class Drill extends Block{
 	@Override
 	public boolean canPlaceOn(Tile tile) {
 		if(isMultiblock()){
-			for(Tile other : tile.getLinkedTiles(drawTiles)){
+			for(Tile other : tile.getLinkedTilesAs(this, drawTiles)){
 				if(isValid(other)){
 					return true;
 				}

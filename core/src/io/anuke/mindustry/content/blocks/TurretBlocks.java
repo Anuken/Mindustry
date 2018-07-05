@@ -83,13 +83,13 @@ public class TurretBlocks extends BlockList implements ContentList {
 		}};
 
 		lancer = new LaserTurret("lancer") {{
-			range = 70f;
-			chargeTime = 70f;
+			range = 90f;
+			chargeTime = 60f;
 			chargeMaxDelay = 30f;
 			chargeEffects = 7;
 			shootType = AmmoTypes.lancerLaser;
 			recoil = 2f;
-			reload = 130f;
+			reload = 100f;
 			cooldown = 0.03f;
 			powerUsed = 20f;
 			powerCapacity = 60f;
@@ -131,7 +131,7 @@ public class TurretBlocks extends BlockList implements ContentList {
 
 		salvo = new BurstTurret("salvo") {{
 			size = 2;
-			range = 110f;
+			range = 120f;
 			ammoTypes = new AmmoType[]{AmmoTypes.bulletTungsten, AmmoTypes.bulletCarbide, AmmoTypes.bulletPyratite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
 			reload = 40f;
 			restitution = 0.03f;

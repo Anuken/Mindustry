@@ -17,7 +17,6 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Callable;
-import io.anuke.ucore.graphics.CapStyle;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
@@ -123,11 +122,11 @@ public class OverlayRenderer {
                             drawbars.run();
 
                             if(values[0] > 0){
-                                drawEncloser(target.drawx(), target.drawy() + block.size * tilesize/2f + 2f + values[0]/2f - 0.5f + (values[0] > 1 ? 0.75f : 0), values[0]);
+                                drawEncloser(target.drawx(), target.drawy() + block.size * tilesize/2f + 2f, values[0]);
                             }
 
                             if(values[1] > 0){
-                                drawEncloser(target.drawx(), target.drawy() - block.size * tilesize/2f - 2f - values[1]/2f - 0.5f, values[1]);
+                                drawEncloser(target.drawx(), target.drawy() - block.size * tilesize/2f - 2f - values[1], values[1]);
                             }
 
                             doDraw[0] = true;
@@ -208,15 +207,11 @@ public class OverlayRenderer {
     }
 
     void drawEncloser(float x, float y, float height){
-        x -= 0.5f;
-        y += 0.5f - (height-1f)/2f;
 
         float len = 3;
 
-        Lines.stroke(2f + height);
         Draw.color(Palette.bar);
-        Lines.line(x - len - 0.5f, y, x + len + 1.5f, y, CapStyle.none);
-
-        Draw.reset();
+        Fill.crect(x - len - 1, y - 1, len*2f + 2f, height + 2f);
+        Draw.color();
     }
 }

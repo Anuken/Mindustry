@@ -146,13 +146,17 @@ public class Build {
                 return true;
             }
 
+            if(!type.canPlaceOn(tile)){
+                return false;
+            }
+
             int offsetx = -(type.size - 1) / 2;
             int offsety = -(type.size - 1) / 2;
             for (int dx = 0; dx < type.size; dx++) {
                 for (int dy = 0; dy < type.size; dy++) {
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
                     if (other == null || (other.block() != Blocks.air && !other.block().alwaysReplace)
-                            || !type.canPlaceOn(other) || other.cliffs != 0  || !other.floor().placeableOn ||
+                             || other.cliffs != 0  || !other.floor().placeableOn ||
                             (tile.floor().liquidDrop != null && !type.floating)) {
                         return false;
                     }
