@@ -213,7 +213,7 @@ public class BuildBlock extends Block {
 
                     if (amount > 0) { //if it's positive, add it to the core
                         int accepting = core.tile.block().acceptStack(requirements[i].item, accumulated, core.tile, builder);
-                        core.tile.block().handleStack(requirements[i].item, accumulated, core.tile, builder);
+                        core.tile.block().handleStack(requirements[i].item, accepting, core.tile, builder);
 
                         accumulator[i] -= accepting;
                     }

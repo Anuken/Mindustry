@@ -170,7 +170,9 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 
 	@Remote(called = Loc.server, in = In.blocks)
 	public static void onTileDamage(Tile tile, float health){
-		tile.entity.health = health;
+		if(tile.entity != null){
+			tile.entity.health = health;
+		}
 	}
 
 	@Remote(called = Loc.server, in = In.blocks)

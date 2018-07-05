@@ -20,5 +20,6 @@
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.type.Recipe" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.net.Streamable" />
 	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.meta.BlockBar" />
+	<extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.mapgen.WorldGenerator" />
 	<extend-configuration-property name="gdx.reflect.include" value="com.badlogic.gdx.utils.Predicate" />
 </module>
