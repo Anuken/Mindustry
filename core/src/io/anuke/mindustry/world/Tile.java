@@ -27,7 +27,8 @@ public class Tile implements PosTrait, TargetTrait {
 	public static final Object tileSetLock = new Object();
 	
 	/**Block ID data.*/
-	private byte floor, wall;
+	private Block wall;
+	private Floor floor;
 	/**Rotation, 0-3. Also used to store offload location for routers, in which case it can be any number.*/
 	private byte rotation;
 	/**Team ordinal.*/
@@ -52,15 +53,15 @@ public class Tile implements PosTrait, TargetTrait {
 
 	public Tile(int x, int y, byte floor, byte wall){
 		this(x, y);
-		this.floor = floor;
-		this.wall = wall;
+		this.floor = (Floor) Block.getByID(floor);
+		this.wall = Block.getByID(wall);
 		changed();
 	}
 	
 	public Tile(int x, int y, byte floor, byte wall, byte rotation, byte team, byte elevation){
 		this(x, y);
-		this.floor = floor;
-		this.wall = wall;
+		this.floor =(Floor) Block.getByID(floor);
+		this.wall = Block.getByID(wall);
 		this.rotation = rotation;
 		this.elevation = elevation;
 		changed();
@@ -72,11 +73,11 @@ public class Tile implements PosTrait, TargetTrait {
 	}
 	
 	public byte getWallID(){
-		return wall;
+		return (byte)wall.id;
 	}
 	
 	public byte getFloorID(){
-		return floor;
+		return (byte)floor.id;
 	}
 	
 	/**Return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile.*/
@@ -129,11 +130,11 @@ public class Tile implements PosTrait, TargetTrait {
 	}
 	
 	public Floor floor(){
-		return (Floor)Block.getByID(getFloorID());
+		return floor;
 	}
 	
 	public Block block(){
-		return Block.getByID(getWallID());
+		return wall;
 	}
 
 	public Team getTeam(){
@@ -161,7 +162,7 @@ public class Tile implements PosTrait, TargetTrait {
 	public void setBlock(Block type, int rotation){
 		synchronized (tileSetLock) {
 			if(rotation < 0) rotation = (-rotation + 2);
-			this.wall = (byte)type.id;
+			this.wall = type;
 			this.link = 0;
 			setRotation((byte) (rotation % 4));
 			changed();
@@ -170,14 +171,14 @@ public class Tile implements PosTrait, TargetTrait {
 	
 	public void setBlock(Block type){
 		synchronized (tileSetLock) {
-			this.wall = (byte)type.id;
+			this.wall = type;
 			this.link = 0;
 			changed();
 		}
 	}
 	
-	public void setFloor(Block type){
-		this.floor = (byte)type.id;
+	public void setFloor(Floor type){
+		this.floor = type;
 	}
 	
 	public void setRotation(byte rotation){

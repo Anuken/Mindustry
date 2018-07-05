@@ -115,6 +115,10 @@ public class World extends Module{
 		if(!Mathf.inBounds(x, y, tiles)) return null;
 		return tiles[x][y];
 	}
+
+	public Tile rawTile(int x, int y){
+		return tiles[x][y];
+	}
 	
 	public Tile tileWorld(float x, float y){
 		return tile(Mathf.scl2(x, tilesize), Mathf.scl2(y, tilesize));

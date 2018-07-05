@@ -59,19 +59,25 @@ public class BlockRenderer{
 		
 		Graphics.surface(renderer.effectSurface);
 
-		for(int x = -rangex - expandr; x <= rangex + expandr; x++){
-			for(int y = -rangey - expandr; y <= rangey + expandr; y++){
-				int worldx = Mathf.scl(camera.position.x, tilesize) + x;
-				int worldy = Mathf.scl(camera.position.y, tilesize) + y;
-				boolean expanded = (x < -rangex || x > rangex || y < -rangey || y > rangey);
+		int avgx = Mathf.scl(camera.position.x, tilesize);
+		int avgy = Mathf.scl(camera.position.y, tilesize);
+
+		int minx = Math.max(avgx - rangex - expandr, 0);
+		int miny = Math.max(avgy - rangey - expandr, 0);
+		int maxx = Math.min(world.width() - 1, avgx + rangex + expandr);
+		int maxy = Math.min(world.height() - 1, avgy+ rangey + expandr);
+
+		for(int x = minx; x <= maxx; x++){
+			for(int y = miny; y <= maxy; y++){
+				boolean expanded = (Math.abs(x - avgx) > rangex || Math.abs(y - avgy) > rangey);
 
 				synchronized (Tile.tileSetLock) {
-					Tile tile = world.tile(worldx, worldy);
+					Tile tile = world.rawTile(x, y);
 
 					if (tile != null) {
 						Block block = tile.block();
 
-						if (!expanded && block != Blocks.air && world.isAccessible(worldx, worldy)) {
+						if (!expanded && block != Blocks.air && world.isAccessible(x, y)) {
 							tile.block().drawShadow(tile);
 						}
 
