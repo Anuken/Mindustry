@@ -154,10 +154,11 @@ public class BuildBlock extends Block {
     }
 
     @Remote(called = Loc.server, in = In.blocks)
-    public static void onConstructFinish(Tile tile, Block block, int builderID){
+    public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation){
         Team team = tile.getTeam();
         tile.setBlock(block);
         tile.setTeam(team);
+        tile.setRotation(rotation);
         Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
 
         //last builder was this local client player, call placed()
@@ -196,7 +197,7 @@ public class BuildBlock extends Block {
             lastProgress = maxProgress;
 
             if(progress >= 1f){
-                CallBlocks.onConstructFinish(tile, recipe.result, builder.getID());
+                CallBlocks.onConstructFinish(tile, recipe.result, builder.getID(), tile.getRotation());
             }
         }
 
