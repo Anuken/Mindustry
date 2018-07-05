@@ -181,6 +181,8 @@ public class BlockInventoryFragment extends Fragment {
 
     @Remote(called = Loc.server, targets = Loc.both, in = In.blocks, forward = true)
     public static void requestItem(Player player, Tile tile, Item item, int amount){
+        if(player == null) return;
+
         int removed = tile.block().removeStack(tile, item, amount);
 
         player.inventory.addItem(item, removed);

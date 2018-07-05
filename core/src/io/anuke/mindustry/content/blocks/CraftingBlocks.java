@@ -52,9 +52,10 @@ public class CraftingBlocks extends BlockList implements ContentList {
             flameColor = Color.valueOf("ffef99");
         }};
 
-        plastaniumCompressor = new PlasteelCompressor("plastanium-compressor") {{
+        plastaniumCompressor = new PlastaniumCompressor("plastanium-compressor") {{
             inputLiquid = Liquids.oil;
-            inputItem = new ItemStack(Items.carbide, 1);
+            inputItem = new ItemStack(Items.titanium, 2);
+            hasItems = true;
             liquidUse = 0.3f;
             liquidCapacity = 60f;
             powerUse = 0.5f;

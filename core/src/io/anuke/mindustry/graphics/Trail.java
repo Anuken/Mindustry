@@ -1,6 +1,7 @@
 package io.anuke.mindustry.graphics;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.FloatArray;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
@@ -9,14 +10,20 @@ import io.anuke.ucore.util.Mathf;
 
 /**Class that renders a trail.*/
 public class Trail {
+    private final static float maxJump = 15f;
     private final int length;
     private final FloatArray points = new FloatArray();
+    private float lastX, lastY;
 
     public Trail(int length){
         this.length = length;
     }
 
     public synchronized void update(float curx, float cury){
+        if(Vector2.dst(curx, cury, lastX, lastY) >= maxJump){
+            points.clear();
+        }
+
         points.add(curx, cury);
 
         if(points.size > length*2) {
@@ -24,6 +31,9 @@ public class Trail {
             System.arraycopy(items, 2, items, 0, points.size - 2);
             points.size -= 2;
         }
+
+        lastX = curx;
+        lastY = cury;
     }
 
     public synchronized void clear(){

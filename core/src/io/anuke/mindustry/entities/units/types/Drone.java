@@ -18,7 +18,6 @@ import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
@@ -206,25 +205,18 @@ public class Drone extends FlyingUnit implements BuilderTrait {
     public void write(DataOutput data) throws IOException {
         super.write(data);
         data.writeInt(mineTile == null ? -1 : mineTile.packedPosition());
-        data.writeInt(placeQueue.size == 0 ? -1 : world.tile(placeQueue.last().x, placeQueue.last().y).packedPosition());
-        data.writeByte(placeQueue.size == 0 ? -1 : placeQueue.last().recipe.id);
+        writeBuilding(data);
     }
 
     @Override
     public void read(DataInput data, long time) throws IOException {
         super.read(data, time);
         int mined = data.readInt();
-        int pp = data.readInt();
-        byte rid = data.readByte();
+
+        readBuilding(data);
 
         if(mined != -1){
             mineTile = world.tile(mined);
-        }
-
-        if(pp != -1){
-            Tile tile = world.tile(pp);
-            placeQueue.clear();
-            placeQueue.addLast(new BuildRequest(tile.x, tile.y, tile.getRotation(), Recipe.getByID(rid)));
         }
     }
 

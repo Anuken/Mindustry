@@ -15,6 +15,7 @@ import io.anuke.mindustry.io.MapTileData.TileDataMarker;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.ucore.noise.RidgedPerlin;
 import io.anuke.ucore.noise.Simplex;
 import io.anuke.ucore.util.Geometry;
@@ -133,7 +134,7 @@ public class WorldGenerator {
 						if(entry.noise.octaveNoise2D(2, 0.7, 1f / (2 + i*2), x, y)/2f +
 								entry.ridge.getValue(x, y, 1f / (28 + i*4)) >= 2.0f - entry.frequency*4.0f
 								&& entry.ridge.getValue(x+9999, y+9999, 1f/100f) > 0.4){
-							tile.setFloor(OreBlocks.get(tile.floor(), entry.item));
+							tile.setFloor((Floor) OreBlocks.get(tile.floor(), entry.item));
 							break;
 						}
 					}

@@ -10,8 +10,8 @@ import io.anuke.mindustry.content.fx.ShootFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.gen.CallBlocks;
-import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.In;
@@ -241,7 +241,7 @@ public class MassDriver extends Block {
                 if(amountDropped > 0){
                     float angle = Mathf.range(180f);
                     float vs = Mathf.random(0f, 4f);
-                    CallEntity.createItemDrop(Item.getByID(i), amountDropped, bullet.x, bullet.y, Angles.trnsx(angle, vs), Angles.trnsy(angle, vs));
+                    ItemDrop.create(Item.getByID(i), amountDropped, bullet.x, bullet.y, Angles.trnsx(angle, vs), Angles.trnsy(angle, vs));
                 }
             }
 

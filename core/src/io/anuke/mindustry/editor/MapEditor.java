@@ -268,6 +268,11 @@ public class MapEditor{
 
 	public void resize(int width, int height){
 		map = new MapTileData(width, height);
+		for (int x = 0; x < map.width(); x++) {
+			for (int y = 0; y < map.height(); y++) {
+				map.write(x, y, DataPosition.floor, (byte)Blocks.stone.id);
+			}
+		}
 		renderer.resize(width, height);
 	}
 }

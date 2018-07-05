@@ -219,6 +219,7 @@ public class NetClient extends Module {
             new Random().nextBytes(bytes);
             String result = new String(Base64Coder.encode(bytes));
             Settings.putString("usid-" + ip, result);
+            Settings.save();
             return result;
         }
     }
@@ -352,7 +353,9 @@ public class NetClient extends Module {
                     if(entity == null){
                         entity = (SyncTrait) TypeTrait.getTypeByID(typeID).get(); //create entity from supplier
                         entity.resetID(id);
-                        add = true;
+                        if(!netClient.isEntityUsed(entity.getID())){
+                            add = true;
+                        }
                     }
 
                     //read the entity
@@ -363,7 +366,7 @@ public class NetClient extends Module {
                         throw new RuntimeException("Error reading entity of type '"+ group.getType() + "': Read length mismatch [write=" + readLength + ", read=" + (netClient.byteStream.position() - position - 1)+ "]");
                     }
 
-                    if(add && !netClient.isEntityUsed(entity.getID())){
+                    if(add){
                         entity.add();
                         netClient.addRemovedEntity(entity.getID());
                     }

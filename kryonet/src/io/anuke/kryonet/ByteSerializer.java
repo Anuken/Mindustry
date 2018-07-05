@@ -26,9 +26,6 @@ public class ByteSerializer implements Serialization {
                 throw new RuntimeException("Unregistered class: " + ClassReflection.getSimpleName(o.getClass()));
             byteBuffer.put(id);
             ((Packet) o).write(byteBuffer);
-            synchronized (packetPoolLock) {
-                Pooling.free(o);
-            }
         }
     }
 

@@ -7,7 +7,9 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.gen.CallBlocks;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
@@ -28,6 +30,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
+//TODO re-implement properly
 public class Reconstructor extends Block{
     protected float departTime = 30f;
     protected float arriveTime = 40f;
@@ -117,9 +120,9 @@ public class Reconstructor extends Block{
         if(entity.current != null){
             float progress = entity.departing ? entity.updateTime : (1f - entity.updateTime);
 
-            Player player = entity.current;
+            //Player player = entity.current;
 
-            TextureRegion region = player.mech.iconRegion;
+            TextureRegion region = entity.current.getIconRegion();
 
             Shaders.build.region = region;
             Shaders.build.progress = progress;
@@ -157,7 +160,7 @@ public class Reconstructor extends Block{
             if(entity.departing){
                 //force respawn if there's suddenly nothing to link to
                 if(!validLink(tile, entity.link)){
-                    entity.current.setRespawning(false);
+                    //entity.current.setRespawning(false);
                     return;
                 }
 
@@ -168,7 +171,7 @@ public class Reconstructor extends Block{
                     //no power? death.
                     if(other.power.amount < powerPerTeleport){
                         entity.current.setDead(true);
-                        entity.current.setRespawning(false);
+                        //entity.current.setRespawning(false);
                         entity.current = null;
                         return;
                     }
@@ -263,8 +266,8 @@ public class Reconstructor extends Block{
         player.rotation = 90f;
         player.baseRotation = 90f;
         player.setDead(true);
-        player.setRespawning(true);
-        player.setRespawning();
+       // player.setRespawning(true);
+        //player.setRespawning();
     }
 
     @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
@@ -300,12 +303,22 @@ public class Reconstructor extends Block{
         });
     }
 
-    public class ReconstructorEntity extends TileEntity{
-        public Player current;
-        public float updateTime;
-        public float time;
-        public int link;
-        public boolean solid = true, departing;
+    public class ReconstructorEntity extends TileEntity implements SpawnerTrait{
+        Unit current;
+        float updateTime;
+        float time;
+        int link;
+        boolean solid = true, departing;
+
+        @Override
+        public void updateSpawning(Unit unit) {
+
+        }
+
+        @Override
+        public float getSpawnProgress() {
+            return 0;
+        }
 
         @Override
         public void write(DataOutputStream stream) throws IOException {

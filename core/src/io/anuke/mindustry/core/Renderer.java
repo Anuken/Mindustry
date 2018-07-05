@@ -191,11 +191,8 @@ public class Renderer extends RendererModule{
 		Graphics.clear(clearColor);
 		
 		batch.setProjectionMatrix(camera.combined);
-		
-		if(pixelate) 
-			Graphics.surface(pixelSurface, false);
-		else
-			batch.begin();
+
+		Graphics.surface(pixelSurface, false);
 
 		drawPadding();
 		
@@ -222,6 +219,7 @@ public class Renderer extends RendererModule{
 			Graphics.endShaders();
 		}
 
+
         drawAllTeams(false);
 
 		blocks.skipLayer(Layer.turret);
@@ -236,18 +234,21 @@ public class Renderer extends RendererModule{
 		drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
 		overlays.drawTop();
 
-		if(pixelate)
-			Graphics.flushSurface();
+		Graphics.flushSurface();
 
 		if(showPaths && debug) drawDebug();
-
-		drawAndInterpolate(playerGroup, p -> !p.isLocal && !p.isDead(), Player::drawName);
 
 		batch.end();
 
 		if(showFog){
 			fog.draw();
 		}
+
+		batch.begin();
+		EntityDraw.setClip(false);
+		drawAndInterpolate(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
+		EntityDraw.setClip(true);
+		batch.end();
 	}
 
 	private void drawAllTeams(boolean flying){
@@ -257,7 +258,7 @@ public class Renderer extends RendererModule{
 			if(group.count(p -> p.isFlying() == flying) +
 					playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
 
-			drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying, Unit::drawUnder);
+			drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
 			drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawUnder);
 
 			Shaders.outline.color.set(team.color);
@@ -265,13 +266,13 @@ public class Renderer extends RendererModule{
 
 			Graphics.beginShaders(Shaders.outline);
 			Graphics.shader(Shaders.mix, true);
-			drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying);
+			drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead());
 			drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team);
 			Graphics.shader();
 			blocks.drawTeamBlocks(Layer.turret, team);
 			Graphics.endShaders();
 
-			drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying, Unit::drawOver);
+			drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
 			drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);
 		}
 	}
@@ -306,11 +307,18 @@ public class Renderer extends RendererModule{
 				}
 			}
 
+			//TODO extremely hacky
+			if(t instanceof Player && ((Player) t).getCarry() != null && ((Player) t).getCarry() instanceof Player && ((Player) ((Player) t).getCarry()).isLocal){
+				((Player) t).x = ((Player) t).getCarry().getX();
+				((Player) t).y = ((Player) t).getCarry().getY();
+			}
+
 			drawer.accept(t);
 
+			t.setX(lastx);
+			t.setY(lasty);
+
 			if(threads.doInterpolate() && threads.isEnabled()) {
-				t.setX(lastx);
-				t.setY(lasty);
 
 				if (t instanceof SolidTrait) {
 					((SolidTrait) t).setRotation(lastrot);

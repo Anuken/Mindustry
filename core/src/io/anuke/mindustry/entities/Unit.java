@@ -132,6 +132,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     @Override
     public void readSave(DataInput stream) throws IOException {
         byte team = stream.readByte();
+        boolean dead = stream.readBoolean();
         float x = stream.readFloat();
         float y = stream.readFloat();
         byte xv = stream.readByte();
@@ -141,6 +142,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
         this.status.readSave(stream);
         this.inventory.readSave(stream);
+        this.dead = dead;
         this.team = Team.all[team];
         this.health = health;
         this.x = x;
@@ -151,6 +153,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     public void writeSave(DataOutput stream, boolean net) throws IOException {
         stream.writeByte(team.ordinal());
+        stream.writeBoolean(isDead());
         stream.writeFloat(net ? interpolator.target.x : x);
         stream.writeFloat(net ? interpolator.target.y : y);
         stream.writeByte((byte)(Mathf.clamp(velocity.x, -maxAbsVelocity, maxAbsVelocity) * velocityPercision));
@@ -196,7 +199,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public void avoidOthers(float avoidRange){
 
         EntityPhysics.getNearby(getGroup(), x, y, avoidRange*2f, t -> {
-            if(t == this || (t instanceof Unit && (((Unit) t).isDead() || (((Unit) t).isFlying() != isFlying())))) return;
+            if(t == this || (t instanceof Unit && (((Unit) t).isDead() || (((Unit) t).isFlying() != isFlying()) || ((Unit) t).getCarrier() == this) || getCarrier() == t)) return;
             float dst = distanceTo(t);
             if(dst > avoidRange) return;
             velocity.add(moveVector.set(x, y).sub(t.getX(), t.getY()).setLength(1f * (1f - (dst / avoidRange))));

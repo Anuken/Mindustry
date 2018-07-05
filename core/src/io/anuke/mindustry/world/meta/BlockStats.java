@@ -5,10 +5,7 @@ import com.badlogic.gdx.utils.OrderedMap;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.meta.values.ItemValue;
-import io.anuke.mindustry.world.meta.values.LiquidValue;
-import io.anuke.mindustry.world.meta.values.NumberValue;
-import io.anuke.mindustry.world.meta.values.StringValue;
+import io.anuke.mindustry.world.meta.values.*;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
 
@@ -22,6 +19,11 @@ public class BlockStats {
     /**Adds a single float value with this stat, formatted to 2 decimal places.*/
     public void add(BlockStat stat, float value, StatUnit unit){
         add(stat, new NumberValue(value, unit));
+    }
+
+    /**Adds a single y/n boolean value.*/
+    public void add(BlockStat stat, boolean value){
+        add(stat, new BooleanValue(value));
     }
 
     /**Adds an item value.*/

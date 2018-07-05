@@ -11,6 +11,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.gen.CallBlocks;
@@ -21,6 +22,7 @@ import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
+import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Effects;
@@ -62,6 +64,13 @@ public class CoreBlock extends StorageBlock {
         itemCapacity = 2000;
         viewRange = 200f;
         flags = EnumSet.of(BlockFlag.resupplyPoint, BlockFlag.target);
+    }
+
+    @Override
+    public void setBars() {
+        super.setBars();
+
+        bars.remove(BarType.inventory);
     }
 
     @Override
@@ -132,7 +141,7 @@ public class CoreBlock extends StorageBlock {
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return tile.entity.items.items[item.id]< itemCapacity && item.type == ItemType.material;
+        return tile.entity.items.items[item.id] < itemCapacity && item.type == ItemType.material;
     }
 
     @Override
@@ -192,14 +201,13 @@ public class CoreBlock extends StorageBlock {
                     }
                 }
 
-                if(!found) {
-
+                if(!found){
                     BaseUnit unit = droneType.create(tile.getTeam());
-                    entity.droneID = unit.id;
+                    unit.setSpawner(tile);
                     unit.setDead(true);
-                    unit.setGroup(unitGroups[unit.getTeam().ordinal()]);
-                    CallBlocks.onCoreUnitSet(tile, unit);
-                    unit.setGroup(null);
+                    unit.add();
+
+                    entity.droneID = unit.id;
                 }
             }
 
@@ -243,18 +251,17 @@ public class CoreBlock extends StorageBlock {
         entity.currentUnit.rotation = 90f;
         entity.currentUnit.setNet(tile.drawx(), tile.drawy());
         entity.currentUnit.add();
-
-        if(entity.currentUnit instanceof Player){
-            ((Player) entity.currentUnit).baseRotation = 90f;
-        }
-
         entity.currentUnit = null;
     }
 
     @Remote(called = Loc.server, in = In.blocks)
+    public static void setCoreSolid(Tile tile, boolean solid){
+        CoreEntity entity = tile.entity();
+        entity.solid = solid;
+    }
+/*
+    @Remote(called = Loc.server, in = In.blocks)
     public static void onCoreUnitSet(Tile tile, Unit player){
-        if(player == null) return;
-
         CoreEntity entity = tile.entity();
         entity.currentUnit = player;
         entity.progress = 0f;
@@ -264,14 +271,8 @@ public class CoreBlock extends StorageBlock {
             ((Player) player).setRespawning(true);
         }
     }
-
-    @Remote(called = Loc.server, in = In.blocks)
-    public static void setCoreSolid(Tile tile, boolean solid){
-        CoreEntity entity = tile.entity();
-        entity.solid = solid;
-    }
-
-    public class CoreEntity extends TileEntity{
+*/
+    public class CoreEntity extends TileEntity implements SpawnerTrait{
         public Unit currentUnit;
         int droneID = -1;
         boolean solid = true;
@@ -280,10 +281,18 @@ public class CoreBlock extends StorageBlock {
         float time;
         float heat;
 
-        public void trySetPlayer(Player player){
+        @Override
+        public void updateSpawning(Unit unit) {
             if(currentUnit == null){
-                CallBlocks.onCoreUnitSet(tile, player);
+                currentUnit = unit;
+                progress = 0f;
+                unit.set(tile.drawx(), tile.drawy());
             }
+        }
+
+        @Override
+        public float getSpawnProgress() {
+            return progress;
         }
 
         @Override

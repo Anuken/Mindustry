@@ -144,6 +144,16 @@ public class TypeIO {
         return world.tile(buffer.getInt());
     }
 
+    @WriteClass(Block.class)
+    public static void writeBlock(ByteBuffer buffer, Block block){
+        buffer.put((byte)block.id);
+    }
+
+    @ReadClass(Block.class)
+    public static Block readBlock(ByteBuffer buffer){
+        return Block.getByID(buffer.get());
+    }
+
     @WriteClass(KickReason.class)
     public static void writeKick(ByteBuffer buffer, KickReason reason){
         buffer.put((byte)reason.ordinal());

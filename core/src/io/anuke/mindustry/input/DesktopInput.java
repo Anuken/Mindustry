@@ -300,14 +300,14 @@ public class DesktopInput extends InputHandler{
             if(player.playerIndex > 0){
                 controlling = true;
             }
-
+            /*
             if(Inputs.keyTap(section,"select")){
                 Inputs.getProcessor().touchDown((int)getMouseX(), (int)getMouseY(), player.playerIndex, Buttons.LEFT);
             }
 
             if(Inputs.keyRelease(section,"select")){
                 Inputs.getProcessor().touchUp((int)getMouseX(), (int)getMouseY(), player.playerIndex, Buttons.LEFT);
-            }
+            }*/
 
             float xa = Inputs.getAxis(section, "cursor_x");
             float ya = Inputs.getAxis(section, "cursor_y");

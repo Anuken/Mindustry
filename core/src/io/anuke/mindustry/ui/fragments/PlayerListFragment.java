@@ -70,9 +70,19 @@ public class PlayerListFragment extends Fragment{
                     if(!checkmap.containsKey(player) || checkmap.get(player, false) != player.isAdmin){
                         rebuild = true;
                     }
-                    checkmap.put(player, player.isAdmin);
                 }
-                if(rebuild) rebuild();
+                for(Player player : checkmap.keys()){
+                    if(!player.isAdded()){
+                        rebuild = true;
+                    }
+                }
+                if(rebuild){
+                    rebuild();
+                    checkmap.clear();
+                    for(Player player : playerGroup.all()){
+                        checkmap.put(player, player.isAdmin);
+                    }
+                }
             });
 
             visible(() -> visible);

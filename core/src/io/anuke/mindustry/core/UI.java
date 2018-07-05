@@ -92,8 +92,6 @@ public class UI extends SceneModule{
 		
 		Settings.setErrorHandler(()-> Timers.run(1f, ()-> showError("[crimson]Failed to access local storage.\nSettings will not be saved.")));
 		
-		Settings.defaults("pixelate", true);
-		
 		Dialog.closePadR = -1;
 		Dialog.closePadT = 5;
 		

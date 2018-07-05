@@ -123,14 +123,12 @@ public class FogRenderer implements Disposable{
         Graphics.shader();
 
         Graphics.begin();
-
         Core.batch.draw(renderer.pixelSurface.texture(), px, py + vh, vw, -vh);
         Graphics.end();
 
         if(Core.batch instanceof ClipSpriteBatch){
             ((ClipSpriteBatch) Core.batch).enableClip(true);
         }
-
     }
 
     public Texture getTexture(){

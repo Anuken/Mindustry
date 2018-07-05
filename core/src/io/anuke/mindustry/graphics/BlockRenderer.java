@@ -59,36 +59,42 @@ public class BlockRenderer{
 		
 		Graphics.surface(renderer.effectSurface);
 
-		for(int x = -rangex - expandr; x <= rangex + expandr; x++){
-			for(int y = -rangey - expandr; y <= rangey + expandr; y++){
-				int worldx = Mathf.scl(camera.position.x, tilesize) + x;
-				int worldy = Mathf.scl(camera.position.y, tilesize) + y;
-				boolean expanded = (x < -rangex || x > rangex || y < -rangey || y > rangey);
-				
-				Tile tile = world.tile(worldx, worldy);
-				
-				if(tile != null){
-					Block block = tile.block();
-					
-					if(!expanded && block != Blocks.air && world.isAccessible(worldx, worldy)){
-						synchronized (Tile.tileSetLock) {
+		int avgx = Mathf.scl(camera.position.x, tilesize);
+		int avgy = Mathf.scl(camera.position.y, tilesize);
+
+		int minx = Math.max(avgx - rangex - expandr, 0);
+		int miny = Math.max(avgy - rangey - expandr, 0);
+		int maxx = Math.min(world.width() - 1, avgx + rangex + expandr);
+		int maxy = Math.min(world.height() - 1, avgy+ rangey + expandr);
+
+		for(int x = minx; x <= maxx; x++){
+			for(int y = miny; y <= maxy; y++){
+				boolean expanded = (Math.abs(x - avgx) > rangex || Math.abs(y - avgy) > rangey);
+
+				synchronized (Tile.tileSetLock) {
+					Tile tile = world.rawTile(x, y);
+
+					if (tile != null) {
+						Block block = tile.block();
+
+						if (!expanded && block != Blocks.air && world.isAccessible(x, y)) {
 							tile.block().drawShadow(tile);
 						}
-					}
-					
-					if(!(block instanceof StaticBlock)){
-						if(block != Blocks.air){
-							if(!expanded){
-								addRequest(tile, Layer.block);
-							}
 
-							if(block.expanded || !expanded){
-								if(block.layer != null && block.isLayer(tile)){
-									addRequest(tile, block.layer);
+						if (!(block instanceof StaticBlock)) {
+							if (block != Blocks.air) {
+								if (!expanded) {
+									addRequest(tile, Layer.block);
 								}
 
-								if(block.layer2 != null && block.isLayer2(tile)){
-									addRequest(tile, block.layer2);
+								if (block.expanded || !expanded) {
+									if (block.layer != null && block.isLayer(tile)) {
+										addRequest(tile, block.layer);
+									}
+
+									if (block.layer2 != null && block.isLayer2(tile)) {
+										addRequest(tile, block.layer2);
+									}
 								}
 							}
 						}

@@ -17,8 +17,8 @@ public class WaveCreator{
 				}},
 
 				new SpawnGroup(UnitTypes.vtol){{
-					begin = 4;
-					end = 6;
+					begin = 12;
+					end = 14;
 				}},
 
 				new SpawnGroup(UnitTypes.scout){{
@@ -29,7 +29,7 @@ public class WaveCreator{
 				}},
 
 				new SpawnGroup(UnitTypes.titan){{
-					begin = 8;
+					begin = 9;
 					spacing = 3;
 					unitScaling = 2;
 
@@ -71,7 +71,7 @@ public class WaveCreator{
 				}},
 
 				new SpawnGroup(UnitTypes.vtol){{
-					begin = 14;
+					begin = 16;
 					unitScaling = 2;
 					spacing = 2;
 
@@ -100,7 +100,7 @@ public class WaveCreator{
 				}},
 
 				new SpawnGroup(UnitTypes.scout){{
-					begin = 25;
+					begin = 35;
 					spacing = 3;
 					unitAmount = 4;
 					groupAmount = 2;
@@ -120,9 +120,10 @@ public class WaveCreator{
 				}},
 
 				new SpawnGroup(UnitTypes.monsoon){{
-					begin = 35;
+					begin = 40;
 					ammoItem = Items.blastCompound;
 					unitAmount = 2;
+					spacing = 2;
 					unitScaling = 3;
 					max = 8;
 				}},

@@ -13,10 +13,10 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.ContentDatabase;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.input.MobileInput;
 import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
+import io.anuke.mindustry.input.MobileInput;
 import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.Saves;
 import io.anuke.mindustry.net.Net;
@@ -162,7 +162,7 @@ public class Control extends Module{
 	}
 
 	public void addPlayer(int index){
-	    if(players.length < index + 1){
+	    if(players.length != index + 1){
 	        Player[] old = players;
 	        players = new Player[index + 1];
             System.arraycopy(old, 0, players, 0, old.length);
@@ -285,8 +285,11 @@ public class Control extends Module{
 	@Override
 	public void dispose(){
 		Platform.instance.onGameExit();
+		ContentLoader.dispose();
 		Net.dispose();
 		ui.editor.dispose();
+		inputs = new InputHandler[]{};
+		players = new Player[]{};
 	}
 
 	@Override
@@ -311,12 +314,24 @@ public class Control extends Module{
 		if(!Settings.has("4.0-warning")){
 			Settings.putBool("4.0-warning", true);
 
-			Timers.runTask(5f, () -> {
+			Timers.run(5f, () -> {
 				FloatingDialog dialog = new FloatingDialog("[orange]WARNING![]");
 				dialog.buttons().addButton("$text.ok", dialog::hide).size(100f, 60f);
 				dialog.content().add("The beta version you are about to play should be considered very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
 						"A large portion of content is still unimplemented. \nAll current art and UI is temporary, and will be re-drawn before release. " +
 						"\n\n[accent]Saves and maps may be corrupted without warning between updates.[] You have been warned!").wrap().width(500f);
+				dialog.show();
+
+			});
+		}
+
+		if(!Settings.has("4.0-no-sound")){
+			Settings.putBool("4.0-no-sound", true);
+
+			Timers.run(4f, () -> {
+				FloatingDialog dialog = new FloatingDialog("[orange]Attention![]");
+				dialog.buttons().addButton("$text.ok", dialog::hide).size(100f, 60f);
+				dialog.content().add("You might have noticed that 4.0 does not have any sound.\nThis is [orange]intentional![] Sound will be added in a later update.\n\n[LIGHT_GRAY](now stop reporting this as a bug)").wrap().width(500f);
 				dialog.show();
 
 			});
@@ -355,7 +370,7 @@ public class Control extends Module{
             }
 
             //check unlocks every 2 seconds
-			if(!state.mode.infiniteResources && !state.mode.disableWaveTimer && Timers.get("timerCheckUnlock", 120)){
+			if(!state.mode.infiniteResources && Timers.get("timerCheckUnlock", 120)){
 				checkUnlockableBlocks();
 
 				//save if the db changed, but don't save unlocks

@@ -31,7 +31,6 @@ public class Net{
 	private static boolean active;
 	private static boolean clientLoaded;
 	private static Array<Object> packetQueue = new Array<>();
-	private static ObjectMap<Class<?>, Consumer> listeners = new ObjectMap<>();
 	private static ObjectMap<Class<?>, Consumer> clientListeners = new ObjectMap<>();
 	private static ObjectMap<Class<?>, BiConsumer<Integer, Object>> serverListeners = new ObjectMap<>();
 	private static ClientProvider clientProvider;
@@ -146,11 +145,6 @@ public class Net{
 		Net.serverProvider = provider;
 	}
 
-	/**Registers a common listener for when an object is recieved. Fired on both client and serve.r*/
-	public static <T> void handle(Class<T> type, Consumer<T> listener){
-		listeners.put(type, listener);
-	}
-
 	/**Registers a client listener for when an object is recieved.*/
 	public static <T> void handleClient(Class<T> type, Consumer<T> listener){
 		clientListeners.put(type, listener);
@@ -178,12 +172,10 @@ public class Net{
 				streams.remove(builder.id);
 				handleClientReceived(builder.build());
 			}
-		}else if(clientListeners.get(object.getClass()) != null ||
-					listeners.get(object.getClass()) != null){
+		}else if(clientListeners.get(object.getClass()) != null){
 
 			if(clientLoaded || ((object instanceof Packet) && ((Packet) object).isImportant())){
 				if(clientListeners.get(object.getClass()) != null) clientListeners.get(object.getClass()).accept(object);
-				if(listeners.get(object.getClass()) != null) listeners.get(object.getClass()).accept(object);
 				synchronized (packetPoolLock) {
 					Pooling.free(object);
 				}
@@ -203,9 +195,8 @@ public class Net{
 	/**Call to handle a packet being recieved for the server.*/
 	public static void handleServerReceived(int connection, Object object){
 
-		if(serverListeners.get(object.getClass()) != null || listeners.get(object.getClass()) != null){
+		if(serverListeners.get(object.getClass()) != null){
 			if(serverListeners.get(object.getClass()) != null) serverListeners.get(object.getClass()).accept(connection, object);
-			if(listeners.get(object.getClass()) != null) listeners.get(object.getClass()).accept(object);
 			synchronized (packetPoolLock) {
 				Pooling.free(object);
 			}

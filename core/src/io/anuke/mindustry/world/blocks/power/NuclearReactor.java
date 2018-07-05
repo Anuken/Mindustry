@@ -13,6 +13,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -38,6 +39,7 @@ public class NuclearReactor extends PowerGenerator {
 	protected float heating = 0.009f; //heating per frame
 	protected float coolantPower = 0.015f; //how much heat decreases per coolant unit
 	protected float smokeThreshold = 0.3f; //threshold at which block starts smoking
+	protected float maxLiquidUse = 1f; //max liquid use per frame
 	protected int explosionRadius = 19;
 	protected int explosionDamage = 135;
 	protected float flashThreshold = 0.46f; //heat threshold at which the lights start flashing
@@ -49,6 +51,7 @@ public class NuclearReactor extends PowerGenerator {
 		liquidCapacity = 50;
 		powerCapacity = 80f;
 		hasItems = true;
+		hasLiquids = true;
 	}
 
 	@Override
@@ -62,6 +65,7 @@ public class NuclearReactor extends PowerGenerator {
 	public void setStats(){
 		super.setStats();
 		stats.add(BlockStat.inputItem, generateItem);
+		stats.add(BlockStat.inputLiquid, new LiquidFilterValue(liquid -> liquid.temperature <= 0.5f));
 		stats.add(BlockStat.maxPowerGeneration, powerMultiplier*60f, StatUnit.powerSecond);
 	}
 	
@@ -85,12 +89,12 @@ public class NuclearReactor extends PowerGenerator {
 
 			if(entity.liquids.liquid.temperature <= 0.5f){ //is coolant
 				float pow = coolantPower * entity.liquids.liquid.heatCapacity; //heat depleted per unit of liquid
-				float maxUsed = Math.min(entity.liquids.amount, entity.heat / pow); //max that can be cooled in terms of liquid
+				float maxUsed = Math.min(Math.min(entity.liquids.amount, entity.heat / pow), maxLiquidUse * Timers.delta()); //max that can be cooled in terms of liquid
 				entity.heat -= maxUsed * pow;
 				entity.liquids.amount -= maxUsed;
 			}else{ //is heater
 				float heat = coolantPower * entity.liquids.liquid.heatCapacity / 4f; //heat created per unit of liquid
-				float maxUsed = Math.min(entity.liquids.amount, (1f - entity.heat) / heat); //max liquid used
+				float maxUsed = Math.min(Math.min(entity.liquids.amount, (1f - entity.heat) / heat), maxLiquidUse * Timers.delta()); //max liquid used
 				entity.heat += maxUsed * heat;
 				entity.liquids.amount -= maxUsed;
 			}

@@ -175,7 +175,7 @@ public class NetServer extends Module{
             NetConnection connection = Net.getConnection(id);
             if(player == null || connection == null || packet.snapid < connection.lastRecievedClientSnapshot) return;
 
-            boolean verifyPosition = !player.isDead() && !debug && headless && !player.mech.flying;
+            boolean verifyPosition = !player.isDead() && !debug && headless && !player.mech.flying && player.getCarrier() == null;
 
             if(connection.lastRecievedClientTime == 0) connection.lastRecievedClientTime = TimeUtils.millis() - 16;
 
@@ -191,6 +191,10 @@ public class NetServer extends Module{
             player.setMineTile(packet.mining);
             player.isBoosting = packet.boosting;
             player.isShooting = packet.shooting;
+            player.getPlaceQueue().clear();
+            if(packet.currentRequest != null){
+                player.getPlaceQueue().addLast(packet.currentRequest);
+            }
 
             vector.set(packet.x - player.getInterpolator().target.x, packet.y - player.getInterpolator().target.y);
 
@@ -485,14 +489,18 @@ public class NetServer extends Module{
             return;
         }
 
-        if(other == null || other.isAdmin){
+        if(other == null || (other.isAdmin && other != player)){ //fun fact: this means you can ban yourself
             Log.err("{0} attempted to perform admin action on nonexistant or admin player.", player.name);
             return;
         }
 
         String ip = player.con.address;
 
-        if(action == AdminAction.ban){
+        if(action == AdminAction.wave) {
+            //no verification is done, so admins can hypothetically spam waves
+            //not a real issue, because server owners may want to do just that
+            state.wavetime = 0f;
+        }else if(action == AdminAction.ban){
             netServer.admins.banPlayerIP(ip);
             netServer.kick(other.con.id, KickReason.banned);
             Log.info("&lc{0} has banned {1}.", player.name, other.name);

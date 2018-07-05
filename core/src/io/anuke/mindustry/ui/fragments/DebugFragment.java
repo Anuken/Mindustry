@@ -2,14 +2,14 @@ package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
@@ -59,13 +59,13 @@ public class DebugFragment extends Fragment {
                row();
                new button("noclip", "toggle", () -> noclip = !noclip);
                row();
-               new button("fire", () -> {
+               new button("items", () -> {
                    for (int i = 0; i < 10; i++) {
-                       Bullet.create(TurretBullets.fireball, player, player.x, player.y, Mathf.random(360f));
+                       ItemDrop.create(Item.all().random(), 5, player.x, player.y, Mathf.random(360f));
                    }
                });
                row();
-               new button("team", "toggle", () -> player.toggleTeam());
+               new button("team", "toggle", player::toggleTeam);
                row();
                new button("blocks", "toggle", () -> showBlockDebug = !showBlockDebug);
                row();
@@ -185,7 +185,7 @@ public class DebugFragment extends Fragment {
             result.append(player.id);
             result.append("\n");
             result.append("   cid: ");
-            result.append(player.con.id);
+            result.append(player.con == null ? -1 : player.con.id);
             result.append("\n");
             result.append("   dead: ");
             result.append(player.isDead());

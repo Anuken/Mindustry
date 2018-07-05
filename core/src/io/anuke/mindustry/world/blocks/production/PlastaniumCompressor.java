@@ -4,9 +4,9 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
-public class PlasteelCompressor extends GenericCrafter {
+public class PlastaniumCompressor extends GenericCrafter {
 
-    public PlasteelCompressor(String name) {
+    public PlastaniumCompressor(String name) {
         super(name);
     }
 

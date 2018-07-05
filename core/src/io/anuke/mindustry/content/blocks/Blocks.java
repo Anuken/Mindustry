@@ -32,7 +32,6 @@ public class Blocks extends BlockList implements ContentList{
 
         for(int i = 1; i <= 6; i ++){
             new BuildBlock("build" + i);
-            new BreakBlock("break" + i);
         }
 
         space = new Floor("space") {{

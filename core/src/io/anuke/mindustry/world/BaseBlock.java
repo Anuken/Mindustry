@@ -198,6 +198,8 @@ public abstract class BaseBlock {
 
     /**Try dumping a specific item near the tile.*/
     public boolean tryDump(Tile tile, Item todump){
+        if(tile.entity == null || !hasItems) return false;
+
         int size = tile.block().size;
 
         GridPoint2[] nearby = Edges.getEdges(size);

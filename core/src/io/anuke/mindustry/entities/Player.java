@@ -30,10 +30,7 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.ThreadQueue;
-import io.anuke.ucore.util.Timer;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -58,6 +55,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 	public float boostHeat;
 	public Color color = new Color();
 	public Mech mech;
+	public int spawner;
 
 	public NetConnection con;
 	public int playerIndex = 0;
@@ -66,7 +64,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 	public TargetTrait target;
 	public TargetTrait moveTarget;
 
-	private boolean respawning;
 	private float walktime;
 	private Queue<BuildRequest> placeQueue = new ThreadQueue<>();
 	private Tile mining;
@@ -179,6 +176,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 	}
 
 	@Override
+	public void added() {
+		baseRotation = 90f;
+	}
+
+	@Override
 	public void addAmmo(Item item) {
 		inventory.addAmmo(mech.weapon.getAmmoType(item));
 	}
@@ -202,7 +204,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 	public void damage(float amount){
 		CallEntity.onPlayerDamage(this, calculateDamage(amount));
 
-		if(health <= 0 && !dead && isLocal){
+		if(health <= 0 && !dead){
 			CallEntity.onPlayerDeath(this);
 		}
 	}
@@ -225,7 +227,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		if(player == null) return;
 
 		player.dead = true;
-		player.respawning = false;
 		player.placeQueue.clear();
 
 		player.dropCarry();
@@ -438,18 +439,21 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		if(isDead()){
 			isBoosting = false;
 			boostHeat = 0f;
-			CoreEntity entity = (CoreEntity)getClosestCore();
-
-			if (!respawning && entity != null) {
-				entity.trySetPlayer(this);
-			}
+			updateRespawning();
 			return;
+		}else{
+			spawner = -1;
 		}
 
 		if(!isLocal){
 			interpolate();
 			updateBuilding(this); //building happens even with non-locals
 			status.update(this); //status effect updating also happens with non locals for effect purposes
+
+			if(getCarrier() != null){
+				x = getCarrier().getX();
+				y = getCarrier().getY();
+			}
 
 			if(Net.server()){
 				updateShooting(); //server simulates player shooting
@@ -532,11 +536,16 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
 		movement.limit(speed);
 
-		velocity.add(movement);
-
-		float prex = x, prey = y;
-		updateVelocityStatus(mech.drag, 10f);
-		moved = distanceTo(prex, prey) > 0.01f;
+		if(getCarrier() == null){
+			velocity.add(movement);
+			float prex = x, prey = y;
+			updateVelocityStatus(mech.drag, 10f);
+			moved = distanceTo(prex, prey) > 0.01f;
+		}else{
+			velocity.setZero();
+			x = Mathf.lerpDelta(x, getCarrier().getX(), 0.1f);
+			y = Mathf.lerpDelta(y, getCarrier().getY(), 0.1f);
+		}
 
 		if(!isShooting()){
 			if(!movement.isZero()) {
@@ -610,7 +619,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 				if (target == null) {
 					isShooting = false;
 					target = Units.getClosestTarget(team, x, y, inventory.getAmmoRange());
-				} else {
+				} else if(target.isValid()){
 					//rotate toward and shoot the target
 					rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
 
@@ -649,7 +658,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		inventory.clear();
 		placeQueue.clear();
 		dead = true;
-		respawning = false;
 		trail.clear();
 		health = maxHealth();
 
@@ -660,12 +668,21 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		return isShooting && inventory.hasAmmo() && (!isBoosting || mech.flying);
 	}
 
-	public void setRespawning(){
-		respawning = true;
+	public void updateRespawning(){
+
+		if (spawner != -1 && world.tile(spawner) != null && world.tile(spawner).entity instanceof SpawnerTrait) {
+			((SpawnerTrait) world.tile(spawner).entity).updateSpawning(this);
+		}else{
+			CoreEntity entity = (CoreEntity)getClosestCore();
+			if(entity != null){
+				this.spawner = entity.tile.id();
+			}
+		}
 	}
 
-	public void setRespawning(boolean respawning){
-		this.respawning = respawning;
+	public void beginRespawning(SpawnerTrait spawner){
+		this.spawner = spawner.getTile().packedPosition();
+		this.dead = true;
 	}
 
 	@Override
@@ -697,12 +714,18 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 	public void readSave(DataInput stream) throws IOException {
 		boolean local = stream.readBoolean();
 
-		if(local){
+		if(local && !headless){
 			byte mechid = stream.readByte();
 			int index = stream.readByte();
 			players[index].readSaveSuper(stream);
 			players[index].mech = Upgrade.getByID(mechid);
 			players[index].dead = false;
+		}else if(local){
+			byte mechid = stream.readByte();
+			stream.readByte();
+			readSaveSuper(stream);
+			mech = Upgrade.getByID(mechid);
+			dead = false;
 		}
 	}
 
@@ -722,6 +745,9 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		buffer.writeByte(mech.id);
 		buffer.writeBoolean(isBoosting);
 		buffer.writeInt(mining == null ? -1 : mining.packedPosition());
+		buffer.writeInt(spawner);
+
+		writeBuilding(buffer);
 	}
 
 	@Override
@@ -735,6 +761,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		mech = Upgrade.getByID(buffer.readByte());
 		boolean boosting = buffer.readBoolean();
 		int mine = buffer.readInt();
+		spawner = buffer.readInt();
+
+		readBuilding(buffer, !isLocal);
+
 		interpolator.read(lastx, lasty, x, y, time, rotation);
 		rotation = lastrot;
 

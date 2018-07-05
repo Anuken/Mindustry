@@ -4,19 +4,20 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.game.Difficulty;
-import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.ui.BorderImage;
-import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.event.Touchable;
+import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.ScrollPane;
+import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.utils.Cursors;
+import io.anuke.ucore.scene.utils.Elements;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
@@ -42,7 +43,7 @@ public class LevelDialog extends FloatingDialog{
 		
 		int maxwidth = (Gdx.graphics.getHeight() > Gdx.graphics.getHeight() ? 2 : 4);
 		
-		/*Table selmode = new Table();
+		Table selmode = new Table();
 		ButtonGroup<TextButton> group = new ButtonGroup<>();
 		selmode.add("$text.level.mode").padRight(15f);
 		
@@ -50,14 +51,13 @@ public class LevelDialog extends FloatingDialog{
 			TextButton[] b = {null};
 			b[0] = Elements.newButton("$mode." + mode.name() + ".name", "toggle", () -> state.mode = mode);
 			b[0].update(() -> b[0].setChecked(state.mode == mode));
-			b[0].setDisabled(true);
 			group.add(b[0]);
 			selmode.add(b[0]).size(130f, 54f);
 		}
 		selmode.addButton("?", this::displayGameModeHelp).size(50f, 54f).padLeft(18f);
 		
 		content().add(selmode);
-		content().row();*/
+		content().row();
 
 		Difficulty[] ds = Difficulty.values();
 

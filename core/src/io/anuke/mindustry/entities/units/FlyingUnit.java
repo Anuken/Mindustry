@@ -22,7 +22,6 @@ import static io.anuke.mindustry.Vars.world;
 
 public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     protected static Translator vec = new Translator();
-    protected static float maxAim = 30f;
     protected static float wobblyness = 0.6f;
 
     protected Trail trail = new Trail(8);
