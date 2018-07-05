@@ -35,7 +35,7 @@ public class Weapons implements ContentList {
 
         chainBlaster = new Weapon("chain-blaster") {{
             length = 1.5f;
-            reload = 20f;
+            reload = 30f;
             roundrobin = true;
             ejectEffect = ShootFx.shellEjectSmall;
             setAmmo(AmmoTypes.bulletLead, AmmoTypes.bulletCarbide, AmmoTypes.bulletTungsten, AmmoTypes.bulletSilicon, AmmoTypes.bulletThorium);

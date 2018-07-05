@@ -17,8 +17,8 @@ public class WaveCreator{
 				}},
 
 				new SpawnGroup(UnitTypes.vtol){{
-					begin = 6;
-					end = 8;
+					begin = 12;
+					end = 14;
 				}},
 
 				new SpawnGroup(UnitTypes.scout){{
@@ -100,7 +100,7 @@ public class WaveCreator{
 				}},
 
 				new SpawnGroup(UnitTypes.scout){{
-					begin = 25;
+					begin = 35;
 					spacing = 3;
 					unitAmount = 4;
 					groupAmount = 2;

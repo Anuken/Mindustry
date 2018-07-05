@@ -42,7 +42,7 @@ public class UnitTypes implements ContentList {
 
         vtol = new UnitType("vtol", Vtol.class, Vtol::new){{
             speed = 0.3f;
-            maxVelocity = 2.1f;
+            maxVelocity = 1.9f;
             drag = 0.01f;
             isFlying = true;
         }};
@@ -50,7 +50,7 @@ public class UnitTypes implements ContentList {
         monsoon = new UnitType("monsoon", Monsoon.class, Monsoon::new){{
             health = 230;
             speed = 0.2f;
-            maxVelocity = 1.5f;
+            maxVelocity = 1.4f;
             drag = 0.01f;
             isFlying = true;
             weapon = Weapons.bomber;

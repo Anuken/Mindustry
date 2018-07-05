@@ -125,7 +125,7 @@ public class StatusEffects implements ContentList {
         overdrive = new StatusEffect(6f) {
             {
                 armorMultiplier = 0.95f;
-                speedMultiplier = 1.4f;
+                speedMultiplier = 1.05f;
                 damageMultiplier = 1.4f;
             }
 
