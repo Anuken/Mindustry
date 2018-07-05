@@ -314,7 +314,7 @@ public class Control extends Module{
 		if(!Settings.has("4.0-warning")){
 			Settings.putBool("4.0-warning", true);
 
-			Timers.runTask(5f, () -> {
+			Timers.run(5f, () -> {
 				FloatingDialog dialog = new FloatingDialog("[orange]WARNING![]");
 				dialog.buttons().addButton("$text.ok", dialog::hide).size(100f, 60f);
 				dialog.content().add("The beta version you are about to play should be considered very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
@@ -328,7 +328,7 @@ public class Control extends Module{
 		if(!Settings.has("4.0-no-sound")){
 			Settings.putBool("4.0-no-sound", true);
 
-			Timers.runTask(4f, () -> {
+			Timers.run(4f, () -> {
 				FloatingDialog dialog = new FloatingDialog("[orange]Attention![]");
 				dialog.buttons().addButton("$text.ok", dialog::hide).size(100f, 60f);
 				dialog.content().add("You might have noticed that 4.0 does not have any sound.\nThis is [orange]intentional![] Sound will be added in a later update.\n\n[LIGHT_GRAY](now stop reporting this as a bug)").wrap().width(500f);

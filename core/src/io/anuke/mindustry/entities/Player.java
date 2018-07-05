@@ -441,6 +441,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 			boostHeat = 0f;
 			updateRespawning();
 			return;
+		}else{
+			spawner = -1;
 		}
 
 		if(!isLocal){
@@ -667,11 +669,14 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 	}
 
 	public void updateRespawning(){
-		CoreEntity entity = (CoreEntity)getClosestCore();
 
-		if (entity != null) {
-			this.spawner = entity.tile.id();
-			entity.updateSpawning(this);
+		if (spawner != -1 && world.tile(spawner) != null && world.tile(spawner).entity instanceof SpawnerTrait) {
+			((SpawnerTrait) world.tile(spawner).entity).updateSpawning(this);
+		}else{
+			CoreEntity entity = (CoreEntity)getClosestCore();
+			if(entity != null){
+				this.spawner = entity.tile.id();
+			}
 		}
 	}
 

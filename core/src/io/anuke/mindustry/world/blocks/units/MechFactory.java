@@ -117,7 +117,7 @@ public class MechFactory extends Block{
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
             entity.progress += 1f / buildTime;
 
-            entity.time += entity.heat;
+            entity.time += 0.5f;
 
             if(entity.progress >= 1f){
                 CallBlocks.onMechFactoryDone(tile);
