@@ -394,7 +394,9 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 	public static void onUnitDeath(BaseUnit unit){
 		if(unit == null) return;
 
-		UnitDrops.dropItems(unit);
+		if(Net.server() || !Net.active()){
+			UnitDrops.dropItems(unit);
+		}
 
 		float explosiveness = 2f + (unit.inventory.hasItem() ? unit.inventory.getItem().item.explosiveness * unit.inventory.getItem().amount : 0f);
 		float flammability = (unit.inventory.hasItem() ? unit.inventory.getItem().item.flammability * unit.inventory.getItem().amount : 0f);
