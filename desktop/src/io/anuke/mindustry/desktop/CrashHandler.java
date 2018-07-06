@@ -1,5 +1,6 @@
 package io.anuke.mindustry.desktop;
 
+import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.util.Strings;
@@ -16,8 +17,12 @@ public class CrashHandler {
         //TODO send full error report to server via HTTP
         e.printStackTrace();
 
+        boolean netActive = false, netServer = false;
+
         //attempt to close connections, if applicable
         try{
+            netActive = Net.active();
+            netServer = Net.server();
             Net.dispose();
         }catch (Throwable p){
             p.printStackTrace();
@@ -26,15 +31,17 @@ public class CrashHandler {
         //don't create crash logs for me (anuke), as it's expected
         if(System.getProperty("user.name").equals("anuke")) return;
 
-        String header = "";
+        String header = "--CRASH REPORT--\n";
 
         try{
             header += "--GAME INFO-- \n";
-            header += "Multithreading: " + Settings.getBool("multithread")+ "\n";
-            header += "Net Active: " + Net.active()+ "\n";
-            header += "Net Server: " + Net.server()+ "\n";
+            header += "Build: " + Version.build + "\n";
+            header += "Net Active: " + netActive + "\n";
+            header += "Net Server: " + netServer + "\n";
             header += "OS: " + System.getProperty("os.name")+ "\n----\n";
+            header += "Multithreading: " + Settings.getBool("multithread")+ "\n";
         }catch (Throwable e4){
+            header += "[Error getting additional game info.]\n";
             e4.printStackTrace();
         }
 

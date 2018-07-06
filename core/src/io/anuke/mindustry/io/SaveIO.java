@@ -74,7 +74,7 @@ public class SaveIO{
 	}
 
 	public static boolean isSaveValid(FileHandle file){
-		return isSaveValid(new DataInputStream(file.read()));
+		return isSaveValid(new DataInputStream(new InflaterInputStream(file.read())));
 	}
 
 	public static boolean isSaveValid(DataInputStream stream){
@@ -85,6 +85,7 @@ public class SaveIO{
 			ver.getData(stream);
 			return true;
 		}catch (Exception e){
+		    e.printStackTrace();
 			return false;
 		}
 	}

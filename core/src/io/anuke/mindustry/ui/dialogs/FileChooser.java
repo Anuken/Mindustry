@@ -145,7 +145,7 @@ public class FileChooser extends FloatingDialog {
 		content.add(icontable).expandX().fillX();
 		content.row();
 
-		content.center().add(pane).width(UIUtils.portrait() ?  Gdx.graphics.getWidth() : Gdx.graphics.getWidth()/Unit.dp.scl(2)).colspan(3).grow();
+		content.center().add(pane).width(UIUtils.portrait() ?  Gdx.graphics.getWidth()/Unit.dp.scl(1) : Gdx.graphics.getWidth()/Unit.dp.scl(2)).colspan(3).grow();
 		content.row();
 		
 		if(!open){

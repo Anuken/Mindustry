@@ -107,6 +107,7 @@ public class BuildBlock extends Block {
 
     @Override
     public void drawLayer(Tile tile) {
+
         BuildEntity entity = tile.entity();
 
         Shaders.blockbuild.color = Palette.accent;
@@ -174,17 +175,17 @@ public class BuildBlock extends Block {
          * If there is no recipe for this block, as is the case with rocks, 'previous' is used.*/
         public Recipe recipe;
 
-        public double progress = 0;
-        public double lastProgress;
-        public double buildCost;
+        public float progress = 0;
+        public float lastProgress;
+        public float buildCost;
         /**The block that used to be here.
          * If a non-recipe block is being deconstructed, this is the block that is being deconstructed.*/
         public Block previous;
 
-        private double[] accumulator;
+        private float[] accumulator;
 
-        public void construct(Unit builder, TileEntity core, double amount){
-            double maxProgress = checkRequired(core.items, amount);
+        public void construct(Unit builder, TileEntity core, float amount){
+            float maxProgress = checkRequired(core.items, amount);
 
             for (int i = 0; i < recipe.requirements.length; i++) {
                 accumulator[i] += recipe.requirements[i].amount*maxProgress; //add min amount progressed to the accumulator
@@ -201,7 +202,7 @@ public class BuildBlock extends Block {
             }
         }
 
-        public void deconstruct(Unit builder, TileEntity core, double amount){
+        public void deconstruct(Unit builder, TileEntity core, float amount){
             Recipe recipe = Recipe.getByResult(previous);
 
             if(recipe != null) {
@@ -227,8 +228,8 @@ public class BuildBlock extends Block {
             }
         }
 
-        private double checkRequired(InventoryModule inventory, double amount){
-            double maxProgress = amount;
+        private float checkRequired(InventoryModule inventory, float amount){
+            float maxProgress = amount;
 
             for(int i = 0; i < recipe.requirements.length; i ++){
                 int required = (int)(accumulator[i]); //calculate items that are required now
@@ -237,7 +238,7 @@ public class BuildBlock extends Block {
                     //calculate how many items it can actually use
                     int maxUse = Math.min(required, inventory.getItem(recipe.requirements[i].item));
                     //get this as a fraction
-                    double fraction = maxUse / (double)required;
+                    float fraction = maxUse / (float)required;
 
                     //move max progress down if this fraction is less than 1
                     maxProgress = Math.min(maxProgress, maxProgress*fraction);
@@ -259,7 +260,7 @@ public class BuildBlock extends Block {
         public void setConstruct(Block previous, Recipe recipe){
             this.recipe = recipe;
             this.previous = previous;
-            this.accumulator = new double[recipe.requirements.length];
+            this.accumulator = new float[recipe.requirements.length];
             this.buildCost = recipe.cost;
         }
 
@@ -268,7 +269,7 @@ public class BuildBlock extends Block {
             this.progress = 1f;
             if(Recipe.getByResult(previous) != null){
                 this.recipe = Recipe.getByResult(previous);
-                this.accumulator = new double[Recipe.getByResult(previous).requirements.length];
+                this.accumulator = new float[Recipe.getByResult(previous).requirements.length];
                 this.buildCost = Recipe.getByResult(previous).cost;
             }else{
                 this.buildCost = 20f; //default no-recipe build cost is 20
@@ -285,8 +286,8 @@ public class BuildBlock extends Block {
                 stream.writeByte(-1);
             }else{
                 stream.writeByte(accumulator.length);
-                for(double d : accumulator){
-                    stream.writeFloat((float)d);
+                for(float d : accumulator){
+                    stream.writeFloat(d);
                 }
             }
         }
@@ -299,7 +300,7 @@ public class BuildBlock extends Block {
             byte acsize = stream.readByte();
             
             if(acsize != -1){
-                accumulator = new double[acsize];
+                accumulator = new float[acsize];
                 for (int i = 0; i < acsize; i++) {
                     accumulator[i] = stream.readFloat();
                 }

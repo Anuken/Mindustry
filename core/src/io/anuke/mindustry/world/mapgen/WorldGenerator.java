@@ -240,7 +240,7 @@ public class WorldGenerator {
 		prepareTiles(tiles, seed, true);
 	}
 
-	static class OreEntry{
+	public static class OreEntry{
 		final float frequency;
 		final Item item;
 		final Simplex noise;
