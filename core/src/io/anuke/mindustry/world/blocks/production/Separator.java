@@ -50,6 +50,7 @@ public class Separator extends Block {
 
         stats.add(BlockStat.liquidUse, liquidUse * 60f, StatUnit.liquidSecond);
         stats.add(BlockStat.inputLiquid, liquid);
+        stats.add(BlockStat.inputItem, item);
         stats.add(BlockStat.outputItem, new ItemFilterValue(item -> {
             for(Item i : results){
                 if(item == i) return true;

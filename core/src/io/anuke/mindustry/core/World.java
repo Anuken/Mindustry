@@ -93,11 +93,11 @@ public class World extends Module{
 	}
 	
 	public int width(){
-		return tiles.length;
+		return tiles == null ? 0 : tiles.length;
 	}
 	
 	public int height(){
-		return tiles[0].length;
+		return tiles == null ? 0 : tiles[0].length;
 	}
 
 	public int toPacked(int x, int y){

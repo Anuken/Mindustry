@@ -100,6 +100,8 @@ public class BuildBlock extends Block {
             return;
         }
 
+        if(entity.previous == null) return;
+
         for (TextureRegion region : entity.previous.getBlockIcon()) {
             Draw.rect(region, tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.getRotation() * 90 : 0);
         }

@@ -59,7 +59,7 @@ public class BlockInventoryFragment extends Fragment {
     public void showFor(Tile t){
         this.tile = t.target();
         if(tile == null || tile.entity == null || !tile.block().isAccessible() || tile.entity.items.totalItems() == 0) return;
-        rebuild();
+        rebuild(true);
     }
 
     public void hide(){
@@ -71,7 +71,7 @@ public class BlockInventoryFragment extends Fragment {
         tile = null;
     }
 
-    private void rebuild(){
+    private void rebuild(boolean actions){
         Player player = input.player;
 
         IntSet container = new IntSet();
@@ -99,7 +99,7 @@ public class BlockInventoryFragment extends Fragment {
                     int[] items = tile.entity.items.items;
                     for (int i = 0; i < items.length; i++) {
                         if ((items[i] == 0) == container.contains(i)) {
-                            rebuild();
+                            rebuild(false);
                         }
                     }
                 }
@@ -160,8 +160,10 @@ public class BlockInventoryFragment extends Fragment {
 
         updateTablePosition();
 
-        table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
-                Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
+        if(actions){
+            table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
+                    Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
+        }
     }
 
     private String round(float f){

@@ -494,14 +494,12 @@ public class NetServer extends Module{
             return;
         }
 
-        String ip = player.con.address;
-
         if(action == AdminAction.wave) {
             //no verification is done, so admins can hypothetically spam waves
             //not a real issue, because server owners may want to do just that
             state.wavetime = 0f;
         }else if(action == AdminAction.ban){
-            netServer.admins.banPlayerIP(ip);
+            netServer.admins.banPlayerIP(other.con.address);
             netServer.kick(other.con.id, KickReason.banned);
             Log.info("&lc{0} has banned {1}.", player.name, other.name);
         }else if(action == AdminAction.kick){

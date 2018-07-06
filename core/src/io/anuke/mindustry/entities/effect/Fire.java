@@ -91,7 +91,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable 
 
         time = Mathf.clamp(time + Timers.delta(), 0, lifetime());
 
-        if(time >= lifetime()){
+        if(time >= lifetime() || tile == null){
             CallEntity.onFireRemoved(getID());
             remove();
         }

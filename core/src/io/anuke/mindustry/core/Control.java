@@ -166,11 +166,13 @@ public class Control extends Module{
 	        Player[] old = players;
 	        players = new Player[index + 1];
             System.arraycopy(old, 0, players, 0, old.length);
-
-            InputHandler[] oldi = inputs;
-            inputs = new InputHandler[index + 1];
-            System.arraycopy(oldi, 0, inputs, 0, oldi.length);
         }
+
+        if(inputs.length != index + 1){
+			InputHandler[] oldi = inputs;
+			inputs = new InputHandler[index + 1];
+			System.arraycopy(oldi, 0, inputs, 0, oldi.length);
+		}
 
         Player setTo = (index == 0 ? null : players[0]);
 

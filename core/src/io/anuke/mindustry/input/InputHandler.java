@@ -283,50 +283,49 @@ public abstract class InputHandler extends InputAdapter{
 			throw new ValidateException(player, "Player cannot transfer an item.");
 		}
 
-		if(player == null) return;
+		threads.run(() -> {
+			if (player == null || tile.entity == null) return;
 
-		player.isTransferring = true;
+			player.isTransferring = true;
 
-		ItemStack stack = player.inventory.getItem();
-		int accepted = tile.block().acceptStack(stack.item, stack.amount, tile, player);
+			ItemStack stack = player.inventory.getItem();
+			int accepted = tile.block().acceptStack(stack.item, stack.amount, tile, player);
 
-		boolean clear = stack.amount == accepted;
-		int sent = Mathf.clamp(accepted/4, 1, 8);
-		int removed = accepted/sent;
-		int[] remaining = {accepted, accepted};
+			boolean clear = stack.amount == accepted;
+			int sent = Mathf.clamp(accepted / 4, 1, 8);
+			int removed = accepted / sent;
+			int[] remaining = {accepted, accepted};
 
-		for(int i = 0; i < sent; i ++){
-			boolean end = i == sent-1;
-			Timers.run(i * 3, () -> {
-				tile.block().getStackOffset(stack.item, tile, stackTrns);
+			for (int i = 0; i < sent; i++) {
+				boolean end = i == sent - 1;
+				Timers.run(i * 3, () -> {
+					tile.block().getStackOffset(stack.item, tile, stackTrns);
 
-				ItemTransfer.create(stack.item,
-						player.x + Angles.trnsx(player.rotation + 180f, backTrns), player.y + Angles.trnsy(player.rotation + 180f, backTrns),
-						new Translator(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
+					ItemTransfer.create(stack.item,
+							player.x + Angles.trnsx(player.rotation + 180f, backTrns), player.y + Angles.trnsy(player.rotation + 180f, backTrns),
+							new Translator(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
 
-							tile.block().handleStack(stack.item, removed, tile, player);
-							remaining[1] -= removed;
+								tile.block().handleStack(stack.item, removed, tile, player);
+								remaining[1] -= removed;
 
-							if(end && remaining[1] > 0) {
-								tile.block().handleStack(stack.item, remaining[1], tile, player);
-							}
-						});
+								if (end && remaining[1] > 0) {
+									tile.block().handleStack(stack.item, remaining[1], tile, player);
+								}
+							});
 
-				stack.amount -= removed;
-				remaining[0] -= removed;
+					stack.amount -= removed;
+					remaining[0] -= removed;
 
-				if(end){
-					stack.amount -= remaining[0];
-					if(clear){
-						player.inventory.clearItem();
+					if (end) {
+						stack.amount -= remaining[0];
+						if (clear) {
+							player.inventory.clearItem();
+						}
+						player.isTransferring = false;
 					}
-					player.isTransferring = false;
-				}
-			});
-		}
-
-		//ItemDrop.create(player.inventory.getItem().item, player.inventory.getItem().amount, player.x, player.y, angle);
-		//player.inventory.clearItem();
+				});
+			}
+		});
 	}
 
 	@Remote(targets = Loc.both, called = Loc.server, forward = true, in = In.blocks)
