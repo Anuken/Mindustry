@@ -2,7 +2,6 @@ package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.async.AsyncExecutor;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
@@ -20,8 +19,6 @@ public class Saves {
     private SaveSlot current;
     private boolean saving;
     private float time;
-
-    private AsyncExecutor exec = new AsyncExecutor(1);
 
     public void load(){
         saves.clear();

@@ -34,7 +34,7 @@ public class CrashHandler {
         String header = "--CRASH REPORT--\n";
 
         try{
-            header += "--GAME INFO-- \n";
+            header += "--GAME INFO--\n";
             header += "Build: " + Version.build + "\n";
             header += "Net Active: " + netActive + "\n";
             header += "Net Server: " + netServer + "\n";

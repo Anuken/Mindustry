@@ -176,7 +176,6 @@ public class BuildBlock extends Block {
         public Recipe recipe;
 
         public float progress = 0;
-        public float lastProgress;
         public float buildCost;
         /**The block that used to be here.
          * If a non-recipe block is being deconstructed, this is the block that is being deconstructed.*/
@@ -185,17 +184,15 @@ public class BuildBlock extends Block {
         private float[] accumulator;
 
         public void construct(Unit builder, TileEntity core, float amount){
-            float maxProgress = checkRequired(core.items, amount);
+            float maxProgress = checkRequired(core.items, amount, false);
 
             for (int i = 0; i < recipe.requirements.length; i++) {
                 accumulator[i] += recipe.requirements[i].amount*maxProgress; //add min amount progressed to the accumulator
             }
 
-            maxProgress = checkRequired(core.items, maxProgress);
+            maxProgress = checkRequired(core.items, maxProgress, true);
 
             progress = Mathf.clamp(progress + maxProgress);
-
-            lastProgress = maxProgress;
 
             if(progress >= 1f){
                 CallBlocks.onConstructFinish(tile, recipe.result, builder.getID(), tile.getRotation());
@@ -228,13 +225,15 @@ public class BuildBlock extends Block {
             }
         }
 
-        private float checkRequired(InventoryModule inventory, float amount){
+        private float checkRequired(InventoryModule inventory, float amount, boolean remove){
             float maxProgress = amount;
 
             for(int i = 0; i < recipe.requirements.length; i ++){
                 int required = (int)(accumulator[i]); //calculate items that are required now
 
-                if(required > 0){ //if this amount is positive...
+                if(inventory.getItem(recipe.requirements[i].item) == 0){
+                    maxProgress = 0f;
+                }else if(required > 0){ //if this amount is positive...
                     //calculate how many items it can actually use
                     int maxUse = Math.min(required, inventory.getItem(recipe.requirements[i].item));
                     //get this as a fraction
@@ -243,9 +242,12 @@ public class BuildBlock extends Block {
                     //move max progress down if this fraction is less than 1
                     maxProgress = Math.min(maxProgress, maxProgress*fraction);
 
-                    //remove stuff that is actually used
                     accumulator[i] -= maxUse;
-                    inventory.removeItem(recipe.requirements[i].item, maxUse);
+
+                    //remove stuff that is actually used
+                    if(remove) {
+                        inventory.removeItem(recipe.requirements[i].item, maxUse);
+                    }
                 }
                 //else, no items are required yet, so just keep going
             }
@@ -254,7 +256,7 @@ public class BuildBlock extends Block {
         }
 
         public float progress(){
-            return (float)progress;
+            return progress;
         }
 
         public void setConstruct(Block previous, Recipe recipe){
@@ -278,7 +280,7 @@ public class BuildBlock extends Block {
 
         @Override
         public void write(DataOutputStream stream) throws IOException {
-            stream.writeFloat((float)progress);
+            stream.writeFloat(progress);
             stream.writeShort(previous == null ? -1 : previous.id);
             stream.writeShort(recipe == null ? -1 : recipe.result.id);
 
