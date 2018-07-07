@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.production;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
@@ -30,6 +31,9 @@ public class Separator extends Block {
     protected float spinnerThickness = 1f;
     protected float spinnerSpeed = 2f;
 
+    protected Color color = Color.valueOf("858585");
+    protected TextureRegion liquidRegion;
+
     protected boolean offloading = false;
 
     public Separator(String name) {
@@ -38,6 +42,13 @@ public class Separator extends Block {
         solid = true;
         hasItems = true;
         hasLiquids = true;
+    }
+
+    @Override
+    public void load() {
+        super.load();
+
+        liquidRegion = Draw.region(name + "-liquid");
     }
 
     @Override
@@ -67,9 +78,9 @@ public class Separator extends Block {
 
         Draw.color(tile.entity.liquids.liquid.color);
         Draw.alpha(tile.entity.liquids.amount / liquidCapacity);
-        Draw.rect(name + "-liquid", tile.drawx(), tile.drawy());
+        Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
 
-        Draw.color(Color.valueOf("858585"));
+        Draw.color(color);
         Lines.stroke(spinnerThickness);
         Lines.spikes(tile.drawx(), tile.drawy(), spinnerRadius, spinnerLength, 3, entity.totalProgress*spinnerSpeed);
         Draw.reset();
@@ -84,7 +95,7 @@ public class Separator extends Block {
 
         entity.totalProgress += entity.warmup*Timers.delta();
 
-        if(entity.liquids.amount >= liquidUsed && entity.items.hasItem(item) &&
+        if(entity.liquids.amount >= liquidUsed && entity.items.has(item) &&
                 (!hasPower || entity.power.amount >= powerUsed)){
             entity.progress += 1f/filterTime;
             entity.liquids.amount -= liquidUsed;
@@ -98,7 +109,7 @@ public class Separator extends Block {
         if(entity.progress >= 1f){
             entity.progress = 0f;
             Item item = Mathf.select(results);
-            entity.items.removeItem(this.item, 1);
+            entity.items.remove(this.item, 1);
             if(item != null){
                 offloading = true;
                 offloadNear(tile, item);
@@ -123,7 +134,7 @@ public class Separator extends Block {
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return this.item == item && tile.entity.items.getItem(item) < itemCapacity;
+        return this.item == item && tile.entity.items.get(item) < itemCapacity;
     }
 
     @Override

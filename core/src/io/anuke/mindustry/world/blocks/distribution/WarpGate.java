@@ -147,7 +147,7 @@ public class WarpGate extends PowerBlock{
 
 		teleporters[entity.color].add(tile);
 
-		if(entity.items.totalItems() > 0){
+		if(entity.items.total() > 0){
 			tryDump(tile);
 		}
 
@@ -210,7 +210,7 @@ public class WarpGate extends PowerBlock{
 
 			entity.time += Timers.delta() * entity.speedScl;
 
-			if (!entity.teleporting && entity.items.totalItems() >= itemCapacity && entity.power.amount >= powerCapacity - 0.01f - powerUse &&
+			if (!entity.teleporting && entity.items.total() >= itemCapacity && entity.power.amount >= powerCapacity - 0.01f - powerUse &&
 					entity.timer.get(timerTeleport, teleportMax)) {
 				Array<Tile> testLinks = findLinks(tile);
 
@@ -226,12 +226,12 @@ public class WarpGate extends PowerBlock{
 					Array<Tile> links = findLinks(tile);
 
 					for (Tile other : links) {
-						int canAccept = itemCapacity - other.entity.items.totalItems();
-						int total = entity.items.totalItems();
+						int canAccept = itemCapacity - other.entity.items.total();
+						int total = entity.items.total();
 						if (total == 0) break;
 						Effects.effect(teleportOutEffect, resultColor, other.drawx(), other.drawy());
 						for (int i = 0; i < canAccept && i < total; i++) {
-							other.entity.items.addItem(entity.items.takeItem(), 1);
+							other.entity.items.add(entity.items.take(), 1);
 						}
 					}
 					Effects.effect(teleportOutEffect, resultColor, tile.drawx(), tile.drawy());
@@ -271,7 +271,7 @@ public class WarpGate extends PowerBlock{
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		TeleporterEntity entity = tile.entity();
-		return entity.items.totalItems() < itemCapacity;
+		return entity.items.total() < itemCapacity;
 	}
 	
 	@Override
@@ -323,7 +323,7 @@ public class WarpGate extends PowerBlock{
 					if(!oe.active) continue;
 					if(oe.color != entity.color){
 						removal.add(other);
-					}else if(other.entity.items.totalItems() == 0){
+					}else if(other.entity.items.total() == 0){
 						returns.add(other);
 					}
 				}else{

@@ -26,8 +26,8 @@ public class BufferedItemBridge extends ExtendingItemBridge {
     public void updateTransport(Tile tile, Tile other){
         BufferedItemBridgeEntity entity = tile.entity();
 
-        if(entity.buffer.accepts() && entity.items.totalItems() > 0){
-            entity.buffer.accept(entity.items.takeItem());
+        if(entity.buffer.accepts() && entity.items.total() > 0){
+            entity.buffer.accept(entity.items.take());
         }
 
         Item item = entity.buffer.poll();

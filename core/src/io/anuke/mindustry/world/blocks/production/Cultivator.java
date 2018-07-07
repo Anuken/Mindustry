@@ -57,7 +57,7 @@ public class Cultivator extends Drill {
     public void draw(Tile tile) {
         CultivatorEntity entity = tile.entity();
 
-        Draw.rect(name, tile.drawx(), tile.drawy());
+        Draw.rect(region, tile.drawx(), tile.drawy());
 
         Draw.color(plantColor);
         Draw.alpha(entity.warmup);

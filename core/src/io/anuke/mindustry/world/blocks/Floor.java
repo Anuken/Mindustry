@@ -35,6 +35,8 @@ public class Floor extends Block{
 	protected Predicate<Floor> blends = block -> block != this && !block.blendOverride(this);
 	protected boolean blend = true;
 
+	/**number of different variant regions to use*/
+	public int variants = 0;
     /**edge fallback, used mainly for ores*/
     public String edge = "stone";
 	/**Multiplies unit velocity by this when walked on.*/

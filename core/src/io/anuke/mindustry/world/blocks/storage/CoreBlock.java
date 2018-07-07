@@ -133,7 +133,7 @@ public class CoreBlock extends StorageBlock {
     @Override
     public int acceptStack(Item item, int amount, Tile tile, Unit source){
         if(acceptItem(item, tile, tile) && hasItems && source.getTeam() == tile.getTeam()){
-            return Math.min(itemCapacity - tile.entity.items.getItem(item), amount);
+            return Math.min(itemCapacity - tile.entity.items.get(item), amount);
         }else{
             return 0;
         }

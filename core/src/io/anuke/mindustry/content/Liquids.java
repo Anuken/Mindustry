@@ -12,13 +12,6 @@ public class Liquids implements ContentList {
     @Override
     public void load() {
 
-        none = new Liquid("none", Color.CLEAR){
-            @Override
-            public boolean isHidden(){
-                return true;
-            }
-        };
-
         water = new Liquid("water", Color.valueOf("486acd")) {
             {
                 heatCapacity = 0.4f;

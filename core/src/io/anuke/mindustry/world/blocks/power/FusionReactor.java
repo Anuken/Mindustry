@@ -93,7 +93,7 @@ public class FusionReactor extends PowerGenerator {
 
         Graphics.setNormalBlending();
 
-        Draw.rect(name, tile.drawx(), tile.drawy());
+        Draw.rect(region, tile.drawx(), tile.drawy());
 
         Draw.rect(name + "-top", tile.drawx(), tile.drawy());
 

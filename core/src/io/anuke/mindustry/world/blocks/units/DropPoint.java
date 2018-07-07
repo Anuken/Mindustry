@@ -21,7 +21,7 @@ public class DropPoint extends Block {
 
     @Override
     public void update(Tile tile) {
-        if (tile.entity.items.totalItems() > 0) {
+        if (tile.entity.items.total() > 0) {
             tryDump(tile);
         }
     }

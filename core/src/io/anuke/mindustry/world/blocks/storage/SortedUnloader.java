@@ -30,16 +30,16 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
     public void update(Tile tile){
         SortedUnloaderEntity entity = tile.entity();
 
-        if(entity.items.totalItems() == 0 && entity.timer.get(timerUnload, speed)){
+        if(entity.items.total() == 0 && entity.timer.get(timerUnload, speed)){
             tile.allNearby(other -> {
-                if(other.block() instanceof StorageBlock && entity.items.totalItems() == 0 &&
+                if(other.block() instanceof StorageBlock && entity.items.total() == 0 &&
                         ((StorageBlock)other.block()).hasItem(other, entity.sortItem)){
                     offloadNear(tile, ((StorageBlock)other.block()).removeItem(other, entity.sortItem));
                 }
             });
         }
 
-        if(entity.items.totalItems() > 0){
+        if(entity.items.total() > 0){
             tryDump(tile);
         }
     }

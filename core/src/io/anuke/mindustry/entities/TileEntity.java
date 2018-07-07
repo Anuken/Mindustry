@@ -1,6 +1,7 @@
 package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.fx.Fx;
@@ -10,11 +11,12 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.CallBlocks;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Wall;
-import io.anuke.mindustry.world.blocks.modules.InventoryModule;
-import io.anuke.mindustry.world.blocks.modules.LiquidModule;
-import io.anuke.mindustry.world.blocks.modules.PowerModule;
+import io.anuke.mindustry.world.modules.InventoryModule;
+import io.anuke.mindustry.world.modules.LiquidModule;
+import io.anuke.mindustry.world.modules.PowerModule;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
@@ -42,6 +44,8 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 	public InventoryModule items;
 	public LiquidModule liquids;
 
+	public Array<Consume> consumers = new Array<>();
+
 	private boolean dead = false;
 	private boolean sleeping;
 	private float sleepTime;
@@ -55,14 +59,10 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 		health = tile.block().health;
 		
 		timer = new Timer(tile.block().timers);
+		tile.block().setConsumers(consumers);
 		
 		if(added){
-			//if(!tile.block().autoSleep) { //TODO only autosleep when creating a fresh block!
-				add();
-			/*}else{
-				sleeping = true;
-				sleepingEntities ++;
-			}*/
+			add();
 		}
 		
 		return this;
@@ -160,6 +160,9 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 			}
 
 			tile.block().update(tile);
+			for(Consume cons : consumers){
+				cons.update(this);
+			}
 		}
 	}
 

@@ -47,7 +47,7 @@ public class Smelter extends Block{
 	@Override
 	public void setBars(){
 		for(ItemStack item : inputs){
-			bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.getItem(item.item)/itemCapacity));
+			bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.get(item.item)/itemCapacity));
 		}
 	}
 	
@@ -79,13 +79,13 @@ public class Smelter extends Block{
 	public void update(Tile tile){
 		SmelterEntity entity = tile.entity();
 		
-		if(entity.timer.get(timerDump, 5) && entity.items.hasItem(result)){
+		if(entity.timer.get(timerDump, 5) && entity.items.has(result)){
 			tryDump(tile, result);
 		}
 
 		//add fuel
-		if(entity.items.getItem(fuel) > 0 && entity.burnTime <= 0f){
-			entity.items.removeItem(fuel, 1);
+		if(entity.items.get(fuel) > 0 && entity.burnTime <= 0f){
+			entity.items.remove(fuel, 1);
 			entity.burnTime += burnDuration;
 			Effects.effect(burnEffect, entity.x + Mathf.range(2f), entity.y + Mathf.range(2f));
 		}
@@ -100,12 +100,12 @@ public class Smelter extends Block{
 
 		//make sure it has all the items
 		for(ItemStack item : inputs){
-			if(!entity.items.hasItem(item.item, item.amount)){
+			if(!entity.items.has(item.item, item.amount)){
 				return;
 			}
 		}
 
-		if(entity.items.getItem(result) >= itemCapacity //output full
+		if(entity.items.get(result) >= itemCapacity //output full
 				|| entity.burnTime <= 0 //not burning
 				|| !entity.timer.get(timerCraft, craftTime)){ //not yet time
 			return;
@@ -116,8 +116,8 @@ public class Smelter extends Block{
 		if(useFlux){
 			//remove flux materials if present
 			for(Item item : Item.all()){
-				if(item.fluxiness >= minFlux && tile.entity.items.getItem(item) > 0){
-					tile.entity.items.removeItem(item, 1);
+				if(item.fluxiness >= minFlux && tile.entity.items.get(item) > 0){
+					tile.entity.items.remove(item, 1);
 
 					//chance of not consuming inputs if flux material present
 					consumeInputs = !Mathf.chance(item.fluxiness * baseFluxChance);
@@ -128,7 +128,7 @@ public class Smelter extends Block{
 
 		if(consumeInputs) {
 			for (ItemStack item : inputs) {
-				entity.items.removeItem(item.item, item.amount);
+				entity.items.remove(item.item, item.amount);
 			}
 		}
 		
@@ -138,7 +138,7 @@ public class Smelter extends Block{
 
 	@Override
 	public int getMaximumAccepted(Tile tile, Item item) {
-		return itemCapacity - tile.entity.items.getItem(item);
+		return itemCapacity - tile.entity.items.get(item);
 	}
 
 	@Override
@@ -152,8 +152,8 @@ public class Smelter extends Block{
 			}
 		}
 
-		return (isInput && tile.entity.items.getItem(item) < itemCapacity) || (item == fuel && tile.entity.items.getItem(fuel) < itemCapacity) ||
-				(useFlux && item.fluxiness >= minFlux && tile.entity.items.getItem(item) < itemCapacity);
+		return (isInput && tile.entity.items.get(item) < itemCapacity) || (item == fuel && tile.entity.items.get(fuel) < itemCapacity) ||
+				(useFlux && item.fluxiness >= minFlux && tile.entity.items.get(item) < itemCapacity);
 	}
 
 	@Override

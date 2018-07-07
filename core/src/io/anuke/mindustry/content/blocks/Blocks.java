@@ -145,17 +145,14 @@ public class Blocks extends BlockList implements ContentList{
 
         rock = new Rock("rock") {{
             variants = 2;
-            varyShadow = true;
         }};
 
         icerock = new Rock("icerock") {{
             variants = 2;
-            varyShadow = true;
         }};
 
         blackrock = new Rock("blackrock") {{
             variants = 1;
-            varyShadow = true;
         }};
     }
 }

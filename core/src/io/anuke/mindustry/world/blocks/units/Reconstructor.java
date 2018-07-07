@@ -112,7 +112,7 @@ public class Reconstructor extends Block{
         ReconstructorEntity entity = tile.entity();
 
         if(entity.solid){
-            Draw.rect(name, tile.drawx(), tile.drawy());
+            Draw.rect(region, tile.drawx(), tile.drawy());
         }else{
             Draw.rect(openRegion, tile.drawx(), tile.drawy());
         }

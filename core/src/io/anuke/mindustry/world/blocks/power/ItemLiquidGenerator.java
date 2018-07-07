@@ -64,7 +64,7 @@ public abstract class ItemLiquidGenerator extends ItemGenerator {
                 }
             }
 
-            if (entity.generateTime <= 0f && entity.items.totalItems() > 0) {
+            if (entity.generateTime <= 0f && entity.items.total() > 0) {
                 Effects.effect(generateEffect, tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
                 for (int i = 0; i < entity.items.items.length; i++) {
                     if (entity.items.items[i] > 0) {

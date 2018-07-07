@@ -4,11 +4,11 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.modules.LiquidModule;
+import io.anuke.mindustry.world.modules.LiquidModule;
 import io.anuke.ucore.graphics.Draw;
 
 public class LiquidBlock extends Block{
-	protected String liquidRegion = name() + "-liquid";
+	protected TextureRegion liquidRegion, bottomRegion, topRegion;
 	
 	public LiquidBlock(String name) {
 		super(name);
@@ -16,6 +16,15 @@ public class LiquidBlock extends Block{
 		solid = true;
 		hasLiquids = true;
 		group = BlockGroup.liquids;
+	}
+
+	@Override
+	public void load() {
+		super.load();
+
+		liquidRegion = Draw.region(name + "-liquid");
+		topRegion = Draw.region(name + "-top");
+		bottomRegion = Draw.region(name + "-bottom");
 	}
 
 	@Override
@@ -29,15 +38,15 @@ public class LiquidBlock extends Block{
 
 		int rotation = rotate ? tile.getRotation() * 90 : 0;
 		
-		Draw.rect(name() + "-bottom", tile.drawx(), tile.drawy(), rotation);
+		Draw.rect(bottomRegion, tile.drawx(), tile.drawy(), rotation);
 		
-		if(mod.amount > 0.001f){
-			Draw.color(mod.liquid.color);
-			Draw.alpha(mod.amount / liquidCapacity);
+		if(mod.total() > 0.001f){
+			Draw.color(mod.current().color);
+			Draw.alpha(mod.total() / liquidCapacity);
 			Draw.rect(liquidRegion, tile.drawx(), tile.drawy(), rotation);
 			Draw.color();
 		}
 		
-		Draw.rect(name() + "-top", tile.drawx(), tile.drawy(), rotation);
+		Draw.rect(topRegion, tile.drawx(), tile.drawy(), rotation);
 	}
 }

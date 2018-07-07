@@ -57,7 +57,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
         for (int i = 0; i < Mathf.clamp(amount/3, 1, 8); i++) {
             Timers.run(i*3, () -> create(item, x, y, tile, () -> {}));
         }
-        tile.entity.items.addItem(item, amount);
+        tile.entity.items.add(item, amount);
     }
 
     public static void create(Item item, float fromx, float fromy, PosTrait to, Runnable done){

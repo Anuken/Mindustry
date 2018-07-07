@@ -38,17 +38,18 @@ public class CooledTurret extends Turret {
         super.updateShooting(tile);
 
         TurretEntity entity = tile.entity();
+        Liquid liquid = entity.liquids.current();
 
-        float used = Math.min(Math.min(entity.liquids.amount, maxUsed * Timers.delta()), Math.max(0, ((reload - entity.reload) / coolantMultiplier) / entity.liquids.liquid.heatCapacity));
-        entity.reload += (used * entity.liquids.liquid.heatCapacity) / entity.liquids.liquid.heatCapacity;
-        entity.liquids.amount -= used;
+        float used = Math.min(Math.min(entity.liquids.get(liquid), maxUsed * Timers.delta()), Math.max(0, ((reload - entity.reload) / coolantMultiplier) / liquid.heatCapacity));
+        entity.reload += (used * liquid.heatCapacity) / liquid.heatCapacity;
+        entity.liquids.remove(liquid, used);
 
         if(Mathf.chance(0.04 * used)){
             Effects.effect(coolEffect, tile.drawx() + Mathf.range(size * tilesize/2f), tile.drawy() + Mathf.range(size * tilesize/2f));
         }
 
         //don't use oil as coolant, thanks
-        if(Mathf.chance(entity.liquids.liquid.flammability / 10f * used)){
+        if(Mathf.chance(liquid.flammability / 10f * used)){
             Fire.create(tile);
         }
     }

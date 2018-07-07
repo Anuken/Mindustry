@@ -118,7 +118,7 @@ public class ResupplyPoint extends Block{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return tile.entity.items.totalItems() < itemCapacity;
+        return tile.entity.items.total() < itemCapacity;
     }
 
     @Override

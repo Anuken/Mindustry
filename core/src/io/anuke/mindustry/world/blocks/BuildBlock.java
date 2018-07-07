@@ -22,7 +22,7 @@ import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.modules.InventoryModule;
+import io.anuke.mindustry.world.modules.InventoryModule;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
@@ -157,11 +157,10 @@ public class BuildBlock extends Block {
     }
 
     @Remote(called = Loc.server, in = In.blocks)
-    public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation){
-        Team team = tile.getTeam();
+    public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team){
         tile.setBlock(block);
-        tile.setTeam(team);
         tile.setRotation(rotation);
+        tile.setTeam(team);
         Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
 
         //last builder was this local client player, call placed()
@@ -197,7 +196,7 @@ public class BuildBlock extends Block {
             progress = Mathf.clamp(progress + maxProgress);
 
             if(progress >= 1f){
-                CallBlocks.onConstructFinish(tile, recipe.result, builder.getID(), tile.getRotation());
+                CallBlocks.onConstructFinish(tile, recipe.result, builder.getID(), tile.getRotation(), tile.getTeam());
             }
         }
 
@@ -233,11 +232,11 @@ public class BuildBlock extends Block {
             for(int i = 0; i < recipe.requirements.length; i ++){
                 int required = (int)(accumulator[i]); //calculate items that are required now
 
-                if(inventory.getItem(recipe.requirements[i].item) == 0){
+                if(inventory.get(recipe.requirements[i].item) == 0){
                     maxProgress = 0f;
                 }else if(required > 0){ //if this amount is positive...
                     //calculate how many items it can actually use
-                    int maxUse = Math.min(required, inventory.getItem(recipe.requirements[i].item));
+                    int maxUse = Math.min(required, inventory.get(recipe.requirements[i].item));
                     //get this as a fraction
                     float fraction = maxUse / (float)required;
 
@@ -248,7 +247,7 @@ public class BuildBlock extends Block {
 
                     //remove stuff that is actually used
                     if(remove) {
-                        inventory.removeItem(recipe.requirements[i].item, maxUse);
+                        inventory.remove(recipe.requirements[i].item, maxUse);
                     }
                 }
                 //else, no items are required yet, so just keep going

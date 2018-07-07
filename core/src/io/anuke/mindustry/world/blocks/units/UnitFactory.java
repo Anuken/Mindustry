@@ -19,7 +19,7 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.modules.InventoryModule;
+import io.anuke.mindustry.world.modules.InventoryModule;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
@@ -154,7 +154,7 @@ public class UnitFactory extends Block {
             entity.openCountdown = openDuration;
 
             for(ItemStack stack : requirements){
-                entity.items.removeItem(stack.item, stack.amount);
+                entity.items.remove(stack.item, stack.amount);
             }
         }
     }
@@ -162,7 +162,7 @@ public class UnitFactory extends Block {
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
         for(ItemStack stack : requirements){
-            if(item == stack.item && tile.entity.items.getItem(item) <= stack.amount*2){
+            if(item == stack.item && tile.entity.items.get(item) <= stack.amount*2){
                 return true;
             }
         }
@@ -176,7 +176,7 @@ public class UnitFactory extends Block {
 
     protected boolean hasRequirements(InventoryModule inv, float fraction){
         for(ItemStack stack : requirements){
-            if(!inv.hasItem(stack.item, (int)(fraction * stack.amount))){
+            if(!inv.has(stack.item, (int)(fraction * stack.amount))){
                 return false;
             }
         }

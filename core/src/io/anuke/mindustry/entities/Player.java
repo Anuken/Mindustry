@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Queue;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.ScorchDecal;
 import io.anuke.mindustry.entities.traits.*;
@@ -660,6 +661,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		dead = true;
 		trail.clear();
 		health = maxHealth();
+		mech = (mobile ? Mechs.starterMobile : Mechs.starterDesktop);
+		placeQueue.clear();
 
 		add();
 	}

@@ -181,7 +181,7 @@ public class Drone extends FlyingUnit implements BuilderTrait {
         if(entity == null){
             return;
         }
-        targetItem = Mathf.findMin(toMine, (a, b) -> -Integer.compare(entity.items.getItem(a), entity.items.getItem(b)));
+        targetItem = Mathf.findMin(toMine, (a, b) -> -Integer.compare(entity.items.get(a), entity.items.get(b)));
     }
 
     protected boolean findItemDrop(){
@@ -247,7 +247,7 @@ public class Drone extends FlyingUnit implements BuilderTrait {
 
                 //if it's missing requirements, try and mine them
                 for(ItemStack stack : entity.recipe.requirements){
-                    if(!core.items.hasItem(stack.item, stack.amount) && toMine.contains(stack.item)){
+                    if(!core.items.has(stack.item, stack.amount) && toMine.contains(stack.item)){
                         targetItem = stack.item;
                         getPlaceQueue().clear();
                         setState(mine);

@@ -60,7 +60,7 @@ public class ItemTurret extends CooledTurret {
 
         AmmoType type = ammoMap.get(item);
         entity.totalAmmo += type.quantityMultiplier;
-        entity.items.addItem(item, 1);
+        entity.items.add(item, 1);
 
         //find ammo entry by type
         for(int i = 0; i < entity.ammo.size; i ++){

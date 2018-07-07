@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
-import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -20,7 +19,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.CursorType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.meta.*;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -31,7 +30,8 @@ import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.EnumSet;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class Block extends BaseBlock implements Content{
 	private static int lastid;
@@ -45,6 +45,9 @@ public class Block extends BaseBlock implements Content{
 	protected TextureRegion[] icon;
 	protected TextureRegion[] compactIcon;
 	protected TextureRegion editorIcon;
+
+	protected TextureRegion shadowRegion;
+	protected TextureRegion region;
 
 	/**internal name*/
 	public final String name;
@@ -72,12 +75,8 @@ public class Block extends BaseBlock implements Content{
 	public int health = -1;
 	/**base block explosiveness*/
 	public float baseExplosiveness = 0f;
-	/**whether to display a different shadow per variant*/
-	public boolean varyShadow = false;
 	/**whether this block can be placed on liquids.*/
 	public boolean floating = true;
-	/**number of block variants, 0 to disable*/
-	public int variants = 0;
 	/**stuff that drops when broken*/
 	public ItemStack drops = null;
 	/**multiblock size*/
@@ -110,10 +109,6 @@ public class Block extends BaseBlock implements Content{
 	public boolean autoSleep;
 	/**Name of shadow region to load. Null to indicate normal shadow.*/
 	public String shadow = null;
-	/**Region used for drawing shadows.*/
-	public TextureRegion shadowRegion;
-	/**Texture region array for drawing multiple shadows.*/
-	public TextureRegion[] shadowRegions;
 	/**Whether the block can be tapped and selected to configure.*/
 	public boolean configurable;
 	/**Whether this block consumes touchDown events when tapped.*/
@@ -136,6 +131,10 @@ public class Block extends BaseBlock implements Content{
 
 		map.put(name, this);
 		blocks.add(this);
+	}
+
+	public void setConsumers(Array<Consume> consumers){
+
 	}
 
 	public boolean isLayer(Tile tile){return true;}
@@ -173,13 +172,7 @@ public class Block extends BaseBlock implements Content{
 	@Override
 	public void load() {
 		shadowRegion = Draw.region(shadow == null ? "shadow-" + size : shadow);
-
-		if(varyShadow && variants > 0) {
-			shadowRegions = new TextureRegion[variants];
-			for(int i = 0; i < variants; i ++){
-				shadowRegions[i] = Draw.region(name + "shadow" + (i + 1));
-			}
-		}
+		region = Draw.region(name);
 	}
 
 	/**Called when the block is tapped.*/
@@ -236,8 +229,8 @@ public class Block extends BaseBlock implements Content{
 	//TODO make this easier to config.
 	public void setBars(){
 		if(hasPower) bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.amount / powerCapacity));
-		if(hasLiquids) bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.amount / liquidCapacity));
-		if(hasItems) bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.totalItems() / itemCapacity));
+		if(hasLiquids) bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.total() / liquidCapacity));
+		if(hasItems) bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.total() / itemCapacity));
 	}
 	
 	public String name(){
@@ -276,14 +269,13 @@ public class Block extends BaseBlock implements Content{
 		float x = tile.worldx(), y = tile.worldy();
 		float explosiveness = baseExplosiveness;
 		float flammability = 0f;
-		float heat = 0f;
 		float power = 0f;
 		int units = 1;
 		tempColor.set(Palette.darkFlame);
 
 		if(hasItems){
 			for(Item item : Item.all()){
-				int amount = tile.entity.items.getItem(item);
+				int amount = tile.entity.items.get(item);
 				explosiveness += item.explosiveness*amount;
 				flammability += item.flammability*amount;
 
@@ -295,15 +287,8 @@ public class Block extends BaseBlock implements Content{
 		}
 
 		if(hasLiquids){
-			float amount = tile.entity.liquids.amount;
-			explosiveness += tile.entity.liquids.liquid.explosiveness*amount/2f;
-			flammability += tile.entity.liquids.liquid.flammability*amount/2f;
-			heat += Mathf.clamp(tile.entity.liquids.liquid.temperature-0.5f)*amount/2f;
-
-			if(tile.entity.liquids.liquid.flammability*amount > 2f){
-				units ++;
-				Hue.addu(tempColor, tile.entity.liquids.liquid.flameColor);
-			}
+			flammability += tile.entity.liquids.sum((liquid, amount) -> liquid.explosiveness * amount/2f);
+			explosiveness += tile.entity.liquids.sum((liquid, amount) -> liquid.flammability * amount/2f);
 		}
 
 		if(hasPower){
@@ -314,17 +299,18 @@ public class Block extends BaseBlock implements Content{
 
 		if(hasLiquids) {
 
-			Liquid liquid = tile.entity.liquids.liquid;
-			float splash = Mathf.clamp(tile.entity.liquids.amount / 4f, 0f, 10f);
+			tile.entity.liquids.forEach((liquid, amount) -> {
+				float splash = Mathf.clamp(amount / 4f, 0f, 10f);
 
-			for (int i = 0; i < Mathf.clamp(tile.entity.liquids.amount / 5, 0, 30); i++) {
-				Timers.run(i / 2, () -> {
-					Tile other = world.tile(tile.x + Mathf.range(size / 2), tile.y + Mathf.range(size / 2));
-					if (other != null) {
-						Puddle.deposit(other, liquid, splash);
-					}
-				});
-			}
+				for (int i = 0; i < Mathf.clamp(amount / 5, 0, 30); i++) {
+					Timers.run(i / 2, () -> {
+						Tile other = world.tile(tile.x + Mathf.range(size / 2), tile.y + Mathf.range(size / 2));
+						if (other != null) {
+							Puddle.deposit(other, liquid, splash);
+						}
+					});
+				}
+			});
 		}
 
 		Damage.dynamicExplosion(x, y, flammability, explosiveness, power, tilesize * size/2f, tempColor);
@@ -342,14 +328,12 @@ public class Block extends BaseBlock implements Content{
 			}
 			return 0;
 		}else{
-			float result = 0f;
-			for (int i = 0; i < Item.all().size; i++) {
-				int amount = tile.entity.items.items[i];
-				result += Item.getByID(i).flammability*amount;
-			}
+			float result = tile.entity.items.sum((item, amount) -> item.flammability * amount);
+
 			if(hasLiquids){
-				result += tile.entity.liquids.amount * tile.entity.liquids.liquid.flammability/3f;
+				result += tile.entity.liquids.sum((liquid, amount) -> liquid.flammability * amount/3f);
 			}
+
 			return result;
 		}
 	}
@@ -411,30 +395,13 @@ public class Block extends BaseBlock implements Content{
 	}
 	
 	public void draw(Tile tile){
-		//note: multiblocks do not support rotation
-		if(!isMultiblock()){
-			Draw.rect(variants > 0 ? (name() + Mathf.randomSeed(tile.id(), 1, variants))  : name(), 
-					tile.worldx(), tile.worldy(), rotate ? tile.getRotation() * 90 : 0);
-		}else{
-			//if multiblock, make sure to draw even block sizes offset, since the core block is at the BOTTOM LEFT
-			Draw.rect(name(), tile.drawx(), tile.drawy());
-		}
-		
-		//update the tile entity through the draw method, only if it's an entity without updating
-		if(destructible && !update && !state.is(State.paused)){
-			tile.entity.update();
-		}
+		Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.getRotation() * 90 : 0);
 	}
 
 	public void drawNonLayer(Tile tile){}
 	
 	public void drawShadow(Tile tile){
-		
-		if(shadowRegions != null) {
-			Draw.rect(shadowRegions[(Mathf.randomSeed(tile.id(), 0, variants - 1))], tile.worldx(), tile.worldy());
-		}else if(shadowRegion != null){
-			Draw.rect(shadowRegion, tile.drawx(), tile.drawy());
-		}
+		Draw.rect(shadowRegion, tile.drawx(), tile.drawy());
 	}
 	
 	/**Offset for placing and drawing multiblocks.*/
@@ -456,7 +423,7 @@ public class Block extends BaseBlock implements Content{
 				"entity.x", tile.entity.x,
 				"entity.y", tile.entity.y,
 				"entity.id", tile.entity.id,
-				"entity.items.total", hasItems ? tile.entity.items.totalItems() : null
+				"entity.items.total", hasItems ? tile.entity.items.total() : null
 		);
 	}
 

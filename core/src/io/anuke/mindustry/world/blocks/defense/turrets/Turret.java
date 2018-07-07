@@ -27,7 +27,10 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.BiConsumer;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.ThreadArray;
+import io.anuke.ucore.util.Translator;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -66,8 +69,9 @@ public abstract class Turret extends Block{
 	protected TextureRegion heatRegion;
 	protected TextureRegion baseTopRegion;
 
-    protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) -> Draw.rect(name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+    protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) -> Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
 	protected BiConsumer<Tile, TurretEntity> heatDrawer = (tile, entity) ->{
+		if(entity.heat <= 0.00001f) return;
 		Graphics.setAdditiveBlending();
 		Draw.color(heatColor);
 		Draw.alpha(entity.heat);
@@ -129,7 +133,7 @@ public abstract class Turret extends Block{
 
 		drawer.accept(tile, entity);
 
-		if(Draw.hasRegion(name + "-heat")){
+		if(heatRegion != null){
 			heatDrawer.accept(tile, entity);
 		}
 

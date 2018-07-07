@@ -64,6 +64,6 @@ public class PhaseWeaver extends PowerSmelter{
             Draw.reset();
         }
 
-        Draw.rect(name, tile.drawx(), tile.drawy());
+        Draw.rect(region, tile.drawx(), tile.drawy());
     }
 }

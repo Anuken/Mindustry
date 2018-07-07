@@ -64,7 +64,7 @@ public class MassDriver extends Block {
 
         if(entity.isUnloading){
             tryDump(tile);
-            if(entity.items.totalItems() <= 0){
+            if(entity.items.total() <= 0){
                 entity.isUnloading = false;
             }
         }
@@ -79,10 +79,10 @@ public class MassDriver extends Block {
                 Tile waiter = entity.waiting.first();
 
                 entity.rotation = Mathf.slerpDelta(entity.rotation, tile.angleTo(waiter), rotateSpeed);
-            }else if (tile.entity.items.totalItems() >= minDistribute &&
+            }else if (tile.entity.items.total() >= minDistribute &&
                 linkValid(tile) && //only fire when at least at half-capacity and power
                 tile.entity.power.amount >= powerCapacity &&
-                link.block().itemCapacity - link.entity.items.totalItems() >= minDistribute && entity.reload <= 0.0001f) {
+                link.block().itemCapacity - link.entity.items.total() >= minDistribute && entity.reload <= 0.0001f) {
 
                 MassDriverEntity other = link.entity();
                 other.waiting.add(tile);
@@ -150,7 +150,7 @@ public class MassDriver extends Block {
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return tile.entity.items.totalItems() < itemCapacity;
+        return tile.entity.items.total() < itemCapacity;
     }
 
     @Override
@@ -221,7 +221,7 @@ public class MassDriver extends Block {
         public float reload = 0f;
 
         public void handlePayload(Bullet bullet, DriverBulletData data){
-            int totalItems = items.totalItems();
+            int totalItems = items.total();
 
             //add all the items possible
             for(int i = 0; i < data.items.length; i ++){

@@ -46,21 +46,21 @@ public class LiquidMixer extends LiquidBlock{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return item == inputItem && tile.entity.items.getItem(item) < itemCapacity;
+        return item == inputItem && tile.entity.items.get(item) < itemCapacity;
     }
 
     @Override
     public float handleAuxLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
         LiquidMixerEntity entity = tile.entity();
 
-        if(liquid == inputLiquid && tile.entity.items.hasItem(inputItem, (int)((entity.accumulator + amount)/amount)) &&
+        if(liquid == inputLiquid && tile.entity.items.has(inputItem, (int)((entity.accumulator + amount)/amount)) &&
                 tile.entity.power.amount >= powerUse){
 
             amount = Math.min(liquidCapacity - tile.entity.liquids.amount, amount);
 
             entity.accumulator += amount;
             int items = (int)(entity.accumulator / liquidPerItem);
-            entity.items.removeItem(inputItem, items);
+            entity.items.remove(inputItem, items);
             entity.accumulator %= liquidPerItem;
             entity.liquids.liquid = outputLiquid;
             entity.liquids.amount += amount;

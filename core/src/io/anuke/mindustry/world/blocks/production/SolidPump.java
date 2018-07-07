@@ -43,7 +43,7 @@ public class SolidPump extends Pump {
     public void draw(Tile tile) {
         SolidPumpEntity entity = tile.entity();
 
-        Draw.rect(name, tile.drawx(), tile.drawy());
+        Draw.rect(region, tile.drawx(), tile.drawy());
         Draw.color(tile.entity.liquids.liquid.color);
         Draw.alpha(tile.entity.liquids.amount / liquidCapacity);
         Draw.rect(liquidRegion, tile.drawx(), tile.drawy());

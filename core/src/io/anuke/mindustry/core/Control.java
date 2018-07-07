@@ -20,7 +20,6 @@ import io.anuke.mindustry.input.MobileInput;
 import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.Saves;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.*;
@@ -264,11 +263,7 @@ public class Control extends Module{
 
 		if(entity == null) return;
 
-		for (int i = 0; i < entity.items.items.length; i++) {
-			if(entity.items.items[i] <= 0) continue;
-			Item item = Item.getByID(i);
-			control.database().unlockContent(item);
-		}
+		entity.items.forEach((item, amount) -> control.database().unlockContent(item));
 
 		if(players[0].inventory.hasItem()){
 			control.database().unlockContent(players[0].inventory.getItem().item);
@@ -276,7 +271,7 @@ public class Control extends Module{
 
 		for(int i = 0 ; i < Recipe.all().size; i ++){
 			Recipe recipe = Recipe.all().get(i);
-			if(!recipe.debugOnly && entity.items.hasItems(recipe.requirements, 1.4f)){
+			if(!recipe.debugOnly && entity.items.has(recipe.requirements, 1.4f)){
 				if(control.database().unlockContent(recipe)){
 					ui.hudfrag.showUnlock(recipe);
 				}

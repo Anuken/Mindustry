@@ -189,7 +189,7 @@ public class Conveyor extends Block{
 			if (pos.y >= 0.9999f && offloadDir(tile, pos.item)) {
 				minremove = Math.min(i, minremove);
 				totalMoved = 1f;
-				tile.entity.items.removeItem(pos.item, 1);
+				tile.entity.items.remove(pos.item, 1);
 			} else {
 				value = pos.pack();
 
@@ -232,7 +232,7 @@ public class Conveyor extends Block{
 				ItemPos pos = pos1.set(val, ItemPos.drawShorts);
 				if(pos.item == item){
 					entity.convey.removeValue(val);
-					entity.items.removeItem(item, 1);
+					entity.items.remove(item, 1);
 					removed ++;
 					break;
 				}
@@ -258,7 +258,7 @@ public class Conveyor extends Block{
 
 		long result = ItemPos.packItem(item, 0f, 0f, (byte)Mathf.random(255));
 		entity.convey.insert(0, result);
-		entity.items.addItem(item, 1);
+		entity.items.add(item, 1);
 		entity.wakeUp();
 	}
 
@@ -285,7 +285,7 @@ public class Conveyor extends Block{
 		long result = ItemPos.packItem(item, y*0.9f, pos, (byte)Mathf.random(255));
 		boolean inserted = false;
 
-		tile.entity.items.addItem(item, 1);
+		tile.entity.items.add(item, 1);
 
 		for(int i = 0; i < entity.convey.size; i ++){
 			if(compareItems(result, entity.convey.get(i)) < 0){

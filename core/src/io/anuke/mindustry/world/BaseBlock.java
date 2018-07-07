@@ -31,20 +31,20 @@ public abstract class BaseBlock {
     }
 
     public int getMaximumAccepted(Tile tile, Item item){
-        return itemCapacity - tile.entity.items.totalItems();
+        return itemCapacity - tile.entity.items.total();
     }
 
     /**Remove a stack from this inventory, and return the amount removed.*/
     public int removeStack(Tile tile, Item item, int amount){
         tile.entity.wakeUp();
-        tile.entity.items.removeItem(item, amount);
+        tile.entity.items.remove(item, amount);
         return amount;
     }
 
     /**Handle a stack input.*/
     public void handleStack(Item item, int amount, Tile tile, Unit source){
         tile.entity.wakeUp();
-        tile.entity.items.addItem(item, amount);
+        tile.entity.items.add(item, amount);
     }
 
     /**Returns offset for stack placement.*/
@@ -53,7 +53,7 @@ public abstract class BaseBlock {
     }
 
     public void handleItem(Item item, Tile tile, Tile source){
-        tile.entity.items.addItem(item, 1);
+        tile.entity.items.add(item, 1);
     }
 
     public boolean acceptItem(Item item, Tile tile, Tile source){
@@ -61,17 +61,11 @@ public abstract class BaseBlock {
     }
 
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        return tile.entity.liquids.amount + amount < liquidCapacity
-                && (tile.entity.liquids.liquid == liquid || tile.entity.liquids.amount <= 0.1f);
-    }
-
-    public float handleAuxLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        return 0f;
+        return tile.entity.liquids.get(liquid) + amount < liquidCapacity;
     }
 
     public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        tile.entity.liquids.liquid = liquid;
-        tile.entity.liquids.amount += amount;
+        tile.entity.liquids.add(liquid, amount);
     }
 
     public boolean acceptPower(Tile tile, Tile source, float amount){
@@ -87,9 +81,7 @@ public abstract class BaseBlock {
         return canAccept;
     }
 
-    public void tryDumpLiquid(Tile tile){
-        if(tile.entity.liquids.amount < 0.001f) return;
-
+    public void tryDumpLiquid(Tile tile, Liquid liquid){
         int size = tile.block().size;
 
         GridPoint2[] nearby = Edges.getEdges(size);
@@ -102,10 +94,10 @@ public abstract class BaseBlock {
             if(other != null) other = other.target();
 
             if (other != null && other.block().hasLiquids) {
-                float ofract = other.entity.liquids.amount / other.block().liquidCapacity;
-                float fract = tile.entity.liquids.amount / liquidCapacity;
+                float ofract = other.entity.liquids.get(liquid) / other.block().liquidCapacity;
+                float fract = tile.entity.liquids.get(liquid) / liquidCapacity;
 
-                if(ofract < fract) tryMoveLiquid(tile, in, other, (fract - ofract) * liquidCapacity / 2f);
+                if(ofract < fract) tryMoveLiquid(tile, in, other, (fract - ofract) * liquidCapacity / 2f, liquid);
             }
 
             i = (byte) ((i + 1) % nearby.length);
@@ -113,35 +105,34 @@ public abstract class BaseBlock {
 
     }
 
-    public void tryMoveLiquid(Tile tile, Tile tileSource, Tile next, float amount){
-        float flow = Math.min(next.block().liquidCapacity - next.entity.liquids.amount - 0.001f, amount);
+    public void tryMoveLiquid(Tile tile, Tile tileSource, Tile next, float amount, Liquid liquid){
+        float flow = Math.min(next.block().liquidCapacity - next.entity.liquids.get(liquid) - 0.001f, amount);
 
-        if(next.block().acceptLiquid(next, tileSource, tile.entity.liquids.liquid, flow)){
-            next.block().handleLiquid(next, tileSource, tile.entity.liquids.liquid, flow);
-            tile.entity.liquids.amount -= flow;
+        if(next.block().acceptLiquid(next, tileSource, liquid, flow)){
+            next.block().handleLiquid(next, tileSource, liquid, flow);
+            tile.entity.liquids.remove(liquid, flow);
         }
     }
 
-    public float tryMoveLiquid(Tile tile, Tile next, boolean leak){
+    public float tryMoveLiquid(Tile tile, Tile next, boolean leak, Liquid liquid){
         if(next == null) return 0;
 
         next = next.target();
 
-        if(next.block().hasLiquids && tile.entity.liquids.amount > 0f){
+        if(next.block().hasLiquids && tile.entity.liquids.get(liquid) > 0f){
 
-            if((next.entity.liquids.liquid == tile.entity.liquids.liquid || next.entity.liquids.amount <= 0.01f) &&
-                    next.block().acceptLiquid(next, tile, tile.entity.liquids.liquid, 0f)) {
-                float ofract = next.entity.liquids.amount / next.block().liquidCapacity;
-                float fract = tile.entity.liquids.amount / liquidCapacity;
-                float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (liquidCapacity), tile.entity.liquids.amount);
-                flow = Math.min(flow, next.block().liquidCapacity - next.entity.liquids.amount - 0.001f);
+            if(next.block().acceptLiquid(next, tile, liquid, 0f)) {
+                float ofract = next.entity.liquids.get(liquid) / next.block().liquidCapacity;
+                float fract = tile.entity.liquids.get(liquid) / liquidCapacity;
+                float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (liquidCapacity), tile.entity.liquids.get(liquid));
+                flow = Math.min(flow, next.block().liquidCapacity - next.entity.liquids.get(liquid) - 0.001f);
 
-                if (flow > 0f && ofract <= fract && next.block().acceptLiquid(next, tile, tile.entity.liquids.liquid, flow)) {
-                    next.block().handleLiquid(next, tile, tile.entity.liquids.liquid, flow);
-                    tile.entity.liquids.amount -= flow;
+                if (flow > 0f && ofract <= fract && next.block().acceptLiquid(next, tile, liquid, flow)) {
+                    next.block().handleLiquid(next, tile, liquid, flow);
+                    tile.entity.liquids.remove(liquid, flow);
                     return flow;
                 } else if (ofract > 0.1f && fract > 0.1f) {
-                    Liquid liquid = tile.entity.liquids.liquid, other = next.entity.liquids.liquid;
+                    Liquid other = next.entity.liquids.current();
                     if ((other.flammability > 0.3f && liquid.temperature > 0.7f) ||
                             (liquid.flammability > 0.3f && other.temperature > 0.7f)) {
                         tile.entity.damage(1 * Timers.delta());
@@ -151,20 +142,17 @@ public abstract class BaseBlock {
                         }
                     } else if ((liquid.temperature > 0.7f && other.temperature < 0.55f) ||
                             (other.temperature > 0.7f && liquid.temperature < 0.55f)) {
-                        tile.entity.liquids.amount -= Math.min(tile.entity.liquids.amount, 0.7f * Timers.delta());
+                        tile.entity.liquids.remove(liquid, Math.min(tile.entity.liquids.get(liquid), 0.7f * Timers.delta()));
                         if (Mathf.chance(0.2f * Timers.delta())) {
                             Effects.effect(EnvironmentFx.steam, (tile.worldx() + next.worldx()) / 2f, (tile.worldy() + next.worldy()) / 2f);
                         }
                     }
                 }
-            }else{
-                float accepted = next.block().handleAuxLiquid(next, tile, tile.entity.liquids.liquid, tile.entity.liquids.amount);
-                tile.entity.liquids.amount -= accepted;
             }
         }else if(leak && !next.block().solid && !next.block().hasLiquids){
-            float leakAmount = Math.min(tile.entity.liquids.amount, tile.entity.liquids.amount/1.5f);
-            Puddle.deposit(next, tile, tile.entity.liquids.liquid, leakAmount);
-            tile.entity.liquids.amount -= leakAmount;
+            float leakAmount = tile.entity.liquids.get(liquid)/1.5f;
+            Puddle.deposit(next, tile, liquid, leakAmount);
+            tile.entity.liquids.remove(liquid, leakAmount);
         }
         return 0;
     }
@@ -198,7 +186,7 @@ public abstract class BaseBlock {
 
     /**Try dumping a specific item near the tile.*/
     public boolean tryDump(Tile tile, Item todump){
-        if(tile.entity == null || !hasItems) return false;
+        if(tile.entity == null || !hasItems || tile.entity.items.total() == 0) return false;
 
         int size = tile.block().size;
 
@@ -216,9 +204,9 @@ public abstract class BaseBlock {
 
                 if(todump != null && item != todump) continue;
 
-                if(tile.entity.items.hasItem(item) && other != null && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
+                if(tile.entity.items.has(item) && other != null && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
                     other.block().handleItem(item, other, in);
-                    tile.entity.items.removeItem(item, 1);
+                    tile.entity.items.remove(item, 1);
                     i = (byte)((i + 1) % nearby.length);
                     tile.setDump(i);
                     return true;

@@ -16,7 +16,6 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.BooleanProvider;
 import io.anuke.ucore.scene.Group;
@@ -29,9 +28,7 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
-import static io.anuke.mindustry.Vars.mobile;
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.*;
 
 public class BlockInventoryFragment extends Fragment {
     private final static float holdWithdraw = 40f;
@@ -58,7 +55,7 @@ public class BlockInventoryFragment extends Fragment {
 
     public void showFor(Tile t){
         this.tile = t.target();
-        if(tile == null || tile.entity == null || !tile.block().isAccessible() || tile.entity.items.totalItems() == 0) return;
+        if(tile == null || tile.entity == null || !tile.block().isAccessible() || tile.entity.items.total() == 0) return;
         rebuild(true);
     }
 
@@ -80,14 +77,14 @@ public class BlockInventoryFragment extends Fragment {
         table.background("inventory");
         table.setTouchable(Touchable.enabled);
         table.update(() -> {
-            if(tile == null || tile.entity == null || !tile.block().isAccessible() || tile.entity.items.totalItems() == 0){
+            if(tile == null || tile.entity == null || !tile.block().isAccessible() || tile.entity.items.total() == 0){
                 hide();
             }else{
                 if(holding && lastItem != null){
                     holdTime += Timers.delta();
 
                     if(holdTime >= holdWithdraw){
-                        int amount = Math.min(tile.entity.items.getItem(lastItem), player.inventory.itemCapacityUsed(lastItem));
+                        int amount = Math.min(tile.entity.items.get(lastItem), player.inventory.itemCapacityUsed(lastItem));
                         CallBlocks.requestItem(player, tile, lastItem, amount);
                         holding = false;
                         holdTime = 0f;
@@ -96,9 +93,8 @@ public class BlockInventoryFragment extends Fragment {
 
                 updateTablePosition();
                 if(tile.block().hasItems) {
-                    int[] items = tile.entity.items.items;
-                    for (int i = 0; i < items.length; i++) {
-                        if ((items[i] == 0) == container.contains(i)) {
+                    for (int i = 0; i < Item.all().size; i++) {
+                        if ((tile.entity.items.has(Item.getByID(i))) == container.contains(i)) {
                             rebuild(false);
                         }
                     }
@@ -113,12 +109,10 @@ public class BlockInventoryFragment extends Fragment {
         table.defaults().size(mobile ? 16*3 : 16*2).space(6f);
 
         if(tile.block().hasItems) {
-            int[] items = tile.entity.items.items;
 
-            for (int i = 0; i < items.length; i++) {
-                final int f = i;
-                if (items[i] == 0) continue;
+            for (int i = 0; i < Item.all().size; i++) {
                 Item item = Item.getByID(i);
+                if (!tile.entity.items.has(item)) continue;
 
                 container.add(i);
 
@@ -127,14 +121,14 @@ public class BlockInventoryFragment extends Fragment {
                 HandCursorListener l = new HandCursorListener();
                 l.setEnabled(canPick);
 
-                ItemImage image = new ItemImage(item.region, () -> round(items[f]));
+                ItemImage image = new ItemImage(item.region, () -> round(tile.entity.items.get(item)));
                 image.addListener(l);
 
                 image.addListener(new InputListener(){
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                        if(!canPick.get() || items[f] == 0) return false;
-                        int amount = Math.min(Inputs.keyDown("item_withdraw") ? items[f] : 1, player.inventory.itemCapacityUsed(item));
+                        if(!canPick.get() || !tile.entity.items.has(item)) return false;
+                        int amount = Math.min(1, player.inventory.itemCapacityUsed(item));
                         CallBlocks.requestItem(player, tile, item, amount);
                         lastItem = item;
                         holding = true;

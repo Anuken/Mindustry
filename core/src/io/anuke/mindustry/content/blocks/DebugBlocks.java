@@ -56,7 +56,7 @@ public class DebugBlocks extends BlockList implements ContentList{
             @Override
             public void update(Tile tile) {
                 SorterEntity entity = tile.entity();
-                entity.items.items[entity.sortItem.id] = 1;
+                entity.items.set(entity.sortItem, 1);
                 tryDump(tile, entity.sortItem);
             }
 
@@ -79,9 +79,8 @@ public class DebugBlocks extends BlockList implements ContentList{
             public void update(Tile tile) {
                 LiquidSourceEntity entity = tile.entity();
 
-                tile.entity.liquids.amount = liquidCapacity;
-                tile.entity.liquids.liquid = entity.source;
-                tryDumpLiquid(tile);
+                tile.entity.liquids.add(entity.source, liquidCapacity);
+                tryDumpLiquid(tile, entity.source);
             }
 
             @Override

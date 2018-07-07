@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
@@ -38,6 +39,8 @@ public class ItemBridge extends Block {
     protected float transportTime = 2f;
     protected IntArray removals = new IntArray();
 
+    protected TextureRegion endRegion, bridgeRegion, arrowRegion;
+
     public ItemBridge(String name) {
         super(name);
         update = true;
@@ -48,6 +51,13 @@ public class ItemBridge extends Block {
         itemCapacity = 30;
         configurable = true;
         hasItems = true;
+    }
+
+    @Override
+    public void load() {
+        endRegion = Draw.region(name + "-end");
+        bridgeRegion = Draw.region(name + "-bridge");
+        arrowRegion = Draw.region(name + "-arrow");
     }
 
     @Override
@@ -162,13 +172,13 @@ public class ItemBridge extends Block {
         ItemBridgeEntity entity = tile.entity();
 
         if(entity.uptime >= 0.5f && entity.timer.get(timerTransport, transportTime)){
-            Item item = entity.items.takeItem();
+            Item item = entity.items.take();
             if(item != null && other.block().acceptItem(item, other, tile)){
                 other.block().handleItem(item, other, tile);
                 entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 4f, 0.05f);
             }else{
                 entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 1f, 0.01f);
-                if(item != null) entity.items.addItem(item, 1);
+                if(item != null) entity.items.add(item, 1);
             }
         }
     }
@@ -185,11 +195,11 @@ public class ItemBridge extends Block {
         Draw.color(Color.WHITE, Color.BLACK, Mathf.absin(Timers.time(), 6f, 0.07f));
         Draw.alpha(Math.max(entity.uptime, 0.25f));
 
-        Draw.rect(name + "-end", tile.drawx(), tile.drawy(), i*90 + 90);
-        Draw.rect(name + "-end", other.drawx(), other.drawy(), i*90 + 270);
+        Draw.rect(endRegion, tile.drawx(), tile.drawy(), i*90 + 90);
+        Draw.rect(endRegion, other.drawx(), other.drawy(), i*90 + 270);
 
         Lines.stroke(8f);
-        Lines.line(Draw.region(name + "-bridge"),
+        Lines.line(bridgeRegion,
                 tile.worldx(),
                 tile.worldy(),
                 other.worldx(),
@@ -204,7 +214,7 @@ public class ItemBridge extends Block {
 
         for(int a = 0; a < arrows; a ++){
             Draw.alpha(Mathf.absin(a/(float)arrows - entity.time/100f, 0.1f, 1f) * entity.uptime);
-            Draw.rect(name + "-arrow",
+            Draw.rect(arrowRegion,
                     tile.worldx() + Geometry.d4[i].x*(tilesize/2f + a*4f + time % 4f),
                     tile.worldy() + Geometry.d4[i].y*(tilesize/2f + a*4f + time % 4f),
                     i*90f);
@@ -214,7 +224,7 @@ public class ItemBridge extends Block {
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return tile.entity.items.totalItems() < itemCapacity;
+        return tile.entity.items.total() < itemCapacity;
     }
 
     @Override

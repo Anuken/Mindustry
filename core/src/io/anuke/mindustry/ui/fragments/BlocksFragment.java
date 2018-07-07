@@ -244,7 +244,7 @@ public class BlocksFragment extends Fragment{
 					if(entity == null) return;
 
 					for(ItemStack s : r.requirements){
-						if(!entity.items.hasItem(s.item, Mathf.ceil(s.amount))){
+						if(!entity.items.has(s.item, Mathf.ceil(s.amount))){
 							istack.setColor(Color.GRAY);
 							return;
 						}
@@ -328,7 +328,7 @@ public class BlocksFragment extends Fragment{
 				TileEntity core = players[0].getClosestCore();
 				if(core == null) return "*/*";
 
-				int amount = core.items.getItem(stack.item);
+				int amount = core.items.get(stack.item);
 				String color = (amount < stack.amount/2f ? "[red]" : amount < stack.amount ? "[orange]" : "[white]");
 
 				return color + format(amount) + "[white]/" + stack.amount;

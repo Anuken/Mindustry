@@ -21,10 +21,10 @@ public class Router extends Block{
 	@Override
 	public void update(Tile tile){
 		int iterations = Math.max(1, (int) (Timers.delta() + 0.4f));
-		boolean moved = tile.entity.items.totalItems() > 0;
+		boolean moved = tile.entity.items.total() > 0;
 
 		for(int i = 0; i < iterations; i ++) {
-			if (tile.entity.items.totalItems() > 0) {
+			if (tile.entity.items.total() > 0) {
 				tryDump(tile);
 				moved = true;
 			}
@@ -37,7 +37,7 @@ public class Router extends Block{
 
 	@Override
 	public boolean canDump(Tile tile, Tile to, Item item) {
-        return !(to.block() instanceof Router) || ((float) to.target().entity.items.totalItems() / to.target().block().itemCapacity) < ((float) tile.entity.items.totalItems() / to.target().block().itemCapacity);
+        return !(to.block() instanceof Router) || ((float) to.target().entity.items.total() / to.target().block().itemCapacity) < ((float) tile.entity.items.total() / to.target().block().itemCapacity);
     }
 
 	@Override
@@ -48,7 +48,7 @@ public class Router extends Block{
 
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
-		int items = tile.entity.items.totalItems();
+		int items = tile.entity.items.total();
 		return items < itemCapacity;
 	}
 

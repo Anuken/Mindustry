@@ -35,11 +35,11 @@ public class DefenseBlocks extends BlockList implements ContentList {
         }};
 
         thoriumWall = new Wall("thorium-wall") {{
-            health = 110 * wallHealthMultiplier;
+            health = 200 * wallHealthMultiplier;
         }};
 
         thoriumWallLarge = new Wall("thorium-wall-large") {{
-            health = 110 * wallHealthMultiplier*4;
+            health = 200 * wallHealthMultiplier*4;
             size = 2;
         }};
 

@@ -33,14 +33,14 @@ public class ExtendingItemBridge extends ItemBridge {
         ey *= entity.uptime;
 
         Lines.stroke(8f);
-        Lines.line(Draw.region(name + "-bridge"),
+        Lines.line(bridgeRegion,
                 tile.worldx() + Geometry.d4[i].x*tilesize/2f,
                 tile.worldy() + Geometry.d4[i].y*tilesize/2f,
                 tile.worldx() + ex,
                 tile.worldy() + ey, CapStyle.none, 0f);
 
-        Draw.rect(name + "-end", tile.drawx(), tile.drawy(), i*90 + 90);
-        Draw.rect(name + "-end",
+        Draw.rect(endRegion, tile.drawx(), tile.drawy(), i*90 + 90);
+        Draw.rect(endRegion,
                 tile.worldx() + ex + Geometry.d4[i].x*tilesize/2f,
                 tile.worldy() + ey + Geometry.d4[i].y*tilesize/2f, i*90 + 270);
 
@@ -52,7 +52,7 @@ public class ExtendingItemBridge extends ItemBridge {
 
         for(int a = 0; a < arrows; a ++){
             Draw.alpha(Mathf.absin(a/(float)arrows - entity.time/100f, 0.1f, 1f) * entity.uptime);
-            Draw.rect(name + "-arrow",
+            Draw.rect(arrowRegion,
                     tile.worldx() + Geometry.d4[i].x*(tilesize/2f + a*6f + 2) * entity.uptime,
                     tile.worldy() + Geometry.d4[i].y*(tilesize/2f + a*6f + 2) * entity.uptime,
                     i*90f);

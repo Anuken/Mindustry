@@ -73,10 +73,10 @@ public class TurretBlocks extends BlockList implements ContentList {
 			health = 360;
 
 			drawer = (tile, entity) -> {
-				Draw.rect(name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+				Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
 
-				Draw.color(entity.liquids.liquid.color);
-				Draw.alpha(entity.liquids.amount / liquidCapacity);
+				Draw.color(entity.liquids.current().color);
+				Draw.alpha(entity.liquids.total() / liquidCapacity);
 				Draw.rect(name + "-liquid", tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
 				Draw.color();
 			};
@@ -145,7 +145,7 @@ public class TurretBlocks extends BlockList implements ContentList {
 			ammoUseEffect = ShootFx.shellEjectBig;
 
 			drawer = (tile, entity) -> {
-				Draw.rect(name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+				Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
 				float offsetx = (int) (Mathf.abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 3f);
 				float offsety = -(int) (Mathf.abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 2f);
 

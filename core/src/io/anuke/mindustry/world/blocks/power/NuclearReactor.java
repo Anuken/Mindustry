@@ -57,7 +57,7 @@ public class NuclearReactor extends PowerGenerator {
 	@Override
 	public void setBars(){
 		super.setBars();
-		bars.replace(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.getItem(generateItem) / itemCapacity));
+		bars.replace(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.get(generateItem) / itemCapacity));
 		bars.add(new BlockBar(BarType.heat, true, tile -> tile.<NuclearReactorEntity>entity().heat));
 	}
 
@@ -73,7 +73,7 @@ public class NuclearReactor extends PowerGenerator {
 	public void update(Tile tile){
 		NuclearReactorEntity entity = tile.entity();
 		
-		int fuel = entity.items.getItem(generateItem);
+		int fuel = entity.items.get(generateItem);
 		float fullness = (float)fuel / itemCapacity;
 		
 		if(fuel > 0){
@@ -81,7 +81,7 @@ public class NuclearReactor extends PowerGenerator {
 			entity.power.amount += powerMultiplier * fullness * Timers.delta();
 			entity.power.amount = Mathf.clamp(entity.power.amount, 0f, powerCapacity);
 			if(entity.timer.get(timerFuel, fuelUseTime)){
-				entity.items.removeItem(generateItem, 1);
+				entity.items.remove(generateItem, 1);
 			}
 		}
 		
@@ -123,7 +123,7 @@ public class NuclearReactor extends PowerGenerator {
 		
 		NuclearReactorEntity entity = tile.entity();
 		
-		int fuel = entity.items.getItem(generateItem);
+		int fuel = entity.items.get(generateItem);
 		
 		if(fuel < 5 && entity.heat < 0.5f) return;
 		
@@ -155,7 +155,7 @@ public class NuclearReactor extends PowerGenerator {
 
 	@Override
 	public boolean acceptItem(Item item, Tile tile, Tile source){
-		return item == generateItem && tile.entity.items.getItem(generateItem) < itemCapacity;
+		return item == generateItem && tile.entity.items.get(generateItem) < itemCapacity;
 	}
 
 	@Override

@@ -33,7 +33,7 @@ public class TunnelConduit extends LiquidBlock {
 
     @Override
     public void draw(Tile tile){
-        Draw.rect(name, tile.drawx(), tile.drawy(), tile.getRotation() * 90);
+        Draw.rect(region, tile.drawx(), tile.drawy(), tile.getRotation() * 90);
     }
 
     @Override
