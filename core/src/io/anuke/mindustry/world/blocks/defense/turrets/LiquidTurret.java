@@ -31,7 +31,7 @@ public abstract class LiquidTurret extends Turret {
     public void setBars() {
         super.setBars();
         bars.remove(BarType.inventory);
-        bars.replace(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.amount / liquidCapacity));
+        bars.replace(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.total() / liquidCapacity));
     }
 
     @Override
@@ -53,20 +53,20 @@ public abstract class LiquidTurret extends Turret {
     @Override
     public AmmoType useAmmo(Tile tile){
         TurretEntity entity = tile.entity();
-        AmmoType type = liquidAmmoMap.get(entity.liquids.liquid);
-        entity.liquids.amount -= type.quantityMultiplier;
+        AmmoType type = liquidAmmoMap.get(entity.liquids.current());
+        entity.liquids.remove(type.liquid, type.quantityMultiplier);
         return type;
     }
 
     @Override
     public AmmoType peekAmmo(Tile tile){
-        return liquidAmmoMap.get(tile.entity.liquids.liquid);
+        return liquidAmmoMap.get(tile.entity.liquids.current());
     }
 
     @Override
     public boolean hasAmmo(Tile tile){
         TurretEntity entity = tile.entity();
-        return liquidAmmoMap.get(entity.liquids.liquid) != null && entity.liquids.amount >= liquidAmmoMap.get(entity.liquids.liquid).quantityMultiplier;
+        return liquidAmmoMap.get(entity.liquids.current()) != null && entity.liquids.total() >= liquidAmmoMap.get(entity.liquids.current()).quantityMultiplier;
     }
 
     @Override
@@ -89,7 +89,8 @@ public abstract class LiquidTurret extends Turret {
 
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        return super.acceptLiquid(tile, source, liquid, amount) && liquidAmmoMap.get(liquid) != null;
+        return super.acceptLiquid(tile, source, liquid, amount) && liquidAmmoMap.get(liquid) != null
+                && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.01f);
     }
 
 }

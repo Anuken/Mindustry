@@ -19,11 +19,11 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.modules.InventoryModule;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.meta.values.ItemListValue;
+import io.anuke.mindustry.world.modules.InventoryModule;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
@@ -136,6 +136,17 @@ public class UnitFactory extends Block {
             }
         }
 
+        /*
+        if(!entity.hasSpawned){
+            for(BaseUnit unit : unitGroups[tile.getTeamID()].all()){
+                if(unit.getType() == type && unit.getSpawner() == null){
+                    entity.hasSpawned = true;
+                    unit.setSpawner(tile);
+                    break;
+                }
+            }
+        }*/
+
         if(!entity.hasSpawned && hasRequirements(entity.items, entity.buildTime/produceTime) &&
                 entity.power.amount >= used && !entity.open){
 
@@ -214,11 +225,13 @@ public class UnitFactory extends Block {
         @Override
         public void write(DataOutputStream stream) throws IOException {
             stream.writeFloat(buildTime);
+            stream.writeBoolean(hasSpawned);
         }
 
         @Override
         public void read(DataInputStream stream) throws IOException {
             buildTime = stream.readFloat();
+            hasSpawned = stream.readBoolean();
         }
     }
 }

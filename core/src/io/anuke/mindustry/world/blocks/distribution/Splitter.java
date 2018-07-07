@@ -1,10 +1,13 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
+import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.meta.BlockGroup;
+import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.mindustry.world.meta.BlockGroup;
+
+import static io.anuke.mindustry.Vars.world;
 
 public class Splitter extends Block{
 
@@ -31,33 +34,17 @@ public class Splitter extends Block{
     }
 
     Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){
-        int dir = source.relativeTo(dest.x, dest.y);
-        if(dir == -1) return null;
-        Tile to;
-
-        Tile a = dest.getNearby(Mathf.mod(dir - 1, 4));
-        Tile b = dest.getNearby(Mathf.mod(dir + 1, 4));
-        boolean ac = !(a.block().instantTransfer && source.block().instantTransfer) &&
-                a.block().acceptItem(item, a, dest);
-        boolean bc = !(b.block().instantTransfer && source.block().instantTransfer) &&
-                b.block().acceptItem(item, b, dest);
-
-        if(ac && !bc){
-            to = a;
-        }else if(bc && !ac){
-            to = b;
-        }else{
-            if(dest.getDump() == 0){
-                to = a;
-                if(flip)
-                    dest.setDump((byte)1);
-            }else{
-                to = b;
-                if(flip)
-                    dest.setDump((byte)0);
+        GridPoint2[] points = Edges.getEdges(size);
+        int counter = source.getDump();
+        for (int i = 0; i < points.length; i++) {
+            GridPoint2 point = points[(i + counter++) % points.length];
+            source.setDump((byte)(counter % points.length));
+            Tile tile = world.tile(dest.x + point.x, dest.y + point.y);
+            if(tile != source && !(tile.block().instantTransfer && source.block().instantTransfer) &&
+                    tile.block().acceptItem(item, tile, dest)){
+                return tile;
             }
         }
-
-        return to;
+        return null;
     }
 }

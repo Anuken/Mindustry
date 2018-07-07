@@ -27,6 +27,7 @@ public class Conduit extends LiquidBlock {
         super.load();
 
         liquidRegion = Draw.region("conduit-liquid");
+
     }
 
     @Override
@@ -67,8 +68,7 @@ public class Conduit extends LiquidBlock {
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
         tile.entity.wakeUp();
-        return super.acceptLiquid(tile, source, liquid, amount) && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.01f) &&
-                ((2 + source.relativeTo(tile.x, tile.y)) % 4 != tile.getRotation());
+        return super.acceptLiquid(tile, source, liquid, amount) && ((2 + source.relativeTo(tile.x, tile.y)) % 4 != tile.getRotation());
     }
 
     @Override

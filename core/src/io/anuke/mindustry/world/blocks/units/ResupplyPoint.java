@@ -85,10 +85,10 @@ public class ResupplyPoint extends Block{
         }else if(entity.target != null && entity.strength > 0.5f){
 
             if(entity.timer.get(timerSupply, supplyInterval)) {
-                for (int i = 0; i < tile.entity.items.items.length; i++) {
+                for (int i = 0; i < Item.all().size; i++) {
                     Item item = Item.getByID(i);
-                    if (tile.entity.items.items[i] > 0 && entity.target.acceptsAmmo(item)) {
-                        tile.entity.items.items[i]--;
+                    if (tile.entity.items.has(item) && entity.target.acceptsAmmo(item)) {
+                        tile.entity.items.remove(item, 1);
                         entity.target.addAmmo(item);
                         break;
                     }
@@ -130,9 +130,9 @@ public class ResupplyPoint extends Block{
         if(unit == null || unit.inventory.totalAmmo() >= unit.inventory.ammoCapacity()
                 || unit.isDead()) return false;
 
-        for(int i = 0; i < entity.items.items.length; i ++) {
+        for (int i = 0; i < Item.all().size; i++) {
             Item item = Item.getByID(i);
-            if (entity.items.items[i] > 0 && unit.acceptsAmmo(item)) {
+            if (entity.items.has(item) && unit.acceptsAmmo(item)) {
                 return true;
             }
         }

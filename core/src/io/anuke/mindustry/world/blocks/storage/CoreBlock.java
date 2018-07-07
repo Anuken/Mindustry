@@ -141,7 +141,7 @@ public class CoreBlock extends StorageBlock {
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return tile.entity.items.items[item.id] < itemCapacity && item.type == ItemType.material;
+        return tile.entity.items.get(item) < itemCapacity && item.type == ItemType.material;
     }
 
     @Override
@@ -220,10 +220,10 @@ public class CoreBlock extends StorageBlock {
             Units.getNearby(tile.getTeam(), rect, unit -> {
                 if(unit.isDead() || unit.distanceTo(tile.drawx(), tile.drawy()) > supplyRadius || unit.getGroup() == null) return;
 
-                for(int i = 0; i < tile.entity.items.items.length; i ++){
+                for(int i = 0; i < Item.all().size; i ++){
                     Item item = Item.getByID(i);
-                    if(tile.entity.items.items[i] > 0 && unit.acceptsAmmo(item)){
-                        tile.entity.items.items[i] --;
+                    if(tile.entity.items.get(item) > 0 && unit.acceptsAmmo(item)){
+                        tile.entity.items.remove(item, 1);
                         unit.addAmmo(item);
                         CallEntity.transferAmmo(item, tile.drawx(), tile.drawy(), unit);
                         return;

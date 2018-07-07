@@ -24,7 +24,7 @@ public class LiquidBridge extends ItemBridge {
 
         Tile other = world.tile(entity.link);
         if(!linkValid(tile, other)){
-            tryDumpLiquid(tile);
+            tryDumpLiquid(tile, entity.liquids.current());
         }else{
             float use = Math.min(powerCapacity, powerUse * Timers.delta());
 
@@ -37,7 +37,7 @@ public class LiquidBridge extends ItemBridge {
 
             if(entity.uptime >= 0.5f){
 
-                if(tryMoveLiquid(tile, other, false) > 0.1f){
+                if(tryMoveLiquid(tile, other, false, entity.liquids.current()) > 0.1f){
                     entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 4f, 0.05f);
                 }else{
                     entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 1f, 0.01f);

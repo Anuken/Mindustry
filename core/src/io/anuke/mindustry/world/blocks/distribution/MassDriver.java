@@ -189,7 +189,9 @@ public class MassDriver extends Block {
         DriverBulletData data = Pooling.obtain(DriverBulletData.class);
         data.from = entity;
         data.to = other;
-        System.arraycopy(entity.items.items, 0, data.items, 0, data.items.length);
+        for (int i = 0; i < Item.all().size; i++) {
+            data.items[i] = entity.items.get(Item.getByID(i));
+        }
         entity.items.clear();
 
         float angle = tile.angleTo(target);
@@ -226,7 +228,7 @@ public class MassDriver extends Block {
             //add all the items possible
             for(int i = 0; i < data.items.length; i ++){
                 int maxAdd = Math.min(data.items[i], itemCapacity - totalItems);
-                items.items[i] += maxAdd;
+                items.add(Item.getByID(i), maxAdd);
                 data.items[i] -= maxAdd;
                 totalItems += maxAdd;
 

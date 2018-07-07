@@ -16,6 +16,8 @@ public abstract class BaseBlock {
     public boolean hasLiquids;
     public boolean hasPower;
 
+    public boolean singleLiquid = true;
+
     public int itemCapacity;
     public float liquidCapacity = 10f;
     public float liquidFlowFactor = 4.9f;
@@ -61,7 +63,8 @@ public abstract class BaseBlock {
     }
 
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        return tile.entity.liquids.get(liquid) + amount < liquidCapacity;
+        return tile.entity.liquids.get(liquid) + amount < liquidCapacity &&
+                (!singleLiquid || (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.01f));
     }
 
     public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){

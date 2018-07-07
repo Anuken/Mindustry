@@ -12,8 +12,8 @@ public class LiquidRouter extends LiquidBlock{
 	@Override
 	public void update(Tile tile){
 		
-		if(tile.entity.liquids.amount > 0){
-			tryDumpLiquid(tile);
+		if(tile.entity.liquids.total() > 0.01f){
+			tryDumpLiquid(tile, tile.entity.liquids.current());
 		}
 	}
 

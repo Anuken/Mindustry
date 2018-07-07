@@ -71,6 +71,10 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 		return type;
 	}
 
+	public Tile getSpawner(){
+		return world.tile(spawner);
+	}
+
 	/**internal constructor used for deserialization, DO NOT USE*/
 	public BaseUnit(){}
 

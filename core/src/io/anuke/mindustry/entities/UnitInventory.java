@@ -87,6 +87,7 @@ public class UnitInventory implements Saveable{
     }
 
     public void addAmmo(AmmoType type){
+        if(type == null) return;
         totalAmmo += type.quantityMultiplier;
 
         //find ammo entry by type
