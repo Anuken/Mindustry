@@ -8,9 +8,9 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.consumers.Uses;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
@@ -35,12 +35,6 @@ public class Drill extends Block{
 	protected int tier;
 	/**Base time to drill one ore, in frames.*/
 	protected float drillTime = 300;
-	/**power use per frame.*/
-	public float powerUse = 0.08f;
-	/**liquid use per frame.*/
-	protected float liquidUse = 0.05f;
-	/**Input liquid. Set hasLiquids to true so this is used.*/
-	protected Liquid inputLiquid = Liquids.water;
 	/**Whether the liquid is required to drill. If false, then it will be used as a speed booster.*/
 	protected boolean liquidRequired = false;
 	/**How many times faster the drill will progress when boosted by liquid.*/
@@ -74,6 +68,8 @@ public class Drill extends Block{
 		hasLiquids = true;
 		liquidCapacity = 5f;
 		hasItems = true;
+
+		consumes.liquid(Liquids.water, 0.01f).optional(true);
 	}
 
 	@Override
@@ -141,14 +137,6 @@ public class Drill extends Block{
 		});
 
         stats.add(BlockStat.drillSpeed, 60f/drillTime, StatUnit.itemsSecond);
-
-		if(inputLiquid != null){
-			stats.add(BlockStat.inputLiquid, inputLiquid);
-		}
-
-		if(hasPower){
-			stats.add(BlockStat.powerUse,  powerUse*60f, StatUnit.powerSecond);
-		}
 	}
 	
 	@Override
@@ -175,20 +163,11 @@ public class Drill extends Block{
 
 		entity.drillTime += entity.warmup * Timers.delta();
 
-		float powerUsed = Math.min(powerCapacity, powerUse * Timers.delta());
-		float liquidUsed = Math.min(liquidCapacity, liquidUse * Timers.delta());
-
-		if(entity.items.total() < itemCapacity && toAdd.size > 0 &&
-				(!hasPower || entity.power.amount >= powerUsed) &&
-				(!liquidRequired || entity.liquids.amount >= liquidUsed)){
-
-			if(hasPower) entity.power.amount -= powerUsed;
-			if(liquidRequired) entity.liquids.amount -= liquidUsed;
+		if(entity.items.total() < itemCapacity && toAdd.size > 0 && entity.cons.valid()){
 
 			float speed = 1f;
 
-			if(entity.liquids.amount >= liquidUsed && !liquidRequired){
-				entity.liquids.amount -= liquidUsed;
+			if(entity.consumed(Uses.liquid) && !liquidRequired){
 				speed = liquidBoostIntensity;
 			}
 
@@ -233,11 +212,6 @@ public class Drill extends Block{
 		}else{
 			return isValid(tile);
 		}
-	}
-
-	@Override
-	public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
-		return super.acceptLiquid(tile, source, liquid, amount) && liquid == inputLiquid;
 	}
 
 	@Override

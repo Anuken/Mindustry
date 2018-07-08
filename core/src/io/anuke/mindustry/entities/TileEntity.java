@@ -1,7 +1,6 @@
 package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.fx.Fx;
@@ -11,9 +10,10 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.CallBlocks;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Wall;
+import io.anuke.mindustry.world.consumers.Uses;
+import io.anuke.mindustry.world.modules.ConsumeModule;
 import io.anuke.mindustry.world.modules.InventoryModule;
 import io.anuke.mindustry.world.modules.LiquidModule;
 import io.anuke.mindustry.world.modules.PowerModule;
@@ -43,8 +43,7 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 	public PowerModule power;
 	public InventoryModule items;
 	public LiquidModule liquids;
-
-	public Array<Consume> consumers = new Array<>();
+	public ConsumeModule cons;
 
 	private boolean dead = false;
 	private boolean sleeping;
@@ -59,7 +58,6 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 		health = tile.block().health;
 		
 		timer = new Timer(tile.block().timers);
-		tile.block().setConsumers(consumers);
 		
 		if(added){
 			add();
@@ -135,6 +133,10 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 		return tile;
 	}
 
+	public boolean consumed(Uses uses){
+		return tile.block().consumes.get(uses).valid(tile.block(), this);
+	}
+
 	@Override
 	public Team getTeam() {
 		return tile.getTeam();
@@ -160,9 +162,7 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 			}
 
 			tile.block().update(tile);
-			for(Consume cons : consumers){
-				cons.update(this);
-			}
+			cons.update(this);
 		}
 	}
 

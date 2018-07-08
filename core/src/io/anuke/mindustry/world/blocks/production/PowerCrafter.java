@@ -76,7 +76,7 @@ public class PowerCrafter extends Block{
         }
 
         if(outputLiquid != null){
-            tryDumpLiquid(tile);
+            tryDumpLiquid(tile, entity.liquids.current());
         }
     }
 

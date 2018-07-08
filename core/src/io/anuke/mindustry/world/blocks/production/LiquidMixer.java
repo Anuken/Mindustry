@@ -1,28 +1,22 @@
 package io.anuke.mindustry.world.blocks.production;
 
-import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
+import io.anuke.mindustry.world.consumers.ConsumeLiquid;
+import io.anuke.mindustry.world.consumers.Uses;
 import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Timers;
 
 public class LiquidMixer extends LiquidBlock{
-    protected Liquid inputLiquid = Liquids.none;
-    protected Liquid outputLiquid = Liquids.none;
-    protected Item inputItem = null;
+    protected Liquid outputLiquid;
     protected float liquidPerItem = 50f;
-    protected float powerUse = 0f;
 
     public LiquidMixer(String name) {
         super(name);
         hasItems = true;
-        hasPower = true;
         rotate = false;
-        liquidRegion = name() + "-liquid";
         solid = true;
     }
 
@@ -31,43 +25,29 @@ public class LiquidMixer extends LiquidBlock{
         super.setStats();
 
         stats.add(BlockStat.liquidOutput, outputLiquid);
-        stats.add(BlockStat.powerUse, powerUse * 60f, StatUnit.powerSecond);
-        stats.add(BlockStat.inputItem, inputItem);
+    }
+
+    @Override
+    public boolean shouldConsume(Tile tile){
+        return tile.entity.liquids.get(outputLiquid) < liquidCapacity;
     }
 
     @Override
     public void update(Tile tile){
-        float used = Math.min(Timers.delta() * powerUse, tile.entity.power.amount);
-
-        tryDumpLiquid(tile);
-
-        if(tile.entity.power.amount > used) tile.entity.power.amount -= used;
-    }
-
-    @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return item == inputItem && tile.entity.items.get(item) < itemCapacity;
-    }
-
-    @Override
-    public float handleAuxLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
         LiquidMixerEntity entity = tile.entity();
 
-        if(liquid == inputLiquid && tile.entity.items.has(inputItem, (int)((entity.accumulator + amount)/amount)) &&
-                tile.entity.power.amount >= powerUse){
-
-            amount = Math.min(liquidCapacity - tile.entity.liquids.amount, amount);
-
-            entity.accumulator += amount;
-            int items = (int)(entity.accumulator / liquidPerItem);
-            entity.items.remove(inputItem, items);
-            entity.accumulator %= liquidPerItem;
-            entity.liquids.liquid = outputLiquid;
-            entity.liquids.amount += amount;
-            return amount;
-        }else{
-            return 0;
+        if(tile.entity.cons.valid()){
+            float use = Math.min(consumes.<ConsumeLiquid>get(Uses.liquid).used() * Timers.delta(), liquidCapacity - entity.liquids.get(outputLiquid));
+            entity.accumulator += use;
+            entity.liquids.add(outputLiquid, use);
+            for (int i = 0; i < (int)(entity.accumulator / liquidPerItem); i++) {
+                if(!entity.items.has(consumes.item())) break;
+                entity.items.remove(consumes.item(), 1);
+                entity.accumulator --;
+            }
         }
+
+        tryDumpLiquid(tile, outputLiquid);
     }
 
     @Override

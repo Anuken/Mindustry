@@ -7,7 +7,7 @@ import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.Liquid;
 
 public class Liquids implements ContentList {
-    public static Liquid none, water, lava, oil, cryofluid;
+    public static Liquid water, lava, oil, cryofluid;
 
     @Override
     public void load() {

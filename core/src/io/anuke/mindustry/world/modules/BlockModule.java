@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks;
+package io.anuke.mindustry.world.modules;
 
 import java.io.DataInput;
 import java.io.DataOutput;

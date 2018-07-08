@@ -147,7 +147,7 @@ public class UI extends SceneModule{
         }
 
 		Graphics.end();
-
+        Draw.color();
 	}
 
 	@Override

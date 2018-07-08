@@ -6,6 +6,8 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.world.consumers.Consumers;
+import io.anuke.mindustry.world.consumers.Uses;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
@@ -22,6 +24,12 @@ public abstract class BaseBlock {
     public float liquidCapacity = 10f;
     public float liquidFlowFactor = 4.9f;
     public float powerCapacity = 10f;
+
+    public Consumers consumes = new Consumers();
+
+    public boolean shouldConsume(Tile tile){
+        return true;
+    }
 
     /**Returns the amount of items this block can accept.*/
     public int acceptStack(Item item, int amount, Tile tile, Unit source){
@@ -59,12 +67,13 @@ public abstract class BaseBlock {
     }
 
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return false;
+        return tile.entity != null && consumes.item() == item && tile.entity.items.total() < itemCapacity;
     }
 
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         return tile.entity.liquids.get(liquid) + amount < liquidCapacity &&
-                (!singleLiquid || (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.01f));
+                (!singleLiquid || (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.01f))
+                && (!consumes.has(Uses.liquid) || consumes.liquid() == liquid);
     }
 
     public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){

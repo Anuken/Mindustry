@@ -2,14 +2,14 @@ package io.anuke.mindustry.world.blocks.production;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
 import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.meta.values.ItemFilterValue;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -20,11 +20,7 @@ import io.anuke.ucore.util.Mathf;
 public class Separator extends Block {
     protected final int timerDump = timers ++;
 
-    protected Liquid liquid;
-    protected Item item;
     protected Item[] results;
-    protected float liquidUse;
-    protected float powerUse;
     protected float filterTime;
     protected float spinnerRadius = 2.5f;
     protected float spinnerLength = 1f;
@@ -42,6 +38,9 @@ public class Separator extends Block {
         solid = true;
         hasItems = true;
         hasLiquids = true;
+
+        consumes.item(Items.stone);
+        consumes.liquid(Liquids.water, 0.1f);
     }
 
     @Override
@@ -55,13 +54,6 @@ public class Separator extends Block {
     public void setStats() {
         super.setStats();
 
-        if(hasPower){
-            stats.add(BlockStat.powerUse, powerUse * 60f, StatUnit.powerSecond);
-        }
-
-        stats.add(BlockStat.liquidUse, liquidUse * 60f, StatUnit.liquidSecond);
-        stats.add(BlockStat.inputLiquid, liquid);
-        stats.add(BlockStat.inputItem, item);
         stats.add(BlockStat.outputItem, new ItemFilterValue(item -> {
             for(Item i : results){
                 if(item == i) return true;
@@ -76,8 +68,8 @@ public class Separator extends Block {
 
         GenericCrafterEntity entity = tile.entity();
 
-        Draw.color(tile.entity.liquids.liquid.color);
-        Draw.alpha(tile.entity.liquids.amount / liquidCapacity);
+        Draw.color(tile.entity.liquids.current().color);
+        Draw.alpha(tile.entity.liquids.total() / liquidCapacity);
         Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
 
         Draw.color(color);
@@ -90,17 +82,10 @@ public class Separator extends Block {
     public void update(Tile tile) {
         GenericCrafterEntity entity = tile.entity();
 
-        float liquidUsed = Math.min(liquidCapacity, liquidUse * Timers.delta());
-        float powerUsed = Math.min(powerCapacity, powerUse * Timers.delta());
-
         entity.totalProgress += entity.warmup*Timers.delta();
 
-        if(entity.liquids.amount >= liquidUsed && entity.items.has(item) &&
-                (!hasPower || entity.power.amount >= powerUsed)){
+        if(entity.cons.valid()){
             entity.progress += 1f/filterTime;
-            entity.liquids.amount -= liquidUsed;
-            if(hasPower) entity.power.amount -= powerUsed;
-
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);
@@ -109,7 +94,7 @@ public class Separator extends Block {
         if(entity.progress >= 1f){
             entity.progress = 0f;
             Item item = Mathf.select(results);
-            entity.items.remove(this.item, 1);
+            entity.items.remove(consumes.item(), 1);
             if(item != null){
                 offloading = true;
                 offloadNear(tile, item);
@@ -124,17 +109,7 @@ public class Separator extends Block {
 
     @Override
     public boolean canDump(Tile tile, Tile to, Item item) {
-        return offloading || item != this.item;
-    }
-
-    @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
-        return super.acceptLiquid(tile, source, liquid, amount) && this.liquid == liquid;
-    }
-
-    @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return this.item == item && tile.entity.items.get(item) < itemCapacity;
+        return offloading || item != consumes.item();
     }
 
     @Override

@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.modules;
 
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.blocks.BlockModule;
 
 import java.io.DataInput;
 import java.io.DataOutput;

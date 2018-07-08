@@ -7,7 +7,6 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -17,8 +16,6 @@ import io.anuke.ucore.util.Mathf;
 /**Pump that makes liquid from solids and takes in power. Only works on solid floor blocks.*/
 public class SolidPump extends Pump {
     protected Liquid result = Liquids.water;
-    /**Power use per liquid unit.*/
-    protected float powerUse = 0.1f;
     protected Effect updateEffect = Fx.none;
     protected float updateEffectChance = 0.02f;
     protected float rotateSpeed = 1f;
@@ -26,7 +23,13 @@ public class SolidPump extends Pump {
     public SolidPump(String name){
         super(name);
         hasPower = true;
-        liquidRegion = name + "-liquid";
+    }
+
+    @Override
+    public void load() {
+        super.load();
+
+        liquidRegion = Draw.region(name + "-liquid");
     }
 
     @Override
@@ -34,8 +37,6 @@ public class SolidPump extends Pump {
         super.setStats();
 
         stats.remove(BlockStat.liquidOutput);
-
-        stats.add(BlockStat.powerUse, powerUse * 60f, StatUnit.powerSecond);
         stats.add(BlockStat.liquidOutput, result);
     }
 
@@ -44,8 +45,8 @@ public class SolidPump extends Pump {
         SolidPumpEntity entity = tile.entity();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
-        Draw.color(tile.entity.liquids.liquid.color);
-        Draw.alpha(tile.entity.liquids.amount / liquidCapacity);
+        Draw.color(tile.entity.liquids.current().color);
+        Draw.alpha(tile.entity.liquids.total() / liquidCapacity);
         Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
         Draw.color();
         Draw.rect(name + "-rotator", tile.drawx(), tile.drawy(), entity.pumpTime * rotateSpeed);
@@ -61,8 +62,6 @@ public class SolidPump extends Pump {
     public void update(Tile tile){
         SolidPumpEntity entity = tile.entity();
 
-        float used = Math.min(powerUse * Timers.delta(), powerCapacity);
-
         float fraction = 0f;
 
         if(isMultiblock()){
@@ -75,11 +74,9 @@ public class SolidPump extends Pump {
             if(isValid(tile)) fraction = 1f;
         }
 
-        if(tile.entity.power.amount >= used && tile.entity.liquids.amount < liquidCapacity - 0.001f){
-            float maxPump = Math.min(liquidCapacity - tile.entity.liquids.amount, pumpAmount * Timers.delta() * fraction);
-            tile.entity.liquids.liquid = result;
-            tile.entity.liquids.amount += maxPump;
-            tile.entity.power.amount -= used;
+        if(tile.entity.cons.valid() && tile.entity.liquids.total() < liquidCapacity - 0.001f){
+            float maxPump = Math.min(liquidCapacity - tile.entity.liquids.total(), pumpAmount * Timers.delta() * fraction);
+            tile.entity.liquids.add(result, maxPump);
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
             if(Mathf.chance(Timers.delta() * updateEffectChance))
                 Effects.effect(updateEffect, entity.x + Mathf.range(size*2f), entity.y + Mathf.range(size*2f));
@@ -89,7 +86,7 @@ public class SolidPump extends Pump {
 
         entity.pumpTime += entity.warmup * Timers.delta();
 
-        tryDumpLiquid(tile);
+        tryDumpLiquid(tile, entity.liquids.current());
     }
 
     @Override

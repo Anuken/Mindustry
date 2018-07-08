@@ -352,28 +352,15 @@ public class Tile implements PosTrait, TargetTrait {
 			GridPoint2 pc = Geometry.d4[i];
 			GridPoint2 pcprev = Geometry.d4[Mathf.mod(i - 1, 4)];
 			GridPoint2 pcnext = Geometry.d4[(i + 1) % 4];
-			GridPoint2 pe = Geometry.d8edge[i];
 
 			Tile tc = world.tile(x + pc.x, y + pc.y);
 			Tile tprev = world.tile(x + pcprev.x, y + pcprev.y);
 			Tile tnext = world.tile(x + pcnext.x, y + pcnext.y);
-			Tile te = world.tile(x + pe.x, y + pe.y);
-			Tile tex = world.tile(x, y + pe.y);
-			Tile tey = world.tile(x + pe.x, y);
 
 			//check for cardinal direction elevation changes and bitmask that
 			if(tc != null && tprev != null && tnext != null && ((tc.elevation < elevation && tc.elevation != -1))){
 				cliffs |= (1 << (i*2));
 			}
-
-			//00S
-            //0X0
-            //010
-
-			//check for corner bitmasking: doesn't even get checked so it doesn't matter
-			/*if(te != null && tex != null && tey != null && te.elevation == -1 && elevation > 0){
-				cliffs |= (1 << (((i+1)%4)*2));
-			}*/
 		}
 		if(occluded){
 			cost += 1;
@@ -394,6 +381,7 @@ public class Tile implements PosTrait, TargetTrait {
 
 			if (block.hasEntity()) {
 				entity = block.getEntity().init(this, block.update);
+				block.consumes.addAll(entity.cons.all());
 				if(block.hasItems) entity.items = new InventoryModule();
 				if(block.hasLiquids) entity.liquids = new LiquidModule();
 				if(block.hasPower) entity.power = new PowerModule();

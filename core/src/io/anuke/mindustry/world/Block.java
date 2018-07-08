@@ -19,7 +19,6 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.CursorType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.meta.*;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -133,10 +132,6 @@ public class Block extends BaseBlock implements Content{
 		blocks.add(this);
 	}
 
-	public void setConsumers(Array<Consume> consumers){
-
-	}
-
 	public boolean isLayer(Tile tile){return true;}
 	public boolean isLayer2(Tile tile){return true;}
 	public void drawLayer(Tile tile){}
@@ -220,6 +215,8 @@ public class Block extends BaseBlock implements Content{
 	public void setStats(){
 		stats.add(BlockStat.size, "{0}x{0}", size);
 		stats.add(BlockStat.health, health, StatUnit.none);
+
+		consumes.forEach(cons -> cons.display(stats));
 
 		if(hasPower) stats.add(BlockStat.powerCapacity, powerCapacity, StatUnit.powerUnits);
 		if(hasLiquids) stats.add(BlockStat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);

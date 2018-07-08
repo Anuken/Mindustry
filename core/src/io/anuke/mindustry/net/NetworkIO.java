@@ -75,6 +75,7 @@ public class NetworkIO {
                     if(tile.entity.items != null) tile.entity.items.write(stream);
                     if(tile.entity.power != null) tile.entity.power.write(stream);
                     if(tile.entity.liquids != null) tile.entity.liquids.write(stream);
+                    if(tile.entity.cons != null) tile.entity.cons.write(stream);
 
                     tile.entity.write(stream);
                 }else if(tile.getWallID() == 0){
@@ -193,6 +194,7 @@ public class NetworkIO {
                     if (tile.entity.items != null) tile.entity.items.read(stream);
                     if (tile.entity.power != null) tile.entity.power.read(stream);
                     if (tile.entity.liquids != null) tile.entity.liquids.read(stream);
+                    if (tile.entity.cons != null) tile.entity.cons.read(stream);
 
                     tile.entity.read(stream);
                 }else if(wallid == 0){

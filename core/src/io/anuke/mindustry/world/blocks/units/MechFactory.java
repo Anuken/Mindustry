@@ -52,6 +52,7 @@ public class MechFactory extends Block{
 
     @Override
     public void tapped(Tile tile, Player player) {
+        if(mobile && !mech.flying) return;
 
         if(checkValidTap(tile, player)){
             CallBlocks.onMechFactoryTap(player, tile);
