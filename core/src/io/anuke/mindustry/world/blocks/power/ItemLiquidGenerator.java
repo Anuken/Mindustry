@@ -23,7 +23,7 @@ public abstract class ItemLiquidGenerator extends ItemGenerator {
         hasLiquids = true;
         liquidCapacity = 10f;
 
-        consumes.add(new ConsumeLiquidFilter(liquid -> getLiquidEfficiency(liquid) >= minLiquidEfficiency, 0.001f)).update(false);
+        consumes.add(new ConsumeLiquidFilter(liquid -> getLiquidEfficiency(liquid) >= minLiquidEfficiency, 0.001f, true)).update(false);
     }
 
     @Override

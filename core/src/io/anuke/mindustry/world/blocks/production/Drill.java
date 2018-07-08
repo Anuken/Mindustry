@@ -13,6 +13,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
@@ -69,7 +70,13 @@ public class Drill extends Block{
 		liquidCapacity = 5f;
 		hasItems = true;
 
-		consumes.liquid(Liquids.water, 0.01f).optional(true);
+		consumes.add(new ConsumeLiquid(Liquids.water, 0.05f){
+			@Override
+			public void display(BlockStats stats) {
+				stats.add(BlockStat.coolantUse, use * 60f, StatUnit.liquidSecond);
+				stats.add(BlockStat.coolant, liquid);
+			}
+		}).optional(true);
 	}
 
 	@Override

@@ -14,12 +14,16 @@ public enum BlockStat {
 
     liquidCapacity(StatCategory.liquids),
     liquidOutput(StatCategory.liquids),
+    coolant(StatCategory.liquids),
+    coolantUse(StatCategory.liquids),
 
     powerCapacity(StatCategory.power),
     powerUse(StatCategory.power),
     powerRange(StatCategory.power),
     powerTransferSpeed(StatCategory.power),
     maxPowerGeneration(StatCategory.power),
+    inputLiquidFuel(StatCategory.power),
+    liquidFuelUse(StatCategory.power),
 
     inputLiquid(StatCategory.crafting),
     liquidUse(StatCategory.crafting),

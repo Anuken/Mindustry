@@ -13,13 +13,19 @@ import io.anuke.ucore.function.Predicate;
 public class ConsumeLiquidFilter extends Consume{
     private final Predicate<Liquid> liquid;
     private final float use;
+    private final boolean isFuel;
 
-    public ConsumeLiquidFilter(Predicate<Liquid> liquid, float amount) {
+    public ConsumeLiquidFilter(Predicate<Liquid> liquid, float amount, boolean isFuel) {
         this.liquid = liquid;
         this.use = amount;
+        this.isFuel = isFuel;
     }
 
-    @Override
+    public ConsumeLiquidFilter(Predicate<Liquid> liquid, float amount){
+        this(liquid, amount, false);
+    }
+
+                               @Override
     public void update(Block block, TileEntity entity) {
         entity.liquids.remove(entity.liquids.current(), use(block));
     }
@@ -31,8 +37,13 @@ public class ConsumeLiquidFilter extends Consume{
 
     @Override
     public void display(BlockStats stats) {
-        stats.add(BlockStat.inputLiquid, new LiquidFilterValue(liquid));
-        stats.add(BlockStat.liquidUse, 60f * use, StatUnit.liquidSecond);
+        if(isFuel){
+            stats.add(BlockStat.inputLiquidFuel, new LiquidFilterValue(liquid));
+            stats.add(BlockStat.liquidFuelUse, 60f * use, StatUnit.liquidSecond);
+        }else {
+            stats.add(BlockStat.inputLiquid, new LiquidFilterValue(liquid));
+            stats.add(BlockStat.liquidUse, 60f * use, StatUnit.liquidSecond);
+        }
     }
 
     float use(Block block) {

@@ -9,8 +9,8 @@ import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Timers;
 
 public class ConsumeLiquid extends Consume {
-    private final float use;
-    private final Liquid liquid;
+    protected final float use;
+    protected final Liquid liquid;
 
     public ConsumeLiquid(Liquid liquid, float use) {
         this.liquid = liquid;
