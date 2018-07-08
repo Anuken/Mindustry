@@ -93,6 +93,10 @@ public class Consumers {
         return map.values();
     }
 
+    public boolean hasAny(){
+        return map.size > 0;
+    }
+
     public void forEach(Consumer<Consume> cons){
         for(Consume c : all()){
             cons.accept(c);

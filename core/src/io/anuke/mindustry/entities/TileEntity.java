@@ -209,7 +209,9 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 			}
 
 			tile.block().update(tile);
-			cons.update(this);
+			if(cons != null){
+				cons.update(this);
+			}
 		}
 	}
 

@@ -202,6 +202,11 @@ public class Drone extends FlyingUnit implements BuilderTrait {
     }
 
     @Override
+    public boolean canCreateBlocks() {
+        return false;
+    }
+
+    @Override
     public void write(DataOutput data) throws IOException {
         super.write(data);
         data.writeInt(mineTile == null ? -1 : mineTile.packedPosition());

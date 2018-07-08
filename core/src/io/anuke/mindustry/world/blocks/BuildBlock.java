@@ -22,8 +22,8 @@ import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.modules.InventoryModule;
 import io.anuke.mindustry.world.meta.BlockBar;
+import io.anuke.mindustry.world.modules.InventoryModule;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
@@ -222,7 +222,7 @@ public class BuildBlock extends Block {
             progress = Mathf.clamp(progress - amount);
 
             if(progress <= 0){
-                CallBlocks.onDeconstructFinish(tile, recipe == null ? previous : recipe.result);
+                CallBlocks.onDeconstructFinish(tile, this.recipe == null ? previous : this.recipe.result);
             }
         }
 

@@ -10,6 +10,7 @@ import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.world.modules.ConsumeModule;
 import io.anuke.mindustry.world.modules.InventoryModule;
 import io.anuke.mindustry.world.modules.LiquidModule;
 import io.anuke.mindustry.world.modules.PowerModule;
@@ -391,12 +392,13 @@ public class Tile implements PosTrait, TargetTrait {
 
 			if (block.hasEntity()) {
 				entity = block.getEntity().init(this, block.update);
+				if(block.consumes.hasAny()) entity.cons = new ConsumeModule();
 				if(block.hasItems) entity.items = new InventoryModule();
 				if(block.hasLiquids) entity.liquids = new LiquidModule();
 				if(block.hasPower) entity.power = new PowerModule();
+				entity.updateProximity();
 			}
 
-			entity.updateProximity();
 			updateOcclusion();
 		}
 

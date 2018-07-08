@@ -58,7 +58,12 @@ public interface BuilderTrait extends Entity{
     /**Build power, can be any float. 1 = builds recipes in normal time, 0 = doesn't build at all.*/
     float getBuildPower(Tile tile);
 
-    default void writeBuilding(DataOutput output) throws IOException{
+    /**Whether this type of builder can begin creating new blocks.*/
+    default boolean canCreateBlocks(){
+        return true;
+    }
+
+    default void writeBuilding(DataOutput output) throws IOException {
         BuildRequest request = getCurrentRequest();
 
         if(request != null){
@@ -172,9 +177,9 @@ public interface BuilderTrait extends Entity{
         Tile tile = world.tile(current.x, current.y);
 
         if (!(tile.block() instanceof BuildBlock)) {
-            if(!current.remove && Build.validPlace(unit.getTeam(), current.x, current.y, current.recipe.result, current.rotation)) {
+            if(canCreateBlocks() && !current.remove && Build.validPlace(unit.getTeam(), current.x, current.y, current.recipe.result, current.rotation)) {
                 Build.beginPlace(unit.getTeam(), current.x, current.y, current.recipe, current.rotation);
-            }else if(current.remove && Build.validBreak(unit.getTeam(), current.x, current.y)){
+            }else if(canCreateBlocks() && current.remove && Build.validBreak(unit.getTeam(), current.x, current.y)){
                 Build.beginBreak(unit.getTeam(), current.x, current.y);
             }else{
                 getPlaceQueue().removeFirst();

@@ -43,7 +43,7 @@ public class Rock extends Block {
             regions = new TextureRegion[variants];
 
             for (int i = 0; i < variants; i++) {
-                shadowRegions[i] = Draw.region(name + "-shadow" + (i+1));
+                shadowRegions[i] = Draw.region(name + "shadow" + (i+1));
                 regions[i] = Draw.region(name + (i+1));
             }
         }
