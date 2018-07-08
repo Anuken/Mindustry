@@ -8,10 +8,11 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.consumers.ConsumeItem;
+import io.anuke.mindustry.world.consumers.ConsumeItems;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.mindustry.world.meta.values.ItemListValue;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -22,9 +23,7 @@ import io.anuke.ucore.util.Mathf;
 public class Smelter extends Block{
 	protected final int timerDump = timers++;
 	protected final int timerCraft = timers++;
-	
-	protected ItemStack[] inputs;
-	protected Item fuel;
+
 	protected Item result;
 
 	protected float minFlux = 0.2f;
@@ -42,11 +41,14 @@ public class Smelter extends Block{
 		hasItems = true;
 		solid = true;
 		itemCapacity = 20;
+
+		consumes.require(ConsumeItems.class);
+		consumes.require(ConsumeItem.class);
 	}
 
 	@Override
 	public void setBars(){
-		for(ItemStack item : inputs){
+		for(ItemStack item : consumes.items()){
 			bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.get(item.item)/itemCapacity));
 		}
 	}
@@ -55,9 +57,9 @@ public class Smelter extends Block{
 	public void setStats(){
 		super.setStats();
 
-		stats.add(BlockStat.inputFuel, fuel);
+		//TODO
+		//stats.add(BlockStat.inputFuel, fuel);
 		stats.add(BlockStat.fuelBurnTime, burnDuration/60f, StatUnit.seconds);
-		stats.add(BlockStat.inputItems, new ItemListValue(inputs));
 		stats.add(BlockStat.outputItem, result);
 		stats.add(BlockStat.craftSpeed, 60f/craftTime, StatUnit.itemsSecond);
 		stats.add(BlockStat.inputItemCapacity, itemCapacity, StatUnit.items);
@@ -68,7 +70,7 @@ public class Smelter extends Block{
 	public void init() {
 		super.init();
 
-		for(ItemStack item : inputs){
+		for(ItemStack item : consumes.items()){
 			if(item.item.fluxiness >= minFlux && useFlux){
 				throw new IllegalArgumentException("'" + name + "' has input item '" + item.item.name + "', which is a flux, when useFlux is enabled. To prevent ambiguous item use, either remove this flux item from the inputs, or set useFlux to false.");
 			}
@@ -84,8 +86,8 @@ public class Smelter extends Block{
 		}
 
 		//add fuel
-		if(entity.items.get(fuel) > 0 && entity.burnTime <= 0f){
-			entity.items.remove(fuel, 1);
+		if(entity.consumed(ConsumeItem.class) && entity.burnTime <= 0f){
+			entity.items.remove(consumes.item(), 1);
 			entity.burnTime += burnDuration;
 			Effects.effect(burnEffect, entity.x + Mathf.range(2f), entity.y + Mathf.range(2f));
 		}
@@ -99,10 +101,8 @@ public class Smelter extends Block{
 		}
 
 		//make sure it has all the items
-		for(ItemStack item : inputs){
-			if(!entity.items.has(item.item, item.amount)){
-				return;
-			}
+		if(!entity.cons.valid()){
+			return;
 		}
 
 		if(entity.items.get(result) >= itemCapacity //output full
@@ -127,7 +127,7 @@ public class Smelter extends Block{
 		}
 
 		if(consumeInputs) {
-			for (ItemStack item : inputs) {
+			for (ItemStack item : consumes.items()) {
 				entity.items.remove(item.item, item.amount);
 			}
 		}
@@ -145,14 +145,14 @@ public class Smelter extends Block{
 	public boolean acceptItem(Item item, Tile tile, Tile source){
 		boolean isInput = false;
 
-		for(ItemStack req : inputs){
+		for(ItemStack req : consumes.items()){
 			if(req.item == item){
 				isInput = true;
 				break;
 			}
 		}
 
-		return (isInput && tile.entity.items.get(item) < itemCapacity) || (item == fuel && tile.entity.items.get(fuel) < itemCapacity) ||
+		return (isInput && tile.entity.items.get(item) < itemCapacity) || (item == consumes.item() && tile.entity.items.get(consumes.item()) < itemCapacity) ||
 				(useFlux && item.fluxiness >= minFlux && tile.entity.items.get(item) < itemCapacity);
 	}
 

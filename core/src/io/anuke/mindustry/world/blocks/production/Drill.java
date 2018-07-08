@@ -10,7 +10,7 @@ import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.Uses;
+import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
@@ -167,7 +167,7 @@ public class Drill extends Block{
 
 			float speed = 1f;
 
-			if(entity.consumed(Uses.liquid) && !liquidRequired){
+			if(entity.consumed(ConsumeLiquid.class) && !liquidRequired){
 				speed = liquidBoostIntensity;
 			}
 

@@ -1,13 +1,14 @@
 package io.anuke.mindustry.world;
 
-import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.consumers.Consumers;
-import io.anuke.mindustry.world.consumers.Uses;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
@@ -71,9 +72,9 @@ public abstract class BaseBlock {
     }
 
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        return tile.entity.liquids.get(liquid) + amount < liquidCapacity &&
+        return hasLiquids && tile.entity.liquids.get(liquid) + amount < liquidCapacity &&
                 (!singleLiquid || (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.01f))
-                && (!consumes.has(Uses.liquid) || consumes.liquid() == liquid);
+                && (!consumes.has(ConsumeLiquid.class) || consumes.liquid() == liquid);
     }
 
     public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
@@ -94,25 +95,20 @@ public abstract class BaseBlock {
     }
 
     public void tryDumpLiquid(Tile tile, Liquid liquid){
-        int size = tile.block().size;
+        Array<Tile> proximity = tile.entity.proximity();
+        int dump = tile.getDump();
 
-        GridPoint2[] nearby = Edges.getEdges(size);
-        byte i = tile.getDump();
+        for (int i = 0; i < proximity.size; i ++) {
+            incrementDump(tile, proximity.size);
+            Tile other = proximity.get((i + dump) % proximity.size);
+            Tile in = Edges.getFacingEdge(tile, other);
 
-        for (int j = 0; j < nearby.length; j ++) {
-            Tile other = tile.getNearby(nearby[i]);
-            Tile in = tile.getNearby(Edges.getInsideEdges(size)[i]);
-
-            if(other != null) other = other.target();
-
-            if (other != null && other.block().hasLiquids) {
+            if (other.block().hasLiquids) {
                 float ofract = other.entity.liquids.get(liquid) / other.block().liquidCapacity;
                 float fract = tile.entity.liquids.get(liquid) / liquidCapacity;
 
-                if(ofract < fract) tryMoveLiquid(tile, in, other, (fract - ofract) * liquidCapacity / 2f, liquid);
+                if (ofract < fract) tryMoveLiquid(tile, in, other, (fract - ofract) * liquidCapacity / 2f, liquid);
             }
-
-            i = (byte) ((i + 1) % nearby.length);
         }
 
     }
@@ -173,16 +169,14 @@ public abstract class BaseBlock {
      * Tries to put this item into a nearby container, if there are no available
      * containers, it gets added to the block's inventory.*/
     public void offloadNear(Tile tile, Item item){
-        int size = tile.block().size;
+        Array<Tile> proximity = tile.entity.proximity();
+        int dump = tile.getDump();
 
-        GridPoint2[] nearby = Edges.getEdges(size);
-        byte i = (byte)(tile.getDump() % nearby.length);
-
-        for(int j = 0; j < nearby.length; j ++){
-            tile.setDump((byte)((i + 1) % nearby.length));
-            Tile other = tile.getNearby(nearby[i]);
-            Tile in = tile.getNearby(Edges.getInsideEdges(size)[i]);
-            if(other != null && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
+        for(int i = 0; i < proximity.size; i ++){
+            incrementDump(tile, proximity.size);
+            Tile other = proximity.get((i + dump) % proximity.size);
+            Tile in = Edges.getFacingEdge(tile, other);
+            if(other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
                 other.block().handleItem(item, other, in);
                 return;
             }
@@ -196,40 +190,51 @@ public abstract class BaseBlock {
         return tryDump(tile, null);
     }
 
-    /**Try dumping a specific item near the tile.*/
+    /**Try dumping a specific item near the tile.
+     * @param todump Item to dump. Can be null to dump anything.*/
     public boolean tryDump(Tile tile, Item todump){
-        if(tile.entity == null || !hasItems || tile.entity.items.total() == 0) return false;
+        TileEntity entity = tile.entity;
+        if(entity == null || !hasItems || tile.entity.items.total() == 0 || (todump != null && !entity.items.has(todump))) return false;
 
-        int size = tile.block().size;
+        Array<Tile> proximity = entity.proximity();
+        int dump = tile.getDump();
 
-        GridPoint2[] nearby = Edges.getEdges(size);
-        byte i = (byte)(tile.getDump() % nearby.length);
+        if(proximity.size == 0) return false;
 
-        for(int j = 0; j < nearby.length; j ++){
-            Tile other;
-            Tile in;
+        for(int i = 0; i < proximity.size; i ++){
+            Tile other = proximity.get((i + dump) % proximity.size);
+            Tile in = Edges.getFacingEdge(tile, other);
 
-            for(int ii = 0; ii < Item.all().size; ii ++){
-                Item item = Item.getByID(ii);
-                other = tile.getNearby(nearby[i]);
-                in = tile.getNearby(Edges.getInsideEdges(size)[i]);
+            if(todump == null) {
 
-                if(todump != null && item != todump) continue;
+                for (int ii = 0; ii < Item.all().size; ii++) {
+                    Item item = Item.getByID(ii);
 
-                if(tile.entity.items.has(item) && other != null && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
-                    other.block().handleItem(item, other, in);
-                    tile.entity.items.remove(item, 1);
-                    i = (byte)((i + 1) % nearby.length);
-                    tile.setDump(i);
+                    if (other.block().acceptItem(item, other, in) && canDump(tile, other, item)) {
+                        other.block().handleItem(item, other, in);
+                        tile.entity.items.remove(item, 1);
+                        incrementDump(tile, proximity.size);
+                        return true;
+                    }
+                }
+            }else{
+
+                if (other.block().acceptItem(todump, other, in) && canDump(tile, other, todump)) {
+                    other.block().handleItem(todump, other, in);
+                    tile.entity.items.remove(todump, 1);
+                    incrementDump(tile, proximity.size);
                     return true;
                 }
             }
 
-            i = (byte)((i + 1) % nearby.length);
-            tile.setDump(i);
+            incrementDump(tile, proximity.size);
         }
 
         return false;
+    }
+
+    private void incrementDump(Tile tile, int prox){
+        tile.setDump((byte)((tile.getDump() + 1) % prox));
     }
 
     /**Used for dumping items.*/

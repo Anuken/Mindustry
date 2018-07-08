@@ -26,11 +26,8 @@ public class LiquidExtendingBridge extends ExtendingItemBridge {
         if(!linkValid(tile, other)){
             tryDumpLiquid(tile, entity.liquids.current());
         }else{
-            float use = Math.min(powerCapacity, powerUse * Timers.delta());
-
-            if(!hasPower || entity.power.amount >= use){
+            if(entity.cons.valid()){
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 1f, 0.04f);
-                if(hasPower) entity.power.amount -= use;
             }else{
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 0f, 0.02f);
             }

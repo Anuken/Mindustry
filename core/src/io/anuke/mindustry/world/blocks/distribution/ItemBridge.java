@@ -35,7 +35,6 @@ public class ItemBridge extends Block {
 
     protected int timerTransport = timers++;
     protected int range;
-    protected float powerUse = 0.05f;
     protected float transportTime = 2f;
     protected IntArray removals = new IntArray();
 
@@ -155,11 +154,9 @@ public class ItemBridge extends Block {
             tryDump(tile);
             entity.uptime = 0f;
         }else{
-            float use = Math.min(powerCapacity, powerUse * Timers.delta());
 
-            if(!hasPower || entity.power.amount >= use){
+            if(entity.cons.valid()){
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 1f, 0.04f);
-                if(hasPower) entity.power.amount -= use;
             }else{
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 0f, 0.02f);
             }

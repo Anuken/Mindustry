@@ -23,6 +23,7 @@ public class Cultivator extends Drill {
     protected Color plantColor = Color.valueOf("648b55");
     protected Color plantColorLight = Color.valueOf("73a75f");
     protected Color bottomColor = Color.valueOf("474747");
+    protected TextureRegion middleRegion, topRegion;
 
     protected Item result;
 
@@ -45,12 +46,19 @@ public class Cultivator extends Drill {
     }
 
     @Override
+    public void load() {
+        super.load();
+
+        middleRegion = Draw.region(name + "-middle");
+        topRegion = Draw.region(name + "-top");
+    }
+
+    @Override
     public void update(Tile tile) {
         super.update(tile);
 
         CultivatorEntity entity = tile.entity();
-        entity.warmup = Mathf.lerpDelta(entity.warmup,
-                tile.entity.liquids.amount > liquidUse ? 1f : 0f, 0.015f);
+        entity.warmup = Mathf.lerpDelta(entity.warmup, entity.cons.valid() ? 1f : 0f, 0.015f);
     }
 
     @Override
@@ -61,7 +69,7 @@ public class Cultivator extends Drill {
 
         Draw.color(plantColor);
         Draw.alpha(entity.warmup);
-        Draw.rect(name + "-middle", tile.drawx(), tile.drawy());
+        Draw.rect(middleRegion, tile.drawx(), tile.drawy());
 
         Draw.color(bottomColor, plantColorLight, entity.warmup);
 
@@ -78,7 +86,7 @@ public class Cultivator extends Drill {
         }
 
         Draw.color();
-        Draw.rect(name + "-top", tile.drawx(), tile.drawy());
+        Draw.rect(topRegion, tile.drawx(), tile.drawy());
     }
 
     @Override

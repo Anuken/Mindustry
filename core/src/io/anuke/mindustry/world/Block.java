@@ -101,7 +101,7 @@ public class Block extends BaseBlock implements Content{
 	/**list of displayed block status bars. Defaults to health bar.*/
 	public BlockBars bars = new BlockBars();
 	/**List of block stats.*/
-	public BlockStats stats = new BlockStats();
+	public BlockStats stats = new BlockStats(this);
 	/**List of block flags. Used for AI indexing.*/
 	public EnumSet<BlockFlag> flags;
 	/**Whether to automatically set the entity to 'sleeping' when created.*/
@@ -162,6 +162,8 @@ public class Block extends BaseBlock implements Content{
 
 		setStats();
 		setBars();
+
+		consumes.checkRequired(this);
 	}
 
 	@Override

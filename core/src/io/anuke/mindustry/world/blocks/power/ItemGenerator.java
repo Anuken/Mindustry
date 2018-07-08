@@ -7,10 +7,10 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.consumers.ConsumeItemFilter;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.mindustry.world.meta.values.ItemFilterValue;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -36,6 +36,8 @@ public abstract class ItemGenerator extends PowerGenerator {
 		super(name);
 		itemCapacity = 20;
 		hasItems = true;
+
+		consumes.add(new ConsumeItemFilter(item -> getItemEfficiency(item) >= minItemEfficiency)).update(false);
 	}
 
 	@Override
@@ -48,7 +50,6 @@ public abstract class ItemGenerator extends PowerGenerator {
 	public void setStats() {
 		super.setStats();
 
-		stats.add(BlockStat.inputItems, new ItemFilterValue(item -> getItemEfficiency(item) >= minItemEfficiency));
 		stats.add(BlockStat.maxPowerGeneration, powerOutput * 60f, StatUnit.powerSecond);
 	}
 
@@ -96,17 +97,12 @@ public abstract class ItemGenerator extends PowerGenerator {
 				Effects.effect(explodeEffect, tile.worldx() + Mathf.range(size * tilesize/2f), tile.worldy() + Mathf.range(size * tilesize/2f));
 			}
 		}
-		
-		if(entity.generateTime <= 0f && entity.items.total() > 0){
-			Effects.effect(generateEffect, tile.worldx() + Mathf.range(size * tilesize/2f), tile.worldy() + Mathf.range(size * tilesize/2f));
-			for(int i = 0; i < entity.items.items.length; i ++){
-				if(entity.items.items[i] > 0){
-					entity.items.items[i] --;
-					entity.efficiency = getItemEfficiency(Item.getByID(i));
-					entity.explosiveness = Item.getByID(i).explosiveness;
-					break;
-				}
-			}
+
+		if (entity.generateTime <= 0f && entity.items.total() > 0) {
+			Effects.effect(generateEffect, tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
+			Item item = entity.items.take();
+			entity.efficiency = getItemEfficiency(item);
+			entity.explosiveness = item.explosiveness;
 			entity.generateTime = 1f;
 		}
 		

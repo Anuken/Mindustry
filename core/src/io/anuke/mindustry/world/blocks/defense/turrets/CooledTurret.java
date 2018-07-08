@@ -4,8 +4,7 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
+import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -24,13 +23,8 @@ public class CooledTurret extends Turret {
         super(name);
         hasLiquids = true;
         liquidCapacity = 20f;
-    }
 
-    @Override
-    public void setStats() {
-        super.setStats();
-
-        stats.add(BlockStat.inputLiquidAux, new LiquidFilterValue(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.2f));
+        consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f, 0.01f)).update(false).optional(true);
     }
 
     @Override

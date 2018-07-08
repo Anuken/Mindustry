@@ -5,7 +5,6 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
-import io.anuke.mindustry.world.consumers.Uses;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.core.Timers;
 
@@ -37,7 +36,7 @@ public class LiquidMixer extends LiquidBlock{
         LiquidMixerEntity entity = tile.entity();
 
         if(tile.entity.cons.valid()){
-            float use = Math.min(consumes.<ConsumeLiquid>get(Uses.liquid).used() * Timers.delta(), liquidCapacity - entity.liquids.get(outputLiquid));
+            float use = Math.min(consumes.get(ConsumeLiquid.class).used() * Timers.delta(), liquidCapacity - entity.liquids.get(outputLiquid));
             entity.accumulator += use;
             entity.liquids.add(outputLiquid, use);
             for (int i = 0; i < (int)(entity.accumulator / liquidPerItem); i++) {

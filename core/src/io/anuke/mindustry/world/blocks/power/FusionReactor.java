@@ -2,11 +2,11 @@ package io.anuke.mindustry.world.blocks.power;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -14,10 +14,7 @@ import io.anuke.ucore.util.Mathf;
 
 public class FusionReactor extends PowerGenerator {
     protected int plasmas = 4;
-    protected float powerUsage = 0.5f;
-    protected float maxPowerProduced = 1.5f;
-    protected float liquidUsage = 1f;
-    protected Liquid inputLiquid = Liquids.water;
+    protected float maxPowerProduced = 2f;
     protected float warmupSpeed = 0.001f;
 
     protected Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
@@ -33,15 +30,17 @@ public class FusionReactor extends PowerGenerator {
     }
 
     @Override
+    public void setStats() {
+        super.setStats();
+
+        stats.add(BlockStat.maxPowerGeneration, maxPowerProduced * 60f, StatUnit.powerSecond);
+    }
+
+    @Override
     public void update(Tile tile){
         FusionReactorEntity entity = tile.entity();
 
-        float powerUse = Math.min(powerCapacity, powerUsage * Timers.delta());
-        float liquidUse = Math.min(liquidCapacity, liquidUsage * Timers.delta());
-
-        if(entity.power.amount >= powerUse && entity.liquids.amount >= liquidUse){
-            entity.power.amount -= powerUse;
-            entity.liquids.amount -= liquidUse;
+        if(entity.cons.valid()){
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, warmupSpeed);
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.01f);
@@ -111,11 +110,6 @@ public class FusionReactor extends PowerGenerator {
     @Override
     public TileEntity getEntity() {
         return new FusionReactorEntity();
-    }
-
-    @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
-        return super.acceptLiquid(tile, source, liquid, amount) && liquid == inputLiquid;
     }
 
     @Override

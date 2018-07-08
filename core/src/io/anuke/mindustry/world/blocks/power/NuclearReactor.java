@@ -6,7 +6,6 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
@@ -26,12 +25,12 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
+//TODO refactor to use consumers
 public class NuclearReactor extends PowerGenerator {
 	protected final int timerFuel = timers++;
 
 	protected final Translator tr = new Translator();
 
-	protected Item generateItem;
 	protected Color coolColor = new Color(1, 1, 1, 0f);
 	protected Color hotColor = Color.valueOf("ff9575a3");
 	protected int fuelUseTime = 120; //time to consume 1 fuel
@@ -39,32 +38,32 @@ public class NuclearReactor extends PowerGenerator {
 	protected float heating = 0.009f; //heating per frame
 	protected float coolantPower = 0.015f; //how much heat decreases per coolant unit
 	protected float smokeThreshold = 0.3f; //threshold at which block starts smoking
-	protected float maxLiquidUse = 1f; //max liquid use per frame
+	protected float maxLiquidUse = 4f; //max liquid use per frame
 	protected int explosionRadius = 19;
 	protected int explosionDamage = 135;
 	protected float flashThreshold = 0.46f; //heat threshold at which the lights start flashing
 
 	public NuclearReactor(String name) {
 		super(name);
-		generateItem = Items.thorium;
 		itemCapacity = 30;
 		liquidCapacity = 50;
 		powerCapacity = 80f;
 		hasItems = true;
 		hasLiquids = true;
+
+		consumes.item(Items.thorium);
 	}
 
 	@Override
 	public void setBars(){
 		super.setBars();
-		bars.replace(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.get(generateItem) / itemCapacity));
+		bars.replace(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.get(consumes.item()) / itemCapacity));
 		bars.add(new BlockBar(BarType.heat, true, tile -> tile.<NuclearReactorEntity>entity().heat));
 	}
 
 	@Override
 	public void setStats(){
 		super.setStats();
-		stats.add(BlockStat.inputItem, generateItem);
 		stats.add(BlockStat.inputLiquid, new LiquidFilterValue(liquid -> liquid.temperature <= 0.5f));
 		stats.add(BlockStat.maxPowerGeneration, powerMultiplier*60f, StatUnit.powerSecond);
 	}
@@ -73,7 +72,7 @@ public class NuclearReactor extends PowerGenerator {
 	public void update(Tile tile){
 		NuclearReactorEntity entity = tile.entity();
 		
-		int fuel = entity.items.get(generateItem);
+		int fuel = entity.items.get(consumes.item());
 		float fullness = (float)fuel / itemCapacity;
 		
 		if(fuel > 0){
@@ -81,22 +80,23 @@ public class NuclearReactor extends PowerGenerator {
 			entity.power.amount += powerMultiplier * fullness * Timers.delta();
 			entity.power.amount = Mathf.clamp(entity.power.amount, 0f, powerCapacity);
 			if(entity.timer.get(timerFuel, fuelUseTime)){
-				entity.items.remove(generateItem, 1);
+				entity.items.remove(consumes.item(), 1);
 			}
 		}
 		
-		if(entity.liquids.amount > 0){
+		if(entity.liquids.total() > 0){
+			Liquid liquid = entity.liquids.current();
 
-			if(entity.liquids.liquid.temperature <= 0.5f){ //is coolant
-				float pow = coolantPower * entity.liquids.liquid.heatCapacity; //heat depleted per unit of liquid
-				float maxUsed = Math.min(Math.min(entity.liquids.amount, entity.heat / pow), maxLiquidUse * Timers.delta()); //max that can be cooled in terms of liquid
+			if(liquid.temperature <= 0.5f){ //is coolant
+				float pow = coolantPower * liquid.heatCapacity; //heat depleted per unit of liquid
+				float maxUsed = Math.min(Math.min(entity.liquids.get(liquid), entity.heat / pow), maxLiquidUse * Timers.delta()); //max that can be cooled in terms of liquid
 				entity.heat -= maxUsed * pow;
-				entity.liquids.amount -= maxUsed;
+				entity.liquids.remove(liquid, maxUsed);
 			}else{ //is heater
-				float heat = coolantPower * entity.liquids.liquid.heatCapacity / 4f; //heat created per unit of liquid
-				float maxUsed = Math.min(Math.min(entity.liquids.amount, (1f - entity.heat) / heat), maxLiquidUse * Timers.delta()); //max liquid used
+				float heat = coolantPower * liquid.heatCapacity / 4f; //heat created per unit of liquid
+				float maxUsed = Math.min(Math.min(entity.liquids.get(liquid), (1f - entity.heat) / heat), maxLiquidUse * Timers.delta()); //max liquid used
 				entity.heat += maxUsed * heat;
-				entity.liquids.amount -= maxUsed;
+				entity.liquids.remove(liquid, maxUsed);
 			}
 		}
 		
@@ -123,7 +123,7 @@ public class NuclearReactor extends PowerGenerator {
 		
 		NuclearReactorEntity entity = tile.entity();
 		
-		int fuel = entity.items.get(generateItem);
+		int fuel = entity.items.get(consumes.item());
 		
 		if(fuel < 5 && entity.heat < 0.5f) return;
 		
@@ -154,14 +154,9 @@ public class NuclearReactor extends PowerGenerator {
 	}
 
 	@Override
-	public boolean acceptItem(Item item, Tile tile, Tile source){
-		return item == generateItem && tile.entity.items.get(generateItem) < itemCapacity;
-	}
-
-	@Override
 	public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-		return tile.entity.liquids.amount + amount < liquidCapacity
-				&& (tile.entity.liquids.liquid == liquid || tile.entity.liquids.amount <= 0.001f);
+		return tile.entity.liquids.get(liquid) + amount < liquidCapacity && liquid.temperature <= 0.5f &&
+				(tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.01f);
 	}
 
 	@Override

@@ -7,6 +7,8 @@ import io.anuke.ucore.util.Mathf;
 
 import java.util.Arrays;
 
+import static io.anuke.mindustry.Vars.world;
+
 public class Edges {
     private static final int maxSize = 11;
     private static final int maxRadius = 12;
@@ -47,6 +49,12 @@ public class Edges {
                         Mathf.clamp(point.y, -(int)((i)/2f), (int)(i/2f + 0.5f)));
             }
         }
+    }
+
+    public static Tile getFacingEdge(Tile tile, Tile other){
+        int size = tile.block().size;
+        return world.tile(tile.x + Mathf.clamp(other.x - tile.x, -(size-1) / 2, (size / 2)),
+                tile.y + Mathf.clamp(other.y - tile.y, -(size-1) / 2, (size / 2)));
     }
 
     public static Vector2[] getPixelPolygon(float radius){

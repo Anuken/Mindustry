@@ -5,8 +5,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.power.ItemGenerator.ItemGeneratorEntity;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
+import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -24,13 +23,8 @@ public abstract class LiquidGenerator extends PowerGenerator {
 		super(name);
 		liquidCapacity = 30f;
 		hasLiquids = true;
-	}
 
-	@Override
-	public void setStats() {
-		super.setStats();
-
-		stats.add(BlockStat.inputLiquid, new LiquidFilterValue(item -> getEfficiency(item) >= minEfficiency));
+		consumes.add(new ConsumeLiquidFilter(liquid -> getEfficiency(liquid) >= minEfficiency, 0.001f)).update(false);
 	}
 
 	@Override
@@ -39,8 +33,8 @@ public abstract class LiquidGenerator extends PowerGenerator {
 
 		TileEntity entity = tile.entity();
 		
-		Draw.color(entity.liquids.liquid.color);
-		Draw.alpha(entity.liquids.amount / liquidCapacity);
+		Draw.color(entity.liquids.current().color);
+		Draw.alpha(entity.liquids.total() / liquidCapacity);
 		drawLiquidCenter(tile);
 		Draw.color();
 	}
@@ -53,12 +47,12 @@ public abstract class LiquidGenerator extends PowerGenerator {
 	public void update(Tile tile){
 		TileEntity entity = tile.entity();
 		
-		if(entity.liquids.amount > 0){
-			float powerPerLiquid = getEfficiency(entity.liquids.liquid)*this.powerPerLiquid;
-			float used = Math.min(entity.liquids.amount, maxLiquidGenerate * Timers.delta());
+		if(entity.liquids.get(entity.liquids.current()) >= 0.001f){
+			float powerPerLiquid = getEfficiency(entity.liquids.current())*this.powerPerLiquid;
+			float used = Math.min(entity.liquids.currentAmount(), maxLiquidGenerate * Timers.delta());
 			used = Math.min(used, (powerCapacity - entity.power.amount)/powerPerLiquid);
-			
-			entity.liquids.amount -= used;
+
+			entity.liquids.remove(entity.liquids.current(), used);
 			entity.power.amount += used * powerPerLiquid;
 			
 			if(used > 0.001f && Mathf.chance(0.05 * Timers.delta())){

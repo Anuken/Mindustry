@@ -22,7 +22,6 @@ public enum BlockStat {
     maxPowerGeneration(StatCategory.power),
 
     inputLiquid(StatCategory.crafting),
-    inputLiquidAux(StatCategory.crafting),
     liquidUse(StatCategory.crafting),
     inputItem(StatCategory.crafting),
     inputItems(StatCategory.crafting),

@@ -34,6 +34,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
+//TODO implement
 public class WarpGate extends PowerBlock{
 	public static final Color[] colorArray = {Color.ROYAL, Color.ORANGE, Color.SCARLET, Color.LIME,
 			Color.PURPLE, Color.GOLD, Color.PINK, Color.LIGHT_GRAY};
@@ -52,8 +53,6 @@ public class WarpGate extends PowerBlock{
 	//time between teleports
 	protected float teleportMax = 400f;
 	protected float teleportLiquidUse = 0.3f;
-	protected float liquidUse = 0.1f;
-	protected float powerUse = 0.3f;
 	protected Liquid inputLiquid = Liquids.cryofluid;
 	protected Effect activateEffect = BlockFx.teleportActivate;
 	protected Effect teleportEffect = BlockFx.teleport;
@@ -162,10 +161,9 @@ public class WarpGate extends PowerBlock{
 				entity.power.amount = 0f;
 				Effects.effect(activateEffect, resultColor, tile.drawx(), tile.drawy());
 			}
-		}else {
+		}else{
 			entity.activeScl = Mathf.lerpDelta(entity.activeScl, 1f, 0.015f);
-
-			float powerUsed = Math.min(powerCapacity, powerUse * Timers.delta());
+			/*
 
 			if (entity.power.amount >= powerUsed) {
 				entity.power.amount -= powerUsed;
@@ -179,15 +177,13 @@ public class WarpGate extends PowerBlock{
 				catastrophicFailure(tile);
 			}
 
-			float liquidUsed = Math.min(liquidCapacity, liquidUse * Timers.delta());
-
 			if (entity.liquids.amount >= liquidUsed) {
 				entity.liquids.amount -= liquidUsed;
 				entity.liquidLackScl = Mathf.lerpDelta(entity.liquidLackScl, 0f, 0.1f);
 			}else{
 				entity.liquids.amount = 0f;
 				entity.liquidLackScl = Mathf.lerpDelta(entity.liquidLackScl, 1f, 0.1f);
-			}
+			}*/
 
 			if(entity.liquidLackScl >= 0.999f){
 				catastrophicFailure(tile);
@@ -197,19 +193,19 @@ public class WarpGate extends PowerBlock{
 
 			if (entity.teleporting) {
 				entity.speedScl = Mathf.lerpDelta(entity.speedScl, 2f, 0.01f);
-				liquidUsed = Math.min(liquidCapacity, teleportLiquidUse * Timers.delta());
+				//liquidUsed = Math.min(liquidCapacity, teleportLiquidUse * Timers.delta());
 
-				if (entity.liquids.amount >= liquidUsed) {
-					entity.liquids.amount -= liquidUsed;
-				} else {
+				//if (entity.liquids.amount >= liquidUsed) {
+				//	entity.liquids.amount -= liquidUsed;
+				//} else {
 					catastrophicFailure(tile);
-				}
+				//}
 			} else {
 				entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.04f);
 			}
 
 			entity.time += Timers.delta() * entity.speedScl;
-
+/*
 			if (!entity.teleporting && entity.items.total() >= itemCapacity && entity.power.amount >= powerCapacity - 0.01f - powerUse &&
 					entity.timer.get(timerTeleport, teleportMax)) {
 				Array<Tile> testLinks = findLinks(tile);
@@ -238,7 +234,7 @@ public class WarpGate extends PowerBlock{
 					entity.power.amount = 0f;
 					entity.teleporting = false;
 				});
-			}
+			}*/
 		}
 	}
 	

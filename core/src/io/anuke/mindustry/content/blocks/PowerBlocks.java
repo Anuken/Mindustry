@@ -1,5 +1,6 @@
 package io.anuke.mindustry.content.blocks;
 
+import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.world.Block;
@@ -32,7 +33,7 @@ public class PowerBlocks extends BlockList implements ContentList {
             powerCapacity = 40f;
             itemDuration = 30f;
             powerPerLiquid = 0.7f;
-            auxLiquidUse = 0.05f;
+            consumes.liquid(Liquids.water, 0.05f);
             size = 2;
         }};
 

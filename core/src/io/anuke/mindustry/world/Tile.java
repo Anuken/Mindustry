@@ -161,6 +161,7 @@ public class Tile implements PosTrait, TargetTrait {
 	
 	public void setBlock(Block type, int rotation){
 		synchronized (tileSetLock) {
+			preChanged();
 			if(rotation < 0) rotation = (-rotation + 2);
 			this.wall = type;
 			this.link = 0;
@@ -171,6 +172,7 @@ public class Tile implements PosTrait, TargetTrait {
 	
 	public void setBlock(Block type){
 		synchronized (tileSetLock) {
+			preChanged();
 			this.wall = type;
 			this.link = 0;
 			changed();
@@ -366,8 +368,16 @@ public class Tile implements PosTrait, TargetTrait {
 			cost += 1;
 		}
 	}
+
+	private void preChanged(){
+		synchronized (tileSetLock) {
+			if (entity != null) {
+				entity.removeFromProximity();
+			}
+		}
+	}
 	
-	public void changed(){
+	private void changed(){
 
 		synchronized (tileSetLock) {
 			if (entity != null) {
@@ -381,12 +391,12 @@ public class Tile implements PosTrait, TargetTrait {
 
 			if (block.hasEntity()) {
 				entity = block.getEntity().init(this, block.update);
-				block.consumes.addAll(entity.cons.all());
 				if(block.hasItems) entity.items = new InventoryModule();
 				if(block.hasLiquids) entity.liquids = new LiquidModule();
 				if(block.hasPower) entity.power = new PowerModule();
 			}
 
+			entity.updateProximity();
 			updateOcclusion();
 		}
 

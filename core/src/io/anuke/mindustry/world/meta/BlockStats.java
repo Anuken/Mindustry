@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.OrderedMap;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.values.*;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
@@ -13,8 +14,13 @@ import io.anuke.ucore.util.Log;
 public class BlockStats {
     private static final boolean errorWhenMissing = true;
 
-    private OrderedMap<StatCategory, OrderedMap<BlockStat, StatValue>> map = new OrderedMap<>();
+    private final OrderedMap<StatCategory, OrderedMap<BlockStat, StatValue>> map = new OrderedMap<>();
+    private final Block block;
     private boolean dirty;
+
+    public BlockStats(Block block) {
+        this.block = block;
+    }
 
     /**Adds a single float value with this stat, formatted to 2 decimal places.*/
     public void add(BlockStat stat, float value, StatUnit unit){
@@ -66,7 +72,7 @@ public class BlockStats {
         }
 
         if(map.containsKey(stat.category) && map.get(stat.category).containsKey(stat)){
-            throw new RuntimeException("Duplicate stat entry: \"" +stat + "\"");
+            throw new RuntimeException("Duplicate stat entry: \"" +stat + "\" in block '" + block.name + "'");
         }
 
         if(!map.containsKey(stat.category)){
@@ -80,7 +86,7 @@ public class BlockStats {
 
     public void remove(BlockStat stat){
         if(!map.containsKey(stat.category) || !map.get(stat.category).containsKey(stat)){
-            throw new RuntimeException("No stat entry found: \"" + stat + "\"!");
+            throw new RuntimeException("No stat entry found: \"" + stat + "\" in block '" + block.name + "'!");
         }
 
         map.get(stat.category).remove(stat);

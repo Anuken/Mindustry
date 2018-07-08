@@ -16,19 +16,16 @@ public class UnitBlocks extends BlockList implements ContentList {
             type = UnitTypes.drone;
             produceTime = 800;
             size = 2;
-            requirements = new ItemStack[]{
-                new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30)
-            };
+            consumes.power(0.08f);
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30)});
         }};
 
         fabricatorFactory = new UnitFactory("fabricator-factory") {{
             type = UnitTypes.fabricator;
             produceTime = 1600;
             size = 2;
-            powerUse = 0.2f;
-            requirements = new ItemStack[]{
-                new ItemStack(Items.silicon, 70), new ItemStack(Items.lead, 80), new ItemStack(Items.titanium, 80)
-            };
+            consumes.power(0.2f);
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 70), new ItemStack(Items.lead, 80), new ItemStack(Items.titanium, 80)});
         }};
 
         resupplyPoint = new ResupplyPoint("resupply-point") {{

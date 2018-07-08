@@ -6,11 +6,12 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
 import io.anuke.ucore.graphics.Draw;
 
+//TODO fix
 public class LiquidJunction extends LiquidBlock{
 
 	public LiquidJunction(String name) {
 		super(name);
-		hasLiquids = false;
+		hasLiquids = true;
 	}
 	
 	@Override

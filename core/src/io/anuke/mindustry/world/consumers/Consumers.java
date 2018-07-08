@@ -1,71 +1,101 @@
 package io.anuke.mindustry.world.consumers;
 
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.function.Consumer;
 
 public class Consumers {
-    private Consume[] consumeMap = new Consume[Uses.values().length];
+    private ObjectMap<Class<? extends Consume>, Consume> map = new ObjectMap<>();
+    private ObjectSet<Class<? extends Consume>> required = new ObjectSet<>();
+
+    public void require(Class<? extends Consume> type){
+        required.add(type);
+    }
+
+    public void checkRequired(Block block){
+        for (Class<? extends Consume> c : required){
+            if(!map.containsKey(c)){
+                throw new RuntimeException("Missing required consumer of type \"" + ClassReflection.getSimpleName(c) + "\" in block \"" + block.name + "\"!");
+            }
+        }
+    }
 
     public ConsumePower power(float amount){
         ConsumePower p = new ConsumePower(amount);
-        add(Uses.power, p);
+        add(p);
         return p;
     }
 
     public ConsumeLiquid liquid(Liquid liquid, float amount){
         ConsumeLiquid c = new ConsumeLiquid(liquid, amount);
-        add(Uses.liquid, c);
+        add(c);
         return c;
     }
 
     public ConsumeItem item(Item item){
-        ConsumeItem i = new ConsumeItem(item);
-        add(Uses.items, i);
+        return item(item, 1);
+    }
+
+    public ConsumeItem item(Item item, int amount){
+        ConsumeItem i = new ConsumeItem(item, amount);
+        add(i);
+        return i;
+    }
+
+    public ConsumeItems items(ItemStack[] items){
+        ConsumeItems i = new ConsumeItems(items);
+        add(i);
         return i;
     }
 
     public Item item(){
-        return this.<ConsumeItem>get(Uses.items).get();
+        return get(ConsumeItem.class).get();
+    }
+
+    public ItemStack[] items(){
+        return get(ConsumeItems.class).getItems();
+    }
+
+    public int itemAmount(){
+        return get(ConsumeItem.class).getAmount();
     }
 
     public Liquid liquid(){
-        return this.<ConsumeLiquid>get(Uses.liquid).get();
+        return get(ConsumeLiquid.class).get();
     }
 
-    public void add(Uses type, Consume consume){
-        consumeMap[type.ordinal()] = consume;
+    public Consume add(Consume consume){
+        map.put(consume.getClass(), consume);
+        return consume;
     }
 
-    public void remove(Uses type){
-        consumeMap[type.ordinal()] = null;
+    public void remove(Class<? extends Consume> type){
+        map.remove(type);
     }
 
-    public boolean has(Uses type){
-        return consumeMap[type.ordinal()] != null;
+    public boolean has(Class<? extends Consume> type){
+        return map.containsKey(type);
     }
 
-    public <T extends Consume> T get(Uses type){
-        if(consumeMap[type.ordinal()] == null){
+    public <T extends Consume> T get(Class<T> type){
+        if(!map.containsKey(type)){
             throw new IllegalArgumentException("Block does not contain consumer of type '" + type + "'!");
         }
-        return (T)consumeMap[type.ordinal()];
+        return (T)map.get(type);
+    }
+
+    public Iterable<Consume> all() {
+        return map.values();
     }
 
     public void forEach(Consumer<Consume> cons){
-        for (Consume c : consumeMap) {
-            if (c != null) {
-                cons.accept(c);
-            }
-        }
-    }
-
-    public void addAll(Array<Consume> result){
-        for (Consume c : consumeMap) {
-            if (c != null) {
-                result.add(c.copy());
-            }
+        for(Consume c : all()){
+            cons.accept(c);
         }
     }
 }

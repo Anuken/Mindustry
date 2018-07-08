@@ -1,6 +1,9 @@
 package io.anuke.mindustry.entities;
 
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.fx.Fx;
@@ -10,9 +13,10 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.CallBlocks;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Wall;
-import io.anuke.mindustry.world.consumers.Uses;
+import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.modules.ConsumeModule;
 import io.anuke.mindustry.world.modules.InventoryModule;
 import io.anuke.mindustry.world.modules.LiquidModule;
@@ -36,6 +40,8 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 	/**This value is only used for debugging.*/
 	public static int sleepingEntities = 0;
 
+	private static final ObjectSet<Tile> tmpTiles = new ObjectSet<>();
+
 	public Tile tile;
 	public Timer timer;
 	public float health;
@@ -45,6 +51,9 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 	public LiquidModule liquids;
 	public ConsumeModule cons;
 
+	//list of (cached) tiles with entities in proximity, used for outputting to
+	//TODO implement
+	private Array<Tile> proximity = new Array<>(8);
 	private boolean dead = false;
 	private boolean sleeping;
 	private float sleepTime;
@@ -133,8 +142,46 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 		return tile;
 	}
 
-	public boolean consumed(Uses uses){
-		return tile.block().consumes.get(uses).valid(tile.block(), this);
+	public boolean consumed(Class<? extends Consume> type){
+		return tile.block().consumes.get(type).valid(tile.block(), this);
+	}
+
+	public void removeFromProximity(){
+		GridPoint2[] nearby = Edges.getEdges(tile.block().size);
+		for (GridPoint2 point : nearby) {
+			Tile other = world.tile(tile.x + point.x, tile.y + point.y);
+			//remove this tile from all nearby tile's proximities
+			if(other != null && other.entity != null){
+				other.entity.proximity.removeValue(tile, true);
+			}
+		}
+	}
+
+	public void updateProximity(){
+		tmpTiles.clear();
+		proximity.clear();
+
+		GridPoint2[] nearby = Edges.getEdges(tile.block().size);
+		for (GridPoint2 point : nearby) {
+			Tile other = world.tile(tile.x + point.x, tile.y + point.y);
+			if(other != null && other.entity != null){
+				tmpTiles.add(other);
+
+				//add this tile to proximity of nearby tiles
+				if(!other.entity.proximity.contains(tile, true)){
+					other.entity.proximity.add(tile);
+				}
+			}
+		}
+
+		//using a set to prevent duplicates
+		for(Tile tile : tmpTiles){
+			proximity.add(tile);
+		}
+	}
+
+	public Array<Tile> proximity(){
+		return proximity;
 	}
 
 	@Override

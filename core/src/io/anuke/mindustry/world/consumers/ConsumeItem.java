@@ -8,9 +8,20 @@ import io.anuke.mindustry.world.meta.BlockStats;
 
 public class ConsumeItem extends Consume {
     private final Item item;
+    private final int amount;
 
     public ConsumeItem(Item item) {
         this.item = item;
+        this.amount = 1;
+    }
+
+    public ConsumeItem(Item item, int amount) {
+        this.item = item;
+        this.amount = amount;
+    }
+
+    public int getAmount() {
+        return amount;
     }
 
     public Item get() {
@@ -24,7 +35,7 @@ public class ConsumeItem extends Consume {
 
     @Override
     public boolean valid(Block block, TileEntity entity) {
-        return entity.items.has(item);
+        return entity.items.has(item, amount);
     }
 
     @Override

@@ -26,14 +26,12 @@ public class LiquidBridge extends ItemBridge {
         if(!linkValid(tile, other)){
             tryDumpLiquid(tile, entity.liquids.current());
         }else{
-            float use = Math.min(powerCapacity, powerUse * Timers.delta());
-
-            if(entity.power.amount >= use){
+            if(entity.cons.valid()){
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 1f, 0.04f);
-                entity.power.amount -= use;
             }else{
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 0f, 0.02f);
             }
+
 
             if(entity.uptime >= 0.5f){
 

@@ -6,39 +6,33 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.function.Predicate;
 
-public class ConsumeLiquid extends Consume {
+public class ConsumeLiquidFilter extends Consume{
+    private final Predicate<Liquid> liquid;
     private final float use;
-    private final Liquid liquid;
 
-    public ConsumeLiquid(Liquid liquid, float use) {
+    public ConsumeLiquidFilter(Predicate<Liquid> liquid, float amount) {
         this.liquid = liquid;
-        this.use = use;
-    }
-
-    public float used() {
-        return use;
-    }
-
-    public Liquid get() {
-        return liquid;
+        this.use = amount;
     }
 
     @Override
     public void update(Block block, TileEntity entity) {
-        entity.liquids.remove(liquid, Math.min(use(block), entity.liquids.get(liquid)));
+        entity.liquids.remove(entity.liquids.current(), use(block));
     }
 
     @Override
     public boolean valid(Block block, TileEntity entity) {
-        return entity.liquids.get(liquid) >= use(block);
+        return liquid.test(entity.liquids.current()) && entity.liquids.currentAmount() >= use(block);
     }
 
     @Override
     public void display(BlockStats stats) {
-        stats.add(BlockStat.liquidUse, use * 60f, StatUnit.liquidSecond);
-        stats.add(BlockStat.inputLiquid, liquid);
+        stats.add(BlockStat.inputLiquid, new LiquidFilterValue(liquid));
+        stats.add(BlockStat.liquidUse, 60f * use, StatUnit.liquidSecond);
     }
 
     float use(Block block) {

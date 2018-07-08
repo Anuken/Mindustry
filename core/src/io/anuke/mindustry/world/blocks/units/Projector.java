@@ -15,7 +15,6 @@ public abstract class Projector extends Block {
     protected final int timerApply = timers++;
     protected final float applyTime = 4f;
 
-    protected float powerUse = 0.01f;
     protected float range = 80f;
 
     protected StatusEffect status;
@@ -39,11 +38,8 @@ public abstract class Projector extends Block {
     public void update(Tile tile) {
         ProjectorEntity entity = tile.entity();
 
-        float used = Math.min(powerCapacity, powerUse * Timers.delta());
-
-        if(entity.power.amount >= used){
+        if(entity.cons.valid()){
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.01f);
-            entity.power.amount -= used;
         }else{
             entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.01f);
         }

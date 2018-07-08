@@ -19,10 +19,10 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.consumers.ConsumeItems;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.mindustry.world.meta.values.ItemListValue;
 import io.anuke.mindustry.world.modules.InventoryModule;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
@@ -37,9 +37,7 @@ import java.io.IOException;
 
 public class UnitFactory extends Block {
     protected UnitType type;
-    protected ItemStack[] requirements;
     protected float produceTime = 1000f;
-    protected float powerUse = 0.1f;
     protected float openDuration = 50f;
     protected float launchVelocity = 0f;
     protected String unitRegion;
@@ -50,14 +48,14 @@ public class UnitFactory extends Block {
         hasPower = true;
         hasItems = true;
         solidifes = true;
+
+        consumes.require(ConsumeItems.class);
     }
 
     @Override
     public void setStats() {
         super.setStats();
 
-        stats.add(BlockStat.inputItems, new ItemListValue(requirements));
-        stats.add(BlockStat.powerUse, powerUse * 60f, StatUnit.powerSecond);
         stats.add(BlockStat.craftSpeed, produceTime/60f, StatUnit.seconds);
     }
 
@@ -119,8 +117,6 @@ public class UnitFactory extends Block {
     public void update(Tile tile) {
         UnitFactoryEntity entity = tile.entity();
 
-        float used = Math.min(powerUse * Timers.delta(), powerCapacity);
-
         entity.time += Timers.delta() * entity.speedScl;
 
         if(entity.openCountdown > 0){
@@ -148,10 +144,9 @@ public class UnitFactory extends Block {
         }*/
 
         if(!entity.hasSpawned && hasRequirements(entity.items, entity.buildTime/produceTime) &&
-                entity.power.amount >= used && !entity.open){
+                entity.cons.valid() && !entity.open){
 
             entity.buildTime += Timers.delta();
-            entity.power.amount -= used;
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
         }else{
             if(!entity.open) entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
@@ -164,7 +159,7 @@ public class UnitFactory extends Block {
 
             entity.openCountdown = openDuration;
 
-            for(ItemStack stack : requirements){
+            for(ItemStack stack : consumes.items()){
                 entity.items.remove(stack.item, stack.amount);
             }
         }
@@ -172,7 +167,7 @@ public class UnitFactory extends Block {
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
-        for(ItemStack stack : requirements){
+        for(ItemStack stack : consumes.items()){
             if(item == stack.item && tile.entity.items.get(item) <= stack.amount*2){
                 return true;
             }
@@ -186,7 +181,7 @@ public class UnitFactory extends Block {
     }
 
     protected boolean hasRequirements(InventoryModule inv, float fraction){
-        for(ItemStack stack : requirements){
+        for(ItemStack stack : consumes.items()){
             if(!inv.has(stack.item, (int)(fraction * stack.amount))){
                 return false;
             }

@@ -21,6 +21,10 @@ public class LiquidModule extends BlockModule {
         return current;
     }
 
+    public float currentAmount(){
+        return liquids[current.id];
+    }
+
     public float get(Liquid liquid){
         return liquids[liquid.id];
     }

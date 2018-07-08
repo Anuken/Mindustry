@@ -4,8 +4,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
+import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -23,13 +22,8 @@ public abstract class ItemLiquidGenerator extends ItemGenerator {
         super(name);
         hasLiquids = true;
         liquidCapacity = 10f;
-    }
 
-    @Override
-    public void setStats() {
-        super.setStats();
-
-        stats.add(BlockStat.inputLiquid, new LiquidFilterValue(item -> getLiquidEfficiency(item) >= minLiquidEfficiency));
+        consumes.add(new ConsumeLiquidFilter(liquid -> getLiquidEfficiency(liquid) >= minLiquidEfficiency, 0.001f)).update(false);
     }
 
     @Override
@@ -37,12 +31,12 @@ public abstract class ItemLiquidGenerator extends ItemGenerator {
         ItemGeneratorEntity entity = tile.entity();
 
         //liquid takes priority over solids
-        if(entity.liquids.amount >= 0.001f){
-            float powerPerLiquid = getLiquidEfficiency(entity.liquids.liquid)*this.powerPerLiquid;
-            float used = Math.min(entity.liquids.amount, maxLiquidGenerate * Timers.delta());
+        if(entity.liquids.currentAmount() >= 0.001f){
+            float powerPerLiquid = getLiquidEfficiency(entity.liquids.current())*this.powerPerLiquid;
+            float used = Math.min(entity.liquids.currentAmount(), maxLiquidGenerate * Timers.delta());
             used = Math.min(used, (powerCapacity - entity.power.amount)/powerPerLiquid);
 
-            entity.liquids.amount -= used;
+            entity.liquids.remove(entity.liquids.current(), used);
             entity.power.amount += used * powerPerLiquid;
 
             if(used > 0.001f && Mathf.chance(0.05 * Timers.delta())){
@@ -66,14 +60,9 @@ public abstract class ItemLiquidGenerator extends ItemGenerator {
 
             if (entity.generateTime <= 0f && entity.items.total() > 0) {
                 Effects.effect(generateEffect, tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
-                for (int i = 0; i < entity.items.items.length; i++) {
-                    if (entity.items.items[i] > 0) {
-                        entity.items.items[i]--;
-                        entity.efficiency = getItemEfficiency(Item.getByID(i));
-                        entity.explosiveness = Item.getByID(i).explosiveness;
-                        break;
-                    }
-                }
+                Item item = entity.items.take();
+                entity.efficiency = getItemEfficiency(item);
+                entity.explosiveness = item.explosiveness;
                 entity.generateTime = 1f;
             }
         }
@@ -87,8 +76,8 @@ public abstract class ItemLiquidGenerator extends ItemGenerator {
 
         TileEntity entity = tile.entity();
 
-        Draw.color(entity.liquids.liquid.color);
-        Draw.alpha(entity.liquids.amount / liquidCapacity);
+        Draw.color(entity.liquids.current().color);
+        Draw.alpha(entity.liquids.currentAmount() / liquidCapacity);
         drawLiquidCenter(tile);
         Draw.color();
     }
