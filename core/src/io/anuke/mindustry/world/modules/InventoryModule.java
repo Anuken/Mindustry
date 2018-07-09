@@ -60,7 +60,6 @@ public class InventoryModule extends BlockModule{
         return true;
     }
 
-    //TODO optimize!
     public int total(){
         return total;
     }

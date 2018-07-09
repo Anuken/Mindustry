@@ -21,7 +21,7 @@ public class Annotations {
         Variant variants() default Variant.all;
         /**The local locations where this method is called locally, when invoked.*/
         Loc called() default Loc.none;
-        /**Whether to forward this packet to all other clients upon recieval. Server only.*/
+        /**Whether to forward this packet to all other clients upon recieval. Client only.*/
         boolean forward() default false;
         /**Whether the packet for this method is sent with UDP instead of TCP.
          * UDP is faster, but is prone to packet loss and duplication.*/

@@ -74,6 +74,11 @@ public class Recipe implements UnlockableContent{
     }
 
     @Override
+    public boolean isHidden() {
+        return debugOnly;
+    }
+
+    @Override
     public void displayInfo(Table table) {
         ContentDisplay.displayRecipe(table, this);
     }

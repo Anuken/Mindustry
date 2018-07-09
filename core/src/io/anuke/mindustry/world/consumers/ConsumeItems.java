@@ -20,9 +20,7 @@ public class ConsumeItems extends Consume {
 
     @Override
     public void update(Block block, TileEntity entity) {
-        for(ItemStack stack : items){
-            entity.items.remove(stack);
-        }
+
     }
 
     @Override

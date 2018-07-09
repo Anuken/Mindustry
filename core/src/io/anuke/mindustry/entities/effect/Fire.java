@@ -94,6 +94,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable 
         if(time >= lifetime() || tile == null){
             CallEntity.onFireRemoved(getID());
             remove();
+            return;
         }
 
         TileEntity entity = tile.target().entity;

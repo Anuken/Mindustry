@@ -6,7 +6,7 @@ import io.anuke.mindustry.world.meta.BlockStats;
 
 public abstract class Consume {
     private boolean optional;
-    private boolean update;
+    private boolean update = true;
 
     public Consume optional(boolean optional) {
         this.optional = optional;
