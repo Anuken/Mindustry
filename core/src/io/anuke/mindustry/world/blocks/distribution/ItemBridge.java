@@ -54,6 +54,8 @@ public class ItemBridge extends Block {
 
     @Override
     public void load() {
+        super.load();
+
         endRegion = Draw.region(name + "-end");
         bridgeRegion = Draw.region(name + "-bridge");
         arrowRegion = Draw.region(name + "-arrow");
@@ -221,6 +223,29 @@ public class ItemBridge extends Block {
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source) {
+        ItemBridgeEntity entity = tile.entity();
+        Tile other = world.tile(entity.link);
+
+        if(linkValid(tile, other)){
+            int rel = tile.absoluteRelativeTo(other.x, other.y);
+            int rel2 = tile.relativeTo(source.x, source.y);
+
+            if(rel == rel2) return false;
+        }else{
+            int i = tile.relativeTo(source.x, source.y);
+
+            IntSetIterator it = entity.incoming.iterator();
+
+            while(it.hasNext){
+                int v = it.next();
+                int x = v % world.width();
+                int y = v / world.width();
+                if(tile.absoluteRelativeTo(x, y) == i){
+                    return false;
+                }
+            }
+        }
+
         return tile.entity.items.total() < itemCapacity;
     }
 

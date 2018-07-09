@@ -133,10 +133,13 @@ public class BuildBlock extends Block {
     public void drawShadow(Tile tile) {
         BuildEntity entity = tile.entity();
 
-        if(entity.recipe != null){
-            entity.recipe.result.drawShadow(tile);
-        }else if(entity.previous != null){
-            entity.previous.drawShadow(tile);
+        Recipe recipe = entity.recipe;
+        Block previous = entity.previous;
+
+        if(recipe != null){
+            recipe.result.drawShadow(tile);
+        }else if(previous != null){
+            previous.drawShadow(tile);
         }
     }
 
@@ -181,6 +184,7 @@ public class BuildBlock extends Block {
         /**The block that used to be here.
          * If a non-recipe block is being deconstructed, this is the block that is being deconstructed.*/
         public Block previous;
+        public int builderID = -1;
 
         private float[] accumulator;
 
@@ -195,8 +199,12 @@ public class BuildBlock extends Block {
 
             progress = Mathf.clamp(progress + maxProgress);
 
+            if(builder instanceof Player){
+                builderID = builder.getID();
+            }
+
             if(progress >= 1f){
-                CallBlocks.onConstructFinish(tile, recipe.result, builder.getID(), tile.getRotation(), tile.getTeam());
+                CallBlocks.onConstructFinish(tile, recipe.result, builderID, tile.getRotation(), tile.getTeam());
             }
         }
 

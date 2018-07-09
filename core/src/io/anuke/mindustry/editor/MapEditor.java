@@ -39,14 +39,16 @@ public class MapEditor{
 		return tags;
 	}
 
-	public void beginEdit(MapTileData map, ObjectMap<String, String> tags){
+	public void beginEdit(MapTileData map, ObjectMap<String, String> tags, boolean clear){
 		this.map = map;
 		this.brushSize = 1;
 		this.tags = tags;
 
-		for (int x = 0; x < map.width(); x++) {
-			for (int y = 0; y < map.height(); y++) {
-				map.write(x, y, DataPosition.floor, (byte)Blocks.stone.id);
+		if(clear) {
+			for (int x = 0; x < map.width(); x++) {
+				for (int y = 0; y < map.height(); y++) {
+					map.write(x, y, DataPosition.floor, (byte) Blocks.stone.id);
+				}
 			}
 		}
 

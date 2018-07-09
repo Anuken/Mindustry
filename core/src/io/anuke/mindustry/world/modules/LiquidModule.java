@@ -32,6 +32,7 @@ public class LiquidModule extends BlockModule {
     public void add(Liquid liquid, float amount){
         liquids[liquid.id] += amount;
         total += amount;
+        current = liquid;
     }
 
     public void remove(Liquid liquid, float amount){

@@ -69,11 +69,12 @@ public class BlockInventoryFragment extends Fragment {
     }
 
     private void rebuild(boolean actions){
+
         Player player = input.player;
 
         IntSet container = new IntSet();
 
-        table.clear();
+        table.clearChildren();
         table.background("inventory");
         table.setTouchable(Touchable.enabled);
         table.update(() -> {
@@ -121,7 +122,12 @@ public class BlockInventoryFragment extends Fragment {
                 HandCursorListener l = new HandCursorListener();
                 l.setEnabled(canPick);
 
-                ItemImage image = new ItemImage(item.region, () -> round(tile.entity.items.get(item)));
+                ItemImage image = new ItemImage(item.region, () -> {
+                    if(tile == null || tile.entity == null){
+                        return "";
+                    }
+                    return round(tile.entity.items.get(item));
+                });
                 image.addListener(l);
 
                 image.addListener(new InputListener(){

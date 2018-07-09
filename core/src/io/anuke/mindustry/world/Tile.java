@@ -392,7 +392,7 @@ public class Tile implements PosTrait, TargetTrait {
 
 			if (block.hasEntity()) {
 				entity = block.getEntity().init(this, block.update);
-				if(block.consumes.hasAny()) entity.cons = new ConsumeModule();
+				entity.cons = new ConsumeModule();
 				if(block.hasItems) entity.items = new InventoryModule();
 				if(block.hasLiquids) entity.liquids = new LiquidModule();
 				if(block.hasPower) entity.power = new PowerModule();

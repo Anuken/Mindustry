@@ -7,6 +7,7 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.world.consumers.ConsumeItem;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.consumers.Consumers;
 import io.anuke.ucore.core.Effects;
@@ -68,7 +69,7 @@ public abstract class BaseBlock {
     }
 
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return tile.entity != null && consumes.item() == item && tile.entity.items.total() < itemCapacity;
+        return tile.entity != null && consumes.has(ConsumeItem.class) && consumes.item() == item && tile.entity.items.total() < itemCapacity;
     }
 
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
@@ -210,7 +211,7 @@ public abstract class BaseBlock {
                 for (int ii = 0; ii < Item.all().size; ii++) {
                     Item item = Item.getByID(ii);
 
-                    if (other.block().acceptItem(item, other, in) && canDump(tile, other, item)) {
+                    if (entity.items.has(item) && other.block().acceptItem(item, other, in) && canDump(tile, other, item)) {
                         other.block().handleItem(item, other, in);
                         tile.entity.items.remove(item, 1);
                         incrementDump(tile, proximity.size);

@@ -170,6 +170,10 @@ public class World extends Module{
 		for(int x = 0; x < tiles.length; x ++) {
 			for (int y = 0; y < tiles[0].length; y++) {
 				tiles[x][y].updateOcclusion();
+
+				if(tiles[x][y].entity != null){
+					tiles[x][y].entity.updateProximity();
+				}
 			}
 		}
 

@@ -84,7 +84,6 @@ public class DebugFragment extends Fragment {
                    FloatingDialog dialog = new FloatingDialog("debug spawn");
                    for(UnitType type : UnitType.all()){
                        dialog.content().addImageButton("white", 40, () -> {
-                           dialog.hide();
                            BaseUnit unit = type.create(player.getTeam());
                            unit.inventory.addAmmo(type.weapon.getAmmoType(type.weapon.getAcceptedItems().iterator().next()));
                            unit.setWave();

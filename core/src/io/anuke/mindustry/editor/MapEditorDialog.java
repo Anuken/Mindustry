@@ -107,7 +107,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 										MapMeta meta = MapIO.readMapMeta(stream);
 										MapTileData data = MapIO.readTileData(stream, meta, false);
 
-										editor.beginEdit(data, meta.tags);
+										editor.beginEdit(data, meta.tags, false);
 										view.clearStack();
 									}catch (Exception e){
 										ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
@@ -125,7 +125,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 										try{
 											MapTileData data = MapIO.readPixmap(new Pixmap(file));
 
-											editor.beginEdit(data, editor.getTags());
+											editor.beginEdit(data, editor.getTags(), false);
 											view.clearStack();
 										}catch (Exception e){
 											ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
@@ -213,7 +213,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 					MapMeta meta = MapIO.readMapMeta(stream);
 					MapTileData data = MapIO.readTileData(stream, meta, false);
 
-					editor.beginEdit(data, meta.tags);
+					editor.beginEdit(data, meta.tags, false);
 					view.clearStack();
 				}catch (IOException e){
 					ui.showError(Bundles.format("text.editor.errormapload", Strings.parseException(e, false)));
@@ -254,7 +254,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 			view.clearStack();
 			Core.scene.setScrollFocus(view);
 			if(!shownWithMap){
-				editor.beginEdit(new MapTileData(256, 256), new ObjectMap<>());
+				editor.beginEdit(new MapTileData(256, 256), new ObjectMap<>(), true);
 			}
 			shownWithMap = false;
 
@@ -348,7 +348,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 				shownWithMap = true;
 				DataInputStream stream = new DataInputStream(is);
 				MapMeta meta = MapIO.readMapMeta(stream);
-				editor.beginEdit(MapIO.readTileData(stream, meta, false), meta.tags);
+				editor.beginEdit(MapIO.readTileData(stream, meta, false), meta.tags, false);
 				is.close();
 				show();
 			}catch (Exception e){

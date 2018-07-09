@@ -117,6 +117,7 @@ public class CraftingBlocks extends BlockList implements ContentList {
             liquidPerItem = 50f;
             itemCapacity = 50;
             size = 2;
+            hasPower = true;
 
             consumes.power(0.1f);
             consumes.item(Items.titanium);
