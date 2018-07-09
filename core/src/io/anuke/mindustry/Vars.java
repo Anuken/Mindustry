@@ -168,7 +168,7 @@ public class Vars{
 		for(EntityGroup<?> group : Entities.getAllGroups()){
 			group.setRemoveListener(entity -> {
 				if(entity instanceof SyncTrait && Net.client()){
-					netClient.addRemovedEntity(((SyncTrait) entity).getID());
+					netClient.addRemovedEntity((entity).getID());
 				}
 			});
 		}
