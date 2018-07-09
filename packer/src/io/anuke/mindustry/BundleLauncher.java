@@ -62,7 +62,7 @@ public class BundleLauncher {
                     result.append(e.toString().replace("\\", "\\\\").replace("\n", "\\n"));
                     result.append("\n");
                 }
-                Files.write(output, result.toString().getBytes());
+                Files.write(child, result.toString().getBytes());
                 //PropertiesUtils.store(other, Files.newBufferedWriter(output), null);
 
             }catch (IOException e){
