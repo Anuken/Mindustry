@@ -70,7 +70,7 @@ public class PowerNode extends PowerBlock{
 		super.setStats();
 
 		stats.add(BlockStat.powerRange, laserRange, StatUnit.blocks);
-		stats.add(BlockStat.powerTransferSpeed, powerSpeed * 60, StatUnit.powerSecond);
+		stats.add(BlockStat.powerTransferSpeed, powerSpeed * 60 / 2f, StatUnit.powerSecond); //divided by 2 since passback exists
 	}
 
 	@Override

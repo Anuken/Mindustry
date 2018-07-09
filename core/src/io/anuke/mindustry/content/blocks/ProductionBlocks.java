@@ -84,12 +84,12 @@ public class ProductionBlocks extends BlockList implements ContentList {
             updateEffect = BlockFx.pulverize;
             liquidCapacity = 50f;
             updateEffectChance = 0.05f;
-            pumpAmount = 0.06f;
+            pumpAmount = 0.08f;
             size = 3;
             liquidCapacity = 30f;
 
             consumes.item(Items.sand);
-            consumes.power(0.6f);
+            consumes.power(0.5f);
             consumes.liquid(Liquids.water, 0.3f);
         }};
 

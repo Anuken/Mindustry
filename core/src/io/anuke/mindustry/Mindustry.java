@@ -1,6 +1,5 @@
 package io.anuke.mindustry;
 
-import com.badlogic.gdx.utils.async.AsyncExecutor;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.io.BundleLoader;
 import io.anuke.ucore.core.Timers;
@@ -10,7 +9,6 @@ import io.anuke.ucore.util.Log;
 import static io.anuke.mindustry.Vars.*;
 
 public class Mindustry extends ModuleCore {
-	private AsyncExecutor exec = new AsyncExecutor(1);
 
 	@Override
 	public void init(){

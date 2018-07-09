@@ -1,21 +1,19 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
 
-import static io.anuke.mindustry.Vars.world;
-
 public class Splitter extends Block{
+    protected float speed = 30f;
 
     public Splitter(String name){
         super(name);
         solid = true;
         instantTransfer = true;
-        destructible = true;
+        update = true;
         group = BlockGroup.transportation;
     }
 
@@ -23,26 +21,24 @@ public class Splitter extends Block{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         Tile to = getTileTarget(item, tile, source, false);
 
-        return to != null && to.block().acceptItem(item, to, tile);
+        return to != null;
     }
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
         Tile to = getTileTarget(item, tile, source, true);
-
         to.block().handleItem(item, to, tile);
     }
 
-    Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){
-        GridPoint2[] points = Edges.getEdges(size);
-        int counter = source.getDump();
-        for (int i = 0; i < points.length; i++) {
-            GridPoint2 point = points[(i + counter++) % points.length];
-            source.setDump((byte)(counter % points.length));
-            Tile tile = world.tile(dest.x + point.x, dest.y + point.y);
-            if(tile != source && !(tile.block().instantTransfer && source.block().instantTransfer) &&
-                    tile.block().acceptItem(item, tile, dest)){
-                return tile;
+    Tile getTileTarget(Item item, Tile tile, Tile source, boolean flip){
+        Array<Tile> proximity = tile.entity.proximity();
+        int counter = tile.getDump();
+        for (int i = 0; i < proximity.size; i++) {
+            Tile other = proximity.get((i + counter) % proximity.size);
+            if(flip) tile.setDump((byte)((tile.getDump() + 1) % proximity.size));
+            if(other != source && !(source.block().instantTransfer && other.block().instantTransfer && !(other.block() instanceof Splitter)) &&
+                    other.block().acceptItem(item, other, tile)){
+                return other;
             }
         }
         return null;
