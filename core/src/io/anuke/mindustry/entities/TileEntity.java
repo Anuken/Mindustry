@@ -151,6 +151,7 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 		for (GridPoint2 point : nearby) {
 			Tile other = world.tile(tile.x + point.x, tile.y + point.y);
 			//remove this tile from all nearby tile's proximities
+			if(other != null) other = other.target();
 			if(other != null && other.entity != null){
 				other.entity.proximity.removeValue(tile, true);
 			}
@@ -164,6 +165,7 @@ public class TileEntity extends BaseEntity implements TargetTrait {
 		GridPoint2[] nearby = Edges.getEdges(tile.block().size);
 		for (GridPoint2 point : nearby) {
 			Tile other = world.tile(tile.x + point.x, tile.y + point.y);
+			if(other != null) other = other.target();
 			if(other != null && other.entity != null){
 				tmpTiles.add(other);
 

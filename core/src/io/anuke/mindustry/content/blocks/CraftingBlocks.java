@@ -175,8 +175,8 @@ public class CraftingBlocks extends BlockList implements ContentList {
             itemCapacity = 40;
             health = 50;
 
-            consumes.item(Items.stone);
-            consumes.liquid(Liquids.water, 0.2f);
+            consumes.item(Items.stone, 2);
+            consumes.liquid(Liquids.water, 0.3f);
         }};
 
         centrifuge = new Separator("centrifuge") {{
@@ -201,9 +201,9 @@ public class CraftingBlocks extends BlockList implements ContentList {
             spinnerSpeed = 3f;
             size = 2;
 
-            consumes.item(Items.stone);
+            consumes.item(Items.stone, 2);
             consumes.power(0.2f);
-            consumes.liquid(Liquids.water, 0.35f);
+            consumes.liquid(Liquids.water, 0.5f);
         }};
 
         biomatterCompressor = new Compressor("biomattercompressor") {{

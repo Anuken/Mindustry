@@ -67,7 +67,7 @@ public class Annotations {
         client(false, true),
         /**Method can be invoked from anywhere*/
         both(true, true),
-        /**Neither server no client.*/
+        /**Neither server nor client.*/
         none(false, false);
 
         /**If true, this method can be invoked ON clients FROM servers.*/

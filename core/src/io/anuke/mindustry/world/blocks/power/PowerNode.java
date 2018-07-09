@@ -184,9 +184,12 @@ public class PowerNode extends PowerBlock{
 			entity.powerRecieved = 0f;
 		}
 
-		float added = super.addPower(tile, amount);
-		entity.powerRecieved += added;
-		return added;
+		float canAccept = Math.min(powerCapacity * Timers.delta() - tile.entity.power.amount, amount);
+
+		tile.entity.power.amount += canAccept;
+		entity.powerRecieved += canAccept;
+
+		return canAccept;
 	}
 
 	protected boolean shouldDistribute(Tile tile, Tile other) {
@@ -226,7 +229,7 @@ public class PowerNode extends PowerBlock{
 			Tile target = world.tile(entity.links.get(i));
 			if(shouldDistribute(tile, target)) {
 
-				float transmit = Math.min(result * Timers.delta(), entity.power.amount);
+				float transmit = Math.min(result, entity.power.amount);
 				if (target.block().acceptPower(target, tile, transmit)) {
 					entity.power.amount -= target.block().addPower(target, transmit);
 				}

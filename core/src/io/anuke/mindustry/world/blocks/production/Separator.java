@@ -94,7 +94,7 @@ public class Separator extends Block {
         if(entity.progress >= 1f){
             entity.progress = 0f;
             Item item = Mathf.select(results);
-            entity.items.remove(consumes.item(), 1);
+            entity.items.remove(consumes.item(), consumes.itemAmount());
             if(item != null){
                 offloading = true;
                 offloadNear(tile, item);

@@ -12,6 +12,7 @@ import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Settings;
@@ -129,6 +130,18 @@ public class OverlayRenderer {
                                 drawEncloser(target.drawx(), target.drawy() - block.size * tilesize/2f - 2f - values[1], values[1]);
                             }
 
+                            Draw.color(Palette.bar);
+
+                            int idx = 0;
+                            for(Consume cons : block.consumes.all()){
+                                if(!cons.valid(block, entity)){
+                                    Fill.crect(entity.x - block.size/2f + idx*4 - 3, entity.y + block.size/2f + values[0] + 11, 3, 3);
+                                    idx ++;
+                                }
+                            }
+
+                            Draw.color();
+
                             doDraw[0] = true;
                             values[0] = 0;
                             values[1] = 1;
@@ -193,25 +206,23 @@ public class OverlayRenderer {
 
         float len = 3;
 
-        float w = (int) (len * 2 * finion) + 0.5f;
-
-        x -= 0.5f;
-        y += 0.5f;
+        float w = (int) (len * 2 * finion);
 
         Draw.color(Color.BLACK);
-        Lines.line(x - len + 1, y, x + len + 0.5f, y);
-        Draw.color(color);
-        if(w >= 1)
-            Lines.line(x - len + 1, y, x - len + w, y);
-        Draw.reset();
+        Fill.crect(x - len, y, len*2f, 1);
+        if(finion > 0){
+            Draw.color(color);
+            Fill.crect(x - len, y, Math.max(1, w), 1);
+        }
+        Draw.color();
     }
 
     void drawEncloser(float x, float y, float height){
 
-        float len = 3;
+        float len = 4;
 
         Draw.color(Palette.bar);
-        Fill.crect(x - len - 1, y - 1, len*2f + 2f, height + 2f);
+        Fill.crect(x - len, y - 1, len*2f, height + 2f);
         Draw.color();
     }
 }

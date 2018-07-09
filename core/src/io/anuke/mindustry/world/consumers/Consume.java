@@ -26,6 +26,10 @@ public abstract class Consume {
         return update;
     }
 
+    public void draw(TileEntity entity){
+
+    }
+
     public abstract void update(Block block, TileEntity entity);
     public abstract boolean valid(Block block, TileEntity entity);
     public abstract void display(BlockStats stats);

@@ -55,6 +55,9 @@ public class DebugFragment extends Fragment {
            new table("pane"){{
                defaults().fillX().width(100f);
 
+               new label(() -> Gdx.app.getJavaHeap() / 1024 / 1024 + "MB");
+               row();
+
                new label("Debug");
                row();
                new button("noclip", "toggle", () -> noclip = !noclip);

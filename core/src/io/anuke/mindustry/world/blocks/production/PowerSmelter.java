@@ -90,11 +90,11 @@ public class PowerSmelter extends PowerBlock {
 
         //heat it up if there's enough power
         if(entity.cons.valid()){
-            entity.heat += 1f / heatUpTime;
+            entity.heat += 1f / heatUpTime * Timers.delta();
             if(Mathf.chance(Timers.delta() * burnEffectChance))
                 Effects.effect(burnEffect, entity.x + Mathf.range(size*4f), entity.y + Mathf.range(size*4));
         }else{
-            entity.heat -= 1f / heatUpTime;
+            entity.heat -= 1f / heatUpTime * Timers.delta();
         }
 
         entity.heat = Mathf.clamp(entity.heat);
