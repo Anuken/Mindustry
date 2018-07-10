@@ -64,6 +64,8 @@ public abstract class BaseBlock {
 
     }
 
+    public void onProximityUpdate(Tile tile){}
+
     public void handleItem(Item item, Tile tile, Tile source){
         tile.entity.items.add(item, 1);
     }
