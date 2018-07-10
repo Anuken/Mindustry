@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.blocks.distribution;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
 
@@ -14,6 +15,7 @@ public class Splitter extends Block{
         solid = true;
         instantTransfer = true;
         update = true;
+        hasItems = false;
         group = BlockGroup.transportation;
     }
 
@@ -27,7 +29,7 @@ public class Splitter extends Block{
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
         Tile to = getTileTarget(item, tile, source, true);
-        to.block().handleItem(item, to, tile);
+        to.block().handleItem(item, to, Edges.getFacingEdge(tile, to));
     }
 
     Tile getTileTarget(Item item, Tile tile, Tile source, boolean flip){
@@ -36,8 +38,8 @@ public class Splitter extends Block{
         for (int i = 0; i < proximity.size; i++) {
             Tile other = proximity.get((i + counter) % proximity.size);
             if(flip) tile.setDump((byte)((tile.getDump() + 1) % proximity.size));
-            if(other != source && !(source.block().instantTransfer && other.block().instantTransfer && !(other.block() instanceof Splitter)) &&
-                    other.block().acceptItem(item, other, tile)){
+            if(other != source && !(source.block().instantTransfer && other.block().instantTransfer) && !(other.block() instanceof Splitter) &&
+                    other.block().acceptItem(item, other, Edges.getFacingEdge(tile, other))){
                 return other;
             }
         }

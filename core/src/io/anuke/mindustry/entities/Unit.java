@@ -38,6 +38,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public static final float velocityPercision = 8f;
     /**Maximum absolute value of a velocity vector component.*/
     public static final float maxAbsVelocity = 127f/velocityPercision;
+    public static final float elevationScale = 4f;
 
     private static final Vector2 moveVector = new Vector2();
 
@@ -52,6 +53,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     protected Vector2 velocity = new Translator(0f, 0.0001f);
     protected float hitTime;
     protected float drownTime;
+    protected float elevation;
 
     @Override
     public UnitInventory getInventory() {
@@ -225,6 +227,8 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         if(isFlying()) {
             x += velocity.x / getMass() * Timers.delta();
             y += velocity.y / getMass() * Timers.delta();
+
+            elevation = Mathf.lerpDelta(elevation, tile.elevation, 0.04f);
         }else{
             boolean onLiquid = floor.isLiquid;
 
@@ -299,6 +303,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     public void drawUnder(){}
     public void drawOver(){}
+    public void drawShadow(){}
 
     public void drawView(){
         Fill.circle(x, y, getViewDistance());

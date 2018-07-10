@@ -95,7 +95,8 @@ public class BlockInventoryFragment extends Fragment {
                 updateTablePosition();
                 if(tile.block().hasItems) {
                     for (int i = 0; i < Item.all().size; i++) {
-                        if ((tile.entity.items.has(Item.getByID(i))) == container.contains(i)) {
+                        boolean has = tile.entity.items.has(Item.getByID(i));
+                        if (has != container.contains(i)) {
                             rebuild(false);
                         }
                     }

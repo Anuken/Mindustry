@@ -33,6 +33,11 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     }
 
     @Override
+    public void drawShadow(){
+        Draw.rect(type.region, x + elevation*elevationScale, y - elevation*elevationScale, rotation - 90);
+    }
+
+    @Override
     public CarriableTrait getCarry() {
         return carrying;
     }

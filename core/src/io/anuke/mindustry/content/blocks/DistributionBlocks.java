@@ -41,7 +41,6 @@ public class DistributionBlocks extends BlockList implements ContentList{
 
 		distributor = new Splitter("distributor") {{
 			size = 2;
-			itemCapacity = 80;
 		}};
 
 		overflowGate = new OverflowGate("overflow-gate");

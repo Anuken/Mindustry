@@ -10,6 +10,6 @@ public class MobileButton extends ImageButton {
         resizeImage(isize);
         clicked(listener);
         row();
-        add(text);
+        add(text).growX().wrap();
     }
 }

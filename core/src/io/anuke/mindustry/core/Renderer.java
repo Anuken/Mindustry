@@ -219,11 +219,12 @@ public class Renderer extends RendererModule{
 			Graphics.endShaders();
 		}
 
-
         drawAllTeams(false);
 
 		blocks.skipLayer(Layer.turret);
 		blocks.drawBlocks(Layer.laser);
+
+		drawFlyerShadows();
 
 		drawAllTeams(true);
 
@@ -249,6 +250,35 @@ public class Renderer extends RendererModule{
 		drawAndInterpolate(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
 		EntityDraw.setClip(true);
 		batch.end();
+	}
+
+	private void drawFlyerShadows(){
+		Graphics.surface(effectSurface);
+
+		float trnsX = 12, trnsY = -13;
+
+		Graphics.end();
+		Core.batch.getTransformMatrix().translate(trnsX, trnsY, 0);
+		Graphics.begin();
+
+		for(EntityGroup<? extends BaseUnit> group : unitGroups){
+			if(!group.isEmpty()){
+				drawAndInterpolate(group, Unit::isFlying, Unit::drawShadow);
+			}
+		}
+
+		if(!playerGroup.isEmpty()){
+			drawAndInterpolate(playerGroup, Unit::isFlying, Unit::drawShadow);
+		}
+
+		Graphics.end();
+		Core.batch.getTransformMatrix().translate(-trnsX, -trnsY, 0);
+		Graphics.begin();
+
+		//TODO this actually isn't necessary
+		Draw.color(0, 0, 0, 0.15f);
+		Graphics.flushSurface();
+		Draw.color();
 	}
 
 	private void drawAllTeams(boolean flying){

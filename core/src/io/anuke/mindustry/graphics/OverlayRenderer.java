@@ -134,8 +134,8 @@ public class OverlayRenderer {
 
                             int idx = 0;
                             for(Consume cons : block.consumes.all()){
-                                if(!cons.valid(block, entity)){
-                                    Fill.crect(entity.x - block.size/2f + idx*4 - 3, entity.y + block.size/2f + values[0] + 11, 3, 3);
+                                if(!cons.isOptional() && !cons.valid(block, entity)){
+                                    Fill.crect(entity.x - 4 + idx*4, entity.y + block.size*tilesize/2f + values[0] + 4, 3, 3);
                                     idx ++;
                                 }
                             }
