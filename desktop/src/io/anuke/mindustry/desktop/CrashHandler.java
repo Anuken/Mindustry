@@ -38,10 +38,10 @@ public class CrashHandler {
             header += "Build: " + Version.build + "\n";
             header += "Net Active: " + netActive + "\n";
             header += "Net Server: " + netServer + "\n";
-            header += "OS: " + System.getProperty("os.name")+ "\n----\n";
-            header += "Multithreading: " + Settings.getBool("multithread")+ "\n";
+            header += "OS: " + System.getProperty("os.name") + "\n";
+            header += "Multithreading: " + Settings.getBool("multithread")+ "\n----\n";
         }catch (Throwable e4){
-            header += "[Error getting additional game info.]\n";
+            header += "\n--error getting additional info--\n";
             e4.printStackTrace();
         }
 

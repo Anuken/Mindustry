@@ -32,56 +32,54 @@ public class DesktopLauncher extends Lwjgl3Application{
     ObjectMap<String, Preferences> prefmap;
 	
 	public static void main (String[] arg) {
-		
-		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.setTitle("Mindustry");
-		config.setMaximized(true);
-		config.setWindowedMode(960, 540);
-		config.setWindowIcon("sprites/icon.png");
+        try {
+            Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+            config.setTitle("Mindustry");
+            config.setMaximized(true);
+            config.setWindowedMode(960, 540);
+            config.setWindowIcon("sprites/icon.png");
 
-		if(OS.isMac) {
-            Application.getApplication().setOpenFileHandler(e -> {
-                List list = e.getFiles();
+            if(OS.isMac) {
+                Application.getApplication().setOpenFileHandler(e -> {
+                    List list = e.getFiles();
 
-                File target = (File)list.get(0);
+                    File target = (File)list.get(0);
 
-                Gdx.app.postRunnable(() -> {
-                    FileHandle file = OS.getAppDataDirectory("Mindustry").child("tmp").child(target.getName());
+                    Gdx.app.postRunnable(() -> {
+                        FileHandle file = OS.getAppDataDirectory("Mindustry").child("tmp").child(target.getName());
 
-                    Gdx.files.absolute(target.getAbsolutePath()).copyTo(file);
+                        Gdx.files.absolute(target.getAbsolutePath()).copyTo(file);
 
-                    if(file.extension().equalsIgnoreCase(saveExtension)){ //open save
+                        if(file.extension().equalsIgnoreCase(saveExtension)){ //open save
 
-                        if(SaveIO.isSaveValid(file)){
-                            try{
-                                SaveSlot slot = control.getSaves().importSave(file);
-                                ui.load.runLoadSave(slot);
-                            }catch (IOException e2){
-                                ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e2, false)));
+                            if(SaveIO.isSaveValid(file)){
+                                try{
+                                    SaveSlot slot = control.getSaves().importSave(file);
+                                    ui.load.runLoadSave(slot);
+                                }catch (IOException e2){
+                                    ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e2, false)));
+                                }
+                            }else{
+                                ui.showError("$text.save.import.invalid");
                             }
-                        }else{
-                            ui.showError("$text.save.import.invalid");
+
+                        }else if(file.extension().equalsIgnoreCase(mapExtension)){ //open map
+                            Gdx.app.postRunnable(() -> {
+                                if (!ui.editor.isShown()) {
+                                    ui.editor.show();
+                                }
+
+                                ui.editor.beginEditMap(file.read());
+                            });
                         }
-
-                    }else if(file.extension().equalsIgnoreCase(mapExtension)){ //open map
-                        Gdx.app.postRunnable(() -> {
-                            if (!ui.editor.isShown()) {
-                                ui.editor.show();
-                            }
-
-                            ui.editor.beginEditMap(file.read());
-                        });
-                    }
+                    });
                 });
-            });
-        }
+            }
 
-        Platform.instance = new DesktopPlatform(arg);
+            Platform.instance = new DesktopPlatform(arg);
 
-		Net.setClientProvider(new KryoClient());
-		Net.setServerProvider(new KryoServer());
-
-		try {
+            Net.setClientProvider(new KryoClient());
+            Net.setServerProvider(new KryoServer());
 			new DesktopLauncher(new Mindustry(), config);
 		}catch (Throwable e){
 		    CrashHandler.handle(e);

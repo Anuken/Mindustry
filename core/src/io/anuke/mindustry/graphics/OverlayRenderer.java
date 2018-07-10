@@ -130,18 +130,6 @@ public class OverlayRenderer {
                                 drawEncloser(target.drawx(), target.drawy() - block.size * tilesize/2f - 2f - values[1], values[1]);
                             }
 
-                            Draw.color(Palette.bar);
-
-                            int idx = 0;
-                            for(Consume cons : block.consumes.all()){
-                                if(!cons.isOptional() && !cons.valid(block, entity)){
-                                    Fill.crect(entity.x - 4 + idx*4, entity.y + block.size*tilesize/2f + values[0] + 4, 3, 3);
-                                    idx ++;
-                                }
-                            }
-
-                            Draw.color();
-
                             doDraw[0] = true;
                             values[0] = 0;
                             values[1] = 1;

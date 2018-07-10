@@ -7,6 +7,7 @@ import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.scene.ui.layout.Table;
 
 public class ConsumeLiquid extends Consume {
     protected final float use;
@@ -23,6 +24,16 @@ public class ConsumeLiquid extends Consume {
 
     public Liquid get() {
         return liquid;
+    }
+
+    @Override
+    public void buildTooltip(Table table) {
+        table.addImage(liquid.getContentIcon()).size(8*3);
+    }
+
+    @Override
+    public String getIcon() {
+        return "icon-liquid";
     }
 
     @Override

@@ -18,9 +18,7 @@ public class ItemImage extends Stack {
         t.row();
         t.label(text).get().setFontScale(Unit.dp.scl(0.5f));
 
-        Image image = new Image(region);
-
-        add(image);
+        add(new Image(region));
         add(t);
     }
 
@@ -31,9 +29,7 @@ public class ItemImage extends Stack {
         t.row();
         t.add(stack.amount + "").get().setFontScale(Unit.dp.scl(0.5f));
 
-        Image image = new Image(stack.item.region);
-
-        add(image);
+        add(new Image(stack.item.region));
         add(t);
     }
 }

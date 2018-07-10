@@ -12,7 +12,7 @@ public class Version {
     public static String name;
     public static String type;
     public static String code;
-    public static int build;
+    public static int build = 0;
     public static String buildName;
 
     public static void init(){

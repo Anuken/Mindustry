@@ -3,7 +3,6 @@ package io.anuke.mindustry.editor;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
@@ -26,7 +25,6 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Pixmaps;
 import io.anuke.ucore.input.Input;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.builders.build;
@@ -115,10 +113,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
 									}
 								});
 							}, true, mapExtension);
-						},
+						}/*,
 						"$text.editor.importimage", "$text.editor.importimage.description", "icon-file-image", (Listenable)() -> {
 							if(gwt){
-								ui.showError("text.web.unsupported");
+								ui.showError("$text.web.unsupported");
 							}else {
 								Platform.instance.showFileChooser("$text.loadimage", "Image Files", file -> {
 									ui.loadAnd(() -> {
@@ -134,7 +132,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 									});
 								}, true, "png");
 							}
-						}));
+						}*/));
 
 			t.addImageTextButton("$text.editor.export", "icon-save-map", isize, () -> createDialog("$text.editor.export",
 					"$text.editor.exportfile", "$text.editor.exportfile.description", "icon-file", (Listenable)() -> {
@@ -165,11 +163,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
 								Log.err(e);
 							}
 						}
-					},
+					}/*,
 					"$text.editor.exportimage", "$text.editor.exportimage.description", "icon-file-image", (Listenable)() -> {
 						if(gwt){
-							ui.showError("text.web.unsupported");
-						}else {
+							ui.showError("$text.web.unsupported");
+						}else{
 							Platform.instance.showFileChooser("$text.saveimage", "Image Files", file -> {
 								file = file.parent().child(file.nameWithoutExtension() + ".png");
 								FileHandle result = file;
@@ -183,7 +181,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 								});
 							}, false, "png");
 						}
-					}));
+					}*/));
 
 			t.row();
 

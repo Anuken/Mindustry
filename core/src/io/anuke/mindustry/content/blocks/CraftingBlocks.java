@@ -128,6 +128,7 @@ public class CraftingBlocks extends BlockList implements ContentList {
             itemCapacity = 20;
             hasItems = true;
             hasPower = true;
+            hasLiquids = true;
             output = Items.blastCompound;
             size = 2;
 

@@ -2,10 +2,12 @@ package io.anuke.mindustry.world.consumers;
 
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.values.ItemListValue;
+import io.anuke.ucore.scene.ui.layout.Table;
 
 public class ConsumeItems extends Consume {
     private ItemStack[] items;
@@ -16,6 +18,18 @@ public class ConsumeItems extends Consume {
 
     public ItemStack[] getItems() {
         return items;
+    }
+
+    @Override
+    public void buildTooltip(Table table) {
+        for(ItemStack stack : items){
+            table.add(new ItemImage(stack)).size(8*4).padRight(5);
+        }
+    }
+
+    @Override
+    public String getIcon() {
+        return "icon-item";
     }
 
     @Override
