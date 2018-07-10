@@ -26,7 +26,6 @@ public class RepairPoint extends Block{
 
     protected float repairRadius = 50f;
     protected float repairSpeed = 0.3f;
-    protected float powerUsage = 0.2f;
 
     protected TextureRegion topRegion;
 
@@ -39,6 +38,7 @@ public class RepairPoint extends Block{
         layer2 = Layer.laser;
         hasPower = true;
         powerCapacity = 20f;
+        consumes.power(0.06f);
     }
 
     @Override
@@ -92,10 +92,7 @@ public class RepairPoint extends Block{
             entity.rotation = Mathf.slerpDelta(entity.rotation, entity.angleTo(entity.target), 0.5f);
         }
 
-        float powerUse = Math.min(Timers.delta() * powerUsage, powerCapacity);
-
-        if(entity.target != null && entity.power.amount >= powerUse){
-            entity.power.amount -= powerUse;
+        if(entity.target != null && entity.cons.valid()){
             entity.strength = Mathf.lerpDelta(entity.strength, 1f, 0.08f * Timers.delta());
         }else{
             entity.strength = Mathf.lerpDelta(entity.strength, 0f, 0.07f * Timers.delta());
@@ -106,6 +103,13 @@ public class RepairPoint extends Block{
             entity.target = Units.getClosest(tile.getTeam(), tile.drawx(), tile.drawy(), repairRadius,
                     unit -> unit.health < unit.maxHealth());
         }
+    }
+
+    @Override
+    public boolean shouldConsume(Tile tile) {
+        RepairPointEntity entity = tile.entity();
+
+        return entity.target != null;
     }
 
     @Override

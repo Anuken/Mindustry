@@ -94,7 +94,7 @@ public class BlockConsumeFragment extends Fragment {
 
                 table.table("inventory", c::buildTooltip).visible(() -> hovered[0]).height(scale * 10 + 6).padBottom(-4).right().update(t -> {
                     if(t.getChildren().size == 0) t.remove();
-                });
+                }).get().act(0);
 
                 Table result = table.table(out -> {
                     out.addImage(c.getIcon()).size(10*scale).color(Color.DARK_GRAY).padRight(-10*scale).padBottom(-scale*2);

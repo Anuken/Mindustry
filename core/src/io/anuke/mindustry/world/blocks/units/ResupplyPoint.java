@@ -27,7 +27,6 @@ public class ResupplyPoint extends Block{
 
     protected float supplyRadius = 50f;
     protected float supplyInterval = 10f;
-    protected float powerUsage = 0.2f;
 
     public ResupplyPoint(String name) {
         super(name);
@@ -38,6 +37,8 @@ public class ResupplyPoint extends Block{
         hasItems = true;
         hasPower = true;
         powerCapacity = 20f;
+
+        consumes.power(0.02f);
     }
 
     @Override
@@ -98,10 +99,7 @@ public class ResupplyPoint extends Block{
             entity.rotation = Mathf.slerpDelta(entity.rotation, entity.angleTo(entity.target), 0.5f);
         }
 
-        float powerUse = Math.min(Timers.delta() * powerUsage, powerCapacity);
-
-        if(entity.target != null && entity.power.amount >= powerUse){
-            entity.power.amount -= powerUse;
+        if(entity.target != null && entity.cons.valid()){
             entity.lastx = entity.target.x;
             entity.lasty = entity.target.y;
             entity.strength = Mathf.lerpDelta(entity.strength, 1f, 0.08f * Timers.delta());

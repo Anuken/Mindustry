@@ -22,6 +22,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.headless;
+
 public class GenericCrafter extends Block{
 	protected final int timerDump = timers++;
 	
@@ -96,6 +99,12 @@ public class GenericCrafter extends Block{
 		if(entity.progress >= 1f){
 			
 			if(consumes.has(ConsumeItem.class)) tile.entity.items.remove(consumes.item(), consumes.itemAmount());
+
+			//unlock output item
+			if(!headless){
+				control.database().unlockContent(output);
+			}
+
 			offloadNear(tile, output);
 			Effects.effect(craftEffect, tile.drawx(), tile.drawy());
 			entity.progress = 0f;
