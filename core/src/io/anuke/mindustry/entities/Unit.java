@@ -228,7 +228,9 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
             x += velocity.x / getMass() * Timers.delta();
             y += velocity.y / getMass() * Timers.delta();
 
-            elevation = Mathf.lerpDelta(elevation, tile.elevation, 0.04f);
+            if(tile != null){
+                elevation = Mathf.lerpDelta(elevation, tile.elevation, 0.04f);
+            }
         }else{
             boolean onLiquid = floor.isLiquid;
 

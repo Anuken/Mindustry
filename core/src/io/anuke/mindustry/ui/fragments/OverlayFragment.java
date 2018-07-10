@@ -7,6 +7,7 @@ import io.anuke.ucore.scene.Group;
 public class OverlayFragment extends Fragment{
     public final BlockInventoryFragment inv;
     public final BlockConfigFragment config;
+    public final BlockConsumeFragment consume;
 
     private Group group = new Group();
     private InputHandler input;
@@ -16,6 +17,7 @@ public class OverlayFragment extends Fragment{
 
         inv = new BlockInventoryFragment(input);
         config = new BlockConfigFragment(input);
+        consume = new BlockConsumeFragment();
     }
 
     @Override
@@ -25,6 +27,7 @@ public class OverlayFragment extends Fragment{
 
         inv.build(group);
         config.build(group);
+        consume.build(group);
 
         input.buildUI(group);
     }

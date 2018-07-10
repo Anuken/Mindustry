@@ -1,8 +1,12 @@
 package io.anuke.mindustry.world.consumers;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.BlockStats;
+import io.anuke.ucore.scene.ui.Tooltip;
+import io.anuke.ucore.scene.ui.layout.Table;
 
 public abstract class Consume {
     private boolean optional;
@@ -26,8 +30,22 @@ public abstract class Consume {
         return update;
     }
 
-    public void draw(TileEntity entity){
+    public void build(Table table){
+        Table t = new Table("clear");
+        t.margin(4);
+        buildTooltip(t);
 
+        table.table("clear", out -> {
+            out.addImage(getIcon()).size(10*4).color(Color.RED);
+        }).size(10*4).get().addListener(new Tooltip<>(t));
+    }
+
+    public void buildTooltip(Table table){
+        table.add("no " + ClassReflection.getSimpleName(getClass()).replace("Consume", ""));
+    }
+
+    public String getIcon(){
+        return "icon-power";
     }
 
     public abstract void update(Block block, TileEntity entity);

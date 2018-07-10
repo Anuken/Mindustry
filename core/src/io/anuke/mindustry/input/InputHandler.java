@@ -101,8 +101,7 @@ public abstract class InputHandler extends InputAdapter{
 	boolean tileTapped(Tile tile){
 		tile = tile.target();
 
-		boolean consumed = false;
-		boolean showedInventory = false;
+		boolean consumed = false, showedInventory = false, showedConsume = false;
 
 		//check if tapped block is configurable
 		if(tile.block().configurable && tile.getTeam() == player.getTeam()){
@@ -129,15 +128,27 @@ public abstract class InputHandler extends InputAdapter{
 		//consume tap event if necessary
 		if(tile.getTeam() == player.getTeam() && tile.block().consumesTap){
 			consumed = true;
-		}else if(tile.getTeam() == player.getTeam() && tile.block().synthetic() && tile.block().hasItems && tile.entity.items.total() > 0 && !consumed){
-			frag.inv.showFor(tile);
-			consumed = true;
-			showedInventory = true;
+		}else if(tile.getTeam() == player.getTeam() && tile.block().synthetic() && !consumed) {
+			if(tile.block().hasItems && tile.entity.items.total() > 0) {
+				frag.inv.showFor(tile);
+				consumed = true;
+				showedInventory = true;
+			}
+
+			if(tile.block().consumes.hasAny()){
+				frag.consume.show(tile);
+				consumed = true;
+				showedConsume = true;
+			}
 		}
 
 		if(!showedInventory){
 			frag.inv.hide();
 		}
+
+        if(!showedConsume){
+            frag.consume.hide();
+        }
 
 		return consumed;
 	}
@@ -166,7 +177,8 @@ public abstract class InputHandler extends InputAdapter{
 	}
 
 	boolean canMine(Tile tile){
-		return tile.floor().drops != null && tile.floor().drops.item.hardness <= player.mech.drillPower
+		return !ui.hasMouse()
+				&& tile.floor().drops != null && tile.floor().drops.item.hardness <= player.mech.drillPower
 				&& !tile.floor().playerUnmineable
 				&& player.inventory.canAcceptItem(tile.floor().drops.item)
 				&& Units.getClosestEnemy(player.getTeam(), tile.worldx(), tile.worldy(), 40f, e -> true) == null //don't being mining when an enemy is near
