@@ -4,8 +4,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Base64Coder;
 import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.scene.ui.TextField;
 
@@ -87,7 +85,6 @@ public abstract class Platform {
 			@Override public void stop() {}
 			@Override public void notify(Object object) {}
 			@Override public void wait(Object object) {}
-			@Override public <T extends Entity> void switchContainer(EntityGroup<T> group) {}
 		};
 	}
 
