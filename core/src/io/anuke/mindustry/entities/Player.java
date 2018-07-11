@@ -374,7 +374,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 			float wobblyness = 0.6f;
 			trail.update(x + Angles.trnsx(rotation + 180f, 5f) + Mathf.range(wobblyness),
 					y + Angles.trnsy(rotation + 180f, 5f) + Mathf.range(wobblyness));
-	    	trail.draw(mech.trailColor, mech.trailColor, 5f * (isFlying() ? 1f : boostHeat));
+	    	trail.draw(mech.trailColor, 5f * (isFlying() ? 1f : boostHeat));
 		}else{
 	    	trail.clear();
 		}

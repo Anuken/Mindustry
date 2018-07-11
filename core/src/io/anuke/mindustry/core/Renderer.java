@@ -253,7 +253,7 @@ public class Renderer extends RendererModule{
 	}
 
 	private void drawFlyerShadows(){
-		Graphics.surface(effectSurface);
+		Graphics.surface(effectSurface, true, false);
 
 		float trnsX = 12, trnsY = -13;
 
@@ -263,12 +263,12 @@ public class Renderer extends RendererModule{
 
 		for(EntityGroup<? extends BaseUnit> group : unitGroups){
 			if(!group.isEmpty()){
-				drawAndInterpolate(group, Unit::isFlying, Unit::drawShadow);
+				drawAndInterpolate(group, unit -> unit.isFlying() && !unit.isDead(), Unit::drawShadow);
 			}
 		}
 
 		if(!playerGroup.isEmpty()){
-			drawAndInterpolate(playerGroup, Unit::isFlying, Unit::drawShadow);
+			drawAndInterpolate(playerGroup, unit -> unit.isFlying() && !unit.isDead(), Unit::drawShadow);
 		}
 
 		Graphics.end();

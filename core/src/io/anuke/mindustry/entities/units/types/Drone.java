@@ -149,7 +149,7 @@ public class Drone extends FlyingUnit implements BuilderTrait {
 
     @Override
     public void drawOver() {
-        trail.draw(Palette.lightTrail, Palette.lightTrail, 3f);
+        trail.draw(Palette.lightTrail, 3f);
 
         TargetTrait entity = target;
 

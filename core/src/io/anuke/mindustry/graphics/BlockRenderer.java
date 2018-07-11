@@ -57,7 +57,7 @@ public class BlockRenderer{
 
 		int expandr = 4;
 		
-		Graphics.surface(renderer.effectSurface);
+		Graphics.surface(renderer.effectSurface, true, false);
 
 		int avgx = Mathf.scl(camera.position.x, tilesize);
 		int avgy = Mathf.scl(camera.position.y, tilesize);

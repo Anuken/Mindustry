@@ -76,7 +76,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
 
     @Override
     public void drawOver() {
-        trail.draw(Palette.lightTrail, Palette.lightTrail, 5f);
+        trail.draw(Palette.lightTrail, 5f);
     }
 
     @Override

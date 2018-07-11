@@ -40,7 +40,8 @@ public class Trail {
         points.clear();
     }
 
-    public synchronized void draw(Color start, Color end, float stroke){
+    public synchronized void draw(Color color, float stroke){
+        Draw.color(color);
 
         for(int i = 0; i < points.size - 2; i += 2){
             float x = points.get(i);
@@ -49,8 +50,6 @@ public class Trail {
             float y2 = points.get(i + 3);
             float s = Mathf.clamp((float)(i) / points.size);
 
-            Draw.color(start, end, s);
-
             Lines.stroke(s * stroke);
             Lines.line(x, y, x2, y2);
         }
@@ -58,8 +57,6 @@ public class Trail {
         if(points.size >= 2){
             Fill.circle(points.get(points.size-2), points.get(points.size-1), stroke/2f);
         }
-
-        Draw.color(start);
 
         Draw.reset();
     }
