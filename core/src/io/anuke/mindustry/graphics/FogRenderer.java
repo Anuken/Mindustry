@@ -1,5 +1,6 @@
 package io.anuke.mindustry.graphics;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
@@ -122,8 +123,8 @@ public class FogRenderer implements Disposable{
         renderer.pixelSurface.getBuffer().end();
         Graphics.shader();
 
-        Graphics.begin();
-        Core.batch.draw(renderer.pixelSurface.texture(), px, py + vh, vw, -vh);
+        Graphics.setScreen();
+        Core.batch.draw(renderer.pixelSurface.texture(), 0, Gdx.graphics.getHeight(), Gdx.graphics.getWidth(), -Gdx.graphics.getHeight());
         Graphics.end();
 
         if(Core.batch instanceof ClipSpriteBatch){
