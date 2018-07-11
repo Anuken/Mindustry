@@ -41,6 +41,7 @@ public interface CarryTrait extends TeamTrait, SolidTrait, TargetTrait{
 
     @Remote(called = Loc.both, targets = Loc.both, forward = true, in = In.entities)
     static void setCarryOf(Player player, CarryTrait trait, CarriableTrait unit){
+        if(trait == null) return;
         if(player != null){ //when a server recieves this called from a player, set the carrier to the player.
             trait = player;
         }

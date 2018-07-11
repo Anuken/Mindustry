@@ -473,7 +473,9 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 			updateMech();
 		}
 
-		avoidOthers(8f);
+		if(isLocal) {
+			avoidOthers(8f);
+		}
 
 		if(!isShooting()) {
 			updateBuilding(this);

@@ -199,7 +199,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void avoidOthers(float avoidRange){
-        if(Net.client()) return;
 
         EntityPhysics.getNearby(getGroup(), x, y, avoidRange*2f, t -> {
             if(t == this || (t instanceof Unit && (((Unit) t).isDead() || (((Unit) t).isFlying() != isFlying()) || ((Unit) t).getCarrier() == this) || getCarrier() == t)) return;

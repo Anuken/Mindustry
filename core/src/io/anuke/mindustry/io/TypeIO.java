@@ -106,6 +106,7 @@ public class TypeIO {
     public static void writeCarry(ByteBuffer buffer, CarryTrait unit){
         if(unit == null){
             buffer.put((byte)-1);
+            return;
         }
         buffer.put((byte)unit.getGroup().getID());
         buffer.putInt(unit.getID());
@@ -123,7 +124,7 @@ public class TypeIO {
 
     @WriteClass(BaseUnit.class)
     public static void writeBaseUnit(ByteBuffer buffer, BaseUnit unit){
-        buffer.put((byte)unit.getGroup().getID());
+        buffer.put((byte)unitGroups[unit.getTeam().ordinal()].getID());
         buffer.putInt(unit.getID());
     }
 

@@ -250,7 +250,7 @@ public class NetClient extends Module {
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
-    public static void onSnapshot(byte[] chunk, int snapshotID, short chunkID, short totalLength, int base){
+    public static void onSnapshot(byte[] chunk, int snapshotID, short chunkID, int totalLength, int base){
         if(NetServer.showSnapshotSize) Log.info("Recieved snapshot: len {0} ID {1} chunkID {2} totalLength {3} base {4} client-base {5}", chunk.length, snapshotID, chunkID, totalLength, base, netClient.lastSnapshotBaseID);
 
         //skip snapshot IDs that have already been recieved OR snapshots that are too far in front

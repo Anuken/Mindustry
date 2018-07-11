@@ -283,7 +283,9 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 			return;
 		}
 
-		avoidOthers(8f);
+		if(!Net.client()){
+			avoidOthers(8f);
+		}
 
 		if(squad != null){
 			squad.update();

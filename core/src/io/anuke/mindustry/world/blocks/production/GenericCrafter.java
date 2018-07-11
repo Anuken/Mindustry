@@ -27,16 +27,9 @@ import static io.anuke.mindustry.Vars.headless;
 
 public class GenericCrafter extends Block{
 	protected final int timerDump = timers++;
-	
-	/**Can be null. If you use this, make sure to set hasItems to true!*/
-	//protected ItemStack inputItem;
-	/**Can be null. If you use this, make sure to set hasLiquids to true!*/
-	//protected Liquid inputLiquid;
-	/**Required.*/
+
 	protected Item output;
 	protected float craftTime = 80;
-	//protected float powerUse;
-	//protected float liquidUse;
 	protected Effect craftEffect = BlockFx.purify;
 	protected Effect updateEffect = Fx.none;
 	protected float updateEffectChance = 0.04f;

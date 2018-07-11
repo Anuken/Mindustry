@@ -449,7 +449,7 @@ public class NetServer extends Module{
     /**Sends a raw byte[] snapshot to a client, splitting up into chunks when needed.*/
     private static void sendSplitSnapshot(int userid, byte[] bytes, int snapshotID, int base){
         if(bytes.length < maxSnapshotSize){
-            Call.onSnapshot(userid, bytes, snapshotID, (short)0, (short)bytes.length, base);
+            Call.onSnapshot(userid, bytes, snapshotID, (short)0, bytes.length, base);
         }else{
             int remaining = bytes.length;
             int offset = 0;
@@ -464,7 +464,7 @@ public class NetServer extends Module{
                 }else {
                     toSend = Arrays.copyOfRange(bytes, offset, Math.min(offset + maxSnapshotSize, bytes.length));
                 }
-                Call.onSnapshot(userid, toSend, snapshotID, (short)chunkid, (short)bytes.length, base);
+                Call.onSnapshot(userid, toSend, snapshotID, (short)chunkid, bytes.length, base);
 
                 remaining -= used;
                 offset += used;
