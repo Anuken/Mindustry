@@ -132,8 +132,8 @@ public class WorldGenerator {
 					for(int i = ores.size-1; i >= 0; i --){
 						OreEntry entry = ores.get(i);
 						if(entry.noise.octaveNoise2D(1, 0.7, 1f / (4 + i*2), x, y)/4f +
-								Math.abs(0.5f-entry.noise.octaveNoise2D(2, 0.7, 1f / (50 + i*2), x, y)) > 0.5f &&
-								Math.abs(0.5f-entry.noise.octaveNoise2D(1, 1, 1f / (55 + i*4), x, y)) > 0.25f){
+								Math.abs(0.5f-entry.noise.octaveNoise2D(2, 0.7, 1f / (50 + i*2), x, y)) > 0.48f &&
+								Math.abs(0.5f-entry.noise.octaveNoise2D(1, 1, 1f / (55 + i*4), x, y)) > 0.22f){
 							tile.setFloor((Floor) OreBlocks.get(tile.floor(), entry.item));
 							break;
 						}
