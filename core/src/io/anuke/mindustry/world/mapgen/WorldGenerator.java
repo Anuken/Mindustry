@@ -131,9 +131,9 @@ public class WorldGenerator {
 
 					for(int i = ores.size-1; i >= 0; i --){
 						OreEntry entry = ores.get(i);
-						if(entry.noise.octaveNoise2D(2, 0.7, 1f / (2 + i*2), x, y)/2f +
-								entry.ridge.getValue(x, y, 1f / (28 + i*4)) >= 2.0f - entry.frequency*4.0f
-								&& entry.ridge.getValue(x+9999, y+9999, 1f/100f) > 0.4){
+						if(entry.noise.octaveNoise2D(1, 0.7, 1f / (4 + i*2), x, y)/4f +
+								Math.abs(0.5f-entry.noise.octaveNoise2D(2, 0.7, 1f / (50 + i*2), x, y)) > 0.5f &&
+								Math.abs(0.5f-entry.noise.octaveNoise2D(1, 1, 1f / (55 + i*4), x, y)) > 0.25f){
 							tile.setFloor((Floor) OreBlocks.get(tile.floor(), entry.item));
 							break;
 						}
@@ -166,7 +166,7 @@ public class WorldGenerator {
 				Block wall = Blocks.air;
 
 				double elevation = sim.octaveNoise2D(3, 0.5, 1f/100, x, y) * 4.1 - 1;
-				double temp = sim3.octaveNoise2D(7, 0.53, 1f/320f, x, y);
+				double temp = sim3.octaveNoise2D(7, 0.54, 1f/320f, x, y);
 
 				double r = sim2.octaveNoise2D(1, 0.6, 1f/70, x, y);
 				double edgeDist = Math.max(width/2, height/2) - Math.max(Math.abs(x - width/2), Math.abs(y - height/2));

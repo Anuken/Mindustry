@@ -662,6 +662,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
 	/**Resets all values of the player.*/
 	public void reset(){
+		status.clear();
 		team = Team.blue;
 		inventory.clear();
 		placeQueue.clear();

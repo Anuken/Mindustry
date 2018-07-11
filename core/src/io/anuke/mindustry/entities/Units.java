@@ -19,6 +19,9 @@ import static io.anuke.mindustry.Vars.*;
 public class Units {
     private static Rectangle rect = new Rectangle();
     private static Rectangle hitrect = new Rectangle();
+    private static Unit result;
+    private static float cdist;
+    private static boolean boolResult;
 
     /**Validates a target.
      * @param target The target to validate
@@ -49,20 +52,20 @@ public class Units {
         rect.setSize(type.size * tilesize, type.size * tilesize);
         rect.setCenter(tile.drawx(), tile.drawy());
 
-        boolean[] value = new boolean[1];
+        boolResult = false;
 
         Units.getNearby(rect, unit -> {
-            if (value[0]) return;
+            if (boolResult) return;
             if (!unit.isFlying()) {
                 unit.getHitbox(hitrect);
 
                 if (hitrect.overlaps(rect)) {
-                    value[0] = true;
+                    boolResult = true;
                 }
             }
         });
 
-        return value[0];
+        return boolResult;
     }
 
     /**Returns whether there are any entities on this tile, with the hitbox expanded.*/
@@ -138,8 +141,8 @@ public class Units {
 
     /**Returns the closest enemy of this team. Filter by predicate.*/
     public static Unit getClosestEnemy(Team team, float x, float y, float range, Predicate<Unit> predicate){
-        Unit[] result = {null};
-        float[] cdist = {0};
+        result = null;
+        cdist = 0f;
 
         rect.setSize(range*2f).setCenter(x, y);
 
@@ -149,20 +152,20 @@ public class Units {
 
             float dist = Vector2.dst(e.x, e.y, x, y);
             if (dist < range) {
-                if (result[0] == null || dist < cdist[0]) {
-                    result[0] = e;
-                    cdist[0] = dist;
+                if (result == null || dist < cdist) {
+                    result = e;
+                    cdist = dist;
                 }
             }
         });
 
-        return result[0];
+        return result;
     }
 
     /**Returns the closest ally of this team. Filter by predicate.*/
     public static Unit getClosest(Team team, float x, float y, float range, Predicate<Unit> predicate){
-        Unit[] result = {null};
-        float[] cdist = {0};
+        result = null;
+        cdist = 0f;
 
         rect.setSize(range*2f).setCenter(x, y);
 
@@ -172,14 +175,14 @@ public class Units {
 
             float dist = Vector2.dst(e.x, e.y, x, y);
             if (dist < range) {
-                if (result[0] == null || dist < cdist[0]) {
-                    result[0] = e;
-                    cdist[0] = dist;
+                if (result == null || dist < cdist) {
+                    result = e;
+                    cdist = dist;
                 }
             }
         });
 
-        return result[0];
+        return result;
     }
 
     /**Iterates over all units in a rectangle.*/
