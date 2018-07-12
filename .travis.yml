@@ -12,6 +12,7 @@ android:
     - extra-google-m2repository
     - extra-android-m2repository
     - addon-google_apis-google-27
+    - build-tools-27.0.3
 
 script: 
     - ./gradlew desktop:dist
