@@ -542,7 +542,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		pointerY = vec.y;
 		updateShooting();
 
-		movement.limit(speed);
+		movement.limit(speed * Timers.delta());
 
 		if(getCarrier() == null){
 			velocity.add(movement);
@@ -751,13 +751,12 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 	public void write(DataOutput buffer) throws IOException {
 		super.writeSave(buffer, !isLocal);
 		buffer.writeUTF(name); //TODO writing strings is very inefficient
-		buffer.writeBoolean(isAdmin);
+		buffer.writeByte(Bits.toByte(isAdmin) | (Bits.toByte(dead) << 1) | (Bits.toByte(isBoosting) << 2));
 		buffer.writeInt(Color.rgba8888(color));
-		buffer.writeBoolean(dead);
 		buffer.writeByte(mech.id);
-		buffer.writeBoolean(isBoosting);
 		buffer.writeInt(mining == null ? -1 : mining.packedPosition());
 		buffer.writeInt(spawner);
+		buffer.writeShort((short)(baseRotation * 2));
 
 		writeBuilding(buffer);
 	}
@@ -767,17 +766,19 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		float lastx = x, lasty = y, lastrot = rotation;
 		super.readSave(buffer);
 		name = buffer.readUTF();
-		isAdmin = buffer.readBoolean();
+		byte bools = buffer.readByte();
+		isAdmin = (bools & 1) != 0;
+		dead = (bools & 2) != 0;
+		boolean boosting = (bools & 4) != 0;
 		color.set(buffer.readInt());
-		dead = buffer.readBoolean();
 		mech = Upgrade.getByID(buffer.readByte());
-		boolean boosting = buffer.readBoolean();
 		int mine = buffer.readInt();
 		spawner = buffer.readInt();
+		float baseRotation = buffer.readShort()/2f;
 
 		readBuilding(buffer, !isLocal);
 
-		interpolator.read(lastx, lasty, x, y, time, rotation);
+		interpolator.read(lastx, lasty, x, y, time, rotation, baseRotation);
 		rotation = lastrot;
 
 		if(isLocal){

@@ -1,7 +1,7 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Log;
@@ -10,7 +10,7 @@ import static io.anuke.mindustry.Vars.control;
 import static io.anuke.mindustry.Vars.logic;
 
 public class ThreadHandler {
-    private final Array<Runnable> toRun = new Array<>();
+    private final Queue<Runnable> toRun = new Queue<>();
     private final ThreadProvider impl;
     private float delta = 1f;
     private float smoothDelta = 1f;
@@ -33,7 +33,7 @@ public class ThreadHandler {
     public void run(Runnable r){
         if(enabled) {
             synchronized (toRun) {
-                toRun.add(r);
+                toRun.addLast(r);
             }
         }else{
             r.run();
@@ -51,7 +51,7 @@ public class ThreadHandler {
     public void runDelay(Runnable r){
         if(enabled) {
             synchronized (toRun) {
-                toRun.add(r);
+                toRun.addLast(r);
             }
         }else{
             Gdx.app.postRunnable(r);
@@ -103,7 +103,7 @@ public class ThreadHandler {
     }
 
     public boolean doInterpolate(){
-        return enabled && Math.abs(Gdx.graphics.getFramesPerSecond() - getTPS()) > 15;
+        return enabled && Gdx.graphics.getFramesPerSecond() - getTPS() > 20 && getTPS() < 30;
     }
 
     public boolean isOnThread(){
@@ -119,13 +119,12 @@ public class ThreadHandler {
                     Runnable r;
                     synchronized (toRun){
                         if(toRun.size > 0){
-                            r = toRun.pop();
+                            r = toRun.removeFirst();
                         }else{
-                            r = null;
+                            break;
                         }
                     }
 
-                    if(r == null) break;
                     r.run();
                 }
 

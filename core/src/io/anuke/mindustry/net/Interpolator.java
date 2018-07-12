@@ -38,11 +38,12 @@ public class Interpolator {
 
     public void update(){
 
+        /*
         if(pos.dst(target) > 128){
             pos.set(target);
             lastUpdated = 0;
             updateSpacing = 16;
-        }
+        }*/
 
         if(lastUpdated != 0 && updateSpacing != 0){
             float timeSinceUpdate = TimeUtils.timeSinceMillis(lastUpdated);

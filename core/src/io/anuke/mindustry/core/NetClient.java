@@ -1,5 +1,6 @@
 package io.anuke.mindustry.core;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.IntSet;
@@ -175,7 +176,7 @@ public class NetClient extends Module {
         ui.loadfrag.hide();
         ui.join.hide();
         Net.setClientLoaded(true);
-        Call.connectConfirm();
+        Gdx.app.postRunnable(Call::connectConfirm);
         Timers.runTask(40f, Platform.instance::updateRPC);
     }
 
