@@ -245,11 +245,11 @@ public class Renderer extends RendererModule{
 			fog.draw();
 		}
 
-		batch.begin();
+		Graphics.beginCam();
 		EntityDraw.setClip(false);
 		drawAndInterpolate(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
 		EntityDraw.setClip(true);
-		batch.end();
+		Graphics.end();
 	}
 
 	private void drawFlyerShadows(){
